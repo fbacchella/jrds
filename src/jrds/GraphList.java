@@ -1,7 +1,7 @@
 /*
  * Created on 16 févr. 2005
  *
- * TODO 
+ * TODO
  */
 package jrds;
 
@@ -18,16 +18,16 @@ import org.apache.log4j.Logger;
 
 
 /**
- * @author bacchell
- *
- * TODO 
+ * Used to generate a tree of all graphs
+ * @author Fabrice Bacchella
+ * @version $Revision$
  */
 public class GraphList extends HttpServlet {
 	static final private Logger logger = JrdsLogger.getLogger(GraphList.class);
-	
+
 	static final HostsList hl = HostsList.getRootGroup() ;
-	
-	/* (non-Javadoc)
+
+	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
 	protected void doGet(HttpServletRequest req, HttpServletResponse res)
@@ -45,18 +45,18 @@ public class GraphList extends HttpServlet {
 		writer.println("\t\t<title>Liste des choix</title>");
 		writer.println("\t</head>");
 		writer.println("\t<body>");
-						
+
 		GraphTreeNode node = hl.getNodeByPath(req.getPathInfo());
 		if(node != null) {
 			Collection allGraphs = node.enumerateChildsGraph();
 			for(Iterator i = allGraphs.iterator(); i.hasNext() ;) {
 				RdsGraph graph = (RdsGraph) i.next();
 				writer.println(Graph.getImgElement(graph, req, beginString, endString));
-				
+
 			}
 		}
 		writer.println("\t</body>");
 		writer.println("</html>");
-		
+
 	}
 }
