@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd"> 
+<web-app> 
+	<display-name>jrds</display-name>
+	<listener>
+		<listener-class>jrds.StartListener</listener-class>
+	</listener>
+	<servlet> 
+		<servlet-name>Graph</servlet-name> 
+		<servlet-class>jrds.Graph</servlet-class> 
+	</servlet> 
+	<servlet>
+		<servlet-name>GraphList</servlet-name> 
+		<servlet-class>jrds.GraphList</servlet-class> 
+	</servlet>
+	<servlet-mapping> 
+		<servlet-name>Graph</servlet-name> 
+		<url-pattern>/graph</url-pattern> 
+	</servlet-mapping>
+	<servlet-mapping> 
+		<servlet-name>GraphList</servlet-name> 
+		<url-pattern>/graphlist/*</url-pattern> 
+	</servlet-mapping>
+	<taglib>
+		<taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
+		<taglib-location>/WEB-INF/c.tld</taglib-location>
+    </taglib>
+</web-app>
