@@ -1,5 +1,5 @@
 /*
- * Created on 28 dc. 2004
+ * Created on 28 déc. 2004
  *
  * TODO
  */
