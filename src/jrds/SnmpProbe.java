@@ -33,23 +33,23 @@ public abstract class SnmpProbe extends Probe {
 	private Map nameMap = null;
 	private SnmpRequester requester;
 
-	public SnmpProbe(RdsHost monitoredHost, ProbeDesc pd) 
+	public SnmpProbe(RdsHost monitoredHost, ProbeDesc pd)
 	{
 		super(monitoredHost, pd);
 		if(nameMap == null)
 			nameMap = getPd().getOidNameMap();
 		requester = getSnmpRequester();
 	}
-	
+
 	protected SnmpRequester getSnmpRequester() {
-		return SnmpRequester.SIMPLE;
-	}
-	
+		return getPd().getRequester();
+  	}
+
 	private Map initNameMap()
 	{
 		return getPd().getOidNameMap();
 	}
-	
+
 	public Map getOidNameMap()
 	{
 		if(nameMap == null)
@@ -58,8 +58,8 @@ public abstract class SnmpProbe extends Probe {
 	}
 
 	protected abstract Set getOidSet();
-	
-	
+
+
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.Probe#getNewSampleValues()
 	 */
@@ -71,7 +71,7 @@ public abstract class SnmpProbe extends Probe {
 		}
 		return retValue;
 	}
-	
+
 	/**
 	 *  Prepare the SnmpVars to be stored by a probe
 	 * @param snmpVars

@@ -3,18 +3,12 @@
  */
 package jrds;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import org.apache.log4j.Logger;
-import org.jrobin.core.DsDef;
-import org.jrobin.core.RrdException;
-import org.snmp4j.smi.OID;
+import org.apache.log4j.*;
+import org.jrobin.core.*;
+import org.snmp4j.smi.*;
+import jrds.snmp.SnmpRequester;
 
 
 
@@ -23,22 +17,22 @@ import org.snmp4j.smi.OID;
  * It's purpose is to make the description of a probe easier to read or write.
  * @author bacchell
  *
- * TODO 
+ * TODO
  */
 public class ProbeDesc implements Cloneable {
 	static final private Logger logger = JrdsLogger.getLogger(ProbeDesc.class);
-	
+
 	private static final class DsType {
 		private String id;
 		private DsType(String id) { this.id = id ;}
 		public String toString() { return id;}
 		static public final DsType NONE = new DsType("NONE");
 		static public final DsType COUNTER = new DsType("COUNTER");
-		static public final DsType GAUGE = new DsType("GAUGE");			
-		static public final DsType DERIVE = new DsType("DERIVE");			
-		static public final DsType ABSOLUTE = new DsType("ABSOLUTE");			
+		static public final DsType GAUGE = new DsType("GAUGE");
+		static public final DsType DERIVE = new DsType("DERIVE");
+		static public final DsType ABSOLUTE = new DsType("ABSOLUTE");
 	};
-	
+
 	static public final DsType NONE = DsType.NONE;
 	static public final DsType COUNTER = DsType.COUNTER;
 	static public final DsType GAUGE = DsType.GAUGE;
@@ -47,9 +41,9 @@ public class ProbeDesc implements Cloneable {
 	static public final double MINDEFAULT = 0;
 	static public final double MAXDEFAULT = Double.NaN;
 	static public final long HEARTBEATDEFAULT = 600;
-	
-	
-	
+
+
+
 	private Map dsMap;
 	private String rrdName;
 	private Collection namedProbesNames;
@@ -58,7 +52,8 @@ public class ProbeDesc implements Cloneable {
 	private boolean readOnly = false;
 	private OID indexOid = null;
 	private boolean asynchronous = false;
-	
+        private SnmpRequester requester = SnmpRequester.RAW;
+
 	private final class DsDesc {
 		//public String dsName;
 		//public String namedProbeName;
@@ -80,7 +75,7 @@ public class ProbeDesc implements Cloneable {
 			this.maxValue = maxValue;
 		}
 	}
-	
+
 	/**
 	 * Create a new Probe Description, with <it>size<it> elements in prevision
 	 * @param size estimated elements number
@@ -88,14 +83,14 @@ public class ProbeDesc implements Cloneable {
 	public ProbeDesc(int size) {
 		dsMap = new HashMap(size);
 	}
-	
+
 	/**
 	 * Create a new Probe Description
 	 */
 	public ProbeDesc() {
 		dsMap = new HashMap();
 	}
-	
+
 	//Differets way to add a munins probe
 	/**
 	 * A datastore that is stored but not collected
@@ -106,14 +101,14 @@ public class ProbeDesc implements Cloneable {
 	{
 		dsMap.put(name, new DsDesc(dsType, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, null));
 	}
-	
+
 	public void add(String dsName, DsType dsType, String probeName)
 	{
 		dsMap.put(dsName, new DsDesc(dsType, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, probeName));
 	}
-	
+
 	/** Add a SNMP probe what will be stored
-	 * @param name 
+	 * @param name
 	 * @param dsType
 	 * @param oid
 	 */
@@ -140,7 +135,7 @@ public class ProbeDesc implements Cloneable {
 	 * Return a map that translate an OID to the datastore name
 	 * @return a Map of oid to datastore name
 	 */
-	public Map getOidNameMap() 
+	public Map getOidNameMap()
 	{
 		Map retValue = new HashMap(dsMap.size());
 		for(Iterator i = dsMap.entrySet().iterator(); i.hasNext() ;) {
@@ -151,7 +146,7 @@ public class ProbeDesc implements Cloneable {
 		}
 		return retValue;
 	}
-	
+
 	/**
 	 * Return a map that translate an String probe name to the datastore name
 	 * @return a Map of probe name to datastore name
@@ -167,7 +162,7 @@ public class ProbeDesc implements Cloneable {
 		}
 		return retValue;
 	}
-	
+
 	public Map getDsNameMap() {
 		Map retValue = new HashMap(dsMap.size());
 		for(Iterator i = dsMap.entrySet().iterator(); i.hasNext() ;) {
@@ -178,7 +173,7 @@ public class ProbeDesc implements Cloneable {
 		}
 		return retValue;
 	}
-	
+
 	public DsDef[] getDsDefs() throws RrdException
 	{
 		List dsList = new ArrayList(dsMap.size());
@@ -191,26 +186,26 @@ public class ProbeDesc implements Cloneable {
 		}
 		return (DsDef[]) dsList.toArray(new DsDef[dsList.size()]);
 	}
-	
+
 	public int getSize()
 	{
 		return dsMap.size();
 	}
-	
+
 	/**
 	 * @return Returns the rrdName.
 	 */
 	public String getRrdName() {
 		return rrdName;
 	}
-	
+
 	/**
 	 * @param rrdName The rrdName to set.
 	 */
 	public void setRrdName(String rrdName) {
 		if(cloned || ! readOnly )
 			this.rrdName = rrdName;
-		else 
+		else
 			logger.error("RRD name tried to be set twice");
 	}
 	/**
@@ -223,14 +218,14 @@ public class ProbeDesc implements Cloneable {
 	public void setNamedProbesNames(Collection muninsProbesNames) {
 		if(cloned || ! readOnly )
 			this.namedProbesNames = muninsProbesNames;
-		else 
+		else
 			logger.error("munins probe name tried to be set twice");
 	}
 
 	public void setMuninsProbesNames(String[] muninsProbesNames) {
 		if(cloned || ! readOnly )
 			this.namedProbesNames = Arrays.asList(muninsProbesNames);
-		else 
+		else
 			logger.error("munins probe name tried to be set twice");
 	}
 	/**
@@ -239,37 +234,37 @@ public class ProbeDesc implements Cloneable {
 	public Collection getGraphClasses() {
 		return graphClasses;
 	}
-	
+
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
 	public void setGraphClasses(Collection graphClasses) {
 		if(cloned || ! readOnly )
 			this.graphClasses = graphClasses;
-		else 
+		else
 			logger.error("graph classes tried to be set twice");
 	}
-	
+
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
 	public void setGraphClasses(Object[] graphClasses) {
 		if(cloned || ! readOnly )
 			this.graphClasses = Arrays.asList(graphClasses);
-		else 
+		else
 			logger.error("graph classes tried to be set twice");
 	}
-	
+
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
 	public void setGraphClasses(Class[] graphClasses) {
 		if(cloned || ! readOnly )
 			this.graphClasses = Arrays.asList(graphClasses);
-		else 
+		else
 			logger.error("graph classes tried to be set twice");
 	}
-	
+
 	/**
 	 * the clone method is automaticaly called by the all thje<code>Probe</code> methods that
 	 * set an <code>ProbeDesc</code> attribue. It allow to define a static <code>ProbeDesc</code> in each
@@ -298,11 +293,20 @@ public class ProbeDesc implements Cloneable {
 	public void setIndexOid(OID index) {
 		this.indexOid = index;
 	}
-	/**
+
+    public void setRequester(SnmpRequester requester) {
+        this.requester = requester;
+    }
+
+    /**
 	 * used to verify if <code>ProbeDesc</code> as been already cloned
 	 * @return Returns the cloned.
 	 */
 	public boolean isCloned() {
 		return cloned;
 	}
+
+    public SnmpRequester getRequester() {
+        return requester;
+    }
 }
