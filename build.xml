@@ -117,13 +117,19 @@
 	<!--  ==================== A few target to run jrds ==================== -->
 	<target name="collect" depends="appjar">
 		<java  classname="jrds.standalone.Collector" fork="true">
-			<classpath refid="project.classpath" />
+			<classpath>
+				<path refid="project.classpath" />
+				<pathelement location="${build.home}/jrds.jar"/>
+			</classpath>
 		</java>
 	</target>
 	
 	<target name="graph" depends="appjar">
 		<java  classname="jrds.Grapher" fork="true">
-			<classpath refid="project.classpath" />
+			<classpath>
+				<path refid="project.classpath" />
+				<pathelement location="${build.home}/jrds.jar"/>
+			</classpath>
 		</java>
 	</target>
 
