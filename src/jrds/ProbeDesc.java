@@ -138,7 +138,7 @@ public class ProbeDesc implements Cloneable {
 
 	/**
 	 * Return a map that translate an OID to the datastore name
-	 * @return
+	 * @return a Map of oid to datastore name
 	 */
 	public Map getOidNameMap() 
 	{
@@ -154,7 +154,7 @@ public class ProbeDesc implements Cloneable {
 	
 	/**
 	 * Return a map that translate an String probe name to the datastore name
-	 * @return
+	 * @return a Map of probe name to datastore name
 	 */
 	public Map getProbesNamesMap()
 	{
