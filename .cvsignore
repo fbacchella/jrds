@@ -2,6 +2,7 @@ WEB-INF
 bak
 classes
 jrds.jpx
+lib
 .classpath
 .metadata
 .project
