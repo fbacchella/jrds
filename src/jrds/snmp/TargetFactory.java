@@ -38,6 +38,9 @@ public class TargetFactory {
 	Target target;
 	
 
+	/**
+	 * A private constructor, it's a singloton factory
+	 */
 	private TargetFactory() {
 		
 	}
@@ -119,6 +122,8 @@ public class TargetFactory {
 		catch(IllegalArgumentException ex) {
 			logger.warn("Adresse definition incorrect: " + addrStr +": " + ex.getLocalizedMessage());
 		}
+		
+		retValue.setTimeout(retValue.getTimeout() + 100 );
 		return retValue;
 	}
 	

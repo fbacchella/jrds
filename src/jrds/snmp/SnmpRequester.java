@@ -34,7 +34,7 @@ import org.snmp4j.util.TableUtils;
   */
 public abstract class SnmpRequester {
 	static private final DefaultPDUFactory factory = new DefaultPDUFactory();
-	static private final Logger logger = JrdsLogger.getLogger(SnmpRequester.class.getPackage().getName());
+	static private final Logger logger = JrdsLogger.getLogger(SnmpRequester.class);
 	static private Snmp snmp;
 	static private boolean started = false;
 
