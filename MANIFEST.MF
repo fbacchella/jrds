@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Sealed: true
+Class-Path:  SNMP4J.jar jrobin-1.4.0.jar mail.jar jconn2.jar log4j-1.2.9.jar mail.jar
+Main-Class: com.aol.Collector
