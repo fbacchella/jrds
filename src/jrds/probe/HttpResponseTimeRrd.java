@@ -55,7 +55,7 @@ public final class HttpResponseTimeRrd extends ExternalCmdProbe {
 		super(thehost, pd);
 		this.url = url;
 		this.setCmd(new String[] {pm.urlperfpath, url.toString()});
-		pd.setRrdName(initName());
+		setRrdName(initName());
 	}
 
 	protected String initName()
