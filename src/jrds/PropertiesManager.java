@@ -186,13 +186,12 @@ public class PropertiesManager {
 	
 	public void update()
 	{
-		urlperfpath = getParameter("urlperfpath",
-		"/Users/bacchell/Devl/RRDTool/Web/obj.Darwin.7.5.0.powerpc/HTTPTest");
-		configfilepath = getParameter("configfilepath", "/Users/bacchell/Devl/RRDTool/jrds/config.xml");
-		rrddir = getParameter("rrddir", "/Users/bacchell/Devl/RRDTool/jrds/probe");
+		urlperfpath = getParameter("urlperfpath","./HTTPTest");
+		configfilepath = getParameter("configfilepath", "config.xml");
+		rrddir = getParameter("rrddir", "probe");
 		servletContext = getParameter("servletContext", "/rds");
 		fileSeparator = getParameter("file.separator", "/");
-		logfile = getParameter("logfile", "/Users/bacchell/Devl/RRDTool/jrds/jrds.log");
+		logfile = getParameter("logfile", "jrds.log");
 		loglevel = Level.toLevel(getParameter("loglevel", "DEBUG"));
 		resolution = parseInteger(getParameter("resolution", "300"));
 		collectorThreads = parseInteger(getParameter("collectorThreads", "1"));
