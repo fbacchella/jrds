@@ -1,5 +1,8 @@
 package jrds;
 
+// ----------------------------------------------------------------------------
+// $Id$
+
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,44 +20,45 @@ import org.apache.log4j.Logger;
 /**
  * A servlet wich genarte a png for a graph
  * @author Fabrice Bacchella
+ * @version $Revision$
  */
 public final class Graph extends HttpServlet {
 	static final private Logger logger = JrdsLogger.getLogger(Graph.class);
-	
+
 	static final HostsList hl = HostsList.getRootGroup() ;
-	
-	/* (non-Javadoc)
+
+	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException {
 		Date begin = new Date(0);
 		Date end = new Date(0);
-		
+
 		calcDate(req.getParameter("begin"), req.getParameter("end"), begin, end);
 		//String beginString = req.getParameter("begin");
 		//Date begin = new Date(Long.parseLong(beginString));
 		//String endString = req.getParameter("end");
 		//Date end = new Date(Long.parseLong(endString));
-		
+
 		if("true".equals(req.getParameter("refresh"))) {
 			long delta = end.getTime() - begin.getTime();
 			end = new Date();
 			begin = new Date(end.getTime() - delta);
 		}
-		
+
 		String rrdId = req.getParameter("id");
 		RdsGraph graph = hl.getGraphById(Integer.parseInt(rrdId));
-		
+
 		res.setContentType("image/png");
 		ServletOutputStream out = res.getOutputStream();
 		res.addHeader("Cache-Control", "no-cache");
-		
+
 		graph.writePng(out, begin, end);
 		//byte[] pngBytes= graph.getPng(begin, end);
 		//if(pngBytes != null)
 		//	out.write(pngBytes);
-		
+
 	}
 
 	/**
@@ -103,38 +107,46 @@ public final class Graph extends HttpServlet {
 		if(rWidth > 0)
 			retValue.append(" width='" + rWidth + "'");
 		retValue.append(">");
-		
+
 		return retValue.toString();
 	}
 
-	private void calcDate(String sbegin, String send, Date begin, Date end){
-		long lbegin = Calendar.DATE * -1;
-		long lend = -1;
-		
-		try {
-			if(sbegin != null)
-				lbegin = Long.parseLong(sbegin);
-		}
-		catch (NumberFormatException ex) {}
-		
-		try {
-			if(send != null)
-				lend = Long.parseLong(send);
-		}
-		catch (NumberFormatException ex) {}
-				
-		if(lend == -1)
-			end.setTime(System.currentTimeMillis());
-		else
-			end.setTime(lend);
+    /**
+     * Calculate date from string parametrs comming from the URL
+     *
+     * @param sbegin String
+     * @param send String
+     * @param begin The calculated begin date
+     * @param end The calculated end date
+     */
+    static private void calcDate(String sbegin, String send, Date begin, Date end){
+        long lbegin = Calendar.DATE * -1;
+        long lend = -1;
 
-		if(lbegin < 0) {
-			Calendar cbegin = new GregorianCalendar();
-			cbegin.setTime(end);
-			cbegin.add((int)(0 - lbegin), -1);
-			begin.setTime(cbegin.getTimeInMillis());
-		}
-		else
-			begin.setTime(lbegin);
-	}
+        try {
+            if(sbegin != null)
+                lbegin = Long.parseLong(sbegin);
+        }
+        catch (NumberFormatException ex) {}
+
+        try {
+            if(send != null)
+                lend = Long.parseLong(send);
+        }
+        catch (NumberFormatException ex) {}
+
+        if(lend == -1)
+            end.setTime(System.currentTimeMillis());
+        else
+            end.setTime(lend);
+
+        if(lbegin < 0) {
+            Calendar cbegin = new GregorianCalendar();
+            cbegin.setTime(end);
+            cbegin.add((int)(0 - lbegin), -1);
+            begin.setTime(cbegin.getTimeInMillis());
+        }
+        else
+            begin.setTime(lbegin);
+    }
 }
