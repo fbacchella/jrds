@@ -6,6 +6,7 @@
  */
 package jrds.probe.snmp;
 
+import jrds.GraphDesc;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
@@ -42,7 +43,25 @@ public class IpSnmp extends RdsSnmpSimple {
 
 
 		pd.setRrdName("ipsnmp");
-		pd.setGraphClasses(new Class[] {IpGraph.class, IpErrorGraph.class});
+		
+		//The associated graph
+		GraphDesc ipGraph = new GraphDesc(13);
+		ipGraph.add("ipInReceives", GraphDesc.LINE);
+		ipGraph.add("ipForwDatagrams", GraphDesc.LINE);
+		ipGraph.add("ipInDelivers", GraphDesc.LINE);
+		ipGraph.add("ipOutRequests", GraphDesc.LINE);
+		ipGraph.add("ipReasmReqds", GraphDesc.LINE);
+		ipGraph.add("ipReasmOKs", GraphDesc.LINE);
+		ipGraph.add("ipFragOKs", GraphDesc.LINE);
+		ipGraph.add("ipFragCreates", GraphDesc.LINE);
+		
+		ipGraph.setFilename("ip");
+		ipGraph.setGraphTitle("IP activity");
+		ipGraph.setVerticalLabel("paquets/s");
+		ipGraph.setHostTree(new Object[] { GraphDesc.HOST, GraphDesc.NETWORK, GraphDesc.IP, GraphDesc.TITLE});
+		ipGraph.setViewTree(new Object[] { GraphDesc.NETWORK, GraphDesc.IP, GraphDesc.HOST, GraphDesc.TITLE});
+
+		pd.setGraphClasses(new Object[] { ipGraph, IpErrorGraph.class});
 	}
 
 	/**
