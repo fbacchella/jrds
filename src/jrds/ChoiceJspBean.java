@@ -1,7 +1,7 @@
 /*
- * Created on 10 dŽc. 2004
+ * Created on 10 déc. 2004
  *
- * TODO 
+ * TODO
  */
 package jrds;
 
@@ -23,17 +23,20 @@ import org.apache.log4j.Logger;
 public class ChoiceJspBean {
 	static final public String ALLGROUPS = "tous";
 	static final private Logger logger = JrdsLogger.getLogger(ChoiceJspBean.class);
-	static private HostsList hostList = null;
+        static final HostsList hl = HostsList.getRootGroup() ;
 	static final PropertiesManager pm = PropertiesManager.getInstance();
 	static final DateFormat df = new SimpleDateFormat("d/M/y");
 
 	Scale scale = new Scale(Scale.SCALE_DAILY);
 
 	public ChoiceJspBean() {
-		if(hostList == null) {
-			hostList = HostsList.getRootGroup();
-		}
-	}
+            try {
+                jbInit();
+            }
+            catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
 
 	/**
 	 * @return Returns the scale.
@@ -47,11 +50,11 @@ public class ChoiceJspBean {
 	public  void setScale(String scale) {
 		this.setScale(scale);
 	}
-	
+
 	public String getNow() {
 		return "\"" + df.format(new Date()) + "\"";
 	}
-	
+
 	public Collection getScaleList() {
 		List scaleList = new ArrayList(Scale.allScale.length);
 		int currScale = scale.getScale();
@@ -64,16 +67,19 @@ public class ChoiceJspBean {
 		}
 		return scaleList;
 	}
-	
+
 	public Collection getGroupList() {
-		List hList = new ArrayList(hostList.size());
+		List hList = new ArrayList(hl.size());
 		hList.add("<OPTION>" + ALLGROUPS + "</OPTION>");
-		for(Iterator i = hostList.enumGroups().iterator() ; i.hasNext() ; ) {
+		for(Iterator i = hl.enumGroups().iterator() ; i.hasNext() ; ) {
 			String group = (String) i.next();
 			String val = "<OPTION>" + group + "</OPTION>";
 			hList.add(val);
 		}
 		return hList;
 	}
+
+  private void jbInit() throws Exception {
+  }
 
 }
