@@ -34,7 +34,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class GraphDescParser extends DefaultHandler {
 
-    static private final Logger logger = JrdsLogger.getLogger(HostConfigParser.class.getPackage().getName());
+    static private final Logger logger = JrdsLogger.getLogger(HostConfigParser.class);
 
     //Tag names
 

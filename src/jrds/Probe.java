@@ -183,7 +183,7 @@ public abstract class Probe
 
     /**
      * Store the values on the rrd backend.
-     * overide should be avoided
+     * Overiding should be avoided.
      * @param oneSample
      */
     protected void updateSample(Sample oneSample) {
@@ -210,8 +210,8 @@ public abstract class Probe
     }
 
     /**
-     * lanch an collect of values
-     * it cannot be overiden
+     * Launch an collect of values.
+     * It cannot be overiden
      * @throws IOException
      * @throws RrdException
      */
@@ -239,7 +239,7 @@ public abstract class Probe
      * Commit the result of a collect
      * @throws IOException
      */
-    public void sync() throws IOException {
+    public final void sync() throws IOException {
         if (isOpen) {
             rrdDb.sync();
             File rrdfile = new File(rrdDb.getCanonicalPath());
@@ -247,7 +247,7 @@ public abstract class Probe
         }
     }
 
-    public void close() throws IOException, RrdException {
+    public final void close() throws IOException, RrdException {
         if (isOpen) {
             pool.release(rrdDb);
         }
@@ -260,15 +260,21 @@ public abstract class Probe
      * the host name / the probe name
      * @see java.lang.Object#toString()
      */
-    public String toString() {
+    public final String toString() {
         if (stringValue == null) {
             stringValue = getHost().getName() + "/" + getName();
         }
         return stringValue;
     }
 
-    public int compareTo(Object arg0) {
-
+    /**
+     * The comparaison order of two object of ths class is a case insensitive
+     * comparaison of it's string value.
+     *
+     * @param arg0 Object
+     * @return int
+     */
+    public final int compareTo(Object arg0) {
         return String.CASE_INSENSITIVE_ORDER.compare(this.toString(),
             arg0.toString());
     }
