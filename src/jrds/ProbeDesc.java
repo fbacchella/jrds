@@ -253,6 +253,16 @@ public class ProbeDesc implements Cloneable {
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
+	public void setGraphClasses(Object[] graphClasses) {
+		if(cloned || ! readOnly )
+			this.graphClasses = Arrays.asList(graphClasses);
+		else 
+			logger.error("graph classes tried to be set twice");
+	}
+	
+	/**
+	 * @param graphClasses The graphClasses to set.
+	 */
 	public void setGraphClasses(Class[] graphClasses) {
 		if(cloned || ! readOnly )
 			this.graphClasses = Arrays.asList(graphClasses);

@@ -65,13 +65,19 @@ public abstract class Probe implements Comparable {
 		Class[] thisClass = new Class[] {Probe.class};
 		Object[] args = new Object [] { this};
 		for(Iterator i = graphClasses.iterator() ; i.hasNext(); ) {
-			Class cl = (Class) i.next();
+			Object o = i.next();
 			try {
-				Constructor co = cl.getConstructor(thisClass);
-				graphList.add(co.newInstance(args));
+				if(o instanceof Class && RdsGraph.class.isAssignableFrom((Class)o)) {
+					Constructor co = ((Class)o).getConstructor(thisClass);
+					graphList.add(co.newInstance(args));
+				}
+				else if(o instanceof GraphDesc ) {
+					RdsGraph newGraph = new RdsGraph(this, (GraphDesc) o);
+					graphList.add(newGraph);
+				}
 			}
 			catch (Exception ex) {
-				logger.warn("Error during creation of graph " + cl + ": ", ex);
+				logger.warn("Error during creation of graph " + o + ": ", ex);
 			}
 		}
 		return graphList;
