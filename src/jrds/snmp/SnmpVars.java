@@ -38,7 +38,7 @@ import org.snmp4j.smi.VariableBinding;
  */
 public class SnmpVars extends HashMap {
 	static final private Logger logger = JrdsLogger.getLogger(SnmpVars.class.getPackage().getName());
-		
+
 	static final private byte TAG1 = (byte) 0x9f;
 	static final private byte TAG_FLOAT = (byte) 0x78;
 	static final private byte TAG_DOUBLE = (byte) 0x79;
@@ -47,9 +47,9 @@ public class SnmpVars extends HashMap {
 		super(data.size());
 		join(data);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public SnmpVars() {
 		super();
@@ -71,10 +71,10 @@ public class SnmpVars extends HashMap {
 			put(vbOid, convertVar(vb.getVariable()));
 		}
 		else {
-			logger.warn("OID " + vb.getOid() + "has error");
+			logger.warn("OID " + vb.getOid() + " has error");
 		}
 	}
-	
+
 	public void join(PDU data)
 	{
 		for(int i = 0 ; i < data.size() ; i++) {
@@ -88,7 +88,7 @@ public class SnmpVars extends HashMap {
 		for (int i = 0 ; i < newVars.length ; i++)
 			addVariable(newVars[i]);
 	}
-	
+
 	private Object convertVar(Variable valueAsVar) {
 		Object retvalue = null;
 		if (valueAsVar != null) {
@@ -127,9 +127,9 @@ public class SnmpVars extends HashMap {
 		}
 		return retvalue;
 	}
-	
+
 	private final Object resolvOpaque(Opaque var) {
-		
+
 		//If not resolved, we will return the data as an array of bytes
 		Object value = var.getValue();
 
