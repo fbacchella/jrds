@@ -23,7 +23,7 @@ public class CpuTimeGraph extends RdsGraph {
 		gd.add("ssCpuUser", GraphDesc.AREA, Color.BLUE, "User");
 		gd.add("ssCpuSystem", GraphDesc.STACK, Color.RED, "System");
 		gd.add("ssCpuIdle", GraphDesc.STACK, Color.GREEN, "Idle");
-		gd.setFilename("Temps CPU");
+		gd.setFilename("cputime");
 		gd.setGraphTitle("Utilisation CPU");
 		gd.setUpperLimit(100);
 		gd.setVerticalLabel("%");
