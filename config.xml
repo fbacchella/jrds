@@ -52,6 +52,7 @@
 		<rrd type="CpuLinuxMunins"/>
 		<rrd type="TcpConnection"/>
 		<rrd type="UdpSnmp"/>
+		<rrd type="IpSnmp"/>
 		<rrd type="DiskIo">
 			<arg type="String" value="sda3"/>
 		</rrd>
