@@ -29,9 +29,9 @@ public class ProbeFactory {
 		argPackages.add("java.net.");
 		argPackages.add("");
 		
-		probePackages.add("com.aol.jrds.probe.");
-		probePackages.add("com.aol.jrds.probe.snmp.");
-		probePackages.add("com.aol.jrds.probe.munins.");
+		probePackages.add("jrds.probe.");
+		probePackages.add("jrds.probe.snmp.");
+		probePackages.add("jrds.probe.munins.");
 		probePackages.add("");
 		
 	}
