@@ -64,7 +64,6 @@ public class GraphFactory {
             retValue = new RdsGraph(probe, (GraphDesc) className);
         }
         else if(className instanceof String) {
-             Class.getResourceAsStream("/monfichier.prop");
         }
         return retValue;
     }
