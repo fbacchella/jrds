@@ -21,7 +21,6 @@ import javax.media.jai.JAI;
 
 import org.apache.log4j.Logger;
 import org.jrobin.core.RrdException;
-import org.jrobin.graph.RrdExportDef;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 
@@ -31,7 +30,7 @@ import org.jrobin.graph.RrdGraphDef;
  *
  * TODO 
  */
-public abstract class RdsGraph implements Comparable {
+public class RdsGraph implements Comparable {
 	
 	
 	
@@ -222,18 +221,9 @@ public abstract class RdsGraph implements Comparable {
 		this.gd = gd;
 	}
 
-	protected void addPlots(RrdGraphDef graphDef) throws RrdException
-	{
-	}
-
-	protected void addDatasource(RrdExportDef graphDef) throws RrdException {
-	}
-	
 	private RrdGraphDef fillGraphDef() throws RrdException, IOException
 	{
 		RrdGraphDef graphDef = getGraphDesc().getGraphDef(probe);
-		addDatasource(graphDef);
-		addPlots(graphDef);
 		return graphDef;
 	}
 	/* (non-Javadoc)
