@@ -80,6 +80,7 @@ public class JrdsLogger {
 		
 		Logger snmp4jLogger = Logger.getLogger("org.snmp4j");
 		snmp4jLogger.setLevel(Level.WARN);
+		snmp4jLogger.removeAppender(APPENDER);
 		snmp4jLogger.addAppender(app);
 		
 		PropertiesManager pm = PropertiesManager.getInstance();
