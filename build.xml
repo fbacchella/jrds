@@ -50,20 +50,20 @@
 	    <pathelement location="${catalina.home}/common/classes"/>
 		<fileset dir="${catalina.home}/common/endorsed">
       		<include name="*.jar"/>
-    		</fileset>
-    		<fileset dir="${catalina.home}/common/lib">
+    	</fileset>
+    	<fileset dir="${catalina.home}/common/lib">
       		<include name="*.jar"/>
-    		</fileset>
-    		<pathelement location="${catalina.home}/shared/classes"/>
-    		<fileset dir="${catalina.home}/shared/lib">
+    	</fileset>
+    	<pathelement location="${catalina.home}/shared/classes"/>
+    	<fileset dir="${catalina.home}/shared/lib">
       		<include name="*.jar"/>
-    		</fileset>
+    	</fileset>
 	</path>
 	
 
 	<!-- ==================== Compilation Classpath =========================== -->
 	<path id="compile.classpath">
-		<path id="catalina.classpath" />
+		<path refid="catalina.classpath" />
 		<fileset refid="app.libraries" />
 	</path>
 
@@ -71,7 +71,7 @@
 	<path id="project.classpath">
 		<fileset dir="${dist.home}/lib">
       		<include name="*.jar"/>
-    		</fileset>
+    	</fileset>
 	</path>
 
 
@@ -83,7 +83,9 @@
 	         	optimize="${compile.optimize}"
 	    	     	encoding="iso-8859-1"
 	    	       	target="1.4">
-			<classpath refid="compile.classpath"/>
+			<classpath>
+				<path refid="compile.classpath"/>
+			</classpath>
 	    </javac>
 	</target>
 
