@@ -1,9 +1,0 @@
-<project name="imported">
-	<target name="install" depends="war">
-		<scp file="${dist.home}/jrds.war" todir="root@widget:/tmp" 
-			keyfile="/Users/bacchell/.ssh/id_rsa" knownhosts="/Users/bacchell/.ssh/known_hosts" passphrase="" />
-		<scp file="${dist.home}/jrds.war" todir="root@217.74.99.15:/tmp"
-			keyfile="/Users/bacchell/.ssh/id_rsa" knownhosts="/Users/bacchell/.ssh/known_hosts" password="L0v6h3ck"/>
-	</target>
-</project>
-
