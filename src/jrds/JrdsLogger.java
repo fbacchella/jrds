@@ -30,7 +30,7 @@ public class JrdsLogger {
 			Appender app = getAppender(false, DEFAULTLOGFILE);
 			initLog(app);
 		} catch (IOException e) {
-			Logger.getLogger(".").error("Unable to open " + DEFAULTLOGFILE + ": " + e.getLocalizedMessage());
+			Logger.getRootLogger().error("Unable to open " + DEFAULTLOGFILE + ": " + e.getLocalizedMessage());
 		}
 	}
 
