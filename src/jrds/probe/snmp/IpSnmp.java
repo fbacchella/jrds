@@ -11,7 +11,6 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
 import jrds.graphe.IpErrorGraph;
-import jrds.graphe.IpGraph;
 
 import org.snmp4j.smi.OID;
 
