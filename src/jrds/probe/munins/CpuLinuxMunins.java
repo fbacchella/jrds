@@ -1,7 +1,7 @@
 /*
  * Created on 11 janv. 2005
  *
- * TODO 
+ * TODO
  */
 package jrds.probe.munins;
 
@@ -9,15 +9,15 @@ import jrds.JrdsLogger;
 import jrds.MuninsProbe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.graphe.CpuLinuxMuninsGraph;
 
 import org.apache.log4j.Logger;
+import jrds.GraphDesc;
 
 
 /**
  * @author bacchell
  *
- * TODO 
+ * TODO
  */
 public class CpuLinuxMunins extends MuninsProbe {
 	static private final Logger logger = JrdsLogger.getLogger(CpuLinuxMunins.class.getPackage().getName());
@@ -33,9 +33,24 @@ public class CpuLinuxMunins extends MuninsProbe {
 		pd.add("softirq", ProbeDesc.COUNTER, "softirq.value");
 		pd.setRrdName("cpulinuxmunins");
 		pd.setMuninsProbesNames(new String[] { "cpu"});
-		pd.setGraphClasses(new Class[] {CpuLinuxMuninsGraph.class});
+
+                GraphDesc gd = new GraphDesc(7);
+                gd.add("system", GraphDesc.AREA, "system");
+                gd.add("user", GraphDesc.STACK, "user");
+                gd.add("nice", GraphDesc.STACK, "nice");
+                gd.add("idle", GraphDesc.STACK, "idle");
+                gd.add("iowait", GraphDesc.STACK, "iowait");
+                gd.add("irq", GraphDesc.STACK, "irq");
+                gd.add("softirq", GraphDesc.STACK, "softirq");
+                gd.setFilename("cpulinux");
+                gd.setGraphTitle("CPU usage");
+                gd.setVerticalLabel("%");
+                gd.setHostTree(GraphDesc.HSLT);
+                gd.setViewTree(GraphDesc.SLHT);
+
+		pd.setGraphClasses(new Object[] {gd});
 	}
-	
+
 	/**
 	 * @param monitoredHost
 	 */
