@@ -12,3 +12,5 @@ local.xml
 jrds.properties
 lib
 probe
+Servlet.library
+jrds.oom
