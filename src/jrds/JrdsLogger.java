@@ -15,6 +15,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.PropertyConfigurator;
+import org.snmp4j.log.Log4jLogFactory;
 
 /**
  * A class to get pre-configue log4j loggers
@@ -78,8 +79,9 @@ public class JrdsLogger {
 		logger.removeAppender(APPENDER);
 		logger.addAppender(app);
 		
+		org.snmp4j.log.LogFactory.setLogFactory(new Log4jLogFactory());
 		Logger snmp4jLogger = Logger.getLogger("org.snmp4j");
-		snmp4jLogger.setLevel(Level.WARN);
+		snmp4jLogger.setLevel(Level.ALL);
 		snmp4jLogger.removeAppender(APPENDER);
 		snmp4jLogger.addAppender(app);
 		
