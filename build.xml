@@ -125,7 +125,7 @@
 	</target>
 	
 	<target name="graph" depends="appjar">
-		<java  classname="jrds.Grapher" fork="true">
+		<java  classname="jrds.standalone.Grapher" fork="true">
 			<classpath>
 				<path refid="project.classpath" />
 				<pathelement location="${build.home}/jrds.jar"/>
