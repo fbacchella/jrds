@@ -28,7 +28,6 @@ import jrds.probe.HttpResponseTimeRrd;
  */
 public class HttpGraph extends RdsGraph {
 	static final private Logger logger = Logger.getLogger(HttpGraph.class.getPackage().getName());
-	URL url;
 	static MessageDigest md5digest;
 	static {
 		try {
@@ -55,14 +54,15 @@ public class HttpGraph extends RdsGraph {
 	 */
 	public HttpGraph(Probe theStore) {
 		super(theStore, gd);
-		this.url = ((HttpResponseTimeRrd) theStore).getUrl();
+		URL url = ((HttpResponseTimeRrd) theStore).getUrl();
 		setGraphTitle(url.toString());
+		setFilename(makeFileNamePrefix(url));
 	}
 	
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.RdsGraph#initName()
 	 */
-	protected String initFileNamePrefix() {
+	private String makeFileNamePrefix(URL url) {
 		String retval = null;
 		md5digest.reset();
 		byte[] digestval = md5digest.digest(url.toString().getBytes());
