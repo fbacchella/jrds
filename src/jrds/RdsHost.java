@@ -150,9 +150,9 @@ public class RdsHost implements Comparable {
 			Probe currrd= (Probe) i.next();
 			for(Iterator j = currrd.getGraphList().iterator() ; j.hasNext(); ) {
 				RdsGraph currGraph= (RdsGraph) j.next();
-				byte[] pngBytes= currGraph.getPngBytes(startDate, endDate);
+				//byte[] pngBytes= currGraph.getPngBytes(startDate, endDate);
 
-				//currGraph.graph(startDate, endDate);
+				currGraph.graph(startDate, endDate);
 			}
 		}
 	}
