@@ -15,7 +15,7 @@
 	<property name="compile.optimize"    value="true"/>
 
 	<!-- ===================== Catalina Classpath =========================== -->
-	<property name="catalina.home" value="/Library/Tomcat"/>
+	<property name="catalina.home" value="C:\Borland\JBuilder2005\thirdparty\jakarta-tomcat-5.0.27"/>
 	<path id="catalina.classpath">
 	    <pathelement location="${catalina.home}/common/classes"/>
 		<fileset dir="${catalina.home}/common/endorsed">
@@ -47,14 +47,16 @@
 	<import file="local.xml" optional="true" />
 
 	<target name="compile">
-	    <javac 	srcdir="${src.home}"
-	          	destdir="${build.home}/classes"
+            <mkdir dir="${build.home}/classes">
+            </mkdir>
+	    <javac srcdir="${src.home}"
+	           destdir="${build.home}/classes"
 	            debug="${compile.debug}"
-	      		deprecation="${compile.deprecation}"
-	         	optimize="${compile.optimize}"
+                    deprecation="${compile.deprecation}"
+                    optimize="${compile.optimize}"
 	    	    encoding="iso-8859-1"
 	    	    target="1.4">
-			<classpath refid="compile.classpath"/>
+                    <classpath refid="compile.classpath"/>
 	    </javac>
 	</target>
 
