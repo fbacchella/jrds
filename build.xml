@@ -79,11 +79,15 @@
 	</target>
 	
 	<target name="srctar" depends="javadoc">
-		<tar destfile="${build.home}/jrds-src.tar.bz2" compression="bzip2">
+		<tar destfile="${build.home}/jrds-src.tar">
 			<tarfileset dir="." prefix="jrds">
+				<include name="build" />
+				<include name="build/classes" />
+				<include name="MANIFEST.MF" />
 				<include name="src/**" />
 				<include name="web/**" />
 				<include name="build.xml"/>
+				<include name="web.xml"/>
 				<include name="lib/**"/>
 				<include name="${docs.build}/**"/>
 			</tarfileset>
