@@ -56,7 +56,7 @@ public class StartListener implements ServletContextListener {
 			
 			pm.update();
 			
-			JrdsLogger.doEmbeded();
+			JrdsLogger.setFileLogger(pm.logfile);
 			
 			System.getProperties().setProperty("java.awt.headless","true");
 			

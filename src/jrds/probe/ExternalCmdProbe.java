@@ -53,7 +53,6 @@ public abstract class ExternalCmdProbe extends Probe {
 		Process urlperfps = null;
 		try {
 			urlperfps = rt.exec(getCmd());
-			logger.debug(urlperfps.getClass().getName());
 			InputStream stdout = urlperfps.getInputStream();
 			BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(stdout));
 			String perfstring = stdoutReader.readLine();
@@ -66,12 +65,10 @@ public abstract class ExternalCmdProbe extends Probe {
 		}
 		try {
 			if(urlperfps != null) {
-				logger.debug("begin close");
 				urlperfps.waitFor();
 				urlperfps.getInputStream().close();
 				urlperfps.getErrorStream().close();
 				urlperfps.getOutputStream().close();
-				logger.debug("end close");
 			}
 		} catch (IOException e1) {
 			logger.warn("Exception on close", e1);

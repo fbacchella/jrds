@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
  */
 public class PropertiesManager {
 	static private PropertiesManager instance;
-	static final protected Logger logger = Logger.getLogger(PropertiesManager.class);
+	static final private Logger logger = JrdsLogger.getLogger(PropertiesManager.class);
 
 	private Properties properties = new Properties();
 	

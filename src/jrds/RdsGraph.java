@@ -172,13 +172,13 @@ public abstract class RdsGraph implements Comparable {
 					" au "  + lastUpdateFormat.format(endDate) + "@l");
 			RrdGraph rrdGraph = new RrdGraph(tempGraphDef);
 			img = rrdGraph.getBufferedImage(getWidth(), getHeight());
+			gd.setRealHeight(img.getHeight());
+			gd.setRealWidth(img.getWidth());
 		} catch (RrdException e) {
-			logger.warn("Unable to creage png for " + gd.getFilename() + " on host " + probe.getHost().getName() + ": " + e.getLocalizedMessage(), e);
+			logger.warn("Unable to creage png for " + gd.getFilename() + " on host " + probe.getHost().getName() + ": " + e.getLocalizedMessage());
 		} catch (IOException e) {
-			logger.warn("Unable to creage png for " + gd.getFilename() + " on host " + probe.getHost().getName() + ": " + e.getLocalizedMessage(), e);
+			logger.warn("Unable to creage png for " + gd.getFilename() + " on host " + probe.getHost().getName() + ": " + e.getLocalizedMessage());
 		}
-		gd.setRealHeight(img.getHeight());
-		gd.setRealWidth(img.getWidth());
 		return img;
 	}
 	

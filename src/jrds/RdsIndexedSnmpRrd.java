@@ -107,7 +107,7 @@ public abstract class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProb
 	}
 
 	/**
-	 * @see com.aol.jrds.snmp.SnmpPreparator#makeOidSet()
+	 * @see jrds.SnmpProbe#getOidSet()
 	 */
 	public Set getOidSet() {
 		Set retValue = null;
