@@ -1,0 +1,164 @@
+<project name="jrds" default="dist" basedir=".">
+	<!-- set global properties for this build -->
+	
+	<property name="app.name"      value="rds"/>
+	<property name="app.path"      value="/${app.name}"/>
+	<property name="app.version"   value="0.1-dev"/>
+	<property name="build.home"    value="${basedir}/build"/>
+	<property name="catalina.home" value="/Library/Tomcat"/>
+	<property name="dist.home"     value="${basedir}/dist"/>
+	<property name="docs.home"     value="${basedir}/docs"/>
+	<property name="src.home"      value="${basedir}/src"/>
+	<property name="web.src"       value="${basedir}/web"/>
+	<property name="web.build"     value="${dist.home}/webapp"/>
+
+	<property name="SNMP4J.jar" value="Libraries/snmp4j/dist/lib/SNMP4J.jar"/>
+	<property name="jconn2.jar" value="Libraries/jConnect-5_5/classes/jconn2.jar"/>
+	<property name="jrobin.jar" value="Libraries/jrobin-1.4.0/lib/jrobin-1.4.0.jar"/>
+	<property name="jstl.jar" value="Libraries/jakarta-taglibs-standard-1.0.6/lib/jstl.jar"/>
+	<property name="standard.jar" value="Libraries/jakarta-taglibs-standard-1.0.6/lib/standard.jar"/>
+	<property name="log4j.jar" value="Libraries/logging-log4j-1.2.9/dist/lib/log4j-1.2.9.jar"/>
+	<property name="javamail.jar" value="Libraries/javamail-1.3.2/mail.jar"/>
+    <property name="jai_codec.jar" value="Libraries/jai-1_1_2_01/lib/jai_codec.jar"/>
+    <property name="jai_core.jar" value="Libraries/jai-1_1_2_01/lib/jai_core.jar"/>
+    <property name="mlibwrapper_jai.jar" value="Libraries/jai-1_1_2_01/lib/mlibwrapper_jai.jar"/>
+	<property name="backport-util-concurrent.jar" value="Libraries/backport-util-concurrent-1.1_01/backport-util-concurrent.jar"/>
+	<property name="ojdbc.jar" value="Libraries/ojdbc14.jar" />
+	
+	<fileset id="app.libraries" dir="${basedir}">
+		<include name="${SNMP4J.jar}"/>
+		<include name="${jconn2.jar}"/>
+		<include name="${jrobin.jar}"/>
+		<include name="${log4j.jar}"/>
+		<include name="${javamail.jar}"/>
+		<include name="${jai_codec.jar}"/>
+		<include name="${jai_core.jar}"/>
+		<include name="${standard.jar}"/>
+		<include name="${jstl.jar}"/>
+		<include name="${backport-util-concurrent.jar}"/>
+		<include name="${ojdbc.jar}" />
+	</fileset>
+
+
+	<!--  ==================== Compilation Control Options ==================== -->
+	<property name="compile.debug"       value="true"/>
+	<property name="compile.deprecation" value="false"/>
+	<property name="compile.optimize"    value="true"/>
+	
+	<!-- ==================== Catalina Classpath =========================== -->
+	<path id="catalina.classpath">
+	    <pathelement location="${catalina.home}/common/classes"/>
+		<fileset dir="${catalina.home}/common/endorsed">
+      		<include name="*.jar"/>
+    		</fileset>
+    		<fileset dir="${catalina.home}/common/lib">
+      		<include name="*.jar"/>
+    		</fileset>
+    		<pathelement location="${catalina.home}/shared/classes"/>
+    		<fileset dir="${catalina.home}/shared/lib">
+      		<include name="*.jar"/>
+    		</fileset>
+	</path>
+	
+
+	<!-- ==================== Compilation Classpath =========================== -->
+	<path id="compile.classpath">
+		<path id="catalina.classpath" />
+		<fileset refid="app.libraries" />
+	</path>
+
+	<!-- ==================== Run Classpath =========================== -->
+	<path id="project.classpath">
+		<fileset dir="${dist.home}/lib">
+      		<include name="*.jar"/>
+    		</fileset>
+	</path>
+
+
+	<target name="compile">
+	    <javac 	srcdir="${src.home}"
+	          	destdir="${build.home}/classes"
+	            	debug="${compile.debug}"
+	      		deprecation="${compile.deprecation}"
+	         	optimize="${compile.optimize}"
+	    	     	encoding="iso-8859-1"
+	    	       	target="1.4">
+			<classpath refid="compile.classpath"/>
+	    </javac>
+	</target>
+
+	<target name="dist" depends="compile">
+		<jar destfile="${dist.home}/lib/jrds.jar" basedir="${build.home}/classes" manifest="${basedir}/MANIFEST.MF" />
+		<copy todir="${dist.home}/src" preservelastmodified="true">
+			<fileset dir="${src.home}" />
+		</copy>
+	</target>
+	
+	<target name="clean" description="clean up" >
+		<delete dir="${build.home}"/>
+		<delete dir="${dist.home}"/>
+	</target>
+	
+	<target name="tar" depends="dist">
+		<tar destfile="jrds.tar.bz2" compression="bzip2">
+			<tarfileset dir="." prefix="jrds">
+				<include name="src/**" />
+				<include name="build.xml"/>
+				<include name="webapp/**" />
+				<exclude name="webapp/WEB-INF/**" />
+			</tarfileset>
+			<tarfileset dir="${dist}" prefix="jrds/lib">
+				<include name="**"/>
+				<exclude name="**/jrds.jar"/>
+			</tarfileset>
+		</tar>
+	</target>
+	
+	<target name="war" depends="dist">
+		<war destfile="${dist.home}/jrds.war" webxml="${basedir}/web.xml" duplicate="preserve">
+			<lib dir="${dist.home}/lib">
+				<include name="*.jar"/>
+			</lib>
+			<webinf dir="Libraries/jakarta-taglibs-standard-1.0.6/tld/">
+				<include name="c.tld" />
+			</webinf>
+			<fileset dir="${web.src}" />
+		</war>
+	</target>
+	
+	<target name="collect" depends="dist">
+		<java  classname="jrds.standalone.Collector" fork="true">
+			<classpath refid="project.classpath" />
+		</java>
+	</target>
+	
+	<target name="graph" depends="dist">
+		<java  classname="jrds.Grapher" fork="true">
+			<classpath refid="project.classpath" />
+		</java>
+	</target>
+
+	<!-- ==================== Prepare Target ================================== -->
+	<target name="prepare">
+		<mkdir  dir="${build.home}/"/>
+		<mkdir dir="${dist.home}/"/>
+		<mkdir dir="${dist.home}/lib"/>
+		<copy todir="${dist.home}/lib" flatten="yes">
+			<fileset refid="app.libraries" />
+		</copy>
+ 	</target>
+
+	<target name="javadoc">
+   		<javadoc destdir="dist/doc" access="protected" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="true" nodeprecatedlist="false" nodeprecated="false" packagenames="jrds.probe,jrds.probe.snmp,jrds.snmp,jrds,jrds.probe.munins,jrds.graphe" sourcepath="src" >
+			<classpath refid="compile.classpath"/>
+    	         <link href="http://java.sun.com/j2se/1.4.2/docs/api"/>
+             <link href="http://www.snmp4j.org/doc"/>
+             <link href="http://www.jrobin.org/javadoc"/>
+        		<link href="http://logging.apache.org/log4j/docs/api"/>
+   			<link href="http://www.mathcs.emory.edu/dcl/util/backport-util-concurrent/doc/api"/>
+        </javadoc>
+    </target>
+
+	<import file="install.xml" optional="true" />
+	
+</project>

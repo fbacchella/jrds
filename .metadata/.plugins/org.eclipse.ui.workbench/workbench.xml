@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workbench version="2.0">
+<window x="128" y="22" width="1024" height="768">
+<fastViewData fastViewLocation="1024"/>
+<perspectiveBar>
+<itemSize x="160"/>
+</perspectiveBar>
+<coolbarLayout locked="0">
+<coolItem id="group.file" itemType="typeGroupMarker"/>
+<coolItem id="org.eclipse.ui.workbench.file" itemType="typeToolBarContribution" x="85" y="22"/>
+<coolItem id="additions" itemType="typeGroupMarker"/>
+<coolItem id="org.eclipse.debug.ui.launchActionSet" itemType="typeToolBarContribution" x="41" y="22"/>
+<coolItem id="org.eclipse.search.searchActionSet" itemType="typeToolBarContribution" x="32" y="22"/>
+<coolItem id="org_eclipse_ui_examples_readmetool_actionSet" itemType="typeToolBarContribution" x="76" y="22"/>
+<coolItem id="group.nav" itemType="typeGroupMarker"/>
+<coolItem id="org.eclipse.ui.workbench.navigate" itemType="typeToolBarContribution" x="94" y="22"/>
+<coolItem id="group.editor" itemType="typeGroupMarker"/>
+</coolbarLayout>
+<page label="Workspace - Resource" focus="true">
+<editors>
+<editorArea activeWorkbook="DefaultEditorWorkbook">
+<info part="DefaultEditorWorkbook">
+<folder expanded="2" appearance="1">
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
+</folder>
+</info>
+</editorArea>
+</editors>
+<views>
+<view id="org.eclipse.ui.views.TaskList" partName="Tasks">
+<viewState columnWidth0="19" columnWidth1="19" columnWidth2="280" columnWidth3="105" columnWidth4="210" columnWidth5="84" verticalPosition="0" horizontalPosition="0">
+<selection/>
+</viewState>
+</view>
+<view id="org.eclipse.ui.views.ContentOutline" partName="Outline">
+<viewState/>
+</view>
+<view id="org.eclipse.ui.views.ResourceNavigator" partName="Navigator">
+<viewState sorter="1" LINK_NAVIGATOR_TO_EDITOR="0">
+<filters>
+<filter element="*.class" isEnabled="false"/>
+<filter element=".*" isEnabled="false"/>
+</filters>
+</viewState>
+</view>
+</views>
+<perspectives activePerspective="org.eclipse.ui.resourcePerspective" activePart="org.eclipse.ui.views.ResourceNavigator">
+<perspective version="0.016" editorAreaVisible="1" fixed="0">
+<descriptor id="org.eclipse.ui.resourcePerspective" label="Resource" class="org.eclipse.ui.internal.ide.ResourcePerspective"/>
+<actionSet id="org.eclipse.search.searchActionSet"/>
+<actionSet id="org.eclipse.ui.cheatsheets.actionSet"/>
+<actionSet id="org.eclipse.ui.edit.text.actionSet.openExternalFile"/>
+<actionSet id="org.eclipse.ui.edit.text.actionSet.navigation"/>
+<actionSet id="org_eclipse_ui_examples_readmetool_actionSet"/>
+<actionSet id="org.eclipse.ui.externaltools.ExternalToolsSet"/>
+<actionSet id="org.eclipse.update.ui.softwareUpdates"/>
+<actionSet id="org.eclipse.ui.NavigateActionSet"/>
+<alwaysOnActionSet id="org.eclipse.search.searchActionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.cheatsheets.actionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.openExternalFile"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.navigation"/>
+<alwaysOnActionSet id="org_eclipse_ui_examples_readmetool_actionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.externaltools.ExternalToolsSet"/>
+<alwaysOnActionSet id="org.eclipse.update.ui.softwareUpdates"/>
+<alwaysOnActionSet id="org.eclipse.ui.NavigateActionSet"/>
+<show_view_action id="org.eclipse.ui.views.ResourceNavigator"/>
+<show_view_action id="org.eclipse.ui.views.BookmarkView"/>
+<show_view_action id="org.eclipse.ui.views.ContentOutline"/>
+<show_view_action id="org.eclipse.ui.views.PropertySheet"/>
+<show_view_action id="org.eclipse.ui.views.ProblemView"/>
+<show_view_action id="org.eclipse.ui.views.TaskList"/>
+<show_view_action id="org.eclipse.ant.ui.views.AntView"/>
+<show_view_action id="org.eclipse.pde.runtime.LogView"/>
+<new_wizard_action id="org.eclipse.ui.wizards.new.folder"/>
+<new_wizard_action id="org.eclipse.ui.wizards.new.file"/>
+<perspective_action id="org.eclipse.jdt.ui.JavaPerspective"/>
+<perspective_action id="org.eclipse.jdt.ui.JavaBrowsingPerspective"/>
+<perspective_action id="org.eclipse.team.cvs.ui.cvsPerspective"/>
+<perspective_action id="org.eclipse.team.ui.TeamSynchronizingPerspective"/>
+<view id="org.eclipse.ui.views.ResourceNavigator"/>
+<view id="org.eclipse.ui.views.ContentOutline"/>
+<view id="org.eclipse.ui.views.TaskList"/>
+<layout>
+<mainWindow>
+<info part="topLeft" folder="true">
+<folder activePageID="org.eclipse.ui.views.ResourceNavigator" expanded="2" appearance="2">
+<page label="Navigator" content="org.eclipse.ui.views.ResourceNavigator"/>
+<page label="LabelNotFound" content="org.eclipse.ui.views.BookmarkView"/>
+<page label="LabelNotFound" content="org.eclipse.team.ccvs.ui.RepositoriesView"/>
+<page label="LabelNotFound" content="org.eclipse.team.ccvs.ui.AnnotateView"/>
+<page label="LabelNotFound" content="org.eclipse.team.ui.target.SiteExplorerView"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+</presentation>
+</folder>
+</info>
+<info part="org.eclipse.ui.internal.ViewStack@34de35" relative="topLeft" relationship="2" ratioLeft="760" ratioRight="254" ratio="0.7495069" folder="true">
+<folder expanded="2" appearance="2">
+<page label="LabelNotFound" content="org.eclipse.ui.cheatsheets.views.CheatSheetView"/>
+<page label="LabelNotFound" content="org.eclipse.ui.internal.introview"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
+</folder>
+</info>
+<info part="org.eclipse.gef.ui.palette_view" relative="topLeft" relationship="2" ratioLeft="263" ratioRight="751" ratio="0.25936884"/>
+<info part="org.eclipse.ui.internal.ViewStack@caff01" relative="org.eclipse.gef.ui.palette_view" relationship="4" ratioLeft="456" ratioRight="235" ratio="0.6599132" folder="true">
+<folder activePageID="org.eclipse.ui.views.TaskList" expanded="2" appearance="2">
+<page label="Tasks" content="org.eclipse.ui.views.TaskList"/>
+<page label="LabelNotFound" content="org.eclipse.team.ccvs.ui.console"/>
+<page label="LabelNotFound" content="org.eclipse.team.ccvs.ui.HistoryView"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+</presentation>
+</folder>
+</info>
+<info part="org.eclipse.ui.editorss" relative="org.eclipse.gef.ui.palette_view" relationship="2" ratioLeft="120" ratioRight="631" ratio="0.15978695"/>
+<info part="bottomLeft" relative="topLeft" relationship="4" ratioLeft="345" ratioRight="346" ratio="0.4992764" folder="true">
+<folder activePageID="org.eclipse.ui.views.ContentOutline" expanded="2" appearance="2">
+<page label="Outline" content="org.eclipse.ui.views.ContentOutline"/>
+<page label="LabelNotFound" content="org.eclipse.ant.ui.views.AntView"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+</presentation>
+</folder>
+</info>
+</mainWindow>
+</layout>
+</perspective>
+</perspectives>
+<navigationHistory/>
+<input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
+</page>
+</window>
+<mruList/>
+</workbench>

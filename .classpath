@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/Users/bacchell/Devl/RRDTool/jrds/dist/lib/jrobin-1.4.0.jar"/>
+	<classpathentry kind="lib" path="/Users/bacchell/Devl/RRDTool/jrds/dist/lib/mail.jar"/>
+	<classpathentry kind="lib" path="/Users/bacchell/Devl/RRDTool/jrds/dist/lib/SNMP4J.jar"/>
+	<classpathentry kind="lib" path="/Library/Tomcat/common/lib/servlet.jar"/>
+	<classpathentry kind="lib" path="/Library/Tomcat/common/lib/jasper-runtime.jar"/>
+	<classpathentry kind="lib" path="/Users/bacchell/Devl/RRDTool/jrds/dist/lib/jconn2.jar"/>
+	<classpathentry kind="lib" path="/Users/bacchell/Devl/RRDTool/jrds/dist/lib/log4j-1.2.9.jar"/>
+	<classpathentry kind="lib" path="/Users/bacchell/Devl/RRDTool/jrds/dist/lib/jai_core.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/java.util.concurrent"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Oracle jdbc"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>
