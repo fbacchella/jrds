@@ -1,15 +1,13 @@
-<project name="jrds" default="dist" basedir=".">
+<project name="jrds" default="compile" basedir=".">
 	<!-- set global properties for this build -->	
 	<property name="app.name"      value="rds"/>
 	<property name="app.path"      value="/${app.name}"/>
 	<property name="app.version"   value="0.1-dev"/>
 	<property name="build.home"    value="${basedir}/build"/>
-	<property name="dist.home"     value="${basedir}/dist"/>
-	<property name="docs.home"     value="${basedir}/docs"/>
-	<property name="docs.build"    value="${dist.home}/docs"/>
+	<property name="docs.build"    value="${build.home}/docs"/>
 	<property name="src.home"      value="${basedir}/src"/>
 	<property name="web.src"       value="${basedir}/web"/>
-	<property name="web.build"     value="${dist.home}/webapp"/>
+	<property name="web.build"     value="${build.home}/webapp"/>
 
 	<!--  ==================== Compilation Control Options ==================== -->
 	<property name="compile.debug"       value="true"/>
@@ -35,9 +33,9 @@
 
 	<!-- ==================== Run Classpath =========================== -->
 	<path id="project.classpath">
-		<fileset dir="${dist.home}/lib">
+		<fileset dir="lib">
       		<include name="*.jar"/>
-    	</fileset>
+    		</fileset>
 	</path>
 
 	<!-- ==================== Compilation Classpath =========================== -->
@@ -60,50 +58,56 @@
 	    </javac>
 	</target>
 
-	<target name="dist" depends="compile">
-		<jar destfile="${dist.home}/lib/jrds.jar" basedir="${build.home}/classes" manifest="${basedir}/MANIFEST.MF" />
-		<copy todir="${dist.home}/src" preservelastmodified="true">
-			<fileset dir="${src.home}" />
-		</copy>
+	<target name="appjar" depends="compile">
+		<jar destfile="${build.home}/jrds.jar" basedir="${build.home}/classes" manifest="${basedir}/MANIFEST.MF" />
 	</target>
 	
 	<target name="javadoc">
-		<javadoc destdir="$docs.build" access="protected" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="true" nodeprecatedlist="false" nodeprecated="false" packagenames="jrds.probe,jrds.probe.snmp,jrds.snmp,jrds,jrds.probe.munins,jrds.graphe" sourcepath="src" >
+		<javadoc destdir="${docs.build}" access="protected" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="true" nodeprecatedlist="false" nodeprecated="false" packagenames="jrds.probe,jrds.probe.snmp,jrds.snmp,jrds,jrds.probe.munins,jrds.graphe" sourcepath="src" >
 			<classpath refid="compile.classpath"/>
 			<link href="http://java.sun.com/j2se/1.4.2/docs/api"/>
+			<link href="http://java.sun.com/products/servlet/2.3/javadoc"/>
 			<link href="http://www.snmp4j.org/doc"/>
 			<link href="http://www.jrobin.org/javadoc"/>
-        	<link href="http://logging.apache.org/log4j/docs/api"/>
+        		<link href="http://logging.apache.org/log4j/docs/api"/>
    			<link href="http://www.mathcs.emory.edu/dcl/util/backport-util-concurrent/doc/api"/>
         </javadoc>
     </target>
 
 	<target name="clean" description="clean up" >
 		<delete dir="${build.home}"/>
-		<delete dir="${dist.home}"/>
 	</target>
 	
-	<target name="tar" depends="dist">
-		<tar destfile="jrds.tar.bz2" compression="bzip2">
+	<target name="srctar" depends="javadoc">
+		<tar destfile="${build.home}/jrds-src.tar.bz2" compression="bzip2">
 			<tarfileset dir="." prefix="jrds">
 				<include name="src/**" />
+				<include name="web/**" />
 				<include name="build.xml"/>
-				<include name="webapp/**" />
-				<exclude name="webapp/WEB-INF/**" />
+				<include name="lib/**"/>
+				<include name="${docs.build}/**"/>
 			</tarfileset>
-			<tarfileset dir="${dist}" prefix="jrds/lib">
-				<include name="**"/>
-				<exclude name="**/jrds.jar"/>
+		</tar>
+	</target>
+
+	<target name="apptar" depends="appjar">
+		<tar destfile="${build.home}/jrds.tar.bz2" compression="bzip2">
+			<tarfileset dir="${dist.home}" prefix="jrds">
+				<include name="${docs.build}/**"/>
+				<include name="${docs.build}/**"/>
 			</tarfileset>
 		</tar>
 	</target>
 	
-	<target name="war" depends="dist">
-		<war destfile="${dist.home}/jrds.war" webxml="${basedir}/web.xml" duplicate="preserve">
-			<lib dir="${dist.home}/lib">
+	<target name="war" depends="appjar">
+		<war destfile="${build.home}/jrds.war" webxml="${basedir}/web.xml" duplicate="preserve">
+			<lib dir="lib">
 				<include name="*.jar"/>
 			</lib>
-			<webinf dir="Libraries/jakarta-taglibs-standard-1.0.6/tld/">
+			<lib dir="${build.home}">
+				<include name="*.jar"/>
+			</lib>
+			<webinf dir="lib/">
 				<include name="c.tld" />
 			</webinf>
 			<fileset dir="${web.src}" />
@@ -111,13 +115,13 @@
 	</target>
 	
 	<!--  ==================== A few target to run jrds ==================== -->
-	<target name="collect" depends="dist">
+	<target name="collect" depends="appjar">
 		<java  classname="jrds.standalone.Collector" fork="true">
 			<classpath refid="project.classpath" />
 		</java>
 	</target>
 	
-	<target name="graph" depends="dist">
+	<target name="graph" depends="appjar">
 		<java  classname="jrds.Grapher" fork="true">
 			<classpath refid="project.classpath" />
 		</java>
