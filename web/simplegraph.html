@@ -23,6 +23,11 @@ function keep_onClick()
 {
 	var historyWin = window.open("graph" + document.location.search, "graph" + document.location.search, "menubar=no,status=no");
 }
+
+function download_onClick()
+{
+	var historyWin = window.open("download" + document.location.search, "download" + document.location.search, "menubar=no,status=no");
+}
 //-->
 </script>
 	</head>
@@ -38,6 +43,8 @@ function keep_onClick()
 					<td><input onclick="keep_onClick();" type="button" name="keepButton" value="garder" tabindex="1"></td>
 					<td width="100"></td>
 					<td><input onclick="history_onClick();" type="button" name="HistoryButton" value="Historique" tabindex="2"></td>
+					<td width="100"></td>
+					<td><input onclick="download_onClick();" type="button" name="DownloadButton" value="Télécharger ls valeurs" tabindex="3"></td>
 				</tr>
 			</table>
 		</div>
