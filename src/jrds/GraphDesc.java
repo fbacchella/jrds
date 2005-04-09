@@ -3,17 +3,22 @@
  */
 package jrds;
 
-import java.io.*;
-import java.util.*;
+import java.awt.Color;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-import java.awt.*;
+import jrds.probe.IndexedProbe;
+import jrds.probe.JdbcProbe;
 
-import org.apache.log4j.*;
-import org.jrobin.core.*;
-import org.jrobin.graph.*;
-import jrds.probe.*;
-import jrds.snmp.SnmpRequester;
+import org.apache.log4j.Logger;
+import org.jrobin.core.RrdDb;
+import org.jrobin.core.RrdException;
+import org.jrobin.graph.RrdGraphDef;
 
 /**
  * @author bacchell
@@ -24,7 +29,7 @@ public final class GraphDesc
     implements Cloneable {
     static final private Logger logger = JrdsLogger.getLogger(GraphDesc.class);
 
-    private static final class ConsFunc {
+    public static final class ConsFunc {
         private String id;
         private ConsFunc(String id) {
             this.id = id;
@@ -44,8 +49,9 @@ public final class GraphDesc
     static public final ConsFunc MIN = ConsFunc.MIN;
     static public final ConsFunc MAX = ConsFunc.MAX;
     static public final ConsFunc LAST = ConsFunc.LAST;
+    static public final ConsFunc DEFAULTCF = AVERAGE;
 
-    private interface GraphType {
+    public interface GraphType {
         public void draw(RrdGraphDef rgd, String sn, Color color, String legend) throws
             RrdException;
 
@@ -241,28 +247,28 @@ public final class GraphDesc
     public void add(String name, GraphType graphType, Color color) {
         dsMap.put(name,
                   new DsDesc(name, name, null, graphType, color, name,
-                             ConsFunc.AVERAGE));
+                  		DEFAULTCF));
     }
 
     public void add(String name, GraphType graphType, Color color,
                     String legend) {
         dsMap.put(name,
                   new DsDesc(name, name, null, graphType, color, legend,
-                             ConsFunc.AVERAGE));
+                  		DEFAULTCF));
     }
 
     public void add(String name, GraphType graphType, String legend) {
         dsMap.put(name,
                   new DsDesc(name, name, null, graphType,
                              colors[ (lastColor++) % colors.length], legend,
-                             ConsFunc.AVERAGE));
+							 DEFAULTCF));
     }
 
     public void add(String name, GraphType graphType) {
         dsMap.put(name,
                   new DsDesc(name, name, null, graphType,
                              colors[ (lastColor++) % colors.length], name,
-                             ConsFunc.AVERAGE));
+							 DEFAULTCF));
     }
 
     public void add(GraphType graphType, String legend) {
@@ -273,30 +279,38 @@ public final class GraphDesc
                     String legend) {
         dsMap.put(name,
                   new DsDesc(name, null, rpn, graphType, color, legend,
-                             ConsFunc.AVERAGE));
+                  		DEFAULTCF));
     }
 
     public void add(String name, String rpn, GraphType graphType, Color color) {
         dsMap.put(name,
                   new DsDesc(name, null, rpn, graphType, color, name,
-                             ConsFunc.AVERAGE));
+                  		DEFAULTCF));
     }
 
     public void add(String name, String rpn, GraphType graphType, String legend) {
         dsMap.put(name,
                   new DsDesc(name, null, rpn, graphType,
                              colors[lastColor++ % colors.length], legend,
-                             ConsFunc.AVERAGE));
+							 DEFAULTCF));
     }
 
     public void add(String name) {
         dsMap.put(name,
-                  new DsDesc(name, name, null, NONE, null, null, ConsFunc.AVERAGE));
+                  new DsDesc(name, name, null, NONE, null, null, DEFAULTCF));
     }
 
     public void add(String name, String rpn) {
         dsMap.put(name,
-                  new DsDesc(name, null, rpn, NONE, null, null, ConsFunc.AVERAGE));
+                  new DsDesc(name, null, rpn, NONE, null, null, DEFAULTCF));
+    }
+    
+    public void add(String name, String dsName, String rpn,
+            GraphType graphType, Color color, String legend,
+            ConsFunc cf) {
+        dsMap.put(name,
+                new DsDesc(name, dsName, rpn, graphType, color, legend, cf));
+  	
     }
 
     public RrdGraphDef getGraphDef(Probe probe) throws IOException,

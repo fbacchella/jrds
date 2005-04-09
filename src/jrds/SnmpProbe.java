@@ -67,8 +67,8 @@ public abstract class SnmpProbe extends Probe {
 		Map retValue = null;
 		Collection oids = getOidSet();
 		if(oids != null) {
-			SnmpVars snmpVars = requester.doSnmpGet(this, oids);
-		}
+			retValue = requester.doSnmpGet(this, oids);
+ 		}
 		return retValue;
 	}
 

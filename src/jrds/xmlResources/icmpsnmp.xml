@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+	<add name="InMsgs" type="line">
+	<add name="InErrors" type="line">
+	<add name="OutMsgs" type="line">
+	<add name="OutErrors" type="line">
+	<filename value="icmp">
+	<graphtitle value="ICMP Info">
+	<verticallabel value="Paquets/s">
+	<hosttree>
+	</hosttree>
+	<viewtree>
+	</viewtree>
+</graphdesc>
