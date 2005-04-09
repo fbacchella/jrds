@@ -1,7 +1,7 @@
 /*
  * Created on 20 déc. 2004
  *
- * TODO 
+ * TODO
  */
 package jrds;
 
@@ -39,9 +39,9 @@ public class JrdsLogger {
 	 * Private because all the method of the object are static
 	 */
 	private JrdsLogger() {
-		
+
 	}
-	
+
 	/**
 	 * Return a configured logger, using the class package name for the appender name
 	 * @param clazz the class of the objet to get a logger for
@@ -59,7 +59,7 @@ public class JrdsLogger {
 	static final public org.apache.log4j.Logger getLogger(String clazz){
 		return Logger.getLogger(clazz);
 	}
-	
+
 	/**
 	 * Configure logging to go to a file
 	 * @param logfile The file to send log to
@@ -73,23 +73,23 @@ public class JrdsLogger {
 			Logger.getLogger(".").error("Unable to open " + logfile + ": " + e.getLocalizedMessage());
 		}
 	}
-	
+
 	static final private void initLog(Appender app) {
 		Logger logger = Logger.getLogger(APPENDER);
 		logger.removeAppender(APPENDER);
 		logger.addAppender(app);
-		
+
 		org.snmp4j.log.LogFactory.setLogFactory(new Log4jLogFactory());
 		Logger snmp4jLogger = Logger.getLogger("org.snmp4j");
 		snmp4jLogger.setLevel(Level.WARN);
 		snmp4jLogger.removeAppender(APPENDER);
 		snmp4jLogger.addAppender(app);
-		
+
 		PropertiesManager pm = PropertiesManager.getInstance();
 		logger.setLevel(pm.loglevel);
 		PropertyConfigurator.configure(pm.getProperties());
 	}
-	
+
 	static final private Appender getAppender(boolean isFile, String logfile) throws IOException {
 		Appender newApp = null;
 		if(isFile) {
@@ -99,7 +99,7 @@ public class JrdsLogger {
 		else {
 			newApp = new ConsoleAppender(new org.apache.log4j.SimpleLayout(), logfile);
 		}
-		newApp.setName(APPENDER);			
+		newApp.setName(APPENDER);
 		return newApp;
 	}
 
