@@ -61,6 +61,7 @@
 		<copy todir="${build.home}/classes">
 			<fileset dir="${src.home}">
 				<include name="**/*.xml"/>
+				<include name="**/*.xsl"/>
 			</fileset>
 		</copy>
 	</target>
@@ -101,19 +102,19 @@
 		</tar>
 	</target>
 
-	<target name="apptar" depends="appjar">
-               <tar destfile="${build.home}/jrds.tar">
-                       <tarfileset dir="." prefix="jrds">
-                               <include name="lib/**"/>
-                       </tarfileset>
-                       <tarfileset dir="${build.home}" prefix="jrds/lib">
-                               <include name="jrds.jar"/>
-                       </tarfileset>
-                       <tarfileset dir="${build.home}" prefix="jrds">
-                               <include name="jrds.war"/>
-			</tarfileset>
-		</tar>
-	</target>
+    <target name="apptar" depends="appjar">
+        <tar destfile="${build.home}/jrds.tar">
+            <tarfileset dir="." prefix="jrds">
+                <include name="lib/**"/>
+            </tarfileset>
+            <tarfileset dir="${build.home}" prefix="jrds/lib">
+                <include name="jrds.jar"/>
+            </tarfileset>
+            <tarfileset dir="${build.home}" prefix="jrds">
+                <include name="jrds.war"/>
+            </tarfileset>
+        </tar>
+    </target>
 
 	<target name="war" depends="appjar">
 		<war destfile="${build.home}/jrds.war" webxml="${basedir}/web.xml" duplicate="preserve">
