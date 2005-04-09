@@ -36,10 +36,6 @@ public final class Graph extends HttpServlet {
 		Date end = new Date(0);
 
 		calcDate(req.getParameter("begin"), req.getParameter("end"), begin, end);
-		//String beginString = req.getParameter("begin");
-		//Date begin = new Date(Long.parseLong(beginString));
-		//String endString = req.getParameter("end");
-		//Date end = new Date(Long.parseLong(endString));
 
 		if("true".equals(req.getParameter("refresh"))) {
 			long delta = end.getTime() - begin.getTime();
