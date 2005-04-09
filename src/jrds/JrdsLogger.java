@@ -1,5 +1,5 @@
 /*
- * Created on 20 dŽc. 2004
+ * Created on 20 déc. 2004
  *
  * TODO 
  */
@@ -81,7 +81,7 @@ public class JrdsLogger {
 		
 		org.snmp4j.log.LogFactory.setLogFactory(new Log4jLogFactory());
 		Logger snmp4jLogger = Logger.getLogger("org.snmp4j");
-		snmp4jLogger.setLevel(Level.ALL);
+		snmp4jLogger.setLevel(Level.WARN);
 		snmp4jLogger.removeAppender(APPENDER);
 		snmp4jLogger.addAppender(app);
 		

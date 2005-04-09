@@ -15,7 +15,7 @@
 	<property name="compile.optimize"    value="true"/>
 
 	<!-- ===================== Catalina Classpath =========================== -->
-	<property name="catalina.home" value="C:\Borland\JBuilder2005\thirdparty\jakarta-tomcat-5.0.27"/>
+	<property name="catalina.home" value="/Library/Tomcat"/>
 	<path id="catalina.classpath">
 	    <pathelement location="${catalina.home}/common/classes"/>
 		<fileset dir="${catalina.home}/common/endorsed">
@@ -47,8 +47,8 @@
 	<import file="local.xml" optional="true" />
 
 	<target name="compile">
-            <mkdir dir="${build.home}/classes">
-            </mkdir>
+		<mkdir dir="${build.home}/classes" />
+
 	    <javac srcdir="${src.home}"
 	           destdir="${build.home}/classes"
 	            debug="${compile.debug}"
@@ -58,6 +58,11 @@
 	    	    target="1.4">
                     <classpath refid="compile.classpath"/>
 	    </javac>
+		<copy todir="${build.home}/classes">
+			<fileset dir="${src.home}">
+				<include name="**/*.xml"/>
+			</fileset>
+		</copy>
 	</target>
 
 	<target name="appjar" depends="compile">
@@ -129,8 +134,9 @@
 	<target name="collect" depends="appjar">
 		<java  classname="jrds.standalone.Collector" fork="true">
 			<classpath>
-				<path refid="project.classpath" />
+				<!--<pathelement location="${build.home}/classes" />-->
 				<pathelement location="${build.home}/jrds.jar"/>
+				<path refid="project.classpath" />
 			</classpath>
 		</java>
 	</target>
