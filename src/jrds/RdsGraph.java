@@ -22,6 +22,21 @@ import org.jrobin.core.RrdException;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerConfigurationException;
+
+import javax.xml.transform.dom.DOMSource;
+
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
+import java.io.StringReader;
+
+
+
+
 /**
  * @author bacchell
  * @version $Revision$
@@ -225,6 +240,51 @@ public class RdsGraph
        }
    }
 
+   public String writeXml(Date startDate, Date endDate) {
+       String xmlData = null;
+     try {
+         RrdGraph rrdGraph = getRrdGraph(startDate, endDate);
+         xmlData = rrdGraph.fetchExportData().exportXml();
+     }
+     catch (RrdException ex) {
+         logger.warn("Unable to creage png for " + gd.getFilename() +
+                    " on host " + probe.getHost().getName() + ": " +
+                    ex.getLocalizedMessage());
+    }
+     catch (IOException ex) {
+         logger.warn("Unable to creage png for " + gd.getFilename() +
+                    " on host " + probe.getHost().getName() + ": " +
+                    ex.getLocalizedMessage());
+    }
+    return xmlData;
+}
+
+
+   public void writeCsv(OutputStream out, Date startDate, Date endDate){
+       // Use a Transformer for output
+       TransformerFactory tFactory = TransformerFactory.newInstance();
+       Transformer transformer = null;
+       try {
+           StreamSource stylesource = new StreamSource(jrds.xmlResources.ResourcesLocator.getResource("jrds.xsl"));
+           transformer = tFactory.newTransformer(stylesource);
+           StringReader reader = new java.io.StringReader(writeXml(startDate, endDate));
+           Source source = new StreamSource(reader);
+           StreamResult result = null;
+           result = new StreamResult(out);
+           transformer.transform(source, result);
+       }
+       catch (TransformerConfigurationException ex1) {
+           logger.warn("Unable to creage csv for " + gd.getFilename() +
+                      " on host " + probe.getHost().getName() + ": " +
+                      ex1.getLocalizedMessage());
+      }
+        catch (TransformerException ex) {
+            logger.warn("Unable to creage csv for " + gd.getFilename() +
+                        " on host " + probe.getHost().getName() + ": " +
+                        ex.getLocalizedMessage());
+       }
+
+    }
     public byte[] getPngBytes(Date startDate, Date endDate) {
         byte[] retValue = null;
         BufferedImage img = makeImg(startDate, endDate);

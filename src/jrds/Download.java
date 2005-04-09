@@ -25,9 +25,7 @@ import org.apache.log4j.Logger;
 
 public class Download
     extends HttpServlet {
-    private static final String CONTENT_TYPE = "text/xml";
-    //@todo set DTD
-    private static final String DOC_TYPE = null;
+    private static final String CONTENT_TYPE = "text/csv";
 
     static final private Logger logger = JrdsLogger.getLogger(Graph.class);
 
@@ -41,17 +39,12 @@ public class Download
         calcDate(req.getParameter("begin"), req.getParameter("end"), begin, end);
 
         res.setContentType(CONTENT_TYPE);
-        //PrintWriter out = response.getWriter();
-        //out.println("<?xml version=\"1.0\"?>");
-        //if (DOC_TYPE != null) {
-        //    out.println(DOC_TYPE);
-        //}
 
         String rrdId = req.getParameter("id");
         RdsGraph graph = hl.getGraphById(Integer.parseInt(rrdId));
         ServletOutputStream out = res.getOutputStream();
 
-        graph.writeXml(out, begin, end);
+        graph.writeCsv(out, begin, end);
     }
     /**
      * Calculate date from string parametrs comming from the URL
