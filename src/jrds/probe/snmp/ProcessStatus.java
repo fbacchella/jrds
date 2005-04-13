@@ -65,7 +65,7 @@ public class ProcessStatus extends RdsSnmpSimple {
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.snmp.SnmpStore#storeValues(com.aol.jrds.snmp.SnmpVars, org.jrobin.core.Sample, com.aol.jrds.RdsSnmpRrd)
 	 */
-	public Map filterValues(SnmpVars snmpVars){
+	public Map filterValues(Map snmpVars){
 		int runnable = 0;
 		int stopped = 0;
 		int inPageWait = 0;

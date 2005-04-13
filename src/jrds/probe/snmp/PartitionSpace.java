@@ -14,7 +14,6 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsIndexedSnmpRrd;
 import jrds.graphe.PartitionSpaceGraph;
-import jrds.snmp.SnmpVars;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.smi.OID;
@@ -67,14 +66,19 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
 		return retval;
 	}
 
-	public Map filterValues(SnmpVars snmpVars) {
+	/**
+	 * The want to store the value in octet, not in bloc size
+	 * The translation is done by the probe, not the graph
+	 * @see jrds.Probe#filterValues(java.util.Map)
+	 */
+	public Map filterValues(Map snmpVars) {
 		int allocUnit = 0;
 		long total = 0;
 		long used = 0;
 		for(Iterator i = snmpVars.entrySet().iterator(); i.hasNext();) {
 			Map.Entry e = (Map.Entry) i.next();
 			OID oid = (OID) e.getKey();
-			Number value = (Number) e.getValue();    //SnmpVars.convertVar((Variable) e.getValue());
+			Number value = (Number) e.getValue();
 			oid.removeLast();
 			if(allocUnitOid.equals(oid)) {
 				allocUnit = value.intValue();
@@ -94,36 +98,4 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
 		
 		return retValue;
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.RdsSnmpRrd#storeValues(com.aol.jrds.snmp.SnmpVars, org.jrobin.core.Sample)
-	 */
-//	public void storeValues(SnmpVars snmpVars, Sample oneSample)
-//	throws RrdException {
-//		if(snmpVars != null && oneSample != null) {
-//			int allocUnit = 0;
-//			long total = 0;
-//			long used = 0;
-//			for(Iterator i = snmpVars.entrySet().iterator(); i.hasNext();) {
-//				Map.Entry e = (Map.Entry) i.next();
-//				OID oid = (OID) e.getKey();
-//				Number value = (Number) e.getValue();    //SnmpVars.convertVar((Variable) e.getValue());
-//				oid.removeLast();
-//				if(allocUnitOid.equals(oid)) {
-//					allocUnit = value.intValue();
-//				}
-//				else if(totalOid.equals(oid)) {
-//					total = value.intValue();
-//				}
-//				else if(usedOid.equals(oid)) {
-//					used = value.intValue();
-//				}
-//			}
-//			
-//			total *= allocUnit;
-//			oneSample.setValue("Total", total);
-//			used *= allocUnit;
-//			oneSample.setValue("Used", used);
-//		}
-//	}
 }

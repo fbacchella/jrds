@@ -5,6 +5,7 @@
  */
 package jrds.probe.snmp;
 
+import jrds.GraphDesc;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
@@ -68,7 +69,18 @@ public class Squid extends RdsSnmpSimple {
 		pd.add("CpuUsage",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.5"));
 		pd.add("CpuTime", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.1.4"));
 		pd.add("MemUsage",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.3"));
-		pd.setGraphClasses(new Class[] {SquidHitRatioGraph.class, SquidBytesGraph.class, SquidCpu.class, SquidReqGraph.class});
+		
+		//An associated graph for the number of object
+		GraphDesc ipGraph = new GraphDesc(1);
+		ipGraph.add("NumObjCount", GraphDesc.LINE,"Number of objects");
+		
+		ipGraph.setFilename("squidnumobj");
+		ipGraph.setGraphTitle("Number of objects");
+		ipGraph.setVerticalLabel("objetcs");
+		ipGraph.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SERVICES, "Squid", GraphDesc.TITLE} );
+		ipGraph.setViewTree(new Object[] {GraphDesc.SERVICES, "Squid", GraphDesc.HOST, GraphDesc.TITLE});
+
+		pd.setGraphClasses(new Object[] {ipGraph, SquidHitRatioGraph.class, SquidBytesGraph.class, SquidCpu.class, SquidReqGraph.class});
 		pd.setRrdName("squid");
 	}
 

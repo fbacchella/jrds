@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 import jrds.snmp.SnmpRequester;
-import jrds.snmp.SnmpVars;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.Target;
@@ -73,7 +72,9 @@ public abstract class SnmpProbe extends Probe {
 	}
 
 	/**
-	 *  Prepare the SnmpVars to be stored by a probe
+	 * Prepare the SnmpVars to be stored by a probe. In the general case, for a snmp probe
+	 * the last element of the OID is removed.
+	 * If the value is a date, the value is the second since epoch
 	 * @param snmpVars
 	 * @return a Map of all the identified vars
 	 */

@@ -6,19 +6,18 @@
  */
 package jrds.probe.snmp;
 
+import java.awt.Color;
 import java.util.Map;
 
+import jrds.GraphDesc;
 import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
 import jrds.snmp.SnmpRequester;
-import jrds.snmp.SnmpVars;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.smi.OID;
-import jrds.GraphDesc;
-import java.awt.Color;
 
 /**
  * Used to get the load average, using the float value
@@ -66,7 +65,7 @@ public class CpuLoad
      * @param snmpVars SnmpVars
      * @return unmodified map
      */
-    public Map filterValues(SnmpVars snmpVars) {
+    public Map filterValues(Map snmpVars) {
         return snmpVars;
     }
 }
