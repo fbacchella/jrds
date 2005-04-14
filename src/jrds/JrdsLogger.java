@@ -85,6 +85,12 @@ public class JrdsLogger {
 		snmp4jLogger.removeAppender(APPENDER);
 		snmp4jLogger.addAppender(app);
 
+		org.snmp4j.log.LogFactory.setLogFactory(new Log4jLogFactory());
+		Logger digesterLogger = Logger.getLogger("org.apache.commons");
+		digesterLogger.setLevel(Level.WARN);
+		digesterLogger.removeAppender(APPENDER);
+		digesterLogger.addAppender(app);
+
 		PropertiesManager pm = PropertiesManager.getInstance();
 		logger.setLevel(pm.loglevel);
 		PropertyConfigurator.configure(pm.getProperties());
