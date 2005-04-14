@@ -1,14 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
-	<add name="InMsgs" type="line">
-	<add name="InErrors" type="line">
-	<add name="OutMsgs" type="line">
-	<add name="OutErrors" type="line">
-	<filename value="icmp">
-	<graphtitle value="ICMP Info">
-	<verticallabel value="Paquets/s">
+	<filename>icmp</filename>
+	<verticalLabel>Paquets/s</verticalLabel>
+	<graphTitle>ICMP Info</graphTitle>
+	<add>
+		<name>InMsgs</name>
+		<graphType>line</graphType>
+		<legend>Number of ICMP messages received</legend>
+	</add>
+	<add>
+		<name>InErrors</name>
+		<graphType>line</graphType>
+		<legend>Number of ICMP messages received with errors</legend>
+	</add>
+	<add>
+		<name>OutMsgs</name>
+		<graphType>line</graphType>
+		<legend>Number of ICMP messages sent</legend>
+	</add>
+	<add>
+		<name>OutErrors</name>
+		<graphType>line</graphType>
+		<legend>Number of ICMP messages sent with errors</legend>
+	</add>
 	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>NETWORK</pathelement>
+		<pathelement>TITLE</pathelement>
 	</hosttree>
 	<viewtree>
+		<pathelement>NETWORK</pathelement>
+		<pathelement>TITLE</pathelement>
+		<pathelement>HOST</pathelement>
 	</viewtree>
 </graphdesc>
