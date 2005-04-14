@@ -19,18 +19,18 @@ public class SquidBytesGraph extends RdsGraph {
 	static final GraphDesc ds = new GraphDesc(2);
 	static {
 		ds.add("HttpOutKb");
-		ds.add("HttpOut", "HttpOutKb, 1024, *", GraphDesc.LINE, "Bytes send to client");
+		ds.add("HttpOut", "HttpOutKb, 8192, *", GraphDesc.LINE, "Bits send to client");
 		ds.add("HttpInKb");
-		ds.add("HttpIn", "HttpInKb, 1024, *", GraphDesc.LINE, "Bytes received from client");
+		ds.add("HttpIn", "HttpInKb, 8192, *", GraphDesc.LINE, "Bits received from client");
 		ds.add("ServerOutKb");
-		ds.add("ServerOut", "ServerOutKb, 1024, *", GraphDesc.LINE, "Bytes send to servers");
+		ds.add("ServerOut", "ServerOutKb, 8192, *", GraphDesc.LINE, "Bits send to servers");
 		ds.add("ServerInKb");
-		ds.add("ServerIn", "ServerInKb, 1024, *", GraphDesc.LINE, "Bytes received from servers");
+		ds.add("ServerIn", "ServerInKb, 8192, *", GraphDesc.LINE, "Bits received from servers");
 
 
 		ds.setFilename("squidbytes");
 		ds.setGraphTitle("Squid bytes transfered");
-		ds.setVerticalLabel("Bytes/s");
+		ds.setVerticalLabel("Bit/s");
 		ds.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SERVICES, "Squid", GraphDesc.TITLE} );
 		ds.setViewTree(new Object[] {GraphDesc.SERVICES, "Squid", GraphDesc.HOST, GraphDesc.TITLE});
 	}
