@@ -5,8 +5,9 @@ package jrds.xmlResources;
 
 
 import java.io.InputStream;
-import jrds.RdsGraph;
+
 import jrds.JrdsLogger;
+
 import org.apache.log4j.Logger;
 
 /**
