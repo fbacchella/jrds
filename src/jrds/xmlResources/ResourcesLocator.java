@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
  * @version $Revision$
  */
 public class ResourcesLocator {
-    static final private Logger logger = JrdsLogger.getLogger(RdsGraph.class);
+    static final private Logger logger = JrdsLogger.getLogger(ResourcesLocator.class);
     /**
      * We don't want any constructor
      */
