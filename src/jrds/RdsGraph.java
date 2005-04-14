@@ -11,28 +11,24 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 
 import javax.media.jai.JAI;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.jrobin.core.RrdException;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerConfigurationException;
-
-import javax.xml.transform.dom.DOMSource;
-
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.Source;
-import javax.xml.transform.stream.StreamSource;
-import java.io.StringReader;
 
 
 
@@ -276,12 +272,12 @@ public class RdsGraph
        catch (TransformerConfigurationException ex1) {
            logger.warn("Unable to creage csv for " + gd.getFilename() +
                       " on host " + probe.getHost().getName() + ": " +
-                      ex1.getLocalizedMessage());
+                      ex1.getLocalizedMessage(),ex1);
       }
         catch (TransformerException ex) {
             logger.warn("Unable to creage csv for " + gd.getFilename() +
                         " on host " + probe.getHost().getName() + ": " +
-                        ex.getLocalizedMessage());
+                        ex.getLocalizedMessage(),ex);
        }
 
     }
