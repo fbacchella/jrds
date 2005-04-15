@@ -99,7 +99,6 @@ public class GraphFactory {
 				public void body (String namespace, String name, String text) {
 					List tree = (List) getDigester().peek();
 					tree.add(GraphDesc.resolvPathElement(text));
-					logger.debug(getDigester().peek());
 				}	
 			}
 			);
@@ -107,7 +106,6 @@ public class GraphFactory {
 				public void body (String namespace, String name, String text) {
 					List tree = (List) getDigester().peek();
 					tree.add(text);
-					logger.debug(getDigester().peek());
 				}	
 			}
 			);
