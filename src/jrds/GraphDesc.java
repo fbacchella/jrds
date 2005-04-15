@@ -195,6 +195,9 @@ implements Cloneable {
 	}
 	
 	static final public PathElement HOST = PathElement.HOST;
+	static final public PathElement SERVICES = PathElement.SERVICES;
+	static final public PathElement NETWORK = PathElement.NETWORK;
+	static final public PathElement IP = PathElement.IP;
 	static final public PathElement TITLE = PathElement.TITLE;
 	static final public PathElement INDEX = PathElement.INDEX;
 	static final public PathElement SUBTITLE = PathElement.SUBTITLE;
