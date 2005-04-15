@@ -10,6 +10,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
 import jrds.graphe.CpuRawTimeSolarisGraph;
+import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;
 
@@ -30,6 +31,7 @@ public class CpuRawTimeSolaris extends RdsSnmpSimple {
 		pd.add("ssCpuRawKernel", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.2021.11.55"));
 		pd.setRrdName("cpurawsol");
 		pd.setGraphClasses(new Class[] {CpuRawTimeSolarisGraph.class});
+        pd.setRequester(SnmpRequester.SIMPLE);
 	}
 	/**
 	 * @param monitoredHost

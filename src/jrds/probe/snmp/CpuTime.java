@@ -10,6 +10,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
 import jrds.graphe.CpuTimeGraph;
+import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;
 
@@ -31,6 +32,7 @@ public class CpuTime extends RdsSnmpSimple {
 		pd.add("NumUsers", ProbeDesc.GAUGE, new OID(".1.3.6.1.2.1.25.1.5"));
 		pd.setRrdName("cpu");
 		pd.setGraphClasses(new Class[] {CpuTimeGraph.class});
+        pd.setRequester(SnmpRequester.SIMPLE);
 		//pd.setGraphClasses(new Object[] {"cputime.xml"});
 	}
 	/**

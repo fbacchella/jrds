@@ -11,6 +11,7 @@ import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
 import jrds.graphe.CpuRawKILinuxGraph;
 import jrds.graphe.CpuRawTimeLinuxGraph;
+import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;
 
@@ -33,6 +34,7 @@ public class CpuRawTimeLinux extends RdsSnmpSimple {
 		pd.add("ssCpuRawInterrupt", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.2021.11.56"));
 		pd.setRrdName("cpurawlinux");
 		pd.setGraphClasses(new Class[] {CpuRawTimeLinuxGraph.class, CpuRawKILinuxGraph.class});
+        pd.setRequester(SnmpRequester.SIMPLE);
 	}
 
 	/**

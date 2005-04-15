@@ -9,6 +9,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
 import jrds.graphe.VMSolarisGraph;
+import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;
 
@@ -27,6 +28,7 @@ public final class VMSolaris extends RdsSnmpSimple {
 		pd.add("rsVSwapOut", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.42.3.13.12"));
 		pd.setRrdName("vmsolaris");
 		pd.setGraphClasses(new Class[] {VMSolarisGraph.class});
+		pd.setRequester(SnmpRequester.SIMPLE);
 	}
 	
 	/**

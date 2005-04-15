@@ -9,6 +9,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
 import jrds.graphe.IcmpGraph;
+import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;
 
@@ -50,6 +51,7 @@ public class IcmpSnmp extends RdsSnmpSimple {
 		pd.add("OutAddrMaskReps", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.5.26"));
 		pd.setRrdName("icmp");
 		pd.setGraphClasses(new Object[] {"icmpsnmp.xml"});
+        pd.setRequester(SnmpRequester.SIMPLE);
 	}
 
 	/**

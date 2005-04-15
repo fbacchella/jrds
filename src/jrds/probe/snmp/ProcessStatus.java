@@ -15,7 +15,6 @@ import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
 import jrds.graphe.ProcessStatusGraph;
 import jrds.snmp.SnmpRequester;
-import jrds.snmp.SnmpVars;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.smi.OID;
@@ -36,7 +35,7 @@ public class ProcessStatus extends RdsSnmpSimple {
 	static final private String SLEEPING="S";
 	static final private String IDLE="I";
 	static final private String ZOMBIE="Z";
-
+	
 	static final private ProbeDesc pd = new ProbeDesc(7);
 	static {
 		pd.add("psProcessState", psProcessState);
@@ -49,19 +48,20 @@ public class ProcessStatus extends RdsSnmpSimple {
 		pd.add(ZOMBIE, ProbeDesc.GAUGE);
 		pd.setGraphClasses(new Class []{ProcessStatusGraph.class});
 		pd.setRrdName("pslist");
+		pd.setRequester(SnmpRequester.SIMPLE);
 	}
-
+	
 	/**
 	 * @param monitoredHost
 	 */
 	public ProcessStatus(RdsHost monitoredHost) {
 		super(monitoredHost, pd);
 	}
-
+	
 	protected SnmpRequester getSnmpRequester() {
 		return SnmpRequester.TABULAR;
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.snmp.SnmpStore#storeValues(com.aol.jrds.snmp.SnmpVars, org.jrobin.core.Sample, com.aol.jrds.RdsSnmpRrd)
 	 */
@@ -102,5 +102,5 @@ public class ProcessStatus extends RdsSnmpSimple {
 		retValue.put(ZOMBIE, new Double(zombie));
 		return retValue;
 	}
-
+	
 }

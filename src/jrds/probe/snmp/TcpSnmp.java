@@ -12,6 +12,7 @@ import jrds.RdsSnmpSimple;
 import jrds.graphe.TcpConnectionGraph;
 import jrds.graphe.TcpEstablishedGraph;
 import jrds.graphe.TcpSegmentsGraph;
+import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;
 
@@ -31,6 +32,7 @@ public class TcpSnmp extends RdsSnmpSimple {
 		pd.add("InSegs", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.10"));
 		pd.add("OutSegs", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.11"));
 		pd.add("RetransSegs", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.12"));
+		pd.setRequester(SnmpRequester.SIMPLE);
 
 		pd.setRrdName("tcp_snmp");
 		pd.setGraphClasses(new Class[] {TcpConnectionGraph.class, TcpEstablishedGraph.class, TcpSegmentsGraph.class});

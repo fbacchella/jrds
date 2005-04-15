@@ -7,8 +7,6 @@ package jrds;
 
 import java.util.Set;
 
-import jrds.snmp.SnmpRequester;
-
 import org.apache.log4j.Logger;
 
 
@@ -27,9 +25,9 @@ public abstract class RdsSnmpSimple extends SnmpProbe  {
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.RdsSnmpRrd#getSnmpRequester()
 	 */
-	protected SnmpRequester getSnmpRequester() {
+	/*protected SnmpRequester getSnmpRequester() {
 		return SnmpRequester.SIMPLE;
-	}
+	}*/
 
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.snmp.SnmpPreparator#makeOidSet()

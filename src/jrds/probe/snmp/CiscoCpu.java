@@ -9,6 +9,8 @@ import jrds.RdsSnmpSimple;
 
 import org.snmp4j.smi.OID;
 import jrds.GraphDesc;
+import jrds.snmp.SnmpRequester;
+
 import java.awt.Color;
 
 
@@ -23,6 +25,7 @@ public class CiscoCpu extends RdsSnmpSimple {
         pd.add("la1", ProbeDesc.GAUGE, new OID(".1.3.6.1.4.1.9.2.1.57"));
         pd.add("la5", ProbeDesc.GAUGE, new OID(".1.3.6.1.4.1.9.2.1.58"));
         pd.setRrdName("ciscocpuload");
+        pd.setRequester(SnmpRequester.SIMPLE);
 
         GraphDesc gd = new GraphDesc(2);
         gd.add("la1", GraphDesc.LINE, Color.GREEN, "1mn");

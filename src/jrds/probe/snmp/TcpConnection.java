@@ -10,6 +10,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
 import jrds.graphe.TcpConnectionGraph;
+import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;
 
@@ -30,6 +31,7 @@ public class TcpConnection extends RdsSnmpSimple {
 		pd.add("OutSegs", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.11"));
 		pd.add("RetransSegs", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.12"));
 		pd.setRrdName("tcp");
+		pd.setRequester(SnmpRequester.SIMPLE);
 		pd.setGraphClasses(new Class[] {TcpConnectionGraph.class});
 		
 	}

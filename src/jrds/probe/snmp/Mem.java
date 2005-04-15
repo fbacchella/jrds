@@ -9,6 +9,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
 import jrds.graphe.MemGraph;
+import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;
 
@@ -26,6 +27,7 @@ public class Mem extends RdsSnmpSimple {
 		pd.add("memTotalReal", ProbeDesc.GAUGE, new OID(".1.3.6.1.4.1.2021.4.5"));
 		pd.add("memAvailReal", ProbeDesc.GAUGE, new OID(".1.3.6.1.4.1.2021.4.6"));
 		pd.setGraphClasses(new Class[] {MemGraph.class});
+	       pd.setRequester(SnmpRequester.SIMPLE);
 		pd.setRrdName("memory");
 	}
 	/**

@@ -9,6 +9,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
 import jrds.graphe.MemGraphLinux;
+import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;
 
@@ -29,6 +30,7 @@ public final class MemLinux extends RdsSnmpSimple {
 		pd.add("memBuffer", ProbeDesc.GAUGE, new OID(".1.3.6.1.4.1.2021.4.14"));
 		pd.add("memCached", ProbeDesc.GAUGE, new OID(".1.3.6.1.4.1.2021.4.15"));
 		pd.setGraphClasses(new Class[] {MemGraphLinux.class});
+	       pd.setRequester(SnmpRequester.SIMPLE);
 		pd.setRrdName("memlinux");
 	}
 

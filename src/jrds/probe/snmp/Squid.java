@@ -13,6 +13,7 @@ import jrds.graphe.SquidBytesGraph;
 import jrds.graphe.SquidCpu;
 import jrds.graphe.SquidHitRatioGraph;
 import jrds.graphe.SquidReqGraph;
+import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;
 
@@ -70,6 +71,8 @@ public class Squid extends RdsSnmpSimple {
 		pd.add("CpuTime", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.1.4"));
 		pd.add("MemUsage",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.3"));
 		
+		pd.setRequester(SnmpRequester.SIMPLE);
+		
 		//An associated graph for the number of object
 		GraphDesc ipGraph = new GraphDesc(1);
 		ipGraph.add("NumObjCount", GraphDesc.LINE,"Number of objects");
@@ -79,11 +82,11 @@ public class Squid extends RdsSnmpSimple {
 		ipGraph.setVerticalLabel("objetcs");
 		ipGraph.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SERVICES, "Squid", GraphDesc.TITLE} );
 		ipGraph.setViewTree(new Object[] {GraphDesc.SERVICES, "Squid", GraphDesc.HOST, GraphDesc.TITLE});
-
+		
 		pd.setGraphClasses(new Object[] {ipGraph, SquidHitRatioGraph.class, SquidBytesGraph.class, SquidCpu.class, SquidReqGraph.class});
 		pd.setRrdName("squid");
 	}
-
+	
 	/**
 	 * @param monitoredHost
 	 */

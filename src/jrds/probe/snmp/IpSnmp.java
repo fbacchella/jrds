@@ -11,6 +11,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
 import jrds.graphe.IpErrorGraph;
+import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;
 
@@ -42,6 +43,7 @@ public class IpSnmp extends RdsSnmpSimple {
 
 
 		pd.setRrdName("ipsnmp");
+        pd.setRequester(SnmpRequester.SIMPLE);
 		
 		//The associated graph
 		GraphDesc ipGraph = new GraphDesc(13);
