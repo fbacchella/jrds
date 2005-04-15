@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8">
+		<title>Graph</title>
+		<script type="text/javascript"><!--
+function update_begin(newbegin)
+{
+	var newloc = "graph" + document.location.search;
+	newloc = newloc.replace(/begin=-?[0-d]*/,"begin=" + newbegin);
+
+	return newloc
+}
+//-->
+</script>
+	</head>
+
+	<body bgcolor="#ffffff">
+		<div align="center">
+			<img id="graphImg1" src="img/aollogo.gif" alt="" name="graphImg1" border="0"/>
+			<img id="graphImg2" src="img/aollogo.gif" alt="" name="graphImg2" border="0"/>
+			<img id="graphImg4" src="img/aollogo.gif" alt="" name="graphImg4" border="0"/>
+			<img id="graphImg5" src="img/aollogo.gif" alt="" name="graphImg5" border="0"/>
+			<script type="text/javascript">document.graphImg1.src=update_begin("-1");</script>
+			<script type="text/javascript">document.graphImg2.src=update_begin("-2");</script>
+			<script type="text/javascript">document.graphImg4.src=update_begin("-4");</script>
+			<script type="text/javascript">document.graphImg5.src=update_begin("-5");</script>
+		</div>
+	</body>
+</html>
+
