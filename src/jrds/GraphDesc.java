@@ -1,7 +1,7 @@
-/*
- * Created on 7 févr. 2005
- */
 package jrds;
+
+// ----------------------------------------------------------------------------
+// $Id$
 
 import java.awt.Color;
 import java.io.IOException;
@@ -22,9 +22,9 @@ import org.jrobin.core.RrdException;
 import org.jrobin.graph.RrdGraphDef;
 
 /**
- * @author bacchell
- *
- * TODO
+ * A classed used to store the static description of a graph
+ * @author Fabrice Bacchella
+ * @version $Revision$
  */
 public final class GraphDesc
     implements Cloneable {
@@ -52,6 +52,13 @@ public final class GraphDesc
     static public final ConsFunc LAST = ConsFunc.LAST;
     static public final ConsFunc DEFAULTCF = AVERAGE;
 
+    /**
+     * Find the value of field in the class, the field is is upper case
+     *
+     * @param clazz Class the class to search in
+     * @param name String the looked for field
+     * @return Object the value of the field or null
+     */
     private static final Object resolv(Class clazz, String name) {
         Object gt = null;
         Field gtfield;
@@ -215,6 +222,7 @@ public final class GraphDesc
     static final public PathElement DISK = PathElement.DISK;
     static final public PathElement MEMORY = PathElement.MEMORY;
 
+    /*Lots of macro to store path definitions*/
     static final public Object[] HSLT = new PathElement[] {
         HOST, PathElement.SYSTEM, PathElement.LOAD, TITLE};
     static final public Object[] SLHT = new PathElement[] {
@@ -321,6 +329,13 @@ public final class GraphDesc
         dsMap = new LinkedHashMap();
     }
 
+    /**
+     * add a graph element
+     *
+     * @param name String
+     * @param graphType GraphType
+     * @param color Color
+     */
     public void add(String name, GraphType graphType, Color color) {
         dsMap.put(name,
                   new DsDesc(name, name, null, graphType, color, name,
@@ -348,6 +363,12 @@ public final class GraphDesc
                              DEFAULTCF));
     }
 
+    /**
+     * Used to add a lign in the legend
+     *
+     * @param graphType GraphType
+     * @param legend String
+     */
     public void add(GraphType graphType, String legend) {
         dsMap.put(legend, new DsDesc(null, null, null, graphType, null, legend, null));
     }
@@ -372,6 +393,11 @@ public final class GraphDesc
                              DEFAULTCF));
     }
 
+    /**
+     * Add a datastore that will not generate a graph
+     *
+     * @param name String
+     */
     public void add(String name) {
         dsMap.put(name,
                   new DsDesc(name, name, null, NONE, null, null, DEFAULTCF));
@@ -416,6 +442,14 @@ public final class GraphDesc
 
     }
 
+    /**
+     * return the RrdGraphDef for this graph, used the indicated probe
+     *
+     * @param probe Probe
+     * @return RrdGraphDef
+     * @throws IOException
+     * @throws RrdException
+     */
     public RrdGraphDef getGraphDef(Probe probe) throws IOException,
         RrdException {
         RrdGraphDef retValue = new RrdGraphDef();
@@ -557,7 +591,7 @@ public final class GraphDesc
         this.width = width;
     }
 
-    /* (non-Javadoc)
+    /**
      * @see java.lang.Object#clone()
      */
     public Object clone() {
@@ -593,7 +627,7 @@ public final class GraphDesc
     }
 
     /**
-     * @return Returns the cloned.
+     * @return Returns true if the object has been already cloned.
      */
     public boolean isCloned() {
         return cloned;

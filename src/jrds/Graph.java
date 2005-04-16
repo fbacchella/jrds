@@ -84,7 +84,16 @@ public final class Graph extends HttpServlet {
 		return retValue.toString();
 	}
 
-	public static String getImgElement(RdsGraph graph, HttpServletRequest req, String begin, String end) {
+    /**
+     * Return an img element, with the URL filled
+     *
+     * @param graph RdsGraph
+     * @param req HttpServletRequest
+     * @param begin String
+     * @param end String
+     * @return String
+     */
+    public static String getImgElement(RdsGraph graph, HttpServletRequest req, String begin, String end) {
 		StringBuffer retValue = new StringBuffer();
 		retValue.append("<img ");
 		retValue.append("src='" + req.getContextPath());
