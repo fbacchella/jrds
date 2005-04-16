@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by  () -->
+<graphdesc>
+	<filename>ip</filename>
+	<verticalLabel>paquets/s</verticalLabel>
+	<lowerLimit>NaN</lowerLimit>
+	<graphTitle>IP activity</graphTitle>
+	<add>
+		<name>Upward graph</name>
+		<graphType>comment</graphType>
+	</add>
+	<add>
+		<name>ifOutUcastPkts</name>
+		<graphType>area</graphType>
+		<color>green</color>
+		<legend>packets sends/s</legend>
+	</add>
+	<add>
+		<name>ifOutErrors</name>
+		<graphType>line</graphType>
+		<color>red</color>
+		<rpn/>
+		<legend>packets in error send/s</legend>
+	</add>
+	<add>
+		<name>ifInUcastPkts</name>
+		<graphType/>
+		<legend/>
+	</add>
+	<add>
+		<name>ifInErrors</name>
+		<graphType/>
+		<rpn/>
+		<legend/>
+	</add>
+	<add>
+		<name>Downward graph</name>
+		<graphType>comment</graphType>
+		<rpn/>
+		<legend/>
+	</add>
+	<add>
+		<name>ifInUcastInversed</name>
+		<graphType>area</graphType>
+		<color>blue</color>
+		<rpn>0, ifInUcastPkts,-</rpn>
+		<legend>packets received/s</legend>
+	</add>
+	<add>
+		<name>ifInErrorsInversed</name>
+		<graphType>line</graphType>
+		<color>red</color>
+		<rpn>0, ifInErrors,-</rpn>
+		<legend>packets in error received/s</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>NETWORK</pathelement>
+		<pathelement>INTERFACES</pathelement>
+		<pathelement>INDEX</pathelement>
+		<pathelement>TITLE</pathelement>
+	</hosttree>
+	<viewtree>
+		<pathelement>NETWORK</pathelement>
+		<pathelement>INTERFACES</pathelement>
+		<pathelement>HOST</pathelement>
+		<pathelement>INDEX</pathelement>
+		<pathelement>TITLE</pathelement>
+	</viewtree>
+</graphdesc>

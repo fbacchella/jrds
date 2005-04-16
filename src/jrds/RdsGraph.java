@@ -173,10 +173,10 @@ public class RdsGraph
         Date lastUpdate = probe.getLastUpdate();
         tempGraphDef.comment("@l");
         tempGraphDef.comment("@l");
-        tempGraphDef.comment("Dernière mesure : " +
+        tempGraphDef.comment("Last update : " +
                              lastUpdateFormat.format(lastUpdate) + "@l");
-        tempGraphDef.comment("Période du " + lastUpdateFormat.format(startDate) +
-                             " au " + lastUpdateFormat.format(endDate) + "@l");
+        tempGraphDef.comment("Period from " + lastUpdateFormat.format(startDate) +
+                             " to " + lastUpdateFormat.format(endDate) + "@l");
         return new RrdGraph(tempGraphDef);
     }
 

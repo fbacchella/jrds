@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by  () -->
+<graphdesc>
+	<filename>tcp</filename>
+	<verticalLabel>Requests/s</verticalLabel>
+	<graphTitle>TCP Connections</graphTitle>
+	<add>
+		<name>ActiveOpens</name>
+		<graphType>line</graphType>
+		<legend>Active Opens</legend>
+	</add>
+	<add>
+		<name>PassiveOpens</name>
+		<graphType>line</graphType>
+		<legend>Passive Opens</legend>
+	</add>
+	<add>
+		<name>AttemptFails</name>
+		<graphType>line</graphType>
+		<legend>Connections attempt failed</legend>
+	</add>
+	<add>
+		<name>EstabResets</name>
+		<graphType>line</graphType>
+		<legend>Connections resets</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>NETWORK</pathelement>
+		<pathelement>TCP</pathelement>
+		<pathelement>TITLE</pathelement>
+	</hosttree>
+	<viewtree>
+		<pathelement>NETWORK</pathelement>
+		<pathelement>TCP</pathelement>
+		<pathelement>HOST</pathelement>
+		<pathelement>TITLE</pathelement>
+	</viewtree>
+</graphdesc>

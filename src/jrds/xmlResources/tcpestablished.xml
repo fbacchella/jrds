@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by  () -->
+<graphdesc>
+	<filename>tcpest</filename>
+	<verticalLabel>Number</verticalLabel>
+	<graphTitle>Established TCP Connections TCP</graphTitle>
+	<add>
+		<name>CurrEstab</name>
+		<graphType>area</graphType>
+		<legend>ESTABLISHED or CLOSE-WAIT connections</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>NETWORK</pathelement>
+		<pathelement>TCP</pathelement>
+		<pathelement>TITLE</pathelement>
+	</hosttree>
+	<viewtree>
+		<pathelement>NETWORK</pathelement>
+		<pathelement>TCP</pathelement>
+		<pathelement>HOST</pathelement>
+		<pathelement>TITLE</pathelement>
+	</viewtree>
+</graphdesc>

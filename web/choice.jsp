@@ -33,7 +33,7 @@ function localReturn(y,m,d) {
 	<body bgcolor="#ffffff">
 		<div align="left"></div>
 		<div align="center">
-			<h4>Bienvenue sur RDS version AOL</h4>
+			<h4>Welcome to RDS, Java version</h4>
 		</div>
 		<div align="left">
 			<!--.AGL.wrap(Fabrice Bacchella ;2005.01.12 17:31;;)<img class="logo" src="img/aollogo.gif" alt="AOL" height="25" width="96" border="0">-->
@@ -41,14 +41,14 @@ function localReturn(y,m,d) {
 				<div align="center">
 					<table border="0" cellspacing="2" cellpadding="0">
 						<tr>
-							<td width="160">Choisissez une tri</td>
+							<td width="160">Choose a sort</td>
 							<td><select name="sort">
-									<option value="1">par serveur</option>
-									<option value="2">par vue</option>
+									<option value="1">by server</option>
+									<option value="2">by view</option>
 								</select></td>
 						</tr>
 						<tr>
-							<td width="160">Choisissez un groupe</td>
+							<td width="160">Choose a group</td>
 							<td><select name="group">
 									<c:forEach items="${jrdsBean.groupList}" var="i">
 										<c:out value="${i}" escapeXml="false" />
@@ -57,16 +57,16 @@ function localReturn(y,m,d) {
 							</td>
 						</tr>
 						<tr>
-							<td width="160">Choisissez une échelle</td>
+							<td width="160">Choose a time scale</td>
 							<td><select name="scale">
-									<option value="1">Quotidienne</option>
+									<option value="1">Daily</option>
 									<option value="2">Hebdomadaire</option>
-									<option value="3">Mensuelle</option>
-									<option value="4">Annuelle</option>
+									<option value="3">Weekly</option>
+									<option value="4">Annually</option>
 								</select></td>
 						</tr>
 						<tr>
-							<td width="160">Choisissez la date de fin</td>
+							<td width="160">Choose the end date</td>
 							<td><input type="text" name="date" value=<%= jrdsBean.getNow() %> size="9" /><a name="anchor" id="anchor" title="Sélection de la date" onclick="cal.select(document.forms[0].date,'anchor','dd/MMM/yyyy'); return false;" name="anchor" href="#"><img src="img/cal.gif" alt="calendrier" height="16" width="16" border="0"></a></td>
 						</tr>
 					</table>

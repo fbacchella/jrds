@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 
 /**
  * @author Fabrice Bacchella
- * @versoin $Revision$
+ * @version $Revision$
  * TODO
  */
 public class ProbeFactory {
