@@ -1,21 +1,21 @@
 <hostlist>
-	<!--<host name="www.lemonde.fr" group="lemonde">
+	<host name="www.lemonde.fr" group="lemonde">
 		<rrd type="HttpResponseTimeRrd">
 			<arg type="URL" value="http://www.lemonde.fr"/>
 		</rrd>
-	</host>-->
+	</host>
 	<host name="aolfr-sn01.fr.office.aol.com">
 		<snmp community="public" version="1" />
 		<rrd type="ProcessStatus" />
 		<rrd type="VMSolaris" />
 	</host>
-	<!--<host name="re-qa.fr.office.aol.com">
+	<host name="re-qa.fr.office.aol.com">
 		<rrd type="Oracle">
 			<arg type="String" value="CPSRE"/>
 			<arg type="String" value="system"/>
 			<arg type="String" value="manager"/>
 		</rrd>
-	</host>-->
+	</host>
 	<host name="pt1.fr.office.aol.com" group="conso+">
 		<snmp community="public" port="161" version="1" />
 		<rrd type="DiskIo">
