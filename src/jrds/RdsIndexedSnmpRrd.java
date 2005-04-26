@@ -10,11 +10,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import jrds.probe.IndexedProbe;
 import jrds.snmp.SnmpRequester;
-import jrds.snmp.SnmpVars;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.smi.OID;
@@ -84,7 +84,7 @@ public abstract class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProb
 		
 		Collection soidSet= new ArrayList(1);
 		soidSet.add(indexOid);
-		SnmpVars somevars = indexFinder.doSnmpGet(this, soidSet);
+		Map somevars = indexFinder.doSnmpGet(this, soidSet);
 		boolean found = false;
 		
 		for(Iterator i = somevars.keySet().iterator(); i.hasNext() &&  ! (uniq && found) ;) {
