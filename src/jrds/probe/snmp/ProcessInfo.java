@@ -15,7 +15,6 @@ import jrds.RdsHost;
 import jrds.RdsIndexedSnmpRrd;
 import jrds.graphe.ProcessInfoNumber;
 import jrds.graphe.ProcessInfoSize;
-import jrds.snmp.SnmpVars;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.smi.OID;
@@ -55,7 +54,7 @@ public class ProcessInfo extends RdsIndexedSnmpRrd {
 		setRrdName("ps-" + getIndexName());
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see com.aol.jrds.snmp.SnmpStore#storeValues(com.aol.jrds.snmp.SnmpVars, org.jrobin.core.Sample, com.aol.jrds.RdsSnmpRrd)
 	 */
 	public Map filterValues(Map snmpVars)  {

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE graphdesc SYSTEM "graphdesc.dtd">
 <graphdesc>
 	<filename>icmp</filename>
 	<verticalLabel>Paquets/s</verticalLabel>

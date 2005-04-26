@@ -46,9 +46,9 @@ public class ProcessStatus extends RdsSnmpSimple {
 		pd.add(SLEEPING, ProbeDesc.GAUGE);
 		pd.add(IDLE, ProbeDesc.GAUGE);
 		pd.add(ZOMBIE, ProbeDesc.GAUGE);
-		pd.setGraphClasses(new Class []{ProcessStatusGraph.class});
+		pd.setGraphClasses(new Object []{"processstatus.xml"});
 		pd.setRrdName("pslist");
-		pd.setRequester(SnmpRequester.SIMPLE);
+		pd.setRequester(SnmpRequester.TABULAR);
 	}
 	
 	/**
@@ -57,12 +57,8 @@ public class ProcessStatus extends RdsSnmpSimple {
 	public ProcessStatus(RdsHost monitoredHost) {
 		super(monitoredHost, pd);
 	}
-	
-	protected SnmpRequester getSnmpRequester() {
-		return SnmpRequester.TABULAR;
-	}
-	
-	/* (non-Javadoc)
+
+	/**
 	 * @see com.aol.jrds.snmp.SnmpStore#storeValues(com.aol.jrds.snmp.SnmpVars, org.jrobin.core.Sample, com.aol.jrds.RdsSnmpRrd)
 	 */
 	public Map filterValues(Map snmpVars){

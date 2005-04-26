@@ -62,7 +62,7 @@ public class CpuLoad
     /**
      * No need to play with the OID, so the snmpVars map can be returned has is
      *
-     * @param snmpVars SnmpVars
+     * @param snmpVars Map
      * @return unmodified map
      */
     public Map filterValues(Map snmpVars) {
