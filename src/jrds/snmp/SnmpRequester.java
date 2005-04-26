@@ -8,6 +8,7 @@ package jrds.snmp;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
 
 import jrds.JrdsLogger;
 import jrds.SnmpProbe;
@@ -31,14 +32,20 @@ import org.snmp4j.util.TableUtils;
  * which gets a probe, a collection of ois
  * and make snmp requests based on those oid 
  * @author Fabrice Bacchella
-  */
+ */
 public abstract class SnmpRequester {
 	static private final DefaultPDUFactory factory = new DefaultPDUFactory();
 	static private final Logger logger = JrdsLogger.getLogger(SnmpRequester.class);
 	static private Snmp snmp;
 	static private boolean started = false;
-
+	static final private Object globLock = new Object();
+	
+	/**
+	 * No constructor, full static class;
+	 */
 	private SnmpRequester() {};
+	
+	
 	
 	/**
 	 * The method that need to be implemented to do the request
@@ -46,7 +53,7 @@ public abstract class SnmpRequester {
 	 * @param oidsSet a <code>collection</code> to be request
 	 * @return a map of the snmp values read
 	 */
-	public abstract SnmpVars doSnmpGet(SnmpProbe probe, Collection oidsSet);
+	public abstract Map doSnmpGet(SnmpProbe probe, Collection oidsSet);
 	
 	/**
 	 * Collect a set of variable by append .0 to the OID of the oid
@@ -54,9 +61,9 @@ public abstract class SnmpRequester {
 	 */
 	public static final SnmpRequester  SIMPLE = new SnmpRequester() {
 		
-		public SnmpVars doSnmpGet(SnmpProbe probe, Collection oidsSet)
+		public Map doSnmpGet(SnmpProbe probe, Collection oidsSet)
 		{
-			SnmpVars snmpVars = null;
+			Map snmpVars = null;
 			Target snmpTarget = probe.getSnmpTarget();
 			if(snmpTarget != null) {
 				VariableBinding[] vars = new VariableBinding[oidsSet.size()];
@@ -81,36 +88,39 @@ public abstract class SnmpRequester {
 	 */
 	public static final SnmpRequester TABULAR = new SnmpRequester() {
 		
-		public SnmpVars doSnmpGet(SnmpProbe probe, Collection oids)
+		public Map doSnmpGet(SnmpProbe probe, Collection oids)
 		{
 			Target snmpTarget = probe.getSnmpTarget();
 			SnmpVars retValue = new SnmpVars();
 			if(snmpTarget != null) {
-				TableUtils tableRet = new TableUtils(snmp, factory);
-				tableRet.setMaxNumColumnsPerPDU(30);
-				OID[] oidTab= new OID[oids.size()];
-				oids.toArray(oidTab);
-				for(Iterator i = tableRet.getTable(snmpTarget, oidTab, null, null).iterator() ;
-				i.hasNext(); ) {
-					TableEvent te = (TableEvent) i.next();
-					if(! te.isError()) {
-						retValue.join(te.getColumns());
+				Object lock = snmpTarget;
+				synchronized(lock){
+					TableUtils tableRet = new TableUtils(snmp, factory);
+					tableRet.setMaxNumColumnsPerPDU(30);
+					OID[] oidTab= new OID[oids.size()];
+					oids.toArray(oidTab);
+					for(Iterator i = tableRet.getTable(snmpTarget, oidTab, null, null).iterator() ;
+					i.hasNext(); ) {
+						TableEvent te = (TableEvent) i.next();
+						if(! te.isError()) {
+							retValue.join(te.getColumns());
+						}
 					}
 				}
 			}
 			return retValue;
 		}	
 	};
-
+	
 	/**
 	 * The simplest requester
 	 * Just get a collection of oid and return the associated value
 	 */
 	public static final SnmpRequester RAW = new SnmpRequester () {
 		
-		public SnmpVars doSnmpGet(SnmpProbe probe, Collection oidsSet)
+		public Map doSnmpGet(SnmpProbe probe, Collection oidsSet)
 		{
-			SnmpVars snmpVars = null;
+			Map snmpVars = null;
 			Target snmpTarget = probe.getSnmpTarget();
 			if(snmpTarget != null) {
 				VariableBinding[] vars = new VariableBinding[oidsSet.size()];
@@ -160,7 +170,7 @@ public abstract class SnmpRequester {
 		started = false;
 	}
 	
-	private static final SnmpVars doRequest(Target snmpTarget, VariableBinding[] vars) {
+	private static final Map doRequest(Target snmpTarget, VariableBinding[] vars) {
 		SnmpVars snmpVars = null;
 		factory.setPduType(PDU.GET);
 		PDU requestPDU = factory.createPDU(snmpTarget);
@@ -170,8 +180,23 @@ public abstract class SnmpRequester {
 			PDU response = null;
 			do {
 				ResponseEvent re = null;
-				if(requestPDU.size() > 0)
-					re = snmp.send(requestPDU, snmpTarget);
+				if(requestPDU.size() > 0) {
+					Object lock = snmpTarget;
+					synchronized(lock) {
+						SyncResponseListener listner = null;
+						synchronized(globLock) {
+							listner = new SyncResponseListener(lock);
+							snmp.send(requestPDU, snmpTarget, null, listner);
+						}
+						try {   
+							lock.wait();
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						re = listner.getResponse();
+					}
+				}
 				if(re != null)
 					response = re.getResponse();
 				if (response != null && response.getErrorStatus() == SnmpConstants.SNMP_ERROR_SUCCESS ){
@@ -180,7 +205,8 @@ public abstract class SnmpRequester {
 				}	
 				else {		
 					if(response == null) {
-						logger.warn("SNMP Timeout for host " + snmpTarget.getAddress());
+						logger.warn("SNMP Timeout, address=" + snmpTarget.getAddress() + ", requestID=" + requestPDU.getRequestID());
+						//, address=192.168.2.4/161, requestID=362690170
 						doAgain = false;
 					}
 					else {
@@ -200,9 +226,9 @@ public abstract class SnmpRequester {
 				}
 			} while (doAgain);
 		} catch (IOException e) {
-			logger.warn("SNMP communication problem with host " + snmpTarget.getAddress() + ": " + e.getLocalizedMessage());	
+			logger.warn("SNMP communication problem, address=" + snmpTarget.getAddress() + ", requestID=" + requestPDU.getRequestID() + ": " + e.getLocalizedMessage());	
 		}
-	return snmpVars;
-
+		return snmpVars;
+		
 	}
 }

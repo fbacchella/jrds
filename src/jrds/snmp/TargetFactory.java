@@ -133,7 +133,7 @@ public class TargetFactory {
 		((CommunityTarget)target).setCommunity(new OctetString(community));
 		target.setAddress(address);
 		target.setVersion(version);
-		target.setTimeout(target.getTimeout() * 2);
+		target.setTimeout(target.getTimeout() * 5);
 		return target;
 	}
 }
