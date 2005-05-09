@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+	<filename>exaerrors</filename>
+	<verticalLabel>Error/s</verticalLabel>
+	<graphTitle>Exelead's error</graphTitle>
+	<add>
+		<name>errors.adsense.connect</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>errors.adsense.highload</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>errors.adsense.parsing</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>errors.adsense.timeout</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>errors.exalead.decodingparams</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>errors.adsense.timeout</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>errors.exalead.index</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>errors.google.connect</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>errors.oogle.parsing</name>
+		<graphType>line</graphType>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SERVICE</pathelement>
+		<pathelement>TITLE</pathelement>
+	</hosttree>
+	<viewtree>
+		<pathelement>SERVICE</pathelement>
+		<pathelement>TITLE</pathelement>
+		<pathelement>HOST</pathelement>
+	</viewtree>
+</graphdesc>
