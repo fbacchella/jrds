@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+	<filename>exaqueries</filename>
+	<verticalLabel>Queries/s</verticalLabel>
+	<graphTitle>Exeleads queries</graphTitle>
+	<add>
+		<name>queries</name>
+		<graphType>line</graphType>
+		<legend>queries</legend>
+	</add>
+	<add>
+		<name>queries.adsense</name>
+		<graphType>line</graphType>
+		<legend>adsense</legend>
+	</add>
+	<add>
+		<name>queries.google</name>
+		<graphType>line</graphType>
+		<legend>Google</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SERVICES</pathelement>
+		<pathelement>TITLE</pathelement>
+	</hosttree>
+	<viewtree>
+		<pathelement>SERVICES</pathelement>
+		<pathelement>TITLE</pathelement>
+		<pathelement>HOST</pathelement>
+	</viewtree>
+</graphdesc>
