@@ -110,20 +110,27 @@ public class TargetFactory {
 		this.proto = proto;
 	}
 	
+	/**
+	 * Make the target filled with the predefined values
+	 * return null if the adress is invalid
+	 * @return the target just build or null in case of error
+	 */
 	public Target makeTarget()
 	{
 		Target retValue = null;
 		String addrStr = proto + ":" + this.hostname + "/" + port;
 		try {
 			address = GenericAddress.parse(addrStr);
-			if(community != null)
+			if(address == null) {
+				logger.warn("Address " + addrStr + " not solvable");
+			}
+			if(community != null && address != null)
 				retValue = doCommunityTarget();
 		}
 		catch(IllegalArgumentException ex) {
 			logger.warn("Adresse definition incorrect: " + addrStr +": " + ex.getLocalizedMessage());
+			retValue = null;
 		}
-		
-		retValue.setTimeout(retValue.getTimeout() + 100 );
 		return retValue;
 	}
 	

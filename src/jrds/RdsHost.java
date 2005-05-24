@@ -1,9 +1,3 @@
-/*
- * Created on 23 nov. 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package jrds;
 
 import java.io.IOException;
@@ -32,6 +26,11 @@ public class RdsHost implements Comparable {
 	private Target target;
 	private Set allProbes;
 	private String group = null;
+	//Default value should be bigger than anything
+	//So if something prevent uptime to be collected
+	//We still collect values
+	private long uptime = Long.MAX_VALUE;
+	private Date upTimeProbe = new Date(0);
 	
 	public RdsHost(String newName)
 	{
@@ -150,8 +149,6 @@ public class RdsHost implements Comparable {
 			Probe currrd= (Probe) i.next();
 			for(Iterator j = currrd.getGraphList().iterator() ; j.hasNext(); ) {
 				RdsGraph currGraph= (RdsGraph) j.next();
-				//byte[] pngBytes= currGraph.getPngBytes(startDate, endDate);
-
 				currGraph.graph(startDate, endDate);
 			}
 		}
@@ -178,5 +175,24 @@ public class RdsHost implements Comparable {
 	public int compareTo(Object arg0) {
 		
 		return String.CASE_INSENSITIVE_ORDER.compare(name, arg0.toString());
+	}
+	/**
+	 * @return Returns the uptime.
+	 */
+	public long getUptime() {
+		return uptime;
+	}
+	/**
+	 * @param uptime The uptime to set.
+	 */
+	public void setUptime(long uptime) {
+		this.uptime = uptime;
+		upTimeProbe.setTime(System.currentTimeMillis());
+	}
+	/**
+	 * @return Returns the upTimeProbe.
+	 */
+	public Date getUpTimeProbe() {
+		return upTimeProbe;
 	}
 }

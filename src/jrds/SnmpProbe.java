@@ -92,6 +92,7 @@ public abstract class SnmpProbe extends Probe {
 				Date value = (Date) o;
 				retValue.put(oid, new Double(value.getTime()));
 			}
+			
 		}
 		return retValue;
 	}

@@ -51,6 +51,23 @@ public class TreeJspBean implements Serializable {
 		return retValue;
 	}
 
+	public String getJavascriptTree(int sort) {
+		calcDate();
+		String retValue = "";
+		GraphTreeNode graphTree = null;
+		if(sort == GraphTreeNode.LEAF_GRAPHTITLE )
+			graphTree = hostList.getGraphTreeByHost();
+		else if(sort == GraphTreeNode.LEAF_HOSTNAME)
+			graphTree = hostList.getGraphTreeByView();
+		if(graphTree != null) {
+			for(Iterator i = graphTree.valuesIterator() ; i.hasNext() ; ) {
+				GraphTreeNode gt = (GraphTreeNode) i.next();
+				retValue += gt.getJavaScriptCode(begin, end, sort);
+			}
+		}
+		return retValue;
+	}
+
 	/**
 	 * @param scale The scale to set.
 	 */

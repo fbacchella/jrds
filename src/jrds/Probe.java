@@ -186,7 +186,7 @@ implements Comparable {
 	protected void updateSample(Sample oneSample) {
 		Map sampleVals = getNewSampleValues();
 		Map nameMap = getPd().getDsNameMap();
-		if (sampleVals != null) {
+		if (sampleVals != null && this.getHost().getUptime() > ProbeDesc.HEARTBEATDEFAULT * 1000) {
 			sampleVals = filterValues(sampleVals);
 			for (Iterator i = sampleVals.entrySet().iterator(); i.hasNext(); ) {
 				Map.Entry e = (Map.Entry) i.next();

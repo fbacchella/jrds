@@ -9,9 +9,6 @@ package jrds.probe.snmp;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
-import jrds.graphe.TcpConnectionGraph;
-import jrds.graphe.TcpEstablishedGraph;
-import jrds.graphe.TcpSegmentsGraph;
 import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;

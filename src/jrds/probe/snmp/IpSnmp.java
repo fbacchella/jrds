@@ -6,7 +6,6 @@
  */
 package jrds.probe.snmp;
 
-import jrds.GraphDesc;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;

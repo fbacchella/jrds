@@ -2,50 +2,52 @@
 <graphdesc>
 	<filename>exaerrors</filename>
 	<verticalLabel>Error/s</verticalLabel>
-	<graphTitle>Exelead's error</graphTitle>
+	<graphTitle>Exeleads error</graphTitle>
 	<add>
-		<name>errors.adsense.connect</name>
+		<name>err.adsense.connect</name>
+		<graphType>line</graphType>
+		<legend>adsense.connect</legend>
+	</add>
+	<add>
+		<name>err.adsense.highload</name>
+		<graphType>line</graphType>
+		<legend>adsense.highload</legend>
+	</add>
+	<add>
+		<name>err.adsense.parsing</name>
 		<graphType>line</graphType>
 	</add>
 	<add>
-		<name>errors.adsense.highload</name>
+		<name>err.adsense.timeout</name>
 		<graphType>line</graphType>
 	</add>
 	<add>
-		<name>errors.adsense.parsing</name>
+		<name>err.exalead.decprms</name>
 		<graphType>line</graphType>
 	</add>
 	<add>
-		<name>errors.adsense.timeout</name>
+		<name>err.adsense.timeout</name>
 		<graphType>line</graphType>
 	</add>
 	<add>
-		<name>errors.exalead.decodingparams</name>
+		<name>err.exalead.index</name>
 		<graphType>line</graphType>
 	</add>
 	<add>
-		<name>errors.adsense.timeout</name>
+		<name>err.google.connect</name>
 		<graphType>line</graphType>
 	</add>
 	<add>
-		<name>errors.exalead.index</name>
-		<graphType>line</graphType>
-	</add>
-	<add>
-		<name>errors.google.connect</name>
-		<graphType>line</graphType>
-	</add>
-	<add>
-		<name>errors.oogle.parsing</name>
+		<name>err.google.parsing</name>
 		<graphType>line</graphType>
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>
-		<pathelement>SERVICE</pathelement>
+		<pathelement>SERVICES</pathelement>
 		<pathelement>TITLE</pathelement>
 	</hosttree>
 	<viewtree>
-		<pathelement>SERVICE</pathelement>
+		<pathelement>SERVICES</pathelement>
 		<pathelement>TITLE</pathelement>
 		<pathelement>HOST</pathelement>
 	</viewtree>

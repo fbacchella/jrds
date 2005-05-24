@@ -1,20 +1,19 @@
-/*
- * Created on 23 déc. 2004
- *
- * TODO 
- */
 package jrds.snmp;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
 import jrds.JrdsLogger;
+import jrds.ProbeDesc;
 import jrds.SnmpProbe;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.PDU;
+import org.snmp4j.PDUv1;
+import org.snmp4j.ScopedPDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.Target;
 import org.snmp4j.event.ResponseEvent;
@@ -34,12 +33,12 @@ import org.snmp4j.util.TableUtils;
  * @author Fabrice Bacchella
  */
 public abstract class SnmpRequester {
-	static private final DefaultPDUFactory factory = new DefaultPDUFactory();
 	static private final Logger logger = JrdsLogger.getLogger(SnmpRequester.class);
 	static private Snmp snmp;
 	static private boolean started = false;
 	static final private Object globLock = new Object();
-	
+	static private final OID upTimeOid = new OID(".1.3.6.1.2.1.1.3.0");
+	static private final VariableBinding upTimeVb = new VariableBinding(upTimeOid);
 	/**
 	 * No constructor, full static class;
 	 */
@@ -73,7 +72,7 @@ public abstract class SnmpRequester {
 					currentOid.append("0");
 					vars[j++] = new VariableBinding(currentOid);
 				}
-				snmpVars = doRequest(probe.getSnmpTarget(), vars);
+				snmpVars = doRequest(probe, vars);
 			}
 			else {
 				logger.warn("SNMP not configured for the probe " +  probe);		
@@ -95,7 +94,8 @@ public abstract class SnmpRequester {
 			if(snmpTarget != null) {
 				Object lock = snmpTarget;
 				synchronized(lock){
-					TableUtils tableRet = new TableUtils(snmp, factory);
+					DefaultPDUFactory localfactory = new DefaultPDUFactory();
+					TableUtils tableRet = new TableUtils(snmp, localfactory);
 					tableRet.setMaxNumColumnsPerPDU(30);
 					OID[] oidTab= new OID[oids.size()];
 					oids.toArray(oidTab);
@@ -129,7 +129,7 @@ public abstract class SnmpRequester {
 					OID currentOid = (OID) i.next();
 					vars[j++] = new VariableBinding(currentOid);
 				}
-				snmpVars = doRequest(probe.getSnmpTarget(), vars);
+				snmpVars = doRequest(probe, vars);
 			}
 			else {
 				logger.warn("SNMP not configured for the probe " +  probe);		
@@ -145,18 +145,20 @@ public abstract class SnmpRequester {
 	 * @throws IOException
 	 */
 	public static final void start() throws IOException {
-		snmp = new Snmp(new DefaultUdpTransportMapping());
-		//snmp.addTransportMapping(new DefaultTcpTransportMapping());
-		
-		/*MPv3 mpv3 =
-		 (MPv3)snmp.getMessageProcessingModel(MessageProcessingModel.MPv3);
-		 USM usm = new USM(SecurityProtocols.getInstance(),
-		 new OctetString(mpv3.createLocalEngineID()), 0);
-		 SecurityModels.getInstance().addSecurityModel(usm);*/
-		
-		snmp.listen();
-		
-		started = true;
+		if( ! started) {
+			snmp = new Snmp(new DefaultUdpTransportMapping());
+			//snmp.addTransportMapping(new DefaultTcpTransportMapping());
+			
+			/*MPv3 mpv3 =
+			 (MPv3)snmp.getMessageProcessingModel(MessageProcessingModel.MPv3);
+			 USM usm = new USM(SecurityProtocols.getInstance(),
+			 new OctetString(mpv3.createLocalEngineID()), 0);
+			 SecurityModels.getInstance().addSecurityModel(usm);*/
+			
+			snmp.listen();
+			
+			started = true;
+		}
 	}
 	
 	/**
@@ -170,11 +172,32 @@ public abstract class SnmpRequester {
 		started = false;
 	}
 	
-	private static final Map doRequest(Target snmpTarget, VariableBinding[] vars) {
+	private static final Map doRequest(SnmpProbe probe, VariableBinding[] vars) {
+		Target snmpTarget = probe.getSnmpTarget();
 		SnmpVars snmpVars = null;
-		factory.setPduType(PDU.GET);
-		PDU requestPDU = factory.createPDU(snmpTarget);
-		requestPDU.addAll(vars);
+		PDU requestPDU = null;
+	    switch (snmpTarget.getVersion()) {
+	      case SnmpConstants.version3: {
+	      	requestPDU = new ScopedPDU();
+	        break;
+	      }
+	      case SnmpConstants.version1: {
+	      	requestPDU = new PDUv1();
+	        break;
+	      }
+	      default:
+	      	requestPDU = new PDU();
+	    }
+	    requestPDU.setType(PDU.GET);
+
+	    requestPDU.addAll(vars);
+
+		//We check if we need to add an uptime check;
+		boolean addUptime = (probe.getHost().getUpTimeProbe().getTime() <= ( System.currentTimeMillis() - ProbeDesc.HEARTBEATDEFAULT * 1000));
+		if(addUptime) {
+			requestPDU.add(upTimeVb);
+		}
+
 		try {
 			boolean doAgain = true;
 			PDU response = null;
@@ -201,6 +224,12 @@ public abstract class SnmpRequester {
 					response = re.getResponse();
 				if (response != null && response.getErrorStatus() == SnmpConstants.SNMP_ERROR_SUCCESS ){
 					snmpVars = new SnmpVars(response);
+					if(addUptime){
+						Date uptime = ((Date)snmpVars.get(upTimeOid));
+						logger.debug(probe.getHost().getName() + " is up for " + uptime.getTime() / 1000 + " seconds");
+						probe.getHost().setUptime(uptime.getTime());
+						snmpVars.remove(upTimeOid);
+					}
 					doAgain = false;
 				}	
 				else {		

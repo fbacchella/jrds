@@ -6,7 +6,6 @@
 package jrds.graphe;
 
 import java.awt.Color;
-import java.util.LinkedList;
 
 import jrds.GraphDesc;
 import jrds.Probe;

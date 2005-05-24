@@ -13,7 +13,6 @@ import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
-import jrds.graphe.ProcessStatusGraph;
 import jrds.snmp.SnmpRequester;
 
 import org.apache.log4j.Logger;
