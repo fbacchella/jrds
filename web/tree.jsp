@@ -21,7 +21,9 @@ A:visited { color: rgb(0, 0, 238); }
 			<script type="text/javascript"><!--
 			 // Part 1 - Tree nodes definition
 var TREE1_NODES = [
-<%= jrdsBean.getJavascriptTree() %>	
+	['Host tree', '', '_', <%= jrdsBean.getJavascriptTree(1) %> ],
+	['View tree', '', '_', <%= jrdsBean.getJavascriptTree(2) %>	 ],
+	
 ];				
 
  // Part 2 - Tree format

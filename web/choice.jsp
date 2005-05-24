@@ -41,13 +41,6 @@ function localReturn(y,m,d) {
 				<div align="center">
 					<table border="0" cellspacing="2" cellpadding="0">
 						<tr>
-							<td width="160">Choose a sort</td>
-							<td><select name="sort">
-									<option value="1">by server</option>
-									<option value="2">by view</option>
-								</select></td>
-						</tr>
-						<tr>
 							<td width="160">Choose a group</td>
 							<td><select name="group">
 									<c:forEach items="${jrdsBean.groupList}" var="i">
