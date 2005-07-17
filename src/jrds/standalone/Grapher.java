@@ -45,8 +45,6 @@ public class Grapher {
 		Date end = new Date();
 		Date begin = new Date(end.getTime() - 86400 * 1000);
 		HostsList theList = HostsList.getRootGroup();
-		theList.openAll();
 		theList.graphAll(begin, end);
-		theList.closeAll();
 	}
 }

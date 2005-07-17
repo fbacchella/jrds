@@ -11,10 +11,12 @@ import java.io.File;
 import jrds.HostsList;
 import jrds.JrdsLogger;
 import jrds.PropertiesManager;
+import jrds.RrdCachedFileBackendFactory;
 import jrds.snmp.SnmpRequester;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.jrobin.core.RrdBackendFactory;
 import org.jrobin.core.RrdDbPool;
 
 
@@ -33,6 +35,8 @@ public class Collector {
 	public static void main(String[] args) throws Exception {
 		pm.join(new File("jrds.properties"));
 		pm.update();
+
+		RrdBackendFactory.registerAndSetAsDefaultFactory(new RrdCachedFileBackendFactory());
 		
 		System.getProperties().setProperty("java.awt.headless","true");
 		HostsList.getRootGroup().append(new File(pm.configfilepath));
@@ -50,10 +54,7 @@ public class Collector {
 				public void run() {
 					try {
 						SnmpRequester.start();
-						hl.openAll();
 						hl.collectAll();
-						hl.syncAll();
-						hl.closeAll();
 						SnmpRequester.stop();
 						logger.info("One collect is done");
 					}

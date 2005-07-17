@@ -5,6 +5,7 @@
  */
 package jrds;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
@@ -16,6 +17,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import javax.servlet.jsp.JspWriter;
 
 import org.apache.log4j.Logger;
 
@@ -64,16 +67,16 @@ public class GraphTreeNode {
 		return retValue;
 	}
 
-	private StringBuffer _getJavaScriptCode(String argsBeginEnd) {
-
-
-		StringBuffer retValue = new StringBuffer(1000);
+	private void _getJavaScriptCode(JspWriter out, String argsBeginEnd, String curNode) throws IOException {
+		out.print(curNode +" = gFld('" + name +"', 'graphlist" + getPath() + "?" + argsBeginEnd + "');\n");
 	
-		retValue.append("[ '"  + name + "', 'graphlist" + getPath() + "?" + argsBeginEnd + "', '_blank', \n");
-	
-		for(Iterator i = childsMap.values().iterator(); i.hasNext(); ) {
+		int depth = 0;
+		StringBuffer childsarray = new StringBuffer(1000);
+		for(Iterator i = childsMap.values().iterator(); i.hasNext(); depth++) {
+			String child = curNode + "_" + depth;
 			GraphTreeNode o = (GraphTreeNode) i.next();
-			retValue.append(o._getJavaScriptCode(argsBeginEnd));
+			o._getJavaScriptCode(out, argsBeginEnd, child);
+			childsarray.append("    " + child + ",");
 		}
 		for(Iterator i = graphsSet.entrySet().iterator(); i.hasNext(); ) {
 			Map.Entry e = (Map.Entry) i.next();
@@ -86,23 +89,26 @@ public class GraphTreeNode {
 			imgUrl.append("&");
 			imgUrl.append(argsBeginEnd);
 			
-			retValue.append("[ '" + leafName + "', ");
-			retValue.append("'" + imgUrl +"', ");
-			retValue.append("'graph1' ], \n");
+			childsarray.append("    gLnk('R', ");
+			childsarray.append("'" + leafName +"',");
+			childsarray.append("'" + imgUrl +"'");
+			childsarray.append("),\n");
 		}
-		retValue.append(" ],\n");
-
-		return retValue;
+		if(childsarray.length() > 0) {
+			out.print(curNode +".addChildren([\n");
+			out.print(childsarray);
+			out.print("]);\n");
+		}
 	}
 	
-	public String getJavaScriptCode(Calendar begin, Calendar end, int leafTitle) {
+	public void getJavaScriptCode(JspWriter out, Calendar begin, Calendar end, String curNode) throws IOException {
 		String argsBeginEnd = "begin=" + begin.getTimeInMillis() + "&end=" + end.getTimeInMillis();
-		return _getJavaScriptCode(argsBeginEnd).toString();
+		_getJavaScriptCode(out, argsBeginEnd, curNode);
 	}
 
-	public String getJavaScriptCode(Date begin, Date end, int leafTitle) {
+	public void getJavaScriptCode(JspWriter out, Date begin, Date end, String curNode) throws IOException {
 		String argsBeginEnd = "begin=" + begin.getTime() + "&end=" + end.getTime();
-		return _getJavaScriptCode(argsBeginEnd).toString();
+		_getJavaScriptCode(out, argsBeginEnd, curNode);
 	}
 	
 	public GraphTreeNode getByPath(List path) {

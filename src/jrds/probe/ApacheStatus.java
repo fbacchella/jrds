@@ -29,7 +29,7 @@ public class ApacheStatus extends HttpProbe {
 		pd.add("Total Accesses", ProbeDesc.COUNTER);
 		pd.add("Total kBytes", ProbeDesc.COUNTER);
 		pd.add("CPULoad", ProbeDesc.GAUGE);
-		pd.add("Uptime", ProbeDesc.GAUGE);
+		pd.add("Uptime", ProbeDesc.NONE);
 		pd.add("ReqPerSec", ProbeDesc.GAUGE);
 		pd.add("BytesPerSec", ProbeDesc.GAUGE);
 		pd.add("BytesPerReq", ProbeDesc.GAUGE);
@@ -63,6 +63,6 @@ public class ApacheStatus extends HttpProbe {
 			}
 			catch (java.lang.NumberFormatException ex) {};
 		}
-		return retValue;
+		return filterUpTime("Uptime", retValue);
 	}
 }

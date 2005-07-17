@@ -26,7 +26,7 @@ public class TcpConnection extends RdsSnmpSimple {
 		pd.add("PassiveOpens", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.6"));
 		pd.add("AttemptFails", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.7"));
 		pd.add("EstabResets", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.8"));
-		pd.add("CurrEstab", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.9"));
+		pd.add("CurrEstab", ProbeDesc.GAUGE, new OID(".1.3.6.1.2.1.6.9"));
 		pd.add("InSegs", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.10"));
 		pd.add("OutSegs", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.11"));
 		pd.add("RetransSegs", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.12"));

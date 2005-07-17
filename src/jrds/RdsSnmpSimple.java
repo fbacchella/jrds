@@ -23,13 +23,6 @@ public abstract class RdsSnmpSimple extends SnmpProbe  {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.aol.jrds.RdsSnmpRrd#getSnmpRequester()
-	 */
-	/*protected SnmpRequester getSnmpRequester() {
-		return SnmpRequester.SIMPLE;
-	}*/
-
-	/* (non-Javadoc)
 	 * @see com.aol.jrds.snmp.SnmpPreparator#makeOidSet()
 	 */
 	public Set getOidSet() {

@@ -177,7 +177,7 @@ public class RdsGraph
                              lastUpdateFormat.format(lastUpdate) + "@l");
         tempGraphDef.comment("Period from " + lastUpdateFormat.format(startDate) +
                              " to " + lastUpdateFormat.format(endDate) + "@l");
-        return new RrdGraph(tempGraphDef);
+        return new RrdGraph(tempGraphDef, true);
     }
 
     public BufferedImage makeImg(Date startDate, Date endDate) {

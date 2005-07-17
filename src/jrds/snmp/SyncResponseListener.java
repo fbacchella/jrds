@@ -17,7 +17,7 @@ import org.snmp4j.event.ResponseListener;
  * TODO 
  */
 public class SyncResponseListener implements ResponseListener {
-	static private final Logger logger = JrdsLogger.getLogger(SnmpRequester.class);
+	static private final Logger logger = JrdsLogger.getLogger(SyncResponseListener.class);
 	
 	private ResponseEvent response = null;
 	private Object lock;
@@ -31,8 +31,9 @@ public class SyncResponseListener implements ResponseListener {
 	 * @param event ResponseEvent
 	 */
 	public void onResponse(ResponseEvent event) {
+		response = event;
+		//the synchronized is here to own the lock monitor
 		synchronized(lock) {
-			response = event;
 			lock.notify();
 		}
 	}

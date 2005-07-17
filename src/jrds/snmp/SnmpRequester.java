@@ -2,12 +2,10 @@ package jrds.snmp;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
 import jrds.JrdsLogger;
-import jrds.ProbeDesc;
 import jrds.SnmpProbe;
 
 import org.apache.log4j.Logger;
@@ -92,8 +90,8 @@ public abstract class SnmpRequester {
 			Target snmpTarget = probe.getSnmpTarget();
 			SnmpVars retValue = new SnmpVars();
 			if(snmpTarget != null) {
-				Object lock = snmpTarget;
-				synchronized(lock){
+				//Object lock = snmpTarget;
+				//synchronized(lock){
 					DefaultPDUFactory localfactory = new DefaultPDUFactory();
 					TableUtils tableRet = new TableUtils(snmp, localfactory);
 					tableRet.setMaxNumColumnsPerPDU(30);
@@ -106,7 +104,7 @@ public abstract class SnmpRequester {
 							retValue.join(te.getColumns());
 						}
 					}
-				}
+				//}
 			}
 			return retValue;
 		}	
@@ -144,7 +142,7 @@ public abstract class SnmpRequester {
 	 * should be called only once
 	 * @throws IOException
 	 */
-	public static final void start() throws IOException {
+	public static final Snmp start() throws IOException {
 		if( ! started) {
 			snmp = new Snmp(new DefaultUdpTransportMapping());
 			//snmp.addTransportMapping(new DefaultTcpTransportMapping());
@@ -159,6 +157,7 @@ public abstract class SnmpRequester {
 			
 			started = true;
 		}
+		return snmp;
 	}
 	
 	/**
@@ -192,11 +191,7 @@ public abstract class SnmpRequester {
 
 	    requestPDU.addAll(vars);
 
-		//We check if we need to add an uptime check;
-		boolean addUptime = (probe.getHost().getUpTimeProbe().getTime() <= ( System.currentTimeMillis() - ProbeDesc.HEARTBEATDEFAULT * 1000));
-		if(addUptime) {
-			requestPDU.add(upTimeVb);
-		}
+		requestPDU.add(upTimeVb);
 
 		try {
 			boolean doAgain = true;
@@ -204,38 +199,35 @@ public abstract class SnmpRequester {
 			do {
 				ResponseEvent re = null;
 				if(requestPDU.size() > 0) {
-					Object lock = snmpTarget;
-					synchronized(lock) {
-						SyncResponseListener listner = null;
-						synchronized(globLock) {
-							listner = new SyncResponseListener(lock);
-							snmp.send(requestPDU, snmpTarget, null, listner);
-						}
-						try {   
-							lock.wait();
-						} catch (InterruptedException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						re = listner.getResponse();
-					}
+					re = snmp.send(requestPDU, snmpTarget);
+					//Object lock = snmpTarget;
+					//the synchronized is here to own the lock monitor
+					//synchronized(lock) {
+					//	SyncResponseListener listner = new SyncResponseListener(lock);
+					//	synchronized(globLock) {
+					//		snmp.send(requestPDU, snmpTarget, null, listner);
+					//	}
+					//	try {   
+					//		lock.wait();
+					//	} catch (InterruptedException e1) {
+					//		// TODO Auto-generated catch block
+					//		e1.printStackTrace();
+					//	}
+					//	re = listner.getResponse();
+					//}
 				}
 				if(re != null)
 					response = re.getResponse();
 				if (response != null && response.getErrorStatus() == SnmpConstants.SNMP_ERROR_SUCCESS ){
 					snmpVars = new SnmpVars(response);
-					if(addUptime){
-						Date uptime = ((Date)snmpVars.get(upTimeOid));
-						logger.debug(probe.getHost().getName() + " is up for " + uptime.getTime() / 1000 + " seconds");
-						probe.getHost().setUptime(uptime.getTime());
-						snmpVars.remove(upTimeOid);
-					}
+					Number uptime = ((Number)snmpVars.get(upTimeOid));
+					if(uptime != null)
+						logger.debug(probe.getHost().getName() + " is up for " + uptime.intValue() + " seconds");
 					doAgain = false;
 				}	
 				else {		
 					if(response == null) {
-						logger.warn("SNMP Timeout, address=" + snmpTarget.getAddress() + ", requestID=" + requestPDU.getRequestID());
-						//, address=192.168.2.4/161, requestID=362690170
+						logger.warn("SNMP Timeout, address=" + snmpTarget.getAddress() + ", requestID=" + requestPDU.getRequestID() + ", probe=" + probe);
 						doAgain = false;
 					}
 					else {
@@ -257,7 +249,7 @@ public abstract class SnmpRequester {
 		} catch (IOException e) {
 			logger.warn("SNMP communication problem, address=" + snmpTarget.getAddress() + ", requestID=" + requestPDU.getRequestID() + ": " + e.getLocalizedMessage());	
 		}
-		return snmpVars;
+		return probe.filterUpTime(upTimeOid, snmpVars);
 		
 	}
 }

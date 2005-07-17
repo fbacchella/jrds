@@ -13,12 +13,10 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import jrds.snmp.SnmpRequester;
-import jrds.standalone.Grapher;
 
 import org.apache.log4j.Logger;
+import org.jrobin.core.RrdBackendFactory;
 import org.jrobin.core.RrdDbPool;
-
-
 
 import edu.emory.mathcs.backport.java.util.concurrent.Executors;
 import edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService;
@@ -32,9 +30,9 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
  * TODO 
  */
 public class StartListener implements ServletContextListener {
-	static final Logger logger = JrdsLogger.getLogger(Grapher.class.getPackage().getName());
+	static final private Logger logger = JrdsLogger.getLogger(StartListener.class);
 	static final PropertiesManager pm = PropertiesManager.getInstance();
-	static final RrdDbPool dbpool = RrdDbPool.getInstance();;
+	static final RrdDbPool dbpool = RrdDbPool.getInstance();
 	static final HostsList hl = HostsList.getRootGroup();
 	private ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
 	
@@ -64,15 +62,19 @@ public class StartListener implements ServletContextListener {
 			
 			logger.debug("propertiesFile = " + arg0.getServletContext().getInitParameter("propertiesFile"));
 			logger.info("Application jrds started");
-			
-			hl.openAll();
 		
-			SnmpRequester.start();
+			dbpool.setCapacity(5);
+			//RrdBackendFactory.setDefaultFactory(RrdFileBackendFactory.NAME);
+			RrdBackendFactory.registerAndSetAsDefaultFactory(new RrdCachedFileBackendFactory());
 
-			Runnable collector = new Runnable () {
+			final Runnable collector = new Runnable () {
 				private final HostsList lhl = hl;
 				public void run() {
-					lhl.collectAll();
+					try {
+						lhl.collectAll();
+					} catch (IOException e) {
+						logger.error("Unable to launch collect: ", e);
+					}
 				}
 			};
 			timer.scheduleAtFixedRate(collector, 1, PropertiesManager.getInstance().resolution, TimeUnit.SECONDS);
@@ -80,9 +82,6 @@ public class StartListener implements ServletContextListener {
 		catch (Exception ex) {
 			logger.fatal("Unable to start " + arg0.getServletContext().getServletContextName(), ex);
 		}
-
-		System.gc();
-
 	}
 	
 	/* (non-Javadoc)
@@ -90,7 +89,6 @@ public class StartListener implements ServletContextListener {
 	 */
 	public void contextDestroyed(ServletContextEvent arg0) {
 		timer.shutdown();
-		hl.closeAll();
 		try {
 			SnmpRequester.stop();
 		} catch (IOException e) {

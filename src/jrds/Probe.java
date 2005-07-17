@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -15,7 +16,6 @@ import org.apache.log4j.Logger;
 import org.jrobin.core.ArcDef;
 import org.jrobin.core.DsDef;
 import org.jrobin.core.RrdDb;
-import org.jrobin.core.RrdDbPool;
 import org.jrobin.core.RrdDef;
 import org.jrobin.core.RrdException;
 import org.jrobin.core.Sample;
@@ -31,14 +31,11 @@ public abstract class Probe
 implements Comparable {
 	
 	static final private Logger logger = JrdsLogger.getLogger(Probe.class);
-	static final private RrdDbPool pool = RrdDbPool.getInstance();
 	
-	private RrdDb rrdDb;
 	private String name;
 	private RdsHost monitoredHost;
 	private Collection graphList;
-	private boolean isOpen = false;
-	private Integer lock = new Integer(1);
+	private final Object lock = new Object();
 	private String stringValue = null;
 	private ProbeDesc pd;
 	
@@ -49,7 +46,7 @@ implements Comparable {
 	 */
 	public Probe(RdsHost monitoredHost, ProbeDesc pd) {
 		name = null;
-		rrdDb = null;
+		RrdDb rrdDb = null;
 		this.monitoredHost = monitoredHost;
 		this.pd = pd;
 	}
@@ -128,9 +125,9 @@ implements Comparable {
 			RrdDef def = getDefaultRrdDef();
 			def.addArchive(getArcDefs());
 			def.addDatasource(getDsDefs());
-			rrdDb = pool.requestRrdDb(def);
+			final RrdDb rrdDb = new RrdDb(def);
 			rrdDb.sync();
-			isOpen = true;
+			rrdDb.close();
 		}
 	}
 	
@@ -140,22 +137,30 @@ implements Comparable {
 	 * @throws IOException
 	 * @throws RrdException
 	 */
-	public void open() throws IOException, RrdException {
+	public boolean checkStore()  {
+		boolean retValue = false;
 		synchronized (lock) {
-			if (rrdDb == null) {
-				File rrdDir = new File(monitoredHost.getHostDir());
-				if (!rrdDir.isDirectory()) {
-					rrdDir.mkdir();
-				}
-				File rrdFile = new File(getRrdName());
-				if (rrdFile.isFile()) {
-					rrdDb = pool.requestRrdDb(getRrdName());
-					isOpen = true;
-				}
-				else
+			File rrdDir = new File(monitoredHost.getHostDir());
+			if (!rrdDir.isDirectory()) {
+				rrdDir.mkdir();
+			}
+			File rrdFile = new File(getRrdName());
+			RrdDb rrdDb = null;
+			try {
+				if ( rrdFile.isFile()) {
+					 rrdDb = StoreOpener.getRrd(getRrdName());
+				} else
 					create();
+				retValue = true;
+			} catch (Exception e) {
+				logger.error("Store " + this.getRrdName() + " unusable: " + e);
+			}
+			finally {
+				if(rrdDb != null)
+					StoreOpener.releaseRrd(rrdDb);				
 			}
 		}
+		return retValue;
 	}
 	
 	/**
@@ -176,6 +181,27 @@ implements Comparable {
 	 */
 	public Map filterValues(Map valuesList) {
 		return valuesList;
+	}
+	
+	/**
+	 * A method to filter buy uptime value
+	 * return an empty map if uptime is to low
+	 * @param id
+	 * @param values
+	 * @return
+	 */
+	final public Map filterUpTime(Object id, Map retValue) {
+		if(retValue != null) {
+			Number uptime = (Number) retValue.get(id);
+			if(uptime != null && uptime.intValue() <= ProbeDesc.HEARTBEATDEFAULT) {
+				retValue = new HashMap(0);
+				logger.info("uptime too low for " + this.toString());
+			}
+			else {
+				retValue.remove(id);
+			}
+		}
+		return retValue;
 	}
 	
 	/**
@@ -212,46 +238,31 @@ implements Comparable {
 	 * @throws IOException
 	 * @throws RrdException
 	 */
-	public final void collect() throws IOException, RrdException {
+	public final void collect() {
 		logger.debug("launch collect for " + this);
-		if (isOpen) {
-			Sample onesample;
-			try {
-				onesample = rrdDb.createSample();
-				updateSample(onesample);
-				logger.debug(onesample.dump());
-				onesample.update();
-			}
-			catch (ArithmeticException ex) {
-				logger.warn("Error while storing sample:" +
-						ex.getLocalizedMessage());
-			}
-		}
-		else {
-			logger.warn("trying to update store " + this +" wich is closed.");
-		}
-	}
-	
-	/**
-	 * Commit the result of a collect
-	 * @throws IOException
-	 */
-	public final void sync() throws IOException {
-		if (isOpen) {
-			rrdDb.sync();
-			File rrdfile = new File(rrdDb.getCanonicalPath());
+		RrdDb rrdDb = null;
+		Sample onesample;
+		try {
+			rrdDb = StoreOpener.getRrd(getRrdName());
+			onesample = rrdDb.createSample();
+			updateSample(onesample);
+			logger.debug(onesample.dump());
+			onesample.update();
+			final File rrdfile = new File(rrdDb.getCanonicalPath());
 			rrdfile.setLastModified(System.currentTimeMillis());
 		}
-	}
-	
-	public final void close() throws IOException, RrdException {
-		if (isOpen) {
-			pool.release(rrdDb);
+		catch (ArithmeticException ex) {
+			logger.warn("Error while storing sample: " +
+					ex.getLocalizedMessage());
+		} catch (Exception e) {
+			logger.error("Error with probe " + this + ": " + e.getLocalizedMessage());
 		}
-		if (rrdDb.isClosed())
-			isOpen = false;
+		finally  {
+			if(rrdDb != null)
+				StoreOpener.releaseRrd(rrdDb);
+		}
 	}
-	
+
 	/**
 	 * Return the string value of the probe as a path constitued of
 	 * the host name / the probe name
@@ -282,20 +293,43 @@ implements Comparable {
 	public ProbeDesc getPd() {
 		return pd;
 	}
-	
-	/**
-	 * @return Returns the rrdDb.
-	 */
-	protected RrdDb getRrdDb() {
-		return rrdDb;
-	}
-	
+
 	/**
 	 * Return the date of the last update of the rrd backend
 	 * @return The date
+	 * @throws RrdException
 	 * @throws IOException
+	 * @throws IOException
+	 * @throws RrdException
 	 */
-	public Date getLastUpdate() throws IOException {
-		return Util.getDate(rrdDb.getLastUpdateTime());
+	public Date getLastUpdate() {
+		Date lastUpdate = null;
+		RrdDb rrdDb = null;
+		try {
+			rrdDb = StoreOpener.getRrd(getRrdName());
+			lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
+		} catch (Exception e) {
+			logger.error("Unable to get last update date for" + this.getName() + ":" + e);
+		}
+		finally {
+			if(rrdDb != null)
+				StoreOpener.releaseRrd(rrdDb);
+		}
+		return lastUpdate;
+	}
+
+	final public boolean dsExist(String dsName) {
+		boolean retValue = false;
+		RrdDb rrddb = null;
+		try {
+			rrddb = StoreOpener.getRrd(getRrdName());
+			retValue = rrddb.getDatasource(dsName) != null;
+		} catch (Exception e) {
+		}
+		finally {
+			if(rrddb != null)
+				StoreOpener.releaseRrd(rrddb);
+		}
+		return retValue;
 	}
 }

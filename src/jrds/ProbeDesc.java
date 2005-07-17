@@ -102,9 +102,19 @@ public class ProbeDesc implements Cloneable {
 		dsMap.put(name, new DsDesc(dsType, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, name));
 	}
 
+	public void add(String name, DsType dsType, double min, double max)
+	{
+		dsMap.put(name, new DsDesc(dsType, HEARTBEATDEFAULT, min, max, name));
+	}
+
 	public void add(String dsName, DsType dsType, String probeName)
 	{
 		dsMap.put(dsName, new DsDesc(dsType, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, probeName));
+	}
+
+	public void add(String dsName, DsType dsType, String probeName, double min, double max)
+	{
+		dsMap.put(dsName, new DsDesc(dsType, HEARTBEATDEFAULT, min, max, probeName));
 	}
 
 	/** Add a SNMP probe what will be stored

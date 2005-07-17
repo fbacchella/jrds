@@ -5,6 +5,7 @@
  */
 package jrds;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -12,7 +13,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
+
+import javax.servlet.jsp.JspWriter;
 
 import org.apache.log4j.Logger;
 
@@ -34,7 +36,7 @@ public class TreeJspBean implements Serializable {
 	String host;
 	int sort = 1;
 
-	public String getJavascriptTree() {
+	public void getJavascriptTree(int sort, String father, JspWriter out) {
 		calcDate();
 		String retValue = "";
 		GraphTreeNode graphTree = null;
@@ -42,30 +44,15 @@ public class TreeJspBean implements Serializable {
 			graphTree = hostList.getGraphTreeByHost();
 		else if(sort == GraphTreeNode.LEAF_HOSTNAME)
 			graphTree = hostList.getGraphTreeByView();
-		if(graphTree != null) {
-			for(Iterator i = graphTree.valuesIterator() ; i.hasNext() ; ) {
-				GraphTreeNode gt = (GraphTreeNode) i.next();
-				retValue += gt.getJavaScriptCode(begin, end, sort);
+		try {
+			if(graphTree != null) {
+				graphTree.getJavaScriptCode(out, begin, end, father + "_0");
+				out.write("" + father + ".addChildren([" + father + "_0]);");
 			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		return retValue;
-	}
-
-	public String getJavascriptTree(int sort) {
-		calcDate();
-		String retValue = "";
-		GraphTreeNode graphTree = null;
-		if(sort == GraphTreeNode.LEAF_GRAPHTITLE )
-			graphTree = hostList.getGraphTreeByHost();
-		else if(sort == GraphTreeNode.LEAF_HOSTNAME)
-			graphTree = hostList.getGraphTreeByView();
-		if(graphTree != null) {
-			for(Iterator i = graphTree.valuesIterator() ; i.hasNext() ; ) {
-				GraphTreeNode gt = (GraphTreeNode) i.next();
-				retValue += gt.getJavaScriptCode(begin, end, sort);
-			}
-		}
-		return retValue;
 	}
 
 	/**

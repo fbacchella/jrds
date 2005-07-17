@@ -7,6 +7,7 @@
 package jrds;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -18,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
+
+import jrds.snmp.SnmpRequester;
 
 import org.apache.log4j.Logger;
 
@@ -122,19 +125,19 @@ public class HostsList {
 		}
 	}
 
-	public void collectAll() {
+	public void collectAll() throws IOException {
+		SnmpRequester.start();
 		final ExecutorService tpool =  Executors.newFixedThreadPool(PropertiesManager.getInstance().collectorThreads);
 		logger.debug("One collect was launched");
 		Date start = new Date();
 		for (Iterator j = hostList.iterator(); j.hasNext();) {
 			final RdsHost oneHost = (RdsHost) j.next();
 			logger.debug("Collect all stats for host " + oneHost.getName());
-			Runnable runCollect = new Runnable() {
-				private RdsHost host = oneHost;
+			final Runnable runCollect = new Runnable() {
+				final private RdsHost host = oneHost;
 				
 				public void run() {
 					host.collectAll();
-					host.syncAll();
 				}
 			};
 			try {
@@ -153,32 +156,9 @@ public class HostsList {
 		Date end = new Date();
 		long duration = end.getTime() - start.getTime();
 		logger.info("Collect started at "  + start + " ran for " + duration + "ms");							
+		SnmpRequester.stop();
 	}
 	
-	public void openAll() {
-		for (Iterator j = hostList.iterator(); j.hasNext();) {
-			RdsHost oneHost = (RdsHost) j.next();
-			logger.debug("Open all RRD for host " + oneHost.getName());
-			oneHost.openAll();
-		}
-	}
-
-	public void closeAll() {
-		for (Iterator j = hostList.iterator(); j.hasNext();) {
-			RdsHost oneHost = (RdsHost) j.next();
-			logger.debug("Close all RRD for host " + oneHost.getName());
-			oneHost.closeAll();
-		}
-	}
-
-	public void syncAll() {
-		for (Iterator j = hostList.iterator(); j.hasNext();) {
-			RdsHost oneHost = (RdsHost) j.next();
-			logger.debug("Sync all RRD for host " + oneHost.getName());
-			oneHost.syncAll();
-		}
-	}
-
 	public void graphAll(Date startDate, Date endDate) {
 		for (Iterator j = hostList.iterator(); j.hasNext();) {
 			RdsHost oneHost = (RdsHost) j.next();

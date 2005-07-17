@@ -18,7 +18,6 @@ import jrds.probe.IndexedProbe;
 import jrds.probe.JdbcProbe;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdDb;
 import org.jrobin.core.RrdException;
 import org.jrobin.graph.RrdGraphDef;
 
@@ -476,13 +475,12 @@ implements Cloneable {
 		RrdGraphDef retValue = new RrdGraphDef();
 		boolean firstStack = true;
 		String rrdName = probe.getRrdName();
-		RrdDb rrddb = probe.getRrdDb();
 		for (Iterator i = dsMap.values().iterator(); i.hasNext(); ) {
 			DsDesc ds = (DsDesc) i.next();
 			if (ds.dsName == null && ds.rpn == null)
 				ds.graphType.draw(retValue, ds.name, ds.color, ds.legend + "@l");
 			else if (ds.rpn == null) {
-				if (rrddb.getDatasource(ds.dsName) != null) {
+				if (probe.dsExist(ds.dsName)) {
 					retValue.datasource(ds.name, rrdName, ds.dsName,
 							ds.cf.toString());
 					ds.graphType.draw(retValue, ds.name, ds.color,

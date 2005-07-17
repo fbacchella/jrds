@@ -12,6 +12,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
+import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
@@ -22,22 +25,23 @@ import jrds.RdsHost;
  * TODO 
  */
 public class ExaleadStatus extends HttpProbe {
+	static final private Logger logger = JrdsLogger.getLogger(ExaleadStatus.class);
 	static final ProbeDesc pd = new ProbeDesc(7);
 	static {
-		pd.add("err.adsense.connect", ProbeDesc.COUNTER, "errors.adsense.connect");
-		pd.add("err.adsense.highload", ProbeDesc.COUNTER, "errors.adsense.highload");
-		pd.add("err.adsense.parsing", ProbeDesc.COUNTER, "errors.adsense.parsing");
-		pd.add("err.adsense.timeout", ProbeDesc.COUNTER, "errors.adsense.timeout");
-		pd.add("err.exalead.decprms", ProbeDesc.COUNTER, "errors.exalead.decodingparams");
-		pd.add("err.exalead.index", ProbeDesc.COUNTER, "errors.exalead.index");
-		pd.add("err.google.connect", ProbeDesc.COUNTER, "errors.google.connect");
-		pd.add("err.google.parsing", ProbeDesc.COUNTER, "errors.google.parsing");
-		pd.add("err.untrapped", ProbeDesc.COUNTER, "errors.untrapped");
-		pd.add("queries", ProbeDesc.COUNTER);
-		pd.add("queries.adsense", ProbeDesc.COUNTER);
-		pd.add("queries.google", ProbeDesc.COUNTER);
-		pd.add("threads.adsense", ProbeDesc.GAUGE);
-		pd.add("threads.queries", ProbeDesc.GAUGE);
+		pd.add("err.adsense.connect", ProbeDesc.COUNTER, "errors.adsense.connect", 0, 100);
+		pd.add("err.adsense.highload", ProbeDesc.COUNTER, "errors.adsense.highload", 0, 100);
+		pd.add("err.adsense.parsing", ProbeDesc.COUNTER, "errors.adsense.parsing", 0, 100);
+		pd.add("err.adsense.timeout", ProbeDesc.COUNTER, "errors.adsense.timeout", 0, 100);
+		pd.add("err.exalead.decprms", ProbeDesc.COUNTER, "errors.exalead.decodingparams", 0, 100);
+		pd.add("err.exalead.index", ProbeDesc.COUNTER, "errors.exalead.index", 0, 100);
+		pd.add("err.google.connect", ProbeDesc.COUNTER, "errors.google.connect", 0, 100);
+		pd.add("err.google.parsing", ProbeDesc.COUNTER, "errors.google.parsing", 0, 100);
+		pd.add("err.untrapped", ProbeDesc.COUNTER, "errors.untrapped", 0, 100);
+		pd.add("queries", ProbeDesc.COUNTER, 0, 100);
+		pd.add("queries.adsense", ProbeDesc.COUNTER, 0, 100);
+		pd.add("queries.google", ProbeDesc.COUNTER, 0, 100);
+		pd.add("threads.adsense", ProbeDesc.GAUGE, 0, 100);
+		pd.add("threads.queries", ProbeDesc.GAUGE, 0, 100);
 		pd.add("uptime", ProbeDesc.NONE);
 		pd.setRrdName("exaleadstatus");
 		pd.setGraphClasses(new Object[] {"exaleaderrors.xml", "exaleadqueries.xml", "exaleadthreads.xml"});
@@ -67,6 +71,6 @@ public class ExaleadStatus extends HttpProbe {
 			}
 			catch (java.lang.NumberFormatException ex) {};
 		}
-		return retValue;
+		return filterUpTime("uptime", retValue);
 	}
 }

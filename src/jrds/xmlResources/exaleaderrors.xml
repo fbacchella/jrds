@@ -6,7 +6,7 @@
 	<add>
 		<name>err.adsense.connect</name>
 		<graphType>line</graphType>
-		<legend>adsense.connect</legend>
+		<legend>adsense connections errors</legend>
 	</add>
 	<add>
 		<name>err.adsense.highload</name>
@@ -24,10 +24,7 @@
 	<add>
 		<name>err.exalead.decprms</name>
 		<graphType>line</graphType>
-	</add>
-	<add>
-		<name>err.adsense.timeout</name>
-		<graphType>line</graphType>
+		<legend>exalead.decprms</legend>
 	</add>
 	<add>
 		<name>err.exalead.index</name>

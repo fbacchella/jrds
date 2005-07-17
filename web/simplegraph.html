@@ -34,8 +34,6 @@ function download_onClick()
 
 	<body bgcolor="#ffffff">
 		<div align="center">
-			<img id="graphImg" src="img/aollogo.gif" alt="" name="graphImg" border="0">
-			<script type="text/javascript">document.graphImg.src="graph" + document.location.search;</script>
 			<table width="180" border="0" cellspacing="2" cellpadding="0">
 				<tr>
 					<td><input onclick="refresh_onClick();" type="button" name="refreshButton" value="Refrech" tabindex="0"></td>
@@ -47,6 +45,8 @@ function download_onClick()
 					<td><input onclick="download_onClick();" type="button" name="DownloadButton" value="Download values" tabindex="3"></td>
 				</tr>
 			</table>
+			<img onclick="history_onClick();" id="graphImg" src="img/aollogo.gif" alt="" name="graphImg" border="0">
+			<script type="text/javascript">document.graphImg.src="graph" + document.location.search;</script>
 		</div>
 	</body>
 </html>

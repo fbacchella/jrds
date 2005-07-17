@@ -5,7 +5,6 @@ package jrds.snmp;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Date;
 import java.util.HashMap;
 
 import jrds.JrdsLogger;
@@ -99,7 +98,7 @@ public class SnmpVars extends HashMap {
 			else if(valueAsVar instanceof UnsignedInteger32) {
 				if(valueAsVar instanceof TimeTicks) {
 					long epochcentisecond = ((UnsignedInteger32)valueAsVar).getValue();
-					retvalue  = new Date(epochcentisecond * 10 );
+					retvalue  = new Double(epochcentisecond / 100.0 );
 				}
 				else
 					retvalue  = new Long(((UnsignedInteger32)valueAsVar).getValue());

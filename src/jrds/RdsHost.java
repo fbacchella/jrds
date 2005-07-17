@@ -1,6 +1,5 @@
 package jrds;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
@@ -8,7 +7,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdException;
 import org.snmp4j.Target;
 
 
@@ -90,59 +88,14 @@ public class RdsHost implements Comparable {
 		
 	}
 	
-	public void collectAll()
+	public void  collectAll()
 	{
 		for(Iterator j = allProbes.iterator() ; j.hasNext() ;) {
 			Probe currrd= (Probe) j.next();
-			try {
-				currrd.collect();
-			} catch (Exception e) {
-				logger.error("Error with probe " + currrd.getName() + ": " + e.getLocalizedMessage(), e);
-			}
+			currrd.collect();
 		}
 	}
-	
-	public void openAll()
-	{
-		for(Iterator j = allProbes.iterator() ; j.hasNext() ;) {
-			Probe currrd= (Probe) j.next();
-			try {
-				currrd.open();
-			} catch (IOException e) {
-				logger.error("Error while opening probe " + currrd.getName() + ": " + e.getLocalizedMessage());
-				e.printStackTrace();
-			} catch (RrdException e) {
-				logger.error("Error while opening probe " + currrd.getName() + ": " + e.getLocalizedMessage());
-				e.printStackTrace();
-			}
-		}
-	}
-	
-	public void closeAll()
-	{
-		for(Iterator j = allProbes.iterator() ; j.hasNext() ;) {
-			Probe currrd= (Probe) j.next();
-			try {
-				currrd.close();
-			} catch (IOException e) {
-				logger.error("Error while closing probe " + currrd.getName() + ": " + e.getLocalizedMessage());
-			} catch (RrdException e) {
-				logger.error("Error while closing probe " + currrd.getName() + ": " + e.getLocalizedMessage());
-			}
-		}
-	}
-	
-	public void syncAll() 
-	{
-		for(Iterator j = allProbes.iterator() ; j.hasNext() ;) {
-			Probe currrd= (Probe) j.next();
-			try {
-				currrd.sync();
-			} catch (IOException e) {
-				logger.error("Error while syncing probe " + currrd.getName() + ": " + e.getLocalizedMessage());
-			}
-		}
-	}
+
 	public void graphAll(Date startDate, Date endDate)
 	{
 		for(Iterator i = allProbes.iterator() ; i.hasNext() ;) {
