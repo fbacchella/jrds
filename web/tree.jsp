@@ -13,49 +13,38 @@
 		<style type="text/css"><!--
 A:visited { color: rgb(0, 0, 238); }
 --></style>
+			<script type="text/javascript" src="lib/ua.js"> </script>
+			<script type="text/javascript" src="lib/ftiens4.js"> </script>
 	</head>
 
 	<body bgcolor="#ffffff">
+<div style="position:absolute; top:0; left:0; "><table border=0><tr><td><font size=-2><a style="font-size:7pt;text-decoration:none;color:silver" href="http://www.treemenu.net/" target="_blank">JavaScript Tree Menu</a></font></td></tr></table></div>
 		<p>
-			<script type="text/javascript" src="lib/cooltree.js"></script>
 			<script type="text/javascript"><!--
-			 // Part 1 - Tree nodes definition
-var TREE1_NODES = [
-	['Host tree', '', '_', <%= jrdsBean.getJavascriptTree(1) %> ],
-	['View tree', '', '_', <%= jrdsBean.getJavascriptTree(2) %>	 ],
-	
-];				
+USETEXTLINKS = 1  
+STARTALLOPEN = 0
+HIGHLIGHT = 1
+PRESERVESTATE = 0
+//GLOBALTARGET="R"
+ICONPATH="img/"
 
- // Part 2 - Tree format
- var TREE1_FORMAT = [
-	10,							// 0. x coordinate
- 	10,							// 1. y coordinate
-	true,						// 2. button images flag
-	[							// 3. button images:
-		"img/c.gif",			//	collapsed,
- 		"img/e.gif",			//	expanded,
-		"img/b.gif"				//	blank
- 	],
- 	[ 16, 16, 0],				// 4. button images size: width, height,
-								// and indentation for childless nodes
- 	true,						// 5. folder images flag
- 	[							// 6. folder images:
-		"img/fc.gif",			//		closed,
-		"img/fe.gif", 			//		opened,
-		"img/d.gif"				//		document
- 	],
-	[ 16, 16],					// 7. folder images size: width, height
- 	[ 0, 16, 32, 48, 64, 80 ],	// 8. indentation for each level
- 	"white",					// 9. background color for the whole tree
- 	"clsNode",					// 10. default CSS class for nodes
- 	[ "cl1", "cl2" ], 			// 11. CSS classes for each level
- 	false,						// 12. single branch mode flag
- 	[ 0, 0 ]					// 13. item padding and spacing
- ];
- var myTree = new COOLjsTree("tree1", TREE1_NODES, TREE1_FORMAT);
-//-->
+foldersTree = gFld("<i>Demo</i>");
+hostTree = gFld("Host tree");
+<% jrdsBean.getJavascriptTree(1, "hostTree", out); %>
+//insFld(foldersTree, hostTree);
+
+viewTree = gFld("View tree");
+<% jrdsBean.getJavascriptTree(2, "viewTree", out); %>
+
+foldersTree.addChildren([hostTree, viewTree]);
+
+initializeDocument();
+ //-->
 </script>
 		</p>
+<noscript>
+A tree for site navigation will open here if you enable JavaScript in your browser.
+</noscript>
 	</body>
 
 </html>
