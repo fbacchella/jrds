@@ -85,12 +85,11 @@ public abstract class MuninsProbe extends Probe {
 					}
 				}
 				catch (IOException e) {
-					logger.error("Unable to read munins probe " + currentProbe
-							+ "because: " + e.getLocalizedMessage());
+					logger.error("Error with munins probe " + this + ": " + e);
 				}
 			}
 		} catch (IOException e) {
-			logger.error("Unable to connect to munins because: " + e.getLocalizedMessage());
+			logger.error("Unable to connect to munins because: " + e);
 		}
 		
 		if(out != null) {
