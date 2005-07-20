@@ -44,8 +44,8 @@ public class VMSolarisGraph extends RdsGraph {
 	public LinkedList getTreePathByHost() {
 		LinkedList retValue = new LinkedList();
 		retValue.add(this.probe.getHost().getName());
-		retValue.add("Système");
-		retValue.add("Mémoire");
+		retValue.add("System");
+		retValue.add("Memory");
 		retValue.add(getGraphTitle());
 		return retValue;
 	}
@@ -55,8 +55,8 @@ public class VMSolarisGraph extends RdsGraph {
 	 */
 	public LinkedList getTreePathByView() {
 		LinkedList retValue = new LinkedList();
-		retValue.add("Système");
-		retValue.add("Mémoire");
+		retValue.add("System");
+		retValue.add("Memory");
 		retValue.add(getGraphTitle());
 		retValue.add(this.probe.getHost().getName());
 		return retValue;
