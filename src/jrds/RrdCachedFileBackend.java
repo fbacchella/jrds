@@ -1,8 +1,6 @@
-/*
- * Created on 17 juil. 2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+/** 
+ * JRobin backend which is used to store RRD data to ordinary disk files 
+ * by using fast java.nio.* package ehanced with caching functionnalities. 
  */
 package jrds;
 
@@ -14,44 +12,38 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 import org.jrobin.core.RrdFileBackend;
-
-/**
- * @author bacchell
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 public class RrdCachedFileBackend extends RrdFileBackend {
 	static final private Logger logger = JrdsLogger.getLogger(RrdCachedFileBackend.class);
-	private static final Timer syncTimer = new Timer(true);
-
+	
 	private static final int CACHE_LENGTH = 8192;
 	ByteBuffer byteBuffer;
+	final Object lock = new Object(); 
 	private int cacheSize;
 	private long cacheStart;
 	private boolean cacheDirty = false;
 	private int dirtyStart;
 	private int dirtyEnd;
-
+	
+	private static final Timer syncTimer = new Timer(true);
 	private int syncMode;
 	private TimerTask syncTask;
 	
-	private int writeHit = 0;
-	private int readHit = 0;
-	private int access = 0;
-
+	private static int writeHit = 0;
+	private static int readHit = 0;
+	private static int access = 0;
+	
 	/**
 	 * @param path
 	 */
 	public RrdCachedFileBackend(String path, boolean readOnly, int lockMode, int syncMode, int syncPeriod)
-		throws IOException {
-			super(path, readOnly, lockMode);
-			this.syncMode = syncMode;
-			if(syncMode == RrdCachedFileBackendFactory.SYNC_BACKGROUND && !readOnly) {
-				createSyncTask(syncPeriod);
-			}
+	throws IOException {
+		super(path, readOnly, lockMode);
+		this.syncMode = syncMode;
+		if(syncMode == RrdCachedFileBackendFactory.SYNC_BACKGROUND && !readOnly) {
+			createSyncTask(syncPeriod);
+		}
 	}
-
+	
 	private void createSyncTask(int syncPeriod) {
 		syncTask = new TimerTask() {
 			public void run() {
@@ -60,53 +52,95 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 		};
 		syncTimer.schedule(syncTask, syncPeriod * 1000L, syncPeriod * 1000L);
 	}
-
+	
 	/**
 	 * This method forces all data cached in memory but not yet stored in the file,
 	 * to be stored in it. RrdNioBackend uses (a lot of) memory to cache I/O data.
 	 * This method is automatically invoked when the {@link #close()}
 	 * method is called. In other words, you don't have to call sync() before you call close().<p>
 	 */
-	public void sync() {
+	public synchronized void sync() {
 		if(cacheDirty) {
-			synchronized(byteBuffer) {
-				logger.debug("** SYNC **");
-				try {
-					final int oldPosition = byteBuffer.position();
-					final int oldLimit = byteBuffer.limit();
-					byteBuffer.position(dirtyStart);
-					byteBuffer.limit(dirtyEnd);
-					logger.debug(byteBuffer);
-					logger.debug(channel.write(byteBuffer, cacheStart + dirtyStart) + " bytes written");
-					byteBuffer.position(oldPosition);
-					byteBuffer.limit(oldLimit);
-					cacheDirty = false;
-					dirtyStart = byteBuffer.capacity();
-					dirtyEnd = 0;
-				} catch (IOException e) {
-					logger.error("Panic whils syncing " +  this.getPath() + ": " + e);
-				}
+			try {
+				int oldLimit = byteBuffer.limit();
+				byteBuffer.position(dirtyStart);
+				byteBuffer.limit(dirtyEnd);
+				int bwriten = channel.write(byteBuffer, cacheStart + dirtyStart);
+				//logger.debug(bwriten + " bytes written at " +  this.getPath() + "@"  + (cacheStart + dirtyStart));
+				byteBuffer.limit(oldLimit);
+				cacheDirty = false;
+				dirtyStart = byteBuffer.capacity();
+				dirtyEnd = 0;
+			} catch (IOException e) {
+				logger.error("Panic while syncing " +  this.getPath() + ": " + e);
 			}
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see org.jrobin.core.RrdBackend#write(long, byte[])
+	/**
+	 * Method called by the framework immediatelly before RRD update operation starts. This method
+	 * will synchronize in-memory cache with the disk content if synchronization mode is set to
+	 * {@link RrdCachedFileBackendFactory#SYNC_BEFOREUPDATE}. Otherwise it does nothing.
+	 */
+	public void beforeUpdate() {
+		if(syncMode == RrdCachedFileBackendFactory.SYNC_BEFOREUPDATE) {
+			sync();
+		}
+	}
+	
+	/**
+	 * Method called by the framework immediatelly after RRD update operation finishes. This method
+	 * will synchronize in-memory cache with the disk content if synchronization mode is set to
+	 * {@link RrdCachedFileBackendFactory#SYNC_AFTERUPDATE}. Otherwise it does nothing.
+	 */
+	public void afterUpdate() {
+		if(syncMode == RrdCachedFileBackendFactory.SYNC_AFTERUPDATE) {
+			sync();
+		}
+	}
+	
+	/**
+	 * Method called by the framework immediatelly before RRD fetch operation starts. This method
+	 * will synchronize in-memory cache with the disk content if synchronization mode is set to
+	 * {@link RrdCachedFileBackendFactory#SYNC_BEFOREFETCH}. Otherwise it does nothing.
+	 */
+	public void beforeFetch() {
+		if(syncMode == RrdCachedFileBackendFactory.SYNC_BEFOREFETCH) {
+			sync();
+		}
+	}
+	
+	/**
+	 * Method called by the framework immediatelly after RRD fetch operation finishes. This method
+	 * will synchronize in-memory cache with the disk content if synchronization mode is set to
+	 * {@link RrdCachedFileBackendFactory#SYNC_AFTERFETCH}. Otherwise it does nothing.
+	 */
+	public void afterFetch() {
+		if(syncMode == RrdCachedFileBackendFactory.SYNC_AFTERFETCH) {
+			sync();
+		}
+	}
+	
+	/**
+	 * Writes bytes to the underlying RRD file on the disk
+	 * @param offset Starting file offset
+	 * @param b Bytes to be written.
+	 * @throws IOException Thrown in case of I/O error
 	 */
 	public void write(long offset, byte[] b) throws IOException {
 		access++;
-		//boolean todo = true;
-		final long cacheEnd = cacheStart + cacheSize;
+		//logger.debug("Need to write " + b.length + " bytes from " + getPath() + "@" + offset);
+		long cacheEnd = cacheStart + cacheSize;
 		if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd)
-			read(offset, new byte[b.length]);
+			cacheMiss(offset, b.length);
 		else
 			writeHit++;
-		
-		cacheDirty = true;
-		byteBuffer.position((int)(offset - cacheStart));
-		byteBuffer.put(b);
-		dirtyStart = Math.min((int)(offset - cacheStart), dirtyStart);
-		dirtyEnd = Math.max(dirtyEnd, byteBuffer.position());
+		synchronized(this) {
+			cacheDirty = true;
+			byteBuffer.position((int)(offset - cacheStart));
+			byteBuffer.put(b);
+			dirtyStart = Math.min((int)(offset - cacheStart), dirtyStart);
+			dirtyEnd = Math.max(dirtyEnd, byteBuffer.position());
+		}
 	}
 	
 	/**
@@ -116,40 +150,95 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 	 * @throws IOException Thrown in case of I/O error.
 	 */
 	public void read(long offset, byte[] b) throws IOException {
+		//logger.debug("Need to read " + b.length + " bytes from " + getPath() + "@" + offset);
 		access++;
 		boolean todo = true;
 		final long cacheEnd = cacheStart + cacheSize;
-		if(offset >= cacheStart && offset + b.length < cacheEnd)
-			todo = false;
-		
-		if(todo) {
-			if(cacheDirty)
-				sync();
-			cacheSize = (int) (Math.ceil((float)b.length /  CACHE_LENGTH) * CACHE_LENGTH);
-			cacheStart = (int) (Math.floor((float)offset /  CACHE_LENGTH) * CACHE_LENGTH);
-			logger.debug("Will read " + cacheSize + " bytes at position " + cacheStart);
-			byteBuffer = ByteBuffer.allocate(cacheSize);
-			channel.position(cacheStart);
-			cacheDirty = false;
-			dirtyStart = byteBuffer.capacity();
-			dirtyEnd = 0;
-			if( channel.read(byteBuffer) < b.length) {
-				throw new IOException("Not enough bytes available in file " + getPath());
-			}
+		if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd) {
+			cacheMiss(offset, b.length);
 		}
 		else {
 			readHit++;
 		}
-		byteBuffer.position((int)(offset - cacheStart));
-		byteBuffer.get(b);
+		try {
+			byteBuffer.position((int)(offset - cacheStart));
+			byteBuffer.get(b);
+		}
+		catch (Exception e) {
+			logger.debug(e);
+			logger.debug(byteBuffer);
+		}
 	}
-	/* (non-Javadoc)
-	 * @see org.jrobin.core.RrdBackend#close()
+	
+	/**
+	 * Called after a cache miss, update the bytebuffer using 8k pages 
+	 * arround the desired offset and size 	 * @param offset
+	 * @param length
+	 * @throws IOException
+	 */
+	private synchronized void cacheMiss(long offset, long length) throws IOException {
+		if(cacheDirty)
+			sync();
+		int newCacheSize = (int) (Math.ceil((float)(length + offset % CACHE_LENGTH)/  CACHE_LENGTH) * CACHE_LENGTH);
+		int newCacheStart = (int) (Math.floor((float)offset /  CACHE_LENGTH) * CACHE_LENGTH);
+		ByteBuffer newByteBuffer = ByteBuffer.allocate(newCacheSize);
+		synchronized(channel) {
+			channel.position(offset + length);
+			channel.position(newCacheStart);
+			int bread = channel.read(newByteBuffer);
+			//logger.debug(bread + " bytes read at " +  this.getPath() + "@"  + newCacheStart);
+			if( bread < length) {
+				throw new IOException("Not enough bytes available in file " + getPath());
+			}
+			else {
+				synchronized(lock) {
+					byteBuffer= newByteBuffer;
+					cacheDirty = false;
+					dirtyStart = byteBuffer.capacity();
+					dirtyEnd = 0;
+					cacheSize = newCacheSize;
+					cacheStart = newCacheStart;
+				}
+			}
+		}
+		
+	}
+	
+	/** 
+	 * Closes the underlying RRD file. 
+	 * @throws IOException Thrown in case of I/O error 
 	 */
 	public void close() throws IOException {
-		super.close();
-		logger.debug("Access: " + access);
-		logger.debug("Write hit: " + writeHit);
-		logger.debug("Read hit: " + readHit);
+		// cancel synchronization
+		if(syncTask != null) {
+			syncTask.cancel();
+		}
+		super.close(); // calls sync() eventually
+		// release the buffer, make it eligible for GC as soon as possible
+		byteBuffer = null;
 	}
+	
+	/** 
+	 * Calculate the cache efficiency, accross all the backend used 
+	 * @return cache efficiency 
+	 */ 	public static float getCacheEfficency() {
+	 	return ((float)readHit + writeHit)/access;
+	 }
+	 
+	 /** 
+	  * @return the number of IO operations that hit the cache, 
+	  * accross all the backend used 
+	  */	public static int getCacheHitsCount() {
+	  	return readHit + writeHit;
+	  }
+	  
+	  /** 
+	   * @return the number of IO operations, 
+	   * accross all the backend used 
+	   */ 
+	  public static int getCacheRequestsCount() {
+	  	return access;
+	  	
+	  }
+	  
 }

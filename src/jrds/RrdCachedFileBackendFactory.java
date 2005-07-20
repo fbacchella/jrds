@@ -44,7 +44,7 @@ public class RrdCachedFileBackendFactory extends RrdFileBackendFactory {
 	 */
 	public static final int DEFAULT_SYNC_PERIOD = 300; // seconds
 
-	private static int syncMode = SYNC_BACKGROUND;
+	private static int syncMode = SYNC_ONCLOSE;
 	private static int syncPeriod = DEFAULT_SYNC_PERIOD;
 
 	/**
