@@ -75,6 +75,7 @@ public class RdsHost implements Comparable {
 	public void addProbe(Probe rrd)
 	{
 		allProbes.add(rrd);
+		rrd.checkStore();
 		
 		Collection rdsGraphs = rrd.getGraphList();
 		if(rdsGraphs != null)
