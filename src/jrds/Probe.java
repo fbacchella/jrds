@@ -57,16 +57,22 @@ implements Comparable {
 	
 	private Collection initGraphList() {
 		Collection graphClasses = pd.getGraphClasses();
-		Collection graphList = new ArrayList(graphClasses.size());
-		Class[] thisClass = new Class[] {
-				Probe.class};
-		Object[] args = new Object[] {
-				this};
-		for (Iterator i = graphClasses.iterator(); i.hasNext(); ) {
-			Object o = i.next();
-			RdsGraph newGraph = GraphFactory.makeGraph(o, this);
-			if(newGraph != null)
-				graphList.add(newGraph);
+		Collection graphList = null;
+		if(graphClasses != null) {
+			graphList = new ArrayList(graphClasses.size());
+			Class[] thisClass = new Class[] {
+					Probe.class};
+			Object[] args = new Object[] {
+					this};
+			for (Iterator i = graphClasses.iterator(); i.hasNext(); ) {
+				Object o = i.next();
+				RdsGraph newGraph = GraphFactory.makeGraph(o, this);
+				if(newGraph != null)
+					graphList.add(newGraph);
+			}
+		}
+		else {
+			logger.debug("No graph for probe" + this);
 		}
 		return graphList;
 	}
@@ -153,7 +159,7 @@ implements Comparable {
 					create();
 				retValue = true;
 			} catch (Exception e) {
-				logger.error("Store " + this.getRrdName() + " unusable: " + e);
+				logger.error("Store " + getRrdName() + " unusable: " + e);
 			}
 			finally {
 				if(rrdDb != null)
@@ -255,7 +261,7 @@ implements Comparable {
 			logger.warn("Error while storing sample: " +
 					ex.getLocalizedMessage());
 		} catch (Exception e) {
-			logger.error("Error with probe " + this + ": " + e.getLocalizedMessage());
+			logger.error("Error with probe " + this + ": " + e);
 		}
 		finally  {
 			if(rrdDb != null)
