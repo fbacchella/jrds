@@ -1,8 +1,3 @@
-/*
- * Created on 6 janv. 2005
- *
- * TODO 
- */
 package jrds.probe;
 
 import java.io.BufferedReader;
@@ -27,7 +22,7 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public abstract class HttpProbe extends Probe  implements IndexedProbe {
-	static final private Logger logger = JrdsLogger.getLogger(HttpResponseTimeRrd.class.getPackage().getName());
+	static final private Logger logger = JrdsLogger.getLogger(HttpResponseTimeRrd.class);
 	private URL url;
 
 	/**
@@ -58,34 +53,6 @@ public abstract class HttpProbe extends Probe  implements IndexedProbe {
 		}
 		return vars;
 	}
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.Probe#updateSample(org.jrobin.core.Sample)
-	 */
-	/*protected void updateSample(Sample oneSample) {
-		try {
-			BufferedReader  in = new BufferedReader(new InputStreamReader(url.openStream()));
-			List lines = new ArrayList();
-			String lastLine;
-			while((lastLine = in.readLine()) != null)
-				lines.add(lastLine);
-			in.close();
-			Map vars = parseLines(lines);
-			for(Iterator i = vars.entrySet().iterator() ; i.hasNext() ;) {
-				Map.Entry e = (Map.Entry) i.next();
-				String name = (String) e.getKey();
-				double value = ((Double) e.getValue()).doubleValue();
-				if(name != null)
-					try {
-						oneSample.setValue(name, value);
-					} catch (RrdException e1) {
-						logger.error("Unable to update value " + value + " from " + this + ": " + e1.getLocalizedMessage());
-					}
-			}
-			
-		} catch (IOException e) {
-			logger.error("Unable to read url " + url + "because: " + e.getLocalizedMessage());
-		}
-	}*/
 
 	/**
 	 * @return Returns the url.

@@ -22,7 +22,7 @@ public class UdpGraph extends RdsGraph {
 		gd.add("InErrors", GraphDesc.LINE, "In Errors");
 		gd.add("OutDatagrams", GraphDesc.LINE, "Out Datagrams");
 		gd.setFilename("udp");
-		gd.setGraphTitle("Activité UDP");
+		gd.setGraphName("Activité UDP");
 		gd.setHostTree(GraphDesc.HNT);
 		gd.setViewTree(GraphDesc.NTH);
 	}

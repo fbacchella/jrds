@@ -23,7 +23,7 @@ public class IcmpGraph extends RdsGraph {
 		gd.add("OutErrors", GraphDesc.LINE);
 
 		gd.setFilename("icmp");
-		gd.setGraphTitle("ICMP Info");
+		gd.setGraphName("ICMP Info");
 		gd.setVerticalLabel("Paquets/s");
 		gd.setHostTree(GraphDesc.HNT);
 		gd.setViewTree(GraphDesc.NTH);

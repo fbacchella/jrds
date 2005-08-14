@@ -21,7 +21,7 @@ public class SquidCpu extends RdsGraph {
 		ds.add("CpuUsage", GraphDesc.LINE, "CPU usage");
 
 		ds.setFilename("squidcpu");
-		ds.setGraphTitle("Squid CPU usage");
+		ds.setGraphName("Squid CPU usage");
 		ds.setVerticalLabel("%");
 		ds.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SERVICES, "Squid", GraphDesc.TITLE} );
 		ds.setViewTree(new Object[] {GraphDesc.SERVICES, "Squid", GraphDesc.HOST, GraphDesc.TITLE});

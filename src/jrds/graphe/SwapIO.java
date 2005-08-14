@@ -27,7 +27,7 @@ public class SwapIO extends RdsGraph {
 		gd.add("swapIn", GraphDesc.AREA, Color.BLUE);
 		gd.add("swapOut");
 		gd.add("swapOutInverser","0,swapOut,-", GraphDesc.AREA, Color.GREEN);
-		gd.setGraphTitle("Swap activity");
+		gd.setGraphName("Swap activity");
 	}
 
 	/**

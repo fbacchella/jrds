@@ -5,8 +5,6 @@
  */
 package jrds.graphe;
 
-import java.util.LinkedList;
-
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.RdsGraph;
@@ -22,9 +20,11 @@ public class TcpEstablishedGraph extends RdsGraph {
 	static {
 		gd.add("CurrEstab", GraphDesc.AREA,"ESTABLISHED or CLOSE-WAIT connections");
 
-		gd.setGraphTitle("Connections TCP établies");
+		gd.setGraphName("Connections TCP établies");
 		gd.setFilename("tcpest");
 		gd.setVerticalLabel("Number");
+		gd.setHostTree(new Object[] { GraphDesc.HOST, GraphDesc.NETWORK, GraphDesc.TCP, GraphDesc.TITLE});
+		gd.setViewTree(new Object[] { GraphDesc.NETWORK,  GraphDesc.TCP, GraphDesc.TITLE, GraphDesc.HOST});
 	}
 
 	/**
@@ -32,30 +32,5 @@ public class TcpEstablishedGraph extends RdsGraph {
 	 */
 	public TcpEstablishedGraph(Probe theStore) {
 		super(theStore, gd);
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.RdsGraph#getTreePathByHost()
-	 */
-	public LinkedList getTreePathByHost() {
-		LinkedList retValue = new LinkedList();
-		retValue.add(this.probe.getHost().getName());
-		retValue.add("Réseau");
-		retValue.add("TCP");
-		retValue.add(getGraphTitle());
-		return retValue;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.RdsGraph#getTreePathByView()
-	 */
-	public LinkedList getTreePathByView() {
-		LinkedList retValue = new LinkedList();
-		retValue.add("Réseau");
-		retValue.add("TCP");
-		retValue.add(probe.getHost().getName());
-		retValue.add(getGraphTitle());
-
-		return retValue;
 	}
 }

@@ -5,8 +5,6 @@
  */
 package jrds.graphe;
 
-import java.util.LinkedList;
-
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.RdsGraph;
@@ -21,7 +19,7 @@ public class PagingSolarisMuninsGraph extends RdsGraph {
 	static final GraphDesc gd = new GraphDesc(7);
 	static {
 		gd.setFilename("pagesolmunins");
-		gd.setGraphTitle("Paging activity");
+		gd.setGraphName("Paging activity");
 		gd.setVerticalLabel("operation/s");
 		gd.add(GraphDesc.COMMENT,"Upward graph");
 		gd.add("pgin",GraphDesc.LINE, "Page-in requests");
@@ -37,35 +35,13 @@ public class PagingSolarisMuninsGraph extends RdsGraph {
 		gd.add("rpgpgout","0, scan, - ", GraphDesc.LINE, "pages paged-out");
 		gd.add("rscan","0, scan, - ", GraphDesc.LINE, "pages per second scanned by");
 		gd.add("rpgfree","0, pgfree, - ", GraphDesc.LINE, "pages per second placed on the free list");
+		gd.setHostTree(new Object[] { GraphDesc.HOST, GraphDesc.SYSTEM, GraphDesc.MEMORY, GraphDesc.TITLE});
+		gd.setViewTree(new Object[] { GraphDesc.SYSTEM, GraphDesc.MEMORY, GraphDesc.TITLE, GraphDesc.HOST, });
 	}
 	/**
 	 * @param theStore
 	 */
 	public PagingSolarisMuninsGraph(Probe theStore) {
 		super(theStore, gd);
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.RdsGraph#getTreePathByHost()
-	 */
-	public LinkedList getTreePathByHost() {
-		LinkedList retValue = new LinkedList();
-		retValue.add(this.probe.getHost().getName());
-		retValue.add("Système");
-		retValue.add("Mémoire");
-		retValue.add(getGraphTitle());
-		return retValue;
-	}
-	
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.RdsGraph#getTreePathByView()
-	 */
-	public LinkedList getTreePathByView() {
-		LinkedList retValue = new LinkedList();
-		retValue.add("Système");
-		retValue.add("Mémoire");
-		retValue.add(getGraphTitle());
-		retValue.add(this.probe.getHost().getName());
-		return retValue;
 	}
 }

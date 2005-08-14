@@ -21,7 +21,7 @@ public class CpuRawKILinuxGraph extends RdsGraph {
 		ds.add("ssCpuRawKernel", GraphDesc.LINE, "kernel CPU time");
 		ds.add("ssCpuRawInterrupt", GraphDesc.LINE, "interruptlevel CPU time");
  		ds.setFilename("cpurawkilinux");
-		ds.setGraphTitle("Consommation  CPU");
+		ds.setGraphName("Consommation  CPU");
 		ds.setHostTree(GraphDesc.HSLT);
 		ds.setViewTree(GraphDesc.SLHT);
 }

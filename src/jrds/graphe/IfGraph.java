@@ -36,7 +36,7 @@ public class IfGraph extends RdsGraph {
 	 * @param theStore
 	 */
 	public IfGraph(Probe theStore) {
-		super(theStore, (GraphDesc) ds.clone());
+		super(theStore, ds);
 		setFilename("if-" + ((IndexedProbe)probe).getIndexName());
 		setGraphTitle("Interface " + ((IndexedProbe)probe).getIndexName());
 	}

@@ -31,7 +31,7 @@ public class SquidHitRatioGraph extends RdsGraph {
 		ds.add("IpHitsRatio","IpHits, IpRequests, /, 100, *", GraphDesc.LINE, "IP to name hit ratio");
 		
 		ds.setFilename("squidhitratio");
-		ds.setGraphTitle("Squid hit ratio");
+		ds.setGraphName("Squid hit ratio");
 		ds.setUpperLimit(100);
 		ds.setVerticalLabel("%");
 		ds.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SERVICES, "Squid", GraphDesc.TITLE} );

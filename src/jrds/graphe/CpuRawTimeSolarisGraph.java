@@ -31,7 +31,7 @@ public class CpuRawTimeSolarisGraph extends RdsGraph {
 		ds.add("Kernelpc","ssCpuRawKernel, total, /, 100, *", GraphDesc.STACK, Color.RED, "Kernel");
 		ds.add("Idlepc","ssCpuRawIdle, total, /, 100, *", GraphDesc.STACK, Color.GREEN, "Idle");
 		ds.setFilename("Temps CPU");
-		ds.setGraphTitle("Utilisation CPU");
+		ds.setGraphName("Utilisation CPU");
 		ds.setUpperLimit(100);
 		ds.setVerticalLabel("%");
 		ds.setHostTree(GraphDesc.HSLT);
