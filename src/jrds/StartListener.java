@@ -1,26 +1,18 @@
-/*
- * Created on 11 déc. 2004
- *
- * TODO 
- */
 package jrds;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import jrds.snmp.SnmpRequester;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdBackendFactory;
-import org.jrobin.core.RrdDbPool;
-
-import edu.emory.mathcs.backport.java.util.concurrent.Executors;
-import edu.emory.mathcs.backport.java.util.concurrent.ScheduledExecutorService;
-import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
  * The class used to initialize the collecter and the logger if jrds is used as
@@ -32,55 +24,57 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 public class StartListener implements ServletContextListener {
 	static final private Logger logger = JrdsLogger.getLogger(StartListener.class);
 	static final PropertiesManager pm = PropertiesManager.getInstance();
-	static final RrdDbPool dbpool = RrdDbPool.getInstance();
 	static final HostsList hl = HostsList.getRootGroup();
-	private ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
+	static private boolean started = false;
+	private static final Timer collectTimer = new Timer(true);
+
 	
 	
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
 	 */
 	public void contextInitialized(ServletContextEvent arg0) {
-		
-		try {
-			InputStream propStream = arg0.getServletContext().getResourceAsStream("/WEB-INF/jrds.properties");
-			if(propStream != null) {
-				pm.join(propStream);
-			}
-			
-			String localPropFile = arg0.getServletContext().getInitParameter("propertiesFile");
-			if(localPropFile != null)
-				pm.join(new File(localPropFile));
-			
-			pm.update();
-			
-			JrdsLogger.setFileLogger(pm.logfile);
-			
-			System.getProperties().setProperty("java.awt.headless","true");
-			
-			hl.append(new File(pm.configfilepath));
-			
-			logger.debug("propertiesFile = " + arg0.getServletContext().getInitParameter("propertiesFile"));
-			logger.info("Application jrds started");
-		
-			dbpool.setCapacity(5);
-			//RrdBackendFactory.setDefaultFactory(RrdFileBackendFactory.NAME);
-			RrdBackendFactory.registerAndSetAsDefaultFactory(new RrdCachedFileBackendFactory());
-
-			final Runnable collector = new Runnable () {
-				private final HostsList lhl = hl;
-				public void run() {
-					try {
-						lhl.collectAll();
-					} catch (IOException e) {
-						logger.error("Unable to launch collect: ", e);
-					}
+		//Resin launch the listener twice !
+		if( ! started ) {
+			try {
+				ServletContext ctxt = arg0.getServletContext();
+				logger.info("Starting jrds");
+				InputStream propStream = ctxt.getResourceAsStream("/WEB-INF/jrds.properties");
+				if(propStream != null) {
+					pm.join(propStream);
 				}
-			};
-			timer.scheduleAtFixedRate(collector, 1, PropertiesManager.getInstance().resolution, TimeUnit.SECONDS);
-		}
-		catch (Exception ex) {
-			logger.fatal("Unable to start " + arg0.getServletContext().getServletContextName(), ex);
+				
+				String localPropFile = ctxt.getInitParameter("propertiesFile");
+				logger.debug("propertiesFile = " + localPropFile);
+				if(localPropFile != null)
+					pm.join(new File(localPropFile));
+				
+				pm.update();
+				
+				JrdsLogger.setFileLogger(pm.logfile);
+				
+				System.getProperties().setProperty("java.awt.headless","true");
+				
+				StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
+				hl.append(new File(pm.configfilepath));
+								
+				TimerTask collector = new TimerTask () {
+					private final HostsList lhl = hl;
+					public void run() {
+						try {
+							lhl.collectAll();
+						} catch (IOException e) {
+							logger.error("Unable to launch collect: ", e);
+						}
+					}
+				};
+				collectTimer.schedule(collector, 5000L, PropertiesManager.getInstance().resolution * 1000L);
+			}
+			catch (Exception ex) {
+				logger.fatal("Unable to start " + arg0.getServletContext().getServletContextName(), ex);
+			}
+			logger.info("Application jrds started");
+			started = true;
 		}
 	}
 	
@@ -88,17 +82,15 @@ public class StartListener implements ServletContextListener {
 	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
 	 */
 	public void contextDestroyed(ServletContextEvent arg0) {
-		timer.shutdown();
+		started = false;
+		collectTimer.cancel();
 		try {
 			SnmpRequester.stop();
 		} catch (IOException e) {
 			logger.error("Strange problem while stopping snmp: ", e);
 		}
 		logger.info("appplication jrds stopped");
-		logger.info("RrdDbPool efficency: " + dbpool.getPoolEfficency());
-		logger.info("RrdDbPool hits: " + dbpool.getPoolHitsCount());
-		logger.info("RrdDbPool requets: " + dbpool.getPoolRequestsCount());
-		
+		StoreOpener.stop();
 	}
 	
 }

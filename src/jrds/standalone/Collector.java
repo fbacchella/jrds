@@ -11,13 +11,11 @@ import java.io.File;
 import jrds.HostsList;
 import jrds.JrdsLogger;
 import jrds.PropertiesManager;
-import jrds.RrdCachedFileBackendFactory;
+import jrds.StoreOpener;
 import jrds.snmp.SnmpRequester;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdBackendFactory;
-import org.jrobin.core.RrdDbPool;
 
 
 /**
@@ -30,47 +28,29 @@ public class Collector {
 	public static final int GRAPH_RESOLUTION = 300; // seconds
 	private static final Logger logger = JrdsLogger.getLogger(Collector.class);
 	private static final PropertiesManager pm = PropertiesManager.getInstance();
-	private static final RrdDbPool dbpool = RrdDbPool.getInstance();
-
 	public static void main(String[] args) throws Exception {
 		pm.join(new File("jrds.properties"));
 		pm.update();
-
-		RrdBackendFactory.registerAndSetAsDefaultFactory(new RrdCachedFileBackendFactory());
 		
 		System.getProperties().setProperty("java.awt.headless","true");
-		HostsList.getRootGroup().append(new File(pm.configfilepath));
+		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
+		
 		final HostsList hl = HostsList.getRootGroup();
-		JrdsLogger.getLogger("").setLevel(Level.ALL);
+		hl.append(new File(pm.configfilepath));
+		logger.setLevel(Level.ERROR);
+		JrdsLogger.getLogger("").setLevel(Level.ERROR);
 		JrdsLogger.getLogger("jrds").setLevel(Level.ALL);
 		JrdsLogger.getLogger("probe").setLevel(Level.ALL);
-		logger.setLevel(Level.ALL);
 		logger.info("jrds' collector started");
-		JrdsLogger.getLogger("org.snmp4j").setLevel(Level.ALL);
-		boolean doCollect = true;
-		while(doCollect == true) {
-			doCollect = false;
-			Thread t = new Thread("Collector") {
-				public void run() {
-					try {
-						SnmpRequester.start();
-						hl.collectAll();
-						SnmpRequester.stop();
-						logger.info("One collect is done");
-					}
-					catch (Exception ex) {
-						logger.error(ex.getLocalizedMessage(), ex);
-					}
-					
-				}
-			};
-			t.start();
-			logger.info("One collect was launched");
-			if(doCollect)
-				Thread.sleep(GRAPH_RESOLUTION * 1000L);
+		//JrdsLogger.getLogger("org.snmp4j").setLevel(Level.ALL);
+		SnmpRequester.start();
+		for(int i = 0; i< 5 ; i++) {
+			hl.collectAll();
+			System.gc();
 		}
-		//hl.getThreadPool().awaitTermination(10, TimeUnit.SECONDS);
-		//hl.getThreadPool().shutdown();
+		SnmpRequester.stop();
+		StoreOpener.stop();
+		System.gc();
 	}
 	
 }

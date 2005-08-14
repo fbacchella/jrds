@@ -1,9 +1,3 @@
-/*
- * Created on 13 juil. 2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package jrds;
 
 import java.io.IOException;
@@ -16,25 +10,25 @@ import org.jrobin.core.RrdException;
 import org.jrobin.core.RrdOpener;
 
 /**
- * @author bacchell
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * A wrapper classe, to manage the rrdDb operations
  */
-public class StoreOpener {
+public final class StoreOpener {
 	static final private Logger logger = JrdsLogger.getLogger(StoreOpener.class);
+	
 	static final private RrdOpener opener = new RrdOpener(true);
-
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @return
-	 * @throws java.io.IOException
-	 * @throws org.jrobin.core.RrdException
-	 */
-	public final static RrdDb getRrd(String arg0)
-			throws IOException, RrdException {
-		return opener.getRrd(arg0, RrdBackendFactory.getDefaultFactory());
+	
+    /**
+     * Retrieves the RrdDb instance matching a specific RRD datasource name
+     * (usually a file name) and using a specified RrdBackendFactory.
+     *
+     * @param rrdFile Name of the RRD datasource.
+     * @return RrdDb instance of the datasource.
+     * @throws IOException Thrown in case of I/O error.
+     * @throws RrdException Thrown in case of a JRobin specific error.
+     */
+	public final static RrdDb getRrd(String rrdFile)
+	throws IOException, RrdException {
+		return opener.getRrd(rrdFile, RrdBackendFactory.getDefaultFactory());
 	}
 	/**
 	 * @param arg0
@@ -42,9 +36,37 @@ public class StoreOpener {
 	public final static void releaseRrd(RrdDb arg0)  {
 		try {
 			opener.releaseRrd(arg0);
-			RrdDbPool.getInstance().dump();
 		} catch (Exception e) {
 			logger.debug("Strange error" + e);
 		}
 	}
+	
+	public static final void prepare(int dbPoolSize, int syncPeriod) throws RrdException {
+		RrdDbPool.getInstance().setCapacity(dbPoolSize);
+		
+		RrdCachedFileBackendFactory.setSyncMode(RrdCachedFileBackendFactory.SYNC_CENTRALIZED);
+		if(syncPeriod > 0)
+			RrdCachedFileBackendFactory.setSyncPeriod(syncPeriod);
+		RrdBackendFactory.registerAndSetAsDefaultFactory(new RrdCachedFileBackendFactory());
+	}
+	
+	public static final void stop() {
+		RrdDbPool dbpool = RrdDbPool.getInstance();
+		logger.info("RrdDbPool efficiency: " + dbpool.getPoolEfficency());
+		logger.info("RrdDbPool hits: " + dbpool.getPoolHitsCount());
+		logger.info("RrdDbPool requets: " + dbpool.getPoolRequestsCount());
+		
+		try {
+			dbpool.reset();
+		} catch (IOException e) {
+			logger.error("Strange problem while stopping db pool: ", e);
+		}
+		
+		logger.info("Cached backend efficiency: " + RrdCachedFileBackend.getCacheEfficency());
+		logger.info("Cached backend  hits: " + RrdCachedFileBackend.getCacheHitsCount());
+		logger.info("Cached backend requests: " + RrdCachedFileBackend.getCacheRequestsCount());
+		
+	}
+	
+	
 }
