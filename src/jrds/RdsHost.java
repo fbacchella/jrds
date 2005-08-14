@@ -101,9 +101,12 @@ public class RdsHost implements Comparable {
 	{
 		for(Iterator i = allProbes.iterator() ; i.hasNext() ;) {
 			Probe currrd= (Probe) i.next();
-			for(Iterator j = currrd.getGraphList().iterator() ; j.hasNext(); ) {
-				RdsGraph currGraph= (RdsGraph) j.next();
-				currGraph.graph(startDate, endDate);
+			Collection gl = currrd.getGraphList();
+			if(gl != null) {
+				for(Iterator j = currrd.getGraphList().iterator() ; j.hasNext(); ) {
+					RdsGraph currGraph= (RdsGraph) j.next();
+					currGraph.graph(startDate, endDate);
+				}
 			}
 		}
 	}
