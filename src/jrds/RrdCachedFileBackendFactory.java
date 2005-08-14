@@ -36,6 +36,9 @@ public class RrdCachedFileBackendFactory extends RrdFileBackendFactory {
 	public static final int SYNC_AFTERFETCH = 4;
 	/** See {@link #setSyncMode(int)} for explanation  */
 	public static final int SYNC_BACKGROUND = 5;
+
+	public static final int SYNC_CENTRALIZED = 6;
+
 	/**
 	 * Period in seconds between consecutive synchronizations when
 	 * sync-mode is set to SYNC_BACKGROUND. By default in-memory cache will be

@@ -17,7 +17,6 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 	
 	private static final int CACHE_LENGTH = 8192;
 	ByteBuffer byteBuffer;
-	final Object lock = new Object(); 
 	private int cacheSize;
 	private long cacheStart;
 	private boolean cacheDirty = false;
@@ -41,6 +40,9 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 		this.syncMode = syncMode;
 		if(syncMode == RrdCachedFileBackendFactory.SYNC_BACKGROUND && !readOnly) {
 			createSyncTask(syncPeriod);
+		}
+		else if(syncMode == RrdCachedFileBackendFactory.SYNC_CENTRALIZED && !readOnly) {
+			BackEndCommiter.getInstance().addBackEnd(this);
 		}
 	}
 	
@@ -127,19 +129,21 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 	 * @throws IOException Thrown in case of I/O error
 	 */
 	public void write(long offset, byte[] b) throws IOException {
-		access++;
-		//logger.debug("Need to write " + b.length + " bytes from " + getPath() + "@" + offset);
-		long cacheEnd = cacheStart + cacheSize;
-		if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd)
-			cacheMiss(offset, b.length);
-		else
-			writeHit++;
-		synchronized(this) {
-			cacheDirty = true;
-			byteBuffer.position((int)(offset - cacheStart));
-			byteBuffer.put(b);
-			dirtyStart = Math.min((int)(offset - cacheStart), dirtyStart);
-			dirtyEnd = Math.max(dirtyEnd, byteBuffer.position());
+		if(b.length > 0) {
+			access++;
+			//logger.debug("Need to write " + b.length + " bytes from " + getPath() + "@" + offset);
+			long cacheEnd = cacheStart + cacheSize - 1;
+			if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd)
+				cacheMiss(offset, b.length);
+			else
+				writeHit++;
+			synchronized(this) {
+				cacheDirty = true;
+				byteBuffer.position((int)(offset - cacheStart));
+				byteBuffer.put(b);
+				dirtyStart = Math.min((int)(offset - cacheStart), dirtyStart);
+				dirtyEnd = Math.max(dirtyEnd, byteBuffer.position());
+			}
 		}
 	}
 	
@@ -150,23 +154,25 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 	 * @throws IOException Thrown in case of I/O error.
 	 */
 	public void read(long offset, byte[] b) throws IOException {
-		//logger.debug("Need to read " + b.length + " bytes from " + getPath() + "@" + offset);
-		access++;
-		boolean todo = true;
-		final long cacheEnd = cacheStart + cacheSize;
-		if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd) {
-			cacheMiss(offset, b.length);
-		}
-		else {
-			readHit++;
-		}
-		try {
-			byteBuffer.position((int)(offset - cacheStart));
-			byteBuffer.get(b);
-		}
-		catch (Exception e) {
-			logger.debug(e);
-			logger.debug(byteBuffer);
+		if(b.length > 0) {
+			//logger.debug("Need to read " + b.length + " bytes from " + getPath() + "@" + offset);
+			access++;
+			boolean todo = true;
+			long cacheEnd = cacheStart + cacheSize - 1;
+			if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd) {
+				cacheMiss(offset, b.length);
+			}
+			else {
+				readHit++;
+			}
+			try {
+				byteBuffer.position((int)(offset - cacheStart));
+				byteBuffer.get(b);
+			}
+			catch (Exception e) {
+				logger.error(e);
+				logger.debug(byteBuffer);
+			}
 		}
 	}
 	
@@ -176,14 +182,13 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 	 * @param length
 	 * @throws IOException
 	 */
-	private synchronized void cacheMiss(long offset, long length) throws IOException {
+	private void cacheMiss(long offset, long length) throws IOException {
 		if(cacheDirty)
 			sync();
 		int newCacheSize = (int) (Math.ceil((float)(length + offset % CACHE_LENGTH)/  CACHE_LENGTH) * CACHE_LENGTH);
 		int newCacheStart = (int) (Math.floor((float)offset /  CACHE_LENGTH) * CACHE_LENGTH);
 		ByteBuffer newByteBuffer = ByteBuffer.allocate(newCacheSize);
 		synchronized(channel) {
-			channel.position(offset + length);
 			channel.position(newCacheStart);
 			int bread = channel.read(newByteBuffer);
 			//logger.debug(bread + " bytes read at " +  this.getPath() + "@"  + newCacheStart);
@@ -191,7 +196,7 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 				throw new IOException("Not enough bytes available in file " + getPath());
 			}
 			else {
-				synchronized(lock) {
+				synchronized(this) {
 					byteBuffer= newByteBuffer;
 					cacheDirty = false;
 					dirtyStart = byteBuffer.capacity();
@@ -213,6 +218,10 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 		if(syncTask != null) {
 			syncTask.cancel();
 		}
+		if(syncMode == RrdCachedFileBackendFactory.SYNC_CENTRALIZED) {
+			BackEndCommiter.getInstance().removeBackEnd(this);
+		}
+
 		super.close(); // calls sync() eventually
 		// release the buffer, make it eligible for GC as soon as possible
 		byteBuffer = null;
