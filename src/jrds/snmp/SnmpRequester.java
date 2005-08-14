@@ -200,29 +200,12 @@ public abstract class SnmpRequester {
 				ResponseEvent re = null;
 				if(requestPDU.size() > 0) {
 					re = snmp.send(requestPDU, snmpTarget);
-					//Object lock = snmpTarget;
-					//the synchronized is here to own the lock monitor
-					//synchronized(lock) {
-					//	SyncResponseListener listner = new SyncResponseListener(lock);
-					//	synchronized(globLock) {
-					//		snmp.send(requestPDU, snmpTarget, null, listner);
-					//	}
-					//	try {   
-					//		lock.wait();
-					//	} catch (InterruptedException e1) {
-					//		// TODO Auto-generated catch block
-					//		e1.printStackTrace();
-					//	}
-					//	re = listner.getResponse();
-					//}
 				}
 				if(re != null)
 					response = re.getResponse();
 				if (response != null && response.getErrorStatus() == SnmpConstants.SNMP_ERROR_SUCCESS ){
 					snmpVars = new SnmpVars(response);
 					Number uptime = ((Number)snmpVars.get(upTimeOid));
-					if(uptime != null)
-						logger.debug(probe.getHost().getName() + " is up for " + uptime.intValue() + " seconds");
 					doAgain = false;
 				}	
 				else {		
