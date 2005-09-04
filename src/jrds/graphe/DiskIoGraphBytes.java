@@ -10,7 +10,6 @@ import java.awt.Color;
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.RdsGraph;
-import jrds.probe.IndexedProbe;
 
 
 /**
@@ -24,9 +23,12 @@ public class DiskIoGraphBytes extends RdsGraph {
 		gd.add("diskIONRead", GraphDesc.LINE, Color.GREEN,"Number of bytes read");
 		gd.add("diskIONWritten", GraphDesc.LINE, Color.BLUE,"Number of bytes written");
 		gd.setVerticalLabel("Bytes/s");
-		gd.setHostTree(GraphDesc.HDAIT);
-		gd.setViewTree(GraphDesc.DAHIT);
-		gd.setSubTitle("Activity as bytes/s");
+		gd.setHostTree(new Object[] {
+				GraphDesc.HOST, GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.INDEX, GraphDesc.TITLE});
+		gd.setViewTree(new Object[] {
+						GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.HOST, "Activity as bytes/s", GraphDesc.TITLE});
+		gd.setGraphName("bytes-{2}");
+		gd.setGraphTitle("E/S (octets) disque on {2} on {1}");
 	}
 
 	/**
@@ -34,7 +36,7 @@ public class DiskIoGraphBytes extends RdsGraph {
 	 */
 	public DiskIoGraphBytes(Probe theStore) {
 		super(theStore, gd);
-		setFilename("BYTES." + probe.getName());
-		setGraphTitle("E/S disque " + ((IndexedProbe)probe).getIndexName() +"(octets)");
+		//setGraphName("BYTES." + probe.getName());
+		//setGraphTitle("E/S disque " + ((IndexedProbe)probe).getIndexName() +"(octets)");
 	}
 }

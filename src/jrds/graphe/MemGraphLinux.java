@@ -39,8 +39,8 @@ public class MemGraphLinux extends RdsGraph {
 		ds.add("memBufferBytes", "memBuffer, 1024, *", GraphDesc.STACK, Color.ORANGE,"Total Buffered Memory");
 		ds.add("memAvailRealBytes", "memAvailReal, 1024, *",GraphDesc.STACK, Color.BLACK,"Available Real/Physical Memory Space");
 		ds.add("memUsedSwapBytes", "memUsedSwap, 1024, *", GraphDesc.STACK,Color.RED,"Used Swap Space");
-		ds.setFilename("memory");
-		ds.setGraphName("Utilisation mémoire");
+		ds.setGraphName("memory");
+		ds.setGraphTitle("Memory usage on {1}");
 		ds.setHostTree(GraphDesc.HSMT);
 		ds.setViewTree(GraphDesc.SMHT);
 

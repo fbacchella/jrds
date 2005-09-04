@@ -28,7 +28,7 @@ public class SquidBytesGraph extends RdsGraph {
 		ds.add("ServerIn", "ServerInKb, 8192, *", GraphDesc.LINE, "Bits received from servers");
 
 
-		ds.setFilename("squidbytes");
+		ds.setGraphName("squidbytes");
 		ds.setGraphName("Squid bytes transfered");
 		ds.setVerticalLabel("Bit/s");
 		ds.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SERVICES, "Squid", GraphDesc.TITLE} );

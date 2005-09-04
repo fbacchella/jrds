@@ -8,7 +8,6 @@ package jrds.graphe;
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.RdsGraph;
-import jrds.probe.IndexedProbe;
 
 
 /**
@@ -28,6 +27,8 @@ public class ProcessInfoSize extends RdsGraph {
 		gd.add(AVERAGE, GraphDesc.LINE, AVERAGE);
 		gd.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SYSTEM, "Processus", GraphDesc.INDEX, GraphDesc.TITLE});
 		gd.setViewTree(new Object [] {GraphDesc.SYSTEM, "Processus", GraphDesc.HOST, GraphDesc.INDEX, GraphDesc.TITLE});
+		gd.setGraphName("size-{2}");
+		gd.setGraphTitle("Memory usage for process {2} on {1}");
 	}
 
 	/**
@@ -35,7 +36,5 @@ public class ProcessInfoSize extends RdsGraph {
 	 */
 	public ProcessInfoSize(Probe theStore) {
 		super(theStore, gd);
-		this.setFilename("size." + ((IndexedProbe)probe).getIndexName());
-		this.setGraphTitle("Memory for Process " + ((IndexedProbe)probe).getIndexName());
 	}
 }

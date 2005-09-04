@@ -34,7 +34,7 @@ public class ProcessInfoNumber extends RdsGraph {
 	 */
 	public ProcessInfoNumber(Probe theStore) {
 		super(theStore, gd);
-		setFilename("num." + ((IndexedProbe)probe).getIndexName());
-		setGraphTitle("Number of Process " + ((IndexedProbe)probe).getIndexName());
+		setGraphName("num." + ((IndexedProbe)probe).getIndexName());
+		setGraphTitle("Number of Process " + ((IndexedProbe)probe).getIndexName() + "on {1}");
 	}
 }

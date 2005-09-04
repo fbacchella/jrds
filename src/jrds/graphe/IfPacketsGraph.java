@@ -10,7 +10,6 @@ import java.awt.Color;
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.RdsGraph;
-import jrds.probe.IndexedProbe;
 
 /**
  * @author bacchell
@@ -38,6 +37,8 @@ public class IfPacketsGraph
         ds.setVerticalLabel("paquets/s");
         ds.setHostTree(GraphDesc.HNIIT);
         ds.setViewTree(GraphDesc.NIHIT);
+        ds.setGraphName("ifpkts-{2}");
+        ds.setGraphTitle("Packets exchanged on interface {2} on {1}");
     }
 
     /**
@@ -45,8 +46,5 @@ public class IfPacketsGraph
      */
     public IfPacketsGraph(Probe theStore) {
         super(theStore, ds);
-        setFilename("ifpkts-" + ( (IndexedProbe) probe).getIndexName());
-        setGraphTitle("Interface " + ( (IndexedProbe) probe).getIndexName() +
-                      " packets");
     }
 }

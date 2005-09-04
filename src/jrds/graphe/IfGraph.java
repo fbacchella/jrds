@@ -10,7 +10,6 @@ import java.awt.Color;
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.RdsGraph;
-import jrds.probe.IndexedProbe;
 
 
 /**
@@ -31,13 +30,15 @@ public class IfGraph extends RdsGraph {
 		ds.setVerticalLabel("bits/s");
 		ds.setHostTree(GraphDesc.HNIIT);
 		ds.setViewTree(GraphDesc.NIHIT);
+		ds.setGraphName("if-{2}");
+		ds.setGraphTitle("Interface {2} on {1}");
 	}
  	/**
 	 * @param theStore
 	 */
 	public IfGraph(Probe theStore) {
 		super(theStore, ds);
-		setFilename("if-" + ((IndexedProbe)probe).getIndexName());
-		setGraphTitle("Interface " + ((IndexedProbe)probe).getIndexName());
+		//setGraphName("if-" + ((IndexedProbe)probe).getIndexName());
+		//setGraphTitle("Interface " + ((IndexedProbe)probe).getIndexName());
 	}
 }

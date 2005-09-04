@@ -35,7 +35,7 @@ public class OracleActivityGraph extends RdsGraph {
 	 */
 	public OracleActivityGraph(Probe theStore) {
 		super(theStore, gd);
-		setFilename(theStore.getName());
+		setGraphName(theStore.getName());
 		setGraphTitle("Activité sur la base " + ((jrds.probe.Oracle) probe).getSid());
 	}
 

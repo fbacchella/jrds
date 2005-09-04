@@ -34,7 +34,7 @@ public class PartitionSpaceGraph extends RdsGraph {
 	public PartitionSpaceGraph(Probe theStore) {
 		super(theStore, gd);
 		this.setGraphTitle("Occupation of file system " + ((IndexedProbe)probe).getIndexName());
-		this.setFilename(initFileNamePrefix());
+		this.setGraphName(initFileNamePrefix());
 	}
 
 	/* (non-Javadoc)

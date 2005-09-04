@@ -34,8 +34,8 @@ public class CpuRawTimeLinuxGraph extends RdsGraph {
 		ds.add("Systempc","ssCpuRawSystem, total, /, 100, *", GraphDesc.STACK, Color.RED, "System CPU time");
 		ds.add("Idlepc","ssCpuRawIdle, total, /, 100, *", GraphDesc.STACK, Color.GREEN, "Idle CPU time");
 		
-		ds.setFilename("cpurawlinux");
-		ds.setGraphName("Utilisation CPU");
+		ds.setGraphName("cpurawlinux");
+		ds.setGraphTitle("Utilisation CPU on {1}");
 		ds.setUpperLimit(100);
 		ds.setVerticalLabel("%");
 		ds.setHostTree(GraphDesc.HSLT);

@@ -24,7 +24,7 @@ public class VMSolarisGraph extends RdsGraph {
 		gd.add("rsVSwapIn", GraphDesc.LINE, "Number of pages swapped in");
 		gd.add("rsVSwapOut", GraphDesc.LINE, "Number of pages swapped out");
 		
-		gd.setFilename("vmsolaris");
+		gd.setGraphName("vmsolaris");
 		gd.setGraphName("VM activity");
 		gd.setVerticalLabel("Operation/s");
 		gd.setHostTree(new Object[] { GraphDesc.HOST, GraphDesc.SYSTEM, GraphDesc.MEMORY, GraphDesc.TITLE});

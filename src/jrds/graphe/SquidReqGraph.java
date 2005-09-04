@@ -23,7 +23,7 @@ public class SquidReqGraph extends RdsGraph {
 		ds.add("FqdnRequests", GraphDesc.LINE, "Direct name resolution ");
 		ds.add("IpRequests", GraphDesc.LINE, "Reverse name resolution");
 
-		ds.setFilename("squidreq");
+		ds.setGraphName("squidreq");
 		ds.setGraphName("Squid Requests");
 		ds.setVerticalLabel("requests/s");
 		ds.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SERVICES, "Squid", GraphDesc.TITLE} );

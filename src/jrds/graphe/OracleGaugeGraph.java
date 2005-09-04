@@ -30,7 +30,7 @@ public class OracleGaugeGraph extends RdsGraph {
 	 */
 	public OracleGaugeGraph(Probe theStore) {
 		super(theStore, gd);
-		setFilename(theStore.getName());
+		setGraphName(theStore.getName());
 		setGraphTitle("Ouverture sur la base " + ((jrds.probe.Oracle) probe).getSid());
 	}
 

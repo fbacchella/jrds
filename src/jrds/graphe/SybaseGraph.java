@@ -35,7 +35,7 @@ public class SybaseGraph extends RdsGraph {
 	 */
 	public SybaseGraph(Probe theStore) {
 		super(theStore, gd);
-		setFilename(theStore.getName());
+		setGraphName(theStore.getName());
 		setGraphTitle("Occupation disque de la base " + ((jrds.probe.Sybase) probe).getDbName());
 	}
 }

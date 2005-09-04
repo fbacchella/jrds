@@ -26,9 +26,9 @@ public class IpErrorGraph extends RdsGraph {
 		ds.add("ipFragFails", GraphDesc.LINE);
 		ds.add("ipRoutingDiscards", GraphDesc.LINE);
 		
-		ds.setFilename("iperrors");
+		ds.setGraphName("iperrors");
 		ds.setVerticalLabel("paquets/s");
-		ds.setGraphName("IP errors activity");
+		ds.setGraphTitle("IP errors activity on {1}");
 		
 		ds.setHostTree(new Object[] { GraphDesc.HOST, GraphDesc.NETWORK, GraphDesc.IP, GraphDesc.TITLE});
 		ds.setViewTree(new Object[] { GraphDesc.NETWORK, GraphDesc.IP, GraphDesc.HOST, GraphDesc.TITLE});

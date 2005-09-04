@@ -21,7 +21,7 @@ public class SwapIO extends RdsGraph {
 	
 	private static final GraphDesc gd = new GraphDesc(3);
 	static {
-		gd.setFilename("swapio");
+		gd.setGraphName("swapio");
 		gd.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.MEMORY, GraphDesc.TITLE});
 		gd.setViewTree(new Object[] {GraphDesc.SYSTEM, GraphDesc.MEMORY, GraphDesc.TITLE, GraphDesc.HOST});
 		gd.add("swapIn", GraphDesc.AREA, Color.BLUE);

@@ -25,7 +25,7 @@ public class ApacheTransfer extends RdsGraph {
 	static final GraphDesc gd = new GraphDesc(1);
 	static {
 		gd.add("Total kBytes", GraphDesc.LINE, Color.GREEN, "Bytes transfered");
-		gd.setFilename("apachetransfer");
+		gd.setGraphName("apachetransfer");
 		gd.setVerticalLabel("Bytes/s");
 		gd.setHostTree(new Object[] { GraphDesc.HOST, GraphDesc.SERVICES, "Web Activity", GraphDesc.TITLE});
 		gd.setViewTree(new Object[] {GraphDesc.SERVICES, "Web Activity", GraphDesc.TITLE});

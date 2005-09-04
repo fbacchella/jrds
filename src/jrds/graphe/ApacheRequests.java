@@ -24,7 +24,7 @@ public class ApacheRequests extends RdsGraph {
 	static final GraphDesc gd = new GraphDesc(1);
 	static {
 		gd.add("Total Accesses", GraphDesc.LINE, Color.GREEN, "Requests");
-		gd.setFilename("apachereq");
+		gd.setGraphName("apachereq");
 		gd.setVerticalLabel("Requests/s");
 		gd.setHostTree(new Object[] { GraphDesc.HOST, GraphDesc.SERVICES, "Web Activity", GraphDesc.TITLE});
 		gd.setViewTree(new Object[] { GraphDesc.SERVICES,  "Web Activity", GraphDesc.TITLE});

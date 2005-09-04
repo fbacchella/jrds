@@ -56,7 +56,7 @@ public class HttpGraph extends RdsGraph {
 		super(theStore, gd);
 		URL url = ((HttpResponseTimeRrd) theStore).getUrl();
 		setGraphTitle(url.toString());
-		setFilename(makeFileNamePrefix(url));
+		setGraphName(makeFileNamePrefix(url));
 	}
 	
 	/* (non-Javadoc)

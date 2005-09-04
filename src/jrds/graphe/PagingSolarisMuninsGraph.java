@@ -18,7 +18,7 @@ import jrds.RdsGraph;
 public class PagingSolarisMuninsGraph extends RdsGraph {
 	static final GraphDesc gd = new GraphDesc(7);
 	static {
-		gd.setFilename("pagesolmunins");
+		gd.setGraphName("pagesolmunins");
 		gd.setGraphName("Paging activity");
 		gd.setVerticalLabel("operation/s");
 		gd.add(GraphDesc.COMMENT,"Upward graph");

@@ -24,9 +24,10 @@ public class DiskIoGraphReq extends RdsGraph {
 		gd.add("diskIOReads", GraphDesc.LINE, Color.GREEN,"Number of read accesses");
 		gd.add("diskIOWrites", GraphDesc.LINE, Color.BLUE,"Number of write accesses");
 		gd.setVerticalLabel("operations/s");
-		gd.setHostTree(GraphDesc.HDAIT);
-		gd.setViewTree(GraphDesc.DAHIT);
-		gd.setSubTitle("Activity as operation/s");
+		gd.setHostTree(new Object[] {
+				GraphDesc.HOST, GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.INDEX, GraphDesc.TITLE});
+		gd.setViewTree(new Object[] {
+						GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.HOST, "Activity as operation/s", GraphDesc.TITLE});
 	}
 
 	/**
@@ -34,7 +35,7 @@ public class DiskIoGraphReq extends RdsGraph {
 	 */
 	public DiskIoGraphReq(Probe theStore) {
 		super(theStore, gd);
-		setFilename("op." + probe.getName());
+		setGraphName("op." + probe.getName());
 		setGraphTitle("E/S disque " + ((IndexedProbe)probe).getIndexName() +"(operations)");
 	}
 }

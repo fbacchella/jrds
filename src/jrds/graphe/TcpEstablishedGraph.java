@@ -21,7 +21,7 @@ public class TcpEstablishedGraph extends RdsGraph {
 		gd.add("CurrEstab", GraphDesc.AREA,"ESTABLISHED or CLOSE-WAIT connections");
 
 		gd.setGraphName("Connections TCP établies");
-		gd.setFilename("tcpest");
+		gd.setGraphName("tcpest");
 		gd.setVerticalLabel("Number");
 		gd.setHostTree(new Object[] { GraphDesc.HOST, GraphDesc.NETWORK, GraphDesc.TCP, GraphDesc.TITLE});
 		gd.setViewTree(new Object[] { GraphDesc.NETWORK,  GraphDesc.TCP, GraphDesc.TITLE, GraphDesc.HOST});

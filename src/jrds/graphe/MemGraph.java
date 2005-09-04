@@ -28,8 +28,8 @@ public class MemGraph extends RdsGraph {
 		ds.add("memUsedRealBytes", "memTotalReal,memAvailReal,-, 1024, *", GraphDesc.AREA, Color.GREEN, "Active Real/Physical Memory Space");
 		ds.add("memAvailRealBytes", "memAvailReal, 1024, *", GraphDesc.STACK, Color.BLUE, "Available Real/Physical Memory Space");
 		ds.add("memUsedSwapBytes", "memTotalSwap,memAvailSwap,-, 1024, *", GraphDesc.STACK, Color.RED, "Used Swap Space");
-		ds.setFilename("memory");
-		ds.setGraphName("Utilisation mémoire");
+		ds.setGraphName("memory");
+		ds.setGraphTitle("Memory usage on {1}");
 	
 		ds.setHostTree(GraphDesc.HSMT);
 		ds.setViewTree(GraphDesc.SMHT);

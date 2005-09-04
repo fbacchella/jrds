@@ -23,7 +23,7 @@ public class TcpSegmentsGraph extends RdsGraph {
 		gd.add("RetransSegs", GraphDesc.LINE, "Number of segments retransmitted");
 
 		gd.setGraphName("Segments TCP échangés");
-		gd.setFilename("tcpseg");
+		gd.setGraphName("tcpseg");
 		gd.setVerticalLabel("Segments/s");
 		gd.setHostTree(new Object[] { GraphDesc.HOST, GraphDesc.NETWORK, GraphDesc.TCP, GraphDesc.TITLE});
 		gd.setViewTree(new Object[] { GraphDesc.NETWORK,  GraphDesc.TCP, GraphDesc.TITLE, GraphDesc.HOST});
