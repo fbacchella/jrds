@@ -2,7 +2,7 @@
 <graphdesc>
 	<filename>tcpseg</filename>
 	<verticalLabel>Segments/s</verticalLabel>
-	<graphTitle>Exchanged TCP segments</graphTitle>
+	<graphTitle>Exchanged TCP segments on {1}</graphTitle>
 	<add>
 		<name>InSegs</name>
 		<graphType>line</graphType>
@@ -22,12 +22,12 @@
 		<pathelement>HOST</pathelement>
 		<pathelement>NETWORK</pathelement>
 		<pathelement>TCP</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>Exchanged TCP segments</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>NETWORK</pathelement>
 		<pathelement>TCP</pathelement>
 		<pathelement>HOST</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>Exchanged TCP segments</pathstring>
 	</viewtree>
 </graphdesc>

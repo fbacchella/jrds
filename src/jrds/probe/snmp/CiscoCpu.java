@@ -30,8 +30,8 @@ public class CiscoCpu extends RdsSnmpSimple {
         GraphDesc gd = new GraphDesc(2);
         gd.add("la1", GraphDesc.LINE, Color.GREEN, "1mn");
         gd.add("la5", GraphDesc.LINE, Color.BLUE, "5mn");
-        gd.setFilename("ciscocpu");
-        gd.setGraphTitle("Charge CPU");
+        gd.setGraphName("ciscocpu");
+        gd.setGraphName("Charge CPU");
         gd.setHostTree(GraphDesc.HSLT);
         gd.setViewTree(GraphDesc.SLHT);
 

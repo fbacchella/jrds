@@ -9,7 +9,6 @@ package jrds.probe.snmp;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.RdsSnmpSimple;
-import jrds.graphe.UdpGraph;
 import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;
@@ -27,7 +26,7 @@ public class UdpSnmp extends RdsSnmpSimple {
 		pd.add("InErrors",ProbeDesc.COUNTER,new OID(".1.3.6.1.2.1.7.3"));
 		pd.add("OutDatagrams",ProbeDesc.COUNTER,new OID(".1.3.6.1.2.1.7.4"));
 		pd.setRrdName("udp_snmp");
-		pd.setGraphClasses(new Class[] {UdpGraph.class});
+		pd.setGraphClasses(new Object[] {"udpactivity.xml"});
 		pd.setRequester(SnmpRequester.SIMPLE);
 	}
 	/**

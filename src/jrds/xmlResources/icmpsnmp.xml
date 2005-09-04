@@ -2,7 +2,7 @@
 <graphdesc>
 	<filename>icmp</filename>
 	<verticalLabel>Paquets/s</verticalLabel>
-	<graphTitle>ICMP Info</graphTitle>
+	<graphTitle>ICMP Info on {1}</graphTitle>
 	<add>
 		<name>InMsgs</name>
 		<graphType>line</graphType>
@@ -26,11 +26,11 @@
 	<hosttree>
 		<pathelement>HOST</pathelement>
 		<pathelement>NETWORK</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>ICMP Info</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>NETWORK</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>ICMP Info</pathstring>
 		<pathelement>HOST</pathelement>
 	</viewtree>
 </graphdesc>

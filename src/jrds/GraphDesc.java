@@ -1,7 +1,7 @@
-package jrds;
+//----------------------------------------------------------------------------
+//$Id$
 
-// ----------------------------------------------------------------------------
-// $Id$
+package jrds;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -137,11 +137,11 @@ implements Cloneable {
 				return ( (IndexedProbe) graph.getProbe()).getIndexName();
 			}
 		};
-		static public final PathElement SUBTITLE = new PathElement() {
-			public String resolve(RdsGraph graph) {
-				return graph.getGraphSubTitle();
-			}
-		};
+		/*static public final PathElement SUBTITLE = new PathElement() {
+		 public String resolve(RdsGraph graph) {
+		 return graph.getGraphSubTitle();
+		 }
+		 };*/
 		static public final PathElement JDBC = new PathElement() {
 			public String resolve(RdsGraph graph) {
 				return ( (JdbcProbe) graph.getProbe()).getJdbcurl();
@@ -207,6 +207,12 @@ implements Cloneable {
 				return "Databases";
 			}
 		};
+		static public final PathElement DBISNTANCE = new PathElement() {
+			public String resolve(RdsGraph graph) {
+				JdbcProbe dbprobe = (JdbcProbe) graph.getProbe();
+				return dbprobe.getJdbcInstanceUrl();
+			}
+		};
 	}
 	
 	static final public PathElement HOST = PathElement.HOST;
@@ -215,23 +221,19 @@ implements Cloneable {
 	static final public PathElement IP = PathElement.IP;
 	static final public PathElement TITLE = PathElement.TITLE;
 	static final public PathElement INDEX = PathElement.INDEX;
-	static final public PathElement SUBTITLE = PathElement.SUBTITLE;
 	static final public PathElement JDBC = PathElement.JDBC;
 	static final public PathElement WEB = PathElement.WEB;
 	static final public PathElement SYSTEM = PathElement.SYSTEM;
 	static final public PathElement DISK = PathElement.DISK;
+	static final public PathElement DISKACTIVITY = PathElement.DISKACTIVITY;
 	static final public PathElement MEMORY = PathElement.MEMORY;
+	static final public PathElement TCP = PathElement.TCP;
 	
 	/*Lots of macro to store path definitions*/
 	static final public Object[] HSLT = new PathElement[] {
 			HOST, PathElement.SYSTEM, PathElement.LOAD, TITLE};
 	static final public Object[] SLHT = new PathElement[] {
 			PathElement.SYSTEM, PathElement.LOAD, TITLE, HOST};
-	
-	static final public Object[] DAHIT = new PathElement[] {
-			PathElement.DISK, PathElement.DISKACTIVITY, HOST, SUBTITLE, TITLE};
-	static final public Object[] HDAIT = new Object[] {
-			HOST, PathElement.DISK, PathElement.DISKACTIVITY, INDEX, TITLE};
 	
 	static final public Object[] NIHIT = new PathElement[] {
 			PathElement.NETWORK, PathElement.INTERFACES, HOST, INDEX, TITLE};
@@ -292,29 +294,24 @@ implements Cloneable {
 	static final public Color COLOR7 = colors[6];
 	
 	private Map dsMap;
-	private String filename;
-	private boolean filenameRO = false;
-	private String graphTitle;
-	private boolean graphTitleRO = false;
 	private int width = 578;
 	private int height = 206;
 	private double upperLimit = Double.NaN;
 	private double lowerLimit = 0;
-	private boolean cloned = false;
 	private String verticalLabel = null;
 	private int lastColor = 0;
 	private List viewTree = null;
 	private List hostTree = null;
-	private String subTitle = null;
+	private String graphName;
+	private String graphTitle ="{0} on {1}";
 	
-	//We don't want this to be copied during a clone
 	private final class Dimension {
 		public int width = 0;
 		public int height = 0;
 	};
 	private Dimension dimension = new Dimension();
 	
-	static private class DsDesc {
+	static private final class DsDesc {
 		public String name;
 		public String dsName;
 		public String rpn;
@@ -332,6 +329,9 @@ implements Cloneable {
 			this.color = color;
 			this.legend = legend;
 			this.cf = cf;
+		}
+		public String toString() {
+			return "DsDesc(" + name + "," + dsName + ",\"" + rpn + "\"," + graphType + "," + color + ",\"" + legend + "\"," + cf + ")";
 		}
 	}
 	
@@ -434,10 +434,20 @@ implements Cloneable {
 		
 	}
 	
+	/**
+	 * Add a plot, but only uses String as parameters, for the GraphFactory
+	 * @param name Name of the plot
+	 * @param dsName the datastore to use
+	 * @param rpn The RPN, used instead of the datastore
+	 * @param graphType
+	 * @param color
+	 * @param legend
+	 * @param consFunc
+	 */
 	public void add(String name, String dsName, String rpn,
 			String graphType, String color, String legend,
 			String consFunc) {
-		if (dsName == null)
+		if (dsName == null && rpn == null)
 			dsName = name;
 		GraphType gt = (GraphType) resolv(GraphType.class, graphType);
 		ConsFunc cf = DEFAULTCF;
@@ -458,7 +468,7 @@ implements Cloneable {
 		if (legend == null)
 			legend = name;
 		dsMap.put(name,
-				new DsDesc(dsName, dsName, rpn, gt, c, legend, cf));
+				new DsDesc(name, dsName, rpn, gt, c, legend, cf));
 		
 	}
 	
@@ -483,8 +493,12 @@ implements Cloneable {
 				if (probe.dsExist(ds.dsName)) {
 					retValue.datasource(ds.name, rrdName, ds.dsName,
 							ds.cf.toString());
-					ds.graphType.draw(retValue, ds.name, ds.color,
-							ds.legend + "@l");
+					if(ds.graphType != null)
+						ds.graphType.draw(retValue, ds.name, ds.color,
+								ds.legend + "@l");
+					else {
+						logger.warn("graph type is null for " + ds.dsName + " on probe " + probe);
+					}
 				}
 			}
 			else {
@@ -492,7 +506,6 @@ implements Cloneable {
 				ds.graphType.draw(retValue, ds.name, ds.color, ds.legend + "@l");
 			}
 		}
-		retValue.setTitle(getGraphTitle() + " on " + probe.getHost().getName());
 		retValue.setShowLegend(true);
 		retValue.setGridRange(lowerLimit, upperLimit, false);
 		if (verticalLabel != null)
@@ -501,41 +514,17 @@ implements Cloneable {
 	}
 	
 	/**
-	 * @return Returns the filename.
-	 */
-	public String getFilename() {
-		return filename;
-	}
-	
-	/**
-	 * @param filename The filename to set.
-	 */
-	public void setFilename(String filename) {
-		if (cloned || !filenameRO) {
-			this.filename = filename;
-			filenameRO = !cloned;
-		}
-		else
-			logger.error("filename tried to be set twice");
-	}
-	
-	/**
 	 * @return Returns the graphTitle.
 	 */
-	public String getGraphTitle() {
-		return graphTitle;
+	public String getGraphName() {
+		return graphName;
 	}
 	
 	/**
 	 * @param graphTitle The graphTitle to set.
 	 */
-	public void setGraphTitle(String graphTitle) {
-		if (cloned || !graphTitleRO) {
-			this.graphTitle = graphTitle;
-			graphTitleRO = !cloned;
-		}
-		else
-			logger.error("graph title tried to be set twice");
+	public void setGraphName(String graphTitle) {
+		this.graphName = graphTitle;
 	}
 	
 	/**
@@ -597,6 +586,13 @@ implements Cloneable {
 	}
 	
 	/**
+	 * @param upperLimit The upperLimit to set.
+	 */
+	public void setUpperLimit(String upperLimit) {
+		this.upperLimit = Double.parseDouble(upperLimit);
+	}
+	
+	/**
 	 * @return Returns the width.
 	 */
 	public int getWidth() {
@@ -609,24 +605,7 @@ implements Cloneable {
 	public void setWidth(int width) {
 		this.width = width;
 	}
-	
-	/**
-	 * @see java.lang.Object#clone()
-	 */
-	public Object clone() {
-		Object o = null;
-		try {
-			o = super.clone();
-			( (GraphDesc) o).cloned = true;
-			( (GraphDesc) o).filenameRO = false;
-			( (GraphDesc) o).graphTitleRO = false;
-		}
-		catch (CloneNotSupportedException e) {
-			logger.error("Clone not suported for this object");
-		}
-		return o;
-	}
-	
+
 	/**
 	 * @return Returns the verticalLabel.
 	 */
@@ -644,14 +623,7 @@ implements Cloneable {
 	public void colorsReset() {
 		lastColor = 0;
 	}
-	
-	/**
-	 * @return Returns true if the object has been already cloned.
-	 */
-	public boolean isCloned() {
-		return cloned;
-	}
-	
+
 	/**
 	 * @return Returns the viewTree.
 	 */
@@ -709,18 +681,17 @@ implements Cloneable {
 	public void setHostTree(Object[] hostTree) {
 		this.hostTree = Arrays.asList(hostTree);
 	}
-	
+
 	/**
-	 * @return Returns the subTitle.
+	 * @return Returns the graphTitleFormat.
 	 */
-	public String getSubTitle() {
-		return subTitle;
+	public String getGraphTitle() {
+		return graphTitle;
 	}
-	
 	/**
-	 * @param subTitle The subTitle to set.
+	 * @param graphTitleFormat The graphTitleFormat to set.
 	 */
-	public void setSubTitle(String subTitle) {
-		this.subTitle = subTitle;
+	public void setGraphTitle(String graphTitle) {
+		this.graphTitle = graphTitle;
 	}
 }

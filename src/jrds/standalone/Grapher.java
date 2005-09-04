@@ -13,6 +13,7 @@ import java.util.Date;
 import jrds.HostsList;
 import jrds.JrdsLogger;
 import jrds.PropertiesManager;
+import jrds.StoreOpener;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -33,8 +34,11 @@ public class Grapher {
 		pm.update();
 		
 		System.getProperties().setProperty("java.awt.headless","true");
-		HostsList.getRootGroup().append(new File(pm.configfilepath));
+		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
+
 		final HostsList hl = HostsList.getRootGroup();
+		hl.append(new File(pm.configfilepath));
+
 		JrdsLogger.getLogger("").setLevel(Level.ALL);
 		JrdsLogger.getLogger("jrds").setLevel(Level.ALL);
 		JrdsLogger.getLogger("jrds.probe").setLevel(Level.ALL);
@@ -44,7 +48,6 @@ public class Grapher {
 		PrintWriter pw = new PrintWriter(System.err);
 		Date end = new Date();
 		Date begin = new Date(end.getTime() - 86400 * 1000);
-		HostsList theList = HostsList.getRootGroup();
-		theList.graphAll(begin, end);
+		hl.graphAll(begin, end);
 	}
 }

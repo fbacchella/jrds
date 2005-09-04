@@ -191,8 +191,9 @@ implements Comparable {
 	
 	/**
 	 * A method to filter buy uptime value
-	 * return an empty map if uptime is to low
-	 * @param id
+	 * return an empty map if uptime is to low.
+	 * The uptime value must be exprimed in seconds
+	 * @param id The id of value
 	 * @param values
 	 * @return
 	 */
@@ -224,14 +225,15 @@ implements Comparable {
 				Map.Entry e = (Map.Entry) i.next();
 				String dsName = (String) nameMap.get(e.getKey());
 				double value = ( (Number) e.getValue()).doubleValue();
-				if (dsName != null)
+				if (dsName != null) {
 					try {
 						oneSample.setValue(dsName, value);
 					}
-				catch (RrdException e1) {
-					logger.warn("Unable to update value " + value +
-							" from " + this +": " +
-							e1.getLocalizedMessage());
+					catch (RrdException e1) {
+						logger.warn("Unable to update value " + value +
+								" from " + this +": " +
+								e1.getLocalizedMessage());
+					}
 				}
 			}
 		}
@@ -254,8 +256,6 @@ implements Comparable {
 			updateSample(onesample);
 			logger.debug(onesample.dump());
 			onesample.update();
-			final File rrdfile = new File(rrdDb.getCanonicalPath());
-			rrdfile.setLastModified(System.currentTimeMillis());
 		}
 		catch (ArithmeticException ex) {
 			logger.warn("Error while storing sample: " +
@@ -303,10 +303,6 @@ implements Comparable {
 	/**
 	 * Return the date of the last update of the rrd backend
 	 * @return The date
-	 * @throws RrdException
-	 * @throws IOException
-	 * @throws IOException
-	 * @throws RrdException
 	 */
 	public Date getLastUpdate() {
 		Date lastUpdate = null;

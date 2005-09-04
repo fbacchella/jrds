@@ -39,31 +39,14 @@ public class IpSnmp extends RdsSnmpSimple {
 		pd.add("ipFragFails", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.4.18"));
 		pd.add("ipFragCreates", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.4.19"));
 		pd.add("ipRoutingDiscards", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.4.23"));
-
-
+		
+		
 		pd.setRrdName("ipsnmp");
-        pd.setRequester(SnmpRequester.SIMPLE);
-
-		//The associated graph
-		/*GraphDesc ipGraph = new GraphDesc(13);
-		ipGraph.add("ipInReceives", GraphDesc.LINE);
-		ipGraph.add("ipForwDatagrams", GraphDesc.LINE);
-		ipGraph.add("ipInDelivers", GraphDesc.LINE);
-		ipGraph.add("ipOutRequests", GraphDesc.LINE);
-		ipGraph.add("ipReasmReqds", GraphDesc.LINE);
-		ipGraph.add("ipReasmOKs", GraphDesc.LINE);
-		ipGraph.add("ipFragOKs", GraphDesc.LINE);
-		ipGraph.add("ipFragCreates", GraphDesc.LINE);
-
-		ipGraph.setFilename("ip");
-		ipGraph.setGraphTitle("IP activity");
-		ipGraph.setVerticalLabel("paquets/s");
-		ipGraph.setHostTree(new Object[] { GraphDesc.HOST, GraphDesc.NETWORK, GraphDesc.IP, GraphDesc.TITLE});
-		ipGraph.setViewTree(new Object[] { GraphDesc.NETWORK, GraphDesc.IP, GraphDesc.HOST, GraphDesc.TITLE});*/
-
+		pd.setRequester(SnmpRequester.SIMPLE);
+		
 		pd.setGraphClasses(new Object[] { "ipactivitysnmp.xml", IpErrorGraph.class});
 	}
-
+	
 	/**
 	 * @param monitoredHost
 	 */

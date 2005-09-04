@@ -3,20 +3,18 @@ package jrds;
 // ----------------------------------------------------------------------------
 // $Id$
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import jrds.xmlResources.ResourcesLocator;
 
 import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.Rule;
 import org.apache.log4j.Logger;
-import org.xml.sax.SAXException;
-
-import java.util.Iterator;
-import java.util.ArrayList;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-
-import jrds.xmlResources.ResourcesLocator;
 
 /**
  * <p>Title: </p>
@@ -80,9 +78,11 @@ public class GraphFactory {
 			digester.setValidating(false);
 			digester.addObjectCreate("graphdesc","jrds.GraphDesc");
 			digester.addSetProperties("graphdesc");
-			digester.addCallMethod("graphdesc/filename", "setFilename", 0);
+			digester.addCallMethod("graphdesc/filename", "setGraphName", 0);
+			digester.addCallMethod("graphdesc/graphName", "setGraphName", 0);
 			digester.addCallMethod("graphdesc/verticalLabel", "setVerticalLabel", 0);
 			digester.addCallMethod("graphdesc/graphTitle", "setGraphTitle", 0);
+			digester.addCallMethod("graphdesc/upperLimit", "setUpperLimit", 0);
 			digester.addCallMethod("graphdesc/add","add",7);
 			digester.addCallParam("graphdesc/add/name",0);
 			digester.addCallParam("graphdesc/add/dsName",1);
@@ -112,12 +112,9 @@ public class GraphFactory {
 			try {
 				GraphDesc gd = (GraphDesc) digester.parse(xmlStream);
 				retValue = new RdsGraph(probe, gd);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (SAXException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			} catch (Exception e) {
+				logger.warn("Unable to parse graph description file with URL "+ url + "for probe " + probe, e);
+				retValue = null;
 			}
 			try {
 				xmlStream.close();

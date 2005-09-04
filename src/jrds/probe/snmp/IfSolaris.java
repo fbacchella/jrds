@@ -11,7 +11,6 @@ import jrds.RdsHost;
 import jrds.RdsIndexedSnmpRrd;
 import jrds.graphe.IfGraph;
 import jrds.graphe.IfPacketSize;
-import jrds.graphe.IfPacketsGraph;
 
 import org.snmp4j.smi.OID;
 
@@ -36,7 +35,7 @@ public class IfSolaris extends RdsIndexedSnmpRrd {
 		pd.add("ifOutNUcastPkts", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.2.2.1.18"));
 		pd.add("ifOutDiscards", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.2.2.1.19"));
 		pd.add("ifOutErrors", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.2.2.1.20"));
-		pd.setGraphClasses(new Object[] {IfGraph.class, IfPacketsGraph.class, IfPacketSize.class});
+		pd.setGraphClasses(new Object[] {IfGraph.class, "ifpacketssnmp.xml", IfPacketSize.class});
 		pd.setIndexOid(new OID(".1.3.6.1.2.1.2.2.1.2"));
 	}
 

@@ -31,8 +31,8 @@ public class CpuLoadMunins extends MuninsProbe {
 
                 GraphDesc gd = new GraphDesc(3);
 
-                gd.setFilename("LoadAverage");
-                gd.setGraphTitle("Charge CPU");
+                gd.setGraphName("LoadAverage");
+                gd.setGraphName("Charge CPU");
                 gd.add("la1", GraphDesc.LINE, Color.GREEN, "1mn");
                 gd.add("la5", GraphDesc.LINE, Color.BLUE, "5mn");
                 gd.add("la15", GraphDesc.LINE, Color.RED, "15mn");

@@ -24,7 +24,6 @@ import jrds.snmp.SnmpRequester;
 
 import org.apache.log4j.Logger;
 
-
 import edu.emory.mathcs.backport.java.util.concurrent.ExecutorService;
 import edu.emory.mathcs.backport.java.util.concurrent.Executors;
 import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException;
@@ -36,19 +35,12 @@ import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
   */
 public class HostsList {
 	static Logger logger = JrdsLogger.getLogger(HostsList.class);
-
 	private Collection hostList;
-
 	private static HostsList instance;
-
 	private GraphTreeNode graphTreeByHost = null;
-
 	private GraphTreeNode graphTreeByView = null;
-
 	private Map graphMap;
-
 	private Map groupList;
-
 	private String group;
 
 
@@ -80,7 +72,7 @@ public class HostsList {
 			instance = new HostsList();
 		return instance;
 	}
-
+	
 	public Iterator iterator() {
 		return hostList.iterator();
 	}
@@ -127,14 +119,14 @@ public class HostsList {
 
 	public void collectAll() throws IOException {
 		SnmpRequester.start();
-		final ExecutorService tpool =  Executors.newFixedThreadPool(PropertiesManager.getInstance().collectorThreads);
+		ExecutorService tpool =  Executors.newFixedThreadPool(PropertiesManager.getInstance().collectorThreads);
 		logger.debug("One collect was launched");
 		Date start = new Date();
 		for (Iterator j = hostList.iterator(); j.hasNext();) {
 			final RdsHost oneHost = (RdsHost) j.next();
 			logger.debug("Collect all stats for host " + oneHost.getName());
-			final Runnable runCollect = new Runnable() {
-				final private RdsHost host = oneHost;
+			Runnable runCollect = new Runnable() {
+				private RdsHost host = oneHost;
 				
 				public void run() {
 					host.collectAll();

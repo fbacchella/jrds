@@ -77,8 +77,8 @@ public class Squid extends RdsSnmpSimple {
 		GraphDesc ipGraph = new GraphDesc(1);
 		ipGraph.add("NumObjCount", GraphDesc.LINE,"Number of objects");
 		
-		ipGraph.setFilename("squidnumobj");
-		ipGraph.setGraphTitle("Number of objects");
+		ipGraph.setGraphName("squidnumobj");
+		ipGraph.setGraphName("Number of objects");
 		ipGraph.setVerticalLabel("objetcs");
 		ipGraph.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SERVICES, "Squid", GraphDesc.TITLE} );
 		ipGraph.setViewTree(new Object[] {GraphDesc.SERVICES, "Squid", GraphDesc.HOST, GraphDesc.TITLE});

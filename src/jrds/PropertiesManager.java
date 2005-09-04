@@ -1,6 +1,5 @@
 package jrds;
 
-import java.awt.Font;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -43,45 +42,6 @@ public class PropertiesManager {
 	
 	private String getParameter(String s, String s1) {
 		return getParameter(s, s1, true);
-	}
-	
-	private static Font getFontbyName(String s) {
-		String name = s;
-		int size = 15;
-		byte style = 0;
-		int j = s.indexOf(45);
-		if (j >= 0) {
-			name = s.substring(0, j);
-			s = s.substring(j + 1);
-			if ( (j = s.indexOf(45)) >= 0) {
-				if (s.startsWith("bold-")) {
-					style = 1;
-				}
-				else
-					if (s.startsWith("italic-")) {
-						style = 2;
-					}
-					else
-						if (s.startsWith("bolditalic-")) {
-							style = 3;
-						}
-				s = s.substring(j + 1);
-			}
-			try {
-				size = Integer.parseInt(s);
-			}
-			catch (NumberFormatException _ex) {}
-		}
-		return new Font(name, style, size);
-	}
-	
-	private Font getFontParameter(Properties properties, String s,
-			String s1) {
-		String s2 = getParameter(s, s1);
-		if (s2.length() == 0) {
-			s2 = s1;
-		}
-		return getFontbyName(s2);
 	}
 	
 	private int parseInteger(String s) throws NumberFormatException {
@@ -189,12 +149,14 @@ public class PropertiesManager {
 		urlperfpath = getParameter("urlperfpath","./HTTPTest");
 		configfilepath = getParameter("configfilepath", "config.xml");
 		rrddir = getParameter("rrddir", "probe");
-		servletContext = getParameter("servletContext", "/rds");
 		fileSeparator = getParameter("file.separator", "/");
 		logfile = getParameter("logfile", "jrds.log");
 		loglevel = Level.toLevel(getParameter("loglevel", "DEBUG"));
 		resolution = parseInteger(getParameter("resolution", "300"));
 		collectorThreads = parseInteger(getParameter("collectorThreads", "1"));
+		dbPoolSize = parseInteger(getParameter("dbPoolSize", "10"));
+		syncPeriod = parseInteger(getParameter("syncPeriod", "-1"));
+		
 	}
 	
 	
@@ -208,10 +170,12 @@ public class PropertiesManager {
 	public String configfilepath;
 	public String urlpngroot;
 	public String rrddir;
-	public String servletContext;
 	public String fileSeparator;
 	public String logfile;
 	public Level loglevel;
 	public int resolution;
 	public int collectorThreads;
+	public int dbPoolSize;
+	public int syncPeriod;
+	
 }

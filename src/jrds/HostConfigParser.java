@@ -1,9 +1,5 @@
-/*
- * Created on 2 déc. 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+//----------------------------------------------------------------------------
+//$Id$
 package jrds;
 
 import java.io.File;
@@ -27,14 +23,13 @@ import org.xml.sax.helpers.DefaultHandler;
 
 
 /**
- * @author bacchell
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * Used to parse config.xml
+ * @author Fabrice Bacchella(
+ * @version $Revision$
  */
 public class HostConfigParser  extends DefaultHandler {
 	
-	static private final Logger logger = JrdsLogger.getLogger(HostConfigParser.class.getPackage().getName());
+	static private final Logger logger = JrdsLogger.getLogger(HostConfigParser.class);
 	
 	//Tag names
 	private final String HOST = "host";
@@ -82,7 +77,7 @@ public class HostConfigParser  extends DefaultHandler {
 		hostsCollection = new HashSet();
 		try {
 			SAXParser saxParser = saxFactory.newSAXParser();
-			logger.debug("Parsing " + hostConfigFile.getAbsoluteFile().getCanonicalPath() + " with " + saxParser);
+			logger.debug("Parsing " + hostConfigFile.getAbsoluteFile().getCanonicalPath());
 			saxParser.parse(hostConfigFile, this);
 		} catch (Exception e) {
 			logger.warn("error during parsing of host config file " + hostConfigFile.getAbsolutePath() +

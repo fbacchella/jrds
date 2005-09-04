@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by  () -->
 <graphdesc>
 	<filename>ip</filename>
 	<verticalLabel>bits/s</verticalLabel>
 	<lowerLimit>NaN</lowerLimit>
-	<graphTitle>IP activity</graphTitle>
+	<graphTitle>IP activity on {1}</graphTitle>
 	<add>
 		<name>ifOutOctets</name>
 	</add>
@@ -30,13 +29,13 @@
 		<pathelement>NETWORK</pathelement>
 		<pathelement>INTERFACES</pathelement>
 		<pathelement>INDEX</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>IP activity</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>NETWORK</pathelement>
 		<pathelement>INTERFACES</pathelement>
 		<pathelement>HOST</pathelement>
 		<pathelement>INDEX</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>IP activity</pathstring>
 	</viewtree>
 </graphdesc>

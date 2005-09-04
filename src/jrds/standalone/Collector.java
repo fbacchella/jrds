@@ -37,12 +37,13 @@ public class Collector {
 		
 		final HostsList hl = HostsList.getRootGroup();
 		hl.append(new File(pm.configfilepath));
+
 		logger.setLevel(Level.ERROR);
 		JrdsLogger.getLogger("").setLevel(Level.ERROR);
 		JrdsLogger.getLogger("jrds").setLevel(Level.ALL);
 		JrdsLogger.getLogger("probe").setLevel(Level.ALL);
 		logger.info("jrds' collector started");
-		//JrdsLogger.getLogger("org.snmp4j").setLevel(Level.ALL);
+		JrdsLogger.getLogger("org.snmp4j").setLevel(Level.ERROR);
 		SnmpRequester.start();
 		for(int i = 0; i< 5 ; i++) {
 			hl.collectAll();

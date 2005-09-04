@@ -23,8 +23,6 @@ import org.snmp4j.smi.OID;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class IfLinux extends RdsIndexedSnmpRrd {
-	static final private OID indexOid = new OID(".1.3.6.1.2.1.2.2.1.2");
-
 	static final private ProbeDesc pd = new ProbeDesc(8);
 	static {
 		//pd.add("Speed", new OID(".1.3.6.1.2.1.2.2.1.5"));
@@ -36,20 +34,13 @@ public class IfLinux extends RdsIndexedSnmpRrd {
 		pd.add("ifOutUcastPkts", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.2.2.1.17"));
 		pd.add("ifOutErrors", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.2.2.1.20"));
 		pd.setGraphClasses(new Class[] {IfGraph.class, IfPacketsGraph.class, IfPacketSize.class});
+		pd.setIndexOid(new OID(".1.3.6.1.2.1.2.2.1.2"));
 	}
 	
 	public IfLinux(RdsHost monitoredHost, String indexName) {
 		super(monitoredHost, pd, indexName);
 		setRrdName("if-" + getIndexName());
 	}
-
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.RdsArraySnmpRrd#initIndexOid()
-	 */
-	protected OID initIndexOid() {
-		return indexOid;
-	}
-
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.RdsIndexedSnmpRrd#initIsUniq()
 	 */

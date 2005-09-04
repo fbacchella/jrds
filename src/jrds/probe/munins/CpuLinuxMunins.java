@@ -42,8 +42,8 @@ public class CpuLinuxMunins extends MuninsProbe {
                 gd.add("iowait", GraphDesc.STACK, "iowait");
                 gd.add("irq", GraphDesc.STACK, "irq");
                 gd.add("softirq", GraphDesc.STACK, "softirq");
-                gd.setFilename("cpulinux");
-                gd.setGraphTitle("CPU usage");
+                gd.setGraphName("cpulinux");
+                gd.setGraphName("CPU usage");
                 gd.setVerticalLabel("%");
                 gd.setHostTree(GraphDesc.HSLT);
                 gd.setViewTree(GraphDesc.SLHT);

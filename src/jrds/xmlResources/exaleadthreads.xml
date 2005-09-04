@@ -2,7 +2,7 @@
 <graphdesc>
 	<filename>exathreads</filename>
 	<verticalLabel>active threads</verticalLabel>
-	<graphTitle>Exeleads threads</graphTitle>
+	<graphTitle>Exeleads threads on {1}</graphTitle>
 	<add>
 		<name>threads.adsense</name>
 		<graphType>line</graphType>
@@ -16,11 +16,13 @@
 	<hosttree>
 		<pathelement>HOST</pathelement>
 		<pathelement>SERVICES</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>Exalead</pathstring>
+		<pathstring>Exeleads threads</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>SERVICES</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>Exalead</pathstring>
+		<pathstring>Exeleads threads</pathstring>
 		<pathelement>HOST</pathelement>
 	</viewtree>
 </graphdesc>

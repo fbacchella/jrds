@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by  () -->
 <graphdesc>
 	<filename>ip</filename>
 	<verticalLabel>paquets/s</verticalLabel>
-	<graphTitle>IP activity</graphTitle>
+	<graphTitle>IP activity on {1}</graphTitle>
 	<add>
 		<name>ipInReceives</name>
 		<graphType>line</graphType>
@@ -43,12 +42,12 @@
 		<pathelement>HOST</pathelement>
 		<pathelement>NETWORK</pathelement>
 		<pathelement>IP</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>IP activity</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>NETWORK</pathelement>
 		<pathelement>IP</pathelement>
 		<pathelement>HOST</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>IP activity</pathstring>
 	</viewtree>
 </graphdesc>

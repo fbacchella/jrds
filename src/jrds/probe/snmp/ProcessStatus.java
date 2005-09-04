@@ -25,8 +25,8 @@ import org.snmp4j.smi.OID;
  * TODO 
  */
 public class ProcessStatus extends RdsSnmpSimple {
-	static final private Logger logger = JrdsLogger.getLogger(ProcessStatus.class.getPackage().getName());
-	static final private OID psProcessState = new OID(".1.3.6.1.4.1.42.3.12.1.1.5");
+	static final private Logger logger = JrdsLogger.getLogger(ProcessStatus.class);
+	static final private OID psProcessState = new OID(".1.3.6.1.4.1.42.3.12.1.5");
 	static final private String RUNNABLE="R";
 	static final private String STOPPED="T";
 	static final private String INPAGEWAIT="P";

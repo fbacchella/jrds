@@ -39,7 +39,7 @@ public class Oracle extends JdbcProbe {
 		pd.setGraphClasses(new Class[] { OracleActivityGraph.class, OracleGaugeGraph.class });
 	}
 	static {
-		registerDriver("oracle.jdbc.driver.OracleDriver");
+		registerDriver(oracle.jdbc.driver.OracleDriver.class);
 	}
 	
 	private String sid;
@@ -49,7 +49,7 @@ public class Oracle extends JdbcProbe {
 	 * 
 	 */
 	public Oracle(RdsHost thehost, String sid, String user, String passwd) {
-		super(thehost, pd, 1521, user, passwd);
+		super(urlPrefix, thehost, pd, 1521, user, passwd);
 		this.sid = sid;
 		setRrdName("oracle-" + sid);
 	}
@@ -58,7 +58,7 @@ public class Oracle extends JdbcProbe {
 	 * 
 	 */
 	public Oracle(RdsHost thehost, Integer port, String sid, String user, String passwd) {
-		super(thehost, pd, port.intValue(), user, passwd);
+		super(urlPrefix, thehost, pd, port.intValue(), user, passwd);
 		this.sid = sid;
 		setRrdName("oracle-" + sid);
 	}

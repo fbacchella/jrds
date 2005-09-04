@@ -25,19 +25,19 @@ import org.snmp4j.smi.OID;
  *
  * TODO 
  */
-public class ProcessInfo extends RdsIndexedSnmpRrd {
+public class ProcessInfoSolaris extends RdsIndexedSnmpRrd {
 	static final private Logger logger = JrdsLogger.getLogger(RdsIndexedSnmpRrd.class);
-	static final private OID hrSWRunPerfMem = new OID(".1.3.6.1.2.1.25.5.1.1.2");
-	static final private OID  hrSWRunPerfCPU = new OID(".1.3.6.1.2.1.25.5.1.1.1");
-	static final private OID indexOid = new OID(".1.3.6.1.2.1.25.4.2.1.2");
+	static final private OID psProcessSize = new OID(".1.3.6.1.4.1.42.3.12.1.3");
+	static final private OID  psProcessCpuTime = new OID(".1.3.6.1.4.1.42.3.12.1.4");
+	static final private OID indexOid = new OID(".1.3.6.1.4.1.42.3.12.1.10");
 	static final private String MIN = "Minimum";
 	static final private String MAX = "Maximum";
 	static final private String AVERAGE = "Average";
 	static final private String NUM = "Number";
 	static final private ProbeDesc pd = new ProbeDesc(2);
 	static {
-		pd.add("hrSWRunPerfMem", hrSWRunPerfMem);
-		pd.add("hrSWRunPerfCPU", hrSWRunPerfCPU);
+		pd.add("psProcessSize", psProcessSize);
+		pd.add("psProcessCpuTime", psProcessCpuTime);
 		pd.add(MIN, ProbeDesc.GAUGE);
 		pd.add(MAX, ProbeDesc.GAUGE);
 		pd.add(AVERAGE, ProbeDesc.GAUGE);
@@ -49,7 +49,7 @@ public class ProcessInfo extends RdsIndexedSnmpRrd {
 	/**
 	 * @param monitoredHost
 	 */
-	public ProcessInfo(RdsHost monitoredHost, String indexName) {
+	public ProcessInfoSolaris(RdsHost monitoredHost, String indexName) {
 		super(monitoredHost, pd, indexName);
 		setRrdName("ps-" + getIndexName());
 	}
@@ -65,9 +65,9 @@ public class ProcessInfo extends RdsIndexedSnmpRrd {
 		for(Iterator i = snmpVars.keySet().iterator() ; i.hasNext() ; ){
 			OID oid = (OID) i.next();
 			double value = ((Number)snmpVars.get(oid)).doubleValue() * 1024;
-			if(oid.startsWith(hrSWRunPerfMem)) {
-				max = Math.max(max, value);
-				min = Math.min(min, value);
+			if(oid.startsWith(psProcessSize)) {
+				max = Math.max(max, value) * 1024;
+				min = Math.min(min, value) * 1024;
 				average += value;
 				nbvalue++;
 			}

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by  () -->
 <graphdesc>
-	<filename>ip</filename>
+	<graphName>ifpkts-{2}</graphName>
 	<verticalLabel>paquets/s</verticalLabel>
 	<lowerLimit>NaN</lowerLimit>
-	<graphTitle>IP activity</graphTitle>
+	<graphTitle>Packets exchanged on interface {2} on {1}</graphTitle>
 	<add>
 		<name>Upward graph</name>
 		<graphType>comment</graphType>
@@ -24,20 +23,15 @@
 	</add>
 	<add>
 		<name>ifInUcastPkts</name>
-		<graphType/>
-		<legend/>
+		<graphType>none</graphType>
 	</add>
 	<add>
 		<name>ifInErrors</name>
-		<graphType/>
-		<rpn/>
-		<legend/>
+		<graphType>none</graphType>
 	</add>
 	<add>
 		<name>Downward graph</name>
 		<graphType>comment</graphType>
-		<rpn/>
-		<legend/>
 	</add>
 	<add>
 		<name>ifInUcastInversed</name>
@@ -58,13 +52,13 @@
 		<pathelement>NETWORK</pathelement>
 		<pathelement>INTERFACES</pathelement>
 		<pathelement>INDEX</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>Packets exchanged on interface {2}</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>NETWORK</pathelement>
 		<pathelement>INTERFACES</pathelement>
 		<pathelement>HOST</pathelement>
 		<pathelement>INDEX</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>Packets exchanged on interface {2}</pathstring>
 	</viewtree>
 </graphdesc>

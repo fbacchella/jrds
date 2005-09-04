@@ -2,24 +2,26 @@
 <graphdesc>
 	<filename>exaerrors</filename>
 	<verticalLabel>Error/s</verticalLabel>
-	<graphTitle>Exeleads error</graphTitle>
+	<graphTitle>Exeleads error on {1}</graphTitle>
 	<add>
 		<name>err.adsense.connect</name>
 		<graphType>line</graphType>
-		<legend>adsense connections errors</legend>
+		<legend>Adsense connections errors</legend>
 	</add>
 	<add>
 		<name>err.adsense.highload</name>
 		<graphType>line</graphType>
-		<legend>adsense.highload</legend>
+		<legend>Adsense highload errors</legend>
 	</add>
 	<add>
 		<name>err.adsense.parsing</name>
 		<graphType>line</graphType>
+		<legend>Adsense parsing errors</legend>
 	</add>
 	<add>
 		<name>err.adsense.timeout</name>
 		<graphType>line</graphType>
+		<legend>Adsense time out errors</legend>
 	</add>
 	<add>
 		<name>err.exalead.decprms</name>
@@ -41,11 +43,13 @@
 	<hosttree>
 		<pathelement>HOST</pathelement>
 		<pathelement>SERVICES</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>Exalead</pathstring>
+		<pathstring>Exeleads error</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>SERVICES</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>Exalead</pathstring>
+		<pathstring>Exeleads error</pathstring>
 		<pathelement>HOST</pathelement>
 	</viewtree>
 </graphdesc>

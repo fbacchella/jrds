@@ -25,7 +25,7 @@ import org.snmp4j.smi.OID;
  * TODO 
  */
 public class PartitionSpace extends RdsIndexedSnmpRrd {
-	static final private Logger logger = JrdsLogger.getLogger(PartitionSpace.class.getPackage().getName());
+	static final private Logger logger = JrdsLogger.getLogger(PartitionSpace.class);
 	static final private OID indexOid = new OID(".1.3.6.1.2.1.25.2.3.1.3");
 	static final private OID allocUnitOid = new OID(".1.3.6.1.2.1.25.2.3.1.4");
 	static final private OID totalOid = new OID(".1.3.6.1.2.1.25.2.3.1.5");

@@ -55,19 +55,13 @@ public class ProbeDesc implements Cloneable {
         private SnmpRequester requester = SnmpRequester.RAW;
 
 	private final class DsDesc {
-		//public String dsName;
-		//public String namedProbeName;
-		//public OID oid;
 		public Object key;
 		public DsType dsType;
 		public long heartbeat;
 		public double minValue;
 		public double maxValue;
-		public DsDesc(/*String dsName, */DsType dsType, long heartbeat, double minValue, double maxValue, /*String namedProbeName, OID oid, */Object key)
+		public DsDesc(DsType dsType, long heartbeat, double minValue, double maxValue, Object key)
 		{
-			//this.dsName = dsName;
-			//this.namedProbeName = namedProbeName;
-			//this.oid = oid;
 			this.key = key;
 			this.dsType = dsType;
 			this.heartbeat = heartbeat;

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
 	<filename>pslist</filename>
-	<verticalLabel>Number (cumuled)</verticalLabel>
-	<graphTitle>Number of process</graphTitle>
+	<verticalLabel>Number (cumulated)</verticalLabel>
+	<graphTitle>Number of process on {1}</graphTitle>
 	<add>
 		<name>S</name>
 		<graphType>area</graphType>
@@ -49,12 +49,12 @@
 		<pathelement>HOST</pathelement>
 		<pathelement>SYSTEM</pathelement>
 		<pathelement>LOAD</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>Number of process</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>SYSTEM</pathelement>
 		<pathelement>LOAD</pathelement>
-		<pathelement>TITLE</pathelement>
+		<pathstring>Number of process</pathstring>
 		<pathelement>HOST</pathelement>
 	</viewtree>
 </graphdesc>
