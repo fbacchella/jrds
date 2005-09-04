@@ -38,7 +38,7 @@ public class Sybase extends JdbcProbe {
 	}
 	
 	static {
-		registerDriver("com.sybase.jdbc2.jdbc.SybDriver");
+		registerDriver(com.sybase.jdbc2.jdbc.SybDriver.class);
 	}
 
 	private String dbName;
@@ -47,7 +47,7 @@ public class Sybase extends JdbcProbe {
 	 * 
 	 */
 	public Sybase(RdsHost thehost, String dbName, String user, String passwd) {
-		super(thehost, pd, 4100, user, passwd);
+		super(urlPrefix, thehost, pd, 4100, user, passwd);
 		this.dbName = dbName;
 		setRrdName("syb-" + dbName);
 	}
@@ -56,7 +56,7 @@ public class Sybase extends JdbcProbe {
 	 * 
 	 */
 	public Sybase(RdsHost thehost, Integer port, String dbName, String user, String passwd) {
-		super(thehost, pd, port.intValue(),  user, passwd);
+		super(urlPrefix, thehost, pd, port.intValue(),  user, passwd);
 		this.dbName = dbName;
 		setRrdName("syb-" + dbName);
 	}
@@ -66,25 +66,6 @@ public class Sybase extends JdbcProbe {
 		return urlPrefix +  getHost() + ":" + this.getPort() + "/" + dbName;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.Probe#updateSample(org.jrobin.core.Sample)
-	 */
-	/*protected void updateSample(Sample oneSample) {
-		Map sizeMap = getSpace();
-		for(Iterator i = sizeMap.entrySet().iterator(); i.hasNext() ; ) {
-			Map.Entry e = (Map.Entry) i.next();
-			String ds = (String) e.getKey();
-			String sizeB = (String) e.getValue();
-			if( ! "database_name".equals(ds))
-				try {
-					oneSample.setValue(ds, trans2bytes(sizeB));
-				} catch (RrdException e1) {
-					logger.warn("unable to store result for probe " + this.name + ": " + e1.getLocalizedMessage());
-				}
-		}
-
-	}*/
-	
 	private double trans2bytes(String line)
 	{
 		double retValue = 0;

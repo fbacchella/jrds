@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+	<filename>sybsp</filename>
+	<verticalLabel>number</verticalLabel>
+	<lowerLimit>0</lowerLimit>
+	<graphTitle>Sybase instance activity</graphTitle>
+	<add>
+		<name>process</name>
+		<graphType>line</graphType>
+		<legend>Number of client/server processes</legend>
+	</add>
+	<add>
+		<name>transactions</name>
+		<graphType>line</graphType>
+		<legend>Number of open transactions</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SERVICES</pathelement>
+		<pathelement>DATABASE</pathelement>
+		<pathstring>Sybase instance activity</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>SERVICES</pathelement>
+		<pathelement>DATABASE</pathelement>
+		<pathstring>Sybase instance activity</pathstring>
+	</viewtree>
+</graphdesc>
