@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+	<filename>udp</filename>
+	<verticalLabel>packets/s</verticalLabel>
+	<graphTitle>UDP activity on {1}</graphTitle>
+	<add>
+		<name>InDatagrams</name>
+		<graphType>line</graphType>
+		<legend>In Datagrams</legend>
+	</add>
+	<add>
+		<name>NoPorts</name>
+		<graphType>line</graphType>
+		<legend>No Ports</legend>
+	</add>
+	<add>
+		<name>InErrors</name>
+		<graphType>line</graphType>
+		<legend>In Errors</legend>
+	</add>
+	<add>
+		<name>OutDatagrams</name>
+		<graphType>line</graphType>
+		<legend>Out Datagrams</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>NETWORK</pathelement>
+		<pathstring>UDP activity</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>NETWORK</pathelement>
+		<pathstring>UDP activity</pathstring>
+		<pathelement>HOST</pathelement>
+	</viewtree>
+</graphdesc>

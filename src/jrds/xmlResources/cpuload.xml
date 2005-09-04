@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+	<graphName>laverage</graphName>
+	<verticalLabel>queue size</verticalLabel>
+	<graphTitle>CPU Load on {1}</graphTitle>
+	<add>
+		<name>la1</name>
+		<graphType>line</graphType>
+		<color>green</color>
+		<legend>1mn</legend>
+	</add>
+	<add>
+		<name>la5</name>
+		<graphType>line</graphType>
+		<color>blue</color>
+		<legend>5mn</legend>
+	</add>
+	<add>
+		<name>la15</name>
+		<graphType>line</graphType>
+		<color>red</color>
+		<legend>15mn</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>LOAD</pathelement>
+		<pathstring>CPU Load</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>LOAD</pathelement>
+		<pathstring>CPU Load</pathstring>
+		<pathelement>HOST</pathelement>
+	</viewtree>
+</graphdesc>

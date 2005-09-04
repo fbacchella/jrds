@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+	<graphName>cpurawkilinux</graphName>
+	<verticalLabel>%</verticalLabel>
+	<graphTitle>Detailled CPU usage on {1}</graphTitle>
+	<add>
+		<name>ssCpuRawKernel</name>
+		<graphType>line</graphType>
+		<legend>kernel CPU time</legend>
+	</add>
+	<add>
+		<name>ssCpuRawInterrupt</name>
+		<graphType>line</graphType>
+		<legend>interruptlevel CPU time</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>LOAD</pathelement>
+		<pathstring>Detailled CPU usage</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>LOAD</pathelement>
+		<pathelement>Detailled CPU usage</pathelement>
+		<pathstring>HOST</pathstring>
+	</viewtree>
+</graphdesc>
