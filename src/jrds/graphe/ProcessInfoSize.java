@@ -25,8 +25,8 @@ public class ProcessInfoSize extends RdsGraph {
 		gd.add(MIN, GraphDesc.LINE, MIN);
 		gd.add(MAX, GraphDesc.LINE, MAX);
 		gd.add(AVERAGE, GraphDesc.LINE, AVERAGE);
-		gd.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SYSTEM, "Processus", GraphDesc.INDEX, GraphDesc.TITLE});
-		gd.setViewTree(new Object [] {GraphDesc.SYSTEM, "Processus", GraphDesc.HOST, GraphDesc.INDEX, GraphDesc.TITLE});
+		gd.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SYSTEM, "Processus", GraphDesc.INDEX, "Memory usage"});
+		gd.setViewTree(new Object [] {GraphDesc.SYSTEM, "Processus", GraphDesc.HOST, GraphDesc.INDEX, "Memory usage"});
 		gd.setGraphName("size-{2}");
 		gd.setGraphTitle("Memory usage for process {2} on {1}");
 	}

@@ -29,10 +29,10 @@ public class SquidBytesGraph extends RdsGraph {
 
 
 		ds.setGraphName("squidbytes");
-		ds.setGraphName("Squid bytes transfered");
+		ds.setGraphTitle("Squid bytes transfered on {1}");
 		ds.setVerticalLabel("Bit/s");
-		ds.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SERVICES, "Squid", GraphDesc.TITLE} );
-		ds.setViewTree(new Object[] {GraphDesc.SERVICES, "Squid", GraphDesc.HOST, GraphDesc.TITLE});
+		ds.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SERVICES, "Squid", "Squid bytes transfered"} );
+		ds.setViewTree(new Object[] {GraphDesc.SERVICES, "Squid", GraphDesc.HOST, "Squid bytes transfered"});
 	}
 	
 	/**

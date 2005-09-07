@@ -11,7 +11,6 @@ import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.RdsGraph;
 
-
 /**
  * @author bacchell
  *
@@ -31,11 +30,13 @@ public class CpuRawTimeSolarisGraph extends RdsGraph {
 		ds.add("Kernelpc","ssCpuRawKernel, total, /, 100, *", GraphDesc.STACK, Color.RED, "Kernel");
 		ds.add("Idlepc","ssCpuRawIdle, total, /, 100, *", GraphDesc.STACK, Color.GREEN, "Idle");
 		ds.setGraphName("cpurawsolaris");
-		ds.setGraphTitle("Utilisation CPU on {1}");
+		ds.setGraphTitle("CPU usage on {1}");
 		ds.setUpperLimit(100);
 		ds.setVerticalLabel("%");
-		ds.setHostTree(GraphDesc.HSLT);
-		ds.setViewTree(GraphDesc.SLHT);
+		ds.setHostTree(new Object[] {
+				GraphDesc.HOST, GraphDesc.SYSTEM, GraphDesc.LOAD, "CPU usage"});
+		ds.setViewTree(new Object[] {
+				GraphDesc.SYSTEM, GraphDesc.LOAD, "CPU usage", GraphDesc.HOST});
 	}
 
 	/**

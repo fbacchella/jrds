@@ -31,11 +31,13 @@ public class CpuTimeSunMibGraph extends RdsGraph {
 		ds.add("system","rsSystemProcessTime, total, /, 100, *", GraphDesc.STACK, Color.RED, "System");
 		ds.add("idle","rsIdleModeTime, total, /, 100, *", GraphDesc.STACK, Color.GREEN, "Idle");
 		ds.setGraphName("Temps CPU");
-		ds.setGraphTitle("Utilisation CPU vue par la MIB SUN on {1}");
+		ds.setGraphTitle("Utilisation CPU vue par la MIB SUN");
 		ds.setUpperLimit(100);
 		ds.setVerticalLabel("%");
-		ds.setHostTree(GraphDesc.HSLT);
-		ds.setViewTree(GraphDesc.SLHT);
+		ds.setHostTree(new Object[] {
+				GraphDesc.HOST, GraphDesc.SYSTEM, GraphDesc.LOAD, "CPU usage"});
+		ds.setViewTree(new Object[] {
+				GraphDesc.SYSTEM, GraphDesc.LOAD, "CPU usage", GraphDesc.HOST});
 	}
 
 	/**

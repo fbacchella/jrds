@@ -27,8 +27,8 @@ public class ApacheTransfer extends RdsGraph {
 		gd.add("Total kBytes", GraphDesc.LINE, Color.GREEN, "Bytes transfered");
 		gd.setGraphName("apachetransfer");
 		gd.setVerticalLabel("Bytes/s");
-		gd.setHostTree(new Object[] { GraphDesc.HOST, GraphDesc.SERVICES, "Web Activity", GraphDesc.TITLE});
-		gd.setViewTree(new Object[] {GraphDesc.SERVICES, "Web Activity", GraphDesc.TITLE});
+		gd.setHostTree(new Object[] { GraphDesc.HOST, GraphDesc.SERVICES, "Apache Activity", GraphDesc.URL, "Bytes transfered/s"});
+		gd.setViewTree(new Object[] { GraphDesc.SERVICES,  "Apache", "Bytes transfered/s", GraphDesc.URL});
 	}
 
 	private URL url;
@@ -45,6 +45,6 @@ public class ApacheTransfer extends RdsGraph {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		setGraphTitle("HTTP Bytes transfered on " + tmpUrl.toExternalForm());
+		setGraphTitle("HTTP bytes transfered on " + tmpUrl.toExternalForm());
 	}
 }

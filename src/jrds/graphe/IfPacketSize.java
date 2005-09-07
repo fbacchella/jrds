@@ -30,8 +30,10 @@ extends RdsGraph {
 		
 		ds.setLowerLimit(Double.NaN);
 		ds.setVerticalLabel("bytes");
-		ds.setHostTree(GraphDesc.HNIIT);
-		ds.setViewTree(GraphDesc.NIHIT);
+		ds.setHostTree(new Object[] {
+				GraphDesc.HOST, GraphDesc.NETWORK, GraphDesc.INTERFACES, GraphDesc.INDEX, "Packets size"});
+		ds.setViewTree(new Object[] {
+				GraphDesc.NETWORK, GraphDesc.INTERFACES, GraphDesc.HOST, GraphDesc.INDEX, "Packets size"});
 		ds.setGraphName("ifpktssz-{2}");
 		ds.setGraphTitle("Packets size on interface {2} on {1} ");
 	}

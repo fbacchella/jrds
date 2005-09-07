@@ -8,8 +8,6 @@ package jrds.graphe;
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.RdsGraph;
-import jrds.probe.IndexedProbe;
-
 
 /**
  * @author bacchell
@@ -25,16 +23,17 @@ public class ProcessInfoNumber extends RdsGraph {
 	static final private GraphDesc gd = new GraphDesc(1);
 	static {
 		gd.add(NUM, GraphDesc.LINE);
-		gd.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SYSTEM, "Processus", GraphDesc.INDEX, GraphDesc.TITLE});
-		gd.setViewTree(new Object [] {GraphDesc.SYSTEM, "Processus", GraphDesc.HOST, GraphDesc.INDEX, GraphDesc.TITLE});
+		gd.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.SYSTEM, "Processus", GraphDesc.INDEX, "Number of Process"});
+		gd.setViewTree(new Object [] {GraphDesc.SYSTEM, "Processus", GraphDesc.HOST, GraphDesc.INDEX, "Number of Process"});
+		gd.setGraphName("num.{2}");
+		gd.setGraphTitle("Number of Process {2} on {1}");
+		
 	}
-
+	
 	/**
 	 * @param theStore
 	 */
 	public ProcessInfoNumber(Probe theStore) {
 		super(theStore, gd);
-		setGraphName("num." + ((IndexedProbe)probe).getIndexName());
-		setGraphTitle("Number of Process " + ((IndexedProbe)probe).getIndexName() + "on {1}");
 	}
 }

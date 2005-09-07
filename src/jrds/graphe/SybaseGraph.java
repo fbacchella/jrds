@@ -11,7 +11,6 @@ import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.RdsGraph;
 
-
 /**
  * @author bacchell
  *
@@ -26,8 +25,11 @@ public class SybaseGraph extends RdsGraph {
 		gd.add("database_size", GraphDesc.LINE, Color.RED, "total size");
 		gd.add("reserved", GraphDesc.LINE, Color.BLACK, "reserved");
 		gd.setVerticalLabel("bytes");
-		gd.setHostTree(GraphDesc.HSDJT);
-		gd.setViewTree(GraphDesc.SDJT);
+		gd.setHostTree(new Object[] {
+				GraphDesc.HOST, GraphDesc.SERVICES, GraphDesc.DATABASE, GraphDesc.JDBC, "Disk usage"});
+		gd.setViewTree(new Object[] {
+				GraphDesc.SERVICES, GraphDesc.DATABASE, GraphDesc.JDBC, "Disk usage"});
+		gd.setGraphTitle("Disk usage for {3}");
 	}
 
 	/**
@@ -36,6 +38,6 @@ public class SybaseGraph extends RdsGraph {
 	public SybaseGraph(Probe theStore) {
 		super(theStore, gd);
 		setGraphName(theStore.getName());
-		setGraphTitle("Occupation disque de la base " + ((jrds.probe.Sybase) probe).getDbName());
+		//setGraphTitle("Disk usage for " + ((jrds.probe.Sybase) probe).getDbName());
 	}
 }

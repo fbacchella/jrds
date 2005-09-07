@@ -38,8 +38,10 @@ public class CpuRawTimeLinuxGraph extends RdsGraph {
 		ds.setGraphTitle("Utilisation CPU on {1}");
 		ds.setUpperLimit(100);
 		ds.setVerticalLabel("%");
-		ds.setHostTree(GraphDesc.HSLT);
-		ds.setViewTree(GraphDesc.SLHT);
+		ds.setHostTree(new Object[] {
+				GraphDesc.HOST, GraphDesc.SYSTEM, GraphDesc.LOAD, "CPU usage"});
+		ds.setViewTree(new Object[] {
+				GraphDesc.SYSTEM, GraphDesc.LOAD, "CPU usage", GraphDesc.HOST});
 }
 
 	/**

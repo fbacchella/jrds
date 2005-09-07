@@ -24,11 +24,11 @@ public class DiskIoGraphBytes extends RdsGraph {
 		gd.add("diskIONWritten", GraphDesc.LINE, Color.BLUE,"Number of bytes written");
 		gd.setVerticalLabel("Bytes/s");
 		gd.setHostTree(new Object[] {
-				GraphDesc.HOST, GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.INDEX, GraphDesc.TITLE});
+				GraphDesc.HOST, GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.INDEX, "Activity as bytes/s"});
 		gd.setViewTree(new Object[] {
-						GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.HOST, "Activity as bytes/s", GraphDesc.TITLE});
+						GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.HOST, "Activity as bytes/s", GraphDesc.INDEX});
 		gd.setGraphName("bytes-{2}");
-		gd.setGraphTitle("E/S (octets) disque on {2} on {1}");
+		gd.setGraphTitle("I/O (bytes) on disk {2} on {1}");
 	}
 
 	/**
@@ -36,7 +36,5 @@ public class DiskIoGraphBytes extends RdsGraph {
 	 */
 	public DiskIoGraphBytes(Probe theStore) {
 		super(theStore, gd);
-		//setGraphName("BYTES." + probe.getName());
-		//setGraphTitle("E/S disque " + ((IndexedProbe)probe).getIndexName() +"(octets)");
 	}
 }

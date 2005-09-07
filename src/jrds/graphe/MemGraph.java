@@ -11,7 +11,6 @@ import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.RdsGraph;
 
-
 /**
  * @author bacchell
  *
@@ -31,8 +30,10 @@ public class MemGraph extends RdsGraph {
 		ds.setGraphName("memory");
 		ds.setGraphTitle("Memory usage on {1}");
 	
-		ds.setHostTree(GraphDesc.HSMT);
-		ds.setViewTree(GraphDesc.SMHT);
+		ds.setHostTree(new Object[] {
+				GraphDesc.HOST, GraphDesc.SYSTEM, GraphDesc.MEMORY, "Memory usage"});
+		ds.setViewTree(new Object[] {
+				GraphDesc.SYSTEM, GraphDesc.MEMORY, "Memory usage", GraphDesc.HOST});
 	}
 
 	/**

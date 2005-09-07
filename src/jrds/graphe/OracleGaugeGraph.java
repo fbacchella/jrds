@@ -21,8 +21,11 @@ public class OracleGaugeGraph extends RdsGraph {
 		gd.add("logonscurr", GraphDesc.LINE, "logons current");
 		gd.add("opcurscurr", GraphDesc.LINE, "opened cursors current");
 		gd.setVerticalLabel("value");
-		gd.setHostTree(GraphDesc.HSDJT);
-		gd.setViewTree(GraphDesc.SDJT);
+		gd.setHostTree(new Object[] {
+				GraphDesc.HOST, GraphDesc.SERVICES, GraphDesc.DATABASE, GraphDesc.JDBC, "DB Open"});
+		gd.setViewTree(new Object[] {
+				GraphDesc.SERVICES, GraphDesc.DATABASE, GraphDesc.JDBC, "DB Open"});
+		gd.setGraphTitle("DB Open on {3}");
 	}
 
 	/**
@@ -31,7 +34,6 @@ public class OracleGaugeGraph extends RdsGraph {
 	public OracleGaugeGraph(Probe theStore) {
 		super(theStore, gd);
 		setGraphName(theStore.getName());
-		setGraphTitle("Ouverture sur la base " + ((jrds.probe.Oracle) probe).getSid());
 	}
 
 }

@@ -10,7 +10,6 @@ import java.awt.Color;
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.RdsGraph;
-import jrds.probe.IndexedProbe;
 
 
 /**
@@ -25,9 +24,11 @@ public class DiskIoGraphReq extends RdsGraph {
 		gd.add("diskIOWrites", GraphDesc.LINE, Color.BLUE,"Number of write accesses");
 		gd.setVerticalLabel("operations/s");
 		gd.setHostTree(new Object[] {
-				GraphDesc.HOST, GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.INDEX, GraphDesc.TITLE});
+				GraphDesc.HOST, GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.INDEX, "Activity as operation/s"});
 		gd.setViewTree(new Object[] {
-						GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.HOST, "Activity as operation/s", GraphDesc.TITLE});
+						GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.HOST, "Activity as operation/s", GraphDesc.INDEX});
+		gd.setGraphName("op-{2}");
+		gd.setGraphTitle("E/S (operations) on disk {2} on {1}");
 	}
 
 	/**
@@ -35,7 +36,5 @@ public class DiskIoGraphReq extends RdsGraph {
 	 */
 	public DiskIoGraphReq(Probe theStore) {
 		super(theStore, gd);
-		setGraphName("op." + probe.getName());
-		setGraphTitle("E/S disque " + ((IndexedProbe)probe).getIndexName() +"(operations)");
 	}
 }

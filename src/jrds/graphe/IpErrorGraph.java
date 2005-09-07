@@ -30,8 +30,8 @@ public class IpErrorGraph extends RdsGraph {
 		ds.setVerticalLabel("paquets/s");
 		ds.setGraphTitle("IP errors activity on {1}");
 		
-		ds.setHostTree(new Object[] { GraphDesc.HOST, GraphDesc.NETWORK, GraphDesc.IP, GraphDesc.TITLE});
-		ds.setViewTree(new Object[] { GraphDesc.NETWORK, GraphDesc.IP, GraphDesc.HOST, GraphDesc.TITLE});
+		ds.setHostTree(new Object[] { GraphDesc.HOST, GraphDesc.NETWORK, GraphDesc.IP, "IP errors activity"});
+		ds.setViewTree(new Object[] { GraphDesc.NETWORK, GraphDesc.IP, GraphDesc.HOST, "IP errors activity"});
 	}
 
 	/**

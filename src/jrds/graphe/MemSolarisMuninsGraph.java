@@ -31,10 +31,12 @@ public class MemSolarisMuninsGraph extends RdsGraph {
 		gd.add("memAvailReal", "memAvailRealMB, 1024, *, 1024, *",GraphDesc.STACK, "Available Real/Physical Memory Space");
 		gd.add("memUsedSwap", "memUsedSwapMB, 1024, *, 1024, *", GraphDesc.STACK,Color.RED,"Used Swap Space");
 		gd.setGraphName("memsolarismunins");
-		gd.setGraphName("Utilisation mémoire");
+		gd.setGraphTitle("Memory usage on {1}");
 		gd.setVerticalLabel("Bytes");
-		gd.setHostTree(GraphDesc.HSMT);
-		gd.setViewTree(GraphDesc.SMHT);
+		gd.setHostTree(new Object[] {
+				GraphDesc.HOST, GraphDesc.SYSTEM, GraphDesc.MEMORY, "Memory usage"});
+		gd.setViewTree(new Object[] {
+				GraphDesc.SYSTEM, GraphDesc.MEMORY, "Memory usage", GraphDesc.HOST});
 	}
 
 	/**

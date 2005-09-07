@@ -26,8 +26,11 @@ public class OracleActivityGraph extends RdsGraph {
 		gd.add("msgsent", GraphDesc.LINE, "messages sent/s");
 		gd.add("msgrcvd", GraphDesc.LINE, "messages received/s");
 		gd.setVerticalLabel("operation/s");
-		gd.setHostTree(GraphDesc.HSDJT);
-		gd.setViewTree(GraphDesc.SDJT);
+		gd.setHostTree(new Object[] {
+				GraphDesc.HOST, GraphDesc.SERVICES, GraphDesc.DATABASE, GraphDesc.JDBC, "DB activity"});
+		gd.setViewTree(new Object[] {
+				GraphDesc.SERVICES, GraphDesc.DATABASE, GraphDesc.JDBC, "DB activity"});
+		gd.setGraphTitle("DB activity on {3}");
 	}
 
 	/**
@@ -36,7 +39,6 @@ public class OracleActivityGraph extends RdsGraph {
 	public OracleActivityGraph(Probe theStore) {
 		super(theStore, gd);
 		setGraphName(theStore.getName());
-		setGraphTitle("Activité sur la base " + ((jrds.probe.Oracle) probe).getSid());
 	}
 
 }

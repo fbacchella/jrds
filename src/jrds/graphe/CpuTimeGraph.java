@@ -27,8 +27,10 @@ public class CpuTimeGraph extends RdsGraph {
 		gd.setGraphTitle("Utilisation CPU on {1}");
 		gd.setUpperLimit(100);
 		gd.setVerticalLabel("%");
-		gd.setHostTree(GraphDesc.HSLT);
-		gd.setViewTree(GraphDesc.SLHT);
+		gd.setHostTree(new Object[] {
+				GraphDesc.HOST, GraphDesc.SYSTEM, GraphDesc.LOAD, "CPU usage"});
+		gd.setViewTree(new Object[] {
+				GraphDesc.SYSTEM, GraphDesc.LOAD, "CPU usage", GraphDesc.HOST});
 	}
 
 	/**
