@@ -25,18 +25,16 @@ USETEXTLINKS = 1
 STARTALLOPEN = 0
 HIGHLIGHT = 1
 PRESERVESTATE = 0
-//GLOBALTARGET="R"
 ICONPATH="img/"
 
-foldersTree = gFld("<i>Demo</i>");
-hostTree = gFld("Host tree");
-<% jrdsBean.getJavascriptTree(1, "hostTree", out); %>
-//insFld(foldersTree, hostTree);
+foldersTree = gFld("<i>Graph List</i>");
 
-viewTree = gFld("View tree");
-<% jrdsBean.getJavascriptTree(2, "viewTree", out); %>
+<%
+	jrdsBean.getJavascriptTree(1, "hostTree", out);
+	jrdsBean.getJavascriptTree(2, "viewTree", out); 
+%>
 
-foldersTree.addChildren([hostTree, viewTree]);
+foldersTree.addChildren([hostTree_0, viewTree_0]);
 
 initializeDocument();
  //-->
