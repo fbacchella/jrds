@@ -27,6 +27,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import jrds.probe.IndexedProbe;
+import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Logger;
 import org.jrobin.core.RrdException;
@@ -135,18 +136,29 @@ implements Comparable {
 		this.graphTitle = title;
 	}
 	
+	private final String parseTemplate(String template) {
+		String index = "";
+		String url = "";
+		if( probe instanceof IndexedProbe) {
+			index =((IndexedProbe) probe).getIndexName();
+		}
+		if( probe instanceof UrlProbe) {
+			url =((UrlProbe) probe).getUrlAsString();
+		}
+		Object[] arguments = {
+				gd.getGraphName(),
+				probe.getHost().getName(),
+				index,
+				url,
+				probe.getName()
+		};
+		return MessageFormat.format(template, arguments) ;
+		
+	}
+	
 	protected String getGraphTitle() {
 		if(graphTitle == null) {
-			String index = "";
-			if( probe instanceof IndexedProbe) {
-				index =((IndexedProbe) probe).getIndexName();
-			}
-			Object[] arguments = {
-					gd.getGraphName(),
-					probe.getHost().getName(),
-					index
-			};
-			graphTitle = MessageFormat.format(gd.getGraphTitle(), arguments) ;
+			graphTitle = parseTemplate(gd.getGraphTitle());
 		}
 		return graphTitle;
 	}
@@ -160,16 +172,7 @@ implements Comparable {
 	
 	protected String getGraphName() {
 		if(graphName == null) {
-			String index = "";
-			if( probe instanceof IndexedProbe) {
-				index =((IndexedProbe) probe).getIndexName();
-			}
-			Object[] arguments = {
-					gd.getGraphName(),
-					probe.getHost().getName(),
-					index
-			};
-			graphName = MessageFormat.format(gd.getGraphName(), arguments);
+			graphName = parseTemplate(gd.getGraphName());
 		}
 		return graphName;
 	}
