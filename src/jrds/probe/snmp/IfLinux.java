@@ -11,7 +11,6 @@ import jrds.RdsHost;
 import jrds.RdsIndexedSnmpRrd;
 import jrds.graphe.IfGraph;
 import jrds.graphe.IfPacketSize;
-import jrds.graphe.IfPacketsGraph;
 
 import org.snmp4j.smi.OID;
 
@@ -33,7 +32,7 @@ public class IfLinux extends RdsIndexedSnmpRrd {
 		pd.add("ifOutOctets", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.2.2.1.16"));
 		pd.add("ifOutUcastPkts", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.2.2.1.17"));
 		pd.add("ifOutErrors", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.2.2.1.20"));
-		pd.setGraphClasses(new Class[] {IfGraph.class, IfPacketsGraph.class, IfPacketSize.class});
+		pd.setGraphClasses(new Object[] {IfGraph.class, "ifpacketssnmp.xml", IfPacketSize.class});
 		pd.setIndexOid(new OID(".1.3.6.1.2.1.2.2.1.2"));
 	}
 	
