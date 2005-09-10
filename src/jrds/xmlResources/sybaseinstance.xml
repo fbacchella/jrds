@@ -18,11 +18,13 @@
 		<pathelement>HOST</pathelement>
 		<pathelement>SERVICES</pathelement>
 		<pathelement>DATABASE</pathelement>
+		<pathelement>JDBC</pathelement>
 		<pathstring>Sybase instance activity</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>SERVICES</pathelement>
 		<pathelement>DATABASE</pathelement>
+		<pathelement>JDBC</pathelement>
 		<pathstring>Sybase instance activity</pathstring>
 	</viewtree>
 </graphdesc>

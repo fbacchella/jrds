@@ -52,13 +52,13 @@
 		<pathelement>NETWORK</pathelement>
 		<pathelement>INTERFACES</pathelement>
 		<pathelement>INDEX</pathelement>
-		<pathstring>Packets exchanged on interface {2}</pathstring>
+		<pathstring>Packets exchanged</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>NETWORK</pathelement>
 		<pathelement>INTERFACES</pathelement>
 		<pathelement>HOST</pathelement>
 		<pathelement>INDEX</pathelement>
-		<pathstring>Packets exchanged on interface {2}</pathstring>
+		<pathstring>Packets exchanged</pathstring>
 	</viewtree>
 </graphdesc>

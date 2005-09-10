@@ -22,7 +22,7 @@
 	<viewtree>
 		<pathelement>SYSTEM</pathelement>
 		<pathelement>LOAD</pathelement>
-		<pathelement>Detailled CPU usage</pathelement>
-		<pathstring>HOST</pathstring>
+		<pathstring>Detailled CPU usage</pathstring>
+		<pathelement>HOST</pathelement>
 	</viewtree>
 </graphdesc>

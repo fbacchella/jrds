@@ -27,7 +27,7 @@
 	<viewtree>
 		<pathelement>SERVICES</pathelement>
 		<pathstring>Exalead</pathstring>
-		<pathelement>Exeleads queries</pathelement>
-		<pathstring>HOST</pathstring>
+		<pathstring>Exeleads queries</pathstring>
+		<pathelement>HOST</pathelement>
 	</viewtree>
 </graphdesc>
