@@ -4,6 +4,18 @@
 	<verticalLabel>Number (cumulated)</verticalLabel>
 	<graphTitle>Number of process on {1}</graphTitle>
 	<add>
+		<name>R</name>
+		<graphType>area</graphType>
+		<color>green</color>
+		<legend>Runnable</legend>
+	</add>
+	<add>
+		<name>P</name>
+		<graphType>area</graphType>
+		<color>yellow</color>
+		<legend>In page wait</legend>
+	</add>
+	<add>
 		<name>S</name>
 		<graphType>area</graphType>
 		<color>blue</color>
@@ -16,10 +28,10 @@
 		<legend>Idle (more than 20 seconds)</legend>
 	</add>
 	<add>
-		<name>R</name>
+		<name>D</name>
 		<graphType>area</graphType>
-		<color>green</color>
-		<legend>Runnable</legend>
+		<color>BLACK</color>
+		<legend>Non-interruptable wait</legend>
 	</add>
 	<add>
 		<name>T</name>
@@ -28,21 +40,9 @@
 		<legend>Stopped</legend>
 	</add>
 	<add>
-		<name>P</name>
-		<graphType>area</graphType>
-		<color>cyan</color>
-		<legend>In page wait</legend>
-	</add>
-	<add>
-		<name>D</name>
-		<graphType>area</graphType>
-		<color>BLACK</color>
-		<legend>Non-interruptable wait</legend>
-	</add>
-	<add>
 		<name>Z</name>
 		<graphType>area</graphType>
-		<color>yellow</color>
+		<color>cyan</color>
 		<legend>Zombie</legend>
 	</add>
 	<hosttree>
