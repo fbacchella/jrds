@@ -16,6 +16,7 @@ import java.util.Map;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.JdbcProbe;
+import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Logger;
 import org.jrobin.core.RrdException;
@@ -137,11 +138,16 @@ implements Cloneable {
 				return ( (IndexedProbe) graph.getProbe()).getIndexName();
 			}
 		};
-		/*static public final PathElement SUBTITLE = new PathElement() {
-		 public String resolve(RdsGraph graph) {
-		 return graph.getGraphSubTitle();
-		 }
-		 };*/
+		static public final PathElement URL = new PathElement() {
+			public String resolve(RdsGraph graph) {
+				String url = "";
+				Probe probe = graph.getProbe();
+				if( probe instanceof UrlProbe) {
+					url =((UrlProbe) probe).getUrlAsString();
+				}
+				return url;
+			}
+		};
 		static public final PathElement JDBC = new PathElement() {
 			public String resolve(RdsGraph graph) {
 				return ( (JdbcProbe) graph.getProbe()).getJdbcurl();
@@ -221,6 +227,7 @@ implements Cloneable {
 	static final public PathElement IP = PathElement.IP;
 	static final public PathElement TITLE = PathElement.TITLE;
 	static final public PathElement INDEX = PathElement.INDEX;
+	static final public PathElement URL = PathElement.URL;
 	static final public PathElement JDBC = PathElement.JDBC;
 	static final public PathElement WEB = PathElement.WEB;
 	static final public PathElement SYSTEM = PathElement.SYSTEM;
@@ -228,32 +235,9 @@ implements Cloneable {
 	static final public PathElement DISKACTIVITY = PathElement.DISKACTIVITY;
 	static final public PathElement MEMORY = PathElement.MEMORY;
 	static final public PathElement TCP = PathElement.TCP;
-	
-	/*Lots of macro to store path definitions*/
-	static final public Object[] HSLT = new PathElement[] {
-			HOST, PathElement.SYSTEM, PathElement.LOAD, TITLE};
-	static final public Object[] SLHT = new PathElement[] {
-			PathElement.SYSTEM, PathElement.LOAD, TITLE, HOST};
-	
-	static final public Object[] NIHIT = new PathElement[] {
-			PathElement.NETWORK, PathElement.INTERFACES, HOST, INDEX, TITLE};
-	static final public Object[] HNIIT = new Object[] {
-			HOST, PathElement.NETWORK, PathElement.INTERFACES, INDEX, TITLE};
-	
-	static final public Object[] HNT = new PathElement[] {
-			GraphDesc.HOST, PathElement.NETWORK, GraphDesc.TITLE};
-	static final public Object[] NTH = new Object[] {
-			PathElement.NETWORK, GraphDesc.TITLE, GraphDesc.HOST};
-	
-	static final public Object[] HSMT = new PathElement[] {
-			HOST, PathElement.SYSTEM, PathElement.MEMORY, TITLE};
-	static final public Object[] SMHT = new PathElement[] {
-			PathElement.SYSTEM, PathElement.MEMORY, GraphDesc.TITLE, GraphDesc.HOST};
-	
-	static final public Object[] HSDJT = new PathElement[] {
-			HOST, PathElement.SERVICES, PathElement.DATABASE, JDBC, TITLE};
-	static final public Object[] SDJT = new PathElement[] {
-			PathElement.SERVICES, PathElement.DATABASE, JDBC, TITLE};
+	static final public PathElement LOAD = PathElement.LOAD;
+	static final public PathElement INTERFACES = PathElement.INTERFACES;
+	static final public PathElement DATABASE = PathElement.DATABASE;
 	
 	static final public Color[] colors = new Color[] {
 			Color.BLUE,
