@@ -11,9 +11,6 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 
 import org.apache.log4j.Logger;
-import jrds.GraphDesc;
-import java.awt.Color;
-
 
 /**
  * @author bacchell
@@ -21,7 +18,7 @@ import java.awt.Color;
  * TODO
  */
 public class CpuLoadMunins extends MuninsProbe {
-	static private final Logger logger = JrdsLogger.getLogger(CpuLoadMunins.class.getPackage().getName());
+	static private final Logger logger = JrdsLogger.getLogger(CpuLoadMunins.class);
 
 	static final private ProbeDesc pd = new ProbeDesc(1);
 	static {
@@ -29,18 +26,7 @@ public class CpuLoadMunins extends MuninsProbe {
 		pd.setMuninsProbesNames(new String[] { "load" });
 		pd.setRrdName("laveragemunins");
 
-                GraphDesc gd = new GraphDesc(3);
-
-                gd.setGraphName("LoadAverage");
-                gd.setGraphName("Charge CPU");
-                gd.add("la1", GraphDesc.LINE, Color.GREEN, "1mn");
-                gd.add("la5", GraphDesc.LINE, Color.BLUE, "5mn");
-                gd.add("la15", GraphDesc.LINE, Color.RED, "15mn");
-                gd.setVerticalLabel("queue size");
-                gd.setHostTree(GraphDesc.HSLT);
-                gd.setViewTree(GraphDesc.SLHT);
-
-                pd.setGraphClasses(new Object[] {gd});
+		pd.setGraphClasses(new Object[] {"cpuload.xml"});
 	}
 
 	/**

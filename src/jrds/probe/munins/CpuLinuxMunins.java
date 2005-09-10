@@ -20,8 +20,8 @@ import jrds.GraphDesc;
  * TODO
  */
 public class CpuLinuxMunins extends MuninsProbe {
-	static private final Logger logger = JrdsLogger.getLogger(CpuLinuxMunins.class.getPackage().getName());
-
+	static private final Logger logger = JrdsLogger.getLogger(CpuLinuxMunins.class);
+	
 	static final private ProbeDesc pd = new ProbeDesc(7);
 	static {
 		pd.add("user", ProbeDesc.COUNTER, "user.value");
@@ -33,24 +33,26 @@ public class CpuLinuxMunins extends MuninsProbe {
 		pd.add("softirq", ProbeDesc.COUNTER, "softirq.value");
 		pd.setRrdName("cpulinuxmunins");
 		pd.setMuninsProbesNames(new String[] { "cpu"});
-
-                GraphDesc gd = new GraphDesc(7);
-                gd.add("system", GraphDesc.AREA, "system");
-                gd.add("user", GraphDesc.STACK, "user");
-                gd.add("nice", GraphDesc.STACK, "nice");
-                gd.add("idle", GraphDesc.STACK, "idle");
-                gd.add("iowait", GraphDesc.STACK, "iowait");
-                gd.add("irq", GraphDesc.STACK, "irq");
-                gd.add("softirq", GraphDesc.STACK, "softirq");
-                gd.setGraphName("cpulinux");
-                gd.setGraphName("CPU usage");
-                gd.setVerticalLabel("%");
-                gd.setHostTree(GraphDesc.HSLT);
-                gd.setViewTree(GraphDesc.SLHT);
-
+		
+		GraphDesc gd = new GraphDesc(7);
+		gd.add("system", GraphDesc.AREA, "system");
+		gd.add("user", GraphDesc.STACK, "user");
+		gd.add("nice", GraphDesc.STACK, "nice");
+		gd.add("idle", GraphDesc.STACK, "idle");
+		gd.add("iowait", GraphDesc.STACK, "iowait");
+		gd.add("irq", GraphDesc.STACK, "irq");
+		gd.add("softirq", GraphDesc.STACK, "softirq");
+		gd.setGraphName("cpulinux");
+		gd.setGraphName("CPU usage");
+		gd.setVerticalLabel("%");
+		gd.setHostTree(new Object[] {
+				GraphDesc.HOST, GraphDesc.SYSTEM, GraphDesc.LOAD, "CPU usage"});
+		gd.setViewTree(new Object[] {
+				GraphDesc.SYSTEM, GraphDesc.LOAD, "CPU usage", GraphDesc.HOST});
+		
 		pd.setGraphClasses(new Object[] {gd});
 	}
-
+	
 	/**
 	 * @param monitoredHost
 	 */
