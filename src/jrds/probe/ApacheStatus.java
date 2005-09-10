@@ -23,7 +23,7 @@ import jrds.graphe.ApacheTransfer;
  *
  * TODO 
  */
-public class ApacheStatus extends HttpProbe {
+public class ApacheStatus extends HttpProbe implements UrlProbe {
 	static final ProbeDesc pd = new ProbeDesc(7);
 	static {
 		pd.add("Total Accesses", ProbeDesc.COUNTER);
