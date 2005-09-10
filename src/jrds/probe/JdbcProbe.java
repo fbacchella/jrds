@@ -17,7 +17,7 @@ import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
-public abstract class JdbcProbe extends Probe {
+public abstract class JdbcProbe extends Probe implements UrlProbe {
 	static final private org.apache.log4j.Logger logger = JrdsLogger.getLogger(JdbcProbe.class);
 	
 	static final void registerDriver(String JdbcDriver) {
@@ -28,7 +28,7 @@ public abstract class JdbcProbe extends Probe {
 			e.printStackTrace();
 		}	
 	}
-
+	
 	static final void registerDriver(Class JdbcDriver) {
 		try {
 			Driver jdbcDriver = (Driver) JdbcDriver.newInstance();
@@ -37,14 +37,14 @@ public abstract class JdbcProbe extends Probe {
 			e.printStackTrace();
 		}	
 	}
-
+	
 	private String jdbcurl;
 	private String user;
 	private String passwd;
 	private int port;
 	private Connection con;
 	private String urlPrefix;
-
+	
 	/**
 	 * @param monitoredHost
 	 * @param pd
@@ -56,7 +56,7 @@ public abstract class JdbcProbe extends Probe {
 		this.passwd = passwd;
 		this.urlPrefix = urlPrefix;
 	}
-
+	
 	public List select2Map(String query)
 	{
 		return select2Map(query, true);
@@ -108,7 +108,7 @@ public abstract class JdbcProbe extends Probe {
 		}
 		return values;
 	}
-
+	
 	public Map select2Map(String query, String keyCol, String valCol)
 	{
 		Map values = new HashMap();
@@ -128,7 +128,7 @@ public abstract class JdbcProbe extends Probe {
 							value = (Number) oValue;
 						else
 							value = new Double(Double.NaN);
-
+						
 						values.put(key, value);
 					}
 				} while(stmt.getMoreResults());
@@ -140,7 +140,7 @@ public abstract class JdbcProbe extends Probe {
 		closeDbCon();
 		return values;
 	}
-
+	
 	public void openDbCon() throws SQLException {
 		if(con == null) 
 			con = DriverManager.getConnection(getJdbcurl() , user, passwd);
@@ -162,10 +162,10 @@ public abstract class JdbcProbe extends Probe {
 			openDbCon();
 		return con.createStatement();
 	}
-
+	
 	protected abstract String doUrl();
 	
-/**
+	/**
 	 * @return Returns the jdbcurl.
 	 */
 	public String getJdbcurl() {
@@ -174,8 +174,15 @@ public abstract class JdbcProbe extends Probe {
 		return jdbcurl;
 	}
 	
+	/**
+	 * @return Returns the jdbcurl.
+	 */
+	public String getUrlAsString() {
+		return getJdbcurl();
+	}
+	
 	public String getJdbcInstanceUrl() {
-			return urlPrefix +  "//" + getHost() + ":" + this.getPort();
+		return urlPrefix +  "//" + getHost() + ":" + this.getPort();
 	}
 	
 	/**

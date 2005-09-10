@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public final class HttpResponseTimeRrd extends ExternalCmdProbe {
+public final class HttpResponseTimeRrd extends ExternalCmdProbe implements UrlProbe {
 	static final private Logger logger = JrdsLogger.getLogger(HttpResponseTimeRrd.class.getPackage().getName());
 	private URL url;
 	static MessageDigest md5digest;
@@ -78,5 +78,12 @@ public final class HttpResponseTimeRrd extends ExternalCmdProbe {
 	 */
 	public URL getUrl() {
 		return url;
+	}
+
+	/* (non-Javadoc)
+	 * @see jrds.probe.UrlProbe#getUrlAsString()
+	 */
+	public String getUrlAsString() {
+		return getUrl().toString();
 	}
 }

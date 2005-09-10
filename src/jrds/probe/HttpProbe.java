@@ -57,9 +57,17 @@ public abstract class HttpProbe extends Probe  implements IndexedProbe {
 	/**
 	 * @return Returns the url.
 	 */
+	public String getUrlAsString() {
+		return getUrl().toString();
+	}
+
+	/**
+	 * @return Returns the url.
+	 */
 	public URL getUrl() {
 		return url;
 	}
+
 	/**
 	 * @param url The url to set.
 	 */
