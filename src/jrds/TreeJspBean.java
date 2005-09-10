@@ -47,7 +47,6 @@ public class TreeJspBean implements Serializable {
 		try {
 			if(graphTree != null) {
 				graphTree.getJavaScriptCode(out, begin, end, father + "_0");
-				out.write("" + father + ".addChildren([" + father + "_0]);");
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

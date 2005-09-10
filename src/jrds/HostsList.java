@@ -42,6 +42,8 @@ public class HostsList {
 	private Map graphMap;
 	private Map groupList;
 	private String group;
+	private static final String hostRoot = "Sorted by host";
+	private static final String viewRoot = "Sorted by view";
 
 
 	/**
@@ -49,8 +51,8 @@ public class HostsList {
 	 */
 	private HostsList() {
 		super();
-		graphTreeByHost = new GraphTreeNode("HOST");
-		graphTreeByView = new GraphTreeNode("VIEW");
+		graphTreeByHost = new GraphTreeNode(hostRoot);
+		graphTreeByView = new GraphTreeNode(viewRoot);
 		graphMap = new HashMap();
 		groupList = new TreeMap(String.CASE_INSENSITIVE_ORDER);
 		hostList = new HashSet();
@@ -59,8 +61,8 @@ public class HostsList {
 
 	private HostsList(String group) {
 		super();
-		graphTreeByHost = new GraphTreeNode("HOST");
-		graphTreeByView = new GraphTreeNode("VIEW");
+		graphTreeByHost = new GraphTreeNode(hostRoot);
+		graphTreeByView = new GraphTreeNode(viewRoot);
 		graphMap = new HashMap();
 		this.group = group;
 		groupList = new TreeMap(String.CASE_INSENSITIVE_ORDER);
@@ -212,9 +214,9 @@ public class HostsList {
 		GraphTreeNode node = null;
 		pathList.remove(0);
 		String rootName = (String) pathList.get(0);
-		if ("HOST".equals(rootName))
+		if (hostRoot.equals(rootName))
 			node = getGraphTreeByHost().getByPath(pathList);
-		else if ("VIEW".equals(rootName))
+		else if (viewRoot.equals(rootName))
 			node = getGraphTreeByView().getByPath(pathList);
 
 		return node;
