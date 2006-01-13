@@ -667,13 +667,13 @@ implements Cloneable {
 	}
 
 	/**
-	 * @return Returns the graphTitleFormat.
+	 * @return Returns the graphTitle.
 	 */
 	public String getGraphTitle() {
 		return graphTitle;
 	}
 	/**
-	 * @param graphTitleFormat The graphTitleFormat to set.
+	 * @param graphTitle The graphTitle to set.
 	 */
 	public void setGraphTitle(String graphTitle) {
 		this.graphTitle = graphTitle;

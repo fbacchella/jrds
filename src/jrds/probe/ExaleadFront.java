@@ -25,7 +25,6 @@ public class ExaleadFront extends Exalead {
 	}
 	/**
 	 * @param monitoredHost
-	 * @param pd
 	 */
 	public ExaleadFront(RdsHost monitoredHost) {
 		super(monitoredHost, pd, 10000);
