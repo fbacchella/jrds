@@ -29,7 +29,7 @@ public class MemSolarisMuninsGraph extends RdsGraph {
 		
 		gd.add("memUsedReal", "memUsedRealMB, 1024, *, 1024, *", GraphDesc.AREA, "Used Real/Physical Memory Space");
 		gd.add("memAvailReal", "memAvailRealMB, 1024, *, 1024, *",GraphDesc.STACK, "Available Real/Physical Memory Space");
-		gd.add("memUsedSwap", "memUsedSwapMB, 1024, *, 1024, *", GraphDesc.STACK,Color.RED,"Used Swap Space");
+		gd.add("memUsedSwap", "memUsedSwapMB, 1024, *, 1024, *", GraphDesc.LINE,Color.RED,"Used Swap Space");
 		gd.setGraphName("memsolarismunins");
 		gd.setGraphTitle("Memory usage on {1}");
 		gd.setVerticalLabel("Bytes");
