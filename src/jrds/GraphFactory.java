@@ -73,54 +73,59 @@ public class GraphFactory {
 		else if(className instanceof String) {
 			String xmlRessourceName = (String)className;
 			java.net.URL url = ResourcesLocator.getResourceUrl(xmlRessourceName);
-			InputStream xmlStream = ResourcesLocator.getResource(xmlRessourceName);
-			Digester digester = new Digester();
-			digester.setValidating(false);
-			digester.addObjectCreate("graphdesc","jrds.GraphDesc");
-			digester.addSetProperties("graphdesc");
-			digester.addCallMethod("graphdesc/filename", "setGraphName", 0);
-			digester.addCallMethod("graphdesc/graphName", "setGraphName", 0);
-			digester.addCallMethod("graphdesc/verticalLabel", "setVerticalLabel", 0);
-			digester.addCallMethod("graphdesc/graphTitle", "setGraphTitle", 0);
-			digester.addCallMethod("graphdesc/upperLimit", "setUpperLimit", 0);
-			digester.addCallMethod("graphdesc/add","add",7);
-			digester.addCallParam("graphdesc/add/name",0);
-			digester.addCallParam("graphdesc/add/dsName",1);
-			digester.addCallParam("graphdesc/add/rpn",2);
-			digester.addCallParam("graphdesc/add/graphType",3);
-			digester.addCallParam("graphdesc/add/color",4);
-			digester.addCallParam("graphdesc/add/legend",5);
-			digester.addCallParam("graphdesc/add/cf",6);
-			digester.addObjectCreate("graphdesc/hosttree", "java.util.ArrayList");
-			digester.addSetNext("graphdesc/hosttree", "setHostTree");
-			digester.addObjectCreate("graphdesc/viewtree", "java.util.ArrayList");
-			digester.addSetNext("graphdesc/viewtree", "setViewTree");
-			digester.addRule("*/pathelement", new Rule() {
-				public void body (String namespace, String name, String text) {
-					List tree = (List) getDigester().peek();
-					tree.add(GraphDesc.resolvPathElement(text));
-				}	
+			if(url == null) {
+				logger.error("Unable to find ressource " + xmlRessourceName + " for probe " + probe);
 			}
-			);
-			digester.addRule("*/pathstring", new Rule() {
-				public void body (String namespace, String name, String text) {
-					List tree = (List) getDigester().peek();
-					tree.add(text);
-				}	
-			}
-			);
-			try {
-				GraphDesc gd = (GraphDesc) digester.parse(xmlStream);
-				retValue = new RdsGraph(probe, gd);
-			} catch (Exception e) {
-				logger.warn("Unable to parse graph description file with URL "+ url + "for probe " + probe, e);
-				retValue = null;
-			}
-			try {
-				xmlStream.close();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			else {
+				InputStream xmlStream = ResourcesLocator.getResource(xmlRessourceName);
+				Digester digester = new Digester();
+				digester.setValidating(false);
+				digester.addObjectCreate("graphdesc","jrds.GraphDesc");
+				digester.addSetProperties("graphdesc");
+				digester.addCallMethod("graphdesc/filename", "setGraphName", 0);
+				digester.addCallMethod("graphdesc/graphName", "setGraphName", 0);
+				digester.addCallMethod("graphdesc/verticalLabel", "setVerticalLabel", 0);
+				digester.addCallMethod("graphdesc/graphTitle", "setGraphTitle", 0);
+				digester.addCallMethod("graphdesc/upperLimit", "setUpperLimit", 0);
+				digester.addCallMethod("graphdesc/add","add",7);
+				digester.addCallParam("graphdesc/add/name",0);
+				digester.addCallParam("graphdesc/add/dsName",1);
+				digester.addCallParam("graphdesc/add/rpn",2);
+				digester.addCallParam("graphdesc/add/graphType",3);
+				digester.addCallParam("graphdesc/add/color",4);
+				digester.addCallParam("graphdesc/add/legend",5);
+				digester.addCallParam("graphdesc/add/cf",6);
+				digester.addObjectCreate("graphdesc/hosttree", "java.util.ArrayList");
+				digester.addSetNext("graphdesc/hosttree", "setHostTree");
+				digester.addObjectCreate("graphdesc/viewtree", "java.util.ArrayList");
+				digester.addSetNext("graphdesc/viewtree", "setViewTree");
+				digester.addRule("*/pathelement", new Rule() {
+					public void body (String namespace, String name, String text) {
+						List tree = (List) getDigester().peek();
+						tree.add(GraphDesc.resolvPathElement(text));
+					}	
+				}
+				);
+				digester.addRule("*/pathstring", new Rule() {
+					public void body (String namespace, String name, String text) {
+						List tree = (List) getDigester().peek();
+						tree.add(text);
+					}	
+				}
+				);
+				try {
+					GraphDesc gd = (GraphDesc) digester.parse(xmlStream);
+					retValue = new RdsGraph(probe, gd);
+				} catch (Exception e) {
+					logger.warn("Unable to parse graph description file with URL "+ url + " for probe " + probe, e);
+					retValue = null;
+				}
+				try {
+					xmlStream.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		}
 		return retValue;
