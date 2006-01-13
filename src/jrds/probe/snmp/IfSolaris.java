@@ -8,7 +8,6 @@ package jrds.probe.snmp;
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.RdsIndexedSnmpRrd;
 import jrds.graphe.IfGraph;
 import jrds.graphe.IfPacketSize;
 

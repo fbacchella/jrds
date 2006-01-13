@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import jrds.RdsHost;
-import jrds.RdsSnmpSimple;
 
 import org.jrobin.core.DsDef;
 import org.jrobin.core.RrdException;

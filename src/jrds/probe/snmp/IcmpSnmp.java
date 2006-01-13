@@ -7,7 +7,6 @@ package jrds.probe.snmp;
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.RdsSnmpSimple;
 import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;

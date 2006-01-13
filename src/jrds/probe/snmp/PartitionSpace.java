@@ -12,7 +12,6 @@ import java.util.Map;
 import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.RdsIndexedSnmpRrd;
 import jrds.graphe.PartitionSpaceGraph;
 
 import org.apache.log4j.Logger;

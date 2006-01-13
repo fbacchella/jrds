@@ -8,7 +8,6 @@ package jrds.probe.snmp;
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.RdsSnmpSimple;
 import jrds.graphe.IpErrorGraph;
 import jrds.snmp.SnmpRequester;
 

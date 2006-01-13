@@ -8,7 +8,6 @@ package jrds.probe.snmp;
 import jrds.GraphDesc;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.RdsSnmpSimple;
 import jrds.graphe.SquidBytesGraph;
 import jrds.graphe.SquidCpu;
 import jrds.graphe.SquidHitRatioGraph;

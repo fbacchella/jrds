@@ -7,7 +7,6 @@ package jrds.probe.snmp;
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.RdsIndexedSnmpRrd;
 import jrds.graphe.DiskIoGraphBytes;
 import jrds.graphe.DiskIoGraphReq;
 import jrds.graphe.DiskIoGraphSize;
