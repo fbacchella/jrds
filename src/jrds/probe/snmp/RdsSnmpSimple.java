@@ -10,7 +10,6 @@ import java.util.Set;
 import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.SnmpProbe;
 
 import org.apache.log4j.Logger;
 

@@ -1,8 +1,9 @@
-/*
- * Created on 8 déc. 2004
- *
- * TODO 
- */
+/*##########################################################################
+_##
+_##  $Id$
+_##
+_##########################################################################*/
+
 package jrds.probe.snmp;
 
 import jrds.ProbeDesc;
@@ -15,9 +16,9 @@ import org.snmp4j.smi.OID;
 
 
 /**
- * @author bacchell
- *
- * TODO 
+ * A class to probe the disk IO, using Net-SNMP
+ * @author Fabrice Bacchella 
+ * @version $Revision$,  $Date$
  */
 public class DiskIo extends RdsIndexedSnmpRrd {
 	static final private ProbeDesc pd = new ProbeDesc(7);

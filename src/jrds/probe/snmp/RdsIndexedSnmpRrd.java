@@ -16,7 +16,6 @@ import java.util.Set;
 import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.SnmpProbe;
 import jrds.probe.IndexedProbe;
 import jrds.snmp.SnmpRequester;
 
@@ -111,7 +110,7 @@ public abstract class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProb
 	}
 
 	/**
-	 * @see jrds.SnmpProbe#getOidSet()
+	 * @see jrds.probe.snmp.SnmpProbe#getOidSet()
 	 */
 	public Set getOidSet() {
 		Set retValue = null;

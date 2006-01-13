@@ -1,5 +1,8 @@
-//----------------------------------------------------------------------------
-//$Id$
+/*##########################################################################
+_##
+_##  $Id$
+_##
+_##########################################################################*/
 
 package jrds.probe.snmp;
 
@@ -16,7 +19,7 @@ import org.snmp4j.smi.OID;
 
 /**
  * Used to get the load average, using the int value
- * @author Fabrice Bacchella(
+ * @author Fabrice Bacchella
  * @version $Revision$
  */
 public class CpuLoadInt
