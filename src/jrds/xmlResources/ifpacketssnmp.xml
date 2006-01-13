@@ -18,7 +18,6 @@
 		<name>ifOutErrors</name>
 		<graphType>line</graphType>
 		<color>red</color>
-		<rpn/>
 		<legend>packets in error send/s</legend>
 	</add>
 	<add>
