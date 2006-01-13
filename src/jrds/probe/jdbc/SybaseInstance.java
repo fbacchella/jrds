@@ -1,4 +1,4 @@
-package jrds.probe;
+package jrds.probe.jdbc;
 
 import java.util.HashMap;
 import java.util.List;
@@ -7,6 +7,7 @@ import java.util.Map;
 import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
+import jrds.probe.IndexedProbe;
 
 
 /**

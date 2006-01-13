@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.probe.IndexedProbe;
-import jrds.probe.JdbcProbe;
 import jrds.probe.UrlProbe;
+import jrds.probe.jdbc.JdbcProbe;
 
 import org.apache.log4j.Logger;
 import org.jrobin.core.RrdException;

@@ -1,4 +1,4 @@
-package jrds.probe;
+package jrds.probe.jdbc;
 
 import java.util.HashMap;
 import java.util.List;

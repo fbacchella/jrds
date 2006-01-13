@@ -1,4 +1,4 @@
-package jrds.probe;
+package jrds.probe.jdbc;
 
 import java.sql.Connection;
 import java.sql.Driver;
@@ -16,6 +16,7 @@ import jrds.JrdsLogger;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
+import jrds.probe.UrlProbe;
 
 public abstract class JdbcProbe extends Probe implements UrlProbe {
 	static final private org.apache.log4j.Logger logger = JrdsLogger.getLogger(JdbcProbe.class);

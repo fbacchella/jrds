@@ -3,7 +3,7 @@
  *
  * TODO 
  */
-package jrds.probe;
+package jrds.probe.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
