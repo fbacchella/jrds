@@ -28,7 +28,6 @@ public class ResourcesLocator {
      * @return
      */
     public static final java.net.URL getResourceUrl(String name) {
-
         return ResourcesLocator.class.getResource(name);
     }
 
@@ -38,7 +37,7 @@ public class ResourcesLocator {
      * @return
      */
     public static final InputStream getResource(String name) {
-        logger.debug("URL for " + name + ": " + getResourceUrl(name));
+        logger.trace("URL for " + name + ": " + getResourceUrl(name));
         return ResourcesLocator.class.getResourceAsStream(name);
     }
 
