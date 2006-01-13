@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import jrds.JrdsLogger;
-import jrds.MuninsProbe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.graphe.DiskIoGraphBytes;

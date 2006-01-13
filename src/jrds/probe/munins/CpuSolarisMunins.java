@@ -6,7 +6,6 @@
 package jrds.probe.munins;
 
 import jrds.JrdsLogger;
-import jrds.MuninsProbe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.graphe.CpuRawTimeSolarisGraph;
