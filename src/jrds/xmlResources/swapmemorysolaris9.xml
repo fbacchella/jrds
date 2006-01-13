@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+	<graphName>swapmemsolaris9munins</graphName>
+	<verticalLabel>Bytes</verticalLabel>
+	<graphTitle>Swap Memory usage on {1}</graphTitle>
+	<add>
+		<name>swap_alloc</name>
+		<graphType>area</graphType>
+	</add>
+	<add>
+		<name>swap_resv</name>
+		<graphType>stack</graphType>
+	</add>
+	<add>
+		<name>swap_avail</name>
+		<graphType>stack</graphType>
+	</add>
+	<add>
+		<name>swap_free</name>
+		<graphType>line</graphType>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>MEMORY</pathelement>
+		<pathstring>Swap Memory usage</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>LOAD</pathelement>
+		<pathstring>MEMORY</pathstring>
+		<pathelement>Swap Memory usage</pathelement>
+	</viewtree>
+</graphdesc>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+	<graphName>memsolaris9munins</graphName>
+	<verticalLabel>Bytes</verticalLabel>
+	<graphTitle>Memory usage on {1}</graphTitle>
+	<add>
+		<name>swap_free</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>swap_resv</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>swap_avail</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>swap_alloc</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>ram_total</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>freemem</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>availrmem</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>pp_kernel</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>pageslocked</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>pagestotal</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>physmem</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>swapfs_minfree</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>disk_total</name>
+		<graphType>line</graphType>
+	</add>
+	<add>
+		<name>disk_free</name>
+		<graphType>line</graphType>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>MEMORY</pathelement>
+		<pathstring>Memory usage</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>LOAD</pathelement>
+		<pathstring>MEMORY</pathstring>
+		<pathelement>Memory usage</pathelement>
+	</viewtree>
+</graphdesc>

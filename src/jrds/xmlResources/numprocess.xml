@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+	<filename>nprocesses</filename>
+	<verticalLabel>Number (cumulated)</verticalLabel>
+	<graphTitle>Number of processes on {1}</graphTitle>
+	<add>
+		<name>hrSystemProcesses</name>
+		<graphType>area</graphType>
+		<color>green</color>
+		<legend>Number of processes</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>LOAD</pathelement>
+		<pathstring>Total number of processes</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>LOAD</pathelement>
+		<pathstring>Total number of processes</pathstring>
+		<pathelement>HOST</pathelement>
+	</viewtree>
+</graphdesc>
