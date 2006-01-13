@@ -164,7 +164,7 @@ implements Comparable {
 	}
 	
 	/**
-	 * @param filename The filename to set.
+	 * @param graphname the filename prefix of the graph.
 	 */
 	public void setGraphName(String graphname) {
 		this.graphName = graphname;

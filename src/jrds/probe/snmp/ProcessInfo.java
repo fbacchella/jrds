@@ -55,7 +55,7 @@ public class ProcessInfo extends RdsIndexedSnmpRrd {
 	}
 	
 	/**
-	 * @see com.aol.jrds.snmp.SnmpStore#storeValues(com.aol.jrds.snmp.SnmpVars, org.jrobin.core.Sample, com.aol.jrds.RdsSnmpRrd)
+	 * @see jrds.Probe#filterValues(java.util.Map)
 	 */
 	public Map filterValues(Map snmpVars)  {
 		double max = 0;

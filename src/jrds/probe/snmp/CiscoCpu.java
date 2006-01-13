@@ -1,7 +1,11 @@
+/*##########################################################################
+ _##
+ _##  $Id$
+ _##
+ _##########################################################################*/
+
 package jrds.probe.snmp;
 
-// ----------------------------------------------------------------------------
-// $Id$
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
@@ -13,8 +17,8 @@ import org.snmp4j.smi.OID;
 
 /**
  * A class to probe the CPU load on a cisco
- * @author Fabrice Bacchella
- * @version $Revision$
+ * @author Fabrice Bacchella 
+ * @version $Revision$,  $Date$
  */
 public class CiscoCpu extends RdsSnmpSimple {
 	static final private ProbeDesc pd = new ProbeDesc(2);

@@ -190,12 +190,11 @@ implements Comparable {
 	}
 	
 	/**
-	 * A method to filter buy uptime value
-	 * return an empty map if uptime is to low.
+	 * A method to filter by uptime value. Used to avoid nonense values when a counter is reset to zero.
 	 * The uptime value must be exprimed in seconds
 	 * @param id The id of value
-	 * @param values
-	 * @return
+	 * @param retValue
+	 * @return the values unmodified or an empty map if uptime is to low
 	 */
 	final public Map filterUpTime(Object id, Map retValue) {
 		if(retValue != null) {

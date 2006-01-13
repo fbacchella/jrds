@@ -1,9 +1,9 @@
-/*
- * Created on 2 déc. 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+/*##########################################################################
+ _##
+ _##  $Id$
+ _##
+ _##########################################################################*/
+
 package jrds.probe.snmp;
 
 import jrds.ProbeDesc;
@@ -16,10 +16,8 @@ import org.snmp4j.smi.OID;
 
 
 /**
- * @author bacchell
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author Fabrice Bacchella 
+ * @version $Revision$,  $Date$
  */
 public class CpuRawTimeLinux extends RdsSnmpSimple {
 	static final private ProbeDesc pd = new ProbeDesc(7);

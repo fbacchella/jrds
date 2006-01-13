@@ -61,10 +61,13 @@ public abstract class JdbcProbe extends Probe implements UrlProbe {
 	{
 		return select2Map(query, true);
 	}
+	
 	/**
+	 * Parse all the collumns of a query and return a List of Map
+	 * where the column name is the key
 	 * @param query
 	 * @param numFilter force all value to be a Number
-	 * @return
+	 * @return a List of Map of values 
 	 */
 	public List select2Map(String query, boolean numFilter)
 	{
@@ -77,7 +80,6 @@ public abstract class JdbcProbe extends Probe implements UrlProbe {
 			ResultSet rs = stmt.executeQuery(query);
 			if(rs != null) {
 				do {
-					// = stmt.getResultSet();
 					ResultSetMetaData rsmd = rs.getMetaData();
 					int colCount = rsmd.getColumnCount();
 					while(rs.next()) {

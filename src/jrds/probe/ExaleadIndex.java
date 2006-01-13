@@ -28,7 +28,6 @@ public class ExaleadIndex extends Exalead {
 	}
 	/**
 	 * @param monitoredHost
-	 * @param pd
 	 */
 	public ExaleadIndex(RdsHost monitoredHost) {
 		super(monitoredHost, pd, 10011);
