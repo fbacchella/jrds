@@ -1,8 +1,9 @@
-/*
- * Created on 6 janv. 2005
- *
- * TODO 
- */
+/*##########################################################################
+ _##
+ _##  $Id$
+ _##
+ _##########################################################################*/
+
 package jrds.probe;
 
 import java.net.MalformedURLException;
@@ -19,9 +20,9 @@ import jrds.graphe.ApacheTransfer;
 
 
 /**
- * @author bacchell
- *
- * TODO 
+ * A class to probe the apache status from the /server-status URL
+ * @author Fabrice Bacchella 
+ * @version $Revision$,  $Date$
  */
 public class ApacheStatus extends HttpProbe implements UrlProbe {
 	static final ProbeDesc pd = new ProbeDesc(7);
@@ -37,7 +38,6 @@ public class ApacheStatus extends HttpProbe implements UrlProbe {
 		pd.add("IdleWorkers", ProbeDesc.GAUGE);
 		pd.setRrdName("apachestatus");
 		pd.setGraphClasses(new Class[] {ApacheRequests.class, ApacheTransfer.class});
-		
 	}
 
 	/**
