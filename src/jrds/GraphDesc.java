@@ -29,7 +29,7 @@ import org.jrobin.graph.RrdGraphDef;
  */
 public final class GraphDesc
 implements Cloneable {
-	static final private Logger logger = JrdsLogger.getLogger(GraphDesc.class);
+	static final private Logger logger = Logger.getLogger(GraphDesc.class);
 	
 	public static final class ConsFunc {
 		private String id;

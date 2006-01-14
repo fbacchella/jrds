@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class BackEndCommiter {
-	static final private Logger logger = JrdsLogger.getLogger(BackEndCommiter.class);
+	static final private Logger logger = Logger.getLogger(BackEndCommiter.class);
 	
 	private static int syncPeriod = 30; //seconds
 	static private BackEndCommiter instance = null;
