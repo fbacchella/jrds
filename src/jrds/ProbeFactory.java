@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
  * TODO
  */
 public class ProbeFactory {
-    static private final Logger logger = JrdsLogger.getLogger(ProbeFactory.class);
+    static private final Logger logger = org.apache.log4j.Logger.getLogger(ProbeFactory.class);
     static final private List argPackages = new ArrayList(3);
     static final private List probePackages = new ArrayList(2);
 
