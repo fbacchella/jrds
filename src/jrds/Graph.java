@@ -51,10 +51,6 @@ public final class Graph extends HttpServlet {
 		res.addHeader("Cache-Control", "no-cache");
 
 		graph.writePng(out, begin, end);
-		//byte[] pngBytes= graph.getPng(begin, end);
-		//if(pngBytes != null)
-		//	out.write(pngBytes);
-
 	}
 
 	/**

@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import jrds.probe.snmp.SnmpProbe;
 import jrds.snmp.TargetFactory;
 
 import org.apache.log4j.Logger;
