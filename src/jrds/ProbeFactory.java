@@ -1,13 +1,10 @@
-/*
- * Created on 28 déc. 2004
- *
- * TODO
- */
+/*##########################################################################
+_##
+_##  $Id$
+_##
+_##########################################################################*/
+
 package jrds;
-
-// ----------------------------------------------------------------------------
-// $Id$
-
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -16,12 +13,12 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
- * @author Fabrice Bacchella
- * @version $Revision$
- * TODO
+ * A class to find probe by their names
+ * @author Fabrice Bacchella 
+ * @version $Revision$,  $Date$
  */
 public class ProbeFactory {
-    static private final Logger logger = org.apache.log4j.Logger.getLogger(ProbeFactory.class);
+    static private final Logger logger = Logger.getLogger(ProbeFactory.class);
     static final private List argPackages = new ArrayList(3);
     static final private List probePackages = new ArrayList(2);
 
@@ -33,7 +30,8 @@ public class ProbeFactory {
         probePackages.add("jrds.probe.");
         probePackages.add("jrds.probe.snmp.");
         probePackages.add("jrds.probe.munins.");
-        probePackages.add("");
+        probePackages.add("jrds.probe.rstat.");
+               probePackages.add("");
 
     }
 
