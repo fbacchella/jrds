@@ -34,7 +34,7 @@ public class Download
     extends HttpServlet {
     private static final String CONTENT_TYPE = "text/csv";
 
-    static final private Logger logger = JrdsLogger.getLogger(Graph.class);
+    static final private Logger logger = Logger.getLogger(Graph.class);
 
     static final HostsList hl = HostsList.getRootGroup() ;
 
