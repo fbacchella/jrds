@@ -1,7 +1,10 @@
-package jrds;
+/*##########################################################################
+_##
+_##  $Id$
+_##
+_##########################################################################*/
 
-// ----------------------------------------------------------------------------
-// $Id$
+package jrds;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,16 +20,12 @@ import org.apache.commons.digester.Rule;
 import org.apache.log4j.Logger;
 
 /**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- * <p>Copyright: Copyright (c) 2005</p>
+ * This servlet reload the host list file
  * @author Fabrice Bacchella
  * @version $Revision$
  */
 public class GraphFactory {
-	static private final Logger logger = JrdsLogger.getLogger(GraphFactory.class);
+	static private final Logger logger = Logger.getLogger(GraphFactory.class);
 	static final private List graphPackages = new ArrayList(2);
 	
 	static {
