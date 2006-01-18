@@ -30,7 +30,7 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class HostConfigParser  extends DefaultHandler {
 	
-	static private final Logger logger = org.apache.log4j.Logger.getLogger(HostConfigParser.class);
+	static private final Logger logger = Logger.getLogger(HostConfigParser.class);
 	
 	//Tag names
 	private final String HOST = "host";
