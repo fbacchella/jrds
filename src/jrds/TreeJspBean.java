@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
  * TODO
  */
 public class TreeJspBean implements Serializable {
-	static private final Logger logger = JrdsLogger.getLogger(TreeJspBean.class);
+	static private final Logger logger = Logger.getLogger(TreeJspBean.class);
 	private static final HostsList rootHostList = HostsList.getRootGroup();
 	static final private DateFormat df = new SimpleDateFormat("d/M/y");
 	static final private PropertiesManager pm = PropertiesManager.getInstance();
@@ -86,16 +86,10 @@ public class TreeJspBean implements Serializable {
 
 	public void setGroup(String hostList)
 	{
-		if(ChoiceJspBean.ALLGROUPS.equals(hostList))
-			this.hostList = rootHostList;
-		else
-			this.hostList = rootHostList.findGroup(hostList);
+		this.hostList = rootHostList;
 	}
 
 	private void calcDate() {
-		//begin.setTime(end.getTime());
-		//begin.add(dateField, -1);
-		//begin.setTimeInMillis()
 		begin = new Date(0 - dateField);
 	}
 
