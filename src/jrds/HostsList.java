@@ -1,9 +1,9 @@
-/*
- * Created on 2 déc. 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+/*##########################################################################
+_##
+_##  $Id$
+_##
+_##########################################################################*/
+
 package jrds;
 
 import java.io.File;
@@ -30,11 +30,12 @@ import edu.emory.mathcs.backport.java.util.concurrent.RejectedExecutionException
 import edu.emory.mathcs.backport.java.util.concurrent.TimeUnit;
 
 /**
- * The classe used to store all the host to manager
- * @author bacchell
-  */
+ * The classe used to store all the host to manage
+ * @author Fabrice Bacchella 
+ * @version $Revision$,  $Date$
+ */
 public class HostsList {
-	static Logger logger = JrdsLogger.getLogger(HostsList.class);
+	static Logger logger = Logger.getLogger(HostsList.class);
 	private Collection hostList;
 	private static HostsList instance;
 	private GraphTreeNode graphTreeByHost = null;
@@ -50,25 +51,18 @@ public class HostsList {
 	 *  
 	 */
 	private HostsList() {
-		super();
+		init();
+	}
+
+	private void init() {
 		graphTreeByHost = new GraphTreeNode(hostRoot);
 		graphTreeByView = new GraphTreeNode(viewRoot);
 		graphMap = new HashMap();
 		groupList = new TreeMap(String.CASE_INSENSITIVE_ORDER);
 		hostList = new HashSet();
 		group = null;
+		
 	}
-
-	private HostsList(String group) {
-		super();
-		graphTreeByHost = new GraphTreeNode(hostRoot);
-		graphTreeByView = new GraphTreeNode(viewRoot);
-		graphMap = new HashMap();
-		this.group = group;
-		groupList = new TreeMap(String.CASE_INSENSITIVE_ORDER);
-		hostList = new HashSet();
-	}
-
 	public static HostsList getRootGroup() {
 		if (instance == null)
 			instance = new HostsList();
@@ -77,6 +71,12 @@ public class HostsList {
 	
 	public Iterator iterator() {
 		return hostList.iterator();
+	}
+	
+	public static HostsList fill(File newHostCfgFile) {
+		instance = new HostsList();
+		instance.append(newHostCfgFile);
+		return instance;
 	}
 
 	public void append(Collection newHostList) {
@@ -91,7 +91,7 @@ public class HostsList {
 		append(tmpHostsList);
 	}
 
-	private void _addHost(RdsHost newhost) {
+	private void addHost(RdsHost newhost) {
 		hostList.add(newhost);
 		for (Iterator j = newhost.getProbes().iterator(); j.hasNext();) {
 			Probe currProbe = (Probe) j.next();
@@ -107,16 +107,7 @@ public class HostsList {
 				}
 		}
 		if (this != instance)
-			instance._addHost(newhost);
-	}
-
-	public void addHost(RdsHost newhost) {
-		String hostGroup = newhost.getGroup();
-		if (hostGroup == null || hostGroup.equals(group)) {
-			_addHost(newhost);
-		} else {
-			findGroup(hostGroup).addHost(newhost);
-		}
+			instance.addHost(newhost);
 	}
 
 	public void collectAll() throws IOException {
@@ -200,14 +191,14 @@ public class HostsList {
 		return (RdsGraph) graphMap.get(new Integer(id));
 	}
 
-	public HostsList findGroup(String group) {
+	/*public HostsList findGroup(String group) {
 		HostsList hl = (HostsList) groupList.get(group);
 		if (hl == null) {
 			hl = new HostsList(group);
 			groupList.put(group, hl);
 		}
 		return hl;
-	}
+	}*/
 
 	public GraphTreeNode getNodeByPath(String path) {
 		List pathList = new LinkedList(Arrays.asList(path.split("/")));

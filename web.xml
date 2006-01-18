@@ -17,6 +17,10 @@
         <servlet-name>download</servlet-name>
         <servlet-class>jrds.Download</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>reload</servlet-name>
+        <servlet-class>jrds.ReloadHostList</servlet-class>
+    </servlet>   		
 	<servlet-mapping>
 		<servlet-name>Graph</servlet-name>
 		<url-pattern>/graph</url-pattern>
@@ -28,6 +32,10 @@
     <servlet-mapping>
         <servlet-name>download</servlet-name>
         <url-pattern>/download</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>reload</servlet-name>
+        <url-pattern>/reload</url-pattern>
     </servlet-mapping>
 	<taglib>
 		<taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
