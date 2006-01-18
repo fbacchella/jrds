@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import jrds.JrdsLogger;
-import jrds.SnmpProbe;
+import jrds.probe.snmp.SnmpProbe;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.PDU;
