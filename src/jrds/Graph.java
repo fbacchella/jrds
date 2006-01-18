@@ -18,21 +18,20 @@ import org.apache.log4j.Logger;
 
 
 /**
- * A servlet wich genarte a png for a graph
+ * A servlet wich generate a png for a graph
  * @author Fabrice Bacchella
  * @version $Revision$
  */
 public final class Graph extends HttpServlet {
 	static final private Logger logger = Logger.getLogger(Graph.class);
 
-	static final HostsList hl = HostsList.getRootGroup() ;
-
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException {
-		Date begin = new Date(0);
+		final HostsList hl = HostsList.getRootGroup() ;
+ 		Date begin = new Date(0);
 		Date end = new Date(0);
 
 		calcDate(req.getParameter("begin"), req.getParameter("end"), begin, end);
