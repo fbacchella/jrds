@@ -29,6 +29,8 @@ public class DiskIo extends RdsIndexedSnmpRrd {
 		pd.add("diskIOWrites", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.2021.13.15.1.1.6"));
 		pd.setGraphClasses(new Class[] {DiskIoGraphBytes.class, DiskIoGraphReq.class, DiskIoGraphSize.class});
 		pd.setIndexOid(new OID(".1.3.6.1.4.1.2021.13.15.1.1.2"));
+		pd.setName("io-{1}");
+		pd.setUniqIndex(true);
 	}
 
 	/**
@@ -37,15 +39,5 @@ public class DiskIo extends RdsIndexedSnmpRrd {
 	 */
 	public DiskIo(RdsHost monitoredHost, String indexName) {
 		super(monitoredHost, pd, indexName);
-		setRrdName("io-" + getIndexName());
 	}
-
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.RdsIndexedSnmpRrd#initIsUniq()
-	 */
-	protected boolean initIsUniq() {
-		return true;
-	}
-
-
 }

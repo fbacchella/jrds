@@ -5,12 +5,16 @@ package jrds;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import jrds.probe.IndexedProbe;
+import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Logger;
 import org.jrobin.core.ArcDef;
@@ -88,7 +92,7 @@ implements Comparable {
 	
 	public String getName() {
 		if (name == null)
-			name = getPd().getRrdName();
+			name = parseTemplate(getPd().getName());
 		return name;
 	}
 	
@@ -97,10 +101,26 @@ implements Comparable {
 		PropertiesManager.getInstance().fileSeparator + getName() + ".rrd";
 	}
 	
-	public void setRrdName(String rrdName) {
-		if (!pd.isCloned())
-			pd = (ProbeDesc) pd.clone();
-		pd.setRrdName(rrdName);
+	private final String parseTemplate(String template) {
+		String index = "";
+		String url = "";
+		if( this instanceof IndexedProbe) {
+			index =((IndexedProbe) this).getIndexName();
+		}
+		if( this instanceof UrlProbe) {
+			url =((UrlProbe) this).getUrlAsString();
+		}
+		Object[] arguments = {
+				getHost().getName(),
+				index,
+				url,
+		};
+		return MessageFormat.format(template, arguments) ;
+		
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	protected DsDef[] getDsDefs() throws RrdException {

@@ -45,7 +45,7 @@ public class ProcessStatusSolaris extends RdsSnmpSimple {
 		pd.add(IDLE, ProbeDesc.GAUGE);
 		pd.add(ZOMBIE, ProbeDesc.GAUGE);
 		pd.setGraphClasses(new Object []{"processstatus.xml"});
-		pd.setRrdName("pslist");
+		pd.setName("pslist");
 		pd.setRequester(SnmpRequester.TABULAR);
 	}
 	

@@ -53,7 +53,7 @@ public class DiskIoMunins extends MuninsProbe implements IndexedProbe {
 	public DiskIoMunins(RdsHost monitoredHost, String indexKey) {
 		super(monitoredHost, (ProbeDesc) pd.clone());
 		this.indexKey = indexKey;
-		getPd().setRrdName("io-" + getIndexName() + "_munins");
+		getPd().setName("io-" + getIndexName() + "_munins");
 	}
 	public Collection getMuninsName()
 	{

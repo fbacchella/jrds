@@ -1,8 +1,9 @@
-/*
- * Created on 21 déc. 2004
- *
- * TODO 
- */
+/*##########################################################################
+_##
+_##  $Id$
+_##
+_##########################################################################*/
+
 package jrds.probe.snmp;
 
 import java.util.HashMap;
@@ -20,9 +21,9 @@ import org.snmp4j.smi.OID;
 
 
 /**
- * @author bacchell
- *
- * TODO 
+ * A class to probe info about a process, using MIB-II
+ * @author Fabrice Bacchella 
+ * @version $Revision$,  $Date$
  */
 public class ProcessInfo extends RdsIndexedSnmpRrd {
 	static final private Logger logger = JrdsLogger.getLogger(RdsIndexedSnmpRrd.class);
@@ -43,6 +44,8 @@ public class ProcessInfo extends RdsIndexedSnmpRrd {
 		pd.add(NUM, ProbeDesc.GAUGE);
 		pd.setGraphClasses(new Class[] {ProcessInfoNumber.class, ProcessInfoSize.class});
 		pd.setIndexOid(indexOid);
+		pd.setName("ps-{1}");
+		pd.setUniqIndex(false);
 	}
 	
 	/**
@@ -50,7 +53,6 @@ public class ProcessInfo extends RdsIndexedSnmpRrd {
 	 */
 	public ProcessInfo(RdsHost monitoredHost, String indexName) {
 		super(monitoredHost, pd, indexName);
-		setRrdName("ps-" + getIndexName());
 	}
 	
 	/**
@@ -79,12 +81,4 @@ public class ProcessInfo extends RdsIndexedSnmpRrd {
 		retValue.put(AVERAGE, new Double(average));
 		return retValue;
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.RdsIndexedSnmpRrd#initIsUniq()
-	 */
-	protected boolean initIsUniq() {
-		return false;
-	}
-	
 }

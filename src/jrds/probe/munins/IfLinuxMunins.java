@@ -37,6 +37,6 @@ public class IfLinuxMunins extends MuninsIndexedNameProbe {
 	 */
 	public IfLinuxMunins(RdsHost monitoredHost, String indexName) {
 		super(monitoredHost, pd, indexName);
-		setRrdName("if-" + getIndexName() + "_munins");
+		setName("if-" + getIndexName() + "_munins");
 	}
 }

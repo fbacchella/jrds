@@ -26,7 +26,7 @@ public class CpuTimeSunMib extends RdsSnmpSimple {
 		pd.add("rsNiceModeTime", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.42.3.13.2"));
 		pd.add("rsSystemProcessTime", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.42.3.13.3"));
 		pd.add("rsIdleModeTime", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.42.3.13.4"));
-		pd.setRrdName("cpusunmib");
+		pd.setName("cpusunmib");
 		pd.setGraphClasses(new Class[] {CpuTimeSunMibGraph.class});
         pd.setRequester(SnmpRequester.SIMPLE);
 	}

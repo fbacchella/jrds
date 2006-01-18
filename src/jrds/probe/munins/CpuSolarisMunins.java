@@ -28,7 +28,7 @@ public class CpuSolarisMunins extends MuninsProbe {
 		pd.add("ssCpuRawKernel", ProbeDesc.COUNTER, "system.value");
 		pd.add("ssCpuRawIdle", ProbeDesc.COUNTER, "idle.value");
 
-		pd.setRrdName("cpusolarismunins");
+		pd.setName("cpusolarismunins");
 		pd.setMuninsProbesNames(new String[] { "cpu"});
 		pd.setGraphClasses(new Class[] {CpuRawTimeSolarisGraph.class});
 	}

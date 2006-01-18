@@ -38,6 +38,6 @@ public class IfSolarisMunins extends MuninsIndexedNameProbe {
 	 */
 	public IfSolarisMunins(RdsHost monitoredHost, String indexName) {
 		super(monitoredHost, pd, indexName);
-		setRrdName("if-" + this.getIndexName() + "_munins");
+		setName("if-" + this.getIndexName() + "_munins");
 	}
 }

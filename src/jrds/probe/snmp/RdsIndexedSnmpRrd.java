@@ -1,9 +1,9 @@
-/*
- * Created on 29 nov. 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+/*##########################################################################
+_##
+_##  $Id$
+_##
+_##########################################################################*/
+
 package jrds.probe.snmp;
 
 import java.util.ArrayList;
@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.probe.IndexedProbe;
@@ -24,17 +23,14 @@ import org.snmp4j.smi.OID;
 
 
 /**
- * @author bacchell
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author Fabrice Bacchella
+ * @version $Revision$
  */
 public abstract class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	
-	static final private Logger logger = JrdsLogger.getLogger(RdsIndexedSnmpRrd.class);
+	static final private Logger logger = Logger.getLogger(RdsIndexedSnmpRrd.class);
 
 	String indexKey;
-	boolean uniq;
 	Collection indexAsString = null;
 	OID indexOid;
 	
@@ -44,7 +40,6 @@ public abstract class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProb
 	public RdsIndexedSnmpRrd(RdsHost monitoredHost, ProbeDesc pd, String indexKey) {
 		super(monitoredHost, pd);
 		indexOid = initIndexOid();
-		uniq = initIsUniq();
 		this.indexKey = indexKey;
 	}
 
@@ -56,7 +51,7 @@ public abstract class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProb
 	protected OID initIndexOid() {
 		return this.getPd().getIndexOid();
 	}
-	protected abstract boolean initIsUniq();
+	
 	public String getIndexName()
 	{
 		return indexKey;
@@ -80,7 +75,7 @@ public abstract class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProb
 	{
 		
 		Collection indexAsString = null;
-		if(uniq)
+		if(isUniq())
 			indexAsString = new ArrayList(1);
 		else
 			indexAsString = new HashSet();
@@ -90,7 +85,7 @@ public abstract class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProb
 		Map somevars = indexFinder.doSnmpGet(this, soidSet);
 		boolean found = false;
 		
-		for(Iterator i = somevars.keySet().iterator(); i.hasNext() &&  ! (uniq && found) ;) {
+		for(Iterator i = somevars.keySet().iterator(); i.hasNext() &&  ! (isUniq() && found) ;) {
 			String name = null;
 			OID tryoid = (OID)i.next();
 			if(tryoid != null)
@@ -120,4 +115,10 @@ public abstract class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProb
 		return retValue;
 	}
 
+	/**
+	 * @return Returns the uniq.
+	 */
+	public boolean isUniq() {
+		return this.getPd().isUniqIndex();
+	}
 }

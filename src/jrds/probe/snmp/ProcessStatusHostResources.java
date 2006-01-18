@@ -43,7 +43,7 @@ public class ProcessStatusHostResources extends RdsSnmpSimple {
 		pd.add(NOTRUNNABLE, ProbeDesc.GAUGE);
 		pd.add(INVALID, ProbeDesc.GAUGE);
 		pd.setGraphClasses(new Object []{"processstatushostsresources.xml"});
-		pd.setRrdName("hrpslist");
+		pd.setName("hrpslist");
 		pd.setRequester(SnmpRequester.TABULAR);
 	}
 	

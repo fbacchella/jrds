@@ -30,7 +30,7 @@ public class TcpSnmp extends RdsSnmpSimple {
 		pd.add("RetransSegs", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.12"));
 		pd.setRequester(SnmpRequester.SIMPLE);
 
-		pd.setRrdName("tcp_snmp");
+		pd.setName("tcp_snmp");
 		pd.setGraphClasses(new Object[] {"tcpconnection.xml", "tcpestablished.xml", "tcpsegments.xml"});
 	}
 

@@ -1,9 +1,9 @@
-/*
- * Created on 30 nov. 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+/*##########################################################################
+_##
+_##  $Id$
+_##
+_##########################################################################*/
+
 package jrds.probe.snmp;
 
 import jrds.ProbeDesc;
@@ -15,10 +15,9 @@ import org.snmp4j.smi.OID;
 
 
 /**
- * @author bacchell
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * A class to probe the NIC activity, using the MIB-II
+ * @author Fabrice Bacchella 
+ * @version $Revision$,  $Date$
  */
 public class IfSolaris extends RdsIndexedSnmpRrd {
 	static final private ProbeDesc pd = new ProbeDesc(12);
@@ -35,19 +34,11 @@ public class IfSolaris extends RdsIndexedSnmpRrd {
 		pd.add("ifOutDiscards", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.2.2.1.19"));
 		pd.add("ifOutErrors", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.2.2.1.20"));
 		pd.setGraphClasses(new Object[] {IfGraph.class, "ifpacketssnmp.xml", IfPacketSize.class});
-		pd.setIndexOid(new OID(".1.3.6.1.2.1.2.2.1.2"));
+		pd.setName("if-{1}");
+		pd.setUniqIndex(true);
 	}
 
 	public IfSolaris(RdsHost monitoredHost, String indexName) {
 		super(monitoredHost, pd, indexName);
-		setRrdName("if-" + getIndexName());
 	}
-
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.RdsIndexedSnmpRrd#initIsUniq()
-	 */
-	protected boolean initIsUniq() {
-		return true;
-	}
-
 }

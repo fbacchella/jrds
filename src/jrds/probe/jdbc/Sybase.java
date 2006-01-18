@@ -49,7 +49,7 @@ public class Sybase extends JdbcProbe {
 	public Sybase(RdsHost thehost, String dbName, String user, String passwd) {
 		super(urlPrefix, thehost, pd, 4100, user, passwd);
 		this.dbName = dbName;
-		setRrdName("syb-" + dbName);
+		setName("syb-" + dbName);
 	}
 
 	/**
@@ -58,7 +58,7 @@ public class Sybase extends JdbcProbe {
 	public Sybase(RdsHost thehost, Integer port, String dbName, String user, String passwd) {
 		super(urlPrefix, thehost, pd, port.intValue(),  user, passwd);
 		this.dbName = dbName;
-		setRrdName("syb-" + dbName);
+		setName("syb-" + dbName);
 	}
 	
 	protected String doUrl()

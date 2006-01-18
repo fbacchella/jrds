@@ -30,7 +30,7 @@ public final class MemLinux extends RdsSnmpSimple {
 		pd.add("memCached", ProbeDesc.GAUGE, new OID(".1.3.6.1.4.1.2021.4.15"));
 		pd.setGraphClasses(new Class[] {MemGraphLinux.class});
 	       pd.setRequester(SnmpRequester.SIMPLE);
-		pd.setRrdName("memlinux");
+		pd.setName("memlinux");
 	}
 
 	/**

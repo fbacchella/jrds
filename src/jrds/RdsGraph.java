@@ -53,7 +53,7 @@ implements Comparable {
 	protected Probe probe;
 	private String viewPath = null;
 	private GraphDesc gd;
-	private String graphName = null;
+	private String name = null;
 	private String graphTitle = null;
 	
 	/**
@@ -129,7 +129,7 @@ implements Comparable {
 	}
 	
 	public String getPngName() {
-		return getGraphName() + ".png";
+		return getName() + ".png";
 	}
 	
 	protected void setGraphTitle(String title) {
@@ -164,22 +164,18 @@ implements Comparable {
 	}
 	
 	/**
-	 * @param graphname the filename prefix of the graph.
+	 * @param name the filename prefix of the graph.
 	 */
-	public void setGraphName(String graphname) {
-		this.graphName = graphname;
+	public void setName(String name) {
+		this.name = name;
 	}
 	
-	protected String getGraphName() {
-		if(graphName == null) {
-			graphName = parseTemplate(gd.getGraphName());
+	protected String getName() {
+		if(name == null) {
+			name = parseTemplate(gd.getGraphName());
 		}
-		return graphName;
+		return name;
 	}
-	
-	//protected String getGraphSubTitle() {
-	//    return gd.getSubTitle();
-	//}
 	
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.RdsGraph#getLowerLimit()
@@ -219,12 +215,12 @@ implements Comparable {
 			gd.setRealWidth(img.getWidth());
 		}
 		catch (RrdException e) {
-			logger.warn("Unable to creage png for " + getGraphName() +
+			logger.warn("Unable to creage png for " + getName() +
 					" on host " + probe.getHost().getName() + ": " +
 					e.getLocalizedMessage());
 		}
 		catch (IOException e) {
-			logger.warn("Unable to creage png for " + getGraphName() +
+			logger.warn("Unable to creage png for " + getName() +
 					" on host " + probe.getHost().getName() + ": " +
 					e.getLocalizedMessage());
 		}
@@ -237,7 +233,7 @@ implements Comparable {
 					getPngName()))), startDate, endDate);
 		}
 		catch (FileNotFoundException e) {
-			logger.warn("Unable to creage png for " + getGraphName() +
+			logger.warn("Unable to creage png for " + getName() +
 					" on host " + probe.getHost().getName() + ": " +
 					e.getLocalizedMessage(), e);
 		}
@@ -255,12 +251,12 @@ implements Comparable {
 			rrdGraph.fetchExportData().exportXml(out);
 		}
 		catch (RrdException ex) {
-			logger.warn("Unable to creage png for " + getGraphName() +
+			logger.warn("Unable to creage png for " + getName() +
 					" on host " + probe.getHost().getName() + ": " +
 					ex.getLocalizedMessage());
 		}
 		catch (IOException ex) {
-			logger.warn("Unable to creage png for " + getGraphName() +
+			logger.warn("Unable to creage png for " + getName() +
 					" on host " + probe.getHost().getName() + ": " +
 					ex.getLocalizedMessage());
 		}
@@ -273,12 +269,12 @@ implements Comparable {
 			xmlData = rrdGraph.fetchExportData().exportXml();
 		}
 		catch (RrdException ex) {
-			logger.warn("Unable to creage png for " + getGraphName() +
+			logger.warn("Unable to creage png for " + getName() +
 					" on host " + probe.getHost().getName() + ": " +
 					ex.getLocalizedMessage());
 		}
 		catch (IOException ex) {
-			logger.warn("Unable to creage png for " + getGraphName() +
+			logger.warn("Unable to creage png for " + getName() +
 					" on host " + probe.getHost().getName() + ": " +
 					ex.getLocalizedMessage());
 		}
@@ -300,12 +296,12 @@ implements Comparable {
 			transformer.transform(source, result);
 		}
 		catch (TransformerConfigurationException ex1) {
-			logger.warn("Unable to creage csv for " + getGraphName() +
+			logger.warn("Unable to creage csv for " + getName() +
 					" on host " + probe.getHost().getName() + ": " +
 					ex1.getLocalizedMessage(),ex1);
 		}
 		catch (TransformerException ex) {
-			logger.warn("Unable to creage csv for " + getGraphName() +
+			logger.warn("Unable to creage csv for " + getName() +
 					" on host " + probe.getHost().getName() + ": " +
 					ex.getLocalizedMessage(),ex);
 		}

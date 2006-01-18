@@ -1,15 +1,15 @@
-/*
- * Created on 21 déc. 2004
- *
- * TODO 
- */
+/*##########################################################################
+_##
+_##  $Id$
+_##
+_##########################################################################*/
+
 package jrds.probe.snmp;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.graphe.ProcessInfoNumber;
@@ -20,12 +20,12 @@ import org.snmp4j.smi.OID;
 
 
 /**
- * @author bacchell
- *
- * TODO 
+ * A class to probe info about a process, using the Solaris MIB
+ * @author Fabrice Bacchella 
+ * @version $Revision$,  $Date$
  */
 public class ProcessInfoSolaris extends RdsIndexedSnmpRrd {
-	static final private Logger logger = JrdsLogger.getLogger(RdsIndexedSnmpRrd.class);
+	static final private Logger logger = Logger.getLogger(RdsIndexedSnmpRrd.class);
 	static final private OID psProcessSize = new OID(".1.3.6.1.4.1.42.3.12.1.3");
 	static final private OID  psProcessCpuTime = new OID(".1.3.6.1.4.1.42.3.12.1.4");
 	static final private OID indexOid = new OID(".1.3.6.1.4.1.42.3.12.1.10");
@@ -43,14 +43,16 @@ public class ProcessInfoSolaris extends RdsIndexedSnmpRrd {
 		pd.add(NUM, ProbeDesc.GAUGE);
 		pd.setGraphClasses(new Class[] {ProcessInfoNumber.class, ProcessInfoSize.class});
 		pd.setIndexOid(indexOid);
+		pd.setName("ps-{1}");
+		pd.setUniqIndex(false);
 	}
 	
 	/**
 	 * @param monitoredHost
+	 * @param indexName
 	 */
 	public ProcessInfoSolaris(RdsHost monitoredHost, String indexName) {
 		super(monitoredHost, pd, indexName);
-		setRrdName("ps-" + getIndexName());
 	}
 	
 	/**
@@ -79,12 +81,4 @@ public class ProcessInfoSolaris extends RdsIndexedSnmpRrd {
 		retValue.put(AVERAGE, new Double(average));
 		return retValue;
 	}
-	
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.RdsIndexedSnmpRrd#initIsUniq()
-	 */
-	protected boolean initIsUniq() {
-		return false;
-	}
-	
 }

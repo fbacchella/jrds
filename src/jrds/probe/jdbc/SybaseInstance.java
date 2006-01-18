@@ -40,7 +40,7 @@ public class SybaseInstance extends JdbcProbe implements IndexedProbe {
 	 */
 	public SybaseInstance(RdsHost thehost, String user, String passwd) {
 		super(urlPrefix, thehost, pd, 4100, user, passwd);
-		setRrdName("sybase-" + getPort());
+		setName("sybase-" + getPort());
 	}
 
 	/**
@@ -48,7 +48,7 @@ public class SybaseInstance extends JdbcProbe implements IndexedProbe {
 	 */
 	public SybaseInstance(RdsHost thehost, Integer port, String user, String passwd) {
 		super(urlPrefix, thehost, pd, port.intValue(),  user, passwd);
-		setRrdName("sybase-" + getPort());
+		setName("sybase-" + getPort());
 	}
 	
 	protected String doUrl()

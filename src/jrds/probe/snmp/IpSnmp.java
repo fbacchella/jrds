@@ -40,7 +40,7 @@ public class IpSnmp extends RdsSnmpSimple {
 		pd.add("ipRoutingDiscards", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.4.23"));
 		
 		
-		pd.setRrdName("ipsnmp");
+		pd.setName("ipsnmp");
 		pd.setRequester(SnmpRequester.SIMPLE);
 		
 		pd.setGraphClasses(new Object[] { "ipactivitysnmp.xml", IpErrorGraph.class});

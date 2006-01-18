@@ -37,6 +37,7 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
 		pd.add("hrStorageAllocationUnits", allocUnitOid);
 		pd.setIndexOid(indexOid);
 		pd.setGraphClasses(new Class[] {PartitionSpaceGraph.class});
+		pd.setUniqIndex(true);
 	}
 	/**
 	 * @param monitoredHost
@@ -44,14 +45,7 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
 	 */
 	public PartitionSpace(RdsHost monitoredHost, String indexKey) {
 		super(monitoredHost, pd, indexKey);
-		setRrdName(initName());
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.RdsIndexedSnmpRrd#initIsUniq()
-	 */
-	protected boolean initIsUniq() {
-		return true;
+		setName(initName());
 	}
 
 	/* (non-Javadoc)

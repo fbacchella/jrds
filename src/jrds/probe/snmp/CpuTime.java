@@ -27,7 +27,7 @@ public class CpuTime extends RdsSnmpSimple {
 		pd.add("ssCpuIdle", ProbeDesc.GAUGE, new OID(".1.3.6.1.4.1.2021.11.11"));
 		pd.add("NumProcess", ProbeDesc.GAUGE, new OID(".1.3.6.1.2.1.25.1.6."));
 		pd.add("NumUsers", ProbeDesc.GAUGE, new OID(".1.3.6.1.2.1.25.1.5"));
-		pd.setRrdName("cpu");
+		pd.setName("cpu");
 		pd.setGraphClasses(new Class[] {CpuTimeGraph.class});
 		pd.setRequester(SnmpRequester.SIMPLE);
 		//pd.setGraphClasses(new Object[] {"cputime.xml"});

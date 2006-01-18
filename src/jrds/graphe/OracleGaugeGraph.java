@@ -33,7 +33,7 @@ public class OracleGaugeGraph extends RdsGraph {
 	 */
 	public OracleGaugeGraph(Probe theStore) {
 		super(theStore, gd);
-		setGraphName(theStore.getName());
+		setName(theStore.getName());
 	}
 
 }

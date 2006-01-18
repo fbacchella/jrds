@@ -23,7 +23,7 @@ public class CpuLoadMunins extends MuninsProbe {
 	static {
 		pd.add("la1", ProbeDesc.GAUGE, "load.value");
 		pd.setMuninsProbesNames(new String[] { "load" });
-		pd.setRrdName("laveragemunins");
+		pd.setName("laveragemunins");
 
 		pd.setGraphClasses(new Object[] {"cpuload.xml"});
 	}

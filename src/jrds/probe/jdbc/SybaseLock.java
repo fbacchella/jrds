@@ -46,7 +46,7 @@ public class SybaseLock extends JdbcProbe {
 	public SybaseLock(RdsHost thehost, String dbName, String user, String passwd) {
 		super(urlPrefix, thehost, pd, 4100, user, passwd);
 		this.dbName = dbName;
-		setRrdName("sybsp-" + dbName);
+		setName("sybsp-" + dbName);
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public class SybaseLock extends JdbcProbe {
 	public SybaseLock(RdsHost thehost, Integer port, String dbName, String user, String passwd) {
 		super(urlPrefix, thehost, pd, port.intValue(),  user, passwd);
 		this.dbName = dbName;
-		setRrdName("sybsp-" + dbName);
+		setName("sybsp-" + dbName);
 	}
 	
 	protected String doUrl()
