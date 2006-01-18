@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
  */
 public class Collector {
 	public static final int GRAPH_RESOLUTION = 300; // seconds
-	private static final Logger logger = JrdsLogger.getLogger(Collector.class);
+	private static final Logger logger = Logger.getLogger(Collector.class);
 	private static final PropertiesManager pm = PropertiesManager.getInstance();
 	public static void main(String[] args) throws Exception {
 		pm.join(new File("jrds.properties"));
@@ -35,8 +35,7 @@ public class Collector {
 		System.getProperties().setProperty("java.awt.headless","true");
 		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
 		
-		final HostsList hl = HostsList.getRootGroup();
-		hl.append(new File(pm.configfilepath));
+		final HostsList hl = HostsList.fill(new File(pm.configfilepath));
 
 		logger.setLevel(Level.ERROR);
 		JrdsLogger.getLogger("").setLevel(Level.ERROR);
