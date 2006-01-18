@@ -18,7 +18,7 @@ import org.snmp4j.Target;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class RdsHost implements Comparable {
-	static protected Logger logger = JrdsLogger.getLogger(RdsHost.class);
+	static protected Logger logger = Logger.getLogger(RdsHost.class);
 	
 	private String name;
 	private Target target;

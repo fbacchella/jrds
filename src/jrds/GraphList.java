@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
  * @version $Revision$
  */
 public class GraphList extends HttpServlet {
-	static final private Logger logger = JrdsLogger.getLogger(GraphList.class);
+	static final private Logger logger = Logger.getLogger(GraphList.class);
 
 	static final HostsList hl = HostsList.getRootGroup() ;
 

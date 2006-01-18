@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import jrds.JrdsLogger;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
@@ -22,7 +21,7 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public abstract class HttpProbe extends Probe  implements IndexedProbe {
-	static final private Logger logger = JrdsLogger.getLogger(HttpResponseTimeRrd.class);
+	static final private Logger logger = Logger.getLogger(HttpResponseTimeRrd.class);
 	private URL url;
 
 	/**

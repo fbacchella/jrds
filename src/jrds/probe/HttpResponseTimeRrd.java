@@ -14,7 +14,6 @@ import java.security.MessageDigest;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeUtility;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.graphe.HttpGraph;
@@ -29,7 +28,7 @@ import org.apache.log4j.Logger;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public final class HttpResponseTimeRrd extends ExternalCmdProbe implements UrlProbe {
-	static final private Logger logger = JrdsLogger.getLogger(HttpResponseTimeRrd.class.getPackage().getName());
+	static final private Logger logger = Logger.getLogger(HttpResponseTimeRrd.class);
 	private URL url;
 	static MessageDigest md5digest;
 	static jrds.PropertiesManager pm = jrds.PropertiesManager.getInstance();

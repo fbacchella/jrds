@@ -43,24 +43,6 @@ public class JrdsLogger {
 	}
 
 	/**
-	 * Return a configured logger, using the class package name for the appender name
-	 * @param clazz the class of the objet to get a logger for
-	 * @return configured logger
-	 */
-	static final public org.apache.log4j.Logger getLogger(Class clazz){
-		return Logger.getLogger(clazz.getPackage().getName());
-	}
-
-	/**
-	 * Return a configured logger, using string used as argument the appender name
-	 * @param clazz the appender name
-	 * @return configured logger
-	 */
-	static final public org.apache.log4j.Logger getLogger(String clazz){
-		return Logger.getLogger(clazz);
-	}
-
-	/**
 	 * Configure logging to go to a file
 	 * @param logfile The file to send log to
 	 */
@@ -108,5 +90,4 @@ public class JrdsLogger {
 		newApp.setName(APPENDER);
 		return newApp;
 	}
-
 }

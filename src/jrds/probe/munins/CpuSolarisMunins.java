@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public class CpuSolarisMunins extends MuninsProbe {
-	static private final Logger logger = JrdsLogger.getLogger(CpuSolarisMunins.class.getPackage().getName());
+	static private final Logger logger = Logger.getLogger(CpuSolarisMunins.class);
 
 	static final private ProbeDesc pd = new ProbeDesc(4);
 	static {

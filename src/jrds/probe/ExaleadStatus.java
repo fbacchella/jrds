@@ -12,11 +12,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -25,7 +24,7 @@ import jrds.RdsHost;
  * TODO 
  */
 public class ExaleadStatus extends HttpProbe {
-	static final private Logger logger = JrdsLogger.getLogger(ExaleadStatus.class);
+	static final private Logger logger = Logger.getLogger(ExaleadStatus.class);
 	static final ProbeDesc pd = new ProbeDesc(7);
 	static {
 		pd.add("err.adsense.connect", ProbeDesc.COUNTER, "errors.adsense.connect", 0, 100);

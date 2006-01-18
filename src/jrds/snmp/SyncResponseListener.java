@@ -5,8 +5,6 @@
  */
 package jrds.snmp;
 
-import jrds.JrdsLogger;
-
 import org.apache.log4j.Logger;
 import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.event.ResponseListener;
@@ -17,7 +15,7 @@ import org.snmp4j.event.ResponseListener;
  * TODO 
  */
 public class SyncResponseListener implements ResponseListener {
-	static private final Logger logger = JrdsLogger.getLogger(SyncResponseListener.class);
+	static private final Logger logger = Logger.getLogger(SyncResponseListener.class);
 	
 	private ResponseEvent response = null;
 	private Object lock;

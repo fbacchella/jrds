@@ -12,10 +12,11 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.graphe.SybaseGraph;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -24,7 +25,7 @@ import jrds.graphe.SybaseGraph;
  * TODO 
  */
 public class Sybase extends JdbcProbe {
-	static final private org.apache.log4j.Logger logger = JrdsLogger.getLogger(Sybase.class.getPackage().getName());
+	static final private org.apache.log4j.Logger logger = Logger.getLogger(Sybase.class);
 	private final static String urlPrefix = "jdbc:sybase:Tds:";
 	
 	private static final ProbeDesc pd = new ProbeDesc(5);

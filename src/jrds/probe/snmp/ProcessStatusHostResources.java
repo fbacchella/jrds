@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.snmp.SnmpRequester;
@@ -24,7 +23,7 @@ import org.snmp4j.smi.OID;
  * @version $Revision$,  $Date$
  */
 public class ProcessStatusHostResources extends RdsSnmpSimple {
-	static final private Logger logger = JrdsLogger.getLogger(ProcessStatusHostResources.class);
+	static final private Logger logger = Logger.getLogger(ProcessStatusHostResources.class);
 	static final private OID psProcessState = new OID(".1.3.6.1.2.1.25.4.2.1.7");
 	static final private String RUNNING="running";
 	static final private int RUNNINGINDEX = 1;

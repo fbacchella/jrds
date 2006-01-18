@@ -6,7 +6,6 @@ _##########################################################################*/
 
 package jrds.probe.snmp;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.snmp.SnmpRequester;
@@ -20,7 +19,7 @@ import org.snmp4j.smi.OID;
  * @version $Revision$,  $Date$
  */
 public class NumProcesses extends RdsSnmpSimple {
-	static final private Logger logger = JrdsLogger.getLogger(NumProcesses.class);
+	static final private Logger logger = Logger.getLogger(NumProcesses.class);
 	static final private OID hrSystemProcesses = new OID(".1.3.6.1.2.1.25.1.6");
 
 	static final private ProbeDesc pd = new ProbeDesc(1);

@@ -4,9 +4,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -15,7 +16,7 @@ import jrds.RdsHost;
  * TODO 
  */
 public class SybaseLock extends JdbcProbe {
-	static final private org.apache.log4j.Logger logger = JrdsLogger.getLogger(SybaseLock.class.getPackage().getName());
+	static final private org.apache.log4j.Logger logger = Logger.getLogger(SybaseLock.class);
 	private final static String urlPrefix = "jdbc:sybase:Tds:";
 	private final static int SEGMENT_SYSTEM = 1;
 	private final static int SEGMENT_USER = 2;

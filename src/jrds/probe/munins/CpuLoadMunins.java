@@ -5,7 +5,6 @@
  */
 package jrds.probe.munins;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
@@ -17,7 +16,7 @@ import org.apache.log4j.Logger;
  * TODO
  */
 public class CpuLoadMunins extends MuninsProbe {
-	static private final Logger logger = JrdsLogger.getLogger(CpuLoadMunins.class);
+	static private final Logger logger = Logger.getLogger(CpuLoadMunins.class);
 
 	static final private ProbeDesc pd = new ProbeDesc(1);
 	static {

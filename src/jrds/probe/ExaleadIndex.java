@@ -1,6 +1,5 @@
 package jrds.probe;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
@@ -13,7 +12,7 @@ import org.apache.log4j.Logger;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class ExaleadIndex extends Exalead {
-	static final private Logger logger = JrdsLogger.getLogger(ExaleadIndex.class);
+	static final private Logger logger = Logger.getLogger(ExaleadIndex.class);
 	static final ProbeDesc pd = new ProbeDesc(7);
 	static {
 		pd.add("threads", ProbeDesc.GAUGE);

@@ -34,7 +34,7 @@ import org.jrobin.core.Util;
 public abstract class Probe
 implements Comparable {
 	
-	static final private Logger logger = JrdsLogger.getLogger(Probe.class);
+	static final private Logger logger = Logger.getLogger(Probe.class);
 	
 	private String name;
 	private RdsHost monitoredHost;

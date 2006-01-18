@@ -9,7 +9,6 @@ package jrds.standalone;
 import java.io.File;
 
 import jrds.HostsList;
-import jrds.JrdsLogger;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
 import jrds.snmp.SnmpRequester;
@@ -38,11 +37,10 @@ public class Collector {
 		final HostsList hl = HostsList.fill(new File(pm.configfilepath));
 
 		logger.setLevel(Level.ERROR);
-		JrdsLogger.getLogger("").setLevel(Level.ERROR);
-		JrdsLogger.getLogger("jrds").setLevel(Level.ALL);
-		JrdsLogger.getLogger("probe").setLevel(Level.ALL);
+		Logger.getRootLogger().setLevel(Level.ERROR);
+		Logger.getLogger("jrds").setLevel(Level.ALL);
 		logger.info("jrds' collector started");
-		JrdsLogger.getLogger("org.snmp4j").setLevel(Level.ERROR);
+		Logger.getLogger("org.snmp4j").setLevel(Level.ERROR);
 		SnmpRequester.start();
 		for(int i = 0; i< 5 ; i++) {
 			hl.collectAll();

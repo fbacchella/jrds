@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import jrds.JrdsLogger;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
@@ -31,7 +30,7 @@ import org.snmp4j.smi.OID;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public abstract class SnmpProbe extends Probe {
-	static final private Logger logger = JrdsLogger.getLogger(SnmpProbe.class);
+	static final private Logger logger = Logger.getLogger(SnmpProbe.class);
 	private Target snmpTarget;
 	private Map nameMap = null;
 	private SnmpRequester requester;

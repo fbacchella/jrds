@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.probe.IndexedProbe;
@@ -23,7 +22,7 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public abstract class MuninsIndexedNameProbe extends MuninsProbe  implements IndexedProbe {
-	static final private Logger logger = JrdsLogger.getLogger(MuninsIndexedNameProbe.class);
+	static final private Logger logger = Logger.getLogger(MuninsIndexedNameProbe.class);
 	String indexKey;
 	Collection muninsName = null;
 

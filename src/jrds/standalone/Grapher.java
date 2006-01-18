@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class Grapher {
-	private static final Logger logger = JrdsLogger.getLogger(Grapher.class);
+	private static final Logger logger = Logger.getLogger(Grapher.class);
 	private static final PropertiesManager pm = PropertiesManager.getInstance();
 	
 	public static void main(String[] args) throws Exception {
@@ -39,9 +39,9 @@ public class Grapher {
 		final HostsList hl = HostsList.getRootGroup();
 		hl.append(new File(pm.configfilepath));
 
-		JrdsLogger.getLogger("").setLevel(Level.ALL);
-		JrdsLogger.getLogger("jrds").setLevel(Level.ALL);
-		JrdsLogger.getLogger("jrds.probe").setLevel(Level.ALL);
+		Logger.getLogger("").setLevel(Level.ALL);
+		Logger.getLogger("jrds").setLevel(Level.ALL);
+		Logger.getLogger("jrds.probe").setLevel(Level.ALL);
 		logger.setLevel(Level.ALL);
 		logger.info("jrds' grapher started");
 		

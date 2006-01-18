@@ -5,8 +5,6 @@
  */
 package jrds.snmp;
 
-import jrds.JrdsLogger;
-
 import org.apache.log4j.Logger;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.Target;
@@ -23,7 +21,7 @@ import org.snmp4j.smi.OctetString;
  * TODO 
  */
 public class TargetFactory {
-	static final private Logger logger = JrdsLogger.getLogger(TargetFactory.class);
+	static final private Logger logger = Logger.getLogger(TargetFactory.class);
 	static final TargetFactory instance=new TargetFactory();
 	static final String TCP = "tcp";
 	static final String UDP = "udp";

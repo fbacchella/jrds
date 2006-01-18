@@ -45,7 +45,7 @@ import org.jrobin.graph.RrdGraphDef;
 public class RdsGraph
 implements Comparable {
 	
-	static final private Logger logger = JrdsLogger.getLogger(RdsGraph.class);
+	static final private Logger logger = Logger.getLogger(RdsGraph.class);
 	static final private PropertiesManager pm = PropertiesManager.getInstance();
 	static final private SimpleDateFormat lastUpdateFormat = new
 	SimpleDateFormat("dd/MM/yyyy HH:mm");

@@ -12,14 +12,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jrds.JrdsLogger;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.probe.UrlProbe;
 
+import org.apache.log4j.Logger;
+
 public abstract class JdbcProbe extends Probe implements UrlProbe {
-	static final private org.apache.log4j.Logger logger = JrdsLogger.getLogger(JdbcProbe.class);
+	static final private org.apache.log4j.Logger logger = Logger.getLogger(JdbcProbe.class);
 	
 	static final void registerDriver(String JdbcDriver) {
 		try {

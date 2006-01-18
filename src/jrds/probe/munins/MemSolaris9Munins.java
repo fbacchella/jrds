@@ -5,7 +5,6 @@
  */
 package jrds.probe.munins;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
@@ -18,7 +17,7 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public class MemSolaris9Munins extends MuninsProbe {
-	static private final Logger logger = JrdsLogger.getLogger(MemSolaris9Munins.class.getPackage().getName());
+	static private final Logger logger = Logger.getLogger(MemSolaris9Munins.class);
 
 	static final private ProbeDesc pd = new ProbeDesc(4);
 	static {

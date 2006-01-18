@@ -6,8 +6,6 @@ package jrds.xmlResources;
 
 import java.io.InputStream;
 
-import jrds.JrdsLogger;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -16,7 +14,7 @@ import org.apache.log4j.Logger;
  * @version $Revision$
  */
 public class ResourcesLocator {
-    static final private Logger logger = JrdsLogger.getLogger(ResourcesLocator.class);
+    static final private Logger logger = Logger.getLogger(ResourcesLocator.class);
     /**
      * We don't want any constructor
      */

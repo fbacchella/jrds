@@ -5,10 +5,9 @@
  */
 package jrds.probe.munins;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.graphe.*;
+import jrds.graphe.PagingSolarisMuninsGraph;
 
 import org.apache.log4j.Logger;
 
@@ -19,7 +18,7 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public class PagingSolarisMunins extends MuninsProbe {
-	static private final Logger logger = JrdsLogger.getLogger(PagingSolarisMunins.class.getPackage().getName());
+	static private final Logger logger = Logger.getLogger(PagingSolarisMunins.class);
 
 	static final private ProbeDesc pd = new ProbeDesc(1);
 	static {

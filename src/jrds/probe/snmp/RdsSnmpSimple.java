@@ -7,7 +7,6 @@ package jrds.probe.snmp;
 
 import java.util.Set;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
@@ -20,7 +19,7 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public abstract class RdsSnmpSimple extends SnmpProbe  {
-	static final private Logger logger = JrdsLogger.getLogger(RdsSnmpSimple.class);
+	static final private Logger logger = Logger.getLogger(RdsSnmpSimple.class);
 
 	public RdsSnmpSimple(RdsHost monitoredHost, ProbeDesc pd) {
 		super(monitoredHost, pd);

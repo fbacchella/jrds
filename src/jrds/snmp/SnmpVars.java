@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 
-import jrds.JrdsLogger;
-
 import org.apache.log4j.Logger;
 import org.snmp4j.PDU;
 import org.snmp4j.asn1.BER;
@@ -36,7 +34,7 @@ import org.snmp4j.smi.VariableBinding;
  *  @author Fabrice Bacchella
  */
 public class SnmpVars extends HashMap {
-	static final private Logger logger = JrdsLogger.getLogger(SnmpVars.class.getPackage().getName());
+	static final private Logger logger = Logger.getLogger(SnmpVars.class);
 
 	static final private byte TAG1 = (byte) 0x9f;
 	static final private byte TAG_FLOAT = (byte) 0x78;

@@ -9,7 +9,6 @@ package jrds.probe.snmp;
 import java.util.Iterator;
 import java.util.Map;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.snmp.SnmpRequester;
@@ -24,7 +23,7 @@ import org.snmp4j.smi.OID;
  */
 public class CpuLoadInt
 extends RdsSnmpSimple {
-	static final private Logger logger = JrdsLogger.getLogger(CpuLoadInt.class);
+	static final private Logger logger = Logger.getLogger(CpuLoadInt.class);
 	
 	static final private ProbeDesc pd = new ProbeDesc(3);
 	static {

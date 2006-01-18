@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 public class GraphTreeNode {
 	static final int LEAF_GRAPHTITLE = 1;
 	static final int LEAF_HOSTNAME = 2;
-	static final private Logger logger = JrdsLogger.getLogger(GraphTreeNode.class);
+	static final private Logger logger = Logger.getLogger(GraphTreeNode.class);
 
 	private GraphTreeNode parent;
 	private Map childsMap;

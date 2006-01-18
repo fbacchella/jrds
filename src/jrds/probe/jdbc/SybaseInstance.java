@@ -4,10 +4,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.probe.IndexedProbe;
+
+import org.apache.log4j.Logger;
 
 
 /**
@@ -16,7 +17,7 @@ import jrds.probe.IndexedProbe;
  * TODO 
  */
 public class SybaseInstance extends JdbcProbe implements IndexedProbe {
-	static final private org.apache.log4j.Logger logger = JrdsLogger.getLogger(SybaseInstance.class.getPackage().getName());
+	static final private org.apache.log4j.Logger logger = Logger.getLogger(SybaseInstance.class);
 	private final static String urlPrefix = "jdbc:sybase:Tds:";
 	private final static int SEGMENT_SYSTEM = 1;
 	private final static int SEGMENT_USER = 2;

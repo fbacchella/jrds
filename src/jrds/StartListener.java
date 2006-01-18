@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public class StartListener implements ServletContextListener {
-	static final private Logger logger = JrdsLogger.getLogger(StartListener.class);
+	static final private Logger logger = Logger.getLogger(StartListener.class);
 	static final PropertiesManager pm = PropertiesManager.getInstance();
 	static final HostsList hl = HostsList.getRootGroup();
 	static private boolean started = false;

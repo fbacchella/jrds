@@ -20,7 +20,7 @@ public class Scale {
 	public static final String SCALE_WEEKLY = "Hebdomadaire";
 	public static final String SCALE_MONTHLY = "Mensuelle";
 	public static final String SCALE_YEARLY = "Annuelle";
-	static Logger logger = JrdsLogger.getLogger(Scale.class.getPackage().getName());
+	static Logger logger = Logger.getLogger(Scale.class);
 	int scale = 0;
 	public static String[] allScale;
 	static {

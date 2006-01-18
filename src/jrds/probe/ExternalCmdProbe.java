@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 
-import jrds.JrdsLogger;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
@@ -29,7 +28,7 @@ import org.jrobin.core.Sample;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public abstract class ExternalCmdProbe extends Probe {
-	static final private Logger logger = JrdsLogger.getLogger(ExternalCmdProbe.class);
+	static final private Logger logger = Logger.getLogger(ExternalCmdProbe.class);
 
 	static Runtime rt = Runtime.getRuntime();
 

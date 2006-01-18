@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public abstract class Exalead extends Probe {
-	static final private Logger logger = JrdsLogger.getLogger(Exalead.class);
+	static final private Logger logger = Logger.getLogger(Exalead.class);
 
 	static private final Pattern filter = Pattern.compile("(\\p{Alnum}+)=(\\p{Digit}+)");
 	static private final Pattern lastarted = Pattern.compile("last-started=\"([^\"]+)\"");

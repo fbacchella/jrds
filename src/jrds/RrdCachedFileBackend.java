@@ -13,7 +13,7 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import org.jrobin.core.RrdFileBackend;
 public class RrdCachedFileBackend extends RrdFileBackend {
-	static final private Logger logger = JrdsLogger.getLogger(RrdCachedFileBackend.class);
+	static final private Logger logger = Logger.getLogger(RrdCachedFileBackend.class);
 	
 	private static final int CACHE_LENGTH = 8192;
 	ByteBuffer byteBuffer;

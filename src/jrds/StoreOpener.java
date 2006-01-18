@@ -13,7 +13,7 @@ import org.jrobin.core.RrdOpener;
  * A wrapper classe, to manage the rrdDb operations
  */
 public final class StoreOpener {
-	static final private Logger logger = JrdsLogger.getLogger(StoreOpener.class);
+	static final private Logger logger = Logger.getLogger(StoreOpener.class);
 	
 	static final private RrdOpener opener = new RrdOpener(true);
 	

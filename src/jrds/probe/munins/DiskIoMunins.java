@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.graphe.DiskIoGraphBytes;
@@ -28,7 +27,7 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public class DiskIoMunins extends MuninsProbe implements IndexedProbe {
-	static private final Logger logger = JrdsLogger.getLogger(DiskIoMunins.class);
+	static private final Logger logger = Logger.getLogger(DiskIoMunins.class);
 	
 	static final private ProbeDesc pd = new ProbeDesc(6);
 	static {

@@ -5,7 +5,6 @@
  */
 package jrds.probe.munins;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.graphe.IfGraph;
@@ -20,7 +19,7 @@ import org.apache.log4j.Logger;
  */
 public class IfSolarisMunins extends MuninsIndexedNameProbe {
 	
-	static private final Logger logger = JrdsLogger.getLogger(IfLinuxMunins.class.getPackage().getName());
+	static private final Logger logger = Logger.getLogger(IfLinuxMunins.class);
 	
 	static final private ProbeDesc pd = new ProbeDesc(5);
 	static {

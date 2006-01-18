@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import jrds.JrdsLogger;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
@@ -29,7 +28,7 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public abstract class MuninsProbe extends Probe {
-	static final private Logger logger = JrdsLogger.getLogger(MuninsProbe.class);
+	static final private Logger logger = Logger.getLogger(MuninsProbe.class);
 	private Collection muninsName = null;
 	protected Map nameMap;
 

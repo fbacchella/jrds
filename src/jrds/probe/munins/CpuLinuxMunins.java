@@ -5,12 +5,11 @@
  */
 package jrds.probe.munins;
 
-import jrds.JrdsLogger;
+import jrds.GraphDesc;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
 import org.apache.log4j.Logger;
-import jrds.GraphDesc;
 
 
 /**
@@ -19,7 +18,7 @@ import jrds.GraphDesc;
  * TODO
  */
 public class CpuLinuxMunins extends MuninsProbe {
-	static private final Logger logger = JrdsLogger.getLogger(CpuLinuxMunins.class);
+	static private final Logger logger = Logger.getLogger(CpuLinuxMunins.class);
 	
 	static final private ProbeDesc pd = new ProbeDesc(7);
 	static {

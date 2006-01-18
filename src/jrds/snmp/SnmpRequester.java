@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import jrds.JrdsLogger;
 import jrds.probe.snmp.SnmpProbe;
 
 import org.apache.log4j.Logger;
@@ -31,7 +30,7 @@ import org.snmp4j.util.TableUtils;
  * @author Fabrice Bacchella
  */
 public abstract class SnmpRequester {
-	static private final Logger logger = JrdsLogger.getLogger(SnmpRequester.class);
+	static private final Logger logger = Logger.getLogger(SnmpRequester.class);
 	static private Snmp snmp;
 	static private boolean started = false;
 	static final private Object globLock = new Object();

@@ -5,7 +5,6 @@
  */
 package jrds.probe.munins;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.graphe.SwapIO;
@@ -19,7 +18,7 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public class SwapMunins extends MuninsProbe {
-	static private final Logger logger = JrdsLogger.getLogger(SwapMunins.class.getPackage().getName());
+	static private final Logger logger = Logger.getLogger(SwapMunins.class);
 
 	static final private ProbeDesc pd = new ProbeDesc(2);
 	static {
