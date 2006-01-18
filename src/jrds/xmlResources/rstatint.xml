@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+	<graphName>rstatmem</graphName>
+	<verticalLabel>Interuptions/s</verticalLabel>
+	<graphTitle>Interruption activity on {1}</graphTitle>
+	<add>
+		<name>v_intr</name>
+		<graphType>line</graphType>
+		<color>green</color>
+		<legend>Number of device interrupts</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>LOAD</pathelement>
+		<pathstring>Interruption activity by rstat</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>LOAD</pathelement>
+		<pathstring>Interruption activity by rstat</pathstring>
+		<pathelement>HOST</pathelement>
+	</viewtree>
+</graphdesc>
