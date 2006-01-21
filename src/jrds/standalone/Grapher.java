@@ -11,7 +11,6 @@ import java.io.PrintWriter;
 import java.util.Date;
 
 import jrds.HostsList;
-import jrds.JrdsLogger;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
 

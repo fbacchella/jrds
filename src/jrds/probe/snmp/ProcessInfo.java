@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import jrds.JrdsLogger;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.graphe.ProcessInfoNumber;

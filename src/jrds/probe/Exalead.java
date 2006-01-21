@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jrds.JrdsLogger;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
