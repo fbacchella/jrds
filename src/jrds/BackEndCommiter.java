@@ -1,9 +1,9 @@
-/*
- * Created on 29 juil. 2005
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+/*##########################################################################
+_##
+_##  $Id$
+_##
+_##########################################################################*/
+
 package jrds;
 
 import java.util.Collection;
@@ -16,15 +16,15 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
 /**
- * @author bacchell
+ * This class manage a thread that runs in the background and is used to commit to disk the RRD datas modifications.
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author Fabrice Bacchella
+ * @version $Revision$
  */
 public class BackEndCommiter {
 	static final private Logger logger = Logger.getLogger(BackEndCommiter.class);
 	
-	private static int syncPeriod = 30; //seconds
+	private int syncPeriod = 30; //seconds
 	static private BackEndCommiter instance = null;
 
 	private final Timer syncTimer = new Timer(true);
@@ -33,7 +33,6 @@ public class BackEndCommiter {
 	 * 
 	 */
 	private BackEndCommiter() {
-		instance = this;
 		createSyncTask(syncPeriod);
 	}
 	
@@ -55,7 +54,7 @@ public class BackEndCommiter {
 	
 	static public BackEndCommiter getInstance() {
 		if(instance == null) {
-			new BackEndCommiter();
+			instance = new BackEndCommiter();
 		}
 		return instance;
 	}
@@ -72,13 +71,13 @@ public class BackEndCommiter {
 	 * @return Returns the syncPeriod.
 	 */
 	public static int getSyncPeriod() {
-		return syncPeriod;
+		return instance.syncPeriod;
 	}
 	/**
 	 * @param syncPeriod The syncPeriod to set.
 	 */
 	public static void setSyncPeriod(int syncPeriod) {
-		BackEndCommiter.syncPeriod = syncPeriod;
+		instance.syncPeriod = syncPeriod;
 	}
 	
 }
