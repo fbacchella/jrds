@@ -9,8 +9,6 @@ import jrds.probe.snmp.SnmpProbe;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.PDU;
-import org.snmp4j.PDUv1;
-import org.snmp4j.ScopedPDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.Target;
 import org.snmp4j.event.ResponseEvent;
@@ -173,20 +171,7 @@ public abstract class SnmpRequester {
 	private static final Map doRequest(SnmpProbe probe, VariableBinding[] vars) {
 		Target snmpTarget = probe.getSnmpTarget();
 		SnmpVars snmpVars = null;
-		PDU requestPDU = null;
-	    switch (snmpTarget.getVersion()) {
-	      case SnmpConstants.version3: {
-	      	requestPDU = new ScopedPDU();
-	        break;
-	      }
-	      case SnmpConstants.version1: {
-	      	requestPDU = new PDUv1();
-	        break;
-	      }
-	      default:
-	      	requestPDU = new PDU();
-	    }
-	    requestPDU.setType(PDU.GET);
+		PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
 
 	    requestPDU.addAll(vars);
 
