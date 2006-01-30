@@ -48,7 +48,7 @@ public abstract class HttpProbe extends Probe  implements IndexedProbe {
 			in.close();
 			vars = parseLines(lines);
 		} catch (IOException e) {
-			logger.error("Unable to read url " + url + "because: " + e.getLocalizedMessage());
+			logger.error("Unable to read url " + url + " because: " + e.getMessage());
 		}
 		return vars;
 	}

@@ -199,7 +199,7 @@ implements Comparable {
 	public abstract Map getNewSampleValues();
 	
 	/**
-	 * A method that might be overiden if specif treatement is needed
+	 * A method that might be overiden if specific treatement is needed
 	 * by a probe.<br>
 	 * By default, it does nothing.
 	 * @param valuesList
@@ -251,7 +251,7 @@ implements Comparable {
 					catch (RrdException e1) {
 						logger.warn("Unable to update value " + value +
 								" from " + this +": " +
-								e1.getLocalizedMessage());
+								e1.getMessage());
 					}
 				}
 			}
@@ -278,9 +278,9 @@ implements Comparable {
 		}
 		catch (ArithmeticException ex) {
 			logger.warn("Error while storing sample: " +
-					ex.getLocalizedMessage());
+					ex.getMessage());
 		} catch (Exception e) {
-			logger.error("Error with probe " + this + ": " + e);
+			logger.error("Error with probe " + this + ": " + e.getMessage());
 		}
 		finally  {
 			if(rrdDb != null)
@@ -330,7 +330,7 @@ implements Comparable {
 			rrdDb = StoreOpener.getRrd(getRrdName());
 			lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
 		} catch (Exception e) {
-			logger.error("Unable to get last update date for" + this.getName() + ":" + e);
+			logger.error("Unable to get last update date for" + this.getName() + ": " + e.getMessage());
 		}
 		finally {
 			if(rrdDb != null)
