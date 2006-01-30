@@ -34,6 +34,7 @@ public class IfSolaris extends RdsIndexedSnmpRrd {
 		pd.add("ifOutDiscards", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.2.2.1.19"));
 		pd.add("ifOutErrors", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.2.2.1.20"));
 		pd.setGraphClasses(new Object[] {IfGraph.class, "ifpacketssnmp.xml", IfPacketSize.class});
+		pd.setIndexOid(new OID(".1.3.6.1.2.1.2.2.1.2"));
 		pd.setName("if-{1}");
 		pd.setUniqIndex(true);
 	}
