@@ -17,13 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 /**
- * <p>Title: </p>
- *
- * <p>Description: This servlet is used to download the values of a graph as an xml file</p>
- *
- * <p>Copyright: Copyright (c) 2005</p>
- *
- * <p>Company: </p>
+ * This servlet is used to download the values of a graph as an xml file
  *
  * @author Fabrice Bacchella
  * @version $Revision$
