@@ -10,7 +10,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -66,17 +65,6 @@ public class ChoiceJspBean {
 			scaleList.add(val);
 		}
 		return scaleList;
-	}
-	
-	public Collection getGroupList() {
-		List hList = new ArrayList(hl.size());
-		hList.add("<OPTION>" + ALLGROUPS + "</OPTION>");
-		for(Iterator i = hl.enumGroups().iterator() ; i.hasNext() ; ) {
-			String group = (String) i.next();
-			String val = "<OPTION>" + group + "</OPTION>";
-			hList.add(val);
-		}
-		return hList;
 	}
 	
 	private void jbInit() throws Exception {

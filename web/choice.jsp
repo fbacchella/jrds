@@ -41,15 +41,6 @@ function localReturn(y,m,d) {
 				<div align="center">
 					<table border="0" cellspacing="2" cellpadding="0">
 						<tr>
-							<td width="160">Choose a group</td>
-							<td><select name="group">
-									<c:forEach items="${jrdsBean.groupList}" var="i">
-										<c:out value="${i}" escapeXml="false" />
-									</c:forEach>
-								</select>
-							</td>
-						</tr>
-						<tr>
 							<td width="160">Choose a time scale</td>
 							<td><select name="scale">
 									<option value="1">Daily</option>
