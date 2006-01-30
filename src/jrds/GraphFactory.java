@@ -20,7 +20,8 @@ import org.apache.commons.digester.Rule;
 import org.apache.log4j.Logger;
 
 /**
- * This servlet reload the host list file
+ * This class is used to generate a class from an object.
+ *
  * @author Fabrice Bacchella
  * @version $Revision$
  */
@@ -38,6 +39,19 @@ public class GraphFactory {
 	private GraphFactory() {
 	}
 	
+	/**
+	 * This method is used to generate a class from an object. It can be :
+	 * 
+	 * <ul>
+	 * <li>a xml file, found by is URL ;</li>
+	 * <li>a GraphDesc Object ;</li>
+	 * <li>a RdsGraph Class</li>
+	 * </ul>
+	 * 
+	 * @param className the object from which the Graph will be created
+	 * @param probe the probe the graph will take data from
+	 * @return a new instanciated Graph
+	 */
 	public final static RdsGraph makeGraph(Object className, Probe probe) {
 		RdsGraph retValue = null;
 		
@@ -69,6 +83,8 @@ public class GraphFactory {
 		else if(className instanceof GraphDesc ) {
 			retValue = new RdsGraph(probe, (GraphDesc) className);
 		}
+		//We get a String
+		//it's an URL to xml description of the graph
 		else if(className instanceof String) {
 			String xmlRessourceName = (String)className;
 			java.net.URL url = ResourcesLocator.getResourceUrl(xmlRessourceName);
@@ -122,8 +138,7 @@ public class GraphFactory {
 				try {
 					xmlStream.close();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					logger.error("You're busted" +  e1.getMessage());
 				}
 			}
 		}
