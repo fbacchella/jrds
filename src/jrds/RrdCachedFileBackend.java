@@ -1,7 +1,9 @@
-/** 
- * JRobin backend which is used to store RRD data to ordinary disk files 
- * by using fast java.nio.* package ehanced with caching functionnalities. 
- */
+/*##########################################################################
+_##
+_##  $Id$
+_##
+_##########################################################################*/
+
 package jrds;
 
 import java.io.IOException;
@@ -9,9 +11,13 @@ import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
 import org.apache.log4j.Logger;
 import org.jrobin.core.RrdFileBackend;
+
+/** 
+ * JRobin backend which is used to store RRD data to ordinary disk files 
+ * by using fast java.nio.* package ehanced with caching functionnalities. 
+ */
 public class RrdCachedFileBackend extends RrdFileBackend {
 	static final private Logger logger = Logger.getLogger(RrdCachedFileBackend.class);
 	
