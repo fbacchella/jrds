@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+	<graphName>apacheworkers</graphName>
+	<verticalLabel>Workers</verticalLabel>
+	<graphTitle>Workers status on {2}</graphTitle>
+	<add>
+		<name>BusyWorkers</name>
+		<graphType>area</graphType>
+		<legend>Busy workers</legend>
+	</add>
+	<add>
+		<name>IdleWorkers</name>
+		<graphType>stack</graphType>
+		<legend>Idle Workers</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SERVICES</pathelement>
+		<pathstring>Apache</pathstring>
+		<pathelement>URL</pathelement>
+		<pathstring>Workers</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>SERVICES</pathelement>
+		<pathstring>Apache</pathstring>
+		<pathstring>Workers</pathstring>
+		<pathelement>URL</pathelement>
+	</viewtree>
+</graphdesc>
