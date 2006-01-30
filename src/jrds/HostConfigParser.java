@@ -3,7 +3,6 @@
 package jrds;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -19,13 +18,12 @@ import jrds.snmp.TargetFactory;
 import org.apache.log4j.Logger;
 import org.snmp4j.Target;
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 
 /**
  * Used to parse config.xml
- * @author Fabrice Bacchella(
+ * @author Fabrice Bacchella
  * @version $Revision$
  */
 public class HostConfigParser  extends DefaultHandler {
@@ -38,6 +36,7 @@ public class HostConfigParser  extends DefaultHandler {
 	private final String SNMP = "snmp";
 	private final String SNMPCOMMUNITY = "community";
 	private final String SNMPVERSION = "version";
+	private final String SNMPHOST = "host";
 	private final String RRD = "rrd";
 	private final String PROBE = "probe";
 	private final String ARG = "arg";
@@ -70,8 +69,7 @@ public class HostConfigParser  extends DefaultHandler {
 	
 	/**
 	 * Parse the config file
-	 * @throws SAXException
-	 * @throws IOException
+	 * @return all the valid hosts found in the config file
 	 */
 	public Collection parse()
 	{
@@ -82,7 +80,7 @@ public class HostConfigParser  extends DefaultHandler {
 			saxParser.parse(hostConfigFile, this);
 		} catch (Exception e) {
 			logger.warn("error during parsing of host config file " + hostConfigFile.getAbsolutePath() +
-					": ", e);
+					": " + e.getMessage());
 		}
 		return hostsCollection;
 	}
@@ -127,7 +125,10 @@ public class HostConfigParser  extends DefaultHandler {
 				targetFactory.setCommunity(atts.getValue(SNMPCOMMUNITY));
 				targetFactory.setVersion(atts.getValue(SNMPVERSION));
 				targetFactory.setPort(atts.getValue(PORT));
-				targetFactory.setHostname(lastHost.getName());
+				String hostName = atts.getValue(SNMPHOST);
+				if(hostName == null)
+					hostName = lastHost.getName();
+				targetFactory.setHostname(hostName);
 				lastSnmpTarget =  targetFactory.makeTarget();
 				if(probeType == null) {
 					lastHost.setTarget(lastSnmpTarget);
@@ -172,7 +173,7 @@ public class HostConfigParser  extends DefaultHandler {
 			}
 		} catch (RuntimeException e) {
 			logger.warn("error during parsing of host config file " + hostConfigFile.getAbsolutePath() +
-					": ", e);
+					": ", e.getCause());
 		}
 	}	
 }
