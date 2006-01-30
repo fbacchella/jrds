@@ -79,7 +79,7 @@
 			<link href="http://www.jrobin.org/javadoc"/>
         		<link href="http://logging.apache.org/log4j/docs/api"/>
    			<link href="http://www.mathcs.emory.edu/dcl/util/backport-util-concurrent/doc/api"/>
-			<link href="http://remotetea.sourceforge.net/javadoc/index.html"/>
+			<link href="http://remotetea.sourceforge.net/javadoc"/>
         </javadoc>
     </target>
 
