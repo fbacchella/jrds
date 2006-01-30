@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import jrds.snmp.SnmpRequester;
 
@@ -42,7 +41,6 @@ public class HostsList {
 	private GraphTreeNode graphTreeByView = null;
 	private Map graphMap;
 	private Map groupList;
-	private String group;
 	private static final String hostRoot = "Sorted by host";
 	private static final String viewRoot = "Sorted by view";
 
@@ -60,8 +58,6 @@ public class HostsList {
 		graphMap = new HashMap();
 		groupList = new TreeMap(String.CASE_INSENSITIVE_ORDER);
 		hostList = new HashSet();
-		group = null;
-		
 	}
 	public static HostsList getRootGroup() {
 		if (instance == null)
@@ -159,12 +155,6 @@ public class HostsList {
 			allrrds.addAll(oneHost.getProbes());
 		}
 		return allrrds;
-	}
-
-	public Collection enumGroups() {
-		Collection allGroups = new TreeSet(String.CASE_INSENSITIVE_ORDER);
-		allGroups.addAll(groupList.keySet());
-		return allGroups;
 	}
 
 	public int size() {

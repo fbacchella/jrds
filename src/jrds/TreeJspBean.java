@@ -26,10 +26,8 @@ import org.apache.log4j.Logger;
  */
 public class TreeJspBean implements Serializable {
 	static private final Logger logger = Logger.getLogger(TreeJspBean.class);
-	private static final HostsList rootHostList = HostsList.getRootGroup();
 	static final private DateFormat df = new SimpleDateFormat("d/M/y");
 	static final private PropertiesManager pm = PropertiesManager.getInstance();
-	private HostsList hostList = null;
 	private Date end;
 	private Date begin;
 	int dateField = -1;
@@ -41,9 +39,9 @@ public class TreeJspBean implements Serializable {
 		String retValue = "";
 		GraphTreeNode graphTree = null;
 		if(sort == GraphTreeNode.LEAF_GRAPHTITLE )
-			graphTree = hostList.getGraphTreeByHost();
+			graphTree = HostsList.getRootGroup().getGraphTreeByHost();
 		else if(sort == GraphTreeNode.LEAF_HOSTNAME)
-			graphTree = hostList.getGraphTreeByView();
+			graphTree = HostsList.getRootGroup().getGraphTreeByView();
 		try {
 			if(graphTree != null) {
 				graphTree.getJavaScriptCode(out, begin, end, father + "_0");
@@ -82,11 +80,6 @@ public class TreeJspBean implements Serializable {
 			endCal.setTimeInMillis(-1);
 		}
 		end = endCal.getTime();
-	}
-
-	public void setGroup(String hostList)
-	{
-		this.hostList = rootHostList;
 	}
 
 	private void calcDate() {
