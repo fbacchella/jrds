@@ -89,7 +89,7 @@ public abstract class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProb
 			String name = null;
 			OID tryoid = (OID)i.next();
 			if(tryoid != null)
-				name = (String) somevars.get(tryoid);
+				name = somevars.get(tryoid).toString();
 			if(name != null && indexKey.equals(name)) {
 				int index = tryoid.removeLast();
 				indexAsString.add(Integer.toString(index));
