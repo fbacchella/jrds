@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 public class ProbeFactory {
     static private final Logger logger = Logger.getLogger(ProbeFactory.class);
     static final private List argPackages = new ArrayList(3);
-    static final private List probePackages = new ArrayList(2);
+    static final private List probePackages = new ArrayList(5);
 
     static {
         argPackages.add("java.lang.");
@@ -32,7 +32,7 @@ public class ProbeFactory {
         probePackages.add("jrds.probe.munins.");
         probePackages.add("jrds.probe.rstat.");
         probePackages.add("jrds.probe.jdbc.");
-               probePackages.add("");
+        probePackages.add("");
 
     }
 
@@ -43,26 +43,38 @@ public class ProbeFactory {
 
     }
 
+    /**
+     * Create an objet providing the class name and a String argument. So the class must have
+     * a constructor taking only a string as an argument.
+     * @param className
+     * @param value
+     * @return
+     */
     public static Object makeArg(String className, String value) {
-        Object retValue = null;
-        Class classType = resolvClass(className, argPackages);
-        if (classType != null) {
-            Class[] argsType = {
-                value.getClass()};
-            Object[] args = {
-                value};
-
-            try {
-                Constructor theConst = classType.getConstructor(argsType);
-                retValue = theConst.newInstance(args);
-            }
-            catch (Exception ex) {
-                logger.warn("Error during of creation :" + className + ": ", ex);
-            }
-        }
-        return retValue;
+    	Object retValue = null;
+    	Class classType = resolvClass(className, argPackages);
+    	if (classType != null) {
+    		Class[] argsType = { String.class };
+    		Object[] args = { value };
+    		
+    		try {
+    			Constructor theConst = classType.getConstructor(argsType);
+    			retValue = theConst.newInstance(args);
+    		}
+    		catch (Exception ex) {
+    			logger.warn("Error during of creation :" + className + ": ", ex);
+    		}
+    	}
+    	return retValue;
     }
-
+    
+    /**
+     * Create an probe, provded his Class and a list of argument for a constructor
+     * for this object. It will be found using the default list of possible package
+     * @param className the probe name
+     * @param constArgs
+     * @return
+     */
     public static Probe makeProbe(String className, List constArgs) {
         Probe retValue = null;
         Class probeClass = resolvClass(className, probePackages);
@@ -92,6 +104,13 @@ public class ProbeFactory {
         return retValue;
     }
 
+    /**
+     * Return a class by is name and a list of possible package in which it can be
+     * found
+     * @param name the class name
+     * @param packList a List of package name
+     * @return
+     */
     static private Class resolvClass(String name, List packList) {
         Class retValue = null;
         for (Iterator i = packList.iterator(); i.hasNext() && retValue == null; ) {
