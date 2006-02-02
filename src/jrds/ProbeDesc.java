@@ -86,7 +86,7 @@ public class ProbeDesc implements Cloneable {
 	 * Create a new Probe Description
 	 */
 	public ProbeDesc() {
-		dsMap = new HashMap();
+		dsMap = new LinkedHashMap();
 	}
 	
 	//Differets way to add a munins probe
