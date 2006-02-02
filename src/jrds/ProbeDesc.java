@@ -79,7 +79,7 @@ public class ProbeDesc implements Cloneable {
 	 * @param size estimated elements number
 	 */
 	public ProbeDesc(int size) {
-		dsMap = new HashMap(size);
+		dsMap = new LinkedHashMap(size);
 	}
 	
 	/**
@@ -145,7 +145,7 @@ public class ProbeDesc implements Cloneable {
 	 */
 	public Map getOidNameMap()
 	{
-		Map retValue = new HashMap(dsMap.size());
+		Map retValue = new LinkedHashMap(dsMap.size());
 		for(Iterator i = dsMap.entrySet().iterator(); i.hasNext() ;) {
 			Map.Entry e = (Map.Entry) i.next();
 			DsDesc dd = (DsDesc) e.getValue();
@@ -161,7 +161,7 @@ public class ProbeDesc implements Cloneable {
 	 */
 	public Map getProbesNamesMap()
 	{
-		Map retValue = new HashMap(dsMap.size());
+		Map retValue = new LinkedHashMap(dsMap.size());
 		for(Iterator i = dsMap.entrySet().iterator(); i.hasNext() ;) {
 			Map.Entry e = (Map.Entry) i.next();
 			DsDesc dd = (DsDesc) e.getValue();
@@ -172,7 +172,7 @@ public class ProbeDesc implements Cloneable {
 	}
 	
 	public Map getDsNameMap() {
-		Map retValue = new HashMap(dsMap.size());
+		Map retValue = new LinkedHashMap(dsMap.size());
 		for(Iterator i = dsMap.entrySet().iterator(); i.hasNext() ;) {
 			Map.Entry e = (Map.Entry) i.next();
 			DsDesc dd = (DsDesc) e.getValue();
