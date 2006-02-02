@@ -6,16 +6,12 @@
  */
 package jrds.probe;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.net.URL;
 import java.security.MessageDigest;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeUtility;
-
 import jrds.ProbeDesc;
 import jrds.RdsHost;
+import jrds.Util;
 import jrds.graphe.HttpGraph;
 
 import org.apache.log4j.Logger;
@@ -62,14 +58,7 @@ public final class HttpResponseTimeRrd extends ExternalCmdProbe implements UrlPr
 		String retval = null;
 		md5digest.reset();
 		byte[] digestval = md5digest.digest(url.toString().getBytes());
-		ByteArrayOutputStream digestOs = new ByteArrayOutputStream(digestval.length * 2);
-		try {
-			MimeUtility.encode(digestOs, "base64").write(digestval);
-			retval = "url-" + digestOs.toString();
-			retval = retval.replace('/', '_');
-		} catch (IOException e) {
-		} catch (MessagingException e) {
-		}
+		retval =  "url-" + Util.toBase64(digestval);;
 		return retval;
 	}
 	/**
