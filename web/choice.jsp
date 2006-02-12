@@ -25,7 +25,7 @@ cal.setTodayText("Aujourd hui");
 cal.setReturnFunction("localReturn");
 cal.showYearNavigation();
 function localReturn(y,m,d) {
-	document.forms[0].date.value=d+"/"+m+"/"+y;
+	document.forms[0].date.value=y+"/"+m+"/"+d;
 }
 </script>
 	</head>
@@ -43,10 +43,10 @@ function localReturn(y,m,d) {
 						<tr>
 							<td width="160">Choose a time scale</td>
 							<td><select name="scale">
-									<option value="1">Daily</option>
-									<option value="2">Hebdomadaire</option>
-									<option value="3">Weekly</option>
-									<option value="4">Annually</option>
+									<option value="0">Daily</option>
+									<option value="1">Weekly</option>
+									<option value="2">Monthly</option>
+									<option value="3">Yearly</option>
 								</select></td>
 						</tr>
 						<tr>
