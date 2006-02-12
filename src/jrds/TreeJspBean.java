@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
  */
 public class TreeJspBean implements Serializable {
 	static private final Logger logger = Logger.getLogger(TreeJspBean.class);
-	static final private DateFormat df = new SimpleDateFormat("d/M/y");
+	static final private DateFormat df = new SimpleDateFormat("y/M/d");
 	static final private PropertiesManager pm = PropertiesManager.getInstance();
 	private Date end;
 	private Date begin;
@@ -57,14 +57,7 @@ public class TreeJspBean implements Serializable {
 	 */
 	public  void setScale(String scale) {
 		int s = Integer.parseInt(scale);
-		if(s == 1)
-			dateField = Calendar.DATE;
-		else if(s == 2)
-			dateField = Calendar.WEEK_OF_YEAR;
-		else if(s == 3)
-			dateField = Calendar.MONTH;
-		else if(s == 4)
-			dateField = Calendar.YEAR;
+		dateField = 0 - s;
 	}
 
 	public void setDate(String date) {
