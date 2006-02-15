@@ -4,7 +4,7 @@
  _##
  _##########################################################################*/
 
-package jrds;
+package jrds.webapp;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -16,6 +16,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import jrds.*;
 
 import org.apache.log4j.Logger;
 

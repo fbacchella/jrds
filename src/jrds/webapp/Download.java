@@ -1,4 +1,4 @@
-package jrds;
+package jrds.webapp;
 
 // ----------------------------------------------------------------------------
 // $Id$
@@ -13,6 +13,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import jrds.*;
 
 import org.apache.log4j.Logger;
 
@@ -28,7 +29,7 @@ public class Download
     extends HttpServlet {
     private static final String CONTENT_TYPE = "text/csv";
 
-    static final private Logger logger = Logger.getLogger(Graph.class);
+    static final private Logger logger = Logger.getLogger(Download.class);
 
     static final HostsList hl = HostsList.getRootGroup() ;
 

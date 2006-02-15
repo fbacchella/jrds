@@ -3,7 +3,7 @@
  *
  * TODO
  */
-package jrds;
+package jrds.webapp;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import javax.servlet.jsp.JspWriter;
+import jrds.*;
 
 import org.apache.log4j.Logger;
 

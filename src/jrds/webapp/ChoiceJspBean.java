@@ -3,11 +3,12 @@
  *
  * TODO
  */
-package jrds;
+package jrds.webapp;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import jrds.*;
 
 import org.apache.log4j.Logger;
 
