@@ -132,7 +132,7 @@ implements Comparable {
 		return getName() + ".png";
 	}
 	
-	protected void setGraphTitle(String title) {
+	public void setGraphTitle(String title) {
 		this.graphTitle = title;
 	}
 	
@@ -156,7 +156,7 @@ implements Comparable {
 		
 	}
 	
-	protected String getGraphTitle() {
+	public String getGraphTitle() {
 		if(graphTitle == null) {
 			graphTitle = parseTemplate(gd.getGraphTitle());
 		}
