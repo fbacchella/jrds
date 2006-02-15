@@ -29,8 +29,8 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public class GraphTreeNode {
-	static final int LEAF_GRAPHTITLE = 1;
-	static final int LEAF_HOSTNAME = 2;
+	static public final int LEAF_GRAPHTITLE = 1;
+	static public final int LEAF_HOSTNAME = 2;
 	static final private Logger logger = Logger.getLogger(GraphTreeNode.class);
 
 	private GraphTreeNode parent;
