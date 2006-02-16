@@ -181,25 +181,17 @@ public class HostsList {
 		return (RdsGraph) graphMap.get(new Integer(id));
 	}
 
-	/*public HostsList findGroup(String group) {
-		HostsList hl = (HostsList) groupList.get(group);
-		if (hl == null) {
-			hl = new HostsList(group);
-			groupList.put(group, hl);
-		}
-		return hl;
-	}*/
-
 	public GraphTreeNode getNodeByPath(String path) {
-		List pathList = new LinkedList(Arrays.asList(path.split("/")));
 		GraphTreeNode node = null;
-		pathList.remove(0);
-		String rootName = (String) pathList.get(0);
-		if (hostRoot.equals(rootName))
-			node = getGraphTreeByHost().getByPath(pathList);
-		else if (viewRoot.equals(rootName))
-			node = getGraphTreeByView().getByPath(pathList);
-
+		if(path != null) {
+			List pathList = new LinkedList(Arrays.asList(path.split("/")));
+			pathList.remove(0);
+			String rootName = (String) pathList.get(0);
+			if (hostRoot.equals(rootName))
+				node = getGraphTreeByHost().getByPath(pathList);
+			else if (viewRoot.equals(rootName))
+				node = getGraphTreeByView().getByPath(pathList);
+		}
 		return node;
 	}
 }
