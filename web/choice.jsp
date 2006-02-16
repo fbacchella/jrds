@@ -1,7 +1,8 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ page session="false" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
+<%@taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+<%@taglib uri="http://jakarta.apache.org/taglibs/datetime-1.0" prefix="dt"%>
 <jsp:useBean id="jrdsBean" class="jrds.ChoiceJspBean" />
 
 <html>
@@ -25,7 +26,7 @@ cal.setTodayText("Aujourd hui");
 cal.setReturnFunction("localReturn");
 cal.showYearNavigation();
 function localReturn(y,m,d) {
-	document.forms[0].date.value=y+"/"+m+"/"+d;
+	document.forms[0].date.value=y+"-"+m+"-"+d;
 }
 </script>
 	</head>
@@ -51,7 +52,7 @@ function localReturn(y,m,d) {
 						</tr>
 						<tr>
 							<td width="160">Choose the end date</td>
-							<td><input type="text" name="date" value=<%= jrdsBean.getNow() %> size="9" /><a name="anchor" id="anchor" title="Sélection de la date" onclick="cal.select(document.forms[0].date,'anchor','dd/MMM/yyyy'); return false;" name="anchor" href="#"><img src="img/cal.gif" alt="calendrier" height="16" width="16" border="0"></a></td>
+							<td><input type="text" name="date" value="<dt:format pattern="yyyy-MM-dd"><dt:currentTime/></dt:format>" size="9" /><a name="anchor" id="anchor" title="Sélection de la date" onclick="cal.select(document.forms[0].date,'anchor','dd/MMM/yyyy'); return false;" name="anchor" href="#"><img src="img/cal.gif" alt="calendrier" height="16" width="16" border="0"></a></td>
 						</tr>
 					</table>
 					<input type="submit" name="submitButtonName"></div>
