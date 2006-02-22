@@ -14,7 +14,6 @@ import java.util.Map;
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.graphe.SybaseGraph;
 
 import org.apache.log4j.Logger;
 
@@ -35,7 +34,7 @@ public class Sybase extends JdbcProbe {
 		pd.add("data", ProbeDesc.GAUGE);
 		pd.add("index_size", ProbeDesc.GAUGE);
 		pd.add("unused", ProbeDesc.GAUGE);
-		pd.setGraphClasses(new Class[] { SybaseGraph.class });
+		pd.setGraphClasses(new Class[] { Sybase.class });
 	}
 	
 	static {
