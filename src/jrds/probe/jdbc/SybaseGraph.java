@@ -3,7 +3,7 @@
  *
  * TODO 
  */
-package jrds.graphe;
+package jrds.probe.jdbc;
 
 import java.awt.Color;
 
