@@ -1,8 +1,9 @@
-/*
- * Created on 9 déc. 2004
- *
- * TODO 
- */
+/*##########################################################################
+_##
+_##  $Id$
+_##
+_##########################################################################*/
+
 package jrds;
 
 import java.io.IOException;
@@ -24,9 +25,9 @@ import org.apache.log4j.Logger;
 
 
 /**
- * @author bacchell
- *
- * TODO 
+  *
+ * @author Fabrice Bacchella
+ * @version $Revision$
  */
 public class GraphTreeNode {
 	static public final int LEAF_GRAPHTITLE = 1;
@@ -89,8 +90,11 @@ public class GraphTreeNode {
 			imgUrl.append("&");
 			imgUrl.append(argsBeginEnd);
 			
-			childsarray.append("    gLnk('R', ");
-			childsarray.append("'" + leafName +"',");
+			childsarray.append("    gLnk('R', ");           
+			/* replace \ with \\
+			 * ex: C:\ become C:\\
+			 * */   
+			childsarray.append("'" + leafName.replaceAll("\\\\","\\\\\\\\") +"',");
 			childsarray.append("'" + imgUrl +"'");
 			childsarray.append("),\n");
 		}
