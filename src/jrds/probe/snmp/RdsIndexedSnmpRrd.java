@@ -90,7 +90,7 @@ public abstract class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProb
 			OID tryoid = (OID)i.next();
 			if(tryoid != null)
 				name = somevars.get(tryoid).toString();
-			if(name != null && indexKey.equals(name)) {
+			if(name != null && matchIndex(indexKey, name)) {
 				int index = tryoid.removeLast();
 				indexAsString.add(Integer.toString(index));
 				found = true;
@@ -104,6 +104,15 @@ public abstract class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProb
 		return indexAsString;
 	}
 
+	/**
+	 * This method check if the tried value match the index
+	 * @param index the index value 
+	 * @param key the found key tried
+	 * @return
+	 */
+	public boolean matchIndex(String index, String key) {
+		return index.equals(key);
+	}
 	/**
 	 * @see jrds.probe.snmp.SnmpProbe#getOidSet()
 	 */
