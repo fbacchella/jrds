@@ -7,10 +7,10 @@ _##########################################################################*/
 package jrds;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,15 +19,13 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.servlet.jsp.JspWriter;
-
 import org.apache.log4j.Logger;
 
 
 /**
   *
  * @author Fabrice Bacchella
- * @version $Revision$
+ * @version $Revision$ $Date$
  */
 public class GraphTreeNode {
 	static public final int LEAF_GRAPHTITLE = 1;
@@ -68,53 +66,60 @@ public class GraphTreeNode {
 		return retValue;
 	}
 
-	private void _getJavaScriptCode(JspWriter out, String argsBeginEnd, String curNode) throws IOException {
-		out.print(curNode +" = gFld('" + name +"', 'graphlist" + getPath() + "?" + argsBeginEnd + "');\n");
-	
-		int depth = 0;
+	public void getJavaScriptCode(Writer out, String queryString, String curNode) throws IOException {
 		StringBuffer childsarray = new StringBuffer(1000);
-		for(Iterator i = childsMap.values().iterator(); i.hasNext(); depth++) {
-			String child = curNode + "_" + depth;
+		childsarray.append(curNode + " = gFld('" + name + "', 'graphlist" + getPath());
+		if(queryString != null &&  ! "".equals(queryString))
+			childsarray.append("?" + queryString);
+		childsarray.append("');\n");
+		childsarray.append(curNode +".addChildren([\n");
+		int width = 0;
+		boolean first = true;
+		for(Iterator i = childsMap.values().iterator(); i.hasNext(); width++) {
+			if(! first)
+				childsarray.append(", ");
+			else {
+				childsarray.append("    ");
+				first = false;
+			}
+			String child = curNode + "_" + width;
 			GraphTreeNode o = (GraphTreeNode) i.next();
-			o._getJavaScriptCode(out, argsBeginEnd, child);
-			childsarray.append("    " + child + ",");
+			o.getJavaScriptCode(out, queryString, child);
+			childsarray.append(child);
 		}
 		for(Iterator i = graphsSet.entrySet().iterator(); i.hasNext(); ) {
+			if(! first)
+				childsarray.append(",\n");
+			else
+				first = false;
 			Map.Entry e = (Map.Entry) i.next();
 			RdsGraph currGraph = (RdsGraph) e.getValue();
-			String leafName = (String) e.getKey();
+			String leafName = ((String) e.getKey()).replaceAll("\\\\","\\\\\\\\");
 			
-			StringBuffer imgUrl = new StringBuffer(50);
-			imgUrl.append("simplegraph.html?id=");
-			imgUrl.append(currGraph.hashCode());
-			imgUrl.append("&");
-			imgUrl.append(argsBeginEnd);
-			
-			childsarray.append("    gLnk('R', ");           
+			//childsarray.append("    gLnk('R', ");
+			childsarray.append("    [");
 			/* replace \ with \\
 			 * ex: C:\ become C:\\
 			 * */   
-			childsarray.append("'" + leafName.replaceAll("\\\\","\\\\\\\\") +"',");
-			childsarray.append("'" + imgUrl +"'");
-			childsarray.append("),\n");
+			childsarray.append("'" + leafName +"',");
+			childsarray.append("'");
+			childsarray.append("simplegraph.jsp?id=");
+			childsarray.append(currGraph.hashCode());
+			if(queryString != null &&  ! "".equals(queryString)) {
+				childsarray.append("&");
+				childsarray.append(queryString);
+			}
+			//childsarray.append("')");
+			childsarray.append("']");
 		}
+		if(! first)
+			childsarray.append("\n");
+		childsarray.append("]);\n");
 		if(childsarray.length() > 0) {
-			out.print(curNode +".addChildren([\n");
-			out.print(childsarray);
-			out.print("]);\n");
+			out.write(childsarray.toString());
 		}
-	}
-	
-	public void getJavaScriptCode(JspWriter out, Calendar begin, Calendar end, String curNode) throws IOException {
-		String argsBeginEnd = "begin=" + begin.getTimeInMillis() + "&end=" + end.getTimeInMillis();
-		_getJavaScriptCode(out, argsBeginEnd, curNode);
 	}
 
-	public void getJavaScriptCode(JspWriter out, Date begin, Date end, String curNode) throws IOException {
-		String argsBeginEnd = "begin=" + begin.getTime() + "&end=" + end.getTime();
-		_getJavaScriptCode(out, argsBeginEnd, curNode);
-	}
-	
 	public GraphTreeNode getByPath(List path) {
 		GraphTreeNode retValue = null;
 		if(path.size() == 1) {

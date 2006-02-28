@@ -7,19 +7,19 @@
 	</listener>
 	<servlet>
 		<servlet-name>Graph</servlet-name>
-		<servlet-class>jrds.Graph</servlet-class>
+		<servlet-class>jrds.webapp.Graph</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>GraphList</servlet-name>
-		<servlet-class>jrds.GraphList</servlet-class>
+		<servlet-class>jrds.webapp.GraphList</servlet-class>
 	</servlet>
     <servlet>
         <servlet-name>download</servlet-name>
-        <servlet-class>jrds.Download</servlet-class>
+        <servlet-class>jrds.webapp.Download</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>reload</servlet-name>
-        <servlet-class>jrds.ReloadHostList</servlet-class>
+        <servlet-class>jrds.webapp.ReloadHostList</servlet-class>
     </servlet>   		
 	<servlet-mapping>
 		<servlet-name>Graph</servlet-name>

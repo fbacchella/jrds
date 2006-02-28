@@ -23,6 +23,9 @@ import org.apache.log4j.Logger;
  * @version $Revision$
  */
 public class ReloadHostList extends HttpServlet {
+	/**
+	 * 
+	 */
 	static final private Logger logger = Logger.getLogger(ReloadHostList.class);
 	private static final PropertiesManager pm = PropertiesManager.getInstance();
 

@@ -8,9 +8,9 @@ package jrds.webapp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import jrds.*;
 
-import org.apache.log4j.Logger;
+import jrds.HostsList;
+import jrds.PropertiesManager;
 
 
 /**
@@ -19,7 +19,6 @@ import org.apache.log4j.Logger;
  */
 public class ChoiceJspBean {
 	static final public String ALLGROUPS = "tous";
-	static final private Logger logger = Logger.getLogger(ChoiceJspBean.class);
 	static final HostsList hl = HostsList.getRootGroup() ;
 	static final PropertiesManager pm = PropertiesManager.getInstance();
 	static final DateFormat df = new SimpleDateFormat("d/M/y");

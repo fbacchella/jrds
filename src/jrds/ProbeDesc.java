@@ -185,7 +185,6 @@ public class ProbeDesc implements Cloneable {
 	public DsDef[] getDsDefs() throws RrdException
 	{
 		List dsList = new ArrayList(dsMap.size());
-		int j = 0;
 		for(Iterator i = dsMap.entrySet().iterator(); i.hasNext() ;) {
 			Map.Entry e = (Map.Entry) i.next();
 			DsDesc desc = (DsDesc) e.getValue();

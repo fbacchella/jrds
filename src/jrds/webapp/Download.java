@@ -1,7 +1,7 @@
 package jrds.webapp;
 
-// ----------------------------------------------------------------------------
-// $Id$
+//----------------------------------------------------------------------------
+//$Id$
 
 import java.io.IOException;
 import java.util.Date;
@@ -23,26 +23,25 @@ import jrds.RdsGraph;
  * @version $Revision$
  */
 
+public class Download extends HttpServlet {
+	private static final String CONTENT_TYPE = "text/csv";
 
-public class Download
-    extends HttpServlet {
-    private static final String CONTENT_TYPE = "text/csv";
+	private static final HostsList hl = HostsList.getRootGroup();
 
-    static final HostsList hl = HostsList.getRootGroup() ;
+	public void doGet(HttpServletRequest req, HttpServletResponse res)
+			throws ServletException, IOException {
 
-   public void doGet(HttpServletRequest req, HttpServletResponse res) throws
-        ServletException, IOException {
-
-	   	Period p = new Period(req.getParameter("begin"), req.getParameter("end"));
+		Period p = new Period(req.getParameter("begin"), 
+				req.getParameter("end"));
 		Date begin = p.getBegin();
 		Date end = p.getEnd();
 
-        res.setContentType(CONTENT_TYPE);
+		res.setContentType(CONTENT_TYPE);
 
-        String rrdId = req.getParameter("id");
-        RdsGraph graph = hl.getGraphById(Integer.parseInt(rrdId));
-        ServletOutputStream out = res.getOutputStream();
+		String rrdId = req.getParameter("id");
+		RdsGraph graph = hl.getGraphById(Integer.parseInt(rrdId));
+		ServletOutputStream out = res.getOutputStream();
 
-        graph.writeCsv(out, begin, end);
-    }
- }
+		graph.writeCsv(out, begin, end);
+	}
+}

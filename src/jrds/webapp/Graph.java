@@ -7,16 +7,17 @@
 package jrds.webapp;
 
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import jrds.*;
+
+import jrds.HostsList;
+import jrds.Period;
+import jrds.RdsGraph;
 
 import org.apache.log4j.Logger;
 
@@ -33,11 +34,17 @@ public final class Graph extends HttpServlet {
 	 */
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException {
-		final HostsList hl = HostsList.getRootGroup() ;
-		Date begin = new Date(0);
-		Date end = new Date(0);
-		
-		calcDate(req.getParameter("begin"), req.getParameter("end"), begin, end);
+		final HostsList hl = HostsList.getRootGroup();
+
+		String scale = req.getParameter("scale");
+		Period p = null;
+		int scaleVal = -1;
+		if(scale != null && (scaleVal = Integer.parseInt(scale)) > 0)
+			p = new Period(scaleVal);
+		else
+			p = new Period(req.getParameter("begin"), req.getParameter("end"));
+		Date begin = p.getBegin();
+		Date end = p.getEnd();
 		
 		if("true".equals(req.getParameter("refresh"))) {
 			long delta = end.getTime() - begin.getTime();
@@ -51,7 +58,7 @@ public final class Graph extends HttpServlet {
 		res.setContentType("image/png");
 		ServletOutputStream out = res.getOutputStream();
 		res.addHeader("Cache-Control", "no-cache");
-		
+		logger.debug("" + begin + " to " + end);
 		graph.writePng(out, begin, end);
 	}
 	
@@ -112,66 +119,6 @@ public final class Graph extends HttpServlet {
 		retValue.append(">");
 		
 		return retValue.toString();
-	}
-	
-	/**
-	 * Calculate date from string parametrs comming from the URL
-	 *
-	 * @param sbegin String
-	 * @param send String
-	 * @param begin The calculated begin date
-	 * @param end The calculated end date
-	 */
-	static private void calcDate(String sbegin, String send, Date begin, Date end){
-		long lbegin = Calendar.DATE * -1;
-		long lend = -1;
-
-		try {
-			if(sbegin != null)
-				lbegin = Long.parseLong(sbegin);
-		}
-		catch (NumberFormatException ex) {}
-		
-		try {
-			if("NOW".compareToIgnoreCase(send) == 0)
-				lend = -1;
-			else if(send != null)
-				lend = Long.parseLong(send);
-		}
-		catch (NumberFormatException ex) {}
-		
-		if(lend == -1)
-			end.setTime(System.currentTimeMillis());
-		else
-			end.setTime(lend);
-		
-		if(lbegin <= 0) {
-			Calendar cbegin = new GregorianCalendar();
-			cbegin.setTime(end);
-			cbegin.add(convertScale(lbegin), -1);
-			begin.setTime(cbegin.getTimeInMillis());
-		}
-		else
-			begin.setTime(lbegin);
-	}
-	
-	/**
-	 * Convert a int to a calendar field
-	 * @param scale
-	 * @return
-	 */
-	static private int convertScale(long scale) {
-		//Failsafe, the whole year
-		int retValue = Calendar.YEAR;
-		if(scale == 0)
-			retValue = Calendar.DAY_OF_MONTH;
-		else if(scale == -1)
-			retValue = Calendar.WEEK_OF_YEAR;
-		else if(scale == -2)
-			retValue = Calendar.MONTH;
-		else if(scale == -3)
-			retValue = Calendar.YEAR;
-		return retValue;
 	}
 	
 }
