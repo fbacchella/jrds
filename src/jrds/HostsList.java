@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import jrds.snmp.SnmpRequester;
 
@@ -40,7 +39,6 @@ public class HostsList {
 	private GraphTreeNode graphTreeByHost = null;
 	private GraphTreeNode graphTreeByView = null;
 	private Map graphMap;
-	private Map groupList;
 	private static final String hostRoot = "Sorted by host";
 	private static final String viewRoot = "Sorted by view";
 
@@ -56,7 +54,6 @@ public class HostsList {
 		graphTreeByHost = new GraphTreeNode(hostRoot);
 		graphTreeByView = new GraphTreeNode(viewRoot);
 		graphMap = new HashMap();
-		groupList = new TreeMap(String.CASE_INSENSITIVE_ORDER);
 		hostList = new HashSet();
 	}
 	public static HostsList getRootGroup() {

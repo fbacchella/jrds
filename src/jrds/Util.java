@@ -905,7 +905,6 @@ public class Util {
 	
 		while(pos < len) {
 			byte b0 = 0, b1 = 0, b2 = 0;
-			int left = len - pos;
 			b0 = buffer[pos++];
 			if(pos  < len )
 				b1 = buffer[pos++];

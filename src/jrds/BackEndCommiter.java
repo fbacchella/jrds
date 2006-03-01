@@ -13,8 +13,6 @@ import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.log4j.Logger;
-
 /**
  * This class manage a thread that runs in the background and is used to commit to disk the RRD datas modifications.
  *
@@ -22,8 +20,6 @@ import org.apache.log4j.Logger;
  * @version $Revision$
  */
 public class BackEndCommiter {
-	static final private Logger logger = Logger.getLogger(BackEndCommiter.class);
-	
 	private int syncPeriod = 30; //seconds
 	static private BackEndCommiter instance = null;
 
@@ -38,8 +34,6 @@ public class BackEndCommiter {
 	
 	private void createSyncTask(int syncPeriod) {
 		TimerTask syncTask = new TimerTask() {
-			//Just to keep an active reference to the singloton
-			BackEndCommiter linstance = instance;
 			public void run() {
 				synchronized(backEndSet) {
 					for(Iterator i = backEndSet.iterator(); i.hasNext() ;) {

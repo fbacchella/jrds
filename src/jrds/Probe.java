@@ -50,7 +50,6 @@ implements Comparable {
 	 */
 	public Probe(RdsHost monitoredHost, ProbeDesc pd) {
 		name = null;
-		RrdDb rrdDb = null;
 		this.monitoredHost = monitoredHost;
 		this.pd = pd;
 	}
@@ -64,10 +63,6 @@ implements Comparable {
 		Collection graphList = null;
 		if(graphClasses != null) {
 			graphList = new ArrayList(graphClasses.size());
-			Class[] thisClass = new Class[] {
-					Probe.class};
-			Object[] args = new Object[] {
-					this};
 			for (Iterator i = graphClasses.iterator(); i.hasNext(); ) {
 				Object o = i.next();
 				RdsGraph newGraph = GraphFactory.makeGraph(o, this);

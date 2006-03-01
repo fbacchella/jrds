@@ -73,7 +73,7 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 				int oldLimit = byteBuffer.limit();
 				byteBuffer.position(dirtyStart);
 				byteBuffer.limit(dirtyEnd);
-				int bwriten = channel.write(byteBuffer, cacheStart + dirtyStart);
+				channel.write(byteBuffer, cacheStart + dirtyStart);
 				//logger.debug(bwriten + " bytes written at " +  this.getPath() + "@"  + (cacheStart + dirtyStart));
 				byteBuffer.limit(oldLimit);
 				cacheDirty = false;
@@ -163,7 +163,6 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 		if(b.length > 0) {
 			//logger.debug("Need to read " + b.length + " bytes from " + getPath() + "@" + offset);
 			access++;
-			boolean todo = true;
 			long cacheEnd = cacheStart + cacheSize - 1;
 			if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd) {
 				cacheMiss(offset, b.length);

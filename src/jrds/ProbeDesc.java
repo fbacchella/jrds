@@ -53,7 +53,6 @@ public class ProbeDesc implements Cloneable {
 	private boolean cloned = false;
 	private boolean readOnly = false;
 	private OID indexOid = null;
-	private boolean asynchronous = false;
 	private SnmpRequester requester = SnmpRequester.RAW;
 	private boolean uniqIndex = false;
 	
