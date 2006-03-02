@@ -37,9 +37,6 @@ public class GraphList extends HttpServlet {
 		res.setContentType("text/html; charset=UTF-8");
 		java.io.PrintWriter writer = res.getWriter();
 		
-		String endString = req.getParameter("end");
-		String beginString = req.getParameter("begin");
-		
 		writer.println("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">");
 		writer.println("<html>");
 		writer.println("\t<head>");
@@ -51,8 +48,10 @@ public class GraphList extends HttpServlet {
 		if(node != null) {
 			Collection allGraphs = node.enumerateChildsGraph();
 			for(Iterator i = allGraphs.iterator(); i.hasNext() ;) {
+				this.getServletContext().getContext(Graph.name);
 				RdsGraph graph = (RdsGraph) i.next();
-				writer.println(Graph.getImgElement(graph, req, beginString, endString));
+				graph.hashCode();
+				//writer.println(Graph.getImgElement(graph, req, req.getQueryString()));
 				
 			}
 		}

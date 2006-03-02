@@ -74,8 +74,11 @@ public class RdsHost implements Comparable {
 	
 	public void addProbe(Probe rrd)
 	{
-		allProbes.add(rrd);
-		rrd.checkStore();
+		//Do not add the probe if the physical store
+		//cannot be checked
+		if(rrd.checkStore()) {
+			allProbes.add(rrd);
+		}
 	}
 	
 	public Collection getProbes() {

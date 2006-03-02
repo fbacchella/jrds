@@ -31,11 +31,10 @@ import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Logger;
 import org.jrobin.core.RrdException;
+import org.jrobin.graph.RrdExport;
+import org.jrobin.graph.RrdExportDef;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
-
-
-
 
 /**
  * @author bacchell
@@ -46,7 +45,6 @@ public class RdsGraph
 implements Comparable {
 	
 	static final private Logger logger = Logger.getLogger(RdsGraph.class);
-	static final private PropertiesManager pm = PropertiesManager.getInstance();
 	static final private SimpleDateFormat lastUpdateFormat = new
 	SimpleDateFormat("dd/MM/yyyy HH:mm");
 	
@@ -69,9 +67,7 @@ implements Comparable {
 	 * @see java.lang.Object#hashCode()
 	 */
 	public int hashCode() {
-		if (viewPath == null)
-			viewPath = getTreePathByView().toString();
-		return viewPath.hashCode();
+		return getQualifieName().hashCode();
 	}
 	
 	/**
@@ -177,6 +173,14 @@ implements Comparable {
 		return name;
 	}
 	
+	/**
+	 * Return a uniq name for the graph
+	 * @return
+	 */
+	public String getQualifieName() {
+		return probe.getHost().getName() + "/"  + getName();
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.RdsGraph#getLowerLimit()
 	 */
@@ -191,18 +195,35 @@ implements Comparable {
 		return gd.getUpperLimit();
 	}
 	
-	private RrdGraph getRrdGraph(Date startDate, Date endDate) throws
-	IOException, RrdException {
-		RrdGraphDef tempGraphDef;
-		tempGraphDef = fillGraphDef();
-		tempGraphDef.setTimePeriod(startDate, endDate);
+	protected RrdGraphDef getRrdDef() throws RrdException, IOException {
+		return getGraphDesc().getGraphDef(probe);
+	}
+	
+	/**
+	 * Add the graph formating information to a RrdGraphDef
+	 * @param graphDef
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 * @throws RrdException
+	 */
+	protected RrdGraphDef graphFormat(RrdGraphDef graphDef, Date startDate, Date endDate) throws RrdException {
 		Date lastUpdate = probe.getLastUpdate();
-		tempGraphDef.comment("@l");
-		tempGraphDef.comment("@l");
-		tempGraphDef.comment("Last update : " +
+		graphDef.setTitle(getGraphTitle());
+		graphDef.comment("@l");
+		graphDef.comment("@l");
+		graphDef.comment("Last update : " +
 				lastUpdateFormat.format(lastUpdate) + "@l");
-		tempGraphDef.comment("Period from " + lastUpdateFormat.format(startDate) +
+		graphDef.comment("Period from " + lastUpdateFormat.format(startDate) +
 				" to " + lastUpdateFormat.format(endDate) + "@l");
+		return graphDef;		
+	}
+	
+	public RrdGraph getRrdGraph(Date startDate, Date endDate) throws
+	IOException, RrdException {
+		RrdGraphDef tempGraphDef = getRrdDef();
+		tempGraphDef.setTimePeriod(startDate, endDate);
+		tempGraphDef = graphFormat(tempGraphDef, startDate, endDate);
 		return new RrdGraph(tempGraphDef, true);
 	}
 	
@@ -247,8 +268,10 @@ implements Comparable {
 	
 	public void writeXml(OutputStream out, Date startDate, Date endDate) {
 		try {
-			RrdGraph rrdGraph = getRrdGraph(startDate, endDate);
-			rrdGraph.fetchExportData().exportXml(out);
+			RrdExportDef exdef = getRrdDef();
+			exdef.setTimePeriod(startDate, endDate);
+			RrdExport ex = new RrdExport(exdef);
+			ex.fetch().exportXml(out);
 		}
 		catch (RrdException ex) {
 			logger.warn("Unable to creage png for " + getName() +
@@ -263,10 +286,12 @@ implements Comparable {
 	}
 	
 	public String writeXml(Date startDate, Date endDate) {
-		String xmlData = null;
+		String xmlData = "";
 		try {
-			RrdGraph rrdGraph = getRrdGraph(startDate, endDate);
-			xmlData = rrdGraph.fetchExportData().exportXml();
+			RrdExportDef exdef = getRrdDef();
+			exdef.setTimePeriod(startDate, endDate);
+			RrdExport ex = new RrdExport(exdef);
+			xmlData = ex.fetch().exportXml();
 		}
 		catch (RrdException ex) {
 			logger.warn("Unable to creage png for " + getName() +
@@ -319,7 +344,7 @@ implements Comparable {
 		return retValue;
 	}
 	
-	final protected GraphDesc getGraphDesc() {
+	final public GraphDesc getGraphDesc() {
 		return gd;
 	}
 	
@@ -328,12 +353,6 @@ implements Comparable {
 	 */
 	public void setGraphDesc(GraphDesc gd) {
 		this.gd = gd;
-	}
-	
-	private RrdGraphDef fillGraphDef() throws RrdException, IOException {
-		RrdGraphDef graphDef = getGraphDesc().getGraphDef(probe);
-		graphDef.setTitle(getGraphTitle());
-		return graphDef;
 	}
 	
 	/* (non-Javadoc)

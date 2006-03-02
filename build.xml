@@ -142,6 +142,15 @@
 		</java>
 	</target>
 
+	<target name="test" depends="appjar">
+		<java  classname="jrds.standalone.TestSumGraph" fork="true">
+			<classpath>
+				<pathelement location="${build.home}/jrds.jar"/>
+				<path refid="project.classpath" />
+			</classpath>
+		</java>
+	</target>
+
 	<target name="graph" depends="appjar">
 		<java  classname="jrds.standalone.Grapher" fork="true">
 			<classpath>

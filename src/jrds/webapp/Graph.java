@@ -19,15 +19,13 @@ import jrds.HostsList;
 import jrds.Period;
 import jrds.RdsGraph;
 
-import org.apache.log4j.Logger;
-
 /**
  * A servlet wich generate a png for a graph
  * @author Fabrice Bacchella
  * @version $Revision$
  */
 public final class Graph extends HttpServlet {
-	static final private Logger logger = Logger.getLogger(Graph.class);
+	static public String name = null;
 	
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
@@ -58,7 +56,6 @@ public final class Graph extends HttpServlet {
 		res.setContentType("image/png");
 		ServletOutputStream out = res.getOutputStream();
 		res.addHeader("Cache-Control", "no-cache");
-		logger.debug("" + begin + " to " + end);
 		graph.writePng(out, begin, end);
 	}
 	
@@ -119,6 +116,16 @@ public final class Graph extends HttpServlet {
 		retValue.append(">");
 		
 		return retValue.toString();
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.GenericServlet#init()
+	 */
+	public void init() throws ServletException {
+		if(name == null)
+			name = getServletName();
+		//this.getServletContext().
+		super.init();
 	}
 	
 }

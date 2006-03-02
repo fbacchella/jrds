@@ -6,6 +6,7 @@ package jrds;
 import java.awt.Color;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,6 +21,7 @@ import jrds.probe.jdbc.JdbcProbe;
 
 import org.apache.log4j.Logger;
 import org.jrobin.core.RrdException;
+import org.jrobin.graph.Plottable;
 import org.jrobin.graph.RrdGraphDef;
 
 /**
@@ -284,8 +286,8 @@ implements Cloneable {
 	private double lowerLimit = 0;
 	private String verticalLabel = null;
 	private int lastColor = 0;
-	private List viewTree = null;
-	private List hostTree = null;
+	private List viewTree = new ArrayList();
+	private List hostTree = new ArrayList();
 	private String graphName;
 	private String graphTitle ="{0} on {1}";
 	
@@ -458,25 +460,35 @@ implements Cloneable {
 	
 	/**
 	 * return the RrdGraphDef for this graph, used the indicated probe
-	 *
-	 * @param probe Probe
-	 * @return RrdGraphDef
+	 * any data can be overined of a provided map of Plottable
+	 * @param probe
+	 * @param ownData data used to overied probe's own values
+	 * @return
 	 * @throws IOException
 	 * @throws RrdException
 	 */
-	public RrdGraphDef getGraphDef(Probe probe) throws IOException,
+	public RrdGraphDef getGraphDef(Probe probe, Map ownData) throws IOException,
 	RrdException {
 		RrdGraphDef retValue = new RrdGraphDef();
-		boolean firstStack = true;
 		String rrdName = probe.getRrdName();
 		for (Iterator i = dsMap.values().iterator(); i.hasNext(); ) {
 			DsDesc ds = (DsDesc) i.next();
 			if (ds.dsName == null && ds.rpn == null)
 				ds.graphType.draw(retValue, ds.name, ds.color, ds.legend + "@l");
 			else if (ds.rpn == null) {
-				if (probe.dsExist(ds.dsName)) {
+				boolean exist = false; // Used to check it the data source one way or another
+				//Does the datas existe in the provided values
+				if(ownData != null && ownData.containsKey(ds.dsName)) {
+					exist = true;
+					retValue.datasource(ds.name, (Plottable) ownData.get(ds.dsName));
+				}
+				//Or they might be on the associated rrd
+				else if(probe.dsExist(ds.dsName)) {
+					exist = true;
 					retValue.datasource(ds.name, rrdName, ds.dsName,
-							ds.cf.toString());
+							ds.cf.toString());				
+				}
+				if (exist) {
 					if(ds.graphType != null)
 						ds.graphType.draw(retValue, ds.name, ds.color,
 								ds.legend + "@l");
@@ -495,6 +507,19 @@ implements Cloneable {
 		if (verticalLabel != null)
 			retValue.setVerticalLabel(verticalLabel);
 		return retValue;
+	}
+	
+	/**
+	 * return the RrdGraphDef for this graph, used the indicated probe
+	 *
+	 * @param probe Probe
+	 * @return RrdGraphDef
+	 * @throws IOException
+	 * @throws RrdException
+	 */
+	public RrdGraphDef getGraphDef(Probe probe) throws IOException,
+	RrdException {
+		return getGraphDef(probe, null);
 	}
 	
 	/**

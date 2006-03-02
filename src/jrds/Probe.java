@@ -19,6 +19,8 @@ import jrds.probe.UrlProbe;
 import org.apache.log4j.Logger;
 import org.jrobin.core.ArcDef;
 import org.jrobin.core.DsDef;
+import org.jrobin.core.FetchData;
+import org.jrobin.core.FetchRequest;
 import org.jrobin.core.RrdDb;
 import org.jrobin.core.RrdDef;
 import org.jrobin.core.RrdException;
@@ -92,8 +94,9 @@ implements Comparable {
 	}
 	
 	public String getRrdName() {
+		String rrdName = getName().replaceAll("/","_");
 		return monitoredHost.getHostDir() +
-		PropertiesManager.getInstance().fileSeparator + getName() + ".rrd";
+		PropertiesManager.getInstance().fileSeparator + rrdName + ".rrd";
 	}
 	
 	private final String parseTemplate(String template) {
@@ -256,11 +259,11 @@ implements Comparable {
 	
 	/**
 	 * Launch an collect of values.
-	 * It cannot be overiden
+	 * You should not try to overide it
 	 * @throws IOException
 	 * @throws RrdException
 	 */
-	public final void collect() {
+	public void collect() {
 		logger.debug("launch collect for " + this);
 		RrdDb rrdDb = null;
 		Sample onesample;
@@ -345,6 +348,29 @@ implements Comparable {
 		finally {
 			if(rrddb != null)
 				StoreOpener.releaseRrd(rrddb);
+		}
+		return retValue;
+	}
+	
+	/**
+	 * Return the probe datas for the given period
+	 * @param startDate
+	 * @param endDate
+	 * @return
+	 */
+	public FetchData fetchData(Date startDate, Date endDate) {
+		FetchData retValue = null;
+		RrdDb rrdDb = null;
+		try {
+			rrdDb = StoreOpener.getRrd(getRrdName());
+			FetchRequest fr = rrdDb.createFetchRequest(GraphDesc.DEFAULTCF.toString(), startDate.getTime() /1000, endDate.getTime() / 1000);
+			retValue = fr.fetchData();
+		} catch (Exception e) {
+			logger.error("Unable to fetch data for" + this.getName() + ": " + e.getMessage());
+		}
+		finally {
+			if(rrdDb != null)
+				StoreOpener.releaseRrd(rrdDb);
 		}
 		return retValue;
 	}

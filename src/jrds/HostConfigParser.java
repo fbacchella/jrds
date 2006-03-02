@@ -12,6 +12,7 @@ import java.util.Set;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import jrds.probe.SumProbe;
 import jrds.probe.snmp.SnmpProbe;
 import jrds.snmp.TargetFactory;
 
@@ -32,7 +33,6 @@ public class HostConfigParser  extends DefaultHandler {
 	
 	//Tag names
 	private final String HOST = "host";
-	private final String HOSTGROUP= "group";
 	private final String SNMP = "snmp";
 	private final String SNMPCOMMUNITY = "community";
 	private final String SNMPVERSION = "version";
@@ -48,6 +48,10 @@ public class HostConfigParser  extends DefaultHandler {
 	private final String INCLUDE_NAME = "name";
 	private final String MUNINS = "munins";
 	private final String PORT = "port";
+	private final String SUM = "sum";
+	private final String SUMNAME = "name";
+	private final String SUMELEMENT = "element";
+	private final String SUMELEMENTNAME = "name";
 	
 	private final static SAXParserFactory saxFactory = SAXParserFactory.newInstance();
 	private final static TargetFactory targetFactory = TargetFactory.getInstance();
@@ -57,6 +61,9 @@ public class HostConfigParser  extends DefaultHandler {
 	private List argsListValue;
 	private String probeType;
 	private File hostConfigFile;
+	private Collection list;
+	private String name;
+	private RdsHost sumhost =  new RdsHost("SumHost");
 	static {
 		saxFactory.setNamespaceAware(true);
 		saxFactory.setValidating(true);		
@@ -74,13 +81,14 @@ public class HostConfigParser  extends DefaultHandler {
 	public Collection parse()
 	{
 		hostsCollection = new HashSet();
+		hostsCollection.add(sumhost);
 		try {
 			SAXParser saxParser = saxFactory.newSAXParser();
 			logger.debug("Parsing " + hostConfigFile.getAbsoluteFile().getCanonicalPath());
 			saxParser.parse(hostConfigFile, this);
 		} catch (Exception e) {
-			logger.warn("error during parsing of host config file " + hostConfigFile.getAbsolutePath() +
-					": " + e.getMessage());
+			logger.warn("SAX error during parsing of host config file " + hostConfigFile.getAbsolutePath() +
+					": " + e.getMessage(), e);
 		}
 		return hostsCollection;
 	}
@@ -98,9 +106,6 @@ public class HostConfigParser  extends DefaultHandler {
 			if (HOST.equals(localName)){
 				String name = atts.getValue(HOSTNAME);
 				lastHost = new RdsHost(name);
-				String group = atts.getValue(HOSTGROUP);
-				if(group != null)
-					lastHost.setGroup(group);
 				lastSnmpTarget = null;
 			}
 			else if(lastHost != null && ( RRD.equals(localName) || PROBE.equals(localName)) ) {
@@ -144,9 +149,18 @@ public class HostConfigParser  extends DefaultHandler {
 			else if(MUNINS.equals(localName)) {
 				
 			}
+			else if(SUM.equals(localName)) {
+				name = atts.getValue(SUMNAME);
+				list = new ArrayList();
+			}
+			else if(SUMELEMENT.equals(localName)) {
+				if(list != null) {
+					list.add(atts.getValue(SUMELEMENTNAME));
+				}
+			}
 		} catch (RuntimeException e) {
 			logger.warn("error during parsing of host config file " + hostConfigFile.getAbsolutePath() +
-					": ", e);
+					": " + e.getMessage(), e);
 		}
 	}
 	
@@ -171,9 +185,16 @@ public class HostConfigParser  extends DefaultHandler {
 				lastSnmpTarget = null;
 				newRdsRrd = null;
 			}
+			else if(SUM.equals(localName)) {
+				Probe newRdsRrd = new SumProbe(sumhost, name, list);
+				sumhost.addProbe(newRdsRrd);
+				logger.debug("adding probe " + newRdsRrd );
+				list = null;
+				name = null;
+			}
 		} catch (RuntimeException e) {
 			logger.warn("error during parsing of host config file " + hostConfigFile.getAbsolutePath() +
-					": ", e.getCause());
+					": " + e.getMessage(), e);
 		}
 	}	
 }

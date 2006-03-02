@@ -9,6 +9,7 @@ package jrds.standalone;
 import java.io.File;
 
 import jrds.HostsList;
+import jrds.JrdsLogger;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
 import jrds.snmp.SnmpRequester;
@@ -25,8 +26,12 @@ import org.apache.log4j.Logger;
  */
 public class Collector {
 	public static final int GRAPH_RESOLUTION = 300; // seconds
-	private static final Logger logger = Logger.getLogger(Collector.class);
 	private static final PropertiesManager pm = PropertiesManager.getInstance();
+	static {
+		JrdsLogger.setFileLogger(pm.logfile);
+	}
+	private static final Logger logger = Logger.getLogger(Collector.class);
+
 	public static void main(String[] args) throws Exception {
 		pm.join(new File("jrds.properties"));
 		pm.update();
