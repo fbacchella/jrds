@@ -32,6 +32,7 @@ public class ProbeFactory {
         probePackages.add("jrds.probe.munins.");
         probePackages.add("jrds.probe.rstat.");
         probePackages.add("jrds.probe.jdbc.");
+        probePackages.add("jrds.probe.exalead.");
         probePackages.add("");
 
     }

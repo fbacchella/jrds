@@ -87,12 +87,14 @@ public class GraphFactory {
 		//it's an URL to xml description of the graph
 		else if(className instanceof String) {
 			String xmlRessourceName = (String)className;
-			java.net.URL url = ResourcesLocator.getResourceUrl(xmlRessourceName);
-			if(url == null) {
+			InputStream xmlStream = ResourcesLocator.getResource(xmlRessourceName);
+			if(xmlStream == null) {
+				xmlStream = probe.getClass().getResourceAsStream(xmlRessourceName);
+			}
+			if(xmlStream == null) {
 				logger.error("Unable to find ressource " + xmlRessourceName + " for probe " + probe);
 			}
 			else {
-				InputStream xmlStream = ResourcesLocator.getResource(xmlRessourceName);
 				Digester digester = new Digester();
 				digester.setValidating(false);
 				digester.addObjectCreate("graphdesc","jrds.GraphDesc");
@@ -132,7 +134,7 @@ public class GraphFactory {
 					GraphDesc gd = (GraphDesc) digester.parse(xmlStream);
 					retValue = new RdsGraph(probe, gd);
 				} catch (Exception e) {
-					logger.warn("Unable to parse graph description file with URL "+ url + " for probe " + probe, e);
+					logger.warn("Unable to parse graph description file "+ xmlRessourceName + " for probe " + probe, e);
 					retValue = null;
 				}
 				try {

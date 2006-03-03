@@ -52,6 +52,9 @@ public class HostConfigParser  extends DefaultHandler {
 	private final String SUMNAME = "name";
 	private final String SUMELEMENT = "element";
 	private final String SUMELEMENTNAME = "name";
+	private final String MACRODEF = "macrodef";
+	private final String MACROUSE = "macro";
+	private final String MACRONAME = "name";
 	
 	private final static SAXParserFactory saxFactory = SAXParserFactory.newInstance();
 	private final static TargetFactory targetFactory = TargetFactory.getInstance();
@@ -63,6 +66,7 @@ public class HostConfigParser  extends DefaultHandler {
 	private File hostConfigFile;
 	private Collection list;
 	private String name;
+	private Macro lastMacro = null;
 	private RdsHost sumhost =  new RdsHost("SumHost");
 	static {
 		saxFactory.setNamespaceAware(true);
@@ -108,11 +112,12 @@ public class HostConfigParser  extends DefaultHandler {
 				lastHost = new RdsHost(name);
 				lastSnmpTarget = null;
 			}
-			else if(lastHost != null && ( RRD.equals(localName) || PROBE.equals(localName)) ) {
+			else if( RRD.equals(localName) || PROBE.equals(localName) ) {
 				probeType = atts.getValue(TYPE);
 				argsListValue = new ArrayList(5);
 				argsListValue.add(lastHost);
-			} else if(argsListValue != null && ARG.equals(localName)) {
+			}
+			else if(argsListValue != null && ARG.equals(localName)) {
 				String type = atts.getValue(ARGTYPE);
 				String value = atts.getValue(ARGVALUE);
 				Object newArgs = ProbeFactory.makeArg(type, value); 
@@ -158,6 +163,22 @@ public class HostConfigParser  extends DefaultHandler {
 					list.add(atts.getValue(SUMELEMENTNAME));
 				}
 			}
+			else if (MACRODEF.equals(localName)){
+				String name = atts.getValue(MACRONAME);
+				lastMacro = new Macro();
+				HostsList.getRootGroup().getMacroList().put(name, lastMacro);
+				logger.debug("New macro " + name);
+			}
+			else if(MACROUSE.equals(localName)) {
+				String name = atts.getValue(MACRONAME);
+				Macro m = (Macro) HostsList.getRootGroup().getMacroList().get(name);
+				if(m != null) {
+					logger.debug("Will populate " + lastHost + " with macro " + name);
+					m.populate(lastHost);
+				}
+				else
+					logger.error("Macro " + name + " not found");
+			}
 		} catch (RuntimeException e) {
 			logger.warn("error during parsing of host config file " + hostConfigFile.getAbsolutePath() +
 					": " + e.getMessage(), e);
@@ -171,19 +192,26 @@ public class HostConfigParser  extends DefaultHandler {
 				hostsCollection.add(lastHost);
 				lastHost = null;
 			}
-			else if(probeType != null && ( RRD.equals(localName) || PROBE.equals(localName)) ) {
-				Probe newRdsRrd = ProbeFactory.makeProbe(probeType, argsListValue);
-				if(lastSnmpTarget != null && newRdsRrd instanceof SnmpProbe)
-					((SnmpProbe)newRdsRrd).setSnmpTarget(lastSnmpTarget);
+			else if ( RRD.equals(localName) || PROBE.equals(localName) ) {
+				if(lastHost != null) {
+					Probe newProbe = ProbeFactory.makeProbe(probeType, argsListValue);
+					if(lastSnmpTarget != null && newProbe instanceof SnmpProbe) {
+						((SnmpProbe)newProbe).setSnmpTarget(lastSnmpTarget);
+					}
+					lastSnmpTarget = null;
 					
-				if(newRdsRrd != null) {
-					lastHost.addProbe(newRdsRrd);
-					logger.debug("adding probe " + newRdsRrd );
+					if(newProbe != null) {
+						lastHost.addProbe(newProbe);
+						logger.debug("adding probe " + newProbe );
+					}
 				}
+				else if(lastMacro != null) {
+					lastMacro.put(probeType, argsListValue);
+				}
+				else
+					logger.warn("What to do with the probe of type " + probeType);
 				probeType = null;
 				argsListValue = null;
-				lastSnmpTarget = null;
-				newRdsRrd = null;
 			}
 			else if(SUM.equals(localName)) {
 				Probe newRdsRrd = new SumProbe(sumhost, name, list);
@@ -191,6 +219,9 @@ public class HostConfigParser  extends DefaultHandler {
 				logger.debug("adding probe " + newRdsRrd );
 				list = null;
 				name = null;
+			}
+			else if(MACRODEF.equals(localName)) {
+				lastMacro = null;
 			}
 		} catch (RuntimeException e) {
 			logger.warn("error during parsing of host config file " + hostConfigFile.getAbsolutePath() +

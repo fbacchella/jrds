@@ -41,7 +41,7 @@ public class HostsList {
 	private Map graphMap;
 	private static final String hostRoot = "Sorted by host";
 	private static final String viewRoot = "Sorted by view";
-
+	private Map macroList = new HashMap();
 
 	/**
 	 *  
@@ -190,5 +190,19 @@ public class HostsList {
 				node = getGraphTreeByView().getByPath(pathList);
 		}
 		return node;
+	}
+
+	/**
+	 * @return
+	 */
+	public Map getMacroList() {
+		return macroList;
+	}
+
+	/**
+	 * @param macroList
+	 */
+	public void setMacroList(Map macroList) {
+		this.macroList = macroList;
 	}
 }
