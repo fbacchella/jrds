@@ -55,64 +55,32 @@ implements Cloneable {
 	static public final ConsFunc LAST = ConsFunc.LAST;
 	static public final ConsFunc DEFAULTCF = AVERAGE;
 	
-	/**
-	 * Find the value of field in the class, the field is is upper case
-	 *
-	 * @param clazz Class the class to search in
-	 * @param name String the looked for field
-	 * @return Object the value of the field or null
-	 */
-	private static final Object resolv(Class clazz, String name) {
-		Object gt = null;
-		Field gtfield;
-		try {
-			gtfield = clazz.getField(name.toUpperCase());
-			if (gtfield != null)
-				gt = gtfield.get(clazz);
-		}
-		catch (Exception e) {
-			logger.error(name + " is a invalid constant name for type " + clazz);
-		}
-		return gt;
-	}
-	
-	public static final PathElement resolvPathElement(String name) {
-		return (PathElement) resolv(PathElement.class, name);
-	}
 	
 	public interface GraphType {
-		public abstract void draw(RrdGraphDef rgd, String sn, Color color,
-				String legend) throws
+		public abstract void draw(RrdGraphDef rgd, String sn, Color color) throws
 				RrdException;
 		
 		public static final GraphType NONE = new GraphType() {
-			public void draw(RrdGraphDef rgd, String sn, Color color,
-					String legend) {};
+			public void draw(RrdGraphDef rgd, String sn, Color color) {};
 		};
 		
 		public static final GraphType LINE = new GraphType() {
-			public void draw(RrdGraphDef rgd, String sn, Color color,
-					String legend) throws RrdException {
-				rgd.line(sn, color, legend);
+			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {
+				rgd.line(sn, color, " @g");
 			};
 		};
 		static public final GraphType AREA = new GraphType() {
-			public void draw(RrdGraphDef rgd, String sn, Color color,
-					String legend) throws RrdException {
-				rgd.area(sn, color, legend);
+			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {
+				rgd.area(sn, color, " @g");
 			};
 		};
 		static public final GraphType STACK = new GraphType() {
-			public void draw(RrdGraphDef rgd, String sn, Color color,
-					String legend) throws RrdException {
-				rgd.stack(sn, color, legend);
+			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {
+				rgd.stack(sn, color, " @g");
 			};
 		};
 		static public final GraphType COMMENT = new GraphType() {
-			public void draw(RrdGraphDef rgd, String sn, Color color,
-					String legend) throws RrdException {
-				rgd.comment(legend);
-			};
+			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {};
 		};
 	};
 	
@@ -279,23 +247,10 @@ implements Cloneable {
 	static final public Color COLOR6 = colors[5];
 	static final public Color COLOR7 = colors[6];
 	
-	private Map dsMap;
-	private int width = 578;
-	private int height = 206;
-	private double upperLimit = Double.NaN;
-	private double lowerLimit = 0;
-	private String verticalLabel = null;
-	private int lastColor = 0;
-	private List viewTree = new ArrayList();
-	private List hostTree = new ArrayList();
-	private String graphName;
-	private String graphTitle ="{0} on {1}";
-	
 	private final class Dimension {
 		public int width = 0;
 		public int height = 0;
 	};
-	private Dimension dimension = new Dimension();
 	
 	static private final class DsDesc {
 		public String name;
@@ -321,6 +276,21 @@ implements Cloneable {
 		}
 	}
 	
+	static final String manySpace = "                                                                  ";
+	private Map dsMap;
+	private int width = 578;
+	private int height = 206;
+	private double upperLimit = Double.NaN;
+	private double lowerLimit = 0;
+	private String verticalLabel = null;
+	private int lastColor = 0;
+	private List viewTree = new ArrayList();
+	private List hostTree = new ArrayList();
+	private String graphName;
+	private String graphTitle ="{0} on {1}";
+	private Dimension dimension = new Dimension();
+	private int maxLengthLegend = 0;
+	
 	/**
 	 * A constructor wich pre allocate the desired size
 	 * @param size the estimated number of graph that will be created
@@ -341,30 +311,24 @@ implements Cloneable {
 	 * @param color Color
 	 */
 	public void add(String name, GraphType graphType, Color color) {
-		dsMap.put(name,
-				new DsDesc(name, name, null, graphType, color, name,
-						DEFAULTCF));
+		add(name, name, null, graphType, color, name, DEFAULTCF);
 	}
 	
 	public void add(String name, GraphType graphType, Color color,
 			String legend) {
-		dsMap.put(name,
-				new DsDesc(name, name, null, graphType, color, legend,
-						DEFAULTCF));
+		add(name, name, null, graphType, color, legend, DEFAULTCF);
 	}
 	
 	public void add(String name, GraphType graphType, String legend) {
-		dsMap.put(name,
-				new DsDesc(name, name, null, graphType,
+		add(name, name, null, graphType,
 						colors[ (lastColor++) % colors.length], legend,
-						DEFAULTCF));
+						DEFAULTCF);
 	}
 	
 	public void add(String name, GraphType graphType) {
-		dsMap.put(name,
-				new DsDesc(name, name, null, graphType,
+		add(name, name, null, graphType,
 						colors[ (lastColor++) % colors.length], name,
-						DEFAULTCF));
+						DEFAULTCF);
 	}
 	
 	/**
@@ -374,27 +338,24 @@ implements Cloneable {
 	 * @param legend String
 	 */
 	public void add(GraphType graphType, String legend) {
-		dsMap.put(legend, new DsDesc(null, null, null, graphType, null, legend, null));
+		add(null, null, null, graphType, null, legend, null);
 	}
 	
 	public void add(String name, String rpn, GraphType graphType, Color color,
 			String legend) {
-		dsMap.put(name,
-				new DsDesc(name, null, rpn, graphType, color, legend,
-						DEFAULTCF));
+		add(name, null, rpn, graphType, color, legend,
+				DEFAULTCF);
 	}
 	
 	public void add(String name, String rpn, GraphType graphType, Color color) {
-		dsMap.put(name,
-				new DsDesc(name, null, rpn, graphType, color, name,
-						DEFAULTCF));
+		add(name, null, rpn, graphType, color, name,
+						DEFAULTCF);
 	}
 	
 	public void add(String name, String rpn, GraphType graphType, String legend) {
-		dsMap.put(name,
-				new DsDesc(name, null, rpn, graphType,
+		add(name, null, rpn, graphType,
 						colors[lastColor++ % colors.length], legend,
-						DEFAULTCF));
+						DEFAULTCF);
 	}
 	
 	/**
@@ -403,21 +364,11 @@ implements Cloneable {
 	 * @param name String
 	 */
 	public void add(String name) {
-		dsMap.put(name,
-				new DsDesc(name, name, null, NONE, null, null, DEFAULTCF));
+		add(name, name, null, NONE, null, null, DEFAULTCF);
 	}
 	
 	public void add(String name, String rpn) {
-		dsMap.put(name,
-				new DsDesc(name, null, rpn, NONE, null, null, DEFAULTCF));
-	}
-	
-	public void add(String name, String dsName, String rpn,
-			GraphType graphType, Color color, String legend,
-			ConsFunc cf) {
-		dsMap.put(name,
-				new DsDesc(name, dsName, rpn, graphType, color, legend, cf));
-		
+		add(name, null, rpn, NONE, null, null, DEFAULTCF);
 	}
 	
 	/**
@@ -451,13 +402,28 @@ implements Cloneable {
 		}
 		else
 			c = colors[lastColor++ % colors.length];
-		if (legend == null)
+		if(legend == null && name != null)
 			legend = name;
-		dsMap.put(name,
-				new DsDesc(name, dsName, rpn, gt, c, legend, cf));
+		logger.debug(legend + " " + maxLengthLegend + " " + legend.length());
+		add(name, dsName, rpn, gt, c, legend, cf);
 		
 	}
 	
+	public void add(String name, String dsName, String rpn,
+			GraphType graphType, Color color, String legend,
+			ConsFunc cf) {
+		String key = name;
+		if(key == null && legend != null)
+			key = legend;
+		dsMap.put(key,
+				new DsDesc(name, dsName, rpn, graphType, color, legend, cf));
+		if(legend != null) {
+			maxLengthLegend = Math.max(maxLengthLegend, legend.length());
+		}
+		
+	}
+	
+
 	/**
 	 * return the RrdGraphDef for this graph, used the indicated probe
 	 * any data can be overined of a provided map of Plottable
@@ -471,10 +437,21 @@ implements Cloneable {
 	RrdException {
 		RrdGraphDef retValue = new RrdGraphDef();
 		String rrdName = probe.getRrdName();
+		
+		/*The title line*/
+		retValue.comment("   @G"); //We simulate the color box
+		retValue.comment(manySpace.substring(0, Math.min(maxLengthLegend, manySpace.length())) + "@G");
+		retValue.comment("    Current");
+		retValue.comment("  Average");
+		retValue.comment("  Maximum");
+		retValue.comment("@l");
+		
 		for (Iterator i = dsMap.values().iterator(); i.hasNext(); ) {
 			DsDesc ds = (DsDesc) i.next();
-			if (ds.dsName == null && ds.rpn == null)
-				ds.graphType.draw(retValue, ds.name, ds.color, ds.legend + "@l");
+			if (ds.dsName == null && ds.rpn == null) {
+				ds.graphType.draw(retValue, ds.name, ds.color);
+				addLegend(retValue, ds.name, ds.graphType, ds.legend);
+			}
 			else if (ds.rpn == null) {
 				boolean exist = false; // Used to check it the data source one way or another
 				//Does the datas existe in the provided values
@@ -489,9 +466,10 @@ implements Cloneable {
 							ds.cf.toString());				
 				}
 				if (exist) {
-					if(ds.graphType != null)
-						ds.graphType.draw(retValue, ds.name, ds.color,
-								ds.legend + "@l");
+					if(ds.graphType != null) {
+						ds.graphType.draw(retValue, ds.name, ds.color);
+						addLegend(retValue, ds.name, ds.graphType, ds.legend);
+					}
 					else {
 						logger.warn("graph type is null for " + ds.dsName + " on probe " + probe);
 					}
@@ -499,7 +477,8 @@ implements Cloneable {
 			}
 			else {
 				retValue.datasource(ds.name, ds.rpn);
-				ds.graphType.draw(retValue, ds.name, ds.color, ds.legend + "@l");
+				ds.graphType.draw(retValue, ds.name, ds.color);
+				addLegend(retValue, ds.name, ds.graphType, ds.legend);
 			}
 		}
 		retValue.setShowLegend(true);
@@ -509,6 +488,22 @@ implements Cloneable {
 		return retValue;
 	}
 	
+	private void addLegend(RrdGraphDef def, String ds, GraphType gt, String legend) throws RrdException {
+		if(gt == GraphType.COMMENT) {
+			def.comment(legend + "@l");
+		}
+		else if(gt != GraphType.NONE && legend != null) {
+			def.comment(legend);
+			int missingLength = Math.min(maxLengthLegend - legend.length(), manySpace.length());
+			if(missingLength > 0)
+				def.comment(manySpace.substring(0, missingLength) + "@G");
+			def.gprint(ds, ConsFunc.LAST.toString(), "@8.2@s");
+			def.gprint(ds, ConsFunc.AVERAGE.toString(), "@8.2@s");
+			def.gprint(ds, ConsFunc.MAX.toString(), "@8.2@s");
+			def.gprint(ds, ConsFunc.MIN.toString(), "@8.2@s");
+			def.comment("@l");
+		}
+	}
 	/**
 	 * return the RrdGraphDef for this graph, used the indicated probe
 	 *
@@ -702,5 +697,30 @@ implements Cloneable {
 	 */
 	public void setGraphTitle(String graphTitle) {
 		this.graphTitle = graphTitle;
+	}
+
+	/**
+	 * Find the value of field in the class, the field is is upper case
+	 *
+	 * @param clazz Class the class to search in
+	 * @param name String the looked for field
+	 * @return Object the value of the field or null
+	 */
+	private static final Object resolv(Class clazz, String name) {
+		Object gt = null;
+		Field gtfield;
+		try {
+			gtfield = clazz.getField(name.toUpperCase());
+			if (gtfield != null)
+				gt = gtfield.get(clazz);
+		}
+		catch (Exception e) {
+			logger.error(name + " is a invalid constant name for type " + clazz);
+		}
+		return gt;
+	}
+	
+	public static final PathElement resolvPathElement(String name) {
+		return (PathElement) resolv(PathElement.class, name);
 	}
 }
