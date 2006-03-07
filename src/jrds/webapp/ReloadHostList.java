@@ -32,9 +32,10 @@ public class ReloadHostList extends HttpServlet {
 	/* (non-Javadoc)
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
-	protected void doGet(HttpServletRequest arg0, HttpServletResponse arg1)
+	protected void doGet(HttpServletRequest req, HttpServletResponse arg1)
 			throws ServletException, IOException {
 		HostsList.fill(new File(pm.configfilepath));
 		logger.info("Configuration file " + pm.configfilepath + " reloaded");
+		arg1.sendRedirect(req.getContextPath() + "/");
 	}
 }
