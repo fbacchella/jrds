@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 public class StartListener implements ServletContextListener {
 	static final private Logger logger = Logger.getLogger(StartListener.class);
 	static final PropertiesManager pm = PropertiesManager.getInstance();
-	static final HostsList hl = HostsList.getRootGroup();
 	static private boolean started = false;
 	private static final Timer collectTimer = new Timer(true);
 
@@ -56,13 +55,12 @@ public class StartListener implements ServletContextListener {
 				System.getProperties().setProperty("java.awt.headless","true");
 				
 				StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
-				hl.append(new File(pm.configfilepath));
+				HostsList.getRootGroup().append(new File(pm.configfilepath));
 								
 				TimerTask collector = new TimerTask () {
-					private final HostsList lhl = hl;
 					public void run() {
 						try {
-							lhl.collectAll();
+							HostsList.getRootGroup().collectAll();
 						} catch (IOException e) {
 							logger.error("Unable to launch collect: ", e);
 						}
