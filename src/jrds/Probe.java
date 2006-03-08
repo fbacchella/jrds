@@ -275,10 +275,13 @@ implements Comparable {
 			onesample.update();
 		}
 		catch (ArithmeticException ex) {
-			logger.warn("Error while storing sample: " +
+			logger.warn("Error while storing sample for probe " + this + ": " +
 					ex.getMessage());
 		} catch (Exception e) {
-			logger.error("Error with probe " + this + ": " + e.getMessage());
+			if(logger.isDebugEnabled())
+				logger.debug("Error with probe " + this + ": ", e);
+			else
+				logger.error("Error with probe " + this + ": " + e.getMessage());
 		}
 		finally  {
 			if(rrdDb != null)
@@ -373,5 +376,25 @@ implements Comparable {
 				StoreOpener.releaseRrd(rrdDb);
 		}
 		return retValue;
+	}
+	
+	public Map getLastValues() {
+		Map retValues = new HashMap();
+		RrdDb rrdDb = null;
+		try {
+			rrdDb = StoreOpener.getRrd(getRrdName());
+			String[] dsNames = rrdDb.getDsNames();
+			for(int i = 0; i < dsNames.length ; i ++) {
+				retValues.put(dsNames[i], new Double(rrdDb.getDatasource(i).getLastValue()));
+			}
+			retValues.put("Last update", new Date(1000 * rrdDb.getLastUpdateTime()));
+		} catch (Exception e) {
+			logger.error("Unable to get last values for" + getName() + ": " + e.getMessage());
+		}
+		finally {
+			if(rrdDb != null)
+				StoreOpener.releaseRrd(rrdDb);
+		}
+		return retValues;
 	}
 }
