@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
  */
 public class Period {
 	static final private Logger logger = Logger.getLogger(Period.class);
-	static private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	static private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd:HH:mm");
 	static private final Pattern datePattern = Pattern.compile("\\d\\d\\d\\d-\\d\\d-\\d\\d");
 	private Date begin = null;
 	private Date end = null;
@@ -101,7 +101,7 @@ public class Period {
 	 * @param begin The begin to set.
 	 */
 	public void setBegin(String begin) {
-		this.begin = string2Date(begin);
+		this.begin = string2Date(begin, "00:00");
 	}
 	
 	/**
@@ -114,7 +114,7 @@ public class Period {
 	 * @param end The end to set.
 	 */
 	public void setEnd(String end) {
-		this.end = string2Date(end);
+		this.end = string2Date(end, "23:59");
 		if(this.end == null)
 			this.end = new Date();
 	}
@@ -133,14 +133,14 @@ public class Period {
 	 * @param begin The calculated begin date
 	 * @param end The calculated end date
 	 */
-	private Date string2Date(String date){
+	private Date string2Date(String date, String hour){
 		Date foundDate = null;
 		if("NOW".compareToIgnoreCase(date) == 0) {
 			foundDate = new Date();
 		}
 		else if(datePattern.matcher(date).matches()) {
 			try {
-				foundDate = df.parse(date);
+				foundDate = df.parse(date + ":" + hour);
 			} catch (ParseException e) {
 				logger.error("Illegal date argument: " + e);
 			}
