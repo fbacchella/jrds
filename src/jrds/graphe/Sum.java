@@ -23,14 +23,16 @@ import org.jrobin.graph.RrdGraphDef;
 public class Sum extends RdsGraph {
 	static final private Logger logger = Logger.getLogger(Sum.class);
 
-	static final HostsList hl = HostsList.getRootGroup();
-	static final GraphDesc gd = new GraphDesc();
+	static final private GraphDesc gd = new GraphDesc();
 	static {
 		gd.setGraphName("Sum");
 		gd.setGraphTitle("Sum");
 		gd.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.TITLE});
 		gd.setViewTree(new Object[] {GraphDesc.SERVICES,  "Sum", GraphDesc.TITLE});
 	}
+
+	/*Does not change during the short life of this object*/
+	private final HostsList hl = HostsList.getRootGroup();
 
 	public Sum(Probe theStore) {
 		super(theStore, gd);
@@ -54,12 +56,19 @@ public class Sum extends RdsGraph {
 					double[][] tempallvalues = fd.getValues();
 					for(int c = 0 ; c < tempallvalues.length ; c++) {
 						for(int r = 0 ; r < tempallvalues[c].length; r++) {
-							allvalues[c][r] += tempallvalues[c][r];
+							double v = tempallvalues[c][r];
+							if ( ! Double.isNaN(v) ) {
+								if(! Double.isNaN(allvalues[c][r]))
+									allvalues[c][r] += v;
+								else	
+									allvalues[c][r] = v;
+
+							}
 						}
 					}
 				}
 				else {
-					allvalues = fd.getValues();
+					allvalues = (double[][]) fd.getValues().clone();
 				}
 			}
 			else {
