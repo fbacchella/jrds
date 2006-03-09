@@ -112,10 +112,6 @@ implements Comparable {
 		this.probe = theStore;
 	}
 	
-	//protected String initFileNamePrefix() {
-	//    return gd.getFilename();
-	//}
-	
 	public LinkedList getTreePathByHost() {
 		return gd.getHostTree(this);
 	}
@@ -212,7 +208,7 @@ implements Comparable {
 		graphDef.setTitle(getGraphTitle());
 		graphDef.comment("@l");
 		graphDef.comment("@l");
-		graphDef.comment("Last update : " +
+		graphDef.comment("Last update: " +
 				lastUpdateFormat.format(lastUpdate) + "@l");
 		graphDef.comment("Period from " + lastUpdateFormat.format(startDate) +
 				" to " + lastUpdateFormat.format(endDate) + "@l");
@@ -221,6 +217,9 @@ implements Comparable {
 	
 	public RrdGraph getRrdGraph(Date startDate, Date endDate) throws
 	IOException, RrdException {
+		Date lastUpdate = probe.getLastUpdate();
+		if(endDate.after(lastUpdate))
+			endDate = new Date(lastUpdate.getTime() );
 		RrdGraphDef tempGraphDef = getRrdDef();
 		tempGraphDef.setTimePeriod(startDate, endDate);
 		tempGraphDef = graphFormat(tempGraphDef, startDate, endDate);
