@@ -404,7 +404,6 @@ implements Cloneable {
 			c = colors[lastColor++ % colors.length];
 		if(legend == null && name != null)
 			legend = name;
-		logger.debug(legend + " " + maxLengthLegend + " " + legend.length());
 		add(name, dsName, rpn, gt, c, legend, cf);
 		
 	}
@@ -443,6 +442,7 @@ implements Cloneable {
 		retValue.comment(manySpace.substring(0, Math.min(maxLengthLegend, manySpace.length())) + "@G");
 		retValue.comment("    Current");
 		retValue.comment("  Average");
+		retValue.comment("  Minimum");
 		retValue.comment("  Maximum");
 		retValue.comment("@l");
 		
@@ -499,8 +499,8 @@ implements Cloneable {
 				def.comment(manySpace.substring(0, missingLength) + "@G");
 			def.gprint(ds, ConsFunc.LAST.toString(), "@8.2@s");
 			def.gprint(ds, ConsFunc.AVERAGE.toString(), "@8.2@s");
-			def.gprint(ds, ConsFunc.MAX.toString(), "@8.2@s");
 			def.gprint(ds, ConsFunc.MIN.toString(), "@8.2@s");
+			def.gprint(ds, ConsFunc.MAX.toString(), "@8.2@s");
 			def.comment("@l");
 		}
 	}
