@@ -397,4 +397,12 @@ implements Comparable {
 		}
 		return retValues;
 	}
+	/**
+	 * Return a uniq name for the graph
+	 * @return
+	 */
+	public String getQualifieName() {
+		return getHost().getName() + "/"  + getName();
+	}
+
 }

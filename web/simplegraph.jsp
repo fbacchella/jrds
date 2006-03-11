@@ -2,8 +2,17 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ page session="false" %>
+<%@ page import="jrds.HostsList" %>
+<%@ page import="jrds.RdsGraph" %>
+
 <jsp:useBean id="period" class="jrds.webapp.PeriodBean"/>
 <jsp:setProperty name="period" property="*" /> 
+
+<%
+		final HostsList hl = HostsList.getRootGroup();
+		String rrdId = request.getParameter("id");
+		RdsGraph graph = hl.getGraphById(Integer.parseInt(rrdId));
+%>
 
 <html>
 
@@ -16,6 +25,7 @@
 <script type="text/javascript" src="lib/calendar-setup.js"></script> 
 <script type="text/javascript" src="lib/jrdsdate.js"></script> 
 <script type="text/javascript" src="lib/querystring.js"></script> 
+<script type="text/javascript" src="lib/infobulle.js"></script> 
 <script type="text/javascript">
 //We preload the image
 var oImage = new Image;
@@ -53,7 +63,7 @@ function download_onClick()
 		<div align="center">
 			<table width="180" border="0" cellspacing="2" cellpadding="0">
 				<tr>
-					<td><input onclick="refresh_onClick();" type="button" name="refreshButton" value="Refrech" tabindex="0"></td>
+					<td><input onclick="refresh_onClick();" type="button" name="refreshButton" value="Refresh" tabindex="0"></td>
 					<td width="100"></td>
 					<td><input onclick="keep_onClick();" type="button" name="keepButton" value="Keep" tabindex="1"></td>
 					<td width="100"></td>
@@ -87,16 +97,19 @@ function download_onClick()
 				</div>
 			</form>
 <script type="text/javascript">
-	dateForm.end.value = "<jsp:getPropertyname="period" property="end" />"; 
-	dateForm.begin.value = "<jsp:getPropertyname="period" property="begin" />"; 
-    dateForm.scale.selectedIndex = <jsp:getPropertyname="period" property="scale" />;
-    dateForm.id.value = qs.get("id", 0);
+	document.dateForm.end.value = "<jsp:getPropertyname="period" property="end" />"; 
+	document.dateForm.begin.value = "<jsp:getPropertyname="period" property="begin" />"; 
+    document.dateForm.scale.selectedIndex = <jsp:getPropertyname="period" property="scale" />;
+    document.dateForm.id.value = qs.get("id", 0);
     beginCal = startCal("begin", "dateBeginTrigger");
     endCal = startCal("end", "dateEndTrigger");
+    InitBulle("navy","#FFCC66","orange",1);
 </script>
-			<img onclick="history_onClick();" id="graphImg" src="img/aollogo.gif" alt="" name="graphImg" border="0">
+			<img onMouseOver="this.T_DELAY=3000;return escape('Graph name: <%=graph.getQualifieName()%><br>Probe Name: <%=graph.getProbe().getQualifieName()%>')" onclick="history_onClick();" id="graphImg" src="img/aollogo.gif" alt="" name="graphImg" border="0">
 			<script type="text/javascript">document.graphImg.src="graph" + window.location.search;</script>
+
 		</div>
+		<script language="JavaScript" type="text/javascript" src="lib/wz_tooltip.js"></script>
 	</body>
 </html>
 
