@@ -401,8 +401,12 @@ implements Comparable {
 	 * Return a uniq name for the graph
 	 * @return
 	 */
-	public String getQualifieName() {
+	public String getQualifiedName() {
 		return getHost().getName() + "/"  + getName();
+	}
+
+	public int hashCode() {
+		return getQualifiedName().hashCode();
 	}
 
 }
