@@ -39,12 +39,16 @@ public class ApacheTransfer extends RdsGraph {
 	public ApacheTransfer(Probe theStore) {
 		super(theStore, gd);
 		url = ((ApacheStatus) theStore).getUrl();
+	}
+
+	public String getGraphTitle() {
 		URL tmpUrl = url;
 		try {
 			tmpUrl = new URL(url.getProtocol(), url.getHost(), "/");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		setGraphTitle("HTTP bytes transfered on " + tmpUrl.toExternalForm());
+		 return "HTTP bytes transfered on " + tmpUrl.toExternalForm();
 	}
+	
 }

@@ -38,12 +38,15 @@ public class ApacheRequests extends RdsGraph {
 	public ApacheRequests(Probe theStore) {
 		super(theStore, gd);
 		url = ((ApacheStatus) theStore).getUrl();
+	}
+
+	public String getGraphTitle() {
 		URL tmpUrl = url;
 		try {
 			tmpUrl = new URL(url.getProtocol(), url.getHost(), "/");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		setGraphTitle("HTTP Requests activity on " + tmpUrl.toExternalForm());
+		return "HTTP Requests activity on " + tmpUrl.toExternalForm();
 	}
 }
