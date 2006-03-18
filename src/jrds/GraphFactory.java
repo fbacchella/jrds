@@ -10,14 +10,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import jrds.xmlResources.ResourcesLocator;
 
 import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.Rule;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -145,23 +143,6 @@ public class GraphFactory {
 				}
 			}
 		}
-		return retValue;
-	}
-	
-	static final private Class resolvClass(String name, List packList) {
-		Class retValue = null;
-		for (Iterator i = packList.iterator(); i.hasNext() && retValue == null; ) {
-			try {
-				String packageTry = (String) i.next();
-				retValue = Class.forName(packageTry + name);
-			}
-			catch (ClassNotFoundException ex) {
-			}
-			catch (NoClassDefFoundError ex) {
-			}
-		}
-		if (retValue == null)
-			logger.warn("Class " + name + " not found");
 		return retValue;
 	}
 	
