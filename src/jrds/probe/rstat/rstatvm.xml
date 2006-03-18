@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+  <graphName>rstatvm</graphName>
+  <verticalLabel>Operation/s</verticalLabel>
+  <graphTitle>Virtual Memory activity on {1}</graphTitle>
+  <add>
+    <graphType>comment</graphType>
+    <legend>Page written to disk</legend>
+  </add>
+  <add>
+    <name>v_pgpgout</name>
+    <graphType>line</graphType>
+    <color>red</color>
+    <legend>Number of pages written to disk</legend>
+  </add>
+  <add>
+    <name>v_pswpout</name>
+    <graphType>line</graphType>
+    <color>yellow</color>
+    <legend>Number of pages swapped out</legend>
+  </add>
+  <add>
+    <graphType>comment</graphType>
+    <legend>Page read from disk</legend>
+  </add>
+  <add>
+    <name>v_pgpgin</name>
+    <graphType>none</graphType>
+  </add>
+  <add>
+    <name>Nv_pgpgin</name>
+    <rpn>0, v_pgpgin, -</rpn>
+    <graphType>line</graphType>
+    <color>green</color>
+    <legend>Number of pages read in from disk</legend>
+  </add>
+  <add>
+    <name>v_pswpin</name>
+    <graphType>none</graphType>
+  </add>
+  <add>
+    <name>Nv_pswpin</name>
+    <rpn>0, v_pswpin, -</rpn>
+    <graphType>line</graphType>
+    <color>blue</color>
+    <legend>Number of pages swapped in</legend>
+  </add>
+  <hosttree>
+  	<pathelement>HOST</pathelement>
+  	<pathelement>SYSTEM</pathelement>
+  	<pathelement>MEMORY</pathelement>
+  	<pathstring>VM activity by rstat</pathstring>
+  </hosttree>
+  <viewtree>
+    <pathelement>SYSTEM</pathelement>
+    <pathelement>MEMORY</pathelement>
+    <pathstring>VM activity by rstat</pathstring>
+    <pathelement>HOST</pathelement>
+  </viewtree>
+</graphdesc>
