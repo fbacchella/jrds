@@ -8,14 +8,11 @@ package jrds;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import jrds.snmp.SnmpRequester;
@@ -36,12 +33,14 @@ public class HostsList {
 	static Logger logger = Logger.getLogger(HostsList.class);
 	private Collection hostList;
 	private static HostsList instance;
-	private GraphTreeNode graphTreeByHost = null;
-	private GraphTreeNode graphTreeByView = null;
+	private GraphTree graphTreeByHost = null;
+	private GraphTree graphTreeByView = null;
 	private Map graphMap;
+	private Map probeMap;
 	private static final String hostRoot = "Sorted by host";
 	private static final String viewRoot = "Sorted by view";
 	private Map macroList = new HashMap();
+	private Map treeMap = null;
 
 	/**
 	 *  
@@ -51,9 +50,13 @@ public class HostsList {
 	}
 
 	private void init() {
-		graphTreeByHost = new GraphTreeNode(hostRoot);
-		graphTreeByView = new GraphTreeNode(viewRoot);
+		treeMap = new HashMap(2);
+		graphTreeByHost = GraphTree.makeGraph(hostRoot);
+		graphTreeByView = GraphTree.makeGraph(viewRoot);
+		treeMap.put(hostRoot, graphTreeByHost);
+		treeMap.put(viewRoot, graphTreeByView);
 		graphMap = new HashMap();
+		probeMap = new HashMap();
 		hostList = new HashSet();
 	}
 	public static HostsList getRootGroup() {
@@ -88,6 +91,7 @@ public class HostsList {
 		hostList.add(newhost);
 		for (Iterator j = newhost.getProbes().iterator(); j.hasNext();) {
 			Probe currProbe = (Probe) j.next();
+			probeMap.put(new Integer(currProbe.hashCode()), currProbe);
 			if (currProbe.getGraphList() != null)
 				for (Iterator k = currProbe.getGraphList().iterator(); k
 						.hasNext();) {
@@ -145,32 +149,16 @@ public class HostsList {
 		}
 	}
 
-	public Collection enumProbes() {
-		Collection allrrds = new HashSet(hostList.size() * 10);
-		for (Iterator i = hostList.iterator(); i.hasNext();) {
-			RdsHost oneHost = (RdsHost) i.next();
-			allrrds.addAll(oneHost.getProbes());
-		}
-		return allrrds;
-	}
-
-	public int size() {
-		int retValue = 0;
-		if (hostList != null)
-			retValue = hostList.size();
-		return retValue;
-	}
-
-	public GraphTreeNode getGraphTreeByHost() {
+	public GraphTree getGraphTreeByHost() {
 		return graphTreeByHost;
 	}
 
-	public GraphTreeNode getGraphTreeByView() {
+	public GraphTree getGraphTreeByView() {
 		return graphTreeByView;
 	}
 
 	/**
-	 * Return a grah identified by his hash value
+	 * Return a graph identified by his hash value
 	 * @param id the hash value of the graph
 	 * @return the graph found or null of nothing found
 	 */
@@ -178,16 +166,20 @@ public class HostsList {
 		return (RdsGraph) graphMap.get(new Integer(id));
 	}
 
-	public GraphTreeNode getNodeByPath(String path) {
-		GraphTreeNode node = null;
-		if(path != null) {
-			List pathList = new LinkedList(Arrays.asList(path.split("/")));
-			pathList.remove(0);
-			String rootName = (String) pathList.get(0);
-			if (hostRoot.equals(rootName))
-				node = getGraphTreeByHost().getByPath(pathList);
-			else if (viewRoot.equals(rootName))
-				node = getGraphTreeByView().getByPath(pathList);
+	/**
+	 * Return a probe identified by his hash value
+	 * @param id the hash value of the probe
+	 * @return the graph found or null of nothing found
+	 */
+	public Probe getProbeById(int id) {
+		return (Probe) probeMap.get(new Integer(id));
+	}
+
+	public GraphTree getNodeByPath(String path) {
+		GraphTree tree = (GraphTree) treeMap.get(path.split("/")[1]);
+		GraphTree node = null;
+		if(tree != null) {
+			node = tree.getByPath(path);
 		}
 		return node;
 	}

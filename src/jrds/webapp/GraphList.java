@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import jrds.GraphTreeNode;
+import jrds.GraphTree;
 import jrds.HostsList;
 import jrds.Period;
 import jrds.RdsGraph;
@@ -64,7 +64,7 @@ public class GraphList extends HttpServlet {
 		writer.println("\t</head>");
 		writer.println("\t<body>");
 		
-		GraphTreeNode node = HostsList.getRootGroup().getNodeByPath(req.getPathInfo());
+		GraphTree node = HostsList.getRootGroup().getNodeByPath(req.getPathInfo());
 		if(node != null) {
 			for(Iterator i = node.enumerateChildsGraph().iterator(); i.hasNext() ;) {
 				StringBuffer imgElement = new StringBuffer();
