@@ -31,6 +31,7 @@ public class OracleActivityGraph extends RdsGraph {
 		gd.setViewTree(new Object[] {
 				GraphDesc.SERVICES, GraphDesc.DATABASE, GraphDesc.JDBC, "DB activity"});
 		gd.setGraphTitle("DB activity on {3}");
+		gd.setGraphName("{4}");
 	}
 
 	/**
@@ -38,7 +39,6 @@ public class OracleActivityGraph extends RdsGraph {
 	 */
 	public OracleActivityGraph(Probe theStore) {
 		super(theStore, gd);
-		setName(theStore.getName());
 	}
 
 }

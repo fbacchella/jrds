@@ -30,6 +30,7 @@ public class SybaseGraph extends RdsGraph {
 		gd.setViewTree(new Object[] {
 				GraphDesc.SERVICES, GraphDesc.DATABASE, GraphDesc.JDBC, "Disk usage"});
 		gd.setGraphTitle("Disk usage for {3}");
+		gd.setGraphName("{4}");
 	}
 
 	/**
@@ -37,7 +38,5 @@ public class SybaseGraph extends RdsGraph {
 	 */
 	public SybaseGraph(Probe theStore) {
 		super(theStore, gd);
-		setName(theStore.getName());
-		//setGraphTitle("Disk usage for " + ((jrds.probe.Sybase) probe).getDbName());
 	}
 }
