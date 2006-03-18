@@ -59,22 +59,6 @@ public final class Graph extends HttpServlet {
 		graph.writePng(out, begin, end);
 	}
 	
-	/**
-	 * @param graph
-	 * @param req
-	 * @param begin
-	 * @param end
-	 * @return A String containing the absolute URL of the image
-	 */
-	public static String getImgUrl(RdsGraph graph, HttpServletRequest req, long begin, long end) {
-		StringBuffer retValue = new StringBuffer();
-		retValue.append(req.getContextPath());
-		retValue.append("/graph?id=" + graph.hashCode());
-		retValue.append("&begin=" + begin);
-		retValue.append("&end=" + end);
-		return retValue.toString();
-	}
-	
 	public static String getImgUrl(RdsGraph graph, HttpServletRequest req, String begin, String end) {
 		StringBuffer retValue = new StringBuffer();
 		retValue.append(req.getContextPath());
