@@ -28,9 +28,9 @@ public class DiskIoGraphSize extends RdsGraph {
 		gd.add("diskIOBLKWSZ", "diskIONWritten, diskIOWrites, /", GraphDesc.LINE,Color.BLUE,"Average request size on write");
 		gd.setVerticalLabel("octets");
 		gd.setHostTree(new Object[] {
-				GraphDesc.HOST, GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.INDEX, "Average requeste size"});
+				GraphDesc.HOST, GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.INDEX, "Average requests size"});
 		gd.setViewTree(new Object[] {
-						GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.HOST, "Average request size", GraphDesc.INDEX});
+						GraphDesc.DISK, GraphDesc.DISKACTIVITY, GraphDesc.HOST, "Average requests size", GraphDesc.INDEX});
 		gd.setGraphName("bsize-{2}");
 		gd.setGraphTitle("Average requeste size on disk {2} on {1}");
 	}
