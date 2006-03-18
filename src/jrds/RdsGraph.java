@@ -78,13 +78,6 @@ implements Comparable {
 	}
 	
 	/**
-	 * @param height The height to set.
-	 */
-	public void setHeight(int height) {
-		gd.setHeight(height);
-	}
-	
-	/**
 	 * @return Returns the width.
 	 */
 	public int getWidth() {
@@ -92,24 +85,10 @@ implements Comparable {
 	}
 	
 	/**
-	 * @param width The width to set.
-	 */
-	public void setWidth(int width) {
-		gd.setWidth(width);
-	}
-	
-	/**
 	 * @return Returns the theStore.
 	 */
 	public Probe getProbe() {
 		return probe;
-	}
-	
-	/**
-	 * @param theStore The theStore to set.
-	 */
-	public void setProbe(Probe theStore) {
-		this.probe = theStore;
 	}
 	
 	public LinkedList getTreePathByHost() {
@@ -122,10 +101,6 @@ implements Comparable {
 	
 	public String getPngName() {
 		return getName() + ".png";
-	}
-	
-	public void setGraphTitle(String title) {
-		this.graphTitle = title;
 	}
 	
 	private final String parseTemplate(String template) {
@@ -153,13 +128,6 @@ implements Comparable {
 			graphTitle = parseTemplate(gd.getGraphTitle());
 		}
 		return graphTitle;
-	}
-	
-	/**
-	 * @param name the filename prefix of the graph.
-	 */
-	public void setName(String name) {
-		this.name = name;
 	}
 	
 	protected String getName() {
@@ -345,13 +313,6 @@ implements Comparable {
 	
 	final public GraphDesc getGraphDesc() {
 		return gd;
-	}
-	
-	/**
-	 * @param gd The gd to set.
-	 */
-	public void setGraphDesc(GraphDesc gd) {
-		this.gd = gd;
 	}
 	
 	/* (non-Javadoc)
