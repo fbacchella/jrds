@@ -17,6 +17,7 @@ import jrds.xmlResources.ResourcesLocator;
 
 import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.Rule;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -97,7 +98,7 @@ public class GraphFactory {
 			else {
 				Digester digester = new Digester();
 				digester.setValidating(false);
-				digester.addObjectCreate("graphdesc","jrds.GraphDesc");
+				digester.addObjectCreate("graphdesc", jrds.GraphDesc.class);
 				digester.addSetProperties("graphdesc");
 				digester.addCallMethod("graphdesc/filename", "setGraphName", 0);
 				digester.addCallMethod("graphdesc/graphName", "setGraphName", 0);
@@ -112,9 +113,9 @@ public class GraphFactory {
 				digester.addCallParam("graphdesc/add/color",4);
 				digester.addCallParam("graphdesc/add/legend",5);
 				digester.addCallParam("graphdesc/add/cf",6);
-				digester.addObjectCreate("graphdesc/hosttree", "java.util.ArrayList");
+				digester.addObjectCreate("graphdesc/hosttree", java.util.ArrayList.class);
 				digester.addSetNext("graphdesc/hosttree", "setHostTree");
-				digester.addObjectCreate("graphdesc/viewtree", "java.util.ArrayList");
+				digester.addObjectCreate("graphdesc/viewtree", java.util.ArrayList.class);
 				digester.addSetNext("graphdesc/viewtree", "setViewTree");
 				digester.addRule("*/pathelement", new Rule() {
 					public void body (String namespace, String name, String text) {
