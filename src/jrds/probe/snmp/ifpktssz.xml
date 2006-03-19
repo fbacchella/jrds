@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+  <graphName>ifpktssz-{2}</graphName>
+  <verticalLabel>bytes</verticalLabel>
+  <lowerLimit>NaN</lowerLimit>
+  <graphTitle>Packets size on interface {2} on {1}</graphTitle>
+  <add>
+    <name>ifOutUcastPkts</name>
+    <graphType>none</graphType>
+  </add>
+  <add>
+    <name>ifOutOctets</name>
+    <graphType>none</graphType>
+  </add>
+  <add>
+    <name>outPktSize</name>
+    <rpn>ifOutOctets, ifOutUcastPkts,/</rpn>
+    <graphType>area</graphType>
+    <color>green</color>
+    <legend>average packets size send</legend>
+  </add>
+  <add>
+    <name>ifInUcastPkts</name>
+    <graphType>none</graphType>
+  </add>
+  <add>
+    <name>ifInOctets</name>
+    <graphType>none</graphType>
+  </add>
+  <add>
+    <name>inPktSize</name>
+    <graphType>area</graphType>
+    <color>blue</color>
+    <rpn>0, ifInOctets, ifInUcastPkts,/,-</rpn>
+    <legend>average packets size received</legend>
+  </add>
+  <hosttree>
+    <pathelement>HOST</pathelement>
+    <pathelement>NETWORK</pathelement>
+    <pathelement>INTERFACES</pathelement>
+    <pathelement>INDEX</pathelement>
+    <pathstring>Packets size</pathstring>
+  </hosttree>
+  <viewtree>
+    <pathelement>NETWORK</pathelement>
+    <pathelement>INTERFACES</pathelement>
+    <pathelement>HOST</pathelement>
+    <pathelement>INDEX</pathelement>
+    <pathstring>Packets size</pathstring>
+  </viewtree>
+</graphdesc>
