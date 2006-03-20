@@ -18,7 +18,7 @@ public class ExaleadFront extends Exalead {
 		pd.add("threads", ProbeDesc.GAUGE, "threads");
 		pd.add("max", ProbeDesc.GAUGE, "max");
 		pd.add("last-started", ProbeDesc.NONE);
-		pd.setName("exeafront");
+		pd.setProbeName("exeafront");
 		pd.setGraphClasses(new Object[] {});
 		
 	}

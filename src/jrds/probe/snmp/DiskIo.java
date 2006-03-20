@@ -29,7 +29,7 @@ public class DiskIo extends RdsIndexedSnmpRrd {
 		pd.add("diskIOWrites", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.2021.13.15.1.1.6"));
 		pd.setGraphClasses(new Class[] {DiskIoGraphBytes.class, DiskIoGraphReq.class, DiskIoGraphSize.class});
 		pd.setIndexOid(new OID(".1.3.6.1.4.1.2021.13.15.1.1.2"));
-		pd.setName("io-{1}");
+		pd.setProbeName("io-{1}");
 		pd.setUniqIndex(true);
 	}
 

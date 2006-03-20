@@ -16,19 +16,13 @@ import jrds.RdsHost;
 import jrds.graphe.DiskIoGraphBytes;
 import jrds.graphe.DiskIoGraphReq;
 import jrds.graphe.DiskIoGraphSize;
-import jrds.probe.IndexedProbe;
-
-import org.apache.log4j.Logger;
-
 
 /**
  * @author bacchell
  *
  * TODO 
  */
-public class DiskIoMunins extends MuninsProbe implements IndexedProbe {
-	static private final Logger logger = Logger.getLogger(DiskIoMunins.class);
-	
+public class DiskIoMunins extends MuninsIndexedNameProbe {
 	static final private ProbeDesc pd = new ProbeDesc(6);
 	static {
 		pd.add("rtime", ProbeDesc.GAUGE, "rtime.value");
@@ -38,21 +32,15 @@ public class DiskIoMunins extends MuninsProbe implements IndexedProbe {
 		pd.add("diskIONRead", ProbeDesc.COUNTER, "nread.value");
 		pd.add("diskIONWritten", ProbeDesc.COUNTER, "nwritten.value");
 		pd.setMuninsProbesNames(new String[] { "io_busy", "io_ops", "io_bytes"});
+		pd.setProbeName("io-{1}_munins");
 		pd.setGraphClasses(new Class[] {DiskIoGraphBytes.class, DiskIoGraphReq.class, DiskIoGraphSize.class});
 	}
-
-	//static final Collection  muninsname = Arrays.asList(n);
-
-	Collection muninsName = null;
-	String indexKey = null;
 
 	/**
 	 * @param monitoredHost
 	 */
 	public DiskIoMunins(RdsHost monitoredHost, String indexKey) {
-		super(monitoredHost, (ProbeDesc) pd.clone());
-		this.indexKey = indexKey;
-		getPd().setName("io-" + getIndexName() + "_munins");
+		super(monitoredHost, pd, indexKey);
 	}
 	public Collection getMuninsName()
 	{
@@ -66,13 +54,6 @@ public class DiskIoMunins extends MuninsProbe implements IndexedProbe {
 			}
 		}
 		return muninsName;
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.probe.IndexedProbe#getIndexName()
-	 */
-	public String getIndexName() {
-		return indexKey;
 	}
 
 	public Map filterValues(Map valuesList)

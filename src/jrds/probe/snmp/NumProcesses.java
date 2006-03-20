@@ -26,7 +26,7 @@ public class NumProcesses extends RdsSnmpSimple {
 	static {
 		pd.add("hrSystemProcesses", ProbeDesc.GAUGE, hrSystemProcesses);
 		pd.setGraphClasses(new Object []{"numprocess.xml"});
-		pd.setName("nprocesses");
+		pd.setProbeName("nprocesses");
 		pd.setRequester(SnmpRequester.SIMPLE);
 	}
 	

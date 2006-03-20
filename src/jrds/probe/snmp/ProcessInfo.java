@@ -43,7 +43,7 @@ public class ProcessInfo extends RdsIndexedSnmpRrd {
 		pd.add(NUM, ProbeDesc.GAUGE);
 		pd.setGraphClasses(new Class[] {ProcessInfoNumber.class, ProcessInfoSize.class});
 		pd.setIndexOid(indexOid);
-		pd.setName("ps-{1}");
+		pd.setProbeName("ps-{1}");
 		pd.setUniqIndex(false);
 	}
 	

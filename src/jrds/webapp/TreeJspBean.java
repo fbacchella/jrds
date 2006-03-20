@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 
-import jrds.GraphTreeNode;
+import jrds.GraphTree;
 import jrds.HostsList;
 
 /**
@@ -22,10 +22,10 @@ import jrds.HostsList;
  */
 public class TreeJspBean {
 	public void getJavascriptTree(int sort, String father, JspWriter out, HttpServletRequest req) throws JspException {
-		GraphTreeNode graphTree = null;
-		if(sort == GraphTreeNode.LEAF_GRAPHTITLE )
+		GraphTree graphTree = null;
+		if(sort == GraphTree.LEAF_GRAPHTITLE )
 			graphTree = HostsList.getRootGroup().getGraphTreeByHost();
-		else if(sort == GraphTreeNode.LEAF_HOSTNAME)
+		else if(sort == GraphTree.LEAF_HOSTNAME)
 			graphTree = HostsList.getRootGroup().getGraphTreeByView();
 		try {
 			if(graphTree != null) {

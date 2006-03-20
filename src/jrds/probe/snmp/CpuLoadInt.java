@@ -30,7 +30,7 @@ extends RdsSnmpSimple {
 		pd.add("la1", ProbeDesc.GAUGE, new OID(".1.3.6.1.4.1.2021.10.1.5.1"));
 		pd.add("la5", ProbeDesc.GAUGE, new OID(".1.3.6.1.4.1.2021.10.1.5.2"));
 		pd.add("la15", ProbeDesc.GAUGE, new OID(".1.3.6.1.4.1.2021.10.1.5.3"));
-		pd.setName("laverage");
+		pd.setProbeName("laverage");
 		pd.setRequester(SnmpRequester.RAW);
 		
 		pd.setGraphClasses(new Object[] {"cpuload.xml"});

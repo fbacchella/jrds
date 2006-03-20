@@ -287,6 +287,7 @@ implements Cloneable {
 	private List viewTree = new ArrayList();
 	private List hostTree = new ArrayList();
 	private String graphName;
+	private String name;
 	private String graphTitle ="{0} on {1}";
 	private Dimension dimension = new Dimension();
 	private int maxLengthLegend = 0;
@@ -722,5 +723,13 @@ implements Cloneable {
 	
 	public static final PathElement resolvPathElement(String name) {
 		return (PathElement) resolv(PathElement.class, name);
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }

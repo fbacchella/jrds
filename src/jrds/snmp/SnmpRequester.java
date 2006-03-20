@@ -1,3 +1,9 @@
+/*##########################################################################
+_##
+_##  $Id$
+_##
+_##########################################################################*/
+
 package jrds.snmp;
 
 import java.io.IOException;
@@ -26,12 +32,12 @@ import org.snmp4j.util.TableUtils;
  * which gets a probe, a collection of ois
  * and make snmp requests based on those oid 
  * @author Fabrice Bacchella
+ * @version $Revision$
  */
 public abstract class SnmpRequester {
 	static private final Logger logger = Logger.getLogger(SnmpRequester.class);
 	static private Snmp snmp;
 	static private boolean started = false;
-	static final private Object globLock = new Object();
 	static private final OID upTimeOid = new OID(".1.3.6.1.2.1.1.3.0");
 	static private final VariableBinding upTimeVb = new VariableBinding(upTimeOid);
 	/**
@@ -87,21 +93,18 @@ public abstract class SnmpRequester {
 			Target snmpTarget = probe.getSnmpTarget();
 			SnmpVars retValue = new SnmpVars();
 			if(snmpTarget != null) {
-				//Object lock = snmpTarget;
-				//synchronized(lock){
-					DefaultPDUFactory localfactory = new DefaultPDUFactory();
-					TableUtils tableRet = new TableUtils(snmp, localfactory);
-					tableRet.setMaxNumColumnsPerPDU(30);
-					OID[] oidTab= new OID[oids.size()];
-					oids.toArray(oidTab);
-					for(Iterator i = tableRet.getTable(snmpTarget, oidTab, null, null).iterator() ;
-					i.hasNext(); ) {
-						TableEvent te = (TableEvent) i.next();
-						if(! te.isError()) {
-							retValue.join(te.getColumns());
-						}
+				DefaultPDUFactory localfactory = new DefaultPDUFactory();
+				TableUtils tableRet = new TableUtils(snmp, localfactory);
+				tableRet.setMaxNumColumnsPerPDU(30);
+				OID[] oidTab= new OID[oids.size()];
+				oids.toArray(oidTab);
+				for(Iterator i = tableRet.getTable(snmpTarget, oidTab, null, null).iterator() ;
+				i.hasNext(); ) {
+					TableEvent te = (TableEvent) i.next();
+					if(! te.isError()) {
+						retValue.join(te.getColumns());
 					}
-				//}
+				}
 			}
 			return retValue;
 		}	
@@ -142,14 +145,6 @@ public abstract class SnmpRequester {
 	public static final Snmp start() throws IOException {
 		if( ! started) {
 			snmp = new Snmp(new DefaultUdpTransportMapping());
-			//snmp.addTransportMapping(new DefaultTcpTransportMapping());
-			
-			/*MPv3 mpv3 =
-			 (MPv3)snmp.getMessageProcessingModel(MessageProcessingModel.MPv3);
-			 USM usm = new USM(SecurityProtocols.getInstance(),
-			 new OctetString(mpv3.createLocalEngineID()), 0);
-			 SecurityModels.getInstance().addSecurityModel(usm);*/
-			
 			snmp.listen();
 			
 			started = true;
@@ -172,11 +167,11 @@ public abstract class SnmpRequester {
 		Target snmpTarget = probe.getSnmpTarget();
 		SnmpVars snmpVars = null;
 		PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
-
-	    requestPDU.addAll(vars);
-
+		
+		requestPDU.addAll(vars);
+		
 		requestPDU.add(upTimeVb);
-
+		
 		try {
 			boolean doAgain = true;
 			PDU response = null;
@@ -189,7 +184,6 @@ public abstract class SnmpRequester {
 					response = re.getResponse();
 				if (response != null && response.getErrorStatus() == SnmpConstants.SNMP_ERROR_SUCCESS ){
 					snmpVars = new SnmpVars(response);
-					Number uptime = ((Number)snmpVars.get(upTimeOid));
 					doAgain = false;
 				}	
 				else {		

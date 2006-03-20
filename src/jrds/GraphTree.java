@@ -128,7 +128,6 @@ public class GraphTree {
 			newChild.setParent(this);
 			newChild.pathsMap = pathsMap;
 			pathsMap.put(newChild.getPath(), newChild);
-			logger.debug("Node added: " + newChild.getPath());
 		}
 	}
 	

@@ -1,43 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
-  <graphName>if-{2}</graphName>
-  <verticalLabel>bits/s</verticalLabel>
+  <graphName>ifpktssz-{2}</graphName>
+  <name>ifpktssz</name>
+  <verticalLabel>bytes</verticalLabel>
   <lowerLimit>NaN</lowerLimit>
-  <graphTitle>Bits exchanged on interface {2} on {1}</graphTitle>
+  <graphTitle>Packets size on interface {2} on {1}</graphTitle>
+  <add>
+    <name>ifOutUcastPkts</name>
+    <graphType>none</graphType>
+  </add>
   <add>
     <name>ifOutOctets</name>
     <graphType>none</graphType>
   </add>
   <add>
-    <name>ifOutBits</name>
-    <rpn>ifOutOctets,8,*</rpn>
+    <name>outPktSize</name>
+    <rpn>ifOutOctets, ifOutUcastPkts,/</rpn>
     <graphType>area</graphType>
     <color>green</color>
-    <legend>bits sends/s</legend>
+    <legend>average packets size send</legend>
+  </add>
+  <add>
+    <name>ifInUcastPkts</name>
+    <graphType>none</graphType>
   </add>
   <add>
     <name>ifInOctets</name>
     <graphType>none</graphType>
   </add>
   <add>
-    <name>ifInBitsInversed</name>
-    <rpn>ifInOctets,-8,*</rpn>
+    <name>inPktSize</name>
     <graphType>area</graphType>
     <color>blue</color>
-    <legend>bits received/s</legend>
+    <rpn>0, ifInOctets, ifInUcastPkts,/,-</rpn>
+    <legend>average packets size received</legend>
   </add>
   <hosttree>
     <pathelement>HOST</pathelement>
     <pathelement>NETWORK</pathelement>
     <pathelement>INTERFACES</pathelement>
     <pathelement>INDEX</pathelement>
-    <pathstring>bits exchanged</pathstring>
+    <pathstring>Packets size</pathstring>
   </hosttree>
   <viewtree>
     <pathelement>NETWORK</pathelement>
     <pathelement>INTERFACES</pathelement>
     <pathelement>HOST</pathelement>
     <pathelement>INDEX</pathelement>
-    <pathstring>bits exchanged</pathstring>
+    <pathstring>Packets size</pathstring>
   </viewtree>
 </graphdesc>

@@ -12,7 +12,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.JspFragment;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 
-import jrds.GraphTreeNode;
+import jrds.GraphTree;
 import jrds.HostsList;
 
 /**
@@ -36,10 +36,10 @@ public class GetTreeTag extends SimpleTagSupport {
 		JspWriter out=getJspContext().getOut();
 		
 		try {
-			GraphTreeNode graphTree = null;
-			if(sort == GraphTreeNode.LEAF_GRAPHTITLE )
+			GraphTree graphTree = null;
+			if(sort == GraphTree.LEAF_GRAPHTITLE )
 				graphTree = HostsList.getRootGroup().getGraphTreeByHost();
-			else if(sort == GraphTreeNode.LEAF_HOSTNAME)
+			else if(sort == GraphTree.LEAF_HOSTNAME)
 				graphTree = HostsList.getRootGroup().getGraphTreeByView();
 			if(graphTree != null) {
 				graphTree.getJavaScriptCode(out, req.getQueryString(), father + "_0");

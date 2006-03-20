@@ -83,7 +83,7 @@ public class Squid extends RdsSnmpSimple {
 		ipGraph.setViewTree(new Object[] {GraphDesc.SERVICES, "Squid", GraphDesc.HOST, "Number of objects"});
 		
 		pd.setGraphClasses(new Object[] {ipGraph, SquidHitRatioGraph.class, SquidBytesGraph.class, SquidCpu.class, SquidReqGraph.class});
-		pd.setName("squid");
+		pd.setProbeName("squid");
 	}
 	
 	/**

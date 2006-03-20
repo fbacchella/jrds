@@ -55,7 +55,11 @@ public class StartListener implements ServletContextListener {
 				System.getProperties().setProperty("java.awt.headless","true");
 				
 				StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
-				HostsList.getRootGroup().append(new File(pm.configfilepath));
+
+				ProbeFactory.init();
+				GraphFactory.init();
+
+				HostsList.fill(new File(pm.configfilepath));
 								
 				TimerTask collector = new TimerTask () {
 					public void run() {

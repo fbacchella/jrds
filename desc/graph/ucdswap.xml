@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+	<graphName>ucdswap</graphName>
+	<name>ucdswap</name>
+	<verticalLabel>Operation/s</verticalLabel>
+	<graphTitle>Virtual Memory activity on {1}</graphTitle>
+	<add>
+		<name>ssRawSwapIn</name>
+		<graphType>line</graphType>
+		<color>blue</color>
+		<legend>Number of pages swapped in</legend>
+	</add>
+	<add>
+		<name>ssRawSwapOut</name>
+		<graphType>none</graphType>
+	</add>
+	<add>
+		<name>ssRawSwapOuti</name>
+		<rpn>0, ssRawSwapOut, -</rpn>
+		<graphType>line</graphType>
+		<color>green</color>
+		<legend>Number of pages swapped out</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>MEMORY</pathelement>
+		<pathstring>VM activity by Net-SNMP</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>MEMORY</pathelement>
+		<pathstring>VM activity by Net-SNMP</pathstring>
+		<pathelement>HOST</pathelement>
+	</viewtree>
+</graphdesc>

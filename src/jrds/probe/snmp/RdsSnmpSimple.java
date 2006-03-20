@@ -1,8 +1,9 @@
-/*
- * Created on 24 déc. 2004
- *
- * TODO 
- */
+/*##########################################################################
+ _##
+ _##  $Id$
+ _##
+ _##########################################################################*/
+
 package jrds.probe.snmp;
 
 import java.util.Set;
@@ -10,17 +11,13 @@ import java.util.Set;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
-import org.apache.log4j.Logger;
-
 
 /**
- * @author bacchell
- *
- * TODO 
+ * This probe is used to do simple mapping from oid to datastore
+ * @author Fabrice Bacchella 
+ * @version $Revision$,  $Date$
  */
-public abstract class RdsSnmpSimple extends SnmpProbe  {
-	static final private Logger logger = Logger.getLogger(RdsSnmpSimple.class);
-
+public class RdsSnmpSimple extends SnmpProbe  {
 	public RdsSnmpSimple(RdsHost monitoredHost, ProbeDesc pd) {
 		super(monitoredHost, pd);
 	}

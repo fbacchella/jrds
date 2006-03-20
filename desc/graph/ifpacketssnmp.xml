@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
 	<graphName>ifpkts-{2}</graphName>
+	<name>ifpacketssnmp</name>
 	<verticalLabel>paquets/s</verticalLabel>
 	<lowerLimit>NaN</lowerLimit>
 	<graphTitle>Packets exchanged on interface {2} on {1}</graphTitle>

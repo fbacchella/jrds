@@ -6,6 +6,7 @@ _##########################################################################*/
 
 package jrds;
 
+import java.lang.reflect.Constructor;
 import java.util.*;
 
 import org.apache.log4j.*;
@@ -21,7 +22,7 @@ import jrds.snmp.SnmpRequester;
  * @author Fabrice Bacchella
  * @version $Revision$
  */
-public class ProbeDesc implements Cloneable {
+public class ProbeDesc {
 	static final private Logger logger = Logger.getLogger(ProbeDesc.class);
 	
 	private static final class DsType {
@@ -47,14 +48,14 @@ public class ProbeDesc implements Cloneable {
 	
 	
 	private Map dsMap;
+	private String probeName;
 	private String name;
 	private Collection namedProbesNames;
 	private Collection graphClasses;
-	private boolean cloned = false;
-	private boolean readOnly = false;
 	private OID indexOid = null;
 	private SnmpRequester requester = SnmpRequester.RAW;
 	private boolean uniqIndex = false;
+	private Class probeClass = Probe.class;
 	
 	
 	private final class DsDesc {
@@ -137,7 +138,33 @@ public class ProbeDesc implements Cloneable {
 	{
 		dsMap.put(name, new DsDesc(null, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, oid));
 	}
-	
+
+	public void add(String name, DsType dsType, Object index, double min, double max)
+	{
+		dsMap.put(name, new DsDesc(null, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, index));
+	}
+
+	public void add(Map valuesMap)
+	{
+		long heartbeat = HEARTBEATDEFAULT;
+		double min = MINDEFAULT;
+		double max = MAXDEFAULT;
+		Object index = null;
+		String name = null;
+		DsType type = null;
+		for(Iterator i = valuesMap.entrySet().iterator() ; i.hasNext() ;) {
+			Map.Entry e = (Map.Entry) i.next();
+			String var = (String)e .getKey();
+			if("dsName".equals(var))
+				name = (String) e.getValue();
+			else if("dsType".equals(var))
+				 type = (DsType) e.getValue();
+			else if("index".equals(var))
+				index = e.getValue();
+		}
+		dsMap.put(name, new DsDesc(type, heartbeat, min, max, index));
+	}
+
 	/**
 	 * Return a map that translate an OID to the datastore name
 	 * @return a Map of oid to datastore name
@@ -201,18 +228,15 @@ public class ProbeDesc implements Cloneable {
 	/**
 	 * @return Returns the rrdName.
 	 */
-	public String getName() {
-		return name;
+	public String getProbeName() {
+		return probeName;
 	}
 	
 	/**
-	 * @param rrdName The rrdName to set.
+	 * @param probeName The rrdName to set.
 	 */
-	public void setName(String rrdName) {
-		if(cloned || ! readOnly )
-			this.name = rrdName;
-		else
-			logger.error("RRD name tried to be set twice");
+	public void setProbeName(String probeName) {
+		this.probeName = probeName;
 	}
 	/**
 	 * @return Returns the muninsProbeName.
@@ -222,17 +246,11 @@ public class ProbeDesc implements Cloneable {
 	}
 	
 	public void setNamedProbesNames(Collection muninsProbesNames) {
-		if(cloned || ! readOnly )
-			this.namedProbesNames = muninsProbesNames;
-		else
-			logger.error("munins probe name tried to be set twice");
+		this.namedProbesNames = muninsProbesNames;
 	}
 	
 	public void setMuninsProbesNames(String[] muninsProbesNames) {
-		if(cloned || ! readOnly )
-			this.namedProbesNames = Arrays.asList(muninsProbesNames);
-		else
-			logger.error("munins probe name tried to be set twice");
+		this.namedProbesNames = Arrays.asList(muninsProbesNames);
 	}
 	/**
 	 * @return Returns the graphClasses.
@@ -245,48 +263,23 @@ public class ProbeDesc implements Cloneable {
 	 * @param graphClasses The graphClasses to set.
 	 */
 	public void setGraphClasses(Collection graphClasses) {
-		if(cloned || ! readOnly )
-			this.graphClasses = graphClasses;
-		else
-			logger.error("graph classes tried to be set twice");
+		this.graphClasses = graphClasses;
 	}
 	
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
 	public void setGraphClasses(Object[] graphClasses) {
-		if(cloned || ! readOnly )
-			this.graphClasses = Arrays.asList(graphClasses);
-		else
-			logger.error("graph classes tried to be set twice");
+		this.graphClasses = Arrays.asList(graphClasses);
 	}
 	
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
 	public void setGraphClasses(Class[] graphClasses) {
-		if(cloned || ! readOnly )
-			this.graphClasses = Arrays.asList(graphClasses);
-		else
-			logger.error("graph classes tried to be set twice");
+		this.graphClasses = Arrays.asList(graphClasses);
 	}
 	
-	/**
-	 * the clone method is automaticaly called by the all thje<code>Probe</code> methods that
-	 * set an <code>ProbeDesc</code> attribue. It allow to define a static <code>ProbeDesc</code> in each
-	 * <code>Probe</code> subclass.
-	 * @see java.lang.Object#clone()
-	 */
-	public Object clone() {
-		Object o = null;
-		try {
-			o = super.clone();
-			((ProbeDesc) o).cloned = true;
-		} catch (CloneNotSupportedException e) {
-			logger.error("Clone not suported for this object");
-		}
-		return o;
-	}
 	/**
 	 * @return Returns the index.
 	 */
@@ -300,16 +293,12 @@ public class ProbeDesc implements Cloneable {
 		this.indexOid = index;
 	}
 	
-	public void setRequester(SnmpRequester requester) {
-		this.requester = requester;
+	public void setIndexOid(String index) {
+		this.indexOid = new OID(index);
 	}
 	
-	/**
-	 * used to verify if <code>ProbeDesc</code> as been already cloned
-	 * @return Returns the cloned.
-	 */
-	public boolean isCloned() {
-		return cloned;
+	public void setRequester(SnmpRequester requester) {
+		this.requester = requester;
 	}
 	
 	public SnmpRequester getRequester() {
@@ -321,6 +310,7 @@ public class ProbeDesc implements Cloneable {
 	public boolean isUniqIndex() {
 		return uniqIndex;
 	}
+
 	/**
 	 * @param uniqIndex The value of the unicity index.
 	 * It's used to avoid doing too much GET if the indes is found only ounce.<p>
@@ -328,5 +318,61 @@ public class ProbeDesc implements Cloneable {
 	 */
 	public void setUniqIndex(boolean uniqIndex) {
 		this.uniqIndex = uniqIndex;
+	}
+
+	/**
+	 * Instanciate a probe for this probe description
+	 * @param constArgs
+	 * @return
+	 */
+	public Probe makeProbe(RdsHost host, List constArgs) {
+		Probe retValue = null;
+		if (probeClass != null) {
+			Object o = null;
+			try {
+				Class[] constArgsType = new Class[constArgs.size() + 2 ];
+				Object[] constArgsVal = new Object[constArgs.size() +2 ];
+				int index = 0;
+				constArgsVal[index] = host;
+				constArgsType[index] = constArgsVal[index].getClass();
+				index++;
+				constArgsVal[index] = this;
+				constArgsType[index] = constArgsVal[index].getClass();
+				index++;
+				for (Iterator i = constArgs.iterator(); i.hasNext(); index++) {
+					Object arg = i.next();
+					constArgsType[index] = arg.getClass();
+					constArgsVal[index] = arg;
+				}
+				Constructor theConst = probeClass.getConstructor(constArgsType);
+				o = theConst.newInstance(constArgsVal);
+				retValue = (Probe) o;
+			}
+			catch (ClassCastException ex) {
+				logger.warn("didn't get a Probe but a " + o.getClass().getName());
+			}
+			catch (Exception ex) {
+				logger.warn("Error during probe creation of type " + probeClass.getName() +
+						": " + ex, ex);
+			}
+		}
+		return retValue;
+	}
+	
+
+	public Class getProbeClass() {
+		return probeClass;
+	}
+
+	public void setProbeClass(Class probeClass) {
+		this.probeClass = probeClass;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }

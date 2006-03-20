@@ -7,10 +7,6 @@ package jrds.probe.munins;
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.graphe.IfGraph;
-
-import org.apache.log4j.Logger;
-
 
 /**
  * @author bacchell
@@ -18,9 +14,6 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public class IfSolarisMunins extends MuninsIndexedNameProbe {
-	
-	static private final Logger logger = Logger.getLogger(IfLinuxMunins.class);
-	
 	static final private ProbeDesc pd = new ProbeDesc(5);
 	static {
 		pd.add("ifInOctets", ProbeDesc.COUNTER, "rbytes.value");
@@ -28,8 +21,9 @@ public class IfSolarisMunins extends MuninsIndexedNameProbe {
 		pd.add("ifInErrors", ProbeDesc.COUNTER, "ierrors.value");
 		pd.add("ifOutErrors", ProbeDesc.COUNTER, "oerrors.value");
 		pd.add("collisions", ProbeDesc.COUNTER, "collisions.value");
-		pd.setGraphClasses(new Class[] {IfGraph.class});
+		pd.setGraphClasses(new Object[] {"ifbps"});
 		pd.setMuninsProbesNames(new String[] { "if", "if_errcoll"});
+		pd.setProbeName("if-{1}_munins");
 	}
 
 	/**
@@ -37,6 +31,5 @@ public class IfSolarisMunins extends MuninsIndexedNameProbe {
 	 */
 	public IfSolarisMunins(RdsHost monitoredHost, String indexName) {
 		super(monitoredHost, pd, indexName);
-		setName("if-" + this.getIndexName() + "_munins");
 	}
 }

@@ -26,7 +26,7 @@ import org.snmp4j.smi.OID;
  * @author Fabrice Bacchella
  * @version $Revision$
  */
-public abstract class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
+public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	
 	static final private Logger logger = Logger.getLogger(RdsIndexedSnmpRrd.class);
 

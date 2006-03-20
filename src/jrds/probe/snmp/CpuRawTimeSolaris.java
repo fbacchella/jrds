@@ -28,7 +28,7 @@ public class CpuRawTimeSolaris extends RdsSnmpSimple {
 		pd.add("ssCpuRawIdle", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.2021.11.53"));
 		pd.add("ssCpuRawWait", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.2021.11.54"));
 		pd.add("ssCpuRawKernel", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.2021.11.55"));
-		pd.setName("cpurawsol");
+		pd.setProbeName("cpurawsol");
 		pd.setGraphClasses(new Class[] {CpuRawTimeSolarisGraph.class});
         pd.setRequester(SnmpRequester.SIMPLE);
 	}

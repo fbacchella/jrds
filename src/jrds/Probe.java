@@ -89,7 +89,7 @@ implements Comparable {
 	
 	public String getName() {
 		if (name == null)
-			name = parseTemplate(getPd().getName());
+			name = parseTemplate(getPd().getProbeName());
 		return name;
 	}
 	

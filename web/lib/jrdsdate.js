@@ -1,6 +1,6 @@
 function calClose(cal)
 {
-	dateForm.scale.selectedIndex = 0;
+	document.dateForm.scale.selectedIndex = 0;
 	cal.hide();
 }
 

@@ -27,7 +27,7 @@ public class Mem extends RdsSnmpSimple {
 		pd.add("memAvailReal", ProbeDesc.GAUGE, new OID(".1.3.6.1.4.1.2021.4.6"));
 		pd.setGraphClasses(new Class[] {MemGraph.class});
 	       pd.setRequester(SnmpRequester.SIMPLE);
-		pd.setName("memory");
+		pd.setProbeName("memory");
 	}
 	/**
 	 * @param monitoredHost

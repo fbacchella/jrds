@@ -115,7 +115,7 @@ public class HostConfigParser  extends DefaultHandler {
 			else if( RRD.equals(localName) || PROBE.equals(localName) ) {
 				probeType = atts.getValue(TYPE);
 				argsListValue = new ArrayList(5);
-				argsListValue.add(lastHost);
+				//argsListValue.add(lastHost);
 			}
 			else if(argsListValue != null && ARG.equals(localName)) {
 				String type = atts.getValue(ARGTYPE);
@@ -194,7 +194,7 @@ public class HostConfigParser  extends DefaultHandler {
 			}
 			else if ( RRD.equals(localName) || PROBE.equals(localName) ) {
 				if(lastHost != null) {
-					Probe newProbe = ProbeFactory.makeProbe(probeType, argsListValue);
+					Probe newProbe = ProbeFactory.makeProbe(probeType, lastHost, argsListValue);
 					if(lastSnmpTarget != null && newProbe instanceof SnmpProbe) {
 						((SnmpProbe)newProbe).setSnmpTarget(lastSnmpTarget);
 					}

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
@@ -22,10 +21,6 @@ public class PropertiesManager {
 
 	private Properties properties = new Properties();
 	
-	
-	private void printError(String s, Throwable throwable) {
-		logger.warn("Invalid value for " + s + " (" + throwable.getLocalizedMessage() + ").");
-	}
 	
 	private String getParameter(String key, String defaultValue,
 			boolean doTrim) {
@@ -63,37 +58,6 @@ public class PropertiesManager {
 					}
 		}
 		return integer.intValue();
-	}
-	
-	private URL gh(URL url, String s) throws MalformedURLException {
-		URL url1 = null;
-		if (s != null && s.length() > 0) {
-			if (s.indexOf(58) != -1) {
-				url1 = new URL(s);
-			}
-			else
-				if (s.startsWith("/")) {
-					url1 = new URL(url.getProtocol(), url.getHost(), url.getPort(), s);
-				}
-				else {
-					url1 = new URL(url, s);
-				}
-		}
-		return url1;
-	}
-	
-	private URL yc(URL url, String s, String s1, String s2) {
-		URL url1 = null;
-		try {
-			url1 = gh(url, s2);
-			if (s1 != null && s1.length() > 0) {
-				url1 = gh(url, s1);
-			}
-		}
-		catch (MalformedURLException malformedurlexception) {
-			printError(s, malformedurlexception);
-		}
-		return url1;
 	}
 	
 	public void join(URL url) {
@@ -149,6 +113,8 @@ public class PropertiesManager {
 		urlperfpath = getParameter("urlperfpath","./HTTPTest");
 		configfilepath = getParameter("configfilepath", "config.xml");
 		rrddir = getParameter("rrddir", "probe");
+		probelibpath = getParameter("probelibpath", "probelib");
+		graphlibpath = getParameter("graphlibpath", "graphlib");
 		fileSeparator = getParameter("file.separator", "/");
 		logfile = getParameter("logfile", "jrds.log");
 		loglevel = Level.toLevel(getParameter("loglevel", "DEBUG"));
@@ -172,6 +138,8 @@ public class PropertiesManager {
 	public String rrddir;
 	public String fileSeparator;
 	public String logfile;
+	public String probelibpath;
+	public String graphlibpath;
 	public Level loglevel;
 	public int resolution;
 	public int collectorThreads;

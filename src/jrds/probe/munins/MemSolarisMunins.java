@@ -27,7 +27,7 @@ public class MemSolarisMunins extends MuninsProbe {
 		pd.add("memUsedRealMB", ProbeDesc.GAUGE, "used.value");
 		pd.add("memTotalSwapMB", ProbeDesc.GAUGE, "swapt.value");
 		pd.add("memUsedSwapMB", ProbeDesc.GAUGE, "swapu.value");
-		pd.setName("memsolarismunins");
+		pd.setProbeName("memsolarismunins");
 		pd.setMuninsProbesNames(new String[] { "memory"});
 		pd.setGraphClasses(new Class[] {MemSolarisMuninsGraph.class});
 	}

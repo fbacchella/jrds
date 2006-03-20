@@ -29,7 +29,7 @@ public class CpuLinuxMunins extends MuninsProbe {
 		pd.add("iowait", ProbeDesc.COUNTER, "iowait.value");
 		pd.add("irq", ProbeDesc.COUNTER, "irq.value");
 		pd.add("softirq", ProbeDesc.COUNTER, "softirq.value");
-		pd.setName("cpulinuxmunins");
+		pd.setProbeName("cpulinuxmunins");
 		pd.setMuninsProbesNames(new String[] { "cpu"});
 		
 		GraphDesc gd = new GraphDesc(7);

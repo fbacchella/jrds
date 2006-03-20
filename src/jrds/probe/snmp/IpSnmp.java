@@ -8,7 +8,6 @@ package jrds.probe.snmp;
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.graphe.IpErrorGraph;
 import jrds.snmp.SnmpRequester;
 
 import org.snmp4j.smi.OID;
@@ -40,10 +39,10 @@ public class IpSnmp extends RdsSnmpSimple {
 		pd.add("ipRoutingDiscards", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.4.23"));
 		
 		
-		pd.setName("ipsnmp");
+		pd.setProbeName("ipsnmp");
 		pd.setRequester(SnmpRequester.SIMPLE);
 		
-		pd.setGraphClasses(new Object[] { "ipactivitysnmp.xml", IpErrorGraph.class});
+		pd.setGraphClasses(new Object[] { "ipactivitysnmp.xml", "iperrors"});
 	}
 	
 	/**

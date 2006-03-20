@@ -26,7 +26,7 @@ public class SwapMunins extends MuninsProbe {
 		pd.add("swapOut", ProbeDesc.COUNTER, "swap_out.value");
 		pd.setGraphClasses(new Class[] {SwapIO.class});
 		pd.setMuninsProbesNames(new String[] { "swap_munins" });
-		pd.setName("swap_munins");
+		pd.setProbeName("swap_munins");
 	}
 
 	/**

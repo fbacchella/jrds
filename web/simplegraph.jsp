@@ -25,7 +25,6 @@
 <script type="text/javascript" src="lib/calendar-setup.js"></script> 
 <script type="text/javascript" src="lib/jrdsdate.js"></script> 
 <script type="text/javascript" src="lib/querystring.js"></script> 
-<script type="text/javascript" src="lib/infobulle.js"></script> 
 <script type="text/javascript">
 //We preload the image
 var oImage = new Image;
@@ -103,9 +102,8 @@ function download_onClick()
     document.dateForm.id.value = qs.get("id", 0);
     beginCal = startCal("begin", "dateBeginTrigger");
     endCal = startCal("end", "dateEndTrigger");
-    InitBulle("navy","#FFCC66","orange",1);
-</script>
-			<img onMouseOver="this.T_DELAY=3000;return escape('Graph name: <%=graph.getQualifieName()%><br>Probe Name: <%=graph.getProbe().getQualifieName()%>')" onclick="history_onClick();" id="graphImg" src="img/aollogo.gif" alt="" name="graphImg" border="0">
+ </script>
+			<img onMouseOver="this.T_DELAY=3000;this.T_STATIC=true;this.T_STICKY=true;return escape('Graph name: <%=graph.getQualifieName()%><br>Probe Name: <%=graph.getProbe().getQualifiedName()%><br>Graph id: <%=graph.hashCode()%><br>Probe id: <%=graph.getProbe().hashCode()%>')" onclick="history_onClick();" id="graphImg" src="img/aollogo.gif" alt="" name="graphImg" border="0">
 			<script type="text/javascript">document.graphImg.src="graph" + window.location.search;</script>
 
 		</div>

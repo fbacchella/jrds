@@ -80,6 +80,7 @@
         		<link href="http://logging.apache.org/log4j/docs/api"/>
    			<link href="http://www.mathcs.emory.edu/dcl/util/backport-util-concurrent/doc/api"/>
 			<link href="http://remotetea.sourceforge.net/javadoc"/>
+			<link href="http://jakarta.apache.org/commons/digester/commons-digester-1.7/docs/api"/>
         </javadoc>
     </target>
 

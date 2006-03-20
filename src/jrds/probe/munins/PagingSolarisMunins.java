@@ -31,7 +31,7 @@ public class PagingSolarisMunins extends MuninsProbe {
 		pd.add("pgfree", ProbeDesc.COUNTER, "pgfree.value");
 		pd.setGraphClasses(new Class[] {PagingSolarisMuninsGraph.class});
 		pd.setMuninsProbesNames(new String[] { "paging_in", "paging_out" });
-		pd.setName("pageingmunins");
+		pd.setProbeName("pageingmunins");
 	}
 
 	/**

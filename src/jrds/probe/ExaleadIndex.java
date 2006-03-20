@@ -21,7 +21,7 @@ public class ExaleadIndex extends Exalead {
 		pd.add("search", ProbeDesc.COUNTER);
 		pd.add("commands", ProbeDesc.COUNTER);
 		pd.add("last-started", ProbeDesc.NONE);
-		pd.setName("exeaindex");
+		pd.setProbeName("exeaindex");
 		pd.setGraphClasses(new Object[] {});
 		
 	}

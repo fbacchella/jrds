@@ -7,7 +7,6 @@ package jrds.probe.munins;
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.graphe.IfGraph;
 
 import org.apache.log4j.Logger;
 
@@ -28,7 +27,8 @@ public class IfLinuxMunins extends MuninsIndexedNameProbe {
 		pd.add("ifInErrors", ProbeDesc.COUNTER, "rcvd.value");
 		pd.add("ifOutErrors", ProbeDesc.COUNTER, "trans.value");
 		pd.setMuninsProbesNames(new String[] { "if", "if_err"});
-		pd.setGraphClasses(new Class[] {IfGraph.class});
+		pd.setGraphClasses(new Object[] {"ifbps.xml"});
+		pd.setProbeName("if-{1}_munins");
 	}
 
 	/**
@@ -36,6 +36,5 @@ public class IfLinuxMunins extends MuninsIndexedNameProbe {
 	 */
 	public IfLinuxMunins(RdsHost monitoredHost, String indexName) {
 		super(monitoredHost, pd, indexName);
-		setName("if-" + getIndexName() + "_munins");
 	}
 }

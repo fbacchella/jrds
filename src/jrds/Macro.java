@@ -16,8 +16,8 @@ public class Macro {
 			Object[] l = (Object[]) i.next();
 			String className = (String) l[0];
 			List constArgs = (List) l[1];
-			constArgs.set(0, host);
-			Probe newRdsRrd = ProbeFactory.makeProbe(className, constArgs);
+			//constArgs.set(0, host);
+			Probe newRdsRrd = ProbeFactory.makeProbe(className, host, constArgs);
 			if(newRdsRrd != null) {
 				host.addProbe(newRdsRrd);
 				logger.debug("adding probe " + newRdsRrd );
