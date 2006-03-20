@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
+  <name>rstatvm</name>
   <graphName>rstatvm</graphName>
   <verticalLabel>Operation/s</verticalLabel>
   <graphTitle>Virtual Memory activity on {1}</graphTitle>

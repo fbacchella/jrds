@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
-	<filename>tcpseg</filename>
+	<name>tcpseg</name>
+	<graphName>tcpseg</graphName>
 	<verticalLabel>Segments/s</verticalLabel>
 	<graphTitle>Exchanged TCP segments on {1}</graphTitle>
 	<add>

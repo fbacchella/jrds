@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
+  <name>memwindowgraph</name>
   <graphName>memwindowgraph</graphName>
   <verticalLabel>Bytes</verticalLabel>
   <graphTitle>Memory usage on {1}</graphTitle>

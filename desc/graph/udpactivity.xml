@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
-	<filename>udp</filename>
+	<name>udp</name>
+	<graphName>udp</graphName>
 	<verticalLabel>packets/s</verticalLabel>
 	<graphTitle>UDP activity on {1}</graphTitle>
 	<add>

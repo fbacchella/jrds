@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
-	<filename>sybsp</filename>
+	<name>sybsp</name>
+	<graphName>sybsp</graphName>
 	<verticalLabel>number</verticalLabel>
 	<lowerLimit>0</lowerLimit>
 	<graphTitle>Sybase instance activity</graphTitle>

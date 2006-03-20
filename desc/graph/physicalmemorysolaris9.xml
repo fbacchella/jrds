@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
+	<name>phymemsolaris9munins</name>
 	<graphName>phymemsolaris9munins</graphName>
 	<verticalLabel>Bytes</verticalLabel>
 	<graphTitle>Physical memory usage on {1}</graphTitle>

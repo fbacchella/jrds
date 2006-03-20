@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
-	<filename>tcpest</filename>
+	<graphName>tcpest</graphName>
 	<verticalLabel>Number</verticalLabel>
 	<graphTitle>Established TCP Connections TCP on {1}</graphTitle>
 	<add>

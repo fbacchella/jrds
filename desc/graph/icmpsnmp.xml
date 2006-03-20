@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
-	<filename>icmp</filename>
+	<name>icmp</name>
+	<graphName>icmp</graphName>
 	<verticalLabel>Paquets/s</verticalLabel>
 	<graphTitle>ICMP Info on {1}</graphTitle>
 	<add>

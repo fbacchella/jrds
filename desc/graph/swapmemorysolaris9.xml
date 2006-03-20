@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
+	<name>swapmemsolaris9munins</name>
 	<graphName>swapmemsolaris9munins</graphName>
 	<verticalLabel>Bytes</verticalLabel>
 	<graphTitle>Swap Memory usage on {1}</graphTitle>

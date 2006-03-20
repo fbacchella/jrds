@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
+	<name>apacheworkers</name>
 	<graphName>apacheworkers</graphName>
 	<verticalLabel>Workers</verticalLabel>
 	<graphTitle>Workers status on {2}</graphTitle>

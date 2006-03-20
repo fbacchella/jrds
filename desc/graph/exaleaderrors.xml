@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
-	<filename>exaerrors</filename>
+	<name>exaerrors</name>
+	<graphName>exaerrors</graphName>
 	<verticalLabel>Error/s</verticalLabel>
 	<graphTitle>Exeleads error on {1}</graphTitle>
 	<add>

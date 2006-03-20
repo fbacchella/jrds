@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
+	<name>cpurawkilinux</name>
 	<graphName>cpurawkilinux</graphName>
 	<verticalLabel>%</verticalLabel>
 	<graphTitle>Detailled CPU usage on {1}</graphTitle>

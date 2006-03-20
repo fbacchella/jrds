@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
+	<name>laverage</name>
 	<graphName>laverage</graphName>
 	<verticalLabel>queue size</verticalLabel>
 	<graphTitle>CPU Load on {1}</graphTitle>

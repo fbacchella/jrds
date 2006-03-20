@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
-  <filename>ip</filename>
+  <name>ip</name>
+  <graphName>ip</graphName>
   <verticalLabel>paquets/s</verticalLabel>
   <graphTitle>IP activity on {1}</graphTitle>
   <add>

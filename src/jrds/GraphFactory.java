@@ -175,7 +175,6 @@ public class GraphFactory {
 		digester.addObjectCreate("graphdesc", jrds.GraphDesc.class);
 		digester.addSetProperties("graphdesc");
 		digester.addCallMethod("graphdesc/name", "setName", 0);
-		digester.addCallMethod("graphdesc/filename", "setGraphName", 0);
 		digester.addCallMethod("graphdesc/graphName", "setGraphName", 0);
 		digester.addCallMethod("graphdesc/verticalLabel", "setVerticalLabel", 0);
 		digester.addCallMethod("graphdesc/graphTitle", "setGraphTitle", 0);
