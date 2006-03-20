@@ -8,10 +8,13 @@ package jrds.standalone;
 
 import java.io.File;
 
+import jrds.GraphFactory;
 import jrds.HostsList;
 import jrds.JrdsLogger;
+import jrds.ProbeFactory;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
+import jrds.log.JrdsLoggerFactory;
 import jrds.snmp.SnmpRequester;
 
 import org.apache.log4j.Level;
@@ -30,7 +33,7 @@ public class Collector {
 	static {
 		JrdsLogger.setFileLogger(pm.logfile);
 	}
-	private static final Logger logger = Logger.getLogger(Collector.class);
+	static final private Logger logger = JrdsLoggerFactory.getLogger(Collector.class);
 
 	public static void main(String[] args) throws Exception {
 		pm.join(new File("jrds.properties"));
@@ -39,6 +42,9 @@ public class Collector {
 		System.getProperties().setProperty("java.awt.headless","true");
 		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
 		
+		ProbeFactory.init();
+		GraphFactory.init();
+
 		final HostsList hl = HostsList.fill(new File(pm.configfilepath));
 
 		logger.setLevel(Level.ERROR);
@@ -47,7 +53,7 @@ public class Collector {
 		logger.info("jrds' collector started");
 		Logger.getLogger("org.snmp4j").setLevel(Level.ERROR);
 		SnmpRequester.start();
-		for(int i = 0; i< 5 ; i++) {
+		for(int i = 0; i< 1 ; i++) {
 			hl.collectAll();
 			System.gc();
 		}
