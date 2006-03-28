@@ -71,11 +71,11 @@ public class GraphFactory {
 			File file = filesAndDirs[i];
 			if(file.isFile()) {
 				try {
-					logger.debug("graph " + file + " found");
 					InputStream xmlStream = new FileInputStream(file);
 					GraphDesc gd = makeGraphDesc(xmlStream);
 					xmlStream.close();
 					graphDescMap.put(gd.getName(), gd);
+					logger.debug("graph " + file + " found, named " + gd.getName());
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

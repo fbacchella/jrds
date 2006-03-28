@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
-	<name>pslist</name>
+	<name>processstatushostsresources</name>
 	<graphName>pslist</graphName>
 	<verticalLabel>Number (cumulated)</verticalLabel>
 	<graphTitle>Number of process on {1}</graphTitle>

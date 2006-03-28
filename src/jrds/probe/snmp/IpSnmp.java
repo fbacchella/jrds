@@ -42,7 +42,7 @@ public class IpSnmp extends RdsSnmpSimple {
 		pd.setProbeName("ipsnmp");
 		pd.setRequester(SnmpRequester.SIMPLE);
 		
-		pd.setGraphClasses(new Object[] { "ipactivitysnmp.xml", "iperrors"});
+		pd.setGraphClasses(new Object[] { "ipactivitysnmp", "iperrors"});
 	}
 	
 	/**

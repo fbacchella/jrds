@@ -43,7 +43,7 @@ public class ExaleadStatus extends HttpProbe {
 		pd.add("threads.queries", ProbeDesc.GAUGE, 0, 100);
 		pd.add("uptime", ProbeDesc.NONE);
 		pd.setProbeName("exaleadstatus");
-		pd.setGraphClasses(new Object[] {"exaleaderrors.xml", "exaleadqueries.xml", "exaleadthreads.xml"});
+		pd.setGraphClasses(new Object[] {"exaleaderrors", "exaleadqueries", "exaleadthreads"});
 		
 	}
 

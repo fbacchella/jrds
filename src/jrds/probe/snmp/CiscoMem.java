@@ -16,7 +16,7 @@ public class CiscoMem extends RdsSnmpSimple {
 		pd.setProbeName("ciscomemory");
 		pd.setRequester(SnmpRequester.SIMPLE);
 		
-		pd.setGraphClasses(new Object[] {"cpuload.xml"});
+		pd.setGraphClasses(new Object[] {"cpuload"});
 	}
 	
 	public CiscoMem(RdsHost monitoredHost) {

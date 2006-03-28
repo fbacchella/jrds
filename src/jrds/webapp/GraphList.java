@@ -75,7 +75,7 @@ public class GraphList extends HttpServlet {
 				StringBuffer urlBuffer = new StringBuffer();
 				urlBuffer.append(req.getContextPath());
 				urlBuffer.append("/graph?id=" + graph.hashCode());
-				if(scale != null)
+				if(scaleVal > 0)
 					urlBuffer.append("&scale=" + scale);
 				else {
 					if(begin != null)

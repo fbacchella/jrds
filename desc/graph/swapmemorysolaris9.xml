@@ -29,7 +29,7 @@
 	<viewtree>
 		<pathelement>SYSTEM</pathelement>
 		<pathelement>LOAD</pathelement>
-		<pathstring>MEMORY</pathstring>
-		<pathelement>Swap Memory usage</pathelement>
+		<pathelement>MEMORY</pathelement>
+		<pathstring>Swap Memory usage</pathstring>
 	</viewtree>
 </graphdesc>

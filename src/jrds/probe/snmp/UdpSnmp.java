@@ -25,7 +25,7 @@ public class UdpSnmp extends RdsSnmpSimple {
 		pd.add("InErrors",ProbeDesc.COUNTER,new OID(".1.3.6.1.2.1.7.3"));
 		pd.add("OutDatagrams",ProbeDesc.COUNTER,new OID(".1.3.6.1.2.1.7.4"));
 		pd.setProbeName("udp_snmp");
-		pd.setGraphClasses(new Object[] {"udpactivity.xml"});
+		pd.setGraphClasses(new Object[] {"udpactivity"});
 		pd.setRequester(SnmpRequester.SIMPLE);
 	}
 	/**

@@ -27,7 +27,7 @@ public class UcdRawSystemCounter extends RdsSnmpSimple {
 		pd.add("ssRawSwapIn", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.2021.11.62"));
 		pd.add("ssRawSwapOut", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.2021.11.63"));
 		pd.setProbeName("ucdrawsystem");
-		pd.setGraphClasses(new Object[] { "ucdswap.xml"});
+		pd.setGraphClasses(new Object[] { "ucdswap"});
 		pd.setRequester(SnmpRequester.SIMPLE);
 	}
 	

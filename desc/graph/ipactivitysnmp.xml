@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
-  <name>ip</name>
+  <name>ipactivitysnmp</name>
   <graphName>ip</graphName>
   <verticalLabel>paquets/s</verticalLabel>
   <graphTitle>IP activity on {1}</graphTitle>

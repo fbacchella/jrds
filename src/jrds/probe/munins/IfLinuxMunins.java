@@ -27,7 +27,7 @@ public class IfLinuxMunins extends MuninsIndexedNameProbe {
 		pd.add("ifInErrors", ProbeDesc.COUNTER, "rcvd.value");
 		pd.add("ifOutErrors", ProbeDesc.COUNTER, "trans.value");
 		pd.setMuninsProbesNames(new String[] { "if", "if_err"});
-		pd.setGraphClasses(new Object[] {"ifbps.xml"});
+		pd.setGraphClasses(new Object[] {"ifbps"});
 		pd.setProbeName("if-{1}_munins");
 	}
 

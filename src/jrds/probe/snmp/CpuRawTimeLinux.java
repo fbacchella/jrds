@@ -29,7 +29,7 @@ public class CpuRawTimeLinux extends RdsSnmpSimple {
 		pd.add("ssCpuRawKernel", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.2021.11.55"));
 		pd.add("ssCpuRawInterrupt", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.2021.11.56"));
 		pd.setProbeName("cpurawlinux");
-		pd.setGraphClasses(new Object[] {CpuRawTimeLinuxGraph.class, "cpurawkillinux.xml"});
+		pd.setGraphClasses(new Object[] {CpuRawTimeLinuxGraph.class, "cpurawkilinux"});
 		pd.setRequester(SnmpRequester.SIMPLE);
 	}
 	

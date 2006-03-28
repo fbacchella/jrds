@@ -16,7 +16,7 @@ public class CiscoTemp extends RdsSnmpSimple {
 		pd.setProbeName("ciscotemperature");
 		pd.setRequester(SnmpRequester.SIMPLE);
 		
-		pd.setGraphClasses(new Object[] {"cpuload.xml"});
+		pd.setGraphClasses(new Object[] {"cpuload"});
 	}
 	
 	public CiscoTemp(RdsHost monitoredHost) {

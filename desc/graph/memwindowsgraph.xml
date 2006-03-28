@@ -16,6 +16,7 @@
   </add>
   <add>
     <name>Available</name>
+     <graphType>stack</graphType>
     <color>GREEN</color>
     <rpn>Total,Used,-</rpn>
     <legend>Memory free</legend>

@@ -13,8 +13,6 @@ import java.util.Map;
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.graphe.DiskIoGraphBytes;
-import jrds.graphe.DiskIoGraphReq;
 import jrds.graphe.DiskIoGraphSize;
 
 /**
@@ -33,7 +31,7 @@ public class DiskIoMunins extends MuninsIndexedNameProbe {
 		pd.add("diskIONWritten", ProbeDesc.COUNTER, "nwritten.value");
 		pd.setMuninsProbesNames(new String[] { "io_busy", "io_ops", "io_bytes"});
 		pd.setProbeName("io-{1}_munins");
-		pd.setGraphClasses(new Class[] {DiskIoGraphBytes.class, DiskIoGraphReq.class, DiskIoGraphSize.class});
+		pd.setGraphClasses(new Object[] {"DiskIoGraphBytes", "DiskIoGraphReq", DiskIoGraphSize.class});
 	}
 
 	/**

@@ -8,8 +8,6 @@ package jrds.probe.snmp;
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.graphe.DiskIoGraphBytes;
-import jrds.graphe.DiskIoGraphReq;
 import jrds.graphe.DiskIoGraphSize;
 
 import org.snmp4j.smi.OID;
@@ -27,7 +25,7 @@ public class DiskIo extends RdsIndexedSnmpRrd {
 		pd.add("diskIONWritten", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.2021.13.15.1.1.4"));
 		pd.add("diskIOReads", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.2021.13.15.1.1.5"));
 		pd.add("diskIOWrites", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.2021.13.15.1.1.6"));
-		pd.setGraphClasses(new Class[] {DiskIoGraphBytes.class, DiskIoGraphReq.class, DiskIoGraphSize.class});
+		pd.setGraphClasses(new Object[] {"DiskIoGraphBytes", "DiskIoGraphReq", DiskIoGraphSize.class});
 		pd.setIndexOid(new OID(".1.3.6.1.4.1.2021.13.15.1.1.2"));
 		pd.setProbeName("io-{1}");
 		pd.setUniqIndex(true);

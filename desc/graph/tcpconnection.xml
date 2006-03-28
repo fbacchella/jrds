@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
-	<name>tcp</name>
+	<name>tcpconnection</name>
 	<graphName>tcp</graphName>
 	<verticalLabel>Requests/s</verticalLabel>
 	<graphTitle>TCP Connections on {1}</graphTitle>

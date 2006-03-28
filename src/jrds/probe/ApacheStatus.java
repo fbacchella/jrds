@@ -37,7 +37,7 @@ public class ApacheStatus extends HttpProbe implements UrlProbe {
 		pd.add("BusyWorkers", ProbeDesc.GAUGE);
 		pd.add("IdleWorkers", ProbeDesc.GAUGE);
 		pd.setProbeName("apachestatus");
-		pd.setGraphClasses(new Object[] {ApacheRequests.class, ApacheTransfer.class, "apacheworkers.xml"});
+		pd.setGraphClasses(new Object[] {ApacheRequests.class, ApacheTransfer.class, "apacheworkers"});
 	}
 
 	/**

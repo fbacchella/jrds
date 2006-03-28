@@ -15,6 +15,6 @@ import jrds.RdsHost;
 public class SwapWindowsSnmp extends PartitionSpaceWindows {
 	public SwapWindowsSnmp(RdsHost monitoredHost) {
 		super(monitoredHost, "Virtual Memory");
-		pd.setGraphClasses(new Object[] {"swapwindowsgraph.xml"});		
+		pd.setGraphClasses(new Object[] {"swapwindowsgraph"});		
 	}
 }

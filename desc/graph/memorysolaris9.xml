@@ -69,7 +69,7 @@
 	<viewtree>
 		<pathelement>SYSTEM</pathelement>
 		<pathelement>LOAD</pathelement>
-		<pathstring>MEMORY</pathstring>
-		<pathelement>Memory usage</pathelement>
+		<pathelement>MEMORY</pathelement>
+		<pathstring>Memory usage</pathstring>
 	</viewtree>
 </graphdesc>

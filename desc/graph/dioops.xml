@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphdesc>
+	<name>DiskIoGraphReq</name>
+	<graphName>op-{2}</graphName>
+	<graphTitle>E/S (operations) on disk {2} on {1}</graphTitle>
+	<verticalLabel>operations/s</verticalLabel>
+	<add>
+		<name>diskIOReads</name>
+		<graphType>line</graphType>
+		<color>green</color>
+		<legend>Number of read accesses</legend>
+	</add>
+	<add>
+		<name>diskIOWrites</name>
+		<graphType>line</graphType>
+		<color>blue</color>
+		<legend>Number of write accesses</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>DISK</pathelement>
+		<pathelement>DISKACTIVITY</pathelement>
+		<pathelement>INDEX</pathelement>
+		<pathstring>Activity as operation/s</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>DISK</pathelement>
+		<pathelement>DISKACTIVITY</pathelement>
+		<pathelement>HOST</pathelement>
+		<pathstring>Activity as operation/s</pathstring>
+		<pathelement>INDEX</pathelement>
+	</viewtree>
+</graphdesc>

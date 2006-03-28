@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
+	<name>exaqueries</name>
 	<graphName>exaqueries</graphName>
 	<verticalLabel>Queries/s</verticalLabel>
 	<graphTitle>Exeleads queries on {1}</graphTitle>

@@ -57,7 +57,7 @@
 	<viewtree>
 		<pathelement>SYSTEM</pathelement>
 		<pathelement>LOAD</pathelement>
-		<pathstring>MEMORY</pathstring>
-		<pathelement>Physical Memory usage</pathelement>
+		<pathelement>MEMORY</pathelement>
+		<pathstring>Physical Memory usage</pathstring>
 	</viewtree>
 </graphdesc>

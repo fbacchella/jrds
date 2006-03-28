@@ -38,7 +38,7 @@ public class MemSolaris9Munins extends MuninsProbe {
 		pd.add("disk_free", ProbeDesc.GAUGE, "disk_free.value");
 		pd.setProbeName("memsolaris9munins");
 		pd.setMuninsProbesNames(new String[] { "memorysolaris9"});
-		pd.setGraphClasses(new Object[] {/*"memorysolaris9.xml", "swapmemorysolaris9.xml",*/ "physicalmemorysolaris9.xml"});
+		pd.setGraphClasses(new Object[] {/*"memorysolaris9.xml", "swapmemorysolaris9.xml",*/ "physicalmemorysolaris9"});
 	}
 	
 	/**

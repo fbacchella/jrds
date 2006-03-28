@@ -48,7 +48,7 @@ public class IcmpSnmp extends RdsSnmpSimple {
 		pd.add("OutAddrMasks", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.5.25"));
 		pd.add("OutAddrMaskReps", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.5.26"));
 		pd.setProbeName("icmp");
-		pd.setGraphClasses(new Object[] {"icmpsnmp.xml"});
+		pd.setGraphClasses(new Object[] {"icmpsnmp"});
         pd.setRequester(SnmpRequester.SIMPLE);
 	}
 

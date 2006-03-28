@@ -2,7 +2,7 @@
 <probedesc>
   <name>ciscocpuload</name>
   <probeName>ciscocpuload</probeName>
-  <probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
+  <probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
   <ds>
     <dsName>la1</dsName>
     <dsType>gauge</dsType>

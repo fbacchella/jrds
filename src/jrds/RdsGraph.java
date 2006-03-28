@@ -63,7 +63,7 @@ implements Comparable {
 		this.gd = gd;
 	}
 	
-	/* (non-Javadoc)
+	/**
 	 * @see java.lang.Object#hashCode()
 	 */
 	public int hashCode() {
@@ -100,7 +100,7 @@ implements Comparable {
 	}
 	
 	public String getPngName() {
-		return getName() + ".png";
+		return getName().replaceAll("/","_") + ".png";
 	}
 	
 	private final String parseTemplate(String template) {

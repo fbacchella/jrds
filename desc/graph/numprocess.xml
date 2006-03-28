@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
+	<name>numprocess</name>
 	<graphName>nprocesses</graphName>
 	<verticalLabel>Number (cumulated)</verticalLabel>
 	<graphTitle>Number of processes on {1}</graphTitle>

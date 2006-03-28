@@ -16,6 +16,7 @@
   </add>
   <add>
     <name>Available</name>
+    <graphType>stack</graphType>
     <rpn>Total,Used,-</rpn>
     <legend>Swap free</legend>
   </add>

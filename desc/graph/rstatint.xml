@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
-	<name>rstatmem</name>
-	<graphName>rstatmem</graphName>
+	<name>rstatint</name>
+	<graphName>rstatint</graphName>
 	<verticalLabel>Interuptions/s</verticalLabel>
 	<graphTitle>Interruption activity on {1}</graphTitle>
 	<add>

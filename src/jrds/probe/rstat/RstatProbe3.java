@@ -38,7 +38,7 @@ public class RstatProbe3 extends Probe {
 		pd.add("v_swtch", ProbeDesc.COUNTER);
 		pd.add("v_intr", ProbeDesc.COUNTER);
 		pd.setProbeName("rstat");
-		pd.setGraphClasses(new Object[] {"rstatvm.xml", "rstatint.xml"});
+		pd.setGraphClasses(new Object[] {"rstatvm", "rstatint"});
 		
 	}
 

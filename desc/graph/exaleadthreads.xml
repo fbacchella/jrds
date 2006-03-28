@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <graphdesc>
+	<name>exathreads</name>
 	<graphName>exathreads</graphName>
 	<verticalLabel>active threads</verticalLabel>
 	<graphTitle>Exeleads threads on {1}</graphTitle>

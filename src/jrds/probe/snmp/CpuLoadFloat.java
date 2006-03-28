@@ -32,7 +32,7 @@ extends RdsSnmpSimple {
 		pd.setProbeName("laverage");
 		pd.setRequester(SnmpRequester.RAW);
 		
-		pd.setGraphClasses(new Object[] {"cpuload.xml"});
+		pd.setGraphClasses(new Object[] {"cpuload"});
 	}
 	
 	/**
