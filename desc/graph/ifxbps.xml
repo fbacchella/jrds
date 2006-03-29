@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
-  <graphName>ifx-{2}</graphName>
   <name>ifxbps</name>
+  <graphName>ifx-{2}</graphName>
+  <graphTitle>Bits exchanged on interface {2} on {1}</graphTitle>
   <verticalLabel>bits/s</verticalLabel>
   <lowerLimit>NaN</lowerLimit>
-  <graphTitle>Bits exchanged on interface {2} on {1}</graphTitle>
   <add>
     <name>ifHCOutOctets</name>
     <graphType>none</graphType>
   </add>
   <add>
     <name>ifOutBits</name>
-    <rpn>ifHCOutOctets,8,*</rpn>
     <graphType>area</graphType>
+    <rpn>ifHCOutOctets,8,*</rpn>
     <color>green</color>
     <legend>bits sends/s</legend>
   </add>
@@ -22,8 +23,8 @@
   </add>
   <add>
     <name>ifInBitsInversed</name>
-    <rpn>ifHCInOctets,-8,*</rpn>
     <graphType>area</graphType>
+    <rpn>ifHCInOctets,-8,*</rpn>
     <color>blue</color>
     <legend>bits received/s</legend>
   </add>

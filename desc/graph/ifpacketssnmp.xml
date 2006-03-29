@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
-	<graphName>ifpkts-{2}</graphName>
 	<name>ifpacketssnmp</name>
+	<graphName>ifpkts-{2}</graphName>
+	<graphTitle>Packets exchanged on interface {2} on {1}</graphTitle>
 	<verticalLabel>paquets/s</verticalLabel>
 	<lowerLimit>NaN</lowerLimit>
-	<graphTitle>Packets exchanged on interface {2} on {1}</graphTitle>
 	<add>
-		<name>Upward graph</name>
-		<graphType>comment</graphType>
+		<legend>Upward graph</legend>
 	</add>
 	<add>
 		<name>ifOutUcastPkts</name>
@@ -23,28 +23,25 @@
 	</add>
 	<add>
 		<name>ifInUcastPkts</name>
-		<graphType>none</graphType>
 	</add>
 	<add>
 		<name>ifInErrors</name>
-		<graphType>none</graphType>
 	</add>
 	<add>
-		<name>Downward graph</name>
-		<graphType>comment</graphType>
+		<legend>Downward graph</legend>
 	</add>
 	<add>
 		<name>ifInUcastInversed</name>
 		<graphType>area</graphType>
-		<color>blue</color>
 		<rpn>0, ifInUcastPkts,-</rpn>
+		<color>blue</color>
 		<legend>packets received/s</legend>
 	</add>
 	<add>
 		<name>ifInErrorsInversed</name>
 		<graphType>line</graphType>
-		<color>red</color>
 		<rpn>0, ifInErrors,-</rpn>
+		<color>red</color>
 		<legend>packets in error received/s</legend>
 	</add>
 	<hosttree>

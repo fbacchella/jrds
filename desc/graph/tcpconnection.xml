@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "http://bidule">
 <graphdesc>
 	<name>tcpconnection</name>
 	<graphName>tcp</graphName>
-	<verticalLabel>Requests/s</verticalLabel>
 	<graphTitle>TCP Connections on {1}</graphTitle>
+	<verticalLabel>Requests/s</verticalLabel>
 	<add>
 		<name>ActiveOpens</name>
 		<graphType>line</graphType>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "http://bidule">
 <graphdesc>
 	<name>ucdswap</name>
 	<graphName>ucdswap</graphName>
-	<verticalLabel>Operation/s</verticalLabel>
 	<graphTitle>Virtual Memory activity on {1}</graphTitle>
+	<verticalLabel>Operation/s</verticalLabel>
 	<add>
 		<name>ssRawSwapIn</name>
 		<graphType>line</graphType>
@@ -16,8 +17,8 @@
 	</add>
 	<add>
 		<name>ssRawSwapOuti</name>
-		<rpn>0, ssRawSwapOut, -</rpn>
 		<graphType>line</graphType>
+		<rpn>0, ssRawSwapOut, -</rpn>
 		<color>green</color>
 		<legend>Number of pages swapped out</legend>
 	</add>

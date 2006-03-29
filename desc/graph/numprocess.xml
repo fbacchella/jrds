@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "http://bidule">
 <graphdesc>
 	<name>numprocess</name>
 	<graphName>nprocesses</graphName>
-	<verticalLabel>Number (cumulated)</verticalLabel>
 	<graphTitle>Number of processes on {1}</graphTitle>
+	<verticalLabel>Number (cumulated)</verticalLabel>
 	<add>
 		<name>hrSystemProcesses</name>
 		<graphType>area</graphType>

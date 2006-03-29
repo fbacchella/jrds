@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+	<name>CpuRawTimeLinux</name>
+	<graphName>cpurawlinux</graphName>
+	<graphTitle>CPU Utilization on {1}</graphTitle>
+	<verticalLabel>%</verticalLabel>
+	<add>
+		<name>ssCpuRawNice</name>
+	</add>
+	<add>
+		<name>ssCpuRawUser</name>
+	</add>
+	<add>
+		<name>ssCpuRawSystem</name>
+	</add>
+	<add>
+		<name>ssCpuRawWait</name>
+	</add>
+	<add>
+		<name>ssCpuRawIdle</name>
+	</add>
+	<add>
+		<name>total</name>
+		<graphType>none</graphType>
+		<rpn>ssCpuRawNice, ssCpuRawUser, +, ssCpuRawSystem,+, ssCpuRawWait, +, ssCpuRawIdle,+</rpn>
+	</add>
+	<add>
+		<name>Userpc</name>
+		<graphType>area</graphType>
+		<rpn>ssCpuRawUser, total, /, 100, *</rpn>
+		<color>blue</color>
+		<legend>User CPU time</legend>
+	</add>
+	<add>
+		<name>Nicepc</name>
+		<graphType>stack</graphType>
+		<rpn>ssCpuRawNice, total, /, 100, *</rpn>
+		<color>orange</color>
+		<legend>Nice CPU time</legend>
+	</add>
+	<add>
+		<name>Waitpc</name>
+		<graphType>stack</graphType>
+		<rpn>ssCpuRawWait, total, /, 100, *</rpn>
+		<color>cyan</color>
+		<legend>Iowait CPU time</legend>
+	</add>
+	<add>
+		<name>Systempc</name>
+		<graphType>stack</graphType>
+		<rpn>ssCpuRawSystem, total, /, 100, *</rpn>
+		<color>red</color>
+		<legend>System CPU time</legend>
+	</add>
+	<add>
+		<name>Idlepc</name>
+		<graphType>stack</graphType>
+		<rpn>ssCpuRawIdle, total, /, 100, *</rpn>
+		<color>green</color>
+		<legend>Idle CPU time</legend>
+	</add>
+	<hosttree>
+		<pathelement>host</pathelement>
+		<pathelement>system</pathelement>
+		<pathelement>load</pathelement>
+		<pathstring>CPU USAGE</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>system</pathelement>
+		<pathelement>load</pathelement>
+		<pathstring>CPU USAGE</pathstring>
+		<pathelement>host</pathelement>
+	</viewtree>
+</graphdesc>

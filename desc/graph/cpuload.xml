@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
 	<name>cpuload</name>
 	<graphName>laverage</graphName>
-	<verticalLabel>queue size</verticalLabel>
 	<graphTitle>CPU Load on {1}</graphTitle>
+	<verticalLabel>queue size</verticalLabel>
 	<add>
 		<name>la1</name>
 		<graphType>line</graphType>

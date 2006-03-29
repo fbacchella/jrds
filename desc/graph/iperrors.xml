@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "http://bidule">
 <graphdesc>
   <name>iperrors</name>
   <graphName>iperrors</graphName>
-  <verticalLabel>paquets/s</verticalLabel>
   <graphTitle>IP errors activity on {1}</graphTitle>
+  <verticalLabel>paquets/s</verticalLabel>
   <add>
     <name>ipInHdrErrors</name>
     <graphType>line</graphType>

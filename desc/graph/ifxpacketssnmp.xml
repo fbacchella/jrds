@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
-	<graphName>ifxpkts-{2}</graphName>
 	<name>ifxpacketssnmp</name>
+	<graphName>ifxpkts-{2}</graphName>
+	<graphTitle>Packets exchanged on interface {2} on {1}</graphTitle>
 	<verticalLabel>paquets/s</verticalLabel>
 	<lowerLimit>NaN</lowerLimit>
-	<graphTitle>Packets exchanged on interface {2} on {1}</graphTitle>
 	<add>
 		<name>Upward graph</name>
 		<graphType>comment</graphType>
@@ -36,15 +37,15 @@
 	<add>
 		<name>ifInUcastInversed</name>
 		<graphType>area</graphType>
-		<color>blue</color>
 		<rpn>0, ifHCInUcastPkts,-</rpn>
+		<color>blue</color>
 		<legend>packets received/s</legend>
 	</add>
 	<add>
 		<name>ifInErrorsInversed</name>
 		<graphType>line</graphType>
-		<color>red</color>
 		<rpn>0, ifInErrors,-</rpn>
+		<color>red</color>
 		<legend>packets in error received/s</legend>
 	</add>
 	<hosttree>

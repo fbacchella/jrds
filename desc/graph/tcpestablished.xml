@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "http://bidule">
 <graphdesc>
 	<name>tcpestablished</name>
 	<graphName>tcpest</graphName>
-	<verticalLabel>Number</verticalLabel>
 	<graphTitle>Established TCP Connections TCP on {1}</graphTitle>
+	<verticalLabel>Number</verticalLabel>
 	<add>
 		<name>CurrEstab</name>
 		<graphType>area</graphType>

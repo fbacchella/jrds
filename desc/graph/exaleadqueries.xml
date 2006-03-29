@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
 	<name>exaqueries</name>
 	<graphName>exaqueries</graphName>
-	<verticalLabel>Queries/s</verticalLabel>
 	<graphTitle>Exeleads queries on {1}</graphTitle>
+	<verticalLabel>Queries/s</verticalLabel>
 	<add>
 		<name>queries</name>
 		<graphType>line</graphType>

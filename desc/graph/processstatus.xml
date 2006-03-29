@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "http://bidule">
 <graphdesc>
 	<name>processstatus</name>
 	<graphName>pslist</graphName>
-	<verticalLabel>Number (cumulated)</verticalLabel>
 	<graphTitle>Number of process on {1}</graphTitle>
+	<verticalLabel>Number (cumulated)</verticalLabel>
 	<add>
 		<name>R</name>
 		<graphType>area</graphType>

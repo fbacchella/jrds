@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "http://bidule">
 <graphdesc>
   <name>rstatvm</name>
   <graphName>rstatvm</graphName>
-  <verticalLabel>Operation/s</verticalLabel>
   <graphTitle>Virtual Memory activity on {1}</graphTitle>
+  <verticalLabel>Operation/s</verticalLabel>
   <add>
-    <graphType>comment</graphType>
-    <legend>Page written to disk</legend>
+     <legend>Page written to disk</legend>
   </add>
   <add>
     <name>v_pgpgout</name>
@@ -21,7 +21,6 @@
     <legend>Number of pages swapped out</legend>
   </add>
   <add>
-    <graphType>comment</graphType>
     <legend>Page read from disk</legend>
   </add>
   <add>
@@ -30,8 +29,8 @@
   </add>
   <add>
     <name>Nv_pgpgin</name>
-    <rpn>0, v_pgpgin, -</rpn>
     <graphType>line</graphType>
+    <rpn>0, v_pgpgin, -</rpn>
     <color>green</color>
     <legend>Number of pages read in from disk</legend>
   </add>
@@ -41,8 +40,8 @@
   </add>
   <add>
     <name>Nv_pswpin</name>
-    <rpn>0, v_pswpin, -</rpn>
     <graphType>line</graphType>
+    <rpn>0, v_pswpin, -</rpn>
     <color>blue</color>
     <legend>Number of pages swapped in</legend>
   </add>

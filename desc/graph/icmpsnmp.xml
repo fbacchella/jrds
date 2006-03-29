@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
 	<name>icmpsnmp</name>
 	<graphName>icmp</graphName>
-	<verticalLabel>Paquets/s</verticalLabel>
 	<graphTitle>ICMP Info on {1}</graphTitle>
+	<verticalLabel>Paquets/s</verticalLabel>
 	<add>
 		<name>InMsgs</name>
 		<graphType>line</graphType>

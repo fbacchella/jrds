@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "http://bidule">
 <graphdesc>
   <name>ipactivitysnmp</name>
   <graphName>ip</graphName>
-  <verticalLabel>paquets/s</verticalLabel>
   <graphTitle>IP activity on {1}</graphTitle>
+  <verticalLabel>paquets/s</verticalLabel>
   <add>
     <name>ipInReceives</name>
     <graphType>none</graphType>
@@ -21,39 +22,37 @@
     <graphType>none</graphType>
   </add>
   <add>
-      <graphType>comment</graphType>
-     <legend>Received datagrams</legend>
+      <legend>Received datagrams</legend>
   </add>	
    <add>
     <name>NipInReceives</name>
-    <rpn>0, ipInReceives, -</rpn>
     <graphType>line</graphType>
+    <rpn>0, ipInReceives, -</rpn>
     <color>RED</color>
     <legend>received datagrams</legend>
   </add>
   <add>
     <name>NipInDelivers</name>
-    <rpn>0, ipInDelivers, -</rpn>
     <graphType>line</graphType>
+    <rpn>0, ipInDelivers, -</rpn>
      <color>ORANGE</color>
     <legend>locally delivered datagram</legend>
   </add>
   <add>
     <name>NipReasmOks</name>
-    <rpn>0, ipReasmOKs, -</rpn>
     <graphType>line</graphType>
+    <rpn>0, ipReasmOKs, -</rpn>
     <color>YELLOW</color>
     <legend>re-assembled datagrams</legend>
   </add>
   <add>
     <name>NipFragOks</name>
-    <rpn>0, ipFragOKs, -</rpn>
     <graphType>line</graphType>
+    <rpn>0, ipFragOKs, -</rpn>
     <color>GRAY</color>
     <legend>fragmented datagrams</legend>
   </add>
    <add>
-      <graphType>comment</graphType>
      <legend>Sent datagrams</legend>
   </add>	
    <add>
