@@ -1,6 +1,9 @@
-/*
- * Created on 26 nov. 2004
- */
+/*##########################################################################
+_##
+_##  $Id$
+_##
+_##########################################################################*/
+
 package jrds.snmp;
 
 import java.io.IOException;
@@ -29,7 +32,7 @@ import org.snmp4j.smi.VariableBinding;
  * A extension to a an HashMap, it's main purpose is to be constructed from an snmp pdu and
  * return values as java base objects
  * the key to access a value is it's OID
- * It's support float and double stored in opaque value
+ * It supports float and double stored in opaque value
  *
  *  @author Fabrice Bacchella
  */
@@ -60,11 +63,11 @@ public class SnmpVars extends HashMap {
 	 * it will be stored as a key/value and the original snmp datas will be lost
 	 * @param vb
 	 */
+	@SuppressWarnings("unchecked")
 	public void addVariable(VariableBinding vb)
 	{
 		if( ! vb.isException()) {
 			OID vbOid = vb.getOid();
-			Variable valueAsVar = vb.getVariable();
 			put(vbOid, convertVar(vb.getVariable()));
 		}
 		else {
@@ -95,22 +98,22 @@ public class SnmpVars extends HashMap {
 			}
 			else if(valueAsVar instanceof UnsignedInteger32) {
 				if(valueAsVar instanceof TimeTicks) {
-					long epochcentisecond = ((UnsignedInteger32)valueAsVar).getValue();
+					long epochcentisecond = valueAsVar.toLong();//((UnsignedInteger32)valueAsVar).getValue();
 					retvalue  = new Double(epochcentisecond / 100.0 );
 				}
 				else
-					retvalue  = new Long(((UnsignedInteger32)valueAsVar).getValue());
+					retvalue  = valueAsVar.toLong(); //new Long(((UnsignedInteger32)valueAsVar).getValue());
 			}
 			else if(valueAsVar instanceof Integer32)
-				retvalue  = new Integer(((Integer32)valueAsVar).getValue());
+				retvalue  = valueAsVar.toInt(); //new Integer(((Integer32)valueAsVar).getValue());
 			else if(valueAsVar instanceof Counter64)
-				retvalue  = new Long(((Counter64)valueAsVar).getValue());
+				retvalue  = valueAsVar.toLong(); //new Long(((Counter64)valueAsVar).getValue());
 			else if(valueAsVar instanceof OctetString) {
 				if(valueAsVar instanceof Opaque) {
 					retvalue  = resolvOpaque((Opaque) valueAsVar);
 				}
 				else
-					retvalue  = ((OctetString)valueAsVar).toString();
+					retvalue  = valueAsVar.toString(); //((OctetString)valueAsVar).toString();
 			}
 			else if(valueAsVar instanceof Null) {
 				retvalue  = null;
@@ -144,7 +147,7 @@ public class SnmpVars extends HashMap {
 					value = new Double(bais.getDouble());
 			}
 		} catch (IOException e) {
-			logger.error(var.toString(),e);
+			logger.error(var.toString());
 		}
 		return value;
 	}

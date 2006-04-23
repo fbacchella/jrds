@@ -88,6 +88,7 @@ public abstract class SnmpRequester {
 	 */
 	public static final SnmpRequester TABULAR = new SnmpRequester() {
 		
+		@SuppressWarnings("unchecked")
 		public Map doSnmpGet(SnmpProbe probe, Collection oids)
 		{
 			Target snmpTarget = probe.getSnmpTarget();
