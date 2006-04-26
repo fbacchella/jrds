@@ -9,7 +9,6 @@ package jrds;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -24,7 +23,7 @@ public class BackEndCommiter {
 	static private BackEndCommiter instance = null;
 
 	private final Timer syncTimer = new Timer(true);
-	private final Collection backEndSet = Collections.synchronizedCollection( new HashSet());
+	private final Collection<RrdCachedFileBackend> backEndSet = Collections.synchronizedCollection( new HashSet<RrdCachedFileBackend>());
 	/**
 	 * 
 	 */
@@ -36,10 +35,8 @@ public class BackEndCommiter {
 		TimerTask syncTask = new TimerTask() {
 			public void run() {
 				synchronized(backEndSet) {
-					for(Iterator i = backEndSet.iterator(); i.hasNext() ;) {
-						Object o = i.next();
-						((RrdCachedFileBackend) o).sync();
-					}
+					for(RrdCachedFileBackend o: backEndSet)
+						o.sync();
 				}
 			}
 		};

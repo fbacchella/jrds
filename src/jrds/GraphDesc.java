@@ -9,7 +9,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,7 +57,7 @@ implements Cloneable {
 	
 	public interface GraphType {
 		public abstract void draw(RrdGraphDef rgd, String sn, Color color) throws
-				RrdException;
+		RrdException;
 		
 		public static final GraphType NONE = new GraphType() {
 			public void draw(RrdGraphDef rgd, String sn, Color color) {};
@@ -210,18 +209,18 @@ implements Cloneable {
 	static final public PathElement DATABASE = PathElement.DATABASE;
 	
 	static final public Color[] colors = new Color[] {
-			Color.BLUE,
-			Color.GREEN,
-			Color.RED,
-			Color.CYAN,
-			Color.BLACK,
-			Color.ORANGE,
-			Color.YELLOW,
-			Color.PINK,
-			Color.MAGENTA
+		Color.BLUE,
+		Color.GREEN,
+		Color.RED,
+		Color.CYAN,
+		Color.BLACK,
+		Color.ORANGE,
+		Color.YELLOW,
+		Color.PINK,
+		Color.MAGENTA
 	};
 	
-	static final private Map COLORMAP = new HashMap(colors.length);
+	static final private Map<String, Color> COLORMAP = new HashMap<String, Color>(colors.length);
 	static {
 		COLORMAP.put("BLUE", Color.BLUE);
 		COLORMAP.put("GREEN", Color.GREEN);
@@ -277,7 +276,7 @@ implements Cloneable {
 	}
 	
 	static final String manySpace = "                                                                  ";
-	private Map dsMap;
+	private Map<Object, DsDesc> dsMap;
 	private int width = 578;
 	private int height = 206;
 	private double upperLimit = Double.NaN;
@@ -297,11 +296,11 @@ implements Cloneable {
 	 * @param size the estimated number of graph that will be created
 	 */
 	public GraphDesc(int size) {
-		dsMap = new LinkedHashMap(size);
+		dsMap = new LinkedHashMap<Object, DsDesc>(size);
 	}
 	
 	public GraphDesc() {
-		dsMap = new LinkedHashMap();
+		dsMap = new LinkedHashMap<Object, DsDesc>();
 	}
 	
 	/**
@@ -322,14 +321,14 @@ implements Cloneable {
 	
 	public void add(String name, GraphType graphType, String legend) {
 		add(name, name, null, graphType,
-						colors[ (lastColor++) % colors.length], legend,
-						DEFAULTCF);
+				colors[ (lastColor++) % colors.length], legend,
+				DEFAULTCF);
 	}
 	
 	public void add(String name, GraphType graphType) {
 		add(name, name, null, graphType,
-						colors[ (lastColor++) % colors.length], name,
-						DEFAULTCF);
+				colors[ (lastColor++) % colors.length], name,
+				DEFAULTCF);
 	}
 	
 	/**
@@ -350,13 +349,13 @@ implements Cloneable {
 	
 	public void add(String name, String rpn, GraphType graphType, Color color) {
 		add(name, null, rpn, graphType, color, name,
-						DEFAULTCF);
+				DEFAULTCF);
 	}
 	
 	public void add(String name, String rpn, GraphType graphType, String legend) {
 		add(name, null, rpn, graphType,
-						colors[lastColor++ % colors.length], legend,
-						DEFAULTCF);
+				colors[lastColor++ % colors.length], legend,
+				DEFAULTCF);
 	}
 	
 	/**
@@ -387,7 +386,15 @@ implements Cloneable {
 			String consFunc) {
 		if (dsName == null && rpn == null)
 			dsName = name;
-		GraphType gt = (GraphType) resolv(GraphType.class, graphType);
+		GraphType gt = null;
+		if(graphType == null) {
+			if(legend != null)
+				gt = GraphType.COMMENT;
+			else if(name != null)
+				gt = GraphType.NONE;
+		}
+		else
+			gt = (GraphType) resolv(GraphType.class, graphType);
 		ConsFunc cf = DEFAULTCF;
 		if (consFunc != null)
 			cf = (ConsFunc) resolv(ConsFunc.class, consFunc);
@@ -423,7 +430,7 @@ implements Cloneable {
 		
 	}
 	
-
+	
 	/**
 	 * return the RrdGraphDef for this graph, used the indicated probe
 	 * any data can be overined of a provided map of Plottable
@@ -447,8 +454,7 @@ implements Cloneable {
 		retValue.comment("  Maximum");
 		retValue.comment("@l");
 		
-		for (Iterator i = dsMap.values().iterator(); i.hasNext(); ) {
-			DsDesc ds = (DsDesc) i.next();
+		for(DsDesc ds: dsMap.values()) {
 			if (ds.dsName == null && ds.rpn == null) {
 				ds.graphType.draw(retValue, ds.name, ds.color);
 				addLegend(retValue, ds.name, ds.graphType, ds.legend);
@@ -610,7 +616,7 @@ implements Cloneable {
 	public void setWidth(int width) {
 		this.width = width;
 	}
-
+	
 	/**
 	 * @return Returns the verticalLabel.
 	 */
@@ -628,14 +634,13 @@ implements Cloneable {
 	public void colorsReset() {
 		lastColor = 0;
 	}
-
+	
 	/**
 	 * @return Returns the viewTree.
 	 */
 	public LinkedList getViewTree(RdsGraph graph) {
-		LinkedList tree = new LinkedList();
-		for (Iterator i = viewTree.iterator(); i.hasNext(); ) {
-			Object o = i.next();
+		LinkedList<Object> tree = new LinkedList<Object>();
+		for (Object o: viewTree) {
 			if (o instanceof String)
 				tree.add(o);
 			else if (o instanceof PathElement)
@@ -662,9 +667,8 @@ implements Cloneable {
 	 * @return Returns the hostTree.
 	 */
 	public LinkedList getHostTree(RdsGraph graph) {
-		LinkedList tree = new LinkedList();
-		for (Iterator i = hostTree.iterator(); i.hasNext(); ) {
-			Object o = i.next();
+		LinkedList<Object> tree = new LinkedList<Object>();
+		for (Object o: hostTree) {
 			if (o instanceof String)
 				tree.add(o);
 			else if (o instanceof PathElement)
@@ -686,7 +690,7 @@ implements Cloneable {
 	public void setHostTree(Object[] hostTree) {
 		this.hostTree = Arrays.asList(hostTree);
 	}
-
+	
 	/**
 	 * @return Returns the graphTitle.
 	 */
@@ -699,7 +703,7 @@ implements Cloneable {
 	public void setGraphTitle(String graphTitle) {
 		this.graphTitle = graphTitle;
 	}
-
+	
 	/**
 	 * Find the value of field in the class, the field is is upper case
 	 *
@@ -724,11 +728,11 @@ implements Cloneable {
 	public static final PathElement resolvPathElement(String name) {
 		return (PathElement) resolv(PathElement.class, name);
 	}
-
+	
 	public String getName() {
 		return name;
 	}
-
+	
 	public void setName(String name) {
 		this.name = name;
 	}

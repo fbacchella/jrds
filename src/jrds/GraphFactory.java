@@ -6,10 +6,6 @@
 
 package jrds;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -18,7 +14,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import jrds.xmlResources.ResourcesLocator;
 
@@ -35,14 +30,17 @@ import org.xml.sax.SAXException;
  */
 public class GraphFactory {
 	static private final Logger logger = Logger.getLogger(GraphFactory.class);
-	static final private List graphPackages = new ArrayList(2);
-	static final private Map graphDescMap = Collections.synchronizedMap(new HashMap());
-	static final Pattern p = Pattern.compile(".*.xml");
-	static final FileFilter filter = new  FileFilter(){
-		public boolean accept(File pathname) {
-			return  ! pathname.isHidden() && ( p.matcher(pathname.getName()).matches() || pathname.isDirectory() );
+	/*static {
+		final String DEFAULT_PARSER_NAME = "org.apache.xerces.parsers.SAXParser";
+		try {
+			XMLReaderFactory.createXMLReader(DEFAULT_PARSER_NAME);
+		} catch (SAXException e) {
+			logger.fatal("xerces is mandatory, please install it");
 		}
-	};
+	}*/
+
+	static final private List<String> graphPackages = new ArrayList<String>(2);
+	static final private Map<String, GraphDesc> graphDescMap = Collections.synchronizedMap(new HashMap<String, GraphDesc>());
 
 	static {
 		graphPackages.add("jrds.graph.");
@@ -54,45 +52,11 @@ public class GraphFactory {
 	private GraphFactory() {
 	}
 	
-	public static void init() {
-		scanProbeDir(new File(PropertiesManager.getInstance().graphlibpath));
+	public static void addDesc(GraphDesc gd) {
+		graphDescMap.put(gd.getName(), gd);
 	}
 	
-	/**
-	 * Recursively walk a directory tree and return a List of all
-	 * Files found; the List is sorted using File.compareTo.
-	 *
-	 * @param aStartingDir is a valid directory, which can be read.
-	 */
-	static private void scanProbeDir( File aStartingDir ) {
-		
-		File[] filesAndDirs = aStartingDir.listFiles(filter);
-		for(int i = 0 ; i < filesAndDirs.length; i++) {
-			File file = filesAndDirs[i];
-			if(file.isFile()) {
-				try {
-					InputStream xmlStream = new FileInputStream(file);
-					GraphDesc gd = makeGraphDesc(xmlStream);
-					xmlStream.close();
-					graphDescMap.put(gd.getName(), gd);
-					logger.debug("graph " + file + " found, named " + gd.getName());
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SAXException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			else if (file.isDirectory()) {
-				scanProbeDir(file);
-			}
-			
-		}
-	}
+
 	
 	/**
 	 * This method is used to generate a class from an object. It can be :
@@ -169,8 +133,9 @@ public class GraphFactory {
 		return retValue;
 	}
 	
-	static public GraphDesc makeGraphDesc(InputStream xmlStream) throws IOException, SAXException {
+	static private GraphDesc makeGraphDesc(InputStream xmlStream) throws IOException, SAXException {
 		Digester digester = new Digester();
+		digester.register("-//jrds//DTD Graph Description//EN", digester.getClass().getResource("/graphdesc.dtd").toString());
 		digester.setValidating(false);
 		digester.addObjectCreate("graphdesc", jrds.GraphDesc.class);
 		digester.addSetProperties("graphdesc");
@@ -193,14 +158,14 @@ public class GraphFactory {
 		digester.addSetNext("graphdesc/viewtree", "setViewTree");
 		digester.addRule("*/pathelement", new Rule() {
 			public void body (String namespace, String name, String text) {
-				List tree = (List) getDigester().peek();
+				List<Object> tree = (List<Object>) getDigester().peek();
 				tree.add(GraphDesc.resolvPathElement(text));
 			}	
 		}
 		);
 		digester.addRule("*/pathstring", new Rule() {
 			public void body (String namespace, String name, String text) {
-				List tree = (List) getDigester().peek();
+				List<Object> tree = (List<Object>) getDigester().peek();
 				tree.add(text);
 			}	
 		}

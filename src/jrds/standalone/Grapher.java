@@ -9,10 +9,9 @@ package jrds.standalone;
 import java.io.File;
 import java.util.Date;
 
-import jrds.GraphFactory;
+import jrds.DescFactory;
 import jrds.HostsList;
 import jrds.JrdsLogger;
-import jrds.ProbeFactory;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
 
@@ -40,8 +39,7 @@ public class Grapher {
 		System.getProperties().setProperty("java.awt.headless","true");
 		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
 
-		ProbeFactory.init();
-		GraphFactory.init();
+		DescFactory.init();
 
 		final HostsList hl = HostsList.getRootGroup();
 		hl.append(new File(pm.configfilepath));

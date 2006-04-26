@@ -56,8 +56,7 @@ public class StartListener implements ServletContextListener {
 				
 				StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
 
-				ProbeFactory.init();
-				GraphFactory.init();
+				DescFactory.init();
 
 				HostsList.fill(new File(pm.configfilepath));
 								

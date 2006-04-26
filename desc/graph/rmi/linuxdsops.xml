@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+  <name>LinuxDiskstatOps</name>
+  <graphName>op-{2}</graphName>
+  <graphTitle>E/S (operations) on disk {2} on {1}</graphTitle>
+  <verticalLabel>operations/s</verticalLabel>
+  <add>
+    <name>r</name>
+    <graphType>line</graphType>
+    <color>green</color>
+    <legend>Number of read accesses</legend>
+  </add>
+  <add>
+    <name>w</name>
+    <graphType>line</graphType>
+    <color>blue</color>
+    <legend>Number of write accesses</legend>
+  </add>
+  <add>
+    <name>rrqm</name>
+    <graphType>line</graphType>
+    <color>green</color>
+    <legend>Number of read accesses merged</legend>
+  </add>
+  <add>
+    <name>wrqm</name>
+    <graphType>line</graphType>
+    <color>blue</color>
+    <legend>Number of write accesses merged</legend>
+  </add>
+  <hosttree>
+    <pathelement>HOST</pathelement>
+    <pathelement>DISK</pathelement>
+    <pathelement>DISKACTIVITY</pathelement>
+    <pathelement>INDEX</pathelement>
+    <pathstring>Activity as operation/s</pathstring>
+  </hosttree>
+  <viewtree>
+    <pathelement>DISK</pathelement>
+    <pathelement>DISKACTIVITY</pathelement>
+    <pathelement>HOST</pathelement>
+    <pathstring>Activity as operation/s</pathstring>
+    <pathelement>INDEX</pathelement>
+  </viewtree>
+</graphdesc>

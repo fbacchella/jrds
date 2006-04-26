@@ -40,7 +40,7 @@ implements Comparable {
 	
 	private String name;
 	private RdsHost monitoredHost;
-	private Collection graphList;
+	private Collection<RdsGraph> graphList;
 	private final Object lock = new Object();
 	private String stringValue = null;
 	private ProbeDesc pd;
@@ -60,11 +60,11 @@ implements Comparable {
 		return monitoredHost;
 	}
 	
-	private Collection initGraphList() {
+	private Collection<RdsGraph> initGraphList() {
 		Collection graphClasses = pd.getGraphClasses();
-		Collection graphList = null;
+		Collection<RdsGraph> graphList = null;
 		if(graphClasses != null) {
-			graphList = new ArrayList(graphClasses.size());
+			graphList = new ArrayList<RdsGraph>(graphClasses.size());
 			for (Iterator i = graphClasses.iterator(); i.hasNext(); ) {
 				Object o = i.next();
 				RdsGraph newGraph = GraphFactory.makeGraph(o, this);
@@ -133,7 +133,7 @@ implements Comparable {
 	
 	private ArcDef[] getArcDefs() throws RrdException {
 		ArcDef[] defaultArc = new ArcDef[3];
-		defaultArc[0] = new ArcDef("AVERAGE", 0.5, 1, 105120);
+		defaultArc[0] = new ArcDef("AVERAGE", 0.5, 1, 12 * 24 * 30 * 6);
 		defaultArc[1] = new ArcDef("AVERAGE", 0.5, 12, 8760);
 		defaultArc[2] = new ArcDef("AVERAGE", 0.5, 288, 730);
 		return defaultArc;
@@ -203,7 +203,7 @@ implements Comparable {
 	 * @param valuesList
 	 * @return an map of value to be stored
 	 */
-	public Map filterValues(Map valuesList) {
+	public Map  filterValues(Map valuesList) {
 		return valuesList;
 	}
 	
@@ -219,7 +219,7 @@ implements Comparable {
 			Number uptime = (Number) retValue.get(id);
 			if(uptime != null && uptime.intValue() <= ProbeDesc.HEARTBEATDEFAULT) {
 				retValue = new HashMap(0);
-				logger.info("uptime too low for " + this.toString());
+				logger.info("uptime too low for " + toString());
 			}
 			else {
 				retValue.remove(id);
@@ -378,14 +378,14 @@ implements Comparable {
 		return retValue;
 	}
 	
-	public Map getLastValues() {
-		Map retValues = new HashMap();
+	public Map<String, Object> getLastValues() {
+		Map<String, Object> retValues = new HashMap<String, Object>();
 		RrdDb rrdDb = null;
 		try {
 			rrdDb = StoreOpener.getRrd(getRrdName());
 			String[] dsNames = rrdDb.getDsNames();
 			for(int i = 0; i < dsNames.length ; i ++) {
-				retValues.put(dsNames[i], new Double(rrdDb.getDatasource(i).getLastValue()));
+				retValues.put(dsNames[i], rrdDb.getDatasource(i).getLastValue());
 			}
 			retValues.put("Last update", new Date(1000 * rrdDb.getLastUpdateTime()));
 		} catch (Exception e) {

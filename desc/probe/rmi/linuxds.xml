@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+  <name>Diskstats</name>
+  <probeName>ds-{1}</probeName>
+  <probeClass>jrds.probe.RMIIndexed</probeClass>
+  <rmiClass>jrds.agent.linux.Diskstats</rmiClass>
+  <ds>
+    <dsName>rrqm</dsName>
+    <dsType>COUNTER</dsType>
+  </ds>
+  <ds>
+    <dsName>wrqm</dsName>
+    <dsType>COUNTER</dsType>
+  </ds>
+  <ds>
+    <dsName>r</dsName>
+    <dsType>COUNTER</dsType>
+  </ds>
+  <ds>
+    <dsName>w</dsName>
+    <dsType>COUNTER</dsType>
+  </ds>
+  <ds>
+    <dsName>rsec</dsName>
+    <dsType>COUNTER</dsType>
+  </ds>
+  <ds>
+    <dsName>wsec</dsName>
+    <dsType>COUNTER</dsType>
+  </ds>
+  <ds>
+    <dsName>svctm</dsName>
+    <dsType>COUNTER</dsType>
+  </ds>
+  <ds>
+    <dsName>rwait</dsName>
+    <dsType>COUNTER</dsType>
+  </ds>
+  <ds>
+    <dsName>qu-sz</dsName>
+    <dsType>GAUGE</dsType>
+  </ds>
+  <ds>
+    <dsName>waittm</dsName>
+    <dsType>COUNTER</dsType>
+  </ds>
+  <ds>
+    <dsName>wwaittm</dsName>
+    <dsType>COUNTER</dsType>
+  </ds>
+  <graphs>
+    <name>LinuxDiskstatOps</name>
+  </graphs>
+</probedesc>

@@ -22,7 +22,7 @@ public class RdsHost implements Comparable {
 	
 	private String name;
 	private Target target;
-	private Set allProbes;
+	private Set<Probe> allProbes;
 	private String group = null;
 	//Default value should be bigger than anything
 	//So if something prevent uptime to be collected
@@ -32,7 +32,7 @@ public class RdsHost implements Comparable {
 	
 	public RdsHost(String newName)
 	{
-		allProbes = new TreeSet();
+		allProbes = new TreeSet<Probe>();
 		name = newName;
 	}
 	
@@ -40,7 +40,7 @@ public class RdsHost implements Comparable {
 	 * 
 	 */
 	public RdsHost() {
-		allProbes = new TreeSet();
+		allProbes = new TreeSet<Probe>();
 		name = null;
 	}
 	

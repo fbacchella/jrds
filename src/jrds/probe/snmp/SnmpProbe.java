@@ -82,14 +82,14 @@ public abstract class SnmpProbe extends Probe {
 	 * @return a Map of all the identified vars
 	 */
 	public Map filterValues(Map snmpVars) {
-		Map retValue = new HashMap(snmpVars.size());
+		Map retValue = new HashMap (snmpVars.size());
 		for(Iterator i = snmpVars.entrySet().iterator(); i.hasNext();) {
-			Map.Entry e= (Map.Entry) i.next();
+			Map.Entry e = (Map.Entry) i.next();
 			OID oid = (OID) e.getKey();
 			oid.removeLast();
 			Object o = e.getValue();
 			if( o instanceof Number) {
-				retValue.put(oid, (Number) o);
+				retValue.put(oid, o);
 			}
 			if( o instanceof Date) {
 				Date value = (Date) o;

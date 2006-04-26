@@ -9,6 +9,7 @@ package jrds;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,21 +35,21 @@ public class GraphTree {
 
 	private GraphTree parent;
 	private GraphTree root;
-	private Map pathsMap;
+	private Map<String, GraphTree> pathsMap;
 	//The node's name
 	private String name;
 	//The childs
-	private Map childsMap;
+	private Map<String, GraphTree> childsMap;
 	//The graphs in this node
-	private Map graphsSet;
+	private Map<String, RdsGraph> graphsSet;
 
 	/**
 	 *  Private constructor, no one can generate an graph on the fly
 	 *  
 	 */
 	 private GraphTree(String name) {
-		graphsSet = new TreeMap(String.CASE_INSENSITIVE_ORDER);
-		childsMap = new TreeMap(GraphTree.getComparator());
+		graphsSet = new TreeMap<String, RdsGraph>(String.CASE_INSENSITIVE_ORDER);
+		childsMap = new TreeMap<String, GraphTree>(GraphTree.getComparator());
 		this.name = name;
 	}
 	 
@@ -59,7 +60,7 @@ public class GraphTree {
 	 */
 	 public static GraphTree makeGraph(String root) {
 		 GraphTree rootNode = new GraphTree(root);
-		 rootNode.pathsMap = new HashMap();
+		 rootNode.pathsMap = new HashMap<String, GraphTree>();
 		 rootNode.pathsMap.put(rootNode.getPath(), rootNode);
 		 return rootNode;
 	 }
@@ -131,7 +132,7 @@ public class GraphTree {
 		}
 	}
 	
-	private void _addGraphByPath(LinkedList path, RdsGraph nodesGraph) {
+	private void _addGraphByPath(LinkedList<String> path, RdsGraph nodesGraph) {
 		if(path.size() == 1) {
 			graphsSet.put(path.getLast(), nodesGraph);
 		}
@@ -142,16 +143,16 @@ public class GraphTree {
 		}
 	}
 	
-	public void addGraphByPath(LinkedList path, RdsGraph nodesGraph) {
+	public void addGraphByPath(LinkedList<String> path, RdsGraph nodesGraph) {
 		if(path.size() < 1) {
 			logger.error("Path is empty : " + path + " for graph " + nodesGraph.getGraphTitle());
 		}
 		else
-			_addGraphByPath((LinkedList) path.clone(), nodesGraph);
+			_addGraphByPath((LinkedList<String>) path.clone(), nodesGraph);
 	}
 	
 	public Set getChildsName() {
-		Set retValue = new TreeSet(String.CASE_INSENSITIVE_ORDER);
+		Set<String> retValue = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
 		for(Iterator i = childsMap.keySet().iterator() ; i.hasNext() ;) {
 			String childName = (String) i.next();
 			retValue.add(childName);
@@ -192,13 +193,12 @@ public class GraphTree {
 		return graphsSet;
 	}
 	
-	public List enumerateChildsGraph() {
-		List retValue  = new ArrayList();
+	public List<GraphTree> enumerateChildsGraph() {
+		List<GraphTree> retValue  = new ArrayList<GraphTree>();
 		if(graphsSet != null)
-			retValue.addAll(graphsSet.values());
+			retValue.addAll((Collection<? extends GraphTree>) graphsSet.values());
 		if(childsMap != null) {
-			for(Iterator i = childsMap.values().iterator() ; i.hasNext() ;) {
-				GraphTree child = (GraphTree) i.next();
+			for(GraphTree child: childsMap.values()) {
 				retValue.addAll(child.enumerateChildsGraph());
 			}
 		}	

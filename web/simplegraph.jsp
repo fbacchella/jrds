@@ -47,7 +47,7 @@ function history_onClick()
 
 function keep_onClick()
 {
-	var historyWin = window.open("graph" + document.location.search, "graph" + document.location.search, "menubar=no,status=no");
+	var historyWin = window.open(window.location, qs.get("id", 0).replace("-","_"), "menubar=no,status=no,resizable=yes");
 }
 
 function download_onClick()

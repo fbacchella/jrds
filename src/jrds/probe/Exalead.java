@@ -86,6 +86,7 @@ public abstract class Exalead extends Probe {
 		String read = "";
 		try {
 			so = new Socket(getHost().getName(), port);
+			so.setSoTimeout(10 * 1000); // 10 seconds timeout
 			out = new PrintWriter(so.getOutputStream());
 			in = new BufferedReader(new InputStreamReader(so.getInputStream()));
 			out.print("status\n");

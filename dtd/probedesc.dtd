@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT ds (dsName,dsType,oid?)>
+<!ELEMENT dsName (#PCDATA)>
+<!ELEMENT dsType (#PCDATA)>
+<!ELEMENT graphs (name+)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT oid (#PCDATA)>
+<!ELEMENT index (#PCDATA)>
+<!ELEMENT uniq (#PCDATA)>
+<!ELEMENT probeClass (#PCDATA)>
+<!ELEMENT probeName (#PCDATA)>
+<!ELEMENT probedesc (name,probeName,probeClass,(snmpRequester|rmiClass)?,(index,uniq)?,ds+,graphs)>
+<!ELEMENT snmpRequester (#PCDATA)>
+<!ELEMENT rmiClass (#PCDATA)>

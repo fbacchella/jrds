@@ -47,12 +47,13 @@ public class ProbeDesc {
 	
 	
 	
-	private Map dsMap;
+	private Map<String, DsDesc> dsMap;
 	private String probeName;
 	private String name;
 	private Collection namedProbesNames;
 	private Collection graphClasses;
 	private OID indexOid = null;
+	private String rmiClass = null;
 	private SnmpRequester requester = SnmpRequester.RAW;
 	private boolean uniqIndex = false;
 	private Class probeClass = Probe.class;
@@ -79,14 +80,14 @@ public class ProbeDesc {
 	 * @param size estimated elements number
 	 */
 	public ProbeDesc(int size) {
-		dsMap = new LinkedHashMap(size);
+		dsMap = new LinkedHashMap<String, DsDesc>(size);
 	}
 	
 	/**
 	 * Create a new Probe Description
 	 */
 	public ProbeDesc() {
-		dsMap = new LinkedHashMap();
+		dsMap = new LinkedHashMap<String, DsDesc>();
 	}
 	
 	//Differets way to add a munins probe
@@ -161,6 +162,8 @@ public class ProbeDesc {
 				 type = (DsType) e.getValue();
 			else if("index".equals(var))
 				index = e.getValue();
+			if(index == null && name != null)
+				index = name;
 		}
 		dsMap.put(name, new DsDesc(type, heartbeat, min, max, index));
 	}
@@ -374,5 +377,13 @@ public class ProbeDesc {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getRmiClass() {
+		return rmiClass;
+	}
+
+	public void setRmiClass(String rmiClass) {
+		this.rmiClass = rmiClass;
 	}
 }
