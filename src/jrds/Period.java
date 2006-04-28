@@ -60,7 +60,7 @@ public class Period {
 		periodList.add(new Period.PeriodItem("Last Day", Calendar.DAY_OF_MONTH, -1));
 		periodList.add(new Period.PeriodItem("Last 2 Days", Calendar.DAY_OF_MONTH, -2));
 		periodList.add(new Period.PeriodItem("Last Week", Calendar.WEEK_OF_MONTH, -1));
-		periodList.add(new Period.PeriodItem("Last 2 Weeks", Calendar.WEEK_OF_MONTH, -1));
+		periodList.add(new Period.PeriodItem("Last 2 Weeks", Calendar.WEEK_OF_MONTH, -2));
 		periodList.add(new Period.PeriodItem("Last Month", Calendar.MONTH, -1));
 		periodList.add(new Period.PeriodItem("Last 2 Months", Calendar.MONTH, -2));
 		periodList.add(new Period.PeriodItem("Last 3 Months", Calendar.MONTH, -3));
