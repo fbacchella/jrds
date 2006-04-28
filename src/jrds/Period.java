@@ -12,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -48,7 +47,7 @@ public class Period {
 			return calBegin.getTime();
 		}
 	}
-	static final private List periodList = new ArrayList(18);
+	static final private List<Period.PeriodItem> periodList = new ArrayList<Period.PeriodItem>(18);
 	static {
 		periodList.add(new Period.PeriodItem("Manual", Calendar.HOUR, -1));
 		periodList.add(new Period.PeriodItem("Last Hour", Calendar.HOUR, -1));
@@ -159,12 +158,10 @@ public class Period {
 		}
 		return foundDate;
 	}
-	static public List getPeriodNames() {
-		List periodName = new ArrayList(periodList.size());
-		for(Iterator i = periodList.iterator(); i.hasNext() ;) {
-			String name =  ((Period.PeriodItem)i.next()).name;
-			periodName.add(name);
-		}
+	static public List<String> getPeriodNames() {
+		List<String> periodName = new ArrayList<String>(periodList.size());
+		for(Period.PeriodItem pi: periodList) 
+			periodName.add(pi.name);
 		return periodName;
 	}
 }
