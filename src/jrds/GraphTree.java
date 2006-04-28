@@ -103,7 +103,7 @@ public class GraphTree {
 			childsarray.append("    [");
 			childsarray.append("'" + leafName +"',");
 			childsarray.append("'");
-			childsarray.append("treenoframes.jsp?id=");
+			childsarray.append("index.jsp?id=");
 			childsarray.append(currGraph.hashCode());
 			if(queryString != null &&  ! "".equals(queryString)) {
 				childsarray.append("&");

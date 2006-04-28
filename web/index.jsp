@@ -94,7 +94,7 @@ initializeDocument();
 					<td><input onclick="download_onClick();" type="button" name="DownloadButton" value="Download values" tabindex="3"></td>
 				</tr>
 			</table>
-			<form  name="dateForm" action="treenoframes.jsp" method="GET">
+			<form  name="dateForm" action="index.jsp" method="GET">
 				<input name="id" type="hidden" value=""/>
 				<div align="center">
 					<table border="0" cellspacing="2" cellpadding="0">

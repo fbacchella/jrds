@@ -8,14 +8,11 @@ package jrds.webapp;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
-
-import org.apache.log4j.Logger;
 
 import jrds.GraphTree;
 import jrds.HostsList;
@@ -26,7 +23,7 @@ import jrds.HostsList;
  * @version $Revision$ $Date$
  */
 public class TreeJspBean {
-	static final private Logger logger = Logger.getLogger(TreeJspBean.class);
+	@SuppressWarnings("unchecked")
 	public void getJavascriptTree(int sort, String father, JspWriter out, HttpServletRequest req) throws JspException {
 		GraphTree graphTree = null;
 		if(sort == GraphTree.LEAF_GRAPHTITLE )
@@ -46,12 +43,9 @@ public class TreeJspBean {
 				}
 				StringBuffer parambuff = new StringBuffer();
 				for(Map.Entry<String, String[]> param: parameters.entrySet()) {
-				//for(Iterator i = parameters.entrySet().iterator(); i.hasNext() ; ) {
-				//	Map.Entry param = (Map.Entry) i.next();
 					parambuff.append("&");
 					parambuff.append(param.getKey());
 					parambuff.append("=");
-					//logger.debug(param.getValue().getClass().getName());
 					parambuff.append(param.getValue()[0]);
 				}
 				parambuff.deleteCharAt(0);
