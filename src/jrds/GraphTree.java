@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import jrds.webapp.PeriodBean;
+
 import org.apache.log4j.Logger;
 
 
@@ -74,15 +76,16 @@ public class GraphTree {
 		childsarray.append(curNode +".addChildren([\n");
 		int width = 0;
 		boolean first = true;
-		for(Iterator i = childsMap.values().iterator(); i.hasNext(); width++) {
+		//for(Iterator i = childsMap.values().iterator(); i.hasNext(); width++) {
+		for(GraphTree o: childsMap.values()) {
 			if(! first)
 				childsarray.append(", ");
 			else {
 				childsarray.append("    ");
 				first = false;
 			}
-			String child = curNode + "_" + width;
-			GraphTree o = (GraphTree) i.next();
+			String child = curNode + "_" + width++;
+			//GraphTree o = (GraphTree) i.next();
 			o.getJavaScriptCode(out, queryString, child);
 			childsarray.append(child);
 		}
@@ -93,15 +96,14 @@ public class GraphTree {
 				first = false;
 			Map.Entry e = (Map.Entry) i.next();
 			RdsGraph currGraph = (RdsGraph) e.getValue();
-			String leafName = ((String) e.getKey()).replaceAll("\\\\","\\\\\\\\");
-			
-			childsarray.append("    [");
 			/* replace \ with \\
 			 * ex: C:\ become C:\\
 			 * */   
+			String leafName = ((String) e.getKey()).replaceAll("\\\\","\\\\\\\\");
+			childsarray.append("    [");
 			childsarray.append("'" + leafName +"',");
 			childsarray.append("'");
-			childsarray.append("simplegraph.jsp?id=");
+			childsarray.append("treenoframes.jsp?id=");
 			childsarray.append(currGraph.hashCode());
 			if(queryString != null &&  ! "".equals(queryString)) {
 				childsarray.append("&");
