@@ -39,9 +39,11 @@ public class HostConfigParser  extends DefaultHandler {
 	private final String SNMPHOST = "host";
 	private final String RRD = "rrd";
 	private final String PROBE = "probe";
+	private final String PROBETREE = "tree";
 	private final String ARG = "arg";
 	private final String TYPE = "type";
 	private final String HOSTNAME = "name";
+	private final String HOSTTREE = "name";
 	private final String ARGTYPE = "type";
 	private final String ARGVALUE = "value";
 	private final String INCLUDE = "include";
@@ -63,6 +65,7 @@ public class HostConfigParser  extends DefaultHandler {
 	private Target lastSnmpTarget;
 	private List argsListValue;
 	private String probeType;
+	private String probeTree;
 	private File hostConfigFile;
 	private Collection list;
 	private String name;
@@ -111,11 +114,14 @@ public class HostConfigParser  extends DefaultHandler {
 				String name = atts.getValue(HOSTNAME);
 				lastHost = new RdsHost(name);
 				lastSnmpTarget = null;
+				String tree = atts.getValue(HOSTTREE);
+				if(tree != null)
+					lastHost.setTree(tree);
 			}
 			else if( RRD.equals(localName) || PROBE.equals(localName) ) {
 				probeType = atts.getValue(TYPE);
 				argsListValue = new ArrayList(5);
-				//argsListValue.add(lastHost);
+				probeTree = atts.getValue(PROBETREE);
 			}
 			else if(argsListValue != null && ARG.equals(localName)) {
 				String type = atts.getValue(ARGTYPE);
@@ -171,7 +177,7 @@ public class HostConfigParser  extends DefaultHandler {
 			}
 			else if(MACROUSE.equals(localName)) {
 				String name = atts.getValue(MACRONAME);
-				Macro m = (Macro) HostsList.getRootGroup().getMacroList().get(name);
+				Macro m = HostsList.getRootGroup().getMacroList().get(name);
 				if(m != null) {
 					logger.debug("Will populate " + lastHost + " with macro " + name);
 					m.populate(lastHost);
@@ -201,6 +207,8 @@ public class HostConfigParser  extends DefaultHandler {
 					lastSnmpTarget = null;
 					
 					if(newProbe != null) {
+						if(probeTree != null)
+							newProbe.setTree(probeTree);
 						lastHost.addProbe(newProbe);
 						logger.debug("adding probe " + newProbe );
 					}
@@ -210,6 +218,7 @@ public class HostConfigParser  extends DefaultHandler {
 				}
 				else
 					logger.warn("What to do with the probe of type " + probeType);
+				probeTree = null;
 				probeType = null;
 				argsListValue = null;
 			}

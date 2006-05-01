@@ -30,16 +30,14 @@ import org.apache.log4j.Logger;
  */
 public class HostsList {
 	static Logger logger = Logger.getLogger(HostsList.class);
-	private Collection hostList;
+	private Collection<RdsHost> hostList;
 	private static HostsList instance;
-	private GraphTree graphTreeByHost = null;
-	private GraphTree graphTreeByView = null;
-	private Map graphMap;
-	private Map probeMap;
+	private Map<Integer, RdsGraph> graphMap;
+	private Map<Integer, Probe> probeMap;
 	private static final String hostRoot = "Sorted by host";
 	private static final String viewRoot = "Sorted by view";
-	private Map macroList = new HashMap();
-	private Map treeMap = null;
+	private Map<String, Macro> macroList = new HashMap<String, Macro>();
+	private Map<String, GraphTree> treeMap = null;
 
 	/**
 	 *  
@@ -49,15 +47,14 @@ public class HostsList {
 	}
 
 	private void init() {
-		treeMap = new HashMap(2);
-		graphTreeByHost = GraphTree.makeGraph(hostRoot);
-		graphTreeByView = GraphTree.makeGraph(viewRoot);
-		treeMap.put(hostRoot, graphTreeByHost);
-		treeMap.put(viewRoot, graphTreeByView);
-		graphMap = new HashMap();
-		probeMap = new HashMap();
-		hostList = new HashSet();
+		treeMap = new HashMap<String, GraphTree>(2);
+		addRoot(hostRoot);
+		addRoot(viewRoot);
+		graphMap = new HashMap<Integer, RdsGraph>();
+		probeMap = new HashMap<Integer, Probe>();
+		hostList = new HashSet<RdsHost>();
 	}
+	
 	public static HostsList getRootGroup() {
 		if (instance == null)
 			instance = new HostsList();
@@ -86,21 +83,33 @@ public class HostsList {
 		append(tmpHostsList);
 	}
 
+	private void addRoot(String root) {
+		if( ! treeMap.containsKey(root)) {
+			 GraphTree newRoot = GraphTree.makeGraph(root);
+			 treeMap.put(root, newRoot);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void addGraph(String root, RdsGraph graph) {
+		getGraphTreeByHost().addGraphByPath(graph.getTreePathByHost(), graph);
+		getGraphTreeByView().addGraphByPath(graph.getTreePathByView(), graph);
+	}
+	
 	private void addHost(RdsHost newhost) {
 		hostList.add(newhost);
 		for (Iterator j = newhost.getProbes().iterator(); j.hasNext();) {
 			Probe currProbe = (Probe) j.next();
-			probeMap.put(new Integer(currProbe.hashCode()), currProbe);
-			if (currProbe.getGraphList() != null)
-				for (Iterator k = currProbe.getGraphList().iterator(); k
-						.hasNext();) {
-					RdsGraph currGraph = (RdsGraph) k.next();
-					graphTreeByView.addGraphByPath(currGraph
-							.getTreePathByView(), currGraph);
-					graphTreeByHost.addGraphByPath(currGraph
-							.getTreePathByHost(), currGraph);
-					graphMap.put(new Integer(currGraph.hashCode()), currGraph);
+			probeMap.put(currProbe.hashCode(), currProbe);
+			if (currProbe.getGraphList() != null) {
+				String rootTree = currProbe.getTree();
+				if(rootTree != null)
+					addRoot(rootTree);
+				for(RdsGraph currGraph: currProbe.getGraphList()) {
+					addGraph(rootTree, currGraph);
+					graphMap.put(currGraph.hashCode(), currGraph);
 				}
+			}
 		}
 		if (this != instance)
 			instance.addHost(newhost);
@@ -111,8 +120,7 @@ public class HostsList {
 		ExecutorService tpool =  Executors.newFixedThreadPool(PropertiesManager.getInstance().collectorThreads);
 		logger.debug("One collect was launched");
 		Date start = new Date();
-		for (Iterator j = hostList.iterator(); j.hasNext();) {
-			final RdsHost oneHost = (RdsHost) j.next();
+		for(final RdsHost oneHost: hostList) {
 			logger.debug("Collect all stats for host " + oneHost.getName());
 			Runnable runCollect = new Runnable() {
 				private RdsHost host = oneHost;
@@ -141,19 +149,18 @@ public class HostsList {
 	}
 	
 	public void graphAll(Date startDate, Date endDate) {
-		for (Iterator j = hostList.iterator(); j.hasNext();) {
-			RdsHost oneHost = (RdsHost) j.next();
+		for(RdsHost oneHost: hostList) {
 			logger.debug("Do all graph for host " + oneHost.getName());
 			oneHost.graphAll(startDate, endDate);
 		}
 	}
 
 	public GraphTree getGraphTreeByHost() {
-		return graphTreeByHost;
+		return treeMap.get(hostRoot);
 	}
 
 	public GraphTree getGraphTreeByView() {
-		return graphTreeByView;
+		return treeMap.get(viewRoot);
 	}
 
 	/**
@@ -162,7 +169,7 @@ public class HostsList {
 	 * @return the graph found or null of nothing found
 	 */
 	public RdsGraph getGraphById(int id) {
-		return (RdsGraph) graphMap.get(new Integer(id));
+		return graphMap.get(id);
 	}
 
 	/**
@@ -171,11 +178,11 @@ public class HostsList {
 	 * @return the graph found or null of nothing found
 	 */
 	public Probe getProbeById(int id) {
-		return (Probe) probeMap.get(new Integer(id));
+		return probeMap.get(id);
 	}
 
 	public GraphTree getNodeByPath(String path) {
-		GraphTree tree = (GraphTree) treeMap.get(path.split("/")[1]);
+		GraphTree tree = treeMap.get(path.split("/")[1]);
 		GraphTree node = null;
 		if(tree != null) {
 			node = tree.getByPath(path);
@@ -183,17 +190,25 @@ public class HostsList {
 		return node;
 	}
 
+	public GraphTree getNodeById(int id) {
+		GraphTree node = null;
+		for(GraphTree tree: treeMap.values())
+			if(tree.getById(id) != null)
+				node = tree.getById(id);
+		return node;
+	}
+
 	/**
 	 * @return
 	 */
-	public Map getMacroList() {
+	public Map<String, Macro> getMacroList() {
 		return macroList;
 	}
 
 	/**
 	 * @param macroList
 	 */
-	public void setMacroList(Map macroList) {
+	public void setMacroList(Map<String, Macro> macroList) {
 		this.macroList = macroList;
 	}
 }

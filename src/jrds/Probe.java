@@ -44,6 +44,7 @@ implements Comparable {
 	private final Object lock = new Object();
 	private String stringValue = null;
 	private ProbeDesc pd;
+	private String tree = null;
 	
 	/**
 	 * The constructor that should be called by derived class
@@ -81,7 +82,7 @@ implements Comparable {
 	/**
 	 * @return Returns the graphList.
 	 */
-	public Collection getGraphList() {
+	public Collection<RdsGraph> getGraphList() {
 		if (graphList == null)
 			graphList = initGraphList();
 		return graphList;
@@ -407,6 +408,17 @@ implements Comparable {
 
 	public int hashCode() {
 		return getQualifiedName().hashCode();
+	}
+
+	public String getTree() {
+		String tempTree = tree;
+		if(tempTree == null)
+			tempTree = monitoredHost.getTree();
+		return tempTree;
+	}
+
+	public void setTree(String treeRoot) {
+		this.tree = treeRoot;
 	}
 
 }

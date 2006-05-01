@@ -29,6 +29,7 @@ public class RdsHost implements Comparable {
 	//We still collect values
 	private long uptime = Long.MAX_VALUE;
 	private Date upTimeProbe = new Date(0);
+	private String tree = null;
 	
 	public RdsHost(String newName)
 	{
@@ -149,5 +150,13 @@ public class RdsHost implements Comparable {
 	 */
 	public Date getUpTimeProbe() {
 		return upTimeProbe;
+	}
+
+	public String getTree() {
+		return tree;
+	}
+
+	public void setTree(String treeRoot) {
+		this.tree = treeRoot;
 	}
 }

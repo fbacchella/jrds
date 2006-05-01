@@ -25,8 +25,6 @@ import jrds.RdsGraph;
  * @version $Revision$
  */
 public final class Graph extends HttpServlet {
-	static public String name = null;
-	
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
@@ -58,58 +56,4 @@ public final class Graph extends HttpServlet {
 		res.addHeader("Cache-Control", "no-cache");
 		graph.writePng(out, begin, end);
 	}
-	
-	public static String getImgUrl(RdsGraph graph, HttpServletRequest req, String begin, String end) {
-		StringBuffer retValue = new StringBuffer();
-		retValue.append(req.getContextPath());
-		retValue.append("/graph?id=" + graph.hashCode());
-		if(begin != null)
-			retValue.append("&begin=" + begin);
-		if(end != null)
-			retValue.append("&end=" + end);
-		return retValue.toString();
-	}
-	
-	/**
-	 * Return an img element, with the URL filled
-	 *
-	 * @param graph RdsGraph
-	 * @param req HttpServletRequest
-	 * @param begin String
-	 * @param end String
-	 * @return String
-	 */
-	public static String getImgElement(RdsGraph graph, HttpServletRequest req, String begin, String end) {
-		StringBuffer retValue = new StringBuffer();
-		retValue.append("<img ");
-		retValue.append("src='" + req.getContextPath());
-		retValue.append("/graph?id=" + graph.hashCode());
-		if(begin != null)
-			retValue.append("&begin=" + begin);
-		if(end != null)
-			retValue.append("&end=" + end);
-		retValue.append("'");
-		retValue.append(" alt='" + graph.getGraphTitle() +"'");
-		retValue.append(" border=''");
-		int rHeight = graph.getRealHeight();
-		if(rHeight > 0)
-			retValue.append(" height='" + rHeight + "'");
-		int rWidth = graph.getRealWidth();
-		if(rWidth > 0)
-			retValue.append(" width='" + rWidth + "'");
-		retValue.append(">");
-		
-		return retValue.toString();
-	}
-
-	/* (non-Javadoc)
-	 * @see javax.servlet.GenericServlet#init()
-	 */
-	public void init() throws ServletException {
-		if(name == null)
-			name = getServletName();
-		//this.getServletContext().
-		super.init();
-	}
-	
 }

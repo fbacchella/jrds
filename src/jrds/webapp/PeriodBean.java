@@ -78,4 +78,15 @@ public class PeriodBean {
 	public void setScale(int scale) {
 		this.scale = scale;
 	}
+	
+	@Override
+	public String toString() {
+		String retValue = "";
+		if( p == null)
+			retValue= "scale=" + scale;
+		else
+			retValue = "begin=" + getBegin() + "&end=" + getEnd();
+		return retValue;
+	}
+	
 }

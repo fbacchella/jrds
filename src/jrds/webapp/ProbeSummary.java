@@ -30,7 +30,7 @@ import org.jrobin.core.RrdException;
  * @version $Revision: 236 $
  */
 public final class ProbeSummary extends HttpServlet {
-	static final private Logger logger = Logger.getLogger(GraphList.class);
+	static final private Logger logger = Logger.getLogger(ProbeSummary.class);
 	
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)

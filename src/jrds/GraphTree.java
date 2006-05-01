@@ -20,8 +20,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import jrds.webapp.PeriodBean;
-
 import org.apache.log4j.Logger;
 
 
@@ -34,10 +32,16 @@ public class GraphTree {
 	static public final int LEAF_GRAPHTITLE = 1;
 	static public final int LEAF_HOSTNAME = 2;
 	static final private Logger logger = Logger.getLogger(GraphTree.class);
+	
+	static final Comparator nodeComparator = new Comparator() {
+		public  int compare(Object arg0, Object arg1) {
+			return String.CASE_INSENSITIVE_ORDER.compare(arg0.toString(), arg1.toString());
+		}
+	};
 
 	private GraphTree parent;
 	private GraphTree root;
-	private Map<String, GraphTree> pathsMap;
+	private Map<Integer, GraphTree> pathsMap;
 	//The node's name
 	private String name;
 	//The childs
@@ -49,9 +53,10 @@ public class GraphTree {
 	 *  Private constructor, no one can generate an graph on the fly
 	 *  
 	 */
-	 private GraphTree(String name) {
+	 @SuppressWarnings("unchecked")
+	private GraphTree(String name) {
 		graphsSet = new TreeMap<String, RdsGraph>(String.CASE_INSENSITIVE_ORDER);
-		childsMap = new TreeMap<String, GraphTree>(GraphTree.getComparator());
+		childsMap = new TreeMap<String, GraphTree>(nodeComparator);
 		this.name = name;
 	}
 	 
@@ -62,21 +67,20 @@ public class GraphTree {
 	 */
 	 public static GraphTree makeGraph(String root) {
 		 GraphTree rootNode = new GraphTree(root);
-		 rootNode.pathsMap = new HashMap<String, GraphTree>();
-		 rootNode.pathsMap.put(rootNode.getPath(), rootNode);
+		 rootNode.pathsMap = new HashMap<Integer, GraphTree>();
+		 rootNode.pathsMap.put(rootNode.getPath().hashCode(), rootNode);
 		 return rootNode;
 	 }
 	 
 	public void getJavaScriptCode(Writer out, String queryString, String curNode) throws IOException {
 		StringBuffer childsarray = new StringBuffer(1000);
-		childsarray.append(curNode + " = gFld('" + name + "', 'graphlist" + getPath());
+		childsarray.append(curNode + " = gFld('" + name + "', 'index.jsp?id=" + getPath().hashCode());
 		if(queryString != null &&  ! "".equals(queryString))
-			childsarray.append("?" + queryString);
+			childsarray.append("&" + queryString);
 		childsarray.append("');\n");
 		childsarray.append(curNode +".addChildren([\n");
 		int width = 0;
 		boolean first = true;
-		//for(Iterator i = childsMap.values().iterator(); i.hasNext(); width++) {
 		for(GraphTree o: childsMap.values()) {
 			if(! first)
 				childsarray.append(", ");
@@ -85,7 +89,6 @@ public class GraphTree {
 				first = false;
 			}
 			String child = curNode + "_" + width++;
-			//GraphTree o = (GraphTree) i.next();
 			o.getJavaScriptCode(out, queryString, child);
 			childsarray.append(child);
 		}
@@ -120,7 +123,11 @@ public class GraphTree {
 	}
 
 	public GraphTree getByPath(String path) {
-		return (GraphTree) pathsMap.get(path);
+		return pathsMap.get(path);
+	}
+	
+	public GraphTree getById(int id) {
+		return pathsMap.get(id);
 	}
 	
 	synchronized private void addChild(String childName) {
@@ -130,7 +137,7 @@ public class GraphTree {
 			childsMap.put(childName, newChild);
 			newChild.setParent(this);
 			newChild.pathsMap = pathsMap;
-			pathsMap.put(newChild.getPath(), newChild);
+			pathsMap.put(newChild.getPath().hashCode(), newChild);
 		}
 	}
 	
@@ -150,7 +157,7 @@ public class GraphTree {
 			logger.error("Path is empty : " + path + " for graph " + nodesGraph.getGraphTitle());
 		}
 		else
-			_addGraphByPath((LinkedList<String>) path.clone(), nodesGraph);
+			_addGraphByPath(new LinkedList<String>(path), nodesGraph);
 	}
 	
 	public Set getChildsName() {
@@ -195,10 +202,10 @@ public class GraphTree {
 		return graphsSet;
 	}
 	
-	public List<GraphTree> enumerateChildsGraph() {
-		List<GraphTree> retValue  = new ArrayList<GraphTree>();
+	public List<RdsGraph> enumerateChildsGraph() {
+		List<RdsGraph> retValue  = new ArrayList<RdsGraph>();
 		if(graphsSet != null)
-			retValue.addAll((Collection<? extends GraphTree>) graphsSet.values());
+			retValue.addAll((Collection<RdsGraph>) graphsSet.values());
 		if(childsMap != null) {
 			for(GraphTree child: childsMap.values()) {
 				retValue.addAll(child.enumerateChildsGraph());
@@ -225,13 +232,4 @@ public class GraphTree {
 	public String getPath() {
 		return _getPath().toString();
 	}
-	
-	static Comparator getComparator() {
-		return new Comparator() {
-			public int compare(Object arg0, Object arg1) {
-				return String.CASE_INSENSITIVE_ORDER.compare(arg0.toString(), arg1.toString());
-			}
-		};
-	}
-
 }

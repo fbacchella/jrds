@@ -64,8 +64,8 @@ GLOBALTARGET = 'S'
 ICONPATH="img/"
 USEFRAMES = 0
 <%
-	jrdsBean.getJavascriptTree(1, "hostTree_0", out, request);
-	jrdsBean.getJavascriptTree(2, "viewTree_0", out, request); 
+	jrdsBean.getJavascriptTree(1, "hostTree_0", out, request, period);
+	jrdsBean.getJavascriptTree(2, "viewTree_0", out, request, period); 
 %>
 
 foldersTree = gFld("<i>Graph List</i>");
@@ -126,9 +126,7 @@ initializeDocument();
     beginCal = startCal("begin", "dateBeginTrigger");
     endCal = startCal("end", "dateEndTrigger");
  </script>
-			<img onclick="history_onClick();" id="graphImg" src="img/aollogo.gif" alt="" name="graphImg" border="0">
-			<script type="text/javascript">document.graphImg.src="graph" + window.location.search;</script>
-
+			<% jrdsBean.getGraphList(out, request, period); %>
 		</div>
 	</body>
 
