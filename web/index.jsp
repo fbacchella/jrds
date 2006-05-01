@@ -11,10 +11,11 @@
 
 	<head>
 		<meta http-equiv="content-type" content="text/html;charset=utf-8">
-		<title>Tree Frame</title>
+		<title>JRDS</title>
 		<style type="text/css"><!--
 A:visited { color: rgb(0, 0, 238); }
 .tree {float: left; height:100%; width: 33%}
+.graph {display: block}
 --></style>
 <link href="lib/calendar-win2k-1.css" rel="stylesheet">
 			<script type="text/javascript" src="lib/ua.js"> </script>
@@ -25,9 +26,6 @@ A:visited { color: rgb(0, 0, 238); }
 			<script type="text/javascript" src="lib/jrdsdate.js"></script> 
 			<script type="text/javascript" src="lib/querystring.js"></script> 
 <script type="text/javascript">
-//We preload the image
-var oImage = new Image;
-oImage.src =  "graph" + document.location.search;
 //the query string analyzer
 qs = new Querystring();
 
@@ -40,7 +38,7 @@ function refresh_onClick()
 
 function history_onClick()
 {
-	var historyWin = window.open("history.html" + document.location.search, "history.html" + document.location.search, "menubar=no,status=no");
+	var historyWin = window.open("history.jsp" + document.location.search, "history.jsp" + document.location.search, "menubar=no,status=no,resizable=yes");
 }
 
 function keep_onClick()
@@ -56,6 +54,14 @@ function download_onClick()
 </script>
 
 			<script type="text/javascript">
+</script>
+	</head>
+
+	<body bgcolor="#ffffff">
+	<div class="tree" >
+<div style="position:absolute; top:0; left:0; "><table border=0><tr><td><font size=-2><a style="font-size:7pt;text-decoration:none;color:silver" href="http://www.treemenu.net/" target="_blank">JavaScript Tree Menu</a></font></td></tr></table></div>
+		<p>
+<script type="text/javascript"><!--
 USETEXTLINKS = 1  
 STARTALLOPEN = 0
 HIGHLIGHT = 1
@@ -70,30 +76,15 @@ USEFRAMES = 0
 
 foldersTree = gFld("<i>Graph List</i>");
 foldersTree.addChildren([hostTree_0, viewTree_0]);
-</script>
-	</head>
-
-	<body bgcolor="#ffffff">
-	<div class="tree" >
-<div style="position:absolute; top:0; left:0; "><table border=0><tr><td><font size=-2><a style="font-size:7pt;text-decoration:none;color:silver" href="http://www.treemenu.net/" target="_blank">JavaScript Tree Menu</a></font></td></tr></table></div>
-		<p>
-<script type="text/javascript"><!--
 initializeDocument();
  //-->
 </script>
 </div>
 		<div align="center">
-			<table width="180" border="0" cellspacing="2" cellpadding="0">
-				<tr>
-					<td><input onclick="refresh_onClick();" type="button" name="refreshButton" value="Refresh" tabindex="0"></td>
-					<td width="100"></td>
-					<td><input onclick="keep_onClick();" type="button" name="keepButton" value="Keep" tabindex="1"></td>
-					<td width="100"></td>
-					<td><input onclick="history_onClick();" type="button" name="HistoryButton" value="History" tabindex="2"></td>
-					<td width="100"></td>
-					<td><input onclick="download_onClick();" type="button" name="DownloadButton" value="Download values" tabindex="3"></td>
-				</tr>
-			</table>
+			<input class="btnlist" onclick="refresh_onClick();" type="button" name="refreshButton" value="Refresh" tabindex="0">
+			<input class="btnlist" onclick="keep_onClick();" type="button" name="keepButton" value="Keep" tabindex="1">
+			<input class="btnlist" onclick="history_onClick();" type="button" name="HistoryButton" value="History" tabindex="2">
+			<input class="btnlist" onclick="download_onClick();" type="button" name="DownloadButton" value="Download values" tabindex="3">
 			<form  name="dateForm" action="index.jsp" method="GET">
 				<input name="id" type="hidden" value=""/>
 				<div align="center">
