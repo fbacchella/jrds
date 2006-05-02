@@ -7,11 +7,18 @@ _##########################################################################*/
 package jrds;
 
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.apache.log4j.*;
-import org.jrobin.core.*;
-import org.snmp4j.smi.*;
+import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
+import org.rrd4j.core.DsDef;
+import org.snmp4j.smi.OID;
 import jrds.snmp.SnmpRequester;
 
 
@@ -25,7 +32,7 @@ import jrds.snmp.SnmpRequester;
 public class ProbeDesc {
 	static final private Logger logger = Logger.getLogger(ProbeDesc.class);
 	
-	private static final class DsType {
+	/*private static final class DsType {
 		private String id;
 		private DsType(String id) { this.id = id ;}
 		public String toString() { return id;}
@@ -40,7 +47,7 @@ public class ProbeDesc {
 	static public final DsType COUNTER = DsType.COUNTER;
 	static public final DsType GAUGE = DsType.GAUGE;
 	static public final DsType DERIVE = DsType.DERIVE;
-	static public final DsType ABSOLUTE = DsType.ABSOLUTE;
+	static public final DsType ABSOLUTE = DsType.ABSOLUTE;*/
 	static public final double MINDEFAULT = 0;
 	static public final double MAXDEFAULT = Double.NaN;
 	static public final long HEARTBEATDEFAULT = 600;
@@ -90,7 +97,13 @@ public class ProbeDesc {
 		dsMap = new LinkedHashMap<String, DsDesc>();
 	}
 	
-	//Differets way to add a munins probe
+	//Differets way to add a probe
+	public void add(String name)
+	{
+		dsMap.put(name, new DsDesc(null, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, name));
+	}
+	
+
 	/**
 	 * A datastore that is stored but not collected
 	 * @param name the datastore name
@@ -142,7 +155,7 @@ public class ProbeDesc {
 
 	public void add(String name, DsType dsType, Object index, double min, double max)
 	{
-		dsMap.put(name, new DsDesc(null, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, index));
+		dsMap.put(name, new DsDesc(dsType, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, index));
 	}
 
 	public void add(Map valuesMap)
@@ -211,14 +224,14 @@ public class ProbeDesc {
 		return retValue;
 	}
 	
-	public DsDef[] getDsDefs() throws RrdException
+	public DsDef[] getDsDefs()
 	{
 		List dsList = new ArrayList(dsMap.size());
 		for(Iterator i = dsMap.entrySet().iterator(); i.hasNext() ;) {
 			Map.Entry e = (Map.Entry) i.next();
 			DsDesc desc = (DsDesc) e.getValue();
-			if(desc.dsType != DsType.NONE && desc.dsType != null)
-				dsList.add(new DsDef((String) e.getKey(), desc.dsType.toString(), desc.heartbeat, desc.minValue, desc.maxValue));
+			if(desc.dsType != null && desc.dsType != null)
+				dsList.add(new DsDef((String) e.getKey(), desc.dsType, desc.heartbeat, desc.minValue, desc.maxValue));
 		}
 		return (DsDef[]) dsList.toArray(new DsDef[dsList.size()]);
 	}

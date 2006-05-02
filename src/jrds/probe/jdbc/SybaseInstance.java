@@ -9,6 +9,7 @@ import jrds.RdsHost;
 import jrds.probe.IndexedProbe;
 
 import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 
 
 /**
@@ -27,8 +28,8 @@ public class SybaseInstance extends JdbcProbe implements IndexedProbe {
 	
 	private static final ProbeDesc pd = new ProbeDesc(5);
 	static {
-		pd.add("process", ProbeDesc.GAUGE);
-		pd.add("transactions", ProbeDesc.GAUGE);
+		pd.add("process", DsType.GAUGE);
+		pd.add("transactions", DsType.GAUGE);
 		pd.setGraphClasses(new Object[] {"sybaseinstance.xml"});
 	}
 	

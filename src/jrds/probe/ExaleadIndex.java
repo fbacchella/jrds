@@ -3,7 +3,7 @@ package jrds.probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
-import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 
 /**
  * @author bacchell
@@ -12,15 +12,14 @@ import org.apache.log4j.Logger;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class ExaleadIndex extends Exalead {
-	static final private Logger logger = Logger.getLogger(ExaleadIndex.class);
 	static final ProbeDesc pd = new ProbeDesc(7);
 	static {
-		pd.add("threads", ProbeDesc.GAUGE);
-		pd.add("max", ProbeDesc.GAUGE);
-		pd.add("ndocs", ProbeDesc.GAUGE);
-		pd.add("search", ProbeDesc.COUNTER);
-		pd.add("commands", ProbeDesc.COUNTER);
-		pd.add("last-started", ProbeDesc.NONE);
+		pd.add("threads", DsType.GAUGE);
+		pd.add("max", DsType.GAUGE);
+		pd.add("ndocs", DsType.GAUGE);
+		pd.add("search", DsType.COUNTER);
+		pd.add("commands", DsType.COUNTER);
+		pd.add("last-started");
 		pd.setProbeName("exeaindex");
 		pd.setGraphClasses(new Object[] {});
 		

@@ -30,11 +30,9 @@ import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdException;
-import org.jrobin.graph.RrdExport;
-import org.jrobin.graph.RrdExportDef;
-import org.jrobin.graph.RrdGraph;
-import org.jrobin.graph.RrdGraphDef;
+import org.rrd4j.graph.RrdGraph;
+import org.rrd4j.graph.RrdGraphDef;
+import org.rrd4j.graph.RrdGraphInfo;
 
 /**
  * @author bacchell
@@ -159,7 +157,7 @@ implements Comparable {
 		return gd.getUpperLimit();
 	}
 	
-	protected RrdGraphDef getRrdDef() throws RrdException, IOException {
+	protected RrdGraphDef getRrdDef() throws IOException {
 		return getGraphDesc().getGraphDef(probe);
 	}
 	
@@ -171,7 +169,7 @@ implements Comparable {
 	 * @return
 	 * @throws RrdException
 	 */
-	protected RrdGraphDef graphFormat(RrdGraphDef graphDef, Date startDate, Date endDate) throws RrdException {
+	protected RrdGraphDef graphFormat(RrdGraphDef graphDef, Date startDate, Date endDate) {
 		Date lastUpdate = probe.getLastUpdate();
 		graphDef.setTitle(getGraphTitle());
 		graphDef.comment("@l");
@@ -184,28 +182,25 @@ implements Comparable {
 	}
 	
 	public RrdGraph getRrdGraph(Date startDate, Date endDate) throws
-	IOException, RrdException {
+	IOException {
 		Date lastUpdate = probe.getLastUpdate();
 		if(endDate.after(lastUpdate))
 			endDate = new Date(lastUpdate.getTime() );
 		RrdGraphDef tempGraphDef = getRrdDef();
-		tempGraphDef.setTimePeriod(startDate, endDate);
+		tempGraphDef.setTimeSpan(startDate.getTime() / 1000, endDate.getTime() / 1000);
 		tempGraphDef = graphFormat(tempGraphDef, startDate, endDate);
-		return new RrdGraph(tempGraphDef, true);
+		return new RrdGraph(tempGraphDef);
 	}
 	
 	public BufferedImage makeImg(Date startDate, Date endDate) {
 		BufferedImage img = null;
 		try {
 			RrdGraph rrdGraph = getRrdGraph(startDate, endDate);
-			img = rrdGraph.getBufferedImage(getWidth(), getHeight());
+			RrdGraphInfo gi = rrdGraph.getRrdGraphInfo();
+			img = new BufferedImage(gi.getWidth(), gi.getHeight(), BufferedImage.TYPE_INT_RGB);
+			rrdGraph.render(img.createGraphics());
 			gd.setRealHeight(img.getHeight());
 			gd.setRealWidth(img.getWidth());
-		}
-		catch (RrdException e) {
-			logger.warn("Unable to creage png for " + getName() +
-					" on host " + probe.getHost().getName() + ": " +
-					e.getLocalizedMessage());
 		}
 		catch (IOException e) {
 			logger.warn("Unable to creage png for " + getName() +
@@ -234,42 +229,32 @@ implements Comparable {
 	}
 	
 	public void writeXml(OutputStream out, Date startDate, Date endDate) {
-		try {
+	/*	try {
 			RrdExportDef exdef = getRrdDef();
 			exdef.setTimePeriod(startDate, endDate);
 			RrdExport ex = new RrdExport(exdef);
 			ex.fetch().exportXml(out);
 		}
-		catch (RrdException ex) {
-			logger.warn("Unable to creage png for " + getName() +
-					" on host " + probe.getHost().getName() + ": " +
-					ex.getLocalizedMessage());
-		}
 		catch (IOException ex) {
 			logger.warn("Unable to creage png for " + getName() +
 					" on host " + probe.getHost().getName() + ": " +
 					ex.getLocalizedMessage());
-		}
+		}*/
 	}
 	
 	public String writeXml(Date startDate, Date endDate) {
 		String xmlData = "";
-		try {
+		/*try {
 			RrdExportDef exdef = getRrdDef();
 			exdef.setTimePeriod(startDate, endDate);
 			RrdExport ex = new RrdExport(exdef);
 			xmlData = ex.fetch().exportXml();
 		}
-		catch (RrdException ex) {
-			logger.warn("Unable to creage png for " + getName() +
-					" on host " + probe.getHost().getName() + ": " +
-					ex.getLocalizedMessage());
-		}
 		catch (IOException ex) {
 			logger.warn("Unable to creage png for " + getName() +
 					" on host " + probe.getHost().getName() + ": " +
 					ex.getLocalizedMessage());
-		}
+		}*/
 		return xmlData;
 	}
 	

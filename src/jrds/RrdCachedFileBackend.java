@@ -8,11 +8,12 @@ package jrds;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdFileBackend;
+import org.rrd4j.core.RrdFileBackend;
 
 /** 
  * JRobin backend which is used to store RRD data to ordinary disk files 
@@ -22,6 +23,7 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 	static final private Logger logger = Logger.getLogger(RrdCachedFileBackend.class);
 	
 	private static final int CACHE_LENGTH = 8192;
+	FileChannel channel;
 	ByteBuffer byteBuffer;
 	private int cacheSize;
 	private long cacheStart;
@@ -42,7 +44,8 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 	 */
 	public RrdCachedFileBackend(String path, boolean readOnly, int lockMode, int syncMode, int syncPeriod)
 	throws IOException {
-		super(path, readOnly, lockMode);
+		super(path, readOnly);
+		channel = file.getChannel();
 		this.syncMode = syncMode;
 		if(syncMode == RrdCachedFileBackendFactory.SYNC_BACKGROUND && !readOnly) {
 			createSyncTask(syncPeriod);

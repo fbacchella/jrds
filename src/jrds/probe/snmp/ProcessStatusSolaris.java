@@ -14,7 +14,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.snmp.SnmpRequester;
 
-import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 import org.snmp4j.smi.OID;
 
 
@@ -23,7 +23,6 @@ import org.snmp4j.smi.OID;
  * @version $Revision$,  $Date$
  */
 public class ProcessStatusSolaris extends RdsSnmpSimple {
-	static final private Logger logger = Logger.getLogger(ProcessStatusSolaris.class);
 	static final private OID psProcessState = new OID(".1.3.6.1.4.1.42.3.12.1.5");
 	static final private String RUNNABLE="R";
 	static final private String STOPPED="T";
@@ -36,13 +35,13 @@ public class ProcessStatusSolaris extends RdsSnmpSimple {
 	static final private ProbeDesc pd = new ProbeDesc(7);
 	static {
 		pd.add("psProcessState", psProcessState);
-		pd.add(RUNNABLE, ProbeDesc.GAUGE);
-		pd.add(STOPPED, ProbeDesc.GAUGE);
-		pd.add(INPAGEWAIT, ProbeDesc.GAUGE);
-		pd.add(NONINTERRUPTABLEWAIT, ProbeDesc.GAUGE);
-		pd.add(SLEEPING, ProbeDesc.GAUGE);
-		pd.add(IDLE, ProbeDesc.GAUGE);
-		pd.add(ZOMBIE, ProbeDesc.GAUGE);
+		pd.add(RUNNABLE, DsType.GAUGE);
+		pd.add(STOPPED, DsType.GAUGE);
+		pd.add(INPAGEWAIT, DsType.GAUGE);
+		pd.add(NONINTERRUPTABLEWAIT, DsType.GAUGE);
+		pd.add(SLEEPING, DsType.GAUGE);
+		pd.add(IDLE, DsType.GAUGE);
+		pd.add(ZOMBIE, DsType.GAUGE);
 		pd.setGraphClasses(new Object []{"processstatus"});
 		pd.setProbeName("pslist");
 		pd.setRequester(SnmpRequester.TABULAR);

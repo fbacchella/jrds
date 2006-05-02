@@ -10,6 +10,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 
 import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 
 
 /**
@@ -22,13 +23,13 @@ public class CpuLinuxMunins extends MuninsProbe {
 	
 	static final private ProbeDesc pd = new ProbeDesc(7);
 	static {
-		pd.add("user", ProbeDesc.COUNTER, "user.value");
-		pd.add("nice", ProbeDesc.COUNTER, "nice.value");
-		pd.add("system", ProbeDesc.COUNTER, "system.value");
-		pd.add("idle", ProbeDesc.COUNTER, "idle.value");
-		pd.add("iowait", ProbeDesc.COUNTER, "iowait.value");
-		pd.add("irq", ProbeDesc.COUNTER, "irq.value");
-		pd.add("softirq", ProbeDesc.COUNTER, "softirq.value");
+		pd.add("user", DsType.COUNTER, "user.value");
+		pd.add("nice", DsType.COUNTER, "nice.value");
+		pd.add("system", DsType.COUNTER, "system.value");
+		pd.add("idle", DsType.COUNTER, "idle.value");
+		pd.add("iowait", DsType.COUNTER, "iowait.value");
+		pd.add("irq", DsType.COUNTER, "irq.value");
+		pd.add("softirq", DsType.COUNTER, "softirq.value");
 		pd.setProbeName("cpulinuxmunins");
 		pd.setMuninsProbesNames(new String[] { "cpu"});
 		

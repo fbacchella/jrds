@@ -9,7 +9,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.graphe.PagingSolarisMuninsGraph;
 
-import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 
 
 /**
@@ -18,17 +18,15 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public class PagingSolarisMunins extends MuninsProbe {
-	static private final Logger logger = Logger.getLogger(PagingSolarisMunins.class);
-
 	static final private ProbeDesc pd = new ProbeDesc(1);
 	static {
-		pd.add("pgin", ProbeDesc.COUNTER, "pgin.value");
-		pd.add("reclaim", ProbeDesc.COUNTER, "reclaim.value");
-		pd.add("pgpgin", ProbeDesc.COUNTER, "pgpgin.value");
-		pd.add("pgout", ProbeDesc.COUNTER, "pgout.value");
-		pd.add("scan", ProbeDesc.COUNTER, "scan.value");
-		pd.add("pgpgout", ProbeDesc.COUNTER, "pgpgout.value");
-		pd.add("pgfree", ProbeDesc.COUNTER, "pgfree.value");
+		pd.add("pgin", DsType.COUNTER, "pgin.value");
+		pd.add("reclaim", DsType.COUNTER, "reclaim.value");
+		pd.add("pgpgin", DsType.COUNTER, "pgpgin.value");
+		pd.add("pgout", DsType.COUNTER, "pgout.value");
+		pd.add("scan", DsType.COUNTER, "scan.value");
+		pd.add("pgpgout", DsType.COUNTER, "pgpgout.value");
+		pd.add("pgfree", DsType.COUNTER, "pgfree.value");
 		pd.setGraphClasses(new Class[] {PagingSolarisMuninsGraph.class});
 		pd.setMuninsProbesNames(new String[] { "paging_in", "paging_out" });
 		pd.setProbeName("pageingmunins");

@@ -14,6 +14,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.graphe.PartitionSpaceGraph;
 
+import org.rrd4j.DsType;
 import org.snmp4j.smi.OID;
 
 
@@ -30,8 +31,8 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
 	
 	static protected final ProbeDesc pd = new ProbeDesc(3);
 	static {
-		pd.add("Total", ProbeDesc.GAUGE, totalOid);
-		pd.add("Used", ProbeDesc.GAUGE, usedOid);
+		pd.add("Total", DsType.GAUGE, totalOid);
+		pd.add("Used", DsType.GAUGE, usedOid);
 		pd.add("hrStorageAllocationUnits", allocUnitOid);
 		pd.setIndexOid(indexOid);
 		pd.setGraphClasses(new Class[] {PartitionSpaceGraph.class});

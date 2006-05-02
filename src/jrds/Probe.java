@@ -17,15 +17,8 @@ import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.ArcDef;
-import org.jrobin.core.DsDef;
-import org.jrobin.core.FetchData;
-import org.jrobin.core.FetchRequest;
-import org.jrobin.core.RrdDb;
-import org.jrobin.core.RrdDef;
-import org.jrobin.core.RrdException;
-import org.jrobin.core.Sample;
-import org.jrobin.core.Util;
+import org.rrd4j.ConsolFun;
+import org.rrd4j.core.*;
 
 /**
  * A abstract class that needs to be derived for specific probe.<br>
@@ -122,21 +115,21 @@ implements Comparable {
 		this.name = name;
 	}
 	
-	protected DsDef[] getDsDefs() throws RrdException {
+	protected DsDef[] getDsDefs() {
 		return getPd().getDsDefs();
 	}
 	
-	protected RrdDef getDefaultRrdDef() throws RrdException {
+	protected RrdDef getDefaultRrdDef() {
 		RrdDef def = new RrdDef(getRrdName());
 		return def;
 		
 	}
 	
-	private ArcDef[] getArcDefs() throws RrdException {
+	private ArcDef[] getArcDefs() {
 		ArcDef[] defaultArc = new ArcDef[3];
-		defaultArc[0] = new ArcDef("AVERAGE", 0.5, 1, 12 * 24 * 30 * 6);
-		defaultArc[1] = new ArcDef("AVERAGE", 0.5, 12, 8760);
-		defaultArc[2] = new ArcDef("AVERAGE", 0.5, 288, 730);
+		defaultArc[0] = new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 6);
+		defaultArc[1] = new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 8760);
+		defaultArc[2] = new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 730);
 		return defaultArc;
 	}
 	
@@ -144,14 +137,13 @@ implements Comparable {
 	 * @throws RrdException
 	 * @throws IOException
 	 */
-	private void create() throws RrdException, IOException {
+	private void create() throws IOException {
 		synchronized (lock) {
 			logger.info("Need to create rrd " + this);
 			RrdDef def = getDefaultRrdDef();
 			def.addArchive(getArcDefs());
 			def.addDatasource(getDsDefs());
 			final RrdDb rrdDb = new RrdDb(def);
-			rrdDb.sync();
 			rrdDb.close();
 		}
 	}
@@ -244,14 +236,7 @@ implements Comparable {
 				String dsName = (String) nameMap.get(e.getKey());
 				double value = ( (Number) e.getValue()).doubleValue();
 				if (dsName != null) {
-					try {
-						oneSample.setValue(dsName, value);
-					}
-					catch (RrdException e1) {
-						logger.warn("Unable to update value " + value +
-								" from " + this +": " +
-								e1.getMessage());
-					}
+					oneSample.setValue(dsName, value);
 				}
 			}
 		}
@@ -330,7 +315,7 @@ implements Comparable {
 		RrdDb rrdDb = null;
 		try {
 			rrdDb = StoreOpener.getRrd(getRrdName());
-			lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
+			lastUpdate = org.rrd4j.core.Util.getDate(rrdDb.getLastUpdateTime());
 		} catch (Exception e) {
 			logger.error("Unable to get last update date for" + this.getName() + ": " + e.getMessage());
 		}
@@ -367,7 +352,7 @@ implements Comparable {
 		RrdDb rrdDb = null;
 		try {
 			rrdDb = StoreOpener.getRrd(getRrdName());
-			FetchRequest fr = rrdDb.createFetchRequest(GraphDesc.DEFAULTCF.toString(), startDate.getTime() /1000, endDate.getTime() / 1000);
+			FetchRequest fr = rrdDb.createFetchRequest(GraphDesc.DEFAULTCF, startDate.getTime() /1000, endDate.getTime() / 1000);
 			retValue = fr.fetchData();
 		} catch (Exception e) {
 			logger.error("Unable to fetch data for" + this.getName() + ": " + e.getMessage());

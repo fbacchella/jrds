@@ -16,6 +16,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 
 import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 
 
 /**
@@ -29,11 +30,11 @@ public class Sybase extends JdbcProbe {
 	
 	private static final ProbeDesc pd = new ProbeDesc(5);
 	static {
-		pd.add("database_size", ProbeDesc.GAUGE);
-		pd.add("reserved", ProbeDesc.GAUGE);
-		pd.add("data", ProbeDesc.GAUGE);
-		pd.add("index_size", ProbeDesc.GAUGE);
-		pd.add("unused", ProbeDesc.GAUGE);
+		pd.add("database_size", DsType.GAUGE);
+		pd.add("reserved", DsType.GAUGE);
+		pd.add("data", DsType.GAUGE);
+		pd.add("index_size", DsType.GAUGE);
+		pd.add("unused", DsType.GAUGE);
 		pd.setGraphClasses(new Class[] { Sybase.class });
 	}
 	

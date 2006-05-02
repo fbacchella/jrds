@@ -23,6 +23,8 @@ import org.apache.log4j.Logger;
 import org.snmp4j.smi.OID;
 import org.xml.sax.SAXException;
 
+import org.rrd4j.DsType;
+
 public class DescFactory {
 	static private final Logger logger = Logger.getLogger(DescFactory.class);
 	static final Pattern p = Pattern.compile(".*.xml");
@@ -162,7 +164,8 @@ public class DescFactory {
 		digester.addRule("probedesc/ds/dsType", new Rule() {
 			public void body(String namespace, String name, String text) throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
 				Map m  = (Map) digester.peek();
-				m.put("dsType", ProbeDesc.class.getField(text.trim().toUpperCase()).get(null));
+				m.put("dsType",  DsType.valueOf(text.trim().toUpperCase()));
+				/*ProbeDesc.class.getField(text.trim().toUpperCase()).get(null)*/
 			}
 		});
 		digester.addRule("probedesc/ds/oid", new Rule() {

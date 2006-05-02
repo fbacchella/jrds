@@ -19,9 +19,9 @@ import jrds.probe.UrlProbe;
 import jrds.probe.jdbc.JdbcProbe;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdException;
-import org.jrobin.graph.Plottable;
-import org.jrobin.graph.RrdGraphDef;
+import org.rrd4j.ConsolFun;
+import org.rrd4j.data.Plottable;
+import org.rrd4j.graph.RrdGraphDef;
 
 /**
  * A classed used to store the static description of a graph
@@ -32,7 +32,7 @@ public final class GraphDesc
 implements Cloneable {
 	static final private Logger logger = Logger.getLogger(GraphDesc.class);
 	
-	public static final class ConsFunc {
+	/*public static final class ConsFunc {
 		private String id;
 		private ConsFunc(String id) {
 			this.id = id;
@@ -46,40 +46,39 @@ implements Cloneable {
 		static public final ConsFunc MIN = new ConsFunc("MIN");
 		static public final ConsFunc MAX = new ConsFunc("MAX");
 		static public final ConsFunc LAST = new ConsFunc("LAST");
-	};
+	};*/
 	
-	static public final ConsFunc AVERAGE = ConsFunc.AVERAGE;
+	/*static public final ConsFunc AVERAGE = ConsFunc.AVERAGE;
 	static public final ConsFunc MIN = ConsFunc.MIN;
 	static public final ConsFunc MAX = ConsFunc.MAX;
-	static public final ConsFunc LAST = ConsFunc.LAST;
-	static public final ConsFunc DEFAULTCF = AVERAGE;
+	static public final ConsFunc LAST = ConsFunc.LAST;*/
+	static public final ConsolFun DEFAULTCF = ConsolFun.AVERAGE;
 	
 	
 	public interface GraphType {
-		public abstract void draw(RrdGraphDef rgd, String sn, Color color) throws
-		RrdException;
+		public abstract void draw(RrdGraphDef rgd, String sn, Color color);
 		
 		public static final GraphType NONE = new GraphType() {
 			public void draw(RrdGraphDef rgd, String sn, Color color) {};
 		};
 		
 		public static final GraphType LINE = new GraphType() {
-			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {
+			public void draw(RrdGraphDef rgd, String sn, Color color)  {
 				rgd.line(sn, color, " @g");
 			};
 		};
 		static public final GraphType AREA = new GraphType() {
-			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {
+			public void draw(RrdGraphDef rgd, String sn, Color color){
 				rgd.area(sn, color, " @g");
 			};
 		};
 		static public final GraphType STACK = new GraphType() {
-			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {
+			public void draw(RrdGraphDef rgd, String sn, Color color) {
 				rgd.stack(sn, color, " @g");
 			};
 		};
 		static public final GraphType COMMENT = new GraphType() {
-			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {};
+			public void draw(RrdGraphDef rgd, String sn, Color color){};
 		};
 	};
 	
@@ -258,10 +257,11 @@ implements Cloneable {
 		public GraphType graphType;
 		public Color color;
 		public String legend;
-		public ConsFunc cf;
+		//public ConsFunc cf;
+		public ConsolFun cf;
 		public DsDesc(String name, String dsName, String rpn,
 				GraphType graphType, Color color, String legend,
-				ConsFunc cf) {
+				ConsolFun cf) {
 			this.name = name;
 			this.dsName = dsName;
 			this.rpn = rpn;
@@ -395,9 +395,10 @@ implements Cloneable {
 		}
 		else
 			gt = (GraphType) resolv(GraphType.class, graphType);
-		ConsFunc cf = DEFAULTCF;
+		ConsolFun cf = DEFAULTCF;
 		if (consFunc != null)
-			cf = (ConsFunc) resolv(ConsFunc.class, consFunc);
+			cf = ConsolFun.valueOf(consFunc.toUpperCase());
+		
 		Color c = Color.WHITE;
 		if (color != null) {
 			c = (Color) COLORMAP.get(color.toUpperCase());
@@ -418,7 +419,7 @@ implements Cloneable {
 	
 	public void add(String name, String dsName, String rpn,
 			GraphType graphType, Color color, String legend,
-			ConsFunc cf) {
+			ConsolFun cf) {
 		String key = name;
 		if(key == null && legend != null)
 			key = legend;
@@ -440,8 +441,7 @@ implements Cloneable {
 	 * @throws IOException
 	 * @throws RrdException
 	 */
-	public RrdGraphDef getGraphDef(Probe probe, Map ownData) throws IOException,
-	RrdException {
+	public RrdGraphDef getGraphDef(Probe probe, Map ownData) throws IOException {
 		RrdGraphDef retValue = new RrdGraphDef();
 		String rrdName = probe.getRrdName();
 		
@@ -470,7 +470,7 @@ implements Cloneable {
 				else if(probe.dsExist(ds.dsName)) {
 					exist = true;
 					retValue.datasource(ds.name, rrdName, ds.dsName,
-							ds.cf.toString());				
+							ds.cf);				
 				}
 				if (exist) {
 					if(ds.graphType != null) {
@@ -488,14 +488,13 @@ implements Cloneable {
 				addLegend(retValue, ds.name, ds.graphType, ds.legend);
 			}
 		}
-		retValue.setShowLegend(true);
-		retValue.setGridRange(lowerLimit, upperLimit, false);
+		//retValue.setGridRange(lowerLimit, upperLimit, false);
 		if (verticalLabel != null)
 			retValue.setVerticalLabel(verticalLabel);
 		return retValue;
 	}
 	
-	private void addLegend(RrdGraphDef def, String ds, GraphType gt, String legend) throws RrdException {
+	private void addLegend(RrdGraphDef def, String ds, GraphType gt, String legend) {
 		if(gt == GraphType.COMMENT) {
 			def.comment(legend + "@l");
 		}
@@ -504,10 +503,10 @@ implements Cloneable {
 			int missingLength = Math.min(maxLengthLegend - legend.length(), manySpace.length());
 			if(missingLength > 0)
 				def.comment(manySpace.substring(0, missingLength) + "@G");
-			def.gprint(ds, ConsFunc.LAST.toString(), "@8.2@s");
-			def.gprint(ds, ConsFunc.AVERAGE.toString(), "@8.2@s");
-			def.gprint(ds, ConsFunc.MIN.toString(), "@8.2@s");
-			def.gprint(ds, ConsFunc.MAX.toString(), "@8.2@s");
+			def.gprint(ds, ConsolFun.LAST, "@8.2@s");
+			def.gprint(ds, ConsolFun.AVERAGE, "@8.2@s");
+			def.gprint(ds, ConsolFun.MIN, "@8.2@s");
+			def.gprint(ds, ConsolFun.MAX, "@8.2@s");
 			def.comment("@l");
 		}
 	}
@@ -519,8 +518,7 @@ implements Cloneable {
 	 * @throws IOException
 	 * @throws RrdException
 	 */
-	public RrdGraphDef getGraphDef(Probe probe) throws IOException,
-	RrdException {
+	public RrdGraphDef getGraphDef(Probe probe) throws IOException {
 		return getGraphDef(probe, null);
 	}
 	

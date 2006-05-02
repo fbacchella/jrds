@@ -15,7 +15,7 @@ import jrds.RdsHost;
 import jrds.graphe.ProcessInfoNumber;
 import jrds.graphe.ProcessInfoSize;
 
-import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 import org.snmp4j.smi.OID;
 
 
@@ -25,7 +25,6 @@ import org.snmp4j.smi.OID;
  * @version $Revision$,  $Date$
  */
 public class ProcessInfoSolaris extends RdsIndexedSnmpRrd {
-	static final private Logger logger = Logger.getLogger(RdsIndexedSnmpRrd.class);
 	static final private OID psProcessSize = new OID(".1.3.6.1.4.1.42.3.12.1.3");
 	static final private OID  psProcessCpuTime = new OID(".1.3.6.1.4.1.42.3.12.1.4");
 	static final private OID indexOid = new OID(".1.3.6.1.4.1.42.3.12.1.10");
@@ -37,10 +36,10 @@ public class ProcessInfoSolaris extends RdsIndexedSnmpRrd {
 	static {
 		pd.add("psProcessSize", psProcessSize);
 		pd.add("psProcessCpuTime", psProcessCpuTime);
-		pd.add(MIN, ProbeDesc.GAUGE);
-		pd.add(MAX, ProbeDesc.GAUGE);
-		pd.add(AVERAGE, ProbeDesc.GAUGE);
-		pd.add(NUM, ProbeDesc.GAUGE);
+		pd.add(MIN, DsType.GAUGE);
+		pd.add(MAX, DsType.GAUGE);
+		pd.add(AVERAGE, DsType.GAUGE);
+		pd.add(NUM, DsType.GAUGE);
 		pd.setGraphClasses(new Class[] {ProcessInfoNumber.class, ProcessInfoSize.class});
 		pd.setIndexOid(indexOid);
 		pd.setProbeName("ps-{1}");

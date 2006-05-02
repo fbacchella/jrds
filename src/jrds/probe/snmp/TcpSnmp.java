@@ -10,6 +10,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.snmp.SnmpRequester;
 
+import org.rrd4j.DsType;
 import org.snmp4j.smi.OID;
 
 
@@ -20,14 +21,14 @@ import org.snmp4j.smi.OID;
 public class TcpSnmp extends RdsSnmpSimple {
 	static final private ProbeDesc pd = new ProbeDesc(8);
 	static {
-		pd.add("ActiveOpens", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.5"));
-		pd.add("PassiveOpens", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.6"));
-		pd.add("AttemptFails", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.7"));
-		pd.add("EstabResets", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.8"));
-		pd.add("CurrEstab", ProbeDesc.GAUGE, new OID(".1.3.6.1.2.1.6.9"));
-		pd.add("InSegs", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.10"));
-		pd.add("OutSegs", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.11"));
-		pd.add("RetransSegs", ProbeDesc.COUNTER, new OID(".1.3.6.1.2.1.6.12"));
+		pd.add("ActiveOpens", DsType.COUNTER, new OID(".1.3.6.1.2.1.6.5"));
+		pd.add("PassiveOpens", DsType.COUNTER, new OID(".1.3.6.1.2.1.6.6"));
+		pd.add("AttemptFails", DsType.COUNTER, new OID(".1.3.6.1.2.1.6.7"));
+		pd.add("EstabResets", DsType.COUNTER, new OID(".1.3.6.1.2.1.6.8"));
+		pd.add("CurrEstab", DsType.GAUGE, new OID(".1.3.6.1.2.1.6.9"));
+		pd.add("InSegs", DsType.COUNTER, new OID(".1.3.6.1.2.1.6.10"));
+		pd.add("OutSegs", DsType.COUNTER, new OID(".1.3.6.1.2.1.6.11"));
+		pd.add("RetransSegs", DsType.COUNTER, new OID(".1.3.6.1.2.1.6.12"));
 		pd.setRequester(SnmpRequester.SIMPLE);
 
 		pd.setProbeName("tcp_snmp");

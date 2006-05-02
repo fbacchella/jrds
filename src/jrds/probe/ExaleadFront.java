@@ -3,7 +3,7 @@ package jrds.probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
-import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 
 /**
  * @author bacchell
@@ -12,12 +12,11 @@ import org.apache.log4j.Logger;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class ExaleadFront extends Exalead {
-	static final private Logger logger = Logger.getLogger(ExaleadFront.class);
 	static final ProbeDesc pd = new ProbeDesc(7);
 	static {
-		pd.add("threads", ProbeDesc.GAUGE, "threads");
-		pd.add("max", ProbeDesc.GAUGE, "max");
-		pd.add("last-started", ProbeDesc.NONE);
+		pd.add("threads", DsType.GAUGE, "threads");
+		pd.add("max", DsType.GAUGE, "max");
+		pd.add("last-started");
 		pd.setProbeName("exeafront");
 		pd.setGraphClasses(new Object[] {});
 		

@@ -10,7 +10,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.snmp.SnmpRequester;
 
-import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 import org.snmp4j.smi.OID;
 
 
@@ -19,12 +19,11 @@ import org.snmp4j.smi.OID;
  * @version $Revision$,  $Date$
  */
 public class NumProcesses extends RdsSnmpSimple {
-	static final private Logger logger = Logger.getLogger(NumProcesses.class);
 	static final private OID hrSystemProcesses = new OID(".1.3.6.1.2.1.25.1.6");
 
 	static final private ProbeDesc pd = new ProbeDesc(1);
 	static {
-		pd.add("hrSystemProcesses", ProbeDesc.GAUGE, hrSystemProcesses);
+		pd.add("hrSystemProcesses", DsType.GAUGE, hrSystemProcesses);
 		pd.setGraphClasses(new Object []{"numprocess"});
 		pd.setProbeName("nprocesses");
 		pd.setRequester(SnmpRequester.SIMPLE);

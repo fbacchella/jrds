@@ -19,6 +19,7 @@ import org.acplt.oncrpc.OncRpcException;
 import org.acplt.oncrpc.OncRpcProgramNotRegisteredException;
 import org.acplt.oncrpc.OncRpcProtocols;
 import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 
 /**
  * This probe is used to collect data throught rstatd, version 3. The process in.rstatd or rstat
@@ -31,12 +32,12 @@ public class RstatProbe3 extends Probe {
 	static final private Logger logger = Logger.getLogger(RstatProbe3.class);
 	static final ProbeDesc pd = new ProbeDesc(7);
 	static {
-		pd.add("v_pgpgin", ProbeDesc.COUNTER);
-		pd.add("v_pgpgout", ProbeDesc.COUNTER);
-		pd.add("v_pswpin", ProbeDesc.COUNTER);
-		pd.add("v_pswpout", ProbeDesc.COUNTER);
-		pd.add("v_swtch", ProbeDesc.COUNTER);
-		pd.add("v_intr", ProbeDesc.COUNTER);
+		pd.add("v_pgpgin", DsType.COUNTER);
+		pd.add("v_pgpgout", DsType.COUNTER);
+		pd.add("v_pswpin", DsType.COUNTER);
+		pd.add("v_pswpout", DsType.COUNTER);
+		pd.add("v_swtch", DsType.COUNTER);
+		pd.add("v_intr", DsType.COUNTER);
 		pd.setProbeName("rstat");
 		pd.setGraphClasses(new Object[] {"rstatvm", "rstatint"});
 		

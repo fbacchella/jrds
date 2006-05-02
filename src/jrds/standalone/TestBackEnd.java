@@ -8,7 +8,7 @@ package jrds.standalone;
 
 import java.io.IOException;
 
-import org.jrobin.core.RrdBackend;
+import org.rrd4j.core.RrdBackend;
 
 import jrds.RrdCachedFileBackend;
 import jrds.RrdCachedFileBackendFactory;

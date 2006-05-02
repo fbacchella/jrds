@@ -15,7 +15,7 @@ import java.util.Map;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
-import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 
 
 /**
@@ -24,24 +24,23 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public class ExaleadStatus extends HttpProbe {
-	static final private Logger logger = Logger.getLogger(ExaleadStatus.class);
 	static final ProbeDesc pd = new ProbeDesc(7);
 	static {
-		pd.add("err.adsense.connect", ProbeDesc.COUNTER, "errors.adsense.connect", 0, 100);
-		pd.add("err.adsense.highload", ProbeDesc.COUNTER, "errors.adsense.highload", 0, 100);
-		pd.add("err.adsense.parsing", ProbeDesc.COUNTER, "errors.adsense.parsing", 0, 100);
-		pd.add("err.adsense.timeout", ProbeDesc.COUNTER, "errors.adsense.timeout", 0, 100);
-		pd.add("err.exalead.decprms", ProbeDesc.COUNTER, "errors.exalead.decodingparams", 0, 100);
-		pd.add("err.exalead.index", ProbeDesc.COUNTER, "errors.exalead.index", 0, 100);
-		pd.add("err.google.connect", ProbeDesc.COUNTER, "errors.google.connect", 0, 100);
-		pd.add("err.google.parsing", ProbeDesc.COUNTER, "errors.google.parsing", 0, 100);
-		pd.add("err.untrapped", ProbeDesc.COUNTER, "errors.untrapped", 0, 100);
-		pd.add("queries", ProbeDesc.COUNTER, 0, 100);
-		pd.add("queries.adsense", ProbeDesc.COUNTER, 0, 100);
-		pd.add("queries.google", ProbeDesc.COUNTER, 0, 100);
-		pd.add("threads.adsense", ProbeDesc.GAUGE, 0, 100);
-		pd.add("threads.queries", ProbeDesc.GAUGE, 0, 100);
-		pd.add("uptime", ProbeDesc.NONE);
+		pd.add("err.adsense.connect", DsType.COUNTER, "errors.adsense.connect", 0, 100);
+		pd.add("err.adsense.highload", DsType.COUNTER, "errors.adsense.highload", 0, 100);
+		pd.add("err.adsense.parsing", DsType.COUNTER, "errors.adsense.parsing", 0, 100);
+		pd.add("err.adsense.timeout", DsType.COUNTER, "errors.adsense.timeout", 0, 100);
+		pd.add("err.exalead.decprms", DsType.COUNTER, "errors.exalead.decodingparams", 0, 100);
+		pd.add("err.exalead.index", DsType.COUNTER, "errors.exalead.index", 0, 100);
+		pd.add("err.google.connect", DsType.COUNTER, "errors.google.connect", 0, 100);
+		pd.add("err.google.parsing", DsType.COUNTER, "errors.google.parsing", 0, 100);
+		pd.add("err.untrapped", DsType.COUNTER, "errors.untrapped", 0, 100);
+		pd.add("queries", DsType.COUNTER, 0, 100);
+		pd.add("queries.adsense", DsType.COUNTER, 0, 100);
+		pd.add("queries.google", DsType.COUNTER, 0, 100);
+		pd.add("threads.adsense", DsType.GAUGE, 0, 100);
+		pd.add("threads.queries", DsType.GAUGE, 0, 100);
+		pd.add("uptime");
 		pd.setProbeName("exaleadstatus");
 		pd.setGraphClasses(new Object[] {"exaleaderrors", "exaleadqueries", "exaleadthreads"});
 		

@@ -10,6 +10,7 @@ import jrds.RdsHost;
 import jrds.graphe.VMSolarisGraph;
 import jrds.snmp.SnmpRequester;
 
+import org.rrd4j.DsType;
 import org.snmp4j.smi.OID;
 
 
@@ -21,10 +22,10 @@ import org.snmp4j.smi.OID;
 public final class VMSolaris extends RdsSnmpSimple {
 	static final private ProbeDesc pd = new ProbeDesc(4);
 	static {
-		pd.add("rsVPagesIn", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.42.3.13.9"));
-		pd.add("rsVPagesOut", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.42.3.13.10"));
-		pd.add("rsVSwapIn", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.42.3.13.11"));
-		pd.add("rsVSwapOut", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.42.3.13.12"));
+		pd.add("rsVPagesIn", DsType.COUNTER, new OID(".1.3.6.1.4.1.42.3.13.9"));
+		pd.add("rsVPagesOut", DsType.COUNTER, new OID(".1.3.6.1.4.1.42.3.13.10"));
+		pd.add("rsVSwapIn", DsType.COUNTER, new OID(".1.3.6.1.4.1.42.3.13.11"));
+		pd.add("rsVSwapOut", DsType.COUNTER, new OID(".1.3.6.1.4.1.42.3.13.12"));
 		pd.setProbeName("vmsolaris");
 		pd.setGraphClasses(new Class[] {VMSolarisGraph.class});
 		pd.setRequester(SnmpRequester.SIMPLE);

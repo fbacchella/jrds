@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.rrd4j.DsType;
+
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.graphe.ApacheRequests;
@@ -27,15 +29,15 @@ import jrds.graphe.ApacheTransfer;
 public class ApacheStatus extends HttpProbe implements UrlProbe {
 	static final ProbeDesc pd = new ProbeDesc(7);
 	static {
-		pd.add("Total Accesses", ProbeDesc.COUNTER);
-		pd.add("Total kBytes", ProbeDesc.COUNTER);
-		pd.add("CPULoad", ProbeDesc.GAUGE);
-		pd.add("Uptime", ProbeDesc.NONE);
-		pd.add("ReqPerSec", ProbeDesc.GAUGE);
-		pd.add("BytesPerSec", ProbeDesc.GAUGE);
-		pd.add("BytesPerReq", ProbeDesc.GAUGE);
-		pd.add("BusyWorkers", ProbeDesc.GAUGE);
-		pd.add("IdleWorkers", ProbeDesc.GAUGE);
+		pd.add("Total Accesses", DsType.COUNTER);
+		pd.add("Total kBytes", DsType.COUNTER);
+		pd.add("CPULoad", DsType.GAUGE);
+		pd.add("Uptime");
+		pd.add("ReqPerSec", DsType.GAUGE);
+		pd.add("BytesPerSec", DsType.GAUGE);
+		pd.add("BytesPerReq", DsType.GAUGE);
+		pd.add("BusyWorkers", DsType.GAUGE);
+		pd.add("IdleWorkers", DsType.GAUGE);
 		pd.setProbeName("apachestatus");
 		pd.setGraphClasses(new Object[] {ApacheRequests.class, ApacheTransfer.class, "apacheworkers"});
 	}

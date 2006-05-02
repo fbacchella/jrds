@@ -18,7 +18,6 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.snmp.SnmpRequester;
 
-import org.apache.log4j.Logger;
 import org.snmp4j.Target;
 import org.snmp4j.smi.OID;
 
@@ -30,7 +29,6 @@ import org.snmp4j.smi.OID;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public abstract class SnmpProbe extends Probe {
-	static final private Logger logger = Logger.getLogger(SnmpProbe.class);
 	private Target snmpTarget;
 	private Map nameMap = null;
 	private SnmpRequester requester;

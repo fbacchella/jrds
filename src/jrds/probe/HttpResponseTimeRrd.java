@@ -15,6 +15,7 @@ import jrds.Util;
 import jrds.graphe.HttpGraph;
 
 import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 
 
 /**
@@ -39,9 +40,9 @@ public final class HttpResponseTimeRrd extends ExternalCmdProbe implements UrlPr
 	
 	static final ProbeDesc pd = new ProbeDesc(3);
 	static {
-		pd.add("Connect", ProbeDesc.GAUGE);
-		pd.add("First Byte", ProbeDesc.GAUGE);
-		pd.add("Last Byte", ProbeDesc.GAUGE);
+		pd.add("Connect", DsType.GAUGE);
+		pd.add("First Byte", DsType.GAUGE);
+		pd.add("Last Byte", DsType.GAUGE);
 		pd.setGraphClasses(new Class[] {HttpGraph.class});
 	}
 	

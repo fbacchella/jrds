@@ -3,19 +3,17 @@ package jrds;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdBackendFactory;
-import org.jrobin.core.RrdDb;
-import org.jrobin.core.RrdDbPool;
-import org.jrobin.core.RrdException;
-import org.jrobin.core.RrdOpener;
-
+import org.rrd4j.core.RrdBackendFactory;
+import org.rrd4j.core.RrdDb;
+import org.rrd4j.core.RrdDbPool;
 /**
  * A wrapper classe, to manage the rrdDb operations
  */
 public final class StoreOpener {
 	static final private Logger logger = Logger.getLogger(StoreOpener.class);
+	static final RrdDbPool pool = RrdDbPool.getInstance();
 	
-	static final private RrdOpener opener = new RrdOpener(true);
+	//static final private RrdOpener opener = new RrdOpener(true);
 	
     /**
      * Retrieves the RrdDb instance matching a specific RRD datasource name
@@ -27,21 +25,21 @@ public final class StoreOpener {
      * @throws RrdException Thrown in case of a JRobin specific error.
      */
 	public final static RrdDb getRrd(String rrdFile)
-	throws IOException, RrdException {
-		return opener.getRrd(rrdFile, RrdBackendFactory.getDefaultFactory());
+	throws IOException {
+		return pool.requestRrdDb(rrdFile);
 	}
 	/**
 	 * @param arg0
 	 */
 	public final static void releaseRrd(RrdDb arg0)  {
 		try {
-			opener.releaseRrd(arg0);
+			pool.release(arg0);
 		} catch (Exception e) {
 			logger.debug("Strange error" + e);
 		}
 	}
 	
-	public static final void prepare(int dbPoolSize, int syncPeriod) throws RrdException {
+	public static final void prepare(int dbPoolSize, int syncPeriod) {
 		RrdDbPool.getInstance().setCapacity(dbPoolSize);
 		
 		RrdCachedFileBackendFactory.setSyncMode(RrdCachedFileBackendFactory.SYNC_CENTRALIZED);
@@ -51,16 +49,16 @@ public final class StoreOpener {
 	}
 	
 	public static final void stop() {
-		RrdDbPool dbpool = RrdDbPool.getInstance();
-		logger.info("RrdDbPool efficiency: " + dbpool.getPoolEfficency());
-		logger.info("RrdDbPool hits: " + dbpool.getPoolHitsCount());
-		logger.info("RrdDbPool requets: " + dbpool.getPoolRequestsCount());
+		//RrdDbPool dbpool = RrdDbPool.getInstance();
+		//logger.info("RrdDbPool efficiency: " + dbpool.getPoolEfficency());
+		//logger.info("RrdDbPool hits: " + dbpool.getPoolHitsCount());
+		//logger.info("RrdDbPool requets: " + dbpool.getPoolRequestsCount());
 		
-		try {
+		/*try {
 			dbpool.reset();
 		} catch (IOException e) {
 			logger.error("Strange problem while stopping db pool: ", e);
-		}
+		}*/
 		
 		logger.info("Cached backend efficiency: " + RrdCachedFileBackend.getCacheEfficency());
 		logger.info("Cached backend  hits: " + RrdCachedFileBackend.getCacheHitsCount());

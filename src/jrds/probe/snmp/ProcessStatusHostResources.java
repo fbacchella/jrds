@@ -14,7 +14,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.snmp.SnmpRequester;
 
-import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 import org.snmp4j.smi.OID;
 
 
@@ -23,7 +23,6 @@ import org.snmp4j.smi.OID;
  * @version $Revision$,  $Date$
  */
 public class ProcessStatusHostResources extends RdsSnmpSimple {
-	static final private Logger logger = Logger.getLogger(ProcessStatusHostResources.class);
 	static final private OID psProcessState = new OID(".1.3.6.1.2.1.25.4.2.1.7");
 	static final private String RUNNING="running";
 	static final private int RUNNINGINDEX = 1;
@@ -37,10 +36,10 @@ public class ProcessStatusHostResources extends RdsSnmpSimple {
 	static final private ProbeDesc pd = new ProbeDesc(7);
 	static {
 		pd.add("psProcessState", psProcessState);
-		pd.add(RUNNING, ProbeDesc.GAUGE);
-		pd.add(RUNNABLE, ProbeDesc.GAUGE);
-		pd.add(NOTRUNNABLE, ProbeDesc.GAUGE);
-		pd.add(INVALID, ProbeDesc.GAUGE);
+		pd.add(RUNNING, DsType.GAUGE);
+		pd.add(RUNNABLE, DsType.GAUGE);
+		pd.add(NOTRUNNABLE, DsType.GAUGE);
+		pd.add(INVALID, DsType.GAUGE);
 		pd.setGraphClasses(new Object []{"processstatushostsresources"});
 		pd.setProbeName("hrpslist");
 		pd.setRequester(SnmpRequester.TABULAR);
