@@ -30,7 +30,7 @@
     <dsType>COUNTER</dsType>
   </ds>
   <ds>
-    <dsName>svctm</dsName>
+    <dsName>wwait</dsName>
     <dsType>COUNTER</dsType>
   </ds>
   <ds>
@@ -51,5 +51,9 @@
   </ds>
   <graphs>
     <name>LinuxDiskstatOps</name>
-  </graphs>
+    <name>LinuxDiskstatWait</name>
+    <name>LinuxDiskstatQueueSize</name>
+    <name>LinuxDiskstatBytes</name>
+	<name>LinuxDiskstatSize</name>
+ </graphs>
 </probedesc>

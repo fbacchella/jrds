@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+  <name>LinuxDiskstatWait</name>
+  <graphName>diskwait-{2}</graphName>
+  <graphTitle>Average wait time on disk {2} on {1}</graphTitle>
+  <verticalLabel>s</verticalLabel>
+  <add>
+    <name>r</name>
+   </add>
+  <add>
+    <name>w</name>
+  </add>
+  <add>
+    <name>waittm</name>
+  </add>
+  <add>
+    <name>await</name>
+    <graphType>line</graphType>
+    <rpn>waittm, r, w, +, /</rpn>
+    <color>blue</color>
+    <legend>Average wait time</legend>
+  </add>
+  <hosttree>
+    <pathelement>HOST</pathelement>
+    <pathelement>DISK</pathelement>
+    <pathelement>DISKACTIVITY</pathelement>
+    <pathelement>INDEX</pathelement>
+    <pathstring>Average wait time</pathstring>
+  </hosttree>
+  <viewtree>
+    <pathelement>DISK</pathelement>
+    <pathelement>DISKACTIVITY</pathelement>
+    <pathelement>HOST</pathelement>
+    <pathstring>Average wait time</pathstring>
+    <pathelement>INDEX</pathelement>
+  </viewtree>
+</graphdesc>
