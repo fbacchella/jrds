@@ -38,6 +38,7 @@ implements Comparable {
 	
 	static final private Logger logger = Logger.getLogger(Probe.class);
 	
+	static final protected int TIMEOUT = 10;
 	private String name;
 	private RdsHost monitoredHost;
 	private Collection<RdsGraph> graphList;
