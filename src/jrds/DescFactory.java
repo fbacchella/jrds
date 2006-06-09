@@ -131,7 +131,6 @@ public class DescFactory {
 			public void end(String namespace, String name) throws Exception {
 				ProbeDesc pd = (ProbeDesc) digester.peek();
 				ProbeFactory.addDesc(pd);
-				logger.debug("probe found, named " + pd.getName());
 			}
 		});
 		
@@ -203,7 +202,6 @@ public class DescFactory {
 			public void end(String namespace, String name) throws Exception {
 				GraphDesc gd = (GraphDesc) digester.peek();
 				GraphFactory.addDesc(gd);
-				logger.debug("graph found, named " + gd.getName());
 			}
 		});
 		digester.addCallMethod("graphdesc/name", "setName", 0);
