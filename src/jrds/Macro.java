@@ -1,7 +1,6 @@
 package jrds;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -9,14 +8,12 @@ import org.apache.log4j.Logger;
 
 public class Macro {
     static private final Logger logger = Logger.getLogger(Macro.class);
-    Set probeList = new HashSet();
+    Set<Object[]> probeList = new HashSet<Object[]>();
 
 	public void populate(RdsHost host) {
-		for(Iterator i = probeList.iterator() ; i.hasNext() ;) {
-			Object[] l = (Object[]) i.next();
+		for(Object[] l: probeList) {
 			String className = (String) l[0];
 			List constArgs = (List) l[1];
-			//constArgs.set(0, host);
 			Probe newRdsRrd = ProbeFactory.makeProbe(className, host, constArgs);
 			if(newRdsRrd != null) {
 				host.addProbe(newRdsRrd);
@@ -25,7 +22,7 @@ public class Macro {
 		}
 	}
 
-	public void put(Object key, Object value) {
+	public void put(String key, List value) {
 		Object[] l = new Object[] {key, value};
 		probeList.add(l);
 	}
