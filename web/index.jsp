@@ -14,7 +14,14 @@
 		<title>JRDS</title>
 		<style type="text/css"><!--
 A:visited { color: rgb(0, 0, 238); }
-.tree {float: left; height:100%; width: 33%}
+.tree {float: left; height:100%; 
+width: 300px; background-color:  #DDD; 
+margin: 5px;
+border: 1px solid black;
+padding: 5px;
+overflow: scroll;
+}
+#graphs {padding-left: 325px}
 .graph {display: block}
 --></style>
 <link href="lib/calendar-win2k-1.css" rel="stylesheet">
@@ -80,12 +87,12 @@ initializeDocument();
  //-->
 </script>
 </div>
-		<div align="center">
+		<div id="content">
 			<input class="btnlist" onclick="refresh_onClick();" type="button" name="refreshButton" value="Refresh" tabindex="0">
 			<input class="btnlist" onclick="keep_onClick();" type="button" name="keepButton" value="Keep" tabindex="1">
 			<input class="btnlist" onclick="history_onClick();" type="button" name="HistoryButton" value="History" tabindex="2">
 			<input class="btnlist" onclick="download_onClick();" type="button" name="DownloadButton" value="Download values" tabindex="3">
-			<form  name="dateForm" action="index.jsp" method="GET">
+			<form  id="select" name="dateForm" action="index.jsp" method="GET">
 				<input name="id" type="hidden" value=""/>
 				<div align="center">
 					<table border="0" cellspacing="2" cellpadding="0">
@@ -117,7 +124,9 @@ initializeDocument();
     beginCal = startCal("begin", "dateBeginTrigger");
     endCal = startCal("end", "dateEndTrigger");
  </script>
+ 			<div id="graphs">
 			<% jrdsBean.getGraphList(out, request, period); %>
+			</div>
 		</div>
 	</body>
 
