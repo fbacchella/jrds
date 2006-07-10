@@ -69,6 +69,8 @@ public class TargetFactory {
 		else if("3".equals(versionStr)) {
 			version = SnmpConstants.version3;
 		}
+		else
+			logger.warn("version " + versionStr + " not valid");
 	}
 	
 	public void setVersion(int version)
