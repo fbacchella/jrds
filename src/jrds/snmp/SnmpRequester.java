@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import jrds.Starter;
 import jrds.probe.snmp.SnmpProbe;
 
 import org.apache.log4j.Logger;
@@ -40,6 +41,34 @@ public abstract class SnmpRequester {
 	static private boolean started = false;
 	static private final OID upTimeOid = new OID(".1.3.6.1.2.1.1.3.0");
 	static private final VariableBinding upTimeVb = new VariableBinding(upTimeOid);
+	static private final Starter s = new Starter(){
+
+		@Override
+		public boolean start() {
+			boolean started = false;
+			try {
+				SnmpRequester.start();
+				started = true;
+			} catch (IOException e) {
+				logger.fatal("Snmp service not started: " + e);
+			}
+			return started;
+		}
+
+		@Override
+		public void stop() {
+			try {
+				SnmpRequester.stop();
+			} catch (IOException e) {
+				logger.fatal("Snmp service not stopped: " + e);
+			}
+		}
+		
+	};
+	
+	static {
+		jrds.HostsList.getRootGroup().addStarter(s);
+	}
 	/**
 	 * No constructor, full static class;
 	 */

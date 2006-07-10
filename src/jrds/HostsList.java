@@ -19,8 +19,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import jrds.snmp.SnmpRequester;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -38,6 +36,7 @@ public class HostsList {
 	private static final String viewRoot = "Sorted by view";
 	private Map<String, Macro> macroList = new HashMap<String, Macro>();
 	private Map<String, GraphTree> treeMap = null;
+	private StartersSet starters = new StartersSet();
 
 	/**
 	 *  
@@ -63,6 +62,10 @@ public class HostsList {
 	
 	public Iterator iterator() {
 		return hostList.iterator();
+	}
+	
+	public static void purge() {
+		instance = new HostsList();
 	}
 	
 	public static HostsList fill(File newHostCfgFile) {
@@ -96,7 +99,7 @@ public class HostsList {
 		getGraphTreeByView().addGraphByPath(graph.getTreePathByView(), graph);
 	}
 	
-	private void addHost(RdsHost newhost) {
+	public void addHost(RdsHost newhost) {
 		hostList.add(newhost);
 		for (Iterator j = newhost.getProbes().iterator(); j.hasNext();) {
 			Probe currProbe = (Probe) j.next();
@@ -116,7 +119,7 @@ public class HostsList {
 	}
 
 	public void collectAll() throws IOException {
-		SnmpRequester.start();
+		starters.startCollect();
 		ExecutorService tpool =  Executors.newFixedThreadPool(PropertiesManager.getInstance().collectorThreads);
 		logger.debug("One collect was launched");
 		Date start = new Date();
@@ -138,14 +141,14 @@ public class HostsList {
 		}
 		tpool.shutdown();
 		try {
-			tpool.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			tpool.awaitTermination(PropertiesManager.getInstance().resolution - 10, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			logger.info("Collect interrupted");
 		}
 		Date end = new Date();
 		long duration = end.getTime() - start.getTime();
 		logger.info("Collect started at "  + start + " ran for " + duration + "ms");							
-		SnmpRequester.stop();
+		starters.stopCollect();
 	}
 	
 	public void graphAll(Date startDate, Date endDate) {
@@ -210,5 +213,9 @@ public class HostsList {
 	 */
 	public void setMacroList(Map<String, Macro> macroList) {
 		this.macroList = macroList;
+	}
+	
+	public void addStarter(Starter s) {
+		starters.register(s);
 	}
 }

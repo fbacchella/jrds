@@ -10,8 +10,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
@@ -35,9 +37,9 @@ import org.jrobin.core.Util;
  */
 public abstract class Probe
 implements Comparable {
-	
+
 	static final private Logger logger = Logger.getLogger(Probe.class);
-	
+
 	static final protected int TIMEOUT = 10;
 	private String name;
 	private RdsHost monitoredHost;
@@ -46,7 +48,8 @@ implements Comparable {
 	private String stringValue = null;
 	private ProbeDesc pd;
 	private String tree = null;
-	
+	private final Set<String> tags = new HashSet<String>();
+
 	/**
 	 * The constructor that should be called by derived class
 	 * @param monitoredHost
@@ -57,11 +60,11 @@ implements Comparable {
 		this.monitoredHost = monitoredHost;
 		this.pd = pd;
 	}
-	
+
 	public RdsHost getHost() {
 		return monitoredHost;
 	}
-	
+
 	private Collection<RdsGraph> initGraphList() {
 		Collection graphClasses = pd.getGraphClasses();
 		Collection<RdsGraph> graphList = null;
@@ -79,7 +82,7 @@ implements Comparable {
 		}
 		return graphList;
 	}
-	
+
 	/**
 	 * @return Returns the graphList.
 	 */
@@ -88,19 +91,19 @@ implements Comparable {
 			graphList = initGraphList();
 		return graphList;
 	}
-	
+
 	public String getName() {
 		if (name == null)
 			name = parseTemplate(getPd().getProbeName());
 		return name;
 	}
-	
+
 	public String getRrdName() {
 		String rrdName = getName().replaceAll("/","_");
 		return monitoredHost.getHostDir() +
 		PropertiesManager.getInstance().fileSeparator + rrdName + ".rrd";
 	}
-	
+
 	private final String parseTemplate(String template) {
 		String index = "";
 		String url = "";
@@ -116,23 +119,23 @@ implements Comparable {
 				url,
 		};
 		return MessageFormat.format(template, arguments) ;
-		
+
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	protected DsDef[] getDsDefs() throws RrdException {
 		return getPd().getDsDefs();
 	}
-	
+
 	protected RrdDef getDefaultRrdDef() throws RrdException {
 		RrdDef def = new RrdDef(getRrdName());
 		return def;
-		
+
 	}
-	
+
 	private ArcDef[] getArcDefs() throws RrdException {
 		ArcDef[] defaultArc = new ArcDef[3];
 		defaultArc[0] = new ArcDef("AVERAGE", 0.5, 1, 12 * 24 * 30 * 6);
@@ -140,7 +143,7 @@ implements Comparable {
 		defaultArc[2] = new ArcDef("AVERAGE", 0.5, 288, 730);
 		return defaultArc;
 	}
-	
+
 	/**
 	 * @throws RrdException
 	 * @throws IOException
@@ -156,7 +159,7 @@ implements Comparable {
 			rrdDb.close();
 		}
 	}
-	
+
 	/**
 	 * Open the rrd backend of the probe.
 	 * it's created if it's needed
@@ -174,7 +177,7 @@ implements Comparable {
 			RrdDb rrdDb = null;
 			try {
 				if ( rrdFile.isFile()) {
-					 rrdDb = StoreOpener.getRrd(getRrdName());
+					rrdDb = new RrdDb(getRrdName());
 				} else
 					create();
 				retValue = true;
@@ -183,12 +186,18 @@ implements Comparable {
 			}
 			finally {
 				if(rrdDb != null)
-					StoreOpener.releaseRrd(rrdDb);				
+					try {
+						rrdDb.close();
+					} catch (IOException e) {
+						retValue = false;
+						logger.error("Strange problem, file cannot be closed :" + e);
+					}
+					//StoreOpener.releaseRrd(rrdDb);				
 			}
 		}
 		return retValue;
 	}
-	
+
 	/**
 	 * The method that return a map of data to be stored.<br>
 	 * the key is resolved using the <code>ProbeDesc</code>. A key not associated with an existent datastore will generate a warning
@@ -197,7 +206,7 @@ implements Comparable {
 	 * @return the map of values
 	 */
 	public abstract Map getNewSampleValues();
-	
+
 	/**
 	 * A method that might be overiden if specific treatement is needed
 	 * by a probe.<br>
@@ -208,7 +217,7 @@ implements Comparable {
 	public Map  filterValues(Map valuesList) {
 		return valuesList;
 	}
-	
+
 	/**
 	 * A method to filter by uptime value. Used to avoid nonense values when a counter is reset to zero.
 	 * The uptime value must be exprimed in seconds
@@ -229,7 +238,7 @@ implements Comparable {
 		}
 		return retValue;
 	}
-	
+
 	/**
 	 * Store the values on the rrd backend.
 	 * Overiding should be avoided.
@@ -256,9 +265,9 @@ implements Comparable {
 				}
 			}
 		}
-		
+
 	}
-	
+
 	/**
 	 * Launch an collect of values.
 	 * You should not try to overide it
@@ -270,7 +279,8 @@ implements Comparable {
 		RrdDb rrdDb = null;
 		Sample onesample;
 		try {
-			rrdDb = StoreOpener.getRrd(getRrdName());
+			//rrdDb = StoreOpener.getRrd(getRrdName());
+			rrdDb = new RrdDb(getRrdName());
 			onesample = rrdDb.createSample();
 			updateSample(onesample);
 			logger.debug(onesample.dump());
@@ -287,7 +297,12 @@ implements Comparable {
 		}
 		finally  {
 			if(rrdDb != null)
-				StoreOpener.releaseRrd(rrdDb);
+				try {
+					rrdDb.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 		}
 	}
 
@@ -302,7 +317,7 @@ implements Comparable {
 		}
 		return stringValue;
 	}
-	
+
 	/**
 	 * The comparaison order of two object of ths class is a case insensitive
 	 * comparaison of it's string value.
@@ -314,7 +329,7 @@ implements Comparable {
 		return String.CASE_INSENSITIVE_ORDER.compare(this.toString(),
 				arg0.toString());
 	}
-	
+
 	/**
 	 * @return Returns the <code>ProbeDesc</code> of the probe.
 	 */
@@ -356,7 +371,7 @@ implements Comparable {
 		}
 		return retValue;
 	}
-	
+
 	/**
 	 * Return the probe datas for the given period
 	 * @param startDate
@@ -379,7 +394,7 @@ implements Comparable {
 		}
 		return retValue;
 	}
-	
+
 	public Map<String, Object> getLastValues() {
 		Map<String, Object> retValues = new HashMap<String, Object>();
 		RrdDb rrdDb = null;
@@ -422,4 +437,15 @@ implements Comparable {
 		this.tree = treeRoot;
 	}
 
+	public void addTag(String tag) {
+		tags.add(tag);
+	}
+
+	public Set<String> getTags() {
+		Set<String> ptags = getHost().getTags();
+		Set<String> alltags = new HashSet<String>(tags.size() + tags.size());
+		alltags.addAll(ptags);
+		alltags.addAll(tags);
+		return alltags;
+	}
 }
