@@ -95,7 +95,7 @@ public class HostConfigParser  extends DefaultHandler {
 			saxParser.parse(hostConfigFile, this);
 		} catch (Exception e) {
 			logger.warn("SAX error during parsing of host config file " + hostConfigFile.getAbsolutePath() +
-					": " + e.getMessage(), e);
+					": " + e.getMessage());
 		}
 		return hostsCollection;
 	}
