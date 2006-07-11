@@ -4,7 +4,7 @@
   <name>LinuxDiskstatBytes</name>
   <graphName>bytes-{2}</graphName>
   <graphTitle>E/S (bytes) on disk {2} on {1}</graphTitle>
-  <verticalLabel>operations/s</verticalLabel>
+  <verticalLabel>bytes/s</verticalLabel>
   <add>
     <name>wsec</name>
   </add>

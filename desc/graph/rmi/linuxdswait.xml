@@ -17,7 +17,7 @@
   <add>
     <name>await</name>
     <graphType>line</graphType>
-    <rpn>waittm, r, w, +, /</rpn>
+    <rpn>waittm, r, w, +, 1000, *, /</rpn>
     <color>blue</color>
     <legend>Average wait time</legend>
   </add>
