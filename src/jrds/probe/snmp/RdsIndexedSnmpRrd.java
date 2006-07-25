@@ -49,7 +49,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	
 
 	protected OID initIndexOid() {
-		return this.getPd().getIndexOid();
+		return getPd().getIndexOid();
 	}
 	
 	public String getIndexName()
@@ -57,30 +57,29 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 		return indexKey;
 	}
 			
-	public Set makeIndexed(Collection oids, Collection indexes)
+	public Set<OID> makeIndexed(Collection<OID> oids, Collection<String> indexes)
 	{
-		Set oidToGet = new HashSet(oids.size() * indexes.size());
-		for(Iterator i = oids.iterator() ; i.hasNext() ; )  {
-			OID oidCurs = (OID) i.next();
-			for(Iterator j = indexes.iterator(); j.hasNext() ;) {
+		Set<OID> oidToGet = new HashSet<OID>(oids.size() * indexes.size());
+		for(OID oidCurs: oids) {
+			for(String j: indexes) {
 				OID oidBuf = (OID) oidCurs.clone();
-				oidBuf.append((String)j.next());
+				oidBuf.append(j);
 				oidToGet.add(oidBuf);
 			}
 		}
 		return oidToGet;
 	}
 	
-	public Collection setIndexValue() 
+	public Collection<String> setIndexValue() 
 	{
 		
-		Collection indexAsString = null;
+		Collection<String> indexAsString = null;
 		if(isUniq())
-			indexAsString = new ArrayList(1);
+			indexAsString = new ArrayList<String>(1);
 		else
-			indexAsString = new HashSet();
+			indexAsString = new HashSet<String>();
 		
-		Collection soidSet= new ArrayList(1);
+		Collection<OID> soidSet= new ArrayList<OID>(1);
 		soidSet.add(indexOid);
 		Map somevars = indexFinder.doSnmpGet(this, soidSet);
 		boolean found = false;
@@ -116,9 +115,9 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	/**
 	 * @see jrds.probe.snmp.SnmpProbe#getOidSet()
 	 */
-	public Set getOidSet() {
-		Set retValue = null;
-		Collection indexAsString = setIndexValue();
+	public Set<OID> getOidSet() {
+		Set<OID> retValue = null;
+		Collection<String> indexAsString = setIndexValue();
 		if(indexAsString != null)
 			retValue = makeIndexed(getOidNameMap().keySet(), indexAsString);
 		return retValue;

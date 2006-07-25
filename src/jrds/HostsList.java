@@ -36,7 +36,7 @@ public class HostsList {
 	private static final String viewRoot = "Sorted by view";
 	private Map<String, Macro> macroList = new HashMap<String, Macro>();
 	private Map<String, GraphTree> treeMap = null;
-	private StartersSet starters = new StartersSet();
+	public StartersSet starters = new StartersSet();
 
 	/**
 	 *  
@@ -70,7 +70,6 @@ public class HostsList {
 	
 	public static HostsList fill(File newHostCfgFile) {
 		instance = new HostsList();
-		instance.append(newHostCfgFile);
 		return instance;
 	}
 
@@ -78,12 +77,6 @@ public class HostsList {
 		for (Iterator i = newHostList.iterator(); i.hasNext();) {
 			addHost((RdsHost) i.next());
 		}
-	}
-
-	public void append(File newHostCfgFile) {
-		HostConfigParser aparser = new HostConfigParser(newHostCfgFile);
-		Collection tmpHostsList = aparser.parse();
-		append(tmpHostsList);
 	}
 
 	private void addRoot(String root) {

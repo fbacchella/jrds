@@ -21,6 +21,7 @@ import org.snmp4j.smi.Null;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.Opaque;
+import org.snmp4j.smi.SMIConstants;
 import org.snmp4j.smi.TimeTicks;
 import org.snmp4j.smi.UnsignedInteger32;
 import org.snmp4j.smi.Variable;
@@ -61,32 +62,65 @@ public class SnmpVars extends HashMap {
 
 	/** Add directly a VariableBinding to the map
 	 * it will be stored as a key/value and the original snmp datas will be lost
+	 * only not 
 	 * @param vb
 	 */
 	@SuppressWarnings("unchecked")
-	public void addVariable(VariableBinding vb)
+	public boolean addVariable(VariableBinding vb)
 	{
+		boolean retValue = false;
 		if( ! vb.isException()) {
 			OID vbOid = vb.getOid();
 			put(vbOid, convertVar(vb.getVariable()));
+			retValue = true;
 		}
 		else {
-			logger.warn("OID " + vb.getOid() + " has error");
+			int exception = vb.getSyntax();
+			String exceptionName = "";
+			switch(exception) {
+            case SMIConstants.EXCEPTION_END_OF_MIB_VIEW:
+            	exceptionName = "End of mib view"; break;
+            case SMIConstants.EXCEPTION_NO_SUCH_INSTANCE:            
+            	exceptionName = "No such instance"; break;
+            case SMIConstants.EXCEPTION_NO_SUCH_OBJECT: 
+            	exceptionName = "No such object"; break;
+            default: exceptionName = "Unknown exception";break;
+				
+			}
+			logger.warn("OID " + vb.getOid() + " has error " + exceptionName);
 		}
+		return retValue;
 	}
 
 	public void join(PDU data)
 	{
+		int numAdded = 0;
+		int numVb = 0;
 		for(int i = 0 ; i < data.size() ; i++) {
 			VariableBinding vb = data.get(i);
-			addVariable(vb);
+			if( addVariable(vb)) {
+				numAdded++;
+			}
+			numVb++;
+		}
+		if(numAdded != numVb) {
+			logger.debug(numAdded +" variables added out of " + numVb);
 		}
 	}
 
 	public void join(VariableBinding[] newVars)
 	{
-		for (int i = 0 ; i < newVars.length ; i++)
-			addVariable(newVars[i]);
+		int numAdded = 0;
+		int numVb = 0;
+		for (int i = 0 ; i < newVars.length ; i++) {
+			if( addVariable(newVars[i])) {
+				numAdded++;
+			}
+			numVb++;
+		}
+		if(numAdded != numVb) {
+			logger.debug(numAdded +" variables added out of " + numVb);
+		}
 	}
 
 	private Object convertVar(Variable valueAsVar) {
@@ -98,22 +132,22 @@ public class SnmpVars extends HashMap {
 			}
 			else if(valueAsVar instanceof UnsignedInteger32) {
 				if(valueAsVar instanceof TimeTicks) {
-					long epochcentisecond = valueAsVar.toLong();//((UnsignedInteger32)valueAsVar).getValue();
+					long epochcentisecond = valueAsVar.toLong();
 					retvalue  = new Double(epochcentisecond / 100.0 );
 				}
 				else
-					retvalue  = valueAsVar.toLong(); //new Long(((UnsignedInteger32)valueAsVar).getValue());
+					retvalue  = valueAsVar.toLong();
 			}
 			else if(valueAsVar instanceof Integer32)
-				retvalue  = valueAsVar.toInt(); //new Integer(((Integer32)valueAsVar).getValue());
+				retvalue  = valueAsVar.toInt();
 			else if(valueAsVar instanceof Counter64)
-				retvalue  = valueAsVar.toLong(); //new Long(((Counter64)valueAsVar).getValue());
+				retvalue  = valueAsVar.toLong();
 			else if(valueAsVar instanceof OctetString) {
 				if(valueAsVar instanceof Opaque) {
 					retvalue  = resolvOpaque((Opaque) valueAsVar);
 				}
 				else
-					retvalue  = valueAsVar.toString(); //((OctetString)valueAsVar).toString();
+					retvalue  = valueAsVar.toString();
 			}
 			else if(valueAsVar instanceof Null) {
 				retvalue  = null;

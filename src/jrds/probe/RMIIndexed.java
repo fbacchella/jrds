@@ -13,7 +13,7 @@ public class RMIIndexed extends RMI implements IndexedProbe {
 		this.index = indexKey;
 		List<String> l = new ArrayList<String>(1);
 		l.add(indexKey);
-		init(l);
+		setArgs(l);
 	}
 	public RMIIndexed(RdsHost monitoredHost, ProbeDesc pd, Integer port, Boolean local) {
 		super(monitoredHost, pd);
@@ -21,7 +21,7 @@ public class RMIIndexed extends RMI implements IndexedProbe {
 		List<Object> l = new ArrayList<Object>(2);
 		l.add(port);
 		l.add(local);
-		init(l);
+		setArgs(l);
 	}
 	
 	public String getIndexName() {

@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 import jrds.HostsList;
 import jrds.Period;
 import jrds.RdsGraph;
@@ -25,12 +27,14 @@ import jrds.RdsGraph;
  * @version $Revision$
  */
 public final class Graph extends HttpServlet {
+	static Logger logger = Logger.getLogger(Graph.class);
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException {
 		final HostsList hl = HostsList.getRootGroup();
+		Date start = new Date();
 
 		String scale = req.getParameter("scale");
 		Period p = null;
@@ -54,6 +58,11 @@ public final class Graph extends HttpServlet {
 		res.setContentType("image/png");
 		ServletOutputStream out = res.getOutputStream();
 		res.addHeader("Cache-Control", "no-cache");
+		Date middle = new Date();
 		graph.writePng(out, begin, end);
+		Date finish = new Date();
+		long duration1 = middle.getTime() - start.getTime();
+		long duration2 = finish.getTime() - middle.getTime();
+		logger.trace("Graph " + graph + " rendering  ran for " + duration1 + ":" + duration2 + "ms");							
 	}
 }

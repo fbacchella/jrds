@@ -42,7 +42,7 @@ public class GetTreeTag extends SimpleTagSupport {
 			else if(sort == GraphTree.LEAF_HOSTNAME)
 				graphTree = HostsList.getRootGroup().getGraphTreeByView();
 			if(graphTree != null) {
-				graphTree.getJavaScriptCode(out, req.getQueryString(), father + "_0");
+				graphTree.getJavaScriptCode(out, req.getQueryString(), father + "_0", null);
 			}
 			JspFragment f=getJspBody();
 			if (f != null) f.invoke(out);

@@ -72,54 +72,64 @@ public class GraphTree {
 		 return rootNode;
 	 }
 	 
-	public void getJavaScriptCode(Writer out, String queryString, String curNode) throws IOException {
-		StringBuffer childsarray = new StringBuffer(1000);
-		childsarray.append(curNode + " = gFld('" + name + "', 'index.jsp?id=" + getPath().hashCode());
+	public boolean getJavaScriptCode(Writer out, String queryString, String curNode, Filter f) throws IOException {
+	
+		StringBuffer thisNode = new StringBuffer(1000);
+		thisNode.append(curNode + " = gFld('" + name + "', 'index.jsp?id=" + getPath().hashCode());
 		if(queryString != null &&  ! "".equals(queryString))
-			childsarray.append("&" + queryString);
-		childsarray.append("');\n");
+			thisNode.append("&" + queryString);
+		thisNode.append("');\n");
+
+		StringBuffer childsarray = new StringBuffer(1000);
 		childsarray.append(curNode +".addChildren([\n");
 		int width = 0;
 		boolean first = true;
 		for(GraphTree o: childsMap.values()) {
-			if(! first)
-				childsarray.append(", ");
-			else {
-				childsarray.append("    ");
-				first = false;
-			}
 			String child = curNode + "_" + width++;
-			o.getJavaScriptCode(out, queryString, child);
-			childsarray.append(child);
-		}
-		for(Iterator i = graphsSet.entrySet().iterator(); i.hasNext(); ) {
-			if(! first)
-				childsarray.append(",\n");
-			else
+			boolean noChild = o.getJavaScriptCode(out, queryString, child, f);
+			if(! noChild) {
+				if(! first)
+					childsarray.append(", ");
+				else {
+					childsarray.append("    ");
+				}
+				childsarray.append(child);
 				first = false;
-			Map.Entry e = (Map.Entry) i.next();
-			RdsGraph currGraph = (RdsGraph) e.getValue();
-			/* replace \ with \\
-			 * ex: C:\ become C:\\
-			 * */   
-			String leafName = ((String) e.getKey()).replaceAll("\\\\","\\\\\\\\");
-			childsarray.append("    [");
-			childsarray.append("'" + leafName +"',");
-			childsarray.append("'");
-			childsarray.append("index.jsp?id=");
-			childsarray.append(currGraph.hashCode());
-			if(queryString != null &&  ! "".equals(queryString)) {
-				childsarray.append("&");
-				childsarray.append(queryString);
 			}
-			childsarray.append("']");
+		}
+		for(Map.Entry<String, RdsGraph> e: graphsSet.entrySet()) {
+			RdsGraph currGraph = e.getValue();
+			String path = getPath() + "/" + currGraph.getName();
+			if(f == null || (f.acceptPath(path) && f.acceptTag(currGraph.getProbe().getTags()))) {
+				if(! first)
+					childsarray.append(",\n");
+				first = false;
+
+				/* replace \ with \\
+				 * ex: C:\ become C:\\
+				 * */   
+				String leafName = e.getKey().replaceAll("\\\\","\\\\\\\\");
+				childsarray.append("    [");
+				childsarray.append("'" + leafName +"',");
+				childsarray.append("'");
+				childsarray.append("index.jsp?id=");
+				childsarray.append(currGraph.hashCode());
+				if(queryString != null &&  ! "".equals(queryString)) {
+					childsarray.append("&");
+					childsarray.append(queryString);
+				}
+				childsarray.append("']");
+			}
 		}
 		if(! first)
 			childsarray.append("\n");
 		childsarray.append("]);\n");
-		if(childsarray.length() > 0) {
-			out.write(childsarray.toString());
+		
+		if(! first) {
+			out.append(thisNode);
+			out.append(childsarray);
 		}
+		return first;
 	}
 
 	public GraphTree getByPath(String path) {
@@ -202,13 +212,23 @@ public class GraphTree {
 		return graphsSet;
 	}
 	
-	public List<RdsGraph> enumerateChildsGraph() {
+	public List<RdsGraph> enumerateChildsGraph(Filter v) {
 		List<RdsGraph> retValue  = new ArrayList<RdsGraph>();
-		if(graphsSet != null)
-			retValue.addAll((Collection<RdsGraph>) graphsSet.values());
+		if(graphsSet != null) {
+			if(v == null)
+				retValue.addAll((Collection<RdsGraph>) graphsSet.values());
+			else {
+				for(RdsGraph g: graphsSet.values()) {
+					String path = this.getPath() + "/" + g.getName();
+					if(v.acceptPath(path) && v.acceptTag(g.getProbe().getTags()))
+						retValue.add(g);
+					
+				}
+			}
+		}
 		if(childsMap != null) {
 			for(GraphTree child: childsMap.values()) {
-				retValue.addAll(child.enumerateChildsGraph());
+				retValue.addAll(child.enumerateChildsGraph(v));
 			}
 		}	
 		return retValue;

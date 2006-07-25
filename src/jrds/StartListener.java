@@ -10,8 +10,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import jrds.probe.SumProbe;
 import jrds.snmp.SnmpRequester;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -22,13 +24,16 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public class StartListener implements ServletContextListener {
-	static final private Logger logger = Logger.getLogger(StartListener.class);
+	static {
+		jrds.log.JrdsLoggerFactory.initLog4J();
+	}
+	static private final Logger logger = Logger.getLogger(StartListener.class);
 	static final PropertiesManager pm = PropertiesManager.getInstance();
 	static private boolean started = false;
 	private static final Timer collectTimer = new Timer(true);
 
-	
-	
+
+
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
 	 */
@@ -42,24 +47,32 @@ public class StartListener implements ServletContextListener {
 				if(propStream != null) {
 					pm.join(propStream);
 				}
-				
+
 				String localPropFile = ctxt.getInitParameter("propertiesFile");
-				logger.debug("propertiesFile = " + localPropFile);
 				if(localPropFile != null)
 					pm.join(new File(localPropFile));
-				
+
 				pm.update();
-				
-				JrdsLogger.setFileLogger(pm.logfile);
-				
+
+				jrds.log.JrdsLoggerFactory.setOutputFile(pm.logfile);
+				Logger.getLogger(jrds.Probe.class).setLevel(Level.INFO);
+
 				System.getProperties().setProperty("java.awt.headless","true");
-				
+
 				StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
 
 				DescFactory.init();
 
-				HostsList.fill(new File(pm.configfilepath));
-								
+				if(pm.configdir != null)
+					DescFactory.scanProbeDir(new File(pm.configdir, "macro"));
+				if(pm.configdir != null)
+					DescFactory.scanProbeDir(new File(pm.configdir));
+
+				HostsList.getRootGroup().addHost(SumProbe.sumhost);
+
+				DescFactory.digester = null;
+				HostsList.getRootGroup().getMacroList().clear();
+
 				TimerTask collector = new TimerTask () {
 					public void run() {
 						try {
@@ -78,7 +91,7 @@ public class StartListener implements ServletContextListener {
 			started = true;
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
 	 */
@@ -93,5 +106,5 @@ public class StartListener implements ServletContextListener {
 		logger.info("appplication jrds stopped");
 		StoreOpener.stop();
 	}
-	
+
 }

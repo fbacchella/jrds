@@ -23,12 +23,12 @@ import org.xml.sax.Attributes;
  * @author Fabrice Bacchella
  * @version $Revision: 237 $
  */
-public class CopyOfHostConfigParser {
+public class HostConfigParser {
 	
-	static private final Logger logger = Logger.getLogger(CopyOfHostConfigParser.class);
+	static private final Logger logger = Logger.getLogger(HostConfigParser.class);
 	
 	private final static TargetFactory targetFactory = TargetFactory.getInstance();
-	public CopyOfHostConfigParser(File hostConfigFile)
+	public HostConfigParser(File hostConfigFile)
 	{
 	}
 	
@@ -217,7 +217,7 @@ public class CopyOfHostConfigParser {
 	static void defineTag(Digester d) {
 		Rule tagRule =  new Rule() {
 			public void body(java.lang.String namespace, java.lang.String name, java.lang.String text) {
-				CopyOfHostConfigParser.Tag t = new CopyOfHostConfigParser.Tag();
+				HostConfigParser.Tag t = new HostConfigParser.Tag();
 				t.setTag(text);
 				digester.push(t);
 			}

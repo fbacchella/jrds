@@ -15,6 +15,7 @@ import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 
+import jrds.probe.SumProbe;
 import jrds.snmp.SnmpRequester;
 
 import org.apache.commons.digester.Digester;
@@ -27,41 +28,68 @@ public class DescFactory {
 	static private final Logger logger = Logger.getLogger(DescFactory.class);
 	static final Pattern p = Pattern.compile(".*.xml");
 	static final FileFilter filter = new  FileFilter(){
-		public boolean accept(File pathname) {
-			return  ! pathname.isHidden() && ( p.matcher(pathname.getName()).matches() || pathname.isDirectory() );
+		public boolean accept(File file) {
+			if(! file.isHidden()) {
+				if(file.isDirectory())
+					scanProbeDir(file);
+				else if(file.isFile() && file.getName().endsWith(".xml")) {
+					try {
+						InputStream xmlStream = new FileInputStream(file);
+						digester.parse(xmlStream);
+						xmlStream.close();
+					} catch (FileNotFoundException e) {
+						logger.error("File  "+ file + " cannot be read: " + e);
+					} catch (IOException e) {
+						logger.error("File  "+ file + " cannot be read: " + e);
+					} catch (SAXException e) {
+						logger.error("File  "+ file + " not parsable: " + e, e);
+					}
+				}
+			}
+			return  false;
 		}
 	};
-	public DescFactory() {
-		super();
-		// TODO Auto-generated constructor stub
+	static public Digester digester; 
+
+	private DescFactory() {
 	}
 
-	static final Digester digester = new Digester();
-	
 	public static void init() {
+		digester = new Digester();
 		addProbeDigester(digester);
 		addGraphDigester(digester);
+		Filter.addToDigester(digester);
+		HostConfigParser.addDigester(digester);
+		SumProbe.addDigester(digester);
+		Macro.addToDigester(digester);
+
 		String probepath = DescFactory.class.getResource("/probe").toString();
 		logger.debug("probes jar path: " + probepath);
 		//Quick hack for Gentoo's tomcat 5
 		String graphpath = DescFactory.class.getResource("/graph").toString();
 		logger.debug("graphs jar path: " + graphpath);
+		String filterpath = DescFactory.class.getResource("/filter").toString();
+		logger.debug("filter jar path: " + filterpath);
 		String path = probepath;
 		while(path != null) {
 			String [] urlelems = path.split("[:!]");
 			if("file".equals(urlelems[0]))
 				scanProbeDir(new File(urlelems[1]));
 			else if("jar".equals(urlelems[0]))
-				DescFactory.importJar(urlelems[2]);
-			path = null;
+				importJar(urlelems[2]);
 			if(graphpath != probepath) {
 				path = graphpath;
-				graphpath = null;
-				probepath = null;
+				graphpath = probepath;
 			}
+			else if(filterpath != probepath) {
+				path = filterpath;
+				filterpath = probepath;
+			}
+			else
+				path = null;
 		}
 	}
-		
+
 
 	public static void importJar(String jarfile) {
 		JarFile probesjar;
@@ -80,7 +108,7 @@ public class DescFactory {
 					}
 					xmlStream.close();
 				}
-				
+
 			}
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
@@ -94,33 +122,9 @@ public class DescFactory {
 	 *
 	 * @param aStartingDir is a valid directory, which can be read.
 	 */
-	static private void scanProbeDir(File aStartingDir) {
-		if(aStartingDir.isDirectory()) {
-			File[] filesAndDirs = aStartingDir.listFiles(filter);
-			for(int i = 0 ; i < filesAndDirs.length; i++) {
-				File file = filesAndDirs[i];
-				if(file.isFile()) {
-					try {
-						InputStream xmlStream = new FileInputStream(file);
-						digester.parse(xmlStream);
-						xmlStream.close();
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (SAXException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				else if (file.isDirectory()) {
-					scanProbeDir(file);
-				}
-				
-			}
-		}
+	static public void scanProbeDir(File aStartingDir) {
+		if(aStartingDir.isDirectory()) 
+			aStartingDir.listFiles(filter);
 	}
 
 	private static void addProbeDigester(Digester digester) {
@@ -133,7 +137,7 @@ public class DescFactory {
 				ProbeFactory.addDesc(pd);
 			}
 		});
-		
+
 		digester.addRule("probedesc/probeClass", new Rule() {
 			public void body(String namespace, String name, String text) throws ClassNotFoundException {
 				Class c = Class.forName(text.trim());
@@ -143,13 +147,13 @@ public class DescFactory {
 		});
 		digester.addCallMethod("probedesc/probeName", "setProbeName", 0);
 		digester.addCallMethod("probedesc/name", "setName", 0);
-		
+
 		Class[] params = new Class[] { Boolean.class};
 		digester.addCallMethod("probedesc/uniq", "setUniqIndex", 0, params);
-		
+
 		params = new Class[] { String.class};
 		digester.addCallMethod("probedesc/index", "setIndexOid", 0, params);
-		
+
 		digester.addObjectCreate("probedesc/ds", HashMap.class);
 		digester.addSetNext("probedesc/ds", "add");
 		digester.addRule("probedesc/ds/dsName", new Rule() {
@@ -186,7 +190,7 @@ public class DescFactory {
 		});
 		digester.addObjectCreate("probedesc/graphs", ArrayList.class);
 		digester.addSetNext("probedesc/graphs","setGraphClasses");
-		
+
 		params = new Class[] { Object.class};
 		digester.addCallMethod("probedesc/graphs/name", "add", 0, params);
 

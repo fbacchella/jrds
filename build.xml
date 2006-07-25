@@ -180,6 +180,7 @@
 	
 	<target name="graph" depends="appjar">
 		<java classname="jrds.standalone.Grapher" fork="true">
+			<arg value="–Xruntracer"/>
 			<classpath>
 				<path refid="project.classpath"/>
 				<pathelement location="${build.home}/${app.name}.jar"/>

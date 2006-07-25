@@ -40,7 +40,7 @@ implements Comparable {
 
 	static final private Logger logger = Logger.getLogger(Probe.class);
 
-	static final protected int TIMEOUT = 10;
+	static final protected int TIMEOUT = 30;
 	private String name;
 	private RdsHost monitoredHost;
 	private Collection<RdsGraph> graphList;
@@ -143,6 +143,13 @@ implements Comparable {
 		defaultArc[2] = new ArcDef("AVERAGE", 0.5, 288, 730);
 		return defaultArc;
 	}
+	
+	public RrdDef getRrdDef() throws RrdException {
+		RrdDef def = getDefaultRrdDef();
+		def.addArchive(getArcDefs());
+		def.addDatasource(getDsDefs());
+		return def;
+	}
 
 	/**
 	 * @throws RrdException
@@ -177,7 +184,7 @@ implements Comparable {
 			RrdDb rrdDb = null;
 			try {
 				if ( rrdFile.isFile()) {
-					rrdDb = new RrdDb(getRrdName());
+					rrdDb = StoreOpener.getRrd(getRrdName());
 				} else
 					create();
 				retValue = true;
@@ -186,13 +193,7 @@ implements Comparable {
 			}
 			finally {
 				if(rrdDb != null)
-					try {
-						rrdDb.close();
-					} catch (IOException e) {
-						retValue = false;
-						logger.error("Strange problem, file cannot be closed :" + e);
-					}
-					//StoreOpener.releaseRrd(rrdDb);				
+					StoreOpener.releaseRrd(rrdDb);				
 			}
 		}
 		return retValue;
@@ -279,8 +280,7 @@ implements Comparable {
 		RrdDb rrdDb = null;
 		Sample onesample;
 		try {
-			//rrdDb = StoreOpener.getRrd(getRrdName());
-			rrdDb = new RrdDb(getRrdName());
+			rrdDb = StoreOpener.getRrd(getRrdName());
 			onesample = rrdDb.createSample();
 			updateSample(onesample);
 			logger.debug(onesample.dump());
@@ -297,12 +297,7 @@ implements Comparable {
 		}
 		finally  {
 			if(rrdDb != null)
-				try {
-					rrdDb.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				StoreOpener.releaseRrd(rrdDb);
 		}
 	}
 

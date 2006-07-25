@@ -230,7 +230,13 @@ implements Comparable {
 	public void writePng(OutputStream out, Date startDate, Date endDate) {
 		BufferedImage img = makeImg(startDate, endDate);
 		if (img != null)
-			JAI.create("encode", img, out, "PNG", null);
+			try {
+				javax.imageio.ImageIO.write(img, "png", out);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
 	}
 	
 	public void writeXml(OutputStream out, Date startDate, Date endDate) {

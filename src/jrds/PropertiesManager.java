@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
  */
 public class PropertiesManager {
 	static private PropertiesManager instance;
-	static final private Logger logger = Logger.getLogger(PropertiesManager.class);
+	static private Logger logger = Logger.getLogger(PropertiesManager.class);
 
 	private Properties properties = new Properties();
 	
@@ -111,7 +111,8 @@ public class PropertiesManager {
 	public void update()
 	{
 		urlperfpath = getParameter("urlperfpath","./HTTPTest");
-		configfilepath = getParameter("configfilepath", "config.xml");
+		configfilepath = getParameter("configfilepath", "");
+		configdir = getParameter("configdir", "config");
 		rrddir = getParameter("rrddir", "probe");
 		probelibpath = getParameter("probelibpath", "probelib");
 		graphlibpath = getParameter("graphlibpath", "graphlib");
@@ -134,6 +135,7 @@ public class PropertiesManager {
 	}
 	public String urlperfpath;
 	public String configfilepath;
+	public String configdir;
 	public String urlpngroot;
 	public String rrddir;
 	public String fileSeparator;

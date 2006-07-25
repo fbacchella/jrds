@@ -5,7 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-class StartersSet {
+public class StartersSet {
 	final Set<Starter> allStarters = new LinkedHashSet<Starter>();
 	final Map<Starter, Boolean> started = new HashMap<Starter, Boolean>();
 	public void startCollect(RdsHost host) {

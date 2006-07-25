@@ -2,6 +2,7 @@ package jrds;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -30,6 +31,8 @@ public class RdsHost implements Comparable {
 	private long uptime = Long.MAX_VALUE;
 	private Date upTimeProbe = new Date(0);
 	private String tree = null;
+	private final Set<String> tags = new HashSet<String>();
+	private final StartersSet starters = new StartersSet();
 	
 	public RdsHost(String newName)
 	{
@@ -82,17 +85,19 @@ public class RdsHost implements Comparable {
 		}
 	}
 	
-	public Collection getProbes() {
+	public Collection<Probe> getProbes() {
 		return allProbes;
 		
 	}
 	
 	public void  collectAll()
 	{
+		starters.startCollect(this);
 		for(Iterator j = allProbes.iterator() ; j.hasNext() ;) {
 			Probe currrd= (Probe) j.next();
 			currrd.collect();
 		}
+		starters.stopCollect(this);
 	}
 
 	public void graphAll(Date startDate, Date endDate)
@@ -159,4 +164,16 @@ public class RdsHost implements Comparable {
 	public void setTree(String treeRoot) {
 		this.tree = treeRoot;
 	}
+	public void addTag(String tag) {
+		tags.add(tag);
+	}
+
+	public Set<String> getTags() {
+		return tags;
+	}
+	
+	public void addStarter(Starter s) {
+		starters.register(s);
+	}
+
 }

@@ -66,24 +66,18 @@ function download_onClick()
 
 	<body bgcolor="#ffffff">
 	<div class="tree" >
-<div style="position:absolute; top:0; left:0; "><table border=0><tr><td><font size=-2><a style="font-size:7pt;text-decoration:none;color:silver" href="http://www.treemenu.net/" target="_blank">JavaScript Tree Menu</a></font></td></tr></table></div>
-		<p>
+	<a href="index.jsp"><img src="img/back_to_album.gif" alt="" height="16" width="20" border="0"></a>
+<div ><table border=0><tr><td><font size=-2><a style="font-size:7pt;text-decoration:none;color:silver" href="http://www.treemenu.net/" target="_blank">JavaScript Tree Menu</a></font></td></tr></table></div>
 <script type="text/javascript"><!--
 USETEXTLINKS = 1  
-STARTALLOPEN = 0
 HIGHLIGHT = 1
-PRESERVESTATE = 1
 GLOBALTARGET = 'S'
 ICONPATH="img/"
 USEFRAMES = 0
-<%
-	jrdsBean.getJavascriptTree(1, "hostTree_0", out, request, period);
-	jrdsBean.getJavascriptTree(2, "viewTree_0", out, request, period); 
-%>
-
-foldersTree = gFld("<i>Graph List</i>");
-foldersTree.addChildren([hostTree_0, viewTree_0]);
-initializeDocument();
+PRESERVESTATE = 1
+STARTALLOPEN = 0
+<%jrdsBean.ManageTree(out, request, response);%>
+<%jrdsBean.getJavascriptTree(out, request, period);%>
  //-->
 </script>
 </div>
@@ -94,6 +88,7 @@ initializeDocument();
 			<input class="btnlist" onclick="download_onClick();" type="button" name="DownloadButton" value="Download values" tabindex="3">
 			<form  id="select" name="dateForm" action="index.jsp" method="GET">
 				<input name="id" type="hidden" value=""/>
+				<input name="filter" type="hidden" value=""/>
 				<div align="center">
 					<table border="0" cellspacing="2" cellpadding="0">
 						<tr>
@@ -121,6 +116,7 @@ initializeDocument();
 	document.dateForm.begin.value = "<jsp:getPropertyname="period" property="begin" />"; 
     document.dateForm.scale.selectedIndex = <jsp:getPropertyname="period" property="scale" />;
     document.dateForm.id.value = qs.get("id", 0);
+    document.dateForm.filter.value = qs.get("filter", 0);
     beginCal = startCal("begin", "dateBeginTrigger");
     endCal = startCal("end", "dateEndTrigger");
  </script>
