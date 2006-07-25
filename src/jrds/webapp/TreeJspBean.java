@@ -85,7 +85,12 @@ public class TreeJspBean {
 	public void getJavascriptTree(JspWriter out, HttpServletRequest req, PeriodBean period) throws JspException {
 		HostsList  root = HostsList.getRootGroup();
 		String filterName = req.getParameter("filter");
-		Filter vf = root.getFilter(filterName);
+		String hostFilter = req.getParameter("host");
+		Filter vf = null;
+		if(filterName != null && ! "".equals(filterName))
+		 vf = root.getFilter(filterName);
+		else if(hostFilter != null && ! "".equals(hostFilter))
+			vf = new jrds.FilterHost(hostFilter);
 
 		Map<String, String[]> parameters = new HashMap<String, String[]>();
 		parameters.putAll(req.getParameterMap());

@@ -23,6 +23,7 @@ overflow: scroll;
 }
 #graphs {padding-left: 325px}
 .graph {display: block}
+#hostSelect {float: right}
 --></style>
 <link href="lib/calendar-win2k-1.css" rel="stylesheet">
 			<script type="text/javascript" src="lib/ua.js"> </script>
@@ -66,8 +67,14 @@ function download_onClick()
 
 	<body bgcolor="#ffffff">
 	<div class="tree" >
-	<a href="index.jsp"><img src="img/back_to_album.gif" alt="" height="16" width="20" border="0"></a>
-<div ><table border=0><tr><td><font size=-2><a style="font-size:7pt;text-decoration:none;color:silver" href="http://www.treemenu.net/" target="_blank">JavaScript Tree Menu</a></font></td></tr></table></div>
+			<a href="index.jsp"><img id="toroot" src="img/back_to_album.gif" alt="" height="16" width="20" border="0"></a>
+			<form id="hostSelect" action="index.jsp" method="get" name="hostForm">
+				<input name="begin" type="hidden" value=""/>
+				<input name="end" type="hidden" value=""/>
+				<input name="scale" type="hidden" value=""/>
+				<label>Only host</label> <input type="text" name="host" size="24">
+			</form>
+			<div ><table border=0><tr><td><font size=-2><a style="font-size:7pt;text-decoration:none;color:silver" href="http://www.treemenu.net/" target="_blank">JavaScript Tree Menu</a></font></td></tr></table></div>
 <script type="text/javascript"><!--
 USETEXTLINKS = 1  
 HIGHLIGHT = 1
@@ -89,6 +96,7 @@ STARTALLOPEN = 0
 			<form  id="select" name="dateForm" action="index.jsp" method="GET">
 				<input name="id" type="hidden" value=""/>
 				<input name="filter" type="hidden" value=""/>
+				<input name="host" type="hidden" value=""/>
 				<div align="center">
 					<table border="0" cellspacing="2" cellpadding="0">
 						<tr>
@@ -115,8 +123,13 @@ STARTALLOPEN = 0
 	document.dateForm.end.value = "<jsp:getPropertyname="period" property="end" />"; 
 	document.dateForm.begin.value = "<jsp:getPropertyname="period" property="begin" />"; 
     document.dateForm.scale.selectedIndex = <jsp:getPropertyname="period" property="scale" />;
+	document.hostForm.end.value = "<jsp:getPropertyname="period" property="end" />"; 
+	document.hostForm.begin.value = "<jsp:getPropertyname="period" property="begin" />"; 
+    document.hostForm.scale.value = <jsp:getPropertyname="period" property="scale" />;
     document.dateForm.id.value = qs.get("id", 0);
-    document.dateForm.filter.value = qs.get("filter", 0);
+    document.dateForm.filter.value = qs.get("filter", "");
+   	document.dateForm.host.value = qs.get("host", "");
+   	document.hostForm.host.value = qs.get("host", "");
     beginCal = startCal("begin", "dateBeginTrigger");
     endCal = startCal("end", "dateEndTrigger");
  </script>
