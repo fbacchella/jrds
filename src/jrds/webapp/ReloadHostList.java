@@ -13,8 +13,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import jrds.*;
-import jrds.probe.SumProbe;
+
+import jrds.DescFactory;
+import jrds.PropertiesManager;
 
 import org.apache.log4j.Logger;
 
@@ -36,18 +37,13 @@ public class ReloadHostList extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse arg1)
 			throws ServletException, IOException {
 		jrds.HostsList.purge();
-		FilterXml.purge();
 		DescFactory.init();
 		if(pm.configdir != null)
 			DescFactory.scanProbeDir(new File(pm.configdir, "macro"));
 		if(pm.configdir != null)
 			DescFactory.scanProbeDir(new File(pm.configdir));
-
-		HostsList.getRootGroup().addHost(SumProbe.sumhost);
-
+		jrds.HostsList.getRootGroup().confLoaded();
 		logger.info("Configuration dir " + pm.configdir + " rescaned");
-		DescFactory.digester = null;
-		HostsList.getRootGroup().getMacroList().clear();
 		arg1.sendRedirect(req.getContextPath() + "/");
 	}
 }

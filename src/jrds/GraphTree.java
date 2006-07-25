@@ -72,7 +72,7 @@ public class GraphTree {
 		 return rootNode;
 	 }
 	 
-	public boolean getJavaScriptCode(Writer out, String queryString, String curNode, FilterXml f) throws IOException {
+	public boolean getJavaScriptCode(Writer out, String queryString, String curNode, Filter f) throws IOException {
 	
 		StringBuffer thisNode = new StringBuffer(1000);
 		thisNode.append(curNode + " = gFld('" + name + "', 'index.jsp?id=" + getPath().hashCode());
@@ -100,7 +100,7 @@ public class GraphTree {
 		for(Map.Entry<String, RdsGraph> e: graphsSet.entrySet()) {
 			RdsGraph currGraph = e.getValue();
 			String path = getPath() + "/" + currGraph.getName();
-			if(f == null || (f.acceptPath(path) && f.acceptTag(currGraph.getProbe().getTags()))) {
+			if(f == null || f.acceptGraph(currGraph, path)/*(f.acceptPath(path) && f.acceptTag(currGraph.getProbe().getTags()))*/) {
 				if(! first)
 					childsarray.append(",\n");
 				first = false;
@@ -212,7 +212,7 @@ public class GraphTree {
 		return graphsSet;
 	}
 	
-	public List<RdsGraph> enumerateChildsGraph(FilterXml v) {
+	public List<RdsGraph> enumerateChildsGraph(Filter v) {
 		List<RdsGraph> retValue  = new ArrayList<RdsGraph>();
 		if(graphsSet != null) {
 			if(v == null)
@@ -220,8 +220,9 @@ public class GraphTree {
 			else {
 				for(RdsGraph g: graphsSet.values()) {
 					String path = this.getPath() + "/" + g.getName();
-					if(v.acceptPath(path) && v.acceptTag(g.getProbe().getTags()))
+					if(v.acceptGraph(g, path))
 						retValue.add(g);
+					//if(v.acceptPath(path) && v.acceptTag(g.getProbe().getTags()))
 					
 				}
 			}

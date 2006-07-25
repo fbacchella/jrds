@@ -1,25 +1,22 @@
 package jrds;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.Rule;
-import org.apache.log4j.Logger;
 
-public class FilterXml {
-	static private final Logger logger = Logger.getLogger(FilterXml.class);
-
+/**
+ * This a a filter generated using an XML config file
+ * @author Fabrice Bacchella 
+ * @version $Revision: 302 $,  $Date: 2006-07-25 13:53:54 +0200 (Tue, 25 Jul 2006) $
+ */
+public class FilterXml extends Filter {
 	final Set<Pattern> goodPaths = new HashSet<Pattern>();
 	final Set<Pattern> tags = new HashSet<Pattern>();
 	String name;
 	
-	static final private Map<String, FilterXml> all = new HashMap<String, FilterXml>();
 	
 	public FilterXml() {
 	}
@@ -36,8 +33,8 @@ public class FilterXml {
 			tags.add(p);
 	}
 	
-	public boolean acceptGraph(RdsGraph graph) {
-		return acceptTag(graph.getProbe().getTags());
+	public boolean acceptGraph(RdsGraph graph, String path) {
+		return acceptPath(path) &&  acceptTag(graph.getProbe().getTags());
 	}
 
 	public boolean acceptPath(String path) {
@@ -78,39 +75,6 @@ public class FilterXml {
 		this.name = name;
 	}
 	
-	public static void add(FilterXml newFilter) {
-		all.put(newFilter.getName(), newFilter);
-		logger.debug("Filter " + newFilter.getName() + " added");
-	}
-	
-	public static FilterXml get(String name) {
-		return all.get(name);
-	}
-	
-	public static void purge() {
-		all.clear();
-	}
-	
-	public static boolean getJavaScriptCode(Writer out, String queryString, String curNode, FilterXml f) throws IOException {
-		out.append("foldersTree = gFld('All filters');");
-		out.append("foldersTree.addChildren([\n");
-		for(String filterName: all.keySet()) {
-			out.append("    [");
-			out.append("'" + filterName +"',");
-			out.append("'");
-			out.append("index.jsp?filter=");
-			out.append(filterName);
-			if(queryString != null &&  ! "".equals(queryString)) {
-				out.append("&");
-				out.append(queryString);
-			}
-			out.append("'],");
-		}
-		out.append("]);\n");
-		out.append("initializeDocument();");
-		return true;
-	}
-
 	public static void addToDigester(Digester digester) {
 		digester.register("-//jrds//DTD Filter//EN", digester.getClass().getResource("/filter.dtd").toString());
 		digester.addObjectCreate("filter", jrds.FilterXml.class);
@@ -119,8 +83,8 @@ public class FilterXml {
 		digester.addCallMethod("filter/tag", "addTag", 0);
 		digester.addRule("filter", new Rule() {
 			public void end(String namespace, String name) throws Exception {
-				FilterXml v = (FilterXml) digester.peek();
-				FilterXml.add(v);
+				Filter v = (Filter ) digester.peek();
+				HostsList.getRootGroup().addFilter(v);
 			}
 		});
 	}

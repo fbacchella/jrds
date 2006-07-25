@@ -56,8 +56,8 @@ public class DescFactory {
 
 	public static void init() {
 		digester = new Digester();
-		addProbeDigester(digester);
-		addGraphDigester(digester);
+		addProbeDescDigester(digester);
+		addGraphDescDigester(digester);
 		FilterXml.addToDigester(digester);
 		HostConfigParser.addDigester(digester);
 		SumProbe.addDigester(digester);
@@ -127,7 +127,7 @@ public class DescFactory {
 			aStartingDir.listFiles(filter);
 	}
 
-	private static void addProbeDigester(Digester digester) {
+	private static void addProbeDescDigester(Digester digester) {
 		digester.register("-//jrds//DTD Probe Description//EN", digester.getClass().getResource("/probedesc.dtd").toString());
 		digester.addObjectCreate("probedesc", jrds.ProbeDesc.class);
 		digester.addRule("probedesc", new Rule() {
@@ -199,7 +199,7 @@ public class DescFactory {
 
 	}
 
-	private static void addGraphDigester(Digester digester) {
+	private static void addGraphDescDigester(Digester digester) {
 		digester.register("-//jrds//DTD Graph Description//EN", digester.getClass().getResource("/graphdesc.dtd").toString());
 		digester.setValidating(false);
 		digester.addObjectCreate("graphdesc", jrds.GraphDesc.class);

@@ -11,31 +11,19 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.graphe.Sum;
 
 import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.Rule;
-import org.apache.log4j.Logger;
 import org.xml.sax.Attributes;
 
 public class SumProbe extends VirtualProbe {
-	static private final Logger logger = Logger.getLogger(SumProbe.class);
 	static final ProbeDesc pd = new ProbeDesc(0);
 	static {
 		pd.setGraphClasses(new Object[] {Sum.class});
 	}
-	public static final RdsHost sumhost =  new RdsHost("SumHost") {
-		@Override
-		protected void finalize() throws Throwable {
-			logger.debug("Sum host destroyed");
-			super.finalize();
-		}
-		
-	};
-
 	private String graphName;
 	Collection graphList;
 
@@ -73,9 +61,7 @@ public class SumProbe extends VirtualProbe {
 			public void end(String namespace, String name) throws Exception {
 				List l = (List) digester.pop();
 				String sumName = (String) digester.pop();
-				Probe newRdsRrd = new SumProbe(sumhost, sumName, l);
-				sumhost.addProbe(newRdsRrd);
-				logger.debug("adding sum " + newRdsRrd );
+				jrds.HostsList.getRootGroup().addSum(sumName, l);
 			}
 		});
 		digester.addRule("sum/element/", new Rule() {

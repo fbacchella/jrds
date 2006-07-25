@@ -10,7 +10,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import jrds.probe.SumProbe;
 import jrds.snmp.SnmpRequester;
 
 import org.apache.log4j.Level;
@@ -68,10 +67,7 @@ public class StartListener implements ServletContextListener {
 				if(pm.configdir != null)
 					DescFactory.scanProbeDir(new File(pm.configdir));
 
-				HostsList.getRootGroup().addHost(SumProbe.sumhost);
-
-				DescFactory.digester = null;
-				HostsList.getRootGroup().getMacroList().clear();
+				HostsList.getRootGroup().confLoaded();
 
 				TimerTask collector = new TimerTask () {
 					public void run() {

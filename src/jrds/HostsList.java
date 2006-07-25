@@ -6,37 +6,53 @@ _##########################################################################*/
 
 package jrds;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import jrds.probe.SumProbe;
+
 import org.apache.log4j.Logger;
 
 /**
- * The classe used to store all the host to manage
+ * The central repository of all informations : hosts, graph, and everything else
  * @author Fabrice Bacchella 
  * @version $Revision$,  $Date$
  */
 public class HostsList {
 	static Logger logger = Logger.getLogger(HostsList.class);
-	private Collection<RdsHost> hostList;
 	private static HostsList instance;
-	private Map<Integer, RdsGraph> graphMap;
-	private Map<Integer, Probe> probeMap;
-	private static final String hostRoot = "Sorted by host";
-	private static final String viewRoot = "Sorted by view";
-	private Map<String, Macro> macroList = new HashMap<String, Macro>();
-	private Map<String, GraphTree> treeMap = null;
-	public StartersSet starters = new StartersSet();
+
+	private static final String HOSTROOT = "Sorted by host";
+	private static final String VIEWROOT = "Sorted by view";
+
+	//This list is never purged
+	private final static StartersSet starters = new StartersSet();
+
+	private final Set<RdsHost> hostList = new HashSet<RdsHost>();
+	private final Map<Integer, RdsGraph> graphMap = new HashMap<Integer, RdsGraph>();
+	private final Map<Integer, Probe> probeMap= new HashMap<Integer, Probe>();
+	private final Map<String, Macro> macroList = new HashMap<String, Macro>();
+	private final Map<String, GraphTree> treeMap = new HashMap<String, GraphTree>(2);
+	private final Map<String, Filter> filters = new HashMap<String, Filter>();
+	private final RdsHost sumhost =  new RdsHost("SumHost") {
+		@Override
+		protected void finalize() throws Throwable {
+			logger.debug("Sum host destroyed");
+			super.finalize();
+		}
+		
+	};
 
 	/**
 	 *  
@@ -46,18 +62,23 @@ public class HostsList {
 	}
 
 	private void init() {
-		treeMap = new HashMap<String, GraphTree>(2);
-		addRoot(hostRoot);
-		addRoot(viewRoot);
-		graphMap = new HashMap<Integer, RdsGraph>();
-		probeMap = new HashMap<Integer, Probe>();
-		hostList = new HashSet<RdsHost>();
+		addRoot(HOSTROOT);
+		addRoot(VIEWROOT);
 	}
 	
 	public static HostsList getRootGroup() {
 		if (instance == null)
 			instance = new HostsList();
 		return instance;
+	}
+	
+	/**
+	 * Must be called after a new configuration has been loaded
+	 */
+	public void confLoaded() {
+		instance.addHost(sumhost);
+		macroList.clear();
+		DescFactory.digester = null;
 	}
 	
 	public Iterator iterator() {
@@ -68,11 +89,6 @@ public class HostsList {
 		instance = new HostsList();
 	}
 	
-	public static HostsList fill(File newHostCfgFile) {
-		instance = new HostsList();
-		return instance;
-	}
-
 	public void append(Collection newHostList) {
 		for (Iterator i = newHostList.iterator(); i.hasNext();) {
 			addHost((RdsHost) i.next());
@@ -94,8 +110,7 @@ public class HostsList {
 	
 	public void addHost(RdsHost newhost) {
 		hostList.add(newhost);
-		for (Iterator j = newhost.getProbes().iterator(); j.hasNext();) {
-			Probe currProbe = (Probe) j.next();
+		for(Probe currProbe: newhost.getProbes()) {
 			probeMap.put(currProbe.hashCode(), currProbe);
 			if (currProbe.getGraphList() != null) {
 				String rootTree = currProbe.getTree();
@@ -152,11 +167,11 @@ public class HostsList {
 	}
 
 	public GraphTree getGraphTreeByHost() {
-		return treeMap.get(hostRoot);
+		return treeMap.get(HOSTROOT);
 	}
 
 	public GraphTree getGraphTreeByView() {
-		return treeMap.get(viewRoot);
+		return treeMap.get(VIEWROOT);
 	}
 
 	/**
@@ -201,14 +216,31 @@ public class HostsList {
 		return macroList;
 	}
 
-	/**
-	 * @param macroList
-	 */
-	public void setMacroList(Map<String, Macro> macroList) {
-		this.macroList = macroList;
-	}
-	
 	public void addStarter(Starter s) {
 		starters.register(s);
 	}
+	
+	public StartersSet getStarters() {
+		return starters;
+	}
+	
+	public void addFilter(Filter newFilter) {
+		filters.put(newFilter.getName(), newFilter);
+		logger.debug("Filter " + newFilter.getName() + " added");
+	}
+	
+	public Filter getFilter(String name) {
+		return filters.get(name);
+	}
+	
+	public Collection<String> getAllFiltersNames() {
+		return filters.keySet();
+	}
+
+	public void addSum(String sumName, List l) {
+		SumProbe sum = new SumProbe(sumhost, sumName, l);
+		sumhost.addProbe(sum);
+		logger.debug("adding sum " + sumName);
+	}
+
 }

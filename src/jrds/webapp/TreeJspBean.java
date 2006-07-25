@@ -8,7 +8,9 @@ package jrds.webapp;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.URLDecoder;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -20,7 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 
-import jrds.FilterXml;
+import jrds.Filter;
 import jrds.GraphTree;
 import jrds.HostsList;
 import jrds.RdsGraph;
@@ -81,8 +83,9 @@ public class TreeJspBean {
 
 	@SuppressWarnings("unchecked")
 	public void getJavascriptTree(JspWriter out, HttpServletRequest req, PeriodBean period) throws JspException {
+		HostsList  root = HostsList.getRootGroup();
 		String filterName = req.getParameter("filter");
-		FilterXml vf = FilterXml.get(filterName);
+		Filter vf = root.getFilter(filterName);
 
 		Map<String, String[]> parameters = new HashMap<String, String[]>();
 		parameters.putAll(req.getParameterMap());
@@ -103,7 +106,6 @@ public class TreeJspBean {
 
 		try {
 			if(vf != null) {
-				HostsList  root = HostsList.getRootGroup();
 				boolean noHostTree = root.getGraphTreeByHost().getJavaScriptCode(out, parambuff.toString(), "hostTree", vf);
 				boolean noViewTree = root.getGraphTreeByView().getJavaScriptCode(out, parambuff.toString(), "viewTree", vf);
 				if( ! (noHostTree || noViewTree))
@@ -116,22 +118,43 @@ public class TreeJspBean {
 					out.println("initializeDocument();");
 			}
 			else
-				FilterXml.getJavaScriptCode(out, parambuff.toString(), "", null);
+				getAllFilterJavascript(out, parambuff.toString(), root.getAllFiltersNames());
 		} catch (IOException e) {
 			throw new JspException(e.getMessage());
 		}
 	}
 
+	public static boolean getAllFilterJavascript(Writer out, String queryString, Collection<String> allFilters) throws IOException {
+		out.append("foldersTree = gFld('All filters');");
+		out.append("foldersTree.addChildren([\n");
+		for(String filterName: allFilters) {
+			out.append("    [");
+			out.append("'" + filterName +"',");
+			out.append("'");
+			out.append("index.jsp?filter=");
+			out.append(filterName);
+			if(queryString != null &&  ! "".equals(queryString)) {
+				out.append("&");
+				out.append(queryString);
+			}
+			out.append("'],");
+		}
+		out.append("]);\n");
+		out.append("initializeDocument();");
+		return true;
+	}
+
 	public void getGraphList(JspWriter out, HttpServletRequest req, PeriodBean period) {
+		HostsList  root = HostsList.getRootGroup();
 		String idS = req.getParameter("id");
 		String filterName = req.getParameter("filter");
-		FilterXml vf = FilterXml.get(filterName);
+		Filter vf = root.getFilter(filterName);
 		GraphTree node = null;
 		int id = 0;
 		if(idS != null) {
 			try {
 				id = Integer.parseInt(idS);
-				node = HostsList.getRootGroup().getNodeById(id);
+				node = root.getNodeById(id);
 			} catch (Throwable e) {
 				logger.error("bad argument " + idS);
 			}

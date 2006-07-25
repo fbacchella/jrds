@@ -14,7 +14,6 @@ import jrds.GraphTree;
 import jrds.HostsList;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
-import jrds.probe.SumProbe;
 
 import org.apache.log4j.Logger;
 
@@ -53,14 +52,14 @@ public class Grapher {
 		System.getProperties().setProperty("org.apache.commons.logging.Log","org.apache.commons.logging.impl.SimpleLog");
 		Logger.getLogger("org.apache.commons.digester").setLevel(Level.DEBUG);
 		logger.info("jrds' grapher started");*/
-		HostsList.getRootGroup().addHost(SumProbe.sumhost);
+		HostsList.getRootGroup().confLoaded();
 		Date end = new Date();
 		Date begin = new Date(end.getTime() - 86400 * 1000);
 		GraphTree graphTree = HostsList.getRootGroup().getGraphTreeByHost();
 		for(jrds.RdsGraph g: graphTree.enumerateChildsGraph(null/*ViewFilter.get("fdggfdl385"))*/)) {
 			logger.debug("Found graph for probe " + g.getProbe());
 			Date start = new Date();
-			//g.graph(begin, end);
+			g.graph(begin, end);
 			Date finish = new Date();
 			long duration = finish.getTime() - start.getTime();
 			logger.info("Graph " + g.getQualifieName() + " renderding  ran for " + duration + "ms");							
