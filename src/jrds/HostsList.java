@@ -12,9 +12,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -33,8 +35,9 @@ public class HostsList {
 	static Logger logger = Logger.getLogger(HostsList.class);
 	private static HostsList instance;
 
-	private static final String HOSTROOT = "Sorted by host";
-	private static final String VIEWROOT = "Sorted by view";
+	public static final String HOSTROOT = "Sorted by host";
+	public static final String VIEWROOT = "Sorted by view";
+	public static final String SUMROOT = "Sums";
 
 	//This list is never purged
 	private final static StartersSet starters = new StartersSet();
@@ -43,16 +46,9 @@ public class HostsList {
 	private final Map<Integer, RdsGraph> graphMap = new HashMap<Integer, RdsGraph>();
 	private final Map<Integer, Probe> probeMap= new HashMap<Integer, Probe>();
 	private final Map<String, Macro> macroList = new HashMap<String, Macro>();
-	private final Map<String, GraphTree> treeMap = new HashMap<String, GraphTree>(2);
-	private final Map<String, Filter> filters = new HashMap<String, Filter>();
-	private final RdsHost sumhost =  new RdsHost("SumHost") {
-		@Override
-		protected void finalize() throws Throwable {
-			logger.debug("Sum host destroyed");
-			super.finalize();
-		}
-		
-	};
+	private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
+	private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
+	private final RdsHost sumhost =  new RdsHost("SumHost");
 
 	/**
 	 *  
@@ -64,6 +60,11 @@ public class HostsList {
 	private void init() {
 		addRoot(HOSTROOT);
 		addRoot(VIEWROOT);
+		addRoot(SUMROOT);
+		filters.put(Filter.SUM.getName(), Filter.SUM);
+		filters.put(Filter.EVERYTHING.getName(), Filter.EVERYTHING);
+		filters.put(Filter.ALLHOSTS.getName(), Filter.ALLHOSTS);
+		filters.put(Filter.ALLVIEWS.getName(), Filter.ALLVIEWS);
 	}
 	
 	public static HostsList getRootGroup() {
@@ -76,13 +77,13 @@ public class HostsList {
 	 * Must be called after a new configuration has been loaded
 	 */
 	public void confLoaded() {
-		instance.addHost(sumhost);
 		macroList.clear();
 		DescFactory.digester = null;
 	}
 	
-	public Iterator iterator() {
-		return hostList.iterator();
+	public Collection<RdsHost> getHosts() {
+		return hostList;
+		
 	}
 	
 	public static void purge() {
@@ -102,12 +103,6 @@ public class HostsList {
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
-	private void addGraph(String root, RdsGraph graph) {
-		getGraphTreeByHost().addGraphByPath(graph.getTreePathByHost(), graph);
-		getGraphTreeByView().addGraphByPath(graph.getTreePathByView(), graph);
-	}
-	
 	public void addHost(RdsHost newhost) {
 		hostList.add(newhost);
 		for(Probe currProbe: newhost.getProbes()) {
@@ -117,7 +112,8 @@ public class HostsList {
 				if(rootTree != null)
 					addRoot(rootTree);
 				for(RdsGraph currGraph: currProbe.getGraphList()) {
-					addGraph(rootTree, currGraph);
+					getGraphTreeByHost().addGraphByPath(currGraph.getTreePathByHost(), currGraph);
+					getGraphTreeByView().addGraphByPath(currGraph.getTreePathByView(), currGraph);
 					graphMap.put(currGraph.hashCode(), currGraph);
 				}
 			}
@@ -164,6 +160,10 @@ public class HostsList {
 			logger.debug("Do all graph for host " + oneHost.getName());
 			oneHost.graphAll(startDate, endDate);
 		}
+	}
+	
+	public Collection<GraphTree> getGraphsRoot() {
+		return treeMap.values();
 	}
 
 	public GraphTree getGraphTreeByHost() {
@@ -230,7 +230,10 @@ public class HostsList {
 	}
 	
 	public Filter getFilter(String name) {
-		return filters.get(name);
+		Filter retValue = null;
+		if(name != null)
+			retValue = filters.get(name);
+		return retValue;
 	}
 	
 	public Collection<String> getAllFiltersNames() {
@@ -239,7 +242,10 @@ public class HostsList {
 
 	public void addSum(String sumName, List l) {
 		SumProbe sum = new SumProbe(sumhost, sumName, l);
-		sumhost.addProbe(sum);
+		for(RdsGraph currGraph: sum.getGraphList()) {
+			treeMap.get(SUMROOT).addGraphByPath(currGraph.getTreePathByHost(), currGraph);
+			graphMap.put(currGraph.hashCode(), currGraph);
+		}
 		logger.debug("adding sum " + sumName);
 	}
 

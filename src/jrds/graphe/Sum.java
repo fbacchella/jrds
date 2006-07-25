@@ -27,8 +27,8 @@ public class Sum extends RdsGraph {
 	static {
 		gd.setGraphName("Sum");
 		gd.setGraphTitle("Sum");
-		gd.setHostTree(new Object[] {GraphDesc.HOST, GraphDesc.TITLE});
-		gd.setViewTree(new Object[] {GraphDesc.SERVICES,  "Sum", GraphDesc.TITLE});
+		gd.setHostTree(new Object[] {GraphDesc.TITLE});
+		gd.setViewTree(new Object[] {});
 	}
 
 	/*Does not change during the short life of this object*/

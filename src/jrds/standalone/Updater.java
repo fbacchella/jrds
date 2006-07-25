@@ -2,7 +2,6 @@ package jrds.standalone;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -64,8 +63,7 @@ public class Updater {
 
 		ExecutorService tpool =  Executors.newFixedThreadPool(3);
 
-		for(Iterator i = hl.iterator(); i.hasNext();) {
-			RdsHost host =(RdsHost) i.next();
+		for(RdsHost host: hl.getHosts()) {
 			for(final Probe p: host.getProbes()) {
 				final Runnable runUpgrade = new Runnable() {
 					private Probe lp = p;

@@ -91,11 +91,11 @@ implements Comparable {
 		return probe;
 	}
 	
-	public LinkedList getTreePathByHost() {
+	public LinkedList<String> getTreePathByHost() {
 		return gd.getHostTree(this);
 	}
 	
-	public LinkedList getTreePathByView() {
+	public LinkedList<String> getTreePathByView() {
 		return gd.getViewTree(this);
 	}
 	

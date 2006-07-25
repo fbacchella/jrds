@@ -638,11 +638,11 @@ implements Cloneable {
 	/**
 	 * @return Returns the viewTree.
 	 */
-	public LinkedList getViewTree(RdsGraph graph) {
-		LinkedList<Object> tree = new LinkedList<Object>();
+	public LinkedList<String> getViewTree(RdsGraph graph) {
+		LinkedList<String> tree = new LinkedList<String>();
 		for (Object o: viewTree) {
 			if (o instanceof String)
-				tree.add(o);
+				tree.add((String)o);
 			else if (o instanceof PathElement)
 				tree.add( ( (PathElement) o).resolve(graph));
 		}
@@ -666,11 +666,11 @@ implements Cloneable {
 	/**
 	 * @return Returns the hostTree.
 	 */
-	public LinkedList getHostTree(RdsGraph graph) {
-		LinkedList<Object> tree = new LinkedList<Object>();
+	public LinkedList<String> getHostTree(RdsGraph graph) {
+		LinkedList<String> tree = new LinkedList<String>();
 		for (Object o: hostTree) {
 			if (o instanceof String)
-				tree.add(o);
+				tree.add((String)o);
 			else if (o instanceof PathElement)
 				tree.add( ( (PathElement) o).resolve(graph));
 		}

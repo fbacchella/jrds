@@ -106,7 +106,25 @@ public class TreeJspBean {
 
 		try {
 			if(vf != null) {
-				boolean noHostTree = root.getGraphTreeByHost().getJavaScriptCode(out, parambuff.toString(), "hostTree", vf);
+				int graphed = 0;
+				for(GraphTree tree: root.getGraphsRoot()) {
+					if(! tree.getJavaScriptCode(out, parambuff.toString(), "tree" + graphed, vf)) {
+						graphed++;
+					}
+				}
+				if(graphed == 1)
+					out.println("foldersTree = tree0;");
+				else if(graphed > 1) {
+					out.println("foldersTree = gFld(\"<i>Graph List</i>\")");
+					out.print("foldersTree.addChildren([\n\ttree0");
+					for(int i = 1; i < graphed ; i++)
+						out.print(",\n\ttree" + i);
+						//	"foldersTree.addChildren([hostTree, viewTree]);");
+					out.println("\n]);");
+				}
+				if(graphed > 0)
+					out.println("initializeDocument();");
+				/*boolean noHostTree = root.getGraphTreeByHost().getJavaScriptCode(out, parambuff.toString(), "hostTree", vf);
 				boolean noViewTree = root.getGraphTreeByView().getJavaScriptCode(out, parambuff.toString(), "viewTree", vf);
 				if( ! (noHostTree || noViewTree))
 					out.println("foldersTree = gFld(\"<i>Graph List</i>\");\nfoldersTree.addChildren([hostTree, viewTree]);");
@@ -115,7 +133,7 @@ public class TreeJspBean {
 				else if( noHostTree)
 					out.println("foldersTree = viewTree;");
 				if( !(noHostTree && noViewTree) )
-					out.println("initializeDocument();");
+					out.println("initializeDocument();");*/
 			}
 			else
 				getAllFilterJavascript(out, parambuff.toString(), root.getAllFiltersNames());
