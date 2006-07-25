@@ -25,9 +25,9 @@ public class SumProbe extends VirtualProbe {
 		pd.setGraphClasses(new Object[] {Sum.class});
 	}
 	private String graphName;
-	Collection graphList;
+	Collection<String> graphList;
 
-	public SumProbe(RdsHost thehost, String name, Collection graphList) {
+	public SumProbe(RdsHost thehost, String name, Collection<String> graphList) {
 		super(thehost, pd);
 		this.setName(name);
 		this.graphList = graphList;
@@ -36,7 +36,7 @@ public class SumProbe extends VirtualProbe {
 	/**
 	 * @return Returns the probeList.
 	 */
-	public Collection getProbeList() {
+	public Collection<String> getProbeList() {
 		return graphList;
 	}
 
@@ -58,8 +58,9 @@ public class SumProbe extends VirtualProbe {
 				digester.push(sumName);
 				digester.push(new ArrayList());
 			}
+			@SuppressWarnings("unchecked")
 			public void end(String namespace, String name) throws Exception {
-				List l = (List) digester.pop();
+				List<String> l = (List<String>) digester.pop();
 				String sumName = (String) digester.pop();
 				jrds.HostsList.getRootGroup().addSum(sumName, l);
 			}

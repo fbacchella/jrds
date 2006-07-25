@@ -3,7 +3,6 @@ package jrds.graphe;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import jrds.GraphDesc;
@@ -46,8 +45,7 @@ public class Sum extends RdsGraph {
 		double[][] allvalues = null;
 		GraphDesc tempgd = null;
 		FetchData fd = null;
-		for(Iterator i = p.getProbeList().iterator() ; i.hasNext() ;) {
-			String name = (String)i.next();
+		for(String name : p.getProbeList()) {
 			RdsGraph g = hl.getGraphById(name.hashCode());
 			if(g != null) {
 				tempgd = g.getGraphDesc();

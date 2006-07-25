@@ -240,7 +240,7 @@ public class HostsList {
 		return filters.keySet();
 	}
 
-	public void addSum(String sumName, List l) {
+	public void addSum(String sumName, List<String> l) {
 		SumProbe sum = new SumProbe(sumhost, sumName, l);
 		for(RdsGraph currGraph: sum.getGraphList()) {
 			treeMap.get(SUMROOT).addGraphByPath(currGraph.getTreePathByHost(), currGraph);
