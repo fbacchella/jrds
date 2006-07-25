@@ -54,7 +54,7 @@ public class RstatProbe4 extends Probe {
 	 * @see jrds.Probe#getNewSampleValues()
 	 */
 	public Map getNewSampleValues() {
-		Map retValue = new HashMap();
+		Map<String,Double> retValue = new HashMap<String,Double>(7);
 		 try {
 		 	rstatClient c = new rstatClient(InetAddress.getByName(getHost().getName()), OncRpcProtocols.ONCRPC_UDP);
 		     statsvar sv = c.RSTATPROC_STATS_4();

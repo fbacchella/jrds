@@ -14,7 +14,6 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.snmp.SnmpRequester;
 
-import org.apache.log4j.Logger;
 import org.snmp4j.smi.OID;
 
 
@@ -23,7 +22,6 @@ import org.snmp4j.smi.OID;
  * @version $Revision$,  $Date$
  */
 public class ProcessStatusSolaris extends RdsSnmpSimple {
-	static final private Logger logger = Logger.getLogger(ProcessStatusSolaris.class);
 	static final private OID psProcessState = new OID(".1.3.6.1.4.1.42.3.12.1.5");
 	static final private String RUNNABLE="R";
 	static final private String STOPPED="T";

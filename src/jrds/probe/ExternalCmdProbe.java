@@ -58,9 +58,9 @@ public abstract class ExternalCmdProbe extends Probe {
 			if(perfstring != null)
 				oneSample.set(perfstring);
 		} catch (IOException e) {
-			logger.warn("external command failed : " + e.getLocalizedMessage());
+			logger.warn("external command failed : " + e);
 		} catch (RrdException e) {
-			logger.warn("unable to store result for probe " + this.getName() + ": " + e.getLocalizedMessage());
+			logger.warn("unable to store result for probe " + this.getName() + ": " + e);
 		}
 		try {
 			if(urlperfps != null) {

@@ -58,7 +58,7 @@ public class DescFactory {
 		digester = new Digester();
 		addProbeDigester(digester);
 		addGraphDigester(digester);
-		Filter.addToDigester(digester);
+		FilterXml.addToDigester(digester);
 		HostConfigParser.addDigester(digester);
 		SumProbe.addDigester(digester);
 		Macro.addToDigester(digester);
@@ -157,18 +157,21 @@ public class DescFactory {
 		digester.addObjectCreate("probedesc/ds", HashMap.class);
 		digester.addSetNext("probedesc/ds", "add");
 		digester.addRule("probedesc/ds/dsName", new Rule() {
+			@SuppressWarnings("unchecked")
 			public void body(java.lang.String namespace, java.lang.String name, java.lang.String text) {
 				Map m  = (Map) digester.peek();
 				m.put("dsName", text);
 			}
 		});
 		digester.addRule("probedesc/ds/dsType", new Rule() {
+			@SuppressWarnings("unchecked")
 			public void body(String namespace, String name, String text) throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
 				Map m  = (Map) digester.peek();
 				m.put("dsType", ProbeDesc.class.getField(text.trim().toUpperCase()).get(null));
 			}
 		});
 		digester.addRule("probedesc/ds/oid", new Rule() {
+			@SuppressWarnings("unchecked")
 			public void body (String namespace, String name, String text) {
 				Map m  = (Map) digester.peek();
 				m.put("index", new OID(text.trim()));
@@ -226,15 +229,17 @@ public class DescFactory {
 		digester.addObjectCreate("graphdesc/viewtree", java.util.ArrayList.class);
 		digester.addSetNext("graphdesc/viewtree", "setViewTree");
 		digester.addRule("*/pathelement", new Rule() {
+			@SuppressWarnings("unchecked")
 			public void body (String namespace, String name, String text) {
-				List<Object> tree = (List<Object>) getDigester().peek();
+				List tree = (List) getDigester().peek();
 				tree.add(GraphDesc.resolvPathElement(text));
 			}	
 		}
 		);
 		digester.addRule("*/pathstring", new Rule() {
+			@SuppressWarnings("unchecked")
 			public void body (String namespace, String name, String text) {
-				List<Object> tree = (List<Object>) getDigester().peek();
+				List tree = (List) getDigester().peek();
 				tree.add(text);
 			}	
 		}

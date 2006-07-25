@@ -9,8 +9,6 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.graphe.PagingSolarisMuninsGraph;
 
-import org.apache.log4j.Logger;
-
 
 /**
  * @author bacchell
@@ -18,8 +16,6 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public class PagingSolarisMunins extends MuninsProbe {
-	static private final Logger logger = Logger.getLogger(PagingSolarisMunins.class);
-
 	static final private ProbeDesc pd = new ProbeDesc(1);
 	static {
 		pd.add("pgin", ProbeDesc.COUNTER, "pgin.value");

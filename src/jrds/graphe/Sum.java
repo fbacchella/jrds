@@ -75,7 +75,7 @@ public class Sum extends RdsGraph {
 				logger.error("Graph not found: " + name);
 			}
 		}
-		Map ownValues = new HashMap(allvalues.length);
+		Map<String,Plottable> ownValues = new HashMap<String,Plottable>(allvalues.length);
 		long[] ts = fd.getTimestamps();
 		String[] dsNames = fd.getDsNames();
 		for(int i= 0; i < fd.getColumnCount(); i++) {

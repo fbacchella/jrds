@@ -27,7 +27,7 @@ public final class HttpResponseTimeRrd extends ExternalCmdProbe implements UrlPr
 	static final private Logger logger = Logger.getLogger(HttpResponseTimeRrd.class);
 	private URL url;
 	static MessageDigest md5digest;
-	static jrds.PropertiesManager pm = jrds.PropertiesManager.getInstance();
+	static final jrds.PropertiesManager pm = jrds.PropertiesManager.getInstance();
 	static {
 		try {
 			md5digest = java.security.MessageDigest.getInstance("MD5");

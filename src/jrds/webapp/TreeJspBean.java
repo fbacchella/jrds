@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 
-import jrds.Filter;
+import jrds.FilterXml;
 import jrds.GraphTree;
 import jrds.HostsList;
 import jrds.RdsGraph;
@@ -82,7 +82,7 @@ public class TreeJspBean {
 	@SuppressWarnings("unchecked")
 	public void getJavascriptTree(JspWriter out, HttpServletRequest req, PeriodBean period) throws JspException {
 		String filterName = req.getParameter("filter");
-		Filter vf = Filter.get(filterName);
+		FilterXml vf = FilterXml.get(filterName);
 
 		Map<String, String[]> parameters = new HashMap<String, String[]>();
 		parameters.putAll(req.getParameterMap());
@@ -116,7 +116,7 @@ public class TreeJspBean {
 					out.println("initializeDocument();");
 			}
 			else
-				Filter.getJavaScriptCode(out, parambuff.toString(), "", null);
+				FilterXml.getJavaScriptCode(out, parambuff.toString(), "", null);
 		} catch (IOException e) {
 			throw new JspException(e.getMessage());
 		}
@@ -125,7 +125,7 @@ public class TreeJspBean {
 	public void getGraphList(JspWriter out, HttpServletRequest req, PeriodBean period) {
 		String idS = req.getParameter("id");
 		String filterName = req.getParameter("filter");
-		Filter vf = Filter.get(filterName);
+		FilterXml vf = FilterXml.get(filterName);
 		GraphTree node = null;
 		int id = 0;
 		if(idS != null) {

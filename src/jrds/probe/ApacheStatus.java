@@ -9,7 +9,6 @@ package jrds.probe;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -53,12 +52,11 @@ public class ApacheStatus extends HttpProbe implements UrlProbe {
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.HttpProbe#parseLines(java.util.List)
 	 */
-	protected Map parseLines(List lines) {
-		Map retValue = new HashMap(lines.size());
-		for(Iterator i = lines.iterator(); i.hasNext() ;) {
-			String[] kvp = ((String) i.next()).split(": ");
+	protected Map parseLines(List<String> lines) {
+		Map<String, Double> retValue = new HashMap<String, Double>(lines.size());
+		for(String l: lines) {
+			String[] kvp = l.split(": ");
 			try {
-				Double value = new Double(kvp[1]);
 				retValue.put(kvp[0], Double.valueOf(kvp[1]));
 			}
 			catch (java.lang.NumberFormatException ex) {};

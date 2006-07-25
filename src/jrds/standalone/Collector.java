@@ -12,9 +12,7 @@ import jrds.DescFactory;
 import jrds.HostsList;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
-import jrds.snmp.SnmpRequester;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 

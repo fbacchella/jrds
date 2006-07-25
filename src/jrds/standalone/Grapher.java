@@ -14,7 +14,6 @@ import jrds.GraphTree;
 import jrds.HostsList;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
-import jrds.Filter;
 import jrds.probe.SumProbe;
 
 import org.apache.log4j.Logger;

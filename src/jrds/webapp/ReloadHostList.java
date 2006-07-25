@@ -36,7 +36,7 @@ public class ReloadHostList extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse arg1)
 			throws ServletException, IOException {
 		jrds.HostsList.purge();
-		Filter.purge();
+		FilterXml.purge();
 		DescFactory.init();
 		if(pm.configdir != null)
 			DescFactory.scanProbeDir(new File(pm.configdir, "macro"));

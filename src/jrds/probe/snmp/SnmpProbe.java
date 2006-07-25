@@ -18,7 +18,6 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.snmp.SnmpRequester;
 
-import org.apache.log4j.Logger;
 import org.snmp4j.Target;
 import org.snmp4j.smi.OID;
 
@@ -30,7 +29,6 @@ import org.snmp4j.smi.OID;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public abstract class SnmpProbe extends Probe {
-	static final private Logger logger = Logger.getLogger(SnmpProbe.class);
 	private Target snmpTarget;
 	private Map nameMap = null;
 	private SnmpRequester requester;
@@ -82,14 +80,14 @@ public abstract class SnmpProbe extends Probe {
 	 * @return a Map of all the identified vars
 	 */
 	public Map filterValues(Map snmpVars) {
-		Map retValue = new HashMap (snmpVars.size());
+		Map<OID, Number> retValue = new HashMap<OID, Number>(snmpVars.size());
 		for(Iterator i = snmpVars.entrySet().iterator(); i.hasNext();) {
 			Map.Entry e = (Map.Entry) i.next();
 			OID oid = (OID) e.getKey();
 			oid.removeLast();
 			Object o = e.getValue();
 			if( o instanceof Number) {
-				retValue.put(oid, o);
+				retValue.put(oid, (Number)o);
 			}
 			if( o instanceof Date) {
 				Date value = (Date) o;

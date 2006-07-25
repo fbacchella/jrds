@@ -72,7 +72,7 @@ public class GraphTree {
 		 return rootNode;
 	 }
 	 
-	public boolean getJavaScriptCode(Writer out, String queryString, String curNode, Filter f) throws IOException {
+	public boolean getJavaScriptCode(Writer out, String queryString, String curNode, FilterXml f) throws IOException {
 	
 		StringBuffer thisNode = new StringBuffer(1000);
 		thisNode.append(curNode + " = gFld('" + name + "', 'index.jsp?id=" + getPath().hashCode());
@@ -212,7 +212,7 @@ public class GraphTree {
 		return graphsSet;
 	}
 	
-	public List<RdsGraph> enumerateChildsGraph(Filter v) {
+	public List<RdsGraph> enumerateChildsGraph(FilterXml v) {
 		List<RdsGraph> retValue  = new ArrayList<RdsGraph>();
 		if(graphsSet != null) {
 			if(v == null)

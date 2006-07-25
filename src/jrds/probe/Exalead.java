@@ -48,7 +48,7 @@ public abstract class Exalead extends Probe {
 	 */
 	public Map getNewSampleValues() {
 		
-		Map retValue = new HashMap();
+		Map<String, Number> retValue = new HashMap<String, Number>();
 		String read = getExaStatus(port);
 		Matcher result = filter.matcher(read);
 		while(result.find()) {

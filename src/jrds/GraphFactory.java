@@ -157,15 +157,17 @@ public class GraphFactory {
 		digester.addObjectCreate("graphdesc/viewtree", java.util.ArrayList.class);
 		digester.addSetNext("graphdesc/viewtree", "setViewTree");
 		digester.addRule("*/pathelement", new Rule() {
+			@SuppressWarnings("unchecked")
 			public void body (String namespace, String name, String text) {
-				List<Object> tree = (List<Object>) getDigester().peek();
+				List tree = (List) getDigester().peek();
 				tree.add(GraphDesc.resolvPathElement(text));
 			}	
 		}
 		);
 		digester.addRule("*/pathstring", new Rule() {
+			@SuppressWarnings("unchecked")
 			public void body (String namespace, String name, String text) {
-				List<Object> tree = (List<Object>) getDigester().peek();
+				List tree = (List) getDigester().peek();
 				tree.add(text);
 			}	
 		}

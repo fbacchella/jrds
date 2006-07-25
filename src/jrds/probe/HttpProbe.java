@@ -32,7 +32,7 @@ public abstract class HttpProbe extends Probe  implements IndexedProbe {
 		this.url = url;
 	}
 	
-	protected abstract Map parseLines(List lines);
+	protected abstract Map parseLines(List<String> lines);
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.Probe#getNewSampleValues()
 	 */
@@ -41,7 +41,7 @@ public abstract class HttpProbe extends Probe  implements IndexedProbe {
 		BufferedReader  in;
 		try {
 			in = new BufferedReader(new InputStreamReader(url.openStream()));
-			List lines = new ArrayList();
+			List<String> lines = new ArrayList<String>();
 			String lastLine;
 			while((lastLine = in.readLine()) != null)
 				lines.add(lastLine);

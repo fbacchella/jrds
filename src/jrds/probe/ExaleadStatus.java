@@ -8,15 +8,11 @@ package jrds.probe;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-
-import org.apache.log4j.Logger;
-
 
 /**
  * @author bacchell
@@ -24,7 +20,6 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public class ExaleadStatus extends HttpProbe {
-	static final private Logger logger = Logger.getLogger(ExaleadStatus.class);
 	static final ProbeDesc pd = new ProbeDesc(7);
 	static {
 		pd.add("err.adsense.connect", ProbeDesc.COUNTER, "errors.adsense.connect", 0, 100);
@@ -60,12 +55,11 @@ public class ExaleadStatus extends HttpProbe {
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.HttpProbe#parseLines(java.util.List)
 	 */
-	protected Map parseLines(List lines) {
-		Map retValue = new HashMap(lines.size());
-		for(Iterator i = lines.iterator(); i.hasNext() ;) {
-			String[] kvp = ((String) i.next()).split(": ");
+	protected Map parseLines(List<String> lines) {
+		Map<String, Number> retValue = new HashMap<String, Number>(lines.size());
+		for(String l: lines) {
+			String[] kvp = l.split(": ");
 			try {
-				Double value = new Double(kvp[1]);
 				retValue.put(kvp[0], Double.valueOf(kvp[1]));
 			}
 			catch (java.lang.NumberFormatException ex) {};

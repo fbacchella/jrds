@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-import jrds.HostsList;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;

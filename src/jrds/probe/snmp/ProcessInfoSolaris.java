@@ -15,7 +15,6 @@ import jrds.RdsHost;
 import jrds.graphe.ProcessInfoNumber;
 import jrds.graphe.ProcessInfoSize;
 
-import org.apache.log4j.Logger;
 import org.snmp4j.smi.OID;
 
 
@@ -25,7 +24,6 @@ import org.snmp4j.smi.OID;
  * @version $Revision$,  $Date$
  */
 public class ProcessInfoSolaris extends RdsIndexedSnmpRrd {
-	static final private Logger logger = Logger.getLogger(RdsIndexedSnmpRrd.class);
 	static final private OID psProcessSize = new OID(".1.3.6.1.4.1.42.3.12.1.3");
 	static final private OID  psProcessCpuTime = new OID(".1.3.6.1.4.1.42.3.12.1.4");
 	static final private OID indexOid = new OID(".1.3.6.1.4.1.42.3.12.1.10");

@@ -9,8 +9,6 @@ import jrds.GraphDesc;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
-import org.apache.log4j.Logger;
-
 
 /**
  * @author bacchell
@@ -18,8 +16,6 @@ import org.apache.log4j.Logger;
  * TODO
  */
 public class CpuLinuxMunins extends MuninsProbe {
-	static private final Logger logger = Logger.getLogger(CpuLinuxMunins.class);
-	
 	static final private ProbeDesc pd = new ProbeDesc(7);
 	static {
 		pd.add("user", ProbeDesc.COUNTER, "user.value");

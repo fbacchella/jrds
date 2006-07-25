@@ -213,7 +213,7 @@ public class ProbeDesc {
 	
 	public DsDef[] getDsDefs() throws RrdException
 	{
-		List dsList = new ArrayList(dsMap.size());
+		List<DsDef> dsList = new ArrayList<DsDef>(dsMap.size());
 		for(Iterator i = dsMap.entrySet().iterator(); i.hasNext() ;) {
 			Map.Entry e = (Map.Entry) i.next();
 			DsDesc desc = (DsDesc) e.getValue();

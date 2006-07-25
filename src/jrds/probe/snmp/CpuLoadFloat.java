@@ -12,7 +12,6 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.snmp.SnmpRequester;
 
-import org.apache.log4j.Logger;
 import org.snmp4j.smi.OID;
 
 /**
@@ -21,9 +20,7 @@ import org.snmp4j.smi.OID;
  * @version $Revision$,  $Date$
  */
 public class CpuLoadFloat
-extends RdsSnmpSimple {
-	static final private Logger logger = Logger.getLogger(CpuLoadFloat.class);
-	
+extends RdsSnmpSimple {	
 	static final private ProbeDesc pd = new ProbeDesc(3);
 	static {
 		pd.add("la1", ProbeDesc.GAUGE, new OID(".1.3.6.1.4.1.2021.10.1.6.1"));

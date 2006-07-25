@@ -12,16 +12,16 @@ import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.Rule;
 import org.apache.log4j.Logger;
 
-public class Filter {
-	static private final Logger logger = Logger.getLogger(Filter.class);
+public class FilterXml {
+	static private final Logger logger = Logger.getLogger(FilterXml.class);
 
 	final Set<Pattern> goodPaths = new HashSet<Pattern>();
 	final Set<Pattern> tags = new HashSet<Pattern>();
 	String name;
 	
-	static final private Map<String, Filter> all = new HashMap<String, Filter>();
+	static final private Map<String, FilterXml> all = new HashMap<String, FilterXml>();
 	
-	public Filter() {
+	public FilterXml() {
 	}
 	
 	public void addPath(String path) {
@@ -34,6 +34,10 @@ public class Filter {
 		Pattern p = Pattern.compile(tag);
 		if(p != null)
 			tags.add(p);
+	}
+	
+	public boolean acceptGraph(RdsGraph graph) {
+		return acceptTag(graph.getProbe().getTags());
 	}
 
 	public boolean acceptPath(String path) {
@@ -74,12 +78,12 @@ public class Filter {
 		this.name = name;
 	}
 	
-	public static void add(Filter newFilter) {
+	public static void add(FilterXml newFilter) {
 		all.put(newFilter.getName(), newFilter);
 		logger.debug("Filter " + newFilter.getName() + " added");
 	}
 	
-	public static Filter get(String name) {
+	public static FilterXml get(String name) {
 		return all.get(name);
 	}
 	
@@ -87,7 +91,7 @@ public class Filter {
 		all.clear();
 	}
 	
-	public static boolean getJavaScriptCode(Writer out, String queryString, String curNode, Filter f) throws IOException {
+	public static boolean getJavaScriptCode(Writer out, String queryString, String curNode, FilterXml f) throws IOException {
 		out.append("foldersTree = gFld('All filters');");
 		out.append("foldersTree.addChildren([\n");
 		for(String filterName: all.keySet()) {
@@ -109,14 +113,14 @@ public class Filter {
 
 	public static void addToDigester(Digester digester) {
 		digester.register("-//jrds//DTD Filter//EN", digester.getClass().getResource("/filter.dtd").toString());
-		digester.addObjectCreate("filter", jrds.Filter.class);
+		digester.addObjectCreate("filter", jrds.FilterXml.class);
 		digester.addCallMethod("filter/name", "setName", 0);
 		digester.addCallMethod("filter/path", "addPath", 0);
 		digester.addCallMethod("filter/tag", "addTag", 0);
 		digester.addRule("filter", new Rule() {
 			public void end(String namespace, String name) throws Exception {
-				Filter v = (Filter) digester.peek();
-				Filter.add(v);
+				FilterXml v = (FilterXml) digester.peek();
+				FilterXml.add(v);
 			}
 		});
 	}
