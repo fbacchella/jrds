@@ -55,13 +55,11 @@ public class Collector {
 		logger.info("jrds' collector started");
 		Logger.getLogger("org.snmp4j").setLevel(Level.ERROR);*/
 
-		hl.getStarters().startCollect();
 		for(int i = 0; i< 1 ; i++) {
 			hl.collectAll();
 			System.gc();
 			//Thread.sleep(10 * 1000L);
 		}
-		hl.getStarters().stopCollect();
 		StoreOpener.stop();
 	}
 	

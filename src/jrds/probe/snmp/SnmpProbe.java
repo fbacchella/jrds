@@ -17,8 +17,8 @@ import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.snmp.SnmpRequester;
+import jrds.snmp.SnmpStarter;
 
-import org.snmp4j.Target;
 import org.snmp4j.smi.OID;
 
 
@@ -29,7 +29,6 @@ import org.snmp4j.smi.OID;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public abstract class SnmpProbe extends Probe {
-	private Target snmpTarget;
 	private Map nameMap = null;
 	private SnmpRequester requester;
 
@@ -65,10 +64,12 @@ public abstract class SnmpProbe extends Probe {
 	 */
 	public Map getNewSampleValues() {
 		Map retValue = null;
-		Collection oids = getOidSet();
-		if(oids != null) {
-			retValue = requester.doSnmpGet(this, oids);
- 		}
+		if(getSnmpStarter().isStarted()) {
+			Collection oids = getOidSet();
+			if(oids != null) {
+				retValue = requester.doSnmpGet(this, oids);
+			}
+		}
 		return retValue;
 	}
 
@@ -97,21 +98,8 @@ public abstract class SnmpProbe extends Probe {
 		}
 		return retValue;
 	}
-	/**
-	 * @return Returns the snmpTarget.
-	 */
-	public Target getSnmpTarget() {
-		Target retValue = null;
-		if(snmpTarget != null)
-			retValue = snmpTarget;
-		else
-			retValue = this.getHost().getTarget();
-		return retValue;
-	}
-	/**
-	 * @param snmpTarget The snmpTarget to set.
-	 */
-	public void setSnmpTarget(Target snmpTarget) {
-		this.snmpTarget = snmpTarget;
+
+	public SnmpStarter getSnmpStarter() {
+		return (SnmpStarter) getStarters().find(SnmpStarter.SNMPKEY);
 	}
 }

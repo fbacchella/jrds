@@ -10,8 +10,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import jrds.snmp.SnmpRequester;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -94,11 +92,6 @@ public class StartListener implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent arg0) {
 		started = false;
 		collectTimer.cancel();
-		try {
-			SnmpRequester.stop();
-		} catch (IOException e) {
-			logger.error("Strange problem while stopping snmp: ", e);
-		}
 		logger.info("appplication jrds stopped");
 		StoreOpener.stop();
 	}

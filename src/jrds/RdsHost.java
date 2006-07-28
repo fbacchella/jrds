@@ -8,9 +8,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.snmp4j.Target;
-
-
 
 /**
  * @author bacchell
@@ -21,31 +18,27 @@ import org.snmp4j.Target;
 public class RdsHost implements Comparable {
 	static protected Logger logger = Logger.getLogger(RdsHost.class);
 	
-	private String name;
-	private Target target;
-	private Set<Probe> allProbes;
-	private String group = null;
+	private String name = null;
+	private final Set<Probe> allProbes = new TreeSet<Probe>();
 	//Default value should be bigger than anything
 	//So if something prevent uptime to be collected
 	//We still collect values
 	private long uptime = Long.MAX_VALUE;
 	private Date upTimeProbe = new Date(0);
-	private String tree = null;
 	private final Set<String> tags = new HashSet<String>();
-	private final StartersSet starters = new StartersSet();
+	private final StartersSet starters = new StartersSet(this);
 	
 	public RdsHost(String newName)
 	{
-		allProbes = new TreeSet<Probe>();
 		name = newName;
+		starters.setParent(HostsList.getRootGroup().getStarters());
 	}
 	
 	/**
 	 * 
 	 */
 	public RdsHost() {
-		allProbes = new TreeSet<Probe>();
-		name = null;
+		starters.setParent(HostsList.getRootGroup().getStarters());
 	}
 	
 	public void setName(String name)
@@ -58,18 +51,6 @@ public class RdsHost implements Comparable {
 		return name;
 	}
 	
-	public Target getTarget()
-	{
-		return target;
-	}
-	
-	/**
-	 * @param target The target to set.
-	 */
-	public void setTarget(Target target) {
-		this.target = target;
-	}
-
 	public String getHostDir()
 	{
 		String rrdDir = PropertiesManager.getInstance().rrddir + PropertiesManager.getInstance().fileSeparator + name;
@@ -92,12 +73,12 @@ public class RdsHost implements Comparable {
 	
 	public void  collectAll()
 	{
-		starters.startCollect(this);
+		starters.startCollect();
 		for(Iterator j = allProbes.iterator() ; j.hasNext() ;) {
 			Probe currrd= (Probe) j.next();
 			currrd.collect();
 		}
-		starters.stopCollect(this);
+		starters.stopCollect();
 	}
 
 	public void graphAll(Date startDate, Date endDate)
@@ -118,19 +99,6 @@ public class RdsHost implements Comparable {
 	public String toString()
 	{
 		return name;
-	}
-	
-	/**
-	 * @return Returns the group.
-	 */
-	public String getGroup() {
-		return group;
-	}
-	/**
-	 * @param group The group to set.
-	 */
-	public void setGroup(String group) {
-		this.group = group;
 	}
 	
 	public int compareTo(Object arg0) {
@@ -157,13 +125,6 @@ public class RdsHost implements Comparable {
 		return upTimeProbe;
 	}
 
-	public String getTree() {
-		return tree;
-	}
-
-	public void setTree(String treeRoot) {
-		this.tree = treeRoot;
-	}
 	public void addTag(String tag) {
 		tags.add(tag);
 	}
@@ -172,8 +133,11 @@ public class RdsHost implements Comparable {
 		return tags;
 	}
 	
-	public void addStarter(Starter s) {
-		starters.register(s);
+	public Starter addStarter(Starter s) {
+		return starters.registerStarter(s, this);
+	}
+	public StartersSet getStarters() {
+		return starters;
 	}
 
 }

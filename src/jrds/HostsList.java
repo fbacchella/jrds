@@ -39,8 +39,8 @@ public class HostsList {
 	public static final String VIEWROOT = "Sorted by view";
 	public static final String SUMROOT = "Sums";
 
-	//This list is never purged
-	private final static StartersSet starters = new StartersSet();
+	private StartersSet starters = null;
+	private RdsHost sumhost =  null;
 
 	private final Set<RdsHost> hostList = new HashSet<RdsHost>();
 	private final Map<Integer, RdsGraph> graphMap = new HashMap<Integer, RdsGraph>();
@@ -48,12 +48,12 @@ public class HostsList {
 	private final Map<String, Macro> macroList = new HashMap<String, Macro>();
 	private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
 	private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
-	private final RdsHost sumhost =  new RdsHost("SumHost");
 
 	/**
 	 *  
 	 */
 	private HostsList() {
+		instance =  this;
 		init();
 	}
 
@@ -65,11 +65,13 @@ public class HostsList {
 		filters.put(Filter.EVERYTHING.getName(), Filter.EVERYTHING);
 		filters.put(Filter.ALLHOSTS.getName(), Filter.ALLHOSTS);
 		filters.put(Filter.ALLVIEWS.getName(), Filter.ALLVIEWS);
+		starters = new StartersSet(this);
+		sumhost =  new RdsHost("SumHost");
 	}
 	
 	public static HostsList getRootGroup() {
 		if (instance == null)
-			instance = new HostsList();
+			 new HostsList();
 		return instance;
 	}
 	
@@ -108,9 +110,6 @@ public class HostsList {
 		for(Probe currProbe: newhost.getProbes()) {
 			probeMap.put(currProbe.hashCode(), currProbe);
 			if (currProbe.getGraphList() != null) {
-				String rootTree = currProbe.getTree();
-				if(rootTree != null)
-					addRoot(rootTree);
 				for(RdsGraph currGraph: currProbe.getGraphList()) {
 					getGraphTreeByHost().addGraphByPath(currGraph.getTreePathByHost(), currGraph);
 					getGraphTreeByView().addGraphByPath(currGraph.getTreePathByView(), currGraph);
@@ -123,10 +122,10 @@ public class HostsList {
 	}
 
 	public void collectAll() throws IOException {
-		starters.startCollect();
-		ExecutorService tpool =  Executors.newFixedThreadPool(PropertiesManager.getInstance().collectorThreads);
 		logger.debug("One collect was launched");
 		Date start = new Date();
+		starters.startCollect();
+		ExecutorService tpool =  Executors.newFixedThreadPool(PropertiesManager.getInstance().collectorThreads);
 		for(final RdsHost oneHost: hostList) {
 			logger.debug("Collect all stats for host " + oneHost.getName());
 			Runnable runCollect = new Runnable() {
@@ -151,8 +150,8 @@ public class HostsList {
 		}
 		Date end = new Date();
 		long duration = end.getTime() - start.getTime();
-		logger.info("Collect started at "  + start + " ran for " + duration + "ms");							
 		starters.stopCollect();
+		logger.info("Collect started at "  + start + " ran for " + duration + "ms");							
 	}
 	
 	public void graphAll(Date startDate, Date endDate) {
@@ -217,7 +216,7 @@ public class HostsList {
 	}
 
 	public void addStarter(Starter s) {
-		starters.register(s);
+		starters.registerStarter(s, this);
 	}
 	
 	public StartersSet getStarters() {
@@ -248,5 +247,11 @@ public class HostsList {
 		}
 		logger.debug("adding sum " + sumName);
 	}
+	
+	@Override
+	public String toString() {
+		return getClass().getName();
+	}
+
 
 }

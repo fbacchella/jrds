@@ -8,13 +8,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import jrds.probe.snmp.SnmpProbe;
-import jrds.snmp.TargetFactory;
+import jrds.snmp.SnmpStarter;
 
 import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.Rule;
 import org.apache.log4j.Logger;
-import org.snmp4j.Target;
 import org.xml.sax.Attributes;
 
 
@@ -27,7 +25,6 @@ public class HostConfigParser {
 	
 	static private final Logger logger = Logger.getLogger(HostConfigParser.class);
 	
-	private final static TargetFactory targetFactory = TargetFactory.getInstance();
 	public HostConfigParser(File hostConfigFile)
 	{
 	}
@@ -52,13 +49,13 @@ public class HostConfigParser {
 
 		Rule cleanStack = new Rule() {
 			public void end(String namespace, String name) throws Exception {
-				Target t = null;
+				Set<Starter> starters = new HashSet<Starter>();
 				Set<Macro> macros = new HashSet<Macro>();
 				Set<Tag> tags = new HashSet<Tag>();
 				Object o = null;
 				while(digester.getCount() != 0 && ! ((o = digester.pop()) instanceof RdsHost)) {
-					if(o instanceof Target) {
-						t = (Target) o;
+					if(o instanceof Starter) {
+						starters.add((Starter) o);
 					}
 					else if(o instanceof Macro) {
 						macros.add((Macro) o);
@@ -69,14 +66,15 @@ public class HostConfigParser {
 				}
 				if( o != null) {
 					RdsHost host = (RdsHost) o;
-					if( t!= null)
-						host.setTarget(t);
+					HostsList.getRootGroup().addHost(host);
+					for(Starter s: starters) {
+						host.addStarter(s);
+					}
 					for(Macro m: macros) {
 						m.populate(host);
 					}
 					for(Tag tg: tags)
 						host.addTag(tg.getTag());
-					HostsList.getRootGroup().addHost(host);
 					digester.push(host);
 				}
 				else
@@ -102,7 +100,7 @@ public class HostConfigParser {
 
 			public void end(String namespace, String name) throws Exception {
 				List argsListValue = null;
-				Target t = null;
+				Starter s = null;
 				Set<Tag> tags = new HashSet<Tag>();
 
 				//All the informations for the probe were kept on the stack
@@ -110,8 +108,8 @@ public class HostConfigParser {
 				//Should it be a specific null delimiter ?
 				Object o = null;
 				while(digester.getCount() != 0 && ! ((o = digester.pop()) instanceof String)) {
-					if(o instanceof Target) {
-						t = (Target) o;
+					if(o instanceof Starter) {
+						s = (Starter) o;
 					}
 					else if(o instanceof  ArrayList) {
 						argsListValue = (List) o;
@@ -125,8 +123,8 @@ public class HostConfigParser {
 					for(int i = 0; i < digester.getCount() && !((o = digester.peek(i)) instanceof RdsHost) ; i++);
 					RdsHost host = (RdsHost) o;
 					Probe newProbe = ProbeFactory.makeProbe(probeType, host, argsListValue);
-					if(t != null && newProbe instanceof SnmpProbe) {
-						((SnmpProbe)newProbe).setSnmpTarget(t);
+					if(s != null) {
+						newProbe.addStarter(s);
 					}
 					for(Tag tg: tags)
 						newProbe.addTag(tg.getTag());
@@ -147,12 +145,12 @@ public class HostConfigParser {
 	 * @param digester
 	 */
 	static void defineSnmp(Digester digester) {
-		Rule buildTargetRule= new Rule() {
+		Rule addSnmpStarterRule= new Rule() {
 			public void begin(String namespace, String name, Attributes attributes) throws Exception {
-				targetFactory.prepareNew();
-				targetFactory.setCommunity(attributes.getValue("community"));
-				targetFactory.setVersion(attributes.getValue("version"));
-				targetFactory.setPort(attributes.getValue("port"));
+				SnmpStarter starter = new SnmpStarter();
+				starter.setCommunity(attributes.getValue("community"));
+				starter.setVersion(attributes.getValue("version"));
+				starter.setPort(attributes.getValue("port"));
 				String hostName = attributes.getValue("host");
 				if(hostName == null) {
 					Object o = null;
@@ -160,19 +158,16 @@ public class HostConfigParser {
 					RdsHost host = (RdsHost) o;
 					hostName = host.getName();
 				}
-				targetFactory.setHostname(hostName);
-				Target t = targetFactory.makeTarget();
-				if( t != null)
-					digester.push(t);
+				starter.setHostname(hostName);
+				digester.push(starter);
 			}
-			
 		};
 		
 		//the target is just pushed on the stack
 		//It will be used at the end of the probe or the host, if it exists
-		digester.addRule("host/snmp", buildTargetRule);
-		digester.addRule("host/rrd/snmp", buildTargetRule);
-		digester.addRule("host/probe/snmp", buildTargetRule);
+		digester.addRule("host/snmp", addSnmpStarterRule);
+		digester.addRule("host/rrd/snmp", addSnmpStarterRule);
+		digester.addRule("host/probe/snmp", addSnmpStarterRule);
 	}
 	
 	static void defineArg(Digester digester) {

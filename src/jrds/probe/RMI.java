@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 
 public abstract class RMI extends Probe {
 	static final private Logger logger = Logger.getLogger(RMI.class);
+	static final private int PORT = 2002;
 	//We want to have socket with a short default timeout
 	static final private RMIClientSocketFactory sf = new RMIClientSocketFactory() {
 		public Socket createSocket(String host, int port) throws IOException {
@@ -44,41 +45,49 @@ public abstract class RMI extends Probe {
 		System.setProperty("sun.rmi.transport.connectionTimeout", "TIMEOUT * 1000");
 	}
 
-	static final Map<RdsHost, Registry> registries = new HashMap<RdsHost, Registry>();
-	static Starter s = new Starter() {
-
+	protected class RMIStarter extends Starter {
+		RdsHost host;
+		int port = PORT;
+		Registry registry = null;
+		RMIStarter(RdsHost host) {
+			this.host = host;
+		}
+		RMIStarter(RdsHost host, int port) {
+			this.host = host;
+			this.port = port;
+		}
 		@Override
-		public boolean start(RdsHost host) {
+		public Object getKey() {
+			return "rmi://" + host + ":"  + port;
+		}
+		@Override
+		public boolean start() {
 			boolean started = false;
-			Registry registry;
 			try {
-				registry = LocateRegistry.getRegistry(host.getName(), 2002, sf);
-				registries.put(host, registry);
+				registry = LocateRegistry.getRegistry(host.getName(), port, sf);
 				started = true;
 			} catch (RemoteException e) {
 				logger.error("Remote exception on server " + host + ": " + e.getCause());
 			}
 			return started;
 		}
-
 		@Override
-		public void stop(RdsHost host) {
-			registries.remove(host);
+		public void stop() {
+			registry = null;
 		}
-
 	};
+	RMIStarter localstarter = null;
 
 	public RMI(RdsHost monitoredHost, ProbeDesc pd) {
 		super(monitoredHost, pd);
-		monitoredHost.addStarter(s);
+		localstarter = (RMIStarter) monitoredHost.addStarter(new RMIStarter(monitoredHost, PORT));
 	}
 
 	protected  RProbe init() {
-		Registry registry = registries.get(getHost());
 		RProbe rp = null;
-		if(registry != null) {
+		if(localstarter.isStarted()) {
 			try {
-				rp = (RProbe) registry.lookup(RProbe.NAME);
+				rp = (RProbe) localstarter.registry.lookup(RProbe.NAME);
 				if( ! rp.exist(remoteName))
 					remoteName = rp.prepare(getPd().getRmiClass(), args);
 			} catch (RemoteException e) {

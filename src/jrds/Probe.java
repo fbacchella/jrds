@@ -47,8 +47,8 @@ implements Comparable {
 	private final Object lock = new Object();
 	private String stringValue = null;
 	private ProbeDesc pd;
-	private String tree = null;
 	private final Set<String> tags = new HashSet<String>();
+	private final StartersSet starters = new StartersSet(this);
 
 	/**
 	 * The constructor that should be called by derived class
@@ -59,6 +59,8 @@ implements Comparable {
 		name = null;
 		this.monitoredHost = monitoredHost;
 		this.pd = pd;
+		starters.setParent(monitoredHost.getStarters());
+
 	}
 
 	public RdsHost getHost() {
@@ -143,7 +145,7 @@ implements Comparable {
 		defaultArc[2] = new ArcDef("AVERAGE", 0.5, 288, 730);
 		return defaultArc;
 	}
-	
+
 	public RrdDef getRrdDef() throws RrdException {
 		RrdDef def = getDefaultRrdDef();
 		def.addArchive(getArcDefs());
@@ -277,6 +279,7 @@ implements Comparable {
 	 */
 	public void collect() {
 		logger.debug("launch collect for " + this);
+		starters.startCollect();
 		RrdDb rrdDb = null;
 		Sample onesample;
 		try {
@@ -299,6 +302,7 @@ implements Comparable {
 			if(rrdDb != null)
 				StoreOpener.releaseRrd(rrdDb);
 		}
+		starters.stopCollect();
 	}
 
 	/**
@@ -421,17 +425,6 @@ implements Comparable {
 		return getQualifiedName().hashCode();
 	}
 
-	public String getTree() {
-		String tempTree = tree;
-		if(tempTree == null)
-			tempTree = monitoredHost.getTree();
-		return tempTree;
-	}
-
-	public void setTree(String treeRoot) {
-		this.tree = treeRoot;
-	}
-
 	public void addTag(String tag) {
 		tags.add(tag);
 	}
@@ -442,5 +435,13 @@ implements Comparable {
 		alltags.addAll(ptags);
 		alltags.addAll(tags);
 		return alltags;
+	}
+
+	public void addStarter(Starter s) {
+		starters.registerStarter(s, this);
+	}
+
+	public StartersSet getStarters() {
+		return starters;
 	}
 }
