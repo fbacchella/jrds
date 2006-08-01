@@ -143,6 +143,9 @@ public class Period {
 			} catch (ParseException e) {
 				logger.error("Illegal date argument: " + e);
 			}
+			catch (NumberFormatException e) {
+				logger.error("Illegal date argument: " + e);				
+			}
 		}
 		if(foundDate == null) {
 			try {
