@@ -27,14 +27,14 @@ import jrds.RdsGraph;
  * @version $Revision$
  */
 public final class Graph extends HttpServlet {
-	static Logger logger = Logger.getLogger(Graph.class);
+	static final private Logger logger = Logger.getLogger(Graph.class);
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException {
-		final HostsList hl = HostsList.getRootGroup();
 		Date start = new Date();
+		HostsList hl = HostsList.getRootGroup();
 
 		String scale = req.getParameter("scale");
 		Period p = null;
@@ -63,6 +63,6 @@ public final class Graph extends HttpServlet {
 		Date finish = new Date();
 		long duration1 = middle.getTime() - start.getTime();
 		long duration2 = finish.getTime() - middle.getTime();
-		logger.trace("Graph " + graph + " rendering  ran for " + duration1 + ":" + duration2 + "ms");							
+		logger.trace("Graph " + graph + " rendering, started at " + start + ", ran for " + duration1 + ":" + duration2 + "ms");							
 	}
 }

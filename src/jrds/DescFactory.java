@@ -68,8 +68,6 @@ public class DescFactory {
 		//Quick hack for Gentoo's tomcat 5
 		String graphpath = DescFactory.class.getResource("/graph").toString();
 		logger.debug("graphs jar path: " + graphpath);
-		String filterpath = DescFactory.class.getResource("/filter").toString();
-		logger.debug("filter jar path: " + filterpath);
 		String path = probepath;
 		while(path != null) {
 			String [] urlelems = path.split("[:!]");
@@ -80,10 +78,6 @@ public class DescFactory {
 			if(graphpath != probepath) {
 				path = graphpath;
 				graphpath = probepath;
-			}
-			else if(filterpath != probepath) {
-				path = filterpath;
-				filterpath = probepath;
 			}
 			else
 				path = null;
@@ -216,7 +210,7 @@ public class DescFactory {
 		digester.addCallMethod("graphdesc/verticalLabel", "setVerticalLabel", 0);
 		digester.addCallMethod("graphdesc/graphTitle", "setGraphTitle", 0);
 		digester.addCallMethod("graphdesc/upperLimit", "setUpperLimit", 0);
-		digester.addCallMethod("graphdesc/add","add",7);
+		digester.addCallMethod("graphdesc/add","add",8);
 		digester.addCallParam("graphdesc/add/name",0);
 		digester.addCallParam("graphdesc/add/dsName",1);
 		digester.addCallParam("graphdesc/add/rpn",2);
@@ -224,6 +218,7 @@ public class DescFactory {
 		digester.addCallParam("graphdesc/add/color",4);
 		digester.addCallParam("graphdesc/add/legend",5);
 		digester.addCallParam("graphdesc/add/cf",6);
+		digester.addCallParam("graphdesc/add/reversed",7);
 		digester.addObjectCreate("graphdesc/hosttree", java.util.ArrayList.class);
 		digester.addSetNext("graphdesc/hosttree", "setHostTree");
 		digester.addObjectCreate("graphdesc/viewtree", java.util.ArrayList.class);

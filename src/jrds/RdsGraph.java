@@ -205,12 +205,12 @@ implements Comparable {
 		catch (RrdException e) {
 			logger.warn("Unable to creage png for " + getName() +
 					" on host " + probe.getHost().getName() + ": " +
-					e.getLocalizedMessage());
+					e);
 		}
 		catch (IOException e) {
 			logger.warn("Unable to creage png for " + getName() +
 					" on host " + probe.getHost().getName() + ": " +
-					e.getLocalizedMessage());
+					e);
 		}
 		return img;
 	}
@@ -223,7 +223,7 @@ implements Comparable {
 		catch (FileNotFoundException e) {
 			logger.warn("Unable to creage png for " + getName() +
 					" on host " + probe.getHost().getName() + ": " +
-					e.getLocalizedMessage(), e);
+					e, e);
 		}
 	}
 	

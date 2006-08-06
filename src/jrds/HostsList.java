@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +31,7 @@ import org.apache.log4j.Logger;
  * @version $Revision$,  $Date$
  */
 public class HostsList {
-	static Logger logger = Logger.getLogger(HostsList.class);
+	static private final Logger logger = Logger.getLogger(HostsList.class);
 	private static HostsList instance;
 
 	public static final String HOSTROOT = "Sorted by host";
@@ -91,12 +90,6 @@ public class HostsList {
 	public static void purge() {
 		instance = new HostsList();
 	}
-	
-	public void append(Collection newHostList) {
-		for (Iterator i = newHostList.iterator(); i.hasNext();) {
-			addHost((RdsHost) i.next());
-		}
-	}
 
 	private void addRoot(String root) {
 		if( ! treeMap.containsKey(root)) {
@@ -105,20 +98,16 @@ public class HostsList {
 		}
 	}
 	
+	public void addGraphs(Collection<RdsGraph> graphs) {
+		for(RdsGraph currGraph: graphs) {
+			getGraphTreeByHost().addGraphByPath(currGraph.getTreePathByHost(), currGraph);
+			getGraphTreeByView().addGraphByPath(currGraph.getTreePathByView(), currGraph);
+			graphMap.put(currGraph.hashCode(), currGraph);
+		}
+	}
+	
 	public void addHost(RdsHost newhost) {
 		hostList.add(newhost);
-		for(Probe currProbe: newhost.getProbes()) {
-			probeMap.put(currProbe.hashCode(), currProbe);
-			if (currProbe.getGraphList() != null) {
-				for(RdsGraph currGraph: currProbe.getGraphList()) {
-					getGraphTreeByHost().addGraphByPath(currGraph.getTreePathByHost(), currGraph);
-					getGraphTreeByView().addGraphByPath(currGraph.getTreePathByView(), currGraph);
-					graphMap.put(currGraph.hashCode(), currGraph);
-				}
-			}
-		}
-		if (this != instance)
-			instance.addHost(newhost);
 	}
 
 	public void collectAll() throws IOException {
@@ -151,6 +140,7 @@ public class HostsList {
 		Date end = new Date();
 		long duration = end.getTime() - start.getTime();
 		starters.stopCollect();
+		System.gc();
 		logger.info("Collect started at "  + start + " ran for " + duration + "ms");							
 	}
 	
@@ -191,6 +181,12 @@ public class HostsList {
 		return probeMap.get(id);
 	}
 
+	public void addProbe(Probe p) {
+		probeMap.put(p.hashCode(), p);
+		addGraphs(p.getGraphList());
+		p.getHost().addProbe(p);
+	}
+	
 	public GraphTree getNodeByPath(String path) {
 		GraphTree tree = treeMap.get(path.split("/")[1]);
 		GraphTree node = null;

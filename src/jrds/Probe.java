@@ -44,10 +44,9 @@ implements Comparable {
 	private String name;
 	private RdsHost monitoredHost;
 	private Collection<RdsGraph> graphList;
-	private final Object lock = new Object();
 	private String stringValue = null;
 	private ProbeDesc pd;
-	private final Set<String> tags = new HashSet<String>();
+	private Set<String> tags = null;
 	private final StartersSet starters = new StartersSet(this);
 
 	/**
@@ -60,7 +59,6 @@ implements Comparable {
 		this.monitoredHost = monitoredHost;
 		this.pd = pd;
 		starters.setParent(monitoredHost.getStarters());
-
 	}
 
 	public RdsHost getHost() {
@@ -158,15 +156,13 @@ implements Comparable {
 	 * @throws IOException
 	 */
 	private void create() throws RrdException, IOException {
-		synchronized (lock) {
-			logger.info("Need to create rrd " + this);
-			RrdDef def = getDefaultRrdDef();
-			def.addArchive(getArcDefs());
-			def.addDatasource(getDsDefs());
-			final RrdDb rrdDb = new RrdDb(def);
-			rrdDb.sync();
-			rrdDb.close();
-		}
+		logger.info("Need to create rrd " + this);
+		RrdDef def = getDefaultRrdDef();
+		def.addArchive(getArcDefs());
+		def.addDatasource(getDsDefs());
+		final RrdDb rrdDb = new RrdDb(def);
+		rrdDb.sync();
+		rrdDb.close();
 	}
 
 	/**
@@ -177,26 +173,24 @@ implements Comparable {
 	 */
 	public boolean checkStore()  {
 		boolean retValue = false;
-		synchronized (lock) {
-			File rrdDir = new File(monitoredHost.getHostDir());
-			if (!rrdDir.isDirectory()) {
-				rrdDir.mkdir();
-			}
-			File rrdFile = new File(getRrdName());
-			RrdDb rrdDb = null;
-			try {
-				if ( rrdFile.isFile()) {
-					rrdDb = StoreOpener.getRrd(getRrdName());
-				} else
-					create();
-				retValue = true;
-			} catch (Exception e) {
-				logger.error("Store " + getRrdName() + " unusable: " + e);
-			}
-			finally {
-				if(rrdDb != null)
-					StoreOpener.releaseRrd(rrdDb);				
-			}
+		File rrdDir = new File(monitoredHost.getHostDir());
+		if (!rrdDir.isDirectory()) {
+			rrdDir.mkdir();
+		}
+		File rrdFile = new File(getRrdName());
+		RrdDb rrdDb = null;
+		try {
+			if ( rrdFile.isFile()) {
+				rrdDb = StoreOpener.getRrd(getRrdName());
+			} else
+				create();
+			retValue = true;
+		} catch (Exception e) {
+			logger.error("Store " + getRrdName() + " unusable: " + e);
+		}
+		finally {
+			if(rrdDb != null)
+				StoreOpener.releaseRrd(rrdDb);				
 		}
 		return retValue;
 	}
@@ -347,7 +341,7 @@ implements Comparable {
 			rrdDb = StoreOpener.getRrd(getRrdName());
 			lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
 		} catch (Exception e) {
-			logger.error("Unable to get last update date for" + this.getName() + ": " + e.getMessage());
+			logger.error("Unable to get last update date for" + getName() + ": " + e.getMessage());
 		}
 		finally {
 			if(rrdDb != null)
@@ -426,14 +420,21 @@ implements Comparable {
 	}
 
 	public void addTag(String tag) {
+		if(tags == null)
+			tags = new HashSet<String>();
 		tags.add(tag);
 	}
 
 	public Set<String> getTags() {
+		int tagsize = 0;
+		if(tags != null)
+			tagsize = tags.size();
 		Set<String> ptags = getHost().getTags();
-		Set<String> alltags = new HashSet<String>(tags.size() + tags.size());
-		alltags.addAll(ptags);
-		alltags.addAll(tags);
+		Set<String> alltags = new HashSet<String>(ptags.size() + tagsize);
+		if(ptags.size() > 0)
+			alltags.addAll(ptags);
+		if(tags != null)
+			alltags.addAll(tags);
 		return alltags;
 	}
 

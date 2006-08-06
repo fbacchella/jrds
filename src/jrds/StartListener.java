@@ -53,6 +53,8 @@ public class StartListener implements ServletContextListener {
 
 				jrds.log.JrdsLoggerFactory.setOutputFile(pm.logfile);
 				Logger.getLogger(jrds.Probe.class).setLevel(Level.INFO);
+				//Logger.getLogger(jrds.webapp.Graph.class).setLevel(Level.TRACE);
+
 
 				System.getProperties().setProperty("java.awt.headless","true");
 

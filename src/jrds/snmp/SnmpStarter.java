@@ -16,7 +16,7 @@ import org.snmp4j.smi.OctetString;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
 public class SnmpStarter extends Starter {
-	static private Logger logger = Logger.getLogger(SnmpStarter.class);
+	static final private Logger logger = Logger.getLogger(SnmpStarter.class);
 	static final String TCP = "tcp";
 	static final String UDP = "udp";
 	static public final String SNMPKEY = "snmp";

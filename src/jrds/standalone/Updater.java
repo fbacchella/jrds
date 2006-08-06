@@ -81,7 +81,6 @@ public class Updater {
 							rrdDest.close();
 							StoreOpener.releaseRrd(rrdSource);
 							logger.debug("Size difference : " + (dest.length() - source.length()));
-							//deleteFile(dest);
 							copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
 						} catch (RrdException e) {
 							e.printStackTrace();

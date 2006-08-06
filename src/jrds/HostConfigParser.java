@@ -22,74 +22,69 @@ import org.xml.sax.Attributes;
  * @version $Revision: 237 $
  */
 public class HostConfigParser {
-	
+
 	static private final Logger logger = Logger.getLogger(HostConfigParser.class);
-	
+
 	public HostConfigParser(File hostConfigFile)
 	{
 	}
-	
+
 	private static final class Tag {
 		String tag;
 
-		public String getTag() {
+		public final String getTag() {
 			return tag;
 		}
 
-		public void setTag(String tag) {
+		public final void setTag(String tag) {
 			this.tag = tag;
 		}
 	};
-	
-	private static void defineHost(Digester digester) {
-		
-		//How to create an host
-		digester.addObjectCreate("host",jrds.RdsHost.class);
-		digester.addSetProperties("host");
 
+	private static void defineHost(Digester digester) {
+
+		//How to create an host
 		Rule cleanStack = new Rule() {
+			public void begin(String namespace, String name, Attributes attributes) throws Exception {
+				String hostName = attributes.getValue("name");
+				RdsHost host = new RdsHost(hostName);
+				HostsList.getRootGroup().addHost(host);
+				digester.push(host);
+			}
 			public void end(String namespace, String name) throws Exception {
-				Set<Starter> starters = new HashSet<Starter>();
-				Set<Macro> macros = new HashSet<Macro>();
 				Set<Tag> tags = new HashSet<Tag>();
+				Set<Starter> starters = new HashSet<Starter>();
 				Object o = null;
 				while(digester.getCount() != 0 && ! ((o = digester.pop()) instanceof RdsHost)) {
-					if(o instanceof Starter) {
-						starters.add((Starter) o);
-					}
-					else if(o instanceof Macro) {
-						macros.add((Macro) o);
-					}
-					else if(o instanceof Tag) {
+					if(o instanceof Tag) {
 						tags.add((Tag) o);
+					}
+					else if(o instanceof Starter) {
+						starters.add((Starter) o);
 					}
 				}
 				if( o != null) {
 					RdsHost host = (RdsHost) o;
-					HostsList.getRootGroup().addHost(host);
-					for(Starter s: starters) {
-						host.addStarter(s);
-					}
-					for(Macro m: macros) {
-						m.populate(host);
-					}
 					for(Tag tg: tags)
 						host.addTag(tg.getTag());
-					digester.push(host);
+					for(Starter s: starters) {
+						logger.debug("Adding starter " + s + " to " + host);
+						host.addStarter(s);
+					}
 				}
 				else
 					logger.error("hitting empty digester stack for an host, internal error");
 			}			
 		};
 		digester.addRule("host",cleanStack);
-		
+
 
 		//End
 		/*hostsCollection.add(lastHost);
 		 lastHost = null;
 		 */
 	}
-	
+
 	private static void defineProbe(Digester digester) {
 		Rule makeProbe = new Rule() {
 			public void begin(String namespace, String name, Attributes attributes) throws Exception {
@@ -100,7 +95,7 @@ public class HostConfigParser {
 
 			public void end(String namespace, String name) throws Exception {
 				List argsListValue = null;
-				Starter s = null;
+				Set<Starter> starters = new HashSet<Starter>();
 				Set<Tag> tags = new HashSet<Tag>();
 
 				//All the informations for the probe were kept on the stack
@@ -109,7 +104,7 @@ public class HostConfigParser {
 				Object o = null;
 				while(digester.getCount() != 0 && ! ((o = digester.pop()) instanceof String)) {
 					if(o instanceof Starter) {
-						s = (Starter) o;
+						starters.add((Starter) o);
 					}
 					else if(o instanceof  ArrayList) {
 						argsListValue = (List) o;
@@ -123,23 +118,24 @@ public class HostConfigParser {
 					for(int i = 0; i < digester.getCount() && !((o = digester.peek(i)) instanceof RdsHost) ; i++);
 					RdsHost host = (RdsHost) o;
 					Probe newProbe = ProbeFactory.makeProbe(probeType, host, argsListValue);
-					if(s != null) {
+					for(Starter s: starters) {
 						newProbe.addStarter(s);
 					}
 					for(Tag tg: tags)
 						newProbe.addTag(tg.getTag());
+					HostsList.getRootGroup().addProbe(newProbe);
 					host.addProbe(newProbe);
 				}
 				else
 					logger.error("hitting empty digester stack for a probe, internal error");
 			}
 		};
-		
+
 		digester.addRule("host/probe/", makeProbe);
 		digester.addRule("host/rrd/", makeProbe);
 	}
-	
-	
+
+
 	/**
 	 * What to do with a snmp element
 	 * @param digester
@@ -162,14 +158,14 @@ public class HostConfigParser {
 				digester.push(starter);
 			}
 		};
-		
+
 		//the target is just pushed on the stack
 		//It will be used at the end of the probe or the host, if it exists
 		digester.addRule("host/snmp", addSnmpStarterRule);
 		digester.addRule("host/rrd/snmp", addSnmpStarterRule);
 		digester.addRule("host/probe/snmp", addSnmpStarterRule);
 	}
-	
+
 	static void defineArg(Digester digester) {
 		Rule storeArg = new Rule() {
 			@SuppressWarnings("unchecked")
@@ -187,7 +183,7 @@ public class HostConfigParser {
 		digester.addRule("host/probe/arg", storeArg);
 		digester.addRule("host/rrd/arg", storeArg);
 	}
-	
+
 	/**
 	 * What to do when a macro definition is found
 	 * @param d
@@ -199,7 +195,10 @@ public class HostConfigParser {
 				if(macroName != null) {
 					Macro m = HostsList.getRootGroup().getMacroList().get(macroName);
 					if (m != null) {
-						digester.push(m);
+						Object o = null;
+						for(int i = 0; i< digester.getCount() && !((o = digester.peek(i)) instanceof RdsHost) ; i++);
+						RdsHost host = (RdsHost) o;
+						m.populate(host);
 					}
 					else
 						logger.error("Macro " + macroName + " not found");
@@ -208,7 +207,7 @@ public class HostConfigParser {
 		}
 		);
 	}
-	
+
 	static void defineTag(Digester d) {
 		Rule tagRule =  new Rule() {
 			public void body(java.lang.String namespace, java.lang.String name, java.lang.String text) {
@@ -236,5 +235,5 @@ public class HostConfigParser {
 		defineHost(digester);
 		defineTag(digester);
 	}
-	
+
 }

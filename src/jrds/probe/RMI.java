@@ -40,15 +40,16 @@ public abstract class RMI extends Probe {
 	private String remoteName = null;
 	static {
 		System.setProperty("java.rmi.server.disableHttp", "true");
-		System.setProperty("sun.rmi.transport.tcp.readTimeout", "TIMEOUT * 1000");
-		System.setProperty("sun.rmi.transport.tcp.handshakeTimeout", "TIMEOUT * 1000");
-		System.setProperty("sun.rmi.transport.connectionTimeout", "TIMEOUT * 1000");
+		System.setProperty("sun.rmi.transport.tcp.readTimeout", Long.toString(TIMEOUT * 1000));
+		System.setProperty("sun.rmi.transport.tcp.handshakeTimeout", Long.toString(TIMEOUT * 1000));
+		System.setProperty("sun.rmi.transport.connectionTimeout", Long.toString(TIMEOUT * 1000));
 	}
 
-	protected class RMIStarter extends Starter {
+	private class RMIStarter extends Starter {
 		RdsHost host;
 		int port = PORT;
 		Registry registry = null;
+		RProbe rp = null;
 		RMIStarter(RdsHost host) {
 			this.host = host;
 		}
@@ -65,15 +66,23 @@ public abstract class RMI extends Probe {
 			boolean started = false;
 			try {
 				registry = LocateRegistry.getRegistry(host.getName(), port, sf);
+				rp = (RProbe) registry.lookup(RProbe.NAME);
 				started = true;
 			} catch (RemoteException e) {
 				logger.error("Remote exception on server " + host + ": " + e.getCause());
+			} catch (NotBoundException e) {
+				logger.error("Unattended exception: ", e);
 			}
 			return started;
 		}
 		@Override
 		public void stop() {
+			rp = null;
 			registry = null;
+		}
+		@Override
+		public String toString() {
+			return (String)getKey();
 		}
 	};
 	RMIStarter localstarter = null;
@@ -85,18 +94,13 @@ public abstract class RMI extends Probe {
 
 	protected  RProbe init() {
 		RProbe rp = null;
-		if(localstarter.isStarted()) {
-			try {
-				rp = (RProbe) localstarter.registry.lookup(RProbe.NAME);
-				if( ! rp.exist(remoteName))
-					remoteName = rp.prepare(getPd().getRmiClass(), args);
-			} catch (RemoteException e) {
-				rp = null;
-				logger.error("Remote exception on server with probe " + this + ": " + e.getCause());
-			} catch (NotBoundException e) {
-				rp = null;
-				logger.error("Unattended exception: ", e);
-			}
+		try {
+			rp = (RProbe) localstarter.rp;
+			if( ! rp.exist(remoteName))
+				remoteName = rp.prepare(getPd().getRmiClass(), args);
+		} catch (RemoteException e) {
+			rp = null;
+			logger.error("Remote exception on server with probe " + this + ": " + e.getCause());
 		}
 		return rp;
 	}
@@ -104,12 +108,14 @@ public abstract class RMI extends Probe {
 	@Override
 	public Map getNewSampleValues() {
 		Map retValues = new HashMap(0);
-		RProbe rp = init();
-		try {
-			if(rp != null)
-				retValues = rp.query(remoteName);
-		} catch (RemoteException e) {
-			logger.error("Remote exception on server with probe " + this + ": " + e.getCause());
+		if(localstarter.isStarted()) {
+			RProbe rp = init();
+			try {
+				if(rp != null)
+					retValues = rp.query(remoteName);
+			} catch (RemoteException e) {
+				logger.error("Remote exception on server with probe " + this + ": " + e.getCause());
+			}
 		}
 		return retValues;
 	}

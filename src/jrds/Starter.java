@@ -17,10 +17,11 @@ public abstract class Starter {
 	public void doStart() {
 		started = start();
 		if(! started)
-			logger.error("Start " + this + " for + " + parent + " failed");
+			logger.error("Start " + this + " for " + parent + " failed");
 			
 	}
 	public void doStop() {
+		logger.debug("trying to stop starter " + this );
 		if(started) {
 			stop();
 			started = false;

@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class RdsHost implements Comparable {
-	static protected Logger logger = Logger.getLogger(RdsHost.class);
+	static private final Logger logger = Logger.getLogger(RdsHost.class);
 	
 	private String name = null;
 	private final Set<Probe> allProbes = new TreeSet<Probe>();
@@ -25,7 +25,7 @@ public class RdsHost implements Comparable {
 	//We still collect values
 	private long uptime = Long.MAX_VALUE;
 	private Date upTimeProbe = new Date(0);
-	private final Set<String> tags = new HashSet<String>();
+	private Set<String> tags = null;
 	private final StartersSet starters = new StartersSet(this);
 	
 	public RdsHost(String newName)
@@ -73,18 +73,18 @@ public class RdsHost implements Comparable {
 	
 	public void  collectAll()
 	{
-		starters.startCollect();
-		for(Iterator j = allProbes.iterator() ; j.hasNext() ;) {
-			Probe currrd= (Probe) j.next();
+		if(starters != null)
+			starters.startCollect();
+		for(Probe currrd: allProbes) {
 			currrd.collect();
 		}
-		starters.stopCollect();
+		if(starters != null)
+			starters.stopCollect();
 	}
 
 	public void graphAll(Date startDate, Date endDate)
 	{
-		for(Iterator i = allProbes.iterator() ; i.hasNext() ;) {
-			Probe currrd= (Probe) i.next();
+		for(Probe currrd: allProbes) {
 			Collection gl = currrd.getGraphList();
 			if(gl != null) {
 				for(Iterator j = currrd.getGraphList().iterator() ; j.hasNext(); ) {
@@ -126,16 +126,22 @@ public class RdsHost implements Comparable {
 	}
 
 	public void addTag(String tag) {
+		if(tags == null)
+			tags = new HashSet<String>();
 		tags.add(tag);
 	}
 
 	public Set<String> getTags() {
-		return tags;
+		Set<String> temptags = tags;
+		if(tags == null)
+			temptags = new HashSet<String>();
+		return temptags;
 	}
 	
 	public Starter addStarter(Starter s) {
 		return starters.registerStarter(s, this);
 	}
+	
 	public StartersSet getStarters() {
 		return starters;
 	}

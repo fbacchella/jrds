@@ -118,7 +118,7 @@ public class GraphFactory {
 			if(xmlStream == null) {
 				logger.error("Unable to find ressource " + xmlRessourceName + " for probe " + probe);
 			}
-			else {
+			/*else {
 				try {
 					GraphDesc gd = makeGraphDesc(xmlStream);
 					retValue = new RdsGraph(probe, gd);
@@ -128,50 +128,9 @@ public class GraphFactory {
 				} catch (SAXException e) {
 					logger.error("Unable to parse xml file " + className);
 				}
-			}
+			}*/
 		}
 		return retValue;
 	}
 	
-	static private GraphDesc makeGraphDesc(InputStream xmlStream) throws IOException, SAXException {
-		Digester digester = new Digester();
-		digester.register("-//jrds//DTD Graph Description//EN", digester.getClass().getResource("/graphdesc.dtd").toString());
-		digester.setValidating(false);
-		digester.addObjectCreate("graphdesc", jrds.GraphDesc.class);
-		digester.addSetProperties("graphdesc");
-		digester.addCallMethod("graphdesc/name", "setName", 0);
-		digester.addCallMethod("graphdesc/graphName", "setGraphName", 0);
-		digester.addCallMethod("graphdesc/verticalLabel", "setVerticalLabel", 0);
-		digester.addCallMethod("graphdesc/graphTitle", "setGraphTitle", 0);
-		digester.addCallMethod("graphdesc/upperLimit", "setUpperLimit", 0);
-		digester.addCallMethod("graphdesc/add","add",7);
-		digester.addCallParam("graphdesc/add/name",0);
-		digester.addCallParam("graphdesc/add/dsName",1);
-		digester.addCallParam("graphdesc/add/rpn",2);
-		digester.addCallParam("graphdesc/add/graphType",3);
-		digester.addCallParam("graphdesc/add/color",4);
-		digester.addCallParam("graphdesc/add/legend",5);
-		digester.addCallParam("graphdesc/add/cf",6);
-		digester.addObjectCreate("graphdesc/hosttree", java.util.ArrayList.class);
-		digester.addSetNext("graphdesc/hosttree", "setHostTree");
-		digester.addObjectCreate("graphdesc/viewtree", java.util.ArrayList.class);
-		digester.addSetNext("graphdesc/viewtree", "setViewTree");
-		digester.addRule("*/pathelement", new Rule() {
-			@SuppressWarnings("unchecked")
-			public void body (String namespace, String name, String text) {
-				List tree = (List) getDigester().peek();
-				tree.add(GraphDesc.resolvPathElement(text));
-			}	
-		}
-		);
-		digester.addRule("*/pathstring", new Rule() {
-			@SuppressWarnings("unchecked")
-			public void body (String namespace, String name, String text) {
-				List tree = (List) getDigester().peek();
-				tree.add(text);
-			}	
-		}
-		);
-		return (GraphDesc) digester.parse(xmlStream);
-	}
 }

@@ -31,38 +31,42 @@ import org.jrobin.graph.RrdGraphDef;
 public final class GraphDesc
 implements Cloneable {
 	static final private Logger logger = Logger.getLogger(GraphDesc.class);
-	
+
 	public static final class ConsFunc {
 		private String id;
 		private ConsFunc(String id) {
 			this.id = id;
 		}
-		
+
 		public String toString() {
 			return id;
 		}
-		
+
 		static public final ConsFunc AVERAGE = new ConsFunc("AVERAGE");
 		static public final ConsFunc MIN = new ConsFunc("MIN");
 		static public final ConsFunc MAX = new ConsFunc("MAX");
 		static public final ConsFunc LAST = new ConsFunc("LAST");
 	};
-	
+
 	static public final ConsFunc AVERAGE = ConsFunc.AVERAGE;
 	static public final ConsFunc MIN = ConsFunc.MIN;
 	static public final ConsFunc MAX = ConsFunc.MAX;
 	static public final ConsFunc LAST = ConsFunc.LAST;
 	static public final ConsFunc DEFAULTCF = AVERAGE;
-	
-	
+
+
 	public interface GraphType {
 		public abstract void draw(RrdGraphDef rgd, String sn, Color color) throws
 		RrdException;
-		
+
 		public static final GraphType NONE = new GraphType() {
 			public void draw(RrdGraphDef rgd, String sn, Color color) {};
 		};
-		
+
+		public static final GraphType VOID = new GraphType() {
+			public void draw(RrdGraphDef rgd, String sn, Color color) {};
+		};
+
 		public static final GraphType LINE = new GraphType() {
 			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {
 				rgd.line(sn, color, " @g");
@@ -82,16 +86,16 @@ implements Cloneable {
 			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {};
 		};
 	};
-	
+
 	static final public GraphType NONE = GraphType.NONE;
 	static final public GraphType LINE = GraphType.LINE;
 	static final public GraphType AREA = GraphType.AREA;
 	static final public GraphType STACK = GraphType.STACK;
 	static final public GraphType COMMENT = GraphType.COMMENT;
-	
+
 	private interface PathElement {
 		public String resolve(RdsGraph graph);
-		
+
 		static public final PathElement HOST = new PathElement() {
 			public String resolve(RdsGraph graph) {
 				return graph.getProbe().getHost().getName();
@@ -189,7 +193,7 @@ implements Cloneable {
 			}
 		};
 	}
-	
+
 	static final public PathElement HOST = PathElement.HOST;
 	static final public PathElement SERVICES = PathElement.SERVICES;
 	static final public PathElement NETWORK = PathElement.NETWORK;
@@ -207,7 +211,7 @@ implements Cloneable {
 	static final public PathElement LOAD = PathElement.LOAD;
 	static final public PathElement INTERFACES = PathElement.INTERFACES;
 	static final public PathElement DATABASE = PathElement.DATABASE;
-	
+
 	static final public Color[] colors = new Color[] {
 		Color.BLUE,
 		Color.GREEN,
@@ -219,7 +223,7 @@ implements Cloneable {
 		Color.PINK,
 		Color.MAGENTA
 	};
-	
+
 	static final private Map<String, Color> COLORMAP = new HashMap<String, Color>(colors.length);
 	static {
 		COLORMAP.put("BLUE", Color.BLUE);
@@ -237,7 +241,7 @@ implements Cloneable {
 		COLORMAP.put("LIGHT_GRAY", Color.LIGHT_GRAY);
 		COLORMAP.put("PINK", Color.PINK);
 	}
-	
+
 	static final public Color COLOR1 = colors[0];
 	static final public Color COLOR2 = colors[1];
 	static final public Color COLOR3 = colors[2];
@@ -245,12 +249,12 @@ implements Cloneable {
 	static final public Color COLOR5 = colors[4];
 	static final public Color COLOR6 = colors[5];
 	static final public Color COLOR7 = colors[6];
-	
+
 	private final class Dimension {
 		public int width = 0;
 		public int height = 0;
 	};
-	
+
 	static private final class DsDesc {
 		public String name;
 		public String dsName;
@@ -274,7 +278,7 @@ implements Cloneable {
 			return "DsDesc(" + name + "," + dsName + ",\"" + rpn + "\"," + graphType + "," + color + ",\"" + legend + "\"," + cf + ")";
 		}
 	}
-	
+
 	static final String manySpace = "                                                                  ";
 	private Map<Object, DsDesc> dsMap;
 	private int width = 578;
@@ -290,7 +294,7 @@ implements Cloneable {
 	private String graphTitle ="{0} on {1}";
 	private Dimension dimension = new Dimension();
 	private int maxLengthLegend = 0;
-	
+
 	/**
 	 * A constructor wich pre allocate the desired size
 	 * @param size the estimated number of graph that will be created
@@ -298,11 +302,11 @@ implements Cloneable {
 	public GraphDesc(int size) {
 		dsMap = new LinkedHashMap<Object, DsDesc>(size);
 	}
-	
+
 	public GraphDesc() {
 		dsMap = new LinkedHashMap<Object, DsDesc>();
 	}
-	
+
 	/**
 	 * add a graph element
 	 *
@@ -311,26 +315,26 @@ implements Cloneable {
 	 * @param color Color
 	 */
 	public void add(String name, GraphType graphType, Color color) {
-		add(name, name, null, graphType, color, name, DEFAULTCF);
+		add(name, name, null, graphType, color, name, DEFAULTCF, false);
 	}
-	
+
 	public void add(String name, GraphType graphType, Color color,
 			String legend) {
-		add(name, name, null, graphType, color, legend, DEFAULTCF);
+		add(name, name, null, graphType, color, legend, DEFAULTCF, false);
 	}
-	
+
 	public void add(String name, GraphType graphType, String legend) {
 		add(name, name, null, graphType,
 				colors[ (lastColor++) % colors.length], legend,
-				DEFAULTCF);
+				DEFAULTCF, false);
 	}
-	
+
 	public void add(String name, GraphType graphType) {
 		add(name, name, null, graphType,
 				colors[ (lastColor++) % colors.length], name,
-				DEFAULTCF);
+				DEFAULTCF, false);
 	}
-	
+
 	/**
 	 * Used to add a lign in the legend
 	 *
@@ -338,39 +342,39 @@ implements Cloneable {
 	 * @param legend String
 	 */
 	public void add(GraphType graphType, String legend) {
-		add(null, null, null, graphType, null, legend, null);
+		add(null, null, null, graphType, null, legend, null, false);
 	}
-	
+
 	public void add(String name, String rpn, GraphType graphType, Color color,
 			String legend) {
 		add(name, null, rpn, graphType, color, legend,
-				DEFAULTCF);
+				DEFAULTCF, false);
 	}
-	
+
 	public void add(String name, String rpn, GraphType graphType, Color color) {
 		add(name, null, rpn, graphType, color, name,
-				DEFAULTCF);
+				DEFAULTCF, false);
 	}
-	
+
 	public void add(String name, String rpn, GraphType graphType, String legend) {
 		add(name, null, rpn, graphType,
 				colors[lastColor++ % colors.length], legend,
-				DEFAULTCF);
+				DEFAULTCF, false);
 	}
-	
+
 	/**
 	 * Add a datastore that will not generate a graph
 	 *
 	 * @param name String
 	 */
 	public void add(String name) {
-		add(name, name, null, NONE, null, null, DEFAULTCF);
+		add(name, name, null, NONE, null, null, DEFAULTCF, false);
 	}
-	
+
 	public void add(String name, String rpn) {
-		add(name, null, rpn, NONE, null, null, DEFAULTCF);
+		add(name, null, rpn, NONE, null, null, DEFAULTCF, false);
 	}
-	
+
 	/**
 	 * Add a plot, but only uses String as parameters, for the GraphFactory
 	 * @param name Name of the plot
@@ -380,10 +384,11 @@ implements Cloneable {
 	 * @param color
 	 * @param legend
 	 * @param consFunc
+	 * @param reversed
 	 */
 	public void add(String name, String dsName, String rpn,
 			String graphType, String color, String legend,
-			String consFunc) {
+			String consFunc, String reversed) {
 		if (dsName == null && rpn == null)
 			dsName = name;
 		GraphType gt = null;
@@ -412,25 +417,35 @@ implements Cloneable {
 			c = colors[lastColor++ % colors.length];
 		if(legend == null && name != null)
 			legend = name;
-		add(name, dsName, rpn, gt, c, legend, cf);
-		
+		add(name, dsName, rpn, gt, c, legend, cf, reversed != null);
+
 	}
-	
+
 	public void add(String name, String dsName, String rpn,
 			GraphType graphType, Color color, String legend,
-			ConsFunc cf) {
+			ConsFunc cf, boolean reversed) {
 		String key = name;
 		if(key == null && legend != null)
 			key = legend;
-		dsMap.put(key,
-				new DsDesc(name, dsName, rpn, graphType, color, legend, cf));
+		if(reversed) {
+			dsMap.put(key,
+					new DsDesc(name, dsName, rpn, GraphType.NONE, null, null, cf));
+			String revRpn = "0, " + name + ", -";
+			dsMap.put("rev_" + key,
+					new DsDesc("rev_" + name, "rev_" + name, revRpn, graphType, color, null, cf));
+			dsMap.put("legend_" + key,
+					new DsDesc(name, dsName, null, GraphType.VOID, null, legend, cf));
+		}
+		else
+			dsMap.put(key,
+					new DsDesc(name, dsName, rpn, graphType, color, legend, cf));
 		if(legend != null) {
 			maxLengthLegend = Math.max(maxLengthLegend, legend.length());
 		}
-		
+
 	}
-	
-	
+
+
 	/**
 	 * return the RrdGraphDef for this graph, used the indicated probe
 	 * any data can be overined of a provided map of Plottable
@@ -444,7 +459,7 @@ implements Cloneable {
 	RrdException {
 		RrdGraphDef retValue = new RrdGraphDef();
 		String rrdName = probe.getRrdName();
-		
+
 		/*The title line*/
 		retValue.comment("   @G"); //We simulate the color box
 		retValue.comment(manySpace.substring(0, Math.min(maxLengthLegend, manySpace.length())) + "@G");
@@ -453,7 +468,7 @@ implements Cloneable {
 		retValue.comment("  Minimum");
 		retValue.comment("  Maximum");
 		retValue.comment("@l");
-		
+
 		for(DsDesc ds: dsMap.values()) {
 			if (ds.dsName == null && ds.rpn == null) {
 				ds.graphType.draw(retValue, ds.name, ds.color);
@@ -494,7 +509,7 @@ implements Cloneable {
 			retValue.setVerticalLabel(verticalLabel);
 		return retValue;
 	}
-	
+
 	private void addLegend(RrdGraphDef def, String ds, GraphType gt, String legend) throws RrdException {
 		if(gt == GraphType.COMMENT) {
 			def.comment(legend + "@l");
@@ -523,118 +538,118 @@ implements Cloneable {
 	RrdException {
 		return getGraphDef(probe, null);
 	}
-	
+
 	/**
 	 * @return Returns the graphTitle.
 	 */
 	public String getGraphName() {
 		return graphName;
 	}
-	
+
 	/**
 	 * @param graphTitle The graphTitle to set.
 	 */
 	public void setGraphName(String graphTitle) {
 		this.graphName = graphTitle;
 	}
-	
+
 	/**
 	 * @return Returns the height.
 	 */
 	public int getHeight() {
 		return height;
 	}
-	
+
 	/**
 	 * @param height The height to set.
 	 */
 	public void setHeight(int height) {
 		this.height = height;
 	}
-	
+
 	public int getRealHeight() {
 		return dimension.height;
 	}
-	
+
 	public void setRealHeight(int height) {
 		dimension.height = height;
 	}
-	
+
 	public int getRealWidth() {
 		return dimension.width;
 	}
-	
+
 	public void setRealWidth(int width) {
 		dimension.width = width;
 	}
-	
+
 	/**
 	 * @return Returns the lowerLimit.
 	 */
 	public double getLowerLimit() {
 		return lowerLimit;
 	}
-	
+
 	/**
 	 * @param lowerLimit The lowerLimit to set.
 	 */
 	public void setLowerLimit(double lowerLimit) {
 		this.lowerLimit = lowerLimit;
 	}
-	
+
 	/**
 	 * @return Returns the upperLimit.
 	 */
 	public double getUpperLimit() {
 		return upperLimit;
 	}
-	
+
 	/**
 	 * @param upperLimit The upperLimit to set.
 	 */
 	public void setUpperLimit(double upperLimit) {
 		this.upperLimit = upperLimit;
 	}
-	
+
 	/**
 	 * @param upperLimit The upperLimit to set.
 	 */
 	public void setUpperLimit(String upperLimit) {
 		this.upperLimit = Double.parseDouble(upperLimit);
 	}
-	
+
 	/**
 	 * @return Returns the width.
 	 */
 	public int getWidth() {
 		return width;
 	}
-	
+
 	/**
 	 * @param width The width to set.
 	 */
 	public void setWidth(int width) {
 		this.width = width;
 	}
-	
+
 	/**
 	 * @return Returns the verticalLabel.
 	 */
 	public String getVerticalLabel() {
 		return verticalLabel;
 	}
-	
+
 	/**
 	 * @param verticalLabel The verticalLabel to set.
 	 */
 	public void setVerticalLabel(String verticalLabel) {
 		this.verticalLabel = verticalLabel;
 	}
-	
+
 	public void colorsReset() {
 		lastColor = 0;
 	}
-	
+
 	/**
 	 * @return Returns the viewTree.
 	 */
@@ -648,21 +663,21 @@ implements Cloneable {
 		}
 		return tree;
 	}
-	
+
 	/**
 	 * @param viewTree The viewTree to set.
 	 */
 	public void setViewTree(List viewTree) {
 		this.viewTree = viewTree;
 	}
-	
+
 	/**
 	 * @param viewTree The viewTree to set.
 	 */
 	public void setViewTree(Object[] viewTree) {
 		this.viewTree = Arrays.asList(viewTree);
 	}
-	
+
 	/**
 	 * @return Returns the hostTree.
 	 */
@@ -676,21 +691,21 @@ implements Cloneable {
 		}
 		return tree;
 	}
-	
+
 	/**
 	 * @param hostTree The hostTree to set.
 	 */
 	public void setHostTree(List hostTree) {
 		this.hostTree = hostTree;
 	}
-	
+
 	/**
 	 * @param hostTree The hostTree to set.
 	 */
 	public void setHostTree(Object[] hostTree) {
 		this.hostTree = Arrays.asList(hostTree);
 	}
-	
+
 	/**
 	 * @return Returns the graphTitle.
 	 */
@@ -703,7 +718,7 @@ implements Cloneable {
 	public void setGraphTitle(String graphTitle) {
 		this.graphTitle = graphTitle;
 	}
-	
+
 	/**
 	 * Find the value of field in the class, the field is is upper case
 	 *
@@ -724,15 +739,15 @@ implements Cloneable {
 		}
 		return gt;
 	}
-	
+
 	public static final PathElement resolvPathElement(String name) {
 		return (PathElement) resolv(PathElement.class, name);
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}

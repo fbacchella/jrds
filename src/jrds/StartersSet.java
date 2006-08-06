@@ -4,25 +4,30 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StartersSet {
-	final Map<Object, Starter> allStarters = new HashMap<Object, Starter>();
-	StartersSet up = null;
-	Object level = null;
+	private Map<Object, Starter> allStarters = null;
+	private StartersSet up = null;
+	private Object level = null;
+
 	StartersSet(Object level) {
 		this.level = level;
 	}
 	public void startCollect() {
-		for(Starter s: allStarters.values()) {
-			s.doStart();
-		}
+		if(allStarters != null)
+			for(Starter s: allStarters.values()) {
+				s.doStart();
+			}
 	}
 
 	public void stopCollect() {
-		for(Starter s: allStarters.values()) {
-			s.doStop();
-		}
+		if(allStarters != null)
+			for(Starter s: allStarters.values()) {
+				s.doStop();
+			}
 	}
 
 	public Starter registerStarter(Starter s, Object parent) {
+		if(allStarters == null)
+			allStarters = new HashMap<Object, Starter>(2);
 		s.initialize(parent, this);
 		Object key = s.getKey();
 		if(! allStarters.containsKey(key)) {
@@ -30,9 +35,10 @@ public class StartersSet {
 		}
 		return find(key);
 	}
+	
 	public Starter find(Object key) {
 		Starter s = null;
-		if(allStarters.containsKey(key))
+		if(allStarters != null && allStarters.containsKey(key))
 			s = allStarters.get(key);
 		else if(up != null)
 			s = up.find(key);
@@ -46,7 +52,7 @@ public class StartersSet {
 			s = st.isStarted();
 		return s;
 	}
-	
+
 	public StartersSet getRoot() {
 		StartersSet ss = null;
 		if (up != null)
