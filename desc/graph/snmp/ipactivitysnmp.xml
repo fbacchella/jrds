@@ -6,6 +6,27 @@
   <graphTitle>IP activity on {1}</graphTitle>
   <verticalLabel>paquets/s</verticalLabel>
   <add>
+    <legend>Sent datagrams</legend>
+  </add>
+  <add>
+    <name>ipForwDatagrams</name>
+    <graphType>line</graphType>
+    <color>GREEN</color>
+    <legend>forwarded datagrams</legend>
+  </add>
+  <add>
+    <name>ipOutRequests</name>
+    <graphType>line</graphType>
+    <color>BLUE</color>
+    <legend>locally generated datagrams</legend>
+  </add>
+  <add>
+    <name>ipFragCreates</name>
+    <graphType>line</graphType>
+    <color>GRAY</color>
+    <legend>generated datagram fragment</legend>
+  </add>
+  <add>
     <legend>Received datagrams</legend>
   </add>
   <add>
@@ -35,27 +56,6 @@
     <color>GRAY</color>
     <legend>fragmented datagrams</legend>
     <reversed>true</reversed>
-  </add>
-  <add>
-    <legend>Sent datagrams</legend>
-  </add>
-  <add>
-    <name>ipForwDatagrams</name>
-    <graphType>line</graphType>
-    <color>GREEN</color>
-    <legend>forwarded datagrams</legend>
-  </add>
-  <add>
-    <name>ipOutRequests</name>
-    <graphType>line</graphType>
-    <color>BLUE</color>
-    <legend>locally generated datagrams</legend>
-  </add>
-  <add>
-    <name>ipFragCreates</name>
-    <graphType>line</graphType>
-    <color>GRAY</color>
-    <legend>generated datagram fragment</legend>
   </add>
   <hosttree>
     <pathelement>HOST</pathelement>

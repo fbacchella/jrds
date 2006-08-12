@@ -6,11 +6,6 @@
 	<graphTitle>Exchanged TCP segments on {1}</graphTitle>
 	<verticalLabel>Segments/s</verticalLabel>
 	<add>
-		<name>InSegs</name>
-		<graphType>line</graphType>
-		<legend>Number of segments received</legend>
-	</add>
-	<add>
 		<name>OutSegs</name>
 		<graphType>line</graphType>
 		<legend>Number of segments sent</legend>
@@ -19,6 +14,12 @@
 		<name>RetransSegs</name>
 		<graphType>line</graphType>
 		<legend>Number of segments retransmitted</legend>
+	</add>
+	<add>
+		<name>InSegs</name>
+		<graphType>line</graphType>
+		<legend>Number of segments received</legend>
+		<reverse>true</reverse>
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>

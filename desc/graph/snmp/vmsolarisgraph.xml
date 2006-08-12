@@ -15,7 +15,7 @@
     <add>
         <dsName>rsVPagesOut</dsName>
         <graphType>line</graphType>
-        <color>GREEN</color>
+        <color>YELLOW</color>
         <legend>Number of pages written to disk</legend>
     </add>
     <add>
