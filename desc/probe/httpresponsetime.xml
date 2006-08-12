@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Graph Description//EN"
+                           "urn:jrds:graphdesc">
+<probedesc>
+    <name>HttpResponseTime</name>
+    <probeName>overwrittent</probeName>
+    <probeClass>jrds.probe.HttpResponseTime</probeClass>
+    <ds>
+        <dsName>Connect</dsName>
+        <dsType>gauge</dsType>
+    </ds>
+    <ds>
+        <dsName>First Byte</dsName>
+        <dsType>gauge</dsType>
+    </ds>
+    <ds>
+        <dsName>Last Byte</dsName>
+        <dsType>gauge</dsType>
+    </ds>
+    <graphs>
+        <name>HttpGraph</name>
+    </graphs>
+</probedesc>
