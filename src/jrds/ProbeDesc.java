@@ -6,14 +6,31 @@ _##########################################################################*/
 
 package jrds;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-import org.apache.log4j.*;
-import org.jrobin.core.*;
-import org.snmp4j.smi.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import jrds.snmp.SnmpRequester;
 
+import org.apache.log4j.Logger;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
+import org.jrobin.core.DsDef;
+import org.jrobin.core.RrdException;
+import org.snmp4j.smi.OID;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 
 /**
@@ -24,7 +41,7 @@ import jrds.snmp.SnmpRequester;
  */
 public class ProbeDesc {
 	static final private Logger logger = Logger.getLogger(ProbeDesc.class);
-	
+
 	private static final class DsType {
 		private String id;
 		private DsType(String id) { this.id = id ;}
@@ -35,7 +52,7 @@ public class ProbeDesc {
 		static public final DsType DERIVE = new DsType("DERIVE");
 		static public final DsType ABSOLUTE = new DsType("ABSOLUTE");
 	};
-	
+
 	static public final DsType NONE = DsType.NONE;
 	static public final DsType COUNTER = DsType.COUNTER;
 	static public final DsType GAUGE = DsType.GAUGE;
@@ -44,9 +61,9 @@ public class ProbeDesc {
 	static public final double MINDEFAULT = 0;
 	static public final double MAXDEFAULT = Double.NaN;
 	static public final long HEARTBEATDEFAULT = 600;
-	
-	
-	
+
+
+
 	private Map<String, DsDesc> dsMap;
 	private String probeName;
 	private String name;
@@ -56,9 +73,9 @@ public class ProbeDesc {
 	private String rmiClass = null;
 	private SnmpRequester requester = SnmpRequester.RAW;
 	private boolean uniqIndex = false;
-	private Class probeClass = Probe.class;
-	
-	
+	private Class probeClass = null;
+
+
 	private final class DsDesc {
 		public Object key;
 		public DsType dsType;
@@ -74,7 +91,7 @@ public class ProbeDesc {
 			this.maxValue = maxValue;
 		}
 	}
-	
+
 	/**
 	 * Create a new Probe Description, with <it>size<it> elements in prevision
 	 * @param size estimated elements number
@@ -82,14 +99,14 @@ public class ProbeDesc {
 	public ProbeDesc(int size) {
 		dsMap = new LinkedHashMap<String, DsDesc>(size);
 	}
-	
+
 	/**
 	 * Create a new Probe Description
 	 */
 	public ProbeDesc() {
 		dsMap = new LinkedHashMap<String, DsDesc>();
 	}
-	
+
 	//Differets way to add a munins probe
 	/**
 	 * A datastore that is stored but not collected
@@ -100,22 +117,22 @@ public class ProbeDesc {
 	{
 		dsMap.put(name, new DsDesc(dsType, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, name));
 	}
-	
+
 	public void add(String name, DsType dsType, double min, double max)
 	{
 		dsMap.put(name, new DsDesc(dsType, HEARTBEATDEFAULT, min, max, name));
 	}
-	
+
 	public void add(String dsName, DsType dsType, String probeName)
 	{
 		dsMap.put(dsName, new DsDesc(dsType, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, probeName));
 	}
-	
+
 	public void add(String dsName, DsType dsType, String probeName, double min, double max)
 	{
 		dsMap.put(dsName, new DsDesc(dsType, HEARTBEATDEFAULT, min, max, probeName));
 	}
-	
+
 	/** Add a SNMP probe what will be stored
 	 * @param name
 	 * @param dsType
@@ -125,12 +142,12 @@ public class ProbeDesc {
 	{
 		dsMap.put(name, new DsDesc(dsType, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, oid));
 	}
-	
+
 	public void add(String name, DsType dsType, OID oid, double min, double max)
 	{
 		dsMap.put(name, new DsDesc(dsType, HEARTBEATDEFAULT, min, max, oid));
 	}
-	
+
 	/**Add a SNMP probe not to be stored
 	 * @param name
 	 * @param oid
@@ -159,7 +176,7 @@ public class ProbeDesc {
 			if("dsName".equals(var))
 				name = (String) e.getValue();
 			else if("dsType".equals(var))
-				 type = (DsType) e.getValue();
+				type = (DsType) e.getValue();
 			else if("index".equals(var))
 				index = e.getValue();
 			if(index == null && name != null)
@@ -172,18 +189,17 @@ public class ProbeDesc {
 	 * Return a map that translate an OID to the datastore name
 	 * @return a Map of oid to datastore name
 	 */
-	public Map getOidNameMap()
+	public Map<OID, String> getOidNameMap()
 	{
-		Map retValue = new LinkedHashMap(dsMap.size());
-		for(Iterator i = dsMap.entrySet().iterator(); i.hasNext() ;) {
-			Map.Entry e = (Map.Entry) i.next();
-			DsDesc dd = (DsDesc) e.getValue();
+		Map<OID, String> retValue = new LinkedHashMap<OID, String>(dsMap.size());
+		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
+			DsDesc dd = e.getValue();
 			if(dd.key != null && dd.key instanceof OID)
-				retValue.put(dd.key, e.getKey());
+				retValue.put((OID)dd.key, e.getKey());
 		}
 		return retValue;
 	}
-	
+
 	/**
 	 * Return a map that translate an String probe name to the datastore name
 	 * @return a Map of probe name to datastore name
@@ -199,7 +215,7 @@ public class ProbeDesc {
 		}
 		return retValue;
 	}
-	
+
 	public Map getDsNameMap() {
 		Map retValue = new LinkedHashMap(dsMap.size());
 		for(Iterator i = dsMap.entrySet().iterator(); i.hasNext() ;) {
@@ -210,7 +226,7 @@ public class ProbeDesc {
 		}
 		return retValue;
 	}
-	
+
 	public DsDef[] getDsDefs() throws RrdException
 	{
 		List<DsDef> dsList = new ArrayList<DsDef>(dsMap.size());
@@ -222,19 +238,19 @@ public class ProbeDesc {
 		}
 		return (DsDef[]) dsList.toArray(new DsDef[dsList.size()]);
 	}
-	
+
 	public int getSize()
 	{
 		return dsMap.size();
 	}
-	
+
 	/**
 	 * @return Returns the rrdName.
 	 */
 	public String getProbeName() {
 		return probeName;
 	}
-	
+
 	/**
 	 * @param probeName The rrdName to set.
 	 */
@@ -247,11 +263,11 @@ public class ProbeDesc {
 	public Collection getNamedProbesNames() {
 		return namedProbesNames;
 	}
-	
+
 	public void setNamedProbesNames(Collection muninsProbesNames) {
 		this.namedProbesNames = muninsProbesNames;
 	}
-	
+
 	public void setMuninsProbesNames(String[] muninsProbesNames) {
 		this.namedProbesNames = Arrays.asList(muninsProbesNames);
 	}
@@ -261,28 +277,28 @@ public class ProbeDesc {
 	public Collection getGraphClasses() {
 		return graphClasses;
 	}
-	
+
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
 	public void setGraphClasses(Collection graphClasses) {
 		this.graphClasses = graphClasses;
 	}
-	
+
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
 	public void setGraphClasses(Object[] graphClasses) {
 		this.graphClasses = Arrays.asList(graphClasses);
 	}
-	
+
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
 	public void setGraphClasses(Class[] graphClasses) {
 		this.graphClasses = Arrays.asList(graphClasses);
 	}
-	
+
 	/**
 	 * @return Returns the index.
 	 */
@@ -295,15 +311,15 @@ public class ProbeDesc {
 	public void setIndexOid(OID index) {
 		this.indexOid = index;
 	}
-	
+
 	public void setIndexOid(String index) {
 		this.indexOid = new OID(index);
 	}
-	
+
 	public void setRequester(SnmpRequester requester) {
 		this.requester = requester;
 	}
-	
+
 	public SnmpRequester getRequester() {
 		return requester;
 	}
@@ -333,15 +349,9 @@ public class ProbeDesc {
 		if (probeClass != null) {
 			Object o = null;
 			try {
-				Class[] constArgsType = new Class[constArgs.size() + 2 ];
-				Object[] constArgsVal = new Object[constArgs.size() +2 ];
+				Class[] constArgsType = new Class[constArgs.size()/* + 2 */];
+				Object[] constArgsVal = new Object[constArgs.size()/* +2 */];
 				int index = 0;
-				constArgsVal[index] = host;
-				constArgsType[index] = constArgsVal[index].getClass();
-				index++;
-				constArgsVal[index] = this;
-				constArgsType[index] = constArgsVal[index].getClass();
-				index++;
 				for (Iterator i = constArgs.iterator(); i.hasNext(); index++) {
 					Object arg = i.next();
 					constArgsType[index] = arg.getClass();
@@ -350,18 +360,24 @@ public class ProbeDesc {
 				Constructor theConst = probeClass.getConstructor(constArgsType);
 				o = theConst.newInstance(constArgsVal);
 				retValue = (Probe) o;
+				retValue.setHost(host);
+				retValue.setPd(this);
 			}
 			catch (ClassCastException ex) {
 				logger.warn("didn't get a Probe but a " + o.getClass().getName());
 			}
+			catch(InstantiationException ex) {
+				logger.warn("Instantation exception : " + ex.getCause().getMessage() /*+ " for " + host + ":" + getName()*/,
+						ex.getCause());
+			}
 			catch (Exception ex) {
-				logger.warn("Error during probe creation of type " + probeClass.getName() +
+				logger.warn("Error during probe creation of type " + getName() + " for " + host +
 						": " + ex, ex);
 			}
 		}
 		return retValue;
 	}
-	
+
 
 	public Class getProbeClass() {
 		return probeClass;
@@ -385,5 +401,94 @@ public class ProbeDesc {
 
 	public void setRmiClass(String rmiClass) {
 		this.rmiClass = rmiClass;
+	}
+
+	public void dumpAsXml(Class c) throws ParserConfigurationException, IOException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document document = builder.newDocument();  // Create from whole cloth
+		Element root = 
+			(Element) document.createElement("probedesc"); 
+		document.appendChild(root);
+
+		Element nameElement = document.createElement("name");
+		nameElement.appendChild(document.createTextNode(c.getSimpleName()));
+		root.appendChild(nameElement);
+		
+		Element probeNamElement = document.createElement("probeName");
+		probeNamElement.appendChild(document.createTextNode(probeName));
+		root.appendChild(probeNamElement);
+
+		Element probeClassElement = document.createElement("probeClass");
+		probeClassElement.appendChild(document.createTextNode(c.getName()));
+		root.appendChild(probeClassElement);
+
+		if(jrds.probe.snmp.SnmpProbe.class.isAssignableFrom(c)) {
+			Element requesterElement = document.createElement("snmpRequester");
+			root.appendChild(requesterElement);
+			requesterElement.appendChild(document.createTextNode(requester.getName()));
+
+			if(jrds.probe.snmp.RdsIndexedSnmpRrd.class.isAssignableFrom(c)) {
+				Element indexElement = document.createElement("index");
+				indexElement.appendChild(document.createTextNode(this.indexOid.toString()));
+				root.appendChild(indexElement);
+				Element uniqElement = document.createElement("uniq");
+				uniqElement.appendChild(document.createTextNode(Boolean.toString(this.uniqIndex)));
+				root.appendChild(uniqElement);
+			}
+		}
+		
+		
+		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
+			DsDesc ds = e.getValue();
+			Element dsElement = document.createElement("ds");
+			root.appendChild(dsElement);
+			
+			Element dsNameElement = document.createElement("dsName");
+			dsElement.appendChild(dsNameElement);
+			dsNameElement.appendChild(document.createTextNode(e.getKey()));
+
+			Element dsTypeElement = document.createElement("dsType");
+			if(ds.dsType != null) {
+				dsTypeElement.appendChild(document.createTextNode(ds.dsType.toString().toLowerCase()));
+				dsElement.appendChild(dsTypeElement);
+			}
+			
+			String keyName = null;
+			if(ds.key instanceof org.snmp4j.smi.OID) {
+				keyName = "oid";
+			}
+			if(keyName != null) {
+				Element keyElement = document.createElement(keyName);
+				keyElement.appendChild(document.createTextNode(ds.key.toString()));
+				dsElement.appendChild(keyElement);
+			}
+		}
+		
+		Element graphElement = document.createElement("graphs");
+		root.appendChild(graphElement);
+		for(Object o: this.graphClasses) {
+			String graphName = null;
+			if(o instanceof String)
+				graphName = o.toString();
+			else if(o instanceof Class)
+				graphName = ((Class) o).getName();
+			if(graphName != null) {
+				Element graphNameElement = document.createElement("name");
+				graphElement.appendChild(graphNameElement);
+				graphNameElement.appendChild(document.createTextNode(graphName));
+			}
+		}
+	
+		FileOutputStream fos = new FileOutputStream("desc/autoprobe/" + c.getSimpleName().toLowerCase() + ".xml");
+//		 XERCES 1 or 2 additionnal classes.
+		OutputFormat of = new OutputFormat("XML","ISO-8859-1",true);
+		of.setIndent(1);
+		of.setIndenting(true);
+		of.setDoctype("-//jrds//DTD Graph Description//EN","urn:jrds:graphdesc");
+		XMLSerializer serializer = new XMLSerializer(fos,of);
+//		 As a DOM Serializer
+		serializer.asDOMSerializer();
+		serializer.serialize( document.getDocumentElement() );
 	}
 }

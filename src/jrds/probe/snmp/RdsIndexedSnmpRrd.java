@@ -29,6 +29,9 @@ import org.snmp4j.smi.OID;
 public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	
 	static final private Logger logger = Logger.getLogger(RdsIndexedSnmpRrd.class);
+	static {
+		logger.setLevel(org.apache.log4j.Level.DEBUG);
+	}
 
 	String indexKey;
 	Collection indexAsString = null;
@@ -41,6 +44,16 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 		super(monitoredHost, pd);
 		indexOid = initIndexOid();
 		this.indexKey = indexKey;
+	}
+
+	public RdsIndexedSnmpRrd(String indexKey) {
+		super();
+		this.indexKey = indexKey;
+	}
+	
+	public void setPd(ProbeDesc pd) {
+		super.setPd(pd);
+		indexOid = initIndexOid();
 	}
 
 	protected SnmpRequester getSnmpRequester() {

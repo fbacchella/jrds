@@ -43,23 +43,11 @@ public class Updater {
 
 		DescFactory.init();
 		final HostsList hl = HostsList.getRootGroup();
-		/*System.getProperties().setProperty("org.apache.commons.logging.simplelog.log.org.apache.commons.digester.Digester","debug");
-		System.getProperties().setProperty("org.apache.commons.logging.simplelog.log.org.apache.commons.digester.Digester.sax","debug");
-		System.getProperties().setProperty("org.apache.commons.logging.Log","org.apache.commons.logging.impl.SimpleLog");
-		Logger.getLogger("org.apache").setLevel(Level.DEBUG);
-		Logger.getLogger("org.apache.commons.digester").setLevel(Level.DEBUG);
-		Logger.getLogger("org.apache.commons.digester.Digester.sax").setLevel(Level.DEBUG);*/
 		//DescFactory.scanProbeDir(new File("config"));
 		if(pm.configdir != null)
 			DescFactory.scanProbeDir(new File(pm.configdir, "macro"));
 		if(pm.configdir != null)
 			DescFactory.scanProbeDir(new File(pm.configdir));
-
-		/*logger.setLevel(Level.ERROR);
-		Logger.getRootLogger().setLevel(Level.ERROR);
-		Logger.getLogger("jrds").setLevel(Level.ALL);
-		logger.info("jrds' collector started");
-		Logger.getLogger("org.snmp4j").setLevel(Level.ERROR);*/
 
 		ExecutorService tpool =  Executors.newFixedThreadPool(3);
 

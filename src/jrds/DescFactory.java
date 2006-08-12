@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -25,6 +27,24 @@ import org.snmp4j.smi.OID;
 import org.xml.sax.SAXException;
 
 public class DescFactory {
+	public static class ProbeClassLoader extends URLClassLoader {
+		static private final Logger logger = Logger.getLogger(ProbeClassLoader.class);
+		public ProbeClassLoader(ClassLoader parent) {
+			super(new URL[0], parent);
+		}
+
+		@Override
+		public void addURL(URL arg0) {
+			super.addURL(arg0);
+		}
+
+		//@Override
+		//protected Class<?> findClass(String arg0) throws ClassNotFoundException {
+		//	return DescFactory.class.getClassLoader().loadClass(arg0);
+		//}
+	}
+
+	static public final ProbeClassLoader probeLoader = new ProbeClassLoader(DescFactory.class.getClassLoader());
 	static private final Logger logger = Logger.getLogger(DescFactory.class);
 	static final Pattern p = Pattern.compile(".*.xml");
 	static final FileFilter filter = new  FileFilter(){
@@ -54,15 +74,20 @@ public class DescFactory {
 	private DescFactory() {
 	}
 
-	public static void init() {
+	private static void makeDigester() {
 		digester = new Digester();
 		addProbeDescDigester(digester);
 		addGraphDescDigester(digester);
 		FilterXml.addToDigester(digester);
 		HostConfigParser.addDigester(digester);
 		SumProbe.addDigester(digester);
-		Macro.addToDigester(digester);
-
+		Macro.addToDigester(digester);		
+	}
+	
+	public static void init() {
+		if(digester == null)
+			makeDigester();
+		
 		String probepath = DescFactory.class.getResource("/probe").toString();
 		logger.debug("probes jar path: " + probepath);
 		//Quick hack for Gentoo's tomcat 5
@@ -87,7 +112,10 @@ public class DescFactory {
 
 	public static void importJar(String jarfile) {
 		JarFile probesjar;
+		logger.debug("Importing jar " + jarfile);
 		try {
+			URL jarUlr = new URL("file:" + jarfile);
+			probeLoader.addURL(jarUlr);
 			probesjar = new JarFile(jarfile);
 			Enumeration e = probesjar.entries();
 			while(e.hasMoreElements()) {
@@ -97,8 +125,7 @@ public class DescFactory {
 					try {
 						digester.parse(xmlStream);
 					} catch (Exception e1) {
-						System.out.println(z.getName());
-						e1.printStackTrace();
+						logger.error(jarUlr + "!/" + z + " not parsable:", e1);
 					}
 					xmlStream.close();
 				}
@@ -133,10 +160,14 @@ public class DescFactory {
 		});
 
 		digester.addRule("probedesc/probeClass", new Rule() {
-			public void body(String namespace, String name, String text) throws ClassNotFoundException {
-				Class c = Class.forName(text.trim());
+			public void body(String namespace, String name, String text) {
 				ProbeDesc pd = (ProbeDesc) digester.peek();
-				pd.setProbeClass(c);
+				try {
+					Class c = probeLoader.loadClass(text.trim());
+					pd.setProbeClass(c);
+				} catch (ClassNotFoundException e) {
+					logger.debug("Invalid probe description for " + pd.getName() + ": class " + text + " not found");
+				}
 			}
 		});
 		digester.addCallMethod("probedesc/probeName", "setProbeName", 0);
@@ -210,6 +241,7 @@ public class DescFactory {
 		digester.addCallMethod("graphdesc/verticalLabel", "setVerticalLabel", 0);
 		digester.addCallMethod("graphdesc/graphTitle", "setGraphTitle", 0);
 		digester.addCallMethod("graphdesc/upperLimit", "setUpperLimit", 0);
+		digester.addCallMethod("graphdesc/lowerLimit", "setLowerLimit", 0);
 		digester.addCallMethod("graphdesc/add","add",8);
 		digester.addCallParam("graphdesc/add/name",0);
 		digester.addCallParam("graphdesc/add/dsName",1);

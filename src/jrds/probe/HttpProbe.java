@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.Probe;
-import jrds.ProbeDesc;
-import jrds.RdsHost;
 
 import org.apache.log4j.Logger;
 
@@ -21,14 +19,14 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public abstract class HttpProbe extends Probe  implements IndexedProbe {
-	static final private Logger logger = Logger.getLogger(HttpResponseTimeRrd.class);
+	static final private Logger logger = Logger.getLogger(HttpResponseTime.class);
 	private URL url;
 
 	/**
 	 * @param monitoredHost
 	 */
-	public HttpProbe(RdsHost monitoredHost, ProbeDesc pd, URL url) {
-		super(monitoredHost, pd);
+	public HttpProbe(URL url) {
+		super();
 		this.url = url;
 	}
 	
@@ -78,5 +76,9 @@ public abstract class HttpProbe extends Probe  implements IndexedProbe {
 	 */
 	public String getIndexName() {
 		return url.toString();
+	}
+	@Override
+	public String getSourceType() {
+		return "HTTP";
 	}
 }

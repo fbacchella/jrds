@@ -8,7 +8,6 @@ package jrds;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +19,7 @@ import org.apache.log4j.Logger;
  * @version $Revision$,  $Date$
  */
 public class ProbeFactory {
+
 	static private final Logger logger = Logger.getLogger(ProbeFactory.class);
 	/*static {
 		final String DEFAULT_PARSER_NAME = "org.apache.xerces.parsers.SAXParser";
@@ -31,14 +31,14 @@ public class ProbeFactory {
 	}*/
 	
 	static final private List<String> argPackages = new ArrayList<String>(3);
+	static final public Map<String, ProbeDesc> probeDescMap = new HashMap<String, ProbeDesc>();
 	static final private List<String> probePackages = new ArrayList<String>(5);
-	static final private Map<String, ProbeDesc> probeDescMap = new HashMap<String, ProbeDesc>();
 	
 	static {
 		argPackages.add("java.lang.");
 		argPackages.add("java.net.");
 		argPackages.add("");
-		
+
 		probePackages.add("jrds.probe.");
 		probePackages.add("jrds.probe.snmp.");
 		probePackages.add("jrds.probe.munins.");
@@ -46,7 +46,7 @@ public class ProbeFactory {
 		probePackages.add("jrds.probe.jdbc.");
 		probePackages.add("jrds.probe.exalead.");
 		probePackages.add("");
-		
+
 	}
 	
 	/**
@@ -103,12 +103,12 @@ public class ProbeFactory {
 			if (probeClass != null) {
 				Object o = null;
 				try {
-					Class[] constArgsType = new Class[constArgs.size() + 1];
-					Object[] constArgsVal = new Object[constArgs.size() + 1];
+					Class[] constArgsType = new Class[constArgs.size()/* + 1*/];
+					Object[] constArgsVal = new Object[constArgs.size()/* + 1*/];
 					int index = 0;
-					constArgsVal[index] = host;
+					/*constArgsVal[index] = host;
 					constArgsType[index] = constArgsVal[index].getClass();
-					index++;
+					index++;*/
 					for (Object arg: constArgs) {
 						constArgsType[index] = arg.getClass();
 						constArgsVal[index] = arg;
@@ -117,6 +117,7 @@ public class ProbeFactory {
 					Constructor theConst = probeClass.getConstructor(constArgsType);
 					o = theConst.newInstance(constArgsVal);
 					retValue = (Probe) o;
+					retValue.setHost(host);
 				}
 				catch (ClassCastException ex) {
 					logger.warn("didn't get a Probe but a " + o.getClass().getName());
@@ -130,18 +131,10 @@ public class ProbeFactory {
 		return retValue;
 	}
 	
-	/**
-	 * Return a class by is name and a list of possible package in which it can be
-	 * found
-	 * @param name the class name
-	 * @param packList a List of package name
-	 * @return
-	 */
-	static private Class resolvClass(String name, List packList) {
+	private static Class<?> resolvClass(String name, List<String> listPackages) {
 		Class retValue = null;
-		for (Iterator i = packList.iterator(); i.hasNext() && retValue == null; ) {
+		for (String packageTry: listPackages) {
 			try {
-				String packageTry = (String) i.next();
 				retValue = Class.forName(packageTry + name);
 			}
 			catch (ClassNotFoundException ex) {
@@ -153,5 +146,8 @@ public class ProbeFactory {
 			logger.warn("Class " + name + " not found");
 		return retValue;
 	}
-	
+
+	public static ProbeDesc getProbeDesc(String name) {
+		return probeDescMap.get(name);
+	}
 }

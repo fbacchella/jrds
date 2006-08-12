@@ -10,10 +10,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import jrds.ProbeDesc;
-import jrds.RdsHost;
-import jrds.graphe.PartitionSpaceGraph;
-
 import org.snmp4j.smi.OID;
 
 
@@ -23,26 +19,16 @@ import org.snmp4j.smi.OID;
  * TODO 
  */
 public class PartitionSpace extends RdsIndexedSnmpRrd {
-	static final private OID indexOid = new OID(".1.3.6.1.2.1.25.2.3.1.3");
 	static final private OID allocUnitOid = new OID(".1.3.6.1.2.1.25.2.3.1.4");
 	static final private OID totalOid = new OID(".1.3.6.1.2.1.25.2.3.1.5");
 	static final private OID usedOid = new OID(".1.3.6.1.2.1.25.2.3.1.6");
 	
-	static protected final ProbeDesc pd = new ProbeDesc(3);
-	static {
-		pd.add("Total", ProbeDesc.GAUGE, totalOid);
-		pd.add("Used", ProbeDesc.GAUGE, usedOid);
-		pd.add("hrStorageAllocationUnits", allocUnitOid);
-		pd.setIndexOid(indexOid);
-		pd.setGraphClasses(new Class[] {PartitionSpaceGraph.class});
-		pd.setUniqIndex(true);
-	}
 	/**
 	 * @param monitoredHost
 	 * @param indexKey
 	 */
-	public PartitionSpace(RdsHost monitoredHost, String indexKey) {
-		super(monitoredHost, pd, indexKey);
+	public PartitionSpace(String indexKey) {
+		super(indexKey);
 		setName(initName());
 	}
 

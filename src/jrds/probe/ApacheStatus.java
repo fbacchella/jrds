@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.graphe.ApacheRequests;
 import jrds.graphe.ApacheTransfer;
 
@@ -24,7 +23,7 @@ import jrds.graphe.ApacheTransfer;
  * @version $Revision$,  $Date$
  */
 public class ApacheStatus extends HttpProbe implements UrlProbe {
-	static final ProbeDesc pd = new ProbeDesc(7);
+	static final public ProbeDesc pd = new ProbeDesc(7);
 	static {
 		pd.add("Total Accesses", ProbeDesc.COUNTER);
 		pd.add("Total kBytes", ProbeDesc.COUNTER);
@@ -44,9 +43,9 @@ public class ApacheStatus extends HttpProbe implements UrlProbe {
 	 * @param newurl
 	 * @throws MalformedURLException
 	 */
-	public ApacheStatus(RdsHost monitoredHost, URL newurl) throws MalformedURLException {
-		super(monitoredHost, pd, new URL("http", newurl.getHost(), newurl.getPort(), "/server-status?auto"));
-
+	public ApacheStatus(URL newurl) throws MalformedURLException {
+		super(new URL("http", newurl.getHost(), newurl.getPort(), "/server-status?auto"));
+		setPd(pd);
 	}
 
 	/* (non-Javadoc)

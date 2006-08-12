@@ -16,6 +16,6 @@ public class MemWindowsSnmp extends PartitionSpaceWindows {
 
 	public MemWindowsSnmp(RdsHost monitoredHost) {
 		super(monitoredHost, "Physical Memory");
-		pd.setGraphClasses(new Object[] {"memwindowsgraph"});		
+		getPd().setGraphClasses(new Object[] {"memwindowsgraph"});
 	}
 }

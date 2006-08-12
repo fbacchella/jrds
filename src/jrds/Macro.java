@@ -33,6 +33,7 @@ public class Macro {
 			List constArgs = (List) l[1];
 			Probe newRdsRrd = ProbeFactory.makeProbe(className, host, constArgs);
 			if(newRdsRrd != null) {
+				HostsList.getRootGroup().addProbe(newRdsRrd);
 				host.addProbe(newRdsRrd);
 			}
 		}

@@ -74,4 +74,8 @@ public class SumProbe extends VirtualProbe {
 			}
 		});
 	}
+	@Override
+	public String getSourceType() {
+		return "virtual";
+	}
 }

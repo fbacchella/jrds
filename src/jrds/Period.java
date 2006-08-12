@@ -70,6 +70,7 @@ public class Period {
 	}
 	
 	public Period() {
+		end = new Date();
 	}
 	
 	public Period(int p) {
@@ -80,13 +81,16 @@ public class Period {
 	public Period(String begin, String end) {
 		setBegin(begin);
 		setEnd(end);
+		this.calPeriod = 0;
 	}
+	
+	
 	
 	/**
 	 * @return Returns the begin.
 	 */
 	public Date getBegin() {
-		if(begin == null && end != null) {
+		if(calPeriod != 0) {
 			if(calPeriod > periodList.size()) {
 				logger.info("Period invalid: " + calPeriod);
 				calPeriod = periodList.size();
@@ -101,6 +105,7 @@ public class Period {
 	 */
 	public void setBegin(String begin) {
 		this.begin = string2Date(begin, "00:00");
+		calPeriod = 0;
 	}
 	
 	/**
@@ -116,12 +121,20 @@ public class Period {
 		this.end = string2Date(end, "23:59");
 		if(this.end == null)
 			this.end = new Date();
+		calPeriod = 0;
 	}
 	
 	public void setScale(int scale) {
 		calPeriod = scale;
 		end = new Date();
 		begin = null;
+	}
+
+	/**
+	 * @return the calPeriod
+	 */
+	public int getScale() {
+		return calPeriod;
 	}
 
 	/**
@@ -167,4 +180,5 @@ public class Period {
 			periodName.add(pi.name);
 		return periodName;
 	}
+
 }

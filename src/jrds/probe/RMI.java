@@ -21,7 +21,7 @@ import jrds.agent.RProbe;
 
 import org.apache.log4j.Logger;
 
-public abstract class RMI extends Probe {
+public class RMI extends Probe {
 	static final private Logger logger = Logger.getLogger(RMI.class);
 	static final private int PORT = 2002;
 	//We want to have socket with a short default timeout
@@ -92,6 +92,14 @@ public abstract class RMI extends Probe {
 		localstarter = (RMIStarter) monitoredHost.addStarter(new RMIStarter(monitoredHost, PORT));
 	}
 
+	public RMI() {
+	}
+
+	public void setHost(RdsHost monitoredHost) {
+		localstarter = (RMIStarter) monitoredHost.addStarter(new RMIStarter(monitoredHost, PORT));
+		super.setHost(monitoredHost);
+	}
+
 	protected  RProbe init() {
 		RProbe rp = null;
 		try {
@@ -126,5 +134,9 @@ public abstract class RMI extends Probe {
 
 	public void setArgs(List<?> l) {
 		this.args = l;
+	}
+	@Override
+	public String getSourceType() {
+		return "JRDS Agent";
 	}
 }

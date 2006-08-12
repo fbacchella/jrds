@@ -52,7 +52,8 @@ public class StartListener implements ServletContextListener {
 				pm.update();
 
 				jrds.log.JrdsLoggerFactory.setOutputFile(pm.logfile);
-				Logger.getLogger(jrds.Probe.class).setLevel(Level.INFO);
+				Logger.getLogger("jrds.snmp").setLevel(Level.TRACE);
+				Logger.getLogger(jrds.Probe.class).setLevel(Level.TRACE);
 				//Logger.getLogger(jrds.webapp.Graph.class).setLevel(Level.TRACE);
 
 
@@ -94,6 +95,7 @@ public class StartListener implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent arg0) {
 		started = false;
 		collectTimer.cancel();
+		HostsList.getRootGroup().getRenderer().finish();
 		logger.info("appplication jrds stopped");
 		StoreOpener.stop();
 	}

@@ -37,7 +37,7 @@ public final class StoreOpener {
 		try {
 			pool.release(arg0);
 		} catch (Exception e) {
-			logger.debug("Strange error" + e);
+			logger.debug("Strange error " + e);
 		}
 	}
 	

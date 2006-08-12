@@ -76,5 +76,9 @@ public class RstatProbe3 extends Probe {
 		 }
 		 return filterUpTime("uptime", retValue);
 	}
+	@Override
+	public String getSourceType() {
+		return "rstat v3";
+	}
 
 }

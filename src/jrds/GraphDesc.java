@@ -4,24 +4,34 @@
 package jrds;
 
 import java.awt.Color;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.probe.jdbc.JdbcProbe;
 
 import org.apache.log4j.Logger;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
 import org.jrobin.core.RrdException;
 import org.jrobin.graph.Plottable;
 import org.jrobin.graph.RrdGraphDef;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * A classed used to store the static description of a graph
@@ -60,30 +70,54 @@ implements Cloneable {
 		RrdException;
 
 		public static final GraphType NONE = new GraphType() {
-			public void draw(RrdGraphDef rgd, String sn, Color color) {};
+			public void draw(RrdGraphDef rgd, String sn, Color color) {}
+			@Override
+			public String toString() {
+				return "none";
+			};
 		};
 
 		public static final GraphType VOID = new GraphType() {
 			public void draw(RrdGraphDef rgd, String sn, Color color) {};
+			@Override
+			public String toString() {
+				return "void";
+			};
 		};
 
 		public static final GraphType LINE = new GraphType() {
 			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {
 				rgd.line(sn, color, " @g");
 			};
+			@Override
+			public String toString() {
+				return "line";
+			};
 		};
 		static public final GraphType AREA = new GraphType() {
 			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {
 				rgd.area(sn, color, " @g");
+			};
+			@Override
+			public String toString() {
+				return "area";
 			};
 		};
 		static public final GraphType STACK = new GraphType() {
 			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {
 				rgd.stack(sn, color, " @g");
 			};
+			@Override
+			public String toString() {
+				return "stack";
+			};
 		};
 		static public final GraphType COMMENT = new GraphType() {
 			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {};
+			@Override
+			public String toString() {
+				return "comment";
+			};
 		};
 	};
 
@@ -93,22 +127,34 @@ implements Cloneable {
 	static final public GraphType STACK = GraphType.STACK;
 	static final public GraphType COMMENT = GraphType.COMMENT;
 
-	private interface PathElement {
-		public String resolve(RdsGraph graph);
+	private static abstract class PathElement {
+		public abstract String resolve(RdsGraph graph);
+		public String toString() {
+			return this.resolve(null).toUpperCase();
+		}
 
 		static public final PathElement HOST = new PathElement() {
 			public String resolve(RdsGraph graph) {
 				return graph.getProbe().getHost().getName();
+			}
+			public String toString() {
+				return "HOST";
 			}
 		};
 		static public final PathElement TITLE = new PathElement() {
 			public String resolve(RdsGraph graph) {
 				return graph.getGraphTitle();
 			}
+			public String toString() {
+				return "TITLE";
+			}
 		};
 		static public final PathElement INDEX = new PathElement() {
 			public String resolve(RdsGraph graph) {
 				return ( (IndexedProbe) graph.getProbe()).getIndexName();
+			}
+			public String toString() {
+				return "INDEX";
 			}
 		};
 		static public final PathElement URL = new PathElement() {
@@ -120,10 +166,16 @@ implements Cloneable {
 				}
 				return url;
 			}
+			public String toString() {
+				return "URL";
+			}
 		};
 		static public final PathElement JDBC = new PathElement() {
 			public String resolve(RdsGraph graph) {
 				return ( (JdbcProbe) graph.getProbe()).getJdbcurl();
+			}
+			public String toString() {
+				return "JDBC";
 			}
 		};
 		static public final PathElement DISK = new PathElement() {
@@ -160,6 +212,7 @@ implements Cloneable {
 			public String resolve(RdsGraph graph) {
 				return "Disk activity";
 			}
+			public String toString() {return "DISKACTIVITY";}
 		};
 		static public final PathElement WEB = new PathElement() {
 			public String resolve(RdsGraph graph) {
@@ -191,6 +244,10 @@ implements Cloneable {
 				JdbcProbe dbprobe = (JdbcProbe) graph.getProbe();
 				return dbprobe.getJdbcInstanceUrl();
 			}
+			@Override
+			public String toString() {
+				return "DBINSTANCE";
+			}
 		};
 	}
 
@@ -212,35 +269,63 @@ implements Cloneable {
 	static final public PathElement INTERFACES = PathElement.INTERFACES;
 	static final public PathElement DATABASE = PathElement.DATABASE;
 
-	static final public Color[] colors = new Color[] {
-		Color.BLUE,
-		Color.GREEN,
-		Color.RED,
-		Color.CYAN,
-		Color.BLACK,
-		Color.ORANGE,
-		Color.YELLOW,
-		Color.PINK,
-		Color.MAGENTA
-	};
 
-	static final private Map<String, Color> COLORMAP = new HashMap<String, Color>(colors.length);
+	static final private Map<String, Color> COLORMAP = new HashMap<String, Color>();
 	static {
-		COLORMAP.put("BLUE", Color.BLUE);
-		COLORMAP.put("GREEN", Color.GREEN);
-		COLORMAP.put("RED", Color.RED);
-		COLORMAP.put("CYAN", Color.CYAN);
-		COLORMAP.put("BLACK", Color.BLACK);
-		COLORMAP.put("ORANGE", Color.ORANGE);
-		COLORMAP.put("YELLOW", Color.YELLOW);
-		COLORMAP.put("PINK", Color.PINK);
-		COLORMAP.put("MAGENTA", Color.MAGENTA);
-		COLORMAP.put("WHITE", Color.WHITE);
-		COLORMAP.put("DARK_GRAY", Color.DARK_GRAY);
-		COLORMAP.put("GRAY", Color.GRAY);
-		COLORMAP.put("LIGHT_GRAY", Color.LIGHT_GRAY);
-		COLORMAP.put("PINK", Color.PINK);
+		COLORMAP.put("BLUE", new Color(Color.BLUE.getRGB()) {
+			public String toString() { return "BLUE"; }
+		});
+		COLORMAP.put("GREEN", new Color(Color.GREEN.getRGB()) {
+			public String toString() { return "GREEN"; }
+		});
+		COLORMAP.put("RED",  new Color(Color.RED.getRGB()) {
+			public String toString() { return "RED"; }
+		});
+		COLORMAP.put("CYAN",  new Color(Color.CYAN.getRGB()) {
+			public String toString() { return "CYAN"; }
+		});
+		COLORMAP.put("BLACK",  new Color(Color.BLACK.getRGB()) {
+			public String toString() { return "BLACK"; }
+		});
+		COLORMAP.put("ORANGE",  new Color(Color.ORANGE.getRGB()) {
+			public String toString() { return "ORANGE"; }
+		});
+		COLORMAP.put("YELLOW",  new Color(Color.YELLOW.getRGB()) {
+			public String toString() { return "YELLOW"; }
+		});
+		COLORMAP.put("PINK",  new Color(Color.PINK.getRGB()) {
+			public String toString() { return "PINK"; }
+		});
+		COLORMAP.put("MAGENTA",  new Color(Color.MAGENTA.getRGB()) {
+			public String toString() { return "MAGENTA"; }
+		});
+		COLORMAP.put("WHITE",  new Color(Color.WHITE.getRGB()) {
+			public String toString() { return "WHITE"; }
+		});
+		COLORMAP.put("DARK_GRAY",  new Color(Color.DARK_GRAY.getRGB()) {
+			public String toString() { return "DARK_GRAY"; }
+		});
+		COLORMAP.put("GRAY",  new Color(Color.GRAY.getRGB()) {
+			public String toString() { return "GRAY"; }
+		});
+		COLORMAP.put("LIGHT_GRAY",  new Color(Color.LIGHT_GRAY.getRGB()) {
+			public String toString() { return "LIGHT_GRAY"; }
+		});
+		COLORMAP.put("PINK",  new Color(Color.GREEN.getRGB()) {
+			public String toString() { return "GREEN"; }
+		});
 	}
+	static final public Color[] colors = new Color[] {
+		COLORMAP.get("BLUE"),
+		COLORMAP.get("GREEN"),
+		COLORMAP.get("RED"),
+		COLORMAP.get("CYAN"),
+		COLORMAP.get("BLACK"),
+		COLORMAP.get("ORANGE"),
+		COLORMAP.get("YELLOW"),
+		COLORMAP.get("PINK"),
+		COLORMAP.get("MAGENTA")
+	};
 
 	static final public Color COLOR1 = colors[0];
 	static final public Color COLOR2 = colors[1];
@@ -249,6 +334,16 @@ implements Cloneable {
 	static final public Color COLOR5 = colors[4];
 	static final public Color COLOR6 = colors[5];
 	static final public Color COLOR7 = colors[6];
+
+	static final public Color BLUE = colors[0];
+	static final public Color GREEN = colors[1];
+	static final public Color RED = colors[2];
+	static final public Color CYAN = colors[3];
+	static final public Color BLACK = colors[4];
+	static final public Color ORANGE = colors[5];
+	static final public Color YELLOW = colors[6];
+	static final public Color PINK = colors[7];
+	static final public Color MAGENTA = colors[8];
 
 	private final class Dimension {
 		public int width = 0;
@@ -598,6 +693,13 @@ implements Cloneable {
 	}
 
 	/**
+	 * @param upperLimit The upperLimit to set.
+	 */
+	public void setLowerLimit(String lowerLimit) {
+		this.lowerLimit = Double.parseDouble(lowerLimit);
+	}
+
+	/**
 	 * @return Returns the upperLimit.
 	 */
 	public double getUpperLimit() {
@@ -751,4 +853,118 @@ implements Cloneable {
 	public void setName(String name) {
 		this.name = name;
 	}
+	public void dumpAsXml(Class c) throws ParserConfigurationException, IOException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document document = builder.newDocument();  // Create from whole cloth
+		Element root = 
+			(Element) document.createElement("graphdesc"); 
+		document.appendChild(root);
+
+		Element nameElement = document.createElement("name");
+		nameElement.appendChild(document.createTextNode(c.getSimpleName()));
+		root.appendChild(nameElement);
+
+		Element graphNameElement = document.createElement("graphName");
+		graphNameElement.appendChild(document.createTextNode(graphName));
+		root.appendChild(graphNameElement);
+
+		Element graphTitleElement = document.createElement("graphTitle");
+		graphTitleElement.appendChild(document.createTextNode(graphTitle));
+		root.appendChild(graphTitleElement);
+
+		Element verticalLabelElement = document.createElement("verticalLabel");
+		verticalLabelElement.appendChild(document.createTextNode(verticalLabel));
+		root.appendChild(verticalLabelElement);
+
+		if(upperLimit != Double.NaN) {
+			Element upperLimitElement = document.createElement("upperLimit");
+			upperLimitElement.appendChild(document.createTextNode(Double.toString(upperLimit)));
+			root.appendChild(upperLimitElement);
+		}
+
+		if(lowerLimit != 0) {
+			Element lowerLimitElement = document.createElement("lowerLimit");
+			lowerLimitElement.appendChild(document.createTextNode(Double.toString(lowerLimit)));
+			root.appendChild(lowerLimitElement);
+		}
+
+		for(Map.Entry<Object, DsDesc> e: dsMap.entrySet()) {
+			DsDesc ds = e.getValue();
+			Element dsElement = document.createElement("add");
+			root.appendChild(dsElement);
+
+			Element dsNameElement = document.createElement("name");
+			dsElement.appendChild(dsNameElement);
+			dsNameElement.appendChild(document.createTextNode(ds.name));
+
+			if(ds.rpn != null) {
+				Element rpnElement = document.createElement("rpn");
+				rpnElement.appendChild(document.createTextNode(ds.rpn));
+				dsElement.appendChild(rpnElement);
+			}			
+
+			if(ds.graphType != null) {
+				Element dsTypeElement = document.createElement("graphType");
+				dsTypeElement.appendChild(document.createTextNode(ds.graphType.toString().toLowerCase()));
+				dsElement.appendChild(dsTypeElement);
+			}			
+
+			if(ds.color != null && ds.graphType != GraphDesc.COMMENT && ds.graphType != GraphDesc.NONE) {
+				Element colorElement = document.createElement("color");
+				colorElement.appendChild(document.createTextNode(ds.color.toString()));
+				dsElement.appendChild(colorElement);
+			}			
+
+			if(ds.legend != null) {
+				Element legendElement = document.createElement("legend");
+				legendElement.appendChild(document.createTextNode(ds.legend));
+				dsElement.appendChild(legendElement);
+			}			
+			if(ds.cf != GraphDesc.AVERAGE) {
+				Element cfElement = document.createElement("cf");
+				cfElement.appendChild(document.createTextNode(ds.cf.id));
+				dsElement.appendChild(cfElement);
+			}			
+		}
+
+		doTree(root, "hosttree", hostTree);
+		doTree(root, "viewtree", viewTree);
+
+		FileOutputStream fos = new FileOutputStream("desc/autograph/" + c.getSimpleName().toLowerCase() + ".xml");
+//		XERCES 1 or 2 additionnal classes.
+		OutputFormat of = new OutputFormat("XML","UTF-8",true);
+		of.setIndent(1);
+		of.setIndenting(true);
+		of.setDoctype("-//jrds//DTD Graph Description//EN","urn:jrds:graphdesc");
+		XMLSerializer serializer = new XMLSerializer(fos,of);
+//		As a DOM Serializer
+		serializer.asDOMSerializer();
+		serializer.serialize( document.getDocumentElement() );
+	}
+
+	private void doTree(Element root, String name, Collection tree) {
+		Document document = root.getOwnerDocument();
+		Element hosttreeElement = document.createElement(name);
+		root.appendChild(hosttreeElement);
+		for(Object o: tree) {
+			String pathName = null;
+			String pathType = null;
+			if(o instanceof String) {
+				pathName = o.toString();
+				pathType = "pathstring";
+			}
+			else if(o instanceof PathElement) {
+				pathName = ((PathElement) o).toString();
+				pathType = "pathelement";
+			}
+			if(pathName != null) {
+				Element graphPathElement = document.createElement(pathType);
+				hosttreeElement.appendChild(graphPathElement);
+				graphPathElement.appendChild(document.createTextNode(pathName));
+			}
+		}
+
+	}
+
 }

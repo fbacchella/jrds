@@ -7,7 +7,6 @@ _##########################################################################*/
 package jrds.probe.snmp;
 
 import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.graphe.CpuRawTimeSolarisGraph;
 import jrds.snmp.SnmpRequester;
 
@@ -35,7 +34,11 @@ public class CpuRawTimeSolaris extends RdsSnmpSimple {
 	/**
 	 * @param monitoredHost
 	 */
-	public CpuRawTimeSolaris(RdsHost monitoredHost) {
-		super(monitoredHost, pd);
+	//public CpuRawTimeSolaris(RdsHost monitoredHost) {
+	//	super(monitoredHost, pd);
+	//}
+	public CpuRawTimeSolaris() {
+		super();
+		setPd(pd);
 	}
 }

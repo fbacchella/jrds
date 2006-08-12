@@ -225,4 +225,16 @@ public abstract class JdbcProbe extends Probe implements UrlProbe {
 	public void setUser(String user) {
 		this.user = user;
 	}
+
+	@Override
+	public Map getNewSampleValues() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getSourceType() {
+		return "JDBC";
+	}
+
 }

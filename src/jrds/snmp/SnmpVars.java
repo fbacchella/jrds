@@ -9,6 +9,7 @@ package jrds.snmp;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.PDU;
@@ -44,6 +45,8 @@ public class SnmpVars extends HashMap {
 	static final private byte TAG_FLOAT = (byte) 0x78;
 	static final private byte TAG_DOUBLE = (byte) 0x79;
 
+	private final Map<OID, Integer> errors = new HashMap<OID, Integer>(0);
+
 	public SnmpVars(PDU data) {
 		super(data.size());
 		join(data);
@@ -75,6 +78,7 @@ public class SnmpVars extends HashMap {
 			retValue = true;
 		}
 		else {
+			errors.put(vb.getOid(), vb.getSyntax());
 			int exception = vb.getSyntax();
 			String exceptionName = "";
 			switch(exception) {
@@ -85,41 +89,32 @@ public class SnmpVars extends HashMap {
             case SMIConstants.EXCEPTION_NO_SUCH_OBJECT: 
             	exceptionName = "No such object"; break;
             default: exceptionName = "Unknown exception";break;
-				
 			}
-			logger.warn("OID " + vb.getOid() + " has error " + exceptionName);
+            logger.debug("Exception " +  exceptionName + " for  " + vb.getOid());
 		}
 		return retValue;
 	}
 
+	public boolean isError(OID tocheck) {
+		return errors.containsKey(tocheck);
+	}
+
+	public Map<OID, Integer> getErrors() {
+		return errors;
+	}
+
 	public void join(PDU data)
 	{
-		int numAdded = 0;
-		int numVb = 0;
 		for(int i = 0 ; i < data.size() ; i++) {
 			VariableBinding vb = data.get(i);
-			if( addVariable(vb)) {
-				numAdded++;
-			}
-			numVb++;
-		}
-		if(numAdded != numVb) {
-			logger.debug(numAdded +" variables added out of " + numVb);
+			addVariable(vb);
 		}
 	}
 
 	public void join(VariableBinding[] newVars)
 	{
-		int numAdded = 0;
-		int numVb = 0;
 		for (int i = 0 ; i < newVars.length ; i++) {
-			if( addVariable(newVars[i])) {
-				numAdded++;
-			}
-			numVb++;
-		}
-		if(numAdded != numVb) {
-			logger.debug(numAdded +" variables added out of " + numVb);
+			addVariable(newVars[i])	;
 		}
 	}
 

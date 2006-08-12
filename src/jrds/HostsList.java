@@ -47,6 +47,7 @@ public class HostsList {
 	private final Map<String, Macro> macroList = new HashMap<String, Macro>();
 	private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
 	private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
+	private final Renderer renderer = new Renderer(20);
 
 	/**
 	 *  
@@ -88,6 +89,7 @@ public class HostsList {
 	}
 	
 	public static void purge() {
+		instance.renderer.finish();
 		instance = new HostsList();
 	}
 
@@ -247,6 +249,13 @@ public class HostsList {
 	@Override
 	public String toString() {
 		return getClass().getName();
+	}
+
+	/**
+	 * @return the renderer
+	 */
+	public Renderer getRenderer() {
+		return renderer;
 	}
 
 

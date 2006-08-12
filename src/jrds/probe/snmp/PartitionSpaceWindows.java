@@ -28,7 +28,7 @@ public class PartitionSpaceWindows extends PartitionSpace {
 	 * @param indexKey
 	 */
 	public PartitionSpaceWindows(RdsHost monitoredHost, String indexKey) {
-		super(monitoredHost, indexKey);
+		super(indexKey);
 	}
 	
 	/**

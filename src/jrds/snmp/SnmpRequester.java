@@ -42,7 +42,7 @@ public abstract class SnmpRequester {
 	 */
 	private SnmpRequester() {};
 
-
+	public abstract String getName();
 
 	/**
 	 * The method that need to be implemented to do the request
@@ -57,7 +57,6 @@ public abstract class SnmpRequester {
 	 * the returned OID are left unchanged
 	 */
 	public static final SnmpRequester  SIMPLE = new SnmpRequester() {
-
 		public Map doSnmpGet(SnmpProbe probe, Collection oidsSet)
 		{
 			VariableBinding[] vars = new VariableBinding[oidsSet.size()];
@@ -68,6 +67,11 @@ public abstract class SnmpRequester {
 				vars[j++] = new VariableBinding(currentOid);
 			}
 			return doRequest(probe, vars);
+		}
+
+		@Override
+		public String getName() {
+			return "simple";
 		}
 	};
 
@@ -100,6 +104,11 @@ public abstract class SnmpRequester {
 				}
 			}
 			return retValue;
+		}
+
+		@Override
+		public String getName() {
+			return "tabular";
 		}	
 	};
 
@@ -118,6 +127,11 @@ public abstract class SnmpRequester {
 				vars[j++] = new VariableBinding(currentOid);
 			}
 			return doRequest(probe, vars);
+		}
+
+		@Override
+		public String getName() {
+			return "raw";
 		}
 	};
 
@@ -142,7 +156,7 @@ public abstract class SnmpRequester {
 					}
 					if(re != null)
 						response = re.getResponse();
-					if (response != null && response.getErrorStatus() == SnmpConstants.SNMP_ERROR_SUCCESS ){
+					if (response != null && response.getErrorStatus() == SnmpConstants.SNMP_ERROR_SUCCESS){
 						snmpVars = new SnmpVars(response);
 						doAgain = false;
 					}	

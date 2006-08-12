@@ -82,38 +82,17 @@ public class TreeJspBean {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void getJavascriptTree(JspWriter out, HttpServletRequest req, PeriodBean period) throws JspException {
-		HostsList  root = HostsList.getRootGroup();
-		String filterName = req.getParameter("filter");
-		String hostFilter = req.getParameter("host");
-		Filter vf = null;
-		if(filterName != null && ! "".equals(filterName))
-		 vf = root.getFilter(filterName);
-		else if(hostFilter != null && ! "".equals(hostFilter))
-			vf = new jrds.FilterHost(hostFilter);
+	public void getJavascriptTree(JspWriter out, ParamsBean params) throws JspException {
 
-		Map<String, String[]> parameters = new HashMap<String, String[]>();
-		parameters.putAll(req.getParameterMap());
-		parameters.remove("id");
-		parameters.remove("scale");
-		parameters.remove("begin");
-		parameters.remove("end");
-		StringBuffer parambuff = new StringBuffer();
-		parambuff.append(period.toString());
-		for(Map.Entry<String, String[]> param: parameters.entrySet()) {
-			for(int i=0; i< param.getValue().length; i++) {
-				parambuff.append("&");
-				parambuff.append(param.getKey());
-				parambuff.append("=");
-				parambuff.append(param.getValue()[i]);
-			}
-		}
+		HostsList root = HostsList.getRootGroup();
 
+		Filter vf = params.getFilter();
+		params.setId(0);
 		try {
 			if(vf != null) {
 				int graphed = 0;
 				for(GraphTree tree: root.getGraphsRoot()) {
-					if(! tree.getJavaScriptCode(out, parambuff.toString(), "tree" + graphed, vf)) {
+					if(! tree.getJavaScriptCode(out, params, "tree" + graphed, vf)) {
 						graphed++;
 					}
 				}
@@ -124,24 +103,13 @@ public class TreeJspBean {
 					out.print("foldersTree.addChildren([\n\ttree0");
 					for(int i = 1; i < graphed ; i++)
 						out.print(",\n\ttree" + i);
-						//	"foldersTree.addChildren([hostTree, viewTree]);");
 					out.println("\n]);");
 				}
 				if(graphed > 0)
 					out.println("initializeDocument();");
-				/*boolean noHostTree = root.getGraphTreeByHost().getJavaScriptCode(out, parambuff.toString(), "hostTree", vf);
-				boolean noViewTree = root.getGraphTreeByView().getJavaScriptCode(out, parambuff.toString(), "viewTree", vf);
-				if( ! (noHostTree || noViewTree))
-					out.println("foldersTree = gFld(\"<i>Graph List</i>\");\nfoldersTree.addChildren([hostTree, viewTree]);");
-				else if( noViewTree)
-					out.println("foldersTree = hostTree;");
-				else if( noHostTree)
-					out.println("foldersTree = viewTree;");
-				if( !(noHostTree && noViewTree) )
-					out.println("initializeDocument();");*/
 			}
 			else
-				getAllFilterJavascript(out, parambuff.toString(), root.getAllFiltersNames());
+				getAllFilterJavascript(out, params.toString(), root.getAllFiltersNames());
 		} catch (IOException e) {
 			throw new JspException(e.getMessage());
 		}
@@ -167,47 +135,40 @@ public class TreeJspBean {
 		return true;
 	}
 
-	public void getGraphList(JspWriter out, HttpServletRequest req, PeriodBean period) {
+	public void getGraphList(JspWriter out,  HttpServletRequest req, ParamsBean cgiParams) {
 		HostsList  root = HostsList.getRootGroup();
-		String idS = req.getParameter("id");
-		String filterName = req.getParameter("filter");
-		Filter vf = root.getFilter(filterName);
-		GraphTree node = null;
-		int id = 0;
-		if(idS != null) {
-			try {
-				id = Integer.parseInt(idS);
-				node = root.getNodeById(id);
-			} catch (Throwable e) {
-				logger.error("bad argument " + idS);
-			}
-		}
+		cgiParams = new ParamsBean(req);
+		Filter vf = cgiParams.getFilter();
+		int id = cgiParams.getId();
 
 		try {
+			GraphTree node = null;
+			node = root.getNodeById(id);
 			if(node != null) {
 				for(RdsGraph graph: node.enumerateChildsGraph(vf)) {
-					out.println(getImgUrl(graph, period, req));
+					out.println(getImgUrl(graph, cgiParams, req));
 				}
 			}
 			else {
 				RdsGraph graph = HostsList.getRootGroup().getGraphById(id);
 				if(graph != null)
-					out.println(getImgUrl(graph, period, req));
+					out.println(getImgUrl(graph, cgiParams, req));
 			}
 		} catch (IOException e) {
 			logger.error("Result not written, connexion closed ?");
 		}
 	}
 
-	private StringBuffer getImgUrl(RdsGraph graph, PeriodBean period, HttpServletRequest req) {
+	private StringBuffer getImgUrl(RdsGraph graph, ParamsBean period, HttpServletRequest req) {
 		StringBuffer imgElement = new StringBuffer();
+		HostsList.getRootGroup().getRenderer().render(graph, period.getBegin(), period.getEnd());
 
 		imgElement.append("<img class=\"graph\" ");
 		//We build the Url
 		StringBuffer urlBuffer = new StringBuffer();
 		urlBuffer.append(req.getContextPath());
 		urlBuffer.append("/graph?id=" + graph.hashCode());
-		urlBuffer.append("&" + period);
+		urlBuffer.append("&" + period.getPeriodUrl());
 		imgElement.append("src='" + urlBuffer + "' ");
 
 		//A few more attributes

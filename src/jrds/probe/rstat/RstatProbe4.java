@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jrds.Probe;
-import jrds.ProbeDesc;
-import jrds.RdsHost;
 
 import org.acplt.oncrpc.OncRpcException;
 import org.acplt.oncrpc.OncRpcProgramNotRegisteredException;
@@ -29,26 +27,6 @@ import org.apache.log4j.Logger;
  */
 public class RstatProbe4 extends Probe {
 	static final private Logger logger = Logger.getLogger(RstatProbe4.class);
-	static final ProbeDesc pd = new ProbeDesc(7);
-	static {
-		pd.add("v_pgpgin", ProbeDesc.COUNTER);
-		pd.add("v_pgpgout", ProbeDesc.COUNTER);
-		pd.add("v_pswpin", ProbeDesc.COUNTER);
-		pd.add("v_pswpout", ProbeDesc.COUNTER);
-		pd.add("v_swtch", ProbeDesc.COUNTER);
-		pd.add("v_intr", ProbeDesc.COUNTER);
-		pd.setProbeName("rstat");
-		pd.setGraphClasses(new Object[] {"rstatvm", "rstatint"});
-		
-	}
-
-	/**
-	 * @param monitoredHost
-	 * @param pd
-	 */
-	public RstatProbe4(RdsHost monitoredHost) {
-		super(monitoredHost, pd);
-	}
 
 	/* (non-Javadoc)
 	 * @see jrds.Probe#getNewSampleValues()
@@ -75,6 +53,11 @@ public class RstatProbe4 extends Probe {
 		 	logger.error("Could not contact portmapper: " + e.getMessage());
 		 }
 		 return filterUpTime("uptime", retValue);
+	}
+
+	@Override
+	public String getSourceType() {
+		return "rstat v4";
 	}
 
 }

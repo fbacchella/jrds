@@ -10,10 +10,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import jrds.ProbeDesc;
-import jrds.RdsHost;
-import jrds.snmp.SnmpRequester;
-
 import org.snmp4j.smi.OID;
 
 
@@ -22,7 +18,6 @@ import org.snmp4j.smi.OID;
  * @version $Revision$,  $Date$
  */
 public class ProcessStatusSolaris extends RdsSnmpSimple {
-	static final private OID psProcessState = new OID(".1.3.6.1.4.1.42.3.12.1.5");
 	static final private String RUNNABLE="R";
 	static final private String STOPPED="T";
 	static final private String INPAGEWAIT="P";
@@ -31,28 +26,6 @@ public class ProcessStatusSolaris extends RdsSnmpSimple {
 	static final private String IDLE="I";
 	static final private String ZOMBIE="Z";
 	
-	static final private ProbeDesc pd = new ProbeDesc(7);
-	static {
-		pd.add("psProcessState", psProcessState);
-		pd.add(RUNNABLE, ProbeDesc.GAUGE);
-		pd.add(STOPPED, ProbeDesc.GAUGE);
-		pd.add(INPAGEWAIT, ProbeDesc.GAUGE);
-		pd.add(NONINTERRUPTABLEWAIT, ProbeDesc.GAUGE);
-		pd.add(SLEEPING, ProbeDesc.GAUGE);
-		pd.add(IDLE, ProbeDesc.GAUGE);
-		pd.add(ZOMBIE, ProbeDesc.GAUGE);
-		pd.setGraphClasses(new Object []{"processstatus"});
-		pd.setProbeName("pslist");
-		pd.setRequester(SnmpRequester.TABULAR);
-	}
-	
-	/**
-	 * @param monitoredHost
-	 */
-	public ProcessStatusSolaris(RdsHost monitoredHost) {
-		super(monitoredHost, pd);
-	}
-
 	/**
 	 * @see jrds.Probe#filterValues(java.util.Map)
 	 */

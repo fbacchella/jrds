@@ -13,8 +13,6 @@ import java.io.InputStreamReader;
 import java.util.Map;
 
 import jrds.Probe;
-import jrds.ProbeDesc;
-import jrds.RdsHost;
 
 import org.apache.log4j.Logger;
 import org.jrobin.core.RrdException;
@@ -32,13 +30,6 @@ public abstract class ExternalCmdProbe extends Probe {
 
 	static Runtime rt = Runtime.getRuntime();
 
-	/**
-	 * @param thehost
-	 */
-	public ExternalCmdProbe(RdsHost thehost, ProbeDesc pd) {
-		super(thehost, pd);
-	}
-	
 	private String[] cmd;
 	
 	/* (non-Javadoc)
@@ -86,5 +77,9 @@ public abstract class ExternalCmdProbe extends Probe {
 	 */
 	public void setCmd(String[] cmd) {
 		this.cmd = cmd;
+	}
+	@Override
+	public String getSourceType() {
+		return "external command";
 	}
 }

@@ -118,5 +118,10 @@ public abstract class MuninsProbe extends Probe {
 		return getPd().getProbesNamesMap();
 	}
 
+	@Override
+	public String getSourceType() {
+		return "Munins";
+	}
+
 
 }

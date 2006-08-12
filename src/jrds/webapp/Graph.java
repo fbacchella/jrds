@@ -15,11 +15,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-
 import jrds.HostsList;
-import jrds.Period;
 import jrds.RdsGraph;
+
+import org.apache.log4j.Logger;
 
 /**
  * A servlet wich generate a png for a graph
@@ -33,36 +32,34 @@ public final class Graph extends HttpServlet {
 	 */
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException {
-		Date start = new Date();
-		HostsList hl = HostsList.getRootGroup();
+		try {
+			Date start = new Date();
+			HostsList hl = HostsList.getRootGroup();
 
-		String scale = req.getParameter("scale");
-		Period p = null;
-		int scaleVal = -1;
-		if(scale != null && (scaleVal = Integer.parseInt(scale)) > 0)
-			p = new Period(scaleVal);
-		else
-			p = new Period(req.getParameter("begin"), req.getParameter("end"));
-		Date begin = p.getBegin();
-		Date end = p.getEnd();
-		
-		if("true".equals(req.getParameter("refresh"))) {
-			long delta = end.getTime() - begin.getTime();
-			end = new Date();
-			begin = new Date(end.getTime() - delta);
-		}
-		
-		String rrdId = req.getParameter("id");
-		RdsGraph graph = hl.getGraphById(Integer.parseInt(rrdId));
-		
-		res.setContentType("image/png");
-		ServletOutputStream out = res.getOutputStream();
-		res.addHeader("Cache-Control", "no-cache");
-		Date middle = new Date();
-		graph.writePng(out, begin, end);
-		Date finish = new Date();
-		long duration1 = middle.getTime() - start.getTime();
-		long duration2 = finish.getTime() - middle.getTime();
-		logger.trace("Graph " + graph + " rendering, started at " + start + ", ran for " + duration1 + ":" + duration2 + "ms");							
+			ParamsBean p = new ParamsBean(req);
+			Date begin = p.getBegin();
+			Date end = p.getEnd();
+			
+			if("true".equals(req.getParameter("refresh"))) {
+				long delta = end.getTime() - begin.getTime();
+				end = new Date();
+				begin = new Date(end.getTime() - delta);
+			}
+			
+			RdsGraph graph = hl.getGraphById(p.getId());
+			
+			res.setContentType("image/png");
+			ServletOutputStream out = res.getOutputStream();
+			res.addHeader("Cache-Control", "no-cache");
+			Date middle = new Date();
+			//graph.writePng(out, begin, end);
+			hl.getRenderer().write(graph, begin, end, out);
+			Date finish = new Date();
+			long duration1 = middle.getTime() - start.getTime();
+			long duration2 = finish.getTime() - middle.getTime();
+			logger.debug("Graph " + graph + " rendering, started at " + start + ", ran for " + duration1 + ":" + duration2 + "ms");
+		} catch (RuntimeException e) {
+			logger.error(e, e);
+		}							
 	}
 }

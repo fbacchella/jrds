@@ -6,7 +6,6 @@
 
 package jrds;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -15,12 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jrds.xmlResources.ResourcesLocator;
-
-import org.apache.commons.digester.Digester;
-import org.apache.commons.digester.Rule;
 import org.apache.log4j.Logger;
-import org.xml.sax.SAXException;
 
 /**
  * This class is used to generate a class from an object.
@@ -30,14 +24,6 @@ import org.xml.sax.SAXException;
  */
 public class GraphFactory {
 	static private final Logger logger = Logger.getLogger(GraphFactory.class);
-	/*static {
-		final String DEFAULT_PARSER_NAME = "org.apache.xerces.parsers.SAXParser";
-		try {
-			XMLReaderFactory.createXMLReader(DEFAULT_PARSER_NAME);
-		} catch (SAXException e) {
-			logger.fatal("xerces is mandatory, please install it");
-		}
-	}*/
 
 	static final private List<String> graphPackages = new ArrayList<String>(2);
 	static final private Map<String, GraphDesc> graphDescMap = Collections.synchronizedMap(new HashMap<String, GraphDesc>());
@@ -55,9 +41,7 @@ public class GraphFactory {
 	public static void addDesc(GraphDesc gd) {
 		graphDescMap.put(gd.getName(), gd);
 	}
-	
-
-	
+		
 	/**
 	 * This method is used to generate a class from an object. It can be :
 	 * 
@@ -111,24 +95,10 @@ public class GraphFactory {
 		//it's an URL to xml description of the graph
 		else if(className instanceof String) {
 			String xmlRessourceName = (String)className;
-			InputStream xmlStream = ResourcesLocator.getResource(xmlRessourceName);
-			if(xmlStream == null) {
-				xmlStream = probe.getClass().getResourceAsStream(xmlRessourceName);
-			}
+			InputStream xmlStream = probe.getClass().getResourceAsStream(xmlRessourceName);
 			if(xmlStream == null) {
 				logger.error("Unable to find ressource " + xmlRessourceName + " for probe " + probe);
 			}
-			/*else {
-				try {
-					GraphDesc gd = makeGraphDesc(xmlStream);
-					retValue = new RdsGraph(probe, gd);
-					graphDescMap.put(gd.getName(), gd);
-				} catch (IOException e) {
-					logger.error("Unable to get the file for " + className);
-				} catch (SAXException e) {
-					logger.error("Unable to parse xml file " + className);
-				}
-			}*/
 		}
 		return retValue;
 	}

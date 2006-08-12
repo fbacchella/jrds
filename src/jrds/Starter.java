@@ -21,7 +21,7 @@ public abstract class Starter {
 			
 	}
 	public void doStop() {
-		logger.debug("trying to stop starter " + this );
+		logger.trace("trying to stop starter " + this );
 		if(started) {
 			stop();
 			started = false;

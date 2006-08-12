@@ -41,7 +41,7 @@ implements Comparable {
 	static final private Logger logger = Logger.getLogger(Probe.class);
 
 	static final protected int TIMEOUT = 30;
-	private String name;
+	private String name = null;
 	private RdsHost monitoredHost;
 	private Collection<RdsGraph> graphList;
 	private String stringValue = null;
@@ -55,14 +55,26 @@ implements Comparable {
 	 * @param pd
 	 */
 	public Probe(RdsHost monitoredHost, ProbeDesc pd) {
-		name = null;
 		this.monitoredHost = monitoredHost;
 		this.pd = pd;
 		starters.setParent(monitoredHost.getStarters());
 	}
 
+	public Probe() {
+	}
+
+	
 	public RdsHost getHost() {
 		return monitoredHost;
+	}
+	
+	public void setHost(RdsHost monitoredHost) {
+		this.monitoredHost = monitoredHost;
+		starters.setParent(monitoredHost.getStarters());		
+	}
+	
+	public void setPd(ProbeDesc pd) {
+		this.pd = pd;
 	}
 
 	private Collection<RdsGraph> initGraphList() {
@@ -445,4 +457,6 @@ implements Comparable {
 	public StartersSet getStarters() {
 		return starters;
 	}
+	
+	public abstract String getSourceType();
 }

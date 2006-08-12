@@ -1,7 +1,7 @@
 package jrds;
 
-// ----------------------------------------------------------------------------
-// $Id$
+//----------------------------------------------------------------------------
+//$Id$
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
@@ -43,17 +43,17 @@ import org.jrobin.graph.RrdGraphDef;
  */
 public class RdsGraph
 implements Comparable {
-	
+
 	static final private Logger logger = Logger.getLogger(RdsGraph.class);
 	static final private SimpleDateFormat lastUpdateFormat = new
 	SimpleDateFormat("dd/MM/yyyy HH:mm");
-	
+
 	protected Probe probe;
 	private String viewPath = null;
 	private GraphDesc gd;
 	private String name = null;
 	private String graphTitle = null;
-	
+
 	/**
 	 *
 	 */
@@ -62,6 +62,10 @@ implements Comparable {
 		this.probe = theStore;
 		this.gd = gd;
 	}
+
+	public void ResolvRealSize(){
+		
+	}
 	
 	/**
 	 * @see java.lang.Object#hashCode()
@@ -69,40 +73,40 @@ implements Comparable {
 	public int hashCode() {
 		return getQualifieName().hashCode();
 	}
-	
+
 	/**
 	 * @return Returns the height.
 	 */
 	public int getHeight() {
 		return gd.getHeight();
 	}
-	
+
 	/**
 	 * @return Returns the width.
 	 */
 	public int getWidth() {
 		return gd.getWidth();
 	}
-	
+
 	/**
 	 * @return Returns the theStore.
 	 */
 	public Probe getProbe() {
 		return probe;
 	}
-	
+
 	public LinkedList<String> getTreePathByHost() {
 		return gd.getHostTree(this);
 	}
-	
+
 	public LinkedList<String> getTreePathByView() {
 		return gd.getViewTree(this);
 	}
-	
+
 	public String getPngName() {
 		return getName().replaceAll("/","_") + ".png";
 	}
-	
+
 	private final String parseTemplate(String template) {
 		String index = "";
 		String url = "";
@@ -120,23 +124,23 @@ implements Comparable {
 				probe.getName()
 		};
 		return MessageFormat.format(template, arguments) ;
-		
+
 	}
-	
+
 	public String getGraphTitle() {
 		if(graphTitle == null) {
 			graphTitle = parseTemplate(gd.getGraphTitle());
 		}
 		return graphTitle;
 	}
-	
+
 	protected String getName() {
 		if(name == null) {
 			name = parseTemplate(gd.getGraphName());
 		}
 		return name;
 	}
-	
+
 	/**
 	 * Return a uniq name for the graph
 	 * @return
@@ -144,25 +148,25 @@ implements Comparable {
 	public String getQualifieName() {
 		return probe.getHost().getName() + "/"  + getName();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.RdsGraph#getLowerLimit()
 	 */
 	protected double getLowerLimit() {
 		return gd.getLowerLimit();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.RdsGraph#getUpperLimit()
 	 */
 	protected double getUpperLimit() {
 		return gd.getUpperLimit();
 	}
-	
+
 	protected RrdGraphDef getRrdDef() throws RrdException, IOException {
 		return getGraphDesc().getGraphDef(probe);
 	}
-	
+
 	/**
 	 * Add the graph formating information to a RrdGraphDef
 	 * @param graphDef
@@ -176,13 +180,14 @@ implements Comparable {
 		graphDef.setTitle(getGraphTitle());
 		graphDef.comment("@l");
 		graphDef.comment("@l");
-		graphDef.comment("Last update: " +
+		graphDef.comment("Last update: " + 
 				lastUpdateFormat.format(lastUpdate) + "@l");
 		graphDef.comment("Period from " + lastUpdateFormat.format(startDate) +
-				" to " + lastUpdateFormat.format(endDate) + "@l");
+				" to " + lastUpdateFormat.format(endDate) + "@L");
+		graphDef.comment("Source type: " + getProbe().getSourceType() + "@r");
 		return graphDef;		
 	}
-	
+
 	public RrdGraph getRrdGraph(Date startDate, Date endDate) throws
 	IOException, RrdException {
 		Date lastUpdate = probe.getLastUpdate();
@@ -193,7 +198,7 @@ implements Comparable {
 		tempGraphDef = graphFormat(tempGraphDef, startDate, endDate);
 		return new RrdGraph(tempGraphDef, true);
 	}
-	
+
 	public BufferedImage makeImg(Date startDate, Date endDate) {
 		BufferedImage img = null;
 		try {
@@ -214,7 +219,7 @@ implements Comparable {
 		}
 		return img;
 	}
-	
+
 	public void graph(Date startDate, Date endDate) {
 		try {
 			writePng(new BufferedOutputStream(new FileOutputStream(new File(
@@ -226,7 +231,7 @@ implements Comparable {
 					e, e);
 		}
 	}
-	
+
 	public void writePng(OutputStream out, Date startDate, Date endDate) {
 		BufferedImage img = makeImg(startDate, endDate);
 		if (img != null)
@@ -236,9 +241,9 @@ implements Comparable {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		
+
 	}
-	
+
 	public void writeXml(OutputStream out, Date startDate, Date endDate) {
 		try {
 			RrdExportDef exdef = getRrdDef();
@@ -257,7 +262,7 @@ implements Comparable {
 					ex.getLocalizedMessage());
 		}
 	}
-	
+
 	public String writeXml(Date startDate, Date endDate) {
 		String xmlData = "";
 		try {
@@ -278,8 +283,8 @@ implements Comparable {
 		}
 		return xmlData;
 	}
-	
-	
+
+
 	public void writeCsv(OutputStream out, Date startDate, Date endDate){
 		// Use a Transformer for output
 		TransformerFactory tFactory = TransformerFactory.newInstance();
@@ -303,7 +308,7 @@ implements Comparable {
 					" on host " + probe.getHost().getName() + ": " +
 					ex.getLocalizedMessage(),ex);
 		}
-		
+
 	}
 	public byte[] getPngBytes(Date startDate, Date endDate) {
 		byte[] retValue = null;
@@ -316,34 +321,34 @@ implements Comparable {
 		}
 		return retValue;
 	}
-	
+
 	final public GraphDesc getGraphDesc() {
 		return gd;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
 	public int compareTo(Object arg0) {
 		if (viewPath == null)
 			viewPath = this.getTreePathByView().toString();
-		
+
 		String otherPath = ( (RdsGraph) arg0).getTreePathByView().toString();
-		
+
 		return String.CASE_INSENSITIVE_ORDER.compare(viewPath, otherPath);
 	}
-	
+
 	/**
 	 * @return Returns the realHeight.
 	 */
 	public int getRealHeight() {
 		return gd.getRealHeight();
 	}
-	
+
 	/**
 	 * @return Returns the realWidth.
 	 */
 	public int getRealWidth() {
 		return gd.getRealWidth();
 	}
-}
+	}

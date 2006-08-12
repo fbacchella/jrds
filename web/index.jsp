@@ -5,8 +5,8 @@
 <%@ page import="jrds.HostsList" %>
 <%@ page import="jrds.RdsGraph" %>
 <jsp:useBean id="jrdsBean" class="jrds.webapp.TreeJspBean" />
-<jsp:useBean id="period" class="jrds.webapp.PeriodBean"/>
-<jsp:setProperty name="period" property="*" /> 
+<jsp:useBean id="period" class="jrds.webapp.ParamsBean"/>
+<%period.parseReq(request);%>
 <html>
 
 	<head>
@@ -84,7 +84,7 @@ USEFRAMES = 0
 PRESERVESTATE = 1
 STARTALLOPEN = 0
 <%jrdsBean.ManageTree(out, request, response);%>
-<%jrdsBean.getJavascriptTree(out, request, period);%>
+<%jrdsBean.getJavascriptTree(out, period);%>
  //-->
 </script>
 </div>
@@ -120,11 +120,11 @@ STARTALLOPEN = 0
 				</div>
 			</form>
 <script type="text/javascript">
-	document.dateForm.end.value = "<jsp:getPropertyname="period" property="end" />"; 
-	document.dateForm.begin.value = "<jsp:getPropertyname="period" property="begin" />"; 
+	document.dateForm.end.value = "<jsp:getPropertyname="period" property="stringEnd" />"; 
+	document.dateForm.begin.value = "<jsp:getPropertyname="period" property="stringBegin" />"; 
     document.dateForm.scale.selectedIndex = <jsp:getPropertyname="period" property="scale" />;
-	document.hostForm.end.value = "<jsp:getPropertyname="period" property="end" />"; 
-	document.hostForm.begin.value = "<jsp:getPropertyname="period" property="begin" />"; 
+	document.hostForm.end.value = "<jsp:getPropertyname="period" property="stringEnd" />"; 
+	document.hostForm.begin.value = "<jsp:getPropertyname="period" property="stringBegin" />"; 
     document.hostForm.scale.value = <jsp:getPropertyname="period" property="scale" />;
     document.dateForm.id.value = qs.get("id", 0);
     document.dateForm.filter.value = qs.get("filter", "");
@@ -134,7 +134,7 @@ STARTALLOPEN = 0
     endCal = startCal("end", "dateEndTrigger");
  </script>
  			<div id="graphs">
-			<% jrdsBean.getGraphList(out, request, period); %>
+<% jrdsBean.getGraphList(out, request, period); %>
 			</div>
 		</div>
 	</body>

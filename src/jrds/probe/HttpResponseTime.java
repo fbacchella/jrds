@@ -9,10 +9,7 @@ package jrds.probe;
 import java.net.URL;
 import java.security.MessageDigest;
 
-import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.Util;
-import jrds.graphe.HttpGraph;
 
 import org.apache.log4j.Logger;
 
@@ -23,11 +20,10 @@ import org.apache.log4j.Logger;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public final class HttpResponseTimeRrd extends ExternalCmdProbe implements UrlProbe {
-	static final private Logger logger = Logger.getLogger(HttpResponseTimeRrd.class);
+public final class HttpResponseTime extends ExternalCmdProbe implements UrlProbe {
+	static final private Logger logger = Logger.getLogger(HttpResponseTime.class);
 	private URL url;
-	static MessageDigest md5digest;
-	static final jrds.PropertiesManager pm = jrds.PropertiesManager.getInstance();
+	static private MessageDigest md5digest;
 	static {
 		try {
 			md5digest = java.security.MessageDigest.getInstance("MD5");
@@ -36,20 +32,11 @@ public final class HttpResponseTimeRrd extends ExternalCmdProbe implements UrlPr
 			logger.fatal("You should not see this message, MD5 not available");
 		}
 	}
-	
-	static final ProbeDesc pd = new ProbeDesc(3);
-	static {
-		pd.add("Connect", ProbeDesc.GAUGE);
-		pd.add("First Byte", ProbeDesc.GAUGE);
-		pd.add("Last Byte", ProbeDesc.GAUGE);
-		pd.setGraphClasses(new Class[] {HttpGraph.class});
-	}
-	
-	public HttpResponseTimeRrd(RdsHost thehost, URL url)
+
+	public HttpResponseTime(URL url)
 	{
-		super(thehost, pd);
 		this.url = url;
-		this.setCmd(new String[] {pm.urlperfpath, url.toString()});
+		setCmd(new String[] {jrds.PropertiesManager.getInstance().urlperfpath, url.toString()});
 		setName(initName());
 	}
 

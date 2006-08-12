@@ -29,7 +29,7 @@ import org.snmp4j.smi.OID;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public abstract class SnmpProbe extends Probe {
-	private Map nameMap = null;
+	private Map<OID, String> nameMap = null;
 	private SnmpRequester requester;
 
 	public SnmpProbe(RdsHost monitoredHost, ProbeDesc pd)
@@ -40,16 +40,29 @@ public abstract class SnmpProbe extends Probe {
 		requester = getSnmpRequester();
 	}
 
+	public SnmpProbe()
+	{
+		super();
+	}
+
+	public void setPd(ProbeDesc pd) {
+		super.setPd(pd);
+		if(nameMap == null)
+			nameMap = getPd().getOidNameMap();
+		requester = getSnmpRequester();
+		
+	}
+
 	protected SnmpRequester getSnmpRequester() {
 		return getPd().getRequester();
   	}
 
-	private Map initNameMap()
+	private Map<OID, String> initNameMap()
 	{
 		return getPd().getOidNameMap();
 	}
 
-	public Map getOidNameMap()
+	public Map<OID, String> getOidNameMap()
 	{
 		if(nameMap == null)
 			nameMap = initNameMap();
@@ -70,6 +83,7 @@ public abstract class SnmpProbe extends Probe {
 				retValue = requester.doSnmpGet(this, oids);
 			}
 		}
+		
 		return retValue;
 	}
 
@@ -102,4 +116,10 @@ public abstract class SnmpProbe extends Probe {
 	public SnmpStarter getSnmpStarter() {
 		return (SnmpStarter) getStarters().find(SnmpStarter.SNMPKEY);
 	}
+
+	@Override
+	public String getSourceType() {
+		return "SNMP";
+	}
+	
 }

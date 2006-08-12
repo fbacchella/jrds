@@ -68,7 +68,6 @@ public class HostConfigParser {
 					for(Tag tg: tags)
 						host.addTag(tg.getTag());
 					for(Starter s: starters) {
-						logger.debug("Adding starter " + s + " to " + host);
 						host.addStarter(s);
 					}
 				}
@@ -118,13 +117,15 @@ public class HostConfigParser {
 					for(int i = 0; i < digester.getCount() && !((o = digester.peek(i)) instanceof RdsHost) ; i++);
 					RdsHost host = (RdsHost) o;
 					Probe newProbe = ProbeFactory.makeProbe(probeType, host, argsListValue);
-					for(Starter s: starters) {
-						newProbe.addStarter(s);
+					if(newProbe != null) {
+						for(Starter s: starters) {
+							newProbe.addStarter(s);
+						}
+						for(Tag tg: tags)
+							newProbe.addTag(tg.getTag());
+						HostsList.getRootGroup().addProbe(newProbe);
+						host.addProbe(newProbe);
 					}
-					for(Tag tg: tags)
-						newProbe.addTag(tg.getTag());
-					HostsList.getRootGroup().addProbe(newProbe);
-					host.addProbe(newProbe);
 				}
 				else
 					logger.error("hitting empty digester stack for a probe, internal error");

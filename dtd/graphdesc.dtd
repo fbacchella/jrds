@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT add ((name) | (name,graphType,rpn?,color?,legend?)|(legend))>
+<!ELEMENT add ((name) | (name,graphType,rpn?,color?,legend?,reversed?)|(legend))>
 <!--<!ELEMENT add (color|graphType|legend|name|rpn)*>-->
 <!ELEMENT color (#PCDATA)>
 <!ELEMENT graphName (#PCDATA)>
@@ -9,6 +9,7 @@
 <!ELEMENT lowerLimit (#PCDATA)>
 <!ELEMENT graphdesc (name,graphName,graphTitle,verticalLabel,lowerLimit?,add+,hosttree,viewtree)>
 <!ELEMENT legend (#PCDATA)>
+<!ELEMENT reversed (#PCDATA)>
 <!ELEMENT name (#PCDATA)>
 <!ELEMENT rpn (#PCDATA)>
 <!ELEMENT pathstring (#PCDATA)>
