@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+	<name>ifpacketssnmp</name>
+	<graphName>ifpkts-{2}</graphName>
+	<graphTitle>Packets exchanged on interface {2} on {1}</graphTitle>
+	<verticalLabel>paquets/s</verticalLabel>
+	<lowerLimit>NaN</lowerLimit>
+	<add>
+		<legend>Upward graph</legend>
+	</add>
+	<add>
+		<name>ifOutUcastPkts</name>
+		<graphType>area</graphType>
+		<color>green</color>
+		<legend>packets sends/s</legend>
+	</add>
+	<add>
+		<name>ifOutErrors</name>
+		<graphType>line</graphType>
+		<color>red</color>
+		<legend>packets in error send/s</legend>
+	</add>
+	<add>
+		<name>ifInUcastPkts</name>
+	</add>
+	<add>
+		<name>ifInErrors</name>
+	</add>
+	<add>
+		<legend>Downward graph</legend>
+	</add>
+	<add>
+		<name>ifInUcastInversed</name>
+		<graphType>area</graphType>
+		<rpn>0, ifInUcastPkts,-</rpn>
+		<color>blue</color>
+		<legend>packets received/s</legend>
+	</add>
+	<add>
+		<name>ifInErrorsInversed</name>
+		<graphType>line</graphType>
+		<rpn>0, ifInErrors,-</rpn>
+		<color>red</color>
+		<legend>packets in error received/s</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>NETWORK</pathelement>
+		<pathelement>INTERFACES</pathelement>
+		<pathelement>INDEX</pathelement>
+		<pathstring>Packets exchanged</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>NETWORK</pathelement>
+		<pathelement>INTERFACES</pathelement>
+		<pathelement>HOST</pathelement>
+		<pathelement>INDEX</pathelement>
+		<pathstring>Packets exchanged</pathstring>
+	</viewtree>
+</graphdesc>
