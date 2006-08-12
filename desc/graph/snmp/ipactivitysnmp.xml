@@ -6,56 +6,40 @@
   <graphTitle>IP activity on {1}</graphTitle>
   <verticalLabel>paquets/s</verticalLabel>
   <add>
+    <legend>Received datagrams</legend>
+  </add>
+  <add>
     <name>ipInReceives</name>
-    <graphType>none</graphType>
+    <graphType>line</graphType>
+    <color>RED</color>
+    <legend>received datagrams</legend>
+    <reversed>true</reversed>
   </add>
   <add>
     <name>ipInDelivers</name>
-    <graphType>none</graphType>
+    <graphType>line</graphType>
+    <color>ORANGE</color>
+    <legend>locally delivered datagram</legend>
+    <reversed>true</reversed>
   </add>
   <add>
     <name>ipReasmOKs</name>
-    <graphType>none</graphType>
+    <graphType>line</graphType>
+    <color>YELLOW</color>
+    <legend>re-assembled datagrams</legend>
+    <reversed>true</reversed>
   </add>
   <add>
     <name>ipFragOKs</name>
-    <graphType>none</graphType>
-  </add>
-  <add>
-      <legend>Received datagrams</legend>
-  </add>	
-   <add>
-    <name>NipInReceives</name>
     <graphType>line</graphType>
-    <rpn>0, ipInReceives, -</rpn>
-    <color>RED</color>
-    <legend>received datagrams</legend>
-  </add>
-  <add>
-    <name>NipInDelivers</name>
-    <graphType>line</graphType>
-    <rpn>0, ipInDelivers, -</rpn>
-     <color>ORANGE</color>
-    <legend>locally delivered datagram</legend>
-  </add>
-  <add>
-    <name>NipReasmOks</name>
-    <graphType>line</graphType>
-    <rpn>0, ipReasmOKs, -</rpn>
-    <color>YELLOW</color>
-    <legend>re-assembled datagrams</legend>
-  </add>
-  <add>
-    <name>NipFragOks</name>
-    <graphType>line</graphType>
-    <rpn>0, ipFragOKs, -</rpn>
     <color>GRAY</color>
     <legend>fragmented datagrams</legend>
+    <reversed>true</reversed>
   </add>
-   <add>
-     <legend>Sent datagrams</legend>
-  </add>	
-   <add>
+  <add>
+    <legend>Sent datagrams</legend>
+  </add>
+  <add>
     <name>ipForwDatagrams</name>
     <graphType>line</graphType>
     <color>GREEN</color>

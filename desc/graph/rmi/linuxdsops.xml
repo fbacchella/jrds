@@ -19,23 +19,17 @@
   </add>
   <add>
     <name>r</name>
-  </add>
-  <add>
-    <name>nr</name>
     <graphType>line</graphType>
-    <rpn>0, r, -</rpn>
-    <color>green</color>
+     <color>green</color>
+	  <reversed>true</reversed>
     <legend>Number of read accesses</legend>
   </add>
   <add>
     <name>rrqm</name>
-  </add>
-  <add>
-    <name>nrrqm</name>
-    <graphType>line</graphType>
-     <rpn>0, rrqm, -</rpn>
-   <color>blue</color>
-    <legend>Number of read request merged</legend>
+	<graphType>line</graphType>
+    <color>blue</color>
+ 	  <reversed>true</reversed>
+   <legend>Number of read request merged</legend>
   </add>
   <hosttree>
     <pathelement>HOST</pathelement>

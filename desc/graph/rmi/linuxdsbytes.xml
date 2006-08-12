@@ -21,8 +21,9 @@
   <add>
     <name>nrbytes</name>
     <graphType>line</graphType>
-    <rpn>rsec, -512, *</rpn>
-    <color>green</color>
+    <rpn>rsec, 512, *</rpn>
+    <color>blue</color>
+	  <reversed>true</reversed>
     <legend>Number of bytes read</legend>
   </add>
   <hosttree>

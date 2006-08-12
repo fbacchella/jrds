@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Graph Description//EN"
+                           "urn:jrds:graphdesc">
+<probedesc>
+    <name>CpuLoadInt</name>
+    <probeName>laverage</probeName>
+    <probeClass>jrds.probe.snmp.CpuLoadInt</probeClass>
+    <requester>raw</requester>
+    <ds>
+        <dsName>la1</dsName>
+        <dsType>gauge</dsType>
+        <oid>1.3.6.1.4.1.2021.10.1.5.1</oid>
+    </ds>
+    <ds>
+        <dsName>la5</dsName>
+        <dsType>gauge</dsType>
+        <oid>1.3.6.1.4.1.2021.10.1.5.2</oid>
+    </ds>
+    <ds>
+        <dsName>la15</dsName>
+        <dsType>gauge</dsType>
+        <oid>1.3.6.1.4.1.2021.10.1.5.3</oid>
+    </ds>
+    <graphs>
+        <name>cpuload</name>
+    </graphs>
+</probedesc>

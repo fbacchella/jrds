@@ -23,30 +23,22 @@
 		<legend>packets in error send/s</legend>
 	</add>
 	<add>
-		<name>ifHCInUcastPkts</name>
-		<graphType>none</graphType>
-	</add>
-	<add>
-		<name>ifInErrors</name>
-		<graphType>none</graphType>
-	</add>
-	<add>
 		<name>Downward graph</name>
 		<graphType>comment</graphType>
 	</add>
 	<add>
-		<name>ifInUcastInversed</name>
+		<name>ifHCInUcastPkts</name>
 		<graphType>area</graphType>
-		<rpn>0, ifHCInUcastPkts,-</rpn>
 		<color>blue</color>
 		<legend>packets received/s</legend>
+		<reversed>true</reversed>
 	</add>
 	<add>
-		<name>ifInErrorsInversed</name>
+		<name>ifInErrors</name>
 		<graphType>line</graphType>
-		<rpn>0, ifInErrors,-</rpn>
 		<color>red</color>
 		<legend>packets in error received/s</legend>
+		<reversed>true</reversed>
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Graph Description//EN"
+                           "urn:jrds:graphdesc">
+<probedesc>
+    <name>RstatProbe4</name>
+    <probeName>rstat</probeName>
+    <probeClass>jrds.probe.rstat.RstatProbe4</probeClass>
+    <ds>
+        <dsName>v_pgpgin</dsName>
+        <dsType>counter</dsType>
+    </ds>
+    <ds>
+        <dsName>v_pgpgout</dsName>
+        <dsType>counter</dsType>
+    </ds>
+    <ds>
+        <dsName>v_pswpin</dsName>
+        <dsType>counter</dsType>
+    </ds>
+    <ds>
+        <dsName>v_pswpout</dsName>
+        <dsType>counter</dsType>
+    </ds>
+    <ds>
+        <dsName>v_swtch</dsName>
+        <dsType>counter</dsType>
+    </ds>
+    <ds>
+        <dsName>v_intr</dsName>
+        <dsType>counter</dsType>
+    </ds>
+    <graphs>
+        <name>rstatvm</name>
+        <name>rstatint</name>
+    </graphs>
+</probedesc>

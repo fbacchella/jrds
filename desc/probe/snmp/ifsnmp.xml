@@ -68,7 +68,7 @@
   </ds>
   <graphs>
     <name>ifbps</name>
-    <name>ifpacketssnmp</name>
+    <name>ifpackets</name>
     <name>ifpktssz</name>
   </graphs>
 </probedesc>

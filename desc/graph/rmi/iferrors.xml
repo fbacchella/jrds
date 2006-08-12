@@ -39,40 +39,27 @@
 	</add>
 	<add>
 		<name>rxerrs</name>
-	</add>
-	<add>
-		<name>rxerrsI</name>
-		<rpn>0, rxerrs, -</rpn>
-		<color>green</color>
 		<graphType>line</graphType>
+		<color>green</color>
 		<legend>Number of receive errors detected by the device</legend>
+   	 	<reversed>true</reversed>
 	</add>
 	<add>
 		<name>rxdrop</name>
-	</add>
-	<add>
-		<name>rxdropI</name>
-		<rpn>0, txdrop, -</rpn>
 		<graphType>line</graphType>
 		<legend>Number of packets dropped by the device</legend>
 	</add>
 	<add>
 		<name>rxfifo</name>
-	</add>
-	<add>
-		<name>rxfifoI</name>
-		<rpn>0, rxfifo, -</rpn>
 		<graphType>line</graphType>
 		<legend>Number of FIFO buffer errors</legend>
+   	 	<reversed>true</reversed>
 	</add>
 	<add>
 		<name>rxframe</name>
-	</add>
-	<add>
-		<name>rxframeI</name>
-		<rpn>0, rxframe, -</rpn>
 		<graphType>line</graphType>
 		<legend>Number of packet framing errors</legend>
+   	 	<reversed>true</reversed>
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>
