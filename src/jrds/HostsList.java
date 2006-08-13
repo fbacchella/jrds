@@ -6,6 +6,7 @@ _##########################################################################*/
 
 package jrds;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
@@ -44,10 +45,12 @@ public class HostsList {
 	private final Set<RdsHost> hostList = new HashSet<RdsHost>();
 	private final Map<Integer, RdsGraph> graphMap = new HashMap<Integer, RdsGraph>();
 	private final Map<Integer, Probe> probeMap= new HashMap<Integer, Probe>();
-	private final Map<String, Macro> macroList = new HashMap<String, Macro>();
 	private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
 	private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
 	private final Renderer renderer = new Renderer(20);
+	private int numCollectors = 1;
+	private int resolution;
+	private String rrdDir;
 
 	/**
 	 *  
@@ -75,14 +78,52 @@ public class HostsList {
 		return instance;
 	}
 	
-	/**
-	 * Must be called after a new configuration has been loaded
-	 */
-	public void confLoaded() {
-		macroList.clear();
-		DescFactory.digester = null;
+	public void configure(PropertiesManager pm) {
+		numCollectors = pm.collectorThreads;
+		resolution = pm.resolution;
+		rrdDir = pm.rrddir;
+
+		DescFactory df = new DescFactory();
+		ProbeFactory pd = new ProbeFactory(df.getProbesDesc(), pm);
+		HostConfigParser hp = new HostConfigParser(pd);
+		
+		//String probepath = DescFactory.class.getResource("/probe").toString();
+		//logger.debug("probes jar path: " + probepath);
+		//Quick hack for Gentoo's tomcat 5
+		//String graphpath = DescFactory.class.getResource("/graph").toString();
+		//logger.debug("graphs jar path: " + graphpath);
+		//String path = probepath;
+
+		try {
+			df.importDescUrl(DescFactory.class.getResource("/probe"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		if(! "".equals(pm.libspath)) {
+			String[] libsPath = pm.libspath.split(";");
+			for(int i=0 ; i < libsPath.length ; i++) {
+				String lib = libsPath[i];
+				try {
+					logger.info("Adding lib " + lib);
+					if(lib.endsWith(".jar"))
+						df.importJar(lib);
+					else
+						df.importDir(new File(lib));
+				} catch (IOException e) {
+					logger.error("Lib " + lib + " can't be imported: " + e);
+				}
+			}
+		}
+
+		if(pm.configdir != null)
+			hp.importDir(new File(pm.configdir,"/macro"));
+		if(pm.configdir != null)
+			hp.importDir(new File(pm.configdir));
+
 	}
-	
+
 	public Collection<RdsHost> getHosts() {
 		return hostList;
 		
@@ -116,7 +157,7 @@ public class HostsList {
 		logger.debug("One collect was launched");
 		Date start = new Date();
 		starters.startCollect();
-		ExecutorService tpool =  Executors.newFixedThreadPool(PropertiesManager.getInstance().collectorThreads);
+		ExecutorService tpool =  Executors.newFixedThreadPool(numCollectors);
 		for(final RdsHost oneHost: hostList) {
 			logger.debug("Collect all stats for host " + oneHost.getName());
 			Runnable runCollect = new Runnable() {
@@ -135,7 +176,7 @@ public class HostsList {
 		}
 		tpool.shutdown();
 		try {
-			tpool.awaitTermination(PropertiesManager.getInstance().resolution - 10, TimeUnit.SECONDS);
+			tpool.awaitTermination(resolution - 10, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			logger.info("Collect interrupted");
 		}
@@ -206,13 +247,6 @@ public class HostsList {
 		return node;
 	}
 
-	/**
-	 * @return
-	 */
-	public Map<String, Macro> getMacroList() {
-		return macroList;
-	}
-
 	public void addStarter(Starter s) {
 		starters.registerStarter(s, this);
 	}
@@ -256,6 +290,14 @@ public class HostsList {
 	 */
 	public Renderer getRenderer() {
 		return renderer;
+	}
+
+	public int getResolution() {
+		return resolution;
+	}
+
+	public String getRrdDir() {
+		return rrdDir;
 	}
 
 

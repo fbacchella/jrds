@@ -2,10 +2,11 @@
 //$Id: HostConfigParser.java 237 2006-03-03 14:57:55 +0100 (ven., 03 mars 2006) fbacchella $
 package jrds;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import jrds.snmp.SnmpStarter;
@@ -21,15 +22,13 @@ import org.xml.sax.Attributes;
  * @author Fabrice Bacchella
  * @version $Revision: 237 $
  */
-public class HostConfigParser {
+public class HostConfigParser  extends DirXmlParser {
 
-	static private final Logger logger = Logger.getLogger(HostConfigParser.class);
+	private final Logger logger = Logger.getLogger(HostConfigParser.class);
+	private Map<String, Macro> macroList = new HashMap<String, Macro>();
+	ProbeFactory pf;
 
-	public HostConfigParser(File hostConfigFile)
-	{
-	}
-
-	private static final class Tag {
+	private final class Tag {
 		String tag;
 
 		public final String getTag() {
@@ -41,8 +40,24 @@ public class HostConfigParser {
 		}
 	};
 
-	private static void defineHost(Digester digester) {
+	public HostConfigParser(ProbeFactory pf) {
+		super();
+		this.pf = pf;
+	}
 
+	void init() {
+		digester.setValidating(false);
+		defineSumDigester(digester);
+		defineSnmp(digester);
+		defineMacro(digester);
+		defineArg(digester);
+		defineProbe(digester);
+		defineHost(digester);
+		defineTag(digester);
+		FilterXml.addToDigester(digester);
+	}
+
+	private void defineHost(Digester digester) {
 		//How to create an host
 		Rule cleanStack = new Rule() {
 			public void begin(String namespace, String name, Attributes attributes) throws Exception {
@@ -84,7 +99,7 @@ public class HostConfigParser {
 		 */
 	}
 
-	private static void defineProbe(Digester digester) {
+	private void defineProbe(Digester digester) {
 		Rule makeProbe = new Rule() {
 			public void begin(String namespace, String name, Attributes attributes) throws Exception {
 				//We will need the type latter, so keep it on the stack
@@ -116,7 +131,7 @@ public class HostConfigParser {
 					String probeType = (String) o;
 					for(int i = 0; i < digester.getCount() && !((o = digester.peek(i)) instanceof RdsHost) ; i++);
 					RdsHost host = (RdsHost) o;
-					Probe newProbe = ProbeFactory.makeProbe(probeType, host, argsListValue);
+					Probe newProbe = pf.makeProbe(probeType, host, argsListValue);
 					if(newProbe != null) {
 						for(Starter s: starters) {
 							newProbe.addStarter(s);
@@ -141,7 +156,7 @@ public class HostConfigParser {
 	 * What to do with a snmp element
 	 * @param digester
 	 */
-	static void defineSnmp(Digester digester) {
+	void defineSnmp(Digester digester) {
 		Rule addSnmpStarterRule= new Rule() {
 			public void begin(String namespace, String name, Attributes attributes) throws Exception {
 				SnmpStarter starter = new SnmpStarter();
@@ -167,13 +182,13 @@ public class HostConfigParser {
 		digester.addRule("host/probe/snmp", addSnmpStarterRule);
 	}
 
-	static void defineArg(Digester digester) {
+	void defineArg(Digester digester) {
 		Rule storeArg = new Rule() {
 			@SuppressWarnings("unchecked")
 			public void begin(String namespace, String name, Attributes attributes) throws Exception {
 				String type = attributes.getValue("type");
 				String value = attributes.getValue("value");
-				Object arg = ProbeFactory.makeArg(type, value);
+				Object arg = pf.makeArg(type, value);
 				Object o = null;
 				for(int i = 0; i< digester.getCount() && !((o = digester.peek(i)) instanceof List) ; i++);
 				List<Object> argsListValue = (List<Object>) o;
@@ -181,20 +196,19 @@ public class HostConfigParser {
 			}
 		};
 
-		digester.addRule("host/probe/arg", storeArg);
-		digester.addRule("host/rrd/arg", storeArg);
+		digester.addRule("*/arg", storeArg);
 	}
 
 	/**
 	 * What to do when a macro definition is found
 	 * @param d
 	 */
-	static void defineMacro(Digester d) {
+	void defineMacro(Digester d) {
 		d.addRule("host/macro", new Rule() {
 			public void begin (String namespace, String name, Attributes attributes) {
 				String macroName = attributes.getValue("name");
 				if(macroName != null) {
-					Macro m = HostsList.getRootGroup().getMacroList().get(macroName);
+					Macro m = macroList.get(macroName);
 					if (m != null) {
 						Object o = null;
 						for(int i = 0; i< digester.getCount() && !((o = digester.peek(i)) instanceof RdsHost) ; i++);
@@ -207,12 +221,65 @@ public class HostConfigParser {
 			}	
 		}
 		);
+		d.addRule("macrodef", new Rule() {
+			public void begin (String namespace, String name, Attributes attributes) {
+				String macroName = attributes.getValue("name");
+				Macro m = new Macro(pf);
+				macroList.put(macroName, m);
+				digester.push(m);
+			}	
+			public void end(String namespace, String name) throws Exception {
+				Set<Tag> tags = new HashSet<Tag>();
+				Set<Object[]> probes = new HashSet<Object[]>();
+				Object o = null;
+				while(digester.getCount() != 0 && ! ((o = digester.pop()) instanceof Macro)) {
+					if(o instanceof Tag) {
+						tags.add((Tag) o);
+					}
+					else if(o instanceof Object[]) {
+						probes.add((Object[]) o);
+					}
+				}
+				if( o instanceof Macro) {
+					Macro m = (Macro) o;
+					for(Tag tg: tags)
+						m.addTag(tg.getTag());
+					for(Object[] p: probes)
+						m.put((String) p[0], (List)p[1]);
+					digester.push(m);
+				}
+				else
+					logger.error("hitting empty digester stack for an host, internal error");
+			}			
+		}
+		);
+		Rule makeProbe = new Rule() {
+			@Override
+			public String toString() {
+				return "MacroProbeAdd";
+			}
+
+			public void begin(String namespace, String name, Attributes attributes) throws Exception {
+				//We will need the type latter, so keep it on the stack
+				digester.push(attributes.getValue("type"));
+				digester.push(new ArrayList(0));
+			}
+
+			public void end(String namespace, String name) throws Exception {
+				List argsListValue = (List)digester.pop();
+				String macroType = (String)digester.pop();
+				Object[] l = new Object[] {macroType, argsListValue};
+				digester.push(l);
+			}
+		};
+		digester.addRule("macrodef/probe/", makeProbe);
+		digester.addRule("macrodef/rrd/", makeProbe);
 	}
 
-	static void defineTag(Digester d) {
+	void defineTag(Digester d) {
 		Rule tagRule =  new Rule() {
 			public void body(java.lang.String namespace, java.lang.String name, java.lang.String text) {
-				HostConfigParser.Tag t = new HostConfigParser.Tag();
+				Tag t = new HostConfigParser.Tag();
 				t.setTag(text);
 				digester.push(t);
 			}
@@ -221,20 +288,32 @@ public class HostConfigParser {
 				return "Tag";
 			}
 		};
-		d.addRule("host/tag", tagRule);
-		d.addRule("host/rrd/tag", tagRule);
-		d.addRule("host/probe/tag", tagRule);
+		d.addRule("*/tag", tagRule);
 	}
-
-	public static void addDigester(Digester digester) {
+	
+	private void defineSumDigester(Digester digester) {
 //		digester.register("-//jrds//DTD View//EN", digester.getClass().getResource("/view.dtd").toString());
-		digester.setValidating(false);
-		defineSnmp(digester);
-		defineMacro(digester);
-		defineArg(digester);
-		defineProbe(digester);
-		defineHost(digester);
-		defineTag(digester);
+		digester.addRule("sum/", new Rule() {
+			public void begin (String namespace, String name, Attributes attributes) {
+				String sumName = attributes.getValue("name");
+				digester.push(sumName);
+				digester.push(new ArrayList());
+			}
+			@SuppressWarnings("unchecked")
+			public void end(String namespace, String name) throws Exception {
+				List<String> l = (List<String>) digester.pop();
+				String sumName = (String) digester.pop();
+				jrds.HostsList.getRootGroup().addSum(sumName, l);
+			}
+		});
+		digester.addRule("sum/element/", new Rule() {
+			@SuppressWarnings("unchecked")
+			public void begin (String namespace, String name, Attributes attributes) {
+				String elementName = attributes.getValue("name");
+				List<String> l = (List<String>) digester.peek();
+				l.add(elementName);
+			}
+		});
 	}
 
 }

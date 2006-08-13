@@ -7,7 +7,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import jrds.DescFactory;
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.PropertiesManager;
@@ -25,15 +24,13 @@ public class Updater {
 	}
 	static final private Logger logger = Logger.getLogger(Updater.class);
 	public static final int GRAPH_RESOLUTION = 300; // seconds
-	private static final PropertiesManager pm = PropertiesManager.getInstance();
 
 	public static void main(String[] args) {
-		pm.join(new File("jrds.properties"));
-		pm.update();
+		PropertiesManager pm = new PropertiesManager(new File("jrds.properties"));
 		//jrds.log.JrdsLoggerFactory.setOutputFile(pm.logfile);
 
 		System.getProperties().setProperty("java.awt.headless","true");
-		System.getProperties().putAll(pm.getProperties());
+		System.getProperties().putAll(pm);
 		try {
 			StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
 		} catch (RrdException e) {
@@ -41,13 +38,8 @@ public class Updater {
 			e.printStackTrace();
 		}
 
-		DescFactory.init();
-		final HostsList hl = HostsList.getRootGroup();
-		//DescFactory.scanProbeDir(new File("config"));
-		if(pm.configdir != null)
-			DescFactory.scanProbeDir(new File(pm.configdir, "macro"));
-		if(pm.configdir != null)
-			DescFactory.scanProbeDir(new File(pm.configdir));
+		HostsList hl = HostsList.getRootGroup();
+		hl.configure(pm);
 
 		ExecutorService tpool =  Executors.newFixedThreadPool(3);
 

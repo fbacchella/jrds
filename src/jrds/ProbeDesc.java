@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -344,13 +345,13 @@ public class ProbeDesc {
 	 * @param constArgs
 	 * @return
 	 */
-	public Probe makeProbe(RdsHost host, List constArgs) {
+	public Probe makeProbe(RdsHost host, List constArgs, Properties prop) {
 		Probe retValue = null;
 		if (probeClass != null) {
 			Object o = null;
 			try {
-				Class[] constArgsType = new Class[constArgs.size()/* + 2 */];
-				Object[] constArgsVal = new Object[constArgs.size()/* +2 */];
+				Class[] constArgsType = new Class[constArgs.size()];
+				Object[] constArgsVal = new Object[constArgs.size()];
 				int index = 0;
 				for (Iterator i = constArgs.iterator(); i.hasNext(); index++) {
 					Object arg = i.next();
@@ -362,6 +363,7 @@ public class ProbeDesc {
 				retValue = (Probe) o;
 				retValue.setHost(host);
 				retValue.setPd(this);
+				retValue.readProperties(prop);
 			}
 			catch (ClassCastException ex) {
 				logger.warn("didn't get a Probe but a " + o.getClass().getName());
@@ -371,8 +373,12 @@ public class ProbeDesc {
 						ex.getCause());
 			}
 			catch (Exception ex) {
+				Throwable showException = ex;
+				Throwable t = ex.getCause();
+				if(t != null)
+					showException = t;
 				logger.warn("Error during probe creation of type " + getName() + " for " + host +
-						": " + ex, ex);
+						": ", showException);
 			}
 		}
 		return retValue;

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import jrds.probe.IndexedProbe;
@@ -63,6 +64,9 @@ implements Comparable {
 	public Probe() {
 	}
 
+	public void readProperties(Properties p) {
+		
+	}
 	
 	public RdsHost getHost() {
 		return monitoredHost;
@@ -113,7 +117,7 @@ implements Comparable {
 	public String getRrdName() {
 		String rrdName = getName().replaceAll("/","_");
 		return monitoredHost.getHostDir() +
-		PropertiesManager.getInstance().fileSeparator + rrdName + ".rrd";
+		org.jrobin.core.Util.getFileSeparator() + rrdName + ".rrd";
 	}
 
 	private final String parseTemplate(String template) {

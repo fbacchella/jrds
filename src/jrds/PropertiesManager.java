@@ -11,26 +11,35 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
- * An ugly class suposed to manage properties
+ * An less ugly class suposed to manage properties
  * should be reworked
  * @author Fabrice Bacchella
  */
-public class PropertiesManager {
-	static private PropertiesManager instance;
-	static private Logger logger = Logger.getLogger(PropertiesManager.class);
+public class PropertiesManager extends Properties {
+	private final Logger logger = Logger.getLogger(PropertiesManager.class);
 
-	private Properties properties = new Properties();
+	public PropertiesManager()
+	{
+		join(System.getProperties());
+		update();
+	}
+	
+	public PropertiesManager(File propFile)
+	{
+		join(propFile);
+		update();
+	}
 	
 	
 	private String getParameter(String key, String defaultValue,
 			boolean doTrim) {
-		String returnValue = properties.getProperty(key);
+		String returnValue = getProperty(key);
 		if (doTrim && returnValue != null) {
 			returnValue = returnValue.trim();
 		}
 		if (returnValue == null) {
 			returnValue = defaultValue;
-			properties.setProperty(key, defaultValue);
+			setProperty(key, defaultValue);
 		}
 		return returnValue;
 	}
@@ -63,7 +72,7 @@ public class PropertiesManager {
 	public void join(URL url) {
 		try {
 			InputStream inputstream = url.openStream();
-			properties.load(inputstream);
+			load(inputstream);
 			inputstream.close();
 		}
 		catch (IOException ex) {
@@ -72,7 +81,7 @@ public class PropertiesManager {
 	}
 	
 	public void join(Properties moreProperties) {
-		properties.putAll(moreProperties);
+		putAll(moreProperties);
 	}
 	
 	public void join(File propFile)
@@ -80,7 +89,7 @@ public class PropertiesManager {
 		logger.debug("Using propertie file " + propFile.getAbsolutePath());
 		try {
 			InputStream inputstream = new FileInputStream(propFile);
-			properties.load(inputstream);
+			load(inputstream);
 			inputstream.close();
 		} catch (IOException ex) {
 			logger.warn("Invalid properties file " + propFile.getAbsolutePath() + ": " + ex.getLocalizedMessage());
@@ -90,62 +99,35 @@ public class PropertiesManager {
 	public void join(InputStream propStream)
 	{
 		try {
-			properties.load(propStream);
-			propStream.close();
+			load(propStream);
 		} catch (IOException ex) {
-			logger.warn("Invalid properties stream " + propStream + ": " + ex.getLocalizedMessage());
+			logger.warn("Invalid properties stream " + propStream + ": " + ex);
 		}
 	}
 
-	public Properties getProperties()
-	{
-		return properties;
-	}
-	
-	private PropertiesManager()
-	{
-		join(System.getProperties());
-		update();
-	}
-	
 	public void update()
 	{
-		urlperfpath = getParameter("urlperfpath","./HTTPTest");
-		configfilepath = getParameter("configfilepath", "");
 		configdir = getParameter("configdir", "config");
 		rrddir = getParameter("rrddir", "probe");
-		probelibpath = getParameter("probelibpath", "probelib");
-		graphlibpath = getParameter("graphlibpath", "graphlib");
-		fileSeparator = getParameter("file.separator", "/");
 		logfile = getParameter("logfile", "jrds.log");
 		loglevel = Level.toLevel(getParameter("loglevel", "DEBUG"));
 		resolution = parseInteger(getParameter("resolution", "300"));
 		collectorThreads = parseInteger(getParameter("collectorThreads", "1"));
 		dbPoolSize = parseInteger(getParameter("dbPoolSize", "10"));
 		syncPeriod = parseInteger(getParameter("syncPeriod", "-1"));
+		libspath = getParameter("libspath", "");
 		
 	}
 	
-	
-	static public PropertiesManager getInstance()
-	{
-		if(instance == null)
-			instance = new PropertiesManager();
-		return instance;
-	}
-	public String urlperfpath;
-	public String configfilepath;
 	public String configdir;
 	public String urlpngroot;
 	public String rrddir;
-	public String fileSeparator;
 	public String logfile;
-	public String probelibpath;
-	public String graphlibpath;
 	public Level loglevel;
 	public int resolution;
 	public int collectorThreads;
 	public int dbPoolSize;
 	public int syncPeriod;
+	public String libspath;
 	
 }

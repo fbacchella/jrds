@@ -6,6 +6,7 @@
 package jrds;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.ConsoleAppender;
@@ -24,12 +25,12 @@ import org.snmp4j.log.Log4jLogFactory;
  */
 public class JrdsLogger {
 	static private final String APPENDER = "jrds";
-	static private final Level DEFAULTLEVEL = Level.DEBUG;
+	static private Level DEFAULTLEVEL = Level.DEBUG;
 	static private final String DEFAULTLOGFILE = ConsoleAppender.SYSTEM_ERR;
 	static {
 		try {
 			Appender app = getAppender(false, DEFAULTLOGFILE);
-			initLog(app);
+			initLog(app, System.getProperties());
 		} catch (IOException e) {
 			Logger.getRootLogger().error("Unable to open " + DEFAULTLOGFILE + ": " + e.getLocalizedMessage());
 		}
@@ -46,17 +47,17 @@ public class JrdsLogger {
 	 * Configure logging to go to a file
 	 * @param logfile The file to send log to
 	 */
-	static final public void setFileLogger(String logfile)
+	static final public void setFileLogger(String logfile, Properties p)
 	{
 		try {
 			Appender app = getAppender(true, logfile);
-			initLog(app);
+			initLog(app, p);
 		} catch (IOException e) {
 			Logger.getLogger(".").error("Unable to open " + logfile + ": " + e.getLocalizedMessage());
 		}
 	}
 
-	static final private void initLog(Appender app) {
+	static final private void initLog(Appender app, Properties p) {
 		Logger logger = Logger.getLogger(APPENDER);
 		logger.removeAppender(APPENDER);
 		logger.addAppender(app);
@@ -73,9 +74,8 @@ public class JrdsLogger {
 		digesterLogger.removeAppender(APPENDER);
 		digesterLogger.addAppender(app);
 
-		PropertiesManager pm = PropertiesManager.getInstance();
-		logger.setLevel(pm.loglevel);
-		PropertyConfigurator.configure(pm.getProperties());
+		logger.setLevel(DEFAULTLEVEL);
+		PropertyConfigurator.configure(p);
 	}
 
 	static final private Appender getAppender(boolean isFile, String logfile) throws IOException {

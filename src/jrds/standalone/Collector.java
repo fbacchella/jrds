@@ -8,7 +8,6 @@ package jrds.standalone;
 
 import java.io.File;
 
-import jrds.DescFactory;
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.PropertiesManager;
@@ -31,7 +30,6 @@ public class Collector {
 	}
 	static final private Logger logger = Logger.getLogger(Collector.class);
 	public static final int GRAPH_RESOLUTION = 300; // seconds
-	private static final PropertiesManager pm = PropertiesManager.getInstance();
 
 	public static void main(String[] args) throws Exception {
 		//ClassLoader cl = Collector.class.getClassLoader();
@@ -46,25 +44,22 @@ public class Collector {
 		//Class.forName("jrds.probe.exalead.Exalead");
 		//System.exit(0);
 
-		pm.join(new File("jrds.properties"));
-		pm.update();
+		PropertiesManager pm = new PropertiesManager(new File("jrds.properties"));
 		jrds.log.JrdsLoggerFactory.setOutputFile(pm.logfile);
 
 		System.getProperties().setProperty("java.awt.headless","true");
-		System.getProperties().putAll(pm.getProperties());
+		System.getProperties().putAll(pm);
 		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
 		
-		final HostsList hl = HostsList.getRootGroup();
+		HostsList hl = HostsList.getRootGroup();
 		Logger logdigest = Logger.getLogger(org.apache.commons.digester.Digester.class);
 		logdigest.setLevel(Level.ERROR);
 		Logger.getLogger("org.apache.commons.digester.Digester.sax").setLevel(Level.ERROR);
 		Logger.getLogger(org.apache.commons.digester.Digester.class).addAppender(jrds.log.JrdsLoggerFactory.app);
 		logger.debug("Scanning dir");
 		
-		DescFactory.init();
-		DescFactory.importJar("../jrdsExalead/build/jrdsexalead.jar");
-		DescFactory.scanProbeDir(new File("config"));
-		HostsList.getRootGroup().confLoaded();
+		//DescFactory.importJar("../jrdsExalead/build/jrdsexalead.jar");
+		HostsList.getRootGroup().configure(pm);
 
 		for(RdsHost h: hl.getHosts()) {
 			for(Probe p: h.getProbes()) {

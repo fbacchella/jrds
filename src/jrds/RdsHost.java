@@ -53,7 +53,7 @@ public class RdsHost implements Comparable {
 	
 	public String getHostDir()
 	{
-		String rrdDir = PropertiesManager.getInstance().rrddir + PropertiesManager.getInstance().fileSeparator + name;
+		String rrdDir = HostsList.getRootGroup().getRrdDir() + org.jrobin.core.Util.getFileSeparator() + name;
 		return rrdDir;
 	}
 	

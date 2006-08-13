@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
@@ -20,21 +21,17 @@ import org.apache.log4j.Logger;
  */
 public class ProbeFactory {
 
-	static private final Logger logger = Logger.getLogger(ProbeFactory.class);
-	/*static {
-		final String DEFAULT_PARSER_NAME = "org.apache.xerces.parsers.SAXParser";
-		try {
-			XMLReaderFactory.createXMLReader(DEFAULT_PARSER_NAME);
-		} catch (SAXException e) {
-			logger.fatal("xerces is mandatory, please install it");
-		}
-	}*/
-	
-	static final private List<String> argPackages = new ArrayList<String>(3);
-	static final public Map<String, ProbeDesc> probeDescMap = new HashMap<String, ProbeDesc>();
-	static final private List<String> probePackages = new ArrayList<String>(5);
-	
-	static {
+	private final Logger logger = Logger.getLogger(ProbeFactory.class);
+	final private List<String> argPackages = new ArrayList<String>(3);
+	final private List<String> probePackages = new ArrayList<String>(5);
+	private Map<String, ProbeDesc> probeDescMap;
+	private Properties prop;
+	/**
+	 * Private constructor
+	 */
+	ProbeFactory(Map<String, ProbeDesc> probeDescMap, Properties prop) {
+		this.probeDescMap = probeDescMap;
+		this.prop = prop;
 		argPackages.add("java.lang.");
 		argPackages.add("java.net.");
 		argPackages.add("");
@@ -44,22 +41,9 @@ public class ProbeFactory {
 		probePackages.add("jrds.probe.munins.");
 		probePackages.add("jrds.probe.rstat.");
 		probePackages.add("jrds.probe.jdbc.");
-		probePackages.add("jrds.probe.exalead.");
 		probePackages.add("");
+	}
 
-	}
-	
-	/**
-	 * Private constructor
-	 */
-	private ProbeFactory() {
-		
-	}
-	
-	public static void addDesc(ProbeDesc p) {
-		probeDescMap.put(p.getName(), p);
-	}
-	
 	/**
 	 * Create an objet providing the class name and a String argument. So the class must have
 	 * a constructor taking only a string as an argument.
@@ -67,13 +51,13 @@ public class ProbeFactory {
 	 * @param value
 	 * @return
 	 */
-	public static Object makeArg(String className, String value) {
+	public Object makeArg(String className, String value) {
 		Object retValue = null;
 		Class classType = resolvClass(className, argPackages);
 		if (classType != null) {
 			Class[] argsType = { String.class };
 			Object[] args = { value };
-			
+
 			try {
 				Constructor theConst = classType.getConstructor(argsType);
 				retValue = theConst.newInstance(args);
@@ -84,7 +68,7 @@ public class ProbeFactory {
 		}
 		return retValue;
 	}
-	
+
 	/**
 	 * Create an probe, provided his Class and a list of argument for a constructor
 	 * for this object. It will be found using the default list of possible package
@@ -92,23 +76,20 @@ public class ProbeFactory {
 	 * @param constArgs
 	 * @return
 	 */
-	public static Probe makeProbe(String className, RdsHost host, List constArgs) {
+	public Probe makeProbe(String className, RdsHost host, List constArgs) {
 		Probe retValue = null;
 		ProbeDesc pd = (ProbeDesc) probeDescMap.get(className);
 		if( pd != null) {
-			retValue = pd.makeProbe(host, constArgs);
+			retValue = pd.makeProbe(host, constArgs, prop);
 		}
 		else {
 			Class probeClass = resolvClass(className, probePackages);
 			if (probeClass != null) {
 				Object o = null;
 				try {
-					Class[] constArgsType = new Class[constArgs.size()/* + 1*/];
-					Object[] constArgsVal = new Object[constArgs.size()/* + 1*/];
+					Class[] constArgsType = new Class[constArgs.size()];
+					Object[] constArgsVal = new Object[constArgs.size()];
 					int index = 0;
-					/*constArgsVal[index] = host;
-					constArgsType[index] = constArgsVal[index].getClass();
-					index++;*/
 					for (Object arg: constArgs) {
 						constArgsType[index] = arg.getClass();
 						constArgsVal[index] = arg;
@@ -118,6 +99,7 @@ public class ProbeFactory {
 					o = theConst.newInstance(constArgsVal);
 					retValue = (Probe) o;
 					retValue.setHost(host);
+					retValue.readProperties(prop);
 				}
 				catch (ClassCastException ex) {
 					logger.warn("didn't get a Probe but a " + o.getClass().getName());
@@ -130,8 +112,8 @@ public class ProbeFactory {
 		}
 		return retValue;
 	}
-	
-	private static Class<?> resolvClass(String name, List<String> listPackages) {
+
+	private Class<?> resolvClass(String name, List<String> listPackages) {
 		Class retValue = null;
 		for (String packageTry: listPackages) {
 			try {
@@ -147,7 +129,7 @@ public class ProbeFactory {
 		return retValue;
 	}
 
-	public static ProbeDesc getProbeDesc(String name) {
+	public ProbeDesc getProbeDesc(String name) {
 		return probeDescMap.get(name);
 	}
 }

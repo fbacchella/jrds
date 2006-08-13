@@ -9,7 +9,6 @@ package jrds.standalone;
 import java.io.File;
 import java.util.Date;
 
-import jrds.DescFactory;
 import jrds.GraphTree;
 import jrds.HostsList;
 import jrds.PropertiesManager;
@@ -30,21 +29,17 @@ public class Grapher {
 		jrds.log.JrdsLoggerFactory.initLog4J();
 	}
 	static final private Logger logger = Logger.getLogger(Grapher.class);
-	private static final PropertiesManager pm = PropertiesManager.getInstance();
 
 	public static void main(String[] args) throws Exception {
-		pm.join(new File("jrds.properties"));
-		pm.update();
+		PropertiesManager pm = new PropertiesManager(new File("jrds.properties"));
 		jrds.log.JrdsLoggerFactory.setOutputFile(pm.logfile);
 		
 		System.getProperties().setProperty("java.awt.headless","true");
-		System.getProperties().putAll(pm.getProperties());
+		System.getProperties().putAll(pm);
 		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
 
-		DescFactory.init();
-		DescFactory.importJar("../jrdsExalead/build/jrdsexalead.jar");
-		DescFactory.scanProbeDir(new File("config"));
-		HostsList.getRootGroup().confLoaded();
+		//DescFactory.importJar("../jrdsExalead/build/jrdsexalead.jar");
+		HostsList.getRootGroup().configure(pm);
 
 		Date end = new Date();
 		Date begin = new Date(end.getTime() - 86400 * 1000);

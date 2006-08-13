@@ -25,7 +25,6 @@ public class StartListener implements ServletContextListener {
 		jrds.log.JrdsLoggerFactory.initLog4J();
 	}
 	static private final Logger logger = Logger.getLogger(StartListener.class);
-	static final PropertiesManager pm = PropertiesManager.getInstance();
 	static private boolean started = false;
 	private static final Timer collectTimer = new Timer(true);
 
@@ -40,6 +39,7 @@ public class StartListener implements ServletContextListener {
 			try {
 				ServletContext ctxt = arg0.getServletContext();
 				logger.info("Starting jrds");
+				PropertiesManager pm = new PropertiesManager();
 				InputStream propStream = ctxt.getResourceAsStream("/WEB-INF/jrds.properties");
 				if(propStream != null) {
 					pm.join(propStream);
@@ -61,15 +61,8 @@ public class StartListener implements ServletContextListener {
 
 				StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
 
-				DescFactory.init();
-
-				if(pm.configdir != null)
-					DescFactory.scanProbeDir(new File(pm.configdir, "macro"));
-				if(pm.configdir != null)
-					DescFactory.scanProbeDir(new File(pm.configdir));
-
-				HostsList.getRootGroup().confLoaded();
-
+				HostsList.getRootGroup().configure(pm);
+				
 				TimerTask collector = new TimerTask () {
 					public void run() {
 						try {
@@ -79,7 +72,7 @@ public class StartListener implements ServletContextListener {
 						}
 					}
 				};
-				collectTimer.schedule(collector, 5000L, PropertiesManager.getInstance().resolution * 1000L);
+				collectTimer.schedule(collector, 5000L, HostsList.getRootGroup().getResolution() * 1000L);
 			}
 			catch (Exception ex) {
 				logger.fatal("Unable to start " + arg0.getServletContext().getServletContextName(), ex);
