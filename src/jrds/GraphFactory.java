@@ -9,8 +9,6 @@ package jrds;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,23 +23,17 @@ import org.apache.log4j.Logger;
 public class GraphFactory {
 	static private final Logger logger = Logger.getLogger(GraphFactory.class);
 
-	static final private List<String> graphPackages = new ArrayList<String>(2);
-	static final private Map<String, GraphDesc> graphDescMap = Collections.synchronizedMap(new HashMap<String, GraphDesc>());
+	final private List<String> graphPackages = new ArrayList<String>(2);
+	private Map<String, GraphDesc> graphDescMap;
 
-	static {
-		graphPackages.add("jrds.graph.");
-	}
-	
 	/**
 	 * Private constructor
 	 */
-	private GraphFactory() {
+	public GraphFactory(Map<String, GraphDesc> graphDescMap) {
+		graphPackages.add("jrds.graph.");
+		this.graphDescMap = graphDescMap;
 	}
-	
-	public static void addDesc(GraphDesc gd) {
-		graphDescMap.put(gd.getName(), gd);
-	}
-		
+
 	/**
 	 * This method is used to generate a class from an object. It can be :
 	 * 
@@ -55,7 +47,7 @@ public class GraphFactory {
 	 * @param probe the probe the graph will take data from
 	 * @return a new instanciated Graph
 	 */
-	public final static RdsGraph makeGraph(Object className, Probe probe) {
+	public final RdsGraph makeGraph(Object className, Probe probe) {
 		RdsGraph retValue = null;
 		
 		//Simple case, the handler is already known

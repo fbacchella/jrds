@@ -69,7 +69,7 @@ public class ProbeDesc {
 	private String probeName;
 	private String name;
 	private Collection namedProbesNames;
-	private Collection graphClasses;
+	private Collection graphClasses = new ArrayList(0);
 	private OID indexOid = null;
 	private String rmiClass = null;
 	private SnmpRequester requester = SnmpRequester.RAW;
@@ -361,15 +361,13 @@ public class ProbeDesc {
 				Constructor theConst = probeClass.getConstructor(constArgsType);
 				o = theConst.newInstance(constArgsVal);
 				retValue = (Probe) o;
-				retValue.setHost(host);
 				retValue.setPd(this);
-				retValue.readProperties(prop);
 			}
 			catch (ClassCastException ex) {
 				logger.warn("didn't get a Probe but a " + o.getClass().getName());
 			}
 			catch(InstantiationException ex) {
-				logger.warn("Instantation exception : " + ex.getCause().getMessage() /*+ " for " + host + ":" + getName()*/,
+				logger.warn("Instantation exception : " + ex.getCause().getMessage(),
 						ex.getCause());
 			}
 			catch (Exception ex) {
@@ -460,6 +458,18 @@ public class ProbeDesc {
 				dsElement.appendChild(dsTypeElement);
 			}
 			
+			if(! Double.isNaN(ds.maxValue)) {
+				Element upperLimitElement = document.createElement("upperLimit");
+				upperLimitElement.appendChild(document.createTextNode(Double.toString(ds.maxValue)));
+				root.appendChild(upperLimitElement);
+			}
+
+			if(ds.minValue != MINDEFAULT) {
+				Element lowerLimitElement = document.createElement("lowerLimit");
+				lowerLimitElement.appendChild(document.createTextNode(Double.toString(ds.minValue)));
+				root.appendChild(lowerLimitElement);
+			}
+
 			String keyName = null;
 			if(ds.key instanceof org.snmp4j.smi.OID) {
 				keyName = "oid";

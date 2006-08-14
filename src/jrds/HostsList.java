@@ -8,7 +8,9 @@ package jrds;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -84,16 +86,7 @@ public class HostsList {
 		rrdDir = pm.rrddir;
 
 		DescFactory df = new DescFactory();
-		ProbeFactory pd = new ProbeFactory(df.getProbesDesc(), pm);
-		HostConfigParser hp = new HostConfigParser(pd);
 		
-		//String probepath = DescFactory.class.getResource("/probe").toString();
-		//logger.debug("probes jar path: " + probepath);
-		//Quick hack for Gentoo's tomcat 5
-		//String graphpath = DescFactory.class.getResource("/graph").toString();
-		//logger.debug("graphs jar path: " + graphpath);
-		//String path = probepath;
-
 		try {
 			df.importDescUrl(DescFactory.class.getResource("/probe"));
 		} catch (IOException e) {
@@ -117,6 +110,14 @@ public class HostsList {
 			}
 		}
 
+		GraphFactory gd = new GraphFactory(df.getGraphDescMap());
+		ProbeFactory pf = new ProbeFactory(df.getProbesDesc(), gd, pm);
+		HostConfigParser hp = new HostConfigParser(pf);
+
+		logger.debug("Graphs :" + df.getGraphDescMap());
+		List<String> probesName = new ArrayList<String>(df.getProbesDesc().keySet());
+		Collections.sort(probesName);
+		logger.debug("Probes: " + probesName);
 		if(pm.configdir != null)
 			hp.importDir(new File(pm.configdir,"/macro"));
 		if(pm.configdir != null)

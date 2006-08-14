@@ -18,6 +18,7 @@ import org.snmp4j.smi.OID;
 
 public class DescFactory extends DirXmlParser {
 	private Map<String, ProbeDesc> probesDesc = new HashMap<String, ProbeDesc>();
+	private Map<String, GraphDesc> graphDescMap = new HashMap<String, GraphDesc>();
 	public class ProbeClassLoader extends URLClassLoader {
 		public ProbeClassLoader(ClassLoader parent) {
 			super(new URL[0], parent);
@@ -120,7 +121,7 @@ public class DescFactory extends DirXmlParser {
 
 	}
 
-	private static void addGraphDescDigester(Digester digester) {
+	private void addGraphDescDigester(Digester digester) {
 		digester.register("-//jrds//DTD Graph Description//EN", digester.getClass().getResource("/graphdesc.dtd").toString());
 		digester.setValidating(false);
 		digester.addObjectCreate("graphdesc", jrds.GraphDesc.class);
@@ -129,7 +130,7 @@ public class DescFactory extends DirXmlParser {
 			@Override
 			public void end(String namespace, String name) throws Exception {
 				GraphDesc gd = (GraphDesc) digester.peek();
-				GraphFactory.addDesc(gd);
+				graphDescMap.put(gd.getName(), gd);
 			}
 		});
 		digester.addCallMethod("graphdesc/name", "setName", 0);
@@ -172,5 +173,9 @@ public class DescFactory extends DirXmlParser {
 
 	public Map<String, ProbeDesc> getProbesDesc() {
 		return probesDesc;
+	}
+
+	public Map<String, GraphDesc> getGraphDescMap() {
+		return graphDescMap;
 	}
 }

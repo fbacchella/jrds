@@ -7,7 +7,6 @@
 package jrds;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -25,12 +24,14 @@ public class ProbeFactory {
 	final private List<String> argPackages = new ArrayList<String>(3);
 	final private List<String> probePackages = new ArrayList<String>(5);
 	private Map<String, ProbeDesc> probeDescMap;
+	private GraphFactory gf;
 	private Properties prop;
 	/**
 	 * Private constructor
 	 */
-	ProbeFactory(Map<String, ProbeDesc> probeDescMap, Properties prop) {
+	ProbeFactory(Map<String, ProbeDesc> probeDescMap, GraphFactory gf, Properties prop) {
 		this.probeDescMap = probeDescMap;
+		this.gf = gf;
 		this.prop = prop;
 		argPackages.add("java.lang.");
 		argPackages.add("java.net.");
@@ -98,8 +99,6 @@ public class ProbeFactory {
 					Constructor theConst = probeClass.getConstructor(constArgsType);
 					o = theConst.newInstance(constArgsVal);
 					retValue = (Probe) o;
-					retValue.setHost(host);
-					retValue.readProperties(prop);
 				}
 				catch (ClassCastException ex) {
 					logger.warn("didn't get a Probe but a " + o.getClass().getName());
@@ -109,6 +108,13 @@ public class ProbeFactory {
 							": " + ex, ex);
 				}
 			}
+		}
+		
+		//Now we finish the initialization of classes
+		if(retValue != null) {
+			retValue.setHost(host);
+			retValue.readProperties(prop);
+			retValue.initGraphList(gf);
 		}
 		return retValue;
 	}

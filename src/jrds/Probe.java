@@ -44,7 +44,7 @@ implements Comparable {
 	static final protected int TIMEOUT = 30;
 	private String name = null;
 	private RdsHost monitoredHost;
-	private Collection<RdsGraph> graphList;
+	private Collection<RdsGraph> graphList = new ArrayList<RdsGraph>(0);
 	private String stringValue = null;
 	private ProbeDesc pd;
 	private Set<String> tags = null;
@@ -81,14 +81,13 @@ implements Comparable {
 		this.pd = pd;
 	}
 
-	private Collection<RdsGraph> initGraphList() {
+	public void initGraphList(GraphFactory gf) {
 		Collection graphClasses = pd.getGraphClasses();
-		Collection<RdsGraph> graphList = null;
 		if(graphClasses != null) {
 			graphList = new ArrayList<RdsGraph>(graphClasses.size());
 			for (Iterator i = graphClasses.iterator(); i.hasNext(); ) {
 				Object o = i.next();
-				RdsGraph newGraph = GraphFactory.makeGraph(o, this);
+				RdsGraph newGraph = gf.makeGraph(o, this);
 				if(newGraph != null)
 					graphList.add(newGraph);
 			}
@@ -96,15 +95,12 @@ implements Comparable {
 		else {
 			logger.debug("No graph for probe" + this);
 		}
-		return graphList;
 	}
 
 	/**
 	 * @return Returns the graphList.
 	 */
 	public Collection<RdsGraph> getGraphList() {
-		if (graphList == null)
-			graphList = initGraphList();
 		return graphList;
 	}
 
