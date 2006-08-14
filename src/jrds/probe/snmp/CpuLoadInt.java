@@ -6,7 +6,6 @@ _##########################################################################*/
 
 package jrds.probe.snmp;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -16,14 +15,13 @@ import java.util.Map;
  */
 public class CpuLoadInt
 extends RdsSnmpSimple {
-	public Map filterValues(Map snmpVars) {
-		for(Iterator i = snmpVars.entrySet().iterator(); i.hasNext();) {
-			Map.Entry e = (Map.Entry) i.next();
+	public Map<?, Number> filterValues(Map snmpVars) {
+		for(Map.Entry<?, Number> e: ((Map<?, Number>) snmpVars).entrySet()) {
 			Number value = (Number) e.getValue();
 			e.setValue(new Double(value.intValue()/100.0));
 		}
 		
-		return snmpVars;
+		return (Map<?, Number>) snmpVars;
 		
 	}
 }

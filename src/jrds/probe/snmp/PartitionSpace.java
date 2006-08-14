@@ -48,7 +48,7 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
 	 * The translation is done by the probe, not the graph
 	 * @see jrds.Probe#filterValues(java.util.Map)
 	 */
-	public Map filterValues(Map snmpVars) {
+	public Map<?, Number> filterValues(Map snmpVars) {
 		int allocUnit = 0;
 		long total = 0;
 		long used = 0;
@@ -69,7 +69,7 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
 		}
 		total *= allocUnit;
 		used *= allocUnit;
-		Map retValue = new HashMap(2);
+		Map<OID, Number> retValue = new HashMap<OID, Number>(2);
 		retValue.put(totalOid, new Long(total));
 		retValue.put(usedOid, new Long(used));
 		

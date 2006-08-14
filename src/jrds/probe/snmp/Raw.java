@@ -19,8 +19,8 @@ extends RdsSnmpSimple {
 	 * For this probe, raw result is used
 	 * @see jrds.Probe#filterValues(java.util.Map)
 	 */
-	public Map filterValues(Map snmpVars) {
-		return snmpVars;
+	public Map<?, Number> filterValues(Map snmpVars) {
+		return (Map<?, Number>)snmpVars;
 		
 	}
 }

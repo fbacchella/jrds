@@ -94,7 +94,7 @@ public abstract class SnmpProbe extends Probe {
 	 * @param snmpVars
 	 * @return a Map of all the identified vars
 	 */
-	public Map filterValues(Map snmpVars) {
+	public Map<?, Number> filterValues(Map snmpVars) {
 		Map<OID, Number> retValue = new HashMap<OID, Number>(snmpVars.size());
 		for(Iterator i = snmpVars.entrySet().iterator(); i.hasNext();) {
 			Map.Entry e = (Map.Entry) i.next();

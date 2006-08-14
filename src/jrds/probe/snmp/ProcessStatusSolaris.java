@@ -29,7 +29,7 @@ public class ProcessStatusSolaris extends RdsSnmpSimple {
 	/**
 	 * @see jrds.Probe#filterValues(java.util.Map)
 	 */
-	public Map filterValues(Map snmpVars){
+	public Map<?, Number> filterValues(Map snmpVars){
 		int runnable = 0;
 		int stopped = 0;
 		int inPageWait = 0;
@@ -56,7 +56,7 @@ public class ProcessStatusSolaris extends RdsSnmpSimple {
 				zombie++;
 			
 		}
-		Map retValue = new HashMap(7);
+		Map<String, Number> retValue = new HashMap<String, Number>(7);
 		retValue.put(RUNNABLE, new Double(runnable));
 		retValue.put(STOPPED, new Double(stopped));
 		retValue.put(INPAGEWAIT, new Double(inPageWait));

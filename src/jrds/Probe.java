@@ -223,8 +223,8 @@ implements Comparable {
 	 * @param valuesList
 	 * @return an map of value to be stored
 	 */
-	public Map  filterValues(Map valuesList) {
-		return valuesList;
+	public Map<?, Number>  filterValues(Map valuesList) {
+		return (Map<?, Number>)valuesList;
 	}
 
 	/**
@@ -255,13 +255,12 @@ implements Comparable {
 	 */
 	protected void updateSample(Sample oneSample) {
 		Map sampleVals = getNewSampleValues();
-		Map nameMap = getPd().getDsNameMap();
+		Map<?, String> nameMap = getPd().getDsNameMap();
 		if (sampleVals != null && this.getHost().getUptime() > ProbeDesc.HEARTBEATDEFAULT * 1000) {
-			sampleVals = filterValues(sampleVals);
-			for (Iterator i = sampleVals.entrySet().iterator(); i.hasNext(); ) {
-				Map.Entry e = (Map.Entry) i.next();
-				String dsName = (String) nameMap.get(e.getKey());
-				double value = ( (Number) e.getValue()).doubleValue();
+			Map<?, Number >filteredSamples = filterValues(sampleVals);
+			for(Map.Entry<?, Number> e: filteredSamples.entrySet()) {
+				String dsName = nameMap.get(e.getKey());
+				double value = e.getValue().doubleValue();
 				if (dsName != null) {
 					try {
 						oneSample.setValue(dsName, value);

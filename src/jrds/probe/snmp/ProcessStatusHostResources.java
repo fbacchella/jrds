@@ -30,7 +30,7 @@ public class ProcessStatusHostResources extends RdsSnmpSimple {
 	/**
 	 * @see jrds.Probe#filterValues(java.util.Map)
 	 */
-	public Map filterValues(Map snmpVars){
+	public Map<?, Number> filterValues(Map snmpVars){
 		int running = 0;
 		int runnable = 0;
 		int notRunnable = 0;
@@ -48,7 +48,7 @@ public class ProcessStatusHostResources extends RdsSnmpSimple {
 				invalid++;
 			
 		}
-		Map retValue = new HashMap(7);
+		Map<String, Number> retValue = new HashMap<String, Number>(7);
 		retValue.put(RUNNING, new Double(running));
 		retValue.put(RUNNABLE, new Double(runnable));
 		retValue.put(NOTRUNNABLE, new Double(notRunnable));

@@ -19,7 +19,6 @@ public class ProcessInfoSize extends RdsGraph {
 	static final private String MIN = "Minimum";
 	static final private String MAX = "Maximum";
 	static final private String AVERAGE = "Average";
-	static final private String NUM = "Number";
 	static final private GraphDesc gd = new GraphDesc(3);
 	static {
 		gd.add(MIN, GraphDesc.LINE, MIN);

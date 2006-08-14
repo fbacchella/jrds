@@ -55,7 +55,7 @@ public class ProcessInfo extends RdsIndexedSnmpRrd {
 	/**
 	 * @see jrds.Probe#filterValues(java.util.Map)
 	 */
-	public Map filterValues(Map snmpVars)  {
+	public Map<?, Number> filterValues(Map snmpVars)  {
 		double max = 0;
 		double min = Double.MAX_VALUE;
 		double average = 0;
@@ -71,7 +71,7 @@ public class ProcessInfo extends RdsIndexedSnmpRrd {
 			}
 		}
 		average /= nbvalue;
-		Map retValue = new HashMap(4);
+		Map<String, Number> retValue = new HashMap<String, Number>(4);
 		retValue.put(NUM, new Double(nbvalue));
 		retValue.put(MAX, new Double(max));
 		retValue.put(MIN, new Double(max));

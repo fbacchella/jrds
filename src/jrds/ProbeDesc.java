@@ -205,23 +205,21 @@ public class ProbeDesc {
 	 * Return a map that translate an String probe name to the datastore name
 	 * @return a Map of probe name to datastore name
 	 */
-	public Map getProbesNamesMap()
+	public Map<String, String> getProbesNamesMap()
 	{
-		Map retValue = new LinkedHashMap(dsMap.size());
-		for(Iterator i = dsMap.entrySet().iterator(); i.hasNext() ;) {
-			Map.Entry e = (Map.Entry) i.next();
-			DsDesc dd = (DsDesc) e.getValue();
+		Map<String, String> retValue = new LinkedHashMap<String, String>(dsMap.size());
+		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
+			DsDesc dd =  e.getValue();
 			if(dd.key != null  && dd.key instanceof String)
-				retValue.put(dd.key, e.getKey());
+				retValue.put((String)dd.key, e.getKey());
 		}
 		return retValue;
 	}
 
-	public Map getDsNameMap() {
-		Map retValue = new LinkedHashMap(dsMap.size());
-		for(Iterator i = dsMap.entrySet().iterator(); i.hasNext() ;) {
-			Map.Entry e = (Map.Entry) i.next();
-			DsDesc dd = (DsDesc) e.getValue();
+	public Map<Object, String> getDsNameMap() {
+		Map<Object, String> retValue = new LinkedHashMap<Object, String>(dsMap.size());
+		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
+			DsDesc dd = e.getValue();
 			if(dd.key != null )
 				retValue.put(dd.key, e.getKey());
 		}
