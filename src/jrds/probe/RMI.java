@@ -46,16 +46,19 @@ public class RMI extends Probe {
 	}
 
 	private class RMIStarter extends Starter {
-		RdsHost host;
-		int port = PORT;
-		Registry registry = null;
-		RProbe rp = null;
+		private RdsHost host;
+		private Starter resolver = null;
+		private int port = PORT;
+		private Registry registry = null;
+		private RProbe rp = null;
 		RMIStarter(RdsHost host) {
 			this.host = host;
+			resolver = host.addStarter(new Starter.Resolver(host.getName()));
 		}
 		RMIStarter(RdsHost host, int port) {
 			this.host = host;
 			this.port = port;
+			resolver = host.addStarter(new Starter.Resolver(host.getName()));
 		}
 		@Override
 		public Object getKey() {
@@ -64,14 +67,16 @@ public class RMI extends Probe {
 		@Override
 		public boolean start() {
 			boolean started = false;
-			try {
-				registry = LocateRegistry.getRegistry(host.getName(), port, sf);
-				rp = (RProbe) registry.lookup(RProbe.NAME);
-				started = true;
-			} catch (RemoteException e) {
-				logger.error("Remote exception on server " + host + ": " + e.getCause());
-			} catch (NotBoundException e) {
-				logger.error("Unattended exception: ", e);
+			if(resolver.isStarted()) {
+				try {
+					registry = LocateRegistry.getRegistry(host.getName(), port, sf);
+					rp = (RProbe) registry.lookup(RProbe.NAME);
+					started = true;
+				} catch (RemoteException e) {
+					logger.error("Remote exception on server " + host + ": " + e.getCause());
+				} catch (NotBoundException e) {
+					logger.error("Unattended exception: ", e);
+				}
 			}
 			return started;
 		}
@@ -79,10 +84,6 @@ public class RMI extends Probe {
 		public void stop() {
 			rp = null;
 			registry = null;
-		}
-		@Override
-		public String toString() {
-			return (String)getKey();
 		}
 	};
 	RMIStarter localstarter = null;
@@ -135,6 +136,11 @@ public class RMI extends Probe {
 	public void setArgs(List<?> l) {
 		this.args = l;
 	}
+	@Override
+	public boolean isStarted() {
+		return localstarter.isStarted();
+	}
+
 	@Override
 	public String getSourceType() {
 		return "JRDS Agent";
