@@ -9,7 +9,9 @@ package jrds.standalone;
 import java.io.File;
 
 import jrds.HostsList;
+import jrds.Probe;
 import jrds.PropertiesManager;
+import jrds.RdsHost;
 import jrds.StoreOpener;
 
 import org.apache.log4j.Logger;
@@ -34,21 +36,31 @@ public class Collector {
 		System.getProperties().setProperty("java.awt.headless","true");
 		System.getProperties().putAll(pm);
 		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
-		
+
 		HostsList hl = HostsList.getRootGroup();
 
 		logger.debug("Scanning dir");
-		
+
 		HostsList.getRootGroup().configure(pm);
 
-		/*for(RdsHost h: hl.getHosts()) {
-			for(Probe p: h.getProbes()) {
-				p.getPd().dumpAsXml(p.getClass());
-				for(jrds.RdsGraph g: p.getGraphList()) {
-					g.getGraphDesc().dumpAsXml(g.getClass());
+		if(false) {
+			for(RdsHost h: hl.getHosts()) {
+				for(Probe p: h.getProbes()) {
+					try {
+						p.getPd().dumpAsXml(p.getClass());
+						for(jrds.RdsGraph g: p.getGraphList()) {
+							try {
+								g.getGraphDesc().dumpAsXml(g.getClass());
+							} catch (RuntimeException e) {
+								logger.error("Unable to transform " + g);
+							}
+						}
+					} catch (RuntimeException e) {
+						logger.error("Unable to transform " + p);
+					}
 				}
 			}
-		}*/
+		}
 		for(int i = 0; i< 1 ; i++) {
 			hl.collectAll();
 			System.gc();
@@ -56,6 +68,6 @@ public class Collector {
 		}
 		StoreOpener.stop();
 	}
-	
+
 }
 

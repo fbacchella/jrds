@@ -30,7 +30,7 @@
     </ds>
     <ds>
         <dsName>Cpu</dsName>
-        <dsType>counter</dsType>
+        <dsType>derive</dsType>
     </ds>
     <graphs>
         <name>ProcessInfoNumber</name>

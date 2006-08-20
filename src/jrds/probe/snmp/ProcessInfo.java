@@ -11,9 +11,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import jrds.ProbeDesc;
-import jrds.RdsHost;
-import jrds.graphe.ProcessInfoNumber;
-import jrds.graphe.ProcessInfoSize;
 
 import org.snmp4j.smi.OID;
 
@@ -39,7 +36,7 @@ public class ProcessInfo extends RdsIndexedSnmpRrd {
 		pd.add(MAX, ProbeDesc.GAUGE);
 		pd.add(AVERAGE, ProbeDesc.GAUGE);
 		pd.add(NUM, ProbeDesc.GAUGE);
-		pd.setGraphClasses(new Class[] {ProcessInfoNumber.class, ProcessInfoSize.class});
+		pd.setGraphClasses(new String[] {"ProcessInfoNumber", "ProcessInfoSize"});
 		pd.setIndexOid(indexOid);
 		pd.setProbeName("ps-{1}");
 		pd.setUniqIndex(false);

@@ -94,7 +94,7 @@ public class TreeJspBean {
 				int graphed = 0;
 				for(GraphTree tree: root.getGraphsRoot()) {
 					tree = vf.setRoot(tree);
-					logger.debug("New tree root: " + tree);
+					logger.trace("New tree root: " + tree);
 					if(tree != null && ! tree.getJavaScriptCode(out, params, "tree" + graphed, vf)) {
 						graphed++;
 					}
