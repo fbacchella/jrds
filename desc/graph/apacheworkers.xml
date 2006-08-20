@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
-	<name>apacheworkers</name>
+	<name>ApacheWorkers</name>
 	<graphName>apacheworkers</graphName>
-	<graphTitle>Workers status on {2}</graphTitle>
+	<graphTitle>Workers status on port {2}</graphTitle>
 	<verticalLabel>Workers</verticalLabel>
 	<add>
 		<name>BusyWorkers</name>
