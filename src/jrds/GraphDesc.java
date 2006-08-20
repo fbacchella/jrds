@@ -172,7 +172,7 @@ implements Cloneable {
 		};
 		static public final PathElement JDBC = new PathElement() {
 			public String resolve(RdsGraph graph) {
-				return ( (JdbcProbe) graph.getProbe()).getJdbcurl();
+				return ( (JdbcProbe) graph.getProbe()).getUrlAsString();
 			}
 			public String toString() {
 				return "JDBC";
@@ -242,7 +242,7 @@ implements Cloneable {
 		static public final PathElement DBISNTANCE = new PathElement() {
 			public String resolve(RdsGraph graph) {
 				JdbcProbe dbprobe = (JdbcProbe) graph.getProbe();
-				return dbprobe.getJdbcInstanceUrl();
+				return dbprobe.getUrlAsString();
 			}
 			@Override
 			public String toString() {
