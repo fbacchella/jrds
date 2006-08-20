@@ -57,7 +57,7 @@ public final class Graph extends HttpServlet {
 			Date finish = new Date();
 			long duration1 = middle.getTime() - start.getTime();
 			long duration2 = finish.getTime() - middle.getTime();
-			logger.debug("Graph " + graph + " rendering, started at " + start + ", ran for " + duration1 + ":" + duration2 + "ms");
+			logger.trace("Graph " + graph + " rendering, started at " + start + ", ran for " + duration1 + ":" + duration2 + "ms");
 		} catch (RuntimeException e) {
 			logger.error(e, e);
 		}							
