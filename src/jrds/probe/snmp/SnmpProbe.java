@@ -121,5 +121,11 @@ public abstract class SnmpProbe extends Probe {
 	public String getSourceType() {
 		return "SNMP";
 	}
+
+	@Override
+	public boolean isStarted() {
+		return getSnmpStarter().isStarted();
+	}
+
 	
 }
