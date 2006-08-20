@@ -33,11 +33,23 @@ public class ApacheStatus extends HttpProbe implements UrlProbe {
 			port = 80;
 	}
 
-	public ApacheStatus(Integer port) throws MalformedURLException {
+	public ApacheStatus(Integer port) {
 		this.port = port;
 	}
 
-	public ApacheStatus() throws MalformedURLException {
+	public ApacheStatus() {
+	}
+
+	/**
+	 * @return Returns the url.
+	 */
+	public String getUrlAsString() {
+		URL tempUrl = null;
+		try {
+			tempUrl = new URL("http", getHost().getName(), port, "/");
+		} catch (MalformedURLException e) {
+		}
+		return tempUrl.toString();
 	}
 
 	@Override

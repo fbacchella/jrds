@@ -18,13 +18,13 @@
 	<hosttree>
 		<pathelement>HOST</pathelement>
 		<pathelement>SERVICES</pathelement>
-		<pathstring>Apache</pathstring>
-		<pathelement>URL</pathelement>
+        <pathstring>Apache Activity</pathstring>
+		<pathelement>INDEX</pathelement>
 		<pathstring>Workers</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>SERVICES</pathelement>
-		<pathstring>Apache</pathstring>
+        <pathstring>Apache Activity</pathstring>
 		<pathstring>Workers</pathstring>
 		<pathelement>URL</pathelement>
 	</viewtree>

@@ -16,13 +16,13 @@
         <pathelement>HOST</pathelement>
         <pathelement>SERVICES</pathelement>
         <pathstring>Apache Activity</pathstring>
-        <pathelement>URL</pathelement>
+		<pathelement>INDEX</pathelement>
         <pathstring>Bytes transfered/s</pathstring>
     </hosttree>
     <viewtree>
         <pathelement>SERVICES</pathelement>
-        <pathstring>Apache</pathstring>
+        <pathstring>Apache Activity</pathstring>
         <pathstring>Bytes transfered/s</pathstring>
-        <pathelement>URL</pathelement>
+		<pathelement>URL</pathelement>
     </viewtree>
 </graphdesc>
