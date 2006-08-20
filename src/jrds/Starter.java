@@ -1,10 +1,56 @@
 package jrds;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import org.apache.log4j.Logger;
 
 
 public abstract class Starter {
 	static final private Logger logger = Logger.getLogger(Starter.class);
+	
+	public static class Resolver extends Starter {
+		String hostname = "";
+		InetAddress address = null;
+		
+		public Resolver(String hostname) {
+			super();
+			this.hostname = hostname;
+		}
+
+		public Resolver() {
+			super();
+		}
+
+		public void setHostname(String hostname) {
+			this.hostname = hostname;
+		}
+
+		@Override
+		public boolean start() {
+			boolean started = false;
+			try {
+				address = InetAddress.getByName(hostname);
+				started = true;
+			} catch (UnknownHostException e) {
+				logger.error("Host name " + hostname + " can't be solved");
+			}
+			return started;
+		}
+
+		@Override
+		public void stop() {
+			address = null;
+		}
+
+		public InetAddress getInetAddress() {
+			return address;
+		}
+		@Override
+		public Object getKey() {
+			return "resolver:" + hostname;
+		}		
+	}
 
 	private StartersSet level = null;
 	private Object parent;	
@@ -21,7 +67,6 @@ public abstract class Starter {
 			
 	}
 	public void doStop() {
-		logger.trace("trying to stop starter " + this );
 		if(started) {
 			stop();
 			started = false;
@@ -43,5 +88,9 @@ public abstract class Starter {
 	}
 	public Object getParent() {
 		return parent;
+	}
+	@Override
+	public String toString() {
+		return getKey().toString();
 	}
 }
