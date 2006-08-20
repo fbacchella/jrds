@@ -8,18 +8,21 @@
 	<add>
 		<name>OutSegs</name>
 		<graphType>line</graphType>
+		<color>green</color>
 		<legend>Number of segments sent</legend>
 	</add>
 	<add>
 		<name>RetransSegs</name>
 		<graphType>line</graphType>
+		<color>red</color>
 		<legend>Number of segments retransmitted</legend>
 	</add>
 	<add>
 		<name>InSegs</name>
 		<graphType>line</graphType>
+		<color>blue</color>
 		<legend>Number of segments received</legend>
-		<reverse>true</reverse>
+		<reversed>true</reversed>
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>
