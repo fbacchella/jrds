@@ -52,8 +52,9 @@ public class TreeJspBean {
 				queryArgs.put(var, val);
 			}
 		}
-		if( referer == null || !(matchArgs(queryArgs.get("filter"), (String) req.getParameter("filter"))
-		)
+		if( referer == null 
+				|| !(matchArgs(queryArgs.get("filter"), (String) req.getParameter("filter")))
+				|| !(matchArgs(queryArgs.get("host"), (String) req.getParameter("host")))
 		) {
 			Cookie c1 = new Cookie("clickedFolder", "");
 			c1.setPath("/");
