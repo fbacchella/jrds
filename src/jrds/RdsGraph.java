@@ -194,6 +194,12 @@ implements Comparable {
 		if(endDate.after(lastUpdate))
 			endDate = new Date(lastUpdate.getTime() );
 		RrdGraphDef tempGraphDef = getRrdDef();
+		
+		//We normalize the last update time, it can't be used directly
+		Date lastUpdateNormalized = new Date(1000L * org.jrobin.core.Util.normalize(getProbe().getLastUpdate().getTime() / 1000L, HostsList.getRootGroup().getResolution()));
+		//We dont want to graph past the last normalized update time
+		if(endDate.after(lastUpdateNormalized))
+			endDate = lastUpdateNormalized;
 		tempGraphDef.setTimePeriod(startDate, endDate);
 		tempGraphDef = graphFormat(tempGraphDef, startDate, endDate);
 		return new RrdGraph(tempGraphDef, true);
