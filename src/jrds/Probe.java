@@ -65,18 +65,18 @@ implements Comparable {
 	}
 
 	public void readProperties(Properties p) {
-		
+
 	}
-	
+
 	public RdsHost getHost() {
 		return monitoredHost;
 	}
-	
+
 	public void setHost(RdsHost monitoredHost) {
 		this.monitoredHost = monitoredHost;
 		starters.setParent(monitoredHost.getStarters());		
 	}
-	
+
 	public void setPd(ProbeDesc pd) {
 		this.pd = pd;
 	}
@@ -254,21 +254,23 @@ implements Comparable {
 	 * @param oneSample
 	 */
 	protected void updateSample(Sample oneSample) {
-		Map sampleVals = getNewSampleValues();
-		Map<?, String> nameMap = getPd().getDsNameMap();
-		if (sampleVals != null && this.getHost().getUptime() > ProbeDesc.HEARTBEATDEFAULT * 1000) {
-			Map<?, Number >filteredSamples = filterValues(sampleVals);
-			for(Map.Entry<?, Number> e: filteredSamples.entrySet()) {
-				String dsName = nameMap.get(e.getKey());
-				double value = e.getValue().doubleValue();
-				if (dsName != null) {
-					try {
-						oneSample.setValue(dsName, value);
-					}
-					catch (RrdException e1) {
-						logger.warn("Unable to update value " + value +
-								" from " + this +": " +
-								e1.getMessage());
+		if(isStarted()) {
+			Map sampleVals = getNewSampleValues();
+			Map<?, String> nameMap = getPd().getDsNameMap();
+			if (sampleVals != null && getHost().getUptime() > ProbeDesc.HEARTBEATDEFAULT * 1000) {
+				Map<?, Number >filteredSamples = filterValues(sampleVals);
+				for(Map.Entry<?, Number> e: filteredSamples.entrySet()) {
+					String dsName = nameMap.get(e.getKey());
+					double value = e.getValue().doubleValue();
+					if (dsName != null) {
+						try {
+							oneSample.setValue(dsName, value);
+						}
+						catch (RrdException ex) {
+							logger.warn("Unable to update value " + value +
+									" from " + this +": " +
+									ex);
+						}
 					}
 				}
 			}
@@ -291,7 +293,7 @@ implements Comparable {
 			rrdDb = StoreOpener.getRrd(getRrdName());
 			onesample = rrdDb.createSample();
 			updateSample(onesample);
-			logger.debug(onesample.dump());
+			logger.trace(onesample.dump());
 			onesample.update();
 		}
 		catch (ArithmeticException ex) {
@@ -456,6 +458,11 @@ implements Comparable {
 	public StartersSet getStarters() {
 		return starters;
 	}
-	
+
+	public boolean isStarted() {
+		return true;
+	}
+
 	public abstract String getSourceType();
+
 }
