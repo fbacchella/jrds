@@ -77,13 +77,15 @@ public class Renderer {
 			this.graph = graph;
 		}
 		public synchronized void run() {
-			bImg = graph.makeImg(start, end);				
-			finished = true;
+			if(bImg == null) {			//write is sometimes call before run
+				bImg = graph.makeImg(start, end);				
+				finished = true;
+			}
 		}
 		public synchronized void write(OutputStream out) throws IOException {
 			//We wait for the lock on the object, meaning rendering is still running
-			if(bImg == null) {
-				logger.error("image for " + graph + " not rendered correctly");
+			if(bImg == null) { 			//write is sometimes call before run
+				logger.info("image for " + graph + " not rendered correctly");
 				bImg = graph.makeImg(start, end);				
 			}
 			javax.imageio.ImageIO.write(bImg, "png", out);
