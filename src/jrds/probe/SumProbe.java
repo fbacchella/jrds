@@ -6,11 +6,11 @@ _##########################################################################*/
 
 package jrds.probe;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
 import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.graphe.Sum;
 
 public class SumProbe extends VirtualProbe {
@@ -21,10 +21,11 @@ public class SumProbe extends VirtualProbe {
 	private String graphName;
 	Collection<String> graphList;
 
-	public SumProbe(RdsHost thehost, String name, Collection<String> graphList) {
-		super(thehost, pd);
-		this.setName(name);
+	//An array list is needed, the introspection is picky
+	public SumProbe(String name, ArrayList<String> graphList) {
+		setName(name);
 		this.graphList = graphList;
+		setPd(pd);
 	}
 
 	/**
