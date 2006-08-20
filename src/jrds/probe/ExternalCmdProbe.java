@@ -1,9 +1,9 @@
-/*
- * Created on 24 nov. 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
+/*##########################################################################
+ _##
+ _##  $Id$
+ _##
+ _##########################################################################*/
+
 package jrds.probe;
 
 import java.io.BufferedReader;
@@ -20,15 +20,12 @@ import org.jrobin.core.Sample;
 
 
 /**
- * @author bacchell
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * This abstract class can be used to parse the results of an external cmd
+ * @author Fabrice Bacchella 
+ * @version $Revision$,  $Date$
  */
 public abstract class ExternalCmdProbe extends Probe {
 	static final private Logger logger = Logger.getLogger(ExternalCmdProbe.class);
-
-	static Runtime rt = Runtime.getRuntime();
 
 	private String[] cmd;
 	
@@ -42,7 +39,7 @@ public abstract class ExternalCmdProbe extends Probe {
 	protected void updateSample(Sample oneSample) {
 		Process urlperfps = null;
 		try {
-			urlperfps = rt.exec(getCmd());
+			urlperfps = Runtime.getRuntime().exec(getCmd());
 			InputStream stdout = urlperfps.getInputStream();
 			BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(stdout));
 			String perfstring = stdoutReader.readLine();
