@@ -3,12 +3,14 @@
 package jrds;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jrds.probe.SumProbe;
 import jrds.snmp.SnmpStarter;
 
 import org.apache.commons.digester.Digester;
@@ -91,12 +93,6 @@ public class HostConfigParser  extends DirXmlParser {
 			}			
 		};
 		digester.addRule("host",cleanStack);
-
-
-		//End
-		/*hostsCollection.add(lastHost);
-		 lastHost = null;
-		 */
 	}
 
 	private void defineProbe(Digester digester) {
@@ -131,15 +127,15 @@ public class HostConfigParser  extends DirXmlParser {
 					String probeType = (String) o;
 					for(int i = 0; i < digester.getCount() && !((o = digester.peek(i)) instanceof RdsHost) ; i++);
 					RdsHost host = (RdsHost) o;
-					Probe newProbe = pf.makeProbe(probeType, host, argsListValue);
+					Probe newProbe = pf.makeProbe(probeType, argsListValue);
 					if(newProbe != null) {
 						for(Starter s: starters) {
 							newProbe.addStarter(s);
 						}
 						for(Tag tg: tags)
 							newProbe.addTag(tg.getTag());
-						HostsList.getRootGroup().addProbe(newProbe);
 						host.addProbe(newProbe);
+						HostsList.getRootGroup().addProbe(newProbe);
 					}
 				}
 				else
@@ -171,7 +167,20 @@ public class HostConfigParser  extends DirXmlParser {
 					hostName = host.getName();
 				}
 				starter.setHostname(hostName);
-				digester.push(starter);
+				
+				//If we are on a host, the starter must be registered right now
+				for(int i = 0; i< digester.getCount() ; i++){
+					Object o = digester.peek(i);
+					if(o instanceof RdsHost) {
+						((RdsHost) o).addStarter(starter);
+						break;
+					}
+					else if(Probe.class.isAssignableFrom(o.getClass())) {
+						digester.push(starter);
+						break;
+					}
+				}
+
 			}
 		};
 
@@ -301,9 +310,13 @@ public class HostConfigParser  extends DirXmlParser {
 			}
 			@SuppressWarnings("unchecked")
 			public void end(String namespace, String name) throws Exception {
-				List<String> l = (List<String>) digester.pop();
+				Collection<String> l = (Collection<String>) digester.pop();
 				String sumName = (String) digester.pop();
-				jrds.HostsList.getRootGroup().addSum(sumName, l);
+				List argsListValue = new ArrayList(2);
+				argsListValue.add(sumName);
+				argsListValue.add(l);
+				SumProbe newProbe = (SumProbe) pf.makeProbe(SumProbe.class.getName(), argsListValue);
+				jrds.HostsList.getRootGroup().addSum(newProbe);
 			}
 		});
 		digester.addRule("sum/element/", new Rule() {
