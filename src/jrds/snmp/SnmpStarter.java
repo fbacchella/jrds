@@ -13,6 +13,7 @@ import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.smi.Address;
 import org.snmp4j.smi.GenericAddress;
 import org.snmp4j.smi.OctetString;
+import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
 public class SnmpStarter extends Starter {
@@ -52,23 +53,22 @@ public class SnmpStarter extends Starter {
 		}
 	};
 
-	private int version = SnmpConstants.version1;
+	private int version = SnmpConstants.version2c;
 	private String proto = UDP;
 	private String hostname = null;
 	private int port = 161;
 	private String community = "public";
+	private Starter.Resolver resolver = null;
 
 	private Target snmpTarget;
 	
 	@Override
 	public boolean start() {
 		boolean started = false;
-		if(full.isStarted()) {
+		if(full.isStarted() && resolver.isStarted()) {
 			snmpTarget = makeTarget();
 			started = snmpTarget != null;
 		}
-		else
-			logger.debug("root SNMP not started");
 		return started;
 	}
 
@@ -80,22 +80,28 @@ public class SnmpStarter extends Starter {
 	private Target makeTarget()
 	{
 		Target retValue = null;
-		String addrStr = proto + ":" + this.hostname + "/" + port;
-		try {
-			Address address = GenericAddress.parse(addrStr);
+		Address address;
+		if(UDP.equals(proto.toLowerCase())) {
+			address = new UdpAddress(resolver.getInetAddress(), port);
+		}
+		else {
+			String addrStr = proto + ":" + this.hostname + "/" + port;
+			address= GenericAddress.parse(addrStr);
 			if(address == null) {
 				logger.warn("Address " + addrStr + " not solvable");
 			}
-			if(community != null && address != null) {
-				retValue = new CommunityTarget(address, new OctetString(community));
-				retValue.setVersion(version);
-				retValue.setTimeout(retValue.getTimeout() * 5);
-			}
 		}
+		if(community != null && address != null) {
+			retValue = new CommunityTarget(address, new OctetString(community));
+			retValue.setVersion(version);
+			retValue.setTimeout(retValue.getTimeout() * 5);
+		}
+		/*try {
 		catch(IllegalArgumentException ex) {
 			logger.warn("Adresse definition incorrect: " + addrStr +": " + ex);
 			retValue = null;
-		}
+	}
+		}*/
 		return retValue;
 	}
 
@@ -159,9 +165,10 @@ public class SnmpStarter extends Starter {
 	@Override
 	public void initialize(Object parent, StartersSet level) {
 		super.initialize(parent, level);
-		if( level.find(full.getKey()) == null)
+		resolver = (Resolver) level.registerStarter(new Starter.Resolver(hostname), null);
+		if( level.find(full.getKey()) == null) {
 			level.getRoot().registerStarter(full, level.getRoot().getLevel());
-			//HostsList.getRootGroup().getStarters().registerStarter(full, HostsList.getRootGroup());
+		}
 	}
 
 	public Target getTarget() {
@@ -182,7 +189,7 @@ public class SnmpStarter extends Starter {
 
 	@Override
 	public String toString() {
-		return proto + ":" + this.hostname + "/" + port;
+		return "snmp:" + proto + "://" + this.hostname + ":" + port;
 	}
 
 
