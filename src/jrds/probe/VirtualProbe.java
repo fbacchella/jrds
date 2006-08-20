@@ -1,11 +1,8 @@
 package jrds.probe;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import jrds.Probe;
-import jrds.ProbeDesc;
-import jrds.RdsHost;
 
 /**
  * All probe derived from this one will not store nor poll data
@@ -14,17 +11,8 @@ import jrds.RdsHost;
  *
  */
 public abstract class VirtualProbe extends Probe {
-	/**
-	 * The constructor that should be called by derived class
-	 * @param monitoredHost
-	 * @param pd
-	 */
-	public VirtualProbe(RdsHost monitoredHost, ProbeDesc pd) {
-		super(monitoredHost, pd);
-	}
-	
 	public Map getNewSampleValues() {
-		return new HashMap();
+		return java.util.Collections.EMPTY_MAP;
 	}
 
 	public boolean checkStore() {
