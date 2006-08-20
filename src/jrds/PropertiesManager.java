@@ -5,6 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Level;
@@ -23,14 +27,13 @@ public class PropertiesManager extends Properties {
 		join(System.getProperties());
 		update();
 	}
-	
+
 	public PropertiesManager(File propFile)
 	{
 		join(propFile);
 		update();
 	}
-	
-	
+
 	private String getParameter(String key, String defaultValue,
 			boolean doTrim) {
 		String returnValue = getProperty(key);
@@ -43,11 +46,11 @@ public class PropertiesManager extends Properties {
 		}
 		return returnValue;
 	}
-	
+
 	private String getParameter(String s, String s1) {
 		return getParameter(s, s1, true);
 	}
-	
+
 	private int parseInteger(String s) throws NumberFormatException {
 		Integer integer = null;
 		if (s != null) {
@@ -68,7 +71,11 @@ public class PropertiesManager extends Properties {
 		}
 		return integer.intValue();
 	}
-	
+
+	private List<String> parseLogLevel(String value) {
+		return Arrays.asList(value.split(","));
+	}
+
 	public void join(URL url) {
 		try {
 			InputStream inputstream = url.openStream();
@@ -79,11 +86,11 @@ public class PropertiesManager extends Properties {
 			logger.warn("Invalid URL: " + ex.getLocalizedMessage());
 		}
 	}
-	
+
 	public void join(Properties moreProperties) {
 		putAll(moreProperties);
 	}
-	
+
 	public void join(File propFile)
 	{
 		logger.debug("Using propertie file " + propFile.getAbsolutePath());
@@ -95,7 +102,7 @@ public class PropertiesManager extends Properties {
 			logger.warn("Invalid properties file " + propFile.getAbsolutePath() + ": " + ex.getLocalizedMessage());
 		}
 	}
-	
+
 	public void join(InputStream propStream)
 	{
 		try {
@@ -109,25 +116,36 @@ public class PropertiesManager extends Properties {
 	{
 		configdir = getParameter("configdir", "config");
 		rrddir = getParameter("rrddir", "probe");
-		logfile = getParameter("logfile", "jrds.log");
-		loglevel = Level.toLevel(getParameter("loglevel", "DEBUG"));
 		resolution = parseInteger(getParameter("resolution", "300"));
 		collectorThreads = parseInteger(getParameter("collectorThreads", "1"));
 		dbPoolSize = parseInteger(getParameter("dbPoolSize", "10"));
 		syncPeriod = parseInteger(getParameter("syncPeriod", "-1"));
 		libspath = getParameter("libspath", "");
-		
+		String[] levels = { "trace", "debug", "info", "error"};
+		String[] defaultLevel = { "", "", "", "org.snmp4j,org.apache"};
+		for(int i = 0; i < levels.length; i++) {
+			String ls = levels[i];
+			Level l = Level.toLevel(ls);
+			String param = getParameter("log." + ls, defaultLevel[i]);
+			if(! "".equals(param)) {
+				List<String> loggerList = parseLogLevel(param);
+				loglevels.put(l, loggerList);
+			}
+		}
+		loglevel = Level.toLevel(getParameter("loglevel", "info"));
+		logfile = getParameter("logfile", "");
 	}
-	
+
 	public String configdir;
 	public String urlpngroot;
 	public String rrddir;
 	public String logfile;
-	public Level loglevel;
 	public int resolution;
 	public int collectorThreads;
 	public int dbPoolSize;
 	public int syncPeriod;
 	public String libspath;
-	
+	public Map<Level, List<String>> loglevels = new HashMap<Level, List<String>>();
+	public Level loglevel;
+
 }
