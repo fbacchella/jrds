@@ -42,7 +42,6 @@ public class GraphTree {
 	};
 
 	private GraphTree parent;
-	private GraphTree root;
 	private Map<Integer, GraphTree> pathsMap;
 	//The node's name
 	private String name;
@@ -142,9 +141,8 @@ public class GraphTree {
 	synchronized private void addChild(String childName) {
 		if( ! childsMap.containsKey(childName)) {
 			GraphTree newChild = new GraphTree(childName);
-			newChild.root = root;
 			childsMap.put(childName, newChild);
-			newChild.setParent(this);
+			newChild.parent = this;
 			newChild.pathsMap = pathsMap;
 			pathsMap.put(newChild.getPath().hashCode(), newChild);
 		}
@@ -155,7 +153,7 @@ public class GraphTree {
 			graphsSet.put(path.getLast(), nodesGraph);
 		}
 		else {
-			String pathElem = (String)path.removeFirst();
+			String pathElem = path.removeFirst();
 			addChild(pathElem);
 			getChildbyName(pathElem)._addGraphByPath(path, nodesGraph);
 		}
@@ -169,7 +167,7 @@ public class GraphTree {
 			_addGraphByPath(new LinkedList<String>(path), nodesGraph);
 	}
 
-	public Set getChildsName() {
+	public Set<String> getChildsName() {
 		Set<String> retValue = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
 		for(Iterator i = childsMap.keySet().iterator() ; i.hasNext() ;) {
 			String childName = (String) i.next();
@@ -186,18 +184,6 @@ public class GraphTree {
 		return name;
 	}
 
-	/**
-	 * @return Returns the parent.
-	 */
-	public GraphTree getParent() {
-		return parent;
-	}
-	/**
-	 * @param parent The parent to set.
-	 */
-	public void setParent(GraphTree parent) {
-		this.parent = parent;
-	}
 	/**
 	 * @return Returns the childsMap.
 	 */
