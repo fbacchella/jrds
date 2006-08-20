@@ -29,8 +29,8 @@ public class Renderer {
 		 */
 		public GraphKey(RdsGraph graph, Date start, Date end) throws RrdException {
 			long step = graph.probe.getRrdDef().getStep();
-			this.start = org.jrobin.core.Util.normalize(start.getTime(), step * 1000);
-			this.end = org.jrobin.core.Util.normalize(end.getTime(), step * 1000);
+			this.start = org.jrobin.core.Util.normalize(start.getTime(), step * 1000L);
+			this.end = org.jrobin.core.Util.normalize(end.getTime(), step * 1000L);
 			this.id = graph.hashCode();
 		}
 		@Override
@@ -82,6 +82,10 @@ public class Renderer {
 		}
 		public synchronized void write(OutputStream out) throws IOException {
 			//We wait for the lock on the object, meaning rendering is still running
+			if(bImg == null) {
+				logger.error("image for " + graph + " not rendered correctly");
+				bImg = graph.makeImg(start, end);				
+			}
 			javax.imageio.ImageIO.write(bImg, "png", out);
 		}
 		public void write() throws IOException {
@@ -93,7 +97,7 @@ public class Renderer {
 
 	static private final Logger logger = Logger.getLogger(Renderer.class);
 	static private final float hashTableLoadFactor = 0.75f;
-	private final ExecutorService tpool =  Executors.newFixedThreadPool(20);
+	private final ExecutorService tpool =  Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
 	private int cacheSize;
 	private Map<GraphKey, RendererRun> rendered;
 
