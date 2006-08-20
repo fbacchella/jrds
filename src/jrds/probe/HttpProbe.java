@@ -22,12 +22,13 @@ public abstract class HttpProbe extends Probe  implements IndexedProbe {
 	static final private Logger logger = Logger.getLogger(HttpResponseTime.class);
 	private URL url;
 
-	/**
-	 * @param monitoredHost
-	 */
 	public HttpProbe(URL url) {
 		super();
 		this.url = url;
+	}
+
+	public HttpProbe() {
+		super();
 	}
 	
 	protected abstract Map parseLines(List<String> lines);

@@ -12,10 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jrds.ProbeDesc;
-import jrds.graphe.ApacheRequests;
-import jrds.graphe.ApacheTransfer;
-
+import jrds.RdsHost;
 
 /**
  * A class to probe the apache status from the /server-status URL
@@ -23,21 +20,7 @@ import jrds.graphe.ApacheTransfer;
  * @version $Revision$,  $Date$
  */
 public class ApacheStatus extends HttpProbe implements UrlProbe {
-	static final public ProbeDesc pd = new ProbeDesc(7);
-	static {
-		pd.add("Total Accesses", ProbeDesc.COUNTER);
-		pd.add("Total kBytes", ProbeDesc.COUNTER);
-		pd.add("CPULoad", ProbeDesc.GAUGE);
-		pd.add("Uptime", ProbeDesc.NONE);
-		pd.add("ReqPerSec", ProbeDesc.GAUGE);
-		pd.add("BytesPerSec", ProbeDesc.GAUGE);
-		pd.add("BytesPerReq", ProbeDesc.GAUGE);
-		pd.add("BusyWorkers", ProbeDesc.GAUGE);
-		pd.add("IdleWorkers", ProbeDesc.GAUGE);
-		pd.setProbeName("apachestatus");
-		pd.setGraphClasses(new Object[] {ApacheRequests.class, ApacheTransfer.class, "apacheworkers"});
-	}
-
+	private int port = 80;
 	/**
 	 * @param monitoredHost
 	 * @param newurl
@@ -45,7 +28,30 @@ public class ApacheStatus extends HttpProbe implements UrlProbe {
 	 */
 	public ApacheStatus(URL newurl) throws MalformedURLException {
 		super(new URL("http", newurl.getHost(), newurl.getPort(), "/server-status?auto"));
-		setPd(pd);
+		this.port = newurl.getPort();
+		if(port <= 0)
+			port = 80;
+	}
+
+	public ApacheStatus(Integer port) throws MalformedURLException {
+		this.port = port;
+	}
+
+	public ApacheStatus() throws MalformedURLException {
+	}
+
+	@Override
+	public String getIndexName() {
+		return Integer.toString(port);
+	}
+
+	@Override
+	public void setHost(RdsHost monitoredHost) {
+		super.setHost(monitoredHost);
+		try {
+			setUrl(new URL("http", monitoredHost.getName(), port, "/server-status?auto"));
+		} catch (MalformedURLException e) {
+		}
 	}
 
 	/* (non-Javadoc)
