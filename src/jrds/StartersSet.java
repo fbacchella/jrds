@@ -1,9 +1,12 @@
 package jrds;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 public class StartersSet {
+	static final private Logger logger = Logger.getLogger(StartersSet.class);
 	private Map<Object, Starter> allStarters = null;
 	private StartersSet up = null;
 	private Object level = null;
@@ -11,9 +14,11 @@ public class StartersSet {
 	StartersSet(Object level) {
 		this.level = level;
 	}
+	
 	public void startCollect() {
 		if(allStarters != null)
 			for(Starter s: allStarters.values()) {
+				logger.trace("Starting " + s);
 				s.doStart();
 			}
 	}
@@ -21,16 +26,17 @@ public class StartersSet {
 	public void stopCollect() {
 		if(allStarters != null)
 			for(Starter s: allStarters.values()) {
+				logger.trace("stopping " + s);
 				s.doStop();
 			}
 	}
 
 	public Starter registerStarter(Starter s, Object parent) {
-		if(allStarters == null)
-			allStarters = new HashMap<Object, Starter>(2);
 		s.initialize(parent, this);
 		Object key = s.getKey();
-		if(! allStarters.containsKey(key)) {
+		if(find(key) == null) {
+			if(allStarters == null)
+				allStarters = new LinkedHashMap<Object, Starter>(2);
 			allStarters.put(key, s);
 		}
 		return find(key);
