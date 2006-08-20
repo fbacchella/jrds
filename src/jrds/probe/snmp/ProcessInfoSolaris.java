@@ -49,8 +49,9 @@ public class ProcessInfoSolaris extends RdsIndexedSnmpRrd {
 	 * @param monitoredHost
 	 * @param indexName
 	 */
-	public ProcessInfoSolaris(RdsHost monitoredHost, String indexName) {
-		super(monitoredHost, pd, indexName);
+	public ProcessInfoSolaris(String indexName) {
+		super(indexName);
+		setPd(pd);
 	}
 	
 	/**

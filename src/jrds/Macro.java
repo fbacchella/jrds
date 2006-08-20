@@ -18,10 +18,10 @@ public class Macro {
 		for(Object[] l: probeList) {
 			String className = (String) l[0];
 			List constArgs = (List) l[1];
-			Probe newRdsRrd = pf.makeProbe(className, host, constArgs);
+			Probe newRdsRrd = pf.makeProbe(className, constArgs);
 			if(newRdsRrd != null) {
-				HostsList.getRootGroup().addProbe(newRdsRrd);
 				host.addProbe(newRdsRrd);
+				HostsList.getRootGroup().addProbe(newRdsRrd);
 			}
 		}
 		for(String tag: tags) {

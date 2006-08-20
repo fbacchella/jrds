@@ -48,8 +48,9 @@ public class ProcessInfo extends RdsIndexedSnmpRrd {
 	/**
 	 * @param monitoredHost
 	 */
-	public ProcessInfo(RdsHost monitoredHost, String indexName) {
-		super(monitoredHost, pd, indexName);
+	public ProcessInfo(String indexName) {
+		super(indexName);
+		setPd(pd);
 	}
 	
 	/**

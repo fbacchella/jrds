@@ -77,11 +77,11 @@ public class ProbeFactory {
 	 * @param constArgs
 	 * @return
 	 */
-	public Probe makeProbe(String className, RdsHost host, List constArgs) {
+	public Probe makeProbe(String className, List constArgs) {
 		Probe retValue = null;
 		ProbeDesc pd = (ProbeDesc) probeDescMap.get(className);
 		if( pd != null) {
-			retValue = pd.makeProbe(host, constArgs, prop);
+			retValue = pd.makeProbe(constArgs, prop);
 		}
 		else {
 			Class probeClass = resolvClass(className, probePackages);
@@ -112,7 +112,6 @@ public class ProbeFactory {
 		
 		//Now we finish the initialization of classes
 		if(retValue != null) {
-			retValue.setHost(host);
 			retValue.readProperties(prop);
 			retValue.initGraphList(gf);
 		}

@@ -8,13 +8,12 @@ package jrds.probe.snmp;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.probe.IndexedProbe;
 import jrds.snmp.SnmpRequester;
 
@@ -29,42 +28,21 @@ import org.snmp4j.smi.OID;
 public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	
 	static final private Logger logger = Logger.getLogger(RdsIndexedSnmpRrd.class);
-	static {
-		logger.setLevel(org.apache.log4j.Level.DEBUG);
-	}
 
 	String indexKey;
 	Collection indexAsString = null;
-	OID indexOid;
-	
+
 	static final SnmpRequester indexFinder = SnmpRequester.TABULAR;
 	static final SnmpRequester valueFinder = SnmpRequester.RAW;
 	
-	public RdsIndexedSnmpRrd(RdsHost monitoredHost, ProbeDesc pd, String indexKey) {
-		super(monitoredHost, pd);
-		indexOid = initIndexOid();
-		this.indexKey = indexKey;
-	}
-
 	public RdsIndexedSnmpRrd(String indexKey) {
-		super();
 		this.indexKey = indexKey;
 	}
 	
-	public void setPd(ProbeDesc pd) {
-		super.setPd(pd);
-		indexOid = initIndexOid();
-	}
-
 	protected SnmpRequester getSnmpRequester() {
 		return valueFinder;
 	}
-	
 
-	protected OID initIndexOid() {
-		return getPd().getIndexOid();
-	}
-	
 	public String getIndexName()
 	{
 		return indexKey;
@@ -83,6 +61,10 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 		return oidToGet;
 	}
 	
+	public Collection<OID> getIndexSet() {
+		return Collections.singleton(getPd().getIndexOid());
+	}
+	
 	public Collection<String> setIndexValue() 
 	{
 		
@@ -92,8 +74,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 		else
 			indexAsString = new HashSet<String>();
 		
-		Collection<OID> soidSet= new ArrayList<OID>(1);
-		soidSet.add(indexOid);
+		Collection<OID> soidSet= getIndexSet();
 		Map somevars = indexFinder.doSnmpGet(this, soidSet);
 		boolean found = false;
 		

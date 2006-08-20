@@ -343,7 +343,7 @@ public class ProbeDesc {
 	 * @param constArgs
 	 * @return
 	 */
-	public Probe makeProbe(RdsHost host, List constArgs, Properties prop) {
+	public Probe makeProbe(List constArgs, Properties prop) {
 		Probe retValue = null;
 		if (probeClass != null) {
 			Object o = null;
@@ -373,7 +373,7 @@ public class ProbeDesc {
 				Throwable t = ex.getCause();
 				if(t != null)
 					showException = t;
-				logger.warn("Error during probe creation of type " + getName() + " for " + host +
+				logger.warn("Error during probe creation of type " + getName() + " with args " + constArgs +
 						": ", showException);
 			}
 		}
