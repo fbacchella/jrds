@@ -131,7 +131,8 @@ public class GraphTree {
 	}
 
 	public GraphTree getByPath(String path) {
-		return pathsMap.get(path);
+		logger.trace("Looking for path " + path + " with id " + path.hashCode());
+		return getById(path.hashCode());
 	}
 
 	public GraphTree getById(int id) {

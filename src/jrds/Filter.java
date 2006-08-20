@@ -44,6 +44,25 @@ public abstract class Filter {
 			return "All views";
 		}
 	};
+	static final Filter ALLSERVICES = new Filter() {
+		static final private String ROOTNAME = "/" + HostsList.VIEWROOT + "/Services";
+		@Override
+		public boolean acceptGraph(RdsGraph graph, String path) {
+			return path.startsWith(ROOTNAME);
+		}
+		@Override
+		public String getName() {
+			return "All Services";
+		}
+		@Override
+		public GraphTree setRoot(GraphTree gt) {
+			return gt.getByPath(ROOTNAME);
+		}
+		
+	};
 	public abstract boolean acceptGraph(RdsGraph graph, String path);
 	public abstract String getName();
+	public GraphTree setRoot(GraphTree gt) {
+		return gt;
+	}
 }

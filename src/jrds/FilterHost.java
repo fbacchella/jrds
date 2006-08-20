@@ -17,4 +17,9 @@ public class FilterHost extends Filter {
 		return "Filter " + hostname;
 	}
 
+	@Override
+	public GraphTree setRoot(GraphTree gt) {
+		return gt.getByPath("/" + HostsList.HOSTROOT + "/" + hostname);
+	}
+
 }

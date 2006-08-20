@@ -70,6 +70,7 @@ public class HostsList {
 		filters.put(Filter.EVERYTHING.getName(), Filter.EVERYTHING);
 		filters.put(Filter.ALLHOSTS.getName(), Filter.ALLHOSTS);
 		filters.put(Filter.ALLVIEWS.getName(), Filter.ALLVIEWS);
+		filters.put(Filter.ALLSERVICES.getName(), Filter.ALLSERVICES);
 		starters = new StartersSet(this);
 		sumhost =  new RdsHost("SumHost");
 	}
@@ -81,6 +82,12 @@ public class HostsList {
 	}
 	
 	public void configure(PropertiesManager pm) {
+		try {
+			jrds.JrdsLoggerConfiguration.configure(pm);
+		} catch (IOException e1) {
+			logger.error("Unable to set log file to " + pm.logfile);
+		}
+
 		numCollectors = pm.collectorThreads;
 		resolution = pm.resolution;
 		rrdDir = pm.rrddir;
@@ -89,6 +96,7 @@ public class HostsList {
 		
 		try {
 			df.importDescUrl(DescFactory.class.getResource("/probe"));
+			df.importDescUrl(DescFactory.class.getResource("/graph"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -114,7 +122,8 @@ public class HostsList {
 		ProbeFactory pf = new ProbeFactory(df.getProbesDesc(), gd, pm);
 		HostConfigParser hp = new HostConfigParser(pf);
 
-		logger.debug("Graphs :" + df.getGraphDescMap());
+		List<String> graphsName = new ArrayList<String>(df.getGraphDescMap().keySet());
+		logger.debug("Graphs :" + graphsName);
 		List<String> probesName = new ArrayList<String>(df.getProbesDesc().keySet());
 		Collections.sort(probesName);
 		logger.debug("Probes: " + probesName);
@@ -122,7 +131,6 @@ public class HostsList {
 			hp.importDir(new File(pm.configdir,"/macro"));
 		if(pm.configdir != null)
 			hp.importDir(new File(pm.configdir));
-
 	}
 
 	public Collection<RdsHost> getHosts() {
@@ -228,18 +236,8 @@ public class HostsList {
 	public void addProbe(Probe p) {
 		probeMap.put(p.hashCode(), p);
 		addGraphs(p.getGraphList());
-		p.getHost().addProbe(p);
 	}
 	
-	public GraphTree getNodeByPath(String path) {
-		GraphTree tree = treeMap.get(path.split("/")[1]);
-		GraphTree node = null;
-		if(tree != null) {
-			node = tree.getByPath(path);
-		}
-		return node;
-	}
-
 	public GraphTree getNodeById(int id) {
 		GraphTree node = null;
 		for(GraphTree tree: treeMap.values())
@@ -272,13 +270,13 @@ public class HostsList {
 		return filters.keySet();
 	}
 
-	public void addSum(String sumName, List<String> l) {
-		SumProbe sum = new SumProbe(sumhost, sumName, l);
+	public void addSum(SumProbe sum) {
+		sumhost.addProbe(sum);
 		for(RdsGraph currGraph: sum.getGraphList()) {
 			treeMap.get(SUMROOT).addGraphByPath(currGraph.getTreePathByHost(), currGraph);
 			graphMap.put(currGraph.hashCode(), currGraph);
 		}
-		logger.debug("adding sum " + sumName);
+		logger.debug("adding sum " + sum.getName());
 	}
 	
 	@Override
@@ -300,6 +298,5 @@ public class HostsList {
 	public String getRrdDir() {
 		return rrdDir;
 	}
-
 
 }
