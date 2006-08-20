@@ -75,7 +75,7 @@ public class ProcessInfo extends RdsIndexedSnmpRrd {
 		Map<String, Number> retValue = new HashMap<String, Number>(4);
 		retValue.put(NUM, new Double(nbvalue));
 		retValue.put(MAX, new Double(max));
-		retValue.put(MIN, new Double(max));
+		retValue.put(MIN, new Double(min));
 		retValue.put(AVERAGE, new Double(average));
 		return retValue;
 	}
