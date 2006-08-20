@@ -1,14 +1,12 @@
 package jrds.probe.jdbc;
 
-import java.util.HashMap;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import jrds.ProbeDesc;
-import jrds.RdsHost;
-import jrds.probe.IndexedProbe;
-
-import org.apache.log4j.Logger;
 
 
 /**
@@ -16,15 +14,7 @@ import org.apache.log4j.Logger;
  *
  * TODO 
  */
-public class SybaseInstance extends JdbcProbe implements IndexedProbe {
-	static final private org.apache.log4j.Logger logger = Logger.getLogger(SybaseInstance.class);
-	private final static String urlPrefix = "jdbc:sybase:Tds:";
-	private final static int SEGMENT_SYSTEM = 1;
-	private final static int SEGMENT_USER = 2;
-	private final static int SEGMENT_SYSUSER = 3;
-	private final static int SEGMENT_LOG = 4;
-	private final static int SEGMENT_DATALOG = 7;
-	
+public class SybaseInstance extends Sybase {
 	private static final ProbeDesc pd = new ProbeDesc(5);
 	static {
 		pd.add("process", ProbeDesc.GAUGE);
@@ -39,43 +29,30 @@ public class SybaseInstance extends JdbcProbe implements IndexedProbe {
 	/**
 	 * 
 	 */
-	public SybaseInstance(RdsHost thehost, String user, String passwd) {
-		super(urlPrefix, thehost, pd, 4100, user, passwd);
+	public SybaseInstance(String user, String passwd) {
+		super("master", user, passwd);
 		setName("sybase-" + getPort());
 	}
 
 	/**
 	 * 
 	 */
-	public SybaseInstance(RdsHost thehost, Integer port, String user, String passwd) {
-		super(urlPrefix, thehost, pd, port.intValue(),  user, passwd);
+	public SybaseInstance(Integer port, String user, String passwd) {
+		super(port,  "master", user, passwd);
 		setName("sybase-" + getPort());
 	}
-	
-	protected String doUrl()
-	{
-		return urlPrefix +  getHost() + ":" + getPort() + "/master";
+
+	@Override
+	public List<String> getQueries() {
+		List<String> retValues = new ArrayList<String>(2);
+		retValues.add("select count(*) transactions from master..syslogshold");
+		retValues.add("select count(*) process from master..sysprocesses where suid > 0");
+		return retValues;
 	}
 
-	public Map getNewSampleValues()
-	{
-		Map retValue = new HashMap(pd.getSize());
-		String jdbcurl = getJdbcurl();
-		logger.debug("Getting activity of " + jdbcurl); 
-
-		List transactions = select2Map("select count(*) transactions from master..syslogshold");
-		retValue.putAll((Map)transactions.get(0));
-		List process = select2Map("select count(*) process from master..sysprocesses where suid > 0");
-		retValue.putAll((Map)process.get(0));
-
-		closeDbCon();
-		return retValue;
+	@Override
+	public Map<String, Number> parseRs(ResultSet rs) throws SQLException {
+		return (Map<String, Number>) this.parseRsHorizontaly(rs, true);
 	}
 
-	/* (non-Javadoc)
-	 * @see jrds.probe.IndexedProbe#getIndexName()
-	 */
-	public String getIndexName() {
-		return new String("" + getPort());
-	}
 }

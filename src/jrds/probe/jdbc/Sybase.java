@@ -8,14 +8,11 @@ package jrds.probe.jdbc;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jrds.ProbeDesc;
-import jrds.RdsHost;
-
-import org.apache.log4j.Logger;
 
 
 /**
@@ -23,10 +20,8 @@ import org.apache.log4j.Logger;
  *
  * TODO 
  */
-public class Sybase extends JdbcProbe {
-	static final private org.apache.log4j.Logger logger = Logger.getLogger(Sybase.class);
-	private final static String urlPrefix = "jdbc:sybase:Tds:";
-	
+public abstract class Sybase extends JdbcProbe {
+
 	private static final ProbeDesc pd = new ProbeDesc(5);
 	static {
 		pd.add("database_size", ProbeDesc.GAUGE);
@@ -34,36 +29,38 @@ public class Sybase extends JdbcProbe {
 		pd.add("data", ProbeDesc.GAUGE);
 		pd.add("index_size", ProbeDesc.GAUGE);
 		pd.add("unused", ProbeDesc.GAUGE);
-		pd.setGraphClasses(new Class[] { Sybase.class });
+		pd.setGraphClasses(new Class[] { SybaseGraph.class });
 	}
 	
 	static {
 		registerDriver(com.sybase.jdbc2.jdbc.SybDriver.class);
 	}
 
-	private String dbName;
-
 	/**
 	 * 
 	 */
-	public Sybase(RdsHost thehost, String dbName, String user, String passwd) {
-		super(urlPrefix, thehost, pd, 4100, user, passwd);
-		this.dbName = dbName;
+	public Sybase(String dbName, String user, String passwd) {
+		super(4100, user, passwd);
 		setName("syb-" + dbName);
 	}
 
 	/**
 	 * 
 	 */
-	public Sybase(RdsHost thehost, Integer port, String dbName, String user, String passwd) {
-		super(urlPrefix, thehost, pd, port.intValue(),  user, passwd);
-		this.dbName = dbName;
+	public Sybase(Integer port, String dbName, String user, String passwd) {
+		super(port.intValue(),  user, passwd);
 		setName("syb-" + dbName);
 	}
 	
-	protected String doUrl()
-	{
-		return urlPrefix +  getHost() + ":" + this.getPort() + "/" + dbName;
+	@Override
+	JdbcStarter setStarter() {
+		return new JdbcStarter() {
+			public String getUrlAsString()
+			{
+				return "jdbc:sybase:Tds:" +  getHost() + ":" + getPort() + "/" + getDbName();
+			}
+			
+		};
 	}
 
 	private double trans2bytes(String line)
@@ -81,41 +78,23 @@ public class Sybase extends JdbcProbe {
 		return retValue;
 	}
 	
-	public Map getNewSampleValues()
-	{
-		String jdbcurl = getJdbcurl();
-		logger.debug("Getting space of database " + jdbcurl); 
-		Map sizeMap = new HashMap(pd.getSize());
-		Statement stmt = null;
-		try {
-			stmt = getStatment();
-			if(stmt.execute("..sp_spaceused")) {
-				do {
-					ResultSet rs = stmt.getResultSet();
-					ResultSetMetaData rsmd = rs.getMetaData();
-					int colCount = rsmd.getColumnCount();
-					while(rs.next()) {
-						for (int i = 1; i <= colCount; i++) {
-							String ds = rsmd.getColumnLabel(i);
-							String sizeB = (String) rs.getString(i);
-							if( ! "database_name".equals(ds))
-								sizeMap.put(ds, new Double(trans2bytes(sizeB)));
-						}
-					}
-				} while(stmt.getMoreResults());
-				stmt.close();
-			}
-		} catch (SQLException e) {
-			logger.error("Error with " + jdbcurl + ": " + e.getLocalizedMessage());
-		}
-		closeDbCon();
-		return sizeMap;
+	@Override
+	public List<String> getQueries() {
+		return java.util.Collections.singletonList("..sp_spaceused");
 	}
 
-	/**
-	 * @return Returns the dbName.
-	 */
-	public String getDbName() {
-		return dbName;
+	@Override
+	public Map<String, Number> parseRs(ResultSet rs) throws SQLException {
+		Map<String, Number> sizeMap = new HashMap<String, Number>(pd.getSize());
+		ResultSetMetaData rsmd = rs.getMetaData();
+		int colCount = rsmd.getColumnCount();
+		
+		for (int i = 1; i <= colCount; i++) {
+			String ds = rsmd.getColumnLabel(i);
+			String sizeB = (String) rs.getString(i);
+			if( ! "database_name".equals(ds))
+				sizeMap.put(ds, new Double(trans2bytes(sizeB)));
+		}
+		return sizeMap;
 	}
 }

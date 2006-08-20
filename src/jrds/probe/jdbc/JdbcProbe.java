@@ -1,6 +1,5 @@
 package jrds.probe.jdbc;
 
-import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.Probe;
-import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.probe.UrlProbe;
 
@@ -21,7 +19,7 @@ import org.apache.log4j.Logger;
 
 public abstract class JdbcProbe extends Probe implements UrlProbe {
 	static final private org.apache.log4j.Logger logger = Logger.getLogger(JdbcProbe.class);
-	
+
 	static final void registerDriver(String JdbcDriver) {
 		try {
 			Driver jdbcDriver = (Driver) Class.forName (JdbcDriver).newInstance();
@@ -30,7 +28,7 @@ public abstract class JdbcProbe extends Probe implements UrlProbe {
 			e.printStackTrace();
 		}	
 	}
-	
+
 	static final void registerDriver(Class JdbcDriver) {
 		try {
 			Driver jdbcDriver = (Driver) JdbcDriver.newInstance();
@@ -39,31 +37,79 @@ public abstract class JdbcProbe extends Probe implements UrlProbe {
 			e.printStackTrace();
 		}	
 	}
-	
-	private String jdbcurl;
-	private String user;
-	private String passwd;
+
 	private int port;
-	private Connection con;
-	private String urlPrefix;
-	
-	/**
-	 * @param monitoredHost
-	 * @param pd
-	 */
-	public JdbcProbe(String urlPrefix, RdsHost monitoredHost, ProbeDesc pd, int port, String user, String passwd) {
-		super(monitoredHost, pd);
+	protected JdbcStarter starter;
+
+	public JdbcProbe(int port, String user, String passwd) {
 		this.port = port;
-		this.user = user;
-		this.passwd = passwd;
-		this.urlPrefix = urlPrefix;
+		starter = setStarter();
+		starter.setPasswd(passwd);
+		starter.setUser(user);
 	}
-	
-	public List select2Map(String query)
+
+	public JdbcProbe(String dbName, int port, String user, String passwd) {
+		this.port = port;
+		starter = setStarter();
+		starter.setDbName(dbName);
+		starter.setPasswd(passwd);
+		starter.setUser(user);
+	}
+
+	abstract JdbcStarter setStarter();
+
+	public Map getNewSampleValues()
 	{
-		return select2Map(query, true);
+		Map<String, Number> retValue = new HashMap<String, Number>(getPd().getSize());
+
+		for(String query: getQueries())
+			retValue.putAll(select2Map(query));
+		return retValue;
 	}
-	
+
+	public abstract List<String> getQueries();
+
+	protected List<Map<String, Object>> parseRsVerticaly(ResultSet rs, boolean numFilter) throws SQLException {
+		ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
+		ResultSetMetaData rsmd = rs.getMetaData();
+		int colCount = rsmd.getColumnCount();
+		logger.debug("Columns: " + colCount);
+		while(rs.next())  {
+			Map<String, Object> row = new HashMap<String, Object>(colCount);
+			String key =  rs.getObject(1).toString();
+			Object oValue = rs.getObject(2).toString();
+			row.put(key, oValue);
+			values.add(row);
+		}
+		values.trimToSize();
+		return values;
+	}
+
+	protected List<Map<String, Object>> parseRsHorizontaly(ResultSet rs, boolean numFilter) throws SQLException {
+		ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
+		ResultSetMetaData rsmd = rs.getMetaData();
+		int colCount = rsmd.getColumnCount();
+		while(rs.next()) {
+			Map<String, Object> row = new HashMap<String, Object>(colCount);
+			for (int i = 1; i <= colCount; i++) {
+				String key = rsmd.getColumnLabel(i);
+				Object oValue = rs.getObject(i);
+				if(numFilter) {
+					if(oValue instanceof Number)
+						oValue = (Number) oValue;
+					else
+						oValue = new Double(Double.NaN);
+				}
+				row.put(key, oValue);
+			}
+			values.add(row);
+		}
+		values.trimToSize();
+		return values;
+	}
+
+	public abstract Map<String, Number> parseRs(ResultSet rs) throws SQLException;
+
 	/**
 	 * Parse all the collumns of a query and return a List of Map
 	 * where the column name is the key
@@ -71,56 +117,36 @@ public abstract class JdbcProbe extends Probe implements UrlProbe {
 	 * @param numFilter force all value to be a Number
 	 * @return a List of Map of values 
 	 */
-	public List select2Map(String query, boolean numFilter)
+	public Map<String, Number> select2Map(String query)
 	{
-		ArrayList values = new ArrayList();
-		String jdbcurl = getJdbcurl();
+		Map<String, Number> values = new HashMap<String, Number>();
+		String jdbcurl = getUrlAsString();
 		logger.debug("Getting " + query + " on "  + jdbcurl); 
-		Statement stmt = null;
 		try {
-			stmt = getStatment();
-			ResultSet rs = stmt.executeQuery(query);
-			if(rs != null) {
+			Statement stmt = starter.getStatment();
+			if(stmt.execute(query)) {
 				do {
-					ResultSetMetaData rsmd = rs.getMetaData();
-					int colCount = rsmd.getColumnCount();
-					while(rs.next()) {
-						Map row = new HashMap(colCount);
-						for (int i = 1; i <= colCount; i++) {
-							String key = rsmd.getColumnLabel(i);
-							Object oValue = rs.getObject(i);
-							if(numFilter) {
-								if(oValue instanceof Number)
-									oValue = (Number) oValue;
-								else
-									oValue = new Double(Double.NaN);
-							}
-							logger.debug(key + ": " + oValue);
-							row.put(key, oValue);
-						}
-						values.add(row);
-					}
+					values = parseRs(stmt.getResultSet());
 				} while(stmt.getMoreResults());
 			}
 			else {
 				logger.warn("Not a select query");
 			}
 			stmt.close();
-			values.trimToSize();
 		} catch (SQLException e) {
-			logger.error("Error with" + jdbcurl + ": " + e.getLocalizedMessage());
+			logger.error("Error with " + jdbcurl + ": " + e, e);
 		}
 		return values;
 	}
-	
+
 	public Map select2Map(String query, String keyCol, String valCol)
 	{
-		Map values = new HashMap();
-		String jdbcurl = getJdbcurl();
+		Map<String, Object> values = new HashMap<String, Object>();
+		String jdbcurl = getUrlAsString();
 		logger.debug("Getting " + query + " on "  + jdbcurl); 
 		Statement stmt = null;
 		try {
-			stmt = getStatment();
+			stmt = starter.getStatment();
 			if(stmt.execute(query)) {
 				do {
 					ResultSet rs = stmt.getResultSet();
@@ -132,7 +158,7 @@ public abstract class JdbcProbe extends Probe implements UrlProbe {
 							value = (Number) oValue;
 						else
 							value = new Double(Double.NaN);
-						
+
 						values.put(key, value);
 					}
 				} while(stmt.getMoreResults());
@@ -141,66 +167,17 @@ public abstract class JdbcProbe extends Probe implements UrlProbe {
 		} catch (SQLException e) {
 			logger.error("Error with" + jdbcurl + ": " + e.getLocalizedMessage());
 		}
-		closeDbCon();
 		return values;
 	}
-	
-	public void openDbCon() throws SQLException {
-		if(con == null) 
-			con = DriverManager.getConnection(getJdbcurl() , user, passwd);
+
+
+	@Override
+	public void setHost(RdsHost monitoredHost) {
+		super.setHost(monitoredHost);
+		starter.setHost(monitoredHost);
+		starter = (JdbcStarter) monitoredHost.addStarter(starter);
 	}
-	
-	public void closeDbCon() {
-		if(con != null) {
-			try {
-				con.close();
-			} catch (SQLException e2) {
-				logger.error("Error with " + getJdbcurl() + ": " + e2.getLocalizedMessage());
-			}
-		}
-		con = null;
-	}
-	
-	public Statement getStatment() throws SQLException {
-		if(con == null)
-			openDbCon();
-		return con.createStatement();
-	}
-	
-	protected abstract String doUrl();
-	
-	/**
-	 * @return Returns the jdbcurl.
-	 */
-	public String getJdbcurl() {
-		if(jdbcurl == null)
-			jdbcurl = doUrl();
-		return jdbcurl;
-	}
-	
-	/**
-	 * @return Returns the jdbcurl.
-	 */
-	public String getUrlAsString() {
-		return getJdbcurl();
-	}
-	
-	public String getJdbcInstanceUrl() {
-		return urlPrefix +  "//" + getHost() + ":" + this.getPort();
-	}
-	
-	/**
-	 * @return Returns the passwd.
-	 */
-	public String getPasswd() {
-		return passwd;
-	}
-	/**
-	 * @param passwd The passwd to set.
-	 */
-	public void setPasswd(String passwd) {
-		this.passwd = passwd;
-	}
+
 	/**
 	 * @return Returns the port.
 	 */
@@ -213,28 +190,25 @@ public abstract class JdbcProbe extends Probe implements UrlProbe {
 	public void setPort(int port) {
 		this.port = port;
 	}
+
 	/**
-	 * @return Returns the user.
+	 * @return Returns the dbName.
 	 */
-	public String getUser() {
-		return user;
+	public String getDbName() {
+		return starter.getDbName();
 	}
-	/**
-	 * @param user The user to set.
-	 */
-	public void setUser(String user) {
-		this.user = user;
+
+	public String getUrlAsString() {
+		return starter.getUrlAsString();
 	}
 
 	@Override
-	public Map getNewSampleValues() {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean isStarted() {
+		return starter.isStarted();
 	}
 
 	@Override
 	public String getSourceType() {
 		return "JDBC";
 	}
-
 }

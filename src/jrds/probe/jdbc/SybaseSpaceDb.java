@@ -1,13 +1,12 @@
 package jrds.probe.jdbc;
 
-import java.util.HashMap;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import jrds.ProbeDesc;
-import jrds.RdsHost;
-
-import org.apache.log4j.Logger;
 
 
 /**
@@ -15,9 +14,7 @@ import org.apache.log4j.Logger;
  *
  * TODO 
  */
-public class SybaseSpaceDb extends JdbcProbe {
-	static final private org.apache.log4j.Logger logger = Logger.getLogger(SybaseSpaceDb.class);
-	private final static String urlPrefix = "jdbc:sybase:Tds:";
+public class SybaseSpaceDb extends Sybase {
 	private final static int SEGMENT_SYSTEM = 1;
 	private final static int SEGMENT_USER = 2;
 	private final static int SEGMENT_SYSUSER = 3;
@@ -34,51 +31,30 @@ public class SybaseSpaceDb extends JdbcProbe {
 		pd.add("free_log", ProbeDesc.GAUGE);
 		//pd.setGraphClasses(new Class[] { SybaseGraph.class });
 	}
-	
-	static {
-		registerDriver("com.sybase.jdbc2.jdbc.SybDriver");
-	}
-
-	private String dbName;
 
 	/**
 	 * 
 	 */
-	public SybaseSpaceDb(RdsHost thehost, String dbName, String user, String passwd) {
-		super(urlPrefix, thehost, pd, 4100, user, passwd);
-		this.dbName = dbName;
+	public SybaseSpaceDb(String dbName, String user, String passwd) {
+		super(dbName, user, passwd);
 		setName("sybsp-" + dbName);
 	}
 
 	/**
 	 * 
 	 */
-	public SybaseSpaceDb(RdsHost thehost, Integer port, String dbName, String user, String passwd) {
-		super(urlPrefix, thehost, pd, port.intValue(),  user, passwd);
-		this.dbName = dbName;
+	public SybaseSpaceDb(Integer port, String dbName, String user, String passwd) {
+		super(port, dbName,  user, passwd);
 		setName("sybsp-" + dbName);
 	}
 	
-	protected String doUrl()
-	{
-		return urlPrefix +  getHost() + ":" + this.getPort() + "/" + dbName;
-	}
 
-	public Map getNewSampleValues()
-	{
-		Map retValue = new HashMap(pd.getSize());
-		String jdbcurl = getJdbcurl();
-		logger.debug("Getting advanced space of database " + jdbcurl); 
-
-		List logs = select2Map(
-				"select (lct_admin('logsegment_freepages', db_id('" + dbName + "')) - lct_admin('reserved_for_rollbacks', db_id('ADSLV7'))) * @@maxpagesize free_log");
-		//int logfree = ((Number)((Map)logs.get(0)).get("free_log")).intValue();
-		retValue.putAll((Map)logs.get(0));
-		
-		List process = select2Map("select count(*) process from master..sysprocesses where suid > 0");
-		retValue.putAll((Map)process.get(0));
-			
-		List segments = select2Map(
+	@Override
+	public List<String> getQueries() {
+		List<String> queries = new ArrayList<String>(3);
+		queries.add("select (lct_admin('logsegment_freepages', db_id('" + getDbName() + "')) - lct_admin('reserved_for_rollbacks', db_id('ADSLV7'))) * @@maxpagesize free_log");
+		queries.add("select count(*) process from master..sysprocesses where suid > 0");
+		queries.add(
 				"declare @numpgsmb 	numeric\n\n" +
 				"select @numpgsmb =   v.low\n" +
 				"from master.dbo.spt_values v\n" +
@@ -91,22 +67,19 @@ public class SybaseSpaceDb extends JdbcProbe {
 				"   master.dbo.sysdevices v, \n" +
 				"	master.dbo.spt_values b, \n" +
 				"	master.dbo.sysmessages m \n" +
-				"where u.dbid = db_id('" + dbName + "') \n" +
+				"where u.dbid = db_id('" + getDbName() + "') \n" +
 				"	and vstart between v.low and v.high \n" +
 				"	and v.status & 2 = 2 \n" +
 				"	and b.type = 'S' " +
 				"	and u.segmap & 7 = b.number \n" +
 				"	and b.msgnum = m.error\n"
-				, true);
-		
-		closeDbCon();
-		return retValue;
+				);
+		return null;
 	}
 
-	/**
-	 * @return Returns the dbName.
-	 */
-	public String getDbName() {
-		return dbName;
+	@Override
+	public Map<String, Number> parseRs(ResultSet rs) throws SQLException {
+		return (Map<String, Number>) this.parseRsHorizontaly(rs, true);
 	}
+
 }
