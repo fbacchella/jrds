@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
  */
 public class StartListener implements ServletContextListener {
 	static {
-		jrds.log.JrdsLoggerFactory.initLog4J();
+		jrds.JrdsLoggerConfiguration.initLog4J();
 	}
 	static private final Logger logger = Logger.getLogger(StartListener.class);
 	static private boolean started = false;
@@ -34,6 +34,7 @@ public class StartListener implements ServletContextListener {
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
 	 */
 	public void contextInitialized(ServletContextEvent arg0) {
+		Logger.getRootLogger().setLevel(Level.TRACE);
 		//Resin launch the listener twice !
 		if( ! started ) {
 			try {
@@ -50,12 +51,6 @@ public class StartListener implements ServletContextListener {
 					pm.join(new File(localPropFile));
 
 				pm.update();
-
-				jrds.log.JrdsLoggerFactory.setOutputFile(pm.logfile);
-				Logger.getLogger("jrds.snmp").setLevel(Level.TRACE);
-				Logger.getLogger(jrds.Probe.class).setLevel(Level.TRACE);
-				//Logger.getLogger(jrds.webapp.Graph.class).setLevel(Level.TRACE);
-
 
 				System.getProperties().setProperty("java.awt.headless","true");
 

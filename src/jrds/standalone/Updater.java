@@ -20,7 +20,7 @@ import org.jrobin.core.RrdException;
 
 public class Updater {
 	static {
-		jrds.log.JrdsLoggerFactory.initLog4J();
+		jrds.JrdsLoggerConfiguration.initLog4J();
 	}
 	static final private Logger logger = Logger.getLogger(Updater.class);
 	public static final int GRAPH_RESOLUTION = 300; // seconds

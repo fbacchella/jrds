@@ -26,28 +26,29 @@ import org.apache.log4j.Logger;
  */
 public class Grapher {
 	static {
-		jrds.log.JrdsLoggerFactory.initLog4J();
+		jrds.JrdsLoggerConfiguration.initLog4J();
 	}
 	static final private Logger logger = Logger.getLogger(Grapher.class);
 
 	public static void main(String[] args) throws Exception {
 		PropertiesManager pm = new PropertiesManager(new File("jrds.properties"));
-		jrds.log.JrdsLoggerFactory.setOutputFile(pm.logfile);
+		jrds.JrdsLoggerConfiguration.configure(pm);
 		
 		System.getProperties().setProperty("java.awt.headless","true");
 		System.getProperties().putAll(pm);
 		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
 
-		//DescFactory.importJar("../jrdsExalead/build/jrdsexalead.jar");
 		HostsList.getRootGroup().configure(pm);
 
 		Date end = new Date();
+		//end.setTime(end.getTime() - HostsList.getRootGroup().getResolution() * 1000L);
 		Date begin = new Date(end.getTime() - 86400 * 1000);
 		GraphTree graphTree = HostsList.getRootGroup().getGraphTreeByHost();
 		Renderer r= new Renderer(3);
 		for(jrds.RdsGraph g: graphTree.enumerateChildsGraph(null)) {
 			logger.debug("Found graph for probe " + g.getProbe());
 			Date start = new Date();
+			//end = new Date(1000L * org.jrobin.core.Util.normalize(g.getProbe().getLastUpdate().getTime() / 1000L, HostsList.getRootGroup().getResolution()));
 			r.render(g, begin, end);
 			Date finish = new Date();
 			long duration = finish.getTime() - start.getTime();

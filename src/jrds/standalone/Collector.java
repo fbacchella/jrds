@@ -9,12 +9,9 @@ package jrds.standalone;
 import java.io.File;
 
 import jrds.HostsList;
-import jrds.Probe;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
 import jrds.StoreOpener;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 
@@ -26,49 +23,32 @@ import org.apache.log4j.Logger;
  */
 public class Collector {
 	static {
-		jrds.log.JrdsLoggerFactory.initLog4J();
+		jrds.JrdsLoggerConfiguration.initLog4J();
 	}
 	static final private Logger logger = Logger.getLogger(Collector.class);
-	public static final int GRAPH_RESOLUTION = 300; // seconds
 
 	public static void main(String[] args) throws Exception {
-		//ClassLoader cl = Collector.class.getClassLoader();
-		//while(cl != null) {
-		//	logger.debug(cl);
-		//	cl = cl.getParent();
-		//}
-		//ProbeClassLoader pl = new jrds.DescFactory.ProbeClassLoader();
-		//pl.addURL(new URL("file:../jrdsExalead/build/jrdsexalead.jar"));
-		//Class c = pl.loadClass("jrds.probe.exalead.Exalead");
-		//logger.debug(c + " " + c.getClass().getClassLoader());
-		//Class.forName("jrds.probe.exalead.Exalead");
-		//System.exit(0);
-
 		PropertiesManager pm = new PropertiesManager(new File("jrds.properties"));
-		jrds.log.JrdsLoggerFactory.setOutputFile(pm.logfile);
+		jrds.JrdsLoggerConfiguration.configure(pm);
 
 		System.getProperties().setProperty("java.awt.headless","true");
 		System.getProperties().putAll(pm);
 		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
 		
 		HostsList hl = HostsList.getRootGroup();
-		Logger logdigest = Logger.getLogger(org.apache.commons.digester.Digester.class);
-		logdigest.setLevel(Level.ERROR);
-		Logger.getLogger("org.apache.commons.digester.Digester.sax").setLevel(Level.ERROR);
-		Logger.getLogger(org.apache.commons.digester.Digester.class).addAppender(jrds.log.JrdsLoggerFactory.app);
+
 		logger.debug("Scanning dir");
 		
-		//DescFactory.importJar("../jrdsExalead/build/jrdsexalead.jar");
 		HostsList.getRootGroup().configure(pm);
 
-		for(RdsHost h: hl.getHosts()) {
+		/*for(RdsHost h: hl.getHosts()) {
 			for(Probe p: h.getProbes()) {
 				p.getPd().dumpAsXml(p.getClass());
 				for(jrds.RdsGraph g: p.getGraphList()) {
 					g.getGraphDesc().dumpAsXml(g.getClass());
 				}
 			}
-		}
+		}*/
 		for(int i = 0; i< 1 ; i++) {
 			hl.collectAll();
 			System.gc();
