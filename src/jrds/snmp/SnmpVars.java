@@ -38,7 +38,7 @@ import org.snmp4j.smi.VariableBinding;
  *
  *  @author Fabrice Bacchella
  */
-public class SnmpVars extends HashMap {
+public class SnmpVars extends HashMap<OID, Object> {
 	static final private Logger logger = Logger.getLogger(SnmpVars.class);
 
 	static final private byte TAG1 = (byte) 0x9f;
@@ -50,6 +50,11 @@ public class SnmpVars extends HashMap {
 	public SnmpVars(PDU data) {
 		super(data.size());
 		join(data);
+	}
+
+	public SnmpVars(VariableBinding[] newVars) {
+		super(newVars.length);
+		join(newVars);
 	}
 
 	/**
