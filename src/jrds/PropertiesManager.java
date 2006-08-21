@@ -34,23 +34,6 @@ public class PropertiesManager extends Properties {
 		update();
 	}
 
-	private String getParameter(String key, String defaultValue,
-			boolean doTrim) {
-		String returnValue = getProperty(key);
-		if (doTrim && returnValue != null) {
-			returnValue = returnValue.trim();
-		}
-		if (returnValue == null) {
-			returnValue = defaultValue;
-			setProperty(key, defaultValue);
-		}
-		return returnValue;
-	}
-
-	private String getParameter(String s, String s1) {
-		return getParameter(s, s1, true);
-	}
-
 	private int parseInteger(String s) throws NumberFormatException {
 		Integer integer = null;
 		if (s != null) {
@@ -70,6 +53,20 @@ public class PropertiesManager extends Properties {
 					}
 		}
 		return integer.intValue();
+	}
+
+	private boolean parseBoolean(String s)
+	{
+		s = s.toLowerCase().trim();
+		boolean retValue = false;
+		if("1".equals(s))
+			retValue = true;
+		else if("yes".equals(s))
+			retValue = true;
+		else if("true".equals(s))
+			retValue = true;
+
+		return retValue;
 	}
 
 	private List<String> parseLogLevel(String value) {
@@ -114,26 +111,27 @@ public class PropertiesManager extends Properties {
 
 	public void update()
 	{
-		configdir = getParameter("configdir", "config");
-		rrddir = getParameter("rrddir", "probe");
-		resolution = parseInteger(getParameter("resolution", "300"));
-		collectorThreads = parseInteger(getParameter("collectorThreads", "1"));
-		dbPoolSize = parseInteger(getParameter("dbPoolSize", "10"));
-		syncPeriod = parseInteger(getParameter("syncPeriod", "-1"));
-		libspath = getParameter("libspath", "");
+		legacymode = parseBoolean(getProperty("legacymode", "0"));
+		configdir = getProperty("configdir", "config");
+		rrddir = getProperty("rrddir", "probe");
+		resolution = parseInteger(getProperty("resolution", "300"));
+		collectorThreads = parseInteger(getProperty("collectorThreads", "1"));
+		dbPoolSize = parseInteger(getProperty("dbPoolSize", "10"));
+		syncPeriod = parseInteger(getProperty("syncPeriod", "-1"));
+		libspath = getProperty("libspath", "");
 		String[] levels = { "trace", "debug", "info", "error"};
 		String[] defaultLevel = { "", "", "", "org.snmp4j,org.apache"};
 		for(int i = 0; i < levels.length; i++) {
 			String ls = levels[i];
 			Level l = Level.toLevel(ls);
-			String param = getParameter("log." + ls, defaultLevel[i]);
+			String param = getProperty("log." + ls, defaultLevel[i]);
 			if(! "".equals(param)) {
 				List<String> loggerList = parseLogLevel(param);
 				loglevels.put(l, loggerList);
 			}
 		}
-		loglevel = Level.toLevel(getParameter("loglevel", "info"));
-		logfile = getParameter("logfile", "");
+		loglevel = Level.toLevel(getProperty("loglevel", "info"));
+		logfile = getProperty("logfile", "");
 	}
 
 	public String configdir;
@@ -147,5 +145,6 @@ public class PropertiesManager extends Properties {
 	public String libspath;
 	public Map<Level, List<String>> loglevels = new HashMap<Level, List<String>>();
 	public Level loglevel;
+	public boolean legacymode;
 
 }

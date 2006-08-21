@@ -26,13 +26,16 @@ public class ProbeFactory {
 	private Map<String, ProbeDesc> probeDescMap;
 	private GraphFactory gf;
 	private Properties prop;
+	private boolean legacymode;
 	/**
 	 * Private constructor
+	 * @param b 
 	 */
-	ProbeFactory(Map<String, ProbeDesc> probeDescMap, GraphFactory gf, Properties prop) {
+	ProbeFactory(Map<String, ProbeDesc> probeDescMap, GraphFactory gf, Properties prop, boolean legacymode) {
 		this.probeDescMap = probeDescMap;
 		this.gf = gf;
 		this.prop = prop;
+		this.legacymode = legacymode;
 		argPackages.add("java.lang.");
 		argPackages.add("java.net.");
 		argPackages.add("");
@@ -83,7 +86,7 @@ public class ProbeFactory {
 		if( pd != null) {
 			retValue = pd.makeProbe(constArgs, prop);
 		}
-		else {
+		else if(legacymode ){
 			Class probeClass = resolvClass(className, probePackages);
 			if (probeClass != null) {
 				Object o = null;
@@ -108,6 +111,9 @@ public class ProbeFactory {
 							": " + ex, ex);
 				}
 			}
+		}
+		else {
+			logger.error("Probe named " + className + " not found");
 		}
 		
 		//Now we finish the initialization of classes

@@ -25,13 +25,16 @@ public class GraphFactory {
 
 	final private List<String> graphPackages = new ArrayList<String>(2);
 	private Map<String, GraphDesc> graphDescMap;
+	boolean legacymode = false;
 
 	/**
 	 * Private constructor
+	 * @param b 
 	 */
-	public GraphFactory(Map<String, GraphDesc> graphDescMap) {
+	public GraphFactory(Map<String, GraphDesc> graphDescMap, boolean legacymode) {
 		graphPackages.add("jrds.graph.");
 		this.graphDescMap = graphDescMap;
+		this.legacymode = legacymode;
 	}
 
 	/**
@@ -57,7 +60,7 @@ public class GraphFactory {
 		}
 		//A class was used as a param
 		//We only need to instanciate it
-		else if (className instanceof Class) {
+		else if (legacymode && className instanceof Class) {
 			Class graphClass = (Class) className;
 			
 			try {
@@ -80,12 +83,12 @@ public class GraphFactory {
 		}
 		//We get a GraphDesc
 		//We need to instanciate a Graph using this description
-		else if(className instanceof GraphDesc ) {
+		else if(legacymode && className instanceof GraphDesc ) {
 			retValue = new RdsGraph(probe, (GraphDesc) className);
 		}
 		//We get a String
 		//it's an URL to xml description of the graph
-		else if(className instanceof String) {
+		else if(legacymode && className instanceof String) {
 			String xmlRessourceName = (String)className;
 			InputStream xmlStream = probe.getClass().getResourceAsStream(xmlRessourceName);
 			if(xmlStream == null) {

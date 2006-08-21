@@ -118,8 +118,8 @@ public class HostsList {
 			}
 		}
 
-		GraphFactory gd = new GraphFactory(df.getGraphDescMap());
-		ProbeFactory pf = new ProbeFactory(df.getProbesDesc(), gd, pm);
+		GraphFactory gd = new GraphFactory(df.getGraphDescMap(), pm.legacymode);
+		ProbeFactory pf = new ProbeFactory(df.getProbesDesc(), gd, pm, pm.legacymode);
 		HostConfigParser hp = new HostConfigParser(pf);
 
 		List<String> graphsName = new ArrayList<String>(df.getGraphDescMap().keySet());
