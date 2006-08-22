@@ -63,7 +63,13 @@ public class PropertiesManager extends Properties {
 			retValue = true;
 		else if("yes".equals(s))
 			retValue = true;
+		else if("y".equals(s))
+			retValue = true;
 		else if("true".equals(s))
+			retValue = true;
+		else if("enable".equals(s))
+			retValue = true;
+		else if("on".equals(s))
 			retValue = true;
 
 		return retValue;
