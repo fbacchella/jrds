@@ -4,7 +4,7 @@
   <name>TestProbe</name>
   <probeName>testprobe</probeName>
   <probeClass>jrds.probe.RMI</probeClass>
-  <rmiClass>jrds.agent.TestProbe</rmiClass>
+  <specific>jrds.agent.TestProbe</specific>
   <ds>
     <dsName>time</dsName>
     <dsType>counter</dsType>

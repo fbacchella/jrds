@@ -4,7 +4,7 @@
   <name>TcpQueue</name>
   <probeName>tcpq:{1}</probeName>
   <probeClass>jrds.probe.RMIIndexed</probeClass>
-  <rmiClass>jrds.agent.linux.TcpQueue</rmiClass>
+  <specific>jrds.agent.linux.TcpQueue</specific>
   <ds>
     <dsName>tx</dsName>
     <dsType>gauge</dsType>

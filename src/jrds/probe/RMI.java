@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.Probe;
-import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.Starter;
 import jrds.agent.RProbe;
@@ -88,11 +87,6 @@ public class RMI extends Probe {
 	};
 	RMIStarter localstarter = null;
 
-	public RMI(RdsHost monitoredHost, ProbeDesc pd) {
-		super(monitoredHost, pd);
-		localstarter = (RMIStarter) monitoredHost.addStarter(new RMIStarter(monitoredHost, PORT));
-	}
-
 	public RMI() {
 	}
 
@@ -106,7 +100,7 @@ public class RMI extends Probe {
 		try {
 			rp = (RProbe) localstarter.rp;
 			if( ! rp.exist(remoteName))
-				remoteName = rp.prepare(getPd().getRmiClass(), args);
+				remoteName = rp.prepare(getSpecific(), args);
 		} catch (RemoteException e) {
 			rp = null;
 			logger.error("Remote exception on server with probe " + this + ": " + e.getCause());

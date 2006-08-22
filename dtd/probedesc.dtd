@@ -11,6 +11,6 @@
 <!ELEMENT uniq (#PCDATA)>
 <!ELEMENT probeClass (#PCDATA)>
 <!ELEMENT probeName (#PCDATA)>
-<!ELEMENT probedesc (name,probeName,probeClass,(snmpRequester|rmiClass)?,(index,uniq)?,ds+,graphs)>
+<!ELEMENT probedesc (name,probeName,probeClass,(snmpRequester|specific)?,(index,uniq)?,ds+,graphs)>
 <!ELEMENT snmpRequester (#PCDATA)>
-<!ELEMENT rmiClass (#PCDATA)>
+<!ELEMENT specific (#PCDATA)>

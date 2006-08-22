@@ -107,10 +107,10 @@ public class DescFactory extends DirXmlParser {
 				pd.setRequester(req);
 			}
 		});
-		digester.addRule("probedesc/rmiClass", new Rule() {
+		digester.addRule("probedesc/specific", new Rule() {
 			public void body(java.lang.String namespace, java.lang.String name, java.lang.String text) throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException  {
 				ProbeDesc pd = (ProbeDesc) digester.peek();
-				pd.setRmiClass(text.trim());
+				pd.setSpecific(text.trim());
 			}
 		});
 		digester.addObjectCreate("probedesc/graphs", ArrayList.class);

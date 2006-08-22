@@ -4,7 +4,7 @@
   <name>IfStat</name>
   <probeName>ifstat:{1}</probeName>
   <probeClass>jrds.probe.RMIIndexed</probeClass>
-  <rmiClass>jrds.agent.linux.IfStat</rmiClass>
+  <specific>jrds.agent.linux.IfStat</specific>
   <ds>
     <dsName>rxbits</dsName>
     <dsType>counter</dsType>

@@ -465,4 +465,7 @@ implements Comparable {
 
 	public abstract String getSourceType();
 
+	public String getSpecific() {
+		return pd.getSpecific();
+	}
 }

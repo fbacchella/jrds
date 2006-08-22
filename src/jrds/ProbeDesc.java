@@ -75,6 +75,7 @@ public class ProbeDesc {
 	private SnmpRequester requester = SnmpRequester.RAW;
 	private boolean uniqIndex = false;
 	private Class probeClass = null;
+	private String specific = null;
 
 
 	private final class DsDesc {
@@ -504,5 +505,13 @@ public class ProbeDesc {
 //		 As a DOM Serializer
 		serializer.asDOMSerializer();
 		serializer.serialize( document.getDocumentElement() );
+	}
+
+	public String getSpecific() {
+		return specific;
+	}
+
+	public void setSpecific(String specific) {
+		this.specific = specific;
 	}
 }

@@ -4,7 +4,7 @@
   <name>Diskstats</name>
   <probeName>ds-{1}</probeName>
   <probeClass>jrds.probe.RMIIndexed</probeClass>
-  <rmiClass>jrds.agent.linux.Diskstats</rmiClass>
+  <specific>jrds.agent.linux.Diskstats</specific>
   <ds>
     <dsName>rrqm</dsName>
     <dsType>COUNTER</dsType>
