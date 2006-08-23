@@ -125,8 +125,22 @@ public class PropertiesManager extends Properties {
 		dbPoolSize = parseInteger(getProperty("dbPoolSize", "10"));
 		syncPeriod = parseInteger(getProperty("syncPeriod", "-1"));
 		libspath = getProperty("libspath", "");
+		tmpdir = getProperty("tmpdir", "/var/tmp/jrds");
+		File tmpDirFile = new File(tmpdir);
+		if( ! tmpDirFile.exists()) {
+			if ( !tmpDirFile.mkdirs()) {
+				logger.error(tmpdir + " doesn't exists and can't be created");
+			}
+		}
+		else if( ! tmpDirFile.isDirectory()) {
+			logger.error(tmpdir + " exists but is not a file");
+		}
+		else if( ! tmpDirFile.canWrite()) {
+			logger.error(tmpdir + " exists can not be written");
+			
+		}
 		String[] levels = { "trace", "debug", "info", "error"};
-		String[] defaultLevel = { "", "", "", "org.snmp4j,org.apache"};
+		String[] defaultLevel = { "", "", "", "org.snmp4j,org.apache,org.apache.commons.digester.Digester.sax"};
 		for(int i = 0; i < levels.length; i++) {
 			String ls = levels[i];
 			Level l = Level.toLevel(ls);
@@ -152,5 +166,6 @@ public class PropertiesManager extends Properties {
 	public Map<Level, List<String>> loglevels = new HashMap<Level, List<String>>();
 	public Level loglevel;
 	public boolean legacymode;
+	public String tmpdir;
 
 }

@@ -33,7 +33,7 @@ public class Grapher {
 	public static void main(String[] args) throws Exception {
 		PropertiesManager pm = new PropertiesManager(new File("jrds.properties"));
 		jrds.JrdsLoggerConfiguration.configure(pm);
-		
+
 		System.getProperties().setProperty("java.awt.headless","true");
 		System.getProperties().putAll(pm);
 		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
@@ -44,7 +44,7 @@ public class Grapher {
 		//end.setTime(end.getTime() - HostsList.getRootGroup().getResolution() * 1000L);
 		Date begin = new Date(end.getTime() - 86400 * 1000);
 		GraphTree graphTree = HostsList.getRootGroup().getGraphTreeByHost();
-		Renderer r= new Renderer(3);
+		Renderer r= new Renderer(2);
 		for(jrds.RdsGraph g: graphTree.enumerateChildsGraph(null)) {
 			logger.debug("Found graph for probe " + g.getProbe());
 			Date start = new Date();
@@ -57,6 +57,7 @@ public class Grapher {
 		for(jrds.Renderer.RendererRun rr: r.getWaitings()) {
 			logger.debug(rr);
 			rr.write();
+			rr.clean();
 		}
 		r.finish();
 		StoreOpener.stop();

@@ -47,13 +47,15 @@ public final class Graph extends HttpServlet {
 			}
 			
 			RdsGraph graph = hl.getGraphById(p.getId());
-			
-			res.setContentType("image/png");
-			ServletOutputStream out = res.getOutputStream();
-			res.addHeader("Cache-Control", "no-cache");
+
 			Date middle = new Date();
-			//graph.writePng(out, begin, end);
-			hl.getRenderer().write(graph, begin, end, out);
+			if(hl.getRenderer().isReady(graph, begin, end)) {
+				res.setContentType("image/png");
+				ServletOutputStream out = res.getOutputStream();
+				res.addHeader("Cache-Control", "no-cache");
+				hl.getRenderer().send(graph, begin, end, out);
+			}
+
 			Date finish = new Date();
 			long duration1 = middle.getTime() - start.getTime();
 			long duration2 = finish.getTime() - middle.getTime();

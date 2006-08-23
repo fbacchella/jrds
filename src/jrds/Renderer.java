@@ -3,9 +3,14 @@ package jrds;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -62,56 +67,106 @@ public class Renderer {
 				return false;
 			return true;
 		}
+		@Override
+		public String toString() {
+			return Integer.toString(hashCode());
+		}
+
 	};
 
 	public class RendererRun implements Runnable {
-		public BufferedImage bImg;
 		public Date start;
 		public Date end;
 		public RdsGraph graph;
 		public boolean  finished = false;
-		public boolean knowSize = true;
-		public RendererRun(Date start, Date end, RdsGraph graph) {
+		File destFile;
+
+		public RendererRun(Date start, Date end, RdsGraph graph, int keyid) {
 			this.start = start;
 			this.end = end;
 			this.graph = graph;
+			destFile = new File(HostsList.getRootGroup().getTmpdir(), Integer.toHexString(keyid) + ".png");
 		}
-		public synchronized void run() {
-			if(bImg == null) {			//write is sometimes call before run
-				bImg = graph.makeImg(start, end);				
-				finished = true;
+
+		@Override
+		protected void finalize() throws Throwable {
+			clean();
+			super.finalize();
+		}
+
+		public void run() {
+			if(! finished) {			//isReady is sometimes call before run
+				writeImg();
 			}
 		}
-		public synchronized void write(OutputStream out) throws IOException {
-			//We wait for the lock on the object, meaning rendering is still running
-			if(bImg == null) { 			//write is sometimes call before run
-				logger.info("image for " + graph + " not rendered correctly");
-				bImg = graph.makeImg(start, end);				
+		public boolean isReady() {
+			boolean retValue = false;
+
+			if(! finished ) { 			//isReady is sometimes call before run
+				writeImg();
 			}
-			javax.imageio.ImageIO.write(bImg, "png", out);
+			if(destFile.isFile() && destFile.canRead())
+				retValue = true;
+			return retValue;
+
 		}
+		public void send(OutputStream out) throws IOException {
+			if(isReady()){
+				WritableByteChannel outC = Channels.newChannel(out);
+				FileChannel inC = new FileInputStream(destFile).getChannel();
+				inC.transferTo(0, destFile.length(), outC);
+				inC.close();
+			}
+		}
+
 		public void write() throws IOException {
 			OutputStream out = new BufferedOutputStream(new FileOutputStream(new File(
 					graph.getPngName())));
-			write(out);
+			send(out);
+			out.close();
 		}
+
+		public void clean(){
+			if(destFile.isFile())
+				destFile.delete();
+		}
+
+		private synchronized void writeImg() {
+			try {
+				BufferedImage bImg = graph.makeImg(start, end);
+				OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile));
+				javax.imageio.ImageIO.write(bImg, "png", out);
+			} catch (FileNotFoundException e) {
+				logger.error("Error with temporary output file: " +e);
+			} catch (IOException e) {
+				logger.error("Error with temporary output file: " +e);
+			}
+			//Allways set to true, we do not try again in case of failure
+			finished = true;
+		}
+
 	};
 
 	static private final Logger logger = Logger.getLogger(Renderer.class);
 	static private final float hashTableLoadFactor = 0.75f;
 	private final ExecutorService tpool =  Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
 	private int cacheSize;
-	private Map<GraphKey, RendererRun> rendered;
+	private Map<Integer, RendererRun> rendered;
 
 	public Renderer(int cacheSize) {
 		int hashTableCapacity = (int)Math.ceil(cacheSize / hashTableLoadFactor) + 1;
-		rendered = new LinkedHashMap<GraphKey, RendererRun>(hashTableCapacity, hashTableLoadFactor, true) {
+		rendered = new LinkedHashMap<Integer, RendererRun>(hashTableCapacity, hashTableLoadFactor, true) {
 			/* (non-Javadoc)
 			 * @see java.util.LinkedHashMap#removeEldestEntry(java.util.Map.Entry)
 			 */
 			@Override
-			protected boolean removeEldestEntry(Entry<GraphKey, RendererRun> eldest) {
-				return eldest.getValue() != null && eldest.getValue().finished &&  size() > Renderer.this.cacheSize;
+			protected boolean removeEldestEntry(Entry<Integer, RendererRun> eldest) {
+				RendererRun rr = eldest.getValue();
+				if( rr != null && rr.finished &&  size() > Renderer.this.cacheSize) {
+					remove(eldest.getKey());
+					rr.clean();
+				}
+				return false;
 			}
 
 		};	
@@ -123,10 +178,10 @@ public class Renderer {
 		try {
 			key = new GraphKey(graph, start, end);
 			synchronized(rendered){
-				if( ! rendered.containsKey(key)) {
+				if( ! rendered.containsKey(key.hashCode())) {
 					// Create graphics object
-					runRender = new RendererRun(start, end, graph); 
-					rendered.put(key, runRender);
+					runRender = new RendererRun(start, end, graph, key.hashCode()); 
+					rendered.put(key.hashCode(), runRender);
 				}
 			}
 		} catch (RrdException e) {
@@ -142,19 +197,38 @@ public class Renderer {
 		}
 	}
 
-	public void write(RdsGraph graph, Date start, Date end, OutputStream out) throws IOException {
-		RendererRun runRender = null;
-		synchronized(rendered){
-			GraphKey key;
-			try {
-				key = new GraphKey(graph, start, end);
-				runRender = rendered.remove(key);
-			} catch (RrdException e) {
-				logger.error("Problem with renderer key for graph " + graph);
+	public boolean isReady(final RdsGraph graph, final Date start, final Date end) {
+		RendererRun  runRender = null;
+		GraphKey key = null;
+		try {
+			key = new GraphKey(graph, start, end);
+			synchronized(rendered){
+				runRender = rendered.get(key.hashCode());
+			}
+		} catch (RrdException e) {
+			logger.error("Problem with renderer key for graph " + graph);
+		}
+		if( runRender == null) {
+			render(graph, start, end);
+			synchronized(rendered){
+				runRender = rendered.get(key.hashCode());
 			}
 		}
+		return (runRender != null) && runRender.isReady();
+	}
+
+	public void send(RdsGraph graph, Date start, Date end, OutputStream out) throws IOException {
+		RendererRun runRender = null;
+		try {
+			GraphKey key = new GraphKey(graph, start, end);
+			synchronized(rendered){
+				runRender = rendered.get(key.hashCode());
+			}
+		} catch (RrdException e) {
+			logger.error("Problem with renderer key for graph " + graph);
+		}
 		if(runRender != null) {
-			runRender.write(out);
+			runRender.send(out);
 		}
 		else {
 			logger.info("Not precalculated render found for " + graph);

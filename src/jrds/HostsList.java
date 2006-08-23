@@ -53,6 +53,7 @@ public class HostsList {
 	private int numCollectors = 1;
 	private int resolution;
 	private String rrdDir;
+	private String tmpdir;
 
 	/**
 	 *  
@@ -91,6 +92,7 @@ public class HostsList {
 		numCollectors = pm.collectorThreads;
 		resolution = pm.resolution;
 		rrdDir = pm.rrddir;
+		tmpdir = pm.tmpdir;
 
 		DescFactory df = new DescFactory();
 		
@@ -297,6 +299,14 @@ public class HostsList {
 
 	public String getRrdDir() {
 		return rrdDir;
+	}
+
+	public String getTmpdir() {
+		return tmpdir;
+	}
+
+	public void setTmpdir(String tmpdir) {
+		this.tmpdir = tmpdir;
 	}
 
 }
