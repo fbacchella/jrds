@@ -79,18 +79,18 @@ public class ProbeDesc {
 
 
 	private final class DsDesc {
-		public Object key;
 		public DsType dsType;
 		public long heartbeat;
 		public double minValue;
 		public double maxValue;
+		public Object collectKey;
 		public DsDesc(DsType dsType, long heartbeat, double minValue, double maxValue, Object key)
 		{
-			this.key = key;
 			this.dsType = dsType;
 			this.heartbeat = heartbeat;
 			this.minValue = minValue;
 			this.maxValue = maxValue;
+			this.collectKey = key;
 		}
 	}
 
@@ -164,65 +164,64 @@ public class ProbeDesc {
 		dsMap.put(name, new DsDesc(null, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, index));
 	}
 
-	public void add(Map valuesMap)
+	public void add(Map<String, Object> valuesMap)
 	{
 		long heartbeat = HEARTBEATDEFAULT;
 		double min = MINDEFAULT;
 		double max = MAXDEFAULT;
-		Object index = null;
+		Object collectKey = null;
 		String name = null;
 		DsType type = null;
-		for(Iterator i = valuesMap.entrySet().iterator() ; i.hasNext() ;) {
-			Map.Entry e = (Map.Entry) i.next();
-			String var = (String)e .getKey();
+		for(Map.Entry<String, Object> e: valuesMap.entrySet()) {
+			String var = e .getKey();
 			if("dsName".equals(var))
 				name = (String) e.getValue();
 			else if("dsType".equals(var))
 				type = (DsType) e.getValue();
-			else if("index".equals(var))
-				index = e.getValue();
-			if(index == null && name != null)
-				index = name;
+			else if("collectKey".equals(var))
+				collectKey = e.getValue();
+			if(collectKey == null && name != null)
+				collectKey = name;
 		}
-		dsMap.put(name, new DsDesc(type, heartbeat, min, max, index));
+		dsMap.put(name, new DsDesc(type, heartbeat, min, max, collectKey));
 	}
 
 	/**
 	 * Return a map that translate an OID to the datastore name
-	 * @return a Map of oid to datastore name
+	 * @return a Map of collect oids to datastore name
 	 */
-	public Map<OID, String> getOidNameMap()
+	public Map<OID, String> getCollectOids()
 	{
 		Map<OID, String> retValue = new LinkedHashMap<OID, String>(dsMap.size());
 		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
 			DsDesc dd = e.getValue();
-			if(dd.key != null && dd.key instanceof OID)
-				retValue.put((OID)dd.key, e.getKey());
+			if(dd.collectKey != null && dd.collectKey instanceof OID)
+				retValue.put((OID)dd.collectKey, e.getKey());
 		}
 		return retValue;
 	}
 
 	/**
 	 * Return a map that translate an String probe name to the datastore name
-	 * @return a Map of probe name to datastore name
+	 * @return a Map of collect names to datastore name
 	 */
-	public Map<String, String> getProbesNamesMap()
+	public Map<String, String> getCollectStrings()
 	{
 		Map<String, String> retValue = new LinkedHashMap<String, String>(dsMap.size());
 		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
 			DsDesc dd =  e.getValue();
-			if(dd.key != null  && dd.key instanceof String)
-				retValue.put((String)dd.key, e.getKey());
+			if(dd.collectKey != null  && dd.collectKey instanceof String)
+				retValue.put((String)dd.collectKey, e.getKey());
 		}
 		return retValue;
 	}
 
-	public Map<Object, String> getDsNameMap() {
+	public Map<Object, String> getCollectkeys() {
 		Map<Object, String> retValue = new LinkedHashMap<Object, String>(dsMap.size());
 		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
 			DsDesc dd = e.getValue();
-			if(dd.key != null )
-				retValue.put(dd.key, e.getKey());
+			if(dd.collectKey != null )
+				retValue.put(dd.collectKey, e.getKey());
 		}
 		return retValue;
 	}
@@ -470,12 +469,12 @@ public class ProbeDesc {
 			}
 
 			String keyName = null;
-			if(ds.key instanceof org.snmp4j.smi.OID) {
+			if(ds.collectKey instanceof org.snmp4j.smi.OID) {
 				keyName = "oid";
 			}
 			if(keyName != null) {
 				Element keyElement = document.createElement(keyName);
-				keyElement.appendChild(document.createTextNode(ds.key.toString()));
+				keyElement.appendChild(document.createTextNode(ds.collectKey.toString()));
 				dsElement.appendChild(keyElement);
 			}
 		}

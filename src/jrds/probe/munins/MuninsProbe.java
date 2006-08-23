@@ -115,7 +115,7 @@ public abstract class MuninsProbe extends Probe {
 	 * @see com.aol.jrds.MuninsProbe#initNameMap()
 	 */
 	protected Map initNameMap() {
-		return getPd().getProbesNamesMap();
+		return getPd().getCollectStrings();
 	}
 
 	@Override

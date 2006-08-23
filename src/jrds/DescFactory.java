@@ -96,7 +96,14 @@ public class DescFactory extends DirXmlParser {
 			@SuppressWarnings("unchecked")
 			public void body (String namespace, String name, String text) {
 				Map m  = (Map) digester.peek();
-				m.put("index", new OID(text.trim()));
+				m.put("collectKey", new OID(text.trim()));
+			}	
+		});
+		digester.addRule("probedesc/ds/collectName", new Rule() {
+			@SuppressWarnings("unchecked")
+			public void body (String namespace, String name, String text) {
+				Map m  = (Map) digester.peek();
+				m.put("collectKey", text.trim());
 			}	
 		}
 		);

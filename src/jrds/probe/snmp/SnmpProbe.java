@@ -36,7 +36,7 @@ public abstract class SnmpProbe extends Probe {
 	{
 		super(monitoredHost, pd);
 		if(nameMap == null)
-			nameMap = getPd().getOidNameMap();
+			nameMap = getPd().getCollectOids();
 		requester = getSnmpRequester();
 	}
 
@@ -48,7 +48,7 @@ public abstract class SnmpProbe extends Probe {
 	public void setPd(ProbeDesc pd) {
 		super.setPd(pd);
 		if(nameMap == null)
-			nameMap = getPd().getOidNameMap();
+			nameMap = getPd().getCollectOids();
 		requester = getSnmpRequester();
 		
 	}
@@ -59,7 +59,7 @@ public abstract class SnmpProbe extends Probe {
 
 	private Map<OID, String> initNameMap()
 	{
-		return getPd().getOidNameMap();
+		return getPd().getCollectOids();
 	}
 
 	public Map<OID, String> getOidNameMap()

@@ -256,7 +256,7 @@ implements Comparable {
 	protected void updateSample(Sample oneSample) {
 		if(isStarted()) {
 			Map sampleVals = getNewSampleValues();
-			Map<?, String> nameMap = getPd().getDsNameMap();
+			Map<?, String> nameMap = getPd().getCollectkeys();
 			if (sampleVals != null && getHost().getUptime() > ProbeDesc.HEARTBEATDEFAULT * 1000) {
 				Map<?, Number >filteredSamples = filterValues(sampleVals);
 				for(Map.Entry<?, Number> e: filteredSamples.entrySet()) {

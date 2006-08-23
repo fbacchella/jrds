@@ -61,7 +61,7 @@ public class DiskIoMunins extends MuninsIndexedNameProbe {
 			String[] elements = indexedName.split("_");
 			String index = elements[0];
 			String rootName = elements[1];
-			if(indexKey.equals(index) && getPd().getProbesNamesMap().containsKey(rootName))
+			if(indexKey.equals(index) && getPd().getCollectStrings().containsKey(rootName))
 				tempMap.put(rootName, valuesList.get(indexedName));
 		}
 		return tempMap;

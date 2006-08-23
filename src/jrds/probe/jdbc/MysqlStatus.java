@@ -29,7 +29,7 @@ public class MysqlStatus extends Mysql {
 	@Override
 	public Map<String, Number> parseRs(ResultSet rs) throws SQLException {
 		Map<String, Number> retValues = new HashMap<String, Number>(getPd().getSize());
-		Set<String> toCollect = getPd().getProbesNamesMap().keySet();
+		Set<String> toCollect = getPd().getCollectStrings().keySet();
 		for(Map<String, Object> m: parseRsVerticaly(rs, false)) {
 			for(Map.Entry<String, Object> e: m.entrySet()) {
 				Double d = Double.NaN;
