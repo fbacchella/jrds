@@ -27,9 +27,6 @@ public class Period {
 	static final private Logger logger = Logger.getLogger(Period.class);
 	static private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd:HH:mm");
 	static private final Pattern datePattern = Pattern.compile("\\d\\d\\d\\d-\\d\\d-\\d\\d");
-	private Date begin = null;
-	private Date end = null;
-	private int calPeriod = 7;
 	private static class PeriodItem {
 		String name;
 		int length;
@@ -68,6 +65,10 @@ public class Period {
 		periodList.add(new Period.PeriodItem("Last Year", Calendar.YEAR, -1));
 		periodList.add(new Period.PeriodItem("Last 2 Years", Calendar.YEAR, -2));
 	}
+	
+	private Date begin = null;
+	private Date end = null;
+	private int calPeriod = 7;
 	
 	public Period() {
 		end = new Date();
