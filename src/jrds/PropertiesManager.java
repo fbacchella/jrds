@@ -117,7 +117,7 @@ public class PropertiesManager extends Properties {
 
 	public void update()
 	{
-		legacymode = parseBoolean(getProperty("legacymode", "0"));
+		legacymode = parseBoolean(getProperty("legacymode", "1"));
 		configdir = getProperty("configdir", "config");
 		rrddir = getProperty("rrddir", "probe");
 		resolution = parseInteger(getProperty("resolution", "300"));
