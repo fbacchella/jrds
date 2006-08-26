@@ -22,9 +22,16 @@
 		<rpn>ssCpuRawUser, ssCpuRawIdle, +, ssCpuRawWait, +, ssCpuRawKernel, +</rpn>
 	</add>
 	<add>
+		<name>Kernelpc</name>
+		<rpn>ssCpuRawKernel, total, /, 100, *</rpn>
+		<graphType>area</graphType>
+		<color>red</color>
+		<legend>Kernel</legend>
+	</add>
+	<add>
 		<name>Userpc</name>
 		<rpn>ssCpuRawUser, total, /, 100, *</rpn>
-		<graphType>area</graphType>
+		<graphType>stack</graphType>
 		<color>blue</color>
 		<legend>User</legend>
 	</add>
@@ -34,13 +41,6 @@
 		<graphType>stack</graphType>
 		<color>cyan</color>
 		<legend>IO Wait</legend>
-	</add>
-	<add>
-		<name>Kernelpc</name>
-		<rpn>ssCpuRawKernel, total, /, 100, *</rpn>
-		<graphType>stack</graphType>
-		<color>red</color>
-		<legend>Kernel</legend>
 	</add>
 	<add>
 		<name>Idlepc</name>

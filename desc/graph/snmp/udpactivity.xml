@@ -6,24 +6,27 @@
 	<graphTitle>UDP activity on {1}</graphTitle>
 	<verticalLabel>packets/s</verticalLabel>
 	<add>
+		<name>OutDatagrams</name>
+		<graphType>line</graphType>
+		<legend>Out Datagrams</legend>
+	</add>
+	<add>
 		<name>InDatagrams</name>
 		<graphType>line</graphType>
-		<legend>In Datagrams</legend>
+		<reversed>true</reversed>
+		<legend>The number of UDP datagrams received</legend>
 	</add>
 	<add>
 		<name>NoPorts</name>
 		<graphType>line</graphType>
-		<legend>No Ports</legend>
+		<reversed>true</reversed>
+		<legend>The number of received UDP datagrams with no listening port</legend>
 	</add>
 	<add>
 		<name>InErrors</name>
 		<graphType>line</graphType>
-		<legend>In Errors</legend>
-	</add>
-	<add>
-		<name>OutDatagrams</name>
-		<graphType>line</graphType>
-		<legend>Out Datagrams</legend>
+		<reversed>true</reversed>
+		<legend>The number of invalid received UDP datagrams</legend>
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>

@@ -8,11 +8,15 @@
     <verticalLabel>%</verticalLabel>
     <add>
         <name>Cpu</name>
+     </add>
+    <add>
+        <name>Cpupercent</name>
+		<rpn>Cpu, 100, *</rpn>
         <graphType>line</graphType>
         <color>BLUE</color>
         <legend>CPU Usage</legend>
     </add>
-     <hosttree>
+    <hosttree>
         <pathelement>HOST</pathelement>
         <pathelement>SYSTEM</pathelement>
         <pathstring>Processus</pathstring>

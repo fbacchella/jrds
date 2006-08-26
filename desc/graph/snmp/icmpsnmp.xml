@@ -6,24 +6,17 @@
 	<graphTitle>ICMP Info on {1}</graphTitle>
 	<verticalLabel>Paquets/s</verticalLabel>
 	<add>
-		<name>InMsgs</name>
-		<graphType>line</graphType>
-		<legend>Number of ICMP messages received</legend>
-	</add>
-	<add>
-		<name>InErrors</name>
-		<graphType>line</graphType>
-		<legend>Number of ICMP messages received with errors</legend>
-	</add>
-	<add>
 		<name>OutMsgs</name>
 		<graphType>line</graphType>
+         <color>blue</color>
 		<legend>Number of ICMP messages sent</legend>
 	</add>
 	<add>
-		<name>OutErrors</name>
+		<name>InMsgs</name>
 		<graphType>line</graphType>
-		<legend>Number of ICMP messages sent with errors</legend>
+        <color>green</color>
+		<legend>Number of ICMP messages received</legend>
+		<reversed>true</reversed>
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>

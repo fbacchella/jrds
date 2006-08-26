@@ -6,32 +6,39 @@
   <graphTitle>IP errors activity on {1}</graphTitle>
   <verticalLabel>paquets/s</verticalLabel>
   <add>
-    <name>ipInHdrErrors</name>
+    <name>ipFragFails</name>
     <graphType>line</graphType>
+	<reversed>true</reversed>
   </add>
   <add>
-    <name>ipInAddrErrors</name>
+    <name>ipInHdrErrors</name>
+	<legend>Number of invalid input datagram because of headers error</legend>
     <graphType>line</graphType>
+	<reversed>true</reversed>
+  </add>
+  <add>
+      <name>ipInAddrErrors</name>
+	  <graphType>line</graphType>
+	  <legend>Number of datagram received with invalid address</legend>
+	  <reversed>true</reversed>
   </add>
   <add>
     <name>ipInUnknownProtos</name>
     <graphType>line</graphType>
+	  <legend>Number of datagram received with an unknown protocol</legend>
+	<reversed>true</reversed>
   </add>
   <add>
     <name>ipInDiscards</name>
     <graphType>line</graphType>
+	  <legend>Number of good datagram received but latter dropped</legend>
+	<reversed>true</reversed>
   </add>
   <add>
     <name>ipReasmFails</name>
     <graphType>line</graphType>
-  </add>
-  <add>
-    <name>ipFragFails</name>
-    <graphType>line</graphType>
-  </add>
-  <add>
-    <name>ipRoutingDiscards</name>
-    <graphType>line</graphType>
+	  <legend>Number of datagram received but for wich re-assembly failed</legend>
+	<reversed>true</reversed>
   </add>
   <hosttree>
     <pathelement>HOST</pathelement>

@@ -5,6 +5,7 @@
 	<graphName>cpurawlinux</graphName>
 	<graphTitle>CPU Utilization on {1}</graphTitle>
 	<verticalLabel>%</verticalLabel>
+   <upperLimit>100.0</upperLimit>
 	<add>
 		<name>ssCpuRawNice</name>
 	</add>
@@ -26,8 +27,15 @@
 		<rpn>ssCpuRawNice, ssCpuRawUser, +, ssCpuRawSystem,+, ssCpuRawWait, +, ssCpuRawIdle,+</rpn>
 	</add>
 	<add>
-		<name>Userpc</name>
+		<name>Systempc</name>
 		<graphType>area</graphType>
+		<rpn>ssCpuRawSystem, total, /, 100, *</rpn>
+		<color>red</color>
+		<legend>System CPU time</legend>
+	</add>
+	<add>
+		<name>Userpc</name>
+		<graphType>stack</graphType>
 		<rpn>ssCpuRawUser, total, /, 100, *</rpn>
 		<color>blue</color>
 		<legend>User CPU time</legend>
@@ -47,13 +55,6 @@
 		<legend>Iowait CPU time</legend>
 	</add>
 	<add>
-		<name>Systempc</name>
-		<graphType>stack</graphType>
-		<rpn>ssCpuRawSystem, total, /, 100, *</rpn>
-		<color>red</color>
-		<legend>System CPU time</legend>
-	</add>
-	<add>
 		<name>Idlepc</name>
 		<graphType>stack</graphType>
 		<rpn>ssCpuRawIdle, total, /, 100, *</rpn>
@@ -64,12 +65,12 @@
 		<pathelement>host</pathelement>
 		<pathelement>system</pathelement>
 		<pathelement>load</pathelement>
-		<pathstring>CPU USAGE</pathstring>
+		<pathstring>CPU usage</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>system</pathelement>
 		<pathelement>load</pathelement>
-		<pathstring>CPU USAGE</pathstring>
+		<pathstring>CPU usage</pathstring>
 		<pathelement>host</pathelement>
 	</viewtree>
 </graphdesc>

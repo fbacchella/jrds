@@ -19,18 +19,17 @@
 		<name>diskIOWrites</name>
 	</add>
 	<add>
-		<name>diskIOBLKRSZ</name>
-		<graphType>line</graphType>
-		<rpn>diskIONRead, diskIOReads, /</rpn>
-		<color>green</color>
-		<legend>Average request size on read</legend>
-	</add>
-	<add>
 		<name>diskIOBLKWSZ</name>
 		<graphType>line</graphType>
 		<rpn>diskIONWritten, diskIOWrites, /</rpn>
-		<color>blue</color>
-		<legend>Average request size on write</legend>
+	    <legend>Average request size on write</legend>
+ 	</add>
+	<add>
+		<name>diskIOBLKRSZ</name>
+		<graphType>line</graphType>
+		<rpn>diskIONRead, diskIOReads, /</rpn>
+		<legend>Average request size on read</legend>
+        <reversed>true</reversed>
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>

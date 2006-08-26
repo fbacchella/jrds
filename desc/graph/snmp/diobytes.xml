@@ -6,16 +6,15 @@
 	<graphTitle>I/O (bytes) on disk {2} on {1}</graphTitle>
 	<verticalLabel>Bytes/s</verticalLabel>
 	<add>
-		<name>diskIONRead</name>
-		<graphType>line</graphType>
-		<color>green</color>
-		<legend>Number of bytes read</legend>
-	</add>
-	<add>
 		<name>diskIONWritten</name>
 		<graphType>line</graphType>
-		<color>blue</color>
 		<legend>Number of bytes written</legend>
+	</add>
+	<add>
+		<name>diskIONRead</name>
+		<graphType>line</graphType>
+		<legend>Number of bytes read</legend>
+		<reversed>true</reversed>
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>

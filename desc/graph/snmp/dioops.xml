@@ -6,16 +6,15 @@
 	<graphTitle>E/S (operations) on disk {2} on {1}</graphTitle>
 	<verticalLabel>operations/s</verticalLabel>
 	<add>
-		<name>diskIOReads</name>
-		<graphType>line</graphType>
-		<color>green</color>
-		<legend>Number of read accesses</legend>
-	</add>
-	<add>
 		<name>diskIOWrites</name>
 		<graphType>line</graphType>
-		<color>blue</color>
 		<legend>Number of write accesses</legend>
+	</add>
+	<add>
+		<name>diskIOReads</name>
+		<graphType>line</graphType>
+		<legend>Number of read accesses</legend>
+	    <reversed>true</reversed>
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>
