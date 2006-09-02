@@ -11,7 +11,7 @@ import org.snmp4j.util.DefaultPDUFactory;
 import org.snmp4j.util.TableEvent;
 import org.snmp4j.util.TableUtils;
 
-public class TabularIterator implements Iterator<SnmpVars> {
+public class TabularIterator implements Iterator<SnmpVars>, Iterable<SnmpVars> {
 	Iterator<TableEvent> tabIterator;
 
 	@SuppressWarnings("unchecked")
@@ -41,5 +41,9 @@ public class TabularIterator implements Iterator<SnmpVars> {
 	
 	public void remove() {
 		throw new UnsupportedOperationException();
+	}
+
+	public Iterator<SnmpVars> iterator() {
+		return this;
 	}
 }
