@@ -69,7 +69,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
 		Pattern p = Pattern.compile(pattern);
 
 		Collection<String>  indexAsString = new HashSet<String>();
-		TabularIterator ti = new TabularIterator(this, soidSet);
+		TabularIterator ti = new TabularIterator(getSnmpStarter(), soidSet);
 		for(SnmpVars s: ti) {
 			List<OID> lk = new ArrayList<OID>(s.keySet());
 			Collections.sort(lk);

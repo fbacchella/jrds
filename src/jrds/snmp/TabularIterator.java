@@ -3,8 +3,6 @@ package jrds.snmp;
 import java.util.Collection;
 import java.util.Iterator;
 
-import jrds.probe.snmp.SnmpProbe;
-
 import org.snmp4j.Target;
 import org.snmp4j.smi.OID;
 import org.snmp4j.util.DefaultPDUFactory;
@@ -15,8 +13,7 @@ public class TabularIterator implements Iterator<SnmpVars>, Iterable<SnmpVars> {
 	Iterator<TableEvent> tabIterator;
 
 	@SuppressWarnings("unchecked")
-	public TabularIterator(SnmpProbe p, Collection<OID> oids) {
-		SnmpStarter starter = p.getSnmpStarter();
+	public TabularIterator(SnmpStarter starter, Collection<OID> oids) {
 		if(starter != null && starter.isStarted()) {
 			Target snmpTarget = starter.getTarget();
 			if(snmpTarget != null) {
