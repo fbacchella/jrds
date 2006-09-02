@@ -1,5 +1,8 @@
 package jrds.probe.jdbc;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 
@@ -18,8 +21,42 @@ public abstract class Mysql extends JdbcProbe {
 		super(PORT, user, passwd);
 	}
 
+	public Mysql(int port, String user, String passwd, String dbName) {
+		super(port, user, passwd, dbName);
+	}
+
+	public Mysql(String user, String passwd, String dbName) {
+		super(PORT, user, passwd, dbName);
+	}
+
 	JdbcStarter setStarter() {
 		return new JdbcStarter() {
+			@Override
+			public boolean start() {
+				boolean started = super.start();
+				long uptime = 0;
+				if(started) {
+					Statement stmt;
+					try {
+						stmt = getStatment();
+						if(stmt.execute("SHOW STATUS LIKE 'Uptime';")) {
+							ResultSet rs = stmt.getResultSet();
+							while(rs.next()) {
+								String key =  rs.getObject(1).toString();
+								String oValue = rs.getObject(2).toString();
+								if("Uptime".equals(key)) {
+									uptime = Long.parseLong(oValue);
+									break;
+								}
+							}
+						}
+					} catch (SQLException e) {
+					} catch (NumberFormatException ex) {
+					}
+				}
+				setUptime(uptime);
+				return started;
+			}
 			public String getUrlAsString() {
 				return "jdbc:mysql://" + getHost() + ":" + getPort() + "/" + getDbName();
 			}

@@ -53,12 +53,12 @@
 		<pathelement>HOST</pathelement>
 		<pathelement>SYSTEM</pathelement>
 		<pathelement>LOAD</pathelement>
-		<pathstring>CPU Load</pathstring>
+		<pathstring>CPU usage</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>SYSTEM</pathelement>
 		<pathelement>LOAD</pathelement>
-		<pathstring>CPU Load</pathstring>
+		<pathstring>CPU usage</pathstring>
 		<pathelement>HOST</pathelement>
 	</viewtree>
 </graphdesc>

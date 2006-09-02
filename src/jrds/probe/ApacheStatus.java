@@ -21,6 +21,7 @@ import jrds.RdsHost;
  */
 public class ApacheStatus extends HttpProbe implements UrlProbe {
 	private int port = 80;
+
 	/**
 	 * @param monitoredHost
 	 * @param newurl
@@ -44,12 +45,13 @@ public class ApacheStatus extends HttpProbe implements UrlProbe {
 	 * @return Returns the url.
 	 */
 	public String getUrlAsString() {
-		URL tempUrl = null;
+		String retValue = "";
 		try {
-			tempUrl = new URL("http", getHost().getName(), port, "/");
+			URL tempUrl = new URL("http", getHost().getName(), port, "/");
+			retValue = tempUrl.toString();
 		} catch (MalformedURLException e) {
 		}
-		return tempUrl.toString();
+		return retValue;
 	}
 
 	@Override
@@ -78,6 +80,9 @@ public class ApacheStatus extends HttpProbe implements UrlProbe {
 			}
 			catch (java.lang.NumberFormatException ex) {};
 		}
-		return filterUpTime("Uptime", retValue);
+		Number uptimeNumber = retValue.remove("Uptime");
+		if(uptimeNumber != null)
+			setUptime(uptimeNumber.longValue());
+		return retValue;
 	}
 }

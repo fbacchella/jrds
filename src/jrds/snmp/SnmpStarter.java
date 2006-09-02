@@ -1,6 +1,9 @@
 package jrds.snmp;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import jrds.Starter;
 import jrds.StartersSet;
@@ -12,6 +15,7 @@ import org.snmp4j.Target;
 import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.smi.Address;
 import org.snmp4j.smi.GenericAddress;
+import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
@@ -21,6 +25,8 @@ public class SnmpStarter extends Starter {
 	static final String TCP = "tcp";
 	static final String UDP = "udp";
 	static public final String SNMPKEY = "snmp";
+	static final private OID hrSystemUptime = new OID(".1.3.6.1.2.1.25.1.1.0");
+	static final private OID sysUpTimeInstance = new OID(".1.3.6.1.2.1.1.3.0");
 
 	static private Snmp snmp = null;
 	static final Starter full = new Starter() {
@@ -59,15 +65,36 @@ public class SnmpStarter extends Starter {
 	private int port = 161;
 	private String community = "public";
 	private Starter.Resolver resolver = null;
-
+	//A default value for the uptime OID, from the HOST-RESSOURCES MIB
+	private OID uptimeOid = hrSystemUptime;
 	private Target snmpTarget;
-	
+
 	@Override
 	public boolean start() {
 		boolean started = false;
 		if(full.isStarted() && resolver.isStarted()) {
 			snmpTarget = makeTarget();
-			started = snmpTarget != null;
+			if(snmpTarget != null) {
+
+				try {
+					Set<OID> upTimesOids = new HashSet<OID>(2);
+					upTimesOids.add(uptimeOid);
+					//Fallback uptime OID, it should be always defined, from SNMPv2-MIB
+					upTimesOids.add(sysUpTimeInstance);
+
+					Map<OID, Object> uptimes = SnmpRequester.RAW.doSnmpGet(this, upTimesOids);
+					Number uptimeNumber = (Number) uptimes.get(uptimeOid);
+					//Try the fallback
+					if(uptimeNumber == null)
+						uptimeNumber = (Number) uptimes.get(sysUpTimeInstance);
+					if(uptimeNumber != null) {
+						setUptime(uptimeNumber.longValue());
+						started = true;
+					}
+				} catch (IOException e) {
+					logger.error("Unable to get uptime for " + snmpTarget + " because of: " + e);
+				}
+			}
 		}
 		return started;
 	}
@@ -96,12 +123,6 @@ public class SnmpStarter extends Starter {
 			retValue.setVersion(version);
 			retValue.setTimeout(retValue.getTimeout() * 5);
 		}
-		/*try {
-		catch(IllegalArgumentException ex) {
-			logger.warn("Adresse definition incorrect: " + addrStr +": " + ex);
-			retValue = null;
-	}
-		}*/
 		return retValue;
 	}
 
@@ -192,5 +213,7 @@ public class SnmpStarter extends Starter {
 		return "snmp:" + proto + "://" + this.hostname + ":" + port;
 	}
 
-
+	public void setUptimeOid(OID uptimeOid) {
+		this.uptimeOid = uptimeOid;
+	}
 }

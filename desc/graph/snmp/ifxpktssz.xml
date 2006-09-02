@@ -18,7 +18,6 @@
     <name>outPktSize</name>
      <graphType>area</graphType>
     <rpn>ifHCOutOctets, ifHCOutUcastPkts,/</rpn>
-   <color>green</color>
     <legend>average packets size send</legend>
   </add>
   <add>
@@ -33,8 +32,7 @@
     <name>inPktSize</name>
     <graphType>area</graphType>
     <rpn>ifHCInOctets, ifHCInUcastPkts,/</rpn>
-    <color>blue</color>
-	  <reversed>true</reversed>
+ 	  <reversed>true</reversed>
     <legend>average packets size received</legend>
   </add>
   <hosttree>

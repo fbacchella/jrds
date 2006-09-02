@@ -3,16 +3,18 @@
 <graphdesc>
   <name>LinuxDiskstatBytes</name>
   <graphName>bytes-{2}</graphName>
-  <graphTitle>E/S (bytes) on disk {2} on {1}</graphTitle>
+  <graphTitle>I/O (bytes) on disk {2} on {1}</graphTitle>
+  <unit>
+    <binary/>
+  </unit>
   <verticalLabel>bytes/s</verticalLabel>
   <add>
     <name>wsec</name>
   </add>
   <add>
     <name>wbytes</name>
-    <graphType>line</graphType>
     <rpn>wsec, 512, *</rpn>
-    <color>green</color>
+    <graphType>line</graphType>
     <legend>Number of bytes written</legend>
   </add>
   <add>
@@ -20,11 +22,10 @@
   </add>
   <add>
     <name>nrbytes</name>
-    <graphType>line</graphType>
     <rpn>rsec, 512, *</rpn>
-    <color>blue</color>
-	  <reversed>true</reversed>
-    <legend>Number of bytes read</legend>
+    <reversed>true</reversed>
+    <graphType>line</graphType>
+     <legend>Number of bytes read</legend>
   </add>
   <hosttree>
     <pathelement>HOST</pathelement>

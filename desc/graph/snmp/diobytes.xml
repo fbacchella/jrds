@@ -1,33 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
-	<name>DiskIoGraphBytes</name>
-	<graphName>bytes-{2}</graphName>
-	<graphTitle>I/O (bytes) on disk {2} on {1}</graphTitle>
-	<verticalLabel>Bytes/s</verticalLabel>
-	<add>
-		<name>diskIONWritten</name>
-		<graphType>line</graphType>
-		<legend>Number of bytes written</legend>
-	</add>
-	<add>
-		<name>diskIONRead</name>
-		<graphType>line</graphType>
-		<legend>Number of bytes read</legend>
-		<reversed>true</reversed>
-	</add>
-	<hosttree>
-		<pathelement>HOST</pathelement>
-		<pathelement>DISK</pathelement>
-		<pathelement>DISKACTIVITY</pathelement>
-		<pathelement>INDEX</pathelement>
-		<pathstring>Activity as bytes/s</pathstring>
-	</hosttree>
-	<viewtree>
-		<pathelement>DISK</pathelement>
-		<pathelement>DISKACTIVITY</pathelement>
-		<pathelement>HOST</pathelement>
-		<pathstring>Activity as bytes/s</pathstring>
-		<pathelement>INDEX</pathelement>
-	</viewtree>
+  <name>DiskIoGraphBytes</name>
+  <graphName>bytes-{2}</graphName>
+  <graphTitle>I/O (bytes) on disk {2} on {1}</graphTitle>
+  <unit>
+    <binary/>
+  </unit>
+  <verticalLabel>Bytes/s</verticalLabel>
+  <add>
+    <name>diskIONWritten</name>
+    <graphType>line</graphType>
+    <legend>Number of bytes written</legend>
+  </add>
+  <add>
+    <name>diskIONRead</name>
+    <reversed>true</reversed>
+    <graphType>line</graphType>
+    <legend>Number of bytes read</legend>
+  </add>
+  <hosttree>
+    <pathelement>HOST</pathelement>
+    <pathelement>DISK</pathelement>
+    <pathelement>DISKACTIVITY</pathelement>
+    <pathelement>INDEX</pathelement>
+    <pathstring>Activity as bytes/s</pathstring>
+  </hosttree>
+  <viewtree>
+    <pathelement>DISK</pathelement>
+    <pathelement>DISKACTIVITY</pathelement>
+    <pathelement>HOST</pathelement>
+    <pathstring>Activity as bytes/s</pathstring>
+    <pathelement>INDEX</pathelement>
+  </viewtree>
 </graphdesc>

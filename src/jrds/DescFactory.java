@@ -99,7 +99,7 @@ public class DescFactory extends DirXmlParser {
 				m.put("collectKey", new OID(text.trim()));
 			}	
 		});
-		digester.addRule("probedesc/ds/collectName", new Rule() {
+		digester.addRule("probedesc/ds/collect", new Rule() {
 			@SuppressWarnings("unchecked")
 			public void body (String namespace, String name, String text) {
 				Map m  = (Map) digester.peek();
@@ -146,6 +146,20 @@ public class DescFactory extends DirXmlParser {
 		digester.addCallMethod("graphdesc/graphTitle", "setGraphTitle", 0);
 		digester.addCallMethod("graphdesc/upperLimit", "setUpperLimit", 0);
 		digester.addCallMethod("graphdesc/lowerLimit", "setLowerLimit", 0);
+		digester.addRule("graphdesc/unit/binary", new Rule() {
+			@Override
+			public void end(String namespace, String name) throws Exception {
+				GraphDesc gd = (GraphDesc) digester.peek();
+				gd.setSiUnit(false);
+			}
+		});
+		digester.addRule("graphdesc/unit/SI", new Rule() {
+			@Override
+			public void end(String namespace, String name) throws Exception {
+				GraphDesc gd = (GraphDesc) digester.peek();
+				gd.setSiUnit(true);
+			}
+		});
 		digester.addCallMethod("graphdesc/add","add",8);
 		digester.addCallParam("graphdesc/add/name",0);
 		digester.addCallParam("graphdesc/add/dsName",1);

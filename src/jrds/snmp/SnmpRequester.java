@@ -11,8 +11,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
-import jrds.probe.snmp.SnmpProbe;
-
 import org.apache.log4j.Logger;
 import org.snmp4j.PDU;
 import org.snmp4j.Target;
@@ -49,15 +47,16 @@ public abstract class SnmpRequester {
 	 * @param probe the probe that does the request
 	 * @param oidsSet a <code>collection</code> to be request
 	 * @return a map of the snmp values read
+	 * @throws IOException 
 	 */
-	public abstract Map doSnmpGet(SnmpProbe probe, Collection oidsSet);
+	public abstract Map<OID, Object> doSnmpGet(SnmpStarter starter, Collection<OID> oidsSet) throws IOException;
 
 	/**
 	 * Collect a set of variable by append .0 to the OID of the oid
 	 * the returned OID are left unchanged
 	 */
 	public static final SnmpRequester  SIMPLE = new SnmpRequester() {
-		public Map doSnmpGet(SnmpProbe probe, Collection oidsSet)
+		public Map<OID, Object> doSnmpGet(SnmpStarter starter, Collection<OID> oidsSet) throws IOException
 		{
 			VariableBinding[] vars = new VariableBinding[oidsSet.size()];
 			int j = 0;
@@ -66,7 +65,7 @@ public abstract class SnmpRequester {
 				currentOid.append("0");
 				vars[j++] = new VariableBinding(currentOid);
 			}
-			return doRequest(probe, vars);
+			return doRequest(starter, vars);
 		}
 
 		@Override
@@ -81,11 +80,11 @@ public abstract class SnmpRequester {
 	public static final SnmpRequester TABULAR = new SnmpRequester() {
 
 		@SuppressWarnings("unchecked")
-		public Map doSnmpGet(SnmpProbe probe, Collection oids)
+		public Map<OID, Object> doSnmpGet(SnmpStarter starter, Collection<OID> oids)
 		{
 			SnmpVars retValue = new SnmpVars();
 
-			SnmpStarter starter = probe.getSnmpStarter();
+			//SnmpStarter starter = probe.getSnmpStarter();
 			if(starter != null && starter.isStarted()) {
 				Target snmpTarget = starter.getTarget();
 				if(snmpTarget != null) {
@@ -118,7 +117,7 @@ public abstract class SnmpRequester {
 	 */
 	public static final SnmpRequester RAW = new SnmpRequester () {
 
-		public Map doSnmpGet(SnmpProbe probe, Collection oidsSet)
+		public Map<OID, Object> doSnmpGet(SnmpStarter starter, Collection<OID> oidsSet) throws IOException
 		{
 			VariableBinding[] vars = new VariableBinding[oidsSet.size()];
 			int j = 0;
@@ -126,7 +125,7 @@ public abstract class SnmpRequester {
 				OID currentOid = (OID) i.next();
 				vars[j++] = new VariableBinding(currentOid);
 			}
-			return doRequest(probe, vars);
+			return doRequest(starter, vars);
 		}
 
 		@Override
@@ -135,10 +134,10 @@ public abstract class SnmpRequester {
 		}
 	};
 
-	private static final Map doRequest(SnmpProbe probe, VariableBinding[] vars) {
-		Map snmpVars = new SnmpVars();
-		SnmpStarter starter = probe.getSnmpStarter();
-		if(starter != null & starter.isStarted()) {
+	private static final Map<OID, Object> doRequest(SnmpStarter starter, VariableBinding[] vars) throws IOException {
+		Map<OID, Object> snmpVars = new SnmpVars();
+		//SnmpStarter starter = probe.getSnmpStarter();
+		//if(starter != null & starter.isStarted()) {
 			Target snmpTarget = starter.getTarget();
 			PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
 
@@ -146,46 +145,48 @@ public abstract class SnmpRequester {
 
 			requestPDU.add(upTimeVb);
 
-			try {
-				boolean doAgain = true;
-				PDU response = null;
-				do {
-					ResponseEvent re = null;
-					if(requestPDU.size() > 0) {
-						re = starter.getSnmp().send(requestPDU, snmpTarget);
+			//try {
+			boolean doAgain = true;
+			PDU response = null;
+			do {
+				ResponseEvent re = null;
+				if(requestPDU.size() > 0) {
+					re = starter.getSnmp().send(requestPDU, snmpTarget);
+				}
+				if(re != null)
+					response = re.getResponse();
+				if (response != null && response.getErrorStatus() == SnmpConstants.SNMP_ERROR_SUCCESS){
+					snmpVars = new SnmpVars(response);
+					doAgain = false;
+				}	
+				else {		
+					if(response == null) {
+						throw new IOException("SNMP Timeout, address=" + snmpTarget.getAddress() + ", requestID=" + requestPDU.getRequestID());
+						//logger.warn( + ", probe=" + probe);
+						//doAgain = false;
 					}
-					if(re != null)
-						response = re.getResponse();
-					if (response != null && response.getErrorStatus() == SnmpConstants.SNMP_ERROR_SUCCESS){
-						snmpVars = new SnmpVars(response);
-						doAgain = false;
-					}	
-					else {		
-						if(response == null) {
-							logger.warn("SNMP Timeout, address=" + snmpTarget.getAddress() + ", requestID=" + requestPDU.getRequestID() + ", probe=" + probe);
+					else {
+						int index = response.getErrorIndex() - 1;
+						VariableBinding vb = response.get(index);
+						logger.warn(response.getErrorStatusText() + " on " + vb.getOid().toString());
+						/*If there is still variable to get, we try again*/
+						if(requestPDU.size() > 1) {
+							requestPDU = response;
+							response = null;
+							requestPDU.remove(index);
+							requestPDU.setType(PDU.GET);
+						}
+						else
 							doAgain = false;
-						}
-						else {
-							int index = response.getErrorIndex() - 1;
-							VariableBinding vb = response.get(index);
-							logger.warn(response.getErrorStatusText() + " on " + vb.getOid().toString());
-							/*If there is still variable to get, we try again*/
-							if(requestPDU.size() > 1) {
-								requestPDU = response;
-								response = null;
-								requestPDU.remove(index);
-								requestPDU.setType(PDU.GET);
-							}
-							else
-								doAgain = false;
-						}
 					}
-				} while (doAgain);
-			} catch (IOException e) {
-				logger.warn("SNMP communication problem, address=" + snmpTarget.getAddress() + ", requestID=" + requestPDU.getRequestID() + ": " + e.getLocalizedMessage());	
-			}
-		}
-		return probe.filterUpTime(upTimeOid, snmpVars);
+				}
+			} while (doAgain);
+			//} catch (IOException e) {
+			//	logger.warn("SNMP communication problem, address=" + snmpTarget.getAddress() + ", requestID=" + requestPDU.getRequestID() + ": " + e.getLocalizedMessage());	
+			//}
+		//}
+		//return probe.filterUpTime(upTimeOid, snmpVars);
+		return snmpVars;
 
 	}
 }

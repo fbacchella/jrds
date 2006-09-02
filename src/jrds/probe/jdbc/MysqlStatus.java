@@ -10,6 +10,13 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+/**
+ * 
+ * This class needs select privilege, so remember to set up something like that :
+ * GRANT USAGE ON *.* TO monitor@'%' IDENTIFIED BY 'password';
+ * @author bacchell
+ *
+ */
 public class MysqlStatus extends Mysql {
 	static final private org.apache.log4j.Logger logger = Logger.getLogger(MysqlStatus.class);
 
@@ -23,7 +30,7 @@ public class MysqlStatus extends Mysql {
 
 	@Override
 	public List<String> getQueries() {
-		return Collections.singletonList("SHOW STATUS");
+		return Collections.singletonList("SHOW /*!50002 GLOBAL */ STATUS");
 	}
 
 	@Override

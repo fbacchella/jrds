@@ -99,8 +99,14 @@ public class HostConfigParser  extends DirXmlParser {
 		Rule makeProbe = new Rule() {
 			public void begin(String namespace, String name, Attributes attributes) throws Exception {
 				//We will need the type latter, so keep it on the stack
-				digester.push(attributes.getValue("type"));
-				digester.push(new ArrayList(0));
+				String type = attributes.getValue("type");
+				if(type == null) {
+					logger.error("No type found at " + digester.getCurrentElementName());
+				}
+				else {
+					digester.push(type);
+					digester.push(new ArrayList(0));
+				}
 			}
 
 			public void end(String namespace, String name) throws Exception {
@@ -122,8 +128,14 @@ public class HostConfigParser  extends DirXmlParser {
 					else if(o instanceof Tag) {
 						tags.add((Tag) o);
 					}
+					else {
+						logger.error("found " + o + " on the stack, what do i do with that ? ");
+						if(o != null)
+							digester.push(o);
+						break;
+					}
 				}
-				if(o != null) {
+				if(o != null && o instanceof String) {
 					String probeType = (String) o;
 					for(int i = 0; i < digester.getCount() && !((o = digester.peek(i)) instanceof RdsHost) ; i++);
 					RdsHost host = (RdsHost) o;
@@ -138,8 +150,15 @@ public class HostConfigParser  extends DirXmlParser {
 						HostsList.getRootGroup().addProbe(newProbe);
 					}
 				}
-				else
-					logger.error("hitting empty digester stack for a probe, internal error");
+				else {
+					logger.error("hitting invalid digester stack for a probe, internal error " + digester);
+					StringBuffer stack = new StringBuffer();
+					for(int i = 0; i < digester.getCount(); i++) {
+						stack.append(digester.peek(i).toString());
+						stack.append("\n");
+					}
+					logger.error("Stack dump:\n" + stack);
+				}
 			}
 		};
 
@@ -167,7 +186,7 @@ public class HostConfigParser  extends DirXmlParser {
 					hostName = host.getName();
 				}
 				starter.setHostname(hostName);
-				
+
 				//If we are on a host, the starter must be registered right now
 				for(int i = 0; i< digester.getCount() ; i++){
 					Object o = digester.peek(i);
@@ -198,10 +217,15 @@ public class HostConfigParser  extends DirXmlParser {
 				String type = attributes.getValue("type");
 				String value = attributes.getValue("value");
 				Object arg = pf.makeArg(type, value);
-				Object o = null;
-				for(int i = 0; i< digester.getCount() && !((o = digester.peek(i)) instanceof List) ; i++);
-				List<Object> argsListValue = (List<Object>) o;
-				argsListValue.add(arg);
+				if(arg != null) {
+					Object o = null;
+					for(int i = 0; i< digester.getCount() && !((o = digester.peek(i)) instanceof List) ; i++);
+					List<Object> argsListValue = (List<Object>) o;
+					argsListValue.add(arg);
+				}
+				else {
+					logger.error("Object of type " + type  + " and value" + value + " can't be instancied");
+				}
 			}
 		};
 
@@ -299,7 +323,7 @@ public class HostConfigParser  extends DirXmlParser {
 		};
 		d.addRule("*/tag", tagRule);
 	}
-	
+
 	private void defineSumDigester(Digester digester) {
 //		digester.register("-//jrds//DTD View//EN", digester.getClass().getResource("/view.dtd").toString());
 		digester.addRule("sum/", new Rule() {

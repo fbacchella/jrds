@@ -4,6 +4,9 @@
   <name>swapwindowgraph</name>
   <graphName>swapwindowgraph</graphName>
   <graphTitle>Virtual Memory usage on {1}</graphTitle>
+  <unit>
+    <binary/>
+  </unit>
   <verticalLabel>Bytes</verticalLabel>
   <add>
     <name>Total</name>
@@ -17,8 +20,8 @@
   </add>
   <add>
     <name>Available</name>
-    <graphType>stack</graphType>
     <rpn>Total,Used,-</rpn>
+    <graphType>stack</graphType>
     <legend>Swap free</legend>
   </add>
   <hosttree>

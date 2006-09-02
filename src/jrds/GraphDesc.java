@@ -272,35 +272,66 @@ implements Cloneable {
 
 	static final private Map<String, Color> COLORMAP = new HashMap<String, Color>();
 	static {
-		COLORMAP.put("BLUE", new Color(Color.BLUE.getRGB()) {
-			public String toString() { return "BLUE"; }
-		});
-		COLORMAP.put("GREEN", new Color(Color.GREEN.getRGB()) {
-			public String toString() { return "GREEN"; }
-		});
-		COLORMAP.put("RED",  new Color(Color.RED.getRGB()) {
-			public String toString() { return "RED"; }
-		});
-		COLORMAP.put("CYAN",  new Color(Color.CYAN.getRGB()) {
-			public String toString() { return "CYAN"; }
+		//Netscape alias for cyan
+		COLORMAP.put("AQUA",  new Color(0,255,225) {
+			public String toString() { return "AQUA"; }
 		});
 		COLORMAP.put("BLACK",  new Color(Color.BLACK.getRGB()) {
 			public String toString() { return "BLACK"; }
 		});
-		COLORMAP.put("ORANGE",  new Color(Color.ORANGE.getRGB()) {
-			public String toString() { return "ORANGE"; }
+		COLORMAP.put("BLUE", new Color(Color.BLUE.getRGB()) {
+			public String toString() { return "BLUE"; }
 		});
-		COLORMAP.put("YELLOW",  new Color(Color.YELLOW.getRGB()) {
-			public String toString() { return "YELLOW"; }
+		COLORMAP.put("CYAN",  new Color(Color.CYAN.getRGB()) {
+			public String toString() { return "CYAN"; }
 		});
-		COLORMAP.put("PINK",  new Color(Color.PINK.getRGB()) {
-			public String toString() { return "PINK"; }
+		COLORMAP.put("FUCHSIA",  new Color(255,0,255) {
+			public String toString() { return "FUCHSIA"; }
+		});
+		COLORMAP.put("GRAY",  new Color(Color.GRAY.getRGB()) {
+			public String toString() { return "GRAY"; }
+		});
+		COLORMAP.put("GREEN", new Color(Color.GREEN.getRGB()) {
+			public String toString() { return "GREEN"; }
+		});
+		COLORMAP.put("LIME",  new Color(204,255,0) {
+			public String toString() { return "LIME"; }
 		});
 		COLORMAP.put("MAGENTA",  new Color(Color.MAGENTA.getRGB()) {
 			public String toString() { return "MAGENTA"; }
 		});
+		COLORMAP.put("MAROON",  new Color(128,0,0) {
+			public String toString() { return "MAROON"; }
+		});
+		COLORMAP.put("NAVY",  new Color(0,0,128) {
+			public String toString() { return "NAVY"; }
+		});
+		COLORMAP.put("OLIVE",  new Color(128,128,0) {
+			public String toString() { return "OLIVE"; }
+		});
+		COLORMAP.put("PURPLE",  new Color(128,0,128) {
+			public String toString() { return "PURPLE"; }
+		});
+		COLORMAP.put("RED",  new Color(Color.RED.getRGB()) {
+			public String toString() { return "RED"; }
+		});
+		COLORMAP.put("SILVER",  new Color(192,192,192) {
+			public String toString() { return "SILVER"; }
+		});
+		COLORMAP.put("TEAL",  new Color(0,128,128) {
+			public String toString() { return "TEAL"; }
+		});
 		COLORMAP.put("WHITE",  new Color(Color.WHITE.getRGB()) {
 			public String toString() { return "WHITE"; }
+		});
+		COLORMAP.put("YELLOW",  new Color(Color.YELLOW.getRGB()) {
+			public String toString() { return "YELLOW"; }
+		});
+		COLORMAP.put("ORANGE",  new Color(Color.ORANGE.getRGB()) {
+			public String toString() { return "ORANGE"; }
+		});
+		COLORMAP.put("PINK",  new Color(Color.PINK.getRGB()) {
+			public String toString() { return "PINK"; }
 		});
 		COLORMAP.put("DARK_GRAY",  new Color(Color.DARK_GRAY.getRGB()) {
 			public String toString() { return "DARK_GRAY"; }
@@ -320,22 +351,16 @@ implements Cloneable {
 		COLORMAP.get("GREEN"),
 		COLORMAP.get("RED"),
 		COLORMAP.get("CYAN"),
-		COLORMAP.get("BLACK"),
 		COLORMAP.get("ORANGE"),
+		COLORMAP.get("TEAL"),
 		COLORMAP.get("YELLOW"),
 		COLORMAP.get("PINK"),
-		COLORMAP.get("MAGENTA")
+		COLORMAP.get("MAGENTA"),
+		COLORMAP.get("BLACK"),
+		COLORMAP.get("NAVY")
 	};
 
-	static final public Color COLOR1 = colors[0];
-	static final public Color COLOR2 = colors[1];
-	static final public Color COLOR3 = colors[2];
-	static final public Color COLOR4 = colors[3];
-	static final public Color COLOR5 = colors[4];
-	static final public Color COLOR6 = colors[5];
-	static final public Color COLOR7 = colors[6];
-
-	static final public Color BLUE = colors[0];
+	/*static final public Color BLUE = colors[0];
 	static final public Color GREEN = colors[1];
 	static final public Color RED = colors[2];
 	static final public Color CYAN = colors[3];
@@ -343,7 +368,7 @@ implements Cloneable {
 	static final public Color ORANGE = colors[5];
 	static final public Color YELLOW = colors[6];
 	static final public Color PINK = colors[7];
-	static final public Color MAGENTA = colors[8];
+	static final public Color MAGENTA = colors[8];*/
 
 	private final class Dimension {
 		public int width = 0;
@@ -389,6 +414,7 @@ implements Cloneable {
 	private String graphTitle ="{0} on {1}";
 	private Dimension dimension = new Dimension();
 	private int maxLengthLegend = 0;
+	private boolean siUnit = true;
 
 	/**
 	 * A constructor wich pre allocate the desired size
@@ -420,14 +446,18 @@ implements Cloneable {
 
 	public void add(String name, GraphType graphType, String legend) {
 		add(name, name, null, graphType,
-				colors[ (lastColor++) % colors.length], legend,
+				colors[ (lastColor) % colors.length], legend,
 				DEFAULTCF, false);
+		if(graphType != GraphType.COMMENT && graphType != GraphType.NONE && graphType != GraphType.VOID)
+			lastColor++;
 	}
 
 	public void add(String name, GraphType graphType) {
 		add(name, name, null, graphType,
-				colors[ (lastColor++) % colors.length], name,
+				colors[ (lastColor) % colors.length], name,
 				DEFAULTCF, false);
+		if(graphType != GraphType.COMMENT && graphType != GraphType.NONE && graphType != GraphType.VOID)
+			lastColor++;
 	}
 
 	/**
@@ -453,8 +483,10 @@ implements Cloneable {
 
 	public void add(String name, String rpn, GraphType graphType, String legend) {
 		add(name, null, rpn, graphType,
-				colors[lastColor++ % colors.length], legend,
+				colors[lastColor % colors.length], legend,
 				DEFAULTCF, false);
+		if(graphType != GraphType.COMMENT && graphType != GraphType.NONE && graphType != GraphType.VOID)
+			lastColor++;
 	}
 
 	/**
@@ -508,8 +540,12 @@ implements Cloneable {
 				c = Color.white;
 			}
 		}
-		else
-			c = colors[lastColor++ % colors.length];
+		else {
+			c = colors[lastColor % colors.length];
+			if(gt != GraphType.COMMENT && gt != GraphType.NONE && gt != GraphType.VOID)
+				lastColor++;
+
+		}
 		if(legend == null && name != null)
 			legend = name;
 		add(name, dsName, rpn, gt, c, legend, cf, reversed != null);
@@ -602,6 +638,12 @@ implements Cloneable {
 		retValue.setGridRange(lowerLimit, upperLimit, false);
 		if (verticalLabel != null)
 			retValue.setVerticalLabel(verticalLabel);
+		if(this.siUnit)
+			retValue.setBaseValue(1000);
+		else	
+			retValue.setBaseValue(1024);
+		
+			
 		return retValue;
 	}
 
@@ -965,6 +1007,14 @@ implements Cloneable {
 			}
 		}
 
+	}
+
+	public boolean isSiUnit() {
+		return siUnit;
+	}
+
+	public void setSiUnit(boolean siUnit) {
+		this.siUnit = siUnit;
 	}
 
 }

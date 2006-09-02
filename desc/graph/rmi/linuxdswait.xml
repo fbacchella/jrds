@@ -7,7 +7,7 @@
   <verticalLabel>s</verticalLabel>
   <add>
     <name>r</name>
-   </add>
+  </add>
   <add>
     <name>w</name>
   </add>
@@ -16,8 +16,8 @@
   </add>
   <add>
     <name>await</name>
-    <graphType>line</graphType>
     <rpn>waittm, r, w, +, 1000, *, /</rpn>
+    <graphType>line</graphType>
     <color>blue</color>
     <legend>Average wait time</legend>
   </add>

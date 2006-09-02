@@ -3,39 +3,39 @@
 <graphdesc>
   <name>LinuxDiskstatOps</name>
   <graphName>op-{2}</graphName>
-  <graphTitle>E/S (operations) on disk {2} on {1}</graphTitle>
+  <graphTitle>I/O operations on disk {2} on {1}</graphTitle>
   <verticalLabel>operations/s</verticalLabel>
   <add>
-	<legend>write operations (up graph)</legend>
+    <legend>write operations (up graph)</legend>
   </add>
   <add>
     <name>w</name>
     <graphType>line</graphType>
-    <color>green</color>
+    <color>blue</color>
     <legend>Number of write accesses</legend>
   </add>
   <add>
     <name>wrqm</name>
     <graphType>line</graphType>
-    <color>blue</color>
+    <color>navy</color>
     <legend>Number of write request merged</legend>
   </add>
-<add>
-	<legend>read operations (down graph)</legend>
-</add>
+  <add>
+    <legend>read operations (down graph)</legend>
+  </add>
   <add>
     <name>r</name>
+    <reversed>true</reversed>
     <graphType>line</graphType>
-    <color>teal</color>
-	<reversed>true</reversed>
+    <color>green</color>
     <legend>Number of read accesses</legend>
   </add>
   <add>
-   <name>rrqm</name>
-   <graphType>line</graphType>
-   <color>navy</color>
-   <reversed>true</reversed>
-   <legend>Number of read request merged</legend>
+    <name>rrqm</name>
+    <reversed>true</reversed>
+    <graphType>line</graphType>
+    <color>teal</color>
+    <legend>Number of read request merged</legend>
   </add>
   <hosttree>
     <pathelement>HOST</pathelement>

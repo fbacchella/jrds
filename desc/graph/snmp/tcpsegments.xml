@@ -8,7 +8,7 @@
 	<add>
 		<name>OutSegs</name>
 		<graphType>line</graphType>
-		<color>green</color>
+		<color>blue</color>
 		<legend>Number of segments sent</legend>
 	</add>
 	<add>
@@ -20,7 +20,7 @@
 	<add>
 		<name>InSegs</name>
 		<graphType>line</graphType>
-		<color>blue</color>
+		<color>green</color>
 		<legend>Number of segments received</legend>
 		<reversed>true</reversed>
 	</add>

@@ -14,7 +14,6 @@
     <name>ifOutBits</name>
     <graphType>area</graphType>
     <rpn>ifHCOutOctets,8,*</rpn>
-    <color>green</color>
     <legend>bits sends/s</legend>
   </add>
   <add>
@@ -25,7 +24,6 @@
     <name>ifInBits</name>
     <graphType>area</graphType>
     <rpn>ifHCInOctets,8,*</rpn>
-    <color>blue</color>
 	  <reversed>true</reversed>
     <legend>bits received/s</legend>
   </add>

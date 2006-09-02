@@ -92,7 +92,7 @@ public class GraphFactory {
 			String xmlRessourceName = (String)className;
 			InputStream xmlStream = probe.getClass().getResourceAsStream(xmlRessourceName);
 			if(xmlStream == null) {
-				logger.error("Unable to find ressource " + xmlRessourceName + " for probe " + probe);
+				logger.error("Unable to find graph " + xmlRessourceName);
 			}
 		}
 		return retValue;

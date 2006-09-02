@@ -44,7 +44,7 @@ public class RstatProbe4 extends Probe {
 		     retValue.put("v_intr", new Double(sv.v_intr));
 		     long bootime = sv.boottime.tv_sec + sv.boottime.tv_sec/1000000;
 		     long currtime = sv.curtime.tv_sec + sv.curtime.tv_sec/1000000;
-		     retValue.put("uptime", new Double(currtime - bootime));
+		     setUptime(currtime - bootime);
 		 } catch ( OncRpcProgramNotRegisteredException e ) {
 		     logger.error("ONC/RPC program server not found: " + getHost().getName());
 		 } catch ( OncRpcException e ) {
@@ -52,7 +52,7 @@ public class RstatProbe4 extends Probe {
 		 } catch ( IOException e ) {
 		 	logger.error("Could not contact portmapper: " + e.getMessage());
 		 }
-		 return filterUpTime("uptime", retValue);
+		 return retValue;
 	}
 
 	@Override

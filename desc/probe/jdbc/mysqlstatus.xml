@@ -21,8 +21,9 @@
     <dsType>counter</dsType>
   </ds>
   <ds>
-    <dsName>Created_tmp_disk_tables</dsName>
+    <dsName>Created_tmp_disk_tab</dsName>
     <dsType>counter</dsType>
+    <collect>Created_tmp_disk_tables</collect>
   </ds>
   <ds>
     <dsName>Created_tmp_tables</dsName>
@@ -33,8 +34,9 @@
     <dsType>counter</dsType>
   </ds>
   <ds>
-    <dsName>Delayed_insert_threads</dsName>
+    <dsName>Delayed_insert_threa</dsName>
     <dsType>gauge</dsType>
+	  <collect>Delayed_insert_threads</collect>
   </ds>
   <ds>
     <dsName>Delayed_writes</dsName>
@@ -73,12 +75,14 @@
     <dsType>counter</dsType>
   </ds>
    <ds>
-    <dsName>Not_flushed_key_blocks</dsName>
+    <dsName>Not_flushed_key_bloc</dsName>
     <dsType>counter</dsType>
+    <collect>Not_flushed_key_blocks</collect>
   </ds>
    <ds>
-    <dsName>Not_flushed_delayed_rows</dsName>
+    <dsName>Not_flushed_delayed_</dsName>
     <dsType>counter</dsType>
+	   <collect>Not_flushed_delayed_rows</collect>
   </ds>
    <ds>
     <dsName>Open_tables</dsName>
@@ -101,8 +105,9 @@
     <dsType>counter</dsType>
   </ds>
    <ds>
-    <dsName>Qcache_queries_in_cache</dsName>
+    <dsName>Qcache_queries_in_ca</dsName>
     <dsType>gauge</dsType>
+    <collect>Qcache_queries_in_cache</collect>
   </ds>
    <ds>
     <dsName>Qcache_inserts</dsName>
@@ -133,12 +138,13 @@
     <dsType>gauge</dsType>
   </ds>
    <ds>
-    <dsName>Select_full_join</dsName>
+    <dsName>Select_full_jobs</dsName>
     <dsType>counter</dsType>
   </ds>
    <ds>
-    <dsName>Select_full_range_join</dsName>
+    <dsName>Select_full_range_jo</dsName>
     <dsType>counter</dsType>
+    <collect>Select_full_range_join</collect>
   </ds>
    <ds>
     <dsName>Select_range</dsName>
@@ -153,8 +159,9 @@
     <dsType>counter</dsType>
   </ds>
    <ds>
-    <dsName>Slave_open_temp_tables</dsName>
+    <dsName>Slave_open_temp_tabl</dsName>
     <dsType>counter</dsType>
+	   <collect>Slave_open_temp_tables</collect>
   </ds>
    <ds>
     <dsName>Slow_launch_threads</dsName>
@@ -181,8 +188,9 @@
     <dsType>counter</dsType>
   </ds>
    <ds>
-    <dsName>Table_locks_immediate</dsName>
+    <dsName>Table_locks_immediat</dsName>
     <dsType>counter</dsType>
+   <collect>Table_locks_immediate</collect>
   </ds>
    <ds>
     <dsName>Table_locks_waited</dsName>

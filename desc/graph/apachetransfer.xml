@@ -2,27 +2,30 @@
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
                            "urn:jrds:graphdesc">
 <graphdesc>
-    <name>ApacheTransfer</name>
-    <graphName>apachetransfer</graphName>
-    <graphTitle>Bytes transfert on port {2}</graphTitle>
-    <verticalLabel>Bytes/s</verticalLabel>
-    <add>
-        <name>Total kBytes</name>
-        <graphType>line</graphType>
-        <color>GREEN</color>
-        <legend>Bytes transfered</legend>
-    </add>
-    <hosttree>
-        <pathelement>HOST</pathelement>
-        <pathelement>SERVICES</pathelement>
-        <pathstring>Apache Activity</pathstring>
-		<pathelement>INDEX</pathelement>
-        <pathstring>Bytes transfered/s</pathstring>
-    </hosttree>
-    <viewtree>
-        <pathelement>SERVICES</pathelement>
-        <pathstring>Apache Activity</pathstring>
-        <pathstring>Bytes transfered/s</pathstring>
-		<pathelement>URL</pathelement>
-    </viewtree>
+  <name>ApacheTransfer</name>
+  <graphName>apachetransfer</graphName>
+  <graphTitle>Bytes transfert on port {2}</graphTitle>
+  <unit>
+    <binary/>
+  </unit>
+  <verticalLabel>Bytes/s</verticalLabel>
+  <add>
+    <name>Total kBytes</name>
+    <graphType>line</graphType>
+    <color>GREEN</color>
+    <legend>Bytes transfered</legend>
+  </add>
+  <hosttree>
+    <pathelement>HOST</pathelement>
+    <pathelement>SERVICES</pathelement>
+    <pathstring>Apache Activity</pathstring>
+    <pathelement>INDEX</pathelement>
+    <pathstring>Bytes transfered/s</pathstring>
+  </hosttree>
+  <viewtree>
+    <pathelement>SERVICES</pathelement>
+    <pathstring>Apache Activity</pathstring>
+    <pathstring>Bytes transfered/s</pathstring>
+    <pathelement>URL</pathelement>
+  </viewtree>
 </graphdesc>

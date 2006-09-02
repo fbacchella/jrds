@@ -11,13 +11,13 @@
   <add>
     <name>ipForwDatagrams</name>
     <graphType>line</graphType>
-    <color>GREEN</color>
+    <color>green</color>
     <legend>forwarded datagrams</legend>
   </add>
   <add>
     <name>ipOutRequests</name>
     <graphType>line</graphType>
-    <color>BLUE</color>
+    <color>teal</color>
     <legend>locally generated datagrams</legend>
   </add>
   <add>

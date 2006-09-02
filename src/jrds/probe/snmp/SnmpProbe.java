@@ -6,6 +6,7 @@
  */
 package jrds.probe.snmp;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ import jrds.RdsHost;
 import jrds.snmp.SnmpRequester;
 import jrds.snmp.SnmpStarter;
 
+import org.apache.log4j.Logger;
 import org.snmp4j.smi.OID;
 
 
@@ -29,6 +31,8 @@ import org.snmp4j.smi.OID;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public abstract class SnmpProbe extends Probe {
+	static final private Logger logger = Logger.getLogger(SnmpProbe.class);
+
 	private Map<OID, String> nameMap = null;
 	private SnmpRequester requester;
 
@@ -69,7 +73,7 @@ public abstract class SnmpProbe extends Probe {
 		return nameMap;
 	}
 
-	protected abstract Set getOidSet();
+	protected abstract Set<OID> getOidSet();
 
 
 	/* (non-Javadoc)
@@ -78,9 +82,13 @@ public abstract class SnmpProbe extends Probe {
 	public Map getNewSampleValues() {
 		Map retValue = null;
 		if(getSnmpStarter().isStarted()) {
-			Collection oids = getOidSet();
+			Collection<OID> oids = getOidSet();
 			if(oids != null) {
-				retValue = requester.doSnmpGet(this, oids);
+				try {
+					retValue = requester.doSnmpGet(this.getSnmpStarter(), oids);
+				} catch (IOException e) {
+					logger.error("SNMP error with probe " + this + ": " +e);
+				}
 			}
 		}
 		
@@ -125,6 +133,11 @@ public abstract class SnmpProbe extends Probe {
 	@Override
 	public boolean isStarted() {
 		return getSnmpStarter().isStarted();
+	}
+
+	@Override
+	public long getUptime() {
+		return getSnmpStarter().getUptime();
 	}
 
 	

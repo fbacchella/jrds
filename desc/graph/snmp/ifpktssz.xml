@@ -4,6 +4,9 @@
   <name>ifpktssz</name>
   <graphName>ifpktssz-{2}</graphName>
   <graphTitle>Packets size on interface {2} on {1}</graphTitle>
+  <unit>
+    <binary/>
+  </unit>
   <verticalLabel>bytes</verticalLabel>
   <lowerLimit>NaN</lowerLimit>
   <add>
@@ -18,8 +21,7 @@
     <name>outPktSize</name>
     <graphType>area</graphType>
     <rpn>ifOutOctets, ifOutUcastPkts,/</rpn>
-    <color>green</color>
-    <legend>average packets size send</legend>
+     <legend>average packets size send</legend>
   </add>
   <add>
     <name>ifInUcastPkts</name>
@@ -33,9 +35,8 @@
     <name>inPktSize</name>
     <graphType>area</graphType>
     <rpn>ifInOctets, ifInUcastPkts,/</rpn>
-    <color>blue</color>
     <legend>average packets size received</legend>
-	<reversed>true</reversed>
+    <reversed>true</reversed>
   </add>
   <hosttree>
     <pathelement>HOST</pathelement>

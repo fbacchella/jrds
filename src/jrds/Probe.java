@@ -49,6 +49,7 @@ implements Comparable {
 	private ProbeDesc pd;
 	private Set<String> tags = null;
 	private final StartersSet starters = new StartersSet(this);
+	long uptime = Long.MAX_VALUE;
 
 	/**
 	 * The constructor that should be called by derived class
@@ -177,6 +178,61 @@ implements Comparable {
 		rrdDb.close();
 	}
 
+	private void upgrade() {
+		RrdDb rrdSource = null;
+		try {
+			logger.warn("Probe " + this + " definition is changed, the store needs to be upgraded");
+			File source = new File(getRrdName());
+			rrdSource = new RrdDb(source.getCanonicalPath());
+
+			RrdDef rrdDef = getRrdDef();
+			File dest = File.createTempFile("JRDS_", ".tmp", source.getParentFile());
+			rrdDef.setPath(dest.getCanonicalPath());
+			RrdDb rrdDest = new RrdDb(rrdDef);
+
+			logger.debug("updating " +  source  + " to "  + dest);
+
+			rrdSource.copyStateTo(rrdDest);
+			rrdDest.close();
+			rrdSource.close();
+			logger.debug("Size difference : " + (dest.length() - source.length()));
+			copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
+		} catch (RrdException e) {
+			logger.error("Upgrade of " + this + " failed: " + e);
+		} catch (IOException e) {
+			logger.error("Upgrade of " + this + " failed: " + e);
+		}
+		finally {
+			if(rrdSource != null)
+				try {
+					rrdSource.close();
+				} catch (IOException e) {
+				}
+
+		}
+
+	}
+
+	private static void copyFile(String sourcePath, String destPath)
+	throws IOException {
+		File source = new File(sourcePath);
+		File dest = new File(destPath);
+		File destOld = new File(destPath + ".old");
+		if (!dest.renameTo(destOld)) {
+			throw new IOException("Could not rename file " + destPath + " from " + destOld);
+		}
+		if (!source.renameTo(dest)) {
+			throw new IOException("Could not rename file " + destPath + " from " + sourcePath);
+		}
+		deleteFile(destOld);
+	}
+
+	private static void deleteFile(File file) throws IOException {
+		if (file.exists() && !file.delete()) {
+			throw new IOException("Could not delete file: " + file.getCanonicalPath());
+		}
+	}
+
 	/**
 	 * Open the rrd backend of the probe.
 	 * it's created if it's needed
@@ -193,7 +249,26 @@ implements Comparable {
 		RrdDb rrdDb = null;
 		try {
 			if ( rrdFile.isFile()) {
-				rrdDb = StoreOpener.getRrd(getRrdName());
+				rrdDb = new RrdDb(getRrdName());
+				//old definition
+				RrdDef tmpdef = rrdDb.getRrdDef();
+				Date startTime = new Date();
+				tmpdef.setStartTime(startTime);
+				String oldDef = tmpdef.dump();
+				logger.trace("Definition found for " + this + ":\n" + oldDef);
+
+				//new definition
+				tmpdef = getRrdDef();
+				tmpdef.setStartTime(startTime);
+				String newDef = tmpdef.dump();
+
+				if(! newDef.equals(oldDef)) {
+					rrdDb.close();
+					rrdDb = null;
+					upgrade();
+					rrdDb = new RrdDb(getRrdName());
+				}
+				logger.trace("******");
 			} else
 				create();
 			retValue = true;
@@ -202,7 +277,11 @@ implements Comparable {
 		}
 		finally {
 			if(rrdDb != null)
-				StoreOpener.releaseRrd(rrdDb);				
+				try {
+					rrdDb.close();
+				} catch (IOException e) {
+				}
+
 		}
 		return retValue;
 	}
@@ -211,7 +290,7 @@ implements Comparable {
 	 * The method that return a map of data to be stored.<br>
 	 * the key is resolved using the <code>ProbeDesc</code>. A key not associated with an existent datastore will generate a warning
 	 * but will not prevent the other values to be stored.<br>
-	 * the value must be a <code>java.lang.Number<code><br>
+	 * the value should be a <code>java.lang.Number<code><br>
 	 * @return the map of values
 	 */
 	public abstract Map getNewSampleValues();
@@ -227,26 +306,6 @@ implements Comparable {
 		return (Map<?, Number>)valuesList;
 	}
 
-	/**
-	 * A method to filter by uptime value. Used to avoid nonense values when a counter is reset to zero.
-	 * The uptime value must be exprimed in seconds
-	 * @param id The id of value
-	 * @param retValue
-	 * @return the values unmodified or an empty map if uptime is to low
-	 */
-	final public Map filterUpTime(Object id, Map retValue) {
-		if(retValue != null) {
-			Number uptime = (Number) retValue.get(id);
-			if(uptime != null && uptime.intValue() <= ProbeDesc.HEARTBEATDEFAULT) {
-				retValue = new HashMap(0);
-				logger.info("uptime too low for " + toString());
-			}
-			else {
-				retValue.remove(id);
-			}
-		}
-		return retValue;
-	}
 
 	/**
 	 * Store the values on the rrd backend.
@@ -257,21 +316,27 @@ implements Comparable {
 		if(isStarted()) {
 			Map sampleVals = getNewSampleValues();
 			Map<?, String> nameMap = getPd().getCollectkeys();
-			if (sampleVals != null && getHost().getUptime() > ProbeDesc.HEARTBEATDEFAULT * 1000) {
+			if (sampleVals != null) {
 				Map<?, Number >filteredSamples = filterValues(sampleVals);
-				for(Map.Entry<?, Number> e: filteredSamples.entrySet()) {
-					String dsName = nameMap.get(e.getKey());
-					double value = e.getValue().doubleValue();
-					if (dsName != null) {
-						try {
-							oneSample.setValue(dsName, value);
-						}
-						catch (RrdException ex) {
-							logger.warn("Unable to update value " + value +
-									" from " + this +": " +
-									ex);
+				if(getUptime() >= ProbeDesc.HEARTBEATDEFAULT) {
+					for(Map.Entry<?, Number> e: filteredSamples.entrySet()) {
+						String dsName = nameMap.get(e.getKey());
+						double value = e.getValue().doubleValue();
+						if (dsName != null) {
+							try {
+								oneSample.setValue(dsName, value);
+							}
+							catch (RrdException ex) {
+								logger.warn("Unable to update value " + value +
+										" from " + this +": " +
+										ex);
+							}
 						}
 					}
+				}
+				else {
+					logger.info("uptime too low for " + toString());
+
 				}
 			}
 		}
@@ -332,7 +397,7 @@ implements Comparable {
 	 * @return int
 	 */
 	public final int compareTo(Object arg0) {
-		return String.CASE_INSENSITIVE_ORDER.compare(this.toString(),
+		return String.CASE_INSENSITIVE_ORDER.compare(toString(),
 				arg0.toString());
 	}
 
@@ -468,4 +533,21 @@ implements Comparable {
 	public String getSpecific() {
 		return pd.getSpecific();
 	}
+
+	/**
+	 * This function should return the uptime of the probe
+	 * If it's not overriden, it will return Long.MAX_VALUE
+	 * and it will because usell, as it used to make the probe pause 
+	 * after a restart of the probe.
+	 * It's called after filterValues
+	 * @return
+	 */
+	public long getUptime() {
+		return uptime;
+	}
+
+	public void setUptime(long uptime) {
+		this.uptime = uptime;
+	}
+	
 }

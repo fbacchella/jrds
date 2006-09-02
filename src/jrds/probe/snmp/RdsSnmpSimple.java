@@ -8,6 +8,8 @@ package jrds.probe.snmp;
 
 import java.util.Set;
 
+import org.snmp4j.smi.OID;
+
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
@@ -28,7 +30,7 @@ public class RdsSnmpSimple extends SnmpProbe  {
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.snmp.SnmpPreparator#makeOidSet()
 	 */
-	public Set getOidSet() {
+	public Set<OID> getOidSet() {
 		return getOidNameMap().keySet();
 	}
 }

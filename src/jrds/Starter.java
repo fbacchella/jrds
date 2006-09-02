@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 
 public abstract class Starter {
 	static final private Logger logger = Logger.getLogger(Starter.class);
+	long uptime = Long.MAX_VALUE;
 	
 	public static class Resolver extends Starter {
 		String hostname = "";
@@ -92,5 +93,17 @@ public abstract class Starter {
 	@Override
 	public String toString() {
 		return getKey().toString();
+	}
+	
+	/**
+	 * Return uptime for the starter, default value is max value
+	 * @return
+	 */
+	public long getUptime() {
+		return uptime;
+	}
+	
+	public void setUptime(long uptime) {
+		this.uptime = uptime;
 	}
 }

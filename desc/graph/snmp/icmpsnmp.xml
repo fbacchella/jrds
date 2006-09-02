@@ -8,14 +8,12 @@
 	<add>
 		<name>OutMsgs</name>
 		<graphType>line</graphType>
-         <color>blue</color>
-		<legend>Number of ICMP messages sent</legend>
+ 		<legend>Number of ICMP messages sent</legend>
 	</add>
 	<add>
 		<name>InMsgs</name>
 		<graphType>line</graphType>
-        <color>green</color>
-		<legend>Number of ICMP messages received</legend>
+ 		<legend>Number of ICMP messages received</legend>
 		<reversed>true</reversed>
 	</add>
 	<hosttree>

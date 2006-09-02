@@ -51,7 +51,7 @@
 		<name>Waitpc</name>
 		<graphType>stack</graphType>
 		<rpn>ssCpuRawWait, total, /, 100, *</rpn>
-		<color>cyan</color>
+		<color>teal</color>
 		<legend>Iowait CPU time</legend>
 	</add>
 	<add>

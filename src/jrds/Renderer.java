@@ -25,54 +25,7 @@ import org.apache.log4j.Logger;
 import org.jrobin.core.RrdException;
 
 public class Renderer {
-	private class GraphKey {
-		private long start;
-		private long end;
-		private int id;
-		/* (non-Javadoc)
-		 * @see java.lang.Object#hashCode()
-		 */
-		public GraphKey(RdsGraph graph, Date start, Date end) throws RrdException {
-			long step = graph.probe.getRrdDef().getStep();
-			this.start = org.jrobin.core.Util.normalize(start.getTime(), step * 1000L);
-			this.end = org.jrobin.core.Util.normalize(end.getTime(), step * 1000L);
-			this.id = graph.hashCode();
-		}
-		@Override
-		public int hashCode() {
-			final int PRIME = 31;
-			int result = 1;
-			result = PRIME * result + (int) (end ^ (end >>> 32));
-			result = PRIME * result + id;
-			result = PRIME * result + (int) (start ^ (start >>> 32));
-			return result;
-		}
-		/* (non-Javadoc)
-		 * @see java.lang.Object#equals(java.lang.Object)
-		 */
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			final GraphKey other = (GraphKey) obj;
-			if (end != other.end)
-				return false;
-			if (id != other.id)
-				return false;
-			if (start != other.start)
-				return false;
-			return true;
-		}
-		@Override
-		public String toString() {
-			return Integer.toString(hashCode());
-		}
-
-	};
+	final int PRIME = 31;
 
 	public class RendererRun implements Runnable {
 		public Date start;
@@ -174,18 +127,19 @@ public class Renderer {
 
 	public void render(final RdsGraph graph, final Date start, final Date end) {
 		RendererRun runRender = null;
-		GraphKey key;
+		int key = 0;
 		try {
-			key = new GraphKey(graph, start, end);
-			synchronized(rendered){
-				if( ! rendered.containsKey(key.hashCode())) {
-					// Create graphics object
-					runRender = new RendererRun(start, end, graph, key.hashCode()); 
-					rendered.put(key.hashCode(), runRender);
-				}
-			}
+			key = makeKey(graph, start, end);
 		} catch (RrdException e) {
-			logger.error("Problem with renderer key for graph " + graph);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		synchronized(rendered){
+			if( ! rendered.containsKey(key)) {
+				// Create graphics object
+				runRender = new RendererRun(start, end, graph, key); 
+				rendered.put(key, runRender);
+			}
 		}
 		if(runRender != null){
 			try {
@@ -199,19 +153,20 @@ public class Renderer {
 
 	public boolean isReady(final RdsGraph graph, final Date start, final Date end) {
 		RendererRun  runRender = null;
-		GraphKey key = null;
+		int key = 0;
 		try {
-			key = new GraphKey(graph, start, end);
+			key = makeKey(graph, start, end);
 			synchronized(rendered){
-				runRender = rendered.get(key.hashCode());
+				runRender = rendered.get(key);
 			}
 		} catch (RrdException e) {
-			logger.error("Problem with renderer key for graph " + graph);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		if( runRender == null) {
 			render(graph, start, end);
 			synchronized(rendered){
-				runRender = rendered.get(key.hashCode());
+				runRender = rendered.get(key);
 			}
 		}
 		return (runRender != null) && runRender.isReady();
@@ -219,13 +174,15 @@ public class Renderer {
 
 	public void send(RdsGraph graph, Date start, Date end, OutputStream out) throws IOException {
 		RendererRun runRender = null;
+		int key;
 		try {
-			GraphKey key = new GraphKey(graph, start, end);
+			key = makeKey(graph, start, end);
 			synchronized(rendered){
-				runRender = rendered.get(key.hashCode());
+				runRender = rendered.get(key);
 			}
 		} catch (RrdException e) {
-			logger.error("Problem with renderer key for graph " + graph);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		if(runRender != null) {
 			runRender.send(out);
@@ -249,5 +206,16 @@ public class Renderer {
 			logger.info("Collect interrupted");
 		}
 
+	}
+	private int makeKey(RdsGraph graph, Date startDate, Date endDate) throws RrdException {
+		long step = graph.probe.getRrdDef().getStep();
+		long start = org.jrobin.core.Util.normalize(startDate.getTime(), step * 1000L);
+		long end = org.jrobin.core.Util.normalize(endDate.getTime(), step * 1000L);
+		int id = graph.hashCode();
+		int result = 1;
+		result = PRIME * result + (int) (end ^ (end >>> 32));
+		result = PRIME * result + id;
+		result = PRIME * result + (int) (start ^ (start >>> 32));
+		return result;
 	}
 }

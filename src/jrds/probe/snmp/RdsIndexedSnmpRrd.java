@@ -6,11 +6,11 @@ _##########################################################################*/
 
 package jrds.probe.snmp;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -75,24 +75,30 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 			indexAsString = new HashSet<String>();
 		
 		Collection<OID> soidSet= getIndexSet();
-		Map somevars = indexFinder.doSnmpGet(this, soidSet);
-		boolean found = false;
-		
-		for(Iterator i = somevars.keySet().iterator(); i.hasNext() &&  ! (isUniq() && found) ;) {
-			String name = null;
-			OID tryoid = (OID)i.next();
-			if(tryoid != null)
-				name = somevars.get(tryoid).toString();
-			if(name != null && matchIndex(indexKey, name)) {
-				int index = tryoid.removeLast();
-				indexAsString.add(Integer.toString(index));
-				found = true;
+		try {
+			Map<OID, Object> somevars = indexFinder.doSnmpGet(getSnmpStarter(), soidSet);
+
+			boolean found = false;
+			
+			for(OID tryoid: somevars.keySet()) {
+				String name = null;
+				if(tryoid != null)
+					name = somevars.get(tryoid).toString();
+				if(name != null && matchIndex(indexKey, name)) {
+					int index = tryoid.removeLast();
+					indexAsString.add(Integer.toString(index));
+					found = true;
+				}
+				if(isUniq() && found)
+					break;
 			}
-		}
-		
-		if(! found) {
-			logger.error("index for " + indexKey + " not found for host " + getHost().getName());
-			indexAsString = null;
+			
+			if(! found) {
+				logger.error("index for " + indexKey + " not found for " + this);
+				indexAsString = null;
+			}
+		} catch (IOException e) {
+			logger.error("index for " + indexKey + " not found for " + this + " because of: " + e);
 		}
 		return indexAsString;
 	}
@@ -106,6 +112,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	public boolean matchIndex(String index, String key) {
 		return index.equals(key);
 	}
+	
 	/**
 	 * @see jrds.probe.snmp.SnmpProbe#getOidSet()
 	 */

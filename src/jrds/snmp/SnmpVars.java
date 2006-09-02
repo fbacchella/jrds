@@ -95,7 +95,7 @@ public class SnmpVars extends HashMap<OID, Object> {
             	exceptionName = "No such object"; break;
             default: exceptionName = "Unknown exception";break;
 			}
-            logger.debug("Exception " +  exceptionName + " for  " + vb.getOid());
+            logger.trace("Exception " +  exceptionName + " for " + vb.getOid());
 		}
 		return retValue;
 	}

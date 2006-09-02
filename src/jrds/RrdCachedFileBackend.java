@@ -20,7 +20,7 @@ import org.jrobin.core.RrdFileBackend;
  */
 public class RrdCachedFileBackend extends RrdFileBackend {
 	static final private Logger logger = Logger.getLogger(RrdCachedFileBackend.class);
-	
+
 	private static final int CACHE_LENGTH = 8192;
 	ByteBuffer byteBuffer;
 	private int cacheSize;
@@ -28,15 +28,15 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 	private boolean cacheDirty = false;
 	private int dirtyStart;
 	private int dirtyEnd;
-	
+
 	private static final Timer syncTimer = new Timer(true);
 	private int syncMode;
 	private TimerTask syncTask;
-	
+
 	private static int writeHit = 0;
 	private static int readHit = 0;
 	private static int access = 0;
-	
+
 	/**
 	 * @param path
 	 */
@@ -51,7 +51,7 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 			BackEndCommiter.getInstance().addBackEnd(this);
 		}
 	}
-	
+
 	private void createSyncTask(int syncPeriod) {
 		syncTask = new TimerTask() {
 			public void run() {
@@ -60,10 +60,10 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 		};
 		syncTimer.schedule(syncTask, syncPeriod * 1000L, syncPeriod * 1000L);
 	}
-	
+
 	/**
 	 * This method forces all data cached in memory but not yet stored in the file,
-	 * to be stored in it. RrdNioBackend uses (a lot of) memory to cache I/O data.
+	 * to be stored in it. RrdCachedFileBackend uses  memory to cache I/O data.
 	 * This method is automatically invoked when the {@link #close()}
 	 * method is called. In other words, you don't have to call sync() before you call close().<p>
 	 */
@@ -74,7 +74,6 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 				byteBuffer.position(dirtyStart);
 				byteBuffer.limit(dirtyEnd);
 				channel.write(byteBuffer, cacheStart + dirtyStart);
-				//logger.debug(bwriten + " bytes written at " +  this.getPath() + "@"  + (cacheStart + dirtyStart));
 				byteBuffer.limit(oldLimit);
 				cacheDirty = false;
 				dirtyStart = byteBuffer.capacity();
@@ -84,6 +83,7 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 			}
 		}
 	}
+
 	/**
 	 * Method called by the framework immediatelly before RRD update operation starts. This method
 	 * will synchronize in-memory cache with the disk content if synchronization mode is set to
@@ -94,7 +94,7 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 			sync();
 		}
 	}
-	
+
 	/**
 	 * Method called by the framework immediatelly after RRD update operation finishes. This method
 	 * will synchronize in-memory cache with the disk content if synchronization mode is set to
@@ -105,7 +105,7 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 			sync();
 		}
 	}
-	
+
 	/**
 	 * Method called by the framework immediatelly before RRD fetch operation starts. This method
 	 * will synchronize in-memory cache with the disk content if synchronization mode is set to
@@ -116,7 +116,7 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 			sync();
 		}
 	}
-	
+
 	/**
 	 * Method called by the framework immediatelly after RRD fetch operation finishes. This method
 	 * will synchronize in-memory cache with the disk content if synchronization mode is set to
@@ -127,7 +127,7 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 			sync();
 		}
 	}
-	
+
 	/**
 	 * Writes bytes to the underlying RRD file on the disk
 	 * @param offset Starting file offset
@@ -137,7 +137,6 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 	public void write(long offset, byte[] b) throws IOException {
 		if(b.length > 0) {
 			access++;
-			//logger.debug("Need to write " + b.length + " bytes from " + getPath() + "@" + offset);
 			long cacheEnd = cacheStart + cacheSize - 1;
 			if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd)
 				cacheMiss(offset, b.length);
@@ -152,7 +151,7 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 			}
 		}
 	}
-	
+
 	/**
 	 * Reads a number of bytes from the RRD file on the disk
 	 * @param offset Starting file offset
@@ -161,7 +160,6 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 	 */
 	public void read(long offset, byte[] b) throws IOException {
 		if(b.length > 0) {
-			//logger.debug("Need to read " + b.length + " bytes from " + getPath() + "@" + offset);
 			access++;
 			long cacheEnd = cacheStart + cacheSize - 1;
 			if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd) {
@@ -180,7 +178,7 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 			}
 		}
 	}
-	
+
 	/**
 	 * Called after a cache miss, update the bytebuffer using 8k pages 
 	 * arround the desired offset and size 	 * @param offset
@@ -196,7 +194,6 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 		synchronized(channel) {
 			channel.position(newCacheStart);
 			int bread = channel.read(newByteBuffer);
-			//logger.debug(bread + " bytes read at " +  this.getPath() + "@"  + newCacheStart);
 			if( bread < length) {
 				throw new IOException("Not enough bytes available in file " + getPath());
 			}
@@ -211,9 +208,9 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 				}
 			}
 		}
-		
+
 	}
-	
+
 	/** 
 	 * Closes the underlying RRD file. 
 	 * @throws IOException Thrown in case of I/O error 
@@ -231,28 +228,30 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 		// release the buffer, make it eligible for GC as soon as possible
 		byteBuffer = null;
 	}
-	
+
 	/** 
 	 * Calculate the cache efficiency, accross all the backend used 
 	 * @return cache efficiency 
-	 */ 	public static float getCacheEfficency() {
-	 	return ((float)readHit + writeHit)/access;
-	 }
-	 
-	 /** 
-	  * @return the number of IO operations that hit the cache, 
-	  * accross all the backend used 
-	  */	public static int getCacheHitsCount() {
-	  	return readHit + writeHit;
-	  }
-	  
-	  /** 
-	   * @return the number of IO operations, 
-	   * accross all the backend used 
-	   */ 
-	  public static int getCacheRequestsCount() {
-	  	return access;
-	  	
-	  }
-	  
+	 */
+	public static float getCacheEfficency() {
+		return ((float)readHit + writeHit)/access;
+	}
+
+	/** 
+	 * @return the number of IO operations that hit the cache, 
+	 * accross all the backend used 
+	 */
+	public static int getCacheHitsCount() {
+		return readHit + writeHit;
+	}
+
+	/** 
+	 * @return the number of IO operations, 
+	 * accross all the backend used 
+	 */ 
+	public static int getCacheRequestsCount() {
+		return access;
+
+	}
+
 }

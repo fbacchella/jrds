@@ -85,6 +85,16 @@ public class Sum extends RdsGraph {
 		tempGraphDef = graphFormat(tempGraphDef, startDate, endDate);
 		return new RrdGraph(tempGraphDef, true);
 	}
+
+	@Override
+	public int getRealHeight() {
+		return 0;
+	}
+
+	@Override
+	public int getRealWidth() {
+		return 0;
+	}
 	
 
 }

@@ -20,11 +20,6 @@ public class RdsHost implements Comparable {
 	
 	private String name = null;
 	private final Set<Probe> allProbes = new TreeSet<Probe>();
-	//Default value should be bigger than anything
-	//So if something prevent uptime to be collected
-	//We still collect values
-	private long uptime = Long.MAX_VALUE;
-	private Date upTimeProbe = new Date(0);
 	private Set<String> tags = null;
 	private final StartersSet starters = new StartersSet(this);
 	
@@ -106,25 +101,6 @@ public class RdsHost implements Comparable {
 	public int compareTo(Object arg0) {
 		
 		return String.CASE_INSENSITIVE_ORDER.compare(name, arg0.toString());
-	}
-	/**
-	 * @return Returns the uptime.
-	 */
-	public long getUptime() {
-		return uptime;
-	}
-	/**
-	 * @param uptime The uptime to set.
-	 */
-	public void setUptime(long uptime) {
-		this.uptime = uptime;
-		upTimeProbe.setTime(System.currentTimeMillis());
-	}
-	/**
-	 * @return Returns the upTimeProbe.
-	 */
-	public Date getUpTimeProbe() {
-		return upTimeProbe;
 	}
 
 	public void addTag(String tag) {

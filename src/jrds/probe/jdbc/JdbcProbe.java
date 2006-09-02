@@ -13,11 +13,12 @@ import java.util.Map;
 
 import jrds.Probe;
 import jrds.RdsHost;
+import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Logger;
 
-public abstract class JdbcProbe extends Probe implements UrlProbe {
+public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe {
 	static final private org.apache.log4j.Logger logger = Logger.getLogger(JdbcProbe.class);
 
 	static final void registerDriver(String JdbcDriver) {
@@ -48,7 +49,7 @@ public abstract class JdbcProbe extends Probe implements UrlProbe {
 		starter.setUser(user);
 	}
 
-	public JdbcProbe(String dbName, int port, String user, String passwd) {
+	public JdbcProbe(int port, String user, String passwd, String dbName) {
 		this.port = port;
 		starter = setStarter();
 		starter.setDbName(dbName);
@@ -211,4 +212,14 @@ public abstract class JdbcProbe extends Probe implements UrlProbe {
 	public String getSourceType() {
 		return "JDBC";
 	}
+
+	@Override
+	public long getUptime() {
+		return starter.getUptime();
+	}
+
+	public String getIndexName() {
+		return starter.getDbName();
+	}
+	
 }

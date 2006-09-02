@@ -63,10 +63,6 @@ implements Comparable {
 		this.gd = gd;
 	}
 
-	public void ResolvRealSize(){
-		
-	}
-	
 	/**
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -104,7 +100,7 @@ implements Comparable {
 	}
 
 	public String getPngName() {
-		return getName().replaceAll("/","_") + ".png";
+		return getName().replaceAll("/","_").replaceAll(" ","_") + ".png";
 	}
 
 	private final String parseTemplate(String template) {
@@ -181,7 +177,11 @@ implements Comparable {
 		graphDef.comment("@l");
 		graphDef.comment("@l");
 		graphDef.comment("Last update: " + 
-				lastUpdateFormat.format(lastUpdate) + "@l");
+				lastUpdateFormat.format(lastUpdate) + "@L");
+		String unit = "SI";
+		if(! gd.isSiUnit()) 
+			unit = "binary";
+		graphDef.comment("Unit type: " + unit + "@r");
 		graphDef.comment("Period from " + lastUpdateFormat.format(startDate) +
 				" to " + lastUpdateFormat.format(endDate) + "@L");
 		graphDef.comment("Source type: " + getProbe().getSourceType() + "@r");

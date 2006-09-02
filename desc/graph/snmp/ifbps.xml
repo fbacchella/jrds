@@ -13,7 +13,6 @@
     <name>ifOutBits</name>
     <graphType>area</graphType>
     <rpn>ifOutOctets,8,*</rpn>
-    <color>green</color>
     <legend>bits sends/s</legend>
   </add>
   <add>
@@ -23,7 +22,6 @@
     <name>ifInBits</name>
     <graphType>area</graphType>
     <rpn>ifInOctets,8,*</rpn>
-    <color>blue</color>
     <legend>bits received/s</legend>
     <reversed>true</reversed>
   </add>

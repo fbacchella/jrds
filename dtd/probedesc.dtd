@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT ds (dsName,dsType,oid?,minValue?,maxValue?)>
+<!ELEMENT ds (dsName,dsType,(oid|collect)?,minValue?,maxValue?)>
 <!ELEMENT dsName (#PCDATA)>
 <!ELEMENT dsType (#PCDATA)>
 <!ELEMENT graphs (name+)>
