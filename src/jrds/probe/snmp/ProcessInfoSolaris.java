@@ -7,8 +7,8 @@ _##########################################################################*/
 package jrds.probe.snmp;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import jrds.ProbeDesc;
 
@@ -54,13 +54,13 @@ public class ProcessInfoSolaris extends RdsIndexedSnmpRrd {
 	/**
 	 * @see jrds.Probe#filterValues(java.util.Map)
 	 */
+	@SuppressWarnings("unchecked")
 	public Map<?, Number> filterValues(Map snmpVars)  {
 		double max = 0;
 		double min = Double.MAX_VALUE;
 		double average = 0;
 		int nbvalue = 0;
-		for(Iterator i = snmpVars.keySet().iterator() ; i.hasNext() ; ){
-			OID oid = (OID) i.next();
+		for(OID oid: (Set<OID>)snmpVars.keySet()){
 			double value = ((Number)snmpVars.get(oid)).doubleValue() * 1024;
 			if(oid.startsWith(psProcessSize)) {
 				max = Math.max(max, value) * 1024;

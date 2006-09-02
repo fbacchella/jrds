@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -102,11 +101,11 @@ public abstract class SnmpProbe extends Probe {
 	 * @param snmpVars
 	 * @return a Map of all the identified vars
 	 */
+	@SuppressWarnings("unchecked")
 	public Map<?, Number> filterValues(Map snmpVars) {
 		Map<OID, Number> retValue = new HashMap<OID, Number>(snmpVars.size());
-		for(Iterator i = snmpVars.entrySet().iterator(); i.hasNext();) {
-			Map.Entry e = (Map.Entry) i.next();
-			OID oid = (OID) e.getKey();
+		for(Map.Entry<OID, Object> e: ((Map<OID, Object> )snmpVars).entrySet()) {
+			OID oid = e.getKey();
 			oid.removeLast();
 			Object o = e.getValue();
 			if( o instanceof Number) {

@@ -7,8 +7,6 @@
 package jrds.webapp;
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -46,18 +44,11 @@ public final class Last extends HttpServlet {
 			Probe p = g.getProbe();
 			if(p != null) {
 				found = true;
-				Map lastValues = p.getLastValues();
-				for(Iterator i = lastValues.entrySet().iterator(); i.hasNext(); ) {
-					Map.Entry e = (Map.Entry) i.next();
+				out.println("Last update:" + p.getLastUpdate());
+				Map<String, Number> lastValues = p.getLastValues();
+				for(Map.Entry<String, Number> e: lastValues.entrySet()) {
 					String dsName = (String) e.getKey();
-					if("Last update".equals(dsName)) {
-						Date lastUpdate = (Date) e.getValue();
-						out.println("Last update:" + lastUpdate);
-					}
-					else {
-						Double value = (Double) e.getValue();
-						out.println(dsName + ": " + value);
-					}
+						out.println(dsName + ": " + e.getValue());
 				}
 			}
 			if( ! found) {

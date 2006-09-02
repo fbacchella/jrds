@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -170,8 +169,7 @@ public class GraphTree {
 
 	public Set<String> getChildsName() {
 		Set<String> retValue = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
-		for(Iterator i = childsMap.keySet().iterator() ; i.hasNext() ;) {
-			String childName = (String) i.next();
+		for(String childName: childsMap.keySet()) {
 			retValue.add(childName);
 		}
 		return retValue;

@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -86,8 +85,7 @@ implements Comparable {
 		Collection graphClasses = pd.getGraphClasses();
 		if(graphClasses != null) {
 			graphList = new ArrayList<RdsGraph>(graphClasses.size());
-			for (Iterator i = graphClasses.iterator(); i.hasNext(); ) {
-				Object o = i.next();
+			for (Object o:  graphClasses ) {
 				RdsGraph newGraph = gf.makeGraph(o, this);
 				if(newGraph != null)
 					graphList.add(newGraph);
@@ -466,8 +464,8 @@ implements Comparable {
 		return retValue;
 	}
 
-	public Map<String, Object> getLastValues() {
-		Map<String, Object> retValues = new HashMap<String, Object>();
+	public Map<String, Number> getLastValues() {
+		Map<String, Number> retValues = new HashMap<String, Number>();
 		RrdDb rrdDb = null;
 		try {
 			rrdDb = StoreOpener.getRrd(getRrdName());
@@ -475,7 +473,6 @@ implements Comparable {
 			for(int i = 0; i < dsNames.length ; i ++) {
 				retValues.put(dsNames[i], rrdDb.getDatasource(i).getLastValue());
 			}
-			retValues.put("Last update", new Date(1000 * rrdDb.getLastUpdateTime()));
 		} catch (Exception e) {
 			logger.error("Unable to get last values for" + getName() + ": " + e.getMessage());
 		}

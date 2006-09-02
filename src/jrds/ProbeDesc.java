@@ -12,7 +12,6 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -229,11 +228,10 @@ public class ProbeDesc {
 	public DsDef[] getDsDefs() throws RrdException
 	{
 		List<DsDef> dsList = new ArrayList<DsDef>(dsMap.size());
-		for(Iterator i = dsMap.entrySet().iterator(); i.hasNext() ;) {
-			Map.Entry e = (Map.Entry) i.next();
-			DsDesc desc = (DsDesc) e.getValue();
+		for(Map.Entry<String, DsDesc> e: dsMap.entrySet() ) {
+			DsDesc desc = e.getValue();
 			if(desc.dsType != DsType.NONE && desc.dsType != null)
-				dsList.add(new DsDef((String) e.getKey(), desc.dsType.toString(), desc.heartbeat, desc.minValue, desc.maxValue));
+				dsList.add(new DsDef(e.getKey(), desc.dsType.toString(), desc.heartbeat, desc.minValue, desc.maxValue));
 		}
 		return (DsDef[]) dsList.toArray(new DsDef[dsList.size()]);
 	}
@@ -351,10 +349,10 @@ public class ProbeDesc {
 				Class[] constArgsType = new Class[constArgs.size()];
 				Object[] constArgsVal = new Object[constArgs.size()];
 				int index = 0;
-				for (Iterator i = constArgs.iterator(); i.hasNext(); index++) {
-					Object arg = i.next();
+				for (Object arg: constArgs) {
 					constArgsType[index] = arg.getClass();
 					constArgsVal[index] = arg;
+					index++;
 				}
 				Constructor theConst = probeClass.getConstructor(constArgsType);
 				o = theConst.newInstance(constArgsVal);

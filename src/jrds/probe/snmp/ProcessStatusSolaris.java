@@ -7,8 +7,8 @@ _##########################################################################*/
 package jrds.probe.snmp;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.snmp4j.smi.OID;
 
@@ -29,6 +29,7 @@ public class ProcessStatusSolaris extends RdsSnmpSimple {
 	/**
 	 * @see jrds.Probe#filterValues(java.util.Map)
 	 */
+	@SuppressWarnings("unchecked")
 	public Map<?, Number> filterValues(Map snmpVars){
 		int runnable = 0;
 		int stopped = 0;
@@ -37,8 +38,7 @@ public class ProcessStatusSolaris extends RdsSnmpSimple {
 		int sleeping = 0;
 		int idle = 0;
 		int zombie = 0;
-		for(Iterator i = snmpVars.keySet().iterator() ; i.hasNext() ; ){
-			OID oid = (OID) i.next();
+		for(OID oid:  (Set<OID>)snmpVars.keySet()){
 			String state = (String) snmpVars.get(oid);
 			if(RUNNABLE.equals(state))
 				runnable++;

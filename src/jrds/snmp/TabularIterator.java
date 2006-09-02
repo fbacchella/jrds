@@ -11,9 +11,10 @@ import org.snmp4j.util.DefaultPDUFactory;
 import org.snmp4j.util.TableEvent;
 import org.snmp4j.util.TableUtils;
 
-public class TabularIterator implements Iterator {
-	Iterator tabIterator;
+public class TabularIterator implements Iterator<SnmpVars> {
+	Iterator<TableEvent> tabIterator;
 
+	@SuppressWarnings("unchecked")
 	public TabularIterator(SnmpProbe p, Collection<OID> oids) {
 		SnmpStarter starter = p.getSnmpStarter();
 		if(starter != null && starter.isStarted()) {
@@ -33,10 +34,11 @@ public class TabularIterator implements Iterator {
 	}
 
 	public SnmpVars next() {
-		TableEvent te = (TableEvent) tabIterator.next();
+		TableEvent te =  tabIterator.next();
 		SnmpVars vars = new SnmpVars(te.getColumns());
 		return vars;
 	}
+	
 	public void remove() {
 		throw new UnsupportedOperationException();
 	}

@@ -3,7 +3,6 @@ package jrds;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -84,8 +83,7 @@ public class RdsHost implements Comparable {
 		for(Probe currrd: allProbes) {
 			Collection gl = currrd.getGraphList();
 			if(gl != null) {
-				for(Iterator j = currrd.getGraphList().iterator() ; j.hasNext(); ) {
-					RdsGraph currGraph= (RdsGraph) j.next();
+				for(RdsGraph currGraph:  currrd.getGraphList()) {
 					currGraph.graph(startDate, endDate);
 					logger.debug("Graphing " + currGraph.getName());
 				}

@@ -8,7 +8,6 @@ package jrds.snmp;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -60,8 +59,8 @@ public abstract class SnmpRequester {
 		{
 			VariableBinding[] vars = new VariableBinding[oidsSet.size()];
 			int j = 0;
-			for(Iterator i = oidsSet.iterator(); i.hasNext();) {
-				OID currentOid = (OID) ((OID) i.next()).clone();
+			for(OID i:  oidsSet) {
+				OID currentOid = (OID) i.clone();
 				currentOid.append("0");
 				vars[j++] = new VariableBinding(currentOid);
 			}
@@ -93,9 +92,7 @@ public abstract class SnmpRequester {
 					tableRet.setMaxNumColumnsPerPDU(30);
 					OID[] oidTab= new OID[oids.size()];
 					oids.toArray(oidTab);
-					for(Iterator i = tableRet.getTable(snmpTarget, oidTab, null, null).iterator() ;
-					i.hasNext(); ) {
-						TableEvent te = (TableEvent) i.next();
+					for(TableEvent te: (Iterable<TableEvent>)tableRet.getTable(snmpTarget, oidTab, null, null)) {
 						if(! te.isError()) {
 							retValue.join(te.getColumns());
 						}
@@ -121,8 +118,7 @@ public abstract class SnmpRequester {
 		{
 			VariableBinding[] vars = new VariableBinding[oidsSet.size()];
 			int j = 0;
-			for(Iterator i = oidsSet.iterator(); i.hasNext();) {
-				OID currentOid = (OID) i.next();
+			for(OID currentOid: oidsSet) {
 				vars[j++] = new VariableBinding(currentOid);
 			}
 			return doRequest(starter, vars);
