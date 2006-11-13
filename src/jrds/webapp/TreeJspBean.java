@@ -10,8 +10,12 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,6 +29,7 @@ import javax.servlet.jsp.JspWriter;
 import jrds.Filter;
 import jrds.GraphTree;
 import jrds.HostsList;
+import jrds.Probe;
 import jrds.RdsGraph;
 
 import org.apache.log4j.Logger;
@@ -148,7 +153,20 @@ public class TreeJspBean {
 			GraphTree node = null;
 			node = root.getNodeById(id);
 			if(node != null) {
+				List<RdsGraph> graphs = new ArrayList<RdsGraph>();
 				for(RdsGraph graph: node.enumerateChildsGraph(vf)) {
+					graphs.add(graph);
+					//out.println(getImgUrl(graph, cgiParams, req));
+				}
+				Collections.sort(graphs, new Comparator<RdsGraph>() {
+					public int compare(RdsGraph g1, RdsGraph g2) {
+						int order = String.CASE_INSENSITIVE_ORDER.compare(g1.getPngName(), g2.getPngName());
+						if(order ==0)
+							order = String.CASE_INSENSITIVE_ORDER.compare(g1.getProbe().getHost().getName(), g2.getProbe().getHost().getName());
+						return order;
+					}
+				});
+				for(RdsGraph graph: graphs) {
 					out.println(getImgUrl(graph, cgiParams, req));
 				}
 			}
@@ -160,6 +178,19 @@ public class TreeJspBean {
 		} catch (IOException e) {
 			logger.error("Result not written, connexion closed ?");
 		}
+	}
+
+	public String getProbeUrl(HttpServletRequest req, ParamsBean cgiParams) {
+		String retValue = req.getContextPath();
+		RdsGraph g = HostsList.getRootGroup().getGraphById(cgiParams.getId());
+		if(g != null) {
+			StringBuffer urlBuffer = new StringBuffer();
+			urlBuffer.append(req.getContextPath());
+			Probe p = g.getProbe();
+			urlBuffer.append("/details?id=" + p.hashCode());
+			retValue = urlBuffer.toString();
+		}
+		return retValue;
 	}
 
 	private StringBuffer getImgUrl(RdsGraph graph, ParamsBean period, HttpServletRequest req) {
