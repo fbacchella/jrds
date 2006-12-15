@@ -35,7 +35,7 @@ public class PartitionSpaceWindows extends PartitionSpace {
 	 *only compare with String found before " " 
 	 * @see jrds.probe.snmp.RdsIndexedSnmpRrd#matchIndex(java.lang.String, java.lang.String)
 	 */
-	public boolean matchIndex(String index, String key) {
+	public boolean matchIndex(String key) {
 		int nameIndex = key.indexOf(separator);
 		
 		if(logger.isDebugEnabled())
@@ -45,6 +45,6 @@ public class PartitionSpaceWindows extends PartitionSpace {
 			key = key.substring(0, nameIndex);
 			logger.debug("index split: new name=\""+key+"\"");
 		}
-		return super.matchIndex(index, key);
+		return super.matchIndex(key);
 	}
 }

@@ -30,6 +30,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	static final private Logger logger = Logger.getLogger(RdsIndexedSnmpRrd.class);
 
 	String indexKey;
+	int indexKeyNum;
 	Collection indexAsString = null;
 
 	static final SnmpRequester indexFinder = SnmpRequester.TABULAR;
@@ -37,6 +38,11 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	
 	public RdsIndexedSnmpRrd(String indexKey) {
 		this.indexKey = indexKey;
+	}
+	
+	public RdsIndexedSnmpRrd(Integer indexKey) {
+		this.indexKeyNum = indexKey;
+		this.indexKey = String.valueOf(indexKey);
 	}
 	
 	protected SnmpRequester getSnmpRequester() {
@@ -84,7 +90,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 				String name = null;
 				if(tryoid != null)
 					name = somevars.get(tryoid).toString();
-				if(name != null && matchIndex(indexKey, name)) {
+				if(name != null && matchIndex(somevars.get(tryoid))) {
 					int index = tryoid.removeLast();
 					indexAsString.add(Integer.toString(index));
 					found = true;
@@ -109,8 +115,13 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	 * @param key the found key tried
 	 * @return
 	 */
-	public boolean matchIndex(String index, String key) {
-		return index.equals(key);
+	public boolean matchIndex(Object key) {
+		boolean match = false;
+		if(key instanceof Integer)
+			match = ((Integer)key == indexKeyNum);
+		else
+			match =  indexKey.equals(key.toString());
+		return match;
 	}
 	
 	/**
