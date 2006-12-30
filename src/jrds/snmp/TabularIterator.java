@@ -5,6 +5,7 @@ import java.util.Iterator;
 
 import org.snmp4j.Target;
 import org.snmp4j.smi.OID;
+import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.util.DefaultPDUFactory;
 import org.snmp4j.util.TableEvent;
 import org.snmp4j.util.TableUtils;
@@ -32,10 +33,15 @@ public class TabularIterator implements Iterator<SnmpVars>, Iterable<SnmpVars> {
 
 	public SnmpVars next() {
 		TableEvent te =  tabIterator.next();
-		SnmpVars vars = new SnmpVars(te.getColumns());
+		VariableBinding[] columns = te.getColumns();
+		SnmpVars vars;
+		if(columns != null)
+			vars = new SnmpVars(columns);
+		else
+			vars = new SnmpVars();
 		return vars;
 	}
-	
+
 	public void remove() {
 		throw new UnsupportedOperationException();
 	}
