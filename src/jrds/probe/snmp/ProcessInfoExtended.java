@@ -28,7 +28,7 @@ import org.snmp4j.smi.OID;
  * @version $Revision: 321 $,  $Date: 2006-08-14 14:03:04 +0000 (lun., 14 août 2006) $
  */
 public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
-	static final private Logger logger = Logger.getLogger(ProcessInfo.class);
+	static final private Logger logger = Logger.getLogger(ProcessInfoExtended.class);
 	static final private OID hrSWRunPath = new OID(".1.3.6.1.2.1.25.4.2.1.4");
 	static final private OID hrSWRunParameters = new OID(".1.3.6.1.2.1.25.4.2.1.5");
 	static final private OID hrSWRunPerfMem = new OID(".1.3.6.1.2.1.25.5.1.1.2");
