@@ -25,17 +25,17 @@
   </add>
   <add>
     <name>v_pgpgin</name>
+    <reversed>true</reversed>
     <graphType>line</graphType>
     <color>green</color>
     <legend>Number of pages read in from disk</legend>
-    <reversed>true</reversed>
   </add>
   <add>
     <name>v_pswpin</name>
+    <reversed>true</reversed>
     <graphType>line</graphType>
     <color>blue</color>
     <legend>Number of pages swapped in</legend>
-    <reversed>true</reversed>
   </add>
   <hosttree>
     <pathelement>HOST</pathelement>
