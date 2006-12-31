@@ -5,7 +5,19 @@
   <probeName>mysqlstatus</probeName>
   <probeClass>jrds.probe.jdbc.MysqlStatus</probeClass>
   <ds>
+    <dsName>Aborted_clients</dsName>
+    <dsType>counter</dsType>
+  </ds>
+  <ds>
     <dsName>Aborted_connects</dsName>
+    <dsType>counter</dsType>
+  </ds>
+  <ds>
+    <dsName>Binlog_cache_disk_use</dsName>
+    <dsType>counter</dsType>
+  </ds>
+  <ds>
+    <dsName>Binlog_cache_use</dsName>
     <dsType>counter</dsType>
   </ds>
    <ds>
@@ -14,6 +26,30 @@
   </ds>
   <ds>
     <dsName>Bytes_sent</dsName>
+    <dsType>counter</dsType>
+  </ds>
+  <ds>
+    <dsName>Com_admin_commands</dsName>
+    <dsType>counter</dsType>
+  </ds>
+  <ds>
+    <dsName>Com_select</dsName>
+    <dsType>counter</dsType>
+  </ds>
+  <ds>
+    <dsName>Com_insert</dsName>
+    <dsType>counter</dsType>
+  </ds>
+  <ds>
+    <dsName>Com_replace</dsName>
+    <dsType>counter</dsType>
+  </ds>
+  <ds>
+    <dsName>Com_update</dsName>
+    <dsType>counter</dsType>
+  </ds>
+  <ds>
+    <dsName>Com_delete</dsName>
     <dsType>counter</dsType>
   </ds>
   <ds>
@@ -50,6 +86,85 @@
     <dsName>Flush_commands</dsName>
     <dsType>counter</dsType>
   </ds>
+	<ds>
+		<dsName>Idb_bp_pages_data</dsName>
+		<dsType>gauge</dsType>
+		<collect>Innodb_buffer_pool_pages_data</collect>
+	</ds>
+	<ds>
+		<dsName>Idb_bp_pages_dirty</dsName>
+		<dsType>gauge</dsType>
+		<collect>Innodb_buffer_pool_pages_dirty</collect>
+	</ds>
+	<ds>
+		<dsName>Idb_bp_pages_flushed</dsName>
+		<dsType>counter</dsType>
+		<collect>Innodb_buffer_pool_pages_flushed</collect>
+	</ds>
+	<ds>
+		<dsName>Idb_bp_pages_free</dsName>
+		<dsType>gauge</dsType>
+		<collect>Innodb_buffer_pool_pages_free</collect>
+	</ds>
+	<ds>
+		<dsName>Idb_bp_read_requests</dsName>
+		<dsType>gauge</dsType>
+		<collect>Innodb_buffer_pool_read_requests</collect>
+	</ds>
+	<ds>
+		<dsName>Idb_bp_write_requests</dsName>
+		<dsType>gauge</dsType>
+		<collect>Innodb_buffer_pool_write_requests</collect>
+	</ds>
+	<ds>
+		<dsName>Innodb_data_read</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>Innodb_data_reads</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>Innodb_data_writes</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>Innodb_data_written</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>Innodb_log_waits</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>Innodb_log_writes</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>Innodb_log_write_req</dsName>
+		<dsType>counter</dsType>
+		<collect>Innodb_log_write_requests</collect>
+	</ds>
+	<ds>
+		<dsName>Innodb_p_created</dsName>
+		<dsType>counter</dsType>
+		<collect>Innodb_pages_created</collect>
+	</ds>
+	<ds>
+		<dsName>Innodb_p_read</dsName>
+		<dsType>counter</dsType>
+		<collect>Innodb_pages_read</collect>
+	</ds>
+	<ds>
+		<dsName>Innodb_p_written</dsName>
+		<dsType>counter</dsType>
+		<collect>Innodb_pages_written</collect>
+	</ds>
+	<ds>
+		<dsName>Idb_row_lock_waits</dsName>
+		<dsType>counter</dsType>
+		<collect>Innodb_row_lock_waits</collect>
+	</ds>
   <ds>
     <dsName>Key_blocks_used</dsName>
     <dsType>counter</dsType>
@@ -201,19 +316,22 @@
     <dsType>gauge</dsType>
   </ds>
    <ds>
-    <dsName>Threads_created</dsName>
-    <dsType>counter</dsType>
-  </ds>
-   <ds>
     <dsName>Threads_connected</dsName>
     <dsType>gauge</dsType>
+  </ds>
+   <ds>
+    <dsName>Threads_created</dsName>
+    <dsType>counter</dsType>
   </ds>
    <ds>
     <dsName>Threads_running</dsName>
     <dsType>gauge</dsType>
   </ds>
  <graphs>
+	 <name>MysqlStatusCacheHits</name>
+	 <name>MysqlStatusOperations</name>
 	 <name>MysqlStatusBytes</name>
 	 <name>MysqlStatusQueries</name>
+	 <name>MysqlThreads</name>
   </graphs>
 </probedesc>

@@ -2,7 +2,7 @@
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
   <name>MysqlStatusBytes</name>
-  <graphName>mysqlstatusbytes</graphName>
+  <graphName>mysqlstatusbytes-{3}</graphName>
   <graphTitle>Bytes exchanged on {3}</graphTitle>
   <unit>
     <binary/>
