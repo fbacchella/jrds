@@ -16,8 +16,8 @@
   </add>
   <add>
     <name>outPktSize</name>
-     <graphType>area</graphType>
     <rpn>ifHCOutOctets, ifHCOutUcastPkts,/</rpn>
+    <graphType>area</graphType>
     <legend>average packets size send</legend>
   </add>
   <add>
@@ -30,9 +30,9 @@
   </add>
   <add>
     <name>inPktSize</name>
-    <graphType>area</graphType>
     <rpn>ifHCInOctets, ifHCInUcastPkts,/</rpn>
- 	  <reversed>true</reversed>
+    <reversed>true</reversed>
+    <graphType>area</graphType>
     <legend>average packets size received</legend>
   </add>
   <hosttree>
@@ -45,8 +45,8 @@
   <viewtree>
     <pathelement>NETWORK</pathelement>
     <pathelement>INTERFACES</pathelement>
+    <pathstring>Packets size</pathstring>
     <pathelement>HOST</pathelement>
     <pathelement>INDEX</pathelement>
-    <pathstring>Packets size</pathstring>
   </viewtree>
 </graphdesc>

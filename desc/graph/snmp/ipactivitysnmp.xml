@@ -31,31 +31,31 @@
   </add>
   <add>
     <name>ipInReceives</name>
+    <reversed>true</reversed>
     <graphType>line</graphType>
     <color>RED</color>
     <legend>received datagrams</legend>
-    <reversed>true</reversed>
   </add>
   <add>
     <name>ipInDelivers</name>
+    <reversed>true</reversed>
     <graphType>line</graphType>
     <color>ORANGE</color>
     <legend>locally delivered datagram</legend>
-    <reversed>true</reversed>
   </add>
   <add>
     <name>ipReasmOKs</name>
+    <reversed>true</reversed>
     <graphType>line</graphType>
     <color>YELLOW</color>
     <legend>re-assembled datagrams</legend>
-    <reversed>true</reversed>
   </add>
   <add>
     <name>ipFragOKs</name>
+    <reversed>true</reversed>
     <graphType>line</graphType>
     <color>GRAY</color>
     <legend>fragmented datagrams</legend>
-    <reversed>true</reversed>
   </add>
   <hosttree>
     <pathelement>HOST</pathelement>

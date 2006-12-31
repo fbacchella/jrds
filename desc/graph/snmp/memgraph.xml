@@ -27,22 +27,22 @@
   </add>
   <add>
     <name>memUsedRealBytes</name>
-    <graphType>area</graphType>
     <rpn>memTotalReal,memAvailReal,-, 1024, *</rpn>
+    <graphType>area</graphType>
     <color>GREEN</color>
     <legend>Active Real/Physical Memory Space</legend>
   </add>
   <add>
     <name>memAvailRealBytes</name>
-    <graphType>stack</graphType>
     <rpn>memAvailReal, 1024, *</rpn>
+    <graphType>stack</graphType>
     <color>BLUE</color>
     <legend>Available Real/Physical Memory Space</legend>
   </add>
   <add>
     <name>memUsedSwapBytes</name>
-    <graphType>stack</graphType>
     <rpn>memTotalSwap,memAvailSwap,-, 1024, *</rpn>
+    <graphType>stack</graphType>
     <color>RED</color>
     <legend>Used Swap Space</legend>
   </add>

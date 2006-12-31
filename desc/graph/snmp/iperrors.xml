@@ -7,38 +7,39 @@
   <verticalLabel>paquets/s</verticalLabel>
   <add>
     <name>ipFragFails</name>
+    <reversed/>
     <graphType>line</graphType>
-	<reversed>true</reversed>
+    <legend>Number of paquets that need to be fragmented but can't be</legend>
   </add>
   <add>
     <name>ipInHdrErrors</name>
-	<legend>Number of invalid input datagram because of headers error</legend>
+    <reversed>true</reversed>
     <graphType>line</graphType>
-	<reversed>true</reversed>
+    <legend>Number of invalid input datagram because of headers error</legend>
   </add>
   <add>
-      <name>ipInAddrErrors</name>
-	  <graphType>line</graphType>
-	  <legend>Number of datagram received with invalid address</legend>
-	  <reversed>true</reversed>
+    <name>ipInAddrErrors</name>
+    <reversed>true</reversed>
+    <graphType>line</graphType>
+    <legend>Number of datagram received with invalid address</legend>
   </add>
   <add>
     <name>ipInUnknownProtos</name>
+    <reversed>true</reversed>
     <graphType>line</graphType>
-	  <legend>Number of datagram received with an unknown protocol</legend>
-	<reversed>true</reversed>
+    <legend>Number of datagram received with an unknown protocol</legend>
   </add>
   <add>
     <name>ipInDiscards</name>
+    <reversed>true</reversed>
     <graphType>line</graphType>
-	  <legend>Number of good datagram received but latter dropped</legend>
-	<reversed>true</reversed>
+    <legend>Number of good datagram received but latter dropped</legend>
   </add>
   <add>
     <name>ipReasmFails</name>
+    <reversed>true</reversed>
     <graphType>line</graphType>
-	  <legend>Number of datagram received but for wich re-assembly failed</legend>
-	<reversed>true</reversed>
+    <legend>Number of datagram received but for wich re-assembly failed</legend>
   </add>
   <hosttree>
     <pathelement>HOST</pathelement>

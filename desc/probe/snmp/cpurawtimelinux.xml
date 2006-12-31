@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Graph Description//EN"
-                           "urn:jrds:graphdesc">
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
     <name>CpuRawTimeLinux</name>
     <probeName>cpurawlinux</probeName>

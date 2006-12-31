@@ -44,8 +44,8 @@
   <viewtree>
     <pathelement>DISK</pathelement>
     <pathelement>DISKACTIVITY</pathelement>
-    <pathelement>HOST</pathelement>
     <pathstring>Average requeste size</pathstring>
+    <pathelement>HOST</pathelement>
     <pathelement>INDEX</pathelement>
   </viewtree>
 </graphdesc>

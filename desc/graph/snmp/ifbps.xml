@@ -4,26 +4,26 @@
   <name>ifbps</name>
   <graphName>if-{2}</graphName>
   <graphTitle>Bits exchanged on interface {2} on {1}</graphTitle>
- <verticalLabel>bits/s</verticalLabel>
+  <verticalLabel>bits/s</verticalLabel>
   <lowerLimit>NaN</lowerLimit>
-   <add>
+  <add>
     <name>ifOutOctets</name>
   </add>
   <add>
     <name>ifOutBits</name>
-    <graphType>area</graphType>
     <rpn>ifOutOctets,8,*</rpn>
+    <graphType>area</graphType>
     <legend>bits sends/s</legend>
   </add>
   <add>
     <name>ifInOctets</name>
-   </add>
+  </add>
   <add>
     <name>ifInBits</name>
-    <graphType>area</graphType>
     <rpn>ifInOctets,8,*</rpn>
-    <legend>bits received/s</legend>
     <reversed>true</reversed>
+    <graphType>area</graphType>
+    <legend>bits received/s</legend>
   </add>
   <hosttree>
     <pathelement>HOST</pathelement>
@@ -35,8 +35,8 @@
   <viewtree>
     <pathelement>NETWORK</pathelement>
     <pathelement>INTERFACES</pathelement>
+    <pathstring>bits exchanged</pathstring>
     <pathelement>HOST</pathelement>
     <pathelement>INDEX</pathelement>
-    <pathstring>bits exchanged</pathstring>
   </viewtree>
 </graphdesc>

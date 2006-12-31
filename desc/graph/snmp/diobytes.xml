@@ -29,8 +29,8 @@
   <viewtree>
     <pathelement>DISK</pathelement>
     <pathelement>DISKACTIVITY</pathelement>
-    <pathelement>HOST</pathelement>
     <pathstring>Activity as bytes/s</pathstring>
+    <pathelement>HOST</pathelement>
     <pathelement>INDEX</pathelement>
   </viewtree>
 </graphdesc>
