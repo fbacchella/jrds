@@ -40,11 +40,11 @@ public class ProbeFactory {
 		argPackages.add("java.net.");
 		argPackages.add("");
 
-		probePackages.add("jrds.probe.");
+		/*probePackages.add("jrds.probe.");
 		probePackages.add("jrds.probe.snmp.");
 		probePackages.add("jrds.probe.munins.");
 		probePackages.add("jrds.probe.rstat.");
-		probePackages.add("jrds.probe.jdbc.");
+		probePackages.add("jrds.probe.jdbc.");*/
 		probePackages.add("");
 	}
 
@@ -116,6 +116,7 @@ public class ProbeFactory {
 			logger.error("Probe named " + className + " not found");
 		}
 		
+//		logger.debug(retValue + " " + gf);
 		//Now we finish the initialization of classes
 		if(retValue != null) {
 			retValue.readProperties(prop);

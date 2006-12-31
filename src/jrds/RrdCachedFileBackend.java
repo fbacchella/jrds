@@ -138,16 +138,21 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 		if(b.length > 0) {
 			access++;
 			long cacheEnd = cacheStart + cacheSize - 1;
-			if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd)
+			if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd) {
 				cacheMiss(offset, b.length);
+			}
 			else
 				writeHit++;
 			synchronized(this) {
-				cacheDirty = true;
-				byteBuffer.position((int)(offset - cacheStart));
-				byteBuffer.put(b);
-				dirtyStart = Math.min((int)(offset - cacheStart), dirtyStart);
-				dirtyEnd = Math.max(dirtyEnd, byteBuffer.position());
+				try {
+					cacheDirty = true;
+					byteBuffer.position((int)(offset - cacheStart));
+					byteBuffer.put(b);
+					dirtyStart = Math.min((int)(offset - cacheStart), dirtyStart);
+					dirtyEnd = Math.max(dirtyEnd, byteBuffer.position());
+				} catch (RuntimeException e) {
+					logger.fatal("data dropped at offset "  + offset + ", cache starting at " + cacheStart, e);
+				}
 			}
 		}
 	}
@@ -186,10 +191,12 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 	 * @throws IOException
 	 */
 	private void cacheMiss(long offset, long length) throws IOException {
+		logger.trace("cache miss of " + length +" bytes at position " + offset);
 		if(cacheDirty)
 			sync();
-		int newCacheSize = (int) (Math.ceil((float)(length + offset % CACHE_LENGTH)/  CACHE_LENGTH) * CACHE_LENGTH);
-		int newCacheStart = (int) (Math.floor((float)offset /  CACHE_LENGTH) * CACHE_LENGTH);
+		int newCacheSize = (int) (Math.ceil((double)(length + offset % CACHE_LENGTH)/  CACHE_LENGTH) * CACHE_LENGTH);
+		//long newCacheStart = (offset % CACHE_LENGTH) * CACHE_LENGTH;
+		long newCacheStart = (long) (Math.floor((double)offset /  CACHE_LENGTH) * CACHE_LENGTH);
 		ByteBuffer newByteBuffer = ByteBuffer.allocate(newCacheSize);
 		synchronized(channel) {
 			channel.position(newCacheStart);

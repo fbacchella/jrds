@@ -30,6 +30,7 @@ public class PropertiesManager extends Properties {
 
 	public PropertiesManager(File propFile)
 	{
+		join(System.getProperties());
 		join(propFile);
 		update();
 	}
@@ -152,6 +153,7 @@ public class PropertiesManager extends Properties {
 		}
 		loglevel = Level.toLevel(getProperty("loglevel", "info"));
 		logfile = getProperty("logfile", "");
+		timeout = parseInteger(getProperty("timeout", "30"));
 	}
 
 	public String configdir;
@@ -167,5 +169,6 @@ public class PropertiesManager extends Properties {
 	public Level loglevel;
 	public boolean legacymode;
 	public String tmpdir;
+	public int timeout;
 
 }

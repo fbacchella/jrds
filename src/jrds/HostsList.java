@@ -22,6 +22,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import jrds.probe.SumProbe;
@@ -50,10 +51,14 @@ public class HostsList {
 	private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
 	private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
 	private final Renderer renderer = new Renderer(20);
+	GraphFactory gf;
+	ProbeFactory pf;
 	private int numCollectors = 1;
 	private int resolution;
 	private String rrdDir;
 	private String tmpdir;
+	private int timeout;
+	private boolean started = false;
 
 	/**
 	 *  
@@ -75,14 +80,15 @@ public class HostsList {
 		starters = new StartersSet(this);
 		sumhost =  new RdsHost("SumHost");
 	}
-	
+
 	public static HostsList getRootGroup() {
 		if (instance == null)
-			 new HostsList();
+			new HostsList();
 		return instance;
 	}
-	
+
 	public void configure(PropertiesManager pm) {
+		started = false;
 		try {
 			jrds.JrdsLoggerConfiguration.configure(pm);
 		} catch (IOException e1) {
@@ -95,7 +101,7 @@ public class HostsList {
 		tmpdir = pm.tmpdir;
 
 		DescFactory df = new DescFactory();
-		
+
 		try {
 			df.importDescUrl(DescFactory.class.getResource("/probe"));
 			df.importDescUrl(DescFactory.class.getResource("/graph"));
@@ -120,8 +126,8 @@ public class HostsList {
 			}
 		}
 
-		GraphFactory gd = new GraphFactory(df.getGraphDescMap(), pm.legacymode);
-		ProbeFactory pf = new ProbeFactory(df.getProbesDesc(), gd, pm, pm.legacymode);
+		gf = new GraphFactory(df.getGraphDescMap(), pm.legacymode);
+		pf = new ProbeFactory(df.getProbesDesc(), gf, pm, pm.legacymode);
 		HostConfigParser hp = new HostConfigParser(pf);
 
 		List<String> graphsName = new ArrayList<String>(df.getGraphDescMap().keySet());
@@ -133,25 +139,28 @@ public class HostsList {
 			hp.importDir(new File(pm.configdir,"/macro"));
 		if(pm.configdir != null)
 			hp.importDir(new File(pm.configdir));
+		started = true;
 	}
 
 	public Collection<RdsHost> getHosts() {
 		return hostList;
-		
+
 	}
-	
+
 	public static void purge() {
+		instance.started = false;
+		StoreOpener.reset();
 		instance.renderer.finish();
 		instance = new HostsList();
 	}
 
 	private void addRoot(String root) {
 		if( ! treeMap.containsKey(root)) {
-			 GraphTree newRoot = GraphTree.makeGraph(root);
-			 treeMap.put(root, newRoot);
+			GraphTree newRoot = GraphTree.makeGraph(root);
+			treeMap.put(root, newRoot);
 		}
 	}
-	
+
 	public void addGraphs(Collection<RdsGraph> graphs) {
 		for(RdsGraph currGraph: graphs) {
 			getGraphTreeByHost().addGraphByPath(currGraph.getTreePathByHost(), currGraph);
@@ -159,7 +168,7 @@ public class HostsList {
 			graphMap.put(currGraph.hashCode(), currGraph);
 		}
 	}
-	
+
 	public void addHost(RdsHost newhost) {
 		hostList.add(newhost);
 	}
@@ -168,12 +177,29 @@ public class HostsList {
 		logger.debug("One collect was launched");
 		Date start = new Date();
 		starters.startCollect();
-		ExecutorService tpool =  Executors.newFixedThreadPool(numCollectors);
+		final Object counter = new Object() {
+			int i = 0;
+			@Override
+			public String toString() {
+				return Integer.toString(i++);
+			}
+
+		};
+		ExecutorService tpool =  Executors.newFixedThreadPool(numCollectors, 
+				new ThreadFactory() {
+			public Thread newThread(Runnable r) {
+				Thread t = new Thread(r, "CollectorThread" + counter);
+				t.setDaemon(true);
+				logger.debug("New thread name:" + t.getName());
+				return t;
+			}
+		}
+		);
 		for(final RdsHost oneHost: hostList) {
 			logger.debug("Collect all stats for host " + oneHost.getName());
 			Runnable runCollect = new Runnable() {
 				private RdsHost host = oneHost;
-				
+
 				public void run() {
 					host.collectAll();
 				}
@@ -197,14 +223,14 @@ public class HostsList {
 		System.gc();
 		logger.info("Collect started at "  + start + " ran for " + duration + "ms");							
 	}
-	
+
 	public void graphAll(Date startDate, Date endDate) {
 		for(RdsHost oneHost: hostList) {
 			logger.debug("Do all graph for host " + oneHost.getName());
 			oneHost.graphAll(startDate, endDate);
 		}
 	}
-	
+
 	public Collection<GraphTree> getGraphsRoot() {
 		return treeMap.values();
 	}
@@ -239,7 +265,7 @@ public class HostsList {
 		probeMap.put(p.hashCode(), p);
 		addGraphs(p.getGraphList());
 	}
-	
+
 	public GraphTree getNodeById(int id) {
 		GraphTree node = null;
 		for(GraphTree tree: treeMap.values())
@@ -251,23 +277,23 @@ public class HostsList {
 	public void addStarter(Starter s) {
 		starters.registerStarter(s, this);
 	}
-	
+
 	public StartersSet getStarters() {
 		return starters;
 	}
-	
+
 	public void addFilter(Filter newFilter) {
 		filters.put(newFilter.getName(), newFilter);
 		logger.debug("Filter " + newFilter.getName() + " added");
 	}
-	
+
 	public Filter getFilter(String name) {
 		Filter retValue = null;
 		if(name != null)
 			retValue = filters.get(name);
 		return retValue;
 	}
-	
+
 	public Collection<String> getAllFiltersNames() {
 		return filters.keySet();
 	}
@@ -280,7 +306,7 @@ public class HostsList {
 		}
 		logger.debug("adding sum " + sum.getName());
 	}
-	
+
 	@Override
 	public String toString() {
 		return getClass().getName();
@@ -307,6 +333,26 @@ public class HostsList {
 
 	public void setTmpdir(String tmpdir) {
 		this.tmpdir = tmpdir;
+	}
+
+	public int getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
+
+	public boolean isStarted() {
+		return started;
+	}
+
+	public GraphFactory getGraphFactory() {
+		return gf;
+	}
+
+	public ProbeFactory getProbeFactory() {
+		return pf;
 	}
 
 }

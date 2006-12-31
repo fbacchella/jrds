@@ -37,6 +37,7 @@ public class DescFactory extends DirXmlParser {
 		addProbeDescDigester(digester);
 		addGraphDescDigester(digester);
 		FilterXml.addToDigester(digester);
+		digester.setValidating(true);
 	}
 
 	public void importJar(String jarfile) throws IOException {
@@ -130,7 +131,6 @@ public class DescFactory extends DirXmlParser {
 
 	private void addGraphDescDigester(Digester digester) {
 		digester.register("-//jrds//DTD Graph Description//EN", digester.getClass().getResource("/graphdesc.dtd").toString());
-		digester.setValidating(false);
 		digester.addObjectCreate("graphdesc", jrds.GraphDesc.class);
 		digester.addSetProperties("graphdesc");
 		digester.addRule("graphdesc", new Rule() {
@@ -148,18 +148,26 @@ public class DescFactory extends DirXmlParser {
 		digester.addCallMethod("graphdesc/lowerLimit", "setLowerLimit", 0);
 		digester.addRule("graphdesc/unit/binary", new Rule() {
 			@Override
-			public void end(String namespace, String name) throws Exception {
+			public void body(String namespace, String name, String text) {
 				GraphDesc gd = (GraphDesc) digester.peek();
 				gd.setSiUnit(false);
 			}
 		});
 		digester.addRule("graphdesc/unit/SI", new Rule() {
 			@Override
-			public void end(String namespace, String name) throws Exception {
+			public void body(String namespace, String name, String text) {
 				GraphDesc gd = (GraphDesc) digester.peek();
 				gd.setSiUnit(true);
 			}
 		});
+		digester.addRule("graphdesc/unit/base", new Rule() {
+			@SuppressWarnings("unchecked")
+			public void body(String namespace, String name, String text) {
+				GraphDesc gd = (GraphDesc) digester.peek();
+				gd.setUnitExponent(text.trim());
+			}	
+		}
+		);
 		digester.addCallMethod("graphdesc/add","add",8);
 		digester.addCallParam("graphdesc/add/name",0);
 		digester.addCallParam("graphdesc/add/dsName",1);

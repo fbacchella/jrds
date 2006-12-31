@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,27 +42,12 @@ public final class GraphDesc
 implements Cloneable {
 	static final private Logger logger = Logger.getLogger(GraphDesc.class);
 
-	public static final class ConsFunc {
-		private String id;
-		private ConsFunc(String id) {
-			this.id = id;
-		}
-
-		public String toString() {
-			return id;
-		}
-
-		static public final ConsFunc AVERAGE = new ConsFunc("AVERAGE");
-		static public final ConsFunc MIN = new ConsFunc("MIN");
-		static public final ConsFunc MAX = new ConsFunc("MAX");
-		static public final ConsFunc LAST = new ConsFunc("LAST");
-	};
-
+	public enum ConsFunc {AVERAGE, MIN, MAX, LAST};
 	static public final ConsFunc AVERAGE = ConsFunc.AVERAGE;
 	static public final ConsFunc MIN = ConsFunc.MIN;
 	static public final ConsFunc MAX = ConsFunc.MAX;
 	static public final ConsFunc LAST = ConsFunc.LAST;
-	static public final ConsFunc DEFAULTCF = AVERAGE;
+	static public final ConsFunc DEFAULTCF = ConsFunc.AVERAGE;
 
 
 	public interface GraphType {
@@ -269,37 +254,38 @@ implements Cloneable {
 	static final public PathElement INTERFACES = PathElement.INTERFACES;
 	static final public PathElement DATABASE = PathElement.DATABASE;
 
-
-	static final private Map<String, Color> COLORMAP = new HashMap<String, Color>();
+	private enum Colors {
+		BLUE, GREEN, RED, CYAN, ORANGE, TEAL, YELLOW, MAGENTA, PINK, BLACK, NAVY,
+		GRAY, LIGHT_GRAY, DARK_GRAY, FUCHSIA, AQUA, LIME, MAROON
+	};
+	private static final Map<Colors, Color> COLORMAP = new EnumMap<Colors, Color>(Colors.class);
+	static final private Color[] colors = new Color[Colors.values().length];
 	static {
+		COLORMAP.put(Colors.BLUE, Color.BLUE);
+		COLORMAP.put(Colors.GREEN, Color.GREEN);
+		COLORMAP.put(Colors.RED, Color.RED);
+		COLORMAP.put(Colors.CYAN, Color.CYAN);
+		COLORMAP.put(Colors.ORANGE, Color.ORANGE);
+		COLORMAP.put(Colors.TEAL, new Color(0,128,128));
+		COLORMAP.put(Colors.YELLOW, Color.YELLOW);
+		COLORMAP.put(Colors.PINK, Color.PINK);
+		COLORMAP.put(Colors.MAGENTA, Color.MAGENTA);
+		COLORMAP.put(Colors.BLACK, Color.BLACK);
+		COLORMAP.put(Colors.NAVY, new Color(0,0,128));
+		COLORMAP.put(Colors.GRAY, Color.GRAY);
+		COLORMAP.put(Colors.LIGHT_GRAY, Color.LIGHT_GRAY);
+		COLORMAP.put(Colors.DARK_GRAY, Color.DARK_GRAY);
 		//Netscape alias for cyan
-		COLORMAP.put("AQUA",  new Color(0,255,225) {
-			public String toString() { return "AQUA"; }
-		});
-		COLORMAP.put("BLACK",  new Color(Color.BLACK.getRGB()) {
-			public String toString() { return "BLACK"; }
-		});
-		COLORMAP.put("BLUE", new Color(Color.BLUE.getRGB()) {
-			public String toString() { return "BLUE"; }
-		});
-		COLORMAP.put("CYAN",  new Color(Color.CYAN.getRGB()) {
-			public String toString() { return "CYAN"; }
-		});
-		COLORMAP.put("FUCHSIA",  new Color(255,0,255) {
-			public String toString() { return "FUCHSIA"; }
-		});
-		COLORMAP.put("GRAY",  new Color(Color.GRAY.getRGB()) {
-			public String toString() { return "GRAY"; }
-		});
-		COLORMAP.put("GREEN", new Color(Color.GREEN.getRGB()) {
-			public String toString() { return "GREEN"; }
-		});
-		COLORMAP.put("LIME",  new Color(204,255,0) {
-			public String toString() { return "LIME"; }
-		});
-		COLORMAP.put("MAGENTA",  new Color(Color.MAGENTA.getRGB()) {
-			public String toString() { return "MAGENTA"; }
-		});
+		COLORMAP.put(Colors.AQUA, Color.CYAN);
+		COLORMAP.put(Colors.FUCHSIA, new Color(255,0,255));
+		COLORMAP.put(Colors.LIME, new Color(204,255,0));
+		COLORMAP.put(Colors.MAROON, new Color(128,0,0));
+
+		COLORMAP.values().toArray(colors);
+	}
+
+	/*static final private Map<String, Color> COLORMAP = new HashMap<String, Color>();
+	static {
 		COLORMAP.put("MAROON",  new Color(128,0,0) {
 			public String toString() { return "MAROON"; }
 		});
@@ -333,43 +319,35 @@ implements Cloneable {
 		COLORMAP.put("PINK",  new Color(Color.PINK.getRGB()) {
 			public String toString() { return "PINK"; }
 		});
-		COLORMAP.put("DARK_GRAY",  new Color(Color.DARK_GRAY.getRGB()) {
-			public String toString() { return "DARK_GRAY"; }
-		});
-		COLORMAP.put("GRAY",  new Color(Color.GRAY.getRGB()) {
-			public String toString() { return "GRAY"; }
-		});
-		COLORMAP.put("LIGHT_GRAY",  new Color(Color.LIGHT_GRAY.getRGB()) {
-			public String toString() { return "LIGHT_GRAY"; }
-		});
-		COLORMAP.put("PINK",  new Color(Color.GREEN.getRGB()) {
-			public String toString() { return "GREEN"; }
-		});
-	}
-	static final public Color[] colors = new Color[] {
-		COLORMAP.get("BLUE"),
-		COLORMAP.get("GREEN"),
-		COLORMAP.get("RED"),
-		COLORMAP.get("CYAN"),
-		COLORMAP.get("ORANGE"),
-		COLORMAP.get("TEAL"),
-		COLORMAP.get("YELLOW"),
-		COLORMAP.get("PINK"),
-		COLORMAP.get("MAGENTA"),
-		COLORMAP.get("BLACK"),
-		COLORMAP.get("NAVY")
+	 */
+	private enum SiPrefix {
+		Y, Z, E, P, T, G, M, k, h, da,
+		FIXED, d, c, m, µ, n, p, f, a, z, y
 	};
-
-	/*static final public Color BLUE = colors[0];
-	static final public Color GREEN = colors[1];
-	static final public Color RED = colors[2];
-	static final public Color CYAN = colors[3];
-	static final public Color BLACK = colors[4];
-	static final public Color ORANGE = colors[5];
-	static final public Color YELLOW = colors[6];
-	static final public Color PINK = colors[7];
-	static final public Color MAGENTA = colors[8];*/
-
+	private static final Map<SiPrefix, Integer> SIPREFIXMAP = new EnumMap<SiPrefix, Integer>(SiPrefix.class);
+	static {
+		SIPREFIXMAP.put(SiPrefix.Y, 24);
+		SIPREFIXMAP.put(SiPrefix.Z, 21);
+		SIPREFIXMAP.put(SiPrefix.E, 18);
+		SIPREFIXMAP.put(SiPrefix.P, 15);
+		SIPREFIXMAP.put(SiPrefix.T, 12);
+		SIPREFIXMAP.put(SiPrefix.G, 9);
+		SIPREFIXMAP.put(SiPrefix.M, 6);
+		SIPREFIXMAP.put(SiPrefix.k, 3);
+		SIPREFIXMAP.put(SiPrefix.h, 2);
+		SIPREFIXMAP.put(SiPrefix.da,1 );
+		SIPREFIXMAP.put(SiPrefix.FIXED, 0);
+		SIPREFIXMAP.put(SiPrefix.d, -1);
+		SIPREFIXMAP.put(SiPrefix.c, -2);
+		SIPREFIXMAP.put(SiPrefix.m, -3);
+		SIPREFIXMAP.put(SiPrefix.µ, -6);
+		SIPREFIXMAP.put(SiPrefix.n, -9);
+		SIPREFIXMAP.put(SiPrefix.p, -12);
+		SIPREFIXMAP.put(SiPrefix.f, -15);
+		SIPREFIXMAP.put(SiPrefix.a, -18);
+		SIPREFIXMAP.put(SiPrefix.z, -21);
+		SIPREFIXMAP.put(SiPrefix.y, -24);
+	}
 	private final class Dimension {
 		public int width = 0;
 		public int height = 0;
@@ -399,7 +377,7 @@ implements Cloneable {
 		}
 	}
 
-	static final String manySpace = "                                                                  ";
+	static final private String manySpace = "                                                                  ";
 	private Map<Object, DsDesc> dsMap;
 	private int width = 578;
 	private int height = 206;
@@ -415,6 +393,7 @@ implements Cloneable {
 	private Dimension dimension = new Dimension();
 	private int maxLengthLegend = 0;
 	private boolean siUnit = true;
+	private Integer unitExponent = null;
 
 	/**
 	 * A constructor wich pre allocate the desired size
@@ -532,7 +511,7 @@ implements Cloneable {
 			cf = (ConsFunc) resolv(ConsFunc.class, consFunc);
 		Color c = Color.WHITE;
 		if (color != null) {
-			c = (Color) COLORMAP.get(color.toUpperCase());
+			c = (Color) COLORMAP.get(Colors.valueOf(color.toUpperCase()));
 			if( c == null)
 				c = Color.getColor(color);
 			if (c == null) {
@@ -642,8 +621,10 @@ implements Cloneable {
 			retValue.setBaseValue(1000);
 		else	
 			retValue.setBaseValue(1024);
-		
-			
+		if(unitExponent != null) {
+			retValue.setUnitsExponent(unitExponent);
+		}
+
 		return retValue;
 	}
 
@@ -965,7 +946,7 @@ implements Cloneable {
 			}			
 			if(ds.cf != GraphDesc.AVERAGE) {
 				Element cfElement = document.createElement("cf");
-				cfElement.appendChild(document.createTextNode(ds.cf.id));
+				cfElement.appendChild(document.createTextNode(ds.cf.name()));
 				dsElement.appendChild(cfElement);
 			}			
 		}
@@ -1017,4 +998,19 @@ implements Cloneable {
 		this.siUnit = siUnit;
 	}
 
+	public void setUnitExponent(String exponent) {
+		if("".equals(exponent))
+			exponent = SiPrefix.FIXED.name();
+		try {
+			unitExponent = SIPREFIXMAP.get(SiPrefix.valueOf(exponent));
+		} catch (IllegalArgumentException e1) {
+		}
+		if(unitExponent == null) {
+			try {
+				unitExponent = new Integer(exponent);
+			} catch (NumberFormatException e) {
+				logger.debug("Base unit not identified: " + exponent);
+			}
+		}
+	}
 }

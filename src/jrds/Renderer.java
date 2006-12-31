@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -87,8 +88,10 @@ public class Renderer {
 		private synchronized void writeImg() {
 			try {
 				BufferedImage bImg = graph.makeImg(start, end);
-				OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile));
-				javax.imageio.ImageIO.write(bImg, "png", out);
+				if(bImg != null) {
+					OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile));
+					javax.imageio.ImageIO.write(bImg, "png", out);
+				}
 			} catch (FileNotFoundException e) {
 				logger.error("Error with temporary output file: " +e);
 			} catch (IOException e) {
@@ -102,13 +105,31 @@ public class Renderer {
 
 	static private final Logger logger = Logger.getLogger(Renderer.class);
 	static private final float hashTableLoadFactor = 0.75f;
-	private final ExecutorService tpool =  Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);
+	final private Object counter = new Object() {
+		int i = 0;
+		@Override
+		public String toString() {
+			return Integer.toString(i++);
+		}
+
+	};
+
+	private final ExecutorService tpool =  Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2, 
+			new ThreadFactory() {
+		public Thread newThread(Runnable r) {
+			Thread t = new Thread(r, "RendererThread" + counter);
+			t.setDaemon(true);
+			logger.debug("New thread name:" + t.getName());
+			return t;
+		}
+	}
+	);
 	private int cacheSize;
 	private Map<Integer, RendererRun> rendered;
 
 	public Renderer(int cacheSize) {
-		int hashTableCapacity = (int)Math.ceil(cacheSize / hashTableLoadFactor) + 1;
-		rendered = new LinkedHashMap<Integer, RendererRun>(hashTableCapacity, hashTableLoadFactor, true) {
+		this.cacheSize = cacheSize;
+		rendered = new LinkedHashMap<Integer, RendererRun>(cacheSize + 5 , hashTableLoadFactor, true) {
 			/* (non-Javadoc)
 			 * @see java.util.LinkedHashMap#removeEldestEntry(java.util.Map.Entry)
 			 */
@@ -181,8 +202,7 @@ public class Renderer {
 				runRender = rendered.get(key);
 			}
 		} catch (RrdException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error with probe: " + e);
 		}
 		if(runRender != null) {
 			runRender.send(out);

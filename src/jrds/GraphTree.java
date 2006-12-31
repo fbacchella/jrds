@@ -75,7 +75,7 @@ public class GraphTree {
 	public boolean getJavaScriptCode(Writer out, ParamsBean params, String curNode, Filter f) throws IOException {
 
 		StringBuffer thisNode = new StringBuffer(1000);
-		thisNode.append(curNode + " = gFld('" + name + "', 'index.jsp?id=" + getPath().hashCode());
+		thisNode.append(curNode + " = gFld('" + name.replaceAll("'","&#x27;") + "', 'index.jsp?id=" + getPath().hashCode());
 		thisNode.append("&" + params);
 		thisNode.append("');\n");
 

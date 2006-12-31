@@ -7,13 +7,20 @@ import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
@@ -28,6 +35,8 @@ import org.jrobin.core.RrdDef;
 import org.jrobin.core.RrdException;
 import org.jrobin.core.Sample;
 import org.jrobin.core.Util;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * A abstract class that needs to be derived for specific probe.<br>
@@ -40,7 +49,7 @@ implements Comparable {
 
 	static final private Logger logger = Logger.getLogger(Probe.class);
 
-	static final protected int TIMEOUT = 30;
+	private int timeout = HostsList.getRootGroup().getTimeout();
 	private String name = null;
 	private RdsHost monitoredHost;
 	private Collection<RdsGraph> graphList = new ArrayList<RdsGraph>(0);
@@ -271,7 +280,10 @@ implements Comparable {
 				create();
 			retValue = true;
 		} catch (Exception e) {
-			logger.error("Store " + getRrdName() + " unusable: " + e);
+			if(logger.isDebugEnabled())
+				logger.error("Store " + getRrdName() + " unusable: " + e,e);
+			else
+				logger.error("Store " + getRrdName() + " unusable: " + e);
 		}
 		finally {
 			if(rrdDb != null)
@@ -313,10 +325,10 @@ implements Comparable {
 	protected void updateSample(Sample oneSample) {
 		if(isStarted()) {
 			Map sampleVals = getNewSampleValues();
-			Map<?, String> nameMap = getPd().getCollectkeys();
 			if (sampleVals != null) {
-				Map<?, Number >filteredSamples = filterValues(sampleVals);
 				if(getUptime() >= ProbeDesc.HEARTBEATDEFAULT) {
+					Map<?, String> nameMap = getPd().getCollectkeys();
+					Map<?, Number >filteredSamples = filterValues(sampleVals);
 					for(Map.Entry<?, Number> e: filteredSamples.entrySet()) {
 						String dsName = nameMap.get(e.getKey());
 						double value = e.getValue().doubleValue();
@@ -329,6 +341,9 @@ implements Comparable {
 										" from " + this +": " +
 										ex);
 							}
+						}
+						else {
+							logger.debug("Dropped entry: " + e.getKey() + " for " + this);
 						}
 					}
 				}
@@ -348,31 +363,38 @@ implements Comparable {
 	 * @throws RrdException
 	 */
 	public void collect() {
-		logger.debug("launch collect for " + this);
-		starters.startCollect();
-		RrdDb rrdDb = null;
-		Sample onesample;
-		try {
-			rrdDb = StoreOpener.getRrd(getRrdName());
-			onesample = rrdDb.createSample();
-			updateSample(onesample);
-			logger.trace(onesample.dump());
-			onesample.update();
+		HostsList hl = HostsList.getRootGroup();
+		//We only collect if the HostsList allow it
+		if(hl.isStarted()) {
+			logger.debug("launch collect for " + this);
+			starters.startCollect();
+			RrdDb rrdDb = null;
+			Sample onesample;
+			try {
+				rrdDb = StoreOpener.getRrd(getRrdName());
+				onesample = rrdDb.createSample();
+				updateSample(onesample);
+				logger.trace(onesample.dump());
+				//The collect might have been stopped
+				//during the reading of samples
+				if(hl.isStarted())
+					onesample.update();
+			}
+			catch (ArithmeticException ex) {
+				logger.warn("Error while storing sample for probe " + this + ": " +
+						ex.getMessage());
+			} catch (Exception e) {
+				if(logger.isDebugEnabled())
+					logger.debug("Error with probe " + this + ": ", e);
+				else
+					logger.error("Error with probe " + this + ": " + e.getMessage());
+			}
+			finally  {
+				if(rrdDb != null)
+					StoreOpener.releaseRrd(rrdDb);
+			}
+			starters.stopCollect();
 		}
-		catch (ArithmeticException ex) {
-			logger.warn("Error while storing sample for probe " + this + ": " +
-					ex.getMessage());
-		} catch (Exception e) {
-			if(logger.isDebugEnabled())
-				logger.debug("Error with probe " + this + ": ", e);
-			else
-				logger.error("Error with probe " + this + ": " + e.getMessage());
-		}
-		finally  {
-			if(rrdDb != null)
-				StoreOpener.releaseRrd(rrdDb);
-		}
-		starters.stopCollect();
 	}
 
 	/**
@@ -381,9 +403,10 @@ implements Comparable {
 	 * @see java.lang.Object#toString()
 	 */
 	public final String toString() {
-		if (stringValue == null) {
-			stringValue = getHost().getName() + "/" + getName();
-		}
+		String hn = "<empty>";
+		if(getHost() != null)
+			hn = getHost().getName();
+		stringValue = hn + "/" + getName();
 		return stringValue;
 	}
 
@@ -537,7 +560,7 @@ implements Comparable {
 	 * and it will because usell, as it used to make the probe pause 
 	 * after a restart of the probe.
 	 * It's called after filterValues
-	 * @return
+	 * @return the uptime in second
 	 */
 	public long getUptime() {
 		return uptime;
@@ -546,5 +569,78 @@ implements Comparable {
 	public void setUptime(long uptime) {
 		this.uptime = uptime;
 	}
-	
+
+	public int getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
+
+	public Document dumpAsXml() throws ParserConfigurationException, IOException, RrdException {
+		return dumpAsXml(false);
+	}
+
+	public Document dumpAsXml(boolean sorted) throws ParserConfigurationException, IOException, RrdException {
+		String probeName = getPd().getName();
+		String name = getName();
+		String host = getHost().getName();
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document document = builder.newDocument();  // Create from whole cloth
+		Element root = 
+			(Element) document.createElement("probe"); 
+		document.appendChild(root);
+		root.setAttribute("name", name);
+		root.setAttribute("host", host);
+		Element probeNameElement = document.createElement("probeName");
+		probeNameElement.appendChild(document.createTextNode(probeName));
+
+		root.appendChild(probeNameElement);
+		if(this instanceof UrlProbe) {
+			Element urlElement = document.createElement("url");
+			String url = ((UrlProbe)this).getUrlAsString();
+			urlElement.appendChild(document.createTextNode(url));
+			root.appendChild(urlElement);
+		}
+		if(this instanceof IndexedProbe) {
+			Element urlElement = document.createElement("index");
+			String index = ((IndexedProbe)this).getIndexName();
+			urlElement.appendChild(document.createTextNode(index));
+			root.appendChild(urlElement);
+		}
+		Element dsElement = document.createElement("ds");
+		root.appendChild(dsElement);
+		DsDef[] dss= getDsDefs();
+		HostsList hl = HostsList.getRootGroup();
+		GraphFactory gf = hl.getGraphFactory();
+		if (sorted)
+			Arrays.sort(dss, new Comparator<DsDef>() {
+				public int compare(DsDef arg0, DsDef arg1) {
+					return String.CASE_INSENSITIVE_ORDER.compare(arg0.getDsName(), arg1.getDsName());
+				}
+			});
+		for(DsDef ds: dss) {
+			String dsName = ds.getDsName();
+			String id = getHost().getName() + "." + getName() + "." + dsName;
+			String graphDescName = getName() + "." + dsName;
+
+			GraphDesc gd = new GraphDesc();
+
+			gd.setName(graphDescName);
+			gd.setGraphName(id);
+			gd.setGraphTitle(getName() + "." + dsName + " on {1}");
+			gd.add(dsName, GraphDesc.LINE);
+			gf.addGraphDesc(gd);
+			RdsGraph g = gf.makeGraph(graphDescName, this);
+			hl.addGraphs(Collections.singleton(g));
+
+			Element dsNameElement = document.createElement("name");
+			dsNameElement.setAttribute("id", "" + g.hashCode());
+			dsNameElement.appendChild(document.createTextNode(dsName));
+			dsElement.appendChild(dsNameElement);
+		}
+		return document;
+	}
 }

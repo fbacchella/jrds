@@ -15,6 +15,7 @@ import java.util.zip.ZipEntry;
 import org.apache.commons.digester.Digester;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 public abstract class DirXmlParser {
 	private final Logger logger = Logger.getLogger(DescFactory.class);
@@ -41,7 +42,30 @@ public abstract class DirXmlParser {
 			return  false;
 		}
 	};
-	Digester digester = new Digester();
+	Digester digester = new Digester() {
+		@Override
+		public void error(SAXParseException exception) throws SAXException {
+	        /*logger.error("Parse Error at line " + exception.getLineNumber() +
+	                " column " + exception.getColumnNumber() + ": " +
+	                exception.getMessage() + " for " + getXMLReader());*/
+			throw exception;
+		}
+
+		@Override
+		public void fatalError(SAXParseException exception) throws SAXException {
+	        log.error("Parse Fatal Error at line " + exception.getLineNumber() +
+	                " column " + exception.getColumnNumber() + ": " +
+	                exception.getMessage(), exception);
+		}
+
+		@Override
+		public void warning(SAXParseException exception) throws SAXException {
+            log.warn("Parse Warning Error at line " + exception.getLineNumber() +
+                    " column " + exception.getColumnNumber() + ": " +
+                    exception.getMessage(), exception);
+		}
+		
+	};
 
 	DirXmlParser() {
 		init();
@@ -51,11 +75,15 @@ public abstract class DirXmlParser {
 
 	public void importDescUrl(URL ressourceUrl) throws IOException {
 		String path = ressourceUrl.toString();
+		if(path != null) {
 		String [] urlelems = path.split("[:!]");
 		if("file".equals(urlelems[0]))
 			importDir(new File(urlelems[1]));
 		else if("jar".equals(urlelems[0]))
 			importJar(urlelems[2]);
+		}
+		else 
+			logger.error("ressource " + ressourceUrl + "can't be loaded" );
 	}
 
 	/**
@@ -71,7 +99,7 @@ public abstract class DirXmlParser {
 
 	public void importJar(String jarfile) throws IOException {
 		JarFile probesjar;
-		URL jarUlr = new URL("file:" + jarfile);
+		URL jarUrl = new URL("file:" + jarfile);
 		probesjar = new JarFile(jarfile);
 		Enumeration e = probesjar.entries();
 		while(e.hasMoreElements()) {
@@ -80,8 +108,14 @@ public abstract class DirXmlParser {
 				InputStream xmlStream = probesjar.getInputStream(z);
 				try {
 					digester.parse(xmlStream);
-				} catch (Exception e1) {
-					logger.error(jarUlr + "!/" + z + " not parsable:", e1);
+				} catch (SAXParseException e1) {
+					logger.error(jarUrl + "!/" + z + ": " +
+			        "Parse Error at line " + e1.getLineNumber() +
+	                " column " + e1.getColumnNumber() + ": " +
+	                e1.getMessage());
+					digester.clear();
+				} catch (SAXException e1) {
+					e1.printStackTrace();
 				}
 				xmlStream.close();
 			}

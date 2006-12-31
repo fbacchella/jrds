@@ -156,16 +156,16 @@ public class TreeJspBean {
 				List<RdsGraph> graphs = new ArrayList<RdsGraph>();
 				for(RdsGraph graph: node.enumerateChildsGraph(vf)) {
 					graphs.add(graph);
-					//out.println(getImgUrl(graph, cgiParams, req));
 				}
-				Collections.sort(graphs, new Comparator<RdsGraph>() {
+				//Not sure sort is a good idea
+				/*Collections.sort(graphs, new Comparator<RdsGraph>() {
 					public int compare(RdsGraph g1, RdsGraph g2) {
 						int order = String.CASE_INSENSITIVE_ORDER.compare(g1.getPngName(), g2.getPngName());
-						if(order ==0)
+						if(order == 0)
 							order = String.CASE_INSENSITIVE_ORDER.compare(g1.getProbe().getHost().getName(), g2.getProbe().getHost().getName());
 						return order;
 					}
-				});
+				});*/
 				for(RdsGraph graph: graphs) {
 					out.println(getImgUrl(graph, cgiParams, req));
 				}

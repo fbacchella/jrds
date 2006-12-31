@@ -68,5 +68,11 @@ public final class StoreOpener {
 		
 	}
 	
-	
+	public static final void reset() {
+		try {
+			RrdDbPool.getInstance().reset();
+		} catch (IOException e) {
+			logger.error("Strange problem while stopping db pool: ", e);
+		}
+	}
 }

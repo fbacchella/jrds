@@ -362,9 +362,17 @@ public class ProbeDesc {
 			catch (ClassCastException ex) {
 				logger.warn("didn't get a Probe but a " + o.getClass().getName());
 			}
+			catch (NoClassDefFoundError ex) {
+				logger.warn("Missing class for the creation of a probe " + ex);
+			}
 			catch(InstantiationException ex) {
-				logger.warn("Instantation exception : " + ex.getCause().getMessage(),
-						ex.getCause());
+				if(ex.getCause() != null)
+					logger.warn("Instantation exception : " + ex.getCause().getMessage(),
+							ex.getCause());
+				else {
+					logger.warn("Instantation exception : " + ex,
+							ex);					
+				}
 			}
 			catch (Exception ex) {
 				Throwable showException = ex;

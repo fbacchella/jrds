@@ -48,14 +48,15 @@ public class ParamsBean {
 	public void parseReq(HttpServletRequest req) {
 		parameters.putAll(req.getParameterMap());
 		p = makePeriod(req);
-		String idS = req.getParameter("id");
-		if(idS != null) {
+		String paramString = req.getParameter("id");
+		if(paramString != null) {
 			try {
-				id = Integer.parseInt(idS);
+				id = Integer.parseInt(paramString);
 			} catch (Throwable e) {
-				logger.error("bad argument " + idS);
+				logger.error("bad argument " + paramString);
 			}
 		}
+		paramString = req.getParameter("pid");
 		if(req.getParameter("end") == null)
 			scalePeriod = true;
 		parameters.remove("id");

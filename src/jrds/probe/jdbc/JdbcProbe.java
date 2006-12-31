@@ -13,6 +13,7 @@ import java.util.Map;
 
 import jrds.Probe;
 import jrds.RdsHost;
+import jrds.Util;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
@@ -55,6 +56,11 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 		starter.setDbName(dbName);
 		starter.setPasswd(passwd);
 		starter.setUser(user);
+	}
+
+	@Override
+	public String getName() {
+		return "jdbc-" + Util.stringSignature(getUrlAsString());
 	}
 
 	abstract JdbcStarter setStarter();

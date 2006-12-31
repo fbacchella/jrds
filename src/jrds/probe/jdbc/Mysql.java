@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-
 public abstract class Mysql extends JdbcProbe {
 
 	protected final static int PORT = 3306;

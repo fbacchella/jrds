@@ -36,6 +36,11 @@ public class GraphFactory {
 		this.graphDescMap = graphDescMap;
 		this.legacymode = legacymode;
 	}
+	
+	public void addGraphDesc(GraphDesc gd) {
+		if( ! graphDescMap.containsKey(gd.getName()))
+			graphDescMap.put(gd.getName(), gd);
+	}
 
 	/**
 	 * This method is used to generate a class from an object. It can be :
