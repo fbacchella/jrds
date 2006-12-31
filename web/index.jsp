@@ -58,6 +58,11 @@ function download_onClick()
 {
 	var historyWin = window.open("download" + document.location.search, "download" + document.location.search, "menubar=no,status=no");
 }
+
+function details_onClick()
+{
+	var historyWin = window.open("<%=jrdsBean.getProbeUrl(request, period) %>", "<%=jrdsBean.getProbeUrl(request, period) %>", "resizable=yes,scrollbars=yes");
+}
 //-->
 </script>
 
@@ -93,6 +98,7 @@ STARTALLOPEN = 0
 			<input class="btnlist" onclick="keep_onClick();" type="button" name="keepButton" value="Keep" tabindex="1">
 			<input class="btnlist" onclick="history_onClick();" type="button" name="HistoryButton" value="History" tabindex="2">
 			<input class="btnlist" onclick="download_onClick();" type="button" name="DownloadButton" value="Download values" tabindex="3">
+			<input class="btnlist" onclick="details_onClick();" type="button" name="DetailsButton" value="Probe's details" tabindex="3">
 			<form  id="select" name="dateForm" action="index.jsp" method="GET">
 				<input name="id" type="hidden" value=""/>
 				<input name="filter" type="hidden" value=""/>
