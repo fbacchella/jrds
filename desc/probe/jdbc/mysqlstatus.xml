@@ -13,8 +13,9 @@
     <dsType>counter</dsType>
   </ds>
   <ds>
-    <dsName>Binlog_cache_disk_use</dsName>
+    <dsName>Binlog_cache_disk_us</dsName>
     <dsType>counter</dsType>
+    <collect>Binlog_cache_disk_use</collect>
   </ds>
   <ds>
     <dsName>Binlog_cache_use</dsName>
@@ -112,7 +113,7 @@
 		<collect>Innodb_buffer_pool_read_requests</collect>
 	</ds>
 	<ds>
-		<dsName>Idb_bp_write_requests</dsName>
+		<dsName>Idb_bp_write_req</dsName>
 		<dsType>gauge</dsType>
 		<collect>Innodb_buffer_pool_write_requests</collect>
 	</ds>
