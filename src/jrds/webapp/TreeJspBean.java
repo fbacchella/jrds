@@ -74,6 +74,13 @@ public class TreeJspBean {
 
 	private boolean matchArgs(String s1, String s2) {
 		boolean retValue = false;
+
+		//An empty string is like a null argument
+		if(s1 != null && s1.trim().length() == 0)
+			s1 = null;
+		if(s2 != null && s2.trim().length() == 0)
+			s2 = null;
+
 		if(s1 == null && s2 == null)
 			retValue = true;
 		else if(s1 != null && s2 != null){
