@@ -6,11 +6,6 @@
   <graphTitle>Cache Hits on {3}</graphTitle>
   <verticalLabel>number/s</verticalLabel>
   <add>
-    <name>Com_select</name>
-	<graphType>area</graphType>
-	<legend>Select</legend>
-  </add>
-  <add>
     <name>Qcache_hits</name>
 	<graphType>area</graphType>
 	<legend>Query cache hits</legend>
