@@ -12,8 +12,6 @@ import java.io.Writer;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +29,10 @@ import jrds.GraphTree;
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.RdsGraph;
+import jrds.Renderer;
 
 import org.apache.log4j.Logger;
+import org.jrobin.core.RrdException;
 
 /**
  * 
@@ -73,7 +73,14 @@ public class TreeJspBean {
 	}
 
 	private boolean matchArgs(String s1, String s2) {
+		logger.trace("Comparing arg \"" + s1 + "\" with \"" + s2 + "\"");
 		boolean retValue = false;
+		//An empty string is like a null argument
+		if(s1 != null && s1.trim().length() == 0)
+			s1 = null;
+		if(s2 != null && s2.trim().length() == 0)
+			s2 = null;
+		
 		if(s1 == null && s2 == null)
 			retValue = true;
 		else if(s1 != null && s2 != null){
@@ -84,6 +91,7 @@ public class TreeJspBean {
 			} catch (UnsupportedEncodingException e) {
 			}
 		}
+		logger.trace("return  " + retValue);
 		return retValue;
 	}
 
@@ -93,6 +101,7 @@ public class TreeJspBean {
 		HostsList root = HostsList.getRootGroup();
 
 		Filter vf = params.getFilter();
+		int oldId = params.getId();
 		params.setId(0);
 		try {
 			if(vf != null) {
@@ -121,13 +130,21 @@ public class TreeJspBean {
 		} catch (IOException e) {
 			throw new JspException(e.getMessage());
 		}
+		params.setId(oldId);
 	}
 
 	public static boolean getAllFilterJavascript(Writer out, String queryString, Collection<String> allFilters) throws IOException {
-		out.append("foldersTree = gFld('All filters');");
+		out.append("foldersTree = gFld('All filters');\n");
 		out.append("foldersTree.addChildren([\n");
+		boolean first = true;
 		for(String filterName: allFilters) {
-			out.append("    [");
+			if( ! first) {
+				out.append(",\n    [");
+			}
+			else {
+				first = false;
+				out.append("    [");
+			}
 			out.append("'" + filterName +"',");
 			out.append("'");
 			out.append("index.jsp?filter=");
@@ -136,24 +153,29 @@ public class TreeJspBean {
 				out.append("&");
 				out.append(queryString);
 			}
-			out.append("'],");
+			out.append("']");
 		}
-		out.append("]);\n");
+		out.append("\n]);\n");
 		out.append("initializeDocument();");
 		return true;
 	}
 
 	public void getGraphList(JspWriter out,  HttpServletRequest req, ParamsBean cgiParams) {
 		HostsList  root = HostsList.getRootGroup();
-		cgiParams = new ParamsBean(req);
+		//cgiParams = new ParamsBean(req);
+		logger.debug(cgiParams.getPeriodUrl());
+		logger.debug(cgiParams.getFilter());
+		logger.debug(cgiParams);
 		Filter vf = cgiParams.getFilter();
 		int id = cgiParams.getId();
+		GraphBean gb = new GraphBean(req, cgiParams);
+		HostsList hl = HostsList.getRootGroup();
 
 		try {
 			GraphTree node = null;
 			node = root.getNodeById(id);
+			List<RdsGraph> graphs = new ArrayList<RdsGraph>();
 			if(node != null) {
-				List<RdsGraph> graphs = new ArrayList<RdsGraph>();
 				for(RdsGraph graph: node.enumerateChildsGraph(vf)) {
 					graphs.add(graph);
 				}
@@ -166,14 +188,61 @@ public class TreeJspBean {
 						return order;
 					}
 				});*/
-				for(RdsGraph graph: graphs) {
-					out.println(getImgUrl(graph, cgiParams, req));
-				}
 			}
 			else {
-				RdsGraph graph = HostsList.getRootGroup().getGraphById(id);
+				RdsGraph graph = hl.getGraphById(id);
 				if(graph != null)
-					out.println(getImgUrl(graph, cgiParams, req));
+					graphs.add(graph);
+			}
+			StringBuffer buffer = new StringBuffer();
+			StringBuffer popupBuffer = new StringBuffer();
+			StringBuffer detailsBuffer = new StringBuffer();
+			StringBuffer historyBuffer = new StringBuffer();
+			if( ! graphs.isEmpty()) {
+				Renderer r = hl.getRenderer();
+				for(RdsGraph graph: graphs) {
+					try {
+						r.render(graph, cgiParams.getBegin(), cgiParams.getEnd());
+						gb.setGraph(graph);
+
+						popupBuffer.setLength(0);
+						popupBuffer.append("onclick='popup(");
+						popupBuffer.append(graph.hashCode());
+						popupBuffer.append(")'");
+
+						Probe p = graph.getProbe();
+						detailsBuffer.setLength(0);
+						detailsBuffer.append("onclick='details(");
+						detailsBuffer.append(p.hashCode());
+						detailsBuffer.append(", \"");
+						detailsBuffer.append(p.getName());
+						detailsBuffer.append("\")'");
+						
+						historyBuffer.setLength(0);
+						historyBuffer.append("onclick='history_popup(");
+						historyBuffer.append(graph.hashCode());
+						historyBuffer.append(", \"");
+						historyBuffer.append(p.getName());
+						historyBuffer.append("\");'");
+						
+						
+						buffer.setLength(0);
+						buffer.append("<div class='graphblock'>\n");
+						buffer.append(gb.getImgElement() + "\n");
+						buffer.append("<div class='iconslist'>\n");
+						buffer.append("<img class='icon' " + popupBuffer + " src='img/application_double.png' alt='popup'  height='16' width='16'  />\n");
+						buffer.append("<img class='icon' " + detailsBuffer + " src='img/application_view_list.png' alt=\"probe's details\"  height='16' width='16'  />\n");
+						buffer.append("<img class='icon' " + historyBuffer + " src='img/time.png' alt='history'  height='16' width='16'  />\n");
+						buffer.append("<img class='icon' src='img/magnifier.png' alt='magnifier'  height='16' width='16'  />\n");
+						buffer.append("<img class='icon' src='img/disk.png' alt='save'  height='16' width='16'  />\n");
+						buffer.append("</div>\n");
+						buffer.append("</div>\n");
+						buffer.append("\n");
+						out.println(buffer);
+					} catch (RrdException e) {
+						logger.error("Graph " + graph + " cannot be rendered"); 
+					}
+				}
 			}
 		} catch (IOException e) {
 			logger.error("Result not written, connexion closed ?");
@@ -191,32 +260,5 @@ public class TreeJspBean {
 			retValue = urlBuffer.toString();
 		}
 		return retValue;
-	}
-
-	private StringBuffer getImgUrl(RdsGraph graph, ParamsBean period, HttpServletRequest req) {
-		StringBuffer imgElement = new StringBuffer();
-		HostsList.getRootGroup().getRenderer().render(graph, period.getBegin(), period.getEnd());
-
-		imgElement.append("<img class=\"graph\" ");
-		//We build the Url
-		StringBuffer urlBuffer = new StringBuffer();
-		urlBuffer.append(req.getContextPath());
-		urlBuffer.append("/graph?id=" + graph.hashCode());
-		urlBuffer.append("&" + period.getPeriodUrl());
-		imgElement.append("src='" + urlBuffer + "' ");
-
-		//A few more attributes
-		imgElement.append("alt='" + graph.getQualifieName() + "' ");
-		int rHeight = graph.getRealHeight();
-		if(rHeight > 0)
-			imgElement.append("height='" + Integer.toString(rHeight) + "' ");
-		int rWidth = graph.getRealWidth();
-		if(rWidth > 0)
-			imgElement.append("width='" + Integer.toString(rWidth)+ "' ");
-
-		imgElement.append(" />");
-
-		return imgElement;
-
-	}
+	}	
 }

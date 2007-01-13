@@ -133,8 +133,11 @@ implements Comparable {
 		if( this instanceof UrlProbe) {
 			url =((UrlProbe) this).getUrlAsString();
 		}
+		String hn = "<empty>";
+		if(getHost() != null)
+			hn = getHost().getName();
 		Object[] arguments = {
-				getHost().getName(),
+				hn,
 				index,
 				url,
 		};
@@ -180,8 +183,7 @@ implements Comparable {
 		RrdDef def = getDefaultRrdDef();
 		def.addArchive(getArcDefs());
 		def.addDatasource(getDsDefs());
-		final RrdDb rrdDb = new RrdDb(def);
-		rrdDb.sync();
+		RrdDb rrdDb = new RrdDb(def);
 		rrdDb.close();
 	}
 

@@ -8,10 +8,7 @@ package jrds.standalone;
 
 import java.io.IOException;
 
-import org.jrobin.core.RrdBackend;
-
-import jrds.RrdCachedFileBackend;
-import jrds.RrdCachedFileBackendFactory;
+import org.snmp4j.smi.OID;
 
 /**
  * @author bacchell
@@ -22,25 +19,9 @@ import jrds.RrdCachedFileBackendFactory;
 public class TestBackEnd {
 
 	public static void main(String[] args) throws IOException {
-		//RrdCachedFileBackend fbe = new RrdCachedFileBackend(args[0], false, 0, 0, 10);
-		RrdCachedFileBackendFactory befact = new RrdCachedFileBackendFactory();
-		RrdCachedFileBackendFactory.setSyncPeriod(5);
-		//RrdCachedFileBackend fbe = befact.opencached(args[0], false, 0);
-		RrdBackend fbe = befact.open(args[0], false, 0);
-		byte b[] = new byte[1];
-		((RrdCachedFileBackend)fbe).read((long)0,b);
-		b[0]='_';
-		((RrdCachedFileBackend)fbe).write(20,b);
-		b[0]=' ';
-		((RrdCachedFileBackend)fbe).write(30,b);
-		((RrdCachedFileBackend)fbe).read(0,b);
-		try {
-			Thread.sleep(10 * 1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		fbe.close();
-		//System.out.println(b);
+		OID a = new OID("1.2.3");
+		OID b = new OID("1.2.3.4");
+		a.fromSubIndex(b, true);
+		System.out.println(a);
 	}
 }

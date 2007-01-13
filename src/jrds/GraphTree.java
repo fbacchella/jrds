@@ -108,7 +108,7 @@ public class GraphTree {
 				/* replace \ with \\
 				 * ex: C:\ become C:\\
 				 * */   
-				String leafName = e.getKey().replaceAll("\\\\","\\\\\\\\");
+				String leafName = e.getKey().replaceAll("\\\\","\\\\\\\\").replaceAll("'","&#x27;");
 				childsarray.append("    [");
 				childsarray.append("'" + leafName +"',");
 				childsarray.append("'");

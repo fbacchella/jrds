@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 
 public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe {
 	static final private org.apache.log4j.Logger logger = Logger.getLogger(JdbcProbe.class);
+	private String label;
 
 	static final void registerDriver(String JdbcDriver) {
 		try {
@@ -226,6 +227,14 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 
 	public String getIndexName() {
 		return starter.getDbName();
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 	
 }

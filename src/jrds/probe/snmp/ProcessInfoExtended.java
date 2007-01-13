@@ -61,14 +61,14 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Collection<String> setIndexValue() 
+	public Collection<int[]> setIndexValue() 
 	{
 
 		boolean found = false;
 		Collection<OID> soidSet= getIndexSet();
 		Pattern p = Pattern.compile(pattern);
 
-		Collection<String>  indexAsString = new HashSet<String>();
+		Collection<int[]>  indexAsString = new HashSet<int[]>();
 		TabularIterator ti = new TabularIterator(getSnmpStarter(), soidSet);
 		for(SnmpVars s: ti) {
 			List<OID> lk = new ArrayList<OID>(s.keySet());
@@ -79,8 +79,9 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
 				cmdBuf.append(" ");
 			}
 			if(p.matcher(cmdBuf.toString().trim()).matches()) {
-				int index = lk.get(0).last();
-				indexAsString.add(Integer.toString(index));
+				int[] index = new int[1];
+				index[0] = lk.get(0).last();
+				indexAsString.add(index);
 				found = true;
 			}
 		}

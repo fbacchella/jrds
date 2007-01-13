@@ -30,29 +30,30 @@ import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdException;
-import org.jrobin.graph.RrdExport;
-import org.jrobin.graph.RrdExportDef;
-import org.jrobin.graph.RrdGraph;
-import org.jrobin.graph.RrdGraphDef;
+import org.jrobin.core.*;
+import org.jrobin.graph.*;
 
 /**
  * @author bacchell
  * @version $Revision$
  * TODO
  */
-public class RdsGraph
-implements Comparable {
-
+public class RdsGraph implements Comparable {
+	
 	static final private Logger logger = Logger.getLogger(RdsGraph.class);
-	static final private SimpleDateFormat lastUpdateFormat = new
-	SimpleDateFormat("dd/MM/yyyy HH:mm");
+	static final private SimpleDateFormat lastUpdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
 	protected Probe probe;
 	private String viewPath = null;
 	private GraphDesc gd;
 	private String name = null;
 	private String graphTitle = null;
+
+	public final class Dimension {
+		public int width = 0;
+		public int height = 0;
+	};
+	protected Dimension dimension = null;
 
 	/**
 	 *
@@ -68,20 +69,6 @@ implements Comparable {
 	 */
 	public int hashCode() {
 		return getQualifieName().hashCode();
-	}
-
-	/**
-	 * @return Returns the height.
-	 */
-	public int getHeight() {
-		return gd.getHeight();
-	}
-
-	/**
-	 * @return Returns the width.
-	 */
-	public int getWidth() {
-		return gd.getWidth();
 	}
 
 	/**
@@ -174,17 +161,17 @@ implements Comparable {
 	protected RrdGraphDef graphFormat(RrdGraphDef graphDef, Date startDate, Date endDate) throws RrdException {
 		Date lastUpdate = probe.getLastUpdate();
 		graphDef.setTitle(getGraphTitle());
-		graphDef.comment("@l");
-		graphDef.comment("@l");
+		graphDef.comment("\\l");
+		graphDef.comment("\\l");
 		graphDef.comment("Last update: " + 
-				lastUpdateFormat.format(lastUpdate) + "@L");
+				lastUpdateFormat.format(lastUpdate) + "\\L");
 		String unit = "SI";
 		if(! gd.isSiUnit()) 
 			unit = "binary";
-		graphDef.comment("Unit type: " + unit + "@r");
+		graphDef.comment("Unit type: " + unit + "\\r");
 		graphDef.comment("Period from " + lastUpdateFormat.format(startDate) +
-				" to " + lastUpdateFormat.format(endDate) + "@L");
-		graphDef.comment("Source type: " + getProbe().getSourceType() + "@r");
+				" to " + lastUpdateFormat.format(endDate) + "\\L");
+		graphDef.comment("Source type: " + getProbe().getSourceType() + "\\r");
 		return graphDef;		
 	}
 
@@ -194,24 +181,38 @@ implements Comparable {
 		if(endDate.after(lastUpdate))
 			endDate = new Date(lastUpdate.getTime() );
 		RrdGraphDef tempGraphDef = getRrdDef();
-		
+		tempGraphDef = graphFormat(tempGraphDef, startDate, endDate);
+
 		//We normalize the last update time, it can't be used directly
 		Date lastUpdateNormalized = new Date(1000L * org.jrobin.core.Util.normalize(getProbe().getLastUpdate().getTime() / 1000L, HostsList.getRootGroup().getResolution()));
 		//We dont want to graph past the last normalized update time
 		if(endDate.after(lastUpdateNormalized))
 			endDate = lastUpdateNormalized;
-		tempGraphDef.setTimePeriod(startDate, endDate);
-		tempGraphDef = graphFormat(tempGraphDef, startDate, endDate);
-		return new RrdGraph(tempGraphDef, true);
+		tempGraphDef.setStartTime(startDate.getTime()/1000);
+		tempGraphDef.setEndTime(endDate.getTime()/1000);
+		tempGraphDef.setWidth(getWidth());
+		tempGraphDef.setHeight(getHeight());
+		RrdGraph graph = new RrdGraph(tempGraphDef);
+		if(dimension == null) {
+			RrdGraphInfo gi = graph.getRrdGraphInfo();
+			dimension = new Dimension();
+			dimension.height = gi.getHeight();
+			dimension.width = gi.getWidth();
+		}
+		return graph;
+	}
+
+	public BufferedImage makeImg(RrdGraph rrdGraph) {
+		BufferedImage img = null;
+		img = new BufferedImage(getRealWidth(), getRealHeight(), BufferedImage.TYPE_INT_RGB);
+		rrdGraph.render(img.getGraphics());
+		return img;
 	}
 
 	public BufferedImage makeImg(Date startDate, Date endDate) {
 		BufferedImage img = null;
 		try {
-			RrdGraph rrdGraph = getRrdGraph(startDate, endDate);
-			img = rrdGraph.getBufferedImage(getWidth(), getHeight());
-			gd.setRealHeight(img.getHeight());
-			gd.setRealWidth(img.getWidth());
+			img = makeImg(getRrdGraph(startDate, endDate));
 		}
 		catch (RrdException e) {
 			logger.warn("Unable to creage png for " + getName() +
@@ -250,7 +251,7 @@ implements Comparable {
 
 	}
 
-	public void writeXml(OutputStream out, Date startDate, Date endDate) {
+	/*public void writeXml(OutputStream out, Date startDate, Date endDate) {
 		try {
 			RrdExportDef exdef = getRrdDef();
 			exdef.setTimePeriod(startDate, endDate);
@@ -267,9 +268,9 @@ implements Comparable {
 					" on host " + probe.getHost().getName() + ": " +
 					ex.getLocalizedMessage());
 		}
-	}
+	}*/
 
-	public String writeXml(Date startDate, Date endDate) {
+	/*public String writeXml(Date startDate, Date endDate) {
 		String xmlData = "";
 		try {
 			RrdExportDef exdef = getRrdDef();
@@ -288,10 +289,10 @@ implements Comparable {
 					ex.getLocalizedMessage());
 		}
 		return xmlData;
-	}
+	}*/
 
 
-	public void writeCsv(OutputStream out, Date startDate, Date endDate){
+	/*public void writeCsv(OutputStream out, Date startDate, Date endDate){
 		// Use a Transformer for output
 		TransformerFactory tFactory = TransformerFactory.newInstance();
 		Transformer transformer = null;
@@ -315,7 +316,7 @@ implements Comparable {
 					ex.getLocalizedMessage(),ex);
 		}
 
-	}
+	}*/
 	public byte[] getPngBytes(Date startDate, Date endDate) {
 		byte[] retValue = null;
 		BufferedImage img = makeImg(startDate, endDate);
@@ -345,16 +346,37 @@ implements Comparable {
 	}
 
 	/**
-	 * @return Returns the realHeight.
+	 * @return Returns the height of the graphic object.
 	 */
 	public int getRealHeight() {
-		return gd.getRealHeight();
+		return dimension.height;
 	}
 
 	/**
-	 * @return Returns the realWidth.
+	 * @return Returns the width  of the graphic object.
 	 */
 	public int getRealWidth() {
-		return gd.getRealWidth();
+		return dimension.width;
 	}
+	
+	/**
+	 * @return Returns the height of the graphic zone.
+	 */
+	public int getHeight() {
+		return gd.getHeight();
 	}
+
+	/**
+	 * @return Returns the width of the graphic zone.
+	 */
+	public int getWidth() {
+		return gd.getWidth();
+	}
+
+	@Override
+	public String toString() {
+		return probe.toString() + "/" + getName();
+	}
+
+
+}

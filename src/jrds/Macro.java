@@ -2,7 +2,10 @@ package jrds;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import jrds.probe.IndexedProbe;
 
 public class Macro {
 	private Set<Object[]> probeList = new HashSet<Object[]>();
@@ -16,10 +19,18 @@ public class Macro {
 
 	public void populate(RdsHost host) {
 		for(Object[] l: probeList) {
-			String className = (String) l[0];
+			Map map = (Map) l[0];
+			Map<String, String> attrs = map;
+			String className = attrs.get("type");
+			String label = attrs.get("label");
 			List constArgs = (List) l[1];
 			Probe newRdsRrd = pf.makeProbe(className, constArgs);
 			if(newRdsRrd != null) {
+				if(newRdsRrd instanceof IndexedProbe && label != null) {
+					//logger.debug("Adding label " + label + " to "  + newRdsRrd);
+					((IndexedProbe)newRdsRrd).setLabel(label);
+				}
+
 				host.addProbe(newRdsRrd);
 				HostsList.getRootGroup().addProbe(newRdsRrd);
 			}
@@ -29,8 +40,7 @@ public class Macro {
 		}
 	}
 
-	public void put(String className, List constArgs) {
-		Object[] l = new Object[] {className, constArgs};
+	public void put(Object[] l) {
 		probeList.add(l);
 	}
 

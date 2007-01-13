@@ -50,7 +50,7 @@ public class HostsList {
 	private final Map<Integer, Probe> probeMap= new HashMap<Integer, Probe>();
 	private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
 	private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
-	private final Renderer renderer = new Renderer(20);
+	private final Renderer renderer = new Renderer(50);
 	GraphFactory gf;
 	ProbeFactory pf;
 	private int numCollectors = 1;

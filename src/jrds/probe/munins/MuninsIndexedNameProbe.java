@@ -25,6 +25,7 @@ public abstract class MuninsIndexedNameProbe extends MuninsProbe  implements Ind
 	static final private Logger logger = Logger.getLogger(MuninsIndexedNameProbe.class);
 	String indexKey;
 	Collection muninsName = null;
+	private String label;
 
 	/**
 	 * @param monitoredHost
@@ -55,6 +56,14 @@ public abstract class MuninsIndexedNameProbe extends MuninsProbe  implements Ind
 	 */
 	public String getIndexName() {
 		return indexKey;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 }

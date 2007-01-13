@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jrds.probe.IndexedProbe;
 import jrds.probe.SumProbe;
 import jrds.snmp.SnmpStarter;
 
@@ -98,27 +99,32 @@ public class HostConfigParser  extends DirXmlParser {
 	private void defineProbe(Digester digester) {
 		Rule makeProbe = new Rule() {
 			public void begin(String namespace, String name, Attributes attributes) throws Exception {
-				//We will need the type latter, so keep it on the stack
 				String type = attributes.getValue("type");
 				if(type == null) {
 					logger.error("No type found at " + digester.getCurrentElementName());
 				}
 				else {
-					digester.push(type);
+					//We will need the atrributes latter, so keep them on the stack
+					Map<String, String> attrMap = new HashMap<String, String>(attributes.getLength());
+					for(int i=attributes.getLength() - 1; i >= 0; i--) {
+						attrMap.put(attributes.getQName(i), attributes.getValue(i));
+					}
+					digester.push(attrMap);
 					digester.push(new ArrayList(0));
 				}
 			}
 
+			@SuppressWarnings("unchecked")
 			public void end(String namespace, String name) throws Exception {
 				List argsListValue = null;
 				Set<Starter> starters = new HashSet<Starter>();
 				Set<Tag> tags = new HashSet<Tag>();
+				Map<String, String> attributes = null;
 
 				//All the informations for the probe were kept on the stack
-				//The delimiter is a string (the type of the prope)
-				//Should it be a specific null delimiter ?
+				//The delimiter is a Map 
 				Object o = null;
-				while(digester.getCount() != 0 && ! ((o = digester.pop()) instanceof String)) {
+				while(digester.getCount() != 0 && ! ((o = digester.pop()) instanceof Map)) {
 					if(o instanceof Starter) {
 						starters.add((Starter) o);
 					}
@@ -135,8 +141,9 @@ public class HostConfigParser  extends DirXmlParser {
 						break;
 					}
 				}
-				if(o != null && o instanceof String) {
-					String probeType = (String) o;
+				if(o != null && o instanceof Map) {
+					attributes = (Map) o;
+					String probeType = attributes.get("type");
 					for(int i = 0; i < digester.getCount() && !((o = digester.peek(i)) instanceof RdsHost) ; i++);
 					RdsHost host = (RdsHost) o;
 					Probe newProbe = pf.makeProbe(probeType, argsListValue);
@@ -146,6 +153,11 @@ public class HostConfigParser  extends DirXmlParser {
 						}
 						for(Tag tg: tags)
 							newProbe.addTag(tg.getTag());
+						String label = attributes.get("label");
+						if(newProbe instanceof IndexedProbe && label != null) {
+							logger.debug("Adding label " + label + " to "  + newProbe);
+							((IndexedProbe)newProbe).setLabel(label);
+						}
 						host.addProbe(newProbe);
 						HostsList.getRootGroup().addProbe(newProbe);
 					}
@@ -278,7 +290,7 @@ public class HostConfigParser  extends DirXmlParser {
 					for(Tag tg: tags)
 						m.addTag(tg.getTag());
 					for(Object[] p: probes)
-						m.put((String) p[0], (List)p[1]);
+						m.put(p);
 					digester.push(m);
 				}
 				else
@@ -293,15 +305,20 @@ public class HostConfigParser  extends DirXmlParser {
 			}
 
 			public void begin(String namespace, String name, Attributes attributes) throws Exception {
-				//We will need the type latter, so keep it on the stack
-				digester.push(attributes.getValue("type"));
+				//We will need the attributes latter, so keep them on the stack
+				Map<String, String> attrMap = new HashMap<String, String>(attributes.getLength());
+				for(int i=attributes.getLength() - 1; i >= 0; i--) {
+					attrMap.put(attributes.getQName(i), attributes.getValue(i));
+				}
+				digester.push(attrMap);
 				digester.push(new ArrayList(0));
 			}
 
+			@SuppressWarnings("unchecked")
 			public void end(String namespace, String name) throws Exception {
 				List argsListValue = (List)digester.pop();
-				String macroType = (String)digester.pop();
-				Object[] l = new Object[] {macroType, argsListValue};
+				Map <String, String> attrs = (Map) digester.pop();
+				Object[] l = new Object[] {attrs, argsListValue};
 				digester.push(l);
 			}
 		};

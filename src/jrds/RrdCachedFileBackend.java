@@ -8,6 +8,7 @@ package jrds;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,12 +38,14 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 	private static int readHit = 0;
 	private static int access = 0;
 
+	protected FileChannel channel;
+
 	/**
 	 * @param path
 	 */
 	public RrdCachedFileBackend(String path, boolean readOnly, int lockMode, int syncMode, int syncPeriod)
 	throws IOException {
-		super(path, readOnly, lockMode);
+		super(path, readOnly);
 		this.syncMode = syncMode;
 		if(syncMode == RrdCachedFileBackendFactory.SYNC_BACKGROUND && !readOnly) {
 			createSyncTask(syncPeriod);
@@ -50,6 +53,7 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 		else if(syncMode == RrdCachedFileBackendFactory.SYNC_CENTRALIZED && !readOnly) {
 			BackEndCommiter.getInstance().addBackEnd(this);
 		}
+		channel = file.getChannel();
 	}
 
 	private void createSyncTask(int syncPeriod) {

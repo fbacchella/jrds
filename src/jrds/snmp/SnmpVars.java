@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.snmp4j.PDU;
 import org.snmp4j.asn1.BER;
 import org.snmp4j.asn1.BERInputStream;
+import org.snmp4j.smi.AbstractVariable;
 import org.snmp4j.smi.Counter64;
 import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.IpAddress;
@@ -156,7 +157,7 @@ public class SnmpVars extends HashMap<OID, Object> {
 				retvalue  = ((IpAddress)valueAsVar).getInetAddress();
 			}
 			else {
-				logger.warn("Unknown syntax " + Variable.getSyntaxString(type));
+				logger.warn("Unknown syntax " + AbstractVariable.getSyntaxString(type));
 			}
 		}
 		return retvalue;

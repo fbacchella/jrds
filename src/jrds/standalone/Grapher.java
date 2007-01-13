@@ -49,7 +49,11 @@ public class Grapher {
 			logger.debug("Found graph for probe " + g.getProbe());
 			Date start = new Date();
 			//end = new Date(1000L * org.jrobin.core.Util.normalize(g.getProbe().getLastUpdate().getTime() / 1000L, HostsList.getRootGroup().getResolution()));
-			r.render(g, begin, end);
+			try {
+				r.render(g, begin, end);
+			} catch (Exception e) {
+				logger.error("Error " + e + " with " + g.getGraphTitle());
+			}
 			Date finish = new Date();
 			long duration = finish.getTime() - start.getTime();
 			logger.info("Graph " + g.getQualifieName() + " renderding  ran for " + duration + "ms");							

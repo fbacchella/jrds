@@ -37,6 +37,6 @@ public class Download extends HttpServlet {
 		RdsGraph graph = hl.getGraphById(Integer.parseInt(rrdId));
 		ServletOutputStream out = res.getOutputStream();
 
-		graph.writeCsv(out, params.getBegin(), params.getEnd());
+		//graph.writeCsv(out, params.getBegin(), params.getEnd());
 	}
 }

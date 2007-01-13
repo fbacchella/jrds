@@ -32,13 +32,15 @@ public class Renderer {
 		public Date start;
 		public Date end;
 		public RdsGraph graph;
+		//public RrdGraph rrdgraph;
 		public boolean  finished = false;
 		File destFile;
 
-		public RendererRun(Date start, Date end, RdsGraph graph, int keyid) {
+		public RendererRun(Date start, Date end, RdsGraph graph, int keyid) throws IOException, RrdException {
 			this.start = start;
 			this.end = end;
 			this.graph = graph;
+			//rrdgraph = graph.getRrdGraph(start, end);
 			destFile = new File(HostsList.getRootGroup().getTmpdir(), Integer.toHexString(keyid) + ".png");
 		}
 
@@ -96,9 +98,16 @@ public class Renderer {
 				logger.error("Error with temporary output file: " +e);
 			} catch (IOException e) {
 				logger.error("Error with temporary output file: " +e);
+			} catch (Exception e) {
+				logger.error("Run time rendering" + this, e);
 			}
 			//Allways set to true, we do not try again in case of failure
 			finished = true;
+		}
+
+		@Override
+		public String toString() {
+			return graph + "#" + start + "#" + end;
 		}
 
 	};
@@ -114,7 +123,7 @@ public class Renderer {
 
 	};
 
-	private final ExecutorService tpool =  Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2, 
+	private final ExecutorService tpool =  Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 3, 
 			new ThreadFactory() {
 		public Thread newThread(Runnable r) {
 			Thread t = new Thread(r, "RendererThread" + counter);
@@ -146,20 +155,16 @@ public class Renderer {
 		};	
 	}
 
-	public void render(final RdsGraph graph, final Date start, final Date end) {
+	public void render(final RdsGraph graph, final Date start, final Date end) throws IOException, RrdException {
 		RendererRun runRender = null;
 		int key = 0;
-		try {
-			key = makeKey(graph, start, end);
-		} catch (RrdException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		key = makeKey(graph, start, end);
 		synchronized(rendered){
 			if( ! rendered.containsKey(key)) {
 				// Create graphics object
 				runRender = new RendererRun(start, end, graph, key); 
 				rendered.put(key, runRender);
+				logger.debug("wants to render " + runRender);
 			}
 		}
 		if(runRender != null){
@@ -185,9 +190,17 @@ public class Renderer {
 			e.printStackTrace();
 		}
 		if( runRender == null) {
-			render(graph, start, end);
-			synchronized(rendered){
-				runRender = rendered.get(key);
+			try {
+				render(graph, start, end);
+				synchronized(rendered){
+					runRender = rendered.get(key);
+				}
+
+			}
+			// If cannot launch render, will always be false
+			catch (IOException e) {
+			}
+			catch (RrdException e) {
 			}
 		}
 		return (runRender != null) && runRender.isReady();
@@ -238,4 +251,5 @@ public class Renderer {
 		result = PRIME * result + (int) (start ^ (start >>> 32));
 		return result;
 	}
+	
 }

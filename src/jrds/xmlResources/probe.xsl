@@ -8,6 +8,8 @@
 <html>
 <head>
 	<title><xsl:value-of select="@name" /> on <xsl:value-of select="@host" /></title>
+	<link rel="stylesheet" type="text/css" href="/lib/jrds.css" />
+	<script type="text/javascript" src="lib/jrds.js" ></script>
 </head>
 <body>
 <h1><xsl:value-of select="@host" />/<xsl:value-of select="@name" /></h1>
@@ -40,6 +42,6 @@
 	</xsl:template>
 	
 	<xsl:template match="name">
-	<li><a href="graph?id={@id}"><xsl:apply-templates/></a></li>
+	<li><a href="popup.jsp?id={@id}"><xsl:apply-templates/></a></li>
 	</xsl:template>
 </xsl:stylesheet>

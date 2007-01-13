@@ -14,14 +14,14 @@ import jrds.probe.SumProbe;
 import org.apache.log4j.Logger;
 import org.jrobin.core.FetchData;
 import org.jrobin.core.RrdException;
-import org.jrobin.graph.LinearInterpolator;
-import org.jrobin.graph.Plottable;
+import org.jrobin.data.LinearInterpolator;
+import org.jrobin.data.Plottable;
 import org.jrobin.graph.RrdGraph;
 import org.jrobin.graph.RrdGraphDef;
 
 public class Sum extends RdsGraph {
 	static final private Logger logger = Logger.getLogger(Sum.class);
-
+	
 	static final private GraphDesc gd = new GraphDesc();
 	static {
 		gd.setGraphName("Sum");
@@ -30,8 +30,8 @@ public class Sum extends RdsGraph {
 		gd.setViewTree(new Object[] {});
 	}
 
-	/*Does not change during the short life of this object*/
-	private final HostsList hl = HostsList.getRootGroup();
+	Date startDate;
+	Date endDate;
 
 	public Sum(Probe theStore) {
 		super(theStore, gd);
@@ -39,12 +39,12 @@ public class Sum extends RdsGraph {
 		gd.setGraphTitle(theStore.getName());
 	}
 	
-	public RrdGraph getRrdGraph(Date startDate, Date endDate) throws
-	IOException, RrdException {
+	protected RrdGraphDef getRrdDef() throws RrdException, IOException {
 		SumProbe p = (SumProbe) probe;
 		double[][] allvalues = null;
 		GraphDesc tempgd = null;
 		FetchData fd = null;
+		HostsList hl = HostsList.getRootGroup();
 		for(String name : p.getProbeList()) {
 			RdsGraph g = hl.getGraphById(name.hashCode());
 			if(g != null) {
@@ -81,20 +81,14 @@ public class Sum extends RdsGraph {
 			ownValues.put(dsNames[i], pl);
 		}
 		RrdGraphDef tempGraphDef = tempgd.getGraphDef(p, ownValues);
-		tempGraphDef.setTimePeriod(startDate, endDate);
-		tempGraphDef = graphFormat(tempGraphDef, startDate, endDate);
-		return new RrdGraph(tempGraphDef, true);
+		return tempGraphDef;
 	}
 
-	@Override
-	public int getRealHeight() {
-		return 0;
-	}
-
-	@Override
-	public int getRealWidth() {
-		return 0;
-	}
 	
-
+	public RrdGraph getRrdGraph(Date startDate, Date endDate) throws
+	IOException, RrdException {
+		this.startDate = startDate;
+		this.endDate = endDate;
+		return super.getRrdGraph(startDate, endDate);
+	}
 }

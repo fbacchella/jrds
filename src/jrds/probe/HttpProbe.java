@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 public abstract class HttpProbe extends Probe  implements IndexedProbe {
 	static final private Logger logger = Logger.getLogger(HttpResponseTime.class);
 	private URL url;
+	private String label;
 
 	public HttpProbe(URL url) {
 		super();
@@ -81,5 +82,13 @@ public abstract class HttpProbe extends Probe  implements IndexedProbe {
 	@Override
 	public String getSourceType() {
 		return "HTTP";
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 }

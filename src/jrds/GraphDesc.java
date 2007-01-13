@@ -4,6 +4,7 @@
 package jrds;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -28,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.jrobin.core.RrdException;
-import org.jrobin.graph.Plottable;
+import org.jrobin.data.*;
 import org.jrobin.graph.RrdGraphDef;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -72,7 +73,7 @@ implements Cloneable {
 
 		public static final GraphType LINE = new GraphType() {
 			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {
-				rgd.line(sn, color, " @g");
+				rgd.line(sn, color, " \\g");
 			};
 			@Override
 			public String toString() {
@@ -81,7 +82,7 @@ implements Cloneable {
 		};
 		static public final GraphType AREA = new GraphType() {
 			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {
-				rgd.area(sn, color, " @g");
+				rgd.area(sn, color, " \\g");
 			};
 			@Override
 			public String toString() {
@@ -90,7 +91,7 @@ implements Cloneable {
 		};
 		static public final GraphType STACK = new GraphType() {
 			public void draw(RrdGraphDef rgd, String sn, Color color) throws RrdException {
-				rgd.stack(sn, color, " @g");
+				rgd.stack(sn, color, " \\g");
 			};
 			@Override
 			public String toString() {
@@ -136,7 +137,21 @@ implements Cloneable {
 		};
 		static public final PathElement INDEX = new PathElement() {
 			public String resolve(RdsGraph graph) {
-				return ( (IndexedProbe) graph.getProbe()).getIndexName();
+				StringBuffer retValue = new StringBuffer("empty");
+				if(graph.getProbe() instanceof IndexedProbe) {
+					retValue.setLength(0);
+					IndexedProbe ip = (IndexedProbe) graph.getProbe();
+					retValue.append(ip.getIndexName());
+					//Check to see if a label is defined and needed to add
+					String label = ip.getLabel();
+					if(label != null) {
+						retValue.append(" (" + label + ")");
+					}
+				}
+				else {
+					logger.debug("Bad graph definition for " + graph);
+				}
+				return retValue.toString();
 			}
 			public String toString() {
 				return "INDEX";
@@ -320,6 +335,9 @@ implements Cloneable {
 			public String toString() { return "PINK"; }
 		});
 	 */
+	
+	private static final Font TITLEFONT = new Font("Lucida Sans Typewriter", Font.BOLD ,12 );
+	private static final Font TEXTFONT = new Font("Lucida Sans Typewriter", Font.PLAIN ,10 );
 	private enum SiPrefix {
 		Y, Z, E, P, T, G, M, k, h, da,
 		FIXED, d, c, m, µ, n, p, f, a, z, y
@@ -348,11 +366,6 @@ implements Cloneable {
 		SIPREFIXMAP.put(SiPrefix.z, -21);
 		SIPREFIXMAP.put(SiPrefix.y, -24);
 	}
-	private final class Dimension {
-		public int width = 0;
-		public int height = 0;
-	};
-
 	static private final class DsDesc {
 		public String name;
 		public String dsName;
@@ -377,7 +390,8 @@ implements Cloneable {
 		}
 	}
 
-	static final private String manySpace = "                                                                  ";
+//	static final private String manySpace = "123456798ABCDEF0123465798ABCDEF0123456798ABCDEF0123465798ABCDEF0123456798ABCDEF0123465798ABCDEF0";
+	static final private String manySpace = "                                                                      ";
 	private Map<Object, DsDesc> dsMap;
 	private int width = 578;
 	private int height = 206;
@@ -390,7 +404,6 @@ implements Cloneable {
 	private String graphName;
 	private String name;
 	private String graphTitle ="{0} on {1}";
-	private Dimension dimension = new Dimension();
 	private int maxLengthLegend = 0;
 	private boolean siUnit = true;
 	private Integer unitExponent = null;
@@ -568,19 +581,24 @@ implements Cloneable {
 	public RrdGraphDef getGraphDef(Probe probe, Map ownData) throws IOException,
 	RrdException {
 		RrdGraphDef retValue = new RrdGraphDef();
+		retValue.setLargeFont(TITLEFONT);
+		retValue.setSmallFont(TEXTFONT);
 		String rrdName = probe.getRrdName();
 
 		/*The title line*/
-		retValue.comment("   @G"); //We simulate the color box
-		retValue.comment(manySpace.substring(0, Math.min(maxLengthLegend, manySpace.length())) + "@G");
-		retValue.comment("    Current");
+		retValue.comment(""); //We simulate the color box
+		retValue.comment(manySpace.substring(0, Math.min(maxLengthLegend, manySpace.length()) + 2));
+		retValue.comment("Current");
 		retValue.comment("  Average");
 		retValue.comment("  Minimum");
 		retValue.comment("  Maximum");
-		retValue.comment("@l");
+		retValue.comment("\\l");
 
 		for(DsDesc ds: dsMap.values()) {
-			if (ds.dsName == null && ds.rpn == null) {
+			if(ds.graphType == GraphType.COMMENT) {
+				addLegend(retValue, ds.name, ds.graphType, ds.legend);
+			}
+			else if (ds.dsName == null && ds.rpn == null) {
 				ds.graphType.draw(retValue, ds.name, ds.color);
 				addLegend(retValue, ds.name, ds.graphType, ds.legend);
 			}
@@ -606,6 +624,9 @@ implements Cloneable {
 						logger.warn("graph type is null for " + ds.dsName + " on probe " + probe);
 					}
 				}
+				else {
+					logger.error("No way to plot " + ds.name + " found");
+				}
 			}
 			else {
 				retValue.datasource(ds.name, ds.rpn);
@@ -613,14 +634,16 @@ implements Cloneable {
 				addLegend(retValue, ds.name, ds.graphType, ds.legend);
 			}
 		}
-		retValue.setShowLegend(true);
-		retValue.setGridRange(lowerLimit, upperLimit, false);
+		if( ! Double.isNaN(lowerLimit))
+			retValue.setMinValue(lowerLimit);
+		if( ! Double.isNaN(upperLimit))
+			retValue.setMaxValue(upperLimit);
 		if (verticalLabel != null)
 			retValue.setVerticalLabel(verticalLabel);
 		if(this.siUnit)
-			retValue.setBaseValue(1000);
+			retValue.setBase(1000);
 		else	
-			retValue.setBaseValue(1024);
+			retValue.setBase(1024);
 		if(unitExponent != null) {
 			retValue.setUnitsExponent(unitExponent);
 		}
@@ -630,18 +653,18 @@ implements Cloneable {
 
 	private void addLegend(RrdGraphDef def, String ds, GraphType gt, String legend) throws RrdException {
 		if(gt == GraphType.COMMENT) {
-			def.comment(legend + "@l");
+			def.comment(legend + "\\l");
 		}
 		else if(gt != GraphType.NONE && legend != null) {
-			def.comment(legend);
-			int missingLength = Math.min(maxLengthLegend - legend.length(), manySpace.length());
+			def.comment(legend + "\\g");
+			int missingLength = Math.min(maxLengthLegend - legend.length(), manySpace.length()) + 2;
 			if(missingLength > 0)
-				def.comment(manySpace.substring(0, missingLength) + "@G");
-			def.gprint(ds, ConsFunc.LAST.toString(), "@8.2@s");
-			def.gprint(ds, ConsFunc.AVERAGE.toString(), "@8.2@s");
-			def.gprint(ds, ConsFunc.MIN.toString(), "@8.2@s");
-			def.gprint(ds, ConsFunc.MAX.toString(), "@8.2@s");
-			def.comment("@l");
+				def.comment(manySpace.substring(0, missingLength));
+			def.gprint(ds, ConsFunc.LAST.toString(), "%6.2f%s");
+			def.gprint(ds, ConsFunc.AVERAGE.toString(), "%8.2f%s");
+			def.gprint(ds, ConsFunc.MIN.toString(), "%8.2f%s");
+			def.gprint(ds, ConsFunc.MAX.toString(), "%8.2f%s");
+			def.comment("\\l");
 		}
 	}
 	/**
@@ -672,33 +695,31 @@ implements Cloneable {
 	}
 
 	/**
-	 * @return Returns the height.
+	 * @return Returns the height of the graphic zone.
 	 */
 	public int getHeight() {
 		return height;
 	}
 
 	/**
-	 * @param height The height to set.
+	 * @param height The height of the graphic zone to set.
 	 */
 	public void setHeight(int height) {
 		this.height = height;
 	}
 
-	public int getRealHeight() {
-		return dimension.height;
+	/**
+	 * @return Returns the width of the graphic zone.
+	 */
+	public int getWidth() {
+		return width;
 	}
 
-	public void setRealHeight(int height) {
-		dimension.height = height;
-	}
-
-	public int getRealWidth() {
-		return dimension.width;
-	}
-
-	public void setRealWidth(int width) {
-		dimension.width = width;
+	/**
+	 * @param width The width of the graphic zone to set.
+	 */
+	public void setWidth(int width) {
+		this.width = width;
 	}
 
 	/**
@@ -741,20 +762,6 @@ implements Cloneable {
 	 */
 	public void setUpperLimit(String upperLimit) {
 		this.upperLimit = Double.parseDouble(upperLimit);
-	}
-
-	/**
-	 * @return Returns the width.
-	 */
-	public int getWidth() {
-		return width;
-	}
-
-	/**
-	 * @param width The width to set.
-	 */
-	public void setWidth(int width) {
-		this.width = width;
 	}
 
 	/**

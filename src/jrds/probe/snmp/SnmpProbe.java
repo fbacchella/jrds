@@ -34,6 +34,7 @@ public abstract class SnmpProbe extends Probe {
 
 	private Map<OID, String> nameMap = null;
 	private SnmpRequester requester;
+	private int suffixLength = 1;
 
 	public SnmpProbe(RdsHost monitoredHost, ProbeDesc pd)
 	{
@@ -106,7 +107,8 @@ public abstract class SnmpProbe extends Probe {
 		Map<OID, Number> retValue = new HashMap<OID, Number>(snmpVars.size());
 		for(Map.Entry<OID, Object> e: ((Map<OID, Object> )snmpVars).entrySet()) {
 			OID oid = e.getKey();
-			oid.removeLast();
+			for(int i= 0; i < getSuffixLength(); i++)
+				oid.removeLast();
 			Object o = e.getValue();
 			if( o instanceof Number) {
 				retValue.put(oid, (Number)o);
@@ -137,6 +139,14 @@ public abstract class SnmpProbe extends Probe {
 	@Override
 	public long getUptime() {
 		return getSnmpStarter().getUptime();
+	}
+
+	public int getSuffixLength() {
+		return suffixLength;
+	}
+
+	public void setSuffixLength(int suffixLength) {
+		this.suffixLength = suffixLength;
 	}
 
 	

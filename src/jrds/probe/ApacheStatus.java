@@ -85,4 +85,5 @@ public class ApacheStatus extends HttpProbe implements UrlProbe {
 			setUptime(uptimeNumber.longValue());
 		return retValue;
 	}
+
 }

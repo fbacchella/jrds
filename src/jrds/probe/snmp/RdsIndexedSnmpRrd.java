@@ -31,7 +31,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 
 	String indexKey;
 	int indexKeyNum;
-	Collection indexAsString = null;
+	private String label;
 
 	static final SnmpRequester indexFinder = SnmpRequester.TABULAR;
 	static final SnmpRequester valueFinder = SnmpRequester.RAW;
@@ -54,13 +54,15 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 		return indexKey;
 	}
 			
-	public Set<OID> makeIndexed(Collection<OID> oids, Collection<String> indexes)
+	public Set<OID> makeIndexed(Collection<OID> oids, Collection<int[]> indexes)
 	{
 		Set<OID> oidToGet = new HashSet<OID>(oids.size() * indexes.size());
 		for(OID oidCurs: oids) {
-			for(String j: indexes) {
-				OID oidBuf = (OID) oidCurs.clone();
-				oidBuf.append(j);
+			for(int[] j: indexes) {
+				OID oidBuf = new OID(oidCurs); //(OID) oidCurs.clone();
+				for(int i = 0; i <j.length; i++) {
+					oidBuf.append(j[i]);
+				}
 				oidToGet.add(oidBuf);
 			}
 		}
@@ -71,42 +73,53 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 		return Collections.singleton(getPd().getIndexOid());
 	}
 	
-	public Collection<String> setIndexValue() 
+	public int getIndexPrefixLength() {
+		return getPd().getIndexOid().size();
+	}
+	
+	public Collection<int[]> setIndexValue() 
 	{
 		
-		Collection<String> indexAsString = null;
+		Collection<int[]> indexSubOid = null;
 		if(isUniq())
-			indexAsString = new ArrayList<String>(1);
+			indexSubOid = new ArrayList<int[]>(1);
 		else
-			indexAsString = new HashSet<String>();
+			indexSubOid = new HashSet<int[]>();
 		
-		Collection<OID> soidSet= getIndexSet();
+		Collection<OID> soidSet = getIndexSet();
 		try {
 			Map<OID, Object> somevars = indexFinder.doSnmpGet(getSnmpStarter(), soidSet);
 
 			boolean found = false;
 			
+			int newSuffixLength = 0;
 			for(OID tryoid: somevars.keySet()) {
 				String name = null;
 				if(tryoid != null)
 					name = somevars.get(tryoid).toString();
 				if(name != null && matchIndex(somevars.get(tryoid))) {
-					int index = tryoid.removeLast();
-					indexAsString.add(Integer.toString(index));
+					newSuffixLength = tryoid.size() - getIndexPrefixLength();
+					int[] index = new int[ newSuffixLength ];
+					for(int i = 0; i < index.length ; i++) {
+						index[i] = tryoid.get(i + getIndexPrefixLength());
+					}
+					indexSubOid.add(index);
 					found = true;
 				}
 				if(isUniq() && found)
 					break;
 			}
-			
-			if(! found) {
+			if(found) {
+				setSuffixLength(newSuffixLength);
+			}
+			else  {
 				logger.error("index for " + indexKey + " not found for " + this);
-				indexAsString = null;
+				indexSubOid = null;
 			}
 		} catch (IOException e) {
 			logger.error("index for " + indexKey + " not found for " + this + " because of: " + e);
 		}
-		return indexAsString;
+		return indexSubOid;
 	}
 
 	/**
@@ -129,7 +142,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	 */
 	public Set<OID> getOidSet() {
 		Set<OID> retValue = null;
-		Collection<String> indexAsString = setIndexValue();
+		Collection<int[]> indexAsString = setIndexValue();
 		if(indexAsString != null)
 			retValue = makeIndexed(getOidNameMap().keySet(), indexAsString);
 		return retValue;
@@ -140,5 +153,13 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	 */
 	public boolean isUniq() {
 		return this.getPd().isUniqIndex();
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 }
