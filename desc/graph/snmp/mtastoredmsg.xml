@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+  <name>mtaStoredMessages</name>
+  <graphName>mtastoredmsg</graphName>
+  <graphTitle>Mail stored messages on {1}</graphTitle>
+  <verticalLabel>messages</verticalLabel>
+  <add>
+    <name>mtaStoredMsg</name>
+     <graphType>area</graphType>
+    <legend>Stored Messages</legend>
+  </add>
+  <hosttree>
+    <pathelement>HOST</pathelement>
+    <pathelement>SERVICES</pathelement>
+    <pathstring>MAIL</pathstring>
+    <pathstring>Stored messages</pathstring>
+  </hosttree>
+  <viewtree>
+   <pathelement>SERVICES</pathelement>
+    <pathstring>MAIL</pathstring>
+    <pathelement>HOST</pathelement>
+    <pathstring>Stored messages</pathstring>
+   </viewtree>
+</graphdesc>
