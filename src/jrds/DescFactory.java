@@ -35,7 +35,7 @@ public class DescFactory extends DirXmlParser {
 	public final ProbeClassLoader probeLoader = new ProbeClassLoader(DescFactory.class.getClassLoader());
 	private final Logger logger = Logger.getLogger(DescFactory.class);
 	
-	DescFactory(ArgFactory af) {
+	public DescFactory(ArgFactory af) {
 		this.af = af;
 	}
 
