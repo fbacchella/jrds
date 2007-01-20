@@ -21,7 +21,6 @@ import org.apache.log4j.Logger;
 public class ProbeFactory {
 
 	private final Logger logger = Logger.getLogger(ProbeFactory.class);
-	final private List<String> argPackages = new ArrayList<String>(3);
 	final private List<String> probePackages = new ArrayList<String>(5);
 	private Map<String, ProbeDesc> probeDescMap;
 	private GraphFactory gf;
@@ -36,41 +35,8 @@ public class ProbeFactory {
 		this.gf = gf;
 		this.prop = prop;
 		this.legacymode = legacymode;
-		argPackages.add("java.lang.");
-		argPackages.add("java.net.");
-		argPackages.add("");
 
-		/*probePackages.add("jrds.probe.");
-		probePackages.add("jrds.probe.snmp.");
-		probePackages.add("jrds.probe.munins.");
-		probePackages.add("jrds.probe.rstat.");
-		probePackages.add("jrds.probe.jdbc.");*/
 		probePackages.add("");
-	}
-
-	/**
-	 * Create an objet providing the class name and a String argument. So the class must have
-	 * a constructor taking only a string as an argument.
-	 * @param className
-	 * @param value
-	 * @return
-	 */
-	public Object makeArg(String className, String value) {
-		Object retValue = null;
-		Class classType = resolvClass(className, argPackages);
-		if (classType != null) {
-			Class[] argsType = { String.class };
-			Object[] args = { value };
-
-			try {
-				Constructor theConst = classType.getConstructor(argsType);
-				retValue = theConst.newInstance(args);
-			}
-			catch (Exception ex) {
-				logger.warn("Error during of creation :" + className + ": ", ex);
-			}
-		}
-		return retValue;
 	}
 
 	/**
@@ -116,7 +82,6 @@ public class ProbeFactory {
 			logger.error("Probe named " + className + " not found");
 		}
 		
-//		logger.debug(retValue + " " + gf);
 		//Now we finish the initialization of classes
 		if(retValue != null) {
 			retValue.readProperties(prop);

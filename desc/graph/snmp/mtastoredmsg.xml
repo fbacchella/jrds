@@ -2,8 +2,8 @@
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
   <name>mtaStoredMessages</name>
-  <graphName>mtastoredmsg</graphName>
-  <graphTitle>Mail stored messages on {1}</graphTitle>
+  <graphName>mtastoredmsg-{2}</graphName>
+  <graphTitle>Mail stored messages on {2} on {1}</graphTitle>
   <verticalLabel>messages</verticalLabel>
   <add>
     <name>mtaStoredMsg</name>
@@ -14,12 +14,14 @@
     <pathelement>HOST</pathelement>
     <pathelement>SERVICES</pathelement>
     <pathstring>MAIL</pathstring>
+    <pathelement>INDEX</pathelement>
     <pathstring>Stored messages</pathstring>
   </hosttree>
   <viewtree>
    <pathelement>SERVICES</pathelement>
     <pathstring>MAIL</pathstring>
     <pathelement>HOST</pathelement>
+    <pathelement>INDEX</pathelement>
     <pathstring>Stored messages</pathstring>
    </viewtree>
 </graphdesc>

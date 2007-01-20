@@ -1,15 +1,21 @@
 //**************************************************************** 
-// Keep this copyright notice: 
-// This copy of the script is the property of the owner of the 
-// particular web site you were visiting.
-// Do not download the script's files from there.
-// For a free download and full instructions go to: 
-// http://www.treeview.net
+// You must keep this copyright notice:
+//
+// This script is Copyright (c) 2006 by Conor O'Mahony.
+// For inquiries, please email GubuSoft@GubuSoft.com.
+// GubuSoft is owned and operated by Conor O'Mahony.
+// Original author of TreeView script is Marcelino Martins.
+//
+// Do not download the script's files from here.  For a free 
+// download and full instructions go to the following site: 
+// http://www.TreeView.net
 //**************************************************************** 
 
- 
 // Log of changes: 
-//
+//      26 Sep 06 - Updated preLoadIcons function;
+//                  Fix small bugs or typos (in the Folder, InitializeFolder,
+//                  and blockStartHTML functions)
+//      14 Feb 06 - Re-brand as GubuSoft
 //      08 Jun 04 - Very small change to one error message
 //      21 Mar 04 - Support for folder.addChildren allows for much bigger trees
 //      12 May 03 - Support for Safari Beta 3
@@ -44,7 +50,6 @@ function Folder(folderDescription, hreference) //constructor
   this.navObj = 0;
   this.iconImg = 0; 
   this.nodeImg = 0;
-  this.isLastNode = 0;
   this.iconSrc = ICONPATH + "ftv2folderopen.gif";
   this.iconSrcClosed = ICONPATH + "ftv2folderclosed.gif";
   this.children = new Array;
@@ -84,7 +89,6 @@ function Folder(folderDescription, hreference) //constructor
  
 function initializeFolder(level, lastNode, leftSide) 
 { 
-  var j=0 
   var i=0       
   nc = this.nChildren 
    
@@ -547,7 +551,7 @@ function blockStartHTML(idprefix) {
   if (browserVersion == 2) 
     docW = "<layer "+ idParam + " top=" + doc.yPos + " visibility=show>"
   else if (browserVersion != 0)
-    docW = "<div " + idParam + " style='display:block; position:block;'>"
+    docW = "<div " + idParam + " style='display:block;'>"
      
   docW = docW + "<table border=0 cellspacing=0 cellpadding=0 width=100% >"
 
@@ -838,20 +842,25 @@ function oldGLnk(target, description, linkData)
 }
  
 function preLoadIcons() {
-	var auxImg
-	auxImg = new Image();
-	auxImg.src = ICONPATH + "ftv2vertline.gif";
-	auxImg.src = ICONPATH + "ftv2mlastnode.gif";
-	auxImg.src = ICONPATH + "ftv2mnode.gif";
-	auxImg.src = ICONPATH + "ftv2plastnode.gif";
-	auxImg.src = ICONPATH + "ftv2pnode.gif";
-	auxImg.src = ICONPATH + "ftv2blank.gif";
-	auxImg.src = ICONPATH + "ftv2lastnode.gif";
-	auxImg.src = ICONPATH + "ftv2node.gif";
-	auxImg.src = ICONPATH + "ftv2folderclosed.gif";
-	auxImg.src = ICONPATH + "ftv2folderopen.gif";
-	auxImg.src = ICONPATH + "ftv2doc.gif";
-}
+       arImageSrc = new Array (
+           "ftv2vertline.gif",
+           "ftv2mlastnode.gif",
+           "ftv2mnode.gif",
+           "ftv2plastnode.gif",
+           "ftv2pnode.gif",
+           "ftv2blank.gif",
+           "ftv2lastnode.gif",
+           "ftv2node.gif",
+           "ftv2folderclosed.gif",
+           "ftv2folderopen.gif",
+           "ftv2doc.gif"
+           )
+       arImageList = new Array ();
+       for (counter in arImageSrc) {
+           arImageList[counter] = new Image();
+           arImageList[counter].src = ICONPATH + arImageSrc[counter];
+       }
+   }
 
 //Open some folders for initial layout, if necessary
 function setInitialLayout() {

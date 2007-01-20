@@ -70,7 +70,11 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	}
 	
 	public Collection<OID> getIndexSet() {
-		return Collections.singleton(getPd().getIndexOid());
+		Collection<OID> retValue = null;
+		OID indexOid = getPd().getIndexOid();
+		if(indexOid != null)
+			retValue = Collections.singleton(indexOid);
+		return retValue;
 	}
 	
 	public int getIndexPrefixLength() {
@@ -87,37 +91,43 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 			indexSubOid = new HashSet<int[]>();
 		
 		Collection<OID> soidSet = getIndexSet();
-		try {
-			Map<OID, Object> somevars = indexFinder.doSnmpGet(getSnmpStarter(), soidSet);
+		if(soidSet == null || soidSet.size() == 0) {
+			OID suffixOid = new OID(indexKey);
+			indexSubOid = Collections.singleton(suffixOid.getValue());
+		}
+		else {
+			try {
+				Map<OID, Object> somevars = indexFinder.doSnmpGet(getSnmpStarter(), soidSet);
 
-			boolean found = false;
-			
-			int newSuffixLength = 0;
-			for(OID tryoid: somevars.keySet()) {
-				String name = null;
-				if(tryoid != null)
-					name = somevars.get(tryoid).toString();
-				if(name != null && matchIndex(somevars.get(tryoid))) {
-					newSuffixLength = tryoid.size() - getIndexPrefixLength();
-					int[] index = new int[ newSuffixLength ];
-					for(int i = 0; i < index.length ; i++) {
-						index[i] = tryoid.get(i + getIndexPrefixLength());
+				boolean found = false;
+
+				int newSuffixLength = 0;
+				for(OID tryoid: somevars.keySet()) {
+					String name = null;
+					if(tryoid != null)
+						name = somevars.get(tryoid).toString();
+					if(name != null && matchIndex(somevars.get(tryoid))) {
+						newSuffixLength = tryoid.size() - getIndexPrefixLength();
+						int[] index = new int[ newSuffixLength ];
+						for(int i = 0; i < index.length ; i++) {
+							index[i] = tryoid.get(i + getIndexPrefixLength());
+						}
+						indexSubOid.add(index);
+						found = true;
 					}
-					indexSubOid.add(index);
-					found = true;
+					if(isUniq() && found)
+						break;
 				}
-				if(isUniq() && found)
-					break;
+				if(found) {
+					setSuffixLength(newSuffixLength);
+				}
+				else  {
+					logger.error("index for " + indexKey + " not found for " + this);
+					indexSubOid = null;
+				}
+			} catch (IOException e) {
+				logger.error("index for " + indexKey + " not found for " + this + " because of: " + e);
 			}
-			if(found) {
-				setSuffixLength(newSuffixLength);
-			}
-			else  {
-				logger.error("index for " + indexKey + " not found for " + this);
-				indexSubOid = null;
-			}
-		} catch (IOException e) {
-			logger.error("index for " + indexKey + " not found for " + this + " because of: " + e);
 		}
 		return indexSubOid;
 	}

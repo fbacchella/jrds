@@ -616,7 +616,7 @@ implements Comparable {
 		root.appendChild(dsElement);
 		DsDef[] dss= getDsDefs();
 		HostsList hl = HostsList.getRootGroup();
-		GraphFactory gf = hl.getGraphFactory();
+		GraphFactory gf = new GraphFactory(false);
 		if (sorted)
 			Arrays.sort(dss, new Comparator<DsDef>() {
 				public int compare(DsDef arg0, DsDef arg1) {

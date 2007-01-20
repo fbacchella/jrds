@@ -1,0 +1,13 @@
+A:visited { color: rgb(0, 0, 238); }
+.tree {float: left; height:100%; 
+width: 300px; background-color:  #DDD; 
+margin: 5px;
+border: 1px solid black;
+padding: 5px;
+overflow: scroll;
+}
+#graphs {padding-left: 325px}
+.graphblock { position: relative; width: 700px} 
+.iconslist {position: absolute; top:0px; right:0px; width: 16px  }
+#hostSelect {float: right}
+.icon {cursor: pointer}

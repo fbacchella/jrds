@@ -9,6 +9,7 @@ package jrds;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +28,14 @@ public class GraphFactory {
 	private Map<String, GraphDesc> graphDescMap;
 	boolean legacymode = false;
 
+	public GraphFactory(boolean legacymode) {
+		graphPackages.add("jrds.graph.");
+		this.graphDescMap = new HashMap<String, GraphDesc>();
+		this.legacymode = legacymode;
+	}
+
 	/**
-	 * Private constructor
+	 * constructor
 	 * @param b 
 	 */
 	public GraphFactory(Map<String, GraphDesc> graphDescMap, boolean legacymode) {

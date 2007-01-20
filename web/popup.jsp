@@ -6,12 +6,25 @@
 <%@ page import="jrds.RdsGraph" %>
 <jsp:useBean id="jrdsBean" class="jrds.webapp.TreeJspBean" />
 <jsp:useBean id="period" class="jrds.webapp.ParamsBean"/>
-<%period.parseReq(request);%>
+<jsp:useBean id="graph" class="jrds.webapp.GraphBean"/>
+
+<%period.parseReq(request);
+graph.config(request, period);
+%>
 <html>
 
 	<head>
 		<meta http-equiv="content-type" content="text/html;charset=utf-8">
-		<title>Graph</title>
+		<title>JRDS</title>
+<link href="lib/calendar-win2k-1.css" rel="stylesheet" />
+			<script type="text/javascript" src="lib/ua.js"> </script>
+			<script type="text/javascript" src="lib/ftiens4.js"> </script>
+			<script type="text/javascript" src="lib/calendar.js"></script> 
+			<script type="text/javascript" src="lib/calendar-en.js"></script> 
+			<script type="text/javascript" src="lib/calendar-setup.js"></script> 
+			<script type="text/javascript" src="lib/jrdsdate.js"></script> 
+			<script type="text/javascript" src="lib/querystring.js"></script> 
+
 <link rel="stylesheet" type="text/css" href="lib/jrds.css" />
 <script type="text/javascript" src="lib/jrds.js" ></script>
 
@@ -19,17 +32,10 @@
 periodUrl="<jsp:getPropertyname="period" property="periodUrl" />";
 </script>
 
+
 	</head>
 
 	<body bgcolor="#ffffff">
-			<jsp:setProperty name="period" property="scale" value="7" /> 
-			<% jrdsBean.getGraphList(out, request, period); %>
-			<jsp:setProperty name="period" property="scale" value="9" /> 
-			<% jrdsBean.getGraphList(out, request, period); %>
-			<jsp:setProperty name="period" property="scale" value="11" /> 
-			<% jrdsBean.getGraphList(out, request, period); %>
-			<jsp:setProperty name="period" property="scale" value="16" /> 
-			<% jrdsBean.getGraphList(out, request, period); %>
+<% jrdsBean.getGraphList(out, request, period); %>
 	</body>
 </html>
-

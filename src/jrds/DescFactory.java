@@ -15,9 +15,11 @@ import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.Rule;
 import org.apache.log4j.Logger;
 import org.snmp4j.smi.OID;
+import org.xml.sax.Attributes;
 
 public class DescFactory extends DirXmlParser {
-	private Map<String, ProbeDesc> probesDesc = new HashMap<String, ProbeDesc>();
+	private ArgFactory af;
+	private Map<String, ProbeDesc> probesDescMap = new HashMap<String, ProbeDesc>();
 	private Map<String, GraphDesc> graphDescMap = new HashMap<String, GraphDesc>();
 	public class ProbeClassLoader extends URLClassLoader {
 		public ProbeClassLoader(ClassLoader parent) {
@@ -32,6 +34,10 @@ public class DescFactory extends DirXmlParser {
 
 	public final ProbeClassLoader probeLoader = new ProbeClassLoader(DescFactory.class.getClassLoader());
 	private final Logger logger = Logger.getLogger(DescFactory.class);
+	
+	DescFactory(ArgFactory af) {
+		this.af = af;
+	}
 
 	void init() {
 		addProbeDescDigester(digester);
@@ -52,7 +58,7 @@ public class DescFactory extends DirXmlParser {
 			@Override
 			public void end(String namespace, String name) throws Exception {
 				ProbeDesc pd = (ProbeDesc) digester.peek();
-				probesDesc.put(pd.getName(), pd);
+				probesDescMap.put(pd.getName(), pd);
 			}
 		});
 
@@ -74,8 +80,47 @@ public class DescFactory extends DirXmlParser {
 		Class[] params = new Class[] { Boolean.class};
 		digester.addCallMethod("probedesc/uniq", "setUniqIndex", 0, params);
 
-		params = new Class[] { String.class};
-		digester.addCallMethod("probedesc/index", "setIndexOid", 0, params);
+		digester.addRule("probedesc/index", new Rule() {
+			@Override
+			public void body(String namespace, String name, String text) throws Exception {
+				if(text.trim().length() > 0) {
+					Object o = null;
+					for(int i = 0; i< digester.getCount() && !((o = digester.peek(i)) instanceof ProbeDesc) ; i++);
+					if(o instanceof ProbeDesc ) {
+						ProbeDesc pd = (ProbeDesc) o;
+						pd.setIndexOid(text);
+					}
+					else {
+						logger.error("No probe desc on stack");
+					}
+				}
+
+			}
+
+		});
+
+		digester.addRule("probedesc/defaultargs/arg", new Rule() {
+			@SuppressWarnings("unchecked")
+			public void begin(String namespace, String name, Attributes attributes) throws Exception {
+				String type = attributes.getValue("type");
+				String value = attributes.getValue("value");
+				Object arg = af.makeArg(type, value);
+				if(arg != null) {
+					Object o = null;
+					for(int i = 0; i< digester.getCount() && !((o = digester.peek(i)) instanceof ProbeDesc) ; i++);
+					if(o instanceof ProbeDesc ) {
+						ProbeDesc pd = (ProbeDesc) o;
+						pd.addDefaultArg(arg);
+					}
+					else {
+						logger.error("No probe desc on stack");
+					}
+				}
+				else {
+					logger.error("Object of type " + type  + " and value" + value + " can't be instancied");
+				}
+			}
+		});
 
 		digester.addObjectCreate("probedesc/ds", HashMap.class);
 		digester.addSetNext("probedesc/ds", "add");
@@ -200,8 +245,8 @@ public class DescFactory extends DirXmlParser {
 
 	}
 
-	public Map<String, ProbeDesc> getProbesDesc() {
-		return probesDesc;
+	public Map<String, ProbeDesc> getProbesDescMap() {
+		return probesDescMap;
 	}
 
 	public Map<String, GraphDesc> getGraphDescMap() {

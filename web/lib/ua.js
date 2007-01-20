@@ -1,10 +1,5 @@
 /*
- * $Log$
- * Revision 1.1  2005/07/17 23:13:08  fbacchella
- * Too much differences, lost track.
- * A new factory for jrobin
- * a new javascript for the tree
- *
+ * $Log: ua.js,v $
  * Revision 1.9  2002/07/22 14:06:21  bc6ix
  * fix license path, change version reporting to use 2 digits for each level
  *

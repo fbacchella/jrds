@@ -6,68 +6,31 @@
 <%@ page import="jrds.RdsGraph" %>
 <jsp:useBean id="jrdsBean" class="jrds.webapp.TreeJspBean" />
 <jsp:useBean id="period" class="jrds.webapp.ParamsBean"/>
-<%period.parseReq(request);%>
+<jsp:useBean id="graph" class="jrds.webapp.GraphBean"/>
+
+<%period.parseReq(request);
+graph.config(request, period);
+%>
 <html>
 
 	<head>
 		<meta http-equiv="content-type" content="text/html;charset=utf-8">
 		<title>JRDS</title>
-		<style type="text/css"><!--
-A:visited { color: rgb(0, 0, 238); }
-.tree {float: left; height:100%; 
-width: 300px; background-color:  #DDD; 
-margin: 5px;
-border: 1px solid black;
-padding: 5px;
-overflow: scroll;
-}
-#graphs {padding-left: 325px}
-.graph {display: block}
-#hostSelect {float: right}
---></style>
-<link href="lib/calendar-win2k-1.css" rel="stylesheet">
+<link href="lib/calendar-win2k-1.css" rel="stylesheet" />
 			<script type="text/javascript" src="lib/ua.js"> </script>
 			<script type="text/javascript" src="lib/ftiens4.js"> </script>
 			<script type="text/javascript" src="lib/calendar.js"></script> 
 			<script type="text/javascript" src="lib/calendar-en.js"></script> 
 			<script type="text/javascript" src="lib/calendar-setup.js"></script> 
-			<script type="text/javascript" src="lib/jrdsdate.js"></script> 
-			<script type="text/javascript" src="lib/querystring.js"></script> 
-<script type="text/javascript">
-//the query string analyzer
-qs = new Querystring();
+			<script type="text/javascript" src="lib/querystring.js"></script>
 
-</script>
-		<script type="text/javascript"><!--
-function refresh_onClick()
-{
-	window.location.reload( false );
-}
-
-function history_onClick()
-{
-	var historyWin = window.open("history.jsp" + document.location.search, "history.jsp" + document.location.search, "menubar=no,status=no,resizable=yes");
-}
-
-function keep_onClick()
-{
-	var historyWin = window.open(window.location, qs.get("id", 0).replace("-","_"), "menubar=no,status=no,resizable=yes");
-}
-
-function download_onClick()
-{
-	var historyWin = window.open("download" + document.location.search, "download" + document.location.search, "menubar=no,status=no");
-}
-
-function details_onClick()
-{
-	var historyWin = window.open("<%=jrdsBean.getProbeUrl(request, period) %>", "<%=jrdsBean.getProbeUrl(request, period) %>", "resizable=yes,scrollbars=yes");
-}
-//-->
+<script type="text/javascript" >
+periodUrl="<jsp:getPropertyname="period" property="periodUrl" />";
 </script>
 
-			<script type="text/javascript">
-</script>
+<link rel="stylesheet" type="text/css" href="lib/jrds.css" />
+<script type="text/javascript" src="lib/jrds.js" ></script>
+
 	</head>
 
 	<body bgcolor="#ffffff">
@@ -96,9 +59,7 @@ STARTALLOPEN = 0
 		<div id="content">
 			<input class="btnlist" onclick="refresh_onClick();" type="button" name="refreshButton" value="Refresh" tabindex="0">
 			<input class="btnlist" onclick="keep_onClick();" type="button" name="keepButton" value="Keep" tabindex="1">
-			<input class="btnlist" onclick="history_onClick();" type="button" name="HistoryButton" value="History" tabindex="2">
 			<input class="btnlist" onclick="download_onClick();" type="button" name="DownloadButton" value="Download values" tabindex="3">
-			<input class="btnlist" onclick="details_onClick();" type="button" name="DetailsButton" value="Probe's details" tabindex="3">
 			<form  id="select" name="dateForm" action="index.jsp" method="GET">
 				<input name="id" type="hidden" value=""/>
 				<input name="filter" type="hidden" value=""/>

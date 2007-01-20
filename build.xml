@@ -170,7 +170,7 @@
 	</target>
 	
 	<target name="test" depends="appjar">
-		<java classname="jrds.standalone.TestSumGraph" fork="true">
+		<java classname="jrds.standalone.TestBackEnd" fork="true">
 			<classpath>
 				<pathelement location="${build.home}/jrds.jar"/>
 				<path refid="project.classpath"/>

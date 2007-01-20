@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -75,6 +76,7 @@ public class ProbeDesc {
 	private boolean uniqIndex = false;
 	private Class probeClass = null;
 	private String specific = null;
+	private List<Object> defaultsArgs = null;
 
 
 	private final class DsDesc {
@@ -346,6 +348,8 @@ public class ProbeDesc {
 		if (probeClass != null) {
 			Object o = null;
 			try {
+				if(defaultsArgs != null && constArgs != null && constArgs.size() <= 0)
+					constArgs = defaultsArgs;
 				Class[] constArgsType = new Class[constArgs.size()];
 				Object[] constArgsVal = new Object[constArgs.size()];
 				int index = 0;
@@ -422,7 +426,7 @@ public class ProbeDesc {
 		Element nameElement = document.createElement("name");
 		nameElement.appendChild(document.createTextNode(c.getSimpleName()));
 		root.appendChild(nameElement);
-		
+
 		Element probeNamElement = document.createElement("probeName");
 		probeNamElement.appendChild(document.createTextNode(probeName));
 		root.appendChild(probeNamElement);
@@ -445,13 +449,13 @@ public class ProbeDesc {
 				root.appendChild(uniqElement);
 			}
 		}
-		
-		
+
+
 		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
 			DsDesc ds = e.getValue();
 			Element dsElement = document.createElement("ds");
 			root.appendChild(dsElement);
-			
+
 			Element dsNameElement = document.createElement("dsName");
 			dsElement.appendChild(dsNameElement);
 			dsNameElement.appendChild(document.createTextNode(e.getKey()));
@@ -461,7 +465,7 @@ public class ProbeDesc {
 				dsTypeElement.appendChild(document.createTextNode(ds.dsType.toString().toLowerCase()));
 				dsElement.appendChild(dsTypeElement);
 			}
-			
+
 			if(! Double.isNaN(ds.maxValue)) {
 				Element upperLimitElement = document.createElement("upperLimit");
 				upperLimitElement.appendChild(document.createTextNode(Double.toString(ds.maxValue)));
@@ -484,7 +488,7 @@ public class ProbeDesc {
 				dsElement.appendChild(keyElement);
 			}
 		}
-		
+
 		Element graphElement = document.createElement("graphs");
 		root.appendChild(graphElement);
 		for(Object o: this.graphClasses) {
@@ -499,15 +503,15 @@ public class ProbeDesc {
 				graphNameElement.appendChild(document.createTextNode(graphName));
 			}
 		}
-	
+
 		FileOutputStream fos = new FileOutputStream("desc/autoprobe/" + c.getSimpleName().toLowerCase() + ".xml");
-//		 XERCES 1 or 2 additionnal classes.
+//		XERCES 1 or 2 additionnal classes.
 		OutputFormat of = new OutputFormat("XML","ISO-8859-1",true);
 		of.setIndent(1);
 		of.setIndenting(true);
 		of.setDoctype("-//jrds//DTD Graph Description//EN","urn:jrds:graphdesc");
 		XMLSerializer serializer = new XMLSerializer(fos,of);
-//		 As a DOM Serializer
+//		As a DOM Serializer
 		serializer.asDOMSerializer();
 		serializer.serialize( document.getDocumentElement() );
 	}
@@ -518,5 +522,16 @@ public class ProbeDesc {
 
 	public void setSpecific(String specific) {
 		this.specific = specific;
+	}
+
+	public void addDefaultArg(Object o){
+		if(defaultsArgs == null) 
+			defaultsArgs = new LinkedList<Object>();
+		defaultsArgs.add(o);
+		logger.debug("Adding " + o + " to default args");
+	}
+
+	public List<Object> getDefaultArgs() {
+		return defaultsArgs;
 	}
 }

@@ -30,6 +30,7 @@ public class HostConfigParser  extends DirXmlParser {
 	private final Logger logger = Logger.getLogger(HostConfigParser.class);
 	private Map<String, Macro> macroList = new HashMap<String, Macro>();
 	ProbeFactory pf;
+	ArgFactory af;
 
 	private final class Tag {
 		String tag;
@@ -43,9 +44,10 @@ public class HostConfigParser  extends DirXmlParser {
 		}
 	};
 
-	public HostConfigParser(ProbeFactory pf) {
+	public HostConfigParser(ProbeFactory pf, ArgFactory af) {
 		super();
 		this.pf = pf;
+		this.af = af;
 	}
 
 	void init() {
@@ -228,7 +230,7 @@ public class HostConfigParser  extends DirXmlParser {
 			public void begin(String namespace, String name, Attributes attributes) throws Exception {
 				String type = attributes.getValue("type");
 				String value = attributes.getValue("value");
-				Object arg = pf.makeArg(type, value);
+				Object arg = af.makeArg(type, value);
 				if(arg != null) {
 					Object o = null;
 					for(int i = 0; i< digester.getCount() && !((o = digester.peek(i)) instanceof List) ; i++);

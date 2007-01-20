@@ -51,15 +51,12 @@ public class HostsList {
 	private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
 	private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
 	private final Renderer renderer = new Renderer(50);
-	GraphFactory gf;
-	ProbeFactory pf;
 	private int numCollectors = 1;
 	private int resolution;
 	private String rrdDir;
 	private String tmpdir;
 	private int timeout;
 	private boolean started = false;
-
 	/**
 	 *  
 	 */
@@ -100,14 +97,16 @@ public class HostsList {
 		rrdDir = pm.rrddir;
 		tmpdir = pm.tmpdir;
 
-		DescFactory df = new DescFactory();
+		ArgFactory af= new ArgFactory();
+		DescFactory df = new DescFactory(af);
+		GraphFactory gf = new GraphFactory(df.getGraphDescMap(), pm.legacymode);
+		ProbeFactory pf = new ProbeFactory(df.getProbesDescMap(), gf, pm, pm.legacymode);
 
 		try {
 			df.importDescUrl(DescFactory.class.getResource("/probe"));
 			df.importDescUrl(DescFactory.class.getResource("/graph"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.fatal("Do descriptions available:", e);
 		}
 
 		if(! "".equals(pm.libspath)) {
@@ -126,13 +125,11 @@ public class HostsList {
 			}
 		}
 
-		gf = new GraphFactory(df.getGraphDescMap(), pm.legacymode);
-		pf = new ProbeFactory(df.getProbesDesc(), gf, pm, pm.legacymode);
-		HostConfigParser hp = new HostConfigParser(pf);
+		HostConfigParser hp = new HostConfigParser(pf,af );
 
 		List<String> graphsName = new ArrayList<String>(df.getGraphDescMap().keySet());
 		logger.debug("Graphs :" + graphsName);
-		List<String> probesName = new ArrayList<String>(df.getProbesDesc().keySet());
+		List<String> probesName = new ArrayList<String>(df.getProbesDescMap().keySet());
 		Collections.sort(probesName);
 		logger.debug("Probes: " + probesName);
 		if(pm.configdir != null)
@@ -213,9 +210,16 @@ public class HostsList {
 		}
 		tpool.shutdown();
 		try {
-			tpool.awaitTermination(resolution - 10, TimeUnit.SECONDS);
+			tpool.awaitTermination(resolution - 60, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			logger.info("Collect interrupted");
+		}
+		if( ! tpool.isTerminated()) {
+			List<Runnable> timedOut = tpool.shutdownNow();
+			logger.warn("Still " + timedOut.size() + " waiting probes: ");
+			for(Runnable r: timedOut) {
+				logger.warn(r.toString());
+			}
 		}
 		Date end = new Date();
 		long duration = end.getTime() - start.getTime();
@@ -346,13 +350,4 @@ public class HostsList {
 	public boolean isStarted() {
 		return started;
 	}
-
-	public GraphFactory getGraphFactory() {
-		return gf;
-	}
-
-	public ProbeFactory getProbeFactory() {
-		return pf;
-	}
-
 }

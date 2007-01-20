@@ -3,37 +3,41 @@
 <probedesc>
     <name>sendmailSnmp</name>
     <probeName>sendmailsnmp</probeName>
- 	<probeClass>jrds.probe.snmp.Raw</probeClass>
-    <snmpRequester>raw</snmpRequester>
+	<probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
+	<index />
+	<uniq>true</uniq>
+	<defaultargs>
+		<arg type="String" value="1" />
+	</defaultargs>
     <ds>
         <dsName>mtaReceivedMsg</dsName>
         <dsType>counter</dsType>
-        <oid>.1.3.6.1.2.1.28.1.1.1.1</oid>
+        <oid>.1.3.6.1.2.1.28.1.1.1</oid>
     </ds>
     <ds>
         <dsName>mtaStoredMsg</dsName>
         <dsType>gauge</dsType>
-        <oid>.1.3.6.1.2.1.28.1.1.2.1</oid>
+        <oid>.1.3.6.1.2.1.28.1.1.2</oid>
     </ds>
     <ds>
         <dsName>mtaTransmittedMsg</dsName>
         <dsType>counter</dsType>
-        <oid>.1.3.6.1.2.1.28.1.1.3.1</oid>
+        <oid>.1.3.6.1.2.1.28.1.1.3</oid>
     </ds>
     <ds>
         <dsName>mtaReceivedVolume</dsName>
         <dsType>counter</dsType>
-        <oid>.1.3.6.1.2.1.28.1.1.4.1</oid>
+        <oid>.1.3.6.1.2.1.28.1.1.4</oid>
     </ds>
     <ds>
         <dsName>mtaStoredVolume</dsName>
         <dsType>gauge</dsType>
-        <oid>.1.3.6.1.2.1.28.1.1.5.1</oid>
+        <oid>.1.3.6.1.2.1.28.1.1.5</oid>
     </ds>
     <ds>
         <dsName>mtaTransmittedVolume</dsName>
         <dsType>counter</dsType>
-        <oid>.1.3.6.1.2.1.28.1.1.6.1</oid>
+        <oid>.1.3.6.1.2.1.28.1.1.6</oid>
     </ds>
     <graphs>
 		<name>mtaVolume</name>
