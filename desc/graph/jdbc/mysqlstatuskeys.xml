@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+  <name>MysqlStatusKeysActivity</name>
+  <graphName>mysqlstatuskeysactivity-{3}</graphName>
+  <graphTitle>keys Activity on {3}</graphTitle>
+  <verticalLabel>number/s</verticalLabel>
+  <add>
+    <name>Key_write_requests</name>
+	<graphType>area</graphType>
+	<legend>Key write requests</legend>
+  </add>
+  <add>
+    <name>Key_writes</name>
+	<graphType>area</graphType>
+	<legend>Key writes</legend>
+  </add>
+  <add>
+    <name>Key_read_requests</name>
+    <reversed>true</reversed>
+	<graphType>area</graphType>
+	<legend>Key read requests</legend>
+  </add>
+  <add>
+    <name>Key_reads</name>
+    <reversed>true</reversed>
+	<graphType>area</graphType>
+	<legend>Key reads</legend>
+  </add>
+  <hosttree>
+    <pathelement>HOST</pathelement>
+    <pathelement>SERVICES</pathelement>
+    <pathelement>URL</pathelement>
+    <pathstring>Keys activity</pathstring>
+  </hosttree>
+  <viewtree>
+    <pathelement>SERVICES</pathelement>
+    <pathstring>Mysql</pathstring>
+    <pathelement>URL</pathelement>
+    <pathstring>Keys activity</pathstring>
+  </viewtree>
+</graphdesc>
