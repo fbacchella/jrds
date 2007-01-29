@@ -173,9 +173,10 @@ public class HostsList {
 		hostList.add(newhost);
 	}
 
-	public void collectAll() throws IOException {
+	public void collectAll() {
 		logger.debug("One collect was launched");
 		Date start = new Date();
+		try {
 		starters.startCollect();
 		final Object counter = new Object() {
 			int i = 0;
@@ -213,13 +214,23 @@ public class HostsList {
 		}
 		tpool.shutdown();
 		try {
-			tpool.awaitTermination(resolution - 10, TimeUnit.SECONDS);
+			tpool.awaitTermination(resolution - 60, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			logger.info("Collect interrupted");
 		}
+		starters.stopCollect();
+        if( ! tpool.isTerminated()) {
+        	List<Runnable> timedOut = tpool.shutdownNow();
+            logger.warn("Still " + timedOut.size() + " waiting probes: ");
+            for(Runnable r: timedOut) {
+            	logger.warn(r.toString());
+             }
+        }
+		} catch (RuntimeException e) {
+			logger.error("problem while collecting data: ", e);
+		}							
 		Date end = new Date();
 		long duration = end.getTime() - start.getTime();
-		starters.stopCollect();
 		System.gc();
 		logger.info("Collect started at "  + start + " ran for " + duration + "ms");							
 	}
