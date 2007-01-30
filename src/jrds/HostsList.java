@@ -106,7 +106,7 @@ public class HostsList {
 			df.importDescUrl(DescFactory.class.getResource("/probe"));
 			df.importDescUrl(DescFactory.class.getResource("/graph"));
 		} catch (IOException e) {
-			logger.fatal("Do descriptions available:", e);
+			logger.fatal("No descriptions available:", e);
 		}
 
 		if(! "".equals(pm.libspath)) {
@@ -170,62 +170,66 @@ public class HostsList {
 		hostList.add(newhost);
 	}
 
-	public void collectAll() throws IOException {
+	public void collectAll() {
 		logger.debug("One collect was launched");
 		Date start = new Date();
-		starters.startCollect();
-		final Object counter = new Object() {
-			int i = 0;
-			@Override
-			public String toString() {
-				return Integer.toString(i++);
-			}
-
-		};
-		ExecutorService tpool =  Executors.newFixedThreadPool(numCollectors, 
-				new ThreadFactory() {
-			public Thread newThread(Runnable r) {
-				Thread t = new Thread(r, "CollectorThread" + counter);
-				t.setDaemon(true);
-				logger.debug("New thread name:" + t.getName());
-				return t;
-			}
-		}
-		);
-		for(final RdsHost oneHost: hostList) {
-			logger.debug("Collect all stats for host " + oneHost.getName());
-			Runnable runCollect = new Runnable() {
-				private RdsHost host = oneHost;
-
-				public void run() {
-					host.collectAll();
-				}
-			};
-			try {
-				tpool.execute(runCollect);
-			}
-			catch(RejectedExecutionException ex) {
-				logger.debug("collector thread dropped for host " + oneHost.getName());
-			}
-		}
-		tpool.shutdown();
 		try {
-			tpool.awaitTermination(resolution - 60, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			logger.info("Collect interrupted");
-		}
-		if( ! tpool.isTerminated()) {
-			List<Runnable> timedOut = tpool.shutdownNow();
-			logger.warn("Still " + timedOut.size() + " waiting probes: ");
-			for(Runnable r: timedOut) {
-				logger.warn(r.toString());
+			starters.startCollect();
+			final Object counter = new Object() {
+				int i = 0;
+				@Override
+				public String toString() {
+					return Integer.toString(i++);
+				}
+
+			};
+			ExecutorService tpool =  Executors.newFixedThreadPool(numCollectors, 
+					new ThreadFactory() {
+				public Thread newThread(Runnable r) {
+					Thread t = new Thread(r, "CollectorThread" + counter);
+					t.setDaemon(true);
+					logger.debug("New thread name:" + t.getName());
+					return t;
+				}
 			}
-		}
+			);
+			for(final RdsHost oneHost: hostList) {
+				logger.debug("Collect all stats for host " + oneHost.getName());
+				Runnable runCollect = new Runnable() {
+					private RdsHost host = oneHost;
+
+					public void run() {
+						host.collectAll();
+					}
+				};
+				try {
+					tpool.execute(runCollect);
+				}
+				catch(RejectedExecutionException ex) {
+					logger.debug("collector thread dropped for host " + oneHost.getName());
+				}
+			}
+			tpool.shutdown();
+			try {
+				tpool.awaitTermination(resolution - 60, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				logger.info("Collect interrupted");
+			}
+			starters.stopCollect();
+			if( ! tpool.isTerminated()) {
+				List<Runnable> timedOut = tpool.shutdownNow();
+				logger.warn("Still " + timedOut.size() + " waiting probes: ");
+				for(Runnable r: timedOut) {
+					logger.warn(r.toString());
+				}
+			}
+		} catch (RuntimeException e) {
+			logger.error("problem while collecting data: ", e);
+		}							
 		Date end = new Date();
 		long duration = end.getTime() - start.getTime();
-		starters.stopCollect();
 		System.gc();
-		logger.info("Collect started at "  + start + " ran for " + duration + "ms");							
+		logger.info("Collect started at "  + start + " ran for " + duration + "ms");
 	}
 
 	public void graphAll(Date startDate, Date endDate) {

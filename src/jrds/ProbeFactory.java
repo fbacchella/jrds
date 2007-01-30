@@ -30,7 +30,7 @@ public class ProbeFactory {
 	 * Private constructor
 	 * @param b 
 	 */
-	ProbeFactory(Map<String, ProbeDesc> probeDescMap, GraphFactory gf, Properties prop, boolean legacymode) {
+	public ProbeFactory(Map<String, ProbeDesc> probeDescMap, GraphFactory gf, Properties prop, boolean legacymode) {
 		this.probeDescMap = probeDescMap;
 		this.gf = gf;
 		this.prop = prop;

@@ -23,7 +23,7 @@ public class ArgFactory {
 
 	final private List<String> argPackages = new ArrayList<String>(3);
 
-	ArgFactory() {
+	public ArgFactory() {
 		argPackages.add("java.lang.");
 		argPackages.add("java.net.");
 		argPackages.add("");
@@ -69,6 +69,5 @@ public class ArgFactory {
 			logger.warn("Class " + name + " not found");
 		return retValue;
 	}
-
 
 }

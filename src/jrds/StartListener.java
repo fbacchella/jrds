@@ -1,7 +1,6 @@
 package jrds;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -60,11 +59,7 @@ public class StartListener implements ServletContextListener {
 				
 				TimerTask collector = new TimerTask () {
 					public void run() {
-						try {
-							HostsList.getRootGroup().collectAll();
-						} catch (IOException e) {
-							logger.error("Unable to launch collect: ", e);
-						}
+						HostsList.getRootGroup().collectAll();
 					}
 				};
 				collectTimer.schedule(collector, 5000L, HostsList.getRootGroup().getResolution() * 1000L);

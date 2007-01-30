@@ -5,26 +5,36 @@
   <graphName>mysqlstatuskeysactivity-{3}</graphName>
   <graphTitle>keys Activity on {3}</graphTitle>
   <verticalLabel>number/s</verticalLabel>
+	<add>
+		<legend>Keys written</legend>
+	</add>
   <add>
     <name>Key_write_requests</name>
 	<graphType>area</graphType>
+	  <color>blue</color>
 	<legend>Key write requests</legend>
   </add>
   <add>
     <name>Key_writes</name>
-	<graphType>area</graphType>
+	<graphType>line</graphType>
+	  <color>red</color>
 	<legend>Key writes</legend>
   </add>
+	<add>
+		<legend>Keys read</legend>
+	</add>
   <add>
     <name>Key_read_requests</name>
     <reversed>true</reversed>
 	<graphType>area</graphType>
+	  <color>green</color>
 	<legend>Key read requests</legend>
   </add>
   <add>
     <name>Key_reads</name>
     <reversed>true</reversed>
-	<graphType>area</graphType>
+	<graphType>line</graphType>
+	  <color>red</color>
 	<legend>Key reads</legend>
   </add>
   <hosttree>

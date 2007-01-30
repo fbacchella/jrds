@@ -320,7 +320,8 @@ implements Comparable {
 
 
 	/**
-	 * Store the values on the rrd backend.
+	 * Collect a value and store it in a rrd Sample.
+	 * it check if the probe is started.
 	 * Overiding should be avoided.
 	 * @param oneSample
 	 */

@@ -23,8 +23,8 @@ import org.snmp4j.log.Log4jLogFactory;
  * @version $Revision: $
  */
 public class JrdsLoggerConfiguration {
-	static private final String APPENDER = "jrds";
-	static private final String DEFAULTLOGFILE = ConsoleAppender.SYSTEM_ERR;
+	static public final String APPENDER = "jrds";
+	static public final String DEFAULTLOGFILE = ConsoleAppender.SYSTEM_ERR;
 
 	static public void initLog4J() {
 		putAppender(new ConsoleAppender(new org.apache.log4j.SimpleLayout(), DEFAULTLOGFILE));

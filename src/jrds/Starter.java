@@ -69,8 +69,8 @@ public abstract class Starter {
 	}
 	public void doStop() {
 		if(started) {
-			stop();
 			started = false;
+			stop();
 		}
 	}
 	public boolean start() {

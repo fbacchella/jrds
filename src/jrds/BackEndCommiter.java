@@ -30,7 +30,7 @@ public class BackEndCommiter {
 	private BackEndCommiter() {
 		createSyncTask(syncPeriod);
 	}
-	
+
 	private void createSyncTask(int syncPeriod) {
 		TimerTask syncTask = new TimerTask() {
 			public void run() {
@@ -42,22 +42,22 @@ public class BackEndCommiter {
 		};
 		syncTimer.schedule(syncTask, syncPeriod * 1000L, syncPeriod * 1000L);
 	}
-	
-	static public BackEndCommiter getInstance() {
+
+	static public synchronized BackEndCommiter getInstance() {
 		if(instance == null) {
 			instance = new BackEndCommiter();
 		}
 		return instance;
 	}
-	
+
 	public void addBackEnd(RrdCachedFileBackend be) {
 		backEndSet.add(be);
 	}
-	
+
 	public void removeBackEnd(RrdCachedFileBackend be) {
 		backEndSet.remove(be);
 	}
-	
+
 	/**
 	 * @return Returns the syncPeriod.
 	 */
@@ -70,5 +70,14 @@ public class BackEndCommiter {
 	public static void setSyncPeriod(int syncPeriod) {
 		instance.syncPeriod = syncPeriod;
 	}
-	
+
+	public static synchronized void commit() {
+		if(instance != null) {
+			Collection<RrdCachedFileBackend> bes = instance.backEndSet;
+			synchronized(bes) {
+				for(RrdCachedFileBackend o: bes)
+					o.sync();
+			}
+		}
+	}
 }

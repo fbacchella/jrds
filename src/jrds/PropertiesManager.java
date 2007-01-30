@@ -158,6 +158,7 @@ public class PropertiesManager extends Properties {
 		Locale.setDefault(new Locale("POSIX"));
 	}
 
+
 	public String configdir;
 	public String urlpngroot;
 	public String rrddir;

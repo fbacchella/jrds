@@ -45,24 +45,23 @@ public abstract class DirXmlParser {
 	Digester digester = new Digester() {
 		@Override
 		public void error(SAXParseException exception) throws SAXException {
-	        /*logger.error("Parse Error at line " + exception.getLineNumber() +
+	        logger.error("Parse error at line " + exception.getLineNumber() +
 	                " column " + exception.getColumnNumber() + ": " +
-	                exception.getMessage() + " for " + getXMLReader());*/
-			throw exception;
+	                exception.getMessage() + " for " + getXMLReader());
 		}
 
 		@Override
 		public void fatalError(SAXParseException exception) throws SAXException {
-	        log.error("Parse Fatal Error at line " + exception.getLineNumber() +
+	        log.error("Parse fatal error at line " + exception.getLineNumber() +
 	                " column " + exception.getColumnNumber() + ": " +
-	                exception.getMessage(), exception);
+	                exception.getMessage());
 		}
 
 		@Override
 		public void warning(SAXParseException exception) throws SAXException {
-            log.warn("Parse Warning Error at line " + exception.getLineNumber() +
+            log.warn("Parse warning at line " + exception.getLineNumber() +
                     " column " + exception.getColumnNumber() + ": " +
-                    exception.getMessage(), exception);
+                    exception.getMessage());
 		}
 		
 	};
