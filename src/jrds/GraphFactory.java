@@ -9,6 +9,7 @@ package jrds;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +28,14 @@ public class GraphFactory {
 	private Map<String, GraphDesc> graphDescMap;
 	boolean legacymode = false;
 
+	public GraphFactory(boolean legacymode) {
+		graphPackages.add("jrds.graph.");
+		this.graphDescMap = new HashMap<String, GraphDesc>();
+		this.legacymode = legacymode;
+	}
+
 	/**
-	 * Private constructor
+	 * Constructor
 	 * @param b 
 	 */
 	public GraphFactory(Map<String, GraphDesc> graphDescMap, boolean legacymode) {
@@ -36,7 +43,7 @@ public class GraphFactory {
 		this.graphDescMap = graphDescMap;
 		this.legacymode = legacymode;
 	}
-	
+
 	public void addGraphDesc(GraphDesc gd) {
 		if( ! graphDescMap.containsKey(gd.getName()))
 			graphDescMap.put(gd.getName(), gd);
@@ -57,7 +64,7 @@ public class GraphFactory {
 	 */
 	public final RdsGraph makeGraph(Object className, Probe probe) {
 		RdsGraph retValue = null;
-		
+
 		//Simple case, the handler is already known
 		if(graphDescMap.containsKey(className)) {
 			GraphDesc gd = (GraphDesc) graphDescMap.get(className);
@@ -67,12 +74,12 @@ public class GraphFactory {
 		//We only need to instanciate it
 		else if (legacymode && className instanceof Class) {
 			Class graphClass = (Class) className;
-			
+
 			try {
 				if (RdsGraph.class.isAssignableFrom(graphClass)) {
 					Class[] probeClassArray = new Class[] {Probe.class};
 					Object[] args = new Object[] {probe};
-					
+
 					Constructor co = graphClass.getConstructor(probeClassArray);
 					retValue = (RdsGraph) co.newInstance(args);
 				}
@@ -102,5 +109,5 @@ public class GraphFactory {
 		}
 		return retValue;
 	}
-	
+
 }

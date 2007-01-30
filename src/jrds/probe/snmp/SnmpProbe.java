@@ -131,7 +131,7 @@ public abstract class SnmpProbe extends Probe {
 
 	@Override
 	public boolean isStarted() {
-		return getSnmpStarter().isStarted();
+		return super.isStarted() && getSnmpStarter().isStarted();
 	}
 
 	@Override

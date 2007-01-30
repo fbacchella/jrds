@@ -126,7 +126,6 @@ public class SnmpVars extends HashMap<OID, Object> {
 	private Object convertVar(Variable valueAsVar) {
 		Object retvalue = null;
 		if (valueAsVar != null) {
-			int type = valueAsVar.getSyntax();
 			if( valueAsVar instanceof OID) {
 				retvalue = valueAsVar;
 			}
@@ -156,7 +155,7 @@ public class SnmpVars extends HashMap<OID, Object> {
 				retvalue  = ((IpAddress)valueAsVar).getInetAddress();
 			}
 			else {
-				logger.warn("Unknown syntax " + Variable.getSyntaxString(type));
+				logger.warn("Unknown syntax " + valueAsVar.getSyntaxString());
 			}
 		}
 		return retvalue;

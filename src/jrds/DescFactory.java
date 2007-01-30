@@ -17,7 +17,8 @@ import org.apache.log4j.Logger;
 import org.snmp4j.smi.OID;
 
 public class DescFactory extends DirXmlParser {
-	private Map<String, ProbeDesc> probesDesc = new HashMap<String, ProbeDesc>();
+	private ArgFactory af;
+	private Map<String, ProbeDesc> probesDescMap = new HashMap<String, ProbeDesc>();
 	private Map<String, GraphDesc> graphDescMap = new HashMap<String, GraphDesc>();
 	public class ProbeClassLoader extends URLClassLoader {
 		public ProbeClassLoader(ClassLoader parent) {
@@ -32,6 +33,10 @@ public class DescFactory extends DirXmlParser {
 
 	public final ProbeClassLoader probeLoader = new ProbeClassLoader(DescFactory.class.getClassLoader());
 	private final Logger logger = Logger.getLogger(DescFactory.class);
+
+	public DescFactory(ArgFactory af) {
+		this.af = af;
+	}
 
 	void init() {
 		addProbeDescDigester(digester);
@@ -52,7 +57,7 @@ public class DescFactory extends DirXmlParser {
 			@Override
 			public void end(String namespace, String name) throws Exception {
 				ProbeDesc pd = (ProbeDesc) digester.peek();
-				probesDesc.put(pd.getName(), pd);
+				probesDescMap.put(pd.getName(), pd);
 			}
 		});
 
@@ -200,8 +205,8 @@ public class DescFactory extends DirXmlParser {
 
 	}
 
-	public Map<String, ProbeDesc> getProbesDesc() {
-		return probesDesc;
+	public Map<String, ProbeDesc> getProbesDescMap() {
+		return probesDescMap;
 	}
 
 	public Map<String, GraphDesc> getGraphDescMap() {

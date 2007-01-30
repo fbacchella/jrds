@@ -211,7 +211,7 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 
 	@Override
 	public boolean isStarted() {
-		return starter.isStarted();
+		return super.isStarted() && starter.isStarted();
 	}
 
 	@Override

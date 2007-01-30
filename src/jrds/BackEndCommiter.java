@@ -70,5 +70,14 @@ public class BackEndCommiter {
 	public static void setSyncPeriod(int syncPeriod) {
 		instance.syncPeriod = syncPeriod;
 	}
-	
+
+	public static synchronized void commit() {
+		if(instance != null) {
+			Collection<RrdCachedFileBackend> bes = instance.backEndSet;
+			synchronized(bes) {
+				for(RrdCachedFileBackend o: bes)
+					o.sync();
+			}
+		}
+	}
 }

@@ -51,13 +51,11 @@ public class HostsList {
 	private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
 	private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
 	private final Renderer renderer = new Renderer(20);
-	GraphFactory gf;
-	ProbeFactory pf;
 	private int numCollectors = 1;
 	private int resolution;
 	private String rrdDir;
 	private String tmpdir;
-	private int timeout;
+	private int timeout = 10;
 	private boolean started = false;
 
 	/**
@@ -100,7 +98,10 @@ public class HostsList {
 		rrdDir = pm.rrddir;
 		tmpdir = pm.tmpdir;
 
-		DescFactory df = new DescFactory();
+		ArgFactory af= new ArgFactory();
+		DescFactory df = new DescFactory(af);
+		GraphFactory gf = new GraphFactory(df.getGraphDescMap(), pm.legacymode);
+		ProbeFactory pf = new ProbeFactory(df.getProbesDescMap(), gf, pm, pm.legacymode);
 
 		try {
 			df.importDescUrl(DescFactory.class.getResource("/probe"));
@@ -127,12 +128,12 @@ public class HostsList {
 		}
 
 		gf = new GraphFactory(df.getGraphDescMap(), pm.legacymode);
-		pf = new ProbeFactory(df.getProbesDesc(), gf, pm, pm.legacymode);
+		pf = new ProbeFactory(df.getProbesDescMap(), gf, pm, pm.legacymode);
 		HostConfigParser hp = new HostConfigParser(pf);
 
 		List<String> graphsName = new ArrayList<String>(df.getGraphDescMap().keySet());
 		logger.debug("Graphs :" + graphsName);
-		List<String> probesName = new ArrayList<String>(df.getProbesDesc().keySet());
+		List<String> probesName = new ArrayList<String>(df.getProbesDescMap().keySet());
 		Collections.sort(probesName);
 		logger.debug("Probes: " + probesName);
 		if(pm.configdir != null)
@@ -189,9 +190,10 @@ public class HostsList {
 		ExecutorService tpool =  Executors.newFixedThreadPool(numCollectors, 
 				new ThreadFactory() {
 			public Thread newThread(Runnable r) {
-				Thread t = new Thread(r, "CollectorThread" + counter);
+				Thread t = new Thread(r, "CollectorThread" + counter) {
+				};
 				t.setDaemon(true);
-				logger.debug("New thread name:" + t.getName());
+				logger.debug("New thread name: " + t.getName());
 				return t;
 			}
 		}
@@ -202,7 +204,9 @@ public class HostsList {
 				private RdsHost host = oneHost;
 
 				public void run() {
+					Thread.currentThread().setName(host.getName());
 					host.collectAll();
+					Thread.currentThread().setName(host.getName() + ":finished");
 				}
 			};
 			try {
@@ -219,6 +223,7 @@ public class HostsList {
 			logger.info("Collect interrupted");
 		}
 		starters.stopCollect();
+		BackEndCommiter.commit();
         if( ! tpool.isTerminated()) {
         	List<Runnable> timedOut = tpool.shutdownNow();
             logger.warn("Still " + timedOut.size() + " waiting probes: ");
@@ -357,13 +362,4 @@ public class HostsList {
 	public boolean isStarted() {
 		return started;
 	}
-
-	public GraphFactory getGraphFactory() {
-		return gf;
-	}
-
-	public ProbeFactory getProbeFactory() {
-		return pf;
-	}
-
 }

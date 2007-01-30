@@ -31,8 +31,6 @@ import org.snmp4j.util.TableUtils;
  */
 public abstract class SnmpRequester {
 	static private final Logger logger = Logger.getLogger(SnmpRequester.class);
-	static private final OID upTimeOid = new OID(".1.3.6.1.2.1.1.3.0");
-	static private final VariableBinding upTimeVb = new VariableBinding(upTimeOid);
 
 	/**
 	 * No constructor, full static class;
@@ -132,16 +130,11 @@ public abstract class SnmpRequester {
 
 	private static final Map<OID, Object> doRequest(SnmpStarter starter, VariableBinding[] vars) throws IOException {
 		Map<OID, Object> snmpVars = new SnmpVars();
-		//SnmpStarter starter = probe.getSnmpStarter();
-		//if(starter != null & starter.isStarted()) {
 			Target snmpTarget = starter.getTarget();
 			PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
 
 			requestPDU.addAll(vars);
 
-			requestPDU.add(upTimeVb);
-
-			//try {
 			boolean doAgain = true;
 			PDU response = null;
 			do {
@@ -158,8 +151,6 @@ public abstract class SnmpRequester {
 				else {		
 					if(response == null) {
 						throw new IOException("SNMP Timeout, address=" + snmpTarget.getAddress() + ", requestID=" + requestPDU.getRequestID());
-						//logger.warn( + ", probe=" + probe);
-						//doAgain = false;
 					}
 					else {
 						int index = response.getErrorIndex() - 1;
@@ -177,11 +168,6 @@ public abstract class SnmpRequester {
 					}
 				}
 			} while (doAgain);
-			//} catch (IOException e) {
-			//	logger.warn("SNMP communication problem, address=" + snmpTarget.getAddress() + ", requestID=" + requestPDU.getRequestID() + ": " + e.getLocalizedMessage());	
-			//}
-		//}
-		//return probe.filterUpTime(upTimeOid, snmpVars);
 		return snmpVars;
 
 	}

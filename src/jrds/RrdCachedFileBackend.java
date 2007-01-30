@@ -8,6 +8,7 @@ package jrds;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedByInterruptException;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -135,23 +136,40 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 	 * @throws IOException Thrown in case of I/O error
 	 */
 	public void write(long offset, byte[] b) throws IOException {
-		if(b.length > 0) {
-			access++;
-			long cacheEnd = cacheStart + cacheSize - 1;
-			if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd) {
-				cacheMiss(offset, b.length);
-			}
-			else
-				writeHit++;
-			synchronized(this) {
-				try {
-					cacheDirty = true;
-					byteBuffer.position((int)(offset - cacheStart));
-					byteBuffer.put(b);
-					dirtyStart = Math.min((int)(offset - cacheStart), dirtyStart);
-					dirtyEnd = Math.max(dirtyEnd, byteBuffer.position());
-				} catch (RuntimeException e) {
-					logger.fatal("data dropped at offset "  + offset + ", cache starting at " + cacheStart, e);
+		if( Thread.currentThread().isInterrupted()) {
+			close();
+			throw new ClosedByInterruptException();
+		}
+		else {
+			if(b.length > 0) {
+				access++;
+				long cacheEnd = cacheStart + cacheSize - 1;
+				if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd) {
+					try {
+						cacheMiss(offset, b.length);
+					}
+					catch (IOException e) {
+						if( e instanceof ClosedByInterruptException) {
+							//too late, it's already close
+							cacheDirty = false;
+							logger.error("data dropped by an IO exception");
+							close();
+						}
+						throw e;
+					}
+				}
+				else
+					writeHit++;
+				synchronized(this) {
+					try {
+						cacheDirty = true;
+						byteBuffer.position((int)(offset - cacheStart));
+						byteBuffer.put(b);
+						dirtyStart = Math.min((int)(offset - cacheStart), dirtyStart);
+						dirtyEnd = Math.max(dirtyEnd, byteBuffer.position());
+					} catch (RuntimeException e) {
+						logger.fatal("data dropped at offset "  + offset + ", cache starting at " + cacheStart, e);
+					}
 				}
 			}
 		}
@@ -164,22 +182,33 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 	 * @throws IOException Thrown in case of I/O error.
 	 */
 	public void read(long offset, byte[] b) throws IOException {
-		if(b.length > 0) {
-			access++;
-			long cacheEnd = cacheStart + cacheSize - 1;
-			if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd) {
-				cacheMiss(offset, b.length);
-			}
-			else {
-				readHit++;
-			}
-			try {
+		if( Thread.currentThread().isInterrupted()) {
+			close();
+			throw new ClosedByInterruptException();
+		}
+		else {
+			if(b.length > 0) {
+				access++;
+				long cacheEnd = cacheStart + cacheSize - 1;
+				if(byteBuffer == null || offset < cacheStart || offset + b.length > cacheEnd) {
+					try {
+						cacheMiss(offset, b.length);
+					}
+					catch (IOException e) {
+						if( e instanceof ClosedByInterruptException) {
+							//too late, it's already close
+							cacheDirty = false;
+							logger.error("data dropped by an exception");
+							close();
+						}
+						throw e;
+					}
+				}
+				else {
+					readHit++;
+				}
 				byteBuffer.position((int)(offset - cacheStart));
 				byteBuffer.get(b);
-			}
-			catch (Exception e) {
-				logger.error(e);
-				logger.debug(byteBuffer);
 			}
 		}
 	}
