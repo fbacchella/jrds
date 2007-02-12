@@ -12,15 +12,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jrds.RdsHost;
-
 /**
  * A class to probe the apache status from the /server-status URL
  * @author Fabrice Bacchella 
  * @version $Revision$,  $Date$
  */
 public class ApacheStatus extends HttpProbe implements UrlProbe {
-	private int port = 80;
 
 	/**
 	 * @param monitoredHost
@@ -28,17 +25,11 @@ public class ApacheStatus extends HttpProbe implements UrlProbe {
 	 * @throws MalformedURLException
 	 */
 	public ApacheStatus(URL newurl) throws MalformedURLException {
-		super(new URL("http", newurl.getHost(), newurl.getPort(), "/server-status?auto"));
-		this.port = newurl.getPort();
-		if(port <= 0)
-			port = 80;
+		super(newurl);
 	}
 
-	public ApacheStatus(Integer port) {
-		this.port = port;
-	}
-
-	public ApacheStatus() {
+	public ApacheStatus(Integer port) throws MalformedURLException {
+		super(new URL("http", EMPTYHOST, port, "/server-status?auto"));
 	}
 
 	/**
@@ -47,7 +38,7 @@ public class ApacheStatus extends HttpProbe implements UrlProbe {
 	public String getUrlAsString() {
 		String retValue = "";
 		try {
-			URL tempUrl = new URL("http", getHost().getName(), port, "/");
+			URL tempUrl = new URL("http", getUrl().getHost(), getUrl().getPort(), "/");
 			retValue = tempUrl.toString();
 		} catch (MalformedURLException e) {
 		}
@@ -56,16 +47,10 @@ public class ApacheStatus extends HttpProbe implements UrlProbe {
 
 	@Override
 	public String getIndexName() {
+		int port = getUrl().getPort();
+		if(port < 0)
+			port = 80;
 		return Integer.toString(port);
-	}
-
-	@Override
-	public void setHost(RdsHost monitoredHost) {
-		super.setHost(monitoredHost);
-		try {
-			setUrl(new URL("http", monitoredHost.getName(), port, "/server-status?auto"));
-		} catch (MalformedURLException e) {
-		}
 	}
 
 	/* (non-Javadoc)
@@ -85,5 +70,4 @@ public class ApacheStatus extends HttpProbe implements UrlProbe {
 			setUptime(uptimeNumber.longValue());
 		return retValue;
 	}
-
 }
