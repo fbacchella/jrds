@@ -10,7 +10,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.WriterAppender;
 import org.apache.log4j.spi.LoggingEvent;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -23,18 +23,14 @@ public class UnitTest {
 		}
 	};
 
-	@Test public void descriptions() {
+	@Test public void loadDescriptions() throws IOException {
 		ArgFactory af= new ArgFactory();
 		DescFactory df = new DescFactory(af);
-		try {
 			df.importDescUrl(DescFactory.class.getResource("/probe"));
 			Assert.assertTrue(df.getGraphDescMap().size() == 0);
 			Assert.assertTrue(df.getProbesDescMap().size() > 0);
 			df.importDescUrl(DescFactory.class.getResource("/graph"));
 			Assert.assertTrue(df.getGraphDescMap().size() > 0);
-		} catch (IOException e) {
-			Assert.fail(e.getMessage());
-		}
 	}
 	@BeforeClass static public void configure() {
 		System.getProperties().setProperty("java.awt.headless","true");
@@ -46,6 +42,6 @@ public class UnitTest {
 		Logger.getLogger("org.apache.commons.digester.Digester").setLevel(Level.INFO);
 	}
 	    
-	@AfterClass static public void tearDown() {
+	@After public void tearDown() {
 	}
 }
