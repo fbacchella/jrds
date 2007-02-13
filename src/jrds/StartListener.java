@@ -58,8 +58,16 @@ public class StartListener implements ServletContextListener {
 				HostsList.getRootGroup().configure(pm);
 
 				TimerTask collector = new TimerTask () {
+					int i = 0;
 					public void run() {
-						HostsList.getRootGroup().collectAll();
+						//A separate thread, because a TimerTask is not supposed to run for too long
+						Thread collector = new Thread("JrdsCollector" + i++) {
+							public void run() {
+								HostsList.getRootGroup().collectAll();
+							}
+						};
+						collector.setDaemon(true);
+						collector.start();
 					}
 				};
 				collectTimer.schedule(collector, 5000L, HostsList.getRootGroup().getResolution() * 1000L);

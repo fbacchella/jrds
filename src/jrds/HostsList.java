@@ -190,8 +190,7 @@ public class HostsList {
 		ExecutorService tpool =  Executors.newFixedThreadPool(numCollectors, 
 				new ThreadFactory() {
 			public Thread newThread(Runnable r) {
-				Thread t = new Thread(r, "CollectorThread" + counter) {
-				};
+				Thread t = new Thread(r, "CollectorThread" + counter);
 				t.setDaemon(true);
 				logger.debug("New thread name: " + t.getName());
 				return t;
@@ -204,9 +203,9 @@ public class HostsList {
 				private RdsHost host = oneHost;
 
 				public void run() {
-					Thread.currentThread().setName(host.getName());
+					Thread.currentThread().setName("JrdsCollect-" + host.getName());
 					host.collectAll();
-					Thread.currentThread().setName(host.getName() + ":finished");
+					Thread.currentThread().setName("JrdsCollect-" + host.getName() + ":finished");
 				}
 			};
 			try {

@@ -117,7 +117,7 @@ public class Renderer {
 	private final ExecutorService tpool =  Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2, 
 			new ThreadFactory() {
 		public Thread newThread(Runnable r) {
-			Thread t = new Thread(r, "RendererThread" + counter);
+			Thread t = new Thread(r, "JrdsRendererThread" + counter);
 			t.setDaemon(true);
 			logger.debug("New thread name:" + t.getName());
 			return t;

@@ -389,9 +389,9 @@ implements Comparable {
 						ex.getMessage());
 			} catch (Exception e) {
 				if(logger.isDebugEnabled())
-					logger.debug("Error with probe " + this + ": ", e);
+					logger.debug("Error with probe collect " + this + ": ", e);
 				else
-					logger.error("Error with probe " + this + ": " + e.getMessage());
+					logger.error("Error with probe collect" + this + ": " + e);
 			}
 			finally  {
 				if(rrdDb != null)
