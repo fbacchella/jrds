@@ -56,7 +56,7 @@ public class StartListener implements ServletContextListener {
 				StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
 
 				HostsList.getRootGroup().configure(pm);
-				
+
 				TimerTask collector = new TimerTask () {
 					public void run() {
 						HostsList.getRootGroup().collectAll();
@@ -79,6 +79,8 @@ public class StartListener implements ServletContextListener {
 		started = false;
 		collectTimer.cancel();
 		HostsList.getRootGroup().getRenderer().finish();
+		HostsList.getRootGroup().getStarters().stopCollect();
+		BackEndCommiter.commit();
 		logger.info("appplication jrds stopped");
 		StoreOpener.stop();
 	}

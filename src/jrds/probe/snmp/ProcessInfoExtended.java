@@ -47,7 +47,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
 	public ProcessInfoExtended(String indexName, String pattern)
 	{
 		super(indexName);
-		setName("psx-" + indexName);
+		//setName("psx-" + indexName);
 		this.pattern = pattern;
 	}
 

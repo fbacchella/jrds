@@ -31,7 +31,12 @@ public final class StoreOpener {
 	 */
 	public final static RrdDb getRrd(String rrdFile)
 	throws IOException, RrdException {
-		return pool.requestRrdDb(rrdFile);
+		RrdDb db;
+		if (pool != null)
+			db = pool.requestRrdDb(rrdFile);
+		else
+			db = new RrdDb(rrdFile);
+		return db;
 	}
 
 	/**
@@ -39,7 +44,10 @@ public final class StoreOpener {
 	 */
 	public final static void releaseRrd(RrdDb arg0)  {
 		try {
-			pool.release(arg0);
+			if(pool != null)
+				pool.release(arg0);
+			else
+				arg0.close();
 		} catch (Exception e) {
 			logger.debug("Strange error " + e);
 		}

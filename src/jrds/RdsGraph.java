@@ -164,13 +164,13 @@ public class RdsGraph implements Comparable {
 		graphDef.comment("\\l");
 		graphDef.comment("\\l");
 		graphDef.comment("Last update: " + 
-				lastUpdateFormat.format(lastUpdate) + "\\L");
+				lastUpdateFormat.format(lastUpdate) + "\\l");
 		String unit = "SI";
 		if(! gd.isSiUnit()) 
 			unit = "binary";
 		graphDef.comment("Unit type: " + unit + "\\r");
 		graphDef.comment("Period from " + lastUpdateFormat.format(startDate) +
-				" to " + lastUpdateFormat.format(endDate) + "\\L");
+				" to " + lastUpdateFormat.format(endDate) + "\\g");
 		graphDef.comment("Source type: " + getProbe().getSourceType() + "\\r");
 		return graphDef;		
 	}

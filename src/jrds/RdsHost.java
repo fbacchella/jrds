@@ -72,6 +72,9 @@ public class RdsHost implements Comparable {
 		if(starters != null)
 			starters.startCollect();
 		for(Probe currrd: allProbes) {
+			//We are finished if current thread was interrupted
+			if( Thread.currentThread().isInterrupted() )
+				break;
 			currrd.collect();
 		}
 		if(starters != null)
@@ -97,7 +100,6 @@ public class RdsHost implements Comparable {
 	}
 	
 	public int compareTo(Object arg0) {
-		
 		return String.CASE_INSENSITIVE_ORDER.compare(name, arg0.toString());
 	}
 

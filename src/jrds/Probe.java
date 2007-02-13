@@ -320,8 +320,7 @@ implements Comparable {
 
 
 	/**
-	 * Collect a value and store it in a rrd Sample.
-	 * it check if the probe is started.
+	 * Store the values on the rrd backend.
 	 * Overiding should be avoided.
 	 * @param oneSample
 	 */
@@ -374,14 +373,18 @@ implements Comparable {
 			RrdDb rrdDb = null;
 			Sample onesample;
 			try {
-				rrdDb = StoreOpener.getRrd(getRrdName());
-				onesample = rrdDb.createSample();
-				updateSample(onesample);
-				logger.trace(onesample.dump());
-				//The collect might have been stopped
-				//during the reading of samples
-				if(hl.isStarted())
-					onesample.update();
+				//No collect if the thread was interrupted
+				if( ! Thread.currentThread().isInterrupted()) {
+					rrdDb = StoreOpener.getRrd(getRrdName());
+					onesample = rrdDb.createSample();
+					updateSample(onesample);
+					logger.trace(onesample.dump());
+					//The collect might have been stopped
+					//during the reading of samples
+					//We also do not store if the thread was interrupted
+					if(hl.isStarted() && ! Thread.currentThread().isInterrupted())
+						onesample.update();
+				}
 			}
 			catch (ArithmeticException ex) {
 				logger.warn("Error while storing sample for probe " + this + ": " +
@@ -548,7 +551,7 @@ implements Comparable {
 	}
 
 	public boolean isStarted() {
-		return true;
+		return HostsList.getRootGroup().isStarted() && ! Thread.currentThread().isInterrupted();
 	}
 
 	public abstract String getSourceType();

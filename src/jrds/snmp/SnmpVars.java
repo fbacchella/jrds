@@ -7,22 +7,16 @@ _##########################################################################*/
 package jrds.snmp;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Test;
 import org.snmp4j.PDU;
 import org.snmp4j.asn1.BER;
 import org.snmp4j.asn1.BERInputStream;
 import org.snmp4j.smi.AbstractVariable;
-import org.snmp4j.smi.Counter32;
 import org.snmp4j.smi.Counter64;
-import org.snmp4j.smi.Gauge32;
 import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.IpAddress;
 import org.snmp4j.smi.Null;
@@ -193,62 +187,4 @@ public class SnmpVars extends HashMap<OID, Object> {
 		return value;
 	}
 
-	@Test public void conversionUnsignedInteger32() {
-		OID oid1 = new OID("1");
-		VariableBinding vb = new VariableBinding(oid1, new UnsignedInteger32(1));
-		addVariable(vb);
-		Assert.assertEquals(get(oid1), (long) 1);
-	}
-	@Test public void conversionInteger32() {
-		OID oid1 = new OID("2");
-		VariableBinding vb = new VariableBinding(oid1, new UnsignedInteger32(1));
-		addVariable(vb);
-		Assert.assertEquals(get(oid1), (long) 1);
-	}
-	@Test public void conversionCounter32() {
-		OID oid1 = new OID("3");
-		VariableBinding vb = new VariableBinding(oid1, new Counter32(1));
-		addVariable(vb);
-		Assert.assertEquals(get(oid1), (long) 1);
-	}
-	@Test public void conversionCounter64() {
-		OID oid1 = new OID("4");
-		VariableBinding vb = new VariableBinding(oid1, new Counter64(1));
-		addVariable(vb);
-		Assert.assertEquals(get(oid1), (long) 1);
-	}
-	@Test public void conversionGauge32() {
-		OID oid1 = new OID("5");
-		VariableBinding vb = new VariableBinding(oid1, new Gauge32(1));
-		addVariable(vb);
-		Assert.assertEquals(get(oid1), (long) 1);
-	}
-	@Test public void conversionNull() {
-		OID oid1 = new OID("6");
-		VariableBinding vb = new VariableBinding(oid1, new org.snmp4j.smi.Null());
-		addVariable(vb);
-		Assert.assertEquals(get(oid1), null);
-	}
-	@Test public void conversionTimeTicks() {
-		OID oid1 = new OID("7");
-		VariableBinding vb = new VariableBinding(oid1, new org.snmp4j.smi.TimeTicks(1));
-		addVariable(vb);
-		Assert.assertEquals(get(oid1), (double) 0.01);
-	}
-	@Test public void conversionOctetString() {
-		OID oid1 = new OID("7");
-		VariableBinding vb = new VariableBinding(oid1, new org.snmp4j.smi.OctetString("a"));
-		addVariable(vb);
-		Assert.assertEquals(get(oid1), "a");
-	}
-	@Test public void conversionIpAddress() {
-		OID oid1 = new OID("8");
-		VariableBinding vb = new VariableBinding(oid1, new org.snmp4j.smi.IpAddress("127.0.0.1"));
-		addVariable(vb);
-		try {
-			Assert.assertEquals(get(oid1), InetAddress.getByName("127.0.0.1"));
-		} catch (UnknownHostException e) {
-			Assert.fail(e.getMessage());
-		}
-	}
 }

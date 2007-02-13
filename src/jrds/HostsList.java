@@ -55,7 +55,7 @@ public class HostsList {
 	private int resolution;
 	private String rrdDir;
 	private String tmpdir;
-	private int timeout;
+	private int timeout = 10;
 	private boolean started = false;
 	/**
 	 *  
@@ -199,7 +199,9 @@ public class HostsList {
 					private RdsHost host = oneHost;
 
 					public void run() {
+						Thread.currentThread().setName(host.getName());
 						host.collectAll();
+						Thread.currentThread().setName(host.getName() + ":finished");
 					}
 				};
 				try {
@@ -216,6 +218,7 @@ public class HostsList {
 				logger.info("Collect interrupted");
 			}
 			starters.stopCollect();
+			BackEndCommiter.commit();
 			if( ! tpool.isTerminated()) {
 				List<Runnable> timedOut = tpool.shutdownNow();
 				logger.warn("Still " + timedOut.size() + " waiting probes: ");
