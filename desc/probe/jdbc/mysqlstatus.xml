@@ -334,5 +334,6 @@
 	 <name>MysqlStatusBytes</name>
 	 <name>MysqlStatusQueries</name>
 	 <name>MysqlThreads</name>
+	 <name>MysqlStatusKeysActivity</name>
   </graphs>
 </probedesc>
