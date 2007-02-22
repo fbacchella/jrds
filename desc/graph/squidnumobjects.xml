@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+	"urn:jrds:graphdesc">
+<graphdesc>
+	<name>SquidNumObject</name>
+	<graphName>squidnumobject</graphName>
+	<graphTitle>Number of Squid objects on {1}</graphTitle>
+	<verticalLabel>objects</verticalLabel>
+	<add>
+		<name>NumObjCount</name>
+		<graphType>line</graphType>
+		<legend>Number of objects</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SERVICES</pathelement>
+		<pathstring>Squid</pathstring>
+		<pathstring>Number of objects</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>SERVICES</pathelement>
+		<pathstring>Squid</pathstring>
+		<pathelement>HOST</pathelement>
+		<pathelement>URL</pathelement>
+		<pathstring>Number of objects</pathstring>
+	</viewtree>
+	
+</graphdesc>

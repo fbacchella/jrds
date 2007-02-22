@@ -365,7 +365,7 @@ implements Comparable {
 	public void collect() {
 		HostsList hl = HostsList.getRootGroup();
 		//We only collect if the HostsList allow it
-		if(hl.isStarted()) {
+		if(hl.isCollectRunning()) {
 			logger.debug("launch collect for " + this);
 			starters.startCollect();
 			RrdDb rrdDb = null;
@@ -380,7 +380,7 @@ implements Comparable {
 					//The collect might have been stopped
 					//during the reading of samples
 					//We also do not store if the thread was interrupted
-					if(hl.isStarted() && ! Thread.currentThread().isInterrupted())
+					if(hl.isCollectRunning() && ! Thread.currentThread().isInterrupted())
 						onesample.update();
 				}
 			}
@@ -391,7 +391,7 @@ implements Comparable {
 				if(logger.isDebugEnabled())
 					logger.debug("Error with probe collect " + this + ": ", e);
 				else
-					logger.error("Error with probe collect" + this + ": " + e);
+					logger.error("Error with probe collect " + this + ": " + e);
 			}
 			finally  {
 				if(rrdDb != null)
@@ -549,7 +549,7 @@ implements Comparable {
 	}
 
 	public boolean isStarted() {
-		return HostsList.getRootGroup().isStarted() && ! Thread.currentThread().isInterrupted();
+		return HostsList.getRootGroup().isCollectRunning() && ! Thread.currentThread().isInterrupted();
 	}
 
 	public abstract String getSourceType();

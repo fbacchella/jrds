@@ -55,6 +55,9 @@ public final class Graph extends HttpServlet {
 				res.addHeader("Cache-Control", "no-cache");
 				hl.getRenderer().send(graph, begin, end, out);
 			}
+			else {
+				logger.warn("One graph failed, not ready");
+			}
 
 			Date finish = new Date();
 			long duration1 = middle.getTime() - start.getTime();

@@ -87,7 +87,7 @@ public class StartListener implements ServletContextListener {
 		started = false;
 		collectTimer.cancel();
 		HostsList.getRootGroup().getRenderer().finish();
-		HostsList.getRootGroup().getStarters().stopCollect();
+		HostsList.getRootGroup().stopCollect();
 		BackEndCommiter.commit();
 		logger.info("appplication jrds stopped");
 		StoreOpener.stop();

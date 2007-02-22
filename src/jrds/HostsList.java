@@ -57,6 +57,7 @@ public class HostsList {
 	private String tmpdir;
 	private int timeout = 10;
 	private boolean started = false;
+	private boolean collecting = false;
 
 	/**
 	 *  
@@ -175,68 +176,87 @@ public class HostsList {
 	}
 
 	public void collectAll() {
-		logger.debug("One collect was launched");
-		Date start = new Date();
-		try {
-		starters.startCollect();
-		final Object counter = new Object() {
-			int i = 0;
-			@Override
-			public String toString() {
-				return Integer.toString(i++);
-			}
-
-		};
-		ExecutorService tpool =  Executors.newFixedThreadPool(numCollectors, 
-				new ThreadFactory() {
-			public Thread newThread(Runnable r) {
-				Thread t = new Thread(r, "CollectorThread" + counter);
-				t.setDaemon(true);
-				logger.debug("New thread name: " + t.getName());
-				return t;
-			}
-		}
-		);
-		for(final RdsHost oneHost: hostList) {
-			logger.debug("Collect all stats for host " + oneHost.getName());
-			Runnable runCollect = new Runnable() {
-				private RdsHost host = oneHost;
-
-				public void run() {
-					Thread.currentThread().setName("JrdsCollect-" + host.getName());
-					host.collectAll();
-					Thread.currentThread().setName("JrdsCollect-" + host.getName() + ":finished");
-				}
-			};
+		if(started) {
+			logger.debug("One collect was launched");
+			Date start = new Date();
 			try {
-				tpool.execute(runCollect);
-			}
-			catch(RejectedExecutionException ex) {
-				logger.debug("collector thread dropped for host " + oneHost.getName());
-			}
+				starters.startCollect();
+				final Object counter = new Object() {
+					int i = 0;
+					@Override
+					public String toString() {
+						return Integer.toString(i++);
+					}
+
+				};
+				ExecutorService tpool =  Executors.newFixedThreadPool(numCollectors, 
+						new ThreadFactory() {
+					public Thread newThread(Runnable r) {
+						Thread t = new Thread(r, "CollectorThread" + counter);
+						t.setDaemon(true);
+						logger.debug("New thread name: " + t.getName());
+						return t;
+					}
+				}
+				);
+				collecting = true;
+				for(final RdsHost oneHost: hostList) {
+					if(! collecting)
+						break;
+					logger.debug("Collect all stats for host " + oneHost.getName());
+					Runnable runCollect = new Runnable() {
+						private RdsHost host = oneHost;
+
+						public void run() {
+							Thread.currentThread().setName("JrdsCollect-" + host.getName());
+							host.collectAll();
+							Thread.currentThread().setName("JrdsCollect-" + host.getName() + ":finished");
+						}
+						@Override
+						public String toString() {
+							return Thread.currentThread().toString();
+						}
+
+					};
+					try {
+						tpool.execute(runCollect);
+					}
+					catch(RejectedExecutionException ex) {
+						logger.debug("collector thread dropped for host " + oneHost.getName());
+					}
+				}
+				tpool.shutdown();
+				try {
+					tpool.awaitTermination(resolution - getTimeout() * 2 , TimeUnit.SECONDS);
+				} catch (InterruptedException e) {
+					logger.info("Collect interrupted");
+				}
+				collecting = false;
+				BackEndCommiter.commit();
+				if( ! tpool.isTerminated()) {
+					//Second chance, we wait for the time out
+					try {
+						tpool.awaitTermination(getTimeout(), TimeUnit.SECONDS);
+					} catch (InterruptedException e) {
+						logger.info("Collect interrupted in last chance");
+					}
+					//Last chance to commit results
+					BackEndCommiter.commit();
+					List<Runnable> timedOut = tpool.shutdownNow();
+					logger.warn("Still " + timedOut.size() + " waiting probes: ");
+					for(Runnable r: timedOut) {
+						logger.warn(r.toString());
+					}
+				}
+				starters.stopCollect();
+			} catch (RuntimeException e) {
+				logger.error("problem while collecting data: ", e);
+			}							
+			Date end = new Date();
+			long duration = end.getTime() - start.getTime();
+			System.gc();
+			logger.info("Collect started at "  + start + " ran for " + duration + "ms");
 		}
-		tpool.shutdown();
-		try {
-			tpool.awaitTermination(resolution - 60, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			logger.info("Collect interrupted");
-		}
-		starters.stopCollect();
-		BackEndCommiter.commit();
-        if( ! tpool.isTerminated()) {
-        	List<Runnable> timedOut = tpool.shutdownNow();
-            logger.warn("Still " + timedOut.size() + " waiting probes: ");
-            for(Runnable r: timedOut) {
-            	logger.warn(r.toString());
-             }
-        }
-		} catch (RuntimeException e) {
-			logger.error("problem while collecting data: ", e);
-		}							
-		Date end = new Date();
-		long duration = end.getTime() - start.getTime();
-		System.gc();
-		logger.info("Collect started at "  + start + " ran for " + duration + "ms");							
 	}
 
 	public void graphAll(Date startDate, Date endDate) {
@@ -358,7 +378,11 @@ public class HostsList {
 		this.timeout = timeout;
 	}
 
-	public boolean isStarted() {
-		return started;
+	public boolean isCollectRunning() {
+		return started && collecting;
+	}
+	
+	public void stopCollect() {
+		collecting = false;
 	}
 }

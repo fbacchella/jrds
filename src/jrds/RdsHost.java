@@ -72,6 +72,8 @@ public class RdsHost implements Comparable {
 		if(starters != null)
 			starters.startCollect();
 		for(Probe currrd: allProbes) {
+			if( ! HostsList.getRootGroup().isCollectRunning())
+				break;
 			//We are finished if current thread was interrupted
 			if( Thread.currentThread().isInterrupted() )
 				break;

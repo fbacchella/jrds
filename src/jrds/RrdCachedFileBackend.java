@@ -76,12 +76,12 @@ public class RrdCachedFileBackend extends RrdFileBackend {
 				byteBuffer.limit(dirtyEnd);
 				channel.write(byteBuffer, cacheStart + dirtyStart);
 				byteBuffer.limit(oldLimit);
-				cacheDirty = false;
-				dirtyStart = byteBuffer.capacity();
-				dirtyEnd = 0;
-			} catch (IOException e) {
-				logger.error("Panic while syncing " +  this.getPath() + ": " + e);
+			} catch (Exception e) {
+				logger.error("Panic while syncing " +  getPath() + ": " + e);
 			}
+			cacheDirty = false;
+			dirtyStart = byteBuffer.capacity();
+			dirtyEnd = 0;
 		}
 	}
 
