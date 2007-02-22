@@ -15,14 +15,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jrds.GraphDesc;
 import jrds.HostsList;
 import jrds.Period;
 import jrds.Probe;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.FetchData;
-import org.jrobin.core.RrdException;
+import org.rrd4j.ConsolFun;
+import org.rrd4j.core.FetchData;
 
 /**
  * A servlet wich show the last update values and time
@@ -67,13 +66,11 @@ public final class ProbeSummary extends HttpServlet {
 				String dsName = names[i];
 				try {
 					out.print(dsName + " ");
-					out.print(fetched.getAggregate(dsName, GraphDesc.AVERAGE.toString()) + " ");
-					out.print(fetched.getAggregate(dsName, GraphDesc.MIN.toString()) + " ");
-					out.println(fetched.getAggregate(dsName, GraphDesc.MAX.toString()));
+					out.print(fetched.getAggregate(dsName, ConsolFun.AVERAGE) + " ");
+					out.print(fetched.getAggregate(dsName, ConsolFun.MIN) + " ");
+					out.println(fetched.getAggregate(dsName, ConsolFun.MAX));
 				} catch (IOException e) {
 					logger.error("Probe file " + probe.getRrdName() + "unusable: " + e);
-				} catch (RrdException e) {
-					logger.error("Error with probe " + probe +": " + e);
 				}
 			}
 		}

@@ -26,15 +26,15 @@ import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.ArcDef;
-import org.jrobin.core.DsDef;
-import org.jrobin.core.FetchData;
-import org.jrobin.core.FetchRequest;
-import org.jrobin.core.RrdDb;
-import org.jrobin.core.RrdDef;
-import org.jrobin.core.RrdException;
-import org.jrobin.core.Sample;
-import org.jrobin.core.Util;
+import org.rrd4j.ConsolFun;
+import org.rrd4j.core.ArcDef;
+import org.rrd4j.core.DsDef;
+import org.rrd4j.core.FetchData;
+import org.rrd4j.core.FetchRequest;
+import org.rrd4j.core.RrdDb;
+import org.rrd4j.core.RrdDef;
+import org.rrd4j.core.Sample;
+import org.rrd4j.core.Util;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -121,7 +121,7 @@ implements Comparable {
 	public String getRrdName() {
 		String rrdName = getName().replaceAll("/","_");
 		return monitoredHost.getHostDir() +
-		org.jrobin.core.Util.getFileSeparator() + rrdName + ".rrd";
+		Util.getFileSeparator() + rrdName + ".rrd";
 	}
 
 	private final String parseTemplate(String template) {
@@ -149,25 +149,25 @@ implements Comparable {
 		this.name = name;
 	}
 
-	protected DsDef[] getDsDefs() throws RrdException {
+	protected DsDef[] getDsDefs() {
 		return getPd().getDsDefs();
 	}
 
-	protected RrdDef getDefaultRrdDef() throws RrdException {
+	protected RrdDef getDefaultRrdDef() {
 		RrdDef def = new RrdDef(getRrdName());
 		return def;
 
 	}
 
-	private ArcDef[] getArcDefs() throws RrdException {
+	private ArcDef[] getArcDefs() {
 		ArcDef[] defaultArc = new ArcDef[3];
-		defaultArc[0] = new ArcDef("AVERAGE", 0.5, 1, 12 * 24 * 30 * 6);
-		defaultArc[1] = new ArcDef("AVERAGE", 0.5, 12, 8760);
-		defaultArc[2] = new ArcDef("AVERAGE", 0.5, 288, 730);
+		defaultArc[0] = new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 6);
+		defaultArc[1] = new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 8760);
+		defaultArc[2] = new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 730);
 		return defaultArc;
 	}
 
-	public RrdDef getRrdDef() throws RrdException {
+	public RrdDef getRrdDef() {
 		RrdDef def = getDefaultRrdDef();
 		def.addArchive(getArcDefs());
 		def.addDatasource(getDsDefs());
@@ -178,7 +178,7 @@ implements Comparable {
 	 * @throws RrdException
 	 * @throws IOException
 	 */
-	private void create() throws RrdException, IOException {
+	private void create() throws IOException {
 		logger.info("Need to create rrd " + this);
 		RrdDef def = getDefaultRrdDef();
 		def.addArchive(getArcDefs());
@@ -206,8 +206,6 @@ implements Comparable {
 			rrdSource.close();
 			logger.debug("Size difference : " + (dest.length() - source.length()));
 			copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
-		} catch (RrdException e) {
-			logger.error("Upgrade of " + this + " failed: " + e);
 		} catch (IOException e) {
 			logger.error("Upgrade of " + this + " failed: " + e);
 		}
@@ -335,14 +333,7 @@ implements Comparable {
 						String dsName = nameMap.get(e.getKey());
 						double value = e.getValue().doubleValue();
 						if (dsName != null) {
-							try {
-								oneSample.setValue(dsName, value);
-							}
-							catch (RrdException ex) {
-								logger.warn("Unable to update value " + value +
-										" from " + this +": " +
-										ex);
-							}
+							oneSample.setValue(dsName, value);
 						}
 						else {
 							logger.debug("Dropped entry: " + e.getKey() + " for " + this);
@@ -367,7 +358,7 @@ implements Comparable {
 	public void collect() {
 		HostsList hl = HostsList.getRootGroup();
 		//We only collect if the HostsList allow it
-		if(hl.isStarted()) {
+		if(hl.isCollectRunning()) {
 			logger.debug("launch collect for " + this);
 			starters.startCollect();
 			RrdDb rrdDb = null;
@@ -382,7 +373,7 @@ implements Comparable {
 					//The collect might have been stopped
 					//during the reading of samples
 					//We also do not store if the thread was interrupted
-					if(hl.isStarted() && ! Thread.currentThread().isInterrupted())
+					if(hl.isCollectRunning() && ! Thread.currentThread().isInterrupted())
 						onesample.update();
 				}
 			}
@@ -391,9 +382,9 @@ implements Comparable {
 						ex.getMessage());
 			} catch (Exception e) {
 				if(logger.isDebugEnabled())
-					logger.debug("Error with probe " + this + ": ", e);
+					logger.debug("Error with probe collect " + this + ": ", e);
 				else
-					logger.error("Error with probe " + this + ": " + e.getMessage());
+					logger.error("Error with probe collect " + this + ": " + e.getMessage());
 			}
 			finally  {
 				if(rrdDb != null)
@@ -481,7 +472,7 @@ implements Comparable {
 		RrdDb rrdDb = null;
 		try {
 			rrdDb = StoreOpener.getRrd(getRrdName());
-			FetchRequest fr = rrdDb.createFetchRequest(GraphDesc.DEFAULTCF.toString(), startDate.getTime() /1000, endDate.getTime() / 1000);
+			FetchRequest fr = rrdDb.createFetchRequest(GraphDesc.DEFAULTCF, startDate.getTime() /1000, endDate.getTime() / 1000);
 			retValue = fr.fetchData();
 		} catch (Exception e) {
 			logger.error("Unable to fetch data for" + this.getName() + ": " + e.getMessage());
@@ -551,7 +542,7 @@ implements Comparable {
 	}
 
 	public boolean isStarted() {
-		return HostsList.getRootGroup().isStarted() && ! Thread.currentThread().isInterrupted();
+		return HostsList.getRootGroup().isCollectRunning() && ! Thread.currentThread().isInterrupted();
 	}
 
 	public abstract String getSourceType();
@@ -584,11 +575,11 @@ implements Comparable {
 		this.timeout = timeout;
 	}
 
-	public Document dumpAsXml() throws ParserConfigurationException, IOException, RrdException {
+	public Document dumpAsXml() throws ParserConfigurationException, IOException {
 		return dumpAsXml(false);
 	}
 
-	public Document dumpAsXml(boolean sorted) throws ParserConfigurationException, IOException, RrdException {
+	public Document dumpAsXml(boolean sorted) throws ParserConfigurationException, IOException {
 		String probeName = getPd().getName();
 		String name = getName();
 		String host = getHost().getName();

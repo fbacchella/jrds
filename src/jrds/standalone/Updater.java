@@ -14,9 +14,8 @@ import jrds.RdsHost;
 import jrds.StoreOpener;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdDb;
-import org.jrobin.core.RrdDef;
-import org.jrobin.core.RrdException;
+import org.rrd4j.core.RrdDb;
+import org.rrd4j.core.RrdDef;
 
 public class Updater {
 	static {
@@ -31,12 +30,7 @@ public class Updater {
 
 		System.getProperties().setProperty("java.awt.headless","true");
 		System.getProperties().putAll(pm);
-		try {
-			StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
-		} catch (RrdException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
 
 		HostsList hl = HostsList.getRootGroup();
 		hl.configure(pm);
@@ -62,8 +56,6 @@ public class Updater {
 							StoreOpener.releaseRrd(rrdSource);
 							logger.debug("Size difference : " + (dest.length() - source.length()));
 							copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
-						} catch (RrdException e) {
-							e.printStackTrace();
 						} catch (IOException e) {
 							e.printStackTrace();
 						}

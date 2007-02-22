@@ -27,8 +27,8 @@ import jrds.snmp.SnmpRequester;
 import org.apache.log4j.Logger;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
-import org.jrobin.core.DsDef;
-import org.jrobin.core.RrdException;
+import org.rrd4j.DsType;
+import org.rrd4j.core.DsDef;
 import org.snmp4j.smi.OID;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -43,7 +43,7 @@ import org.w3c.dom.Element;
 public class ProbeDesc {
 	static final private Logger logger = Logger.getLogger(ProbeDesc.class);
 
-	private static final class DsType {
+	/*private static final class DsType {
 		private String id;
 		private DsType(String id) { this.id = id ;}
 		public String toString() { return id;}
@@ -58,7 +58,7 @@ public class ProbeDesc {
 	static public final DsType COUNTER = DsType.COUNTER;
 	static public final DsType GAUGE = DsType.GAUGE;
 	static public final DsType DERIVE = DsType.DERIVE;
-	static public final DsType ABSOLUTE = DsType.ABSOLUTE;
+	static public final DsType ABSOLUTE = DsType.ABSOLUTE;*/
 	static public final double MINDEFAULT = 0;
 	static public final double MAXDEFAULT = Double.NaN;
 	static public final long HEARTBEATDEFAULT = 600;
@@ -227,13 +227,13 @@ public class ProbeDesc {
 		return retValue;
 	}
 
-	public DsDef[] getDsDefs() throws RrdException
+	public DsDef[] getDsDefs() 
 	{
 		List<DsDef> dsList = new ArrayList<DsDef>(dsMap.size());
 		for(Map.Entry<String, DsDesc> e: dsMap.entrySet() ) {
 			DsDesc desc = e.getValue();
-			if(desc.dsType != DsType.NONE && desc.dsType != null)
-				dsList.add(new DsDef(e.getKey(), desc.dsType.toString(), desc.heartbeat, desc.minValue, desc.maxValue));
+			if(desc.dsType != null)
+				dsList.add(new DsDef(e.getKey(), desc.dsType, desc.heartbeat, desc.minValue, desc.maxValue));
 		}
 		return (DsDef[]) dsList.toArray(new DsDef[dsList.size()]);
 	}

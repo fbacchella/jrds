@@ -30,8 +30,8 @@ import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.*;
-import org.jrobin.graph.*;
+import org.rrd4j.core.*;
+import org.rrd4j.graph.*;
 
 /**
  * @author bacchell
@@ -146,7 +146,7 @@ public class RdsGraph implements Comparable {
 		return gd.getUpperLimit();
 	}
 
-	protected RrdGraphDef getRrdDef() throws RrdException, IOException {
+	protected RrdGraphDef getRrdDef() throws IOException {
 		return getGraphDesc().getGraphDef(probe);
 	}
 
@@ -158,25 +158,25 @@ public class RdsGraph implements Comparable {
 	 * @return
 	 * @throws RrdException
 	 */
-	protected RrdGraphDef graphFormat(RrdGraphDef graphDef, Date startDate, Date endDate) throws RrdException {
+	protected RrdGraphDef graphFormat(RrdGraphDef graphDef, Date startDate, Date endDate) {
 		Date lastUpdate = probe.getLastUpdate();
 		graphDef.setTitle(getGraphTitle());
 		graphDef.comment("\\l");
 		graphDef.comment("\\l");
 		graphDef.comment("Last update: " + 
-				lastUpdateFormat.format(lastUpdate) + "\\l");
+				lastUpdateFormat.format(lastUpdate) + "\\L");
 		String unit = "SI";
 		if(! gd.isSiUnit()) 
 			unit = "binary";
 		graphDef.comment("Unit type: " + unit + "\\r");
 		graphDef.comment("Period from " + lastUpdateFormat.format(startDate) +
-				" to " + lastUpdateFormat.format(endDate) + "\\g");
+				" to " + lastUpdateFormat.format(endDate) + "\\L");
 		graphDef.comment("Source type: " + getProbe().getSourceType() + "\\r");
 		return graphDef;		
 	}
 
 	public RrdGraph getRrdGraph(Date startDate, Date endDate) throws
-	IOException, RrdException {
+	IOException {
 		Date lastUpdate = probe.getLastUpdate();
 		if(endDate.after(lastUpdate))
 			endDate = new Date(lastUpdate.getTime() );
@@ -184,7 +184,7 @@ public class RdsGraph implements Comparable {
 		tempGraphDef = graphFormat(tempGraphDef, startDate, endDate);
 
 		//We normalize the last update time, it can't be used directly
-		Date lastUpdateNormalized = new Date(1000L * org.jrobin.core.Util.normalize(getProbe().getLastUpdate().getTime() / 1000L, HostsList.getRootGroup().getResolution()));
+		Date lastUpdateNormalized = new Date(1000L * org.rrd4j.core.Util.normalize(getProbe().getLastUpdate().getTime() / 1000L, HostsList.getRootGroup().getResolution()));
 		//We dont want to graph past the last normalized update time
 		if(endDate.after(lastUpdateNormalized))
 			endDate = lastUpdateNormalized;
@@ -213,11 +213,6 @@ public class RdsGraph implements Comparable {
 		BufferedImage img = null;
 		try {
 			img = makeImg(getRrdGraph(startDate, endDate));
-		}
-		catch (RrdException e) {
-			logger.warn("Unable to creage png for " + getName() +
-					" on host " + probe.getHost().getName() + ": " +
-					e);
 		}
 		catch (IOException e) {
 			logger.warn("Unable to creage png for " + getName() +

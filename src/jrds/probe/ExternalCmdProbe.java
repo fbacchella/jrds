@@ -15,8 +15,7 @@ import java.util.Map;
 import jrds.Probe;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdException;
-import org.jrobin.core.Sample;
+import org.rrd4j.core.Sample;
 
 
 /**
@@ -47,8 +46,6 @@ public abstract class ExternalCmdProbe extends Probe {
 				oneSample.set(perfstring);
 		} catch (IOException e) {
 			logger.warn("external command failed : " + e);
-		} catch (RrdException e) {
-			logger.warn("unable to store result for probe " + this.getName() + ": " + e);
 		}
 		try {
 			if(urlperfps != null) {

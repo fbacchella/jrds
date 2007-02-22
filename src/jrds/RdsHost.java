@@ -47,7 +47,7 @@ public class RdsHost implements Comparable {
 	
 	public String getHostDir()
 	{
-		String rrdDir = HostsList.getRootGroup().getRrdDir() + org.jrobin.core.Util.getFileSeparator() + name;
+		String rrdDir = HostsList.getRootGroup().getRrdDir() + org.rrd4j.core.Util.getFileSeparator() + name;
 		return rrdDir;
 	}
 	
@@ -72,8 +72,7 @@ public class RdsHost implements Comparable {
 		if(starters != null)
 			starters.startCollect();
 		for(Probe currrd: allProbes) {
-			//We are finished if current thread was interrupted
-			if( Thread.currentThread().isInterrupted() )
+			if( ! currrd.isStarted())
 				break;
 			currrd.collect();
 		}

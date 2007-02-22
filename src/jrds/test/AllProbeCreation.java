@@ -18,12 +18,11 @@ import jrds.PropertiesManager;
 import jrds.RdsGraph;
 import jrds.RdsHost;
 
-import org.jrobin.core.RrdBackendFactory;
-import org.jrobin.core.RrdDb;
-import org.jrobin.core.RrdDef;
-import org.jrobin.core.RrdException;
-import org.jrobin.core.RrdMemoryBackendFactory;
-import org.jrobin.core.Sample;
+import org.rrd4j.core.RrdBackendFactory;
+import org.rrd4j.core.RrdDb;
+import org.rrd4j.core.RrdDef;
+import org.rrd4j.core.RrdMemoryBackendFactory;
+import org.rrd4j.core.Sample;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -31,7 +30,7 @@ public class AllProbeCreation/* extends UnitTest*/ {
 	 static Collection<ProbeDesc> probeList;
 	 static ProbeFactory pf;
 	 static RrdMemoryBackendFactory membef;
-	 @BeforeClass public static void prepare() throws RrdException {
+	 @BeforeClass public static void prepare() {
 			RrdBackendFactory.setDefaultFactory("MEMORY");
 			//.registerAndSetAsDefaultFactory(new org.jrobin.core.RrdMemoryBackendFactory());
 			membef = (RrdMemoryBackendFactory) RrdBackendFactory.getDefaultFactory();
@@ -54,7 +53,7 @@ public class AllProbeCreation/* extends UnitTest*/ {
 		}
 		probeList = df.getProbesDescMap().values();
 	}
-	@Test public void makeProbe() throws ParserConfigurationException, IOException, RrdException {
+	@Test public void makeProbe() throws ParserConfigurationException, IOException {
 		RdsHost host = new RdsHost("Empty");
 		for(ProbeDesc pd: probeList) {
 			Class originalClass = pd.getProbeClass();

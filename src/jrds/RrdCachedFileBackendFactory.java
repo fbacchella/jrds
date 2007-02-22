@@ -9,11 +9,11 @@ package jrds;
 import java.io.File;
 import java.io.IOException;
 
-import org.jrobin.core.FetchRequest;
-import org.jrobin.core.RrdBackend;
-import org.jrobin.core.RrdDb;
-import org.jrobin.core.RrdFileBackendFactory;
-import org.jrobin.core.Sample;
+import org.rrd4j.core.FetchRequest;
+import org.rrd4j.core.RrdBackend;
+import org.rrd4j.core.RrdDb;
+import org.rrd4j.core.RrdFileBackendFactory;
+import org.rrd4j.core.Sample;
 
 /**
  * @author bacchell

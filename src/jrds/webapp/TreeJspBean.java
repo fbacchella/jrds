@@ -32,7 +32,6 @@ import jrds.RdsGraph;
 import jrds.Renderer;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdException;
 
 /**
  * 
@@ -80,7 +79,7 @@ public class TreeJspBean {
 			s1 = null;
 		if(s2 != null && s2.trim().length() == 0)
 			s2 = null;
-		
+
 		if(s1 == null && s2 == null)
 			retValue = true;
 		else if(s1 != null && s2 != null){
@@ -201,47 +200,43 @@ public class TreeJspBean {
 			if( ! graphs.isEmpty()) {
 				Renderer r = hl.getRenderer();
 				for(RdsGraph graph: graphs) {
-					try {
-						r.render(graph, cgiParams.getBegin(), cgiParams.getEnd());
-						gb.setGraph(graph);
+					r.render(graph, cgiParams.getBegin(), cgiParams.getEnd());
+					gb.setGraph(graph);
 
-						popupBuffer.setLength(0);
-						popupBuffer.append("onclick='popup(");
-						popupBuffer.append(graph.hashCode());
-						popupBuffer.append(")'");
+					popupBuffer.setLength(0);
+					popupBuffer.append("onclick='popup(");
+					popupBuffer.append(graph.hashCode());
+					popupBuffer.append(")'");
 
-						Probe p = graph.getProbe();
-						detailsBuffer.setLength(0);
-						detailsBuffer.append("onclick='details(");
-						detailsBuffer.append(p.hashCode());
-						detailsBuffer.append(", \"");
-						detailsBuffer.append(p.getName());
-						detailsBuffer.append("\")'");
-						
-						historyBuffer.setLength(0);
-						historyBuffer.append("onclick='history_popup(");
-						historyBuffer.append(graph.hashCode());
-						historyBuffer.append(", \"");
-						historyBuffer.append(p.getName());
-						historyBuffer.append("\");'");
-						
-						
-						buffer.setLength(0);
-						buffer.append("<div class='graphblock'>\n");
-						buffer.append(gb.getImgElement() + "\n");
-						buffer.append("<div class='iconslist'>\n");
-						buffer.append("<img class='icon' " + popupBuffer + " src='img/application_double.png' alt='popup'  height='16' width='16'  />\n");
-						buffer.append("<img class='icon' " + detailsBuffer + " src='img/application_view_list.png' alt=\"probe's details\"  height='16' width='16'  />\n");
-						buffer.append("<img class='icon' " + historyBuffer + " src='img/time.png' alt='history'  height='16' width='16'  />\n");
-						buffer.append("<img class='icon' src='img/magnifier.png' alt='magnifier'  height='16' width='16'  />\n");
-						buffer.append("<img class='icon' src='img/disk.png' alt='save'  height='16' width='16'  />\n");
-						buffer.append("</div>\n");
-						buffer.append("</div>\n");
-						buffer.append("\n");
-						out.println(buffer);
-					} catch (RrdException e) {
-						logger.error("Graph " + graph + " cannot be rendered"); 
-					}
+					Probe p = graph.getProbe();
+					detailsBuffer.setLength(0);
+					detailsBuffer.append("onclick='details(");
+					detailsBuffer.append(p.hashCode());
+					detailsBuffer.append(", \"");
+					detailsBuffer.append(p.getName());
+					detailsBuffer.append("\")'");
+
+					historyBuffer.setLength(0);
+					historyBuffer.append("onclick='history_popup(");
+					historyBuffer.append(graph.hashCode());
+					historyBuffer.append(", \"");
+					historyBuffer.append(p.getName());
+					historyBuffer.append("\");'");
+
+
+					buffer.setLength(0);
+					buffer.append("<div class='graphblock'>\n");
+					buffer.append(gb.getImgElement() + "\n");
+					buffer.append("<div class='iconslist'>\n");
+					buffer.append("<img class='icon' " + popupBuffer + " src='img/application_double.png' alt='popup'  height='16' width='16'  />\n");
+					buffer.append("<img class='icon' " + detailsBuffer + " src='img/application_view_list.png' alt=\"probe's details\"  height='16' width='16'  />\n");
+					buffer.append("<img class='icon' " + historyBuffer + " src='img/time.png' alt='history'  height='16' width='16'  />\n");
+					buffer.append("<img class='icon' src='img/magnifier.png' alt='magnifier'  height='16' width='16'  />\n");
+					buffer.append("<img class='icon' src='img/disk.png' alt='save'  height='16' width='16'  />\n");
+					buffer.append("</div>\n");
+					buffer.append("</div>\n");
+					buffer.append("\n");
+					out.println(buffer);
 				}
 			}
 		} catch (IOException e) {

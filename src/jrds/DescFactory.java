@@ -14,6 +14,7 @@ import jrds.snmp.SnmpRequester;
 import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.Rule;
 import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 import org.snmp4j.smi.OID;
 import org.xml.sax.Attributes;
 
@@ -135,7 +136,10 @@ public class DescFactory extends DirXmlParser {
 			@SuppressWarnings("unchecked")
 			public void body(String namespace, String name, String text) throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
 				Map m  = (Map) digester.peek();
-				m.put("dsType", ProbeDesc.class.getField(text.trim().toUpperCase()).get(null));
+				DsType type = null;
+				if( !"NONE".equals(text.trim().toUpperCase()))
+					type = DsType.valueOf(text.trim().toUpperCase());
+				m.put("dsType", type);
 			}
 		});
 		digester.addRule("probedesc/ds/oid", new Rule() {

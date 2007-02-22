@@ -14,6 +14,8 @@ import java.util.Map;
 
 import jrds.ProbeDesc;
 
+import org.rrd4j.DsType;
+
 
 /**
  * @author bacchell
@@ -24,11 +26,11 @@ public abstract class Sybase extends JdbcProbe {
 
 	private static final ProbeDesc pd = new ProbeDesc(5);
 	static {
-		pd.add("database_size", ProbeDesc.GAUGE);
-		pd.add("reserved", ProbeDesc.GAUGE);
-		pd.add("data", ProbeDesc.GAUGE);
-		pd.add("index_size", ProbeDesc.GAUGE);
-		pd.add("unused", ProbeDesc.GAUGE);
+		pd.add("database_size", DsType.GAUGE);
+		pd.add("reserved", DsType.GAUGE);
+		pd.add("data", DsType.GAUGE);
+		pd.add("index_size", DsType.GAUGE);
+		pd.add("unused", DsType.GAUGE);
 		pd.setGraphClasses(new Class[] { SybaseGraph.class });
 	}
 	

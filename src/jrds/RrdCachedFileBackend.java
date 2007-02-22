@@ -14,7 +14,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdFileBackend;
+import org.rrd4j.core.RrdFileBackend;
 
 /** 
  * JRobin backend which is used to store RRD data to ordinary disk files 

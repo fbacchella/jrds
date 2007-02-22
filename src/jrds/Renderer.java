@@ -23,7 +23,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdException;
 
 public class Renderer {
 	final int PRIME = 31;
@@ -36,11 +35,10 @@ public class Renderer {
 		public boolean  finished = false;
 		File destFile;
 
-		public RendererRun(Date start, Date end, RdsGraph graph, int keyid) throws IOException, RrdException {
+		public RendererRun(Date start, Date end, RdsGraph graph, int keyid) throws IOException {
 			this.start = start;
 			this.end = end;
 			this.graph = graph;
-			//rrdgraph = graph.getRrdGraph(start, end);
 			destFile = new File(HostsList.getRootGroup().getTmpdir(), Integer.toHexString(keyid) + ".png");
 		}
 
@@ -155,7 +153,7 @@ public class Renderer {
 		};	
 	}
 
-	public void render(final RdsGraph graph, final Date start, final Date end) throws IOException, RrdException {
+	public void render(final RdsGraph graph, final Date start, final Date end) throws IOException {
 		RendererRun runRender = null;
 		int key = 0;
 		key = makeKey(graph, start, end);
@@ -180,14 +178,9 @@ public class Renderer {
 	public boolean isReady(final RdsGraph graph, final Date start, final Date end) {
 		RendererRun  runRender = null;
 		int key = 0;
-		try {
-			key = makeKey(graph, start, end);
-			synchronized(rendered){
-				runRender = rendered.get(key);
-			}
-		} catch (RrdException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		key = makeKey(graph, start, end);
+		synchronized(rendered){
+			runRender = rendered.get(key);
 		}
 		if( runRender == null) {
 			try {
@@ -199,8 +192,6 @@ public class Renderer {
 			}
 			// If cannot launch render, will always be false
 			catch (IOException e) {
-			}
-			catch (RrdException e) {
 			}
 		}
 		return (runRender != null) && runRender.isReady();
@@ -214,7 +205,7 @@ public class Renderer {
 			synchronized(rendered){
 				runRender = rendered.get(key);
 			}
-		} catch (RrdException e) {
+		} catch (Exception e) {
 			logger.error("Error with probe: " + e);
 		}
 		if(runRender != null) {
@@ -240,10 +231,10 @@ public class Renderer {
 		}
 
 	}
-	private int makeKey(RdsGraph graph, Date startDate, Date endDate) throws RrdException {
+	private int makeKey(RdsGraph graph, Date startDate, Date endDate) {
 		long step = graph.probe.getRrdDef().getStep();
-		long start = org.jrobin.core.Util.normalize(startDate.getTime(), step * 1000L);
-		long end = org.jrobin.core.Util.normalize(endDate.getTime(), step * 1000L);
+		long start = org.rrd4j.core.Util.normalize(startDate.getTime(), step * 1000L);
+		long end = org.rrd4j.core.Util.normalize(endDate.getTime(), step * 1000L);
 		int id = graph.hashCode();
 		int result = 1;
 		result = PRIME * result + (int) (end ^ (end >>> 32));

@@ -27,7 +27,6 @@ import jrds.HostsList;
 import jrds.Probe;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.RrdException;
 import org.w3c.dom.Document;
 
 public class ProbeDetails extends HttpServlet {
@@ -69,9 +68,6 @@ public class ProbeDetails extends HttpServlet {
 				transformer.transform(source, result);
 				res.getOutputStream().flush();
 			} catch (ParserConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (RrdException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (TransformerConfigurationException e) {

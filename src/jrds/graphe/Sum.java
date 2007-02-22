@@ -12,12 +12,11 @@ import jrds.RdsGraph;
 import jrds.probe.SumProbe;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.FetchData;
-import org.jrobin.core.RrdException;
-import org.jrobin.data.LinearInterpolator;
-import org.jrobin.data.Plottable;
-import org.jrobin.graph.RrdGraph;
-import org.jrobin.graph.RrdGraphDef;
+import org.rrd4j.core.FetchData;
+import org.rrd4j.data.LinearInterpolator;
+import org.rrd4j.data.Plottable;
+import org.rrd4j.graph.RrdGraph;
+import org.rrd4j.graph.RrdGraphDef;
 
 public class Sum extends RdsGraph {
 	static final private Logger logger = Logger.getLogger(Sum.class);
@@ -39,7 +38,7 @@ public class Sum extends RdsGraph {
 		gd.setGraphTitle(theStore.getName());
 	}
 	
-	protected RrdGraphDef getRrdDef() throws RrdException, IOException {
+	protected RrdGraphDef getRrdDef() throws IOException {
 		SumProbe p = (SumProbe) probe;
 		double[][] allvalues = null;
 		GraphDesc tempgd = null;
@@ -86,7 +85,7 @@ public class Sum extends RdsGraph {
 
 	
 	public RrdGraph getRrdGraph(Date startDate, Date endDate) throws
-	IOException, RrdException {
+	IOException {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		return super.getRrdGraph(startDate, endDate);

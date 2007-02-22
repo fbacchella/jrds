@@ -3,7 +3,7 @@ package jrds;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.jrobin.core.*;
+import org.rrd4j.core.*;
 
 /**
  * A wrapper classe, to manage the rrdDb operations
@@ -15,7 +15,7 @@ public final class StoreOpener {
 	static {
 		try {
 			pool = RrdDbPool.getInstance();
-		} catch (RrdException e) {
+		} catch (Exception e) {
 			logger.fatal(e);
 		}
 	}
@@ -30,7 +30,7 @@ public final class StoreOpener {
 	 * @throws RrdException Thrown in case of a JRobin specific error.
 	 */
 	public final static RrdDb getRrd(String rrdFile)
-	throws IOException, RrdException {
+	throws IOException {
 		RrdDb db;
 		if (pool != null)
 			db = pool.requestRrdDb(rrdFile);
@@ -53,7 +53,7 @@ public final class StoreOpener {
 		}
 	}
 
-	public static final void prepare(int dbPoolSize, int syncPeriod) throws RrdException {
+	public static final void prepare(int dbPoolSize, int syncPeriod) {
 		pool.setCapacity(dbPoolSize);
 
 		RrdCachedFileBackendFactory.setSyncMode(RrdCachedFileBackendFactory.SYNC_CENTRALIZED);
