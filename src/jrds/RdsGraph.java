@@ -177,24 +177,29 @@ public class RdsGraph implements Comparable {
 
 	public RrdGraph getRrdGraph(Date startDate, Date endDate) throws
 	IOException {
-		Date lastUpdate = probe.getLastUpdate();
-		if(endDate.after(lastUpdate))
-			endDate = new Date(lastUpdate.getTime() );
+		//We normalize the last update time, it can't be used directly
+		long resolution = HostsList.getRootGroup().getResolution();
+		Date lastUpdateNormalized = new Date(1000L * org.rrd4j.core.Util.normalize(getProbe().getLastUpdate().getTime() / 1000L, resolution));
+		//We dont want to graph past the last normalized update time
+		//but only if we are within a resolution interval
+		if(endDate.after(lastUpdateNormalized) && endDate.getTime() - lastUpdateNormalized.getTime() < resolution * 1000L)
+			endDate = lastUpdateNormalized;
 		RrdGraphDef tempGraphDef = getRrdDef();
 		tempGraphDef = graphFormat(tempGraphDef, startDate, endDate);
 
-		//We normalize the last update time, it can't be used directly
-		Date lastUpdateNormalized = new Date(1000L * org.rrd4j.core.Util.normalize(getProbe().getLastUpdate().getTime() / 1000L, HostsList.getRootGroup().getResolution()));
-		//We dont want to graph past the last normalized update time
-		if(endDate.after(lastUpdateNormalized))
-			endDate = lastUpdateNormalized;
-		tempGraphDef.setStartTime(startDate.getTime()/1000);
-		tempGraphDef.setEndTime(endDate.getTime()/1000);
+		try {
+			tempGraphDef.setStartTime(startDate.getTime()/1000);
+			tempGraphDef.setEndTime(endDate.getTime()/1000);
+		} catch (IllegalArgumentException e) {
+			logger.error("Impossible to create graph definition, invalid date definition from " + startDate + " to " + endDate + " : " + e);
+		}
 		tempGraphDef.setWidth(getWidth());
 		tempGraphDef.setHeight(getHeight());
-		RrdGraph graph = new RrdGraph(tempGraphDef);
+		RrdGraph graph = new RrdGraph(tempGraphDef/*, true*/);
+		//graph.paint();
 		if(dimension == null) {
 			RrdGraphInfo gi = graph.getRrdGraphInfo();
+			//logger.trace("" + this + " w=" + gi.getWidth() + ", h=" + gi.getHeight());
 			dimension = new Dimension();
 			dimension.height = gi.getHeight();
 			dimension.width = gi.getWidth();

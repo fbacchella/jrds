@@ -624,7 +624,7 @@ implements Cloneable {
 					}
 				}
 				else {
-					logger.error("No way to plot " + ds.name + " found");
+					logger.error("No way to plot " + ds.name + " in " + name + " found");
 				}
 			}
 			else {

@@ -6,7 +6,7 @@
   <graphName>apachetransfer</graphName>
   <graphTitle>Bytes transfert on port {2}</graphTitle>
   <unit>
-    <binary/>
+    <SI/>
   </unit>
   <verticalLabel>Bytes/s</verticalLabel>
   <add>

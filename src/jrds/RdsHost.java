@@ -72,9 +72,10 @@ public class RdsHost implements Comparable {
 		if(starters != null)
 			starters.startCollect();
 		for(Probe currrd: allProbes) {
-			if( ! currrd.isStarted())
+			if(! HostsList.getRootGroup().isCollectRunning() )
 				break;
-			currrd.collect();
+			if(currrd.isStarted())
+				currrd.collect();
 		}
 		if(starters != null)
 			starters.stopCollect();
@@ -122,5 +123,10 @@ public class RdsHost implements Comparable {
 	public StartersSet getStarters() {
 		return starters;
 	}
+	
+	public boolean isCollectRunning() {
+		return HostsList.getRootGroup().isCollectRunning() && ! Thread.currentThread().isInterrupted();
+	}
+	
 
 }

@@ -1,0 +1,952 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
+"http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<?xmlspysps http://www.altova.com/sps/Template/Publishing/docbook.sps?>
+<article>
+  <title>JRDS Setup and usage</title>
+  <section>
+    <title>Pre requisite</title>
+    <para>jrds is a web application. It needs a JVM version 5 on the server.
+    It can collect datas from many probes like</para>
+    <itemizedlist>
+      <listitem>
+        <para>snmp agent (net-snmp)</para>
+      </listitem>
+      <listitem>
+        <para>Apache status</para>
+      </listitem>
+      <listitem>
+        <para>rstat v3 and v4</para>
+      </listitem>
+      <listitem>
+        <para>munins</para>
+      </listitem>
+      <listitem>
+        <para>jdbc</para>
+      </listitem>
+      <listitem>
+        <para>connector to Exalead search engine</para>
+      </listitem>
+      <listitem>
+        <para>External program</para>
+      </listitem>
+    </itemizedlist>
+    <para>It currently runs on Tomcat 5.5 but is known to also work on Tomcat
+    5.0 and Resin 3.0. It should work without too many problems with any
+    serlvet engine.</para>
+  </section>
+  <section>
+    <title>Initial setup</title>
+    <para>The jrds web needs to find an initial properties file. For example,
+    for Tomcat, the following elements needs to be added to the web app
+    definition to let the application find it :</para>
+    <para/>
+    <programlisting>  &lt;Parameter
+    name="propertiesFile"
+    value="/opt/jrds/conf/jrds.properties"/&gt;
+</programlisting>
+    <para>In this file, three parameters are mandatory</para>
+    <para/>
+    <orderedlist>
+      <listitem>
+        <para>configdir, where the xml configuration files are to be
+        found,</para>
+      </listitem>
+      <listitem>
+        <para>rrddir, where the probe values will be stored,</para>
+      </listitem>
+      <listitem>
+        <para>logfile, where the logfile is to be written.</para>
+      </listitem>
+    </orderedlist>
+    <para>Example :</para>
+    <programlisting>configdir=/opt/jrds/config
+rrddir=/opt/jrds/probe
+logfile=/opt/jrds/log/jrds.log
+</programlisting>
+    <para>The loglevel can be choosen with the option :</para>
+    <programlisting>loglevel=level
+</programlisting>
+    <para>The level are the same as in log4j, and are, with increased
+    verbosity :</para>
+    <para>fatal, error, warn, info, debug, trace.</para>
+    <para>Trace level should be avoided except in some rare conditions and
+    even debug level can be quite verbose.</para>
+    <section>
+      <title>Configuration files</title>
+      <para>The configuration is stored in 4 different kinds of file, the most
+      common one is the host file, describing an host and every probe running
+      on it, the thre other are the filter file, the macro file and the sum
+      file.</para>
+      <section>
+        <title>The host file</title>
+        <para>There is one file for each host, it provide the dns name for the
+        host and all the probes. It can also contains tag definitions, macro
+        calls and snmp parameters.</para>
+        <para>For example:</para>
+        <programlisting>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;host name="avalon"&gt;
+        &lt;snmp community="public" version="2"/&gt;
+        &lt;tag&gt;webServer&lt;/tag&gt;
+        &lt;tag&gt;V40z&lt;/tag&gt;
+        &lt;macro name="solarisHost" /&gt;
+        &lt;probe type="DiskIo"&gt;
+                &lt;arg type="String" value="sd1"/&gt;
+        &lt;/probe&gt;
+        &lt;probe type="PartitionSpace"&gt;
+                &lt;arg type="String" value="/"/&gt;
+        &lt;/probe&gt;
+        &lt;probe type="ApacheStatus" /&gt;
+        &lt;probe type="ProcessInfoExtended" &gt;
+            &lt;arg type="String" value="apache"/&gt;
+            &lt;arg type="String" value="httpd"/&gt;
+        &lt;/probe&gt;
+&lt;/host&gt;
+
+</programlisting>
+        <para>The snmp element must be defined once if any snmp based probe is
+        to be used. Each snmp based probe can also have the snmp sub-element
+        if it's different from the default one.</para>
+      </section>
+      <section>
+        <title>The macro file</title>
+        <para>A macro file is used to store many probes that can be used by a
+        host. It's used to centralize many definitions at the same
+        time.</para>
+        <para>Example:</para>
+        <programlisting>&lt;macrodef name="solaris"&gt;
+        &lt;tag&gt;solaris&lt;/tag&gt;
+        &lt;probe type="TcpSnmp" /&gt;
+        &lt;probe type="IpSnmp" /&gt;
+        &lt;probe type="UdpSnmp" /&gt;
+        &lt;probe type="IcmpSnmp" /&gt;
+        &lt;probe type="Mem" /&gt;
+        &lt;probe type="ProcessStatusHostResources" /&gt;
+        &lt;probe type="CpuRawTimeSolaris" /&gt;
+        &lt;probe type="UcdRawSystemCounter" /&gt;
+        &lt;probe type="VMSolaris" /&gt;
+        &lt;probe type="RstatProbe4" /&gt;
+&lt;/macrodef&gt;
+</programlisting>
+        <para>As they must be parsed before the host files that use them, jrds
+        will look for them in a subdirectory of the configuration directory
+        called <filename>macro</filename>.</para>
+        <para>Any defined macro can be used within an host with the
+        <markup>macro</markup> element, with a name attributes used to
+        identify the good macro definition. The snmp configuration can't be
+        defined in a macro definition.</para>
+      </section>
+      <section>
+        <title>The filter file</title>
+        <para>When there is a great number of monitored hosts, it becomes
+        cumbersone to browse the tree and get a good overview of the
+        situation. To select a number of hosts and graphs, filter can be
+        defined, that will only some hosts, using the tags as a filter, and on
+        those hosts, only some graphs.</para>
+        <para>For example:</para>
+        <programlisting>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!DOCTYPE view PUBLIC "-//jrds//DTD View//EN" "urn:jrds:view"&gt;
+&lt;view&gt;
+        &lt;name&gt;Routeur&lt;/name&gt;
+        &lt;tag&gt;solarisHost&lt;/tag&gt;
+        &lt;path&gt;.*merlin/Network.*&lt;/path&gt;
+&lt;/view&gt;
+</programlisting>
+        <para>Only hosts matching the tags will be kept, and on those hosts,
+        only the graphs matching at least one path will be shown.</para>
+      </section>
+      <section>
+        <title>Edition the configuration</title>
+        <para>Both <filename>jrds.properties</filename> and the configurations
+        files can be edited when jrds is up. To have the configuration
+        reloaded, one just have to access the url <filename>http://&lt;jrds
+        path&gt;/reload</filename>.</para>
+      </section>
+    </section>
+  </section>
+  <section>
+    <title>Adding an external library</title>
+    <para>jrds can use jar to add new probes. They must be declared in
+    <filename>jrds.properties</filename>, in an entry called
+    <varname>libspath</varname>.</para>
+    <programlisting>libspath=lib/jrdsexalead.jar;lib/jrdsagent.jar</programlisting>
+  </section>
+  <section>
+    <title>Current probes list</title>
+    <para>This list show all the probes of jrds and the argument needed in the
+    probe file for each instance.</para>
+    <section>
+      <title>In the base application</title>
+      <table>
+        <title>ApacheStatus</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>Integer</entry>
+              <entry>The http listening port</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <para>Needs <application>mod_status</application> to works. Can take a
+      optional Integer argument wich will be the Apache server probe. It will
+      check the <filename>http://host:port/server-status?auto</filename>
+      url.</para>
+      <table>
+        <title>CiscoPix</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>CpuLoadFloat</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>CpuRaw</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>CpuRawTimeLinux</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>CpuRawTimeSolaris</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>DiskIo</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>String</entry>
+              <entry>name in the diskIODevice SNMP table</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>DiskIo64</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>String</entry>
+              <entry>name in the diskIODevice SNMP table</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <para>Like DiskIo, but with 64 bits counters. This kind of counters are
+      supported only with snmp v2 and some agents.</para>
+      <table>
+        <title>HpPdu</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>String</entry>
+              <entry>identifier</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>HttpResponseTime</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>URL</entry>
+              <entry>The URL to probe</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>IcmpSnmp</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>IfSnmp</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>String</entry>
+              <entry>The interface name in the ifDescr SNMP table</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>IfXSnmp</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>String</entry>
+              <entry>The interface name in the ifDescr SNMP table</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <para>Like IfSnmp, but with 64 bits counters and more informations. This
+      kind of counters are supported only with snmp v2 and some agents.</para>
+      <table>
+        <title>IpSnmp</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>Mem</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>MemLinux</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>MySqlStatus</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>String</entry>
+              <entry>Login</entry>
+            </row>
+            <row>
+              <entry>String</entry>
+              <entry>Password</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>MysqlTableSpace</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>String</entry>
+              <entry>Login</entry>
+            </row>
+            <row>
+              <entry>String</entry>
+              <entry>Password</entry>
+            </row>
+            <row>
+              <entry>String</entry>
+              <entry>Table name</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>NumProcesses</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>PartitionSpace</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>String</entry>
+              <entry>Mount point of a file system</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>ProcessInfoExtended</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>String</entry>
+              <entry>Process name</entry>
+            </row>
+            <row>
+              <entry>String</entry>
+              <entry>Regular expression used as a filter on the full command
+              line</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>ProcessStatusHostResources</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>ProcessStatusSolaris</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>RstatProbe3</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>RstatProbe4</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <para>Both this probe and RstatProbe3 need the rstat service to be
+      activated on the monitored server. The number 3 and 4 show the rstat RPC
+      version.</para>
+      <table>
+        <title>TcpSnmp</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>UcdRawSystemCounter</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>UdpSnmp</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>VMSolaris</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>ciscocpuload</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>cpmCPUTotal</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>Integer</entry>
+              <entry>Cpu ID</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>cpqTemperature</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>Integer</entry>
+              <entry>Temperature probe ID</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>mtaGroup</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>String</entry>
+              <entry>The name of a MTA group, as in the MTA MIB</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>sendmailSnmp</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>none</entry>
+              <entry>N/A</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <para>To use those two probes and if net-snmp is used, it must be
+      compiled with the <application>mibII/mta_sendmail</application> mib
+      module. To do so, add <command>--with-mib-modules="...
+      mibII/mta_sendmail"</command> to the
+      <application>configure</application> parameters.</para>
+    </section>
+    <section>
+      <title>Exalead's probes</title>
+      <table>
+        <title>CrawlerSimpleStats</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>Integer</entry>
+              <entry>the box TCP port</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>CrawlerStatus</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>Integer</entry>
+              <entry>the box TCP port</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>FrontProfiler</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>Integer</entry>
+              <entry>the box TCP port</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>FrontStatus</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>Integer</entry>
+              <entry>the box TCP port</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>Index</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>Integer</entry>
+              <entry>the box TCP port</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>IndexProduction</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>Integer</entry>
+              <entry>the box TCP port</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </section>
+    <section>
+      <title>jrdsagent's probes</title>
+      <table>
+        <title>Diskstats</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>String</entry>
+              <entry>Device name in /proc/diskstats</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>TcpQueue</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>String</entry>
+              <entry>Device name in /proc/diskstats</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+      <table>
+        <title>IfStat</title>
+        <tgroup cols="2">
+          <thead>
+            <row>
+              <entry align="center">type</entry>
+              <entry align="center">usage</entry>
+            </row>
+          </thead>
+          <tbody>
+            <row>
+              <entry>String</entry>
+              <entry>Device name in /proc/diskstats</entry>
+            </row>
+          </tbody>
+        </tgroup>
+      </table>
+    </section>
+  </section>
+</article>

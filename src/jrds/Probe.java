@@ -356,24 +356,22 @@ implements Comparable {
 	 * @throws RrdException
 	 */
 	public void collect() {
-		HostsList hl = HostsList.getRootGroup();
 		//We only collect if the HostsList allow it
-		if(hl.isCollectRunning()) {
+		if(monitoredHost.isCollectRunning()) {
 			logger.debug("launch collect for " + this);
 			starters.startCollect();
 			RrdDb rrdDb = null;
 			Sample onesample;
 			try {
 				//No collect if the thread was interrupted
-				if( ! Thread.currentThread().isInterrupted()) {
+				if( monitoredHost.isCollectRunning()) {
 					rrdDb = StoreOpener.getRrd(getRrdName());
 					onesample = rrdDb.createSample();
 					updateSample(onesample);
 					logger.trace(onesample.dump());
 					//The collect might have been stopped
 					//during the reading of samples
-					//We also do not store if the thread was interrupted
-					if(hl.isCollectRunning() && ! Thread.currentThread().isInterrupted())
+					if(monitoredHost.isCollectRunning())
 						onesample.update();
 				}
 			}
