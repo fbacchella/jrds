@@ -69,16 +69,25 @@ public class RdsHost implements Comparable {
 	
 	public void  collectAll()
 	{
+		long start = System.currentTimeMillis();
 		if(starters != null)
 			starters.startCollect();
 		for(Probe currrd: allProbes) {
 			if(! HostsList.getRootGroup().isCollectRunning() )
 				break;
+			long duration = (System.currentTimeMillis() - start) /1000 ;
+			if(duration > (HostsList.getRootGroup().getResolution() / 2 )) {
+				logger.error("Collect for " + this + " ran too long: " + duration + "s");
+				break;
+			}
 			if(currrd.isStarted())
 				currrd.collect();
 		}
 		if(starters != null)
 			starters.stopCollect();
+		long end = System.currentTimeMillis();
+		float elapsed = ((float)(end - start))/1000;
+		logger.trace("Collect time for " + name + ": " + elapsed + "s");
 	}
 
 	public void graphAll(Date startDate, Date endDate)

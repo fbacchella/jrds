@@ -30,12 +30,15 @@ public class Collector {
 	static final private Logger logger = Logger.getLogger(Collector.class);
 
 	public static void main(String[] args) throws Exception {
-		PropertiesManager pm = new PropertiesManager(new File("jrds.properties"));
+		String propFile = "jrds.properties";
+		if(args.length == 1)
+			propFile = args[0];
+		PropertiesManager pm = new PropertiesManager(new File(propFile));
 		jrds.JrdsLoggerConfiguration.configure(pm);
 
 		System.getProperties().setProperty("java.awt.headless","true");
 		System.getProperties().putAll(pm);
-		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
+		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, pm.rrdbackend);
 
 		HostsList hl = HostsList.getRootGroup();
 

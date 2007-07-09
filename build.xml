@@ -160,8 +160,8 @@
 		</xmlvalidate>
 	</target>
 	<!--  ==================== A few target to run jrds ==================== -->
-	<target name="collect" depends="appjar">
-		<java classname="jrds.standalone.Collector" fork="true">
+	<target name="collect" depends="appjar" >
+		<java classname="jrds.standalone.Collector" fork="true" maxmemory="512m">
 			<classpath>
 				<pathelement location="${build.home}/jrds.jar"/>
 				<path refid="project.classpath"/>
@@ -170,7 +170,7 @@
 	</target>
 	
 	<target name="test" depends="appjar">
-		<java classname="jrds.standalone.TestBackEnd" fork="true">
+		<java classname="jrds.standalone.TestBackEnd" fork="true" maxmemory="256m">
 			<classpath>
 				<pathelement location="${build.home}/jrds.jar"/>
 				<path refid="project.classpath"/>

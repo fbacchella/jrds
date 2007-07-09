@@ -124,7 +124,7 @@ public class PropertiesManager extends Properties {
 		rrddir = getProperty("rrddir", "probe");
 		resolution = parseInteger(getProperty("resolution", "300"));
 		collectorThreads = parseInteger(getProperty("collectorThreads", "1"));
-		dbPoolSize = parseInteger(getProperty("dbPoolSize", "10"));
+		dbPoolSize = parseInteger(getProperty("dbPoolSize", "10")) + collectorThreads;
 		syncPeriod = parseInteger(getProperty("syncPeriod", "-1"));
 		libspath = getProperty("libspath", "");
 		tmpdir = getProperty("tmpdir", "/var/tmp/jrds");
@@ -155,6 +155,7 @@ public class PropertiesManager extends Properties {
 		loglevel = Level.toLevel(getProperty("loglevel", "info"));
 		logfile = getProperty("logfile", "");
 		timeout = parseInteger(getProperty("timeout", "30"));
+		rrdbackend = getProperty("rrdbackend", "NIO");
 		Locale.setDefault(new Locale("POSIX"));
 	}
 
@@ -173,5 +174,6 @@ public class PropertiesManager extends Properties {
 	public boolean legacymode;
 	public String tmpdir;
 	public int timeout;
+	public String rrdbackend;
 
 }

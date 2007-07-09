@@ -53,7 +53,7 @@ public class StartListener implements ServletContextListener {
 
 				System.getProperties().setProperty("java.awt.headless","true");
 
-				StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
+				StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, pm.rrdbackend);
 
 				HostsList.getRootGroup().configure(pm);
 

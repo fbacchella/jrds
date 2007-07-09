@@ -60,10 +60,10 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
 				allocUnit = value.intValue();
 			}
 			else if(totalOid.equals(oid)) {
-				total = value.intValue();
+				total = value.longValue();
 			}
 			else if(usedOid.equals(oid)) {
-				used = value.intValue();
+				used = value.longValue();
 			}
 		}
 		total *= allocUnit;

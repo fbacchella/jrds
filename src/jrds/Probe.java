@@ -155,15 +155,19 @@ implements Comparable {
 
 	protected RrdDef getDefaultRrdDef() {
 		RrdDef def = new RrdDef(getRrdName());
+		def.setVersion(2);
 		return def;
 
 	}
 
 	private ArcDef[] getArcDefs() {
 		ArcDef[] defaultArc = new ArcDef[3];
-		defaultArc[0] = new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 6);
-		defaultArc[1] = new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 8760);
-		defaultArc[2] = new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 730);
+		//Five minutes step
+		defaultArc[0] = new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 3);
+		//One hour step
+		defaultArc[1] = new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 24 * 365);
+		//One day step
+		defaultArc[2] = new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 365 * 2);
 		return defaultArc;
 	}
 
@@ -255,7 +259,7 @@ implements Comparable {
 		File rrdFile = new File(getRrdName());
 		RrdDb rrdDb = null;
 		try {
-			if ( rrdFile.isFile()) {
+			if ( rrdFile.isFile() ) {
 				rrdDb = new RrdDb(getRrdName());
 				//old definition
 				RrdDef tmpdef = rrdDb.getRrdDef();
@@ -361,12 +365,11 @@ implements Comparable {
 			logger.debug("launch collect for " + this);
 			starters.startCollect();
 			RrdDb rrdDb = null;
-			Sample onesample;
 			try {
 				//No collect if the thread was interrupted
 				if( monitoredHost.isCollectRunning()) {
 					rrdDb = StoreOpener.getRrd(getRrdName());
-					onesample = rrdDb.createSample();
+					Sample onesample = rrdDb.createSample();
 					updateSample(onesample);
 					logger.trace(onesample.dump());
 					//The collect might have been stopped

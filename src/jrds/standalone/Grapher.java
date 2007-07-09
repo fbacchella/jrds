@@ -31,12 +31,15 @@ public class Grapher {
 	static final private Logger logger = Logger.getLogger(Grapher.class);
 
 	public static void main(String[] args) throws Exception {
-		PropertiesManager pm = new PropertiesManager(new File("jrds.properties"));
+		String propFile = "jrds.properties";
+		if(args.length == 1)
+			propFile = args[0];
+		PropertiesManager pm = new PropertiesManager(new File(propFile));
 		jrds.JrdsLoggerConfiguration.configure(pm);
 
 		System.getProperties().setProperty("java.awt.headless","true");
 		System.getProperties().putAll(pm);
-		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
+		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, pm.rrdbackend);
 
 		HostsList.getRootGroup().configure(pm);
 
@@ -44,19 +47,15 @@ public class Grapher {
 		//end.setTime(end.getTime() - HostsList.getRootGroup().getResolution() * 1000L);
 		Date begin = new Date(end.getTime() - 86400 * 1000);
 		GraphTree graphTree = HostsList.getRootGroup().getGraphTreeByHost();
-		Renderer r= new Renderer(2);
+		Renderer r= new Renderer(10);
 		for(jrds.RdsGraph g: graphTree.enumerateChildsGraph(null)) {
 			logger.debug("Found graph for probe " + g.getProbe());
-			Date start = new Date();
 			//end = new Date(1000L * org.jrobin.core.Util.normalize(g.getProbe().getLastUpdate().getTime() / 1000L, HostsList.getRootGroup().getResolution()));
 			try {
 				r.render(g, begin, end);
 			} catch (Exception e) {
 				logger.error("Error " + e + " with " + g.getGraphTitle());
 			}
-			Date finish = new Date();
-			long duration = finish.getTime() - start.getTime();
-			logger.info("Graph " + g.getQualifieName() + " renderding  ran for " + duration + "ms");							
 		}
 		for(jrds.Renderer.RendererRun rr: r.getWaitings()) {
 			logger.debug(rr);

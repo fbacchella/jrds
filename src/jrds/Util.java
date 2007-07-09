@@ -1,6 +1,7 @@
 package jrds;
 
 import java.security.MessageDigest;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 
@@ -79,7 +80,26 @@ public class Util {
 			sb.deleteCharAt(sb.length() -1 );
 		}
 		return sb.toString();	
-
 	}
+
+	/**
+	 * Used to normalize the end date to the last update time
+	 * but only if it's close to it 
+	 * @param p the probe to check against
+	 * @param endDate the desired end date
+	 * @return the normalized end date
+	 */
+	public static Date endDate(Probe p, Date endDate) {
+		Date normalized = endDate;
+		//We normalize the last update time, it can't be used directly
+		long resolution = HostsList.getRootGroup().getResolution();
+		Date lastUpdateNormalized = new Date(1000L * org.rrd4j.core.Util.normalize(p.getLastUpdate().getTime() / 1000L, resolution));
+		//We dont want to graph past the last normalized update time
+		//but only if we are within a resolution interval
+		if(endDate.after(lastUpdateNormalized) && endDate.getTime() - lastUpdateNormalized.getTime() < resolution * 1000L)
+			normalized = lastUpdateNormalized;
+		return normalized;
+	}
+
 }
 

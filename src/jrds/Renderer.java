@@ -12,6 +12,7 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,6 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
 
@@ -31,8 +33,8 @@ public class Renderer {
 		public Date start;
 		public Date end;
 		public RdsGraph graph;
-		//public RrdGraph rrdgraph;
-		public boolean  finished = false;
+		public boolean finished = false;
+		public final ReentrantLock running = new ReentrantLock(); 
 		File destFile;
 
 		public RendererRun(Date start, Date end, RdsGraph graph, int keyid) throws IOException {
@@ -86,21 +88,31 @@ public class Renderer {
 		}
 
 		private synchronized void writeImg() {
-			try {
-				BufferedImage bImg = graph.makeImg(start, end);
-				if(bImg != null) {
-					OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile));
-					javax.imageio.ImageIO.write(bImg, "png", out);
+			running.lock();
+			if( ! finished) {
+				long starttime = System.currentTimeMillis();
+				try {
+					BufferedImage bImg = graph.makeImg(start, end);
+					long middletime = System.currentTimeMillis();
+					if(bImg != null) {
+						OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile));
+						javax.imageio.ImageIO.write(bImg, "png", out);
+					}
+					long endtime = System.currentTimeMillis();
+					long duration1 = (middletime - starttime );
+					long duration2 = (endtime - middletime );
+					logger.info("Graph " + graph.getQualifieName() + " renderding ran for (ms) " + duration1 + ":" + duration2);	
+				} catch (FileNotFoundException e) {
+					logger.error("Error with temporary output file: " +e);
+				} catch (IOException e) {
+					logger.error("Error with temporary output file: " +e);
+				} catch (Exception e) {
+					logger.error("Run time rendering" + this, e);
 				}
-			} catch (FileNotFoundException e) {
-				logger.error("Error with temporary output file: " +e);
-			} catch (IOException e) {
-				logger.error("Error with temporary output file: " +e);
-			} catch (Exception e) {
-				logger.error("Run time rendering" + this, e);
-			}
-			//Allways set to true, we do not try again in case of failure
-			finished = true;
+				//Allways set to true, we do not try again in case of failure
+				finished = true;
+			}						
+			running.unlock();
 		}
 
 		@Override
@@ -136,7 +148,7 @@ public class Renderer {
 
 	public Renderer(int cacheSize) {
 		this.cacheSize = cacheSize;
-		rendered = new LinkedHashMap<Integer, RendererRun>(cacheSize + 5 , hashTableLoadFactor, true) {
+		Map<Integer, RendererRun> m = new LinkedHashMap<Integer, RendererRun>(cacheSize + 5 , hashTableLoadFactor, true) {
 			/* (non-Javadoc)
 			 * @see java.util.LinkedHashMap#removeEldestEntry(java.util.Map.Entry)
 			 */
@@ -147,22 +159,28 @@ public class Renderer {
 					remove(eldest.getKey());
 					rr.clean();
 				}
+				else if (rr != null &&  size() > Renderer.this.cacheSize){
+					logger.info("Graph queue too short, it's now " +  size() + " instead of " + Renderer.this.cacheSize);
+				}
 				return false;
 			}
 
-		};	
+		};
+		rendered =  Collections.synchronizedMap(m);	
 	}
 
 	public void render(final RdsGraph graph, final Date start, final Date end) throws IOException {
 		RendererRun runRender = null;
 		int key = 0;
 		key = makeKey(graph, start, end);
-		synchronized(rendered){
-			if( ! rendered.containsKey(key)) {
-				// Create graphics object
-				runRender = new RendererRun(start, end, graph, key); 
-				rendered.put(key, runRender);
-				logger.debug("wants to render " + runRender);
+		if( ! rendered.containsKey(key)) {
+			synchronized(rendered){
+				if( ! rendered.containsKey(key)) {
+					// Create graphics object
+					runRender = new RendererRun(start, end, graph, key); 
+					rendered.put(key, runRender);
+					logger.debug("wants to render " + runRender + ", with key " + key);
+				}
 			}
 		}
 		if(runRender != null){
@@ -179,19 +197,15 @@ public class Renderer {
 		RendererRun  runRender = null;
 		int key = 0;
 		key = makeKey(graph, start, end);
-		synchronized(rendered){
-			runRender = rendered.get(key);
-		}
+		runRender = rendered.get(key);
 		if( runRender == null) {
 			try {
 				render(graph, start, end);
-				synchronized(rendered){
-					runRender = rendered.get(key);
-				}
-
+				runRender = rendered.get(key);
 			}
 			// If cannot launch render, will always be false
 			catch (IOException e) {
+				runRender = null;
 			}
 		}
 		return (runRender != null) && runRender.isReady();
@@ -202,9 +216,7 @@ public class Renderer {
 		int key;
 		try {
 			key = makeKey(graph, start, end);
-			synchronized(rendered){
-				runRender = rendered.get(key);
-			}
+			runRender = rendered.get(key);
 		} catch (Exception e) {
 			logger.error("Error with probe: " + e);
 		}
@@ -242,5 +254,5 @@ public class Renderer {
 		result = PRIME * result + (int) (start ^ (start >>> 32));
 		return result;
 	}
-	
+
 }
