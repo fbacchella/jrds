@@ -51,7 +51,6 @@ implements Cloneable {
 	static public final ConsFunc DEFAULTCF = ConsFunc.AVERAGE;*/
 	static public final ConsolFun DEFAULTCF = ConsolFun.AVERAGE;
 
-
 	public interface GraphType {
 		public abstract void draw(RrdGraphDef rgd, String sn, Color color);
 
@@ -335,7 +334,7 @@ implements Cloneable {
 			public String toString() { return "PINK"; }
 		});
 	 */
-	
+
 	private static final Font TITLEFONT = new Font("Lucida Sans Typewriter", Font.BOLD ,12 );
 	private static final Font TEXTFONT = new Font("Lucida Sans Typewriter", Font.PLAIN ,10 );
 	private enum SiPrefix {
@@ -508,19 +507,17 @@ implements Cloneable {
 	public void add(String name, String dsName, String rpn,
 			String graphType, String color, String legend,
 			String consFunc, String reversed) {
-		if (dsName == null && rpn == null)
-			dsName = name;
 		GraphType gt = null;
-		if(graphType == null) {
+		if(graphType == null || "".equals(graphType)) {
 			if(legend != null)
 				gt = GraphType.COMMENT;
-			else if(name != null)
+			else
 				gt = GraphType.NONE;
 		}
 		else
 			gt = (GraphType) resolv(GraphType.class, graphType);
 		ConsolFun cf = DEFAULTCF;
-		if (consFunc != null)
+		if (consFunc != null || "".equals(consFunc))
 			cf = (ConsolFun) resolv(ConsolFun.class, consFunc);
 		Color c = Color.WHITE;
 		if (color != null) {
@@ -537,6 +534,28 @@ implements Cloneable {
 			if(gt != GraphType.COMMENT && gt != GraphType.NONE && gt != GraphType.VOID)
 				lastColor++;
 
+		}
+		if(name != null) {
+			// If nothing to use but a name anyway, it supposed to be a datastore
+			if(dsName == null && rpn == null && legend == null) {
+				dsName = name;
+				gt = GraphType.NONE;
+			}
+			//If neither datasource or rpn, it's a datasource
+			else if(dsName == null && rpn == null) {
+				dsName = name;
+			}
+		}
+		//If the name is missing, where do we find it ?
+		else {
+			if(dsName != null)
+				name = dsName;
+			else if(rpn != null)
+				name = rpn;
+			else if(legend != null) {
+				gt = GraphType.COMMENT;
+				name = legend;
+			}
 		}
 		if(legend == null && name != null)
 			legend = name;
@@ -597,10 +616,6 @@ implements Cloneable {
 			if(ds.graphType == GraphType.COMMENT) {
 				addLegend(retValue, ds.name, ds.graphType, ds.legend);
 			}
-			else if (ds.dsName == null && ds.rpn == null) {
-				ds.graphType.draw(retValue, ds.name, ds.color);
-				addLegend(retValue, ds.name, ds.graphType, ds.legend);
-			}
 			else if (ds.rpn == null) {
 				boolean exist = false; // Used to check it the data source one way or another
 				//Does the datas existe in the provided values
@@ -647,6 +662,60 @@ implements Cloneable {
 			retValue.setUnitsExponent(unitExponent);
 		}
 
+		return retValue;
+	}
+
+	/**
+	 * return the RrdGraphDef for this graph, used the indicated probe
+	 * any data can be overined of a provided map of Plottable
+	 * @param probe
+	 * @param ownData data used to overied probe's own values
+	 * @return
+	 * @throws IOException
+	 * @throws RrdException
+	 */
+	public DataProcessor getPlottedDatas(Probe probe, Map ownData, long start, long end) throws IOException {
+		DataProcessor retValue = new DataProcessor(start, end);
+		String rrdName = probe.getRrdName();
+
+		String lastName = null;
+		for(DsDesc ds: dsMap.values()) {
+			boolean stack = ds.graphType == GraphType.STACK;
+			boolean plotted = stack || ds.graphType == GraphType.LINE  || ds.graphType == GraphType.AREA;
+			if (ds.rpn == null && ds.dsName != null) {
+				//Does the datas existe in the provided values
+				if(ownData != null && ownData.containsKey(ds.dsName) && ds.graphType == GraphType.LINE) {
+					retValue.addDatasource(ds.name, (Plottable) ownData.get(ds.dsName));
+				}
+				//Or they might be on the associated rrd
+				else if(probe.dsExist(ds.dsName)) {
+					retValue.addDatasource(ds.name, rrdName, ds.dsName, ds.cf);                             
+				}
+			}
+			else if(ds.rpn != null){
+				retValue.addDatasource(ds.name, ds.rpn);
+			}
+			if(plotted && stack) {
+				retValue.addDatasource("Plotted" + ds.name, lastName + ", " +  ds.name + ", +");
+			}
+			else if(plotted) {
+				retValue.addDatasource("Plotted" + ds.name, ds.name);
+			}
+			lastName = ds.name; 
+		}
+		if(logger.isTraceEnabled()) {
+			logger.trace("Datastore for " + getName());
+			for(String s: retValue.getSourceNames())
+				logger.trace("\t" + s);
+		}
+		return retValue;
+	}
+
+	public boolean plottable(String dsName) {
+		boolean retValue = false;
+		DsDesc ds = dsMap.get(dsName);
+		if(ds != null)
+			retValue = ds.graphType != GraphType.COMMENT  && ds.graphType != GraphType.VOID && ds.graphType != GraphType.NONE;
 		return retValue;
 	}
 

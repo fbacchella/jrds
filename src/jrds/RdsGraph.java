@@ -11,27 +11,21 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.StringReader;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 
 import javax.media.jai.JAI;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Logger;
-import org.rrd4j.core.*;
-import org.rrd4j.graph.*;
+import org.rrd4j.data.DataProcessor;
+import org.rrd4j.graph.RrdGraph;
+import org.rrd4j.graph.RrdGraphDef;
+import org.rrd4j.graph.RrdGraphInfo;
 
 /**
  * @author bacchell
@@ -39,9 +33,11 @@ import org.rrd4j.graph.*;
  * TODO
  */
 public class RdsGraph implements Comparable {
-	
+
 	static final private Logger logger = Logger.getLogger(RdsGraph.class);
 	static final private SimpleDateFormat lastUpdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+	static private final SimpleDateFormat exportDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
 
 	protected Probe probe;
 	private String viewPath = null;
@@ -178,12 +174,8 @@ public class RdsGraph implements Comparable {
 	public RrdGraph getRrdGraph(Date startDate, Date endDate) throws
 	IOException {
 		//We normalize the last update time, it can't be used directly
-		long resolution = HostsList.getRootGroup().getResolution();
-		Date lastUpdateNormalized = new Date(1000L * org.rrd4j.core.Util.normalize(getProbe().getLastUpdate().getTime() / 1000L, resolution));
-		//We dont want to graph past the last normalized update time
-		//but only if we are within a resolution interval
-		if(endDate.after(lastUpdateNormalized) && endDate.getTime() - lastUpdateNormalized.getTime() < resolution * 1000L)
-			endDate = lastUpdateNormalized;
+		endDate = Util.endDate(getProbe(), endDate);
+		
 		RrdGraphDef tempGraphDef = getRrdDef();
 		tempGraphDef = graphFormat(tempGraphDef, startDate, endDate);
 
@@ -196,10 +188,8 @@ public class RdsGraph implements Comparable {
 		tempGraphDef.setWidth(getWidth());
 		tempGraphDef.setHeight(getHeight());
 		RrdGraph graph = new RrdGraph(tempGraphDef/*, true*/);
-		//graph.paint();
 		if(dimension == null) {
 			RrdGraphInfo gi = graph.getRrdGraphInfo();
-			//logger.trace("" + this + " w=" + gi.getWidth() + ", h=" + gi.getHeight());
 			dimension = new Dimension();
 			dimension.height = gi.getHeight();
 			dimension.width = gi.getWidth();
@@ -251,6 +241,41 @@ public class RdsGraph implements Comparable {
 
 	}
 
+	public void writeCsv(OutputStream out, Date startDate, Date endDate){
+		try {
+			//We normalize the last update time, it can't be used directly
+			endDate = Util.endDate(getProbe(), endDate);
+
+			DataProcessor dp = getGraphDesc().getPlottedDatas(getProbe(), null, startDate.getTime() / 1000, endDate.getTime() / 1000);
+			dp.processData();
+			String sources[] = dp.getSourceNames();
+			StringBuilder sourcesline = new StringBuilder();
+			sourcesline.append("Date,");
+			for(String name: sources) {
+				if(! name.startsWith("rev_"))
+					sourcesline.append(name + ",");
+			}
+			sourcesline.deleteCharAt(sourcesline.length() - 1);
+			sourcesline.append("\r\n");
+			out.write(sourcesline.toString().getBytes());
+			double[][] values = dp.getValues();
+			long[] ts = dp.getTimestamps();
+			for(int i=0; i < ts.length; i++) {
+				sourcesline.setLength(0);
+				sourcesline.append(exportDateFormat.format(org.rrd4j.core.Util.getDate(ts[i])) + ",");
+				for(int j = 0; j < sources.length; j++) {
+					if(! sources[j].startsWith("rev_"))
+						sourcesline.append(values[j][i]+",");
+				}
+				sourcesline.deleteCharAt(sourcesline.length() - 1);
+				sourcesline.append("\r\n");
+				out.write(sourcesline.toString().getBytes());
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	/*public void writeXml(OutputStream out, Date startDate, Date endDate) {
 		try {
 			RrdExportDef exdef = getRrdDef();
@@ -358,7 +383,7 @@ public class RdsGraph implements Comparable {
 	public int getRealWidth() {
 		return dimension.width;
 	}
-	
+
 	/**
 	 * @return Returns the height of the graphic zone.
 	 */

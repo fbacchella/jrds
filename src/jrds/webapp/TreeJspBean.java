@@ -193,10 +193,12 @@ public class TreeJspBean {
 				if(graph != null)
 					graphs.add(graph);
 			}
-			StringBuffer buffer = new StringBuffer();
-			StringBuffer popupBuffer = new StringBuffer();
-			StringBuffer detailsBuffer = new StringBuffer();
-			StringBuffer historyBuffer = new StringBuffer();
+			StringBuilder buffer = new StringBuilder();
+			StringBuilder popupBuffer = new StringBuilder();
+			StringBuilder detailsBuffer = new StringBuilder();
+			StringBuilder historyBuffer = new StringBuilder();
+			StringBuilder saveBuffer = new StringBuilder();
+
 			if( ! graphs.isEmpty()) {
 				Renderer r = hl.getRenderer();
 				for(RdsGraph graph: graphs) {
@@ -223,6 +225,10 @@ public class TreeJspBean {
 					historyBuffer.append(p.getName());
 					historyBuffer.append("\");'");
 
+					saveBuffer.setLength(0);
+					saveBuffer.append("onclick='save_popup(");
+					saveBuffer.append(graph.hashCode());
+					saveBuffer.append(");'");
 
 					buffer.setLength(0);
 					buffer.append("<div class='graphblock'>\n");
@@ -231,8 +237,8 @@ public class TreeJspBean {
 					buffer.append("<img class='icon' " + popupBuffer + " src='img/application_double.png' alt='popup'  height='16' width='16'  />\n");
 					buffer.append("<img class='icon' " + detailsBuffer + " src='img/application_view_list.png' alt=\"probe's details\"  height='16' width='16'  />\n");
 					buffer.append("<img class='icon' " + historyBuffer + " src='img/time.png' alt='history'  height='16' width='16'  />\n");
-					buffer.append("<img class='icon' src='img/magnifier.png' alt='magnifier'  height='16' width='16'  />\n");
-					buffer.append("<img class='icon' src='img/disk.png' alt='save'  height='16' width='16'  />\n");
+					//buffer.append("<img class='icon' src='img/magnifier.png' alt='magnifier'  height='16' width='16'  />\n");
+					buffer.append("<img class='icon' " + saveBuffer + " src='img/disk.png' alt='save'  height='16' width='16'  />\n");
 					buffer.append("</div>\n");
 					buffer.append("</div>\n");
 					buffer.append("\n");

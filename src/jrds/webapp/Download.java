@@ -24,8 +24,6 @@ import jrds.RdsGraph;
 public class Download extends HttpServlet {
 	private static final String CONTENT_TYPE = "text/csv";
 
-	private static final HostsList hl = HostsList.getRootGroup();
-
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
 
@@ -34,9 +32,10 @@ public class Download extends HttpServlet {
 		res.setContentType(CONTENT_TYPE);
 
 		String rrdId = req.getParameter("id");
-		RdsGraph graph = hl.getGraphById(Integer.parseInt(rrdId));
+		RdsGraph graph = HostsList.getRootGroup().getGraphById(Integer.parseInt(rrdId));
 		ServletOutputStream out = res.getOutputStream();
+		res.addHeader("content-disposition","attachment; filename="+graph.getQualifieName().replace('/', '.') + ".csv");
 
-		//graph.writeCsv(out, params.getBegin(), params.getEnd());
+		graph.writeCsv(out, params.getBegin(), params.getEnd());
 	}
 }
