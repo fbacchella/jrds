@@ -98,10 +98,12 @@ public class Renderer {
 						OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile));
 						javax.imageio.ImageIO.write(bImg, "png", out);
 					}
-					long endtime = System.currentTimeMillis();
-					long duration1 = (middletime - starttime );
-					long duration2 = (endtime - middletime );
-					logger.info("Graph " + graph.getQualifieName() + " renderding ran for (ms) " + duration1 + ":" + duration2);	
+					if(logger.isTraceEnabled()) {
+						long endtime = System.currentTimeMillis();
+						long duration1 = (middletime - starttime );
+						long duration2 = (endtime - middletime );
+						logger.trace("Graph " + graph.getQualifieName() + " renderding ran for (ms) " + duration1 + ":" + duration2);	
+					}
 				} catch (FileNotFoundException e) {
 					logger.error("Error with temporary output file: " +e);
 				} catch (IOException e) {
