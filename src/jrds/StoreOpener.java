@@ -12,7 +12,6 @@ import org.apache.log4j.Logger;
 import org.rrd4j.core.RrdBackendFactory;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdFileBackendFactory;
-import org.rrd4j.core.RrdNioBackendFactory;
 
 /**
  * A wrapper classe, to manage the rrdDb operations
@@ -97,27 +96,9 @@ public final class StoreOpener {
 	}
 
 	public static final void prepare(int dbPoolSize, int syncPeriod, int timeout, String backend) {
-
-		RrdBackendFactory.registerFactory(new RrdCachedFileBackendFactory());
 		RrdBackendFactory.registerFactory(new RrdAccountingNioBackendFactory());
-		if( (RrdCachedFileBackendFactory.NAME.equals(backend) || RrdNioBackendFactory.NAME.equals(backend) ) &&  syncPeriod > 0)
-			RrdCachedFileBackendFactory.setSyncPeriod(syncPeriod);
-		if(RrdCachedFileBackendFactory.NAME.equals(backend)) {
-			RrdCachedFileBackendFactory.setSyncMode(RrdCachedFileBackendFactory.SYNC_CENTRALIZED);
-		}
 		RrdBackendFactory.setDefaultFactory(backend);
 
-		//pool..setCapacity(dbPoolSize);
-
-		/*RrdBerkeleyDbBackendFactory fact = new RrdBerkeleyDbBackendFactory();
-		fact.setHomeDirectory("/backup2/jrds/probe");
-		fact.setHomeDirectory("/Users/bacchell/Devl/jrds/probe");
-		try {
-			fact.init();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
 		RrdBackendFactory factory = RrdBackendFactory.getDefaultFactory();
 
 		if (!(factory instanceof RrdFileBackendFactory)) {
@@ -130,25 +111,8 @@ public final class StoreOpener {
 	}
 
 	public static final void stop() {
-		//RrdDbPool dbpool = RrdDbPool.getInstance();
-//		logger.info("RrdDbPool efficiency: " + dbpool.getPoolEfficency());
-//		logger.info("RrdDbPool hits: " + dbpool.getPoolHitsCount());
-//		logger.info("RrdDbPool requets: " + dbpool.getPoolRequestsCount());
-
-		/*try {
-			dbpool.reset();
-		} catch (IOException e) {
-			logger.error("Strange problem while stopping db pool: ", e);
-		}*/
 		RrdBackendFactory factory = RrdBackendFactory.getDefaultFactory();
-		if(factory instanceof RrdCachedFileBackendFactory) {
-			logger.info("Cached backend efficiency: " + RrdCachedFileBackend.getCacheEfficency());
-			logger.info("Cached backend hits: " + RrdCachedFileBackend.getCacheHitsCount());
-			logger.info("Cached backend requests: " + RrdCachedFileBackend.getCacheRequestsCount());
-			logger.info("Cached backend bytes written: " + RrdCachedFileBackend.getEffectiveWrite());
-			logger.info("Cached backend bytes really written: " + RrdCachedFileBackend.getRealWrite());
-		}
-		else if(factory instanceof RrdAccountingNioBackendFactory) {
+		if(factory instanceof RrdAccountingNioBackendFactory) {
 			logger.info("backend opened: " + RrdAccountingNioBackend.getAccess());
 			logger.info("backend bytes read: " + RrdAccountingNioBackend.getBytesRead());
 			logger.info("backend reads: " + RrdAccountingNioBackend.getReadOp());
@@ -160,10 +124,5 @@ public final class StoreOpener {
 	}
 
 	public static final void reset() {
-		/*try {
-			RrdDbPool.getInstance().reset();
-		} catch (IOException e) {
-			logger.error("Strange problem while stopping db pool: ", e);
-		}*/
 	}
 }

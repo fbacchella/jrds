@@ -227,7 +227,6 @@ public class HostsList implements StarterNode {
 					logger.info("Collect interrupted");
 				}
 				collecting = false;
-				BackEndCommiter.commit();
 				if( ! tpool.isTerminated()) {
 					//Second chance, we wait for the time out
 					try {
@@ -236,7 +235,6 @@ public class HostsList implements StarterNode {
 						logger.info("Collect interrupted in last chance");
 					}
 					//Last chance to commit results
-					BackEndCommiter.commit();
 					List<Runnable> timedOut = tpool.shutdownNow();
 					logger.warn("Still " + timedOut.size() + " waiting probes: ");
 					for(Runnable r: timedOut) {
