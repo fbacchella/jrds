@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.rrd4j.DsType;
+
 import jrds.ProbeDesc;
 
 
@@ -18,12 +20,12 @@ public class SybaseLock extends Sybase {
 
 	private static final ProbeDesc pd = new ProbeDesc(5);
 	static {
-		pd.add("db_size", ProbeDesc.GAUGE);
-		pd.add("data", ProbeDesc.GAUGE);
-		pd.add("log", ProbeDesc.GAUGE);
-		pd.add("process", ProbeDesc.GAUGE);
-		pd.add("data+log", ProbeDesc.GAUGE);
-		pd.add("free_log", ProbeDesc.GAUGE);
+		pd.add("db_size", DsType.GAUGE);
+		pd.add("data", DsType.GAUGE);
+		pd.add("log", DsType.GAUGE);
+		pd.add("process", DsType.GAUGE);
+		pd.add("data+log", DsType.GAUGE);
+		pd.add("free_log", DsType.GAUGE);
 		//pd.setGraphClasses(new Class[] { SybaseGraph.class });
 	}
 

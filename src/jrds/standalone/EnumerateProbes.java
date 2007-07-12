@@ -25,7 +25,7 @@ public class EnumerateProbes {
 
 		System.getProperties().setProperty("java.awt.headless","true");
 		System.getProperties().putAll(pm);
-		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
+		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, pm.rrdbackend);
 
 		HostsList hl = HostsList.getRootGroup();
 		hl.configure(pm);

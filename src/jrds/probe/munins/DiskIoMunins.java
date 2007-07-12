@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.rrd4j.DsType;
+
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
@@ -22,12 +24,12 @@ import jrds.RdsHost;
 public class DiskIoMunins extends MuninsIndexedNameProbe {
 	static final private ProbeDesc pd = new ProbeDesc(6);
 	static {
-		pd.add("rtime", ProbeDesc.GAUGE, "rtime.value");
-		pd.add("wtime", ProbeDesc.GAUGE, "wtime.value");
-		pd.add("diskIOReads", ProbeDesc.COUNTER, "reads.value");
-		pd.add("diskIOWrites", ProbeDesc.COUNTER, "writes.value");
-		pd.add("diskIONRead", ProbeDesc.COUNTER, "nread.value");
-		pd.add("diskIONWritten", ProbeDesc.COUNTER, "nwritten.value");
+		pd.add("rtime", DsType.GAUGE, "rtime.value");
+		pd.add("wtime", DsType.GAUGE, "wtime.value");
+		pd.add("diskIOReads", DsType.COUNTER, "reads.value");
+		pd.add("diskIOWrites", DsType.COUNTER, "writes.value");
+		pd.add("diskIONRead", DsType.COUNTER, "nread.value");
+		pd.add("diskIONWritten", DsType.COUNTER, "nwritten.value");
 		pd.setMuninsProbesNames(new String[] { "io_busy", "io_ops", "io_bytes"});
 		pd.setProbeName("io-{1}_munins");
 		pd.setGraphClasses(new Object[] {"DiskIoGraphBytes", "DiskIoGraphReq", "DiskIoGraphSize"});

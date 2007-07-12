@@ -28,10 +28,13 @@ import org.snmp4j.smi.OID;
 public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	
 	static final private Logger logger = Logger.getLogger(RdsIndexedSnmpRrd.class);
+	
+	static public final String INDEXOIDNAME="index";
 
 	String indexKey;
 	int indexKeyNum;
 	private String label;
+	private OID indexOid;
 
 	static final SnmpRequester indexFinder = SnmpRequester.TABULAR;
 	static final SnmpRequester valueFinder = SnmpRequester.RAW;
@@ -47,6 +50,18 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	
 	protected SnmpRequester getSnmpRequester() {
 		return valueFinder;
+	}
+
+	/* (non-Javadoc)
+	 * @see jrds.probe.snmp.SnmpProbe#readSpecific()
+	 */
+	@Override
+	public boolean readSpecific() {
+		getPd().addSpecific(REQUESTERNAME, "RAW");
+		String oidString =  getPd().getSpecific(INDEXOIDNAME);
+		if(oidString != null && oidString.length() > 0) 
+			indexOid = new OID(oidString);
+		return super.readSpecific();
 	}
 
 	public String getIndexName()
@@ -71,14 +86,13 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	
 	public Collection<OID> getIndexSet() {
 		Collection<OID> retValue = null;
-		OID indexOid = getPd().getIndexOid();
 		if(indexOid != null)
 			retValue = Collections.singleton(indexOid);
 		return retValue;
 	}
 	
 	public int getIndexPrefixLength() {
-		return getPd().getIndexOid().size();
+		return indexOid.size();
 	}
 	
 	public Collection<int[]> setIndexValue() 
@@ -91,6 +105,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 			indexSubOid = new HashSet<int[]>();
 		
 		Collection<OID> soidSet = getIndexSet();
+		//If no index OID, the indexKey is already the snmp suffix.
 		if(soidSet == null || soidSet.size() == 0) {
 			OID suffixOid = new OID(indexKey);
 			indexSubOid = Collections.singleton(suffixOid.getValue());

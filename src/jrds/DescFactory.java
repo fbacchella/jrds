@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jrds.snmp.SnmpRequester;
-
 import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.Rule;
 import org.apache.log4j.Logger;
@@ -84,20 +82,16 @@ public class DescFactory extends DirXmlParser {
 		digester.addRule("probedesc/index", new Rule() {
 			@Override
 			public void body(String namespace, String name, String text) throws Exception {
-				if(text.trim().length() > 0) {
-					Object o = null;
-					for(int i = 0; i< digester.getCount() && !((o = digester.peek(i)) instanceof ProbeDesc) ; i++);
-					if(o instanceof ProbeDesc ) {
-						ProbeDesc pd = (ProbeDesc) o;
-						pd.setIndexOid(text);
-					}
-					else {
-						logger.error("No probe desc on stack");
-					}
+				Object o = null;
+				for(int i = 0; i< digester.getCount() && !((o = digester.peek(i)) instanceof ProbeDesc) ; i++);
+				if(o instanceof ProbeDesc ) {
+					ProbeDesc pd = (ProbeDesc) o;
+					pd.addSpecific(jrds.probe.snmp.RdsIndexedSnmpRrd.INDEXOIDNAME, text.trim());
 				}
-
+				else {
+					logger.error("No probe desc on stack");
+				}
 			}
-
 		});
 
 		digester.addRule("probedesc/defaultargs/arg", new Rule() {
@@ -159,15 +153,20 @@ public class DescFactory extends DirXmlParser {
 		);
 		digester.addRule("probedesc/snmpRequester", new Rule() {
 			public void body(java.lang.String namespace, java.lang.String name, java.lang.String text) throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException  {
-				SnmpRequester req = (SnmpRequester) SnmpRequester.class.getField(text.toUpperCase()).get(null);
 				ProbeDesc pd = (ProbeDesc) digester.peek();
-				pd.setRequester(req);
+				pd.addSpecific("requester", text.trim());
 			}
 		});
 		digester.addRule("probedesc/specific", new Rule() {
+			String specificName = "";
+			public void begin(String namespace, String name, Attributes attributes) throws Exception {
+				specificName = attributes.getValue("name");
+			}
 			public void body(java.lang.String namespace, java.lang.String name, java.lang.String text) throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException  {
 				ProbeDesc pd = (ProbeDesc) digester.peek();
-				pd.setSpecific(text.trim());
+				pd.addSpecific(specificName, text.trim());
+				logger.trace("Add specific " + specificName + ":<" + text.trim() +">");
+				specificName = "";
 			}
 		});
 		digester.addObjectCreate("probedesc/graphs", ArrayList.class);

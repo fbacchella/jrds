@@ -6,7 +6,9 @@ import java.util.Map;
 import java.util.Set;
 
 import jrds.Starter;
+import jrds.StarterNode;
 import jrds.StartersSet;
+import jrds.probe.snmp.SnmpProbe;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.CommunityTarget;
@@ -68,6 +70,19 @@ public class SnmpStarter extends Starter {
 	//A default value for the uptime OID, from the HOST-RESSOURCES MIB
 	private OID uptimeOid = hrSystemUptime;
 	private Target snmpTarget;
+
+	/* (non-Javadoc)
+	 * @see jrds.Starter#register(jrds.StarterNode)
+	 */
+	@Override
+	public Starter register(StarterNode node) {
+		if(node instanceof SnmpProbe) {
+			OID newUptimeOid = ((SnmpProbe)node).getUptimeoid();
+			if(newUptimeOid != null)
+				uptimeOid = newUptimeOid;
+		}
+		return super.register(node);
+	}
 
 	@Override
 	public boolean start() {
@@ -186,7 +201,8 @@ public class SnmpStarter extends Starter {
 	@Override
 	public void initialize(Object parent, StartersSet level) {
 		super.initialize(parent, level);
-		resolver = (Resolver) level.registerStarter(new Starter.Resolver(hostname), null);
+		level.find(Starter.Resolver.buildKey(hostname));
+		resolver = (Resolver) level.find(Starter.Resolver.buildKey(hostname));
 		if( level.find(full.getKey()) == null) {
 			level.getRoot().registerStarter(full, level.getRoot().getLevel());
 		}

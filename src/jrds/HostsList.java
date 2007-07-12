@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
  * @author Fabrice Bacchella 
  * @version $Revision$,  $Date$
  */
-public class HostsList {
+public class HostsList implements StarterNode {
 	static private final Logger logger = Logger.getLogger(HostsList.class);
 	private static HostsList instance;
 
@@ -197,7 +197,7 @@ public class HostsList {
 				);
 				collecting = true;
 				for(final RdsHost oneHost: hostList) {
-					if(! collecting)
+					if( ! isCollectRunning())
 						break;
 					logger.debug("Collect all stats for host " + oneHost.getName());
 					Runnable runCollect = new Runnable() {
@@ -304,10 +304,6 @@ public class HostsList {
 		return node;
 	}
 
-	public void addStarter(Starter s) {
-		starters.registerStarter(s, this);
-	}
-
 	public StartersSet getStarters() {
 		return starters;
 	}
@@ -374,10 +370,11 @@ public class HostsList {
 	}
 
 	public boolean isCollectRunning() {
-		return started && collecting;
+		return started && collecting && ! Thread.currentThread().isInterrupted();
 	}
 	
 	public void stopCollect() {
 		collecting = false;
 	}
+
 }

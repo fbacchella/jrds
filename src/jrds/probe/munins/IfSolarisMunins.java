@@ -5,6 +5,8 @@
  */
 package jrds.probe.munins;
 
+import org.rrd4j.DsType;
+
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
@@ -16,11 +18,11 @@ import jrds.RdsHost;
 public class IfSolarisMunins extends MuninsIndexedNameProbe {
 	static final private ProbeDesc pd = new ProbeDesc(5);
 	static {
-		pd.add("ifInOctets", ProbeDesc.COUNTER, "rbytes.value");
-		pd.add("ifOutOctets", ProbeDesc.COUNTER, "obytes.value");
-		pd.add("ifInErrors", ProbeDesc.COUNTER, "ierrors.value");
-		pd.add("ifOutErrors", ProbeDesc.COUNTER, "oerrors.value");
-		pd.add("collisions", ProbeDesc.COUNTER, "collisions.value");
+		pd.add("ifInOctets", DsType.COUNTER, "rbytes.value");
+		pd.add("ifOutOctets", DsType.COUNTER, "obytes.value");
+		pd.add("ifInErrors", DsType.COUNTER, "ierrors.value");
+		pd.add("ifOutErrors", DsType.COUNTER, "oerrors.value");
+		pd.add("collisions", DsType.COUNTER, "collisions.value");
 		pd.setGraphClasses(new Object[] {"ifbps"});
 		pd.setMuninsProbesNames(new String[] { "if", "if_errcoll"});
 		pd.setProbeName("if-{1}_munins");

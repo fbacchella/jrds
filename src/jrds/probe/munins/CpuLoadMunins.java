@@ -5,6 +5,8 @@
  */
 package jrds.probe.munins;
 
+import org.rrd4j.DsType;
+
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
@@ -16,7 +18,7 @@ import jrds.RdsHost;
 public class CpuLoadMunins extends MuninsProbe {
 	static final private ProbeDesc pd = new ProbeDesc(1);
 	static {
-		pd.add("la1", ProbeDesc.GAUGE, "load.value");
+		pd.add("la1", DsType.GAUGE, "load.value");
 		pd.setMuninsProbesNames(new String[] { "load" });
 		pd.setProbeName("laveragemunins");
 

@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,7 +23,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.snmp.SnmpRequester;
+//import jrds.snmp.SnmpRequester;
 
 import org.apache.log4j.Logger;
 import org.apache.xml.serialize.OutputFormat;
@@ -43,22 +44,6 @@ import org.w3c.dom.Element;
 public class ProbeDesc {
 	static final private Logger logger = Logger.getLogger(ProbeDesc.class);
 
-	/*private static final class DsType {
-		private String id;
-		private DsType(String id) { this.id = id ;}
-		public String toString() { return id;}
-		static public final DsType NONE = new DsType("NONE");
-		static public final DsType COUNTER = new DsType("COUNTER");
-		static public final DsType GAUGE = new DsType("GAUGE");
-		static public final DsType DERIVE = new DsType("DERIVE");
-		static public final DsType ABSOLUTE = new DsType("ABSOLUTE");
-	};
-
-	static public final DsType NONE = DsType.NONE;
-	static public final DsType COUNTER = DsType.COUNTER;
-	static public final DsType GAUGE = DsType.GAUGE;
-	static public final DsType DERIVE = DsType.DERIVE;
-	static public final DsType ABSOLUTE = DsType.ABSOLUTE;*/
 	static public final double MINDEFAULT = 0;
 	static public final double MAXDEFAULT = Double.NaN;
 	static public final long HEARTBEATDEFAULT = 600;
@@ -66,16 +51,13 @@ public class ProbeDesc {
 
 
 	private Map<String, DsDesc> dsMap;
+	private Map<String, String> specific = new HashMap<String, String>();;
 	private String probeName;
 	private String name;
 	private Collection namedProbesNames;
 	private Collection graphClasses = new ArrayList(0);
-	private OID indexOid = null;
-	private String rmiClass = null;
-	private SnmpRequester requester = SnmpRequester.RAW;
 	private boolean uniqIndex = false;
 	private Class probeClass = null;
-	private String specific = null;
 	private List<Object> defaultsArgs = null;
 
 
@@ -299,30 +281,6 @@ public class ProbeDesc {
 	}
 
 	/**
-	 * @return Returns the index.
-	 */
-	public OID getIndexOid() {
-		return indexOid;
-	}
-	/**
-	 * @param index The index to set.
-	 */
-	public void setIndexOid(OID index) {
-		this.indexOid = index;
-	}
-
-	public void setIndexOid(String index) {
-		this.indexOid = new OID(index);
-	}
-
-	public void setRequester(SnmpRequester requester) {
-		this.requester = requester;
-	}
-
-	public SnmpRequester getRequester() {
-		return requester;
-	}
-	/**
 	 * @return Returns the unicity of the index.
 	 */
 	public boolean isUniqIndex() {
@@ -407,13 +365,13 @@ public class ProbeDesc {
 		this.name = name;
 	}
 
-	public String getRmiClass() {
+	/*public String getRmiClass() {
 		return rmiClass;
 	}
 
 	public void setRmiClass(String rmiClass) {
 		this.rmiClass = rmiClass;
-	}
+	}*/
 
 	public void dumpAsXml(Class c) throws ParserConfigurationException, IOException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -438,11 +396,11 @@ public class ProbeDesc {
 		if(jrds.probe.snmp.SnmpProbe.class.isAssignableFrom(c)) {
 			Element requesterElement = document.createElement("snmpRequester");
 			root.appendChild(requesterElement);
-			requesterElement.appendChild(document.createTextNode(requester.getName()));
+			//requesterElement.appendChild(document.createTextNode(requester.getName()));
 
 			if(jrds.probe.snmp.RdsIndexedSnmpRrd.class.isAssignableFrom(c)) {
 				Element indexElement = document.createElement("index");
-				indexElement.appendChild(document.createTextNode(this.indexOid.toString()));
+				//indexElement.appendChild(document.createTextNode(this.indexOid.toString()));
 				root.appendChild(indexElement);
 				Element uniqElement = document.createElement("uniq");
 				uniqElement.appendChild(document.createTextNode(Boolean.toString(this.uniqIndex)));
@@ -516,19 +474,19 @@ public class ProbeDesc {
 		serializer.serialize( document.getDocumentElement() );
 	}
 
-	public String getSpecific() {
-		return specific;
+	public String getSpecific(String name) {
+		return specific.get(name);
 	}
 
-	public void setSpecific(String specific) {
-		this.specific = specific;
+	public void addSpecific(String name, String value) {
+		specific.put(name, value);
 	}
 
 	public void addDefaultArg(Object o){
 		if(defaultsArgs == null) 
 			defaultsArgs = new LinkedList<Object>();
 		defaultsArgs.add(o);
-		logger.debug("Adding " + o + " to default args");
+		logger.debug("Adding " + o + "(" + o.getClass() + ") to default args");
 	}
 
 	public List<Object> getDefaultArgs() {

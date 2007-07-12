@@ -55,3 +55,7 @@ function popup(id)
 	var popupWin = window.open("popup.jsp?id=" + id + "&" + periodUrl, name , height + "," + width + ",menubar=no,status=no,resizable=no,scrollbars=no");
 }
 
+function save_popup(id)
+{
+       var popupWin = window.open("download?id=" + id + "&" + periodUrl, name , "menubar=no,status=no,resizable=no,scrollbars=no");
+}

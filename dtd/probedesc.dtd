@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT probedesc (name, probeName?, probeClass, (snmpRequester | specific)?, (index, uniq)?, defaultargs?, ds+, graphs)>
+<!ELEMENT probedesc (name, probeName?, probeClass, (snmpRequester | specific+)?, (index, uniq)?, defaultargs?, ds+, graphs)>
+<!ATTLIST specific 
+			name CDATA #REQUIRED
+>
+<!ELEMENT specific (#PCDATA)>
 <!ELEMENT ds (dsName, dsType?, (oid | collect)?, minValue?, maxValue?)>
 <!ELEMENT defaultargs (arg+) >
 <!ELEMENT arg EMPTY>
@@ -11,6 +15,7 @@
 <!ELEMENT dsName (#PCDATA)>
 <!ELEMENT dsType (#PCDATA)>
 <!ELEMENT name (#PCDATA)>
+<!ELEMENT value (#PCDATA)>
 <!ELEMENT oid (#PCDATA)>
 <!ELEMENT minValue (#PCDATA)>
 <!ELEMENT maxValue (#PCDATA)>
@@ -19,5 +24,4 @@
 <!ELEMENT probeClass (#PCDATA)>
 <!ELEMENT probeName (#PCDATA)>
 <!ELEMENT snmpRequester (#PCDATA)>
-<!ELEMENT specific (#PCDATA)>
 <!ELEMENT collect (#PCDATA)>

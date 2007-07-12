@@ -43,6 +43,8 @@ public class HostConfigParser  extends DirXmlParser {
 			this.tag = tag;
 		}
 	};
+	
+	private final class ProbeElement {}
 
 	public HostConfigParser(ProbeFactory pf, ArgFactory af) {
 		super();
@@ -88,7 +90,7 @@ public class HostConfigParser  extends DirXmlParser {
 					for(Tag tg: tags)
 						host.addTag(tg.getTag());
 					for(Starter s: starters) {
-						host.addStarter(s);
+						s.register(host);
 					}
 				}
 				else
@@ -111,6 +113,7 @@ public class HostConfigParser  extends DirXmlParser {
 					for(int i=attributes.getLength() - 1; i >= 0; i--) {
 						attrMap.put(attributes.getQName(i), attributes.getValue(i));
 					}
+					digester.push(new ProbeElement()); //juste a delimiter
 					digester.push(attrMap);
 					digester.push(new ArrayList(0));
 				}
@@ -124,9 +127,9 @@ public class HostConfigParser  extends DirXmlParser {
 				Map<String, String> attributes = null;
 
 				//All the informations for the probe were kept on the stack
-				//The delimiter is a Map 
+				//The delimiter is a ProbeElement 
 				Object o = null;
-				while(digester.getCount() != 0 && ! ((o = digester.pop()) instanceof Map)) {
+				while(digester.getCount() != 0 && ! ((o = digester.pop()) instanceof ProbeElement)) {
 					if(o instanceof Starter) {
 						starters.add((Starter) o);
 					}
@@ -136,6 +139,9 @@ public class HostConfigParser  extends DirXmlParser {
 					else if(o instanceof Tag) {
 						tags.add((Tag) o);
 					}
+					else if(o instanceof Map) {
+						attributes = (Map) o;
+					}
 					else {
 						logger.error("found " + o + " on the stack, what do i do with that ? ");
 						if(o != null)
@@ -143,16 +149,12 @@ public class HostConfigParser  extends DirXmlParser {
 						break;
 					}
 				}
-				if(o != null && o instanceof Map) {
-					attributes = (Map) o;
+				if(o != null && o instanceof ProbeElement) {
 					String probeType = attributes.get("type");
 					for(int i = 0; i < digester.getCount() && !((o = digester.peek(i)) instanceof RdsHost) ; i++);
 					RdsHost host = (RdsHost) o;
 					Probe newProbe = pf.makeProbe(probeType, argsListValue);
 					if(newProbe != null) {
-						for(Starter s: starters) {
-							newProbe.addStarter(s);
-						}
 						for(Tag tg: tags)
 							newProbe.addTag(tg.getTag());
 						String label = attributes.get("label");
@@ -162,6 +164,9 @@ public class HostConfigParser  extends DirXmlParser {
 						}
 						host.addProbe(newProbe);
 						HostsList.getRootGroup().addProbe(newProbe);
+						for(Starter s: starters) {
+							s.register(newProbe);
+						}
 					}
 				}
 				else {
@@ -200,15 +205,14 @@ public class HostConfigParser  extends DirXmlParser {
 					hostName = host.getName();
 				}
 				starter.setHostname(hostName);
-
 				//If we are on a host, the starter must be registered right now
 				for(int i = 0; i< digester.getCount() ; i++){
 					Object o = digester.peek(i);
-					if(o instanceof RdsHost) {
-						((RdsHost) o).addStarter(starter);
+					if(o instanceof StarterNode) {
+						starter.register((StarterNode) o);
 						break;
 					}
-					else if(Probe.class.isAssignableFrom(o.getClass())) {
+					else if(o instanceof ProbeElement) {
 						digester.push(starter);
 						break;
 					}

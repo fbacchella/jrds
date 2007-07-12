@@ -30,7 +30,7 @@ public class Updater {
 
 		System.getProperties().setProperty("java.awt.headless","true");
 		System.getProperties().putAll(pm);
-		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod);
+		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, pm.rrdbackend);
 
 		HostsList hl = HostsList.getRootGroup();
 		hl.configure(pm);
@@ -57,6 +57,8 @@ public class Updater {
 							logger.debug("Size difference : " + (dest.length() - source.length()));
 							copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
 						} catch (IOException e) {
+							e.printStackTrace();
+						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
 					}

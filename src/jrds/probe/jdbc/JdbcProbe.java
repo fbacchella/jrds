@@ -183,7 +183,7 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 	public void setHost(RdsHost monitoredHost) {
 		super.setHost(monitoredHost);
 		starter.setHost(monitoredHost);
-		starter = (JdbcStarter) monitoredHost.addStarter(starter);
+		starter.register(monitoredHost);
 	}
 
 	/**
@@ -211,8 +211,8 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 	}
 
 	@Override
-	public boolean isStarted() {
-		return super.isStarted() && starter.isStarted();
+	public boolean isCollectRunning() {
+		return super.isCollectRunning() && starter.isStarted();
 	}
 
 	@Override

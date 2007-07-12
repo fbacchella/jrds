@@ -45,7 +45,7 @@ import org.w3c.dom.Element;
  * @author Fabrice Bacchella
  */
 public abstract class Probe
-implements Comparable {
+implements Comparable, StarterNode {
 
 	static final private Logger logger = Logger.getLogger(Probe.class);
 
@@ -68,6 +68,9 @@ implements Comparable {
 		this.monitoredHost = monitoredHost;
 		this.pd = pd;
 		starters.setParent(monitoredHost.getStarters());
+		if( ! this.readSpecific()) {
+			throw new RuntimeException("Creation failed");
+		}
 	}
 
 	public Probe() {
@@ -88,6 +91,9 @@ implements Comparable {
 
 	public void setPd(ProbeDesc pd) {
 		this.pd = pd;
+		if( ! readSpecific()) {
+			throw new RuntimeException("Creation failed");
+		}
 	}
 
 	public void initGraphList(GraphFactory gf) {
@@ -327,7 +333,7 @@ implements Comparable {
 	 * @param oneSample
 	 */
 	protected void updateSample(Sample oneSample) {
-		if(isStarted()) {
+		if(isCollectRunning()) {
 			Map sampleVals = getNewSampleValues();
 			if (sampleVals != null) {
 				if(getUptime() >= ProbeDesc.HEARTBEATDEFAULT) {
@@ -367,14 +373,14 @@ implements Comparable {
 			RrdDb rrdDb = null;
 			try {
 				//No collect if the thread was interrupted
-				if( monitoredHost.isCollectRunning()) {
+				if( isCollectRunning()) {
 					rrdDb = StoreOpener.getRrd(getRrdName());
 					Sample onesample = rrdDb.createSample();
 					updateSample(onesample);
 					logger.trace(onesample.dump());
 					//The collect might have been stopped
 					//during the reading of samples
-					if(monitoredHost.isCollectRunning())
+					if( isCollectRunning())
 						onesample.update();
 				}
 			}
@@ -534,23 +540,29 @@ implements Comparable {
 		return alltags;
 	}
 
-	public void addStarter(Starter s) {
-		starters.registerStarter(s, this);
-	}
-
 	public StartersSet getStarters() {
 		return starters;
 	}
 
-	public boolean isStarted() {
-		return HostsList.getRootGroup().isCollectRunning() && ! Thread.currentThread().isInterrupted();
+	public boolean isCollectRunning() {
+		return getHost().isCollectRunning();
 	}
 
 	public abstract String getSourceType();
 
-	public String getSpecific() {
-		return pd.getSpecific();
+	/**
+	 * This function reads all the specified arguments
+	 * Every override should finish by:
+	 * return super();
+	 * @return
+	 */
+	public boolean readSpecific() {
+		return true;
 	}
+
+	/*public String getSpecific() {
+		return pd.getSpecific();
+	}*/
 
 	/**
 	 * This function should return the uptime of the probe

@@ -47,7 +47,6 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
 	public ProcessInfoExtended(String indexName, String pattern)
 	{
 		super(indexName);
-		//setName("psx-" + indexName);
 		this.pattern = pattern;
 	}
 
@@ -58,6 +57,15 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
 		indexes.add(hrSWRunPath);
 		indexes.add(hrSWRunParameters);
 		return indexes;
+	}
+
+	/* (non-Javadoc)
+	 * @see jrds.probe.snmp.RdsIndexedSnmpRrd#readSpecific()
+	 */
+	@Override
+	public boolean readSpecific() {
+		getPd().addSpecific(RdsIndexedSnmpRrd.INDEXOIDNAME, hrSWRunPath.toString());
+		return super.readSpecific();
 	}
 
 	@SuppressWarnings("unchecked")

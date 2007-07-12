@@ -14,46 +14,50 @@ import org.apache.log4j.Logger;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class RdsHost implements Comparable {
+public class RdsHost implements Comparable, StarterNode {
 	static private final Logger logger = Logger.getLogger(RdsHost.class);
-	
+
 	private String name = null;
 	private final Set<Probe> allProbes = new TreeSet<Probe>();
 	private Set<String> tags = null;
 	private final StartersSet starters = new StartersSet(this);
-	
+
 	public RdsHost(String newName)
 	{
 		name = newName;
+		Starter resolver = new Starter.Resolver(name);
+		resolver.register(this);
 		starters.setParent(HostsList.getRootGroup().getStarters());
 	}
-	
+
 	/**
 	 * 
 	 */
 	public RdsHost() {
 		starters.setParent(HostsList.getRootGroup().getStarters());
 	}
-	
+
 	public void setName(String name)
 	{
 		this.name = name;
+		Starter resolver = new Starter.Resolver(name);
+		resolver.register(this);
 	}
-	
+
 	public String getName()
 	{
 		return name;
 	}
-	
+
 	public String getHostDir()
 	{
 		String rrdDir = HostsList.getRootGroup().getRrdDir() + org.rrd4j.core.Util.getFileSeparator() + name;
 		return rrdDir;
 	}
-	
+
 	public void addProbe(Probe rrd)
 	{
-		
+
 		rrd.setHost(this);
 		//Do not add the probe if the physical store
 		//cannot be checked
@@ -61,27 +65,26 @@ public class RdsHost implements Comparable {
 			allProbes.add(rrd);
 		}
 	}
-	
+
 	public Collection<Probe> getProbes() {
 		return allProbes;
-		
+
 	}
-	
+
 	public void  collectAll()
 	{
 		long start = System.currentTimeMillis();
 		if(starters != null)
 			starters.startCollect();
 		for(Probe currrd: allProbes) {
-			if(! HostsList.getRootGroup().isCollectRunning() )
+			if(! isCollectRunning() )
 				break;
 			long duration = (System.currentTimeMillis() - start) /1000 ;
 			if(duration > (HostsList.getRootGroup().getResolution() / 2 )) {
 				logger.error("Collect for " + this + " ran too long: " + duration + "s");
 				break;
 			}
-			if(currrd.isStarted())
-				currrd.collect();
+			currrd.collect();
 		}
 		if(starters != null)
 			starters.stopCollect();
@@ -102,12 +105,12 @@ public class RdsHost implements Comparable {
 			}
 		}
 	}
-	
+
 	public String toString()
 	{
 		return name;
 	}
-	
+
 	public int compareTo(Object arg0) {
 		return String.CASE_INSENSITIVE_ORDER.compare(name, arg0.toString());
 	}
@@ -124,18 +127,12 @@ public class RdsHost implements Comparable {
 			temptags = new HashSet<String>();
 		return temptags;
 	}
-	
-	public Starter addStarter(Starter s) {
-		return starters.registerStarter(s, this);
-	}
-	
+
 	public StartersSet getStarters() {
 		return starters;
 	}
-	
-	public boolean isCollectRunning() {
-		return HostsList.getRootGroup().isCollectRunning() && ! Thread.currentThread().isInterrupted();
-	}
-	
 
+	public boolean isCollectRunning() {
+		return HostsList.getRootGroup().isCollectRunning();
+	}
 }

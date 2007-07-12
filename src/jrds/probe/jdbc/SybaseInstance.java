@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.rrd4j.DsType;
+
 import jrds.ProbeDesc;
 
 
@@ -17,8 +19,8 @@ import jrds.ProbeDesc;
 public class SybaseInstance extends Sybase {
 	private static final ProbeDesc pd = new ProbeDesc(5);
 	static {
-		pd.add("process", ProbeDesc.GAUGE);
-		pd.add("transactions", ProbeDesc.GAUGE);
+		pd.add("process", DsType.GAUGE);
+		pd.add("transactions", DsType.GAUGE);
 		pd.setGraphClasses(new Object[] {"sybaseinstance.xml"});
 	}
 	

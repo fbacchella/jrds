@@ -32,16 +32,18 @@ import org.snmp4j.smi.OID;
 public abstract class SnmpProbe extends Probe {
 	static final private Logger logger = Logger.getLogger(SnmpProbe.class);
 
+	public final static String REQUESTERNAME = "requester";
+	public final static String UPTIMEOIDNAME = "uptimeOid";
 	private Map<OID, String> nameMap = null;
 	private SnmpRequester requester;
 	private int suffixLength = 1;
-
+	private OID uptimeoid = null;
+	
 	public SnmpProbe(RdsHost monitoredHost, ProbeDesc pd)
 	{
 		super(monitoredHost, pd);
 		if(nameMap == null)
 			nameMap = getPd().getCollectOids();
-		requester = getSnmpRequester();
 	}
 
 	public SnmpProbe()
@@ -49,17 +51,40 @@ public abstract class SnmpProbe extends Probe {
 		super();
 	}
 
+	/* (non-Javadoc)
+	 * @see jrds.Probe#readSpecific()
+	 */
+	@Override
+	public boolean readSpecific() {
+		boolean readOK = false;
+		String requesterName =  getPd().getSpecific(REQUESTERNAME);
+		String uptimeOidName =  getPd().getSpecific(UPTIMEOIDNAME);
+		try {
+			if(requesterName != null) {
+				logger.trace("Setting requester to " + requesterName);
+				requester = (SnmpRequester) SnmpRequester.class.getField(requesterName.toUpperCase()).get(null);
+				readOK = true;
+			}
+			else {
+				logger.error("No requester found");
+			}
+			if(uptimeOidName != null) {
+				logger.trace("Setting uptime OID to " + uptimeOidName);
+				uptimeoid = new OID(uptimeOidName);
+				if(uptimeoid == null)
+					readOK = false;
+			}
+		} catch (Exception e) {
+			logger.error("Unable to read specific: "+ e);
+		}
+		return readOK && super.readSpecific();
+	}
+
 	public void setPd(ProbeDesc pd) {
 		super.setPd(pd);
 		if(nameMap == null)
 			nameMap = getPd().getCollectOids();
-		requester = getSnmpRequester();
-		
 	}
-
-	protected SnmpRequester getSnmpRequester() {
-		return getPd().getRequester();
-  	}
 
 	private Map<OID, String> initNameMap()
 	{
@@ -132,8 +157,8 @@ public abstract class SnmpProbe extends Probe {
 	}
 
 	@Override
-	public boolean isStarted() {
-		return super.isStarted() && getSnmpStarter().isStarted();
+	public boolean isCollectRunning() {
+		return super.isCollectRunning() && getSnmpStarter().isStarted();
 	}
 
 	@Override
@@ -149,5 +174,10 @@ public abstract class SnmpProbe extends Probe {
 		this.suffixLength = suffixLength;
 	}
 
-	
+	/**
+	 * @return the uptimeoid
+	 */
+	public OID getUptimeoid() {
+		return uptimeoid;
+	}
 }

@@ -9,6 +9,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 
 import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
 
 
 /**
@@ -22,10 +23,10 @@ public class IfLinuxMunins extends MuninsIndexedNameProbe {
 	
 	static final private ProbeDesc pd = new ProbeDesc(4);
 	static {
-		pd.add("ifInOctets", ProbeDesc.COUNTER, "down.value");
-		pd.add("ifOutOctets", ProbeDesc.COUNTER, "up.value");
-		pd.add("ifInErrors", ProbeDesc.COUNTER, "rcvd.value");
-		pd.add("ifOutErrors", ProbeDesc.COUNTER, "trans.value");
+		pd.add("ifInOctets", DsType.COUNTER, "down.value");
+		pd.add("ifOutOctets", DsType.COUNTER, "up.value");
+		pd.add("ifInErrors", DsType.COUNTER, "rcvd.value");
+		pd.add("ifOutErrors", DsType.COUNTER, "trans.value");
 		pd.setMuninsProbesNames(new String[] { "if", "if_err"});
 		pd.setGraphClasses(new Object[] {"ifbps"});
 		pd.setProbeName("if-{1}_munins");

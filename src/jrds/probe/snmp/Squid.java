@@ -14,6 +14,7 @@ import jrds.graphe.SquidHitRatioGraph;
 import jrds.graphe.SquidReqGraph;
 import jrds.snmp.SnmpRequester;
 
+import org.rrd4j.DsType;
 import org.snmp4j.smi.OID;
 
 
@@ -25,50 +26,50 @@ import org.snmp4j.smi.OID;
 public class Squid extends RdsSnmpSimple {
 	static final private ProbeDesc pd = new ProbeDesc(44);
 	static {
-		pd.add("SysPageFaults", ProbeDesc.COUNTER, new OID(".1.3.6.1.4.1.3495.1.3.1.1"));
-		pd.add("SysNumReads", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.1.2"));
-		pd.add("DnsNumberServers",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.4.3.3"));
-		pd.add("DnsReplies", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.3.2"), 0, 10000);
-		pd.add("DnsRequests", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.3.1"), 0, 10000);
-		pd.add("BlkGetHostByAddr", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.2.7"));
-		pd.add("FqdnMisses", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.2.6"));
-		pd.add("FqdnNegativeHits", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.2.5"));
-		pd.add("FqdnPendingHits", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.2.4"));
-		pd.add("FqdnHits", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.2.3"), 0, 10000);
-		pd.add("FqdnRequests", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.2.2"), 0, 10000);
-		pd.add("FqdnEntries",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.4.2.1"), 0, 10000);
-		pd.add("AttemptReleaseLckEnt", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.1.8"));
-		pd.add("BlkGetHostByName", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.1.7"));
-		pd.add("IpMisses",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.4.1.6"), 0, 10000);
-		pd.add("IpNegativeHits",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.4.1.5"), 0, 10000);
-		pd.add("IpPendingHits", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.1.4"), 0, 10000);
-		pd.add("IpHits", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.1.3"), 0, 10000);
-		pd.add("IpRequests", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.1.2"), 0, 10000);
-		pd.add("IpEntries",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.4.1.1"));
-		pd.add("Clients", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.15"));
-		pd.add("CurrentSwapSize",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.2.1.14"));
-		pd.add("ServerOutKb", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.13"), 0, 100000);
-		pd.add("ServerInKb", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.12"), 0, 100000);
-		pd.add("ServerErrors", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.11"), 0, 10000);
-		pd.add("ServerRequests", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.10"), 0, 10000);
-		pd.add("IcpKbRecv", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.9"), 0, 100000);
-		pd.add("IcpKbSent", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.8"), 0, 100000);
-		pd.add("IcpPktsRecv", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.7"));
-		pd.add("IcpPktsSent", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.6"));
-		pd.add("HttpOutKb", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.5"), 0, 100000);
-		pd.add("HttpInKb", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.4"), 0, 100000);
-		pd.add("HttpErrors", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.3"), 0, 10000);
-		pd.add("HttpHits", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.2"), 0, 10000);
-		pd.add("HttpRqt", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.1"), 0, 10000);
-		pd.add("CurrentResFileDC",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.11"));
-		pd.add("CurrentUnusedFDC",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.10"));
-		pd.add("CurrentUnlinkRe",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.9"));
-		pd.add("CurrentLRUExp", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.1.8"));
-		pd.add("NumObjCount",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.7"));
-		pd.add("MaxResSize",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.6"));
-		pd.add("CpuUsage",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.5"));
-		pd.add("CpuTime", ProbeDesc.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.1.4"));
-		pd.add("MemUsage",ProbeDesc.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.3"));
+		pd.add("SysPageFaults", DsType.COUNTER, new OID(".1.3.6.1.4.1.3495.1.3.1.1"));
+		pd.add("SysNumReads", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.1.2"));
+		pd.add("DnsNumberServers",DsType.GAUGE,new OID(".1.3.6.1.4.1.3495.1.4.3.3"));
+		pd.add("DnsReplies", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.3.2"), 0, 10000);
+		pd.add("DnsRequests", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.3.1"), 0, 10000);
+		pd.add("BlkGetHostByAddr", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.2.7"));
+		pd.add("FqdnMisses", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.2.6"));
+		pd.add("FqdnNegativeHits", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.2.5"));
+		pd.add("FqdnPendingHits", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.2.4"));
+		pd.add("FqdnHits", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.2.3"), 0, 10000);
+		pd.add("FqdnRequests", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.2.2"), 0, 10000);
+		pd.add("FqdnEntries",DsType.GAUGE,new OID(".1.3.6.1.4.1.3495.1.4.2.1"), 0, 10000);
+		pd.add("AttemptReleaseLckEnt", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.1.8"));
+		pd.add("BlkGetHostByName", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.1.7"));
+		pd.add("IpMisses",DsType.GAUGE,new OID(".1.3.6.1.4.1.3495.1.4.1.6"), 0, 10000);
+		pd.add("IpNegativeHits",DsType.GAUGE,new OID(".1.3.6.1.4.1.3495.1.4.1.5"), 0, 10000);
+		pd.add("IpPendingHits", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.1.4"), 0, 10000);
+		pd.add("IpHits", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.1.3"), 0, 10000);
+		pd.add("IpRequests", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.4.1.2"), 0, 10000);
+		pd.add("IpEntries",DsType.GAUGE,new OID(".1.3.6.1.4.1.3495.1.4.1.1"));
+		pd.add("Clients", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.15"));
+		pd.add("CurrentSwapSize",DsType.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.2.1.14"));
+		pd.add("ServerOutKb", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.13"), 0, 100000);
+		pd.add("ServerInKb", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.12"), 0, 100000);
+		pd.add("ServerErrors", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.11"), 0, 10000);
+		pd.add("ServerRequests", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.10"), 0, 10000);
+		pd.add("IcpKbRecv", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.9"), 0, 100000);
+		pd.add("IcpKbSent", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.8"), 0, 100000);
+		pd.add("IcpPktsRecv", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.7"));
+		pd.add("IcpPktsSent", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.6"));
+		pd.add("HttpOutKb", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.5"), 0, 100000);
+		pd.add("HttpInKb", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.4"), 0, 100000);
+		pd.add("HttpErrors", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.3"), 0, 10000);
+		pd.add("HttpHits", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.2"), 0, 10000);
+		pd.add("HttpRqt", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.2.1.1"), 0, 10000);
+		pd.add("CurrentResFileDC",DsType.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.11"));
+		pd.add("CurrentUnusedFDC",DsType.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.10"));
+		pd.add("CurrentUnlinkRe",DsType.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.9"));
+		pd.add("CurrentLRUExp", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.1.8"));
+		pd.add("NumObjCount",DsType.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.7"));
+		pd.add("MaxResSize",DsType.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.6"));
+		pd.add("CpuUsage",DsType.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.5"));
+		pd.add("CpuTime", DsType.COUNTER,new OID(".1.3.6.1.4.1.3495.1.3.1.4"));
+		pd.add("MemUsage",DsType.GAUGE,new OID(".1.3.6.1.4.1.3495.1.3.1.3"));
 		
 		pd.setRequester(SnmpRequester.SIMPLE);
 		
@@ -91,5 +92,9 @@ public class Squid extends RdsSnmpSimple {
 	 */
 	public Squid(RdsHost monitoredHost) {
 		super(monitoredHost, pd);
+	}
+	public Squid() {
+		super();
+		this.setPd(pd);
 	}
 }

@@ -31,17 +31,14 @@ public class StartersSet {
 			}
 	}
 
-	public Starter registerStarter(Starter s, Object parent) {
+	public void registerStarter(Starter s, Object parent) {
 		s.initialize(parent, this);
 		Object key = s.getKey();
-		if(find(key) == null) {
-			if(allStarters == null)
-				allStarters = new LinkedHashMap<Object, Starter>(2);
-			allStarters.put(key, s);
-		}
-		return find(key);
+		if(allStarters == null)
+			allStarters = new LinkedHashMap<Object, Starter>(2);
+		allStarters.put(key, s);
 	}
-	
+
 	public Starter find(Object key) {
 		Starter s = null;
 		if(allStarters != null && allStarters.containsKey(key))

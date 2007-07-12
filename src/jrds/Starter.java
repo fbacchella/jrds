@@ -38,7 +38,6 @@ public abstract class Starter {
 			}
 			return started;
 		}
-
 		@Override
 		public void stop() {
 			address = null;
@@ -50,7 +49,22 @@ public abstract class Starter {
 		@Override
 		public Object getKey() {
 			return "resolver:" + hostname;
-		}		
+		}
+		
+		public static Object buildKey(String hostname) {
+			return "resolver:" + hostname;
+		}
+
+		/* (non-Javadoc)
+		 * @see jrds.Starter#register(jrds.StarterNode)
+		 */
+		@Override
+		public Starter register(StarterNode node) {
+			StartersSet ss = node.getStarters();
+			if(ss.find(getKey()) == null)
+				super.register(node);
+			return ss.find(getKey());
+		}
 	}
 
 	private StartersSet level = null;
@@ -62,6 +76,7 @@ public abstract class Starter {
 		this.parent = parent;
 	}
 	public void doStart() {
+		logger.trace("Starting " + this);
 		started = start();
 		if(! started)
 			logger.error("Start " + this + " for " + parent + " failed");
@@ -69,6 +84,7 @@ public abstract class Starter {
 	}
 	public void doStop() {
 		if(started) {
+			logger.trace("Stopping " + this);
 			stop();
 			started = false;
 		}
@@ -105,5 +121,10 @@ public abstract class Starter {
 	
 	public void setUptime(long uptime) {
 		this.uptime = uptime;
+	}
+	
+	public Starter register(StarterNode node) {
+		node.getStarters().registerStarter(this, node);
+		return this;
 	}
 }
