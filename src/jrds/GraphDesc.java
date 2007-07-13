@@ -43,12 +43,6 @@ public final class GraphDesc
 implements Cloneable {
 	static final private Logger logger = Logger.getLogger(GraphDesc.class);
 
-	/*public enum ConsFunc {AVERAGE, MIN, MAX, LAST};
-	static public final ConsFunc AVERAGE = ConsFunc.AVERAGE;
-	static public final ConsFunc MIN = ConsFunc.MIN;
-	static public final ConsFunc MAX = ConsFunc.MAX;
-	static public final ConsFunc LAST = ConsFunc.LAST;
-	static public final ConsFunc DEFAULTCF = ConsFunc.AVERAGE;*/
 	static public final ConsolFun DEFAULTCF = ConsolFun.AVERAGE;
 
 	public interface GraphType {
@@ -504,7 +498,7 @@ implements Cloneable {
 	 * @param consFunc
 	 * @param reversed
 	 */
-	public void add(String name, String dsName, String rpn,
+	public void add(String name, String rpn,
 			String graphType, String color, String legend,
 			String consFunc, String reversed) {
 		GraphType gt = null;
@@ -535,39 +529,31 @@ implements Cloneable {
 				lastColor++;
 
 		}
+		String dsName = null;
 		if(name != null) {
-			// If nothing to use but a name anyway, it supposed to be a datastore
-			if(dsName == null && rpn == null && legend == null) {
-				dsName = name;
-				gt = GraphType.NONE;
-			}
-			//If neither datasource or rpn, it's a datasource
-			else if(dsName == null && rpn == null) {
+			// If not a rpn, it must be a datastore
+			if(rpn == null) {
 				dsName = name;
 			}
 		}
 		//If the name is missing, where do we find it ?
 		else {
-			if(dsName != null)
-				name = dsName;
-			else if(rpn != null)
+			if(rpn != null)
 				name = rpn;
 			else if(legend != null) {
-				gt = GraphType.COMMENT;
 				name = legend;
 			}
 		}
 		if(legend == null && name != null)
 			legend = name;
 		add(name, dsName, rpn, gt, c, legend, cf, reversed != null);
-
 	}
 
 	public void add(String name, String dsName, String rpn,
 			GraphType graphType, Color color, String legend,
 			ConsolFun cf, boolean reversed) {
 		String key = name;
-		if(key == null && legend != null)
+		if(name == null && legend != null)
 			key = legend;
 		if(reversed) {
 			dsMap.put(key,
@@ -576,7 +562,7 @@ implements Cloneable {
 			dsMap.put("rev_" + key,
 					new DsDesc("rev_" + name, "rev_" + name, revRpn, graphType, color, null, cf));
 			dsMap.put("legend_" + key,
-					new DsDesc(name, dsName, null, GraphType.VOID, null, legend, cf));
+					new DsDesc(name, dsName, rpn, GraphType.VOID, null, legend, cf));
 		}
 		else
 			dsMap.put(key,
@@ -639,6 +625,7 @@ implements Cloneable {
 					}
 				}
 				else {
+					logger.debug("Error for " + ds);
 					logger.error("No way to plot " + ds.name + " in " + name + " found");
 				}
 			}

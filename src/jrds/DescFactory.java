@@ -216,15 +216,14 @@ public class DescFactory extends DirXmlParser {
 			}	
 		}
 		);
-		digester.addCallMethod("graphdesc/add","add",8);
+		digester.addCallMethod("graphdesc/add","add",7);
 		digester.addCallParam("graphdesc/add/name",0);
-		digester.addCallParam("graphdesc/add/dsName",1);
-		digester.addCallParam("graphdesc/add/rpn",2);
-		digester.addCallParam("graphdesc/add/graphType",3);
-		digester.addCallParam("graphdesc/add/color",4);
-		digester.addCallParam("graphdesc/add/legend",5);
-		digester.addCallParam("graphdesc/add/cf",6);
-		digester.addCallParam("graphdesc/add/reversed",7);
+		digester.addCallParam("graphdesc/add/rpn",1);
+		digester.addCallParam("graphdesc/add/graphType",2);
+		digester.addCallParam("graphdesc/add/color",3);
+		digester.addCallParam("graphdesc/add/legend",4);
+		digester.addCallParam("graphdesc/add/cf",5);
+		digester.addCallParam("graphdesc/add/reversed",6);
 		digester.addObjectCreate("graphdesc/hosttree", java.util.ArrayList.class);
 		digester.addSetNext("graphdesc/hosttree", "setHostTree");
 		digester.addObjectCreate("graphdesc/viewtree", java.util.ArrayList.class);
