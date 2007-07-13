@@ -7,6 +7,7 @@
 package jrds.webapp;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -43,23 +44,31 @@ public final class ProbeSummary extends HttpServlet {
 		String scale = req.getParameter("scale");
 		Period p = null;
 		int scaleVal = -1;
-		if(scale != null && (scaleVal = Integer.parseInt(scale)) > 0)
-			p = new Period(scaleVal);
-		else
-			p = new Period(req.getParameter("begin"), req.getParameter("end"));
-		Date begin = p.getBegin();
-		Date end = p.getEnd();
-		
-		if("true".equals(req.getParameter("refresh"))) {
-			long delta = end.getTime() - begin.getTime();
-			end = new Date();
-			begin = new Date(end.getTime() - delta);
+		Date begin = null;
+		Date end = null;
+		try {
+			if(scale != null && (scaleVal = Integer.parseInt(scale)) > 0)
+				p = new Period(scaleVal);
+			else
+				p = new Period(req.getParameter("begin"), req.getParameter("end"));
+			begin = p.getBegin();
+			end = p.getEnd();
+
+			if("true".equals(req.getParameter("refresh"))) {
+				long delta = end.getTime() - begin.getTime();
+				end = new Date();
+				begin = new Date(end.getTime() - delta);
+			}
+
+		} catch (NumberFormatException e1) {
+		} catch (ParseException e1) {
 		}
+		
 		
 		HostsList hl = HostsList.getRootGroup();
 		String rrdId = req.getParameter("id");
 		Probe probe = hl.getProbeById(Integer.parseInt(rrdId));
-		if(probe != null) {
+		if(probe != null && p != null) {
 			FetchData fetched = probe.fetchData(begin, end);
 			String names[] = fetched.getDsNames();
 			for(int i= 0; i< names.length ; i++) {

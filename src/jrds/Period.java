@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
@@ -25,8 +26,12 @@ import org.apache.log4j.Logger;
  */
 public class Period {
 	static final private Logger logger = Logger.getLogger(Period.class);
-	static private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd:HH:mm");
-	static private final Pattern datePattern = Pattern.compile("\\d\\d\\d\\d-\\d\\d-\\d\\d");
+	static private final DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	static private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+	static private final String dateRegexp = "(\\d\\d\\d\\d-\\d\\d-\\d\\d)?";
+	static private final String timeRegexp = "(\\d\\d:\\d\\d)?(:\\d\\d)?";
+	static private final Pattern datePattern = Pattern.compile( dateRegexp + "[T ]?" + timeRegexp);
+
 	private static class PeriodItem {
 		String name;
 		int length;
@@ -65,28 +70,28 @@ public class Period {
 		periodList.add(new Period.PeriodItem("Last Year", Calendar.YEAR, -1));
 		periodList.add(new Period.PeriodItem("Last 2 Years", Calendar.YEAR, -2));
 	}
-	
+
 	private Date begin = null;
 	private Date end = null;
 	private int calPeriod = 7;
-	
+
 	public Period() {
 		end = new Date();
 	}
-	
+
 	public Period(int p) {
 		calPeriod = p;
 		end = new Date();
 	}
-	
-	public Period(String begin, String end) {
+
+	public Period(String begin, String end) throws ParseException {
 		setBegin(begin);
 		setEnd(end);
 		this.calPeriod = 0;
 	}
-	
-	
-	
+
+
+
 	/**
 	 * @return Returns the begin.
 	 */
@@ -103,12 +108,13 @@ public class Period {
 	}
 	/**
 	 * @param begin The begin to set.
+	 * @throws ParseException 
 	 */
-	public void setBegin(String begin) {
-		this.begin = string2Date(begin, "00:00");
+	public void setBegin(String begin) throws ParseException {
+		this.begin = string2Date(begin, true);
 		calPeriod = 0;
 	}
-	
+
 	/**
 	 * @return Returns the end.
 	 */
@@ -117,14 +123,13 @@ public class Period {
 	}
 	/**
 	 * @param end The end to set.
+	 * @throws ParseException 
 	 */
-	public void setEnd(String end) {
-		this.end = string2Date(end, "23:59");
-		if(this.end == null)
-			this.end = new Date();
+	public void setEnd(String end) throws ParseException {
+		this.end = string2Date(end, false);
 		calPeriod = 0;
 	}
-	
+
 	public void setScale(int scale) {
 		calPeriod = scale;
 		end = new Date();
@@ -145,34 +150,64 @@ public class Period {
 	 * @param send String
 	 * @param begin The calculated begin date
 	 * @param end The calculated end date
+	 * @throws ParseException 
 	 */
-	private Date string2Date(String date, String hour){
+	private Date string2Date(String date, boolean isBegin) throws ParseException{
 		Date foundDate = null;
-		if("NOW".compareToIgnoreCase(date) == 0) {
-			foundDate = new Date();
-		}
-		else if(datePattern.matcher(date).matches()) {
-			try {
-				foundDate = df.parse(date + ":" + hour);
-			} catch (ParseException e) {
-				logger.error("Illegal date argument: " + e);
+		if(date != null) {
+			Matcher dateMatcher = datePattern.matcher(date);
+			if("NOW".compareToIgnoreCase(date) == 0) {
+				foundDate = new Date();
 			}
-			catch (NumberFormatException e) {
-				logger.error("Illegal date argument: " + e);				
+			else if(date.length() >= 5 && dateMatcher.matches()) {
+				if(logger.isTraceEnabled()) {
+					logger.trace("Matching " + date);
+					for(int i = 1; i <= dateMatcher.groupCount(); i++) {
+						logger.trace(i +": " + dateMatcher.group(i));
+					}
+				}
+				String dateFound = dateMatcher.group(1);
+				String timeFound = dateMatcher.group(2);
+				String secondFound = dateMatcher.group(3);
+				if(secondFound == null) {
+					if(isBegin)
+						secondFound = ":00";
+					else
+						secondFound = ":59";	
+				}
+				if(timeFound == null) {
+					if(isBegin)
+						timeFound = "00:00";
+					else
+						timeFound = "23:59";
+				}
+				if(dateFound == null) {
+					Date now = new Date();
+
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(now);
+					dateFound = dateFormat.format(cal.getTime());
+				}
+				isoFormat.setLenient(false);
+				foundDate = isoFormat.parse(dateFound + "T" + timeFound + secondFound);
+
+			}
+			else {
+				try {
+					long value = Long.parseLong(date);
+					if(value == 0)
+						foundDate = new Date();
+					else if(value > 0)
+						foundDate = new Date(value);
+					else
+						calPeriod = (int) value;
+				} catch (NumberFormatException e) {
+					throw new ParseException("Not a long: " + e.getMessage(), 0);
+				}
 			}
 		}
-		if(foundDate == null) {
-			try {
-				long value = Long.parseLong(date);
-				if(value == 0)
-					foundDate = new Date();
-				else if(value > 0)
-					foundDate = new Date(value);
-				else
-					calPeriod = (int) value;
-			}
-			catch (NumberFormatException ex) {}
-		}
+		else 
+			throw new ParseException("Null string to parse", 0);
 		return foundDate;
 	}
 	static public List<String> getPeriodNames() {

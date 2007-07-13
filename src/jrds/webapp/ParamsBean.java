@@ -7,6 +7,7 @@
 package jrds.webapp;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -142,14 +143,15 @@ public class ParamsBean {
 	}
 
 	public String getPeriodUrl() {
-		StringBuffer parambuff = new StringBuffer();
-		parambuff.append("begin=" + p.getBegin().getTime() + "&end=" + p.getEnd().getTime());
+		StringBuilder parambuff = new StringBuilder();
+		if(p != null)
+			parambuff.append("begin=" + p.getBegin().getTime() + "&end=" + p.getEnd().getTime());
 		return parambuff.toString();
 	}
 
 	@Override
 	public String toString() {
-		StringBuffer parambuff = new StringBuffer();
+		StringBuilder parambuff = new StringBuilder();
 		if(p != null) {
 			if( scalePeriod || p.getScale() != 0)
 				parambuff.append("scale=" + p.getScale()) ;
@@ -192,15 +194,21 @@ public class ParamsBean {
 
 	public static Period makePeriod(HttpServletRequest req) {
 		Period p = null;
-		String scale = req.getParameter("scale");
-		String end = req.getParameter("end");
-		int scaleVal = -1;
-		if(scale != null && (scaleVal = Integer.parseInt(scale)) > 0)
-			p = new Period(scaleVal);
-		else if(end != null)
-			p = new Period(req.getParameter("begin"), end);
-		else
-			p = new Period();
+		try {
+			String scale = req.getParameter("scale");
+			String end = req.getParameter("end");
+			int scaleVal = -1;
+			if(scale != null && (scaleVal = Integer.parseInt(scale)) > 0)
+				p = new Period(scaleVal);
+			else if(end != null)
+				p = new Period(req.getParameter("begin"), end);
+			else
+				p = new Period();
+		} catch (NumberFormatException e) {
+			logger.error("Period cannot be parser :" + req.getQueryString());
+		} catch (ParseException e) {
+			logger.error("Period cannot be parser :" + req.getQueryString());
+		}
 		return p;
 	}
 
