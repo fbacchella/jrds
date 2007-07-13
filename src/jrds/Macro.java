@@ -17,17 +17,16 @@ public class Macro {
 		this.pf = pf;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void populate(RdsHost host) {
 		for(Object[] l: probeList) {
-			Map map = (Map) l[0];
-			Map<String, String> attrs = map;
+			Map<String, String> attrs = (Map) l[0];
 			String className = attrs.get("type");
 			String label = attrs.get("label");
 			List constArgs = (List) l[1];
 			Probe newRdsRrd = pf.makeProbe(className, constArgs);
 			if(newRdsRrd != null) {
 				if(newRdsRrd instanceof IndexedProbe && label != null) {
-					//logger.debug("Adding label " + label + " to "  + newRdsRrd);
 					((IndexedProbe)newRdsRrd).setLabel(label);
 				}
 
@@ -50,7 +49,7 @@ public class Macro {
 
 	@Override
 	public String toString() {
-		StringBuffer ret =new StringBuffer();
+		StringBuilder ret =new StringBuilder();
 		ret.append("[");
 		for(Object[] probes: probeList) {
 			ret.append(probes[0]);
