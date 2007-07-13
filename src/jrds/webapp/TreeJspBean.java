@@ -12,6 +12,8 @@ import java.io.Writer;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -178,15 +180,16 @@ public class TreeJspBean {
 				for(RdsGraph graph: node.enumerateChildsGraph(vf)) {
 					graphs.add(graph);
 				}
-				//Not sure sort is a good idea
-				/*Collections.sort(graphs, new Comparator<RdsGraph>() {
-					public int compare(RdsGraph g1, RdsGraph g2) {
-						int order = String.CASE_INSENSITIVE_ORDER.compare(g1.getPngName(), g2.getPngName());
-						if(order == 0)
-							order = String.CASE_INSENSITIVE_ORDER.compare(g1.getProbe().getHost().getName(), g2.getProbe().getHost().getName());
-						return order;
-					}
-				});*/
+				if(cgiParams.isSorted()) {
+					Collections.sort(graphs, new Comparator<RdsGraph>() {
+						public int compare(RdsGraph g1, RdsGraph g2) {
+							int order = String.CASE_INSENSITIVE_ORDER.compare(g1.getPngName(), g2.getPngName());
+							if(order == 0)
+								order = String.CASE_INSENSITIVE_ORDER.compare(g1.getProbe().getHost().getName(), g2.getProbe().getHost().getName());
+							return order;
+						}
+					});
+				}
 			}
 			else {
 				RdsGraph graph = hl.getGraphById(id);

@@ -18,29 +18,24 @@ import jrds.PropertiesManager;
 import jrds.RdsGraph;
 import jrds.RdsHost;
 
-import org.rrd4j.core.RrdBackendFactory;
-import org.rrd4j.core.RrdDb;
-import org.rrd4j.core.RrdDef;
-import org.rrd4j.core.RrdMemoryBackendFactory;
-import org.rrd4j.core.Sample;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.rrd4j.core.RrdDb;
+import org.rrd4j.core.RrdDef;
+import org.rrd4j.core.Sample;
 
-public class AllProbeCreation/* extends UnitTest*/ {
-	 static Collection<ProbeDesc> probeList;
+public class AllProbeCreation extends JrdsTester {
+	static Collection<ProbeDesc> probeList;
 	 static ProbeFactory pf;
-	 static RrdMemoryBackendFactory membef;
-	 @BeforeClass public static void prepare() {
-			RrdBackendFactory.setDefaultFactory("MEMORY");
-			//.registerAndSetAsDefaultFactory(new org.jrobin.core.RrdMemoryBackendFactory());
-			membef = (RrdMemoryBackendFactory) RrdBackendFactory.getDefaultFactory();
-	 }
-	 
-	@BeforeClass static public void configure() {
+
+	 @BeforeClass static public void configure() {
+		JrdsTester.configure();
+		
 		HostsList hl = HostsList.getRootGroup();
 		hl.configure(new PropertiesManager());
 		UnitTest.configure();
 		PropertiesManager pm = new PropertiesManager();
+		pm.rrdbackend = "MEM";
 		ArgFactory af= new ArgFactory();
 		DescFactory df = new DescFactory(af);
 		GraphFactory gf = new GraphFactory(df.getGraphDescMap(), true);
@@ -75,7 +70,7 @@ public class AllProbeCreation/* extends UnitTest*/ {
 				Date now = new Date();
 				graph.getPngBytes(new Date(now.getTime() - 10000000), now);
 			}
-			membef.delete(p.getRrdName());
+			//membef.delete(p.getRrdName());
 		}
 	}
 

@@ -26,14 +26,13 @@ function refresh_onClick()
 	window.location.reload( false );
 }
 
-function history_popup(id, name)
+function sort_onClick()
 {
-	var historyWin = window.open("history.jsp?id=" + id, name, "width=700,menubar=no,status=no,resizable=yes");
-}
-
-function keep_onClick()
-{
-	var historyWin = window.open(window.location, qs.get("id", 0).replace("-","_"), "menubar=no,status=no,resizable=yes");
+	var url = location.href.replace(/sort=./, '')
+	var separator = "&"
+	if(location.search.length <1)
+	    separator="?"
+	window.location.replace( url + separator + "sort=1" );
 }
 
 function download_onClick()

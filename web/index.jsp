@@ -58,8 +58,7 @@ STARTALLOPEN = 0
 </div>
 		<div id="content">
 			<input class="btnlist" onclick="refresh_onClick();" type="button" name="refreshButton" value="Refresh" tabindex="0">
-			<input class="btnlist" onclick="keep_onClick();" type="button" name="keepButton" value="Keep" tabindex="1">
-			<input class="btnlist" onclick="download_onClick();" type="button" name="DownloadButton" value="Download values" tabindex="3">
+			<input class="btnlist" onclick="sort_onClick();" type="button" name="sortButton" value="Sort by graph name" tabindex="1">
 			<form  id="select" name="dateForm" action="index.jsp" method="GET">
 				<input name="id" type="hidden" value=""/>
 				<input name="filter" type="hidden" value=""/>

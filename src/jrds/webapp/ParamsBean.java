@@ -30,10 +30,11 @@ import jrds.Period;
  */
 public class ParamsBean {
 	static final private Logger logger = Logger.getLogger(ParamsBean.class);
-	static private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	static private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	Period p = new Period();
 	int id = 0;
 	boolean scalePeriod = true;
+	boolean sorted = false;
 	final Map<String, String[]> parameters = new HashMap<String, String[]>();
 	final HostsList root = HostsList.getRootGroup();
 
@@ -60,10 +61,14 @@ public class ParamsBean {
 		paramString = req.getParameter("pid");
 		if(req.getParameter("end") == null)
 			scalePeriod = true;
+		String sortArg = req.getParameter("sort");
+		if("1".equals(sortArg))
+			sorted = true;
 		parameters.remove("id");
 		parameters.remove("scale");
 		parameters.remove("begin");
 		parameters.remove("end");
+		parameters.remove("sort");
 	}
 
 	public String getParameter(String name) {
@@ -210,6 +215,13 @@ public class ParamsBean {
 			logger.error("Period cannot be parser :" + req.getQueryString());
 		}
 		return p;
+	}
+
+	/**
+	 * @return the sort
+	 */
+	public boolean isSorted() {
+		return sorted;
 	}
 
 }
