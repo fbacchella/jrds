@@ -58,3 +58,8 @@ function save_popup(id)
 {
        var popupWin = window.open("download?id=" + id + "&" + periodUrl, name , "menubar=no,status=no,resizable=no,scrollbars=no");
 }
+
+function history_popup(id, name)
+{
+	var historyWin = window.open("history.jsp?id=" + id, name, "width=700,menubar=no,status=no,resizable=yes,scrollbars=yes");
+}
