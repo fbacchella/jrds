@@ -4,7 +4,7 @@
   <name>MysqlThreads</name>
   <graphName>mysqlthreads-{3}</graphName>
   <graphTitle>Threads created for {3}</graphTitle>
-  <verticalLabel>bytes</verticalLabel>
+  <verticalLabel>creation/s</verticalLabel>
   <add>
     <name>Threads_created</name>
     <graphType>line</graphType>

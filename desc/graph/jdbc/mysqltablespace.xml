@@ -18,7 +18,7 @@
     <name>Index_length</name>
     <graphType>stack</graphType>
     <color>teal</color>
-    <legend>Index length</legend>
+    <legend>Index length (without primary key indexes)</legend>
   </add>
   <add>
     <name>Data_free</name>

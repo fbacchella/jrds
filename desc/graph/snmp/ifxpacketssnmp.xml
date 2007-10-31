@@ -7,8 +7,7 @@
   <verticalLabel>paquets/s</verticalLabel>
   <lowerLimit>NaN</lowerLimit>
   <add>
-    <name>Upward graph</name>
-    <graphType>comment</graphType>
+    <legend>Upward graph</legend>
   </add>
   <add>
     <name>ifHCOutUcastPkts</name>
@@ -23,8 +22,7 @@
     <legend>packets in error send/s</legend>
   </add>
   <add>
-    <name>Downward graph</name>
-    <graphType>comment</graphType>
+    <legend>Downward graph</legend>
   </add>
   <add>
     <name>ifHCInUcastPkts</name>
