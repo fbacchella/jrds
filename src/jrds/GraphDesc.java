@@ -39,7 +39,7 @@ import org.w3c.dom.Element;
  * @author Fabrice Bacchella
  * @version $Revision$
  */
-public final class GraphDesc
+public class GraphDesc
 implements Cloneable {
 	static final private Logger logger = Logger.getLogger(GraphDesc.class);
 
@@ -107,13 +107,13 @@ implements Cloneable {
 	static final public GraphType COMMENT = GraphType.COMMENT;
 
 	private static abstract class PathElement {
-		public abstract String resolve(RdsGraph graph);
+		public abstract String resolve(GraphNode graph);
 		public String toString() {
 			return this.resolve(null).toUpperCase();
 		}
 
 		static public final PathElement HOST = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return graph.getProbe().getHost().getName();
 			}
 			public String toString() {
@@ -121,7 +121,7 @@ implements Cloneable {
 			}
 		};
 		static public final PathElement TITLE = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return graph.getGraphTitle();
 			}
 			public String toString() {
@@ -129,7 +129,7 @@ implements Cloneable {
 			}
 		};
 		static public final PathElement INDEX = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				StringBuffer retValue = new StringBuffer("empty");
 				if(graph.getProbe() instanceof IndexedProbe) {
 					retValue.setLength(0);
@@ -151,7 +151,7 @@ implements Cloneable {
 			}
 		};
 		static public final PathElement URL = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				String url = "";
 				Probe probe = graph.getProbe();
 				if( probe instanceof UrlProbe) {
@@ -164,7 +164,7 @@ implements Cloneable {
 			}
 		};
 		static public final PathElement JDBC = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return ( (JdbcProbe) graph.getProbe()).getUrlAsString();
 			}
 			public String toString() {
@@ -172,68 +172,68 @@ implements Cloneable {
 			}
 		};
 		static public final PathElement DISK = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return "Disk";
 			}
 		};
 		static public final PathElement NETWORK = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return "Network";
 			}
 		};
 		static public final PathElement TCP = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return "TCP";
 			}
 		};
 		static public final PathElement SERVICES = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return "Services";
 			}
 		};
 		static public final PathElement SYSTEM = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return "System";
 			}
 		};
 		static public final PathElement LOAD = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return "Load";
 			}
 		};
 		static public final PathElement DISKACTIVITY = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return "Disk activity";
 			}
 			public String toString() {return "DISKACTIVITY";}
 		};
 		static public final PathElement WEB = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return "Web";
 			}
 		};
 		static public final PathElement INTERFACES = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return "Interfaces";
 			}
 		};
 		static public final PathElement IP = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return "IP";
 			}
 		};
 		static public final PathElement MEMORY = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return "Memory";
 			}
 		};
 		static public final PathElement DATABASE = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				return "Databases";
 			}
 		};
 		static public final PathElement DBISNTANCE = new PathElement() {
-			public String resolve(RdsGraph graph) {
+			public String resolve(GraphNode graph) {
 				JdbcProbe dbprobe = (JdbcProbe) graph.getProbe();
 				return dbprobe.getUrlAsString();
 			}
@@ -400,6 +400,13 @@ implements Cloneable {
 	private int maxLengthLegend = 0;
 	private boolean siUnit = true;
 	private Integer unitExponent = null;
+	
+	public final class Dimension {
+		public int width = 0;
+		public int height = 0;
+	};
+	private Dimension dimension = null;
+
 
 	/**
 	 * A constructor wich pre allocate the desired size
@@ -839,7 +846,7 @@ implements Cloneable {
 	/**
 	 * @return Returns the viewTree.
 	 */
-	public LinkedList<String> getViewTree(RdsGraph graph) {
+	public LinkedList<String> getViewTree(GraphNode graph) {
 		LinkedList<String> tree = new LinkedList<String>();
 		for (Object o: viewTree) {
 			if (o instanceof String)
@@ -867,7 +874,7 @@ implements Cloneable {
 	/**
 	 * @return Returns the hostTree.
 	 */
-	public LinkedList<String> getHostTree(RdsGraph graph) {
+	public LinkedList<String> getHostTree(GraphNode graph) {
 		LinkedList<String> tree = new LinkedList<String>();
 		for (Object o: hostTree) {
 			if (o instanceof String)
@@ -1073,5 +1080,19 @@ implements Cloneable {
 				logger.debug("Base unit not identified: " + exponent);
 			}
 		}
+	}
+
+	/**
+	 * @return the dimension of the graphic object
+	 */
+	public Dimension getDimension() {
+		return dimension;
+	}
+
+	/**
+	 * @param dimension the dimension of the graphic object to set
+	 */
+	public void setDimension(Dimension dimension) {
+		this.dimension = dimension;
 	}
 }

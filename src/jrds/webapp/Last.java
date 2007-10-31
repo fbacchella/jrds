@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import jrds.HostsList;
 import jrds.Probe;
-import jrds.RdsGraph;
+import jrds.GraphNode;
 
 /**
  * A servlet wich show the last update values and time
@@ -39,7 +39,7 @@ public final class Last extends HttpServlet {
 
 		String rrdId = req.getParameter("id");
 		HostsList hl = HostsList.getRootGroup();
-		RdsGraph g = hl.getGraphById(Integer.parseInt(rrdId));
+		GraphNode g = hl.getGraphById(Integer.parseInt(rrdId));
 		if(g != null ) {
 			Probe p = g.getProbe();
 			if(p != null) {

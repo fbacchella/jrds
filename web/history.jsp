@@ -2,8 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ page session="false" %>
-<%@ page import="jrds.HostsList" %>
-<%@ page import="jrds.RdsGraph" %>
+
 <jsp:useBean id="jrdsBean" class="jrds.webapp.TreeJspBean" />
 <jsp:useBean id="period" class="jrds.webapp.ParamsBean"/>
 <%period.parseReq(request);%>
@@ -13,6 +12,7 @@
 		<meta http-equiv="content-type" content="text/html;charset=utf-8">
 		<title>Graph</title>
 <link rel="stylesheet" type="text/css" href="lib/jrds.css" />
+<script type="text/javascript" src="lib/querystring.js"></script>
 <script type="text/javascript" src="lib/jrds.js" ></script>
 
 <script type="text/javascript" >

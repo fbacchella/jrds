@@ -3,14 +3,11 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ page session="false" %>
 <%@ page import="jrds.HostsList" %>
-<%@ page import="jrds.RdsGraph" %>
+<%@ page import="jrds.GraphNode" %>
 <jsp:useBean id="jrdsBean" class="jrds.webapp.TreeJspBean" />
 <jsp:useBean id="period" class="jrds.webapp.ParamsBean"/>
-<jsp:useBean id="graph" class="jrds.webapp.GraphBean"/>
 
-<%period.parseReq(request);
-graph.config(request, period);
-%>
+<%period.parseReq(request);%>
 <html>
 
 	<head>
@@ -37,9 +34,11 @@ periodUrl="<jsp:getPropertyname="period" property="periodUrl" />";
 	<div class="tree" >
 			<a href="index.jsp"><img id="toroot" src="img/back_to_album.gif" alt="" height="16" width="20" border="0"></a>
 			<form id="hostSelect" action="index.jsp" method="get" name="hostForm">
-				<input name="begin" type="hidden" value=""/>
-				<input name="end" type="hidden" value=""/>
-				<input name="scale" type="hidden" value=""/>
+				<input name="begin" type="hidden" value="<jsp:getPropertyname="period" property="stringBegin" />"/>
+				<input name="end" type="hidden" value="<jsp:getPropertyname="period" property="stringEnd" />"/>
+				<input name="scale" type="hidden" value="<jsp:getPropertyname="period" property="scale" />"/>
+				<input name="max" type="hidden" value="<jsp:getPropertyname="period" property="maxStr" />"/>
+				<input name="min" type="hidden" value="<jsp:getPropertyname="period" property="minStr" />"/>
 				<label>Only host</label> <input type="text" name="host" size="24">
 			</form>
 			<div ><table border=0><tr><td><font size=-2><a style="font-size:7pt;text-decoration:none;color:silver" href="http://www.treemenu.net/" target="_blank">JavaScript Tree Menu</a></font></td></tr></table></div>
@@ -81,6 +80,14 @@ STARTALLOPEN = 0
 							<td width="160">Choose the end date</td>
 							<td><input size="14" type="text" name="end" id="end" value="" size="9" /><img id="dateEndTrigger" src="img/cal.gif" alt="calendrier" height="16" width="16" border="0" style="cursor: pointer"></td>
 						</tr>
+						<tr>
+							<td width="160">Choose the min value</td>
+							<td><input size="14" type="text" name="min" id="min" value="" size="9" /></td>
+						</tr>
+						<tr>
+							<td width="160">Choose the max value</td>
+							<td><input size="14" type="text" name="max" id="max" value="" size="9" /></td>
+						</tr>
 					</table>
 					<input type="submit">
 				</div>
@@ -88,10 +95,9 @@ STARTALLOPEN = 0
 <script type="text/javascript">
 	document.dateForm.end.value = "<jsp:getPropertyname="period" property="stringEnd" />"; 
 	document.dateForm.begin.value = "<jsp:getPropertyname="period" property="stringBegin" />"; 
+	document.dateForm.max.value = "<jsp:getPropertyname="period" property="maxStr" />"; 
+	document.dateForm.min.value = "<jsp:getPropertyname="period" property="minStr" />"; 
     document.dateForm.scale.selectedIndex = <jsp:getPropertyname="period" property="scale" />;
-	document.hostForm.end.value = "<jsp:getPropertyname="period" property="stringEnd" />"; 
-	document.hostForm.begin.value = "<jsp:getPropertyname="period" property="stringBegin" />"; 
-    document.hostForm.scale.value = <jsp:getPropertyname="period" property="scale" />;
     document.dateForm.id.value = qs.get("id", 0);
     document.dateForm.filter.value = qs.get("filter", "");
    	document.dateForm.host.value = qs.get("host", "");

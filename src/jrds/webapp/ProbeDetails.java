@@ -23,7 +23,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import jrds.HostsList;
 import jrds.Probe;
 
 import org.apache.log4j.Logger;
@@ -42,7 +41,7 @@ public class ProbeDetails extends HttpServlet {
 		public void warning(TransformerException e) throws TransformerException {
 			logger.warn("Invalid xsl: " + e.getMessageAndLocation());
 		}
-		
+
 	};
 
 	@Override
@@ -50,9 +49,8 @@ public class ProbeDetails extends HttpServlet {
 		res.setContentType("text/html");
 		res.addHeader("Cache-Control", "no-cache");
 
-		HostsList hl = HostsList.getRootGroup();
 		ParamsBean params = new ParamsBean(req);
-		Probe probe = hl.getProbeById(params.getId());
+		Probe probe = params.getProbe();
 
 		if(probe != null)
 			try {

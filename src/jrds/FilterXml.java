@@ -33,7 +33,7 @@ public class FilterXml extends Filter {
 			tags.add(p);
 	}
 	
-	public boolean acceptGraph(RdsGraph graph, String path) {
+	public boolean acceptGraph(GraphNode graph, String path) {
 		return acceptPath(path) &&  acceptTag(graph.getProbe().getTags());
 	}
 

@@ -9,7 +9,7 @@ import java.awt.Color;
 
 import jrds.GraphDesc;
 import jrds.Probe;
-import jrds.RdsGraph;
+import jrds.GraphNode;
 
 
 /**
@@ -17,7 +17,7 @@ import jrds.RdsGraph;
  *
  * TODO 
  */
-public class CpuTimeGraph extends RdsGraph {
+public class CpuTimeGraph extends GraphNode {
 	static final GraphDesc gd = new GraphDesc(1);
 	static {
 		gd.add("ssCpuUser", GraphDesc.AREA, Color.BLUE, "User");

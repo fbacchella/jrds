@@ -51,7 +51,7 @@ public class Collector {
 				for(Probe p: h.getProbes()) {
 					try {
 						p.getPd().dumpAsXml(p.getClass());
-						for(jrds.RdsGraph g: p.getGraphList()) {
+						for(jrds.GraphNode g: p.getGraphList()) {
 							try {
 								g.getGraphDesc().dumpAsXml(g.getClass());
 							} catch (RuntimeException e) {

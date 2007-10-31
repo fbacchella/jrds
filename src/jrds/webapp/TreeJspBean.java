@@ -30,7 +30,7 @@ import jrds.Filter;
 import jrds.GraphTree;
 import jrds.HostsList;
 import jrds.Probe;
-import jrds.RdsGraph;
+import jrds.GraphNode;
 import jrds.Renderer;
 
 import org.apache.log4j.Logger;
@@ -127,14 +127,16 @@ public class TreeJspBean {
 					out.println("initializeDocument();");
 			}
 			else
-				getAllFilterJavascript(out, params.toString(), root.getAllFiltersNames());
+				getAllFilterJavascript(out, params, root.getAllFiltersNames());
 		} catch (IOException e) {
 			throw new JspException(e.getMessage());
 		}
 		params.setId(oldId);
 	}
 
-	public static boolean getAllFilterJavascript(Writer out, String queryString, Collection<String> allFilters) throws IOException {
+	public static boolean getAllFilterJavascript(Writer out, ParamsBean params, Collection<String> allFilters) throws IOException {
+		HostsList root = HostsList.getRootGroup();
+		
 		out.append("foldersTree = gFld('All filters');\n");
 		out.append("foldersTree.addChildren([\n");
 		boolean first = true;
@@ -148,42 +150,41 @@ public class TreeJspBean {
 			}
 			out.append("'" + filterName +"',");
 			out.append("'");
-			out.append("index.jsp?filter=");
-			out.append(filterName);
-			if(queryString != null &&  ! "".equals(queryString)) {
-				out.append("&");
-				out.append(queryString);
-			}
+			out.append(params.makeObjectUrl("index.jsp", root.getFilter(filterName), false));
+			//out.append("index.jsp?filter=");
+			//out.append(filterName);
+			//if(queryString != null &&  ! "".equals(queryString)) {
+			//	out.append("&");
+			//	out.append(queryString);
+			//}
 			out.append("']");
 		}
 		out.append("\n]);\n");
 		out.append("initializeDocument();");
 		return true;
 	}
-
+	
 	public void getGraphList(JspWriter out,  HttpServletRequest req, ParamsBean cgiParams) {
 		HostsList  root = HostsList.getRootGroup();
-		//cgiParams = new ParamsBean(req);
-		logger.debug(cgiParams.getPeriodUrl());
+		logger.debug(cgiParams.getPeriod());
 		logger.debug(cgiParams.getFilter());
 		logger.debug(cgiParams);
 		Filter vf = cgiParams.getFilter();
 		int id = cgiParams.getId();
-		GraphBean gb = new GraphBean(req, cgiParams);
 		HostsList hl = HostsList.getRootGroup();
 
 		try {
 			GraphTree node = null;
 			node = root.getNodeById(id);
-			List<RdsGraph> graphs = new ArrayList<RdsGraph>();
+			List<GraphNode> graphs = new ArrayList<GraphNode>();
 			if(node != null) {
-				for(RdsGraph graph: node.enumerateChildsGraph(vf)) {
+				for(GraphNode graph: node.enumerateChildsGraph(vf)) {
 					graphs.add(graph);
 				}
 				if(cgiParams.isSorted()) {
-					Collections.sort(graphs, new Comparator<RdsGraph>() {
-						public int compare(RdsGraph g1, RdsGraph g2) {
-							int order = String.CASE_INSENSITIVE_ORDER.compare(g1.getPngName(), g2.getPngName());
+					Collections.sort(graphs, new Comparator<GraphNode>() {
+						public int compare(GraphNode g1, GraphNode g2) {
+							int order = String.CASE_INSENSITIVE_ORDER.compare(g1.getName(), g2.getName());
 							if(order == 0)
 								order = String.CASE_INSENSITIVE_ORDER.compare(g1.getProbe().getHost().getName(), g2.getProbe().getHost().getName());
 							return order;
@@ -192,7 +193,7 @@ public class TreeJspBean {
 				}
 			}
 			else {
-				RdsGraph graph = hl.getGraphById(id);
+				GraphNode graph = hl.getGraphById(id);
 				if(graph != null)
 					graphs.add(graph);
 			}
@@ -204,38 +205,43 @@ public class TreeJspBean {
 
 			if( ! graphs.isEmpty()) {
 				Renderer r = hl.getRenderer();
-				for(RdsGraph graph: graphs) {
-					r.render(graph, cgiParams.getBegin(), cgiParams.getEnd());
-					gb.setGraph(graph);
+				for(GraphNode gn: graphs) {
+					jrds.Graph graph = gn.getGraph();
+					cgiParams.configureGraph(graph);
+					r.render(graph);
 
 					popupBuffer.setLength(0);
-					popupBuffer.append("onclick='popup(");
+					popupBuffer.append("onclick='popup(\"");
+					popupBuffer.append(cgiParams.makeObjectUrl("popup.jsp", graph, true));
+					popupBuffer.append("\",");
 					popupBuffer.append(graph.hashCode());
 					popupBuffer.append(")'");
 
-					Probe p = graph.getProbe();
+					Probe p = gn.getProbe();
 					detailsBuffer.setLength(0);
-					detailsBuffer.append("onclick='details(");
-					detailsBuffer.append(p.hashCode());
-					detailsBuffer.append(", \"");
+					detailsBuffer.append("onclick='details(\"");
+					detailsBuffer.append(cgiParams.makeObjectUrl("details", graph, true));
+					detailsBuffer.append("\", \"");
 					detailsBuffer.append(p.getName());
 					detailsBuffer.append("\")'");
 
 					historyBuffer.setLength(0);
-					historyBuffer.append("onclick='history_popup(");
-					historyBuffer.append(graph.hashCode());
-					historyBuffer.append(", \"");
+					historyBuffer.append("onclick='history_popup(\"");
+					historyBuffer.append(cgiParams.makeObjectUrl("history.jsp", graph, false));
+					historyBuffer.append("\", \"");
 					historyBuffer.append(p.getName());
 					historyBuffer.append("\");'");
 
 					saveBuffer.setLength(0);
-					saveBuffer.append("onclick='save_popup(");
-					saveBuffer.append(graph.hashCode());
-					saveBuffer.append(");'");
+					saveBuffer.append("onclick='save_popup(\"");
+					saveBuffer.append(cgiParams.makeObjectUrl("download", graph, true));
+					saveBuffer.append("\", \"");
+					saveBuffer.append(graph.getQualifieName());
+					saveBuffer.append("\");'");
 
 					buffer.setLength(0);
 					buffer.append("<div class='graphblock'>\n");
-					buffer.append(gb.getImgElement() + "\n");
+					buffer.append(getImgElement(graph, cgiParams) + "\n");
 					buffer.append("<div class='iconslist'>\n");
 					buffer.append("<img class='icon' " + popupBuffer + " src='img/application_double.png' alt='popup'  height='16' width='16'  />\n");
 					buffer.append("<img class='icon' " + detailsBuffer + " src='img/application_view_list.png' alt=\"probe's details\"  height='16' width='16'  />\n");
@@ -253,16 +259,26 @@ public class TreeJspBean {
 		}
 	}
 
-	public String getProbeUrl(HttpServletRequest req, ParamsBean cgiParams) {
-		String retValue = req.getContextPath();
-		RdsGraph g = HostsList.getRootGroup().getGraphById(cgiParams.getId());
-		if(g != null) {
-			StringBuffer urlBuffer = new StringBuffer();
-			urlBuffer.append(req.getContextPath());
-			Probe p = g.getProbe();
-			urlBuffer.append("/details?id=" + p.hashCode());
-			retValue = urlBuffer.toString();
-		}
-		return retValue;
-	}	
+	public String getImgElement(jrds.Graph graph, ParamsBean cgiParams) {
+		StringBuilder imgElement = new StringBuilder();
+
+		imgElement.append("<img class='graph' ");
+		imgElement.append("id='" + graph.hashCode() + "' " );
+		imgElement.append("src='" + cgiParams.makeObjectUrl("graph",graph, true) + "' ");
+
+		//A few more attributes
+		imgElement.append("name='" + graph.getQualifieName() + "' ");
+		imgElement.append("alt='" + graph.getQualifieName() + "' ");
+//		int rHeight = graph.getRealHeight();
+//		if(rHeight > 0)
+//			imgElement.append("height='" + Integer.toString(rHeight) + "' ");
+//		int rWidth = graph.getRealWidth();
+//		if(rWidth > 0)
+//			imgElement.append("width='" + Integer.toString(rWidth)+ "' ");
+
+		imgElement.append(" />");
+
+		return imgElement.toString();
+	}
+
 }

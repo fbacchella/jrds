@@ -9,13 +9,14 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.ArgFactory;
 import jrds.DescFactory;
+import jrds.Graph;
 import jrds.GraphFactory;
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.ProbeFactory;
 import jrds.PropertiesManager;
-import jrds.RdsGraph;
+import jrds.GraphNode;
 import jrds.RdsHost;
 
 import org.junit.BeforeClass;
@@ -36,6 +37,7 @@ public class AllProbeCreation extends JrdsTester {
 		UnitTest.configure();
 		PropertiesManager pm = new PropertiesManager();
 		pm.rrdbackend = "MEM";
+		pm.libspath="";
 		ArgFactory af= new ArgFactory();
 		DescFactory df = new DescFactory(af);
 		GraphFactory gf = new GraphFactory(df.getGraphDescMap(), true);
@@ -65,12 +67,11 @@ public class AllProbeCreation extends JrdsTester {
 			Sample s = db.createSample();
 			s.update();
 			db.close();
-			for(RdsGraph graph : p.getGraphList()) {
-				graph.getGraphDesc();
+			/*for(GraphNode gn : p.getGraphList()) {
 				Date now = new Date();
-				graph.getPngBytes(new Date(now.getTime() - 10000000), now);
-			}
-			//membef.delete(p.getRrdName());
+				Graph graph = new Graph(gn, new Date(now.getTime() - 10000000), now);
+				graph.getPngBytes();
+			}*/
 		}
 	}
 

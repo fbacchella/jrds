@@ -4,9 +4,9 @@ import jrds.graphe.Sum;
 
 
 public abstract class Filter {
-	static final Filter SUM = new Filter() {
+	static final public Filter SUM = new Filter() {
 		@Override
-		public boolean acceptGraph(RdsGraph graph, String path) {
+		public boolean acceptGraph(GraphNode graph, String path) {
 			return (graph instanceof Sum);
 		}
 		@Override
@@ -14,9 +14,9 @@ public abstract class Filter {
 			return "All sums";
 		}
 	};
-	static final Filter EVERYTHING = new Filter() {
+	static final public Filter EVERYTHING = new Filter() {
 		@Override
-		public boolean acceptGraph(RdsGraph graph, String path) {
+		public boolean acceptGraph(GraphNode graph, String path) {
 			return true;
 		}
 		@Override
@@ -24,9 +24,9 @@ public abstract class Filter {
 			return "Everything";
 		}
 	};
-	static final Filter ALLHOSTS = new Filter() {
+	static final public Filter ALLHOSTS = new Filter() {
 		@Override
-		public boolean acceptGraph(RdsGraph graph, String path) {
+		public boolean acceptGraph(GraphNode graph, String path) {
 			return path.startsWith("/" + HostsList.HOSTROOT + "/");
 		}
 		@Override
@@ -34,9 +34,9 @@ public abstract class Filter {
 			return "All hosts";
 		}
 	};
-	static final Filter ALLVIEWS = new Filter() {
+	static final public Filter ALLVIEWS = new Filter() {
 		@Override
-		public boolean acceptGraph(RdsGraph graph, String path) {
+		public boolean acceptGraph(GraphNode graph, String path) {
 			return path.startsWith("/" + HostsList.VIEWROOT + "/");
 		}
 		@Override
@@ -44,10 +44,10 @@ public abstract class Filter {
 			return "All views";
 		}
 	};
-	static final Filter ALLSERVICES = new Filter() {
+	static final public Filter ALLSERVICES = new Filter() {
 		static final private String ROOTNAME = "/" + HostsList.VIEWROOT + "/Services";
 		@Override
-		public boolean acceptGraph(RdsGraph graph, String path) {
+		public boolean acceptGraph(GraphNode graph, String path) {
 			return path.startsWith(ROOTNAME);
 		}
 		@Override
@@ -60,7 +60,7 @@ public abstract class Filter {
 		}
 		
 	};
-	public abstract boolean acceptGraph(RdsGraph graph, String path);
+	public abstract boolean acceptGraph(GraphNode graph, String path);
 	public abstract String getName();
 	public GraphTree setRoot(GraphTree gt) {
 		return gt;

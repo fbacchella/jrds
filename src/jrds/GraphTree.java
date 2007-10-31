@@ -47,7 +47,7 @@ public class GraphTree {
 	//The childs
 	private Map<String, GraphTree> childsMap;
 	//The graphs in this node
-	private Map<String, RdsGraph> graphsSet;
+	private Map<String, GraphNode> graphsSet;
 
 	/**
 	 *  Private constructor, no one can generate an graph on the fly
@@ -55,7 +55,7 @@ public class GraphTree {
 	 */
 	@SuppressWarnings("unchecked")
 	private GraphTree(String name) {
-		graphsSet = new TreeMap<String, RdsGraph>(String.CASE_INSENSITIVE_ORDER);
+		graphsSet = new TreeMap<String, GraphNode>(String.CASE_INSENSITIVE_ORDER);
 		childsMap = new TreeMap<String, GraphTree>(nodeComparator);
 		this.name = name;
 	}
@@ -75,8 +75,10 @@ public class GraphTree {
 	public boolean getJavaScriptCode(Writer out, ParamsBean params, String curNode, Filter f) throws IOException {
 
 		StringBuffer thisNode = new StringBuffer(1000);
-		thisNode.append(curNode + " = gFld('" + name.replaceAll("'","&#x27;") + "', 'index.jsp?id=" + getPath().hashCode());
-		thisNode.append("&" + params);
+		thisNode.append(curNode + " = gFld('" + name.replaceAll("'","&#x27;") + "', '");
+		//thisNode.append(curNode + " = gFld('" + name.replaceAll("'","&#x27;") + "', 'index.jsp?id=" + getPath().hashCode());
+		//thisNode.append("&" + params);
+		thisNode.append(params.makeObjectUrl("index.jsp", getPath(), false));
 		thisNode.append("');\n");
 
 		StringBuffer childsarray = new StringBuffer(1000);
@@ -96,8 +98,8 @@ public class GraphTree {
 				first = false;
 			}
 		}
-		for(Map.Entry<String, RdsGraph> e: graphsSet.entrySet()) {
-			RdsGraph currGraph = e.getValue();
+		for(Map.Entry<String, GraphNode> e: graphsSet.entrySet()) {
+			GraphNode currGraph = e.getValue();
 			String path = getPath() + "/" + currGraph.getName();
 			if(f == null || f.acceptGraph(currGraph, path)) {
 				//Start to render the accepted graph
@@ -112,9 +114,10 @@ public class GraphTree {
 				childsarray.append("    [");
 				childsarray.append("'" + leafName +"',");
 				childsarray.append("'");
-				childsarray.append("index.jsp?id=");
-				childsarray.append(currGraph.hashCode());
-				childsarray.append("&" + params);
+				childsarray.append(params.makeObjectUrl("index.jsp", currGraph, false));
+				//childsarray.append("index.jsp?id=");
+				//childsarray.append(currGraph.hashCode());
+				//childsarray.append("&" + params);
 				childsarray.append("']");
 			}
 		}
@@ -148,7 +151,7 @@ public class GraphTree {
 		}
 	}
 
-	private void _addGraphByPath(LinkedList<String> path, RdsGraph nodesGraph) {
+	private void _addGraphByPath(LinkedList<String> path, GraphNode nodesGraph) {
 		if(path.size() == 1) {
 			graphsSet.put(path.getLast(), nodesGraph);
 		}
@@ -159,7 +162,7 @@ public class GraphTree {
 		}
 	}
 
-	public void addGraphByPath(LinkedList<String> path, RdsGraph nodesGraph) {
+	public void addGraphByPath(LinkedList<String> path, GraphNode nodesGraph) {
 		if(path.size() < 1) {
 			logger.error("Path is empty : " + path + " for graph " + nodesGraph.getGraphTitle());
 		}
@@ -196,13 +199,13 @@ public class GraphTree {
 		return graphsSet;
 	}
 
-	public List<RdsGraph> enumerateChildsGraph(Filter v) {
-		List<RdsGraph> retValue  = new ArrayList<RdsGraph>();
+	public List<GraphNode> enumerateChildsGraph(Filter v) {
+		List<GraphNode> retValue  = new ArrayList<GraphNode>();
 		if(graphsSet != null) {
 			if(v == null)
-				retValue.addAll((Collection<RdsGraph>) graphsSet.values());
+				retValue.addAll((Collection<GraphNode>) graphsSet.values());
 			else {
-				for(RdsGraph g: graphsSet.values()) {
+				for(GraphNode g: graphsSet.values()) {
 					String path = this.getPath() + "/" + g.getName();
 					if(v.acceptGraph(g, path))
 						retValue.add(g);

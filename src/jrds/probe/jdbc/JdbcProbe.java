@@ -70,8 +70,11 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 	{
 		Map<String, Number> retValue = new HashMap<String, Number>(getPd().getSize());
 
-		for(String query: getQueries())
+		String jdbcurl = getUrlAsString();
+		for(String query: getQueries()) {
+			logger.debug("Getting " + query + " on "  + jdbcurl); 
 			retValue.putAll(select2Map(query));
+		}
 		return retValue;
 	}
 
@@ -129,7 +132,6 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 	{
 		Map<String, Number> values = new HashMap<String, Number>();
 		String jdbcurl = getUrlAsString();
-		logger.debug("Getting " + query + " on "  + jdbcurl); 
 		try {
 			Statement stmt = starter.getStatment();
 			if(stmt.execute(query)) {
@@ -236,5 +238,5 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 	public void setLabel(String label) {
 		this.label = label;
 	}
-	
+
 }

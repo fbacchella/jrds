@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jrds.HostsList;
-import jrds.RdsGraph;
 
 import org.apache.log4j.Logger;
 
@@ -37,32 +36,24 @@ public final class Graph extends HttpServlet {
 			HostsList hl = HostsList.getRootGroup();
 
 			ParamsBean p = new ParamsBean(req);
-			Date begin = p.getBegin();
-			Date end = p.getEnd();
-			
-			if("true".equals(req.getParameter("refresh"))) {
-				long delta = end.getTime() - begin.getTime();
-				end = new Date();
-				begin = new Date(end.getTime() - delta);
-			}
-			
-			RdsGraph graph = hl.getGraphById(p.getId());
+
+			jrds.Graph graph = p.getGraph();
 
 			Date middle = new Date();
-			if(hl.getRenderer().isReady(graph, begin, end)) {
-				res.setContentType("image/png");
-				ServletOutputStream out = res.getOutputStream();
-				res.addHeader("Cache-Control", "no-cache");
-				hl.getRenderer().send(graph, begin, end, out);
-			}
-			else {
+			if( ! hl.getRenderer().isReady(graph)) {
 				logger.warn("One graph failed, not ready");
 			}
+			res.setContentType("image/png");
+			ServletOutputStream out = res.getOutputStream();
+			res.addHeader("Cache-Control", "no-cache");
+			hl.getRenderer().send(graph, out);
 
-			Date finish = new Date();
-			long duration1 = middle.getTime() - start.getTime();
-			long duration2 = finish.getTime() - middle.getTime();
-			logger.trace("Graph " + graph + " rendering, started at " + start + ", ran for " + duration1 + ":" + duration2 + "ms");
+			if(logger.isTraceEnabled()) {
+				Date finish = new Date();
+				long duration1 = middle.getTime() - start.getTime();
+				long duration2 = finish.getTime() - middle.getTime();
+				logger.trace("Graph " + graph + " rendering, started at " + start + ", ran for " + duration1 + ":" + duration2 + "ms");
+			}
 		} catch (RuntimeException e) {
 			logger.error(e, e);
 		}							

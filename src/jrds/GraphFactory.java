@@ -62,13 +62,13 @@ public class GraphFactory {
 	 * @param probe the probe the graph will take data from
 	 * @return a new instanciated Graph
 	 */
-	public final RdsGraph makeGraph(Object className, Probe probe) {
-		RdsGraph retValue = null;
+	public final GraphNode makeGraph(Object className, Probe probe) {
+		GraphNode retValue = null;
 		
 		//Simple case, the handler is already known
 		if(graphDescMap.containsKey(className)) {
 			GraphDesc gd = (GraphDesc) graphDescMap.get(className);
-			retValue = new RdsGraph(probe, gd);
+			retValue = new GraphNode(probe, gd);
 		}
 		//A class was used as a param
 		//We only need to instanciate it
@@ -76,12 +76,12 @@ public class GraphFactory {
 			Class graphClass = (Class) className;
 			
 			try {
-				if (RdsGraph.class.isAssignableFrom(graphClass)) {
+				if (GraphNode.class.isAssignableFrom(graphClass)) {
 					Class[] probeClassArray = new Class[] {Probe.class};
 					Object[] args = new Object[] {probe};
 					
 					Constructor co = graphClass.getConstructor(probeClassArray);
-					retValue = (RdsGraph) co.newInstance(args);
+					retValue = (GraphNode) co.newInstance(args);
 				}
 				else {
 					logger.warn("didn't get a RdsGraph but a " +
@@ -96,7 +96,7 @@ public class GraphFactory {
 		//We get a GraphDesc
 		//We need to instanciate a Graph using this description
 		else if(legacymode && className instanceof GraphDesc ) {
-			retValue = new RdsGraph(probe, (GraphDesc) className);
+			retValue = new GraphNode(probe, (GraphDesc) className);
 		}
 		//We get a String
 		//it's an URL to xml description of the graph

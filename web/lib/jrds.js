@@ -35,31 +35,32 @@ function sort_onClick()
 	window.location.replace( url + separator + "sort=1" );
 }
 
-function download_onClick()
+function download_onClick(url)
 {
 	var historyWin = window.open("download" + document.location.search, "download" + document.location.search, "menubar=no,status=no");
 }
 
-function details(id, name)
+function details(url, name)
 {
-	var detailsWin = window.open("details?id=" + id + "&" + periodUrl, name, "resizable=yes,scrollbars=yes");
+	var detailsWin = window.open(url, name, "resizable=yes,scrollbars=yes");
 }
 
-function popup(id)
+function popup(url,id)
 {
 	var img = document.getElementById(id);
 	var width = "width=" + img.width * 1.1;
 	var height = "height=" + img.height * 1.1;
 	var title = img.name;
-	var popupWin = window.open("popup.jsp?id=" + id + "&" + periodUrl, name , height + "," + width + ",menubar=no,status=no,resizable=no,scrollbars=no");
+	var popupWin = window.open(url, "_blank" , height + "," + width + ",menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
+	//var popupWin = window.open("popup.jsp?gid=" + id + "&" + periodUrl, name , height + "," + width + ",menubar=no,status=no,resizable=no,scrollbars=no");
 }
 
-function save_popup(id)
+function save_popup(url, name)
 {
-       var popupWin = window.open("download?id=" + id + "&" + periodUrl, name , "menubar=no,status=no,resizable=no,scrollbars=no");
+       var popupWin = window.open(url, name , "menubar=no,status=no,resizable=no,scrollbars=no");
 }
 
-function history_popup(id, name)
+function history_popup(url, name)
 {
-	var historyWin = window.open("history.jsp?id=" + id, name, "width=700,menubar=no,status=no,resizable=yes,scrollbars=yes");
+	var historyWin = window.open(url, name, "width=700,menubar=no,status=no,resizable=yes,scrollbars=yes");
 }

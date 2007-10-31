@@ -98,8 +98,11 @@ public class RdsHost implements Comparable, StarterNode {
 		for(Probe currrd: allProbes) {
 			Collection gl = currrd.getGraphList();
 			if(gl != null) {
-				for(RdsGraph currGraph:  currrd.getGraphList()) {
-					currGraph.graph(startDate, endDate);
+				for(GraphNode currGraph:  currrd.getGraphList()) {
+					Graph g = new Graph(currGraph);
+					g.setStart(startDate);
+					g.setEnd(endDate);
+					g.graph();
 					logger.debug("Graphing " + currGraph.getName());
 				}
 			}

@@ -2,15 +2,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%@ page session="false" %>
-<%@ page import="jrds.HostsList" %>
-<%@ page import="jrds.RdsGraph" %>
+
 <jsp:useBean id="jrdsBean" class="jrds.webapp.TreeJspBean" />
 <jsp:useBean id="period" class="jrds.webapp.ParamsBean"/>
-<jsp:useBean id="graph" class="jrds.webapp.GraphBean"/>
 
-<%period.parseReq(request);
-graph.config(request, period);
-%>
+<%period.parseReq(request);%>
 <html>
 
 	<head>

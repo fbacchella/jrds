@@ -8,21 +8,27 @@ package jrds.probe;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
+import jrds.GraphNode;
 import jrds.ProbeDesc;
 import jrds.graphe.Sum;
 
+import org.apache.log4j.Logger;
+
 public class SumProbe extends VirtualProbe {
+	static final private Logger logger = Logger.getLogger(SumProbe.class);
+
 	static final ProbeDesc pd = new ProbeDesc(0);
-	static {
+	/*static {
 		pd.setGraphClasses(new Object[] {Sum.class});
-	}
-	private String graphName;
+	}*/
 	Collection<String> graphList;
 
 	//An array list is needed, the introspection is picky
 	public SumProbe(String name, ArrayList<String> graphList) {
+		logger.debug("new sum: " + name);
 		setName(name);
 		this.graphList = graphList;
 		setPd(pd);
@@ -35,16 +41,20 @@ public class SumProbe extends VirtualProbe {
 		return graphList;
 	}
 
-	/**
-	 * @return Returns the probeName.
+	/* (non-Javadoc)
+	 * @see jrds.Probe#getGraphList()
 	 */
-	public String getGraphName() {
-		return graphName;
+	@Override
+	public Collection<GraphNode> getGraphList() {
+		logger.debug("Returning a sum graphnode");
+		return Collections.singleton((GraphNode)new Sum(this));
 	}
 
+	@Override
 	public Date getLastUpdate() {
 		return new Date();
 	}
+	
 	@Override
 	public String getSourceType() {
 		return "virtual";

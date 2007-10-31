@@ -46,7 +46,7 @@ public class HostsList implements StarterNode {
 	private RdsHost sumhost =  null;
 
 	private final Set<RdsHost> hostList = new HashSet<RdsHost>();
-	private final Map<Integer, RdsGraph> graphMap = new HashMap<Integer, RdsGraph>();
+	private final Map<Integer, GraphNode> graphMap = new HashMap<Integer, GraphNode>();
 	private final Map<Integer, Probe> probeMap= new HashMap<Integer, Probe>();
 	private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
 	private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
@@ -159,8 +159,8 @@ public class HostsList implements StarterNode {
 		}
 	}
 
-	public void addGraphs(Collection<RdsGraph> graphs) {
-		for(RdsGraph currGraph: graphs) {
+	public void addGraphs(Collection<GraphNode> graphs) {
+		for(GraphNode currGraph: graphs) {
 			getGraphTreeByHost().addGraphByPath(currGraph.getTreePathByHost(), currGraph);
 			getGraphTreeByView().addGraphByPath(currGraph.getTreePathByView(), currGraph);
 			graphMap.put(currGraph.hashCode(), currGraph);
@@ -276,7 +276,7 @@ public class HostsList implements StarterNode {
 	 * @param id the hash value of the graph
 	 * @return the graph found or null of nothing found
 	 */
-	public RdsGraph getGraphById(int id) {
+	public GraphNode getGraphById(int id) {
 		return graphMap.get(id);
 	}
 
@@ -324,7 +324,7 @@ public class HostsList implements StarterNode {
 
 	public void addSum(SumProbe sum) {
 		sumhost.addProbe(sum);
-		for(RdsGraph currGraph: sum.getGraphList()) {
+		for(GraphNode currGraph: sum.getGraphList()) {
 			treeMap.get(SUMROOT).addGraphByPath(currGraph.getTreePathByHost(), currGraph);
 			graphMap.put(currGraph.hashCode(), currGraph);
 		}

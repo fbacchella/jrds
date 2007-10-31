@@ -13,7 +13,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -30,18 +29,14 @@ public class Renderer {
 	final int PRIME = 31;
 
 	public class RendererRun implements Runnable {
-		public Date start;
-		public Date end;
-		public RdsGraph graph;
+		public Graph graph;
 		public boolean finished = false;
 		public final ReentrantLock running = new ReentrantLock(); 
 		File destFile;
 
-		public RendererRun(Date start, Date end, RdsGraph graph, int keyid) throws IOException {
-			this.start = start;
-			this.end = end;
+		public RendererRun(Graph graph) throws IOException {
 			this.graph = graph;
-			destFile = new File(HostsList.getRootGroup().getTmpdir(), Integer.toHexString(keyid) + ".png");
+			destFile = new File(HostsList.getRootGroup().getTmpdir(), Integer.toHexString(graph.hashCode()) + ".png");
 		}
 
 		@Override
@@ -92,7 +87,7 @@ public class Renderer {
 			if( ! finished) {
 				long starttime = System.currentTimeMillis();
 				try {
-					BufferedImage bImg = graph.makeImg(start, end);
+					BufferedImage bImg = graph.makeImg();
 					long middletime = System.currentTimeMillis();
 					if(bImg != null) {
 						OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile));
@@ -119,7 +114,7 @@ public class Renderer {
 
 		@Override
 		public String toString() {
-			return graph + "#" + start + "#" + end;
+			return graph.toString();
 		}
 
 	};
@@ -158,7 +153,7 @@ public class Renderer {
 			protected boolean removeEldestEntry(Entry<Integer, RendererRun> eldest) {
 				RendererRun rr = eldest.getValue();
 				if( rr != null && rr.finished &&  size() > Renderer.this.cacheSize) {
-					remove(eldest.getKey());
+					remove(eldest);
 					rr.clean();
 				}
 				else if (rr != null &&  size() > Renderer.this.cacheSize){
@@ -171,54 +166,56 @@ public class Renderer {
 		rendered =  Collections.synchronizedMap(m);	
 	}
 
-	public void render(final RdsGraph graph, final Date start, final Date end) throws IOException {
-		RendererRun runRender = null;
-		int key = 0;
-		key = makeKey(graph, start, end);
-		if( ! rendered.containsKey(key)) {
+	public void render(Graph graph) throws IOException {
+		if( ! rendered.containsKey(graph.hashCode())) {
 			synchronized(rendered){
-				if( ! rendered.containsKey(key)) {
+				if( ! rendered.containsKey(graph.hashCode())) {
+					RendererRun runRender = new RendererRun(graph);
 					// Create graphics object
-					runRender = new RendererRun(start, end, graph, key); 
-					rendered.put(key, runRender);
-					logger.debug("wants to render " + runRender + ", with key " + key);
+					rendered.put(graph.hashCode(), runRender);
+					try {
+						tpool.execute(runRender);
+					}
+					catch(RejectedExecutionException ex) {
+						logger.warn("Render thread dropped for graph " + graph);
+					}
+					logger.debug("wants to render " + runRender);
 				}
 			}
 		}
-		if(runRender != null){
-			try {
-				tpool.execute(runRender);
-			}
-			catch(RejectedExecutionException ex) {
-				logger.warn("Render thread dropped for graph " + graph);
-			}
+	}
+	
+	public Graph getGraph(int key) {
+		Graph g = null;
+		if(key != 0) {
+			RendererRun rr = rendered.get(key);
+			if(rr != null)
+				g = rr.graph;
 		}
+		return g;
 	}
 
-	public boolean isReady(final RdsGraph graph, final Date start, final Date end) {
-		RendererRun  runRender = null;
-		int key = 0;
-		key = makeKey(graph, start, end);
-		runRender = rendered.get(key);
+	public boolean isReady(Graph graph) {
+		RendererRun runRender = null;
+		runRender = rendered.get(graph.hashCode());
 		if( runRender == null) {
 			try {
-				render(graph, start, end);
-				runRender = rendered.get(key);
+				render(graph);
+				runRender = rendered.get(graph.hashCode());
 			}
 			// If cannot launch render, will always be false
 			catch (IOException e) {
+				logger.error("graph " + graph + " will not be calculated:" + e);
 				runRender = null;
 			}
 		}
 		return (runRender != null) && runRender.isReady();
 	}
 
-	public void send(RdsGraph graph, Date start, Date end, OutputStream out) throws IOException {
+	public void send(Graph graph, OutputStream out) throws IOException {
 		RendererRun runRender = null;
-		int key;
 		try {
-			key = makeKey(graph, start, end);
-			runRender = rendered.get(key);
+			runRender = rendered.get(graph.hashCode());
 		} catch (Exception e) {
 			logger.error("Error with probe: " + e);
 		}
@@ -226,9 +223,9 @@ public class Renderer {
 			runRender.send(out);
 		}
 		else {
-			logger.info("Not precalculated render found for " + graph);
+			logger.info("No precalculated render found for " + graph);
 			//No precalculation found, so we do it right now
-			graph.writePng(out, start, end);
+			graph.writePng(out);
 		}
 	}
 
@@ -245,16 +242,4 @@ public class Renderer {
 		}
 
 	}
-	private int makeKey(RdsGraph graph, Date startDate, Date endDate) {
-		long step = graph.probe.getRrdDef().getStep();
-		long start = org.rrd4j.core.Util.normalize(startDate.getTime(), step * 1000L);
-		long end = org.rrd4j.core.Util.normalize(endDate.getTime(), step * 1000L);
-		int id = graph.hashCode();
-		int result = 1;
-		result = PRIME * result + (int) (end ^ (end >>> 32));
-		result = PRIME * result + id;
-		result = PRIME * result + (int) (start ^ (start >>> 32));
-		return result;
-	}
-
 }

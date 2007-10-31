@@ -7,7 +7,7 @@ package jrds.graphe;
 
 import jrds.GraphDesc;
 import jrds.Probe;
-import jrds.RdsGraph;
+import jrds.GraphNode;
 
 
 /**
@@ -15,7 +15,7 @@ import jrds.RdsGraph;
  *
  * TODO 
  */
-public class PagingSolarisMuninsGraph extends RdsGraph {
+public class PagingSolarisMuninsGraph extends GraphNode {
 	static final GraphDesc gd = new GraphDesc(7);
 	static {
 		gd.setGraphName("pagesolmunins");

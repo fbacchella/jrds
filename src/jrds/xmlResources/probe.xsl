@@ -9,7 +9,8 @@
 <head>
 	<title><xsl:value-of select="@name" /> on <xsl:value-of select="@host" /></title>
 	<link rel="stylesheet" type="text/css" href="/lib/jrds.css" />
-	<script type="text/javascript" src="lib/jrds.js" ></script>
+	<script type="text/javascript" src="lib/querystring.js"></script><script type="text/javascript" src="lib/jrds.js" ></script>
+	
 </head>
 <body>
 <h1><xsl:value-of select="@host" />/<xsl:value-of select="@name" /></h1>

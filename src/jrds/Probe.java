@@ -52,7 +52,7 @@ implements Comparable, StarterNode {
 	private int timeout = HostsList.getRootGroup().getTimeout();
 	private String name = null;
 	private RdsHost monitoredHost;
-	private Collection<RdsGraph> graphList = new ArrayList<RdsGraph>(0);
+	private Collection<GraphNode> graphList = new ArrayList<GraphNode>(0);
 	private String stringValue = null;
 	private ProbeDesc pd;
 	private Set<String> tags = null;
@@ -99,9 +99,9 @@ implements Comparable, StarterNode {
 	public void initGraphList(GraphFactory gf) {
 		Collection graphClasses = pd.getGraphClasses();
 		if(graphClasses != null) {
-			graphList = new ArrayList<RdsGraph>(graphClasses.size());
+			graphList = new ArrayList<GraphNode>(graphClasses.size());
 			for (Object o:  graphClasses ) {
-				RdsGraph newGraph = gf.makeGraph(o, this);
+				GraphNode newGraph = gf.makeGraph(o, this);
 				if(newGraph != null)
 					graphList.add(newGraph);
 			}
@@ -114,7 +114,7 @@ implements Comparable, StarterNode {
 	/**
 	 * @return Returns the graphList.
 	 */
-	public Collection<RdsGraph> getGraphList() {
+	public Collection<GraphNode> getGraphList() {
 		return graphList;
 	}
 
@@ -643,7 +643,7 @@ implements Comparable, StarterNode {
 			gd.setGraphTitle(getName() + "." + dsName + " on {1}");
 			gd.add(dsName, GraphDesc.LINE);
 			gf.addGraphDesc(gd);
-			RdsGraph g = gf.makeGraph(graphDescName, this);
+			GraphNode g = gf.makeGraph(graphDescName, this);
 			hl.addGraphs(Collections.singleton(g));
 
 			Element dsNameElement = document.createElement("name");

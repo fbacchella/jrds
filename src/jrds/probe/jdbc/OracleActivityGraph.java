@@ -7,14 +7,14 @@ package jrds.probe.jdbc;
 
 import jrds.GraphDesc;
 import jrds.Probe;
-import jrds.RdsGraph;
+import jrds.GraphNode;
 
 /**
  * @author bacchell
  *
  * TODO 
  */
-public class OracleActivityGraph extends RdsGraph {
+public class OracleActivityGraph extends GraphNode {
 	
 	static final GraphDesc gd = new GraphDesc(7);
 	static {

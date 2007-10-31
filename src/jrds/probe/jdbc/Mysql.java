@@ -5,7 +5,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 public abstract class Mysql extends JdbcProbe {
+	static final private org.apache.log4j.Logger logger = Logger.getLogger(Mysql.class);
 
 	protected final static int PORT = 3306;
 	static {
@@ -32,6 +35,7 @@ public abstract class Mysql extends JdbcProbe {
 		return new JdbcStarter() {
 			@Override
 			public boolean start() {
+				logger.trace("Getting uptime for " + this);
 				boolean started = super.start();
 				long uptime = 0;
 				if(started) {
@@ -50,10 +54,13 @@ public abstract class Mysql extends JdbcProbe {
 							}
 						}
 					} catch (SQLException e) {
+						logger.error("SQL exception while getting uptime for " + this);
 					} catch (NumberFormatException ex) {
+						logger.error("Uptime not parsable for " + this);
 					}
 				}
 				setUptime(uptime);
+				logger.trace(this + "is started: " + started);
 				return started;
 			}
 			public String getUrlAsString() {

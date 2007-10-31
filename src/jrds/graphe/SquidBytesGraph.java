@@ -7,14 +7,14 @@ package jrds.graphe;
 
 import jrds.GraphDesc;
 import jrds.Probe;
-import jrds.RdsGraph;
+import jrds.GraphNode;
 
 /**
  * @author bacchell
  *
  * TODO 
  */
-public class SquidBytesGraph extends RdsGraph {
+public class SquidBytesGraph extends GraphNode {
 	
 	static final GraphDesc ds = new GraphDesc(2);
 	static {

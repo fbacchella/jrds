@@ -8,13 +8,13 @@ public class FilterHost extends Filter {
 	}
 
 	@Override
-	public boolean acceptGraph(RdsGraph graph, String path) {
+	public boolean acceptGraph(GraphNode graph, String path) {
 		return graph.getProbe().getHost().getName().equals(hostname) && path.startsWith("/" + HostsList.HOSTROOT + "/");
 	}
 
 	@Override
 	public String getName() {
-		return "Filter " + hostname;
+		return hostname;
 	}
 
 	@Override

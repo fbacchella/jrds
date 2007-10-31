@@ -9,7 +9,7 @@ import java.awt.Color;
 
 import jrds.GraphDesc;
 import jrds.Probe;
-import jrds.RdsGraph;
+import jrds.GraphNode;
 
 
 /**
@@ -17,7 +17,7 @@ import jrds.RdsGraph;
  *
  * TODO 
  */
-public class CpuTimeSunMibGraph extends RdsGraph {
+public class CpuTimeSunMibGraph extends GraphNode {
 	
 	static final GraphDesc ds = new GraphDesc(9);
 	static {

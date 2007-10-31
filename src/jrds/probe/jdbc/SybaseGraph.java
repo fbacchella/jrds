@@ -9,14 +9,14 @@ import java.awt.Color;
 
 import jrds.GraphDesc;
 import jrds.Probe;
-import jrds.RdsGraph;
+import jrds.GraphNode;
 
 /**
  * @author bacchell
  *
  * TODO 
  */
-public class SybaseGraph extends RdsGraph {
+public class SybaseGraph extends GraphNode {
 	static final private GraphDesc gd = new GraphDesc(5);
 	static {
 		gd.add("data", GraphDesc.AREA, Color.BLUE, "data");

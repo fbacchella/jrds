@@ -90,8 +90,6 @@ public class Period {
 		this.calPeriod = 0;
 	}
 
-
-
 	/**
 	 * @return Returns the begin.
 	 */
@@ -121,6 +119,7 @@ public class Period {
 	public Date getEnd() {
 		return end;
 	}
+	
 	/**
 	 * @param end The end to set.
 	 * @throws ParseException 
@@ -128,6 +127,10 @@ public class Period {
 	public void setEnd(String end) throws ParseException {
 		this.end = string2Date(end, false);
 		calPeriod = 0;
+	}
+	
+	public void setEnd(Date end) {
+		this.end = end;
 	}
 
 	public void setScale(int scale) {
@@ -215,6 +218,54 @@ public class Period {
 		for(Period.PeriodItem pi: periodList) 
 			periodName.add(pi.name);
 		return periodName;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((begin == null) ? 0 : begin.hashCode());
+		result = PRIME * result + calPeriod;
+		result = PRIME * result + ((end == null) ? 0 : end.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final Period other = (Period) obj;
+		if (begin == null) {
+			if (other.begin != null)
+				return false;
+		} else if (!begin.equals(other.begin))
+			return false;
+		if (calPeriod != other.calPeriod)
+			return false;
+		if (end == null) {
+			if (other.end != null)
+				return false;
+		} else if (!end.equals(other.end))
+			return false;
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "b=" + begin + ", e=" + end + ", s=" + periodList.get(calPeriod).name;
 	}
 
 }

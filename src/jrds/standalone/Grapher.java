@@ -7,10 +7,14 @@
 package jrds.standalone;
 
 import java.io.File;
-import java.util.Date;
+import java.util.Collection;
+import java.util.HashSet;
 
+import jrds.Graph;
+import jrds.GraphNode;
 import jrds.GraphTree;
 import jrds.HostsList;
+import jrds.Period;
 import jrds.PropertiesManager;
 import jrds.Renderer;
 import jrds.StoreOpener;
@@ -43,18 +47,27 @@ public class Grapher {
 
 		HostsList.getRootGroup().configure(pm);
 
-		Date end = new Date();
-		//end.setTime(end.getTime() - HostsList.getRootGroup().getResolution() * 1000L);
-		Date begin = new Date(end.getTime() - 86400 * 1000);
-		GraphTree graphTree = HostsList.getRootGroup().getGraphTreeByHost();
+		//Date end = new Date();
+		//Date begin = new Date(end.getTime() - 86400 * 1000);
+		Period p = new Period();
 		Renderer r= new Renderer(10);
-		for(jrds.RdsGraph g: graphTree.enumerateChildsGraph(null)) {
-			logger.debug("Found graph for probe " + g.getProbe());
-			//end = new Date(1000L * org.jrobin.core.Util.normalize(g.getProbe().getLastUpdate().getTime() / 1000L, HostsList.getRootGroup().getResolution()));
-			try {
-				r.render(g, begin, end);
-			} catch (Exception e) {
-				logger.error("Error " + e + " with " + g.getGraphTitle());
+		Collection<Integer> done = new HashSet<Integer>();
+		for(GraphTree graphTree: HostsList.getRootGroup().getGraphsRoot()) {
+			for(GraphNode gn: graphTree.enumerateChildsGraph(null)) {
+				if(! done.contains(gn.hashCode())) {
+					done.add(gn.hashCode());
+					logger.debug(gn.getName());
+					Graph g = gn.getGraph();
+					g.setPeriod(p);
+					g.setMax(2);
+					g.setMin(0);
+					logger.debug("Found graph for probe " + gn.getProbe());
+					try {
+						r.render(g);
+					} catch (Exception e) {
+						logger.error("Error " + e + " with " + gn.getGraphTitle());
+					}
+				}
 			}
 		}
 		for(jrds.Renderer.RendererRun rr: r.getWaitings()) {

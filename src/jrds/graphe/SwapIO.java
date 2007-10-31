@@ -9,7 +9,7 @@ import java.awt.Color;
 
 import jrds.GraphDesc;
 import jrds.Probe;
-import jrds.RdsGraph;
+import jrds.GraphNode;
 
 
 /**
@@ -17,7 +17,7 @@ import jrds.RdsGraph;
  *
  * TODO 
  */
-public class SwapIO extends RdsGraph {
+public class SwapIO extends GraphNode {
 	
 	private static final GraphDesc gd = new GraphDesc(3);
 	static {

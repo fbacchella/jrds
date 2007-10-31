@@ -42,8 +42,9 @@ public class PeriodTest {
 		Date begin = calBegin.getTime();
 
 		Period p = new Period(4);
-		Assert.assertTrue(p.getEnd().compareTo(now) >= 0);
 		long delta = p.getBegin().getTime() - begin.getTime();
+		Assert.assertTrue(p.getEnd().compareTo(now) >= 0);
+		System.out.println(delta);
 		Assert.assertTrue(delta < 10 && delta > -10);
 		Assert.assertEquals(4, p.getScale());
 	}

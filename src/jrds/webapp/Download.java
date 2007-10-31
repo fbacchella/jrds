@@ -11,9 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jrds.HostsList;
-import jrds.RdsGraph;
-
 /**
  * This servlet is used to download the values of a graph as an xml file
  *
@@ -31,11 +28,10 @@ public class Download extends HttpServlet {
 
 		res.setContentType(CONTENT_TYPE);
 
-		String rrdId = req.getParameter("id");
-		RdsGraph graph = HostsList.getRootGroup().getGraphById(Integer.parseInt(rrdId));
+		jrds.Graph graph = params.getGraph();
 		ServletOutputStream out = res.getOutputStream();
-		res.addHeader("content-disposition","attachment; filename="+graph.getQualifieName().replace('/', '.') + ".csv");
+		res.addHeader("content-disposition","attachment; filename="+ graph.getPngName().replaceFirst("\\.png",".csv"));
 
-		graph.writeCsv(out, params.getBegin(), params.getEnd());
+		graph.writeCsv(out);
 	}
 }
