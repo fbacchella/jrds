@@ -28,9 +28,12 @@ import jrds.probe.UrlProbe;
 import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.ArcDef;
+import org.rrd4j.core.Archive;
+import org.rrd4j.core.Datasource;
 import org.rrd4j.core.DsDef;
 import org.rrd4j.core.FetchData;
 import org.rrd4j.core.FetchRequest;
+import org.rrd4j.core.Header;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDef;
 import org.rrd4j.core.Sample;
@@ -45,7 +48,7 @@ import org.w3c.dom.Element;
  * @author Fabrice Bacchella
  */
 public abstract class Probe
-implements Comparable, StarterNode {
+implements Comparable<Probe>, StarterNode {
 
 	static final private Logger logger = Logger.getLogger(Probe.class);
 
@@ -211,7 +214,50 @@ implements Comparable, StarterNode {
 
 			logger.debug("updating " +  source  + " to "  + dest);
 
-			rrdSource.copyStateTo(rrdDest);
+			Set<String> badDs = new HashSet<String>();
+			Header header = rrdSource.getHeader();
+			int dsCount = header.getDsCount();;
+			header.copyStateTo(rrdDest.getHeader());
+			for (int i = 0; i < dsCount; i++) {
+				Datasource srcDs = rrdSource.getDatasource(i);
+				String dsName = srcDs.getDsName();
+				Datasource dstDS = rrdDest.getDatasource(dsName);
+				if (dstDS != null ) {
+					try {
+						srcDs.copyStateTo(dstDS);
+						logger.trace("Update " + dsName + " on " + this);
+					} catch (RuntimeException e) {
+						badDs.add(dsName);
+						logger.error("Datasource " + dsName +" can't be upgraded: " + e.getMessage());
+					}
+				}
+			}
+			int robinMigrated = 0;
+			for (int i = 0; i < rrdSource.getArcCount(); i++) {
+				Archive srcArchive = rrdSource.getArchive(i);
+				ConsolFun consolFun = srcArchive.getConsolFun();
+				int steps = srcArchive.getSteps();
+				Archive dstArchive = rrdDest.getArchive(consolFun, steps);
+				if (dstArchive != null) {
+					if ( dstArchive.getConsolFun().equals(srcArchive.getConsolFun())  &&
+							dstArchive.getSteps() == srcArchive.getSteps() ) {
+						for (int k = 0; k < dsCount; k++) {
+							Datasource srcDs = rrdSource.getDatasource(k);
+							String dsName = srcDs.getDsName();
+							int j = rrdDest.getDsIndex(dsName);
+							if (j >= 0 && ! badDs.contains(dsName)) {
+								logger.trace("Upgrade of " + dsName + " from " + srcArchive);
+								srcArchive.getArcState(k).copyStateTo(dstArchive.getArcState(j));
+								srcArchive.getRobin(k).copyStateTo(dstArchive.getRobin(j));
+								robinMigrated++;
+							}
+						}
+						logger.trace("Update " + srcArchive + " on " + this);
+					}
+				}
+			}
+			logger.debug("Robin migrated: " + robinMigrated);
+
 			rrdDest.close();
 			rrdSource.close();
 			logger.debug("Size difference : " + (dest.length() - source.length()));
@@ -225,9 +271,7 @@ implements Comparable, StarterNode {
 					rrdSource.close();
 				} catch (IOException e) {
 				}
-
 		}
-
 	}
 
 	private static void copyFile(String sourcePath, String destPath)
@@ -316,7 +360,7 @@ implements Comparable, StarterNode {
 	public abstract Map getNewSampleValues();
 
 	/**
-	 * A method that might be overiden if specific treatement is needed
+	 * A method that might be overriden if specific treatement is needed
 	 * by a probe.<br>
 	 * By default, it does nothing.
 	 * @param valuesList
@@ -329,7 +373,7 @@ implements Comparable, StarterNode {
 
 	/**
 	 * Store the values on the rrd backend.
-	 * Overiding should be avoided.
+	 * Overriding should be avoided.
 	 * @param oneSample
 	 */
 	protected void updateSample(Sample oneSample) {
@@ -361,7 +405,7 @@ implements Comparable, StarterNode {
 
 	/**
 	 * Launch an collect of values.
-	 * You should not try to overide it
+	 * You should not try to override it
 	 * @throws IOException
 	 * @throws RrdException
 	 */
@@ -415,13 +459,13 @@ implements Comparable, StarterNode {
 	}
 
 	/**
-	 * The comparaison order of two object of ths class is a case insensitive
+	 * The comparaison order of two object of the class is a case insensitive
 	 * comparaison of it's string value.
 	 *
 	 * @param arg0 Object
 	 * @return int
 	 */
-	public final int compareTo(Object arg0) {
+	public final int compareTo(Probe arg0) {
 		return String.CASE_INSENSITIVE_ORDER.compare(toString(),
 				arg0.toString());
 	}
@@ -559,10 +603,6 @@ implements Comparable, StarterNode {
 	public boolean readSpecific() {
 		return true;
 	}
-
-	/*public String getSpecific() {
-		return pd.getSpecific();
-	}*/
 
 	/**
 	 * This function should return the uptime of the probe
