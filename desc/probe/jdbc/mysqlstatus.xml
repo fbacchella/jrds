@@ -109,12 +109,12 @@
 	</ds>
 	<ds>
 		<dsName>Idb_bp_read_requests</dsName>
-		<dsType>gauge</dsType>
+		<dsType>counter</dsType>
 		<collect>Innodb_buffer_pool_read_requests</collect>
 	</ds>
 	<ds>
 		<dsName>Idb_bp_write_req</dsName>
-		<dsType>gauge</dsType>
+		<dsType>counter</dsType>
 		<collect>Innodb_buffer_pool_write_requests</collect>
 	</ds>
 	<ds>
