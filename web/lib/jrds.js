@@ -48,11 +48,16 @@ function details(url, name)
 function popup(url,id)
 {
 	var img = document.getElementById(id);
-	var width = "width=" + img.width * 1.1;
-	var height = "height=" + img.height * 1.1;
-	var title = img.name;
-	var popupWin = window.open(url, "_blank" , height + "," + width + ",menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
-	//var popupWin = window.open("popup.jsp?gid=" + id + "&" + periodUrl, name , height + "," + width + ",menubar=no,status=no,resizable=no,scrollbars=no");
+	if(img != null) {
+	   	var width = "width=" + img.width * 1.1;
+		var height = "height=" + img.height * 1.1;
+		var title = img.name;
+	}
+	else {
+	   	var width = "width=750";
+		var height = "height=500";
+	}
+	return popupWin = window.open(url, "_blank" , height + "," + width + ",menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
 }
 
 function save_popup(url, name)
@@ -62,5 +67,5 @@ function save_popup(url, name)
 
 function history_popup(url, name)
 {
-	var historyWin = window.open(url, name, "width=700,menubar=no,status=no,resizable=yes,scrollbars=yes");
+	var historyWin = window.open(url, "_blank", "width=750,menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
 }

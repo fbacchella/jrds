@@ -43,6 +43,8 @@
 	</xsl:template>
 	
 	<xsl:template match="name">
-	<li><a href="popup.jsp?id={@id}"><xsl:apply-templates/></a></li>
+		<xsl:text disable-output-escaping="yes">
+	<li><a href="popup.jsp?id={@id}"  onclick="popup('popup.jsp?id={@id}',{@id}); return false"><xsl:apply-templates/></a></li>
+		</xsl:text>
 	</xsl:template>
 </xsl:stylesheet>

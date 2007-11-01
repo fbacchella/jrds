@@ -7,6 +7,7 @@
 package jrds.webapp;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -45,33 +46,48 @@ public class ProbeDetails extends HttpServlet {
 	};
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException{
 		res.setContentType("text/html");
 		res.addHeader("Cache-Control", "no-cache");
 
 		ParamsBean params = new ParamsBean(req);
 		Probe probe = params.getProbe();
+		
+		OutputStream os = null;
+		try {
+			os = res.getOutputStream();
+		} catch (IOException e) {
+			logger.error("No output stream availaible");
+		}
 
-		if(probe != null)
-			try {
-				TransformerFactory tFactory = TransformerFactory.newInstance();
-				tFactory.setErrorListener(el);
-				Source stylesource = new StreamSource(jrds.xmlResources.ResourcesLocator.getResource("probe.xsl"));
-				Transformer transformer = tFactory.newTransformer(stylesource);
+		if(probe != null) {
+			dump(probe, os);
+		}
+	}
+	
+	public void dump(Probe probe, OutputStream os) {
+		try {
+			Document xmlDesc = probe.dumpAsXml(true);
+			Source source = new DOMSource(xmlDesc);
 
-				Document xmlDesc = probe.dumpAsXml(true);
-				Source source = new DOMSource(xmlDesc);
+			TransformerFactory tFactory = TransformerFactory.newInstance();
+			tFactory.setErrorListener(el);
+			Source stylesource = new StreamSource(jrds.xmlResources.ResourcesLocator.getResource("probe.xsl"));
+			Transformer transformer = tFactory.newTransformer(stylesource);
 
-				StreamResult result = new StreamResult(res.getOutputStream());
-				transformer.transform(source, result);
-				res.getOutputStream().flush();
-			} catch (ParserConfigurationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (TransformerConfigurationException e) {
-				logger.error("probe.xsl is invalid: " + e.getMessage());
-			} catch (TransformerException e) {
-				logger.error("probe.xsl is invalid: " + e.getMessage());
-			}
+
+			StreamResult result = new StreamResult(os);
+			transformer.transform(source, result);
+			os.flush();
+		} catch (ParserConfigurationException e) {
+			logger.fatal("Fatal parser error: " + e);
+		} catch (TransformerConfigurationException e) {
+			logger.error("probe.xsl is invalid: " + e.getMessage());
+		} catch (TransformerException e) {
+			logger.error("probe.xsl is invalid: " + e.getMessage());
+		} catch (IOException e) {
+			logger.error("Unable to flush to " + os);
+		}
+
 	}
 }

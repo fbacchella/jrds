@@ -4,13 +4,23 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.rrd4j.DsType;
+
 import jrds.GraphDesc;
+import jrds.ProbeDesc;
 import jrds.Probe;
 import jrds.RdsHost;
 
 public class GetMoke {
 	static public RdsHost getHost() {
 		return new RdsHost("MokeHost");
+	}
+	
+	static public ProbeDesc getPd() {
+		ProbeDesc pd = new ProbeDesc();
+		pd.setName("MokeProbeDesc");
+		pd.add("MokeDs", DsType.COUNTER);
+		return pd;
 	}
 	
 	static public Probe getProbe() {
@@ -39,6 +49,7 @@ public class GetMoke {
 			}
 		};
 		p.setHost(getHost());
+		p.setPd(getPd());
 		return p;
 	}
 	

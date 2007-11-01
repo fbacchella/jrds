@@ -323,7 +323,7 @@ public class ParamsBean implements Serializable {
 		period = new Period(s);
 	}
 
-	public List getPeriodNames() {
+	public List<String> getPeriodNames() {
 		return Period.getPeriodNames();
 	}
 
