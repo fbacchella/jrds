@@ -95,7 +95,7 @@ public class PeriodTest {
 		cal.set(Calendar.MILLISECOND, 0);
 		Date end = cal.getTime();
 
-		Period p = new Period("01:12", "22:58");
+		Period p = new Period("1:12", "22:58");
 		Assert.assertEquals(begin, p.getBegin());
 		Assert.assertEquals(end, p.getEnd());
 		Assert.assertEquals(0, p.getScale());
