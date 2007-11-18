@@ -29,7 +29,7 @@ public class Period {
 	static private final DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 	static private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	static private final String dateRegexp = "(\\d\\d\\d\\d-\\d\\d-\\d\\d)?";
-	static private final String timeRegexp = "(\\d\\d:\\d\\d)?(:\\d\\d)?";
+	static private final String timeRegexp = "(\\d?\\d:\\d\\d)?(:\\d\\d)?";
 	static private final Pattern datePattern = Pattern.compile( dateRegexp + "[T ]?" + timeRegexp);
 
 	private static class PeriodItem {
@@ -162,7 +162,7 @@ public class Period {
 			if("NOW".compareToIgnoreCase(date) == 0) {
 				foundDate = new Date();
 			}
-			else if(date.length() >= 5 && dateMatcher.matches()) {
+			else if(date.length() >= 4 && dateMatcher.matches()) {
 				if(logger.isTraceEnabled()) {
 					logger.trace("Matching " + date);
 					for(int i = 1; i <= dateMatcher.groupCount(); i++) {
