@@ -95,6 +95,10 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 		return indexOid.size();
 	}
 	
+	/**
+	 * Generate the index suffix for the probe
+	 * @return
+	 */
 	public Collection<int[]> setIndexValue() 
 	{
 		
@@ -105,17 +109,18 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 			indexSubOid = new HashSet<int[]>();
 		
 		Collection<OID> soidSet = getIndexSet();
+
 		//If no index OID, the indexKey is already the snmp suffix.
 		if(soidSet == null || soidSet.size() == 0) {
 			OID suffixOid = new OID(indexKey);
 			indexSubOid = Collections.singleton(suffixOid.getValue());
+			setSuffixLength(suffixOid.size());
 		}
 		else {
 			try {
 				Map<OID, Object> somevars = indexFinder.doSnmpGet(getSnmpStarter(), soidSet);
 
 				boolean found = false;
-
 				int newSuffixLength = 0;
 				for(OID tryoid: somevars.keySet()) {
 					String name = null;

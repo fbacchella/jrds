@@ -71,7 +71,7 @@ implements Comparable<Probe>, StarterNode {
 		this.monitoredHost = monitoredHost;
 		this.pd = pd;
 		starters.setParent(monitoredHost.getStarters());
-		if( ! this.readSpecific()) {
+		if( ! readSpecific()) {
 			throw new RuntimeException("Creation failed");
 		}
 	}
@@ -136,11 +136,13 @@ implements Comparable<Probe>, StarterNode {
 	private final String parseTemplate(String template) {
 		String index = "";
 		String url = "";
+		int port = 0;
 		if( this instanceof IndexedProbe) {
 			index =((IndexedProbe) this).getIndexName();
 		}
 		if( this instanceof UrlProbe) {
 			url =((UrlProbe) this).getUrlAsString();
+			port = ((UrlProbe) this).getUrl().getPort();
 		}
 		String hn = "<empty>";
 		if(getHost() != null)
@@ -149,6 +151,7 @@ implements Comparable<Probe>, StarterNode {
 				hn,
 				index,
 				url,
+				port
 		};
 		return MessageFormat.format(template, arguments) ;
 
@@ -244,13 +247,19 @@ implements Comparable<Probe>, StarterNode {
 						for (int k = 0; k < dsCount; k++) {
 							Datasource srcDs = rrdSource.getDatasource(k);
 							String dsName = srcDs.getDsName();
-							int j = rrdDest.getDsIndex(dsName);
-							if (j >= 0 && ! badDs.contains(dsName)) {
-								logger.trace("Upgrade of " + dsName + " from " + srcArchive);
-								srcArchive.getArcState(k).copyStateTo(dstArchive.getArcState(j));
-								srcArchive.getRobin(k).copyStateTo(dstArchive.getRobin(j));
-								robinMigrated++;
+							try {
+								int j = rrdDest.getDsIndex(dsName);
+								if (j >= 0 && ! badDs.contains(dsName)) {
+									logger.trace("Upgrade of " + dsName + " from " + srcArchive);
+									srcArchive.getArcState(k).copyStateTo(dstArchive.getArcState(j));
+									srcArchive.getRobin(k).copyStateTo(dstArchive.getRobin(j));
+									robinMigrated++;
+								}
 							}
+							catch (IllegalArgumentException e) {
+								logger.trace("Datastore " + dsName + " removed for " + this);
+							}
+
 						}
 						logger.trace("Update " + srcArchive + " on " + this);
 					}
@@ -380,11 +389,14 @@ implements Comparable<Probe>, StarterNode {
 		if(isCollectRunning()) {
 			Map sampleVals = getNewSampleValues();
 			if (sampleVals != null) {
-				if(getUptime() >= ProbeDesc.HEARTBEATDEFAULT) {
+				if(getUptime() * pd.getUptimefactor() >= ProbeDesc.HEARTBEATDEFAULT) {
 					Map<?, String> nameMap = getPd().getCollectkeys();
 					Map<?, Number >filteredSamples = filterValues(sampleVals);
 					for(Map.Entry<?, Number> e: filteredSamples.entrySet()) {
 						String dsName = nameMap.get(e.getKey());
+						//A collect key may be null or empty to prevent collect, use the original name in this case
+						if(dsName == null || "".equals(dsName))
+							dsName = e.getKey().toString();
 						double value = e.getValue().doubleValue();
 						if (dsName != null) {
 							oneSample.setValue(dsName, value);
@@ -450,7 +462,7 @@ implements Comparable<Probe>, StarterNode {
 	 * the host name / the probe name
 	 * @see java.lang.Object#toString()
 	 */
-	public final String toString() {
+	public String toString() {
 		String hn = "<empty>";
 		if(getHost() != null)
 			hn = getHost().getName();
@@ -465,7 +477,7 @@ implements Comparable<Probe>, StarterNode {
 	 * @param arg0 Object
 	 * @return int
 	 */
-	public final int compareTo(Probe arg0) {
+	public int compareTo(Probe arg0) {
 		return String.CASE_INSENSITIVE_ORDER.compare(toString(),
 				arg0.toString());
 	}
@@ -616,6 +628,10 @@ implements Comparable<Probe>, StarterNode {
 		return uptime;
 	}
 
+	/**
+	 * Define the uptime of the probe
+	 * @param uptime in seconds
+	 */
 	public void setUptime(long uptime) {
 		this.uptime = uptime;
 	}

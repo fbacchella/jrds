@@ -1,5 +1,7 @@
 package jrds.probe.jdbc;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -237,6 +239,19 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+
+	/* (non-Javadoc)
+	 * @see jrds.probe.UrlProbe#getUrl()
+	 */
+	public URL getUrl(){
+		URL newurl = null;
+		try {
+			newurl = new URL(getUrlAsString());
+		} catch (MalformedURLException e) {
+			logger.error("Invalid jdbc url: " + newurl);
+		}
+		return newurl;
 	}
 
 }

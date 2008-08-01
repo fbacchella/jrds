@@ -6,18 +6,26 @@
 
 package jrds.probe;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
 
 /**
  * A class to probe the apache status from the /server-status URL
  * @author Fabrice Bacchella 
  * @version $Revision$,  $Date$
  */
-public class ApacheStatus extends HttpProbe implements UrlProbe {
+public class ApacheStatus extends HttpProbe implements IndexedProbe {
+	static final private Logger logger = Logger.getLogger(ApacheStatus.class);
 
 	/**
 	 * @param monitoredHost
@@ -45,19 +53,39 @@ public class ApacheStatus extends HttpProbe implements UrlProbe {
 		return retValue;
 	}
 
-	@Override
 	public String getIndexName() {
 		int port = getUrl().getPort();
-		if(port < 0)
+		if(port <= 0)
 			port = 80;
 		return Integer.toString(port);
 	}
 
 	/* (non-Javadoc)
+	 * @see jrds.probe.HttpProbe#parseStream(java.io.InputStream)
+	 */
+	@Override
+	protected Map<String, Number> parseStream(InputStream stream) {
+		Map<String, Number> vars = java.util.Collections.emptyMap();
+		logger.debug("Getting " + getUrl());
+		try {
+			BufferedReader in = new BufferedReader(new InputStreamReader(stream));
+			List<String> lines = new ArrayList<String>();
+			String lastLine;
+			while((lastLine = in.readLine()) != null)
+				lines.add(lastLine);
+			in.close();
+			vars = parseLines(lines);
+		} catch (IOException e) {
+			logger.error("Unable to read url " + getUrl() + " because: " + e.getMessage());
+		}
+		return vars;
+	}
+
+	/* (non-Javadoc)
 	 * @see com.aol.jrds.HttpProbe#parseLines(java.util.List)
 	 */
-	protected Map parseLines(List<String> lines) {
-		Map<String, Double> retValue = new HashMap<String, Double>(lines.size());
+	protected Map<String, Number> parseLines(List<String> lines) {
+		Map<String, Number> retValue = new HashMap<String, Number>(lines.size());
 		for(String l: lines) {
 			String[] kvp = l.split(": ");
 			try {

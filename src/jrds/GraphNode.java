@@ -17,7 +17,7 @@ import jrds.probe.UrlProbe;
  * @version $Revision$
  * TODO
  */
-public class GraphNode implements Comparable {
+public class GraphNode implements Comparable<GraphNode> {
 
 	protected Probe probe;
 	private String viewPath = null;
@@ -197,11 +197,11 @@ public class GraphNode implements Comparable {
 	/* (non-Javadoc)
 	 * @see java.lang.Comparable#compareTo(java.lang.Object)
 	 */
-	public int compareTo(Object arg0) {
+	public int compareTo(GraphNode arg0) {
 		if (viewPath == null)
 			viewPath = this.getTreePathByView().toString();
 
-		String otherPath = ( (GraphNode) arg0).getTreePathByView().toString();
+		String otherPath = arg0.getTreePathByView().toString();
 
 		return String.CASE_INSENSITIVE_ORDER.compare(viewPath, otherPath);
 	}

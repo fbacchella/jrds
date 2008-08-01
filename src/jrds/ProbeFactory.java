@@ -46,14 +46,14 @@ public class ProbeFactory {
 	 * @param constArgs
 	 * @return
 	 */
-	public Probe makeProbe(String className, List constArgs) {
+	public Probe makeProbe(String className, List<?> constArgs) {
 		Probe retValue = null;
 		ProbeDesc pd = (ProbeDesc) probeDescMap.get(className);
 		if( pd != null) {
 			retValue = pd.makeProbe(constArgs, prop);
 		}
 		else if(legacymode ){
-			Class probeClass = resolvClass(className, probePackages);
+			Class<?> probeClass = resolvClass(className, probePackages);
 			if (probeClass != null) {
 				Object o = null;
 				try {

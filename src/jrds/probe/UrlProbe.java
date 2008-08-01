@@ -5,6 +5,9 @@
  */
 package jrds.probe;
 
+import java.net.URL;
+
+
 /**
  * @author bacchell
  *
@@ -12,4 +15,5 @@ package jrds.probe;
  */
 public interface UrlProbe {
 	public String getUrlAsString();
+	public URL getUrl();
 }

@@ -5,9 +5,9 @@ import java.util.Map;
 import jrds.Probe;
 
 public class DummyProbe extends Probe {
-	Class originalProbe;
+	Class<? extends Probe> originalProbe;
 
-	public DummyProbe(Class originalProbe) {
+	public DummyProbe(Class<? extends Probe> originalProbe) {
 		this.originalProbe = originalProbe;
 	}
 

@@ -103,6 +103,9 @@ public class Renderer {
 					logger.error("Error with temporary output file: " +e);
 				} catch (IOException e) {
 					logger.error("Error with temporary output file: " +e);
+					Throwable cause = e.getCause();
+					if(cause != null)
+						logger.error("    Cause was: " + cause);
 				} catch (Exception e) {
 					logger.error("Run time rendering" + this, e);
 				}

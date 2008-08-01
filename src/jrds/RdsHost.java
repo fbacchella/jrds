@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class RdsHost implements Comparable, StarterNode {
+public class RdsHost implements Comparable<RdsHost>, StarterNode {
 	static private final Logger logger = Logger.getLogger(RdsHost.class);
 
 	private String name = null;
@@ -96,7 +96,7 @@ public class RdsHost implements Comparable, StarterNode {
 	public void graphAll(Date startDate, Date endDate)
 	{
 		for(Probe currrd: allProbes) {
-			Collection gl = currrd.getGraphList();
+			Collection<GraphNode> gl = currrd.getGraphList();
 			if(gl != null) {
 				for(GraphNode currGraph:  currrd.getGraphList()) {
 					Graph g = new Graph(currGraph);
@@ -114,11 +114,13 @@ public class RdsHost implements Comparable, StarterNode {
 		return name;
 	}
 
-	public int compareTo(Object arg0) {
+	public int compareTo(RdsHost arg0)
+	{
 		return String.CASE_INSENSITIVE_ORDER.compare(name, arg0.toString());
 	}
 
-	public void addTag(String tag) {
+	public void addTag(String tag)
+	{
 		if(tags == null)
 			tags = new HashSet<String>();
 		tags.add(tag);

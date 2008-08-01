@@ -8,6 +8,8 @@ package jrds;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -103,26 +105,16 @@ public class HostsList implements StarterNode {
 		GraphFactory gf = new GraphFactory(df.getGraphDescMap(), pm.legacymode);
 		ProbeFactory pf = new ProbeFactory(df.getProbesDescMap(), gf, pm, pm.legacymode);
 
-		try {
-			df.importDescUrl(DescFactory.class.getResource("/probe"));
-			df.importDescUrl(DescFactory.class.getResource("/graph"));
-		} catch (IOException e) {
-			logger.fatal("No descriptions available:", e);
-		}
+		pm.libspath.add(DescFactory.class.getResource("/probe"));
+		pm.libspath.add(DescFactory.class.getResource("/graph"));
 
-		if(! "".equals(pm.libspath)) {
-			String[] libsPath = pm.libspath.split(";");
-			for(int i=0 ; i < libsPath.length ; i++) {
-				String lib = libsPath[i];
-				try {
-					logger.info("Adding lib " + lib);
-					if(lib.endsWith(".jar"))
-						df.importJar(lib);
-					else
-						df.importDir(new File(lib));
-				} catch (IOException e) {
-					logger.error("Lib " + lib + " can't be imported: " + e);
-				}
+		logger.trace("Scanning " + pm.libspath + " for probes libraries");
+		for(URL lib: pm.libspath) {
+			try {
+				logger.info("Adding lib " + lib);
+				df.importDescUrl(lib);
+			} catch (IOException e) {
+				logger.error("Lib " + lib + " can't be imported: " + e);
 			}
 		}
 
@@ -134,10 +126,16 @@ public class HostsList implements StarterNode {
 		Collections.sort(probesName);
 		logger.debug("Probes: " + probesName);
 		if(pm.configdir != null)
-			hp.importDir(new File(pm.configdir,"/macro"));
-		if(pm.configdir != null)
-			hp.importDir(new File(pm.configdir));
-		started = true;
+			try {
+				hp.importDescUrl((new File(pm.configdir,"/macro")).toURL());
+				hp.importDescUrl((new File(pm.configdir)).toURL());
+			} catch (MalformedURLException e) {
+				logger.error("What is this configuration directory " + pm.configdir);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			started = true;
 	}
 
 	public Collection<RdsHost> getHosts() {

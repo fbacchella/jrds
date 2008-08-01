@@ -4,13 +4,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -126,7 +129,21 @@ public class PropertiesManager extends Properties {
 		collectorThreads = parseInteger(getProperty("collectorThreads", "1"));
 		dbPoolSize = parseInteger(getProperty("dbPoolSize", "10")) + collectorThreads;
 		syncPeriod = parseInteger(getProperty("syncPeriod", "-1"));
-		libspath = getProperty("libspath", "");
+		String libspathString = getProperty("libspath", "");
+		if(! "".equals(libspathString)) {
+			for(String libName: libspathString.split(";")) {
+				File lib = new File(libName);
+				if(lib.isFile() || lib.isDirectory())
+					try {
+						libspath.add(lib.toURL());
+					} catch (MalformedURLException e) {
+						logger.fatal("What is this library " + lib);
+					}
+					else
+						logger.error("Invalid lib path: "+ libName);
+			}
+		}
+
 		tmpdir = getProperty("tmpdir", "/var/tmp/jrds");
 		File tmpDirFile = new File(tmpdir);
 		if( ! tmpDirFile.exists()) {
@@ -168,8 +185,8 @@ public class PropertiesManager extends Properties {
 	public int collectorThreads;
 	public int dbPoolSize;
 	public int syncPeriod;
-	public String libspath;
-	public Map<Level, List<String>> loglevels = new HashMap<Level, List<String>>();
+	public final Set<URL> libspath = new HashSet<URL>();
+	public final Map<Level, List<String>> loglevels = new HashMap<Level, List<String>>();
 	public Level loglevel;
 	public boolean legacymode;
 	public String tmpdir;

@@ -142,7 +142,6 @@ public class Graph {
 		} catch (IllegalArgumentException e) {
 			logger.error("Impossible to create graph definition, invalid date definition from " + start + " to " + end + " : " + e);
 		}
-		logger.debug(max + "" + min);
 		if( ! Double.isNaN(max) && ! Double.isNaN(min) ) {
 			tempGraphDef.setMaxValue(max);
 			tempGraphDef.setMinValue(min);
@@ -150,7 +149,8 @@ public class Graph {
 		}
 		tempGraphDef.setWidth(gd.getWidth());
 		tempGraphDef.setHeight(gd.getHeight());
-		RrdGraph graph = new RrdGraph(tempGraphDef/*, true*/);
+		RrdGraph graph;
+		graph = new RrdGraph(tempGraphDef/*, true*/);
 		GraphDesc.Dimension dimension = gd.getDimension();
 		if(dimension == null) {
 			RrdGraphInfo gi = graph.getRrdGraphInfo();

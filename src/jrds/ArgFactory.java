@@ -38,13 +38,13 @@ public class ArgFactory {
 	 */
 	public Object makeArg(String className, String value) {
 		Object retValue = null;
-		Class classType = resolvClass(className, argPackages);
+		Class<?> classType = resolvClass(className, argPackages);
 		if (classType != null) {
-			Class[] argsType = { String.class };
+			Class<?>[] argsType = { String.class };
 			Object[] args = { value };
 
 			try {
-				Constructor theConst = classType.getConstructor(argsType);
+				Constructor<?> theConst = classType.getConstructor(argsType);
 				retValue = theConst.newInstance(args);
 			}
 			catch (Exception ex) {
@@ -55,7 +55,7 @@ public class ArgFactory {
 	}
 
 	private Class<?> resolvClass(String name, List<String> listPackages) {
-		Class retValue = null;
+		Class<?> retValue = null;
 		for (String packageTry: listPackages) {
 			try {
 				retValue = Class.forName(packageTry + name);

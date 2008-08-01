@@ -34,9 +34,9 @@ public class GraphTree {
 	static public final int LEAF_HOSTNAME = 2;
 	static final private Logger logger = Logger.getLogger(GraphTree.class);
 
-	static final Comparator nodeComparator = new Comparator() {
-		public  int compare(Object arg0, Object arg1) {
-			return String.CASE_INSENSITIVE_ORDER.compare(arg0.toString(), arg1.toString());
+	static final Comparator<String> nodeComparator = new Comparator<String>() {
+		public  int compare(String arg0, String arg1) {
+			return String.CASE_INSENSITIVE_ORDER.compare(arg0, arg1);
 		}
 	};
 
@@ -189,13 +189,13 @@ public class GraphTree {
 	/**
 	 * @return Returns the childsMap.
 	 */
-	public Map getChildsMap() {
+	public Map<String, GraphTree> getChildsMap() {
 		return childsMap;
 	}
 	/**
 	 * @return Returns the graphsSet.
 	 */
-	public Map getGraphsSet() {
+	public Map<String, GraphNode>  getGraphsSet() {
 		return graphsSet;
 	}
 

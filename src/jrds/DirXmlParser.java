@@ -7,10 +7,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Enumeration;
+import java.util.Collections;
+import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
 
 import org.apache.commons.digester.Digester;
 import org.apache.log4j.Logger;
@@ -18,7 +18,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 public abstract class DirXmlParser {
-	private final Logger logger = Logger.getLogger(DescFactory.class);
+	private final Logger logger = Logger.getLogger(DirXmlParser.class);
+
 	final Pattern p = Pattern.compile(".*.xml");
 	final FileFilter filter = new  FileFilter(){
 		public boolean accept(File file) {
@@ -27,6 +28,7 @@ public abstract class DirXmlParser {
 					importDir(file);
 				else if(file.isFile() && file.getName().endsWith(".xml")) {
 					try {
+						logger.trace("Parsing " + file.getName());
 						InputStream xmlStream = new FileInputStream(file);
 						digester.parse(xmlStream);
 						xmlStream.close();
@@ -34,6 +36,12 @@ public abstract class DirXmlParser {
 						logger.error("File  "+ file + " cannot be read: " + e);
 					} catch (IOException e) {
 						logger.error("File  "+ file + " cannot be read: " + e);
+					} catch (SAXParseException e1) {
+						logger.error(file.getName() + ": " +
+								"Parse Error at line " + e1.getLineNumber() +
+								" column " + e1.getColumnNumber() + ": " +
+								e1.getMessage());
+						digester.clear();
 					} catch (SAXException e) {
 						logger.error("File  "+ file + " not parsable: " + e, e);
 					}
@@ -42,47 +50,64 @@ public abstract class DirXmlParser {
 			return  false;
 		}
 	};
-	Digester digester = new Digester() {
+	public Digester digester = new Digester() {
 		@Override
 		public void error(SAXParseException exception) throws SAXException {
-	        logger.error("Parse error at line " + exception.getLineNumber() +
+			/*logger.error("Parse error at line " + exception.getLineNumber() +
 	                " column " + exception.getColumnNumber() + ": " +
-	                exception.getMessage() + " for " + getXMLReader());
+	                exception.getMessage());*/
+			throw exception;
 		}
 
 		@Override
 		public void fatalError(SAXParseException exception) throws SAXException {
-	        log.error("Parse fatal error at line " + exception.getLineNumber() +
-	                " column " + exception.getColumnNumber() + ": " +
-	                exception.getMessage());
+			log.error("Parse fatal error at line " + exception.getLineNumber() +
+					" column " + exception.getColumnNumber() + ": " +
+					exception.getMessage());
 		}
 
 		@Override
 		public void warning(SAXParseException exception) throws SAXException {
-            log.warn("Parse warning at line " + exception.getLineNumber() +
-                    " column " + exception.getColumnNumber() + ": " +
-                    exception.getMessage());
+			log.warn("Parse warning at line " + exception.getLineNumber() +
+					" column " + exception.getColumnNumber() + ": " +
+					exception.getMessage());
 		}
-		
+
 	};
 
-	DirXmlParser() {
+	public DirXmlParser() {
 		init();
 	}
 
-	abstract void init();
+	abstract public void init();
 
-	public void importDescUrl(URL ressourceUrl) throws IOException {
+	public boolean importDescUrl(URL ressourceUrl) throws IOException {
+		logger.debug("Importing " + ressourceUrl);
 		String path = ressourceUrl.toString();
 		if(path != null) {
-		String [] urlelems = path.split("[:!]");
-		if("file".equals(urlelems[0]))
-			importDir(new File(urlelems[1]));
-		else if("jar".equals(urlelems[0]))
-			importJar(urlelems[2]);
+			String [] urlelems = path.split("[:!]");
+			if("file".equals(urlelems[0])) {
+				String fileName = urlelems[1];
+				File imported = new File(fileName);
+				if(imported.isDirectory())
+					importDir(imported);
+				else if(fileName.endsWith(".jar")) {
+					importJar(imported, "");
+					return true;
+				}
+			}
+			else if("jar".equals(urlelems[0])) {
+				String root= "";
+				if(! "".equals(urlelems[3]))
+					root = urlelems[3];
+				importJar(new File(urlelems[2]), root);
+				return true;
+			}
 		}
-		else 
+		else {
 			logger.error("ressource " + ressourceUrl + "can't be loaded" );
+		}
+		return false;
 	}
 
 	/**
@@ -91,34 +116,31 @@ public abstract class DirXmlParser {
 	 *
 	 * @param aStartingDir is a valid directory, which can be read.
 	 */
-	public void importDir(File filePath) {
+	private void importDir(File filePath) {
 		if(filePath.isDirectory()) 
 			filePath.listFiles(filter);
 	}
 
-	public void importJar(String jarfile) throws IOException {
-		JarFile probesjar;
-		URL jarUrl = new URL("file:" + jarfile);
-		probesjar = new JarFile(jarfile);
-		Enumeration e = probesjar.entries();
-		while(e.hasMoreElements()) {
-			ZipEntry z = (ZipEntry) e.nextElement();
-			if( !z.isDirectory() && z.getName().endsWith(".xml")) {
-				InputStream xmlStream = probesjar.getInputStream(z);
+	private void importJar(File jarfile, String root) throws IOException {
+		logger.trace("Importing jar " + jarfile);
+		JarFile probesjar = new JarFile(jarfile);
+		for(JarEntry je: Collections.list(probesjar.entries())) {
+			if( !je.isDirectory() && je.getName().endsWith(".xml")) {
+				InputStream xmlStream = probesjar.getInputStream(je);
 				try {
+					logger.trace("Parsing jar:" + jarfile.toURL() + "!/" + je);
 					digester.parse(xmlStream);
 				} catch (SAXParseException e1) {
-					logger.error(jarUrl + "!/" + z + ": " +
-			        "Parse Error at line " + e1.getLineNumber() +
-	                " column " + e1.getColumnNumber() + ": " +
-	                e1.getMessage());
+					logger.error("jar:" + jarfile.toURL() + "!/" + je + ": " +
+							"Parse Error at line " + e1.getLineNumber() +
+							" column " + e1.getColumnNumber() + ": " +
+							e1.getMessage());
 					digester.clear();
-				} catch (SAXException e1) {
-					e1.printStackTrace();
+				} catch (SAXException e) {
+					logger.error("jar:" + jarfile.toURL() + "!/" + je + " not parsable: " + e, e);
 				}
 				xmlStream.close();
 			}
-
 		}
 	}
 

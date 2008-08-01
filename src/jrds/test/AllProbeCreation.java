@@ -3,20 +3,17 @@ package jrds.test;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.ArgFactory;
 import jrds.DescFactory;
-import jrds.Graph;
 import jrds.GraphFactory;
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.ProbeFactory;
 import jrds.PropertiesManager;
-import jrds.GraphNode;
 import jrds.RdsHost;
 
 import org.junit.BeforeClass;
@@ -32,12 +29,11 @@ public class AllProbeCreation extends JrdsTester {
 	 @BeforeClass static public void configure() {
 		JrdsTester.configure();
 		
-		HostsList hl = HostsList.getRootGroup();
-		hl.configure(new PropertiesManager());
-		UnitTest.configure();
+		//HostsList hl = HostsList.getRootGroup();
 		PropertiesManager pm = new PropertiesManager();
+		//hl.configure(pm);
+		//UnitTest.configure();
 		pm.rrdbackend = "MEM";
-		pm.libspath="";
 		ArgFactory af= new ArgFactory();
 		DescFactory df = new DescFactory(af);
 		GraphFactory gf = new GraphFactory(df.getGraphDescMap(), true);
@@ -53,7 +49,7 @@ public class AllProbeCreation extends JrdsTester {
 	@Test public void makeProbe() throws ParserConfigurationException, IOException {
 		RdsHost host = new RdsHost("Empty");
 		for(ProbeDesc pd: probeList) {
-			Class originalClass = pd.getProbeClass();
+			Class<? extends Probe> originalClass = pd.getProbeClass();
 			if(jrds.probe.IndexedProbe.class.isAssignableFrom(originalClass)) {
 				pd.setProbeClass(DummyProbeIndexed.class);
 			}

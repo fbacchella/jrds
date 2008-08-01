@@ -52,7 +52,7 @@ public class HostConfigParser  extends DirXmlParser {
 		this.af = af;
 	}
 
-	void init() {
+	public void init() {
 		digester.setValidating(false);
 		defineSumDigester(digester);
 		defineSnmp(digester);

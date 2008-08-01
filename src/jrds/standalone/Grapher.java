@@ -59,8 +59,6 @@ public class Grapher {
 					logger.debug(gn.getName());
 					Graph g = gn.getGraph();
 					g.setPeriod(p);
-					g.setMax(2);
-					g.setMin(0);
 					logger.debug("Found graph for probe " + gn.getProbe());
 					try {
 						r.render(g);

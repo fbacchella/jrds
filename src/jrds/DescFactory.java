@@ -29,6 +29,16 @@ public class DescFactory extends DirXmlParser {
 		public void addURL(URL arg0) {
 			super.addURL(arg0);
 		}
+
+		/* (non-Javadoc)
+		 * @see java.lang.ClassLoader#loadClass(java.lang.String)
+		 */
+		@SuppressWarnings("unchecked")
+		@Override
+		public Class<Probe> loadClass(String name) throws ClassNotFoundException {
+			// TODO Auto-generated method stub
+			return (Class<Probe>) super.loadClass(name);
+		}
 	}
 
 	public final ProbeClassLoader probeLoader = new ProbeClassLoader(DescFactory.class.getClassLoader());
@@ -38,16 +48,20 @@ public class DescFactory extends DirXmlParser {
 		this.af = af;
 	}
 
-	void init() {
+	public void init() {
 		addProbeDescDigester(digester);
 		addGraphDescDigester(digester);
 		FilterXml.addToDigester(digester);
 		digester.setValidating(true);
 	}
 
-	public void importJar(String jarfile) throws IOException {
-		probeLoader.addURL(new URL("file:" + jarfile));
-		super.importJar(jarfile);
+	public boolean importDescUrl(URL ressourceUrl) throws IOException {
+		probeLoader.addURL(ressourceUrl);
+		if(super.importDescUrl(ressourceUrl)) {
+			logger.trace("adding " + ressourceUrl + " to classpath");
+			return true;
+		}
+		return false;
 	}
 
 	private void addProbeDescDigester(Digester digester) {
@@ -65,18 +79,18 @@ public class DescFactory extends DirXmlParser {
 			public void body(String namespace, String name, String text) {
 				ProbeDesc pd = (ProbeDesc) digester.peek();
 				try {
-					Class c = probeLoader.loadClass(text.trim());
+					Class<Probe> c = probeLoader.loadClass(text.trim());
 					pd.setProbeClass(c);
 				} catch (ClassNotFoundException e) {
-					logger.debug("Invalid probe description for " + pd.getName() + ": class " + text + " not found");
-					logger.debug("Looking in " + Arrays.asList(probeLoader.getURLs()));
+					logger.error("Invalid probe description for " + pd.getName() + ": class " + text + " not found");
+					logger.error("Looking in " + Arrays.asList(probeLoader.getURLs()));
 				}
 			}
 		});
 		digester.addCallMethod("probedesc/probeName", "setProbeName", 0);
 		digester.addCallMethod("probedesc/name", "setName", 0);
 
-		Class[] params = new Class[] { Boolean.class};
+		Class<?>[] params = new Class[] { Boolean.class};
 		digester.addCallMethod("probedesc/uniq", "setUniqIndex", 0, params);
 
 		digester.addRule("probedesc/index", new Rule() {
@@ -155,6 +169,18 @@ public class DescFactory extends DirXmlParser {
 			public void body(java.lang.String namespace, java.lang.String name, java.lang.String text) throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException  {
 				ProbeDesc pd = (ProbeDesc) digester.peek();
 				pd.addSpecific("requester", text.trim());
+			}
+		});
+		digester.addRule("probedesc/uptimefactor", new Rule() {
+			public void body(java.lang.String namespace, java.lang.String name, java.lang.String text) throws IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException  {
+				ProbeDesc pd = (ProbeDesc) digester.peek();
+				try {
+					float uptimefactor = Float.parseFloat(text);
+					pd.setUptimefactor(uptimefactor);
+				} catch (NumberFormatException e) {
+					logger.warn("Uptime factor not valid " + text);
+					pd.setUptimefactor(0);
+				}
 			}
 		});
 		digester.addRule("probedesc/specific", new Rule() {

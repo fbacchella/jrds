@@ -57,8 +57,9 @@ public class ProbeDesc {
 	private Collection namedProbesNames;
 	private Collection graphClasses = new ArrayList(0);
 	private boolean uniqIndex = false;
-	private Class probeClass = null;
+	private Class<? extends Probe> probeClass = null;
 	private List<Object> defaultsArgs = null;
+	private float uptimefactor = (float) 1.0;
 
 
 	private final class DsDesc {
@@ -185,7 +186,7 @@ public class ProbeDesc {
 	}
 
 	/**
-	 * Return a map that translate an String probe name to the datastore name
+	 * Return a map that translate the probe technical name  as a string to the datastore name
 	 * @return a Map of collect names to datastore name
 	 */
 	public Map<String, String> getCollectStrings()
@@ -199,11 +200,15 @@ public class ProbeDesc {
 		return retValue;
 	}
 
+	/**
+	 * Return a map that translate the probe technical name to the datastore name
+	 * @return a Map of collect names to datastore name
+	 */
 	public Map<Object, String> getCollectkeys() {
 		Map<Object, String> retValue = new LinkedHashMap<Object, String>(dsMap.size());
 		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
 			DsDesc dd = e.getValue();
-			if(dd.collectKey != null )
+			if(dd.collectKey != null)
 				retValue.put(dd.collectKey, e.getKey());
 		}
 		return retValue;
@@ -238,6 +243,22 @@ public class ProbeDesc {
 	public void setProbeName(String probeName) {
 		this.probeName = probeName;
 	}
+	
+	
+	/**
+	 * @return the uptimefactor
+	 */
+	public float getUptimefactor() {
+		return uptimefactor;
+	}
+
+	/**
+	 * @param uptimefactor the uptimefactor to set
+	 */
+	public void setUptimefactor(float uptimefactor) {
+		this.uptimefactor = uptimefactor;
+	}
+
 	/**
 	 * @return Returns the muninsProbeName.
 	 */
@@ -245,7 +266,7 @@ public class ProbeDesc {
 		return namedProbesNames;
 	}
 
-	public void setNamedProbesNames(Collection muninsProbesNames) {
+	public void setNamedProbesNames(Collection<String> muninsProbesNames) {
 		this.namedProbesNames = muninsProbesNames;
 	}
 
@@ -308,7 +329,7 @@ public class ProbeDesc {
 			try {
 				if(defaultsArgs != null && constArgs != null && constArgs.size() <= 0)
 					constArgs = defaultsArgs;
-				Class[] constArgsType = new Class[constArgs.size()];
+				Class<?>[] constArgsType = new Class[constArgs.size()];
 				Object[] constArgsVal = new Object[constArgs.size()];
 				int index = 0;
 				for (Object arg: constArgs) {
@@ -316,7 +337,7 @@ public class ProbeDesc {
 					constArgsVal[index] = arg;
 					index++;
 				}
-				Constructor theConst = probeClass.getConstructor(constArgsType);
+				Constructor<? extends Probe> theConst = probeClass.getConstructor(constArgsType);
 				o = theConst.newInstance(constArgsVal);
 				retValue = (Probe) o;
 				retValue.setPd(this);
@@ -349,11 +370,11 @@ public class ProbeDesc {
 	}
 
 
-	public Class getProbeClass() {
+	public Class<? extends Probe> getProbeClass() {
 		return probeClass;
 	}
 
-	public void setProbeClass(Class probeClass) {
+	public void setProbeClass(Class<? extends Probe> probeClass) {
 		this.probeClass = probeClass;
 	}
 
@@ -373,7 +394,7 @@ public class ProbeDesc {
 		this.rmiClass = rmiClass;
 	}*/
 
-	public void dumpAsXml(Class c) throws ParserConfigurationException, IOException {
+	public void dumpAsXml(Class<? extends Probe> class1) throws ParserConfigurationException, IOException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document document = builder.newDocument();  // Create from whole cloth
@@ -382,7 +403,7 @@ public class ProbeDesc {
 		document.appendChild(root);
 
 		Element nameElement = document.createElement("name");
-		nameElement.appendChild(document.createTextNode(c.getSimpleName()));
+		nameElement.appendChild(document.createTextNode(class1.getSimpleName()));
 		root.appendChild(nameElement);
 
 		Element probeNamElement = document.createElement("probeName");
@@ -390,15 +411,15 @@ public class ProbeDesc {
 		root.appendChild(probeNamElement);
 
 		Element probeClassElement = document.createElement("probeClass");
-		probeClassElement.appendChild(document.createTextNode(c.getName()));
+		probeClassElement.appendChild(document.createTextNode(class1.getName()));
 		root.appendChild(probeClassElement);
 
-		if(jrds.probe.snmp.SnmpProbe.class.isAssignableFrom(c)) {
+		if(jrds.probe.snmp.SnmpProbe.class.isAssignableFrom(class1)) {
 			Element requesterElement = document.createElement("snmpRequester");
 			root.appendChild(requesterElement);
 			//requesterElement.appendChild(document.createTextNode(requester.getName()));
 
-			if(jrds.probe.snmp.RdsIndexedSnmpRrd.class.isAssignableFrom(c)) {
+			if(jrds.probe.snmp.RdsIndexedSnmpRrd.class.isAssignableFrom(class1)) {
 				Element indexElement = document.createElement("index");
 				//indexElement.appendChild(document.createTextNode(this.indexOid.toString()));
 				root.appendChild(indexElement);
@@ -454,7 +475,7 @@ public class ProbeDesc {
 			if(o instanceof String)
 				graphName = o.toString();
 			else if(o instanceof Class)
-				graphName = ((Class) o).getName();
+				graphName = ((Class<?>) o).getName();
 			if(graphName != null) {
 				Element graphNameElement = document.createElement("name");
 				graphElement.appendChild(graphNameElement);
@@ -462,7 +483,7 @@ public class ProbeDesc {
 			}
 		}
 
-		FileOutputStream fos = new FileOutputStream("desc/autoprobe/" + c.getSimpleName().toLowerCase() + ".xml");
+		FileOutputStream fos = new FileOutputStream("desc/autoprobe/" + class1.getSimpleName().toLowerCase() + ".xml");
 //		XERCES 1 or 2 additionnal classes.
 		OutputFormat of = new OutputFormat("XML","ISO-8859-1",true);
 		of.setIndent(1);

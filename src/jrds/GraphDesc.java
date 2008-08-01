@@ -919,7 +919,7 @@ implements Cloneable {
 	 * @param name String the looked for field
 	 * @return Object the value of the field or null
 	 */
-	private static final Object resolv(Class clazz, String name) {
+	private static final Object resolv(Class<?> clazz, String name) {
 		Object gt = null;
 		Field gtfield;
 		try {
