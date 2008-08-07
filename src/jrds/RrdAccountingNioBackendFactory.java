@@ -46,7 +46,7 @@ public class RrdAccountingNioBackendFactory extends RrdNioBackendFactory {
 	 * @throws IOException Thrown in case of I/O error.
 	 */
 	protected RrdBackend open(String path, boolean readOnly) throws IOException {
-		return new RrdAccountingNioBackend(path, readOnly, syncPeriod);
+		return new RrdAccountingNioBackend(path, readOnly, null, syncPeriod);
 	}
 
 	/**

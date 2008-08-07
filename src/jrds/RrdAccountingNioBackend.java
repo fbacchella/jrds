@@ -1,11 +1,19 @@
 package jrds;
 
 import java.io.IOException;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.rrd4j.core.RrdNioBackend;
 
 public class RrdAccountingNioBackend extends RrdNioBackend {
+	protected RrdAccountingNioBackend(String path, boolean readOnly,
+			ScheduledExecutorService syncExecutor, int syncPeriod)
+			throws IOException {
+		super(path, readOnly, syncExecutor, syncPeriod);
+		// TODO Auto-generated constructor stub
+	}
+
 	private static final AtomicInteger bytesRead = new AtomicInteger(0);
 	private static final AtomicInteger readOp = new AtomicInteger(0);
 
@@ -13,11 +21,11 @@ public class RrdAccountingNioBackend extends RrdNioBackend {
 	private static final AtomicInteger writeOp = new AtomicInteger(0);
 	private static final AtomicInteger access = new AtomicInteger(0);
 
-	protected RrdAccountingNioBackend(String path, boolean readOnly, int syncPeriod)
+	/*protected RrdAccountingNioBackend(String path, boolean readOnly, int syncPeriod)
 	throws IOException {
 		super(path, readOnly, syncPeriod);
 		access.incrementAndGet();
-	}
+	}*/
 
 	@Override
 	protected synchronized void read(long offset, byte[] b) throws IOException {
