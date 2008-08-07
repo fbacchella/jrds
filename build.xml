@@ -9,6 +9,7 @@
 	<property name="web.src" value="${basedir}/web"/>
 	<property name="web.build" value="${build.home}/webapp"/>
 	
+	<property file="local.properties" />
 	
 	<!--  ==================== Compilation Control Options ==================== -->
 	<property name="compile.debug" value="true"/>
@@ -17,7 +18,6 @@
 	
 	
 	<!-- ===================== Catalina Classpath =========================== -->
-	<property name="catalina.home" value="/Library/Tomcat"/>
 	<path id="catalina.classpath">
 		<pathelement location="${catalina.home}/common/classes"/>
 		<fileset dir="${catalina.home}/common/endorsed">
@@ -68,7 +68,7 @@
 	
 	<target name="appjar" depends="compile">
 		<jar destfile="${build.home}/jrds.jar" basedir="${build.home}/classes"
-			manifest="${basedir}/MANIFEST.MF">
+			manifest="${basedir}/web/META-INF/MANIFEST.MF">
 			<fileset dir="dtd">
 				<include name="**.dtd" />
 			</fileset>
@@ -133,7 +133,7 @@
 	</target>
 	
 	<target name="war" depends="appjar">
-		<war destfile="${build.home}/${app.name}.war" webxml="${basedir}/web.xml"
+		<war destfile="${build.home}/${app.name}.war" webxml="${basedir}/web/WEB-INF/web.xml"
 			duplicate="preserve">
 			<lib dir="lib">
 				<include name="*.jar"/>
