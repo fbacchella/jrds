@@ -25,7 +25,7 @@ public class StartListener implements ServletContextListener {
 	}
 	static private final Logger logger = Logger.getLogger(StartListener.class);
 	static private boolean started = false;
-	private static final Timer collectTimer = new Timer(true);
+	private static final Timer collectTimer = new Timer("jrds-main-timer", true);
 
 
 
@@ -59,7 +59,11 @@ public class StartListener implements ServletContextListener {
 
 				TimerTask collector = new TimerTask () {
 					public void run() {
-						HostsList.getRootGroup().collectAll();
+						try {
+							HostsList.getRootGroup().collectAll();
+						} catch (RuntimeException e) {
+							logger.fatal("A fatal error occured during collect: ",e);
+						}
 					}
 				};
 				collectTimer.schedule(collector, 5000L, HostsList.getRootGroup().getResolution() * 1000L);
