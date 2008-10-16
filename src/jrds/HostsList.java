@@ -39,6 +39,14 @@ import org.apache.log4j.Logger;
 public class HostsList implements StarterNode {
 	static private final Logger logger = Logger.getLogger(HostsList.class);
 	private static HostsList instance;
+	
+	public class Stats {
+		Stats() {
+			lastCollect = new Date(0);
+		}
+		public long runtime = 0;
+		public Date lastCollect;
+	}
 
 	public static final String HOSTROOT = "Sorted by host";
 	public static final String VIEWROOT = "Sorted by view";
@@ -60,6 +68,8 @@ public class HostsList implements StarterNode {
 	private int timeout = 10;
 	private boolean started = false;
 	private boolean collecting = false;
+	private Stats stats = new Stats(); 
+	 
 	/**
 	 *  
 	 */
@@ -245,6 +255,10 @@ public class HostsList implements StarterNode {
 			starters.stopCollect();
 			Date end = new Date();
 			long duration = end.getTime() - start.getTime();
+			synchronized(stats) {
+				stats.lastCollect = start;
+				stats.runtime = duration;
+			}
 			System.gc();
 			logger.info("Collect started at "  + start + " ran for " + duration + "ms");
 		}
@@ -371,6 +385,13 @@ public class HostsList implements StarterNode {
 	
 	public void stopCollect() {
 		collecting = false;
+	}
+
+	/**
+	 * @return the stats
+	 */
+	public Stats getStats() {
+		return stats;
 	}
 
 }
