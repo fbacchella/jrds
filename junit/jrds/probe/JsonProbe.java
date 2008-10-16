@@ -1,4 +1,4 @@
-package jrds;
+package jrds.probe;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,7 +10,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.WriterAppender;
 import org.apache.log4j.spi.LoggingEvent;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

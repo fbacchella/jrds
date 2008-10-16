@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
@@ -23,11 +22,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.rrd4j.DsType;
-
-import jrds.GraphDesc;
-import jrds.ProbeDesc;
-import jrds.Probe;
-import jrds.RdsHost;
 
 public class GetMoke {
 	static public RdsHost getHost() {

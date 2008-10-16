@@ -1,4 +1,4 @@
-package jrds;
+package jrds.probe;
 
 import java.util.Map;
 

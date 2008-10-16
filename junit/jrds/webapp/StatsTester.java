@@ -3,14 +3,11 @@ package jrds.webapp;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 
 import jrds.GetMoke;
 import jrds.JrdsTester;
-import jrds.webapp.ParamsBean;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

@@ -1,7 +1,5 @@
 package jrds;
 
-import jrds.PropertiesManager;
-
 import org.junit.Test;
 
 public class Configuration {

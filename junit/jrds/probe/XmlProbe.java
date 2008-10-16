@@ -1,4 +1,4 @@
-package jrds;
+package jrds.probe;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -14,7 +14,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 import jrds.ProbeDesc;
-import jrds.probe.HttpXml;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
@@ -25,8 +24,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.rrd4j.DsType;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class XmlProbe extends jrds.probe.HttpXml {

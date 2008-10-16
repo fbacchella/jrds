@@ -1,4 +1,4 @@
-package jrds;
+package jrds.probe;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -15,6 +15,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import jrds.JrdsTester;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;

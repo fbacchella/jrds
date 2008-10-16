@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import jrds.GetMoke;
 import jrds.JrdsTester;
-import jrds.webapp.ParamsBean;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

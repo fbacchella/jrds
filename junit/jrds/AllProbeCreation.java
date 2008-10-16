@@ -6,15 +6,8 @@ import java.util.Collections;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.ArgFactory;
-import jrds.DescFactory;
-import jrds.GraphFactory;
-import jrds.HostsList;
-import jrds.Probe;
-import jrds.ProbeDesc;
-import jrds.ProbeFactory;
-import jrds.PropertiesManager;
-import jrds.RdsHost;
+import jrds.probe.DummyProbe;
+import jrds.probe.DummyProbeIndexed;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
