@@ -47,7 +47,7 @@ public class ProbeDetails extends HttpServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException{
-		res.setContentType("text/html");
+		res.setContentType("application/xhtml+xml");
 		res.addHeader("Cache-Control", "no-cache");
 
 		ParamsBean params = new ParamsBean(req);
