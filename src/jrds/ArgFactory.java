@@ -26,6 +26,7 @@ public class ArgFactory {
 	public ArgFactory() {
 		argPackages.add("java.lang.");
 		argPackages.add("java.net.");
+		argPackages.add("org.snmp4j.smi.");
 		argPackages.add("");
 	}
 	

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT probedesc (name, probeName?, probeClass, (snmpRequester | specific+)?, (index, uniq)?, defaultargs?, ds+, graphs)>
+<!ELEMENT probedesc (name, probeName?, probeClass, (snmpRequester | specific+)?, uptimefactor?, (index, uniq)?, defaultargs?, ds+, graphs)>
 <!ATTLIST specific 
 			name CDATA #REQUIRED
 >
@@ -19,6 +19,7 @@
 <!ELEMENT oid (#PCDATA)>
 <!ELEMENT minValue (#PCDATA)>
 <!ELEMENT maxValue (#PCDATA)>
+<!ELEMENT uptimefactor (#PCDATA)>
 <!ELEMENT index (#PCDATA)>
 <!ELEMENT uniq (#PCDATA)>
 <!ELEMENT probeClass (#PCDATA)>

@@ -34,7 +34,7 @@
 	<viewtree>
 		<pathelement>NETWORK</pathelement>
 		<pathelement>TCP</pathelement>
-		<pathelement>HOST</pathelement>
 		<pathstring>TCP Connections</pathstring>
+		<pathelement>HOST</pathelement>
 	</viewtree>
 </graphdesc>

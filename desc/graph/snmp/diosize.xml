@@ -4,7 +4,7 @@
 <graphdesc>
 	<name>DiskIoGraphSize</name>
 	<graphName>bsize-{2}</graphName>
-	<graphTitle>Average requeste size on disk {2} on {1}</graphTitle>
+	<graphTitle>Average requests size on disk {2} on {1}</graphTitle>
 	<unit>
 		<binary/>
 	</unit>
@@ -25,26 +25,26 @@
 		<name>diskIOBLKWSZ</name>
 		<rpn>diskIONWritten, diskIOWrites, /</rpn>
 		<graphType>line</graphType>
-		<legend>Average request size on write</legend>
+		<legend>Average requests size on write</legend>
 	</add>
 	<add>
 		<name>diskIOBLKRSZ</name>
 		<rpn>diskIONRead, diskIOReads, /</rpn>
 		<reversed>true</reversed>
 		<graphType>line</graphType>
-		<legend>Average request size on read</legend>
+		<legend>Average requests size on read</legend>
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>
 		<pathelement>DISK</pathelement>
 		<pathelement>DISKACTIVITY</pathelement>
 		<pathelement>INDEX</pathelement>
-		<pathstring>Average requeste size</pathstring>
+		<pathstring>Average requests size</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>DISK</pathelement>
 		<pathelement>DISKACTIVITY</pathelement>
-		<pathstring>Average requeste size</pathstring>
+		<pathstring>Average requests size</pathstring>
 		<pathelement>HOST</pathelement>
 		<pathelement>INDEX</pathelement>
 	</viewtree>

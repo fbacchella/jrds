@@ -3,7 +3,7 @@
                            "urn:jrds:graphdesc">
 <graphdesc>
   <name>ApacheTransfer</name>
-  <graphName>apachetransfer</graphName>
+  <graphName>apachetransfer_{2}</graphName>
   <graphTitle>Bytes transfert on port {2}</graphTitle>
   <unit>
     <SI/>
