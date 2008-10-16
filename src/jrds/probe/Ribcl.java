@@ -27,14 +27,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class Ribcl extends Probe {
-	String user;
-	String passwd;
-	String iloHost;
-	int port = 443;
+	private String user;
+	private String passwd;
+	private String iloHost;
+	private int port = 443;
 
-	static final String encoding = "ISO-8859-1";
-	static final String eol = "\r\n";
-	static final String xmlHeader = "<?xml version=\"1.0\" ?>" + eol;
+	static final private String encoding = "ISO-8859-1";
+	static final private String eol = "\r\n";
+	static final private String xmlHeader = "<?xml version=\"1.0\" ?>" + eol;
 
 	static final private Logger logger = Logger.getLogger(Ribcl.class);
 
