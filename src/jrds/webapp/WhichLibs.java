@@ -19,6 +19,8 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import org.apache.commons.digester.Digester;
 import org.apache.log4j.Logger;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
+import javax.media.jai.JAI;
+
 
 /**
  * A servlet wich generate a png for a graph
@@ -51,7 +53,8 @@ public final class WhichLibs extends HttpServlet {
 			out.println(resolv("common logging API", org.apache.commons.logging.LogFactory.class));
 			out.println(resolv("common logging", org.apache.commons.logging.LogFactory.getLog(this.getClass())));
 			out.println(resolv("STL", org.apache.taglibs.standard.Version.class));
-			
+			out.println(resolv("JAI", JAI.class));
+
 
 		} catch (RuntimeException e) {
 			logger.error(e, e);
