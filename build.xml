@@ -6,6 +6,7 @@
 	<property name="build.home" value="${basedir}/build"/>
 	<property name="docs.build" value="${build.home}/docs"/>
 	<property name="src.home" value="${basedir}/src"/>
+	<property name="src.junit" value="${basedir}/junit"/>
 	<property name="web.src" value="${basedir}/web"/>
 	<property name="web.build" value="${build.home}/webapp"/>
 	
@@ -45,15 +46,32 @@
 	
 	<!-- ==================== Compilation Classpath =========================== -->
 	<path id="compile.classpath">
-		<path refid="catalina.classpath"/>
+		<pathelement path="${localcompile.classpath}"/>
 		<path refid="project.classpath"/>
+		<path refid="catalina.classpath"/>
+	    <dirset dir="${build.home}/classes">
+	      <include name="**/classes"/>
+	    </dirset>
+	   <pathelement location="${build.home}/classes"/>
 	</path>
 	
-	<import file="local.xml" optional="true"/>
+	<!-- ==================== Execution Classpath =========================== -->
+	<path id="execution.classpath">
+		<pathelement location="${build.home}/*.jar"/>
+		<pathelement path="${localexec.classpath}"/>
+		<path refid="project.classpath"/>
+		<path refid="catalina.classpath"/>
+	</path>
 	
 	<target name="compile">
 		<mkdir dir="${build.home}/classes"/>
 		<javac srcdir="${src.home}" destdir="${build.home}/classes"
+			debug="${compile.debug}" deprecation="${compile.deprecation}"
+			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
+			<classpath refid="compile.classpath"/>
+		</javac>
+		<mkdir dir="${build.home}/classes-junit"/>
+		<javac srcdir="${src.junit}" destdir="${build.home}/classes-junit"
 			debug="${compile.debug}" deprecation="${compile.deprecation}"
 			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
 			<classpath refid="compile.classpath"/>
@@ -162,28 +180,19 @@
 	<!--  ==================== A few target to run jrds ==================== -->
 	<target name="collect" depends="appjar" >
 		<java classname="jrds.standalone.Collector" fork="true" maxmemory="512m">
-			<classpath>
-				<pathelement location="${build.home}/jrds.jar"/>
-				<path refid="project.classpath"/>
-			</classpath>
+			<classpath refid="execution.classpath" />
 		</java>
 	</target>
 	
 	<target name="test" depends="appjar">
 		<java classname="jrds.standalone.TestBackEnd" fork="true" maxmemory="256m">
-			<classpath>
-				<pathelement location="${build.home}/jrds.jar"/>
-				<path refid="project.classpath"/>
-			</classpath>
+			<classpath refid="execution.classpath" />
 		</java>
 	</target>
 	
 	<target name="graph" depends="appjar">
 		<java classname="jrds.standalone.Grapher" fork="true" maxmemory="128m">
-			<classpath>
-				<path refid="project.classpath"/>
-				<pathelement location="${build.home}/${app.name}.jar"/>
-			</classpath>
+			<classpath refid="execution.classpath" />
 		</java>
 	</target>
 	
