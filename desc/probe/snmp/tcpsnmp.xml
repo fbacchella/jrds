@@ -45,6 +45,16 @@
         <dsType>counter</dsType>
         <oid>1.3.6.1.2.1.6.12</oid>
     </ds>
+    <ds>
+        <dsName>InErrs</dsName>
+        <dsType>counter</dsType>
+        <oid>1.3.6.1.2.1.6.14</oid>
+    </ds>
+     <ds>
+        <dsName>OutRsts</dsName>
+        <dsType>counter</dsType>
+        <oid>1.3.6.1.2.1.6.15</oid>
+    </ds>
     <graphs>
         <name>tcpconnection</name>
         <name>tcpestablished</name>
