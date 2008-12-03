@@ -20,16 +20,8 @@
 	
 	<!-- ===================== Catalina Classpath =========================== -->
 	<path id="catalina.classpath">
-		<pathelement location="${catalina.home}/common/classes"/>
-		<fileset dir="${catalina.home}/common/endorsed">
-			<include name="*.jar"/>
-		</fileset>
-		<fileset dir="${catalina.home}/common/lib">
-			<include name="*.jar"/>
-		</fileset>
-		<pathelement location="${catalina.home}/shared/classes"/>
-		<fileset dir="${catalina.home}/shared/lib">
-			<include name="*.jar"/>
+		<fileset dir="${catalina.home}">
+			<include name="**/lib/*.jar"/>
 		</fileset>
 	</path>
 	
