@@ -181,4 +181,13 @@ public class XmlProvider extends Starter {
 	public Node getNode(Document d, String xpath) throws XPathExpressionException {
 		return  (Node) xpather.evaluate(xpath, d, XPathConstants.NODE);
 	}
+	
+	@Override
+	public Starter register(StarterNode node) {
+		StartersSet ss = node.getStarters();
+		if(ss.find(getKey()) == null)
+			super.register(node);
+		return ss.find(getKey());
+	}
+
 }
