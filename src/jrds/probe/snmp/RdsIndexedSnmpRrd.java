@@ -64,6 +64,11 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 		this.indexKey = indexKey.toString();
 	}
 
+	public RdsIndexedSnmpRrd(String keyName, OID indexKey) {
+		this.key = indexKey;
+		this.indexKey = keyName;
+	}
+
 	protected SnmpRequester getSnmpRequester() {
 		return valueFinder;
 	}
@@ -126,8 +131,14 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 
 				Collection<OID> soidSet = getIndexSet();
 
+				//If we already have the key, no need to search for it
+				if(key instanceof OID) {
+					OID suffixOid = (OID) key;
+					indexSubOid = Collections.singleton(suffixOid.getValue());
+					setSuffixLength(suffixOid.size());
+				}
 				//If no index OID, the indexKey is already the snmp suffix.
-				if(key instanceof OID || soidSet == null || soidSet.size() == 0) {
+				else if(soidSet == null || soidSet.size() == 0) {
 					OID suffixOid = new OID(indexKey);
 					indexSubOid = Collections.singleton(suffixOid.getValue());
 					setSuffixLength(suffixOid.size());
