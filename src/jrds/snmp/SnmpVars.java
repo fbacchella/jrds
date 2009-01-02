@@ -152,8 +152,7 @@ public class SnmpVars extends HashMap<OID, Object> {
 					//But only if the new string is printable
 					OctetString octetVar = (OctetString)valueAsVar;
 					int length = octetVar.length();
-					byte last = octetVar.get(length - 1 );
-					if(last == 0) {
+					if(length > 1 && octetVar.get(length - 1 ) == 0) {
 						OctetString newVar = octetVar.substring(0, length - 1);
 						if(newVar.isPrintable()) {
 							valueAsVar = newVar;
