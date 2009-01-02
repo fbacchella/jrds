@@ -6,6 +6,9 @@
 	<graphTitle>Memory usage on router {1}</graphTitle>
 	<verticalLabel>Bytes</verticalLabel>
 	<add>
+		<name>processorRam</name>
+	</add>
+	<add>
 		<name>memused</name>
 		<rpn>processorRam, freeMem,-</rpn>
 		<graphType>area</graphType>
