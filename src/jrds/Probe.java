@@ -151,7 +151,9 @@ implements Comparable<Probe>, StarterNode {
 				hn,
 				index,
 				url,
-				port
+				port,
+				jrds.Util.stringSignature(index),
+				jrds.Util.stringSignature(url)
 		};
 		return MessageFormat.format(template, arguments) ;
 

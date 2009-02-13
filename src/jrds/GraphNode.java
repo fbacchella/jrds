@@ -70,7 +70,9 @@ public class GraphNode implements Comparable<GraphNode> {
 				probe.getHost().getName(),
 				index,
 				url,
-				probe.getName()
+				probe.getName(),
+				Util.stringSignature(index),
+				Util.stringSignature(url)
 		};
 		return MessageFormat.format(template, arguments) ;
 
