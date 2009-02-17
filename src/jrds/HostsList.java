@@ -50,10 +50,10 @@ public class HostsList implements StarterNode {
 		public Date lastCollect;
 	}
 
-	public static final String HOSTROOT = "Sorted by host";
-	public static final String VIEWROOT = "Sorted by view";
-	public static final String SUMROOT = "Sums";
-	public static final String CUSTOMROOT = "Customs";
+	public static final String HOSTROOT = "All hosts";
+	public static final String VIEWROOT = "All views";
+	public static final String SUMROOT = "All sums";
+	public static final String CUSTOMROOT = "All customs graph";
 
 	private StartersSet starters = null;
 	private RdsHost sumhost =  null;
@@ -83,19 +83,25 @@ public class HostsList implements StarterNode {
 	}
 
 	private void init() {
-		addRoot(HOSTROOT);
-		addRoot(VIEWROOT);
 		addRoot(SUMROOT);
-		addRoot(CUSTOMROOT);
 		filters.put(Filter.SUM.getName(), Filter.SUM);
-		filters.put(Filter.CUSTOM.getName(), Filter.CUSTOM);
-		filters.put(Filter.EVERYTHING.getName(), Filter.EVERYTHING);
-		filters.put(Filter.ALLHOSTS.getName(), Filter.ALLHOSTS);
-		filters.put(Filter.ALLVIEWS.getName(), Filter.ALLVIEWS);
-		filters.put(Filter.ALLSERVICES.getName(), Filter.ALLSERVICES);
-		starters = new StartersSet(this);
 		sumhost =  new RdsHost("SumHost");
+
+		addRoot(CUSTOMROOT);
+		filters.put(Filter.CUSTOM.getName(), Filter.CUSTOM);
 		customhost =  new RdsHost("CustomHost");
+
+		filters.put(Filter.EVERYTHING.getName(), Filter.EVERYTHING);
+
+		addRoot(HOSTROOT);
+		filters.put(Filter.ALLHOSTS.getName(), Filter.ALLHOSTS);
+
+		addRoot(VIEWROOT);
+		filters.put(Filter.ALLVIEWS.getName(), Filter.ALLVIEWS);
+
+		filters.put(Filter.ALLSERVICES.getName(), Filter.ALLSERVICES);
+
+		starters = new StartersSet(this);
 	}
 
 	public static HostsList getRootGroup() {
@@ -148,7 +154,7 @@ public class HostsList implements StarterNode {
 					gf.addGraphDesc(gd);
 					cp.addGraph(gd);
 				}
-				addVirtual(cp, customhost);
+				addVirtual(cp, customhost, CUSTOMROOT);
 			} catch (MalformedURLException e) {
 				logger.error("What is this configuration directory " + pm.configdir);
 			} catch (IOException e) {
@@ -170,7 +176,7 @@ public class HostsList implements StarterNode {
 //				logger.debug(p.);
 			}
 		}
-	
+
 		HostConfigParser hp = new HostConfigParser(pf,af/*, df.digester */);
 
 		if(pm.configdir != null) {
@@ -385,19 +391,19 @@ public class HostsList implements StarterNode {
 	}
 
 	public void addSum(SumProbe sum) {
-		addVirtual(sum, sumhost);
+		addVirtual(sum, sumhost, SUMROOT);
 	}
-	
-	private void addVirtual(VirtualProbe vprobe, RdsHost vhost) {
+
+	private void addVirtual(VirtualProbe vprobe, RdsHost vhost, String root) {
 		vhost.addProbe(vprobe);
 		for(GraphNode currGraph: vprobe.getGraphList()) {
 			logger.trace("adding virtual graph: " + currGraph);
-			treeMap.get(SUMROOT).addGraphByPath(currGraph.getTreePathByHost(), currGraph);
+			treeMap.get(root).addGraphByPath(currGraph.getTreePathByHost(), currGraph);
 			graphMap.put(currGraph.hashCode(), currGraph);
 		}
 		logger.debug("adding virtual probe " + vprobe.getName());
-		
-		
+
+
 	}
 
 	@Override

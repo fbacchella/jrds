@@ -12,7 +12,7 @@ public abstract class Filter {
 		}
 		@Override
 		public String getName() {
-			return "All sums";
+			return HostsList.SUMROOT;
 		}
 	};
 	static final public Filter CUSTOM = new Filter() {
@@ -22,7 +22,7 @@ public abstract class Filter {
 		}
 		@Override
 		public String getName() {
-			return "All customs graph";
+			return HostsList.CUSTOMROOT;
 		}
 	};
 	static final public Filter EVERYTHING = new Filter() {
@@ -42,7 +42,7 @@ public abstract class Filter {
 		}
 		@Override
 		public String getName() {
-			return "All hosts";
+			return HostsList.HOSTROOT;
 		}
 	};
 	static final public Filter ALLVIEWS = new Filter() {
@@ -52,7 +52,7 @@ public abstract class Filter {
 		}
 		@Override
 		public String getName() {
-			return "All views";
+			return HostsList.VIEWROOT;
 		}
 	};
 	static final public Filter ALLSERVICES = new Filter() {

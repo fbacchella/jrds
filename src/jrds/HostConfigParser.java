@@ -43,7 +43,7 @@ public class HostConfigParser  extends DirXmlParser {
 			this.tag = tag;
 		}
 	};
-	
+
 	private final class ProbeElement {}
 
 	public HostConfigParser(ProbeFactory pf, ArgFactory af) {
@@ -348,7 +348,6 @@ public class HostConfigParser  extends DirXmlParser {
 	}
 
 	private void defineSumDigester(Digester digester) {
-//		digester.register("-//jrds//DTD View//EN", digester.getClass().getResource("/view.dtd").toString());
 		digester.addRule("sum/", new Rule() {
 			public void begin (String namespace, String name, Attributes attributes) {
 				String sumName = attributes.getValue("name");
