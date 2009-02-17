@@ -50,8 +50,8 @@ public class HostsList implements StarterNode {
 		public Date lastCollect;
 	}
 
-	public static final String HOSTROOT = "All hosts";
-	public static final String VIEWROOT = "All views";
+	public static final String HOSTROOT = "Sorted by host";
+	public static final String VIEWROOT = "Sorted by view";
 	public static final String SUMROOT = "All sums";
 	public static final String CUSTOMROOT = "All customs graph";
 

@@ -203,7 +203,6 @@ public class DescFactory extends DirXmlParser {
 	}
 
 	private void addGraphDescDigester(Digester digester) {
-		digester.register("-//jrds//DTD Graph Description//EN", digester.getClass().getResource("/graphdesc.dtd").toString());
 		digester.addObjectCreate("graphdesc", jrds.GraphDesc.class);
 		digester.addSetProperties("graphdesc");
 		digester.addRule("graphdesc", new Rule() {
