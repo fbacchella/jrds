@@ -27,7 +27,9 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import jrds.probe.ContainerProbe;
 import jrds.probe.SumProbe;
+import jrds.probe.VirtualProbe;
 
 import org.apache.log4j.Logger;
 
@@ -39,7 +41,7 @@ import org.apache.log4j.Logger;
 public class HostsList implements StarterNode {
 	static private final Logger logger = Logger.getLogger(HostsList.class);
 	private static HostsList instance;
-	
+
 	public class Stats {
 		Stats() {
 			lastCollect = new Date(0);
@@ -51,9 +53,11 @@ public class HostsList implements StarterNode {
 	public static final String HOSTROOT = "Sorted by host";
 	public static final String VIEWROOT = "Sorted by view";
 	public static final String SUMROOT = "Sums";
+	public static final String CUSTOMROOT = "Customs";
 
 	private StartersSet starters = null;
 	private RdsHost sumhost =  null;
+	private RdsHost customhost =  null;
 
 	private final Set<RdsHost> hostList = new HashSet<RdsHost>();
 	private final Map<Integer, GraphNode> graphMap = new HashMap<Integer, GraphNode>();
@@ -69,7 +73,7 @@ public class HostsList implements StarterNode {
 	private boolean started = false;
 	private boolean collecting = false;
 	private Stats stats = new Stats(); 
-	 
+
 	/**
 	 *  
 	 */
@@ -82,13 +86,16 @@ public class HostsList implements StarterNode {
 		addRoot(HOSTROOT);
 		addRoot(VIEWROOT);
 		addRoot(SUMROOT);
+		addRoot(CUSTOMROOT);
 		filters.put(Filter.SUM.getName(), Filter.SUM);
+		filters.put(Filter.CUSTOM.getName(), Filter.CUSTOM);
 		filters.put(Filter.EVERYTHING.getName(), Filter.EVERYTHING);
 		filters.put(Filter.ALLHOSTS.getName(), Filter.ALLHOSTS);
 		filters.put(Filter.ALLVIEWS.getName(), Filter.ALLVIEWS);
 		filters.put(Filter.ALLSERVICES.getName(), Filter.ALLSERVICES);
 		starters = new StartersSet(this);
 		sumhost =  new RdsHost("SumHost");
+		customhost =  new RdsHost("CustomHost");
 	}
 
 	public static HostsList getRootGroup() {
@@ -118,7 +125,7 @@ public class HostsList implements StarterNode {
 		pm.libspath.add(DescFactory.class.getResource("/probe"));
 		pm.libspath.add(DescFactory.class.getResource("/graph"));
 
-		logger.trace("Scanning " + pm.libspath + " for probes libraries");
+		logger.debug("Scanning " + pm.libspath + " for probes libraries");
 		for(URL lib: pm.libspath) {
 			try {
 				logger.info("Adding lib " + lib);
@@ -127,15 +134,46 @@ public class HostsList implements StarterNode {
 				logger.error("Lib " + lib + " can't be imported: " + e);
 			}
 		}
+		//We might find graph descriptions in the confidir
+		if(pm.configdir != null) {
+			ContainerProbe cp = new ContainerProbe(customhost.getName(), null);
+			customhost.addProbe(cp);
+			try {
+				DescFactory tempdf = new DescFactory(af);
 
-		HostConfigParser hp = new HostConfigParser(pf,af );
+				tempdf.importDescUrl((new File(pm.configdir)).toURL());
 
-		List<String> graphsName = new ArrayList<String>(df.getGraphDescMap().keySet());
-		logger.debug("Graphs :" + graphsName);
-		List<String> probesName = new ArrayList<String>(df.getProbesDescMap().keySet());
-		Collections.sort(probesName);
-		logger.debug("Probes: " + probesName);
-		if(pm.configdir != null)
+				for(GraphDesc gd: tempdf.getGraphDescMap().values()) {
+					logger.trace("Adding graphdesc: " + gd.getGraphTitle());
+					gf.addGraphDesc(gd);
+					cp.addGraph(gd);
+				}
+				addVirtual(cp, customhost);
+			} catch (MalformedURLException e) {
+				logger.error("What is this configuration directory " + pm.configdir);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		if(logger.isDebugEnabled()) {
+			List<String> graphsName = new ArrayList<String>(df.getGraphDescMap().keySet());
+			Collections.sort(graphsName);
+			List<String> probesName = new ArrayList<String>(df.getProbesDescMap().keySet());
+			Collections.sort(probesName);
+			logger.debug("Graphs :" + graphsName);
+			logger.debug("Probes: " + probesName);
+			for(Probe p: probeMap.values()) {
+				logger.debug(p);
+			}
+			for(GraphDesc p: df.getGraphDescMap().values()) {
+//				logger.debug(p.);
+			}
+		}
+	
+		HostConfigParser hp = new HostConfigParser(pf,af/*, df.digester */);
+
+		if(pm.configdir != null) {
 			try {
 				hp.importDescUrl((new File(pm.configdir,"/macro")).toURL());
 				hp.importDescUrl((new File(pm.configdir)).toURL());
@@ -145,7 +183,8 @@ public class HostsList implements StarterNode {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			started = true;
+		}
+		started = true;
 	}
 
 	public Collection<RdsHost> getHosts() {
@@ -295,10 +334,21 @@ public class HostsList implements StarterNode {
 	/**
 	 * Return a probe identified by his hash value
 	 * @param id the hash value of the probe
-	 * @return the graph found or null of nothing found
+	 * @return the probe found or null of nothing found
 	 */
 	public Probe getProbeById(int id) {
 		return probeMap.get(id);
+	}
+
+	/**
+	 * Return a probe identified by path
+	 * @param host the host
+	 * @param probeName the probe name: the probeName element of a probedesc
+	 * @return the graph found or null of nothing found
+	 */
+	public Probe getProbeByPath(String host, String probeName) {
+		String path = host + "/" + probeName;
+		return probeMap.get(path.hashCode());
 	}
 
 	public void addProbe(Probe p) {
@@ -335,12 +385,19 @@ public class HostsList implements StarterNode {
 	}
 
 	public void addSum(SumProbe sum) {
-		sumhost.addProbe(sum);
-		for(GraphNode currGraph: sum.getGraphList()) {
+		addVirtual(sum, sumhost);
+	}
+	
+	private void addVirtual(VirtualProbe vprobe, RdsHost vhost) {
+		vhost.addProbe(vprobe);
+		for(GraphNode currGraph: vprobe.getGraphList()) {
+			logger.trace("adding virtual graph: " + currGraph);
 			treeMap.get(SUMROOT).addGraphByPath(currGraph.getTreePathByHost(), currGraph);
 			graphMap.put(currGraph.hashCode(), currGraph);
 		}
-		logger.debug("adding sum " + sum.getName());
+		logger.debug("adding virtual probe " + vprobe.getName());
+		
+		
 	}
 
 	@Override
@@ -382,7 +439,7 @@ public class HostsList implements StarterNode {
 	public boolean isCollectRunning() {
 		return started && collecting && ! Thread.currentThread().isInterrupted();
 	}
-	
+
 	public void stopCollect() {
 		collecting = false;
 	}

@@ -367,9 +367,15 @@ implements Cloneable {
 		public Color color;
 		public String legend;
 		public ConsolFun cf;
+		public class DsPath  {
+			String host;
+			String probe;
+			String dsName;
+		};
+		public DsPath dspath = null;
 		public DsDesc(String name, String dsName, String rpn,
 				GraphType graphType, Color color, String legend,
-				ConsolFun cf) {
+				ConsolFun cf, String host, String probe) {
 			this.name = name;
 			this.dsName = dsName;
 			this.rpn = rpn;
@@ -377,6 +383,11 @@ implements Cloneable {
 			this.color = color;
 			this.legend = legend;
 			this.cf = cf;
+			if(host != null && probe != null) {
+				this.dspath = new DsPath();
+				dspath.host = host;
+				dspath.probe = probe;
+			}
 		}
 		public String toString() {
 			return "DsDesc(" + name + "," + dsName + ",\"" + rpn + "\"," + graphType + "," + color + ",\"" + legend + "\"," + cf + ")";
@@ -400,7 +411,7 @@ implements Cloneable {
 	private int maxLengthLegend = 0;
 	private boolean siUnit = true;
 	private Integer unitExponent = null;
-	
+
 	public final class Dimension {
 		public int width = 0;
 		public int height = 0;
@@ -428,18 +439,18 @@ implements Cloneable {
 	 * @param color Color
 	 */
 	public void add(String name, GraphType graphType, Color color) {
-		add(name, name, null, graphType, color, name, DEFAULTCF, false);
+		add(name, name, null, graphType, color, name, DEFAULTCF, false, null, null);
 	}
 
 	public void add(String name, GraphType graphType, Color color,
 			String legend) {
-		add(name, name, null, graphType, color, legend, DEFAULTCF, false);
+		add(name, name, null, graphType, color, legend, DEFAULTCF, false, null, null);
 	}
 
 	public void add(String name, GraphType graphType, String legend) {
 		add(name, name, null, graphType,
 				colors[ (lastColor) % colors.length], legend,
-				DEFAULTCF, false);
+				DEFAULTCF, false, null, null);
 		if(graphType != GraphType.COMMENT && graphType != GraphType.NONE && graphType != GraphType.VOID)
 			lastColor++;
 	}
@@ -447,7 +458,7 @@ implements Cloneable {
 	public void add(String name, GraphType graphType) {
 		add(name, name, null, graphType,
 				colors[ (lastColor) % colors.length], name,
-				DEFAULTCF, false);
+				DEFAULTCF, false, null, null);
 		if(graphType != GraphType.COMMENT && graphType != GraphType.NONE && graphType != GraphType.VOID)
 			lastColor++;
 	}
@@ -459,24 +470,24 @@ implements Cloneable {
 	 * @param legend String
 	 */
 	public void add(GraphType graphType, String legend) {
-		add(null, null, null, graphType, null, legend, null, false);
+		add(null, null, null, graphType, null, legend, null, false, null, null);
 	}
 
 	public void add(String name, String rpn, GraphType graphType, Color color,
 			String legend) {
 		add(name, null, rpn, graphType, color, legend,
-				DEFAULTCF, false);
+				DEFAULTCF, false, null, null);
 	}
 
 	public void add(String name, String rpn, GraphType graphType, Color color) {
 		add(name, null, rpn, graphType, color, name,
-				DEFAULTCF, false);
+				DEFAULTCF, false, null, null);
 	}
 
 	public void add(String name, String rpn, GraphType graphType, String legend) {
 		add(name, null, rpn, graphType,
 				colors[lastColor % colors.length], legend,
-				DEFAULTCF, false);
+				DEFAULTCF, false, null, null);
 		if(graphType != GraphType.COMMENT && graphType != GraphType.NONE && graphType != GraphType.VOID)
 			lastColor++;
 	}
@@ -487,11 +498,11 @@ implements Cloneable {
 	 * @param name String
 	 */
 	public void add(String name) {
-		add(name, name, null, NONE, null, null, DEFAULTCF, false);
+		add(name, name, null, NONE, null, null, DEFAULTCF, false, null, null);
 	}
 
 	public void add(String name, String rpn) {
-		add(name, null, rpn, NONE, null, null, DEFAULTCF, false);
+		add(name, null, rpn, NONE, null, null, DEFAULTCF, false, null, null);
 	}
 
 	/**
@@ -504,10 +515,15 @@ implements Cloneable {
 	 * @param legend
 	 * @param consFunc
 	 * @param reversed
+	 * @param host
+	 * @param probe
+	 * @param subDsName
 	 */
 	public void add(String name, String rpn,
 			String graphType, String color, String legend,
-			String consFunc, String reversed) {
+			String consFunc, String reversed,
+			String host, String probe, String dsName) {
+		logger.trace("Adding " + name + ", " + rpn + ", " + graphType + ", " + color + ", " + legend + ", " + consFunc + ", " + reversed + ", " + host + ", " + probe);
 		GraphType gt = null;
 		if(graphType == null || "".equals(graphType)) {
 			if(legend != null)
@@ -536,10 +552,9 @@ implements Cloneable {
 				lastColor++;
 
 		}
-		String dsName = null;
 		if(name != null) {
 			// If not a rpn, it must be a datastore
-			if(rpn == null) {
+			if(rpn == null && dsName == null) {
 				dsName = name;
 			}
 		}
@@ -550,34 +565,38 @@ implements Cloneable {
 			else if(legend != null) {
 				name = legend;
 			}
+			else if(host != null) {
+				name = host + "/" + probe + "/" + dsName;
+			}
 		}
+		//Auto generated legend
 		if(legend == null && name != null)
 			legend = name;
-		add(name, dsName, rpn, gt, c, legend, cf, reversed != null);
+		add(name, dsName, rpn, gt, c, legend, cf, reversed != null, host, probe);
 	}
 
 	public void add(String name, String dsName, String rpn,
 			GraphType graphType, Color color, String legend,
-			ConsolFun cf, boolean reversed) {
+			ConsolFun cf, boolean reversed,
+			String host, String probe) {
 		String key = name;
 		if(name == null && legend != null)
 			key = legend;
 		if(reversed) {
 			dsMap.put(key,
-					new DsDesc(name, dsName, rpn, GraphType.NONE, null, null, cf));
+					new DsDesc(name, dsName, rpn, GraphType.NONE, null, null, cf, host, probe));
 			String revRpn = "0, " + name + ", -";
 			dsMap.put("rev_" + key,
-					new DsDesc("rev_" + name, "rev_" + name, revRpn, graphType, color, null, cf));
+					new DsDesc("rev_" + name, "rev_" + name, revRpn, graphType, color, null, cf, host, probe));
 			dsMap.put("legend_" + key,
-					new DsDesc(name, dsName, rpn, GraphType.VOID, null, legend, cf));
+					new DsDesc(name, dsName, rpn, GraphType.VOID, null, legend, cf, host, probe));
 		}
 		else
 			dsMap.put(key,
-					new DsDesc(name, dsName, rpn, graphType, color, legend, cf));
+					new DsDesc(name, dsName, rpn, graphType, color, legend, cf, host, probe));
 		if(legend != null) {
 			maxLengthLegend = Math.max(maxLengthLegend, legend.length());
 		}
-
 	}
 
 
@@ -590,11 +609,11 @@ implements Cloneable {
 	 * @throws IOException
 	 * @throws RrdException
 	 */
-	public RrdGraphDef getGraphDef(Probe probe, Map ownData) throws IOException {
+	public RrdGraphDef getGraphDef(Probe defProbe, Map<String, Plottable> ownData) throws IOException {
 		RrdGraphDef retValue = new RrdGraphDef();
 		retValue.setLargeFont(TITLEFONT);
 		retValue.setSmallFont(TEXTFONT);
-		String rrdName = probe.getRrdName();
+		String defRrdName = defProbe.getRrdName();
 
 		/*The title line*/
 		retValue.comment(""); //We simulate the color box
@@ -606,15 +625,26 @@ implements Cloneable {
 		retValue.comment("\\l");
 
 		for(DsDesc ds: dsMap.values()) {
-			if(ds.graphType == GraphType.COMMENT) {
+			String rrdName = defRrdName;
+			Probe probe = defProbe;
+			if(ds.dspath != null) {
+				logger.trace("External probe path: " + ds.dspath.host + "/" + ds.dspath.probe + "/" + ds.name);
+				probe = HostsList.getRootGroup().getProbeByPath(ds.dspath.host, ds.dspath.probe);
+				if(probe == null) {
+					logger.error("Invalide probe: " + ds.dspath.host + "/" + ds.dspath.probe);
+				}
+				else 
+					rrdName = probe.getRrdName();
+			}
+			if(probe != null && ds.graphType == GraphType.COMMENT) {
 				addLegend(retValue, ds.name, ds.graphType, ds.legend);
 			}
-			else if (ds.rpn == null) {
+			else if (probe != null && ds.rpn == null) {
 				boolean exist = false; // Used to check it the data source one way or another
 				//Does the datas existe in the provided values
 				if(ownData != null && ownData.containsKey(ds.dsName)) {
 					exist = true;
-					retValue.datasource(ds.name, (Plottable) ownData.get(ds.dsName));
+					retValue.datasource(ds.name, ownData.get(ds.dsName));
 				}
 				//Or they might be on the associated rrd
 				else if(probe.dsExist(ds.dsName)) {
@@ -636,7 +666,7 @@ implements Cloneable {
 					logger.error("No way to plot " + ds.name + " in " + name + " found");
 				}
 			}
-			else {
+			else if(probe != null){
 				retValue.datasource(ds.name, ds.rpn);
 				ds.graphType.draw(retValue, ds.name, ds.color);
 				addLegend(retValue, ds.name, ds.graphType, ds.legend);

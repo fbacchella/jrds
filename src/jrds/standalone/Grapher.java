@@ -47,16 +47,15 @@ public class Grapher {
 
 		HostsList.getRootGroup().configure(pm);
 
-		//Date end = new Date();
-		//Date begin = new Date(end.getTime() - 86400 * 1000);
 		Period p = new Period();
 		Renderer r= new Renderer(10);
 		Collection<Integer> done = new HashSet<Integer>();
 		for(GraphTree graphTree: HostsList.getRootGroup().getGraphsRoot()) {
+			logger.trace("Tree found: " + graphTree.getName());
 			for(GraphNode gn: graphTree.enumerateChildsGraph(null)) {
 				if(! done.contains(gn.hashCode())) {
 					done.add(gn.hashCode());
-					logger.debug(gn.getName());
+					logger.debug("New graph: " + gn.getGraphTitle());
 					Graph g = gn.getGraph();
 					g.setPeriod(p);
 					logger.debug("Found graph for probe " + gn.getProbe());
@@ -69,7 +68,7 @@ public class Grapher {
 			}
 		}
 		for(jrds.Renderer.RendererRun rr: r.getWaitings()) {
-			logger.debug(rr);
+			logger.debug("Rendering " + rr.graph.getQualifieName());
 			rr.write();
 			rr.clean();
 		}

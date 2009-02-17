@@ -44,6 +44,8 @@ public abstract class DirXmlParser {
 						digester.clear();
 					} catch (SAXException e) {
 						logger.error("File  "+ file + " not parsable: " + e, e);
+					} catch (IllegalArgumentException e) {
+						logger.error("File  "+ file + " not parsable: " + e, e);
 					}
 				}
 			}
@@ -77,6 +79,19 @@ public abstract class DirXmlParser {
 
 	public DirXmlParser() {
 		init();
+		digester.register("-//jrds//DTD Graph Description//EN", digester.getClass().getResource("/graphdesc.dtd").toString());
+//		digester.register("-//jrds//DTD View//EN", digester.getClass().getResource("/view.dtd").toString());
+		digester.register("-//jrds//DTD Probe Description//EN", digester.getClass().getResource("/probedesc.dtd").toString());
+		digester.register("-//jrds//DTD Filter//EN", digester.getClass().getResource("/filter.dtd").toString());
+	}
+
+	public DirXmlParser(Digester d) {
+		digester = d;
+		init();
+		digester.register("-//jrds//DTD Graph Description//EN", digester.getClass().getResource("/graphdesc.dtd").toString());
+//		digester.register("-//jrds//DTD View//EN", digester.getClass().getResource("/view.dtd").toString());
+		digester.register("-//jrds//DTD Probe Description//EN", digester.getClass().getResource("/probedesc.dtd").toString());
+		digester.register("-//jrds//DTD Filter//EN", digester.getClass().getResource("/filter.dtd").toString());
 	}
 
 	abstract public void init();

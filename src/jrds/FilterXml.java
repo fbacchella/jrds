@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.digester.Digester;
 import org.apache.commons.digester.Rule;
+import org.apache.log4j.Logger;
 
 /**
  * This a a filter generated using an XML config file
@@ -13,6 +14,8 @@ import org.apache.commons.digester.Rule;
  * @version $Revision: 302 $,  $Date: 2006-07-25 13:53:54 +0200 (Tue, 25 Jul 2006) $
  */
 public class FilterXml extends Filter {
+	static private final Logger logger = Logger.getLogger(FilterXml.class);
+
 	final Set<Pattern> goodPaths = new HashSet<Pattern>();
 	final Set<Pattern> tags = new HashSet<Pattern>();
 	String name;
@@ -76,7 +79,6 @@ public class FilterXml extends Filter {
 	}
 	
 	public static void addToDigester(Digester digester) {
-		digester.register("-//jrds//DTD Filter//EN", digester.getClass().getResource("/filter.dtd").toString());
 		digester.addObjectCreate("filter", jrds.FilterXml.class);
 		digester.addCallMethod("filter/name", "setName", 0);
 		digester.addCallMethod("filter/path", "addPath", 0);
@@ -84,6 +86,7 @@ public class FilterXml extends Filter {
 		digester.addRule("filter", new Rule() {
 			public void end(String namespace, String name) throws Exception {
 				Filter v = (Filter ) digester.peek();
+				logger.trace("Adding filter:" + v.getName());
 				HostsList.getRootGroup().addFilter(v);
 			}
 		});

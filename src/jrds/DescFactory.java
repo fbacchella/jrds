@@ -49,10 +49,10 @@ public class DescFactory extends DirXmlParser {
 	}
 
 	public void init() {
+		digester.setValidating(false);
 		addProbeDescDigester(digester);
 		addGraphDescDigester(digester);
 		FilterXml.addToDigester(digester);
-		digester.setValidating(true);
 	}
 
 	public boolean importDescUrl(URL ressourceUrl) throws IOException {
@@ -65,7 +65,6 @@ public class DescFactory extends DirXmlParser {
 	}
 
 	private void addProbeDescDigester(Digester digester) {
-		digester.register("-//jrds//DTD Probe Description//EN", digester.getClass().getResource("/probedesc.dtd").toString());
 		digester.addObjectCreate("probedesc", jrds.ProbeDesc.class);
 		digester.addRule("probedesc", new Rule() {
 			@Override
@@ -242,7 +241,7 @@ public class DescFactory extends DirXmlParser {
 			}	
 		}
 		);
-		digester.addCallMethod("graphdesc/add","add",7);
+		digester.addCallMethod("graphdesc/add","add",10);
 		digester.addCallParam("graphdesc/add/name",0);
 		digester.addCallParam("graphdesc/add/rpn",1);
 		digester.addCallParam("graphdesc/add/graphType",2);
@@ -250,6 +249,9 @@ public class DescFactory extends DirXmlParser {
 		digester.addCallParam("graphdesc/add/legend",4);
 		digester.addCallParam("graphdesc/add/cf",5);
 		digester.addCallParam("graphdesc/add/reversed",6);
+		digester.addCallParam("graphdesc/add/path/host",7);
+		digester.addCallParam("graphdesc/add/path/probe",8);
+		digester.addCallParam("graphdesc/add/path/name",9);
 		digester.addObjectCreate("graphdesc/hosttree", java.util.ArrayList.class);
 		digester.addSetNext("graphdesc/hosttree", "setHostTree");
 		digester.addObjectCreate("graphdesc/viewtree", java.util.ArrayList.class);

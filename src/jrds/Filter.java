@@ -1,6 +1,7 @@
 package jrds;
 
 import jrds.graphe.Sum;
+import jrds.probe.ContainerProbe;
 
 
 public abstract class Filter {
@@ -12,6 +13,16 @@ public abstract class Filter {
 		@Override
 		public String getName() {
 			return "All sums";
+		}
+	};
+	static final public Filter CUSTOM = new Filter() {
+		@Override
+		public boolean acceptGraph(GraphNode graph, String path) {
+			return (graph.getProbe() instanceof ContainerProbe);
+		}
+		@Override
+		public String getName() {
+			return "All customs graph";
 		}
 	};
 	static final public Filter EVERYTHING = new Filter() {
