@@ -537,7 +537,7 @@ implements Cloneable {
 		if (consFunc != null && ! "".equals(consFunc))
 			cf = (ConsolFun) resolv(ConsolFun.class, consFunc);
 		Color c = Color.WHITE;
-		if (! "".equals(color) && color != null) {
+		if (color != null && ! "".equals(color)) {
 			c = (Color) COLORMAP.get(Colors.valueOf(color.toUpperCase()));
 			if( c == null)
 				c = Color.getColor(color);
