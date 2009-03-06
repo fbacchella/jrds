@@ -464,7 +464,7 @@ implements Cloneable {
 	}
 
 	/**
-	 * Used to add a lign in the legend
+	 * Used to add a line in the legend
 	 *
 	 * @param graphType GraphType
 	 * @param legend String
@@ -534,10 +534,10 @@ implements Cloneable {
 		else
 			gt = (GraphType) resolv(GraphType.class, graphType);
 		ConsolFun cf = DEFAULTCF;
-		if (consFunc != null || "".equals(consFunc))
+		if (consFunc != null && ! "".equals(consFunc))
 			cf = (ConsolFun) resolv(ConsolFun.class, consFunc);
 		Color c = Color.WHITE;
-		if (color != null) {
+		if (! "".equals(color) && color != null) {
 			c = (Color) COLORMAP.get(Colors.valueOf(color.toUpperCase()));
 			if( c == null)
 				c = Color.getColor(color);
@@ -892,6 +892,7 @@ implements Cloneable {
 	 */
 	public void setViewTree(List viewTree) {
 		this.viewTree = viewTree;
+		logger.trace("Adding view tree: " + viewTree);
 	}
 
 	/**
@@ -920,6 +921,7 @@ implements Cloneable {
 	 */
 	public void setHostTree(List hostTree) {
 		this.hostTree = hostTree;
+		logger.trace("Adding host tree: " + hostTree);
 	}
 
 	/**
@@ -958,7 +960,7 @@ implements Cloneable {
 				gt = gtfield.get(clazz);
 		}
 		catch (Exception e) {
-			logger.error(name + " is a invalid constant name for type " + clazz);
+			logger.error("\"" + name  +"\""+ " is a invalid constant name for type " + clazz);
 		}
 		return gt;
 	}
