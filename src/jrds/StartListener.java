@@ -2,6 +2,8 @@ package jrds;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,6 +41,30 @@ public class StartListener implements ServletContextListener {
 			try {
 				ServletContext ctxt = arg0.getServletContext();
 				logger.info("Starting jrds");
+				if(logger.isTraceEnabled()) {
+					logger.trace("Dumping attributes");
+					for (Enumeration<?> e = ctxt.getAttributeNames() ; e.hasMoreElements() ;)
+					{
+						String attr = (String) e.nextElement();
+						Object o = ctxt.getAttribute(attr);
+						logger.trace(attr + " = " + o);
+					}
+					logger.trace("Dumping init parameters");
+					for (Enumeration<?> e = ctxt.getInitParameterNames() ; e.hasMoreElements() ;)
+					{
+						String attr = (String) e.nextElement();
+						Object o = ctxt.getInitParameter(attr);
+						logger.trace(attr + " = " + o);
+					}
+					logger.trace("Dumping properties");
+					Properties p = System.getProperties();
+					for (Enumeration<?> e = p.propertyNames() ; e.hasMoreElements() ;)
+					{
+						String attr = (String) e.nextElement();
+						Object o = p.getProperty(attr);
+						logger.trace(attr + " = " + o);
+					}
+				}
 				PropertiesManager pm = new PropertiesManager();
 				InputStream propStream = ctxt.getResourceAsStream("/WEB-INF/jrds.properties");
 				if(propStream != null) {
@@ -46,6 +72,10 @@ public class StartListener implements ServletContextListener {
 				}
 
 				String localPropFile = ctxt.getInitParameter("propertiesFile");
+				if(localPropFile != null)
+					pm.join(new File(localPropFile));
+
+				 localPropFile = System.getProperty("propertiesFile");
 				if(localPropFile != null)
 					pm.join(new File(localPropFile));
 

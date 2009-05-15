@@ -27,3 +27,6 @@
 
 #JAI home on solaris 10
 #jai.home=/usr/jdk/packages/jai/lib/ext
+
+#JAI home on Mac OS
+#jai.home=/System/Library/Java/Extensions

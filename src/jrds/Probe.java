@@ -117,7 +117,7 @@ implements Comparable<Probe>, StarterNode {
 	public void addGraph(GraphDesc gd) {
 		graphList.add(new GraphNode(this, gd));
 	}
-	
+
 	public void addGraph(GraphNode node) {
 		graphList.add(node);
 	}

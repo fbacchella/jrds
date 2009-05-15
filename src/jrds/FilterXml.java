@@ -19,25 +19,26 @@ public class FilterXml extends Filter {
 	final Set<Pattern> goodPaths = new HashSet<Pattern>();
 	final Set<Pattern> tags = new HashSet<Pattern>();
 	String name;
-	
-	
+
 	public FilterXml() {
 	}
-	
+
 	public void addPath(String path) {
 		Pattern p = Pattern.compile(path);
 		if(p != null)
 			goodPaths.add(p);
 	}
-	
+
 	public void addTag(String tag) {
 		Pattern p = Pattern.compile(tag);
 		if(p != null)
 			tags.add(p);
 	}
-	
+
 	public boolean acceptGraph(GraphNode graph, String path) {
-		return acceptPath(path) &&  acceptTag(graph.getProbe().getTags());
+		boolean accepted  = acceptPath(path) &&  acceptTag(graph.getProbe().getTags());
+		logger.trace("Trying to accept : " + path +", " + graph.getProbe().getTags() + ": " + accepted);
+		return accepted;
 	}
 
 	public boolean acceptPath(String path) {
@@ -50,7 +51,7 @@ public class FilterXml extends Filter {
 		}
 		return valid;
 	}
-	
+
 	public boolean acceptTag(Set<String> probeTags) {
 		//All the tags must be matched
 		boolean valid = false;
@@ -69,7 +70,7 @@ public class FilterXml extends Filter {
 		}
 		return valid;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
@@ -77,7 +78,7 @@ public class FilterXml extends Filter {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public static void addToDigester(Digester digester) {
 		digester.addObjectCreate("filter", jrds.FilterXml.class);
 		digester.addCallMethod("filter/name", "setName", 0);

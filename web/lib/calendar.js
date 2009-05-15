@@ -1335,8 +1335,8 @@ Calendar.prototype.show = function () {
 	this.hidden = false;
 	if (this.isPopup) {
 		window._dynarch_popupCalendar = this;
-		Calendar.addEvent(document, "keydown", Calendar._keyEvent);
-		Calendar.addEvent(document, "keypress", Calendar._keyEvent);
+		//Calendar.addEvent(document, "keydown", Calendar._keyEvent);
+		//Calendar.addEvent(document, "keypress", Calendar._keyEvent);
 		Calendar.addEvent(document, "mousedown", Calendar._checkCalendar);
 	}
 	this.hideShowCovered();

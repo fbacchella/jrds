@@ -50,14 +50,14 @@ public class ProbeFactory {
 		Probe retValue = null;
 		ProbeDesc pd = (ProbeDesc) probeDescMap.get(className);
 		if( pd != null) {
-			retValue = pd.makeProbe(constArgs, prop);
+			retValue = makeProbe(pd, constArgs);
 		}
 		else if(legacymode ){
 			Class<?> probeClass = resolvClass(className, probePackages);
 			if (probeClass != null) {
 				Object o = null;
 				try {
-					Class[] constArgsType = new Class[constArgs.size()];
+					Class<?>[] constArgsType = new Class[constArgs.size()];
 					Object[] constArgsVal = new Object[constArgs.size()];
 					int index = 0;
 					for (Object arg: constArgs) {
@@ -65,7 +65,7 @@ public class ProbeFactory {
 						constArgsVal[index] = arg;
 						index++;
 					}
-					Constructor theConst = probeClass.getConstructor(constArgsType);
+					Constructor<?> theConst = probeClass.getConstructor(constArgsType);
 					o = theConst.newInstance(constArgsVal);
 					retValue = (Probe) o;
 				}
@@ -89,9 +89,66 @@ public class ProbeFactory {
 		}
 		return retValue;
 	}
+	
+	/**
+	 * Instanciate a probe using a probedesc
+	 * @param constArgs
+	 * @return
+	 */
+	public Probe makeProbe(ProbeDesc pd, List<?> constArgs) {
+		Class<? extends Probe> probeClass = pd.getProbeClass();
+		List<?> defaultsArgs = pd.getDefaultArgs();
+		Probe retValue = null;
+		if (probeClass != null) {
+			Object o = null;
+			try {
+				if(defaultsArgs != null && constArgs != null && constArgs.size() <= 0)
+					constArgs = defaultsArgs;
+				Class<?>[] constArgsType = new Class[constArgs.size()];
+				Object[] constArgsVal = new Object[constArgs.size()];
+				int index = 0;
+				for (Object arg: constArgs) {
+					constArgsType[index] = arg.getClass();
+					constArgsVal[index] = arg;
+					index++;
+				}
+				Constructor<? extends Probe> theConst = probeClass.getConstructor(constArgsType);
+				o = theConst.newInstance(constArgsVal);
+				retValue = (Probe) o;
+				retValue.setPd(pd);
+			}
+			catch (ClassCastException ex) {
+				logger.warn("didn't get a Probe but a " + o.getClass().getName());
+			}
+			catch (NoClassDefFoundError ex) {
+				logger.warn("Missing class for the creation of a probe " + ex);
+			}
+			catch(InstantiationException ex) {
+				if(ex.getCause() != null)
+					logger.warn("Instantation exception : " + ex.getCause().getMessage(),
+							ex.getCause());
+				else {
+					logger.warn("Instantation exception : " + ex,
+							ex);					
+				}
+			}
+			catch (Exception ex) {
+				Throwable showException = ex;
+				Throwable t = ex.getCause();
+				if(t != null)
+					showException = t;
+				logger.warn("Error during probe creation of type " + pd.getName() + " with args " + constArgs +
+						": ", showException);
+			}
+		}
+		return retValue;
+	}
+
+
+
 
 	private Class<?> resolvClass(String name, List<String> listPackages) {
-		Class retValue = null;
+		Class<?> retValue = null;
 		for (String packageTry: listPackages) {
 			try {
 				retValue = Class.forName(packageTry + name);

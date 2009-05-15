@@ -36,30 +36,7 @@ public class GetMoke {
 	}
 	
 	static public Probe getProbe() {
-		Probe p = new Probe() {
-			@Override
-			public Map getNewSampleValues() {
-				return new HashMap();
-			}
-			@Override
-			public String getSourceType() {
-				return "MokeSourceType";
-			}
-			/* (non-Javadoc)
-			 * @see jrds.Probe#getName()
-			 */
-			@Override
-			public String getName() {
-				return "MokeProbe";
-			}
-			/* (non-Javadoc)
-			 * @see jrds.Probe#getLastUpdate()
-			 */
-			@Override
-			public Date getLastUpdate() {
-				return new Date();
-			}
-		};
+		Probe p = new MokeProbe();
 		p.setHost(getHost());
 		p.setPd(getPd());
 		return p;

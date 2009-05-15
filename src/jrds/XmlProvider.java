@@ -42,6 +42,14 @@ public class XmlProvider extends Starter {
 	public XmlProvider(RdsHost monitoredHost) {
 		super();
 		hostname = monitoredHost.getName();
+		if(logger.isTraceEnabled()) {
+			logger.trace( this + " " + getClass().getName() + '@' + Integer.toHexString(hashCode()));
+			StringBuilder s = new StringBuilder();
+			for(StackTraceElement e: Thread.currentThread().getStackTrace()) {
+				s.append(e.toString() + "\n");
+			}
+			logger.trace(s);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -67,7 +75,8 @@ public class XmlProvider extends Starter {
 			logger.fatal("No Document builder available");
 			return false;
 		}
-		return true;
+		logger.trace("starting XmlProvider " + getClass().getName() + '@' + Integer.toHexString(hashCode()) + " " + xpather + " "+ dbuilder);
+		return dbuilder != null && xpather != null;
 	}
 
 	/* (non-Javadoc)
@@ -77,6 +86,7 @@ public class XmlProvider extends Starter {
 	public void stop() {
 		xpather = null;
 		dbuilder = null;
+		logger.trace("stopping XmlProvider " + getClass().getName() + '@' + Integer.toHexString(hashCode()));
 	}
 
 	public long findUptime(Document d, String upTimePath) {
@@ -125,6 +135,7 @@ public class XmlProvider extends Starter {
 
 	public Document getDocument(InputSource stream) {
 		Document d = null;
+		logger.trace("" + stream + " " + dbuilder + " " + this.isStarted() + " " + getClass().getName() + '@' + Integer.toHexString(hashCode()));
 		try {
 			dbuilder.reset();
 			d = dbuilder.parse(stream);

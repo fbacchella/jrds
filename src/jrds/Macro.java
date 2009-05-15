@@ -8,9 +8,10 @@ import java.util.Set;
 import jrds.probe.IndexedProbe;
 
 public class Macro {
-	private Set<Object[]> probeList = new HashSet<Object[]>();
+	private final Set<Object[]> probeList = new HashSet<Object[]>();
 	private final Set<String> tags = new HashSet<String>();
-	ProbeFactory pf;
+	private ProbeFactory pf;
+	private String name;
 
 	public Macro(ProbeFactory pf) {
 		super();
@@ -58,5 +59,19 @@ public class Macro {
 		}
 		ret.setCharAt(ret.length()-1, ']');
 		return "Macro"+ ret  ;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
 	}
 }

@@ -69,7 +69,8 @@ public class HostConfigParser  extends DirXmlParser {
 		Rule cleanStack = new Rule() {
 			public void begin(String namespace, String name, Attributes attributes) throws Exception {
 				String hostName = attributes.getValue("name");
-				RdsHost host = new RdsHost(hostName);
+				String dnsName = attributes.getValue("dnsname");
+				RdsHost host = new RdsHost(hostName, dnsName);
 				HostsList.getRootGroup().addHost(host);
 				digester.push(host);
 			}

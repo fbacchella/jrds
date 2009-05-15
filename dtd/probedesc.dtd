@@ -5,12 +5,13 @@
 >
 <!ELEMENT specific (#PCDATA)>
 <!ELEMENT ds (dsName, dsType?, (oid | collect)?, minValue?, maxValue?)>
-<!ELEMENT defaultargs (arg+) >
+<!ELEMENT defaultargs (arg | list)+ >
 <!ELEMENT arg EMPTY>
 <!ATTLIST arg
 			type CDATA #REQUIRED
 			value CDATA #REQUIRED
 >
+<!ELEMENT list (arg | list)+ >
 <!ELEMENT graphs (name*)>
 <!ELEMENT dsName (#PCDATA)>
 <!ELEMENT dsType (#PCDATA)>

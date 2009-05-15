@@ -11,7 +11,7 @@ public class StartersSet {
 	private StartersSet up = null;
 	private Object level = null;
 
-	StartersSet(Object level) {
+	public StartersSet(Object level) {
 		this.level = level;
 	}
 	

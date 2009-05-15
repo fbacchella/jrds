@@ -63,6 +63,7 @@ public class Sum extends GraphNode {
 				HostsList hl = HostsList.getRootGroup();
 				for(String name : p.getProbeList()) {
 					GraphNode g = hl.getGraphById(name.hashCode());
+					logger.trace("Looking for " + name + " in graph base, and found " + g);
 					if(g != null) {
 						tempgd = g.getGraphDesc();
 						fd = g.getProbe().fetchData(getStart(), getEnd());
@@ -99,6 +100,12 @@ public class Sum extends GraphNode {
 						ownValues.put(dsNames[i], pl);
 					}
 					tempGraphDef = tempgd.getGraphDef(p, ownValues);
+				}
+				else {
+					logger.error("no data found for " + this);
+				}
+				if(tempGraphDef == null) {
+					logger.error("pseudo graph definition not generated for " + this);
 				}
 				return tempGraphDef;
 			}

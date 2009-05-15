@@ -18,6 +18,7 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 	static private final Logger logger = Logger.getLogger(RdsHost.class);
 
 	private String name = null;
+	private String dnsName = null;
 	private final Set<Probe> allProbes = new TreeSet<Probe>();
 	private Set<String> tags = null;
 	private final StartersSet starters = new StartersSet(this);
@@ -26,6 +27,15 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 	{
 		name = newName;
 		Starter resolver = new Starter.Resolver(name);
+		resolver.register(this);
+		starters.setParent(HostsList.getRootGroup().getStarters());
+	}
+
+	public RdsHost(String name, String dnsName)
+	{
+		this.name = name;
+		this.dnsName = dnsName;
+		Starter resolver = new Starter.Resolver(getDnsName());
 		resolver.register(this);
 		starters.setParent(HostsList.getRootGroup().getStarters());
 	}
@@ -40,7 +50,7 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 	public void setName(String name)
 	{
 		this.name = name;
-		Starter resolver = new Starter.Resolver(name);
+		Starter resolver = new Starter.Resolver(getDnsName());
 		resolver.register(this);
 	}
 
@@ -139,5 +149,22 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 
 	public boolean isCollectRunning() {
 		return HostsList.getRootGroup().isCollectRunning();
+	}
+
+	/**
+	 * @return the dnsName
+	 */
+	public String getDnsName() {
+		if(dnsName != null)
+			return dnsName;
+		else
+			return name;
+	}
+
+	/**
+	 * @param dnsName the dnsName to set
+	 */
+	public void setDnsName(String dnsName) {
+		this.dnsName = dnsName;
 	}
 }

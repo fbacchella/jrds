@@ -1,8 +1,18 @@
-function calClose(cal)
+function calCloseBegin(cal)
+{
+	cal.hide();
+	document.dateForm.scale.selectedIndex = 0;
+	if(document.dateForm.end.value == "") {
+	    document.dateForm.end.value = document.dateForm.begin.value;
+	}
+}
+
+function calCloseEnd(cal)
 {
 	document.dateForm.scale.selectedIndex = 0;
 	cal.hide();
 }
+
 
 function submitScale(scale)
 {
@@ -14,9 +24,9 @@ function submitScale(scale)
 	}
 }
 
-function startCal(ifF, trigger)
+function startCal(ifF, trigger, close)
 {
-	Calendar.setup( { inputField : ifF, button : trigger, onClose : calClose });
+	Calendar.setup( { inputField : ifF, button : trigger, displayArea: ifF, onClose : close });	
 }
 //the query string analyzer
 qs = new Querystring();
@@ -33,6 +43,12 @@ function sort_onClick()
 	if(location.search.length <1)
 	    separator="?"
 	window.location.replace( url + separator + "sort=1" );
+}
+
+function autoscale_onClick() {
+	document.dateForm.max.value = ""; 
+	document.dateForm.min.value = ""; 
+ 
 }
 
 function download_onClick(url)

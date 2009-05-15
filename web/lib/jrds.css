@@ -1,13 +1,117 @@
-A:visited { color: rgb(0, 0, 238); }
-.tree {float: left; height:100%; 
-width: 300px; background-color:  #DDD; 
-margin: 5px;
-border: 1px solid black;
-padding: 5px;
-overflow: scroll;
+/* Define Polices */
+body,input,option,select,tab,div,td,a,textarea,.link a {font-family:'Bitstream Vera Sans', arial, Tahoma, 'Sans serif';}
+
+/* Defined Polices font and color*/
+body,input,option,select,tab,div,td,a,textarea {
+	color: black;
+	font-size:11px;
+	margin:0;
+	padding:0;
 }
-#graphs {padding-left: 325px}
-.graphblock { position: relative; width: 700px} 
+
+/* Set Basic objects properties */
+a 		{text-decoration:none;}
+a:hover {text-decoration:underline;}
+A:visited { color: rgb(0, 0, 238); }
+
+body {
+	background-color:#FFF;
+}
+
+#treeframe {
+	float: left;
+	background-color: #DDD; 
+	margin: 5px;
+	border: 1px solid black;
+	padding: 5px;
+	width: 330px;
+}
+#toroot {
+}
+#graphframe {
+	background-color: #FFF;
+	padding-left: 350px; 
+	width:710px;
+}
+#form {
+	padding: 5px;
+	padding-bottom: 15px;
+}
+#dateForm .calendar {
+//	display: block;
+//	float: left;
+	display:inline;
+}
+
+#dateForm input {
+//    display: block;
+//    width: 175px;
+//    float: left;
+//    margin-bottom: 10px;
+	margin:5px;
+}
+#dateForm .hiddeninput {
+	display: none;
+}
+.formblock label {
+//    display: block;
+//    text-align: right;
+//    float: left;
+//    width: 75px;
+	padding-left:10px;
+}
+#dateForm select {
+//    display: block;
+//    text-align: right;
+//    float: left;
+//    width: 75px;
+    padding-right: 20px;
+}
+
+#dateForm br {
+    clear: left;
+}
+
+.formblock {
+	margin:5px;
+	background-color:#F5F5F5;
+	border:1px solid #AAAAAA;
+}
+
+.formblock label, .formblock select, .formblock input, .formblock img {
+	vertical-align: middle;
+}
+
+.linelabel {
+	padding-left: 5px;
+}
+#submit {
+	width: 0px;
+	margin-left: auto;
+	margin-right: auto;
+	background-color:white;
+	border:medium none;
+}
+
+#dateForm .buttonSubmit {
+ 	width: 75px;
+ 	margin-left: 95px;
+}
+
+#graphs {
+	text-align: center;
+}
+.graphblock {
+	position: relative;
+} 
+.graph {
+}
 .iconslist {position: absolute; top:0px; right:0px; width: 16px  }
-#hostSelect {float: right}
+#hostSelect { }
 .icon {cursor: pointer}
+.scale {display:block }
+.firstscale {  }
+.secondscale {  }
+#timescale { }
+#treenotice {
+}

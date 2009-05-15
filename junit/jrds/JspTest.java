@@ -60,7 +60,7 @@ public class JspTest extends JrdsTester {
 		logger.debug(runner.JASPER_DESCRIPTOR.getClassName());
 		runner.newClient().newInvocation("http://localhost/web/index.jsp");*/
 		//
-		runner.getResponse("http://localhost/index.jsp");
+		runner.getResponse("http://localhost/jrds/index.jsp");
 	}
 
 	@BeforeClass static public void configure() {

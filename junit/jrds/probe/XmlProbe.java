@@ -1,19 +1,17 @@
 package jrds.probe;
 
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
+import jrds.JrdsTester;
 import jrds.ProbeDesc;
+import jrds.factories.ProbeDescBuilder;
+import jrds.factories.xml.JrdsNode;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
@@ -23,10 +21,9 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.rrd4j.DsType;
-import org.xml.sax.SAXException;
+import org.xml.sax.InputSource;
 
-public class XmlProbe extends jrds.probe.HttpXml {
+public class XmlProbe {
 	static final Appender app = new WriterAppender() {
 		public void doAppend(LoggingEvent event) {
 			System.out.println(event.getLevel() + ": " + event.getMessage());
@@ -34,66 +31,66 @@ public class XmlProbe extends jrds.probe.HttpXml {
 	};
 	static Logger logger = null;
 	XPath xpath = XPathFactory.newInstance().newXPath();
+	static ProbeDesc pd;
 
 
-	@BeforeClass static public void configure() {
-		System.getProperties().setProperty("java.awt.headless","true");
-		jrds.JrdsLoggerConfiguration.initLog4J();
-		app.setName(jrds.JrdsLoggerConfiguration.APPENDER);
-		jrds.JrdsLoggerConfiguration.putAppender(app);
+	@BeforeClass static public void configure() throws Exception {
+		JrdsTester.configure();
+
 		Logger.getRootLogger().setLevel(Level.INFO);
 		Logger.getLogger(jrds.JrdsLoggerConfiguration.APPENDER).setLevel(Level.INFO);
 		Logger.getLogger("org.apache.commons.digester.Digester").setLevel(Level.INFO);
 		Logger.getLogger("jrds.probe.HttpXml").setLevel(Level.TRACE);
 		logger = Logger.getLogger(XmlProbe.class);
 		logger.setLevel(Level.TRACE);
+
+		JrdsTester.prepareXml();
+
+		ProbeDescBuilder builder = new ProbeDescBuilder();
+		pd = builder.makeProbeDesc(new JrdsNode(JrdsTester.parseRessource("httpxmlprobedesc.xml")));
 	}
 
-	@Test public void findUptime() throws ParserConfigurationException, SAXException, IOException {
-		ProbeDesc pd = new ProbeDesc();
-		HttpXml p  = new jrds.probe.HttpXml() {
+	@Test public void findUptime() throws Exception {
+		HttpXml p  = new  HttpXml() {
 			@Override
 			public String getName() {
 				return "Moke";
 			}
 		};
 		p.setPd(pd);
-		DocumentBuilder dbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		double l;
 		Reader uptimeXml;
 
 		uptimeXml = new StringReader("<?xml version=\"1.0\" ?><element />");
-		//l = p.findUptime(dbuilder.parse(new InputSource(uptimeXml)), xpath);
-		//Assert.assertEquals(0, l, 0.0001);
+		l = p.findUptime(JrdsTester.dbuilder.parse(new InputSource(uptimeXml)));
+		Assert.assertEquals(0, l, 0.0001);
 
-		pd.addSpecific("upTimePath", "/element/@uptime");
 		uptimeXml = new StringReader("<?xml version=\"1.0\" ?><element uptime=\"1.125\" />");
-		//l = p.findUptime(dbuilder.parse(new InputSource(uptimeXml)), xpath);
-		//Assert.assertEquals(1.125, l, 0.0001);
+		l = p.findUptime(JrdsTester.dbuilder.parse(new InputSource(uptimeXml)));
+		Assert.assertEquals(1.125, l, 0.0001);
 
 		uptimeXml = new StringReader("<?xml version=\"1.0\" ?><element />");
-		//l = p.findUptime(dbuilder.parse(new InputSource(uptimeXml)), xpath);
-		//Assert.assertEquals(0, l, 0.0001);
+		l = p.findUptime(JrdsTester.dbuilder.parse(new InputSource(uptimeXml)));
+		Assert.assertEquals(0, l, 0.0001);
 
-		
+
 		pd.addSpecific("upTimePath", "A/element/@uptime");
 		uptimeXml = new StringReader("<?xml version=\"1.0\" ?><element />");
-		//l = p.findUptime(dbuilder.parse(new InputSource(uptimeXml)), xpath);
-		//Assert.assertEquals(0, l, 0.0001);
+		l = p.findUptime(JrdsTester.dbuilder.parse(new InputSource(uptimeXml)));
+		Assert.assertEquals(0, l, 0.0001);
 	}
-	
-	@Test public void parseXml() throws ParserConfigurationException, SAXException, IOException {
-		String ressource = "/" + this.getClass().getPackage().getName().replace(".", "/") + "/xmldata.xml";
-		URL url = this.getClass().getResource(ressource);
-		logger.trace(ressource + " " +url);
+
+	@Test public void parseXml() throws Exception {
+		URL url = this.getClass().getResource("/ressources/xmldata.xml");
+		logger.trace("/ressources/xmldata.xml" + " " +url);
 		HttpXml p  = new jrds.probe.HttpXml(url) {
 			@Override
 			public String getName() {
 				return "Moke";
 			}
 		};
-		ProbeDesc pd = new ProbeDesc();
-		Map<String, Object> dsMap = new HashMap<String, Object>();
+
+		/*Map<String, Object> dsMap = new HashMap<String, Object>();
 		dsMap.put("dsName", "a");
 		dsMap.put("dsType", DsType.COUNTER);
 		dsMap.put("collectKey", "/jrdsstats/stat[@key='a']/@value");
@@ -105,7 +102,7 @@ public class XmlProbe extends jrds.probe.HttpXml {
 		dsMap = new HashMap<String, Object>();
 		dsMap.put("dsName", "c");
 		dsMap.put("dsType", DsType.COUNTER);
-		pd.add(dsMap);
+		pd.add(dsMap);*/
 		p.setPd(pd);
 		Map<?, ?> vars = p.getNewSampleValues();
 		Assert.assertEquals(new Double(1.0), vars.get("/jrdsstats/stat[@key='a']/@value"));

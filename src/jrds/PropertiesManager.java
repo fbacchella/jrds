@@ -1,12 +1,15 @@
 package jrds;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -119,6 +122,39 @@ public class PropertiesManager extends Properties {
 			logger.warn("Invalid properties stream " + propStream + ": " + ex);
 		}
 	}
+	
+	private ClassLoader doClassLoader() {
+		 FileFilter filter = new  FileFilter(){
+			public boolean accept(File file) {
+				return  (! file.isHidden()) && file.isFile() && file.getName().endsWith(".jar");
+			}
+		};
+
+		Collection<URL> urls = new HashSet<URL>();
+
+		if(extensiondir != null) {
+			logger.debug("Setting class directories to: " + extensiondir);
+
+			File path = new File(extensiondir);
+
+			if(path.isDirectory()) {
+				for(File f: path.listFiles(filter)) {
+					try {
+						urls.add(f.toURL());
+					} catch (MalformedURLException e) {
+					}
+				}
+			}
+		}
+
+		for(URL u: libspath) {
+			urls.add(u);
+		}
+
+		URL[] arrayUrl = new URL[urls.size()];
+		urls.toArray(arrayUrl);
+		return  URLClassLoader.newInstance(arrayUrl, this.getClass().getClassLoader());
+	}
 
 	public void update()
 	{
@@ -173,6 +209,7 @@ public class PropertiesManager extends Properties {
 		logfile = getProperty("logfile", "");
 		timeout = parseInteger(getProperty("timeout", "30"));
 		rrdbackend = getProperty("rrdbackend", "NIO");
+		extensionClassLoader = doClassLoader();
 		Locale.setDefault(new Locale("POSIX"));
 	}
 
@@ -192,5 +229,7 @@ public class PropertiesManager extends Properties {
 	public String tmpdir;
 	public int timeout;
 	public String rrdbackend;
+	public String extensiondir;
+	public ClassLoader extensionClassLoader;
 
 }

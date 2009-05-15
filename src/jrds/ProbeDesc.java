@@ -8,7 +8,6 @@ package jrds;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,13 +16,10 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
-//import jrds.snmp.SnmpRequester;
 
 import org.apache.log4j.Logger;
 import org.apache.xml.serialize.OutputFormat;
@@ -316,59 +312,6 @@ public class ProbeDesc {
 	public void setUniqIndex(boolean uniqIndex) {
 		this.uniqIndex = uniqIndex;
 	}
-
-	/**
-	 * Instanciate a probe for this probe description
-	 * @param constArgs
-	 * @return
-	 */
-	public Probe makeProbe(List constArgs, Properties prop) {
-		Probe retValue = null;
-		if (probeClass != null) {
-			Object o = null;
-			try {
-				if(defaultsArgs != null && constArgs != null && constArgs.size() <= 0)
-					constArgs = defaultsArgs;
-				Class<?>[] constArgsType = new Class[constArgs.size()];
-				Object[] constArgsVal = new Object[constArgs.size()];
-				int index = 0;
-				for (Object arg: constArgs) {
-					constArgsType[index] = arg.getClass();
-					constArgsVal[index] = arg;
-					index++;
-				}
-				Constructor<? extends Probe> theConst = probeClass.getConstructor(constArgsType);
-				o = theConst.newInstance(constArgsVal);
-				retValue = (Probe) o;
-				retValue.setPd(this);
-			}
-			catch (ClassCastException ex) {
-				logger.warn("didn't get a Probe but a " + o.getClass().getName());
-			}
-			catch (NoClassDefFoundError ex) {
-				logger.warn("Missing class for the creation of a probe " + ex);
-			}
-			catch(InstantiationException ex) {
-				if(ex.getCause() != null)
-					logger.warn("Instantation exception : " + ex.getCause().getMessage(),
-							ex.getCause());
-				else {
-					logger.warn("Instantation exception : " + ex,
-							ex);					
-				}
-			}
-			catch (Exception ex) {
-				Throwable showException = ex;
-				Throwable t = ex.getCause();
-				if(t != null)
-					showException = t;
-				logger.warn("Error during probe creation of type " + getName() + " with args " + constArgs +
-						": ", showException);
-			}
-		}
-		return retValue;
-	}
-
 
 	public Class<? extends Probe> getProbeClass() {
 		return probeClass;

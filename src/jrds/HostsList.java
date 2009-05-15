@@ -8,6 +8,7 @@ package jrds;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,6 +28,11 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import javax.xml.parsers.ParserConfigurationException;
+
+import jrds.factories.ConfigObjectFactory;
+import jrds.factories.Loader;
+import jrds.factories.xml.JrdsNode;
 import jrds.probe.ContainerProbe;
 import jrds.probe.SumProbe;
 import jrds.probe.VirtualProbe;
@@ -52,8 +58,8 @@ public class HostsList implements StarterNode {
 
 	public static final String HOSTROOT = "Sorted by host";
 	public static final String VIEWROOT = "Sorted by view";
-	public static final String SUMROOT = "All sums";
-	public static final String CUSTOMROOT = "All customs graph";
+	public static final String SUMROOT = "Sums";
+	public static final String CUSTOMROOT = "Dashboard";
 
 	private StartersSet starters = null;
 	private RdsHost sumhost =  null;
@@ -110,7 +116,76 @@ public class HostsList implements StarterNode {
 		return instance;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void configure(PropertiesManager pm) {
+		started = false;
+		try {
+			jrds.JrdsLoggerConfiguration.configure(pm);
+		} catch (IOException e1) {
+			logger.error("Unable to set log file to " + pm.logfile);
+		}
+
+		numCollectors = pm.collectorThreads;
+		resolution = pm.resolution;
+		rrdDir = pm.rrddir;
+		tmpdir = pm.tmpdir;
+		started = true;
+
+		Loader l;
+		try {
+			l = new Loader();
+			l.importUrl(l.getClass().getResource("/graph"));
+			l.importUrl(new URL("file:" + pm.configdir));
+		} catch (ParserConfigurationException e) {
+			throw new RuntimeException("Loader initialisation error",e);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException("Loader initialisation error",e);
+		}
+
+		logger.debug("Scanning " + pm.libspath + " for probes libraries");
+		for(URL lib: pm.libspath) {
+			logger.info("Adding lib " + lib);
+			l.importUrl(lib);
+		}
+
+		logger.debug("Starting parsing descriptions");
+		ConfigObjectFactory conf = new ConfigObjectFactory(pm, l);
+		Map<String, GraphDesc> graphDescMap = (Map<String, GraphDesc>)conf.getObjectMap(Loader.ConfigType.GRAPHDESC);
+		logger.debug("All graphdesc:" + graphDescMap);
+		conf.setGraphFactory(graphDescMap);
+
+		Map<String, ProbeDesc> probeDescMap = (Map<String, ProbeDesc>)conf.getObjectMap(Loader.ConfigType.PROBEDESC);
+		logger.debug("All probedesc:" + probeDescMap);
+		conf.setProbeFactory(probeDescMap);
+
+		Map<String, Macro> m = (Map<String, Macro>) conf.getObjectMap(Loader.ConfigType.MACRODEF);
+		conf.setMacroMap(m);
+		logger.debug("All macro:" + m);
+		Map<String, RdsHost> hosts = (Map<String, RdsHost>) conf.getObjectMap(Loader.ConfigType.HOSTS);
+		for(RdsHost h: hosts.values()) {
+			addHost(h);
+			for(Probe p: h.getProbes()) {
+				addProbe(p);
+			}				
+		}
+		
+		Map <String, Filter> f = (Map <String, Filter>)conf.getObjectMap(Loader.ConfigType.FILTER);
+		logger.debug("All filters:" + f);
+		//getObjectMap return the wrong type of map
+		for(Filter filter: f.values()) {
+			addFilter(filter);
+		}
+		logger.debug("Parsing sum configuration");
+		Map<String, SumProbe> sums = (Map<String, SumProbe>)conf.getObjectMap(Loader.ConfigType.SUM);
+		for(SumProbe s: sums.values()) {
+			addSum(s);
+		}
+
+		started = true;
+
+	}
+
+	/*	public void configure(PropertiesManager pm) {
 		started = false;
 		try {
 			jrds.JrdsLoggerConfiguration.configure(pm);
@@ -177,7 +252,7 @@ public class HostsList implements StarterNode {
 			}
 		}
 
-		HostConfigParser hp = new HostConfigParser(pf,af/*, df.digester */);
+		HostConfigParser hp = new HostConfigParser(pf,af);
 
 		if(pm.configdir != null) {
 			try {
@@ -192,12 +267,12 @@ public class HostsList implements StarterNode {
 		}
 		started = true;
 	}
+	 */
 
 	public Collection<RdsHost> getHosts() {
 		return hostList;
 
 	}
-
 	public static void purge() {
 		instance.started = false;
 		StoreOpener.reset();

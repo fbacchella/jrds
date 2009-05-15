@@ -12,7 +12,7 @@ public abstract class Filter {
 		}
 		@Override
 		public String getName() {
-			return HostsList.SUMROOT;
+			return "All sums";
 		}
 	};
 	static final public Filter CUSTOM = new Filter() {
@@ -22,7 +22,7 @@ public abstract class Filter {
 		}
 		@Override
 		public String getName() {
-			return HostsList.CUSTOMROOT;
+			return "All customs graph";
 		}
 	};
 	static final public Filter EVERYTHING = new Filter() {
@@ -38,11 +38,11 @@ public abstract class Filter {
 	static final public Filter ALLHOSTS = new Filter() {
 		@Override
 		public boolean acceptGraph(GraphNode graph, String path) {
-			return path.startsWith("/" + HostsList.HOSTROOT + "/");
+			return path.startsWith("/" + getName() + "/");
 		}
 		@Override
 		public String getName() {
-			return HostsList.HOSTROOT;
+			return "All hosts";
 		}
 	};
 	static final public Filter ALLVIEWS = new Filter() {
@@ -52,14 +52,13 @@ public abstract class Filter {
 		}
 		@Override
 		public String getName() {
-			return HostsList.VIEWROOT;
+			return "All views";
 		}
 	};
 	static final public Filter ALLSERVICES = new Filter() {
-		static final private String ROOTNAME = "/" + HostsList.VIEWROOT + "/Services";
 		@Override
 		public boolean acceptGraph(GraphNode graph, String path) {
-			return path.startsWith(ROOTNAME);
+			return path.startsWith("/" + HostsList.VIEWROOT + "/Services");
 		}
 		@Override
 		public String getName() {
@@ -67,7 +66,7 @@ public abstract class Filter {
 		}
 		@Override
 		public GraphTree setRoot(GraphTree gt) {
-			return gt.getByPath(ROOTNAME);
+			return gt.getByPath("/" + HostsList.VIEWROOT + "/Services");
 		}
 		
 	};

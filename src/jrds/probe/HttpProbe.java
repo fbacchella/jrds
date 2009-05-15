@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +59,26 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 		this.file = file;
 	}
 
+/*	public HttpProbe(List<Object> l) {
+		List<Object> defaultArgs = getPd().getDefaultArgs();
+		int i=0;
+		for(Object defArg: defaultArgs ) {
+			if(defArg != null && l.get(i) ==)
+		}
+		Object portObject = l.get(0);
+		if(portObject != null && portObject instanceof Integer) {
+			port = (Integer) portObject;
+		}
+		Object fileObject = l.get(1);
+		if(fileObject != null && fileObject instanceof String) {
+			file = (String) portObject;
+		}
+		StringBuilder urlString = new StringBuilder();
+		
+		Formatter f = new Formatter(urlString);
+		f.format(format, args)
+	}
+*/
 	public HttpProbe() {
 		super();
 	}

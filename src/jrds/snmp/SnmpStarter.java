@@ -31,7 +31,7 @@ public class SnmpStarter extends Starter {
 	static final private OID sysUpTimeInstance = new OID(".1.3.6.1.2.1.1.3.0");
 
 	static private Snmp snmp = null;
-	static final Starter full = new Starter() {
+	static public final Starter full = new Starter() {
 		public boolean start() {
 			boolean started = false;
 			try {
@@ -209,6 +209,8 @@ public class SnmpStarter extends Starter {
 	}
 
 	public Target getTarget() {
+		if(snmpTarget == null)
+			snmpTarget = makeTarget();
 		return snmpTarget;
 	}
 
