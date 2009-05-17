@@ -4,8 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.commons.digester.Digester;
-import org.apache.commons.digester.Rule;
 import org.apache.log4j.Logger;
 
 /**
@@ -77,19 +75,5 @@ public class FilterXml extends Filter {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public static void addToDigester(Digester digester) {
-		digester.addObjectCreate("filter", jrds.FilterXml.class);
-		digester.addCallMethod("filter/name", "setName", 0);
-		digester.addCallMethod("filter/path", "addPath", 0);
-		digester.addCallMethod("filter/tag", "addTag", 0);
-		digester.addRule("filter", new Rule() {
-			public void end(String namespace, String name) throws Exception {
-				Filter v = (Filter ) digester.peek();
-				logger.trace("Adding filter:" + v.getName());
-				HostsList.getRootGroup().addFilter(v);
-			}
-		});
 	}
 }

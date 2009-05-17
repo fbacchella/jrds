@@ -2,7 +2,6 @@ package jrds.factories;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import jrds.Probe;
@@ -88,15 +87,11 @@ public class ProbeDescBuilder extends ObjectBuilder {
 		}
 
 		//Populating default argument vector
-		//for(JrdsNode argsNode: n.iterate(CompiledXPath.get("/probedesc/defaultargs/*"))) {
-		//	Map<String, String> m = argsNode.attrMap();
-		//	Object o = makeArg(m.get("type"), m.get("value"));
-		//	pd.addDefaultArg(o);
-		//}
 		JrdsNode argsNode = n.getChild(CompiledXPath.get("/probedesc/defaultargs"));
-		for(Object o:  makeArgs(argsNode)) {
-			pd.addDefaultArg(o);
-		}
+		if(argsNode != null)
+			for(Object o:  makeArgs(argsNode)) {
+				pd.addDefaultArg(o);
+			}
 
 		for(JrdsNode dsNode: n.iterate(CompiledXPath.get("/probedesc/ds"))) {
 			Map<String, Object> dsMap = new HashMap<String, Object>(4);

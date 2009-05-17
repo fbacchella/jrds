@@ -9,6 +9,7 @@ package jrds.webapp;
 import java.io.IOException;
 import java.net.URL;
 
+import javax.media.jai.JAI;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -16,10 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
-import org.apache.commons.digester.Digester;
 import org.apache.log4j.Logger;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
-import javax.media.jai.JAI;
 
 
 /**
@@ -47,7 +46,6 @@ public final class WhichLibs extends HttpServlet {
 				out.println("no xml transformer factory ");
 				out.println("System's property " + System.getProperties().getProperty("javax.xml.transform.TransformerFactory"));
 			}
-			out.println(resolv("Digester", Digester.class));
 			out.println(resolv("SNMP4J", DefaultUdpTransportMapping.class));
 			out.println(resolv("Log4j",logger.getClass()));
 			out.println(resolv("common logging API", org.apache.commons.logging.LogFactory.class));
@@ -71,7 +69,7 @@ public final class WhichLibs extends HttpServlet {
 	}
 	
 
-	private String resolv(String name, Class c) {
+	private String resolv(String name, Class<?> c) {
 		String retValue = "";
 		try {
 			retValue = name + " found in " + locateJar(c);
@@ -81,7 +79,7 @@ public final class WhichLibs extends HttpServlet {
 		return retValue;
 	}
 	
-	private String locateJar(Class c ) {
+	private String locateJar(Class<?> c ) {
 		String retValue="Not found";
 		String cName = c.getName();
 		int lastDot = cName.lastIndexOf('.');

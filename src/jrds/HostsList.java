@@ -6,14 +6,10 @@ _##########################################################################*/
 
 package jrds;
 
-import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,8 +28,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.factories.ConfigObjectFactory;
 import jrds.factories.Loader;
-import jrds.factories.xml.JrdsNode;
-import jrds.probe.ContainerProbe;
 import jrds.probe.SumProbe;
 import jrds.probe.VirtualProbe;
 
