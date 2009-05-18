@@ -1,6 +1,6 @@
 /*##########################################################################
  _##
- _##  $Id$
+ _##  $Id: ApacheStatus.java 475 2009-05-15 20:04:03Z fbacchella $
  _##
  _##########################################################################*/
 
@@ -22,21 +22,45 @@ import org.apache.log4j.Logger;
 /**
  * A class to probe the apache status from the /server-status URL
  * @author Fabrice Bacchella 
- * @version $Revision$,  $Date$
+ * @version $Revision: 475 $,  $Date: 2009-05-15 22:04:03 +0200 (Fri, 15 May 2009) $
  */
-public class ApacheStatus extends HttpProbe implements IndexedProbe {
-	static final private Logger logger = Logger.getLogger(ApacheStatus.class);
+public class ApacheStatusDetails extends HttpProbe implements IndexedProbe {
+	
+	static private final Map<Character, WorkerStat> map = new HashMap<Character, WorkerStat>();
+	//"_" Waiting for Connection, "S" Starting up, "R" Reading Request,
+	//"W" Sending Reply, "K" Keepalive (read), "D" DNS Lookup,
+	//"C" Closing connection, "L" Logging, "G" Gracefully finishing,
+	//"I" Idle cleanup of worker, "." Open slot with no current process
+	private enum WorkerStat {
+		WAITING('_'),
+		STARTING('S'),
+		READING('R'),
+		SENDING('W'),
+		KEEPALIVE('K'),
+		DNS('D'),
+		CLOSING('C'),
+		LOGGING('L'),
+		GRACEFULLY('G'),
+		IDLE('I'),
+		OPEN('.');
+		
+		WorkerStat(char key) {
+			map.put(key, this);
+		}
+	}
+	
+	static final private Logger logger = Logger.getLogger(ApacheStatusDetails.class);
 
 	/**
 	 * @param monitoredHost
 	 * @param newurl
 	 * @throws MalformedURLException
 	 */
-	public ApacheStatus(URL newurl) throws MalformedURLException {
+	public ApacheStatusDetails(URL newurl) throws MalformedURLException {
 		super(newurl);
 	}
 
-	public ApacheStatus(Integer port) throws MalformedURLException {
+	public ApacheStatusDetails(Integer port) throws MalformedURLException {
 		super(new URL("http", EMPTYHOST, port, "/server-status?auto"));
 	}
 
@@ -89,6 +113,10 @@ public class ApacheStatus extends HttpProbe implements IndexedProbe {
 		for(String l: lines) {
 			String[] kvp = l.split(": ");
 			try {
+				if("Scoreboard".equals(kvp[0].trim())) {
+					parseScoreboard(kvp[1].trim(), retValue);
+				}
+				else
 				retValue.put(kvp[0], Double.valueOf(kvp[1]));
 			}
 			catch (java.lang.NumberFormatException ex) {};
@@ -97,5 +125,17 @@ public class ApacheStatus extends HttpProbe implements IndexedProbe {
 		if(uptimeNumber != null)
 			setUptime(uptimeNumber.longValue());
 		return retValue;
+	}
+	
+	void parseScoreboard(String scoreboard, Map<String, Number> retValue) {
+		int workers[] = new int[WorkerStat.values().length];
+		for(char c: scoreboard.toCharArray()) {
+			WorkerStat worker = map.get(c);
+			workers[worker.ordinal()]++;
+		}
+		for(WorkerStat worker: WorkerStat.values()) {
+			retValue.put(worker.toString(), workers[worker.ordinal()]);
+		}
+		
 	}
 }
