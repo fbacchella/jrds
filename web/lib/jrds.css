@@ -10,9 +10,8 @@ body,input,option,select,tab,div,td,a,textarea {
 }
 
 /* Set Basic objects properties */
-a 		{text-decoration:none;}
+a, a:visited		{text-decoration:none; color: black;}
 a:hover {text-decoration:underline;}
-A:visited { color: rgb(0, 0, 238); }
 
 body {
 	background-color:#FFF;
