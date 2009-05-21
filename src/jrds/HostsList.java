@@ -6,8 +6,8 @@ _##########################################################################*/
 
 package jrds;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Date;
@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.factories.ConfigObjectFactory;
 import jrds.factories.Loader;
+import jrds.probe.ContainerProbe;
 import jrds.probe.SumProbe;
 import jrds.probe.VirtualProbe;
 
@@ -110,7 +111,6 @@ public class HostsList implements StarterNode {
 		return instance;
 	}
 
-	@SuppressWarnings("unchecked")
 	public void configure(PropertiesManager pm) {
 		started = false;
 		try {
@@ -128,11 +128,10 @@ public class HostsList implements StarterNode {
 		Loader l;
 		try {
 			l = new Loader();
-			l.importUrl(l.getClass().getResource("/graph"));
-			l.importUrl(new URL("file:" + pm.configdir));
+			URL graphUrl = getClass().getResource("/graph");
+			if(graphUrl != null)
+			l.importUrl(graphUrl);
 		} catch (ParserConfigurationException e) {
-			throw new RuntimeException("Loader initialisation error",e);
-		} catch (MalformedURLException e) {
 			throw new RuntimeException("Loader initialisation error",e);
 		}
 
@@ -142,20 +141,16 @@ public class HostsList implements StarterNode {
 			l.importUrl(lib);
 		}
 
+		l.importDir(new File(pm.configdir));
+
 		logger.debug("Starting parsing descriptions");
-		ConfigObjectFactory conf = new ConfigObjectFactory(pm, l);
-		Map<String, GraphDesc> graphDescMap = (Map<String, GraphDesc>)conf.getObjectMap(Loader.ConfigType.GRAPHDESC);
-		logger.debug("All graphdesc:" + graphDescMap);
-		conf.setGraphFactory(graphDescMap);
+		ConfigObjectFactory conf = new ConfigObjectFactory(pm, pm.extensionClassLoader);
 
-		Map<String, ProbeDesc> probeDescMap = (Map<String, ProbeDesc>)conf.getObjectMap(Loader.ConfigType.PROBEDESC);
-		logger.debug("All probedesc:" + probeDescMap);
-		conf.setProbeFactory(probeDescMap);
+		conf.setGraphDescMap(l.getRepository(Loader.ConfigType.GRAPHDESC));
+		conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
+		conf.setMacroMap(l.getRepository(Loader.ConfigType.MACRODEF));
 
-		Map<String, Macro> m = (Map<String, Macro>) conf.getObjectMap(Loader.ConfigType.MACRODEF);
-		conf.setMacroMap(m);
-		logger.debug("All macro:" + m);
-		Map<String, RdsHost> hosts = (Map<String, RdsHost>) conf.getObjectMap(Loader.ConfigType.HOSTS);
+		Map<String, RdsHost> hosts = conf.setHostMap(l.getRepository(Loader.ConfigType.HOSTS));
 		for(RdsHost h: hosts.values()) {
 			addHost(h);
 			for(Probe p: h.getProbes()) {
@@ -163,18 +158,27 @@ public class HostsList implements StarterNode {
 			}				
 		}
 		
-		Map <String, Filter> f = (Map <String, Filter>)conf.getObjectMap(Loader.ConfigType.FILTER);
-		logger.debug("All filters:" + f);
-		//getObjectMap return the wrong type of map
+		Map <String, Filter> f = conf.setFilterMap(l.getRepository(Loader.ConfigType.FILTER));
 		for(Filter filter: f.values()) {
 			addFilter(filter);
 		}
-		logger.debug("Parsing sum configuration");
-		Map<String, SumProbe> sums = (Map<String, SumProbe>)conf.getObjectMap(Loader.ConfigType.SUM);
+		
+		Map<String, SumProbe> sums = conf.setSumMap(l.getRepository(Loader.ConfigType.SUM));
 		for(SumProbe s: sums.values()) {
 			addSum(s);
 		}
-
+		
+		logger.debug("Parsing graphs configuration");
+		Map<String, GraphDesc> graphs = conf.setGrapMap(l.getRepository(Loader.ConfigType.GRAPH));
+		if(! graphs.isEmpty()) {
+			ContainerProbe cp = new ContainerProbe(customhost.getName(), null);
+			for(GraphDesc gd: graphs.values()) {
+				logger.trace("Adding graphdesc: " + gd.getGraphTitle());
+				cp.addGraph(gd);
+			}
+			customhost.addProbe(cp);
+			addVirtual(cp, customhost, CUSTOMROOT);
+		}
 		started = true;
 
 	}

@@ -4,7 +4,7 @@
  _##
  _##########################################################################*/
 
-package jrds;
+package jrds.factories;
 
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
@@ -12,6 +12,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jrds.GraphDesc;
+import jrds.GraphNode;
+import jrds.Probe;
 
 import org.apache.log4j.Logger;
 
@@ -73,14 +77,14 @@ public class GraphFactory {
 		//A class was used as a param
 		//We only need to instanciate it
 		else if (legacymode && className instanceof Class) {
-			Class graphClass = (Class) className;
+			Class<?> graphClass = (Class<?>) className;
 			
 			try {
 				if (GraphNode.class.isAssignableFrom(graphClass)) {
-					Class[] probeClassArray = new Class[] {Probe.class};
+					Class<?>[] probeClassArray = new Class[] {Probe.class};
 					Object[] args = new Object[] {probe};
 					
-					Constructor co = graphClass.getConstructor(probeClassArray);
+					Constructor<?> co = graphClass.getConstructor(probeClassArray);
 					retValue = (GraphNode) co.newInstance(args);
 				}
 				else {

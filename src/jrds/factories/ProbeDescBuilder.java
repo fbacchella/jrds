@@ -19,13 +19,22 @@ public class ProbeDescBuilder extends ObjectBuilder {
 	private ClassLoader classLoader = ProbeDescBuilder.class.getClassLoader();
 
 	@Override
-	Object build(JrdsNode n) {
+	Object build(JrdsNode n) throws InvocationTargetException {
 		try {
 			return makeProbeDesc(n);
-		} catch (Exception e) {
-			logger.error("Exception during probe building: ", e);
+		} catch (SecurityException e) {
+			throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
+		} catch (IllegalArgumentException e) {
+			throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
+		} catch (NoSuchMethodException e) {
+			throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
+		} catch (IllegalAccessException e) {
+			throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
+		} catch (InvocationTargetException e) {
+			throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
+		} catch (ClassNotFoundException e) {
+			throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
 		}
-		return null;
 	}
 
 	public ProbeDesc makeProbeDesc(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
@@ -37,7 +46,7 @@ public class ProbeDescBuilder extends ObjectBuilder {
 		logger.trace("Creating probe description " + pd.getName());
 
 		String className = n.evaluate(CompiledXPath.get("/probedesc/probeClass")).trim();
-		Class<Probe> c = (Class<Probe>) classLoader.loadClass(className);
+		Class<? extends Probe> c = (Class<? extends Probe>) classLoader.loadClass(className);
 		pd.setProbeClass(c);
 
 		if(n.checkPath(CompiledXPath.get("/probedesc/uniq")))

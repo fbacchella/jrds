@@ -4,12 +4,16 @@
  _##
  _##########################################################################*/
 
-package jrds;
+package jrds.factories;
+
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+
+import jrds.Probe;
+import jrds.ProbeDesc;
 
 import org.apache.log4j.Logger;
 
@@ -109,6 +113,9 @@ public class ProbeFactory {
 				int index = 0;
 				for (Object arg: constArgs) {
 					constArgsType[index] = arg.getClass();
+					if(arg instanceof List) {
+						constArgsType[index] = List.class;
+					}
 					constArgsVal[index] = arg;
 					index++;
 				}
@@ -132,6 +139,9 @@ public class ProbeFactory {
 							ex);					
 				}
 			}
+			catch (NoSuchMethodException ex) {
+				logger.warn("ProbeDescription invalid " + pd.getName() + ": no constructor " + ex.getMessage() + " found");
+ 			}
 			catch (Exception ex) {
 				Throwable showException = ex;
 				Throwable t = ex.getCause();

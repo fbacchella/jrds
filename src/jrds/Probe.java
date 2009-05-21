@@ -14,6 +14,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -22,6 +23,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.factories.GraphFactory;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
@@ -40,6 +42,8 @@ import org.rrd4j.core.Sample;
 import org.rrd4j.core.Util;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import sun.tools.tree.ThisExpression;
 
 /**
  * A abstract class that needs to be derived for specific probe.<br>
@@ -100,7 +104,7 @@ implements Comparable<Probe>, StarterNode {
 	}
 
 	public void initGraphList(GraphFactory gf) {
-		Collection graphClasses = pd.getGraphClasses();
+		Collection<?> graphClasses = pd.getGraphClasses();
 		if(graphClasses != null) {
 			graphList = new ArrayList<GraphNode>(graphClasses.size());
 			for (Object o:  graphClasses ) {
@@ -155,15 +159,24 @@ implements Comparable<Probe>, StarterNode {
 		String hn = "<empty>";
 		if(getHost() != null)
 			hn = getHost().getName();
-		Object[] arguments = {
+		Map<String, Object> env = new LinkedHashMap<String, Object>();
+		env.put("host", hn);
+		env.put("index", index);
+		env.put("url", url);
+		env.put("port", port);
+		env.put("index.signature", jrds.Util.stringSignature(index));
+		env.put("url.signature", jrds.Util.stringSignature(url));
+
+		/*Object[] arguments = {
 				hn,
 				index,
 				url,
 				port,
 				jrds.Util.stringSignature(index),
 				jrds.Util.stringSignature(url)
-		};
-		return MessageFormat.format(template, arguments) ;
+		};*/
+		Object[] arguments = env.values().toArray();
+		return MessageFormat.format(jrds.Util.evaluateVariables(template, env), arguments) ;
 
 	}
 
@@ -376,7 +389,7 @@ implements Comparable<Probe>, StarterNode {
 	 * the value should be a <code>java.lang.Number<code><br>
 	 * @return the map of values
 	 */
-	public abstract Map getNewSampleValues();
+	public abstract Map<?, ?> getNewSampleValues();
 
 	/**
 	 * A method that might be overriden if specific treatement is needed
@@ -385,10 +398,14 @@ implements Comparable<Probe>, StarterNode {
 	 * @param valuesList
 	 * @return an map of value to be stored
 	 */
-	public Map<?, Number>  filterValues(Map valuesList) {
+	@SuppressWarnings("unchecked")
+	public Map<?, Number>  filterValues(Map<?, ?> valuesList) {
 		return (Map<?, Number>)valuesList;
 	}
 
+	public Map<?, String> getCollectkeys() {
+		return getPd().getCollectkeys();
+	}
 
 	/**
 	 * Store the values on the rrd backend.
@@ -397,10 +414,10 @@ implements Comparable<Probe>, StarterNode {
 	 */
 	protected void updateSample(Sample oneSample) {
 		if(isCollectRunning()) {
-			Map sampleVals = getNewSampleValues();
+			Map<?, ?> sampleVals = getNewSampleValues();
 			if (sampleVals != null) {
 				if(getUptime() * pd.getUptimefactor() >= ProbeDesc.HEARTBEATDEFAULT) {
-					Map<?, String> nameMap = getPd().getCollectkeys();
+					Map<?, String> nameMap = getCollectkeys();
 					Map<?, Number >filteredSamples = filterValues(sampleVals);
 					for(Map.Entry<?, Number> e: filteredSamples.entrySet()) {
 						String dsName = nameMap.get(e.getKey());

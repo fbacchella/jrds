@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jrds.factories.ProbeFactory;
 import jrds.probe.IndexedProbe;
 
 public class Macro {

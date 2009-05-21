@@ -12,50 +12,44 @@ import jrds.factories.xml.JrdsNode;
 public class GraphDescBuilder extends ObjectBuilder {
 
 	@Override
-	Object build(JrdsNode n) {
+	Object build(JrdsNode n) throws InvocationTargetException {
 		try {
 			return makeGraphDesc(n);
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
 		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
 		}
-		return null;
 	}
 	public GraphDesc makeGraphDesc(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		GraphDesc gd = new GraphDesc();
+		
+		JrdsNode subnode = n.getChild(CompiledXPath.get("/graphdesc | /graph"));
 
-		n.setMethod(gd, CompiledXPath.get("/graphdesc/name"), "setName");
-		n.setMethod(gd, CompiledXPath.get("/graphdesc/graphName"), "setGraphName");
-		n.setMethod(gd, CompiledXPath.get("/graphdesc/verticalLabel"), "setVerticalLabel");
-		n.setMethod(gd, CompiledXPath.get("/graphdesc/graphTitle"), "setGraphTitle");
-		n.setMethod(gd, CompiledXPath.get("/graphdesc/upperLimit"), "setUpperLimit");
-		n.setMethod(gd, CompiledXPath.get("/graphdesc/lowerLimit"), "setLowerLimit");
-		n.setMethod(gd, CompiledXPath.get("/graphdesc/unit/base"), "setUnitExponent");
+		subnode.setMethod(gd, CompiledXPath.get("name"), "setName");
+		subnode.setMethod(gd, CompiledXPath.get("graphName"), "setGraphName");
+		subnode.setMethod(gd, CompiledXPath.get("verticalLabel"), "setVerticalLabel");
+		subnode.setMethod(gd, CompiledXPath.get("graphTitle"), "setGraphTitle");
+		subnode.setMethod(gd, CompiledXPath.get("upperLimit"), "setUpperLimit");
+		subnode.setMethod(gd, CompiledXPath.get("lowerLimit"), "setLowerLimit");
+		subnode.setMethod(gd, CompiledXPath.get("unit/base"), "setUnitExponent");
 		
 		//Vertical label should never be empty
 		if(gd.getVerticalLabel() == null)
 			gd.setVerticalLabel("");
 
-		if(n.checkPath(CompiledXPath.get("/graphdesc/unit/binary"))) {
+		if(subnode.checkPath(CompiledXPath.get("unit/binary"))) {
 			gd.setSiUnit(false);
 		}
-		if(n.checkPath(CompiledXPath.get("/graphdesc/unit/SI"))) {
+		if(subnode.checkPath(CompiledXPath.get("unit/SI"))) {
 			gd.setSiUnit(true);
 		}
 
-		for(Node addnode: n.iterate(CompiledXPath.get("/graphdesc/add"))) {
+		for(Node addnode: subnode.iterate(CompiledXPath.get("add"))) {
 			Map<String, String> elements = new HashMap<String, String>(10);
 			for(JrdsNode child: new NodeListIterator(addnode.getChildNodes())) {
 				if("path".equals(child.getNodeName())) {
@@ -77,16 +71,16 @@ public class GraphDescBuilder extends ObjectBuilder {
 					elements.put(key, value);
 				}
 			}
-			String addName = elements.get("name"); //xpather.evaluate("//name", addnode).trim();
-			String addgraphType = elements.get("graphType"); //xpather.evaluate("/graphType", addnode).trim();
-			String addColor = elements.get("color"); //xpather.evaluate("/color", addnode).trim();
-			String addLegend = elements.get("legend"); //xpather.evaluate("/legend", addnode).trim();
-			String addrpn = elements.get("rpn"); //xpather.evaluate("/rpn", addnode).trim();
-			String consFunc = elements.get("cf"); //xpather.evaluate("/cf", addnode).trim();
-			String reversed = elements.get("reversed"); //xpather.evaluate("/reversed", addnode).trim();
-			String host = elements.get("pathhost"); //xpather.evaluate("/path/host", addnode).trim();
-			String probe = elements.get("pathprobe"); //xpather.evaluate("/path/probe", addnode).trim();
-			String dsName = elements.get("pathname"); //xpather.evaluate("/path/name", addnode).trim();
+			String addName = elements.get("name");
+			String addgraphType = elements.get("graphType");
+			String addColor = elements.get("color");
+			String addLegend = elements.get("legend");
+			String addrpn = elements.get("rpn");
+			String consFunc = elements.get("cf");
+			String reversed = elements.get("reversed");
+			String host = elements.get("pathhost");
+			String probe = elements.get("pathprobe");
+			String dsName = elements.get("pathname");
 
 			gd.add(addName, addrpn, addgraphType, addColor, addLegend, consFunc, reversed, host, probe, dsName);
 		}
@@ -101,8 +95,8 @@ public class GraphDescBuilder extends ObjectBuilder {
 			}
 		};
 
-		gd.setHostTree(n.doTreeList(CompiledXPath.get("/graphdesc/hosttree/*"),viewFilter));
-		gd.setViewTree(n.doTreeList(CompiledXPath.get("/graphdesc/viewtree/*"),viewFilter));
+		gd.setHostTree(subnode.doTreeList(CompiledXPath.get("hosttree/*"),viewFilter));
+		gd.setViewTree(subnode.doTreeList(CompiledXPath.get("viewtree/*"),viewFilter));
 		return gd;
 	}
 

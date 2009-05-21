@@ -42,14 +42,6 @@ public class XmlProvider extends Starter {
 	public XmlProvider(RdsHost monitoredHost) {
 		super();
 		hostname = monitoredHost.getName();
-		if(logger.isTraceEnabled()) {
-			logger.trace( this + " " + getClass().getName() + '@' + Integer.toHexString(hashCode()));
-			StringBuilder s = new StringBuilder();
-			for(StackTraceElement e: Thread.currentThread().getStackTrace()) {
-				s.append(e.toString() + "\n");
-			}
-			logger.trace(s);
-		}
 	}
 
 	/* (non-Javadoc)
@@ -98,11 +90,12 @@ public class XmlProvider extends Starter {
 		try {
 			Node upTimeNode = (Node) xpather.evaluate(upTimePath, d, XPathConstants.NODE);
 			if(upTimeNode != null) {
+				logger.warn("Will parse uptime: " + upTimeNode.getTextContent());
 				uptime = Long.parseLong(upTimeNode.getTextContent());
 			}
 			logger.debug("uptime for " + this + " is " + uptime);
 		} catch (NumberFormatException e) {
-			logger.warn("Uptime not parsable for " + this + e);
+			logger.trace("Uptime not parsable for " + this + ": " + e);
 		} catch (XPathExpressionException e) {
 			logger.error("Uptime not found" + e);
 		}
@@ -137,7 +130,10 @@ public class XmlProvider extends Starter {
 		Document d = null;
 		logger.trace("" + stream + " " + dbuilder + " " + this.isStarted() + " " + getClass().getName() + '@' + Integer.toHexString(hashCode()));
 		try {
-			dbuilder.reset();
+			try {
+				dbuilder.reset();
+			} catch (UnsupportedOperationException e) {
+			}
 			d = dbuilder.parse(stream);
 			logger.trace("just parsed a " + d.getDocumentElement().getTagName() + " from " + this);
 		} catch (SAXException e) {

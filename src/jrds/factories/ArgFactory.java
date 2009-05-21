@@ -4,7 +4,7 @@
  _##
  _##########################################################################*/
 
-package jrds;
+package jrds.factories;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
 public class ArgFactory {
 	private final Logger logger = Logger.getLogger(ArgFactory.class);
 
-	final private List<String> argPackages = new ArrayList<String>(3);
+	final private List<String> argPackages = new ArrayList<String>(4);
 
 	public ArgFactory() {
 		argPackages.add("java.lang.");

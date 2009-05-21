@@ -67,6 +67,15 @@ public class Loader {
 				return xpath;
 			}
 		},
+		GRAPH {
+			final XPathExpression xpath = CompiledXPath.get("/graph/name");
+			public boolean memberof(Node d) {
+				return matchDocElement(d, "graph");
+			}
+			public XPathExpression getNameXpath() {
+				return xpath;
+			}
+		},
 		GRAPHDESC {
 			final XPathExpression xpath = CompiledXPath.get("/graphdesc/name");
 			public boolean memberof(Node d) {
@@ -153,24 +162,26 @@ public class Loader {
 
 	}
 
-	void importDir(File path) {
-		if(path.isDirectory()) {
-			for(File f: path.listFiles(filter)) {
-				if(f.isDirectory()) {
-					importDir(f);
-				}
-				else {
-					try {
-						logger.trace("Will import " + f);
-						if (! importStream(new FileInputStream(f)))
-								logger.warn("Unknown type for " + f);
-					} catch (FileNotFoundException e) {
-						logger.error("File not found: " + f);
-					} catch (SAXException e) {
-						logger.error("Invalid xml document + " + f  + ": " + e);
-					} catch (IOException e) {
-						logger.error("IO error with " + f + ": " + e);
-					}
+	public void importDir(File path) {
+		if(! path.isDirectory()) {
+			logger.warn(path + " is not a directory");
+			return;
+		}
+		for(File f: path.listFiles(filter)) {
+			if(f.isDirectory()) {
+				importDir(f);
+			}
+			else {
+				try {
+					logger.trace("Will import " + f);
+					if (! importStream(new FileInputStream(f)))
+						logger.warn("Unknown type for " + f);
+				} catch (FileNotFoundException e) {
+					logger.error("File not found: " + f);
+				} catch (SAXException e) {
+					logger.error("Invalid xml document + " + f  + ": " + e);
+				} catch (IOException e) {
+					logger.error("IO error with " + f + ": " + e);
 				}
 			}
 		}
@@ -199,15 +210,19 @@ public class Loader {
 
 	boolean importStream(InputStream xmlstream) throws SAXException, IOException {
 		boolean known = false;
-		ConfigType type = null;
 		JrdsNode d = new JrdsNode(dbuilder.parse(xmlstream));
 		for(ConfigType t: ConfigType.values()) {
 			if(t.memberof(d)) {
+				logger.trace("Found a " + t);
 				known = true;
-				type = t;
+				//We check the Name
 				JrdsNode n = d.getChild(t.getNameXpath());
-				if(n != null) {
-					repositories.get(type).put(n.getTextContent().trim(), d);
+				if(n != null && ! "".equals(n.getTextContent().trim())) {
+					repositories.get(t).put(n.getTextContent().trim(), d);
+					//A graph is also stored as a graphdesc
+					//if(t == ConfigType.GRAPH) {
+					//	repositories.get(ConfigType.GRAPHDESC).put(n.getTextContent().trim(), d);
+					//}
 				}
 				break;
 			}

@@ -2,6 +2,9 @@ package jrds;
 
 import java.security.MessageDigest;
 import java.util.Date;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -26,6 +29,8 @@ public class Util {
 	private static final String BASE64_CHARS =
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+_=";
 	private static final char[] BASE64_CHARSET = BASE64_CHARS.toCharArray();
+
+	private static final Pattern varregexp = Pattern.compile("(.*?)\\$\\{([\\w\\.-]+)\\}(.*)");
 
 	private Util() {
 	}
@@ -99,6 +104,29 @@ public class Util {
 		if(endDate.after(lastUpdateNormalized) && endDate.getTime() - lastUpdateNormalized.getTime() < resolution * 1000L)
 			normalized = lastUpdateNormalized;
 		return normalized;
+	}
+	
+	public static String evaluateVariables(String in, Map<String, Object> variables) {
+		Matcher m = varregexp.matcher(in);
+		if(m.find()) {
+			StringBuilder out = new StringBuilder();
+			if(m.groupCount() == 3) {
+				String before = m.group(1);
+				String var = m.group(2);
+				String after = m.group(3);
+				out.append(before);
+				if(variables.containsKey(var)) {
+					out.append(variables.get(var));
+				}
+				else
+					out.append("${" + var + "}");
+				if(after.length() > 0)
+					out.append(evaluateVariables(after, variables));
+				return out.toString();
+
+			}
+		}
+		return in;
 	}
 
 }

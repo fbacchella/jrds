@@ -25,13 +25,13 @@ import org.apache.log4j.Logger;
  * @version $Revision: 475 $,  $Date: 2009-05-15 22:04:03 +0200 (Fri, 15 May 2009) $
  */
 public class ApacheStatusDetails extends HttpProbe implements IndexedProbe {
-	
-	static private final Map<Character, WorkerStat> map = new HashMap<Character, WorkerStat>();
+
 	//"_" Waiting for Connection, "S" Starting up, "R" Reading Request,
 	//"W" Sending Reply, "K" Keepalive (read), "D" DNS Lookup,
 	//"C" Closing connection, "L" Logging, "G" Gracefully finishing,
 	//"I" Idle cleanup of worker, "." Open slot with no current process
-	private enum WorkerStat {
+	static private final Map<Character, WorkerStat> map = new HashMap<Character, WorkerStat>();
+	enum WorkerStat {
 		WAITING('_'),
 		STARTING('S'),
 		READING('R'),
@@ -43,12 +43,19 @@ public class ApacheStatusDetails extends HttpProbe implements IndexedProbe {
 		GRACEFULLY('G'),
 		IDLE('I'),
 		OPEN('.');
-		
+
+
+		static WorkerStat resolv(char key) {
+			return map.get(key);
+		}
+		static synchronized void add(char key, WorkerStat value) {
+			map.put(key, value);
+		}
 		WorkerStat(char key) {
-			map.put(key, this);
+			WorkerStat.add(key, this);
 		}
 	}
-	
+
 	static final private Logger logger = Logger.getLogger(ApacheStatusDetails.class);
 
 	/**
@@ -117,7 +124,7 @@ public class ApacheStatusDetails extends HttpProbe implements IndexedProbe {
 					parseScoreboard(kvp[1].trim(), retValue);
 				}
 				else
-				retValue.put(kvp[0], Double.valueOf(kvp[1]));
+					retValue.put(kvp[0], Double.valueOf(kvp[1]));
 			}
 			catch (java.lang.NumberFormatException ex) {};
 		}
@@ -126,16 +133,16 @@ public class ApacheStatusDetails extends HttpProbe implements IndexedProbe {
 			setUptime(uptimeNumber.longValue());
 		return retValue;
 	}
-	
+
 	void parseScoreboard(String scoreboard, Map<String, Number> retValue) {
 		int workers[] = new int[WorkerStat.values().length];
 		for(char c: scoreboard.toCharArray()) {
-			WorkerStat worker = map.get(c);
+			WorkerStat worker = WorkerStat.resolv(c);
 			workers[worker.ordinal()]++;
 		}
 		for(WorkerStat worker: WorkerStat.values()) {
 			retValue.put(worker.toString(), workers[worker.ordinal()]);
 		}
-		
+
 	}
 }

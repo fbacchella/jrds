@@ -12,26 +12,18 @@ public class FilterBuilder extends ObjectBuilder {
 	static final private Logger logger = Logger.getLogger(FilterBuilder.class);
 
 	@Override
-	Object build(JrdsNode n) {
+	Object build(JrdsNode n) throws InvocationTargetException {
 		try {
 			return makeFilter(n);
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvocationTargetException(e, FilterBuilder.class.getName());
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvocationTargetException(e, FilterBuilder.class.getName());
 		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvocationTargetException(e, FilterBuilder.class.getName());
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvocationTargetException(e, FilterBuilder.class.getName());
 		}
-		return null;
 	}
 
 	public Filter makeFilter(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {

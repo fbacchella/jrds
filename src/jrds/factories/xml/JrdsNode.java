@@ -76,14 +76,13 @@ public class JrdsNode implements Node {
 	 * @param xpath where to find the value
 	 * @param method the name of the method
 	 * @param uniq can the method be applied many time ?
-	 * @throws XPathExpressionException
-	 * @throws SecurityException
-	 * @throws NoSuchMethodException
-	 * @throws IllegalArgumentException
-	 * @throws IllegalAccessException
-	 * @throws InvocationTargetException
+	 * @throws InvocationTargetException 
+	 * @throws IllegalAccessException 
+	 * @throws IllegalArgumentException 
+	 * @throws NoSuchMethodException 
+	 * @throws SecurityException 
 	 */
-	public void setMethod(Object o, XPathExpression xpath, String method, boolean uniq) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+	public void setMethod(Object o, XPathExpression xpath, String method, boolean uniq) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException {
 		for(Node n: new NodeListIterator(parent, xpath)) {
 			String name = n.getTextContent().trim();
 			if(name != null && ! "".equals(name)) {
@@ -112,7 +111,6 @@ public class JrdsNode implements Node {
 		List<Object> l = new ArrayList<Object>(list.getLength());
 		for(int i=0; i < list.getLength(); i++) {
 			Object o = f.filter(list.item(i));
-
 			l.add(o);
 		}
 		return l;
@@ -145,7 +143,7 @@ public class JrdsNode implements Node {
 
 	public String evaluate(XPathExpression xpath) {
 		try {
-			return xpath.evaluate(this);
+			return xpath.evaluate(parent);
 		} catch (XPathExpressionException e) {
 			throw new RuntimeException("xpath evaluate failed", e);
 		}
@@ -483,7 +481,6 @@ public class JrdsNode implements Node {
 	 */
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
 		return parent.toString();
 	}
 }

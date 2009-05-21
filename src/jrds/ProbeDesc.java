@@ -450,7 +450,7 @@ public class ProbeDesc {
 		if(defaultsArgs == null) 
 			defaultsArgs = new LinkedList<Object>();
 		defaultsArgs.add(o);
-		logger.debug("Adding " + o + "(" + o.getClass() + ") to default args");
+		logger.trace("Adding " + o + " (" + o.getClass() + ") to default args");
 	}
 
 	public List<Object> getDefaultArgs() {

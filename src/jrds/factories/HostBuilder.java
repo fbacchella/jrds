@@ -6,9 +6,9 @@ import java.util.Map;
 
 import jrds.Macro;
 import jrds.Probe;
-import jrds.ProbeFactory;
 import jrds.RdsHost;
 import jrds.factories.xml.JrdsNode;
+import jrds.probe.IndexedProbe;
 import jrds.snmp.SnmpStarter;
 
 import org.apache.log4j.Logger;
@@ -20,30 +20,22 @@ public class HostBuilder extends ObjectBuilder {
 	private Map<String, Macro> macrosMap;
 
 	@Override
-	Object build(JrdsNode n) {
+	Object build(JrdsNode n) throws InvocationTargetException {
 		try {
-			Object o = makeRdsHost(n);
-			return o;
+			return makeRdsHost(n);
 		} catch (SecurityException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvocationTargetException(e, HostBuilder.class.getName());
 		} catch (IllegalArgumentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvocationTargetException(e, HostBuilder.class.getName());
 		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvocationTargetException(e, HostBuilder.class.getName());
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvocationTargetException(e, HostBuilder.class.getName());
 		} catch (InvocationTargetException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvocationTargetException(e, HostBuilder.class.getName());
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new InvocationTargetException(e, HostBuilder.class.getName());
 		}
-		return null;
 	}
 
 	public RdsHost makeRdsHost(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
@@ -66,7 +58,13 @@ public class HostBuilder extends ObjectBuilder {
 				logger.trace(p);
 				host.addProbe(p);
 			}
-
+			if(p instanceof IndexedProbe) {
+				String label = probeNode.evaluate(CompiledXPath.get("@label"));
+				if(label != null && ! "".equals(label)) {
+					logger.trace("Adding label " + label + " to "  + p);
+					((IndexedProbe)p).setLabel(label);
+				}
+			}
 			JrdsNode snmpProbeNode = probeNode.getChild(CompiledXPath.get("snmp"));
 			if(snmpProbeNode != null) {
 				SnmpStarter starter = snmpStarter(snmpProbeNode, host);

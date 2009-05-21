@@ -1,10 +1,10 @@
 package jrds.factories;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import jrds.ArgFactory;
 import jrds.factories.xml.JrdsNode;
 
 import org.apache.log4j.Logger;
@@ -18,7 +18,7 @@ public abstract class ObjectBuilder {
 
 	private ArgFactory af = new ArgFactory();
 
-	abstract Object build(JrdsNode n);
+	abstract Object build(JrdsNode n) throws InvocationTargetException;
 
 	void setProperty(properties name, Object o) {
 		switch(name) {

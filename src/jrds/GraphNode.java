@@ -5,7 +5,9 @@ package jrds;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.rrd4j.graph.RrdGraphDef;
 
@@ -65,7 +67,19 @@ public class GraphNode implements Comparable<GraphNode> {
 		if( probe instanceof UrlProbe) {
 			url =((UrlProbe) probe).getUrlAsString();
 		}
-		Object[] arguments = {
+		Map<String, Object> env = new LinkedHashMap<String, Object>();
+		env.put("graphdesc.name", gd.getGraphName());
+		env.put("host", probe.getHost().getName());
+		env.put("index", index);
+		env.put("url", url);
+		env.put("probename", probe.getName());
+		env.put("index.signature", jrds.Util.stringSignature(index));
+		env.put("url.signature", jrds.Util.stringSignature(url));
+		env.put("graphdesc.title", gd.getGraphTitle());
+
+		Object[] arguments = env.values().toArray();
+
+		/*Object[] arguments = {
 				gd.getGraphName(),
 				probe.getHost().getName(),
 				index,
@@ -73,8 +87,8 @@ public class GraphNode implements Comparable<GraphNode> {
 				probe.getName(),
 				Util.stringSignature(index),
 				Util.stringSignature(url)
-		};
-		return MessageFormat.format(template, arguments) ;
+		};*/
+		return MessageFormat.format(jrds.Util.evaluateVariables(template, env), arguments) ;
 
 	}
 

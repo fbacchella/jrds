@@ -97,12 +97,12 @@ public class StartListener implements ServletContextListener {
 					}
 				};
 				collectTimer.schedule(collector, 5000L, HostsList.getRootGroup().getResolution() * 1000L);
+				started = true;
+				logger.info("Application jrds started");
 			}
 			catch (Exception ex) {
 				logger.fatal("Unable to start " + arg0.getServletContext().getServletContextName(), ex);
 			}
-			logger.info("Application jrds started");
-			started = true;
 		}
 	}
 
