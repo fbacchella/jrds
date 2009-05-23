@@ -1,6 +1,6 @@
 /*##########################################################################
 _##
-_##  $Id$
+_##  $Id: RstatProbe3.java 365 2006-09-02 12:04:34Z fbacchella $
 _##
 _##########################################################################*/
 
@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
  * needs to run at the client
  *  
  * @author Fabrice Bacchella
- * @version $Revision$
+ * @version $Revision: 365 $
  */
 public class RstatProbe3 extends Probe {
 	static final private Logger logger = Logger.getLogger(RstatProbe3.class);
