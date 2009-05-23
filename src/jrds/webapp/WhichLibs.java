@@ -15,6 +15,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.apache.log4j.Logger;
@@ -44,12 +46,17 @@ public final class WhichLibs extends HttpServlet {
 				out.println("System's property " + System.getProperties().getProperty("javax.xml.transform.TransformerFactory"));
 			} catch (TransformerFactoryConfigurationError e) {
 				out.println("no xml transformer factory ");
-				out.println("System's property " + System.getProperties().getProperty("javax.xml.transform.TransformerFactory"));
+				out.println("System's property" + System.getProperties().getProperty("javax.xml.transform.TransformerFactory"));
+			}
+			try {
+				out.println(resolv("DOM implementation",  DocumentBuilderFactory.newInstance().newDocumentBuilder().getDOMImplementation()));
+			} catch (ParserConfigurationException e) {
+				out.println("Invalid DOM parser configuration");
 			}
 			out.println(resolv("SNMP4J", DefaultUdpTransportMapping.class));
 			out.println(resolv("Log4j",logger.getClass()));
-			out.println(resolv("common logging API", org.apache.commons.logging.LogFactory.class));
-			out.println(resolv("common logging", org.apache.commons.logging.LogFactory.getLog(this.getClass())));
+//			out.println(resolv("common logging API", org.apache.commons.logging.LogFactory.class));
+//			out.println(resolv("common logging", org.apache.commons.logging.LogFactory.getLog(this.getClass())));
 			out.println(resolv("STL", org.apache.taglibs.standard.Version.class));
 			out.println(resolv("JAI", JAI.class));
 

@@ -128,7 +128,7 @@ public class ProbeFactory {
 				logger.warn("didn't get a Probe but a " + o.getClass().getName());
 			}
 			catch (NoClassDefFoundError ex) {
-				logger.warn("Missing class for the creation of a probe " + pd.getName());
+				logger.warn("Missing class for the creation of a probe " + pd.getName() +": ", ex);
 			}
 			catch(InstantiationException ex) {
 				if(ex.getCause() != null)

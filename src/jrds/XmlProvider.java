@@ -90,12 +90,12 @@ public class XmlProvider extends Starter {
 		try {
 			Node upTimeNode = (Node) xpather.evaluate(upTimePath, d, XPathConstants.NODE);
 			if(upTimeNode != null) {
-				logger.warn("Will parse uptime: " + upTimeNode.getTextContent());
+				logger.trace("Will parse uptime: " + upTimeNode.getTextContent());
 				uptime = Long.parseLong(upTimeNode.getTextContent());
 			}
 			logger.debug("uptime for " + this + " is " + uptime);
 		} catch (NumberFormatException e) {
-			logger.trace("Uptime not parsable for " + this + ": " + e);
+			logger.warn("Uptime not parsable for " + this + ": " + e);
 		} catch (XPathExpressionException e) {
 			logger.error("Uptime not found" + e);
 		}
@@ -157,7 +157,10 @@ public class XmlProvider extends Starter {
 	 * @return an empty document
 	 */
 	public Document getDocument() {
-		dbuilder.reset();
+		try {
+			dbuilder.reset();
+		} catch (UnsupportedOperationException e) {
+		}
 		return dbuilder.newDocument();
 	}
 
