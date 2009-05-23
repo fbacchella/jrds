@@ -2,7 +2,7 @@
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
   <name>MysqlTableSpace</name>
-  <probeName>mysqltablespace-{1}</probeName>
+  <probeName>mysqltablespace-${index}</probeName>
   <probeClass>jrds.probe.jdbc.MysqlTableSpace</probeClass>
   <ds>
     <dsName>Data_length</dsName>

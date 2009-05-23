@@ -3,7 +3,7 @@
     "urn:jrds:probedesc">
 <probedesc>
     <name>ciscotemperature</name>
-    <probeName>ciscotemp-{1}</probeName>
+    <probeName>ciscotemp-${index}</probeName>
     <probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
     <snmpRequester>simple</snmpRequester>
     <ds>

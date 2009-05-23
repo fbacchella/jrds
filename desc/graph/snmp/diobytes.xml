@@ -3,8 +3,8 @@
 	"urn:jrds:graphdesc">
 <graphdesc>
 	<name>DiskIoGraphBytes</name>
-	<graphName>bytes-{2}</graphName>
-	<graphTitle>I/O (bytes) on disk {2} on {1}</graphTitle>
+	<graphName>bytes-${index}</graphName>
+	<graphTitle>I/O (bytes) on disk ${index} on ${host}</graphTitle>
 	<unit>
 		<binary/>
 	</unit>

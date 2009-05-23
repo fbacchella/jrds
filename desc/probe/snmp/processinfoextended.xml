@@ -2,7 +2,7 @@
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
   <name>ProcessInfoExtended</name>
-  <probeName>psx-{1}</probeName>
+  <probeName>psx-${index}</probeName>
   <probeClass>jrds.probe.snmp.ProcessInfoExtended</probeClass>
   <ds>
     <dsName>hrSWRunPerfMem</dsName>

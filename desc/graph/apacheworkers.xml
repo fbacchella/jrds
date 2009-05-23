@@ -2,8 +2,8 @@
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
 	<name>ApacheWorkers</name>
-	<graphName>apacheworkers_{2}</graphName>
-	<graphTitle>Workers status on port {2}</graphTitle>
+	<graphName>apacheworkers_${index}</graphName>
+	<graphTitle>Workers status on port ${index}</graphTitle>
 	<verticalLabel>Workers</verticalLabel>
 	<add>
 		<name>BusyWorkers</name>

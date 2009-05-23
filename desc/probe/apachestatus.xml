@@ -3,7 +3,7 @@
 	"urn:jrds:probedesc">
 <probedesc>
 	<name>ApacheStatus</name>
-	<probeName>apachestatus_{1}</probeName>
+	<probeName>apachestatus_${index}</probeName>
 	<probeClass>jrds.probe.ApacheStatus</probeClass>
 	<defaultargs>
 		<arg type="Integer" value="80"/>

@@ -3,8 +3,8 @@
                            "urn:jrds:graphdesc">
 <graphdesc>
   <name>ApacheRequests</name>
-  <graphName>apachereq_{2}</graphName>
-  <graphTitle>Requests on port {2}</graphTitle>
+  <graphName>apachereq_${index}</graphName>
+  <graphTitle>Requests on port ${index}</graphTitle>
   <unit>
     <base/>
   </unit>

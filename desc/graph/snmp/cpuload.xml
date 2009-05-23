@@ -4,7 +4,7 @@
 <graphdesc>
 	<name>cpuload</name>
 	<graphName>laverage</graphName>
-	<graphTitle>CPU Load on {1}</graphTitle>
+	<graphTitle>CPU Load on ${host}</graphTitle>
 	<verticalLabel>queue size</verticalLabel>
 	<add>
 		<name>la1</name>

@@ -2,7 +2,7 @@
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
   <name>cpmCPUTotal</name>
-  <probeName>cpmcputotal-{1}</probeName>
+  <probeName>cpmcputotal-${index}</probeName>
   <probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
   <snmpRequester>simple</snmpRequester>
 	<index>.1.3.6.1.4.1.9.9.109.1.1.1.1.2</index>
