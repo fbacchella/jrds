@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+	<info organisation="jrds" module="main" />
+	<dependencies>
+		<dependency org="log4j" name="log4j" rev="1.2.14" />
+		<dependency org="taglibs" name="standard" rev="1.1.2" />
+		<dependency org="javax.servlet" name="jstl" rev="1.2" >
+			<exclude conf="jsp-api"></exclude>
+		</dependency>
+		<dependency org="mysql" name="mysql-connector-java" rev="5.1.6" />
+		<dependency org="org.snmp4j" name="snmp4j" rev="1.9.1f" />
+	</dependencies>
+</ivy-module>

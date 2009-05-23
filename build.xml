@@ -1,4 +1,4 @@
-<project name="jrds" default="compile" basedir=".">
+<project name="jrds" default="compile" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" >
 	<!-- set global properties for this build -->
 	<property name="app.name" value="jrds"/>
 	<property name="app.path" value="/${app.name}"/>
@@ -201,5 +201,17 @@
 			<classpath refid="execution.classpath" />
 		</java>
 	</target>
-	
+    <target name="resolve" description="--> retrieve dependencies with ivy">
+        <ivy:retrieve type="jar" pattern="${ivy.lib.dir}/[artifact].[ext]" />
+    	<unzip src="lib/standard.jar" dest="lib" >
+    	    <patternset>
+    	        <include name="META-INC/c.tld"/>
+    	    </patternset>
+    		<mapper type="flatten"/>
+    	</unzip>
+    	<delete file="lib/jsp-api.jar"></delete>
+    </target>	
+    <target name="resolve-test" description="--> retrieve dependencies with ivy" >
+        <ivy:retrieve type="jar" file="ivy-test.xml" pattern="${ivy.lib.dir}/[artifact].[ext]" />
+     </target>	
 </project>
