@@ -215,17 +215,18 @@ public class Loader {
 			if(t.memberof(d)) {
 				logger.trace("Found a " + t);
 				known = true;
-				//We check the Name
 				JrdsNode n = d.getChild(t.getNameXpath());
-				Map<String, JrdsNode> rep = repositories.get(t);
-				//We warn for dual inclusion, none is loader, as we don't know the good one
 				String name = n.getTextContent().trim();
-				if(rep.containsKey(name)) {
-					logger.error("Dual definition of " + t + " with name " + name);
-					rep.remove(name);
-				}
+				//We check the Name
 				if(n != null && ! "".equals(name)) {
-					rep.put(name, d);
+					Map<String, JrdsNode> rep = repositories.get(t);
+					//We warn for dual inclusion, none is loaded, as we don't know the good one
+					if(rep.containsKey(name)) {
+						logger.error("Dual definition of " + t + " with name " + name);
+						rep.remove(name);
+					}
+					else
+						rep.put(name, d);
 				}
 				break;
 			}
