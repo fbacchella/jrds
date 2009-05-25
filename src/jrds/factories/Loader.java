@@ -217,12 +217,15 @@ public class Loader {
 				known = true;
 				//We check the Name
 				JrdsNode n = d.getChild(t.getNameXpath());
-				if(n != null && ! "".equals(n.getTextContent().trim())) {
-					repositories.get(t).put(n.getTextContent().trim(), d);
-					//A graph is also stored as a graphdesc
-					//if(t == ConfigType.GRAPH) {
-					//	repositories.get(ConfigType.GRAPHDESC).put(n.getTextContent().trim(), d);
-					//}
+				Map<String, JrdsNode> rep = repositories.get(t);
+				//We warn for dual inclusion, none is loader, as we don't know the good one
+				String name = n.getTextContent().trim();
+				if(rep.containsKey(name)) {
+					logger.error("Dual definition of " + t + " with name " + name);
+					rep.remove(name);
+				}
+				if(n != null && ! "".equals(name)) {
+					rep.put(name, d);
 				}
 				break;
 			}
