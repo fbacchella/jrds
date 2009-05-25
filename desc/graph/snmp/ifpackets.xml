@@ -5,7 +5,7 @@
 	<name>ifpackets</name>
 	<graphName>ifpkts-{2}</graphName>
 	<graphTitle>Packets exchanged on interface {2} on {1}</graphTitle>
-	<verticalLabel>paquets/s</verticalLabel>
+	<verticalLabel>packets/s</verticalLabel>
 	<lowerLimit>NaN</lowerLimit>
 	<add>
 		<legend>Upward graph</legend>
