@@ -68,10 +68,10 @@ public abstract class Starter {
 	}
 
 	private StartersSet level = null;
-	private Object parent;	
+	private StarterNode parent;	
 	private boolean started = false;
 	
-	public void initialize(Object parent, StartersSet level) {
+	public void initialize(StarterNode parent, StartersSet level) {
 		this.level = level;
 		this.parent = parent;
 	}
@@ -103,7 +103,7 @@ public abstract class Starter {
 	public boolean isStarted() {
 		return started;
 	}
-	public Object getParent() {
+	public StarterNode getParent() {
 		return parent;
 	}
 	@Override

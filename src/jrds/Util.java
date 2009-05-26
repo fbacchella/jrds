@@ -1,12 +1,19 @@
 package jrds;
 
+import java.net.URL;
 import java.security.MessageDigest;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jrds.probe.IndexedProbe;
+import jrds.probe.UrlProbe;
+
 import org.apache.log4j.Logger;
+
+import com.sun.tools.javac.util.List;
 
 
 /**
@@ -105,8 +112,13 @@ public class Util {
 			normalized = lastUpdateNormalized;
 		return normalized;
 	}
-	
-	public static String evaluateVariables(String in, Map<String, Object> variables) {
+
+	public static String evaluateVariables(String in, Map<String, Object> variables, StarterNode node) {
+		PropertyStarter props = (PropertyStarter)node.getStarters().find(PropertyStarter.KEY);
+		return evaluateVariables(in, variables, props);
+	}
+
+	public static String evaluateVariables(String in, Map<String, Object> variables, PropertyStarter props) {
 		Matcher m = varregexp.matcher(in);
 		if(m.find()) {
 			StringBuilder out = new StringBuilder();
@@ -115,13 +127,21 @@ public class Util {
 				String var = m.group(2);
 				String after = m.group(3);
 				out.append(before);
+				String toAppend = null;
 				if(variables.containsKey(var)) {
-					out.append(variables.get(var));
+					toAppend = variables.get(var).toString();
 				}
-				else
-					out.append("${" + var + "}");
+				else if(props != null) {
+					String propsValue = props.getProp(var);
+					if(propsValue != null)
+						out.append(propsValue);
+				}
+				if(toAppend == null) {
+					toAppend = "${" + var + "}";
+				}
+				out.append(toAppend);
 				if(after.length() > 0)
-					out.append(evaluateVariables(after, variables));
+					out.append(evaluateVariables(after, variables, props));
 				return out.toString();
 
 			}
@@ -129,5 +149,58 @@ public class Util {
 		return in;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static String parseTemplate(String template, Object... arguments) {
+		Map<String, Object> env = new HashMap<String, Object>();
+		StarterNode node = null;
+		for(Object o: arguments) {
+			if( o instanceof IndexedProbe) {
+				String index = ((IndexedProbe) o).getIndexName();
+				env.put("index", index);
+				env.put("index.signature", jrds.Util.stringSignature(index));
+			}
+			if( o instanceof UrlProbe) {
+				URL url = ((UrlProbe) o).getUrl();
+				env.put("url", url);
+				env.put("port", url.getPort());
+				env.put("url.signature", jrds.Util.stringSignature(url.toString()));
+			}
+			if( o instanceof Probe) {
+				Probe p = ((Probe) o);
+				RdsHost host = p.getHost();
+				if(host != null)
+					env.put("host", host.getName());
+				env.put("probename", p.getName());
+			}
+			if( o instanceof RdsHost) {
+				env.put("host", ((RdsHost) o).getName());
+			}
+			if(o instanceof GraphDesc) {
+				GraphDesc gd = (GraphDesc) o;
+				env.put("graphdesc.title", gd.getGraphTitle());
+				env.put("graphdesc.name", gd.getGraphName());
+			}
+			if(o instanceof ProbeDesc) {
+				ProbeDesc pd = (ProbeDesc) o;
+				env.put("probedesc.name", pd.getName());
+
+			}
+			if(o instanceof StarterNode) {
+				node = (StarterNode) o;
+			}
+			if(o instanceof Map) {
+				Map<? extends String, ?> tempMap = (Map<? extends String, ?>)o;
+				env.putAll(tempMap);
+			}
+			if(o instanceof List) {
+				int rank=1;
+				for(Object listElem: (List<? extends Object>) o) {
+					env.put(String.valueOf(rank++), listElem.toString());
+				}
+			}
+		}
+
+		return jrds.Util.evaluateVariables(template, env, node);
+	}
 }
 

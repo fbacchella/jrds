@@ -5,14 +5,12 @@ package jrds;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
-import java.util.Map;
-
-import org.rrd4j.graph.RrdGraphDef;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
+
+import org.rrd4j.graph.RrdGraphDef;
 
 /**
  * @author bacchell
@@ -67,7 +65,7 @@ public class GraphNode implements Comparable<GraphNode> {
 		if( probe instanceof UrlProbe) {
 			url =((UrlProbe) probe).getUrlAsString();
 		}
-		Map<String, Object> env = new LinkedHashMap<String, Object>();
+		/*Map<String, Object> env = new LinkedHashMap<String, Object>();
 		env.put("graphdesc.name", gd.getGraphName());
 		env.put("host", probe.getHost().getName());
 		env.put("index", index);
@@ -77,9 +75,9 @@ public class GraphNode implements Comparable<GraphNode> {
 		env.put("url.signature", jrds.Util.stringSignature(url));
 		env.put("graphdesc.title", gd.getGraphTitle());
 
-		Object[] arguments = env.values().toArray();
+		Object[] arguments = env.values().toArray();*/
 
-		/*Object[] arguments = {
+		Object[] arguments = {
 				gd.getGraphName(),
 				probe.getHost().getName(),
 				index,
@@ -87,8 +85,9 @@ public class GraphNode implements Comparable<GraphNode> {
 				probe.getName(),
 				Util.stringSignature(index),
 				Util.stringSignature(url)
-		};*/
-		return MessageFormat.format(jrds.Util.evaluateVariables(template, env), arguments) ;
+		};
+		String evaluted = jrds.Util.parseTemplate(template, probe, gd);
+		return MessageFormat.format(evaluted, arguments) ;
 
 	}
 

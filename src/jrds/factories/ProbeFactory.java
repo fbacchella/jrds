@@ -88,7 +88,6 @@ public class ProbeFactory {
 		
 		//Now we finish the initialization of classes
 		if(retValue != null) {
-			retValue.readProperties(prop);
 			retValue.initGraphList(gf);
 		}
 		return retValue;
@@ -128,7 +127,7 @@ public class ProbeFactory {
 				logger.warn("didn't get a Probe but a " + o.getClass().getName());
 			}
 			catch (NoClassDefFoundError ex) {
-				logger.warn("Missing class for the creation of a probe " + pd.getName() +": ", ex);
+				logger.warn("Missing class for the creation of a probe " + pd.getName());
 			}
 			catch(InstantiationException ex) {
 				if(ex.getCause() != null)

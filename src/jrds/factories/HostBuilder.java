@@ -6,6 +6,7 @@ import java.util.Map;
 
 import jrds.Macro;
 import jrds.Probe;
+import jrds.PropertyStarter;
 import jrds.RdsHost;
 import jrds.factories.xml.JrdsNode;
 import jrds.probe.IndexedProbe;
@@ -51,7 +52,12 @@ public class HostBuilder extends ObjectBuilder {
 			SnmpStarter starter = snmpStarter(snmpNode, host);
 			starter.register(host);
 		}
-
+		
+		PropertyStarter hostprop = propertiesStarter(n.getChild(CompiledXPath.get("/host")));
+		if(hostprop != null) {
+			hostprop.register(host);
+		}
+		
 		for(JrdsNode probeNode: n.iterate(CompiledXPath.get("/host/probe | /host/rrd"))) {
 			Probe p = makeProbe(probeNode);
 			if(p != null) {
@@ -70,7 +76,10 @@ public class HostBuilder extends ObjectBuilder {
 				SnmpStarter starter = snmpStarter(snmpProbeNode, host);
 				starter.register(p);
 			}
-
+			PropertyStarter nodeprop = propertiesStarter(probeNode);
+			if(nodeprop != null) {
+				nodeprop.register(p);
+			}
 		}
 		for(JrdsNode probeNode: n.iterate(CompiledXPath.get("/host/macro/@name"))) {
 			String name = probeNode.getTextContent();
@@ -81,6 +90,24 @@ public class HostBuilder extends ObjectBuilder {
 			}
 		}
 		return host;
+	}
+
+	public PropertyStarter propertiesStarter(JrdsNode n) {
+		if(n == null)
+			return null;
+		NodeListIterator propsNodes = n.iterate(CompiledXPath.get("properties/entry"));
+		if(propsNodes.getLength() == 0) {
+			return null;
+		}
+		PropertyStarter propstart = new PropertyStarter();
+		//			propstart.register(host);
+		for(JrdsNode propNode: propsNodes) {
+			String key = propNode.evaluate(CompiledXPath.get("@key"));
+			String value = propNode.getTextContent();
+			logger.trace("Adding propertie " + key + ": " + value);
+			propstart.setProp(key, value);
+		}
+		return propstart;
 	}
 
 	public SnmpStarter snmpStarter(JrdsNode d, RdsHost host) {

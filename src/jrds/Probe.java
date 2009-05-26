@@ -14,9 +14,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -42,8 +40,6 @@ import org.rrd4j.core.Sample;
 import org.rrd4j.core.Util;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import sun.tools.tree.ThisExpression;
 
 /**
  * A abstract class that needs to be derived for specific probe.<br>
@@ -83,17 +79,14 @@ implements Comparable<Probe>, StarterNode {
 	public Probe() {
 	}
 
-	public void readProperties(Properties p) {
-
-	}
-
 	public RdsHost getHost() {
 		return monitoredHost;
 	}
 
 	public void setHost(RdsHost monitoredHost) {
 		this.monitoredHost = monitoredHost;
-		starters.setParent(monitoredHost.getStarters());		
+		starters.setParent(monitoredHost.getStarters());
+		name = parseTemplate(getPd().getProbeName());
 	}
 
 	public void setPd(ProbeDesc pd) {
@@ -134,8 +127,6 @@ implements Comparable<Probe>, StarterNode {
 	}
 
 	public String getName() {
-		if (name == null)
-			name = parseTemplate(getPd().getProbeName());
 		return name;
 	}
 
@@ -159,24 +150,26 @@ implements Comparable<Probe>, StarterNode {
 		String hn = "<empty>";
 		if(getHost() != null)
 			hn = getHost().getName();
-		Map<String, Object> env = new LinkedHashMap<String, Object>();
+		/*Map<String, Object> env = new LinkedHashMap<String, Object>();
 		env.put("host", hn);
 		env.put("index", index);
 		env.put("url", url);
 		env.put("port", port);
 		env.put("index.signature", jrds.Util.stringSignature(index));
 		env.put("url.signature", jrds.Util.stringSignature(url));
+				Object[] arguments = env.values().toArray();
 
-		/*Object[] arguments = {
+*/
+		Object[] arguments = {
 				hn,
 				index,
 				url,
 				port,
 				jrds.Util.stringSignature(index),
 				jrds.Util.stringSignature(url)
-		};*/
-		Object[] arguments = env.values().toArray();
-		return MessageFormat.format(jrds.Util.evaluateVariables(template, env), arguments) ;
+		};
+		String evaluted = jrds.Util.parseTemplate(template, this);
+		return MessageFormat.format(evaluted, arguments) ;
 
 	}
 
@@ -418,7 +411,7 @@ implements Comparable<Probe>, StarterNode {
 			if (sampleVals != null) {
 				if(getUptime() * pd.getUptimefactor() >= ProbeDesc.HEARTBEATDEFAULT) {
 					Map<?, String> nameMap = getCollectkeys();
-					Map<?, Number >filteredSamples = filterValues(sampleVals);
+					Map<?, Number>filteredSamples = filterValues(sampleVals);
 					for(Map.Entry<?, Number> e: filteredSamples.entrySet()) {
 						String dsName = nameMap.get(e.getKey());
 						//A collect key may be null or empty to prevent collect, use the original name in this case

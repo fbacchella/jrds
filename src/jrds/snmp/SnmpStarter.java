@@ -199,7 +199,7 @@ public class SnmpStarter extends Starter {
 		this.proto = proto;
 	}
 	@Override
-	public void initialize(Object parent, StartersSet level) {
+	public void initialize(StarterNode parent, StartersSet level) {
 		super.initialize(parent, level);
 		level.find(Starter.Resolver.buildKey(hostname));
 		resolver = (Resolver) level.find(Starter.Resolver.buildKey(hostname));

@@ -11,7 +11,7 @@ import jrds.factories.xml.JrdsNode;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class NodeListIterator implements Iterable<JrdsNode> {
+public class NodeListIterator implements Iterable<JrdsNode>, NodeList {
 
 	final Node d;
 	final XPathExpression path;
@@ -20,40 +20,50 @@ public class NodeListIterator implements Iterable<JrdsNode> {
 	public NodeListIterator(Node d, XPathExpression path) {
 		this.d = d;
 		this.path = path;
-		this.nl = null;
+		try {
+			this.nl = (NodeList)path.evaluate(d, XPathConstants.NODESET);
+		} catch (XPathExpressionException e) {
+			throw new RuntimeException("XPathExpressionException",e);
+		}
 	}
 
 	public NodeListIterator(NodeList nl) {
+		if(nl == null) {
+			throw new NullPointerException();
+		}
 		this.nl = nl;
 		d = null;
 		path = null;
 	}
 
 	public Iterator<JrdsNode> iterator() {
-		try {
-			final NodeList localnl;
-			if(nl != null)
-				localnl = nl;
-			else
-				localnl = (NodeList)path.evaluate(d, XPathConstants.NODESET);
-			Iterator<JrdsNode> iter  = new Iterator<JrdsNode>() {
-				int i = 0;
-				int last = localnl.getLength();
-				public boolean hasNext() {
-					return i < last;
-				}
-				public JrdsNode next() {
-					return new JrdsNode(localnl.item(i++));
-				}
-				public void remove() {
-					throw new UnsupportedOperationException();
-				}
+		Iterator<JrdsNode> iter  = new Iterator<JrdsNode>() {
+			int i = 0;
+			int last = nl.getLength();
+			public boolean hasNext() {
+				return i < last;
+			}
+			public JrdsNode next() {
+				return new JrdsNode(nl.item(i++));
+			}
+			public void remove() {
+				throw new UnsupportedOperationException();
+			}
 
-			};
-			return iter;
-		} catch (XPathExpressionException e) {
-			throw new RuntimeException("XPathExpressionException",e);
-		}
+		};
+		return iter;
+	}
+
+	public int getLength() {
+		if(nl==null)
+			return 0;
+		return nl.getLength();
+	}
+
+	public Node item(int index) {
+		if(nl==null)
+			return null;
+		return nl.item(index);
 	}
 
 }

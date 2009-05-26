@@ -9,9 +9,9 @@ public class StartersSet {
 	static final private Logger logger = Logger.getLogger(StartersSet.class);
 	private Map<Object, Starter> allStarters = null;
 	private StartersSet up = null;
-	private Object level = null;
+	private StarterNode level = null;
 
-	public StartersSet(Object level) {
+	public StartersSet(StarterNode level) {
 		this.level = level;
 	}
 	
@@ -31,7 +31,7 @@ public class StartersSet {
 			}
 	}
 
-	public void registerStarter(Starter s, Object parent) {
+	public void registerStarter(Starter s, StarterNode parent) {
 		s.initialize(parent, this);
 		Object key = s.getKey();
 		if(allStarters == null)
@@ -68,7 +68,7 @@ public class StartersSet {
 	public void setParent(StartersSet s) {
 		up = s;
 	}
-	public Object getLevel() {
+	public StarterNode getLevel() {
 		return level;
 	}
 }
