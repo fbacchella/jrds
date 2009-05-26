@@ -128,7 +128,7 @@ public class HostsList implements StarterNode {
 		Loader l;
 		try {
 			l = new Loader();
-			URL graphUrl = getClass().getResource("/graph");
+			URL graphUrl = getClass().getResource("/desc");
 			if(graphUrl != null)
 			l.importUrl(graphUrl);
 		} catch (ParserConfigurationException e) {
