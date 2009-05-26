@@ -2,7 +2,7 @@
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
     <name>HttpResponseTime</name>
-    <probeName>overwrittent</probeName>
+    <probeName>url-${url.signature}</probeName>
     <probeClass>jrds.probe.HttpResponseTime</probeClass>
     <ds>
         <dsName>Connect</dsName>

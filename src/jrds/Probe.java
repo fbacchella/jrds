@@ -68,8 +68,8 @@ implements Comparable<Probe>, StarterNode {
 	 * @param pd
 	 */
 	public Probe(RdsHost monitoredHost, ProbeDesc pd) {
-		this.monitoredHost = monitoredHost;
 		this.pd = pd;
+		setHost(monitoredHost);
 		starters.setParent(monitoredHost.getStarters());
 		if( ! readSpecific()) {
 			throw new RuntimeException("Creation failed");

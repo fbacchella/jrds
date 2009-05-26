@@ -94,6 +94,13 @@ public class Util {
 		return sb.toString();	
 	}
 
+	public static String cleanPath(String s){
+		String retval = s.replace('\\', '_');
+		retval = retval.replace(':', '_');
+		retval = retval.replace('/', '_');
+		return retval;
+	}
+
 	/**
 	 * Used to normalize the end date to the last update time
 	 * but only if it's close to it 
@@ -157,7 +164,8 @@ public class Util {
 			if( o instanceof IndexedProbe) {
 				String index = ((IndexedProbe) o).getIndexName();
 				env.put("index", index);
-				env.put("index.signature", jrds.Util.stringSignature(index));
+				env.put("index.signature", stringSignature(index));
+				env.put("index.cleanpath", cleanPath(index));
 			}
 			if( o instanceof UrlProbe) {
 				URL url = ((UrlProbe) o).getUrl();
@@ -170,7 +178,11 @@ public class Util {
 				RdsHost host = p.getHost();
 				if(host != null)
 					env.put("host", host.getName());
-				env.put("probename", p.getName());
+				String probename=p.getName();
+				//It migh be called juste for evaluate probename
+				//So no probem if it's null
+				if(probename != null)
+					env.put("probename", probename);
 			}
 			if( o instanceof RdsHost) {
 				env.put("host", ((RdsHost) o).getName());
@@ -200,6 +212,7 @@ public class Util {
 			}
 		}
 
+		logger.trace("Properties to use for parsing: " + env + " with template "+ template);
 		return jrds.Util.evaluateVariables(template, env, node);
 	}
 }

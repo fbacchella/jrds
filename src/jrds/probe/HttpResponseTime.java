@@ -8,8 +8,6 @@ package jrds.probe;
 
 import java.net.URL;
 
-import jrds.Util;
-
 /**
  * @author bacchell
  *
@@ -21,7 +19,7 @@ public final class HttpResponseTime extends ExternalCmdProbe implements UrlProbe
 	public HttpResponseTime(URL url)
 	{
 		this.url = url;
-		setName("url-" + Util.stringSignature(url.toString()));
+		//setName("url-" + Util.stringSignature(url.toString()));
 		//setCmd(new String[] {p.getProperty("urlperfpath", "./HTTPTest"), url.toString()});
 	}
 

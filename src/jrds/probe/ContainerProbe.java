@@ -9,6 +9,7 @@ package jrds.probe;
 import java.util.ArrayList;
 import java.util.Date;
 
+import jrds.Probe;
 import jrds.ProbeDesc;
 
 import org.apache.log4j.Logger;
@@ -16,7 +17,20 @@ import org.apache.log4j.Logger;
 public class ContainerProbe extends VirtualProbe {
 	static final private Logger logger = Logger.getLogger(ContainerProbe.class);
 
-	static final ProbeDesc pd = new ProbeDesc(0);
+	static final ProbeDesc pd = new ProbeDesc(0) {
+		@Override
+		public String getName() {
+			return "ContainerProbeDesc";
+		}
+		@Override
+		public Class<? extends Probe> getProbeClass() {
+			return ContainerProbe.class;
+		}
+		public String getProbeName() {
+			return "ContainerProbeDesc";
+		}
+		
+	};
 
 	//An array list is needed, the introspection is picky
 	public ContainerProbe(String name, ArrayList<String> graphList) {

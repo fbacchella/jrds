@@ -28,18 +28,6 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
 	 */
 	public PartitionSpace(String indexKey) {
 		super(indexKey);
-		setName(initName());
-	}
-
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.Probe#initName()
-	 */
-	protected String initName() {
-		String retval = "fs-" + getIndexName();
-		retval = retval.replace('\\', '_');
-		retval = retval.replace(':', '_');
-		retval = retval.replace('/', '_');
-		return retval;
 	}
 
 	/**
