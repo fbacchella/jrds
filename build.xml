@@ -4,7 +4,7 @@
 	<property name="app.path" value="/${app.name}"/>
 	<property name="app.version" value="0.1-dev"/>
 	<property name="build.home" value="${basedir}/build"/>
-	<property name="docs.build" value="${build.home}/docs"/>
+	<property name="docs.build" value="${build.home}/doc"/>
 	<property name="src.home" value="${basedir}/src"/>
 	<property name="src.junit" value="${basedir}/junit"/>
 	<property name="web.src" value="${basedir}/web"/>
@@ -97,9 +97,9 @@
 				<include name="**.dtd" />
 			</fileset>
 		</jar>
-		<jar destfile="${build.home}/probes.jar" basedir="desc" excludes="*.*">
-			<fileset dir="desc">
-				<include name="**.xml" />
+		<jar destfile="${build.home}/probes.jar" >
+			<fileset dir=".">
+				<include name="desc/**/*.xml" />
 			</fileset>
 		</jar>
 	</target>
@@ -109,16 +109,14 @@
 			notree="false" nonavbar="false" noindex="false" splitindex="true"
 			author="true" version="true" nodeprecatedlist="false"
 			nodeprecated="false"
-			packagenames="jrds.probe,jrds.probe.snmp,jrds.snmp,jrds,jrds.probe.munins,jrds.graphe"
+			packagenames="jrds,jrds.probe,jrds.probe.*,jrds.snmp,jrds.factories,jrds.factories.xml"
 			sourcepath="src">
 			<classpath refid="compile.classpath"/>
-			<link href="http://java.sun.com/j2se/1.4.2/docs/api"/>
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
 			<link href="http://java.sun.com/products/servlet/2.3/javadoc"/>
 			<link href="http://www.snmp4j.org/doc"/>
-			<link href="http://www.jrobin.org/javadoc"/>
-			<link href="http://logging.apache.org/log4j/docs/api"/>
-			<link
-				href="http://jakarta.apache.org/commons/digester/commons-digester-1.7/docs/api"/>
+			<link href="http://jrds.sourceforge.net/apidoc-rrd4j/"/>
+			<link href="http://www.junit.org/junit/javadoc/4.3"/>
 		</javadoc>
 	</target>
 	
@@ -205,7 +203,7 @@
         <ivy:retrieve type="jar" pattern="${ivy.lib.dir}/[artifact].[ext]" />
     	<unzip src="lib/standard.jar" dest="lib" >
     	    <patternset>
-    	        <include name="META-INC/c.tld"/>
+    	        <include name="META-INF/c.tld"/>
     	    </patternset>
     		<mapper type="flatten"/>
     	</unzip>
