@@ -12,5 +12,6 @@
 		<dependency org="mysql" name="mysql-connector-java" rev="5.1.6" />
 		<dependency org="org.snmp4j" name="snmp4j" rev="1.9.1f" />
 		<dependency org="xerces" name="xercesImpl" rev="2.9.1" />
+		<dependency org="javax.mail" name="mail" rev="1.4.1" />
 	</dependencies>
 </ivy-module>

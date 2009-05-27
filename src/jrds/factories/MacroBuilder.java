@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 import jrds.Macro;
+import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 
 public class MacroBuilder extends ObjectBuilder {
@@ -40,6 +41,7 @@ public class MacroBuilder extends ObjectBuilder {
 	}
 
 	@Override
+	public
 	void setProperty(ObjectBuilder.properties name, Object o) {
 		switch(name) {
 		case PROBEFACTORY:

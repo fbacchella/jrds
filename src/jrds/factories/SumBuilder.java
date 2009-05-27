@@ -2,6 +2,7 @@ package jrds.factories;
 
 import java.util.ArrayList;
 
+import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 import jrds.probe.SumProbe;
 

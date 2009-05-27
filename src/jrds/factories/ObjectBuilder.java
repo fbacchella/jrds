@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 
 import org.apache.log4j.Logger;
@@ -20,7 +21,7 @@ public abstract class ObjectBuilder {
 
 	abstract Object build(JrdsNode n) throws InvocationTargetException;
 
-	void setProperty(properties name, Object o) {
+	public void setProperty(properties name, Object o) {
 		switch(name) {
 		case ARGFACTORY:
 			af = (ArgFactory) o;

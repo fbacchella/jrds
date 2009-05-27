@@ -6,6 +6,7 @@ import java.util.Map;
 
 import jrds.Probe;
 import jrds.ProbeDesc;
+import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 
 import org.apache.log4j.Logger;
@@ -128,6 +129,7 @@ public class ProbeDescBuilder extends ObjectBuilder {
 	}
 
 	@Override
+	public
 	void setProperty(ObjectBuilder.properties name, Object o) {
 		switch(name) {
 		case CLASSLOADER:

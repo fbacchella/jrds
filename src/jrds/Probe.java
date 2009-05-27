@@ -62,6 +62,8 @@ implements Comparable<Probe>, StarterNode {
 	private final StartersSet starters = new StartersSet(this);
 	long uptime = Long.MAX_VALUE;
 
+	private Map<String, Set<Threshold>> thresholds = new HashMap<String, Set<Threshold>>();
+
 	/**
 	 * The constructor that should be called by derived class
 	 * @param monitoredHost
@@ -458,8 +460,10 @@ implements Comparable<Probe>, StarterNode {
 					logger.trace(onesample.dump());
 					//The collect might have been stopped
 					//during the reading of samples
-					if( isCollectRunning())
+					if( isCollectRunning()) {
 						onesample.update();
+						checkThreshold(onesample);
+					}
 				}
 			}
 			catch (ArithmeticException ex) {
@@ -731,4 +735,32 @@ implements Comparable<Probe>, StarterNode {
 		}
 		return document;
 	}
+
+	public void addThreshold(Threshold t) {
+		Set<Threshold> tset = thresholds.get(t.dsName);
+		if(tset == null) {
+			tset = new HashSet<Threshold>();
+			thresholds.put(t.dsName, tset);
+		}
+		logger.trace("Threshold added: " + t.name);
+		tset.add(t);
+	}
+
+
+	private void checkThreshold(Sample onesample) {
+		String[] names = onesample.getDsNames();
+		double[] values = onesample.getValues();
+		for(int i=0; i< names.length; i++) {
+			Set<Threshold> tset = thresholds.get(names[i]);
+			if(tset == null)
+				continue;
+			for(Threshold t: tset) {
+				if(t != null && t.check(values[i], onesample.getTime())) {
+					t.run(this);
+				}
+			}
+		}
+	}
+
+
 }

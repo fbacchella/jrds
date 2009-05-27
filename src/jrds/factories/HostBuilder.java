@@ -8,6 +8,9 @@ import jrds.Macro;
 import jrds.Probe;
 import jrds.PropertyStarter;
 import jrds.RdsHost;
+import jrds.Threshold;
+import jrds.Threshold.Comparator;
+import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 import jrds.probe.IndexedProbe;
 import jrds.snmp.SnmpStarter;
@@ -137,11 +140,29 @@ public class HostBuilder extends ObjectBuilder {
 		List<Object> args = makeArgs(probeNode);
 		String type = probeNode.attrMap().get("type");
 		p = pf.makeProbe(type, args);
+		for(JrdsNode thresholdNode: probeNode.iterate(CompiledXPath.get("threshold"))) {
+			Map<String, String> thresholdAttr = thresholdNode.attrMap();
+			String name = thresholdAttr.get("name").trim();
+			String dsName = thresholdAttr.get("dsName").trim();
+			long value = Long.parseLong(thresholdAttr.get("value").trim());
+			long duration = Long.parseLong(thresholdAttr.get("duration").trim());
+			String operationStr = thresholdAttr.get("operation").trim();
+			Comparator operation = Comparator.valueOf(operationStr.trim().toUpperCase());
+			
+			Threshold t= new Threshold(name, dsName, value, duration, operation);
+			for(JrdsNode actionNode: thresholdNode.iterate(CompiledXPath.get("action"))) {
+				String actionType = actionNode.getChild(CompiledXPath.get("@type")).getTextContent().trim().toUpperCase();
+				Threshold.Action a = Threshold.Action.valueOf(actionType);
+				t.addAction(a, makeArgs(actionNode));
+			}
+		p.addThreshold(t);
+		}
 		return p;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
+	public
 	void setProperty(ObjectBuilder.properties name, Object o) {
 		switch(name) {
 		case MACRO:

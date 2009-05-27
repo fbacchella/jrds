@@ -210,6 +210,14 @@ public class PropertiesManager extends Properties {
 		timeout = parseInteger(getProperty("timeout", "30"));
 		rrdbackend = getProperty("rrdbackend", "NIO");
 		extensionClassLoader = doClassLoader();
+		String actionMailFrom = getProperty("action.mail.from", "root");
+		Threshold.mailappender.setFrom(actionMailFrom);
+		String actionMailTo = getProperty("action.mail.to", "root");
+		Threshold.mailappender.setTo(actionMailTo);
+		String actionMailHost = getProperty("action.mail.host", "localhost");
+		Threshold.mailappender.setSMTPHost(actionMailHost);
+		Threshold.mailappender.activateOptions();
+
 		Locale.setDefault(new Locale("POSIX"));
 	}
 

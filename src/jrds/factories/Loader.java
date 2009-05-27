@@ -19,6 +19,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpression;
 
+import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.EntityResolver;
 import jrds.factories.xml.JrdsNode;
 

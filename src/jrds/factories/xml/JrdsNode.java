@@ -133,6 +133,8 @@ public class JrdsNode implements Node {
 
 	public Map<String, String> attrMap() {
 		NamedNodeMap attrs = parent.getAttributes();
+		if(attrs == null)
+			return Collections.emptyMap();
 		Map<String, String> retValues = new HashMap<String, String>(attrs.getLength());
 		for(int i = 0; i < attrs.getLength(); i++) {
 			Node attrNode = attrs.item(i);

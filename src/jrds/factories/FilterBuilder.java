@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 
 import jrds.Filter;
 import jrds.FilterXml;
+import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 
 public class FilterBuilder extends ObjectBuilder {

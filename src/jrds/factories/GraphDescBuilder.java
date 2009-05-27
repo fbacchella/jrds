@@ -7,6 +7,7 @@ import java.util.Map;
 import org.w3c.dom.Node;
 
 import jrds.GraphDesc;
+import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 
 public class GraphDescBuilder extends ObjectBuilder {
