@@ -28,8 +28,7 @@ public class ContainerProbe extends VirtualProbe {
 		}
 		public String getProbeName() {
 			return "ContainerProbeDesc";
-		}
-		
+		}	
 	};
 
 	//An array list is needed, the introspection is picky

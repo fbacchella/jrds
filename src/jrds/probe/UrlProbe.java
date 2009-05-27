@@ -16,4 +16,5 @@ import java.net.URL;
 public interface UrlProbe {
 	public String getUrlAsString();
 	public URL getUrl();
+	public int getPort();
 }

@@ -1,9 +1,9 @@
 package jrds;
 
-import java.net.URL;
 import java.security.MessageDigest;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,9 +12,6 @@ import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Logger;
-
-import com.sun.tools.javac.util.List;
-
 
 /**
  *
@@ -168,10 +165,9 @@ public class Util {
 				env.put("index.cleanpath", cleanPath(index));
 			}
 			if( o instanceof UrlProbe) {
-				URL url = ((UrlProbe) o).getUrl();
-				env.put("url", url);
-				env.put("port", url.getPort());
-				env.put("url.signature", jrds.Util.stringSignature(url.toString()));
+				env.put("url", ((UrlProbe) o).getUrlAsString());
+				env.put("port", ((UrlProbe) o).getPort());
+				env.put("url.signature", jrds.Util.stringSignature(((UrlProbe) o).getUrlAsString()));
 			}
 			if( o instanceof Probe) {
 				Probe p = ((Probe) o);

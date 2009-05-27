@@ -86,7 +86,9 @@ implements Comparable<Probe>, StarterNode {
 	public void setHost(RdsHost monitoredHost) {
 		this.monitoredHost = monitoredHost;
 		starters.setParent(monitoredHost.getStarters());
-		name = parseTemplate(getPd().getProbeName());
+		//Name can be set by other means
+		if(name == null)
+			name = parseTemplate(getPd().getProbeName());
 	}
 
 	public void setPd(ProbeDesc pd) {
@@ -145,7 +147,7 @@ implements Comparable<Probe>, StarterNode {
 		}
 		if( this instanceof UrlProbe) {
 			url =((UrlProbe) this).getUrlAsString();
-			port = ((UrlProbe) this).getUrl().getPort();
+			port = ((UrlProbe) this).getPort();
 		}
 		String hn = "<empty>";
 		if(getHost() != null)
@@ -159,7 +161,7 @@ implements Comparable<Probe>, StarterNode {
 		env.put("url.signature", jrds.Util.stringSignature(url));
 				Object[] arguments = env.values().toArray();
 
-*/
+		 */
 		Object[] arguments = {
 				hn,
 				index,

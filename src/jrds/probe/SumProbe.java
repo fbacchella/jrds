@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Date;
 
 import jrds.GraphNode;
+import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.graphe.Sum;
 
@@ -20,10 +21,20 @@ import org.apache.log4j.Logger;
 public class SumProbe extends VirtualProbe {
 	static final private Logger logger = Logger.getLogger(SumProbe.class);
 
-	static final ProbeDesc pd = new ProbeDesc(0);
-	/*static {
-		pd.setGraphClasses(new Object[] {Sum.class});
-	}*/
+	static final ProbeDesc pd = new ProbeDesc(0) {
+		@Override
+		public String getName() {
+			return "SumProbeDesc";
+		}
+		@Override
+		public Class<? extends Probe> getProbeClass() {
+			return SumProbe.class;
+		}
+		public String getProbeName() {
+			return "SumProbeDesc";
+		}	
+	};
+
 	Collection<String> graphList;
 
 	//An array list is needed, the introspection is picky

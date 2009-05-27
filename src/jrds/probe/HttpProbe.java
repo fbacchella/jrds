@@ -130,6 +130,9 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 		return getUrl().toString();
 	}
 
+	public int getPort() {
+		return getUrl().getPort();
+	}
 	/**
 	 * @return Returns the url.
 	 */

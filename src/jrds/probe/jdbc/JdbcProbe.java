@@ -249,7 +249,7 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 		try {
 			newurl = new URL(getUrlAsString());
 		} catch (MalformedURLException e) {
-			logger.error("Invalid jdbc url: " + newurl);
+			logger.error("Invalid jdbc url: " + getUrlAsString(), e);
 		}
 		return newurl;
 	}

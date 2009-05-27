@@ -11,7 +11,7 @@ import jrds.Probe;
  *
  */
 public abstract class VirtualProbe extends Probe {
-	public Map getNewSampleValues() {
+	public Map<?, ?> getNewSampleValues() {
 		return java.util.Collections.EMPTY_MAP;
 	}
 
