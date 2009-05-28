@@ -125,6 +125,11 @@ public class ProbeDescBuilder extends ObjectBuilder {
 			}
 			pd.add(dsMap);
 		}
+		
+		Map<String, String> props = makeProperties(n.getChild(CompiledXPath.get("/probedesc")));
+		if(props != null)
+			pd.setProperties(props);
+		
 		return pd;
 	}
 

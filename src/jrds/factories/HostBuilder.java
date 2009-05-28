@@ -4,9 +4,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
+import jrds.ChainedProperties;
 import jrds.Macro;
 import jrds.Probe;
-import jrds.PropertyStarter;
 import jrds.RdsHost;
 import jrds.Threshold;
 import jrds.Threshold.Comparator;
@@ -55,12 +55,18 @@ public class HostBuilder extends ObjectBuilder {
 			SnmpStarter starter = snmpStarter(snmpNode, host);
 			starter.register(host);
 		}
-		
-		PropertyStarter hostprop = propertiesStarter(n.getChild(CompiledXPath.get("/host")));
+
+		/*PropertyStarter hostprop = propertiesStarter(n.getChild(CompiledXPath.get("/host")));
 		if(hostprop != null) {
 			hostprop.register(host);
+		}*/
+
+		Map<String, String> hostprop = makeProperties(n.getChild(CompiledXPath.get("/host")));
+		if(hostprop != null) {
+			ChainedProperties temp = new ChainedProperties(hostprop);
+			temp.register(host);
 		}
-		
+
 		for(JrdsNode probeNode: n.iterate(CompiledXPath.get("/host/probe | /host/rrd"))) {
 			Probe p = makeProbe(probeNode);
 			if(p != null) {
@@ -79,9 +85,10 @@ public class HostBuilder extends ObjectBuilder {
 				SnmpStarter starter = snmpStarter(snmpProbeNode, host);
 				starter.register(p);
 			}
-			PropertyStarter nodeprop = propertiesStarter(probeNode);
+			Map<String, String> nodeprop = makeProperties(probeNode);
 			if(nodeprop != null) {
-				nodeprop.register(p);
+				ChainedProperties temp = new ChainedProperties(nodeprop);
+				temp.register(p);
 			}
 		}
 		for(JrdsNode probeNode: n.iterate(CompiledXPath.get("/host/macro/@name"))) {
@@ -93,24 +100,6 @@ public class HostBuilder extends ObjectBuilder {
 			}
 		}
 		return host;
-	}
-
-	public PropertyStarter propertiesStarter(JrdsNode n) {
-		if(n == null)
-			return null;
-		NodeListIterator propsNodes = n.iterate(CompiledXPath.get("properties/entry"));
-		if(propsNodes.getLength() == 0) {
-			return null;
-		}
-		PropertyStarter propstart = new PropertyStarter();
-		//			propstart.register(host);
-		for(JrdsNode propNode: propsNodes) {
-			String key = propNode.evaluate(CompiledXPath.get("@key"));
-			String value = propNode.getTextContent();
-			logger.trace("Adding propertie " + key + ": " + value);
-			propstart.setProp(key, value);
-		}
-		return propstart;
 	}
 
 	public SnmpStarter snmpStarter(JrdsNode d, RdsHost host) {
@@ -148,14 +137,14 @@ public class HostBuilder extends ObjectBuilder {
 			long duration = Long.parseLong(thresholdAttr.get("duration").trim());
 			String operationStr = thresholdAttr.get("operation").trim();
 			Comparator operation = Comparator.valueOf(operationStr.trim().toUpperCase());
-			
+
 			Threshold t= new Threshold(name, dsName, value, duration, operation);
 			for(JrdsNode actionNode: thresholdNode.iterate(CompiledXPath.get("action"))) {
 				String actionType = actionNode.getChild(CompiledXPath.get("@type")).getTextContent().trim().toUpperCase();
 				Threshold.Action a = Threshold.Action.valueOf(actionType);
 				t.addAction(a, makeArgs(actionNode));
 			}
-		p.addThreshold(t);
+			p.addThreshold(t);
 		}
 		return p;
 	}

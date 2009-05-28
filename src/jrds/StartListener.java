@@ -35,7 +35,8 @@ public class StartListener implements ServletContextListener {
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
 	 */
 	public void contextInitialized(ServletContextEvent arg0) {
-		Logger.getRootLogger().setLevel(Level.TRACE);
+		//Logger.getLogger("jrds").setLevel(Level.TRACE);
+		//logger.setLevel(Level.TRACE);
 		//Resin launch the listener twice !
 		if( ! started ) {
 			try {
@@ -75,7 +76,7 @@ public class StartListener implements ServletContextListener {
 				if(localPropFile != null)
 					pm.join(new File(localPropFile));
 
-				 localPropFile = System.getProperty("propertiesFile");
+				localPropFile = System.getProperty("propertiesFile");
 				if(localPropFile != null)
 					pm.join(new File(localPropFile));
 

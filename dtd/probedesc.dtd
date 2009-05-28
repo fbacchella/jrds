@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT probedesc (name, probeName?, probeClass, (snmpRequester | specific+)?, uptimefactor?, (index, uniq)?, defaultargs?, ds+, graphs)>
+<!ELEMENT probedesc (name, probeName?, probeClass, (snmpRequester | specific+)?, properties?, uptimefactor?, (index, uniq)?, defaultargs?, ds+, graphs)>
 <!ATTLIST specific 
 			name CDATA #REQUIRED
 >
@@ -27,3 +27,8 @@
 <!ELEMENT probeName (#PCDATA)>
 <!ELEMENT snmpRequester (#PCDATA)>
 <!ELEMENT collect (#PCDATA)>
+<!--from http://java.sun.com/dtd/properties.dtd -->
+<!ELEMENT properties ( comment?, entry* ) >
+<!ELEMENT comment (#PCDATA) >
+<!ELEMENT entry (#PCDATA) >
+<!ATTLIST entry key CDATA #REQUIRED>

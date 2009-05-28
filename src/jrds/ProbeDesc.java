@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -56,7 +57,7 @@ public class ProbeDesc {
 	private Class<? extends Probe> probeClass = null;
 	private List<Object> defaultsArgs = null;
 	private float uptimefactor = (float) 1.0;
-
+	private Map<String, String> properties = null;
 
 	private final class DsDesc {
 		public DsType dsType;
@@ -455,5 +456,19 @@ public class ProbeDesc {
 
 	public List<Object> getDefaultArgs() {
 		return defaultsArgs;
+	}
+
+	/**
+	 * @return the properties
+	 */
+	public Map<String, String> getProperties() {
+		return properties;
+	}
+
+	/**
+	 * @param properties the properties to set
+	 */
+	public void setProperties(Map<String, String> properties) {
+		this.properties = properties;
 	}
 }

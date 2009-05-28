@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT graphdesc (name, graphName, graphTitle, unit?, verticalLabel, upperLimit?, lowerLimit?, add+, hosttree, viewtree)>
+<!ELEMENT graphdesc (name, graphName, graphTitle, properties?, unit?, verticalLabel, upperLimit?, lowerLimit?, add+, hosttree, viewtree)>
 <!ELEMENT graph (name, graphName, graphTitle, unit?, verticalLabel, upperLimit?, lowerLimit?, add+, hosttree, viewtree)>
 <!ELEMENT add (legend | (name, path?, rpn?, reversed?, graphType?, color?, legend?))>
 <!ELEMENT viewtree (pathelement | pathstring)*>
@@ -24,3 +24,8 @@
 <!ELEMENT binary EMPTY>
 <!ELEMENT SI EMPTY>
 <!ELEMENT base (#PCDATA)>
+<!--from http://java.sun.com/dtd/properties.dtd -->
+<!ELEMENT properties ( comment?, entry* ) >
+<!ELEMENT comment (#PCDATA) >
+<!ELEMENT entry (#PCDATA) >
+<!ATTLIST entry key CDATA #REQUIRED>

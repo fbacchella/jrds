@@ -118,11 +118,11 @@ public class Util {
 	}
 
 	public static String evaluateVariables(String in, Map<String, Object> variables, StarterNode node) {
-		PropertyStarter props = (PropertyStarter)node.getStarters().find(PropertyStarter.KEY);
+		ChainedProperties props = (ChainedProperties)node.getStarters().find(ChainedProperties.KEY);
 		return evaluateVariables(in, variables, props);
 	}
 
-	public static String evaluateVariables(String in, Map<String, Object> variables, PropertyStarter props) {
+	public static String evaluateVariables(String in, Map<String, Object> variables, Map<String,String> props) {
 		Matcher m = varregexp.matcher(in);
 		if(m.find()) {
 			StringBuilder out = new StringBuilder();
@@ -132,11 +132,14 @@ public class Util {
 				String after = m.group(3);
 				out.append(before);
 				String toAppend = null;
-				if(variables.containsKey(var)) {
+				if(var.startsWith("system.")) {
+					 toAppend = System.getProperty(var.replace("system.", ""));
+				}
+				else if(variables.containsKey(var)) {
 					toAppend = variables.get(var).toString();
 				}
 				else if(props != null) {
-					String propsValue = props.getProp(var);
+					String propsValue = props.get(var);
 					if(propsValue != null)
 						out.append(propsValue);
 				}
@@ -147,7 +150,6 @@ public class Util {
 				if(after.length() > 0)
 					out.append(evaluateVariables(after, variables, props));
 				return out.toString();
-
 			}
 		}
 		return in;

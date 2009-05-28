@@ -2,6 +2,7 @@ package jrds.factories;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,5 +49,23 @@ public abstract class ObjectBuilder {
 	public Object makeArg(String className, String value) {
 		return af.makeArg(className, value);
 	}
+	
+	public Map<String, String> makeProperties(JrdsNode n) {
+		if(n == null)
+			return null;
+		NodeListIterator propsNodes = n.iterate(CompiledXPath.get("properties/entry"));
+		if(propsNodes.getLength() == 0) {
+			return null;
+		}
+		Map<String, String> props = new HashMap<String, String>();
+		for(JrdsNode propNode: propsNodes) {
+			String key = propNode.evaluate(CompiledXPath.get("@key"));
+			String value = propNode.getTextContent();
+			logger.trace("Adding propertie " + key + ": " + value);
+			props.put(key, value);
+		}
+		return props;
+	}
+
 
 }
