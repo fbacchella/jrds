@@ -8,8 +8,10 @@ package jrds.webapp;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Enumeration;
 
 import javax.media.jai.JAI;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -38,6 +40,15 @@ public final class WhichLibs extends HttpServlet {
 		try {
 			ServletOutputStream out = res.getOutputStream();
 			res.addHeader("Cache-Control", "no-cache");
+			
+			ServletContext ctxt = getServletContext();
+
+			for (Enumeration<?> e = ctxt.getAttributeNames() ; e.hasMoreElements() ;)
+			{
+				String attr = (String) e.nextElement();
+				Object o = ctxt.getAttribute(attr);
+				out.println(attr + " = " + o);
+			}
 
 			out.println(resolv("String", ""));
 			out.println(resolv("jrds", this));

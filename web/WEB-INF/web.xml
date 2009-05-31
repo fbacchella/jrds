@@ -42,6 +42,13 @@
   	<servlet-name>status</servlet-name>
   	<servlet-class>jrds.webapp.Status</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>discover</servlet-name>
+  	<display-name>discover</display-name>
+  	<description></description>
+  	<servlet-class>
+  	jrds.webapp.Discover</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>Last</servlet-name>
     <url-pattern>/lastvalues</url-pattern>
@@ -77,6 +84,10 @@
   <servlet-mapping>
     <servlet-name>status</servlet-name>
     <url-pattern>/status</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>discover</servlet-name>
+  	<url-pattern>/discover</url-pattern>
   </servlet-mapping>
   <taglib>
     <taglib-uri>http://java.sun.com/jstl/core</taglib-uri>

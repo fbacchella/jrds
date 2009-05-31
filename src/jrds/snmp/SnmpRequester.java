@@ -8,6 +8,7 @@ package jrds.snmp;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -18,9 +19,11 @@ import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.util.DefaultPDUFactory;
+import org.snmp4j.util.PDUFactory;
 import org.snmp4j.util.TableEvent;
 import org.snmp4j.util.TableUtils;
-
+import org.snmp4j.util.TreeEvent;
+import org.snmp4j.util.TreeUtils;
 
 /**
  * An abstract class to generate simple SNMP requesters
@@ -84,7 +87,7 @@ public abstract class SnmpRequester {
 			if(starter != null && starter.isStarted()) {
 				Target snmpTarget = starter.getTarget();
 				if(snmpTarget != null) {
-					DefaultPDUFactory localfactory = new DefaultPDUFactory();
+					PDUFactory localfactory = starter.getPdufactory();
 					TableUtils tableRet = new TableUtils(starter.getSnmp(), localfactory);
 					tableRet.setMaxNumColumnsPerPDU(30);
 					OID[] oidTab= new OID[oids.size()];
@@ -102,6 +105,37 @@ public abstract class SnmpRequester {
 		@Override
 		public String getName() {
 			return "tabular";
+		}	
+	};
+	/**
+	 *  A requester used to read an tee of oid
+	 */
+	public static final SnmpRequester TREE = new SnmpRequester() {
+
+		@SuppressWarnings("unchecked")
+		public Map<OID, Object> doSnmpGet(SnmpStarter starter, Collection<OID> oids)
+		{
+			SnmpVars retValue = new SnmpVars();
+
+			if(starter != null && starter.isStarted()) {
+				Target snmpTarget = starter.getTarget();
+				if(snmpTarget != null) {
+					TreeUtils treeRet = new TreeUtils(starter.getSnmp(), starter.getPdufactory());
+					for(OID rootOid : oids) {
+						List<TreeEvent> subOids = treeRet.getSubtree(snmpTarget, rootOid);
+						for(TreeEvent te: subOids) {
+							retValue.join(te.getVariableBindings());
+						}
+						
+					}
+				}
+			}
+			return retValue;
+		}
+
+		@Override
+		public String getName() {
+			return "tree";
 		}	
 	};
 

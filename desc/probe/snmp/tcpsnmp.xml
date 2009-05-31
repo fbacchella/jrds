@@ -4,6 +4,7 @@
     <name>TcpSnmp</name>
     <probeName>tcp_snmp</probeName>
     <probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
+ 	<specific name="existOid">.1.3.6.1.2.1.6.9.0</specific>
     <snmpRequester>simple</snmpRequester>
     <ds>
         <dsName>ActiveOpens</dsName>

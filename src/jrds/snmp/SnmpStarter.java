@@ -12,6 +12,7 @@ import jrds.probe.snmp.SnmpProbe;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.CommunityTarget;
+import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.Target;
 import org.snmp4j.mp.SnmpConstants;
@@ -21,6 +22,8 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
+import org.snmp4j.util.DefaultPDUFactory;
+import org.snmp4j.util.PDUFactory;
 
 public class SnmpStarter extends Starter {
 	static final private Logger logger = Logger.getLogger(SnmpStarter.class);
@@ -29,6 +32,7 @@ public class SnmpStarter extends Starter {
 	static public final String SNMPKEY = "snmp";
 	static final private OID hrSystemUptime = new OID(".1.3.6.1.2.1.25.1.1.0");
 	static final private OID sysUpTimeInstance = new OID(".1.3.6.1.2.1.1.3.0");
+	static final private PDUFactory pdufactory = new DefaultPDUFactory(PDU.GET);
 
 	static private Snmp snmp = null;
 	static public final Starter full = new Starter() {
@@ -233,5 +237,12 @@ public class SnmpStarter extends Starter {
 
 	public void setUptimeOid(OID uptimeOid) {
 		this.uptimeOid = uptimeOid;
+	}
+
+	/**
+	 * @return the pdufactory
+	 */
+	public PDUFactory getPdufactory() {
+		return pdufactory;
 	}
 }

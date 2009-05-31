@@ -67,6 +67,7 @@ public class StartListener implements ServletContextListener {
 					}
 				}
 				PropertiesManager pm = new PropertiesManager();
+				ctxt.setAttribute(PropertiesManager.class.getCanonicalName(), pm);
 				InputStream propStream = ctxt.getResourceAsStream("/WEB-INF/jrds.properties");
 				if(propStream != null) {
 					pm.join(propStream);
