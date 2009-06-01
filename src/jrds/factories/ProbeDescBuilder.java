@@ -41,21 +41,22 @@ public class ProbeDescBuilder extends ObjectBuilder {
 	public ProbeDesc makeProbeDesc(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
 		ProbeDesc pd = new ProbeDesc();
 
-		n.setMethod(pd, CompiledXPath.get("/probedesc/probeName"), "setProbeName");
-		n.setMethod(pd, CompiledXPath.get("/probedesc/name"), "setName");
+		JrdsNode probeDescNode = n.getChild(CompiledXPath.get("/probedesc"));
+		probeDescNode.setMethod(pd, CompiledXPath.get("probeName"), "setProbeName");
+		probeDescNode.setMethod(pd, CompiledXPath.get("name"), "setName");
 
 		logger.trace("Creating probe description " + pd.getName());
 
-		String className = n.evaluate(CompiledXPath.get("/probedesc/probeClass")).trim();
+		String className = probeDescNode.evaluate(CompiledXPath.get("probeClass")).trim();
 		Class<? extends Probe> c = (Class<? extends Probe>) classLoader.loadClass(className);
 		pd.setProbeClass(c);
 
-		if(n.checkPath(CompiledXPath.get("/probedesc/uniq")))
+		if(probeDescNode.checkPath(CompiledXPath.get("uniq")))
 			pd.setUniqIndex(true);
 
 		String uptimefactorStr = "";
 		try {
-			uptimefactorStr = n.evaluate(CompiledXPath.get("/probedesc/uptimefactor")).trim();
+			uptimefactorStr = probeDescNode.evaluate(CompiledXPath.get("uptimefactor")).trim();
 			if( uptimefactorStr != null && ! "".equals(uptimefactorStr)) {
 				float uptimefactor = Float.parseFloat(uptimefactorStr);
 				pd.setUptimefactor(uptimefactor);
@@ -65,7 +66,7 @@ public class ProbeDescBuilder extends ObjectBuilder {
 			pd.setUptimefactor(0);
 		}
 
-		pd.setGraphClasses(n.doTreeList(CompiledXPath.get("/probedesc/graphs/name"), new JrdsNode.FilterNode() {
+		pd.setGraphClasses(probeDescNode.doTreeList(CompiledXPath.get("graphs/name"), new JrdsNode.FilterNode() {
 			@Override
 			public Object filter(Node input) {
 				logger.trace("Adding graph: " + input.getTextContent());
@@ -74,7 +75,7 @@ public class ProbeDescBuilder extends ObjectBuilder {
 
 		}));
 
-		for(JrdsNode specificNode: n.iterate(CompiledXPath.get("/probedesc/specific"))) {
+		for(JrdsNode specificNode: probeDescNode.iterate(CompiledXPath.get("specific"))) {
 			Map<String, String> m = specificNode.attrMap();
 			if(m != null) {
 				String name = m.get("name");
@@ -84,26 +85,26 @@ public class ProbeDescBuilder extends ObjectBuilder {
 			}
 		}
 
-		String snmpRequester = n.evaluate(CompiledXPath.get("/probedesc/snmpRequester"));
+		String snmpRequester = probeDescNode.evaluate(CompiledXPath.get("snmpRequester"));
 		if(snmpRequester != null && ! "".equals(snmpRequester.trim())) {
 			pd.addSpecific("requester", snmpRequester.trim());
 			logger.trace("Specific added: requester='" + snmpRequester.trim() + "'");
 
 		}
 
-		String index = n.evaluate(CompiledXPath.get("/probedesc/index"));
+		String index = probeDescNode.evaluate(CompiledXPath.get("index"));
 		if(index !=null && ! "".equals(index))	{
 			pd.addSpecific(jrds.probe.snmp.RdsIndexedSnmpRrd.INDEXOIDNAME, index.trim());
 		}
 
 		//Populating default argument vector
-		JrdsNode argsNode = n.getChild(CompiledXPath.get("/probedesc/defaultargs"));
+		JrdsNode argsNode = probeDescNode.getChild(CompiledXPath.get("defaultargs"));
 		if(argsNode != null)
 			for(Object o:  makeArgs(argsNode)) {
 				pd.addDefaultArg(o);
 			}
 
-		for(JrdsNode dsNode: n.iterate(CompiledXPath.get("/probedesc/ds"))) {
+		for(JrdsNode dsNode: probeDescNode.iterate(CompiledXPath.get("ds"))) {
 			Map<String, Object> dsMap = new HashMap<String, Object>(4);
 			for(JrdsNode dsContent: dsNode.iterate(CompiledXPath.get("*"))) {
 				String element = dsContent.getNodeName();
@@ -126,7 +127,7 @@ public class ProbeDescBuilder extends ObjectBuilder {
 			pd.add(dsMap);
 		}
 		
-		Map<String, String> props = makeProperties(n.getChild(CompiledXPath.get("/probedesc")));
+		Map<String, String> props = makeProperties(probeDescNode);
 		if(props != null)
 			pd.setProperties(props);
 		
