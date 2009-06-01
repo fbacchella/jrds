@@ -13,13 +13,13 @@ public class Threshold {
 	static final private Logger logger = Logger.getLogger(Threshold.class);
 
 	public enum Comparator {
-		GREATER {
+		HIGH {
 			@Override
 			public boolean check(double a, double b) {
 				return Double.compare(a, b) >= 0;
 			}
 		},
-		LESS {
+		LOW {
 			@Override
 			public boolean check(double a, double b) {
 				return Double.compare(a, b) <= 0;

@@ -68,27 +68,32 @@ public class HostBuilder extends ObjectBuilder {
 		}
 
 		for(JrdsNode probeNode: n.iterate(CompiledXPath.get("/host/probe | /host/rrd"))) {
-			Probe p = makeProbe(probeNode);
-			if(p != null) {
-				logger.trace(p);
-				host.addProbe(p);
-			}
-			if(p instanceof IndexedProbe) {
-				String label = probeNode.evaluate(CompiledXPath.get("@label"));
-				if(label != null && ! "".equals(label)) {
-					logger.trace("Adding label " + label + " to "  + p);
-					((IndexedProbe)p).setLabel(label);
+			try {
+				Probe p = makeProbe(probeNode);
+				if(p != null) {
+					logger.trace(p);
+					host.addProbe(p);
 				}
-			}
-			JrdsNode snmpProbeNode = probeNode.getChild(CompiledXPath.get("snmp"));
-			if(snmpProbeNode != null) {
-				SnmpStarter starter = snmpStarter(snmpProbeNode, host);
-				starter.register(p);
-			}
-			Map<String, String> nodeprop = makeProperties(probeNode);
-			if(nodeprop != null) {
-				ChainedProperties temp = new ChainedProperties(nodeprop);
-				temp.register(p);
+				if(p instanceof IndexedProbe) {
+					String label = probeNode.evaluate(CompiledXPath.get("@label"));
+					if(label != null && ! "".equals(label)) {
+						logger.trace("Adding label " + label + " to "  + p);
+						((IndexedProbe)p).setLabel(label);
+					}
+				}
+				JrdsNode snmpProbeNode = probeNode.getChild(CompiledXPath.get("snmp"));
+				if(snmpProbeNode != null) {
+					SnmpStarter starter = snmpStarter(snmpProbeNode, host);
+					starter.register(p);
+				}
+				Map<String, String> nodeprop = makeProperties(probeNode);
+				if(nodeprop != null) {
+					ChainedProperties temp = new ChainedProperties(nodeprop);
+					temp.register(p);
+				}
+			} catch (Exception e) {
+				logger.error("Probe creation failed for host " + host.getName() + ": " + e);
+				e.printStackTrace();
 			}
 		}
 		for(JrdsNode probeNode: n.iterate(CompiledXPath.get("/host/macro/@name"))) {
@@ -135,8 +140,8 @@ public class HostBuilder extends ObjectBuilder {
 			String dsName = thresholdAttr.get("dsName").trim();
 			long value = Long.parseLong(thresholdAttr.get("value").trim());
 			long duration = Long.parseLong(thresholdAttr.get("duration").trim());
-			String operationStr = thresholdAttr.get("operation").trim();
-			Comparator operation = Comparator.valueOf(operationStr.trim().toUpperCase());
+			String operationStr = thresholdAttr.get("limit").trim();
+			Comparator operation = Comparator.valueOf(operationStr.toUpperCase());
 
 			Threshold t= new Threshold(name, dsName, value, duration, operation);
 			for(JrdsNode actionNode: thresholdNode.iterate(CompiledXPath.get("action"))) {

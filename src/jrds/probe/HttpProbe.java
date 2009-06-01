@@ -12,6 +12,7 @@ import java.util.Map;
 
 import jrds.Probe;
 import jrds.RdsHost;
+import jrds.Starter;
 
 import org.apache.log4j.Logger;
 
@@ -99,6 +100,11 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 	 * @see com.aol.jrds.Probe#getNewSampleValues()
 	 */
 	public Map<?, ?> getNewSampleValues() {
+		Starter resolver = getStarters().find(Starter.Resolver.buildKey(getUrl().getHost()));
+		if(! resolver.isStarted()) {
+			logger.trace("Resolver not started for " + getUrl().getHost());
+			return null;
+		}
 		Map<String, Number> vars = java.util.Collections.emptyMap();
 		logger.debug("Getting " + getUrl());
 		try {
