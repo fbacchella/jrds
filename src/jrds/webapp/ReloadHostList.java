@@ -47,6 +47,10 @@ public class ReloadHostList extends HttpServlet {
 		if(localPropFile != null)
 			pm.join(new File(localPropFile));
 
+		localPropFile = System.getProperty("propertiesFile");
+		if(localPropFile != null)
+			pm.join(new File(localPropFile));
+
 		pm.update();
 		jrds.HostsList.purge();
 		jrds.HostsList.getRootGroup().configure(pm);
