@@ -95,6 +95,10 @@ public class Discover extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 
 		String hostname = request.getParameter("host");
+		boolean withOid = false;
+		String withOidStr = request.getParameter("withoid");
+		if(withOidStr != null)
+			withOid = true;
 
 		PropertiesManager pm = (PropertiesManager) getServletContext().getAttribute(PropertiesManager.class.getCanonicalName());
 
@@ -117,7 +121,7 @@ public class Discover extends HttpServlet {
 		l.importDir(new File(pm.configdir));
 
 		try {
-			Document hostDom = generate(hostname, l.getRepository(Loader.ConfigType.PROBEDESC).values());
+			Document hostDom = generate(hostname, l.getRepository(Loader.ConfigType.PROBEDESC).values(), withOid, request.getParameterValues("tag"));
 
 			of.setIndent(1);
 			of.setIndenting(true);
@@ -135,7 +139,7 @@ public class Discover extends HttpServlet {
 		}
 	}
 
-	public Document generate(String hostname, Collection<JrdsNode> probdescs) throws IOException, ParserConfigurationException {
+	public Document generate(String hostname, Collection<JrdsNode> probdescs, boolean withOid, String[] tags) throws IOException, ParserConfigurationException {
 		DocumentBuilder dbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document hostDom = dbuilder.newDocument();
 
@@ -145,10 +149,16 @@ public class Discover extends HttpServlet {
 		hosttarget.setVersion(SnmpConstants.version2c);
 		active.target = hosttarget;
 		active.doStart();
-		
+
 		Element hostEleme = hostDom.createElement("host");
 		hostEleme.setAttribute("name", hostname);
 		hostDom.appendChild(hostEleme);
+		
+		for(String tag: tags) {
+			Element tagElem = hostDom.createElement("tag");
+			tagElem.setTextContent(tag);
+			hostEleme.appendChild(tagElem);
+		}
 
 		Element snmpElem = hostDom.createElement("snmp");
 		if(hosttarget instanceof CommunityTarget) {
@@ -168,7 +178,7 @@ public class Discover extends HttpServlet {
 					logger.debug("index OID for " + name + ": " + index);
 					logger.debug("label OID for " + name + ": " + labelOid);
 					try {
-						enumerateIndexed(hostEleme, active, name, index, labelOid);
+						enumerateIndexed(hostEleme, active, name, index, labelOid, withOid);
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
@@ -206,7 +216,7 @@ public class Discover extends HttpServlet {
 		return null;
 	}
 
-	private void enumerateIndexed(Element hostEleme, SnmpStarter active, String name, String indexOid, String labelOid ) throws IOException {
+	private void enumerateIndexed(Element hostEleme, SnmpStarter active, String name, String indexOid, String labelOid, boolean withOid ) throws IOException {
 		Set<OID> oidsSet = Collections.singleton(new OID(indexOid));
 		Map<OID, Object> indexes= (Map<OID, Object>) SnmpRequester.TREE.doSnmpGet(active, oidsSet);
 		logger.trace("Elements :"  + indexes);
@@ -220,18 +230,20 @@ public class Discover extends HttpServlet {
 			Element arg1 = hostEleme.getOwnerDocument().createElement("arg");
 			arg1.setAttribute("type", "String");
 			arg1.setAttribute("value", indexfName.toString());
+			rrdElem.appendChild(arg1);
 
-			Element arg2 = hostEleme.getOwnerDocument().createElement("arg");
-			arg2.setAttribute("type", "OID");
-			arg2.setAttribute("value", Integer.toString(index));
+			if(withOid) {
+				Element arg2 = hostEleme.getOwnerDocument().createElement("arg");
+				arg2.setAttribute("type", "OID");
+				arg2.setAttribute("value", Integer.toString(index));
+				rrdElem.appendChild(arg2);
+			}
 
 			OID Oidlabel = new OID(labelOid + "." + index);
 			String label = getLabel(active, Collections.singletonList(Oidlabel));
 			if(label != null) {
 				rrdElem.setAttribute("label", label);
 			}
-			rrdElem.appendChild(arg1);
-			rrdElem.appendChild(arg2);
 			hostEleme.appendChild(rrdElem);
 		}
 	}
