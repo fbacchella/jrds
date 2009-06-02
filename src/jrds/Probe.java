@@ -52,7 +52,7 @@ implements Comparable<Probe>, StarterNode {
 
 	static final private Logger logger = Logger.getLogger(Probe.class);
 
-	private int timeout = HostsList.getRootGroup().getTimeout();
+	private int timeout = 30;
 	private String name = null;
 	private RdsHost monitoredHost;
 	private Collection<GraphNode> graphList = new ArrayList<GraphNode>(0);
@@ -748,24 +748,11 @@ implements Comparable<Probe>, StarterNode {
 
 
 	private void checkThreshold(RrdDb rrdDb) throws IOException {
-		//No thresholds, nothing to do
-		if(thresholds.size() == 0)
-			return;
-
-		String[] dsNames = rrdDb.getDsNames();
-		long lastUpdate = Util.getDate(rrdDb.getLastUpdateTime()).getTime();
-
-		for(int i=0; i< dsNames.length; i++) {
-			Set<Threshold> tset = thresholds.get(dsNames[i]);
-			if(tset == null)
-				continue;
-			double value = rrdDb.getDatasource(i).getLastValue();
-			if(Double.isNaN(value))
-				continue;
+		for(Set<Threshold> tset: thresholds.values()) {
 			for(Threshold t: tset) {
-				if(t != null &&  t.check(value, lastUpdate)) {
+				logger.trace("Threshold to " + this + ": " + t);
+				if(t.check(rrdDb)) 
 					t.run(this);
-				}
 			}
 		}
 	}

@@ -1,5 +1,6 @@
 package jrds;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +10,9 @@ import org.apache.log4j.PatternLayout;
 import org.apache.log4j.net.SMTPAppender;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.TriggeringEventEvaluator;
+import org.rrd4j.ConsolFun;
+import org.rrd4j.core.FetchRequest;
+import org.rrd4j.core.RrdDb;
 public class Threshold {
 	static final private Logger logger = Logger.getLogger(Threshold.class);
 
@@ -93,27 +97,31 @@ public class Threshold {
 		this.name = name;
 		this.dsName = dsName;
 		this.value = value;
-		this.duration = duration * 60 * 1000;
+		this.duration = duration * 60;
 		this.operation = operation;
+		logger.debug( Threshold.mailappender.getErrorHandler());
 	}
 
 	public void addAction(Action a, List<Object> args) {
 		actions.add(a);
 		actionsArgs.add(args);
-
-	}
-	public boolean check(double collected) {
-		return check(collected, System.currentTimeMillis());
 	}
 
-	public boolean check(double collected, long time) {
-		boolean checked = operation.check(collected, value);
-		if(!checked && firstTrue >= 0)
-			firstTrue = -1;
-		else if (checked && firstTrue < 0 ) {
-			firstTrue = time;
+	public boolean check(RrdDb db) {
+		try {
+			long lastUpdate = db.getLastUpdateTime();
+			long tempduration = Math.max(duration, db.getHeader().getStep());
+			FetchRequest fr = db.createFetchRequest(ConsolFun.AVERAGE, lastUpdate - tempduration , lastUpdate);
+			double collected = fr.fetchData().getAggregate(dsName, ConsolFun.AVERAGE);
+			if(Double.isNaN(collected))
+				return false;
+			logger.debug("compare value:" + value + " to " +  fr.fetchData().getAggregate(dsName, ConsolFun.AVERAGE) + ", result:"+ Double.compare(collected, value));
+			return operation.check(collected, value);
+		} catch (IOException e) {
+			logger.equals("Check failed for " + this);
 		}
-		return checked && (time - firstTrue) >= duration;
+
+		return false;
 	}
 
 	public void run(Probe p) {
