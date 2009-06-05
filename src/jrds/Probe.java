@@ -60,7 +60,7 @@ implements Comparable<Probe>, StarterNode {
 	private ProbeDesc pd;
 	private Set<String> tags = null;
 	private final StartersSet starters = new StartersSet(this);
-	long uptime = Long.MAX_VALUE;
+	private long uptime = Long.MAX_VALUE;
 
 	private Map<String, Set<Threshold>> thresholds = new HashMap<String, Set<Threshold>>();
 
@@ -90,6 +90,7 @@ implements Comparable<Probe>, StarterNode {
 		starters.setParent(monitoredHost.getStarters());
 		//Name can be set by other means
 		if(name == null)
+		//	name = getPd().getProbeName();
 			name = parseTemplate(getPd().getProbeName());
 	}
 
@@ -132,6 +133,7 @@ implements Comparable<Probe>, StarterNode {
 
 	public String getName() {
 		return name;
+//		return parseTemplate(name);
 	}
 
 	public String getRrdName() {
@@ -756,5 +758,6 @@ implements Comparable<Probe>, StarterNode {
 			}
 		}
 	}
+
 
 }

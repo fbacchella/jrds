@@ -130,7 +130,7 @@ public class HostsList implements StarterNode {
 			l = new Loader();
 			URL graphUrl = getClass().getResource("/desc");
 			if(graphUrl != null)
-			l.importUrl(graphUrl);
+				l.importUrl(graphUrl);
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException("Loader initialisation error",e);
 		}
@@ -150,24 +150,33 @@ public class HostsList implements StarterNode {
 		conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
 		conf.setMacroMap(l.getRepository(Loader.ConfigType.MACRODEF));
 
+		Set<String> hostsTags = new HashSet<String>();
 		Map<String, RdsHost> hosts = conf.setHostMap(l.getRepository(Loader.ConfigType.HOSTS));
 		for(RdsHost h: hosts.values()) {
 			addHost(h);
 			for(Probe p: h.getProbes()) {
+				p.setTimeout(getTimeout());
 				addProbe(p);
+				for(String hostTag: p.getTags()) {
+					hostsTags.add(hostTag);
+				}
 			}				
 		}
-		
+
+		for(String tag: hostsTags) {
+			Filter f = new FilterTag(tag);
+			filters.put(f.getName(), f);
+		}
 		Map <String, Filter> f = conf.setFilterMap(l.getRepository(Loader.ConfigType.FILTER));
 		for(Filter filter: f.values()) {
 			addFilter(filter);
 		}
-		
+
 		Map<String, SumProbe> sums = conf.setSumMap(l.getRepository(Loader.ConfigType.SUM));
 		for(SumProbe s: sums.values()) {
 			addSum(s);
 		}
-		
+
 		logger.debug("Parsing graphs configuration");
 		Map<String, GraphDesc> graphs = conf.setGrapMap(l.getRepository(Loader.ConfigType.GRAPH));
 		if(! graphs.isEmpty()) {
@@ -182,90 +191,6 @@ public class HostsList implements StarterNode {
 		started = true;
 
 	}
-
-	/*	public void configure(PropertiesManager pm) {
-		started = false;
-		try {
-			jrds.JrdsLoggerConfiguration.configure(pm);
-		} catch (IOException e1) {
-			logger.error("Unable to set log file to " + pm.logfile);
-		}
-
-		numCollectors = pm.collectorThreads;
-		resolution = pm.resolution;
-		rrdDir = pm.rrddir;
-		tmpdir = pm.tmpdir;
-
-		ArgFactory af= new ArgFactory();
-		DescFactory df = new DescFactory(af);
-		GraphFactory gf = new GraphFactory(df.getGraphDescMap(), pm.legacymode);
-		ProbeFactory pf = new ProbeFactory(df.getProbesDescMap(), gf, pm, pm.legacymode);
-
-		pm.libspath.add(DescFactory.class.getResource("/probe"));
-		pm.libspath.add(DescFactory.class.getResource("/graph"));
-
-		logger.debug("Scanning " + pm.libspath + " for probes libraries");
-		for(URL lib: pm.libspath) {
-			try {
-				logger.info("Adding lib " + lib);
-				df.importDescUrl(lib);
-			} catch (IOException e) {
-				logger.error("Lib " + lib + " can't be imported: " + e);
-			}
-		}
-		//We might find graph descriptions in the confidir
-		if(pm.configdir != null) {
-			ContainerProbe cp = new ContainerProbe(customhost.getName(), null);
-			customhost.addProbe(cp);
-			try {
-				DescFactory tempdf = new DescFactory(af);
-
-				tempdf.importDescUrl((new File(pm.configdir)).toURL());
-
-				for(GraphDesc gd: tempdf.getGraphDescMap().values()) {
-					logger.trace("Adding graphdesc: " + gd.getGraphTitle());
-					gf.addGraphDesc(gd);
-					cp.addGraph(gd);
-				}
-				addVirtual(cp, customhost, CUSTOMROOT);
-			} catch (MalformedURLException e) {
-				logger.error("What is this configuration directory " + pm.configdir);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		if(logger.isDebugEnabled()) {
-			List<String> graphsName = new ArrayList<String>(df.getGraphDescMap().keySet());
-			Collections.sort(graphsName);
-			List<String> probesName = new ArrayList<String>(df.getProbesDescMap().keySet());
-			Collections.sort(probesName);
-			logger.debug("Graphs :" + graphsName);
-			logger.debug("Probes: " + probesName);
-			for(Probe p: probeMap.values()) {
-				logger.debug(p);
-			}
-			for(GraphDesc p: df.getGraphDescMap().values()) {
-//				logger.debug(p.);
-			}
-		}
-
-		HostConfigParser hp = new HostConfigParser(pf,af);
-
-		if(pm.configdir != null) {
-			try {
-				hp.importDescUrl((new File(pm.configdir,"/macro")).toURL());
-				hp.importDescUrl((new File(pm.configdir)).toURL());
-			} catch (MalformedURLException e) {
-				logger.error("What is this configuration directory " + pm.configdir);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		started = true;
-	}
-	 */
 
 	public Collection<RdsHost> getHosts() {
 		return hostList;

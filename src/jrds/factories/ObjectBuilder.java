@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jrds.PropertiesManager;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 
@@ -15,10 +16,11 @@ public abstract class ObjectBuilder {
 	static final private Logger logger = Logger.getLogger(ObjectBuilder.class);
 
 	public enum properties {
-		MACRO, GRAPHDESC, PROBEDESC, ARGFACTORY, PROBEFACTORY, GRAPHFACTORY, LOADER, CLASSLOADER;
+		MACRO, GRAPHDESC, PROBEDESC, ARGFACTORY, PROBEFACTORY, GRAPHFACTORY, LOADER, CLASSLOADER, PM;
 	}
 
 	private ArgFactory af = new ArgFactory();
+	PropertiesManager pm;
 
 	abstract Object build(JrdsNode n) throws InvocationTargetException;
 
@@ -26,6 +28,9 @@ public abstract class ObjectBuilder {
 		switch(name) {
 		case ARGFACTORY:
 			af = (ArgFactory) o;
+			break;
+		case PM:
+			pm = (PropertiesManager) o;
 			break;
 		}
 	}

@@ -49,6 +49,7 @@ public class HostBuilder extends ObjectBuilder {
 		n.setMethod(host, CompiledXPath.get("/host/tag"), "addTag", false);
 
 		n.setMethod(host, CompiledXPath.get("/host/@name"), "setName");
+		host.setHostDir(pm.rrddir + org.rrd4j.core.Util.getFileSeparator() + host.getName());
 
 		JrdsNode snmpNode = n.getChild(CompiledXPath.get("/host/snmp"));
 		if(snmpNode != null) {
@@ -138,7 +139,7 @@ public class HostBuilder extends ObjectBuilder {
 			Map<String, String> thresholdAttr = thresholdNode.attrMap();
 			String name = thresholdAttr.get("name").trim();
 			String dsName = thresholdAttr.get("dsName").trim();
-			long value = Long.parseLong(thresholdAttr.get("value").trim());
+			double value = Double.parseDouble(thresholdAttr.get("value").trim());
 			long duration = Long.parseLong(thresholdAttr.get("duration").trim());
 			String operationStr = thresholdAttr.get("limit").trim();
 			Comparator operation = Comparator.valueOf(operationStr.toUpperCase());

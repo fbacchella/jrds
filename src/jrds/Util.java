@@ -160,13 +160,14 @@ public class Util {
 		Map<String, Object> env = new HashMap<String, Object>();
 		StarterNode node = null;
 		for(Object o: arguments) {
+			logger.trace("Argument for tempate: " + o.getClass());
 			if( o instanceof IndexedProbe) {
 				String index = ((IndexedProbe) o).getIndexName();
 				env.put("index", index);
 				env.put("index.signature", stringSignature(index));
 				env.put("index.cleanpath", cleanPath(index));
 			}
-			if( o instanceof UrlProbe) {
+			if(o instanceof UrlProbe) {
 				env.put("url", ((UrlProbe) o).getUrlAsString());
 				env.put("port", ((UrlProbe) o).getPort());
 				env.put("url.signature", jrds.Util.stringSignature(((UrlProbe) o).getUrlAsString()));

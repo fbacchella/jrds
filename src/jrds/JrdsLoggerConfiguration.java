@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-
 import org.apache.log4j.Appender;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.DailyRollingFileAppender;
@@ -37,7 +36,7 @@ public class JrdsLoggerConfiguration {
 	}
 
 	static public void configure(PropertiesManager pm) throws IOException {
-		Logger.getRootLogger().setLevel(pm.loglevel);
+		Logger.getLogger("jrds").setLevel(pm.loglevel);
 		if(! "".equals(pm.logfile))
 			setOutputFile(pm.logfile);
 		for(Map.Entry<Level, List<String>> e: pm.loglevels.entrySet()) {
@@ -57,12 +56,12 @@ public class JrdsLoggerConfiguration {
 	}
 
 	static public void putAppender(Appender app) {
-		Logger logger = Logger.getRootLogger();
+		Logger logger = Logger.getLogger("jrds");
 		Appender oldApp = logger.getAppender(app.getName());
 		if(oldApp != null)
 			logger.removeAppender(oldApp);
 
 		app.setName(APPENDER);
-		Logger.getRootLogger().addAppender(app);
+		logger.addAppender(app);
 	}
 }

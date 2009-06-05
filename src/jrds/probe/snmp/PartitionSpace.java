@@ -30,6 +30,10 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
 		super(indexKey);
 	}
 
+	public PartitionSpace(String keyName, OID indexKey) {
+		super(keyName, indexKey);
+	}
+
 	/**
 	 * The want to store the value in octet, not in bloc size
 	 * The translation is done by the probe, not the graph

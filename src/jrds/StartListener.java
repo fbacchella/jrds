@@ -35,8 +35,8 @@ public class StartListener implements ServletContextListener {
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
 	 */
 	public void contextInitialized(ServletContextEvent arg0) {
-		//Logger.getLogger("jrds").setLevel(Level.TRACE);
-		//logger.setLevel(Level.TRACE);
+		Logger.getLogger("jrds").setLevel(Level.TRACE);
+		logger.setLevel(Level.TRACE);
 		//Resin launch the listener twice !
 		if( ! started ) {
 			try {

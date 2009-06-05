@@ -117,7 +117,6 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 
 	@Override
 	public void setHost(RdsHost monitoredHost) {
-		super.setHost(monitoredHost);
 		logger.trace("Set host to " + monitoredHost);
 		host = monitoredHost.getName();
 		try {
@@ -127,6 +126,7 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 			logger.error("URL " + "http://" + host + ":" + getUrl().getPort() + getUrl().getFile() + " is invalid");
 		}
 		logger.debug("Url to collect is " + getUrl());
+		super.setHost(monitoredHost);
 	}
 
 	/**

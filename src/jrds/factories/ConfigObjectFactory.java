@@ -44,6 +44,7 @@ public class ConfigObjectFactory {
 		
 		setProperty(ObjectBuilder.properties.ARGFACTORY, af);
 		setProperty(ObjectBuilder.properties.CLASSLOADER, cl);
+		setProperty(ObjectBuilder.properties.PM, pm);
 	}
 
 	public Map<String, ?> getObjectMap(Loader.ConfigType ct, Map<String, JrdsNode> nodeMap) {
