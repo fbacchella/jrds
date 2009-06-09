@@ -16,7 +16,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,16 +42,14 @@ public class ProbeDesc {
 
 	static public final double MINDEFAULT = 0;
 	static public final double MAXDEFAULT = Double.NaN;
-	static public final long HEARTBEATDEFAULT = 600;
-
-
-
+	
+	private long heartBeatDefault = 600;
 	private Map<String, DsDesc> dsMap;
 	private Map<String, String> specific = new HashMap<String, String>();;
 	private String probeName;
 	private String name;
-	private Collection namedProbesNames;
-	private Collection graphClasses = new ArrayList(0);
+	private Collection<?> namedProbesNames;
+	private Collection<?> graphClasses = new ArrayList(0);
 	private boolean uniqIndex = false;
 	private Class<? extends Probe> probeClass = null;
 	private List<Object> defaultsArgs = null;
@@ -98,22 +95,22 @@ public class ProbeDesc {
 	 */
 	public void add(String name, DsType dsType)
 	{
-		dsMap.put(name, new DsDesc(dsType, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, name));
+		dsMap.put(name, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, name));
 	}
 
 	public void add(String name, DsType dsType, double min, double max)
 	{
-		dsMap.put(name, new DsDesc(dsType, HEARTBEATDEFAULT, min, max, name));
+		dsMap.put(name, new DsDesc(dsType, heartBeatDefault, min, max, name));
 	}
 
 	public void add(String dsName, DsType dsType, String probeName)
 	{
-		dsMap.put(dsName, new DsDesc(dsType, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, probeName));
+		dsMap.put(dsName, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, probeName));
 	}
 
 	public void add(String dsName, DsType dsType, String probeName, double min, double max)
 	{
-		dsMap.put(dsName, new DsDesc(dsType, HEARTBEATDEFAULT, min, max, probeName));
+		dsMap.put(dsName, new DsDesc(dsType, heartBeatDefault, min, max, probeName));
 	}
 
 	/** Add a SNMP probe what will be stored
@@ -123,12 +120,12 @@ public class ProbeDesc {
 	 */
 	public void add(String name, DsType dsType, OID oid)
 	{
-		dsMap.put(name, new DsDesc(dsType, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, oid));
+		dsMap.put(name, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, oid));
 	}
 
 	public void add(String name, DsType dsType, OID oid, double min, double max)
 	{
-		dsMap.put(name, new DsDesc(dsType, HEARTBEATDEFAULT, min, max, oid));
+		dsMap.put(name, new DsDesc(dsType, heartBeatDefault, min, max, oid));
 	}
 
 	/**Add a SNMP probe not to be stored
@@ -137,17 +134,17 @@ public class ProbeDesc {
 	 */
 	public void add(String name, OID oid)
 	{
-		dsMap.put(name, new DsDesc(null, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, oid));
+		dsMap.put(name, new DsDesc(null, heartBeatDefault, MINDEFAULT, MAXDEFAULT, oid));
 	}
 
 	public void add(String name, DsType dsType, Object index, double min, double max)
 	{
-		dsMap.put(name, new DsDesc(null, HEARTBEATDEFAULT, MINDEFAULT, MAXDEFAULT, index));
+		dsMap.put(name, new DsDesc(null, heartBeatDefault, MINDEFAULT, MAXDEFAULT, index));
 	}
 
 	public void add(Map<String, Object> valuesMap)
 	{
-		long heartbeat = HEARTBEATDEFAULT;
+		long heartbeat = heartBeatDefault;
 		double min = MINDEFAULT;
 		double max = MAXDEFAULT;
 		Object collectKey = null;
@@ -470,5 +467,19 @@ public class ProbeDesc {
 	 */
 	public void setProperties(Map<String, String> properties) {
 		this.properties = properties;
+	}
+
+	/**
+	 * @return the heartBeatDefault
+	 */
+	public long getHeartBeatDefault() {
+		return heartBeatDefault;
+	}
+
+	/**
+	 * @param heartBeatDefault the heartBeatDefault to set
+	 */
+	public void setHeartBeatDefault(long heartBeatDefault) {
+		this.heartBeatDefault = heartBeatDefault;
 	}
 }

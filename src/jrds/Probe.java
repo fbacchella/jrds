@@ -53,6 +53,7 @@ implements Comparable<Probe>, StarterNode {
 	static final private Logger logger = Logger.getLogger(Probe.class);
 
 	private int timeout = 30;
+	private long resolution = -1;
 	private String name = null;
 	private RdsHost monitoredHost;
 	private Collection<GraphNode> graphList = new ArrayList<GraphNode>(0);
@@ -89,8 +90,9 @@ implements Comparable<Probe>, StarterNode {
 		this.monitoredHost = monitoredHost;
 		starters.setParent(monitoredHost.getStarters());
 		//Name can be set by other means
-		if(name == null)
-		//	name = getPd().getProbeName();
+		if(name != null)
+			name = parseTemplate(name);
+		else
 			name = parseTemplate(getPd().getProbeName());
 	}
 
@@ -99,6 +101,10 @@ implements Comparable<Probe>, StarterNode {
 		if( ! readSpecific()) {
 			throw new RuntimeException("Creation failed");
 		}
+		if(name != null)
+			name = parseTemplate(name);
+		else
+			name = parseTemplate(pd.getProbeName());
 	}
 
 	public void initGraphList(GraphFactory gf) {
@@ -133,7 +139,6 @@ implements Comparable<Probe>, StarterNode {
 
 	public String getName() {
 		return name;
-//		return parseTemplate(name);
 	}
 
 	public String getRrdName() {
@@ -187,14 +192,7 @@ implements Comparable<Probe>, StarterNode {
 		return getPd().getDsDefs();
 	}
 
-	protected RrdDef getDefaultRrdDef() {
-		RrdDef def = new RrdDef(getRrdName());
-		def.setVersion(2);
-		return def;
-
-	}
-
-	private ArcDef[] getArcDefs() {
+	protected ArcDef[] getArcDefs() {
 		ArcDef[] defaultArc = new ArcDef[3];
 		//Five minutes step
 		defaultArc[0] = new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 3);
@@ -206,9 +204,13 @@ implements Comparable<Probe>, StarterNode {
 	}
 
 	public RrdDef getRrdDef() {
-		RrdDef def = getDefaultRrdDef();
+		RrdDef def = new RrdDef(getRrdName());
+		def.setVersion(2);
 		def.addArchive(getArcDefs());
 		def.addDatasource(getDsDefs());
+		if(resolution > 0) {
+			def.setStep(resolution);
+		}
 		return def;
 	}
 
@@ -218,9 +220,7 @@ implements Comparable<Probe>, StarterNode {
 	 */
 	private void create() throws IOException {
 		logger.info("Need to create rrd " + this);
-		RrdDef def = getDefaultRrdDef();
-		def.addArchive(getArcDefs());
-		def.addDatasource(getDsDefs());
+		RrdDef def = getRrdDef();
 		RrdDb rrdDb = new RrdDb(def);
 		rrdDb.close();
 	}
@@ -347,14 +347,21 @@ implements Comparable<Probe>, StarterNode {
 				Date startTime = new Date();
 				tmpdef.setStartTime(startTime);
 				String oldDef = tmpdef.dump();
+				long oldstep = tmpdef.getStep();
 				logger.trace("Definition found for " + this + ":\n" + oldDef);
 
 				//new definition
 				tmpdef = getRrdDef();
 				tmpdef.setStartTime(startTime);
 				String newDef = tmpdef.dump();
+				long newstep = tmpdef.getStep();
 
-				if(! newDef.equals(oldDef)) {
+				if(newstep != oldstep ) {
+					logger.error(this + "'s step changed, you're in trouble" );
+					return false;
+				}
+				else if(! newDef.equals(oldDef)) {
+					
 					rrdDb.close();
 					rrdDb = null;
 					upgrade();
@@ -415,7 +422,7 @@ implements Comparable<Probe>, StarterNode {
 		if(isCollectRunning()) {
 			Map<?, ?> sampleVals = getNewSampleValues();
 			if (sampleVals != null) {
-				if(getUptime() * pd.getUptimefactor() >= ProbeDesc.HEARTBEATDEFAULT) {
+				if(getUptime() * pd.getUptimefactor() >= pd.getHeartBeatDefault()) {
 					Map<?, String> nameMap = getCollectkeys();
 					Map<?, Number>filteredSamples = filterValues(sampleVals);
 					for(Map.Entry<?, Number> e: filteredSamples.entrySet()) {
@@ -757,6 +764,20 @@ implements Comparable<Probe>, StarterNode {
 					t.run(this);
 			}
 		}
+	}
+
+	/**
+	 * @return the resolution
+	 */
+	public long getResolution() {
+		return resolution;
+	}
+
+	/**
+	 * @param resolution the resolution to set
+	 */
+	public void setResolution(long resolution) {
+		this.resolution = resolution;
 	}
 
 

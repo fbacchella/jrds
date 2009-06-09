@@ -94,7 +94,7 @@ public class ConfigObjectFactory {
 	public Map<String, ProbeDesc> setProbeDescMap(Map<String, JrdsNode> nodemap) {
 		Map<String, ProbeDesc> probeDescMap = (Map<String, ProbeDesc>) getObjectMap(Loader.ConfigType.PROBEDESC, nodemap);
 		setProperty(ObjectBuilder.properties.PROBEDESC, probeDescMap);
-		pf = new ProbeFactory(probeDescMap, gf, pm, pm.legacymode);
+		pf = new ProbeFactory(probeDescMap, gf, pm);
 		setProperty(ObjectBuilder.properties.PROBEFACTORY, pf);
 		logger.debug("Probe description configured: " + probeDescMap.keySet());
 		return probeDescMap;

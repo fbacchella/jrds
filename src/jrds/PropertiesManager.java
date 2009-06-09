@@ -158,6 +158,27 @@ public class PropertiesManager extends Properties {
 
 	public void update()
 	{
+		String[] levels = { "trace", "debug", "info", "error"};
+		String[] defaultLevel = { "", "", "", "org.snmp4j,org.apache"};
+		for(int i = 0; i < levels.length; i++) {
+			String ls = levels[i];
+			Level l = Level.toLevel(ls);
+			String param = getProperty("log." + ls, defaultLevel[i]);
+			if(! "".equals(param)) {
+				List<String> loggerList = parseLogLevel(param);
+				loglevels.put(l, loggerList);
+			}
+		}
+		loglevel = Level.toLevel(getProperty("loglevel", "info"));
+		logfile = getProperty("logfile", "");
+
+		//Let's configure the log fast
+		try {
+			jrds.JrdsLoggerConfiguration.configure(this);
+		} catch (IOException e1) {
+			logger.error("Unable to set log file to " + this.logfile);
+		}
+
 		legacymode = parseBoolean(getProperty("legacymode", "1"));
 		configdir = getProperty("configdir", "config");
 		rrddir = getProperty("rrddir", "probe");
@@ -192,21 +213,8 @@ public class PropertiesManager extends Properties {
 		}
 		else if( ! tmpDirFile.canWrite()) {
 			logger.error(tmpdir + " exists can not be written");
-			
 		}
-		String[] levels = { "trace", "debug", "info", "error"};
-		String[] defaultLevel = { "", "", "", "org.snmp4j,org.apache,org.apache.commons.digester.Digester.sax"};
-		for(int i = 0; i < levels.length; i++) {
-			String ls = levels[i];
-			Level l = Level.toLevel(ls);
-			String param = getProperty("log." + ls, defaultLevel[i]);
-			if(! "".equals(param)) {
-				List<String> loggerList = parseLogLevel(param);
-				loglevels.put(l, loggerList);
-			}
-		}
-		loglevel = Level.toLevel(getProperty("loglevel", "info"));
-		logfile = getProperty("logfile", "");
+		
 		timeout = parseInteger(getProperty("timeout", "30"));
 		rrdbackend = getProperty("rrdbackend", "NIO");
 		extensionClassLoader = doClassLoader();

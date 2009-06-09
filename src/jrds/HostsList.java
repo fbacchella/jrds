@@ -55,6 +55,7 @@ public class HostsList implements StarterNode {
 	public static final String VIEWROOT = "Sorted by view";
 	public static final String SUMROOT = "Sums";
 	public static final String CUSTOMROOT = "Dashboard";
+	public static final String TAGSROOT = "All tags";
 
 	private StartersSet starters = null;
 	private RdsHost sumhost =  null;
@@ -101,6 +102,9 @@ public class HostsList implements StarterNode {
 		filters.put(Filter.ALLVIEWS.getName(), Filter.ALLVIEWS);
 
 		filters.put(Filter.ALLSERVICES.getName(), Filter.ALLSERVICES);
+		
+		addRoot(TAGSROOT);
+
 
 		starters = new StartersSet(this);
 	}

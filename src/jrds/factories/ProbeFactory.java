@@ -10,10 +10,10 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import jrds.Probe;
 import jrds.ProbeDesc;
+import jrds.PropertiesManager;
 
 import org.apache.log4j.Logger;
 
@@ -28,17 +28,15 @@ public class ProbeFactory {
 	final private List<String> probePackages = new ArrayList<String>(5);
 	private Map<String, ProbeDesc> probeDescMap;
 	private GraphFactory gf;
-	private Properties prop;
-	private boolean legacymode;
+	private PropertiesManager pm;
 	/**
 	 * Private constructor
 	 * @param b 
 	 */
-	public ProbeFactory(Map<String, ProbeDesc> probeDescMap, GraphFactory gf, Properties prop, boolean legacymode) {
+	public ProbeFactory(Map<String, ProbeDesc> probeDescMap, GraphFactory gf, PropertiesManager pm) {
 		this.probeDescMap = probeDescMap;
 		this.gf = gf;
-		this.prop = prop;
-		this.legacymode = legacymode;
+		this.pm = pm;
 
 		probePackages.add("");
 	}
@@ -56,7 +54,7 @@ public class ProbeFactory {
 		if( pd != null) {
 			retValue = makeProbe(pd, constArgs);
 		}
-		else if(legacymode ){
+		else if(pm.legacymode ){
 			Class<?> probeClass = resolvClass(className, probePackages);
 			if (probeClass != null) {
 				Object o = null;
@@ -85,14 +83,14 @@ public class ProbeFactory {
 		else {
 			logger.error("Probe named " + className + " not found");
 		}
-		
+
 		//Now we finish the initialization of classes
 		if(retValue != null) {
 			retValue.initGraphList(gf);
 		}
 		return retValue;
 	}
-	
+
 	/**
 	 * Instanciate a probe using a probedesc
 	 * @param constArgs
@@ -140,7 +138,7 @@ public class ProbeFactory {
 			}
 			catch (NoSuchMethodException ex) {
 				logger.warn("ProbeDescription invalid " + pd.getName() + ": no constructor " + ex.getMessage() + " found");
- 			}
+			}
 			catch (Exception ex) {
 				Throwable showException = ex;
 				Throwable t = ex.getCause();
@@ -149,6 +147,10 @@ public class ProbeFactory {
 				logger.warn("Error during probe creation of type " + pd.getName() + " with args " + constArgs +
 						": ", showException);
 			}
+		}
+		if(pm != null) {
+			logger.trace("Setting resolution to " + pm.resolution + " for " + retValue);
+			retValue.setResolution(pm.resolution);
 		}
 		return retValue;
 	}
