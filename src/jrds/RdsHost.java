@@ -99,7 +99,7 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 			if(! isCollectRunning() )
 				break;
 			long duration = (System.currentTimeMillis() - start) /1000 ;
-			if(duration > (HostsList.getRootGroup().getResolution() / 2 )) {
+			if(duration > (HostsList.getRootGroup().getStep() / 2 )) {
 				logger.error("Collect for " + this + " ran too long: " + duration + "s");
 				break;
 			}

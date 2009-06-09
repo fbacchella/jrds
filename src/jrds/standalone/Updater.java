@@ -22,7 +22,6 @@ public class Updater {
 		jrds.JrdsLoggerConfiguration.initLog4J();
 	}
 	static final private Logger logger = Logger.getLogger(Updater.class);
-	public static final int GRAPH_RESOLUTION = 300; // seconds
 
 	public static void main(String[] args) {
 		PropertiesManager pm = new PropertiesManager(new File("jrds.properties"));

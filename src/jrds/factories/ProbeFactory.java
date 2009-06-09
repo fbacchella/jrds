@@ -149,8 +149,8 @@ public class ProbeFactory {
 			}
 		}
 		if(pm != null) {
-			logger.trace("Setting resolution to " + pm.resolution + " for " + retValue);
-			retValue.setResolution(pm.resolution);
+			logger.trace("Setting time step to " + pm.step + " for " + retValue);
+			retValue.setStep(pm.step);
 		}
 		return retValue;
 	}

@@ -53,7 +53,7 @@ implements Comparable<Probe>, StarterNode {
 	static final private Logger logger = Logger.getLogger(Probe.class);
 
 	private int timeout = 30;
-	private long resolution = -1;
+	private long step = -1;
 	private String name = null;
 	private RdsHost monitoredHost;
 	private Collection<GraphNode> graphList = new ArrayList<GraphNode>(0);
@@ -208,8 +208,8 @@ implements Comparable<Probe>, StarterNode {
 		def.setVersion(2);
 		def.addArchive(getArcDefs());
 		def.addDatasource(getDsDefs());
-		if(resolution > 0) {
-			def.setStep(resolution);
+		if(step > 0) {
+			def.setStep(step);
 		}
 		return def;
 	}
@@ -767,17 +767,17 @@ implements Comparable<Probe>, StarterNode {
 	}
 
 	/**
-	 * @return the resolution
+	 * @return the time step (in seconds)
 	 */
-	public long getResolution() {
-		return resolution;
+	public long getStep() {
+		return step;
 	}
 
 	/**
-	 * @param resolution the resolution to set
+	 * @param step the time step to set (in seconds)
 	 */
-	public void setResolution(long resolution) {
-		this.resolution = resolution;
+	public void setStep(long step) {
+		this.step = step;
 	}
 
 

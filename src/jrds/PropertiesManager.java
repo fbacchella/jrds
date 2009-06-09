@@ -182,7 +182,7 @@ public class PropertiesManager extends Properties {
 		legacymode = parseBoolean(getProperty("legacymode", "1"));
 		configdir = getProperty("configdir", "config");
 		rrddir = getProperty("rrddir", "probe");
-		resolution = parseInteger(getProperty("resolution", "300"));
+		step = parseInteger(getProperty("step", "300"));
 		collectorThreads = parseInteger(getProperty("collectorThreads", "1"));
 		dbPoolSize = parseInteger(getProperty("dbPoolSize", "10")) + collectorThreads;
 		syncPeriod = parseInteger(getProperty("syncPeriod", "-1"));
@@ -234,7 +234,7 @@ public class PropertiesManager extends Properties {
 	public String urlpngroot;
 	public String rrddir;
 	public String logfile;
-	public int resolution;
+	public int step;
 	public int collectorThreads;
 	public int dbPoolSize;
 	public int syncPeriod;

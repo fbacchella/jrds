@@ -68,7 +68,7 @@ public class HostsList implements StarterNode {
 	private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
 	private final Renderer renderer = new Renderer(50);
 	private int numCollectors = 1;
-	private int resolution;
+	private int step;
 	private String rrdDir;
 	private String tmpdir;
 	private int timeout = 10;
@@ -124,7 +124,7 @@ public class HostsList implements StarterNode {
 		}
 
 		numCollectors = pm.collectorThreads;
-		resolution = pm.resolution;
+		step = pm.step;
 		rrdDir = pm.rrddir;
 		tmpdir = pm.tmpdir;
 		started = true;
@@ -277,7 +277,7 @@ public class HostsList implements StarterNode {
 				}
 				tpool.shutdown();
 				try {
-					tpool.awaitTermination(resolution - getTimeout() * 2 , TimeUnit.SECONDS);
+					tpool.awaitTermination(step - getTimeout() * 2 , TimeUnit.SECONDS);
 				} catch (InterruptedException e) {
 					logger.info("Collect interrupted");
 				}
@@ -420,8 +420,8 @@ public class HostsList implements StarterNode {
 		return renderer;
 	}
 
-	public int getResolution() {
-		return resolution;
+	public int getStep() {
+		return step;
 	}
 
 	public String getRrdDir() {

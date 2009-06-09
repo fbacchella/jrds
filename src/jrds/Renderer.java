@@ -239,7 +239,7 @@ public class Renderer {
 	public void finish() {
 		tpool.shutdown();
 		try {
-			tpool.awaitTermination(HostsList.getRootGroup().getResolution() - 10, TimeUnit.SECONDS);
+			tpool.awaitTermination(HostsList.getRootGroup().getStep() - 10, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			logger.info("Collect interrupted");
 		}

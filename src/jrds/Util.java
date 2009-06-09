@@ -108,11 +108,11 @@ public class Util {
 	public static Date endDate(Probe p, Date endDate) {
 		Date normalized = endDate;
 		//We normalize the last update time, it can't be used directly
-		long resolution = HostsList.getRootGroup().getResolution();
-		Date lastUpdateNormalized = new Date(1000L * org.rrd4j.core.Util.normalize(p.getLastUpdate().getTime() / 1000L, resolution));
+		long step = HostsList.getRootGroup().getStep();
+		Date lastUpdateNormalized = new Date(1000L * org.rrd4j.core.Util.normalize(p.getLastUpdate().getTime() / 1000L, step));
 		//We dont want to graph past the last normalized update time
-		//but only if we are within a resolution interval
-		if(endDate.after(lastUpdateNormalized) && endDate.getTime() - lastUpdateNormalized.getTime() < resolution * 1000L)
+		//but only if we are within a step interval
+		if(endDate.after(lastUpdateNormalized) && endDate.getTime() - lastUpdateNormalized.getTime() < step * 1000L)
 			normalized = lastUpdateNormalized;
 		return normalized;
 	}
