@@ -153,12 +153,13 @@ public class Discover extends HttpServlet {
 		Element hostEleme = hostDom.createElement("host");
 		hostEleme.setAttribute("name", hostname);
 		hostDom.appendChild(hostEleme);
-		
-		for(String tag: tags) {
-			Element tagElem = hostDom.createElement("tag");
-			tagElem.setTextContent(tag);
-			hostEleme.appendChild(tagElem);
-		}
+
+		if(tags != null)
+			for(String tag: tags) {
+				Element tagElem = hostDom.createElement("tag");
+				tagElem.setTextContent(tag);
+				hostEleme.appendChild(tagElem);
+			}
 
 		Element snmpElem = hostDom.createElement("snmp");
 		if(hosttarget instanceof CommunityTarget) {
@@ -180,7 +181,7 @@ public class Discover extends HttpServlet {
 					try {
 						enumerateIndexed(hostEleme, active, name, index, labelOid, withOid);
 					} catch (Exception e1) {
-						e1.printStackTrace();
+						logger.error("Error discoverer " + name + "for index " + index + ": " +e1);
 					}
 				}
 				String doesExistOid = e.evaluate(CompiledXPath.get("/probedesc/specific[@name='existOid']"));
@@ -217,6 +218,7 @@ public class Discover extends HttpServlet {
 	}
 
 	private void enumerateIndexed(Element hostEleme, SnmpStarter active, String name, String indexOid, String labelOid, boolean withOid ) throws IOException {
+		logger.trace("Will enumerate " + indexOid);
 		Set<OID> oidsSet = Collections.singleton(new OID(indexOid));
 		Map<OID, Object> indexes= (Map<OID, Object>) SnmpRequester.TREE.doSnmpGet(active, oidsSet);
 		logger.trace("Elements :"  + indexes);
