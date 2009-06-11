@@ -5,18 +5,21 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import jrds.HostsList;
 import jrds.Probe;
 import jrds.RdsHost;
 import jrds.XmlProvider;
@@ -142,8 +145,15 @@ public class Ribcl extends Probe {
 	}
 
 	private Socket connect() throws NoSuchAlgorithmException, KeyManagementException, UnknownHostException, IOException {
+		final int timeout = HostsList.getRootGroup().getTimeout();
+		Socket s = new Socket(iloHost, port) {
+			public void connect(SocketAddress endpoint) throws IOException {
+				super.connect(endpoint, timeout * 1000);
+			}
+		};
+		s.setSoTimeout(timeout);
 		if(port == 23) {
-			return new Socket(iloHost, port);
+			return 	s;
 		}		
 		// Create a trust manager that does not validate certificate chains
 		TrustManager[] trustAllCerts = new TrustManager[]{
@@ -164,8 +174,10 @@ public class Ribcl extends Probe {
 		sc.init(null, trustAllCerts, new java.security.SecureRandom());
 
 		SSLSocketFactory ssf = sc.getSocketFactory();
-		SSLSocket s = (SSLSocket) ssf.createSocket(iloHost, port);
+		s = ssf.createSocket(s, iloHost, port, true);
 		logger.debug("done SSL handshake for " + iloHost);
+
+		SocketFactory sf = SocketFactory.getDefault();
 		return s;
 	}
 

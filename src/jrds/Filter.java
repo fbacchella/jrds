@@ -38,7 +38,7 @@ public abstract class Filter {
 	static final public Filter ALLHOSTS = new Filter() {
 		@Override
 		public boolean acceptGraph(GraphNode graph, String path) {
-			return path.startsWith("/" + getName() + "/");
+			return path.startsWith("/" + HostsList.HOSTROOT + "/");
 		}
 		@Override
 		public String getName() {

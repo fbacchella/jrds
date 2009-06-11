@@ -96,7 +96,6 @@ public class TreeJspBean {
 		return retValue;
 	}
 
-	@SuppressWarnings("unchecked")
 	public void getJavascriptTree(JspWriter out, ParamsBean params) throws JspException {
 
 		HostsList root = HostsList.getRootGroup();
