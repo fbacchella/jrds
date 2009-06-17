@@ -1,0 +1,301 @@
+<html >
+<head>
+	<title>JRDS</title>
+<style type="text/css">
+@import "lib/dijit/themes/nihilo/nihilo.css";
+@import "lib/dojox/form/resources/DropDownSelect.css";
+/* Define Polices */
+body, input, option, select, tab, div, td, a, textarea, .link a {
+	font-family:'Bitstream Vera Sans', arial, Tahoma, 'Sans serif';
+}
+/* Defined Polices font and color*/
+body, input, option, select, tab, div, td, a, textarea {
+	color: black;
+	font-size:11px;
+	margin:0;
+	padding:0;
+}
+.linelabel {
+	width: 60px;
+}
+#mainDiv {
+	height: 100%;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	background-color:#FFF;
+}
+.graph {
+	float:left;
+}
+#treePane {
+	background-color:#DDDDDD;
+	border:1px solid black;
+	float:left;
+	margin:5px;
+	padding:5px;
+	width:330px;
+}
+#graphPane {
+	width:710px;
+}
+#formPane {
+	width:710px;
+}
+.box {
+	background-color: white;
+	border: 2px solid black;
+	padding: 8px;
+	margin: 4px;
+}
+.formblock {
+	background-color:#F5F5F5;
+	border:1px solid #AAAAAA;
+	margin:5px;
+}
+.field {
+	margin: 5px;
+}
+.iconslist {
+	float:left;
+	width:16px;
+	margin:5px;
+}
+.icon {
+	cursor:pointer;
+}
+.graphblock {
+	text-align:center;
+}
+</style>
+<script type="text/javascript" src="lib/dojo/dojo.js" djConfig="parseOnLoad:true, isDebug: true"></script>
+<script type="text/javascript">
+
+dojo.require("dijit.layout.BorderContainer");
+dojo.require("dijit.layout.ContentPane");
+dojo.require("dijit.layout.AccordionContainer");
+dojo.require("dijit.form.DateTextBox");
+dojo.require("dijit.form.Button");
+dojo.require("dijit.Dialog");
+dojo.require("dijit.form.TextBox");
+dojo.require("dijit.form.FilteringSelect");
+dojo.require("dijit.form.TextBox");
+dojo.require("dojox.form.DropDownSelect");
+dojo.require("dijit.form.Form");
+dojo.require("dijit.layout.ContentPane");
+dojo.require("dojo.parser");  // scan page for widgets and instantiate them
+dojo.require("dijit.form.Button");
+dojo.require("dijit.form.ValidationTextBox");
+dojo.require("dojo.number");
+dojo.require("dojo.parser");
+dojo.require("dojo.data.ItemFileReadStore");
+dojo.require("dijit.Tree");
+
+function doGraphList(result) {
+	var graphPane = dojo.byId("graphPane");
+	dojo.empty(graphPane);
+	for(i in result.items) {
+		graph = result.items[i];
+		dojo.deprecated("bla", dojo.toJson(graph));
+		var  graphBlock = dojo.create("div")
+		dojo.attr(graphBlock, "class","graphblock");
+		 
+		var graphImg = dojo.create("img");
+		dojo.attr(graphImg, "class","graph");
+		dojo.attr(graphImg, "name", graph.name);
+		dojo.attr(graphImg, "alt", graph.name);
+		dojo.attr(graphImg, "id", graph.id);
+		dojo.attr(graphImg, "src", graph.imghref);
+
+		var iconsList =  dojo.create("div");
+		dojo.attr(iconsList, "class","iconslist");
+
+		var application_double = dojo.create("img");
+		dojo.attr(application_double, "class","icon");
+		dojo.attr(application_double, "src","img/application_double.png");
+		dojo.attr(application_double, "heigth","16");
+		dojo.attr(application_double, "width","16");
+	 	var application_view_list = dojo.create("img");
+		dojo.attr(application_view_list, "class","icon");
+		dojo.attr(application_view_list, "src","img/application_view_list.png");
+		dojo.attr(application_view_list, "heigth","16");
+		dojo.attr(application_view_list, "width","16");
+		var time = dojo.create("img");
+		dojo.attr(time, "class","icon");
+		dojo.attr(time, "src","img/time.png");
+		dojo.attr(time, "heigth","16");
+		dojo.attr(time, "width","16");
+		var disk = dojo.create("img");
+		dojo.attr(disk, "class","icon");
+		dojo.attr(disk, "src","img/disk.png");
+		dojo.attr(disk, "heigth","16");
+		dojo.attr(disk, "width","16");
+
+		dojo.place(application_double, iconsList);
+		dojo.place(application_view_list, iconsList);
+		dojo.place(time, iconsList);
+		dojo.place(disk, iconsList);
+		 
+		dojo.place(graphImg, graphBlock);
+		dojo.place(iconsList, graphBlock);
+		dojo.place(graphBlock,graphPane);
+	}
+	
+	return result;
+}
+
+function loadTree(item,  node){
+	var newhref = store.getValue(item, "href");
+	if(newhref) {				
+		var newurl = location.href.replace(/draft.html.*/,  newhref);
+		window.location.replace(newurl);
+	}
+	else {
+		var id = store.getValue(item, "id").replace(/.*\./, "");
+		var queryForm = dojo.byId("dateForm");
+		queryForm.id.value = id;
+		var query = dojo.formToQuery(queryForm);
+		var d = dojo.xhrGet( {
+							url: "jsongraph?" + query,
+							handleAs: "json",
+							load: doGraphList
+							});
+	}
+}
+
+var queryParams = dojo.queryToObject(window.location.search.slice(1));
+var type="filter";
+var query=""
+if(queryParams["filter"]) {
+	type="tree";
+	query="?filter=" + queryParams["filter"];
+}
+
+var store = new dojo.data.ItemFileReadStore({
+    url: "jsontree" + query
+});
+
+        dojo.addOnLoad(function(){
+                dojo.declare("DayHourTextBox", dijit.form.DateTextBox, {
+        				//	constraints: { isValid: function() {return 1} },
+                        	dayhourFormat: {selector: 'date', datePattern: 'yyyy-MM-dd HH:mm'},
+						//locale: "en-us",
+                        //value:  function(date) { 
+                        //        // convert value to Date object
+                        //        return dojo.date.locale.parse(date, this.dayhourFormat);
+						//},
+                        //postMixInProperties: function() { // change value string to Date object
+                        //        this.inherited(arguments);
+                                // convert value to Date object
+                        //        this.value = dojo.date.locale.parse(this.value, this.dayhourFormat);
+                        //},
+                        // To write back to the server in Oracle format, override the serialize method:
+                        	serialize: function(dateObject, options) {
+                        		return dojo.date.locale.format(dateObject, this.dayhourFormat);
+                        	}
+                });
+               new DayHourTextBox({
+                        name: "begin",
+                }, "begin");
+                new DayHourTextBox({
+                        name: "end",
+                }, "end");
+				dijit.byId("begin").constraints.isValid = function() {return 0};
+ 				dijit.byId("end").constraints.isValid = function() {return 0};
+				dijit.byId("begin").constraints.validator = function() {return 0};
+				dijit.byId("end").constraints.validator = function() {return 0};
+
+    var treeModel = new dijit.tree.ForestStoreModel({
+		jsId:"treeModel",
+		id:"treeModel",
+        store: store,
+        query: {"type": type},
+        rootId: "root",
+        childrenAttrs: ["children"]
+    });
+
+    new dijit.Tree({
+        model: treeModel,
+		showRoot: false,
+        onClick: loadTree,
+     }, "treeOne");
+
+ 		});		
+</script>
+</head>
+<body class="nihilo">
+<div id="mainDiv" dojoType="dijit.layout.BorderContainer" >
+  <div id="treePane" dojoType="dijit.layout.ContentPane" region="leading" >
+    <div dojoType="dijit.form.Form" id="hostSelect" action="index.jsp" method="get" name="hostForm"> <a id="toroot" href="index.jsp"><img src="img/back_to_album.gif" alt="" height="16" width="20" border="0"></a>
+      <input name="begin" type="hidden" value=""/>
+      <input name="end" type="hidden" value=""/>
+      <input name="scale" type="hidden" value="7"/>
+      <input name="max" type="hidden" value=""/>
+      <input name="min" type="hidden" value=""/>
+      <label for="host">Only host</label>
+      <input type="text" name="host" size="24"  dojoType="dijit.form.TextBox"
+        trim="true" >
+    </div>
+    <div id="treeOne" > </div>
+  </div>
+  <div dojoType="dijit.layout.ContentPane" region="center">
+    <div dojoType="dijit.layout.ContentPane" id="formPane" >
+      <form  id="dateForm" name="dateForm" action="index.jsp" method="get">
+        <input name="id" type="hidden" value="" class="hiddeninput" />
+        <input name="filter" type="hidden" value="" class="hiddeninput" />
+        <input name="host" type="hidden" value="" class="hiddeninput" />
+        <div  dojoType="dijit.layout.ContentPane" class="formblock" > <span class="linelabel">Time scale</span>
+          <select dojoType="dojox.form.DropDownSelect" id="scale" name="scale">
+            <option value="0">Manual</option>
+            <option value="1">Last Hour</option>
+            <option value="2">Last 2 Hours</option>
+            <option value="3">Last 3 Hours</option>
+            <option value="4">Last 4 Hours</option>
+            <option value="5">Last 6 Hours</option>
+            <option value="6">Last 12 Hours</option>
+            <option value="7">Last Day</option>
+            <option value="8">Last 2 Days</option>
+            <option value="9">Last Week</option>
+            <option value="10">Last 2 Weeks</option>
+            <option value="11">Last Month</option>
+            <option value="12">Last 2 Months</option>
+            <option value="13">Last 3 Months</option>
+            <option value="14">Last 4 Months</option>
+            <option value="15">Last 6 Months</option>
+            <option value="16">Last Year</option>
+            <option value="17">Last 2 Years</option>
+          </select>
+          <label for="begin">Begin</label>
+          <input type="text" name="begin" id="begin" class="field" />
+          <label for="end">End</label>
+          <input type="text" name="end" id="end" class="field" />
+        </div>
+        <div  dojoType="dijit.layout.ContentPane" class="formblock" > <span class="linelabel">Vertical scale</span>
+          <button dojoType="dijit.form.ToggleButton"  name="autoscaleButton"
+  onChange="autoscale_onClick();" 
+  iconClass="dijitCheckBoxIcon"> Auto </button>
+          <label for="min">Min</label>
+          <input id="min" type="text" name="min" class="field" value=""
+    dojoType="dijit.form.ValidationTextBox"
+    regExpGen="dojo.number._realNumberRegexp"
+    trim="true"
+    size="14" />
+          <label for="max">Max</label>
+          <input id="max" type="text" name="max" class="field" value=""
+    dojoType="dijit.form.ValidationTextBox"
+    regExpGen="dojo.number._realNumberRegexp"
+    trim="true"
+    size="14" />
+        </div>
+        <button type="submit" dojoType="dijit.form.Button" > Rendu </button>
+      </form>
+    </div>
+    <div  dojoType="dijit.layout.ContentPane" id="graphPane">
+      <div class='graphblock'>
+      
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

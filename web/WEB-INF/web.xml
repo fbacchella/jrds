@@ -49,6 +49,20 @@
   	<servlet-class>
   	jrds.webapp.Discover</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>JSonTree</servlet-name>
+  	<display-name>JSonTree</display-name>
+  	<description></description>
+  	<servlet-class>
+  	jrds.webapp.JSonTree</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>JSonGraph</servlet-name>
+  	<display-name>JSonGraph</display-name>
+  	<description></description>
+  	<servlet-class>
+  	jrds.webapp.JSonGraph</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>Last</servlet-name>
     <url-pattern>/lastvalues</url-pattern>
@@ -88,6 +102,14 @@
   <servlet-mapping>
   	<servlet-name>discover</servlet-name>
   	<url-pattern>/discover</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>JSonTree</servlet-name>
+  	<url-pattern>/jsontree</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>JSonGraph</servlet-name>
+  	<url-pattern>/jsongraph</url-pattern>
   </servlet-mapping>
   <taglib>
     <taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
