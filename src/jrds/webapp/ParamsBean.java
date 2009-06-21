@@ -52,7 +52,6 @@ public class ParamsBean implements Serializable {
 		parseReq(req);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void parseReq(HttpServletRequest req) {
 		contextPath = req.getContextPath();
 		period = makePeriod(req);
@@ -76,22 +75,8 @@ public class ParamsBean implements Serializable {
 		String sortArg = req.getParameter("sort");
 		if("1".equals(sortArg))
 			sorted = true;
-		String maxStr = req.getParameter("max");
-		if(maxStr != null) {
-			try {
-				max = Double.parseDouble(maxStr);
-			} catch (NumberFormatException e) {
-				logger.error("max parameter invalid: " + maxStr);
-			}
-		}
-		String minStr = req.getParameter("min");
-		if(minStr != null) {
-			try {
-				min = Double.parseDouble(minStr);
-			} catch (NumberFormatException e) {
-				logger.error("min parameter invalid: " + minStr);
-			}
-		}
+		max = jrds.Util.parseStringNumber(req.getParameter("max"), Double.class, max).doubleValue();
+		min = jrds.Util.parseStringNumber(req.getParameter("min"), Double.class, min).doubleValue();
 		String paramFilterName = req.getParameter("filter");
 		String paramHostFilter = req.getParameter("host");
 		if(paramFilterName != null && ! "".equals(paramFilterName)) {
@@ -251,20 +236,25 @@ public class ParamsBean implements Serializable {
 	private Period makePeriod(HttpServletRequest req) {
 		Period p = null;
 		try {
-			String scale = req.getParameter("scale");
+			String scaleStr = req.getParameter("scale");
+			//Changed name for this attribute
+			if(scaleStr == null)
+				scaleStr = req.getParameter("autoperiod");
+
+			int scale = jrds.Util.parseStringNumber(scaleStr, Integer.class, -1).intValue();
+
 			String end = req.getParameter("end");
 			String begin = req.getParameter("begin");
-			int scaleVal = -1;
-			if(scale != null && (scaleVal = Integer.parseInt(scale)) > 0)
-				p = new Period(scaleVal);
+			if(scale > 0)
+				p = new Period(scale);
 			else if(end != null && begin !=null)
 				p = new Period(begin, end);
 			else
 				p = new Period();
 		} catch (NumberFormatException e) {
-			logger.error("Period cannot be parser :" + req.getQueryString());
+			logger.error("Period cannot be parsed :" + req.getQueryString());
 		} catch (ParseException e) {
-			logger.error("Period cannot be parser :" + req.getQueryString());
+			logger.error("Period cannot be parsed :" + req.getQueryString());
 		}
 		return p;
 	}
@@ -306,10 +296,28 @@ public class ParamsBean implements Serializable {
 	 * @return Returns the end.
 	 */
 	public String getStringEnd() {
-		String formatted = "";
+			String formatted = "";
 		if(period.getScale() == 0)
 			formatted = df.format(period.getEnd());
 		return formatted;
+	}
+
+	/**
+	 * @return Returns the begin.
+	 */
+	public long getBegin() {
+		if(period != null)
+			return period.getBegin().getTime();
+		return Long.MIN_VALUE;
+	}
+
+	/**
+	 * @return Returns the end.
+	 */
+	public long getEnd() {
+		if(period != null)
+			return period.getEnd().getTime();
+		return Long.MIN_VALUE;
 	}
 
 	/**
@@ -324,6 +332,7 @@ public class ParamsBean implements Serializable {
 	}
 
 	public List<String> getPeriodNames() {
+		logger.trace("Knonw period names: " + Period.getPeriodNames());
 		return Period.getPeriodNames();
 	}
 

@@ -1,5 +1,7 @@
 package jrds;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.util.Date;
 import java.util.HashMap;
@@ -213,6 +215,25 @@ public class Util {
 
 		logger.trace("Properties to use for parsing: " + env + " with template "+ template);
 		return jrds.Util.evaluateVariables(template, env, node);
+	}
+	
+	public static Number parseStringNumber(String toParse, Class<? extends Number> numberClass, Number defaultVal) {
+		if(! (Number.class.isAssignableFrom(numberClass))) {
+			return defaultVal;
+		}
+		
+		try {
+			Constructor<? extends Number> c = numberClass.getConstructor(String.class);
+			Number n = c.newInstance(toParse);
+			return n;
+		} catch (SecurityException e) {
+		} catch (NoSuchMethodException e) {
+		} catch (IllegalArgumentException e) {
+		} catch (InstantiationException e) {
+		} catch (IllegalAccessException e) {
+		} catch (InvocationTargetException e) {
+		}
+		return defaultVal;
 	}
 }
 

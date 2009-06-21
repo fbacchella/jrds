@@ -6,6 +6,7 @@
 <%@ page session="false" %>
 <%@ page import="jrds.HostsList" %>
 <%@ page import="jrds.GraphNode" %>
+<%@ page isELIgnored="false" %>
 <jsp:useBean id="jrdsBean" class="jrds.webapp.TreeJspBean" />
 <jsp:useBean id="period" class="jrds.webapp.ParamsBean"/>
 

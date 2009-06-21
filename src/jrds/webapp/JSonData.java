@@ -12,9 +12,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 import jrds.HostsList;
 
 public abstract class JSonData extends HttpServlet {
+	static final private Logger logger = Logger.getLogger(JSonData.class);
 	
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -24,19 +27,25 @@ public abstract class JSonData extends HttpServlet {
 
 		HostsList root = HostsList.getRootGroup();
 
-		response.setContentType("application/json");
-		ServletOutputStream out = response.getOutputStream();
-		out.println("{ identifier: 'id'," +
-				"  label: 'name'," +
-				"  items: [ "
-		);
+		try {
+			response.setContentType("application/json");
+			ServletOutputStream out = response.getOutputStream();
+			out.println("{ identifier: 'id'," +
+					"  label: 'name'," +
+					"  items: [ "
+			);
 
-		generate(out, root, params);
-		
-		out.println("]}");
+			if (! generate(out, root, params)) {
+				logger.warn("Invalid request received: " + request.getRequestURI() + "?" + request.getQueryString());
+			}
+			
+			out.println("]}");
+		} catch (Exception e) {
+			logger.warn("Failed request: " + request.getRequestURI() + "?" + request.getQueryString() +": " + e);
+		}
 	}
 
-	public abstract void generate(ServletOutputStream out, HostsList root, ParamsBean params) throws IOException;
+	public abstract boolean generate(ServletOutputStream out, HostsList root, ParamsBean params) throws IOException;
 	
 	public String doNode(String name, int id, String type, List<String> childsref) {
 		return doNode(name, Integer.toString(id), type, childsref, null);

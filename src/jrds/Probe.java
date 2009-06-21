@@ -62,6 +62,7 @@ implements Comparable<Probe>, StarterNode {
 	private Set<String> tags = null;
 	private final StartersSet starters = new StartersSet(this);
 	private long uptime = Long.MAX_VALUE;
+	private boolean finished = false;
 
 	private Map<String, Set<Threshold>> thresholds = new HashMap<String, Set<Threshold>>();
 
@@ -71,12 +72,9 @@ implements Comparable<Probe>, StarterNode {
 	 * @param pd
 	 */
 	public Probe(RdsHost monitoredHost, ProbeDesc pd) {
-		this.pd = pd;
+		setPd(pd);
 		setHost(monitoredHost);
 		starters.setParent(monitoredHost.getStarters());
-		if( ! readSpecific()) {
-			throw new RuntimeException("Creation failed");
-		}
 	}
 
 	public Probe() {
@@ -89,11 +87,6 @@ implements Comparable<Probe>, StarterNode {
 	public void setHost(RdsHost monitoredHost) {
 		this.monitoredHost = monitoredHost;
 		starters.setParent(monitoredHost.getStarters());
-		//Name can be set by other means
-		if(name != null)
-			name = parseTemplate(name);
-		else
-			name = parseTemplate(getPd().getProbeName());
 	}
 
 	public void setPd(ProbeDesc pd) {
@@ -101,10 +94,6 @@ implements Comparable<Probe>, StarterNode {
 		if( ! readSpecific()) {
 			throw new RuntimeException("Creation failed");
 		}
-		if(name != null)
-			name = parseTemplate(name);
-		else
-			name = parseTemplate(pd.getProbeName());
 	}
 
 	public void initGraphList(GraphFactory gf) {
@@ -326,12 +315,27 @@ implements Comparable<Probe>, StarterNode {
 	}
 
 	/**
+	 * Check the final status of the probe. It must be called once before an probe can be used
+	 * 
 	 * Open the rrd backend of the probe.
 	 * it's created if it's needed
 	 * @throws IOException
 	 * @throws RrdException
 	 */
 	public boolean checkStore()  {
+		if(pd == null) {
+			logger.error("Missing Probe description");
+			return false;
+		}
+		if(monitoredHost == null) {
+			logger.error("Missing host for " + pd.getProbeName());
+			return false;
+		}
+		
+		//Name can be set by other means
+		if(name == null)
+			name = parseTemplate(getPd().getProbeName());
+
 		boolean retValue = false;
 		File rrdDir = new File(monitoredHost.getHostDir());
 		if (!rrdDir.isDirectory()) {
@@ -385,6 +389,7 @@ implements Comparable<Probe>, StarterNode {
 				}
 
 		}
+		finished = retValue;
 		return retValue;
 	}
 
@@ -455,6 +460,10 @@ implements Comparable<Probe>, StarterNode {
 	 * @throws RrdException
 	 */
 	public void collect() {
+		if(! finished) {
+			logger.error("Using an unfinished probe:" + this);
+			return;
+		}
 		//We only collect if the HostsList allow it
 		if(monitoredHost.isCollectRunning()) {
 			logger.debug("launch collect for " + this);

@@ -27,11 +27,15 @@ public class JSonGraph extends JSonData {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public void generate(ServletOutputStream out, HostsList root,
+	public boolean generate(ServletOutputStream out, HostsList root,
 			ParamsBean params) throws IOException {
 
 		Filter filter = params.getFilter();
 		int id = params.getId();
+		
+		if(params.getPeriod() == null) {
+			return false;
+		}
 
 		GraphTree node = root.getNodeById(id);
 		List<GraphNode> graphs = new ArrayList<GraphNode>();
@@ -77,7 +81,7 @@ public class JSonGraph extends JSonData {
 				out.print(doNode(graph.getQualifieName(), graph.hashCode(), "graph", null, imgProps));
 			}
 		}
-
+		return true;
 	}
 
 }

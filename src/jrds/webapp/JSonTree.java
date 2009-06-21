@@ -26,24 +26,27 @@ public class JSonTree extends JSonData {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public void generate(ServletOutputStream out, HostsList root,
+	public boolean generate(ServletOutputStream out, HostsList root,
 			ParamsBean params) throws IOException {
 		Filter f = params.getFilter();
 		if( f != null) {
-			evaluateFilter(params, out, root, f);
+			return evaluateFilter(params, out, root, f);
 		}
 		else 
-			dumpRoots(out, root);
-	}
-	
-	void evaluateFilter(ParamsBean params, ServletOutputStream out, HostsList root, Filter f) throws IOException {
-		for(GraphTree tree: root.getGraphsRoot()) {
-			tree = f.setRoot(tree);
-			sub(params, out, tree, "tree", f, "", tree.hashCode());
-		}
+			return dumpRoots(out, root);
 	}
 
-	void dumpRoots(ServletOutputStream out, HostsList root) throws IOException {
+	boolean evaluateFilter(ParamsBean params, ServletOutputStream out, HostsList root, Filter f) throws IOException {
+		logger.debug("Dumping with filter" + f);
+		for(GraphTree tree: root.getGraphsRoot()) {
+			tree = f.setRoot(tree);
+			if(tree != null)
+				sub(params, out, tree, "tree", f, "", tree.hashCode());
+		}
+		return true;
+	}
+
+	boolean dumpRoots(ServletOutputStream out, HostsList root) throws IOException {
 		List<String> tagsref = new ArrayList<String>();
 		for(String filterName: root.getAllFiltersNames()) {
 			Filter filter = root.getFilter(filterName);
@@ -54,12 +57,13 @@ public class JSonTree extends JSonData {
 				type="subfilter";
 			}
 			Map<String, String> href = new HashMap<String, String>();
-			href.put("href", "draft.html?filter=" +URLEncoder.encode(filterName, "UTF-8") );
+			href.put("filter", filterName);
 			out.print(doNode(filterName, filter.hashCode(), type, null, href));
 		}
 		if(tagsref.size() > 0) {
 			out.print(doNode("All tags", tagsref.hashCode(), "filter", tagsref));
 		}
+		return true;
 	}
 
 	String sub(ParamsBean params, ServletOutputStream out, GraphTree gt, String type, Filter f, String path, int base) throws IOException {
@@ -70,7 +74,7 @@ public class JSonTree extends JSonData {
 		Map<String, GraphTree> childs = gt.getChildsMap();
 
 		//    ['http://ng171:15610/index/taya-infkw/0/r1/GetProbeValues','/jrds/index.jsp?filter=All+hosts&scale=7&id=-1156832049&refresh=true']
-		
+
 		List<String> childsref = new ArrayList<String>();
 		for(Map.Entry<String, GraphTree>e: childs.entrySet()) {
 			String childid = sub(params, out, e.getValue(), "node", f, subpath, base);
@@ -81,7 +85,7 @@ public class JSonTree extends JSonData {
 		}
 
 		for(GraphNode child: gt.getGraphsSet().values()) {
-			if(f.acceptGraph(child, subpath + "/" + child.getName())) {
+			if(f.acceptGraph(child, gt.getPath() + "/" + child.getName())) {
 				hasChild = true;
 				String graphid = base + "." + child.hashCode();
 				childsref.add(graphid );
