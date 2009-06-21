@@ -44,14 +44,15 @@ public class HostBuilder extends ObjectBuilder {
 
 	public RdsHost makeRdsHost(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
 		RdsHost host = new RdsHost();
+		JrdsNode hostNode = n.getChild(CompiledXPath.get("/host"));
 
-		n.setMethod(host, CompiledXPath.get("/host/@dnsName"), "setDnsName");
-		n.setMethod(host, CompiledXPath.get("/host/tag"), "addTag", false);
+		hostNode.setMethod(host, CompiledXPath.get("@dnsName"), "setDnsName");
+		hostNode.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
 
-		n.setMethod(host, CompiledXPath.get("/host/@name"), "setName");
+		hostNode.setMethod(host, CompiledXPath.get("@name"), "setName");
 		host.setHostDir(pm.rrddir + org.rrd4j.core.Util.getFileSeparator() + host.getName());
 
-		JrdsNode snmpNode = n.getChild(CompiledXPath.get("/host/snmp"));
+		JrdsNode snmpNode = hostNode.getChild(CompiledXPath.get("snmp"));
 		if(snmpNode != null) {
 			SnmpStarter starter = snmpStarter(snmpNode, host);
 			starter.register(host);
@@ -62,13 +63,13 @@ public class HostBuilder extends ObjectBuilder {
 			hostprop.register(host);
 		}*/
 
-		Map<String, String> hostprop = makeProperties(n.getChild(CompiledXPath.get("/host")));
+		Map<String, String> hostprop = makeProperties(hostNode);
 		if(hostprop != null) {
 			ChainedProperties temp = new ChainedProperties(hostprop);
 			temp.register(host);
 		}
 
-		for(JrdsNode probeNode: n.iterate(CompiledXPath.get("/host/probe | /host/rrd"))) {
+		for(JrdsNode probeNode: hostNode.iterate(CompiledXPath.get("probe | rrd"))) {
 			try {
 				Probe p = makeProbe(probeNode);
 				if(p != null) {
@@ -97,7 +98,7 @@ public class HostBuilder extends ObjectBuilder {
 				e.printStackTrace();
 			}
 		}
-		for(JrdsNode probeNode: n.iterate(CompiledXPath.get("/host/macro/@name"))) {
+		for(JrdsNode probeNode: hostNode.iterate(CompiledXPath.get("macro/@name"))) {
 			String name = probeNode.getTextContent();
 			logger.trace("Adding macro " + name + ": " + macrosMap.get(name));
 			Macro m = macrosMap.get(name);
