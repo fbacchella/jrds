@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT probedesc (name, probeName?, probeClass, (snmpRequester | specific+)?, properties?, uptimefactor?, (index, uniq)?, defaultargs?, ds+, graphs)>
+<!ATTLIST specific 
+			name CDATA #REQUIRED
+>
+<!ELEMENT specific (#PCDATA)>
+<!ELEMENT ds (dsName, dsType?, (oid | collect)?, minValue?, maxValue?)>
+<!ELEMENT defaultargs (arg | list)+ >
+<!ELEMENT arg EMPTY>
+<!ATTLIST arg
+			type CDATA #REQUIRED
+			value CDATA #REQUIRED
+>
+<!ELEMENT list (arg | list)+ >
+<!ELEMENT graphs (name*)>
+<!ELEMENT dsName (#PCDATA)>
+<!ELEMENT dsType (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT value (#PCDATA)>
+<!ELEMENT oid (#PCDATA)>
+<!ELEMENT minValue (#PCDATA)>
+<!ELEMENT maxValue (#PCDATA)>
+<!ELEMENT uptimefactor (#PCDATA)>
+<!ELEMENT index (#PCDATA)>
+<!ELEMENT uniq (#PCDATA)>
+<!ELEMENT probeClass (#PCDATA)>
+<!ELEMENT probeName (#PCDATA)>
+<!ELEMENT snmpRequester (#PCDATA)>
+<!ELEMENT collect (#PCDATA)>
+<!--from http://java.sun.com/dtd/properties.dtd -->
+<!ELEMENT properties ( comment?, entry* ) >
+<!ELEMENT comment (#PCDATA) >
+<!ELEMENT entry (#PCDATA) >
+<!ATTLIST entry key CDATA #REQUIRED>

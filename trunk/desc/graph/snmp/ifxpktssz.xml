@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "http://bidule">
+<graphdesc>
+  <name>ifxpktssz</name>
+  <graphName>ifxpktssz-{2}</graphName>
+  <graphTitle>Packets size on interface {2} on {1}</graphTitle>
+  <verticalLabel>bytes</verticalLabel>
+  <lowerLimit>NaN</lowerLimit>
+  <add>
+    <name>ifHCOutUcastPkts</name>
+    <graphType>none</graphType>
+  </add>
+  <add>
+    <name>ifHCOutOctets</name>
+    <graphType>none</graphType>
+  </add>
+  <add>
+    <name>outPktSize</name>
+    <rpn>ifHCOutOctets, ifHCOutUcastPkts,/</rpn>
+    <graphType>area</graphType>
+    <legend>average packets size send</legend>
+  </add>
+  <add>
+    <name>ifHCInUcastPkts</name>
+    <graphType>none</graphType>
+  </add>
+  <add>
+    <name>ifHCInOctets</name>
+    <graphType>none</graphType>
+  </add>
+  <add>
+    <name>inPktSize</name>
+    <rpn>ifHCInOctets, ifHCInUcastPkts,/</rpn>
+    <reversed>true</reversed>
+    <graphType>area</graphType>
+    <legend>average packets size received</legend>
+  </add>
+  <hosttree>
+    <pathelement>HOST</pathelement>
+    <pathelement>NETWORK</pathelement>
+    <pathelement>INTERFACES</pathelement>
+    <pathelement>INDEX</pathelement>
+    <pathstring>Packets size</pathstring>
+  </hosttree>
+  <viewtree>
+    <pathelement>NETWORK</pathelement>
+    <pathelement>INTERFACES</pathelement>
+    <pathstring>Packets size</pathstring>
+    <pathelement>HOST</pathelement>
+    <pathelement>INDEX</pathelement>
+  </viewtree>
+</graphdesc>

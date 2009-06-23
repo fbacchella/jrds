@@ -1,0 +1,215 @@
+<project name="jrds" default="war" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" >
+	<!-- set global properties for this build -->
+	<property name="app.name" value="jrds"/>
+	<property name="app.path" value="/${app.name}"/>
+	<property name="app.version" value="0.1-dev"/>
+	<property name="build.home" value="${basedir}/build"/>
+	<property name="docs.build" value="${build.home}/doc"/>
+	<property name="src.home" value="${basedir}/src"/>
+	<property name="src.junit" value="${basedir}/junit"/>
+	<property name="web.src" value="${basedir}/web"/>
+	<property name="web.build" value="${build.home}/webapp"/>
+	
+	<property file="local.properties" />
+	
+	<!--  ==================== Compilation Control Options ==================== -->
+	<property name="compile.debug" value="true"/>
+	<property name="compile.deprecation" value="false"/>
+	<property name="compile.optimize" value="true"/>
+	
+	<!-- ===================== Webapplaction server Classpath =========================== -->
+	<path id="webapp.classpath">
+		<fileset dir="${appserv.servlet-api}">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${appserv.jsp-api}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+
+	<!-- ===================== JAI extension Classpath =========================== -->
+	<path id="jai.classpath">
+		<fileset dir="${jai.home}">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
+	<!-- ==================== Run Classpath =========================== -->
+	<path id="project.classpath">
+		<fileset dir="lib">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="build">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
+	
+	<!-- ==================== Compilation Classpath =========================== -->
+	<path id="compile.classpath">
+		<pathelement path="${localcompile.classpath}"/>
+		<path refid="project.classpath"/>
+		<path refid="webapp.classpath"/>
+		<path refid="jai.classpath"/>
+	    <dirset dir="${build.home}/classes">
+	      <include name="**/classes"/>
+	    </dirset>
+	   <pathelement location="${build.home}/classes"/>
+	</path>
+	
+	<!-- ==================== Execution Classpath =========================== -->
+	<path id="execution.classpath">
+		<pathelement location="${build.home}/*.jar"/>
+		<pathelement path="${localexec.classpath}"/>
+		<path refid="project.classpath"/>
+		<path refid="webapp.classpath"/>
+	</path>
+	
+	<target name="compile">
+		<mkdir dir="${build.home}/classes"/>
+		<javac srcdir="${src.home}" destdir="${build.home}/classes"
+			debug="${compile.debug}" deprecation="${compile.deprecation}"
+			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
+			<classpath refid="compile.classpath"/>
+		</javac>
+		<copy todir="${build.home}/classes">
+			<fileset dir="${src.home}">
+				<include name="**/*.xml"/>
+				<include name="**/*.xsl"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="compile.test" depends="compile">
+		<mkdir dir="${build.home}/classes-junit"/>
+		<javac srcdir="${src.junit}" destdir="${build.home}/classes-junit"
+			debug="${compile.debug}" deprecation="${compile.deprecation}"
+			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
+			<classpath refid="compile.classpath"/>
+		</javac>
+	</target>
+
+	
+	<target name="appjar" depends="compile">
+		<jar destfile="${build.home}/jrds.jar" basedir="${build.home}/classes"
+			manifest="${basedir}/web/META-INF/MANIFEST.MF">
+			<fileset dir="dtd">
+				<include name="**.dtd" />
+			</fileset>
+		</jar>
+		<jar destfile="${build.home}/probes.jar" >
+			<fileset dir=".">
+				<include name="desc/**/*.xml" />
+			</fileset>
+		</jar>
+	</target>
+	
+	<target name="javadoc">
+		<javadoc destdir="${docs.build}" access="protected" use="true"
+			notree="false" nonavbar="false" noindex="false" splitindex="true"
+			author="true" version="true" nodeprecatedlist="false"
+			nodeprecated="false"
+			packagenames="jrds,jrds.probe,jrds.probe.*,jrds.snmp,jrds.factories,jrds.factories.xml"
+			sourcepath="src">
+			<classpath refid="compile.classpath"/>
+			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+			<link href="http://java.sun.com/products/servlet/2.3/javadoc"/>
+			<link href="http://www.snmp4j.org/doc"/>
+			<link href="http://jrds.sourceforge.net/apidoc-rrd4j/"/>
+			<link href="http://www.junit.org/junit/javadoc/4.3"/>
+		</javadoc>
+	</target>
+	
+	<target name="clean" description="clean up">
+		<delete dir="${build.home}"/>
+	</target>
+	
+	<target name="srctar" depends="javadoc">
+		<tar destfile="${build.home}/${app.name}-src.tar">
+			<tarfileset dir="." prefix="jrds">
+				<include name="build"/>
+				<include name="build/classes"/>
+				<include name="MANIFEST.MF"/>
+				<include name="src/**"/>
+				<include name="web/**"/>
+				<include name="build.xml"/>
+				<include name="web.xml"/>
+				<include name="lib/**"/>
+				<include name="${docs.build}/**"/>
+			</tarfileset>
+		</tar>
+	</target>
+	
+	<target name="apptar" depends="appjar">
+		<tar destfile="${build.home}/${app.name}.tar">
+			<tarfileset dir="." prefix="jrds">
+				<include name="lib/**"/>
+			</tarfileset>
+			<tarfileset dir="${build.home}" prefix="jrds/lib">
+				<include name="jrds.jar"/>
+			</tarfileset>
+			<tarfileset dir="${build.home}" prefix="jrds">
+				<include name="jrds.war"/>
+			</tarfileset>
+		</tar>
+	</target>
+	
+	<target name="war" depends="appjar" description="Build JRDS war">
+		<war destfile="${build.home}/${app.name}.war" webxml="${basedir}/web/WEB-INF/web.xml"
+			duplicate="preserve">
+			<lib dir="lib">
+				<include name="*.jar"/>
+			</lib>
+			<lib dir="${build.home}">
+				<include name="*.jar"/>
+			</lib>
+			<webinf dir="lib/">
+				<include name="c.tld"/>
+			</webinf>
+			<fileset dir="${web.src}"/>
+		</war>
+	</target>
+	
+	<target name="checkdtd">
+		<xmlvalidate>
+			<xmlcatalog>
+				<dtd publicId="-//jrds//DTD Graph Description//EN"
+					location="dtd/graphdesc.dtd"/>
+				<dtd publicId="-//jrds//DTD Probe Description//EN"
+					location="dtd/probedesc.dtd"/>
+			</xmlcatalog>
+			<fileset dir="desc" includes="**/*.xml"/>
+		</xmlvalidate>
+	</target>
+	<!--  ==================== A few target to run jrds ==================== -->
+	<target name="collect" depends="appjar" >
+		<java classname="jrds.standalone.Collector" fork="true" maxmemory="512m">
+			<classpath refid="execution.classpath" />
+		</java>
+	</target>
+	
+	<target name="test" depends="appjar">
+		<java classname="jrds.standalone.TestBackEnd" fork="true" maxmemory="256m">
+			<classpath refid="execution.classpath" />
+		</java>
+	</target>
+	
+	<target name="graph" depends="appjar">
+		<java classname="jrds.standalone.Grapher" fork="true" maxmemory="128m">
+			<classpath refid="execution.classpath" />
+		</java>
+	</target>
+    <target name="resolve" description="--> retrieve dependencies with ivy">
+        <ivy:retrieve type="jar" pattern="${ivy.lib.dir}/[artifact].[ext]" />
+    	<unzip src="lib/standard.jar" dest="lib" >
+    	    <patternset>
+    	        <include name="META-INF/c.tld"/>
+    	    </patternset>
+    		<mapper type="flatten"/>
+    	</unzip>
+    	<delete file="lib/jsp-api.jar"></delete>
+    </target>	
+    <target name="resolve-test" description="--> retrieve dependencies with ivy" >
+        <ivy:retrieve type="jar" file="ivy-test.xml" pattern="${ivy.lib.dir}/[artifact].[ext]" />
+     </target>	
+</project>

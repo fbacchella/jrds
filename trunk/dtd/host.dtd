@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT probe ((arg, list)*, threshold+, properties?) >
+<!ELEMENT arg EMPTY>
+<!ATTLIST arg
+			type CDATA #REQUIRED
+			value CDATA #REQUIRED
+>
+<!ELEMENT list (arg, list)+ >
+<!ELEMENT threshold (action+ ) >
+<!ATTLIST threshold
+	name CDATA #REQUIRED
+	dsName CDATA #REQUIRED
+	value CDATA #REQUIRED
+	duration CDATA #REQUIRED
+	operation CDATA #REQUIRED
+>
+<!ELEMENT action (arg, list)* >
+<!ATTLIST action
+	type CDATA #REQUIRED
+>
+<!--from http://java.sun.com/dtd/properties.dtd -->
+<!ELEMENT properties ( comment?, entry* ) >
+<!ELEMENT comment (#PCDATA) >
+<!ELEMENT entry (#PCDATA) >
+<!ATTLIST entry key CDATA #REQUIRED>
