@@ -1,0 +1,64 @@
+/* Define Polices */
+body, input, option, select, tab, div, td, a, textarea, .link a {
+	font-family:'Bitstream Vera Sans', arial, Tahoma, 'Sans serif';
+}
+/* Defined Polices font and color*/
+body, input, option, select, tab, div, td, a, textarea {
+	color: black;
+	font-size:11px;
+	margin:0;
+	padding:0;
+}
+.linelabel {
+	width: 60px;
+}
+#mainDiv {
+	height: 100%;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	background-color:#FFF;
+}
+.graph {
+	float:left;
+}
+#treePane {
+	background-color:#DDDDDD;
+	border:1px solid black;
+	float:left;
+	margin:5px;
+	padding:5px;
+	width:330px;
+	height: 100%;
+}
+#graphPane {
+	width:710px;
+}
+#formPane {
+	width:710px;
+}
+.box {
+	background-color: white;
+	border: 2px solid black;
+	padding: 8px;
+	margin: 4px;
+}
+.formblock {
+	background-color:#F5F5F5;
+	border:1px solid #AAAAAA;
+	margin:5px;
+}
+.field {
+	margin: 5px;
+}
+.iconslist {
+	float:left;
+	width:16px;
+	margin:5px;
+}
+.icon {
+	cursor:pointer;
+}
+.graphblock {
+	text-align:center;
+}
