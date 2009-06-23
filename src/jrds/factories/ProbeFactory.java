@@ -123,9 +123,11 @@ public class ProbeFactory {
 			}
 			catch (ClassCastException ex) {
 				logger.warn("didn't get a Probe but a " + o.getClass().getName());
+				return null;
 			}
 			catch (NoClassDefFoundError ex) {
 				logger.warn("Missing class for the creation of a probe " + pd.getName());
+				return null;
 			}
 			catch(InstantiationException ex) {
 				if(ex.getCause() != null)
@@ -135,9 +137,11 @@ public class ProbeFactory {
 					logger.warn("Instantation exception : " + ex,
 							ex);					
 				}
+				return null;
 			}
 			catch (NoSuchMethodException ex) {
 				logger.warn("ProbeDescription invalid " + pd.getName() + ": no constructor " + ex.getMessage() + " found");
+				return null;
 			}
 			catch (Exception ex) {
 				Throwable showException = ex;
@@ -146,6 +150,7 @@ public class ProbeFactory {
 					showException = t;
 				logger.warn("Error during probe creation of type " + pd.getName() + " with args " + constArgs +
 						": ", showException);
+				return null;
 			}
 		}
 		if(pm != null) {
