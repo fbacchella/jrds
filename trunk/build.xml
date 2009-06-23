@@ -156,7 +156,7 @@
 	
 	<target name="war" depends="appjar" description="Build JRDS war">
 		<war destfile="${build.home}/${app.name}.war" webxml="${basedir}/web/WEB-INF/web.xml"
-			duplicate="preserve">
+			duplicate="preserve" manifest="manifest.mf">
 			<lib dir="lib">
 				<include name="*.jar"/>
 			</lib>
@@ -167,6 +167,9 @@
 				<include name="c.tld"/>
 			</webinf>
 			<fileset dir="${web.src}"/>
+			<fileset dir="${build.home}/classes">
+				<include name="Main.class" />
+			</fileset>
 		</war>
 	</target>
 	
