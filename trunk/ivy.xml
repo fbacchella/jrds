@@ -13,5 +13,21 @@
 		<dependency org="org.snmp4j" name="snmp4j" rev="1.9.1f" />
 		<dependency org="xerces" name="xercesImpl" rev="2.9.1" />
 		<dependency org="javax.mail" name="mail" rev="1.4.1" />
+		<dependency org="org.mortbay.jetty" name="jetty-util" rev="6.1.10"/>
+		<dependency org="org.mortbay.jetty" name="jetty-plus" rev="6.1.10"/>
+		<dependency org="org.mortbay.jetty" name="jetty-naming" rev="6.1.10"/>
+		<dependency org="org.mortbay.jetty" name="jetty-ant" rev="6.1.10"/>
+		<dependency org="org.mortbay.jetty" name="servlet-api-2.5" rev="6.1.10"/>
+		<dependency org="org.mortbay.jetty" name="jsp-api-2.0" rev="6.1.10"/>
+		<dependency org="org.mortbay.jetty" name="jsp-2.0" rev="6.1.10"/>
+		<dependency org="org.eclipse.jdt" name="core" rev="3.1.1"/>
+		<dependency org="org.mortbay.jetty" name="jetty" rev="6.1.10"/>
+<!--
+		<dependency org="org.mortbay.jetty" name="servlet-api-3.0" rev="7.0.0pre0"/>
+	<dependency
+		 org="net.sourceforge.winstone"
+		 name="winstone"
+		 rev="0.9.10" />
+	-->
 	</dependencies>
 </ivy-module>

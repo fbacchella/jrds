@@ -154,9 +154,10 @@
 		</tar>
 	</target>
 	
-	<target name="war" depends="appjar" description="Build JRDS war">
+	<target name="war" depends="appjar,manifest" description="Build JRDS war">
 		<war destfile="${build.home}/${app.name}.war" webxml="${basedir}/web/WEB-INF/web.xml"
 			duplicate="preserve" manifest="manifest.mf">
+<!--			duplicate="preserve" manifest="build/MANIFEST.MF"> -->
 			<lib dir="lib">
 				<include name="*.jar"/>
 			</lib>
@@ -169,6 +170,10 @@
 			<fileset dir="${web.src}"/>
 			<fileset dir="${build.home}/classes">
 				<include name="Main.class" />
+				<include name="Jetty.class" />
+			</fileset>
+			<fileset dir="${basedir}">
+				<include name="webdefault.xml" />
 			</fileset>
 		</war>
 	</target>
@@ -215,4 +220,17 @@
     <target name="resolve-test" description="--> retrieve dependencies with ivy" >
         <ivy:retrieve type="jar" file="ivy-test.xml" pattern="${ivy.lib.dir}/[artifact].[ext]" />
      </target>	
+
+	<target name="manifest">
+<!--	  <echo message="${toString:project.classpath}" /> -->
+	  <manifest file="build/MANIFEST.MF">
+		 <attribute name="Main-Class" value="Main"/>
+		 <attribute name="Class-Path" value="${toString:project.classpath}" />
+	  </manifest>
+   </target>
+
+ 	<target name="run">
+		<java classpath="${toString:project.classpath}" classname="Main" />
+	</target>
+
 </project>

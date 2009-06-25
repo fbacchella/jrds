@@ -40,6 +40,9 @@
                     <target>clean</target>
                     <target>war</target>
                 </action>
+                <action name="run">
+                    <target>war</target>
+                </action>
             </ide-actions>
             <export>
                 <type>folder</type>
@@ -69,6 +72,7 @@
                     <ide-action name="rebuild"/>
                     <ide-action name="clean"/>
                     <ide-action name="javadoc"/>
+                    <ide-action name="run"/>
                     <ide-action name="test"/>
                 </context-menu>
             </view>
@@ -77,7 +81,7 @@
         <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/1">
             <compilation-unit>
                 <package-root>src</package-root>
-                <classpath mode="compile">lib/activation.jar:lib/jstl.jar:lib/log4j.jar:lib/mail.jar:lib/mysql-connector-java.jar:lib/rrd4j-2.0.6.jar:lib/servlet-api.jar:lib/snmp4j.jar:lib/standard.jar:lib/xercesImpl.jar:lib/xml-apis.jar:lib/xml-resolver.jar:../../Tools/glassfish/lib/javaee.jar</classpath>
+                <classpath mode="compile">../../Tools/glassfish/lib/javaee.jar:lib/activation.jar:lib/classworlds.jar:lib/geronimo-spec-jta.jar:lib/jetty-util.jar:lib/jetty.jar:lib/jstl.jar:lib/junit.jar:lib/log4j.jar:lib/mail.jar:lib/mysql-connector-java.jar:lib/plexus-container-default.jar:lib/plexus-utils.jar:lib/rrd4j-2.0.6.jar:lib/servlet-api-2.5.jar:lib/servlet-api.jar:lib/snmp4j.jar:lib/standard.jar:lib/wagon-provider-api.jar:lib/xercesImpl.jar:lib/xml-apis.jar:lib/xml-resolver.jar:lib/activation.jar:lib/jstl.jar:lib/log4j.jar:lib/mail.jar:lib/mysql-connector-java.jar:lib/servlet-api.jar:lib/snmp4j.jar:lib/standard.jar:lib/winstone.jar:lib/xercesImpl.jar:lib/xml-apis.jar:lib/xml-resolver.jar</classpath>
                 <built-to>build/classes</built-to>
                 <source-level>1.5</source-level>
             </compilation-unit>
