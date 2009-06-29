@@ -177,7 +177,7 @@ public class Graph {
 		}
 		catch (IOException e) {
 			logger.warn("Unable to creage image for " + node.getName() +
-					" on host " + node.getProbe().getHost().getName() + ": " +
+					" on host " + node.getProbe() + ": " +
 					e);
 		}
 		return img;
@@ -190,7 +190,7 @@ public class Graph {
 		}
 		catch (FileNotFoundException e) {
 			logger.warn("Unable to creage png for " + node.getName() +
-					" on host " + node.getProbe().getHost().getName() + ": " +
+					" on host " + node.getProbe() + ": " +
 					e, e);
 		}
 	}
@@ -201,8 +201,7 @@ public class Graph {
 			try {
 				javax.imageio.ImageIO.write(img, "png", out);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.error("Can't write png:"  + e);
 			}
 
 	}
