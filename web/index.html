@@ -1,13 +1,4 @@
 <html >
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
-<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
-<%@ page session="false" %>
-<%@ page import="jrds.HostsList" %>
-<%@ page import="jrds.GraphNode" %>
-<%@ page isELIgnored="false" %>
-<jsp:useBean id="jrdsBean" class="jrds.webapp.TreeJspBean" />
-<jsp:useBean id="period" class="jrds.webapp.ParamsBean"/>
-<%period.parseReq(request);%>
 
 <head>
 	<title>JRDS</title>
@@ -18,15 +9,16 @@
 <script type="text/javascript" src="lib/jrds.js"></script>
 <script type="text/javascript">
 function initQuery() {
-	var queryParams = dojo.queryToObject(window.location.search.slice(1));
-	
-	queryParams.end = "<jsp:getPropertyname="period" property="stringEnd" />";
-	queryParams.begin = "<jsp:getPropertyname="period" property="stringBegin" />";
-	queryParams.autoperiod = "<jsp:getPropertyname="period" property="scale" />";	
-
-	queryParams.max = "<jsp:getPropertyname="period" property="maxStr" />";
-	queryParams.min = "<jsp:getPropertyname="period" property="minStr" />";
-
+	 dojo.xhrGet( {
+			content:  dojo.queryToObject(window.location.search.slice(1)),
+			sync: true,
+			url: "queryparams",
+			handleAs: "json",
+			load: function(response, ioArgs) {
+				console.log(ioArgs);
+				queryParams =  response;
+			}
+		});
 	return queryParams;
 }
 
@@ -42,8 +34,8 @@ dojo.addOnLoad(function(){
 <body class="nihilo">
 <div id="mainDiv" dojoType="dijit.layout.BorderContainer" >
  	<div id="treePane" dojoType="dijit.layout.ContentPane" region="leading" >
-    	<form dojoType="dijit.form.Form" id="hostForm" action="index.jsp" method="get" name="hostForm">
-			<a id="toroot" href="index.jsp"><img src="img/back_to_album.gif" alt="" height="16" width="20" border="0" /></a>
+    	<form dojoType="dijit.form.Form" id="hostForm" action="index.html" method="get" name="hostForm">
+			<a id="toroot" href="index.html"><img src="img/back_to_album.gif" alt="" height="16" width="20" border="0" /></a>
       		<label for="host">Only host</label>
       		<input type="text" name="host" size="24"  dojoType="dijit.form.TextBox" trim="true" />
     	</form>
@@ -51,14 +43,28 @@ dojo.addOnLoad(function(){
 	</div>
   <div dojoType="dijit.layout.ContentPane" region="center">
     <div dojoType="dijit.layout.ContentPane" id="formPane" >
-      <form  id="dateForm" name="dateForm" action="index.jsp" method="get">
+      <form  id="dateForm" name="dateForm" action="index.html" method="get">
        <div  dojoType="dijit.layout.ContentPane" class="formblock" > <span class="linelabel">Time scale</span>
        <select id="autoperiod" name="autoperiod">
-<c:set value="0" var="opt" />
-<c:forEach var="i" items="${period.periodNames}"><option value="<c:out value="${opt}" />"><c:out value="${i}"/></option>
-<c:set value="${opt + 1}" var="opt" /></c:forEach>
-          </select>
-
+		<option value="0">Manual</option>
+		<option value="1">Last Hour</option>
+		<option value="2">Last 2 Hours</option>
+		<option value="3">Last 3 Hours</option>
+		<option value="4">Last 4 Hours</option>
+		<option value="5">Last 6 Hours</option>
+		<option value="6">Last 12 Hours</option>
+		<option value="7">Last Day</option>
+		<option value="8">Last 2 Days</option>
+		<option value="9">Last Week</option>
+		<option value="10">Last 2 Weeks</option>
+		<option value="11">Last Month</option>
+		<option value="12">Last 2 Months</option>
+		<option value="13">Last 3 Months</option>
+		<option value="14">Last 4 Months</option>
+		<option value="15">Last 6 Months</option>
+		<option value="16">Last Year</option>
+		<option value="17">Last 2 Years</option>
+       </select>
           <label for="begin">Begin</label>
           <input type="text" name="begin" id="begin" class="field" />
           <label for="end">End</label>

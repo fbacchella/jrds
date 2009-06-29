@@ -40,21 +40,25 @@ function doGraphList(result) {
 		dojo.attr(application_double, "src","img/application_double.png");
 		dojo.attr(application_double, "heigth","16");
 		dojo.attr(application_double, "width","16");
+		dojo.attr(application_double, "onclick","popup('" + graph.popuparg + "'," + graph.id + ");");
 	 	var application_view_list = dojo.create("img");
 		dojo.attr(application_view_list, "class","icon");
 		dojo.attr(application_view_list, "src","img/application_view_list.png");
 		dojo.attr(application_view_list, "heigth","16");
 		dojo.attr(application_view_list, "width","16");
+		dojo.attr(application_view_list, "onclick","details('" + graph.detailsarg + "', '" + graph.probename + "');");
 		var time = dojo.create("img");
 		dojo.attr(time, "class","icon");
 		dojo.attr(time, "src","img/time.png");
 		dojo.attr(time, "heigth","16");
 		dojo.attr(time, "width","16");
+		dojo.attr(time, "onclick","history('" + graph.historyarg + "', '" + graph.probename + "');");
 		var disk = dojo.create("img");
 		dojo.attr(disk, "class","icon");
 		dojo.attr(disk, "src","img/disk.png");
 		dojo.attr(disk, "heigth","16");
 		dojo.attr(disk, "width","16");
+		dojo.attr(disk, "onclick","save('" + graph.savearg + "', '" + graph.probename + "');");
 
 		dojo.place(application_double, iconsList);
 		dojo.place(application_view_list, iconsList);
@@ -83,18 +87,19 @@ function loadTree(item,  node){
 
 function reloadTree() {	
 	return dojo.xhrGet( {
-		url: "jsongraph?" + dojo.objectToQuery(queryParams),
+		content: queryParams,
+		url: "jsongraph", // + dojo.objectToQuery(queryParams),
 		handleAs: "json",
 		load: doGraphList
 	});
 }
 
 function fileForms() {	
-    var dateForm = dojo.byId("dateForm");
-	dateForm.end.value =  queryParams.end;
-	dateForm.begin.value =  queryParams.begin;
-	dateForm.max.value =  queryParams.max;
-	dateForm.min.value = queryParams.min;
+	var dateForm = dojo.byId("dateForm");
+	if(queryParams.begin && queryParams.end) {
+		dateForm.end.value =  queryParams.end;
+		dateForm.begin.value =  queryParams.begin;
+    }
 	
 	if(queryParams.max || queryParams.min) {
 		setAutoscale(false);
@@ -182,7 +187,6 @@ function setupCalendar() {
         	return dojo.date.locale.parse(date, this.jrdsFormat);
         },
     	serialize: function(date) {
-        	console.log("Serialize in " + this.id);
         	var sdate = dojo.date.locale.format(date, this.jrdsFormat);
         	queryParams[this.id] = sdate;
         	queryParams.autoperiod = -1;
@@ -198,4 +202,47 @@ function setupCalendar() {
 	
 }
 
-		
+function sort()
+{
+	if(! queryParams ) {
+		queryParams.sort = 1;
+	}
+	else
+		queryParams.sort = undef;
+	reloadTree();
+}
+
+function download_onClick(url)
+{
+	var historyWin = window.open("download" + document.location.search, "download" + document.location.search, "menubar=no,status=no");
+}
+
+function details(url, name)
+{
+	var detailsWin = window.open(url, name, "resizable=yes,scrollbars=yes");
+}
+
+function popup(url,id)
+{
+	var img = document.getElementById(id);
+	if(img != null) {
+	   	var width = "width=" + img.width * 1.1;
+		var height = "height=" + img.height * 1.1;
+		var title = img.name;
+	}
+	else {
+	   	var width = "width=750";
+		var height = "height=500";
+	}
+	return popupWin = window.open(url, "_blank" , height + "," + width + ",menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
+}
+
+function save(url, name)
+{
+       var popupWin = window.open(url, name , "menubar=no,status=no,resizable=no,scrollbars=no");
+}
+
+function history(url, name)
+{
+	var historyWin = window.open(url, "_blank", "width=750,menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
+}

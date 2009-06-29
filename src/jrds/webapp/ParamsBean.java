@@ -56,22 +56,9 @@ public class ParamsBean implements Serializable {
 		contextPath = req.getContextPath();
 		period = makePeriod(req);
 		logger.trace("period from parameters: " + period);
-		String paramString = req.getParameter("id");
-		if(paramString != null) {
-			try {
-				id = Integer.parseInt(paramString);
-			} catch (Throwable e) {
-				logger.error("bad argument " + paramString);
-			}
-		}
-		paramString = req.getParameter("gid");
-		if(paramString != null) {
-			try {
-				gid = Integer.parseInt(paramString);
-			} catch (Throwable e) {
-				logger.error("bad argument " + paramString);
-			}
-		}
+		gid = jrds.Util.parseStringNumber(req.getParameter("gid"), Integer.class, 0).intValue();
+		id = jrds.Util.parseStringNumber(req.getParameter("id"), Integer.class, 0).intValue();
+
 		String sortArg = req.getParameter("sort");
 		if("1".equals(sortArg))
 			sorted = true;
@@ -296,7 +283,7 @@ public class ParamsBean implements Serializable {
 	 * @return Returns the end.
 	 */
 	public String getStringEnd() {
-			String formatted = "";
+		String formatted = "";
 		if(period.getScale() == 0)
 			formatted = df.format(period.getEnd());
 		return formatted;
@@ -397,5 +384,19 @@ public class ParamsBean implements Serializable {
 	 */
 	public void setMin(double min) {
 		this.min = min;
+	}
+
+	/**
+	 * @return the gid
+	 */
+	public int getGid() {
+		return gid;
+	}
+
+	/**
+	 * @param gid the gid to set
+	 */
+	public void setGid(int gid) {
+		this.gid = gid;
 	}
 }

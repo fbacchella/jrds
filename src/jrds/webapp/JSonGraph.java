@@ -32,7 +32,7 @@ public class JSonGraph extends JSonData {
 
 		Filter filter = params.getFilter();
 		int id = params.getId();
-		
+
 		if(params.getPeriod() == null) {
 			return false;
 		}
@@ -56,11 +56,11 @@ public class JSonGraph extends JSonData {
 			}
 		}
 		else {
-			GraphNode graph = root.getGraphById(id);
-			if(graph != null)
-				graphs.add(graph);
+			GraphNode gn = root.getGraphById(id);
+			if(gn != null)
+				graphs.add(gn);
 		}
-
+		logger.debug("Graphs found:" +  graphs);
 		if( ! graphs.isEmpty()) {
 			Renderer r = root.getRenderer();
 			for(GraphNode gn: graphs) {
@@ -68,17 +68,19 @@ public class JSonGraph extends JSonData {
 				jrds.Graph graph = gn.getGraph();
 				params.configureGraph(graph);
 				r.render(graph);
-				
+
 				Probe p = gn.getProbe();
 				imgProps.put("probename", p.getName());
+				imgProps.put("qualifiedname", graph.getQualifieName());
 
-				imgProps.put("popuparg", params.makeObjectUrl("popup.jsp", graph, true));
-				imgProps.put("detailsarg", params.makeObjectUrl("details", graph, true));
-				imgProps.put("historyarg", params.makeObjectUrl("history.jsp", graph, false));
-				imgProps.put("savearg", params.makeObjectUrl("download", graph, true));
+				imgProps.put("popuparg", params.makeObjectUrl("popup.html", graph, true));
+				imgProps.put("detailsarg", params.makeObjectUrl("details", gn, true));
+				imgProps.put("historyarg", params.makeObjectUrl("history.jsp", gn, false));
+				imgProps.put("savearg", params.makeObjectUrl("download", gn, true));
 				imgProps.put("imghref", params.makeObjectUrl("graph",graph, true));
+				imgProps.put("qualifiedname", graph.getQualifieName());
 
-				out.print(doNode(graph.getQualifieName(), graph.hashCode(), "graph", null, imgProps));
+				out.print(doNode(graph.getQualifieName(), gn.hashCode(), "graph", null, imgProps));
 			}
 		}
 		return true;

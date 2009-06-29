@@ -9,7 +9,7 @@
 <head>
 	<title><xsl:value-of select="@name" /> on <xsl:value-of select="@host" /></title>
 	<link rel="stylesheet" type="text/css" href="lib/jrds.css" />
-	<script type="text/javascript" src="lib/querystring.js"></script>
+<script type="text/javascript" src="lib/dojo/dojo.js.uncompressed.js" djConfig="parseOnLoad:true, isDebug: true, locale:'en-us'"></script>
 	<script type="text/javascript" src="lib/jrds.js" ><xsl:text></xsl:text></script>
 </head>
 <body>
@@ -44,7 +44,7 @@
 	
 	<xsl:template match="name">
 		<xsl:text disable-output-escaping="yes">
-	<li><a href="popup.jsp?id={@id}"  onclick="popup('popup.jsp?id={@id}',{@id}); return false"><xsl:apply-templates/></a></li>
+	<li><a href="popup.html?id={@id}"  onclick="popup('popup.html?id={@id}',{@id}); return false"><xsl:apply-templates/></a></li>
 		</xsl:text>
 	</xsl:template>
 </xsl:stylesheet>

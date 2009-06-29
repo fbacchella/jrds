@@ -63,6 +63,20 @@
   	<servlet-class>
   	jrds.webapp.JSonGraph</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>JSonPeriod</servlet-name>
+  	<display-name>JSonPeriod</display-name>
+  	<description></description>
+  	<servlet-class>
+  	jrds.webapp.JSonPeriod</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>JSonQueryParams</servlet-name>
+  	<display-name>JSonQueryParams</display-name>
+  	<description></description>
+  	<servlet-class>
+  	jrds.webapp.JSonQueryParams</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>Last</servlet-name>
     <url-pattern>/lastvalues</url-pattern>
@@ -110,6 +124,14 @@
   <servlet-mapping>
   	<servlet-name>JSonGraph</servlet-name>
   	<url-pattern>/jsongraph</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>JSonPeriod</servlet-name>
+  	<url-pattern>/jsonperiod</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>JSonQueryParams</servlet-name>
+  	<url-pattern>/queryparams</url-pattern>
   </servlet-mapping>
   <taglib>
     <taglib-uri>http://java.sun.com/jstl/core</taglib-uri>
