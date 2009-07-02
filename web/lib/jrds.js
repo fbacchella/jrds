@@ -17,6 +17,31 @@ dojo.require("dojo.number");
 dojo.require("dojo.data.ItemFileReadStore");
 dojo.require("dijit.Tree");
 
+function initQuery() {
+	 dojo.xhrGet( {
+			content:  dojo.queryToObject(window.location.search.slice(1)),
+			sync: true,
+			url: "queryparams",
+			handleAs: "json",
+			load: function(response, ioArgs) {
+				console.log(ioArgs);
+				queryParams =  response;
+			}
+		});
+}
+
+function graphHistory() {
+	var graphPane = dojo.byId("graphPane");
+	dojo.empty(graphPane);
+
+	var graphParams = {};
+	graphParams.id = queryParams.id;
+	graphParams.history = 1;
+	var graphImg = dojo.create("img");
+	dojo.attr(graphImg, "src", "graph?" + dojo.objToQuery(graphParams));		
+	dojo.place(graphImg, graphPane);
+}
+
 function doGraphList(result) {
 	var graphPane = dojo.byId("graphPane");
 	dojo.empty(graphPane);

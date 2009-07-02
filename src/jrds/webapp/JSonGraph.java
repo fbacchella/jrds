@@ -25,6 +25,7 @@ import jrds.Renderer;
 public class JSonGraph extends JSonData {
 	static final private Logger logger = Logger.getLogger(JSonGraph.class);
 	private static final long serialVersionUID = 1L;
+	private int periodHistory[] = {7, 9, 11, 16};
 
 	@Override
 	public boolean generate(ServletOutputStream out, HostsList root,
@@ -64,26 +65,39 @@ public class JSonGraph extends JSonData {
 		if( ! graphs.isEmpty()) {
 			Renderer r = root.getRenderer();
 			for(GraphNode gn: graphs) {
-				Map<String, String> imgProps = new HashMap<String, String>();
-				jrds.Graph graph = gn.getGraph();
-				params.configureGraph(graph);
-				r.render(graph);
-
-				Probe p = gn.getProbe();
-				imgProps.put("probename", p.getName());
-				imgProps.put("qualifiedname", graph.getQualifieName());
-
-				imgProps.put("popuparg", params.makeObjectUrl("popup.html", graph, true));
-				imgProps.put("detailsarg", params.makeObjectUrl("details", gn, true));
-				imgProps.put("historyarg", params.makeObjectUrl("history.jsp", gn, false));
-				imgProps.put("savearg", params.makeObjectUrl("download", gn, true));
-				imgProps.put("imghref", params.makeObjectUrl("graph",graph, true));
-				imgProps.put("qualifiedname", graph.getQualifieName());
-
-				out.print(doNode(graph.getQualifieName(), gn.hashCode(), "graph", null, imgProps));
+				if(params.isHistory()) {
+					for(int p: periodHistory) {
+						params.setScale(p);
+						doGraph(gn, r, params, out);
+					}
+				}
+				else {
+					doGraph(gn, r, params, out);
+				}
 			}
 		}
 		return true;
+	}
+
+	private void doGraph(GraphNode gn, Renderer r, ParamsBean params, ServletOutputStream out) throws IOException {
+		jrds.Graph graph = gn.getGraph();
+		params.configureGraph(graph);
+
+		Map<String, String> imgProps = new HashMap<String, String>();
+		r.render(graph);
+		Probe p = gn.getProbe();
+		imgProps.put("probename", p.getName());
+		imgProps.put("qualifiedname", graph.getQualifieName());
+
+		imgProps.put("popuparg", params.makeObjectUrl("popup.html", graph, true));
+		imgProps.put("detailsarg", params.makeObjectUrl("details", gn, true));
+		imgProps.put("historyarg", params.makeObjectUrl("history.html", gn, false));
+		imgProps.put("savearg", params.makeObjectUrl("download", gn, true));
+		imgProps.put("imghref", params.makeObjectUrl("graph",graph, true));
+		imgProps.put("qualifiedname", graph.getQualifieName());
+
+		out.print(doNode(graph.getQualifieName(), gn.hashCode(), "graph", null, imgProps));
+
 	}
 
 }

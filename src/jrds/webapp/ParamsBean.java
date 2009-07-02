@@ -39,6 +39,7 @@ public class ParamsBean implements Serializable {
 	int id = 0;
 	int gid = 0;
 	boolean sorted = false;
+	boolean history = false;
 	double max = Double.NaN;
 	double min = Double.NaN;
 	Filter f = null;
@@ -62,6 +63,9 @@ public class ParamsBean implements Serializable {
 		String sortArg = req.getParameter("sort");
 		if("1".equals(sortArg))
 			sorted = true;
+		String historyArg = req.getParameter("history");
+		if("1".equals(historyArg))
+			history = true;
 		max = jrds.Util.parseStringNumber(req.getParameter("max"), Double.class, max).doubleValue();
 		min = jrds.Util.parseStringNumber(req.getParameter("min"), Double.class, min).doubleValue();
 		String paramFilterName = req.getParameter("filter");
@@ -323,20 +327,6 @@ public class ParamsBean implements Serializable {
 		return Period.getPeriodNames();
 	}
 
-
-	/**
-	 * @param p the p to set
-	 */
-	/*public void setPeriod(Period p) {
-		if(p.getScale() != 0) {
-			scalePeriod = true;
-			this.p = new Period(p.getScale());
-		}
-		else {
-			this.p.setBegin(p.getBegin());
-			this.p.setEnd(p.getEnd());
-		}
-	}*/
 	public String getPeriodUrl() {
 		StringBuilder parambuff = new StringBuilder();
 		if(period != null)
@@ -387,16 +377,9 @@ public class ParamsBean implements Serializable {
 	}
 
 	/**
-	 * @return the gid
+	 * @return the history
 	 */
-	public int getGid() {
-		return gid;
-	}
-
-	/**
-	 * @param gid the gid to set
-	 */
-	public void setGid(int gid) {
-		this.gid = gid;
+	public boolean isHistory() {
+		return history;
 	}
 }

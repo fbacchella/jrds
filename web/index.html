@@ -8,21 +8,9 @@
 <script type="text/javascript" src="lib/dojo/dojo.js.uncompressed.js" djConfig="parseOnLoad:true, isDebug: true, locale:'en-us'"></script>
 <script type="text/javascript" src="lib/jrds.js"></script>
 <script type="text/javascript">
-function initQuery() {
-	 dojo.xhrGet( {
-			content:  dojo.queryToObject(window.location.search.slice(1)),
-			sync: true,
-			url: "queryparams",
-			handleAs: "json",
-			load: function(response, ioArgs) {
-				console.log(ioArgs);
-				queryParams =  response;
-			}
-		});
-	return queryParams;
-}
 
-var queryParams=initQuery();
+initQuery();
+
 dojo.addOnLoad(function(){
 	setupCalendar();
 	fileForms();
