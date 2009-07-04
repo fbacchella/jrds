@@ -2,14 +2,16 @@
 
 <head>
 	<title>JRDS</title>
-<link href="lib/dijit/themes/nihilo/nihilo.css" rel="stylesheet" type="text/css" />
-<link href="lib/dojox/form/resources/DropDownSelect.css" rel="stylesheet" type="text/css" />
+<link href="dijit/themes/nihilo/nihilo.css" rel="stylesheet" type="text/css" />
+<link href="dojox/form/resources/DropDownSelect.css" rel="stylesheet" type="text/css" />
 <link href="lib/jrds.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="lib/dojo/dojo.js.uncompressed.js" djConfig="parseOnLoad:true, isDebug: true, locale:'en-us'"></script>
+<script type="text/javascript" src="dojo/dojo.js" djConfig="parseOnLoad:true, isDebug: true, locale:'en-us'"></script>
+<script type="text/javascript" src="dojo/dojo-jrds.js"></script>
 <script type="text/javascript" src="lib/jrds.js"></script>
 <script type="text/javascript">
 
 initQuery();
+dojo.cookie("treeOneSaveStateCookie", null, {expires: -1});
 
 dojo.addOnLoad(function(){
 	setupCalendar();

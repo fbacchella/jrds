@@ -1,21 +1,21 @@
-dojo.require("dijit.layout.BorderContainer");
-dojo.require("dijit.layout.ContentPane");
-dojo.require("dijit.layout.AccordionContainer");
-dojo.require("dijit.form.DateTextBox");
-dojo.require("dijit.form.Button");
-dojo.require("dijit.Dialog");
-dojo.require("dijit.form.TextBox");
-dojo.require("dijit.form.FilteringSelect");
-dojo.require("dijit.form.TextBox");
-dojo.require("dojox.form.DropDownSelect");
-dojo.require("dijit.form.Form");
-dojo.require("dijit.layout.ContentPane");
-dojo.require("dojo.parser");  // scan page for widgets and instantiate them
-dojo.require("dijit.form.Button");
-dojo.require("dijit.form.ValidationTextBox");
-dojo.require("dojo.number");
-dojo.require("dojo.data.ItemFileReadStore");
-dojo.require("dijit.Tree");
+//dojo.require("dijit.layout.BorderContainer");
+//dojo.require("dijit.layout.ContentPane");
+//dojo.require("dijit.layout.AccordionContainer");
+//dojo.require("dijit.form.DateTextBox");
+//dojo.require("dijit.form.Button");
+//dojo.require("dijit.Dialog");
+//dojo.require("dijit.form.TextBox");
+//dojo.require("dijit.form.FilteringSelect");
+//dojo.require("dijit.form.TextBox");
+//dojo.require("dojox.form.DropDownSelect");
+//dojo.require("dijit.form.Form");
+//dojo.require("dijit.layout.ContentPane");
+//dojo.require("dojo.parser");  // scan page for widgets and instantiate them
+//dojo.require("dijit.form.Button");
+//dojo.require("dijit.form.ValidationTextBox");
+//dojo.require("dojo.number");
+//dojo.require("dojo.data.ItemFileReadStore");
+//dojo.require("dijit.Tree");
 
 function initQuery() {
 	 dojo.xhrGet( {
@@ -24,7 +24,6 @@ function initQuery() {
 			url: "queryparams",
 			handleAs: "json",
 			load: function(response, ioArgs) {
-				console.log(ioArgs);
 				queryParams =  response;
 			}
 		});
@@ -197,25 +196,46 @@ function setAutoscale(value) {
 
 function setupCalendar() {
     dojo.declare("DayHourTextBox", dijit.form.DateTextBox, {
-    	jrdsFormat: {
+    	jrdsFormatDate: {
             selector: 'date', 
             datePattern: 'yyyy-MM-dd',
             locale: 'en-us'
     	},
+    	jrdsFormatBoth: {
+            selector: 'both', 
+            datePattern: 'yyyy-MM-dd',
+            timePattern: 'HH:mm',
+            locale: 'en-us'
+    	},
+    	dateStr: '',
     	regExpGen: function() { 
-    		return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
+    		return "\\d\\d\\d\\d-\\d\\d-\\d\\d( \\d\\d:\\d\\d)*";
     	},
     	format: function(date) {
-        	return dojo.date.locale.format(date, this.jrdsFormat);
+    		console.log("format: " + date);
+    		if(this.dateStr == '') {
+    			this.dateStr = dojo.date.locale.format(date, this.jrdsFormatDate);
+    		}
+    		return this.dateStr;
+        	//return dojo.date.locale.format(date, this.jrdsFormat);
         },
     	parse: function(date) {
-        	return dojo.date.locale.parse(date, this.jrdsFormat);
+    		console.log("parse: '" + date + "'");
+    		elems = date.split(' ');
+    		console.log("parse elem : '" + elems[1] + "'");
+    		this.dateStr = date;
+    		format = this.jrdsFormatDate;
+    		if(elems[1])
+    			format = this.jrdsFormatBoth;
+    		return dojo.date.locale.parse(date, format);
         },
     	serialize: function(date) {
-        	var sdate = dojo.date.locale.format(date, this.jrdsFormat);
-        	queryParams[this.id] = sdate;
+    		console.log("serialize: " + date);
+    		var sdate = dojo.date.locale.format(date, this.jrdsFormatDate);
+        	queryParams[this.id] = this.dateStr;
         	queryParams.autoperiod = -1;
-        	return sdate
+        	return sdate;
+        	//return this.dateStr;
         }
     });
    new DayHourTextBox({

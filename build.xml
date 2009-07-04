@@ -163,10 +163,8 @@
 			<lib dir="${build.home}">
 				<include name="*.jar"/>
 			</lib>
-			<webinf dir="lib/">
-				<include name="c.tld"/>
-			</webinf>
 			<fileset dir="${web.src}"/>
+			<fileset dir="${build.home}/dojo-1.3.0"/>
 		</war>
 	</target>
 	
@@ -200,16 +198,11 @@
 		</java>
 	</target>
     <target name="resolve" description="--> retrieve dependencies with ivy">
-        <ivy:retrieve type="jar" pattern="${ivy.lib.dir}/[artifact].[ext]" />
-    	<unzip src="lib/standard.jar" dest="lib" >
-    	    <patternset>
-    	        <include name="META-INF/c.tld"/>
-    	    </patternset>
-    		<mapper type="flatten"/>
-    	</unzip>
-    	<delete file="lib/jsp-api.jar"></delete>
-    </target>	
-    <target name="resolve-test" description="--> retrieve dependencies with ivy" >
-        <ivy:retrieve type="jar" file="ivy-test.xml" pattern="${ivy.lib.dir}/[artifact].[ext]" />
-     </target>	
+        <ivy:retrieve type="jar,zip" pattern="[conf]/[artifact].[ext]" />
+    		<unzip src="build/dojo.zip" dest="build" >
+    			<!--<filtermapper>
+    			  <replacestring from="dojo-.*/" to="${build.home}/dojo/"/>
+    			</filtermapper>-->
+    		</unzip>
+    </target>		
 </project>
