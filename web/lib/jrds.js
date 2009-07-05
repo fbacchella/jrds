@@ -1,21 +1,4 @@
-//dojo.require("dijit.layout.BorderContainer");
-//dojo.require("dijit.layout.ContentPane");
-//dojo.require("dijit.layout.AccordionContainer");
-//dojo.require("dijit.form.DateTextBox");
-//dojo.require("dijit.form.Button");
-//dojo.require("dijit.Dialog");
-//dojo.require("dijit.form.TextBox");
-//dojo.require("dijit.form.FilteringSelect");
-//dojo.require("dijit.form.TextBox");
-//dojo.require("dojox.form.DropDownSelect");
-//dojo.require("dijit.form.Form");
-//dojo.require("dijit.layout.ContentPane");
-//dojo.require("dojo.parser");  // scan page for widgets and instantiate them
-//dojo.require("dijit.form.Button");
-//dojo.require("dijit.form.ValidationTextBox");
-//dojo.require("dojo.number");
-//dojo.require("dojo.data.ItemFileReadStore");
-//dojo.require("dijit.Tree");
+dojo.require("dijit.form.TimeTextBox");
 
 function initQuery() {
 	 dojo.xhrGet( {
@@ -195,56 +178,84 @@ function setAutoscale(value) {
 }
 
 function setupCalendar() {
+    dojo.declare("HourBox",dijit.form.TimeTextBox , {
+    	style: "width:50px",
+    	hourFormat: {
+    		timePattern: 'HH:mm',
+            locale: 'en-us',
+            selector: 'time', 
+    	},        
+    	onChange: function(date) {
+    		if(date && ! date == '') {
+    			var elems = queryParams[this.queryId].split(' ');
+    			queryParams[this.queryId] = elems[0] + ' ' + dojo.date.locale.format(date, this.hourFormat);
+    		}
+    		return this.inherited(arguments);
+    	}
+
+    });
+    
+    var beginHour = new Date();
+    beginHour.setHours(00);
+    beginHour.setMinutes(00);
+    beginHour.setSeconds(00);
+    beginTimeTextBox = new HourBox( {
+    	name: 'beginh',
+    	value: '',
+        queryId: 'begin',
+        constraints:{timePattern:'HH:mm', clickableIncrement:'T00:30:00', visibleIncrement:'T00:30:00', visibleRange:'T05:00:00'},
+    }, 'beginh');
+    var endHour = new Date();
+    endHour.setHours(23);
+    endHour.setMinutes(59);
+    endHour.setSeconds(59);
+    endTimeTextBox = new HourBox( {
+    	name: 'endh',
+    	value: '',
+        queryId: 'end',
+        constraints:{timePattern:'HH:mm', clickableIncrement:'T00:30:00', visibleIncrement:'T00:30:00', visibleRange:'T05:00:00'},
+    }, 'endh');
+
     dojo.declare("DayHourTextBox", dijit.form.DateTextBox, {
+    	style: "width:100px",
     	jrdsFormatDate: {
             selector: 'date', 
             datePattern: 'yyyy-MM-dd',
             locale: 'en-us'
     	},
-    	jrdsFormatBoth: {
-            selector: 'both', 
-            datePattern: 'yyyy-MM-dd',
-            timePattern: 'HH:mm',
-            locale: 'en-us'
-    	},
     	dateStr: '',
     	regExpGen: function() { 
-    		return "\\d\\d\\d\\d-\\d\\d-\\d\\d( \\d\\d:\\d\\d)*";
+    		return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
     	},
     	format: function(date) {
-    		console.log("format: " + date);
-    		if(this.dateStr == '') {
-    			this.dateStr = dojo.date.locale.format(date, this.jrdsFormatDate);
-    		}
-    		return this.dateStr;
-        	//return dojo.date.locale.format(date, this.jrdsFormat);
+        	return dojo.date.locale.format(date, this.jrdsFormatDate);
         },
     	parse: function(date) {
-    		console.log("parse: '" + date + "'");
-    		elems = date.split(' ');
-    		console.log("parse elem : '" + elems[1] + "'");
-    		this.dateStr = date;
-    		format = this.jrdsFormatDate;
-    		if(elems[1])
-    			format = this.jrdsFormatBoth;
-    		return dojo.date.locale.parse(date, format);
+    		return dojo.date.locale.parse(date, this.jrdsFormatDate);
         },
     	serialize: function(date) {
-    		console.log("serialize: " + date);
-    		var sdate = dojo.date.locale.format(date, this.jrdsFormatDate);
-        	queryParams[this.id] = this.dateStr;
+        	return dojo.date.locale.format(date, this.jrdsFormatDate);
+        },
+        onChange: function(date) {
+        	var sdate = dojo.date.locale.format(date, this.jrdsFormatDate);
+        	queryParams[this.id] = sdate;
         	queryParams.autoperiod = -1;
-        	return sdate;
-        	//return this.dateStr;
+        	this.timeBox.attr('value', this.resetHour);
+
+        	return this.inherited(arguments);
         }
     });
    new DayHourTextBox({
             name: "begin",
+            resetHour: beginHour,
+            timeBox: beginTimeTextBox
     }, "begin");
     new DayHourTextBox({
             name: "end",
+            resetHour: endHour,
+            timeBox: endTimeTextBox
     }, "end");
-	
+    
 }
 
 function sort()
