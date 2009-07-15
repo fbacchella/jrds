@@ -50,6 +50,7 @@ public class Grapher {
 		Period p = new Period();
 		Renderer r= new Renderer(10);
 		Collection<Integer> done = new HashSet<Integer>();
+		logger.debug(HostsList.getRootGroup().getGraphsRoot());
 		for(GraphTree graphTree: HostsList.getRootGroup().getGraphsRoot()) {
 			logger.trace("Tree found: " + graphTree.getName());
 			for(GraphNode gn: graphTree.enumerateChildsGraph(null)) {

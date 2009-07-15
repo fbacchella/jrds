@@ -199,22 +199,26 @@ public class GraphTree {
 		return graphsSet;
 	}
 
-	public List<GraphNode> enumerateChildsGraph(Filter v) {
+	/**
+	 * @param Filter, can be null
+	 * @return
+	 */
+	public List<GraphNode> enumerateChildsGraph(Filter f) {
 		List<GraphNode> retValue  = new ArrayList<GraphNode>();
 		if(graphsSet != null) {
-			if(v == null)
+			if(f == null)
 				retValue.addAll((Collection<GraphNode>) graphsSet.values());
 			else {
 				for(GraphNode g: graphsSet.values()) {
 					String path = this.getPath() + "/" + g.getName();
-					if(v.acceptGraph(g, path))
+					if(f.acceptGraph(g, path))
 						retValue.add(g);
 				}
 			}
 		}
 		if(childsMap != null) {
 			for(GraphTree child: childsMap.values()) {
-				retValue.addAll(child.enumerateChildsGraph(v));
+				retValue.addAll(child.enumerateChildsGraph(f));
 			}
 		}	
 		return retValue;

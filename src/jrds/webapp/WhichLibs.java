@@ -68,7 +68,6 @@ public final class WhichLibs extends HttpServlet {
 			out.println(resolv("Log4j",logger.getClass()));
 //			out.println(resolv("common logging API", org.apache.commons.logging.LogFactory.class));
 //			out.println(resolv("common logging", org.apache.commons.logging.LogFactory.getLog(this.getClass())));
-			out.println(resolv("STL", org.apache.taglibs.standard.Version.class));
 			out.println(resolv("JAI", JAI.class));
 
 
