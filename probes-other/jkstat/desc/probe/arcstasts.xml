@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+  <name>ArcStats</name>
+  <probeName>arcstats</probeName>
+  <probeClass>jrds.probe.KstatProbe</probeClass>
+  <specific name="kstat">zfs:0:arcstats</specific>
+  <ds>
+    <dsName>hits</dsName>
+    <dsType>counter</dsType>
+  </ds>
+</probedesc>
