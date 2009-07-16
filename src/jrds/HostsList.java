@@ -135,6 +135,9 @@ public class HostsList implements StarterNode {
 			URL graphUrl = getClass().getResource("/desc");
 			if(graphUrl != null)
 				l.importUrl(graphUrl);
+			else {
+				logger.fatal("Default probes not found");
+			}
 		} catch (ParserConfigurationException e) {
 			throw new RuntimeException("Loader initialisation error",e);
 		}

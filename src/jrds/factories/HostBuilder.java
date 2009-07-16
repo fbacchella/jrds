@@ -136,6 +136,8 @@ public class HostBuilder extends ObjectBuilder {
 		List<Object> args = makeArgs(probeNode);
 		String type = probeNode.attrMap().get("type");
 		p = pf.makeProbe(type, args);
+		if(p == null)
+			return null;
 		for(JrdsNode thresholdNode: probeNode.iterate(CompiledXPath.get("threshold"))) {
 			Map<String, String> thresholdAttr = thresholdNode.attrMap();
 			String name = thresholdAttr.get("name").trim();
