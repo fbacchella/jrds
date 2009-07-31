@@ -28,8 +28,8 @@ public class Macro {
 			List constArgs = (List) l[1];
 			Probe newRdsRrd = pf.makeProbe(className, constArgs);
 			if(newRdsRrd != null) {
-				if(newRdsRrd instanceof IndexedProbe && label != null) {
-					((IndexedProbe)newRdsRrd).setLabel(label);
+				if(label != null) {
+					newRdsRrd.setLabel(label);
 				}
 
 				host.addProbe(newRdsRrd);

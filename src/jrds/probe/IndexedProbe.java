@@ -12,6 +12,4 @@ package jrds.probe;
  */
 public interface IndexedProbe {
 	public String getIndexName();
-	public String getLabel();
-	public void setLabel(String label);
 }

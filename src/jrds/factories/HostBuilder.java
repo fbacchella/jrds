@@ -1,13 +1,16 @@
 package jrds.factories;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
 import jrds.ChainedProperties;
+import jrds.Connection;
 import jrds.Macro;
 import jrds.Probe;
 import jrds.RdsHost;
+import jrds.StarterNode;
 import jrds.Threshold;
 import jrds.Threshold.Comparator;
 import jrds.factories.xml.CompiledXPath;
@@ -58,10 +61,7 @@ public class HostBuilder extends ObjectBuilder {
 			starter.register(host);
 		}
 
-		/*PropertyStarter hostprop = propertiesStarter(n.getChild(CompiledXPath.get("/host")));
-		if(hostprop != null) {
-			hostprop.register(host);
-		}*/
+		makeConnexion(hostNode, host);
 
 		Map<String, String> hostprop = makeProperties(hostNode);
 		if(hostprop != null) {
@@ -76,13 +76,6 @@ public class HostBuilder extends ObjectBuilder {
 					logger.trace(p);
 					host.addProbe(p);
 				}
-				if(p instanceof IndexedProbe) {
-					String label = probeNode.evaluate(CompiledXPath.get("@label"));
-					if(label != null && ! "".equals(label)) {
-						logger.trace("Adding label " + label + " to "  + p);
-						((IndexedProbe)p).setLabel(label);
-					}
-				}
 				JrdsNode snmpProbeNode = probeNode.getChild(CompiledXPath.get("snmp"));
 				if(snmpProbeNode != null) {
 					SnmpStarter starter = snmpStarter(snmpProbeNode, host);
@@ -93,6 +86,8 @@ public class HostBuilder extends ObjectBuilder {
 					ChainedProperties temp = new ChainedProperties(nodeprop);
 					temp.register(p);
 				}
+				makeConnexion(probeNode, p);
+
 			} catch (Exception e) {
 				logger.error("Probe creation failed for host " + host.getName() + ": " + e);
 				e.printStackTrace();
@@ -155,7 +150,47 @@ public class HostBuilder extends ObjectBuilder {
 			}
 			p.addThreshold(t);
 		}
+		String label = probeNode.evaluate(CompiledXPath.get("@label"));
+		if(label != null && ! "".equals(label)) {
+			logger.trace("Adding label " + label + " to "  + p);
+			p.setLabel(label);
+		}
 		return p;
+	}
+
+	public void makeConnexion(JrdsNode domNode, StarterNode sNode) {
+		for(JrdsNode cnxNode: domNode.iterate(CompiledXPath.get("connection"))) {
+			List<Object> args = makeArgs(cnxNode);
+			String type = cnxNode.attrMap().get("type");
+			if(type == null) {
+				logger.equals("No type declared");
+			}
+			Connection o = null;
+			try {
+				Class<?> connectionClass = Class.forName(type);
+				Class<?>[] constArgsType = new Class[args.size()];
+				Object[] constArgsVal = new Object[args.size()];
+				int index = 0;
+				for (Object arg: args) {
+					constArgsType[index] = arg.getClass();
+					constArgsVal[index] = arg;
+					index++;
+				}
+				Constructor<?> theConst = connectionClass.getConstructor(constArgsType);
+				o = (Connection)theConst.newInstance(constArgsVal);
+				o.register(sNode);
+				logger.debug("Connexion registred: " + o + " for " + sNode);
+			}
+			catch (ClassCastException ex) {
+				logger.warn("didn't get a Connection but a " + o.getClass().getName());
+			}
+			catch (Exception ex) {
+				logger.warn("Error during connection creation of type " + type +
+						": " + ex, ex);
+			}
+
+		}
+
 	}
 
 	@SuppressWarnings("unchecked")

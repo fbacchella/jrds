@@ -1,7 +1,6 @@
 package jrds.webapp;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -73,8 +72,6 @@ public class JSonTree extends JSonData {
 		boolean hasChild = false;
 		Map<String, GraphTree> childs = gt.getChildsMap();
 
-		//    ['http://ng171:15610/index/taya-infkw/0/r1/GetProbeValues','/jrds/index.jsp?filter=All+hosts&scale=7&id=-1156832049&refresh=true']
-
 		List<String> childsref = new ArrayList<String>();
 		for(Map.Entry<String, GraphTree>e: childs.entrySet()) {
 			String childid = sub(params, out, e.getValue(), "node", f, subpath, base);
@@ -84,12 +81,14 @@ public class JSonTree extends JSonData {
 			}
 		}
 
-		for(GraphNode child: gt.getGraphsSet().values()) {
+		for(Map.Entry<String, GraphNode> leaf: gt.getGraphsSet().entrySet()) {
+			GraphNode child = leaf.getValue();
+			String leafName = leaf.getKey();
 			if(f.acceptGraph(child, gt.getPath() + "/" + child.getName())) {
 				hasChild = true;
 				String graphid = base + "." + child.hashCode();
 				childsref.add(graphid );
-				out.print(doNode(child.getName(), graphid, "graph", null));
+				out.print(doNode(leafName, graphid, "graph", null));
 			}
 		}
 

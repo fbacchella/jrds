@@ -24,6 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.probe.jdbc.JdbcProbe;
+import jrds.Util.SiPrefix;
 
 import org.apache.log4j.Logger;
 import org.apache.xml.serialize.OutputFormat;
@@ -136,7 +137,7 @@ implements Cloneable {
 					IndexedProbe ip = (IndexedProbe) graph.getProbe();
 					retValue.append(ip.getIndexName());
 					//Check to see if a label is defined and needed to add
-					String label = ip.getLabel();
+					String label = graph.getProbe().getLabel();
 					if(label != null) {
 						retValue.append(" (" + label + ")");
 					}
@@ -264,11 +265,12 @@ implements Cloneable {
 
 	private enum Colors {
 		BLUE, GREEN, RED, CYAN, ORANGE, TEAL, YELLOW, MAGENTA, PINK, BLACK, NAVY,
-		GRAY, LIGHT_GRAY, DARK_GRAY, FUCHSIA, AQUA, LIME, MAROON
+		GRAY, LIGHT_GRAY, DARK_GRAY, FUCHSIA, AQUA, LIME, MAROON, OLIVE, PURPLE, SILVER, WHITE
 	};
 	private static final Map<Colors, Color> COLORMAP = new EnumMap<Colors, Color>(Colors.class);
 	static final private Color[] colors = new Color[Colors.values().length];
 	static {
+		COLORMAP.put(Colors.WHITE, Color.WHITE);
 		COLORMAP.put(Colors.BLUE, Color.BLUE);
 		COLORMAP.put(Colors.GREEN, Color.GREEN);
 		COLORMAP.put(Colors.RED, Color.RED);
@@ -288,77 +290,16 @@ implements Cloneable {
 		COLORMAP.put(Colors.FUCHSIA, new Color(255,0,255));
 		COLORMAP.put(Colors.LIME, new Color(204,255,0));
 		COLORMAP.put(Colors.MAROON, new Color(128,0,0));
+		COLORMAP.put(Colors.OLIVE, new Color(128,128,0));
+		COLORMAP.put(Colors.OLIVE, new Color(128,0,128));
+		COLORMAP.put(Colors.SILVER, new Color(192,192,192));
 
 		COLORMAP.values().toArray(colors);
 	}
 
-	/*static final private Map<String, Color> COLORMAP = new HashMap<String, Color>();
-	static {
-		COLORMAP.put("MAROON",  new Color(128,0,0) {
-			public String toString() { return "MAROON"; }
-		});
-		COLORMAP.put("NAVY",  new Color(0,0,128) {
-			public String toString() { return "NAVY"; }
-		});
-		COLORMAP.put("OLIVE",  new Color(128,128,0) {
-			public String toString() { return "OLIVE"; }
-		});
-		COLORMAP.put("PURPLE",  new Color(128,0,128) {
-			public String toString() { return "PURPLE"; }
-		});
-		COLORMAP.put("RED",  new Color(Color.RED.getRGB()) {
-			public String toString() { return "RED"; }
-		});
-		COLORMAP.put("SILVER",  new Color(192,192,192) {
-			public String toString() { return "SILVER"; }
-		});
-		COLORMAP.put("TEAL",  new Color(0,128,128) {
-			public String toString() { return "TEAL"; }
-		});
-		COLORMAP.put("WHITE",  new Color(Color.WHITE.getRGB()) {
-			public String toString() { return "WHITE"; }
-		});
-		COLORMAP.put("YELLOW",  new Color(Color.YELLOW.getRGB()) {
-			public String toString() { return "YELLOW"; }
-		});
-		COLORMAP.put("ORANGE",  new Color(Color.ORANGE.getRGB()) {
-			public String toString() { return "ORANGE"; }
-		});
-		COLORMAP.put("PINK",  new Color(Color.PINK.getRGB()) {
-			public String toString() { return "PINK"; }
-		});
-	 */
-
 	private static final Font TITLEFONT = new Font("Lucida Sans Typewriter", Font.BOLD ,12 );
 	private static final Font TEXTFONT = new Font("Lucida Sans Typewriter", Font.PLAIN ,10 );
-	private enum SiPrefix {
-		Y, Z, E, P, T, G, M, k, h, da,
-		FIXED, d, c, m, µ, n, p, f, a, z, y
-	};
-	private static final Map<SiPrefix, Integer> SIPREFIXMAP = new EnumMap<SiPrefix, Integer>(SiPrefix.class);
-	static {
-		SIPREFIXMAP.put(SiPrefix.Y, 24);
-		SIPREFIXMAP.put(SiPrefix.Z, 21);
-		SIPREFIXMAP.put(SiPrefix.E, 18);
-		SIPREFIXMAP.put(SiPrefix.P, 15);
-		SIPREFIXMAP.put(SiPrefix.T, 12);
-		SIPREFIXMAP.put(SiPrefix.G, 9);
-		SIPREFIXMAP.put(SiPrefix.M, 6);
-		SIPREFIXMAP.put(SiPrefix.k, 3);
-		SIPREFIXMAP.put(SiPrefix.h, 2);
-		SIPREFIXMAP.put(SiPrefix.da,1 );
-		SIPREFIXMAP.put(SiPrefix.FIXED, 0);
-		SIPREFIXMAP.put(SiPrefix.d, -1);
-		SIPREFIXMAP.put(SiPrefix.c, -2);
-		SIPREFIXMAP.put(SiPrefix.m, -3);
-		SIPREFIXMAP.put(SiPrefix.µ, -6);
-		SIPREFIXMAP.put(SiPrefix.n, -9);
-		SIPREFIXMAP.put(SiPrefix.p, -12);
-		SIPREFIXMAP.put(SiPrefix.f, -15);
-		SIPREFIXMAP.put(SiPrefix.a, -18);
-		SIPREFIXMAP.put(SiPrefix.z, -21);
-		SIPREFIXMAP.put(SiPrefix.y, -24);
-	}
+
 	static private final class DsDesc {
 		public String name;
 		public String dsName;
@@ -698,7 +639,7 @@ implements Cloneable {
 	 * @throws IOException
 	 * @throws RrdException
 	 */
-	public DataProcessor getPlottedDatas(Probe probe, Map ownData, long start, long end) throws IOException {
+	public DataProcessor getPlottedDatas(Probe probe, Map<?, ?> ownData, long start, long end) throws IOException {
 		DataProcessor retValue = new DataProcessor(start, end);
 		String rrdName = probe.getRrdName();
 
@@ -877,20 +818,13 @@ implements Cloneable {
 	 * @return Returns the viewTree.
 	 */
 	public LinkedList<String> getViewTree(GraphNode graph) {
-		LinkedList<String> tree = new LinkedList<String>();
-		for (Object o: viewTree) {
-			if (o instanceof String)
-				tree.add((String)o);
-			else if (o instanceof PathElement)
-				tree.add( ( (PathElement) o).resolve(graph));
-		}
-		return tree;
+		return getTree(graph, viewTree);
 	}
 
 	/**
 	 * @param viewTree The viewTree to set.
 	 */
-	public void setViewTree(List viewTree) {
+	public void setViewTree(List<?> viewTree) {
 		this.viewTree = viewTree;
 		logger.trace("Adding view tree: " + viewTree);
 	}
@@ -906,10 +840,16 @@ implements Cloneable {
 	 * @return Returns the hostTree.
 	 */
 	public LinkedList<String> getHostTree(GraphNode graph) {
+		return getTree(graph, hostTree);
+	}
+	
+	private LinkedList<String> getTree(GraphNode graph, List<?> ElementsTree) {
 		LinkedList<String> tree = new LinkedList<String>();
-		for (Object o: hostTree) {
-			if (o instanceof String)
-				tree.add((String)o);
+		for (Object o: ElementsTree) {
+			if (o instanceof String) {
+				String pathElem = jrds.Util.parseTemplate((String) o, graph.getProbe(), this, graph.getProbe().getHost());
+				tree.add(pathElem);
+			}
 			else if (o instanceof PathElement)
 				tree.add( ( (PathElement) o).resolve(graph));
 		}
@@ -919,7 +859,7 @@ implements Cloneable {
 	/**
 	 * @param hostTree The hostTree to set.
 	 */
-	public void setHostTree(List hostTree) {
+	public void setHostTree(List<?> hostTree) {
 		this.hostTree = hostTree;
 		logger.trace("Adding host tree: " + hostTree);
 	}
@@ -1102,7 +1042,8 @@ implements Cloneable {
 		if("".equals(exponent))
 			exponent = SiPrefix.FIXED.name();
 		try {
-			unitExponent = SIPREFIXMAP.get(SiPrefix.valueOf(exponent));
+			unitExponent = SiPrefix.valueOf(exponent).getExponent();
+				//SIPREFIXMAP.get(SiPrefix.valueOf(exponent));
 		} catch (IllegalArgumentException e1) {
 		}
 		if(unitExponent == null) {

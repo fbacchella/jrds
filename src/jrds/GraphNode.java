@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
+import org.apache.log4j.Logger;
 import org.rrd4j.graph.RrdGraphDef;
 
 /**
@@ -18,6 +19,8 @@ import org.rrd4j.graph.RrdGraphDef;
  * TODO
  */
 public class GraphNode implements Comparable<GraphNode> {
+
+	static final private Logger logger = Logger.getLogger(GraphNode.class);
 
 	protected Probe probe;
 	private String viewPath = null;
@@ -65,17 +68,6 @@ public class GraphNode implements Comparable<GraphNode> {
 		if( probe instanceof UrlProbe) {
 			url =((UrlProbe) probe).getUrlAsString();
 		}
-		/*Map<String, Object> env = new LinkedHashMap<String, Object>();
-		env.put("graphdesc.name", gd.getGraphName());
-		env.put("host", probe.getHost().getName());
-		env.put("index", index);
-		env.put("url", url);
-		env.put("probename", probe.getName());
-		env.put("index.signature", jrds.Util.stringSignature(index));
-		env.put("url.signature", jrds.Util.stringSignature(url));
-		env.put("graphdesc.title", gd.getGraphTitle());
-
-		Object[] arguments = env.values().toArray();*/
 
 		Object[] arguments = {
 				gd.getGraphName(),
@@ -87,7 +79,14 @@ public class GraphNode implements Comparable<GraphNode> {
 				Util.stringSignature(url)
 		};
 		String evaluted = jrds.Util.parseTemplate(template, probe, gd);
-		return MessageFormat.format(evaluted, arguments) ;
+		String formated;
+		try {
+			formated = MessageFormat.format(evaluted, arguments);
+			return formated;
+		} catch (IllegalArgumentException e) {
+			logger.error("Template invalid:" + template);
+		}
+		return evaluted;
 
 	}
 

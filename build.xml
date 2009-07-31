@@ -120,6 +120,7 @@
 			</fileset>
 			<fileset dir="${build.home}/classes">
 				<include name="**/*.class" />
+				<include name="**/*.xsl" />
 			</fileset>		
 		</jar>
 	</target>

@@ -63,6 +63,7 @@ implements Comparable<Probe>, StarterNode {
 	private final StartersSet starters = new StartersSet(this);
 	private long uptime = Long.MAX_VALUE;
 	private boolean finished = false;
+	private String label = null;
 
 	private Map<String, Set<Threshold>> thresholds = new HashMap<String, Set<Threshold>>();
 
@@ -150,16 +151,7 @@ implements Comparable<Probe>, StarterNode {
 		String hn = "<empty>";
 		if(getHost() != null)
 			hn = getHost().getName();
-		/*Map<String, Object> env = new LinkedHashMap<String, Object>();
-		env.put("host", hn);
-		env.put("index", index);
-		env.put("url", url);
-		env.put("port", port);
-		env.put("index.signature", jrds.Util.stringSignature(index));
-		env.put("url.signature", jrds.Util.stringSignature(url));
-				Object[] arguments = env.values().toArray();
 
-		 */
 		Object[] arguments = {
 				hn,
 				index,
@@ -169,8 +161,14 @@ implements Comparable<Probe>, StarterNode {
 				jrds.Util.stringSignature(url)
 		};
 		String evaluted = jrds.Util.parseTemplate(template, this);
-		return MessageFormat.format(evaluted, arguments) ;
-
+		String formated;
+		try {
+			formated = MessageFormat.format(evaluted, arguments);
+			return formated;
+		} catch (IllegalArgumentException e) {
+			logger.error("Template invalid:" + template);
+		}
+		return evaluted;
 	}
 
 	public void setName(String name) {
@@ -200,6 +198,9 @@ implements Comparable<Probe>, StarterNode {
 		if(step > 0) {
 			def.setStep(step);
 		}
+		/*else {
+			step = def.getStep();
+		}*/
 		return def;
 	}
 
@@ -662,8 +663,8 @@ implements Comparable<Probe>, StarterNode {
 
 	/**
 	 * This function should return the uptime of the probe
-	 * If it's not overriden, it will return Long.MAX_VALUE
-	 * and it will because usell, as it used to make the probe pause 
+	 * If it's not overriden or fixed with setUptime, it will return Long.MAX_VALUE
+	 * that's make it useless, as it used to make the probe pause 
 	 * after a restart of the probe.
 	 * It's called after filterValues
 	 * @return the uptime in second
@@ -789,5 +790,12 @@ implements Comparable<Probe>, StarterNode {
 		this.step = step;
 	}
 
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
+	}
 
 }

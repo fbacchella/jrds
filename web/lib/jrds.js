@@ -35,7 +35,7 @@ function doGraphList(result) {
 		var graphImg = dojo.create("img");
 		dojo.attr(graphImg, "class","graph");
 		dojo.attr(graphImg, "name", graph.name);
-		dojo.attr(graphImg, "alt", graph.name);
+		dojo.attr(graphImg, "title", graph.name);
 		dojo.attr(graphImg, "id", graph.id);
 		dojo.attr(graphImg, "src", graph.imghref);
 
@@ -47,24 +47,28 @@ function doGraphList(result) {
 		dojo.attr(application_double, "src","img/application_double.png");
 		dojo.attr(application_double, "heigth","16");
 		dojo.attr(application_double, "width","16");
+		dojo.attr(application_double, "title","Popup the graph");
 		dojo.attr(application_double, "onclick","popup('" + graph.popuparg + "'," + graph.id + ");");
 	 	var application_view_list = dojo.create("img");
 		dojo.attr(application_view_list, "class","icon");
 		dojo.attr(application_view_list, "src","img/application_view_list.png");
 		dojo.attr(application_view_list, "heigth","16");
 		dojo.attr(application_view_list, "width","16");
+		dojo.attr(application_view_list, "title","Graph details");
 		dojo.attr(application_view_list, "onclick","details('" + graph.detailsarg + "', '" + graph.probename + "');");
 		var time = dojo.create("img");
 		dojo.attr(time, "class","icon");
 		dojo.attr(time, "src","img/time.png");
 		dojo.attr(time, "heigth","16");
 		dojo.attr(time, "width","16");
+		dojo.attr(time, "title","Graph history");
 		dojo.attr(time, "onclick","history('" + graph.historyarg + "', '" + graph.probename + "');");
 		var disk = dojo.create("img");
 		dojo.attr(disk, "class","icon");
 		dojo.attr(disk, "src","img/disk.png");
 		dojo.attr(disk, "heigth","16");
 		dojo.attr(disk, "width","16");
+		dojo.attr(disk, "title","Save data");
 		dojo.attr(disk, "onclick","save('" + graph.savearg + "', '" + graph.probename + "');");
 
 		dojo.place(application_double, iconsList);

@@ -46,8 +46,12 @@ public class Renderer {
 		}
 
 		public void run() {
-			if(! finished) {			//isReady is sometimes call before run
-				writeImg();
+			try {
+				if(! finished) {			//isReady is sometimes call before run
+					writeImg();
+				}
+			} catch (Exception e) {
+				logger.error("Uncatched error while rendering " + graph + ": "  +e, e);
 			}
 		}
 		public boolean isReady() {

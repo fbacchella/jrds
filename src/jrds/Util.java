@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +39,44 @@ public class Util {
 
 	private static final Pattern varregexp = Pattern.compile("(.*?)\\$\\{([\\w\\.-]+)\\}(.*)");
 
-	private Util() {
-	}
+	public enum SiPrefix {
+		Y(24),
+		Z(21),
+		E(18),
+		P(15),
+		T(12),
+		G(9),
+		M(6),
+		k(3),
+		h(2),
+		da(1),
+		FIXED(0) {
+			public double evaluate(double value, int base) {
+				return value;
+			}
+		},
+		d(-1),
+		c(-2),
+		m(-3),
+		µ(-6),
+		n(-9),
+		p(-12),
+		f(-15),
+		a(-18),
+		z(-21),
+		y(-24);
+		
+		private int exponent;
+		private SiPrefix(int exponent) {
+			this.exponent = exponent;
+		}
+		public double evaluate(double value, boolean isBinary) {
+			return Math.pow(isBinary ? 1024 : 10, isBinary ? exponent/3.0 : exponent) * value;
+		}
+		public int getExponent() {
+			return exponent;
+		}
+	};
 
 	public static String stringSignature(String s)
 	{
@@ -199,7 +236,12 @@ public class Util {
 				//So no problem if it's null
 				if(probename != null)
 					env.put("probename", probename);
-			}
+				String label = p.getLabel();
+				if(label != null) {
+					env.put("label", label);
+
+				}
+			} 
 			if( o instanceof RdsHost) {
 				env.put("host", ((RdsHost) o).getName());
 			}

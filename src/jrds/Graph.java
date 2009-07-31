@@ -138,7 +138,7 @@ public class Graph {
 
 		try {
 			tempGraphDef.setStartTime(start.getTime()/1000);
-			tempGraphDef.setEndTime(end.getTime()/1000);
+			tempGraphDef.setEndTime(Util.endDate(node.getProbe(), end).getTime()/1000);
 		} catch (IllegalArgumentException e) {
 			logger.error("Impossible to create graph definition, invalid date definition from " + start + " to " + end + " : " + e);
 		}

@@ -64,7 +64,7 @@ public abstract class JSonData extends HttpServlet {
 		out.print("{ name:'" + name + "', type:'" + type + "', id:'" + id + "'");
 		if(attributes != null && attributes.size() > 0) {
 			for(Map.Entry<String, String> e: attributes.entrySet()) {
-				out.print(", " + e.getKey() + ":'" + e.getValue() +"'");
+				out.print(", " + e.getKey() + ":'" + e.getValue().replace("'", " ") +"'");
 			}
 		}
 		if(childsref != null && childsref.size() >0 ) {

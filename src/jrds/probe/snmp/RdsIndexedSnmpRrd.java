@@ -31,15 +31,8 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 
 	static public final String INDEXOIDNAME="index";
 
-	/*private enum IndexType {
-		INTEGER,
-		STRING
-	};
-	String indexKey;
-	int indexKeyNum;*/
 	Object key;
 	String indexKey;
-	private String label;
 	private OID indexOid;
 
 	static final SnmpRequester indexFinder = SnmpRequester.TABULAR;
@@ -95,7 +88,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 		Set<OID> oidToGet = new HashSet<OID>(oids.size() * indexes.size());
 		for(OID oidCurs: oids) {
 			for(int[] j: indexes) {
-				OID oidBuf = new OID(oidCurs); //(OID) oidCurs.clone();
+				OID oidBuf = new OID(oidCurs);
 				for(int i = 0; i <j.length; i++) {
 					oidBuf.append(j[i]);
 				}
@@ -186,7 +179,6 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	 * @return
 	 */
 	public boolean matchIndex(Object readKey) {
-		boolean match = false;
 		return key.equals(readKey);
 	}
 
@@ -206,13 +198,5 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	 */
 	public boolean isUniq() {
 		return this.getPd().isUniqIndex();
-	}
-
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
 	}
 }
