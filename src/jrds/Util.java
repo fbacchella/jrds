@@ -113,16 +113,13 @@ public class Util {
 		long step = p.getStep();
 		Date lastUpdate = p.getLastUpdate();
 		
-		
-		//If the end date is before the last update daten othing to do
-		if(endDate.before(lastUpdate))
-			return endDate;
-		
 		//We dont want to graph past the last normalized update time
 		//but only if we are within a step interval
 		if( (endDate.getTime() - lastUpdate.getTime()) <= (step * 1000L))
 			return normalize(lastUpdate, step);
-		return normalize(endDate, step);
+
+		//Else rrd4j will manage the normalization itself
+		return endDate;
 	}
 	
 	/**
@@ -134,7 +131,7 @@ public class Util {
 	 */
 	public static Date normalize(Date date, long step) {
 		long timestamp = org.rrd4j.core.Util.getTimestamp(date);
-		return org.rrd4j.core.Util.getDate((1000L * org.rrd4j.core.Util.normalize(timestamp, step)));
+		return org.rrd4j.core.Util.getDate(org.rrd4j.core.Util.normalize(timestamp, step));
 	}
 
 	public static String evaluateVariables(String in, Map<String, Object> variables, StarterNode node) {
@@ -198,7 +195,7 @@ public class Util {
 				if(host != null)
 					env.put("host", host.getName());
 				String probename=p.getName();
-				//It might be called juste for evaluate probename
+				//It might be called just for evaluate probename
 				//So no problem if it's null
 				if(probename != null)
 					env.put("probename", probename);
