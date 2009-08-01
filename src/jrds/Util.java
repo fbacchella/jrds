@@ -70,8 +70,8 @@ public class Util {
 		private SiPrefix(int exponent) {
 			this.exponent = exponent;
 		}
-		public double evaluate(double value, boolean isBinary) {
-			return Math.pow(isBinary ? 1024 : 10, isBinary ? exponent/3.0 : exponent) * value;
+		public double evaluate(double value, boolean isSi) {
+			return Math.pow(isSi ? 10 : 1024, isSi ? exponent: exponent/3.0 ) * value;
 		}
 		public int getExponent() {
 			return exponent;

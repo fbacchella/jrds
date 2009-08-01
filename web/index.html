@@ -69,18 +69,20 @@ dojo.addOnLoad(function(){
           <label for="min">Min</label>
           <input id="min" type="text" name="min" class="field"
     			 dojoType="dijit.form.ValidationTextBox"
-    			 regExpGen="dojo.number._realNumberRegexp"
+    			 regExp="(-?\d+(.\d+)?)([a-zA-Z]{0,2})"
     			 trim="true"
     			 onFocus="setAutoscale(false);"
     			 onchange="updateScale"
+    			 onkeypress="rangeKeyEvent"
     			 size="14" />
           <label for="max">Max</label>
           <input id="max" type="text" name="max" class="field"
     			 dojoType="dijit.form.ValidationTextBox"
-    			 regExpGen="dojo.number._realNumberRegexp"
+    			 regExp="(-?\d+(.\d+)?)([a-zA-Z]{0,2})"
     			 trim="true"
     			 onFocus="setAutoscale(false);"
     			 onchange="updateScale"
+    			 onkeypress="rangeKeyEvent"
     			 size="14" />
         </div>
         <button onClick="reloadTree(); return false" type="submit" dojoType="dijit.form.Button" >Render</button>

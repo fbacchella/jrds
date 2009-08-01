@@ -173,7 +173,8 @@ function resetScale() {
 	dateForm.max.value =  queryParams.max;
 	dateForm.min.value = queryParams.min;
 	
-	reloadTree();
+	if(dijit.byId("autoscale").attr('checked'))
+		reloadTree();
 }
 
 function setAutoscale(value) {
@@ -286,9 +287,9 @@ function popup(url,id)
 {
 	var img = document.getElementById(id);
 	if(img != null) {
-	   	var width = "width=" + img.width * 1.1;
-		var height = "height=" + img.height * 1.1;
-		var title = img.name;
+        var width = "width=" + img.width * 1.1;
+        var height = "height=" + img.height * 1.1;
+        var title = img.name;
 	}
 	else {
 	   	var width = "width=750";
@@ -305,4 +306,15 @@ function save(url, name)
 function history(url, name)
 {
 	var historyWin = window.open(url, "_blank", "width=750,menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
+}
+
+function rangeKeyEvent(evt)
+{
+	if(evt.keyCode == dojo.keys.ENTER){
+		queryParams[this.id] = this.getValue();
+		if(queryParams.max && queryParams.min) {
+			reloadTree();
+		}
+	    dojo.stopEvent(evt);
+	}
 }

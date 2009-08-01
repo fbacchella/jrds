@@ -15,12 +15,16 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
 import jrds.Filter;
+import jrds.Graph;
 import jrds.HostsList;
 import jrds.Period;
+import jrds.Util.SiPrefix;
 
 import org.apache.log4j.Logger;
 
@@ -32,7 +36,9 @@ import org.apache.log4j.Logger;
  */
 public class ParamsBean implements Serializable {
 	static final private Logger logger = Logger.getLogger(ParamsBean.class);
+
 	static private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+	static private final Pattern rangePattern = Pattern.compile("(-?\\d+(.\\d+)?)([a-zA-Z]{0,2})");
 
 	String contextPath = "";
 	Period period = new Period();
@@ -40,8 +46,8 @@ public class ParamsBean implements Serializable {
 	int gid = 0;
 	boolean sorted = false;
 	boolean history = false;
-	double max = Double.NaN;
-	double min = Double.NaN;
+	String maxArg = null;
+	String minArg = null;
 	Filter f = null;
 	final HostsList root = HostsList.getRootGroup();
 
@@ -66,8 +72,8 @@ public class ParamsBean implements Serializable {
 		String historyArg = req.getParameter("history");
 		if("1".equals(historyArg))
 			history = true;
-		max = jrds.Util.parseStringNumber(req.getParameter("max"), Double.class, max).doubleValue();
-		min = jrds.Util.parseStringNumber(req.getParameter("min"), Double.class, min).doubleValue();
+		maxArg = req.getParameter("max");
+		minArg = req.getParameter("min");
 		String paramFilterName = req.getParameter("filter");
 		String paramHostFilter = req.getParameter("host");
 		if(paramFilterName != null && ! "".equals(paramFilterName)) {
@@ -78,12 +84,37 @@ public class ParamsBean implements Serializable {
 		}
 	}
 
+	private double parseRangeArg(String rangeArg, Graph g){
+		if(rangeArg == null)
+			return Double.NaN;
+		Matcher  m = rangePattern.matcher(rangeArg);
+		jrds.GraphNode node = g.getNode();
+		if(m.matches() && node != null) {
+			String valueString = m.group(1);
+			Number value = jrds.Util.parseStringNumber(valueString, Double.class, Double.NaN);
+			String suffixString = m.group(3);
+			if(! "".equals(suffixString)) {
+				try {
+					SiPrefix suffix = SiPrefix.valueOf(suffixString);
+					return suffix.evaluate(value.doubleValue(), node.getGraphDesc().isSiUnit());
+				} catch (java.lang.IllegalArgumentException e) {
+					logger.info("Illegal SI suffix " + suffixString);
+				}
+			}
+			else
+				return value.doubleValue();
+		}
+		return Double.NaN;
+	}
+
 	public Filter getFilter() {
 		return f;
 	}
 
 	public void configureGraph(jrds.Graph g) {
 		g.setPeriod(period);
+		double max = parseRangeArg(maxArg, g);
+		double min = parseRangeArg(minArg, g);
 		if(! Double.isNaN(max))
 			g.setMax(max);
 		if(! Double.isNaN(min))
@@ -123,10 +154,10 @@ public class ParamsBean implements Serializable {
 	}
 
 	private void addMinMaxArgs(Map<String, Object> args) {
-		if(! Double.isNaN(max))
-			args.put("max", max);
-		if(! Double.isNaN(min))
-			args.put("min", min);
+		if( maxArg != null)
+			args.put("max", maxArg);
+		if(minArg !=null)
+			args.put("min", minArg);
 	}
 
 	private void addFilterArgs(Map<String, Object> args) {
@@ -258,13 +289,6 @@ public class ParamsBean implements Serializable {
 	}
 
 	/**
-	 * @return the contextPath
-	 */
-	public String getContextPath() {
-		return contextPath;
-	}
-
-	/**
 	 * @return the p
 	 */
 	public Period getPeriod() {
@@ -334,46 +358,12 @@ public class ParamsBean implements Serializable {
 		return parambuff.toString();
 	}
 
-	/**
-	 * @return the max
-	 */
-	public double getMax() {
-		return max;
-	}
-
 	public String getMaxStr() {
-		String maxStr = "";
-		if(! Double.isNaN(max))
-			maxStr = Double.toString(max);
-		return maxStr;
-	}
-
-	/**
-	 * @param max the max to set
-	 */
-	public void setMax(double max) {
-		this.max = max;
-	}
-
-	/**
-	 * @return the min
-	 */
-	public double getMin() {
-		return min;
+		return maxArg;
 	}
 
 	public String getMinStr() {
-		String minStr = "";
-		if(! Double.isNaN(min))
-			minStr = Double.toString(min);
-		return minStr;
-	}
-
-	/**
-	 * @param min the min to set
-	 */
-	public void setMin(double min) {
-		this.min = min;
+		return minArg;
 	}
 
 	/**
