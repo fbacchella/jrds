@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+	"urn:jrds:graphdesc">
+<graphdesc>
+	<name>SunJVM5MemoryPool</name>
+	<graphName>jvmsun5pool-${label}</graphName>
+	<graphTitle>JVM Memory Usage for ${label}</graphTitle>
+	<verticalLabel>Bytes</verticalLabel>
+	<unit>
+		<binary />
+	</unit>
+	<add>
+		<legend>Heap Memory</legend>
+	</add>
+	<add>
+		<name>Eden Space</name>
+		<graphType>area</graphType>
+		<legend>Eden Space</legend>
+	</add>
+	<add>
+		<name>Survivor Space</name>
+		<graphType>stack</graphType>
+		<legend>Survivor Space</legend>
+	</add>
+	<add>
+		<name>Old Gen</name>
+		<graphType>stack</graphType>
+		<legend>Old Gen</legend>
+	</add>
+	<add>
+		<legend>Non Heap Memory</legend>
+	</add>
+	<add>
+		<name>Code Cache</name>
+		<graphType>stack</graphType>
+		<legend>Code Cache</legend>
+	</add>
+	<add>
+		<name>Perm Gen</name>
+		<graphType>stack</graphType>
+		<legend>Perm Gen</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SYSTEM</pathelement>
+		<pathstring>JVM</pathstring>
+		<pathstring>${label}</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>SYSTEM</pathelement>
+		<pathstring>JVM</pathstring>
+		<pathelement>HOST</pathelement>
+		<pathstring>${label}</pathstring>
+	</viewtree>
+</graphdesc>
