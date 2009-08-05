@@ -20,12 +20,3 @@
 
 #If your application serve is jetty
 #appserv.servlet-api = ${appserv.home}/lib
-
-#JAI home on Gentoo
-#jai.home=/usr/share/sun-jai-bin/lib
-
-#JAI home on solaris 10
-#jai.home=/usr/jdk/packages/jai/lib/ext
-
-#JAI home on Mac OS
-#jai.home=/System/Library/Java/Extensions

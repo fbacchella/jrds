@@ -1,17 +1,9 @@
 package jrds;
 
-import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import javax.media.jai.JAI;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.data.DataProcessor;
@@ -30,17 +22,10 @@ public class Graph {
 	Date end;
 	double max = Double.NaN;
 	double min = Double.NaN;
-	
+
 	public Graph(GraphNode node) {
 		super();
 		this.node = node;
-
-		//We normalize the last update time, it can't be used directly
-		//end = Util.endDate(node.getProbe(), endDate);
-		//start = startDate;
-		//int step = HostsList.getRootGroup().getResolution();
-		//this.start = new Date(org.rrd4j.core.Util.normalize(startDate.getTime() / 1000L, step) * 1000L);
-		//this.end = Util.endDate(node.getProbe(), endDate);
 	}
 
 	public Graph(GraphNode node, Date begin, Date start) {
@@ -122,9 +107,11 @@ public class Graph {
 		graphDef.comment("Period from " + lastUpdateFormat.format(start) +
 				" to " + lastUpdateFormat.format(end) + "\\L");
 		graphDef.comment("Source type: " + node.getProbe().getSourceType() + "\\r");
+		graphDef.setImageFormat("PNG");
+		graphDef.setFilename("-");
 		return graphDef;		
 	}
-	
+
 	public RrdGraphDef getRrdGraphDef() throws IOException {
 		return node.getGraphDesc().getGraphDef(node.getProbe());
 	}
@@ -132,7 +119,6 @@ public class Graph {
 	private RrdGraph getRrdGraph() throws
 	IOException {
 		GraphDesc gd = node.getGraphDesc();
-		//RrdGraphDef tempGraphDef = gd.getGraphDef(node.getProbe());
 		RrdGraphDef tempGraphDef = getRrdGraphDef();
 		tempGraphDef = graphFormat(tempGraphDef);
 
@@ -150,7 +136,7 @@ public class Graph {
 		tempGraphDef.setWidth(gd.getWidth());
 		tempGraphDef.setHeight(gd.getHeight());
 		RrdGraph graph;
-		graph = new RrdGraph(tempGraphDef/*, true*/);
+		graph = new RrdGraph(tempGraphDef);
 		GraphDesc.Dimension dimension = gd.getDimension();
 		if(dimension == null) {
 			RrdGraphInfo gi = graph.getRrdGraphInfo();
@@ -162,62 +148,11 @@ public class Graph {
 		return graph;
 	}
 
-	private BufferedImage makeImg(RrdGraph rrdGraph) {
-		BufferedImage img = null;
-		GraphDesc.Dimension dimension = node.getGraphDesc().getDimension();
-		img = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_RGB);
-		rrdGraph.render(img.getGraphics());
-		return img;
+	public void writePng(OutputStream out) throws IOException {
+		byte[] buffer = getRrdGraph().getRrdGraphInfo().getBytes();
+		out.write(buffer);
 	}
 
-	public BufferedImage makeImg() {
-		BufferedImage img = null;
-		try {
-			img = makeImg(getRrdGraph());
-		}
-		catch (IOException e) {
-			logger.warn("Unable to creage image for " + node.getName() +
-					" on host " + node.getProbe() + ": " +
-					e);
-		}
-		return img;
-	}
-
-	public void graph() {
-		try {
-			writePng(new BufferedOutputStream(new FileOutputStream(new File(
-					getPngName()))));
-		}
-		catch (FileNotFoundException e) {
-			logger.warn("Unable to creage png for " + node.getName() +
-					" on host " + node.getProbe() + ": " +
-					e, e);
-		}
-	}
-
-	public void writePng(OutputStream out) {
-		BufferedImage img = makeImg();
-		if (img != null)
-			try {
-				javax.imageio.ImageIO.write(img, "png", out);
-			} catch (IOException e) {
-				logger.error("Can't write png:"  + e);
-			}
-
-	}
-
-	public byte[] getPngBytes() {
-		byte[] retValue = null;
-		BufferedImage img = makeImg();
-		if (img != null) {
-			ByteArrayOutputStream imgBytesOs = new ByteArrayOutputStream(img.
-					getHeight() * img.getWidth());
-			JAI.create("encode", img, imgBytesOs, "PNG", null);
-			retValue = imgBytesOs.toByteArray();
-		}
-		return retValue;
-	}
-	
 	public void writeCsv(OutputStream out){
 		try {
 			DataProcessor dp = node.getGraphDesc().getPlottedDatas(node.getProbe(), null, start.getTime() / 1000, end.getTime() / 1000);
@@ -250,7 +185,7 @@ public class Graph {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public String getPngName() {
 		return node.getName().replaceAll("/","_").replaceAll(" ","_") + ".png";
 	}

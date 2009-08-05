@@ -1,7 +1,6 @@
 package jrds;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -110,22 +109,6 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 		long end = System.currentTimeMillis();
 		float elapsed = ((float)(end - start))/1000;
 		logger.trace("Collect time for " + name + ": " + elapsed + "s");
-	}
-
-	public void graphAll(Date startDate, Date endDate)
-	{
-		for(Probe currrd: allProbes) {
-			Collection<GraphNode> gl = currrd.getGraphList();
-			if(gl != null) {
-				for(GraphNode currGraph:  currrd.getGraphList()) {
-					Graph g = new Graph(currGraph);
-					g.setStart(startDate);
-					g.setEnd(endDate);
-					g.graph();
-					logger.debug("Graphing " + currGraph.getName());
-				}
-			}
-		}
 	}
 
 	public String toString()

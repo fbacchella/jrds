@@ -1,6 +1,5 @@
 package jrds;
 
-import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -91,12 +90,9 @@ public class Renderer {
 			if( ! finished) {
 				long starttime = System.currentTimeMillis();
 				try {
-					BufferedImage bImg = graph.makeImg();
+					OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile));
 					long middletime = System.currentTimeMillis();
-					if(bImg != null) {
-						OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile));
-						javax.imageio.ImageIO.write(bImg, "png", out);
-					}
+					graph.writePng(out);
 					if(logger.isTraceEnabled()) {
 						long endtime = System.currentTimeMillis();
 						long duration1 = (middletime - starttime );
@@ -111,7 +107,7 @@ public class Renderer {
 					if(cause != null)
 						logger.error("    Cause was: " + cause);
 				} catch (Exception e) {
-					logger.error("Run time rendering" + this, e);
+					logger.error("Run time rendering " + this, e);
 				}
 				//Allways set to true, we do not try again in case of failure
 				finished = true;

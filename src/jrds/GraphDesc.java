@@ -4,7 +4,6 @@
 package jrds;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -21,16 +20,17 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.Util.SiPrefix;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.probe.jdbc.JdbcProbe;
-import jrds.Util.SiPrefix;
 
 import org.apache.log4j.Logger;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.XMLSerializer;
 import org.rrd4j.ConsolFun;
-import org.rrd4j.data.*;
+import org.rrd4j.data.DataProcessor;
+import org.rrd4j.data.Plottable;
 import org.rrd4j.graph.RrdGraphDef;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -297,9 +297,6 @@ implements Cloneable {
 		COLORMAP.values().toArray(colors);
 	}
 
-	private static final Font TITLEFONT = new Font("Lucida Sans Typewriter", Font.BOLD ,12 );
-	private static final Font TEXTFONT = new Font("Lucida Sans Typewriter", Font.PLAIN ,10 );
-
 	static private final class DsDesc {
 		public String name;
 		public String dsName;
@@ -552,8 +549,6 @@ implements Cloneable {
 	 */
 	public RrdGraphDef getGraphDef(Probe defProbe, Map<String, Plottable> ownData) throws IOException {
 		RrdGraphDef retValue = new RrdGraphDef();
-		retValue.setLargeFont(TITLEFONT);
-		retValue.setSmallFont(TEXTFONT);
 		String defRrdName = defProbe.getRrdName();
 
 		/*The title line*/
@@ -1043,7 +1038,6 @@ implements Cloneable {
 			exponent = SiPrefix.FIXED.name();
 		try {
 			unitExponent = SiPrefix.valueOf(exponent).getExponent();
-				//SIPREFIXMAP.get(SiPrefix.valueOf(exponent));
 		} catch (IllegalArgumentException e1) {
 		}
 		if(unitExponent == null) {

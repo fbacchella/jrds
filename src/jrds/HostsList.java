@@ -314,13 +314,6 @@ public class HostsList implements StarterNode {
 		}
 	}
 
-	public void graphAll(Date startDate, Date endDate) {
-		for(RdsHost oneHost: hostList) {
-			logger.debug("Do all graph for host " + oneHost.getName());
-			oneHost.graphAll(startDate, endDate);
-		}
-	}
-
 	public Collection<GraphTree> getGraphsRoot() {
 		return treeMap.values();
 	}
