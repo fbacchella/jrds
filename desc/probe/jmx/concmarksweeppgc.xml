@@ -12,7 +12,7 @@ More informations can be found at http://java.sun.com/javase/6/docs/technotes/gu
 As there is no index to discriminate between jvm, label is used and is mandatory
  -->
 <probedesc>
-	<name>JMXSunJVM6MemoryPool</name>
+	<name>JMXConcMarkSweepGC</name>
 	<probeName>jvmpool-${label}</probeName>
 	<probeClass>jrds.probe.JMX</probeClass>
 	<uptimefactor>1</uptimefactor>
