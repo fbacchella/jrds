@@ -25,6 +25,9 @@
 		<fileset dir="lib">
 			<include name="*.jar"/>
 		</fileset>
+		<fileset dir="libjetty">
+			<include name="*.jar"/>
+		</fileset>
 	</path>
 
 	<!-- ==================== Run Classpath =========================== -->
@@ -118,10 +121,23 @@
 			<fileset dir="${build.home}/classes">
 				<include name="**/*.class" />
 				<include name="**/*.xsl" />
+				<exclude name="**/bootstrap/**" />
 			</fileset>		
 		</jar>
 	</target>
 	
+	<target name="bootjar" depends="compile">
+		<jar destfile="${build.home}/boot.jar" >
+			<fileset dir="${build.home}/classes">
+				<include name="**/bootstrap/**" />
+			</fileset>	
+			<manifest>
+			    <attribute name="Built-By" value="${user.name}"/>
+	      		<attribute name="Main-Class" value="jrds.bootstrap.BootStrap"/>
+			</manifest>
+		</jar>
+	</target>
+
 	<target name="javadoc">
 		<javadoc destdir="${docs.build}" access="protected" use="true"
 			notree="false" nonavbar="false" noindex="false" splitindex="true"
@@ -173,6 +189,20 @@
 		</tar>
 	</target>
 	
+	<target name="jetty" depends="appjar, bootjar" description="Build JRDS war">
+		<tar destfile="${build.home}/${app.name}.tar" >  
+			<tarfileset dir="lib" prefix="WEB-INF/lib" >
+				<include name="*.jar"/>
+			</tarfileset>
+			<tarfileset dir="${build.home}" prefix="WEB-INF/lib">
+				<include name="*.jar"/>
+			</tarfileset>
+			<tarfileset dir="${web.src}"/>
+			<tarfileset dir="lib/dojo"/>
+			<tarfileset dir="libjetty" prefix="WEB-INF/lib"/>
+		</tar>
+	</target>
+	
 	<target name="war" depends="appjar" description="Build JRDS war">
 		<war destfile="${build.home}/${app.name}.war" webxml="${basedir}/web/WEB-INF/web.xml"
 			duplicate="preserve">
@@ -218,7 +248,7 @@
 		</java>
 	</target>
     <target name="resolve" description="--> retrieve dependencies with ivy">
-        <ivy:retrieve type="jar,zip" pattern="lib/[artifact].[ext]" />
+        <ivy:retrieve type="jar,zip" pattern="[conf]/[artifact].[ext]" />
     		<unzip src="lib/dojo.zip" dest="lib" >
     			<regexpmapper from="dojo-[^/]*/(.*)" to="dojo/\1"/>
     		</unzip>

@@ -4,9 +4,9 @@
 	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
 	<info organisation="jrds" module="main" />
 	<configurations>
-       	<conf name="build" />
     	<conf name="lib" />
     	<conf name="libtest" />
+     	<conf name="libjetty" />
     </configurations>
 	<dependencies>
 		<dependency org="log4j" name="log4j" rev="1.2.14" conf="lib->default" />
@@ -14,7 +14,7 @@
 		<dependency org="org.snmp4j" name="snmp4j" rev="1.9.1f"  conf="lib->default" />
 		<dependency org="xerces" name="xercesImpl" rev="2.9.1"  conf="lib->default" />
 		<dependency org="javax.mail" name="mail" rev="1.4.1"  conf="lib->default" />
-  		<dependency org="org.dojotoolkit" name="dojo" rev="1.3.0b2" conf="build->default" >
+  		<dependency org="org.dojotoolkit" name="dojo" rev="1.3.0b2" conf="lib->default" >
 	    	<artifact name="dojo" type="zip" />
 		</dependency>
 		<dependency org="junit" name="junit" rev="4.6" conf="libtest->default" />
@@ -22,5 +22,8 @@
 			<exclude
 				conf="rhino,js,junit,jtidy,aspectjrt,servlet-api,nekohtml,xmlParserAPIs,xercesImpl,javax.servlet" />
 		</dependency>
+		<dependency org="org.mortbay.jetty" name="jetty" rev="6.1.19"  conf="libjetty->default" />
+		<dependency org="org.slf4j" name="slf4j-api"  rev="1.5.8" conf="libjetty->default" />
+		<dependency org="org.slf4j" name="slf4j-log4j12"  rev="1.5.8" conf="libjetty->default" />
 	</dependencies>
 </ivy-module>

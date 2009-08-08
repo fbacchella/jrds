@@ -1,8 +1,12 @@
 package jrds;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,7 +15,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 /**
@@ -22,9 +28,6 @@ import org.apache.log4j.Logger;
  * TODO 
  */
 public class StartListener implements ServletContextListener {
-	static {
-		jrds.JrdsLoggerConfiguration.initLog4J();
-	}
 	static private final Logger logger = Logger.getLogger(StartListener.class);
 	static private boolean started = false;
 	private static final Timer collectTimer = new Timer("jrds-main-timer", true);
@@ -34,11 +37,19 @@ public class StartListener implements ServletContextListener {
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
 	 */
+	@SuppressWarnings("unchecked")
 	public void contextInitialized(ServletContextEvent arg0) {
+		//System.out.println(arg0);
 		//Logger.getLogger("jrds").setLevel(Level.TRACE);
 		//logger.setLevel(Level.TRACE);
 		//Resin launch the listener twice !
 		if( ! started ) {
+			try {
+				jrds.JrdsLoggerConfiguration.initLog4J();
+			} catch (IOException e2) {
+				throw new RuntimeException(e2);
+			}
+
 			try {
 				ServletContext ctxt = arg0.getServletContext();
 				logger.info("Starting jrds");
@@ -48,7 +59,7 @@ public class StartListener implements ServletContextListener {
 					{
 						String attr = (String) e.nextElement();
 						Object o = ctxt.getAttribute(attr);
-						logger.trace(attr + " = " + o);
+						logger.trace(attr + " = (" + o.getClass().getName() + ") " + o);
 					}
 					logger.trace("Dumping init parameters");
 					for (Enumeration<?> e = ctxt.getInitParameterNames() ; e.hasMoreElements() ;)
@@ -83,7 +94,7 @@ public class StartListener implements ServletContextListener {
 
 				pm.update();
 
-				System.getProperties().setProperty("java.awt.headless","true");
+				System.setProperty("java.awt.headless","true");
 
 				StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, pm.rrdbackend);
 
@@ -105,7 +116,24 @@ public class StartListener implements ServletContextListener {
 			catch (Exception ex) {
 				logger.fatal("Unable to start " + arg0.getServletContext().getServletContextName() + " because "+ ex +": ", ex);
 			}
+
+//			System.out.println("Default level: " + Logger.getRootLogger().getLevel());
+//			Map<String, Appender> allapps= new HashMap<String, Appender>();
+//			Enumeration<Logger> e = (Enumeration<Logger>)LogManager.getCurrentLoggers();
+//			for(Logger l: Collections.list(e)) {
+//				Enumeration<Appender> e1 = (Enumeration<Appender>)l.getAllAppenders();
+//				if(e1.hasMoreElements() || l.getLevel() !=null) {
+//					System.out.println(l.getName() + " " + l.getLevel());
+//					for(Appender app: Collections.list(e1)) {
+//						allapps.put(app.getName(), app);
+//						System.out.println("    appender: " + app.getName());
+//
+//					}
+//				}
+//			}
+//			System.out.println(allapps);
 		}
+
 	}
 
 	/* (non-Javadoc)

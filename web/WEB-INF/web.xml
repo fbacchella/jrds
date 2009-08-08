@@ -15,10 +15,6 @@
     <servlet-class>jrds.webapp.Graph</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>GraphList</servlet-name>
-    <servlet-class>jrds.webapp.GraphList</servlet-class>
-  </servlet>
-  <servlet>
     <servlet-name>download</servlet-name>
     <servlet-class>jrds.webapp.Download</servlet-class>
   </servlet>
@@ -84,10 +80,6 @@
   <servlet-mapping>
     <servlet-name>Graph</servlet-name>
     <url-pattern>/graph</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>GraphList</servlet-name>
-    <url-pattern>/graphlist/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>download</servlet-name>
