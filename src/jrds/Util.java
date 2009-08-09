@@ -226,6 +226,9 @@ public class Util {
 				env.put("port", ((UrlProbe) o).getPort());
 				env.put("url.signature", jrds.Util.stringSignature(((UrlProbe) o).getUrlAsString()));
 			}
+			if(o instanceof ConnectedProbe) {
+				env.put("connection.name", ((ConnectedProbe) o).getConnection());
+			}
 			if( o instanceof Probe) {
 				Probe p = ((Probe) o);
 				RdsHost host = p.getHost();

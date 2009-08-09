@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.ChainedProperties;
+import jrds.ConnectedProbe;
 import jrds.Connection;
 import jrds.Macro;
 import jrds.Probe;
@@ -15,7 +16,6 @@ import jrds.Threshold;
 import jrds.Threshold.Comparator;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
-import jrds.probe.IndexedProbe;
 import jrds.snmp.SnmpStarter;
 
 import org.apache.log4j.Logger;
@@ -152,9 +152,17 @@ public class HostBuilder extends ObjectBuilder {
 		}
 		String label = probeNode.evaluate(CompiledXPath.get("@label"));
 		if(label != null && ! "".equals(label)) {
-			logger.trace("Adding label " + label + " to "  + p);
+			logger.trace("Adding label " + label + " to " + p);
 			p.setLabel(label);
 		}
+		if(p instanceof ConnectedProbe) {
+			String connexionName = probeNode.evaluate(CompiledXPath.get("@connection"));
+			if(connexionName != null && ! "".equals(connexionName)) {
+				logger.trace("Adding connection " + connexionName + " to " + p);
+				((ConnectedProbe)p).setConnection(connexionName);
+			}
+		}
+
 		return p;
 	}
 
@@ -165,6 +173,7 @@ public class HostBuilder extends ObjectBuilder {
 			if(type == null) {
 				logger.equals("No type declared");
 			}
+			String name = cnxNode.attrMap().get("name");
 			Connection o = null;
 			try {
 				Class<?> connectionClass = Class.forName(type);
@@ -178,6 +187,8 @@ public class HostBuilder extends ObjectBuilder {
 				}
 				Constructor<?> theConst = connectionClass.getConstructor(constArgsType);
 				o = (Connection)theConst.newInstance(constArgsVal);
+				if(name !=null && ! "".equals(name))
+					o.setName(name.trim());
 				o.register(sNode);
 				logger.debug("Connexion registred: " + o + " for " + sNode);
 			}

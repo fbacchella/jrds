@@ -104,4 +104,5 @@ public abstract class Connection extends Starter {
 	public long getUptime() {
 		return uptime;
 	}
+	
 }

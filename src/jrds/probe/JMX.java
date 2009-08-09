@@ -20,19 +20,23 @@ import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 
-import org.apache.log4j.Logger;
-
-import jrds.Connection;
+import jrds.ConnectedProbe;
 import jrds.Probe;
 
-public class JMX extends Probe {
+import org.apache.log4j.Logger;
+
+public class JMX extends Probe implements ConnectedProbe {
 
 	static final private Logger logger = Logger.getLogger(JMX.class);
 
-	Connection jmxCnx = null;
+	private String connectionName = JMXConnection.class.getName();
+
 	@Override
 	public Map<?, ?> getNewSampleValues() {
-		JMXConnection cnx = (JMXConnection) getStarters().find(JMXConnection.class.getName());
+		JMXConnection cnx = (JMXConnection) getStarters().find(connectionName);
+		if( !cnx.isStarted()) {
+			return Collections.EMPTY_MAP;
+		}
 		MBeanServerConnection mbean = (MBeanServerConnection) cnx.getConnection();
 		//Uptime is collected only once, by the connexion
 		setUptime(cnx.getUptime());
@@ -120,4 +124,18 @@ public class JMX extends Probe {
 		}
 		return Double.NaN;
 	}
+	/**
+	 * @return the connection
+	 */
+	public String getConnection() {
+		return connectionName;
+	}
+
+	/**
+	 * @param connection the connection to set
+	 */
+	public void setConnection(String connectionName) {
+		this.connectionName = connectionName;
+	}
+
 }
