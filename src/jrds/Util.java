@@ -18,8 +18,9 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @version $Revision$
- */
+ * @author Fabrice Bacchella 
+ * @version $Revision$,  $Date$
+  */
 public class Util {
 	static final private Logger logger = Logger.getLogger(Util.class);
 
@@ -227,7 +228,7 @@ public class Util {
 				env.put("url.signature", jrds.Util.stringSignature(((UrlProbe) o).getUrlAsString()));
 			}
 			if(o instanceof ConnectedProbe) {
-				env.put("connection.name", ((ConnectedProbe) o).getConnection());
+				env.put("connection.name", ((ConnectedProbe) o).getConnectionName());
 			}
 			if( o instanceof Probe) {
 				Probe p = ((Probe) o);
