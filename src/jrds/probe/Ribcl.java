@@ -12,20 +12,20 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.TransformerException;
 
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.RdsHost;
+import jrds.Util;
 import jrds.XmlProvider;
 
 import org.apache.log4j.Logger;
-import org.apache.xml.serialize.OutputFormat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -42,16 +42,6 @@ public class Ribcl extends Probe {
 	static final private Logger logger = Logger.getLogger(Ribcl.class);
 
 	XmlProvider xmlstarter = null;
-
-	static final OutputFormat iloXml = new OutputFormat("XML",encoding,true);
-	static {
-		iloXml.setIndenting(true);
-		iloXml.setOmitComments(true);
-		iloXml.setLineSeparator("#EOL#");
-		iloXml.setOmitDocumentType(true);
-		iloXml.setOmitXMLDeclaration(true);
-	}
-
 
 	public Ribcl(String iloHost, int port, String user, String passwd) {
 		this.iloHost = iloHost;
@@ -86,18 +76,12 @@ public class Ribcl extends Probe {
 			return java.util.Collections.emptyMap();
 		}
 
-		OutputStream outputSocket;
 		try {
-			outputSocket = s.getOutputStream();
+			OutputStream outputSocket = s.getOutputStream();
 			InputStream inputSocket = s.getInputStream();
 
 			outputSocket.write(xmlHeader.getBytes(encoding));
-			for(String l: buildQuery().split("#EOL#")) {
-				outputSocket.write(l.trim().getBytes(encoding));
-				outputSocket.write(eol.getBytes(encoding));
-				outputSocket.flush();
-				logger.trace(l.trim());
-			}
+			buildQuery(outputSocket);
 
 			byte[] buffer = new byte[4096];
 			int n;
@@ -126,11 +110,14 @@ public class Ribcl extends Probe {
 		return "RIBCL";
 	}
 
-	private String buildQuery() {
+	private void buildQuery(OutputStream out) {
 		Document ribclQ = xmlstarter.getDocument();
+		Element LOCFG = ribclQ.createElement("LOCFG");
+		LOCFG.setAttribute("version", "2.21");
+		ribclQ.appendChild(LOCFG);
 		Element RIBCL = ribclQ.createElement("RIBCL");
-		RIBCL.setAttribute("VERSION", "2.22");
-		ribclQ.appendChild(RIBCL);
+		LOCFG.appendChild(RIBCL);
+		RIBCL.setAttribute("VERSION", "2.0");
 		Element LOGIN = ribclQ.createElement("LOGIN");
 		LOGIN.setAttribute("USER_LOGIN", user);
 		LOGIN.setAttribute("PASSWORD", passwd);
@@ -141,7 +128,16 @@ public class Ribcl extends Probe {
 		Element subcommand = ribclQ.createElement(getPd().getSpecific("subcommand"));
 		command.appendChild(subcommand);
 
-		return xmlstarter.serialize(ribclQ, iloXml);
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put(OutputKeys.INDENT, "no");
+		properties.put(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		try {
+			Util.serialize(ribclQ, out, null, properties);
+		} catch (TransformerException e) {
+		} catch (IOException e) {
+			logger.fatal("Unable to serialize in memory");
+			throw new Error(e);
+		}
 	}
 
 	private Socket connect() throws NoSuchAlgorithmException, KeyManagementException, UnknownHostException, IOException {
@@ -151,7 +147,7 @@ public class Ribcl extends Probe {
 				super.connect(endpoint, timeout * 1000);
 			}
 		};
-		s.setSoTimeout(timeout);
+		s.setSoTimeout(timeout * 1000);
 		if(port == 23) {
 			return 	s;
 		}		
@@ -177,7 +173,6 @@ public class Ribcl extends Probe {
 		s = ssf.createSocket(s, iloHost, port, true);
 		logger.debug("done SSL handshake for " + iloHost);
 
-		SocketFactory sf = SocketFactory.getDefault();
 		return s;
 	}
 
