@@ -4,21 +4,15 @@
 package jrds;
 
 import java.awt.Color;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Util.SiPrefix;
 import jrds.probe.IndexedProbe;
@@ -26,14 +20,10 @@ import jrds.probe.UrlProbe;
 import jrds.probe.jdbc.JdbcProbe;
 
 import org.apache.log4j.Logger;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.Plottable;
 import org.rrd4j.graph.RrdGraphDef;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * A classed used to store the static description of a graph
@@ -910,119 +900,6 @@ implements Cloneable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-	public void dumpAsXml(Class c) throws ParserConfigurationException, IOException {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document document = builder.newDocument();  // Create from whole cloth
-		Element root = 
-			(Element) document.createElement("graphdesc"); 
-		document.appendChild(root);
-
-		Element nameElement = document.createElement("name");
-		nameElement.appendChild(document.createTextNode(c.getSimpleName()));
-		root.appendChild(nameElement);
-
-		Element graphNameElement = document.createElement("graphName");
-		graphNameElement.appendChild(document.createTextNode(graphName));
-		root.appendChild(graphNameElement);
-
-		Element graphTitleElement = document.createElement("graphTitle");
-		graphTitleElement.appendChild(document.createTextNode(graphTitle));
-		root.appendChild(graphTitleElement);
-
-		Element verticalLabelElement = document.createElement("verticalLabel");
-		verticalLabelElement.appendChild(document.createTextNode(verticalLabel));
-		root.appendChild(verticalLabelElement);
-
-		if(upperLimit != Double.NaN) {
-			Element upperLimitElement = document.createElement("upperLimit");
-			upperLimitElement.appendChild(document.createTextNode(Double.toString(upperLimit)));
-			root.appendChild(upperLimitElement);
-		}
-
-		if(lowerLimit != 0) {
-			Element lowerLimitElement = document.createElement("lowerLimit");
-			lowerLimitElement.appendChild(document.createTextNode(Double.toString(lowerLimit)));
-			root.appendChild(lowerLimitElement);
-		}
-
-		for(Map.Entry<Object, DsDesc> e: dsMap.entrySet()) {
-			DsDesc ds = e.getValue();
-			Element dsElement = document.createElement("add");
-			root.appendChild(dsElement);
-
-			Element dsNameElement = document.createElement("name");
-			dsElement.appendChild(dsNameElement);
-			dsNameElement.appendChild(document.createTextNode(ds.name));
-
-			if(ds.rpn != null) {
-				Element rpnElement = document.createElement("rpn");
-				rpnElement.appendChild(document.createTextNode(ds.rpn));
-				dsElement.appendChild(rpnElement);
-			}			
-
-			if(ds.graphType != null) {
-				Element dsTypeElement = document.createElement("graphType");
-				dsTypeElement.appendChild(document.createTextNode(ds.graphType.toString().toLowerCase()));
-				dsElement.appendChild(dsTypeElement);
-			}			
-
-			if(ds.color != null && ds.graphType != GraphDesc.COMMENT && ds.graphType != GraphDesc.NONE) {
-				Element colorElement = document.createElement("color");
-				colorElement.appendChild(document.createTextNode(ds.color.toString()));
-				dsElement.appendChild(colorElement);
-			}			
-
-			if(ds.legend != null) {
-				Element legendElement = document.createElement("legend");
-				legendElement.appendChild(document.createTextNode(ds.legend));
-				dsElement.appendChild(legendElement);
-			}			
-			if(ds.cf != ConsolFun.AVERAGE) {
-				Element cfElement = document.createElement("cf");
-				cfElement.appendChild(document.createTextNode(ds.cf.name()));
-				dsElement.appendChild(cfElement);
-			}			
-		}
-
-		doTree(root, "hosttree", hostTree);
-		doTree(root, "viewtree", viewTree);
-
-		FileOutputStream fos = new FileOutputStream("desc/autograph/" + c.getSimpleName().toLowerCase() + ".xml");
-//		XERCES 1 or 2 additionnal classes.
-		OutputFormat of = new OutputFormat("XML","UTF-8",true);
-		of.setIndent(1);
-		of.setIndenting(true);
-		of.setDoctype("-//jrds//DTD Graph Description//EN","urn:jrds:graphdesc");
-		XMLSerializer serializer = new XMLSerializer(fos,of);
-//		As a DOM Serializer
-		serializer.asDOMSerializer();
-		serializer.serialize( document.getDocumentElement() );
-	}
-
-	private void doTree(Element root, String name, Collection tree) {
-		Document document = root.getOwnerDocument();
-		Element hosttreeElement = document.createElement(name);
-		root.appendChild(hosttreeElement);
-		for(Object o: tree) {
-			String pathName = null;
-			String pathType = null;
-			if(o instanceof String) {
-				pathName = o.toString();
-				pathType = "pathstring";
-			}
-			else if(o instanceof PathElement) {
-				pathName = ((PathElement) o).toString();
-				pathType = "pathelement";
-			}
-			if(pathName != null) {
-				Element graphPathElement = document.createElement(pathType);
-				hosttreeElement.appendChild(graphPathElement);
-				graphPathElement.appendChild(document.createTextNode(pathName));
-			}
-		}
-
 	}
 
 	public boolean isSiUnit() {

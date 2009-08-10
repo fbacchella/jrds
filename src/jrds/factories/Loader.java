@@ -25,11 +25,11 @@ import jrds.factories.xml.JrdsNode;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 public class Loader {
-
-	private static final EntityResolver urnResolver = new EntityResolver();
 
 	public enum ConfigType {
 		FILTER {
@@ -121,7 +121,18 @@ public class Loader {
 		instance.setIgnoringComments(true);
 		instance.setValidating(false);
 		dbuilder = instance.newDocumentBuilder();
-		dbuilder.setEntityResolver(urnResolver);
+		dbuilder.setEntityResolver(new EntityResolver());
+		dbuilder.setErrorHandler(new ErrorHandler() {
+			public void error(SAXParseException exception) throws SAXException {
+				throw exception;
+			}
+			public void fatalError(SAXParseException exception) throws SAXException {
+				throw exception;
+			}
+			public void warning(SAXParseException exception) throws SAXException {
+				throw exception;
+			}
+		});
 
 		for(ConfigType t: ConfigType.values()) {
 			repositories.put(t, new  HashMap<String, JrdsNode>());
@@ -179,8 +190,10 @@ public class Loader {
 						logger.warn("Unknown type for " + f);
 				} catch (FileNotFoundException e) {
 					logger.error("File not found: " + f);
+				} catch (SAXParseException e) {
+					logger.error("Invalid xml document " + f + " (line " + e.getLineNumber() + "): " + e.getMessage());
 				} catch (SAXException e) {
-					logger.error("Invalid xml document + " + f  + ": " + e);
+					logger.error("Invalid xml document " + f  + ": " + e);
 				} catch (IOException e) {
 					logger.error("IO error with " + f + ": " + e);
 				}
@@ -199,8 +212,10 @@ public class Loader {
 						if(! importStream(probesjar.getInputStream(je))) {
 							logger.warn("Unknonw type " + je + " in jar " + jarfile);
 						}
+					} catch (SAXParseException e) {
+						logger.error("Invalid xml document " + je + " in " + jarfile + " (line " + e.getLineNumber() + "): " + e.getMessage());
 					} catch (SAXException e) {
-						logger.error("Invalid xml document + " + je + " in " + jarfile + ": " + e);
+						logger.error("Invalid xml document " + je + " in " + jarfile + ": " + e);
 					}
 				}
 			}

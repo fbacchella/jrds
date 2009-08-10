@@ -15,35 +15,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.ErrorListener;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
 
 import jrds.Probe;
+import jrds.Util;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
 public class ProbeDetails extends HttpServlet {
 	static final private Logger logger = Logger.getLogger(ProbeDetails.class);
-	static final private ErrorListener el = new ErrorListener() {
-
-		public void error(TransformerException e) throws TransformerException {
-			logger.error("Invalid xsl: " + e.getMessageAndLocation());
-		}
-		public void fatalError(TransformerException e) throws TransformerException {
-			logger.fatal("Invalid xsl: " + e.getMessageAndLocation());
-		}
-		public void warning(TransformerException e) throws TransformerException {
-			logger.warn("Invalid xsl: " + e.getMessageAndLocation());
-		}
-
-	};
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException{
@@ -68,17 +50,8 @@ public class ProbeDetails extends HttpServlet {
 	public void dump(Probe probe, OutputStream os) {
 		try {
 			Document xmlDesc = probe.dumpAsXml(true);
-			Source source = new DOMSource(xmlDesc);
+			Util.serialize(xmlDesc, os, jrds.xmlResources.ResourcesLocator.getResourceUrl("probe.xsl"), null);
 
-			TransformerFactory tFactory = TransformerFactory.newInstance();
-			tFactory.setErrorListener(el);
-			Source stylesource = new StreamSource(jrds.xmlResources.ResourcesLocator.getResource("probe.xsl"));
-			Transformer transformer = tFactory.newTransformer(stylesource);
-
-
-			StreamResult result = new StreamResult(os);
-			transformer.transform(source, result);
-			os.flush();
 		} catch (ParserConfigurationException e) {
 			logger.fatal("Fatal parser error: " + e);
 		} catch (TransformerConfigurationException e) {

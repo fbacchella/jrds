@@ -45,24 +45,6 @@ public class Collector {
 
 		HostsList.getRootGroup().configure(pm);
 
-		if(false) {
-			for(RdsHost h: hl.getHosts()) {
-				for(Probe p: h.getProbes()) {
-					try {
-						p.getPd().dumpAsXml(p.getClass());
-						for(jrds.GraphNode g: p.getGraphList()) {
-							try {
-								g.getGraphDesc().dumpAsXml(g.getClass());
-							} catch (RuntimeException e) {
-								logger.error("Unable to transform " + g);
-							}
-						}
-					} catch (RuntimeException e) {
-						logger.error("Unable to transform " + p);
-					}
-				}
-			}
-		}
 		for(int i = 0; i< 1 ; i++) {
 			hl.collectAll();
 			System.gc();

@@ -6,8 +6,6 @@ _##########################################################################*/
 
 package jrds;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,18 +15,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.log4j.Logger;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
 import org.rrd4j.DsType;
 import org.rrd4j.core.DsDef;
 import org.snmp4j.smi.OID;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 
 /**
@@ -325,115 +315,6 @@ public class ProbeDesc {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	/*public String getRmiClass() {
-		return rmiClass;
-	}
-
-	public void setRmiClass(String rmiClass) {
-		this.rmiClass = rmiClass;
-	}*/
-
-	public void dumpAsXml(Class<? extends Probe> class1) throws ParserConfigurationException, IOException {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document document = builder.newDocument();  // Create from whole cloth
-		Element root = 
-			(Element) document.createElement("probedesc"); 
-		document.appendChild(root);
-
-		Element nameElement = document.createElement("name");
-		nameElement.appendChild(document.createTextNode(class1.getSimpleName()));
-		root.appendChild(nameElement);
-
-		Element probeNamElement = document.createElement("probeName");
-		probeNamElement.appendChild(document.createTextNode(probeName));
-		root.appendChild(probeNamElement);
-
-		Element probeClassElement = document.createElement("probeClass");
-		probeClassElement.appendChild(document.createTextNode(class1.getName()));
-		root.appendChild(probeClassElement);
-
-		if(jrds.probe.snmp.SnmpProbe.class.isAssignableFrom(class1)) {
-			Element requesterElement = document.createElement("snmpRequester");
-			root.appendChild(requesterElement);
-			//requesterElement.appendChild(document.createTextNode(requester.getName()));
-
-			if(jrds.probe.snmp.RdsIndexedSnmpRrd.class.isAssignableFrom(class1)) {
-				Element indexElement = document.createElement("index");
-				//indexElement.appendChild(document.createTextNode(this.indexOid.toString()));
-				root.appendChild(indexElement);
-				Element uniqElement = document.createElement("uniq");
-				uniqElement.appendChild(document.createTextNode(Boolean.toString(this.uniqIndex)));
-				root.appendChild(uniqElement);
-			}
-		}
-
-
-		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
-			DsDesc ds = e.getValue();
-			Element dsElement = document.createElement("ds");
-			root.appendChild(dsElement);
-
-			Element dsNameElement = document.createElement("dsName");
-			dsElement.appendChild(dsNameElement);
-			dsNameElement.appendChild(document.createTextNode(e.getKey()));
-
-			Element dsTypeElement = document.createElement("dsType");
-			if(ds.dsType != null) {
-				dsTypeElement.appendChild(document.createTextNode(ds.dsType.toString().toLowerCase()));
-				dsElement.appendChild(dsTypeElement);
-			}
-
-			if(! Double.isNaN(ds.maxValue)) {
-				Element upperLimitElement = document.createElement("upperLimit");
-				upperLimitElement.appendChild(document.createTextNode(Double.toString(ds.maxValue)));
-				root.appendChild(upperLimitElement);
-			}
-
-			if(ds.minValue != MINDEFAULT) {
-				Element lowerLimitElement = document.createElement("lowerLimit");
-				lowerLimitElement.appendChild(document.createTextNode(Double.toString(ds.minValue)));
-				root.appendChild(lowerLimitElement);
-			}
-
-			String keyName = null;
-			if(ds.collectKey instanceof org.snmp4j.smi.OID) {
-				keyName = "oid";
-			}
-			if(keyName != null) {
-				Element keyElement = document.createElement(keyName);
-				keyElement.appendChild(document.createTextNode(ds.collectKey.toString()));
-				dsElement.appendChild(keyElement);
-			}
-		}
-
-		Element graphElement = document.createElement("graphs");
-		root.appendChild(graphElement);
-		for(Object o: this.graphClasses) {
-			String graphName = null;
-			if(o instanceof String)
-				graphName = o.toString();
-			else if(o instanceof Class)
-				graphName = ((Class<?>) o).getName();
-			if(graphName != null) {
-				Element graphNameElement = document.createElement("name");
-				graphElement.appendChild(graphNameElement);
-				graphNameElement.appendChild(document.createTextNode(graphName));
-			}
-		}
-
-		FileOutputStream fos = new FileOutputStream("desc/autoprobe/" + class1.getSimpleName().toLowerCase() + ".xml");
-//		XERCES 1 or 2 additionnal classes.
-		OutputFormat of = new OutputFormat("XML","ISO-8859-1",true);
-		of.setIndent(1);
-		of.setIndenting(true);
-		of.setDoctype("-//jrds//DTD Graph Description//EN","urn:jrds:graphdesc");
-		XMLSerializer serializer = new XMLSerializer(fos,of);
-//		As a DOM Serializer
-		serializer.asDOMSerializer();
-		serializer.serialize( document.getDocumentElement() );
 	}
 
 	public String getSpecific(String name) {

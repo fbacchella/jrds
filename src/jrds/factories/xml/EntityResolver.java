@@ -9,7 +9,7 @@ import org.xml.sax.SAXException;
 public class EntityResolver implements org.xml.sax.EntityResolver {
 	public InputSource resolveEntity(String publicId, String systemId)
 	throws SAXException, IOException {
-		URL realSystemId = new URL(systemId);
+		URL realSystemId;
 		if("-//jrds//DTD Graph Description//EN".equals(publicId)) {
 			realSystemId = getClass().getResource("/graphdesc.dtd");
 		}
@@ -18,6 +18,9 @@ public class EntityResolver implements org.xml.sax.EntityResolver {
 		}
 		else if("-//jrds//DTD Filter//EN".equals(publicId)) {
 			realSystemId =  getClass().getResource("/filter.dtd");
+		}
+		else {
+			realSystemId = new URL(systemId);
 		}
 
 		return new InputSource(realSystemId.openStream());

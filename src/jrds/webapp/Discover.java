@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,8 +17,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.TransformerException;
 
 import jrds.PropertiesManager;
+import jrds.Util;
 import jrds.factories.Loader;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
@@ -25,8 +29,6 @@ import jrds.snmp.SnmpRequester;
 import jrds.snmp.SnmpStarter;
 
 import org.apache.log4j.Logger;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
@@ -46,7 +48,6 @@ import org.w3c.dom.Element;
  * Servlet implementation class AutoDetect
  */
 public class Discover extends HttpServlet {
-	static final private OutputFormat of = new OutputFormat("XML","UTF-8",true);
 	static final private Logger logger = Logger.getLogger(Discover.class);
 
 	private static final String CONTENT_TYPE = "application/xml";
@@ -130,18 +131,18 @@ public class Discover extends HttpServlet {
 		try {
 			Document hostDom = generate(hostname, l.getRepository(Loader.ConfigType.PROBEDESC).values(), withOid, request.getParameterValues("tag"));
 
-			of.setIndent(1);
-			of.setIndenting(true);
-
 			response.setContentType(CONTENT_TYPE);
 			response.addHeader("Cache-Control", "no-cache");
 
-			XMLSerializer serializer = new XMLSerializer(response.getOutputStream(),of);
-			serializer.asDOMSerializer();
-			serializer.serialize(hostDom.getDocumentElement() );
+			Map<String, String> prop = new HashMap<String, String>(1);
+			prop.put(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			prop.put(OutputKeys.INDENT, "yes");
+			Util.serialize(hostDom, response.getOutputStream(), null, prop);
 		} catch (IOException e) {
 			logger.error(e);
 		} catch (ParserConfigurationException e) {
+			logger.error(e);
+		} catch (TransformerException e) {
 			logger.error(e);
 		}
 	}

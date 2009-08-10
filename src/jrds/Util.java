@@ -1,7 +1,10 @@
 package jrds;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.util.Date;
 import java.util.HashMap;
@@ -10,16 +13,28 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.xml.transform.ErrorListener;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.DocumentType;
 
 /**
  *
  * @author Fabrice Bacchella 
  * @version $Revision$,  $Date$
-  */
+ */
 public class Util {
 	static final private Logger logger = Logger.getLogger(Util.class);
 
@@ -65,7 +80,7 @@ public class Util {
 		a(-18),
 		z(-21),
 		y(-24);
-		
+
 		private int exponent;
 		private SiPrefix(int exponent) {
 			this.exponent = exponent;
@@ -77,6 +92,22 @@ public class Util {
 			return exponent;
 		}
 	};
+
+	static final private ErrorListener el = new ErrorListener() {
+		public void error(TransformerException e) throws TransformerException {
+			logger.error("Invalid xsl: " + e.getMessageAndLocation());
+		}
+		public void fatalError(TransformerException e) throws TransformerException {
+			logger.fatal("Invalid xsl: " + e.getMessageAndLocation());
+		}
+		public void warning(TransformerException e) throws TransformerException {
+			logger.warn("Invalid xsl: " + e.getMessageAndLocation());
+		}
+	};
+	static final TransformerFactory tFactory = TransformerFactory.newInstance();
+	static {
+		tFactory.setErrorListener(el);
+	}
 
 	public static String stringSignature(String s)
 	{
@@ -149,7 +180,7 @@ public class Util {
 		//We normalize the last update time, it can't be used directly
 		long step = p.getStep();
 		Date lastUpdate = p.getLastUpdate();
-		
+
 		//We dont want to graph past the last normalized update time
 		//but only if we are within a step interval
 		if( (endDate.getTime() - lastUpdate.getTime()) <= (step * 1000L))
@@ -158,7 +189,7 @@ public class Util {
 		//Else rrd4j will manage the normalization itself
 		return endDate;
 	}
-	
+
 	/**
 	 * Normalize to a probe step, as org.rrd4j.core.Util.normalize
 	 * But use a Date argument and return a Date
@@ -187,7 +218,7 @@ public class Util {
 				out.append(before);
 				String toAppend = null;
 				if(var.startsWith("system.")) {
-					 toAppend = System.getProperty(var.replace("system.", ""));
+					toAppend = System.getProperty(var.replace("system.", ""));
 				}
 				else if(variables.containsKey(var)) {
 					toAppend = variables.get(var).toString();
@@ -276,12 +307,12 @@ public class Util {
 		logger.trace("Properties to use for parsing: " + env + " with template "+ template);
 		return jrds.Util.evaluateVariables(template, env, node);
 	}
-	
+
 	public static Number parseStringNumber(String toParse, Class<? extends Number> numberClass, Number defaultVal) {
 		if(! (Number.class.isAssignableFrom(numberClass))) {
 			return defaultVal;
 		}
-		
+
 		try {
 			Constructor<? extends Number> c = numberClass.getConstructor(String.class);
 			Number n = c.newInstance(toParse);
@@ -294,6 +325,41 @@ public class Util {
 		} catch (InvocationTargetException e) {
 		}
 		return defaultVal;
+	}
+
+	public static void serialize(Document d, OutputStream out, URL transformerLocation, Map<String, String> properties) throws TransformerException, IOException {
+		Source source = new DOMSource(d);
+
+		Transformer transformer = null;
+		if(transformerLocation != null) {
+			Source stylesource = new StreamSource(transformerLocation.toString());
+			transformer = tFactory.newTransformer(stylesource);
+		}
+		else
+			transformer = tFactory.newTransformer();
+
+		transformer.setOutputProperty("encoding", "UTF-8");
+
+		DocumentType dt = d.getDoctype();
+		//If no transformation, we try to keep the Document type
+		if(dt != null && transformerLocation == null) {
+			String publicId = dt.getPublicId();
+			if(publicId != null)
+				transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, publicId);
+			String systemId = dt.getSystemId();
+			if(systemId != null)
+				transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, systemId);
+		}
+
+		if(properties != null) {
+			for(Map.Entry<String, String> e: properties.entrySet()) {
+				transformer.setOutputProperty(e.getKey(), e.getValue());
+			}
+		}
+
+		StreamResult result = new StreamResult(out);
+		transformer.transform(source, result);
+		out.flush();
 	}
 }
 

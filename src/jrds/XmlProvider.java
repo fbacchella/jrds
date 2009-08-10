@@ -3,7 +3,6 @@ package jrds;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,8 +15,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -162,19 +159,6 @@ public class XmlProvider extends Starter {
 		} catch (UnsupportedOperationException e) {
 		}
 		return dbuilder.newDocument();
-	}
-
-	public String serialize(Document d, OutputFormat of) {
-		StringWriter w = new StringWriter();
-		try {
-			XMLSerializer serializer = new XMLSerializer(w,of);
-			serializer.asDOMSerializer();
-			serializer.serialize(d.getDocumentElement() );
-		} catch (IOException e) {
-			logger.fatal("Unable to serialize in memory");
-			throw new Error(e);
-		}
-		return w.toString();
 	}
 
 	/**
