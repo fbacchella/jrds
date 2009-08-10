@@ -145,7 +145,6 @@ public class ParamsBean implements Serializable {
 	private void addPeriodArgs(Map<String, Object> args, boolean timeAbsolute) {
 		if(! timeAbsolute && period.getScale() != 0) {
 			args.put("scale",period.getScale());
-			args.put("refresh", Boolean.TRUE);
 		}
 		else {
 			args.put("begin", period.getBegin().getTime());

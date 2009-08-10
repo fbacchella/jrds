@@ -25,6 +25,11 @@ import jrds.Probe;
 
 import org.apache.log4j.Logger;
 
+/**
+ * 
+ * @author Fabrice Bacchella 
+ * @version $Revision: 407 $,  $Date: 2007-02-22 18:48:03 +0100 (jeu., 22 févr. 2007) $
+ */
 public class JMX extends Probe implements ConnectedProbe {
 
 	static final private Logger logger = Logger.getLogger(JMX.class);
@@ -127,14 +132,14 @@ public class JMX extends Probe implements ConnectedProbe {
 	/**
 	 * @return the connection
 	 */
-	public String getConnection() {
+	public String getConnectionName() {
 		return connectionName;
 	}
 
 	/**
 	 * @param connection the connection to set
 	 */
-	public void setConnection(String connectionName) {
+	public void setConnectionName(String connectionName) {
 		this.connectionName = connectionName;
 	}
 

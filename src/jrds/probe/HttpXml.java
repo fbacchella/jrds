@@ -15,6 +15,10 @@ import jrds.XmlProvider;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
+/**
+ * @author Fabrice Bacchella 
+ * @version $Revision: 407 $,  $Date: 2007-02-22 18:48:03 +0100 (jeu., 22 févr. 2007) $
+ */
 public class HttpXml extends HttpProbe {
 
 	static final private Logger logger = Logger.getLogger(HttpXml.class);
@@ -45,6 +49,10 @@ public class HttpXml extends HttpProbe {
 	}
 	public HttpXml(URL url, List<Object> args) {
 		super(url);
+		this.args = args;
+	}
+	public HttpXml(Integer port, String file, List<Object> args) {
+		super(port, file);
 		this.args = args;
 	}
 

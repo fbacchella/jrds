@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.IllegalFormatConversionException;
 import java.util.List;
 import java.util.Map;
 
@@ -16,19 +17,18 @@ import jrds.Starter;
 
 import org.apache.log4j.Logger;
 
-
 /**
- * @author bacchell
- * 
- * A generic probe to collect an http service
+ 
+ * A generic probe to collect an HTTP service
  * default generic : 
  * port to provide a default port to collect
  * file to provide a specific file to collect
  * 
- * Implemantion should implemant the parseStream method
+ * Implemention should implement the parseStream method
  *
- * TODO 
- */
+ * @author Fabrice Bacchella 
+ * @version $Revision$,  $Date$
+  */
 public abstract class HttpProbe extends Probe implements UrlProbe {
 	static final private Logger logger = Logger.getLogger(HttpProbe.class);
 	protected static final String EMPTYHOST="__EMPTYHOST__";
@@ -159,8 +159,13 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 					}
 				}
 				if(argslist != null) {
-					String urlString = String.format("http://" + host + ":" + portStr + file, argslist.toArray());
-					url = new URL(urlString);
+					try {
+						String urlString = String.format("http://" + host + ":" + portStr + file, argslist.toArray());
+						url = new URL(urlString);
+					} catch (IllegalFormatConversionException e) {
+						logger.error("Illegal format string:" + "http://" + host + ":" + portStr + file);
+						return null;
+					}
 				}
 				else {
 					if(port == 0)

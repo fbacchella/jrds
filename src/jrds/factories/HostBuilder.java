@@ -159,7 +159,7 @@ public class HostBuilder extends ObjectBuilder {
 			String connexionName = probeNode.evaluate(CompiledXPath.get("@connection"));
 			if(connexionName != null && ! "".equals(connexionName)) {
 				logger.trace("Adding connection " + connexionName + " to " + p);
-				((ConnectedProbe)p).setConnection(connexionName);
+				((ConnectedProbe)p).setConnectionName(connexionName);
 			}
 		}
 

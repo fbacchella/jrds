@@ -41,7 +41,7 @@ public abstract class JSonData extends HttpServlet {
 			
 			out.println("]}");
 		} catch (Exception e) {
-			logger.warn("Failed request: " + request.getRequestURI() + "?" + request.getQueryString() +": " + e);
+			logger.warn("Failed request: " + request.getRequestURI() + "?" + request.getQueryString() +": " + e, e);
 		}
 	}
 
