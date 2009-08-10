@@ -14,12 +14,11 @@ import org.apache.xml.serialize.XMLSerializer;
 import org.w3c.dom.Document;
 
 public class EnumerateProbes {
-	static {
-		jrds.JrdsLoggerConfiguration.initLog4J();
-	}
 	static final private Logger logger = Logger.getLogger(EnumerateProbes.class);
 
 	public static void main(String[] args) throws Exception {
+		jrds.JrdsLoggerConfiguration.initLog4J();
+
 		PropertiesManager pm = new PropertiesManager(new File("jrds.properties"));
 		jrds.JrdsLoggerConfiguration.configure(pm);
 

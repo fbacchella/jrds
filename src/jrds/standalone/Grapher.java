@@ -29,12 +29,11 @@ import org.apache.log4j.Logger;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class Grapher {
-	static {
-		jrds.JrdsLoggerConfiguration.initLog4J();
-	}
 	static final private Logger logger = Logger.getLogger(Grapher.class);
 
 	public static void main(String[] args) throws Exception {
+		jrds.JrdsLoggerConfiguration.initLog4J();
+
 		String propFile = "jrds.properties";
 		if(args.length == 1)
 			propFile = args[0];

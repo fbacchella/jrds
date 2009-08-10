@@ -18,12 +18,11 @@ import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDef;
 
 public class Updater {
-	static {
-		jrds.JrdsLoggerConfiguration.initLog4J();
-	}
 	static final private Logger logger = Logger.getLogger(Updater.class);
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		jrds.JrdsLoggerConfiguration.initLog4J();
+
 		PropertiesManager pm = new PropertiesManager(new File("jrds.properties"));
 		//jrds.log.JrdsLoggerFactory.setOutputFile(pm.logfile);
 

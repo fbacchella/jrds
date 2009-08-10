@@ -24,12 +24,11 @@ import org.apache.log4j.Logger;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class Collector {
-	static {
-		jrds.JrdsLoggerConfiguration.initLog4J();
-	}
 	static final private Logger logger = Logger.getLogger(Collector.class);
 
 	public static void main(String[] args) throws Exception {
+		jrds.JrdsLoggerConfiguration.initLog4J();
+
 		String propFile = "jrds.properties";
 		if(args.length == 1)
 			propFile = args[0];

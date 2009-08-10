@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import jrds.StartListener;
 import jrds.bootstrap.CommandStarter;
 
 import org.apache.log4j.Level;
