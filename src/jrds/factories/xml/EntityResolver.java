@@ -22,6 +22,4 @@ public class EntityResolver implements org.xml.sax.EntityResolver {
 
 		return new InputSource(realSystemId.openStream());
 	}
-
-
 }
