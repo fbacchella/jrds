@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.IllegalFormatConversionException;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ import jrds.Starter;
 import org.apache.log4j.Logger;
 
 /**
- 
+
  * A generic probe to collect an HTTP service
  * default generic : 
  * port to provide a default port to collect
@@ -28,7 +29,7 @@ import org.apache.log4j.Logger;
  *
  * @author Fabrice Bacchella 
  * @version $Revision$,  $Date$
-  */
+ */
 public abstract class HttpProbe extends Probe implements UrlProbe {
 	static final private Logger logger = Logger.getLogger(HttpProbe.class);
 	protected static final String EMPTYHOST="__EMPTYHOST__";
@@ -100,10 +101,13 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 	 * @see com.aol.jrds.Probe#getNewSampleValues()
 	 */
 	public Map<?, ?> getNewSampleValues() {
-		Starter resolver = getStarters().find(Starter.Resolver.buildKey(getUrl().getHost()));
-		if(! resolver.isStarted()) {
-			logger.trace("Resolver not started for " + getUrl().getHost());
-			return null;
+		String hostName = getUrl().getHost();
+		if(hostName != null) {
+			Starter resolver = getStarters().find(Starter.Resolver.buildKey(hostName));
+			if(resolver != null && ! resolver.isStarted()) {
+				logger.trace("Resolver not started for " + getUrl().getHost());
+				return Collections.emptyMap();
+			}
 		}
 		Map<String, Number> vars = java.util.Collections.emptyMap();
 		logger.debug("Getting " + getUrl());

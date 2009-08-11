@@ -545,7 +545,7 @@ implements Comparable<Probe>, StarterNode {
 			rrdDb = StoreOpener.getRrd(getRrdName());
 			lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
 		} catch (Exception e) {
-			logger.error("Unable to get last update date for" + getName() + ": " + e.getMessage());
+			logger.error("Unable to get last update date for " + getName() + ": " + e.getMessage());
 		}
 		finally {
 			if(rrdDb != null)

@@ -112,6 +112,11 @@ public class Period {
 		this.begin = string2Date(begin, true);
 		calPeriod = 0;
 	}
+	
+	public void setBegin(Date begin) {
+		this.begin = begin;
+		calPeriod = 0;
+	}
 
 	/**
 	 * @return Returns the end.

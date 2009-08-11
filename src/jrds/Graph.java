@@ -244,7 +244,7 @@ public class Graph {
 	 * @param start the start to set
 	 */
 	public void setStart(Date start) {
-		int step = HostsList.getRootGroup().getStep();
+		long step = getNode().getProbe().getStep();
 		this.start = new Date(org.rrd4j.core.Util.normalize(start.getTime() / 1000L, step) * 1000L);
 	}
 

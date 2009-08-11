@@ -65,11 +65,7 @@ public class Util {
 		k(3),
 		h(2),
 		da(1),
-		FIXED(0) {
-			public double evaluate(double value, int base) {
-				return value;
-			}
-		},
+		FIXED(0),
 		d(-1),
 		c(-2),
 		m(-3),
@@ -203,10 +199,24 @@ public class Util {
 	}
 
 	public static String evaluateVariables(String in, Map<String, Object> variables, StarterNode node) {
-		ChainedProperties props = (ChainedProperties)node.getStarters().find(ChainedProperties.KEY);
+		ChainedProperties props = null;
+		if(node != null)
+			props = (ChainedProperties)node.getStarters().find(ChainedProperties.KEY);
 		return evaluateVariables(in, variables, props);
 	}
 
+	/**
+	 * Evaluate a string containing variables in the form ${varname}
+	 * 
+	 * variable is map of variable name pointing to object that will be evaluted
+	 * with their toString method to get variable names
+	 * 
+	 * Any variable starting with system. is a system property
+	 * @param in
+	 * @param variables
+	 * @param props
+	 * @return
+	 */
 	public static String evaluateVariables(String in, Map<String, Object> variables, Map<String,String> props) {
 		Matcher m = varregexp.matcher(in);
 		if(m.find()) {
@@ -226,7 +236,7 @@ public class Util {
 				else if(props != null) {
 					String propsValue = props.get(var);
 					if(propsValue != null)
-						out.append(propsValue);
+						toAppend = propsValue;
 				}
 				if(toAppend == null) {
 					toAppend = "${" + var + "}";
@@ -245,7 +255,7 @@ public class Util {
 		Map<String, Object> env = new HashMap<String, Object>();
 		StarterNode node = null;
 		for(Object o: arguments) {
-			logger.trace("Argument for tempate: " + o.getClass());
+			logger.trace("Argument for template: " + o.getClass());
 			if( o instanceof IndexedProbe) {
 				String index = ((IndexedProbe) o).getIndexName();
 				env.put("index", index);
