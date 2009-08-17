@@ -179,7 +179,7 @@ public class Util {
 
 		//We dont want to graph past the last normalized update time
 		//but only if we are within a step interval
-		if( (endDate.getTime() - lastUpdate.getTime()) <= (step * 1000L))
+		if( Math.abs(endDate.getTime() - lastUpdate.getTime()) <= (step * 1000L))
 			return normalize(lastUpdate, step);
 
 		//Else rrd4j will manage the normalization itself

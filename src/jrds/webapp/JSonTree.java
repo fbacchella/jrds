@@ -2,6 +2,7 @@ package jrds.webapp;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Map;
 import javax.servlet.ServletOutputStream;
 
 import jrds.Filter;
+import jrds.FilterHost;
 import jrds.FilterTag;
 import jrds.GraphNode;
 import jrds.GraphTree;
@@ -37,7 +39,25 @@ public class JSonTree extends JSonData {
 
 	boolean evaluateFilter(ParamsBean params, ServletOutputStream out, HostsList root, Filter f) throws IOException {
 		logger.debug("Dumping with filter" + f);
-		for(GraphTree tree: root.getGraphsRoot()) {
+		Collection<GraphTree> level = root.getGraphsRoot();
+		logger.trace("This level size: " + level.size());
+
+		//A first pass to see if there is only one root
+		//Jump into the childs it's the case
+		//The tree is parsed twice, that's not optimal
+		if(! (f  instanceof FilterHost)) {
+			int count =0;
+			for(GraphTree tree: root.getGraphsRoot()) {
+				if(tree.enumerateChildsGraph(f).size() > 0) {
+					count++;
+					level = tree.getChildsMap().values();
+				}
+			}
+			if(count > 1)
+				level = root.getGraphsRoot();
+		}
+
+		for(GraphTree tree: level) {
 			tree = f.setRoot(tree);
 			if(tree != null)
 				sub(params, out, tree, "tree", f, "", tree.hashCode());

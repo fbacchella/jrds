@@ -39,7 +39,7 @@ public class ProbeDesc {
 	private String probeName;
 	private String name;
 	private Collection<?> namedProbesNames;
-	private Collection<?> graphClasses = new ArrayList(0);
+	private Collection<?> graphClasses = new ArrayList<Object>(0);
 	private boolean uniqIndex = false;
 	private Class<? extends Probe> probeClass = null;
 	private List<Object> defaultsArgs = null;
@@ -140,16 +140,17 @@ public class ProbeDesc {
 		Object collectKey = null;
 		String name = null;
 		DsType type = null;
-		for(Map.Entry<String, Object> e: valuesMap.entrySet()) {
-			String var = e .getKey();
-			if("dsName".equals(var))
-				name = (String) e.getValue();
-			else if("dsType".equals(var))
-				type = (DsType) e.getValue();
-			else if("collectKey".equals(var))
-				collectKey = e.getValue();
-			if(collectKey == null && name != null)
-				collectKey = name;
+		if(valuesMap.containsKey("dsName")) {
+			name = (String) valuesMap.get("dsName");
+		}
+		if(valuesMap.containsKey("dsType")) {
+			type = (DsType) valuesMap.get("dsType");
+		}
+		if(valuesMap.containsKey("collectKey")) {
+			collectKey = valuesMap.get("collectKey");
+		}
+		else {
+			collectKey = name;
 		}
 		dsMap.put(name, new DsDesc(type, heartbeat, min, max, collectKey));
 	}
@@ -178,7 +179,7 @@ public class ProbeDesc {
 		Map<String, String> retValue = new LinkedHashMap<String, String>(dsMap.size());
 		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
 			DsDesc dd =  e.getValue();
-			if(dd.collectKey != null  && dd.collectKey instanceof String)
+			if(dd.collectKey != null  && dd.collectKey instanceof String  && ! "".equals((String) dd.collectKey))
 				retValue.put((String)dd.collectKey, e.getKey());
 		}
 		return retValue;
@@ -246,7 +247,7 @@ public class ProbeDesc {
 	/**
 	 * @return Returns the muninsProbeName.
 	 */
-	public Collection getNamedProbesNames() {
+	public Collection<?> getNamedProbesNames() {
 		return namedProbesNames;
 	}
 
@@ -260,14 +261,14 @@ public class ProbeDesc {
 	/**
 	 * @return Returns the graphClasses.
 	 */
-	public Collection getGraphClasses() {
+	public Collection<?> getGraphClasses() {
 		return graphClasses;
 	}
 
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
-	public void setGraphClasses(Collection graphClasses) {
+	public void setGraphClasses(Collection<?> graphClasses) {
 		this.graphClasses = graphClasses;
 	}
 
@@ -281,7 +282,7 @@ public class ProbeDesc {
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
-	public void setGraphClasses(Class[] graphClasses) {
+	public void setGraphClasses(Class<?>[] graphClasses) {
 		this.graphClasses = Arrays.asList(graphClasses);
 	}
 

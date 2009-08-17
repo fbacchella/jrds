@@ -57,6 +57,15 @@ public class JrdsLoggerConfiguration {
 		newApp.setName(APPENDER);
 		putAppender(newApp);
 	}
+	
+	static public void joinAppender(String logName) {
+		Logger logger = Logger.getLogger(logName);
+		Appender app = Logger.getLogger("jrds").getAppender(APPENDER);
+		Appender oldApp = logger.getAppender(app.getName());
+		if(oldApp != null)
+			logger.removeAppender(oldApp);
+		logger.addAppender(app);
+	}
 
 	static public void putAppender(Appender app) {
 		for(String loggerName: rootLoggers) {

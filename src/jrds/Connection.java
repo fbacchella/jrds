@@ -4,8 +4,13 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
+import java.util.Date;
+
+import org.apache.log4j.Logger;
 
 public abstract class Connection extends Starter {
+	static final private Logger logger = Logger.getLogger(Connection.class);
+	
 	private String name;
 	private long uptime;
 
@@ -74,9 +79,12 @@ public abstract class Connection extends Starter {
 	 */
 	@Override
 	public boolean start() {
+		long begin = new Date().getTime();
 		boolean started =  startConnection();
+		long end = new Date().getTime();
 		if(started)
 			uptime = setUptime();
+		logger.debug("Starting connection " + getKey() + " for " + getHostName() +" took "  + (end - begin) + "ms");
 		return started;
 	}
 
@@ -103,6 +111,14 @@ public abstract class Connection extends Starter {
 	 */
 	public long getUptime() {
 		return uptime;
+	}
+
+	/* (non-Javadoc)
+	 * @see jrds.Starter#toString()
+	 */
+	@Override
+	public String toString() {
+		return getKey() + "@" + getHostName();
 	}
 	
 }

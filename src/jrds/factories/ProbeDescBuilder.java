@@ -111,8 +111,12 @@ public class ProbeDescBuilder extends ObjectBuilder {
 				String element = dsContent.getNodeName();
 				String textValue = dsContent.getTextContent().trim();
 				Object value = textValue;
-				if("collect".equals(element))
+				if("collect".equals(element)) {
 					element ="collectKey";
+					if ("".equals(textValue)) {
+						value=null;
+					}
+				}
 				if("dsType".equals(element)) {
 					if( !"NONE".equals(textValue.toUpperCase()))
 						value = DsType.valueOf(textValue.toUpperCase());

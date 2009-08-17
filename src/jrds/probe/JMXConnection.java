@@ -2,7 +2,6 @@ package jrds.probe;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 

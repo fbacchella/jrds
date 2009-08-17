@@ -492,7 +492,7 @@ implements Comparable<Probe>, StarterNode {
 				if(logger.isDebugEnabled())
 					logger.debug("Error with probe collect " + this + ": ", e);
 				else
-					logger.error("Error with probe collect " + this + ": " + e.getMessage());
+					logger.error("Error with probe collect " + this + ": " + e);
 			}
 			finally  {
 				if(rrdDb != null)
