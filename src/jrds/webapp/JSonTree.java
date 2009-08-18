@@ -10,8 +10,8 @@ import java.util.Map;
 import javax.servlet.ServletOutputStream;
 
 import jrds.Filter;
-import jrds.FilterHost;
 import jrds.FilterTag;
+import jrds.FilterXml;
 import jrds.GraphNode;
 import jrds.GraphTree;
 import jrds.HostsList;
@@ -45,7 +45,7 @@ public class JSonTree extends JSonData {
 		//A first pass to see if there is only one root
 		//Jump into the childs it's the case
 		//The tree is parsed twice, that's not optimal
-		if(! (f  instanceof FilterHost)) {
+		if( (f  instanceof FilterXml)) {
 			int count =0;
 			for(GraphTree tree: root.getGraphsRoot()) {
 				if(tree.enumerateChildsGraph(f).size() > 0) {
