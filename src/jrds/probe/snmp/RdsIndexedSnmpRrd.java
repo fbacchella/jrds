@@ -38,12 +38,12 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	static final SnmpRequester indexFinder = SnmpRequester.TABULAR;
 	static final SnmpRequester valueFinder = SnmpRequester.RAW;
 
-	public RdsIndexedSnmpRrd(String indexKey) {
+	public void configure(String indexKey) {
 		this.key = indexKey;
 		this.indexKey = indexKey;
 	}
 
-	public RdsIndexedSnmpRrd(Integer indexKey) {
+	public void configure(Integer indexKey) {
 		this.key = indexKey;
 		this.indexKey = String.valueOf(indexKey);
 	}
@@ -52,12 +52,12 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	 * If the key type is an OID, it is directly the OID suffix, no look up will be done
 	 * @param indexKey
 	 */
-	public RdsIndexedSnmpRrd(OID indexKey) {
+	public void configure(OID indexKey) {
 		this.key = indexKey;
 		this.indexKey = indexKey.toString();
 	}
 
-	public RdsIndexedSnmpRrd(String keyName, OID indexKey) {
+	public void configure(String keyName, OID indexKey) {
 		this.key = indexKey;
 		this.indexKey = keyName;
 	}

@@ -6,8 +6,6 @@
 
 package jrds.probe.snmp;
 
-import jrds.RdsHost;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -27,8 +25,8 @@ public class PartitionSpaceWindows extends PartitionSpace {
 	 * @param monitoredHost
 	 * @param indexKey
 	 */
-	public PartitionSpaceWindows(RdsHost monitoredHost, String indexKey) {
-		super(indexKey);
+	public void configure(String indexKey) {
+		super.configure(indexKey);
 	}
 	
 	/**

@@ -7,6 +7,7 @@
 package jrds.factories;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.Map;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
+import jrds.RdsHost;
 
 import org.apache.log4j.Logger;
 
@@ -45,14 +47,15 @@ public class ProbeFactory {
 	 * Create an probe, provided his Class and a list of argument for a constructor
 	 * for this object. It will be found using the default list of possible package
 	 * @param className the probe name
+	 * @param host 
 	 * @param constArgs
 	 * @return
 	 */
-	public Probe makeProbe(String className, List<?> constArgs) {
+	public Probe makeProbe(String className, RdsHost host, List<?> constArgs) {
 		Probe retValue = null;
 		ProbeDesc pd = (ProbeDesc) probeDescMap.get(className);
 		if( pd != null) {
-			retValue = makeProbe(pd, constArgs);
+			retValue = makeProbe(pd, host, constArgs);
 		}
 		else if(pm.legacymode ){
 			Class<?> probeClass = resolvClass(className, probePackages);
@@ -96,13 +99,29 @@ public class ProbeFactory {
 	 * @param constArgs
 	 * @return
 	 */
-	public Probe makeProbe(ProbeDesc pd, List<?> constArgs) {
+	public Probe makeProbe(ProbeDesc pd, RdsHost host, List<?> constArgs) {
 		Class<? extends Probe> probeClass = pd.getProbeClass();
 		List<?> defaultsArgs = pd.getDefaultArgs();
 		Probe retValue = null;
 		if (probeClass != null) {
-			Object o = null;
 			try {
+				Constructor<? extends Probe> c = probeClass.getConstructor();
+				retValue = c.newInstance();
+			}
+			catch (ClassCastException ex) {
+				logger.warn("didn't get a Probe but a " + retValue.getClass().getName());
+				return null;
+			} catch (Exception ex) {
+				Throwable showException = ex;
+				Throwable t = ex.getCause();
+				if(t != null)
+					showException = t;
+				logger.warn("Error during probe instantation of type " + pd.getName() + ": ", showException);
+				return null;
+			}
+			try {
+				retValue.setHost(host);
+				retValue.setPd(pd);
 				if(defaultsArgs != null && constArgs != null && constArgs.size() <= 0)
 					constArgs = defaultsArgs;
 				Class<?>[] constArgsType = new Class[constArgs.size()];
@@ -116,27 +135,11 @@ public class ProbeFactory {
 					constArgsVal[index] = arg;
 					index++;
 				}
-				Constructor<? extends Probe> theConst = probeClass.getConstructor(constArgsType);
-				o = theConst.newInstance(constArgsVal);
-				retValue = (Probe) o;
-				retValue.setPd(pd);
-			}
-			catch (ClassCastException ex) {
-				logger.warn("didn't get a Probe but a " + o.getClass().getName());
-				return null;
+				Method configurator = probeClass.getMethod("configure", constArgsType);
+				configurator.invoke(retValue, constArgsVal);
 			}
 			catch (NoClassDefFoundError ex) {
 				logger.warn("Missing class for the creation of a probe " + pd.getName());
-				return null;
-			}
-			catch(InstantiationException ex) {
-				if(ex.getCause() != null)
-					logger.warn("Instantation exception : " + ex.getCause().getMessage(),
-							ex.getCause());
-				else {
-					logger.warn("Instantation exception : " + ex,
-							ex);					
-				}
 				return null;
 			}
 			catch (NoSuchMethodException ex) {
@@ -159,9 +162,6 @@ public class ProbeFactory {
 		}
 		return retValue;
 	}
-
-
-
 
 	private Class<?> resolvClass(String name, List<String> listPackages) {
 		Class<?> retValue = null;

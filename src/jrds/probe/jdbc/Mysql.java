@@ -15,20 +15,20 @@ public abstract class Mysql extends JdbcProbe {
 		registerDriver(com.mysql.jdbc.Driver.class);
 	}
 
-	public Mysql(int port, String user, String passwd) {
-		super(port, user, passwd);
+	public void configure(int port, String user, String passwd) {
+		super.configure(port, user, passwd);
 	}
 
-	public Mysql(String user, String passwd) {
-		super(PORT, user, passwd);
+	public void configure(String user, String passwd) {
+		super.configure(PORT, user, passwd);
 	}
 
-	public Mysql(int port, String user, String passwd, String dbName) {
-		super(port, user, passwd, dbName);
+	public void configure(int port, String user, String passwd, String dbName) {
+		super.configure(port, user, passwd, dbName);
 	}
 
-	public Mysql(String user, String passwd, String dbName) {
-		super(PORT, user, passwd, dbName);
+	public void configure(String user, String passwd, String dbName) {
+		super.configure(PORT, user, passwd, dbName);
 	}
 
 	JdbcStarter setStarter() {

@@ -44,9 +44,9 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
 	/**
 	 * @param monitoredHost
 	 */
-	public ProcessInfoExtended(String indexName, String pattern)
+	public void configure(String indexName, String pattern)
 	{
-		super(indexName);
+		super.configure(indexName);
 		this.pattern = pattern;
 	}
 

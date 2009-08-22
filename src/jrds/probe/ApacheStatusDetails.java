@@ -58,17 +58,12 @@ public class ApacheStatusDetails extends HttpProbe implements IndexedProbe {
 
 	static final private Logger logger = Logger.getLogger(ApacheStatusDetails.class);
 
-	/**
-	 * @param monitoredHost
-	 * @param newurl
-	 * @throws MalformedURLException
-	 */
-	public ApacheStatusDetails(URL newurl) throws MalformedURLException {
-		super(newurl);
-	}
-
-	public ApacheStatusDetails(Integer port) throws MalformedURLException {
-		super(new URL("http", EMPTYHOST, port, "/server-status?auto"));
+	public void configure(Integer port) {
+		try {
+			configure(new URL("http", getHost().getDnsName(), port, "/server-status?auto"));
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

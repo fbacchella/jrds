@@ -12,11 +12,11 @@ import jrds.Macro;
 import jrds.Probe;
 import jrds.RdsHost;
 import jrds.StarterNode;
-import jrds.Threshold;
-import jrds.Threshold.Comparator;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 import jrds.snmp.SnmpStarter;
+import jrds.thresholds.Threshold;
+import jrds.thresholds.Threshold.Comparator;
 
 import org.apache.log4j.Logger;
 
@@ -71,10 +71,11 @@ public class HostBuilder extends ObjectBuilder {
 
 		for(JrdsNode probeNode: hostNode.iterate(CompiledXPath.get("probe | rrd"))) {
 			try {
-				Probe p = makeProbe(probeNode);
-				if(p != null) {
+				Probe p = makeProbe(probeNode, host);
+				if(p != null && p.checkStore()) {
 					logger.trace(p);
-					host.addProbe(p);
+//					host.addProbe(p);
+					host.getProbes().add(p);
 				}
 				JrdsNode snmpProbeNode = probeNode.getChild(CompiledXPath.get("snmp"));
 				if(snmpProbeNode != null) {
@@ -126,11 +127,11 @@ public class HostBuilder extends ObjectBuilder {
 		return starter;
 	}
 
-	public Probe makeProbe(JrdsNode probeNode) {
+	public Probe makeProbe(JrdsNode probeNode, RdsHost host) {
 		Probe p = null;
 		List<Object> args = makeArgs(probeNode);
 		String type = probeNode.attrMap().get("type");
-		p = pf.makeProbe(type, args);
+		p = pf.makeProbe(type, host, args);
 		if(p == null)
 			return null;
 		for(JrdsNode thresholdNode: probeNode.iterate(CompiledXPath.get("threshold"))) {

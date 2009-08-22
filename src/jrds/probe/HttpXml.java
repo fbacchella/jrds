@@ -24,49 +24,30 @@ public class HttpXml extends HttpProbe {
 	static final private Logger logger = Logger.getLogger(HttpXml.class);
 
 	public XmlProvider xmlstarter = null;
-	private List<Object> args = null;
 	private Set<String> xpaths = null;
 	private Map<String, String> collectKeys = null;
 
-	public HttpXml(URL url) {
-		super(url);
+	public void configure(List<Object> args) {
+		super.configure(args);
+		finishConfig(args);
+	}
+	
+	public void configure(URL url, List<Object> args) {
+		super.configure(url, args);
+		finishConfig(args);
 	}
 
-	public HttpXml(Integer port, String file) {
-		super(port, file);
+	public void configure(Integer port, String file, List<Object> args) {
+		super.configure(port, file, args);
+		finishConfig(args);
 	}
 
-	public HttpXml(String file) {
-		super(file);
+	public void configure() {
+		super.configure();
+		finishConfig(null);
 	}
 
-	public HttpXml(Integer port) {
-		super(port);
-	}
-	public HttpXml(List<Object> args) {
-		super(args);
-		this.args = args;
-	}
-	public HttpXml(URL url, List<Object> args) {
-		super(url);
-		this.args = args;
-	}
-	public HttpXml(Integer port, String file, List<Object> args) {
-		super(port, file);
-		this.args = args;
-	}
-
-	public HttpXml() {
-		super();
-	}
-
-
-	/* (non-Javadoc)
-	 * @see jrds.Probe#setPd(jrds.ProbeDesc)
-	 */
-	@Override
-	public void setPd(ProbeDesc pd) {
-		super.setPd(pd);
+	private void finishConfig(List<Object> args) {
 		if(args != null) {
 			xpaths = new HashSet<String>(getPd().getCollectStrings().size());
 			collectKeys = new HashMap<String, String>(xpaths.size());
@@ -83,7 +64,15 @@ public class HttpXml extends HttpProbe {
 		else {
 			xpaths = getPd().getCollectStrings().keySet();
 			collectKeys = getPd().getCollectStrings();
-		}
+		}		
+	}
+	
+	/* (non-Javadoc)
+	 * @see jrds.Probe#setPd(jrds.ProbeDesc)
+	 */
+	@Override
+	public void setPd(ProbeDesc pd) {
+		super.setPd(pd);
 	}
 
 	/* (non-Javadoc)

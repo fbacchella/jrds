@@ -39,10 +39,10 @@ public class SumProbe extends VirtualProbe {
 
 	//An array list is needed, the introspection is picky
 	public SumProbe(String name, ArrayList<String> graphList) {
+		super(pd);
 		logger.debug("new sum: " + name);
 		setName(name);
 		this.graphList = graphList;
-		setPd(pd);
 	}
 
 	/**
@@ -66,8 +66,4 @@ public class SumProbe extends VirtualProbe {
 		return new Date();
 	}
 	
-	@Override
-	public String getSourceType() {
-		return "virtual";
-	}
 }

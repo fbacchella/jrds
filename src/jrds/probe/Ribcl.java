@@ -43,13 +43,13 @@ public class Ribcl extends Probe {
 
 	XmlProvider xmlstarter = null;
 
-	public Ribcl(String iloHost, int port, String user, String passwd) {
+	public void configure(String iloHost, int port, String user, String passwd) {
 		this.iloHost = iloHost;
 		this.user = user;
 		this.passwd = passwd;
 	}
 
-	public Ribcl(String iloHost, String user, String passwd) {
+	public void configure(String iloHost, String user, String passwd) {
 		this.iloHost = iloHost;
 		this.user = user;
 		this.passwd = passwd;
@@ -66,7 +66,7 @@ public class Ribcl extends Probe {
 	}
 
 	@Override
-	public Map getNewSampleValues() {
+	public Map<?, ?> getNewSampleValues() {
 		Map<String, Number> vars = new HashMap<String, Number>();
 		Socket s = null;
 		try {

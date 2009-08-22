@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
+import jrds.ProbeDesc;
+import jrds.RdsHost;
+
 import org.apache.log4j.Logger;
 import org.snmp4j.smi.Counter32;
 import org.snmp4j.smi.OID;
@@ -23,10 +26,8 @@ public class CpqDaPhyDrv extends RdsIndexedSnmpRrd {
 	static final private OID cpqDaPhyDrvHReads = new OID(".1.3.6.1.4.1.232.3.2.5.1.1.10");
 	static final private OID cpqDaPhyDrvReads = new OID(".1.3.6.1.4.1.232.3.2.5.1.1.11");
 
-
-
-	public CpqDaPhyDrv(Integer controlerIdx, Integer driveIdx) {
-		super(controlerIdx + "." + driveIdx);
+	public void configure(Integer controlerIdx, Integer driveIdx) {
+		super.configure(controlerIdx + "." + driveIdx);
 		this.controlerIdx = controlerIdx;
 		this.driveIdx = driveIdx;
 	}

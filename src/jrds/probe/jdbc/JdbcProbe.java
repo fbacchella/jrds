@@ -34,6 +34,7 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 		}	
 	}
 
+	@SuppressWarnings("unchecked")
 	static final void registerDriver(Class JdbcDriver) {
 		try {
 			Driver jdbcDriver = (Driver) JdbcDriver.newInstance();
@@ -46,14 +47,14 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 	private int port;
 	protected JdbcStarter starter;
 
-	public JdbcProbe(int port, String user, String passwd) {
+	public void configure(int port, String user, String passwd) {
 		this.port = port;
 		starter = setStarter();
 		starter.setPasswd(passwd);
 		starter.setUser(user);
 	}
 
-	public JdbcProbe(int port, String user, String passwd, String dbName) {
+	public void configure(int port, String user, String passwd, String dbName) {
 		this.port = port;
 		starter = setStarter();
 		starter.setDbName(dbName);
@@ -68,7 +69,7 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 
 	abstract JdbcStarter setStarter();
 
-	public Map getNewSampleValues()
+	public Map<String, Number> getNewSampleValues()
 	{
 		Map<String, Number> retValue = new HashMap<String, Number>(getPd().getSize());
 
@@ -151,7 +152,7 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 		return values;
 	}
 
-	public Map select2Map(String query, String keyCol, String valCol)
+	public Map<String, Object> select2Map(String query, String keyCol, String valCol)
 	{
 		Map<String, Object> values = new HashMap<String, Object>();
 		String jdbcurl = getUrlAsString();

@@ -20,12 +20,12 @@ import org.apache.log4j.Logger;
 public class MysqlStatus extends Mysql {
 	static final private org.apache.log4j.Logger logger = Logger.getLogger(MysqlStatus.class);
 
-	public MysqlStatus(int port, String user, String passwd) {
-		super(port, user, passwd);
+	public void configure(int port, String user, String passwd) {
+		super.configure(port, user, passwd);
 	}
 
-	public MysqlStatus(String user, String passwd) {
-		super(user, passwd);
+	public void configure(String user, String passwd) {
+		super.configure(user, passwd);
 	}
 
 	@Override

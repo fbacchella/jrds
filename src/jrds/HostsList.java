@@ -174,6 +174,7 @@ public class HostsList implements StarterNode {
 			Filter f = new FilterTag(tag);
 			filters.put(f.getName(), f);
 		}
+		
 		Map <String, Filter> f = conf.setFilterMap(l.getRepository(Loader.ConfigType.FILTER));
 		for(Filter filter: f.values()) {
 			addFilter(filter);
@@ -181,18 +182,17 @@ public class HostsList implements StarterNode {
 
 		Map<String, SumProbe> sums = conf.setSumMap(l.getRepository(Loader.ConfigType.SUM));
 		for(SumProbe s: sums.values()) {
-			addSum(s);
+			addVirtual(s, sumhost, SUMROOT);
 		}
 
 		logger.debug("Parsing graphs configuration");
 		Map<String, GraphDesc> graphs = conf.setGrapMap(l.getRepository(Loader.ConfigType.GRAPH));
 		if(! graphs.isEmpty()) {
-			ContainerProbe cp = new ContainerProbe(customhost.getName(), null);
+			ContainerProbe cp = new ContainerProbe();
 			for(GraphDesc gd: graphs.values()) {
 				logger.trace("Adding graphdesc: " + gd.getGraphTitle());
 				cp.addGraph(gd);
 			}
-			customhost.addProbe(cp);
 			addVirtual(cp, customhost, CUSTOMROOT);
 		}
 		started = true;
@@ -388,12 +388,9 @@ public class HostsList implements StarterNode {
 		return filters.keySet();
 	}
 
-	public void addSum(SumProbe sum) {
-		addVirtual(sum, sumhost, SUMROOT);
-	}
-
 	private void addVirtual(VirtualProbe vprobe, RdsHost vhost, String root) {
-		vhost.addProbe(vprobe);
+		vhost.getProbes().add(vprobe);
+		vprobe.setHost(vhost);
 		for(GraphNode currGraph: vprobe.getGraphList()) {
 			logger.trace("adding virtual graph: " + currGraph);
 			treeMap.get(root).addGraphByPath(currGraph.getTreePathByHost(), currGraph);

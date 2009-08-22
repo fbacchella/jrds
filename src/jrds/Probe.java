@@ -24,6 +24,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import jrds.factories.GraphFactory;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
+import jrds.thresholds.Threshold;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
@@ -78,9 +79,31 @@ implements Comparable<Probe>, StarterNode {
 		starters.setParent(monitoredHost.getStarters());
 	}
 
+	/**
+	 * A special case constructor, mainly used by virtual probe
+	 * @param monitoredHost
+	 * @param pd
+	 */
+	public Probe(ProbeDesc pd) {
+		setPd(pd);
+	}
+
+	/**
+	 * A special case constructor, mainly used by virtual probe
+	 * @param monitoredHost
+	 * @param pd
+	 */
 	public Probe() {
 	}
 
+	/**
+	 * A empty configurator doing nothing
+	 * This method is often overriden
+	 */
+	public void configure() {
+		
+	}
+	
 	public RdsHost getHost() {
 		return monitoredHost;
 	}
@@ -451,7 +474,6 @@ implements Comparable<Probe>, StarterNode {
 				}
 			}
 		}
-
 	}
 
 	/**
@@ -545,7 +567,7 @@ implements Comparable<Probe>, StarterNode {
 			rrdDb = StoreOpener.getRrd(getRrdName());
 			lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
 		} catch (Exception e) {
-			logger.error("Unable to get last update date for " + getName() + ": " + e.getMessage());
+			logger.error("Unable to get last update date for " + getName() + ": " + e, e);
 		}
 		finally {
 			if(rrdDb != null)

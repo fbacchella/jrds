@@ -73,16 +73,16 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 		return hostdir;
 	}
 
-	public void addProbe(Probe rrd)
-	{
-
-		rrd.setHost(this);
-		//Do not add the probe if the physical store
-		//cannot be checked
-		if(rrd.checkStore()) {
-			allProbes.add(rrd);
-		}
-	}
+//	public void addProbe(Probe rrd)
+//	{
+//
+//		rrd.setHost(this);
+//		//Do not add the probe if the physical store
+//		//cannot be checked
+//		if(rrd.checkStore()) {
+//			allProbes.add(rrd);
+//		}
+//	}
 
 	public Collection<Probe> getProbes() {
 		return allProbes;

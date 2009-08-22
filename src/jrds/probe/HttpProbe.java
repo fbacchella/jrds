@@ -32,41 +32,67 @@ import org.apache.log4j.Logger;
  */
 public abstract class HttpProbe extends Probe implements UrlProbe {
 	static final private Logger logger = Logger.getLogger(HttpProbe.class);
-	protected static final String EMPTYHOST="__EMPTYHOST__";
 	private URL url = null;
-	private String host = EMPTYHOST;
+	private String host = null;
 	private int	   port = 0;
 	private String file = null;
 	private String label;
 	private List<Object> argslist = null;
-	public HttpProbe(URL url) {
-		super();
+
+	public void configure(URL url) {
 		this.url = url;
+		finishConfigure();
 	}
 
-	public HttpProbe(Integer port, String file) {
-		super();
+	public void configure(Integer port, String file) {
 		this.port = port;
 		this.file = file;
-
+		finishConfigure();
 	}
 
-	public HttpProbe(Integer port) {
-		super();
+	public void configure(Integer port) {
 		this.port = port;
+		finishConfigure();
 	}
 
-	public HttpProbe(String file) {
-		super();
+	public void configure(String file) {
 		this.file = file;
+		finishConfigure();
 	}
 
-	public HttpProbe(List<Object> argslist) {
+	public void configure(List<Object> argslist) {
 		this.argslist = argslist;
+		finishConfigure();
 	}
 
-	public HttpProbe() {
-		super();
+	public void configure(URL url, List<Object> argslist) {
+		this.url = url;
+		this.argslist = argslist;
+		finishConfigure();
+	}
+
+	public void configure(Integer port, String file, List<Object> argslist) {
+		this.port = port;
+		this.file = file;
+		this.argslist = argslist;
+		finishConfigure();
+	}
+
+	public void configure() {
+		finishConfigure();
+	}
+
+	private void finishConfigure() {
+		RdsHost monitoredHost = getHost();
+		logger.trace("Set host to " + monitoredHost);
+		host = monitoredHost.getName();
+		try {
+			if(url != null)
+				setUrl(new URL(getUrl().getProtocol(), host, getUrl().getPort(), getUrl().getFile()));
+		} catch (MalformedURLException e) {
+			logger.error("URL " + "http://" + host + ":" + getUrl().getPort() + getUrl().getFile() + " is invalid");
+		}
+		logger.debug("Url to collect is " + getUrl());
 	}
 
 	/**
@@ -119,20 +145,6 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 		return vars;
 	}
 
-	@Override
-	public void setHost(RdsHost monitoredHost) {
-		logger.trace("Set host to " + monitoredHost);
-		host = monitoredHost.getName();
-		try {
-			if(url != null && EMPTYHOST.equals(getUrl().getHost()))
-				setUrl(new URL(getUrl().getProtocol(), host, getUrl().getPort(), getUrl().getFile()));
-		} catch (MalformedURLException e) {
-			logger.error("URL " + "http://" + host + ":" + getUrl().getPort() + getUrl().getFile() + " is invalid");
-		}
-		logger.debug("Url to collect is " + getUrl());
-		super.setHost(monitoredHost);
-	}
-
 	/**
 	 * @return Returns the url.
 	 */
@@ -167,13 +179,13 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 						String urlString = String.format("http://" + host + ":" + portStr + file, argslist.toArray());
 						url = new URL(urlString);
 					} catch (IllegalFormatConversionException e) {
-						logger.error("Illegal format string:" + "http://" + host + ":" + portStr + file);
+						logger.error("Illegal format string: " + "http://" + host + ":" + portStr + file + ", args: " + argslist.size());
 						return null;
 					}
 				}
 				else {
 					if(port == 0)
-						port = Integer.parseInt(portStr);
+						port = jrds.Util.parseStringNumber(portStr, Integer.class, 80).intValue();
 					url = new URL("http", host, port, file);
 				}
 			} catch (MalformedURLException e) {

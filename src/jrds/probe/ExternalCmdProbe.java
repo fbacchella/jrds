@@ -31,7 +31,7 @@ public abstract class ExternalCmdProbe extends Probe {
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.Probe#getNewSampleValues()
 	 */
-	public Map getNewSampleValues() {
+	public Map<?, ?> getNewSampleValues() {
 		return null;
 	}
 	

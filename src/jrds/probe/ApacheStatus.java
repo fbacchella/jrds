@@ -27,17 +27,12 @@ import org.apache.log4j.Logger;
 public class ApacheStatus extends HttpProbe implements IndexedProbe {
 	static final private Logger logger = Logger.getLogger(ApacheStatus.class);
 
-	/**
-	 * @param monitoredHost
-	 * @param newurl
-	 * @throws MalformedURLException
-	 */
-	public ApacheStatus(URL newurl) throws MalformedURLException {
-		super(newurl);
-	}
-
-	public ApacheStatus(Integer port) throws MalformedURLException {
-		super(new URL("http", EMPTYHOST, port, "/server-status?auto"));
+	public void configure(Integer port) {
+		try {
+			configure(new URL("http", getHost().getDnsName(), port, "/server-status?auto"));
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

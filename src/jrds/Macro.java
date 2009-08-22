@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 
 import jrds.factories.ProbeFactory;
-import jrds.probe.IndexedProbe;
 
 public class Macro {
 	private final Set<Object[]> probeList = new HashSet<Object[]>();
@@ -20,25 +19,26 @@ public class Macro {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void populate(RdsHost host) {
+	public  Set<Probe> populate(RdsHost host) {
+		Set<Probe> probes = new HashSet<Probe>();
 		for(Object[] l: probeList) {
-			Map<String, String> attrs = (Map) l[0];
+			Map<String, String> attrs = (Map<String, String>) l[0];
 			String className = attrs.get("type");
 			String label = attrs.get("label");
 			List constArgs = (List) l[1];
-			Probe newRdsRrd = pf.makeProbe(className, constArgs);
+			Probe newRdsRrd = pf.makeProbe(className, host, constArgs);
 			if(newRdsRrd != null) {
 				if(label != null) {
 					newRdsRrd.setLabel(label);
 				}
-
-				host.addProbe(newRdsRrd);
-				HostsList.getRootGroup().addProbe(newRdsRrd);
+				host.getProbes().add(newRdsRrd);
+				//HostsList.getRootGroup().addProbe(newRdsRrd);
 			}
 		}
 		for(String tag: tags) {
 			host.addTag(tag);
 		}
+		return probes;
 	}
 
 	public void put(Object[] l) {

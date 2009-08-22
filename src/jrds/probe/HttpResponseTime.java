@@ -16,11 +16,10 @@ import java.net.URL;
  */
 public final class HttpResponseTime extends ExternalCmdProbe implements UrlProbe {
 	private URL url;
-	public HttpResponseTime(URL url)
+	
+	public void configure(URL url)
 	{
 		this.url = url;
-		//setName("url-" + Util.stringSignature(url.toString()));
-		//setCmd(new String[] {p.getProperty("urlperfpath", "./HTTPTest"), url.toString()});
 	}
 
 	/**

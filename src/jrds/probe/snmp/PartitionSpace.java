@@ -26,12 +26,12 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
 	 * @param monitoredHost
 	 * @param indexKey
 	 */
-	public PartitionSpace(String indexKey) {
-		super(indexKey);
+	public void configure(String indexKey) {
+		super.configure(indexKey);
 	}
 
-	public PartitionSpace(String keyName, OID indexKey) {
-		super(keyName, indexKey);
+	public void configure(String keyName, OID indexKey) {
+		super.configure(keyName, indexKey);
 	}
 
 	/**

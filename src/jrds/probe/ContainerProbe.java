@@ -31,11 +31,14 @@ public class ContainerProbe extends VirtualProbe {
 		}	
 	};
 
+	public ContainerProbe() {
+		super(pd);
+	}
+
 	//An array list is needed, the introspection is picky
-	public ContainerProbe(String name, ArrayList<String> graphList) {
+	public void configure(String name, ArrayList<String> graphList) {
 		logger.debug("new container: " + name);
 		setName(name);
-		setPd(pd);
 	}
 
 	@Override

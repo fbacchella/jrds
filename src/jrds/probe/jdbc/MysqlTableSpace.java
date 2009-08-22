@@ -19,12 +19,12 @@ import org.apache.log4j.Logger;
 public class MysqlTableSpace extends Mysql {
 	static final private org.apache.log4j.Logger logger = Logger.getLogger(MysqlTableSpace.class);
 
-	public MysqlTableSpace(int port, String user, String passwd, String table) {
-		super(port, user, passwd, table);
+	public void configure(int port, String user, String passwd, String table) {
+		super.configure(port, user, passwd, table);
 	}
 
-	public MysqlTableSpace(String user, String passwd, String table) {
-		super(user, passwd, table);
+	public void configure(String user, String passwd, String table) {
+		super.configure(user, passwd, table);
 	}
 
 	@Override

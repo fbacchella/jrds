@@ -15,10 +15,12 @@ import java.util.Map;
  */
 public class Raw
 extends RdsSnmpSimple {	
+
 	/**
 	 * For this probe, raw result is used
 	 * @see jrds.Probe#filterValues(java.util.Map)
 	 */
+	@SuppressWarnings("unchecked")
 	public Map<?, Number> filterValues(Map snmpVars) {
 		return (Map<?, Number>)snmpVars;
 		

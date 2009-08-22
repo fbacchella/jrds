@@ -15,7 +15,6 @@ import java.util.Set;
 
 import jrds.Probe;
 import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.snmp.SnmpRequester;
 import jrds.snmp.SnmpStarter;
 
@@ -38,17 +37,14 @@ public abstract class SnmpProbe extends Probe {
 	private SnmpRequester requester;
 	private int suffixLength = 1;
 	private OID uptimeoid = null;
-	
-	public SnmpProbe(RdsHost monitoredHost, ProbeDesc pd)
-	{
-		super(monitoredHost, pd);
-		if(nameMap == null)
-			nameMap = getPd().getCollectOids();
-	}
 
-	public SnmpProbe()
-	{
-		super();
+	/* (non-Javadoc)
+	 * @see jrds.Probe#setPd(jrds.ProbeDesc)
+	 */
+	@Override
+	public void setPd(ProbeDesc pd) {
+		super.setPd(pd);
+		nameMap = getPd().getCollectOids();
 	}
 
 	/* (non-Javadoc)
@@ -80,12 +76,6 @@ public abstract class SnmpProbe extends Probe {
 		return readOK && super.readSpecific();
 	}
 
-	public void setPd(ProbeDesc pd) {
-		super.setPd(pd);
-		if(nameMap == null)
-			nameMap = getPd().getCollectOids();
-	}
-
 	private Map<OID, String> initNameMap()
 	{
 		return getPd().getCollectOids();
@@ -104,19 +94,19 @@ public abstract class SnmpProbe extends Probe {
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.Probe#getNewSampleValues()
 	 */
-	public Map getNewSampleValues() {
-		Map retValue = null;
+	public Map<?, ?> getNewSampleValues() {
+		Map<?, ?> retValue = null;
 		if(getSnmpStarter().isStarted()) {
 			Collection<OID> oids = getOidSet();
 			if(oids != null) {
 				try {
-					retValue = requester.doSnmpGet(this.getSnmpStarter(), oids);
+					retValue = requester.doSnmpGet(getSnmpStarter(), oids);
 				} catch (IOException e) {
 					logger.error("SNMP error with probe " + this + ": " +e);
 				}
 			}
 		}
-		
+
 		return retValue;
 	}
 
@@ -142,7 +132,7 @@ public abstract class SnmpProbe extends Probe {
 				Date value = (Date) o;
 				retValue.put(oid, new Double(value.getTime()));
 			}
-			
+
 		}
 		return retValue;
 	}
