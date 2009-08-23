@@ -24,7 +24,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import jrds.factories.GraphFactory;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
-import jrds.thresholds.Threshold;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
@@ -66,7 +65,7 @@ implements Comparable<Probe>, StarterNode {
 	private boolean finished = false;
 	private String label = null;
 
-	private Map<String, Set<Threshold>> thresholds = new HashMap<String, Set<Threshold>>();
+//	private Map<String, Set<Threshold>> thresholds = new HashMap<String, Set<Threshold>>();
 
 	/**
 	 * The constructor that should be called by derived class
@@ -503,7 +502,7 @@ implements Comparable<Probe>, StarterNode {
 					if( isCollectRunning()) {
 						logger.trace(onesample.dump());
 						onesample.update();
-						checkThreshold(rrdDb);
+//						checkThreshold(rrdDb);
 					}
 				}
 			}
@@ -668,6 +667,13 @@ implements Comparable<Probe>, StarterNode {
 	}
 
 	public boolean isCollectRunning() {
+		//Detected if a connected probe failed to start
+		if(this instanceof ConnectedProbe) {
+			ConnectedProbe cp = (ConnectedProbe) this;
+			String cnxName = cp.getConnectionName();
+			if(! getStarters().find(cnxName).isStarted())
+				return false;
+		}
 		return getHost().isCollectRunning();
 	}
 
@@ -777,27 +783,27 @@ implements Comparable<Probe>, StarterNode {
 		return document;
 	}
 
-	public void addThreshold(Threshold t) {
-		Set<Threshold> tset = thresholds.get(t.dsName);
-		if(tset == null) {
-			tset = new HashSet<Threshold>();
-			thresholds.put(t.dsName, tset);
-		}
-		logger.trace("Threshold added: " + t.name);
-		tset.add(t);
-	}
-
-
-	private void checkThreshold(RrdDb rrdDb) throws IOException {
-		for(Set<Threshold> tset: thresholds.values()) {
-			for(Threshold t: tset) {
-				logger.trace("Threshold to " + this + ": " + t);
-				if(t.check(rrdDb)) 
-					t.run(this);
-			}
-		}
-	}
-
+//	public void addThreshold(Threshold t) {
+//		Set<Threshold> tset = thresholds.get(t.dsName);
+//		if(tset == null) {
+//			tset = new HashSet<Threshold>();
+//			thresholds.put(t.dsName, tset);
+//		}
+//		logger.trace("Threshold added: " + t.name);
+//		tset.add(t);
+//	}
+//
+//
+//	private void checkThreshold(RrdDb rrdDb) throws IOException {
+//		for(Set<Threshold> tset: thresholds.values()) {
+//			for(Threshold t: tset) {
+//				logger.trace("Threshold to " + this + ": " + t);
+//				if(t.check(rrdDb)) 
+//					t.run(this);
+//			}
+//		}
+//	}
+//
 	/**
 	 * @return the time step (in seconds)
 	 */

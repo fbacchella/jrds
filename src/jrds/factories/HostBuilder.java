@@ -15,8 +15,6 @@ import jrds.StarterNode;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 import jrds.snmp.SnmpStarter;
-import jrds.thresholds.Threshold;
-import jrds.thresholds.Threshold.Comparator;
 
 import org.apache.log4j.Logger;
 
@@ -134,23 +132,23 @@ public class HostBuilder extends ObjectBuilder {
 		p = pf.makeProbe(type, host, args);
 		if(p == null)
 			return null;
-		for(JrdsNode thresholdNode: probeNode.iterate(CompiledXPath.get("threshold"))) {
-			Map<String, String> thresholdAttr = thresholdNode.attrMap();
-			String name = thresholdAttr.get("name").trim();
-			String dsName = thresholdAttr.get("dsName").trim();
-			double value = Double.parseDouble(thresholdAttr.get("value").trim());
-			long duration = Long.parseLong(thresholdAttr.get("duration").trim());
-			String operationStr = thresholdAttr.get("limit").trim();
-			Comparator operation = Comparator.valueOf(operationStr.toUpperCase());
-
-			Threshold t= new Threshold(name, dsName, value, duration, operation);
-			for(JrdsNode actionNode: thresholdNode.iterate(CompiledXPath.get("action"))) {
-				String actionType = actionNode.getChild(CompiledXPath.get("@type")).getTextContent().trim().toUpperCase();
-				Threshold.Action a = Threshold.Action.valueOf(actionType);
-				t.addAction(a, makeArgs(actionNode));
-			}
-			p.addThreshold(t);
-		}
+//		for(JrdsNode thresholdNode: probeNode.iterate(CompiledXPath.get("threshold"))) {
+//			Map<String, String> thresholdAttr = thresholdNode.attrMap();
+//			String name = thresholdAttr.get("name").trim();
+//			String dsName = thresholdAttr.get("dsName").trim();
+//			double value = Double.parseDouble(thresholdAttr.get("value").trim());
+//			long duration = Long.parseLong(thresholdAttr.get("duration").trim());
+//			String operationStr = thresholdAttr.get("limit").trim();
+//			Comparator operation = Comparator.valueOf(operationStr.toUpperCase());
+//
+//			Threshold t= new Threshold(name, dsName, value, duration, operation);
+//			for(JrdsNode actionNode: thresholdNode.iterate(CompiledXPath.get("action"))) {
+//				String actionType = actionNode.getChild(CompiledXPath.get("@type")).getTextContent().trim().toUpperCase();
+//				Threshold.Action a = Threshold.Action.valueOf(actionType);
+//				t.addAction(a, makeArgs(actionNode));
+//			}
+//			p.addThreshold(t);
+//		}
 		String label = probeNode.evaluate(CompiledXPath.get("@label"));
 		if(label != null && ! "".equals(label)) {
 			logger.trace("Adding label " + label + " to " + p);
