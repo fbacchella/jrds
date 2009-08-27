@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IllegalFormatConversionException;
@@ -38,7 +39,8 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 	private String file = null;
 	private String label;
 	private List<Object> argslist = null;
-
+	Starter resolver = null;
+	
 	public void configure(URL url) {
 		this.url = url;
 		finishConfigure();
@@ -92,7 +94,21 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 		} catch (MalformedURLException e) {
 			logger.error("URL " + "http://" + host + ":" + getUrl().getPort() + getUrl().getFile() + " is invalid");
 		}
+		URL tempurl = getUrl();
+		if("http".equals(tempurl.getProtocol())) {
+			resolver = new Starter.Resolver(url.getHost()).register(getHost());
+		}
 		logger.debug("Url to collect is " + getUrl());
+	}
+
+	/* (non-Javadoc)
+	 * @see jrds.Probe#isCollectRunning()
+	 */
+	@Override
+	public boolean isCollectRunning() {
+		if (resolver != null && ! resolver.isStarted())
+			return false;
+		return super.isCollectRunning();
 	}
 
 	/**
@@ -138,9 +154,13 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 		Map<String, Number> vars = java.util.Collections.emptyMap();
 		logger.debug("Getting " + getUrl());
 		try {
-			vars = parseStream(getUrl().openStream());
+			URLConnection cnx = getUrl().openConnection();
+			cnx.setConnectTimeout(getTimeout() * 1000);
+			cnx.setReadTimeout(getTimeout() * 1000);
+			cnx.connect();
+			vars = parseStream(cnx.getInputStream());
 		} catch (IOException e) {
-			logger.error("Unable to read url " + getUrl() + " because: " + e.getMessage());
+			logger.error("Unable to read url " + getUrl() + " because: " + e);
 		}
 		return vars;
 	}
