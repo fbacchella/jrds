@@ -3,7 +3,7 @@
 <graphdesc>
   <name>CpuRawTimeSolarisGraph</name>
   <graphName>cpurawsolaris</graphName>
-  <graphTitle>CPU usage on {1}</graphTitle>
+  <graphTitle>CPU usage on ${host}</graphTitle>
   <verticalLabel>% usage</verticalLabel>
   <upperLimit>100</upperLimit>
   <add>

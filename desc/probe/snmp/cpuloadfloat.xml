@@ -4,7 +4,7 @@
   <name>CpuLoadFloat</name>
   <probeName>laverage</probeName>
   <probeClass>jrds.probe.snmp.Raw</probeClass>
-  <snmpRequester>raw</snmpRequester>
+	<specific name="requester">RAW</specific>
   <ds>
     <dsName>la1</dsName>
     <dsType>gauge</dsType>

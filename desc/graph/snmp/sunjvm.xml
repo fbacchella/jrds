@@ -5,10 +5,10 @@
 	<name>SunJVM5MemoryPool</name>
 	<graphName>jvmsun5pool-${label}</graphName>
 	<graphTitle>JVM Memory Usage for ${label}</graphTitle>
-	<verticalLabel>Bytes</verticalLabel>
 	<unit>
 		<binary />
 	</unit>
+	<verticalLabel>Bytes</verticalLabel>
 	<add>
 		<legend>Heap Memory</legend>
 	</add>
