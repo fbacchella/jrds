@@ -36,16 +36,16 @@ public class SybaseLock extends Sybase {
 	/**
 	 * 
 	 */
-	public SybaseLock(String dbName, String user, String passwd) {
-		super(dbName, user, passwd);
+	public void configure(String dbName, String user, String passwd) {
+		super.configure(dbName, user, passwd);
 		setName("sybsp-" + dbName);
 	}
 
 	/**
 	 * 
 	 */
-	public SybaseLock(Integer port, String dbName, String user, String passwd) {
-		super(port,  dbName, user, passwd);
+	public void configure(Integer port, String dbName, String user, String passwd) {
+		super.configure(port,  dbName, user, passwd);
 		setName("sybsp-" + dbName);
 	}
 

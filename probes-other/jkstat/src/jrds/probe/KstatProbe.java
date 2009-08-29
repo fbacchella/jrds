@@ -18,8 +18,8 @@ public class KstatProbe extends jrds.Probe {
 	URL remoteUrl;
 	Kstat ks;
 
-	public KstatProbe(Integer port) {
-		super();
+	public void configure(Integer port) {
+		super.configure();
 		this.port = port;
 	}
 

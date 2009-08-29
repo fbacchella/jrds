@@ -12,9 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jrds.ProbeDesc;
-
-import org.rrd4j.DsType;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -23,34 +21,31 @@ import org.rrd4j.DsType;
  * TODO 
  */
 public abstract class Sybase extends JdbcProbe {
+	static final private Logger logger = Logger.getLogger(Sybase.class);
 
-	private static final ProbeDesc pd = new ProbeDesc(5);
 	static {
-		pd.add("database_size", DsType.GAUGE);
-		pd.add("reserved", DsType.GAUGE);
-		pd.add("data", DsType.GAUGE);
-		pd.add("index_size", DsType.GAUGE);
-		pd.add("unused", DsType.GAUGE);
-		pd.setGraphClasses(new Class[] { SybaseGraph.class });
-	}
-	
-	static {
-		registerDriver(com.sybase.jdbc2.jdbc.SybDriver.class);
+		try {
+			Class<?> c;
+			c = Class.forName("com.sybase.jdbc2.jdbc.SybDriver");
+			registerDriver(c);
+		} catch (ClassNotFoundException e) {
+			logger.fatal("No Sybase jdbc drivers found");
+		}
 	}
 
 	/**
 	 * 
 	 */
-	public Sybase(String dbName, String user, String passwd) {
-		super(4100, user, passwd);
+	public void configure(String dbName, String user, String passwd) {
+		super.configure(4100, user, passwd);
 		setName("syb-" + dbName);
 	}
 
 	/**
 	 * 
 	 */
-	public Sybase(Integer port, String dbName, String user, String passwd) {
-		super(port.intValue(),  user, passwd);
+	public void configure(Integer port, String dbName, String user, String passwd) {
+		super.configure(port.intValue(),  user, passwd);
 		setName("syb-" + dbName);
 	}
 	
@@ -87,7 +82,7 @@ public abstract class Sybase extends JdbcProbe {
 
 	@Override
 	public Map<String, Number> parseRs(ResultSet rs) throws SQLException {
-		Map<String, Number> sizeMap = new HashMap<String, Number>(pd.getSize());
+		Map<String, Number> sizeMap = new HashMap<String, Number>(getPd().getSize());
 		ResultSetMetaData rsmd = rs.getMetaData();
 		int colCount = rsmd.getColumnCount();
 		

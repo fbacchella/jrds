@@ -24,23 +24,19 @@ public class SybaseInstance extends Sybase {
 		pd.setGraphClasses(new Object[] {"sybaseinstance.xml"});
 	}
 	
-	static {
-		registerDriver(com.sybase.jdbc2.jdbc.SybDriver.class);
-	}
-
 	/**
 	 * 
 	 */
-	public SybaseInstance(String user, String passwd) {
-		super("master", user, passwd);
+	public void configure(String user, String passwd) {
+		super.configure("master", user, passwd);
 		setName("sybase-" + getPort());
 	}
 
 	/**
 	 * 
 	 */
-	public SybaseInstance(Integer port, String user, String passwd) {
-		super(port,  "master", user, passwd);
+	public void configure(Integer port, String user, String passwd) {
+		super.configure(port,  "master", user, passwd);
 		setName("sybase-" + getPort());
 	}
 

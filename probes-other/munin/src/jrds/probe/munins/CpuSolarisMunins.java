@@ -7,7 +7,6 @@ package jrds.probe.munins;
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.graphe.CpuRawTimeSolarisGraph;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
@@ -30,7 +29,7 @@ public class CpuSolarisMunins extends MuninsProbe {
 
 		pd.setProbeName("cpusolarismunins");
 		pd.setMuninsProbesNames(new String[] { "cpu"});
-		pd.setGraphClasses(new Class[] {CpuRawTimeSolarisGraph.class});
+		pd.setGraphClasses(new String[] {"CpuRawTimeSolarisGraph"});
 	}
 	
 	/**
