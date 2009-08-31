@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.Probe;
-import jrds.RdsHost;
 import jrds.Util;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
@@ -52,6 +51,8 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 		starter = setStarter();
 		starter.setPasswd(passwd);
 		starter.setUser(user);
+		starter.setHost(getHost());
+		starter.register(getHost());
 	}
 
 	public void configure(int port, String user, String passwd, String dbName) {
@@ -60,6 +61,8 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 		starter.setDbName(dbName);
 		starter.setPasswd(passwd);
 		starter.setUser(user);
+		starter.setHost(getHost());
+		starter.register(getHost());
 	}
 
 	@Override
@@ -181,14 +184,6 @@ public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe 
 			logger.error("Error with" + jdbcurl + ": " + e.getLocalizedMessage());
 		}
 		return values;
-	}
-
-
-	@Override
-	public void setHost(RdsHost monitoredHost) {
-		super.setHost(monitoredHost);
-		starter.setHost(monitoredHost);
-		starter.register(monitoredHost);
 	}
 
 	/**
