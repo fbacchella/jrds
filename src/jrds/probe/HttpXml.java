@@ -42,13 +42,7 @@ public class HttpXml extends HttpProbe {
 		finishConfig(args);
 	}
 
-	public void configure() {
-		super.configure();
-		finishConfig(null);
-	}
-
 	private void finishConfig(List<Object> args) {
-		if(args != null) {
 			xpaths = new HashSet<String>(getPd().getCollectStrings().size());
 			collectKeys = new HashMap<String, String>(xpaths.size());
 			for(Map.Entry<String, String> e:getPd().getCollectStrings().entrySet()) {
@@ -60,11 +54,6 @@ public class HttpXml extends HttpProbe {
 			}
 			//args will not used again, can be discarded
 			args = null;
-		}
-		else {
-			xpaths = getPd().getCollectStrings().keySet();
-			collectKeys = getPd().getCollectStrings();
-		}		
 	}
 	
 	/* (non-Javadoc)
@@ -73,6 +62,8 @@ public class HttpXml extends HttpProbe {
 	@Override
 	public void setPd(ProbeDesc pd) {
 		super.setPd(pd);
+		xpaths = getPd().getCollectStrings().keySet();
+		collectKeys = getPd().getCollectStrings();
 	}
 
 	/* (non-Javadoc)
