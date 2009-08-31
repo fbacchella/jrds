@@ -17,7 +17,6 @@ import org.apache.log4j.Logger;
 public class ConfigObjectFactory {
 	static final private Logger logger = Logger.getLogger(ConfigObjectFactory.class);
 
-	private final ArgFactory af = new ArgFactory();
 	private GraphFactory gf;
 	private ProbeFactory pf;
 	private Map<Loader.ConfigType, ObjectBuilder> builderMap;
@@ -42,7 +41,6 @@ public class ConfigObjectFactory {
 		builderMap.put(Loader.ConfigType.PROBEDESC, new ProbeDescBuilder());
 		builderMap.put(Loader.ConfigType.SUM, new SumBuilder());
 		
-		setProperty(ObjectBuilder.properties.ARGFACTORY, af);
 		setProperty(ObjectBuilder.properties.CLASSLOADER, cl);
 		setProperty(ObjectBuilder.properties.PM, pm);
 	}

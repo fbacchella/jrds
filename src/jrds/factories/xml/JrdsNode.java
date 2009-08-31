@@ -485,4 +485,11 @@ public class JrdsNode implements Node {
 	public String toString() {
 		return parent.toString();
 	}
+
+	/**
+	 * @return the parent
+	 */
+	public Node getParent() {
+		return parent;
+	}
 }

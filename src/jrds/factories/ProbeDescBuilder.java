@@ -101,7 +101,7 @@ public class ProbeDescBuilder extends ObjectBuilder {
 		//Populating default argument vector
 		JrdsNode argsNode = probeDescNode.getChild(CompiledXPath.get("defaultargs"));
 		if(argsNode != null)
-			for(Object o:  makeArgs(argsNode)) {
+			for(Object o:  ArgFactory.makeArgs(argsNode)) {
 				pd.addDefaultArg(o);
 			}
 

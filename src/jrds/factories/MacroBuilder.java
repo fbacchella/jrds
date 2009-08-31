@@ -1,13 +1,13 @@
 package jrds.factories;
 
-import java.util.List;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
 
 import jrds.Macro;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
+
+import org.apache.log4j.Logger;
+import org.w3c.dom.DocumentFragment;
 
 public class MacroBuilder extends ObjectBuilder {
 	static final private Logger logger = Logger.getLogger(MacroBuilder.class);
@@ -33,9 +33,10 @@ public class MacroBuilder extends ObjectBuilder {
 		//Populating default argument vector
 		for(JrdsNode probeNode: n.iterate(CompiledXPath.get("/macrodef/probe | /macrodef/rrd"))) {
 			Map<String, String> attrMap = probeNode.attrMap();
-			List<Object> args = makeArgs(probeNode);
-			Object[] l = new Object[] {attrMap, args};
-			m.put(l);
+			DocumentFragment argsFragment = probeNode.getOwnerDocument().createDocumentFragment();
+			argsFragment.appendChild(probeNode.getParent());
+			JrdsNode args = new JrdsNode(argsFragment.getFirstChild());
+			m.put(attrMap, args);
 		}
 		return m;
 	}

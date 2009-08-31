@@ -71,8 +71,6 @@ public class HostBuilder extends ObjectBuilder {
 			try {
 				Probe p = makeProbe(probeNode, host);
 				if(p != null && p.checkStore()) {
-					logger.trace(p);
-//					host.addProbe(p);
 					host.getProbes().add(p);
 				}
 				JrdsNode snmpProbeNode = probeNode.getChild(CompiledXPath.get("snmp"));
@@ -81,7 +79,7 @@ public class HostBuilder extends ObjectBuilder {
 					starter.register(p);
 				}
 				Map<String, String> nodeprop = makeProperties(probeNode);
-				if(nodeprop != null) {
+				if(nodeprop != null && nodeprop.size() > 0) {
 					ChainedProperties temp = new ChainedProperties(nodeprop);
 					temp.register(p);
 				}
@@ -92,12 +90,20 @@ public class HostBuilder extends ObjectBuilder {
 				e.printStackTrace();
 			}
 		}
-		for(JrdsNode probeNode: hostNode.iterate(CompiledXPath.get("macro/@name"))) {
-			String name = probeNode.getTextContent();
-			logger.trace("Adding macro " + name + ": " + macrosMap.get(name));
+		for(JrdsNode macroNode: hostNode.iterate(CompiledXPath.get("macro"))) {
+			String name = macroNode.attrMap().get("name");
 			Macro m = macrosMap.get(name);
+			logger.trace("Adding macro " + name + ": " + m);
 			if(m != null) {
-				m.populate(host);
+				Map<String, String> properties = makeProperties(macroNode);
+				for(Probe p:m.populate(host, properties)) {
+					if(p != null && p.checkStore()) {
+						host.getProbes().add(p);
+					}
+				}
+			}
+			else {
+				logger.error("Unknown macro:" + name);
 			}
 		}
 		return host;
@@ -127,28 +133,28 @@ public class HostBuilder extends ObjectBuilder {
 
 	public Probe makeProbe(JrdsNode probeNode, RdsHost host) {
 		Probe p = null;
-		List<Object> args = makeArgs(probeNode);
+		List<Object> args = ArgFactory.makeArgs(probeNode);
 		String type = probeNode.attrMap().get("type");
 		p = pf.makeProbe(type, host, args);
 		if(p == null)
 			return null;
-//		for(JrdsNode thresholdNode: probeNode.iterate(CompiledXPath.get("threshold"))) {
-//			Map<String, String> thresholdAttr = thresholdNode.attrMap();
-//			String name = thresholdAttr.get("name").trim();
-//			String dsName = thresholdAttr.get("dsName").trim();
-//			double value = Double.parseDouble(thresholdAttr.get("value").trim());
-//			long duration = Long.parseLong(thresholdAttr.get("duration").trim());
-//			String operationStr = thresholdAttr.get("limit").trim();
-//			Comparator operation = Comparator.valueOf(operationStr.toUpperCase());
-//
-//			Threshold t= new Threshold(name, dsName, value, duration, operation);
-//			for(JrdsNode actionNode: thresholdNode.iterate(CompiledXPath.get("action"))) {
-//				String actionType = actionNode.getChild(CompiledXPath.get("@type")).getTextContent().trim().toUpperCase();
-//				Threshold.Action a = Threshold.Action.valueOf(actionType);
-//				t.addAction(a, makeArgs(actionNode));
-//			}
-//			p.addThreshold(t);
-//		}
+		//		for(JrdsNode thresholdNode: probeNode.iterate(CompiledXPath.get("threshold"))) {
+		//			Map<String, String> thresholdAttr = thresholdNode.attrMap();
+		//			String name = thresholdAttr.get("name").trim();
+		//			String dsName = thresholdAttr.get("dsName").trim();
+		//			double value = Double.parseDouble(thresholdAttr.get("value").trim());
+		//			long duration = Long.parseLong(thresholdAttr.get("duration").trim());
+		//			String operationStr = thresholdAttr.get("limit").trim();
+		//			Comparator operation = Comparator.valueOf(operationStr.toUpperCase());
+		//
+		//			Threshold t= new Threshold(name, dsName, value, duration, operation);
+		//			for(JrdsNode actionNode: thresholdNode.iterate(CompiledXPath.get("action"))) {
+		//				String actionType = actionNode.getChild(CompiledXPath.get("@type")).getTextContent().trim().toUpperCase();
+		//				Threshold.Action a = Threshold.Action.valueOf(actionType);
+		//				t.addAction(a, makeArgs(actionNode));
+		//			}
+		//			p.addThreshold(t);
+		//		}
 		String label = probeNode.evaluate(CompiledXPath.get("@label"));
 		if(label != null && ! "".equals(label)) {
 			logger.trace("Adding label " + label + " to " + p);
@@ -167,7 +173,7 @@ public class HostBuilder extends ObjectBuilder {
 
 	public void makeConnexion(JrdsNode domNode, StarterNode sNode) {
 		for(JrdsNode cnxNode: domNode.iterate(CompiledXPath.get("connection"))) {
-			List<Object> args = makeArgs(cnxNode);
+			List<Object> args = ArgFactory.makeArgs(cnxNode);
 			String type = cnxNode.attrMap().get("type");
 			if(type == null) {
 				logger.equals("No type declared");
