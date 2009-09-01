@@ -28,7 +28,9 @@ public class Macro {
 		for(ProbeInfo pi: probeList) {
 			Map<String, String> attrs = pi.attrs;
 			String className = attrs.get("type");
-			String label = jrds.Util.parseTemplate(attrs.get("label"), properties, host);
+			String label = attrs.get("label");
+			if(label != null)
+				label = jrds.Util.parseTemplate(label, properties, host);
 			List<?> constArgs = ArgFactory.makeArgs(pi.args, properties, host);
 			Probe newRdsRrd = pf.makeProbe(className, host, constArgs);
 			if(newRdsRrd != null) {
