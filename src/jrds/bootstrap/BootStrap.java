@@ -33,10 +33,9 @@ public class BootStrap {
 			rootUrl = me;
 		}
 
-
 		File file = new File(rootUrl.getFile());
 		File baseClassPath = file.getParentFile();
-		classPath.add(baseClassPath.toURL());
+		classPath.add(baseClassPath.toURI().toURL());
 
 		FileFilter jarfilter = new  FileFilter(){
 			public boolean accept(File file) {
@@ -44,7 +43,7 @@ public class BootStrap {
 			}
 		};
 		for(File f: baseClassPath.listFiles(jarfilter)) {
-			classPath.add(f.toURL());
+			classPath.add(f.toURI().toURL());
 		}
 
 		Map<String, String> configuration = new HashMap<String, String>();
@@ -53,13 +52,14 @@ public class BootStrap {
 			configuration.put("propertiesFile", propertiesFile);
 		}
 		
-		String webRoot = baseClassPath.getAbsolutePath().replace("/WEB-INF/lib", "");
-		if(new File(webRoot).isDirectory()) {
-			configuration.put("webRoot", webRoot);
+		//To remove WEB-INF/lib in the path and find the web root
+		File webRoot = baseClassPath.getParentFile().getParentFile();
+		if(webRoot.isDirectory()) {
+			configuration.put("webRoot", webRoot.getAbsolutePath());
 		}
 		 
 		try {
-			ClassLoader cl = URLClassLoader.newInstance(classPath.toArray(new URL[]{}));
+			ClassLoader cl = URLClassLoader.newInstance(classPath.toArray(new URL[classPath.size()]));
 			Class<?>  jettyStarter = cl.loadClass("jrds.standalone.Jetty");
 			CommandStarter cmd = (CommandStarter) jettyStarter.newInstance();
 			cmd.configure(configuration);
