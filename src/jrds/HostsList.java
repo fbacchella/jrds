@@ -188,7 +188,7 @@ public class HostsList implements StarterNode {
 		logger.debug("Parsing graphs configuration");
 		Map<String, GraphDesc> graphs = conf.setGrapMap(l.getRepository(Loader.ConfigType.GRAPH));
 		if(! graphs.isEmpty()) {
-			ContainerProbe cp = new ContainerProbe();
+			ContainerProbe cp = new ContainerProbe(customhost.getName());
 			for(GraphDesc gd: graphs.values()) {
 				logger.trace("Adding graphdesc: " + gd.getGraphTitle());
 				cp.addGraph(gd);

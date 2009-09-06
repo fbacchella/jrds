@@ -29,6 +29,11 @@ public class Jetty implements CommandStarter {
 	}
 
 	public void configure(Map<String, String> configuration) {
+		try {
+			jrds.JrdsLoggerConfiguration.initLog4J();
+		} catch (IOException e) {
+			throw new RuntimeException("Log configuration failed",e);
+		}
 		logger.debug("Configuration: " + configuration);
 		port = jrds.Util.parseStringNumber(configuration.get("jetty.port"), Integer.class, 8080).intValue();
 		propFile = configuration.get("propFile");
@@ -36,11 +41,6 @@ public class Jetty implements CommandStarter {
 	}
 	
 	public void start() {
-		try {
-			jrds.JrdsLoggerConfiguration.initLog4J();
-		} catch (IOException e) {
-			throw new RuntimeException("Log configuration failed",e);
-		}
 		Logger.getRootLogger().setLevel(Level.ERROR);
 
 		Server server = new Server();

@@ -31,8 +31,9 @@ public class ContainerProbe extends VirtualProbe {
 		}	
 	};
 
-	public ContainerProbe() {
+	public ContainerProbe(String name) {
 		super(pd);
+		setName(name);
 	}
 
 	//An array list is needed, the introspection is picky

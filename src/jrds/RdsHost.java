@@ -108,7 +108,7 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 			starters.stopCollect();
 		long end = System.currentTimeMillis();
 		float elapsed = ((float)(end - start))/1000;
-		logger.trace("Collect time for " + name + ": " + elapsed + "s");
+		logger.debug("Collect time for " + name + ": " + elapsed + "s");
 	}
 
 	public String toString()

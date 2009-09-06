@@ -21,6 +21,8 @@ import org.apache.log4j.Logger;
 public class HostBuilder extends ObjectBuilder {
 	static final private Logger logger = Logger.getLogger(HostBuilder.class);
 
+	private ClassLoader classLoader = null;
+
 	private ProbeFactory pf;
 	private Map<String, Macro> macrosMap;
 
@@ -181,7 +183,7 @@ public class HostBuilder extends ObjectBuilder {
 			String name = cnxNode.attrMap().get("name");
 			Connection o = null;
 			try {
-				Class<?> connectionClass = Class.forName(type);
+				Class<?> connectionClass = classLoader.loadClass(type);
 				Class<?>[] constArgsType = new Class[args.size()];
 				Object[] constArgsVal = new Object[args.size()];
 				int index = 0;
@@ -197,6 +199,9 @@ public class HostBuilder extends ObjectBuilder {
 				o.register(sNode);
 				logger.debug("Connexion registred: " + o + " for " + sNode);
 			}
+			catch (NoClassDefFoundError ex) {
+				logger.warn("Connection class not found: " + type+ ": " + ex);
+			}
 			catch (ClassCastException ex) {
 				logger.warn("didn't get a Connection but a " + o.getClass().getName());
 			}
@@ -204,9 +209,7 @@ public class HostBuilder extends ObjectBuilder {
 				logger.warn("Error during connection creation of type " + type +
 						": " + ex, ex);
 			}
-
 		}
-
 	}
 
 	@SuppressWarnings("unchecked")
@@ -214,6 +217,9 @@ public class HostBuilder extends ObjectBuilder {
 	public
 	void setProperty(ObjectBuilder.properties name, Object o) {
 		switch(name) {
+		case CLASSLOADER:
+			classLoader = (ClassLoader) o;
+			break;
 		case MACRO:
 			macrosMap = (Map<String, Macro>) o;
 			break;

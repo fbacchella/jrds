@@ -108,6 +108,10 @@ public class ProbeFactory {
 				Constructor<? extends Probe> c = probeClass.getConstructor();
 				retValue = c.newInstance();
 			}
+			catch (LinkageError ex) {
+				logger.warn("Error creating probe's class " + probeClass);
+				return null;
+			}
 			catch (ClassCastException ex) {
 				logger.warn("didn't get a Probe but a " + retValue.getClass().getName());
 				return null;

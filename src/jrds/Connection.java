@@ -93,7 +93,10 @@ public abstract class Connection extends Starter {
 	 */
 	@Override
 	public void stop() {
+		long begin = new Date().getTime();
 		stopConnection();
+		long end = new Date().getTime();
+		logger.debug("Stopped connection " + getKey() + " for " + getHostName() +" took "  + (end - begin) + "ms");
 	}
 
 	public abstract boolean startConnection();

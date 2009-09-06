@@ -122,9 +122,9 @@ public class PropertiesManager extends Properties {
 			logger.warn("Invalid properties stream " + propStream + ": " + ex);
 		}
 	}
-	
-	private ClassLoader doClassLoader() {
-		 FileFilter filter = new  FileFilter(){
+
+	private ClassLoader doClassLoader(String extendedclasspath) {
+		FileFilter filter = new  FileFilter(){
 			public boolean accept(File file) {
 				return  (! file.isHidden()) && file.isFile() && file.getName().endsWith(".jar");
 			}
@@ -132,15 +132,23 @@ public class PropertiesManager extends Properties {
 
 		Collection<URL> urls = new HashSet<URL>();
 
-		if(extensiondir != null) {
-			logger.debug("Setting class directories to: " + extensiondir);
+		if(extendedclasspath != null && ! "".equals(extendedclasspath)) {
+			for(String pathElement: extendedclasspath.split(";")) {
+				logger.debug("Setting class directories to: " + pathElement);
 
-			File path = new File(extensiondir);
+				File path = new File(pathElement);
 
-			if(path.isDirectory()) {
-				for(File f: path.listFiles(filter)) {
+				if(path.isDirectory()) {
+					for(File f: path.listFiles(filter)) {
+						try {
+							urls.add(f.toURL());
+						} catch (MalformedURLException e) {
+						}
+					}
+				}
+				else if(filter.accept(path)) {
 					try {
-						urls.add(f.toURL());
+						urls.add(path.toURL());
 					} catch (MalformedURLException e) {
 					}
 				}
@@ -153,7 +161,9 @@ public class PropertiesManager extends Properties {
 
 		URL[] arrayUrl = new URL[urls.size()];
 		urls.toArray(arrayUrl);
-		return  URLClassLoader.newInstance(arrayUrl, this.getClass().getClassLoader());
+		if(logger.isDebugEnabled())
+			logger.debug("Internal class loader will look in:" + urls);
+		return  URLClassLoader.newInstance(arrayUrl, getClass().getClassLoader());
 	}
 
 	public void update()
@@ -183,6 +193,7 @@ public class PropertiesManager extends Properties {
 		configdir = getProperty("configdir", "config");
 		rrddir = getProperty("rrddir", "probe");
 		step = parseInteger(getProperty("step", "300"));
+		timeout = parseInteger(getProperty("timeout", "30"));
 		collectorThreads = parseInteger(getProperty("collectorThreads", "1"));
 		dbPoolSize = parseInteger(getProperty("dbPoolSize", "10")) + collectorThreads;
 		syncPeriod = parseInteger(getProperty("syncPeriod", "-1"));
@@ -201,8 +212,16 @@ public class PropertiesManager extends Properties {
 			}
 		}
 
-		tmpdir = getProperty("tmpdir", "/var/tmp/jrds");
-		File tmpDirFile = new File(tmpdir);
+		//Let's try to be clever to do not use path separator
+		File tmpDirFile = null;
+		String tmpdir = getProperty("tmpdir","");
+		if("".equals(tmpdir)) {
+			File systemtmpdir = new File(System.getProperty("java.io.tmpdir"));
+			tmpDirFile = new File(systemtmpdir, "jrds");
+		}
+		else {
+			tmpDirFile = new File(tmpdir);
+		}
 		if( ! tmpDirFile.exists()) {
 			if ( !tmpDirFile.mkdirs()) {
 				logger.error(tmpdir + " doesn't exists and can't be created");
@@ -214,21 +233,13 @@ public class PropertiesManager extends Properties {
 		else if( ! tmpDirFile.canWrite()) {
 			logger.error(tmpdir + " exists can not be written");
 		}
-		
-		timeout = parseInteger(getProperty("timeout", "30"));
+
 		rrdbackend = getProperty("rrdbackend", "NIO");
-		extensionClassLoader = doClassLoader();
-		String actionMailFrom = getProperty("action.mail.from", "root");
-		Threshold.mailappender.setFrom(actionMailFrom);
-		String actionMailTo = getProperty("action.mail.to", "root");
-		Threshold.mailappender.setTo(actionMailTo);
-		String actionMailHost = getProperty("action.mail.host", "localhost");
-		Threshold.mailappender.setSMTPHost(actionMailHost);
-		Threshold.mailappender.activateOptions();
+		extensionClassLoader = doClassLoader(getProperty("extensionsdir", ""));
+
 
 		Locale.setDefault(new Locale("POSIX"));
 	}
-
 
 	public String configdir;
 	public String urlpngroot;
@@ -239,13 +250,12 @@ public class PropertiesManager extends Properties {
 	public int dbPoolSize;
 	public int syncPeriod;
 	public final Set<URL> libspath = new HashSet<URL>();
+	public ClassLoader extensionClassLoader;
 	public final Map<Level, List<String>> loglevels = new HashMap<Level, List<String>>();
 	public Level loglevel;
 	public boolean legacymode;
 	public String tmpdir;
 	public int timeout;
 	public String rrdbackend;
-	public String extensiondir;
-	public ClassLoader extensionClassLoader;
 
 }

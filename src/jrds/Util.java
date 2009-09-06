@@ -252,10 +252,16 @@ public class Util {
 
 	@SuppressWarnings("unchecked")
 	public static String parseTemplate(String template, Object... arguments) {
+		//Don't lose time with an empty template
+		if(template == null || "".equals(template.trim())) {
+			return template;
+		}
+		
 		Map<String, Object> env = new HashMap<String, Object>();
 		StarterNode node = null;
 		for(Object o: arguments) {
-			logger.trace("Argument for template: " + o.getClass());
+			if(logger.isTraceEnabled())
+				logger.trace("Argument for template \"" + template + "\": " + o.getClass());
 			if( o instanceof IndexedProbe) {
 				String index = ((IndexedProbe) o).getIndexName();
 				env.put("index", index);
@@ -313,8 +319,9 @@ public class Util {
 				}
 			}
 		}
+		if(logger.isDebugEnabled())
+			logger.debug("Properties to use for parsing template \"" + template + "\": " + env);
 
-		logger.trace("Properties to use for parsing: " + env + " with template "+ template);
 		return jrds.Util.evaluateVariables(template, env, node);
 	}
 

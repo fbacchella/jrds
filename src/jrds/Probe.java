@@ -795,6 +795,7 @@ implements Comparable<Probe>, StarterNode {
 //
 //
 //	private void checkThreshold(RrdDb rrdDb) throws IOException {
+//	rrdDb = StoreOpener.getRrd(getRrdName());
 //		for(Set<Threshold> tset: thresholds.values()) {
 //			for(Threshold t: tset) {
 //				logger.trace("Threshold to " + this + ": " + t);
@@ -803,7 +804,7 @@ implements Comparable<Probe>, StarterNode {
 //			}
 //		}
 //	}
-//
+
 	/**
 	 * @return the time step (in seconds)
 	 */
