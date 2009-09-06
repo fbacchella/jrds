@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -154,22 +155,26 @@ public class Loader {
 	}
 
 	public void importUrl(URL ressourceUrl) {
-		logger.debug("Importing " + ressourceUrl);
-		String protocol = ressourceUrl.getProtocol();
-		if("file".equals(protocol)) {
-			String fileName = ressourceUrl.getFile();
-			File imported = new File(fileName);
-			if(imported.isDirectory())
-				importDir(imported);
-			else if(fileName.endsWith(".jar"))
-				importJar(imported);
-		}
-		else if("jar".equals(protocol)) {
-			String [] urlelems = ressourceUrl.toString().split("[:!]");
-			importJar(new File(urlelems[2]));
-		}
-		else {
-			logger.error("ressource " + ressourceUrl + " can't be loaded" );
+		try {
+			logger.debug("Importing " + ressourceUrl);
+			String protocol = ressourceUrl.getProtocol();
+			if("file".equals(protocol)) {
+				String fileName = ressourceUrl.getFile();
+				File imported = new File(fileName);
+				if(imported.isDirectory())
+					importDir(imported);
+				else if(fileName.endsWith(".jar"))
+					importJar(new JarFile(imported));
+			}
+			else if("jar".equals(protocol)) {
+				JarURLConnection cnx = (JarURLConnection)ressourceUrl.openConnection();
+				importJar(cnx.getJarFile());
+			}
+			else {
+				logger.error("ressource " + ressourceUrl + " can't be loaded" );
+			}
+		} catch (IOException e) {
+			logger.error("Invalid URL " + ressourceUrl + ": " + e);
 		}
 
 	}
@@ -201,26 +206,21 @@ public class Loader {
 		}
 	}
 
-	public void importJar(File jarfile) {
-		try {
-			JarFile probesjar = new JarFile(jarfile);
-			for(JarEntry je: Collections.list(probesjar.entries())) {
-				String name = je.getName();
-				if( !je.isDirectory() && name.endsWith(".xml") && (name.startsWith("desc/") || name.startsWith("graph/") || name.startsWith("probe/"))) {
-					logger.trace("Will import " + je);
-					try {
-						if(! importStream(probesjar.getInputStream(je))) {
-							logger.warn("Unknonw type " + je + " in jar " + jarfile);
-						}
-					} catch (SAXParseException e) {
-						logger.error("Invalid xml document " + je + " in " + jarfile + " (line " + e.getLineNumber() + "): " + e.getMessage());
-					} catch (SAXException e) {
-						logger.error("Invalid xml document " + je + " in " + jarfile + ": " + e);
+	public void importJar(JarFile jarfile) throws IOException {
+		for(JarEntry je: Collections.list(jarfile.entries())) {
+			String name = je.getName();
+			if( !je.isDirectory() && name.endsWith(".xml") && (name.startsWith("desc/") || name.startsWith("graph/") || name.startsWith("probe/"))) {
+				logger.trace("Will import " + je);
+				try {
+					if(! importStream(jarfile.getInputStream(je))) {
+						logger.warn("Unknonw type " + je + " in jar " + jarfile);
 					}
+				} catch (SAXParseException e) {
+					logger.error("Invalid xml document " + je + " in " + jarfile + " (line " + e.getLineNumber() + "): " + e.getMessage());
+				} catch (SAXException e) {
+					logger.error("Invalid xml document " + je + " in " + jarfile + ": " + e);
 				}
 			}
-		} catch (IOException e) {
-			logger.error("Invalid jar " + jarfile + ": " + e);
 		}
 	}
 
