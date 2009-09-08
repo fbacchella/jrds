@@ -83,10 +83,6 @@ public class PropertiesManager extends Properties {
 		return retValue;
 	}
 
-	private List<String> parseLogLevel(String value) {
-		return Arrays.asList(value.split(","));
-	}
-
 	public void join(URL url) {
 		try {
 			InputStream inputstream = url.openStream();
@@ -141,15 +137,17 @@ public class PropertiesManager extends Properties {
 				if(path.isDirectory()) {
 					for(File f: path.listFiles(filter)) {
 						try {
-							urls.add(f.toURL());
+							urls.add(f.toURI().toURL());
 						} catch (MalformedURLException e) {
+							logger.fatal("What is this library " + f);
 						}
 					}
 				}
 				else if(filter.accept(path)) {
 					try {
-						urls.add(path.toURL());
+						urls.add(path.toURI().toURL());
 					} catch (MalformedURLException e) {
+						logger.fatal("What is this library " + path);
 					}
 				}
 			}
@@ -168,16 +166,14 @@ public class PropertiesManager extends Properties {
 
 	public void update()
 	{
-		String[] levels = { "trace", "debug", "info", "error"};
-		String[] defaultLevel = { "", "", "", "org.snmp4j,org.apache"};
-		for(int i = 0; i < levels.length; i++) {
-			String ls = levels[i];
+		for(String ls: new String[]{ "trace", "debug", "info", "error", "fatal", "warn"}) {
 			Level l = Level.toLevel(ls);
-			String param = getProperty("log." + ls, defaultLevel[i]);
+			String param = getProperty("log." + ls, "");
 			if(! "".equals(param)) {
-				List<String> loggerList = parseLogLevel(param);
+				List<String> loggerList = Arrays.asList(param.split(","));
 				loglevels.put(l, loggerList);
 			}
+			
 		}
 		loglevel = Level.toLevel(getProperty("loglevel", "info"));
 		logfile = getProperty("logfile", "");
@@ -186,9 +182,9 @@ public class PropertiesManager extends Properties {
 		try {
 			jrds.JrdsLoggerConfiguration.configure(this);
 		} catch (IOException e1) {
-			logger.error("Unable to set log file to " + this.logfile);
+			logger.error("Unable to set log file to " + this.logfile + ": " + e1);
 		}
-
+		
 		legacymode = parseBoolean(getProperty("legacymode", "1"));
 		configdir = getProperty("configdir", "config");
 		rrddir = getProperty("rrddir", "probe");
@@ -203,7 +199,7 @@ public class PropertiesManager extends Properties {
 				File lib = new File(libName);
 				if(lib.isFile() || lib.isDirectory())
 					try {
-						libspath.add(lib.toURL());
+						libspath.add(lib.toURI().toURL());
 					} catch (MalformedURLException e) {
 						logger.fatal("What is this library " + lib);
 					}
@@ -211,6 +207,7 @@ public class PropertiesManager extends Properties {
 						logger.error("Invalid lib path: "+ libName);
 			}
 		}
+		extensionClassLoader = doClassLoader(getProperty("classpath", ""));
 
 		//Let's try to be clever to do not use path separator
 		File tmpDirFile = null;
@@ -235,8 +232,6 @@ public class PropertiesManager extends Properties {
 		}
 
 		rrdbackend = getProperty("rrdbackend", "NIO");
-		extensionClassLoader = doClassLoader(getProperty("extensionsdir", ""));
-
 
 		Locale.setDefault(new Locale("POSIX"));
 	}

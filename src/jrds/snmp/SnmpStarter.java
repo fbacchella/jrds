@@ -5,16 +5,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import jrds.JrdsLoggerConfiguration;
 import jrds.Starter;
 import jrds.StarterNode;
 import jrds.StartersSet;
 import jrds.probe.snmp.SnmpProbe;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.Target;
+import org.snmp4j.log.Log4jLogFactory;
 import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.smi.Address;
 import org.snmp4j.smi.GenericAddress;
@@ -26,6 +30,17 @@ import org.snmp4j.util.DefaultPDUFactory;
 import org.snmp4j.util.PDUFactory;
 
 public class SnmpStarter extends Starter {
+	//Used to setup the log configuration of SNMP4J
+	static {
+		org.snmp4j.log.LogFactory.setLogFactory(new Log4jLogFactory());
+		//If not already configured, we filter it
+		Logger snmpLogger = LogManager.getLoggerRepository().exists("org.snmp4j");
+		if(snmpLogger != null) {
+			snmpLogger.setLevel(Level.ERROR);
+			JrdsLoggerConfiguration.joinAppender("org.snmp4j");
+		}
+	}
+
 	static final private Logger logger = Logger.getLogger(SnmpStarter.class);
 	static final String TCP = "tcp";
 	static final String UDP = "udp";
@@ -64,6 +79,7 @@ public class SnmpStarter extends Starter {
 			return "SNMP root";
 		}
 	};
+	
 
 	private int version = SnmpConstants.version2c;
 	private String proto = UDP;
