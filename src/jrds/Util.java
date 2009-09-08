@@ -7,7 +7,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -256,7 +258,7 @@ public class Util {
 		if(template == null || "".equals(template.trim())) {
 			return template;
 		}
-		
+
 		Map<String, Object> env = new HashMap<String, Object>();
 		StarterNode node = null;
 		for(Object o: arguments) {
@@ -377,6 +379,25 @@ public class Util {
 		StreamResult result = new StreamResult(out);
 		transformer.transform(source, result);
 		out.flush();
+	}
+
+	public static <T> Iterable<T> iterate(final Enumeration<T> en) {
+		final Iterator<T> iterator = new Iterator<T>() {
+			public boolean hasNext() {  
+				return en.hasMoreElements();  
+			}
+			public T next() {
+				return en.nextElement();  
+			}
+			public void remove() {
+				throw new UnsupportedOperationException();  
+			}
+		};
+		return new Iterable<T>() {
+			public Iterator<T> iterator() {
+				return iterator;
+			}
+		};
 	}
 }
 
