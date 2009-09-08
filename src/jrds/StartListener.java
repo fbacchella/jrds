@@ -84,6 +84,11 @@ public class StartListener implements ServletContextListener {
 					pm.join(propStream);
 				}
 
+				for(String attr: jrds.Util.iterate((Enumeration<String>)ctxt.getInitParameterNames())) {
+					String value = ctxt.getInitParameter(attr);
+					pm.setProperty(attr, value);
+				}
+				
 				String localPropFile = ctxt.getInitParameter("propertiesFile");
 				if(localPropFile != null)
 					pm.join(new File(localPropFile));
@@ -91,7 +96,7 @@ public class StartListener implements ServletContextListener {
 				localPropFile = System.getProperty("propertiesFile");
 				if(localPropFile != null)
 					pm.join(new File(localPropFile));
-
+				
 				pm.update();
 
 				System.setProperty("java.awt.headless","true");
