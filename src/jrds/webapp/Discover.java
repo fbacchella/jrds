@@ -126,7 +126,7 @@ public class Discover extends HttpServlet {
 			l.importUrl(lib);
 		}
 
-		l.importDir(new File(pm.configdir));
+		l.importDir(pm.configdir);
 
 		try {
 			Document hostDom = generate(hostname, l.getRepository(Loader.ConfigType.PROBEDESC).values(), withOid, request.getParameterValues("tag"));

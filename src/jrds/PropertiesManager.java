@@ -25,19 +25,18 @@ import org.apache.log4j.Logger;
  * An less ugly class suposed to manage properties
  * should be reworked
  * @author Fabrice Bacchella
+ * @version $Revision$,  $Date$
  */
 public class PropertiesManager extends Properties {
 	private final Logger logger = Logger.getLogger(PropertiesManager.class);
 
 	public PropertiesManager()
 	{
-		join(System.getProperties());
 		update();
 	}
 
 	public PropertiesManager(File propFile)
 	{
-		join(System.getProperties());
 		join(propFile);
 		update();
 	}
@@ -164,30 +163,75 @@ public class PropertiesManager extends Properties {
 		return  URLClassLoader.newInstance(arrayUrl, getClass().getClassLoader());
 	}
 
+	private File prepareDir(File dir) {
+		if( ! dir.exists()) {
+			if(! autocreate) {
+				logger.error(dir + " doesn't exists");
+				return null;
+			}
+			if ( autocreate && !dir.mkdirs()) {
+				logger.error(dir + " doesn't exists and can't be created");
+				return null;
+			}
+		}
+		else if( ! dir.isDirectory()) {
+			logger.error(dir + " exists but is not a Directory");
+			return null;
+		}
+		else if( ! dir.canWrite()) {
+			logger.error(dir + " exists can not be written");
+			return null;
+		}
+		return dir;
+	}
+
+	private File prepareDir(String path) {
+		if(path == null || "".equals(path)) {
+			return null;
+		}
+		File dir = new File(path);
+		return prepareDir(dir);
+	}
+
 	public void update()
 	{
-		for(String ls: new String[]{ "trace", "debug", "info", "error", "fatal", "warn"}) {
-			Level l = Level.toLevel(ls);
-			String param = getProperty("log." + ls, "");
-			if(! "".equals(param)) {
-				List<String> loggerList = Arrays.asList(param.split(","));
-				loglevels.put(l, loggerList);
-			}
-			
-		}
-		loglevel = Level.toLevel(getProperty("loglevel", "info"));
-		logfile = getProperty("logfile", "");
+		boolean nologgin = parseBoolean(getProperty("nologging", "false"));
+		if(! nologgin) {
+			for(String ls: new String[]{ "trace", "debug", "info", "error", "fatal", "warn"}) {
+				Level l = Level.toLevel(ls);
+				String param = getProperty("log." + ls, "");
+				if(! "".equals(param)) {
+					List<String> loggerList = Arrays.asList(param.split(","));
+					loglevels.put(l, loggerList);
+				}
 
-		//Let's configure the log fast
-		try {
-			jrds.JrdsLoggerConfiguration.configure(this);
-		} catch (IOException e1) {
-			logger.error("Unable to set log file to " + this.logfile + ": " + e1);
+			}
+			loglevel = Level.toLevel(getProperty("loglevel", "info"));
+			logfile = getProperty("logfile", "");
+
+			//Let's configure the log fast
+			try {
+				jrds.JrdsLoggerConfiguration.configure(this);
+			} catch (IOException e1) {
+				logger.error("Unable to set log file to " + this.logfile + ": " + e1);
+			}
 		}
-		
 		legacymode = parseBoolean(getProperty("legacymode", "1"));
-		configdir = getProperty("configdir", "config");
-		rrddir = getProperty("rrddir", "probe");
+
+		//Directories configuration
+		autocreate = parseBoolean(getProperty("autocreate", "false"));
+		configdir = prepareDir(getProperty("configdir"));
+		rrddir = prepareDir(getProperty("rrddir"));
+		//Different place to find the tempdirectory
+		tmpdir = prepareDir(getProperty("tmpdir"));
+		if(tmpdir == null)
+			tmpdir = prepareDir(System.getProperty("javax.servlet.context.tempdir"));
+		if(tmpdir == null) {
+			String tmpDirPath = System.getProperty("java.io.tmpdir");
+			if(tmpDirPath != null || "".equals(tmpDirPath))
+				tmpdir = prepareDir(new File(tmpDirPath, "jrds"));
+		}
+
 		step = parseInteger(getProperty("step", "300"));
 		timeout = parseInteger(getProperty("timeout", "30"));
 		collectorThreads = parseInteger(getProperty("collectorThreads", "1"));
@@ -209,36 +253,15 @@ public class PropertiesManager extends Properties {
 		}
 		extensionClassLoader = doClassLoader(getProperty("classpath", ""));
 
-		//Let's try to be clever to do not use path separator
-		File tmpDirFile = null;
-		String tmpdir = getProperty("tmpdir","");
-		if("".equals(tmpdir)) {
-			File systemtmpdir = new File(System.getProperty("java.io.tmpdir"));
-			tmpDirFile = new File(systemtmpdir, "jrds");
-		}
-		else {
-			tmpDirFile = new File(tmpdir);
-		}
-		if( ! tmpDirFile.exists()) {
-			if ( !tmpDirFile.mkdirs()) {
-				logger.error(tmpdir + " doesn't exists and can't be created");
-			}
-		}
-		else if( ! tmpDirFile.isDirectory()) {
-			logger.error(tmpdir + " exists but is not a file");
-		}
-		else if( ! tmpDirFile.canWrite()) {
-			logger.error(tmpdir + " exists can not be written");
-		}
-
 		rrdbackend = getProperty("rrdbackend", "NIO");
 
 		Locale.setDefault(new Locale("POSIX"));
 	}
 
-	public String configdir;
+	public File configdir;
+	public File rrddir;
+	public File tmpdir;
 	public String urlpngroot;
-	public String rrddir;
 	public String logfile;
 	public int step;
 	public int collectorThreads;
@@ -249,7 +272,7 @@ public class PropertiesManager extends Properties {
 	public final Map<Level, List<String>> loglevels = new HashMap<Level, List<String>>();
 	public Level loglevel;
 	public boolean legacymode;
-	public String tmpdir;
+	public boolean autocreate;
 	public int timeout;
 	public String rrdbackend;
 

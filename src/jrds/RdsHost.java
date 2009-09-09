@@ -1,5 +1,6 @@
 package jrds;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +22,7 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 	private final Set<Probe> allProbes = new TreeSet<Probe>();
 	private Set<String> tags = null;
 	private final StartersSet starters = new StartersSet(this);
-	private String hostdir = null;
+	private File hostdir = null;
 
 	public RdsHost(String newName)
 	{
@@ -62,14 +63,14 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 	/**
 	 * @param hostdir the hostdir to set
 	 */
-	public void setHostDir(String hostdir) {
+	public void setHostDir(File hostdir) {
 		this.hostdir = hostdir;
 	}
 
-	public String getHostDir()
+	public File getHostDir()
 	{
 		if(hostdir == null)
-			hostdir = HostsList.getRootGroup().getRrdDir() + org.rrd4j.core.Util.getFileSeparator() + name;
+			hostdir = new File(HostsList.getRootGroup().getRrdDir(), name);
 		return hostdir;
 	}
 

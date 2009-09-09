@@ -1,5 +1,6 @@
 package jrds.factories;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -53,7 +54,7 @@ public class HostBuilder extends ObjectBuilder {
 		hostNode.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
 
 		hostNode.setMethod(host, CompiledXPath.get("@name"), "setName");
-		host.setHostDir(pm.rrddir + org.rrd4j.core.Util.getFileSeparator() + host.getName());
+		host.setHostDir(new File(pm.rrddir, host.getName()));
 
 		JrdsNode snmpNode = hostNode.getChild(CompiledXPath.get("snmp"));
 		if(snmpNode != null) {

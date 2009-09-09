@@ -360,7 +360,7 @@ implements Comparable<Probe>, StarterNode {
 			name = parseTemplate(getPd().getProbeName());
 
 		boolean retValue = false;
-		File rrdDir = new File(monitoredHost.getHostDir());
+		File rrdDir = monitoredHost.getHostDir();
 		if (!rrdDir.isDirectory()) {
 			rrdDir.mkdir();
 		}

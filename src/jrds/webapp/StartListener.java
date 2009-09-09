@@ -62,7 +62,6 @@ public class StartListener implements ServletContextListener {
 
 				for(String attr: jrds.Util.iterate((Enumeration<String>)ctxt.getInitParameterNames())) {
 					String value = ctxt.getInitParameter(attr);
-					System.out.println(attr +" = " + value);
 					if(value != null)
 						pm.setProperty(attr, value);
 				}

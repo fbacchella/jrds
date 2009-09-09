@@ -69,8 +69,8 @@ public class HostsList implements StarterNode {
 	private final Renderer renderer = new Renderer(50);
 	private int numCollectors = 1;
 	private int step;
-	private String rrdDir;
-	private String tmpdir;
+	private File rrdDir = null;
+	private File tmpDir = null;
 	private int timeout = 10;
 	private boolean started = false;
 	private boolean collecting = false;
@@ -102,7 +102,7 @@ public class HostsList implements StarterNode {
 		filters.put(Filter.ALLVIEWS.getName(), Filter.ALLVIEWS);
 
 		filters.put(Filter.ALLSERVICES.getName(), Filter.ALLSERVICES);
-		
+
 		addRoot(TAGSROOT);
 
 
@@ -123,11 +123,21 @@ public class HostsList implements StarterNode {
 			logger.error("Unable to set log file to " + pm.logfile);
 		}
 
+		if(pm.rrddir == null) {
+			logger.error("Probes directory not configured, can't configure");
+			return;
+		}
+
+		if(pm.configdir == null) {
+			logger.error("Configuration directory not configured, can't configure");
+			return;
+		}
+
 		numCollectors = pm.collectorThreads;
 		step = pm.step;
-		rrdDir = pm.rrddir;
-		tmpdir = pm.tmpdir;
 		started = true;
+		rrdDir = pm.rrddir;
+		tmpDir = pm.tmpdir;
 
 		Loader l;
 		try {
@@ -148,7 +158,7 @@ public class HostsList implements StarterNode {
 			l.importUrl(lib);
 		}
 
-		l.importDir(new File(pm.configdir));
+		l.importDir(pm.configdir);
 
 		logger.debug("Starting parsing descriptions");
 		ConfigObjectFactory conf = new ConfigObjectFactory(pm, pm.extensionClassLoader);
@@ -174,7 +184,7 @@ public class HostsList implements StarterNode {
 			Filter f = new FilterTag(tag);
 			filters.put(f.getName(), f);
 		}
-		
+
 		Map <String, Filter> f = conf.setFilterMap(l.getRepository(Loader.ConfigType.FILTER));
 		for(Filter filter: f.values()) {
 			addFilter(filter);
@@ -417,24 +427,16 @@ public class HostsList implements StarterNode {
 		return step;
 	}
 
-	public String getRrdDir() {
+	public File getRrdDir() {
 		return rrdDir;
 	}
 
-	public String getTmpdir() {
-		return tmpdir;
-	}
-
-	public void setTmpdir(String tmpdir) {
-		this.tmpdir = tmpdir;
+	public File getTmpdir() {
+		return tmpDir;
 	}
 
 	public int getTimeout() {
 		return timeout;
-	}
-
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
 	}
 
 	public boolean isCollectRunning() {
