@@ -1,5 +1,6 @@
 package jrds;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
@@ -19,7 +20,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
 import org.apache.log4j.spi.LoggingEvent;
-import org.apache.tools.ant.filters.StringInputStream;
 import org.w3c.dom.Document;
 
 final public class Tools {
@@ -62,7 +62,7 @@ final public class Tools {
 	}
 
 	static public Document parseString(String s) throws Exception { 
-		InputStream is = new StringInputStream(s);
+		InputStream is = new ByteArrayInputStream(s.getBytes());
 		Document d = Tools.parseRessource(is);
 		return d;
 	}

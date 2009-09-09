@@ -1,5 +1,6 @@
 package jrds.factories;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -16,7 +17,6 @@ import jrds.mockobjects.GetMoke;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.tools.ant.filters.StringInputStream;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -80,7 +80,7 @@ public class TestDescFactory {
 
 	@Test
 	public void loadGraphDesc() throws Exception {
-		InputStream is = new StringInputStream(graphDescXml);
+		InputStream is = new ByteArrayInputStream(graphDescXml.getBytes());
 		Document d = Tools.parseRessource(is);
 
 		GraphDescBuilder builder = new GraphDescBuilder();
