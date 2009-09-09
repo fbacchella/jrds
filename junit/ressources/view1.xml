@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filter PUBLIC "-//jrds//DTD Filter//EN" "urn:jrds:filter">
+<filter>
+        <name>Test view 1</name>
+        <tag>test tag</tag>
+        <path>/Sorted by view/.*/Activity as operation/s/.*</path>
+        <path>/Sorted by view/.*/Average queue size/.</path>
+        <path>/Sorted by view/.*/Average request.? size/.*</path>
+        <path>/Sorted by view/.*/Average wait time/.*</path>
+        <path>/Sorted by view/Network/Interfaces/.*bond0*</path>
+        <path>/Sorted by view/System/Memory/.*</path>
+        <path>/Sorted by view/Disk/File system use/.*data.*</path>
+        <path>/Sorted by view/.*cpurawlinux</path>
+        <path>/Sorted by view/.*Services/.*</path>
+</filter>

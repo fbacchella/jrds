@@ -6,17 +6,17 @@ import java.util.HashMap;
 
 import javax.servlet.ServletException;
 
-import jrds.GetMoke;
-import jrds.JrdsTester;
+import jrds.Tools;
+import jrds.mockobjects.GetMoke;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class StatsTester  extends JrdsTester {
+public class TestStats {
+	static final private Logger logger = Logger.getLogger(TestStats.class);
+
 	@Test
 	public void testStats() throws ServletException, IOException
 	{
@@ -30,19 +30,12 @@ public class StatsTester  extends JrdsTester {
 		Assert.assertTrue(output.contains("Last collect:"));
 		Assert.assertTrue(output.contains("Last running duration:"));
 	}
-	
-	@BeforeClass static public void configure() {
-		JrdsTester.configure();
-		Logger.getLogger(ParamsBean.class).setLevel(Level.TRACE);
-		try {
-			System.out.println(GetMoke.getResponse(null).getOutputStream().getClass());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 
-	@After public void tearDown() {
+	@BeforeClass
+	static public void configure() throws IOException {
+		Tools.configure();
+		Tools.setLevel(new String[] {ParamsBean.class.getName()}, logger.getLevel());
+		logger.trace(GetMoke.getResponse(null).getOutputStream().getClass());
 	}
 
 }

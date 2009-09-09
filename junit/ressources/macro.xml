@@ -1,0 +1,12 @@
+<macrodef name="bidule">
+    <tag>bidule</tag>
+    <probe type="PerfOS_Processor" >
+        <arg type="String" value="${processor}" />
+    </probe>
+    <probe type="PerfOS_System" />
+    <probe type="PerfOS_Memory" />
+    <probe type="Process" >
+        <arg type="String" value="All svchost" />
+        <arg type="String" value=".*svchost.exe.*" />
+    </probe>
+ </macrodef> 

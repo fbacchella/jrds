@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+  <name>SybaseSpace</name>
+  <probeName>sybasespace-${index}</probeName>
+  <probeClass>jrds.probe.jdbc.Sybase</probeClass>
+  <ds>
+    <dsName>database_size</dsName>
+    <dsType>gauge</dsType>
+  </ds>
+  <ds>
+    <dsName>reserved</dsName>
+    <dsType>gauge</dsType>
+  </ds>
+  <ds>
+    <dsName>data</dsName>
+    <dsType>gauge</dsType>
+  </ds>
+  <ds>
+  	<dsName>index_size</dsName>
+  	<dsType>gauge</dsType>
+  </ds>
+  <ds>
+  	<dsName>unused</dsName>
+  	<dsType>gauge</dsType>
+  </ds>
+  <graphs>
+	<name>SybaseSize</name>
+  </graphs>
+</probedesc>

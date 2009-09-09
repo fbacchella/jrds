@@ -1,0 +1,11 @@
+<probe type="blabla" >
+	<threshold name="name1" dsName="dsName" value="100" duration="10" limit="high" />
+	<threshold name="name2" dsName="dsName" value="100" duration="10" limit="high" >
+		<action type="log">
+	      <arg type="String" value="info" />
+		</action>
+		<action type="log">
+	      <arg type="String" value="fatal" />
+		</action>
+	</threshold>
+</probe>

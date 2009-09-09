@@ -1,0 +1,7 @@
+<host name="name" dnsName="dnsName">
+	<child >1<subnode /></child>
+	<child >2</child>
+	<properties>
+		<entry key="key">value</entry>
+	</properties>
+</host>

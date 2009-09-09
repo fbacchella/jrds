@@ -4,7 +4,7 @@
 <web-app>
   <display-name>jrds</display-name>
   <listener>
-    <listener-class>jrds.StartListener</listener-class>
+    <listener-class>jrds.webapp.StartListener</listener-class>
   </listener>
   <servlet>
     <servlet-name>Last</servlet-name>

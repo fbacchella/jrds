@@ -1,0 +1,14 @@
+<host name="myhost">
+	<properties>
+		<entry key="bidule1">toto1</entry>
+	</properties>
+	<probe type="PartitionSpace">
+		<arg type="String" value="/" />
+		<properties>
+			<entry key="bidule2">toto2</entry>
+		</properties>
+	</probe>
+	<probe type="TcpSnmp">
+	</probe>
+	<snmp community="public" version="2" />
+</host>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN"
+	"urn:jrds:probedesc">
+<probedesc>
+	<name>name</name>
+	<probeName>probename</probeName>
+	<probeClass>jrds.mockobjects.MokeProbe</probeClass>
+	<specific name="specificname1">specificvalue1</specific>
+	<specific name="specificname2">specificvalue2</specific>
+	<properties>
+		<entry key="key">value</entry>
+	</properties>
+	<uptimefactor>0.5</uptimefactor>
+	<defaultargs>
+		<arg type="Integer" value="80"/>
+		<arg type="Integer" value="81"/>
+		<list>
+					<arg type="Integer" value="80"/>
+		</list>
+		<list>
+		</list>
+	</defaultargs>
+	<ds>
+		<dsName>a</dsName>
+		<dsType>counter</dsType>
+		<collect>/jrdsstats/stat[@key='a']/@value</collect>
+	</ds>
+	<ds>
+		<dsName>Total kBytes</dsName>
+		<dsType>counter</dsType>
+		<oid>.1.3.6.1.4.1.9.9.109.1.1.1.1.2</oid>
+	</ds>
+	<ds>
+		<dsName>CPULoad</dsName>
+		<dsType>gauge</dsType>
+	</ds>
+	<ds>
+		<dsName>Uptime</dsName>
+		<dsType>none</dsType>
+	</ds>
+	<ds>
+		<dsName>NotCollected1</dsName>
+		<dsType>gauge</dsType>
+		<collect></collect>
+	</ds>
+	<ds>
+		<dsName>NotCollected2</dsName>
+		<dsType>gauge</dsType>
+		<collect />
+	</ds>
+	<graphs>
+		<name>ApacheRequests</name>
+		<name>ApacheTransfer</name>
+		<name>ApacheWorkers</name>
+	</graphs>
+</probedesc>

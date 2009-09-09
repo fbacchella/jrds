@@ -1,82 +1,58 @@
-package jrds;
+package jrds.webapp;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
+import jrds.HostsList;
+import jrds.PropertiesManager;
+import jrds.StoreOpener;
+
 import org.apache.log4j.Logger;
 
 /**
- * The class used to initialize the collecter and the logger if jrds is used as
- * a web application
- * @author Fabrice Bacchella
- *
- * TODO 
+ * Used to start the application.<p>
+ * Jrds search his configuration in different places, using the following order :
+ * <ol>
+ * <li>A file named <code>jrds.properties</code> in the <code>/WEB-INF</code> directory.
+ * <li>The init parameters of the web app.
+ * <li>A file whose path given by the init parameter <code>propertiesFile</code>.
+ * <li>A file whose path is given by system property named <code>jrds.propertiesFile</code>.
+ * <li>Any system property whose name start with <code>jrds.</code> .
+ * </ol>
+ * @author Fabrice Bacchella 
+ * @version $Revision$,  $Date$
  */
 public class StartListener implements ServletContextListener {
 	static private final Logger logger = Logger.getLogger(StartListener.class);
 	static private boolean started = false;
 	private static final Timer collectTimer = new Timer("jrds-main-timer", true);
 
-
-
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
 	 */
 	@SuppressWarnings("unchecked")
 	public void contextInitialized(ServletContextEvent arg0) {
-		//System.out.println(arg0);
-		//Logger.getLogger("jrds").setLevel(Level.TRACE);
-		//logger.setLevel(Level.TRACE);
-		//Resin launch the listener twice !
+		//Resin and some others launch the listener twice !
 		if( ! started ) {
 			try {
-				jrds.JrdsLoggerConfiguration.initLog4J();
-			} catch (IOException e2) {
-				throw new RuntimeException(e2);
-			}
-
-			try {
-				ServletContext ctxt = arg0.getServletContext();
-				logger.info("Starting jrds");
-				if(logger.isTraceEnabled()) {
-					logger.trace("Dumping attributes");
-					for (Enumeration<?> e = ctxt.getAttributeNames() ; e.hasMoreElements() ;)
-					{
-						String attr = (String) e.nextElement();
-						Object o = ctxt.getAttribute(attr);
-						logger.trace(attr + " = (" + o.getClass().getName() + ") " + o);
-					}
-					logger.trace("Dumping init parameters");
-					for (Enumeration<?> e = ctxt.getInitParameterNames() ; e.hasMoreElements() ;)
-					{
-						String attr = (String) e.nextElement();
-						Object o = ctxt.getInitParameter(attr);
-						logger.trace(attr + " = " + o);
-					}
-					logger.trace("Dumping properties");
-					Properties p = System.getProperties();
-					for (Enumeration<?> e = p.propertyNames() ; e.hasMoreElements() ;)
-					{
-						String attr = (String) e.nextElement();
-						Object o = p.getProperty(attr);
-						logger.trace(attr + " = " + o);
-					}
+				try {
+					jrds.JrdsLoggerConfiguration.initLog4J();
+				} catch (IOException e2) {
+					throw new RuntimeException(e2);
 				}
+
+				ServletContext ctxt = arg0.getServletContext();
 				PropertiesManager pm = new PropertiesManager();
 				ctxt.setAttribute(PropertiesManager.class.getCanonicalName(), pm);
 				InputStream propStream = ctxt.getResourceAsStream("/WEB-INF/jrds.properties");
@@ -86,18 +62,37 @@ public class StartListener implements ServletContextListener {
 
 				for(String attr: jrds.Util.iterate((Enumeration<String>)ctxt.getInitParameterNames())) {
 					String value = ctxt.getInitParameter(attr);
-					pm.setProperty(attr, value);
+					System.out.println(attr +" = " + value);
+					if(value != null)
+						pm.setProperty(attr, value);
 				}
-				
+
 				String localPropFile = ctxt.getInitParameter("propertiesFile");
 				if(localPropFile != null)
 					pm.join(new File(localPropFile));
 
-				localPropFile = System.getProperty("propertiesFile");
+				localPropFile = System.getProperty("jrds.propertiesFile");
 				if(localPropFile != null)
 					pm.join(new File(localPropFile));
-				
+
+				Pattern jrdsPropPattern = Pattern.compile("jrds\\.(.+)");
+				Properties p = System.getProperties();
+				for(String name: jrds.Util.iterate((Enumeration<String>)p.propertyNames())) {
+					Matcher m = jrdsPropPattern.matcher(name);
+					if(m.matches()) {
+						String prop = System.getProperty(name);
+						if(prop != null)
+							pm.setProperty(m.group(1), prop);
+					}
+				}
+
 				pm.update();
+
+				logger.info("Starting jrds");
+
+				if(logger.isTraceEnabled()) {
+					dumpConfiguration(ctxt);
+				}
 
 				System.setProperty("java.awt.headless","true");
 
@@ -114,31 +109,15 @@ public class StartListener implements ServletContextListener {
 						}
 					}
 				};
-				collectTimer.schedule(collector, 5000L, HostsList.getRootGroup().getStep() * 1000L);
+				collectTimer.schedule(collector, 5000L, pm.step * 1000L);
 				started = true;
 				logger.info("Application jrds started");
 			}
 			catch (Exception ex) {
 				logger.fatal("Unable to start " + arg0.getServletContext().getServletContextName() + " because "+ ex +": ", ex);
+				throw new RuntimeException(ex);
 			}
-
-//			System.out.println("Default level: " + Logger.getRootLogger().getLevel());
-//			Map<String, Appender> allapps= new HashMap<String, Appender>();
-//			Enumeration<Logger> e = (Enumeration<Logger>)LogManager.getCurrentLoggers();
-//			for(Logger l: Collections.list(e)) {
-//				Enumeration<Appender> e1 = (Enumeration<Appender>)l.getAllAppenders();
-//				if(e1.hasMoreElements() || l.getLevel() !=null) {
-//					System.out.println(l.getName() + " " + l.getLevel());
-//					for(Appender app: Collections.list(e1)) {
-//						allapps.put(app.getName(), app);
-//						System.out.println("    appender: " + app.getName());
-//
-//					}
-//				}
-//			}
-//			System.out.println(allapps);
 		}
-
 	}
 
 	/* (non-Javadoc)
@@ -152,6 +131,26 @@ public class StartListener implements ServletContextListener {
 		jrds.HostsList.purge();
 		StoreOpener.stop();
 		logger.info("appplication jrds stopped");
+	}
+
+	@SuppressWarnings("unchecked")
+	private void dumpConfiguration(ServletContext ctxt) {
+		logger.trace("Dumping attributes");
+		for(String attr: jrds.Util.iterate((Enumeration<String>)ctxt.getAttributeNames())) {
+			Object o = ctxt.getAttribute(attr);
+			logger.trace(attr + " = (" + o.getClass().getName() + ") " + o);
+		}
+		logger.trace("Dumping init parameters");
+		for(String attr: jrds.Util.iterate((Enumeration<String>)ctxt.getInitParameterNames())) {
+			String o = ctxt.getInitParameter(attr);
+			logger.trace(attr + " = " + o);
+		}
+		logger.trace("Dumping system properties");
+		Properties p = System.getProperties();
+		for(String attr: jrds.Util.iterate((Enumeration<String>)p.propertyNames())) {
+			Object o = p.getProperty(attr);
+			logger.trace(attr + " = " + o);
+		}		
 	}
 
 }
