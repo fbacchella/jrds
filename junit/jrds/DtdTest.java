@@ -1,43 +1,34 @@
 package jrds;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
+import java.io.File;
 import java.net.URL;
 
-import org.apache.log4j.Level;
+import jrds.factories.Loader;
+
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class DtdTest extends JrdsTester {
+public class DtdTest {
 	static final private Logger logger = Logger.getLogger(DtdTest.class);
 	static final PropertiesManager pm = new PropertiesManager();
-	static final DirXmlParser validateParser = new DirXmlParser() {
-		public void init() {
-			System.out.println( digester.getClass().getResource("/graphdesc.dtd"));
-			logger.debug(digester.getClass().getResource("/graphdesc.dtd"));
-			digester.register("-//jrds//DTD Graph Description//EN", digester.getClass().getResource("/graphdesc.dtd").toString());
-			digester.register("-//jrds//DTD Probe Description//EN", digester.getClass().getResource("/probedesc.dtd").toString());
-			digester.setValidating(true);
-		}
-	};
 	
-
-	@BeforeClass static public void configure() {
-		JrdsTester.configure();
+	@BeforeClass static public void configure() throws Exception {
+		Tools.configure();
+		Tools.prepareXml();
+		Tools.setLevel(new String[] {"jrds", "org.apache"}, logger.getLevel());
 	}
 	
-	@Test public void scanPaths() throws MalformedURLException, IOException {
-		logger.setLevel(Level.TRACE);
-		Logger.getLogger("jrds.DirXmlParser").setLevel(Level.TRACE);
-		Logger.getLogger("org.apache").setLevel(Level.TRACE);
+	@Test public void scanPaths() throws Exception {
+		Loader l = new Loader();
+		
+		pm.join(new File("jrds.properties"));
+		pm.libspath.add(new URL("file:build/classes"));
+		pm.update();
 
-		pm.libspath.add(new URL("file:/Users/bacchell/Devl/jrds/build/probes.jar"));
-		pm.libspath.add(new URL("file:/Users/bacchell/Devl/jrdsExalead/build/jrdsexalead.jar"));
-		pm.libspath.add(new URL("file:/Users/bacchell/Devl/jrdsAgent/build/jrdsagent.jar"));
 		for(URL lib: pm.libspath) {
 			logger.info("Adding lib " + lib);
-			validateParser.importDescUrl(lib);
+			l.importUrl(lib);
 		}
 	}
 }

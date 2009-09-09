@@ -2,13 +2,14 @@ package jrds;
 
 import java.net.URL;
 
-import jrds.ArgFactory;
+import jrds.factories.ArgFactory;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class Factory {
-	@Test public void argFactory() {
+public class FactoryTest {
+	@Test
+	public void argFactory() {
 		try {
 			ArgFactory af = new ArgFactory();
 			Object o = af.makeArg("Integer", "1");

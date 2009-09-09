@@ -1,4 +1,4 @@
-package jrds;
+package jrds.mockobjects;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -7,9 +7,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
-import java.util.Date;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -21,6 +19,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import jrds.GraphDesc;
+import jrds.Probe;
+import jrds.ProbeDesc;
+import jrds.RdsHost;
+
+
 import org.rrd4j.DsType;
 
 public class GetMoke {
@@ -31,14 +35,15 @@ public class GetMoke {
 	static public ProbeDesc getPd() {
 		ProbeDesc pd = new ProbeDesc();
 		pd.setName("MokeProbeDesc");
+		pd.setProbeName("mokeprobedesc");
 		pd.add("MokeDs", DsType.COUNTER);
 		return pd;
 	}
 	
 	static public Probe getProbe() {
 		Probe p = new MokeProbe();
-		p.setHost(getHost());
 		p.setPd(getPd());
+		p.setHost(getHost());
 		return p;
 	}
 	
@@ -48,6 +53,7 @@ public class GetMoke {
 		return gd;
 	}
 	
+	@SuppressWarnings("deprecation")
 	static public HttpServletResponse getResponse(final OutputStream os) {
 		return new HttpServletResponse() {
 			private String encoding = null;
@@ -93,7 +99,8 @@ public class GetMoke {
 			public void setLocale(Locale arg0) { }
 		};
 	}
-
+	
+	@SuppressWarnings("deprecation")
 	static public HttpServletRequest getRequest(final Map<String, String[]> p) {
 		//static private final HttpServletRequest req =
 		return new HttpServletRequest() {
@@ -134,6 +141,7 @@ public class GetMoke {
 			public String getLocalName() { return null; }
 			public int getLocalPort() { return 0; }
 			public Locale getLocale()  { return null; }
+			@SuppressWarnings("unchecked")
 			public Enumeration getLocales() { return null; }
 			public String getParameter(String arg0) { 
 				String[] array = parameters.get(arg0);
@@ -142,6 +150,7 @@ public class GetMoke {
 				return null;
 			}
 			public Map getParameterMap() { return parameters; }
+			@SuppressWarnings("unchecked")
 			public Enumeration getParameterNames()  { return null; }
 			public String[] getParameterValues(String arg0) { return null; }
 			public String getProtocol() { return null; }

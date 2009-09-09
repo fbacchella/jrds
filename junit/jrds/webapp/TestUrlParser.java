@@ -32,7 +32,7 @@ public class TestUrlParser {
 	@BeforeClass
 	static public void configure() throws IOException {
 		Tools.configure();
-		logger.setLevel(Level.TRACE);
+		logger.setLevel(Level.ERROR);
 		Tools.setLevel(new String[] {ParamsBean.class.getName() }, logger.getLevel());
 	}
 

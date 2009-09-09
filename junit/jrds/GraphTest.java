@@ -1,29 +1,36 @@
 package jrds;
 
-import jrds.Graph;
-import jrds.GraphNode;
-import jrds.HostsList;
-import jrds.Period;
-import jrds.Probe;
-import jrds.PropertiesManager;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URL;
 
-import org.apache.log4j.Appender;
+import jrds.mockobjects.GetMoke;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.WriterAppender;
-import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class GraphTest {
-	static final Appender app = new WriterAppender() {
-		public void doAppend(LoggingEvent event) {
-			System.out.println(event.getLevel() + ": " + event.getMessage());
-		}
-	};
+	static final Logger logger = Logger.getLogger(GraphTest.class);
 	static final HostsList hl = HostsList.getRootGroup();
-	@Test public void compare() {
+	@Test 
+	public void getBytes() throws IOException {
+		Probe p = GetMoke.getProbe();
+		GraphNode gn = new GraphNode(p, GetMoke.getGraphDesc());
+		Period pr = new Period();
+		Graph g = new Graph(gn);
+		g.setPeriod(pr);
+		File outputFile =  new File("tmp/mock.png");
+		OutputStream out = new FileOutputStream(outputFile);
+		g.writePng(out);
+		Assert.assertTrue(outputFile.isFile());
+		Assert.assertTrue(outputFile.length() > 0);
+	}
+	@Test public void compare() throws IOException {
 		Probe p = GetMoke.getProbe();
 		GraphNode gn = new GraphNode(p, GetMoke.getGraphDesc());
 		Period pr = new Period();
@@ -35,16 +42,14 @@ public class GraphTest {
 		Assert.assertEquals(g1, g2);
 	}
 
-	@BeforeClass static public void configure() {
-		System.getProperties().setProperty("java.awt.headless","true");
-		jrds.JrdsLoggerConfiguration.initLog4J();
-		app.setName(jrds.JrdsLoggerConfiguration.APPENDER);
-		jrds.JrdsLoggerConfiguration.putAppender(app);
-		Logger.getRootLogger().setLevel(Level.INFO);
-		Logger.getLogger(jrds.JrdsLoggerConfiguration.APPENDER).setLevel(Level.INFO);
-		Logger.getLogger("org.apache.commons.digester.Digester").setLevel(Level.INFO);
-		Logger.getLogger("jrds.Period").setLevel(Level.TRACE);
+	@BeforeClass static public void configure() throws IOException {
+		Tools.configure();
+		logger.setLevel(Level.ERROR);
+		Tools.setLevel(new String[] {"jrds.Graph"}, logger.getLevel());
 		PropertiesManager pm = new PropertiesManager();
+		//Not sure to find the descriptions in test environnement
+		if(PropertiesManager.class.getResource("/desc") == null)
+			pm.libspath.add(new URL("file:desc"));
 		hl.configure(pm);
 	}
 
