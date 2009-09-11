@@ -9,9 +9,7 @@ package jrds.standalone;
 import java.io.File;
 
 import jrds.HostsList;
-import jrds.Probe;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
 import jrds.StoreOpener;
 
 import org.apache.log4j.Logger;
@@ -39,11 +37,9 @@ public class Collector {
 		System.getProperties().putAll(pm);
 		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, pm.rrdbackend);
 
-		HostsList hl = HostsList.getRootGroup();
+		HostsList hl = new HostsList(pm);
 
 		logger.debug("Scanning dir");
-
-		HostsList.getRootGroup().configure(pm);
 
 		for(int i = 0; i< 1 ; i++) {
 			hl.collectAll();

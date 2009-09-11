@@ -10,7 +10,7 @@ import java.util.Set;
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
-import jrds.XmlProvider;
+import jrds.starter.XmlProvider;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;

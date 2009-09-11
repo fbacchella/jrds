@@ -24,6 +24,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import jrds.factories.GraphFactory;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
+import jrds.starter.Collecting;
+import jrds.starter.StarterNode;
+import jrds.starter.StartersSet;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
@@ -65,7 +68,7 @@ implements Comparable<Probe>, StarterNode {
 	private boolean finished = false;
 	private String label = null;
 
-//	private Map<String, Set<Threshold>> thresholds = new HashMap<String, Set<Threshold>>();
+	//	private Map<String, Set<Threshold>> thresholds = new HashMap<String, Set<Threshold>>();
 
 	/**
 	 * The constructor that should be called by derived class
@@ -100,9 +103,9 @@ implements Comparable<Probe>, StarterNode {
 	 * This method is often overriden
 	 */
 	public void configure() {
-		
+
 	}
-	
+
 	public RdsHost getHost() {
 		return monitoredHost;
 	}
@@ -354,7 +357,7 @@ implements Comparable<Probe>, StarterNode {
 			logger.error("Missing host for " + pd.getProbeName());
 			return false;
 		}
-		
+
 		//Name can be set by other means
 		if(name == null)
 			name = parseTemplate(getPd().getProbeName());
@@ -388,7 +391,7 @@ implements Comparable<Probe>, StarterNode {
 					return false;
 				}
 				else if(! newDef.equals(oldDef)) {
-					
+
 					rrdDb.close();
 					rrdDb = null;
 					upgrade();
@@ -487,7 +490,7 @@ implements Comparable<Probe>, StarterNode {
 			return;
 		}
 		//We only collect if the HostsList allow it
-		if(monitoredHost.isCollectRunning()) {
+		if(isCollectRunning()) {
 			logger.debug("launch collect for " + this);
 			starters.startCollect();
 			RrdDb rrdDb = null;
@@ -502,7 +505,7 @@ implements Comparable<Probe>, StarterNode {
 					if( isCollectRunning()) {
 						logger.trace(onesample.dump());
 						onesample.update();
-//						checkThreshold(rrdDb);
+						//						checkThreshold(rrdDb);
 					}
 				}
 			}
@@ -516,10 +519,10 @@ implements Comparable<Probe>, StarterNode {
 					logger.error("Error with probe collect " + this + ": " + e);
 			}
 			finally  {
+				starters.stopCollect();
 				if(rrdDb != null)
 					StoreOpener.releaseRrd(rrdDb);
 			}
-			starters.stopCollect();
 		}
 	}
 
@@ -674,7 +677,7 @@ implements Comparable<Probe>, StarterNode {
 			if(! getStarters().find(cnxName).isStarted())
 				return false;
 		}
-		return getHost().isCollectRunning();
+		return getStarters().isStarted(Collecting.makeKey(this));
 	}
 
 	public abstract String getSourceType();
@@ -752,7 +755,7 @@ implements Comparable<Probe>, StarterNode {
 		Element dsElement = document.createElement("ds");
 		root.appendChild(dsElement);
 		DsDef[] dss= getDsDefs();
-		HostsList hl = HostsList.getRootGroup();
+		HostsList hl = getHostList();
 		GraphFactory gf = new GraphFactory(false);
 		if (sorted)
 			Arrays.sort(dss, new Comparator<DsDef>() {
@@ -783,27 +786,27 @@ implements Comparable<Probe>, StarterNode {
 		return document;
 	}
 
-//	public void addThreshold(Threshold t) {
-//		Set<Threshold> tset = thresholds.get(t.dsName);
-//		if(tset == null) {
-//			tset = new HashSet<Threshold>();
-//			thresholds.put(t.dsName, tset);
-//		}
-//		logger.trace("Threshold added: " + t.name);
-//		tset.add(t);
-//	}
-//
-//
-//	private void checkThreshold(RrdDb rrdDb) throws IOException {
-//	rrdDb = StoreOpener.getRrd(getRrdName());
-//		for(Set<Threshold> tset: thresholds.values()) {
-//			for(Threshold t: tset) {
-//				logger.trace("Threshold to " + this + ": " + t);
-//				if(t.check(rrdDb)) 
-//					t.run(this);
-//			}
-//		}
-//	}
+	//	public void addThreshold(Threshold t) {
+	//		Set<Threshold> tset = thresholds.get(t.dsName);
+	//		if(tset == null) {
+	//			tset = new HashSet<Threshold>();
+	//			thresholds.put(t.dsName, tset);
+	//		}
+	//		logger.trace("Threshold added: " + t.name);
+	//		tset.add(t);
+	//	}
+	//
+	//
+	//	private void checkThreshold(RrdDb rrdDb) throws IOException {
+	//	rrdDb = StoreOpener.getRrd(getRrdName());
+	//		for(Set<Threshold> tset: thresholds.values()) {
+	//			for(Threshold t: tset) {
+	//				logger.trace("Threshold to " + this + ": " + t);
+	//				if(t.check(rrdDb)) 
+	//					t.run(this);
+	//			}
+	//		}
+	//	}
 
 	/**
 	 * @return the time step (in seconds)
@@ -825,6 +828,10 @@ implements Comparable<Probe>, StarterNode {
 
 	public void setLabel(String label) {
 		this.label = label;
+	}
+	
+	public HostsList getHostList() {
+		return (HostsList) getStarters().find(HostsList.class);
 	}
 
 }

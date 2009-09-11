@@ -65,15 +65,16 @@ public class Discover extends HttpServlet {
 		static final PDUFactory factory = new DefaultPDUFactory(PDU.GETBULK);
 		Target target;
 		@Override
-		public void doStart() {
+		public boolean start() {
 			try {
 				snmp = new Snmp(new DefaultUdpTransportMapping());
 				snmp.listen();
 			} catch (IOException e) {
 			}
+			return true;
 		}
 		@Override
-		public void doStop() {
+		public void stop() {
 			try {
 				snmp.close();
 			} catch (IOException e) {

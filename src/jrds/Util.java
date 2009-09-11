@@ -27,6 +27,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
+import jrds.starter.StarterNode;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -328,6 +329,8 @@ public class Util {
 	}
 
 	public static Number parseStringNumber(String toParse, Class<? extends Number> numberClass, Number defaultVal) {
+		if(toParse == null || "".equals(toParse))
+			return defaultVal;
 		if(! (Number.class.isAssignableFrom(numberClass))) {
 			return defaultVal;
 		}

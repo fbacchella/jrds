@@ -29,7 +29,7 @@ public class TestFullLifeCycle {
 	public void create() throws IOException {
 		PropertiesManager pm = new PropertiesManager();
 		pm.setProperty("configdir", "tmp");
-		pm.setProperty("tmpdir", "tmp");
+		pm.setProperty("rrddir", "tmp");
 		pm.update();
 		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, pm.rrdbackend);
 

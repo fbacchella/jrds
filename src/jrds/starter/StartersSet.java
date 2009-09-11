@@ -1,4 +1,4 @@
-package jrds;
+package jrds.starter;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -70,5 +70,12 @@ public class StartersSet {
 	}
 	public StarterNode getLevel() {
 		return level;
+	}
+
+	/**
+	 * @return the up
+	 */
+	public StartersSet getUp() {
+		return up;
 	}
 }

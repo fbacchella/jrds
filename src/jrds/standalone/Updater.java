@@ -30,8 +30,7 @@ public class Updater {
 		System.getProperties().putAll(pm);
 		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, pm.rrdbackend);
 
-		HostsList hl = HostsList.getRootGroup();
-		hl.configure(pm);
+		HostsList hl =  new HostsList(pm);
 
 		ExecutorService tpool =  Executors.newFixedThreadPool(3);
 

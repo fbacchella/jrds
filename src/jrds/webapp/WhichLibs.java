@@ -9,6 +9,7 @@ package jrds.webapp;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -34,21 +35,38 @@ public final class WhichLibs extends HttpServlet {
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
+	@SuppressWarnings("unchecked")
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException {
 		try {
 			ServletOutputStream out = res.getOutputStream();
+			res.setContentType("text/plain");
 			res.addHeader("Cache-Control", "no-cache");
 			
 			ServletContext ctxt = getServletContext();
 
-			for (Enumeration<?> e = ctxt.getAttributeNames() ; e.hasMoreElements() ;)
-			{
-				String attr = (String) e.nextElement();
+			out.println("Dumping attributes");
+			for(String attr: jrds.Util.iterate((Enumeration<String>)ctxt.getAttributeNames())) {
 				Object o = ctxt.getAttribute(attr);
+				out.println(attr + " = (" + o.getClass().getName() + ") " + o);
+			}
+			out.println("Dumping init parameters");
+			for(String attr: jrds.Util.iterate((Enumeration<String>)ctxt.getInitParameterNames())) {
+				String o = ctxt.getInitParameter(attr);
 				out.println(attr + " = " + o);
 			}
+			out.println("Dumping system properties");
+			Properties p = System.getProperties();
+			for(String attr: jrds.Util.iterate((Enumeration<String>)p.propertyNames())) {
+				Object o = p.getProperty(attr);
+				out.println(attr + " = " + o);
+			}		
 
+			out.println(ctxt.getMajorVersion());
+			out.println(ctxt.getMinorVersion());
+			out.println(ctxt.getServerInfo());
+			out.println(ctxt.getServletContextName());
+			out.println(getServletInfo());
 			out.println(resolv("String", ""));
 			out.println(resolv("jrds", this));
 			try {

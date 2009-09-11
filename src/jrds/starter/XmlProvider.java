@@ -1,4 +1,4 @@
-package jrds;
+package jrds.starter;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +13,8 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
+import jrds.RdsHost;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -183,5 +185,11 @@ public class XmlProvider extends Starter {
 			super.register(node);
 		return ss.find(getKey());
 	}
+
+	static public Object makeKey(StarterNode node) {
+		RdsHost host = (RdsHost) node;
+		return "xmlprovider:" + host.getName();
+	}
+
 
 }

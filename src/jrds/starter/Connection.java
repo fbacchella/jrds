@@ -1,10 +1,12 @@
-package jrds;
+package jrds.starter;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
+
+import jrds.Probe;
+import jrds.RdsHost;
 
 import org.apache.log4j.Logger;
 
@@ -17,13 +19,8 @@ public abstract class Connection extends Starter {
 	public abstract Object getConnection();
 
 	Socket makeSocket(String host, int port) throws UnknownHostException, IOException {
-		Socket s = new Socket(host, port) {
-			public void connect(SocketAddress endpoint) throws IOException {
-				super.connect(endpoint, getTimeout() * 1000);
-			}
-		};
-		s.setSoTimeout(getTimeout());
-		return s;
+		SocketFactory sf = (SocketFactory) getParent().getStarters().find(SocketFactory.makeKey(getParent()));
+		return sf.createSocket(host, port);
 	}
 
 	/* (non-Javadoc)
@@ -70,7 +67,8 @@ public abstract class Connection extends Starter {
 	 * @return the connection timeout in second
 	 */
 	public int getTimeout() {
-		return HostsList.getRootGroup().getTimeout();
+		SocketFactory sf = (SocketFactory) getParent().getStarters().find(SocketFactory.makeKey(getParent()));
+		return sf.getTimeout();
 
 	}
 

@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jrds.HostsList;
 import jrds.PropertiesManager;
 
 import org.apache.log4j.Logger;
@@ -36,25 +37,27 @@ public class ReloadHostList extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest req, HttpServletResponse arg1)
 			throws ServletException, IOException {
-		ServletContext ctxt = getServletContext();
-		PropertiesManager pm = new PropertiesManager();
-		InputStream propStream = ctxt.getResourceAsStream("/WEB-INF/jrds.properties");
-		if(propStream != null) {
-			pm.join(propStream);
-		}
-
-		String localPropFile = ctxt.getInitParameter("propertiesFile");
-		if(localPropFile != null)
-			pm.join(new File(localPropFile));
-
-		localPropFile = System.getProperty("propertiesFile");
-		if(localPropFile != null)
-			pm.join(new File(localPropFile));
-
-		pm.update();
-		jrds.HostsList.purge();
-		jrds.HostsList.getRootGroup().configure(pm);
-		logger.info("Configuration dir " + pm.configdir + " rescaned");
-		arg1.sendRedirect(req.getContextPath() + "/");
+//		ServletContext ctxt = getServletContext();
+//		PropertiesManager pm = new PropertiesManager();
+//		InputStream propStream = ctxt.getResourceAsStream("/WEB-INF/jrds.properties");
+//		if(propStream != null) {
+//			pm.join(propStream);
+//		}
+//
+//		String localPropFile = ctxt.getInitParameter("propertiesFile");
+//		if(localPropFile != null)
+//			pm.join(new File(localPropFile));
+//
+//		localPropFile = System.getProperty("propertiesFile");
+//		if(localPropFile != null)
+//			pm.join(new File(localPropFile));
+//
+//		pm.update();
+//		HostsList hl = (HostsList) arg0.getServletContext().getAttribute(HostsList.class.getName());
+//
+//		jrds.HostsList.purge();
+//		jrds.HostsList.getRootGroup().configure(pm);
+//		logger.info("Configuration dir " + pm.configdir + " rescaned");
+//		arg1.sendRedirect(req.getContextPath() + "/");
 	}
 }

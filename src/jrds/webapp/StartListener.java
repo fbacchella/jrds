@@ -97,12 +97,13 @@ public class StartListener implements ServletContextListener {
 
 				StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, pm.rrdbackend);
 
-				HostsList.getRootGroup().configure(pm);
+				final HostsList hl = new HostsList(pm);
+				ctxt.setAttribute(HostsList.class.getName(), hl);
 
 				TimerTask collector = new TimerTask () {
 					public void run() {
 						try {
-							HostsList.getRootGroup().collectAll();
+							hl.collectAll();
 						} catch (RuntimeException e) {
 							logger.fatal("A fatal error occured during collect: ",e);
 						}
@@ -125,9 +126,9 @@ public class StartListener implements ServletContextListener {
 	public void contextDestroyed(ServletContextEvent arg0) {
 		started = false;
 		collectTimer.cancel();
-		HostsList.getRootGroup().getRenderer().finish();
-		HostsList.getRootGroup().getStarters().stopCollect();
-		jrds.HostsList.purge();
+		HostsList hl = (HostsList) arg0.getServletContext().getAttribute(HostsList.class.getName());
+		hl.getRenderer().finish();
+		hl.getStarters().stopCollect();
 		StoreOpener.stop();
 		logger.info("appplication jrds stopped");
 	}

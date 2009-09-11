@@ -71,7 +71,7 @@ public class JrdsLoggerConfiguration {
 	 */
 	static public void configure(PropertiesManager pm) throws IOException {
 		Logger.getLogger("jrds").setLevel(pm.loglevel);
-		if(! "".equals(pm.logfile))
+		if(pm.logfile!= null && ! "".equals(pm.logfile))
 			setOutputFile(pm.logfile);
 		for(Map.Entry<Level, List<String>> e: pm.loglevels.entrySet()) {
 			Level l = e.getKey();

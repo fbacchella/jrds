@@ -10,10 +10,10 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.Tools;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
+import jrds.Tools;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
@@ -77,7 +77,7 @@ public class DummyProbe extends Probe {
 		//Logger.getLogger(DummyProbe.class).setLevel(Level.TRACE);
 	}
 
-	@Test
+	@Test(expected=NullPointerException.class)
 	public void GetDetails() throws Exception, IOException
 	{
 		for(Class c : this.getClass().getInterfaces()) {

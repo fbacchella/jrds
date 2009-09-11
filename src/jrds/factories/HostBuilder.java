@@ -8,14 +8,14 @@ import java.util.Map;
 
 import jrds.ChainedProperties;
 import jrds.ConnectedProbe;
-import jrds.Connection;
 import jrds.Macro;
 import jrds.Probe;
 import jrds.RdsHost;
-import jrds.StarterNode;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 import jrds.snmp.SnmpStarter;
+import jrds.starter.Connection;
+import jrds.starter.StarterNode;
 
 import org.apache.log4j.Logger;
 
@@ -50,10 +50,10 @@ public class HostBuilder extends ObjectBuilder {
 		RdsHost host = new RdsHost();
 		JrdsNode hostNode = n.getChild(CompiledXPath.get("/host"));
 
+		hostNode.setMethod(host, CompiledXPath.get("@name"), "setName");
 		hostNode.setMethod(host, CompiledXPath.get("@dnsName"), "setDnsName");
 		hostNode.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
 
-		hostNode.setMethod(host, CompiledXPath.get("@name"), "setName");
 		host.setHostDir(new File(pm.rrddir, host.getName()));
 
 		JrdsNode snmpNode = hostNode.getChild(CompiledXPath.get("snmp"));
@@ -122,13 +122,13 @@ public class HostBuilder extends ObjectBuilder {
 		//Optional parameters
 		String portStr = attributes.get("port");
 		if(portStr != null && ! "".equals(portStr)) {
-			int port = Integer.parseInt(portStr);
+			int port = jrds.Util.parseStringNumber(portStr, Integer.class, 161).intValue();
 			starter.setPort(port);
 		}
 
 		String hostName = attributes.get("host");
 		if(hostName == null) {
-			hostName = host.getName();
+			hostName = host.getDnsName();
 		}
 		starter.setHostname(hostName);
 		return starter;

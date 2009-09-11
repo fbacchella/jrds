@@ -1,7 +1,6 @@
-package jrds;
+package jrds.starter;
 
 public interface StarterNode {
 	public StartersSet getStarters();
-	public boolean isCollectRunning();
 }
 	

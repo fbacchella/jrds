@@ -23,9 +23,9 @@ public abstract class JSonData extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ParamsBean params = new ParamsBean(request);
+		ParamsBean params = new ParamsBean(request, (HostsList) getServletContext().getAttribute(HostsList.class.getName()));
 
-		HostsList root = HostsList.getRootGroup();
+		HostsList root = (HostsList) getServletContext().getAttribute(HostsList.class.getName());
 
 		try {
 			response.setContentType("application/json");

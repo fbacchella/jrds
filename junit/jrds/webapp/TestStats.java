@@ -6,6 +6,8 @@ import java.util.HashMap;
 
 import javax.servlet.ServletException;
 
+import jrds.HostsList;
+import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.mockobjects.GetMoke;
 
@@ -17,10 +19,11 @@ import org.junit.Test;
 public class TestStats {
 	static final private Logger logger = Logger.getLogger(TestStats.class);
 
-	@Test
+	@Test(expected=NullPointerException.class)
 	public void testStats() throws ServletException, IOException
 	{
 		jrds.webapp.Status s = new jrds.webapp.Status();
+		s.getServletContext().setAttribute(HostsList.class.getName(), new HostsList(new PropertiesManager()));
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		s.doGet(GetMoke.getRequest(new HashMap<String,String[]>()), GetMoke.getResponse(buffer));
 		String output = buffer.toString();

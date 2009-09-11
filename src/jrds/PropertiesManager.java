@@ -29,14 +29,19 @@ import org.apache.log4j.Logger;
  */
 public class PropertiesManager extends Properties {
 	private final Logger logger = Logger.getLogger(PropertiesManager.class);
+	
+	//The default constructor cannot build directories, canact is used to detect that
+	private boolean canact = false;
 
 	public PropertiesManager()
 	{
 		update();
+		canact = true;
 	}
 
 	public PropertiesManager(File propFile)
 	{
+		canact = true;
 		join(propFile);
 		update();
 	}
@@ -163,14 +168,17 @@ public class PropertiesManager extends Properties {
 		return  URLClassLoader.newInstance(arrayUrl, getClass().getClassLoader());
 	}
 
-	private File prepareDir(File dir) {
+	private File prepareDir(File dir, boolean autocreate) {
+		if(dir == null)
+			return null;
 		if( ! dir.exists()) {
 			if(! autocreate) {
 				logger.error(dir + " doesn't exists");
 				return null;
 			}
-			if ( autocreate && !dir.mkdirs()) {
-				logger.error(dir + " doesn't exists and can't be created");
+			if ( autocreate && canact && !dir.mkdirs()) {
+				if(canact)
+					logger.error(dir + " doesn't exists and can't be created");
 				return null;
 			}
 		}
@@ -185,18 +193,18 @@ public class PropertiesManager extends Properties {
 		return dir;
 	}
 
-	private File prepareDir(String path) {
+	private File prepareDir(String path, boolean autocreate) {
 		if(path == null || "".equals(path)) {
 			return null;
 		}
 		File dir = new File(path);
-		return prepareDir(dir);
+		return prepareDir(dir, autocreate);
 	}
 
 	public void update()
 	{
-		boolean nologgin = parseBoolean(getProperty("nologging", "false"));
-		if(! nologgin) {
+		boolean nologging = parseBoolean(getProperty("nologging", "false"));
+		if(! nologging) {
 			for(String ls: new String[]{ "trace", "debug", "info", "error", "fatal", "warn"}) {
 				Level l = Level.toLevel(ls);
 				String param = getProperty("log." + ls, "");
@@ -207,7 +215,7 @@ public class PropertiesManager extends Properties {
 
 			}
 			loglevel = Level.toLevel(getProperty("loglevel", "info"));
-			logfile = getProperty("logfile", "");
+			logfile = getProperty("logfile");
 
 			//Let's configure the log fast
 			try {
@@ -220,16 +228,16 @@ public class PropertiesManager extends Properties {
 
 		//Directories configuration
 		autocreate = parseBoolean(getProperty("autocreate", "false"));
-		configdir = prepareDir(getProperty("configdir"));
-		rrddir = prepareDir(getProperty("rrddir"));
-		//Different place to find the tempdirectory
-		tmpdir = prepareDir(getProperty("tmpdir"));
+		configdir = prepareDir(getProperty("configdir"), autocreate);
+		rrddir = prepareDir(getProperty("rrddir"), autocreate);
+		//Different place to find the temp directory
+		tmpdir = prepareDir(getProperty("tmpdir"), autocreate);
 		if(tmpdir == null)
-			tmpdir = prepareDir(System.getProperty("javax.servlet.context.tempdir"));
+			tmpdir = prepareDir(System.getProperty("javax.servlet.context.tempdir"), false);
 		if(tmpdir == null) {
 			String tmpDirPath = System.getProperty("java.io.tmpdir");
 			if(tmpDirPath != null || "".equals(tmpDirPath))
-				tmpdir = prepareDir(new File(tmpDirPath, "jrds"));
+				tmpdir = prepareDir(new File(tmpDirPath, "jrds"), true);
 		}
 
 		step = parseInteger(getProperty("step", "300"));

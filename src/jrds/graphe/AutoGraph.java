@@ -67,7 +67,7 @@ public class AutoGraph extends GraphNode {
 				double[][] allvalues = null;
 				GraphDesc tempgd = null;
 				FetchData fd = null;
-				HostsList hl = HostsList.getRootGroup();
+				HostsList hl = p.getHostList();
 				for(String name : p.getProbeList()) {
 					GraphNode g = hl.getGraphById(name.hashCode());
 					if(g != null) {

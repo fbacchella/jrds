@@ -60,7 +60,7 @@ public class Sum extends GraphNode {
 				double[][] allvalues = null;
 				GraphDesc tempgd = null;
 				FetchData fd = null;
-				HostsList hl = HostsList.getRootGroup();
+				HostsList hl = (HostsList)p.getStarters().find(HostsList.class);
 				for(String name : p.getProbeList()) {
 					GraphNode g = hl.getGraphById(name.hashCode());
 					logger.trace("Looking for " + name + " in graph base, and found " + g);

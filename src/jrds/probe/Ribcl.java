@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -19,11 +18,11 @@ import javax.net.ssl.X509TrustManager;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 
-import jrds.HostsList;
 import jrds.Probe;
 import jrds.RdsHost;
 import jrds.Util;
-import jrds.XmlProvider;
+import jrds.starter.SocketFactory;
+import jrds.starter.XmlProvider;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -141,13 +140,8 @@ public class Ribcl extends Probe {
 	}
 
 	private Socket connect() throws NoSuchAlgorithmException, KeyManagementException, UnknownHostException, IOException {
-		final int timeout = HostsList.getRootGroup().getTimeout();
-		Socket s = new Socket(iloHost, port) {
-			public void connect(SocketAddress endpoint) throws IOException {
-				super.connect(endpoint, timeout * 1000);
-			}
-		};
-		s.setSoTimeout(timeout * 1000);
+		SocketFactory ss = (SocketFactory) getStarters().find(SocketFactory.makeKey(this)); 
+		Socket s = ss.createSocket(iloHost, port);
 		if(port == 23) {
 			return 	s;
 		}		

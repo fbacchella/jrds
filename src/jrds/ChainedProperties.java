@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import jrds.starter.Starter;
+import jrds.starter.StarterNode;
+
 import org.apache.log4j.Logger;
 
 public class ChainedProperties extends Starter implements Map<String, String> {

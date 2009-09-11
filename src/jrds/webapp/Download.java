@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jrds.HostsList;
+
 /**
  * This servlet is used to download the values of a graph as an xml file
  *
@@ -24,7 +26,7 @@ public class Download extends HttpServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
 
-		ParamsBean params = new ParamsBean(req);
+		ParamsBean params = new ParamsBean(req, (HostsList) getServletContext().getAttribute(HostsList.class.getName()));
 
 		res.setContentType(CONTENT_TYPE);
 

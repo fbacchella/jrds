@@ -16,7 +16,7 @@ import org.junit.Test;
 
 public class GraphTest {
 	static final Logger logger = Logger.getLogger(GraphTest.class);
-	static final HostsList hl = HostsList.getRootGroup();
+	static HostsList hl;
 	@Test 
 	public void getBytes() throws IOException {
 		Probe p = GetMoke.getProbe();
@@ -50,7 +50,7 @@ public class GraphTest {
 		//Not sure to find the descriptions in test environnement
 		if(PropertiesManager.class.getResource("/desc") == null)
 			pm.libspath.add(new URL("file:desc"));
-		hl.configure(pm);
+		hl = new HostsList(pm);
 	}
 
 }

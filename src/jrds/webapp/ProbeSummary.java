@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jrds.HostsList;
 import jrds.Probe;
 
 import org.apache.log4j.Logger;
@@ -38,7 +39,7 @@ public final class ProbeSummary extends HttpServlet {
 		res.addHeader("Cache-Control", "no-cache");
 		ServletOutputStream out = res.getOutputStream();
 
-		ParamsBean params = new ParamsBean(req);
+		ParamsBean params = new ParamsBean(req, (HostsList) getServletContext().getAttribute(HostsList.class.getName()));
 
 		Probe probe = params.getProbe();
 		if(probe != null) {

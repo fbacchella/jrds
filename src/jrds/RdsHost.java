@@ -6,6 +6,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import jrds.starter.Collecting;
+import jrds.starter.Resolver;
+import jrds.starter.Starter;
+import jrds.starter.StarterNode;
+import jrds.starter.StartersSet;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -27,31 +33,28 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 	public RdsHost(String newName)
 	{
 		name = newName;
-		Starter resolver = new Starter.Resolver(name);
+		Starter resolver = new Resolver(name);
 		resolver.register(this);
-		starters.setParent(HostsList.getRootGroup().getStarters());
 	}
 
 	public RdsHost(String name, String dnsName)
 	{
 		this.name = name;
 		this.dnsName = dnsName;
-		Starter resolver = new Starter.Resolver(getDnsName());
+		Starter resolver = new Resolver(name);
 		resolver.register(this);
-		starters.setParent(HostsList.getRootGroup().getStarters());
 	}
 
 	/**
 	 * 
 	 */
 	public RdsHost() {
-		starters.setParent(HostsList.getRootGroup().getStarters());
 	}
 
 	public void setName(String name)
 	{
 		this.name = name;
-		Starter resolver = new Starter.Resolver(getDnsName());
+		Starter resolver = new Resolver(name);
 		resolver.register(this);
 	}
 
@@ -69,8 +72,6 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 
 	public File getHostDir()
 	{
-		if(hostdir == null)
-			hostdir = new File(HostsList.getRootGroup().getRrdDir(), name);
 		return hostdir;
 	}
 
@@ -141,7 +142,7 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 	}
 
 	public boolean isCollectRunning() {
-		return HostsList.getRootGroup().isCollectRunning();
+		return getStarters().isStarted(Collecting.makeKey(this));
 	}
 
 	/**
@@ -159,5 +160,7 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 	 */
 	public void setDnsName(String dnsName) {
 		this.dnsName = dnsName;
+		Starter resolver = new Resolver(dnsName);
+		resolver.register(this);
 	}
 }

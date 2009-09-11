@@ -49,17 +49,19 @@ public class ParamsBean implements Serializable {
 	String maxArg = null;
 	String minArg = null;
 	Filter f = null;
-	final HostsList root = HostsList.getRootGroup();
+	HostsList root;
 
 	public ParamsBean(){
 
 	}
 
-	public ParamsBean(HttpServletRequest req) {
-		parseReq(req);
+	public ParamsBean(HttpServletRequest req, HostsList hl) {
+		parseReq(req, hl);
 	}
 
-	public void parseReq(HttpServletRequest req) {
+	public void parseReq(HttpServletRequest req, HostsList hl) {
+		root =	hl;
+
 		contextPath = req.getContextPath();
 		period = makePeriod(req);
 		logger.trace("period from parameters: " + period);
@@ -122,10 +124,10 @@ public class ParamsBean implements Serializable {
 	}
 
 	public jrds.Graph getGraph() {
-		jrds.Graph g = HostsList.getRootGroup().getRenderer().getGraph(gid);
+		jrds.Graph g = root.getRenderer().getGraph(gid);
 		if(g == null) {
 			logger.warn("graph cache miss");
-			jrds.GraphNode node = HostsList.getRootGroup().getGraphById(getId());
+			jrds.GraphNode node = root.getGraphById(getId());
 			g = node.getGraph();
 			configureGraph(g);
 		}
@@ -133,9 +135,9 @@ public class ParamsBean implements Serializable {
 	}
 
 	public jrds.Probe getProbe() {
-		jrds.Probe p = HostsList.getRootGroup().getProbeById(getId());
+		jrds.Probe p = root.getProbeById(getId());
 		if(p == null) {
-			jrds.GraphNode node = HostsList.getRootGroup().getGraphById(getId());
+			jrds.GraphNode node = root.getGraphById(getId());
 			if(node != null)
 				p = node.getProbe();
 		}

@@ -44,13 +44,13 @@ public class Grapher {
 		System.getProperties().putAll(pm);
 		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, pm.rrdbackend);
 
-		HostsList.getRootGroup().configure(pm);
+		HostsList hl = new HostsList(pm);
 
 		Period p = new Period();
-		Renderer r= new Renderer(10);
+		Renderer r= new Renderer(10, pm.step, pm.tmpdir);
 		Collection<Integer> done = new HashSet<Integer>();
-		logger.debug(HostsList.getRootGroup().getGraphsRoot());
-		for(GraphTree graphTree: HostsList.getRootGroup().getGraphsRoot()) {
+		logger.debug(hl.getGraphsRoot());
+		for(GraphTree graphTree: hl.getGraphsRoot()) {
 			logger.trace("Tree found: " + graphTree.getName());
 			for(GraphNode gn: graphTree.enumerateChildsGraph(null)) {
 				if(! done.contains(gn.hashCode())) {

@@ -6,10 +6,11 @@ import java.util.Map;
 import java.util.Set;
 
 import jrds.JrdsLoggerConfiguration;
-import jrds.Starter;
-import jrds.StarterNode;
-import jrds.StartersSet;
 import jrds.probe.snmp.SnmpProbe;
+import jrds.starter.Resolver;
+import jrds.starter.Starter;
+import jrds.starter.StarterNode;
+import jrds.starter.StartersSet;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
@@ -63,7 +64,7 @@ public class SnmpStarter extends Starter {
 			}
 			return started;
 		}
-		public void stop () {
+		public void stop() {
 			try {
 				snmp.close();
 			} catch (IOException e) {
@@ -86,7 +87,7 @@ public class SnmpStarter extends Starter {
 	private String hostname = null;
 	private int port = 161;
 	private String community = "public";
-	private Starter.Resolver resolver = null;
+	private Resolver resolver = null;
 	//A default value for the uptime OID, from the HOST-RESSOURCES MIB
 	private OID uptimeOid = hrSystemUptime;
 	private Target snmpTarget;
@@ -221,11 +222,8 @@ public class SnmpStarter extends Starter {
 	@Override
 	public void initialize(StarterNode parent, StartersSet level) {
 		super.initialize(parent, level);
-		level.find(Starter.Resolver.buildKey(hostname));
-		resolver = (Resolver) level.find(Starter.Resolver.buildKey(hostname));
-		if( level.find(full.getKey()) == null) {
-			level.getRoot().registerStarter(full, level.getRoot().getLevel());
-		}
+		level.find(Resolver.buildKey(hostname));
+		resolver = (Resolver) level.find(Resolver.buildKey(hostname));
 	}
 
 	public Target getTarget() {
@@ -243,7 +241,6 @@ public class SnmpStarter extends Starter {
 	@Override
 	public Object getKey() {
 		return SNMPKEY;
-
 	}
 
 	@Override

@@ -35,7 +35,7 @@ public final class Status extends HttpServlet {
 	throws ServletException, IOException {
 		res.setContentType("text/plain");
 		res.addHeader("Cache-Control", "no-cache");
-		HostsList hl = HostsList.getRootGroup();
+		HostsList hl = (HostsList) getServletContext().getAttribute(HostsList.class.getName());
 
 		Collection<RdsHost> hosts = hl.getHosts();
 		int numHosts = hosts.size();

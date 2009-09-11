@@ -7,7 +7,8 @@ import java.sql.Statement;
 import java.util.Properties;
 
 import jrds.RdsHost;
-import jrds.Starter;
+import jrds.starter.Resolver;
+import jrds.starter.Starter;
 
 import org.apache.log4j.Logger;
 
@@ -22,7 +23,7 @@ public abstract class JdbcStarter extends Starter {
 
 	public void setHost(RdsHost monitoredHost) {
 		this.url = getUrlAsString();
-		resolver = monitoredHost.getStarters().find(Starter.Resolver.buildKey(monitoredHost.getName()));
+		resolver = monitoredHost.getStarters().find(Resolver.buildKey(monitoredHost.getName()));
 	}
 	
 	public abstract String getUrlAsString();

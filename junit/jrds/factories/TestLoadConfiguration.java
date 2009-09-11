@@ -1,6 +1,5 @@
 package jrds.factories;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
@@ -73,9 +72,9 @@ public class TestLoadConfiguration {
 		dbuilder = l.dbuilder;
 		l.importUrl(new URL("file:desc"));
 
-		pm.setProperty("configdir", "config");
+		pm.setProperty("configdir", "tmp");
 		pm.setProperty("rrdbackend", "NIO");
-		pm.setProperty("rrddir", "probe");
+		pm.setProperty("rrddir", "tmp");
 		pm.update();
 
 		conf = new ConfigObjectFactory(pm);

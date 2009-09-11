@@ -39,7 +39,7 @@ public class EntityResolver implements org.xml.sax.EntityResolver {
 
 		logger.trace("Resolving \"" + publicId + "\" \"" + systemId + "\" to "  + realSystemId);
 		if(realSystemId == null) {
-			logger.equals("Failed to resolve " + publicId + " " + systemId);
+			logger.error("Failed to resolve " + publicId + " " + systemId);
 		}
 		return new InputSource(realSystemId.openStream());
 	}

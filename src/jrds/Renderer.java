@@ -26,6 +26,8 @@ import org.apache.log4j.Logger;
 
 public class Renderer {
 	final int PRIME = 31;
+	final File tmpDir;
+	int step;
 
 	public class RendererRun implements Runnable {
 		public Graph graph;
@@ -35,7 +37,7 @@ public class Renderer {
 
 		public RendererRun(Graph graph) throws IOException {
 			this.graph = graph;
-			destFile = new File(HostsList.getRootGroup().getTmpdir(), Integer.toHexString(graph.hashCode()) + ".png");
+			destFile = new File(tmpDir, Integer.toHexString(graph.hashCode()) + ".png");
 		}
 
 		@Override
@@ -146,8 +148,10 @@ public class Renderer {
 	private int cacheSize;
 	private Map<Integer, RendererRun> rendered;
 
-	public Renderer(int cacheSize) {
+	public Renderer(int cacheSize, int step, File tmpDir) {
+		this.tmpDir = tmpDir;
 		this.cacheSize = cacheSize;
+		this.step = step;
 		Map<Integer, RendererRun> m = new LinkedHashMap<Integer, RendererRun>(cacheSize + 5 , hashTableLoadFactor, true) {
 			/* (non-Javadoc)
 			 * @see java.util.LinkedHashMap#removeEldestEntry(java.util.Map.Entry)
@@ -239,7 +243,7 @@ public class Renderer {
 	public void finish() {
 		tpool.shutdown();
 		try {
-			tpool.awaitTermination(HostsList.getRootGroup().getStep() - 10, TimeUnit.SECONDS);
+			tpool.awaitTermination(step - 10, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			logger.info("Collect interrupted");
 		}

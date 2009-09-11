@@ -17,8 +17,8 @@ import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.TabularData;
 
-import jrds.Connection;
 import jrds.Tools;
+import jrds.starter.Connection;
 
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;

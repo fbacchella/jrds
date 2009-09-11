@@ -540,6 +540,7 @@ implements Cloneable {
 	public RrdGraphDef getGraphDef(Probe defProbe, Map<String, Plottable> ownData) throws IOException {
 		RrdGraphDef retValue = new RrdGraphDef();
 		String defRrdName = defProbe.getRrdName();
+		HostsList hl = (HostsList)defProbe.getStarters().find(HostsList.class);
 
 		/*The title line*/
 		retValue.comment(""); //We simulate the color box
@@ -555,7 +556,7 @@ implements Cloneable {
 			Probe probe = defProbe;
 			if(ds.dspath != null) {
 				logger.trace("External probe path: " + ds.dspath.host + "/" + ds.dspath.probe + "/" + ds.name);
-				probe = HostsList.getRootGroup().getProbeByPath(ds.dspath.host, ds.dspath.probe);
+				probe = hl.getProbeByPath(ds.dspath.host, ds.dspath.probe);
 				if(probe == null) {
 					logger.error("Invalide probe: " + ds.dspath.host + "/" + ds.dspath.probe);
 				}

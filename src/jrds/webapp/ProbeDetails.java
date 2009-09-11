@@ -14,10 +14,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.ErrorListener;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import jrds.HostsList;
 import jrds.Probe;
 import jrds.Util;
 
@@ -32,7 +32,7 @@ public class ProbeDetails extends HttpServlet {
 		res.setContentType("application/xhtml+xml");
 		res.addHeader("Cache-Control", "no-cache");
 
-		ParamsBean params = new ParamsBean(req);
+		ParamsBean params = new ParamsBean(req, (HostsList) getServletContext().getAttribute(HostsList.class.getName()));
 		Probe probe = params.getProbe();
 		
 		OutputStream os = null;

@@ -33,9 +33,9 @@ public final class Graph extends HttpServlet {
 	throws ServletException, IOException {
 		try {
 			Date start = new Date();
-			HostsList hl = HostsList.getRootGroup();
+			HostsList hl = (HostsList) getServletContext().getAttribute(HostsList.class.getName());
 
-			ParamsBean p = new ParamsBean(req);
+			ParamsBean p = new ParamsBean(req, (HostsList) getServletContext().getAttribute(HostsList.class.getName()));
 
 			jrds.Graph graph = p.getGraph();
 

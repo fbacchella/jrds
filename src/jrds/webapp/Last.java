@@ -38,7 +38,7 @@ public final class Last extends HttpServlet {
 		ServletOutputStream out = res.getOutputStream();
 
 		String rrdId = req.getParameter("id");
-		HostsList hl = HostsList.getRootGroup();
+		HostsList hl = (HostsList) getServletContext().getAttribute(HostsList.class.getName());
 		GraphNode g = hl.getGraphById(Integer.parseInt(rrdId));
 		if(g != null ) {
 			Probe p = g.getProbe();

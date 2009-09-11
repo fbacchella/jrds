@@ -31,6 +31,11 @@ import jrds.factories.Loader;
 import jrds.probe.ContainerProbe;
 import jrds.probe.SumProbe;
 import jrds.probe.VirtualProbe;
+import jrds.starter.Collecting;
+import jrds.starter.SocketFactory;
+import jrds.starter.Starter;
+import jrds.starter.StarterNode;
+import jrds.starter.StartersSet;
 
 import org.apache.log4j.Logger;
 
@@ -39,9 +44,9 @@ import org.apache.log4j.Logger;
  * @author Fabrice Bacchella 
  * @version $Revision$,  $Date$
  */
-public class HostsList implements StarterNode {
+public class HostsList extends Starter implements StarterNode {
 	static private final Logger logger = Logger.getLogger(HostsList.class);
-	private static HostsList instance;
+	//	private static HostsList instance;
 
 	public class Stats {
 		Stats() {
@@ -66,22 +71,28 @@ public class HostsList implements StarterNode {
 	private final Map<Integer, Probe> probeMap= new HashMap<Integer, Probe>();
 	private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
 	private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
-	private final Renderer renderer = new Renderer(50);
+	private Renderer renderer = null;
 	private int numCollectors = 1;
 	private int step;
 	private File rrdDir = null;
 	private File tmpDir = null;
 	private int timeout = 10;
 	private boolean started = false;
-	private boolean collecting = false;
 	private Stats stats = new Stats(); 
 
 	/**
 	 *  
 	 */
-	private HostsList() {
-		instance =  this;
+	public HostsList() {
 		init();
+	}
+
+	/**
+	 *  
+	 */
+	public HostsList(PropertiesManager pm) {
+		init();
+		configure(pm);
 	}
 
 	private void init() {
@@ -107,12 +118,10 @@ public class HostsList implements StarterNode {
 
 
 		starters = new StartersSet(this);
-	}
-
-	public static HostsList getRootGroup() {
-		if (instance == null)
-			new HostsList();
-		return instance;
+		new Collecting().register(this);
+		register(this);
+		jrds.snmp.SnmpStarter.full.register(this);
+		new SocketFactory().register(this);
 	}
 
 	public void configure(PropertiesManager pm) {
@@ -139,6 +148,8 @@ public class HostsList implements StarterNode {
 		rrdDir = pm.rrddir;
 		tmpDir = pm.tmpdir;
 
+		renderer = new Renderer(50, step, tmpDir);
+		
 		Loader l;
 		try {
 			l = new Loader();
@@ -213,12 +224,6 @@ public class HostsList implements StarterNode {
 		return hostList;
 
 	}
-	public static void purge() {
-		instance.started = false;
-		StoreOpener.reset();
-		instance.renderer.finish();
-		instance = new HostsList();
-	}
 
 	private void addRoot(String root) {
 		if( ! treeMap.containsKey(root)) {
@@ -237,6 +242,7 @@ public class HostsList implements StarterNode {
 
 	public void addHost(RdsHost newhost) {
 		hostList.add(newhost);
+		newhost.getStarters().setParent(getStarters());
 	}
 
 	public void collectAll() {
@@ -244,7 +250,6 @@ public class HostsList implements StarterNode {
 			logger.debug("One collect was launched");
 			Date start = new Date();
 			try {
-				starters.startCollect();
 				final Object counter = new Object() {
 					int i = 0;
 					@Override
@@ -263,7 +268,7 @@ public class HostsList implements StarterNode {
 					}
 				}
 				);
-				collecting = true;
+				starters.startCollect();
 				for(final RdsHost oneHost: hostList) {
 					if( ! isCollectRunning())
 						break;
@@ -294,7 +299,7 @@ public class HostsList implements StarterNode {
 				} catch (InterruptedException e) {
 					logger.info("Collect interrupted");
 				}
-				collecting = false;
+				starters.stopCollect();
 				if( ! tpool.isTerminated()) {
 					//Second chance, we wait for the time out
 					try {
@@ -312,7 +317,6 @@ public class HostsList implements StarterNode {
 			} catch (RuntimeException e) {
 				logger.error("problem while collecting data: ", e);
 			}							
-			starters.stopCollect();
 			Date end = new Date();
 			long duration = end.getTime() - start.getTime();
 			synchronized(stats) {
@@ -407,8 +411,6 @@ public class HostsList implements StarterNode {
 			graphMap.put(currGraph.hashCode(), currGraph);
 		}
 		logger.debug("adding virtual probe " + vprobe.getName());
-
-
 	}
 
 	@Override
@@ -440,11 +442,7 @@ public class HostsList implements StarterNode {
 	}
 
 	public boolean isCollectRunning() {
-		return started && collecting && ! Thread.currentThread().isInterrupted();
-	}
-
-	public void stopCollect() {
-		collecting = false;
+		return started && getStarters().isStarted(Collecting.class);
 	}
 
 	/**
@@ -452,6 +450,14 @@ public class HostsList implements StarterNode {
 	 */
 	public Stats getStats() {
 		return stats;
+	}
+
+	/* (non-Javadoc)
+	 * @see jrds.starter.Starter#getKey()
+	 */
+	@Override
+	public Object getKey() {
+		return this.getClass();
 	}
 
 }

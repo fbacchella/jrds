@@ -13,7 +13,9 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import jrds.HostsList;
 import jrds.Period;
+import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.mockobjects.GetMoke;
 
@@ -28,6 +30,7 @@ public class TestUrlParser {
 	static private final Map<String, String[]> parameters = new HashMap<String, String[]>();
 	static private final HttpServletRequest req = GetMoke.getRequest(parameters);
 	static final private DateFormat fullISOFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	static final private HostsList hl = new HostsList(new PropertiesManager());
 
 	@BeforeClass
 	static public void configure() throws IOException {
@@ -39,31 +42,31 @@ public class TestUrlParser {
 	@Test public void checkId() {
 		parameters.clear();
 		parameters.put("id", new String[] { "1" });
-		ParamsBean pb = new ParamsBean(req);
+		ParamsBean pb = new ParamsBean(req, hl);
 		Assert.assertEquals(1, pb.getId());
 	}
 	@Test public void checkSortedTrue() {
 		parameters.clear();
 		parameters.put("sort", new String[] { "1" });
-		ParamsBean pb = new ParamsBean(req);
+		ParamsBean pb = new ParamsBean(req, hl);
 		Assert.assertTrue(pb.isSorted());
 	}
 	@Test public void checkSortedFalseDefault() {
 		parameters.clear();
-		ParamsBean pb = new ParamsBean(req);
+		ParamsBean pb = new ParamsBean(req, hl);
 		Assert.assertTrue(! pb.isSorted());
 	}
 	@Test public void checkSortedFalse() {
 		parameters.clear();
 		parameters.put("sort", new String[] { "0" });
-		ParamsBean pb = new ParamsBean(req);
+		ParamsBean pb = new ParamsBean(req, hl);
 		Assert.assertTrue(! pb.isSorted());
 	}
 	@Test public void checkParseDate1() throws ParseException {
 		parameters.clear();
 		parameters.put("begin", new String[] { "2007-01-01" });
 		parameters.put("end", new String[] { "2007-12-31" });
-		ParamsBean pb = new ParamsBean(req);
+		ParamsBean pb = new ParamsBean(req, hl);
 		Period p = pb.getPeriod();
 
 		Date begin = fullISOFORMAT.parse("2007-01-01T00:00:00");
@@ -81,7 +84,7 @@ public class TestUrlParser {
 	}
 	@Test public void checkParseDate2() throws ParseException {
 		parameters.clear();
-		ParamsBean pb = new ParamsBean(req);
+		ParamsBean pb = new ParamsBean(req, hl);
 		Period p = pb.getPeriod();
 
 		Date now = new Date();
@@ -95,7 +98,7 @@ public class TestUrlParser {
 	@Test public void checkParseDate3() throws ParseException {
 		parameters.clear();
 		parameters.put("scale", new String [] { "4"} );
-		ParamsBean pb = new ParamsBean(req);
+		ParamsBean pb = new ParamsBean(req, hl);
 		Period p = pb.getPeriod();
 
 		Date now = new Date();
@@ -118,7 +121,7 @@ public class TestUrlParser {
 		parameters.put("scale", new String [] { "2"} );
 		parameters.put("max", new String [] { "2"} );
 		parameters.put("min", new String [] { "2"} );
-		ParamsBean pb = new ParamsBean(req);
+		ParamsBean pb = new ParamsBean(req, null);
 		String url = pb.makeObjectUrl("root", "", false);
 		Assert.assertTrue(url.contains("host=host"));
 		Assert.assertTrue(url.contains("/root?"));
@@ -133,7 +136,7 @@ public class TestUrlParser {
 		parameters.clear();
 		parameters.put("max", new String [] { String.valueOf(Double.NaN)} );
 		parameters.put("min", new String [] { String.valueOf(Double.NaN)} );
-		ParamsBean pb = new ParamsBean(req);
+		ParamsBean pb = new ParamsBean(req, hl);
 		jrds.Filter f = new jrds.FilterHost("host");
 		String url = pb.makeObjectUrl("root", f, true);
 		logger.trace(url);
@@ -152,7 +155,7 @@ public class TestUrlParser {
 		String filterName = f.getName();
 		parameters.put("filter", new String [] { filterName } );
 
-		ParamsBean pb = new ParamsBean(req);
+		ParamsBean pb = new ParamsBean(req, hl);
 		String url = pb.makeObjectUrl("root", f, true);
 		Assert.assertTrue(url.contains("filter=" + URLEncoder.encode(filterName, "UTF-8")));
 		Assert.assertTrue(url.contains("/root?"));
