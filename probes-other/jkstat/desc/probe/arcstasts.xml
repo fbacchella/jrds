@@ -1,12 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
-  <name>ArcStats</name>
-  <probeName>arcstats</probeName>
-  <probeClass>jrds.probe.KstatProbe</probeClass>
-  <specific name="kstat">zfs:0:arcstats</specific>
-  <ds>
-    <dsName>hits</dsName>
-    <dsType>counter</dsType>
-  </ds>
+	<name>ArcStats</name>
+	<probeName>arcstats</probeName>
+	<probeClass>jrds.probe.KstatProbe</probeClass>
+	<specific name="kstat">zfs:0:arcstats</specific>
+	<ds>
+		<dsName>hits</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>miss</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>size</dsName>
+		<dsType>gauge</dsType>
+	</ds>
+	<ds>
+		<dsName>c_max</dsName>
+		<dsType>gauge</dsType>
+	</ds>
+	<ds>
+		<dsName>demand_data_hits</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>demand_md_misses</dsName>
+		<dsType>counter</dsType>
+		<collect>demand_metadata_misses</collect>
+	</ds>
+	<ds>
+		<dsName>hash_chain_max</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>mru_ghost_hits</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>hdr_size</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>recycle_miss</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>prefetch_md_misses</dsName>
+		<dsType>counter</dsType>
+		<collect>prefetch_metadata_misses</collect>
+	</ds>
+	<ds>
+		<dsName>mru_hits</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>l2_io_error</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>l2_evict_lock_retry</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>l2_cksum_bad</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>l2_writes_sent</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>l2_writes_done</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>l2_evict_reading</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>l2_size</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>l2_hits</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>l2_misses</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<graphs>
+		<name>ARCStats</name>
+		<name>ARCStatsSize</name>
+	</graphs>
 </probedesc>
+	<!--
+		=0, =0, =0, evict_skip=184892, =131128648, deleted=69059,
+		l2_free_on_write=0, l2_rw_clash=0, mfu_ghost_hits=12462,
+		l2_write_bytes=0, hash_elements=17542, demand_metadata_hits=125866,
+		hash_elements_max=27470, hash_collisions=71675, =0, =798664704,
+		memory_throttle_count=165, data_size=48222720,
+		prefetch_metadata_hits=47122, prefetch_data_hits=1517, l2_hdr_size=0,
+		c=130829353, mutex_miss=24, hash_chains=4764, other_size=79813648,
+		l2_writes_hdr_miss=0, l2_abort_lowmem=0, mfu_hits=187283, l2_feeds=0,
+		demand_data_misses=33506, prefetch_data_misses=2643, =54839,
+		c_min=99833088, l2_writes_error=0, l2_read_bytes=0, =0}
+	-->

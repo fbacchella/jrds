@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+                           "urn:jrds:graphdesc">
+<graphdesc>
+	<name>ARCStats</name>
+	<graphName>arcstats</graphName>
+	<graphTitle>ARC reads on ${host}</graphTitle>
+	<verticalLabel>op/s</verticalLabel>
+	<add>
+		<name>hits</name>
+		<graphType>area</graphType>
+		<color>GREEN</color>
+		<legend>ARC reads per second</legend>
+	</add>
+	<add>
+		<name>miss</name>
+		<graphType>stack</graphType>
+		<color>RED</color>
+		<legend>ARC misses per second</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathstring>System</pathstring>
+		<pathstring>ARC</pathstring>
+		<pathstring>reads</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathstring>System</pathstring>
+		<pathstring>ARC</pathstring>
+		<pathstring>reads</pathstring>
+		<pathelement>HOST</pathelement>
+	</viewtree>
+</graphdesc>

@@ -19,41 +19,30 @@ public class KstatProbe extends jrds.Probe {
 	Kstat ks;
 
 	public void configure(Integer port) {
-		super.configure();
 		this.port = port;
-	}
-
-	/* (non-Javadoc)
-	 * @see jrds.Probe#setHost(jrds.RdsHost)
-	 */
-	@Override
-	public void setHost(RdsHost monitoredHost) {
-		super.setHost(monitoredHost);
 		try {
-			remoteUrl = new URL("http", monitoredHost.getName(), port, "/");
+			remoteUrl = new URL("http",getHost().getName(), port, "/");
 			String kstatPath[] = getPd().getSpecific("kstat").split(":");
 			String module = kstatPath[0];
 			String instStr = kstatPath[1];
 			String name = kstatPath[2];
-			int inst = -1;
-			inst = Integer.parseInt(instStr);
+			int inst = jrds.Util.parseStringNumber(instStr, Integer.class, -1).intValue();
 			ks = new Kstat(module, inst, name);
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (NumberFormatException e) {
 		}
 	}
 
 	public  static void main(String[] args) throws MalformedURLException {
 		ProbeDesc pd = new ProbeDesc();
 		pd.addSpecific("kstat", "zfs:0:arcstats");
-		KstatProbe probe = new KstatProbe(2002);
+		KstatProbe probe = new KstatProbe();
 		probe.setPd(pd);
-		probe.setHost(new RdsHost("ng263.prod"));
+		probe.setHost(new RdsHost("10.0.0.127"));
+		probe.configure(7777);
 		probe.getUptime();
 		System.out.println(probe.getNewSampleValues());
-
 	}
 
 	public Map getNewSampleValues() {
@@ -88,12 +77,16 @@ public class KstatProbe extends jrds.Probe {
 	public String getSourceType() {
 		return "kstat";
 	}
+	
 	/* (non-Javadoc)
 	 * @see jrds.Probe#getUptime()
 	 */
 	public long getUptime() {
 		JKstat remoteJk = new RemoteJKstat(remoteUrl.toString());
-		Long uptime = (Long)remoteJk.getKstat("unix", 0, "system_misc").getData("boot_time");
+		Kstat ks = remoteJk.getKstat("unix", 0, "system_misc");
+		if(ks == null)
+			return 0;
+		Long uptime = (Long)ks.getData("boot_time");
 		long now = System.currentTimeMillis() / 1000;
 		return now - uptime.longValue() ;
 	}
