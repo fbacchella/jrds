@@ -17,8 +17,6 @@
 		<list>
 					<arg type="Integer" value="80"/>
 		</list>
-		<list>
-		</list>
 	</defaultargs>
 	<ds>
 		<dsName>a</dsName>

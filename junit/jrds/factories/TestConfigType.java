@@ -36,7 +36,7 @@ public class TestConfigType {
 	@Test
 	public void detectGraph() throws Exception {
 		Node n = Tools.parseRessource("customgraph.xml");
-		checkNode(n, ConfigType.GRAPH);
+		checkNode(n, ConfigType.GRAPHDESC);
 	}
 
 	@Test

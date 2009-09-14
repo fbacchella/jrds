@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE graph PUBLIC "-//jrds//DTD Graph Description//EN"
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
                            "urn:jrds:graphdesc">
-<graph>
+<graphdesc>
 	<name>name</name>
 	<graphName>graphName</graphName>
 	<graphTitle>graphTitle</graphTitle>
@@ -32,5 +32,5 @@
 		<pathstring>viewtree1</pathstring>
 		<pathstring>viewtree2</pathstring>
 	</viewtree>
-</graph>
+</graphdesc>
   
