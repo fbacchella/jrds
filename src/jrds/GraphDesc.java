@@ -2,10 +2,8 @@ package jrds;
 
 import java.awt.Color;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,15 +32,9 @@ implements Cloneable {
 
 	static public final ConsolFun DEFAULTCF = ConsolFun.AVERAGE;
 
-	public interface GraphType {
-		public abstract void draw(RrdGraphDef rgd, String sn, Color color);
-		public abstract boolean toPlot();
-		public abstract boolean datasource();
-		public abstract boolean legend();
-
-		public static final GraphType NONE = new GraphType() {
+	public enum GraphType {
+		NONE  {
 			public void draw(RrdGraphDef rgd, String sn, Color color) {}
-			@Override
 			public String toString() {
 				return "none";
 			}
@@ -54,42 +46,39 @@ implements Cloneable {
 			}
 			public boolean legend() {
 				return false;
-			};
-		};
-
-		public static final GraphType LEGEND = new GraphType() {
-			public void draw(RrdGraphDef rgd, String sn, Color color) {};
-			@Override
+			}
+		},
+		LEGEND {
+			public void draw(RrdGraphDef rgd, String sn, Color color) {}
 			public String toString() {
 				return "void";
-			};
+			}
 			public boolean datasource() {
 				return true;
 			}
 			public boolean toPlot() {
 				return false;
-			};
+			}
 			public boolean legend() {
 				return true;
-			};
-		};
-		static public final GraphType COMMENT = new GraphType() {
+			}
+		},
+		COMMENT {
 			public void draw(RrdGraphDef rgd, String sn, Color color) {};
-			@Override
 			public String toString() {
 				return "comment";
-			};
+			}
 			public boolean datasource() {
 				return false;
 			}
 			public boolean toPlot() {
 				return false;
-			};
+			}
 			public boolean legend() {
 				return true;
-			};
-		};
-		public static final GraphType LINE = new GraphType() {
+			}
+		},
+		LINE {
 			public void draw(RrdGraphDef rgd, String sn, Color color) {
 				rgd.line(sn, color, " \\g");
 			};
@@ -106,8 +95,8 @@ implements Cloneable {
 			public boolean legend() {
 				return true;
 			};
-		};
-		static public final GraphType AREA = new GraphType() {
+		},
+		AREA {
 			public void draw(RrdGraphDef rgd, String sn, Color color) {
 				rgd.area(sn, color, " \\g");
 			};
@@ -124,8 +113,8 @@ implements Cloneable {
 			public boolean legend() {
 				return true;
 			};
-		};
-		static public final GraphType STACK = new GraphType() {
+		},
+		STACK {
 			public void draw(RrdGraphDef rgd, String sn, Color color) {
 				rgd.stack(sn, color, " \\g");
 			};
@@ -143,6 +132,11 @@ implements Cloneable {
 				return true;
 			};
 		};
+		
+		public abstract void draw(RrdGraphDef rgd, String sn, Color color);
+		public abstract boolean toPlot();
+		public abstract boolean datasource();
+		public abstract boolean legend();
 	};
 
 	//Old name kept
@@ -153,29 +147,24 @@ implements Cloneable {
 	static final public GraphType STACK = GraphType.STACK;
 	static final public GraphType COMMENT = GraphType.COMMENT;
 
-	private static abstract class PathElement {
-		public abstract String resolve(GraphNode graph);
-		public String toString() {
-			return this.resolve(null).toUpperCase();
-		}
-
-		static public final PathElement HOST = new PathElement() {
+	private enum PathElement {
+		HOST {
 			public String resolve(GraphNode graph) {
 				return graph.getProbe().getHost().getName();
 			}
 			public String toString() {
 				return "HOST";
 			}
-		};
-		static public final PathElement TITLE = new PathElement() {
+		},
+		TITLE {
 			public String resolve(GraphNode graph) {
 				return graph.getGraphTitle();
 			}
 			public String toString() {
 				return "TITLE";
 			}
-		};
-		static public final PathElement INDEX = new PathElement() {
+		},
+		INDEX {
 			public String resolve(GraphNode graph) {
 				StringBuffer retValue = new StringBuffer("empty");
 				if(graph.getProbe() instanceof IndexedProbe) {
@@ -196,8 +185,8 @@ implements Cloneable {
 			public String toString() {
 				return "INDEX";
 			}
-		};
-		static public final PathElement URL = new PathElement() {
+		},
+		URL {
 			public String resolve(GraphNode graph) {
 				String url = "";
 				Probe probe = graph.getProbe();
@@ -209,77 +198,77 @@ implements Cloneable {
 			public String toString() {
 				return "URL";
 			}
-		};
-		static public final PathElement JDBC = new PathElement() {
+		},
+		JDBC {
 			public String resolve(GraphNode graph) {
 				return ( (JdbcProbe) graph.getProbe()).getUrlAsString();
 			}
 			public String toString() {
 				return "JDBC";
 			}
-		};
-		static public final PathElement DISK = new PathElement() {
+		},
+		DISK {
 			public String resolve(GraphNode graph) {
 				return "Disk";
 			}
-		};
-		static public final PathElement NETWORK = new PathElement() {
+		},
+		NETWORK {
 			public String resolve(GraphNode graph) {
 				return "Network";
 			}
-		};
-		static public final PathElement TCP = new PathElement() {
+		},
+		TCP {
 			public String resolve(GraphNode graph) {
 				return "TCP";
 			}
-		};
-		static public final PathElement SERVICES = new PathElement() {
+		},
+		SERVICES {
 			public String resolve(GraphNode graph) {
 				return "Services";
 			}
-		};
-		static public final PathElement SYSTEM = new PathElement() {
+		},
+		SYSTEM {
 			public String resolve(GraphNode graph) {
 				return "System";
 			}
-		};
-		static public final PathElement LOAD = new PathElement() {
+		},
+		LOAD {
 			public String resolve(GraphNode graph) {
 				return "Load";
 			}
-		};
-		static public final PathElement DISKACTIVITY = new PathElement() {
+		},
+		DISKACTIVITY {
 			public String resolve(GraphNode graph) {
 				return "Disk activity";
 			}
 			public String toString() {return "DISKACTIVITY";}
-		};
-		static public final PathElement WEB = new PathElement() {
+		},
+		WEB {
 			public String resolve(GraphNode graph) {
 				return "Web";
 			}
-		};
-		static public final PathElement INTERFACES = new PathElement() {
+		},
+		INTERFACES {
 			public String resolve(GraphNode graph) {
 				return "Interfaces";
 			}
-		};
-		static public final PathElement IP = new PathElement() {
+		},
+		IP {
 			public String resolve(GraphNode graph) {
 				return "IP";
 			}
-		};
-		static public final PathElement MEMORY = new PathElement() {
+		},
+		MEMORY {
 			public String resolve(GraphNode graph) {
 				return "Memory";
 			}
-		};
-		static public final PathElement DATABASE = new PathElement() {
+		},
+		DATABASE{
 			public String resolve(GraphNode graph) {
 				return "Databases";
 			}
-		};
-		static public final PathElement DBISNTANCE = new PathElement() {
+		},
+		DBISNTANCE {
 			public String resolve(GraphNode graph) {
 				JdbcProbe dbprobe = (JdbcProbe) graph.getProbe();
 				return dbprobe.getUrlAsString();
@@ -289,6 +278,10 @@ implements Cloneable {
 				return "DBINSTANCE";
 			}
 		};
+		public abstract String resolve(GraphNode graph);
+		public String toString() {
+			return resolve(null).toUpperCase();
+		}
 	}
 
 	static final public PathElement HOST = PathElement.HOST;
@@ -310,39 +303,147 @@ implements Cloneable {
 	static final public PathElement DATABASE = PathElement.DATABASE;
 
 	private enum Colors {
-		BLUE, GREEN, RED, CYAN, ORANGE, TEAL, YELLOW, MAGENTA, PINK, BLACK, NAVY,
-		GRAY, LIGHT_GRAY, DARK_GRAY, FUCHSIA, AQUA, LIME, MAROON, OLIVE, PURPLE, SILVER, WHITE
-	};
-	private static final Map<Colors, Color> COLORMAP = new EnumMap<Colors, Color>(Colors.class);
-	static final private Color[] colors = new Color[Colors.values().length];
-	static {
-		COLORMAP.put(Colors.WHITE, Color.WHITE);
-		COLORMAP.put(Colors.BLUE, Color.BLUE);
-		COLORMAP.put(Colors.GREEN, Color.GREEN);
-		COLORMAP.put(Colors.RED, Color.RED);
-		COLORMAP.put(Colors.CYAN, Color.CYAN);
-		COLORMAP.put(Colors.ORANGE, Color.ORANGE);
-		COLORMAP.put(Colors.TEAL, new Color(0,128,128));
-		COLORMAP.put(Colors.YELLOW, Color.YELLOW);
-		COLORMAP.put(Colors.PINK, Color.PINK);
-		COLORMAP.put(Colors.MAGENTA, Color.MAGENTA);
-		COLORMAP.put(Colors.BLACK, Color.BLACK);
-		COLORMAP.put(Colors.NAVY, new Color(0,0,128));
-		COLORMAP.put(Colors.GRAY, Color.GRAY);
-		COLORMAP.put(Colors.LIGHT_GRAY, Color.LIGHT_GRAY);
-		COLORMAP.put(Colors.DARK_GRAY, Color.DARK_GRAY);
+		BLUE {
+			@Override
+			public Color getColor() {
+				return Color.BLUE;
+			}
+		}, 
+		GREEN {
+			@Override
+			public Color getColor() {
+				return Color.GREEN;
+			}
+		}, 
+		RED {
+			@Override
+			public Color getColor() {
+				return Color.RED;
+			}
+		},
+		CYAN {
+			@Override
+			public Color getColor() {
+				return Color.CYAN;
+			}
+		},
+		ORANGE {
+			@Override
+			public Color getColor() {
+				return Color.ORANGE;
+			}
+		},
+		TEAL {
+			@Override
+			public Color getColor() {
+				return new Color(0,128,128);
+			}
+		},
+		YELLOW {
+			@Override
+			public Color getColor() {
+				return Color.YELLOW;
+			}
+		},
+		MAGENTA {
+			@Override
+			public Color getColor() {
+				return Color.MAGENTA;
+			}
+		},
+		PINK {
+			@Override
+			public Color getColor() {
+				return Color.PINK;
+			}
+		},
+		BLACK {
+			@Override
+			public Color getColor() {
+				return Color.BLACK;
+			}
+		},
+		NAVY {
+			@Override
+			public Color getColor() {
+				return new Color(0,0,128);
+			}
+		},
+		GRAY {
+			@Override
+			public Color getColor() {
+				return Color.GRAY;
+			}
+		},
+		LIGHT_GRAY {
+			@Override
+			public Color getColor() {
+				return Color.LIGHT_GRAY;
+			}
+		},
+		DARK_GRAY {
+			@Override
+			public Color getColor() {
+				return Color.DARK_GRAY;
+			}
+		},
+		FUCHSIA {
+			@Override
+			public Color getColor() {
+				return new Color(255,0,255);
+			}
+		},
 		//Netscape alias for cyan
-		COLORMAP.put(Colors.AQUA, Color.CYAN);
-		COLORMAP.put(Colors.FUCHSIA, new Color(255,0,255));
-		COLORMAP.put(Colors.LIME, new Color(204,255,0));
-		COLORMAP.put(Colors.MAROON, new Color(128,0,0));
-		COLORMAP.put(Colors.OLIVE, new Color(128,128,0));
-		COLORMAP.put(Colors.OLIVE, new Color(128,0,128));
-		COLORMAP.put(Colors.SILVER, new Color(192,192,192));
-
-		COLORMAP.values().toArray(colors);
-	}
-
+		AQUA {
+			@Override
+			public Color getColor() {
+				return Color.CYAN;
+			}
+		},
+		LIME {
+			@Override
+			public Color getColor() {
+				return new Color(204,255,0);
+			}
+		},
+		MAROON {
+			@Override
+			public Color getColor() {
+				return new Color(128,0,0);
+			}
+		},
+		OLIVE {
+			@Override
+			public Color getColor() {
+				return new Color(128,128,0);
+			}
+		},
+		PURPLE {
+			@Override
+			public Color getColor() {
+				return new Color(128,0,128);
+			}
+		},
+		SILVER {
+			@Override
+			public Color getColor() {
+				return new Color(192,192,192);
+			}
+		},
+		WHITE {
+			@Override
+			public Color getColor() {
+				return Color.WHITE;
+			}
+		};
+		
+		public abstract Color getColor();
+		public static final int length = Colors.values().length;
+		public static final Color resolveIndex(int i) {
+			return Colors.values()[ i % Colors.length].getColor();
+		}
+	};
+	
 	static private final class DsDesc {
 		public String name;
 		public String dsName;
@@ -433,17 +534,17 @@ implements Cloneable {
 
 	public void add(String name, GraphType graphType, String legend) {
 		add(name, name, null, graphType,
-				colors[ (lastColor) % colors.length], legend,
+				Colors.resolveIndex(lastColor), legend,
 				DEFAULTCF, false, null, null);
-		if(graphType != GraphType.COMMENT && graphType != GraphType.NONE && graphType != GraphType.LEGEND)
+		if(graphType.toPlot())
 			lastColor++;
 	}
 
 	public void add(String name, GraphType graphType) {
 		add(name, name, null, graphType,
-				colors[ (lastColor) % colors.length], name,
+				Colors.resolveIndex(lastColor), name,
 				DEFAULTCF, false, null, null);
-		if(graphType != GraphType.COMMENT && graphType != GraphType.NONE && graphType != GraphType.LEGEND)
+		if(graphType.toPlot())
 			lastColor++;
 	}
 
@@ -470,9 +571,9 @@ implements Cloneable {
 
 	public void add(String name, String rpn, GraphType graphType, String legend) {
 		add(name, null, rpn, graphType,
-				colors[lastColor % colors.length], legend,
+				Colors.resolveIndex(lastColor), legend,
 				DEFAULTCF, false, null, null);
-		if(graphType != GraphType.COMMENT && graphType != GraphType.NONE && graphType != GraphType.LEGEND)
+		if(graphType.toPlot())
 			lastColor++;
 	}
 
@@ -518,20 +619,20 @@ implements Cloneable {
 				gt = GraphType.NONE;
 		}
 		else
-			gt = (GraphType) resolv(GraphType.class, graphType);
+			gt = GraphType.valueOf(graphType.toUpperCase());
 
 		ConsolFun cf  = null;
 		if(gt != GraphType.COMMENT) {
 			cf = DEFAULTCF;
 			if (consFunc != null && ! "".equals(consFunc))
-				cf = (ConsolFun) resolv(ConsolFun.class, consFunc);
+				cf = ConsolFun.valueOf(consFunc.toUpperCase());
 		}
 
 		Color c = null;
 		if(gt.toPlot()) {
 			c = Color.WHITE;
 			if (color != null && ! "".equals(color)) {
-				c = (Color) COLORMAP.get(Colors.valueOf(color.toUpperCase()));
+				c = Colors.valueOf(color.toUpperCase()).getColor();
 				if( c == null)
 					c = Color.getColor(color);
 				if (c == null) {
@@ -540,7 +641,7 @@ implements Cloneable {
 				}
 			}
 			else {
-				c = colors[lastColor % colors.length];
+				c = Colors.resolveIndex(lastColor);
 				if(gt.toPlot())
 					lastColor++;
 
@@ -592,7 +693,6 @@ implements Cloneable {
 			maxLengthLegend = Math.max(maxLengthLegend, legend.length());
 		}
 	}
-
 
 	/**
 	 * return the RrdGraphDef for this graph, used the indicated probe
@@ -703,7 +803,7 @@ implements Cloneable {
 
 	/**
 	 * return the RrdGraphDef for this graph, used the indicated probe
-	 * any data can be overined of a provided map of Plottable
+	 * any data can be overridden of a provided map of Plottable
 	 * @param probe
 	 * @param ownData data used to overied probe's own values
 	 * @return
@@ -950,29 +1050,8 @@ implements Cloneable {
 		this.graphTitle = graphTitle;
 	}
 
-	/**
-	 * Find the value of field in the class, the field is is upper case
-	 *
-	 * @param clazz Class the class to search in
-	 * @param name String the looked for field
-	 * @return Object the value of the field or null
-	 */
-	private static final Object resolv(Class<?> clazz, String name) {
-		Object gt = null;
-		Field gtfield;
-		try {
-			gtfield = clazz.getField(name.toUpperCase());
-			if (gtfield != null)
-				gt = gtfield.get(clazz);
-		}
-		catch (Exception e) {
-			logger.error("\"" + name  +"\""+ " is a invalid constant name for type " + clazz);
-		}
-		return gt;
-	}
-
 	public static final PathElement resolvPathElement(String name) {
-		return (PathElement) resolv(PathElement.class, name);
+		return PathElement.valueOf(name.toUpperCase());
 	}
 
 	public String getName() {
