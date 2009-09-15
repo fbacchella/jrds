@@ -25,7 +25,7 @@ public final class StoreOpener {
 	}
 
 	public static final int INITIAL_CAPACITY = 200;
-	private static Semaphore capacity;
+	private static Semaphore capacity = null;
 	private static int timeout;
 
 	static private final ConcurrentHashMap<String, Indirection> pool = new ConcurrentHashMap<String, Indirection>(INITIAL_CAPACITY);
@@ -96,9 +96,10 @@ public final class StoreOpener {
 	}
 
 	public static final void prepare(int dbPoolSize, int syncPeriod, int timeout, String backend) {
-		RrdBackendFactory.registerFactory(new RrdAccountingNioBackendFactory());
-		RrdBackendFactory.setDefaultFactory(backend);
-
+		if(capacity == null) {
+			RrdBackendFactory.registerFactory(new RrdAccountingNioBackendFactory());
+			RrdBackendFactory.setDefaultFactory(backend);
+		}
 		RrdBackendFactory factory = RrdBackendFactory.getDefaultFactory();
 
 		if (!(factory instanceof RrdFileBackendFactory)) {
