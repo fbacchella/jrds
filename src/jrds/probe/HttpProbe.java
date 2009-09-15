@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -41,7 +42,7 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 	private String label;
 	private List<Object> argslist = null;
 	Starter resolver = null;
-	
+
 	public void configure(URL url) {
 		this.url = url;
 		finishConfigure();
@@ -139,7 +140,6 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 		return lines;
 	}
 
-
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.Probe#getNewSampleValues()
 	 */
@@ -154,15 +154,36 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 		}
 		Map<String, Number> vars = java.util.Collections.emptyMap();
 		logger.debug("Getting " + getUrl());
+		URLConnection cnx = null;
 		try {
-			URLConnection cnx = getUrl().openConnection();
+			cnx = getUrl().openConnection();
 			cnx.setConnectTimeout(getTimeout() * 1000);
 			cnx.setReadTimeout(getTimeout() * 1000);
 			cnx.connect();
-			vars = parseStream(cnx.getInputStream());
 		} catch (IOException e) {
 			logger.error("Unable to read url " + getUrl() + " because: " + e);
 		}
+		try {
+			InputStream is = cnx.getInputStream();
+			vars = parseStream(is);
+			is.close();
+		} catch (IOException e) {
+			//Clean http connection error management
+			//see http://java.sun.com/j2se/1.5.0/docs/guide/net/http-keepalive.html
+			try {
+				byte[] buffer = new byte[4096];
+				int respCode = ((HttpURLConnection)cnx).getResponseCode();
+				logger.error("Unable to read url " + getUrl() + " because: " + e +", http error code: " + respCode);
+				InputStream es = ((HttpURLConnection)cnx).getErrorStream();
+				// read the response body
+				while (es.read(buffer) > 0) {}
+				// close the error stream
+				es.close();
+			} catch(IOException ex) {
+				logger.error("Unable to recover from error in url " + getUrl() + " because: " + e);
+			}
+		}
+
 		return vars;
 	}
 
