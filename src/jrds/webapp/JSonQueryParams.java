@@ -8,19 +8,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jrds.HostsList;
-
 /**
  * Servlet implementation class JSonQueryParams
  */
-public class JSonQueryParams extends HttpServlet {
+public class JSonQueryParams extends JrdsServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ParamsBean params = new ParamsBean(request, (HostsList) getServletContext().getAttribute(HostsList.class.getName()));
+		ParamsBean params = getParamsBean(request);
 		response.setContentType("application/json");
 		ServletOutputStream out = response.getOutputStream();
 

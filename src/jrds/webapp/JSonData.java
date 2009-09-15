@@ -16,18 +16,16 @@ import org.apache.log4j.Logger;
 
 import jrds.HostsList;
 
-public abstract class JSonData extends HttpServlet {
+public abstract class JSonData extends JrdsServlet {
 	static final private Logger logger = Logger.getLogger(JSonData.class);
 	
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ParamsBean params = new ParamsBean(request, (HostsList) getServletContext().getAttribute(HostsList.class.getName()));
-
-		HostsList root = (HostsList) getServletContext().getAttribute(HostsList.class.getName());
-
 		try {
+			ParamsBean params = getParamsBean(request);
+			HostsList root = getHostsList();
 			response.setContentType("application/json");
 			ServletOutputStream out = response.getOutputStream();
 			out.println("{ identifier: 'id'," +

@@ -10,21 +10,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import jrds.HostsList;
 import jrds.Probe;
 import jrds.Util;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
-public class ProbeDetails extends HttpServlet {
+public class ProbeDetails extends JrdsServlet {
 	static final private Logger logger = Logger.getLogger(ProbeDetails.class);
 
 	@Override
@@ -32,7 +30,7 @@ public class ProbeDetails extends HttpServlet {
 		res.setContentType("application/xhtml+xml");
 		res.addHeader("Cache-Control", "no-cache");
 
-		ParamsBean params = new ParamsBean(req, (HostsList) getServletContext().getAttribute(HostsList.class.getName()));
+		ParamsBean params = getParamsBean(req);
 		Probe probe = params.getProbe();
 		
 		OutputStream os = null;

@@ -14,12 +14,13 @@ import java.util.Properties;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+
+import jrds.PropertiesManager;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
@@ -30,7 +31,7 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
  * @author Fabrice Bacchella
  * @version $Revision: 360 $
  */
-public final class WhichLibs extends HttpServlet {
+public final class WhichLibs extends JrdsServlet {
 	static final private Logger logger = Logger.getLogger(WhichLibs.class);
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
@@ -67,6 +68,9 @@ public final class WhichLibs extends HttpServlet {
 			out.println(ctxt.getServerInfo());
 			out.println(ctxt.getServletContextName());
 			out.println(getServletInfo());
+			
+			PropertiesManager pm = getPropertiesManager();
+			out.println("Temp dir:" + pm.tmpdir);
 			out.println(resolv("String", ""));
 			out.println(resolv("jrds", this));
 			try {
@@ -83,6 +87,7 @@ public final class WhichLibs extends HttpServlet {
 			}
 			out.println(resolv("SNMP4J", DefaultUdpTransportMapping.class));
 			out.println(resolv("Log4j",logger.getClass()));
+			out.println("Generation:" + getConfig().thisgeneration);
 //			out.println(resolv("common logging API", org.apache.commons.logging.LogFactory.class));
 //			out.println(resolv("common logging", org.apache.commons.logging.LogFactory.getLog(this.getClass())));
 //			out.println(resolv("JAI", JAI.class));

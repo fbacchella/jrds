@@ -1,6 +1,5 @@
 package jrds.webapp;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
@@ -47,7 +46,7 @@ import org.w3c.dom.Element;
 /**
  * Servlet implementation class AutoDetect
  */
-public class Discover extends HttpServlet {
+public class Discover extends JrdsServlet {
 	static final private Logger logger = Logger.getLogger(Discover.class);
 
 	private static final String CONTENT_TYPE = "application/xml";
@@ -109,7 +108,7 @@ public class Discover extends HttpServlet {
 		if(withOidStr != null)
 			withOid = true;
 
-		PropertiesManager pm = (PropertiesManager) getServletContext().getAttribute(PropertiesManager.class.getCanonicalName());
+		PropertiesManager pm = getPropertiesManager();
 
 		Loader l;
 		try {

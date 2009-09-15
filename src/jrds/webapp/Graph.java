@@ -11,7 +11,6 @@ import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,7 +23,7 @@ import org.apache.log4j.Logger;
  * @author Fabrice Bacchella
  * @version $Revision$
  */
-public final class Graph extends HttpServlet {
+public final class Graph extends JrdsServlet {
 	static final private Logger logger = Logger.getLogger(Graph.class);
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
@@ -33,9 +32,9 @@ public final class Graph extends HttpServlet {
 	throws ServletException, IOException {
 		try {
 			Date start = new Date();
-			HostsList hl = (HostsList) getServletContext().getAttribute(HostsList.class.getName());
+			HostsList hl = getHostsList();
 
-			ParamsBean p = new ParamsBean(req, (HostsList) getServletContext().getAttribute(HostsList.class.getName()));
+			ParamsBean p = getParamsBean(req);
 
 			jrds.Graph graph = p.getGraph();
 

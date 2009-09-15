@@ -1,29 +1,26 @@
 package jrds.webapp;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jrds.HostsList;
 import jrds.Period;
-
-import org.apache.log4j.Logger;
 
 /**
  * Servlet implementation class JSonPeriod
  */
-public class JSonPeriod extends HttpServlet {
-	static final private Logger logger = Logger.getLogger(JSonPeriod.class);
+public class JSonPeriod extends JrdsServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ParamsBean params = new ParamsBean(request, (HostsList) getServletContext().getAttribute(HostsList.class.getName()));
+		ParamsBean params = getParamsBean(request);
 		response.setContentType("application/json");
 		ServletOutputStream out = response.getOutputStream();
 

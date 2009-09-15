@@ -12,22 +12,18 @@ import java.util.Collection;
 import java.util.Date;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jrds.HostsList;
 import jrds.RdsHost;
 
-import org.apache.log4j.Logger;
-
 /**
  * A few stats for jrds inner status
  * @author Fabrice Bacchella
  * @version $Revision: 360 $
  */
-public final class Status extends HttpServlet {
-	static final private Logger logger = Logger.getLogger(Status.class);
+public final class Status extends JrdsServlet {
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
@@ -35,7 +31,7 @@ public final class Status extends HttpServlet {
 	throws ServletException, IOException {
 		res.setContentType("text/plain");
 		res.addHeader("Cache-Control", "no-cache");
-		HostsList hl = (HostsList) getServletContext().getAttribute(HostsList.class.getName());
+		HostsList hl = getHostsList();
 
 		Collection<RdsHost> hosts = hl.getHosts();
 		int numHosts = hosts.size();

@@ -11,11 +11,9 @@ import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jrds.HostsList;
 import jrds.Probe;
 
 import org.apache.log4j.Logger;
@@ -27,7 +25,7 @@ import org.rrd4j.core.FetchData;
  * @author Fabrice Bacchella
  * @version $Revision: 236 $
  */
-public final class ProbeSummary extends HttpServlet {
+public final class ProbeSummary extends JrdsServlet {
 	static final private Logger logger = Logger.getLogger(ProbeSummary.class);
 	
 	/**
@@ -39,7 +37,7 @@ public final class ProbeSummary extends HttpServlet {
 		res.addHeader("Cache-Control", "no-cache");
 		ServletOutputStream out = res.getOutputStream();
 
-		ParamsBean params = new ParamsBean(req, (HostsList) getServletContext().getAttribute(HostsList.class.getName()));
+		ParamsBean params = getParamsBean(req);
 
 		Probe probe = params.getProbe();
 		if(probe != null) {

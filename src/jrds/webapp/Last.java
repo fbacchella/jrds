@@ -11,20 +11,19 @@ import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jrds.GraphNode;
 import jrds.HostsList;
 import jrds.Probe;
-import jrds.GraphNode;
 
 /**
  * A servlet wich show the last update values and time
  * @author Fabrice Bacchella
  * @version $Revision: 236 $
  */
-public final class Last extends HttpServlet {
+public final class Last extends JrdsServlet {
 	static public String name = null;
 	
 	/**
@@ -38,7 +37,7 @@ public final class Last extends HttpServlet {
 		ServletOutputStream out = res.getOutputStream();
 
 		String rrdId = req.getParameter("id");
-		HostsList hl = (HostsList) getServletContext().getAttribute(HostsList.class.getName());
+		HostsList hl = getHostsList();
 		GraphNode g = hl.getGraphById(Integer.parseInt(rrdId));
 		if(g != null ) {
 			Probe p = g.getProbe();
