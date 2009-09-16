@@ -109,7 +109,7 @@ public class ProbeFactory {
 				retValue = c.newInstance();
 			}
 			catch (LinkageError ex) {
-				logger.warn("Error creating probe's class " + probeClass);
+				logger.warn("Error creating probe's " + pd.getName() +": " + ex);
 				return null;
 			}
 			catch (ClassCastException ex) {
@@ -140,7 +140,13 @@ public class ProbeFactory {
 					index++;
 				}
 				Method configurator = probeClass.getMethod("configure", constArgsType);
-				configurator.invoke(retValue, constArgsVal);
+				Object result = configurator.invoke(retValue, constArgsVal);
+				if(result != null && result instanceof Boolean) {
+					Boolean configured = (Boolean) result;
+					if(! configured.booleanValue()) {
+						return null;
+					}
+				}
 			}
 			catch (NoClassDefFoundError ex) {
 				logger.warn("Missing class for the creation of a probe " + pd.getName());

@@ -98,14 +98,6 @@ implements Comparable<Probe>, StarterNode {
 	public Probe() {
 	}
 
-	/**
-	 * A empty configurator doing nothing
-	 * This method is often overriden
-	 */
-	public void configure() {
-
-	}
-
 	public RdsHost getHost() {
 		return monitoredHost;
 	}

@@ -111,7 +111,6 @@ public class SnmpStarter extends Starter {
 		if(full.isStarted() && resolver.isStarted()) {
 			snmpTarget = makeTarget();
 			if(snmpTarget != null) {
-
 				try {
 					Set<OID> upTimesOids = new HashSet<OID>(2);
 					upTimesOids.add(uptimeOid);

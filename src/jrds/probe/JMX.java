@@ -35,6 +35,10 @@ public class JMX extends Probe implements ConnectedProbe {
 	static final private Logger logger = Logger.getLogger(JMX.class);
 
 	private String connectionName = JMXConnection.class.getName();
+	
+	public boolean configure() {
+		return true;
+	}
 
 	@Override
 	public Map<?, ?> getNewSampleValues() {

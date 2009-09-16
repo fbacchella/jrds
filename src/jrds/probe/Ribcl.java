@@ -55,7 +55,7 @@ public class Ribcl extends Probe {
 	}
 
 	/* (non-Javadoc)
-	 * @see jrds.probe.HttpProbe#setHost(jrds.RdsHost)
+	 * @see jrds.probe.Probe#setHost(jrds.RdsHost)
 	 */
 	@Override
 	public void setHost(RdsHost monitoredHost) {

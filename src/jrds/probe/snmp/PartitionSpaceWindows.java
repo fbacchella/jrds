@@ -25,8 +25,8 @@ public class PartitionSpaceWindows extends PartitionSpace {
 	 * @param monitoredHost
 	 * @param indexKey
 	 */
-	public void configure(String indexKey) {
-		super.configure(indexKey);
+	public boolean configure(String indexKey) {
+		return super.configure(indexKey);
 	}
 	
 	/**

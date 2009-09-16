@@ -26,10 +26,11 @@ public class CpqDaPhyDrv extends RdsIndexedSnmpRrd {
 	static final private OID cpqDaPhyDrvHReads = new OID(".1.3.6.1.4.1.232.3.2.5.1.1.10");
 	static final private OID cpqDaPhyDrvReads = new OID(".1.3.6.1.4.1.232.3.2.5.1.1.11");
 
-	public void configure(Integer controlerIdx, Integer driveIdx) {
+	public boolean configure(Integer controlerIdx, Integer driveIdx) {
 		super.configure(controlerIdx + "." + driveIdx);
 		this.controlerIdx = controlerIdx;
 		this.driveIdx = driveIdx;
+		return configure();
 	}
 
 	@Override

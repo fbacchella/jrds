@@ -46,6 +46,15 @@ public abstract class SnmpProbe extends Probe {
 		super.setPd(pd);
 		nameMap = getPd().getCollectOids();
 	}
+	
+	public boolean configure() {
+		SnmpStarter snmp = getSnmpStarter();
+		if(snmp == null) {
+			logger.error("No snmp connection configured for " + this);
+			return false;
+		}
+		return true;
+	}
 
 	/* (non-Javadoc)
 	 * @see jrds.Probe#readSpecific()
