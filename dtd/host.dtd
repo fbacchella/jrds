@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT host (macro|connection|probe)+ >
+<!ATTLIST host
+	name CDATA #REQUIRED
+	dnsName CDATA #IMPLIED
+>
+<!ELEMENT macro (properties?) >
+<!ATTLIST macro
+	name CDATA #REQUIRED
+>
+<!ELEMENT connection (arg, list)* >
+<!ATTLIST connection
+		type CDATA #REQUIRED
+		name CDATA #IMPLIED
+>
 <!ELEMENT probe ((arg, list)*, threshold+, properties?) >
 <!ELEMENT arg EMPTY>
 <!ATTLIST arg

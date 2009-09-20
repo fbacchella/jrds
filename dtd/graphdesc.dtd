@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!ELEMENT graphdesc (name, graphName, graphTitle, properties?, unit?, verticalLabel, upperLimit?, lowerLimit?, add+, hosttree, viewtree)>
-<!ELEMENT graph (name, graphName, graphTitle, unit?, verticalLabel, upperLimit?, lowerLimit?, add+, hosttree, viewtree)>
-<!ELEMENT add (legend | ((name | (name?, rpn)) , reversed?, graphType?, color?, legend?))>
+<!ELEMENT graph (name, graphName, graphTitle, properties?, unit?, verticalLabel, upperLimit?, lowerLimit?, (add|addpath)+, tree)>
+<!ELEMENT add (legend | ((name | (name?, rpn)), reversed?, graphType?, color?, legend?))>
+<!ELEMENT addpath (name?, path, reversed?, graphType?, color?, legend?)>
 <!ELEMENT viewtree (pathelement | pathstring)*>
 <!ELEMENT hosttree (pathelement | pathstring)*>
+<!ELEMENT tree (pathelement | pathstring)*>
 <!ELEMENT unit ((binary | SI)?, base?)>
 <!ELEMENT color (#PCDATA)>
 <!ELEMENT graphName (#PCDATA)>
@@ -15,8 +17,8 @@
 <!ELEMENT reversed (#PCDATA)>
 <!ELEMENT name (#PCDATA)>
 <!ELEMENT host (#PCDATA)>
-<!ELEMENT path (host,probe, name)>
 <!ELEMENT probe (#PCDATA)>
+<!ELEMENT path (host, probe, name)>
 <!ELEMENT rpn (#PCDATA)>
 <!ELEMENT pathstring (#PCDATA)>
 <!ELEMENT pathelement (#PCDATA)>
