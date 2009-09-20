@@ -2,7 +2,6 @@ package jrds.snmp;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import jrds.JrdsLoggerConfiguration;
@@ -19,13 +18,16 @@ import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.Target;
+import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.log.Log4jLogFactory;
 import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.smi.Address;
 import org.snmp4j.smi.GenericAddress;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
+import org.snmp4j.smi.TcpAddress;
 import org.snmp4j.smi.UdpAddress;
+import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 import org.snmp4j.util.DefaultPDUFactory;
 import org.snmp4j.util.PDUFactory;
@@ -80,7 +82,7 @@ public class SnmpStarter extends Starter {
 			return "SNMP root";
 		}
 	};
-	
+
 
 	private int version = SnmpConstants.version2c;
 	private String proto = UDP;
@@ -111,27 +113,40 @@ public class SnmpStarter extends Starter {
 		if(full.isStarted() && resolver.isStarted()) {
 			snmpTarget = makeTarget();
 			if(snmpTarget != null) {
-				try {
-					Set<OID> upTimesOids = new HashSet<OID>(2);
-					upTimesOids.add(uptimeOid);
-					//Fallback uptime OID, it should be always defined, from SNMPv2-MIB
-					upTimesOids.add(sysUpTimeInstance);
-
-					Map<OID, Object> uptimes = SnmpRequester.RAW.doSnmpGet(this, upTimesOids);
-					Number uptimeNumber = (Number) uptimes.get(uptimeOid);
-					//Try the fallback
-					if(uptimeNumber == null)
-						uptimeNumber = (Number) uptimes.get(sysUpTimeInstance);
-					if(uptimeNumber != null) {
-						setUptime(uptimeNumber.longValue());
-						started = true;
-					}
-				} catch (IOException e) {
-					logger.error("Unable to get uptime for " + snmpTarget + " because of: " + e);
-				}
+				started = readUpTime();
 			}
 		}
 		return started;
+	}
+
+	private boolean readUpTime() {
+		Set<OID> upTimesOids = new HashSet<OID>(2);
+		upTimesOids.add(uptimeOid);
+		//Fallback uptime OID, it should be always defined, from SNMPv2-MIB
+		upTimesOids.add(sysUpTimeInstance);
+
+		for(OID uptimeoid: upTimesOids) {
+			if(! full.isStarted() || ! resolver.isStarted()) {
+				break;
+			}
+			try {
+				PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
+				requestPDU.addOID(new VariableBinding(uptimeoid));
+				ResponseEvent re = snmp.send(requestPDU, snmpTarget);
+				PDU response = re.getResponse();
+				if(response == null) {
+					throw new IOException("SNMP Timeout for uptime, address=" + snmpTarget.getAddress() + ", requestID=" + requestPDU.getRequestID());
+				}
+				Object value = new SnmpVars(response).get(uptimeoid);
+				if(value instanceof Number) {
+					this.setUptime(((Number) value).longValue());
+					return true;
+				}
+			} catch (IOException e) {
+				logger.error("Unable to get uptime for " + snmpTarget + " because of: " + e);
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -145,6 +160,9 @@ public class SnmpStarter extends Starter {
 		Address address;
 		if(UDP.equals(proto.toLowerCase())) {
 			address = new UdpAddress(resolver.getInetAddress(), port);
+		}
+		if(TCP.equals(proto.toLowerCase())) {
+			address = new TcpAddress(resolver.getInetAddress(), port);
 		}
 		else {
 			String addrStr = proto + ":" + this.hostname + "/" + port;
@@ -233,7 +251,7 @@ public class SnmpStarter extends Starter {
 
 	public Snmp getSnmp() {
 		Snmp retValue = null;
-		if(full.isStarted())
+		if(isStarted())
 			retValue = snmp;
 		return retValue;
 	}
@@ -256,5 +274,13 @@ public class SnmpStarter extends Starter {
 	 */
 	public PDUFactory getPdufactory() {
 		return pdufactory;
+	}
+
+	/* (non-Javadoc)
+	 * @see jrds.starter.Starter#isStarted()
+	 */
+	@Override
+	public boolean isStarted() {
+		return super.isStarted() && full.isStarted();
 	}
 }

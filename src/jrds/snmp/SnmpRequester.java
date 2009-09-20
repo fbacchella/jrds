@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.PDU;
+import org.snmp4j.Snmp;
 import org.snmp4j.Target;
 import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.mp.SnmpConstants;
@@ -84,18 +85,20 @@ public abstract class SnmpRequester {
 		{
 			SnmpVars retValue = new SnmpVars();
 
-			if(starter != null && starter.isStarted()) {
-				Target snmpTarget = starter.getTarget();
-				if(snmpTarget != null) {
-					PDUFactory localfactory = starter.getPdufactory();
-					TableUtils tableRet = new TableUtils(starter.getSnmp(), localfactory);
-					tableRet.setMaxNumColumnsPerPDU(30);
-					OID[] oidTab= new OID[oids.size()];
-					oids.toArray(oidTab);
-					for(TableEvent te: (Iterable<TableEvent>)tableRet.getTable(snmpTarget, oidTab, null, null)) {
-						if(! te.isError()) {
-							retValue.join(te.getColumns());
-						}
+			Target snmpTarget = starter.getTarget();
+			Snmp snmp = starter.getSnmp();
+			if(starter != null && starter.isStarted() && snmpTarget != null && snmp != null) {
+				PDUFactory localfactory = starter.getPdufactory();
+				TableUtils tableRet = new TableUtils(snmp, localfactory);
+				tableRet.setMaxNumColumnsPerPDU(30);
+				OID[] oidTab= new OID[oids.size()];
+				oids.toArray(oidTab);
+				for(TableEvent te: (Iterable<TableEvent>)tableRet.getTable(snmpTarget, oidTab, null, null)) {
+					if(! starter.isStarted()) {
+						break;
+					}
+					if(! te.isError()) {
+						retValue.join(te.getColumns());
 					}
 				}
 			}
@@ -117,16 +120,14 @@ public abstract class SnmpRequester {
 		{
 			SnmpVars retValue = new SnmpVars();
 
-			if(starter != null && starter.isStarted()) {
-				Target snmpTarget = starter.getTarget();
-				if(snmpTarget != null) {
-					TreeUtils treeRet = new TreeUtils(starter.getSnmp(), starter.getPdufactory());
-					for(OID rootOid : oids) {
-						List<TreeEvent> subOids = treeRet.getSubtree(snmpTarget, rootOid);
-						for(TreeEvent te: subOids) {
-							retValue.join(te.getVariableBindings());
-						}
-						
+			Target snmpTarget = starter.getTarget();
+			Snmp snmp = starter.getSnmp();
+			if(starter != null && starter.isStarted() && snmpTarget != null && snmp != null) {
+				TreeUtils treeRet = new TreeUtils(starter.getSnmp(), starter.getPdufactory());
+				for(OID rootOid : oids) {
+					List<TreeEvent> subOids = treeRet.getSubtree(snmpTarget, rootOid);
+					for(TreeEvent te: subOids) {
+						retValue.join(te.getVariableBindings());
 					}
 				}
 			}
@@ -170,14 +171,13 @@ public abstract class SnmpRequester {
 		requestPDU.addAll(vars);
 
 		boolean doAgain = true;
-		PDU response = null;
+		Snmp snmp = starter.getSnmp();
 		do {
-			ResponseEvent re = null;
-			if(requestPDU.size() > 0) {
-				re = starter.getSnmp().send(requestPDU, snmpTarget);
-			}
-			if(re != null)
+			PDU response = null;
+			if(starter.isStarted() && requestPDU.size() > 0) {
+				ResponseEvent re = snmp.send(requestPDU, snmpTarget);
 				response = re.getResponse();
+			}
 			if (response != null && response.getErrorStatus() == SnmpConstants.SNMP_ERROR_SUCCESS){
 				snmpVars = new SnmpVars(response);
 				doAgain = false;
@@ -201,7 +201,7 @@ public abstract class SnmpRequester {
 						doAgain = false;
 				}
 			}
-		} while (doAgain);
+		} while (doAgain && starter.isStarted());
 		return snmpVars;
 
 	}
