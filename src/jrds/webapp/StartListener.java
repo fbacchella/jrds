@@ -42,18 +42,12 @@ public class StartListener implements ServletContextListener {
 			System.setProperty("java.awt.headless","true");
 
 			ServletContext ctxt = arg0.getServletContext();
-			try {
-				Configuration c = new Configuration(ctxt);
-				c.start();
-				ctxt.setAttribute(Configuration.class.getName(), c);
-				started = true;
-				logger.info("jrds started");
-				logger.info("Application jrds started");
-			}
-			catch (Exception ex) {
-				logger.fatal("Unable to start " + ctxt.getServletContextName() + " because "+ ex +": ", ex);
-				throw new RuntimeException(ex);
-			}
+			Configuration c = new Configuration(ctxt);
+			c.start();
+			ctxt.setAttribute(Configuration.class.getName(), c);
+			started = true;
+			logger.info("jrds started");
+			logger.info("Application jrds started");
 		}
 	}
 

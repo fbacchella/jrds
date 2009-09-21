@@ -10,13 +10,13 @@ import java.util.Set;
 
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;
+import jrds.starter.StartersSet;
 
 import org.apache.log4j.Logger;
 
 public class ChainedProperties extends Starter implements Map<String, String> {
 	static final private Logger logger = Logger.getLogger(ChainedProperties.class);
 
-	static final public String KEY="PROPERTIES";
 	private Map<String, String> properties = new HashMap<String, String>();
 	private Map<String, String> parent = null;
 
@@ -36,18 +36,9 @@ public class ChainedProperties extends Starter implements Map<String, String> {
 	 */
 	@Override
 	public Object getKey() {
-		return KEY;
+		return getClass().getName();
 	}
 
-	/* (non-Javadoc)
-	 * @see jrds.Starter#register(jrds.StarterNode)
-	 */
-	@Override
-	public Starter register(StarterNode node) {
-		parent = (ChainedProperties) node.getStarters().find(KEY);
-		return super.register(node);
-	}
-	
 	public void chain(ChainedProperties parent) {
 		this.parent = parent;
 	}
@@ -191,5 +182,14 @@ public class ChainedProperties extends Starter implements Map<String, String> {
 	 */
 	public Collection<String> values() {
 		return properties.values();
+	}
+
+	/* (non-Javadoc)
+	 * @see jrds.starter.Starter#initialize(jrds.starter.StarterNode, jrds.starter.StartersSet)
+	 */
+	@Override
+	public void initialize(StarterNode parent, StartersSet level) {
+		super.initialize(parent, level);
+		this.parent = (ChainedProperties) level.find(getKey());
 	}
 }

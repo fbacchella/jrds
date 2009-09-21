@@ -6,11 +6,11 @@ package jrds;
  * <ul>
  * <li> it should have this field
  * <pre>
- * 	private String connectionName = ThisProbe.class.getName();
+ * 	private String connectionName = ConnectionClass.class.getName();
  * </pre>
  * <li> the method getNewSampleValues should begin with the following code :
  * <pre>
- * 	ThisConnection cnx = (ThisConnection) getStarters().find(connectionName);
+ * 	ConnectionClass cnx = (ConnectionClass) getStarters().find(connectionName);
  *	if( !cnx.isStarted()) {
  *		return Collections.EMPTY_MAP;
  *	}
@@ -27,6 +27,10 @@ package jrds;
  *	}
  * </pre>
  * </ul>
+ * 
+ * This intereface is used by the Probe class to check if it needs to check the connection started, so there is no need
+ * to overwrite the isStarted method.
+ * 
  * @author Fabrice Bacchella 
  * @version $Revision: 407 $,  $Date: 2007-02-22 18:48:03 +0100 (jeu., 22 févr. 2007) $
  */

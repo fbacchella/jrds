@@ -2,6 +2,7 @@ package jrds.factories;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Node;
@@ -28,8 +29,8 @@ public class GraphDescBuilder extends ObjectBuilder {
 	}
 	public GraphDesc makeGraphDesc(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 		GraphDesc gd = new GraphDesc();
-		
-		JrdsNode subnode = n.getChild(CompiledXPath.get("/graphdesc | /graph"));
+
+		JrdsNode subnode = n.getChild(CompiledXPath.get("(/graphdesc|/graph)"));
 
 		subnode.setMethod(gd, CompiledXPath.get("name"), "setName");
 		subnode.setMethod(gd, CompiledXPath.get("graphName"), "setGraphName");
@@ -38,7 +39,7 @@ public class GraphDescBuilder extends ObjectBuilder {
 		subnode.setMethod(gd, CompiledXPath.get("upperLimit"), "setUpperLimit");
 		subnode.setMethod(gd, CompiledXPath.get("lowerLimit"), "setLowerLimit");
 		subnode.setMethod(gd, CompiledXPath.get("unit/base"), "setUnitExponent");
-		
+
 		//Vertical label should never be empty
 		if(gd.getVerticalLabel() == null)
 			gd.setVerticalLabel("");
@@ -50,7 +51,7 @@ public class GraphDescBuilder extends ObjectBuilder {
 			gd.setSiUnit(true);
 		}
 
-		for(Node addnode: subnode.iterate(CompiledXPath.get("add"))) {
+		for(Node addnode: subnode.iterate(CompiledXPath.get("add|addpath"))) {
 			Map<String, String> elements = new HashMap<String, String>(10);
 			for(JrdsNode child: new NodeListIterator(addnode.getChildNodes())) {
 				if("path".equals(child.getNodeName())) {
@@ -96,8 +97,18 @@ public class GraphDescBuilder extends ObjectBuilder {
 			}
 		};
 
-		gd.setHostTree(subnode.doTreeList(CompiledXPath.get("hosttree/*"),viewFilter));
-		gd.setViewTree(subnode.doTreeList(CompiledXPath.get("viewtree/*"),viewFilter));
+		List<Object> tree;
+
+		tree = subnode.doTreeList(CompiledXPath.get("hosttree/*"),viewFilter);
+		if(tree != null && ! tree.isEmpty())
+			gd.setHostTree(tree);
+		tree = subnode.doTreeList(CompiledXPath.get("viewtree/*"),viewFilter);
+		if(tree != null && ! tree.isEmpty())
+			gd.setViewTree(tree);
+		tree = subnode.doTreeList(CompiledXPath.get("tree/*"),viewFilter);
+		if(tree != null && ! tree.isEmpty())
+			gd.setHostTree(tree);
+
 		return gd;
 	}
 

@@ -23,7 +23,7 @@ public abstract class JdbcStarter extends Starter {
 
 	public void setHost(RdsHost monitoredHost) {
 		this.url = getUrlAsString();
-		resolver = monitoredHost.getStarters().find(Resolver.buildKey(monitoredHost.getName()));
+		resolver = monitoredHost.getStarters().find(Resolver.makeKey(monitoredHost));
 	}
 	
 	public abstract String getUrlAsString();

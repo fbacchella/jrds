@@ -46,7 +46,6 @@ import org.apache.log4j.Logger;
  */
 public class HostsList extends Starter implements StarterNode {
 	static private final Logger logger = Logger.getLogger(HostsList.class);
-	//	private static HostsList instance;
 
 	public class Stats {
 		Stats() {
@@ -116,12 +115,13 @@ public class HostsList extends Starter implements StarterNode {
 
 		addRoot(TAGSROOT);
 
-
 		starters = new StartersSet(this);
 		new Collecting().register(this);
 		register(this);
 		jrds.snmp.SnmpStarter.full.register(this);
 		new SocketFactory().register(this);
+		sumhost.getStarters().setParent(getStarters());
+		customhost.getStarters().setParent(getStarters());
 	}
 
 	public void configure(PropertiesManager pm) {
@@ -211,7 +211,7 @@ public class HostsList extends Starter implements StarterNode {
 		if(! graphs.isEmpty()) {
 			ContainerProbe cp = new ContainerProbe(customhost.getName());
 			for(GraphDesc gd: graphs.values()) {
-				logger.trace("Adding graphdesc: " + gd.getGraphTitle());
+				logger.trace("Adding graph: " + gd.getGraphTitle());
 				cp.addGraph(gd);
 			}
 			addVirtual(cp, customhost, CUSTOMROOT);
@@ -458,6 +458,13 @@ public class HostsList extends Starter implements StarterNode {
 	@Override
 	public Object getKey() {
 		return this.getClass();
+	}
+
+	/**
+	 * @param started the started to set
+	 */
+	public void finished() {
+		this.started = started;
 	}
 
 }

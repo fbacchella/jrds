@@ -11,17 +11,23 @@ public abstract class Starter {
 	private StarterNode parent;	
 	private boolean started = false;
 
+	/**
+	 * This method is called when the started is really registred<p/>
+	 * It can be overriden to contains delayed initialization but it must begin with a call to super.initialize(parent, level)
+	 * @param parent
+	 * @param level
+	 */
 	public void initialize(StarterNode parent, StartersSet level) {
 		this.level = level;
 		this.parent = parent;
 	}
-	public final void doStart() {
-		logger.trace("Starting " + this);
-		started = start();
-		if(! started)
-			logger.error("Start " + this + " for " + parent + " failed");
 
+	public final void doStart() {
+		if(logger.isTraceEnabled())
+			logger.trace("Starting " + getKey() + "@" + hashCode() +  " for " + parent);
+		started = start();
 	}
+	
 	public final void doStop() {
 		if(started) {
 			logger.trace("Stopping " + this);
@@ -32,20 +38,26 @@ public abstract class Starter {
 	public boolean start() {
 		return true;
 	}
+	
 	public void stop() {
 	}
+	
 	public Object getKey() {
 		return this;
 	}
+	
 	public StartersSet getLevel() {
 		return level;
 	}
+	
 	public boolean isStarted() {
 		return started;
 	}
+	
 	public StarterNode getParent() {
 		return parent;
 	}
+	
 	@Override
 	public String toString() {
 		return getKey().toString();
@@ -68,12 +80,7 @@ public abstract class Starter {
 	 * @param node
 	 * @return
 	 */
-	public Starter register(StarterNode node) {
-		node.getStarters().registerStarter(this, node);
-		return this;
-	}
-
-	static public Object makeKey(StarterNode node) {
-		throw new UnsupportedOperationException("Make key not defined"); 
+	public final Starter register(StarterNode node) {
+		return node.getStarters().registerStarter(this, node);
 	}
 }

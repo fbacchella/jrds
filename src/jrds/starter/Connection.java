@@ -31,7 +31,7 @@ public abstract class Connection extends Starter {
 		if(name !=null)
 			return name;
 		else
-			return this.getClass().getName();
+			return getClass().getName();
 	}
 
 	/**
@@ -54,10 +54,10 @@ public abstract class Connection extends Starter {
 	 */
 	public String getHostName() {
 		if(getParent() instanceof RdsHost) {
-			return ((RdsHost)getParent()).getName();
+			return ((RdsHost)getParent()).getDnsName();
 		}
 		if(getParent() instanceof Probe) {
-			return ((Probe)getParent()).getHost().getName();
+			return ((Probe)getParent()).getHost().getDnsName();
 		}
 		return null;
 	}

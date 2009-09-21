@@ -90,7 +90,7 @@ public class Configuration {
 		collectTimer.cancel();
 		collectTimer = null;
 		hostsList.getRenderer().finish();
-		hostsList.getStarters().stopCollect();
+		hostsList.finished();
 	}
 
 	@SuppressWarnings("unchecked")

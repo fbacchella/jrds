@@ -94,19 +94,6 @@ public class SnmpStarter extends Starter {
 	private OID uptimeOid = hrSystemUptime;
 	private Target snmpTarget;
 
-	/* (non-Javadoc)
-	 * @see jrds.Starter#register(jrds.StarterNode)
-	 */
-	@Override
-	public Starter register(StarterNode node) {
-		if(node instanceof SnmpProbe) {
-			OID newUptimeOid = ((SnmpProbe)node).getUptimeoid();
-			if(newUptimeOid != null)
-				uptimeOid = newUptimeOid;
-		}
-		return super.register(node);
-	}
-
 	@Override
 	public boolean start() {
 		boolean started = false;
@@ -126,7 +113,7 @@ public class SnmpStarter extends Starter {
 		upTimesOids.add(sysUpTimeInstance);
 
 		for(OID uptimeoid: upTimesOids) {
-			if(! full.isStarted() || ! resolver.isStarted()) {
+			if(! full.isStarted() && resolver.isStarted() ) {
 				break;
 			}
 			try {
@@ -135,15 +122,15 @@ public class SnmpStarter extends Starter {
 				ResponseEvent re = snmp.send(requestPDU, snmpTarget);
 				PDU response = re.getResponse();
 				if(response == null) {
-					throw new IOException("SNMP Timeout for uptime, address=" + snmpTarget.getAddress() + ", requestID=" + requestPDU.getRequestID());
+					throw new IOException("SNMP Timeout for " + snmpTarget);
 				}
 				Object value = new SnmpVars(response).get(uptimeoid);
 				if(value instanceof Number) {
-					this.setUptime(((Number) value).longValue());
+					setUptime(((Number) value).longValue());
 					return true;
 				}
 			} catch (IOException e) {
-				logger.error("Unable to get uptime for " + snmpTarget + " because of: " + e);
+				logger.error("Unable to get uptime for " + getParent() + " because of: " + e);
 			}
 		}
 		return false;
@@ -236,11 +223,17 @@ public class SnmpStarter extends Starter {
 	public void setProto(String proto) {
 		this.proto = proto;
 	}
+	
 	@Override
 	public void initialize(StarterNode parent, StartersSet level) {
 		super.initialize(parent, level);
-		level.find(Resolver.buildKey(hostname));
-		resolver = (Resolver) level.find(Resolver.buildKey(hostname));
+		logger.trace("registering a SnmpStarter for host " + hostname);
+		resolver = (Resolver) new Resolver(hostname).register(parent);
+		if(parent instanceof SnmpProbe) {
+			OID newUptimeOid = ((SnmpProbe)parent).getUptimeoid();
+			if(newUptimeOid != null)
+				uptimeOid = newUptimeOid;
+		}
 	}
 
 	public Target getTarget() {

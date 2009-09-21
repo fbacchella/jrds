@@ -146,7 +146,7 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 	public Map<?, ?> getNewSampleValues() {
 		String hostName = getUrl().getHost();
 		if(hostName != null) {
-			Starter resolver = getStarters().find(Resolver.buildKey(hostName));
+			Starter resolver = getStarters().find(Resolver.makeKey(hostName));
 			if(resolver != null && ! resolver.isStarted()) {
 				logger.trace("Resolver not started for " + getUrl().getHost());
 				return Collections.emptyMap();

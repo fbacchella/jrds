@@ -33,16 +33,14 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 	public RdsHost(String newName)
 	{
 		name = newName;
-		Starter resolver = new Resolver(name);
-		resolver.register(this);
+		new Resolver(name).register(this);
 	}
 
 	public RdsHost(String name, String dnsName)
 	{
 		this.name = name;
 		this.dnsName = dnsName;
-		Starter resolver = new Resolver(name);
-		resolver.register(this);
+		new Resolver(dnsName).register(this);
 	}
 
 	/**
@@ -160,7 +158,6 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 	 */
 	public void setDnsName(String dnsName) {
 		this.dnsName = dnsName;
-		Starter resolver = new Resolver(dnsName);
-		resolver.register(this);
+		new Resolver(dnsName).register(this);
 	}
 }

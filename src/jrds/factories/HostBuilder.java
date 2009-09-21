@@ -47,11 +47,20 @@ public class HostBuilder extends ObjectBuilder {
 	}
 
 	public RdsHost makeRdsHost(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
-		RdsHost host = new RdsHost();
 		JrdsNode hostNode = n.getChild(CompiledXPath.get("/host"));
+		Map<String, String> hostattr = hostNode.attrMap();
+		String hostName = hostattr.get("name");
+		String dnsHostname = hostattr.get("dnsName");
+		RdsHost host = null;
+		if(hostName == null) {
+			return null;
+		}
+		else if(dnsHostname != null) {
+			host = new RdsHost(hostName, dnsHostname);
+		}
+		else
+			host = new RdsHost(hostName);
 
-		hostNode.setMethod(host, CompiledXPath.get("@name"), "setName");
-		hostNode.setMethod(host, CompiledXPath.get("@dnsName"), "setDnsName");
 		hostNode.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
 
 		host.setHostDir(new File(pm.rrddir, host.getName()));

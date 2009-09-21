@@ -25,6 +25,7 @@ import jrds.factories.GraphFactory;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.starter.Collecting;
+import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 import jrds.starter.StartersSet;
 
@@ -666,7 +667,8 @@ implements Comparable<Probe>, StarterNode {
 		if(this instanceof ConnectedProbe) {
 			ConnectedProbe cp = (ConnectedProbe) this;
 			String cnxName = cp.getConnectionName();
-			if(! getStarters().find(cnxName).isStarted())
+			Starter cnx = getStarters().find(cnxName);
+			if(cnx == null || ! cnx.isStarted())
 				return false;
 		}
 		return getStarters().isStarted(Collecting.makeKey(this));

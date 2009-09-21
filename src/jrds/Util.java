@@ -204,7 +204,7 @@ public class Util {
 	public static String evaluateVariables(String in, Map<String, Object> variables, StarterNode node) {
 		ChainedProperties props = null;
 		if(node != null)
-			props = (ChainedProperties)node.getStarters().find(ChainedProperties.KEY);
+			props = (ChainedProperties)node.getStarters().find(ChainedProperties.class.getName());
 		return evaluateVariables(in, variables, props);
 	}
 

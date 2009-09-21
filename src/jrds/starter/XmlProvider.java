@@ -39,7 +39,6 @@ public class XmlProvider extends Starter {
 	private String hostname = null;
 
 	public XmlProvider(RdsHost monitoredHost) {
-		super();
 		hostname = monitoredHost.getName();
 	}
 
@@ -178,18 +177,4 @@ public class XmlProvider extends Starter {
 		return  (Node) xpather.evaluate(xpath, d, XPathConstants.NODE);
 	}
 	
-	@Override
-	public Starter register(StarterNode node) {
-		StartersSet ss = node.getStarters();
-		if(ss.find(getKey()) == null)
-			super.register(node);
-		return ss.find(getKey());
-	}
-
-	static public Object makeKey(StarterNode node) {
-		RdsHost host = (RdsHost) node;
-		return "xmlprovider:" + host.getName();
-	}
-
-
 }

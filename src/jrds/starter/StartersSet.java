@@ -14,29 +14,43 @@ public class StartersSet {
 	public StartersSet(StarterNode level) {
 		this.level = level;
 	}
-	
+
 	public void startCollect() {
 		if(allStarters != null)
 			for(Starter s: allStarters.values()) {
-				logger.trace("Starting " + s);
-				s.doStart();
+				try {
+					logger.trace("Starting " + s);
+					s.doStart();
+				} catch (Exception e) {
+					logger.error("Unable to start starter " + s.getKey());
+				}
 			}
 	}
 
 	public void stopCollect() {
 		if(allStarters != null)
 			for(Starter s: allStarters.values()) {
-				logger.trace("stopping " + s);
-				s.doStop();
+				try {
+					logger.trace("stopping " + s);
+					s.doStop();
+				} catch (Exception e) {
+					logger.error("Unable to stop timer " + s.getKey());
+				}
 			}
 	}
 
-	public void registerStarter(Starter s, StarterNode parent) {
-		s.initialize(parent, this);
+	public Starter registerStarter(Starter s, StarterNode parent) {
 		Object key = s.getKey();
 		if(allStarters == null)
 			allStarters = new LinkedHashMap<Object, Starter>(2);
-		allStarters.put(key, s);
+		if(! allStarters.containsKey(key)) {
+			s.initialize(parent, this);
+			allStarters.put(key, s);
+			return s;
+		}
+		else {
+			return allStarters.get(key);
+		}
 	}
 
 	public Starter find(Object key) {
