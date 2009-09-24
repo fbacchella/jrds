@@ -35,7 +35,7 @@ public class JMX extends Probe implements ConnectedProbe {
 	static final private Logger logger = Logger.getLogger(JMX.class);
 
 	private String connectionName = JMXConnection.class.getName();
-	
+
 	public boolean configure() {
 		return true;
 	}
@@ -57,33 +57,33 @@ public class JMX extends Probe implements ConnectedProbe {
 
 			logger.debug(collectKeys);
 			for(Map.Entry<String, String> e: collectKeys.entrySet()) {
+				String[] jmxPathArray = e.getKey().split("/");
+				List<String> jmxPath = new ArrayList<String>();
+				jmxPath.addAll(Arrays.asList(jmxPathArray));
+				ObjectName mbeanName = new ObjectName(jmxPath.remove(0));
+				String attributeName =  jmxPath.remove(0);
 				try {
-					String[] jmxPathArray = e.getKey().split("/");
-					List<String> jmxPath = new ArrayList<String>();
-					jmxPath.addAll(Arrays.asList(jmxPathArray));
-					ObjectName mbeanName = new ObjectName(jmxPath.remove(0));
-					String attributeName =  jmxPath.remove(0);
 					Object attr = mbean.getAttribute(mbeanName, attributeName);
 					Number v = resolvJmxObject(jmxPath, attr);
 					logger.debug("JMX Path: " + e.getKey() +" = " + v);
 					retValues.put(e.getValue(), v.doubleValue());
 				} catch (AttributeNotFoundException e1) {
-					logger.error("JMX error for " + this + ": ");
+					logger.error("Invalide JMX attribue" +  attributeName + " for " + this);
 				} catch (InstanceNotFoundException e1) {
-					logger.error("JMX error for " + this + ": ");
+					logger.error("JMX instance not found for " + this + ": ");
 				} catch (MBeanException e1) {
-					logger.error("JMX error for " + this + ": ");
+					logger.error("JMX MBeanException for " + this + ": " + e1);
 				} catch (ReflectionException e1) {
-					logger.error("JMX error for " + this + ": ");
+					logger.error("JMX reflection error for " + this + ": " + e1);
 				} catch (IOException e1) {
-					logger.error("JMX error for " + this + ": ");
+					logger.error("JMX IO error for " + this + ": " + e1);
 				}
 			}
 			return retValues;
 		} catch (MalformedObjectNameException e) {
-			logger.error("JMX error for " + this + ": ");
+			logger.error("JMX name error for " + this + ": " + e);
 		} catch (NullPointerException e) {
-			logger.error("JMX error for " + this + ": ");
+			logger.error("JMX error for " + this + ": " + e);
 		}
 
 		return Collections.emptyMap();
@@ -106,14 +106,15 @@ public class JMX extends Probe implements ConnectedProbe {
 	 */
 	Number resolvJmxObject(List<String> jmxPath, Object o) {
 		Object value = null;
-		String subKey = jmxPath.remove(0);
 		if(o instanceof CompositeData) {
+			String subKey = jmxPath.remove(0);
 			CompositeData co = (CompositeData) o;
 			value = co.get(subKey);
 		}
 		else if(o instanceof Number)
 			return (Number) o;
 		else if(o instanceof Map) {
+			String subKey = jmxPath.remove(0);
 			value = ((Map<?, ?>) o).get(subKey);
 		}
 		else if(o instanceof Collection) {
@@ -133,6 +134,7 @@ public class JMX extends Probe implements ConnectedProbe {
 		}
 		return Double.NaN;
 	}
+	
 	/**
 	 * @return the connection
 	 */
