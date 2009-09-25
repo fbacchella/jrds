@@ -402,7 +402,7 @@ public class HostsList extends Starter implements StarterNode {
 		return filters.keySet();
 	}
 
-	private void addVirtual(VirtualProbe<?, ?> vprobe, RdsHost vhost, String root) {
+	private void addVirtual(VirtualProbe vprobe, RdsHost vhost, String root) {
 		vhost.getProbes().add(vprobe);
 		vprobe.setHost(vhost);
 		for(GraphNode currGraph: vprobe.getGraphList()) {

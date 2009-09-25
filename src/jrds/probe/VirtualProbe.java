@@ -11,12 +11,12 @@ import jrds.ProbeDesc;
  * @author bacchell
  *
  */
-public abstract class VirtualProbe<KeyType, ValueType> extends Probe<KeyType, ValueType> {
+public abstract class VirtualProbe extends Probe<Object, Number> {
 	public VirtualProbe(ProbeDesc pd) {
 		super(pd);
 	}
 
-	public Map<KeyType, ValueType> getNewSampleValues() {
+	public Map<Object, Number> getNewSampleValues() {
 		return java.util.Collections.emptyMap();
 	}
 

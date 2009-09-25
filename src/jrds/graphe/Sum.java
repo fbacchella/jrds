@@ -56,7 +56,7 @@ public class Sum extends GraphNode {
 			 */
 			@Override
 			public RrdGraphDef getRrdGraphDef() throws IOException {
-				SumProbe<?,?> p = (SumProbe<?,?>) getNode().getProbe();
+				SumProbe p = (SumProbe) getNode().getProbe();
 				double[][] allvalues = null;
 				GraphDesc tempgd = null;
 				FetchData fd = null;

@@ -48,7 +48,7 @@ public class ProbeDescBuilder extends ObjectBuilder {
 		logger.trace("Creating probe description " + pd.getName());
 
 		String className = probeDescNode.evaluate(CompiledXPath.get("probeClass")).trim();
-		Class<? extends Probe> c = (Class<? extends Probe>) classLoader.loadClass(className);
+		Class<? extends Probe<?,?>> c = (Class<? extends Probe<?,?>>) classLoader.loadClass(className);
 		pd.setProbeClass(c);
 		pd.setHeartBeatDefault(pm.step * 2);
 

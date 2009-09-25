@@ -41,7 +41,7 @@ public class ProbeDesc {
 	private Collection<?> namedProbesNames;
 	private Collection<?> graphClasses = new ArrayList<Object>(0);
 	private boolean uniqIndex = false;
-	private Class<? extends Probe> probeClass = null;
+	private Class<? extends Probe<?,?>> probeClass = null;
 	private List<Object> defaultsArgs = null;
 	private float uptimefactor = (float) 1.0;
 	private Map<String, String> properties = null;
@@ -193,7 +193,7 @@ public class ProbeDesc {
 		Map<Object, String> retValue = new LinkedHashMap<Object, String>(dsMap.size());
 		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
 			DsDesc dd = e.getValue();
-			if(dd.collectKey != null)
+			if(dd.collectKey != null && dd.dsType != null)
 				retValue.put(dd.collectKey, e.getKey());
 		}
 		return retValue;
@@ -302,11 +302,11 @@ public class ProbeDesc {
 		this.uniqIndex = uniqIndex;
 	}
 
-	public Class<? extends Probe> getProbeClass() {
+	public Class<? extends Probe<?,?>> getProbeClass() {
 		return probeClass;
 	}
 
-	public void setProbeClass(Class<? extends Probe> probeClass) {
+	public void setProbeClass(Class<? extends Probe<?,?>> probeClass) {
 		this.probeClass = probeClass;
 	}
 

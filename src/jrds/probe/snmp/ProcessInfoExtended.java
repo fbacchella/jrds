@@ -68,10 +68,8 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
 		return super.readSpecific();
 	}
 
-	@SuppressWarnings("unchecked")
 	public Collection<int[]> setIndexValue() 
 	{
-
 		boolean found = false;
 		Collection<OID> soidSet= getIndexSet();
 		Pattern p = Pattern.compile(pattern);
