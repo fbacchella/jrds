@@ -13,7 +13,7 @@
 		<legend>ARC reads per second</legend>
 	</add>
 	<add>
-		<name>miss</name>
+		<name>misses</name>
 		<graphType>stack</graphType>
 		<color>RED</color>
 		<legend>ARC misses per second</legend>

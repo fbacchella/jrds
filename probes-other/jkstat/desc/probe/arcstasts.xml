@@ -11,7 +11,7 @@
 		<dsType>counter</dsType>
 	</ds>
 	<ds>
-		<dsName>miss</dsName>
+		<dsName>misses</dsName>
 		<dsType>counter</dsType>
 	</ds>
 	<ds>
