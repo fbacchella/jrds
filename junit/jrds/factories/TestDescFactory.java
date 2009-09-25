@@ -112,7 +112,7 @@ public class TestDescFactory {
 		Assert.assertEquals(0.5, pd.getUptimefactor(), 0);
 		Assert.assertEquals("value", pd.getProperties().get("key"));
 		Assert.assertEquals((long) pm.step * 2, pd.getHeartBeatDefault());
-		logger.trace(pd.getCollectkeys());
+		logger.trace(pd.getCollectMapping());
 		logger.trace(pd.getCollectOids());
 		logger.trace(pd.getCollectStrings());
 		logger.trace(pd.getDefaultArgs());
@@ -125,7 +125,7 @@ public class TestDescFactory {
 		Assert.assertEquals(82, base);
 		Assert.assertTrue(defaultargs.get(2) instanceof List);
 		//A collect string "" should not be collected
-		Assert.assertEquals(4, pd.getCollectkeys().size());
+		Assert.assertEquals(3, pd.getCollectMapping().size());
 		Assert.assertEquals(1, pd.getCollectOids().size());
 		Assert.assertEquals(3, pd.getCollectStrings().size());
 	}

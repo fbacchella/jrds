@@ -69,7 +69,7 @@ public class TestLoader {
 		Loader l = new Loader();
 
 		l.importStream(getClass().getResourceAsStream("/ressources/customgraph.xml"));
-		Map<String, JrdsNode> rep = l.getRepository(ConfigType.GRAPHDESC);
+		Map<String, JrdsNode> rep = l.getRepository(ConfigType.GRAPH);
 		logger.trace(rep);
 		Assert.assertTrue(rep.containsKey("name"));
 	}

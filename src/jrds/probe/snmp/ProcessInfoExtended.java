@@ -68,6 +68,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
 		return super.readSpecific();
 	}
 
+	@SuppressWarnings("unchecked")
 	public Collection<int[]> setIndexValue() 
 	{
 		boolean found = false;

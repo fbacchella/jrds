@@ -37,7 +37,7 @@ public class Mail extends Action {
 	}
 	
 	@Override
-	public void run(Threshold t, Probe p, List<Object> args) {
+	public void run(Threshold t, Probe<?,?> p, List<Object> args) {
 		mailloger.log(Level.INFO, "Threshold reached for " + t.name + " on "+ p);
 	}
 

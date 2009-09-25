@@ -43,7 +43,7 @@ public class CpuTimeSunMibGraph extends GraphNode {
 	/**
 	 * @param theStore
 	 */
-	public CpuTimeSunMibGraph(Probe theStore) {
+	public CpuTimeSunMibGraph(Probe<?,?> theStore) {
 		super(theStore, ds);
 	}
 }

@@ -101,7 +101,7 @@ public class TestLoadConfiguration {
 		JrdsNode pnode = new JrdsNode(d);
 
 		HostBuilder hb = new HostBuilder();
-		Probe p = hb.makeProbe(pnode.getChild(CompiledXPath.get("//probe")), new RdsHost());
+		Probe<?,?> p = hb.makeProbe(pnode.getChild(CompiledXPath.get("//probe")), new RdsHost());
 		//		Probe p = conf.makeProbe(pnode.getChild(CompiledXPath.get("//probe")));
 		Assert.assertNotNull(p);
 		Assert.assertEquals("<empty>/fs-_", p.toString());
@@ -128,8 +128,8 @@ public class TestLoadConfiguration {
 		RdsHost h = hostMap.get("myhost");
 		Assert.assertNotNull(h);
 		Assert.assertEquals("myhost",h.getName());
-		logger.debug("properties: " + h.getStarters().find(ChainedProperties.KEY));
-		Collection<Probe> probes = h.getProbes();
+		logger.debug("properties: " + h.getStarters().find(ChainedProperties.class.getName()));
+		Collection<Probe<?,?>> probes = h.getProbes();
 		Assert.assertEquals(2, probes.size());
 		//		HostBuilder hb = new HostBuilder();
 		//		hb.setProperty(ObjectBuilder.properties.ARGFACTORY, new ArgFactory());

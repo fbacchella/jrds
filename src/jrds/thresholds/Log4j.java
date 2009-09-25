@@ -31,7 +31,7 @@ public class Log4j extends Action {
 	}
 
 	@Override
-	public void run(Threshold t, Probe p, List<Object> args) {		
+	public void run(Threshold t, Probe<?,?> p, List<Object> args) {		
 	}
 
 }

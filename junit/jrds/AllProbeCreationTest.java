@@ -59,7 +59,7 @@ public class AllProbeCreationTest {
 		RdsHost host = new RdsHost("Empty");
 		host.setHostDir(pm.rrddir);
 		for(ProbeDesc pd: probeDescMap.values()) {
-			Class<? extends Probe> originalClass = pd.getProbeClass();
+			Class<? extends Probe<?,?>> originalClass = pd.getProbeClass();
 			if(jrds.probe.UrlProbe.class.isAssignableFrom(originalClass)) {
 				pd.setProbeClass(DummyProbeIndexedUrl.class);
 			}

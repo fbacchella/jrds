@@ -52,12 +52,12 @@ public class Discover extends JrdsServlet {
 	private static final String CONTENT_TYPE = "application/xml";
 	private static final long serialVersionUID = 1L;
 	
-	private static final OID sysObjectID = new OID("1.3.6.1.2.1.1.2.0");
-	private static final OID linuxOID = new OID("1.3.6.1.4.1.8072.3.2.10");
-	private static final OID solarisOID = new OID("1.3.6.1.4.1.8072.3.2.3");
-	private static final OID windowsNT_workstation_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.1");
-	private static final OID windowsNT_server_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.2");
-	private static final OID windowsNT_dc_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.3");
+//	private static final OID sysObjectID = new OID("1.3.6.1.2.1.1.2.0");
+//	private static final OID linuxOID = new OID("1.3.6.1.4.1.8072.3.2.10");
+//	private static final OID solarisOID = new OID("1.3.6.1.4.1.8072.3.2.3");
+//	private static final OID windowsNT_workstation_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.1");
+//	private static final OID windowsNT_server_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.2");
+//	private static final OID windowsNT_dc_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.3");
 
 	static class LocalSnmpStarter extends SnmpStarter {
 		Snmp snmp;
@@ -258,10 +258,10 @@ public class Discover extends JrdsServlet {
 		}
 	}
 	
-	private String operatingSystem(SnmpStarter active) throws IOException {
-		Map<OID, Object> osType = SnmpRequester.RAW.doSnmpGet(active, Collections.singletonList(sysObjectID));
-		OID  identity = (OID)osType.get(sysObjectID);
-		
-		return null;
-	}
+//	private String operatingSystem(SnmpStarter active) throws IOException {
+//		Map<OID, Object> osType = SnmpRequester.RAW.doSnmpGet(active, Collections.singletonList(sysObjectID));
+//		OID  identity = (OID)osType.get(sysObjectID);
+//		
+//		return null;
+//	}
 }

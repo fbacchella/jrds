@@ -53,7 +53,6 @@ public class GraphTree {
 	 *  Private constructor, no one can generate an graph on the fly
 	 *  
 	 */
-	@SuppressWarnings("unchecked")
 	private GraphTree(String name) {
 		graphsSet = new TreeMap<String, GraphNode>(String.CASE_INSENSITIVE_ORDER);
 		childsMap = new TreeMap<String, GraphTree>(nodeComparator);

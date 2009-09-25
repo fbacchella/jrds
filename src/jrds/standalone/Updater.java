@@ -35,9 +35,9 @@ public class Updater {
 		ExecutorService tpool =  Executors.newFixedThreadPool(3);
 
 		for(RdsHost host: hl.getHosts()) {
-			for(final Probe p: host.getProbes()) {
+			for(final Probe<?,?> p: host.getProbes()) {
 				final Runnable runUpgrade = new Runnable() {
-					private Probe lp = p;
+					private Probe<?,?> lp = p;
 					
 					public void run() {
 						try {

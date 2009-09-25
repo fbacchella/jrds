@@ -23,11 +23,11 @@ import org.rrd4j.DsType;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-public class DummyProbe extends Probe {
+public class DummyProbe extends Probe<String, Number> {
 
-	Class<? extends Probe> originalProbe;
+	Class<? extends Probe<?,?>> originalProbe;
 
-	public void configure(Class<? extends Probe> originalProbe) {
+	public void configure(Class<? extends Probe<?,?>> originalProbe) {
 		this.originalProbe = originalProbe;
 		configure();
 	}
@@ -60,7 +60,7 @@ public class DummyProbe extends Probe {
 	}
 
 	@Override
-	public Map<?, ?> getNewSampleValues() {
+	public Map<String, Number> getNewSampleValues() {
 		return Collections.emptyMap();
 	}
 

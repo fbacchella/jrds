@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+<!DOCTYPE graph PUBLIC "-//jrds//DTD Graph Description//EN"
                            "urn:jrds:graphdesc">
-<graphdesc>
+<graph>
 	<name>name</name>
 	<graphName>graphName</graphName>
 	<graphTitle>graphTitle</graphTitle>
 	<verticalLabel>verticalLabel</verticalLabel>
-	<add>
+	<addpath>
 		<path>
 			<host>host1</host>
 			<probe>probe1</probe>
@@ -14,8 +14,8 @@
 		</path>
 		<graphType>line</graphType>
 		<legend>legend1</legend>
-	</add>
-	<add>
+	</addpath>
+	<addpath>
 		<path>
 			<host>host1</host>
 			<probe>probe1</probe>
@@ -23,14 +23,10 @@
 		</path>
 		<graphType>line</graphType>
 		<legend>legend1</legend>
-	</add>
-	<hosttree>
+	</addpath>
+	<tree>
 		<pathstring>hosttree1</pathstring>
 		<pathstring>hosttree2</pathstring>
-	</hosttree>
-	<viewtree>
-		<pathstring>viewtree1</pathstring>
-		<pathstring>viewtree2</pathstring>
-	</viewtree>
-</graphdesc>
+	</tree>
+</graph>
   

@@ -39,7 +39,7 @@ public final class ProbeSummary extends JrdsServlet {
 
 		ParamsBean params = getParamsBean(req);
 
-		Probe probe = params.getProbe();
+		Probe<?,?> probe = params.getProbe();
 		if(probe != null) {
 			Date begin = params.getPeriod().getBegin();
 			Date end = params.getPeriod().getEnd();

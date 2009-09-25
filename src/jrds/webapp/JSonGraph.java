@@ -85,7 +85,7 @@ public class JSonGraph extends JSonData {
 
 		Map<String, String> imgProps = new HashMap<String, String>();
 		r.render(graph);
-		Probe p = gn.getProbe();
+		Probe<?,?> p = gn.getProbe();
 		imgProps.put("probename", p.getName());
 		imgProps.put("qualifiedname", graph.getQualifieName());
 

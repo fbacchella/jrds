@@ -25,7 +25,7 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 
 	private String name = null;
 	private String dnsName = null;
-	private final Set<Probe> allProbes = new TreeSet<Probe>();
+	private final Set<Probe<?,?>> allProbes = new TreeSet<Probe<?,?>>();
 	private Set<String> tags = null;
 	private final StartersSet starters = new StartersSet(this);
 	private File hostdir = null;
@@ -73,18 +73,7 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 		return hostdir;
 	}
 
-//	public void addProbe(Probe rrd)
-//	{
-//
-//		rrd.setHost(this);
-//		//Do not add the probe if the physical store
-//		//cannot be checked
-//		if(rrd.checkStore()) {
-//			allProbes.add(rrd);
-//		}
-//	}
-
-	public Collection<Probe> getProbes() {
+	public Collection<Probe<?,?>> getProbes() {
 		return allProbes;
 
 	}
@@ -94,7 +83,7 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 		long start = System.currentTimeMillis();
 		if(starters != null)
 			starters.startCollect();
-		for(Probe currrd: allProbes) {
+		for(Probe<?,?> currrd: allProbes) {
 			if(! isCollectRunning() )
 				break;
 			long duration = (System.currentTimeMillis() - start) /1000 ;

@@ -23,7 +23,7 @@ import org.rrd4j.core.Sample;
  * @author Fabrice Bacchella 
  * @version $Revision$,  $Date$
  */
-public abstract class ExternalCmdProbe extends Probe {
+public abstract class ExternalCmdProbe extends Probe<String, Number> {
 	static final private Logger logger = Logger.getLogger(ExternalCmdProbe.class);
 
 	private String[] cmd;
@@ -31,7 +31,7 @@ public abstract class ExternalCmdProbe extends Probe {
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.Probe#getNewSampleValues()
 	 */
-	public Map<?, ?> getNewSampleValues() {
+	public Map<String, Number> getNewSampleValues() {
 		return null;
 	}
 	

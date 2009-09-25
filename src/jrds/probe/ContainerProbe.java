@@ -14,7 +14,7 @@ import jrds.ProbeDesc;
 
 import org.apache.log4j.Logger;
 
-public class ContainerProbe<KeyType, ValueType> extends VirtualProbe {
+public class ContainerProbe extends VirtualProbe {
 	static final private Logger logger = Logger.getLogger(ContainerProbe.class);
 
 	static final ProbeDesc pd = new ProbeDesc(0) {
@@ -22,7 +22,6 @@ public class ContainerProbe<KeyType, ValueType> extends VirtualProbe {
 		public String getName() {
 			return "ContainerProbeDesc";
 		}
-		@SuppressWarnings("unchecked")
 		@Override
 		public Class<? extends Probe<?,?>> getProbeClass() {
 			return (Class<? extends Probe<?, ?>>) ContainerProbe.class;

@@ -174,7 +174,7 @@ public class Util {
 	 * @param endDate the desired end date
 	 * @return the normalized end date
 	 */
-	public static Date endDate(Probe p, Date endDate) {
+	public static Date endDate(Probe<?,?> p, Date endDate) {
 		//Date normalized = endDate;
 		//We normalize the last update time, it can't be used directly
 		long step = p.getStep();

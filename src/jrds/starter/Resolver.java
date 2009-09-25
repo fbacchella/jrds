@@ -49,7 +49,7 @@ public class Resolver extends Starter {
 		if(node instanceof RdsHost)
 			host =(RdsHost)node;
 		else if(node instanceof Probe) {
-			Probe p = (Probe) node;
+			Probe<?,?> p = (Probe<?,?>) node;
 			host = p.getHost();
 		}
 		return "resolver:" + host.getDnsName();

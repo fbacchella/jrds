@@ -23,8 +23,8 @@ public class Macro {
 		this.pf = pf;
 	}
 
-	public  Set<Probe> populate(RdsHost host, Map<String, String> properties) {
-		Set<Probe> probes = new HashSet<Probe>();
+	public  Set<Probe<?,?>> populate(RdsHost host, Map<String, String> properties) {
+		Set<Probe<?,?>> probes = new HashSet<Probe<?,?>>();
 		for(ProbeInfo pi: probeList) {
 			Map<String, String> attrs = pi.attrs;
 			String className = attrs.get("type");
@@ -32,7 +32,7 @@ public class Macro {
 			if(label != null)
 				label = jrds.Util.parseTemplate(label, properties, host);
 			List<?> constArgs = ArgFactory.makeArgs(pi.args, properties, host);
-			Probe newRdsRrd = pf.makeProbe(className, host, constArgs);
+			Probe<?,?> newRdsRrd = pf.makeProbe(className, host, constArgs);
 			if(newRdsRrd != null) {
 				if(label != null) {
 					newRdsRrd.setLabel(label);

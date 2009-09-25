@@ -57,7 +57,7 @@ public abstract class Connection extends Starter {
 			return ((RdsHost)getParent()).getDnsName();
 		}
 		if(getParent() instanceof Probe) {
-			return ((Probe)getParent()).getHost().getDnsName();
+			return ((Probe<?,?>)getParent()).getHost().getDnsName();
 		}
 		return null;
 	}

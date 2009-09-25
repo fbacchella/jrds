@@ -464,7 +464,7 @@ public class HostsList extends Starter implements StarterNode {
 	 * @param started the started to set
 	 */
 	public void finished() {
-		this.started = started;
+		this.started = false;
 	}
 
 }

@@ -74,7 +74,6 @@ public class SnmpVars extends HashMap<OID, Object> {
 	 * only not 
 	 * @param vb
 	 */
-	@SuppressWarnings("unchecked")
 	public boolean addVariable(VariableBinding vb)
 	{
 		boolean retValue = false;

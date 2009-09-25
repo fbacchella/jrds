@@ -40,7 +40,7 @@ public final class Last extends JrdsServlet {
 		HostsList hl = getHostsList();
 		GraphNode g = hl.getGraphById(Integer.parseInt(rrdId));
 		if(g != null ) {
-			Probe p = g.getProbe();
+			Probe<?,?> p = g.getProbe();
 			if(p != null) {
 				found = true;
 				out.println("Last update:" + p.getLastUpdate());

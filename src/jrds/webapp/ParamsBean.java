@@ -24,6 +24,7 @@ import jrds.Filter;
 import jrds.Graph;
 import jrds.HostsList;
 import jrds.Period;
+import jrds.Probe;
 import jrds.Util.SiPrefix;
 
 import org.apache.log4j.Logger;
@@ -134,8 +135,8 @@ public class ParamsBean implements Serializable {
 		return g;
 	}
 
-	public jrds.Probe getProbe() {
-		jrds.Probe p = root.getProbeById(getId());
+	public Probe<?,?> getProbe() {
+		Probe<?,?> p = root.getProbeById(getId());
 		if(p == null) {
 			jrds.GraphNode node = root.getGraphById(getId());
 			if(node != null)

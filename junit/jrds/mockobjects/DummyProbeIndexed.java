@@ -4,9 +4,9 @@ import jrds.Probe;
 import jrds.probe.IndexedProbe;
 
 public class DummyProbeIndexed extends DummyProbe implements IndexedProbe {
-	Class<? extends Probe> originalProbe;
+	Class<? extends Probe<?,?>> originalProbe;
 
-	public void configure(Class<? extends Probe> originalProbe) {
+	public void configure(Class<? extends Probe<?,?>> originalProbe) {
 		super.configure(originalProbe);
 	}
 

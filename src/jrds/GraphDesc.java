@@ -189,7 +189,7 @@ implements Cloneable {
 		URL {
 			public String resolve(GraphNode graph) {
 				String url = "";
-				Probe probe = graph.getProbe();
+				Probe<?,?> probe = graph.getProbe();
 				if( probe instanceof UrlProbe) {
 					url =((UrlProbe) probe).getUrlAsString();
 				}
@@ -488,8 +488,8 @@ implements Cloneable {
 	private double lowerLimit = 0;
 	private String verticalLabel = null;
 	private int lastColor = 0;
-	private List viewTree = new ArrayList();
-	private List hostTree = new ArrayList();
+	private List<?> viewTree = new ArrayList<Object>();
+	private List<?> hostTree = new ArrayList<Object>();
 	private String graphName;
 	private String name;
 	private String graphTitle ="{0} on {1}";
@@ -703,7 +703,7 @@ implements Cloneable {
 	 * @throws IOException
 	 * @throws RrdException
 	 */
-	public RrdGraphDef getGraphDef(Probe defProbe, Map<String, Plottable> ownData) throws IOException {
+	public RrdGraphDef getGraphDef(Probe<?,?> defProbe, Map<String, Plottable> ownData) throws IOException {
 		RrdGraphDef retValue = new RrdGraphDef();
 		String defRrdName = defProbe.getRrdName();
 		HostsList hl = (HostsList)defProbe.getStarters().find(HostsList.class);
@@ -712,7 +712,7 @@ implements Cloneable {
 
 		for(DsDesc ds: allds) {
 			String rrdName = defRrdName;
-			Probe probe = defProbe;
+			Probe<?,?> probe = defProbe;
 			if(ds.dspath != null) {
 				if(logger.isTraceEnabled())
 					logger.trace("External probe path: " + ds.dspath.host + "/" + ds.dspath.probe + "/" + ds.dsName);
@@ -810,7 +810,7 @@ implements Cloneable {
 	 * @throws IOException
 	 * @throws RrdException
 	 */
-	public DataProcessor getPlottedDatas(Probe probe, Map<?, ?> ownData, long start, long end) throws IOException {
+	public DataProcessor getPlottedDatas(Probe<?,?> probe, Map<?, ?> ownData, long start, long end) throws IOException {
 		DataProcessor retValue = new DataProcessor(start, end);
 		String rrdName = probe.getRrdName();
 
@@ -874,7 +874,7 @@ implements Cloneable {
 	 * @throws IOException
 	 * @throws RrdException
 	 */
-	public RrdGraphDef getGraphDef(Probe probe) throws IOException {
+	public RrdGraphDef getGraphDef(Probe<?,?> probe) throws IOException {
 		return getGraphDef(probe, null);
 	}
 

@@ -66,7 +66,7 @@ public class GraphFactory {
 	 * @param probe the probe the graph will take data from
 	 * @return a new instanciated Graph
 	 */
-	public final GraphNode makeGraph(Object className, Probe probe) {
+	public final GraphNode makeGraph(Object className, Probe<?,?> probe) {
 		GraphNode retValue = null;
 		
 		//Simple case, the handler is already known

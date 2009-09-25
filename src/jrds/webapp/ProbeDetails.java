@@ -31,7 +31,7 @@ public class ProbeDetails extends JrdsServlet {
 		res.addHeader("Cache-Control", "no-cache");
 
 		ParamsBean params = getParamsBean(req);
-		Probe probe = params.getProbe();
+		Probe<?,?> probe = params.getProbe();
 		
 		OutputStream os = null;
 		try {
@@ -45,7 +45,7 @@ public class ProbeDetails extends JrdsServlet {
 		}
 	}
 	
-	public void dump(Probe probe, OutputStream os) {
+	public void dump(Probe<?,?> probe, OutputStream os) {
 		try {
 			Document xmlDesc = probe.dumpAsXml(true);
 			Util.serialize(xmlDesc, os, jrds.xmlResources.ResourcesLocator.getResourceUrl("probe.xsl"), null);

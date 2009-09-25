@@ -51,8 +51,8 @@ public class ProbeFactory {
 	 * @param constArgs
 	 * @return
 	 */
-	public Probe makeProbe(String className, RdsHost host, List<?> constArgs) {
-		Probe retValue = null;
+	public Probe<?,?> makeProbe(String className, RdsHost host, List<?> constArgs) {
+		Probe<?,?> retValue = null;
 		ProbeDesc pd = (ProbeDesc) probeDescMap.get(className);
 		if( pd != null) {
 			retValue = makeProbe(pd, host, constArgs);
@@ -72,7 +72,7 @@ public class ProbeFactory {
 					}
 					Constructor<?> theConst = probeClass.getConstructor(constArgsType);
 					o = theConst.newInstance(constArgsVal);
-					retValue = (Probe) o;
+					retValue = (Probe<?,?>) o;
 				}
 				catch (ClassCastException ex) {
 					logger.warn("didn't get a Probe but a " + o.getClass().getName());
@@ -99,13 +99,13 @@ public class ProbeFactory {
 	 * @param constArgs
 	 * @return
 	 */
-	public Probe makeProbe(ProbeDesc pd, RdsHost host, List<?> constArgs) {
-		Class<? extends Probe> probeClass = pd.getProbeClass();
+	public Probe<?,?> makeProbe(ProbeDesc pd, RdsHost host, List<?> constArgs) {
+		Class<? extends Probe<?,?>> probeClass = pd.getProbeClass();
 		List<?> defaultsArgs = pd.getDefaultArgs();
-		Probe retValue = null;
+		Probe<?,?> retValue = null;
 		if (probeClass != null) {
 			try {
-				Constructor<? extends Probe> c = probeClass.getConstructor();
+				Constructor<? extends Probe<?,?>> c = probeClass.getConstructor();
 				retValue = c.newInstance();
 			}
 			catch (LinkageError ex) {

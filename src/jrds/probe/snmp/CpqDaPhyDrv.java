@@ -4,15 +4,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.rrd4j.core.Sample;
 import org.snmp4j.smi.OID;
 
 public class CpqDaPhyDrv extends RdsIndexedSnmpRrd {
-	static final private Logger logger = Logger.getLogger(CpqDaPhyDrv.class);
 
-	private int controlerIdx;
-	private int driveIdx;
 	static final private String READ = "cpqDaPhyDrvReads64";
 	static final private String WRITE = "cpqDaPhyDrvWrites64";
 	
@@ -22,13 +18,6 @@ public class CpqDaPhyDrv extends RdsIndexedSnmpRrd {
 	static final private OID cpqDaPhyDrvWrites = new OID(".1.3.6.1.4.1.232.3.2.5.1.1.13");
 	static final private OID cpqDaPhyDrvHReads = new OID(".1.3.6.1.4.1.232.3.2.5.1.1.10");
 	static final private OID cpqDaPhyDrvReads = new OID(".1.3.6.1.4.1.232.3.2.5.1.1.11");
-
-	public boolean configure(Integer controlerIdx, Integer driveIdx) {
-		super.configure(controlerIdx + "." + driveIdx);
-		this.controlerIdx = controlerIdx;
-		this.driveIdx = driveIdx;
-		return configure();
-	}
 
 	@Override
 	public Collection<OID> getIndexSet()

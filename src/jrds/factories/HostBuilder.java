@@ -81,7 +81,7 @@ public class HostBuilder extends ObjectBuilder {
 
 		for(JrdsNode probeNode: hostNode.iterate(CompiledXPath.get("probe | rrd"))) {
 			try {
-				Probe p = makeProbe(probeNode, host);
+				Probe<?,?> p = makeProbe(probeNode, host);
 				if(p != null && p.checkStore()) {
 					host.getProbes().add(p);
 				}
@@ -108,7 +108,7 @@ public class HostBuilder extends ObjectBuilder {
 			logger.trace("Adding macro " + name + ": " + m);
 			if(m != null) {
 				Map<String, String> properties = makeProperties(macroNode);
-				for(Probe p:m.populate(host, properties)) {
+				for(Probe<?,?> p:m.populate(host, properties)) {
 					if(p != null && p.checkStore()) {
 						host.getProbes().add(p);
 					}
@@ -143,8 +143,8 @@ public class HostBuilder extends ObjectBuilder {
 		return starter;
 	}
 
-	public Probe makeProbe(JrdsNode probeNode, RdsHost host) {
-		Probe p = null;
+	public Probe<?,?> makeProbe(JrdsNode probeNode, RdsHost host) {
+		Probe<?,?> p = null;
 		List<Object> args = ArgFactory.makeArgs(probeNode);
 		String type = probeNode.attrMap().get("type");
 		p = pf.makeProbe(type, host, args);

@@ -20,7 +20,7 @@ import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Logger;
 
-public abstract class JdbcProbe extends Probe implements UrlProbe, IndexedProbe {
+public abstract class JdbcProbe extends Probe<String, Number> implements UrlProbe, IndexedProbe {
 	static final private org.apache.log4j.Logger logger = Logger.getLogger(JdbcProbe.class);
 	private String label;
 

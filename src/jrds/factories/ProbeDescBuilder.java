@@ -38,6 +38,7 @@ public class ProbeDescBuilder extends ObjectBuilder {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public ProbeDesc makeProbeDesc(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
 		ProbeDesc pd = new ProbeDesc();
 

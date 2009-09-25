@@ -22,7 +22,7 @@ public class GraphNode implements Comparable<GraphNode> {
 
 	static final private Logger logger = Logger.getLogger(GraphNode.class);
 
-	protected Probe probe;
+	protected Probe<?,?> probe;
 	private String viewPath = null;
 	private GraphDesc gd;
 	private String name = null;
@@ -31,7 +31,7 @@ public class GraphNode implements Comparable<GraphNode> {
 	/**
 	 *
 	 */
-	public GraphNode(Probe theStore, GraphDesc gd) {
+	public GraphNode(Probe<?,?> theStore, GraphDesc gd) {
 		super();
 		this.probe = theStore;
 		this.gd = gd;
@@ -47,7 +47,7 @@ public class GraphNode implements Comparable<GraphNode> {
 	/**
 	 * @return Returns the theStore.
 	 */
-	public Probe getProbe() {
+	public Probe<?,?> getProbe() {
 		return probe;
 	}
 

@@ -36,7 +36,7 @@ public class CpuTimeGraph extends GraphNode {
 	/**
 	 * @param theStore
 	 */
-	public CpuTimeGraph(Probe theStore) {
+	public CpuTimeGraph(Probe<?,?> theStore) {
 		super(theStore, gd);
 	}
 }

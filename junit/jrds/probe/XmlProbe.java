@@ -94,8 +94,8 @@ public class XmlProbe {
 		p.setHost(new RdsHost("moke"));
 		p.setPd(pd);
 		p.configure(url, args);
-		Map<String, String> keys = p.getCollectkeys();
-		logger.trace("Collect keys: " + p.getCollectkeys());
+		Map<String, String> keys = p.getCollectMapping();
+		logger.trace("Collect keys: " + p.getCollectMapping());
 		logger.trace("Collect strings: " + pd.getCollectStrings());
 		Assert.assertTrue(keys.containsKey("/jrdsstats/stat[@key='a']/@value"));
 		Assert.assertTrue(keys.containsKey("/jrdsstats/stat[@key='b']/@value"));
@@ -126,7 +126,7 @@ public class XmlProbe {
 		h.getStarters().stopCollect();
 
 		logger.trace("vars: " + vars);
-		logger.trace("Collect keys: " + p.getCollectkeys());
+		logger.trace("Collect keys: " + p.getCollectMapping());
 		logger.trace("Collect strings: " + pd.getCollectStrings());
 
 		Assert.assertEquals(new Double(1.0), vars.get("/jrdsstats/stat[@key='a']/@value"));

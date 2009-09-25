@@ -34,7 +34,7 @@ public class Threshold {
 	public enum Action {
 		LOG{
 			@Override
-			public void run(Threshold t, Probe p, List<Object> args) {
+			public void run(Threshold t, Probe<?,?> p, List<Object> args) {
 				Level loglevel = Level.INFO;
 				if(args != null && args.size() == 1) {
 					String level = args.get(0).toString();
@@ -49,7 +49,7 @@ public class Threshold {
 		},
 		MAIL{
 			@Override
-			public void run(Threshold t, Probe p, List<Object> args) {
+			public void run(Threshold t, Probe<?,?> p, List<Object> args) {
 			}
 
 			@Override
@@ -58,14 +58,14 @@ public class Threshold {
 		},
 		TRAP {
 			@Override
-			public void run(Threshold t, Probe p, List<Object> args) {
+			public void run(Threshold t, Probe<?,?> p, List<Object> args) {
 			}
 
 			@Override
 			public void configure(PropertiesManager pm) {				
 			}
 		};
-		public abstract void run(Threshold t, Probe p, List<Object> args);
+		public abstract void run(Threshold t, Probe<?,?> p, List<Object> args);
 		public abstract void configure(PropertiesManager pm);
 	}
 
@@ -118,7 +118,7 @@ public class Threshold {
 		return false;
 	}
 
-	public void run(Probe p) {
+	public void run(Probe<?,?> p) {
 		int i=0;
 		for(Action a: actions) {
 			a.run(this, p, actionsArgs.get(i++));
