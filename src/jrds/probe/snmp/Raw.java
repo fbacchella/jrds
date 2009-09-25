@@ -8,6 +8,8 @@ package jrds.probe.snmp;
 
 import java.util.Map;
 
+import org.snmp4j.smi.OID;
+
 /**
  * Used to just store some oid, with raw values
  * @author Fabrice Bacchella 
@@ -21,8 +23,8 @@ extends RdsSnmpSimple {
 	 * @see jrds.Probe#filterValues(java.util.Map)
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<?, Number> filterValues(Map snmpVars) {
-		return (Map<?, Number>)snmpVars;
+	public Map<OID, Number> filterValues(Map snmpVars) {
+		return (Map<OID, Number>)snmpVars;
 		
 	}
 }

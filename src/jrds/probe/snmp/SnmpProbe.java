@@ -28,7 +28,7 @@ import org.snmp4j.smi.OID;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public abstract class SnmpProbe extends Probe {
+public abstract class SnmpProbe extends Probe<OID, Object> {
 	static final private Logger logger = Logger.getLogger(SnmpProbe.class);
 
 	public final static String REQUESTERNAME = "requester";
@@ -103,8 +103,9 @@ public abstract class SnmpProbe extends Probe {
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.Probe#getNewSampleValues()
 	 */
-	public Map<?, ?> getNewSampleValues() {
-		Map<?, ?> retValue = null;
+	@Override
+	public Map<OID, Object> getNewSampleValues() {
+		Map<OID, Object> retValue = null;
 		if(getSnmpStarter().isStarted()) {
 			Collection<OID> oids = getOidSet();
 			if(oids != null) {
@@ -126,10 +127,10 @@ public abstract class SnmpProbe extends Probe {
 	 * @param snmpVars
 	 * @return a Map of all the identified vars
 	 */
-	@SuppressWarnings("unchecked")
-	public Map<?, Number> filterValues(Map snmpVars) {
+	@Override
+	public Map<OID, Number> filterValues(Map<OID, Object>snmpVars) {
 		Map<OID, Number> retValue = new HashMap<OID, Number>(snmpVars.size());
-		for(Map.Entry<OID, Object> e: ((Map<OID, Object> )snmpVars).entrySet()) {
+		for(Map.Entry<OID, Object> e: snmpVars.entrySet()) {
 			OID oid = e.getKey();
 			for(int i= 0; i < getSuffixLength(); i++)
 				oid.removeLast();

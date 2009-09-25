@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
  * @author Fabrice Bacchella 
  * @version $Revision$,  $Date$
  */
-public abstract class HttpProbe extends Probe implements UrlProbe {
+public abstract class HttpProbe extends Probe<String, Number> implements UrlProbe {
 	static final private Logger logger = Logger.getLogger(HttpProbe.class);
 	private URL url = null;
 	private String host = null;
@@ -143,7 +143,7 @@ public abstract class HttpProbe extends Probe implements UrlProbe {
 	/* (non-Javadoc)
 	 * @see com.aol.jrds.Probe#getNewSampleValues()
 	 */
-	public Map<?, ?> getNewSampleValues() {
+	public Map<String, Number> getNewSampleValues() {
 		String hostName = getUrl().getHost();
 		if(hostName != null) {
 			Starter resolver = getStarters().find(Resolver.makeKey(hostName));

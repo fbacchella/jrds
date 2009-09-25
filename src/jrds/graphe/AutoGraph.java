@@ -26,7 +26,7 @@ public class AutoGraph extends GraphNode {
 	static int i;
 	Operation op;
 
-	public AutoGraph(Probe theStore, Operation op) {
+	public AutoGraph(Probe<?,?> theStore, Operation op) {
 		super(theStore, new GraphDesc() {
 			String name = "autograph" + i++;
 			/* (non-Javadoc)
@@ -63,7 +63,7 @@ public class AutoGraph extends GraphNode {
 			 */
 			@Override
 			public RrdGraphDef getRrdGraphDef() throws IOException {
-				SumProbe p = (SumProbe) getNode().getProbe();
+				SumProbe<?,?> p = (SumProbe<?,?>) getNode().getProbe();
 				double[][] allvalues = null;
 				GraphDesc tempgd = null;
 				FetchData fd = null;

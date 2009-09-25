@@ -9,7 +9,6 @@ package jrds.probe.snmp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +18,7 @@ import jrds.snmp.SnmpVars;
 import jrds.snmp.TabularIterator;
 
 import org.apache.log4j.Logger;
+import org.rrd4j.core.Sample;
 import org.snmp4j.smi.OID;
 
 
@@ -100,38 +100,35 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
 		return indexAsString;
 	}
 
-	/**
-	 * @see jrds.Probe#filterValues(java.util.Map)
+	/* (non-Javadoc)
+	 * @see jrds.Probe#modifySample(org.rrd4j.core.Sample, java.util.Map)
 	 */
-	@SuppressWarnings("unchecked")
-	public Map<?, Number> filterValues(Map snmpVars)
-	{
+	@Override
+	public void modifySample(Sample oneSample, Map<OID, Object> snmpVars) {
 		double max = 0;
 		double min = Double.MAX_VALUE;
 		double average = 0;
 		int nbvalue = 0;
 		double cpuUsed = 0;
-		for(Map.Entry<OID, Number> e: ((Map<OID, Number>)snmpVars).entrySet()) {
+		for(Map.Entry<OID, Object> e: ((Map<OID, Object>)snmpVars).entrySet()) {
 			OID oid = e.getKey();
 			if(oid.startsWith(hrSWRunPerfMem)) {
-				double value = e.getValue().doubleValue() * 1024;
+				double value = ((Number)e.getValue()).doubleValue() * 1024;
 				max = Math.max(max, value);
 				min = Math.min(min, value);
 				average += value;
 				nbvalue++;
 			}
 			else if(oid.startsWith(hrSWRunPerfCPU)) {
-				cpuUsed += e.getValue().doubleValue() / 100.0;
+				cpuUsed += ((Number)e.getValue()).doubleValue() / 100.0;
 			}
 		}
 		average /= nbvalue;
-		Map<String, Number> retValue = new HashMap<String, Number>(5);
-		retValue.put(NUM, nbvalue);
-		retValue.put(MAX, max);
-		retValue.put(MIN, min);
-		retValue.put(AVERAGE, average);
-		retValue.put(CPU, cpuUsed);		
-		return retValue;
+		oneSample.setValue(NUM, nbvalue);
+		oneSample.setValue(MAX, max);
+		oneSample.setValue(MIN, min);
+		oneSample.setValue(AVERAGE, average);
+		oneSample.setValue(CPU, cpuUsed);		
 	}
 }
 

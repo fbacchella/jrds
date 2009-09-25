@@ -189,7 +189,7 @@ public class ProbeDesc {
 	 * Return a map that translate the probe technical name to the datastore name
 	 * @return a Map of collect names to datastore name
 	 */
-	public Map<Object, String> getCollectkeys() {
+	public Map<Object, String> getCollectMapping() {
 		Map<Object, String> retValue = new LinkedHashMap<Object, String>(dsMap.size());
 		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
 			DsDesc dd = e.getValue();

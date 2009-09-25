@@ -70,7 +70,7 @@ public class HttpXml extends HttpProbe {
 	 * @see jrds.Probe#getCollectkeys()
 	 */
 	@Override
-	public Map<String, String> getCollectkeys() {
+	public Map<String, String> getCollectMapping() {
 		return collectKeys;
 	}
 

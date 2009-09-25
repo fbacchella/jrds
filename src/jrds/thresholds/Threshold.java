@@ -1,15 +1,14 @@
-package jrds;
+package jrds.thresholds;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import jrds.Probe;
+import jrds.PropertiesManager;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.net.SMTPAppender;
-import org.apache.log4j.spi.LoggingEvent;
-import org.apache.log4j.spi.TriggeringEventEvaluator;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchRequest;
 import org.rrd4j.core.RrdDb;
@@ -32,22 +31,6 @@ public class Threshold {
 		public abstract boolean check(double a, double b);
 	};
 
-	static final Logger mailloger = Logger.getLogger("maillogger");
-
-	static final public  SMTPAppender mailappender = new org.apache.log4j.net.SMTPAppender( new TriggeringEventEvaluator() {
-		public boolean isTriggeringEvent(LoggingEvent arg0) {
-			return true;
-		}
-	});
-	static {
-		mailappender.setSubject("Threshold reached");
-		mailappender.setName("Jrds Thresold logger");
-		mailappender.setLayout(new PatternLayout() );
-		mailappender.setSMTPDebug(false);
-		mailappender.setThreshold(Level.TRACE);
-		mailappender.activateOptions();
-		mailloger.addAppender(mailappender);
-	}
 	public enum Action {
 		LOG{
 			@Override
@@ -59,23 +42,35 @@ public class Threshold {
 				}
 				logger.log(loglevel, "Threshold reached for " + t.name + " on "+ p);
 			}
+
+			@Override
+			public void configure(PropertiesManager pm) {				
+			}
 		},
 		MAIL{
 			@Override
 			public void run(Threshold t, Probe p, List<Object> args) {
-				mailloger.log(Level.INFO, "Threshold reached for " + t.name + " on "+ p);
+			}
+
+			@Override
+			public void configure(PropertiesManager pm) {				
 			}
 		},
 		TRAP {
 			@Override
 			public void run(Threshold t, Probe p, List<Object> args) {
 			}
+
+			@Override
+			public void configure(PropertiesManager pm) {				
+			}
 		};
 		public abstract void run(Threshold t, Probe p, List<Object> args);
+		public abstract void configure(PropertiesManager pm);
 	}
 
-	String name;
-	String dsName;
+	public String name;
+	public String dsName;
 	double value;
 	long duration;
 	Comparator operation;
@@ -99,7 +94,6 @@ public class Threshold {
 		this.value = value;
 		this.duration = duration * 60;
 		this.operation = operation;
-		logger.debug( Threshold.mailappender.getErrorHandler());
 	}
 
 	public void addAction(Action a, List<Object> args) {
@@ -113,9 +107,9 @@ public class Threshold {
 			long tempduration = Math.max(duration, db.getHeader().getStep());
 			FetchRequest fr = db.createFetchRequest(ConsolFun.AVERAGE, lastUpdate - tempduration , lastUpdate);
 			double collected = fr.fetchData().getAggregate(dsName, ConsolFun.AVERAGE);
+			logger.debug("compare value:" + value + " to " +  collected + ", result:"+ operation.check(collected, value));
 			if(Double.isNaN(collected))
 				return false;
-			logger.debug("compare value:" + value + " to " +  fr.fetchData().getAggregate(dsName, ConsolFun.AVERAGE) + ", result:"+ Double.compare(collected, value));
 			return operation.check(collected, value);
 		} catch (IOException e) {
 			logger.equals("Check failed for " + this);

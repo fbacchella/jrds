@@ -18,7 +18,7 @@ import jrds.graphe.Sum;
 
 import org.apache.log4j.Logger;
 
-public class SumProbe extends VirtualProbe {
+public class SumProbe<KeyType, ValueType> extends VirtualProbe<KeyType, ValueType> {
 	static final private Logger logger = Logger.getLogger(SumProbe.class);
 
 	static final ProbeDesc pd = new ProbeDesc(0) {

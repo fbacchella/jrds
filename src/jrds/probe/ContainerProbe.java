@@ -14,7 +14,7 @@ import jrds.ProbeDesc;
 
 import org.apache.log4j.Logger;
 
-public class ContainerProbe extends VirtualProbe {
+public class ContainerProbe<KeyType, ValueType> extends VirtualProbe<KeyType, ValueType> {
 	static final private Logger logger = Logger.getLogger(ContainerProbe.class);
 
 	static final ProbeDesc pd = new ProbeDesc(0) {

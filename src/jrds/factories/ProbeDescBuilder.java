@@ -113,9 +113,8 @@ public class ProbeDescBuilder extends ObjectBuilder {
 				Object value = textValue;
 				if("collect".equals(element)) {
 					element ="collectKey";
-					if ("".equals(textValue)) {
-						value=null;
-					}
+					if("".equals(value))
+						value = null;
 				}
 				if("dsType".equals(element)) {
 					if( !"NONE".equals(textValue.toUpperCase()))

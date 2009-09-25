@@ -6,10 +6,10 @@ _##########################################################################*/
 
 package jrds.probe.snmp;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.rrd4j.core.Sample;
 import org.snmp4j.smi.OID;
 
 
@@ -26,11 +26,12 @@ public class ProcessStatusSolaris extends RdsSnmpSimple {
 	static final private String IDLE="I";
 	static final private String ZOMBIE="Z";
 	
-	/**
-	 * @see jrds.Probe#filterValues(java.util.Map)
+
+	/* (non-Javadoc)
+	 * @see jrds.Probe#modifySample(org.rrd4j.core.Sample, java.util.Map)
 	 */
-	@SuppressWarnings("unchecked")
-	public Map<?, Number> filterValues(Map snmpVars){
+	@Override
+	public void modifySample(Sample oneSample, Map<OID, Object> snmpVars) {
 		int runnable = 0;
 		int stopped = 0;
 		int inPageWait = 0;
@@ -56,15 +57,12 @@ public class ProcessStatusSolaris extends RdsSnmpSimple {
 				zombie++;
 			
 		}
-		Map<String, Number> retValue = new HashMap<String, Number>(7);
-		retValue.put(RUNNABLE, new Double(runnable));
-		retValue.put(STOPPED, new Double(stopped));
-		retValue.put(INPAGEWAIT, new Double(inPageWait));
-		retValue.put(NONINTERRUPTABLEWAIT, new Double(nonInterruptableWait));
-		retValue.put(SLEEPING, new Double(sleeping));
-		retValue.put(IDLE, new Double(idle));
-		retValue.put(ZOMBIE, new Double(zombie));
-		return retValue;
+		oneSample.setValue(RUNNABLE, new Double(runnable));
+		oneSample.setValue(STOPPED, new Double(stopped));
+		oneSample.setValue(INPAGEWAIT, new Double(inPageWait));
+		oneSample.setValue(NONINTERRUPTABLEWAIT, new Double(nonInterruptableWait));
+		oneSample.setValue(SLEEPING, new Double(sleeping));
+		oneSample.setValue(IDLE, new Double(idle));
+		oneSample.setValue(ZOMBIE, new Double(zombie));
 	}
-	
 }

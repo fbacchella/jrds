@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class Ribcl extends Probe {
+public class Ribcl extends Probe<String, Number> {
 	private String user;
 	private String passwd;
 	private String iloHost;
@@ -65,7 +65,7 @@ public class Ribcl extends Probe {
 	}
 
 	@Override
-	public Map<?, ?> getNewSampleValues() {
+	public Map<String, Number> getNewSampleValues() {
 		Map<String, Number> vars = new HashMap<String, Number>();
 		Socket s = null;
 		try {

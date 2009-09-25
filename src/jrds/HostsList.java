@@ -67,7 +67,7 @@ public class HostsList extends Starter implements StarterNode {
 
 	private final Set<RdsHost> hostList = new HashSet<RdsHost>();
 	private final Map<Integer, GraphNode> graphMap = new HashMap<Integer, GraphNode>();
-	private final Map<Integer, Probe> probeMap= new HashMap<Integer, Probe>();
+	private final Map<Integer, Probe<?,?>> probeMap= new HashMap<Integer, Probe<?,?>>();
 	private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
 	private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
 	private Renderer renderer = null;
@@ -182,7 +182,7 @@ public class HostsList extends Starter implements StarterNode {
 		Map<String, RdsHost> hosts = conf.setHostMap(l.getRepository(Loader.ConfigType.HOSTS));
 		for(RdsHost h: hosts.values()) {
 			addHost(h);
-			for(Probe p: h.getProbes()) {
+			for(Probe<?,?> p: h.getProbes()) {
 				p.setTimeout(getTimeout());
 				addProbe(p);
 				for(String hostTag: p.getTags()) {
@@ -354,7 +354,7 @@ public class HostsList extends Starter implements StarterNode {
 	 * @param id the hash value of the probe
 	 * @return the probe found or null of nothing found
 	 */
-	public Probe getProbeById(int id) {
+	public Probe<?,?> getProbeById(int id) {
 		return probeMap.get(id);
 	}
 
@@ -364,12 +364,12 @@ public class HostsList extends Starter implements StarterNode {
 	 * @param probeName the probe name: the probeName element of a probedesc
 	 * @return the graph found or null of nothing found
 	 */
-	public Probe getProbeByPath(String host, String probeName) {
+	public Probe<?,?> getProbeByPath(String host, String probeName) {
 		String path = host + "/" + probeName;
 		return probeMap.get(path.hashCode());
 	}
 
-	public void addProbe(Probe p) {
+	public void addProbe(Probe<?,?> p) {
 		probeMap.put(p.hashCode(), p);
 		addGraphs(p.getGraphList());
 	}
@@ -402,7 +402,7 @@ public class HostsList extends Starter implements StarterNode {
 		return filters.keySet();
 	}
 
-	private void addVirtual(VirtualProbe vprobe, RdsHost vhost, String root) {
+	private void addVirtual(VirtualProbe<?, ?> vprobe, RdsHost vhost, String root) {
 		vhost.getProbes().add(vprobe);
 		vprobe.setHost(vhost);
 		for(GraphNode currGraph: vprobe.getGraphList()) {

@@ -6,10 +6,10 @@ _##########################################################################*/
 
 package jrds.probe.snmp;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.rrd4j.core.Sample;
 import org.snmp4j.smi.OID;
 
 
@@ -27,17 +27,17 @@ public class ProcessStatusHostResources extends RdsSnmpSimple {
 	static final private String INVALID="invalid";
 	static final private int INVALIDINDEX = 4;
 	
-	/**
-	 * @see jrds.Probe#filterValues(java.util.Map)
+	/* (non-Javadoc)
+	 * @see jrds.Probe#modifySample(org.rrd4j.core.Sample, java.util.Map)
 	 */
-	@SuppressWarnings("unchecked")
-	public Map<?, Number> filterValues(Map snmpVars){
+	@Override
+	public void modifySample(Sample oneSample, Map<OID, Object> snmpVars) {
 		int running = 0;
 		int runnable = 0;
 		int notRunnable = 0;
 		int invalid = 0;
 		for(OID oid: (Set<OID>)snmpVars.keySet()){
-			int state = ((Number) snmpVars.get(oid)).intValue();
+			int state = ((Number)snmpVars.get(oid)).intValue();
 			if(RUNNINGINDEX == state)
 				running++;
 			else if(RUNNABLEINDEX == state)
@@ -48,12 +48,10 @@ public class ProcessStatusHostResources extends RdsSnmpSimple {
 				invalid++;
 			
 		}
-		Map<String, Number> retValue = new HashMap<String, Number>(7);
-		retValue.put(RUNNING, new Double(running));
-		retValue.put(RUNNABLE, new Double(runnable));
-		retValue.put(NOTRUNNABLE, new Double(notRunnable));
-		retValue.put(INVALID, new Double(invalid));
-		return retValue;
+		oneSample.setValue(RUNNING, new Double(running));
+		oneSample.setValue(RUNNABLE, new Double(runnable));
+		oneSample.setValue(NOTRUNNABLE, new Double(notRunnable));
+		oneSample.setValue(INVALID, new Double(invalid));
 	}
 	
 }

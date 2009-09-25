@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -22,6 +23,7 @@ import javax.management.openmbean.TabularData;
 
 import jrds.ConnectedProbe;
 import jrds.Probe;
+import jrds.ProbeDesc;
 
 import org.apache.log4j.Logger;
 
@@ -30,21 +32,29 @@ import org.apache.log4j.Logger;
  * @author Fabrice Bacchella 
  * @version $Revision: 407 $,  $Date: 2007-02-22 18:48:03 +0100 (jeu., 22 févr. 2007) $
  */
-public class JMX extends Probe implements ConnectedProbe {
+public class JMX extends Probe<String, Double> implements ConnectedProbe {
 
 	static final private Logger logger = Logger.getLogger(JMX.class);
 
 	private String connectionName = JMXConnection.class.getName();
+	private Map<String, String> collectKeys = null;
 
 	public boolean configure() {
+		collectKeys = new HashMap<String, String>();
+		for(Map.Entry<String, String> e:getPd().getCollectStrings().entrySet()) {
+			String dsName = e.getValue();
+			String solved = jrds.Util.parseTemplate(e.getKey(), this);
+			collectKeys.put(solved, dsName);
+		}
 		return true;
 	}
 
+
 	@Override
-	public Map<?, ?> getNewSampleValues() {
+	public Map<String, Double> getNewSampleValues() {
 		JMXConnection cnx = (JMXConnection) getStarters().find(connectionName);
 		if( !cnx.isStarted()) {
-			return Collections.EMPTY_MAP;
+			return Collections.emptyMap();
 		}
 		MBeanServerConnection mbean = (MBeanServerConnection) cnx.getConnection();
 		//Uptime is collected only once, by the connexion
@@ -52,12 +62,12 @@ public class JMX extends Probe implements ConnectedProbe {
 
 		try {
 
-			Map<String, String> collectKeys = getPd().getCollectStrings();
+			Set<String> collectKeys = getCollectMapping().keySet();
 			Map<String, Double> retValues = new HashMap<String, Double>(collectKeys.size());
 
 			logger.debug(collectKeys);
-			for(Map.Entry<String, String> e: collectKeys.entrySet()) {
-				String[] jmxPathArray = e.getKey().split("/");
+			for(String collect: collectKeys) {
+				String[] jmxPathArray = collect.split("/");
 				List<String> jmxPath = new ArrayList<String>();
 				jmxPath.addAll(Arrays.asList(jmxPathArray));
 				ObjectName mbeanName = new ObjectName(jmxPath.remove(0));
@@ -65,8 +75,8 @@ public class JMX extends Probe implements ConnectedProbe {
 				try {
 					Object attr = mbean.getAttribute(mbeanName, attributeName);
 					Number v = resolvJmxObject(jmxPath, attr);
-					logger.debug("JMX Path: " + e.getKey() +" = " + v);
-					retValues.put(e.getValue(), v.doubleValue());
+					logger.debug("JMX Path: " + collect +" = " + v);
+					retValues.put(collect, v.doubleValue());
 				} catch (AttributeNotFoundException e1) {
 					logger.error("Invalide JMX attribue" +  attributeName + " for " + this);
 				} catch (InstanceNotFoundException e1) {
@@ -135,6 +145,23 @@ public class JMX extends Probe implements ConnectedProbe {
 		return Double.NaN;
 	}
 	
+	/* (non-Javadoc)
+	 * @see jrds.Probe#setPd(jrds.ProbeDesc)
+	 */
+	@Override
+	public void setPd(ProbeDesc pd) {
+		super.setPd(pd);
+		collectKeys = getPd().getCollectStrings();
+	}
+
+	/* (non-Javadoc)
+	 * @see jrds.Probe#getCollectkeys()
+	 */
+	@Override
+	public Map<String, String> getCollectMapping() {
+		return collectKeys;
+	}
+
 	/**
 	 * @return the connection
 	 */

@@ -51,8 +51,8 @@ import org.w3c.dom.Element;
  * can overid some method as needed
  * @author Fabrice Bacchella
  */
-public abstract class Probe
-implements Comparable<Probe>, StarterNode {
+public abstract class Probe<KeyType, ValueType>
+implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 
 	static final private Logger logger = Logger.getLogger(Probe.class);
 
@@ -413,28 +413,38 @@ implements Comparable<Probe>, StarterNode {
 	}
 
 	/**
-	 * The method that return a map of data to be stored.<br>
+	 * The method that return a map of data collected.<br>
+	 * It should return return as raw as possible, they can even be opaque data tied to the probe.
 	 * the key is resolved using the <code>ProbeDesc</code>. A key not associated with an existent datastore will generate a warning
 	 * but will not prevent the other values to be stored.<br>
 	 * the value should be a <code>java.lang.Number<code><br>
-	 * @return the map of values
+	 * @return the map of collected object
 	 */
-	public abstract Map<?, ?> getNewSampleValues();
+	public abstract Map<KeyType, ValueType> getNewSampleValues();
 
 	/**
-	 * A method that might be overriden if specific treatement is needed
-	 * by a probe.<br>
-	 * By default, it does nothing.
+	 * This method convert the collected object to numbers and can do post treatment
 	 * @param valuesList
 	 * @return an map of value to be stored
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<?, Number>  filterValues(Map<?, ?> valuesList) {
-		return (Map<?, Number>)valuesList;
+	public Map<KeyType, Number>  filterValues(Map<KeyType, ValueType> valuesList) {
+		return (Map<KeyType, Number>)valuesList;
+	}
+	
+	/**
+	 * The sample itself can be modified<br>
+	 * The defautl function does nothing
+	 * @param oneSample
+	 * @param values
+	 */
+	public void modifySample(Sample oneSample, Map<KeyType, ValueType> values) {
+		
 	}
 
-	public Map<?, String> getCollectkeys() {
-		return getPd().getCollectkeys();
+	@SuppressWarnings("unchecked")
+	public Map<KeyType, String> getCollectMapping() {
+		return (Map<KeyType, String>)getPd().getCollectMapping();
 	}
 
 	/**
@@ -442,18 +452,18 @@ implements Comparable<Probe>, StarterNode {
 	 * Overriding should be avoided.
 	 * @param oneSample
 	 */
-	protected void updateSample(Sample oneSample) {
+	private void updateSample(Sample oneSample) {
 		if(isCollectRunning()) {
-			Map<?, ?> sampleVals = getNewSampleValues();
+			Map<KeyType, ValueType> sampleVals = getNewSampleValues();
 			if (sampleVals != null) {
 				if(getUptime() * pd.getUptimefactor() >= pd.getHeartBeatDefault()) {
-					Map<?, String> nameMap = getCollectkeys();
-					Map<?, Number>filteredSamples = filterValues(sampleVals);
-					for(Map.Entry<?, Number> e: filteredSamples.entrySet()) {
+					Map<?, String> nameMap = getCollectMapping();
+					if(logger.isTraceEnabled()) {
+						logger.trace("Collect keys:" + nameMap);
+					}
+					Map<KeyType, Number>filteredSamples = filterValues(sampleVals);
+					for(Map.Entry<KeyType, Number> e: filteredSamples.entrySet()) {
 						String dsName = nameMap.get(e.getKey());
-						//A collect key may be null or empty to prevent collect, use the original name in this case
-						if(dsName == null || "".equals(dsName))
-							dsName = e.getKey().toString();
 						double value = e.getValue().doubleValue();
 						if (dsName != null) {
 							oneSample.setValue(dsName, value);
@@ -462,6 +472,7 @@ implements Comparable<Probe>, StarterNode {
 							logger.debug("Dropped entry: " + e.getKey() + " for " + this);
 						}
 					}
+					modifySample(oneSample, sampleVals);
 				}
 				else {
 					logger.info("uptime too low for " + toString());
@@ -539,7 +550,7 @@ implements Comparable<Probe>, StarterNode {
 	 * @param arg0 Object
 	 * @return int
 	 */
-	public int compareTo(Probe arg0) {
+	public int compareTo(Probe<KeyType, ValueType> arg0) {
 		return String.CASE_INSENSITIVE_ORDER.compare(toString(),
 				arg0.toString());
 	}
@@ -823,7 +834,7 @@ implements Comparable<Probe>, StarterNode {
 	public void setLabel(String label) {
 		this.label = label;
 	}
-	
+
 	public HostsList getHostList() {
 		return (HostsList) getStarters().find(HostsList.class);
 	}

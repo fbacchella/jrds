@@ -4,11 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
-import jrds.ProbeDesc;
-import jrds.RdsHost;
-
 import org.apache.log4j.Logger;
-import org.snmp4j.smi.Counter32;
+import org.rrd4j.core.Sample;
 import org.snmp4j.smi.OID;
 
 public class CpqDaPhyDrv extends RdsIndexedSnmpRrd {
@@ -51,14 +48,11 @@ public class CpqDaPhyDrv extends RdsIndexedSnmpRrd {
 	}
 
 	/* (non-Javadoc)
-	 * @see jrds.probe.snmp.SnmpProbe#filterValues(java.util.Map)
+	 * @see jrds.Probe#modifySample(org.rrd4j.core.Sample, java.util.Map)
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public Map<?, Number> filterValues(Map snmpVars) {
-		snmpVars = super.filterValues(snmpVars);
-		snmpVars.put(READ, joinCounter32((Long)snmpVars.get(cpqDaPhyDrvHReads), (Long)snmpVars.get(cpqDaPhyDrvReads)));
-		snmpVars.put(WRITE, joinCounter32((Long)snmpVars.get(cpqDaPhyDrvHWrites), (Long)snmpVars.get(cpqDaPhyDrvWrites)));
-		return snmpVars;
+	public void modifySample(Sample oneSample, Map<OID, Object> values) {
+		oneSample.setValue(READ, joinCounter32((Long)values.get(cpqDaPhyDrvHReads), (Long)values.get(cpqDaPhyDrvReads)));
+		oneSample.setValue(WRITE, joinCounter32((Long)values.get(cpqDaPhyDrvHWrites), (Long)values.get(cpqDaPhyDrvWrites)));
 	}
 }

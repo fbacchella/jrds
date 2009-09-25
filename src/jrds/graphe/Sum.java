@@ -21,7 +21,7 @@ public class Sum extends GraphNode {
 	static final private Logger logger = Logger.getLogger(Sum.class);
 	static int i;
 
-	public Sum(Probe theStore) {
+	public Sum(Probe<?,?> theStore) {
 		super(theStore, new GraphDesc() {
 			String name = "sum" + i++;
 			/* (non-Javadoc)
@@ -56,7 +56,7 @@ public class Sum extends GraphNode {
 			 */
 			@Override
 			public RrdGraphDef getRrdGraphDef() throws IOException {
-				SumProbe p = (SumProbe) getNode().getProbe();
+				SumProbe<?,?> p = (SumProbe<?,?>) getNode().getProbe();
 				double[][] allvalues = null;
 				GraphDesc tempgd = null;
 				FetchData fd = null;
