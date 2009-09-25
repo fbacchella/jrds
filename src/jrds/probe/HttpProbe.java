@@ -89,7 +89,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 	private void finishConfigure() {
 		RdsHost monitoredHost = getHost();
 		logger.trace("Set host to " + monitoredHost);
-		host = monitoredHost.getName();
+		host = monitoredHost.getDnsName();
 		try {
 			if(url != null)
 				setUrl(new URL(getUrl().getProtocol(), host, getUrl().getPort(), getUrl().getFile()));
