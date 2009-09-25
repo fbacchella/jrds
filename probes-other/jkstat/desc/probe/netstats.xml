@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+	<name>KstatNetstats</name>
+	<probeName>net-${index}</probeName>
+	<probeClass>jrds.probe.KstatProbeIndexed</probeClass>
+	<specific name="module">${device}</specific>
+	<specific name="name">${device}${instance}</specific>
+	<specific name="index">${device}${instance}</specific>
+	<ds>
+		<dsName>norcvbuf</dsName>
+		<dsType>gauge</dsType>
+	</ds>
+	<ds>
+		<dsName>rbytes64</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>brdcstrcv</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>opackets64</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>unknowns</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>multircv</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>oerrors</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>obytes64</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>ipackets64</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>noxmtbuf</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>collisions</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>brdcstxmt</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>multixmt</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>ierrors</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>opackets64</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<graphs>
+		<name>KstatNetstatspkts</name>
+	</graphs>
+</probedesc>

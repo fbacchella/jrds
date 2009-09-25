@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+	<name>KstatDiskstat</name>
+	<probeName>ds-${index}</probeName>
+	<probeClass>jrds.probe.KstatProbeIndexed</probeClass>
+	<specific name="module">sd</specific>
+	<specific name="name">sd${instance}</specific>
+	<specific name="index">sd${instance}</specific>
+	<ds>
+		<dsName>rlentime</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>writes</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>wlentime</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>rcnt</dsName>
+		<dsType>gauge</dsType>
+	</ds>
+	<ds>
+		<dsName>reads</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>nread</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>nwritten</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>wlastupdate</dsName>
+		<dsType>gauge</dsType>
+	</ds>
+	<ds>
+		<dsName>wtime</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>wcnt</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>rtime</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>rlastupdate</dsName>
+		<dsType>gauge</dsType>
+	</ds>
+	<graphs>
+		<name>KstatDiskstatBytes</name>
+		<name>KstatDiskstatOps</name>
+		<name>KstatDiskstatQueue</name>
+	</graphs>
+</probedesc>

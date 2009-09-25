@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+	<name>KstatNetstats2</name>
+	<probeName>net-${index}</probeName>
+	<probeClass>jrds.probe.KstatProbeIndexed</probeClass>
+	<specific name="module">${device}</specific>
+	<specific name="name">statistics</specific>
+	<specific name="index">${device}${instance}</specific>
+	<ds>
+		<dsName>Xmit_TCP_Seg_Contexts_Fail</dsName>
+		<dsType></dsType>
+		<collect>Xmit_TCP_Seg_Contexts_Fail</collect>
+	</ds>
+	<ds>
+		<dsName>Good_Octets_Recvd_Lo</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Tx Pkt Over Size</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Total_Octets_Recvd_Hi</dsName>
+		<dsType></dsType>
+		<collect>Total_Octets_Recvd_Hi</collect>
+	</ds>
+	<ds>
+		<dsName>XOFFs_Recvd</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Recv_Undersize</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Rx Size Error</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Total_Octets_Xmitd_Hi</dsName>
+		<dsType></dsType>
+		<collect>Total_Octets_Xmitd_Hi</collect>
+	</ds>
+	<ds>
+		<dsName>Xmit_TCP_Seg_Contexts</dsName>
+		<dsType></dsType>
+		<collect>Xmit_TCP_Seg_Contexts</collect>
+	</ds>
+	<ds>
+		<dsName>Total_Packets_Recvd</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Rx Error</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Recv_Length_Errors</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>XONs_Recvd</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Xmit_with_No_CRS</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Reset Count</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Good_Pkts_Recvd</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Tx No Buffer</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Total_Octets_Xmitd_Lo</dsName>
+		<dsType></dsType>
+		<collect>Total_Octets_Xmitd_Lo</collect>
+	</ds>
+	<ds>
+		<dsName>Rx Allocb Failure</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Tx Reschedule</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Recv_Unsupport_FC_Pkts</dsName>
+		<dsType></dsType>
+		<collect>Recv_Unsupport_FC_Pkts</collect>
+	</ds>
+	<ds>
+		<dsName>Good_Octets_Recvd_Hi</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Tx Send Failure</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>XOFFs_Xmitd</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>link_speed</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Good_Pkts_Xmitd</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Recv_Symbol_Errors</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Recv_Frag</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Recv_Missed_Packets</dsName>
+		<dsType></dsType>
+	</ds>2
+	<ds>
+		<dsName>Recv_Oversize</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Good_Octets_Xmitd_Lo</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Total_Octets_Recvd_Lo</dsName>
+		<dsType></dsType>
+		<collect>Total_Octets_Recvd_Lo</collect>
+	</ds>
+	<ds>
+		<dsName>XONs_Xmitd</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Tx No Desc</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Good_Octets_Xmitd_Hi</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Total_Packets_Xmitd</dsName>
+		<dsType></dsType>
+	</ds>
+	<ds>
+		<dsName>Recv_Jabber</dsName>
+		<dsType></dsType>
+	</ds>
+	<graphs>
+		<name>KstatNetstatspkts</name>
+	</graphs>
+</probedesc>

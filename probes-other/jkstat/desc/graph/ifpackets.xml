@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+  <name>KstatNetstatspkts</name>
+  <graphName>ifxpkts-${index}</graphName>
+  <graphTitle>Packets exchanged on interface ${index} on ${host}</graphTitle>
+  <verticalLabel>paquets/s</verticalLabel>
+  <lowerLimit>NaN</lowerLimit>
+  <add>
+    <legend>Upward graph</legend>
+  </add>
+  <add>
+    <name>opackets64</name>
+    <graphType>area</graphType>
+    <color>green</color>
+    <legend>packets sends/s</legend>
+  </add>
+  <add>
+    <name>oerrors</name>
+    <graphType>line</graphType>
+    <color>red</color>
+    <legend>packets in error send/s</legend>
+  </add>
+  <add>
+    <legend>Downward graph</legend>
+  </add>
+  <add>
+    <name>ipackets64</name>
+    <reversed>true</reversed>
+    <graphType>area</graphType>
+    <color>blue</color>
+    <legend>packets received/s</legend>
+  </add>
+  <add>
+    <name>ierrors</name>
+    <reversed>true</reversed>
+    <graphType>line</graphType>
+    <color>red</color>
+    <legend>packets in error received/s</legend>
+  </add>
+  <hosttree>
+    <pathelement>HOST</pathelement>
+    <pathelement>NETWORK</pathelement>
+    <pathelement>INTERFACES</pathelement>
+    <pathelement>INDEX</pathelement>
+    <pathstring>Packets exchanged</pathstring>
+  </hosttree>
+  <viewtree>
+    <pathelement>NETWORK</pathelement>
+    <pathelement>INTERFACES</pathelement>
+    <pathstring>Packets exchanged</pathstring>
+    <pathelement>HOST</pathelement>
+    <pathelement>INDEX</pathelement>
+  </viewtree>
+</graphdesc>

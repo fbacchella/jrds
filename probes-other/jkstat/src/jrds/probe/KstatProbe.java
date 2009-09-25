@@ -1,53 +1,81 @@
 package jrds.probe;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import jrds.ConnectedProbe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
+import jrds.starter.Connection;
+
+import org.apache.log4j.Logger;
 
 import uk.co.petertribble.jkstat.api.JKstat;
 import uk.co.petertribble.jkstat.api.Kstat;
 import uk.co.petertribble.jkstat.api.KstatData;
-import uk.co.petertribble.jkstat.client.RemoteJKstat;
 
-public class KstatProbe extends jrds.Probe {
-	int port;
-	URL remoteUrl;
+public class KstatProbe extends jrds.Probe  implements ConnectedProbe {
+	static final private Logger logger = Logger.getLogger(KstatProbe.class);
+
 	Kstat ks;
+	private String connectionName = KstatConnection.class.getName();
 
-	public void configure(Integer port) {
-		this.port = port;
-		try {
-			remoteUrl = new URL("http",getHost().getName(), port, "/");
-			String kstatPath[] = getPd().getSpecific("kstat").split(":");
-			String module = kstatPath[0];
-			String instStr = kstatPath[1];
-			String name = kstatPath[2];
-			int inst = jrds.Util.parseStringNumber(instStr, Integer.class, -1).intValue();
-			ks = new Kstat(module, inst, name);
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	protected Boolean setup(String module, int instance,String name) {
+		ks = new Kstat(module, instance, name);
+		return true;
+	}
+	
+	public Boolean configure() {
+		String module = getPd().getSpecific("module");
+		String name = getPd().getSpecific("name");
+		return setup(module, 0, name);
 	}
 
 	public  static void main(String[] args) throws MalformedURLException {
 		ProbeDesc pd = new ProbeDesc();
-		pd.addSpecific("kstat", "zfs:0:arcstats");
-		KstatProbe probe = new KstatProbe();
+		Connection cnx = new KstatConnection(3000);
+		pd.addSpecific("module", "${device}");
+		pd.addSpecific("name", "statistics");
+		pd.addSpecific("index", "${device}${instance}");
+		KstatProbeIndexed probe = new KstatProbeIndexed();
 		probe.setPd(pd);
-		probe.setHost(new RdsHost("10.0.0.127"));
-		probe.configure(7777);
+		probe.setHost(new RdsHost("toto","10.0.0.127"));
+		probe.configure("e1000g", 0);
+		cnx.register(probe);
+		probe.getStarters().startCollect();
 		probe.getUptime();
+		Map<?, ?> m =  probe.getNewSampleValues();
+		for(Object key: m.keySet() ) {
+			String keyName = key.toString();
+			System.out.println("<ds>");
+			System.out.println("    <dsName>" + keyName + "</dsName>");
+			System.out.println("    <dsType></dsType>");
+			if(keyName.length() > 20) {
+				System.out.println("    <collect>" + keyName + "</collect>");
+			}
+			System.out.println("</ds>");
+		}
 		System.out.println(probe.getNewSampleValues());
 	}
 
 	public Map getNewSampleValues() {
-		JKstat remoteJk = new RemoteJKstat(remoteUrl.toString());
+		KstatConnection cnx = (KstatConnection) getStarters().find(connectionName);
+		if(cnx == null) {
+			logger.warn("No connection found for " + this + " with name " + getConnectionName());
+		}
+		if( !cnx.isStarted()) {
+			return null;
+		}
+		//Uptime is collected only once, by the connexion
+		setUptime(cnx.getUptime());
+
+		JKstat remoteJk = (JKstat) cnx.getConnection();
 		Kstat active  = remoteJk.getKstat(ks);
+		if(active == null) {
+			return Collections.emptyMap();
+		}
 		Map<String, Number> retValues = new HashMap<String,Number>();
 		for(Map.Entry<String, KstatData> e: active.getMap().entrySet()) {
 			String name = e.getKey();
@@ -77,18 +105,12 @@ public class KstatProbe extends jrds.Probe {
 	public String getSourceType() {
 		return "kstat";
 	}
-	
-	/* (non-Javadoc)
-	 * @see jrds.Probe#getUptime()
-	 */
-	public long getUptime() {
-		JKstat remoteJk = new RemoteJKstat(remoteUrl.toString());
-		Kstat ks = remoteJk.getKstat("unix", 0, "system_misc");
-		if(ks == null)
-			return 0;
-		Long uptime = (Long)ks.getData("boot_time");
-		long now = System.currentTimeMillis() / 1000;
-		return now - uptime.longValue() ;
-	}
 
+	public String getConnectionName() {
+		return connectionName;
+	}
+	
+	public void setConnectionName(String connectionName) {
+		this.connectionName = connectionName;
+	}
 }
