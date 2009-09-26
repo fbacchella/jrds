@@ -1,4 +1,5 @@
 dojo.require("dijit.form.TimeTextBox");
+//dojo.require("dojo.fx");
 
 function initQuery() {
 	 dojo.xhrGet( {
@@ -26,11 +27,18 @@ function graphHistory() {
 
 function doGraphList(result) {
 	var graphPane = dojo.byId("graphPane");
+    //var wipeArgs = {
+    //        node: graphPane
+    //};
+    //dojo.fx.wipeIn(wipeArgs).play();
+    //dojo.style(graphPane, "display", "none")
+	//dojo.fadeOut({node: graphPane,duration: 1000}).play
 	dojo.empty(graphPane);
 	for(i in result.items) {
 		graph = result.items[i];
 		var  graphBlock = dojo.create("div")
 		dojo.attr(graphBlock, "class","graphblock");
+		dojo.place(graphBlock,graphPane);
 		 
 		var graphImg = dojo.create("img");
 		dojo.attr(graphImg, "class","graph");
@@ -38,6 +46,8 @@ function doGraphList(result) {
 		dojo.attr(graphImg, "title", graph.name);
 		dojo.attr(graphImg, "id", graph.id);
 		dojo.attr(graphImg, "src", graph.imghref);
+		dojo.attr(graphImg, "width",graph.width);
+		dojo.attr(graphImg, "height", graph.height);
 
 		var iconsList =  dojo.create("div");
 		dojo.attr(iconsList, "class","iconslist");
@@ -78,9 +88,15 @@ function doGraphList(result) {
 		 
 		dojo.place(graphImg, graphBlock);
 		dojo.place(iconsList, graphBlock);
-		dojo.place(graphBlock,graphPane);
+        //dojo.style(graphBlock, "display", "none");
+        //var wipeArgs = {
+        //        node: graphBlock
+        //};
+		
 	}
-	
+    //dojo.fx.wipeOut(wipeArgs).play();
+	//dojo.fadeIn({node: graphPane,duration: 1000}).play
+	//dojo.style(graphPane, "display", "block");
 	return result;
 }
 
@@ -161,7 +177,7 @@ function getTree() {
     new dijit.Tree({
         model: treeModel,
 		showRoot: false,
-        onClick: loadTree,
+        onClick: loadTree
      }, "treeOne");	
 }
 
@@ -188,7 +204,7 @@ function setupCalendar() {
     	hourFormat: {
     		timePattern: 'HH:mm',
             locale: 'en-us',
-            selector: 'time', 
+            selector: 'time'
     	},        
     	onChange: function(date) {
     		if(date && ! date == '') {
@@ -208,7 +224,7 @@ function setupCalendar() {
     	name: 'beginh',
     	value: '',
         queryId: 'begin',
-        constraints:{timePattern:'HH:mm', clickableIncrement:'T00:30:00', visibleIncrement:'T00:30:00', visibleRange:'T05:00:00'},
+        constraints:{timePattern:'HH:mm', clickableIncrement:'T00:30:00', visibleIncrement:'T00:30:00', visibleRange:'T05:00:00'}
     }, 'beginh');
     var endHour = new Date();
     endHour.setHours(23);
@@ -218,7 +234,7 @@ function setupCalendar() {
     	name: 'endh',
     	value: '',
         queryId: 'end',
-        constraints:{timePattern:'HH:mm', clickableIncrement:'T00:30:00', visibleIncrement:'T00:30:00', visibleRange:'T05:00:00'},
+        constraints:{timePattern:'HH:mm', clickableIncrement:'T00:30:00', visibleIncrement:'T00:30:00', visibleRange:'T05:00:00'}
     }, 'endh');
 
     dojo.declare("DayHourTextBox", dijit.form.DateTextBox, {

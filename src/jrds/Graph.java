@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
-import org.rrd4j.graph.RrdGraphInfo;
 
 public class Graph {
 	static final private Logger logger = Logger.getLogger(Graph.class);
@@ -116,7 +115,7 @@ public class Graph {
 		return node.getGraphDesc().getGraphDef(node.getProbe());
 	}
 
-	private RrdGraph getRrdGraph() throws
+	public RrdGraph getRrdGraph() throws
 	IOException {
 		GraphDesc gd = node.getGraphDesc();
 		RrdGraphDef tempGraphDef = getRrdGraphDef();
@@ -137,14 +136,6 @@ public class Graph {
 		tempGraphDef.setHeight(gd.getHeight());
 		RrdGraph graph;
 		graph = new RrdGraph(tempGraphDef);
-		GraphDesc.Dimension dimension = gd.getDimension();
-		if(dimension == null) {
-			RrdGraphInfo gi = graph.getRrdGraphInfo();
-			dimension = gd.new Dimension();
-			dimension.height = gi.getHeight();
-			dimension.width = gi.getWidth();
-			gd.setDimension(dimension);
-		}
 		return graph;
 	}
 

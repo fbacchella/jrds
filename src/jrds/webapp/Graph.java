@@ -48,6 +48,10 @@ public final class Graph extends JrdsServlet {
 			hl.getRenderer().send(graph, out);
 
 			if(logger.isTraceEnabled()) {
+				jrds.GraphNode node = hl.getGraphById(p.getId());
+				int wh = node.getGraphDesc().getDimension().height;
+				int rh = graph.getRrdGraph().getRrdGraphInfo().getHeight();
+				logger.trace("Delta heigt:" + (rh - wh) + " for " + node.getGraphDesc());
 				Date finish = new Date();
 				long duration1 = middle.getTime() - start.getTime();
 				long duration2 = finish.getTime() - middle.getTime();

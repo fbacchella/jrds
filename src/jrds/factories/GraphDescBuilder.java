@@ -1,10 +1,15 @@
 package jrds.factories;
 
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.font.LineMetrics;
+import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.rrd4j.graph.RrdGraphConstants;
 import org.w3c.dom.Node;
 
 import jrds.GraphDesc;
@@ -109,7 +114,104 @@ public class GraphDescBuilder extends ObjectBuilder {
 		if(tree != null && ! tree.isEmpty())
 			gd.setHostTree(tree);
 
+		initializeLimits(gd);
 		return gd;
+	}
+	
+	private class ImageParameters {
+		int xsize;
+		int ysize;
+		int unitslength;
+		int xorigin;
+		int yorigin;
+		
+		int xgif, ygif;
+	}
+	
+	private final double LEGEND_LEADING_SMALL = 0.7; // chars
+	private final int PADDING_LEFT = 10; // pix
+	private final int PADDING_TOP = 12; // pix
+	private final int PADDING_TITLE = 6; // pix
+	private final int PADDING_RIGHT = 16; // pix
+	private final int PADDING_PLOT = 2; //chars
+	private final int PADDING_BOTTOM = 6; //pix
+
+	private final int DEFAULT_UNITS_LENGTH = 9;
+
+	private static final String DUMMY_TEXT = "Dummy";
+	private final BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+	private final Graphics2D gd = img.createGraphics();
+	private final Font smallFont = RrdGraphConstants.DEFAULT_SMALL_FONT; // ok
+	private final Font largeFont = RrdGraphConstants.DEFAULT_LARGE_FONT; // ok
+
+	private double getFontHeight(Font font) {
+		LineMetrics lm = font.getLineMetrics(DUMMY_TEXT, gd.getFontRenderContext());
+		return lm.getAscent() + lm.getDescent();
+	}
+
+	private double getSmallFontHeight() {
+		return getFontHeight(smallFont);
+	}
+
+	private double getLargeFontHeight() {
+		return getFontHeight(largeFont);
+	}
+
+	private double getStringWidth(String text, Font font) {
+		return font.getStringBounds(text, 0, text.length(), gd.getFontRenderContext()).getBounds().getWidth();
+	}
+	
+	private double getSmallFontCharWidth() {
+		return getStringWidth("a", smallFont);
+	}
+
+	private double getSmallLeading() {
+		return getSmallFontHeight() * LEGEND_LEADING_SMALL;
+	}
+
+	private void initializeLimits(GraphDesc gd) {
+		ImageParameters im = new ImageParameters();
+
+		im.xsize = gd.getWidth();
+		im.ysize = gd.getHeight();
+		im.unitslength = DEFAULT_UNITS_LENGTH;
+		//gdef.onlyGraph
+		if (false) {
+			if (im.ysize > 64) {
+				throw new IllegalArgumentException("Cannot create graph only, height too big: " + im.ysize);
+			}
+			im.xorigin = 0;
+		}
+		else {
+			im.xorigin = (int) (PADDING_LEFT + im.unitslength * getSmallFontCharWidth());
+		}
+		//gdef.verticalLabel != null
+		if (true) {
+			im.xorigin += getSmallFontHeight();
+		}
+		//gdef.onlyGraph
+		if (false) {
+			im.yorigin = im.ysize;
+		}
+		else {
+			im.yorigin = PADDING_TOP + im.ysize;
+		}
+		//gdef.title != null
+		if (true) {
+			im.yorigin += getLargeFontHeight() + PADDING_TITLE;
+		}
+		//gdef.onlyGraph
+		if (false) {
+			im.xgif = im.xsize;
+			im.ygif = im.yorigin;
+		}
+		else {
+			im.xgif = PADDING_RIGHT + im.xsize + im.xorigin;
+			im.ygif = im.yorigin + (int) (PADDING_PLOT * getSmallFontHeight());
+		}
+		im.ygif += ( (int) getSmallLeading() + 5 ) * ( gd.getLegendLines() + 5);
+		im.ygif += PADDING_BOTTOM;
+		gd.setDimension(im.ygif, im.xgif);
 	}
 
 }

@@ -132,7 +132,7 @@ implements Cloneable {
 				return true;
 			};
 		};
-		
+
 		public abstract void draw(RrdGraphDef rgd, String sn, Color color);
 		public abstract boolean toPlot();
 		public abstract boolean datasource();
@@ -436,14 +436,14 @@ implements Cloneable {
 				return Color.WHITE;
 			}
 		};
-		
+
 		public abstract Color getColor();
 		public static final int length = Colors.values().length;
 		public static final Color resolveIndex(int i) {
 			return Colors.values()[ i % Colors.length].getColor();
 		}
 	};
-	
+
 	static private final class DsDesc {
 		public String name;
 		public String dsName;
@@ -1096,7 +1096,19 @@ implements Cloneable {
 	/**
 	 * @param dimension the dimension of the graphic object to set
 	 */
-	public void setDimension(Dimension dimension) {
-		this.dimension = dimension;
+	public void setDimension(int height, int width) {
+		dimension = new Dimension();
+		dimension.height = height;
+		dimension.width = width;
 	}
+
+	public int getLegendLines() {
+		int numlegend = 0;
+		for(DsDesc dd: allds) {
+			if (dd.graphType.legend() && dd.legend != null)
+				numlegend++;
+		}
+		return numlegend;
+	}
+
 }
