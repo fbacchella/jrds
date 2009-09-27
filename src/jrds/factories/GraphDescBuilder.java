@@ -124,19 +124,18 @@ public class GraphDescBuilder extends ObjectBuilder {
 		int unitslength;
 		int xorigin;
 		int yorigin;
-		
 		int xgif, ygif;
 	}
 	
-	private final double LEGEND_LEADING_SMALL = 0.7; // chars
-	private final int PADDING_LEFT = 10; // pix
-	private final int PADDING_TOP = 12; // pix
-	private final int PADDING_TITLE = 6; // pix
-	private final int PADDING_RIGHT = 16; // pix
-	private final int PADDING_PLOT = 2; //chars
-	private final int PADDING_BOTTOM = 6; //pix
+	static private final double LEGEND_LEADING_SMALL = 0.7; // chars
+	static private final int PADDING_LEFT = 10; // pix
+	static private final int PADDING_TOP = 12; // pix
+	static private final int PADDING_TITLE = 6; // pix
+	static private final int PADDING_RIGHT = 16; // pix
+	static private final int PADDING_PLOT = 2; //chars
+	static private final int PADDING_BOTTOM = 6; //pix
 
-	private final int DEFAULT_UNITS_LENGTH = 9;
+	static private final int DEFAULT_UNITS_LENGTH = 9;
 
 	private static final String DUMMY_TEXT = "Dummy";
 	private final BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
@@ -169,7 +168,7 @@ public class GraphDescBuilder extends ObjectBuilder {
 		return getSmallFontHeight() * LEGEND_LEADING_SMALL;
 	}
 
-	private void initializeLimits(GraphDesc gd) {
+	public void initializeLimits(GraphDesc gd) {
 		ImageParameters im = new ImageParameters();
 
 		im.xsize = gd.getWidth();

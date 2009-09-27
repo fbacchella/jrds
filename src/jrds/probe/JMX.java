@@ -57,7 +57,6 @@ public class JMX extends Probe<String, Double> implements ConnectedProbe {
 			return Collections.emptyMap();
 		}
 		MBeanServerConnection mbean = (MBeanServerConnection) cnx.getConnection();
-		//Uptime is collected only once, by the connexion
 		setUptime(cnx.getUptime());
 
 		try {
@@ -65,7 +64,7 @@ public class JMX extends Probe<String, Double> implements ConnectedProbe {
 			Set<String> collectKeys = getCollectMapping().keySet();
 			Map<String, Double> retValues = new HashMap<String, Double>(collectKeys.size());
 
-			logger.debug(collectKeys);
+			logger.debug("will collect:" + collectKeys);
 			for(String collect: collectKeys) {
 				String[] jmxPathArray = collect.split("/");
 				List<String> jmxPath = new ArrayList<String>();
@@ -75,7 +74,7 @@ public class JMX extends Probe<String, Double> implements ConnectedProbe {
 				try {
 					Object attr = mbean.getAttribute(mbeanName, attributeName);
 					Number v = resolvJmxObject(jmxPath, attr);
-					logger.debug("JMX Path: " + collect +" = " + v);
+					logger.trace("JMX Path: " + collect +" = " + v);
 					retValues.put(collect, v.doubleValue());
 				} catch (AttributeNotFoundException e1) {
 					logger.error("Invalide JMX attribue" +  attributeName + " for " + this);

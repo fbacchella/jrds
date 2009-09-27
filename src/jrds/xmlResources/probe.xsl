@@ -8,9 +8,11 @@
 <html>
 <head>
 	<title><xsl:value-of select="@name" /> on <xsl:value-of select="@host" /></title>
+	<link href="dijit/themes/nihilo/nihilo.css" rel="stylesheet" type="text/css" />
 	<link rel="stylesheet" type="text/css" href="lib/jrds.css" />
-<script type="text/javascript" src="lib/dojo/dojo.js.uncompressed.js" djConfig="parseOnLoad:true, isDebug: true, locale:'en-us'"></script>
-	<script type="text/javascript" src="lib/jrds.js" ><xsl:text></xsl:text></script>
+	<script type="text/javascript" src="dojo/dojo.js" djConfig="parseOnLoad:true, locale:'en-us'"></script>
+	<script type="text/javascript" src="dojo/dojo-jrds.js"></script>
+	<script type="text/javascript" src="lib/jrds.js"></script>
 </head>
 <body>
 <h1><xsl:value-of select="@host" />/<xsl:value-of select="@name" /></h1>

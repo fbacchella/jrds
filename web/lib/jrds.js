@@ -1,4 +1,4 @@
-dojo.require("dijit.form.TimeTextBox");
+//dojo.require("dijit.form.TimeTextBox");
 //dojo.require("dojo.fx");
 
 function initQuery() {
@@ -46,8 +46,10 @@ function doGraphList(result) {
 		dojo.attr(graphImg, "title", graph.name);
 		dojo.attr(graphImg, "id", graph.id);
 		dojo.attr(graphImg, "src", graph.imghref);
-		dojo.attr(graphImg, "width",graph.width);
-		dojo.attr(graphImg, "height", graph.height);
+		if(graph.width)
+			dojo.attr(graphImg, "width", graph.width);
+		if(graph.height)
+			dojo.attr(graphImg, "height", graph.height);
 
 		var iconsList =  dojo.create("div");
 		dojo.attr(iconsList, "class","iconslist");

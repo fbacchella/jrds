@@ -21,6 +21,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.factories.GraphDescBuilder;
 import jrds.factories.GraphFactory;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
@@ -762,6 +763,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 		DsDef[] dss= getDsDefs();
 		HostsList hl = getHostList();
 		GraphFactory gf = new GraphFactory(false);
+		GraphDescBuilder gdbuilder = new GraphDescBuilder();
 		if (sorted)
 			Arrays.sort(dss, new Comparator<DsDef>() {
 				public int compare(DsDef arg0, DsDef arg1) {
@@ -779,6 +781,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 			gd.setGraphName(id);
 			gd.setGraphTitle(getName() + "." + dsName + " on {1}");
 			gd.add(dsName, GraphDesc.LINE);
+			gdbuilder.initializeLimits(gd);
 			gf.addGraphDesc(gd);
 			GraphNode g = gf.makeGraph(graphDescName, this);
 			hl.addGraphs(Collections.singleton(g));

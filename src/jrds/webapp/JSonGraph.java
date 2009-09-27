@@ -13,6 +13,7 @@ import javax.servlet.ServletOutputStream;
 import org.apache.log4j.Logger;
 
 import jrds.Filter;
+import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.GraphTree;
 import jrds.HostsList;
@@ -95,8 +96,11 @@ public class JSonGraph extends JSonData {
 		imgProps.put("savearg", params.makeObjectUrl("download", gn, true));
 		imgProps.put("imghref", params.makeObjectUrl("graph",graph, true));
 		imgProps.put("qualifiedname", graph.getQualifieName());
-		imgProps.put("height", Integer.toString(gn.getGraphDesc().getDimension().height));
-		imgProps.put("width", Integer.toString(gn.getGraphDesc().getDimension().width));
+		GraphDesc gd = gn.getGraphDesc();
+		if(gd !=null) {
+			imgProps.put("height", Integer.toString(gd.getDimension().height));
+			imgProps.put("width", Integer.toString(gd.getDimension().width));
+		}
 
 		out.print(doNode(graph.getQualifieName(), gn.hashCode(), "graph", null, imgProps));
 
