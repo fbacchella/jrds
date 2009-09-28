@@ -7,7 +7,6 @@ _##########################################################################*/
 package jrds.probe.snmp;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.rrd4j.core.Sample;
 import org.snmp4j.smi.OID;
@@ -36,8 +35,12 @@ public class ProcessStatusHostResources extends RdsSnmpSimple {
 		int runnable = 0;
 		int notRunnable = 0;
 		int invalid = 0;
-		for(OID oid: (Set<OID>)snmpVars.keySet()){
-			int state = ((Number)snmpVars.get(oid)).intValue();
+		for(Object status: snmpVars.values()){
+			if(status == null)
+				continue;
+			if(! (status instanceof Number))
+				continue;
+			int state = ((Number)status).intValue();
 			if(RUNNINGINDEX == state)
 				running++;
 			else if(RUNNABLEINDEX == state)
@@ -46,7 +49,6 @@ public class ProcessStatusHostResources extends RdsSnmpSimple {
 				notRunnable++;
 			else if(INVALIDINDEX == state)
 				invalid++;
-			
 		}
 		oneSample.setValue(RUNNING, new Double(running));
 		oneSample.setValue(RUNNABLE, new Double(runnable));
