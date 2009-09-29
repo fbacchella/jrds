@@ -34,7 +34,6 @@ public class Period {
 
 	private static class PeriodItem {
 		String name;
-		int length;
 		int unit;
 		int number;
 		PeriodItem(String name, int unit, int number) {
