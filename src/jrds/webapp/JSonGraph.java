@@ -97,7 +97,7 @@ public class JSonGraph extends JSonData {
 		imgProps.put("imghref", params.makeObjectUrl("graph",graph, true));
 		imgProps.put("qualifiedname", graph.getQualifieName());
 		GraphDesc gd = gn.getGraphDesc();
-		if(gd !=null) {
+		if(gd !=null && gd.getDimension() != null) {
 			imgProps.put("height", Integer.toString(gd.getDimension().height));
 			imgProps.put("width", Integer.toString(gd.getDimension().width));
 		}

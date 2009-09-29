@@ -183,6 +183,21 @@ function getTree() {
      }, "treeOne");	
 }
 
+function toogleSort() {
+	queryParams.sort = dijit.byId("sorted").attr('checked');
+	reloadTree();
+}
+
+function sort()
+{
+	if(! queryParams ) {
+		queryParams.sort = 1;
+	}
+	else
+		queryParams.sort = undef;
+	reloadTree();
+}
+
 function resetScale() {
 	queryParams.max = "";
 	queryParams.min = "";
@@ -279,16 +294,6 @@ function setupCalendar() {
             timeBox: endTimeTextBox
     }, "end");
     
-}
-
-function sort()
-{
-	if(! queryParams ) {
-		queryParams.sort = 1;
-	}
-	else
-		queryParams.sort = undef;
-	reloadTree();
 }
 
 function download_onClick(url)

@@ -87,6 +87,13 @@ dojo.addOnLoad(function(){
     			 onkeypress="rangeKeyEvent"
     			 size="14" />
         </div>
+
+        <div  dojoType="dijit.layout.ContentPane" class="formblock" > <span class="linelabel">Sort</span>
+        	<button id="sorted" dojoType="dijit.form.ToggleButton"  name="sorted"
+  				onChange="toogleSort();" 
+  				iconClass="dijitCheckBoxIcon"> Sorted graphs </button>
+        </div>
+ 
         <button onClick="reloadTree(); return false" type="submit" dojoType="dijit.form.Button" >Render</button>
       </form>
     </div>

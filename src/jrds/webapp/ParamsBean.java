@@ -70,7 +70,7 @@ public class ParamsBean implements Serializable {
 		id = jrds.Util.parseStringNumber(req.getParameter("id"), Integer.class, 0).intValue();
 
 		String sortArg = req.getParameter("sort");
-		if("1".equals(sortArg))
+		if("true".equals(sortArg))
 			sorted = true;
 		String historyArg = req.getParameter("history");
 		if("1".equals(historyArg))
