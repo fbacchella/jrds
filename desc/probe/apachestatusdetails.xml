@@ -20,10 +20,10 @@
 		<dsName>CPULoad</dsName>
 		<dsType>gauge</dsType>
 	</ds>
-	<ds>
-		<dsName>Uptime</dsName>
-		<dsType>none</dsType>
-	</ds>
+<!--	<ds>-->
+<!--		<dsName>Uptime</dsName>-->
+<!--		<dsType>none</dsType>-->
+<!--	</ds>-->
 	<ds>
 		<dsName>ReqPerSec</dsName>
 		<dsType>gauge</dsType>
