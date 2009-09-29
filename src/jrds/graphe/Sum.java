@@ -37,14 +37,17 @@ public class Sum extends GraphNode {
 		SumProbe p = (SumProbe) theStore;
 		HostsList hl = (HostsList)p.getStarters().find(HostsList.class);
 		String aname = p.getProbeList().iterator().next();
-		GraphNode g = hl.getGraphById(aname.hashCode());
-		GraphDesc oldgd = g.getGraphDesc();
 		GraphDesc gd = getGraphDesc();
 		gd.setGraphName(theStore.getName());
 		gd.setGraphTitle(theStore.getName());
-		gd.setVerticalLabel(oldgd.getVerticalLabel());
-		gd.setDimension(oldgd.getDimension().height, oldgd.getDimension().width);
-		gd.setSiUnit(oldgd.isSiUnit());
+		GraphNode g = hl.getGraphById(aname.hashCode());
+		if(g != null){
+			GraphDesc oldgd = g.getGraphDesc();
+			gd.setVerticalLabel(oldgd.getVerticalLabel());
+			gd.setDimension(oldgd.getDimension().height, oldgd.getDimension().width);
+			gd.setSiUnit(oldgd.isSiUnit());
+			gd.setGraphTitle(oldgd.getGraphTitle());
+		}
 		gd.setName(theStore.getName());
 		gd.setHostTree(new Object[] {GraphDesc.TITLE});
 		gd.setViewTree(new Object[] {});
