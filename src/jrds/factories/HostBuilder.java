@@ -60,7 +60,11 @@ public class HostBuilder extends ObjectBuilder {
 		}
 		else
 			host = new RdsHost(hostName);
-
+		
+		String hidden = hostattr.get("hidden");
+		host.setHidden(hidden != null && Boolean.parseBoolean(hidden));
+		logger.trace(host + " is hidden: " + host.isHidden());
+		
 		hostNode.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
 
 		host.setHostDir(new File(pm.rrddir, host.getName()));

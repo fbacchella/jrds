@@ -29,6 +29,7 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 	private Set<String> tags = null;
 	private final StartersSet starters = new StartersSet(this);
 	private File hostdir = null;
+	private boolean hidden = false;
 
 	public RdsHost(String newName)
 	{
@@ -148,5 +149,20 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 	public void setDnsName(String dnsName) {
 		this.dnsName = dnsName;
 		new Resolver(dnsName).register(this);
+	}
+
+	/**
+	 * Is the host to be shown in the host list ?
+	 * @return the hidden
+	 */
+	public boolean isHidden() {
+		return hidden;
+	}
+
+	/**
+	 * @param hidden the hidden to set
+	 */
+	public void setHidden(boolean hidden) {
+		this.hidden = hidden;
 	}
 }
