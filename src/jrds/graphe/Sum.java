@@ -31,22 +31,20 @@ public class Sum extends GraphNode {
 			public String getGraphName() {
 				return name;
 			}
-
-
 		});
 		SumProbe p = (SumProbe) theStore;
-		HostsList hl = (HostsList)p.getStarters().find(HostsList.class);
-		String aname = p.getProbeList().iterator().next();
 		GraphDesc gd = getGraphDesc();
 		gd.setGraphName(theStore.getName());
 		gd.setGraphTitle(theStore.getName());
+
+		String aname = p.getProbeList().iterator().next();
+		HostsList hl = (HostsList)p.getStarters().find(HostsList.class);
 		GraphNode g = hl.getGraphById(aname.hashCode());
 		if(g != null){
 			GraphDesc oldgd = g.getGraphDesc();
 			gd.setVerticalLabel(oldgd.getVerticalLabel());
 			gd.setDimension(oldgd.getDimension().height, oldgd.getDimension().width);
 			gd.setSiUnit(oldgd.isSiUnit());
-			gd.setGraphTitle(oldgd.getGraphTitle());
 		}
 		gd.setName(theStore.getName());
 		gd.setHostTree(new Object[] {GraphDesc.TITLE});
@@ -113,6 +111,9 @@ public class Sum extends GraphNode {
 					tempGraphDef = tempgd.getGraphDef(p, ownValues);
 				}
 				else {
+					GraphNode node = getNode();
+					GraphDesc gd = node.getGraphDesc();
+					tempGraphDef = gd.getGraphDef(p);
 					logger.error("no data found for " + this);
 				}
 				if(tempGraphDef == null) {
