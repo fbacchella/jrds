@@ -29,7 +29,7 @@ dojo.addOnLoad(function(){
     	<form dojoType="dijit.form.Form" id="hostForm" action="index.html" method="get" name="hostForm">
 			<a id="toroot" href="index.html"><img src="img/back_to_album.gif" alt="" height="16" width="20" border="0" /></a>
       		<label for="host">Only host</label>
-      		<input type="text" name="host" size="24"  dojoType="dijit.form.TextBox" trim="true" />
+      		<input type="text" name="host" size="24"  dojoType="dijit.form.TextBox" trim="true" onkeypress="hostKeyEvent"/>
     	</form>
     	<div id="treeOne" > </div>
 	</div>
@@ -58,11 +58,11 @@ dojo.addOnLoad(function(){
 		<option value="17">Last 2 Years</option>
        </select>
           <label for="begin">Begin</label>
-          <input type="text" name="begin" id="begin" class="field" />
-          <input type="text" name="beginh" id="beginh" class="field" />
+          <input type="text" name="begin" id="begin" class="field" onkeypress="periodKeyEvent"/>
+          <input type="text" name="beginh" id="beginh" class="field" onkeypress="periodKeyEvent"/>
           <label for="end">End</label>
-          <input type="text" name="end" id="end" class="field" />
-          <input type="text" name="endh" id="endh" class="field" />
+          <input type="text" name="end" id="end" class="field" onkeypress="periodKeyEvent"/>
+          <input type="text" name="endh" id="endh" class="field" onkeypress="periodKeyEvent"/>
         </div>
         <div  dojoType="dijit.layout.ContentPane" class="formblock" > <span class="linelabel">Vertical scale</span>
           <button id="autoscale" dojoType="dijit.form.ToggleButton"  checked name="autoscale"
@@ -75,7 +75,7 @@ dojo.addOnLoad(function(){
     			 trim="true"
     			 onFocus="setAutoscale(false);"
     			 onchange="updateScale"
-    			 onkeypress="rangeKeyEvent"
+    			 onkeypress="scaleKeyEvent"
     			 size="14" />
           <label for="max">Max</label>
           <input id="max" type="text" name="max" class="field"
@@ -84,7 +84,7 @@ dojo.addOnLoad(function(){
     			 trim="true"
     			 onFocus="setAutoscale(false);"
     			 onchange="updateScale"
-    			 onkeypress="rangeKeyEvent"
+    			 onkeypress="scaleKeyEvent"
     			 size="14" />
         </div>
 

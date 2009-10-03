@@ -1,4 +1,4 @@
-//dojo.require("dijit.form.TimeTextBox");
+dojo.require("dijit.form.TimeTextBox");
 //dojo.require("dojo.fx");
 
 function initQuery() {
@@ -331,13 +331,30 @@ function history(url, name)
 	var historyWin = window.open(url, "_blank", "width=750,menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
 }
 
-function rangeKeyEvent(evt)
+function scaleKeyEvent(evt)
 {
 	if(evt.keyCode == dojo.keys.ENTER){
 		queryParams[this.id] = this.getValue();
 		if(queryParams.max && queryParams.min) {
 			reloadTree();
 		}
+	    dojo.stopEvent(evt);
+	}
+}
+
+function hostKeyEvent(evt)
+{
+	if(evt.keyCode == dojo.keys.ENTER){
+		queryParams.host = this.getValue();
+		if( queryParams.host == undefined || queryParams.host == "") {
+		    dojo.stopEvent(evt);
+		}
+	}
+}
+
+function periodKeyEvent(evt)
+{
+	if(evt.keyCode == dojo.keys.ENTER){
 	    dojo.stopEvent(evt);
 	}
 }
