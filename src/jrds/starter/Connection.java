@@ -10,13 +10,13 @@ import jrds.RdsHost;
 
 import org.apache.log4j.Logger;
 
-public abstract class Connection extends Starter {
+public abstract class Connection<ConnectedType> extends Starter {
 	static final private Logger logger = Logger.getLogger(Connection.class);
 	
 	private String name;
 	private long uptime;
 
-	public abstract Object getConnection();
+	public abstract ConnectedType getConnection();
 
 	Socket makeSocket(String host, int port) throws UnknownHostException, IOException {
 		SocketFactory sf = (SocketFactory) getParent().getStarters().find(SocketFactory.makeKey(getParent()));
@@ -56,10 +56,20 @@ public abstract class Connection extends Starter {
 		if(getParent() instanceof RdsHost) {
 			return ((RdsHost)getParent()).getDnsName();
 		}
-		if(getParent() instanceof Probe) {
+		if(getParent() instanceof Probe<?, ?>) {
 			return ((Probe<?,?>)getParent()).getHost().getDnsName();
 		}
 		return null;
+	}
+	
+	public Resolver getResolver() {
+		String hostName = getHostName();
+		Resolver r = (Resolver) getLevel().find(Resolver.makeKey(getParent()));
+		if(r == null) {
+			r = new Resolver(hostName);
+			r.register(getParent());
+		}
+		return r;
 	}
 
 	/**
@@ -77,6 +87,8 @@ public abstract class Connection extends Starter {
 	 */
 	@Override
 	public boolean start() {
+		if(! getResolver().isStarted())
+			return false;
 		long begin = new Date().getTime();
 		boolean started =  startConnection();
 		long end = new Date().getTime();

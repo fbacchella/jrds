@@ -11,7 +11,7 @@ import jrds.starter.Connection;
 
 import org.apache.log4j.Logger;
 
-public class LdapConnection extends Connection {
+public class LdapConnection extends Connection<DirContext> {
 	static final private Logger logger = Logger.getLogger(LdapConnection.class);
 	private String binddn;
 	private String password;
@@ -40,7 +40,7 @@ public class LdapConnection extends Connection {
 	}
 
 	@Override
-	public Object getConnection() {
+	public DirContext getConnection() {
 		return dctx;
 	}
 

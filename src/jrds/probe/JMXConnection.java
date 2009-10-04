@@ -15,7 +15,7 @@ import jrds.starter.Connection;
 
 import org.apache.log4j.Logger;
 
-public class JMXConnection extends Connection {
+public class JMXConnection extends Connection<MBeanServerConnection> {
 	static final private Logger logger = Logger.getLogger(JMXConnection.class);
 
 	final static String startTimeObjectName = "java.lang:type=Runtime";
@@ -26,7 +26,6 @@ public class JMXConnection extends Connection {
 	private String password = null;
 	private JMXConnector connector;
 	private MBeanServerConnection connection;
-
 
 	public JMXConnection(Integer port) {
 		super();
@@ -41,7 +40,7 @@ public class JMXConnection extends Connection {
 	}
 
 	@Override
-	public Object getConnection() {
+	public MBeanServerConnection getConnection() {
 		return connection;
 	}
 
@@ -56,7 +55,6 @@ public class JMXConnection extends Connection {
 			return uptime;
 		} catch (Exception e) {
 			logger.error("Uptime error for " + this + ": " + e);
-
 		}
 		return 0;
 	}

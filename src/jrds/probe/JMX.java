@@ -22,7 +22,7 @@ import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 
 import jrds.ConnectedProbe;
-import jrds.Probe;
+import jrds.ProbeConnected;
 import jrds.ProbeDesc;
 
 import org.apache.log4j.Logger;
@@ -32,35 +32,30 @@ import org.apache.log4j.Logger;
  * @author Fabrice Bacchella 
  * @version $Revision: 407 $,  $Date: 2007-02-22 18:48:03 +0100 (jeu., 22 févr. 2007) $
  */
-public class JMX extends Probe<String, Double> implements ConnectedProbe {
-
+public class JMX extends ProbeConnected<String, Double, JMXConnection> implements ConnectedProbe {
 	static final private Logger logger = Logger.getLogger(JMX.class);
 
-	private String connectionName = JMXConnection.class.getName();
 	private Map<String, String> collectKeys = null;
 
-	public boolean configure() {
+	public JMX() {
+		super(JMXConnection.class.getName());
+	}
+
+	@Override
+	public Boolean configure() {
 		collectKeys = new HashMap<String, String>();
 		for(Map.Entry<String, String> e:getPd().getCollectStrings().entrySet()) {
 			String dsName = e.getValue();
 			String solved = jrds.Util.parseTemplate(e.getKey(), this);
 			collectKeys.put(solved, dsName);
 		}
-		return true;
+		return super.configure();
 	}
 
-
 	@Override
-	public Map<String, Double> getNewSampleValues() {
-		JMXConnection cnx = (JMXConnection) getStarters().find(connectionName);
-		if( !cnx.isStarted()) {
-			return Collections.emptyMap();
-		}
-		MBeanServerConnection mbean = (MBeanServerConnection) cnx.getConnection();
-		setUptime(cnx.getUptime());
-
+	public Map<String, Double> getNewSampleValuesConnected(JMXConnection cnx) {
+		MBeanServerConnection mbean =  cnx.getConnection();
 		try {
-
 			Set<String> collectKeys = getCollectMapping().keySet();
 			Map<String, Double> retValues = new HashMap<String, Double>(collectKeys.size());
 
@@ -122,11 +117,11 @@ public class JMX extends Probe<String, Double> implements ConnectedProbe {
 		}
 		else if(o instanceof Number)
 			return (Number) o;
-		else if(o instanceof Map) {
+		else if(o instanceof Map<?, ?>) {
 			String subKey = jmxPath.remove(0);
 			value = ((Map<?, ?>) o).get(subKey);
 		}
-		else if(o instanceof Collection) {
+		else if(o instanceof Collection<?>) {
 			return ((Collection<?>) o ).size();
 		}
 		else if(o instanceof TabularData) {
@@ -160,19 +155,4 @@ public class JMX extends Probe<String, Double> implements ConnectedProbe {
 	public Map<String, String> getCollectMapping() {
 		return collectKeys;
 	}
-
-	/**
-	 * @return the connection
-	 */
-	public String getConnectionName() {
-		return connectionName;
-	}
-
-	/**
-	 * @param connection the connection to set
-	 */
-	public void setConnectionName(String connectionName) {
-		this.connectionName = connectionName;
-	}
-
 }
