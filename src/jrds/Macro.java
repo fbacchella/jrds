@@ -28,17 +28,27 @@ public class Macro {
 		for(ProbeInfo pi: probeList) {
 			Map<String, String> attrs = pi.attrs;
 			String className = attrs.get("type");
-			String label = attrs.get("label");
-			if(label != null)
-				label = jrds.Util.parseTemplate(label, properties, host);
 			List<?> constArgs = ArgFactory.makeArgs(pi.args, properties, host);
-			Probe<?,?> newRdsRrd = pf.makeProbe(className, host, constArgs);
-			if(newRdsRrd != null) {
-				if(label != null) {
-					newRdsRrd.setLabel(label);
-				}
-				probes.add(newRdsRrd);
+			Probe<?,?> newRdsRrd = pf.makeProbe(className);
+			if(newRdsRrd == null)
+				continue;
+
+			String label = attrs.get("label");
+			if(label != null && ! "".equals(label)) {
+				label = jrds.Util.parseTemplate(label, properties, host);
+				newRdsRrd.setLabel(label);
 			}
+
+			newRdsRrd.setHost(host);
+
+			String connexionName = attrs.get("connection");
+			if(newRdsRrd instanceof ConnectedProbe && connexionName != null && ! "".equals(connexionName)) {
+				((ConnectedProbe)newRdsRrd).setConnectionName(connexionName);
+			}
+
+			if(pf.configure(newRdsRrd, constArgs))
+				probes.add(newRdsRrd);
+
 		}
 		for(String tag: tags) {
 			host.addTag(tag);
@@ -57,18 +67,18 @@ public class Macro {
 		tags.add(tag);
 	}
 
-//	@Override
-//	public String toString() {
-//		StringBuilder ret =new StringBuilder();
-//		ret.append("[");
-//		for(Object[] probes: probeList) {
-//			ret.append(probes[0]);
-//			ret.append(probes[1]);
-//			ret.append(",");
-//		}
-//		ret.setCharAt(ret.length()-1, ']');
-//		return "Macro"+ ret  ;
-//	}
+	//	@Override
+	//	public String toString() {
+	//		StringBuilder ret =new StringBuilder();
+	//		ret.append("[");
+	//		for(Object[] probes: probeList) {
+	//			ret.append(probes[0]);
+	//			ret.append(probes[1]);
+	//			ret.append(",");
+	//		}
+	//		ret.setCharAt(ret.length()-1, ']');
+	//		return "Macro"+ ret  ;
+	//	}
 
 	/**
 	 * @return the name

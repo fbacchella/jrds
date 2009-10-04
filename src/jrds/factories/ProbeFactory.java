@@ -43,6 +43,83 @@ public class ProbeFactory {
 		probePackages.add("");
 	}
 
+	public  Probe<?,?> makeProbe(String className) {
+		ProbeDesc pd = (ProbeDesc) probeDescMap.get(className);
+		Class<? extends Probe<?,?>> probeClass = pd.getProbeClass();
+		Probe<?,?> retValue = null;
+		if (probeClass != null) {
+			try {
+				Constructor<? extends Probe<?,?>> c = probeClass.getConstructor();
+				retValue = c.newInstance();
+			}
+			catch (LinkageError ex) {
+				logger.warn("Error creating probe's " + pd.getName() +": " + ex);
+				return null;
+			}
+			catch (ClassCastException ex) {
+				logger.warn("didn't get a Probe but a " + retValue.getClass().getName());
+				return null;
+			} catch (Exception ex) {
+				Throwable showException = ex;
+				Throwable t = ex.getCause();
+				if(t != null)
+					showException = t;
+				logger.warn("Error during probe instantation of type " + pd.getName() + ": ", showException);
+				return null;
+			}
+		}
+		retValue.setPd(pd);
+		return retValue;
+	}
+
+	public boolean configure(Probe<?, ?> p,  List<?> constArgs) {
+		if(pm != null) {
+			logger.trace("Setting time step to " + pm.step + " for " + p);
+			p.setStep(pm.step);
+		}
+
+		List<?> defaultsArgs = p.getPd().getDefaultArgs();
+		if(defaultsArgs != null && constArgs != null && constArgs.size() <= 0)
+			constArgs = defaultsArgs;
+		Class<?>[] constArgsType = new Class[constArgs.size()];
+		Object[] constArgsVal = new Object[constArgs.size()];
+		int index = 0;
+		for (Object arg: constArgs) {
+			constArgsType[index] = arg.getClass();
+			if(arg instanceof List<?>) {
+				constArgsType[index] = List.class;
+			}
+			constArgsVal[index] = arg;
+			index++;
+		}
+		Method configurator;
+		try {
+			configurator = p.getClass().getMethod("configure", constArgsType);
+			Object result = configurator.invoke(p, constArgsVal);
+			if(result != null && result instanceof Boolean) {
+				Boolean configured = (Boolean) result;
+				if(! configured.booleanValue()) {
+					return false;
+				}
+				p.initGraphList(gf);
+				return true;
+			}
+		} catch (SecurityException e) {
+		} catch (NoSuchMethodException e) {
+			logger.warn("ProbeDescription invalid " + p.getPd().getName() + ": no constructor " + e.getMessage() + " found");
+			return false;
+		}catch (Exception ex) {
+			Throwable showException = ex;
+			Throwable t = ex.getCause();
+			if(t != null)
+				showException = t;
+			logger.warn("Error during probe creation of type " + p.getPd().getName() + " with args " + constArgs +
+					": ", showException);
+			return false;
+		}
+		return false;
+	}
+
 	/**
 	 * Create an probe, provided his Class and a list of argument for a constructor
 	 * for this object. It will be found using the default list of possible package
@@ -51,7 +128,7 @@ public class ProbeFactory {
 	 * @param constArgs
 	 * @return
 	 */
-	public Probe<?,?> makeProbe(String className, RdsHost host, List<?> constArgs) {
+	private Probe<?,?> makeProbe(String className, RdsHost host, List<?> constArgs) {
 		Probe<?,?> retValue = null;
 		ProbeDesc pd = (ProbeDesc) probeDescMap.get(className);
 		if( pd != null) {
@@ -99,7 +176,7 @@ public class ProbeFactory {
 	 * @param constArgs
 	 * @return
 	 */
-	public Probe<?,?> makeProbe(ProbeDesc pd, RdsHost host, List<?> constArgs) {
+	private Probe<?,?> makeProbe(ProbeDesc pd, RdsHost host, List<?> constArgs) {
 		Class<? extends Probe<?,?>> probeClass = pd.getProbeClass();
 		List<?> defaultsArgs = pd.getDefaultArgs();
 		Probe<?,?> retValue = null;

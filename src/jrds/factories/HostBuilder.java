@@ -60,11 +60,10 @@ public class HostBuilder extends ObjectBuilder {
 		}
 		else
 			host = new RdsHost(hostName);
-		
+
 		String hidden = hostattr.get("hidden");
 		host.setHidden(hidden != null && Boolean.parseBoolean(hidden));
-		logger.trace(host + " is hidden: " + host.isHidden());
-		
+
 		hostNode.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
 
 		host.setHostDir(new File(pm.rrddir, host.getName()));
@@ -149,11 +148,13 @@ public class HostBuilder extends ObjectBuilder {
 
 	public Probe<?,?> makeProbe(JrdsNode probeNode, RdsHost host) {
 		Probe<?,?> p = null;
-		List<Object> args = ArgFactory.makeArgs(probeNode);
 		String type = probeNode.attrMap().get("type");
-		p = pf.makeProbe(type, host, args);
+		//p = pf.makeProbe(type, host, args);
+		p = pf.makeProbe(type);
 		if(p == null)
 			return null;
+		p.setHost(host);
+
 		//		for(JrdsNode thresholdNode: probeNode.iterate(CompiledXPath.get("threshold"))) {
 		//			Map<String, String> thresholdAttr = thresholdNode.attrMap();
 		//			String name = thresholdAttr.get("name").trim();
@@ -183,8 +184,13 @@ public class HostBuilder extends ObjectBuilder {
 				((ConnectedProbe)p).setConnectionName(connexionName);
 			}
 		}
-
-		return p;
+		List<Object> args = ArgFactory.makeArgs(probeNode);
+		if(pf.configure(p, args))
+			return p;
+		else {
+			logger.error(p + " configuration failed");
+			return null;
+		}
 	}
 
 	public void makeConnexion(JrdsNode domNode, StarterNode sNode) {
@@ -195,7 +201,7 @@ public class HostBuilder extends ObjectBuilder {
 				logger.equals("No type declared");
 			}
 			String name = cnxNode.attrMap().get("name");
-			Connection o = null;
+			Connection<?> o = null;
 			try {
 				Class<?> connectionClass = classLoader.loadClass(type);
 				Class<?>[] constArgsType = new Class[args.size()];
@@ -207,7 +213,7 @@ public class HostBuilder extends ObjectBuilder {
 					index++;
 				}
 				Constructor<?> theConst = connectionClass.getConstructor(constArgsType);
-				o = (Connection)theConst.newInstance(constArgsVal);
+				o = (Connection<?>)theConst.newInstance(constArgsVal);
 				if(name !=null && ! "".equals(name))
 					o.setName(name.trim());
 				o.register(sNode);
