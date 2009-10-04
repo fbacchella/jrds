@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+	<name>OpenLdap</name>
+	<probeName>openldap</probeName>
+	<probeClass>jrds.probe.Ldap</probeClass>
+	<specific name="base">cn=Operations,cn=Monitor</specific>
+	<specific name="filter">objectclass=*</specific>
+	<ds>
+		<dsName>a</dsName>
+		<dsType>counter</dsType>
+		<collect>monitorOpInitiated</collect>
+	</ds>
+	<ds>
+		<dsName>b</dsName>
+		<dsType>counter</dsType>
+		<collect>monitorOpCompleted</collect>
+	</ds>
+	<graphs>
+	</graphs>
+</probedesc>
