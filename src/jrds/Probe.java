@@ -3,6 +3,8 @@
  */
 package jrds;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
@@ -21,7 +23,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.factories.GraphDescBuilder;
 import jrds.factories.GraphFactory;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
@@ -217,9 +218,6 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 		if(step > 0) {
 			def.setStep(step);
 		}
-		/*else {
-			step = def.getStep();
-		}*/
 		return def;
 	}
 
@@ -763,7 +761,6 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 		DsDef[] dss= getDsDefs();
 		HostsList hl = getHostList();
 		GraphFactory gf = new GraphFactory(false);
-		GraphDescBuilder gdbuilder = new GraphDescBuilder();
 		if (sorted)
 			Arrays.sort(dss, new Comparator<DsDef>() {
 				public int compare(DsDef arg0, DsDef arg1) {
@@ -779,9 +776,11 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 
 			gd.setName(graphDescName);
 			gd.setGraphName(id);
-			gd.setGraphTitle(getName() + "." + dsName + " on {1}");
+			gd.setGraphTitle(getName() + "." + dsName + " on ${host}");
 			gd.add(dsName, GraphDesc.LINE);
-			gdbuilder.initializeLimits(gd);
+			Graphics2D g2d = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
+			gd.initializeLimits(g2d);
+			 
 			gf.addGraphDesc(gd);
 			GraphNode g = gf.makeGraph(graphDescName, this);
 			hl.addGraphs(Collections.singleton(g));

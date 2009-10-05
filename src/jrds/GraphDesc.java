@@ -1,6 +1,10 @@
 package jrds;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineMetrics;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.Plottable;
+import org.rrd4j.graph.RrdGraphConstants;
 import org.rrd4j.graph.RrdGraphDef;
 
 /**
@@ -1109,6 +1114,72 @@ implements Cloneable {
 				numlegend++;
 		}
 		return numlegend;
+	}
+
+	private class ImageParameters {
+		int xsize;
+		int ysize;
+		int unitslength;
+		int xorigin;
+		int yorigin;
+		int xgif, ygif;
+	}
+
+	static private final double LEGEND_LEADING_SMALL = 0.7; // chars
+	static private final int PADDING_LEFT = 10; // pix
+	static private final int PADDING_TOP = 12; // pix
+	static private final int PADDING_TITLE = 6; // pix
+	static private final int PADDING_RIGHT = 16; // pix
+	static private final int PADDING_PLOT = 2; //chars
+	static private final int PADDING_BOTTOM = 6; //pix
+
+	static private final int DEFAULT_UNITS_LENGTH = 9;
+
+	private static final String DUMMY_TEXT = "Dummy";
+	private static final Font smallFont = RrdGraphConstants.DEFAULT_SMALL_FONT; // ok
+	private static final Font largeFont = RrdGraphConstants.DEFAULT_LARGE_FONT; // ok
+
+	private double getFontHeight(FontRenderContext frc, Font font) {
+		LineMetrics lm = font.getLineMetrics(DUMMY_TEXT, frc);
+		return lm.getAscent() + lm.getDescent();
+	}
+
+	private double getSmallFontHeight(FontRenderContext frc) {
+		return getFontHeight(frc, smallFont);
+	}
+
+	private double getLargeFontHeight(FontRenderContext frc) {
+		return getFontHeight(frc, largeFont);
+	}
+
+	private double getStringWidth(Font font, FontRenderContext frc) {
+		return font.getStringBounds("a", 0, 1, frc).getBounds().getWidth();
+	}
+	
+	private double getSmallFontCharWidth(FontRenderContext frc) {
+		return getStringWidth(smallFont, frc);
+	}
+
+	private double getSmallLeading(FontRenderContext frc) {
+		return getSmallFontHeight(frc) * LEGEND_LEADING_SMALL;
+	}
+
+	public void initializeLimits(Graphics2D g2d) {
+		FontRenderContext frc  = g2d.getFontRenderContext();
+		ImageParameters im = new ImageParameters();
+
+		im.xsize = getWidth();
+		im.ysize = getHeight();
+		im.unitslength = DEFAULT_UNITS_LENGTH;
+		im.xorigin = (int) (PADDING_LEFT + im.unitslength * getSmallFontCharWidth(frc));
+		im.xorigin += getSmallFontHeight(frc);
+		im.yorigin = PADDING_TOP + im.ysize;
+		im.yorigin += getLargeFontHeight(frc) + PADDING_TITLE;
+		im.xgif = PADDING_RIGHT + im.xsize + im.xorigin;
+		im.ygif = im.yorigin + (int) (PADDING_PLOT * getSmallFontHeight(frc));
+		im.ygif += ( (int) getSmallLeading(frc) + 5 ) * ( getLegendLines() + 5);
+		im.ygif += PADDING_BOTTOM;
+		setDimension(im.ygif, im.xgif);
 	}
 
 }
