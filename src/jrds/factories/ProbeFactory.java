@@ -15,7 +15,6 @@ import java.util.Map;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
 
 import org.apache.log4j.Logger;
 
@@ -43,40 +42,49 @@ public class ProbeFactory {
 		probePackages.add("");
 	}
 
-	public  Probe<?,?> makeProbe(String className) {
-		ProbeDesc pd = (ProbeDesc) probeDescMap.get(className);
+	/**
+	 * Create an probe, provided his Class and a list of argument for a constructor
+	 * for this object. It will be found using the default list of possible package
+	 * @param className the probe name
+	 * @param host 
+	 * @param constArgs
+	 * @return
+	 */
+	public  Probe<?,?> makeProbe(String probeType) {
+		ProbeDesc pd = (ProbeDesc) probeDescMap.get(probeType);
+		if(pd == null) {
+			logger.error("Probe named " + probeType + " not found");
+			return null;
+		}
 		Class<? extends Probe<?,?>> probeClass = pd.getProbeClass();
+		if(probeClass == null) {
+			logger.error("Invalid probe description " + probeType + ", probe class name not found");
+		}
 		Probe<?,?> retValue = null;
-		if (probeClass != null) {
-			try {
-				Constructor<? extends Probe<?,?>> c = probeClass.getConstructor();
-				retValue = c.newInstance();
-			}
-			catch (LinkageError ex) {
-				logger.warn("Error creating probe's " + pd.getName() +": " + ex);
-				return null;
-			}
-			catch (ClassCastException ex) {
-				logger.warn("didn't get a Probe but a " + retValue.getClass().getName());
-				return null;
-			} catch (Exception ex) {
-				Throwable showException = ex;
-				Throwable t = ex.getCause();
-				if(t != null)
-					showException = t;
-				logger.warn("Error during probe instantation of type " + pd.getName() + ": ", showException);
-				return null;
-			}
+		try {
+			Constructor<? extends Probe<?,?>> c = probeClass.getConstructor();
+			retValue = c.newInstance();
+		}
+		catch (LinkageError ex) {
+			logger.warn("Error creating probe's " + pd.getName() +": " + ex);
+			return null;
+		}
+		catch (ClassCastException ex) {
+			logger.warn("didn't get a Probe but a " + retValue.getClass().getName());
+			return null;
+		} catch (Exception ex) {
+			Throwable showException = ex;
+			Throwable t = ex.getCause();
+			if(t != null)
+				showException = t;
+			logger.warn("Error during probe instantation of type " + pd.getName() + ": ", showException);
+			return null;
 		}
 		retValue.setPd(pd);
 		return retValue;
 	}
 
 	public boolean configure(Probe<?, ?> p,  List<?> constArgs) {
-		if(pm != null) {
-			logger.trace("Setting time step to " + pm.step + " for " + p);
-			p.setStep(pm.step);
-		}
 
 		List<?> defaultsArgs = p.getPd().getDefaultArgs();
 		if(defaultsArgs != null && constArgs != null && constArgs.size() <= 0)
@@ -92,18 +100,27 @@ public class ProbeFactory {
 			constArgsVal[index] = arg;
 			index++;
 		}
-		Method configurator;
 		try {
-			configurator = p.getClass().getMethod("configure", constArgsType);
+			Method configurator = p.getClass().getMethod("configure", constArgsType);
 			Object result = configurator.invoke(p, constArgsVal);
 			if(result != null && result instanceof Boolean) {
+				if(logger.isTraceEnabled())
+					logger.trace("Result of configuration for " + p + ": " + result);
 				Boolean configured = (Boolean) result;
 				if(! configured.booleanValue()) {
 					return false;
 				}
-				p.initGraphList(gf);
-				return true;
 			}
+			String name = p.getName();
+			if(name == null)
+				name = jrds.Util.parseTemplate(p.getPd().getProbeName(), p);
+			p.setName(name);
+			p.initGraphList(gf);
+			if(pm != null) {
+				logger.trace("Setting time step to " + pm.step + " for " + p);
+				p.setStep(pm.step);
+			}
+			return true;
 		} catch (SecurityException e) {
 		} catch (NoSuchMethodException e) {
 			logger.warn("ProbeDescription invalid " + p.getPd().getName() + ": no constructor " + e.getMessage() + " found");
@@ -118,152 +135,6 @@ public class ProbeFactory {
 			return false;
 		}
 		return false;
-	}
-
-	/**
-	 * Create an probe, provided his Class and a list of argument for a constructor
-	 * for this object. It will be found using the default list of possible package
-	 * @param className the probe name
-	 * @param host 
-	 * @param constArgs
-	 * @return
-	 */
-	private Probe<?,?> makeProbe(String className, RdsHost host, List<?> constArgs) {
-		Probe<?,?> retValue = null;
-		ProbeDesc pd = (ProbeDesc) probeDescMap.get(className);
-		if( pd != null) {
-			retValue = makeProbe(pd, host, constArgs);
-		}
-		else if(pm.legacymode ){
-			Class<?> probeClass = resolvClass(className, probePackages);
-			if (probeClass != null) {
-				Object o = null;
-				try {
-					Class<?>[] constArgsType = new Class[constArgs.size()];
-					Object[] constArgsVal = new Object[constArgs.size()];
-					int index = 0;
-					for (Object arg: constArgs) {
-						constArgsType[index] = arg.getClass();
-						constArgsVal[index] = arg;
-						index++;
-					}
-					Constructor<?> theConst = probeClass.getConstructor(constArgsType);
-					o = theConst.newInstance(constArgsVal);
-					retValue = (Probe<?,?>) o;
-				}
-				catch (ClassCastException ex) {
-					logger.warn("didn't get a Probe but a " + o.getClass().getName());
-				}
-				catch (Exception ex) {
-					logger.warn("Error during probe creation of type " + className +
-							": " + ex, ex);
-				}
-			}
-		}
-		else {
-			logger.error("Probe named " + className + " not found");
-		}
-
-		//Now we finish the initialization of classes
-		if(retValue != null) {
-			retValue.initGraphList(gf);
-		}
-		return retValue;
-	}
-
-	/**
-	 * Instanciate a probe using a probedesc
-	 * @param constArgs
-	 * @return
-	 */
-	private Probe<?,?> makeProbe(ProbeDesc pd, RdsHost host, List<?> constArgs) {
-		Class<? extends Probe<?,?>> probeClass = pd.getProbeClass();
-		List<?> defaultsArgs = pd.getDefaultArgs();
-		Probe<?,?> retValue = null;
-		if (probeClass != null) {
-			try {
-				Constructor<? extends Probe<?,?>> c = probeClass.getConstructor();
-				retValue = c.newInstance();
-			}
-			catch (LinkageError ex) {
-				logger.warn("Error creating probe's " + pd.getName() +": " + ex);
-				return null;
-			}
-			catch (ClassCastException ex) {
-				logger.warn("didn't get a Probe but a " + retValue.getClass().getName());
-				return null;
-			} catch (Exception ex) {
-				Throwable showException = ex;
-				Throwable t = ex.getCause();
-				if(t != null)
-					showException = t;
-				logger.warn("Error during probe instantation of type " + pd.getName() + ": ", showException);
-				return null;
-			}
-			try {
-				retValue.setHost(host);
-				retValue.setPd(pd);
-				if(defaultsArgs != null && constArgs != null && constArgs.size() <= 0)
-					constArgs = defaultsArgs;
-				Class<?>[] constArgsType = new Class[constArgs.size()];
-				Object[] constArgsVal = new Object[constArgs.size()];
-				int index = 0;
-				for (Object arg: constArgs) {
-					constArgsType[index] = arg.getClass();
-					if(arg instanceof List) {
-						constArgsType[index] = List.class;
-					}
-					constArgsVal[index] = arg;
-					index++;
-				}
-				Method configurator = probeClass.getMethod("configure", constArgsType);
-				Object result = configurator.invoke(retValue, constArgsVal);
-				if(result != null && result instanceof Boolean) {
-					Boolean configured = (Boolean) result;
-					if(! configured.booleanValue()) {
-						return null;
-					}
-				}
-			}
-			catch (NoClassDefFoundError ex) {
-				logger.warn("Missing class for the creation of a probe " + pd.getName());
-				return null;
-			}
-			catch (NoSuchMethodException ex) {
-				logger.warn("ProbeDescription invalid " + pd.getName() + ": no constructor " + ex.getMessage() + " found");
-				return null;
-			}
-			catch (Exception ex) {
-				Throwable showException = ex;
-				Throwable t = ex.getCause();
-				if(t != null)
-					showException = t;
-				logger.warn("Error during probe creation of type " + pd.getName() + " with args " + constArgs +
-						": ", showException);
-				return null;
-			}
-		}
-		if(pm != null) {
-			logger.trace("Setting time step to " + pm.step + " for " + retValue);
-			retValue.setStep(pm.step);
-		}
-		return retValue;
-	}
-
-	private Class<?> resolvClass(String name, List<String> listPackages) {
-		Class<?> retValue = null;
-		for (String packageTry: listPackages) {
-			try {
-				retValue = Class.forName(packageTry + name);
-			}
-			catch (ClassNotFoundException ex) {
-			}
-			catch (NoClassDefFoundError ex) {
-			}
-		}
-		if (retValue == null)
-			logger.warn("Class " + name + " not found");
-		return retValue;
 	}
 
 	public ProbeDesc getProbeDesc(String name) {
