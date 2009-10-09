@@ -31,6 +31,7 @@ import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 import jrds.starter.StartersSet;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.ArcDef;
@@ -70,6 +71,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	private long uptime = Long.MAX_VALUE;
 	private boolean finished = false;
 	private String label = null;
+	private Logger namedLogger = Logger.getLogger("jrds.Probe.EmptyProbe");
 
 	//	private Map<String, Set<Threshold>> thresholds = new HashMap<String, Set<Threshold>>();
 
@@ -115,6 +117,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 		if( ! readSpecific()) {
 			throw new RuntimeException("Creation failed");
 		}
+		namedLogger =  Logger.getLogger("jrds.Probe." + pd.getName());
 	}
 
 	public void initGraphList(GraphFactory gf) {
@@ -128,7 +131,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 			}
 		}
 		else {
-			logger.debug("No graph for probe" + this);
+			log(Level.DEBUG, "No graph");
 		}
 	}
 
@@ -186,7 +189,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 			formated = MessageFormat.format(evaluted, arguments);
 			return formated;
 		} catch (IllegalArgumentException e) {
-			logger.error("Template invalid:" + template);
+			log(Level.ERROR, "Template invalid: ",template);
 		}
 		return evaluted;
 	}
@@ -226,7 +229,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	 * @throws IOException
 	 */
 	private void create() throws IOException {
-		logger.info("Need to create rrd " + this);
+		log(Level.INFO, "Need to create rrd");
 		RrdDef def = getRrdDef();
 		RrdDb rrdDb = new RrdDb(def);
 		rrdDb.close();
@@ -235,7 +238,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	private void upgrade() {
 		RrdDb rrdSource = null;
 		try {
-			logger.warn("Probe " + this + " definition is changed, the store needs to be upgraded");
+			log(Level.WARN,"Definition is changed, the store needs to be upgraded");
 			File source = new File(getRrdName());
 			rrdSource = new RrdDb(source.getCanonicalPath());
 
@@ -279,29 +282,29 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 							try {
 								int j = rrdDest.getDsIndex(dsName);
 								if (j >= 0 && ! badDs.contains(dsName)) {
-									logger.trace("Upgrade of " + dsName + " from " + srcArchive);
+									log(Level.TRACE, "Upgrade of ", dsName, " from ", srcArchive);
 									srcArchive.getArcState(k).copyStateTo(dstArchive.getArcState(j));
 									srcArchive.getRobin(k).copyStateTo(dstArchive.getRobin(j));
 									robinMigrated++;
 								}
 							}
 							catch (IllegalArgumentException e) {
-								logger.trace("Datastore " + dsName + " removed for " + this);
+								log(Level.TRACE, "Datastore ", dsName, " removed");
 							}
 
 						}
-						logger.trace("Update " + srcArchive + " on " + this);
+						log(Level.TRACE, "Update ", srcArchive);
 					}
 				}
 			}
-			logger.debug("Robin migrated: " + robinMigrated);
+			log(Level.DEBUG, "Robin migrated: ", robinMigrated);
 
 			rrdDest.close();
 			rrdSource.close();
-			logger.debug("Size difference : " + (dest.length() - source.length()));
+			log(Level.DEBUG, "Size difference : ", (dest.length() - source.length()));
 			copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
 		} catch (IOException e) {
-			logger.error("Upgrade of " + this + " failed: " + e);
+			log(Level.ERROR, e, "Upgrade failed: ", e);
 		}
 		finally {
 			if(rrdSource != null)
@@ -342,11 +345,11 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	 */
 	public boolean checkStore()  {
 		if(pd == null) {
-			logger.error("Missing Probe description");
+			log(Level.ERROR, "Missing Probe description");
 			return false;
 		}
 		if(monitoredHost == null) {
-			logger.error("Missing host for " + pd.getProbeName());
+			log(Level.ERROR, "Missing host");
 			return false;
 		}
 
@@ -370,7 +373,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 				tmpdef.setStartTime(startTime);
 				String oldDef = tmpdef.dump();
 				long oldstep = tmpdef.getStep();
-				logger.trace("Definition found for " + this + ":\n" + oldDef);
+				log(Level.TRACE, "Definition found:\n", oldDef);
 
 				//new definition
 				tmpdef = getRrdDef();
@@ -379,7 +382,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 				long newstep = tmpdef.getStep();
 
 				if(newstep != oldstep ) {
-					logger.error(this + "'s step changed, you're in trouble" );
+					log(Level.ERROR, "step changed, you're in trouble" );
 					return false;
 				}
 				else if(! newDef.equals(oldDef)) {
@@ -389,15 +392,12 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 					upgrade();
 					rrdDb = new RrdDb(getRrdName());
 				}
-				logger.trace("******");
+				log(Level.TRACE, "******");
 			} else
 				create();
 			retValue = true;
 		} catch (Exception e) {
-			if(logger.isDebugEnabled())
-				logger.error("Store " + getRrdName() + " unusable: " + e,e);
-			else
-				logger.error("Store " + getRrdName() + " unusable: " + e);
+				log(Level.ERROR, e, "Store ", getRrdName(), " unusable: ", e);
 		}
 		finally {
 			if(rrdDb != null)
@@ -430,7 +430,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	public Map<KeyType, Number>  filterValues(Map<KeyType, ValueType> valuesList) {
 		return (Map<KeyType, Number>)valuesList;
 	}
-	
+
 	/**
 	 * The sample itself can be modified<br>
 	 * The defautl function does nothing
@@ -438,7 +438,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	 * @param values
 	 */
 	public void modifySample(Sample oneSample, Map<KeyType, ValueType> values) {
-		
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -457,9 +457,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 			if (sampleVals != null) {
 				if(getUptime() * pd.getUptimefactor() >= pd.getHeartBeatDefault()) {
 					Map<?, String> nameMap = getCollectMapping();
-					if(logger.isTraceEnabled()) {
-						logger.trace("Collect keys:" + nameMap);
-					}
+					log(Level.TRACE, "Collect keys: ", nameMap);
 					Map<KeyType, Number>filteredSamples = filterValues(sampleVals);
 					for(Map.Entry<KeyType, Number> e: filteredSamples.entrySet()) {
 						String dsName = nameMap.get(e.getKey());
@@ -468,14 +466,13 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 							oneSample.setValue(dsName, value);
 						}
 						else {
-							logger.debug("Dropped entry: " + e.getKey() + " for " + this);
+							log(Level.DEBUG, "Dropped entry: ", e.getKey());
 						}
 					}
 					modifySample(oneSample, sampleVals);
 				}
 				else {
-					logger.info("uptime too low for " + toString());
-
+					log(Level.INFO, "uptime too low");
 				}
 			}
 		}
@@ -489,12 +486,12 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	 */
 	public void collect() {
 		if(! finished) {
-			logger.error("Using an unfinished probe:" + this);
+			log(Level.ERROR, "Using an unfinished probe");
 			return;
 		}
 		//We only collect if the HostsList allow it
 		if(isCollectRunning()) {
-			logger.debug("launch collect for " + this);
+			log(Level.DEBUG,"launching collect");
 			starters.startCollect();
 			RrdDb rrdDb = null;
 			try {
@@ -506,20 +503,17 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 					//The collect might have been stopped
 					//during the reading of samples
 					if( isCollectRunning()) {
-						logger.trace(onesample.dump());
+						if(namedLogger.isTraceEnabled())
+							log(Level.TRACE, onesample.dump());
 						onesample.update();
 						//						checkThreshold(rrdDb);
 					}
 				}
 			}
 			catch (ArithmeticException ex) {
-				logger.warn("Error while storing sample for probe " + this + ": " +
-						ex.getMessage());
+				log(Level.WARN, ex, "Error while storing sample: ", ex.getMessage());
 			} catch (Exception e) {
-				if(logger.isDebugEnabled())
-					logger.debug("Error with probe collect " + this + ": ", e);
-				else
-					logger.error("Error with probe collect " + this + ": " + e);
+					log(Level.ERROR, e, "Error while collecting: ", e);
 			}
 			finally  {
 				starters.stopCollect();
@@ -572,7 +566,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 			rrdDb = StoreOpener.getRrd(getRrdName());
 			lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
 		} catch (Exception e) {
-			logger.error("Unable to get last update date for " + getName() + ": " + e, e);
+			log(Level.ERROR, e, "Unable to get last update date: ", e);
 		}
 		finally {
 			if(rrdDb != null)
@@ -610,7 +604,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 			FetchRequest fr = rrdDb.createFetchRequest(GraphDesc.DEFAULTCF, startDate.getTime() /1000, endDate.getTime() / 1000);
 			retValue = fr.fetchData();
 		} catch (Exception e) {
-			logger.error("Unable to fetch data for" + this.getName() + ": " + e.getMessage());
+			log(Level.ERROR, e, "Unable to fetch data: ", e.getMessage());
 		}
 		finally {
 			if(rrdDb != null)
@@ -629,7 +623,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 				retValues.put(dsNames[i], rrdDb.getDatasource(i).getLastValue());
 			}
 		} catch (Exception e) {
-			logger.error("Unable to get last values for" + getName() + ": " + e.getMessage());
+			log(Level.ERROR, e, "Unable to get last values: ", e.getMessage());
 		}
 		finally {
 			if(rrdDb != null)
@@ -713,6 +707,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	 * @param uptime in seconds
 	 */
 	public void setUptime(long uptime) {
+		log(Level.TRACE, "Setting uptime to: ", uptime);
 		this.uptime = uptime;
 	}
 
@@ -780,7 +775,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 			gd.add(dsName, GraphDesc.LINE);
 			Graphics2D g2d = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
 			gd.initializeLimits(g2d);
-			 
+
 			gf.addGraphDesc(gd);
 			GraphNode g = gf.makeGraph(graphDescName, this);
 			hl.addGraphs(Collections.singleton(g));
@@ -839,6 +834,21 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 
 	public HostsList getHostList() {
 		return (HostsList) getStarters().find(HostsList.class);
+	}
+
+	public void log(Level l, Exception e, Object... elements) {
+		jrds.Util.log(this, namedLogger, l, e, elements);
+	}
+
+	public void log(Level l, Object... elements) {
+		jrds.Util.log(this, namedLogger,l, null, elements);
+	}
+
+	/**
+	 * @return the namedLogger
+	 */
+	public Logger getNamedLogger() {
+		return namedLogger;
 	}
 
 }

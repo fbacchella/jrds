@@ -25,7 +25,7 @@ import jrds.ConnectedProbe;
 import jrds.ProbeConnected;
 import jrds.ProbeDesc;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 /**
  * 
@@ -33,8 +33,6 @@ import org.apache.log4j.Logger;
  * @version $Revision: 407 $,  $Date: 2007-02-22 18:48:03 +0100 (jeu., 22 févr. 2007) $
  */
 public class JMX extends ProbeConnected<String, Double, JMXConnection> implements ConnectedProbe {
-	static final private Logger logger = Logger.getLogger(JMX.class);
-
 	private Map<String, String> collectKeys = null;
 
 	public JMX() {
@@ -59,7 +57,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
 			Set<String> collectKeys = getCollectMapping().keySet();
 			Map<String, Double> retValues = new HashMap<String, Double>(collectKeys.size());
 
-			logger.debug("will collect:" + collectKeys);
+			log(Level.DEBUG, "will collect:", collectKeys);
 			for(String collect: collectKeys) {
 				String[] jmxPathArray = collect.split("/");
 				List<String> jmxPath = new ArrayList<String>();
@@ -69,25 +67,25 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
 				try {
 					Object attr = mbean.getAttribute(mbeanName, attributeName);
 					Number v = resolvJmxObject(jmxPath, attr);
-					logger.trace("JMX Path: " + collect +" = " + v);
+					log(Level.TRACE, "JMX Path: " + collect +" = " + v);
 					retValues.put(collect, v.doubleValue());
 				} catch (AttributeNotFoundException e1) {
-					logger.error("Invalide JMX attribue" +  attributeName + " for " + this);
+					log(Level.ERROR, e1, "Invalide JMX attribue " +  attributeName);
 				} catch (InstanceNotFoundException e1) {
-					logger.error("JMX instance not found for " + this + ": ");
+					log(Level.ERROR, e1, "JMX instance not found: ");
 				} catch (MBeanException e1) {
-					logger.error("JMX MBeanException for " + this + ": " + e1);
+					log(Level.ERROR, e1, "JMX MBeanException: " + e1);
 				} catch (ReflectionException e1) {
-					logger.error("JMX reflection error for " + this + ": " + e1);
+					log(Level.ERROR, e1, "JMX reflection error: " + e1);
 				} catch (IOException e1) {
-					logger.error("JMX IO error for " + this + ": " + e1);
+					log(Level.ERROR, e1, "JMX IO error: " + e1);
 				}
 			}
 			return retValues;
 		} catch (MalformedObjectNameException e) {
-			logger.error("JMX name error for " + this + ": " + e);
+			log(Level.ERROR, e, "JMX name error: " + e);
 		} catch (NullPointerException e) {
-			logger.error("JMX error for " + this + ": " + e);
+			log(Level.ERROR, e, "JMX error: " + e);
 		}
 
 		return Collections.emptyMap();

@@ -30,6 +30,7 @@ import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.starter.StarterNode;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
@@ -479,5 +480,21 @@ public class Util {
 			}
 		};
 	}
+	
+	static public void log(Object source, Logger namedLogger, Level l, Exception e, Object... elements) {
+		if(namedLogger.isEnabledFor(l)) {
+			StringBuilder line = new StringBuilder();
+			if(source != null)
+				line.append("[" + source.toString() + "] ");
+			for(Object o: elements) {
+				line.append(o.toString());
+			}
+			namedLogger.log(l, line.toString());
+			if(e != null && l.isGreaterOrEqual(Level.DEBUG)) {
+				namedLogger.log(l, "Error stack: ", e);
+			}
+		}
+	}
+
 }
 
