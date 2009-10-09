@@ -67,12 +67,12 @@ public class Full {
 		return gd;
 	}
 	
-	static public Probe getProbe() {
-		Probe p = new Probe() {
+	static public Probe<?,?> getProbe() {
+		Probe<?,?> p = new Probe<String, Number>() {
 
 			@Override
-			public Map<?, ?> getNewSampleValues() {
-				return Collections.EMPTY_MAP;
+			public Map<String, Number> getNewSampleValues() {
+				return Collections.emptyMap();
 			}
 
 			@Override
@@ -84,15 +84,14 @@ public class Full {
 		return p;
 
 	}
-	static public Probe create() {
+	static public Probe<?,?> create() {
 		PropertiesManager pm = new PropertiesManager();
 		pm.setProperty("rrddir", "tmp");
-		//pm.rrdbackend = "MEM";
 
 		RdsHost host = new RdsHost("Empty");
 		host.setHostDir(new File("tmp"));
 		
-		Probe p = getProbe();
+		Probe<?,?> p = getProbe();
 		p.setHost(host);
 		
 		p.checkStore();
@@ -100,7 +99,7 @@ public class Full {
 		return p;
 	}
 
-	static public long fill(Probe p) throws IOException {
+	static public long fill(Probe<?,?> p) throws IOException {
 		long start = System.currentTimeMillis() / 1000;
 		long end = start + 3600 * 24 * 30;
 

@@ -34,7 +34,7 @@ public class JmxConnexionTest {
 
 	@Test
 	public void build1() throws MalformedObjectNameException, NullPointerException, AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException, IOException, IntrospectionException {
-		Connection cnx = new JMXConnection(8998) {
+		Connection<MBeanServerConnection> cnx = new JMXConnection(8998) {
 			@Override
 			public String getHostName() {
 				return "localhost";
@@ -43,7 +43,7 @@ public class JmxConnexionTest {
 		boolean started = cnx.start();
 		if(! started)
 			return;
-		MBeanServerConnection mbean = (MBeanServerConnection) cnx.getConnection();
+		MBeanServerConnection mbean =  cnx.getConnection();
 
 		/*Set<ObjectInstance> s = mbean.queryMBeans(null, null);
 		for(ObjectInstance o : s) {

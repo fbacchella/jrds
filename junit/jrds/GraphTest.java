@@ -19,7 +19,7 @@ public class GraphTest {
 	static HostsList hl;
 	@Test 
 	public void getBytes() throws IOException {
-		Probe p = GetMoke.getProbe();
+		Probe<?,?> p = GetMoke.getProbe();
 		GraphNode gn = new GraphNode(p, GetMoke.getGraphDesc());
 		Period pr = new Period();
 		Graph g = new Graph(gn);
@@ -31,7 +31,7 @@ public class GraphTest {
 		Assert.assertTrue(outputFile.length() > 0);
 	}
 	@Test public void compare() throws IOException {
-		Probe p = GetMoke.getProbe();
+		Probe<?,?> p = GetMoke.getProbe();
 		GraphNode gn = new GraphNode(p, GetMoke.getGraphDesc());
 		Period pr = new Period();
 		Graph g1 = new Graph(gn);

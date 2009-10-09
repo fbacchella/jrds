@@ -11,12 +11,11 @@ public class FactoryTest {
 	@Test
 	public void argFactory() {
 		try {
-			ArgFactory af = new ArgFactory();
-			Object o = af.makeArg("Integer", "1");
+			Object o = ArgFactory.makeArg("Integer", "1");
 			Assert.assertEquals(o, new Integer(1));
-			o = af.makeArg("URL", "http://localhost/");
+			o = ArgFactory.makeArg("URL", "http://localhost/");
 			Assert.assertEquals(o, new URL("http://localhost/"));
-			o = af.makeArg(Integer.class.getName(), "1");
+			o = ArgFactory.makeArg(Integer.class.getName(), "1");
 			Assert.assertEquals(o, new Integer(1));
 		} catch (Exception e) {
 			Assert.fail(e.getMessage());

@@ -73,7 +73,7 @@ public class TestLoadConfiguration {
 		l.importUrl(new URL("file:desc"));
 
 		pm.setProperty("configdir", "tmp");
-		pm.setProperty("rrdbackend", "NIO");
+		//pm.setProperty("rrdbackend", "NIO");
 		pm.setProperty("rrddir", "tmp");
 		pm.update();
 

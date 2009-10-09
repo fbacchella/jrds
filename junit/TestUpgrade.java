@@ -35,7 +35,7 @@ public class TestUpgrade {
 		ProbeDesc pd = GetMoke.getPd();
 		pd.add("MokeDs2", DsType.GAUGE);
 
-		Probe p = new DummyProbe() {
+		Probe<?,?> p = new DummyProbe() {
 			protected ArcDef[] getArcDefs() {
 				ArcDef[] defaultArc = new ArcDef[1];
 				defaultArc[0] = new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 10);

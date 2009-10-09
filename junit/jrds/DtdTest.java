@@ -1,6 +1,5 @@
 package jrds;
 
-import java.io.File;
 import java.net.URL;
 
 import jrds.factories.Loader;
@@ -22,7 +21,7 @@ public class DtdTest {
 	@Test public void scanPaths() throws Exception {
 		Loader l = new Loader();
 		
-		pm.join(new File("jrds.properties"));
+		//pm.join(new File("jrds.properties"));
 		pm.libspath.add(new URL("file:build/classes"));
 		pm.update();
 

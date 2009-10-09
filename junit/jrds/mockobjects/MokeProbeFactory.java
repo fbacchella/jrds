@@ -1,13 +1,11 @@
 package jrds.mockobjects;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
 import jrds.factories.GraphFactory;
 import jrds.factories.ProbeFactory;
 
@@ -24,8 +22,7 @@ public class MokeProbeFactory extends ProbeFactory {
 	/* (non-Javadoc)
 	 * @see jrds.factories.ProbeFactory#makeProbe(jrds.ProbeDesc, java.util.List)
 	 */
-	@Override
-	public Probe makeProbe(ProbeDesc pd, RdsHost host, List<?> constArgs) {
+	public Probe makeProbe(ProbeDesc pd) {
 		return new MokeProbe();
 	}
 }

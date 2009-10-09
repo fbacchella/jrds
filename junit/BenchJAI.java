@@ -12,6 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Tools;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,6 +28,7 @@ public class BenchJAI {
 	@BeforeClass
 	static public void configure() throws IOException {
 		Tools.configure();
+		logger.setLevel(Level.TRACE);
 		Tools.setLevel(new String[] {"jrds.Util"}, logger.getLevel());
 	}
 

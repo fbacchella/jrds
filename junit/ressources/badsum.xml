@@ -1,0 +1,3 @@
+<sum name="badsum" >
+    <element name="nonhost/nonprobe" />
+</sum>

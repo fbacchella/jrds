@@ -47,18 +47,12 @@ public class TestUrlParser {
 	}
 	@Test public void checkSortedTrue() {
 		parameters.clear();
-		parameters.put("sort", new String[] { "1" });
+		parameters.put("sort", new String[] { "true" });
 		ParamsBean pb = new ParamsBean(req, hl);
 		Assert.assertTrue(pb.isSorted());
 	}
 	@Test public void checkSortedFalseDefault() {
 		parameters.clear();
-		ParamsBean pb = new ParamsBean(req, hl);
-		Assert.assertTrue(! pb.isSorted());
-	}
-	@Test public void checkSortedFalse() {
-		parameters.clear();
-		parameters.put("sort", new String[] { "0" });
 		ParamsBean pb = new ParamsBean(req, hl);
 		Assert.assertTrue(! pb.isSorted());
 	}

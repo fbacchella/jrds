@@ -44,7 +44,6 @@ public class AllProbeCreationTest {
 		pm.update();
 		
 		Assert.assertTrue(pm.rrddir.isDirectory());
-		//pm.rrdbackend = "MEM";
 
 		Loader l = new Loader();
 		l.importDir(new File("desc"));
@@ -70,7 +69,9 @@ public class AllProbeCreationTest {
 				pd.setProbeClass(DummyProbe.class);
 
 			logger.trace("Will create probedesc " + pd.getName());
-			Probe p = pf.makeProbe(pd.getName(), host, Collections.singletonList(originalClass));
+			Probe<?,?> p = pf.makeProbe(pd.getName());
+			p.setHost(host);
+			pf.configure(p, Collections.singletonList(originalClass));
 			p.setLabel("mokelabel");
 			if(p.checkStore()) {
 				RrdDef def = p.getRrdDef();
