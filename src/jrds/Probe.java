@@ -23,7 +23,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.factories.GraphFactory;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.starter.Collecting;
@@ -63,7 +62,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	private long step = -1;
 	private String name = null;
 	private RdsHost monitoredHost;
-	private Collection<GraphNode> graphList = new ArrayList<GraphNode>(0);
+	private Collection<GraphNode> graphList = new ArrayList<GraphNode>();
 	private String stringValue = null;
 	private ProbeDesc pd;
 	private Set<String> tags = null;
@@ -118,21 +117,6 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 			throw new RuntimeException("Creation failed");
 		}
 		namedLogger =  Logger.getLogger("jrds.Probe." + pd.getName());
-	}
-
-	public void initGraphList(GraphFactory gf) {
-		Collection<?> graphClasses = pd.getGraphClasses();
-		if(graphClasses != null) {
-			graphList = new ArrayList<GraphNode>(graphClasses.size());
-			for (Object o:  graphClasses ) {
-				GraphNode newGraph = gf.makeGraph(o, this);
-				if(newGraph != null)
-					graphList.add(newGraph);
-			}
-		}
-		else {
-			log(Level.DEBUG, "No graph");
-		}
 	}
 
 	public void addGraph(GraphDesc gd) {
@@ -755,29 +739,26 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 		root.appendChild(dsElement);
 		DsDef[] dss= getDsDefs();
 		HostsList hl = getHostList();
-		GraphFactory gf = new GraphFactory(false);
 		if (sorted)
 			Arrays.sort(dss, new Comparator<DsDef>() {
 				public int compare(DsDef arg0, DsDef arg1) {
 					return String.CASE_INSENSITIVE_ORDER.compare(arg0.getDsName(), arg1.getDsName());
 				}
 			});
+		Graphics2D g2d = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
 		for(DsDef ds: dss) {
 			String dsName = ds.getDsName();
 			String id = getHost().getName() + "." + getName() + "." + dsName;
 			String graphDescName = getName() + "." + dsName;
 
 			GraphDesc gd = new GraphDesc();
-
 			gd.setName(graphDescName);
 			gd.setGraphName(id);
 			gd.setGraphTitle(getName() + "." + dsName + " on ${host}");
 			gd.add(dsName, GraphDesc.LINE);
-			Graphics2D g2d = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
 			gd.initializeLimits(g2d);
 
-			gf.addGraphDesc(gd);
-			GraphNode g = gf.makeGraph(graphDescName, this);
+			GraphNode g = new GraphNode(this, gd);
 			hl.addGraphs(Collections.singleton(g));
 
 			Element dsNameElement = document.createElement("name");

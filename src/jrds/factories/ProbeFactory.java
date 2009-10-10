@@ -9,9 +9,12 @@ package jrds.factories;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import jrds.GraphDesc;
+import jrds.GraphNode;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
@@ -28,15 +31,15 @@ public class ProbeFactory {
 	private final Logger logger = Logger.getLogger(ProbeFactory.class);
 	final private List<String> probePackages = new ArrayList<String>(5);
 	private Map<String, ProbeDesc> probeDescMap;
-	private GraphFactory gf;
+	private Map<String, GraphDesc> graphDescMap;
 	private PropertiesManager pm;
 	/**
 	 * Private constructor
 	 * @param b 
 	 */
-	public ProbeFactory(Map<String, ProbeDesc> probeDescMap, GraphFactory gf, PropertiesManager pm) {
+	public ProbeFactory(Map<String, ProbeDesc> probeDescMap, Map<String, GraphDesc> graphDescMap, PropertiesManager pm) {
 		this.probeDescMap = probeDescMap;
-		this.gf = gf;
+		this.graphDescMap = graphDescMap;
 		this.pm = pm;
 
 		probePackages.add("");
@@ -115,7 +118,17 @@ public class ProbeFactory {
 			if(name == null)
 				name = jrds.Util.parseTemplate(p.getPd().getProbeName(), p);
 			p.setName(name);
-			p.initGraphList(gf);
+			Collection<?> graphClasses = p.getPd().getGraphClasses();
+			if(graphClasses != null) {
+				for (Object o:  graphClasses ) {
+					GraphDesc gd = graphDescMap.get(o);
+					if(gd == null)
+						continue;
+					GraphNode newGraph = new GraphNode(p, gd);
+					if(newGraph != null)
+						p.addGraph(newGraph);
+				}
+			}
 			if(pm != null) {
 				logger.trace("Setting time step to " + pm.step + " for " + p);
 				p.setStep(pm.step);

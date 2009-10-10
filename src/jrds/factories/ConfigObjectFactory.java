@@ -17,8 +17,8 @@ import org.apache.log4j.Logger;
 public class ConfigObjectFactory {
 	static final private Logger logger = Logger.getLogger(ConfigObjectFactory.class);
 
-	private GraphFactory gf;
 	private ProbeFactory pf;
+	private Map<String, GraphDesc> graphDescMap;
 	private Map<Loader.ConfigType, ObjectBuilder> builderMap;
 	private jrds.PropertiesManager pm = null;
 
@@ -81,9 +81,8 @@ public class ConfigObjectFactory {
 	}
 	@SuppressWarnings("unchecked")
 	public Map<String, GraphDesc> setGraphDescMap(Map<String, JrdsNode> nodemap) {
-		Map<String, GraphDesc> graphDescMap = (Map<String, GraphDesc>) getObjectMap(Loader.ConfigType.GRAPHDESC, nodemap);
+		graphDescMap = (Map<String, GraphDesc>) getObjectMap(Loader.ConfigType.GRAPHDESC, nodemap);
 		setProperty(ObjectBuilder.properties.GRAPHDESC, graphDescMap);
-		gf = new GraphFactory(graphDescMap, pm.legacymode);
 		setProperty(ObjectBuilder.properties.GRAPHFACTORY, graphDescMap);
 		logger.debug("Graph description configured: " + graphDescMap.keySet());
 		return graphDescMap;
@@ -92,7 +91,7 @@ public class ConfigObjectFactory {
 	public Map<String, ProbeDesc> setProbeDescMap(Map<String, JrdsNode> nodemap) {
 		Map<String, ProbeDesc> probeDescMap = (Map<String, ProbeDesc>) getObjectMap(Loader.ConfigType.PROBEDESC, nodemap);
 		setProperty(ObjectBuilder.properties.PROBEDESC, probeDescMap);
-		pf = new ProbeFactory(probeDescMap, gf, pm);
+		pf = new ProbeFactory(probeDescMap, graphDescMap, pm);
 		setProperty(ObjectBuilder.properties.PROBEFACTORY, pf);
 		logger.debug("Probe description configured: " + probeDescMap.keySet());
 		return probeDescMap;
