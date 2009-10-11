@@ -101,7 +101,7 @@ public class GraphDescBuilder extends ObjectBuilder {
 			}
 		};
 
-		List<Object> tree;
+		List<?> tree;
 
 		tree = subnode.doTreeList(CompiledXPath.get("hosttree/*"),viewFilter);
 		if(tree != null && ! tree.isEmpty())

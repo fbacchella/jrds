@@ -2,6 +2,7 @@ package jrds.factories;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jrds.Probe;
@@ -68,14 +69,16 @@ public class ProbeDescBuilder extends ObjectBuilder {
 			pd.setUptimefactor(0);
 		}
 
-		pd.setGraphClasses(probeDescNode.doTreeList(CompiledXPath.get("graphs/name"), new JrdsNode.FilterNode() {
+		List<String> graphs = (List<String>) probeDescNode.doTreeList(CompiledXPath.get("graphs/name"), new JrdsNode.FilterNode() {
 			@Override
 			public Object filter(Node input) {
-				logger.trace("Adding graph: " + input.getTextContent());
+				if(logger.isTraceEnabled())
+					logger.trace("Adding graph: " + input.getTextContent());
 				return input.getTextContent();
 			}
 
-		}));
+		});
+		pd.setGraphClasses(graphs);
 
 		for(JrdsNode specificNode: probeDescNode.iterate(CompiledXPath.get("specific"))) {
 			Map<String, String> m = specificNode.attrMap();
@@ -131,11 +134,11 @@ public class ProbeDescBuilder extends ObjectBuilder {
 			}
 			pd.add(dsMap);
 		}
-		
+
 		Map<String, String> props = makeProperties(probeDescNode);
 		if(props != null)
 			pd.setProperties(props);
-		
+
 		return pd;
 	}
 

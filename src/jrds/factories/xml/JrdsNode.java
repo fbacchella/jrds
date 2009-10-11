@@ -98,7 +98,7 @@ public class JrdsNode implements Node {
 		public abstract Object filter(Node input);
 	};
 
-	public List<Object> doTreeList(XPathExpression xpath, FilterNode f) {
+	public List<?> doTreeList(XPathExpression xpath, FilterNode f) {
 		NodeList list;
 		try {
 			list = (NodeList) xpath.evaluate(parent, XPathConstants.NODESET);

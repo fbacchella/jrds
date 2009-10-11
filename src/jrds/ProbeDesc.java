@@ -39,7 +39,7 @@ public class ProbeDesc {
 	private String probeName;
 	private String name;
 	private Collection<?> namedProbesNames;
-	private Collection<?> graphClasses = new ArrayList<Object>(0);
+	private Collection<String> graphClasses = new ArrayList<String>();
 	private boolean uniqIndex = false;
 	private Class<? extends Probe<?,?>> probeClass = null;
 	private List<Object> defaultsArgs = null;
@@ -261,28 +261,21 @@ public class ProbeDesc {
 	/**
 	 * @return Returns the graphClasses.
 	 */
-	public Collection<?> getGraphClasses() {
+	public Collection<String> getGraphClasses() {
 		return graphClasses;
 	}
 
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
-	public void setGraphClasses(Collection<?> graphClasses) {
+	public void setGraphClasses(Collection<String> graphClasses) {
 		this.graphClasses = graphClasses;
 	}
 
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
-	public void setGraphClasses(Object[] graphClasses) {
-		this.graphClasses = Arrays.asList(graphClasses);
-	}
-
-	/**
-	 * @param graphClasses The graphClasses to set.
-	 */
-	public void setGraphClasses(Class<?>[] graphClasses) {
+	public void setGraphClasses(String[] graphClasses) {
 		this.graphClasses = Arrays.asList(graphClasses);
 	}
 
