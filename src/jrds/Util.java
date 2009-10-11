@@ -481,14 +481,12 @@ public class Util {
 		};
 	}
 	
-	static public void log(Object source, Logger namedLogger, Level l, Exception e, Object... elements) {
+	static public void log(Object source, Logger namedLogger, Level l, Throwable e, String format, Object... args) {
 		if(namedLogger.isEnabledFor(l)) {
 			StringBuilder line = new StringBuilder();
 			if(source != null)
 				line.append("[" + source.toString() + "] ");
-			for(Object o: elements) {
-				line.append(o.toString());
-			}
+			line.append(String.format(format, args));
 			namedLogger.log(l, line.toString());
 			if(e != null && l.isGreaterOrEqual(Level.DEBUG)) {
 				namedLogger.log(l, "Error stack: ", e);

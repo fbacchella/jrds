@@ -12,7 +12,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.starter.XmlProvider;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 import org.w3c.dom.Document;
 
 /**
@@ -20,8 +20,6 @@ import org.w3c.dom.Document;
  * @version $Revision: 407 $,  $Date: 2007-02-22 18:48:03 +0100 (jeu., 22 févr. 2007) $
  */
 public class HttpXml extends HttpProbe {
-
-	static final private Logger logger = Logger.getLogger(HttpXml.class);
 
 	public XmlProvider xmlstarter = null;
 	private Set<String> xpaths = null;
@@ -91,7 +89,7 @@ public class HttpXml extends HttpProbe {
 	protected long findUptime(Document d) {
 		String upTimePath = getPd().getSpecific("upTimePath");
 		if(upTimePath == null) {
-			logger.error("No xpath for the uptime for " + this);
+			log(Level.ERROR, "No xpath for the uptime");
 			return 0;
 		}
 		return xmlstarter.findUptime(d, upTimePath);
@@ -106,9 +104,9 @@ public class HttpXml extends HttpProbe {
 		setUptime(findUptime(d));
 		Map<String, Number> vars = new HashMap<String, Number>();
 		xmlstarter.fileFromXpaths(d, xpaths, vars);
-		logger.trace(vars);
+		log(Level.TRACE, "%s", vars);
 		vars = dom2Map(d, vars);
-		logger.trace(vars);
+		log(Level.TRACE, "%s", vars);
 		return vars; 
 	}
 

@@ -11,13 +11,13 @@ public abstract class ProbeConnected<KeyType, ValueType, ConnectionClass extends
 	public ProbeConnected(String connectionName) {
 		super();
 		this.connectionName = connectionName;
-		log(Level.DEBUG, "New Probe connect called ", connectionName);
+		log(Level.DEBUG, "New Probe connect called %s", connectionName);
 	}
 	
 	public Boolean configure() {
 		ConnectionClass cnx = getConnection();
 		if(cnx == null) {
-			log(Level.ERROR, "No connection configured for ", this, " with name ", getConnectionName());
+			log(Level.ERROR, "No connection configured with name %s", getConnectionName());
 			return false;
 		}
 		return true;
@@ -48,10 +48,10 @@ public abstract class ProbeConnected<KeyType, ValueType, ConnectionClass extends
 	@Override
 	public Map<KeyType, ValueType> getNewSampleValues() {
 		ConnectionClass cnx = getConnection();
-		log(Level.DEBUG, "find connection ", connectionName);
 		if(cnx == null) {
-			log(Level.WARN, "No connection found for ", this, " with name ", getConnectionName());
+			log(Level.WARN, "No connection found with name %s", getConnectionName());
 		}
+		log(Level.DEBUG, "find connection %s", connectionName);
 		if( cnx == null || !cnx.isStarted()) {
 			return Collections.emptyMap();
 		}

@@ -57,7 +57,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
 			Set<String> collectKeys = getCollectMapping().keySet();
 			Map<String, Double> retValues = new HashMap<String, Double>(collectKeys.size());
 
-			log(Level.DEBUG, "will collect:", collectKeys);
+			log(Level.DEBUG, "will collect: %s", collectKeys);
 			for(String collect: collectKeys) {
 				String[] jmxPathArray = collect.split("/");
 				List<String> jmxPath = new ArrayList<String>();
@@ -67,25 +67,25 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
 				try {
 					Object attr = mbean.getAttribute(mbeanName, attributeName);
 					Number v = resolvJmxObject(jmxPath, attr);
-					log(Level.TRACE, "JMX Path: " + collect +" = " + v);
+					log(Level.TRACE, "JMX Path: %s = %s", collect, v);
 					retValues.put(collect, v.doubleValue());
 				} catch (AttributeNotFoundException e1) {
-					log(Level.ERROR, e1, "Invalide JMX attribue " +  attributeName);
+					log(Level.ERROR, e1, "Invalide JMX attribue %s", attributeName);
 				} catch (InstanceNotFoundException e1) {
-					log(Level.ERROR, e1, "JMX instance not found: ");
+					log(Level.ERROR, e1, "JMX instance not found: ", e1.getMessage());
 				} catch (MBeanException e1) {
-					log(Level.ERROR, e1, "JMX MBeanException: " + e1);
+					log(Level.ERROR, e1, "JMX MBeanException: %s", e1);
 				} catch (ReflectionException e1) {
-					log(Level.ERROR, e1, "JMX reflection error: " + e1);
+					log(Level.ERROR, e1, "JMX reflection error: %s", e1);
 				} catch (IOException e1) {
-					log(Level.ERROR, e1, "JMX IO error: " + e1);
+					log(Level.ERROR, e1, "JMX IO error: %s", e1);
 				}
 			}
 			return retValues;
 		} catch (MalformedObjectNameException e) {
-			log(Level.ERROR, e, "JMX name error: " + e);
+			log(Level.ERROR, e, "JMX name error: %s", e);
 		} catch (NullPointerException e) {
-			log(Level.ERROR, e, "JMX error: " + e);
+			log(Level.ERROR, e, "JMX error: %s", e);
 		}
 
 		return Collections.emptyMap();

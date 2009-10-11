@@ -56,8 +56,6 @@ import org.w3c.dom.Element;
 public abstract class Probe<KeyType, ValueType>
 implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 
-	static final private Logger logger = Logger.getLogger(Probe.class);
-
 	private int timeout = 30;
 	private long step = -1;
 	private String name = null;
@@ -173,7 +171,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 			formated = MessageFormat.format(evaluted, arguments);
 			return formated;
 		} catch (IllegalArgumentException e) {
-			log(Level.ERROR, "Template invalid: ",template);
+			log(Level.ERROR, "Template invalid: %s",template);
 		}
 		return evaluted;
 	}
@@ -231,7 +229,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 			rrdDef.setPath(dest.getCanonicalPath());
 			RrdDb rrdDest = new RrdDb(rrdDef);
 
-			logger.debug("updating " +  source  + " to "  + dest);
+			log(Level.DEBUG, "updating %s to %s",source, dest);
 
 			Set<String> badDs = new HashSet<String>();
 			Header header = rrdSource.getHeader();
@@ -244,10 +242,10 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 				if (dstDS != null ) {
 					try {
 						srcDs.copyStateTo(dstDS);
-						logger.trace("Update " + dsName + " on " + this);
+						log(Level.TRACE, "Update %s", dsName);
 					} catch (RuntimeException e) {
 						badDs.add(dsName);
-						logger.error("Datasource " + dsName +" can't be upgraded: " + e.getMessage());
+						log(Level.ERROR, e, "Datasource %s can't be upgraded: %s", dsName,  e.getMessage());
 					}
 				}
 			}
@@ -266,29 +264,29 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 							try {
 								int j = rrdDest.getDsIndex(dsName);
 								if (j >= 0 && ! badDs.contains(dsName)) {
-									log(Level.TRACE, "Upgrade of ", dsName, " from ", srcArchive);
+									log(Level.TRACE, "Upgrade of %s from %s", dsName, srcArchive);
 									srcArchive.getArcState(k).copyStateTo(dstArchive.getArcState(j));
 									srcArchive.getRobin(k).copyStateTo(dstArchive.getRobin(j));
 									robinMigrated++;
 								}
 							}
 							catch (IllegalArgumentException e) {
-								log(Level.TRACE, "Datastore ", dsName, " removed");
+								log(Level.TRACE, "Datastore %s removed", dsName);
 							}
 
 						}
-						log(Level.TRACE, "Update ", srcArchive);
+						log(Level.TRACE, "Update %s", srcArchive);
 					}
 				}
 			}
-			log(Level.DEBUG, "Robin migrated: ", robinMigrated);
+			log(Level.DEBUG, "Robin migrated: %s", robinMigrated);
 
 			rrdDest.close();
 			rrdSource.close();
-			log(Level.DEBUG, "Size difference : ", (dest.length() - source.length()));
+			log(Level.DEBUG, "Size difference : %d", (dest.length() - source.length()));
 			copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
 		} catch (IOException e) {
-			log(Level.ERROR, e, "Upgrade failed: ", e);
+			log(Level.ERROR, e, "Upgrade failed: %s", e);
 		}
 		finally {
 			if(rrdSource != null)
@@ -357,7 +355,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 				tmpdef.setStartTime(startTime);
 				String oldDef = tmpdef.dump();
 				long oldstep = tmpdef.getStep();
-				log(Level.TRACE, "Definition found:\n", oldDef);
+				log(Level.TRACE, "Definition found: %s\n", oldDef);
 
 				//new definition
 				tmpdef = getRrdDef();
@@ -381,7 +379,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 				create();
 			retValue = true;
 		} catch (Exception e) {
-				log(Level.ERROR, e, "Store ", getRrdName(), " unusable: ", e);
+				log(Level.ERROR, e, "Store %s unusable: %s", getRrdName(), e);
 		}
 		finally {
 			if(rrdDb != null)
@@ -438,19 +436,21 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	private void updateSample(Sample oneSample) {
 		if(isCollectRunning()) {
 			Map<KeyType, ValueType> sampleVals = getNewSampleValues();
+			log(Level.TRACE, "Collected values: %s", sampleVals);
 			if (sampleVals != null) {
 				if(getUptime() * pd.getUptimefactor() >= pd.getHeartBeatDefault()) {
 					Map<?, String> nameMap = getCollectMapping();
-					log(Level.TRACE, "Collect keys: ", nameMap);
+					log(Level.TRACE, "Collect keys: %s", nameMap);
 					Map<KeyType, Number>filteredSamples = filterValues(sampleVals);
 					for(Map.Entry<KeyType, Number> e: filteredSamples.entrySet()) {
+						log(Level.TRACE, "Filtered values: %s", sampleVals);
 						String dsName = nameMap.get(e.getKey());
 						double value = e.getValue().doubleValue();
 						if (dsName != null) {
 							oneSample.setValue(dsName, value);
 						}
 						else {
-							log(Level.DEBUG, "Dropped entry: ", e.getKey());
+							log(Level.TRACE, "Dropped entry: %s", e.getKey());
 						}
 					}
 					modifySample(oneSample, sampleVals);
@@ -487,17 +487,17 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 					//The collect might have been stopped
 					//during the reading of samples
 					if( isCollectRunning()) {
-						if(namedLogger.isTraceEnabled())
-							log(Level.TRACE, onesample.dump());
+						if(namedLogger.isDebugEnabled())
+							log(Level.DEBUG, "%s", onesample.dump());
 						onesample.update();
 						//						checkThreshold(rrdDb);
 					}
 				}
 			}
 			catch (ArithmeticException ex) {
-				log(Level.WARN, ex, "Error while storing sample: ", ex.getMessage());
+				log(Level.WARN, ex, "Error while storing sample: %s", ex.getMessage());
 			} catch (Exception e) {
-					log(Level.ERROR, e, "Error while collecting: ", e);
+					log(Level.ERROR, e, "Error while collecting: %s", e.getMessage());
 			}
 			finally  {
 				starters.stopCollect();
@@ -550,7 +550,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 			rrdDb = StoreOpener.getRrd(getRrdName());
 			lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
 		} catch (Exception e) {
-			log(Level.ERROR, e, "Unable to get last update date: ", e);
+			log(Level.ERROR, e, "Unable to get last update date: %s", e);
 		}
 		finally {
 			if(rrdDb != null)
@@ -588,7 +588,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 			FetchRequest fr = rrdDb.createFetchRequest(GraphDesc.DEFAULTCF, startDate.getTime() /1000, endDate.getTime() / 1000);
 			retValue = fr.fetchData();
 		} catch (Exception e) {
-			log(Level.ERROR, e, "Unable to fetch data: ", e.getMessage());
+			log(Level.ERROR, e, "Unable to fetch data: %s", e.getMessage());
 		}
 		finally {
 			if(rrdDb != null)
@@ -607,7 +607,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 				retValues.put(dsNames[i], rrdDb.getDatasource(i).getLastValue());
 			}
 		} catch (Exception e) {
-			log(Level.ERROR, e, "Unable to get last values: ", e.getMessage());
+			log(Level.ERROR, e, "Unable to get last values: %s", e.getMessage());
 		}
 		finally {
 			if(rrdDb != null)
@@ -691,7 +691,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	 * @param uptime in seconds
 	 */
 	public void setUptime(long uptime) {
-		log(Level.TRACE, "Setting uptime to: ", uptime);
+		log(Level.TRACE, "Setting uptime to: %d", uptime);
 		this.uptime = uptime;
 	}
 
@@ -817,12 +817,12 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 		return (HostsList) getStarters().find(HostsList.class);
 	}
 
-	public void log(Level l, Exception e, Object... elements) {
-		jrds.Util.log(this, namedLogger, l, e, elements);
+	public void log(Level l, Throwable e, String format, Object... elements) {
+		jrds.Util.log(this, namedLogger, l, e, format, elements);
 	}
 
-	public void log(Level l, Object... elements) {
-		jrds.Util.log(this, namedLogger,l, null, elements);
+	public void log(Level l, String format, Object... elements) {
+		jrds.Util.log(this, namedLogger,l, null, format, elements);
 	}
 
 	/**
