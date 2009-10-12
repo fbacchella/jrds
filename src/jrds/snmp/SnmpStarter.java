@@ -52,7 +52,7 @@ public class SnmpStarter extends Starter {
 	static final private OID sysUpTimeInstance = new OID(".1.3.6.1.2.1.1.3.0");
 	static final private PDUFactory pdufactory = new DefaultPDUFactory(PDU.GET);
 
-	static private Snmp snmp = null;
+	volatile static private Snmp snmp = null;
 	static public final Starter full = new Starter() {
 		public boolean start() {
 			boolean started = false;

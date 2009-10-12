@@ -48,7 +48,7 @@ public class Resolver extends Starter {
 		RdsHost host = null;
 		if(node instanceof RdsHost)
 			host =(RdsHost)node;
-		else if(node instanceof Probe) {
+		else if(node instanceof Probe<?,?>) {
 			Probe<?,?> p = (Probe<?,?>) node;
 			host = p.getHost();
 		}

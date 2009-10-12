@@ -5,6 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 
+import jrds.RdsHost;
+
 public class SocketFactory extends Starter {
 	int timeout;
 	
@@ -28,6 +30,28 @@ public class SocketFactory extends Starter {
 
 	public Socket createSocket(String host, int port) throws IOException {
 		Socket s = new Socket(host, port) {
+			public void connect(SocketAddress endpoint) throws IOException {
+				super.connect(endpoint, timeout * 1000);
+			}
+
+			/* (non-Javadoc)
+			 * @see java.net.Socket#connect(java.net.SocketAddress, int)
+			 */
+			public void connect(SocketAddress endpoint, int timeout) throws IOException {
+				super.connect(endpoint, timeout);
+			}
+		};
+		s.setSoTimeout(timeout * 1000);
+		s.setTcpNoDelay(true);
+		return s;
+	}
+
+	public Socket createSocket(RdsHost host, int port) throws IOException {
+		Resolver r = (Resolver) host.getStarters().find(Resolver.makeKey(host));
+		if(r == null || ! r.isStarted())
+			return null;
+
+		Socket s = new Socket(r.getInetAddress(), port) {
 			public void connect(SocketAddress endpoint) throws IOException {
 				super.connect(endpoint, timeout * 1000);
 			}

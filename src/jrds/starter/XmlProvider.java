@@ -65,7 +65,8 @@ public class XmlProvider extends Starter {
 			logger.fatal("No Document builder available");
 			return false;
 		}
-		logger.trace("starting XmlProvider " + getClass().getName() + '@' + Integer.toHexString(hashCode()) + " " + xpather + " "+ dbuilder);
+		if(logger.isTraceEnabled())
+			logger.trace("starting XmlProvider " + getClass().getName() + '@' + Integer.toHexString(hashCode()) + " " + xpather + " "+ dbuilder);
 		return dbuilder != null && xpather != null;
 	}
 
@@ -76,7 +77,8 @@ public class XmlProvider extends Starter {
 	public void stop() {
 		xpather = null;
 		dbuilder = null;
-		logger.trace("stopping XmlProvider " + getClass().getName() + '@' + Integer.toHexString(hashCode()));
+		if(logger.isTraceEnabled())
+			logger.trace("stopping XmlProvider " + getClass().getName() + '@' + Integer.toHexString(hashCode()));
 	}
 
 	public long findUptime(Document d, String upTimePath) {
@@ -88,7 +90,8 @@ public class XmlProvider extends Starter {
 		try {
 			Node upTimeNode = (Node) xpather.evaluate(upTimePath, d, XPathConstants.NODE);
 			if(upTimeNode != null) {
-				logger.trace("Will parse uptime: " + upTimeNode.getTextContent());
+				if(logger.isTraceEnabled())
+					logger.trace("Will parse uptime: " + upTimeNode.getTextContent());
 				uptime = Long.parseLong(upTimeNode.getTextContent());
 			}
 			logger.debug("uptime for " + this + " is " + uptime);
@@ -110,7 +113,8 @@ public class XmlProvider extends Starter {
 				Node n = (Node)xpather.evaluate(xpath, d, XPathConstants.NODE);
 				double value = 0;
 				if(n != null) {
-					logger.trace(n);
+					if(logger.isTraceEnabled())
+						logger.trace(n);
 					value = Double.parseDouble(n.getTextContent());
 					oldMap.put(xpath, Double.valueOf(value));
 				}
@@ -126,14 +130,16 @@ public class XmlProvider extends Starter {
 
 	public Document getDocument(InputSource stream) {
 		Document d = null;
-		logger.trace("" + stream + " " + dbuilder + " " + this.isStarted() + " " + getClass().getName() + '@' + Integer.toHexString(hashCode()));
+		if(logger.isTraceEnabled())
+			logger.trace("" + stream + " " + dbuilder + " " + isStarted() + " " + getClass().getName() + '@' + Integer.toHexString(hashCode()));
 		try {
 			try {
 				dbuilder.reset();
 			} catch (UnsupportedOperationException e) {
 			}
 			d = dbuilder.parse(stream);
-			logger.trace("just parsed a " + d.getDocumentElement().getTagName() + " from " + this);
+			if(logger.isTraceEnabled())
+				logger.trace("just parsed a " + d.getDocumentElement().getTagName() + " from " + this);
 		} catch (SAXException e) {
 			logger.error("Invalid XML for the probe " + this + ":" + e, e);
 		} catch (IOException e) {
@@ -141,7 +147,7 @@ public class XmlProvider extends Starter {
 		}
 		return d;
 	}
-	
+
 	public Document getDocument(InputStream stream) {
 		return getDocument(new InputSource(stream));
 	}
@@ -168,13 +174,13 @@ public class XmlProvider extends Starter {
 	public XPath getXpather() {
 		return xpather;
 	}
-	
+
 	public NodeList getNodeList(Document d, String xpath) throws XPathExpressionException {
 		return  (NodeList) xpather.evaluate(xpath, d, XPathConstants.NODESET);
 	}
-	
+
 	public Node getNode(Document d, String xpath) throws XPathExpressionException {
 		return  (Node) xpather.evaluate(xpath, d, XPathConstants.NODE);
 	}
-	
+
 }

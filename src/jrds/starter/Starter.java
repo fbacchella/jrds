@@ -9,7 +9,7 @@ public abstract class Starter {
 
 	private StartersSet level = null;
 	private StarterNode parent;	
-	private boolean started = false;
+	volatile private boolean started = false;
 
 	/**
 	 * This method is called when the started is really registred<p/>
