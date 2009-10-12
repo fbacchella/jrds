@@ -12,12 +12,11 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 import jrds.ProbeConnected;
 
 public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
-	static final private Logger logger = Logger.getLogger(Ldap.class);
 
 	public Ldap() {
 		super(LdapConnection.class.getName());
@@ -30,15 +29,16 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
 
 		DirContext dctx = cnx.getConnection();
 
+		Set<String> collected = getCollectMapping().keySet();
 		Set<String> fieldSet = new HashSet<String>();
-		for(String collect : getCollectMapping().keySet()) {
+		for(String collect : collected) {
 			String[] parsed = collect.toString().split("\\?");
 			String field = parsed[0];
 			if(parsed.length == 2)
 				field = parsed[1];
 			fieldSet.add(field);
 		}
-		logger.trace("Attributes to collect "  + fieldSet);
+		log(Level.TRACE, "Attributes to collect %s", fieldSet);
 		
 		SearchControls sc = new SearchControls();
 		String[] attributeFilter = fieldSet.toArray(new String[]{});
@@ -47,7 +47,6 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
 		sc.setReturningObjFlag(false);
 
 		Map<String, Number> retValues = new HashMap<String, Number>();
-		Map<String, String> collectMap = getPd().getCollectStrings();
 		try {
 			NamingEnumeration<?> results = dctx.search(base, filter, sc);
 			while (results.hasMore()) {
@@ -57,20 +56,17 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
 					String collectName = a.getID();
 					if(! "".equals(dn))
 						collectName = dn + "?" + collectName;
-					logger.trace(collectName);
-					String ds = collectMap.get(collectName);
-					if(ds != null) {
+					log(Level.TRACE, "collect name: %s", collectName);
+					if(collected.contains(collectName)) {
 						double val = jrds.Util.parseStringNumber(a.get().toString(), Double.class, Double.NaN).doubleValue();
-						retValues.put(ds, val);
+						retValues.put(collectName, val);
 					}
 				}
 			}
 		} catch (NamingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log(Level.ERROR, e, e.getMessage());
 		}
-		logger.trace(retValues);
-		return null;
+		return retValues;
 	}
 
 	@Override

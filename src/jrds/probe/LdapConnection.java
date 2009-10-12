@@ -44,12 +44,6 @@ public class LdapConnection extends Connection<DirContext> {
 		return dctx;
 	}
 
-	@Override
-	public long getUptime() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 	/* (non-Javadoc)
 	 * @see jrds.Starter#start()
 	 */
@@ -93,7 +87,7 @@ public class LdapConnection extends Connection<DirContext> {
 	@Override
 	public long setUptime() {
 		// TODO Auto-generated method stub
-		return 0;
+		return 100000;
 	}
 
 }

@@ -7,15 +7,46 @@
 	<specific name="base">cn=Operations,cn=Monitor</specific>
 	<specific name="filter">objectclass=*</specific>
 	<ds>
-		<dsName>a</dsName>
+		<dsName>base_i</dsName>
 		<dsType>counter</dsType>
 		<collect>monitorOpInitiated</collect>
 	</ds>
 	<ds>
-		<dsName>b</dsName>
+		<dsName>base_c</dsName>
 		<dsType>counter</dsType>
 		<collect>monitorOpCompleted</collect>
 	</ds>
+	<ds>
+		<dsName>bind_i</dsName>
+		<dsType>counter</dsType>
+		<collect>cn=Bind?monitorOpInitiated</collect>
+	</ds>
+	<ds>
+		<dsName>bind_c</dsName>
+		<dsType>counter</dsType>
+		<collect>cn=Bind?monitorOpCompleted</collect>
+	</ds>
+	<ds>
+		<dsName>unbind_i</dsName>
+		<dsType>counter</dsType>
+		<collect>cn=Unbind?monitorOpInitiated</collect>
+	</ds>
+	<ds>
+		<dsName>unbind_c</dsName>
+		<dsType>counter</dsType>
+		<collect>cn=Search?monitorOpCompleted</collect>
+	</ds>
+	<ds>
+		<dsName>search_i</dsName>
+		<dsType>counter</dsType>
+		<collect>cn=Search?monitorOpInitiated</collect>
+	</ds>
+	<ds>
+		<dsName>search_c</dsName>
+		<dsType>counter</dsType>
+		<collect>cn=Search?monitorOpCompleted</collect>
+	</ds>
 	<graphs>
+		<name>OpenLdap</name>
 	</graphs>
 </probedesc>
