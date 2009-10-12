@@ -3,8 +3,8 @@
 	"urn:jrds:graphdesc">
 <graphdesc>
 	<name>ifbps</name>
-	<graphName>if-{2}</graphName>
-	<graphTitle>Bits exchanged on interface {2} on {1}</graphTitle>
+  <graphName>ifx-${index}</graphName>
+  <graphTitle>Bits exchanged on interface ${index} on ${host}</graphTitle>
 	<verticalLabel>bits/s</verticalLabel>
 	<lowerLimit>NaN</lowerLimit>
 	<add>
@@ -26,18 +26,18 @@
 		<graphType>area</graphType>
 		<legend>bits received/s</legend>
 	</add>
-	<hosttree>
-		<pathelement>HOST</pathelement>
-		<pathelement>NETWORK</pathelement>
-		<pathelement>INTERFACES</pathelement>
-		<pathelement>INDEX</pathelement>
-		<pathstring>bits exchanged</pathstring>
-	</hosttree>
-	<viewtree>
-		<pathelement>NETWORK</pathelement>
-		<pathelement>INTERFACES</pathelement>
-		<pathstring>bits exchanged</pathstring>
-		<pathelement>HOST</pathelement>
-		<pathelement>INDEX</pathelement>
-	</viewtree>
+  <hosttree>
+    <pathelement>HOST</pathelement>
+    <pathelement>NETWORK</pathelement>
+    <pathelement>INTERFACES</pathelement>
+    <pathelement>INDEX</pathelement>
+    <pathstring>Bits exchanged</pathstring>
+  </hosttree>
+  <viewtree>
+    <pathelement>NETWORK</pathelement>
+    <pathelement>INTERFACES</pathelement>
+    <pathstring>Bits exchanged</pathstring>
+    <pathelement>HOST</pathelement>
+    <pathelement>INDEX</pathelement>
+  </viewtree>
 </graphdesc>

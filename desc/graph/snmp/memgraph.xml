@@ -4,7 +4,7 @@
 <graphdesc>
   <name>MemGraph</name>
   <graphName>memory</graphName>
-  <graphTitle>Memory usage on {1}</graphTitle>
+  <graphTitle>Memory usage on ${host}</graphTitle>
   <unit>
     <binary/>
   </unit>
