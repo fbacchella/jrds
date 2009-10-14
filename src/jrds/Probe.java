@@ -379,7 +379,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 				create();
 			retValue = true;
 		} catch (Exception e) {
-				log(Level.ERROR, e, "Store %s unusable: %s", getRrdName(), e);
+			log(Level.ERROR, e, "Store %s unusable: %s", getRrdName(), e);
 		}
 		finally {
 			if(rrdDb != null)
@@ -442,8 +442,8 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 					Map<?, String> nameMap = getCollectMapping();
 					log(Level.TRACE, "Collect keys: %s", nameMap);
 					Map<KeyType, Number>filteredSamples = filterValues(sampleVals);
+					log(Level.TRACE, "Filtered values: %s", filteredSamples);
 					for(Map.Entry<KeyType, Number> e: filteredSamples.entrySet()) {
-						log(Level.TRACE, "Filtered values: %s", sampleVals);
 						String dsName = nameMap.get(e.getKey());
 						double value = e.getValue().doubleValue();
 						if (dsName != null) {
@@ -469,6 +469,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	 * @throws RrdException
 	 */
 	public void collect() {
+		boolean interrupted = true;
 		if(! finished) {
 			log(Level.ERROR, "Using an unfinished probe");
 			return;
@@ -490,6 +491,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 						if(namedLogger.isDebugEnabled())
 							log(Level.DEBUG, "%s", onesample.dump());
 						onesample.update();
+						interrupted = false;
 						//						checkThreshold(rrdDb);
 					}
 				}
@@ -497,13 +499,15 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 			catch (ArithmeticException ex) {
 				log(Level.WARN, ex, "Error while storing sample: %s", ex.getMessage());
 			} catch (Exception e) {
-					log(Level.ERROR, e, "Error while collecting: %s", e.getMessage());
+				log(Level.ERROR, e, "Error while collecting: %s", e.getMessage());
 			}
 			finally  {
 				starters.stopCollect();
 				if(rrdDb != null)
 					StoreOpener.releaseRrd(rrdDb);
 			}
+			if(interrupted) 
+				log(Level.INFO, "Interrupted");
 		}
 	}
 

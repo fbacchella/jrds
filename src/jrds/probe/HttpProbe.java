@@ -19,7 +19,7 @@ import jrds.RdsHost;
 import jrds.starter.Resolver;
 import jrds.starter.Starter;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 /**
 
@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
  * @version $Revision$,  $Date$
  */
 public abstract class HttpProbe extends Probe<String, Number> implements UrlProbe {
-	static final private Logger logger = Logger.getLogger(HttpProbe.class);
 	private URL url = null;
 	private String host = null;
 	private int	   port = 0;
@@ -88,19 +87,19 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 
 	private void finishConfigure() {
 		RdsHost monitoredHost = getHost();
-		logger.trace("Set host to " + monitoredHost);
+		log(Level.TRACE, "Set host to %s", monitoredHost);
 		host = monitoredHost.getDnsName();
 		try {
 			if(url != null)
 				setUrl(new URL(getUrl().getProtocol(), host, getUrl().getPort(), getUrl().getFile()));
 		} catch (MalformedURLException e) {
-			logger.error("URL " + "http://" + host + ":" + getUrl().getPort() + getUrl().getFile() + " is invalid");
+			log(Level.ERROR, e, "URL " + "http://%d:%s%s is invalid", host, getUrl().getPort(), getUrl().getFile());
 		}
 		URL tempurl = getUrl();
 		if("http".equals(tempurl.getProtocol())) {
 			resolver = new Resolver(url.getHost()).register(getHost());
 		}
-		logger.debug("Url to collect is " + getUrl());
+		log(Level.DEBUG, "Url to collect is %s", getUrl());
 	}
 
 	/* (non-Javadoc)
@@ -126,7 +125,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 	 */
 	public List<String> parseStreamToLines(InputStream stream) {
 		List<String> lines = java.util.Collections.emptyList();
-		logger.debug("Getting " + getUrl());
+		log(Level.DEBUG, "Getting %s", getUrl());
 		try {
 			BufferedReader in = new BufferedReader(new InputStreamReader(stream));
 			lines = new ArrayList<String>();
@@ -135,7 +134,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 				lines.add(lastLine);
 			in.close();
 		} catch (IOException e) {
-			logger.error("Unable to read url " + getUrl() + " because: " + e.getMessage());
+			log(Level.ERROR, e, "Unable to read url %s because; %s", getUrl(), e.getMessage());
 		}
 		return lines;
 	}
@@ -148,12 +147,12 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 		if(hostName != null) {
 			Starter resolver = getStarters().find(Resolver.makeKey(hostName));
 			if(resolver != null && ! resolver.isStarted()) {
-				logger.trace("Resolver not started for " + getUrl().getHost());
+				log(Level.TRACE, "Resolver not started for %s", hostName);
 				return Collections.emptyMap();
 			}
 		}
 		Map<String, Number> vars = java.util.Collections.emptyMap();
-		logger.debug("Getting " + getUrl());
+		log(Level.DEBUG, "Getting %s", getUrl());
 		URLConnection cnx = null;
 		try {
 			cnx = getUrl().openConnection();
@@ -161,7 +160,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 			cnx.setReadTimeout(getTimeout() * 1000);
 			cnx.connect();
 		} catch (IOException e) {
-			logger.error("Unable to read url " + getUrl() + " because: " + e);
+			log(Level.ERROR, e, "Unable to read url %s because; %s", getUrl(), e.getMessage());
 		}
 		try {
 			InputStream is = cnx.getInputStream();
@@ -173,14 +172,14 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 			try {
 				byte[] buffer = new byte[4096];
 				int respCode = ((HttpURLConnection)cnx).getResponseCode();
-				logger.error("Unable to read url " + getUrl() + " because: " + e +", http error code: " + respCode);
+				log(Level.ERROR, e, "Unable to read url %s because : %s, htt error code: %d", getUrl(), e.getMessage(),respCode);
 				InputStream es = ((HttpURLConnection)cnx).getErrorStream();
 				// read the response body
 				while (es.read(buffer) > 0) {}
 				// close the error stream
 				es.close();
 			} catch(IOException ex) {
-				logger.error("Unable to recover from error in url " + getUrl() + " because: " + e);
+				log(Level.ERROR, e, "Unable to recover from error in url %s because %s", getUrl(), e.getMessage());
 			}
 		}
 
@@ -221,7 +220,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 						String urlString = String.format("http://" + host + ":" + portStr + file, argslist.toArray());
 						url = new URL(urlString);
 					} catch (IllegalFormatConversionException e) {
-						logger.error("Illegal format string: " + "http://" + host + ":" + portStr + file + ", args: " + argslist.size());
+						log(Level.ERROR, "Illegal format string: http://%s:%s%s, args %d", host, portStr, file, argslist.size());
 						return null;
 					}
 				}
@@ -231,7 +230,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 					url = new URL("http", host, port, file);
 				}
 			} catch (MalformedURLException e) {
-				logger.error("URL " + "http://" + host + ":" + port + file + " is invalid");
+				log(Level.ERROR, e, "URL http://%s:%s%s is invalid",host , port, file);
 			}
 		}
 		return url;

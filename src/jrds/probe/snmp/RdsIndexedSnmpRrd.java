@@ -17,7 +17,7 @@ import java.util.Set;
 import jrds.probe.IndexedProbe;
 import jrds.snmp.SnmpRequester;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 import org.snmp4j.smi.OID;
 
 
@@ -26,8 +26,6 @@ import org.snmp4j.smi.OID;
  * @version $Revision$
  */
 public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
-
-	static final private Logger logger = Logger.getLogger(RdsIndexedSnmpRrd.class);
 
 	static public final String INDEXOIDNAME="index";
 
@@ -42,7 +40,6 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 		this.key = indexKey;
 		this.indexKey = indexKey;
 		return configure();
-
 	}
 
 	public boolean configure(Integer indexKey) {
@@ -84,8 +81,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 		return super.readSpecific();
 	}
 
-	public String getIndexName()
-	{
+	public String getIndexName(){
 		return indexKey;
 	}
 
@@ -121,7 +117,6 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 	 */
 	public Collection<int[]> setIndexValue() 
 	{
-
 		Collection<int[]> indexSubOid = null;
 		if(isUniq())
 			indexSubOid = new ArrayList<int[]>(1);
@@ -168,11 +163,11 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 							setSuffixLength(newSuffixLength);
 						}
 						else  {
-							logger.error("index for " + indexKey + " not found for " + this);
+							log(Level.ERROR, "index for %s not found", indexKey);
 							indexSubOid = null;
 						}
 					} catch (IOException e) {
-						logger.error("index for " + indexKey + " not found for " + this + " because of: " + e);
+						log(Level.ERROR, e, "index for %s not found because of %s", indexKey, e);
 					}
 				}
 				return indexSubOid;

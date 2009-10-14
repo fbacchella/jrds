@@ -76,7 +76,7 @@ public class HostsList extends Starter implements StarterNode {
 	private File rrdDir = null;
 	private File tmpDir = null;
 	private int timeout = 10;
-	private boolean started = false;
+	volatile private boolean started = false;
 	private Stats stats = new Stats(); 
 
 	/**

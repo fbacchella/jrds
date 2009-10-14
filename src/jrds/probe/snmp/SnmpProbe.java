@@ -1,9 +1,3 @@
-/*
- * Created on 23 nov. 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package jrds.probe.snmp;
 
 import java.io.IOException;
@@ -18,19 +12,16 @@ import jrds.ProbeDesc;
 import jrds.snmp.SnmpRequester;
 import jrds.snmp.SnmpStarter;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 import org.snmp4j.smi.OID;
 
-
 /**
+ * A abstract class from which all snmp probes should be derived.<p>
+ * An usefull command to browse the content of an snmp agent :<p>
+ * <quote>snmpbulkwalk -OX -c public -v 2c hostname  enterprises | sed -e 's/\[.*\]//' -e 's/ =.*$//'|  grep '::' | uniq </quote>
  * @author bacchell
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public abstract class SnmpProbe extends Probe<OID, Object> {
-	static final private Logger logger = Logger.getLogger(SnmpProbe.class);
-
 	public final static String REQUESTERNAME = "requester";
 	public final static String UPTIMEOIDNAME = "uptimeOid";
 	private Map<OID, String> nameMap = null;
@@ -50,7 +41,7 @@ public abstract class SnmpProbe extends Probe<OID, Object> {
 	public boolean configure() {
 		SnmpStarter snmp = getSnmpStarter();
 		if(snmp == null) {
-			logger.error("No snmp connection configured for " + this);
+			log(Level.ERROR, "No snmp connection configured");
 			return false;
 		}
 		return true;
@@ -66,21 +57,21 @@ public abstract class SnmpProbe extends Probe<OID, Object> {
 		String uptimeOidName =  getPd().getSpecific(UPTIMEOIDNAME);
 		try {
 			if(requesterName != null) {
-				logger.trace("Setting requester to " + requesterName);
+				log(Level.TRACE, "Setting requester to %s", requesterName);
 				requester = (SnmpRequester) SnmpRequester.class.getField(requesterName.toUpperCase()).get(null);
 				readOK = true;
 			}
 			else {
-				logger.error("No requester found");
+				log(Level.ERROR, "No requester found");
 			}
 			if(uptimeOidName != null) {
-				logger.trace("Setting uptime OID to " + uptimeOidName);
+				log(Level.TRACE, "Setting uptime OID to %s", uptimeOidName);
 				uptimeoid = new OID(uptimeOidName);
 				if(uptimeoid == null)
 					readOK = false;
 			}
 		} catch (Exception e) {
-			logger.error("Unable to read specific: "+ e);
+			log(Level.ERROR, e, "Unable to read specific: %s", e.getMessage());
 		}
 		return readOK && super.readSpecific();
 	}
@@ -112,7 +103,7 @@ public abstract class SnmpProbe extends Probe<OID, Object> {
 				try {
 					retValue = requester.doSnmpGet(getSnmpStarter(), oids);
 				} catch (IOException e) {
-					logger.error("SNMP error with probe " + this + ": " +e);
+					log(Level.ERROR, e, "IO Error: %s", e.getMessage());
 				}
 			}
 		}
@@ -142,7 +133,6 @@ public abstract class SnmpProbe extends Probe<OID, Object> {
 				Date value = (Date) o;
 				retValue.put(oid, new Double(value.getTime()));
 			}
-
 		}
 		return retValue;
 	}
