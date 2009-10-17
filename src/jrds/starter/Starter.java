@@ -31,8 +31,8 @@ public abstract class Starter {
 	public final void doStop() {
 		if(started) {
 			logger.trace("Stopping " + this);
-			stop();
 			started = false;
+			stop();
 		}
 	}
 	public boolean start() {
