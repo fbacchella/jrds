@@ -16,7 +16,7 @@ import org.junit.Test;
 public class TestPropertiesManager {
 	static final private Logger logger = Logger.getLogger(TestPropertiesManager.class);
 	static private final Random r= new Random();
-	static private final File tmpdir = new File(System.getProperty("java.io.tmpdir"), "jrds"); 
+//	static private final File tmpdir = new File(System.getProperty(),); 
 	static private final String[] dirs = new String[] {"configdir", "rrddir", "tmpdir"};
 
 	@BeforeClass
@@ -24,6 +24,7 @@ public class TestPropertiesManager {
 		Tools.configure();
 		logger.setLevel(Level.TRACE);
 		Tools.setLevel(new String[] {"jrds.PropertiesManager"}, logger.getLevel());
+		System.setProperty("java.io.tmpdir",  "tmp");
 	}
 	
 	@Test
@@ -43,6 +44,7 @@ public class TestPropertiesManager {
 
 	@Test
 	public void testConfig1() {
+		File tmpdir = new File(System.getProperty("java.io.tmpdir"),"jrds"); 
 		boolean toclean = tmpdir.isDirectory();
 		PropertiesManager pm = new PropertiesManager();
 		pm.update();
@@ -79,6 +81,7 @@ public class TestPropertiesManager {
 
 	@Test
 	public void testConfig3() throws IOException {
+		File tmpdir = new File(System.getProperty("java.io.tmpdir"),"jrds"); 
 		PropertiesManager pm = new PropertiesManager();
 
 		Map<String, File> dirMap = new HashMap<String, File>(dirs.length);

@@ -1,5 +1,6 @@
 package jrds;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +39,7 @@ public class Log4jTest {
 		Logger jrdsLogger = LogManager.getLoggerRepository().exists("jrds");
 		Assert.assertNotNull(jrdsLogger);
 		PropertiesManager pm = new PropertiesManager();
+		pm.tmpdir = new File("tmp");
 		JrdsLoggerConfiguration.configure(pm);
 		Assert.assertEquals(pm.loglevel, jrdsLogger.getLevel());
 	}
@@ -52,7 +54,9 @@ public class Log4jTest {
 		Logger.getRootLogger().addAppender(ta);
 		JrdsLoggerConfiguration.initLog4J();
 		Assert.assertNotNull(LogManager.getLoggerRepository().exists("jrds"));
-		JrdsLoggerConfiguration.configure(new PropertiesManager());
+		PropertiesManager pm = new PropertiesManager();
+		pm.tmpdir = new File("tmp");
+		JrdsLoggerConfiguration.configure(pm);
 		l.error("A message");
 		l.debug("A debug message");
 		Assert.assertEquals(1, logs.size());
