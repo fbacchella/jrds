@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -166,6 +167,8 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 			InputStream is = cnx.getInputStream();
 			vars = parseStream(is);
 			is.close();
+		} catch(ConnectException e) {
+			log(Level.ERROR, e, "Connection refused to %", getUrl());
 		} catch (IOException e) {
 			//Clean http connection error management
 			//see http://java.sun.com/j2se/1.5.0/docs/guide/net/http-keepalive.html
@@ -179,7 +182,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 				// close the error stream
 				es.close();
 			} catch(IOException ex) {
-				log(Level.ERROR, e, "Unable to recover from error in url %s because %s", getUrl(), e.getMessage());
+				log(Level.ERROR, ex, "Unable to recover from error in url %s because %s", getUrl(), ex.getMessage());
 			}
 		}
 

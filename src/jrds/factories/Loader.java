@@ -109,6 +109,7 @@ public class Loader {
 
 	private final FileFilter filter = new  FileFilter(){
 		public boolean accept(File file) {
+			logger.trace(file);
 			return  (! file.isHidden()) && (file.isDirectory()) || (file.isFile() && file.getName().endsWith(".xml"));
 		}
 	};
@@ -180,11 +181,18 @@ public class Loader {
 	}
 
 	public void importDir(File path) {
+		logger.trace("Importing " + path);
 		if(! path.isDirectory()) {
 			logger.warn(path + " is not a directory");
 			return;
 		}
-		for(File f: path.listFiles(filter)) {
+		//listFiles can return null
+		File[] foundFiles = path.listFiles(filter);
+		if(foundFiles == null) {
+			logger.error("Failed to import " + path);
+			return;
+		}
+		for(File f: foundFiles) {
 			if(f.isDirectory()) {
 				importDir(f);
 			}

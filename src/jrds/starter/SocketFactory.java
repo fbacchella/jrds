@@ -76,7 +76,7 @@ public class SocketFactory extends Starter {
 	}
 
 	/**
-	 * @param timeout the timeout to set
+	 * @param timeout the timeout to set (in seconds)
 	 */
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;

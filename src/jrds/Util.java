@@ -488,7 +488,7 @@ public class Util {
 				line.append("[" + source.toString() + "] ");
 			line.append(String.format(format, args));
 			namedLogger.log(l, line.toString());
-			if(e != null && l.isGreaterOrEqual(Level.DEBUG)) {
+			if(e != null && namedLogger.isDebugEnabled()) {
 				namedLogger.log(l, "Error stack: ", e);
 			}
 		}

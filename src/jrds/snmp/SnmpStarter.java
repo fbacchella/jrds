@@ -122,7 +122,7 @@ public class SnmpStarter extends Starter {
 				ResponseEvent re = snmp.send(requestPDU, snmpTarget);
 				PDU response = re.getResponse();
 				if(response == null) {
-					throw new IOException("SNMP Timeout for " + snmpTarget);
+					throw new IOException("SNMP Timeout");
 				}
 				Object value = new SnmpVars(response).get(uptimeoid);
 				if(value instanceof Number) {

@@ -64,7 +64,7 @@ public abstract class Mysql extends JdbcProbe {
 				return started;
 			}
 			public String getUrlAsString() {
-				return "jdbc:mysql://" + getHost() + ":" + getPort() + "/" + getDbName();
+				return "jdbc:mysql://" + getHost().getDnsName() + ":" + getPort() + "/" + getDbName();
 			}
 			@Override
 			public Properties getProperties() {

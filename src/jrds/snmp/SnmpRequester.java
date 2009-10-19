@@ -8,6 +8,7 @@ package jrds.snmp;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,6 @@ import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.VariableBinding;
-import org.snmp4j.util.DefaultPDUFactory;
 import org.snmp4j.util.PDUFactory;
 import org.snmp4j.util.TableEvent;
 import org.snmp4j.util.TableUtils;
@@ -95,6 +95,7 @@ public abstract class SnmpRequester {
 				oids.toArray(oidTab);
 				for(TableEvent te: (Iterable<TableEvent>)tableRet.getTable(snmpTarget, oidTab, null, null)) {
 					if(! starter.isStarted()) {
+						retValue = new SnmpVars();
 						break;
 					}
 					if(! te.isError()) {
@@ -163,45 +164,44 @@ public abstract class SnmpRequester {
 	};
 
 	private static final Map<OID, Object> doRequest(SnmpStarter starter, VariableBinding[] vars) throws IOException {
-		Map<OID, Object> snmpVars = new SnmpVars();
+		Map<OID, Object> snmpVars = Collections.emptyMap();
 
 		Target snmpTarget = starter.getTarget();
-		PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
+		PDU requestPDU = starter.getPdufactory().createPDU(snmpTarget);
 
 		requestPDU.addAll(vars);
 
+		//If no oid to collect, nothing to do
+		if(requestPDU.size() < 1) 
+			return Collections.emptyMap();
+
 		boolean doAgain = true;
 		Snmp snmp = starter.getSnmp();
-		do {
-			PDU response = null;
-			if(starter.isStarted() && requestPDU.size() > 0) {
-				ResponseEvent re = snmp.send(requestPDU, snmpTarget);
-				response = re.getResponse();
-			}
+		while(doAgain && starter.isStarted()) {
+			ResponseEvent re = snmp.send(requestPDU, snmpTarget);
+			PDU response = re.getResponse();
 			if (response != null && response.getErrorStatus() == SnmpConstants.SNMP_ERROR_SUCCESS){
 				snmpVars = new SnmpVars(response);
 				doAgain = false;
 			}	
-			else {		
-				if(response == null) {
-					throw new IOException("SNMP Timeout, address=" + snmpTarget.getAddress() + ", requestID=" + requestPDU.getRequestID());
-				}
-				else {
-					int index = response.getErrorIndex() - 1;
-					VariableBinding vb = response.get(index);
-					logger.warn(response.getErrorStatusText() + " on " + vb.getOid().toString());
-					/*If there is still variable to get, we try again*/
-					if(requestPDU.size() > 1) {
-						requestPDU = response;
-						response = null;
-						requestPDU.remove(index);
-						requestPDU.setType(PDU.GET);
-					}
-					else
-						doAgain = false;
-				}
+			else if(response == null) {
+				throw new IOException("SNMP Timeout");
 			}
-		} while (doAgain && starter.isStarted());
+			else {
+				int index = response.getErrorIndex() - 1;
+				VariableBinding vb = response.get(index);
+				logger.warn(response.getErrorStatusText() + " on " + vb.getOid().toString());
+				/*If there is still variable to get, we try again*/
+				if(requestPDU.size() > 1) {
+					requestPDU = response;
+					response = null;
+					requestPDU.remove(index);
+					requestPDU.setType(PDU.GET);
+				}
+				else
+					doAgain = false;
+			}
+		};
 		return snmpVars;
 
 	}

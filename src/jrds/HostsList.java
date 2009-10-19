@@ -147,6 +147,8 @@ public class HostsList extends Starter implements StarterNode {
 		started = true;
 		rrdDir = pm.rrddir;
 		tmpDir = pm.tmpdir;
+		
+		((SocketFactory) getStarters().find(SocketFactory.class)).setTimeout(pm.timeout);
 
 		renderer = new Renderer(50, step, tmpDir);
 		
