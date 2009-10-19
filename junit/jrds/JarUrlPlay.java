@@ -56,7 +56,7 @@ public class JarUrlPlay {
 	}
 
 	private String ressourcePath(Object o) {
-		if(o instanceof Class) {
+		if(o instanceof Class<?>) {
 			Class<?> c = (Class<?>) o;
 			return "/".concat(c.getName().replace(".", "/").concat(".class"));
 		}

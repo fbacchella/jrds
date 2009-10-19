@@ -73,7 +73,6 @@ public class TestLoadConfiguration {
 		l.importUrl(new URL("file:desc"));
 
 		pm.setProperty("configdir", "tmp");
-		//pm.setProperty("rrdbackend", "NIO");
 		pm.setProperty("rrddir", "tmp");
 		pm.update();
 
@@ -81,8 +80,8 @@ public class TestLoadConfiguration {
 		conf.setGraphDescMap(l.getRepository(Loader.ConfigType.GRAPHDESC));
 		conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
 
-		logger.setLevel(Level.ERROR);
-		Tools.setLevel(new String[] {"jrds.factories"}, logger.getLevel());
+		logger.setLevel(Level.TRACE);
+		Tools.setLevel(new String[] {"jrds.factories","jrds.Probe"}, logger.getLevel());
 
 	}
 
@@ -127,7 +126,7 @@ public class TestLoadConfiguration {
 		logger.trace(hostMap);
 		RdsHost h = hostMap.get("myhost");
 		Assert.assertNotNull(h);
-		Assert.assertEquals("myhost",h.getName());
+		Assert.assertEquals("myhost", h.getName());
 		logger.debug("properties: " + h.getStarters().find(ChainedProperties.class.getName()));
 		Collection<Probe<?,?>> probes = h.getProbes();
 		Assert.assertEquals(2, probes.size());

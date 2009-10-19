@@ -7,7 +7,7 @@ import jrds.Probe;
 import jrds.probe.UrlProbe;
 
 public class DummyProbeIndexedUrl extends DummyProbeIndexed implements UrlProbe {
-	Class<? extends Probe> originalProbe;
+	Class<? extends Probe<?,?>> originalProbe;
 	URL url;
 
 	public void configure (Class<? extends Probe<?,?>> originalProbe) {

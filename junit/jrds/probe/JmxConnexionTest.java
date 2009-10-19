@@ -17,8 +17,12 @@ import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.TabularData;
 
+import jrds.RdsHost;
 import jrds.Tools;
+import jrds.mockobjects.GetMoke;
 import jrds.starter.Connection;
+import jrds.starter.Resolver;
+import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
@@ -30,17 +34,26 @@ public class JmxConnexionTest {
 	@BeforeClass static public void configure() throws Exception {
 		Tools.configure();
 		Tools.setLevel(new String[] {JmxConnexionTest.class.getName(),jrds.probe.JMXConnection.class.getName() }, logger.getLevel());
+//		RuntimeMXBean mxbean = ManagementFactory.getRuntimeMXBean();
+//		JMXConnectorServerFactory.newJMXConnectorServer(null, null, mxbean.);
 	}
 
 	@Test
 	public void build1() throws MalformedObjectNameException, NullPointerException, AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException, IOException, IntrospectionException {
+		
+		
+		RdsHost host = GetMoke.getHost("localhost");
 		Connection<MBeanServerConnection> cnx = new JMXConnection(8998) {
 			@Override
 			public String getHostName() {
 				return "localhost";
 			}	
 		};
+		Resolver r = new Resolver(cnx.getHostName());
+		r.register(host);
+		cnx.register(host);
 		boolean started = cnx.start();
+		Assert.assertFalse(started);
 		if(! started)
 			return;
 		MBeanServerConnection mbean =  cnx.getConnection();

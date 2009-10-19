@@ -6,7 +6,7 @@ import java.util.Map;
 
 import jrds.Probe;
 
-public class MokeProbe extends Probe {
+public class MokeProbe<A,B> extends Probe<A,B> {
 
 	@SuppressWarnings("unchecked")
 	@Override

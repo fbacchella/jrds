@@ -1,4 +1,5 @@
 <host name="myhost">
+	<snmp community="public" version="2" />
 	<properties>
 		<entry key="bidule1">toto1</entry>
 	</properties>
@@ -10,5 +11,4 @@
 	</probe>
 	<probe type="TcpSnmp">
 	</probe>
-	<snmp community="public" version="2" />
 </host>

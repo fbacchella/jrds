@@ -35,6 +35,7 @@ public class SnmpWalk {
 	@BeforeClass
 	static public void configure() throws IOException {
 		Tools.configure();
+		logger.setLevel(Level.DEBUG);
 		Tools.setLevel(new String[] {"jrds"}, logger.getLevel());
 		logger.addAppender(Logger.getLogger("jrds").getAppender("jrds"));
 	}

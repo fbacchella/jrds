@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.factories.ConfigObjectFactory;
-import jrds.factories.GraphFactory;
 import jrds.factories.Loader;
 import jrds.factories.ProbeFactory;
 import jrds.mockobjects.DummyProbe;
@@ -52,8 +51,7 @@ public class AllProbeCreationTest {
 		Map<String, GraphDesc> graphDescMap = conf.setGraphDescMap(l.getRepository(Loader.ConfigType.GRAPHDESC));
 		Map<String, ProbeDesc> probeDescMap = conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
 
-		GraphFactory gf = new GraphFactory(graphDescMap, pm.legacymode);
-		ProbeFactory pf = new ProbeFactory(probeDescMap, gf, pm);
+		ProbeFactory pf = new ProbeFactory(probeDescMap, graphDescMap, pm);
 
 		RdsHost host = new RdsHost("Empty");
 		host.setHostDir(pm.rrddir);

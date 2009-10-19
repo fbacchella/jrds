@@ -7,7 +7,6 @@ import java.net.URL;
 
 import jrds.Tools;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,7 +36,7 @@ public class UriParse {
 				retValue = jarUrl.getPath();
 			else
 				retValue = scn + " not found";
-			Class Uriclass = uri.getClass();
+			Class<?> Uriclass = uri.getClass();
 			for(Method m: Uriclass.getDeclaredMethods()) {
 				if(m.getName().startsWith("get")) {
 					Object getted = m.invoke(uri);

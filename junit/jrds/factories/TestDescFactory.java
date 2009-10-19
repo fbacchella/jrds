@@ -123,7 +123,7 @@ public class TestDescFactory {
 				Assert.assertEquals(base++, ((Integer)o).intValue());
 		}
 		Assert.assertEquals(82, base);
-		Assert.assertTrue(defaultargs.get(2) instanceof List);
+		Assert.assertTrue(defaultargs.get(2) instanceof List<?>);
 		//A collect string "" should not be collected
 		Assert.assertEquals(3, pd.getCollectMapping().size());
 		Assert.assertEquals(1, pd.getCollectOids().size());

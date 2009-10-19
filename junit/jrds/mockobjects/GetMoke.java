@@ -31,6 +31,10 @@ public class GetMoke {
 	static public RdsHost getHost() {
 		return new RdsHost("MokeHost");
 	}
+
+	static public RdsHost getHost(String name) {
+		return new RdsHost(name);
+	}
 	
 	static public ProbeDesc getPd() {
 		ProbeDesc pd = new ProbeDesc();
@@ -40,8 +44,8 @@ public class GetMoke {
 		return pd;
 	}
 	
-	static public Probe getProbe() {
-		Probe p = new MokeProbe();
+	static public Probe<?,?> getProbe() {
+		Probe<?,?> p = new MokeProbe<String, Number>();
 		p.setPd(getPd());
 		p.setHost(getHost());
 		return p;
@@ -111,7 +115,9 @@ public class GetMoke {
 			public Cookie[] getCookies() { return null; }
 			public long getDateHeader(String arg0)  { return 0; }
 			public String getHeader(String arg0) { return null; }
+			@SuppressWarnings("unchecked")
 			public Enumeration getHeaderNames() { return null; }
+			@SuppressWarnings("unchecked")
 			public Enumeration getHeaders(String arg0) { return null; }
 			public int getIntHeader(String arg0) { return 0; }
 			public String getMethod() { return null; }
@@ -132,6 +138,7 @@ public class GetMoke {
 			public boolean isRequestedSessionIdValid() { return false; }
 			public boolean isUserInRole(String arg0)  { return false; }
 			public Object getAttribute(String arg0) { return null; }
+			@SuppressWarnings("unchecked")
 			public Enumeration getAttributeNames() { return null; }
 			public String getCharacterEncoding() { return null; }
 			public int getContentLength() { return 0; }
@@ -149,6 +156,7 @@ public class GetMoke {
 					return array[0];
 				return null;
 			}
+			@SuppressWarnings("unchecked")
 			public Map getParameterMap() { return parameters; }
 			@SuppressWarnings("unchecked")
 			public Enumeration getParameterNames()  { return null; }

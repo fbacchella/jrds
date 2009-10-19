@@ -80,7 +80,7 @@ public class DummyProbe extends Probe<String, Number> {
 	@Test(expected=NullPointerException.class)
 	public void GetDetails() throws Exception, IOException
 	{
-		for(Class c : this.getClass().getInterfaces()) {
+		for(Class<?> c : this.getClass().getInterfaces()) {
 			System.out.println(c);
 		}
 

@@ -16,7 +16,7 @@ import org.rrd4j.core.RrdDb;
 public class TestThreshold {
 	static final private Logger logger = Logger.getLogger(TestThreshold.class);
 
-	static Probe p = null;
+	static Probe<?,?> p = null;
 	static RrdDb db = null;
 
 	@BeforeClass

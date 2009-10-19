@@ -164,7 +164,7 @@ public class UtilTest {
 	
 	@Test
 	public void testParseTemplate1() {
-		Probe p = new MokeProbe();
+		Probe<?,?> p = new MokeProbe<String, Number>();
 		p.setHost(new RdsHost("Moke"));
 		p.setLabel("label");
 		String parsed = Util.parseTemplate("${host} ${probename} ${label}", p);
@@ -181,7 +181,7 @@ public class UtilTest {
 	
 	@Test
 	public void testNormalization1() {
-		Probe p = new jrds.mockobjects.DummyProbe() {
+		Probe<?,?> p = new jrds.mockobjects.DummyProbe() {
 			@Override
 			public Date getLastUpdate() {
 				return new Date();
@@ -195,7 +195,7 @@ public class UtilTest {
 
 	@Test
 	public void testNormalization2() {		
-		Probe p = new jrds.mockobjects.DummyProbe() {
+		Probe<?,?> p = new jrds.mockobjects.DummyProbe() {
 			@Override
 			public Date getLastUpdate() {
 				Date now = new Date();
@@ -214,7 +214,7 @@ public class UtilTest {
 
 	@Test
 	public void testNormalization3() {		
-		Probe p = new jrds.mockobjects.DummyProbe() {
+		Probe<?,?> p = new jrds.mockobjects.DummyProbe() {
 			@Override
 			public Date getLastUpdate() {
 				Date now = new Date();
