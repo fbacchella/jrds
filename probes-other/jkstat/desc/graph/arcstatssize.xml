@@ -6,13 +6,35 @@
 	<graphName>arcstatssize</graphName>
 	<graphTitle>ARC size on ${host}</graphTitle>
 	<unit>
-		<binary /></unit>
+		<binary />
+	</unit>
 	<verticalLabel>bytes</verticalLabel>
 	<add>
-		<name>size</name>
+		<name>c</name>
+	</add>
+	<add>
+		<name>p</name>
 		<graphType>area</graphType>
 		<color>GREEN</color>
-		<legend>ARC Size</legend>
+		<legend>Most Recently Used Cache Size</legend>
+	</add>
+	<add>
+		<rpn>c,p,-</rpn>
+		<graphType>stack</graphType>
+		<color>BLUE</color>
+		<legend>Most Frequently Used Cache Size</legend>
+	</add>
+	<add>
+		<rpn>c</rpn>
+		<graphType>line</graphType>
+		<color>BLACK</color>
+		<legend>Target Size (Adaptive)</legend>
+	</add>
+	<add>
+		<name>size</name>
+		<graphType>line</graphType>
+		<color>RED</color>
+		<legend>Current Size</legend>
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>
