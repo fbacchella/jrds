@@ -152,7 +152,6 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 				return Collections.emptyMap();
 			}
 		}
-		Map<String, Number> vars = java.util.Collections.emptyMap();
 		log(Level.DEBUG, "Getting %s", getUrl());
 		URLConnection cnx = null;
 		try {
@@ -161,21 +160,23 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 			cnx.setReadTimeout(getTimeout() * 1000);
 			cnx.connect();
 		} catch (IOException e) {
-			log(Level.ERROR, e, "Unable to read url %s because; %s", getUrl(), e.getMessage());
+			log(Level.ERROR, e, "Connection to %s failed: %s", getUrl(), e.getMessage());
+			return Collections.emptyMap();
 		}
 		try {
 			InputStream is = cnx.getInputStream();
-			vars = parseStream(is);
+			Map<String, Number> vars = parseStream(is);
 			is.close();
+			return vars;
 		} catch(ConnectException e) {
-			log(Level.ERROR, e, "Connection refused to %", getUrl());
+			log(Level.ERROR, e, "Connection refused to %s", getUrl());
 		} catch (IOException e) {
 			//Clean http connection error management
 			//see http://java.sun.com/j2se/1.5.0/docs/guide/net/http-keepalive.html
 			try {
 				byte[] buffer = new byte[4096];
 				int respCode = ((HttpURLConnection)cnx).getResponseCode();
-				log(Level.ERROR, e, "Unable to read url %s because : %s, htt error code: %d", getUrl(), e.getMessage(),respCode);
+				log(Level.ERROR, e, "Unable to read url %s because: %s, http error code: %d", getUrl(), e.getMessage(), respCode);
 				InputStream es = ((HttpURLConnection)cnx).getErrorStream();
 				// read the response body
 				while (es.read(buffer) > 0) {}
@@ -186,7 +187,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 			}
 		}
 
-		return vars;
+		return Collections.emptyMap();
 	}
 
 	/**
