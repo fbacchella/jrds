@@ -7,50 +7,62 @@
 	<specific name="module">sd</specific>
 	<specific name="name">sd${instance}</specific>
 	<specific name="index">sd${instance}</specific>
+	<!--cumulative run length*time product-->
 	<ds>
 		<dsName>rlentime</dsName>
 		<dsType>counter</dsType>
 	</ds>
+	<!--number of write operations-->
 	<ds>
 		<dsName>writes</dsName>
 		<dsType>counter</dsType>
 	</ds>
+	<!--cumulative wait length*time product-->
 	<ds>
 		<dsName>wlentime</dsName>
 		<dsType>counter</dsType>
 	</ds>
+	<!--count of elements in run state-->
 	<ds>
 		<dsName>rcnt</dsName>
 		<dsType>gauge</dsType>
 	</ds>
+	<!--number of read operations-->
 	<ds>
 		<dsName>reads</dsName>
 		<dsType>counter</dsType>
 	</ds>
+	<!--number of bytes read-->
 	<ds>
 		<dsName>nread</dsName>
 		<dsType>counter</dsType>
 	</ds>
+	<!--number of bytes written-->
 	<ds>
 		<dsName>nwritten</dsName>
 		<dsType>counter</dsType>
 	</ds>
+	<!--last time wait queue changed-->
 	<ds>
 		<dsName>wlastupdate</dsName>
 		<dsType>gauge</dsType>
 	</ds>
+	<!--cumulative wait (pre-service) time-->
 	<ds>
 		<dsName>wtime</dsName>
 		<dsType>counter</dsType>
 	</ds>
+	<!--count of elements in wait state-->
 	<ds>
 		<dsName>wcnt</dsName>
 		<dsType>counter</dsType>
 	</ds>
+	<!--cumulative run (service) time-->
 	<ds>
 		<dsName>rtime</dsName>
 		<dsType>counter</dsType>
 	</ds>
+	<!--last time run queue changed-->
 	<ds>
 		<dsName>rlastupdate</dsName>
 		<dsType>gauge</dsType>
@@ -59,5 +71,6 @@
 		<name>KstatDiskstatBytes</name>
 		<name>KstatDiskstatOps</name>
 		<name>KstatDiskstatQueue</name>
+		<name>KstatDiskstatWait</name>
 	</graphs>
 </probedesc>

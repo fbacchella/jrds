@@ -1,41 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<!-- Time unit is nanosec -->
 <graphdesc>
-  <name>KstatDiskstatWait</name>
-  <graphName>diskwait-${index}</graphName>
-  <graphTitle>Average wait time on disk ${index} on ${host}</graphTitle>
-  <unit>
-    <SI />
-    <base>m</base>
-  </unit>
-  <verticalLabel>s</verticalLabel>
-  <add>
-    <name>r</name>
-  </add>
-  <add>
-    <name>w</name>
-  </add>
-  <add>
-    <name>wwaittm</name>
-  </add>
-  <add>
-    <rpn>wwaittm, r, w, +, 1000, *, /</rpn>
-    <graphType>line</graphType>
-    <color>blue</color>
-    <legend>Average wait time</legend>
-  </add>
-  <hosttree>
-    <pathelement>HOST</pathelement>
-    <pathelement>DISK</pathelement>
-    <pathelement>DISKACTIVITY</pathelement>
-    <pathelement>INDEX</pathelement>
-    <pathstring>Average wait time</pathstring>
-  </hosttree>
-  <viewtree>
-    <pathelement>DISK</pathelement>
-    <pathelement>DISKACTIVITY</pathelement>
-    <pathstring>Average wait time</pathstring>
-    <pathelement>HOST</pathelement>
-    <pathelement>INDEX</pathelement>
-  </viewtree>
+	<name>KstatDiskstatWait</name>
+	<graphName>diskwait-${index}</graphName>
+	<graphTitle>Average wait time on disk ${index} on ${host}</graphTitle>
+	<unit>
+		<SI />
+		<base>m</base>
+	</unit>
+	<verticalLabel>s</verticalLabel>
+	<add>
+		<name>reads</name>
+	</add>
+	<add>
+		<name>writes</name>
+	</add>
+	<add>
+		<name>rlentime</name>
+	</add>
+	<add>
+		<name>wlentime</name>
+	</add>
+	<add>
+		<rpn>wlentime, reads, writes, +, 1000000000, *, /</rpn>
+		<graphType>line</graphType>
+		<color>blue</color>
+		<legend>Average wait time</legend>
+	</add>
+	<add>
+		<rpn>rlentime, reads, writes, +, 1000000000, *, /</rpn>
+		<graphType>line</graphType>
+		<color>green</color>
+		<legend>Average service time</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>DISK</pathelement>
+		<pathelement>DISKACTIVITY</pathelement>
+		<pathelement>INDEX</pathelement>
+		<pathstring>Average wait time</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>DISK</pathelement>
+		<pathelement>DISKACTIVITY</pathelement>
+		<pathstring>Average wait time</pathstring>
+		<pathelement>HOST</pathelement>
+		<pathelement>INDEX</pathelement>
+	</viewtree>
 </graphdesc>
