@@ -7,11 +7,8 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import jrds.HostsList;
 
 /**
  * This servlet is used to download the values of a graph as an xml file
@@ -20,13 +17,13 @@ import jrds.HostsList;
  * @version $Revision$
  */
 
-public class Download extends HttpServlet {
+public class Download extends JrdsServlet {
 	private static final String CONTENT_TYPE = "text/csv";
 
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
-			throws ServletException, IOException {
+	throws ServletException, IOException {
 
-		ParamsBean params = new ParamsBean(req, (HostsList) getServletContext().getAttribute(HostsList.class.getName()));
+		ParamsBean params = getParamsBean(req);
 
 		res.setContentType(CONTENT_TYPE);
 
