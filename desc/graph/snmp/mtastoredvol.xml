@@ -13,13 +13,13 @@
   <hosttree>
     <pathelement>HOST</pathelement>
     <pathelement>SERVICES</pathelement>
-    <pathstring>MAIL</pathstring>
+    <pathstring>Mail</pathstring>
     <pathelement>INDEX</pathelement>
     <pathstring>Stored volume</pathstring>
   </hosttree>
   <viewtree>
    <pathelement>SERVICES</pathelement>
-    <pathstring>MAIL</pathstring>
+    <pathstring>Mail</pathstring>
     <pathelement>HOST</pathelement>
     <pathelement>INDEX</pathelement>
     <pathstring>Stored volume</pathstring>
