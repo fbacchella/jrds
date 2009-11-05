@@ -13,7 +13,7 @@
     </ds>
     <ds>
         <dsName>mtaGroupRejectedMsg</dsName>
-        <dsType>gauge</dsType>
+        <dsType>counter</dsType>
         <oid>.1.3.6.1.2.1.28.2.1.3</oid>
     </ds>
     <ds>

@@ -17,6 +17,12 @@
     <graphType>area</graphType>
     <legend>Received</legend>
   </add>
+  <add>
+    <name>mtaGroupRejectedMsg</name>
+    <reversed>true</reversed>
+    <graphType>stack</graphType>
+    <legend>Rejected</legend>
+  </add>
   <hosttree>
     <pathelement>HOST</pathelement>
     <pathelement>SERVICES</pathelement>
