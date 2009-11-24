@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN"
+	"urn:jrds:probedesc">
+<probedesc>
+	<name>LighthttpdStatus</name>
+	<probeName>lighthttpdstatus_${index}</probeName>
+	<probeClass>jrds.probe.ApacheStatus</probeClass>
+	<defaultargs>
+		<arg type="Integer" value="80"/>
+	</defaultargs>
+	<ds>
+		<dsName>Total Accesses</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>Total kBytes</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>BusyWorkers</dsName>
+		<dsType>gauge</dsType>
+		<collect>BusyServers</collect>
+	</ds>
+	<ds>
+		<dsName>IdleWorkers</dsName>
+		<dsType>gauge</dsType>
+		<collect>IdleServers</collect>
+	</ds>
+	<graphs>
+		<name>ApacheRequests</name>
+		<name>ApacheTransfer</name>
+		<name>ApacheWorkers</name>
+	</graphs>
+</probedesc>
