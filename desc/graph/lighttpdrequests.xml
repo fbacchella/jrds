@@ -2,33 +2,30 @@
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
                            "urn:jrds:graphdesc">
 <graphdesc>
-	<name>ApacheTransfer</name>
-	<graphName>apachetransfer_${index}</graphName>
-	<graphTitle>Bytes transfered on port ${index}</graphTitle>
+	<name>LighttpdRequests</name>
+	<graphName>lighttpdreq_${index}</graphName>
+	<graphTitle>Lighttpd's requests on port ${index}</graphTitle>
 	<unit>
-		<SI />
+		<base />
 	</unit>
-	<verticalLabel>Bytes/s</verticalLabel>
+	<verticalLabel>Requests/s</verticalLabel>
 	<add>
-		<name>Total kBytes</name>
-	</add>
-	<add>
-		<rpn>Total kBytes, 1024, *</rpn>
+		<name>Total Accesses</name>
 		<graphType>line</graphType>
 		<color>GREEN</color>
-		<legend>Bytes transfered</legend>
+		<legend>Requests</legend>
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>
 		<pathelement>SERVICES</pathelement>
-		<pathstring>Apache Activity</pathstring>
+		<pathstring>Lighttpd Activity</pathstring>
 		<pathelement>INDEX</pathelement>
-		<pathstring>Bytes transfered/s</pathstring>
+		<pathstring>Requests/s</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>SERVICES</pathelement>
-		<pathstring>Apache Activity</pathstring>
-		<pathstring>Bytes transfered/s</pathstring>
+		<pathstring>Lighttpd Activity</pathstring>
+		<pathstring>Requests/s</pathstring>
 		<pathelement>URL</pathelement>
 	</viewtree>
 </graphdesc>
