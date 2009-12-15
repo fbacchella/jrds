@@ -184,7 +184,7 @@ public class HostBuilder extends ObjectBuilder {
 				((ConnectedProbe)p).setConnectionName(connexionName);
 			}
 		}
-		List<Object> args = ArgFactory.makeArgs(probeNode);
+		List<Object> args = ArgFactory.makeArgs(probeNode, host);
 		if(pf.configure(p, args))
 			return p;
 		else {
