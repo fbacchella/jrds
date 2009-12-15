@@ -24,7 +24,7 @@ import jrds.Util;
 import jrds.starter.SocketFactory;
 import jrds.starter.XmlProvider;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -37,8 +37,6 @@ public class Ribcl extends Probe<String, Number> {
 	static final private String encoding = "ISO-8859-1";
 	static final private String eol = "\r\n";
 	static final private String xmlHeader = "<?xml version=\"1.0\" ?>" + eol;
-
-	static final private Logger logger = Logger.getLogger(Ribcl.class);
 
 	XmlProvider xmlstarter = null;
 
@@ -71,7 +69,7 @@ public class Ribcl extends Probe<String, Number> {
 		try {
 			s = connect();
 		} catch (Exception e) {
-			logger.error("SSL connect error for " + this + " " + e);
+			log(Level.ERROR, e, "SSL connect error %s", e);
 			return java.util.Collections.emptyMap();
 		}
 
@@ -98,7 +96,7 @@ public class Ribcl extends Probe<String, Number> {
 			}
 			s.close();
 		} catch (IOException e) {
-			logger.error("SSL socket error for " + this + " :" + e);
+			log(Level.ERROR, e, "SSL socket error %s", e);
 		}
 
 		return vars;
@@ -134,7 +132,7 @@ public class Ribcl extends Probe<String, Number> {
 			Util.serialize(ribclQ, out, null, properties);
 		} catch (TransformerException e) {
 		} catch (IOException e) {
-			logger.fatal("Unable to serialize in memory");
+			log(Level.FATAL, e, "Unable to serialize in memory");
 			throw new Error(e);
 		}
 	}
@@ -165,16 +163,15 @@ public class Ribcl extends Probe<String, Number> {
 
 		SSLSocketFactory ssf = sc.getSocketFactory();
 		s = ssf.createSocket(s, iloHost, port, true);
-		logger.debug("done SSL handshake for " + iloHost);
-
+		log(Level.DEBUG, "done SSL handshake for %s", iloHost);
 		return s;
 	}
 
 	public void parse(String message, Map<String, Number> vars) {
 		if(message == null ||  "".equals(message))
 			return;
-		logger.trace("new message to parse: ");
-		logger.trace(message);
+		log(Level.TRACE,"new message to parse: ");
+		log(Level.TRACE,message);
 		//The XML returned from an iLO is buggy, up to ilO2 1.50 
 		message = message.replaceAll("<RIBCL VERSION=\"[0-9\\.]+\"/>", "<RIBCL >");
 		Document d = this.xmlstarter.getDocument(new StringReader(message));
