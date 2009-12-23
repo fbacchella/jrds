@@ -7,16 +7,17 @@ _##########################################################################*/
 package jrds.probe.rstat;
 
 import java.io.IOException;
-import java.net.InetAddress;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import jrds.Probe;
+import jrds.starter.Resolver;
 
 import org.acplt.oncrpc.OncRpcException;
 import org.acplt.oncrpc.OncRpcProgramNotRegisteredException;
 import org.acplt.oncrpc.OncRpcProtocols;
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 /**
  * This probe is used to collect data throught rstatd, version 3. The process in.rstatd or rstat
@@ -25,16 +26,23 @@ import org.apache.log4j.Logger;
  * @author Fabrice Bacchella
  * @version $Revision: 365 $
  */
-public class RstatProbe3 extends Probe {
-	static final private Logger logger = Logger.getLogger(RstatProbe3.class);
+public class RstatProbe3 extends Probe<String, Number> {
 
+	public void configure() {
+		
+	}
+	
 	/* (non-Javadoc)
 	 * @see jrds.Probe#getNewSampleValues()
 	 */
-	public Map getNewSampleValues() {
-		Map<String,Double> retValue = new HashMap<String,Double>();
+	public Map<String, Number> getNewSampleValues() {
+		Resolver r = (Resolver) getStarters().find(Resolver.makeKey(this));
+		if(! r.isStarted()) {
+			return Collections.emptyMap();
+		}
+		Map<String,Number> retValue = new HashMap<String,Number>();
 		try {
-			rstatClient c = new rstatClient(InetAddress.getByName(getHost().getName()), OncRpcProtocols.ONCRPC_UDP);
+			rstatClient c = new rstatClient(r.getInetAddress(), OncRpcProtocols.ONCRPC_UDP);
 			statstime st = c.RSTATPROC_STATS_3();
 			retValue.put("v_pgpgin", new Double(st.v_pgpgin));
 			retValue.put("v_pgpgout", new Double(st.v_pgpgout));
@@ -46,11 +54,11 @@ public class RstatProbe3 extends Probe {
 			long currtime = st.curtime.tv_sec + st.curtime.tv_sec/1000000;
 			setUptime(currtime - bootime);
 		} catch ( OncRpcProgramNotRegisteredException e ) {
-			logger.error("ONC/RPC program server not found: " + getHost().getName());
+			log(Level.ERROR, "ONC/RPC program server not found");
 		} catch ( OncRpcException e ) {
-			logger.error("Could not contact portmapper: " + e.getMessage());
+			log(Level.ERROR, e, "Could not contact portmapper: %s", e.getMessage());
 		} catch ( IOException e ) {
-			logger.error("Could not contact portmapper: " + e.getMessage());
+			log(Level.ERROR, e, "Could not contact portmapper: %s", e.getMessage());
 		}
 		return retValue;
 	}
@@ -58,6 +66,5 @@ public class RstatProbe3 extends Probe {
 	public String getSourceType() {
 		return "rstat v3";
 	}
-
 
 }
