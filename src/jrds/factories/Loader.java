@@ -109,7 +109,6 @@ public class Loader {
 
 	private final FileFilter filter = new  FileFilter(){
 		public boolean accept(File file) {
-			logger.trace(file);
 			return  (! file.isHidden()) && (file.isDirectory()) || (file.isFile() && file.getName().endsWith(".xml"));
 		}
 	};
@@ -177,11 +176,10 @@ public class Loader {
 		} catch (IOException e) {
 			logger.error("Invalid URL " + ressourceUrl + ": " + e);
 		}
-
 	}
 
 	public void importDir(File path) {
-		logger.trace("Importing " + path);
+		logger.trace("Importing directory " + path);
 		if(! path.isDirectory()) {
 			logger.warn(path + " is not a directory");
 			return;
@@ -215,10 +213,12 @@ public class Loader {
 	}
 
 	public void importJar(JarFile jarfile) throws IOException {
+		if(logger.isTraceEnabled())
+			logger.trace("Importing jar " + jarfile.getName());
 		for(JarEntry je: Collections.list(jarfile.entries())) {
 			String name = je.getName();
 			if( !je.isDirectory() && name.endsWith(".xml") && (name.startsWith("desc/") || name.startsWith("graph/") || name.startsWith("probe/"))) {
-				logger.trace("Will import " + je);
+				logger.trace("Will import jar entry " + je);
 				try {
 					if(! importStream(jarfile.getInputStream(je))) {
 						logger.warn("Unknonw type " + je + " in jar " + jarfile);
