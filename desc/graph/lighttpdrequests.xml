@@ -10,7 +10,7 @@
 	</unit>
 	<verticalLabel>Requests/s</verticalLabel>
 	<add>
-		<name>Total Accesses</name>
+		<name>TotalAccesses</name>
 		<graphType>line</graphType>
 		<color>GREEN</color>
 		<legend>Requests</legend>

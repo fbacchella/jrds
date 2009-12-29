@@ -2,7 +2,7 @@
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
                            "urn:jrds:graphdesc">
 <graphdesc>
-	<name>>LighttpdTransfer</name>
+	<name>LighttpdTransfer</name>
 	<graphName>lighttptransfer_${index}</graphName>
 	<graphTitle>Bytes transfered by Lighttpd on port ${index}</graphTitle>
 	<unit>
@@ -10,10 +10,10 @@
 	</unit>
 	<verticalLabel>Bytes/s</verticalLabel>
 	<add>
-		<name>Total kBytes</name>
+		<name>TotalkBytes</name>
 	</add>
 	<add>
-		<rpn>Total kBytes, 1024, *</rpn>
+		<rpn>TotalkBytes, 1024, *</rpn>
 		<graphType>line</graphType>
 		<color>GREEN</color>
 		<legend>Bytes transfered</legend>
