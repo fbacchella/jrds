@@ -221,7 +221,7 @@ public class Loader {
 				logger.trace("Will import jar entry " + je);
 				try {
 					if(! importStream(jarfile.getInputStream(je))) {
-						logger.warn("Unknonw type " + je + " in jar " + jarfile);
+						logger.warn("Unknown type " + je + " in jar " + jarfile);
 					}
 				} catch (SAXParseException e) {
 					logger.error("Invalid xml document " + je + " in " + jarfile + " (line " + e.getLineNumber() + "): " + e.getMessage());
@@ -238,19 +238,20 @@ public class Loader {
 		for(ConfigType t: ConfigType.values()) {
 			if(t.memberof(d)) {
 				logger.trace("Found a " + t);
-				known = true;
 				JrdsNode n = d.getChild(t.getNameXpath());
-				String name = n.getTextContent().trim();
 				//We check the Name
-				if(n != null && ! "".equals(name)) {
+				if(n != null && ! "".equals(n.getTextContent().trim())) {
+					String name = n.getTextContent().trim();
 					Map<String, JrdsNode> rep = repositories.get(t);
 					//We warn for dual inclusion, none is loaded, as we don't know the good one
 					if(rep.containsKey(name)) {
 						logger.error("Dual definition of " + t + " with name " + name);
 						rep.remove(name);
 					}
-					else
+					else {
 						rep.put(name, d);
+						known = true;
+					}
 				}
 				break;
 			}
