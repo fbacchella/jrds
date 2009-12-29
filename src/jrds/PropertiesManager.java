@@ -29,7 +29,13 @@ import org.apache.log4j.Logger;
  */
 public class PropertiesManager extends Properties {
 	private final Logger logger = Logger.getLogger(PropertiesManager.class);
-	
+
+	private final FileFilter filter = new  FileFilter(){
+		public boolean accept(File file) {
+			return (! file.isHidden()) && (file.isFile() && file.getName().endsWith(".jar"));
+		}
+	};
+
 	//The default constructor cannot build directories, canact is used to detect that
 	private boolean canact = false;
 
@@ -239,6 +245,9 @@ public class PropertiesManager extends Properties {
 			if(tmpDirPath != null || "".equals(tmpDirPath))
 				tmpdir = prepareDir(new File(tmpDirPath, "jrds"), true);
 		}
+		if(tmpdir == null) {
+			throw new RuntimeException("No temp dir defined");
+		}
 
 		step = parseInteger(getProperty("step", "300"));
 		timeout = parseInteger(getProperty("timeout", "30"));
@@ -249,14 +258,31 @@ public class PropertiesManager extends Properties {
 		if(! "".equals(libspathString)) {
 			for(String libName: libspathString.split(";")) {
 				File lib = new File(libName);
-				if(lib.isFile() || lib.isDirectory())
+
+				boolean noJarDir = true;
+				if(lib.isDirectory()) {
+					File[] foundFiles = lib.listFiles(filter);
+					if(foundFiles == null) {
+						logger.error("Failed to search in " + lib);
+						continue;
+					}
+					for(File f: foundFiles) {
+						try {
+							libspath.add(f.toURI().toURL());
+							noJarDir = false;
+						} catch (MalformedURLException e) {
+							logger.error("Invalid libs directory: " + f);
+						}
+					}
+				}
+
+				//If a jar was found previously, it's not a source directory, don't add it
+				if(lib.isFile() || (lib.isDirectory() && noJarDir))
 					try {
 						libspath.add(lib.toURI().toURL());
 					} catch (MalformedURLException e) {
 						logger.fatal("What is this library " + lib);
 					}
-					else
-						logger.error("Invalid lib path: "+ libName);
 			}
 		}
 		extensionClassLoader = doClassLoader(getProperty("classpath", ""));
