@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+	<name>KstatMemUsage</name>
+	<probeName>memusage</probeName>
+	<probeClass>jrds.probe.KstatProbe</probeClass>
+	<specific name="module">unix</specific>
+	<specific name="name">vminfo</specific>
+	<ds>
+		<dsName>freemem</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>swap_avail</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>swap_free</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>swap_resv</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>swap_alloc</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<graphs>
+		<name>KstatFreeMem</name>
+		<name>KstatSwapUsed</name>
+	</graphs>
+</probedesc>

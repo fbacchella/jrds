@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+                           "urn:jrds:graphdesc">
+<graphdesc>
+	<name>KstatSwapUsed</name>
+	<graphName>swapused</graphName>
+	<graphTitle>Swap use on ${host}</graphTitle>
+	<unit>
+		<binary /></unit>
+	<verticalLabel>bytes</verticalLabel>
+	<add>
+		<name>swap_resv</name>
+	</add>
+	<add>
+		<name>swap_alloc</name>
+	</add>
+	<add>
+		<name>swap_avail</name>
+	</add>
+	<add>
+		<rpn>swap_resv, 1024, *</rpn>
+		<graphType>area</graphType>
+		<color>RED</color>
+		<legend>Swap reserverd</legend>
+	</add>
+	<add>
+		<rpn>swap_alloc, 1024, *</rpn>
+		<graphType>stack</graphType>
+		<color>BLUE</color>
+		<legend>Swap allocated</legend>
+	</add>
+	<add>
+		<rpn>swap_avail, 1024, *</rpn>
+		<graphType>stack</graphType>
+		<color>GREEN</color>
+		<legend>Swap available</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>MEMORY</pathelement>
+		<pathstring>Swap usage</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>MEMORY</pathelement>
+		<pathstring>Swap usage</pathstring>
+		<pathelement>HOST</pathelement>
+	</viewtree>
+</graphdesc>
