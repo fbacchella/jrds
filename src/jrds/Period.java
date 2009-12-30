@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,11 +27,13 @@ import org.apache.log4j.Logger;
  */
 public class Period {
 	static final private Logger logger = Logger.getLogger(Period.class);
-	static private final DateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-	static private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-	static private final String dateRegexp = "(\\d\\d\\d\\d-\\d\\d-\\d\\d)?";
+	static private final DateFormat isoFormatShort = new SimpleDateFormat("yyyyMMdd'T'HH:mm:ssZ");
+	static private final DateFormat dateFormatShort= new SimpleDateFormat("yyyyMMdd");
+	static private final String dateRegexpBoth = "(\\d\\d\\d\\d-?\\d\\d-?\\d\\d)?";
 	static private final String timeRegexp = "(\\d?\\d:\\d\\d)?(:\\d\\d)?";
-	static private final Pattern datePattern = Pattern.compile( dateRegexp + "[T ]?" + timeRegexp);
+	static private final Pattern datePatternBoth = Pattern.compile( dateRegexpBoth+ "[T ]?" + timeRegexp + "(.*)");
+	static private final Pattern secondsPattern = Pattern.compile( "\\d+");
+	static private final String timeZone = TimeZone.getDefault().getDisplayName();
 
 	private static class PeriodItem {
 		String name;
@@ -111,7 +114,7 @@ public class Period {
 		this.begin = string2Date(begin, true);
 		calPeriod = 0;
 	}
-	
+
 	public void setBegin(Date begin) {
 		this.begin = begin;
 		calPeriod = 0;
@@ -123,7 +126,7 @@ public class Period {
 	public Date getEnd() {
 		return end;
 	}
-	
+
 	/**
 	 * @param end The end to set.
 	 * @throws ParseException 
@@ -132,7 +135,7 @@ public class Period {
 		this.end = string2Date(end, false);
 		calPeriod = 0;
 	}
-	
+
 	public void setEnd(Date end) {
 		this.end = end;
 	}
@@ -151,7 +154,7 @@ public class Period {
 	}
 
 	/**
-	 * Calculate date from string parametrs comming from the URL
+	 * Calculate date from string parameters coming from the URL
 	 *
 	 * @param sbegin String
 	 * @param send String
@@ -161,62 +164,77 @@ public class Period {
 	 */
 	private Date string2Date(String date, boolean isBegin) throws ParseException{
 		Date foundDate = null;
-		if(date != null) {
-			Matcher dateMatcher = datePattern.matcher(date);
-			if("NOW".compareToIgnoreCase(date) == 0) {
-				foundDate = new Date();
+		if(date == null) {
+			throw new ParseException("Null string to parse", 0);
+		}
+		Matcher dateMatcher = datePatternBoth.matcher(date);
+		if("NOW".compareToIgnoreCase(date) == 0) {
+			foundDate = new Date();
+		}
+		else if(secondsPattern.matcher(date).matches()) {
+			try {
+				long value = Long.parseLong(date);
+				if(value == 0)
+					foundDate = new Date();
+				else if(value > 0)
+					foundDate = new Date(value);
+				else
+					calPeriod = (int) value;
+			} catch (NumberFormatException e) {
+				throw new ParseException("Not a long: " + e.getMessage(), 0);
+			}				
+		}
+		else if(date.length() >= 4 && dateMatcher.find()) {
+			if(logger.isTraceEnabled()) {
+				logger.trace("Matching " + date);
+				for(int i = 1; i <= dateMatcher.groupCount(); i++) {
+					logger.trace(i +": " + "'" + dateMatcher.group(i) + "'");
+				}
 			}
-			else if(date.length() >= 4 && dateMatcher.matches()) {
-				if(logger.isTraceEnabled()) {
-					logger.trace("Matching " + date);
-					for(int i = 1; i <= dateMatcher.groupCount(); i++) {
-						logger.trace(i +": " + dateMatcher.group(i));
-					}
-				}
-				String dateFound = dateMatcher.group(1);
-				String timeFound = dateMatcher.group(2);
-				String secondFound = dateMatcher.group(3);
-				if(secondFound == null) {
-					if(isBegin)
-						secondFound = ":00";
-					else
-						secondFound = ":59";	
-				}
-				if(timeFound == null) {
-					if(isBegin)
-						timeFound = "00:00";
-					else
-						timeFound = "23:59";
-				}
-				if(dateFound == null) {
-					Date now = new Date();
+			String dateFound = dateMatcher.group(1);
+			String timeFound = dateMatcher.group(2);
+			String secondFound = dateMatcher.group(3);
+			String timeZoneFound = dateMatcher.group(4);
+			if(dateFound == null && timeFound == null && secondFound == null) {
+				throw new ParseException("Invalid string to parse: " + date, 0);
+			}
+			if(secondFound == null) {
+				if(isBegin)
+					secondFound = ":00";
+				else
+					secondFound = ":59";	
+			}
+			if(timeFound == null) {
+				if(isBegin)
+					timeFound = "00:00";
+				else
+					timeFound = "23:59";
+			}
+			if(dateFound == null) {
+				Date now = new Date();
 
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(now);
-					dateFound = dateFormat.format(cal.getTime());
-				}
-				isoFormat.setLenient(false);
-				foundDate = isoFormat.parse(dateFound + "T" + timeFound + secondFound);
-
+				Calendar cal = Calendar.getInstance();
+				cal.setTime(now);
+				dateFound = dateFormatShort.format(cal.getTime());
 			}
 			else {
-				try {
-					long value = Long.parseLong(date);
-					if(value == 0)
-						foundDate = new Date();
-					else if(value > 0)
-						foundDate = new Date(value);
-					else
-						calPeriod = (int) value;
-				} catch (NumberFormatException e) {
-					throw new ParseException("Not a long: " + e.getMessage(), 0);
-				}
+				dateFound = dateFound.replaceAll("-", "");
 			}
+			if(timeZoneFound == null || "".equals(timeZoneFound)) {
+				timeZoneFound = timeZone;
+			}
+			else if("Z".equals(timeZoneFound.toUpperCase())) {
+				timeZoneFound="+0000";
+			}
+			isoFormatShort.setLenient(false);
+			foundDate = isoFormatShort.parse(dateFound + "T" + timeFound + secondFound + timeZoneFound);
 		}
-		else 
-			throw new ParseException("Null string to parse", 0);
+		else {
+			throw new ParseException("Invalid string to parse: " + date, 0);
+		}
 		return foundDate;
 	}
+	
 	static public List<String> getPeriodNames() {
 		List<String> periodName = new ArrayList<String>(periodList.size());
 		for(Period.PeriodItem pi: periodList) 

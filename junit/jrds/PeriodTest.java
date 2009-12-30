@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -16,6 +17,7 @@ public class PeriodTest {
 	static final private Logger logger = Logger.getLogger(PeriodTest.class);
 
 	static final private DateFormat fullISOFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+	static final private DateFormat strictISOFORMAT = new SimpleDateFormat("yyyyMMdd'T'HH:mm:ssZ");
 
 	private Date begin;
 	private Date end;
@@ -23,6 +25,7 @@ public class PeriodTest {
 	@BeforeClass 
 	static public void configure() throws IOException {
 		jrds.Tools.configure();
+		logger.setLevel(Level.WARN);
 		Tools.setLevel(new String[] {"jrds.Period"}, logger.getLevel());
 	}
 
@@ -132,6 +135,15 @@ public class PeriodTest {
 		begin = fullISOFORMAT.parse("2007-01-01T00:00:00");
 		end = fullISOFORMAT.parse("2007-12-31T23:59:59");
 		Period p = new Period("2007-01-01T00:00:00", "2007-12-31T23:59:59");
+		Assert.assertEquals(begin, p.getBegin());
+		Assert.assertEquals(end, p.getEnd());
+		Assert.assertEquals(0, p.getScale());
+	}
+	@Test
+	public void StrictIsoFormat() throws ParseException {
+		begin = strictISOFORMAT.parse("20070101T00:00:00+0000");
+		end = fullISOFORMAT.parse("2007-12-31T23:59:59");
+		Period p = new Period("20070101T00:00:00Z", "20071231T23:59:59");
 		Assert.assertEquals(begin, p.getBegin());
 		Assert.assertEquals(end, p.getEnd());
 		Assert.assertEquals(0, p.getScale());
