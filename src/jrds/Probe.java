@@ -425,7 +425,16 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 
 	@SuppressWarnings("unchecked")
 	public Map<KeyType, String> getCollectMapping() {
-		return (Map<KeyType, String>)getPd().getCollectMapping();
+		Map<KeyType, String> rawMap = (Map<KeyType, String>)getPd().getCollectMapping();
+		Map<KeyType, String> retValues = new HashMap<KeyType, String>(rawMap.size());
+		for(Map.Entry<KeyType, String> e: rawMap.entrySet()) {
+			String value = jrds.Util.parseTemplate(e.getValue(), this);
+			KeyType key = e.getKey();
+			if(key instanceof String)
+				key = (KeyType)jrds.Util.parseTemplate((String)key, this);
+			retValues.put(key, value);
+		}
+		return retValues;
 	}
 
 	/**
