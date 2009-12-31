@@ -17,16 +17,18 @@ public class LdapConnection extends Connection<DirContext> {
 	private String password;
 	private int port = 389;
 	DirContext dctx = null;
+	
+	long uptime;
 
 	public LdapConnection() {
 		super();
 	}
 
-	public LdapConnection(int port) {
+	public LdapConnection(Integer port) {
 		super();
 		this.port = port;
 	}
-	public LdapConnection(int port, String binddn, String password) {
+	public LdapConnection(Integer port, String binddn, String password) {
 		super();
 		this.binddn = binddn;
 		this.password = password;
@@ -75,6 +77,7 @@ public class LdapConnection extends Connection<DirContext> {
 	 */
 	@Override
 	public void stopConnection() {
+		uptime = 1;
 		if(dctx != null)
 			try {
 				dctx.close();
@@ -86,8 +89,7 @@ public class LdapConnection extends Connection<DirContext> {
 
 	@Override
 	public long setUptime() {
-		// TODO Auto-generated method stub
-		return 100000;
+		return uptime;
 	}
 
 }

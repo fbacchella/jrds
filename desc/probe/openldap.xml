@@ -4,47 +4,47 @@
 	<name>OpenLdap</name>
 	<probeName>openldap</probeName>
 	<probeClass>jrds.probe.Ldap</probeClass>
-	<specific name="base">cn=Operations,cn=Monitor</specific>
-	<specific name="filter">objectclass=*</specific>
+	<specific name="startTimePath">cn=Monitor?modifyTimestamp</specific>
+	<specific name="timePattern">yyyyMMddHHmmss'Z'</specific>
 	<ds>
 		<dsName>base_i</dsName>
 		<dsType>counter</dsType>
-		<collect>monitorOpInitiated</collect>
+		<collect>cn=Operations,cn=Monitor?monitorOpInitiated</collect>
 	</ds>
 	<ds>
 		<dsName>base_c</dsName>
 		<dsType>counter</dsType>
-		<collect>monitorOpCompleted</collect>
+		<collect>cn=Operations,cn=Monitor?monitorOpCompleted</collect>
 	</ds>
 	<ds>
 		<dsName>bind_i</dsName>
 		<dsType>counter</dsType>
-		<collect>cn=Bind?monitorOpInitiated</collect>
+		<collect>cn=Bind,cn=Operations,cn=Monitor?monitorOpInitiated</collect>
 	</ds>
 	<ds>
 		<dsName>bind_c</dsName>
 		<dsType>counter</dsType>
-		<collect>cn=Bind?monitorOpCompleted</collect>
+		<collect>cn=Bind,cn=Operations,cn=Monitor?monitorOpCompleted</collect>
 	</ds>
 	<ds>
 		<dsName>unbind_i</dsName>
 		<dsType>counter</dsType>
-		<collect>cn=Unbind?monitorOpInitiated</collect>
+		<collect>cn=Unbind,cn=Operations,cn=Monitor?monitorOpInitiated</collect>
 	</ds>
 	<ds>
 		<dsName>unbind_c</dsName>
 		<dsType>counter</dsType>
-		<collect>cn=Search?monitorOpCompleted</collect>
+		<collect>cn=Unbind,cn=Operations,cn=Monitor?monitorOpCompleted</collect>
 	</ds>
 	<ds>
 		<dsName>search_i</dsName>
 		<dsType>counter</dsType>
-		<collect>cn=Search?monitorOpInitiated</collect>
+		<collect>cn=Search,cn=Operations,cn=Monitor?monitorOpInitiated</collect>
 	</ds>
 	<ds>
 		<dsName>search_c</dsName>
 		<dsType>counter</dsType>
-		<collect>cn=Search?monitorOpCompleted</collect>
+		<collect>cn=Search,cn=Operations,cn=Monitor?monitorOpCompleted</collect>
 	</ds>
 	<graphs>
 		<name>OpenLdap</name>
