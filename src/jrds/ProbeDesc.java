@@ -38,7 +38,6 @@ public class ProbeDesc {
 	private Map<String, String> specific = new HashMap<String, String>();;
 	private String probeName;
 	private String name;
-	private Collection<?> namedProbesNames;
 	private Collection<String> graphClasses = new ArrayList<String>();
 	private boolean uniqIndex = false;
 	private Class<? extends Probe<?,?>> probeClass = null;
@@ -198,7 +197,7 @@ public class ProbeDesc {
 		}
 		return retValue;
 	}
-
+	
 	public DsDef[] getDsDefs() 
 	{
 		List<DsDef> dsList = new ArrayList<DsDef>(dsMap.size());
@@ -244,20 +243,6 @@ public class ProbeDesc {
 		this.uptimefactor = uptimefactor;
 	}
 
-	/**
-	 * @return Returns the muninsProbeName.
-	 */
-	public Collection<?> getNamedProbesNames() {
-		return namedProbesNames;
-	}
-
-	public void setNamedProbesNames(Collection<String> muninsProbesNames) {
-		this.namedProbesNames = muninsProbesNames;
-	}
-
-	public void setMuninsProbesNames(String[] muninsProbesNames) {
-		this.namedProbesNames = Arrays.asList(muninsProbesNames);
-	}
 	/**
 	 * @return Returns the graphClasses.
 	 */

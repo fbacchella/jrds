@@ -15,20 +15,13 @@ import jrds.RdsHost;
  *
  * TODO
  */
-public class CpuLoadMunins extends MuninsProbe {
+public class CpuLoadMunins extends Munin {
 	static final private ProbeDesc pd = new ProbeDesc(1);
 	static {
 		pd.add("la1", DsType.GAUGE, "load.value");
-		pd.setMuninsProbesNames(new String[] { "load" });
+		//pd.setMuninsProbesNames(new String[] { "load" });
 		pd.setProbeName("laveragemunins");
 
-		pd.setGraphClasses(new Object[] {"cpuload"});
-	}
-
-	/**
-	 * @param monitoredHost
-	 */
-	public CpuLoadMunins(RdsHost monitoredHost) {
-		super(monitoredHost, pd);
+		//pd.setGraphClasses(new Object[] {"cpuload"});
 	}
 }

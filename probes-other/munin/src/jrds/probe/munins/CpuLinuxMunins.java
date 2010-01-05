@@ -17,7 +17,7 @@ import jrds.RdsHost;
  *
  * TODO
  */
-public class CpuLinuxMunins extends MuninsProbe {
+public class CpuLinuxMunins extends Munin {
 	static final private ProbeDesc pd = new ProbeDesc(7);
 	static {
 		pd.add("user", DsType.COUNTER, "user.value");
@@ -28,7 +28,7 @@ public class CpuLinuxMunins extends MuninsProbe {
 		pd.add("irq", DsType.COUNTER, "irq.value");
 		pd.add("softirq", DsType.COUNTER, "softirq.value");
 		pd.setProbeName("cpulinuxmunins");
-		pd.setMuninsProbesNames(new String[] { "cpu"});
+		//pd.setMuninsProbesNames(new String[] { "cpu"});
 		
 		GraphDesc gd = new GraphDesc(7);
 		gd.add("system", GraphDesc.AREA, "system");
@@ -46,13 +46,6 @@ public class CpuLinuxMunins extends MuninsProbe {
 		gd.setViewTree(new Object[] {
 				GraphDesc.SYSTEM, GraphDesc.LOAD, "CPU usage", GraphDesc.HOST});
 		
-		pd.setGraphClasses(new Object[] {gd});
-	}
-	
-	/**
-	 * @param monitoredHost
-	 */
-	public CpuLinuxMunins(RdsHost monitoredHost) {
-		super(monitoredHost, pd);
+		//pd.setGraphClasses(new Object[] {gd});
 	}
 }

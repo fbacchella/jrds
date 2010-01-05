@@ -5,11 +5,9 @@
  */
 package jrds.probe.munins;
 
-import org.rrd4j.DsType;
-
 import jrds.ProbeDesc;
-import jrds.RdsHost;
-import jrds.graphe.PagingSolarisMuninsGraph;
+
+import org.rrd4j.DsType;
 
 
 /**
@@ -17,7 +15,7 @@ import jrds.graphe.PagingSolarisMuninsGraph;
  *
  * TODO 
  */
-public class PagingSolarisMunins extends MuninsProbe {
+public class PagingSolarisMunins extends Munin {
 	static final private ProbeDesc pd = new ProbeDesc(1);
 	static {
 		pd.add("pgin", DsType.COUNTER, "pgin.value");
@@ -27,15 +25,8 @@ public class PagingSolarisMunins extends MuninsProbe {
 		pd.add("scan", DsType.COUNTER, "scan.value");
 		pd.add("pgpgout", DsType.COUNTER, "pgpgout.value");
 		pd.add("pgfree", DsType.COUNTER, "pgfree.value");
-		pd.setGraphClasses(new Class[] {PagingSolarisMuninsGraph.class});
-		pd.setMuninsProbesNames(new String[] { "paging_in", "paging_out" });
+//		pd.setGraphClasses(new Class[] {PagingSolarisMuninsGraph.class});
+//		pd.setMuninsProbesNames(new String[] { "paging_in", "paging_out" });
 		pd.setProbeName("pageingmunins");
-	}
-
-	/**
-	 * @param monitoredHost
-	 */
-	public PagingSolarisMunins(RdsHost monitoredHost) {
-		super(monitoredHost, pd);
 	}
 }

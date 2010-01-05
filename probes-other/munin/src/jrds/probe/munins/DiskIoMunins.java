@@ -21,7 +21,7 @@ import jrds.RdsHost;
  *
  * TODO 
  */
-public class DiskIoMunins extends MuninsIndexedNameProbe {
+public class DiskIoMunins extends MuninIndexed {
 	static final private ProbeDesc pd = new ProbeDesc(6);
 	static {
 		pd.add("rtime", DsType.GAUGE, "rtime.value");
@@ -30,30 +30,24 @@ public class DiskIoMunins extends MuninsIndexedNameProbe {
 		pd.add("diskIOWrites", DsType.COUNTER, "writes.value");
 		pd.add("diskIONRead", DsType.COUNTER, "nread.value");
 		pd.add("diskIONWritten", DsType.COUNTER, "nwritten.value");
-		pd.setMuninsProbesNames(new String[] { "io_busy", "io_ops", "io_bytes"});
+		//pd.setMuninsProbesNames(new String[] { "io_busy_${index}", "io_ops_${index}", "io_bytes_${index}"});
 		pd.setProbeName("io-{1}_munins");
-		pd.setGraphClasses(new Object[] {"DiskIoGraphBytes", "DiskIoGraphReq", "DiskIoGraphSize"});
+		//pd.setGraphClasses(new Object[] {"DiskIoGraphBytes", "DiskIoGraphReq", "DiskIoGraphSize"});
 	}
 
-	/**
-	 * @param monitoredHost
-	 */
-	public DiskIoMunins(RdsHost monitoredHost, String indexKey) {
-		super(monitoredHost, pd, indexKey);
-	}
-	public Collection getMuninsName()
-	{
-		if(muninsName == null) {
-			Collection muninsTplName = pd.getNamedProbesNames();
-			muninsName = new ArrayList(muninsTplName.size());
-			for(Iterator i = muninsTplName.iterator() ; i.hasNext() ;) {
-				String name = (String) i.next();
-				name += "_" + this.getIndexName().replaceAll("\\d","");
-				muninsName.add(name);
-			}
-		}
-		return muninsName;
-	}
+//	public Collection getMuninsName()
+//	{
+//		if(muninsName == null) {
+//			Collection muninsTplName = pd.getNamedProbesNames();
+//			muninsName = new ArrayList(muninsTplName.size());
+//			for(Iterator i = muninsTplName.iterator() ; i.hasNext() ;) {
+//				String name = (String) i.next();
+//				name += "_" + this.getIndexName().replaceAll("\\d","");
+//				muninsName.add(name);
+//			}
+//		}
+//		return muninsName;
+//	}
 
 	public Map filterValues(Map valuesList)
 	{

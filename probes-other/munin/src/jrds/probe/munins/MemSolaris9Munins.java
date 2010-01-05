@@ -6,9 +6,7 @@
 package jrds.probe.munins;
 
 import jrds.ProbeDesc;
-import jrds.RdsHost;
 
-import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
 
 
@@ -17,9 +15,7 @@ import org.rrd4j.DsType;
  *
  * TODO 
  */
-public class MemSolaris9Munins extends MuninsProbe {
-	static private final Logger logger = Logger.getLogger(MemSolaris9Munins.class);
-
+public class MemSolaris9Munins extends Munin {
 	static final private ProbeDesc pd = new ProbeDesc(4);
 	static {
 		
@@ -39,14 +35,7 @@ public class MemSolaris9Munins extends MuninsProbe {
 		pd.add("disk_free", DsType.GAUGE, "disk_free.value");
 		pd.setName("memsolaris9munins");
 		pd.setProbeName("memsolaris9munins");
-		pd.setMuninsProbesNames(new String[] { "memorysolaris9"});
-		pd.setGraphClasses(new Object[] {/*"memorysolaris9.xml", "swapmemorysolaris9.xml",*/ "MemSolaris9Munins"});
-	}
-	
-	/**
-	 * @param monitoredHost
-	 */
-	public MemSolaris9Munins(RdsHost monitoredHost) {
-		super(monitoredHost, pd);
+//		pd.setMuninsProbesNames(new String[] { "memorysolaris9"});
+//		pd.setGraphClasses(new Object[] {/*"memorysolaris9.xml", "swapmemorysolaris9.xml",*/ "MemSolaris9Munins"});
 	}
 }

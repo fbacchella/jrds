@@ -6,10 +6,7 @@
 package jrds.probe.munins;
 
 import jrds.ProbeDesc;
-import jrds.RdsHost;
-import jrds.graphe.MemSolarisMuninsGraph;
 
-import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
 
 
@@ -18,9 +15,7 @@ import org.rrd4j.DsType;
  *
  * TODO 
  */
-public class MemSolarisMunins extends MuninsProbe {
-	static private final Logger logger = Logger.getLogger(MemSolarisMunins.class);
-
+public class MemSolarisMunins extends Munin {
 	static final private ProbeDesc pd = new ProbeDesc(4);
 	static {
 		
@@ -29,14 +24,7 @@ public class MemSolarisMunins extends MuninsProbe {
 		pd.add("memTotalSwapMB", DsType.GAUGE, "swapt.value");
 		pd.add("memUsedSwapMB", DsType.GAUGE, "swapu.value");
 		pd.setProbeName("memsolarismunins");
-		pd.setMuninsProbesNames(new String[] { "memory"});
-		pd.setGraphClasses(new Class[] {MemSolarisMuninsGraph.class});
-	}
-	
-	/**
-	 * @param monitoredHost
-	 */
-	public MemSolarisMunins(RdsHost monitoredHost) {
-		super(monitoredHost, pd);
+//		pd.setMuninsProbesNames(new String[] { "memory"});
+//		pd.setGraphClasses(new Class[] {MemSolarisMuninsGraph.class});
 	}
 }

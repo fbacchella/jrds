@@ -17,7 +17,7 @@ import org.rrd4j.DsType;
  *
  * TODO 
  */
-public class CpuSolarisMunins extends MuninsProbe {
+public class CpuSolarisMunins extends Munin {
 	static private final Logger logger = Logger.getLogger(CpuSolarisMunins.class);
 
 	static final private ProbeDesc pd = new ProbeDesc(4);
@@ -28,14 +28,7 @@ public class CpuSolarisMunins extends MuninsProbe {
 		pd.add("ssCpuRawIdle", DsType.COUNTER, "idle.value");
 
 		pd.setProbeName("cpusolarismunins");
-		pd.setMuninsProbesNames(new String[] { "cpu"});
+		//pd.setMuninsProbesNames(new String[] { "cpu"});
 		pd.setGraphClasses(new String[] {"CpuRawTimeSolarisGraph"});
-	}
-	
-	/**
-	 * @param monitoredHost
-	 */
-	public CpuSolarisMunins(RdsHost monitoredHost) {
-		super(monitoredHost, pd);
 	}
 }
