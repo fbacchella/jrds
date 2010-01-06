@@ -7,8 +7,8 @@
     <listener-class>jrds.webapp.StartListener</listener-class>
   </listener>
   <servlet>
-    <servlet-name>Last</servlet-name>
-    <servlet-class>jrds.webapp.Last</servlet-class>
+    <servlet-name>CheckValues</servlet-name>
+    <servlet-class>jrds.webapp.CheckValues</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>Graph</servlet-name>
@@ -74,8 +74,8 @@
   	jrds.webapp.JSonQueryParams</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>Last</servlet-name>
-    <url-pattern>/lastvalues</url-pattern>
+    <servlet-name>CheckValues</servlet-name>
+    <url-pattern>/checkvalues/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>Graph</servlet-name>
