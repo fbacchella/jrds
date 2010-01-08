@@ -4,7 +4,7 @@
 <graphdesc>
 	<name>SwapIO</name>
 	<graphName>swapio</graphName>
-	<graphTitle>Virtual Memory activity on {1}</graphTitle>
+	<graphTitle>Virtual Memory activity on ${host}</graphTitle>
 	<verticalLabel>Pages/s</verticalLabel>
 	<add>
 		<name>swapIn</name>

@@ -3,7 +3,8 @@
 <probedesc>
     <name>SwapMunin</name>
     <probeName>swap_munin</probeName>
-    <probeClass>jrds.probe.Munin</probeClass>
+    <probeClass>jrds.probe.munin.Munin</probeClass>
+    <specific name="fetch"></specific>
     <ds>
         <dsName>swapIn</dsName>
         <dsType>counter</dsType>
