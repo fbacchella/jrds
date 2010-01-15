@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!ELEMENT graphdesc (name, graphName, graphTitle, properties?, unit?, verticalLabel, upperLimit?, lowerLimit?, add+, hosttree, viewtree)>
 <!ELEMENT graph (name, graphName, graphTitle, properties?, unit?, verticalLabel, upperLimit?, lowerLimit?, (add|addpath)+, tree)>
-<!ELEMENT add (legend | ((name | (name?, rpn)), reversed?, graphType?, color?, legend?))>
+<!ELEMENT add ((name, rpn?) | legend | ((name | (name?, rpn)), reversed?, graphType, color?, legend?))>
 <!ELEMENT addpath (name?, path, reversed?, graphType?, color?, legend?)>
 <!ELEMENT viewtree (pathelement | pathstring)*>
 <!ELEMENT hosttree (pathelement | pathstring)*>

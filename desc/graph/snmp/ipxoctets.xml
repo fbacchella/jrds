@@ -7,10 +7,12 @@
   <verticalLabel>octets/s</verticalLabel>
   <add>
     <name>ipOutOctets</name>
+    <graphType>line</graphType>
     <legend>Sent Octets</legend>
   </add>
   <add>
     <name>ipOutOctets</name>
+    <graphType>line</graphType>
     <legend>Received Octets</legend>
   </add>
   <hosttree>
