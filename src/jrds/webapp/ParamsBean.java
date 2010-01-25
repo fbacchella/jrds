@@ -75,8 +75,15 @@ public class ParamsBean implements Serializable {
 		String historyArg = req.getParameter("history");
 		if("1".equals(historyArg))
 			history = true;
-		maxArg = req.getParameter("max");
-		minArg = req.getParameter("min");
+		
+		//max and min should only go together
+		//it's up to the gui (aka js code) to manage default value
+		String minStr = req.getParameter("min");
+		String maxStr = req.getParameter("max");
+		if(minStr != null && maxStr != null && ! "".equals(minStr) && ! "".equals(maxStr)) {
+			maxArg = maxStr;
+			minArg = minStr;
+		}
 		String paramFilterName = req.getParameter("filter");
 		String paramHostFilter = req.getParameter("host");
 		if(paramFilterName != null && ! "".equals(paramFilterName)) {

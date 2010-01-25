@@ -42,13 +42,12 @@ public class JSonQueryParams extends JrdsServlet {
 		}
 		out.println("}");
 	}
-	
+
 	private void doVariable(ServletOutputStream out, String key, String value) throws IOException {
 		if(value != null && ! "".equals(value)) {
 			value = value.replace("'", " ").replace("\"", " ");
 			out.println(key + ": '" + value + "',");
 		}
-
 	}
 
 }

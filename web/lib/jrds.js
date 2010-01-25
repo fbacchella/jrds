@@ -1,4 +1,4 @@
-dojo.require("dijit.form.TimeTextBox");
+//dojo.require("dijit.form.TimeTextBox");
 //dojo.require("dojo.fx");
 
 function initQuery() {
@@ -8,7 +8,7 @@ function initQuery() {
 			url: "queryparams",
 			handleAs: "json",
 			load: function(response, ioArgs) {
-				queryParams =  response;
+				queryParams = response;
 			}
 		});
 }
@@ -126,16 +126,13 @@ function reloadTree() {
 function fileForms() {	
 	var dateForm = dojo.byId("dateForm");
 	if(queryParams.begin && queryParams.end) {
-		dateForm.end.value =  queryParams.end;
-		dateForm.begin.value =  queryParams.begin;
+		dateForm.end.value = queryParams.end;
+		dateForm.begin.value = queryParams.begin;
     }
 	
-	if(queryParams.max || queryParams.min) {
-		setAutoscale(false);
-	    dijit.byId("max").attr('value',queryParams.max);
-	    dijit.byId("min").attr('value',queryParams.min);
-	}
 
+	setAutoscale(queryParams.max == null || queryParams.min ==null);
+	
     var autoperiod = new dojox.form.DropDownSelect({
          	value:queryParams.autoperiod,
         	name: "autoperiod"
@@ -145,10 +142,6 @@ function fileForms() {
 
     if(queryParams.host)
     	dojo.byId("hostForm").host.value = queryParams.host;
-}
-
-function updateScale(value) {
-	queryParams[this.id] = value;
 }
 
 function setScale(item, evt) {
@@ -198,23 +191,6 @@ function sort()
 	reloadTree();
 }
 
-function resetScale() {
-	queryParams.max = "";
-	queryParams.min = "";
-
-    var dateForm = dojo.byId("dateForm");
-	dateForm.max.value =  queryParams.max;
-	dateForm.min.value = queryParams.min;
-	
-	if(dijit.byId("autoscale").attr('checked'))
-		reloadTree();
-}
-
-function setAutoscale(value) {
-	var autoscale = dijit.byId("autoscale");
-	autoscale.attr('checked',value)	
-}
-
 function setupCalendar() {
     dojo.declare("HourBox",dijit.form.TimeTextBox , {
     	style: "width:50px",
@@ -230,7 +206,6 @@ function setupCalendar() {
     		}
     		return this.inherited(arguments);
     	}
-
     });
     
     var beginHour = new Date();
@@ -331,20 +306,48 @@ function history(url, name)
 	var historyWin = window.open(url, "_blank", "width=750,menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
 }
 
+//called onChange for scale button
+function resetScale() {
+	if(dijit.byId("autoscale").attr('checked')) {
+		queryParams.max = null;
+		queryParams.min = null;
+		if(queryParams.id || queryParams.id == 0 )
+			reloadTree();
+	}
+    dijit.byId("max").attr('value', queryParams.max);
+    dijit.byId("min").attr('value', queryParams.min);
+}
+
+//Called upon startup and focus on scale text boxes, will propagate good values using onChange function : resetScale and updateScale, 
+function setAutoscale(value) {
+	var autoscale = dijit.byId("autoscale");
+	autoscale.attr('checked',value);
+}
+
+//Called upon edited scale text boxes
+function updateScale(value) {
+	//value==0 is not a null value, keep it
+	if(! value && value !=0 )
+		value = null;
+	queryParams[this.id] = value;
+}
+
 function scaleKeyEvent(evt)
 {
-	if(evt.keyCode == dojo.keys.ENTER){
+	if(evt.keyCode == dojo.keys.ENTER || evt.keyCode == dojo.keys.TAB){
 		queryParams[this.id] = this.getValue();
-		if(queryParams.max && queryParams.min) {
-			reloadTree();
+		if(evt.keyCode == dojo.keys.ENTER) {
+			if(queryParams.max != null && queryParams.min != null) {
+				reloadTree();
+			}
+			dojo.stopEvent(evt);
 		}
-	    dojo.stopEvent(evt);
 	}
 }
 
 function hostKeyEvent(evt)
 {
-	if(evt.keyCode == dojo.keys.ENTER){
+	if(evt.keyCode == dojo.keys.ENTER || evt.keyCode == dojo.keys.TAB){
 		queryParams.host = this.getValue();
 		if( queryParams.host == undefined || queryParams.host == "") {
 		    dojo.stopEvent(evt);
