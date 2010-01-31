@@ -1,6 +1,3 @@
-//dojo.require("dijit.form.TimeTextBox");
-//dojo.require("dojo.fx");
-
 function initQuery() {
 	 dojo.xhrGet( {
 			content:  dojo.queryToObject(window.location.search.slice(1)),
