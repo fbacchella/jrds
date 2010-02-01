@@ -112,26 +112,29 @@ public class SnmpStarter extends Starter {
 		//Fallback uptime OID, it should be always defined, from SNMPv2-MIB
 		upTimesOids.add(sysUpTimeInstance);
 
-		for(OID uptimeoid: upTimesOids) {
-			if(! full.isStarted() && resolver.isStarted() ) {
-				break;
-			}
-			try {
+		try {
+			for(OID uptimeoid: upTimesOids) {
+				if(! full.isStarted() && resolver.isStarted() ) {
+					break;
+				}
 				PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
 				requestPDU.addOID(new VariableBinding(uptimeoid));
 				ResponseEvent re = snmp.send(requestPDU, snmpTarget);
 				PDU response = re.getResponse();
-				if(response == null) {
-					throw new IOException("SNMP Timeout");
+				if(response == null || re.getError() != null ) {
+					Exception snmpException = re.getError();
+					if(snmpException == null)
+						snmpException =  new IOException("SNMP Timeout");
+					throw snmpException;
 				}
 				Object value = new SnmpVars(response).get(uptimeoid);
 				if(value instanceof Number) {
 					setUptime(((Number) value).longValue());
 					return true;
 				}
-			} catch (IOException e) {
-				logger.error("Unable to get uptime for " + getParent() + " because of: " + e);
 			}
+		} catch (Exception e) {
+			logger.error("Unable to get uptime for " + getParent() + " because of: " + e);
 		}
 		return false;
 	}
@@ -223,7 +226,7 @@ public class SnmpStarter extends Starter {
 	public void setProto(String proto) {
 		this.proto = proto;
 	}
-	
+
 	@Override
 	public void initialize(StarterNode parent, StartersSet level) {
 		super.initialize(parent, level);
