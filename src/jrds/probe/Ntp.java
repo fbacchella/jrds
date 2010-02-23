@@ -1,14 +1,12 @@
 package jrds.probe;
 
 import java.io.IOException;
-import java.net.SocketException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import jrds.Probe;
 import jrds.starter.Resolver;
-import jrds.starter.SocketFactory;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.NtpV3Packet;
@@ -17,22 +15,25 @@ import org.apache.log4j.Level;
 
 public class Ntp extends Probe<String, Number> {
 	static final NTPUDPClient client = new NTPUDPClient();
-	int port = 123;
+	int port = NTPUDPClient.DEFAULT_PORT;
 
 	public Boolean configure() {
-		SocketFactory sf = (SocketFactory) getStarters().find(SocketFactory.makeKey(this)); 
-		try {
-			client.setSoTimeout(sf.getTimeout());
-		} catch (SocketException e) {
-			log(Level.ERROR, e, "Set timeout failed: %", e);
-			return false;
-		}
 		return true;
 	}
 	
 	public Boolean configure(Integer port) {
 		this.port = port;
 		return configure();
+	}
+
+	
+	/* (non-Javadoc)
+	 * @see jrds.Probe#setTimeout(int)
+	 */
+	@Override
+	public void setTimeout(int timeout) {
+		super.setTimeout(timeout);
+		client.setDefaultTimeout(timeout);
 	}
 
 	@Override
