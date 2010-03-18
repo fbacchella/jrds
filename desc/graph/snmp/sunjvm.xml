@@ -45,6 +45,7 @@
 		<pathelement>SYSTEM</pathelement>
 		<pathstring>JVM</pathstring>
 		<pathstring>${label}</pathstring>
+		<pathstring>Memory usage</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>SYSTEM</pathelement>
