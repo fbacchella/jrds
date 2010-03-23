@@ -263,9 +263,7 @@ public class Discover extends JrdsServlet {
 	}
 
 	private String getLabel(SnmpStarter active, List<OID> labelsOID) throws IOException {
-		logger.trace("look for label in" + labelsOID);
 		Map<OID, Object> ifLabel = SnmpRequester.RAW.doSnmpGet(active, labelsOID);
-		logger.trace("found label" + ifLabel);
 		for(Map.Entry<OID, Object> labelEntry: ifLabel.entrySet()) {
 			String label = labelEntry.getValue().toString();
 			if(label.length() >= 1)
@@ -298,12 +296,14 @@ public class Discover extends JrdsServlet {
 				rrdElem.appendChild(arg2);
 			}
 
-			for(String lookin: labelOid.split(",")) {
-				OID Oidlabel = new OID(lookin.trim() + "." + index);
-				String label = getLabel(active, Collections.singletonList(Oidlabel));
-				if(label != null) {
-					rrdElem.setAttribute("label", label);
-					break;
+			if (labelOid != null && ! "".equals(labelOid)) {
+				for(String lookin: labelOid.split(",")) {
+					OID Oidlabel = new OID(lookin.trim() + "." + index);
+					String label = getLabel(active, Collections.singletonList(Oidlabel));
+					if(label != null) {
+						rrdElem.setAttribute("label", label);
+						break;
+					}
 				}
 			}
 			hostEleme.appendChild(rrdElem);
