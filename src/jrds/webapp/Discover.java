@@ -3,6 +3,7 @@ package jrds.webapp;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -51,13 +52,34 @@ public class Discover extends JrdsServlet {
 
 	private static final String CONTENT_TYPE = "application/xml";
 	private static final long serialVersionUID = 1L;
-	
-//	private static final OID sysObjectID = new OID("1.3.6.1.2.1.1.2.0");
-//	private static final OID linuxOID = new OID("1.3.6.1.4.1.8072.3.2.10");
-//	private static final OID solarisOID = new OID("1.3.6.1.4.1.8072.3.2.3");
-//	private static final OID windowsNT_workstation_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.1");
-//	private static final OID windowsNT_server_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.2");
-//	private static final OID windowsNT_dc_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.3");
+
+	//	private static final OID sysObjectID = new OID("1.3.6.1.2.1.1.2.0");
+	//	private static final OID linuxOID = new OID("1.3.6.1.4.1.8072.3.2.10");
+	//	private static final OID solarisOID = new OID("1.3.6.1.4.1.8072.3.2.3");
+	//	private static final OID windowsNT_workstation_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.1");
+	//	private static final OID windowsNT_server_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.2");
+	//	private static final OID windowsNT_dc_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.3");
+	private static final OID sysORID = new OID("1.3.6.1.2.1.1.9.1.2");
+	//	private static final OID ifMIB = new OID("1.3.6.1.2.1.31");
+	//	private static final OID snmpMIB = new OID("1.3.6.1.6.3.1");
+	private static final OID tcpMIB = new OID("1.3.6.1.2.1.49");
+	private static final OID ip = new OID("1.3.6.1.2.1.4");
+	private static final OID udpMIB = new OID("1.3.6.1.2.1.50");
+	private static final Map<OID, String> OID2Probe;
+	static {
+		OID2Probe = new HashMap<OID, String>(5);
+		OID2Probe.put(tcpMIB, "TcpSnmp");
+		OID2Probe.put(ip, "IpSnmp");
+		OID2Probe.put(udpMIB, "UdpSnmp");
+	}
+
+	//Works in progress, does nothing now
+	//private static final Map<String, String> hides;
+	//static {
+	//	hides = new HashMap<String, String>();
+	//	hides.put("IfXSnmp", "IfSnmp");
+	//	hides.put("DiskIo64", "DiskIo");
+	//}
 
 	static class LocalSnmpStarter extends SnmpStarter {
 		Snmp snmp;
@@ -108,6 +130,13 @@ public class Discover extends JrdsServlet {
 		if(withOidStr != null)
 			withOid = true;
 
+		Target hosttarget;
+		try {
+			hosttarget = makeSnmpTarget(request);
+		} catch (UnknownHostException e) {
+			throw new RuntimeException("Host name unknown",e);
+		}
+
 		PropertiesManager pm = getPropertiesManager();
 
 		Loader l;
@@ -129,7 +158,7 @@ public class Discover extends JrdsServlet {
 		l.importDir(pm.configdir);
 
 		try {
-			Document hostDom = generate(hostname, l.getRepository(Loader.ConfigType.PROBEDESC).values(), withOid, request.getParameterValues("tag"));
+			Document hostDom = generate(hostname, hosttarget, l.getRepository(Loader.ConfigType.PROBEDESC).values(), withOid, request.getParameterValues("tag"));
 
 			response.setContentType(CONTENT_TYPE);
 			response.addHeader("Cache-Control", "no-cache");
@@ -147,14 +176,23 @@ public class Discover extends JrdsServlet {
 		}
 	}
 
-	public Document generate(String hostname, Collection<JrdsNode> probdescs, boolean withOid, String[] tags) throws IOException, ParserConfigurationException {
+	private Target makeSnmpTarget(HttpServletRequest request) throws UnknownHostException{
+		String hostname = request.getParameter("host");
+		String community = request.getParameter("community");
+		if(community == null) {
+			community = "public";
+		}
+		IpAddress addr = new UdpAddress(InetAddress.getByName(hostname), 161);
+		Target hosttarget = new CommunityTarget(addr, new OctetString(community));
+		hosttarget.setVersion(SnmpConstants.version2c);
+		return hosttarget;
+	}
+
+	public Document generate(String hostname, Target hosttarget, Collection<JrdsNode> probdescs, boolean withOid, String[] tags) throws IOException, ParserConfigurationException {
 		DocumentBuilder dbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document hostDom = dbuilder.newDocument();
 
 		LocalSnmpStarter active = new LocalSnmpStarter();
-		IpAddress addr = new UdpAddress(InetAddress.getByName(hostname), 161);
-		Target hosttarget = new CommunityTarget(addr, new OctetString("public"));
-		hosttarget.setVersion(SnmpConstants.version2c);
 		active.target = hosttarget;
 		active.doStart();
 
@@ -200,7 +238,16 @@ public class Discover extends JrdsServlet {
 				logger.error("Error detecting + " + name + ": " +e1);
 			}
 		}
+
+		walksysORID(hostEleme, active);
+
 		active.doStop();
+
+		//		JrdsNode jrdsHost = new JrdsNode(hostEleme);
+		//		for (JrdsNode probe: jrdsHost.iterate(CompiledXPath.get("/host/probe"))) {
+		//			String type = probe.attrMap().get("type");
+		//			
+		//		}
 		return hostDom;
 	}
 
@@ -216,7 +263,9 @@ public class Discover extends JrdsServlet {
 	}
 
 	private String getLabel(SnmpStarter active, List<OID> labelsOID) throws IOException {
+		logger.trace("look for label in" + labelsOID);
 		Map<OID, Object> ifLabel = SnmpRequester.RAW.doSnmpGet(active, labelsOID);
+		logger.trace("found label" + ifLabel);
 		for(Map.Entry<OID, Object> labelEntry: ifLabel.entrySet()) {
 			String label = labelEntry.getValue().toString();
 			if(label.length() >= 1)
@@ -249,19 +298,40 @@ public class Discover extends JrdsServlet {
 				rrdElem.appendChild(arg2);
 			}
 
-			OID Oidlabel = new OID(labelOid + "." + index);
-			String label = getLabel(active, Collections.singletonList(Oidlabel));
-			if(label != null) {
-				rrdElem.setAttribute("label", label);
+			for(String lookin: labelOid.split(",")) {
+				OID Oidlabel = new OID(lookin.trim() + "." + index);
+				String label = getLabel(active, Collections.singletonList(Oidlabel));
+				if(label != null) {
+					rrdElem.setAttribute("label", label);
+					break;
+				}
 			}
 			hostEleme.appendChild(rrdElem);
 		}
 	}
-	
-//	private String operatingSystem(SnmpStarter active) throws IOException {
-//		Map<OID, Object> osType = SnmpRequester.RAW.doSnmpGet(active, Collections.singletonList(sysObjectID));
-//		OID  identity = (OID)osType.get(sysObjectID);
-//		
-//		return null;
-//	}
+
+	private void walksysORID(Element hostEleme, SnmpStarter active) throws IOException {
+		logger.trace("Will enumerate " + sysORID);
+		Set<OID> oidsSet = Collections.singleton(new OID(sysORID));
+		Map<OID, Object> indexes= (Map<OID, Object>) SnmpRequester.TREE.doSnmpGet(active, oidsSet);
+		logger.trace("Elements :"  + indexes);
+		for(Object value: indexes.values()) {
+			if(value instanceof OID) {
+				String probe = OID2Probe.get(value);
+				if(probe != null) {
+					Element rrdElem = hostEleme.getOwnerDocument().createElement("probe");
+					rrdElem.setAttribute("type", probe);
+					hostEleme.appendChild(rrdElem);			
+				}
+			}
+		}
+
+	}
+
+	//	private String operatingSystem(SnmpStarter active) throws IOException {
+	//		Map<OID, Object> osType = SnmpRequester.RAW.doSnmpGet(active, Collections.singletonList(sysObjectID));
+	//		OID  identity = (OID)osType.get(sysObjectID);
+	//		
+	//		return null;
+	//	}
 }

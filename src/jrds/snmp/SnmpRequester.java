@@ -168,6 +168,7 @@ public abstract class SnmpRequester {
 
 		Target snmpTarget = starter.getTarget();
 		PDU requestPDU = starter.getPdufactory().createPDU(snmpTarget);
+		requestPDU.setMaxRepetitions(vars.length);
 
 		requestPDU.addAll(vars);
 
