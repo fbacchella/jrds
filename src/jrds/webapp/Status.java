@@ -50,7 +50,7 @@ public final class Status extends JrdsServlet {
 			runtime = stats.runtime;
 		}
 		long lastCollectAgo = (System.currentTimeMillis() - lastCollect.getTime())/1000;
-		writer.println("Last collect: " + lastCollectAgo  + " (" + lastCollect + ")" );
+		writer.println("Last collect: " + lastCollectAgo  + "s ago (" + lastCollect + ")" );
 		writer.println("Last running duration: " + runtime / 1000 + "s");
 		writer.flush();
 	}
