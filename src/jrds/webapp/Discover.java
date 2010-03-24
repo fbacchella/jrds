@@ -30,7 +30,6 @@ import jrds.snmp.SnmpStarter;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.CommunityTarget;
-import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.Target;
 import org.snmp4j.mp.SnmpConstants;
@@ -39,8 +38,6 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
-import org.snmp4j.util.DefaultPDUFactory;
-import org.snmp4j.util.PDUFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -83,7 +80,6 @@ public class Discover extends JrdsServlet {
 
 	static class LocalSnmpStarter extends SnmpStarter {
 		Snmp snmp;
-		static final PDUFactory factory = new DefaultPDUFactory(PDU.GETBULK);
 		Target target;
 		@Override
 		public boolean start() {
@@ -108,10 +104,6 @@ public class Discover extends JrdsServlet {
 		@Override
 		public Target getTarget() {
 			return target;
-		}
-		@Override
-		public PDUFactory getPdufactory() {
-			return factory;
 		}
 		@Override
 		public boolean isStarted() {
@@ -281,7 +273,6 @@ public class Discover extends JrdsServlet {
 			OID indexoid = e.getKey();
 			String indexfName = e.getValue().toString();
 			int index = indexoid.last();
-			logger.trace("Append " + indexfName);
 			Element rrdElem = hostEleme.getOwnerDocument().createElement("probe");
 			rrdElem.setAttribute("type", name);
 			Element arg1 = hostEleme.getOwnerDocument().createElement("arg");
@@ -314,7 +305,8 @@ public class Discover extends JrdsServlet {
 		logger.trace("Will enumerate " + sysORID);
 		Set<OID> oidsSet = Collections.singleton(new OID(sysORID));
 		Map<OID, Object> indexes= (Map<OID, Object>) SnmpRequester.TREE.doSnmpGet(active, oidsSet);
-		logger.trace("Elements :"  + indexes);
+		if(logger.isTraceEnabled())
+			logger.trace("Elements :"  + indexes);
 		for(Object value: indexes.values()) {
 			if(value instanceof OID) {
 				String probe = OID2Probe.get(value);

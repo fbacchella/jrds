@@ -167,8 +167,8 @@ public abstract class SnmpRequester {
 		Map<OID, Object> snmpVars = Collections.emptyMap();
 
 		Target snmpTarget = starter.getTarget();
-		PDU requestPDU = starter.getPdufactory().createPDU(snmpTarget);
-		requestPDU.setMaxRepetitions(vars.length);
+		PDU requestPDU = new PDU();
+		requestPDU.setType(PDU.GET);
 
 		requestPDU.addAll(vars);
 
@@ -197,7 +197,7 @@ public abstract class SnmpRequester {
 					requestPDU = response;
 					response = null;
 					requestPDU.remove(index);
-					requestPDU.setType(PDU.GET);
+					//requestPDU.setType(PDU.GET);
 				}
 				else
 					doAgain = false;

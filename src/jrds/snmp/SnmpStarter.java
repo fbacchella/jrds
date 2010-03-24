@@ -50,6 +50,7 @@ public class SnmpStarter extends Starter {
 	static public final String SNMPKEY = "snmp";
 	static final private OID hrSystemUptime = new OID(".1.3.6.1.2.1.25.1.1.0");
 	static final private OID sysUpTimeInstance = new OID(".1.3.6.1.2.1.1.3.0");
+	
 	static final private PDUFactory pdufactory = new DefaultPDUFactory(PDU.GET);
 
 	volatile static private Snmp snmp = null;
