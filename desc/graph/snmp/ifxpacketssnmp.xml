@@ -12,7 +12,7 @@
   <add>
     <name>ifHCOutUcastPkts</name>
     <graphType>area</graphType>
-    <color>green</color>
+    <color>blue</color>
     <legend>packets sends/s</legend>
   </add>
   <add>
@@ -28,7 +28,7 @@
     <name>ifHCInUcastPkts</name>
     <reversed>true</reversed>
     <graphType>area</graphType>
-    <color>blue</color>
+    <color>green</color>
     <legend>packets received/s</legend>
   </add>
   <add>

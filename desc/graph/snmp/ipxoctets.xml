@@ -11,7 +11,7 @@
     <legend>Sent Octets</legend>
   </add>
   <add>
-    <name>ipOutOctets</name>
+    <name>ipInOctets</name>
     <graphType>line</graphType>
     <legend>Received Octets</legend>
   </add>
@@ -19,12 +19,12 @@
     <pathelement>HOST</pathelement>
     <pathelement>NETWORK</pathelement>
     <pathelement>INDEX</pathelement>
-    <pathstring>IP activityin octets</pathstring>
+    <pathstring>IP activity in octets</pathstring>
   </hosttree>
   <viewtree>
     <pathelement>NETWORK</pathelement>
     <pathelement>INDEX</pathelement>
     <pathelement>HOST</pathelement>
-    <pathstring>IP activityin octets</pathstring>
+    <pathstring>IP activity in octets</pathstring>
   </viewtree>
 </graphdesc>
