@@ -60,6 +60,11 @@ public class GraphNode implements Comparable<GraphNode> {
 	}
 
 	private final String parseTemplate(String template) {
+		//Don't lose time with an empty template
+		if(template == null || "".equals(template.trim())) {
+			return template;
+		}
+
 		String index = "";
 		String url = "";
 		if( probe instanceof IndexedProbe) {

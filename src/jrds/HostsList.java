@@ -405,14 +405,18 @@ public class HostsList extends Starter implements StarterNode {
 	}
 
 	private void addVirtual(VirtualProbe vprobe, RdsHost vhost, String root) {
-		vhost.getProbes().add(vprobe);
-		vprobe.setHost(vhost);
-		for(GraphNode currGraph: vprobe.getGraphList()) {
-			logger.trace("adding virtual graph: " + currGraph);
-			treeMap.get(root).addGraphByPath(currGraph.getTreePathByHost(), currGraph);
-			graphMap.put(currGraph.hashCode(), currGraph);
+		try {
+			vhost.getProbes().add(vprobe);
+			vprobe.setHost(vhost);
+			for(GraphNode currGraph: vprobe.getGraphList()) {
+				logger.trace("adding virtual graph: " + currGraph);
+				treeMap.get(root).addGraphByPath(currGraph.getTreePathByHost(), currGraph);
+				graphMap.put(currGraph.hashCode(), currGraph);
+			}
+			logger.debug("adding virtual probe " + vprobe.getName());
+		} catch (Exception e) {
+			logger.error("Virtual probe initialization failed for " + vhost.getName() + "/" + vprobe.getName(), e);
 		}
-		logger.debug("adding virtual probe " + vprobe.getName());
 	}
 
 	@Override
