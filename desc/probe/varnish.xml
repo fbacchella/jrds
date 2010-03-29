@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+	<name>Varnish</name>
+	<probeName>varnish</probeName>
+	<probeClass>jrds.probe.Varnish</probeClass>
+	<specific name="command">stats</specific>
+	<ds>
+		<dsName>connrecycled</dsName>
+		<dsType>counter</dsType>
+		<collect>Backend conn. recycles</collect>
+	</ds>
+	<graphs></graphs>
+</probedesc>
