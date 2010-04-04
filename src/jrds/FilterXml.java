@@ -16,6 +16,7 @@ public class FilterXml extends Filter {
 
 	final Set<Pattern> goodPaths = new HashSet<Pattern>();
 	final Set<Pattern> tags = new HashSet<Pattern>();
+	final Set<String> names = new HashSet<String>();
 	String name;
 
 	public FilterXml() {
@@ -33,9 +34,22 @@ public class FilterXml extends Filter {
 			tags.add(p);
 	}
 
+	public void addGraph(String qualifiedName) {
+		names.add(qualifiedName);
+	}
+
 	public boolean acceptGraph(GraphNode graph, String path) {
-		boolean accepted  = acceptPath(path) &&  acceptTag(graph.getProbe().getTags());
-		logger.trace("Trying to accept : " + path +", " + graph.getProbe().getTags() + ": " + accepted);
+		//An explicit graph is always accepted
+		if (names.contains(graph.getQualifieName()))
+			return true;
+
+		//if neither tags or path, it's refused
+		if(tags.isEmpty()&& goodPaths.isEmpty())
+			return false;
+
+		boolean accepted  = (acceptPath(path) &&  acceptTag(graph.getProbe().getTags()) ) ;
+		logger.trace(names.contains(graph.getQualifieName()));
+		logger.trace("Trying to accept : " + path + "(" + graph.getQualifieName() + ") "+", " + graph.getProbe().getTags() + ": " + accepted);
 		return accepted;
 	}
 
