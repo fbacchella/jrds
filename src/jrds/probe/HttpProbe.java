@@ -69,6 +69,12 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 		finishConfigure();
 	}
 
+	public void configure(Integer port, List<Object> argslist) {
+		this.port = port;
+		this.argslist = argslist;
+		finishConfigure();
+	}
+
 	public void configure(URL url, List<Object> argslist) {
 		this.url = url;
 		this.argslist = argslist;
@@ -206,12 +212,9 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 	public URL getUrl() {
 		if(url == null) {
 			try {
-				String portStr = null;
 				if(port == 0) {
-					portStr = getPd().getSpecific("port");
-					if(portStr == null || "".equals(portStr)) {
-						portStr = "80";
-					}
+					String portStr = getPd().getSpecific("port");
+					port = jrds.Util.parseStringNumber(portStr, Integer.class, 80).intValue();
 				}
 				if(file == null) {
 					file = getPd().getSpecific("file");
@@ -221,16 +224,14 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 				}
 				if(argslist != null) {
 					try {
-						String urlString = String.format("http://" + host + ":" + portStr + file, argslist.toArray());
+						String urlString = String.format("http://" + host + ":" + port + file, argslist.toArray());
 						url = new URL(urlString);
 					} catch (IllegalFormatConversionException e) {
-						log(Level.ERROR, "Illegal format string: http://%s:%s%s, args %d", host, portStr, file, argslist.size());
+						log(Level.ERROR, "Illegal format string: http://%s:%d%s, args %d", host, port, file, argslist.size());
 						return null;
 					}
 				}
 				else {
-					if(port == 0)
-						port = jrds.Util.parseStringNumber(portStr, Integer.class, 80).intValue();
 					url = new URL("http", host, port, file);
 				}
 			} catch (MalformedURLException e) {

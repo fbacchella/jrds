@@ -2,6 +2,8 @@ package jrds.probe;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +31,12 @@ public class HttpXml extends HttpProbe {
 		super.configure(args);
 		finishConfig(args);
 	}
-	
+
+	public void configure(Integer port, List<Object> args) {
+		super.configure(port, args);
+		finishConfig(args);
+	}
+
 	public void configure(URL url, List<Object> args) {
 		super.configure(url, args);
 		finishConfig(args);
@@ -41,19 +48,17 @@ public class HttpXml extends HttpProbe {
 	}
 
 	private void finishConfig(List<Object> args) {
-			xpaths = new HashSet<String>(getPd().getCollectStrings().size());
-			collectKeys = new HashMap<String, String>(xpaths.size());
-			for(Map.Entry<String, String> e:getPd().getCollectStrings().entrySet()) {
-				String xpath = e.getKey();
-				String dsName = e.getValue();
-				String solved = String.format(xpath, args.toArray());
-				xpaths.add(solved);
-				collectKeys.put(solved, dsName);
-			}
-			//args will not used again, can be discarded
-			args = null;
+		xpaths = new HashSet<String>(getPd().getCollectStrings().size());
+		collectKeys = new HashMap<String, String>(xpaths.size());
+		for(Map.Entry<String, String> e:getPd().getCollectStrings().entrySet()) {
+			String xpath = e.getKey();
+			String dsName = e.getValue();
+			String solved = String.format(xpath, args.toArray());
+			xpaths.add(solved);
+			collectKeys.put(solved, dsName);
+		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see jrds.Probe#setPd(jrds.ProbeDesc)
 	 */
@@ -88,11 +93,22 @@ public class HttpXml extends HttpProbe {
 
 	protected long findUptime(Document d) {
 		String upTimePath = getPd().getSpecific("upTimePath");
-		if(upTimePath == null) {
-			log(Level.ERROR, "No xpath for the uptime");
-			return 0;
+		if(upTimePath != null) {
+			return xmlstarter.findUptime(d, upTimePath);
 		}
-		return xmlstarter.findUptime(d, upTimePath);
+		else {
+			String startTimePath = getPd().getSpecific("startTimePath");
+			String currentTimePath = getPd().getSpecific("currentTimePath");
+			String timePattern = getPd().getSpecific("timePattern");
+			if(startTimePath != null && currentTimePath != null && timePattern !=null) {
+				DateFormat df = new SimpleDateFormat(timePattern);
+				return xmlstarter.findUptimeByDate(d, startTimePath, currentTimePath, df);
+			}
+			else {
+				log(Level.ERROR, "No xpath for the uptime");
+				return 0;
+			}
+		}
 	}
 
 	/* (non-Javadoc)
@@ -114,6 +130,5 @@ public class HttpXml extends HttpProbe {
 	public String getSourceType() {
 		return "HttpXml";
 	}
-
 
 }
