@@ -39,17 +39,17 @@ public class FilterXml extends Filter {
 	}
 
 	public boolean acceptGraph(GraphNode graph, String path) {
+		boolean accepted = false;
+
 		//An explicit graph is always accepted
 		if (names.contains(graph.getQualifieName()))
-			return true;
-
+			accepted = true;
 		//if neither tags or path, it's refused
-		if(tags.isEmpty()&& goodPaths.isEmpty())
-			return false;
+		else if(! tags.isEmpty() && ! goodPaths.isEmpty())
+			accepted  = (acceptPath(path) &&  acceptTag(graph.getProbe().getTags()) ) ;
 
-		boolean accepted  = (acceptPath(path) &&  acceptTag(graph.getProbe().getTags()) ) ;
-		logger.trace(names.contains(graph.getQualifieName()));
-		logger.trace("Trying to accept : " + path + "(" + graph.getQualifieName() + ") "+", " + graph.getProbe().getTags() + ": " + accepted);
+		if(logger.isTraceEnabled())
+			logger.trace("Trying to accept : " + path + "=" + graph.getQualifieName() + ", " + graph.getProbe().getTags() + ": " + accepted);
 		return accepted;
 	}
 
