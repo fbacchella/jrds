@@ -24,26 +24,29 @@ import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;
 
 /**
- * A servlet wich return values from a probe
+ * A servlet wich return datastore values from a probe.
  * It can be used in many way :
- * http://<it>server</it>/values/<it>host</it>/<it>probe</it>
- * It will return all dsValues
- * It's possible to refine the query with some arguments, using a post or a get
- * The argument are
- * host
- * probe
- * period: the time interval in seconds
- * cf: the consolidated function used
- * dsName: the dsName of the value
- * rpn: a rpn used to generate the value
- * 
+ * The simplest way is by using a URL of the form :
+ * http://<it>server</it>/values/<it>host</it>/<it>probe.</it>
+ * It will return all datastores values for this probe. By adding a /<it>datastore</i>, one can choose only 
+ * one data store.<p>
+ * It's possible to refine the query with some arguments, using a post or a get.<p>
+ * The argument can be:
+ * <ul>
+ * <li>host</li>
+ * <li>probe</li>
+ * <li>period: the time interval in seconds, default to the step value.</li>
+ * <li>cf: the consolidated function used.</li>
+ * <li>dsName: the datastore name</li>
+ * <li>rpn: a rpn used to generate the value.</li>
+ * </ul>
  * If there is only one value generated, it's displayed as is. Else the name is also shown as well as the last update value
+ * in the form <code>datastore: value</code>
  * @author Fabrice Bacchella
  * @version $Revision: 236 $
  */
 public final class CheckValues extends JrdsServlet {
-	static public String name = null;
-	enum ParametersNames {
+	private static enum ParametersNames {
 		HOST,
 		RRD,
 		PROBE,

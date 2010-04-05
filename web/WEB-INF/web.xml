@@ -75,7 +75,7 @@
   </servlet>
   <servlet-mapping>
     <servlet-name>CheckValues</servlet-name>
-    <url-pattern>/checkvalues/*</url-pattern>
+    <url-pattern>/values/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>Graph</servlet-name>
