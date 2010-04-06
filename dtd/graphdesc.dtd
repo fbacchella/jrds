@@ -16,9 +16,10 @@
 <!ELEMENT legend (#PCDATA)>
 <!ELEMENT reversed (#PCDATA)>
 <!ELEMENT name (#PCDATA)>
+<!ELEMENT dsName (#PCDATA)>
 <!ELEMENT host (#PCDATA)>
 <!ELEMENT probe (#PCDATA)>
-<!ELEMENT path (host, probe, name)>
+<!ELEMENT path (host, probe, dsName)>
 <!ELEMENT rpn (#PCDATA)>
 <!ELEMENT pathstring (#PCDATA)>
 <!ELEMENT pathelement (#PCDATA)>

@@ -86,7 +86,7 @@ public class GraphDescBuilder extends ObjectBuilder {
 			String reversed = elements.get("reversed");
 			String host = elements.get("pathhost");
 			String probe = elements.get("pathprobe");
-			String dsName = elements.get("pathname");
+			String dsName = elements.get("pathdsName");
 
 			gd.add(addName, addrpn, addgraphType, addColor, addLegend, consFunc, reversed, host, probe, dsName);
 		}
