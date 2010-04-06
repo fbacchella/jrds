@@ -3,6 +3,10 @@ package jrds.starter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -81,6 +85,23 @@ public class XmlProvider extends Starter {
 			logger.trace("stopping XmlProvider " + getClass().getName() + '@' + Integer.toHexString(hashCode()));
 	}
 
+	public long findUptimeByDate(Document d, String startTimePath, String currentTimePath, DateFormat pattern) {
+		try {
+			Node startTimeNode = (Node) xpather.evaluate(startTimePath, d, XPathConstants.NODE);
+			String startTimeString = startTimeNode.getTextContent();
+			Date startTime = pattern.parse(startTimeString);
+			Node currentTimeNode = (Node) xpather.evaluate(currentTimePath, d, XPathConstants.NODE);
+			String currentTimeString = currentTimeNode.getTextContent();
+			Date currentTime = pattern.parse(currentTimeString);
+			return (currentTime.getTime() - startTime.getTime()) / 1000;
+		} catch (XPathExpressionException e) {
+			logger.error("Time not found: " + e);
+		} catch (ParseException e) {
+			logger.error("Date not parsed with pattern " + ((SimpleDateFormat) pattern).toPattern() + ": " + e);
+		}
+		return 0;
+	}
+
 	public long findUptime(Document d, String upTimePath) {
 		long uptime = 0;
 		if(upTimePath == null) {
@@ -92,11 +113,10 @@ public class XmlProvider extends Starter {
 			if(upTimeNode != null) {
 				if(logger.isTraceEnabled())
 					logger.trace("Will parse uptime: " + upTimeNode.getTextContent());
-				uptime = Long.parseLong(upTimeNode.getTextContent());
+				String dateString = upTimeNode.getTextContent();
+				uptime = jrds.Util.parseStringNumber(dateString, Long.class, 0).longValue();
 			}
 			logger.debug("uptime for " + this + " is " + uptime);
-		} catch (NumberFormatException e) {
-			logger.warn("Uptime not parsable for " + this + ": " + e);
 		} catch (XPathExpressionException e) {
 			logger.error("Uptime not found" + e);
 		}
