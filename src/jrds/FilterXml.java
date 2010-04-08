@@ -45,7 +45,7 @@ public class FilterXml extends Filter {
 		if (names.contains(graph.getQualifieName()))
 			accepted = true;
 		//if neither tags or path, it's refused
-		else if(! tags.isEmpty() && ! goodPaths.isEmpty())
+		else if(! tags.isEmpty() || ! goodPaths.isEmpty())
 			accepted  = (acceptPath(path) &&  acceptTag(graph.getProbe().getTags()) ) ;
 
 		if(logger.isTraceEnabled())
