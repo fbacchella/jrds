@@ -3,6 +3,7 @@ package jrds.standalone;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import jrds.bootstrap.CommandStarter;
 
@@ -28,16 +29,17 @@ public class Jetty implements CommandStarter {
 	public Jetty()  {
 	}
 
-	public void configure(Map<String, String> configuration) {
+	public void configure(Properties configuration) {
 		try {
 			jrds.JrdsLoggerConfiguration.initLog4J();
 		} catch (IOException e) {
 			throw new RuntimeException("Log configuration failed",e);
 		}
 		logger.debug("Configuration: " + configuration);
-		port = jrds.Util.parseStringNumber(configuration.get("jetty.port"), Integer.class, 8080).intValue();
-		propFile = configuration.get("propFile");
-		webRoot = configuration.get("webRoot");
+		
+		port = jrds.Util.parseStringNumber((String) configuration.getProperty("jetty.port"), Integer.class, port).intValue();
+		propFile =  configuration.getProperty("propertiesFile", propFile);
+		webRoot = configuration.getProperty("webRoot", webRoot);
 	}
 	
 	public void start() {

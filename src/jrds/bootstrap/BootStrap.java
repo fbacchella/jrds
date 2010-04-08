@@ -7,13 +7,13 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 
 
 public class BootStrap {
 
+	static final private String[] propertiesList = { "jetty.port", "propertiesFile", "loglevel"};
 	/**
 	 * @param args
 	 * @throws IOException 
@@ -46,10 +46,11 @@ public class BootStrap {
 			classPath.add(f.toURI().toURL());
 		}
 
-		Map<String, String> configuration = new HashMap<String, String>();
-		String propertiesFile = System.getProperty("propertiesFile");
-		if (propertiesFile != null) {
-			configuration.put("propertiesFile", propertiesFile);
+		Properties configuration = new Properties();
+		for(String prop: propertiesList) {
+			String propVal = System.getProperty(prop);
+			if(propVal != null)
+				configuration.put(prop, propVal);
 		}
 		
 		//To remove WEB-INF/lib in the path and find the web root
@@ -86,7 +87,7 @@ public class BootStrap {
 	}
 
 	static private String ressourcePath(Object o) {
-		if(o instanceof Class) {
+		if(o instanceof Class<?>) {
 			Class<?> c = (Class<?>) o;
 			return "/".concat(c.getName().replace(".", "/").concat(".class"));
 		}

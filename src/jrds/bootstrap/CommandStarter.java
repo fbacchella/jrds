@@ -1,8 +1,8 @@
 package jrds.bootstrap;
 
-import java.util.Map;
+import java.util.Properties;
 
 public interface CommandStarter {
-	public void configure(Map<String, String> configuration);
+	public void configure(Properties configuration);
 	public void start() throws Exception;
 }
