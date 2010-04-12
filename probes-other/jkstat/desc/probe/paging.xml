@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
-	<name>PagingActivity</name>
+	<name>KstatPagingActivity</name>
 	<probeName>paging</probeName>
 	<probeClass>jrds.probe.KstatSumProbe</probeClass>
 	<specific name="module">cpu_stat</specific>
