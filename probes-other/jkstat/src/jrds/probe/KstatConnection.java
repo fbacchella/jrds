@@ -1,14 +1,20 @@
 package jrds.probe;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
+import jrds.starter.Connection;
 import uk.co.petertribble.jkstat.api.JKstat;
 import uk.co.petertribble.jkstat.api.Kstat;
+import uk.co.petertribble.jkstat.api.KstatData;
 import uk.co.petertribble.jkstat.client.RemoteJKstat;
-import jrds.starter.Connection;
 
-public class KstatConnection extends Connection {
+public class KstatConnection extends Connection<JKstat> {
 	int port;
 	JKstat remoteJk = null;
 
@@ -17,7 +23,7 @@ public class KstatConnection extends Connection {
 	}
 
 	@Override
-	public Object getConnection() {
+	public JKstat getConnection() {
 		return remoteJk;
 	}
 
@@ -37,11 +43,10 @@ public class KstatConnection extends Connection {
 		try {
 			String hostName = getHostName();
 			URL remoteUrl = new URL("http", hostName, port, "/");
-			 remoteJk = new RemoteJKstat(remoteUrl.toString());
+			remoteJk = new RemoteJKstat(remoteUrl.toString());
 			return true;
 		} catch (MalformedURLException e) {
-			e.printStackTrace();
-			return false;
+			e.printStackTrace();			return false;
 		}
 	}
 
@@ -50,4 +55,28 @@ public class KstatConnection extends Connection {
 		remoteJk = null;
 	}
 
+	public  static void main(String[] args) throws IOException {
+		int port = 3000;
+		String hostname = "192.168.1.21";
+		URL remoteUrl = new URL("http", hostname, port, "/");
+		JKstat remoteJk = new RemoteJKstat(remoteUrl.toString());
+		String module ="zfs";
+		int instance = 0;
+		String name = "arcstats";
+		Kstat active  = remoteJk.getKstat(module, instance, name);
+		Map<String, KstatData> m =  active.getMap();
+		List<String> attr = new ArrayList<String>(m.keySet().size());
+		attr.addAll(m.keySet());
+		Collections.sort(attr, String.CASE_INSENSITIVE_ORDER);
+		for(Object key: attr ) {
+			String keyName = key.toString();
+			System.out.println("<ds>");
+			System.out.println("    <dsName>" + keyName + "</dsName>");
+			System.out.println("    <dsType>counter</dsType>");
+			if(keyName.length() > 20) {
+				System.out.println("    <collect>" + keyName + "</collect>");
+			}
+			System.out.println("</ds>");
+		}
+	}
 }

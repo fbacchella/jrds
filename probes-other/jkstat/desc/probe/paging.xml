@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+	<name>PagingActivity</name>
+	<probeName>paging</probeName>
+	<probeClass>jrds.probe.KstatSumProbe</probeClass>
+	<specific name="module">cpu_stat</specific>
+	<specific name="name">cpu_stat%d</specific>
+	<ds>
+		<dsName>scan</dsName>
+		<dsType>counter</dsType>
+	</ds>
+	<graphs>
+		<name>PageScan</name>
+	</graphs>
+</probedesc>

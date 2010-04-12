@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
+	<!--  This probe expect an integer, the instance number of the disk -->
 	<name>KstatDiskstat</name>
 	<probeName>ds-${index}</probeName>
 	<probeClass>jrds.probe.KstatProbeIndexed</probeClass>
