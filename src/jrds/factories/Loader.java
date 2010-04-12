@@ -118,9 +118,13 @@ public class Loader {
 	final private Map<ConfigType, Map<String, JrdsNode>> repositories = new HashMap<ConfigType, Map<String, JrdsNode>>(ConfigType.values().length);
 
 	public Loader() throws ParserConfigurationException {
+		this(false);
+	}
+
+	public Loader(boolean strict) throws ParserConfigurationException {
 		DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
 		instance.setIgnoringComments(true);
-		instance.setValidating(false);
+		instance.setValidating(strict);
 		dbuilder = instance.newDocumentBuilder();
 		dbuilder.setEntityResolver(new EntityResolver());
 		dbuilder.setErrorHandler(new ErrorHandler() {
@@ -140,6 +144,8 @@ public class Loader {
 		}
 	}
 
+	public void setStrict() {
+	}
 	public Map<ConfigType, Map<String, JrdsNode>> getRepositories(){
 		return repositories;
 	}

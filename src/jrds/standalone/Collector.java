@@ -7,6 +7,7 @@
 package jrds.standalone;
 
 import java.io.File;
+import java.util.Properties;
 
 import jrds.HostsList;
 import jrds.PropertiesManager;
@@ -21,15 +22,19 @@ import org.apache.log4j.Logger;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class Collector {
+public class Collector extends CommandStarterImpl {
 	static final private Logger logger = Logger.getLogger(Collector.class);
 
-	public static void main(String[] args) throws Exception {
-		jrds.JrdsLoggerConfiguration.initLog4J();
+	String propFile = "jrds.properties";
 
-		String propFile = "jrds.properties";
-		if(args.length == 1)
-			propFile = args[0];
+	public void configure(Properties configuration) {
+		logger.debug("Configuration: " + configuration);
+		
+		propFile =  configuration.getProperty("propertiesFile", propFile);
+	}
+
+	public void start(String[] args) throws Exception {
+
 		PropertiesManager pm = new PropertiesManager(new File(propFile));
 		jrds.JrdsLoggerConfiguration.configure(pm);
 
