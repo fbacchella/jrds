@@ -6,9 +6,7 @@
 
 package jrds;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -27,13 +25,10 @@ import org.apache.log4j.Logger;
  */
 public class Period {
 	static final private Logger logger = Logger.getLogger(Period.class);
-	static private final DateFormat isoFormatShort = new SimpleDateFormat("yyyyMMdd'T'HH:mm:ssZ");
-	static private final DateFormat dateFormatShort= new SimpleDateFormat("yyyyMMdd");
-	static private final String dateRegexpBoth = "(\\d\\d\\d\\d-?\\d\\d-?\\d\\d)?";
-	static private final String timeRegexp = "(\\d?\\d:\\d\\d)?(:\\d\\d)?";
+	static private final String dateRegexpBoth = "((\\d\\d\\d\\d)-?(\\d\\d)-?(\\d\\d))?";
+	static private final String timeRegexp = "((\\d?\\d):(\\d\\d))?(:(\\d\\d))?";
 	static private final Pattern datePatternBoth = Pattern.compile( dateRegexpBoth+ "[T ]?" + timeRegexp + "(.*)");
 	static private final Pattern secondsPattern = Pattern.compile( "\\d+");
-	static private final String timeZone = TimeZone.getDefault().getDisplayName();
 
 	private static class PeriodItem {
 		String name;
@@ -169,7 +164,7 @@ public class Period {
 		}
 		Matcher dateMatcher = datePatternBoth.matcher(date);
 		if("NOW".compareToIgnoreCase(date) == 0) {
-			foundDate = new Date();
+			return new Date();
 		}
 		else if(secondsPattern.matcher(date).matches()) {
 			try {
@@ -185,56 +180,78 @@ public class Period {
 			}				
 		}
 		else if(date.length() >= 4 && dateMatcher.find()) {
-			if(logger.isTraceEnabled()) {
-				logger.trace("Matching " + date);
-				for(int i = 1; i <= dateMatcher.groupCount(); i++) {
-					logger.trace(i +": " + "'" + dateMatcher.group(i) + "'");
+			try {
+				if(logger.isTraceEnabled()) {
+					logger.trace("Matching " + date);
+					for(int i = 1; i <= dateMatcher.groupCount(); i++) {
+						logger.trace(i +": " + "'" + dateMatcher.group(i) + "'");
+					}
 				}
-			}
-			String dateFound = dateMatcher.group(1);
-			String timeFound = dateMatcher.group(2);
-			String secondFound = dateMatcher.group(3);
-			String timeZoneFound = dateMatcher.group(4);
-			if(dateFound == null && timeFound == null && secondFound == null) {
+				String dateFound = dateMatcher.group(1);
+				String timeFound = dateMatcher.group(5);
+				String secondFound = dateMatcher.group(8);
+				String timeZoneFound = dateMatcher.group(10);
+				if(dateFound == null && timeFound == null && secondFound == null) {
+					throw new ParseException("Invalid string to parse: " + date, 0);
+				}
+				Calendar cal = Calendar.getInstance();
+				cal.setLenient(false);
+				cal.setTime(new Date());
+				cal.set(Calendar.MILLISECOND, 0);
+
+				if( timeZoneFound != null &&  ! "".equals(timeZoneFound)) {
+					cal.setTimeZone(TimeZone.getTimeZone(timeZoneFound));
+				}
+
+				if(dateFound != null && ! "".equals(dateFound)) {
+					String year = dateMatcher.group(2);
+					cal.set(Calendar.YEAR, jrds.Util.parseStringNumber(year, Integer.class, 1970).intValue());
+					String month = dateMatcher.group(3);
+					cal.set(Calendar.MONTH, jrds.Util.parseStringNumber(month, Integer.class, 1).intValue() - 1);
+					String day = dateMatcher.group(4);
+					cal.set(Calendar.DAY_OF_MONTH, jrds.Util.parseStringNumber(day, Integer.class, 1).intValue());
+				}
+
+				if(timeFound == null || "".equals(timeFound)) {
+					if(isBegin) {
+						cal.set(Calendar.HOUR_OF_DAY, 00);
+						cal.set(Calendar.MINUTE, 00);
+					}
+					else {
+						cal.set(Calendar.HOUR_OF_DAY, 23);
+						cal.set(Calendar.MINUTE, 59);
+					}
+				}
+				else {
+					String hour = dateMatcher.group(6);
+					cal.set(Calendar.HOUR_OF_DAY, jrds.Util.parseStringNumber(hour, Integer.class, 0).intValue());
+
+					String minute = dateMatcher.group(7);
+					cal.set(Calendar.MINUTE, jrds.Util.parseStringNumber(minute, Integer.class, 0).intValue());
+				}
+
+				if(secondFound == null || "".equals(secondFound)) {
+					if(isBegin)
+						cal.set(Calendar.SECOND, 00);
+					else
+						cal.set(Calendar.SECOND, 59);
+				}
+				else {
+					String seconds = dateMatcher.group(9);
+					cal.set(Calendar.SECOND, jrds.Util.parseStringNumber(seconds, Integer.class, 0).intValue());
+				}
+
+				return cal.getTime();
+			} catch (Exception e) {
 				throw new ParseException("Invalid string to parse: " + date, 0);
 			}
-			if(secondFound == null) {
-				if(isBegin)
-					secondFound = ":00";
-				else
-					secondFound = ":59";	
-			}
-			if(timeFound == null) {
-				if(isBegin)
-					timeFound = "00:00";
-				else
-					timeFound = "23:59";
-			}
-			if(dateFound == null) {
-				Date now = new Date();
-
-				Calendar cal = Calendar.getInstance();
-				cal.setTime(now);
-				dateFound = dateFormatShort.format(cal.getTime());
-			}
-			else {
-				dateFound = dateFound.replaceAll("-", "");
-			}
-			if(timeZoneFound == null || "".equals(timeZoneFound)) {
-				timeZoneFound = timeZone;
-			}
-			else if("Z".equals(timeZoneFound.toUpperCase())) {
-				timeZoneFound="+0000";
-			}
-			isoFormatShort.setLenient(false);
-			foundDate = isoFormatShort.parse(dateFound + "T" + timeFound + secondFound + timeZoneFound);
 		}
 		else {
 			throw new ParseException("Invalid string to parse: " + date, 0);
 		}
 		return foundDate;
 	}
-	
+
 	static public List<String> getPeriodNames() {
 		List<String> periodName = new ArrayList<String>(periodList.size());
 		for(Period.PeriodItem pi: periodList) 
