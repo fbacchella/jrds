@@ -2,4 +2,5 @@
 <!ELEMENT path (#PCDATA)>
 <!ELEMENT tag (#PCDATA)>
 <!ELEMENT name (#PCDATA)>
-<!ELEMENT filter (name, (path | tag)+)>
+<!ELEMENT qualifiedname (#PCDATA)>
+<!ELEMENT filter (name, (path | tag | qualifiedname)+)>

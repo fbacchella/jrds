@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT host (macro|connection|probe)+ >
+<!ELEMENT host (tag|snmp|macro|connection|probe|for)+ >
+<!ELEMENT macrodef (probe|tag)+ >
+<!ATTLIST macrodef
+	name CDATA #REQUIRED
+>
 <!ATTLIST host
 	name CDATA #REQUIRED
 	dnsName CDATA #IMPLIED
+	hidden (true|false) "false"
 >
+<!ELEMENT tag (#PCDATA)>
 <!ELEMENT macro (properties?) >
 <!ATTLIST macro
 	name CDATA #REQUIRED
@@ -13,7 +19,11 @@
 		type CDATA #REQUIRED
 		name CDATA #IMPLIED
 >
-<!ELEMENT probe ((arg, list)*, threshold+, properties?) >
+<!ELEMENT probe ((arg| list)*, threshold*, properties?) >
+<!ATTLIST probe
+			type CDATA #REQUIRED
+			label CDATA #IMPLIED
+>
 <!ELEMENT arg EMPTY>
 <!ATTLIST arg
 			type CDATA #REQUIRED
@@ -37,3 +47,13 @@
 <!ELEMENT comment (#PCDATA) >
 <!ELEMENT entry (#PCDATA) >
 <!ATTLIST entry key CDATA #REQUIRED>
+<!ELEMENT for (probe+) >
+<!ATTLIST for 
+	var CDATA #REQUIRED
+	value CDATA #REQUIRED
+>
+<!ELEMENT snmp (#PCDATA) >
+<!ATTLIST snmp 
+	community CDATA #REQUIRED
+	version CDATA #REQUIRED
+>
