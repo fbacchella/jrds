@@ -3,7 +3,6 @@
 <head>
 	<title>JRDS</title>
 <link href="dijit/themes/nihilo/nihilo.css" rel="stylesheet" type="text/css" />
-<link href="dojox/form/resources/DropDownSelect.css" rel="stylesheet" type="text/css" />
 <link href="lib/jrds.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="dojo/dojo.js" djConfig="parseOnLoad:true, locale:'en-us'"></script>
 <script type="text/javascript" src="dojo/dojo-jrds.js"></script>
@@ -13,6 +12,7 @@
 var queryParams = {};
 
 initQuery();
+
 dojo.cookie("treeOneSaveStateCookie", null, {expires: -1});
 
 dojo.addOnLoad(function(){
@@ -37,25 +37,25 @@ dojo.addOnLoad(function(){
     <div dojoType="dijit.layout.ContentPane" id="formPane" >
       <form  id="dateForm" name="dateForm" action="index.html" method="get">
        <div  dojoType="dijit.layout.ContentPane" class="formblock" > <span class="linelabel">Time scale</span>
-       <select id="autoperiod" name="autoperiod">
-		<option value="0">Manual</option>
-		<option value="1">Last Hour</option>
-		<option value="2">Last 2 Hours</option>
-		<option value="3">Last 3 Hours</option>
-		<option value="4">Last 4 Hours</option>
-		<option value="5">Last 6 Hours</option>
-		<option value="6">Last 12 Hours</option>
-		<option value="7">Last Day</option>
-		<option value="8">Last 2 Days</option>
-		<option value="9">Last Week</option>
-		<option value="10">Last 2 Weeks</option>
-		<option value="11">Last Month</option>
-		<option value="12">Last 2 Months</option>
-		<option value="13">Last 3 Months</option>
-		<option value="14">Last 4 Months</option>
-		<option value="15">Last 6 Months</option>
-		<option value="16">Last Year</option>
-		<option value="17">Last 2 Years</option>
+       <select id="autoperiod" name="autoperiod" dojoType="dijit.form.Select">
+		<option value="0" id="0">Manual</option>
+		<option value="1" id="1">Last Hour</option>
+		<option value="2" id="2">Last 2 Hours</option>
+		<option value="3" id="3">Last 3 Hours</option>
+		<option value="4" id="4">Last 4 Hours</option>
+		<option value="5" id="5">Last 6 Hours</option>
+		<option value="6" id="6">Last 12 Hours</option>
+		<option value="7" id="7">Last Day</option>
+		<option value="8" id="8">Last 2 Days</option>
+		<option value="9" id="9">Last Week</option>
+		<option value="10" id="10">Last 2 Weeks</option>
+		<option value="11" id="11">Last Month</option>
+		<option value="12" id="12">Last 2 Months</option>
+		<option value="13" id="13">Last 3 Months</option>
+		<option value="14" id="14">Last 4 Months</option>
+		<option value="15" id="15">Last 6 Months</option>
+		<option value="16" id="16">Last Year</option>
+		<option value="17" id="17">Last 2 Years</option>
        </select>
           <label for="begin">Begin</label>
           <input type="text" name="begin" id="begin" class="field" onkeypress="periodKeyEvent"/>

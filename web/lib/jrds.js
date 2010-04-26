@@ -1,12 +1,19 @@
 function initQuery() {
-	 dojo.xhrGet( {
+	var iq = dojo.xhrGet( {
 			content:  dojo.queryToObject(window.location.search.slice(1)),
 			sync: true,
 			url: "queryparams",
 			handleAs: "json",
+			preventCache: true,
 			load: function(response, ioArgs) {
 				queryParams = response;
+			    return response;
+			},
+			error: function(response, ioArgs) {
+				console.error("init query failed with " + response.message);
+			    return response;
 			}
+
 		});
 }
 
@@ -127,13 +134,9 @@ function fileForms() {
 		dateForm.begin.value = queryParams.begin;
     }
 	
-
 	setAutoscale(queryParams.max == null || queryParams.min ==null);
-	
-    var autoperiod = new dojox.form.DropDownSelect({
-         	value:queryParams.autoperiod,
-        	name: "autoperiod"
-         }, "autoperiod");
+	var autoperiod = dijit.byId('autoperiod'); 
+	autoperiod.attr('value', queryParams.autoperiod);
     autoperiod.dropDown.oldItemClick=autoperiod.dropDown.onItemClick;
     autoperiod.dropDown.onItemClick = setScale;
 
@@ -158,19 +161,20 @@ function getTree() {
 	});
 
 	var treeModel = new dijit.tree.ForestStoreModel({
-		jsId:"treeModel",
-		id:"treeModel",
         store: store,
         query: {"type": type},
-        rootId: "root",
+        rootLabel: 'All filters',
         childrenAttrs: ["children"]
     });
+	console.debug(treeModel);
 
     new dijit.Tree({
-        model: treeModel,
+    	model: treeModel,
 		showRoot: false,
         onClick: loadTree
-     }, "treeOne");	
+    }, "treeOne");	
+	console.debug("got tree")
+
 }
 
 function toogleSort() {
@@ -234,7 +238,8 @@ function setupCalendar() {
             locale: 'en-us'
     	},
     	dateStr: '',
-    	regExpGen: function() { 
+    	regExpGen: function() {
+    		console.debug("\\d\\d\\d\\d-\\d\\d-\\d\\d");
     		return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
     	},
     	format: function(date) {
@@ -256,11 +261,19 @@ function setupCalendar() {
         }
     });
    new DayHourTextBox({
+	   		//A bug in dojo 4.2 ?
+	   		regExpGen: function() {
+				return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
+			},
             name: "begin",
             resetHour: beginHour,
             timeBox: beginTimeTextBox
     }, "begin");
     new DayHourTextBox({
+   			//A bug in dojo 4.2 ?
+   			regExpGen: function() {
+				return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
+			},
             name: "end",
             resetHour: endHour,
             timeBox: endTimeTextBox
