@@ -213,7 +213,9 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 		if(url == null) {
 			try {
 				if(port == 0) {
-					String portStr = String.format(getPd().getSpecific("port"), argslist.toArray());
+					String portStr = getPd().getSpecific("port");
+					if(portStr != null && ! "".equals(portStr) && argslist != null)
+						portStr = String.format(portStr, argslist.toArray());
 					port = jrds.Util.parseStringNumber(portStr, Integer.class, 80).intValue();
 				}
 				if(file == null) {

@@ -39,6 +39,8 @@ public class Ntp extends Probe<String, Number> {
 	@Override
 	public Map<String, Number> getNewSampleValues() {
 		Resolver resolv = (Resolver) getStarters().find(Resolver.makeKey(this)); 
+		if(! resolv.isStarted())
+			return Collections.emptyMap();
 		try {
 			TimeInfo ti = client.getTime(resolv.getInetAddress(), port);
 			ti.computeDetails();
