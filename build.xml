@@ -80,6 +80,7 @@
 	       </antcall>
 	</target>
 
+	<!-- See http://remotetea.sourceforge.net, needs  oncprc.jar-->
 	<target name="rstat" depends="compile" description="To use rstat, needs oncprc.jar from http://remotetea.sourceforge.net/">
 	      <antcall target="compile.subprobes">
 	            <param name="subprobe" value="rstat"/>
@@ -144,12 +145,16 @@
 			author="true" version="true" nodeprecatedlist="false"
 			nodeprecated="false"
 			packagenames="jrds,jrds.*,jrds.probe.*,jrds.factories.*"
-			sourcepath="src">
+			>
+			<fileset dir="src" />
+			<fileset dir="probes-other">
+				<include name="*/src/**/*.java" />
+			</fileset>
 			<classpath refid="external.classpath"/>
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
 			<link href="http://java.sun.com/products/servlet/2.3/javadoc"/>
 			<link href="http://www.snmp4j.org/doc"/>
-			<link href="http://jrds.sourceforge.net/apidoc-rrd4j/"/>
+			<link href="http://jrds.fr/apidoc-rrd4j/"/>
 			<link href="http://www.junit.org/junit/javadoc/4.3"/>
 			<link href="http://www.mortbay.org/apidocs/"/>
 		</javadoc>
@@ -189,32 +194,37 @@
 		</tar>
 	</target>
 	
-	<target name="jetty" depends="appjar" description="Build JRDS war">
+	<target name="jetty" depends="appjar" description="Build JRDS for jetty">
 		<tar destfile="${build.home}/${app.name}.tar" >  
+			<tarfileset dir="lib/dojo">
+			    <include name="dijit/themes/nihilo/**/*.*" />
+			    <include name="dojo/resources/blank.gif" />
+		    </tarfileset>
+			<tarfileset dir="${web.src}"/>
+			<tarfileset dir="libjetty" prefix="WEB-INF/lib"/>
 			<tarfileset dir="lib" prefix="WEB-INF/lib" >
 				<include name="*.jar"/>
 			</tarfileset>
 			<tarfileset dir="${build.home}" prefix="WEB-INF/lib">
 				<include name="*.jar"/>
 			</tarfileset>
-			<tarfileset dir="${web.src}"/>
-			<tarfileset dir="lib/dojo"/>
-			<tarfileset dir="libjetty" prefix="WEB-INF/lib"/>
 		</tar>
 	</target>
 	
 	<target name="war" depends="appjar" description="Build JRDS war">
 		<war destfile="${build.home}/${app.name}.war" webxml="${basedir}/web/WEB-INF/web.xml"
 			duplicate="preserve">
+			<fileset dir="${web.src}"/>
+			<fileset dir="lib/dojo">
+			    <exclude name="dojo/dojo.js" />
+		    </fileset>
 			<lib dir="lib">
 				<include name="*.jar"/>
 			</lib>
 			<lib dir="${build.home}">
 				<include name="*.jar"/>
 			</lib>
-			<fileset dir="${web.src}"/>
-			<fileset dir="lib/dojo"/>
-		</war>
+    		</war>
 	</target>
 	
 	<target name="checkdtd">
@@ -230,7 +240,7 @@
 		</xmlvalidate>
 	</target>
 	
-	<target name="test" depends="compile.test">
+	<target name="test" depends="compile.test, checkdtd">
 		<junit printsummary="yes" showoutput="no">
 			<formatter type="plain"/>
 			<classpath refid="test.classpath"/>
