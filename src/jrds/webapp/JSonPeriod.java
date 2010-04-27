@@ -11,7 +11,6 @@ import jrds.Period;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;
-import org.json.JSONWriter;
 
 /**
  * Servlet implementation class JSonPeriod
@@ -28,7 +27,7 @@ public class JSonPeriod extends JrdsServlet {
 		ParamsBean params = getParamsBean(request);
 
 		try {
-			JSONWriter w = JsonHeader(response);
+			JrdsJSONWriter w = new JrdsJSONWriter(response);
 			w.object();
 
 			Period p = params.getPeriod();
@@ -41,6 +40,8 @@ public class JSonPeriod extends JrdsServlet {
 				w.key("scale").value(scale);
 			}
 			w.endObject();
+			w.newLine();
+			w.flush();
 		} catch (JSONException e) {
 			logger.warn("Failed request: " + request.getRequestURI() + "?" + request.getQueryString() +": " + e, e);
 		}
