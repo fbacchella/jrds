@@ -8,7 +8,7 @@ dependencies ={
             "dijit.form.DateTextBox",
             "dijit.form.Button",
             "dijit.form.TextBox",
-            "dojox.form.DropDownSelect",
+            "dijit.form.Select",
             "dijit.form.Form",
             "dojo.parser",
             "dijit.form.Button",
@@ -16,7 +16,8 @@ dependencies ={
             "dojo.data.ItemFileReadStore",
             "dijit.form.NumberTextBox",
             "dijit.Tree",
-            "dojo.number"
+            "dojo.number",
+            "dijit.form.TimeTextBox"
         ]
         }
     ],
