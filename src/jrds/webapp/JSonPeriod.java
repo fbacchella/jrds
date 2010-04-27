@@ -3,17 +3,22 @@ package jrds.webapp;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jrds.Period;
 
+import org.apache.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONWriter;
+
 /**
  * Servlet implementation class JSonPeriod
  */
 public class JSonPeriod extends JrdsServlet {
+	static final private Logger logger = Logger.getLogger(JSonPeriod.class);
+
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -21,18 +26,24 @@ public class JSonPeriod extends JrdsServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		ParamsBean params = getParamsBean(request);
-		response.setContentType("application/json");
-		ServletOutputStream out = response.getOutputStream();
 
-		out.println("{");
-		Period p = params.getPeriod();
-		out.println("begin: \"" + params.getStringBegin() + ",\"");
-		out.println("end: \"" + params.getStringEnd() + ",\"");
-		int scale = p.getScale();
-		if(scale != 0) {
-			out.println("scale: \"" + scale + "\"");
+		try {
+			JSONWriter w = JsonHeader(response);
+			w.object();
+
+			Period p = params.getPeriod();
+			
+			w.key("begin").value(params.getStringBegin());
+			w.key("end").value(params.getStringEnd());
+
+			int scale = p.getScale();
+			if(scale != 0) {
+				w.key("scale").value(scale);
+			}
+			w.endObject();
+		} catch (JSONException e) {
+			logger.warn("Failed request: " + request.getRequestURI() + "?" + request.getQueryString() +": " + e, e);
 		}
-		out.println("}");
 	}
 
 }

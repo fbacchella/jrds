@@ -1,24 +1,22 @@
 package jrds.webapp;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-
 import jrds.HostsList;
+
+import org.apache.log4j.Logger;
+import org.json.JSONException;
 
 public abstract class JSonData extends JrdsServlet {
 	static final private Logger logger = Logger.getLogger(JSonData.class);
-	
+
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
@@ -26,58 +24,61 @@ public abstract class JSonData extends JrdsServlet {
 		try {
 			ParamsBean params = getParamsBean(request);
 			HostsList root = getHostsList();
-			response.setContentType("application/json");
-			ServletOutputStream out = response.getOutputStream();
-			out.println("{ identifier: 'id'," +
-					"  label: 'name'," +
-					"  items: [ "
-			);
-
-			if (! generate(out, root, params)) {
+			JrdsJSONWriter w = new JrdsJSONWriter(response);
+			w.object();
+			w.key("identifier").value("id");
+			w.key("label").value("name");
+			w.key("items");
+			w.array();
+			w.newLine();
+			if (! generate(w, root, params)) {
 				logger.warn("Invalid request received: " + request.getRequestURI() + "?" + request.getQueryString());
 			}
-			
-			out.println("]}");
+			w.endArray();
+			w.endObject();
+			w.newLine();
+			w.flush();
 		} catch (Exception e) {
 			logger.warn("Failed request: " + request.getRequestURI() + "?" + request.getQueryString() +": " + e, e);
 		}
 	}
 
-	public abstract boolean generate(ServletOutputStream out, HostsList root, ParamsBean params) throws IOException;
-	
-	public String doNode(String name, int id, String type, List<String> childsref) {
-		return doNode(name, Integer.toString(id), type, childsref, null);
-	}
-	public String doNode(String name, int id, String type, List<String> childsref, Map<String, String> attributes) {
-		return doNode(name, Integer.toString(id), type, childsref, attributes);
-	}
-	public String doNode(String name, String id, String type, List<String> childsref) {
-		return doNode(name, id, type, childsref, null);
+	public abstract boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException, JSONException;
 
+	public JrdsJSONWriter doNode(JrdsJSONWriter w, String name, int id, String type, List<String> childsref) throws JSONException {
+		return doNode(w, name, Integer.toString(id), type, childsref, null);
 	}
-	public String doNode(String name, String id, String type, List<String> childsref, Map<String, String> attributes) {
-		StringWriter buffer = new StringWriter();
-		PrintWriter out = new PrintWriter(buffer );
+	
+	public JrdsJSONWriter doNode(JrdsJSONWriter w,String name, int id, String type, List<String> childsref, Map<String, String> attributes) throws JSONException {
+		return doNode(w, name, Integer.toString(id), type, childsref, attributes);
+	}
+	
+	public JrdsJSONWriter doNode(JrdsJSONWriter w, String name, String id, String type, List<String> childsref) throws JSONException {
+		return doNode(w, name, id, type, childsref, null);
+	}
+	
+	public JrdsJSONWriter doNode(JrdsJSONWriter w, String name, String id, String type, List<String> childsref, Map<String, String> attributes) throws JSONException {
 		name = name.replace("'", " ").replace("\"", " ");
-		out.print("{ name:'" + name + "', type:'" + type + "', id:'" + id + "'");
+		w.object();
+		w.key("name").value(name);
+		w.key("type").value(type);
+		w.key("id").value(id);
+
 		if(attributes != null && attributes.size() > 0) {
 			for(Map.Entry<String, String> e: attributes.entrySet()) {
-				out.print(", " + e.getKey() + ":'" + e.getValue().replace("'", " ") +"'");
+				w.key(e.getKey()).value(e.getValue().replace("'", " "));
 			}
 		}
 		if(childsref != null && childsref.size() >0 ) {
-			out.println(", ");
-			out.println("children:[");
-			out.print("  ");
+			w.key("children").array();
 			for(String child: childsref) {
-				out.print("{_reference:'" + child + "'},");
+				w.object().key("_reference").value(child).endObject();
 			}
-			out.println();
-			out.println("]");
+			w.endArray();
 		}
-		out.println("},");
+		w.endObject();
 
-		return buffer.toString();
+		return w;
 	}
 
 }

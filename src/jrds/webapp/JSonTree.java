@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletOutputStream;
-
 import jrds.Filter;
 import jrds.FilterTag;
 import jrds.FilterXml;
@@ -17,6 +15,7 @@ import jrds.GraphTree;
 import jrds.HostsList;
 
 import org.apache.log4j.Logger;
+import org.json.JSONException;
 
 /**
  * Servlet implementation class JSonTree
@@ -27,17 +26,16 @@ public class JSonTree extends JSonData {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public boolean generate(ServletOutputStream out, HostsList root,
-			ParamsBean params) throws IOException {
+	public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException, JSONException {
 		Filter f = params.getFilter();
 		if( f != null) {
-			return evaluateFilter(params, out, root, f);
+			return evaluateFilter(params, w, root, f);
 		}
 		else 
-			return dumpRoots(out, root);
+			return dumpRoots(w, root);
 	}
 
-	boolean evaluateFilter(ParamsBean params, ServletOutputStream out, HostsList root, Filter f) throws IOException {
+	boolean evaluateFilter(ParamsBean params, JrdsJSONWriter w, HostsList root, Filter f) throws IOException, JSONException {
 		logger.debug("Dumping with filter" + f);
 		Collection<GraphTree> level = root.getGraphsRoot();
 		logger.trace("This level size: " + level.size());
@@ -59,13 +57,15 @@ public class JSonTree extends JSonData {
 
 		for(GraphTree tree: level) {
 			tree = f.setRoot(tree);
-			if(tree != null)
-				sub(params, out, tree, "tree", f, "", tree.hashCode());
+			if(tree != null) {
+				sub(params, w, tree, "tree", f, "", tree.hashCode());
+			}
+
 		}
 		return true;
 	}
 
-	boolean dumpRoots(ServletOutputStream out, HostsList root) throws IOException {
+	boolean dumpRoots(JrdsJSONWriter w, HostsList root) throws IOException, JSONException {
 		List<String> tagsref = new ArrayList<String>();
 		for(String filterName: root.getAllFiltersNames()) {
 			Filter filter = root.getFilter(filterName);
@@ -77,15 +77,15 @@ public class JSonTree extends JSonData {
 			}
 			Map<String, String> href = new HashMap<String, String>();
 			href.put("filter", filterName);
-			out.print(doNode(filterName, filter.hashCode(), type, null, href));
+			doNode(w,filterName, filter.hashCode(), type, null, href);
 		}
 		if(tagsref.size() > 0) {
-			out.print(doNode("All tags", tagsref.hashCode(), "filter", tagsref));
+			doNode(w,"All tags", tagsref.hashCode(), "filter", tagsref);
 		}
 		return true;
 	}
 
-	String sub(ParamsBean params, ServletOutputStream out, GraphTree gt, String type, Filter f, String path, int base) throws IOException {
+	String sub(ParamsBean params, JrdsJSONWriter w, GraphTree gt, String type, Filter f, String path, int base) throws IOException, JSONException {
 		String id = null;
 		String subpath = path + "/" + gt.getName();
 		logger.trace(subpath);
@@ -94,7 +94,7 @@ public class JSonTree extends JSonData {
 
 		List<String> childsref = new ArrayList<String>();
 		for(Map.Entry<String, GraphTree>e: childs.entrySet()) {
-			String childid = sub(params, out, e.getValue(), "node", f, subpath, base);
+			String childid = sub(params, w, e.getValue(), "node", f, subpath, base);
 			if(childid != null) {
 				hasChild = true;
 				childsref.add(childid);
@@ -108,13 +108,13 @@ public class JSonTree extends JSonData {
 				hasChild = true;
 				String graphid = base + "." + child.hashCode();
 				childsref.add(graphid );
-				out.print(doNode(leafName, graphid, "graph", null));
+				doNode(w,leafName, graphid, "graph", null);
 			}
 		}
 
 		if(hasChild) {
 			id = base + "." +  gt.getPath().hashCode();
-			out.print(doNode(gt.getName(), id, type, childsref));
+			doNode(w,gt.getName(), id, type, childsref);
 		}
 		return id;
 	}

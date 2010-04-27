@@ -8,10 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletOutputStream;
-
-import org.apache.log4j.Logger;
-
 import jrds.Filter;
 import jrds.GraphDesc;
 import jrds.GraphNode;
@@ -19,6 +15,9 @@ import jrds.GraphTree;
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.Renderer;
+
+import org.apache.log4j.Logger;
+import org.json.JSONException;
 
 /**
  * Servlet implementation class JSonGraph
@@ -29,8 +28,8 @@ public class JSonGraph extends JSonData {
 	private int periodHistory[] = {7, 9, 11, 16};
 
 	@Override
-	public boolean generate(ServletOutputStream out, HostsList root,
-			ParamsBean params) throws IOException {
+	public boolean generate(JrdsJSONWriter w, HostsList root,
+			ParamsBean params) throws IOException, JSONException {
 
 		Filter filter = params.getFilter();
 		int id = params.getId();
@@ -69,18 +68,18 @@ public class JSonGraph extends JSonData {
 				if(params.isHistory()) {
 					for(int p: periodHistory) {
 						params.setScale(p);
-						doGraph(gn, r, params, out);
+						doGraph(gn, r, params, w);
 					}
 				}
 				else {
-					doGraph(gn, r, params, out);
+					doGraph(gn, r, params, w);
 				}
 			}
 		}
 		return true;
 	}
 
-	private void doGraph(GraphNode gn, Renderer r, ParamsBean params, ServletOutputStream out) throws IOException {
+	private void doGraph(GraphNode gn, Renderer r, ParamsBean params, JrdsJSONWriter w) throws IOException, JSONException {
 		jrds.Graph graph = gn.getGraph();
 		params.configureGraph(graph);
 
@@ -102,7 +101,7 @@ public class JSonGraph extends JSonData {
 			imgProps.put("width", Integer.toString(gd.getDimension().width));
 		}
 
-		out.print(doNode(graph.getQualifieName(), gn.hashCode(), "graph", null, imgProps));
+		doNode(w, graph.getQualifieName(), gn.hashCode(), "graph", null, imgProps);
 
 	}
 

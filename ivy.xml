@@ -18,6 +18,7 @@
 	    	<artifact name="dojo" type="zip" />
 		</dependency>
 		<dependency org="commons-net" name="commons-net" rev="2.0"  conf="lib->default" />
+		<dependency org="org.json" name="json" rev="20090211"/>
 		<dependency org="junit" name="junit" rev="4.7" conf="libtest->default" />
 		<dependency org="httpunit" name="httpunit" rev="1.6.2" conf="libtest->default">
 			<exclude
