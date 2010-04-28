@@ -94,6 +94,8 @@ public class Graph {
 	 */
 	private RrdGraphDef graphFormat(RrdGraphDef graphDef) {
 		Date lastUpdate = node.getProbe().getLastUpdate();
+		graphDef.setAntiAliasing(true);
+		graphDef.setTextAntiAliasing(true);
 		graphDef.setTitle(node.getGraphTitle());
 		graphDef.comment("\\l");
 		graphDef.comment("\\l");
