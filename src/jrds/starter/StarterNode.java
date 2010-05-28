@@ -13,7 +13,9 @@ public abstract class StarterNode {
 	private final StartersSet starters = new StartersSet(this);
 
 	public StarterNode() {
-		
+		if (this instanceof HostsList) {
+			root = (HostsList) this;
+		}
 	}
 	
 	public StarterNode(StarterNode parent) {
@@ -56,13 +58,13 @@ public abstract class StarterNode {
 		return root;
 	}
 
+
 	/**
 	 * @return the parent
 	 */
 	public StarterNode getParent() {
 		return parent;
 	}
-
 
 }
 	

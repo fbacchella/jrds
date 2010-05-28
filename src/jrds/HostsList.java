@@ -80,6 +80,7 @@ public class HostsList extends StarterNode {
 	 *  
 	 */
 	public HostsList() {
+		super();
 		init();
 	}
 
