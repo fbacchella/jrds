@@ -11,6 +11,9 @@ public class SocketFactory extends Starter {
 	int timeout;
 	
 	public ServerSocket createServerSocket(int port) throws IOException {
+		if(! isStarted())
+			return null;
+		
 		ServerSocket s = new ServerSocket(port) {
 
 			/* (non-Javadoc)
@@ -29,6 +32,9 @@ public class SocketFactory extends Starter {
 	}
 
 	public Socket createSocket(String host, int port) throws IOException {
+		if(! isStarted())
+			return null;
+		
 		Socket s = new Socket(host, port) {
 			public void connect(SocketAddress endpoint) throws IOException {
 				super.connect(endpoint, timeout * 1000);
@@ -47,6 +53,9 @@ public class SocketFactory extends Starter {
 	}
 
 	public Socket createSocket(RdsHost host, int port) throws IOException {
+		if(! isStarted())
+			return null;
+
 		Resolver r = (Resolver) host.getStarters().find(Resolver.makeKey(host));
 		if(r == null || ! r.isStarted())
 			return null;
