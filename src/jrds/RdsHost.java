@@ -6,11 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import jrds.starter.Collecting;
 import jrds.starter.Resolver;
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;
-import jrds.starter.StartersSet;
 
 import org.apache.log4j.Logger;
 
@@ -20,25 +18,26 @@ import org.apache.log4j.Logger;
  * TODO To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Style - Code Templates
  */
-public class RdsHost implements Comparable<RdsHost>, StarterNode {
+public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
 	static private final Logger logger = Logger.getLogger(RdsHost.class);
 
 	private String name = null;
 	private String dnsName = null;
 	private final Set<Probe<?,?>> allProbes = new TreeSet<Probe<?,?>>();
 	private Set<String> tags = null;
-	private final StartersSet starters = new StartersSet(this);
 	private File hostdir = null;
 	private boolean hidden = false;
 
 	public RdsHost(String newName)
 	{
+		super();
 		name = newName;
 		new Resolver(name).register(this);
 	}
 
 	public RdsHost(String name, String dnsName)
 	{
+		super();
 		this.name = name;
 		this.dnsName = dnsName;
 		new Resolver(dnsName).register(this);
@@ -82,8 +81,7 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 	public void  collectAll()
 	{
 		long start = System.currentTimeMillis();
-		if(starters != null)
-			starters.startCollect();
+		startCollect();
 		for(Probe<?,?> currrd: allProbes) {
 			if(! isCollectRunning() )
 				break;
@@ -94,8 +92,7 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 			}
 			currrd.collect();
 		}
-		if(starters != null)
-			starters.stopCollect();
+		stopCollect();
 		long end = System.currentTimeMillis();
 		float elapsed = ((float)(end - start))/1000;
 		logger.debug("Collect time for " + name + ": " + elapsed + "s");
@@ -123,14 +120,6 @@ public class RdsHost implements Comparable<RdsHost>, StarterNode {
 		if(tags == null)
 			temptags = new HashSet<String>();
 		return temptags;
-	}
-
-	public StartersSet getStarters() {
-		return starters;
-	}
-
-	public boolean isCollectRunning() {
-		return getStarters().isStarted(Collecting.makeKey(this));
 	}
 
 	/**

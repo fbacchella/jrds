@@ -25,10 +25,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
-import jrds.starter.Collecting;
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;
-import jrds.starter.StartersSet;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -53,8 +51,7 @@ import org.w3c.dom.Element;
  * can overid some method as needed
  * @author Fabrice Bacchella
  */
-public abstract class Probe<KeyType, ValueType>
-implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
+public abstract class Probe<KeyType, ValueType> extends StarterNode implements Comparable<Probe<KeyType, ValueType>>  {
 
 	private int timeout = 30;
 	private long step = -1;
@@ -64,7 +61,6 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	private String stringValue = null;
 	private ProbeDesc pd;
 	private Set<String> tags = null;
-	private final StartersSet starters = new StartersSet(this);
 	private long uptime = Long.MAX_VALUE;
 	private boolean finished = false;
 	private String label = null;
@@ -78,9 +74,9 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	 * @param pd
 	 */
 	public Probe(RdsHost monitoredHost, ProbeDesc pd) {
+		super(monitoredHost);
 		setPd(pd);
 		setHost(monitoredHost);
-		starters.setParent(monitoredHost.getStarters());
 	}
 
 	/**
@@ -89,6 +85,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	 * @param pd
 	 */
 	public Probe(ProbeDesc pd) {
+		super();
 		setPd(pd);
 	}
 
@@ -98,6 +95,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 	 * @param pd
 	 */
 	public Probe() {
+		super();
 	}
 
 	public RdsHost getHost() {
@@ -106,7 +104,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 
 	public void setHost(RdsHost monitoredHost) {
 		this.monitoredHost = monitoredHost;
-		starters.setParent(monitoredHost.getStarters());
+		setParent(monitoredHost);
 	}
 
 	public void setPd(ProbeDesc pd) {
@@ -484,9 +482,9 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 			return;
 		}
 		//We only collect if the HostsList allow it
-		if(isCollectRunning()) {
+		if(getParent().isCollectRunning()) {
 			log(Level.DEBUG,"launching collect");
-			starters.startCollect();
+			startCollect();
 			RrdDb rrdDb = null;
 			try {
 				//No collect if the thread was interrupted
@@ -511,7 +509,7 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 				log(Level.ERROR, e, "Error while collecting: %s", e.getMessage());
 			}
 			finally  {
-				starters.stopCollect();
+				stopCollect();
 				if(rrdDb != null)
 					StoreOpener.releaseRrd(rrdDb);
 			}
@@ -659,20 +657,22 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 		return alltags;
 	}
 
-	public StartersSet getStarters() {
-		return starters;
-	}
 
+	/* (non-Javadoc)
+	 * @see jrds.starter.StarterNode#isCollectRunning()
+	 */
+	@Override
 	public boolean isCollectRunning() {
 		//Detected if a connected probe failed to start
 		if(this instanceof ConnectedProbe) {
 			ConnectedProbe cp = (ConnectedProbe) this;
 			String cnxName = cp.getConnectionName();
 			Starter cnx = getStarters().find(cnxName);
+			log(Level.TRACE, "Connection: " + cnx.isStarted() );
 			if(cnx == null || ! cnx.isStarted())
 				return false;
 		}
-		return getStarters().isStarted(Collecting.makeKey(this));
+		return super.isCollectRunning();
 	}
 
 	public abstract String getSourceType();
@@ -824,10 +824,6 @@ implements Comparable<Probe<KeyType, ValueType>>, StarterNode {
 
 	public void setLabel(String label) {
 		this.label = label;
-	}
-
-	public HostsList getHostList() {
-		return (HostsList) getStarters().find(HostsList.class);
 	}
 
 	public void log(Level l, Throwable e, String format, Object... elements) {

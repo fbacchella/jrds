@@ -38,7 +38,7 @@ public class Sum extends GraphNode {
 		gd.setGraphTitle(theStore.getName());
 
 		String aname = p.getProbeList().iterator().next();
-		HostsList hl = (HostsList)p.getStarters().find(HostsList.class);
+		HostsList hl = p.getHostList();
 		GraphNode g = hl.getGraphById(aname.hashCode());
 		if(g != null){
 			GraphDesc oldgd = g.getGraphDesc();
@@ -69,7 +69,7 @@ public class Sum extends GraphNode {
 				double[][] allvalues = null;
 				GraphDesc tempgd = null;
 				FetchData fd = null;
-				HostsList hl = (HostsList)p.getStarters().find(HostsList.class);
+				HostsList hl = p.getHostList();
 				for(String name : p.getProbeList()) {
 					GraphNode g = hl.getGraphById(name.hashCode());
 					logger.trace("Looking for " + name + " in graph base, and found " + g);

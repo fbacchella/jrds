@@ -711,7 +711,7 @@ implements Cloneable {
 	public RrdGraphDef getGraphDef(Probe<?,?> defProbe, Map<String, Plottable> ownData) throws IOException {
 		RrdGraphDef retValue = new RrdGraphDef();
 		String defRrdName = defProbe.getRrdName();
-		HostsList hl = (HostsList)defProbe.getStarters().find(HostsList.class);
+		HostsList hl = defProbe.getHostList();
 		List<DsDesc> toDo = new ArrayList<DsDesc>();
 		Set<String> datasources = new HashSet<String>();
 

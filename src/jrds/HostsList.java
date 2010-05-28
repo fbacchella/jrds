@@ -31,11 +31,8 @@ import jrds.factories.Loader;
 import jrds.probe.ContainerProbe;
 import jrds.probe.SumProbe;
 import jrds.probe.VirtualProbe;
-import jrds.starter.Collecting;
 import jrds.starter.SocketFactory;
-import jrds.starter.Starter;
 import jrds.starter.StarterNode;
-import jrds.starter.StartersSet;
 
 import org.apache.log4j.Logger;
 
@@ -44,7 +41,7 @@ import org.apache.log4j.Logger;
  * @author Fabrice Bacchella 
  * @version $Revision$,  $Date$
  */
-public class HostsList extends Starter implements StarterNode {
+public class HostsList extends StarterNode {
 	static private final Logger logger = Logger.getLogger(HostsList.class);
 
 	public class Stats {
@@ -61,7 +58,6 @@ public class HostsList extends Starter implements StarterNode {
 	public static final String CUSTOMROOT = "Dashboard";
 	public static final String TAGSROOT = "All tags";
 
-	private StartersSet starters = null;
 	private RdsHost sumhost =  null;
 	private RdsHost customhost =  null;
 
@@ -76,6 +72,7 @@ public class HostsList extends Starter implements StarterNode {
 	private File rrdDir = null;
 	private File tmpDir = null;
 	private int timeout = 10;
+	// A global flag that tells globally that this HostsList can be used
 	volatile private boolean started = false;
 	private Stats stats = new Stats(); 
 
@@ -115,9 +112,6 @@ public class HostsList extends Starter implements StarterNode {
 
 		addRoot(TAGSROOT);
 
-		starters = new StartersSet(this);
-		new Collecting().register(this);
-		register(this);
 		jrds.snmp.SnmpStarter.full.register(this);
 		new SocketFactory().register(this);
 		sumhost.getStarters().setParent(getStarters());
@@ -219,7 +213,6 @@ public class HostsList extends Starter implements StarterNode {
 			addVirtual(cp, customhost, CUSTOMROOT);
 		}
 		started = true;
-
 	}
 
 	public Collection<RdsHost> getHosts() {
@@ -244,7 +237,7 @@ public class HostsList extends Starter implements StarterNode {
 
 	public void addHost(RdsHost newhost) {
 		hostList.add(newhost);
-		newhost.getStarters().setParent(getStarters());
+		newhost.setParent(this);
 	}
 
 	public void collectAll() {
@@ -270,7 +263,7 @@ public class HostsList extends Starter implements StarterNode {
 					}
 				}
 				);
-				starters.startCollect();
+				startCollect();
 				for(final RdsHost oneHost: hostList) {
 					if( ! isCollectRunning())
 						break;
@@ -301,7 +294,7 @@ public class HostsList extends Starter implements StarterNode {
 				} catch (InterruptedException e) {
 					logger.info("Collect interrupted");
 				}
-				starters.stopCollect();
+				stopCollect();
 				if( ! tpool.isTerminated()) {
 					//Second chance, we wait for the time out
 					try {
@@ -384,10 +377,6 @@ public class HostsList extends Starter implements StarterNode {
 		return node;
 	}
 
-	public StartersSet getStarters() {
-		return starters;
-	}
-
 	public void addFilter(Filter newFilter) {
 		filters.put(newFilter.getName(), newFilter);
 		logger.debug("Filter " + newFilter.getName() + " added");
@@ -447,10 +436,6 @@ public class HostsList extends Starter implements StarterNode {
 		return timeout;
 	}
 
-	public boolean isCollectRunning() {
-		return started && getStarters().isStarted(Collecting.class);
-	}
-
 	/**
 	 * @return the stats
 	 */
@@ -458,19 +443,19 @@ public class HostsList extends Starter implements StarterNode {
 		return stats;
 	}
 
-	/* (non-Javadoc)
-	 * @see jrds.starter.Starter#getKey()
-	 */
-	@Override
-	public Object getKey() {
-		return this.getClass();
-	}
-
 	/**
 	 * @param started the started to set
 	 */
 	public void finished() {
 		this.started = false;
+	}
+
+	/* (non-Javadoc)
+	 * @see jrds.starter.StarterNode#isCollectRunning()
+	 */
+	@Override
+	public boolean isCollectRunning() {
+		return started && super.isCollectRunning();
 	}
 
 }

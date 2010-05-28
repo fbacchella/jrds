@@ -64,7 +64,8 @@ public abstract class Connection<ConnectedType> extends Starter {
 	
 	public Resolver getResolver() {
 		String hostName = getHostName();
-		Resolver r = (Resolver) getLevel().find(Resolver.makeKey(getParent()));
+		//Resolver r = (Resolver) getLevel().find(Resolver.makeKey(getParent()));
+		Resolver r = getLevel().find(Resolver.class, getParent());
 		if(r == null) {
 			r = new Resolver(hostName);
 			r.register(getParent());

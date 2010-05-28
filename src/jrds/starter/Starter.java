@@ -81,6 +81,7 @@ public abstract class Starter {
 	 * @return
 	 */
 	public final Starter register(StarterNode node) {
+		logger.trace("Registering " + this);
 		return node.getStarters().registerStarter(this, node);
 	}
 }
