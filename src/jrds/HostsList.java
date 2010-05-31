@@ -115,8 +115,8 @@ public class HostsList extends StarterNode {
 
 		jrds.snmp.SnmpStarter.full.register(this);
 		new SocketFactory().register(this);
-		sumhost.getStarters().setParent(getStarters());
-		customhost.getStarters().setParent(getStarters());
+		sumhost.setParent(this);
+		customhost.setParent(this);
 	}
 
 	public void configure(PropertiesManager pm) {
