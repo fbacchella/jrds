@@ -83,6 +83,12 @@ public class Renderer {
 		}
 
 		public void clean(){
+			if(logger.isTraceEnabled()) {
+				logger.trace("clean in");
+				for(StackTraceElement e: Thread.currentThread().getStackTrace()) {
+					logger.trace("    " + e.toString());
+				}
+			}
 			if(destFile.isFile())
 				destFile.delete();
 		}
@@ -160,13 +166,33 @@ public class Renderer {
 			protected boolean removeEldestEntry(Entry<Integer, RendererRun> eldest) {
 				RendererRun rr = eldest.getValue();
 				if( rr != null && rr.finished &&  size() > Renderer.this.cacheSize) {
-					remove(eldest);
-					rr.clean();
+					return true;
 				}
 				else if (rr != null &&  size() > Renderer.this.cacheSize){
 					logger.info("Graph queue too short, it's now " +  size() + " instead of " + Renderer.this.cacheSize);
 				}
 				return false;
+			}
+
+			/* (non-Javadoc)
+			 * @see java.util.HashMap#remove(java.lang.Object)
+			 */
+			@Override
+			public RendererRun remove(Object key) {
+				RendererRun rr =  super.remove(key);
+				rr.clean();
+				return rr;
+			}
+
+			/* (non-Javadoc)
+			 * @see java.lang.Object#finalize()
+			 */
+			@Override
+			protected void finalize() throws Throwable {
+				for(RendererRun rr: this.values()) {
+					rr.clean();
+				}
+				super.finalize();
 			}
 
 		};
@@ -245,8 +271,10 @@ public class Renderer {
 		try {
 			tpool.awaitTermination(step - 10, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
-			logger.info("Collect interrupted");
+			logger.info("Rendering interrupted");
 		}
-
+		for(RendererRun rr: rendered.values()) {
+			rr.clean();
+		}
 	}
 }

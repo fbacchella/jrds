@@ -39,7 +39,7 @@ public class Jetty extends CommandStarterImpl {
 	public void start(String args[]) {
 		Logger.getRootLogger().setLevel(Level.ERROR);
 
-		Server server = new Server();
+		final Server server = new Server();
 		Connector connector=new SelectChannelConnector();
 		connector.setPort(port);
 
@@ -65,6 +65,18 @@ public class Jetty extends CommandStarterImpl {
 		HandlerCollection handlers = new HandlerList();
 		handlers.setHandlers(new Handler[]{staticFiles,webapp});
 		server.setHandler(handlers);
+
+		Thread finish = new Thread() {
+		    public void run()
+		    {
+		    	try {
+					server.stop();
+				} catch (Exception e) {
+					throw new RuntimeException("Jetty server failed to stop", e);
+				}
+		    }
+		};
+		Runtime.getRuntime().addShutdownHook(finish);
 
 		try {
 			server.start();
