@@ -7,8 +7,7 @@ public abstract class Starter {
 	static final private Logger logger = Logger.getLogger(Starter.class);
 	long uptime = Long.MAX_VALUE;
 
-	private StartersSet level = null;
-	private StarterNode parent;	
+	private StarterNode level;	
 	volatile private boolean started = false;
 
 	/**
@@ -17,17 +16,20 @@ public abstract class Starter {
 	 * @param parent
 	 * @param level
 	 */
-	public void initialize(StarterNode parent, StartersSet level) {
+	public void initialize(StarterNode level) {
 		this.level = level;
-		this.parent = parent;
+	}
+
+	public void initialize(jrds.starter.StarterNode level ,jrds.starter.StartersSet none) {
+		this.level = level;
 	}
 
 	public final void doStart() {
 		if(logger.isTraceEnabled())
-			logger.trace("Starting " + getKey() + "@" + hashCode() +  " for " + parent);
+			logger.trace("Starting " + getKey() + "@" + hashCode() +  " for " + level);
 		started = start();
 	}
-	
+
 	public final void doStop() {
 		if(started) {
 			logger.trace("Stopping " + this);
@@ -38,26 +40,22 @@ public abstract class Starter {
 	public boolean start() {
 		return true;
 	}
-	
+
 	public void stop() {
 	}
-	
+
 	public Object getKey() {
-		return this;
+		return getClass();
 	}
-	
-	public StartersSet getLevel() {
+
+	public StarterNode getLevel() {
 		return level;
 	}
-	
+
 	public boolean isStarted() {
 		return started;
 	}
-	
-	public StarterNode getParent() {
-		return parent;
-	}
-	
+
 	@Override
 	public String toString() {
 		return getKey().toString();
@@ -82,6 +80,16 @@ public abstract class Starter {
 	 */
 	public final Starter register(StarterNode node) {
 		logger.trace("Registering " + this);
-		return node.getStarters().registerStarter(this, node);
+		return node.registerStarter(this);
 	}
+
+	//Compatibily code
+	public StartersSet getParent() {
+		return level;
+	}
+
+	public final Starter register(StartersSet node) {
+		return register((StarterNode)node);
+	}
+
 }

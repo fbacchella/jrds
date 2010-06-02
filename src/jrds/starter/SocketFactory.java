@@ -56,7 +56,7 @@ public class SocketFactory extends Starter {
 		if(! isStarted())
 			return null;
 
-		Resolver r = (Resolver) host.getStarters().find(Resolver.makeKey(host));
+		Resolver r = (Resolver) host.find(Resolver.makeKey(host));
 		if(r == null || ! r.isStarted())
 			return null;
 

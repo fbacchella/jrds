@@ -19,7 +19,7 @@ public abstract class Connection<ConnectedType> extends Starter {
 	public abstract ConnectedType getConnection();
 
 	Socket makeSocket(String host, int port) throws UnknownHostException, IOException {
-		SocketFactory sf = (SocketFactory) getParent().getStarters().find(SocketFactory.makeKey(getParent()));
+		SocketFactory sf = (SocketFactory) getLevel().find(SocketFactory.makeKey(getLevel()));
 		return sf.createSocket(host, port);
 	}
 
@@ -53,11 +53,11 @@ public abstract class Connection<ConnectedType> extends Starter {
 	 * @return
 	 */
 	public String getHostName() {
-		if(getParent() instanceof RdsHost) {
-			return ((RdsHost)getParent()).getDnsName();
+		if(getLevel() instanceof RdsHost) {
+			return ((RdsHost)getLevel()).getDnsName();
 		}
-		if(getParent() instanceof Probe<?, ?>) {
-			return ((Probe<?,?>)getParent()).getHost().getDnsName();
+		if(getLevel() instanceof Probe<?, ?>) {
+			return ((Probe<?,?>)getLevel()).getHost().getDnsName();
 		}
 		return null;
 	}
@@ -65,10 +65,10 @@ public abstract class Connection<ConnectedType> extends Starter {
 	public Resolver getResolver() {
 		String hostName = getHostName();
 		//Resolver r = (Resolver) getLevel().find(Resolver.makeKey(getParent()));
-		Resolver r = getLevel().find(Resolver.class, getParent());
+		Resolver r = getLevel().find(Resolver.class, getLevel());
 		if(r == null) {
 			r = new Resolver(hostName);
-			r.register(getParent());
+			r.register(getLevel());
 		}
 		return r;
 	}
@@ -78,7 +78,7 @@ public abstract class Connection<ConnectedType> extends Starter {
 	 * @return the connection timeout in second
 	 */
 	public int getTimeout() {
-		SocketFactory sf = (SocketFactory) getParent().getStarters().find(SocketFactory.makeKey(getParent()));
+		SocketFactory sf = (SocketFactory) getLevel().find(SocketFactory.makeKey(getLevel()));
 		return sf.getTimeout();
 
 	}
