@@ -18,7 +18,8 @@ public class DtdTest {
 		Tools.setLevel(new String[] {"jrds", "org.apache"}, logger.getLevel());
 	}
 	
-	@Test public void scanPaths() throws Exception {
+	@Test
+	public void scanPaths() throws Exception {
 		Loader l = new Loader();
 		
 		//pm.join(new File("jrds.properties"));
@@ -30,4 +31,26 @@ public class DtdTest {
 			l.importUrl(lib);
 		}
 	}
+	
+	@Test
+	public void chechHost() throws Exception {
+		Tools.parseRessource("goodhost1.xml");
+		
+	}
+	@Test
+	public void chechFullDesc() throws Exception {
+		Tools.parseRessource("fulldesc.xml");
+		
+	}
+	@Test
+	public void chechMacro() throws Exception {
+		Tools.parseRessource("macro.xml");
+		
+	}
+	@Test
+	public void chechFilter() throws Exception {
+		Tools.parseRessource("view1.xml");
+		
+	}
+	
 }

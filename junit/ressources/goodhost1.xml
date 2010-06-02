@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE host PUBLIC "-//jrds//DTD Host//EN"
+                           "urn:jrds:host">
 <host name="myhost">
 	<snmp community="public" version="2" />
 	<properties>
@@ -5,10 +8,19 @@
 	</properties>
 	<probe type="PartitionSpace">
 		<arg type="String" value="/" />
-		<properties>
-			<entry key="bidule2">toto2</entry>
-		</properties>
+		<!--
+			<properties> <entry key="bidule2">toto2</entry> </properties>
+		-->
 	</probe>
 	<probe type="TcpSnmp">
 	</probe>
+	<collection name="netcard">
+		<element>eth0</element>
+		<element>eth1</element>
+	</collection>
+	<for var="i" collection="netcard">
+		<probe type="IfXSnmp">
+			<arg type="String" value="${i}"/>
+		</probe>
+	</for>
 </host>

@@ -19,7 +19,7 @@ import org.junit.Test;
 public class TestStats {
 	static final private Logger logger = Logger.getLogger(TestStats.class);
 
-	@Test(expected=NullPointerException.class)
+	@Test(expected=IllegalStateException.class)
 	public void testStats() throws ServletException, IOException
 	{
 		jrds.webapp.Status s = new jrds.webapp.Status();

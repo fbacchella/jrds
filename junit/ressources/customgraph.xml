@@ -10,7 +10,7 @@
 		<path>
 			<host>host1</host>
 			<probe>probe1</probe>
-			<name>name1</name>
+			<dsName>name1</dsName>
 		</path>
 		<graphType>line</graphType>
 		<legend>legend1</legend>
@@ -19,7 +19,7 @@
 		<path>
 			<host>host1</host>
 			<probe>probe1</probe>
-			<name>name1</name>
+			<dsName>name1</dsName>
 		</path>
 		<graphType>line</graphType>
 		<legend>legend1</legend>

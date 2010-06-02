@@ -31,17 +31,20 @@ public class TestLoadConfiguration {
 	static final private Logger logger = Logger.getLogger(TestLoadConfiguration.class);
 
 	static final private String propertiesXmlString = 
+		"<!DOCTYPE properties PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
 		"<properties>" +
 		"<entry key=\"a\">1</entry>" +
 		"<entry key=\"b\">2</entry>" +
 		"</properties>";
 
 	static final private String goodProbeXml2 = 
+		"<!DOCTYPE probe PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
 		"<probe type = \"PartitionSpace\">" +
 		"<arg type=\"String\" value=\"/\" />" +
 		"</probe>";
 
 	static final private String goodMacroXml = 
+		"<!DOCTYPE macrodef PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
 		"<macrodef name=\"macrodef\">" +
 		"<probe type = \"TcpSnmp\">" +
 		"</probe>" + 
@@ -51,6 +54,7 @@ public class TestLoadConfiguration {
 		"</macrodef>";
 
 	static final private String goodHostXml = 
+		"<!DOCTYPE host PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
 		"<host name=\"myhost\">" +
 		"<probe type = \"PartitionSpace\">" +
 		"<arg type=\"String\" value=\"/\" />" +
@@ -127,7 +131,7 @@ public class TestLoadConfiguration {
 		RdsHost h = hostMap.get("myhost");
 		Assert.assertNotNull(h);
 		Assert.assertEquals("myhost", h.getName());
-		logger.debug("properties: " + h.getStarters().find(ChainedProperties.class.getName()));
+		logger.debug("properties: " + h.find(ChainedProperties.class.getName()));
 		Collection<Probe<?,?>> probes = h.getProbes();
 		Assert.assertEquals(2, probes.size());
 		//		HostBuilder hb = new HostBuilder();

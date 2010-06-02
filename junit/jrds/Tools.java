@@ -45,7 +45,7 @@ final public class Tools {
 	static public void prepareXml() throws ParserConfigurationException {
 		DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
 		instance.setIgnoringComments(true);
-		instance.setValidating(false);
+		instance.setValidating(true);
 		instance.setExpandEntityReferences(false);
 		dbuilder = instance.newDocumentBuilder();
 		dbuilder.setEntityResolver(new EntityResolver());

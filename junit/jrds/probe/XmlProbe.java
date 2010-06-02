@@ -119,11 +119,11 @@ public class XmlProbe {
 		p.setPd(pd);
 
 		p.configure(url, args);
-		p.getStarters().startCollect();
-		h.getStarters().startCollect();
+		p.startCollect();
+		h.startCollect();
 		Map<?, ?> vars = p.getNewSampleValues();
-		p.getStarters().stopCollect();
-		h.getStarters().stopCollect();
+		p.stopCollect();
+		h.stopCollect();
 
 		logger.trace("vars: " + vars);
 		logger.trace("Collect keys: " + p.getCollectMapping());

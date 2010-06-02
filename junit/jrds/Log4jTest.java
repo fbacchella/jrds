@@ -12,6 +12,7 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class Log4jTest {
@@ -31,6 +32,11 @@ public class Log4jTest {
 			return false;
 		}
 	};
+
+	@BeforeClass
+	static public void configure() throws IOException {
+		System.setProperty("java.io.tmpdir",  "tmp");
+	}
 
 	@Test
 	public void testConfiguration() throws IOException {

@@ -25,8 +25,9 @@ public class PeriodTest {
 	@BeforeClass 
 	static public void configure() throws IOException {
 		jrds.Tools.configure();
-		logger.setLevel(Level.WARN);
+		logger.setLevel(Level.TRACE);
 		Tools.setLevel(new String[] {"jrds.Period"}, logger.getLevel());
+		logger.error("after before");
 	}
 
 	@Test
@@ -105,6 +106,7 @@ public class PeriodTest {
 		Date end = cal.getTime();
 
 		Period p = new Period("1:12", "22:58");
+		System.err.println(p);
 		Assert.assertEquals(begin, p.getBegin());
 		Assert.assertEquals(end, p.getEnd());
 		Assert.assertEquals(0, p.getScale());

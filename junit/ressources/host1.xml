@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE host PUBLIC "-//jrds//DTD Host//EN"
+                           "urn:jrds:host">
 <host name="name" dnsName="dnsName">
 	<child >1<subnode /></child>
 	<child >2</child>

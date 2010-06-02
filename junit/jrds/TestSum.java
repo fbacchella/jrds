@@ -27,15 +27,15 @@ public class TestSum {
 	}
 	
 	@Test
-	public void badsum() throws Exception {
+	public void emptysum() throws Exception {
 		ArrayList<String> graphlist = new ArrayList<String>();
 		graphlist.add("badhost/badgraph");
-		SumProbe s = new SumProbe("badsum", graphlist);
+		SumProbe s = new SumProbe("emptysum", graphlist);
 		RdsHost sumhost = new RdsHost();
-		s.setHost(sumhost);
 		HostsList hl = new HostsList();
 		hl.configure(new PropertiesManager());
-		hl.register(sumhost);
+		hl.addHost(sumhost);
+		s.setHost(sumhost);
 		GraphNode gn = s.getGraphList().iterator().next();
 		Graph g = gn.getGraph();
 		g.setPeriod(new Period());

@@ -10,10 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 
 import jrds.mockobjects.MokeProbe;
 import junit.framework.Assert;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,6 +28,7 @@ public class UtilTest {
 	static public void configure() throws IOException, ParserConfigurationException {
 		Tools.configure();
 		Tools.prepareXml();
+		logger.setLevel(Level.TRACE);
 		Tools.setLevel(new String[] {"jrds.Util"}, logger.getLevel());
 
 	}
@@ -85,12 +88,11 @@ public class UtilTest {
 		String publicId = d.getDoctype().getPublicId();
 		String systemId = d.getDoctype().getSystemId();
 		prop = new HashMap<String, String>();
-		prop.put("encoding", "ISO-8859-1");
+		prop.put(OutputKeys.ENCODING, "ISO-8859-1");
 		Util.serialize(d, out, null, prop);
 		outBuffer = out.toString();
-		logger.debug(outBuffer);
+		logger.debug("out buffer: " + outBuffer);
 		//It should have auto-detected the doc type
-		logger.trace(outBuffer);
 		Assert.assertTrue(outBuffer.contains(publicId));
 		Assert.assertTrue(outBuffer.contains(systemId));
 		Assert.assertTrue(outBuffer.contains("ISO-8859-1"));
@@ -160,6 +162,17 @@ public class UtilTest {
 
 		String evaluated = Util.evaluateVariables("${a} ${b}", var, Collections.EMPTY_MAP);
 		Assert.assertEquals("v1 1", evaluated);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void evaluateVariable4() {
+		Map<String, Object> var = new HashMap<String, Object>();
+		
+		var.put("FSID", "248ba235");
+
+		String evaluated = Util.evaluateVariables("C:\\ Label:  Serial Number ${FSID}", var, Collections.EMPTY_MAP);
+		Assert.assertEquals("C:\\ Label:  Serial Number 248ba235", evaluated);
 	}
 	
 	@Test
