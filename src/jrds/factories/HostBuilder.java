@@ -3,10 +3,12 @@ package jrds.factories;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import jrds.ChainedProperties;
 import jrds.ConnectedProbe;
 import jrds.Macro;
 import jrds.Probe;
@@ -14,6 +16,7 @@ import jrds.RdsHost;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 import jrds.snmp.SnmpStarter;
+import jrds.starter.ChainedProperties;
 import jrds.starter.Connection;
 import jrds.starter.StarterNode;
 
@@ -60,13 +63,10 @@ public class HostBuilder extends ObjectBuilder {
 		}
 		else
 			host = new RdsHost(hostName);
+		host.setHostDir(new File(pm.rrddir, host.getName()));
 
 		String hidden = hostattr.get("hidden");
 		host.setHidden(hidden != null && Boolean.parseBoolean(hidden));
-
-		hostNode.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
-
-		host.setHostDir(new File(pm.rrddir, host.getName()));
 
 		JrdsNode snmpNode = hostNode.getChild(CompiledXPath.get("snmp"));
 		if(snmpNode != null) {
@@ -76,36 +76,50 @@ public class HostBuilder extends ObjectBuilder {
 
 		makeConnexion(hostNode, host);
 
-		Map<String, String> hostprop = makeProperties(hostNode);
-		if(hostprop != null) {
-			ChainedProperties temp = new ChainedProperties(hostprop);
-			temp.register(host);
+		parseFragment(hostNode, host);
+
+		return host;
+	}
+
+	private void parseFragment(JrdsNode fragment, RdsHost host) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		fragment.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
+		
+		Map<String, Set<String>> collections = new HashMap<String, Set<String>>();
+		for(JrdsNode collectionNode: fragment.iterate(CompiledXPath.get("collection"))) {
+			String name = collectionNode.attrMap().get("name");
+			Set<String> set = new HashSet<String>();
+			collectionNode.setMethod(set, CompiledXPath.get("element"), "add", false);
+			collections.put(name, set);
+			logger.trace("Set added: " + set);
 		}
 
-		for(JrdsNode probeNode: hostNode.iterate(CompiledXPath.get("probe | rrd"))) {
+		for(JrdsNode forNode: fragment.iterate(CompiledXPath.get("for"))) {
+		String iterprop = forNode.attrMap().get("var");
+		String name = forNode.attrMap().get("collection");
+		Set<String> set = collections.get(name);
+		if(set != null) {
+			Map<String, String> properties = new HashMap<String, String>(1);
+			for(String i: set) {
+				properties.put(iterprop, i);
+			}			
+		}
+		else {
+			logger.error("Invalid host configuration, collection " + name + " not found");
+		}
+		//String set = forNode.attrMap().get("set");
+//		String[] = set.split(",");
+//		
+	}
+		for(JrdsNode probeNode: fragment.iterate(CompiledXPath.get("probe | rrd"))) {
 			try {
 				Probe<?,?> p = makeProbe(probeNode, host);
-				if(p != null && p.checkStore()) {
-					host.getProbes().add(p);
-				}
-				JrdsNode snmpProbeNode = probeNode.getChild(CompiledXPath.get("snmp"));
-				if(snmpProbeNode != null) {
-					SnmpStarter starter = snmpStarter(snmpProbeNode, host);
-					starter.register(p);
-				}
-				Map<String, String> nodeprop = makeProperties(probeNode);
-				if(nodeprop != null && nodeprop.size() > 0) {
-					ChainedProperties temp = new ChainedProperties(nodeprop);
-					temp.register(p);
-				}
-				makeConnexion(probeNode, p);
-
 			} catch (Exception e) {
 				logger.error("Probe creation failed for host " + host.getName() + ": " + e);
 				e.printStackTrace();
 			}
 		}
-		for(JrdsNode macroNode: hostNode.iterate(CompiledXPath.get("macro"))) {
+		
+		for(JrdsNode macroNode: fragment.iterate(CompiledXPath.get("macro"))) {
 			String name = macroNode.attrMap().get("name");
 			Macro m = macrosMap.get(name);
 			logger.trace("Adding macro " + name + ": " + m);
@@ -121,7 +135,11 @@ public class HostBuilder extends ObjectBuilder {
 				logger.error("Unknown macro:" + name);
 			}
 		}
-		return host;
+		Map<String, String> hostprop = makeProperties(fragment);
+		if(hostprop != null) {
+			ChainedProperties temp = new ChainedProperties(hostprop);
+			temp.register(host);
+		}
 	}
 
 	public SnmpStarter snmpStarter(JrdsNode d, RdsHost host) {
@@ -185,12 +203,25 @@ public class HostBuilder extends ObjectBuilder {
 			}
 		}
 		List<Object> args = ArgFactory.makeArgs(probeNode, host);
-		if(pf.configure(p, args))
-			return p;
-		else {
+		if( !pf.configure(p, args)) {
 			logger.error(p + " configuration failed");
 			return null;
 		}
+		if(p != null && p.checkStore()) {
+			host.getProbes().add(p);
+		}
+		JrdsNode snmpProbeNode = probeNode.getChild(CompiledXPath.get("snmp"));
+		if(snmpProbeNode != null) {
+			SnmpStarter starter = snmpStarter(snmpProbeNode, host);
+			starter.register(p);
+		}
+		Map<String, String> nodeprop = makeProperties(probeNode);
+		if(nodeprop != null && nodeprop.size() > 0) {
+			ChainedProperties temp = new ChainedProperties(nodeprop);
+			temp.register(p);
+		}
+		makeConnexion(probeNode, p);
+		return p;
 	}
 
 	public void makeConnexion(JrdsNode domNode, StarterNode sNode) {

@@ -28,6 +28,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
+import jrds.starter.ChainedProperties;
 import jrds.starter.StarterNode;
 
 import org.apache.log4j.Level;
@@ -206,7 +207,7 @@ public class Util {
 	public static String evaluateVariables(String in, Map<String, Object> variables, StarterNode node) {
 		ChainedProperties props = null;
 		if(node != null)
-			props = (ChainedProperties)node.getStarters().find(ChainedProperties.class.getName());
+			props = node.find(ChainedProperties.class);
 		return evaluateVariables(in, variables, props);
 	}
 
