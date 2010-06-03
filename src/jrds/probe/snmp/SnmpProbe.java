@@ -138,7 +138,7 @@ public abstract class SnmpProbe extends Probe<OID, Object> {
 	}
 
 	public SnmpStarter getSnmpStarter() {
-		return (SnmpStarter) getStarters().find(SnmpStarter.SNMPKEY);
+		return find(SnmpStarter.class);
 	}
 
 	@Override
