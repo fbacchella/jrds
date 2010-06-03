@@ -10,6 +10,7 @@
 	<property name="web.src" value="${basedir}/web"/>
 	<property name="web.build" value="${build.home}/webapp"/>
 	<property name="compile.deprecation" value="yes"/>
+	<property name="testdir" value="tmp"/>
 	
 	<property file="local.properties" />
 	
@@ -44,8 +45,10 @@
 	
 	<!-- ==================== Test Classpath =========================== -->
 	<path id="test.classpath">
+		<pathelement path="${build.home}/classes"/>
 		<pathelement path="${build.home}/classes-junit"/>
 		<pathelement path="junit"/>
+		<pathelement path="dtd"/>
 		<path refid="project.classpath"/>
 	</path>
 	
@@ -162,6 +165,7 @@
 	
 	<target name="clean" description="clean up">
 		<delete dir="${build.home}"/>
+		<delete dir="${testdir}"/>
 	</target>
 	
 	<target name="srctar" depends="javadoc">
@@ -198,7 +202,7 @@
 		<tar destfile="${build.home}/${app.name}.tar" >  
 			<tarfileset dir="lib/dojo">
 			    <include name="dijit/themes/nihilo/**/*.*" />
-			    <include name="dojo/resources/blank.gif" />
+			    <include name="dojo/resources/blank.*" />
 		    </tarfileset>
 			<tarfileset dir="${web.src}"/>
 			<tarfileset dir="libjetty" prefix="WEB-INF/lib"/>
@@ -216,7 +220,8 @@
 			duplicate="preserve">
 			<fileset dir="${web.src}"/>
 			<fileset dir="lib/dojo">
-			    <exclude name="dojo/dojo.js" />
+			    <include name="dijit/themes/nihilo/**/*.*" />
+			    <include name="dojo/resources/blank.*" />
 		    </fileset>
 			<lib dir="lib">
 				<include name="*.jar"/>
@@ -241,10 +246,11 @@
 	</target>
 	
 	<target name="test" depends="compile.test, checkdtd">
+		<mkdir dir="${testdir}"/>
 		<junit printsummary="yes" showoutput="no">
 			<formatter type="plain"/>
 			<classpath refid="test.classpath"/>
-			<batchtest todir="tmp">
+			<batchtest todir="${testdir}">
 				<fileset dir="junit">
 			    	<include name="**/*Test*.java"/>
 			    	<exclude name="**/TestUtil.java"/>
