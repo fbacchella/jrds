@@ -1,16 +1,13 @@
 /**
  * 
  */
-package jrds;
+package jrds.starter;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import jrds.starter.Starter;
-import jrds.starter.StarterNode;
-import jrds.starter.StartersSet;
 
 import org.apache.log4j.Logger;
 
@@ -31,14 +28,6 @@ public class ChainedProperties extends Starter implements Map<String, String> {
 		}
 	}
 
-	/* The key is static, there is only one for each level
-	 * @see jrds.Starter#getKey()
-	 */
-	@Override
-	public Object getKey() {
-		return getClass().getName();
-	}
-
 	public void chain(ChainedProperties parent) {
 		this.parent = parent;
 	}
@@ -49,7 +38,7 @@ public class ChainedProperties extends Starter implements Map<String, String> {
 	@Override
 	public String toString() {
 		StringBuilder retValue = new StringBuilder();
-		retValue.append("Properties(" + properties.size() + ") for " + getParent());
+		retValue.append("Properties(" + properties.size() + ") for " + getLevel());
 		if(parent != null) {
 			retValue.append("following " + parent.toString());
 		}
@@ -188,8 +177,8 @@ public class ChainedProperties extends Starter implements Map<String, String> {
 	 * @see jrds.starter.Starter#initialize(jrds.starter.StarterNode, jrds.starter.StartersSet)
 	 */
 	@Override
-	public void initialize(StarterNode parent, StartersSet level) {
-		super.initialize(parent, level);
-		this.parent = (ChainedProperties) level.find(getKey());
+	public void initialize(StarterNode parent) {
+		this.parent = parent.find(getClass());
+		super.initialize(parent);
 	}
 }
