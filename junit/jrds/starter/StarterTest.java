@@ -32,7 +32,7 @@ public class StarterTest {
 		Tools.configure();
 
 		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {StartersSet.class.toString(), Starter.class.toString()}, logger.getLevel());
+		Tools.setLevel(new String[] {StarterNode.class.toString(), Starter.class.toString()}, logger.getLevel());
 	}
 
 	@Test
@@ -50,8 +50,7 @@ public class StarterTest {
 		Starter s1 = new Starter() {};
 		n1.registerStarter(s1);
 
-		StarterNode n2 = new StarterNode() { };
-		n2.setParent(n1);
+		StarterNode n2 = new StarterNode(n1) { };
 
 		Assert.assertNotNull(n2.find(s1.getClass()));
 	}
@@ -62,7 +61,7 @@ public class StarterTest {
 		};
 		Starter s = new LocalStarter(0);
 		n.registerStarter(s);
-		Assert.assertNotNull(n.find(0));
+		Assert.assertNotNull(n.find(LocalStarter.class, 0));
 	}
 
 	@Test
@@ -78,8 +77,8 @@ public class StarterTest {
 		Starter s2 = new LocalStarter(1);
 		n2.registerStarter(s2);
 
-		Assert.assertNotNull(n2.find(1));
-		Assert.assertNotNull(n2.find(0));
+		Assert.assertNotNull(n2.find(LocalStarter.class, 1));
+		Assert.assertNotNull(n2.find(LocalStarter.class, 0));
 	}
 
 }

@@ -10,7 +10,6 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.ChainedProperties;
 import jrds.Filter;
 import jrds.Macro;
 import jrds.Probe;
@@ -19,6 +18,7 @@ import jrds.RdsHost;
 import jrds.Tools;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
+import jrds.starter.ChainedProperties;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

@@ -4,6 +4,8 @@ package jrds;
 import java.io.IOException;
 import java.util.Map;
 
+import jrds.starter.ChainedProperties;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
