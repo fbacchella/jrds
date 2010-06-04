@@ -1,6 +1,5 @@
 package jrds;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +22,7 @@ public class TestTranslateProbe {
 	@BeforeClass
 	static public void configure() throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, Exception  {
 		Tools.configure();
+		Tools.prepareXml();
 		logger.setLevel(Level.ERROR);
 		Tools.setLevel(new String[] {"jrds.Probe", Threshold.class.getName()}, logger.getLevel());
 

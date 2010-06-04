@@ -1,6 +1,8 @@
 package jrds.starter;
 
+import jrds.RdsHost;
 import jrds.Tools;
+import jrds.probe.snmp.RdsSnmpSimple;
 import jrds.snmp.SnmpStarter;
 
 import org.apache.log4j.Level;
@@ -17,30 +19,37 @@ public class TestSnmpStarter {
 		Tools.configure();
 
 		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"org.snmp4j", "jrds.snmp", "jrds.starter"}, logger.getLevel());
+		Tools.setLevel(new String[] {"org.snmp4j", "jrds.snmp", "jrds.Starter", "jrds.starter"}, logger.getLevel());
 	}
 
 	@Test
 	public void test() {
-		StarterNode n1 = new StarterNode() { };
+		RdsHost n1 = new RdsHost("localhost") { };
 		n1.registerStarter(jrds.snmp.SnmpStarter.full);
-		
-		StarterNode n2 = new StarterNode(n1) { };
 		SnmpStarter snmp = new SnmpStarter();
-		snmp.setHostname("localhost");
-		n2.registerStarter(snmp);
+		snmp.setHostname(n1.getDnsName());
+		n1.registerStarter(snmp);
+		
+		RdsSnmpSimple n2 = new RdsSnmpSimple() { };
+		n2.setHost(n1);
+		n2.configure();
 		
 		logger.debug("Starting at level 1");
 		n1.startCollect();
+		//True because some starters are allowed to fail
+		Assert.assertTrue(n1.isCollectRunning());
+
 		logger.debug("Starting at level 2");
 		n2.startCollect();
 
-		Assert.assertTrue(n2.isCollectRunning());
+		//False because the resolver fail, so the SnmpStarter failed and it is mandatory for a snmp probe
+		Assert.assertFalse(n2.isCollectRunning());
 
 		logger.debug("Stopping at level 1");
 		n1.stopCollect();
 
 		Assert.assertFalse(n2.isCollectRunning());
+		Assert.assertFalse(n1.isCollectRunning());
 
 	}
 }
