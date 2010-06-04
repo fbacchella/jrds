@@ -47,7 +47,7 @@ public abstract class StarterNode implements StartersSet {
 			if(logger.isDebugEnabled())
 				logger.debug("Starting " + allStarters.size() + " starters for "+ this);
 			for(Starter s: allStarters.values()) {
-				//If collecte is stopped while we're starting, drop it
+				//If collect is stopped while we're starting, drop it
 				if(parent !=null && ! parent.isCollectRunning())
 					return false;
 				s.doStart();

@@ -15,7 +15,7 @@ public abstract class Starter {
 
 	public Starter() {
 		String[] classElements = getClass().getName().split("\\.");
-		namedLogger = Logger.getLogger("jrds.Starter."  + classElements[classElements.length - 1 ]);
+		namedLogger = Logger.getLogger("jrds.Starter."  + classElements[classElements.length - 1 ].replaceAll("\\$", ".$"));
 	}
 
 	/**
@@ -47,7 +47,7 @@ public abstract class Starter {
 			long end = new Date().getTime();
 			log(Level.DEBUG, "Starting connection took %d ms", end - begin);
 		} catch (Exception e) {
-			log(Level.ERROR, e, "Error while starting");
+			log(Level.ERROR, e, "Error while starting: %s", e.getMessage());
 		}
 	}
 
