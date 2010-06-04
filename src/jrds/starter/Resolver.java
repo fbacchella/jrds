@@ -51,6 +51,9 @@ public class Resolver extends Starter {
 			Probe<?,?> p = (Probe<?,?>) node;
 			host = p.getHost();
 		}
+		else {
+			return null;
+		}
 		return "resolver:" + host.getDnsName();
 	}
 

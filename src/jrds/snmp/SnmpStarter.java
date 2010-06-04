@@ -112,7 +112,7 @@ public class SnmpStarter extends Starter {
 		try {
 			for(OID uptimeoid: upTimesOids) {
 				if(! full.isStarted() || !resolver.isStarted() ) {
-					break;
+					return false;
 				}
 				PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
 				requestPDU.addOID(new VariableBinding(uptimeoid));
