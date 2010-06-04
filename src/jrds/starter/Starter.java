@@ -12,7 +12,7 @@ public abstract class Starter {
 
 	/**
 	 * This method is called when the started is really registred<p/>
-	 * It can be overriden to contains delayed initialization but it must begin with a call to super.initialize(parent, level)
+	 * It can be overriden to contains delayed initialization but it must begin with a call to super.initialize(parent)
 	 * @param parent
 	 * @param level
 	 */
@@ -20,6 +20,13 @@ public abstract class Starter {
 		this.level = level;
 	}
 
+	/**
+	 * @param level
+	 * @param none
+	 * @deprecated
+	 * The second argument is ignored, just remove it
+	 */
+	@SuppressWarnings("deprecation")
 	public void initialize(jrds.starter.StarterNode level ,jrds.starter.StartersSet none) {
 		this.level = level;
 	}
@@ -83,11 +90,23 @@ public abstract class Starter {
 		return node.registerStarter(this);
 	}
 
-	//Compatibily code
+	/**
+	 * @deprecated
+	 * Use getLevel instead.
+	 * @return the StarterNode for this starter
+	 */
+	@Deprecated
 	public StartersSet getParent() {
 		return level;
 	}
 
+	@Deprecated
+	/**
+	 * @deprecated
+	 * Use a StarterNode type argument instead.
+	 * @return
+	 */
+	@SuppressWarnings("deprecation")
 	public final Starter register(StartersSet node) {
 		return register((StarterNode)node);
 	}

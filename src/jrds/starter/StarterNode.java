@@ -9,9 +9,10 @@ import jrds.HostsList;
 
 import org.apache.log4j.Logger;
 
+@SuppressWarnings("deprecation")
 public abstract class StarterNode implements StartersSet {
 
-	static final private Logger logger = Logger.getLogger(StartersSet.class);
+	static final private Logger logger = Logger.getLogger(StarterNode.class);
 	private Map<Object, Starter> allStarters = null;
 
 	private HostsList root = null;
@@ -50,10 +51,9 @@ public abstract class StarterNode implements StartersSet {
 				if(parent !=null && ! parent.isCollectRunning())
 					return false;
 				try {
-					logger.trace("Starting " + s);
 					s.doStart();
 				} catch (Exception e) {
-					logger.error("Unable to start starter " + s.getKey());
+					logger.error("Unable to start starter " + s.getKey() + " for " + this);
 				}
 			}
 		}
@@ -66,7 +66,6 @@ public abstract class StarterNode implements StartersSet {
 		if(allStarters != null)
 			for(Starter s: allStarters.values()) {
 				try {
-					logger.trace("stopping " + s);
 					s.doStop();
 				} catch (Exception e) {
 					logger.error("Unable to stop timer " + s.getKey());
@@ -74,6 +73,10 @@ public abstract class StarterNode implements StartersSet {
 			}
 	}
 
+	/**
+	 * @param s the starter to register
+	 * @return the starter that will be used
+	 */
 	public Starter registerStarter(Starter s) {
 		Object key = s.getKey();
 		if(allStarters == null)
@@ -90,6 +93,7 @@ public abstract class StarterNode implements StartersSet {
 	
 	public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc) {
 		Object key = null;
+		if(logger.isTraceEnabled())
 		logger.trace(sc + " " + key);
 		try {
 			Method m = sc.getMethod("makeKey", StarterNode.class);
@@ -111,6 +115,10 @@ public abstract class StarterNode implements StartersSet {
 		return find(sc, key);
 	}
 
+	/* (non-Javadoc)
+	 * @see jrds.starter.StartersSet#find(java.lang.Object)
+	 */
+	@Deprecated
 	public Starter find(Object key) {
 		return find(Starter.class, key);
 	}
@@ -137,7 +145,7 @@ public abstract class StarterNode implements StartersSet {
 
 	public boolean isStarted(Object key) {
 		boolean s = false;
-		Starter st = find(key);
+		Starter st = find(Starter.class, key);
 		if(st != null)
 			s = st.isStarted();
 		return s;
@@ -155,22 +163,43 @@ public abstract class StarterNode implements StartersSet {
 	}
 
 	//Compatibily code
+	/**
+	 * @deprecated
+	 * Useless method, it return <code>this</code>
+	 * @return
+	 */
+	@Deprecated
 	public StartersSet getStarters() {
 		return this;
 	}
 
+	/**
+	 * @deprecated
+	 * Useless method, it return <code>this</code>
+	 * @return
+	 */
+	@Deprecated
 	public StarterNode getLevel() {
 		return this;
 	}
 
+	@Deprecated
 	public void setParent(StartersSet s) {
 		setParent((StarterNode) s);
 	}
 
+	/* (non-Javadoc)
+	 * @see jrds.starter.StartersSet#registerStarter(jrds.starter.Starter, jrds.starter.StarterNode)
+	 */
+	@Deprecated
 	public Starter registerStarter(Starter s, StarterNode parent) {
 		return registerStarter(s);
 	};
 
+	/* (non-Javadoc)
+	 * @see jrds.starter.StartersSet#find(java.lang.Class, jrds.starter.StarterNode)
+	 */
+	@Deprecated
 	public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, StarterNode nope) {
 		return find(sc);
 	}
