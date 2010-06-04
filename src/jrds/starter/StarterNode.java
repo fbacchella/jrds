@@ -2,7 +2,7 @@ package jrds.starter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import jrds.HostsList;
@@ -50,11 +50,7 @@ public abstract class StarterNode implements StartersSet {
 				//If collecte is stopped while we're starting, drop it
 				if(parent !=null && ! parent.isCollectRunning())
 					return false;
-				try {
-					s.doStart();
-				} catch (Exception e) {
-					logger.error("Unable to start starter " + s.getKey() + " for " + this);
-				}
+				s.doStart();
 			}
 		}
 		started = true;
@@ -80,7 +76,8 @@ public abstract class StarterNode implements StartersSet {
 	public Starter registerStarter(Starter s) {
 		Object key = s.getKey();
 		if(allStarters == null)
-			allStarters = new HashMap<Object, Starter>(2);
+			//Must be a linked hashed map, order of insertion might be important
+			allStarters = new LinkedHashMap<Object, Starter>(2);
 		if(! allStarters.containsKey(key)) {
 			s.initialize(this);
 			allStarters.put(key, s);

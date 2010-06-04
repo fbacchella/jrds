@@ -56,7 +56,7 @@ public class SocketFactory extends Starter {
 		if(! isStarted())
 			return null;
 
-		Resolver r = (Resolver) host.find(Resolver.makeKey(host));
+		Resolver r = host.find(Resolver.class);
 		if(r == null || ! r.isStarted())
 			return null;
 
@@ -91,16 +91,8 @@ public class SocketFactory extends Starter {
 		this.timeout = timeout;
 	}
 
-	public static Object makeKey(StarterNode node) {
+	@Deprecated
+	public static Object makeKey(StarterNode level) {
 		return SocketFactory.class;
 	}
-
-	/* (non-Javadoc)
-	 * @see jrds.starter.Starter#getKey()
-	 */
-	@Override
-	public Object getKey() {
-		return SocketFactory.class;
-	}
-
 }

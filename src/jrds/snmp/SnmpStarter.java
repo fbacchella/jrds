@@ -9,7 +9,6 @@ import jrds.probe.snmp.SnmpProbe;
 import jrds.starter.Resolver;
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;
-import jrds.starter.StartersSet;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
@@ -44,10 +43,8 @@ public class SnmpStarter extends Starter {
 		}
 	}
 
-	static final private Logger logger = Logger.getLogger(SnmpStarter.class);
 	static final String TCP = "tcp";
 	static final String UDP = "udp";
-	static public final String SNMPKEY = "snmp";
 	static final private OID hrSystemUptime = new OID(".1.3.6.1.2.1.25.1.1.0");
 	static final private OID sysUpTimeInstance = new OID(".1.3.6.1.2.1.1.3.0");
 	
@@ -62,7 +59,7 @@ public class SnmpStarter extends Starter {
 				snmp.listen();
 				started = true;
 			} catch (IOException e) {
-				logger.error("Snmp activity not started : " +  e);
+				log(Level.ERROR, e, "Snmp activity not started");
 				snmp = null;
 			}
 			return started;
@@ -74,10 +71,7 @@ public class SnmpStarter extends Starter {
 			}
 			snmp = null;
 		}
-		@Override
-		public Object getKey() {
-			return full.getClass();
-		}
+
 		@Override
 		public String toString() {
 			return "SNMP root";
@@ -90,7 +84,6 @@ public class SnmpStarter extends Starter {
 	private String hostname = null;
 	private int port = 161;
 	private String community = "public";
-	private Resolver resolver = null;
 	//A default value for the uptime OID, from the HOST-RESSOURCES MIB
 	private OID uptimeOid = hrSystemUptime;
 	private Target snmpTarget;
@@ -98,6 +91,8 @@ public class SnmpStarter extends Starter {
 	@Override
 	public boolean start() {
 		boolean started = false;
+		Resolver resolver = getLevel().find(Resolver.class);
+
 		if(full.isStarted() && resolver.isStarted()) {
 			snmpTarget = makeTarget();
 			if(snmpTarget != null) {
@@ -112,10 +107,11 @@ public class SnmpStarter extends Starter {
 		upTimesOids.add(uptimeOid);
 		//Fallback uptime OID, it should be always defined, from SNMPv2-MIB
 		upTimesOids.add(sysUpTimeInstance);
+		Resolver resolver = getLevel().find(Resolver.class);
 
 		try {
 			for(OID uptimeoid: upTimesOids) {
-				if(! full.isStarted() && resolver.isStarted() ) {
+				if(! full.isStarted() || !resolver.isStarted() ) {
 					break;
 				}
 				PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
@@ -135,7 +131,7 @@ public class SnmpStarter extends Starter {
 				}
 			}
 		} catch (Exception e) {
-			logger.error("Unable to get uptime for " + getParent() + " because of: " + e);
+			log(Level.ERROR, e, "Unable to get uptime");
 		}
 		return false;
 	}
@@ -149,6 +145,8 @@ public class SnmpStarter extends Starter {
 	{
 		Target retValue = null;
 		Address address;
+		Resolver resolver = getLevel().find(Resolver.class);
+
 		if(UDP.equals(proto.toLowerCase())) {
 			address = new UdpAddress(resolver.getInetAddress(), port);
 		}
@@ -159,7 +157,7 @@ public class SnmpStarter extends Starter {
 			String addrStr = proto + ":" + this.hostname + "/" + port;
 			address= GenericAddress.parse(addrStr);
 			if(address == null) {
-				logger.warn("Address " + addrStr + " not solvable");
+				log(Level.WARN, "Address " + addrStr + " not solvable");
 			}
 		}
 		if(community != null && address != null) {
@@ -188,7 +186,7 @@ public class SnmpStarter extends Starter {
 			version = SnmpConstants.version3;
 		}
 		else
-			logger.warn("version " + versionStr + " not valid");
+			log(Level.WARN, "version " + versionStr + " not valid");
 	}
 
 	public void setVersion(int version)
@@ -229,10 +227,8 @@ public class SnmpStarter extends Starter {
 	}
 
 	@Override
-	public void initialize(StarterNode parent, StartersSet level) {
-		super.initialize(parent, level);
-		logger.trace("registering a SnmpStarter for host " + hostname);
-		resolver = (Resolver) new Resolver(hostname).register(parent);
+	public void initialize(StarterNode parent) {
+		super.initialize(parent);
 		if(parent instanceof SnmpProbe) {
 			OID newUptimeOid = ((SnmpProbe)parent).getUptimeoid();
 			if(newUptimeOid != null)
@@ -251,10 +247,6 @@ public class SnmpStarter extends Starter {
 		if(isStarted())
 			retValue = snmp;
 		return retValue;
-	}
-	@Override
-	public Object getKey() {
-		return SNMPKEY;
 	}
 
 	@Override
@@ -278,6 +270,6 @@ public class SnmpStarter extends Starter {
 	 */
 	@Override
 	public boolean isStarted() {
-		return super.isStarted() && full.isStarted();
+		return super.isStarted() && full.isStarted()  && getLevel().find(Resolver.class).isStarted();
 	}
 }

@@ -8,10 +8,9 @@ import java.util.Date;
 import jrds.Probe;
 import jrds.RdsHost;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 public abstract class Connection<ConnectedType> extends Starter {
-	static final private Logger logger = Logger.getLogger(Connection.class);
 	
 	private String name;
 	private long uptime;
@@ -19,7 +18,7 @@ public abstract class Connection<ConnectedType> extends Starter {
 	public abstract ConnectedType getConnection();
 
 	Socket makeSocket(String host, int port) throws UnknownHostException, IOException {
-		SocketFactory sf = (SocketFactory) getLevel().find(SocketFactory.makeKey(getLevel()));
+		SocketFactory sf = getLevel().find(SocketFactory.class);
 		return sf.createSocket(host, port);
 	}
 
@@ -64,8 +63,7 @@ public abstract class Connection<ConnectedType> extends Starter {
 	
 	public Resolver getResolver() {
 		String hostName = getHostName();
-		//Resolver r = (Resolver) getLevel().find(Resolver.makeKey(getParent()));
-		Resolver r = getLevel().find(Resolver.class, getLevel());
+		Resolver r = getLevel().find(Resolver.class);
 		if(r == null) {
 			r = new Resolver(hostName);
 			r.register(getLevel());
@@ -78,7 +76,7 @@ public abstract class Connection<ConnectedType> extends Starter {
 	 * @return the connection timeout in second
 	 */
 	public int getTimeout() {
-		SocketFactory sf = (SocketFactory) getLevel().find(SocketFactory.makeKey(getLevel()));
+		SocketFactory sf = getLevel().find(SocketFactory.class);
 		return sf.getTimeout();
 
 	}
@@ -90,12 +88,9 @@ public abstract class Connection<ConnectedType> extends Starter {
 	public boolean start() {
 		if(! getResolver().isStarted())
 			return false;
-		long begin = new Date().getTime();
 		boolean started =  startConnection();
-		long end = new Date().getTime();
 		if(started)
 			uptime = setUptime();
-		logger.debug("Starting connection " + getKey() + " for " + getHostName() +" took "  + (end - begin) + "ms");
 		return started;
 	}
 
@@ -104,10 +99,7 @@ public abstract class Connection<ConnectedType> extends Starter {
 	 */
 	@Override
 	public void stop() {
-		long begin = new Date().getTime();
 		stopConnection();
-		long end = new Date().getTime();
-		logger.debug("Stopped connection " + getKey() + " for " + getHostName() +" took "  + (end - begin) + "ms");
 	}
 
 	public abstract boolean startConnection();

@@ -20,7 +20,7 @@ import javax.xml.xpath.XPathFactory;
 
 import jrds.RdsHost;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -36,8 +36,6 @@ import org.xml.sax.SAXException;
  * 
  */
 public class XmlProvider extends Starter {
-	static final private Logger logger = Logger.getLogger(XmlProvider.class);
-
 	private DocumentBuilder dbuilder = null;
 	private XPath xpather = null;
 	private String hostname = null;
@@ -66,11 +64,10 @@ public class XmlProvider extends Starter {
 		try {
 			dbuilder = instance.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
-			logger.fatal("No Document builder available");
+			log(Level.FATAL, e, "No Document builder available");
 			return false;
 		}
-		if(logger.isTraceEnabled())
-			logger.trace("starting XmlProvider " + getClass().getName() + '@' + Integer.toHexString(hashCode()) + " " + xpather + " "+ dbuilder);
+		log(Level.TRACE, "starting XmlProvider %s@%s %s %s " , getClass().getName(), Integer.toHexString(hashCode()), xpather, dbuilder);
 		return dbuilder != null && xpather != null;
 	}
 
@@ -81,8 +78,7 @@ public class XmlProvider extends Starter {
 	public void stop() {
 		xpather = null;
 		dbuilder = null;
-		if(logger.isTraceEnabled())
-			logger.trace("stopping XmlProvider " + getClass().getName() + '@' + Integer.toHexString(hashCode()));
+		log(Level.TRACE, "stopping XmlProvider %s@%s", getClass().getName(),Integer.toHexString(hashCode()) );
 	}
 
 	public long findUptimeByDate(Document d, String startTimePath, String currentTimePath, DateFormat pattern) {
@@ -95,9 +91,9 @@ public class XmlProvider extends Starter {
 			Date currentTime = pattern.parse(currentTimeString);
 			return (currentTime.getTime() - startTime.getTime()) / 1000;
 		} catch (XPathExpressionException e) {
-			logger.error("Time not found: " + e);
+			log(Level.ERROR, e, "Time not found");
 		} catch (ParseException e) {
-			logger.error("Date not parsed with pattern " + ((SimpleDateFormat) pattern).toPattern() + ": " + e);
+			log(Level.ERROR, e, "Date not parsed with pattern " + ((SimpleDateFormat) pattern).toPattern());
 		}
 		return 0;
 	}
@@ -105,20 +101,19 @@ public class XmlProvider extends Starter {
 	public long findUptime(Document d, String upTimePath) {
 		long uptime = 0;
 		if(upTimePath == null) {
-			logger.error("No xpath for the uptime for " + this);
+			log(Level.ERROR, "No xpath for the uptime for " + this);
 			return 0;
 		}
 		try {
 			Node upTimeNode = (Node) xpather.evaluate(upTimePath, d, XPathConstants.NODE);
 			if(upTimeNode != null) {
-				if(logger.isTraceEnabled())
-					logger.trace("Will parse uptime: " + upTimeNode.getTextContent());
+					log(Level.TRACE, "Will parse uptime: %s", upTimeNode.getTextContent());
 				String dateString = upTimeNode.getTextContent();
 				uptime = jrds.Util.parseStringNumber(dateString, Long.class, 0).longValue();
 			}
-			logger.debug("uptime for " + this + " is " + uptime);
+			log(Level.ALL, "uptime is %d", uptime);
 		} catch (XPathExpressionException e) {
-			logger.error("Uptime not found" + e);
+			log(Level.ERROR, e, "Uptime not found");
 		}
 		return uptime;
 	}
@@ -126,44 +121,40 @@ public class XmlProvider extends Starter {
 	public void fileFromXpaths(Document d, Set<String> xpaths, Map<String, Number> oldMap) {
 		for(String xpath: xpaths) {
 			try {
-				if(logger.isTraceEnabled())
-					logger.trace("Will search the xpath \"" + xpath + "\" for " + this);
+					log(Level.TRACE, "Will search the xpath \"%s\"", xpath);
 				if(xpath == null || "".equals(xpath))
 					continue;
 				Node n = (Node)xpather.evaluate(xpath, d, XPathConstants.NODE);
 				double value = 0;
 				if(n != null) {
-					if(logger.isTraceEnabled())
-						logger.trace(n);
+						log(Level.TRACE, "%s", n);
 					value = Double.parseDouble(n.getTextContent());
 					oldMap.put(xpath, Double.valueOf(value));
 				}
 			} catch (XPathExpressionException e) {
-				logger.error("Invalid XPATH : " + xpath + " for " + this);
+				log(Level.ERROR, "Invalid XPATH : " + xpath + " for " + this);
 			} catch (NumberFormatException e) {
-				logger.warn("value read from " + xpath + "  not parsable for " + this + ": " + e);
+				log(Level.WARN, e, "value read from %s  not parsable", xpath);
 			}
 		}
-		logger.trace("Values found: " + oldMap);
+		log(Level.TRACE, "Values found: %s", oldMap);
 		return;
 	}
 
 	public Document getDocument(InputSource stream) {
 		Document d = null;
-		if(logger.isTraceEnabled())
-			logger.trace("" + stream + " " + dbuilder + " " + isStarted() + " " + getClass().getName() + '@' + Integer.toHexString(hashCode()));
+			log(Level.TRACE, "%s %s %s started %s@%s", stream, dbuilder, isStarted(), getClass().getName(), Integer.toHexString(hashCode()));
 		try {
 			try {
 				dbuilder.reset();
 			} catch (UnsupportedOperationException e) {
 			}
 			d = dbuilder.parse(stream);
-			if(logger.isTraceEnabled())
-				logger.trace("just parsed a " + d.getDocumentElement().getTagName() + " from " + this);
+				log(Level.TRACE, "just parsed a %s", d.getDocumentElement().getTagName());
 		} catch (SAXException e) {
-			logger.error("Invalid XML for the probe " + this + ":" + e, e);
+			log(Level.ERROR, e, "Invalid XML");
 		} catch (IOException e) {
-			logger.error("IO Exception getting values for " + this + ":" + e);
+			log(Level.ERROR, e, "IO Exception getting values");
 		}
 		return d;
 	}

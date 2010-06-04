@@ -8,12 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 public class ChainedProperties extends Starter implements Map<String, String> {
-	static final private Logger logger = Logger.getLogger(ChainedProperties.class);
-
 	private Map<String, String> properties = new HashMap<String, String>();
 	private Map<String, String> parent = null;
 
@@ -132,7 +129,7 @@ public class ChainedProperties extends Starter implements Map<String, String> {
 	 * @see java.util.Map#put(java.lang.Object, java.lang.Object)
 	 */
 	public String put(String key, String value) {
-		logger.trace("Adding properties " + key + ": " + value);
+		log(Level.TRACE, "Adding properties %s: %s", key, value);
 		return properties.put(key, value);
 	}
 

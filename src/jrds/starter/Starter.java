@@ -1,14 +1,22 @@
 package jrds.starter;
 
+import java.util.Date;
+
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 
 public abstract class Starter {
-	static final private Logger logger = Logger.getLogger(Starter.class);
 	long uptime = Long.MAX_VALUE;
 
 	private StarterNode level;	
+	private Logger namedLogger = null;
 	volatile private boolean started = false;
+
+	public Starter() {
+		String[] classElements = getClass().getName().split("\\.");
+		namedLogger = Logger.getLogger("jrds.Starter."  + classElements[classElements.length - 1 ]);
+	}
 
 	/**
 	 * This method is called when the started is really registred<p/>
@@ -32,14 +40,20 @@ public abstract class Starter {
 	}
 
 	public final void doStart() {
-		if(logger.isTraceEnabled())
-			logger.trace("Starting " + getKey() + "@" + hashCode() +  " for " + level);
-		started = start();
+		log(Level.TRACE, "Starting");
+		try {
+			long begin = new Date().getTime();
+			started = start();
+			long end = new Date().getTime();
+			log(Level.DEBUG, "Starting connection took %d ms", end - begin);
+		} catch (Exception e) {
+			log(Level.ERROR, e, "Error while starting");
+		}
 	}
 
 	public final void doStop() {
 		if(started) {
-			logger.trace("Stopping " + this);
+			log(Level.TRACE, "Stopping");
 			started = false;
 			stop();
 		}
@@ -65,7 +79,18 @@ public abstract class Starter {
 
 	@Override
 	public String toString() {
-		return getKey().toString();
+		String levelString = "''";
+		String keyString = "";
+		if(level != null)
+			levelString = level.toString();
+		Object key = getKey();
+		if(key instanceof Class<?>) {
+			keyString = ((Class<?>) key).getName();
+		}
+		else {
+			keyString = key.toString();
+		}
+		return keyString + "@" + levelString;
 	}
 
 	/**
@@ -86,7 +111,7 @@ public abstract class Starter {
 	 * @return
 	 */
 	public final Starter register(StarterNode node) {
-		logger.trace("Registering " + this);
+		log(Level.TRACE,"Registering");
 		return node.registerStarter(this);
 	}
 
@@ -110,5 +135,14 @@ public abstract class Starter {
 	public final Starter register(StartersSet node) {
 		return register((StarterNode)node);
 	}
+
+	public void log(Level l, Throwable e, String format, Object... elements) {
+		jrds.Util.log(this, namedLogger, l, e, format, elements);
+	}
+
+	public void log(Level l, String format, Object... elements) {
+		jrds.Util.log(this, namedLogger,l, null, format, elements);
+	}
+
 
 }

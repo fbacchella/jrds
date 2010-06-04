@@ -6,15 +6,14 @@ import java.net.UnknownHostException;
 import jrds.Probe;
 import jrds.RdsHost;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 public class Resolver extends Starter {
-	static final private Logger logger = Logger.getLogger(Resolver.class);
 	String hostname = "";
 	InetAddress address = null;
 
 	public Resolver(String hostname) {
-		logger.debug("New dns resolver for " + hostname);
+		log(Level.DEBUG, "New dns resolver");
 		this.hostname = hostname;
 	}
 
@@ -25,7 +24,7 @@ public class Resolver extends Starter {
 			address = InetAddress.getByName(hostname);
 			started = true;
 		} catch (UnknownHostException e) {
-			logger.error("DNS host name " + hostname + " can't be found");
+			log(Level.ERROR, e,  "DNS host name %s can't be found", hostname);
 		}
 		return started;
 	}
@@ -55,6 +54,7 @@ public class Resolver extends Starter {
 		return "resolver:" + host.getDnsName();
 	}
 
+	@Deprecated
 	public static Object makeKey(String hostname) {
 		return "resolver:" + hostname;
 	}
