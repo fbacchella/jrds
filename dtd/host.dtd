@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT host (tag|snmp|macro|connection|probe|for)+ >
-<!ELEMENT macrodef (probe|tag)+ >
+<!ELEMENT host (tag|snmp|macro|connection|probe|collection|for|properties)+ >
+<!ELEMENT macrodef (probe|tag|collection|for)+ >
 <!ATTLIST macrodef
 	name CDATA #REQUIRED
 >
@@ -47,10 +47,13 @@
 <!ELEMENT comment (#PCDATA) >
 <!ELEMENT entry (#PCDATA) >
 <!ATTLIST entry key CDATA #REQUIRED>
+<!ELEMENT collection (element+)>
+<!ATTLIST collection name CDATA #REQUIRED >
+<!ELEMENT element (#PCDATA)>
 <!ELEMENT for (probe+) >
 <!ATTLIST for 
 	var CDATA #REQUIRED
-	value CDATA #REQUIRED
+	collection CDATA #REQUIRED
 >
 <!ELEMENT snmp (#PCDATA) >
 <!ATTLIST snmp 

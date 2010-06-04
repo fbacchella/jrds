@@ -11,6 +11,7 @@ public class EntityResolver implements org.xml.sax.EntityResolver {
 	static final Logger logger = Logger.getLogger(EntityResolver.class);
 	public InputSource resolveEntity(String publicId, String systemId)
 	throws SAXException, IOException {
+		logger.trace("Will look for DTD " + publicId + " " + systemId);
 		URL realSystemId;
 		if("-//jrds//DTD Graph Description//EN".equals(publicId)) {
 			realSystemId = getClass().getResource("/graphdesc.dtd");
@@ -20,6 +21,9 @@ public class EntityResolver implements org.xml.sax.EntityResolver {
 		}
 		else if("-//jrds//DTD Filter//EN".equals(publicId)) {
 			realSystemId =  getClass().getResource("/filter.dtd");
+		}
+		else if("-//jrds//DTD Host//EN".equals(publicId)) {
+			realSystemId =  getClass().getResource("/host.dtd");
 		}
 		else if("-//W3C//DTD XHTML 1.0 Strict//EN".equals(publicId)) {
 			realSystemId =  getClass().getResource("/ressources/xhtml1-strict.dtd");
