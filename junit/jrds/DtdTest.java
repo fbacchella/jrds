@@ -4,6 +4,7 @@ import java.net.URL;
 
 import jrds.factories.Loader;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -15,7 +16,8 @@ public class DtdTest {
 	@BeforeClass static public void configure() throws Exception {
 		Tools.configure();
 		Tools.prepareXml();
-		Tools.setLevel(new String[] {"jrds", "org.apache"}, logger.getLevel());
+		logger.setLevel(Level.TRACE);
+		Tools.setLevel(new String[] {"jrds.factories.xml", "org.apache"}, logger.getLevel());
 	}
 	
 	@Test
