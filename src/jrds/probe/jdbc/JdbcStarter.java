@@ -10,10 +10,9 @@ import jrds.RdsHost;
 import jrds.starter.Resolver;
 import jrds.starter.Starter;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 public abstract class JdbcStarter extends Starter {
-	static final private org.apache.log4j.Logger logger = Logger.getLogger(JdbcProbe.class);
 	private Starter resolver = null;
 	private Connection con;
 	private String url;
@@ -23,7 +22,7 @@ public abstract class JdbcStarter extends Starter {
 
 	public void setHost(RdsHost monitoredHost) {
 		this.url = getUrlAsString();
-		resolver = monitoredHost.getStarters().find(Resolver.makeKey(monitoredHost));
+		resolver = monitoredHost.find(Resolver.class);
 	}
 	
 	public abstract String getUrlAsString();
@@ -40,7 +39,7 @@ public abstract class JdbcStarter extends Starter {
 				con = DriverManager.getConnection(url , user, passwd);
 				started = true;
 			} catch (SQLException e) {
-				logger.error("Sql error: " + e + " for " + url);
+				log(Level.ERROR, e, "SQL error: %s", e);
 			}
 		}
 		return started;
@@ -52,7 +51,7 @@ public abstract class JdbcStarter extends Starter {
 			try {
 				con.close();
 			} catch (SQLException e) {
-				logger.error("Error with " + url + ": " + e);
+				log(Level.ERROR, e, "SQL error: %s", e);
 			}
 		}
 		con = null;

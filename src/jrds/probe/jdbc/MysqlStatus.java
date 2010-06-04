@@ -8,18 +8,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import jrds.Util;
 
 /**
  * 
  * This class needs select privilege, so remember to set up something like that :
  * GRANT USAGE ON *.* TO monitor@'%' IDENTIFIED BY 'password';
- * @author bacchell
+ * @author Fabrice Bacchella
  *
  */
 public class MysqlStatus extends Mysql {
-	static final private org.apache.log4j.Logger logger = Logger.getLogger(MysqlStatus.class);
-
 	public void configure(int port, String user, String passwd) {
 		super.configure(port, user, passwd);
 	}
@@ -42,19 +40,12 @@ public class MysqlStatus extends Mysql {
 				Double d = Double.NaN;
 				//We only keep the data in data stores list
 				if(toCollect.contains(e.getKey())) {
-					try {
-						if(e.getValue() instanceof String)
-							d = Double.parseDouble((String)e.getValue());
-					} catch (NumberFormatException ex) {
-						logger.error("Conversion problem with : " + e.getValue() + " for variable " + e.getKey() + " on probe " + this);
-					}
+					if(e.getValue() instanceof String)
+						d = Util.parseStringNumber((String)e.getValue(), Double.class, Double.NaN).doubleValue();
 					retValues.put(e.getKey(), d);
 				}
-
 			}
 		}
 		return retValues;
 	}
-
-
 }

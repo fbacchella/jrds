@@ -18,10 +18,9 @@ import jrds.Util;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 public abstract class JdbcProbe extends Probe<String, Number> implements UrlProbe, IndexedProbe {
-	static final private org.apache.log4j.Logger logger = Logger.getLogger(JdbcProbe.class);
 	private String label;
 
 	static final void registerDriver(String JdbcDriver) {
@@ -76,9 +75,8 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 	{
 		Map<String, Number> retValue = new HashMap<String, Number>(getPd().getSize());
 
-		String jdbcurl = getUrlAsString();
 		for(String query: getQueries()) {
-			logger.debug("Getting " + query + " on "  + jdbcurl); 
+			log(Level.DEBUG, "Getting %s", query); 
 			retValue.putAll(select2Map(query));
 		}
 		return retValue;
@@ -90,7 +88,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 		ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
 		ResultSetMetaData rsmd = rs.getMetaData();
 		int colCount = rsmd.getColumnCount();
-		logger.debug("Columns: " + colCount);
+		log(Level.DEBUG, "Columns: %d", colCount);
 		while(rs.next())  {
 			Map<String, Object> row = new HashMap<String, Object>(colCount);
 			String key =  rs.getObject(1).toString();
@@ -137,7 +135,6 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 	public Map<String, Number> select2Map(String query)
 	{
 		Map<String, Number> values = new HashMap<String, Number>();
-		String jdbcurl = getUrlAsString();
 		try {
 			Statement stmt = starter.getStatment();
 			if(stmt.execute(query)) {
@@ -146,11 +143,11 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 				} while(stmt.getMoreResults());
 			}
 			else {
-				logger.warn("Not a select query");
+				log(Level.WARN, "Not a select query");
 			}
 			stmt.close();
 		} catch (SQLException e) {
-			logger.error("Error with " + jdbcurl + ": " + e, e);
+			log(Level.ERROR, e, "SQL Error: " + e);
 		}
 		return values;
 	}
@@ -158,8 +155,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 	public Map<String, Object> select2Map(String query, String keyCol, String valCol)
 	{
 		Map<String, Object> values = new HashMap<String, Object>();
-		String jdbcurl = getUrlAsString();
-		logger.debug("Getting " + query + " on "  + jdbcurl); 
+		log(Level.DEBUG, "Getting %s", query); 
 		Statement stmt = null;
 		try {
 			stmt = starter.getStatment();
@@ -181,7 +177,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 			}
 			stmt.close();
 		} catch (SQLException e) {
-			logger.error("Error with" + jdbcurl + ": " + e.getLocalizedMessage());
+			log(Level.ERROR, e, "SQL Error: %s", e.getLocalizedMessage());
 		}
 		return values;
 	}
@@ -245,7 +241,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 		try {
 			newurl = new URL(getUrlAsString());
 		} catch (MalformedURLException e) {
-			logger.error("Invalid jdbc url: " + getUrlAsString(), e);
+			log(Level.ERROR, e, "Invalid jdbc url: " + getUrlAsString());
 		}
 		return newurl;
 	}

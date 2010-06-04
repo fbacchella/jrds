@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 /**
  * 
  * This class needs select privilege, so remember to set up something like that :
@@ -17,7 +15,6 @@ import org.apache.log4j.Logger;
  *
  */
 public class MysqlTableSpace extends Mysql {
-	static final private org.apache.log4j.Logger logger = Logger.getLogger(MysqlTableSpace.class);
 
 	public void configure(int port, String user, String passwd, String table) {
 		super.configure(port, user, passwd, table);
@@ -44,11 +41,8 @@ public class MysqlTableSpace extends Mysql {
 				//We only keep the data in data stores list
 				if(n != null) {
 					if(e.getValue() instanceof String) {
-						try {
-							n = n.doubleValue() + Double.parseDouble((String)e.getValue());
-						} catch (NumberFormatException ex) {
-							logger.error("Conversion problem with : " + e.getValue() + " for variable " + e.getKey() + " on probe " + this);
-						}
+						double d = jrds.Util.parseStringNumber((String)e.getValue(), Double.class, 0).doubleValue();
+						n = n.doubleValue() + d;
 					}
 					else if(Number.class.isAssignableFrom(e.getValue().getClass()))
 						n = n.doubleValue() + ((Number) e.getValue()).doubleValue();
