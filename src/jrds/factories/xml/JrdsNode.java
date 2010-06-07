@@ -85,8 +85,13 @@ public class JrdsNode implements Node {
 	public void setMethod(Object o, XPathExpression xpath, String method, boolean uniq) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException {
 		for(Node n: new NodeListIterator(parent, xpath)) {
 			String name = n.getTextContent().trim();
+			Method m;
 			if(name != null && ! "".equals(name)) {
-				Method m = o.getClass().getMethod(method, String.class);
+				try {
+					m = o.getClass().getMethod(method, String.class);
+				} catch (NoSuchMethodException e) {
+					m = o.getClass().getMethod(method, Object.class);
+				}
 				m.invoke(o, name);
 				if(uniq)
 					break;

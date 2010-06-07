@@ -1,8 +1,12 @@
 package jrds.factories;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -76,49 +80,82 @@ public class HostBuilder extends ObjectBuilder {
 
 		makeConnexion(hostNode, host);
 
-		parseFragment(hostNode, host);
+		hostNode.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
+
+		StarterNode ns = new StarterNode() {};
+
+		parseFragment(hostNode, host, ns);
 
 		return host;
 	}
 
-	private void parseFragment(JrdsNode fragment, RdsHost host) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-		fragment.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
-		
+	private void parseFragment(JrdsNode fragment, RdsHost host, StarterNode ns) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+
+		Map<String, String> hostprop = makeProperties(fragment);
+		if(hostprop != null) {
+			ChainedProperties temp = new ChainedProperties(hostprop);
+			//temp.register(host);
+			ns.registerStarter(temp);
+		}
+
 		Map<String, Set<String>> collections = new HashMap<String, Set<String>>();
 		for(JrdsNode collectionNode: fragment.iterate(CompiledXPath.get("collection"))) {
 			String name = collectionNode.attrMap().get("name");
 			Set<String> set = new HashSet<String>();
 			collectionNode.setMethod(set, CompiledXPath.get("element"), "add", false);
 			collections.put(name, set);
-			logger.trace("Set added: " + set);
 		}
 
 		for(JrdsNode forNode: fragment.iterate(CompiledXPath.get("for"))) {
-		String iterprop = forNode.attrMap().get("var");
-		String name = forNode.attrMap().get("collection");
-		Set<String> set = collections.get(name);
-		if(set != null) {
-			Map<String, String> properties = new HashMap<String, String>(1);
-			for(String i: set) {
-				properties.put(iterprop, i);
-			}			
-		}
-		else {
-			logger.error("Invalid host configuration, collection " + name + " not found");
-		}
-		//String set = forNode.attrMap().get("set");
-//		String[] = set.split(",");
-//		
-	}
-		for(JrdsNode probeNode: fragment.iterate(CompiledXPath.get("probe | rrd"))) {
-			try {
-				Probe<?,?> p = makeProbe(probeNode, host);
-			} catch (Exception e) {
-				logger.error("Probe creation failed for host " + host.getName() + ": " + e);
-				e.printStackTrace();
+			Map<String, String> forattr = forNode.attrMap();
+			String iterprop = forattr.get("var");
+			Collection<String> set = null;
+			String name = forNode.attrMap().get("collection");
+			if(name != null)
+				set = collections.get(name);
+			else if(forattr.containsKey("min") && forattr.containsKey("max") && forattr.containsKey("step")) {
+				int min = jrds.Util.parseStringNumber(forattr.get("min"), Integer.class, Integer.MAX_VALUE).intValue();
+				int max = jrds.Util.parseStringNumber(forattr.get("max"), Integer.class, Integer.MIN_VALUE).intValue();
+				int step = jrds.Util.parseStringNumber(forattr.get("step"), Integer.class, Integer.MIN_VALUE).intValue();
+				if( min > max || step <= 0) {
+					logger.error("invalid range from " + min + " to " + max + " with step " + step);
+					break;
+				}
+				set = new ArrayList<String>((max - min)/step + 1);
+				for(int i=min; i <= max; i+= step) {
+					set.add(Integer.toString(i));
+				}
+			}
+
+			if(set != null) {
+				if(logger.isDebugEnabled()) {
+					logger.trace("for using " + set);
+				}
+
+				for(String i: set) {
+					Map<String, String> properties = new HashMap<String, String>(1);
+					properties.put(iterprop, i);
+					StarterNode fornode = new StarterNode(ns) {};
+					ChainedProperties temp = new ChainedProperties(properties);
+					fornode.registerStarter(temp);
+					parseFragment(forNode, host, fornode);
+				}
+			}
+			else {
+				logger.error("Invalid host configuration, collection " + name + " not found");
 			}
 		}
-		
+		for(JrdsNode probeNode: fragment.iterate(CompiledXPath.get("probe | rrd"))) {
+			try {
+				makeProbe(probeNode, host, ns);
+			} catch (Exception e) {
+				logger.error("Probe creation failed for host " + host.getName() + ": ");
+				ByteArrayOutputStream buffer = new ByteArrayOutputStream();  
+				e.printStackTrace(new PrintStream(buffer));
+				logger.error(buffer);
+			}
+		}
+
 		for(JrdsNode macroNode: fragment.iterate(CompiledXPath.get("macro"))) {
 			String name = macroNode.attrMap().get("name");
 			Macro m = macrosMap.get(name);
@@ -134,11 +171,6 @@ public class HostBuilder extends ObjectBuilder {
 			else {
 				logger.error("Unknown macro:" + name);
 			}
-		}
-		Map<String, String> hostprop = makeProperties(fragment);
-		if(hostprop != null) {
-			ChainedProperties temp = new ChainedProperties(hostprop);
-			temp.register(host);
 		}
 	}
 
@@ -164,10 +196,9 @@ public class HostBuilder extends ObjectBuilder {
 		return starter;
 	}
 
-	public Probe<?,?> makeProbe(JrdsNode probeNode, RdsHost host) {
+	public Probe<?,?> makeProbe(JrdsNode probeNode, RdsHost host, StarterNode ns) {
 		Probe<?,?> p = null;
 		String type = probeNode.attrMap().get("type");
-		//p = pf.makeProbe(type, host, args);
 		p = pf.makeProbe(type);
 		if(p == null)
 			return null;
@@ -202,7 +233,7 @@ public class HostBuilder extends ObjectBuilder {
 				((ConnectedProbe)p).setConnectionName(connexionName);
 			}
 		}
-		List<Object> args = ArgFactory.makeArgs(probeNode, host);
+		List<Object> args = ArgFactory.makeArgs(probeNode, ns.find(ChainedProperties.class), host);
 		if( !pf.configure(p, args)) {
 			logger.error(p + " configuration failed");
 			return null;
