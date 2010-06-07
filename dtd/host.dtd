@@ -53,7 +53,10 @@
 <!ELEMENT for (probe+) >
 <!ATTLIST for 
 	var CDATA #REQUIRED
-	collection CDATA #REQUIRED
+	collection CDATA #IMPLIED
+	min CDATA #IMPLIED
+	max CDATA #IMPLIED
+	step CDATA #IMPLIED
 >
 <!ELEMENT snmp (#PCDATA) >
 <!ATTLIST snmp 
