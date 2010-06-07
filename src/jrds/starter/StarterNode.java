@@ -149,6 +149,8 @@ public abstract class StarterNode implements StartersSet {
 	}
 
 	public HostsList getHostList() {
+		if(root == null && getParent() != null)
+			root = getParent().getHostList();
 		return root;
 	}
 
