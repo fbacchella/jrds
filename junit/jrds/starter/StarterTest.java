@@ -1,5 +1,6 @@
 package jrds.starter;
 
+import jrds.HostsList;
 import jrds.Tools;
 
 import org.apache.log4j.Level;
@@ -79,6 +80,26 @@ public class StarterTest {
 
 		Assert.assertNotNull(n2.find(LocalStarter.class, 1));
 		Assert.assertNotNull(n2.find(LocalStarter.class, 0));
+	}
+	
+	@Test
+	public void testHostList1() {
+		HostsList hl = new HostsList();		
+		StarterNode n2 = new StarterNode(hl) {};
+		StarterNode n3 = new StarterNode(n2) {};
+		
+		Assert.assertEquals(hl, n3.getHostList());
+	}
+
+	@Test
+	public void testHostList2() {
+		StarterNode n2 = new StarterNode() {};
+		StarterNode n3 = new StarterNode(n2) {};
+
+		HostsList hl = new HostsList();
+		n2.setParent(hl);
+		
+		Assert.assertEquals(hl, n3.getHostList());
 	}
 
 }

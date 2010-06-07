@@ -6,21 +6,20 @@
 	<properties>
 		<entry key="bidule1">toto1</entry>
 	</properties>
-	<probe type="PartitionSpace">
-		<arg type="String" value="/" />
-		<!--
-			<properties> <entry key="bidule2">toto2</entry> </properties>
-		-->
-	</probe>
 	<probe type="TcpSnmp">
 	</probe>
-	<collection name="netcard">
-		<element>eth0</element>
-		<element>eth1</element>
+	<collection name="partitions">
+		<element>/</element>
+		<element>/data</element>
 	</collection>
-	<for var="i" collection="netcard">
+	<for var="i" collection="partitions">
+		<probe type="PartitionSpace">
+			<arg type="String" value="${i}" />
+		</probe>
+	</for>
+	<for var="i" min="0" max="3" step="1">
 		<probe type="IfXSnmp">
-			<arg type="String" value="${i}"/>
+			<arg type="String" value="eth${i}" />
 		</probe>
 	</for>
 </host>
