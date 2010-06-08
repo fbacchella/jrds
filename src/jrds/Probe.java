@@ -25,7 +25,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
-import jrds.starter.Starter;
+import jrds.starter.Connection;
 import jrds.starter.StarterNode;
 
 import org.apache.log4j.Level;
@@ -667,8 +667,9 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 		if(this instanceof ConnectedProbe) {
 			ConnectedProbe cp = (ConnectedProbe) this;
 			String cnxName = cp.getConnectionName();
-			Starter cnx = getStarters().find(cnxName);
-			log(Level.TRACE, "Connection: " + cnx.isStarted() );
+			Connection<?> cnx = find(Connection.class, cnxName);
+			if(getNamedLogger().isTraceEnabled())
+				log(Level.TRACE, "Connection: %s", (cnx != null ? Boolean.toString(cnx.isStarted()) : "null") );
 			if(cnx == null || ! cnx.isStarted())
 				return false;
 		}
