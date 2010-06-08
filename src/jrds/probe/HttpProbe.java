@@ -104,9 +104,9 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 		}
 		URL tempurl = getUrl();
 		if("http".equals(tempurl.getProtocol())) {
-			resolver = new Resolver(url.getHost()).register(getHost());
+			resolver = getHost().registerStarter(new Resolver(url.getHost()));
 		}
-		log(Level.DEBUG, "Url to collect is %s", getUrl());
+		log(Level.DEBUG, "URL to collect is %s", getUrl());
 	}
 
 	/* (non-Javadoc)
@@ -114,7 +114,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 	 */
 	@Override
 	public boolean isCollectRunning() {
-		if (resolver != null && ! resolver.isStarted())
+		if (resolver == null || ! resolver.isStarted())
 			return false;
 		return super.isCollectRunning();
 	}
@@ -141,7 +141,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 				lines.add(lastLine);
 			in.close();
 		} catch (IOException e) {
-			log(Level.ERROR, e, "Unable to read url %s because; %s", getUrl(), e.getMessage());
+			log(Level.ERROR, e, "Unable to read url %s because: %s", getUrl(), e.getMessage());
 		}
 		return lines;
 	}
@@ -150,14 +150,6 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 	 * @see com.aol.jrds.Probe#getNewSampleValues()
 	 */
 	public Map<String, Number> getNewSampleValues() {
-		String hostName = getUrl().getHost();
-		if(hostName != null) {
-			Starter resolver = getStarters().find(Resolver.makeKey(hostName));
-			if(resolver != null && ! resolver.isStarted()) {
-				log(Level.TRACE, "Resolver not started for %s", hostName);
-				return Collections.emptyMap();
-			}
-		}
 		log(Level.DEBUG, "Getting %s", getUrl());
 		URLConnection cnx = null;
 		try {
