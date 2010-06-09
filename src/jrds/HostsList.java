@@ -21,6 +21,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
@@ -74,7 +75,9 @@ public class HostsList extends StarterNode {
 	private int timeout = 10;
 	// A global flag that tells globally that this HostsList can be used
 	volatile private boolean started = false;
-	private Stats stats = new Stats(); 
+	private Stats stats = new Stats();
+	
+	private Semaphore collectMutex = new Semaphore(1);
 
 	/**
 	 *  
@@ -143,7 +146,7 @@ public class HostsList extends StarterNode {
 		rrdDir = pm.rrddir;
 		tmpDir = pm.tmpdir;
 		
-		((SocketFactory) getStarters().find(SocketFactory.class)).setTimeout(pm.timeout);
+		find(SocketFactory.class).setTimeout(pm.timeout);
 
 		renderer = new Renderer(50, step, tmpDir);
 		
@@ -264,6 +267,7 @@ public class HostsList extends StarterNode {
 					}
 				}
 				);
+				collectMutex.acquire();
 				startCollect();
 				for(final RdsHost oneHost: hostList) {
 					if( ! isCollectRunning())
@@ -296,6 +300,7 @@ public class HostsList extends StarterNode {
 					logger.info("Collect interrupted");
 				}
 				stopCollect();
+				collectMutex.release();
 				if( ! tpool.isTerminated()) {
 					//Second chance, we wait for the time out
 					try {
@@ -312,6 +317,8 @@ public class HostsList extends StarterNode {
 				}
 			} catch (RuntimeException e) {
 				logger.error("problem while collecting data: ", e);
+			} catch (InterruptedException e) {
+				logger.error("Collect thread interrupted: ");
 			}							
 			Date end = new Date();
 			long duration = end.getTime() - start.getTime();
@@ -324,6 +331,15 @@ public class HostsList extends StarterNode {
 		}
 	}
 
+	public void lockCollect() throws InterruptedException {
+		collectMutex.acquire();
+	}
+
+	public void releaseCollect() {
+		collectMutex.release();
+	}
+
+	
 	public Collection<GraphTree> getGraphsRoot() {
 		return treeMap.values();
 	}

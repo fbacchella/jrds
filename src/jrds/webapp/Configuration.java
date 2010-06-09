@@ -87,10 +87,15 @@ public class Configuration {
 	}
 
 	public void stop() {
+		try {
+			hostsList.lockCollect();
+		} catch (InterruptedException e) {
+		}
 		collectTimer.cancel();
 		collectTimer = null;
 		hostsList.getRenderer().finish();
 		hostsList.finished();
+		hostsList.releaseCollect();
 	}
 
 	@SuppressWarnings("unchecked")
