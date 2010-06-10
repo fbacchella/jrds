@@ -489,7 +489,8 @@ public class Util {
 				line.append("[" + source.toString() + "] ");
 			line.append(String.format(format, args));
 			namedLogger.log(l, line.toString());
-			if(e != null && namedLogger.isDebugEnabled()) {
+			//NPE should never happen, so it's always logged
+			if(e != null && (namedLogger.isDebugEnabled() || e instanceof NullPointerException) ) {
 				namedLogger.log(l, "Error stack: ", e);
 			}
 		}
