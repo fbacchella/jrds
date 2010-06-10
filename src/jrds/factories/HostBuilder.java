@@ -221,19 +221,21 @@ public class HostBuilder extends ObjectBuilder {
 		//			}
 		//			p.addThreshold(t);
 		//		}
+		
+		ChainedProperties cp = ns.find(ChainedProperties.class);
 		String label = probeNode.evaluate(CompiledXPath.get("@label"));
 		if(label != null && ! "".equals(label)) {
 			logger.trace("Adding label " + label + " to " + p);
-			p.setLabel(label);
+			p.setLabel(jrds.Util.parseTemplate(label, cp));;
 		}
 		if(p instanceof ConnectedProbe) {
 			String connexionName = probeNode.evaluate(CompiledXPath.get("@connection"));
 			if(connexionName != null && ! "".equals(connexionName)) {
 				logger.trace("Adding connection " + connexionName + " to " + p);
-				((ConnectedProbe)p).setConnectionName(connexionName);
+				((ConnectedProbe)p).setConnectionName(jrds.Util.parseTemplate(connexionName, cp));
 			}
 		}
-		List<Object> args = ArgFactory.makeArgs(probeNode, ns.find(ChainedProperties.class), host);
+		List<Object> args = ArgFactory.makeArgs(probeNode, cp, host);
 		if( !pf.configure(p, args)) {
 			logger.error(p + " configuration failed");
 			return null;
