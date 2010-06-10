@@ -40,5 +40,6 @@
 		<pathstring>Web Activity</pathstring>
 		<pathstring>Service time</pathstring>
 		<pathstring>${label}</pathstring>
+		<pathelement>HOST</pathelement>
 	</viewtree>
 </graphdesc>

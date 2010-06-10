@@ -54,5 +54,6 @@
 		<pathstring>Web Activity</pathstring>
 		<pathstring>Requests/s</pathstring>
 		<pathstring>${label}</pathstring>
+		<pathelement>HOST</pathelement>
 	</viewtree>
 </graphdesc>
