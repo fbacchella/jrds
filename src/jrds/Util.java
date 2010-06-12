@@ -1,8 +1,10 @@
 package jrds;
 
+import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -498,7 +500,11 @@ public class Util {
 			namedLogger.log(l, line.toString());
 			//NPE should never happen, so it's always logged
 			if(e != null && (namedLogger.isDebugEnabled() || e instanceof NullPointerException) ) {
-				namedLogger.log(l, "Error stack: ", e);
+				Writer w = new CharArrayWriter(e.getStackTrace().length + 20);
+				e.printStackTrace(new PrintWriter(w));
+				namedLogger.log(l, "Error stack: ");
+				namedLogger.log(l, w);
+
 			}
 		}
 	}
