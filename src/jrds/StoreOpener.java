@@ -60,8 +60,8 @@ public final class StoreOpener {
 		if(instance == null) {
 			instance = RrdDbPool.getInstance();
 			instance.setCapacity(dbPoolSize);
-			//RrdBackendFactory.registerFactory(new RrdAccountingNioBackendFactory());
-			RrdBackendFactory.setDefaultFactory(backend);
+			if(backend !=  null)
+				RrdBackendFactory.setDefaultFactory(backend);
 		}
 		RrdBackendFactory factory = RrdBackendFactory.getDefaultFactory();
 
