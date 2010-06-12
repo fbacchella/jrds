@@ -2,6 +2,8 @@ package jrds;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -363,7 +365,11 @@ public class Util {
 		else
 			transformer = tFactory.newTransformer();
 
-		transformer.setOutputProperty("encoding", "UTF-8");
+		String documentEncoding = d.getInputEncoding();
+		if(documentEncoding == null)
+			documentEncoding = "UTF-8";
+		transformer.setOutputProperty(OutputKeys.ENCODING, documentEncoding);
+		transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 
 		DocumentType dt = d.getDoctype();
 		//If no transformation, we try to keep the Document type
@@ -382,7 +388,8 @@ public class Util {
 			}
 		}
 
-		StreamResult result = new StreamResult(out);
+		Writer w = new OutputStreamWriter(out, documentEncoding);
+		StreamResult result = new StreamResult(w);
 		transformer.transform(source, result);
 		out.flush();
 	}
