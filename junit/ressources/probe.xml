@@ -1,3 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE probe PUBLIC "-//jrds//DTD Host//EN"
+                           "urn:jrds:host">
 <probe type="blabla" >
 	<threshold name="name1" dsName="dsName" value="100" duration="10" limit="high" />
 	<threshold name="name2" dsName="dsName" value="100" duration="10" limit="high" >

@@ -18,6 +18,7 @@ import jrds.RdsHost;
 import jrds.Tools;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
+import jrds.mockobjects.MokeProbeFactory;
 import jrds.starter.ChainedProperties;
 import jrds.starter.StarterNode;
 
@@ -27,11 +28,13 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 public class TestLoadConfiguration {
 	static final private Logger logger = Logger.getLogger(TestLoadConfiguration.class);
 
 	static final private String propertiesXmlString = 
+		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
 		"<!DOCTYPE properties PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
 		"<properties>" +
 		"<entry key=\"a\">1</entry>" +
@@ -39,14 +42,17 @@ public class TestLoadConfiguration {
 		"</properties>";
 
 	static final private String goodProbeXml2 = 
+		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
 		"<!DOCTYPE probe PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
 		"<probe type = \"PartitionSpace\">" +
 		"<arg type=\"String\" value=\"/\" />" +
 		"</probe>";
 
-	static final private String goodMacroXml = 
+	static final private String goodMacroXml =
+		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
 		"<!DOCTYPE macrodef PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
 		"<macrodef name=\"macrodef\">" +
+		"<tag>mytag</tag>" +
 		"<probe type = \"TcpSnmp\">" +
 		"</probe>" + 
 		"<probe type = \"PartitionSpace\">" +
@@ -55,6 +61,7 @@ public class TestLoadConfiguration {
 		"</macrodef>";
 
 	static final private String goodHostXml = 
+		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
 		"<!DOCTYPE host PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
 		"<host name=\"myhost\">" +
 		"<probe type = \"PartitionSpace\">" +
@@ -116,9 +123,24 @@ public class TestLoadConfiguration {
 		Document d = Tools.parseString(goodMacroXml);
 
 		MacroBuilder b = new MacroBuilder();
-		Macro m = b.makeMacro(new JrdsNode(d));
+		JrdsNode jn = new JrdsNode(d);
+		int xmlProbesNumber = jn.getChildNodes().item(1).getChildNodes().getLength();
+
+		Macro m = b.makeMacro(jn);
+		int macroProbesNumber = m.getDf().getChildNodes().getLength();
 		Assert.assertEquals("macrodef", m.getName());
-		logger.debug("Macro: " + m);
+		Assert.assertEquals(xmlProbesNumber, macroProbesNumber);
+
+		Document hostdoc = Tools.dbuilder.newDocument();
+		Node macroNode = m.getDf().cloneNode(true);
+		hostdoc.adoptNode(macroNode);
+		Node hostNode = hostdoc.appendChild(hostdoc.createElement("host"));
+		while(macroNode.hasChildNodes())
+			hostNode.appendChild(macroNode.removeChild(macroNode.getFirstChild()));
+		int hostProbesNumber = hostNode.getChildNodes().getLength();
+		Assert.assertEquals(macroProbesNumber, hostProbesNumber);
+		jrds.Util.serialize(hostdoc, System.out, null, null);
+		System.out.println();
 	}
 
 	@Test
@@ -142,7 +164,7 @@ public class TestLoadConfiguration {
 		//		logger.trace(h.getProbes());
 	}
 
-	@Test(expected = java.lang.NullPointerException.class)
+	@Test
 	public void testMacroHost() throws Exception {
 		Document macrodoc = Tools.parseString(goodMacroXml);
 
@@ -156,21 +178,23 @@ public class TestLoadConfiguration {
 
 		HostBuilder hb = new HostBuilder();
 		hb.setProperty(ObjectBuilder.properties.PM, pm);
+		hb.setProperty(ObjectBuilder.properties.PROBEFACTORY, new MokeProbeFactory());
+
 		RdsHost h = hb.makeRdsHost(hostNode);
 		Assert.assertEquals("myhost",h.getName());
 
 		Map<String, String> properties = Collections.emptyMap();
 		m.populate(h, properties);
-		logger.trace(h.getProbes());
+		Assert.assertEquals(0, h.getProbes().size());
 	}
-	
+
 	@Test
 	public void TestProperties() throws Exception {
 		JrdsNode pnode = new JrdsNode(Tools.parseString(propertiesXmlString));
 
 		HostBuilder hb = new HostBuilder();
 		hb.setProperty(ObjectBuilder.properties.PM, pm);
-		
+
 		Map<String, String> props = hb.makeProperties(pnode);
 		Assert.assertEquals(2, props.size());
 		Assert.assertNotNull(props.get("a"));

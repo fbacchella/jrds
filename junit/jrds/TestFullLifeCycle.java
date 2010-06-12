@@ -38,7 +38,7 @@ public class TestFullLifeCycle {
 		pm.setProperty("rrddir", "tmp");
 		pm.setProperty("logevel", logger.getLevel().toString());
 		pm.update();
-		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, pm.rrdbackend);
+		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, null);
 
 		File rrdFile = new File("tmp", "fullmock.rrd");
 		if(rrdFile.exists())
@@ -46,7 +46,6 @@ public class TestFullLifeCycle {
 
 		Probe<?,?> p = Full.create();
 		logger.debug("Created " + p);
-		System.out.println(p);
 		long endSec = Full.fill(p);
 		logger.debug("fill time: " + endSec);
 
