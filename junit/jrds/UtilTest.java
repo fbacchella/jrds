@@ -10,14 +10,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
 
+import jrds.mockobjects.DummyProbe;
 import jrds.mockobjects.MokeProbe;
 import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.w3c.dom.Document;
 
@@ -88,24 +89,25 @@ public class UtilTest {
 		String publicId = d.getDoctype().getPublicId();
 		String systemId = d.getDoctype().getSystemId();
 		prop = new HashMap<String, String>();
-		prop.put(OutputKeys.ENCODING, "ISO-8859-1");
+
 		Util.serialize(d, out, null, prop);
 		outBuffer = out.toString();
-		logger.debug("out buffer: " + outBuffer);
+		logger.debug("out buffer for testSerialization3: \n" + outBuffer + "\n");
 		//It should have auto-detected the doc type
 		Assert.assertTrue(outBuffer.contains(publicId));
 		Assert.assertTrue(outBuffer.contains(systemId));
-		Assert.assertTrue(outBuffer.contains("ISO-8859-1"));
+		Assert.assertTrue(outBuffer.contains(d.getInputEncoding()));
 	}
 
-	@Test
+	@Test @Ignore
 	public void testSerialization4() throws Exception {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		Document d;
+		DummyProbe p = new DummyProbe();
+		p.configure();
+		Document d = p.dumpAsXml();
 		String outBuffer;
 		URL xsl = UtilTest.class.getResource("/jrds/xmlResources/probe.xsl");
 		out.reset();
-		d = Tools.parseRessource("probe.xml");
 		Util.serialize(d, out, xsl, null);
 		outBuffer = out.toString();
 		logger.debug(outBuffer);
