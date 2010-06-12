@@ -59,12 +59,12 @@
 			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
 			<classpath refid="external.classpath"/>
 		</javac>
-		<copy todir="${build.home}/classes">
+<!--		<copy todir="${build.home}/classes">
 			<fileset dir="${src.home}">
 				<include name="**/*.xml"/>
 				<include name="**/*.xsl"/>
 			</fileset>
-		</copy>
+		</copy>-->
 	</target>
 
 	<target name="compile.test" depends="compile">
@@ -130,6 +130,10 @@
 				<include name="**/*.xsl" />
 				<exclude name="**/bootstrap/**" />
 			</fileset>		
+			<fileset dir="${src.home}">
+				<include name="**/*.xml"/>
+				<include name="**/*.xsl"/>
+			</fileset>
 		</jar>
 		<jar destfile="${build.home}/boot.jar" >
 			<fileset dir="${build.home}/classes">
@@ -246,17 +250,22 @@
 	</target>
 	
 	<target name="test" depends="compile.test, checkdtd">
-		<mkdir dir="${testdir}"/>
-		<junit printsummary="yes" showoutput="no">
-			<formatter type="plain"/>
+		<mkdir dir="${testdir}/rawtestoutput"/>
+		<junit printsummary="yes" showoutput="no" failureproperty="junit.failure">
+			<formatter type="xml"/>
 			<classpath refid="test.classpath"/>
-			<batchtest todir="${testdir}">
+			<batchtest todir="${testdir}/rawtestoutput">
 				<fileset dir="junit">
 			    	<include name="**/*Test*.java"/>
 			    	<exclude name="**/TestUtil.java"/>
 			    </fileset>
 			</batchtest>
 		</junit>
+	    <junitreport todir="${testdir}/rawtestoutput">
+	      <fileset dir="${testdir}/rawtestoutput"/>
+	      <report todir="${testdir}"/>
+	    </junitreport>
+	    <fail if="junit.failure" message="Unit test(s) failed.  See reports!"/>
 	</target>
 	
 	<!--  ==================== A few target to run jrds ==================== -->
