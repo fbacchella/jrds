@@ -2,6 +2,7 @@ package jrds.factories;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -27,8 +28,9 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.w3c.dom.Element;
 
 public class TestLoadConfiguration {
 	static final private Logger logger = Logger.getLogger(TestLoadConfiguration.class);
@@ -53,9 +55,9 @@ public class TestLoadConfiguration {
 		"<!DOCTYPE macrodef PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
 		"<macrodef name=\"macrodef\">" +
 		"<tag>mytag</tag>" +
-		"<probe type = \"TcpSnmp\">" +
+		"<probe type = \"MacroProbe1\">" +
 		"</probe>" + 
-		"<probe type = \"PartitionSpace\">" +
+		"<probe type = \"MacroProbe2\">" +
 		"<arg type=\"String\" value=\"/\" />" +
 		"</probe>" +
 		"</macrodef>";
@@ -93,8 +95,8 @@ public class TestLoadConfiguration {
 		conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
 
 		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"jrds.factories","jrds.Probe"}, logger.getLevel());
-
+		Tools.setLevel(new String[] {"jrds.factories"}, logger.getLevel());
+		Tools.setLevel(new String[] {"jrds.factories.xml.CompiledXPath"}, Level.INFO);
 	}
 
 	@Test
@@ -112,6 +114,9 @@ public class TestLoadConfiguration {
 		JrdsNode pnode = new JrdsNode(d);
 
 		HostBuilder hb = new HostBuilder();
+		hb.setProperty(ObjectBuilder.properties.PROBEFACTORY, new MokeProbeFactory());
+		hb.setProperty(ObjectBuilder.properties.PM, pm);
+
 		Probe<?,?> p = hb.makeProbe(pnode.getChild(CompiledXPath.get("//probe")), new RdsHost(), new StarterNode() {});
 		//		Probe p = conf.makeProbe(pnode.getChild(CompiledXPath.get("//probe")));
 		Assert.assertNotNull(p);
@@ -119,28 +124,54 @@ public class TestLoadConfiguration {
 	}
 
 	@Test
-	public void testMacro() throws Exception {
+	public void testMacroLoad() throws Exception {
 		Document d = Tools.parseString(goodMacroXml);
 
 		MacroBuilder b = new MacroBuilder();
 		JrdsNode jn = new JrdsNode(d);
-		int xmlProbesNumber = jn.getChildNodes().item(1).getChildNodes().getLength();
 
 		Macro m = b.makeMacro(jn);
 		int macroProbesNumber = m.getDf().getChildNodes().getLength();
 		Assert.assertEquals("macrodef", m.getName());
-		Assert.assertEquals(xmlProbesNumber, macroProbesNumber);
+		Assert.assertEquals(1, macroProbesNumber);
+		Assert.assertEquals(3, m.getDf().getChildNodes().item(0).getChildNodes().getLength());
+	}
+	
+	@Test
+	public void testMacroFill() throws Exception {
+		Document d = Tools.parseString(goodMacroXml);
 
-		Document hostdoc = Tools.dbuilder.newDocument();
-		Node macroNode = m.getDf().cloneNode(true);
-		hostdoc.adoptNode(macroNode);
-		Node hostNode = hostdoc.appendChild(hostdoc.createElement("host"));
-		while(macroNode.hasChildNodes())
-			hostNode.appendChild(macroNode.removeChild(macroNode.getFirstChild()));
-		int hostProbesNumber = hostNode.getChildNodes().getLength();
-		Assert.assertEquals(macroProbesNumber, hostProbesNumber);
+		MacroBuilder b = new MacroBuilder();
+		JrdsNode jn = new JrdsNode(d);
+
+		Macro m = b.makeMacro(jn);
+		
+		Map<String, Macro> macroMap = new HashMap<String, Macro>();
+		macroMap.put(m.getName(), m);
+
+		Document hostdoc = Tools.parseString(goodHostXml);
+		
+		Map<String, String> attr = new HashMap<String, String>(1);
+		attr.put("name", "macrodef");
+		Tools.appendElement(hostdoc.getDocumentElement(), "macro", attr);
 		jrds.Util.serialize(hostdoc, System.out, null, null);
 		System.out.println();
+		
+		HostBuilder hb = new HostBuilder();
+		hb.setProperty(ObjectBuilder.properties.PM, pm);
+		hb.setProperty(ObjectBuilder.properties.MACRO, macroMap);
+		hb.setProperty(ObjectBuilder.properties.PROBEFACTORY, new MokeProbeFactory());
+
+		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
+		
+		logger.debug("probes:" + host.getProbes());
+		Collection<Probe<?,?>> probes = host.getProbes();
+		Collection<String> probesName = new ArrayList<String>(probes.size());
+		for(Probe<?,?> p: probes) {
+			probesName.add(p.toString());
+		}
+		Assert.assertTrue("MacroProbe1 found", probesName.contains("myhost/MacroProbe1"));
+		Assert.assertTrue("MacroProbe1 found", probesName.contains("myhost/MacroProbe2"));
 	}
 
 	@Test
@@ -162,30 +193,6 @@ public class TestLoadConfiguration {
 
 		//		RdsHost h = hb.makeRdsHost(hostNode);
 		//		logger.trace(h.getProbes());
-	}
-
-	@Test
-	public void testMacroHost() throws Exception {
-		Document macrodoc = Tools.parseString(goodMacroXml);
-
-		MacroBuilder mb = new MacroBuilder();
-		mb.setProperty(ObjectBuilder.properties.PM, pm);
-
-		Macro m = mb.makeMacro(new JrdsNode(macrodoc));
-
-		Document hostdoc = Tools.parseString(goodHostXml);
-		JrdsNode hostNode = new JrdsNode(hostdoc);
-
-		HostBuilder hb = new HostBuilder();
-		hb.setProperty(ObjectBuilder.properties.PM, pm);
-		hb.setProperty(ObjectBuilder.properties.PROBEFACTORY, new MokeProbeFactory());
-
-		RdsHost h = hb.makeRdsHost(hostNode);
-		Assert.assertEquals("myhost",h.getName());
-
-		Map<String, String> properties = Collections.emptyMap();
-		m.populate(h, properties);
-		Assert.assertEquals(0, h.getProbes().size());
 	}
 
 	@Test

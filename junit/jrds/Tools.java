@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,7 +21,10 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
 import org.apache.log4j.spi.LoggingEvent;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 final public class Tools {
 	public static DocumentBuilder dbuilder = null;
@@ -78,5 +82,13 @@ final public class Tools {
 		}
 	}
 
-
+	static public void appendElement(Node n, String name, Map<String, String> attributes) {
+		Document d = n.getOwnerDocument();
+		Element e = d.createElement(name);
+		if(attributes != null)
+			for(Map.Entry<String, String> a: attributes.entrySet()) {
+				e.setAttribute(a.getKey(), a.getValue());
+			}
+		n.appendChild(e);
+	}
 }

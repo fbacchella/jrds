@@ -1,6 +1,7 @@
 package jrds.mockobjects;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import jrds.GraphDesc;
@@ -23,6 +24,21 @@ public class MokeProbeFactory extends ProbeFactory {
 	 * @see jrds.factories.ProbeFactory#makeProbe(jrds.ProbeDesc, java.util.List)
 	 */
 	public Probe<?,?> makeProbe(ProbeDesc pd) {
-		return new MokeProbe<String, Number>();
+		return new MokeProbe<String, Number>(pd);
+	}
+	public Probe<?,?> makeProbe(String type) {
+		return new MokeProbe<String, Number>(type);
+	}
+
+	/* (non-Javadoc)
+	 * @see jrds.factories.ProbeFactory#configure(jrds.Probe, java.util.List)
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean configure(Probe<?, ?> p, List<?> constArgs) {
+		if(p instanceof MokeProbe) {
+			((MokeProbe)p).configure();
+		}
+		return true;
 	}
 }

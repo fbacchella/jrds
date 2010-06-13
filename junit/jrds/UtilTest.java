@@ -183,7 +183,7 @@ public class UtilTest {
 		p.setHost(new RdsHost("Moke"));
 		p.setLabel("label");
 		String parsed = Util.parseTemplate("${host} ${probename} ${label}", p);
-		Assert.assertEquals("Moke MokeProbe label", parsed);
+		Assert.assertEquals("Moke DummyProbe label", parsed);
 	}
 
 	@Test
