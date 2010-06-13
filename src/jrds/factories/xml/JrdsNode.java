@@ -285,10 +285,13 @@ public class JrdsNode implements Node {
 	}
 
 	/**
+	 * If it's a document, it return itself
 	 * @return
 	 * @see org.w3c.dom.Node#getOwnerDocument()
 	 */
 	public Document getOwnerDocument() {
+		if(getNodeType() == Node.DOCUMENT_NODE)
+			return (Document) this.parent;
 		return parent.getOwnerDocument();
 	}
 
