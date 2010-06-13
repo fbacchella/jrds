@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,9 +27,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 public class TestLoadConfiguration {
 	static final private Logger logger = Logger.getLogger(TestLoadConfiguration.class);
