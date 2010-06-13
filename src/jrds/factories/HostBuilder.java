@@ -25,6 +25,8 @@ import jrds.starter.Connection;
 import jrds.starter.StarterNode;
 
 import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 public class HostBuilder extends ObjectBuilder {
 	static final private Logger logger = Logger.getLogger(HostBuilder.class);
@@ -91,6 +93,27 @@ public class HostBuilder extends ObjectBuilder {
 
 	private void parseFragment(JrdsNode fragment, RdsHost host, StarterNode ns) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
+		for(JrdsNode macroNode: fragment.iterate(CompiledXPath.get("macro"))) {
+			String name = macroNode.attrMap().get("name");
+			Macro m = macrosMap.get(name);
+			logger.trace("Adding macro " + name + ": " + m);
+			if(m != null) {
+				Map<String, String> properties = makeProperties(macroNode);
+				StarterNode macrosnode = new StarterNode(ns) {};
+				ChainedProperties temp = new ChainedProperties(properties);
+				macrosnode.registerStarter(temp);
+
+				Document hostdoc = fragment.getOwnerDocument();
+				Node macrofragment = m.getDf().cloneNode(true);
+				hostdoc.adoptNode(macrofragment);
+
+				parseFragment((new JrdsNode(macrofragment)).getChild(CompiledXPath.get("macrodef")), host, ns);
+			}
+			else {
+				logger.error("Unknown macro:" + name);
+			}
+		}
+		
 		Map<String, String> hostprop = makeProperties(fragment);
 		if(hostprop != null) {
 			ChainedProperties temp = new ChainedProperties(hostprop);
@@ -156,22 +179,6 @@ public class HostBuilder extends ObjectBuilder {
 			}
 		}
 
-		for(JrdsNode macroNode: fragment.iterate(CompiledXPath.get("macro"))) {
-			String name = macroNode.attrMap().get("name");
-			Macro m = macrosMap.get(name);
-			logger.trace("Adding macro " + name + ": " + m);
-			if(m != null) {
-				Map<String, String> properties = makeProperties(macroNode);
-				for(Probe<?,?> p:m.populate(host, properties)) {
-					if(p != null && p.checkStore()) {
-						host.getProbes().add(p);
-					}
-				}
-			}
-			else {
-				logger.error("Unknown macro:" + name);
-			}
-		}
 	}
 
 	public SnmpStarter snmpStarter(JrdsNode d, RdsHost host) {
