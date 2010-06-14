@@ -77,7 +77,10 @@ public class SnmpVars extends HashMap<OID, Object> {
 	public boolean addVariable(VariableBinding vb)
 	{
 		boolean retValue = false;
-		if( ! vb.isException()) {
+		if(vb == null) {
+			logger.error("null variable to add ?");
+		}
+		else if( ! vb.isException()) {
 			OID vbOid = vb.getOid();
 			put(vbOid, convertVar(vb.getVariable()));
 			retValue = true;

@@ -216,7 +216,7 @@ public class SnmpStarter extends Starter {
 	 * @param port The port to set.
 	 */
 	public void setPort(String port) {
-		if(port != null)
+		if(port != null && ! "".equals(port))
 			this.port = Integer.parseInt(port);
 	}
 	/**
