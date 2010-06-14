@@ -38,8 +38,6 @@ public class Ribcl extends Probe<String, Number> {
 	static final private String eol = "\r\n";
 	static final private String xmlHeader = "<?xml version=\"1.0\" ?>" + eol;
 
-	XmlProvider xmlstarter = null;
-
 	public void configure(String iloHost, int port, String user, String passwd) {
 		this.iloHost = iloHost;
 		this.user = user;
@@ -58,8 +56,6 @@ public class Ribcl extends Probe<String, Number> {
 	@Override
 	public void setHost(RdsHost monitoredHost) {
 		super.setHost(monitoredHost);
-		xmlstarter = new XmlProvider(monitoredHost);
-		xmlstarter = (XmlProvider) xmlstarter.register(monitoredHost);
 	}
 
 	@Override
@@ -74,11 +70,16 @@ public class Ribcl extends Probe<String, Number> {
 		}
 
 		try {
+			XmlProvider xmlstarter  = find(XmlProvider.class);
+			
+			if(! isCollectRunning())
+				return java.util.Collections.emptyMap();
+
 			OutputStream outputSocket = s.getOutputStream();
 			InputStream inputSocket = s.getInputStream();
 
 			outputSocket.write(xmlHeader.getBytes(encoding));
-			buildQuery(outputSocket);
+			buildQuery(outputSocket, xmlstarter);
 
 			byte[] buffer = new byte[4096];
 			int n;
@@ -87,7 +88,7 @@ public class Ribcl extends Probe<String, Number> {
 				String messageBuffer = new String(buffer, 0, n, encoding);
 				if(messageBuffer.startsWith("<?xml version=\"1.0\"?>")) {
 					if(message != null)
-						parse(message.toString(), vars);
+						parse(message.toString(), vars, xmlstarter);
 					message = new StringBuffer(messageBuffer);
 				}
 				else {
@@ -107,7 +108,7 @@ public class Ribcl extends Probe<String, Number> {
 		return "RIBCL";
 	}
 
-	private void buildQuery(OutputStream out) {
+	private void buildQuery(OutputStream out, XmlProvider xmlstarter) {
 		Document ribclQ = xmlstarter.getDocument();
 		Element LOCFG = ribclQ.createElement("LOCFG");
 		LOCFG.setAttribute("version", "2.21");
@@ -138,8 +139,11 @@ public class Ribcl extends Probe<String, Number> {
 	}
 
 	private Socket connect() throws NoSuchAlgorithmException, KeyManagementException, UnknownHostException, IOException {
-		SocketFactory ss = (SocketFactory) getStarters().find(SocketFactory.makeKey(this)); 
+		SocketFactory ss = find(SocketFactory.class); 
 		Socket s = ss.createSocket(iloHost, port);
+		if (s == null)
+			return s;
+		
 		if(port == 23) {
 			return 	s;
 		}		
@@ -162,21 +166,31 @@ public class Ribcl extends Probe<String, Number> {
 		sc.init(null, trustAllCerts, new java.security.SecureRandom());
 
 		SSLSocketFactory ssf = sc.getSocketFactory();
+		if(! isCollectRunning())
+			return null;
 		s = ssf.createSocket(s, iloHost, port, true);
 		log(Level.DEBUG, "done SSL handshake for %s", iloHost);
 		return s;
 	}
 
-	public void parse(String message, Map<String, Number> vars) {
+	public void parse(String message, Map<String, Number> vars, XmlProvider xmlstarter) {
 		if(message == null ||  "".equals(message))
 			return;
 		log(Level.TRACE,"new message to parse: ");
-		log(Level.TRACE,message);
+		log(Level.TRACE, message);
 		//The XML returned from an iLO is buggy, up to ilO2 1.50 
 		message = message.replaceAll("<RIBCL VERSION=\"[0-9\\.]+\"/>", "<RIBCL >");
-		Document d = this.xmlstarter.getDocument(new StringReader(message));
+		Document d = xmlstarter.getDocument(new StringReader(message));
 		xmlstarter.fileFromXpaths(d, getPd().getCollectStrings().keySet(), vars);
 		return;
+	}
+
+	/* (non-Javadoc)
+	 * @see jrds.starter.StarterNode#isStarted(java.lang.Object)
+	 */
+	@Override
+	public boolean isStarted(Object key) {
+		return super.isStarted(key) && find(XmlProvider.class).isStarted() && find(SocketFactory.class).isStarted();
 	}
 
 }

@@ -13,10 +13,9 @@ import javax.management.remote.JMXServiceURL;
 
 import jrds.starter.Connection;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 public class JMXConnection extends Connection<MBeanServerConnection> {
-	static final private Logger logger = Logger.getLogger(JMXConnection.class);
 
 	final static String startTimeObjectName = "java.lang:type=Runtime";
 	final static String startTimeAttribue = "Uptime";
@@ -51,10 +50,10 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
 			objectname = new ObjectName(startTimeObjectName);
 			Object o = connection.getAttribute(objectname, startTimeAttribue);
 			long uptime = ((Number)o).longValue() / 1000;
-			logger.debug("Uptime for " + this + "="  + uptime);
+			log(Level.DEBUG, "Uptime for %s = %ld", this, uptime);
 			return uptime;
 		} catch (Exception e) {
-			logger.error("Uptime error for " + this + ": " + e);
+			log(Level.ERROR, e, "Uptime error for %s: %s", this, e);
 		}
 		return 0;
 	}
@@ -77,9 +76,9 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
 			connection = connector.getMBeanServerConnection();
 			return true;
 		} catch (MalformedURLException e) {
-			logger.error("Invalid jmx URL " + uri + ": " + e);
+			log(Level.ERROR, e, "Invalid jmx URL %s: %s", uri, e);
 		} catch (IOException e) {
-			logger.error("Communication error with " + uri + ": " + e);
+			log(Level.ERROR, e, "Communication error with %s: %s", uri, e);
 		}
 		return false;
 	}
@@ -92,7 +91,7 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
 		try {
 			connector.close();
 		} catch (IOException e) {
-			logger.error("JMXConnector to " + this + " close failed because of: " + e );
+			log(Level.ERROR, e, "JMXConnector to %s close failed because of: %s", this, e );
 		}
 		connection = null;
 	}

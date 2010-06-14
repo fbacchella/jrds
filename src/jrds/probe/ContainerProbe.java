@@ -12,10 +12,9 @@ import java.util.Date;
 import jrds.Probe;
 import jrds.ProbeDesc;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 public class ContainerProbe extends VirtualProbe {
-	static final private Logger logger = Logger.getLogger(ContainerProbe.class);
 
 	static final ProbeDesc pd = new ProbeDesc(0) {
 		@Override
@@ -38,7 +37,7 @@ public class ContainerProbe extends VirtualProbe {
 
 	//An array list is needed, the introspection is picky
 	public void configure(String name, ArrayList<String> graphList) {
-		logger.debug("new container: " + name);
+		log(Level.DEBUG, "new container: %s", name);
 		setName(name);
 	}
 

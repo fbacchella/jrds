@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 import jrds.snmp.SnmpVars;
 import jrds.snmp.TabularIterator;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 import org.rrd4j.core.Sample;
 import org.snmp4j.smi.OID;
 
@@ -28,7 +28,6 @@ import org.snmp4j.smi.OID;
  * @version $Revision: 321 $,  $Date: 2006-08-14 14:03:04 +0000 (lun., 14 août 2006) $
  */
 public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
-	static final private Logger logger = Logger.getLogger(ProcessInfoExtended.class);
 	static final private OID hrSWRunPath = new OID(".1.3.6.1.2.1.25.4.2.1.4");
 	static final private OID hrSWRunParameters = new OID(".1.3.6.1.2.1.25.4.2.1.5");
 	static final private OID hrSWRunPerfMem = new OID(".1.3.6.1.2.1.25.5.1.1.2");
@@ -93,7 +92,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
 			}
 		}
 		if(! found) {
-			logger.error("index for " + indexKey + " not found for host " + getHost().getName());
+			log(Level.ERROR, "index for %s not found for host %s", indexKey, getHost().getName());
 			indexAsString = null;
 		}
 		return indexAsString;

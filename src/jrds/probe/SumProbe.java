@@ -16,10 +16,9 @@ import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.graphe.Sum;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 public class SumProbe extends VirtualProbe {
-	static final private Logger logger = Logger.getLogger(SumProbe.class);
 
 	static final ProbeDesc pd = new ProbeDesc(0) {
 		@Override
@@ -40,7 +39,7 @@ public class SumProbe extends VirtualProbe {
 	//An array list is needed, the introspection is picky
 	public SumProbe(String name, ArrayList<String> graphList) {
 		super(pd);
-		logger.debug("new sum: " + name);
+		log(Level.DEBUG, "new sum: %s", name);
 		setName(name);
 		this.graphList = graphList;
 	}
@@ -57,7 +56,7 @@ public class SumProbe extends VirtualProbe {
 	 */
 	@Override
 	public Collection<GraphNode> getGraphList() {
-		logger.debug("Returning a sum graphnode");
+		log(Level.DEBUG, "Returning a sum graphnode");
 		return Collections.singleton((GraphNode)new Sum(this));
 	}
 

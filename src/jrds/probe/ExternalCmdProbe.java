@@ -14,17 +14,15 @@ import java.util.Map;
 
 import jrds.Probe;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 import org.rrd4j.core.Sample;
 
-
 /**
- * This abstract class can be used to parse the results of an external cmd
+ * This abstract class can be used to parse the results of an external command
  * @author Fabrice Bacchella 
  * @version $Revision$,  $Date$
  */
 public abstract class ExternalCmdProbe extends Probe<String, Number> {
-	static final private Logger logger = Logger.getLogger(ExternalCmdProbe.class);
 
 	private String[] cmd;
 	
@@ -45,7 +43,7 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
 			if(perfstring != null)
 				oneSample.set(perfstring);
 		} catch (IOException e) {
-			logger.warn("external command failed : " + e);
+			log(Level.ERROR, e, "external command failed : %s", e);
 		}
 		try {
 			if(urlperfps != null) {
@@ -54,10 +52,10 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
 				urlperfps.getErrorStream().close();
 				urlperfps.getOutputStream().close();
 			}
-		} catch (IOException e1) {
-			logger.warn("Exception on close", e1);
+		} catch (IOException e) {
+			log(Level.ERROR, e, "Exception on close: %s", e);
 		} catch (InterruptedException e) {
-			logger.warn("Exception on close", e);
+			log(Level.ERROR, e, "Exception on close: %s", e);
 		}
 	}
 	/**

@@ -9,10 +9,9 @@ import javax.naming.directory.InitialDirContext;
 
 import jrds.starter.Connection;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 public class LdapConnection extends Connection<DirContext> {
-	static final private Logger logger = Logger.getLogger(LdapConnection.class);
 	private String binddn;
 	private String password;
 	private int port = 389;
@@ -64,11 +63,11 @@ public class LdapConnection extends Connection<DirContext> {
 		try {
 			dctx = new InitialDirContext(env);
 		} catch (NamingException e) {
-			logger.error("Cannot connect to " + getParent() + ", cause: " + e.getCause());
+			log(Level.ERROR, e, "Cannot connect to %s, cause: ", getLevel(), e.getCause());
 			return false;
 		}
 
-		logger.info("Binding to: " + env.get(Context.PROVIDER_URL) + " with dn: " + binddn);
+		log(Level.DEBUG, "Binding to: %s with dn: %s", env.get(Context.PROVIDER_URL), binddn);
 		return dctx != null;
 	}
 
@@ -82,7 +81,7 @@ public class LdapConnection extends Connection<DirContext> {
 			try {
 				dctx.close();
 			} catch (NamingException e) {
-				logger.error("Error close to " + getParent() + ", cause: " + e.getCause());
+				log(Level.ERROR, e, "Error close to %s, cause: %s", getLevel(), e.getCause());
 			}
 			dctx = null;
 	}

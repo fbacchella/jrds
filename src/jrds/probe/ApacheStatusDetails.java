@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 /**
  * A class to probe the apache status from the /server-status URL
@@ -56,8 +56,6 @@ public class ApacheStatusDetails extends HttpProbe implements IndexedProbe {
 		}
 	}
 
-	static final private Logger logger = Logger.getLogger(ApacheStatusDetails.class);
-
 	public void configure(Integer port) {
 		try {
 			configure(new URL("http", getHost().getDnsName(), port, "/server-status?auto"));
@@ -92,7 +90,7 @@ public class ApacheStatusDetails extends HttpProbe implements IndexedProbe {
 	@Override
 	protected Map<String, Number> parseStream(InputStream stream) {
 		Map<String, Number> vars = java.util.Collections.emptyMap();
-		logger.debug("Getting " + getUrl());
+		log(Level.DEBUG, "Getting %s", getUrl());
 		try {
 			BufferedReader in = new BufferedReader(new InputStreamReader(stream));
 			List<String> lines = new ArrayList<String>();
@@ -102,7 +100,7 @@ public class ApacheStatusDetails extends HttpProbe implements IndexedProbe {
 			in.close();
 			vars = parseLines(lines);
 		} catch (IOException e) {
-			logger.error("Unable to read url " + getUrl() + " because: " + e.getMessage());
+			log(Level.ERROR, e, "Unable to read url %s because: %s", getUrl(), e.getMessage());
 		}
 		return vars;
 	}

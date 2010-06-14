@@ -6,16 +6,15 @@
 
 package jrds.probe.snmp;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 /**
  * @author Fabrice Bacchella 
  * @version $Revision: 187 $,  $Date: 2006-01-18 19:08:14 +0100 (mer., 18 janv. 2006) $
  */
 public class PartitionSpaceWindows extends PartitionSpace {
-	static final private Logger logger = Logger.getLogger(PartitionSpaceWindows.class);
 	static final private char separator=' ';
-	
+
 	/**
 	 * A extention of the partitionSpace probe, used tom manager the long naming convention
 	 * of disks in windows
@@ -28,20 +27,19 @@ public class PartitionSpaceWindows extends PartitionSpace {
 	public boolean configure(String indexKey) {
 		return super.configure(indexKey);
 	}
-	
+
 	/**
 	 *only compare with String found before " " 
 	 * @see jrds.probe.snmp.RdsIndexedSnmpRrd#matchIndex(java.lang.String, java.lang.String)
 	 */
 	public boolean matchIndex(String key) {
 		int nameIndex = key.indexOf(separator);
-		
-		if(logger.isDebugEnabled())
-			logger.debug("index split: found separator=\""+ separator + "\" in \"" + key + "\" index=" + key);
-		
+
+		log(Level.DEBUG, "index split: found separator=\"%s\" in \"%s\" index=%s", separator, key, key);
+
 		if (nameIndex != -1) {
 			key = key.substring(0, nameIndex);
-			logger.debug("index split: new name=\""+key+"\"");
+			log(Level.DEBUG, "index split: new name=\"%s\"", key);
 		}
 		return super.matchIndex(key);
 	}
