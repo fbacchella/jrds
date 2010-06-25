@@ -57,8 +57,10 @@ public class GraphDescBuilder extends ObjectBuilder {
 
 		for(Node addnode: subnode.iterate(CompiledXPath.get("add|addpath"))) {
 			Map<String, String> elements = new HashMap<String, String>(10);
+			boolean withPath = false;
 			for(JrdsNode child: new NodeListIterator(addnode.getChildNodes())) {
 				if("path".equals(child.getNodeName())) {
+					withPath = true;
 					for(JrdsNode hostchild: new NodeListIterator(child.getChildNodes())) {
 						String key = hostchild.getNodeName();
 						String value = hostchild.getTextContent();
@@ -83,10 +85,17 @@ public class GraphDescBuilder extends ObjectBuilder {
 			String addLegend = elements.get("legend");
 			String addrpn = elements.get("rpn");
 			String consFunc = elements.get("cf");
-			String reversed = elements.get("reversed");
-			String host = elements.get("pathhost");
-			String probe = elements.get("pathprobe");
-			String dsName = elements.get("pathdsName");
+			String reversed = elements.get("reversed");	
+			String host = null;
+			String probe = null;
+			String dsName = null;
+			if(withPath) {
+				host = elements.get("pathhost");
+				probe = elements.get("pathprobe");
+				dsName = elements.get("pathdsName");
+			}
+			else 
+				dsName = elements.get("dsName");
 
 			gd.add(addName, addrpn, addgraphType, addColor, addLegend, consFunc, reversed, host, probe, dsName);
 		}
