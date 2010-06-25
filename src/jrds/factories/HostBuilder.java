@@ -104,10 +104,9 @@ public class HostBuilder extends ObjectBuilder {
 				macrosnode.registerStarter(temp);
 
 				Document hostdoc = fragment.getOwnerDocument();
-				Node macrofragment = m.getDf().cloneNode(true);
-				hostdoc.adoptNode(macrofragment);
+				Node newNode = hostdoc.adoptNode(hostdoc.importNode(m.getDf(), true));
 
-				parseFragment((new JrdsNode(macrofragment)).getChild(CompiledXPath.get("macrodef")), host, ns);
+				parseFragment((new JrdsNode(newNode)).getChild(CompiledXPath.get("macrodef")), host, macrosnode);
 			}
 			else {
 				logger.error("Unknown macro:" + name);
