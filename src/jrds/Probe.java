@@ -577,6 +577,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 			rrddb = StoreOpener.getRrd(getRrdName());
 			retValue = rrddb.getDatasource(dsName) != null;
 		} catch (Exception e) {
+			log(Level.ERROR, e, "Could not get data sources info for %s : %s", getRrdName(), e);
 		}
 		finally {
 			if(rrddb != null)
