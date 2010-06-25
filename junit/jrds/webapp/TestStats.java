@@ -2,6 +2,7 @@ package jrds.webapp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 
 import javax.servlet.ServletException;
@@ -22,6 +23,8 @@ public class TestStats {
 	@Test(expected=IllegalStateException.class)
 	public void testStats() throws ServletException, IOException
 	{
+		System.out.println(resolv("Servlet API", javax.servlet.ServletContext.class));
+
 		jrds.webapp.Status s = new jrds.webapp.Status();
 		s.getServletContext().setAttribute(HostsList.class.getName(), new HostsList(new PropertiesManager()));
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -39,6 +42,41 @@ public class TestStats {
 		Tools.configure();
 		Tools.setLevel(new String[] {ParamsBean.class.getName()}, logger.getLevel());
 		logger.trace(GetMoke.getResponse(null).getOutputStream().getClass());
+	}
+
+	private String resolv(String name, Object o) {
+		String retValue = "";
+		if(o != null)
+			retValue = resolv(name, o.getClass());
+		else
+			retValue = name + " not found";
+		return retValue;
+	}
+	
+
+	private String resolv(String name, Class<?> c) {
+		String retValue = "";
+		try {
+			retValue = name + " found in " + locateJar(c);
+		} catch (RuntimeException e) {
+			retValue = "Problem with " + c + ": " + e.getMessage();
+		}
+		return retValue;
+	}
+	
+	private String locateJar(Class<?> c ) {
+		String retValue="Not found";
+		String cName = c.getName();
+		int lastDot = cName.lastIndexOf('.');
+		if(lastDot > 1) {
+			String scn = cName.substring(lastDot + 1);
+			URL jarUrl = c.getResource(scn + ".class");
+			if(jarUrl != null)
+				retValue = jarUrl.getPath();
+			else
+				retValue = scn + " not found";
+		}
+		return retValue;
 	}
 
 }

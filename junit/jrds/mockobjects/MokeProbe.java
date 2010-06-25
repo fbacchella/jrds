@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.rrd4j.DsType;
@@ -17,7 +18,8 @@ public class MokeProbe<A,B> extends Probe<A,B> {
 	Class<? extends Probe<?,?>> originalProbe;
 	String probeType = "DummyProbe";
 	ProbeDesc pd = null;
-
+	List<?> args;
+	
 	public MokeProbe(String probeType) {
 		this.probeType = probeType;
 	}
@@ -27,6 +29,7 @@ public class MokeProbe<A,B> extends Probe<A,B> {
 	}
 
 	public MokeProbe() {
+		configure();
 	}
 
 	public void configure(Class<? extends Probe<?,?>> originalProbe) {
@@ -79,6 +82,20 @@ public class MokeProbe<A,B> extends Probe<A,B> {
 	@Override
 	public Date getLastUpdate() {
 		return new Date();
+	}
+
+	/**
+	 * @return the args
+	 */
+	public List<?> getArgs() {
+		return args;
+	}
+
+	/**
+	 * @param args the args to set
+	 */
+	public void setArgs(List<?> args) {
+		this.args = args;
 	}
 
 }

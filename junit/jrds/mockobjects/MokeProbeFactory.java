@@ -37,7 +37,9 @@ public class MokeProbeFactory extends ProbeFactory {
 	@Override
 	public boolean configure(Probe<?, ?> p, List<?> constArgs) {
 		if(p instanceof MokeProbe) {
-			((MokeProbe)p).configure();
+			MokeProbe<?,?> mp = (MokeProbe<?,?>)p;
+			mp.configure();
+			mp.setArgs(constArgs);
 		}
 		return true;
 	}

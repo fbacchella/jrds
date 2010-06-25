@@ -81,7 +81,7 @@ final public class Tools {
 		}
 	}
 
-	static public void appendElement(Node n, String name, Map<String, String> attributes) {
+	static public Element appendElement(Node n, String name, Map<String, String> attributes) {
 		Document d = n.getOwnerDocument();
 		Element e = d.createElement(name);
 		if(attributes != null)
@@ -89,5 +89,16 @@ final public class Tools {
 				e.setAttribute(a.getKey(), a.getValue());
 			}
 		n.appendChild(e);
+		return e;
+	}
+	
+	static public Node appendString(Node n, String xmlString) throws Exception {
+		Document d = parseString(xmlString);
+		
+		Element docElem = d.getDocumentElement();
+		Node newNode = n.getOwnerDocument().importNode(docElem, true);
+		n.appendChild(newNode);
+
+		return newNode;
 	}
 }
