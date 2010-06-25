@@ -29,7 +29,8 @@ dojo.addOnLoad(function(){
     	<form dojoType="dijit.form.Form" id="hostForm" action="index.html" method="get" name="hostForm">
 			<a id="toroot" href="index.html"><img src="img/back_to_album.gif" alt="" height="16" width="20" border="0" /></a>
       		<label for="host">Only host</label>
-      		<input type="text" name="host" size="24"  dojoType="dijit.form.TextBox" trim="true" onkeypress="hostKeyEvent"/>
+      		<input id="hostfield" type="text" name="host" size="24"  dojoType="dijit.form.TextBox" trim="true" onkeypress="hostKeyEvent"/>
+        	<button onClick="searchHost" type="submit" dojoType="dijit.form.Button" >Search</button>
     	</form>
     	<div id="treeOne" > </div>
 	</div>

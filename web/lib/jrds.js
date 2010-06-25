@@ -365,6 +365,11 @@ function hostKeyEvent(evt)
 	}
 }
 
+function searchHost()
+{
+	queryParams.host = dojo.byId("hostfield");
+}
+
 function periodKeyEvent(evt)
 {
 	if(evt.keyCode == dojo.keys.ENTER){

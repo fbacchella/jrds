@@ -1,7 +1,8 @@
 package jrds.webapp;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -31,35 +32,20 @@ public class JSonGraph extends JSonData {
 	public boolean generate(JrdsJSONWriter w, HostsList root,
 			ParamsBean params) throws IOException, JSONException {
 
-		Filter filter = params.getFilter();
-		int id = params.getId();
-
 		if(params.getPeriod() == null) {
 			return false;
 		}
 
-		GraphTree node = root.getNodeById(id);
-		List<GraphNode> graphs = new ArrayList<GraphNode>();
-		if(node != null) {
-			logger.debug("Tree found: " + node);
-			for(GraphNode graph: node.enumerateChildsGraph(filter)) {
-				graphs.add(graph);
-			}
-			if(params.isSorted()) {
-				Collections.sort(graphs, new Comparator<GraphNode>() {
-					public int compare(GraphNode g1, GraphNode g2) {
-						int order = String.CASE_INSENSITIVE_ORDER.compare(g1.getName(), g2.getName());
-						if(order == 0)
-							order = String.CASE_INSENSITIVE_ORDER.compare(g1.getProbe().getHost().getName(), g2.getProbe().getHost().getName());
-						return order;
-					}
-				});
-			}
-		}
-		else {
-			GraphNode gn = root.getGraphById(id);
-			if(gn != null)
-				graphs.add(gn);
+		List<GraphNode> graphs = getGraphs(root, params);
+		if(params.isSorted()) {
+			Collections.sort(graphs, new Comparator<GraphNode>() {
+				public int compare(GraphNode g1, GraphNode g2) {
+					int order = String.CASE_INSENSITIVE_ORDER.compare(g1.getName(), g2.getName());
+					if(order == 0)
+						order = String.CASE_INSENSITIVE_ORDER.compare(g1.getProbe().getHost().getName(), g2.getProbe().getHost().getName());
+					return order;
+				}
+			});
 		}
 		logger.debug("Graphs found:" +  graphs);
 		if( ! graphs.isEmpty()) {
@@ -79,6 +65,45 @@ public class JSonGraph extends JSonData {
 		return true;
 	}
 
+	private List<GraphNode> getGraphs(HostsList root, ParamsBean params) {
+		int id = params.getId();
+		String dsName = params.getDsName();
+
+		GraphTree node = root.getNodeById(id);
+		if(node != null) {
+			logger.debug("Tree found: " + node);
+			Filter filter = params.getFilter();
+			return node.enumerateChildsGraph(filter);
+		}
+		else if(params.getPid() != 0 && dsName != null) {
+			Probe<?, ?> p = params.getProbe();
+			if(p == null) {
+				logger.error("Looking for unknonw probe");
+				return Collections.emptyList();
+			}
+			
+			Graphics2D g2d = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
+			String graphDescName = p.getName() + "." + dsName;
+
+			GraphDesc gd = new GraphDesc();
+			gd.setName(graphDescName);
+			gd.setGraphName(p.getHost().getName() + "." + p.getName() + "." + dsName);
+			gd.setGraphTitle(p.getName() + "." + dsName + " on ${host}");
+			gd.add(dsName, GraphDesc.LINE);
+			gd.initializeLimits(g2d);
+
+			GraphNode gn = new GraphNode(p, gd);
+			return Collections.singletonList(gn);
+		}
+		else {
+			GraphNode gn = root.getGraphById(id);
+			if(gn != null)
+				return Collections.singletonList(gn);
+		}
+
+		return Collections.emptyList();
+	}
+
 	private void doGraph(GraphNode gn, Renderer r, ParamsBean params, JrdsJSONWriter w) throws IOException, JSONException {
 		jrds.Graph graph = gn.getGraph();
 		params.configureGraph(graph);
@@ -90,7 +115,7 @@ public class JSonGraph extends JSonData {
 		imgProps.put("qualifiedname", graph.getQualifieName());
 
 		imgProps.put("popuparg", params.makeObjectUrl("popup.html", graph, true));
-		imgProps.put("detailsarg", params.makeObjectUrl("details", gn, true));
+		imgProps.put("detailsarg", params.makeObjectUrl("details", p, true));
 		imgProps.put("historyarg", params.makeObjectUrl("history.html", gn, false));
 		imgProps.put("savearg", params.makeObjectUrl("download", gn, true));
 		imgProps.put("imghref", params.makeObjectUrl("graph",graph, true));
@@ -102,7 +127,6 @@ public class JSonGraph extends JSonData {
 		}
 
 		doNode(w, graph.getQualifieName(), gn.hashCode(), "graph", null, imgProps);
-
 	}
 
 }

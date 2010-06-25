@@ -3,15 +3,12 @@
  */
 package jrds;
 
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -753,31 +750,20 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 		Element dsElement = document.createElement("ds");
 		root.appendChild(dsElement);
 		DsDef[] dss= getDsDefs();
-		HostsList hl = getHostList();
+
 		if (sorted)
 			Arrays.sort(dss, new Comparator<DsDef>() {
 				public int compare(DsDef arg0, DsDef arg1) {
 					return String.CASE_INSENSITIVE_ORDER.compare(arg0.getDsName(), arg1.getDsName());
 				}
 			});
-		Graphics2D g2d = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
 		for(DsDef ds: dss) {
 			String dsName = ds.getDsName();
-			String id = getHost().getName() + "." + getName() + "." + dsName;
-			String graphDescName = getName() + "." + dsName;
-
-			GraphDesc gd = new GraphDesc();
-			gd.setName(graphDescName);
-			gd.setGraphName(id);
-			gd.setGraphTitle(getName() + "." + dsName + " on ${host}");
-			gd.add(dsName, GraphDesc.LINE);
-			gd.initializeLimits(g2d);
-
-			GraphNode g = new GraphNode(this, gd);
-			hl.addGraphs(Collections.singleton(g));
 
 			Element dsNameElement = document.createElement("name");
-			dsNameElement.setAttribute("id", "" + g.hashCode());
+
+			dsNameElement.setAttribute("pid", String.valueOf(hashCode()));
+			dsNameElement.setAttribute("dsName", dsName);
 			dsNameElement.appendChild(document.createTextNode(dsName));
 			dsElement.appendChild(dsNameElement);
 		}

@@ -23,6 +23,7 @@ public class JSonQueryParams extends JrdsServlet {
 		JrdsJSONWriter w = new JrdsJSONWriter(response);
 		try {
 			w.object();
+			doVariable(w, "pid", request.getParameter("pid"));
 			doVariable(w, "id", request.getParameter("id"));
 			doVariable(w, "gid", request.getParameter("gid"));
 			doVariable(w, "sort", request.getParameter("sort"));
@@ -32,6 +33,7 @@ public class JSonQueryParams extends JrdsServlet {
 			doVariable(w, "end", params.getStringEnd());
 			doVariable(w, "min", params.getMinStr());
 			doVariable(w, "max", params.getMaxStr());
+			doVariable(w, "dsName", request.getParameter("dsName"));
 			int scale = params.getScale();
 			if(scale > 0) {
 				doVariable(w, "autoperiod", "" + scale);

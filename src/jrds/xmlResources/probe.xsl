@@ -46,7 +46,7 @@
 	
 	<xsl:template match="name">
 		<xsl:text disable-output-escaping="yes">
-	<li><a href="popup.html?id={@id}"  onclick="popup('popup.html?id={@id}',{@id}); return false"><xsl:apply-templates/></a></li>
+	<li><a href="popup.html?pid={@pid}&amp;dsName={@dsName}"  onclick="popup('popup.html?pid={@pid}&amp;dsName={@dsName}',null); return false"><xsl:apply-templates/></a></li>
 		</xsl:text>
 	</xsl:template>
 </xsl:stylesheet>

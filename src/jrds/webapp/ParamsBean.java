@@ -42,9 +42,11 @@ public class ParamsBean implements Serializable {
 	static private final Pattern rangePattern = Pattern.compile("(-?\\d+(.\\d+)?)([a-zA-Z]{0,2})");
 
 	String contextPath = "";
+	String dsName = null;
 	Period period = new Period();
 	int id = 0;
 	int gid = 0;
+	int pid = 0;
 	boolean sorted = false;
 	boolean history = false;
 	String maxArg = null;
@@ -68,7 +70,11 @@ public class ParamsBean implements Serializable {
 		logger.trace("period from parameters: " + period);
 		gid = jrds.Util.parseStringNumber(req.getParameter("gid"), Integer.class, 0).intValue();
 		id = jrds.Util.parseStringNumber(req.getParameter("id"), Integer.class, 0).intValue();
-
+		pid = jrds.Util.parseStringNumber(req.getParameter("pid"), Integer.class, 0).intValue();
+		dsName =  req.getParameter("dsName");
+		if("".equals(dsName))
+			dsName = null;
+		
 		String sortArg = req.getParameter("sort");
 		if(sortArg != null && "true".equals(sortArg.toLowerCase()))
 			sorted = true;
@@ -143,9 +149,9 @@ public class ParamsBean implements Serializable {
 	}
 
 	public Probe<?,?> getProbe() {
-		Probe<?,?> p = root.getProbeById(getId());
+		Probe<?,?> p = root.getProbeById(pid);
 		if(p == null) {
-			jrds.GraphNode node = root.getGraphById(getId());
+			jrds.GraphNode node = root.getGraphById(pid);
 			if(node != null)
 				p = node.getProbe();
 		}
@@ -199,6 +205,9 @@ public class ParamsBean implements Serializable {
 		else if(o instanceof jrds.Graph) {
 			args.put("gid", o.hashCode());
 			args.put("id", ((jrds.Graph)o).getNode().hashCode());	
+		}
+		else if(o instanceof jrds.Probe<?,?>){
+			args.put("pid", o.hashCode());
 		}
 		else {
 			addFilterArgs(args);
@@ -380,5 +389,13 @@ public class ParamsBean implements Serializable {
 	 */
 	public boolean isHistory() {
 		return history;
+	}
+
+	public int getPid() {
+		return pid;
+	}
+
+	public String getDsName() {
+		return dsName;
 	}
 }
