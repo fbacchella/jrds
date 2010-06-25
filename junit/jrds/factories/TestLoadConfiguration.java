@@ -15,6 +15,7 @@ import jrds.Macro;
 import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.RdsHost;
+import jrds.StoreOpener;
 import jrds.Tools;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
@@ -88,6 +89,7 @@ public class TestLoadConfiguration {
 		pm.setProperty("configdir", "tmp");
 		pm.setProperty("rrddir", "tmp");
 		pm.update();
+		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, null);
 
 		conf = new ConfigObjectFactory(pm);
 		conf.setGraphDescMap(l.getRepository(Loader.ConfigType.GRAPHDESC));
@@ -107,7 +109,7 @@ public class TestLoadConfiguration {
 		Assert.assertEquals("Test view 1",f.getName());
 	}
 
-	@Test(expected = java.lang.NullPointerException.class)
+	@Test
 	public void testProbe2() throws Exception {
 		Document d = Tools.parseString(goodProbeXml2);
 		JrdsNode pnode = new JrdsNode(d);
@@ -115,11 +117,15 @@ public class TestLoadConfiguration {
 		HostBuilder hb = new HostBuilder();
 		hb.setProperty(ObjectBuilder.properties.PROBEFACTORY, new MokeProbeFactory());
 		hb.setProperty(ObjectBuilder.properties.PM, pm);
+		
+		RdsHost host = new RdsHost();
+		host.setHostDir(pm.rrddir);
+		host.setName("testProbe2");
 
-		Probe<?,?> p = hb.makeProbe(pnode.getChild(CompiledXPath.get("//probe")), new RdsHost(), new StarterNode() {});
-		//		Probe p = conf.makeProbe(pnode.getChild(CompiledXPath.get("//probe")));
+		Probe<?,?> p = hb.makeProbe(pnode.getChild(CompiledXPath.get("/probe")), host, new StarterNode() {});
+		jrds.Util.serialize(p.dumpAsXml(), System.out, null, null);
 		Assert.assertNotNull(p);
-		Assert.assertEquals("<empty>/fs-_", p.toString());
+		Assert.assertEquals(host.getName() + "/" + p.getName() , p.toString());
 	}
 
 	@Test
