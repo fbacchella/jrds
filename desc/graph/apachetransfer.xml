@@ -10,10 +10,11 @@
 	</unit>
 	<verticalLabel>Bytes/s</verticalLabel>
 	<add>
-		<name>Total kBytes</name>
+		<name>TotalkBytes</name>
+		<dsName>Total kBytes</dsName>
 	</add>
 	<add>
-		<rpn>Total kBytes, 1024, *</rpn>
+		<rpn>TotalkBytes, 1024, *</rpn>
 		<graphType>line</graphType>
 		<color>GREEN</color>
 		<legend>Bytes transfered</legend>
