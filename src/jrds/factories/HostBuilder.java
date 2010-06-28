@@ -84,6 +84,15 @@ public class HostBuilder extends ObjectBuilder {
 
 	private void parseFragment(JrdsNode fragment, RdsHost host, StarterNode ns) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
+		JrdsNode snmpNode = fragment.getChild(CompiledXPath.get("snmp"));
+		if(snmpNode != null) {
+			logger.trace("found a snmp starter");
+			SnmpStarter starter = snmpStarter(snmpNode, host);
+			starter.register(host);
+		}
+
+		makeConnexion(fragment, host);
+
 		for(JrdsNode macroNode: fragment.iterate(CompiledXPath.get("macro"))) {
 			String name = macroNode.attrMap().get("name");
 			Macro m = macrosMap.get(name);
@@ -104,15 +113,6 @@ public class HostBuilder extends ObjectBuilder {
 			}
 		}
 		
-		JrdsNode snmpNode = fragment.getChild(CompiledXPath.get("snmp"));
-		if(snmpNode != null) {
-			logger.trace("found a snmp starter");
-			SnmpStarter starter = snmpStarter(snmpNode, host);
-			starter.register(host);
-		}
-
-		makeConnexion(fragment, host);
-
 		fragment.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
 
 		Map<String, String> hostprop = makeProperties(fragment);
@@ -191,10 +191,8 @@ public class HostBuilder extends ObjectBuilder {
 
 		//Optional parameters
 		String portStr = attributes.get("port");
-		if(portStr != null && ! "".equals(portStr)) {
-			int port = jrds.Util.parseStringNumber(portStr, Integer.class, 161).intValue();
-			starter.setPort(port);
-		}
+		int port = jrds.Util.parseStringNumber(portStr, 161);
+		starter.setPort(port);
 
 		String hostName = attributes.get("host");
 		if(hostName == null) {
