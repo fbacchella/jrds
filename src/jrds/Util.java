@@ -335,16 +335,36 @@ public class Util {
 		return jrds.Util.evaluateVariables(template, env, node);
 	}
 
-	public static Number parseStringNumber(String toParse, Class<? extends Number> numberClass, Number defaultVal) {
+	@SuppressWarnings("unchecked")
+	public static <NumberClass extends Number> NumberClass parseStringNumber(String toParse, NumberClass defaultVal) {
 		if(toParse == null || "".equals(toParse))
 			return defaultVal;
-		if(! (Number.class.isAssignableFrom(numberClass))) {
+
+		try {
+			Class<NumberClass> clazz = (Class<NumberClass>) defaultVal.getClass();
+			Constructor<NumberClass> c = clazz.getConstructor(String.class);
+			NumberClass n = c.newInstance(toParse);
+			return n;
+		} catch (SecurityException e) {
+		} catch (NoSuchMethodException e) {
+		} catch (IllegalArgumentException e) {
+		} catch (InstantiationException e) {
+		} catch (IllegalAccessException e) {
+		} catch (InvocationTargetException e) {
+		}
+		return defaultVal;
+	}
+	
+	public static <NumberClass extends Number> NumberClass parseStringNumber(String toParse, Class<NumberClass> nc, NumberClass defaultVal) {
+		if(toParse == null || "".equals(toParse))
+			return defaultVal;
+		if(! (Number.class.isAssignableFrom(nc))) {
 			return defaultVal;
 		}
 
 		try {
-			Constructor<? extends Number> c = numberClass.getConstructor(String.class);
-			Number n = c.newInstance(toParse);
+			Constructor<NumberClass> c = nc.getConstructor(String.class);
+			NumberClass n = c.newInstance(toParse);
 			return n;
 		} catch (SecurityException e) {
 		} catch (NoSuchMethodException e) {
@@ -414,7 +434,7 @@ public class Util {
 			}
 		};
 	}
-	
+
 	/**
 	 * Return an alpha numeric sorter where host2 is before host10
 	 * Copied from http://sanjaal.com/java/tag/sample-alphanumeric-sorting/
@@ -490,7 +510,7 @@ public class Util {
 			}
 		};
 	}
-	
+
 	static public void log(Object source, Logger namedLogger, Level l, Throwable e, String format, Object... args) {
 		if(namedLogger.isEnabledFor(l)) {
 			StringBuilder line = new StringBuilder();
