@@ -74,15 +74,6 @@ public class HostBuilder extends ObjectBuilder {
 		String hidden = hostattr.get("hidden");
 		host.setHidden(hidden != null && Boolean.parseBoolean(hidden));
 
-		JrdsNode snmpNode = hostNode.getChild(CompiledXPath.get("snmp"));
-		if(snmpNode != null) {
-			SnmpStarter starter = snmpStarter(snmpNode, host);
-			starter.register(host);
-		}
-
-		makeConnexion(hostNode, host);
-
-		hostNode.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
 
 		StarterNode ns = new StarterNode() {};
 
@@ -113,6 +104,16 @@ public class HostBuilder extends ObjectBuilder {
 			}
 		}
 		
+		JrdsNode snmpNode = fragment.getChild(CompiledXPath.get("snmp"));
+		if(snmpNode != null) {
+			SnmpStarter starter = snmpStarter(snmpNode, host);
+			starter.register(host);
+		}
+
+		makeConnexion(fragment, host);
+
+		fragment.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
+
 		Map<String, String> hostprop = makeProperties(fragment);
 		if(hostprop != null) {
 			ChainedProperties temp = new ChainedProperties(hostprop);
