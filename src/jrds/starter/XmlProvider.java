@@ -18,8 +18,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import jrds.RdsHost;
-
 import org.apache.log4j.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -38,19 +36,6 @@ import org.xml.sax.SAXException;
 public class XmlProvider extends Starter {
 	private DocumentBuilder dbuilder = null;
 	private XPath xpather = null;
-	private String hostname = null;
-
-	public XmlProvider(RdsHost monitoredHost) {
-		hostname = monitoredHost.getName();
-	}
-
-	/* (non-Javadoc)
-	 * @see jrds.Starter#getKey()
-	 */
-	@Override
-	public Object getKey() {
-		return "xmlprovider:" + hostname;
-	}
 
 	/* (non-Javadoc)
 	 * @see jrds.Starter#start()
