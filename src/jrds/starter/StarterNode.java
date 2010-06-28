@@ -90,8 +90,6 @@ public abstract class StarterNode implements StartersSet {
 
 	public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc) {
 		Object key = null;
-		if(logger.isTraceEnabled())
-			logger.trace(sc + " " + key);
 		try {
 			Method m = sc.getMethod("makeKey", StarterNode.class);
 			logger.trace(m);
@@ -108,7 +106,8 @@ public abstract class StarterNode implements StartersSet {
 		} catch (InvocationTargetException e) {
 			logger.error("Error for " + this + " with " + sc, e.getCause());
 		}
-		logger.trace(sc + " " + key);
+		if(logger.isTraceEnabled())
+			logger.trace(sc + " " + key);
 		return find(sc, key);
 	}
 

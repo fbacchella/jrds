@@ -39,7 +39,7 @@ public abstract class ProbeConnected<KeyType, ValueType, ConnectionClass extends
 
 	@SuppressWarnings("unchecked")
 	public ConnectionClass getConnection() {
-		return (ConnectionClass) getStarters().find(getConnectionName());
+		return (ConnectionClass) find(getConnectionName());
 	}
 
 	/* (non-Javadoc)

@@ -3,12 +3,9 @@ package jrds.starter;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Date;
 
 import jrds.Probe;
 import jrds.RdsHost;
-
-import org.apache.log4j.Level;
 
 public abstract class Connection<ConnectedType> extends Starter {
 	
