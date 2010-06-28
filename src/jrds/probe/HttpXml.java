@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +24,6 @@ import org.w3c.dom.Document;
  */
 public class HttpXml extends HttpProbe {
 
-	public XmlProvider xmlstarter = null;
 	private Set<String> xpaths = null;
 	private Map<String, String> collectKeys = null;
 
@@ -83,15 +83,14 @@ public class HttpXml extends HttpProbe {
 	@Override
 	public void setHost(RdsHost monitoredHost) {
 		super.setHost(monitoredHost);
-		xmlstarter = new XmlProvider(monitoredHost);
-		xmlstarter = (XmlProvider) xmlstarter.register(monitoredHost);
+		new XmlProvider().register(monitoredHost);
 	}
 
 	public Map<String, Number> dom2Map(Document d, Map<String, Number> variables) {
 		return variables;
 	}
 
-	protected long findUptime(Document d) {
+	protected long findUptime(XmlProvider xmlstarter, Document d) {
 		String upTimePath = getPd().getSpecific("upTimePath");
 		if(upTimePath != null) {
 			return xmlstarter.findUptime(d, upTimePath);
@@ -116,8 +115,14 @@ public class HttpXml extends HttpProbe {
 	 */
 	@Override
 	protected Map<String, Number> parseStream(InputStream stream) {
+		XmlProvider xmlstarter  = find(XmlProvider.class);
+		if(xmlstarter == null) {
+			log(Level.ERROR, "XML Provider not found");
+			return Collections.emptyMap();
+		}
+
 		Document d = xmlstarter.getDocument(stream);
-		setUptime(findUptime(d));
+		setUptime(findUptime(xmlstarter, d));
 		Map<String, Number> vars = new HashMap<String, Number>();
 		xmlstarter.fileFromXpaths(d, xpaths, vars);
 		log(Level.TRACE, "%s", vars);

@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,6 +43,8 @@ public class Ribcl extends Probe<String, Number> {
 		this.iloHost = iloHost;
 		this.user = user;
 		this.passwd = passwd;
+		this.port = port;
+		
 	}
 
 	public void configure(String iloHost, String user, String passwd) {
@@ -56,6 +59,7 @@ public class Ribcl extends Probe<String, Number> {
 	@Override
 	public void setHost(RdsHost monitoredHost) {
 		super.setHost(monitoredHost);
+		new XmlProvider().register(monitoredHost);
 	}
 
 	@Override
@@ -71,6 +75,10 @@ public class Ribcl extends Probe<String, Number> {
 
 		try {
 			XmlProvider xmlstarter  = find(XmlProvider.class);
+			if(xmlstarter == null) {
+				log(Level.ERROR, "XML Provider not found");
+				return Collections.emptyMap();
+			}
 			
 			if(! isCollectRunning())
 				return java.util.Collections.emptyMap();
