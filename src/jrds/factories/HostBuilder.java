@@ -106,6 +106,7 @@ public class HostBuilder extends ObjectBuilder {
 		
 		JrdsNode snmpNode = fragment.getChild(CompiledXPath.get("snmp"));
 		if(snmpNode != null) {
+			logger.trace("found a snmp starter");
 			SnmpStarter starter = snmpStarter(snmpNode, host);
 			starter.register(host);
 		}

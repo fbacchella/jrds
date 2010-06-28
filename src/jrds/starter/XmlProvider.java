@@ -92,7 +92,7 @@ public class XmlProvider extends Starter {
 		try {
 			Node upTimeNode = (Node) xpather.evaluate(upTimePath, d, XPathConstants.NODE);
 			if(upTimeNode != null) {
-					log(Level.TRACE, "Will parse uptime: %s", upTimeNode.getTextContent());
+				log(Level.TRACE, "Will parse uptime: %s", upTimeNode.getTextContent());
 				String dateString = upTimeNode.getTextContent();
 				uptime = jrds.Util.parseStringNumber(dateString, Long.class, 0).longValue();
 			}
@@ -106,14 +106,14 @@ public class XmlProvider extends Starter {
 	public void fileFromXpaths(Document d, Set<String> xpaths, Map<String, Number> oldMap) {
 		for(String xpath: xpaths) {
 			try {
-					log(Level.TRACE, "Will search the xpath \"%s\"", xpath);
+				log(Level.TRACE, "Will search the xpath \"%s\"", xpath);
 				if(xpath == null || "".equals(xpath))
 					continue;
 				Node n = (Node)xpather.evaluate(xpath, d, XPathConstants.NODE);
 				double value = 0;
 				if(n != null) {
-						log(Level.TRACE, "%s", n);
-					value = Double.parseDouble(n.getTextContent());
+					log(Level.TRACE, "%s", n);
+					value = jrds.Util.parseStringNumber(n.getTextContent(), Double.class, Double.NaN).doubleValue();
 					oldMap.put(xpath, Double.valueOf(value));
 				}
 			} catch (XPathExpressionException e) {
@@ -128,14 +128,14 @@ public class XmlProvider extends Starter {
 
 	public Document getDocument(InputSource stream) {
 		Document d = null;
-			log(Level.TRACE, "%s %s %s started %s@%s", stream, dbuilder, isStarted(), getClass().getName(), Integer.toHexString(hashCode()));
+		log(Level.TRACE, "%s %s %s started %s@%s", stream, dbuilder, isStarted(), getClass().getName(), Integer.toHexString(hashCode()));
 		try {
 			try {
 				dbuilder.reset();
 			} catch (UnsupportedOperationException e) {
 			}
 			d = dbuilder.parse(stream);
-				log(Level.TRACE, "just parsed a %s", d.getDocumentElement().getTagName());
+			log(Level.TRACE, "just parsed a %s", d.getDocumentElement().getTagName());
 		} catch (SAXException e) {
 			log(Level.ERROR, e, "Invalid XML");
 		} catch (IOException e) {
