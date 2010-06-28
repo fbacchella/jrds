@@ -8,7 +8,6 @@ import jrds.snmp.SnmpStarter;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

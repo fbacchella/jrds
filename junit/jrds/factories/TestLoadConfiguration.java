@@ -21,6 +21,7 @@ import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 import jrds.mockobjects.MokeProbe;
 import jrds.mockobjects.MokeProbeFactory;
+import jrds.snmp.SnmpStarter;
 import jrds.starter.ChainedProperties;
 import jrds.starter.StarterNode;
 
@@ -53,7 +54,8 @@ public class TestLoadConfiguration {
 		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
 		"<!DOCTYPE macrodef PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
 		"<macrodef name=\"macrodef\">" +
-		"<tag>mytag</tag>" +
+//		"<snmp community=\"public\" version = \"2\" />" +
+//		"<tag>mytag</tag>" +
 		"<probe type = \"MacroProbe1\">" +
 		"<arg type=\"String\" value=\"${a}\" />" +
 		"</probe>" + 
@@ -71,7 +73,6 @@ public class TestLoadConfiguration {
 		"</probe>" +
 		"<probe type = \"TcpSnmp\">" +
 		"</probe>" +
-		"<snmp community=\"public\" version = \"2\" />" +
 		"</host>";
 
 	static DocumentBuilder dbuilder;
@@ -140,7 +141,7 @@ public class TestLoadConfiguration {
 		Assert.assertEquals("macrodef", m.getName());
 		Assert.assertEquals("Macro$macrodef", m.toString());
 		Assert.assertEquals(1, macroProbesNumber);
-		Assert.assertEquals(3, m.getDf().getChildNodes().item(0).getChildNodes().getLength());
+		Assert.assertEquals(2, m.getDf().getChildNodes().item(0).getChildNodes().getLength());
 	}
 	
 	@Test
@@ -180,6 +181,36 @@ public class TestLoadConfiguration {
 	}
 
 	@Test
+	public void testRecursiveMacro() throws Exception {
+		Document d = Tools.parseString(goodMacroXml);
+		String tagname = "mytag";
+		
+		Tools.appendString(d.getDocumentElement(), "<tag>" +tagname + "</tag>");
+		Tools.appendString(d.getDocumentElement(), "<snmp community=\"public\" version = \"2\" />");
+
+		MacroBuilder b = new MacroBuilder();
+		JrdsNode jn = new JrdsNode(d);
+
+		Macro m = b.makeMacro(jn);
+		
+		Map<String, Macro> macroMap = new HashMap<String, Macro>();
+		macroMap.put(m.getName(), m);
+
+		Document hostdoc = Tools.parseString(goodHostXml);
+
+		Tools.appendString(hostdoc.getDocumentElement(), "<macro name=\"macrodef\" />");
+
+		HostBuilder hb = new HostBuilder();
+		hb.setProperty(ObjectBuilder.properties.PM, pm);
+		hb.setProperty(ObjectBuilder.properties.MACRO, macroMap);
+		hb.setProperty(ObjectBuilder.properties.PROBEFACTORY, new MokeProbeFactory());
+
+		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
+		Assert.assertTrue("tag not found", host.getTags().contains(tagname));
+		Assert.assertEquals("SNMP starter not found", "snmp:udp://myhost:161", host.find(SnmpStarter.class).toString());
+	}
+
+	@Test
 	public void testMacroFillwithProps() throws Exception {
 		Document d = Tools.parseString(goodMacroXml);
 
@@ -192,12 +223,11 @@ public class TestLoadConfiguration {
 		macroMap.put(m.getName(), m);
 
 		Document hostdoc = Tools.parseString(goodHostXml);
-		
-		//String macroString = "<macro name=\"macrodef\" ><properties> <entry key=\"a\" >bidule</entry> </properties></macro>";
-		Tools.appendString(Tools.appendString(Tools.appendString(hostdoc.getDocumentElement(), "<macro name=\"macrodef\" />"), "<properties />"), "<entry key=\"a\" >bidule</entry>") ;
+
+		Tools.appendString(Tools.appendString(Tools.appendString(hostdoc.getDocumentElement(), "<macro name=\"macrodef\" />"), "<properties />"), "<entry key=\"a\" >bidule</entry>");
 		jrds.Util.serialize(hostdoc, System.out, null, null);
 		System.out.println();
-		
+
 		HostBuilder hb = new HostBuilder();
 		hb.setProperty(ObjectBuilder.properties.PM, pm);
 		hb.setProperty(ObjectBuilder.properties.MACRO, macroMap);

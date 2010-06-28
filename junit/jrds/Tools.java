@@ -55,6 +55,16 @@ final public class Tools {
 		xpather = XPathFactory.newInstance().newXPath();
 	}
 
+	static public void prepareXml(boolean validating) throws ParserConfigurationException {
+		DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
+		instance.setIgnoringComments(true);
+		instance.setValidating(validating);
+		instance.setExpandEntityReferences(false);
+		dbuilder = instance.newDocumentBuilder();
+		dbuilder.setEntityResolver(new EntityResolver());
+		xpather = XPathFactory.newInstance().newXPath();
+	}
+
 	static public Document parseRessource(String name) throws Exception {
 		InputStream is = Tools.class.getResourceAsStream("/ressources/" + name);
 		return parseRessource(is);

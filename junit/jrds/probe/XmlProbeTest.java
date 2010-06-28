@@ -15,6 +15,7 @@ import jrds.RdsHost;
 import jrds.factories.ObjectBuilder;
 import jrds.factories.ProbeDescBuilder;
 import jrds.factories.xml.JrdsNode;
+import jrds.starter.XmlProvider;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -22,25 +23,26 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class XmlProbe {
-	static Logger logger = Logger.getLogger(XmlProbe.class);
+public class XmlProbeTest {
+	static Logger logger = Logger.getLogger(XmlProbeTest.class);
 	XPath xpath = XPathFactory.newInstance().newXPath();
 	static ProbeDesc pd;
 
-
-	@BeforeClass static public void configure() throws Exception {
+	@BeforeClass
+	static public void configure() throws Exception {
 		Tools.configure();
 
 		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"jrds.probe.HttpXml", "jrds.probe.HttpProbe", "jrds.XmlProvider"}, logger.getLevel());
-		Tools.prepareXml();
+		Tools.setLevel(new String[] {"jrds.Probe.HttpXml", "jrds.Probe.HttpProbe", "jrds.starter.XmlProvider"}, logger.getLevel());
+		Tools.prepareXml(false);
 
 		ProbeDescBuilder builder = new ProbeDescBuilder();
 		builder.setProperty(ObjectBuilder.properties.PM, new PropertiesManager());
 		pd = builder.makeProbeDesc(new JrdsNode(Tools.parseRessource("httpxmlprobedesc.xml")));
 	}
 
-	@Test public void findUptime() throws Exception {
+	@Test
+	public void findUptime() throws Exception {
 		HttpXml p  = new  HttpXml() {
 			@Override
 			public String getName() {
@@ -49,34 +51,33 @@ public class XmlProbe {
 		};
 		p.setHost(new RdsHost("moke"));
 		p.setPd(pd);
-		p.xmlstarter.start();
 		long l;
 		String uptimeXml;
 
-		p.xmlstarter.start();
+		p.find(XmlProvider.class).start();
 		uptimeXml = new String("<?xml version=\"1.0\" ?><element />");
-		l = p.findUptime(Tools.parseString(uptimeXml));
+		l = p.findUptime(p.find(XmlProvider.class), Tools.parseString(uptimeXml));
 		Assert.assertEquals(0, l, 0.0001);
-		p.xmlstarter.stop();
+		p.find(XmlProvider.class).stop();
 
-		p.xmlstarter.start();
+		p.find(XmlProvider.class).start();
 		uptimeXml = new String("<?xml version=\"1.0\" ?><element uptime=\"1125\" />");
-		l = p.findUptime(Tools.parseString(uptimeXml));
+		l = p.findUptime(p.find(XmlProvider.class), Tools.parseString(uptimeXml));
 		Assert.assertEquals((long) 1125, l);
-		p.xmlstarter.stop();
+		p.find(XmlProvider.class).stop();
 
-		p.xmlstarter.start();
+		p.find(XmlProvider.class).start();
 		uptimeXml = new String("<?xml version=\"1.0\" ?><element />");
-		l = p.findUptime(Tools.parseString(uptimeXml));
+		l = p.findUptime(p.find(XmlProvider.class), Tools.parseString(uptimeXml));
 		Assert.assertEquals((long)0, l);
-		p.xmlstarter.stop();
+		p.find(XmlProvider.class).stop();
 
 		pd.addSpecific("upTimePath", "A/element/@uptime");
-		p.xmlstarter.start();
+		p.find(XmlProvider.class).start();
 		uptimeXml = new String("<?xml version=\"1.0\" ?><element />");
-		l = p.findUptime(Tools.parseString(uptimeXml));
+		l = p.findUptime(p.find(XmlProvider.class), Tools.parseString(uptimeXml));
 		Assert.assertEquals((long)0, l);
-		p.xmlstarter.stop();
+		p.find(XmlProvider.class).stop();
 	}
 
 	@Test
@@ -102,7 +103,7 @@ public class XmlProbe {
 		Assert.assertTrue(keys.containsKey("c"));
 	}
 
-	@Test //(expected = java.lang.NullPointerException.class)
+	@Test
 	public void parseXml() throws Exception {
 		URL url = this.getClass().getResource("/ressources/xmldata.xml");
 		List<Object> args = new ArrayList<Object>(1);
@@ -119,8 +120,8 @@ public class XmlProbe {
 		p.setPd(pd);
 
 		p.configure(url, args);
-		p.startCollect();
 		h.startCollect();
+		p.startCollect();
 		Map<?, ?> vars = p.getNewSampleValues();
 		p.stopCollect();
 		h.stopCollect();
@@ -130,7 +131,7 @@ public class XmlProbe {
 		logger.trace("Collect strings: " + pd.getCollectStrings());
 
 		Assert.assertEquals(new Double(1.0), vars.get("/jrdsstats/stat[@key='a']/@value"));
-		Assert.assertNull(vars.get("/jrdsstats/stat[@key='b']/@value"));
+		Assert.assertEquals(Double.NaN, vars.get("/jrdsstats/stat[@key='b']/@value"));
 		Assert.assertEquals(new Double(3.5), vars.get("/jrdsstats/stat[@key='d']/@value"));
 
 
