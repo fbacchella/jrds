@@ -5,6 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.servlet.ServletContext;
+
+import jrds.PropertiesManager;
+import jrds.webapp.Configuration;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.Connector;
@@ -14,8 +19,11 @@ import org.mortbay.jetty.handler.HandlerCollection;
 import org.mortbay.jetty.handler.HandlerList;
 import org.mortbay.jetty.handler.ResourceHandler;
 import org.mortbay.jetty.nio.SelectChannelConnector;
+import org.mortbay.jetty.security.Constraint;
+import org.mortbay.jetty.security.ConstraintMapping;
+import org.mortbay.jetty.security.HashUserRealm;
+import org.mortbay.jetty.security.SecurityHandler;
 import org.mortbay.jetty.webapp.WebAppContext;
-
 
 public class Jetty extends CommandStarterImpl {
 
@@ -38,6 +46,8 @@ public class Jetty extends CommandStarterImpl {
 	
 	public void start(String args[]) {
 		Logger.getRootLogger().setLevel(Level.ERROR);
+		
+		System.setProperty("org.mortbay.log.class", jrds.standalone.JettyLogger.class.getName());
 
 		final Server server = new Server();
 		Connector connector=new SelectChannelConnector();
@@ -51,12 +61,54 @@ public class Jetty extends CommandStarterImpl {
 		}
 		server.setConnectors(new Connector[]{connector});
 
-		WebAppContext webapp = new WebAppContext(webRoot, "/");
+		final WebAppContext webapp = new WebAppContext(webRoot, "/");
 		webapp.setClassLoader(getClass().getClassLoader());
-		server.addHandler(webapp);
 		Map<String, Object> initParams = new HashMap<String, Object>();
 		initParams.put("propertiesFile", propFile);
 		webapp.setInitParams(initParams);
+
+		Thread t = new Thread() {
+			/* (non-Javadoc)
+			 * @see java.lang.Thread#run()
+			 */
+			@Override
+			public void run() {
+				try {
+					ServletContext sc = webapp.getServletContext();
+					Configuration c = (Configuration) sc.getAttribute(Configuration.class.getName());
+					PropertiesManager pm = c.getPropertiesManager();
+					if(pm.security) {
+						Constraint constraint = new Constraint();
+						constraint.setName(Constraint.__BASIC_AUTH);;
+						constraint.setRoles(new String[]{"user","admin","moderator"});
+						constraint.setAuthenticate(true);
+
+						ConstraintMapping cm = new ConstraintMapping();
+						cm.setConstraint(constraint);
+						cm.setPathSpec("/*");
+
+						SecurityHandler sh = new SecurityHandler();
+						sh.setUserRealm(new HashUserRealm("MyRealm",pm.userfile));
+						sh.setConstraintMappings(new ConstraintMapping[]{cm});
+						
+						webapp.addHandler(sh);
+
+//						HandlerCollection handlers = new HandlerList();
+//						//handlers.addHandler(sh);
+//						for(Handler h: server.getHandlers()) {
+//							//handlers.addHandler(h);
+//							//server.removeHandler(h);
+//							h.
+//						}
+//						//server.setHandler(handlers);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		};
+		webapp.getServletContext().setAttribute(Thread.class.getName(), new Thread[] {t});
 
 		ResourceHandler staticFiles=new ResourceHandler();
 		staticFiles.setWelcomeFiles(new String[]{"index.html"});
