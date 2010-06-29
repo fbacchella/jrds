@@ -94,7 +94,7 @@ public class XmlProvider extends Starter {
 			if(upTimeNode != null) {
 				log(Level.TRACE, "Will parse uptime: %s", upTimeNode.getTextContent());
 				String dateString = upTimeNode.getTextContent();
-				uptime = jrds.Util.parseStringNumber(dateString, Long.class, 0).longValue();
+				uptime = jrds.Util.parseStringNumber(dateString, 0L);
 			}
 			log(Level.ALL, "uptime is %d", uptime);
 		} catch (XPathExpressionException e) {

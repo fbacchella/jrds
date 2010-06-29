@@ -128,7 +128,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
 		Map<String, Object> retValues = doMultiSearch(cnx, requestInfo);
 		log(Level.TRACE, "will search uptime in %s", retValues);
 		if(retValues.containsKey("upTimePath")) {
-			long uptime = jrds.Util.parseStringNumber(retValues.get("upTimePath").toString(), Long.class, -1).longValue();
+			long uptime = jrds.Util.parseStringNumber(retValues.get("upTimePath").toString(), -1L);
 			return uptime;
 		}
 		else {

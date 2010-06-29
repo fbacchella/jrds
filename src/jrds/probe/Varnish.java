@@ -72,7 +72,7 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
 				String statsline = statsbuffer.readLine();
 				Matcher m = statlinepattern.matcher(statsline);
 				if(m.matches()) {
-					Number value = jrds.Util.parseStringNumber(m.group(1), Long.class, -1).longValue();
+					Number value = jrds.Util.parseStringNumber(m.group(1), -1L);
 					String key = m.group(2);
 					vars.put(key, value);
 				}

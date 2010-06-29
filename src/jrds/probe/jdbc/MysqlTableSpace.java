@@ -41,7 +41,7 @@ public class MysqlTableSpace extends Mysql {
 				//We only keep the data in data stores list
 				if(n != null) {
 					if(e.getValue() instanceof String) {
-						double d = jrds.Util.parseStringNumber((String)e.getValue(), Double.class, 0).doubleValue();
+						double d = jrds.Util.parseStringNumber((String)e.getValue(), 0.0d);
 						n = n.doubleValue() + d;
 					}
 					else if(Number.class.isAssignableFrom(e.getValue().getClass()))
