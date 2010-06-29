@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.rrd4j.core.DsDef;
 import org.w3c.dom.Document;
 
 public class UtilTest {
@@ -99,7 +100,7 @@ public class UtilTest {
 		Assert.assertTrue(outBuffer.contains(d.getInputEncoding()));
 	}
 
-	@Test @Ignore
+	@Test
 	public void testSerialization4() throws Exception {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		DummyProbe p = new DummyProbe();
@@ -112,24 +113,28 @@ public class UtilTest {
 		outBuffer = out.toString();
 		logger.debug(outBuffer);
 		Assert.assertTrue(outBuffer.contains("DOCTYPE html"));
+		Assert.assertTrue(outBuffer.contains("pid=" + p.hashCode()));
+		for(DsDef ds: p.getDsDefs()) {
+			Assert.assertTrue(outBuffer.contains("dsName=" + ds.getDsName()));
+		}
 	}
 	
 	@Test
 	public void testParseStringNumber1() {
-		Number n = Util.parseStringNumber("1", Double.class, Double.NaN);
-		Assert.assertEquals(1.0, n.doubleValue(), 0.001);
+		double n = Util.parseStringNumber("1", Double.class, Double.NaN);
+		Assert.assertEquals(1.0, n, 0.001);
 	}
 	
 	@Test
 	public void testParseStringNumber2() {
-		Number n = Util.parseStringNumber(null, Double.class, Double.NaN);
-		Assert.assertTrue(((Double) n).isNaN());
+		double n = Util.parseStringNumber(null, Double.class, Double.NaN);
+		Assert.assertTrue(Double.isNaN(n));
 	}
 	
 	@Test
 	public void testParseStringNumber3() {
-		Number n = Util.parseStringNumber("a", Double.class, Double.NaN);
-		Assert.assertTrue(((Double) n).isNaN());
+		double n = Util.parseStringNumber("a", Double.class, Double.NaN);
+		Assert.assertTrue(Double.isNaN(n));
 	}
 	
 	@Test
@@ -147,7 +152,7 @@ public class UtilTest {
 	@Test
 	public void testParseStringNumber6() {
 		double n = Util.parseStringNumber("1", 1.0d);
-		Assert.assertEquals(1, n);
+		Assert.assertEquals(1.0,n , 0.001);
 	}
 
 	@SuppressWarnings("unchecked")
