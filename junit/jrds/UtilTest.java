@@ -134,7 +134,19 @@ public class UtilTest {
 	
 	@Test
 	public void testParseStringNumber4() {
-		Number n = Util.parseStringNumber("1", Integer.class, Double.NaN);
+		Number n = Util.parseStringNumber("1", Integer.class, 1);
+		Assert.assertEquals(1, n);
+	}
+
+	@Test
+	public void testParseStringNumber5() {
+		int n = Util.parseStringNumber("1", 1);
+		Assert.assertEquals(1, n);
+	}
+
+	@Test
+	public void testParseStringNumber6() {
+		double n = Util.parseStringNumber("1", 1.0d);
 		Assert.assertEquals(1, n);
 	}
 

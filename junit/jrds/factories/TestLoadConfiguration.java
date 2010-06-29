@@ -251,6 +251,10 @@ public class TestLoadConfiguration {
 	public void testHost() throws Exception {
 		JrdsNode hostNode = new JrdsNode(Tools.parseRessource("goodhost1.xml"));
 
+		String tagname = "mytag";
+		Tools.appendString(hostNode.getChild(CompiledXPath.get("/host")), "<tag>" +tagname + "</tag>");
+		Tools.appendString(hostNode.getChild(CompiledXPath.get("/host")), "<snmp community=\"public\" version = \"2\" />");
+
 		Map<String, JrdsNode> hostDescMap = new HashMap<String, JrdsNode>();
 		hostDescMap.put("name", hostNode);
 		Map<String, RdsHost> hostMap = conf.setHostMap(hostDescMap);
@@ -261,11 +265,9 @@ public class TestLoadConfiguration {
 		logger.debug("properties: " + h.find(ChainedProperties.class));
 		Collection<Probe<?,?>> probes = h.getProbes();
 		Assert.assertEquals(7, probes.size());
-		//		HostBuilder hb = new HostBuilder();
-		//		hb.setProperty(ObjectBuilder.properties.ARGFACTORY, new ArgFactory());
-
-		//		RdsHost h = hb.makeRdsHost(hostNode);
-		//		logger.trace(h.getProbes());
+		Assert.assertTrue("tag not found", h.getTags().contains(tagname));
+		Assert.assertEquals("SNMP starter not found", "snmp:udp://myhost:161", h.find(SnmpStarter.class).toString());
+		logger.trace(h.find(SnmpStarter.class));
 	}
 
 	@Test
