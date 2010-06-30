@@ -180,6 +180,9 @@ public abstract class SnmpRequester {
 		Snmp snmp = starter.getSnmp();
 		while(doAgain && starter.isStarted()) {
 			ResponseEvent re = snmp.send(requestPDU, snmpTarget);
+			if(re == null) {
+				throw new IOException("SNMP Timeout");
+			}
 			PDU response = re.getResponse();
 			if (response != null && response.getErrorStatus() == SnmpConstants.SNMP_ERROR_SUCCESS){
 				snmpVars = new SnmpVars(response);
