@@ -32,7 +32,7 @@ public final class StoreOpener {
 	 * @throws InterruptedException 
 	 */
 	public final static RrdDb getRrd(String rrdFile)
-	throws IOException, InterruptedException {
+	throws IOException {
 		File f = new File(rrdFile);
 		String cp = f.getCanonicalPath();
 		long start = System.currentTimeMillis();
