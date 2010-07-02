@@ -3,20 +3,19 @@ package jrds.webapp;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
-
-import org.apache.log4j.Logger;
 
 import jrds.HostsList;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
+
+import org.apache.log4j.Logger;
 
 public class Configuration {
 	static private final Logger logger = Logger.getLogger(Configuration.class);
@@ -28,9 +27,16 @@ public class Configuration {
 	private Timer collectTimer;
 	public int thisgeneration = generation.incrementAndGet();
 
+	public Configuration(Map<String, String> ctxt) {
+		finishConfig();
+	}
 	
 	@SuppressWarnings("unchecked")
 	public Configuration(ServletContext ctxt) {
+		if(logger.isTraceEnabled()) {
+			dumpConfiguration(ctxt);
+		}
+
 		InputStream propStream = ctxt.getResourceAsStream("/WEB-INF/jrds.properties");
 		if(propStream != null) {
 			propertiesManager.join(propStream);
@@ -45,27 +51,13 @@ public class Configuration {
 		String localPropFile = ctxt.getInitParameter("propertiesFile");
 		if(localPropFile != null)
 			propertiesManager.join(new File(localPropFile));
+		finishConfig();
+	}
+	
+	private void finishConfig() {
 
-		localPropFile = System.getProperty("jrds.propertiesFile");
-		if(localPropFile != null)
-			propertiesManager.join(new File(localPropFile));
-
-		Pattern jrdsPropPattern = Pattern.compile("jrds\\.(.+)");
-		Properties p = System.getProperties();
-		for(String name: jrds.Util.iterate((Enumeration<String>)p.propertyNames())) {
-			Matcher m = jrdsPropPattern.matcher(name);
-			if(m.matches()) {
-				String prop = System.getProperty(name);
-				if(prop != null)
-					propertiesManager.setProperty(m.group(1), prop);
-			}
-		}
-
+		propertiesManager.importSystemProps();
 		propertiesManager.update();
-
-		if(logger.isTraceEnabled()) {
-			dumpConfiguration(ctxt);
-		}
 
 		StoreOpener.prepare(propertiesManager.dbPoolSize, propertiesManager.syncPeriod, propertiesManager.timeout, propertiesManager.rrdbackend);
 

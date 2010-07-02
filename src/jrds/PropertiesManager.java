@@ -10,6 +10,8 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,6 +19,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -206,9 +210,28 @@ public class PropertiesManager extends Properties {
 		File dir = new File(path);
 		return prepareDir(dir, autocreate);
 	}
+	
+	@SuppressWarnings("unchecked")
+	public void importSystemProps() {
+		String localPropFile = System.getProperty("jrds.propertiesFile");
+		if(localPropFile != null)
+			join(new File(localPropFile));
+
+		Pattern jrdsPropPattern = Pattern.compile("jrds\\.(.+)");
+		Properties p = System.getProperties();
+		for(String name: Collections.list((Enumeration<String>) p.propertyNames() )) {
+			Matcher m = jrdsPropPattern.matcher(name);
+			if(m.matches()) {
+				String prop = System.getProperty(name);
+				if(prop != null)
+					setProperty(m.group(1), prop);
+			}
+		}		
+	}
 
 	public void update()
 	{
+
 		boolean nologging = parseBoolean(getProperty("nologging", "false"));
 		if(! nologging) {
 			for(String ls: new String[]{ "trace", "debug", "info", "error", "fatal", "warn"}) {
@@ -288,6 +311,16 @@ public class PropertiesManager extends Properties {
 		extensionClassLoader = doClassLoader(getProperty("classpath", ""));
 
 		rrdbackend = getProperty("rrdbackend", "NIO");
+		
+		security = parseBoolean(getProperty("security", "false"));
+		if(security) {
+			userfile = getProperty("userfile", "users.properties");
+
+			String  defaultRolesString = getProperty("defaultroles", "admin");
+			String[] defaultRolesArray = defaultRolesString.split(",");
+			defaultRoles = new HashSet<String>(defaultRolesArray.length);
+			defaultRoles.addAll(Arrays.asList(defaultRolesArray));
+		}
 
 		Locale.setDefault(new Locale("POSIX"));
 	}
@@ -309,5 +342,7 @@ public class PropertiesManager extends Properties {
 	public boolean autocreate;
 	public int timeout;
 	public String rrdbackend;
-
+	public boolean security = true;
+	public String userfile = "/tmp/bidule";
+	public Set<String> defaultRoles = Collections.emptySet();
 }

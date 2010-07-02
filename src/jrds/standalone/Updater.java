@@ -55,8 +55,6 @@ public class Updater {
 							copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
 						} catch (IOException e) {
 							e.printStackTrace();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
 						}
 					}
 				};

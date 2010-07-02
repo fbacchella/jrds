@@ -1,14 +1,12 @@
 package jrds.standalone;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.servlet.ServletContext;
-
 import jrds.PropertiesManager;
-import jrds.webapp.Configuration;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -19,10 +17,13 @@ import org.mortbay.jetty.handler.HandlerCollection;
 import org.mortbay.jetty.handler.HandlerList;
 import org.mortbay.jetty.handler.ResourceHandler;
 import org.mortbay.jetty.nio.SelectChannelConnector;
+import org.mortbay.jetty.security.Authenticator;
+import org.mortbay.jetty.security.BasicAuthenticator;
 import org.mortbay.jetty.security.Constraint;
 import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SecurityHandler;
+import org.mortbay.jetty.security.UserRealm;
 import org.mortbay.jetty.webapp.WebAppContext;
 
 public class Jetty extends CommandStarterImpl {
@@ -30,23 +31,31 @@ public class Jetty extends CommandStarterImpl {
 	static private final Logger logger = Logger.getLogger(Jetty.class);
 
 	int port = 8080;
-	String propFile = "jrds.properties";
+	String propFileName = "jrds.properties";
 	String webRoot = ".";
-	
+
 	public Jetty()  {
 	}
 
 	public void configure(Properties configuration) {
 		logger.debug("Configuration: " + configuration);
-		
+
 		port = jrds.Util.parseStringNumber((String) configuration.getProperty("jetty.port"), Integer.class, port).intValue();
-		propFile =  configuration.getProperty("propertiesFile", propFile);
+		propFileName =  configuration.getProperty("propertiesFile", propFileName);
 		webRoot = configuration.getProperty("webRoot", webRoot);
 	}
-	
+
 	public void start(String args[]) {
 		Logger.getRootLogger().setLevel(Level.ERROR);
-		
+
+
+		PropertiesManager pm = new PropertiesManager();
+		File propFile = new File(propFileName);
+		if(propFile.isFile())
+			pm.join(propFile);
+		pm.importSystemProps();
+		pm.update();
+
 		System.setProperty("org.mortbay.log.class", jrds.standalone.JettyLogger.class.getName());
 
 		final Server server = new Server();
@@ -64,69 +73,53 @@ public class Jetty extends CommandStarterImpl {
 		final WebAppContext webapp = new WebAppContext(webRoot, "/");
 		webapp.setClassLoader(getClass().getClassLoader());
 		Map<String, Object> initParams = new HashMap<String, Object>();
-		initParams.put("propertiesFile", propFile);
+		initParams.put("propertiesFile", propFileName);
 		webapp.setInitParams(initParams);
-
-		Thread t = new Thread() {
-			/* (non-Javadoc)
-			 * @see java.lang.Thread#run()
-			 */
-			@Override
-			public void run() {
-				try {
-					ServletContext sc = webapp.getServletContext();
-					Configuration c = (Configuration) sc.getAttribute(Configuration.class.getName());
-					PropertiesManager pm = c.getPropertiesManager();
-					if(pm.security) {
-						Constraint constraint = new Constraint();
-						constraint.setName(Constraint.__BASIC_AUTH);;
-						constraint.setRoles(new String[]{"user","admin","moderator"});
-						constraint.setAuthenticate(true);
-
-						ConstraintMapping cm = new ConstraintMapping();
-						cm.setConstraint(constraint);
-						cm.setPathSpec("/*");
-
-						SecurityHandler sh = new SecurityHandler();
-						sh.setUserRealm(new HashUserRealm("MyRealm",pm.userfile));
-						sh.setConstraintMappings(new ConstraintMapping[]{cm});
-						
-						webapp.addHandler(sh);
-
-//						HandlerCollection handlers = new HandlerList();
-//						//handlers.addHandler(sh);
-//						for(Handler h: server.getHandlers()) {
-//							//handlers.addHandler(h);
-//							//server.removeHandler(h);
-//							h.
-//						}
-//						//server.setHandler(handlers);
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			
-		};
-		webapp.getServletContext().setAttribute(Thread.class.getName(), new Thread[] {t});
 
 		ResourceHandler staticFiles=new ResourceHandler();
 		staticFiles.setWelcomeFiles(new String[]{"index.html"});
 		staticFiles.setResourceBase(webRoot);
 
+		if(pm.security) {
+			try {
+				UserRealm myrealm = new HashUserRealm("jrds",pm.userfile);
+				server.setUserRealms(new UserRealm[] {myrealm});
+
+				Authenticator auth = new BasicAuthenticator();
+				Constraint constraint = new Constraint();
+				constraint.setName("jrds");;
+				constraint.setRoles(new String[]{Constraint.ANY_ROLE});
+				constraint.setAuthenticate(true);
+				constraint.setDataConstraint(Constraint.DC_NONE);
+
+				ConstraintMapping cm = new ConstraintMapping();
+				cm.setConstraint(constraint);
+				cm.setPathSpec("/*");
+
+				SecurityHandler sh = new SecurityHandler();
+				sh.setUserRealm(myrealm);
+				sh.setConstraintMappings(new ConstraintMapping[]{cm});
+				sh.setAuthenticator(auth);
+				webapp.setSecurityHandler(sh);
+			} catch (IOException e) {
+				throw new RuntimeException("Jetty server failed to configure authentication", e);
+			}
+
+
+		}
 		HandlerCollection handlers = new HandlerList();
 		handlers.setHandlers(new Handler[]{staticFiles,webapp});
 		server.setHandler(handlers);
 
 		Thread finish = new Thread() {
-		    public void run()
-		    {
-		    	try {
+			public void run()
+			{
+				try {
 					server.stop();
 				} catch (Exception e) {
 					throw new RuntimeException("Jetty server failed to stop", e);
 				}
-		    }
+			}
 		};
 		Runtime.getRuntime().addShutdownHook(finish);
 
@@ -137,7 +130,7 @@ public class Jetty extends CommandStarterImpl {
 			throw new RuntimeException("Jetty server failed to start", e);
 		}
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see jrds.standalone.CommandStarterImpl#help()
 	 */
