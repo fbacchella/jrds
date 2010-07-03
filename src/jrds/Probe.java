@@ -503,7 +503,18 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 			catch (ArithmeticException ex) {
 				log(Level.WARN, ex, "Error while storing sample: %s", ex.getMessage());
 			} catch (Exception e) {
-				log(Level.ERROR, e, "Error while collecting: %s", e.getMessage());
+				Throwable rootCause = e;
+				Throwable upCause;
+				do {
+					upCause = rootCause.getCause();
+					if(upCause != null)
+						rootCause = upCause;
+				} while (upCause != null);
+				String message =rootCause.getMessage();
+				if(message == null) {
+					message = rootCause.toString();
+				}
+				log(Level.ERROR, e, "Error while collecting: %s", message);
 			}
 			finally  {
 				stopCollect();
