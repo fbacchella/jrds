@@ -505,21 +505,25 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 			} catch (Exception e) {
 				Throwable rootCause = e;
 				Throwable upCause;
+				StringBuilder message = new StringBuilder();
 				do {
+					String cause = rootCause.getMessage();
+					if(cause == null || "".equals(cause)) {
+						message.append(": ").append(rootCause.toString());
+					}
+					else {
+						message.append(": ").append(cause);
+					}
 					upCause = rootCause.getCause();
 					if(upCause != null)
 						rootCause = upCause;
 				} while (upCause != null);
-				String message =rootCause.getMessage();
-				if(message == null) {
-					message = rootCause.toString();
-				}
-				log(Level.ERROR, e, "Error while collecting: %s", message);
+				log(Level.ERROR, e, "Error while collecting%s", message);
 			}
 			finally  {
-				stopCollect();
 				if(rrdDb != null)
 					StoreOpener.releaseRrd(rrdDb);
+				stopCollect();
 			}
 			if(interrupted) 
 				log(Level.INFO, "Interrupted");
