@@ -26,6 +26,7 @@ public class Configuration {
 	private HostsList hostsList = null;
 	private Timer collectTimer;
 	public int thisgeneration = generation.incrementAndGet();
+	TimerTask collector;
 
 	public Configuration(Map<String, String> ctxt) {
 		finishConfig();
@@ -66,7 +67,7 @@ public class Configuration {
 
 	public void start() {
 		collectTimer = new Timer("jrds-main-timer", true);
-		TimerTask collector = new TimerTask () {
+		collector = new TimerTask () {
 			public void run() {
 				try {
 					hostsList.collectAll();
@@ -79,14 +80,15 @@ public class Configuration {
 	}
 
 	public void stop() {
+		collector.cancel();
+		hostsList.finished();
 		try {
 			hostsList.lockCollect();
 		} catch (InterruptedException e) {
 		}
+		hostsList.getRenderer().finish();
 		collectTimer.cancel();
 		collectTimer = null;
-		hostsList.getRenderer().finish();
-		hostsList.finished();
 		hostsList.releaseCollect();
 	}
 

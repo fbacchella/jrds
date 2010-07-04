@@ -36,7 +36,7 @@ public class StartListener implements ServletContextListener {
 			try {
 				jrds.JrdsLoggerConfiguration.initLog4J();
 			} catch (IOException e2) {
-				throw new RuntimeException(e2);
+				throw new RuntimeException("Log configuration failed", e2);
 			}
 
 			System.setProperty("java.awt.headless","true");
@@ -46,7 +46,6 @@ public class StartListener implements ServletContextListener {
 			c.start();
 			ctxt.setAttribute(Configuration.class.getName(), c);
 			started = true;
-			logger.info("jrds started");
 			logger.info("Application jrds started");
 		}
 	}
@@ -56,12 +55,13 @@ public class StartListener implements ServletContextListener {
 	 */
 	public void contextDestroyed(ServletContextEvent arg0) {
 		if(started) {
+			logger.info("Application jrds will stop");
 			started = false;
 			ServletContext ctxt = arg0.getServletContext();
 			Configuration c = (Configuration) ctxt.getAttribute(Configuration.class.getName());
 			c.stop();
 			StoreOpener.stop();
-			logger.info("appplication jrds stopped");
+			logger.info("Application jrds stopped");
 		}
 	}
 
