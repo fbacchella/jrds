@@ -250,6 +250,7 @@
 	</target>
 	
 	<target name="test" depends="compile.test, checkdtd">
+		<delete dir="${testdir}"/>
 		<mkdir dir="${testdir}/rawtestoutput"/>
 		<junit printsummary="yes" showoutput="no" failureproperty="junit.failure">
 			<formatter type="xml"/>
