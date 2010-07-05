@@ -10,10 +10,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,10 +75,12 @@ public class HostsList extends StarterNode {
 	private File rrdDir = null;
 	private File tmpDir = null;
 	private int timeout = 10;
+	private Set<String> roles = new HashSet<String>();
+	private Set<String> defaultRoles = Collections.emptySet();
 	// A global flag that tells globally that this HostsList can be used
 	volatile private boolean started = false;
 	private Stats stats = new Stats();
-	
+
 	private Semaphore collectMutex = new Semaphore(1);
 
 	/**
@@ -130,6 +134,11 @@ public class HostsList extends StarterNode {
 			logger.error("Unable to set log file to " + pm.logfile);
 		}
 
+		if(pm.security) {
+			defaultRoles = pm.defaultRoles;
+			roles.addAll(defaultRoles);
+		}
+
 		if(pm.rrddir == null) {
 			logger.error("Probes directory not configured, can't configure");
 			return;
@@ -145,11 +154,11 @@ public class HostsList extends StarterNode {
 		started = true;
 		rrdDir = pm.rrddir;
 		tmpDir = pm.tmpdir;
-		
+
 		find(SocketFactory.class).setTimeout(pm.timeout);
 
 		renderer = new Renderer(50, step, tmpDir);
-		
+
 		Loader l;
 		try {
 			l = new Loader();
@@ -233,9 +242,29 @@ public class HostsList extends StarterNode {
 
 	public void addGraphs(Collection<GraphNode> graphs) {
 		for(GraphNode currGraph: graphs) {
-			getGraphTreeByHost().addGraphByPath(currGraph.getTreePathByHost(), currGraph);
-			getGraphTreeByView().addGraphByPath(currGraph.getTreePathByView(), currGraph);
+			LinkedList<String> path;
+
+			path = currGraph.getTreePathByHost();
+			getGraphTreeByHost().addGraphByPath(path, currGraph);
+			checkRoles(currGraph, path);
+
+			path = currGraph.getTreePathByView();
+			getGraphTreeByView().addGraphByPath(path, currGraph);
+			checkRoles(currGraph, path);
+
 			graphMap.put(currGraph.hashCode(), currGraph);
+		}
+	}
+
+	private void checkRoles(GraphNode gn, List<String> pathList) {
+		StringBuilder path = new StringBuilder();
+		for(String pathElem: pathList) {
+			path.append("/").append(pathElem);
+		}
+		for(Filter f: filters.values()) {
+			if(f.acceptGraph(gn, path.toString())) {
+				gn.addRoles(f.getRoles());
+			}
 		}
 	}
 
@@ -246,8 +275,13 @@ public class HostsList extends StarterNode {
 
 	public void collectAll() {
 		if(started) {
-			logger.debug("One collect was launched");
+			logger.debug("One collect is launched");
 			Date start = new Date();
+			try {
+				collectMutex.acquire();
+			} catch (InterruptedException e) {
+				throw new RuntimeException("Collect task failed to start", e);
+			}
 			try {
 				final Object counter = new Object() {
 					int i = 0;
@@ -267,7 +301,6 @@ public class HostsList extends StarterNode {
 					}
 				}
 				);
-				collectMutex.acquire();
 				startCollect();
 				for(final RdsHost oneHost: hostList) {
 					if( ! isCollectRunning())
@@ -300,26 +333,32 @@ public class HostsList extends StarterNode {
 					logger.info("Collect interrupted");
 				}
 				stopCollect();
-				collectMutex.release();
 				if( ! tpool.isTerminated()) {
 					//Second chance, we wait for the time out
+					boolean emergencystop = false;
 					try {
-						tpool.awaitTermination(getTimeout(), TimeUnit.SECONDS);
+						emergencystop = tpool.awaitTermination(getTimeout(), TimeUnit.SECONDS);
 					} catch (InterruptedException e) {
 						logger.info("Collect interrupted in last chance");
 					}
-					//Last chance to commit results
-					List<Runnable> timedOut = tpool.shutdownNow();
-					logger.warn("Still " + timedOut.size() + " waiting probes: ");
-					for(Runnable r: timedOut) {
-						logger.warn(r.toString());
+					if(! emergencystop) {
+						logger.info("Some task still alive, needs to be killed");
+						//Last chance to commit results
+						List<Runnable> timedOut = tpool.shutdownNow();
+						if(! timedOut.isEmpty()) {
+							logger.warn("Still " + timedOut.size() + " waiting probes: ");
+							for(Runnable r: timedOut) {
+								logger.warn(r.toString());
+							}
+						}
 					}
 				}
 			} catch (RuntimeException e) {
 				logger.error("problem while collecting data: ", e);
-			} catch (InterruptedException e) {
-				logger.error("Collect thread interrupted: ");
-			}							
+			}
+			finally {
+				collectMutex.release();				
+			}
 			Date end = new Date();
 			long duration = end.getTime() - start.getTime();
 			synchronized(stats) {
@@ -339,7 +378,7 @@ public class HostsList extends StarterNode {
 		collectMutex.release();
 	}
 
-	
+
 	public Collection<GraphTree> getGraphsRoot() {
 		return treeMap.values();
 	}
@@ -473,6 +512,20 @@ public class HostsList extends StarterNode {
 	@Override
 	public boolean isCollectRunning() {
 		return started && super.isCollectRunning();
+	}
+
+	/**
+	 * @return the roles
+	 */
+	public Set<String> getRoles() {
+		return roles;
+	}
+
+	/**
+	 * @return the defaultRoles
+	 */
+	public Set<String> getDefaultRoles() {
+		return defaultRoles;
 	}
 
 }
