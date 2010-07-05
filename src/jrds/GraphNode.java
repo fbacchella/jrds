@@ -5,7 +5,9 @@ package jrds;
 
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
@@ -27,6 +29,7 @@ public class GraphNode implements Comparable<GraphNode> {
 	private GraphDesc gd;
 	private String name = null;
 	private String graphTitle = null;
+	private Set<String> roles = new HashSet<String>();
 
 	/**
 	 *
@@ -243,4 +246,17 @@ public class GraphNode implements Comparable<GraphNode> {
 	public String toString() {
 		return probe.toString() + "/" + getName();
 	}
+	
+	public void addRoles(Set<String> roles) {
+		this.roles.addAll(roles);
+	}
+	
+	public boolean roleAllowed(String role) {
+		return roles.contains(role);
+	}
+
+	public boolean rolesAllowed(Set<String> roles) {
+		return jrds.Util.rolesAllowed(this.roles, roles);
+	}
+
 }
