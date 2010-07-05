@@ -17,8 +17,8 @@ import org.junit.Test;
 import org.mortbay.jetty.testing.HttpTester;
 import org.mortbay.jetty.testing.ServletTester;
 
-public class TestStats  {
-	static final private Logger logger = Logger.getLogger(TestStats.class);
+public class TestSecurity  {
+	static final private Logger logger = Logger.getLogger(TestSecurity.class);
 	static String[] oldvalues;
 	static String[] props;
 	
@@ -35,11 +35,7 @@ public class TestStats  {
 
 		response.parse(tester.getResponses(request.generate()));
 
-		Assert.assertEquals(200,response.getStatus());
-		Assert.assertTrue(response.getContent().contains("Hosts: 1"));
-		Assert.assertTrue(response.getContent().contains("Probes: 1"));
-		Assert.assertTrue(response.getContent().contains("Last collect:"));
-		Assert.assertTrue(response.getContent().contains("Last running duration: 0s"));
+		Assert.assertEquals(403,response.getStatus());
 		
 		logger.trace(response.getContent());
 	}
@@ -54,8 +50,8 @@ public class TestStats  {
 		tester.setContextPath("/");
 		ServletContext sc =  tester.getContext().getServletContext();
 
-		props = new String[] {"tmpdir", "configdir", "autocreate", "rrddir"};
-		String[] values = new String[] {"tmp", "tmp/config", "true", "tmp"};
+		props = new String[] {"tmpdir", "configdir", "autocreate", "rrddir", "security"};
+		String[] values = new String[] {"tmp", "tmp/config", "true", "tmp", "true"};
 		oldvalues = new String[values.length];
 		for(int i = 0; i < values.length; i++) {
 			String prop = "jrds." + props[i];

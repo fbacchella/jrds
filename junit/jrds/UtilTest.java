@@ -18,7 +18,6 @@ import junit.framework.Assert;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.rrd4j.core.DsDef;
 import org.w3c.dom.Document;

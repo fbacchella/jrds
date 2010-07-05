@@ -80,6 +80,24 @@ final public class Tools {
 		return d;
 	}
 
+	static public Node parseStringElement(String s) throws Exception { 
+		InputStream is = new ByteArrayInputStream(s.getBytes());
+		Document d = Tools.parseRessource(is);
+//		while(d.hasChildNodes()) {
+//			Node n = d.removeChild(d.getChildNodes().item(0));
+//			if(n.getNodeType() == Node.ELEMENT_NODE)
+//				return n;
+//		}
+		return d.removeChild(d.getDocumentElement());
+	}
+	
+	static public Node AdoptElementString(Node n, String s) throws Exception {
+		Node element = parseStringElement(s);
+		n.getOwnerDocument().adoptNode(element);
+		n.appendChild(element);
+		return element;
+	}
+
 	static public void setLevel(String[] allLoggers, Level level) {
 		Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDER);
 		for(String loggerName: allLoggers) {

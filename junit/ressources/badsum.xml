@@ -1,3 +1,6 @@
-<sum name="badsum" >
-    <element name="nonhost/nonprobe" />
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE sum PUBLIC "-//jrds//DTD Sum//EN"
+                           "urn:jrds:sum">
+<sum name="badsum">
+	<element name="nonhost/nonprobe" />
 </sum>
