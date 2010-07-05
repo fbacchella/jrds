@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -425,7 +426,7 @@ public class Util {
 				return en.nextElement();  
 			}
 			public void remove() {
-				throw new UnsupportedOperationException();  
+				throw new UnsupportedOperationException("Cannot remove in XML serialization iterator");  
 			}
 		};
 		return new Iterable<T>() {
@@ -527,6 +528,16 @@ public class Util {
 
 			}
 		}
+	}
+
+	static	public boolean rolesAllowed(Set<String> allowedRoles, Set<String> userRoles) {
+		if(allowedRoles.size() == 0)
+			return true;
+		for(String role: userRoles) {
+			if(allowedRoles.contains(role))
+				return true;
+		}
+		return false;
 	}
 
 }

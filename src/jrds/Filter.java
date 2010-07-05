@@ -1,5 +1,8 @@
 package jrds;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jrds.graphe.Sum;
 import jrds.probe.ContainerProbe;
 
@@ -76,4 +79,30 @@ public abstract class Filter {
 	public GraphTree setRoot(GraphTree gt) {
 		return gt;
 	}
+	
+	private Set<String> roles = new HashSet<String>();
+	
+	public void addRole(String role) {
+		roles.add(role);
+	}
+	
+	public void addRoles(Set<String> roles) {
+		this.roles.addAll(roles);
+	}
+	
+	public boolean roleAllowed(String role) {
+		return roles.contains(role);
+	}
+	
+	public boolean rolesAllowed(Set<String> roles) {
+		return jrds.Util.rolesAllowed(this.roles, roles);
+	}
+
+	/**
+	 * @return the roles
+	 */
+	public Set<String> getRoles() {
+		return roles;
+	}
+
 }
