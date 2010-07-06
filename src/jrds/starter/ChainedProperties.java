@@ -3,26 +3,23 @@
  */
 package jrds.starter;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Level;
-
 public class ChainedProperties extends Starter implements Map<String, String> {
-	private Map<String, String> properties = new HashMap<String, String>();
-	private Map<String, String> parent = null;
+	private final Map<String, String> properties = new HashMap<String, String>();
+	public ChainedProperties parent = null;
 
 	public ChainedProperties() {
-		properties = new HashMap<String, String>();
 	}
 
 	public ChainedProperties(Map<String, String> prop) {
-		properties = new HashMap<String, String>(prop.size());
-		for(Entry<?, ?> e: prop.entrySet()) {
-			properties.put(e.getKey().toString(), e.getValue().toString());
-		}
+		properties.putAll(prop);
 	}
 
 	public void chain(ChainedProperties parent) {
@@ -37,11 +34,10 @@ public class ChainedProperties extends Starter implements Map<String, String> {
 		StringBuilder retValue = new StringBuilder();
 		retValue.append("Properties(" + properties.size() + ") for " + getLevel());
 		if(parent != null) {
-			retValue.append("following " + parent.toString());
+			retValue.append(" followed by " + parent.toString());
 		}
 		return  retValue.toString();
 	}
-
 
 	/**
 	 * 
@@ -51,16 +47,14 @@ public class ChainedProperties extends Starter implements Map<String, String> {
 		properties.clear();
 	}
 
-
 	/**
 	 * @param key
 	 * @return
 	 * @see java.util.Map#containsKey(java.lang.Object)
 	 */
 	public boolean containsKey(Object key) {
-		return properties.containsKey(key);
+		return properties.containsKey(key) || (parent !=null ? parent.containsKey(key) : false);
 	}
-
 
 	/**
 	 * @param value
@@ -68,28 +62,20 @@ public class ChainedProperties extends Starter implements Map<String, String> {
 	 * @see java.util.Map#containsValue(java.lang.Object)
 	 */
 	public boolean containsValue(Object value) {
-		return properties.containsValue(value);
+		return properties.containsValue(value) || (parent !=null ? parent.containsValue(value) : false);
 	}
-
 
 	/**
 	 * @return
 	 * @see java.util.Map#entrySet()
 	 */
 	public Set<java.util.Map.Entry<String, String>> entrySet() {
-		return properties.entrySet();
+		Set<java.util.Map.Entry<String, String>> entries = new HashSet<java.util.Map.Entry<String, String>>(size());
+		if(parent != null)
+			entries.addAll(parent.entrySet());
+		entries.addAll(properties.entrySet());
+		return entries;
 	}
-
-
-	/**
-	 * @param o
-	 * @return
-	 * @see java.util.Map#equals(java.lang.Object)
-	 */
-	public boolean equals(Object o) {
-		return properties.equals(o);
-	}
-
 
 	/**
 	 * @param key
@@ -109,18 +95,20 @@ public class ChainedProperties extends Starter implements Map<String, String> {
 	 * @see java.util.Map#isEmpty()
 	 */
 	public boolean isEmpty() {
-		return properties.isEmpty();
+		return properties.isEmpty() && (parent != null ? parent.isEmpty() : true) ;
 	}
-
 
 	/**
 	 * @return
 	 * @see java.util.Map#keySet()
 	 */
 	public Set<String> keySet() {
-		return properties.keySet();
+		Set<String> keys = new HashSet<String>(size());
+		if(parent != null)
+			keys.addAll(parent.keySet());
+		keys.addAll(properties.keySet());
+		return keys;
 	}
-
 
 	/**
 	 * @param key
@@ -129,10 +117,8 @@ public class ChainedProperties extends Starter implements Map<String, String> {
 	 * @see java.util.Map#put(java.lang.Object, java.lang.Object)
 	 */
 	public String put(String key, String value) {
-		log(Level.TRACE, "Adding properties %s: %s", key, value);
 		return properties.put(key, value);
 	}
-
 
 	/**
 	 * @param t
@@ -141,7 +127,6 @@ public class ChainedProperties extends Starter implements Map<String, String> {
 	public void putAll(Map<? extends String, ? extends String> t) {
 		properties.putAll(t);
 	}
-
 
 	/**
 	 * @param key
@@ -152,22 +137,24 @@ public class ChainedProperties extends Starter implements Map<String, String> {
 		return properties.remove(key);
 	}
 
-
 	/**
 	 * @return
 	 * @see java.util.Map#size()
 	 */
 	public int size() {
-		return properties.size();
+		return properties.size() + (parent ==null ? 0:parent.size());
 	}
-
 
 	/**
 	 * @return
 	 * @see java.util.Map#values()
 	 */
 	public Collection<String> values() {
-		return properties.values();
+		List<String> values = new ArrayList<String>(size());
+		values.addAll(properties.values());
+		if(parent != null)
+			values.addAll(parent.values());
+		return values;
 	}
 
 	/* (non-Javadoc)
@@ -175,7 +162,7 @@ public class ChainedProperties extends Starter implements Map<String, String> {
 	 */
 	@Override
 	public void initialize(StarterNode parent) {
-		this.parent = parent.find(getClass());
 		super.initialize(parent);
+		this.parent = parent.find(getClass());
 	}
 }
