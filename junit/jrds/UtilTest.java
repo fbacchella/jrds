@@ -13,6 +13,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.mockobjects.DummyProbe;
 import jrds.mockobjects.MokeProbe;
+import jrds.xmlResources.ResourcesLocator;
 import junit.framework.Assert;
 
 import org.apache.log4j.Level;
@@ -105,14 +106,14 @@ public class UtilTest {
 		DummyProbe p = new DummyProbe();
 		p.configure();
 		Document d = p.dumpAsXml();
-		String outBuffer;
-		URL xsl = UtilTest.class.getResource("/jrds/xmlResources/probe.xsl");
+		URL xsl = ResourcesLocator.getResourceUrl("/jrds/xmlResources/probe.xsl");
+		Assert.assertNotNull("xls transformation not found", xsl);
 		out.reset();
 		Util.serialize(d, out, xsl, null);
-		outBuffer = out.toString();
-		logger.debug(outBuffer);
-		Assert.assertTrue(outBuffer.contains("DOCTYPE html"));
-		Assert.assertTrue(outBuffer.contains("pid=" + p.hashCode()));
+		String outBuffer = out.toString();
+		logger.debug("testSerialization4: " + outBuffer);
+		Assert.assertTrue("HTML doctype not found", outBuffer.contains("DOCTYPE html"));
+		Assert.assertTrue("probe id not found in HTML", outBuffer.contains("pid=" + p.hashCode()));
 		for(DsDef ds: p.getDsDefs()) {
 			Assert.assertTrue(outBuffer.contains("dsName=" + ds.getDsName()));
 		}

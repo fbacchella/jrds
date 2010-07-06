@@ -72,6 +72,7 @@ public class TestMacro {
 
 		logger.setLevel(Level.TRACE);
 		Tools.setLevel(new String[] {"jrds.factories"}, logger.getLevel());
+		Tools.setLevel(new String[] {"jrds.starter.ChainedProperties"}, Level.TRACE);
 		Tools.setLevel(new String[] {"jrds.factories.xml.CompiledXPath"}, Level.INFO);
 	}
 	
@@ -180,7 +181,7 @@ public class TestMacro {
 			if("myhost/MacroProbe3".equals(p.toString()) ) {
 				MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
 				logger.trace("Args:" + mp.getArgs());
-				Assert.assertTrue(mp.getArgs().contains("bidule"));
+				Assert.assertFalse(mp.getArgs().contains("bidule"));
 				found = true;
 			}
 		}
@@ -214,7 +215,7 @@ public class TestMacro {
 	@Test
 	public void testMacroFillwithProps3() throws Exception {
 		Document d = Tools.parseString(goodMacroXml);
-		Tools.appendString(Tools.appendString(d.getDocumentElement(), "<probe type = \"MacroProbe1\" />"), "<arg type=\"String\" value=\"${a}\" />");
+		Tools.appendString(Tools.appendString(d.getDocumentElement(), "<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
 		Macro m = doMacro(d, "macrodef");
 
 		Document hostdoc = Tools.parseString(goodHostXml);
@@ -228,7 +229,7 @@ public class TestMacro {
 		Collection<Probe<?,?>> probes = host.getProbes();
 		boolean found = false;
 		for(Probe<?,?> p: probes) {
-			if("myhost/MacroProbe1".equals(p.toString()) ) {
+			if("myhost/MacroProbe3".equals(p.toString()) ) {
 				MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
 				logger.trace("Args:" + mp.getArgs());
 				Assert.assertTrue(mp.getArgs().contains("bidule"));
