@@ -57,7 +57,7 @@ public class TestMacro {
 	@BeforeClass
 	static public void configure() throws ParserConfigurationException, IOException {
 		Tools.configure();
-		Tools.prepareXml();
+		Tools.prepareXml(false);
 		Loader l = new Loader();
 		dbuilder = l.dbuilder;
 		l.importUrl(new URL("file:desc"));
@@ -237,5 +237,31 @@ public class TestMacro {
 			}
 		}
 		Assert.assertTrue("macro probe with properties not found", found);
+	}
+	
+	@Test
+	public void testCollection() throws Exception {
+		Document d = Tools.parseString(goodMacroXml);
+		Tools.appendString(Tools.appendString(Tools.appendString(d.getDocumentElement(), "<for var=\"a\" collection=\"c\"/>"),"<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
+		Macro m = doMacro(d, "macrodef");
+
+		Document hostdoc = Tools.parseString(goodHostXml);
+		Tools.appendString(Tools.appendString(hostdoc.getDocumentElement(), "<collection name=\"c\"/>"), "<element>bidule</element>");
+
+		HostBuilder hb = getBuilder(m);
+		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
+
+		Collection<Probe<?,?>> probes = host.getProbes();
+		boolean found = false;
+		for(Probe<?,?> p: probes) {
+			if("myhost/MacroProbe3".equals(p.toString()) ) {
+				MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
+				logger.trace("Args:" + mp.getArgs());
+				Assert.assertTrue(mp.getArgs().contains("bidule"));
+				found = true;
+			}
+		}
+		Assert.assertTrue("macro probe with properties not found", found);
+
 	}
 }

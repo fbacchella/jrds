@@ -26,7 +26,6 @@ import jrds.starter.StarterNode;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 
 public class HostBuilder extends ObjectBuilder {
 	static final private Logger logger = Logger.getLogger(HostBuilder.class);
@@ -76,13 +75,14 @@ public class HostBuilder extends ObjectBuilder {
 
 
 		StarterNode ns = new StarterNode() {};
+		Map<String, Set<String>> collections = new HashMap<String, Set<String>>();
 
-		parseFragment(hostNode, host, ns);
+		parseFragment(hostNode, host, ns, collections);
 
 		return host;
 	}
 
-	private void parseFragment(JrdsNode fragment, RdsHost host, StarterNode ns) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	private void parseFragment(JrdsNode fragment, RdsHost host, StarterNode ns, Map<String, Set<String>> collections) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
 		JrdsNode snmpNode = fragment.getChild(CompiledXPath.get("snmp"));
 		if(snmpNode != null) {
@@ -92,6 +92,21 @@ public class HostBuilder extends ObjectBuilder {
 		}
 
 		makeConnexion(fragment, host);
+
+		fragment.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
+
+		Map<String, String> hostprop = makeProperties(fragment);
+		if(hostprop != null) {
+			ChainedProperties temp = new ChainedProperties(hostprop);
+			ns.registerStarter(temp);
+		}
+
+		for(JrdsNode collectionNode: fragment.iterate(CompiledXPath.get("collection"))) {
+			String name = collectionNode.attrMap().get("name");
+			Set<String> set = new HashSet<String>();
+			collectionNode.setMethod(set, CompiledXPath.get("element"), "add", false);
+			collections.put(name, set);
+		}
 
 		for(JrdsNode macroNode: fragment.iterate(CompiledXPath.get("macro"))) {
 			String name = macroNode.attrMap().get("name");
@@ -104,30 +119,12 @@ public class HostBuilder extends ObjectBuilder {
 				macrosnode.registerStarter(temp);
 
 				Document hostdoc = fragment.getOwnerDocument();
-				Node newNode = hostdoc.adoptNode(hostdoc.importNode(m.getDf(), true));
-
-				parseFragment((new JrdsNode(newNode)).getChild(CompiledXPath.get("macrodef")), host, macrosnode);
+				JrdsNode newNode = new JrdsNode(hostdoc.adoptNode(hostdoc.importNode(m.getDf(), true)));
+				parseFragment((new JrdsNode(newNode)).getChild(CompiledXPath.get("macrodef")), host, macrosnode, collections);
 			}
 			else {
 				logger.error("Unknown macro:" + name);
 			}
-		}
-		
-		fragment.setMethod(host, CompiledXPath.get("tag"), "addTag", false);
-
-		Map<String, String> hostprop = makeProperties(fragment);
-		if(hostprop != null) {
-			ChainedProperties temp = new ChainedProperties(hostprop);
-			//temp.register(host);
-			ns.registerStarter(temp);
-		}
-
-		Map<String, Set<String>> collections = new HashMap<String, Set<String>>();
-		for(JrdsNode collectionNode: fragment.iterate(CompiledXPath.get("collection"))) {
-			String name = collectionNode.attrMap().get("name");
-			Set<String> set = new HashSet<String>();
-			collectionNode.setMethod(set, CompiledXPath.get("element"), "add", false);
-			collections.put(name, set);
 		}
 
 		for(JrdsNode forNode: fragment.iterate(CompiledXPath.get("for"))) {
@@ -162,7 +159,7 @@ public class HostBuilder extends ObjectBuilder {
 					StarterNode fornode = new StarterNode(ns) {};
 					ChainedProperties temp = new ChainedProperties(properties);
 					fornode.registerStarter(temp);
-					parseFragment(forNode, host, fornode);
+					parseFragment(forNode, host, fornode, collections);
 				}
 			}
 			else {
@@ -227,7 +224,7 @@ public class HostBuilder extends ObjectBuilder {
 		//			}
 		//			p.addThreshold(t);
 		//		}
-		
+
 		ChainedProperties cp = ns.find(ChainedProperties.class);
 		String label = probeNode.evaluate(CompiledXPath.get("@label"));
 		if(label != null && ! "".equals(label)) {
