@@ -12,6 +12,7 @@ import jrds.PropertiesManager;
 import jrds.RdsHost;
 import jrds.Tools;
 import jrds.factories.xml.JrdsNode;
+import jrds.graphe.Sum;
 import jrds.mockobjects.MokeProbe;
 import jrds.probe.SumProbe;
 import junit.framework.Assert;
@@ -52,60 +53,52 @@ public class TestSum {
 		conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
 
 		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"jrds.factories", "jrds.probe.SumProbe"}, logger.getLevel());
+		Tools.setLevel(new String[] {"jrds.factories", "jrds.probe.SumProbe","jrds.graphe.Sum"}, logger.getLevel());
 		Tools.setLevel(new String[] {"jrds.factories.xml.CompiledXPath"}, Level.INFO);
 	}
-	
+
+	private SumProbe doSumProbe(Document d, HostsList hl) {
+		SumBuilder sm = new SumBuilder();
+		sm.setProperty(ObjectBuilder.properties.PM, pm);
+		SumProbe sp = sm.makeSum(new JrdsNode(d));
+		RdsHost host = new RdsHost("SumHost");
+		sp.setHost(host);
+		hl.addHost(host);
+		hl.addProbe(sp);
+
+		Probe<?, ?> mp = new MokeProbe<String, String>();
+		hl.addHost(mp.getHost());
+		hl.addProbe(mp);
+		
+		return sp;
+	}
+
 	@Test
 	public void testLoad() throws Exception {
-		SumBuilder sm = new SumBuilder();
-		sm.setProperty(ObjectBuilder.properties.PM, pm);
-		
+
 		Document d = Tools.parseString(goodSumSXml);
 		Tools.JrdsElement je = new Tools.JrdsElement(d);
 		je.addElement("element", "name=DummyHost/DummyProbe");
-		jrds.Util.serialize(d, System.out, null, null);
-		
-		SumProbe sp = sm.makeSum(new JrdsNode(d));
-		RdsHost host = new RdsHost("SumHost");
-		sp.setHost(host);
-		HostsList hl = new HostsList();
-		hl.addHost(host);
-		hl.addProbe(sp);
-		
-		Probe<?, ?> mp = new MokeProbe<String, String>();
-		hl.addHost(mp.getHost());
-		hl.addProbe(mp);
-		
-		logger.trace(hl.getHosts());
-		logger.trace(mp);
+
+		HostsList hl = new HostsList();		
+		SumProbe sp = doSumProbe(d, hl);
 		Assert.assertEquals("name mismatch", "sumname", "sumname");
-		logger.trace(sp.getGraphList());
+		Sum s = (Sum) sp.getGraphList().toArray()[0];
+		logger.trace(s);
 	}
+
 	@Test
 	public void testRoles() throws Exception {
-		SumBuilder sm = new SumBuilder();
-		sm.setProperty(ObjectBuilder.properties.PM, pm);
-		
 		Document d = Tools.parseString(goodSumSXml);
 		Tools.JrdsElement je = new Tools.JrdsElement(d);
 		je.addElement("element", "name=DummyHost/DummyProbe");
 		je.addElement("role").setTextContent("role1");
-		je.addElement("role").setTextContent("role1");
-		jrds.Util.serialize(d, System.out, null, null);
-		
-		SumProbe sp = sm.makeSum(new JrdsNode(d));
-		RdsHost host = new RdsHost("SumHost");
-		sp.setHost(host);
+
 		HostsList hl = new HostsList();
-		hl.addHost(host);
-		hl.addProbe(sp);
-		
-		Probe<?, ?> mp = new MokeProbe<String, String>();
-		hl.addHost(mp.getHost());
-		hl.addProbe(mp);
-		
-		logger.trace(sp.getRoles());
+		SumProbe sp = doSumProbe(d, hl);
+
+		Sum s = (Sum) sp.getGraphList().toArray()[0];
+		Assert.assertTrue("role not found", s.roleAllowed("role1"));
 	}
 
 }

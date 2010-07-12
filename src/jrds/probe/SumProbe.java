@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import jrds.GraphNode;
 import jrds.Probe;
@@ -35,6 +37,7 @@ public class SumProbe extends VirtualProbe {
 	};
 
 	Collection<String> graphList;
+	Set<String> roles = new HashSet<String>();
 
 	//An array list is needed, the introspection is picky
 	public SumProbe(String name, ArrayList<String> graphList) {
@@ -57,12 +60,25 @@ public class SumProbe extends VirtualProbe {
 	@Override
 	public Collection<GraphNode> getGraphList() {
 		log(Level.DEBUG, "Returning a sum graphnode");
-		return Collections.singleton((GraphNode)new Sum(this));
+		Sum s = new Sum(this);
+		s.addRoles(roles);
+		return Collections.singleton((GraphNode)s);
 	}
 
 	@Override
 	public Date getLastUpdate() {
 		return new Date();
+	}
+	
+	public void addRole(String role) {
+		roles.add(role);
+	}
+
+	/**
+	 * @return the roles
+	 */
+	public Set<String> getRoles() {
+		return roles;
 	}
 	
 }
