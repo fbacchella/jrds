@@ -13,6 +13,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 import jrds.factories.xml.EntityResolver;
+import jrds.factories.xml.JrdsNode;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
@@ -28,6 +29,37 @@ import org.w3c.dom.Node;
 final public class Tools {
 	public static DocumentBuilder dbuilder = null;
 	public static XPath xpather = null;
+	
+	public static class JrdsElement extends JrdsNode
+	{
+		Element e;
+		public JrdsElement(Document d) {
+			super(d.getDocumentElement());
+			e = d.getDocumentElement();
+		}
+
+		public JrdsElement(Element e) {
+			super(e);
+			this.e = e;
+		}
+
+		public JrdsElement(JrdsNode jn) {
+			super(jn.getParent());
+			this.e = (Element)jn.getParent();
+		}
+
+		public JrdsElement addElement(String tag, String... attrs) {
+			Element newelement = getOwnerDocument().createElement(tag);
+			appendChild(newelement);
+			for(String attr: attrs) {
+				int pos = attr.indexOf('=');
+				String key = attr.substring(0, pos);
+				String value = attr.substring(pos +  1);
+				newelement.setAttribute(key, value);
+			}
+			return new JrdsElement(newelement);
+		}
+	}
 
 	static final Appender app = new WriterAppender() {
 		public void doAppend(LoggingEvent event) {
@@ -79,6 +111,27 @@ final public class Tools {
 		Document d = Tools.parseRessource(is);
 		return d;
 	}
+	
+	static public JrdsNode addElement(Node node, String element, String... attrs) throws Exception { 
+		return addElement(new JrdsNode(node), element, attrs);
+	}
+
+	static public JrdsNode addElement(Document d, String element, String... attrs) throws Exception { 
+		return addElement(new JrdsNode(d.getDocumentElement()), element, attrs);
+	}
+
+	static public JrdsNode addElement(JrdsNode node, String element, String... attrs) throws Exception { 
+		Element e = node.getOwnerDocument().createElement(element);
+		node.appendChild(e);
+		for(String attr: attrs) {
+			int pos = attr.indexOf('=');
+			String key = attr.substring(0, pos - 1);
+			String value = attr.substring(pos +  1);
+			e.setAttribute(key, value);
+		}
+		return new JrdsNode(e);
+	}
+
 
 	static public Node parseStringElement(String s) throws Exception { 
 		InputStream is = new ByteArrayInputStream(s.getBytes());

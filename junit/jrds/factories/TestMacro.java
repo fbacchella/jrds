@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -86,10 +87,14 @@ public class TestMacro {
 		return m;
 	}
 	
-	static HostBuilder getBuilder(Macro m) {
+	static HostBuilder getBuilder(Macro... macros) {
 		HostBuilder hb = new HostBuilder();
 		hb.setProperty(ObjectBuilder.properties.PM, pm);
-		hb.setProperty(ObjectBuilder.properties.MACRO, Collections.singletonMap(m.getName(), m));
+		Map<String, Macro> mmap = new HashMap<String, Macro>(macros.length);
+		for(Macro m: macros) {
+			mmap.put(m.getName(), m);
+		}
+		hb.setProperty(ObjectBuilder.properties.MACRO, mmap);
 		hb.setProperty(ObjectBuilder.properties.PROBEFACTORY, new MokeProbeFactory());
 		return hb;
 	}
@@ -134,7 +139,11 @@ public class TestMacro {
 	@Test
 	public void testMacroStarter() throws Exception {
 		Document d = Tools.parseString(goodMacroXml);
-		Tools.appendString(d.getDocumentElement(), "<snmp community=\"public\" version=\"2\" />");
+		//Tools.appendString(d.getDocumentElement(), "<snmp community=\"public\" version=\"2\" />");
+		//Tools.addElement(d, "snmp", "community=public", "version=2");
+		//Tools.JrdsElement je = new Tools.JrdsElement(d);
+		//je.addElement("snmp", "community=public", "version=2");
+		new Tools.JrdsElement(d).addElement("snmp", "community=public", "version=2");
 
 		Macro m = doMacro(d, "macrodef");
 		
@@ -153,7 +162,7 @@ public class TestMacro {
 	public void testMacroTag() throws Exception {
 		Document d = Tools.parseString(goodMacroXml);
 		String tagname = "mytag";
-		Tools.appendString(d.getDocumentElement(), "<tag>" +tagname + "</tag>");
+		new Tools.JrdsElement(d).addElement("tag").setTextContent(tagname);
 
 		Macro m = doMacro(d, "macrodef");
 		HostBuilder hb = getBuilder(m);
@@ -166,11 +175,12 @@ public class TestMacro {
 	@Test
 	public void testMacroFillwithProps1() throws Exception {
 		Document d = Tools.parseString(goodMacroXml);
-		Tools.appendString(Tools.appendString(d.getDocumentElement(), "<properties />"), "<entry key=\"a\" >bidule</entry>");
+		new Tools.JrdsElement(d).addElement("entry", "key=a").setTextContent("bidule");
+		jrds.Util.serialize(d, System.out, null, null);
 		Macro m = doMacro(d, "macrodef");
 
 		Document hostdoc = Tools.parseString(goodHostXml);
-		Tools.appendString(Tools.appendString(hostdoc.getDocumentElement(), "<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
+		new Tools.JrdsElement(hostdoc).addElement("probe", "type=MacroProbe3").addElement("arg", "type=String", "value=${a}");
 
 		HostBuilder hb = getBuilder(m);
 		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
@@ -191,11 +201,13 @@ public class TestMacro {
 	@Test
 	public void testMacroFillwithProps2() throws Exception {
 		Document d = Tools.parseString(goodMacroXml);
-		Tools.appendString(Tools.appendString(d.getDocumentElement(), "<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
+		new Tools.JrdsElement(d).addElement("probe", "type=MacroProbe3").addElement("arg", "type=String", "value=${a}");
+		//Tools.appendString(Tools.appendString(d.getDocumentElement(), "<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
 		Macro m = doMacro(d, "macrodef");
 
 		Document hostdoc = Tools.parseString(goodHostXml);
-		Tools.appendString(Tools.appendString(hostdoc.getDocumentElement(), "<properties />"), "<entry key=\"a\" >bidule</entry>");
+		new Tools.JrdsElement(hostdoc).addElement("properties").addElement("entry", "key=a").setTextContent("bidule");
+		//Tools.appendString(Tools.appendString(hostdoc.getDocumentElement(), "<properties />"), "<entry key=\"a\" >bidule</entry>");
 
 		HostBuilder hb = getBuilder(m);
 		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
@@ -212,16 +224,17 @@ public class TestMacro {
 		}
 		Assert.assertTrue("macro probe with properties not found", found);
 	}
+	
 	@Test
 	public void testMacroFillwithProps3() throws Exception {
 		Document d = Tools.parseString(goodMacroXml);
-		Tools.appendString(Tools.appendString(d.getDocumentElement(), "<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
+		new Tools.JrdsElement(d).addElement("probe", "type=MacroProbe3").addElement("arg", "type=String", "value=${a}");
 		Macro m = doMacro(d, "macrodef");
 
 		Document hostdoc = Tools.parseString(goodHostXml);
 		JrdsNode jhostdoc = new JrdsNode(hostdoc);
 		JrdsNode macronode = jhostdoc.getChild(CompiledXPath.get("/host/macro"));
-		Tools.appendString(Tools.appendString(macronode, "<properties />"), "<entry key=\"a\" >bidule</entry>");
+		new Tools.JrdsElement(macronode).addElement("properties").addElement("entry", "key=a").setTextContent("bidule");
 
 		HostBuilder hb = getBuilder(m);
 		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
@@ -261,7 +274,33 @@ public class TestMacro {
 				found = true;
 			}
 		}
-		Assert.assertTrue("macro probe with properties not found", found);
+		Assert.assertTrue("collection not found", found);
+	}
+	
+	@Test
+	public void testRecursive() throws Exception {
+		Document d1 = Tools.parseString(goodMacroXml);
+		Tools.appendString(d1.getDocumentElement(), "<macro name=\"macrodef2\" />");
+		Macro m1 = doMacro(d1, "macrodef");
 
+		Document d2 = Tools.parseString(goodMacroXml);
+		Tools.appendString(Tools.appendString(d2.getDocumentElement(), "<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"bidule\" />");
+		Macro m2 = doMacro(d2, "macrodef2");
+
+		HostBuilder hb = getBuilder(m1, m2);
+		Document hostdoc = Tools.parseString(goodHostXml);
+		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
+
+		Collection<Probe<?,?>> probes = host.getProbes();
+		boolean found = false;
+		for(Probe<?,?> p: probes) {
+			if("myhost/MacroProbe3".equals(p.toString()) ) {
+				MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
+				logger.trace("Args:" + mp.getArgs());
+				Assert.assertTrue(mp.getArgs().contains("bidule"));
+				found = true;
+			}
+		}
+		Assert.assertTrue("macro not recursive", found);
 	}
 }
