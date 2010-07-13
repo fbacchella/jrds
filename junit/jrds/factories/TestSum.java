@@ -1,6 +1,7 @@
 package jrds.factories;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -57,7 +58,7 @@ public class TestSum {
 		Tools.setLevel(new String[] {"jrds.factories.xml.CompiledXPath"}, Level.INFO);
 	}
 
-	private SumProbe doSumProbe(Document d, HostsList hl) {
+	private SumProbe doSumProbe(Document d, HostsList hl) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		SumBuilder sm = new SumBuilder();
 		sm.setProperty(ObjectBuilder.properties.PM, pm);
 		SumProbe sp = sm.makeSum(new JrdsNode(d));
