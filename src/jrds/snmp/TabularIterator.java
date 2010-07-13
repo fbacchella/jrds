@@ -27,6 +27,7 @@ public class TabularIterator implements Iterator<SnmpVars>, Iterable<SnmpVars> {
 			}
 		}
 	}
+	
 	public boolean hasNext() {
 		return tabIterator.hasNext();
 	}
@@ -43,7 +44,7 @@ public class TabularIterator implements Iterator<SnmpVars>, Iterable<SnmpVars> {
 	}
 
 	public void remove() {
-		throw new UnsupportedOperationException();
+		throw new UnsupportedOperationException("Cannot remove in a TabularIterator");
 	}
 
 	public Iterator<SnmpVars> iterator() {

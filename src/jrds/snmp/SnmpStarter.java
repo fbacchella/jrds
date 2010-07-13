@@ -37,17 +37,18 @@ public class SnmpStarter extends Starter {
 		org.snmp4j.log.LogFactory.setLogFactory(new Log4jLogFactory());
 		//If not already configured, we filter it
 		Logger snmpLogger = LogManager.getLoggerRepository().exists("org.snmp4j");
-		if(snmpLogger != null) {
+		if(snmpLogger == null) {
+			snmpLogger = Logger.getLogger("org.snmp4j");
 			snmpLogger.setLevel(Level.ERROR);
-			JrdsLoggerConfiguration.joinAppender("org.snmp4j");
 		}
+		JrdsLoggerConfiguration.joinAppender("org.snmp4j");
 	}
 
 	static final String TCP = "tcp";
 	static final String UDP = "udp";
 	static final private OID hrSystemUptime = new OID(".1.3.6.1.2.1.25.1.1.0");
 	static final private OID sysUpTimeInstance = new OID(".1.3.6.1.2.1.1.3.0");
-	
+
 	static final private PDUFactory pdufactory = new DefaultPDUFactory(PDU.GET);
 
 	volatile static private Snmp snmp = null;
@@ -59,7 +60,7 @@ public class SnmpStarter extends Starter {
 				snmp.listen();
 				started = true;
 			} catch (IOException e) {
-				log(Level.ERROR, e, "Snmp activity not started");
+				log(Level.ERROR, e, "SNMP UDP Transport Mapping not started: %s", e);
 				snmp = null;
 			}
 			return started;
@@ -68,6 +69,7 @@ public class SnmpStarter extends Starter {
 			try {
 				snmp.close();
 			} catch (IOException e) {
+				log(Level.ERROR, e, "IO error while stop SNMP UDP Transport Mapping: %s", e);
 			}
 			snmp = null;
 		}
@@ -121,7 +123,7 @@ public class SnmpStarter extends Starter {
 				if(response == null || re.getError() != null ) {
 					Exception snmpException = re.getError();
 					if(snmpException == null)
-						snmpException =  new IOException("SNMP Timeout");
+						snmpException = new IOException("SNMP Timeout");
 					throw snmpException;
 				}
 				Object value = new SnmpVars(response).get(uptimeoid);
@@ -131,7 +133,7 @@ public class SnmpStarter extends Starter {
 				}
 			}
 		} catch (Exception e) {
-			log(Level.ERROR, e, "Unable to get uptime");
+			log(Level.ERROR, e, "Unable to get uptime: %s", e);
 		}
 		return false;
 	}
@@ -150,11 +152,11 @@ public class SnmpStarter extends Starter {
 		if(UDP.equals(proto.toLowerCase())) {
 			address = new UdpAddress(resolver.getInetAddress(), port);
 		}
-		if(TCP.equals(proto.toLowerCase())) {
+		else if(TCP.equals(proto.toLowerCase())) {
 			address = new TcpAddress(resolver.getInetAddress(), port);
 		}
 		else {
-			String addrStr = proto + ":" + this.hostname + "/" + port;
+			String addrStr = proto + ":" + hostname + "/" + port;
 			address= GenericAddress.parse(addrStr);
 			if(address == null) {
 				log(Level.WARN, "Address " + addrStr + " not solvable");
@@ -163,11 +165,11 @@ public class SnmpStarter extends Starter {
 		if(community != null && address != null) {
 			retValue = new CommunityTarget(address, new OctetString(community));
 			retValue.setVersion(version);
-			retValue.setTimeout(retValue.getTimeout() * 5);
+			retValue.setTimeout(getLevel().getHostList().getTimeout() * 1000 / 2);
+			retValue.setRetries(1);
 		}
 		return retValue;
 	}
-
 
 	@Override
 	public void stop() {
@@ -186,7 +188,7 @@ public class SnmpStarter extends Starter {
 			version = SnmpConstants.version3;
 		}
 		else
-			log(Level.WARN, "version " + versionStr + " not valid");
+			log(Level.WARN, "version %s not valid", versionStr);
 	}
 
 	public void setVersion(int version)
@@ -200,18 +202,21 @@ public class SnmpStarter extends Starter {
 	public void setCommunity(String community) {
 		this.community = community;
 	}
+
 	/**
 	 * @param hostname The hostname to set.
 	 */
 	public void setHostname(String hostname) {
 		this.hostname = hostname;
 	}
+
 	/**
 	 * @param port The port to set.
 	 */
 	public void setPort(int port) {
 		this.port = port;
 	}
+
 	/**
 	 * @param port The port to set.
 	 */
@@ -219,6 +224,7 @@ public class SnmpStarter extends Starter {
 		if(port != null && ! "".equals(port))
 			this.port = Integer.parseInt(port);
 	}
+
 	/**
 	 * @param proto The proto to set.
 	 */
