@@ -33,6 +33,7 @@ public class FilterBuilder extends ObjectBuilder {
 		n.setMethod(f, CompiledXPath.get("/filter/path"), "addPath", false);
 		n.setMethod(f, CompiledXPath.get("/filter/tag"), "addTag", false);
 		n.setMethod(f, CompiledXPath.get("/filter/qualifiedname"), "addGraph", false);
+		n.setMethod(f, CompiledXPath.get("/filter/role"), "addRole", false);
 
 		logger.trace("Filter loaded: " + f.getName());
 		return f;
