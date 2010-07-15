@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 
 public class Configuration {
 	static private final Logger logger = Logger.getLogger(Configuration.class);
-	
+
 	static final private AtomicInteger generation = new AtomicInteger(0);
 
 	private PropertiesManager propertiesManager = new PropertiesManager();
@@ -27,11 +27,12 @@ public class Configuration {
 	private Timer collectTimer;
 	public int thisgeneration = generation.incrementAndGet();
 	TimerTask collector;
+	Thread shutDownHook;
 
 	public Configuration(Map<String, String> ctxt) {
 		finishConfig();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Configuration(ServletContext ctxt) {
 		if(logger.isTraceEnabled()) {
@@ -54,7 +55,7 @@ public class Configuration {
 			propertiesManager.join(new File(localPropFile));
 		finishConfig();
 	}
-	
+
 	private void finishConfig() {
 
 		propertiesManager.importSystemProps();
@@ -77,11 +78,23 @@ public class Configuration {
 			}
 		};
 		collectTimer.schedule(collector, 5000L, propertiesManager.step * 1000L);
+		// Add a shutdown hook, the shutdown signal might be send before the listener is stopped
+		shutDownHook = new Thread("Collect-Shutdown") {
+			@Override
+			public void run() {
+				if(hostsList != null)
+					hostsList.finished();
+			}
+		};
+		Runtime.getRuntime().addShutdownHook(shutDownHook);
+
 	}
 
 	public void stop() {
 		collector.cancel();
 		hostsList.finished();
+		Thread.yield();
+		Runtime.getRuntime().removeShutdownHook(shutDownHook);
 		try {
 			hostsList.lockCollect();
 		} catch (InterruptedException e) {
