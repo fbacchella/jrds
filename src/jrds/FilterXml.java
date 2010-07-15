@@ -90,4 +90,5 @@ public class FilterXml extends Filter {
 	public void setName(String name) {
 		this.name = name;
 	}
+
 }
