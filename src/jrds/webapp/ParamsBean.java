@@ -12,9 +12,12 @@ import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,6 +56,8 @@ public class ParamsBean implements Serializable {
 	String minArg = null;
 	Filter f = null;
 	HostsList root;
+	String user = null;
+	Set<String> roles = Collections.emptySet();
 
 	public ParamsBean(){
 
@@ -64,6 +69,15 @@ public class ParamsBean implements Serializable {
 
 	public void parseReq(HttpServletRequest req, HostsList hl) {
 		root =	hl;
+		
+		user = req.getRemoteUser();
+		if(user != null) {
+			roles = new HashSet<String>();
+			for(String role: hl.getRoles()) {
+				if(req.isUserInRole(role))
+					roles.add(role);
+			}
+		}
 
 		contextPath = req.getContextPath();
 		period = makePeriod(req);
@@ -397,5 +411,19 @@ public class ParamsBean implements Serializable {
 
 	public String getDsName() {
 		return dsName;
+	}
+
+	/**
+	 * @return the user
+	 */
+	public String getUser() {
+		return user;
+	}
+
+	/**
+	 * @return the roles
+	 */
+	public Set<String> getRoles() {
+		return roles;
 	}
 }

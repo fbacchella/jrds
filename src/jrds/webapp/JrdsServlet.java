@@ -25,4 +25,11 @@ public abstract class JrdsServlet extends HttpServlet {
 	protected ParamsBean getParamsBean(HttpServletRequest request) {
 		return new ParamsBean(request, getHostsList());
 	}
+	
+	protected boolean allowed(ParamsBean params) {
+		if(getPropertiesManager().security) {
+			return jrds.Util.rolesAllowed(getHostsList().getDefaultRoles(), params.getRoles());
+		}
+		return false;
+	}
 }

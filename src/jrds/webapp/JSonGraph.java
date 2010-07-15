@@ -73,15 +73,18 @@ public class JSonGraph extends JSonData {
 		if(node != null) {
 			logger.debug("Tree found: " + node);
 			Filter filter = params.getFilter();
-			return node.enumerateChildsGraph(filter);
+			if(filter.rolesAllowed(params.getRoles()))
+				return node.enumerateChildsGraph(filter);
 		}
 		else if(params.getPid() != 0 && dsName != null) {
+			if( ! jrds.Util.rolesAllowed(root.getDefaultRoles(), params.getRoles()))
+				return Collections.emptyList();
 			Probe<?, ?> p = params.getProbe();
 			if(p == null) {
 				logger.error("Looking for unknonw probe");
 				return Collections.emptyList();
 			}
-			
+
 			Graphics2D g2d = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
 			String graphDescName = p.getName() + "." + dsName;
 
@@ -97,7 +100,7 @@ public class JSonGraph extends JSonData {
 		}
 		else {
 			GraphNode gn = root.getGraphById(id);
-			if(gn != null)
+			if(gn != null && gn.rolesAllowed(params.getRoles()))
 				return Collections.singletonList(gn);
 		}
 
