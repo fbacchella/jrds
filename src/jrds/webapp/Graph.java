@@ -38,6 +38,17 @@ public final class Graph extends JrdsServlet {
 
 			jrds.Graph graph = p.getGraph();
 
+			if(getPropertiesManager().security) {
+				boolean allowed = false;
+				for(String role: p.getRoles()) {
+					allowed |= graph.getNode().roleAllowed(role);
+				}
+				if(! allowed) {
+					res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+					return;
+				}
+			}
+
 			Date middle = new Date();
 			if( ! hl.getRenderer().isReady(graph)) {
 				logger.warn("One graph failed, not ready");
@@ -51,7 +62,7 @@ public final class Graph extends JrdsServlet {
 				jrds.GraphNode node = hl.getGraphById(p.getId());
 				int wh = node.getGraphDesc().getDimension().height;
 				int rh = graph.getRrdGraph().getRrdGraphInfo().getHeight();
-				logger.trace("Delta heigt:" + (rh - wh) + " for " + node.getGraphDesc());
+				logger.trace("Delta height:" + (rh - wh) + " for " + node.getGraphDesc());
 				Date finish = new Date();
 				long duration1 = middle.getTime() - start.getTime();
 				long duration2 = finish.getTime() - middle.getTime();

@@ -23,15 +23,23 @@ import jrds.RdsHost;
  * @author Fabrice Bacchella
  * @version $Revision: 360 $
  */
-public final class Status extends JrdsServlet {
+public class Status extends JrdsServlet {
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException {
+		
+		HostsList hl = getHostsList();
+
+		ParamsBean params = new ParamsBean();
+		params.parseReq(req, hl);
+		if( getPropertiesManager().security && ! allowed(params)) {
+			res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return;
+		}
 		res.setContentType("text/plain");
 		res.addHeader("Cache-Control", "no-cache");
-		HostsList hl = getHostsList();
 
 		Collection<RdsHost> hosts = hl.getHosts();
 		int numHosts = hosts.size();
