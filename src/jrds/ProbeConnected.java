@@ -3,6 +3,8 @@ package jrds;
 import java.util.Collections;
 import java.util.Map;
 
+import jrds.starter.Connection;
+
 import org.apache.log4j.Level;
 
 public abstract class ProbeConnected<KeyType, ValueType, ConnectionClass extends jrds.starter.Connection<?>> extends Probe<KeyType, ValueType> implements ConnectedProbe {
@@ -11,7 +13,7 @@ public abstract class ProbeConnected<KeyType, ValueType, ConnectionClass extends
 	public ProbeConnected(String connectionName) {
 		super();
 		this.connectionName = connectionName;
-		log(Level.DEBUG, "New Probe connect called %s", connectionName);
+		log(Level.DEBUG, "New connected probe using %s", connectionName);
 	}
 	
 	public Boolean configure() {
@@ -37,7 +39,7 @@ public abstract class ProbeConnected<KeyType, ValueType, ConnectionClass extends
 		this.connectionName = connectionName;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	public ConnectionClass getConnection() {
 		return (ConnectionClass) find(getConnectionName());
 	}
@@ -61,5 +63,19 @@ public abstract class ProbeConnected<KeyType, ValueType, ConnectionClass extends
 	}
 
 	public abstract Map<KeyType, ValueType> getNewSampleValuesConnected(ConnectionClass cnx);
+
+	/* (non-Javadoc)
+	 * @see jrds.Probe#isCollectRunning()
+	 */
+	@Override
+	public boolean isCollectRunning() {
+		String cnxName = getConnectionName();
+		Connection<?> cnx = find(Connection.class, cnxName);
+		if(getNamedLogger().isTraceEnabled())
+			log(Level.TRACE, "Connection: %s", (cnx != null ? Boolean.toString(cnx.isStarted()) : "null") );
+		if(cnx == null || ! cnx.isStarted())
+			return false;
+		return super.isCollectRunning();
+	}
 
 }

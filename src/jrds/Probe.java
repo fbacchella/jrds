@@ -22,7 +22,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
-import jrds.starter.Connection;
 import jrds.starter.StarterNode;
 
 import org.apache.log4j.Level;
@@ -62,6 +61,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 	private boolean finished = false;
 	private String label = null;
 	private Logger namedLogger = Logger.getLogger("jrds.Probe.EmptyProbe");
+	private volatile boolean running = false;
 
 	//	private Map<String, Set<Threshold>> thresholds = new HashMap<String, Set<Threshold>>();
 
@@ -473,13 +473,19 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 	 * @throws RrdException
 	 */
 	public void collect() {
+		long start = System.currentTimeMillis();
 		boolean interrupted = true;
 		if(! finished) {
 			log(Level.ERROR, "Using an unfinished probe");
 			return;
 		}
+		if(running) {
+			log(Level.ERROR, "Hanged from a previous collect");
+			return;
+		}
 		//We only collect if the HostsList allow it
 		if(getParent().isCollectRunning()) {
+			running = true;
 			log(Level.DEBUG,"launching collect");
 			startCollect();
 			RrdDb rrdDb = null;
@@ -518,15 +524,19 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 					if(upCause != null)
 						rootCause = upCause;
 				} while (upCause != null);
-				log(Level.ERROR, e, "Error while collecting%s", message);
+				log(Level.ERROR, e, "Error while collecting: %s", message);
 			}
 			finally  {
 				if(rrdDb != null)
 					StoreOpener.releaseRrd(rrdDb);
 				stopCollect();
 			}
-			if(interrupted) 
-				log(Level.INFO, "Interrupted");
+			if(interrupted) {
+				long end = System.currentTimeMillis();
+				float elapsed = ((float)(end - start))/1000;
+				log(Level.INFO, "Interrupted after %.2fs", elapsed);
+			}
+			running = false;
 		}
 	}
 
@@ -668,25 +678,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 		if(tags != null)
 			alltags.addAll(tags);
 		return alltags;
-	}
-
-
-	/* (non-Javadoc)
-	 * @see jrds.starter.StarterNode#isCollectRunning()
-	 */
-	@Override
-	public boolean isCollectRunning() {
-		//Detected if a connected probe failed to start
-		if(this instanceof ConnectedProbe) {
-			ConnectedProbe cp = (ConnectedProbe) this;
-			String cnxName = cp.getConnectionName();
-			Connection<?> cnx = find(Connection.class, cnxName);
-			if(getNamedLogger().isTraceEnabled())
-				log(Level.TRACE, "Connection: %s", (cnx != null ? Boolean.toString(cnx.isStarted()) : "null") );
-			if(cnx == null || ! cnx.isStarted())
-				return false;
-		}
-		return super.isCollectRunning();
 	}
 
 	public abstract String getSourceType();
