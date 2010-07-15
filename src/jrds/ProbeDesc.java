@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -207,6 +208,20 @@ public class ProbeDesc {
 				dsList.add(new DsDef(e.getKey(), desc.dsType, desc.heartbeat, desc.minValue, desc.maxValue));
 		}
 		return (DsDef[]) dsList.toArray(new DsDef[dsList.size()]);
+	}
+	
+	public Collection<String> getDs() {
+		HashSet<String> dsList = new HashSet<String>(dsMap.size());
+		for(Map.Entry<String, DsDesc> e: dsMap.entrySet() ) {
+			if(e.getValue().dsType != null)
+				dsList.add(e.getKey());
+		}
+		return dsList;
+	}
+	
+	public boolean dsExist(String dsName) {
+		DsDesc dd = dsMap.get(dsName);
+		return (dd !=null && dd.dsType != null);
 	}
 
 	public int getSize()

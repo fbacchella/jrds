@@ -592,20 +592,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 		return lastUpdate;
 	}
 
-	final public boolean dsExist(String dsName) {
-		boolean retValue = false;
-		RrdDb rrddb = null;
-		try {
-			rrddb = StoreOpener.getRrd(getRrdName());
-			retValue = rrddb.getDatasource(dsName) != null;
-		} catch (Exception e) {
-			log(Level.ERROR, e, "Could not get data sources info for %s : %s", getRrdName(), e);
-		}
-		finally {
-			if(rrddb != null)
-				StoreOpener.releaseRrd(rrddb);
-		}
-		return retValue;
+	public boolean dsExist(String dsName) {
+		return pd.dsExist(dsName);
 	}
 
 	/**
