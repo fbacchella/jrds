@@ -276,7 +276,7 @@ public class PropertiesManager extends Properties {
 		timeout = parseInteger(getProperty("timeout", "30"));
 		collectorThreads = parseInteger(getProperty("collectorThreads", "1"));
 		dbPoolSize = parseInteger(getProperty("dbPoolSize", "10")) + collectorThreads;
-		syncPeriod = parseInteger(getProperty("syncPeriod", "-1"));
+		syncPeriod = parseInteger(getProperty("syncPeriod", Integer.toString(step / 2)));
 		String libspathString = getProperty("libspath", "");
 		if(! "".equals(libspathString)) {
 			for(String libName: libspathString.split(";")) {

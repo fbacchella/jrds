@@ -94,7 +94,11 @@ public class Configuration {
 		collector.cancel();
 		hostsList.finished();
 		Thread.yield();
-		Runtime.getRuntime().removeShutdownHook(shutDownHook);
+		//We don't care if it failed, just try
+		try {
+			Runtime.getRuntime().removeShutdownHook(shutDownHook);
+		} catch (Exception e1) {
+		}
 		try {
 			hostsList.lockCollect();
 		} catch (InterruptedException e) {

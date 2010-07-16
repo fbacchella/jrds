@@ -39,6 +39,7 @@ public final class StoreOpener {
 		RrdDb db = instance.requestRrdDb(cp);
 		long finish = System.currentTimeMillis();
 		waitTime.addAndGet(finish - start);
+		lockCount.incrementAndGet();
 		return db;
 	}
 
@@ -51,6 +52,7 @@ public final class StoreOpener {
 			instance.release(arg0);
 			long finish = System.currentTimeMillis();
 			waitTime.addAndGet(finish - start);
+			lockCount.incrementAndGet();
 		} catch (Exception e) {
 			logger.debug("Strange error " + e);
 		}
@@ -69,7 +71,6 @@ public final class StoreOpener {
 			throw new RuntimeException("Cannot create an opener with " +
 			"a default backend factory not derived from RrdFileBackendFactory");
 		}
-
 	}
 
 	public static final void stop() {
@@ -86,5 +87,12 @@ public final class StoreOpener {
 	}
 
 	public static final void reset() {
+	}
+
+	/**
+	 * @return the instance
+	 */
+	public static RrdDbPool getInstance() {
+		return instance;
 	}
 }

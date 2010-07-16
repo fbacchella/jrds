@@ -22,6 +22,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import jrds.HostsList;
 import jrds.PropertiesManager;
+import jrds.StoreOpener;
 
 import org.apache.log4j.Logger;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
@@ -55,40 +56,51 @@ public final class WhichLibs extends JrdsServlet {
 			res.addHeader("Cache-Control", "no-cache");
 			
 			ServletContext ctxt = getServletContext();
+//
+//			out.println("Dumping attributes");
+//			for(String attr: jrds.Util.iterate((Enumeration<String>)ctxt.getAttributeNames())) {
+//				Object o = ctxt.getAttribute(attr);
+//				out.println(attr + " = (" + o.getClass().getName() + ") " + o);
+//			}
+//			out.println("Dumping init parameters");
+//			for(String attr: jrds.Util.iterate((Enumeration<String>)ctxt.getInitParameterNames())) {
+//				String o = ctxt.getInitParameter(attr);
+//				out.println(attr + " = " + o);
+//			}
+//			out.println("Dumping system properties");
+//			Properties p = System.getProperties();
+//			for(String attr: jrds.Util.iterate((Enumeration<String>)p.propertyNames())) {
+//				Object o = p.getProperty(attr);
+//				out.println(attr + " = " + o);
+//			}		
 
-			out.println("Dumping attributes");
-			for(String attr: jrds.Util.iterate((Enumeration<String>)ctxt.getAttributeNames())) {
-				Object o = ctxt.getAttribute(attr);
-				out.println(attr + " = (" + o.getClass().getName() + ") " + o);
-			}
-			out.println("Dumping init parameters");
-			for(String attr: jrds.Util.iterate((Enumeration<String>)ctxt.getInitParameterNames())) {
-				String o = ctxt.getInitParameter(attr);
-				out.println(attr + " = " + o);
-			}
-			out.println("Dumping system properties");
-			Properties p = System.getProperties();
-			for(String attr: jrds.Util.iterate((Enumeration<String>)p.propertyNames())) {
-				Object o = p.getProperty(attr);
-				out.println(attr + " = " + o);
-			}		
-
-			out.println(ctxt.getMajorVersion());
-			out.println(ctxt.getMinorVersion());
-			out.println(ctxt.getServerInfo());
-			out.println(ctxt.getServletContextName());
-			out.println(getServletInfo());
+			out.println("Server info: ");
+			out.println("    Servlet API: " + ctxt.getMajorVersion() + "." + ctxt.getMinorVersion());
+			out.println("    Server info: " + ctxt.getServerInfo());
+			out.println();
 			
+			String[] openned = StoreOpener.getInstance().getOpenFiles();
+			out.println("" + StoreOpener.getInstance().getOpenFileCount() + " opened rrd: ");
+			for(String rrdPath: openned) {
+				out.println("   " + rrdPath);
+			}
+			out.println();
+
 			PropertiesManager pm = getPropertiesManager();
 			out.println("Temp dir:" + pm.tmpdir);
 			out.println(resolv("String", ""));
 			out.println(resolv("jrds", this));
+			String transformerFactory = System.getProperties().getProperty("javax.xml.transform.TransformerFactory");
 			try {
-				out.println(resolv("Xml Transformer", javax.xml.transform.TransformerFactory.newInstance()));
-				out.println("System's property " + System.getProperties().getProperty("javax.xml.transform.TransformerFactory"));
+				out.print(resolv("Xml Transformer", javax.xml.transform.TransformerFactory.newInstance()));
 			} catch (TransformerFactoryConfigurationError e) {
-				out.println("no xml transformer factory ");
-				out.println("System's property" + System.getProperties().getProperty("javax.xml.transform.TransformerFactory"));
+				out.print("no xml transformer factory ");
+			}
+			if(transformerFactory != null) {
+				out.println("Set by sytem property javax.xml.transform.TransformerFactory: " + transformerFactory);
+			}
+			else {
+				out.println();
 			}
 			try {
 				out.println(resolv("DOM implementation",  DocumentBuilderFactory.newInstance().newDocumentBuilder().getDOMImplementation()));
@@ -126,7 +138,7 @@ public final class WhichLibs extends JrdsServlet {
 		} catch (RuntimeException e) {
 			retValue = "Problem with " + c + ": " + e.getMessage();
 		}
-		return retValue;
+		return retValue.replaceFirst("!.*", "").replaceFirst("file:", "");
 	}
 	
 	private String locateJar(Class<?> c ) {

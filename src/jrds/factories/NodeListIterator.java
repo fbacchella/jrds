@@ -29,7 +29,7 @@ public class NodeListIterator implements Iterable<JrdsNode>, NodeList {
 
 	public NodeListIterator(NodeList nl) {
 		if(nl == null) {
-			throw new NullPointerException();
+			throw new NullPointerException("Node list invalid");
 		}
 		this.nl = nl;
 		d = null;
@@ -47,7 +47,7 @@ public class NodeListIterator implements Iterable<JrdsNode>, NodeList {
 				return new JrdsNode(nl.item(i++));
 			}
 			public void remove() {
-				throw new UnsupportedOperationException();
+				throw new UnsupportedOperationException("Cannot remove in a JrdsNode");
 			}
 
 		};
