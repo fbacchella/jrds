@@ -20,6 +20,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
+import jrds.HostsList;
 import jrds.PropertiesManager;
 
 import org.apache.log4j.Logger;
@@ -39,6 +40,15 @@ public final class WhichLibs extends JrdsServlet {
 	@SuppressWarnings("unchecked")
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException {
+		HostsList hl = getHostsList();
+
+		ParamsBean params = new ParamsBean();
+		params.parseReq(req, hl);
+		if(! allowed(params, getPropertiesManager().adminrole)) {
+			res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+			return;
+		}
+
 		try {
 			ServletOutputStream out = res.getOutputStream();
 			res.setContentType("text/plain");
@@ -85,6 +95,7 @@ public final class WhichLibs extends JrdsServlet {
 			} catch (ParserConfigurationException e) {
 				out.println("Invalid DOM parser configuration");
 			}
+			out.println(resolv("Servlet API", javax.servlet.ServletContext.class));
 			out.println(resolv("SNMP4J", DefaultUdpTransportMapping.class));
 			out.println(resolv("Log4j",logger.getClass()));
 			out.println("Generation:" + getConfig().thisgeneration);

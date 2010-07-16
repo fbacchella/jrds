@@ -73,11 +73,11 @@ public class JSonGraph extends JSonData {
 		if(node != null) {
 			logger.debug("Tree found: " + node);
 			Filter filter = params.getFilter();
-			if(filter.rolesAllowed(params.getRoles()))
+			if(allowed(params, filter.getRoles()))
 				return node.enumerateChildsGraph(filter);
 		}
 		else if(params.getPid() != 0 && dsName != null) {
-			if( ! jrds.Util.rolesAllowed(root.getDefaultRoles(), params.getRoles()))
+			if(! allowed(params, root.getDefaultRoles()))
 				return Collections.emptyList();
 			Probe<?, ?> p = params.getProbe();
 			if(p == null) {
@@ -100,7 +100,7 @@ public class JSonGraph extends JSonData {
 		}
 		else {
 			GraphNode gn = root.getGraphById(id);
-			if(gn != null && gn.rolesAllowed(params.getRoles()))
+			if(gn != null && allowed(params, gn.getRoles()))
 				return Collections.singletonList(gn);
 		}
 

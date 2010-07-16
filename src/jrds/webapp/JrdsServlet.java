@@ -1,13 +1,19 @@
 package jrds.webapp;
 
+import java.util.Collections;
+import java.util.Set;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+
+import org.apache.log4j.Logger;
 
 import jrds.HostsList;
 import jrds.PropertiesManager;
 
 public abstract class JrdsServlet extends HttpServlet {
+	static final private Logger logger = Logger.getLogger(JrdsServlet.class);
 
 	protected Configuration getConfig() {
 		ServletContext ctxt = getServletContext();
@@ -26,10 +32,20 @@ public abstract class JrdsServlet extends HttpServlet {
 		return new ParamsBean(request, getHostsList());
 	}
 	
-	protected boolean allowed(ParamsBean params) {
+	protected boolean allowed(ParamsBean params, Set<String> roles) {
 		if(getPropertiesManager().security) {
-			return jrds.Util.rolesAllowed(getHostsList().getDefaultRoles(), params.getRoles());
+			if(roles.contains("ANONYMOUS"))
+				return true;
+			if(logger.isTraceEnabled()) {
+				logger.trace("Checking if roles " + params.getRoles() + " in roles " + roles);
+				logger.trace("Disjoint: " +  Collections.disjoint(roles, params.getRoles()));
+			}
+			return ! Collections.disjoint(roles, params.getRoles());
 		}
-		return false;
+		return true;
+	}
+	
+	protected boolean allowed(ParamsBean params, String role) {
+		return allowed(params, Collections.singleton(role));
 	}
 }

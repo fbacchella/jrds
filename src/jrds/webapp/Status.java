@@ -34,7 +34,7 @@ public class Status extends JrdsServlet {
 
 		ParamsBean params = new ParamsBean();
 		params.parseReq(req, hl);
-		if( getPropertiesManager().security && ! allowed(params)) {
+		if(! allowed(params, getPropertiesManager().defaultRoles)) {
 			res.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			return;
 		}

@@ -316,12 +316,14 @@ public class PropertiesManager extends Properties {
 		if(security) {
 			userfile = getProperty("userfile", "users.properties");
 
-			String  defaultRolesString = getProperty("defaultroles", "admin");
+			adminrole = getProperty("adminrole", adminrole);
+
+			String  defaultRolesString = getProperty("defaultroles", adminrole);
 			String[] defaultRolesArray = defaultRolesString.split(",");
 			defaultRoles = new HashSet<String>(defaultRolesArray.length);
 			defaultRoles.addAll(Arrays.asList(defaultRolesArray));
 		}
-
+		
 		Locale.setDefault(new Locale("POSIX"));
 	}
 
@@ -342,7 +344,8 @@ public class PropertiesManager extends Properties {
 	public boolean autocreate;
 	public int timeout;
 	public String rrdbackend;
-	public boolean security = true;
+	public boolean security = false;
 	public String userfile = "/tmp/bidule";
 	public Set<String> defaultRoles = Collections.emptySet();
+	public String adminrole = "admin";
 }

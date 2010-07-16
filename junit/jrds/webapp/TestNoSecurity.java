@@ -17,8 +17,8 @@ import org.junit.Test;
 import org.mortbay.jetty.testing.HttpTester;
 import org.mortbay.jetty.testing.ServletTester;
 
-public class TestSecurity  {
-	static final private Logger logger = Logger.getLogger(TestSecurity.class);
+public class TestNoSecurity  {
+	static final private Logger logger = Logger.getLogger(TestNoSecurity.class);
 	static String[] oldvalues;
 	static String[] props;
 	
@@ -53,7 +53,7 @@ public class TestSecurity  {
 
 		response.parse(tester.getResponses(request.generate()));
 
-		Assert.assertEquals(403,response.getStatus());
+		Assert.assertEquals(200,response.getStatus());
 		
 		logger.trace(response.getContent());
 	}
@@ -69,7 +69,7 @@ public class TestSecurity  {
 		ServletContext sc =  tester.getContext().getServletContext();
 
 		props = new String[] {"tmpdir", "configdir", "autocreate", "rrddir", "security", "defaultroles", "adminrole"};
-		String[] values = new String[] {"tmp", "tmp/config", "true", "tmp", "true", "ANONYMOUS", "admin"};
+		String[] values = new String[] {"tmp", "tmp/config", "true", "tmp", "false", "ANONYMOUS", "admin"};
 		oldvalues = new String[values.length];
 		for(int i = 0; i < values.length; i++) {
 			String prop = "jrds." + props[i];
