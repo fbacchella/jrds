@@ -247,6 +247,10 @@ public class GraphNode implements Comparable<GraphNode> {
 		return probe.toString() + "/" + getName();
 	}
 	
+	public void addRole(String role) {
+		this.roles.add(role);
+	}
+
 	public void addRoles(Set<String> roles) {
 		this.roles.addAll(roles);
 	}
@@ -257,6 +261,13 @@ public class GraphNode implements Comparable<GraphNode> {
 
 	public boolean rolesAllowed(Set<String> roles) {
 		return jrds.Util.rolesAllowed(this.roles, roles);
+	}
+
+	/**
+	 * @return the roles
+	 */
+	public Set<String> getRoles() {
+		return roles;
 	}
 
 }
