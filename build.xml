@@ -249,7 +249,7 @@
 		</xmlvalidate>
 	</target>
 	
-	<target name="test" depends="compile.test, checkdtd">
+	<target name="test" depends="compile.test, checkdtd, appjar">
 		<delete dir="${testdir}"/>
 		<mkdir dir="${testdir}/rawtestoutput"/>
 		<junit printsummary="yes" showoutput="no" failureproperty="junit.failure">

@@ -22,7 +22,7 @@ public class FilterTag extends Filter {
 
 	@Override
 	public String getName() {
-		return "Tag " + tag;
+		return tag;
 	}
 
 }
