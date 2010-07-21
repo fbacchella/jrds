@@ -4,8 +4,7 @@
 	<name>PgStatDatabase</name>
 	<probeName>pgstatdatabase-${1}</probeName>
 	<probeClass>jrds.probe.jdbc.GenericJdbcProbe</probeClass>
-	<specific name="query">select * from pg_stat_database where
-		datname='${1}';</specific>
+	<specific name="query">select * from pg_stat_database where	datname='${1}';</specific>
 	<specific name="index">${1}</specific>
 	<ds>
 		<dsName>xact_commit</dsName>
