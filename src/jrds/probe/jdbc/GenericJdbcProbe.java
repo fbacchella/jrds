@@ -10,8 +10,10 @@ import java.sql.Types;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Level;
 
@@ -72,7 +74,10 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
 				log(Level.DEBUG, "sql query used: %s", query);
 				if(stmt != null && stmt.execute(query)) {
 					ResultSet rs = stmt.getResultSet();
-					values = getValuesFromRS(rs);
+					Set<String> collectKeys = new HashSet<String>(getPd().getCollectStrings().keySet());
+					if(uptimeQuery == null && uptimeRow != null)
+						collectKeys.add(uptimeRow);
+					values = getValuesFromRS(rs, collectKeys);
 					if(uptimeRow != null && values.containsKey(uptimeRow)) {
 						setUptime(values.get(uptimeRow).longValue());
 						values.remove(uptimeRow);
@@ -93,7 +98,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
 		try {
 			stmt.execute(uptimeQuery);
 			ResultSet rs = stmt.getResultSet();
-			Map<String, Number> values = getValuesFromRS(rs);
+			Map<String, Number> values = getValuesFromRS(rs, Collections.singleton(uptimeRow));
 			if(uptimeRow != null && values.containsKey(uptimeRow)) {
 				setUptime(values.get(uptimeRow).longValue());
 				values.remove(uptimeRow);
@@ -106,7 +111,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
 		return false;
 	}
 	
-	private Map<String, Number> getValuesFromRS(ResultSet rs) {
+	private Map<String, Number> getValuesFromRS(ResultSet rs, Set<String> collectKeys) {
 		Map<String, Number> values = Collections.emptyMap();
 		try {
 			ResultSetMetaData meta = rs.getMetaData();
@@ -120,27 +125,33 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
 				}
 
 				for(int i = 1; i <= columnCount ; i++) {
-					String key = meta.getColumnLabel(i);
+					String key = keyValue + meta.getColumnLabel(i);
+					if(! collectKeys.contains(key))
+						continue;
 					Number value = Double.NaN;
 					Object oValue = rs.getObject(i);
+					log(Level.TRACE, "type info for %s: type %d, %s = %s",  key, meta.getColumnType(i), oValue.getClass(), oValue.toString());
 					if(oValue instanceof Number) {
 						value = ((Number) oValue);
-						values.put(keyValue + key, value);
+						values.put(key, value);
 					}
 					else {
 						int type = meta.getColumnType(i);
+						value = Double.NaN;
 						switch(type) {
-						case Types.DATE: value = rs.getDate(i).getTime();
-						case Types.TIME: value = rs.getDate(i).getTime();
-						case Types.VARCHAR: value = Util.parseStringNumber(rs.getString(i), Double.class, Double.NaN);
+						case Types.DATE: value = rs.getDate(i).getTime() / 1000; break;
+						case Types.TIME: value = rs.getTime(i).getTime() / 1000; break;
+						case Types.VARCHAR: value = Util.parseStringNumber(rs.getString(i), Double.class, Double.NaN); break;
+						case Types.TIMESTAMP: value = rs.getTimestamp(i).getTime() / 1000; break;
 						}
-						values.put(keyValue + key, value);
+						values.put(key, value);
 					}
 				}
 			}
 		} catch (SQLException e) {
 			log(Level.ERROR, e, "SQL exception while getting values: ", e.getMessage());
 		}
+		log(Level.TRACE, "values found: %s", values);
 		return values;
 	}
 	

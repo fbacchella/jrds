@@ -1,20 +1,19 @@
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
-  <name>pgsqlxact</name>
-  <graphName>pgsqlxact-${index}</graphName>
-  <graphTitle>PostgreSQL transactions on ${index}</graphTitle>
-  <verticalLabel>Transaction/s</verticalLabel>
+  <name>pgsqlblks</name>
+  <graphName>pgsqlblks-${index}</graphName>
+  <graphTitle>PostgreSQL blocks on ${index}</graphTitle>
+  <verticalLabel>block/s</verticalLabel>
 
   <add>
-    <name>xact_commit</name>
+    <name>blks_read</name>
     <graphType>area</graphType>
-    <legend>Number of transactions committed</legend>
+    <legend>Disk blocks read</legend>
   </add>
   <add>
-    <name>xact_rollback</name>
+    <name>blks_hit</name>
     <graphType>stack</graphType>
-    <color>RED</color>
-    <legend>Number of transactions rolled back</legend>
+    <legend>Buffer hits</legend>
   </add>
 
   <hosttree>
@@ -22,13 +21,13 @@
     <pathelement>SERVICES</pathelement>
     <pathelement>URL</pathelement>
     <pathstring>${index}</pathstring>
-    <pathstring>transaction</pathstring>
+    <pathstring>blocks</pathstring>
   </hosttree>
   <viewtree>
     <pathelement>SERVICES</pathelement>
     <pathstring>Postgresql</pathstring>
     <pathelement>URL</pathelement>
     <pathstring>${index}</pathstring>
-    <pathstring>transaction</pathstring>
+    <pathstring>blocks</pathstring>
   </viewtree>
 </graphdesc>

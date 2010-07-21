@@ -4,8 +4,10 @@
 	<name>PgStatDatabase</name>
 	<probeName>pgstatdatabase-${1}</probeName>
 	<probeClass>jrds.probe.jdbc.GenericJdbcProbe</probeClass>
-	<specific name="query">select * from pg_stat_database where	datname='${1}';</specific>
+	<specific name="query">select * from pg_stat_database where datname='${1}';</specific>
 	<specific name="index">${1}</specific>
+	<specific name="uptimeQuery">select (now() - pg_postmaster_start_time())::time;</specific>
+	<specific name="uptimeRow">time</specific>
 	<ds>
 		<dsName>xact_commit</dsName>
 		<dsType>derive</dsType>
@@ -44,5 +46,7 @@
 	</ds>
 	<graphs>
 		<name>pgsqlxact</name>
+		<name>pgsqlblks</name>
+		<name>pgsqltup</name>
 	</graphs>
 </probedesc>
