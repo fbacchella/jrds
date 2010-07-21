@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+	<name>PgStatDatabase</name>
+	<probeName>pgstatdatabase-${1}</probeName>
+	<probeClass>jrds.probe.jdbc.GenericJdbcProbe</probeClass>
+	<specific name="query">select * from pg_stat_database where datname='${1}';</specific>
+	<ds>
+		<dsName>xact_commit</dsName>
+		<dsType>derive</dsType>
+	</ds>
+	<ds>
+		<dsName>xact_rollback</dsName>
+		<dsType>derive</dsType>
+	</ds>
+	<ds>
+		<dsName>blks_read</dsName>
+		<dsType>derive</dsType>
+	</ds>
+	<ds>
+		<dsName>blks_hit</dsName>
+		<dsType>derive</dsType>
+	</ds>
+	<ds>
+		<dsName>tup_returned</dsName>
+		<dsType>derive</dsType>
+	</ds>
+	<ds>
+		<dsName>tup_fetched</dsName>
+		<dsType>derive</dsType>
+	</ds>
+	<ds>
+		<dsName>tup_inserted</dsName>
+		<dsType>derive</dsType>
+	</ds>
+	<ds>
+		<dsName>tup_updated</dsName>
+		<dsType>derive</dsType>
+	</ds>
+	<ds>
+		<dsName>tup_deleted</dsName>
+		<dsType>derive</dsType>
+	</ds>
+	<graphs></graphs>
+</probedesc>
