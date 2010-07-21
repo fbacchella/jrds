@@ -1,10 +1,13 @@
 package jrds.probe.jdbc;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -14,10 +17,16 @@ import org.apache.log4j.Level;
 
 import jrds.ProbeConnected;
 import jrds.ProbeDesc;
+import jrds.Util;
+import jrds.probe.IndexedProbe;
+import jrds.probe.UrlProbe;
 
-public class GenericJdbcProbe extends ProbeConnected<String, Double, JdbcConnection> {
+public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnection> implements UrlProbe, IndexedProbe {
 	String query = null;
 	String keyColumn = null;
+	String index = "";
+	String uptimeRow = null;
+	String uptimeQuery = null;
 
 	public GenericJdbcProbe() {
 		super(JdbcConnection.class.getName());
@@ -31,60 +40,135 @@ public class GenericJdbcProbe extends ProbeConnected<String, Double, JdbcConnect
 			ProbeDesc pd =  getPd();
 			query = jrds.Util.parseTemplate(pd.getSpecific("query"), this, args);
 			keyColumn = jrds.Util.parseTemplate(pd.getSpecific("key"), this, args);
+			uptimeQuery = jrds.Util.parseTemplate(pd.getSpecific("uptimeQuery"), this, args);
+			uptimeRow = jrds.Util.parseTemplate(pd.getSpecific("uptimeRow"), this, args);
+			String indexTemplate = pd.getSpecific("index");
+			if(indexTemplate != null && ! "".equals(indexTemplate))
+				index = jrds.Util.parseTemplate(indexTemplate, this, args);
 			setName(jrds.Util.parseTemplate(pd.getProbeName(), args));
 			return true;
 		}
 		return false;
 	}
 
+	public Boolean configure() {
+		return configure(Collections.emptyList());
+	}
+	
+	public Boolean configure(Object... args) {
+		return configure(Arrays.asList(args));
+	}
+
 	@Override
-	public Map<String, Double> getNewSampleValuesConnected(JdbcConnection cnx) {
-		Map<String, Double> values = Collections.emptyMap();
+	public Map<String, Number> getNewSampleValuesConnected(JdbcConnection cnx) {
+		Map<String, Number> values = Collections.emptyMap();
 		Statement stmt = cnx.getConnection();
+		if(stmt != null && uptimeQuery != null && ! "".equals(uptimeQuery)) {
+			if( ! doUptimeQuery(stmt))
+				return Collections.emptyMap();
+		}
 		try {
 			try {
+				log(Level.DEBUG, "sql query used: %s", query);
 				if(stmt != null && stmt.execute(query)) {
 					ResultSet rs = stmt.getResultSet();
-					ResultSetMetaData meta = rs.getMetaData();
-					int columnCount = meta.getColumnCount();
-					values = new HashMap<String, Double>(columnCount);
-					while(rs.next()) {
-						for(int i = 1; i <= columnCount ; i++) {
-							String key = meta.getColumnLabel(i);
-							if(keyColumn != null) {
-								key = rs.getString(keyColumn) + "." + key;
-							}
-							double value = Double.NaN;
-							Object oValue = rs.getObject(i);
-							if(oValue instanceof Number) {
-								value = ((Number) oValue).doubleValue();
-								values.put(key, value);
-							}
-							else {
-								int type = meta.getColumnType(i);
-								switch(type) {
-								case Types.BIGINT: value = rs.getBigDecimal(i).doubleValue();
-								case Types.DATE: value = rs.getDate(i).getTime();
-								case Types.TIME: value = rs.getDate(i).getTime();
-								}
-								values.put(key, value);
-							}
-						}
+					values = getValuesFromRS(rs);
+					if(uptimeRow != null && values.containsKey(uptimeRow)) {
+						setUptime(values.get(uptimeRow).longValue());
+						values.remove(uptimeRow);
 					}
 				}
 			}
 			finally {
 				stmt.close();	
 			}
+			return values;
+		} catch (SQLException e) {
+			log(Level.ERROR, e, "SQL exception while getting values: ", e.getMessage());
+		}
+		return Collections.emptyMap();
+	}
+	
+	private boolean doUptimeQuery(Statement stmt) {
+		try {
+			stmt.execute(uptimeQuery);
+			ResultSet rs = stmt.getResultSet();
+			Map<String, Number> values = getValuesFromRS(rs);
+			if(uptimeRow != null && values.containsKey(uptimeRow)) {
+				setUptime(values.get(uptimeRow).longValue());
+				values.remove(uptimeRow);
+			}
+			return true;
+		} catch (SQLException e) {
+			log(Level.ERROR, e, "SQL exception while getting uptime: ", e.getMessage());
+		}
+
+		return false;
+	}
+	
+	private Map<String, Number> getValuesFromRS(ResultSet rs) {
+		Map<String, Number> values = Collections.emptyMap();
+		try {
+			ResultSetMetaData meta = rs.getMetaData();
+			int columnCount = meta.getColumnCount();
+			values = new HashMap<String, Number>(columnCount);
+			while(rs.next()) {
+				String keyValue = "";
+				if(keyColumn != null) {
+					keyValue = rs.getString(keyColumn) + ".";
+					log(Level.TRACE, "found a row with key %s", rs.getString(keyColumn));
+				}
+
+				for(int i = 1; i <= columnCount ; i++) {
+					String key = meta.getColumnLabel(i);
+					Number value = Double.NaN;
+					Object oValue = rs.getObject(i);
+					if(oValue instanceof Number) {
+						value = ((Number) oValue);
+						values.put(keyValue + key, value);
+					}
+					else {
+						int type = meta.getColumnType(i);
+						switch(type) {
+						case Types.DATE: value = rs.getDate(i).getTime();
+						case Types.TIME: value = rs.getDate(i).getTime();
+						case Types.VARCHAR: value = Util.parseStringNumber(rs.getString(i), Double.class, Double.NaN);
+						}
+						values.put(keyValue + key, value);
+					}
+				}
+			}
 		} catch (SQLException e) {
 			log(Level.ERROR, e, "SQL exception while getting values: ", e.getMessage());
 		}
 		return values;
 	}
-
+	
 	@Override
 	public String getSourceType() {
 		return "JDBC";
+	}
+
+	public int getPort() {
+		return 0;
+	}
+
+	public URL getUrl() {
+		URL newurl = null;
+		try {
+			newurl = new URL(getUrlAsString());
+		} catch (MalformedURLException e) {
+			log(Level.ERROR, e, "Invalid jdbc url: " + getUrlAsString());
+		}
+		return newurl;
+	}
+
+	public String getUrlAsString() {
+		return getConnection().getUrl();
+	}
+
+	public String getIndexName() {
+		return index;
 	}
 
 }
