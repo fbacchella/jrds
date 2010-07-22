@@ -6,6 +6,7 @@ _##########################################################################*/
 
 package jrds;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,11 +17,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
 import org.rrd4j.core.DsDef;
 import org.snmp4j.smi.OID;
-
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * The description of a probe that must be used for each probe.
@@ -33,7 +39,7 @@ public class ProbeDesc {
 
 	static public final double MINDEFAULT = 0;
 	static public final double MAXDEFAULT = Double.NaN;
-	
+
 	private long heartBeatDefault = 600;
 	private Map<String, DsDesc> dsMap;
 	private Map<String, String> specific = new HashMap<String, String>();;
@@ -198,7 +204,7 @@ public class ProbeDesc {
 		}
 		return retValue;
 	}
-	
+
 	public DsDef[] getDsDefs() 
 	{
 		List<DsDef> dsList = new ArrayList<DsDef>(dsMap.size());
@@ -209,7 +215,7 @@ public class ProbeDesc {
 		}
 		return (DsDef[]) dsList.toArray(new DsDef[dsList.size()]);
 	}
-	
+
 	public Collection<String> getDs() {
 		HashSet<String> dsList = new HashSet<String>(dsMap.size());
 		for(Map.Entry<String, DsDesc> e: dsMap.entrySet() ) {
@@ -218,7 +224,7 @@ public class ProbeDesc {
 		}
 		return dsList;
 	}
-	
+
 	public boolean dsExist(String dsName) {
 		DsDesc dd = dsMap.get(dsName);
 		return (dd !=null && dd.dsType != null);
@@ -242,8 +248,8 @@ public class ProbeDesc {
 	public void setProbeName(String probeName) {
 		this.probeName = probeName;
 	}
-	
-	
+
+
 	/**
 	 * @return the uptimefactor
 	 */
@@ -356,5 +362,36 @@ public class ProbeDesc {
 	 */
 	public void setHeartBeatDefault(long heartBeatDefault) {
 		this.heartBeatDefault = heartBeatDefault;
+	}
+
+	public Document dumpAsXml() throws ParserConfigurationException, IOException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		Document document = builder.newDocument();
+		Element root = 
+			(Element) document.createElement("ProbeDesc"); 
+		document.appendChild(root);
+		root.appendChild(document.createElement("name")).setTextContent(name);
+		if(probeName != null)
+			root.appendChild(document.createElement("probeName")).setTextContent(probeName);
+		root.appendChild(document.createElement("probeClass")).setTextContent(probeClass.getName());
+		for(Map.Entry<String, String> e: specific.entrySet()) {
+			Element specElement = (Element) root.appendChild(document.createElement("specific"));
+			specElement.setAttribute("name", e.getKey());
+			specElement.setTextContent(e.getValue());
+		}
+		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
+			Element dsElement = (Element) root.appendChild(document.createElement("ds"));
+			dsElement.appendChild(document.createElement("dsName")).setTextContent(e.getKey());
+			if(e.getValue().dsType != null)
+				dsElement.appendChild(document.createElement("dsType")).setTextContent(e.getValue().dsType.toString());
+			if(e.getValue().collectKey instanceof OID)
+				dsElement.appendChild(document.createElement("OID")).setTextContent(e.getValue().collectKey.toString());
+		}
+		Element graphsElement = (Element) root.appendChild(document.createElement("graphs"));
+		for(String graph: graphClasses) {
+			graphsElement.appendChild(document.createElement("name")).setTextContent(graph);
+		}
+		return document;
 	}
 }

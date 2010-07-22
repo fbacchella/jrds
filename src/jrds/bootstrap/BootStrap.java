@@ -24,6 +24,7 @@ public class BootStrap {
 		cmdClasses.put("wikidoc", "jrds.standalone.EnumerateWikiProbes");
 		cmdClasses.put("checkjar", "jrds.standalone.CheckJar");
 		cmdClasses.put("collect", "jrds.standalone.Collector");
+		cmdClasses.put("dosnmpprobe", "jrds.standalone.DoSnmpProbe");
 	}
 	
 	/**
