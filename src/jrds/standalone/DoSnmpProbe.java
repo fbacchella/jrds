@@ -33,6 +33,23 @@ public class DoSnmpProbe  extends CommandStarterImpl {
 		String name;
 		DsType type;
 	}
+	
+	static final Map<String, Method> argstomethod = new HashMap<String, Method>();
+	static final Map<String, Method> typeMapper = new HashMap<String, Method>();
+	static {
+		try {
+			argstomethod.put("name", ProbeDesc.class.getMethod("setName", String.class));
+			argstomethod.put("probename", ProbeDesc.class.getMethod("setProbeName", String.class));
+			argstomethod.put("uptimefactor", ProbeDesc.class.getMethod("setUptimefactor", float.class));
+			argstomethod.put("uniqindex", ProbeDesc.class.getMethod("setUniqIndex", boolean.class));
+
+			typeMapper.put("uptimefactor", Float.class.getMethod("valueOf", String.class));
+			typeMapper.put("uniqindex", Boolean.class.getMethod("valueOf", String.class));
+
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 
 	public void configure(Properties configuration) {
@@ -60,6 +77,8 @@ public class DoSnmpProbe  extends CommandStarterImpl {
 				String syntax = syntaxMatcher.group(1);
 				if("counter".matches(syntax.toLowerCase()))
 					info.type = DsType.COUNTER;
+				if("integer".matches(syntax.toLowerCase()))
+					info.type = DsType.GAUGE;
 			}
 			line = r.readLine();
 		}
@@ -99,11 +118,14 @@ public class DoSnmpProbe  extends CommandStarterImpl {
 					pd.add(info.name, info.type, info.oid);
 				}
 			}
-
 			else if(cmd.startsWith("--") ) {
-				String method = cmd.replace("--", "set");
-				Method m = ProbeDesc.class.getMethod(method, String.class);
-				m.invoke(pd, args[++i]);
+				String key = cmd.replace("--", "").toLowerCase();
+				Object arg = args[++i];
+				Method m = argstomethod.get(key);
+				Method parser = typeMapper.get(key);
+				if(parser != null)
+					arg = parser.invoke(null, arg);
+				m.invoke(pd, arg);
 			}
 		}
 		if( ! indexed)

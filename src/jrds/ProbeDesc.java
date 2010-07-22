@@ -375,11 +375,18 @@ public class ProbeDesc {
 		if(probeName != null)
 			root.appendChild(document.createElement("probeName")).setTextContent(probeName);
 		root.appendChild(document.createElement("probeClass")).setTextContent(probeClass.getName());
+		
+		//Setting specific values
 		for(Map.Entry<String, String> e: specific.entrySet()) {
 			Element specElement = (Element) root.appendChild(document.createElement("specific"));
 			specElement.setAttribute("name", e.getKey());
 			specElement.setTextContent(e.getValue());
 		}
+		//Setting the uptime factor
+		if(uptimefactor != 1.0)
+			root.appendChild(document.createElement("uptimefactor")).setTextContent(Float.toString(uptimefactor));
+
+		//Adding all the datastores
 		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
 			Element dsElement = (Element) root.appendChild(document.createElement("ds"));
 			dsElement.appendChild(document.createElement("dsName")).setTextContent(e.getKey());
