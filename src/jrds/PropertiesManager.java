@@ -210,7 +210,7 @@ public class PropertiesManager extends Properties {
 		File dir = new File(path);
 		return prepareDir(dir, autocreate);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public void importSystemProps() {
 		String localPropFile = System.getProperty("jrds.propertiesFile");
@@ -231,6 +231,8 @@ public class PropertiesManager extends Properties {
 
 	public void update()
 	{
+
+		Locale.setDefault(new Locale("POSIX"));
 
 		boolean nologging = parseBoolean(getProperty("nologging", "false"));
 		if(! nologging) {
@@ -311,7 +313,7 @@ public class PropertiesManager extends Properties {
 		extensionClassLoader = doClassLoader(getProperty("classpath", ""));
 
 		rrdbackend = getProperty("rrdbackend", "NIO");
-		
+
 		security = parseBoolean(getProperty("security", "false"));
 		if(security) {
 			userfile = getProperty("userfile", "users.properties");
@@ -323,8 +325,21 @@ public class PropertiesManager extends Properties {
 			defaultRoles = new HashSet<String>(defaultRolesArray.length);
 			defaultRoles.addAll(Arrays.asList(defaultRolesArray));
 		}
-		
-		Locale.setDefault(new Locale("POSIX"));
+
+		String preloadclasses = getProperty("preloadclasses", "");
+
+		for(String className: preloadclasses.split(":")) {
+			try {
+				if(className != null && ! "".equals(className))
+					preloadedClasses.add(Class.forName(className, true, extensionClassLoader));
+			} catch (Exception e) {
+				logger.error("Class not found:" + className, e);
+			}
+		}
+		preloadedClasses.add(jrds.snmp.MainStarter.class);
+		logger.debug("Preloaded classes: " + preloadedClasses);
+
+
 	}
 
 	public File configdir;
@@ -348,4 +363,5 @@ public class PropertiesManager extends Properties {
 	public String userfile = "/tmp/bidule";
 	public Set<String> defaultRoles = Collections.emptySet();
 	public String adminrole = "admin";
+	public Set<Class<?>> preloadedClasses = new HashSet<Class<?>>();
 }

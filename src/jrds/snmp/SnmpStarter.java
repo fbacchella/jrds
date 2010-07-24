@@ -27,7 +27,6 @@ import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.TcpAddress;
 import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.smi.VariableBinding;
-import org.snmp4j.transport.DefaultUdpTransportMapping;
 import org.snmp4j.util.DefaultPDUFactory;
 import org.snmp4j.util.PDUFactory;
 
@@ -51,34 +50,8 @@ public class SnmpStarter extends Starter {
 
 	static final private PDUFactory pdufactory = new DefaultPDUFactory(PDU.GET);
 
-	volatile static private Snmp snmp = null;
-	static public final Starter full = new Starter() {
-		public boolean start() {
-			boolean started = false;
-			try {
-				snmp = new Snmp(new DefaultUdpTransportMapping());
-				snmp.listen();
-				started = true;
-			} catch (IOException e) {
-				log(Level.ERROR, e, "SNMP UDP Transport Mapping not started: %s", e);
-				snmp = null;
-			}
-			return started;
-		}
-		public void stop() {
-			try {
-				snmp.close();
-			} catch (IOException e) {
-				log(Level.ERROR, e, "IO error while stop SNMP UDP Transport Mapping: %s", e);
-			}
-			snmp = null;
-		}
-
-		@Override
-		public String toString() {
-			return "SNMP root";
-		}
-	};
+	volatile static Snmp snmp = null;
+	static public final Starter full = new MainStarter();
 
 
 	private int version = SnmpConstants.version2c;
@@ -89,6 +62,22 @@ public class SnmpStarter extends Starter {
 	//A default value for the uptime OID, from the HOST-RESSOURCES MIB
 	private OID uptimeOid = hrSystemUptime;
 	private Target snmpTarget;
+
+	public SnmpStarter() {
+	}
+
+	public SnmpStarter(String community, String version) {
+		super();
+		setVersion(version);
+		this.community = community;
+	}
+
+	public SnmpStarter(String community, String version, String portStr) {
+		super();
+		setVersion(version);
+		this.community = community;
+		this.port = jrds.Util.parseStringNumber(portStr, 161);
+	}
 
 	@Override
 	public boolean start() {

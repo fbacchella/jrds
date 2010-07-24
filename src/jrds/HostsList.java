@@ -35,6 +35,7 @@ import jrds.probe.ContainerProbe;
 import jrds.probe.SumProbe;
 import jrds.probe.VirtualProbe;
 import jrds.starter.SocketFactory;
+import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 
 import org.apache.log4j.Logger;
@@ -95,6 +96,7 @@ public class HostsList extends StarterNode {
 	 *  
 	 */
 	public HostsList(PropertiesManager pm) {
+		super();
 		init();
 		configure(pm);
 	}
@@ -120,7 +122,6 @@ public class HostsList extends StarterNode {
 
 		addRoot(TAGSROOT);
 
-		jrds.snmp.SnmpStarter.full.register(this);
 		new SocketFactory().register(this);
 		sumhost.setParent(this);
 		customhost.setParent(this);
@@ -132,6 +133,18 @@ public class HostsList extends StarterNode {
 			jrds.JrdsLoggerConfiguration.configure(pm);
 		} catch (IOException e1) {
 			logger.error("Unable to set log file to " + pm.logfile);
+		}
+
+		for(Class<?> c: pm.preloadedClasses) {
+			try {
+				if(Starter.class.isAssignableFrom(c)) {
+					Class<Starter> sclass = (Class<Starter>) c;
+					Starter s = sclass.getConstructor().newInstance();
+					s.register(this);
+				}
+			} catch (Exception e) {
+				logger.error("Unable to register " + c.getName());
+			}
 		}
 
 		if(pm.security) {
@@ -225,6 +238,18 @@ public class HostsList extends StarterNode {
 			}
 			addVirtual(cp, customhost, CUSTOMROOT);
 		}
+
+		if(pm.security) {
+			for(Filter filter: f.values()) {
+				filter.addRole(pm.adminrole);
+			}
+			for(GraphNode gn: graphMap.values()) {
+				gn.addRole(pm.adminrole);
+				checkRoles(gn, gn.getTreePathByHost());
+				checkRoles(gn, gn.getTreePathByView());
+			}
+		}
+
 		started = true;
 	}
 
@@ -246,11 +271,9 @@ public class HostsList extends StarterNode {
 
 			path = currGraph.getTreePathByHost();
 			getGraphTreeByHost().addGraphByPath(path, currGraph);
-			checkRoles(currGraph, path);
 
 			path = currGraph.getTreePathByView();
 			getGraphTreeByView().addGraphByPath(path, currGraph);
-			checkRoles(currGraph, path);
 
 			graphMap.put(currGraph.hashCode(), currGraph);
 		}
@@ -278,9 +301,13 @@ public class HostsList extends StarterNode {
 			logger.debug("One collect is launched");
 			Date start = new Date();
 			try {
-				collectMutex.acquire();
+				if( ! collectMutex.tryAcquire(getTimeout(), TimeUnit.SECONDS)) {
+					logger.fatal("A collect failed because a start time out");
+					return;
+				}
 			} catch (InterruptedException e) {
-				throw new RuntimeException("Collect task failed to start", e);
+				logger.fatal("A collect start was interrupted");
+				return;
 			}
 			try {
 				final Object counter = new Object() {
@@ -342,8 +369,11 @@ public class HostsList extends StarterNode {
 						logger.info("Collect interrupted in last chance");
 					}
 					if(! emergencystop) {
+						//logger.info("Some probes are hanged");
+
+						//					if(! emergencystop) {
 						logger.info("Some task still alive, needs to be killed");
-						//Last chance to commit results
+						//						//Last chance to commit results
 						List<Runnable> timedOut = tpool.shutdownNow();
 						if(! timedOut.isEmpty()) {
 							logger.warn("Still " + timedOut.size() + " waiting probes: ");
@@ -357,6 +387,7 @@ public class HostsList extends StarterNode {
 				logger.error("problem while collecting data: ", e);
 			}
 			finally {
+				//StoreOpener.
 				collectMutex.release();				
 			}
 			Date end = new Date();
