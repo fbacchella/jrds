@@ -8,8 +8,10 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.MessageDigest;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
@@ -355,7 +357,7 @@ public class Util {
 		}
 		return defaultVal;
 	}
-	
+
 	public static <NumberClass extends Number> NumberClass parseStringNumber(String toParse, Class<NumberClass> nc, NumberClass defaultVal) {
 		if(toParse == null || "".equals(toParse))
 			return defaultVal;
@@ -531,13 +533,25 @@ public class Util {
 	}
 
 	static	public boolean rolesAllowed(Set<String> allowedRoles, Set<String> userRoles) {
-		if(allowedRoles.size() == 0)
-			return true;
-		for(String role: userRoles) {
-			if(allowedRoles.contains(role))
-				return true;
+		return ! Collections.disjoint(allowedRoles, userRoles);
+	}
+
+	static public Object callMethod(Class<?>clazz, Object instance, String method, Object[] args) {
+		Class<?> types[] = new Class<?>[args.length];
+		for(int i = 0; i < args.length; i++) {
+			types[i] = args[i].getClass();
 		}
-		return false;
+		return callMethod(clazz, instance, method, types, args);
+	}
+	
+	static public Object callMethod(Class<?>clazz, Object instance, String method, Class<?>[] types, Object[] args) {
+		try {
+			Method m = clazz.getMethod(method, types);
+			return m.invoke(instance, args);
+		} catch (Exception e) {
+			new RuntimeException("method call", e.getCause() != null ? e.getCause() : e);
+		}
+		return null;
 	}
 
 }
