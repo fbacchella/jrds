@@ -4,21 +4,17 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import jrds.JrdsLoggerConfiguration;
 import jrds.probe.snmp.SnmpProbe;
 import jrds.starter.Resolver;
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 
 import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.Target;
 import org.snmp4j.event.ResponseEvent;
-import org.snmp4j.log.Log4jLogFactory;
 import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.smi.Address;
 import org.snmp4j.smi.GenericAddress;
@@ -31,28 +27,12 @@ import org.snmp4j.util.DefaultPDUFactory;
 import org.snmp4j.util.PDUFactory;
 
 public class SnmpStarter extends Starter {
-	//Used to setup the log configuration of SNMP4J
-	static {
-		org.snmp4j.log.LogFactory.setLogFactory(new Log4jLogFactory());
-		//If not already configured, we filter it
-		Logger snmpLogger = LogManager.getLoggerRepository().exists("org.snmp4j");
-		if(snmpLogger == null) {
-			snmpLogger = Logger.getLogger("org.snmp4j");
-			snmpLogger.setLevel(Level.ERROR);
-		}
-		JrdsLoggerConfiguration.joinAppender("org.snmp4j");
-	}
-
 	static final String TCP = "tcp";
 	static final String UDP = "udp";
 	static final private OID hrSystemUptime = new OID(".1.3.6.1.2.1.25.1.1.0");
 	static final private OID sysUpTimeInstance = new OID(".1.3.6.1.2.1.1.3.0");
 
 	static final private PDUFactory pdufactory = new DefaultPDUFactory(PDU.GET);
-
-	volatile static Snmp snmp = null;
-	static public final Starter full = new MainStarter();
-
 
 	private int version = SnmpConstants.version2c;
 	private String proto = UDP;
@@ -84,7 +64,7 @@ public class SnmpStarter extends Starter {
 		boolean started = false;
 		Resolver resolver = getLevel().find(Resolver.class);
 
-		if(full.isStarted() && resolver.isStarted()) {
+		if(getLevel().find(MainStarter.class).isStarted() && resolver.isStarted()) {
 			snmpTarget = makeTarget();
 			if(snmpTarget != null) {
 				started = readUpTime();
@@ -98,16 +78,15 @@ public class SnmpStarter extends Starter {
 		upTimesOids.add(uptimeOid);
 		//Fallback uptime OID, it should be always defined, from SNMPv2-MIB
 		upTimesOids.add(sysUpTimeInstance);
-		Resolver resolver = getLevel().find(Resolver.class);
 
 		try {
 			for(OID uptimeoid: upTimesOids) {
-				if(! full.isStarted() || !resolver.isStarted() ) {
-					return false;
-				}
 				PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
 				requestPDU.addOID(new VariableBinding(uptimeoid));
+				Snmp snmp = getSnmp();
 				ResponseEvent re = snmp.send(requestPDU, snmpTarget);
+				if(re == null)
+					throw new IOException("SNMP Timeout");
 				PDU response = re.getResponse();
 				if(response == null || re.getError() != null ) {
 					Exception snmpException = re.getError();
@@ -239,8 +218,7 @@ public class SnmpStarter extends Starter {
 
 	public Snmp getSnmp() {
 		Snmp retValue = null;
-		if(isStarted())
-			retValue = snmp;
+		retValue = getLevel().find(MainStarter.class).snmp;
 		return retValue;
 	}
 
@@ -265,6 +243,6 @@ public class SnmpStarter extends Starter {
 	 */
 	@Override
 	public boolean isStarted() {
-		return super.isStarted() && full.isStarted()  && getLevel().find(Resolver.class).isStarted();
+		return super.isStarted() && getLevel().find(MainStarter.class).isStarted()  && getLevel().find(Resolver.class).isStarted();
 	}
 }
