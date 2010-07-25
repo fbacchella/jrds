@@ -1,10 +1,12 @@
 package jrds.starter;
 
 import jrds.HostsList;
+import jrds.PropertiesManager;
 import jrds.RdsHost;
 import jrds.Tools;
 import jrds.mockobjects.SnmpAgent;
 import jrds.probe.snmp.RdsSnmpSimple;
+import jrds.snmp.MainStarter;
 import jrds.snmp.SnmpStarter;
 
 import org.apache.log4j.Level;
@@ -22,12 +24,12 @@ public class TestSnmpStarter {
 		Tools.configure();
 
 		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"org.snmp4j.agent.request.SnmpRequest", "org.snmp4j", "jrds.snmp", "jrds.Starter", "jrds.starter", "jrds.mockobjects"}, logger.getLevel());
+		Tools.setLevel(new String[] {"org.hostslist", "org.snmp4j.agent.request.SnmpRequest", "org.snmp4j", "jrds.snmp", "jrds.Starter.SnmpStarter", "jrds.starter", "jrds.mockobjects"}, logger.getLevel());
 		agent = new SnmpAgent();
 	}
 	
 	private HostsList registerHost(RdsHost h, RdsSnmpSimple probe) {
-		HostsList hl = new HostsList() {
+		HostsList hl = new HostsList(new PropertiesManager()) {
 			@Override
 			public boolean isCollectRunning() {
 				return true;
