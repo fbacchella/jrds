@@ -36,6 +36,8 @@ public class ProbeDescBuilder extends ObjectBuilder {
 			throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
 		} catch (ClassNotFoundException e) {
 			throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
+		} catch (NoClassDefFoundError e) {
+			throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
 		}
 	}
 
@@ -115,21 +117,21 @@ public class ProbeDescBuilder extends ObjectBuilder {
 				String element = dsContent.getNodeName();
 				String textValue = dsContent.getTextContent().trim();
 				Object value = textValue;
-				if("collect".equals(element)) {
-					element ="collectKey";
+				if( element.startsWith("collect")) {
 					if("".equals(value))
 						value = null;
 				}
-				if("dsType".equals(element)) {
+				else if("dsType".equals(element)) {
 					if( !"NONE".equals(textValue.toUpperCase()))
 						value = DsType.valueOf(textValue.toUpperCase());
 					else
 						value = null;
 				}
-				else if("oid".equals(element)) {
+				else if(element.startsWith("oid")) {
 					value = new OID(textValue);
-					element ="collectKey";
+					element = element.replace("oid", "collect");
 				}
+
 				dsMap.put(element, value);
 			}
 			pd.add(dsMap);

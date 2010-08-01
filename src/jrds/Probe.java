@@ -409,13 +409,33 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 	}
 
 	/**
+	 * This method take two unsigned 32 integers and return a signed 64 bits long
+	 * The input value me be stored in a Long object
+	 * @param high high bits of the value
+	 * @param low low bits of the value
+	 * @return
+	 */
+	private Long joinCounter32(ValueType high, ValueType low) {
+		if(high instanceof Long && low instanceof Long) {
+			long highnum = ((Number) high).longValue();
+			long lownum = ((Number) low).longValue();
+			return (highnum << 32) + lownum;
+		}
+		return null;
+	}
+
+	/**
 	 * The sample itself can be modified<br>
-	 * The defautl function does nothing
+	 * The default function does nothing
 	 * @param oneSample
 	 * @param values
 	 */
 	public void modifySample(Sample oneSample, Map<KeyType, ValueType> values) {
-
+		for(Map.Entry<String, ProbeDesc.Joined> e: getPd().getHighlowcollectmap().entrySet()) {
+			Long joined = joinCounter32(values.get(e.getValue().keyhigh), values.get(e.getValue().keylow));
+			if(joined != null)
+				oneSample.setValue(e.getKey(), joined.doubleValue());
+		}
 	}
 
 	@SuppressWarnings("unchecked")

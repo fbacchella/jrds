@@ -138,6 +138,24 @@ public class ProbeDesc {
 		dsMap.put(name, new DsDesc(null, heartBeatDefault, MINDEFAULT, MAXDEFAULT, index));
 	}
 
+	public class Joined {
+		Object keyhigh;
+		Object keylow;
+		Joined(Object keyhigh, Object keylow) {
+			this.keyhigh = keyhigh;
+			this.keylow = keylow;
+		}
+	}
+	
+	Map<String, Joined> highlowcollectmap = new HashMap<String, Joined>();
+		
+	/**
+	 * @return the highlowcollectmap
+	 */
+	public Map<String, Joined> getHighlowcollectmap() {
+		return highlowcollectmap;
+	}
+
 	public void add(Map<String, Object> valuesMap)
 	{
 		long heartbeat = heartBeatDefault;
@@ -152,8 +170,15 @@ public class ProbeDesc {
 		if(valuesMap.containsKey("dsType")) {
 			type = (DsType) valuesMap.get("dsType");
 		}
-		if(valuesMap.containsKey("collectKey")) {
-			collectKey = valuesMap.get("collectKey");
+		if(valuesMap.containsKey("collect")) {
+			collectKey = valuesMap.get("collect");
+		}
+		else if(valuesMap.containsKey("collecthigh") && valuesMap.containsKey("collectlow")) {
+			Object keyHigh = valuesMap.get("collecthigh");
+			Object keyLow = valuesMap.get("collectlow");
+			dsMap.put(name + "high", new DsDesc(null, heartbeat, min, max, keyHigh));
+			dsMap.put(name + "low", new DsDesc(null, heartbeat, min, max, keyLow));
+			highlowcollectmap.put(name, new Joined(keyHigh, keyLow));
 		}
 		else {
 			collectKey = name;
@@ -394,6 +419,8 @@ public class ProbeDesc {
 				dsElement.appendChild(document.createElement("dsType")).setTextContent(e.getValue().dsType.toString());
 			if(e.getValue().collectKey instanceof OID)
 				dsElement.appendChild(document.createElement("OID")).setTextContent(e.getValue().collectKey.toString());
+			if(e.getValue().collectKey instanceof String)
+				dsElement.appendChild(document.createElement("collect")).setTextContent(e.getValue().collectKey.toString());
 		}
 		Element graphsElement = (Element) root.appendChild(document.createElement("graphs"));
 		for(String graph: graphClasses) {
