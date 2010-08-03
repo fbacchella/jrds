@@ -17,15 +17,15 @@ public class MokeProbe<A,B> extends Probe<A,B> {
 
 	Class<? extends Probe<?,?>> originalProbe;
 	String probeType = "DummyProbe";
-	ProbeDesc pd = null;
 	List<?> args;
+	Map<A, B> values = Collections.emptyMap();
 	
 	public MokeProbe(String probeType) {
 		this.probeType = probeType;
 	}
 
 	public MokeProbe(ProbeDesc pd) {
-		this.pd = pd;
+		setPd(pd);
 	}
 
 	public MokeProbe() {
@@ -38,8 +38,9 @@ public class MokeProbe<A,B> extends Probe<A,B> {
 	}
 
 	public void configure() {
+		ProbeDesc pd = getPd();
 		if(pd == null) {
-			ProbeDesc pd = new ProbeDesc();
+			pd = new ProbeDesc();
 			pd.setName(probeType);
 			pd.setProbeName("dummyprobe");
 			setPd(pd);
@@ -57,7 +58,10 @@ public class MokeProbe<A,B> extends Probe<A,B> {
 			dsMap.put("dsName", "ds2");
 			dsMap.put("dsType", DsType.COUNTER);
 			pd.add(dsMap);
+			setPd(pd);
 		}
+		if(pd.getProbeClass() == null)
+			pd.setProbeClass((Class<? extends Probe<?,?>>) this.getClass());
 		if(getHost() == null) {
 			RdsHost host = new RdsHost();
 			host.setName("DummyHost");
@@ -65,10 +69,16 @@ public class MokeProbe<A,B> extends Probe<A,B> {
 			setHost(host);
 		}
 	}
+	
+	public void injectValues(Map<A, B> values) {
+		this.values = values;
+	}
 
 	@Override
 	public Map<A, B> getNewSampleValues() {
-		return Collections.emptyMap();
+		Map<A, B> retValues = values;
+		values = Collections.emptyMap();
+		return retValues;
 	}
 
 	@Override
