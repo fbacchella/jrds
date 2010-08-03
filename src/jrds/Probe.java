@@ -514,6 +514,9 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 				if( isCollectRunning()) {
 					rrdDb = StoreOpener.getRrd(getRrdName());
 					Sample onesample = rrdDb.createSample();
+					for(Map.Entry<String, Double> e: getPd().getDefaultValues().entrySet()) {
+						onesample.setValue(e.getKey(), e.getValue());
+					}
 					updateSample(onesample);
 					//The collect might have been stopped
 					//during the reading of samples

@@ -51,6 +51,7 @@ public class ProbeDesc {
 	private List<Object> defaultsArgs = null;
 	private float uptimefactor = (float) 1.0;
 	private Map<String, String> properties = null;
+	private Map<String, Double> defaultValues = new HashMap<String,Double>(0);
 
 	private final class DsDesc {
 		public DsType dsType;
@@ -182,6 +183,9 @@ public class ProbeDesc {
 		}
 		else {
 			collectKey = name;
+		}
+		if(valuesMap.containsKey("defaultValue")) {
+			defaultValues.put(name, jrds.Util.parseStringNumber(valuesMap.get("defaultValue").toString(), Double.NaN));
 		}
 		dsMap.put(name, new DsDesc(type, heartbeat, min, max, collectKey));
 	}
@@ -387,6 +391,13 @@ public class ProbeDesc {
 	 */
 	public void setHeartBeatDefault(long heartBeatDefault) {
 		this.heartBeatDefault = heartBeatDefault;
+	}
+
+	/**
+	 * @return the defaultValues
+	 */
+	public Map<String, Double> getDefaultValues() {
+		return defaultValues;
 	}
 
 	public Document dumpAsXml() throws ParserConfigurationException, IOException {

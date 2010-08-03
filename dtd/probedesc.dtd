@@ -4,7 +4,7 @@
 			name CDATA #REQUIRED
 >
 <!ELEMENT specific (#PCDATA)>
-<!ELEMENT ds (dsName, dsType?, (oid | (oidhigh, oidlow) | collect | (collecthigh, collectlow) )?, minValue?, maxValue?)>
+<!ELEMENT ds (dsName, dsType?, (oid | (oidhigh, oidlow) | collect | (collecthigh, collectlow) )?, minValue?, maxValue?, defaultValue?)>
 <!ELEMENT defaultargs (arg | list)+ >
 <!ELEMENT arg EMPTY>
 <!ATTLIST arg
@@ -24,6 +24,7 @@
 <!ELEMENT collectlow (#PCDATA)>
 <!ELEMENT minValue (#PCDATA)>
 <!ELEMENT maxValue (#PCDATA)>
+<!ELEMENT defaultValue (#PCDATA)>
 <!ELEMENT uptimefactor (#PCDATA)>
 <!ELEMENT index (#PCDATA)>
 <!ELEMENT uniq (#PCDATA)>
