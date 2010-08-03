@@ -39,6 +39,12 @@
 	</add>
 	<add>
 		<name>status.503</name>
+	</add>
+	<add>
+		<name>status.500</name>
+	</add>
+	<add>
+		<rpn>status.500, status.503, +</rpn>
 		<graphType>line</graphType>
 		<legend>Service Unavailable</legend>
 	</add>

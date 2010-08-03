@@ -24,7 +24,13 @@
 		<name>svctime.503</name>
 	</add>
 	<add>
-		<rpn>svctime.503, status.503, /</rpn>
+		<name>status.500</name>
+	</add>
+	<add>
+		<name>svctime.500</name>
+	</add>
+	<add>
+		<rpn>svctime.503,svctime.500, +, status.503, status.500, +, /</rpn>
 		<graphType>line</graphType>
 		<legend>Service Unavailable</legend>
 	</add>
