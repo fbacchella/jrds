@@ -553,6 +553,22 @@ public class Util {
 		}
 		return null;
 	}
+	
+	
+	/**
+	 * A wrapper method to delay evaluation of log4j arguments
+	 * @param format
+	 * @param args
+	 * @return
+	 */
+	static public Object delayedFormatString(final String format, final Object ...args) {
+		return new Object() {
+			@Override
+			public String toString() {
+				return String.format(format, args);
+			}
+		};
+	}
 
 }
 
