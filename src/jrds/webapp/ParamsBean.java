@@ -12,6 +12,7 @@ import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +40,7 @@ import org.apache.log4j.Logger;
  * @version $Revision: 217 $ $Date$
  */
 public class ParamsBean implements Serializable {
+
 	static final private Logger logger = Logger.getLogger(ParamsBean.class);
 
 	static private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -58,18 +60,61 @@ public class ParamsBean implements Serializable {
 	HostsList root;
 	String user = null;
 	Set<String> roles = Collections.emptySet();
+	Map<String, String[]> params  = Collections.emptyMap();
 
 	public ParamsBean(){
 
 	}
 
 	public ParamsBean(HttpServletRequest req, HostsList hl) {
+		params =  getReqParamsMap(req);
 		parseReq(req, hl);
+	}
+
+	public ParamsBean(HttpServletRequest req, HostsList hl, String... restPath ) {
+		String probeInfo = req.getPathInfo();
+		if (probeInfo != null) {
+			params = new HashMap<String, String[]>(restPath.length);
+			String[] path = probeInfo.trim().split("/");
+			logger.trace(jrds.Util.delayedFormatString("mapping %s to %s", Arrays.asList(path), Arrays.asList(restPath)));
+			int elem = Math.min(path.length -1 , restPath.length);
+			for(int i=0; i < elem; i++) {
+				String value = path[i + 1];
+				String key = restPath[i].toLowerCase();
+				params.put(key, new String[] {value});
+			}
+			params.putAll(getReqParamsMap(req));
+		}
+		else {
+			params =  getReqParamsMap(req);
+		}
+		if(logger.isTraceEnabled()) {
+			logger.trace("params map:");
+			for(String key: params.keySet()) {
+				String[] value = params.get(key);
+				if(value != null)
+					logger.trace(key + ": " + Arrays.asList(value));
+			}
+		}
+		parseReq(req, hl);
+	}
+
+	@SuppressWarnings("unchecked")
+	//Not a really useful method, just to reduce warning
+	private Map<String, String[]> getReqParamsMap(HttpServletRequest req) {
+		return req.getParameterMap();
+	}
+
+	public String getValue(String key) {
+		String[] values = params.get(key);
+		if(values != null && values.length > 0)
+			return values[0];
+		return null;
 	}
 
 	public void parseReq(HttpServletRequest req, HostsList hl) {
 		root =	hl;
-		
+
 		user = req.getRemoteUser();
 		if(user != null) {
 			roles = new HashSet<String>();
@@ -78,34 +123,43 @@ public class ParamsBean implements Serializable {
 					roles.add(role);
 			}
 		}
+		logger.trace("Found user "  + user + " with roles " + roles);
 
 		contextPath = req.getContextPath();
 		period = makePeriod(req);
 		logger.trace("period from parameters: " + period);
-		gid = jrds.Util.parseStringNumber(req.getParameter("gid"), Integer.class, 0).intValue();
-		id = jrds.Util.parseStringNumber(req.getParameter("id"), Integer.class, 0).intValue();
-		pid = jrds.Util.parseStringNumber(req.getParameter("pid"), Integer.class, 0).intValue();
-		dsName =  req.getParameter("dsName");
+		gid = jrds.Util.parseStringNumber(getValue("gid"), Integer.class, 0);
+		id = jrds.Util.parseStringNumber(getValue("id"), Integer.class, 0);
+
+		String pidStr = getValue("pid");
+		String host = getValue("host");
+		String probe = getValue("probe");
+		if(pidStr != null)
+			pid = jrds.Util.parseStringNumber(pidStr, Integer.class, 0);
+		else if(host != null && ! "".equals(host) && probe != null && ! "".equals(probe) )
+			pid = (host + "/" + probe).hashCode();
+
+		dsName =  getValue("dsName");
 		if("".equals(dsName))
 			dsName = null;
-		
-		String sortArg = req.getParameter("sort");
+
+		String sortArg = getValue("sort");
 		if(sortArg != null && "true".equals(sortArg.toLowerCase()))
 			sorted = true;
-		String historyArg = req.getParameter("history");
+		String historyArg = getValue("history");
 		if("1".equals(historyArg))
 			history = true;
-		
+
 		//max and min should only go together
 		//it's up to the gui (aka js code) to manage default value
-		String minStr = req.getParameter("min");
-		String maxStr = req.getParameter("max");
+		String minStr = getValue("min");
+		String maxStr = getValue("max");
 		if(minStr != null && maxStr != null && ! "".equals(minStr) && ! "".equals(maxStr)) {
 			maxArg = maxStr;
 			minArg = minStr;
 		}
-		String paramFilterName = req.getParameter("filter");
-		String paramHostFilter = req.getParameter("host");
+		String paramFilterName = getValue("filter");
+		String paramHostFilter = getValue("host");
 		if(paramFilterName != null && ! "".equals(paramFilterName)) {
 			f = root.getFilter(paramFilterName);
 		}

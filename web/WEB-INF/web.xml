@@ -73,6 +73,13 @@
   	<servlet-class>
   	jrds.webapp.JSonQueryParams</servlet-class>
   </servlet>
+  <servlet>
+  	<servlet-name>Cmd</servlet-name>
+  	<display-name>Cmd</display-name>
+  	<description></description>
+  	<servlet-class>
+  	jrds.webapp.Cmd</servlet-class>
+  </servlet>
   <servlet-mapping>
     <servlet-name>CheckValues</servlet-name>
     <url-pattern>/values/*</url-pattern>
@@ -124,5 +131,9 @@
   <servlet-mapping>
   	<servlet-name>JSonQueryParams</servlet-name>
   	<url-pattern>/queryparams</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>Cmd</servlet-name>
+  	<url-pattern>/cmd/*</url-pattern>
   </servlet-mapping>
 </web-app>
