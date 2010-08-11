@@ -10,17 +10,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import jrds.GraphNode;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.graphe.Sum;
+import jrds.webapp.ACL;
+import jrds.webapp.WithACL;
 
 import org.apache.log4j.Level;
 
-public class SumProbe extends VirtualProbe {
+public class SumProbe extends VirtualProbe implements WithACL {
 
 	static final ProbeDesc pd = new ProbeDesc(0) {
 		@Override
@@ -36,8 +36,8 @@ public class SumProbe extends VirtualProbe {
 		}	
 	};
 
-	Collection<String> graphList;
-	Set<String> roles = new HashSet<String>();
+	private Collection<String> graphList;
+	private ACL acl = ACL.AllowedACL;
 
 	//An array list is needed, the introspection is picky
 	public SumProbe(String name, ArrayList<String> graphList) {
@@ -61,7 +61,6 @@ public class SumProbe extends VirtualProbe {
 	public Collection<GraphNode> getGraphList() {
 		log(Level.DEBUG, "Returning a sum graphnode");
 		Sum s = new Sum(this);
-		s.addRoles(roles);
 		return Collections.singleton((GraphNode)s);
 	}
 
@@ -70,15 +69,13 @@ public class SumProbe extends VirtualProbe {
 		return new Date();
 	}
 	
-	public void addRole(String role) {
-		roles.add(role);
+	public void addACL(ACL acl) {
+		this.acl = this.acl.join(acl);
+		
 	}
 
-	/**
-	 * @return the roles
-	 */
-	public Set<String> getRoles() {
-		return roles;
+	public ACL getACL() {
+		return acl;
 	}
 	
 }
