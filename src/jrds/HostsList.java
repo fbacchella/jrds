@@ -151,13 +151,6 @@ public class HostsList extends StarterNode {
 				logger.error("Unable to register " + c.getName());
 			}
 		}
-
-		if(pm.security) {
-			defaultRoles = pm.defaultRoles;
-			roles.addAll(defaultRoles);
-			roles.add(pm.adminrole);
-		}
-
 		if(pm.rrddir == null) {
 			logger.error("Probes directory not configured, can't configure");
 			return;
@@ -201,7 +194,6 @@ public class HostsList extends StarterNode {
 
 		logger.debug("Starting parsing descriptions");
 		ConfigObjectFactory conf = new ConfigObjectFactory(pm, pm.extensionClassLoader);
-
 		conf.setGraphDescMap(l.getRepository(Loader.ConfigType.GRAPHDESC));
 		conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
 		conf.setMacroMap(l.getRepository(Loader.ConfigType.MACRODEF));
@@ -222,6 +214,11 @@ public class HostsList extends StarterNode {
 		for(String tag: hostsTags) {
 			Filter f = new FilterTag(tag);
 			filters.put(f.getName(), f);
+		}
+
+		//Configure the default ACL of all automatic filters
+		for(Filter filter: filters.values()) {
+			filter.addACL(pm.defaultACL);
 		}
 
 		Map <String, Filter> f = conf.setFilterMap(l.getRepository(Loader.ConfigType.FILTER));
@@ -247,8 +244,9 @@ public class HostsList extends StarterNode {
 
 		if(pm.security) {
 			for(GraphNode gn: graphMap.values()) {
-				checkRoles(gn, gn.getTreePathByHost());
-				checkRoles(gn, gn.getTreePathByView());
+				gn.addACL(pm.defaultACL);
+				checkRoles(gn, HOSTROOT, gn.getTreePathByHost());
+				checkRoles(gn, VIEWROOT, gn.getTreePathByView());
 			}
 		}
 
@@ -286,13 +284,14 @@ public class HostsList extends StarterNode {
 	 * @param gn
 	 * @param pathList
 	 */
-	private void checkRoles(GraphNode gn, List<String> pathList) {
-		StringBuilder path = new StringBuilder();
+	private void checkRoles(GraphNode gn, String root, List<String> pathList) {
+		StringBuilder path = new StringBuilder("/" + root);
 		for(String pathElem: pathList) {
 			path.append("/").append(pathElem);
 		}
 		for(Filter f: filters.values()) {
 			if(f.acceptGraph(gn, path.toString())) {
+				logger.trace(jrds.Util.delayedFormatString("Adding ACL %s to %s", f.getACL(), gn));
 				gn.addACL(f.getACL());
 			}
 		}
@@ -477,7 +476,7 @@ public class HostsList extends StarterNode {
 		if(acl instanceof RolesACL) {
 			roles.addAll(((RolesACL) acl).getRoles());
 		}
-		logger.debug("Filter " + newFilter.getName() + " added");
+		logger.debug(jrds.Util.delayedFormatString("Filter %s added with ACL %s", newFilter.getName(), newFilter.getACL()));
 	}
 
 	public Filter getFilter(String name) {

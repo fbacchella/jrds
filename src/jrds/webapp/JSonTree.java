@@ -103,10 +103,10 @@ public class JSonTree extends JSonData {
 
 		for(Map.Entry<String, GraphNode> leaf: gt.getGraphsSet().entrySet()) {
 			GraphNode child = leaf.getValue();
+			if(getPropertiesManager().security &&  ! child.getACL().check(params))
+				continue;
 			String leafName = leaf.getKey();
 			if(f.acceptGraph(child, gt.getPath() + "/" + child.getName())) {
-				if(getPropertiesManager().security &&  ! f.getACL().check(params))
-					continue;
 				hasChild = true;
 				String graphid = base + "." + child.hashCode();
 				childsref.add(graphid );

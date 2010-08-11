@@ -51,6 +51,8 @@ public class JSonGraph extends JSonData {
 		if( ! graphs.isEmpty()) {
 			Renderer r = root.getRenderer();
 			for(GraphNode gn: graphs) {
+				if(! gn.getACL().check(params))
+					continue;
 				if(params.isHistory()) {
 					for(int p: periodHistory) {
 						params.setScale(p);
@@ -73,8 +75,7 @@ public class JSonGraph extends JSonData {
 		if(node != null) {
 			logger.debug("Tree found: " + node);
 			Filter filter = params.getFilter();
-			if(filter.getACL().check(params))
-				return node.enumerateChildsGraph(filter);
+			return node.enumerateChildsGraph(filter);
 		}
 		else if(params.getPid() != 0 && dsName != null) {
 			if(! allowed(params, root.getDefaultRoles()))
@@ -97,11 +98,12 @@ public class JSonGraph extends JSonData {
 			gd.initializeLimits(g2d);
 
 			GraphNode gn = new GraphNode(p, gd);
+			gn.addACL(getConfig().getPropertiesManager().defaultACL);
 			return Collections.singletonList(gn);
 		}
 		else {
 			GraphNode gn = root.getGraphById(id);
-			if(gn != null && gn.getACL().check(params))
+			if(gn != null)
 				return Collections.singletonList(gn);
 		}
 

@@ -5,30 +5,36 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import jrds.webapp.ACL;
+import jrds.webapp.WithACL;
+
 import org.apache.log4j.Logger;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
 
-public class Graph {
+public class Graph implements WithACL {
 	static final private Logger logger = Logger.getLogger(Graph.class);
 
 	static final private SimpleDateFormat lastUpdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	static private final SimpleDateFormat exportDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-	GraphNode node;
-	Date start;
-	Date end;
-	double max = Double.NaN;
-	double min = Double.NaN;
+	private GraphNode node;
+	private Date start;
+	private Date end;
+	private double max = Double.NaN;
+	private double min = Double.NaN;
+	private ACL acl = ACL.AllowedACL;
 
 	public Graph(GraphNode node) {
 		super();
 		this.node = node;
+		addACL(node.getACL());
 	}
 
 	public Graph(GraphNode node, Date begin, Date start) {
 		this.node = node;
+		addACL(node.getACL());
 		setStart(start);
 		setEnd(end);
 	}
@@ -260,5 +266,13 @@ public class Graph {
 		logger.trace("Period for graph:" + p);
 		setStart(p.getBegin());
 		setEnd(p.getEnd());
+	}
+
+	public void addACL(ACL acl) {
+		this.acl = this.acl.join(acl);
+	}
+
+	public ACL getACL() {
+		return acl;
 	}
 }

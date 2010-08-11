@@ -1,23 +1,24 @@
 package jrds.webapp;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 public class RolesACL extends ACL {
 	static final private Logger logger = Logger.getLogger(ACL.class.getName() + ".RolesACL");
 
-	List<String> roles;
+	Set<String> roles;
 	
 	/**
 	 * @return the roles
 	 */
-	public List<String> getRoles() {
+	public Set<String> getRoles() {
 		return roles;
 	}
 
-	public RolesACL(List<String> roles) {
+	public RolesACL(Set<String> roles) {
 		super();
 		this.roles = roles;
 	}
@@ -35,9 +36,26 @@ public class RolesACL extends ACL {
 	@Override
 	public ACL join(ACL acl) {
 		if(acl instanceof RolesACL) {
-			roles.addAll(((RolesACL) acl).getRoles());
+			Set<String> newRoles = new HashSet<String>(roles);
+			newRoles.addAll(((RolesACL) acl).getRoles());
+			return new RolesACL(newRoles);
 		}
-		return this;
+		else if(acl instanceof AdminACL) {
+			Set<String> newRoles = new HashSet<String>(roles);
+			newRoles.add(((AdminACL)acl).getAdminRole());
+			return new RolesACL(newRoles);
+		}
+		else {
+			return this;
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "roles " + roles;
 	}
 	
 }

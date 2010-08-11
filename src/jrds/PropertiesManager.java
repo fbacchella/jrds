@@ -22,6 +22,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jrds.webapp.ACL;
+import jrds.webapp.RolesACL;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -319,11 +322,17 @@ public class PropertiesManager extends Properties {
 			userfile = getProperty("userfile", "users.properties");
 
 			adminrole = getProperty("adminrole", adminrole);
-
-			String  defaultRolesString = getProperty("defaultroles", adminrole);
-			String[] defaultRolesArray = defaultRolesString.split(",");
+			adminACL = new ACL.AdminACL(adminrole);
+			
+			String  defaultRolesString = getProperty("defaultroles", "ANONYMOUS");
+			String[] defaultRolesArray = defaultRolesString.split(" ?, ?");
 			defaultRoles = new HashSet<String>(defaultRolesArray.length);
 			defaultRoles.addAll(Arrays.asList(defaultRolesArray));
+			defaultACL = new RolesACL(defaultRoles);
+			defaultACL = defaultACL.join(adminACL);
+			
+			logger.debug(jrds.Util.delayedFormatString("Admin ACL is %s", adminACL));
+			logger.debug(jrds.Util.delayedFormatString("Default ACL is %s", defaultACL));
 		}
 
 		String preloadclasses = getProperty("preloadclasses", "");
@@ -363,5 +372,7 @@ public class PropertiesManager extends Properties {
 	public String userfile = "/tmp/bidule";
 	public Set<String> defaultRoles = Collections.emptySet();
 	public String adminrole = "admin";
+	public ACL defaultACL = ACL.AllowedACL;
+	public ACL adminACL = ACL.AllowedACL;
 	public Set<Class<?>> preloadedClasses = new HashSet<Class<?>>();
 }

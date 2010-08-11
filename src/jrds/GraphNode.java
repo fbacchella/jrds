@@ -150,7 +150,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
 	}
 	
 	public void addACL(ACL acl) {
-		this.acl = acl.join(acl);
+		this.acl = this.acl.join(acl);
 	}
 
 	public ACL getACL() {

@@ -39,7 +39,8 @@ public final class Graph extends JrdsServlet {
 			jrds.Graph graph = p.getGraph();
 
 			if(getPropertiesManager().security) {				
-				boolean allowed = graph.getNode().getACL().check(p);
+				boolean allowed = graph.getACL().check(p);
+				logger.trace(jrds.Util.delayedFormatString("Looking if ACL %s allow access to %s", graph.getACL(), this));
 				if(! allowed) {
 					res.setStatus(HttpServletResponse.SC_FORBIDDEN);
 					return;

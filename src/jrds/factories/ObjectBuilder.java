@@ -3,6 +3,7 @@ package jrds.factories;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ public abstract class ObjectBuilder {
 	static final private Logger logger = Logger.getLogger(ObjectBuilder.class);
 
 	public enum properties {
-		MACRO, GRAPHDESC, PROBEDESC, PROBEFACTORY, GRAPHFACTORY, LOADER, CLASSLOADER, PM;
+		MACRO, GRAPHDESC, PROBEDESC, PROBEFACTORY, GRAPHFACTORY, LOADER, CLASSLOADER, PM, DEFAULTROLE;
 	}
 
 	PropertiesManager pm;
@@ -72,9 +73,12 @@ public abstract class ObjectBuilder {
 				}
 			}
 			);
-			if(roles.size() > 0) {
-				roles.add(pm.adminrole);
-				object.addACL(new RolesACL(roles));
+			if(roles.size() > 0) {				
+				object.addACL(new RolesACL(new HashSet<String>(roles)));
+				object.addACL(pm.adminACL);
+			}
+			else {
+				object.addACL(pm.defaultACL);
 			}
 		}
 	}

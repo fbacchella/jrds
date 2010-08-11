@@ -91,7 +91,7 @@ public abstract class Filter implements WithACL {
 	 * @see jrds.webapp.WithACL#addACL()
 	 */
 	public void addACL(ACL acl) {
-		this.acl = acl; 
+		this.acl = this.acl.join(acl); 
 	}
 
 }
