@@ -20,10 +20,15 @@ public class ReloadHostList extends JrdsServlet {
 	/* (non-Javadoc)
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
-	protected void doGet(HttpServletRequest req, HttpServletResponse arg1)
+	protected void doGet(HttpServletRequest req, HttpServletResponse res)
 			throws ServletException, IOException {
 		final ServletContext ctxt = getServletContext();
 		
+		ParamsBean params = new ParamsBean();
+		params.parseReq(req, getHostsList());
+		if(! allowed(params, getPropertiesManager().adminACL, req, res))
+			return;
+
 		Thread configthread = new Thread("jrds-new-config") {
 			@Override
 			public void run() {
@@ -36,6 +41,6 @@ public class ReloadHostList extends JrdsServlet {
 			}
 		};
 		configthread.start();
-		arg1.sendRedirect(req.getContextPath() + "/");
+		res.sendRedirect(req.getContextPath() + "/");
 	}
 }

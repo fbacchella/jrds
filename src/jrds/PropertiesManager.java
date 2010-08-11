@@ -372,7 +372,7 @@ public class PropertiesManager extends Properties {
 	public String userfile = "/tmp/bidule";
 	public Set<String> defaultRoles = Collections.emptySet();
 	public String adminrole = "admin";
-	public ACL defaultACL = ACL.AllowedACL;
-	public ACL adminACL = ACL.AllowedACL;
+	public ACL defaultACL = ACL.ALLOWEDACL;
+	public ACL adminACL = ACL.ALLOWEDACL;
 	public Set<Class<?>> preloadedClasses = new HashSet<Class<?>>();
 }

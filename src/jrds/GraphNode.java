@@ -29,7 +29,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
 	private GraphDesc gd;
 	private String name = null;
 	private String graphTitle = null;
-	private ACL acl = ACL.AllowedACL;
+	private ACL acl = ACL.ALLOWEDACL;
 
 	/**
 	 *

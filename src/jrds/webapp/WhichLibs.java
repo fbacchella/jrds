@@ -8,8 +8,6 @@ package jrds.webapp;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -29,7 +27,6 @@ import org.snmp4j.transport.DefaultUdpTransportMapping;
 
 
 /**
- * A servlet wich generate a png for a graph
  * @author Fabrice Bacchella
  * @version $Revision: 360 $
  */
@@ -38,51 +35,31 @@ public final class WhichLibs extends JrdsServlet {
 	/**
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
 	 */
-	@SuppressWarnings("unchecked")
 	public void doGet(HttpServletRequest req, HttpServletResponse res)
 	throws ServletException, IOException {
 		HostsList hl = getHostsList();
 
 		ParamsBean params = new ParamsBean();
 		params.parseReq(req, hl);
-		if(! allowed(params, getPropertiesManager().adminrole)) {
-			res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+		if(! allowed(params, getPropertiesManager().adminACL, req, res))
 			return;
-		}
 
 		try {
 			ServletOutputStream out = res.getOutputStream();
 			res.setContentType("text/plain");
 			res.addHeader("Cache-Control", "no-cache");
-			
+
 			ServletContext ctxt = getServletContext();
-//
-//			out.println("Dumping attributes");
-//			for(String attr: jrds.Util.iterate((Enumeration<String>)ctxt.getAttributeNames())) {
-//				Object o = ctxt.getAttribute(attr);
-//				out.println(attr + " = (" + o.getClass().getName() + ") " + o);
-//			}
-//			out.println("Dumping init parameters");
-//			for(String attr: jrds.Util.iterate((Enumeration<String>)ctxt.getInitParameterNames())) {
-//				String o = ctxt.getInitParameter(attr);
-//				out.println(attr + " = " + o);
-//			}
-//			out.println("Dumping system properties");
-//			Properties p = System.getProperties();
-//			for(String attr: jrds.Util.iterate((Enumeration<String>)p.propertyNames())) {
-//				Object o = p.getProperty(attr);
-//				out.println(attr + " = " + o);
-//			}		
 
 			out.println("Server info: ");
 			out.println("    Servlet API: " + ctxt.getMajorVersion() + "." + ctxt.getMinorVersion());
 			out.println("    Server info: " + ctxt.getServerInfo());
 			out.println();
-			
+
 			String[] openned = StoreOpener.getInstance().getOpenFiles();
 			out.println("" + StoreOpener.getInstance().getOpenFileCount() + " opened rrd: ");
 			for(String rrdPath: openned) {
-				out.println("   " + rrdPath);
+				out.println("   " + rrdPath + ": " + StoreOpener.getOpenCount(rrdPath));
 			}
 			out.println();
 
@@ -111,16 +88,11 @@ public final class WhichLibs extends JrdsServlet {
 			out.println(resolv("SNMP4J", DefaultUdpTransportMapping.class));
 			out.println(resolv("Log4j",logger.getClass()));
 			out.println("Generation:" + getConfig().thisgeneration);
-//			out.println(resolv("common logging API", org.apache.commons.logging.LogFactory.class));
-//			out.println(resolv("common logging", org.apache.commons.logging.LogFactory.getLog(this.getClass())));
-//			out.println(resolv("JAI", JAI.class));
-
-
 		} catch (RuntimeException e) {
 			logger.error(e, e);
 		}							
 	}
-	
+
 	private String resolv(String name, Object o) {
 		String retValue = "";
 		if(o != null)
@@ -129,7 +101,7 @@ public final class WhichLibs extends JrdsServlet {
 			retValue = name + " not found";
 		return retValue;
 	}
-	
+
 
 	private String resolv(String name, Class<?> c) {
 		String retValue = "";
@@ -140,7 +112,7 @@ public final class WhichLibs extends JrdsServlet {
 		}
 		return retValue.replaceFirst("!.*", "").replaceFirst("file:", "");
 	}
-	
+
 	private String locateJar(Class<?> c ) {
 		String retValue="Not found";
 		String cName = c.getName();

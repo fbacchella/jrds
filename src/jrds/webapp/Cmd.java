@@ -19,22 +19,19 @@ public class Cmd extends JrdsServlet {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Default constructor. 
-	 */
-	public Cmd() {
-		// TODO Auto-generated constructor stub
-	}
-
-	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		ParamsBean params = new ParamsBean(req, getHostsList(), "command", "arg");
 
 		String command = params.getValue("command");
-
+		if(command == null || "".equals(command)) {
+			command = req.getServletPath().substring(1);
+		}
 		logger.debug(Util.delayedFormatString("Command found: %s", command));
-		logger.trace(Util.delayedFormatString("path info found: %s", req.getPathInfo()));
+
+		if(! allowed(params, getPropertiesManager().adminACL, req, res))
+			return;
 
 		if("reload".equalsIgnoreCase(command)) {
 			ServletContext ctxt = getServletContext();
@@ -79,5 +76,4 @@ public class Cmd extends JrdsServlet {
 		};
 		configthread.start();
 	}
-
 }

@@ -79,7 +79,7 @@ public abstract class Filter implements WithACL {
 		return gt;
 	}
 	
-	private ACL acl = ACL.AllowedACL;
+	private ACL acl = ACL.ALLOWEDACL;
 	
 	/* (non-Javadoc)
 	 * @see jrds.webapp.WithACL#getACL()

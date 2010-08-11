@@ -24,7 +24,7 @@ public class Graph implements WithACL {
 	private Date end;
 	private double max = Double.NaN;
 	private double min = Double.NaN;
-	private ACL acl = ACL.AllowedACL;
+	private ACL acl = ACL.ALLOWEDACL;
 
 	public Graph(GraphNode node) {
 		super();
