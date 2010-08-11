@@ -2,12 +2,12 @@ package jrds.factories;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.apache.log4j.Logger;
-
 import jrds.Filter;
 import jrds.FilterXml;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
+
+import org.apache.log4j.Logger;
 
 public class FilterBuilder extends ObjectBuilder {
 	static final private Logger logger = Logger.getLogger(FilterBuilder.class);
@@ -33,8 +33,7 @@ public class FilterBuilder extends ObjectBuilder {
 		n.setMethod(f, CompiledXPath.get("/filter/path"), "addPath", false);
 		n.setMethod(f, CompiledXPath.get("/filter/tag"), "addTag", false);
 		n.setMethod(f, CompiledXPath.get("/filter/qualifiedname"), "addGraph", false);
-		n.setMethod(f, CompiledXPath.get("/filter/role"), "addRole", false);
-
+		doACL(f, n, CompiledXPath.get("/filter/role"));
 		logger.trace("Filter loaded: " + f.getName());
 		return f;
 	}

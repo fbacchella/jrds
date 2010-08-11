@@ -37,6 +37,8 @@ import jrds.probe.VirtualProbe;
 import jrds.starter.SocketFactory;
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;
+import jrds.webapp.ACL;
+import jrds.webapp.RolesACL;
 
 import org.apache.log4j.Logger;
 
@@ -76,6 +78,7 @@ public class HostsList extends StarterNode {
 	private File rrdDir = null;
 	private File tmpDir = null;
 	private int timeout = 10;
+	// The list of roles known to jrds
 	private Set<String> roles = new HashSet<String>();
 	private Set<String> defaultRoles = Collections.emptySet();
 	// A global flag that tells globally that this HostsList can be used
@@ -135,9 +138,11 @@ public class HostsList extends StarterNode {
 			logger.error("Unable to set log file to " + pm.logfile);
 		}
 
+		logger.trace("Classes to check: " + pm.preloadedClasses);
 		for(Class<?> c: pm.preloadedClasses) {
 			try {
 				if(Starter.class.isAssignableFrom(c)) {
+					logger.trace("Registering " + c.getName());
 					Class<Starter> sclass = (Class<Starter>) c;
 					Starter s = sclass.getConstructor().newInstance();
 					s.register(this);
@@ -150,6 +155,7 @@ public class HostsList extends StarterNode {
 		if(pm.security) {
 			defaultRoles = pm.defaultRoles;
 			roles.addAll(defaultRoles);
+			roles.add(pm.adminrole);
 		}
 
 		if(pm.rrddir == null) {
@@ -240,11 +246,7 @@ public class HostsList extends StarterNode {
 		}
 
 		if(pm.security) {
-			for(Filter filter: f.values()) {
-				filter.addRole(pm.adminrole);
-			}
 			for(GraphNode gn: graphMap.values()) {
-				gn.addRole(pm.adminrole);
 				checkRoles(gn, gn.getTreePathByHost());
 				checkRoles(gn, gn.getTreePathByView());
 			}
@@ -279,6 +281,11 @@ public class HostsList extends StarterNode {
 		}
 	}
 
+	/**
+	 * Generate the list of roles that might view this node, using the filters
+	 * @param gn
+	 * @param pathList
+	 */
 	private void checkRoles(GraphNode gn, List<String> pathList) {
 		StringBuilder path = new StringBuilder();
 		for(String pathElem: pathList) {
@@ -286,7 +293,7 @@ public class HostsList extends StarterNode {
 		}
 		for(Filter f: filters.values()) {
 			if(f.acceptGraph(gn, path.toString())) {
-				gn.addRoles(f.getRoles());
+				gn.addACL(f.getACL());
 			}
 		}
 	}
@@ -466,6 +473,10 @@ public class HostsList extends StarterNode {
 
 	public void addFilter(Filter newFilter) {
 		filters.put(newFilter.getName(), newFilter);
+		ACL acl = newFilter.getACL();
+		if(acl instanceof RolesACL) {
+			roles.addAll(((RolesACL) acl).getRoles());
+		}
 		logger.debug("Filter " + newFilter.getName() + " added");
 	}
 

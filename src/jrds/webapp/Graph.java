@@ -38,11 +38,8 @@ public final class Graph extends JrdsServlet {
 
 			jrds.Graph graph = p.getGraph();
 
-			if(getPropertiesManager().security) {
-				boolean allowed = false;
-				for(String role: p.getRoles()) {
-					allowed |= graph.getNode().roleAllowed(role);
-				}
+			if(getPropertiesManager().security) {				
+				boolean allowed = graph.getNode().getACL().check(p);
 				if(! allowed) {
 					res.setStatus(HttpServletResponse.SC_FORBIDDEN);
 					return;

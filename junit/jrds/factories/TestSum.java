@@ -16,6 +16,8 @@ import jrds.factories.xml.JrdsNode;
 import jrds.graphe.Sum;
 import jrds.mockobjects.MokeProbe;
 import jrds.probe.SumProbe;
+import jrds.webapp.ACL;
+import jrds.webapp.RolesACL;
 import junit.framework.Assert;
 
 import org.apache.log4j.Level;
@@ -47,6 +49,7 @@ public class TestSum {
 
 		pm.setProperty("configdir", "tmp");
 		pm.setProperty("rrddir", "tmp");
+		pm.setProperty("security", "true");
 		pm.update();
 
 		conf = new ConfigObjectFactory(pm);
@@ -99,7 +102,9 @@ public class TestSum {
 		SumProbe sp = doSumProbe(d, hl);
 
 		Sum s = (Sum) sp.getGraphList().toArray()[0];
-		Assert.assertTrue("role not found", s.roleAllowed("role1"));
+		ACL acl = s.getACL();
+		Assert.assertEquals("Not an role ACL", RolesACL.class, acl.getClass());
+
 	}
 
 }

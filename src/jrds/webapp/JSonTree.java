@@ -105,6 +105,8 @@ public class JSonTree extends JSonData {
 			GraphNode child = leaf.getValue();
 			String leafName = leaf.getKey();
 			if(f.acceptGraph(child, gt.getPath() + "/" + child.getName())) {
+				if(getPropertiesManager().security &&  ! f.getACL().check(params))
+					continue;
 				hasChild = true;
 				String graphid = base + "." + child.hashCode();
 				childsref.add(graphid );

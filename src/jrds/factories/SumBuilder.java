@@ -35,7 +35,7 @@ public class SumBuilder extends ObjectBuilder {
 				elements.add(elemName);
 			}
 			SumProbe sp = new SumProbe(name, elements);
-			n.setMethod(sp, CompiledXPath.get("/sum/role"), "addRole", false);
+			doACL(sp, n,  CompiledXPath.get("/sum/role"));
 			return sp;
 		}
 		return null;

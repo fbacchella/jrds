@@ -73,15 +73,16 @@ public class JSonGraph extends JSonData {
 		if(node != null) {
 			logger.debug("Tree found: " + node);
 			Filter filter = params.getFilter();
-			if(allowed(params, filter.getRoles()))
+			if(filter.getACL().check(params))
 				return node.enumerateChildsGraph(filter);
 		}
 		else if(params.getPid() != 0 && dsName != null) {
 			if(! allowed(params, root.getDefaultRoles()))
 				return Collections.emptyList();
 			Probe<?, ?> p = params.getProbe();
+			logger.debug("Probe found: " + p);
 			if(p == null) {
-				logger.error("Looking for unknonw probe");
+				logger.error("Looking for unknown probe");
 				return Collections.emptyList();
 			}
 
@@ -100,7 +101,7 @@ public class JSonGraph extends JSonData {
 		}
 		else {
 			GraphNode gn = root.getGraphById(id);
-			if(gn != null && allowed(params, gn.getRoles()))
+			if(gn != null && gn.getACL().check(params))
 				return Collections.singletonList(gn);
 		}
 

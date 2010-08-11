@@ -1,13 +1,12 @@
 package jrds;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import jrds.graphe.Sum;
 import jrds.probe.ContainerProbe;
+import jrds.webapp.ACL;
+import jrds.webapp.WithACL;
 
 
-public abstract class Filter {
+public abstract class Filter implements WithACL {
 	static final public Filter SUM = new Filter() {
 		@Override
 		public boolean acceptGraph(GraphNode graph, String path) {
@@ -80,29 +79,19 @@ public abstract class Filter {
 		return gt;
 	}
 	
-	private Set<String> roles = new HashSet<String>();
+	private ACL acl = ACL.AllowedACL;
 	
-	public void addRole(String role) {
-		roles.add(role);
-	}
-	
-	public void addRoles(Set<String> roles) {
-		this.roles.addAll(roles);
-	}
-	
-	public boolean roleAllowed(String role) {
-		return roles.contains(role);
-	}
-	
-	public boolean rolesAllowed(Set<String> roles) {
-		return jrds.Util.rolesAllowed(this.roles, roles);
-	}
-
-	/**
-	 * @return the roles
+	/* (non-Javadoc)
+	 * @see jrds.webapp.WithACL#getACL()
 	 */
-	public Set<String> getRoles() {
-		return roles;
+	public ACL getACL() {
+		return acl;
+	}
+	/* (non-Javadoc)
+	 * @see jrds.webapp.WithACL#addACL()
+	 */
+	public void addACL(ACL acl) {
+		this.acl = acl; 
 	}
 
 }

@@ -11,6 +11,8 @@ import jrds.Filter;
 import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.factories.xml.JrdsNode;
+import jrds.webapp.ACL;
+import jrds.webapp.RolesACL;
 import junit.framework.Assert;
 
 import org.apache.log4j.Level;
@@ -43,6 +45,7 @@ public class TestFilter {
 
 		pm.setProperty("configdir", "tmp");
 		pm.setProperty("rrddir", "tmp");
+		pm.setProperty("security", "yes");
 		pm.update();
 
 		conf = new ConfigObjectFactory(pm);
@@ -73,15 +76,15 @@ public class TestFilter {
 	}
 
 	@Test
-	public void testRole() throws Exception {
+	public void testACL() throws Exception {
 		Document d = Tools.parseString(goodFilterXml);
 		Tools.JrdsElement je = new Tools.JrdsElement(d);
 		je.addElement("role").setTextContent("role1");
 		je.addElement("path").setTextContent("^.*$");
 		Filter f = doFilter(d);
 		
-		Assert.assertTrue("Role allowed failed", f.roleAllowed("role1"));
-		Assert.assertFalse("Role denied failed", f.roleAllowed("role2"));
+		ACL acl = f.getACL();
+		Assert.assertEquals("Not an role ACL", RolesACL.class, acl.getClass());
 	}
 
 }
