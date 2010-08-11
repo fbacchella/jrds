@@ -24,15 +24,13 @@ public class Sum extends GraphNode {
 	public Sum(Probe<?,?> theStore) {
 		super(theStore, new GraphDesc() {
 			String name = "sum" + i++;
-			/* (non-Javadoc)
-			 * @see jrds.GraphDesc#getGraphName()
-			 */
 			@Override
 			public String getGraphName() {
 				return name;
 			}
 		});
 		SumProbe p = (SumProbe) theStore;
+		addACL(p.getACL());
 		GraphDesc gd = getGraphDesc();
 		gd.setGraphName(theStore.getName());
 		gd.setGraphTitle(theStore.getName());
@@ -49,7 +47,7 @@ public class Sum extends GraphNode {
 		gd.setName(theStore.getName());
 		gd.setHostTree(new Object[] {GraphDesc.TITLE});
 		gd.setViewTree(new Object[] {});
-		logger.debug(this.getQualifieName());
+		logger.debug(getQualifieName());
 	}
 
 	/* (non-Javadoc)
