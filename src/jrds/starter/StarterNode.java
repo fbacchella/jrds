@@ -35,9 +35,11 @@ public abstract class StarterNode implements StartersSet {
 	}
 
 	public boolean isCollectRunning() {
+		if(Thread.interrupted())
+			started = false;
 		if(parent != null && ! parent.isCollectRunning())
 			return false;
-		return started && ! Thread.currentThread().isInterrupted();
+		return started;
 	}
 
 	public boolean startCollect() {
@@ -64,7 +66,7 @@ public abstract class StarterNode implements StartersSet {
 				try {
 					s.doStop();
 				} catch (Exception e) {
-					logger.error("Unable to stop timer " + s.getKey());
+					logger.error("Unable to stop timer " + s.getKey() +": " + e);
 				}
 			}
 	}

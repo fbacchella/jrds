@@ -426,7 +426,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
 	/**
 	 * The sample itself can be modified<br>
-	 * The default function does nothing
 	 * @param oneSample
 	 * @param values
 	 */

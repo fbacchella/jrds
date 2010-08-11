@@ -82,7 +82,7 @@ public final class StoreOpener {
 			logger.info("backend bytes written: " + RrdAccountingNioBackend.getBytesWritten());
 			logger.info("backend reads: " + RrdAccountingNioBackend.getWriteOp());
 		}
-		logger.info("Average wait time: " +  waitTime.doubleValue() / lockCount.doubleValue());
+		logger.info("Average wait time: " +  waitTime.doubleValue() / lockCount.doubleValue() + " ms");
 
 	}
 
@@ -94,5 +94,25 @@ public final class StoreOpener {
 	 */
 	public static RrdDbPool getInstance() {
 		return instance;
+	}
+
+	/**
+	 * @param rrdDb
+	 * @return
+	 * @throws IOException
+	 * @see org.rrd4j.core.RrdDbPool#getOpenCount(org.rrd4j.core.RrdDb)
+	 */
+	public static int getOpenCount(RrdDb rrdDb) throws IOException {
+		return instance.getOpenCount(rrdDb);
+	}
+
+	/**
+	 * @param path
+	 * @return
+	 * @throws IOException
+	 * @see org.rrd4j.core.RrdDbPool#getOpenCount(java.lang.String)
+	 */
+	public static int getOpenCount(String path) throws IOException {
+		return instance.getOpenCount(path);
 	}
 }
