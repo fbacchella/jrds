@@ -99,11 +99,11 @@ public class JrdsNode implements Node {
 		}
 	}
 
-	public static abstract class FilterNode {
-		public abstract Object filter(Node input);
+	public static abstract class   FilterNode<T> {
+		public abstract T filter(Node input);
 	};
 
-	public List<?> doTreeList(XPathExpression xpath, FilterNode f) {
+	public <T> List<T> doTreeList(XPathExpression xpath, FilterNode<T> f) {
 		NodeList list;
 		try {
 			list = (NodeList) xpath.evaluate(parent, XPathConstants.NODESET);
@@ -113,9 +113,9 @@ public class JrdsNode implements Node {
 		if(list == null || list.getLength() == 0 ) {
 			return Collections.emptyList();
 		}
-		List<Object> l = new ArrayList<Object>(list.getLength());
+		List<T> l = new ArrayList<T>(list.getLength());
 		for(int i=0; i < list.getLength(); i++) {
-			Object o = f.filter(list.item(i));
+			T o = f.filter(list.item(i));
 			l.add(o);
 		}
 		return l;
