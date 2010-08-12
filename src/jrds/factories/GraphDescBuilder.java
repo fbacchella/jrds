@@ -44,6 +44,8 @@ public class GraphDescBuilder extends ObjectBuilder {
 		subnode.setMethod(gd, CompiledXPath.get("lowerLimit"), "setLowerLimit");
 		subnode.setMethod(gd, CompiledXPath.get("unit/base"), "setUnitExponent");
 
+		doACL(gd, n, CompiledXPath.get("/graph/role"));
+
 		//Vertical label should never be empty
 		if(gd.getVerticalLabel() == null)
 			gd.setVerticalLabel("");
@@ -100,7 +102,7 @@ public class GraphDescBuilder extends ObjectBuilder {
 			gd.add(addName, addrpn, addgraphType, addColor, addLegend, consFunc, reversed, host, probe, dsName);
 		}
 
-		JrdsNode.FilterNode viewFilter = new JrdsNode.FilterNode() {
+		JrdsNode.FilterNode<Object> viewFilter = new JrdsNode.FilterNode<Object>() {
 			@Override
 			public Object filter(Node input) {
 				Object value = input.getTextContent();

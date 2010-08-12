@@ -38,6 +38,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
 		super();
 		this.probe = theStore;
 		this.gd = gd;
+		this.acl = gd.getACL();
 	}
 
 	/**

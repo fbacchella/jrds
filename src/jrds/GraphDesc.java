@@ -18,6 +18,8 @@ import jrds.Util.SiPrefix;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.probe.jdbc.JdbcProbe;
+import jrds.webapp.ACL;
+import jrds.webapp.WithACL;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
@@ -32,7 +34,7 @@ import org.rrd4j.graph.RrdGraphDef;
  * @version $Id$
  */
 public class GraphDesc
-implements Cloneable {
+implements Cloneable, WithACL {
 	static final private Logger logger = Logger.getLogger(GraphDesc.class);
 
 	static public final ConsolFun DEFAULTCF = ConsolFun.AVERAGE;
@@ -501,6 +503,7 @@ implements Cloneable {
 	private int maxLengthLegend = 0;
 	private boolean siUnit = true;
 	private Integer unitExponent = null;
+	private ACL acl = ACL.ALLOWEDACL;
 
 	public final class Dimension {
 		public int width = 0;
@@ -1181,6 +1184,14 @@ implements Cloneable {
 		im.ygif += ( (int) getSmallLeading(frc) + 5 ) * ( getLegendLines() + 5);
 		im.ygif += PADDING_BOTTOM;
 		setDimension(im.ygif, im.xgif);
+	}
+
+	public void addACL(ACL acl) {
+		this.acl = this.acl.join(acl);
+	}
+
+	public ACL getACL() {
+		return acl;
 	}
 
 }
