@@ -37,7 +37,7 @@ public class SumProbe extends VirtualProbe implements WithACL {
 	};
 
 	private Collection<String> graphList;
-	private ACL acl = ACL.AllowedACL;
+	private ACL acl = ACL.ALLOWEDACL;
 
 	//An array list is needed, the introspection is picky
 	public SumProbe(String name, ArrayList<String> graphList) {
