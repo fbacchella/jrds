@@ -45,9 +45,8 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
 		long total = 0;
 		long used = 0;
 		for(Map.Entry<OID, Object> e: snmpVars.entrySet()) {
-			OID oid = e.getKey();
+			OID oid = new OID(e.getKey());
 			Number value = (Number)e.getValue();
-			oid.removeLast();
 			if(allocUnitOid.equals(oid)) {
 				allocUnit = value.intValue();
 			}

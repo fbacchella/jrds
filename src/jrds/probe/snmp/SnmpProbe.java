@@ -2,6 +2,7 @@ package jrds.probe.snmp;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,7 +38,7 @@ public abstract class SnmpProbe extends Probe<OID, Object> {
 		super.setPd(pd);
 		nameMap = getPd().getCollectOids();
 	}
-	
+
 	public boolean configure() {
 		SnmpStarter snmp = getSnmpStarter();
 		if(snmp == null) {
@@ -96,15 +97,19 @@ public abstract class SnmpProbe extends Probe<OID, Object> {
 	 */
 	@Override
 	public Map<OID, Object> getNewSampleValues() {
-		Map<OID, Object> retValue = null;
-		if(getSnmpStarter().isStarted()) {
-			Collection<OID> oids = getOidSet();
-			if(oids != null) {
-				try {
-					retValue = requester.doSnmpGet(getSnmpStarter(), oids);
-				} catch (IOException e) {
-					log(Level.ERROR, e, "IO Error: %s", e.getMessage());
+		Map<OID, Object> retValue = Collections.emptyMap();
+		Collection<OID> oids = getOidSet();
+		if(oids != null && getSnmpStarter().isStarted()) {
+			try {
+				Map<OID, Object> rawValues = requester.doSnmpGet(getSnmpStarter(), oids);
+				retValue = new HashMap<OID, Object>(rawValues.size());
+				for(Map.Entry<OID, Object> e: rawValues.entrySet()) {
+					OID oid = new OID(e.getKey());
+					oid.trim(getSuffixLength());
+					retValue.put(oid, e.getValue());
 				}
+			} catch (IOException e) {
+				log(Level.ERROR, e, "IO Error: %s", e.getMessage());
 			}
 		}
 
@@ -123,8 +128,6 @@ public abstract class SnmpProbe extends Probe<OID, Object> {
 		Map<OID, Number> retValue = new HashMap<OID, Number>(snmpVars.size());
 		for(Map.Entry<OID, Object> e: snmpVars.entrySet()) {
 			OID oid = e.getKey();
-			for(int i= 0; i < getSuffixLength(); i++)
-				oid.removeLast();
 			Object o = e.getValue();
 			if( o instanceof Number) {
 				retValue.put(oid, (Number)o);
