@@ -17,11 +17,6 @@ import jrds.ProbeDesc;
  * TODO 
  */
 public class SybaseSpaceDb extends Sybase {
-	private final static int SEGMENT_SYSTEM = 1;
-	private final static int SEGMENT_USER = 2;
-	private final static int SEGMENT_SYSUSER = 3;
-	private final static int SEGMENT_LOG = 4;
-	private final static int SEGMENT_DATALOG = 7;
 	
 	private static final ProbeDesc pd = new ProbeDesc(5);
 	static {
@@ -79,6 +74,7 @@ public class SybaseSpaceDb extends Sybase {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, Number> parseRs(ResultSet rs) throws SQLException {
 		return (Map<String, Number>) this.parseRsHorizontaly(rs, true);

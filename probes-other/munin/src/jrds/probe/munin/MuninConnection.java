@@ -25,9 +25,10 @@ public class MuninConnection extends Connection<Socket> {
 		return Long.MAX_VALUE;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean startConnection() {
-		SocketFactory ss = (SocketFactory) getLevel().find(SocketFactory.makeKey(getParent())); 
+		SocketFactory ss = (SocketFactory) getLevel().find(SocketFactory.makeKey(getLevel())); 
 		try {
 			muninsSocket = ss.createSocket(getHostName(), port);
 		} catch (IOException e) {

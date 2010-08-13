@@ -5,10 +5,9 @@
  */
 package jrds.probe.munin;
 
-import org.rrd4j.DsType;
-
 import jrds.ProbeDesc;
-import jrds.RdsHost;
+
+import org.rrd4j.DsType;
 
 /**
  * @author bacchell

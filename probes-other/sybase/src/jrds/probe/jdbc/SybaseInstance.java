@@ -21,9 +21,10 @@ public class SybaseInstance extends Sybase {
 	static {
 		pd.add("process", DsType.GAUGE);
 		pd.add("transactions", DsType.GAUGE);
-		pd.setGraphClasses(new Object[] {"sybaseinstance.xml"});
+		String[] graphs = new String[] {"sybaseinstance.xml"};
+		pd.setGraphClasses(graphs);
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -48,6 +49,7 @@ public class SybaseInstance extends Sybase {
 		return retValues;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, Number> parseRs(ResultSet rs) throws SQLException {
 		return (Map<String, Number>) this.parseRsHorizontaly(rs, true);

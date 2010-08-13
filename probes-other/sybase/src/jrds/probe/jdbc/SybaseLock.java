@@ -66,6 +66,7 @@ public class SybaseLock extends Sybase {
 		return retValues;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, Number> parseRs(ResultSet rs) throws SQLException {
 		return (Map<String, Number>) this.parseRsHorizontaly(rs, true);
