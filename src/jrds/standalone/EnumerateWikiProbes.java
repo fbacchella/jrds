@@ -22,11 +22,21 @@ import org.rrd4j.core.DsDef;
 
 public class EnumerateWikiProbes extends CommandStarterImpl {
 	static private final Logger logger = Logger.getLogger(EnumerateWikiProbes.class);
+	
+	static final private String JAVADOCURLTEMPLATES = "http://jrds.fr/apidoc-core/index.html?%s.html";
 
 	String propFile = "jrds.properties";
 
 	public void configure(Properties configuration) {
 		propFile =  configuration.getProperty("propertiesFile", propFile);
+	}
+	
+	private String classToLink(Class<?> c) {
+		String className = c.getName();
+		String classurlpath = className.replace('.', '/');
+		String newurl = String.format(JAVADOCURLTEMPLATES, classurlpath);
+		String classLine = String.format("[[%s|%s]]", newurl, className);
+		return classLine;
 	}
 
 	public void start(String args[]) throws Exception {
@@ -93,10 +103,8 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
 				p.setPd(pd);
 				System.out.println(oneLine(p));
 			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -110,7 +118,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
 		if (description == null)
 			description = "";
 		String link= "[[sourcetype:" + sourceType + ":" + probeName.toLowerCase() + "|" + probeName + "]]";
-		return new String("| " + sourceType + " | " + link + " | " + description + " | " + p.getClass().getName() + " | ");
+		return new String("| " + sourceType + " | " + link + " | " + description + " | " + classToLink(p.getClass()) + " | ");
 		
 	}
 	private void dumpProbe(ProbeDesc pd) throws InstantiationException, IllegalAccessException {
@@ -126,7 +134,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
 		System.out.println(p.getSourceType());
 		System.out.println(doTitle("Probe class"));
 		System.out.println("");
-		System.out.println(pd.getProbeClass().getName());
+		System.out.println(classToLink(pd.getProbeClass()));
 		System.out.println("");
 		System.out.println(doTitle("Arguments"));
 		System.out.println("");
@@ -157,8 +165,8 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
 			System.out.println(doTitle("Connection class"));
 
 			ParameterizedType t = (ParameterizedType) c.getGenericSuperclass();
-			
-			System.out.println(t.getActualTypeArguments()[2]);
+			Class<?> typeArg = (Class<?>)t.getActualTypeArguments()[2];
+			System.out.println(classToLink(typeArg));
 			System.out.println("");
 		}
 		System.out.println("=====Example=====");
