@@ -54,6 +54,7 @@ public class TestGraphDescBuilder {
 	public void testGraphDesc() throws Exception {
 		JrdsNode d = new JrdsNode(Tools.parseRessource("graphdesc.xml"));
 		GraphDescBuilder gdbuild = new GraphDescBuilder();
+		gdbuild.setProperty(ObjectBuilder.properties.PM, new PropertiesManager());
 		GraphDesc gd = gdbuild.makeGraphDesc(d);
 		MokeProbe<String, Number> p = new MokeProbe<String, Number>();
 
@@ -88,6 +89,7 @@ public class TestGraphDescBuilder {
 	public void testCustomGraph() throws Exception {
 		JrdsNode d = new JrdsNode(Tools.parseRessource("customgraph.xml"));
 		GraphDescBuilder gdbuild = new GraphDescBuilder();
+		gdbuild.setProperty(ObjectBuilder.properties.PM, new PropertiesManager());
 		GraphDesc gd = gdbuild.makeGraphDesc(d);
 		Assert.assertEquals("graph name failed", "graphName", gd.getGraphName());
 		Assert.assertEquals("graph title failed", "graphTitle", gd.getGraphTitle());

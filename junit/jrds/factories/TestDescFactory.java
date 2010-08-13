@@ -9,9 +9,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.GraphDesc;
 import jrds.GraphNode;
+import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.ProbeDesc;
-import jrds.PropertiesManager;
 import jrds.factories.xml.JrdsNode;
 import jrds.mockobjects.GetMoke;
 
@@ -65,6 +65,7 @@ public class TestDescFactory {
 	public void loadGraph()  throws Exception {
 		Document d = Tools.parseRessource("customgraph.xml");
 		GraphDescBuilder builder = new GraphDescBuilder();
+		builder.setProperty(ObjectBuilder.properties.PM, new PropertiesManager());
 		GraphDesc gd = (GraphDesc) builder.build(new JrdsNode(d));
 
 		Assert.assertEquals("name", gd.getName());
@@ -84,6 +85,7 @@ public class TestDescFactory {
 		Document d = Tools.parseRessource(is);
 
 		GraphDescBuilder builder = new GraphDescBuilder();
+		builder.setProperty(ObjectBuilder.properties.PM, new PropertiesManager());
 		GraphDesc gd = (GraphDesc) builder.build(new JrdsNode(d));
 
 		Assert.assertEquals("mokegraph", gd.getName());

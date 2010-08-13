@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import jrds.webapp.RolesACL;
+import jrds.webapp.ACL.AdminACL;
 import junit.framework.Assert;
 
 import org.apache.log4j.Level;
@@ -102,6 +104,25 @@ public class TestPropertiesManager {
 			logger.trace(dir);
 			Assert.assertTrue(dir.equals(tmpdir) || ! dir.exists());
 		}
+	}
+	
+	@Test
+	public void testSecurity() {
+		PropertiesManager pm = new PropertiesManager();
+		pm.setProperty("security", "true");
+		pm.setProperty("adminrole", "role1");
+		pm.setProperty("defaultroles", " role2 ,role3");
+		pm.update();
+
+		Assert.assertEquals("Bad default ACL class", RolesACL.class, pm.defaultACL.getClass());
+		RolesACL rolesacl = (RolesACL) pm.defaultACL;
+		Assert.assertTrue("Admin role1 not found", rolesacl.getRoles().contains("role1"));
+		Assert.assertTrue("default role role2 not found", rolesacl.getRoles().contains("role2"));
+		Assert.assertTrue("default role role3 not found", rolesacl.getRoles().contains("role3"));
+		
+		Assert.assertEquals("Bad adminACL", AdminACL.class, pm.adminACL.getClass());
+		AdminACL adminacl = (AdminACL) pm.adminACL;
+		Assert.assertEquals("Bad admin role", "role1", adminacl.getAdminRole());
 	}
 
 }

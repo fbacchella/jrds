@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.snmp4j.smi.Counter32;
 import org.snmp4j.smi.Counter64;
 import org.snmp4j.smi.Gauge32;
+import org.snmp4j.smi.Integer32;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.UnsignedInteger32;
 import org.snmp4j.smi.VariableBinding;
@@ -25,9 +26,9 @@ public class TestSnmpVars {
 	public void conversionInteger32() {
 		jrds.snmp.SnmpVars vars = new jrds.snmp.SnmpVars();
 		OID oid1 = new OID("2");
-		VariableBinding vb = new VariableBinding(oid1, new UnsignedInteger32(1));
+		VariableBinding vb = new VariableBinding(oid1, new Integer32(1));
 		vars.addVariable(vb);
-		Assert.assertEquals(vars.get(oid1), (long) 1);
+		Assert.assertEquals(1, vars.get(oid1));
 	}
 	@Test
 	public void conversionCounter32() {

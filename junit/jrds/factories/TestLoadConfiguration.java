@@ -106,6 +106,7 @@ public class TestLoadConfiguration {
 		JrdsNode d = new JrdsNode(Tools.parseRessource("view1.xml"));
 
 		FilterBuilder fb = new FilterBuilder();
+		fb.setProperty(ObjectBuilder.properties.PM, pm);
 		Filter f = fb.makeFilter(d);
 		Assert.assertEquals("Test view 1",f.getName());
 	}

@@ -3,10 +3,12 @@ package jrds;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -211,6 +213,14 @@ public class UtilTest {
 		Assert.assertEquals("true", parsed);
 	}
 	
+	@Test
+	public void testParseTemplate3() {
+		List<String> args = Arrays.asList("unittest");
+
+		String parsed = Util.parseTemplate("${1}", args);
+		Assert.assertEquals("unittest", parsed);
+	}
+
 	@Test
 	public void testNormalization1() {
 		Probe<?,?> p = new jrds.mockobjects.DummyProbe() {

@@ -1,7 +1,9 @@
 package jrds;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -129,5 +131,14 @@ public class TestProbe {
 		p.collect();
 		Assert.assertEquals("Default value is not inserted", 1, p.getLastValues().get("ds0").doubleValue(), 0.1);
 		Assert.assertEquals("Default value overwrite read value", 2, p.getLastValues().get("ds1").doubleValue(), 0.1);
+	}
+	
+	@Test
+	public void testDump() throws TransformerException, IOException, ParserConfigurationException {
+		Probe<String, Long> p = new MokeProbe<String, Long>();
+		File outputFile =  new File("tmp/probe.html");
+		OutputStream out = new FileOutputStream(outputFile);
+
+		jrds.Util.serialize(p.dumpAsXml(), out, jrds.xmlResources.ResourcesLocator.getResourceUrl("probe.xsl"), null);
 	}
 }
