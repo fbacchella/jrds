@@ -11,8 +11,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import jrds.HostsList;
 import jrds.Period;
 import jrds.PropertiesManager;
@@ -27,40 +25,46 @@ import org.junit.Test;
 
 public class TestUrlParser {
 	static final Logger logger = Logger.getLogger(TestUrlParser.class);
-	static private final Map<String, String[]> parameters = new HashMap<String, String[]>();
-	static private final HttpServletRequest req = GetMoke.getRequest(parameters);
 	static final private DateFormat fullISOFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-	static final private HostsList hl = new HostsList(new PropertiesManager());
+	static private HostsList hl;
 
 	@BeforeClass
 	static public void configure() throws IOException {
 		Tools.configure();
 		logger.setLevel(Level.ERROR);
 		Tools.setLevel(new String[] {ParamsBean.class.getName() }, logger.getLevel());
+		hl = new HostsList(new PropertiesManager());
 	}
 
-	@Test public void checkId() {
-		parameters.clear();
+	@Test
+	public void checkId() {
+		Map<String, String[]> parameters = new HashMap<String, String[]>();
 		parameters.put("id", new String[] { "1" });
-		ParamsBean pb = new ParamsBean(req, hl);
+		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
 		Assert.assertEquals(1, pb.getId());
 	}
-	@Test public void checkSortedTrue() {
-		parameters.clear();
+	
+	@Test
+	public void checkSortedTrue() {
+		Map<String, String[]> parameters = new HashMap<String, String[]>();
 		parameters.put("sort", new String[] { "true" });
-		ParamsBean pb = new ParamsBean(req, hl);
+		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
 		Assert.assertTrue(pb.isSorted());
 	}
-	@Test public void checkSortedFalseDefault() {
-		parameters.clear();
-		ParamsBean pb = new ParamsBean(req, hl);
+	
+	@Test
+	public void checkSortedFalseDefault() {
+		Map<String, String[]> parameters = new HashMap<String, String[]>();
+		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
 		Assert.assertTrue(! pb.isSorted());
 	}
-	@Test public void checkParseDate1() throws ParseException {
-		parameters.clear();
+	
+	@Test
+	public void checkParseDate1() throws ParseException {
+		Map<String, String[]> parameters = new HashMap<String, String[]>();
 		parameters.put("begin", new String[] { "2007-01-01" });
 		parameters.put("end", new String[] { "2007-12-31" });
-		ParamsBean pb = new ParamsBean(req, hl);
+		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
 		Period p = pb.getPeriod();
 
 		Date begin = fullISOFORMAT.parse("2007-01-01T00:00:00");
@@ -68,17 +72,18 @@ public class TestUrlParser {
 		Assert.assertEquals(p.getBegin(), begin);
 		Assert.assertEquals(p.getEnd(), end);
 		Assert.assertEquals(0, p.getScale());
-		
+
 		String url = pb.makeObjectUrl("root", "", false);
 		Assert.assertTrue(url.contains("begin=" + begin.getTime()));
 		Assert.assertTrue(url.contains("end=" + end.getTime()));
-		
-		logger.trace(url);
 
+		logger.trace(url);
 	}
-	@Test public void checkParseDate2() throws ParseException {
-		parameters.clear();
-		ParamsBean pb = new ParamsBean(req, hl);
+	
+	@Test
+	public void checkParseDate2() throws ParseException {
+		Map<String, String[]> parameters = new HashMap<String, String[]>();
+		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
 		Period p = pb.getPeriod();
 
 		Date now = new Date();
@@ -89,10 +94,11 @@ public class TestUrlParser {
 		logger.trace(url);
 	}
 
-	@Test public void checkParseDate3() throws ParseException {
-		parameters.clear();
+	@Test
+	public void checkParseDate3() throws ParseException {
+		Map<String, String[]> parameters = new HashMap<String, String[]>();
 		parameters.put("scale", new String [] { "4"} );
-		ParamsBean pb = new ParamsBean(req, hl);
+		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
 		Period p = pb.getPeriod();
 
 		Date now = new Date();
@@ -109,13 +115,14 @@ public class TestUrlParser {
 		logger.trace(url);
 	}
 
-	@Test public void checkUrl1() {
-		parameters.clear();
+	@Test
+	public void checkUrl1() {
+		Map<String, String[]> parameters = new HashMap<String, String[]>();
 		parameters.put("host", new String [] { "host"} );
 		parameters.put("scale", new String [] { "2"} );
 		parameters.put("max", new String [] { "2"} );
 		parameters.put("min", new String [] { "2"} );
-		ParamsBean pb = new ParamsBean(req, null);
+		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
 		String url = pb.makeObjectUrl("root", "", false);
 		Assert.assertTrue(url.contains("host=host"));
 		Assert.assertTrue(url.contains("/root?"));
@@ -126,11 +133,13 @@ public class TestUrlParser {
 		Assert.assertFalse(url.contains("begin="));
 		Assert.assertFalse(url.contains("end="));
 	}
-	@Test public void checkUrl2() {
-		parameters.clear();
+	
+	@Test
+	public void checkUrl2() {
+		Map<String, String[]> parameters = new HashMap<String, String[]>();
 		parameters.put("max", new String [] { String.valueOf(Double.NaN)} );
 		parameters.put("min", new String [] { String.valueOf(Double.NaN)} );
-		ParamsBean pb = new ParamsBean(req, hl);
+		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
 		jrds.Filter f = new jrds.FilterHost("host");
 		String url = pb.makeObjectUrl("root", f, true);
 		logger.trace(url);
@@ -143,13 +152,15 @@ public class TestUrlParser {
 		Assert.assertTrue(url.contains("max="));
 		Assert.assertTrue(url.contains("min="));
 	}
-	@Test public void checkUrl3() throws UnsupportedEncodingException {
-		parameters.clear();
+	
+	@Test
+	public void checkUrl3() throws UnsupportedEncodingException {
+		Map<String, String[]> parameters = new HashMap<String, String[]>();
 		jrds.Filter f = jrds.Filter.ALLHOSTS;
 		String filterName = f.getName();
 		parameters.put("filter", new String [] { filterName } );
 
-		ParamsBean pb = new ParamsBean(req, hl);
+		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
 		String url = pb.makeObjectUrl("root", f, true);
 		Assert.assertTrue(url.contains("filter=" + URLEncoder.encode(filterName, "UTF-8")));
 		Assert.assertTrue(url.contains("/root?"));
