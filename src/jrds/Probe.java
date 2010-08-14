@@ -765,6 +765,14 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 		}
 		Element dsElement = document.createElement("ds");
 		root.appendChild(dsElement);
+		
+		Element graphs = (Element) root.appendChild(document.createElement("graphs"));
+		for(GraphNode gn: this.graphList) {
+			String qualifiedGraphName = gn.getQualifieName();
+			Element graph = (Element) graphs.appendChild(document.createElement("graphname"));
+			graph.setTextContent(qualifiedGraphName);
+			graph.setAttribute("id", String.valueOf(gn.hashCode()));
+		}
 		DsDef[] dss= getDsDefs();
 
 		if (sorted)
