@@ -33,6 +33,7 @@ public class TestConfiguration {
 		sc.initParameters.put("configdir", "tmp/config");
 		sc.initParameters.put("autocreate", "true");
 		Configuration c = new Configuration(sc);
+		@SuppressWarnings("unused")
 		PropertiesManager pm = c.getPropertiesManager();
 		logger.trace(c.getHostsList().getHosts());
 		Assert.assertTrue("confid dir not created", new File("tmp/config").isDirectory());

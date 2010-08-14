@@ -13,6 +13,7 @@ public class MockParamsBean extends ParamsBean {
 	/* (non-Javadoc)
 	 * @see jrds.webapp.ParamsBean#getRoles()
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Set<String> getRoles() {
 		return (Set<String>) params.get("roles");

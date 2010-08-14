@@ -37,6 +37,8 @@ public class TestSnmpStarter {
 		};
 		hl.addHost(h);
 		
+		hl.registerStarter(new MainStarter());
+		
 		SnmpStarter snmp = new SnmpStarter();
 		snmp.setHostname(h.getDnsName());
 		snmp.setPort(agent.getPort());

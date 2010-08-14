@@ -65,6 +65,7 @@ public class Log4jTest {
 		JrdsLoggerConfiguration.configure(pm);
 		l.error("A message");
 		l.debug("A debug message");
+		System.out.println(logs.get(0).getMessage());
 		Assert.assertEquals(1, logs.size());
 	}
 }
