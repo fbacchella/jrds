@@ -54,6 +54,11 @@ public class ProbeDescBuilder extends ObjectBuilder {
 		String className = probeDescNode.evaluate(CompiledXPath.get("probeClass")).trim();
 		Class<? extends Probe<?,?>> c = (Class<? extends Probe<?,?>>) classLoader.loadClass(className);
 		pd.setProbeClass(c);
+
+		String preloadClass = probeDescNode.evaluate(CompiledXPath.get("preloadClass"));
+		if(preloadClass != null && ! "".equals(preloadClass))
+			pd.setPreloadClass(preloadClass.trim());
+
 		pd.setHeartBeatDefault(pm.step * 2);
 
 		if(probeDescNode.checkPath(CompiledXPath.get("uniq")))

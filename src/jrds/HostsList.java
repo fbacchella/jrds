@@ -138,19 +138,6 @@ public class HostsList extends StarterNode {
 			logger.error("Unable to set log file to " + pm.logfile);
 		}
 
-		logger.trace("Classes to check: " + pm.preloadedClasses);
-		for(Class<?> c: pm.preloadedClasses) {
-			try {
-				if(Starter.class.isAssignableFrom(c)) {
-					logger.trace("Registering " + c.getName());
-					Class<Starter> sclass = (Class<Starter>) c;
-					Starter s = sclass.getConstructor().newInstance();
-					s.register(this);
-				}
-			} catch (Exception e) {
-				logger.error("Unable to register " + c.getName());
-			}
-		}
 		if(pm.rrddir == null) {
 			logger.error("Probes directory not configured, can't configure");
 			return;
@@ -210,7 +197,9 @@ public class HostsList extends StarterNode {
 				}
 			}				
 		}
-
+		
+		preloadClasses(conf.getPreloadedClass());
+		
 		for(String tag: hostsTags) {
 			Filter f = new FilterTag(tag);
 			filters.put(f.getName(), f);
@@ -251,6 +240,23 @@ public class HostsList extends StarterNode {
 		}
 
 		started = true;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void preloadClasses(Set<Class<?>> classes) {
+		logger.debug(jrds.Util.delayedFormatString("Classes preloaded: %s", classes));
+		for(Class<?> c: classes) {
+			try {
+				if(Starter.class.isAssignableFrom(c)) {
+					logger.trace("Registering " + c.getName());
+					Class<Starter> sclass = (Class<Starter>) c;
+					Starter s = sclass.getConstructor().newInstance();
+					s.register(this);
+				}
+			} catch (Exception e) {
+				logger.error("Unable to register " + c.getName());
+			}
+		}
 	}
 
 	public Collection<RdsHost> getHosts() {

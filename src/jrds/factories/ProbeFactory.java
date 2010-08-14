@@ -10,8 +10,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jrds.GraphDesc;
 import jrds.GraphNode;
@@ -33,6 +35,8 @@ public class ProbeFactory {
 	private Map<String, ProbeDesc> probeDescMap;
 	private Map<String, GraphDesc> graphDescMap;
 	private PropertiesManager pm;
+	private Set<Class<?>> preloadedClass = new HashSet<Class<?>>();
+	
 	/**
 	 * Private constructor
 	 * @param b 
@@ -63,6 +67,14 @@ public class ProbeFactory {
 		if(probeClass == null) {
 			logger.error("Invalid probe description " + probeType + ", probe class name not found");
 		}
+		String preload = pd.getPreloadClass();
+		if(preload != null && ! "".equals(preload)) {
+			try {
+				preloadedClass.add(probeClass.getClassLoader().loadClass(preload));
+			} catch (ClassNotFoundException e) {
+				logger.error("Preload class " + preload + " for " + pd.getName() + "can 't be loaded");
+			}
+		}
 		Probe<?,?> retValue = null;
 		try {
 			Constructor<? extends Probe<?,?>> c = probeClass.getConstructor();
@@ -88,7 +100,6 @@ public class ProbeFactory {
 	}
 
 	public boolean configure(Probe<?, ?> p,  List<?> constArgs) {
-
 		List<?> defaultsArgs = p.getPd().getDefaultArgs();
 		if(defaultsArgs != null && constArgs != null && constArgs.size() <= 0)
 			constArgs = defaultsArgs;
@@ -152,5 +163,12 @@ public class ProbeFactory {
 
 	public ProbeDesc getProbeDesc(String name) {
 		return probeDescMap.get(name);
+	}
+
+	/**
+	 * @return the preloadedClass
+	 */
+	public Set<Class<?>> getPreloadedClass() {
+		return preloadedClass;
 	}
 }

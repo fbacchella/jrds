@@ -325,9 +325,10 @@ public class PropertiesManager extends Properties {
 			adminACL = new ACL.AdminACL(adminrole);
 			
 			String  defaultRolesString = getProperty("defaultroles", "ANONYMOUS");
-			String[] defaultRolesArray = defaultRolesString.split(" ?, ?");
-			defaultRoles = new HashSet<String>(defaultRolesArray.length);
-			defaultRoles.addAll(Arrays.asList(defaultRolesArray));
+			defaultRoles = new HashSet<String>();
+			for(String aRole:  defaultRolesString.split(",") ) {
+				defaultRoles.add(aRole.trim());
+			}
 			defaultACL = new RolesACL(defaultRoles);
 			defaultACL = defaultACL.join(adminACL);
 			
@@ -335,18 +336,18 @@ public class PropertiesManager extends Properties {
 			logger.debug(jrds.Util.delayedFormatString("Default ACL is %s", defaultACL));
 		}
 
-		String preloadclasses = getProperty("preloadclasses", "");
-
-		for(String className: preloadclasses.split(":")) {
-			try {
-				if(className != null && ! "".equals(className))
-					preloadedClasses.add(Class.forName(className, true, extensionClassLoader));
-			} catch (Exception e) {
-				logger.error("Class not found:" + className, e);
-			}
-		}
-		preloadedClasses.add(jrds.snmp.MainStarter.class);
-		logger.debug("Preloaded classes: " + preloadedClasses);
+//		String preloadclasses = getProperty("preloadclasses", "");
+//
+//		for(String className: preloadclasses.split(":")) {
+//			try {
+//				if(className != null && ! "".equals(className))
+//					preloadedClasses.add(Class.forName(className, true, extensionClassLoader));
+//			} catch (Exception e) {
+//				logger.error("Class not found:" + className, e);
+//			}
+//		}
+//		preloadedClasses.add(jrds.snmp.MainStarter.class);
+//		logger.debug("Preloaded classes: " + preloadedClasses);
 
 
 	}
@@ -374,5 +375,5 @@ public class PropertiesManager extends Properties {
 	public String adminrole = "admin";
 	public ACL defaultACL = ACL.ALLOWEDACL;
 	public ACL adminACL = ACL.ALLOWEDACL;
-	public Set<Class<?>> preloadedClasses = new HashSet<Class<?>>();
+	//public Set<Class<?>> preloadedClasses = new HashSet<Class<?>>();
 }

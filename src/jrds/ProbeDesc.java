@@ -48,6 +48,7 @@ public class ProbeDesc {
 	private Collection<String> graphClasses = new ArrayList<String>();
 	private boolean uniqIndex = false;
 	private Class<? extends Probe<?,?>> probeClass = null;
+	private String preloadClass = null;
 	private List<Object> defaultsArgs = null;
 	private float uptimefactor = (float) 1.0;
 	private Map<String, String> properties = null;
@@ -438,5 +439,19 @@ public class ProbeDesc {
 			graphsElement.appendChild(document.createElement("name")).setTextContent(graph);
 		}
 		return document;
+	}
+
+	/**
+	 * @return the preloadClass
+	 */
+	public String getPreloadClass() {
+		return preloadClass;
+	}
+
+	/**
+	 * @param preloadClass the preloadClass to set
+	 */
+	public void setPreloadClass(String preloadClass) {
+		this.preloadClass = preloadClass;
 	}
 }

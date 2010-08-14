@@ -3,6 +3,7 @@ package jrds.factories;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import jrds.Filter;
 import jrds.GraphDesc;
@@ -121,5 +122,9 @@ public class ConfigObjectFactory {
 		Map<String, GraphDesc> graphsMap = (Map<String, GraphDesc>)getObjectMap(Loader.ConfigType.GRAPH, graphmap);
 		logger.debug("Graphs configured: " + graphsMap.keySet());
 		return graphsMap;
+	}
+
+	public Set<Class<?>> getPreloadedClass() {
+		return pf.getPreloadedClass();
 	}
 }
