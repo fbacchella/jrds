@@ -207,6 +207,7 @@
 			<tarfileset dir="lib/dojo">
 			    <include name="dijit/themes/nihilo/**/*.*" />
 			    <include name="dojo/resources/blank.*" />
+                <include name="dojo/resources/dojo.css" />
 		    </tarfileset>
 			<tarfileset dir="${web.src}"/>
 			<tarfileset dir="libjetty" prefix="WEB-INF/lib"/>
@@ -226,6 +227,7 @@
 			<fileset dir="lib/dojo">
 			    <include name="dijit/themes/nihilo/**/*.*" />
 			    <include name="dojo/resources/blank.*" />
+                <include name="dojo/resources/dojo.css" />
 		    </fileset>
 			<lib dir="lib">
 				<include name="*.jar"/>
