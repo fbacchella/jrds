@@ -29,6 +29,7 @@ import jrds.Graph;
 import jrds.HostsList;
 import jrds.Period;
 import jrds.Probe;
+import jrds.Util;
 import jrds.Util.SiPrefix;
 
 import org.apache.log4j.Logger;
@@ -128,12 +129,21 @@ public class ParamsBean implements Serializable {
 		contextPath = req.getContextPath();
 		period = makePeriod(req);
 		logger.trace("period from parameters: " + period);
-		gid = jrds.Util.parseStringNumber(getValue("gid"), Integer.class, 0);
-		id = jrds.Util.parseStringNumber(getValue("id"), Integer.class, 0);
 
-		String pidStr = getValue("pid");
 		String host = getValue("host");
 		String probe = getValue("probe");
+
+		gid = jrds.Util.parseStringNumber(getValue("gid"), Integer.class, 0);
+		//Many way to discover id (graph node id)
+		String idStr = getValue("id");
+		String graph =  getValue("graphname");
+		if(idStr != null && ! "".equals(idStr))
+			id = Util.parseStringNumber(idStr, Integer.class, 0);
+		else if(host != null && ! "".equals(host) && graph != null && ! "".equals(graph)) {
+			id = (host + "/" + graph).hashCode();
+		}
+
+		String pidStr = getValue("pid");
 		if(pidStr != null)
 			pid = jrds.Util.parseStringNumber(pidStr, Integer.class, 0);
 		else if(host != null && ! "".equals(host) && probe != null && ! "".equals(probe) )

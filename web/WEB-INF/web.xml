@@ -89,6 +89,10 @@
     <url-pattern>/graph</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
+    <servlet-name>Graph</servlet-name>
+    <url-pattern>/graph/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
     <servlet-name>download</servlet-name>
     <url-pattern>/download</url-pattern>
   </servlet-mapping>

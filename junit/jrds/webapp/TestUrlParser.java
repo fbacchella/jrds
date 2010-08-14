@@ -11,11 +11,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import jrds.GraphNode;
 import jrds.HostsList;
 import jrds.Period;
+import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.mockobjects.GetMoke;
+import jrds.mockobjects.MockGraph;
+import jrds.mockobjects.MokeProbe;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -31,7 +35,7 @@ public class TestUrlParser {
 	@BeforeClass
 	static public void configure() throws IOException {
 		Tools.configure();
-		logger.setLevel(Level.ERROR);
+		logger.setLevel(Level.TRACE);
 		Tools.setLevel(new String[] {ParamsBean.class.getName() }, logger.getLevel());
 		hl = new HostsList(new PropertiesManager());
 	}
@@ -44,6 +48,22 @@ public class TestUrlParser {
 		Assert.assertEquals(1, pb.getId());
 	}
 	
+	@Test
+	public void checkIdRest() {
+		Map<String, String[]> parameters = new HashMap<String, String[]>();
+		parameters.put("host", new String[] { "DummyHost" });
+		parameters.put("graphname", new String[] { "MockGraph" });
+
+		Probe<String, Number> p = new MokeProbe<String, Number>();
+		GraphNode gn = new MockGraph(p);
+		logger.trace(gn);
+		p.addGraph(gn);
+		hl.addProbe(p);
+		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
+		Assert.assertEquals("Graph not found by path", gn.hashCode(), pb.getId());
+	}
+	
+
 	@Test
 	public void checkSortedTrue() {
 		Map<String, String[]> parameters = new HashMap<String, String[]>();

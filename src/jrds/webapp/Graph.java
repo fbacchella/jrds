@@ -34,7 +34,7 @@ public final class Graph extends JrdsServlet {
 			Date start = new Date();
 			HostsList hl = getHostsList();
 
-			ParamsBean p = getParamsBean(req);
+			ParamsBean p = new ParamsBean(req, hl, "host", "graphname");
 
 			jrds.Graph graph = p.getGraph();
 
