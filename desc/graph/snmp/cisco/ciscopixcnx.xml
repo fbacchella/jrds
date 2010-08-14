@@ -4,7 +4,7 @@
 	<name>CiscoPixConnections</name>
 	<graphName>ciscopixconnections</graphName>
 	<graphTitle>IP connections in use on pix {1}</graphTitle>
-	<verticalLabel>Bytes</verticalLabel>
+	<verticalLabel>Connections</verticalLabel>
 	<add>
 		<name>currentInUse</name>
 		<graphType>area</graphType>
@@ -14,12 +14,12 @@
 	<hosttree>
 		<pathelement>HOST</pathelement>
 		<pathelement>NETWORK</pathelement>
-		<pathelement>IP</pathelement>
+		<pathstring>Firewall</pathstring>
 		<pathstring>IP Connections</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>NETWORK</pathelement>
-		<pathelement>IP</pathelement>
+		<pathstring>Firewall</pathstring>
 		<pathelement>HOST</pathelement>
 		<pathstring>IP Connections</pathstring>
 	</viewtree>

@@ -21,5 +21,6 @@
 		<collect>cn=${index},cn=monitor?bytesRead</collect>
 	</ds>
 	<graphs>
+        <name>OpenDSBytes</name>
 	</graphs>
 </probedesc>

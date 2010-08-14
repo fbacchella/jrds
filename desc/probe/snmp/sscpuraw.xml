@@ -4,6 +4,7 @@
 	<name>CpuRaw</name>
 	<probeName>cpuraw</probeName>
 	<probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
+    <preloadClass>jrds.snmp.MainStarter</preloadClass>
     <snmpRequester>simple</snmpRequester>
 	<ds>
 		<dsName>ssCpuRawUser </dsName>

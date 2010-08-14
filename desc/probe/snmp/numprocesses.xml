@@ -4,6 +4,7 @@
     <name>NumProcesses</name>
     <probeName>nprocesses</probeName>
     <probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
+    <preloadClass>jrds.snmp.MainStarter</preloadClass>
     <snmpRequester>simple</snmpRequester>
     <ds>
         <dsName>hrSystemProcesses</dsName>

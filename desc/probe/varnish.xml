@@ -5,6 +5,7 @@
 	<probeName>varnish${index}</probeName>
 	<probeClass>jrds.probe.Varnish</probeClass>
 	<specific name="command">stats</specific>
+	<specific name="uptime">Client uptime</specific>
 	<ds>
 		<dsName>connrecycled</dsName>
 		<dsType>counter</dsType>

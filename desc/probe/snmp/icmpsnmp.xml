@@ -4,6 +4,7 @@
     <name>IcmpSnmp</name>
     <probeName>icmp</probeName>
     <probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
+    <preloadClass>jrds.snmp.MainStarter</preloadClass>
     <snmpRequester>simple</snmpRequester>
     <ds>
         <dsName>InMsgs</dsName>

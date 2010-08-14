@@ -3,7 +3,7 @@
                            "urn:jrds:graphdesc">
 <graphdesc>
 	<name>OpenLdap</name>
-	<graphName>OpenLdap</graphName>
+	<graphName>openldap</graphName>
 	<graphTitle>LDAP operations on ${host}</graphTitle>
 	<verticalLabel>op/s</verticalLabel>
 	<add>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+	<name>CiscoIpSecTraficTunnel</name>
+	<graphName>ciscoipsectrafic</graphName>
+	<graphTitle>Active tunnel on ${host}</graphTitle>
+	<verticalLabel>bits/s</verticalLabel>
+	<add>
+		<name>InOctets</name>
+	</add>
+	<add>
+		<rpn>InOctets, 8, *</rpn>
+		<graphType>area</graphType>
+		<color>green</color>
+		<legend>Bytes received by IPsec Phase-2 Tunnels</legend>
+	</add>
+	<add>
+		<name>OutOctets</name>
+	</add>
+	<add>
+		<rpn>OutOctets, 8, *</rpn>
+		<graphType>area</graphType>
+		<color>green</color>
+		<legend>Bytes sent by IPsec Phase-2 Tunnels</legend>
+	</add>
+	<hosttree>
+		<pathstring>${host}</pathstring>
+		<pathelement>NETWORK</pathelement>
+		<pathstring>Cisco IPsec</pathstring>
+		<pathstring>Active tunnels</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>NETWORK</pathelement>
+		<pathstring>Cisco IPsec</pathstring>
+		<pathstring>${host}</pathstring>
+		<pathstring>Active tunnels</pathstring>
+	</viewtree>
+</graphdesc>

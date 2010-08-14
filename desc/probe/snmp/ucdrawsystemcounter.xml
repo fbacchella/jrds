@@ -4,6 +4,7 @@
     <name>UcdRawSystemCounter</name>
     <probeName>ucdrawsystem</probeName>
     <probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
+    <preloadClass>jrds.snmp.MainStarter</preloadClass>
     <snmpRequester>simple</snmpRequester>
     <ds>
         <dsName>ssIORawSent</dsName>
