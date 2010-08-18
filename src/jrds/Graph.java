@@ -120,7 +120,7 @@ public class Graph implements WithACL {
 	}
 
 	public RrdGraphDef getRrdGraphDef() throws IOException {
-		return node.getGraphDesc().getGraphDef(node.getProbe());
+		return node.getRrdGraphDef();
 	}
 
 	public RrdGraph getRrdGraph() throws
@@ -130,8 +130,16 @@ public class Graph implements WithACL {
 		tempGraphDef = graphFormat(tempGraphDef);
 
 		try {
-			tempGraphDef.setStartTime(start.getTime()/1000);
-			tempGraphDef.setEndTime(Util.endDate(node.getProbe(), end).getTime()/1000);
+			long startsec = start.getTime()/1000;
+			long endsec = Util.endDate(node.getProbe(), end).getTime()/1000;
+			tempGraphDef.setStartTime(startsec);
+			tempGraphDef.setEndTime(endsec);
+
+			ProxyPlottableMap customData = node.getCustomData();
+			if(customData != null) {
+				long step = Math.max((endsec - startsec) / gd.getWidth(), 1);
+				customData.configure(startsec, endsec, step);
+			}
 		} catch (IllegalArgumentException e) {
 			logger.error("Impossible to create graph definition, invalid date definition from " + start + " to " + end + " : " + e);
 		}
@@ -142,9 +150,8 @@ public class Graph implements WithACL {
 		}
 		tempGraphDef.setWidth(gd.getWidth());
 		tempGraphDef.setHeight(gd.getHeight());
-		RrdGraph graph;
-		graph = new RrdGraph(tempGraphDef);
-		return graph;
+
+		return new RrdGraph(tempGraphDef);
 	}
 
 	public void writePng(OutputStream out) throws IOException {

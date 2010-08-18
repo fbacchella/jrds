@@ -205,7 +205,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 	 * @throws RrdException
 	 * @throws IOException
 	 */
-	private void create() throws IOException {
+	protected void create() throws IOException {
 		log(Level.INFO, "Need to create rrd");
 		RrdDef def = getRrdDef();
 		RrdDb rrdDb = new RrdDb(def);
@@ -334,12 +334,25 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 		if(name == null)
 			name = parseTemplate(getPd().getProbeName());
 
-		boolean retValue = false;
+		finished = checkStoreFile();
+		return finished;
+	}
+	
+	protected boolean checkStoreFile() {
+		File rrdFile = new File(getRrdName());
+
 		File rrdDir = monitoredHost.getHostDir();
 		if (!rrdDir.isDirectory()) {
-			rrdDir.mkdir();
+			if( ! rrdDir.mkdir()) {
+				try {
+					log(Level.ERROR, "prode dir %s creation failed ", rrdDir.getCanonicalPath());
+				} catch (IOException e) {
+				}
+				return false;
+			}
 		}
-		File rrdFile = new File(getRrdName());
+
+		boolean retValue = false;
 		RrdDb rrdDb = null;
 		try {
 			if ( rrdFile.isFile() ) {
@@ -384,7 +397,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 				}
 
 		}
-		finished = retValue;
 		return retValue;
 	}
 

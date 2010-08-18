@@ -704,6 +704,18 @@ implements Cloneable, WithACL {
 
 	/**
 	 * return the RrdGraphDef for this graph, used the indicated probe
+	 *
+	 * @param probe Probe
+	 * @return RrdGraphDef
+	 * @throws IOException
+	 * @throws RrdException
+	 */
+	public RrdGraphDef getGraphDef(Probe<?,?> probe) throws IOException {
+		return getGraphDef(probe, null);
+	}
+
+	/**
+	 * return the RrdGraphDef for this graph, used the indicated probe
 	 * any data can be overined of a provided map of Plottable
 	 * @param probe
 	 * @param ownData data used to overied probe's own values
@@ -711,7 +723,7 @@ implements Cloneable, WithACL {
 	 * @throws IOException
 	 * @throws RrdException
 	 */
-	public RrdGraphDef getGraphDef(Probe<?,?> defProbe, Map<String, Plottable> ownData) throws IOException {
+	public RrdGraphDef getGraphDef(Probe<?,?> defProbe, Map<String, ? extends Plottable> ownData) throws IOException {
 		RrdGraphDef retValue = new RrdGraphDef();
 		retValue.setPoolUsed(true);
 		String defRrdName = defProbe.getRrdName();
@@ -873,18 +885,6 @@ implements Cloneable, WithACL {
 			def.gprint(ds, ConsolFun.MAX, "%8.2f%s");
 			def.comment("\\l");
 		}
-	}
-
-	/**
-	 * return the RrdGraphDef for this graph, used the indicated probe
-	 *
-	 * @param probe Probe
-	 * @return RrdGraphDef
-	 * @throws IOException
-	 * @throws RrdException
-	 */
-	public RrdGraphDef getGraphDef(Probe<?,?> probe) throws IOException {
-		return getGraphDef(probe, null);
 	}
 
 	/**

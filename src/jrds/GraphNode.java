@@ -6,6 +6,7 @@ package jrds;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.LinkedList;
+import java.util.Map;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
@@ -13,6 +14,7 @@ import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
 import org.apache.log4j.Logger;
+import org.rrd4j.data.Plottable;
 import org.rrd4j.graph.RrdGraphDef;
 
 /**
@@ -30,6 +32,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
 	private String name = null;
 	private String graphTitle = null;
 	private ACL acl = ACL.ALLOWEDACL;
+	private ProxyPlottableMap customData = null;
 
 	/**
 	 *
@@ -126,7 +129,11 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
 	}
 	
 	public RrdGraphDef getRrdGraphDef() throws IOException {
-		return getGraphDesc().getGraphDef(getProbe());
+		return getGraphDesc().getGraphDef(getProbe(), customData);
+	}
+
+	public RrdGraphDef getRrdGraphDef(Map<String, Plottable> ownData) throws IOException {
+		return getGraphDesc().getGraphDef(getProbe(), ownData);
 	}
 
 	public Graph getGraph() {
@@ -156,6 +163,20 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
 
 	public ACL getACL() {
 		return acl;
+	}
+
+	/**
+	 * @return the customData
+	 */
+	public ProxyPlottableMap getCustomData() {
+		return customData;
+	}
+
+	/**
+	 * @param customData the customData to set
+	 */
+	public void setCustomData(ProxyPlottableMap customData) {
+		this.customData = customData;
 	}
 
 }
