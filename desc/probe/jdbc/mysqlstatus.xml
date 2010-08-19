@@ -269,10 +269,16 @@
 	<ds>
 		<dsName>Select_range_check</dsName>
 		<dsType>counter</dsType>
+		<defaultValue>0</defaultValue>
 	</ds>
 	<ds>
 		<dsName>Select_scan</dsName>
 		<dsType>counter</dsType>
+	</ds>
+	<ds>
+		<dsName>Select_full_join</dsName>
+		<dsType>counter</dsType>
+		<defaultValue>0</defaultValue>
 	</ds>
 	<ds>
 		<dsName>Slave_open_temp_tabl</dsName>
@@ -336,5 +342,6 @@
 		<name>MysqlThreads</name>
 		<name>MysqlStatusKeysActivity</name>
 		<name>MysqlStatusTempTables</name>
+		<name>MysqlStatusBadJoin</name>
 	</graphs>
 </probedesc>
