@@ -395,5 +395,6 @@
 		<name>MysqlThreads</name>
 		<name>MysqlStatusKeysActivity</name>
 		<name>MysqlStatusTempTables</name>
+		<name>MysqlStatusBadJoin</name>
 	</graphs>
 </probedesc>
