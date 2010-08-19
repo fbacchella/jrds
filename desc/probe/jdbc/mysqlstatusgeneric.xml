@@ -316,11 +316,18 @@
 		<dsName>Select_range_check</dsName>
 		<dsType>counter</dsType>
 		<collect>Select_range_check.Value</collect>
+		<defaultValue>0</defaultValue>
 	</ds>
 	<ds>
 		<dsName>Select_scan</dsName>
 		<dsType>counter</dsType>
 		<collect>Select_scan.Value</collect>
+	</ds>
+	<ds>
+		<dsName>Select_full_join</dsName>
+		<dsType>counter</dsType>
+		<collect>Select_full_join.Value</collect>
+		<defaultValue>0</defaultValue>
 	</ds>
 	<ds>
 		<dsName>Slave_open_temp_tabl</dsName>
