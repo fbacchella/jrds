@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 public final class ArgFactory {
 	static private final Logger logger = Logger.getLogger(ArgFactory.class);
 
-	static private final String[] argPackages = new String[] {"java.lang.", "java.net.", "org.snmp4j.smi.", ""};
+	static private final String[] argPackages = new String[] {"java.lang.", "java.net.", "org.snmp4j.smi.", "java.io", ""};
 
 	public static List<Object> makeArgs(JrdsNode n) {
 		return makeArgs(n, new Object[]{});

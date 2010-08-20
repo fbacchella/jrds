@@ -143,7 +143,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
 			if("configure".equals(m.getName())) {
 				System.out.println("^ Type ^ Description ^");
 				for(Class<?> arg: m.getParameterTypes()) {
-					System.out.println("| " + arg.getName()+ " | | ");
+					System.out.println("| " + arg.getSimpleName() + " | | ");
 				}
 				System.out.println();
 			}
