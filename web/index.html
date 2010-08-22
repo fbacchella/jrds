@@ -4,106 +4,152 @@
 	<title>JRDS</title>
 <link href="dijit/themes/nihilo/nihilo.css" rel="stylesheet" type="text/css" />
 <link href="lib/jrds.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="dojo/dojo.js" djConfig="parseOnLoad:true, locale:'en-us'"></script>
+<script type="text/javascript" src="dojo/dojo.js" djConfig="parseOnLoad:false, isDebug: false, locale:'en-us'"></script>
 <script type="text/javascript" src="dojo/dojo-jrds.js"></script>
-<script type="text/javascript" src="lib/jrds.js"></script>
+<script type="text/javascript" src="lib/jrds.js"></script> 
+<script type="text/javascript">
+    dojo.require("dijit.layout.TabContainer");
+    dojo.require("dijit.layout.ContentPane");
+    dojo.require("dijit.form.Button");
+    dojo.require("dijit.layout.BorderContainer");
+    dojo.require("dijit.layout.ContentPane");
+    dojo.require("dijit.form.DateTextBox");
+    dojo.require("dijit.form.Button");
+    dojo.require("dijit.form.TextBox");
+    dojo.require("dijit.form.Form");
+    dojo.require("dijit.form.Select");
+    dojo.require("dojo.parser");
+    dojo.require("dijit.form.Button");
+    dojo.require("dijit.form.ValidationTextBox");
+    dojo.require("dojo.data.ItemFileReadStore");
+    dojo.require("dijit.form.NumberTextBox");
+    dojo.require("dijit.Tree");
+    dojo.require("dojo.number");
+    dojo.require("dijit.form.TimeTextBox");
+    dojo.require("dojo.parser");
+</script>
 <script type="text/javascript">
 
 var queryParams = {};
+
+//Used to get a clean copy of the pane that will be in each tab
+var mainPane;
 
 initQuery();
 
 dojo.cookie("treeOneSaveStateCookie", null, {expires: -1});
 
 dojo.addOnLoad(function(){
+	//The copy is saved
+	mainPane = dojo.clone(dojo.byId('mainPane'));
+	//The parse can be done
+	dojo.parser.parse();
+	
+	var tabs = dijit.byId("tabs");
+	dojo.connect(tabs,"_transition", transitTab);
 	setupCalendar();
 	fileForms();
-	getTree();
-	});
+	getTree('filter');
+});
 
 </script>
 </head>
 <body class="nihilo">
-<div id="mainDiv" dojoType="dijit.layout.BorderContainer" >
- 	<div id="treePane" dojoType="dijit.layout.ContentPane" region="leading" >
-    	<form dojoType="dijit.form.Form" id="hostForm" action="index.html" method="get" name="hostForm">
-			<a id="toroot" href="index.html"><img src="img/back_to_album.gif" alt="" height="16" width="20" border="0" /></a>
-      		<label for="host">Only host</label>
-      		<input id="hostfield" type="text" name="host" size="24"  dojoType="dijit.form.TextBox" trim="true" onkeypress="hostKeyEvent"/>
-        	<button onClick="searchHost" type="submit" dojoType="dijit.form.Button" >Search</button>
-    	</form>
-    	<div id="treeOne" > </div>
+<div id='tabs' dojoType="dijit.layout.TabContainer" style="width: 100%; height: 100%;">
+    <div dojoType="dijit.layout.ContentPane" id='mainTab' title="Main tree" selected="true"">
+		<div id="mainPane" dojoType="dijit.layout.BorderContainer" design="sidebar" gutters="false" >
+			<div id="treePane" dojoType="dijit.layout.ContentPane" region="leading" >
+				<form dojoType="dijit.form.Form" id="hostForm" action="" method="" onSubmit="searchHost">
+					<a id="toroot" href="javascript:goHome()"><img src="img/back_to_album.gif" alt="" height="16" width="20" border="0" /></a>
+      				<label for="host">Only host</label>
+      				<input id="host" type="text" name="host" size="24" dojoType="dijit.form.TextBox" type="submit"  trim="true" required="true" />
+        			<button type="submit" dojoType="dijit.form.Button">Search</button>
+				</form>
+<!--			    <div id="treeOne" > </div>-->
+			</div> <!-- treePane -->
+			<div id="centerPane" dojoType="dijit.layout.ContentPane" region="center">
+				<div dojoType="dijit.layout.ContentPane" id="paramsPane" >
+					<form  id="dateForm" name="dateForm" action="" method="">
+						<div  dojoType="dijit.layout.ContentPane" class="formblock" >
+							<span class="linelabel">Time scale</span>
+       						<select id="autoperiod" name="autoperiod" dojoType="dijit.form.Select">
+								<option value="0" id="0">Manual</option>
+								<option value="1" id="1">Last Hour</option>
+								<option value="2" id="2">Last 2 Hours</option>
+								<option value="3" id="3">Last 3 Hours</option>
+								<option value="4" id="4">Last 4 Hours</option>
+								<option value="5" id="5">Last 6 Hours</option>
+								<option value="6" id="6">Last 12 Hours</option>
+								<option value="7" id="7">Last Day</option>
+								<option value="8" id="8">Last 2 Days</option>
+								<option value="9" id="9">Last Week</option>
+								<option value="10" id="10">Last 2 Weeks</option>
+								<option value="11" id="11">Last Month</option>
+								<option value="12" id="12">Last 2 Months</option>
+								<option value="13" id="13">Last 3 Months</option>
+								<option value="14" id="14">Last 4 Months</option>
+								<option value="15" id="15">Last 6 Months</option>
+								<option value="16" id="16">Last Year</option>
+								<option value="17" id="17">Last 2 Years</option>
+       						</select>
+          					<label for="begin">Begin</label>
+          					<input type="text" name="begin" id="begin" class="field" onkeypress="periodKeyEvent"/>
+          					<input type="text" name="beginh" id="beginh" class="field" onkeypress="periodKeyEvent"/>
+          					<label for="end">End</label>
+          					<input type="text" name="end" id="end" class="field" onkeypress="periodKeyEvent"/>
+          					<input type="text" name="endh" id="endh" class="field" onkeypress="periodKeyEvent"/>
+        				</div>
+        				<div  dojoType="dijit.layout.ContentPane" class="formblock" >
+        					<span class="linelabel">Vertical scale</span>
+          					<button id="autoscale" dojoType="dijit.form.ToggleButton"  checked name="autoscale"
+  				  					onChange="resetScale();" 
+  				  					iconClass="dijitCheckBoxIcon"> Auto </button>
+          					<label for="min">Min</label>
+          					<input id="min" type="text" name="min" class="field"
+    			 				   dojoType="dijit.form.ValidationTextBox"
+    			 				   regExp="(-?\d+(.\d+)?)([a-zA-Z]{0,2})"
+    			 				   trim="true"
+    			 			       onFocus="setAutoscale(false);"
+    			 				   onchange="updateScale"
+    			 				   onkeypress="scaleKeyEvent"
+    			 				   size="14" />
+          					<label for="max">Max</label>
+          					<input  id="max" type="text" name="max" class="field"
+    			 					dojoType="dijit.form.ValidationTextBox"
+    			 					regExp="(-?\d+(.\d+)?)([a-zA-Z]{0,2})"
+    			 					trim="true"
+    			 					onFocus="setAutoscale(false);"
+    			 					onchange="updateScale"
+    			 					onkeypress="scaleKeyEvent"
+    			 					size="14" />
+        				</div>
+				        <div  dojoType="dijit.layout.ContentPane" class="formblock" > <span class="linelabel">Sort</span>
+        					<button id="sorted" dojoType="dijit.form.ToggleButton"  name="sorted"
+  									onChange="toogleSort();" 
+  									iconClass="dijitCheckBoxIcon"> Sorted graphs </button>
+        				</div>
+				        <button onClick="reloadTree(); return false" type="submit" dojoType="dijit.form.Button" >Render</button>
+					</form>
+					
+				</div> <!-- "paramsPane" -->
+				<div  dojoType="dijit.layout.ContentPane" id="graphPane">
+					<div class='graphblock'>
+					</div>
+				</div> <!-- graphPane -->
+			</div> <!-- centerPane -->
+		</div>
+    	
+	</div> <!-- mainTab -->
+    <div dojoType="dijit.layout.ContentPane" id='hoststab' title="All hosts" selected="false">
 	</div>
-  <div dojoType="dijit.layout.ContentPane" region="center">
-    <div dojoType="dijit.layout.ContentPane" id="formPane" >
-      <form  id="dateForm" name="dateForm" action="index.html" method="get">
-       <div  dojoType="dijit.layout.ContentPane" class="formblock" > <span class="linelabel">Time scale</span>
-       <select id="autoperiod" name="autoperiod" dojoType="dijit.form.Select">
-		<option value="0" id="0">Manual</option>
-		<option value="1" id="1">Last Hour</option>
-		<option value="2" id="2">Last 2 Hours</option>
-		<option value="3" id="3">Last 3 Hours</option>
-		<option value="4" id="4">Last 4 Hours</option>
-		<option value="5" id="5">Last 6 Hours</option>
-		<option value="6" id="6">Last 12 Hours</option>
-		<option value="7" id="7">Last Day</option>
-		<option value="8" id="8">Last 2 Days</option>
-		<option value="9" id="9">Last Week</option>
-		<option value="10" id="10">Last 2 Weeks</option>
-		<option value="11" id="11">Last Month</option>
-		<option value="12" id="12">Last 2 Months</option>
-		<option value="13" id="13">Last 3 Months</option>
-		<option value="14" id="14">Last 4 Months</option>
-		<option value="15" id="15">Last 6 Months</option>
-		<option value="16" id="16">Last Year</option>
-		<option value="17" id="17">Last 2 Years</option>
-       </select>
-          <label for="begin">Begin</label>
-          <input type="text" name="begin" id="begin" class="field" onkeypress="periodKeyEvent"/>
-          <input type="text" name="beginh" id="beginh" class="field" onkeypress="periodKeyEvent"/>
-          <label for="end">End</label>
-          <input type="text" name="end" id="end" class="field" onkeypress="periodKeyEvent"/>
-          <input type="text" name="endh" id="endh" class="field" onkeypress="periodKeyEvent"/>
-        </div>
-        <div  dojoType="dijit.layout.ContentPane" class="formblock" > <span class="linelabel">Vertical scale</span>
-          <button id="autoscale" dojoType="dijit.form.ToggleButton"  checked name="autoscale"
-  				  onChange="resetScale();" 
-  				  iconClass="dijitCheckBoxIcon"> Auto </button>
-          <label for="min">Min</label>
-          <input id="min" type="text" name="min" class="field"
-    			 dojoType="dijit.form.ValidationTextBox"
-    			 regExp="(-?\d+(.\d+)?)([a-zA-Z]{0,2})"
-    			 trim="true"
-    			 onFocus="setAutoscale(false);"
-    			 onchange="updateScale"
-    			 onkeypress="scaleKeyEvent"
-    			 size="14" />
-          <label for="max">Max</label>
-          <input id="max" type="text" name="max" class="field"
-    			 dojoType="dijit.form.ValidationTextBox"
-    			 regExp="(-?\d+(.\d+)?)([a-zA-Z]{0,2})"
-    			 trim="true"
-    			 onFocus="setAutoscale(false);"
-    			 onchange="updateScale"
-    			 onkeypress="scaleKeyEvent"
-    			 size="14" />
-        </div>
-
-        <div  dojoType="dijit.layout.ContentPane" class="formblock" > <span class="linelabel">Sort</span>
-        	<button id="sorted" dojoType="dijit.form.ToggleButton"  name="sorted"
-  				onChange="toogleSort();" 
-  				iconClass="dijitCheckBoxIcon"> Sorted graphs </button>
-        </div>
- 
-        <button onClick="reloadTree(); return false" type="submit" dojoType="dijit.form.Button" >Render</button>
-      </form>
-    </div>
-    <div  dojoType="dijit.layout.ContentPane" id="graphPane">
-      <div class='graphblock'>
-      
-      </div>
-    </div>
-  </div>
+    <div dojoType="dijit.layout.ContentPane" id='servicestab' title="All services" selected="false">
+	</div>
+    <div dojoType="dijit.layout.ContentPane" id='tagstab' title="All tags" selected="false">
+	</div>
+	<div dojoType="dijit.layout.ContentPane" title="Administration" id="adminTab" selected="false">
+		<button dojoType="dijit.form.Button" type="button" onClick="sendReload"> Reload </button>
+	</div> <!-- adminTab -->
+	
 </div>
 </body>
 </html>

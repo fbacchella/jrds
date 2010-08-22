@@ -14,7 +14,7 @@
 		<dependency org="postgresql" name="postgresql" rev="8.4-701.jdbc4"  conf="lib->default" />
 		<dependency org="org.snmp4j" name="snmp4j" rev="1.10.1"  conf="lib->default" />
 		<dependency org="xerces" name="xercesImpl" rev="2.9.1"  conf="lib->default" />
-  		<dependency org="org.dojotoolkit" name="dojo" rev="1.4.2" conf="lib->default" >
+  		<dependency org="org.dojotoolkit" name="dojo" rev="1.4.3" conf="lib->default" >
 	    	<artifact name="dojo" type="zip" />
 		</dependency>
 		<dependency org="commons-net" name="commons-net" rev="2.0"  conf="lib->default" />

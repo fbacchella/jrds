@@ -17,7 +17,8 @@ dependencies ={
             "dijit.form.NumberTextBox",
             "dijit.Tree",
             "dojo.number",
-            "dijit.form.TimeTextBox"
+            "dijit.form.TimeTextBox",
+            "dijit.layout.TabContainer"
         ]
         }
     ],

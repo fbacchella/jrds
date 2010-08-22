@@ -31,8 +31,16 @@ public class JSonTree extends JSonData {
 		if( f != null) {
 			return evaluateFilter(params, w, root, f);
 		}
-		else 
+		else {
+			String filterName = params.getValue("filter");
+			if(filterName != null && "All tags".equals(filterName.trim())) {
+				return dumpTags(w, root);
+
+			}
+			else
 			return dumpRoots(w, root);
+			
+		}
 	}
 
 	boolean evaluateFilter(ParamsBean params, JrdsJSONWriter w, HostsList root, Filter f) throws IOException, JSONException {
@@ -65,7 +73,7 @@ public class JSonTree extends JSonData {
 		return true;
 	}
 
-	boolean dumpRoots(JrdsJSONWriter w, HostsList root) throws IOException, JSONException {
+	boolean dumpTags(JrdsJSONWriter w, HostsList root) throws IOException, JSONException {
 		List<String> tagsref = new ArrayList<String>();
 		for(String filterName: root.getAllFiltersNames()) {
 			Filter filter = root.getFilter(filterName);
@@ -74,13 +82,26 @@ public class JSonTree extends JSonData {
 				logger.trace("Found filter tag: " + filter);
 				tagsref.add(Integer.toString(filter.hashCode()));
 				type="subfilter";
+				Map<String, String> href = new HashMap<String, String>();
+				href.put("filter", filterName);
+				doNode(w,filterName, filter.hashCode(), type, null, href);
 			}
-			Map<String, String> href = new HashMap<String, String>();
-			href.put("filter", filterName);
-			doNode(w,filterName, filter.hashCode(), type, null, href);
 		}
 		if(tagsref.size() > 0) {
 			doNode(w,"All tags", tagsref.hashCode(), "filter", tagsref);
+		}
+		return true;
+	}
+
+	boolean dumpRoots(JrdsJSONWriter w, HostsList root) throws IOException, JSONException {
+		for(String filterName: root.getAllFiltersNames()) {
+			Filter filter = root.getFilter(filterName);
+			String type = "filter";
+			if(!(filter instanceof FilterTag)){
+				Map<String, String> href = new HashMap<String, String>();
+				href.put("filter", filterName);
+				doNode(w,filterName, filter.hashCode(), type, null, href);
+			}
 		}
 		return true;
 	}
