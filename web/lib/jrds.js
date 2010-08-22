@@ -31,12 +31,6 @@ function graphHistory() {
 
 function doGraphList(result) {
 	var graphPane = dojo.byId("graphPane");
-	//var wipeArgs = {
-	//        node: graphPane
-	//};
-	//dojo.fx.wipeIn(wipeArgs).play();
-	//dojo.style(graphPane, "display", "none")
-	//dojo.fadeOut({node: graphPane,duration: 1000}).play
 	dojo.empty(graphPane);
 	for(i in result.items) {
 		graph = result.items[i];
@@ -94,22 +88,14 @@ function doGraphList(result) {
 
 		dojo.place(graphImg, graphBlock);
 		dojo.place(iconsList, graphBlock);
-		//dojo.style(graphBlock, "display", "none");
-		//var wipeArgs = {
-		//        node: graphBlock
-		//};
-
 	}
-	//dojo.fx.wipeOut(wipeArgs).play();
-	//dojo.fadeIn({node: graphPane,duration: 1000}).play
-	//dojo.style(graphPane, "display", "block");
 	return result;
 }
 
 function reloadTree() {	
 	return dojo.xhrGet( {
 		content: queryParams,
-		url: "jsongraph", // + dojo.objectToQuery(queryParams),
+		url: "jsongraph",
 		handleAs: "json",
 		load: doGraphList
 	});
@@ -143,16 +129,12 @@ function getTree(treeType) {
 	// filter, subfilter for a custom tree
 	// graph, node, tree filter
 	// graph, node, tree for an host
-	console.log("tree type: " + treeType);
+
 	
 	var treeOne = dijit.byId("treeOne");
 	if( treeOne) {
 		treeOne.destroyRecursive(true);
 	}
-//	var type="filter";
-//	if(queryParams.filter || queryParams.host) {
-//		type="tree";
-//	}
 
 	var store = new dojo.data.ItemFileReadStore({
 		url: "jsontree?" + dojo.objectToQuery(queryParams)
@@ -287,10 +269,10 @@ function setupCalendar() {
 	timeBox: beginTimeTextBox
 	}, "begin");
 	new DayHourTextBox({
-		//A bug in dojo 4.2 ?
+		//A bug in dojo 1.4.2 ?
 		regExpGen: function() {
-		return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
-	},
+			return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
+		},
 	name: "end",
 	resetHour: endHour,
 	timeBox: endTimeTextBox
@@ -390,10 +372,6 @@ function transitTab(newPage, oldPage){
 		treeType = 'filter';
 		queryParams.filter = '';
 	}
-//	else if(newId == 'hoststab') {
-//		treeType = 'tree';
-//		queryParams.filter = 'All hosts';
-//	}
 	else if(newId == 'tagstab') {
 		treeType = 'subfilter';
 		queryParams.filter = 'All tags';
@@ -401,7 +379,6 @@ function transitTab(newPage, oldPage){
 	else {
 		treeType = 'tree';
 		queryParams.filter = newPage.attr('title');
-		console.log("Filter tree " + queryParams.filter);
 	}
 	if(newId != 'adminTab') {
 		newPage.attr('content', dojo.clone(mainPane));
