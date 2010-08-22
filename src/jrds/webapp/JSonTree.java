@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 import jrds.Filter;
 import jrds.FilterTag;
-import jrds.FilterXml;
 import jrds.GraphNode;
 import jrds.GraphTree;
 import jrds.HostsList;
@@ -23,8 +23,6 @@ import org.json.JSONException;
 public class JSonTree extends JSonData {
 	static final private Logger logger = Logger.getLogger(JSonTree.class);
 
-	private static final long serialVersionUID = 1L;
-
 	@Override
 	public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException, JSONException {
 		Filter f = params.getFilter();
@@ -35,40 +33,35 @@ public class JSonTree extends JSonData {
 			String filterName = params.getValue("filter");
 			if(filterName != null && "All tags".equals(filterName.trim())) {
 				return dumpTags(w, root);
-
 			}
 			else
-			return dumpRoots(w, root);
-			
+				return dumpRoots(w, root);
 		}
 	}
 
 	boolean evaluateFilter(ParamsBean params, JrdsJSONWriter w, HostsList root, Filter f) throws IOException, JSONException {
 		logger.debug("Dumping with filter" + f);
 		Collection<GraphTree> level = root.getGraphsRoot();
-		logger.trace("This level size: " + level.size());
+		logger.trace("Graphs root: " + level);
 
-		//A first pass to see if there is only one root
-		//Jump into the childs it's the case
+		//We construct the graph tree root to use
 		//The tree is parsed twice, that's not optimal
-		if( (f  instanceof FilterXml)) {
-			int count =0;
-			for(GraphTree tree: root.getGraphsRoot()) {
-				if(tree.enumerateChildsGraph(f).size() > 0) {
-					count++;
-					level = tree.getChildsMap().values();
-				}
+		Collection<GraphTree> rootToDo = new HashSet<GraphTree>(level.size());
+		for(GraphTree tree: root.getGraphsRoot()) {
+			GraphTree testTree = f.setRoot(tree);
+			if(testTree != null && ! rootToDo.contains(testTree) && testTree.enumerateChildsGraph(f).size() > 0) {
+				rootToDo.add(testTree);
 			}
-			if(count > 1)
-				level = root.getGraphsRoot();
 		}
 
-		for(GraphTree tree: level) {
-			tree = f.setRoot(tree);
-			if(tree != null) {
-				sub(params, w, tree, "tree", f, "", tree.hashCode());
-			}
+		//Look for the first level with many childs
+		while(rootToDo.size() == 1) {
+			GraphTree child = rootToDo.iterator().next();
+			rootToDo = child.getChildsMap().values();
+		}
 
+		for(GraphTree tree: rootToDo) {
+			sub(params, w, tree, "tree", f, "", tree.hashCode());
 		}
 		return true;
 	}
