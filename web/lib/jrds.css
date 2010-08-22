@@ -29,13 +29,12 @@ body, input, option, select, tab, div, td, a, textarea {
 	margin:5px;
 	padding:5px;
 	width:330px;
-	height: 100%;
 }
 #graphPane {
-	width:710px;
+	width:800px;
 }
-#formPane {
-	width:710px;
+#paramsPane {
+	width:800px;
 }
 .box {
 	background-color: white;
