@@ -32,7 +32,7 @@ public class TestRRDProbe {
 		logger.setLevel(Level.TRACE);
 		Tools.setLevel(new String[] { "jrds.Probe" }, logger.getLevel());
 
-		Process p = Runtime.getRuntime().exec(new String[] {"/sw/bin/rrdtool", "restore", "-", "tmp/rrdtool.rrd"});
+		Process p = Runtime.getRuntime().exec(new String[] {"rrdtool", "restore", "-", "tmp/rrdtool.rrd"});
 //		InputStreamReader stdout = new InputStreamReader(p.getInputStream());
 //		InputStreamReader stderr = new InputStreamReader(p.getErrorStream());
 //		InputStreamReader[] out = new InputStreamReader[] {stdout, stderr};
