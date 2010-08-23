@@ -42,12 +42,12 @@ public class JSonTree extends JSonData {
 	boolean evaluateFilter(ParamsBean params, JrdsJSONWriter w, HostsList root, Filter f) throws IOException, JSONException {
 		logger.debug("Dumping with filter" + f);
 		Collection<GraphTree> level = root.getGraphsRoot();
-		logger.trace("Graphs root: " + level);
+		//logger.trace("Graphs root: " + level);
 
 		//We construct the graph tree root to use
 		//The tree is parsed twice, that's not optimal
 		Collection<GraphTree> rootToDo = new HashSet<GraphTree>(level.size());
-		for(GraphTree tree: root.getGraphsRoot()) {
+		for(GraphTree tree: level) {
 			GraphTree testTree = f.setRoot(tree);
 			if(testTree != null && ! rootToDo.contains(testTree) && testTree.enumerateChildsGraph(f).size() > 0) {
 				rootToDo.add(testTree);
@@ -56,7 +56,12 @@ public class JSonTree extends JSonData {
 
 		//Look for the first level with many childs
 		while(rootToDo.size() == 1) {
+			logger.trace(jrds.Util.delayedFormatString("Trying with graph tree roots: %s", rootToDo));
 			GraphTree child = rootToDo.iterator().next();
+			Map<String, GraphTree> childTree = child.getChildsMap();
+			//Don't go too deep
+			if(childTree.isEmpty())
+				break;
 			rootToDo = child.getChildsMap().values();
 		}
 
