@@ -238,6 +238,17 @@ public class PropertiesManager extends Properties {
 		Locale.setDefault(new Locale("POSIX"));
 
 		boolean nologging = parseBoolean(getProperty("nologging", "false"));
+		String log4jXmlFile = getProperty("log4jxmlfile", "");
+		String log4jPropFile = getProperty("log4jpropfile", "");
+		if(log4jXmlFile != null && ! "".equals(log4jXmlFile.trim())) {
+			org.apache.log4j.xml.DOMConfigurator.configure(log4jXmlFile.trim());
+			nologging = true;
+		}
+		else if(log4jPropFile != null && ! "".equals(log4jPropFile.trim())) {
+			org.apache.log4j.PropertyConfigurator.configure(log4jPropFile.trim());
+			nologging = true;
+		}
+
 		if(! nologging) {
 			for(String ls: new String[]{ "trace", "debug", "info", "error", "fatal", "warn"}) {
 				Level l = Level.toLevel(ls);
@@ -335,20 +346,6 @@ public class PropertiesManager extends Properties {
 			logger.debug(jrds.Util.delayedFormatString("Admin ACL is %s", adminACL));
 			logger.debug(jrds.Util.delayedFormatString("Default ACL is %s", defaultACL));
 		}
-
-//		String preloadclasses = getProperty("preloadclasses", "");
-//
-//		for(String className: preloadclasses.split(":")) {
-//			try {
-//				if(className != null && ! "".equals(className))
-//					preloadedClasses.add(Class.forName(className, true, extensionClassLoader));
-//			} catch (Exception e) {
-//				logger.error("Class not found:" + className, e);
-//			}
-//		}
-//		preloadedClasses.add(jrds.snmp.MainStarter.class);
-//		logger.debug("Preloaded classes: " + preloadedClasses);
-
 
 	}
 

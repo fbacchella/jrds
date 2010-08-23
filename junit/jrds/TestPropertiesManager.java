@@ -2,6 +2,10 @@ package jrds;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -125,4 +129,20 @@ public class TestPropertiesManager {
 		Assert.assertEquals("Bad admin role", "role1", adminacl.getAdminRole());
 	}
 
+	@Test
+	public void testlog4jpropfile() throws IOException {
+		
+		InputStream is = Tools.class.getResourceAsStream("/ressources/log4j.properties");
+		ReadableByteChannel isChannel = Channels.newChannel(is);
+		FileChannel tmpProp = new java.io.FileOutputStream("tmp/log4j.properties").getChannel();
+		tmpProp.transferFrom(isChannel, 0, 4096);
+		PropertiesManager pm = new PropertiesManager();
+		pm.setProperty("log4jpropfile", "tmp/log4j.properties");
+		pm.update();
+		logger.debug("log file created");
+		
+		File logFile = new File("tmp/log4j.log");
+		Assert.assertTrue("Log4j file not created", logFile.canRead());
+
+	}
 }
