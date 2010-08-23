@@ -4,6 +4,7 @@
     <name>mtaGroup</name>
     <probeName>mtagroupsnmp-${index}</probeName>
 	<probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
+	<preloadClass>jrds.snmp.MainStarter</preloadClass>
 	<index>.1.3.6.1.2.1.28.2.1.25</index>
 	<uniq>true</uniq>
     <ds>

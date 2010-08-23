@@ -5,6 +5,7 @@
     <name>CiscoRouterMemory</name>
     <probeName>ciscomemory</probeName>
     <probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
+    <preloadClass>jrds.snmp.MainStarter</preloadClass>
     <snmpRequester>simple</snmpRequester>
     <ds>
         <dsName>processorRam</dsName>

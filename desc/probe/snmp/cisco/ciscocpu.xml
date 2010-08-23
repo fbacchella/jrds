@@ -4,6 +4,7 @@
   <name>ciscocpuload</name>
   <probeName>ciscocpuload</probeName>
   <probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
+  <preloadClass>jrds.snmp.MainStarter</preloadClass>
   <snmpRequester>simple</snmpRequester>
   <ds>
     <dsName>la1</dsName>

@@ -4,7 +4,8 @@
     <name>CpuRawTimeLinux</name>
     <probeName>cpurawlinux</probeName>
     <probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
-	<specific name="requester">simple</specific>
+    <preloadClass>jrds.snmp.MainStarter</preloadClass>
+    <specific name="requester">simple</specific>
 	<specific name="existOid">.1.3.6.1.4.1.2021.11.1.0</specific>
     <ds>
         <dsName>ssCpuRawUser</dsName>

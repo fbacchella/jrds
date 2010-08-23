@@ -4,6 +4,7 @@
     <name>CpuRawTimeF5</name>
     <probeName>cpurawf5</probeName>
     <probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
+    <preloadClass>jrds.snmp.MainStarter</preloadClass>
     <snmpRequester>simple</snmpRequester>
     <ds>
         <dsName>ssCpuRawUser</dsName>
