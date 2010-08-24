@@ -112,10 +112,13 @@ public class ParamsBean implements Serializable {
 			return values[0];
 		return null;
 	}
-
-	public void parseReq(HttpServletRequest req, HostsList hl) {
-		root =	hl;
-
+	
+	/**
+	 * Set the authentication context, witout touching the requests parameters
+	 * @param req
+	 * @param hl
+	 */
+	public void readAuthorization(HttpServletRequest req, HostsList hl) {
 		user = req.getRemoteUser();
 		if(user != null) {
 			roles = new HashSet<String>();
@@ -124,7 +127,13 @@ public class ParamsBean implements Serializable {
 					roles.add(role);
 			}
 		}
-		logger.trace("Found user "  + user + " with roles " + roles);
+		logger.trace("Found user "  + user + " with roles " + roles);		
+	}
+
+	public void parseReq(HttpServletRequest req, HostsList hl) {
+		root =	hl;
+		
+		readAuthorization(req, hl);
 
 		contextPath = req.getContextPath();
 		period = makePeriod(req);
