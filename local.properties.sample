@@ -19,4 +19,4 @@
 #appserv.servlet-api = ${appserv.home}/server/default/lib
 
 #If your application serve is jetty
-#appserv.servlet-api = ${appserv.home}/lib
+#appserv.servlet-api = ${appserv.home}/libjetty
