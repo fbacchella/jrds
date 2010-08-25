@@ -39,8 +39,7 @@ public final class WhichLibs extends JrdsServlet {
 	throws ServletException, IOException {
 		HostsList hl = getHostsList();
 
-		ParamsBean params = new ParamsBean();
-		params.parseReq(req, hl);
+		ParamsBean params = new ParamsBean(req, hl);
 		if(! allowed(params, getPropertiesManager().adminACL, req, res))
 			return;
 

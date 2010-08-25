@@ -15,6 +15,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONException;
+
 import jrds.HostsList;
 import jrds.RdsHost;
 
@@ -32,14 +34,11 @@ public class Status extends JrdsServlet {
 		
 		HostsList hl = getHostsList();
 
-		ParamsBean params = new ParamsBean();
-		params.parseReq(req, hl);
+		ParamsBean params = new ParamsBean(req, hl);
 		if(! allowed(params, getPropertiesManager().defaultRoles)) {
 			res.setStatus(HttpServletResponse.SC_FORBIDDEN);
 			return;
 		}
-		res.setContentType("text/plain");
-		res.addHeader("Cache-Control", "no-cache");
 
 		Collection<RdsHost> hosts = hl.getHosts();
 		int numHosts = hosts.size();
@@ -47,9 +46,6 @@ public class Status extends JrdsServlet {
 		for(RdsHost h: hosts) {
 			numProbes += h.getProbes().size();
 		}
-		PrintWriter writer = res.getWriter();
-		writer.println("Hosts: " + numHosts);
-		writer.println("Probes: " + numProbes);
 		HostsList.Stats stats = hl.getStats();
 		Date lastCollect;
 		long runtime;
@@ -58,8 +54,30 @@ public class Status extends JrdsServlet {
 			runtime = stats.runtime;
 		}
 		long lastCollectAgo = (System.currentTimeMillis() - lastCollect.getTime())/1000;
-		writer.println("Last collect: " + lastCollectAgo  + "s ago (" + lastCollect + ")" );
-		writer.println("Last running duration: " + runtime / 1000 + "s");
-		writer.flush();
+
+		if(params.getValue("json") != null) {
+			JrdsJSONWriter writer = new JrdsJSONWriter(res);
+			try {
+				writer.object();
+				writer.key("Hosts").value(numHosts);
+				writer.key("Probes").value(numProbes);
+				writer.key("LastCollect").value(lastCollectAgo);
+				writer.key("LastDuration").value(runtime / 1000);
+				writer.endObject();
+				writer.flush();
+			} catch (JSONException e) {
+			}
+			
+		}
+		else {
+			res.setContentType("text/plain");
+			res.addHeader("Cache-Control", "no-cache");
+			PrintWriter writer = res.getWriter();
+			writer.println("Hosts: " + numHosts);
+			writer.println("Probes: " + numProbes);
+			writer.println("Last collect: " + lastCollectAgo  + "s ago (" + lastCollect + ")" );
+			writer.println("Last running duration: " + runtime / 1000 + "s");
+			writer.flush();			
+		}
 	}
 }

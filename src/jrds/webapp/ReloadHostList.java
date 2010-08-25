@@ -24,8 +24,7 @@ public class ReloadHostList extends JrdsServlet {
 			throws ServletException, IOException {
 		final ServletContext ctxt = getServletContext();
 		
-		ParamsBean params = new ParamsBean();
-		params.parseReq(req, getHostsList());
+		ParamsBean params = new ParamsBean(req, getHostsList());
 		if(! allowed(params, getPropertiesManager().adminACL, req, res))
 			return;
 

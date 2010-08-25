@@ -103,6 +103,7 @@ public class ParamsBean implements Serializable {
 	@SuppressWarnings("unchecked")
 	//Not a really useful method, just to reduce warning
 	private Map<String, String[]> getReqParamsMap(HttpServletRequest req) {
+		logger.trace(jrds.Util.delayedFormatString("Parameter map for %s: %s", req, req.getParameterMap()));
 		return req.getParameterMap();
 	}
 
@@ -130,7 +131,7 @@ public class ParamsBean implements Serializable {
 		logger.trace("Found user "  + user + " with roles " + roles);		
 	}
 
-	public void parseReq(HttpServletRequest req, HostsList hl) {
+	private void parseReq(HttpServletRequest req, HostsList hl) {
 		root =	hl;
 		
 		readAuthorization(req, hl);
