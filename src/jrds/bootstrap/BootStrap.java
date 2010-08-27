@@ -115,7 +115,6 @@ public class BootStrap {
 
 			return baseClassPath;
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -162,6 +161,13 @@ public class BootStrap {
 			for(String commandName: cmdClasses.keySet()) {
 				System.out.println("    " + commandName);
 			}
+			System.out.println("");
+			System.out.println("Lists of configuration propreties:");
+			for(String propName: propertiesList) {
+				System.out.println("    " + propName);
+			}
+			System.out.println(String.format("A class path can be auto build with the propery libspath, a list of directory or jar, separated by a %s", File.pathSeparatorChar));
+
 		}
 		System.exit(0);
 	}

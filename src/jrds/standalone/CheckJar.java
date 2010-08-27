@@ -58,6 +58,11 @@ public class CheckJar extends CommandStarterImpl {
 
 			Map<String, GraphDesc> grapMapjar = confjar.setGraphDescMap(jarload.getRepository(Loader.ConfigType.GRAPHDESC));
 			for(ProbeDesc pd: confjar.setProbeDescMap(jarload.getRepository(Loader.ConfigType.PROBEDESC)).values()) {
+				for(String ds: pd.getDs()) {
+					if(ds.length() > 20) {
+						System.out.println(String.format("DS name %s too long for probe description %s", ds, pd.getName() ));
+					}
+				}
 				Collection<String> graphs = pd.getGraphClasses();
 				if(graphs.size() == 0) {
 					System.out.println("no graphs for probe desc: " + pd.getName());
