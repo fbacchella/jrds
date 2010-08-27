@@ -309,7 +309,7 @@ implements Cloneable, WithACL {
 	static final public PathElement INTERFACES = PathElement.INTERFACES;
 	static final public PathElement DATABASE = PathElement.DATABASE;
 
-	private enum Colors {
+	public enum Colors {
 		BLUE {
 			@Override
 			public Color getColor() {
