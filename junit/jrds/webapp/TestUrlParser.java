@@ -11,6 +11,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import jrds.GraphNode;
 import jrds.HostsList;
 import jrds.Period;
@@ -47,7 +49,7 @@ public class TestUrlParser {
 		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
 		Assert.assertEquals(1, pb.getId());
 	}
-	
+
 	@Test
 	public void checkIdRest() {
 		Map<String, String[]> parameters = new HashMap<String, String[]>();
@@ -62,7 +64,7 @@ public class TestUrlParser {
 		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
 		Assert.assertEquals("Graph not found by path", gn.hashCode(), pb.getId());
 	}
-	
+
 
 	@Test
 	public void checkSortedTrue() {
@@ -71,14 +73,14 @@ public class TestUrlParser {
 		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
 		Assert.assertTrue(pb.isSorted());
 	}
-	
+
 	@Test
 	public void checkSortedFalseDefault() {
 		Map<String, String[]> parameters = new HashMap<String, String[]>();
 		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
 		Assert.assertTrue(! pb.isSorted());
 	}
-	
+
 	@Test
 	public void checkParseDate1() throws ParseException {
 		Map<String, String[]> parameters = new HashMap<String, String[]>();
@@ -99,7 +101,7 @@ public class TestUrlParser {
 
 		logger.trace(url);
 	}
-	
+
 	@Test
 	public void checkParseDate2() throws ParseException {
 		Map<String, String[]> parameters = new HashMap<String, String[]>();
@@ -153,7 +155,7 @@ public class TestUrlParser {
 		Assert.assertFalse(url.contains("begin="));
 		Assert.assertFalse(url.contains("end="));
 	}
-	
+
 	@Test
 	public void checkUrl2() {
 		Map<String, String[]> parameters = new HashMap<String, String[]>();
@@ -172,7 +174,7 @@ public class TestUrlParser {
 		Assert.assertTrue(url.contains("max="));
 		Assert.assertTrue(url.contains("min="));
 	}
-	
+
 	@Test
 	public void checkUrl3() throws UnsupportedEncodingException {
 		Map<String, String[]> parameters = new HashMap<String, String[]>();
@@ -189,13 +191,22 @@ public class TestUrlParser {
 		Assert.assertTrue(url.contains("end="));
 		Assert.assertFalse(url.contains("scale="));
 	}
-	
+
+	//	@Test
+	//	public void testUnpack() {
+	//		Map<String, String[]> parameters = new HashMap<String, String[]>();
+	//		parameters.put("p", new String [] {"E3JMQqAMBBE0auEqRPYNcbodp5DbISogYBgtBLvbiwEq3n8uWAhA%2FqU1BzTEfYMjWk7lxgwavB3rls%2B8lsIYljDQwo1mrL8whVUxGSoNdyqyorrSq7%2F2SsiIcL9ACNvWBB2AAAA"});
+	//		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
+	//	}
+	//	
+
 	@Test
-	public void testUnpack() {
+	public void testPath() {
 		Map<String, String[]> parameters = new HashMap<String, String[]>();
-		parameters.put("p", new String [] {"E3JMQqAMBBE0auEqRPYNcbodp5DbISogYBgtBLvbiwEq3n8uWAhA%2FqU1BzTEfYMjWk7lxgwavB3rls%2B8lsIYljDQwo1mrL8whVUxGSoNdyqyorrSq7%2F2SsiIcL9ACNvWBB2AAAA"});
-		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
-		
+		HttpServletRequest req = GetMoke.getRequest(parameters);
+		ParamsBean pb = new ParamsBean(req, hl);
+		String buildurl = pb.makeObjectUrl("graph", jrds.Filter.ALLHOSTS, true);
+		Assert.assertTrue("bad build url", buildurl.startsWith("/mockurl/graph?"));
 	}
 
 }

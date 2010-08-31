@@ -8,7 +8,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.HostsList;
 import jrds.PropertiesManager;
-import jrds.Tab;
+//import jrds.Tab;
 import jrds.Tools;
 import jrds.factories.xml.JrdsNode;
 import jrds.graphe.Sum;
@@ -63,7 +63,7 @@ public class TestTab {
 		TabBuilder tb = new TabBuilder();
 		tb.setProperty(ObjectBuilder.properties.PM, pm);
 	
-		Tab tab = tb.makeTab(new JrdsNode(d));
+//		Tab tab = tb.makeTab(new JrdsNode(d));
 	}
 
 }
