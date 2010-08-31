@@ -151,7 +151,7 @@
 			notree="false" nonavbar="false" noindex="false" splitindex="true"
 			author="true" version="true" nodeprecatedlist="false"
 			nodeprecated="false"
-			packagenames="jrds,jrds.*,jrds.probe.*,jrds.factories.*"
+			packagenames="jrds,jrds.*,jrds.probe.*,jrds.factories.*,jrds.webapp"
 			>
 			<fileset dir="src" />
 			<fileset dir="probes-other">
@@ -164,6 +164,8 @@
 			<link href="http://jrds.fr/apidoc-rrd4j/"/>
 			<link href="http://www.junit.org/junit/javadoc/4.3"/>
 			<link href="http://www.mortbay.org/apidocs/"/>
+			<link href="http://ws.apache.org/xmlrpc/apidocs"/>
+			<link href="http://www.json.org/javadoc/"/>
 		</javadoc>
 	</target>
 	
