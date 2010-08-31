@@ -75,12 +75,14 @@ public class ParamsBean implements Serializable {
 	}
 
 	public ParamsBean(HttpServletRequest req, HostsList hl) {
+		contextPath = req.getContextPath();
 		params =  getReqParamsMap(req);
 		readAuthorization(req, hl);
 		parseReq(hl);
 	}
 
 	public ParamsBean(HttpServletRequest req, HostsList hl, String... restPath ) {
+		contextPath = req.getContextPath();
 		String probeInfo = req.getPathInfo();
 		if (probeInfo != null) {
 			params = new HashMap<String, String[]>(restPath.length);
