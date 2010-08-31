@@ -7,6 +7,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jrds.Filter;
+import jrds.FilterHost;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 
 /**
@@ -23,22 +27,34 @@ public class JSonQueryParams extends JrdsServlet {
 		JrdsJSONWriter w = new JrdsJSONWriter(response);
 		try {
 			w.object();
-			doVariable(w, "pid", request.getParameter("pid"));
-			doVariable(w, "id", request.getParameter("id"));
-			doVariable(w, "gid", request.getParameter("gid"));
-			doVariable(w, "sort", request.getParameter("sort"));
-			doVariable(w, "host", request.getParameter("host"));
-			doVariable(w, "filter", request.getParameter("filter"));
-			doVariable(w, "begin", params.getStringBegin());
-			doVariable(w, "end", params.getStringEnd());
+			doVariable(w, "pid", params.getValue("pid"));
+			doVariable(w, "id", params.getValue("id"));
+			doVariable(w, "gid", params.getValue("gid"));
+			doVariable(w, "sort", params.getValue("sort"));
+			String pathString = params.getValue("path");
+			if(pathString != null && ! "".equals(pathString)) {
+				doVariable(w, "path", new JSONArray(pathString));
+			}
+			doVariable(w, "tab", params.getValue("tab"));
+			Filter f = params.getFilter();
+			if(f != null) {
+				if(f instanceof FilterHost) {
+					doVariable(w, "host", f.getName());
+				}
+				else {
+					doVariable(w, "filter", f.getName());
+				}
+			}
 			doVariable(w, "min", params.getMinStr());
 			doVariable(w, "max", params.getMaxStr());
-			doVariable(w, "dsName", request.getParameter("dsName"));
+			doVariable(w, "dsName", params.getValue("dsName"));
 			int scale = params.getScale();
 			if(scale > 0) {
 				doVariable(w, "autoperiod", "" + scale);
 			}
 			else {
+				doVariable(w, "begin", params.getStringBegin());
+				doVariable(w, "end", params.getStringEnd());
 				doVariable(w, "autoperiod", "0");
 			}
 			w.endObject();
@@ -49,11 +65,16 @@ public class JSonQueryParams extends JrdsServlet {
 		}
 	}
 
-	private final void doVariable(JrdsJSONWriter w, String key, String value) throws JSONException {
-		if(value != null && ! "".equals(value)) {
-			value = value.replace("'", " ").replace("\"", " ");
-			w.key(key).value(value);
+	private final void doVariable(JrdsJSONWriter w, String key, Object value) throws JSONException {
+		if(value == null) 
+			return;
+		if(value instanceof String && "".equals(value.toString().trim())) {
+			return;
 		}
+		//		if(value != null && ! "".equals(value)) {
+		//			value = value.replace("'", " ");//.replace("\"", " ");
+		//		}
+		w.key(key).value(value);
 	}
 
 }

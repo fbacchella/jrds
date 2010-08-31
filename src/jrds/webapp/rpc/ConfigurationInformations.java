@@ -7,14 +7,23 @@ import java.util.Set;
 import jrds.RdsHost;
 import jrds.webapp.Configuration;
 import jrds.webapp.rpc.JrdsRequestProcessorFactoryFactory.InitializableRequestProcessor;
+import jrds.webapp.rpc.Role.RoleList;
 
 import org.apache.xmlrpc.XmlRpcException;
 
+/**
+ * @author bacchell
+ *
+ */
 public class ConfigurationInformations implements InitializableRequestProcessor {
-	static final String REMOTENAME = "configurationinformations";
-	
+	/**
+	 * The name for the xml-rpc handler
+	 */
+	static final public String REMOTENAME = "configurationinformations";
+
 	Configuration config;
 
+	@Role(RoleList.USER)
 	public Object[] getHostsName() {
 		Collection<RdsHost> hostsList = config.getHostsList().getHosts();
 		Set<String> hosts = new HashSet<String>(hostsList.size());
@@ -26,5 +35,5 @@ public class ConfigurationInformations implements InitializableRequestProcessor 
 
 	public void init(Configuration config) throws XmlRpcException {
 		this.config = config;
-	}		
+	}
 }

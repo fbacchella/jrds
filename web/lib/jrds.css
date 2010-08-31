@@ -31,10 +31,10 @@ body, input, option, select, tab, div, td, a, textarea {
 	width:330px;
 }
 #graphPane {
-	width:800px;
+	width:700px;
 }
 #paramsPane {
-	width:800px;
+	width:700px;
 }
 .box {
 	background-color: white;
@@ -46,6 +46,7 @@ body, input, option, select, tab, div, td, a, textarea {
 	background-color:#F5F5F5;
 	border:1px solid #AAAAAA;
 	margin:5px;
+	width:550px;
 }
 .field {
 	margin: 5px;

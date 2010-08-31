@@ -6,6 +6,9 @@
 
 package jrds.webapp;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -21,9 +24,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import jrds.Base64;
 import jrds.Filter;
 import jrds.Graph;
 import jrds.HostsList;
@@ -33,6 +38,8 @@ import jrds.Util;
 import jrds.Util.SiPrefix;
 
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 /**
  * A bean to have a period with begin and end of type String
@@ -69,7 +76,8 @@ public class ParamsBean implements Serializable {
 
 	public ParamsBean(HttpServletRequest req, HostsList hl) {
 		params =  getReqParamsMap(req);
-		parseReq(req, hl);
+		readAuthorization(req, hl);
+		parseReq(hl);
 	}
 
 	public ParamsBean(HttpServletRequest req, HostsList hl, String... restPath ) {
@@ -97,14 +105,15 @@ public class ParamsBean implements Serializable {
 					logger.trace(key + ": " + Arrays.asList(value));
 			}
 		}
-		parseReq(req, hl);
+		readAuthorization(req, hl);
+		parseReq(hl);
 	}
 
 	@SuppressWarnings("unchecked")
 	//Not a really useful method, just to reduce warning
 	private Map<String, String[]> getReqParamsMap(HttpServletRequest req) {
 		logger.trace(jrds.Util.delayedFormatString("Parameter map for %s: %s", req, req.getParameterMap()));
-		return req.getParameterMap();
+		return new HashMap<String, String[]>(req.getParameterMap());
 	}
 
 	public String getValue(String key) {
@@ -113,7 +122,7 @@ public class ParamsBean implements Serializable {
 			return values[0];
 		return null;
 	}
-	
+
 	/**
 	 * Set the authentication context, witout touching the requests parameters
 	 * @param req
@@ -131,14 +140,43 @@ public class ParamsBean implements Serializable {
 		logger.trace("Found user "  + user + " with roles " + roles);		
 	}
 
-	private void parseReq(HttpServletRequest req, HostsList hl) {
-		root =	hl;
-		
-		readAuthorization(req, hl);
+	private void unpack(String packed) {
+		String formatedpack;
+		formatedpack = JSonPack.GZIPHEADER +  packed.replace('!', '=').replace('$', '/').replace('*', '+');
+		logger.trace(formatedpack);
+		ByteArrayOutputStream outbuffer = new ByteArrayOutputStream(formatedpack.length());
+		ByteArrayInputStream inbuffer = new ByteArrayInputStream(Base64.decode(formatedpack));
+		try {
+			byte[] copybuffer = new byte[1500];
+			GZIPInputStream os = new GZIPInputStream(inbuffer);
+			int realread = os.read(copybuffer);
+			while(realread > 0) {
+				outbuffer.write(copybuffer, 0, realread );
+				realread = os.read(copybuffer);
+			}
+			JrdsJSONObject json = new JrdsJSONObject(outbuffer.toString());
+			for(String key: json) {
+				Object value = json.get(key);
+				String newkey = JSonPack.JSONKEYS.get(new Integer(key));
+				params.put(newkey, new String[] {value.toString()});
+				logger.trace(jrds.Util.delayedFormatString("adding %s = %s", newkey, value));
+			}
+		} catch (IOException e) {
+			logger.error("IOException " + e, e);
+		} catch (JSONException e) {
+			logger.error("JSON parsing exception " + e);
+		}
+		logger.trace("Params unpacked: " + params);
+	}
 
-		contextPath = req.getContextPath();
-		period = makePeriod(req);
-		logger.trace("period from parameters: " + period);
+	private void parseReq(HostsList hl) {
+		root =	hl;
+
+		String packed = getValue("p");
+		if(packed != null && ! "".equals(packed))
+			unpack(packed);
+
+		period = makePeriod();
 
 		String host = getValue("host");
 		String probe = getValue("probe");
@@ -361,18 +399,18 @@ public class ParamsBean implements Serializable {
 		this.id = id;
 	}
 
-	private Period makePeriod(HttpServletRequest req) {
+	private Period makePeriod() {
 		Period p = null;
 		try {
-			String scaleStr = req.getParameter("scale");
+			String scaleStr = getValue("scale");
 			//Changed name for this attribute
 			if(scaleStr == null)
-				scaleStr = req.getParameter("autoperiod");
+				scaleStr = getValue("autoperiod");
 
 			int scale = jrds.Util.parseStringNumber(scaleStr, Integer.class, -1).intValue();
 
-			String end = req.getParameter("end");
-			String begin = req.getParameter("begin");
+			String end = getValue("end");
+			String begin = getValue("begin");
 			if(scale > 0)
 				p = new Period(scale);
 			else if(end != null && begin !=null)
@@ -380,9 +418,9 @@ public class ParamsBean implements Serializable {
 			else
 				p = new Period();
 		} catch (NumberFormatException e) {
-			logger.error("Period cannot be parsed :" + req.getQueryString());
+			logger.error("Period cannot be parsed");
 		} catch (ParseException e) {
-			logger.error("Period cannot be parsed :" + req.getQueryString());
+			logger.error("Period cannot be parsed");
 		}
 		return p;
 	}

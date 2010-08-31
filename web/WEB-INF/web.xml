@@ -91,6 +91,13 @@
           </description>
 		</init-param>
 	</servlet>
+	<servlet>
+		<servlet-name>JSonPack</servlet-name>
+		<display-name>JSonPack</display-name>
+		<description></description>
+		<servlet-class>
+		jrds.webapp.JSonPack</servlet-class>
+	</servlet>
 	<servlet-mapping>
 		<servlet-name>CheckValues</servlet-name>
 		<url-pattern>/values/*</url-pattern>
@@ -154,5 +161,13 @@
 	<servlet-mapping>
 		<servlet-name>XmlRpcServlet</servlet-name>
 		<url-pattern>/xmlrpc</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>XmlRpcServlet</servlet-name>
+		<url-pattern>/xmlrpc/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>JSonPack</servlet-name>
+		<url-pattern>/jsonpack/*</url-pattern>
 	</servlet-mapping>
 </web-app>

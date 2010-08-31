@@ -189,5 +189,13 @@ public class TestUrlParser {
 		Assert.assertTrue(url.contains("end="));
 		Assert.assertFalse(url.contains("scale="));
 	}
+	
+	@Test
+	public void testUnpack() {
+		Map<String, String[]> parameters = new HashMap<String, String[]>();
+		parameters.put("p", new String [] {"E3JMQqAMBBE0auEqRPYNcbodp5DbISogYBgtBLvbiwEq3n8uWAhA%2FqU1BzTEfYMjWk7lxgwavB3rls%2B8lsIYljDQwo1mrL8whVUxGSoNdyqyorrSq7%2F2SsiIcL9ACNvWBB2AAAA"});
+		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
+		
+	}
 
 }

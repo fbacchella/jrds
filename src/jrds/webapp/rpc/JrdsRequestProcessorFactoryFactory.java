@@ -11,6 +11,13 @@ import org.apache.xmlrpc.server.RequestProcessorFactoryFactory;
 
 public class JrdsRequestProcessorFactoryFactory extends RequestProcessorFactoryFactory.RequestSpecificProcessorFactoryFactory {
 
+	/**
+	 * This interface is used for handler class that need access to the global configuration objects
+	 * of JRDS : jrds.HostsList and jrds.PropertiesManager
+	 * 
+	 * @author bacchell
+	 *
+	 */
 	public interface InitializableRequestProcessor {
 		void init(Configuration config) throws XmlRpcException;
 	}

@@ -48,8 +48,7 @@ dojo.addOnLoad(function(){
 	var tabs = dijit.byId("tabs");
 	dojo.connect(tabs,"_transition", transitTab);
 	setupCalendar();
-	fileForms();
-	getTree('filter');
+	setupDisplay();
 });
 
 </script>
@@ -62,42 +61,42 @@ dojo.addOnLoad(function(){
 				<form dojoType="dijit.form.Form" id="hostForm" action="" method="" onSubmit="searchHost">
 					<a id="toroot" href="javascript:goHome()"><img src="img/back_to_album.gif" alt="" height="16" width="20" border="0" /></a>
       				<label for="host">Only host</label>
-      				<input id="host" type="text" name="host" size="24" dojoType="dijit.form.TextBox" type="submit"  trim="true" required="true" />
+      				<input id="host" type="text" name="host" size="24" dojoType="dijit.form.TextBox" trim="true" required="true" />
         			<button type="submit" dojoType="dijit.form.Button">Search</button>
 				</form>
 <!--			    <div id="treeOne" > </div>-->
 			</div> <!-- treePane -->
 			<div id="centerPane" dojoType="dijit.layout.ContentPane" region="center">
 				<div dojoType="dijit.layout.ContentPane" id="paramsPane" >
-					<form  id="dateForm" name="dateForm" action="" method="">
+					<form dojoType="dijit.form.Form" id="dateForm" name="dateForm" action="" method="" onSubmit="submitRenderForm">
 						<div  dojoType="dijit.layout.ContentPane" class="formblock" >
 							<span class="linelabel">Time scale</span>
-       						<select id="autoperiod" name="autoperiod" dojoType="dijit.form.Select">
-								<option value="0" id="0">Manual</option>
-								<option value="1" id="1">Last Hour</option>
-								<option value="2" id="2">Last 2 Hours</option>
-								<option value="3" id="3">Last 3 Hours</option>
-								<option value="4" id="4">Last 4 Hours</option>
-								<option value="5" id="5">Last 6 Hours</option>
-								<option value="6" id="6">Last 12 Hours</option>
-								<option value="7" id="7">Last Day</option>
-								<option value="8" id="8">Last 2 Days</option>
-								<option value="9" id="9">Last Week</option>
-								<option value="10" id="10">Last 2 Weeks</option>
-								<option value="11" id="11">Last Month</option>
-								<option value="12" id="12">Last 2 Months</option>
-								<option value="13" id="13">Last 3 Months</option>
-								<option value="14" id="14">Last 4 Months</option>
-								<option value="15" id="15">Last 6 Months</option>
-								<option value="16" id="16">Last Year</option>
-								<option value="17" id="17">Last 2 Years</option>
+       						<select id="autoperiod" name="autoperiod" dojoType="dijit.form.Select" style="width: 90px">
+								<option value="0" id="period.0">Manual</option>
+								<option value="1" id="period.1">Last Hour</option>
+								<option value="2" id="period.2">Last 2 Hours</option>
+								<option value="3" id="period.3">Last 3 Hours</option>
+								<option value="4" id="period.4">Last 4 Hours</option>
+								<option value="5" id="period.5">Last 6 Hours</option>
+								<option value="6" id="period.6">Last 12 Hours</option>
+								<option value="7" id="period.7">Last Day</option>
+								<option value="8" id="period.8">Last 2 Days</option>
+								<option value="9" id="period.9">Last Week</option>
+								<option value="10" id="period.10">Last 2 Weeks</option>
+								<option value="11" id="period.11">Last Month</option>
+								<option value="12" id="period.12">Last 2 Months</option>
+								<option value="13" id="period.13">Last 3 Months</option>
+								<option value="14" id="period.14">Last 4 Months</option>
+								<option value="15" id="period.15">Last 6 Months</option>
+								<option value="16" id="period.16">Last Year</option>
+								<option value="17" id="period.17">Last 2 Years</option>
        						</select>
           					<label for="begin">Begin</label>
-          					<input type="text" name="begin" id="begin" class="field" onkeypress="periodKeyEvent"/>
-          					<input type="text" name="beginh" id="beginh" class="field" onkeypress="periodKeyEvent"/>
+          					<input type="text" name="begin" id="begin" class="field" />
+          					<input type="text" name="beginh" id="beginh" class="field" />
           					<label for="end">End</label>
-          					<input type="text" name="end" id="end" class="field" onkeypress="periodKeyEvent"/>
-          					<input type="text" name="endh" id="endh" class="field" onkeypress="periodKeyEvent"/>
+          					<input type="text" name="end" id="end" class="field" />
+          					<input type="text" name="endh" id="endh" class="field" />
         				</div>
         				<div  dojoType="dijit.layout.ContentPane" class="formblock" >
         					<span class="linelabel">Vertical scale</span>
@@ -111,7 +110,6 @@ dojo.addOnLoad(function(){
     			 				   trim="true"
     			 			       onFocus="setAutoscale(false);"
     			 				   onchange="updateScale"
-    			 				   onkeypress="scaleKeyEvent"
     			 				   size="14" />
           					<label for="max">Max</label>
           					<input  id="max" type="text" name="max" class="field"
@@ -120,7 +118,6 @@ dojo.addOnLoad(function(){
     			 					trim="true"
     			 					onFocus="setAutoscale(false);"
     			 					onchange="updateScale"
-    			 					onkeypress="scaleKeyEvent"
     			 					size="14" />
         				</div>
 				        <div  dojoType="dijit.layout.ContentPane" class="formblock" > <span class="linelabel">Sort</span>
@@ -128,7 +125,7 @@ dojo.addOnLoad(function(){
   									onChange="toogleSort();" 
   									iconClass="dijitCheckBoxIcon"> Sorted graphs </button>
         				</div>
-				        <button onClick="reloadTree(); return false" type="submit" dojoType="dijit.form.Button" >Render</button>
+				        <button type="submit" dojoType="dijit.form.Button" >Render</button>
 					</form>
 					
 				</div> <!-- "paramsPane" -->
