@@ -55,8 +55,8 @@ public class TestTab {
 		Tools.setLevel(new String[] {"jrds.factories.xml.CompiledXPath"}, Level.INFO);
 	}
 
-//	@Test
-//	public void testLoad() throws Exception {
+	@Test
+	public void testLoad() throws Exception {
 //
 //		Document d = Tools.parseString(goodTabXml);
 //
@@ -64,6 +64,6 @@ public class TestTab {
 //		tb.setProperty(ObjectBuilder.properties.PM, pm);
 //	
 //		Tab tab = tb.makeTab(new JrdsNode(d));
-//	}
+	}
 
 }
