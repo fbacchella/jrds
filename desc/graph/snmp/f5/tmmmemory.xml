@@ -4,7 +4,7 @@
 <graphdesc>
     <name>tmmmemory</name>
     <graphName>tmmmemory-${index}</graphName>
-    <graphTitle>TMM ${index} CPU usage on ${host}</graphTitle>
+    <graphTitle>TMM ${index} memory usage on ${host}</graphTitle>
     <verticalLabel>bytes</verticalLabel>
     <add>
         <name>MemoryTotal</name>
