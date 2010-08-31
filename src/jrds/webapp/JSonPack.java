@@ -24,7 +24,7 @@ import org.json.JSONException;
  */
 public class JSonPack extends HttpServlet {
 	static final private Logger logger = Logger.getLogger(JSonPack.class);
-	static final public List<String> JSONKEYS =  Arrays.asList(new String[] {"autoperiod", "filter", "host", "path", "begin", "end", "max", "min", "tab"});
+	static final public List<String> JSONKEYS =  Arrays.asList(new String[] {"autoperiod", "filter", "host", "path", "begin", "end", "max", "min", "tab", "sort"});
 	static final public Map<String, Integer> JSONDICT = new HashMap<String, Integer>(JSONKEYS.size());
 	static {
 		for(int i= JSONKEYS.size() -1; i >= 0; i--) {
@@ -32,22 +32,6 @@ public class JSonPack extends HttpServlet {
 		}
 	}
 	static final public String GZIPHEADER="H4sIAAAAAAA";
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String probeInfo = request.getPathInfo();
-		String[] path = probeInfo.trim().split("/");
-		logger.trace(Arrays.asList(path));
-		if("pack".equals(path[1])) {
-
-		}
-		else if("unpack".equals(path[1])) {
-
-		}
-
-	}
 
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)

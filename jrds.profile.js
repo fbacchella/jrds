@@ -3,22 +3,22 @@ dependencies ={
         {
         name: "dojo-jrds.js",
         dependencies: [
+            "dojo.number",
+            "dojo.parser",
+            "dojo.data.ItemFileReadStore",
+            "dijit.Dialog",
             "dijit.layout.BorderContainer",
             "dijit.layout.ContentPane",
+            "dijit.layout.TabContainer",
             "dijit.form.DateTextBox",
             "dijit.form.Button",
             "dijit.form.TextBox",
             "dijit.form.Select",
             "dijit.form.Form",
-            "dojo.parser",
-            "dijit.form.Button",
             "dijit.form.ValidationTextBox",
-            "dojo.data.ItemFileReadStore",
             "dijit.form.NumberTextBox",
             "dijit.Tree",
-            "dojo.number",
-            "dijit.form.TimeTextBox",
-            "dijit.layout.TabContainer"
+            "dijit.form.TimeTextBox"
         ]
         }
     ],

@@ -127,29 +127,38 @@ function getGraphList() {
 }
 
 function fileForms() {
-	var dateForm = dojo.byId("dateForm");
-	if(queryParams.begin && queryParams.end) {
-		dateForm.end.value = queryParams.end;
-		dateForm.begin.value = queryParams.begin;
+	if(queryParams.host) {
+		dojo.byId("hostForm").host.value = queryParams.host;
 	}
 
-	setAutoscale(queryParams.max == null || queryParams.min == null);
+	var dateForm = dojo.byId("dateForm");
+	if(queryParams.begin && queryParams.end) {
+		var beginarray = queryParams.begin.split(" ");
+		var endarray = queryParams.end.split(" ");
+		dijit.byId('begin').attr('value', new Date(beginarray[0]));
+		dijit.byId('beginh').attr('value', new Date(beginarray[1]));
+		dijit.byId('end').attr('value', new Date(endarray[0]));
+		dijit.byId('endh').attr('value', new Date(endarray[1]));
+	}
+	else {
+		dojo.forEach(['begin', 'beginh', 'end', 'endh'], function(id, i) {
+			dijit.byId(id).attr('value', '');
+		});
+	}
+
 	var autoperiod = dijit.byId('autoperiod'); 
 	autoperiod.attr('value', queryParams.autoperiod);
 	autoperiod.dropDown.oldItemClick=autoperiod.dropDown.onItemClick;
 	autoperiod.dropDown.onItemClick = setAutoperiod;
-	console.log(autoperiod);
-	if(queryParams.host) {
-		dojo.byId("hostForm").host.value = queryParams.host;
-	}
-	
+
+	setAutoscale(queryParams.max == null || queryParams.min == null);
 }
 
 function setupDisplay() {
 	fileForms();
 	
 	var type = 'filter';
-	if(queryParams.host != null|| queryParams.filter != null) {
+	if(queryParams.host != null || queryParams.filter != null) {
 		type = 'tree';
 	}
 
@@ -198,7 +207,10 @@ function getTree(treeType) {
 		onClick: loadTree,
 		onLoad: function() {
 			if(queryParams.path != null) {
-				this.attr('path', queryParams.path);
+				//This operation destroy the array used as an argument
+				//so clone it !
+				this.attr('path', dojo.clone(queryParams.path));
+
 			}
 		}
 	}, treeOneDiv);	
@@ -404,7 +416,6 @@ function sendlink(id)
 }
 
 function linkdialog(data, ioargs) {
-	dojo.require("dijit.Dialog");
 	// create the dialog:
 	var myDialog = new dijit.Dialog({
 		title: "Graph context",
@@ -520,7 +531,7 @@ function sendReload(evt) {
 function searchHost(evt) {
 	try {
 		queryParams.host = this.attr('value').host;
-		queryParams.filter = '';
+		delete queryParams.filter;
 		getTree('tree');
 	}
 	catch(err) {
