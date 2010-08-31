@@ -111,7 +111,7 @@ public class GetMoke {
 			private final Map<String, String[]> parameters = p;
 
 			public String getAuthType() { return null; }
-			public String getContextPath() { return ""; }
+			public String getContextPath() { return "/mockurl"; }
 			public Cookie[] getCookies() { return null; }
 			public long getDateHeader(String arg0)  { return 0; }
 			public String getHeader(String arg0) { return null; }
