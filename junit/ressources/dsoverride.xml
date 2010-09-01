@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE host PUBLIC "-//jrds//DTD Host//EN" "urn:jrds:host" >
+<host name="dsoverride">
+	<probe type="TcpSnmp">
+		<dslist>
+			<ds>
+				<dsName>new1</dsName>
+			</ds>
+		</dslist>
+	</probe>
+</host>

@@ -1,6 +1,7 @@
 package jrds.mockobjects;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +12,7 @@ import jrds.PropertiesManager;
 import jrds.factories.ProbeFactory;
 
 public class MokeProbeFactory extends ProbeFactory {
-	static Map<String, ProbeDesc> probeDescMap = Collections.emptyMap();
+	static Map<String, ProbeDesc> probeDescMap = new HashMap<String, ProbeDesc>();
 	static Map<String, GraphDesc> graphDescMap = Collections.emptyMap();
 	static PropertiesManager  pm = new PropertiesManager();
 	static boolean legacymode = false;
@@ -42,5 +43,18 @@ public class MokeProbeFactory extends ProbeFactory {
 			mp.setArgs(constArgs);
 		}
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see jrds.factories.ProbeFactory#getProbeDesc(java.lang.String)
+	 */
+	@Override
+	public ProbeDesc getProbeDesc(String name) {
+		if(!probeDescMap.containsKey(name) ) {
+			MokeProbe <String, Number> mp = new MokeProbe<String, Number>(name);
+			mp.configure();
+			probeDescMap.put(name, mp.getPd());
+		}
+		return super.getProbeDesc(name);
 	}
 }
