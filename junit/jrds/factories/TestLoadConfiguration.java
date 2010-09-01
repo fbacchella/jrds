@@ -1,5 +1,6 @@
 package jrds.factories;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import jrds.Filter;
 import jrds.Macro;
 import jrds.Probe;
+import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.RdsHost;
 import jrds.StoreOpener;
@@ -75,6 +77,18 @@ public class TestLoadConfiguration {
 		"</probe>" +
 		"</host>";
 
+	static final private String dsOverride = 
+		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+		"<!DOCTYPE host PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
+		"<host name=\"myhost\">" +
+		"<probe type = \"PartitionSpace\">" +
+		"<arg type=\"String\" value=\"/\" />" +
+		"<dslist>" +
+		
+		"<dslist>" +
+		"</probe>" +
+		"</host>";
+
 	static DocumentBuilder dbuilder;
 	static ConfigObjectFactory conf;
 	static PropertiesManager pm = new PropertiesManager();
@@ -85,7 +99,8 @@ public class TestLoadConfiguration {
 		Tools.prepareXml();
 		Loader l = new Loader();
 		dbuilder = l.dbuilder;
-		l.importUrl(new URL("file:desc"));
+		File descdir = new File("desc");
+		l.importUrl(descdir.toURI().toURL());
 
 		pm.setProperty("configdir", "tmp");
 		pm.setProperty("rrddir", "tmp");
@@ -128,6 +143,33 @@ public class TestLoadConfiguration {
 		jrds.Util.serialize(p.dumpAsXml(), System.out, null, null);
 		Assert.assertNotNull(p);
 		Assert.assertEquals(host.getName() + "/" + p.getName() , p.toString());
+	}
+
+	@Test
+	public void testDsreplace() throws Exception {
+		JrdsNode d = new JrdsNode(Tools.parseRessource("dsoverride.xml"));
+		JrdsNode pnode = new JrdsNode(d);
+
+		HostBuilder hb = new HostBuilder();
+		ProbeFactory pf =  new MokeProbeFactory();
+		hb.setProperty(ObjectBuilder.properties.PROBEFACTORY, pf);
+		hb.setProperty(ObjectBuilder.properties.PM, pm);
+		
+		RdsHost host = new RdsHost();
+		host.setHostDir(pm.rrddir);
+		host.setName("testDsreplace");
+
+		Probe<?,?> p = hb.makeProbe(pnode.getChild(CompiledXPath.get("/host/probe")), host, new StarterNode() {});
+		jrds.Util.serialize(p.dumpAsXml(), System.out, null, null);
+		ProbeDesc pd = p.getPd();
+//		System.out.println();
+//		jrds.Util.serialize(pd.dumpAsXml(), System.out, null, null);
+//		System.out.println();
+//		jrds.Util.serialize(pf.getProbeDesc(pd.getName()).dumpAsXml(), System.out, null, null);
+		Assert.assertNotNull(pd);
+		Assert.assertEquals(1 , pd.getSize());
+		Assert.assertNotSame(pf.getProbeDesc(pd.getName()) , pd.getSize());
+
 	}
 
 	@Test

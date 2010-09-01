@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.Set;
 import jrds.ConnectedProbe;
 import jrds.Macro;
 import jrds.Probe;
+import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
@@ -202,10 +204,27 @@ public class HostBuilder extends ObjectBuilder {
 	public Probe<?,?> makeProbe(JrdsNode probeNode, RdsHost host, StarterNode ns) {
 		Probe<?,?> p = null;
 		String type = probeNode.attrMap().get("type");
-		p = pf.makeProbe(type);
+
+		List<Map<String, Object>> dsList = doDsList(probeNode.getChild(CompiledXPath.get("dslist")));
+		if(dsList.size() > 0) {
+			ProbeDesc oldpd = pf.getProbeDesc(type);
+			try {
+				ProbeDesc pd = (ProbeDesc) oldpd.clone();
+				pd.replaceDs(dsList);
+				List<String> empty = Collections.emptyList();
+				pd.setGraphClasses(empty);
+				p = pf.makeProbe(pd);
+			} catch (CloneNotSupportedException e) {
+			}
+		}
+		else {
+			p = pf.makeProbe(type);
+		}
 		if(p == null)
 			return null;
 		p.setHost(host);
+
+
 
 		//		for(JrdsNode thresholdNode: probeNode.iterate(CompiledXPath.get("threshold"))) {
 		//			Map<String, String> thresholdAttr = thresholdNode.attrMap();
@@ -317,5 +336,5 @@ public class HostBuilder extends ObjectBuilder {
 			super.setProperty(name, o);
 		}
 	}
-	
+
 }

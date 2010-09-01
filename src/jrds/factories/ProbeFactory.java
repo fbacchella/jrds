@@ -50,22 +50,28 @@ public class ProbeFactory {
 	}
 
 	/**
-	 * Create an probe, provided his Class and a list of argument for a constructor
-	 * for this object. It will be found using the default list of possible package
-	 * @param className the probe name
-	 * @param host 
-	 * @param constArgs
-	 * @return
+	 * Create an probe, provided the probe name. It will be found in the probe description map already provided
+	 * @param probeName the probe name
+	 * @return A probe
 	 */
-	public  Probe<?,?> makeProbe(String probeType) {
-		ProbeDesc pd = (ProbeDesc) probeDescMap.get(probeType);
+	public  Probe<?,?> makeProbe(String probeName) {
+		ProbeDesc pd = (ProbeDesc) probeDescMap.get(probeName);
 		if(pd == null) {
-			logger.error("Probe named " + probeType + " not found");
+			logger.error("Probe named " + probeName + " not found");
 			return null;
 		}
+		return makeProbe(pd);
+	}
+
+	/**
+	 * Create an probe, provided a probe description
+	 * @param ProbeDesc a probe description
+	 * @return A probe
+	 */
+	public  Probe<?,?> makeProbe(ProbeDesc pd) {
 		Class<? extends Probe<?,?>> probeClass = pd.getProbeClass();
 		if(probeClass == null) {
-			logger.error("Invalid probe description " + probeType + ", probe class name not found");
+			logger.error("Invalid probe description " + pd.getName() + ", probe class name not found");
 		}
 		String preload = pd.getPreloadClass();
 		if(preload != null && ! "".equals(preload)) {
@@ -147,9 +153,9 @@ public class ProbeFactory {
 			return true;
 		} catch (SecurityException e) {
 		} catch (NoSuchMethodException e) {
-			logger.warn("ProbeDescription invalid " + p.getPd().getName() + ": no constructor " + e.getMessage() + " found");
+			logger.warn("Probe arguments not matching configurators for" + p.getPd().getName() + ": " + e.getMessage());
 			return false;
-		}catch (Exception ex) {
+		} catch (Exception ex) {
 			Throwable showException = ex;
 			Throwable t = ex.getCause();
 			if(t != null)

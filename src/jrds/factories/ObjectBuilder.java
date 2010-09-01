@@ -1,6 +1,7 @@
 package jrds.factories;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +18,8 @@ import jrds.webapp.RolesACL;
 import jrds.webapp.WithACL;
 
 import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
+import org.snmp4j.smi.OID;
 import org.w3c.dom.Node;
 
 public abstract class ObjectBuilder {
@@ -83,4 +86,34 @@ public abstract class ObjectBuilder {
 		}
 	}
 
+	protected List<Map<String, Object>> doDsList(JrdsNode node) {
+		if(node == null)
+			return Collections.emptyList();
+		List<Map<String, Object>> dsList = new ArrayList<Map<String, Object>>();
+		for(JrdsNode dsNode: node.iterate(CompiledXPath.get("ds"))) {
+			Map<String, Object> dsMap = new HashMap<String, Object>(4);
+			for(JrdsNode dsContent: dsNode.iterate(CompiledXPath.get("*"))) {
+				String element = dsContent.getNodeName();
+				String textValue = dsContent.getTextContent().trim();
+				Object value = textValue;
+				if( element.startsWith("collect")) {
+					if("".equals(value))
+						value = null;
+				}
+				else if("dsType".equals(element)) {
+					if( !"NONE".equals(textValue.toUpperCase()))
+						value = DsType.valueOf(textValue.toUpperCase());
+					else
+						value = null;
+				}
+				else if(element.startsWith("oid")) {
+					value = new OID(textValue);
+					element = element.replace("oid", "collect");
+				}
+				dsMap.put(element, value);
+			}
+			dsList.add(dsMap);
+		}
+		return dsList;
+	}
 }

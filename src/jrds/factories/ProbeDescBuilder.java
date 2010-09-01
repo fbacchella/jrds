@@ -1,7 +1,6 @@
 package jrds.factories;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,8 +10,6 @@ import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 
 import org.apache.log4j.Logger;
-import org.rrd4j.DsType;
-import org.snmp4j.smi.OID;
 import org.w3c.dom.Node;
 
 public class ProbeDescBuilder extends ObjectBuilder {
@@ -116,30 +113,8 @@ public class ProbeDescBuilder extends ObjectBuilder {
 				pd.addDefaultArg(o);
 			}
 
-		for(JrdsNode dsNode: probeDescNode.iterate(CompiledXPath.get("ds"))) {
-			Map<String, Object> dsMap = new HashMap<String, Object>(4);
-			for(JrdsNode dsContent: dsNode.iterate(CompiledXPath.get("*"))) {
-				String element = dsContent.getNodeName();
-				String textValue = dsContent.getTextContent().trim();
-				Object value = textValue;
-				if( element.startsWith("collect")) {
-					if("".equals(value))
-						value = null;
-				}
-				else if("dsType".equals(element)) {
-					if( !"NONE".equals(textValue.toUpperCase()))
-						value = DsType.valueOf(textValue.toUpperCase());
-					else
-						value = null;
-				}
-				else if(element.startsWith("oid")) {
-					value = new OID(textValue);
-					element = element.replace("oid", "collect");
-				}
-
-				dsMap.put(element, value);
-			}
-			pd.add(dsMap);
+		for(Map<String, Object> dsMap: doDsList(probeDescNode)) {
+			pd.add(dsMap);			
 		}
 
 		Map<String, String> props = makeProperties(probeDescNode);

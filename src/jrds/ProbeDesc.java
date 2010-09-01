@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
  * @author Fabrice Bacchella
  * @version $Revision$
  */
-public class ProbeDesc {
+public class ProbeDesc implements Cloneable {
 	static final private Logger logger = Logger.getLogger(ProbeDesc.class);
 
 	static public final double MINDEFAULT = 0;
@@ -45,7 +45,7 @@ public class ProbeDesc {
 	private Map<String, String> specific = new HashMap<String, String>();;
 	private String probeName;
 	private String name;
-	private Collection<String> graphClasses = new ArrayList<String>();
+	private Collection<String> graphesList = new ArrayList<String>();
 	private boolean uniqIndex = false;
 	private Class<? extends Probe<?,?>> probeClass = null;
 	private String preloadClass = null;
@@ -190,6 +190,18 @@ public class ProbeDesc {
 		}
 		dsMap.put(name, new DsDesc(type, heartbeat, min, max, collectKey));
 	}
+	
+	/**
+	 * Replace all the data source for this probe description with the list provided
+	 * @param dsList a list of data source description as a map.
+	 */
+	public void replaceDs(List<Map<String, Object>> dsList) {
+		defaultValues = new HashMap<String,Double>(0);
+		dsMap = new HashMap<String, DsDesc>(dsList.size());
+		for(Map<String, Object> dsinfo: dsList) {
+			add(dsinfo);
+		}
+	}
 
 	/**
 	 * Return a map that translate an OID to the datastore name
@@ -298,21 +310,21 @@ public class ProbeDesc {
 	 * @return Returns the graphClasses.
 	 */
 	public Collection<String> getGraphClasses() {
-		return graphClasses;
+		return graphesList;
 	}
 
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
 	public void setGraphClasses(Collection<String> graphClasses) {
-		this.graphClasses = graphClasses;
+		this.graphesList = graphClasses;
 	}
 
 	/**
 	 * @param graphClasses The graphClasses to set.
 	 */
 	public void setGraphClasses(String[] graphClasses) {
-		this.graphClasses = Arrays.asList(graphClasses);
+		this.graphesList = Arrays.asList(graphClasses);
 	}
 
 	/**
@@ -435,7 +447,7 @@ public class ProbeDesc {
 				dsElement.appendChild(document.createElement("collect")).setTextContent(e.getValue().collectKey.toString());
 		}
 		Element graphsElement = (Element) root.appendChild(document.createElement("graphs"));
-		for(String graph: graphClasses) {
+		for(String graph: graphesList) {
 			graphsElement.appendChild(document.createElement("name")).setTextContent(graph);
 		}
 		return document;
@@ -454,4 +466,15 @@ public class ProbeDesc {
 	public void setPreloadClass(String preloadClass) {
 		this.preloadClass = preloadClass;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		ProbeDesc newpd = (ProbeDesc) super.clone();
+		return newpd;
+	}
+	
+	
 }
