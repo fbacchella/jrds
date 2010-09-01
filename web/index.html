@@ -69,7 +69,7 @@ dojo.addOnLoad(function(){
 			</div> <!-- treePane -->
 			<div id="centerPane" dojoType="dijit.layout.ContentPane" region="center">
 				<div dojoType="dijit.layout.ContentPane" id="paramsPane" >
-					<form dojoType="dijit.form.Form" id="dateForm" name="dateForm" action="" method="" onSubmit="submitRenderForm">
+					<form dojoType="dijit.form.Form" id="dateForm" name="dateForm" action="" method="" onSubmit="submitRenderForm" style='width: 560px'>
 						<div  dojoType="dijit.layout.ContentPane" class="formblock" >
 							<span class="linelabel">Time scale</span>
        						<select id="autoperiod" name="autoperiod" dojoType="dijit.form.Select" style="width: 90px">
@@ -127,8 +127,8 @@ dojo.addOnLoad(function(){
   									iconClass="dijitCheckBoxIcon"> Sorted graphs </button>
         				</div>
 				        <button type="submit" dojoType="dijit.form.Button" >Render</button>
+				        <button onClick="sendlink()"; dojoType="dijit.form.Button" >State URL</button>
 					</form>
-					
 				</div> <!-- "paramsPane" -->
 				<div  dojoType="dijit.layout.ContentPane" id="graphPane">
 					<div class='graphblock'>

@@ -95,19 +95,11 @@ function doGraphList(result) {
 		dojo.attr(disk, "title","Save data");
 		dojo.attr(disk, "onclick","save('" + graph.savearg + "', '" + graph.probename + "');");
 		var link = dojo.create("img");
-		dojo.attr(link, "class","icon");
-		dojo.attr(link, "src","img/application_link.png");
-		dojo.attr(link, "heigth","16");
-		dojo.attr(link, "width","16");
-		dojo.attr(link, "title","Save data");
-		dojo.attr(link, "id", "link." + graph.id);
-		dojo.attr(link, "onclick","sendlink('" + graph.id + "');");
 
 		dojo.place(application_double, iconsList);
 		dojo.place(application_view_list, iconsList);
 		dojo.place(time, iconsList);
 		dojo.place(disk, iconsList);
-		dojo.place(link, iconsList);
 
 		dojo.place(graphImg, graphBlock);
 		dojo.place(iconsList, graphBlock);
@@ -394,10 +386,10 @@ function history(url, name)
 	var historyWin = window.open(url, "_blank", "width=750,menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
 }
 
-function sendlink(id)
+function sendlink()
 {
     var xhrArgs = {
-    	parentid: "link." + id,
+//    	parentid: "link." + id,
         url: "jsonpack",
         postData: dojo.toJson(queryParams),
         handleAs: "text",
@@ -466,15 +458,13 @@ function setAutoperiod(item, evt) {
 
 function submitRenderForm(evt) {
 	try {
-		if( ! queryParams.id)
+		if( queryParams.id == null )
 			return false;
-		if(queryParams.autoperiod == 0 && (! queryParams.begin || ! queryParams.end) )
+		if(queryParams.autoperiod == 0 && (queryParams.begin == null || queryParams.end == null) )
 			return false;
-		if(! queryParams.max || ! queryParams.min)
+		if( (queryParams.max != null && queryParams.min == null) || (queryParams.max == null && queryParams.min != null) )
 			return false;
-		
-		if(queryParams.id && queryParams.id != 0 )
-			getGraphList();
+		getGraphList();
 	}
 	catch(err) {
 		console.error(err);
