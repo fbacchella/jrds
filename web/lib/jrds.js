@@ -118,6 +118,19 @@ function getGraphList() {
 	});
 }
 
+function parseBool(stringbool){
+	if(stringbool == null)
+		return false;
+    switch(dojo.trim(stringbool.toLowerCase())){
+    	case "true":
+        case "yes":
+        case "1":
+        	return true;
+        default:
+        	return false;
+    }
+}
+
 function fileForms() {
 	if(queryParams.host) {
 		dojo.byId("hostForm").host.value = queryParams.host;
@@ -127,10 +140,12 @@ function fileForms() {
 	if(queryParams.begin && queryParams.end) {
 		var beginarray = queryParams.begin.split(" ");
 		var endarray = queryParams.end.split(" ");
-		dijit.byId('begin').attr('value', new Date(beginarray[0]));
-		dijit.byId('beginh').attr('value', new Date(beginarray[1]));
-		dijit.byId('end').attr('value', new Date(endarray[0]));
-		dijit.byId('endh').attr('value', new Date(endarray[1]));
+		if(beginarray.length == 2 && endarray.length == 2) {
+			dijit.byId('begin').attr('value', new Date(beginarray[0]));
+			dijit.byId('beginh').attr('value', new Date(beginarray[1]));
+			dijit.byId('end').attr('value', new Date(endarray[0]));
+			dijit.byId('endh').attr('value', new Date(endarray[1]));
+		}
 	}
 	else {
 		dojo.forEach(['begin', 'beginh', 'end', 'endh'], function(id, i) {
@@ -144,6 +159,8 @@ function fileForms() {
 	autoperiod.dropDown.onItemClick = setAutoperiod;
 
 	setAutoscale(queryParams.max == null || queryParams.min == null);
+		
+	dijit.byId("sorted").attr('checked', parseBool(queryParams.sort));
 }
 
 function setupDisplay() {
@@ -252,37 +269,36 @@ function sort()
 }
 
 function setupCalendar() {
+	var hourFormat = {
+		timePattern: 'HH:mm',
+		selector: 'time'
+	};
+	
 	dojo.declare("HourBox",dijit.form.TimeTextBox , {
-		style: "width:50px",
-		hourFormat: {
-			timePattern: 'HH:mm',
-			locale: 'en-us',
-			selector: 'time'
-	},        
-	onChange: function(date) {
-		if(date && ! date == '') {
-			var elems = queryParams[this.queryId].split(' ');
-			queryParams[this.queryId] = elems[0] + ' ' + dojo.date.locale.format(date, this.hourFormat);
-			dijit.byId('autoperiod').attr('value', 0); 
+		'class': 'field fieldHour', 
+		hourFormat: hourFormat,        
+		onChange: function(date) {
+			if(date) {
+				dijit.byId('autoperiod').attr('value', 0); 
+				var queryDate = queryParams[this.queryId];
+				if(queryDate) {
+					var elems = queryDate.split(' ');
+					queryParams[this.queryId] = elems[0] + ' ' + dojo.date.locale.format(date, this.hourFormat);
+				}
+				else {
+					queryParams[this.queryId] = '1970-01-01 ' + dojo.date.locale.format(date, this.hourFormat);
+				}
+			}
+			return this.inherited(arguments);
 		}
-		return this.inherited(arguments);
-	}
 	});
 
-	var beginHour = new Date();
-	beginHour.setHours(00);
-	beginHour.setMinutes(00);
-	beginHour.setSeconds(00);
 	beginTimeTextBox = new HourBox( {
 		constraints:{timePattern:'HH:mm', clickableIncrement:'T00:30:00', visibleIncrement:'T00:30:00', visibleRange:'T05:00:00'},
 		name: 'beginh',
 		value: '',
 		queryId: 'begin'
 	}, 'beginh');
-	var endHour = new Date();
-	endHour.setHours(23);
-	endHour.setMinutes(59);
-	endHour.setSeconds(59);
 	endTimeTextBox = new HourBox( {
 		constraints:{timePattern:'HH:mm', clickableIncrement:'T00:30:00', visibleIncrement:'T00:30:00', visibleRange:'T05:00:00'},
 		name: 'endh',
@@ -291,62 +307,75 @@ function setupCalendar() {
 	}, 'endh');
 
 	dojo.declare("DayHourTextBox", dijit.form.DateTextBox, {
-		style: "width:100px",
-		jrdsFormatDate: {
+		'class': 'field fieldDay', 
+		dayFormat: {
 			selector: 'date', 
-			datePattern: 'yyyy-MM-dd',
-			locale: 'en-us'
+			datePattern: 'yyyy-MM-dd'
 		},
+		hourFormat: hourFormat,        
 		dateStr: '',
 		regExpGen: function() {
 			return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
 		},
 		format: function(date) {
-			if(date && ! date == '')
-				return dojo.date.locale.format(date, this.jrdsFormatDate);
+			if(date)
+				return dojo.date.locale.format(date, this.dayFormat);
 			else
 				return '';
 		},
 		parse: function(date) {
-			if(date && ! date == '')
-				return dojo.date.locale.parse(date, this.jrdsFormatDate);
+			if(date)
+				return dojo.date.locale.parse(date, this.dayFormat);
 			else
 				return '';
 		},
 		serialize: function(date) {
-			if(date && ! date == '')
-			return dojo.date.locale.format(date, this.jrdsFormatDate);
+			if(date)
+				return dojo.date.locale.format(date, this.dayFormat);
 			else
 				return '';
 		},
 		onChange: function(date) {
-			if(date && ! date == '') {
-				var sdate = dojo.date.locale.format(date, this.jrdsFormatDate);
-				queryParams[this.id] = sdate;
+			if(date) {
 				queryParams.autoperiod = 0;
-				this.timeBox.attr('value', this.resetHour);
+
+				//Let's try to keep the existing hour
+				var hour = this.resetHour;
+				if(queryParams[this.id]) {
+					var dateArray = queryParams[this.id].split(' ');
+					if(dateArray.length == 2) {
+						hour = dateArray[1];
+					}
+				}
+				//If hour in form not defined, set it.
+				if(! this.timeBox.attr('value') ) {
+					this.timeBox.attr('value', dojo.date.locale.parse(hour, this.hourFormat));
+				}
+				var sdate = dojo.date.locale.format(date, this.dayFormat);
+				queryParams[this.id] = sdate + ' ' + hour;
 				dijit.byId('autoperiod').attr('value', 0); 
 			}
 			return this.inherited(arguments);
 		}
 	});
+	
+	dayRegExp = function() {
+		return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
+	}
 	new DayHourTextBox({
 		//A bug in dojo 4.2 ?
-		regExpGen: function() {
-		return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
-	},
-	name: "begin",
-	resetHour: beginHour,
-	timeBox: beginTimeTextBox
-	}, "begin");
+		regExpGen: dayRegExp,
+		name: "begin",
+		resetHour: '00:00',
+		timeBox: beginTimeTextBox
+		}, "begin");
+	
 	new DayHourTextBox({
 		//A bug in dojo 1.4.2 ?
-		regExpGen: function() {
-			return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
-		},
-	name: "end",
-	resetHour: endHour,
-	timeBox: endTimeTextBox
+		regExpGen: dayRegExp,
+		name: "end",
+		resetHour: '23:59',
+		timeBox: endTimeTextBox
 	}, "end");
 
 }

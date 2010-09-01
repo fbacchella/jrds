@@ -51,6 +51,15 @@ body, input, option, select, tab, div, td, a, textarea {
 .field {
 	margin: 5px;
 }
+
+.fieldHour {
+	width:50px
+}
+
+.fieldDay {
+	width:100px
+}
+
 .iconslist {
 	float:left;
 	width:16px;
