@@ -2,7 +2,6 @@ package jrds.factories;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -12,6 +11,7 @@ import jrds.factories.Loader.ConfigType;
 import jrds.factories.xml.JrdsNode;
 import junit.framework.Assert;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,17 +22,17 @@ public class TestLoader {
 	@BeforeClass
 	static public void configure() throws ParserConfigurationException, IOException {
 		Tools.configure();
+		logger.setLevel(Level.TRACE);
 		Tools.setLevel(new String[] {"jrds"}, logger.getLevel());
 		Tools.prepareXml();
-
 	}
 
 	@Test
 	public void doLoadJar() throws ParserConfigurationException, MalformedURLException  {
 		Loader l = new Loader();
-		l.importUrl(new URL("file:desc"));
-		Assert.assertFalse(l.getRepository(ConfigType.GRAPHDESC).isEmpty());
-		Assert.assertFalse(l.getRepository(ConfigType.PROBEDESC).isEmpty());
+		l.importUrl(Tools.pathToUrl("desc"));
+		Assert.assertFalse("graph desc list is empty", l.getRepository(ConfigType.GRAPHDESC).isEmpty());
+		Assert.assertFalse("probe desc list is empty", l.getRepository(ConfigType.PROBEDESC).isEmpty());
 	}
 
 	@Test

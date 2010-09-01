@@ -41,7 +41,7 @@ public class TestFilter {
 		Tools.prepareXml(false);
 		Loader l = new Loader();
 		dbuilder = l.dbuilder;
-		l.importUrl(new URL("file:desc"));
+		l.importUrl(Tools.pathToUrl("desc"));
 
 		pm.setProperty("configdir", "tmp");
 		pm.setProperty("rrddir", "tmp");

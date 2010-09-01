@@ -29,6 +29,10 @@ public class TestTab {
 		"<!DOCTYPE tab PUBLIC \"-//jrds//DTD Tab//EN\" \"urn:jrds:tab\">" +
 		"<tab name=\"tabname\">" +
 		"<filter>afilter</filter>" +
+		"<graph id=\"graphid\">" +
+		"<path>p1</path>" +
+		"<path>p2</path>" +
+		"</graph>" +
 		"</tab>";
 
 	static DocumentBuilder dbuilder;
@@ -41,7 +45,7 @@ public class TestTab {
 		Tools.prepareXml(false);
 		Loader l = new Loader();
 		dbuilder = l.dbuilder;
-		l.importUrl(new URL("file:desc"));
+		l.importUrl(Tools.pathToUrl("desc"));
 
 		pm.setProperty("configdir", "tmp");
 		pm.setProperty("rrddir", "tmp");
@@ -57,13 +61,13 @@ public class TestTab {
 
 	@Test
 	public void testLoad() throws Exception {
-//
 //		Document d = Tools.parseString(goodTabXml);
 //
 //		TabBuilder tb = new TabBuilder();
 //		tb.setProperty(ObjectBuilder.properties.PM, pm);
-//	
+//
 //		Tab tab = tb.makeTab(new JrdsNode(d));
+//		Assert.assertEquals("tabname", tab.getName());
 	}
 
 }

@@ -1,11 +1,16 @@
 package jrds;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 
+import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -14,6 +19,7 @@ import javax.xml.xpath.XPathFactory;
 
 import jrds.factories.xml.EntityResolver;
 import jrds.factories.xml.JrdsNode;
+import jrds.webapp.Configuration;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.Level;
@@ -22,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
 import org.apache.log4j.spi.LoggingEvent;
+import org.mortbay.jetty.testing.ServletTester;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -181,5 +188,34 @@ final public class Tools {
 		n.appendChild(newNode);
 
 		return newNode;
+	}
+	
+	static public void getServer(Map<String, String> properties) {
+		ServletTester tester=new ServletTester();
+		tester.setContextPath("/");
+		ServletContext sc =  tester.getContext().getServletContext();
+		
+		for(Map.Entry<String, String> e: properties.entrySet()) {
+			System.setProperty("jrds." + e.getKey(), e.getValue());
+		}
+
+		Configuration c = new Configuration(sc);
+		sc.setAttribute(Configuration.class.getName(), c);
+
+		Properties sp = System.getProperties();
+		for(Object  key: sp.keySet()) {
+			if(key.toString().startsWith("jrds.")) {
+				sp.remove(key);
+			}
+		}
+	}
+	
+	static public URL pathToUrl(String pathname) {
+		try {
+			File path = new File(pathname);
+			return path.toURI().toURL();
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

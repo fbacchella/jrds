@@ -25,7 +25,7 @@ public class DtdTest {
 		Loader l = new Loader();
 		
 		//pm.join(new File("jrds.properties"));
-		pm.libspath.add(new URL("file:build/classes"));
+		pm.libspath.add(Tools.pathToUrl("build/classes"));
 		pm.update();
 
 		for(URL lib: pm.libspath) {
