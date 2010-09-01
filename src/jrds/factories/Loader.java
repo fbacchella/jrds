@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,6 +56,15 @@ public class Loader {
 			final XPathExpression xpath = CompiledXPath.get("/sum/@name");
 			public boolean memberof(Node d) {
 				return matchDocElement(d, "sum");
+			}
+			public XPathExpression getNameXpath() {
+				return xpath;
+			}
+		},
+		TAB {
+			final XPathExpression xpath = CompiledXPath.get("/tab/@name");
+			public boolean memberof(Node d) {
+				return matchDocElement(d, "tab");
 			}
 			public XPathExpression getNameXpath() {
 				return xpath;
@@ -166,7 +176,7 @@ public class Loader {
 			String protocol = ressourceUrl.getProtocol();
 			if("file".equals(protocol)) {
 				String fileName = ressourceUrl.getFile();
-				File imported = new File(fileName);
+				File imported = new File(ressourceUrl.toURI());
 				if(imported.isDirectory())
 					importDir(imported);
 				else if(fileName.endsWith(".jar"))
@@ -181,6 +191,8 @@ public class Loader {
 			}
 		} catch (IOException e) {
 			logger.error("Invalid URL " + ressourceUrl + ": " + e);
+		} catch (URISyntaxException e){
+		    logger.error("Invalid URL " + ressourceUrl + ": " + e);
 		}
 	}
 
