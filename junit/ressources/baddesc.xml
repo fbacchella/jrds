@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN"
+	"urn:jrds:probedesc">
+<probedesc>
+	<name>name</name>
+	<probeName>probename</probeName>
+	<probeClass>jrds.mockobjects.MokeProbe</probeClass>
+	<ds>
+		<dsName>a</dsName>
+		<dsType>totor</dsType>
+		<collect>/jrdsstats/stat[@key='a']/@value</collect>
+	</ds>
+	<ds>
+		<dsName>b</dsName>
+		<dsType>gauge</dsType>
+	</ds>
+	<graphs>
+	</graphs>
+</probedesc>
