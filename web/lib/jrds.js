@@ -119,6 +119,10 @@ function getGraphList() {
 }
 
 function parseBool(stringbool){
+	var argtype = typeof stringbool;
+	if(argtype == 'boolean')
+		return stringbool;
+	console.log(typeof stringbool);
 	if(stringbool == null)
 		return false;
     switch(dojo.trim(stringbool.toLowerCase())){
