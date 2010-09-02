@@ -111,7 +111,7 @@ function getGraphList() {
 	var graphPane = dojo.byId("graphPane");
 	dojo.empty(graphPane);
 	return dojo.xhrGet( {
-		content: cleanParams(['id','begin','end','min','max', 'sort','autoperiod']),
+		content: cleanParams(['id','begin','end','min','max', 'sort','autoperiod', 'history']),
 		url: "jsongraph",
 		handleAs: "json",
 		load: doGraphList

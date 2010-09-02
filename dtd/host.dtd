@@ -19,7 +19,7 @@
 		type CDATA #REQUIRED
 		name CDATA #IMPLIED
 >
-<!ELEMENT probe ((arg| list)*, threshold*, properties?) >
+<!ELEMENT probe ((arg| list)*, dslist?, threshold*, properties?) >
 <!ATTLIST probe
 			type CDATA #REQUIRED
 			label CDATA #IMPLIED
@@ -63,3 +63,18 @@
 	community CDATA #REQUIRED
 	version CDATA #REQUIRED
 >
+
+<!ELEMENT dslist (ds+)>
+<!-- Exact copy from probedesc.dtd -->
+<!ELEMENT ds (dsName, dsType?, (oid | (oidhigh, oidlow) | collect | (collecthigh, collectlow) )?, minValue?, maxValue?, defaultValue?)>
+<!ELEMENT dsName (#PCDATA)>
+<!ELEMENT dsType (#PCDATA)>
+<!ELEMENT oid (#PCDATA)>
+<!ELEMENT oidhigh (#PCDATA)>
+<!ELEMENT oidlow (#PCDATA)>
+<!ELEMENT collect (#PCDATA)>
+<!ELEMENT collecthigh (#PCDATA)>
+<!ELEMENT collectlow (#PCDATA)>
+<!ELEMENT minValue (#PCDATA)>
+<!ELEMENT maxValue (#PCDATA)>
+<!ELEMENT defaultValue (#PCDATA)>
