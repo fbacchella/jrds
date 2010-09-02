@@ -4,7 +4,7 @@
 			name CDATA #REQUIRED
 >
 <!ELEMENT specific (#PCDATA)>
-<!ELEMENT ds (dsName, dsType?, (oid | (oidhigh, oidlow) | collect | (collecthigh, collectlow) )?, minValue?, maxValue?, defaultValue?)>
+<!ELEMENT ds ((dsName, dsType)?, (oid | (oidhigh, oidlow) | collect | (collecthigh, collectlow) )?, minValue?, maxValue?, defaultValue?)>
 <!ELEMENT defaultargs (arg | list)+ >
 <!ELEMENT arg EMPTY>
 <!ATTLIST arg

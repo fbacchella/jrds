@@ -2,6 +2,7 @@ package jrds.factories;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -13,6 +14,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import jrds.ConnectedProbe;
 import jrds.Macro;
@@ -205,8 +209,9 @@ public class HostBuilder extends ObjectBuilder {
 		Probe<?,?> p = null;
 		String type = probeNode.attrMap().get("type");
 
-		List<Map<String, Object>> dsList = doDsList(probeNode.getChild(CompiledXPath.get("dslist")));
+		List<Map<String, Object>> dsList = doDsList(type, probeNode.getChild(CompiledXPath.get("dslist")));
 		if(dsList.size() > 0) {
+			logger.trace(jrds.Util.delayedFormatString("Data source replaced for %s/%s: %s", host, type, dsList));
 			ProbeDesc oldpd = pf.getProbeDesc(type);
 			try {
 				ProbeDesc pd = (ProbeDesc) oldpd.clone();
@@ -264,6 +269,9 @@ public class HostBuilder extends ObjectBuilder {
 		}
 		if(p != null && p.checkStore()) {
 			host.getProbes().add(p);
+		}
+		else {
+			return null;
 		}
 		JrdsNode snmpProbeNode = probeNode.getChild(CompiledXPath.get("snmp"));
 		if(snmpProbeNode != null) {

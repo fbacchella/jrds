@@ -5,6 +5,7 @@
 		<dslist>
 			<ds>
 				<dsName>new1</dsName>
+				<dsType>gauge</dsType>
 			</ds>
 		</dslist>
 	</probe>

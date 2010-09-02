@@ -6,11 +6,11 @@
 	<probeClass>jrds.probe.snmp.ProcessInfoExtended</probeClass>
 	<preloadClass>jrds.snmp.MainStarter</preloadClass>
 	<ds>
-		<dsName>hrSWRunPerfMem</dsName>
+		<!-- <dsName>hrSWRunPerfMem</dsName> -->
 		<oid>1.3.6.1.2.1.25.5.1.1.2</oid>
 	</ds>
 	<ds>
-		<dsName>hrSWRunPerfCPU</dsName>
+		<!-- <dsName>hrSWRunPerfCPU</dsName>-->
 		<oid>1.3.6.1.2.1.25.5.1.1.1</oid>
 	</ds>
 	<ds>

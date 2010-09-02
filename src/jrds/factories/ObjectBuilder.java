@@ -86,7 +86,13 @@ public abstract class ObjectBuilder {
 		}
 	}
 
-	protected List<Map<String, Object>> doDsList(JrdsNode node) {
+	/**
+	 * Extract the data store list from a DOM node, it must contains a list of ds elements
+	 * @param name the name of the graph desc being build
+	 * @param node a DOM node wrapped in a JrdsNode
+	 * @return a list of Map describing the data sources
+	 */
+	protected List<Map<String, Object>> doDsList(String name, JrdsNode node) {
 		if(node == null)
 			return Collections.emptyList();
 		List<Map<String, Object>> dsList = new ArrayList<Map<String, Object>>();
@@ -102,9 +108,15 @@ public abstract class ObjectBuilder {
 				}
 				else if("dsType".equals(element)) {
 					if( !"NONE".equals(textValue.toUpperCase()))
-						value = DsType.valueOf(textValue.toUpperCase());
-					else
-						value = null;
+						try {
+							value = DsType.valueOf(textValue.toUpperCase());
+						} catch (Exception e) {
+							logger.error("Invalid ds type specified for " + name + ": " + textValue);
+							dsMap = null;
+							break;
+						}
+						else
+							value = null;
 				}
 				else if(element.startsWith("oid")) {
 					value = new OID(textValue);
@@ -112,8 +124,10 @@ public abstract class ObjectBuilder {
 				}
 				dsMap.put(element, value);
 			}
-			dsList.add(dsMap);
+			if(dsMap != null)
+				dsList.add(dsMap);
 		}
+		logger.trace(jrds.Util.delayedFormatString("data store list build: %s", dsList));
 		return dsList;
 	}
 }

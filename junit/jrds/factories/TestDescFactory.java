@@ -17,6 +17,7 @@ import jrds.mockobjects.GetMoke;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,14 +50,14 @@ public class TestDescFactory {
 		"</viewtree>" +
 		"</graphdesc>";
 
-
 	static Loader l;
 
 	@BeforeClass
 	static public void configure() throws ParserConfigurationException, IOException {
 		Tools.configure();
-		logger.setLevel(Level.INFO);
-		Tools.setLevel(new String[] {"jrds"}, logger.getLevel());
+		logger.setLevel(Level.TRACE);
+		Tools.setLevel(new String[] {"jrds.factories"}, logger.getLevel());
+		Tools.setLevel(new String[] {"jrds.factories.xml.CompiledXPath"}, Level.INFO);
 		Tools.prepareXml();
 
 	}
@@ -131,4 +132,31 @@ public class TestDescFactory {
 		Assert.assertEquals(1, pd.getCollectOids().size());
 		Assert.assertEquals(3, pd.getCollectStrings().size());
 	}
+	
+	@Test
+	public void loadBadProbeDesc() throws Exception {
+		Document d = Tools.parseRessource("baddesc.xml");
+		PropertiesManager pm = new PropertiesManager();
+		
+		List<LoggingEvent> logged = Tools.getLockChecker("jrds.factories.ObjectBuilder");
+
+		ProbeDescBuilder builder = new ProbeDescBuilder();
+		builder.setProperty(ObjectBuilder.properties.PM, pm);
+		ProbeDesc pd = builder.makeProbeDesc(new JrdsNode(d));
+		logger.trace("Collect mapping: " + pd.getCollectMapping());
+		logger.trace("Collect oids: " + pd.getCollectOids());
+		logger.trace("Collect strings: " + pd.getCollectStrings());
+		Assert.assertEquals(1, pd.getCollectMapping().size());
+		Assert.assertEquals(1, pd.getCollectStrings().size());
+		boolean found = false;
+		for(LoggingEvent le: logged) {
+			String  message = le.getRenderedMessage();
+			if(message.contains("Invalid ds type specified")) {
+				found = true;
+				break;
+			}
+		}
+		Assert.assertTrue("bad probe desc not detected", found);
+	}
+
 }

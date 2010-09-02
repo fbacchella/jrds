@@ -77,18 +77,6 @@ public class TestLoadConfiguration {
 		"</probe>" +
 		"</host>";
 
-	static final private String dsOverride = 
-		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
-		"<!DOCTYPE host PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
-		"<host name=\"myhost\">" +
-		"<probe type = \"PartitionSpace\">" +
-		"<arg type=\"String\" value=\"/\" />" +
-		"<dslist>" +
-		
-		"<dslist>" +
-		"</probe>" +
-		"</host>";
-
 	static DocumentBuilder dbuilder;
 	static ConfigObjectFactory conf;
 	static PropertiesManager pm = new PropertiesManager();
@@ -112,7 +100,7 @@ public class TestLoadConfiguration {
 		conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
 
 		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"jrds.factories"}, logger.getLevel());
+		Tools.setLevel(new String[] {"jrds.factories", "jrds.Probe.DummyProbe"}, logger.getLevel());
 		Tools.setLevel(new String[] {"jrds.factories.xml.CompiledXPath"}, Level.INFO);
 	}
 
@@ -160,8 +148,8 @@ public class TestLoadConfiguration {
 		host.setName("testDsreplace");
 
 		Probe<?,?> p = hb.makeProbe(pnode.getChild(CompiledXPath.get("/host/probe")), host, new StarterNode() {});
-		jrds.Util.serialize(p.dumpAsXml(), System.out, null, null);
 		ProbeDesc pd = p.getPd();
+//		jrds.Util.serialize(p.dumpAsXml(), System.out, null, null);
 //		System.out.println();
 //		jrds.Util.serialize(pd.dumpAsXml(), System.out, null, null);
 //		System.out.println();

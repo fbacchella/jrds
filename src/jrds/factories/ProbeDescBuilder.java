@@ -113,7 +113,7 @@ public class ProbeDescBuilder extends ObjectBuilder {
 				pd.addDefaultArg(o);
 			}
 
-		for(Map<String, Object> dsMap: doDsList(probeDescNode)) {
+		for(Map<String, Object> dsMap: doDsList(pd.getName(), probeDescNode)) {
 			pd.add(dsMap);			
 		}
 
