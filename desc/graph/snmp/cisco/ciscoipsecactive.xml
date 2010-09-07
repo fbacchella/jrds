@@ -3,7 +3,7 @@
 <graphdesc>
 	<name>CiscoIpSecActiveTunnel</name>
 	<graphName>ciscoipsecactive</graphName>
-	<graphTitle>Active tunnel on ${host}</graphTitle>
+	<graphTitle>Active tunnels on ${host}</graphTitle>
 	<verticalLabel>Tunnels</verticalLabel>
 	<add>
 		<name>ActiveTunnels</name>

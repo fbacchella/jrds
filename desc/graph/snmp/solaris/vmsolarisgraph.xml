@@ -4,7 +4,7 @@
 <graphdesc>
   <name>VMSolarisGraph</name>
   <graphName>vmsolaris</graphName>
-  <graphTitle>VM activity on {1}</graphTitle>
+  <graphTitle>VM activity on ${host}</graphTitle>
   <verticalLabel>Operation/s</verticalLabel>
   <add>
     <name>rsVPagesIn</name>
@@ -34,12 +34,12 @@
     <pathelement>HOST</pathelement>
     <pathelement>SYSTEM</pathelement>
     <pathelement>MEMORY</pathelement>
-    <pathstring>VM activity</pathstring>
+    <pathstring>VM activity (Sun agent)</pathstring>
   </hosttree>
   <viewtree>
     <pathelement>SYSTEM</pathelement>
     <pathelement>MEMORY</pathelement>
-    <pathstring>VM activity</pathstring>
+    <pathstring>VM activity (Sun agent)</pathstring>
     <pathelement>HOST</pathelement>
   </viewtree>
 </graphdesc>
