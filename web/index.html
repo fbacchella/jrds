@@ -42,7 +42,9 @@ dojo.cookie("treeOneSaveStateCookie", null, {expires: -1});
 
 dojo.addOnLoad(function(){
 	//The copy is saved
-	mainPane = dojo.clone(dojo.byId('mainPane'));
+	var tempMainPane = dojo.byId('mainPane');
+	mainPane = dojo.clone(tempMainPane);
+	dojo.destroy(tempMainPane);
 	//The parse can be done
 	dojo.parser.parse();
 	
@@ -55,8 +57,15 @@ dojo.addOnLoad(function(){
 </script>
 </head>
 <body class="nihilo">
-<div id='tabs' dojoType="dijit.layout.TabContainer" style="width: 100%; height: 100%;">
-    <div dojoType="dijit.layout.ContentPane" id='mainTab' title="Main tree" selected="true"">
+	<div id='tabs' dojoType="dijit.layout.TabContainer" style="width: 100%; height: 100%;">
+  		<div dojoType="dijit.layout.ContentPane" title="Administration" id="adminTab" selected="false">
+			<button dojoType="dijit.form.Button" type="button" onClick="sendReload"> Reload </button>
+		</div> <!-- adminTab -->
+	
+	</div>
+
+  <!--  The content of tab panes, it can be any where, it will be destroyed -->
+   <div dojoType="dijit.layout.ContentPane" id='mainTab' title="Main tree" selected="true"">
 		<div id="mainPane" dojoType="dijit.layout.BorderContainer" design="sidebar" gutters="false" >
 			<div id="treePane" dojoType="dijit.layout.ContentPane" region="leading" >
 				<form dojoType="dijit.form.Form" id="hostForm" action="" method="" onSubmit="searchHost">
@@ -136,22 +145,7 @@ dojo.addOnLoad(function(){
 				</div> <!-- graphPane -->
 			</div> <!-- centerPane -->
 		</div>
-    	
 	</div> <!-- mainTab -->
-    <div dojoType="dijit.layout.ContentPane" id='sumstab' title="All sums" selected="false">
-	</div>
-    <div dojoType="dijit.layout.ContentPane" id='hoststab' title="All hosts" selected="false">
-	</div>
-    <div dojoType="dijit.layout.ContentPane" id='viewstab' title="All views" selected="false">
-	</div>
-    <div dojoType="dijit.layout.ContentPane" id='servicestab' title="All services" selected="false">
-	</div>
-    <div dojoType="dijit.layout.ContentPane" id='tagstab' title="All tags" selected="false">
-	</div>
-	<div dojoType="dijit.layout.ContentPane" title="Administration" id="adminTab" selected="false">
-		<button dojoType="dijit.form.Button" type="button" onClick="sendReload"> Reload </button>
-	</div> <!-- adminTab -->
-	
-</div>
+
 </body>
 </html>

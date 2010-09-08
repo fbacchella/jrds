@@ -38,6 +38,7 @@ import jrds.starter.SocketFactory;
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 import jrds.webapp.ACL;
+import jrds.webapp.ParamsBean;
 import jrds.webapp.RolesACL;
 
 import org.apache.log4j.Logger;
@@ -58,12 +59,6 @@ public class HostsList extends StarterNode {
 		public Date lastCollect;
 	}
 
-	public static final String HOSTROOT = "Sorted by host";
-	public static final String VIEWROOT = "Sorted by view";
-	public static final String SUMROOT = "Sums";
-	public static final String CUSTOMROOT = "Dashboard";
-	public static final String TAGSROOT = "All tags";
-
 	private RdsHost sumhost =  null;
 	private RdsHost customhost =  null;
 
@@ -72,6 +67,7 @@ public class HostsList extends StarterNode {
 	private final Map<Integer, Probe<?,?>> probeMap= new HashMap<Integer, Probe<?,?>>();
 	private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
 	private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
+	private Map<String, Tab> tabs = new LinkedHashMap<String, Tab>();
 	private Renderer renderer = null;
 	private int numCollectors = 1;
 	private int step;
@@ -105,25 +101,27 @@ public class HostsList extends StarterNode {
 	}
 
 	private void init() {
-		addRoot(SUMROOT);
+		addTree(Filter.SUM.getName(), GraphTree.SUMROOT);
 		filters.put(Filter.SUM.getName(), Filter.SUM);
 		sumhost =  new RdsHost("SumHost");
 
-		addRoot(CUSTOMROOT);
+		addTree(Filter.CUSTOM.getName(), Filter.CUSTOM.getName());
 		filters.put(Filter.CUSTOM.getName(), Filter.CUSTOM);
 		customhost =  new RdsHost("CustomHost");
 
 		filters.put(Filter.EVERYTHING.getName(), Filter.EVERYTHING);
 
-		addRoot(HOSTROOT);
+		addTree(Filter.ALLHOSTS.getName(), GraphTree.HOSTROOT);
 		filters.put(Filter.ALLHOSTS.getName(), Filter.ALLHOSTS);
 
-		addRoot(VIEWROOT);
+		GraphTree viewtree = addTree(Filter.ALLVIEWS.getName(), GraphTree.VIEWROOT);
+		viewtree.addPath("Services");
 		filters.put(Filter.ALLVIEWS.getName(), Filter.ALLVIEWS);
 
+		treeMap.put(Filter.ALLSERVICES.getName(), Filter.ALLSERVICES.setRoot(viewtree));
 		filters.put(Filter.ALLSERVICES.getName(), Filter.ALLSERVICES);
 
-		addRoot(TAGSROOT);
+		addTree("All tags", GraphTree.TAGSROOT);
 
 		new SocketFactory().register(this);
 		sumhost.setParent(this);
@@ -171,9 +169,9 @@ public class HostsList extends StarterNode {
 			throw new RuntimeException("Loader initialisation error",e);
 		}
 
-		logger.debug("Scanning " + pm.libspath + " for probes libraries");
+		logger.debug(jrds.Util.delayedFormatString("Scanning %s for probes libraries", pm.libspath));
 		for(URL lib: pm.libspath) {
-			logger.info("Adding lib " + lib);
+			logger.info(jrds.Util.delayedFormatString("Adding lib %s", lib));
 			l.importUrl(lib);
 		}
 
@@ -184,6 +182,7 @@ public class HostsList extends StarterNode {
 		conf.setGraphDescMap(l.getRepository(Loader.ConfigType.GRAPHDESC));
 		conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
 		conf.setMacroMap(l.getRepository(Loader.ConfigType.MACRODEF));
+		conf.setTabMap(l.getRepository(Loader.ConfigType.TAB));
 
 		Set<String> hostsTags = new HashSet<String>();
 		Map<String, RdsHost> hosts = conf.setHostMap(l.getRepository(Loader.ConfigType.HOSTS));
@@ -197,12 +196,14 @@ public class HostsList extends StarterNode {
 				}
 			}				
 		}
-		
+
 		preloadClasses(conf.getPreloadedClass());
-		
+
+		Tab tagsTab = new Tab("All tags");
 		for(String tag: hostsTags) {
 			Filter f = new FilterTag(tag);
 			filters.put(f.getName(), f);
+			tagsTab.add(f.getName());
 		}
 
 		//Configure the default ACL of all automatic filters
@@ -210,38 +211,100 @@ public class HostsList extends StarterNode {
 			filter.addACL(pm.defaultACL);
 		}
 
+		Tab filterTab = new Tab("All filters");
+
 		Map <String, Filter> f = conf.setFilterMap(l.getRepository(Loader.ConfigType.FILTER));
 		for(Filter filter: f.values()) {
 			addFilter(filter);
+			filterTab.add(filter.getName());
 		}
 
+		Tab sumsTab = null;
 		Map<String, SumProbe> sums = conf.setSumMap(l.getRepository(Loader.ConfigType.SUM));
-		for(SumProbe s: sums.values()) {
-			addVirtual(s, sumhost, SUMROOT);
+		if(sums.size() > 0) {
+			sumsTab = new Tab("All sums");
+			for(SumProbe s: sums.values()) {
+				addVirtual(s, sumhost, Filter.SUM.getName());
+				GraphNode sum = s.getGraphList().iterator().next();
+				//String id = Integer.toString(sum.hashCode());
+				graphMap.put(sum.getQualifieName().hashCode(), sum);
+				sumsTab.add(sum.getQualifieName(), Collections.singletonList(s.getName()));
+			}
 		}
 
 		logger.debug("Parsing graphs configuration");
+		Tab customGraphsTab = null;
 		Map<String, GraphDesc> graphs = conf.setGrapMap(l.getRepository(Loader.ConfigType.GRAPH));
-		if(! graphs.isEmpty()) {
-			ContainerProbe cp = new ContainerProbe(customhost.getName());
-			for(GraphDesc gd: graphs.values()) {
-				logger.trace("Adding graph: " + gd.getGraphTitle());
-				cp.addGraph(gd);
+		if(graphs.size() > 0) {
+			customGraphsTab = new Tab("Custom graphs");
+			if(! graphs.isEmpty()) {
+				ContainerProbe cp = new ContainerProbe(customhost.getName());
+				for(GraphDesc gd: graphs.values()) {
+					logger.trace("Adding graph: " + gd.getGraphTitle());
+					cp.addGraph(gd);
+
+				}
+				addVirtual(cp, customhost, Filter.CUSTOM.getName());
+				for(GraphNode gn: cp.getGraphList()) {
+					customGraphsTab.add(gn.getQualifieName(), gn.getGraphDesc().getHostTree(gn));
+				}
 			}
-			addVirtual(cp, customhost, CUSTOMROOT);
+		}
+
+		Map<String, Tab> externalTabMap = conf.setTabMap(l.getRepository(Loader.ConfigType.TAB));
+		//		logger.trace(jrds.Util.delayedFormatString("tabs to add: %s", tabs));
+		//		for(Map.Entry<String, Tab> e: tabs.entrySet()) {
+		//			GraphTree tabtree = addTree(e.getValue().getName());
+		//			for(GraphNode gn: e.getValue().getGraphList()) {
+		//				logger.trace(jrds.Util.delayedFormatString("path for tab: %s  %s", gn, gn.getTreePathByHost()));
+		//				tabtree.addGraphByPath(gn.getTreePathByHost(), gn);
+		//			}
+		//		}
+
+		tabs.put(ParamsBean.DEFAULTTAB, filterTab);
+		tabs.putAll(externalTabMap);
+		if(sumsTab != null)
+			tabs.put("sumstab", sumsTab);
+		if(customGraphsTab != null)
+			tabs.put("customgraph", customGraphsTab);
+
+		tabs.put("servicestab", new Tab("All services") {
+			@Override
+			public GraphTree getGraphTree() {
+				return  getHostList().getGraphTreeByView().getByPath(GraphTree.VIEWROOT, "Services");
+			}		
+		});
+		tabs.put("hoststab", new Tab("All hosts") {
+			@Override
+			public GraphTree getGraphTree() {
+				return getHostList().getGraphTreeByHost();
+			}		
+		});
+		tabs.put("viewstab", new Tab("All views") {
+			@Override
+			public GraphTree getGraphTree() {
+				return getHostList().getGraphTreeByView();
+			}		
+		});
+
+		tabs.put("tagstab", tagsTab);
+
+		//Hosts list adopts all tabs
+		for(Tab t: tabs.values()) {
+			t.setHostlist(this);
 		}
 
 		if(pm.security) {
 			for(GraphNode gn: graphMap.values()) {
 				gn.addACL(pm.defaultACL);
-				checkRoles(gn, HOSTROOT, gn.getTreePathByHost());
-				checkRoles(gn, VIEWROOT, gn.getTreePathByView());
+				checkRoles(gn, GraphTree.HOSTROOT, gn.getTreePathByHost());
+				checkRoles(gn, GraphTree.VIEWROOT, gn.getTreePathByView());
 			}
 		}
 
 		started = true;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private void preloadClasses(Set<Class<?>> classes) {
 		logger.debug(jrds.Util.delayedFormatString("Classes preloaded: %s", classes));
@@ -264,11 +327,27 @@ public class HostsList extends StarterNode {
 
 	}
 
-	private void addRoot(String root) {
-		if( ! treeMap.containsKey(root)) {
-			GraphTree newRoot = GraphTree.makeGraph(root);
-			treeMap.put(root, newRoot);
+	public Set<String> getTabsId() {
+		return tabs.keySet();
+	}
+
+	public Tab getTab(String id) {
+		return tabs.get(id);
+	}
+
+	/**
+	 * Create a new graph tree
+	 * @param label The name of the tree
+	 * @param root The name of the first element in the tree
+	 * @return a graph tree
+	 */
+	private GraphTree addTree(String label, String root) {
+		if( ! treeMap.containsKey(label)) {
+			GraphTree newTree = GraphTree.makeGraph(root);
+			treeMap.put(label, newTree);
+			return newTree;
 		}
+		return null;
 	}
 
 	public void addGraphs(Collection<GraphNode> graphs) {
@@ -421,17 +500,24 @@ public class HostsList extends StarterNode {
 		collectMutex.release();
 	}
 
+	public GraphTree getGraphTree(String name) {
+		return treeMap.get(name);
+	}
 
-	public Collection<GraphTree> getGraphsRoot() {
+	public Set<String> getTreesName() {
+		return treeMap.keySet();
+	}
+
+	public Collection<GraphTree> getTrees() {
 		return treeMap.values();
 	}
 
 	public GraphTree getGraphTreeByHost() {
-		return treeMap.get(HOSTROOT);
+		return treeMap.get(Filter.ALLHOSTS.getName());
 	}
 
 	public GraphTree getGraphTreeByView() {
-		return treeMap.get(VIEWROOT);
+		return treeMap.get(Filter.ALLVIEWS.getName());
 	}
 
 	/**

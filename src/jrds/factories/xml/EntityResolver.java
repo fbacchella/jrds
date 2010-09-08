@@ -28,6 +28,9 @@ public class EntityResolver implements org.xml.sax.EntityResolver {
 		else if("-//jrds//DTD Sum//EN".equals(publicId)) {
 			realSystemId =  getClass().getResource("/sum.dtd");
 		}
+		else if("-//jrds//DTD Tab//EN".equals(publicId)) {
+			realSystemId =  getClass().getResource("/tab.dtd");
+		}
 		else if("-//W3C//DTD XHTML 1.0 Strict//EN".equals(publicId)) {
 			realSystemId =  getClass().getResource("/ressources/xhtml1-strict.dtd");
 		}

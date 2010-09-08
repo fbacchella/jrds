@@ -49,8 +49,8 @@ public class Grapher {
 		Period p = new Period();
 		Renderer r= new Renderer(10, pm.step, pm.tmpdir);
 		Collection<Integer> done = new HashSet<Integer>();
-		logger.debug(hl.getGraphsRoot());
-		for(GraphTree graphTree: hl.getGraphsRoot()) {
+		logger.debug(hl.getTrees());
+		for(GraphTree graphTree: hl.getTrees()) {
 			logger.trace("Tree found: " + graphTree.getName());
 			for(GraphNode gn: graphTree.enumerateChildsGraph(null)) {
 				if(! done.contains(gn.hashCode())) {

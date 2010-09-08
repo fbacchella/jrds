@@ -16,6 +16,10 @@ public abstract class Filter implements WithACL {
 		public String getName() {
 			return "All sums";
 		}
+		@Override
+		public GraphTree setRoot(GraphTree gt) {
+			return gt.getByPath(GraphTree.SUMROOT);
+		}
 	};
 	static final public Filter CUSTOM = new Filter() {
 		@Override
@@ -41,7 +45,7 @@ public abstract class Filter implements WithACL {
 		@Override
 		public boolean acceptGraph(GraphNode graph, String path) {
 			RdsHost host = graph.getProbe().getHost();
-			return (! host.isHidden()) && path.startsWith("/" + HostsList.HOSTROOT + "/");
+			return (! host.isHidden()) && path.startsWith("/" + GraphTree.HOSTROOT + "/");
 		}
 		@Override
 		public String getName() {
@@ -51,7 +55,7 @@ public abstract class Filter implements WithACL {
 	static final public Filter ALLVIEWS = new Filter() {
 		@Override
 		public boolean acceptGraph(GraphNode graph, String path) {
-			return path.startsWith("/" + HostsList.VIEWROOT + "/");
+			return path.startsWith("/" + GraphTree.VIEWROOT + "/");
 		}
 		@Override
 		public String getName() {
@@ -61,7 +65,7 @@ public abstract class Filter implements WithACL {
 	static final public Filter ALLSERVICES = new Filter() {
 		@Override
 		public boolean acceptGraph(GraphNode graph, String path) {
-			return path.startsWith("/" + HostsList.VIEWROOT + "/Services");
+			return path.startsWith("/" + GraphTree.VIEWROOT + "/Services");
 		}
 		@Override
 		public String getName() {
@@ -69,9 +73,8 @@ public abstract class Filter implements WithACL {
 		}
 		@Override
 		public GraphTree setRoot(GraphTree gt) {
-			return gt.getByPath("/" + HostsList.VIEWROOT + "/Services");
+			return gt.getByPath(GraphTree.VIEWROOT, "Services");
 		}
-		
 	};
 	public abstract boolean acceptGraph(GraphNode graph, String path);
 	public abstract String getName();

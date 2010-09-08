@@ -1194,4 +1194,13 @@ implements Cloneable, WithACL {
 		return acl;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#clone()
+	 */
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		GraphDesc newgd =  (GraphDesc) super.clone();
+		return newgd;
+	}
+
 }

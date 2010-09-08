@@ -26,7 +26,7 @@ public abstract class ObjectBuilder {
 	static final private Logger logger = Logger.getLogger(ObjectBuilder.class);
 
 	public enum properties {
-		MACRO, GRAPHDESC, PROBEDESC, PROBEFACTORY, GRAPHFACTORY, LOADER, CLASSLOADER, PM, DEFAULTROLE;
+		MACRO, GRAPHDESC, PROBEDESC, PROBEFACTORY, GRAPHFACTORY, LOADER, CLASSLOADER, PM, DEFAULTROLE, GRAPHMAP;
 	}
 
 	PropertiesManager pm;

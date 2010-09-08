@@ -74,4 +74,14 @@ public class TestLoader {
 		Assert.assertTrue(rep.containsKey("name"));
 	}
 
+	@Test
+	public void doLoadTab()  throws Exception {
+		Loader l = new Loader();
+
+		l.importStream(getClass().getResourceAsStream("/ressources/goodtab.xml"));
+		Map<String, JrdsNode> rep = l.getRepository(ConfigType.TAB);
+		logger.trace(rep);
+		Assert.assertTrue(rep.containsKey("goodtab"));
+	}
+
 }

@@ -9,7 +9,7 @@ public class FilterHost extends Filter {
 
 	@Override
 	public boolean acceptGraph(GraphNode graph, String path) {
-		return graph.getProbe().getHost().getName().equals(hostname) && path.startsWith("/" + HostsList.HOSTROOT + "/");
+		return graph.getProbe().getHost().getName().equals(hostname) && path.startsWith("/" + GraphTree.HOSTROOT + "/");
 	}
 
 	@Override
@@ -19,7 +19,7 @@ public class FilterHost extends Filter {
 
 	@Override
 	public GraphTree setRoot(GraphTree gt) {
-		return gt.getByPath("/" + HostsList.HOSTROOT + "/" + hostname);
+		return gt.getByPath(GraphTree.HOSTROOT, hostname);
 	}
 
 }

@@ -7,6 +7,7 @@ _##########################################################################*/
 package jrds;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,16 +18,23 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
-
 /**
  *
  * @author Fabrice Bacchella
  * @version $Revision$ $Date$
  */
 public class GraphTree {
+
+	static final private Logger logger = Logger.getLogger(GraphTree.class);
+
+	public static final String HOSTROOT = "Sorted by host";
+	public static final String VIEWROOT = "Sorted by view";
+	public static final String SUMROOT = "Sums";
+	public static final String TAGSROOT = "All tags";
+
+
 	static public final int LEAF_GRAPHTITLE = 1;
 	static public final int LEAF_HOSTNAME = 2;
-	static final private Logger logger = Logger.getLogger(GraphTree.class);
 
 	static final Comparator<String> nodeComparator = jrds.Util.AlphanumericSorting();
 
@@ -61,10 +69,18 @@ public class GraphTree {
 		return rootNode;
 	}
 
-	public GraphTree getByPath(String path) {
-		if(logger.isTraceEnabled())
-			logger.trace("Looking for path " + path + " with id " + path.hashCode());
-		return getById(path.hashCode());
+	public GraphTree getByPath(String... path) {
+		logger.trace(Arrays.asList(path) + " match " + name);
+		logger.trace("childs: "+ childsMap);
+		if(! path[0].equals(this.name))
+			return null;
+		if(path.length == 1)
+			return this;
+		GraphTree child = childsMap.get(path[1]);
+		if(child != null)
+			return child.getByPath(Arrays.copyOfRange(path, 1, path.length));
+
+		return null;
 	}
 
 	public GraphTree getById(int id) {
@@ -82,22 +98,40 @@ public class GraphTree {
 	}
 
 	private void _addGraphByPath(LinkedList<String> path, GraphNode nodesGraph) {
-		if(path.size() == 1) {
-			graphsSet.put(path.getLast(), nodesGraph);
+		if(path.size() == 1 && nodesGraph != null ) {
+				graphsSet.put(path.getLast(), nodesGraph);
 		}
-		else {
+		else if(! path.isEmpty()){
 			String pathElem = path.removeFirst();
 			addChild(pathElem);
 			getChildbyName(pathElem)._addGraphByPath(path, nodesGraph);
 		}
 	}
 
-	public void addGraphByPath(LinkedList<String> path, GraphNode nodesGraph) {
+	/**
+	 * Add a graph node provided it's full path, the last element will be the graph
+	 * node name
+	 * @param path
+	 * @param nodesGraph
+	 */
+	public void addGraphByPath(List<String> path, GraphNode nodesGraph) {
 		if(path.size() < 1) {
 			logger.error("Path is empty : " + path + " for graph " + nodesGraph.getGraphTitle());
 		}
 		else
 			_addGraphByPath(new LinkedList<String>(path), nodesGraph);
+	}
+
+	/**
+	 * Create an empty path in a tree
+	 * @param path
+	 */
+	public void addPath(String... path) {
+		if(path.length < 1) {
+			logger.error("Path is empty : " + path);
+		}
+		else
+			_addGraphByPath(new LinkedList<String>(Arrays.asList(path)), null);
 	}
 
 	public GraphTree getChildbyName(String name) {
@@ -144,6 +178,10 @@ public class GraphTree {
 			}
 		}	
 		return retValue;
+	}
+	
+	public List<GraphNode> enumerateChildsGraph() {
+		return enumerateChildsGraph(null);
 	}
 
 	public String toString() {

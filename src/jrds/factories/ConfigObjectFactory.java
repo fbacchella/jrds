@@ -10,6 +10,7 @@ import jrds.GraphDesc;
 import jrds.Macro;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
+import jrds.Tab;
 import jrds.factories.xml.JrdsNode;
 import jrds.probe.SumProbe;
 
@@ -41,6 +42,7 @@ public class ConfigObjectFactory {
 		builderMap.put(Loader.ConfigType.MACRODEF, new MacroBuilder());
 		builderMap.put(Loader.ConfigType.PROBEDESC, new ProbeDescBuilder());
 		builderMap.put(Loader.ConfigType.SUM, new SumBuilder());
+		builderMap.put(Loader.ConfigType.TAB, new TabBuilder());
 		
 		setProperty(ObjectBuilder.properties.CLASSLOADER, cl);
 		setProperty(ObjectBuilder.properties.PM, pm);
@@ -116,6 +118,12 @@ public class ConfigObjectFactory {
 		Map<String, SumProbe> sumpsMap = (Map<String, SumProbe>)getObjectMap(Loader.ConfigType.SUM, summap);
 		logger.debug("Sums configured: " + sumpsMap.keySet());
 		return sumpsMap;
+	}
+	@SuppressWarnings("unchecked")
+	public Map<String, Tab> setTabMap(Map<String, JrdsNode> tabmap) {
+		Map<String, Tab> tabsMap = (Map<String, Tab>)getObjectMap(Loader.ConfigType.TAB, tabmap);
+		logger.debug("Tabs configured: " + tabsMap.keySet());
+		return tabsMap;
 	}
 	@SuppressWarnings("unchecked")
 	public Map<String, GraphDesc> setGrapMap(Map<String, JrdsNode> graphmap) {

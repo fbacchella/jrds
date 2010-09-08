@@ -111,7 +111,7 @@ function getGraphList() {
 	var graphPane = dojo.byId("graphPane");
 	dojo.empty(graphPane);
 	return dojo.xhrGet( {
-		content: cleanParams(['id','begin','end','min','max', 'sort','autoperiod', 'history']),
+		content: cleanParams(['id', 'begin', 'end', 'min', 'max', 'sort', 'autoperiod', 'history', 'filter', 'role', 'tab']),
 		url: "jsongraph",
 		handleAs: "json",
 		load: doGraphList
@@ -168,22 +168,25 @@ function fileForms() {
 }
 
 function setupDisplay() {
-	fileForms();
-	
-	var type = 'filter';
-	if(queryParams.host != null || queryParams.filter != null) {
-		type = 'tree';
-	}
+	var tabWidget = dijit.byId('tabs');
+	var i = 0;
+	dojo.forEach(queryParams.tabslist, function(key) {
+		var pane = new dijit.layout.ContentPane({
+	        title: key.label,
+	        id: key.id
+	    });
+		tabWidget.addChild(pane, i++);		
+	    if(key.selected && ! queryParams.tab) {
+			tabWidget.selectChild(pane);
+	    }	    	
+	});
 
-	//selectChild send a transitTab that send getTree
-	//Don't do it twice
 	if(queryParams.tab) {
-		tabWidget = dijit.byId('tabs');
 		tabWidget.selectChild(queryParams.tab);
 	}
-	else {
-		getTree(type);
-	}
+
+	fileForms();
+
 	if(queryParams.id) {
 		getGraphList();
 	}
@@ -201,7 +204,7 @@ function getTree(treeType) {
 	}
 
 	var store = new dojo.data.ItemFileReadStore({
-		url: "jsontree?" + dojo.objectToQuery(cleanParams(['host', 'filter']))
+		url: "jsontree?" + dojo.objectToQuery(cleanParams(['host', 'filter', 'tree', 'tab']))
 	});
 
 	var treeModel = new dijit.tree.ForestStoreModel({
@@ -223,7 +226,6 @@ function getTree(treeType) {
 				//This operation destroy the array used as an argument
 				//so clone it !
 				this.attr('path', dojo.clone(queryParams.path));
-
 			}
 		}
 	}, treeOneDiv);	
@@ -233,11 +235,19 @@ function loadTree(item,  node){
 	var tree = dijit.byId("treeOne");
 	if(item.filter) {
 		queryParams.filter = item.filter[0];
-		delete queryParams.hos;
+		delete queryParams.host;
+		delete queryParams.tree;
 		getTree('tree');
 	}
 	else if(item.host) {
 		queryParams.host = item.host[0];
+		delete queryParams.filter;
+		delete queryParams.tree;
+		getTree('tree');
+	}
+	else if(item.tree) {
+		queryParams.tree = item.host[0];
+		delete queryParams.host;
 		delete queryParams.filter;
 		getTree('tree');
 	}
@@ -422,7 +432,6 @@ function history(url, name)
 function sendlink()
 {
     var xhrArgs = {
-//    	parentid: "link." + id,
         url: "jsonpack",
         postData: dojo.toJson(queryParams),
         handleAs: "text",
@@ -516,12 +525,15 @@ function transitTab(newPage, oldPage){
 		return;
 	}
 	var treeType = 'tree';
-	queryParams.filter = newPage.attr('title');
+	delete queryParams.host;
+	//queryParams.filter = newPage.attr('title');
+	delete queryParams.filter;
+	delete queryParams.id;
 	queryParams.tab = newPage.attr('id');
 	
 	//To manage special tabs
 	if(newId == 'mainTab') {
-		treeType = 'filter';
+		treeType = 'tree';
 		queryParams.filter = '';
 	}
 	else if(newId == 'tagstab') {
@@ -533,7 +545,6 @@ function transitTab(newPage, oldPage){
 
 	newPage.attr('content', dojo.clone(mainPane));
 	setupCalendar();
-	delete queryParams.host;
 	fileForms();
 	getTree(treeType);
 }
@@ -568,5 +579,5 @@ function goHome(evt) {
 	delete queryParams.filter;
 	tabs = dijit.byId('tabs');
 	tabs.selectChild('mainTab');
-	getTree('filter');
+	getTree('tree');
 }

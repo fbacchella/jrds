@@ -2,7 +2,6 @@ package jrds.factories;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,6 +17,7 @@ import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.RdsHost;
 import jrds.StoreOpener;
+import jrds.Tab;
 import jrds.Tools;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
@@ -149,11 +149,6 @@ public class TestLoadConfiguration {
 
 		Probe<?,?> p = hb.makeProbe(pnode.getChild(CompiledXPath.get("/host/probe")), host, new StarterNode() {});
 		ProbeDesc pd = p.getPd();
-//		jrds.Util.serialize(p.dumpAsXml(), System.out, null, null);
-//		System.out.println();
-//		jrds.Util.serialize(pd.dumpAsXml(), System.out, null, null);
-//		System.out.println();
-//		jrds.Util.serialize(pf.getProbeDesc(pd.getName()).dumpAsXml(), System.out, null, null);
 		Assert.assertNotNull(pd);
 		Assert.assertEquals(1 , pd.getSize());
 		Assert.assertNotSame(pf.getProbeDesc(pd.getName()) , pd.getSize());
@@ -302,7 +297,7 @@ public class TestLoadConfiguration {
 	}
 
 	@Test
-	public void TestProperties() throws Exception {
+	public void testProperties() throws Exception {
 		JrdsNode pnode = new JrdsNode(Tools.parseString(propertiesXmlString));
 
 		HostBuilder hb = new HostBuilder();
@@ -312,6 +307,16 @@ public class TestLoadConfiguration {
 		Assert.assertEquals(2, props.size());
 		Assert.assertNotNull(props.get("a"));
 		Assert.assertNotNull(props.get("b"));
+	}
+	
+	@Test
+	public void testTab() throws Exception {
+		JrdsNode tabNode = new JrdsNode(Tools.parseRessource("goodtab.xml"));
+		
+		TabBuilder tb = new TabBuilder();
+		Tab tab = tb.makeTab(tabNode);
+		
+		Assert.assertEquals("Tab name not set", "goodtab", tab.getName());
 	}
 
 }

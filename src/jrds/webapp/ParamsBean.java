@@ -31,14 +31,15 @@ import javax.servlet.http.HttpServletRequest;
 import jrds.Base64;
 import jrds.Filter;
 import jrds.Graph;
+import jrds.GraphTree;
 import jrds.HostsList;
 import jrds.Period;
 import jrds.Probe;
+import jrds.Tab;
 import jrds.Util;
 import jrds.Util.SiPrefix;
 
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONException;
 
 /**
@@ -54,6 +55,8 @@ public class ParamsBean implements Serializable {
 	static private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 	static private final Pattern rangePattern = Pattern.compile("(-?\\d+(.\\d+)?)([a-zA-Z]{0,2})");
 
+	static public String DEFAULTTAB = "filtertab";
+
 	String contextPath = "";
 	String dsName = null;
 	Period period = new Period();
@@ -65,10 +68,14 @@ public class ParamsBean implements Serializable {
 	String maxArg = null;
 	String minArg = null;
 	Filter f = null;
-	HostsList root;
+	private HostsList hostlist;
 	String user = null;
 	Set<String> roles = Collections.emptySet();
-	Map<String, String[]> params  = Collections.emptyMap();
+	private Map<String, String[]> params  = Collections.emptyMap();
+	private GraphTree tree = null;
+	private Tab tab = null;
+	private String choiceType = null;
+	private String choiceValue = null;
 
 	public ParamsBean(){
 
@@ -172,7 +179,7 @@ public class ParamsBean implements Serializable {
 	}
 
 	private void parseReq(HostsList hl) {
-		root =	hl;
+		hostlist =	hl;
 
 		String packed = getValue("p");
 		if(packed != null && ! "".equals(packed))
@@ -220,11 +227,43 @@ public class ParamsBean implements Serializable {
 		}
 		String paramFilterName = getValue("filter");
 		String paramHostFilter = getValue("host");
+		String treeName = getValue("tree");
+		String tabName = getValue("tab");
 		if(paramFilterName != null && ! "".equals(paramFilterName)) {
-			f = root.getFilter(paramFilterName);
+			f = hostlist.getFilter(paramFilterName);
+			if(f != null) {
+				choiceType = "filter";
+				choiceValue = paramFilterName;
+			}
 		}
 		else if(paramHostFilter != null && ! "".equals(paramHostFilter)) {
-			f = new jrds.FilterHost(paramHostFilter);
+			tree = hl.getGraphTreeByHost().getByPath(GraphTree.HOSTROOT, paramHostFilter);
+			if(tree != null) {
+				choiceType = "host";
+				choiceValue = paramHostFilter;
+			}
+			//f = new jrds.FilterHost(paramHostFilter);
+		}
+		else if(treeName != null && ! "".equals(treeName)) {
+			tree = hl.getGraphTree(treeName);
+			if(tree != null) {
+				choiceType = "tree";
+				choiceValue = treeName;
+			}
+		}
+		else if(tabName != null && ! "".equals(tabName)) {
+			tab = hl.getTab(tabName);
+			if(tab != null) {
+				choiceType = "tab";
+				choiceValue = tabName;
+			}
+		}
+		
+		//If previous steps failed
+		if(choiceType == null || choiceValue == null) {
+			tab = hl.getTab(DEFAULTTAB);
+			choiceType = "tab";
+			choiceValue = DEFAULTTAB;
 		}
 	}
 
@@ -266,10 +305,10 @@ public class ParamsBean implements Serializable {
 	}
 
 	public jrds.Graph getGraph() {
-		jrds.Graph g = root.getRenderer().getGraph(gid);
+		jrds.Graph g = hostlist.getRenderer().getGraph(gid);
 		if(g == null) {
 			logger.warn("graph cache miss");
-			jrds.GraphNode node = root.getGraphById(getId());
+			jrds.GraphNode node = hostlist.getGraphById(getId());
 			g = node.getGraph();
 			configureGraph(g);
 		}
@@ -277,9 +316,9 @@ public class ParamsBean implements Serializable {
 	}
 
 	public Probe<?,?> getProbe() {
-		Probe<?,?> p = root.getProbeById(pid);
+		Probe<?,?> p = hostlist.getProbeById(pid);
 		if(p == null) {
-			jrds.GraphNode node = root.getGraphById(pid);
+			jrds.GraphNode node = hostlist.getGraphById(pid);
 			if(node != null)
 				p = node.getProbe();
 		}
@@ -539,5 +578,33 @@ public class ParamsBean implements Serializable {
 	 */
 	public Set<String> getRoles() {
 		return roles;
+	}
+
+	/**
+	 * @return the tree
+	 */
+	public GraphTree getTree() {
+		return tree;
+	}
+
+	/**
+	 * @return the choiceType
+	 */
+	public String getChoiceType() {
+		return choiceType;
+	}
+
+	/**
+	 * @return the choiceValue
+	 */
+	public String getChoiceValue() {
+		return choiceValue;
+	}
+
+	/**
+	 * @return the tab
+	 */
+	public Tab getTab() {
+		return tab;
 	}
 }

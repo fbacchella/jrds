@@ -106,7 +106,7 @@ public class JSonGraph extends JSonData {
 			if(gn != null)
 				return Collections.singletonList(gn);
 		}
-
+		logger.warn(jrds.Util.delayedFormatString("Id %d maps to nothing", id));
 		return Collections.emptyList();
 	}
 

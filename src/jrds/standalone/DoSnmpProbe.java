@@ -77,7 +77,9 @@ public class DoSnmpProbe  extends CommandStarterImpl {
 				String syntax = syntaxMatcher.group(1);
 				if("counter".matches(syntax.toLowerCase()))
 					info.type = DsType.COUNTER;
-				if("integer".matches(syntax.toLowerCase()))
+				else if("integer".matches(syntax.toLowerCase()))
+					info.type = DsType.GAUGE;
+				else if("gauge32".matches(syntax.toLowerCase()))
 					info.type = DsType.GAUGE;
 			}
 			line = r.readLine();
