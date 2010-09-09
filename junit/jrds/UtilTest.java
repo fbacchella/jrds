@@ -99,7 +99,8 @@ public class UtilTest {
 		//It should have auto-detected the doc type
 		Assert.assertTrue(outBuffer.contains(publicId));
 		Assert.assertTrue(outBuffer.contains(systemId));
-		Assert.assertTrue(outBuffer.contains(d.getInputEncoding()));
+		logger.debug(outBuffer.contains(d.getInputEncoding()));
+		Assert.assertTrue("Output encoding "+ d.getInputEncoding() + " not found", outBuffer.contains(d.getInputEncoding()));
 	}
 
 	@Test
@@ -275,10 +276,10 @@ public class UtilTest {
 
 	@Test
 	public void testSort() {
-		String[] toSort =  new String[]{"zOS", "linux", "redbus", "telecity", "linode"};
+		String[] toSort =  new String[]{"zOS", "linux", "Linux", "host10", "host2", "host03", "redbus", "telecity", "linode"};
 		Arrays.sort(toSort, jrds.Util.nodeComparator);
+		String sorted = Arrays.asList(toSort).toString();
 		logger.trace(Arrays.asList(toSort));
-		Assert.assertEquals("linode", toSort[0]);
-		Assert.assertEquals("zOS", toSort[4]);
+		Assert.assertEquals("[host2, host03, host10, linode, linux, Linux, redbus, telecity, zOS]", sorted);
 	}
 }

@@ -138,6 +138,9 @@ function fileForms() {
 	if(queryParams.host) {
 		dojo.byId("hostForm").host.value = queryParams.host;
 	}
+	else {
+		dojo.byId("hostForm").host.value = '';
+	}
 
 	var dateForm = dojo.byId("dateForm");
 	if(queryParams.begin && queryParams.end) {
@@ -585,6 +588,7 @@ function goHome(evt) {
 		delete queryParams.filter;
 		delete queryParams.id;
 		queryParams.tab = queryParams.landtab;
+		fileForms();
 		getTree('tree');
 	}		
 }

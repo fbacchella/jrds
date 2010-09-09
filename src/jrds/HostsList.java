@@ -252,14 +252,13 @@ public class HostsList extends StarterNode {
 		}
 
 		Map<String, Tab> externalTabMap = conf.setTabMap(l.getRepository(Loader.ConfigType.TAB));
-		//		logger.trace(jrds.Util.delayedFormatString("tabs to add: %s", tabs));
-		//		for(Map.Entry<String, Tab> e: tabs.entrySet()) {
-		//			GraphTree tabtree = addTree(e.getValue().getName());
-		//			for(GraphNode gn: e.getValue().getGraphList()) {
-		//				logger.trace(jrds.Util.delayedFormatString("path for tab: %s  %s", gn, gn.getTreePathByHost()));
-		//				tabtree.addGraphByPath(gn.getTreePathByHost(), gn);
-		//			}
-		//		}
+		logger.debug(jrds.Util.delayedFormatString("Tabs to add: %s", externalTabMap.values()));
+		for(Tab t: externalTabMap.values()) {
+			t.setHostlist(this);
+			GraphTree tabtree = t.getGraphTree();
+			if(tabtree != null)
+				treeMap.put(t.getName(), tabtree);
+		}
 
 		tabs.put(ParamsBean.DEFAULTTAB, filterTab);
 		tabs.putAll(externalTabMap);
@@ -556,9 +555,11 @@ public class HostsList extends StarterNode {
 
 	public GraphTree getNodeById(int id) {
 		GraphTree node = null;
-		for(GraphTree tree: treeMap.values())
-			if(tree.getById(id) != null)
-				node = tree.getById(id);
+		for(GraphTree tree: treeMap.values()) {
+			node = tree.getById(id);
+			if(node != null)
+				return node;
+		}
 		return node;
 	}
 

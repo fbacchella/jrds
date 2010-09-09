@@ -47,7 +47,7 @@ public class JSonGraph extends JSonData {
 				}
 			});
 		}
-		logger.debug("Graphs found:" +  graphs);
+		logger.debug(jrds.Util.delayedFormatString("Graphs found: %s", graphs));
 		if( ! graphs.isEmpty()) {
 			Renderer r = root.getRenderer();
 			for(GraphNode gn: graphs) {
@@ -73,7 +73,7 @@ public class JSonGraph extends JSonData {
 
 		GraphTree node = root.getNodeById(id);
 		if(node != null) {
-			logger.debug("Tree found: " + node);
+			logger.debug(jrds.Util.delayedFormatString("Tree found: %s", node));
 			Filter filter = params.getFilter();
 			return node.enumerateChildsGraph(filter);
 		}

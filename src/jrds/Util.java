@@ -453,6 +453,9 @@ public class Util {
 				if (secondString == null || firstString == null) {
 					return 0;
 				}
+				
+				firstString = firstString.toLowerCase();
+				secondString = secondString.toLowerCase();
 
 				int lengthFirstStr = firstString.length();
 				int lengthSecondStr = secondString.length();
