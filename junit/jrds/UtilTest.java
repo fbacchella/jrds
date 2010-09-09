@@ -273,4 +273,12 @@ public class UtilTest {
 		Assert.assertTrue(Math.abs(now.getTime() - n.getTime()) < 500 * 1000);
 	}
 
+	@Test
+	public void testSort() {
+		String[] toSort =  new String[]{"zOS", "linux", "redbus", "telecity", "linode"};
+		Arrays.sort(toSort, jrds.Util.nodeComparator);
+		logger.trace(Arrays.asList(toSort));
+		Assert.assertEquals("linode", toSort[0]);
+		Assert.assertEquals("zOS", toSort[4]);
+	}
 }

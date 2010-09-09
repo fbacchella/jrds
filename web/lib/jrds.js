@@ -158,8 +158,6 @@ function fileForms() {
 
 	var autoperiod = dijit.byId('autoperiod'); 
 	autoperiod.attr('value', queryParams.autoperiod);
-	//autoperiod.dropDown.oldItemClick = autoperiod.dropDown.onItemClick;
-	//autoperiod.dropDown.onItemClick = setAutoperiod;
 
 	setAutoscale(queryParams.max == null || queryParams.min == null);
 		
@@ -169,8 +167,7 @@ function fileForms() {
 function setupDisplay() {
 	var tabWidget = dijit.byId('tabs');
 	var i = 0;
-	//Selecting default tab will destroy queryParams, that's no good
-	//var oldQueryParams = dojo.clone(queryParams);
+
 	dojo.forEach(queryParams.tabslist, function(key) {
 		var pane = new dijit.layout.ContentPane({
 	        title: key.label,
@@ -182,8 +179,6 @@ function setupDisplay() {
 			tabWidget.selectChild(pane);
 	    }	    	
 	});
-
-	//queryParams = oldQueryParams;
 
 	if(queryParams.tab) {
 		tabWidget.selectChild(queryParams.tab);
@@ -444,9 +439,6 @@ function sendlink()
             linkdialog(data, ioargs);
         },
         error: function(error) {
-            //We'll 404 in the demo, but that's okay.  We don't have a 'postIt' service on the
-            //docs server.
-            //dojo.byId("response2").innerHTML = "Message posted.";
         }
     }
     //Call the asynchronous xhrPost
@@ -457,7 +449,6 @@ function linkdialog(data, ioargs) {
 	// create the dialog:
 	var myDialog = new dijit.Dialog({
 		title: "Graph context",
-	    //content: "<i>" + data +"</i>"
 	    content: "<a target='_blank' href='" + data +"'>" + data +"</a>"
 	});	  
 	myDialog.show();
@@ -488,14 +479,15 @@ function setAutoscale(value) {
 //Called upon edited scale text boxes
 function updateScale(value) {
 	//value==0 is not a null value, keep it
-	if(! value && value !=0 )
+	if(! value && value != 0 )
 		value = null;
 	queryParams[this.id] = value;
 }
 
-function setAutoperiod(newValue) {
-	queryParams.autoperiod = newValue;
-	if(newValue != 0) {
+function setAutoperiod(value) {
+	queryParams.autoperiod = value;
+	//value = 0 means manual time period, so don't mess with the period fields
+	if(value != 0) {
 		submitRenderForm();
 		dojo.forEach(['begin', 'beginh', 'end', 'endh'], function(id, i) {
 			dijit.byId(id).attr('value', '');
@@ -534,6 +526,7 @@ function transitTab(newPage, oldPage){
 
 	var treeType = 'tree';
 
+	//keepParams used during page setup, to keep queryParams fields
 	if(newPage.keepParams) {
 		delete newPage.keepParams;
 	}
@@ -542,6 +535,7 @@ function transitTab(newPage, oldPage){
 		delete queryParams.filter;
 		delete queryParams.id;
 		queryParams.tab = newPage.attr('id');
+		queryParams.landtab = newPage.attr('id');
 	}
 	//To manage special tabs
 	if(newId == 'sumstab') {
@@ -562,6 +556,7 @@ function sendReload(evt) {
 		load: function(response, ioArgs) {
 		},
 		error: function(response, ioArgs) {
+			console.error(response);
 		}
 	});
 }
@@ -570,6 +565,8 @@ function searchHost(evt) {
 	try {
 		queryParams.host = this.attr('value').host;
 		delete queryParams.filter;
+		delete queryParams.id;
+		delete queryParams.tab;
 		getTree('tree');
 	}
 	catch(err) {
@@ -579,9 +576,15 @@ function searchHost(evt) {
 }
 
 function goHome(evt) {
-	delete queryParams.host;
-	delete queryParams.filter;
-	tabs = dijit.byId('tabs');
-	tabs.selectChild('mainTab');
-	getTree('tree');
+	var tabs = dijit.byId('tabs');
+	var tabSelected = tabs.attr('selectedChildWidget');
+	if(tabSelected.id !=  queryParams.landtab)
+		tabs.selectChild(queryParams.landtab);
+	else {
+		delete queryParams.host;
+		delete queryParams.filter;
+		delete queryParams.id;
+		queryParams.tab = queryParams.landtab;
+		getTree('tree');
+	}		
 }

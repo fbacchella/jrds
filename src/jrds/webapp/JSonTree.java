@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import jrds.Filter;
-import jrds.FilterTag;
 import jrds.GraphNode;
 import jrds.GraphTree;
 import jrds.HostsList;
@@ -28,8 +27,6 @@ public class JSonTree extends JSonData {
 
 	@Override
 	public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException, JSONException {
-		logger.trace(root.getTreesName());
-		logger.trace(root.getTrees());
 		Filter f = params.getFilter();
 		GraphTree tree = params.getTree();
 		Tab tab = params.getTab();
@@ -48,21 +45,15 @@ public class JSonTree extends JSonData {
 			return false;
 		}
 		else if(tree != null) {
-			logger.debug(jrds.Util.delayedFormatString("Tree specified: ", tree));
+			logger.debug(jrds.Util.delayedFormatString("Tree specified: %s", tree));
 			return evaluateTree(params, w, root, tree);
 		}
 		else if( f != null) {
-			logger.debug(jrds.Util.delayedFormatString("Filter specified: ", f));
+			logger.debug(jrds.Util.delayedFormatString("Filter specified: %s", f));
 			return evaluateFilter(params, w, root, f);
 		}
-		else {
-			String filterName = params.getValue("filter");
-			if(filterName != null && "All tags".equals(filterName.trim())) {
-				return dumpTags(w, root);
-			}
-			else
-				return dumpRoots(w, root);
-		}
+		logger.error("What to do ? No enough context");
+		return false;
 	}
 
 	boolean evaluateTree(ParamsBean params, JrdsJSONWriter w, HostsList root, GraphTree trytree) throws IOException, JSONException {
@@ -73,9 +64,7 @@ public class JSonTree extends JSonData {
 	}
 
 	boolean evaluateFilter(ParamsBean params, JrdsJSONWriter w, HostsList root, Filter f) throws IOException, JSONException {
-		logger.debug("Dumping with filter" + f);
 		Collection<GraphTree> level = root.getTrees();
-		//logger.trace("Graphs root: " + level);
 
 		//We construct the graph tree root to use
 		//The tree is parsed twice, that's not optimal
@@ -93,7 +82,7 @@ public class JSonTree extends JSonData {
 		return true;
 	}
 
-	Collection<GraphTree> findRoot(Collection<GraphTree> rootstry) {
+	private Collection<GraphTree> findRoot(Collection<GraphTree> rootstry) {
 		//Look for the first level with many childs
 		while(rootstry.size() == 1) {
 			logger.trace(jrds.Util.delayedFormatString("Trying with graph tree roots: %s", rootstry));
@@ -107,58 +96,21 @@ public class JSonTree extends JSonData {
 		return rootstry;
 	}
 
-	boolean dumpTags(JrdsJSONWriter w, HostsList root) throws IOException, JSONException {
-		List<String> tagsref = new ArrayList<String>();
-		for(String filterName: root.getAllFiltersNames()) {
-			Filter filter = root.getFilter(filterName);
-			String type = "tree";
-			if(filter instanceof FilterTag){
-				logger.trace("Found filter tag: " + filter);
-				tagsref.add(Integer.toString(filter.hashCode()));
-				type="subfilter";
-				Map<String, String> href = new HashMap<String, String>();
-				href.put("filter", filterName);
-				doNode(w,filterName, filter.hashCode(), type, null, href);
-			}
-		}
-		if(tagsref.size() > 0) {
-			doNode(w,"All tags", tagsref.hashCode(), "tree", tagsref);
-		}
-		return true;
-	}
-
-	boolean dumpRoots(JrdsJSONWriter w, HostsList root) throws IOException, JSONException {
-		for(String filterName: root.getAllFiltersNames()) {
-			Filter filter = root.getFilter(filterName);
-			String type = "tree";
-			if(!(filter instanceof FilterTag)){
-				Map<String, String> href = new HashMap<String, String>();
-				href.put("filter", filterName);
-				doNode(w,filterName, filter.hashCode(), type, null, href);
-			}
-		}
-		return true;
-	}
-
 	boolean dumpFilters(JrdsJSONWriter w, Set<Filter> filterSet) throws JSONException {
-		String type = "tree";
 		for(Filter filter: filterSet) {
 			String filterName = filter.getName();
 			Map<String, String> href = new HashMap<String, String>();
 			href.put("filter", filterName);
-			doNode(w,filterName, filter.hashCode(), type, null, href);
+			doNode(w,filterName, filter.hashCode(), "tree", null, href);
 		}
 		return true;
 	}
 
 	String sub(ParamsBean params, JrdsJSONWriter w, GraphTree gt, String type, Filter f, String path, int base) throws IOException, JSONException {
-		logger.trace("path: " + path);
 		String id = null;
 		String subpath = path + "/" + gt.getName();
-		logger.trace("subpath:" + gt.getChildsMap());
 		boolean hasChild = false;
 		Map<String, GraphTree> childs = gt.getChildsMap();
-		logger.trace(childs);
 
 		List<String> childsref = new ArrayList<String>();
 		for(Map.Entry<String, GraphTree>e: childs.entrySet()) {

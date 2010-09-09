@@ -443,7 +443,9 @@ public class Util {
 	 * Copied from http://sanjaal.com/java/tag/sample-alphanumeric-sorting/
 	 * @return
 	 */
-	public static Comparator<String> AlphanumericSorting() {
+	public static final Comparator<String> nodeComparator = jrds.Util.AlphanumericSorting();
+
+	private static Comparator<String> AlphanumericSorting() {
 		return new Comparator<String>() {
 
 			public int compare(String firstString, String secondString) {

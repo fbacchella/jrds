@@ -9,7 +9,6 @@ package jrds;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,11 +31,8 @@ public class GraphTree {
 	public static final String SUMROOT = "Sums";
 	public static final String TAGSROOT = "All tags";
 
-
 	static public final int LEAF_GRAPHTITLE = 1;
 	static public final int LEAF_HOSTNAME = 2;
-
-	static final Comparator<String> nodeComparator = jrds.Util.AlphanumericSorting();
 
 	private GraphTree parent;
 	private Map<Integer, GraphTree> pathsMap;
@@ -52,8 +48,8 @@ public class GraphTree {
 	 *  
 	 */
 	private GraphTree(String name) {
-		graphsSet = new TreeMap<String, GraphNode>(nodeComparator);
-		childsMap = new TreeMap<String, GraphTree>(nodeComparator);
+		graphsSet = new TreeMap<String, GraphNode>(jrds.Util.nodeComparator);
+		childsMap = new TreeMap<String, GraphTree>(jrds.Util.nodeComparator);
 		this.name = name;
 	}
 
@@ -148,6 +144,7 @@ public class GraphTree {
 	public Map<String, GraphTree> getChildsMap() {
 		return childsMap;
 	}
+	
 	/**
 	 * @return Returns the graphsSet.
 	 */
@@ -188,10 +185,10 @@ public class GraphTree {
 		return name;
 	}
 
-	private StringBuffer _getPath() {
-		StringBuffer retValue = null;
+	private StringBuilder _getPath() {
+		StringBuilder retValue = null;
 		if(parent == null)
-			retValue = new StringBuffer();
+			retValue = new StringBuilder();
 		else
 			retValue = parent._getPath();
 		retValue.append("/");
