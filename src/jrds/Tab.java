@@ -16,7 +16,7 @@ public class Tab {
 	private final Map<String, List<String>> paths = new TreeMap<String, List<String>>(jrds.Util.nodeComparator);
 	
 	private String name;
-	private HostsList hostlist;
+	protected HostsList hostlist;
 
 	public Tab(String name) {
 		this.name = name;

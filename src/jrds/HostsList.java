@@ -271,7 +271,7 @@ public class HostsList extends StarterNode {
 		tabs.put("servicestab", new Tab("All services") {
 			@Override
 			public GraphTree getGraphTree() {
-				return  getHostList().getGraphTreeByView().getByPath(GraphTree.VIEWROOT, "Services");
+				return  hostlist.getGraphTreeByView().getByPath(GraphTree.VIEWROOT, "Services");
 			}		
 		});
 		tabs.put("hoststab", new Tab("All hosts") {
