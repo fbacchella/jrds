@@ -18,6 +18,7 @@ import jrds.HostsList;
 import jrds.Period;
 import jrds.Probe;
 import jrds.PropertiesManager;
+import jrds.RdsHost;
 import jrds.Tools;
 import jrds.mockobjects.GetMoke;
 import jrds.mockobjects.MockGraph;
@@ -146,7 +147,7 @@ public class TestUrlParser {
 		parameters.put("min", new String [] { "2"} );
 		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
 		String url = pb.makeObjectUrl("root", "", false);
-		Assert.assertTrue(url.contains("host=host"));
+		logger.trace(url);
 		Assert.assertTrue(url.contains("/root?"));
 		Assert.assertTrue(url.contains("id=" + "".hashCode()));
 		Assert.assertTrue(url.contains("scale=2"));

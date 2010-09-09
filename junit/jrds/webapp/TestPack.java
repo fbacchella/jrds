@@ -7,7 +7,6 @@ import javax.servlet.ServletContext;
 
 import jrds.Period;
 import jrds.Tools;
-import jrds.standalone.JettyLogger;
 import junit.framework.Assert;
 
 import org.apache.log4j.Level;
@@ -68,9 +67,9 @@ public class TestPack {
 	
 	@Test
 	public void testPack1() throws IOException, Exception {
-		JrdsJSONObject params = new JrdsJSONObject( packunpack("{'tab':'tabtest', 'begin':'2010-08-17 00:00','end':'2010-08-18 23:59', 'min':'0', 'max':'10', 'autoperiod':'0','filter':['All hosts'],'host':'','treeType':'tree','id':'-744958554','path':['All filters','bougie','Services','jdbc:postgresql://appartland.eu/postgres','xwiki']}"));
+		JrdsJSONObject params = new JrdsJSONObject( packunpack("{'begin':'2010-08-17 00:00','end':'2010-08-18 23:59', 'min':'0', 'max':'10', 'autoperiod':'0','filter':['All hosts'],'host':'','treeType':'tree','id':'-744958554','path':['All filters','bougie','Services','jdbc:postgresql://appartland.eu/postgres','xwiki']}"));
 		Assert.assertEquals("0", params.get("autoperiod"));
-		Assert.assertEquals("tabtest", params.get("tab"));
+		Assert.assertEquals(ParamsBean.DEFAULTTAB, params.get("tab"));
 
 	}
 
@@ -80,7 +79,6 @@ public class TestPack {
 		Assert.assertEquals("0", params.get("autoperiod"));
 		Assert.assertEquals("0", params.get("min"));
 		Assert.assertEquals("10", params.get("max"));
-		Assert.assertEquals("hosttest", params.get("host"));
 		
 		Period p = new Period(params.getString("begin"), params.getString("end"));
 		logger.trace(p);

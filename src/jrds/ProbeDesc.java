@@ -418,7 +418,7 @@ public class ProbeDesc implements Cloneable {
 		DocumentBuilder builder = factory.newDocumentBuilder();
 		Document document = builder.newDocument();
 		Element root = 
-			(Element) document.createElement("ProbeDesc"); 
+			(Element) document.createElement("probedesc"); 
 		document.appendChild(root);
 		root.appendChild(document.createElement("name")).setTextContent(name);
 		if(probeName != null)

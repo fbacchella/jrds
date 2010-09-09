@@ -1,8 +1,9 @@
 package jrds;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -25,8 +26,8 @@ public class TestGraphTree {
 		Tools.setLevel(new String[] {"jrds.GraphTree"}, logger.getLevel());
 	}
 	
-	private LinkedList<String> doList(String... pathelems) {
-		return new LinkedList<String>( Arrays.asList(pathelems));
+	private List<String> doList(String... pathelems) {
+		return new ArrayList<String>( Arrays.asList(pathelems));
 	}
 	
 	@Test
