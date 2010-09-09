@@ -111,7 +111,7 @@ function getGraphList() {
 	var graphPane = dojo.byId("graphPane");
 	dojo.empty(graphPane);
 	return dojo.xhrGet( {
-		content: cleanParams(['id', 'begin', 'end', 'min', 'max', 'sort', 'autoperiod', 'history', 'filter', 'role', 'tab']),
+		content: cleanParams(['id', 'begin', 'end', 'min', 'max', 'sort', 'autoperiod', 'history', 'filter', 'pid', 'dsName']),
 		url: "jsongraph",
 		handleAs: "json",
 		load: doGraphList
@@ -122,7 +122,6 @@ function parseBool(stringbool){
 	var argtype = typeof stringbool;
 	if(argtype == 'boolean')
 		return stringbool;
-	console.log(typeof stringbool);
 	if(stringbool == null)
 		return false;
     switch(dojo.trim(stringbool.toLowerCase())){
@@ -159,8 +158,8 @@ function fileForms() {
 
 	var autoperiod = dijit.byId('autoperiod'); 
 	autoperiod.attr('value', queryParams.autoperiod);
-	autoperiod.dropDown.oldItemClick=autoperiod.dropDown.onItemClick;
-	autoperiod.dropDown.onItemClick = setAutoperiod;
+	//autoperiod.dropDown.oldItemClick = autoperiod.dropDown.onItemClick;
+	//autoperiod.dropDown.onItemClick = setAutoperiod;
 
 	setAutoscale(queryParams.max == null || queryParams.min == null);
 		
@@ -170,6 +169,8 @@ function fileForms() {
 function setupDisplay() {
 	var tabWidget = dijit.byId('tabs');
 	var i = 0;
+	//Selecting default tab will destroy queryParams, that's no good
+	//var oldQueryParams = dojo.clone(queryParams);
 	dojo.forEach(queryParams.tabslist, function(key) {
 		var pane = new dijit.layout.ContentPane({
 	        title: key.label,
@@ -177,9 +178,12 @@ function setupDisplay() {
 	    });
 		tabWidget.addChild(pane, i++);		
 	    if(key.selected && ! queryParams.tab) {
+	    	pane.keepParams = true;
 			tabWidget.selectChild(pane);
 	    }	    	
 	});
+
+	//queryParams = oldQueryParams;
 
 	if(queryParams.tab) {
 		tabWidget.selectChild(queryParams.tab);
@@ -489,13 +493,14 @@ function updateScale(value) {
 	queryParams[this.id] = value;
 }
 
-function setAutoperiod(item, evt) {
-	queryParams.autoperiod = item.option.value;
-	submitRenderForm();
-	dojo.forEach(['begin', 'beginh', 'end', 'endh'], function(id, i) {
-		dijit.byId(id).attr('value', '');
-	});
-	return this.oldItemClick(item, evt);
+function setAutoperiod(newValue) {
+	queryParams.autoperiod = newValue;
+	if(newValue != 0) {
+		submitRenderForm();
+		dojo.forEach(['begin', 'beginh', 'end', 'endh'], function(id, i) {
+			dijit.byId(id).attr('value', '');
+		});
+	}
 }
 
 function submitRenderForm(evt) {
@@ -524,26 +529,25 @@ function transitTab(newPage, oldPage){
 	if(newId == 'adminTab') {
 		return;
 	}
+
+	newPage.attr('content', dojo.clone(mainPane));
+
 	var treeType = 'tree';
-	delete queryParams.host;
-	//queryParams.filter = newPage.attr('title');
-	delete queryParams.filter;
-	delete queryParams.id;
-	queryParams.tab = newPage.attr('id');
-	
+
+	if(newPage.keepParams) {
+		delete newPage.keepParams;
+	}
+	else {
+		delete queryParams.host;
+		delete queryParams.filter;
+		delete queryParams.id;
+		queryParams.tab = newPage.attr('id');
+	}
 	//To manage special tabs
-	if(newId == 'mainTab') {
-		treeType = 'tree';
-		queryParams.filter = '';
-	}
-	else if(newId == 'tagstab') {
-		treeType = 'subfilter';
-	}
-	else if(newId == 'sumstab') {
+	if(newId == 'sumstab') {
 		treeType = 'graph';
 	}
 
-	newPage.attr('content', dojo.clone(mainPane));
 	setupCalendar();
 	fileForms();
 	getTree(treeType);

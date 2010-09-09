@@ -81,7 +81,7 @@ dojo.addOnLoad(function(){
 					<form dojoType="dijit.form.Form" id="dateForm" name="dateForm" action="" method="" onSubmit="submitRenderForm" style='width: 560px'>
 						<div  dojoType="dijit.layout.ContentPane" class="formblock" >
 							<span class="linelabel">Time scale</span>
-       						<select id="autoperiod" name="autoperiod" dojoType="dijit.form.Select" style="width: 90px">
+       						<select id="autoperiod" name="autoperiod" onChange="setAutoperiod" dojoType="dijit.form.Select" style="width: 90px">
 								<option value="0" id="period.0">Manual</option>
 								<option value="1" id="period.1">Last Hour</option>
 								<option value="2" id="period.2">Last 2 Hours</option>
