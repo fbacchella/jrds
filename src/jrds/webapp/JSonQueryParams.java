@@ -74,6 +74,7 @@ public class JSonQueryParams extends JrdsServlet {
 				Tab tab = root.getTab(id);
 				w.key("id").value(id);
 				w.key("label").value(tab.getName());
+				w.key("isFilters").value(tab.isFilters());
 				if(ParamsBean.DEFAULTTAB.equals(id))
 					w.key("selected").value("true");
 				w.endObject();

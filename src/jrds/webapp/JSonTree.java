@@ -101,7 +101,7 @@ public class JSonTree extends JSonData {
 			String filterName = filter.getName();
 			Map<String, String> href = new HashMap<String, String>();
 			href.put("filter", filterName);
-			doNode(w,filterName, filter.hashCode(), "tree", null, href);
+			doNode(w,filterName, filter.hashCode(), "filter", null, href);
 		}
 		return true;
 	}

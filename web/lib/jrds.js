@@ -1,3 +1,19 @@
+	dojo.declare("jrdsTree", dijit.Tree, {
+		onLoad: function() {
+			if(queryParams.path != null) {
+				//This operation destroy the array used as an argument
+				//so clone it !
+				this.attr('path', dojo.clone(queryParams.path));
+			}
+		},
+		getIconClass: function(item, opened){
+			if(item.type == 'filter')
+				return "filterFolder";
+			return this.inherited(arguments);
+		}
+	});	
+	
+
 function initQuery() {
 	var iq = dojo.xhrGet( {
 		content:  dojo.queryToObject(window.location.search.slice(1)),
@@ -82,7 +98,7 @@ function doGraphList(result) {
 		dojo.attr(application_view_list, "onclick","details('" + graph.detailsarg + "', '" + graph.probename + "');");
 		var time = dojo.create("img");
 		dojo.attr(time, "class","icon");
-		dojo.attr(time, "src","img/time.png");
+		dojo.attr(time, "src","img/date.png");
 		dojo.attr(time, "heigth","16");
 		dojo.attr(time, "width","16");
 		dojo.attr(time, "title","Graph history");
@@ -174,7 +190,8 @@ function setupDisplay() {
 	dojo.forEach(queryParams.tabslist, function(key) {
 		var pane = new dijit.layout.ContentPane({
 	        title: key.label,
-	        id: key.id
+	        id: key.id,
+	        isFilters: key.isFilters
 	    });
 		tabWidget.addChild(pane, i++);		
 	    if(key.selected && ! queryParams.tab) {
@@ -194,7 +211,17 @@ function setupDisplay() {
 	}
 }
 
-function getTree(treeType) {	
+function getTree(isFilters, unfold) {	
+	var foldbutton = dojo.byId('foldButton');
+	var treeType;
+	if(isFilters) {
+		dojo.style(foldbutton, 'display', 'none');
+		treeType = 'filter';
+	}
+	else {
+		dojo.style(foldbutton, 'display', 'block');
+		treeType = 'tree';
+	}
 	//treeType can be :
 	// filter, subfilter for a custom tree
 	// graph, node, tree filter
@@ -218,19 +245,27 @@ function getTree(treeType) {
 	});
 	
 	treeOneDiv = dojo.create("div", {id: 'treeOne'}, dojo.byId('treePane'), "last");
-
-	treeOne = new dijit.Tree({
+	
+	treeOne = new jrdsTree({
 		model: treeModel,
 		showRoot: false,
 		onClick: loadTree,
-		onLoad: function() {
-			if(queryParams.path != null) {
-				//This operation destroy the array used as an argument
-				//so clone it !
-				this.attr('path', dojo.clone(queryParams.path));
-			}
-		}
-	}, treeOneDiv);	
+		persist: false,
+		autoExpand: true == unfold,
+		isFilters: isFilters
+	}, treeOneDiv);
+
+}
+
+function doUnfold() {
+	var foldbutton = dojo.byId('foldButton');
+	dojo.toggleClass(foldbutton, "dijitFolderClosed");
+	dojo.toggleClass(foldbutton, "dijitFolderOpened");
+	var tree = dijit.byId('treeOne');
+	var unfold = tree.attr('autoExpand');
+	var model = tree.attr('model');
+	var type = model.query.type;
+	getTree(tree.isFilters, true != unfold);
 }
 
 function loadTree(item,  node){
@@ -239,19 +274,19 @@ function loadTree(item,  node){
 		queryParams.filter = item.filter[0];
 		delete queryParams.host;
 		delete queryParams.tree;
-		getTree('tree');
+		getTree(false);
 	}
 	else if(item.host) {
 		queryParams.host = item.host[0];
 		delete queryParams.filter;
 		delete queryParams.tree;
-		getTree('tree');
+		getTree(false);
 	}
 	else if(item.tree) {
 		queryParams.tree = item.host[0];
 		delete queryParams.host;
 		delete queryParams.filter;
-		getTree('tree');
+		getTree(false);
 	}
 	else {
 		queryParams.id = item.id[0].replace(/.*\./, "");
@@ -547,7 +582,7 @@ function transitTab(newPage, oldPage){
 
 	setupCalendar();
 	fileForms();
-	getTree(treeType);
+	getTree(newPage.isFilters);
 }
 
 function sendReload(evt) {
@@ -570,7 +605,7 @@ function searchHost(evt) {
 		delete queryParams.filter;
 		delete queryParams.id;
 		delete queryParams.tab;
-		getTree('tree');
+		getTree(false);
 	}
 	catch(err) {
 		console.error(err);
@@ -589,6 +624,6 @@ function goHome(evt) {
 		delete queryParams.id;
 		queryParams.tab = queryParams.landtab;
 		fileForms();
-		getTree('tree');
+		getTree(tabSelected.isFilters);
 	}		
 }

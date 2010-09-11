@@ -69,11 +69,12 @@ dojo.addOnLoad(function(){
 		<div id="mainPane" dojoType="dijit.layout.BorderContainer" design="sidebar" gutters="false" >
 			<div id="treePane" dojoType="dijit.layout.ContentPane" region="leading" >
 				<form dojoType="dijit.form.Form" id="hostForm" action="" method="" onSubmit="searchHost">
-					<a id="toroot" href="javascript:goHome()"><img src="img/back_to_album.gif" alt="" height="16" width="20" border="0" /></a>
+					<a id="toroot" href="javascript:goHome()"><img src="img/back_to_album.png" alt="" height="14" width="16" border="0" /></a>
       				<label for="host">Only host</label>
       				<input id="host" type="text" name="host" size="24" dojoType="dijit.form.TextBox" trim="true" required="true" />
         			<button type="submit" dojoType="dijit.form.Button">Search</button>
 				</form>
+				<img id=foldButton class="dijitTreeIcon dijitFolderClosed" alt="" src="dojo/resources/blank.gif" onClick="doUnfold();">
 <!--			    <div id="treeOne" > </div>-->
 			</div> <!-- treePane -->
 			<div id="centerPane" dojoType="dijit.layout.ContentPane" region="center">

@@ -71,3 +71,7 @@ body, input, option, select, tab, div, td, a, textarea {
 .graphblock {
 	text-align:center;
 }
+.filterFolder {
+	background: url('../img/folder_go.png') no-repeat top left;
+}
+

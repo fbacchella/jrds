@@ -63,6 +63,7 @@ public abstract class JSonData extends JrdsServlet {
 		w.key("name").value(name);
 		w.key("type").value(type);
 		w.key("id").value(id);
+		w.key("bidule").value("machin");
 
 		if(attributes != null && attributes.size() > 0) {
 			for(Map.Entry<String, String> e: attributes.entrySet()) {
