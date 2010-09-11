@@ -76,5 +76,9 @@ public class Tab {
 	public String getName() {
 		return name;
 	}
+	
+	public boolean isFilters() {
+		return ! filters.isEmpty();
+	}
 
 }
