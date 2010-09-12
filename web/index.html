@@ -6,7 +6,6 @@
 <link href="lib/jrds.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript" src="dojo/dojo.js" djConfig="parseOnLoad:false, isDebug: false, locale:'en-us'"></script>
 <script type="text/javascript" src="dojo/dojo-jrds.js"></script>
-<script type="text/javascript" src="lib/jrds.js"></script> 
 <script type="text/javascript">
     dojo.require("dijit.layout.TabContainer");
     dojo.require("dijit.layout.ContentPane");
@@ -29,41 +28,14 @@
     dojo.require("dojo.parser");
 	dojo.require("dijit.Dialog");
 </script>
-<script type="text/javascript">
-
-var queryParams = {};
-
-//Used to get a clean copy of the pane that will be in each tab
-var mainPane;
-
-initQuery();
-
-dojo.cookie("treeOneSaveStateCookie", null, {expires: -1});
-
-dojo.addOnLoad(function(){
-	//The copy is saved
-	var tempMainPane = dojo.byId('mainPane');
-	mainPane = dojo.clone(tempMainPane);
-	dojo.destroy(tempMainPane);
-	//The parse can be done
-	dojo.parser.parse();
-	
-	var tabs = dijit.byId("tabs");
-	dojo.connect(tabs,"_transition", transitTab);
-	setupCalendar();
-	setupDisplay();
-});
-
-</script>
+<script type="text/javascript" src="lib/jrds.js"></script> 
 </head>
 <body class="nihilo">
-	<div id='tabs' dojoType="dijit.layout.TabContainer" style="width: 100%; height: 100%;">
+	<div id='tabs' dojoType="dijit.layout.TabContainer" style="width: 100%; height: 100%;" region="center">
   		<div dojoType="dijit.layout.ContentPane" title="Administration" id="adminTab" selected="false">
 			<button dojoType="dijit.form.Button" type="button" onClick="sendReload"> Reload </button>
 		</div> <!-- adminTab -->
-	
 	</div>
-
   <!--  The content of tab panes, it can be any where, it will be destroyed -->
    <div dojoType="dijit.layout.ContentPane" id='mainTab' title="Main tree" selected="true"">
 		<div id="mainPane" dojoType="dijit.layout.BorderContainer" design="sidebar" gutters="false" >
@@ -74,15 +46,14 @@ dojo.addOnLoad(function(){
       				<input id="host" type="text" name="host" size="24" dojoType="dijit.form.TextBox" trim="true" required="true" />
         			<button type="submit" dojoType="dijit.form.Button">Search</button>
 				</form>
-				<img id=foldButton class="dijitTreeIcon dijitFolderClosed" alt="" src="dojo/resources/blank.gif" onClick="doUnfold();">
-<!--			    <div id="treeOne" > </div>-->
+				<img id=foldButton class="dijitTreeIcon dijitFolderClosed" alt="" src="dojo/resources/blank.gif" onClick="doUnfold();" />
 			</div> <!-- treePane -->
 			<div id="centerPane" dojoType="dijit.layout.ContentPane" region="center">
 				<div dojoType="dijit.layout.ContentPane" id="paramsPane" >
-					<form dojoType="dijit.form.Form" id="dateForm" name="dateForm" action="" method="" onSubmit="submitRenderForm" style='width: 560px'>
+					<form dojoType="dijit.form.Form" id="dateForm" name="dateForm" action="" method="" onSubmit="submitRenderForm">
 						<div  dojoType="dijit.layout.ContentPane" class="formblock" >
 							<span class="linelabel">Time scale</span>
-       						<select id="autoperiod" name="autoperiod" onChange="setAutoperiod" dojoType="dijit.form.Select" style="width: 90px">
+       						<select id="autoperiod" name="autoperiod" onChange="setAutoperiod" dojoType="dijit.form.Select">
 								<option value="0" id="period.0">Manual</option>
 								<option value="1" id="period.1">Last Hour</option>
 								<option value="2" id="period.2">Last 2 Hours</option>
@@ -102,10 +73,10 @@ dojo.addOnLoad(function(){
 								<option value="16" id="period.16">Last Year</option>
 								<option value="17" id="period.17">Last 2 Years</option>
        						</select>
-          					<label for="begin">Begin</label>
+          					<label class="paramslabel" for="begin">Begin</label>
           					<input type="text" name="begin" id="begin" />
           					<input type="text" name="beginh" id="beginh" />
-          					<label for="end">End</label>
+          					<label class="paramslabel" for="end">End</label>
           					<input type="text" name="end" id="end" />
           					<input type="text" name="endh" id="endh" />
         				</div>
@@ -114,7 +85,7 @@ dojo.addOnLoad(function(){
           					<button id="autoscale" dojoType="dijit.form.ToggleButton"  checked name="autoscale"
   				  					onChange="resetScale();" 
   				  					iconClass="dijitCheckBoxIcon"> Auto </button>
-          					<label for="min">Min</label>
+          					<label class="paramslabel" for="min">Min</label>
           					<input id="min" type="text" name="min" class="field"
     			 				   dojoType="dijit.form.ValidationTextBox"
     			 				   regExp="(-?\d+(.\d+)?)([a-zA-Z]{0,2})"
@@ -122,7 +93,7 @@ dojo.addOnLoad(function(){
     			 			       onFocus="setAutoscale(false);"
     			 				   onchange="updateScale"
     			 				   size="14" />
-          					<label for="max">Max</label>
+          					<label class="paramslabel" for="max">Max</label>
           					<input  id="max" type="text" name="max" class="field"
     			 					dojoType="dijit.form.ValidationTextBox"
     			 					regExp="(-?\d+(.\d+)?)([a-zA-Z]{0,2})"

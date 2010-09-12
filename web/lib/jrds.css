@@ -10,7 +10,10 @@ body, input, option, select, tab, div, td, a, textarea {
 	padding:0;
 }
 .linelabel {
-	width: 60px;
+	display:inline-block;
+	padding:0.4em;
+	margin:1px;
+	vertical-align: middle;
 }
 #mainDiv {
 	height: 100%;
@@ -47,17 +50,27 @@ body, input, option, select, tab, div, td, a, textarea {
 	border:1px solid #AAAAAA;
 	margin:5px;
 	width:550px;
+	height:28px;
 }
+
+.paramslabel {
+	padding: 0.4em;
+}
+
 .field {
 	margin: 5px;
 }
 
 .fieldHour {
-	width:50px
+	width: 50px
 }
 
 .fieldDay {
-	width:100px
+	width: 70px
+}
+
+#autoperiod {
+	width: 100px;
 }
 
 .iconslist {

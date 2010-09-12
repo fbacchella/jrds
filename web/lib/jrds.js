@@ -1,18 +1,124 @@
-	dojo.declare("jrdsTree", dijit.Tree, {
-		onLoad: function() {
-			if(queryParams.path != null) {
-				//This operation destroy the array used as an argument
-				//so clone it !
-				this.attr('path', dojo.clone(queryParams.path));
-			}
-		},
-		getIconClass: function(item, opened){
-			if(item.type == 'filter')
-				return "filterFolder";
-			return this.inherited(arguments);
-		}
-	});	
+
+var queryParams = {};
+
+//Used to get a clean copy of the pane that will be in each tab
+var mainPane;
+
+initQuery();
+
+dojo.cookie("treeOneSaveStateCookie", null, {expires: -1});
+
+dojo.addOnLoad(function(){
+	//The copy is saved
+	var tempMainPane = dojo.byId('mainPane');
+	mainPane = dojo.clone(tempMainPane);
+	dojo.destroy(tempMainPane);
+	//The parse can be done
+	dojo.parser.parse();
 	
+	var tabs = dijit.byId("tabs");
+	dojo.connect(tabs,"_transition", transitTab);
+	setupCalendar();
+	setupDisplay();
+});
+
+dojo.declare("jrdsTree", dijit.Tree, {
+	onLoad: function() {
+		if(queryParams.path != null) {
+			//This operation destroy the array used as an argument
+			//so clone it !
+			this.attr('path', dojo.clone(queryParams.path));
+		}
+	},
+	getIconClass: function(item, opened){
+		if(item.type == 'filter')
+			return "filterFolder";
+		return this.inherited(arguments);
+	}
+});	
+
+var hourFormat = {
+		timePattern: 'HH:mm',
+		selector: 'time'
+};
+
+var hourconstraints = {
+		timePattern:'HH:mm',
+		clickableIncrement:'T00:30:00',
+		visibleIncrement:'T00:30:00',
+		visibleRange:'T05:00:00'
+};
+
+dojo.declare("HourBox",dijit.form.TimeTextBox , {
+	'class': 'field fieldHour', 
+	onChange: function(date) {
+		if(date) {
+			dijit.byId('autoperiod').attr('value', 0); 
+			var queryDate = queryParams[this.queryId];
+			if(queryDate) {
+				var elems = queryDate.split(' ');
+				queryParams[this.queryId] = elems[0] + ' ' + dojo.date.locale.format(date, this.hourFormat);
+			}
+			else {
+				queryParams[this.queryId] = '1970-01-01 ' + dojo.date.locale.format(date, this.hourFormat);
+			}
+		}
+		return this.inherited(arguments);
+	}
+});
+
+function dayRegExp() {
+	return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
+};
+
+dojo.declare("DayHourTextBox", dijit.form.DateTextBox, {
+	dayFormat: {
+		selector: 'date', 
+		datePattern: 'yyyy-MM-dd'
+	},
+	hourFormat: hourFormat,        
+	dateStr: '',
+	format: function(date) {
+		if(date)
+			return dojo.date.locale.format(date, this.dayFormat);
+		else
+			return '';
+	},
+	parse: function(date) {
+		if(date)
+			return dojo.date.locale.parse(date, this.dayFormat);
+		else
+			return '';
+	},
+	serialize: function(date) {
+		if(date)
+			return dojo.date.locale.format(date, this.dayFormat);
+		else
+			return '';
+	},
+	onChange: function(date) {
+		if(date) {
+			queryParams.autoperiod = 0;
+
+			//Let's try to keep the existing hour
+			var hour = this.resetHour;
+			if(queryParams[this.id]) {
+				var dateArray = queryParams[this.id].split(' ');
+				if(dateArray.length == 2) {
+					hour = dateArray[1];
+				}
+			}
+			//If hour in form not defined, set it.
+			if(! this.timeBox.attr('value') ) {
+				this.timeBox.attr('value', dojo.date.locale.parse(hour, this.hourFormat));
+			}
+			var sdate = dojo.date.locale.format(date, this.dayFormat);
+			queryParams[this.id] = sdate + ' ' + hour;
+			dijit.byId('autoperiod').attr('value', 0); 
+		}
+		return this.inherited(arguments);
+	}
+});
 
 function initQuery() {
 	var iq = dojo.xhrGet( {
@@ -320,101 +426,24 @@ function sort()
 }
 
 function setupCalendar() {
-	var hourFormat = {
-		timePattern: 'HH:mm',
-		selector: 'time'
-	};
-	
-	dojo.declare("HourBox",dijit.form.TimeTextBox , {
-		'class': 'field fieldHour', 
-		hourFormat: hourFormat,        
-		onChange: function(date) {
-			if(date) {
-				dijit.byId('autoperiod').attr('value', 0); 
-				var queryDate = queryParams[this.queryId];
-				if(queryDate) {
-					var elems = queryDate.split(' ');
-					queryParams[this.queryId] = elems[0] + ' ' + dojo.date.locale.format(date, this.hourFormat);
-				}
-				else {
-					queryParams[this.queryId] = '1970-01-01 ' + dojo.date.locale.format(date, this.hourFormat);
-				}
-			}
-			return this.inherited(arguments);
-		}
-	});
-
 	beginTimeTextBox = new HourBox( {
-		constraints:{timePattern:'HH:mm', clickableIncrement:'T00:30:00', visibleIncrement:'T00:30:00', visibleRange:'T05:00:00'},
+		hourFormat: hourFormat,  
+		constraints: hourconstraints,
 		name: 'beginh',
 		value: '',
 		queryId: 'begin'
 	}, 'beginh');
 	endTimeTextBox = new HourBox( {
-		constraints:{timePattern:'HH:mm', clickableIncrement:'T00:30:00', visibleIncrement:'T00:30:00', visibleRange:'T05:00:00'},
+		hourFormat: hourFormat,  
+		constraints: hourconstraints,
 		name: 'endh',
 		value: '',
 		queryId: 'end'
 	}, 'endh');
 
-	dojo.declare("DayHourTextBox", dijit.form.DateTextBox, {
-		'class': 'field fieldDay', 
-		dayFormat: {
-			selector: 'date', 
-			datePattern: 'yyyy-MM-dd'
-		},
-		hourFormat: hourFormat,        
-		dateStr: '',
-		regExpGen: function() {
-			return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
-		},
-		format: function(date) {
-			if(date)
-				return dojo.date.locale.format(date, this.dayFormat);
-			else
-				return '';
-		},
-		parse: function(date) {
-			if(date)
-				return dojo.date.locale.parse(date, this.dayFormat);
-			else
-				return '';
-		},
-		serialize: function(date) {
-			if(date)
-				return dojo.date.locale.format(date, this.dayFormat);
-			else
-				return '';
-		},
-		onChange: function(date) {
-			if(date) {
-				queryParams.autoperiod = 0;
-
-				//Let's try to keep the existing hour
-				var hour = this.resetHour;
-				if(queryParams[this.id]) {
-					var dateArray = queryParams[this.id].split(' ');
-					if(dateArray.length == 2) {
-						hour = dateArray[1];
-					}
-				}
-				//If hour in form not defined, set it.
-				if(! this.timeBox.attr('value') ) {
-					this.timeBox.attr('value', dojo.date.locale.parse(hour, this.hourFormat));
-				}
-				var sdate = dojo.date.locale.format(date, this.dayFormat);
-				queryParams[this.id] = sdate + ' ' + hour;
-				dijit.byId('autoperiod').attr('value', 0); 
-			}
-			return this.inherited(arguments);
-		}
-	});
-	
-	dayRegExp = function() {
-		return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
-	}
 	new DayHourTextBox({
-		//A bug in dojo 4.2 ?
+		'class': 'field fieldDay', 
+		//A bug in dojo 1.4+ ?
 		regExpGen: dayRegExp,
 		name: "begin",
 		resetHour: '00:00',
@@ -422,7 +451,8 @@ function setupCalendar() {
 		}, "begin");
 	
 	new DayHourTextBox({
-		//A bug in dojo 1.4.2 ?
+		'class': 'field fieldDay', 
+		//A bug in dojo 1.4+ ?
 		regExpGen: dayRegExp,
 		name: "end",
 		resetHour: '23:59',
