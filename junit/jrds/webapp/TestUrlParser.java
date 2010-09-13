@@ -18,7 +18,6 @@ import jrds.HostsList;
 import jrds.Period;
 import jrds.Probe;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
 import jrds.Tools;
 import jrds.mockobjects.GetMoke;
 import jrds.mockobjects.MockGraph;
@@ -48,7 +47,7 @@ public class TestUrlParser {
 		Map<String, String[]> parameters = new HashMap<String, String[]>();
 		parameters.put("id", new String[] { "1" });
 		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
-		Assert.assertEquals(1, pb.getId());
+		Assert.assertEquals(new Integer(1), pb.getId());
 	}
 
 	@Test
@@ -63,7 +62,7 @@ public class TestUrlParser {
 		p.addGraph(gn);
 		hl.addProbe(p);
 		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
-		Assert.assertEquals("Graph not found by path", gn.hashCode(), pb.getId());
+		Assert.assertEquals("Graph not found by path", new Integer(gn.hashCode()), pb.getId());
 	}
 
 
