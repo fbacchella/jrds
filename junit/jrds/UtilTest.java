@@ -158,6 +158,12 @@ public class UtilTest {
 		Assert.assertEquals(1.0,n , 0.001);
 	}
 
+	@Test
+	public void testParseStringNumber7() {
+		Integer n = Util.parseStringNumber(null, Integer.class, null);
+		Assert.assertNull("null string parse to not null", n);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void evaluateVariable1() {

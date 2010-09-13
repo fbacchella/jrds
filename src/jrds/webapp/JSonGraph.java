@@ -68,7 +68,12 @@ public class JSonGraph extends JSonData {
 	}
 
 	private List<GraphNode> getGraphs(HostsList root, ParamsBean params) {
-		int id = params.getId();
+		Integer id = params.getId();
+		Integer pid = params.getPid();
+		//Neither id or pid where specified, nothing can be done
+		if(id == null && pid == null)
+			return Collections.emptyList();
+		
 		String dsName = params.getDsName();
 
 		GraphTree node = root.getNodeById(id);
@@ -77,7 +82,7 @@ public class JSonGraph extends JSonData {
 			Filter filter = params.getFilter();
 			return node.enumerateChildsGraph(filter);
 		}
-		else if(params.getPid() != 0 && dsName != null) {
+		else if(pid != null && pid != 0 && dsName != null) {
 			if(! allowed(params, root.getDefaultRoles()))
 				return Collections.emptyList();
 			Probe<?, ?> p = params.getProbe();

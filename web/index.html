@@ -29,6 +29,13 @@
 	dojo.require("dijit.Dialog");
 </script>
 <script type="text/javascript" src="lib/jrds.js"></script> 
+<script type="text/javascript">
+//Used to get a clean copy of the pane that will be in each tab
+var mainPane;
+
+initIndex();
+</script>
+
 </head>
 <body class="nihilo">
 	<div id='tabs' dojoType="dijit.layout.TabContainer" style="width: 100%; height: 100%;" region="center">
@@ -75,12 +82,12 @@
        						</select>
           					<label class="paramslabel" for="begin">Begin</label>
           					<input type="text" name="begin" id="begin" />
-          					<input type="text" name="beginh" id="beginh" />
+          					<input type="text" name="beginh" id="beginh"/>
           					<label class="paramslabel" for="end">End</label>
           					<input type="text" name="end" id="end" />
-          					<input type="text" name="endh" id="endh" />
+          					<input type="text" name="endh" id="endh"/>
         				</div>
-        				<div  dojoType="dijit.layout.ContentPane" class="formblock" >
+        				<div dojoType="dijit.layout.ContentPane" class="formblock" >
         					<span class="linelabel">Vertical scale</span>
           					<button id="autoscale" dojoType="dijit.form.ToggleButton"  checked name="autoscale"
   				  					onChange="resetScale();" 
@@ -102,7 +109,7 @@
     			 					onchange="updateScale"
     			 					size="14" />
         				</div>
-				        <div  dojoType="dijit.layout.ContentPane" class="formblock" > <span class="linelabel">Sort</span>
+				        <div dojoType="dijit.layout.ContentPane" class="formblock" > <span class="linelabel">Sort</span>
         					<button id="sorted" dojoType="dijit.form.ToggleButton"  name="sorted"
   									onChange="toogleSort();" 
   									iconClass="dijitCheckBoxIcon"> Sorted graphs </button>

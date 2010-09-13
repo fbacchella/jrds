@@ -1,27 +1,6 @@
 
 var queryParams = {};
 
-//Used to get a clean copy of the pane that will be in each tab
-var mainPane;
-
-initQuery();
-
-dojo.cookie("treeOneSaveStateCookie", null, {expires: -1});
-
-dojo.addOnLoad(function(){
-	//The copy is saved
-	var tempMainPane = dojo.byId('mainPane');
-	mainPane = dojo.clone(tempMainPane);
-	dojo.destroy(tempMainPane);
-	//The parse can be done
-	dojo.parser.parse();
-	
-	var tabs = dijit.byId("tabs");
-	dojo.connect(tabs,"_transition", transitTab);
-	setupCalendar();
-	setupDisplay();
-});
-
 dojo.declare("jrdsTree", dijit.Tree, {
 	onLoad: function() {
 		if(queryParams.path != null) {
@@ -50,7 +29,6 @@ var hourconstraints = {
 };
 
 dojo.declare("HourBox",dijit.form.TimeTextBox , {
-	'class': 'field fieldHour', 
 	onChange: function(date) {
 		if(date) {
 			dijit.byId('autoperiod').attr('value', 0); 
@@ -119,6 +97,44 @@ dojo.declare("DayHourTextBox", dijit.form.DateTextBox, {
 		return this.inherited(arguments);
 	}
 });
+
+function initIndex() {
+	initQuery();
+
+	dojo.cookie("treeOneSaveStateCookie", null, {expires: -1});
+
+	dojo.addOnLoad(function(){
+		//The copy is saved
+		var tempMainPane = dojo.byId('mainPane');
+		mainPane = dojo.clone(tempMainPane);
+		dojo.destroy(tempMainPane);
+		//The parse can be done
+		dojo.parser.parse();
+		
+		var tabs = dijit.byId("tabs");
+		dojo.connect(tabs,"_transition", transitTab);
+		setupCalendar();
+		setupDisplay();
+	});	
+}
+
+function initPopup() {
+	initQuery();
+
+	dojo.addOnLoad(function(){
+		getGraphList();
+		});
+}
+
+function initHistory() {
+
+	initQuery();
+
+	dojo.addOnLoad(function(){
+		queryParams.history = 1;
+		getGraphList();
+		});
+}
 
 function initQuery() {
 	var iq = dojo.xhrGet( {
@@ -427,6 +443,7 @@ function sort()
 
 function setupCalendar() {
 	beginTimeTextBox = new HourBox( {
+		'class': 'field fieldHour', 
 		hourFormat: hourFormat,  
 		constraints: hourconstraints,
 		name: 'beginh',
@@ -434,6 +451,7 @@ function setupCalendar() {
 		queryId: 'begin'
 	}, 'beginh');
 	endTimeTextBox = new HourBox( {
+		'class': 'field fieldHour', 
 		hourFormat: hourFormat,  
 		constraints: hourconstraints,
 		name: 'endh',

@@ -60,9 +60,9 @@ public class ParamsBean implements Serializable {
 	String contextPath = "";
 	String dsName = null;
 	Period period = new Period();
-	int id = 0;
-	int gid = 0;
-	int pid = 0;
+	Integer id = null;
+	Integer gid = null;
+	Integer pid = null;
 	boolean sorted = false;
 	boolean history = false;
 	String maxArg = null;
@@ -190,19 +190,19 @@ public class ParamsBean implements Serializable {
 		String host = getValue("host");
 		String probe = getValue("probe");
 
-		gid = jrds.Util.parseStringNumber(getValue("gid"), Integer.class, 0);
+		gid = jrds.Util.parseStringNumber(getValue("gid"), Integer.class, null);
 		//Many way to discover id (graph node id)
 		String idStr = getValue("id");
 		String graph =  getValue("graphname");
 		if(idStr != null && ! "".equals(idStr))
-			id = Util.parseStringNumber(idStr, Integer.class, 0);
+			id = Util.parseStringNumber(idStr, Integer.class, null);
 		else if(host != null && ! "".equals(host) && graph != null && ! "".equals(graph)) {
 			id = (host + "/" + graph).hashCode();
 		}
 
 		String pidStr = getValue("pid");
 		if(pidStr != null)
-			pid = jrds.Util.parseStringNumber(pidStr, Integer.class, 0);
+			pid = jrds.Util.parseStringNumber(pidStr, Integer.class, null);
 		else if(host != null && ! "".equals(host) && probe != null && ! "".equals(probe) )
 			pid = (host + "/" + probe).hashCode();
 
@@ -430,7 +430,7 @@ public class ParamsBean implements Serializable {
 	/**
 	 * @return the id
 	 */
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 	/**
@@ -558,7 +558,7 @@ public class ParamsBean implements Serializable {
 		return history;
 	}
 
-	public int getPid() {
+	public Integer getPid() {
 		return pid;
 	}
 
