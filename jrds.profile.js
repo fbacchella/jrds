@@ -18,7 +18,8 @@ dependencies ={
             "dijit.form.ValidationTextBox",
             "dijit.form.NumberTextBox",
             "dijit.Tree",
-            "dijit.form.TimeTextBox"
+            "dijit.form.TimeTextBox",
+            "dojox.widget.Standby"
         ]
         }
     ],

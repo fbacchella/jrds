@@ -1,3 +1,24 @@
+dojo.require("dijit.layout.TabContainer");
+dojo.require("dijit.layout.ContentPane");
+dojo.require("dijit.form.Button");
+dojo.require("dijit.layout.BorderContainer");
+dojo.require("dijit.layout.ContentPane");
+dojo.require("dijit.form.DateTextBox");
+dojo.require("dijit.form.Button");
+dojo.require("dijit.form.TextBox");
+dojo.require("dijit.form.Form");
+dojo.require("dijit.form.Select");
+dojo.require("dojo.parser");
+dojo.require("dijit.form.Button");
+dojo.require("dijit.form.ValidationTextBox");
+dojo.require("dojo.data.ItemFileReadStore");
+dojo.require("dijit.form.NumberTextBox");
+dojo.require("dijit.Tree");
+dojo.require("dojo.number");
+dojo.require("dijit.form.TimeTextBox");
+dojo.require("dojo.parser");
+dojo.require("dijit.Dialog");
+dojo.require("dojox.widget.Standby");
 
 var queryParams = {};
 
@@ -110,11 +131,12 @@ function initIndex() {
 		dojo.destroy(tempMainPane);
 		//The parse can be done
 		dojo.parser.parse();
-		
+
 		var tabs = dijit.byId("tabs");
 		dojo.connect(tabs,"_transition", transitTab);
 		setupCalendar();
 		setupDisplay();
+
 	});	
 }
 
@@ -188,7 +210,7 @@ function doGraphList(result) {
 		graph = result.items[i];
 		var  graphBlock = dojo.create("div")
 		dojo.attr(graphBlock, "class","graphblock");
-		dojo.place(graphBlock,graphPane);
+		dojo.place(graphBlock, graphPane);
 
 		var graphImg = dojo.create("img");
 		dojo.attr(graphImg, "class","graph");
@@ -242,17 +264,24 @@ function doGraphList(result) {
 		dojo.place(graphImg, graphBlock);
 		dojo.place(iconsList, graphBlock);
 	}
+	if(this.standby != null)
+		this.standby.hide();
+
 	return result;
 }
 
-function getGraphList() {	
-	var graphPane = dojo.byId("graphPane");
-	dojo.empty(graphPane);
+function getGraphList() {
+	if(! queryParams.id &&  ! queryParams.pid)
+		return;
+	
+	var graphStandby = startStandBy('graphPane');
+
 	return dojo.xhrGet( {
 		content: cleanParams(['id', 'begin', 'end', 'min', 'max', 'sort', 'autoperiod', 'history', 'filter', 'pid', 'dsName']),
 		url: "jsongraph",
 		handleAs: "json",
-		load: doGraphList
+		load: doGraphList,
+		standby: graphStandby
 	});
 }
 
@@ -308,6 +337,7 @@ function fileForms() {
 function setupDisplay() {
 	var tabWidget = dijit.byId('tabs');
 	var i = 0;
+	var isFilters;
 
 	dojo.forEach(queryParams.tabslist, function(key) {
 		var pane = new dijit.layout.ContentPane({
@@ -319,11 +349,19 @@ function setupDisplay() {
 	    if(key.selected && ! queryParams.tab) {
 	    	pane.keepParams = true;
 			tabWidget.selectChild(pane);
+			isFilters = key.isFilters;
 	    }	    	
 	});
 
+	//Tab was specified, so go to it, no need to load tree
 	if(queryParams.tab) {
 		tabWidget.selectChild(queryParams.tab);
+	}
+	//We're in the default tab, load the needed try now
+	else {
+		if(queryParams.host || queryParams.tree || queryParams.filter)
+			isFilters = false;
+		getTree(isFilters);
 	}
 
 	fileForms();
@@ -333,7 +371,24 @@ function setupDisplay() {
 	}
 }
 
+function startStandBy(pane) {
+	var standbyName = 'standby.' + pane;
+	var standby = dijit.byId(standbyName);
+	if(standby != null) {
+		standby.destroyRecursive(false);
+	}
+	standby = new dojox.widget.Standby({
+		target: pane,
+		id: standbyName
+	});
+	document.body.appendChild(standby.domNode);
+	standby.show();
+	return standby;
+}
+
 function getTree(isFilters, unfold) {	
+	var treeStandby = startStandBy('treePane');
+	
 	var foldbutton = dojo.byId('foldButton');
 	var treeType;
 	if(isFilters) {
@@ -355,17 +410,27 @@ function getTree(isFilters, unfold) {
 	}
 
 	var store = new dojo.data.ItemFileReadStore({
-		url: "jsontree?" + dojo.objectToQuery(cleanParams(['host', 'filter', 'tree', 'tab']))
+		url: "jsontree?" + dojo.objectToQuery(cleanParams(['host', 'filter', 'tree', 'tab'])),
 	});
 
-	var treeModel = new dijit.tree.ForestStoreModel({
-		store: store,
-		query: {"type": treeType },
-		rootId: '0.0',
-		rootLabel: 'All filters',
-		childrenAttrs: ["children"]
+	store.fetch({
+		onError: function(errData, request) {
+			console.log("on error detected in dojo.data.ItemFileReadStore");
+			var standby = dijit.byId('standby.' );
+			if(standby != null) {
+				standby.hide();
+			}
+		}
 	});
 	
+	var treeModel = new dijit.tree.ForestStoreModel({
+		store: store,
+		query: {"type": treeType},
+		rootId: '0.0',
+		rootLabel: 'All filters',
+		childrenAttrs: ["children"],
+	});
+
 	treeOneDiv = dojo.create("div", {id: 'treeOne'}, dojo.byId('treePane'), "last");
 	
 	treeOne = new jrdsTree({
@@ -374,7 +439,13 @@ function getTree(isFilters, unfold) {
 		onClick: loadTree,
 		persist: false,
 		autoExpand: true == unfold,
-		isFilters: isFilters
+		isFilters: isFilters,
+		standby: treeStandby,
+		onLoad: function() {
+			if(this.standby != null) {
+				this.standby.hide();
+			}
+		}
 	}, treeOneDiv);
 
 }
@@ -431,15 +502,15 @@ function toogleSort() {
 	getGraphList();
 }
 
-function sort()
-{
-	if(! queryParams ) {
-		queryParams.sort = 1;
-	}
-	else
-		delete queryParams.sort;
-	getGraphList();
-}
+//function sort()
+//{
+//	if(! queryParams ) {
+//		queryParams.sort = 1;
+//	}
+//	else
+//		delete queryParams.sort;
+//	getGraphList();
+//}
 
 function setupCalendar() {
 	beginTimeTextBox = new HourBox( {
@@ -610,10 +681,14 @@ function transitTab(newPage, oldPage){
 
 	newPage.attr('content', dojo.clone(mainPane));
 
+	var treePane = dojo.byId('treePane');
+
 	var treeType = 'tree';
+	
+	var keepParams = newPage.keepParams;
 
 	//keepParams used during page setup, to keep queryParams fields
-	if(newPage.keepParams) {
+	if(keepParams) {
 		delete newPage.keepParams;
 	}
 	else {
@@ -630,7 +705,11 @@ function transitTab(newPage, oldPage){
 
 	setupCalendar();
 	fileForms();
-	getTree(newPage.isFilters);
+	
+	//We don't load tree during initial setup
+	//It's done later
+	if(! keepParams)
+		getTree(newPage.isFilters);
 }
 
 function sendReload(evt) {
