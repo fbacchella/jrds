@@ -18,13 +18,26 @@ initIndex();
 <body class="nihilo">
 	<div id='tabs' dojoType="dijit.layout.TabContainer" style="width: 100%; height: 100%;" region="center">
   		<div dojoType="dijit.layout.ContentPane" title="Administration" id="adminTab" selected="false">
-			<button dojoType="dijit.form.Button" type="button" onClick="sendReload"> Reload </button>
+				<div id="statusPane" dojoType="dijit.TitlePane" title="Status">
+					<div id="status" >
+						<div class="statusrow"><span class="statuslabel">Hosts</span><span class="statusvalue">1</span></div>
+						<div class="statusrow"><span class="statuslabel">Probes</span><span class="statusvalue">1</span></div>
+						<div class="statusrow"><span class="statuslabel">Last collect</span><span class="statusvalue">1</span></div>
+						<div class="statusrow"><span class="statuslabel">Last duration</span><span class="statusvalue">1</span></div>
+						<div class="statusrow"><span class="statuslabel">Generation duration</span><span class="statusvalue">1</span></div>
+					</div>
+<!-- dojoType="dijit.form.Button" type="button" onClick="refreshStatus"-->
+<!--					<button id="refreshButton"> Refresh </button>-->
+				</div>
+				<div dojoType="dijit.TitlePane" title="Command">
+					<button dojoType="dijit.form.Button" type="button" onClick="sendReload"> Reload </button>
+				</div>
 		</div> <!-- adminTab -->
 	</div>
   <!--  The content of tab panes, it can be any where, it will be destroyed -->
    <div dojoType="dijit.layout.ContentPane" id='mainTab' title="Main tree" selected="true"">
 		<div id="mainPane" dojoType="dijit.layout.BorderContainer" design="sidebar" gutters="false" >
-			<div id="treePane" dojoType="dijit.layout.ContentPane" region="leading" >
+			<div id="treePane" dojoType="dijit.layout.ContentPane" region="leading" splitter="true" >
 				<form dojoType="dijit.form.Form" id="hostForm" action="" method="" onSubmit="searchHost">
 					<a id="toroot" href="javascript:goHome()"><img src="img/back_to_album.png" alt="" height="14" width="16" border="0" /></a>
       				<label for="host">Only host</label>

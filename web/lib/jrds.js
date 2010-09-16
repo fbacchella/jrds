@@ -19,6 +19,7 @@ dojo.require("dijit.form.TimeTextBox");
 dojo.require("dojo.parser");
 dojo.require("dijit.Dialog");
 dojo.require("dojox.widget.Standby");
+dojo.require("dijit.TitlePane");
 
 var queryParams = {};
 
@@ -676,6 +677,7 @@ function transitTab(newPage, oldPage){
 	}
 	//Nothing special to do when showing adminTab
 	if(newId == 'adminTab') {
+		refreshStatus();
 		return;
 	}
 
@@ -715,10 +717,11 @@ function transitTab(newPage, oldPage){
 function sendReload(evt) {
 	var iq = dojo.xhrGet( {
 		sync: true,
-		url: "reload",
+		url: "reload?sync",
 		handleAs: "text",
 		preventCache: true,
 		load: function(response, ioArgs) {
+			refreshStatus();
 		},
 		error: function(response, ioArgs) {
 			console.error(response);
@@ -753,4 +756,85 @@ function goHome(evt) {
 		fileForms();
 		getTree(tabSelected.isFilters);
 	}		
+}
+
+function refreshStatus() {
+	dojo.xhrGet( {
+		url: "status?json",
+		handleAs: "json",
+		preventCache: true,
+		load: function(response, ioArgs) {
+			updateStatus(response);
+		},
+		error: function(response, ioArgs) {
+			console.error("can't refresh status " + response.message);
+			return response;
+		}
+	});
+}
+
+function updateStatus(statusInfo) {
+	var oldButton = dijit.byId('refreshButton');
+	if(oldButton != null)
+		oldButton.destroyRecursive(false);
+	
+//	var statusPane = dijit.byId('statusPane');
+//	var statusPaneDom = statusPane.attr('domNode');
+
+	var statusNode = dojo.byId('status');
+	statusNode.innerHTML = '';
+	
+	//var statusNode = dojo.create('div', {id: 'status'});
+	//dojo.create('button', {id: 'refreshButton'}, statusPane.attr('domNode'));
+	
+	var row1 = dojo.create("div", {'class': "statusrow"}, statusNode);
+	dojo.create('span', {'class': 'statuslabel', innerHTML: 'hosts'}, row1);
+	dojo.create('span', {'class': 'statusvalue', innerHTML: statusInfo.Hosts}, row1);
+
+	var row2 = dojo.create("div", {'class': "statusrow"}, statusNode);
+	dojo.create('span', {'class': 'statuslabel', innerHTML: 'Probes'}, row2);
+	dojo.create('span', {'class': 'statusvalue', innerHTML: statusInfo.Probes}, row2);
+
+	var lastCollect = statusInfo.LastCollect + "s ago";
+	var lastDuration = statusInfo.LastDuration + "s";
+	if(statusInfo.LastDuration == 0) {
+		lastCollect = 'not run';
+		lastDuration = 'not run'
+	}
+	var row3 = dojo.create("div", {'class': "statusrow"}, statusNode);
+	dojo.create('span', {'class': 'statuslabel', innerHTML: 'Last collect'}, row3);
+	dojo.create('span', {'class': 'statusvalue', innerHTML: lastCollect}, row3);
+
+	var row4 = dojo.create("div", {'class': "statusrow"}, statusNode);
+	dojo.create('span', {'class': 'statuslabel', innerHTML: 'Last duration'}, row4);
+	dojo.create('span', {'class': 'statusvalue', innerHTML: lastDuration}, row4);
+
+	var row4 = dojo.create("div", {'class': "statusrow"}, statusNode);
+	dojo.create('span', {'class': 'statuslabel', innerHTML: 'Generation'}, row4);
+	dojo.create('span', {'class': 'statusvalue', innerHTML: statusInfo.Generation}, row4);
+	
+	//statusPane.attr('content', statusNode);
+	//statusNode.innerHTML = statusNode;
+	
+	//	<button dojoType="dijit.form.Button" type="button" onClick="refreshStatus"> Refresh </button>
+	
+	var button = dojo.create("button", {id: 'refreshButton'});
+	dojo.place(button, statusNode, 'after');
+
+   	new dijit.form.Button({
+   		'class': 'refreshbutton',
+        label: "Refresh",
+        onClick: refreshStatus
+    }, "refreshButton");
+
+//	var button = dojo.create('button', {
+//			dojoType: 'dijit.form.Button',
+//			type: 'button',
+//			onClick: refreshStatus,
+//			innerHTML: 'Refresh'
+//		}, dojo.byId('statusPane'));
+	
+	
+//	dijit.byId('statusPane').refresh();
+//	console.log(dijit.byId('statusPane'));
 }

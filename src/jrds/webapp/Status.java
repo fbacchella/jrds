@@ -43,6 +43,7 @@ public class Status extends JrdsServlet {
 		Collection<RdsHost> hosts = hl.getHosts();
 		int numHosts = hosts.size();
 		int numProbes = 0;
+		int generation = getConfig().thisgeneration;
 		for(RdsHost h: hosts) {
 			numProbes += h.getProbes().size();
 		}
@@ -63,6 +64,7 @@ public class Status extends JrdsServlet {
 				writer.key("Probes").value(numProbes);
 				writer.key("LastCollect").value(lastCollectAgo);
 				writer.key("LastDuration").value(runtime / 1000);
+				writer.key("Generation").value(generation);
 				writer.endObject();
 				writer.flush();
 			} catch (JSONException e) {

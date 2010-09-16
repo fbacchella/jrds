@@ -88,3 +88,37 @@ body, input, option, select, tab, div, td, a, textarea {
 	background: url('../img/folder_go.png') no-repeat top left;
 }
 
+.statusrow {
+}
+
+.statuslabel {
+	display:inline-block;
+	width:80px;
+	font-weight: bold;
+	background-color: #EEE;
+	padding-top: 2px;
+	padding-right: 2px;
+	padding-bottom: 2px;
+	padding-left: 4px;
+}
+
+.statusvalue {
+	background-color: #999;
+	display: inline-block;
+	width: 4em;
+	text-align: right;
+	padding-top: 2px;
+	padding-right: 4px;
+	padding-bottom: 2px;
+	padding-left: 2px;
+}
+
+#status {
+	//float: left;
+	display:inline-block;
+}
+
+.refreshbutton {
+	display:inline-block;
+	vertical-align:top;
+}

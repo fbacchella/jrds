@@ -19,7 +19,8 @@ dependencies ={
             "dijit.form.NumberTextBox",
             "dijit.Tree",
             "dijit.form.TimeTextBox",
-            "dojox.widget.Standby"
+            "dojox.widget.Standby",
+            "dijit.TitlePane"
         ]
         }
     ],

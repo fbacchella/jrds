@@ -39,6 +39,11 @@ public class ReloadHostList extends JrdsServlet {
 				logger.info("Configuration rescaned");
 			}
 		};
+		if(params.getValue("sync") != null) {
+			configthread.run();
+			return;
+		}
+
 		configthread.start();
 		res.sendRedirect(req.getContextPath() + "/");
 	}
