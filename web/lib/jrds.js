@@ -558,7 +558,7 @@ function download_onClick(url)
 
 function details(url, name)
 {
-	var detailsWin = window.open(url, name, "resizable=yes,scrollbars=yes");
+	var detailsWin = window.open(url, name, "width=400,resizable=yes,menubar=no,scrollbars=yes");
 }
 
 function popup(url,id)

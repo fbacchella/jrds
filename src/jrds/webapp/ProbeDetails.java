@@ -27,7 +27,7 @@ public class ProbeDetails extends JrdsServlet {
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException{
-		res.setContentType("application/xhtml+xml");
+		res.setContentType("text/html");
 		res.addHeader("Cache-Control", "no-cache");
 
 		ParamsBean params = getParamsBean(req);

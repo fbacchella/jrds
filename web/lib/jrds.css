@@ -122,3 +122,8 @@ body, input, option, select, tab, div, td, a, textarea {
 	display:inline-block;
 	vertical-align:top;
 }
+
+.fillspace { 
+	height: 100%;
+	width: 100%;
+}
