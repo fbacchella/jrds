@@ -151,13 +151,16 @@ public class Discover extends JrdsServlet {
 
 		try {
 			Document hostDom = generate(hostname, hosttarget, l.getRepository(Loader.ConfigType.PROBEDESC).values(), withOid, request.getParameterValues("tag"));
-
 			response.setContentType(CONTENT_TYPE);
 			response.addHeader("Cache-Control", "no-cache");
 
 			Map<String, String> prop = new HashMap<String, String>(1);
-			prop.put(OutputKeys.OMIT_XML_DECLARATION, "yes");
+			prop.put(OutputKeys.OMIT_XML_DECLARATION, "no");
 			prop.put(OutputKeys.INDENT, "yes");
+			prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
+			prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
+			prop.put(OutputKeys.DOCTYPE_PUBLIC, "-//jrds//DTD Host//EN");
+			prop.put(OutputKeys.DOCTYPE_SYSTEM, "urn:jrds:host");
 			Util.serialize(hostDom, response.getOutputStream(), null, prop);
 		} catch (IOException e) {
 			logger.error(e);

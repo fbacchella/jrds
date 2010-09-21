@@ -21,17 +21,30 @@ initIndex();
   		<div dojoType="dijit.layout.ContentPane" title="Administration" id="adminTab" selected="false">
 				<div id="statusPane" dojoType="dijit.TitlePane" title="Status">
 					<div id="status" >
-						<div class="statusrow"><span class="statuslabel">Hosts</span><span class="statusvalue">1</span></div>
-						<div class="statusrow"><span class="statuslabel">Probes</span><span class="statusvalue">1</span></div>
-						<div class="statusrow"><span class="statuslabel">Last collect</span><span class="statusvalue">1</span></div>
-						<div class="statusrow"><span class="statuslabel">Last duration</span><span class="statusvalue">1</span></div>
-						<div class="statusrow"><span class="statuslabel">Generation duration</span><span class="statusvalue">1</span></div>
 					</div>
 <!-- dojoType="dijit.form.Button" type="button" onClick="refreshStatus"-->
 <!--					<button id="refreshButton"> Refresh </button>-->
 				</div>
 				<div dojoType="dijit.TitlePane" title="Command">
 					<button dojoType="dijit.form.Button" type="button" onClick="sendReload"> Reload </button>
+				</div>
+				<div dojoType="dijit.TitlePane" title="Discover an host">
+					<form action="" dojoType="dijit.form.Form"  id="discoverForm" method="" onSubmit=discoverHost>
+						<button type="submit" dojoType="dijit.form.Button" >Discover</button>
+						<div>
+							<label for="discoverHostName">Host name</label>
+							<input dojoType="dijit.form.TextBox" trim="true" id="discoverHostName" name="discoverHostName"></input>
+						</div>
+						<div>
+						<label for "discoverSnmpCommunity">SNMP community</label>
+						<input dojoType="dijit.form.TextBox" trim="true" id="discoverSnmpCommunity" name="discoverSnmpCommunity"></input>
+						<label for="discoverSnmpPort">SNMP Port</label>
+						<input dojoType="dijit.form.TextBox" trim="true" id="discoverSnmpPort" name="discoverSnmpPort"></input>
+       					<button id="discoverWithOid" dojoType="dijit.form.ToggleButton"  name="discoverWithOid"
+  									iconClass="dijitCheckBoxIcon"> Keep index OID </button>
+  						</div>
+ 					</form>
+ 					<pre id="discoverResponse"></pre>
 				</div>
 		</div> <!-- adminTab -->
 	</div>

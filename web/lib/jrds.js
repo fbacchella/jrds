@@ -678,7 +678,7 @@ function transitTab(newPage, oldPage){
 	}
 	//Nothing special to do when showing adminTab
 	if(newId == 'adminTab') {
-		refreshStatus();
+		setAdminTab();
 		return;
 	}
 
@@ -790,7 +790,7 @@ function updateStatus(statusInfo) {
 	statusNode.innerHTML = '';
 
 	var row1 = dojo.create("div", {'class': "statusrow"}, statusNode);
-	dojo.create('span', {'class': 'statuslabel', innerHTML: 'hosts'}, row1);
+	dojo.create('span', {'class': 'statuslabel', innerHTML: 'Hosts'}, row1);
 	dojo.create('span', {'class': 'statusvalue', innerHTML: statusInfo.Hosts}, row1);
 
 	var row2 = dojo.create("div", {'class': "statusrow"}, statusNode);
@@ -832,16 +832,18 @@ function discoverHost(evt) {
 		queryArgs.host = this.attr('value').discoverHostName;
 		queryArgs.community = this.attr('value').discoverSnmpCommunity;
 		queryArgs.discoverSnmpPort = this.attr('value').discoverSnmpPort;
-
+		if(dijit.byId("discoverWithOid").attr('checked')) {
+			queryArgs.withoid = 1;
+		}
+			
 		dojo.xhrGet( {
 			url: "discover?" + dojo.objectToQuery(queryArgs),
 			handleAs: "text",
 			load: function(response, ioArgs) {
 				var codeTag = dojo.byId('discoverResponse');
-				console.log(codeTag);
+				dojo.style( codeTag, 'display', 'block');
 				var toPlace = response.replace(/</g, "&lt;").replace(/>/g,"&gt;").replace('/\n/mg','<br>');
-				console.log(toPlace);
-				dojo.place("<code id='discoverResponse'>" + toPlace + "</code>", codeTag, "replace");
+				dojo.place("<pre id='discoverResponse'>" + toPlace + "</pre>", codeTag, "replace");
 			},
 			error: function(response, ioArgs) {
 			}
@@ -852,4 +854,14 @@ function discoverHost(evt) {
 		console.error(err);
 	}
 	return false;
+}
+
+function setAdminTab() {
+	refreshStatus();
+	var form = dojo.byId('discoverForm');
+	form.discoverHostName.value = '';
+	form.discoverSnmpCommunity.value = 'public';
+	form.discoverSnmpPort.value = '161';
+	dojo.style( dojo.byId('discoverResponse'), 'display', 'none');
+
 }

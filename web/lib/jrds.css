@@ -109,7 +109,7 @@ body, input, option, select, tab, div, td, a, textarea {
 .statusvalue {
 	background-color: #999;
 	display: inline-block;
-	width: 4em;
+	width: 5em;
 	text-align: right;
 	padding-top: 2px;
 	padding-right: 4px;
