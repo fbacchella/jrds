@@ -34,10 +34,10 @@ body, input, option, select, tab, div, td, a, textarea {
 	width:330px;
 }
 #graphPane {
-	width:700px;
+	width:703px;
 }
 #paramsPane {
-	width:700px;
+	width:703px;
 }
 .box {
 	background-color: white;
@@ -59,6 +59,7 @@ body, input, option, select, tab, div, td, a, textarea {
 
 .field {
 	margin: 5px;
+	width: 100px;
 }
 
 .fieldHour {
@@ -77,12 +78,15 @@ body, input, option, select, tab, div, td, a, textarea {
 	float:left;
 	width:16px;
 	margin:5px;
+	border:0 none;
 }
 .icon {
 	cursor:pointer;
 }
 .graphblock {
 	text-align:center;
+	border:0 none;
+	width: 703px;
 }
 .filterFolder {
 	background: url('../img/folder_go.png') no-repeat top left;

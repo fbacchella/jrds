@@ -137,7 +137,6 @@ function initIndex() {
 		dojo.connect(tabs,"_transition", transitTab);
 		setupCalendar();
 		setupDisplay();
-
 	});	
 }
 
@@ -146,17 +145,16 @@ function initPopup() {
 
 	dojo.addOnLoad(function(){
 		getGraphList();
-		});
+	});
 }
 
 function initHistory() {
-
 	initQuery();
 
 	dojo.addOnLoad(function(){
 		queryParams.history = 1;
 		getGraphList();
-		});
+	});
 }
 
 function initQuery() {
@@ -373,6 +371,8 @@ function setupDisplay() {
 }
 
 function startStandBy(pane) {
+	if(dojo.isIE)
+		return null;
 	var standbyName = 'standby.' + pane;
 	var standby = dijit.byId(standbyName);
 	if(standby != null) {
@@ -411,7 +411,7 @@ function getTree(isFilters, unfold) {
 	}
 
 	var store = new dojo.data.ItemFileReadStore({
-		url: "jsontree?" + dojo.objectToQuery(cleanParams(['host', 'filter', 'tree', 'tab'])),
+		url: "jsontree?" + dojo.objectToQuery(cleanParams(['host', 'filter', 'tree', 'tab']))
 	});
 
 	store.fetch({
@@ -426,10 +426,10 @@ function getTree(isFilters, unfold) {
 	
 	var treeModel = new dijit.tree.ForestStoreModel({
 		store: store,
-		query: {"type": treeType},
+		query: {type: treeType},
 		rootId: '0.0',
 		rootLabel: 'All filters',
-		childrenAttrs: ["children"],
+		childrenAttrs: ["children"]
 	});
 
 	treeOneDiv = dojo.create("div", {id: 'treeOne'}, dojo.byId('treePane'), "last");
@@ -670,6 +670,7 @@ function submitRenderForm(evt) {
 }
 
 function transitTab(newPage, oldPage){
+	try {
 	var newId = newPage.attr('id');
 	var oldId = oldPage.attr('id');
 	if(oldId != 'adminTab') {
@@ -694,9 +695,12 @@ function transitTab(newPage, oldPage){
 		delete newPage.keepParams;
 	}
 	else {
-		delete queryParams.host;
-		delete queryParams.filter;
-		delete queryParams.id;
+		if(queryParams.host)
+			delete queryParams.host;
+		if(queryParams.filter)
+			delete queryParams.filter;
+		if(queryParams.id)
+			delete queryParams.id;
 		queryParams.tab = newPage.attr('id');
 		queryParams.landtab = newPage.attr('id');
 	}
@@ -712,6 +716,10 @@ function transitTab(newPage, oldPage){
 	//It's done later
 	if(! keepParams)
 		getTree(newPage.isFilters);
+	}
+	catch(err) {
+		alert(err.message);
+	}
 }
 
 function sendReload(evt) {
@@ -777,16 +785,10 @@ function updateStatus(statusInfo) {
 	var oldButton = dijit.byId('refreshButton');
 	if(oldButton != null)
 		oldButton.destroyRecursive(false);
-	
-//	var statusPane = dijit.byId('statusPane');
-//	var statusPaneDom = statusPane.attr('domNode');
 
 	var statusNode = dojo.byId('status');
 	statusNode.innerHTML = '';
-	
-	//var statusNode = dojo.create('div', {id: 'status'});
-	//dojo.create('button', {id: 'refreshButton'}, statusPane.attr('domNode'));
-	
+
 	var row1 = dojo.create("div", {'class': "statusrow"}, statusNode);
 	dojo.create('span', {'class': 'statuslabel', innerHTML: 'hosts'}, row1);
 	dojo.create('span', {'class': 'statusvalue', innerHTML: statusInfo.Hosts}, row1);
@@ -809,15 +811,10 @@ function updateStatus(statusInfo) {
 	dojo.create('span', {'class': 'statuslabel', innerHTML: 'Last duration'}, row4);
 	dojo.create('span', {'class': 'statusvalue', innerHTML: lastDuration}, row4);
 
-	var row4 = dojo.create("div", {'class': "statusrow"}, statusNode);
-	dojo.create('span', {'class': 'statuslabel', innerHTML: 'Generation'}, row4);
-	dojo.create('span', {'class': 'statusvalue', innerHTML: statusInfo.Generation}, row4);
-	
-	//statusPane.attr('content', statusNode);
-	//statusNode.innerHTML = statusNode;
-	
-	//	<button dojoType="dijit.form.Button" type="button" onClick="refreshStatus"> Refresh </button>
-	
+	var row5 = dojo.create("div", {'class': "statusrow"}, statusNode);
+	dojo.create('span', {'class': 'statuslabel', innerHTML: 'Generation'}, row5);
+	dojo.create('span', {'class': 'statusvalue', innerHTML: statusInfo.Generation}, row5);
+
 	var button = dojo.create("button", {id: 'refreshButton'});
 	dojo.place(button, statusNode, 'after');
 
@@ -826,15 +823,33 @@ function updateStatus(statusInfo) {
         label: "Refresh",
         onClick: refreshStatus
     }, "refreshButton");
+}
 
-//	var button = dojo.create('button', {
-//			dojoType: 'dijit.form.Button',
-//			type: 'button',
-//			onClick: refreshStatus,
-//			innerHTML: 'Refresh'
-//		}, dojo.byId('statusPane'));
-	
-	
-//	dijit.byId('statusPane').refresh();
-//	console.log(dijit.byId('statusPane'));
+function discoverHost(evt) {
+	try {
+		var queryArgs = { };
+		
+		queryArgs.host = this.attr('value').discoverHostName;
+		queryArgs.community = this.attr('value').discoverSnmpCommunity;
+		queryArgs.discoverSnmpPort = this.attr('value').discoverSnmpPort;
+
+		dojo.xhrGet( {
+			url: "discover?" + dojo.objectToQuery(queryArgs),
+			handleAs: "text",
+			load: function(response, ioArgs) {
+				var codeTag = dojo.byId('discoverResponse');
+				console.log(codeTag);
+				var toPlace = response.replace(/</g, "&lt;").replace(/>/g,"&gt;").replace('/\n/mg','<br>');
+				console.log(toPlace);
+				dojo.place("<code id='discoverResponse'>" + toPlace + "</code>", codeTag, "replace");
+			},
+			error: function(response, ioArgs) {
+			}
+		});
+	}
+	catch(err) {
+		console.log(err);
+		console.error(err);
+	}
+	return false;
 }
