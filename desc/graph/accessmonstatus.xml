@@ -4,7 +4,7 @@
 <graphdesc>
 	<name>AccessMonitorStatus</name>
 	<graphName>accessmonstatus-${label}</graphName>
-	<graphTitle>Status code for ${label}</graphTitle>
+	<graphTitle>Status code for ${label} on ${host}</graphTitle>
 	<verticalLabel>request/s</verticalLabel>
 	<add>
 		<name>status.200</name>

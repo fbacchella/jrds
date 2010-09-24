@@ -3,7 +3,7 @@
 <graphdesc>
 	<name>tcpsegments</name>
 	<graphName>tcpseg</graphName>
-	<graphTitle>Exchanged TCP segments on {1}</graphTitle>
+	<graphTitle>Exchanged TCP segments on ${host}</graphTitle>
 	<verticalLabel>Segments/s</verticalLabel>
 	<add>
 		<name>OutSegs</name>
@@ -38,7 +38,7 @@
 		<legend>Number of segments received in error</legend>
 	</add>
 	<hosttree>
-		<pathelement>HOST</pathelement>
+		<pathstring>${host}</pathstring>
 		<pathelement>NETWORK</pathelement>
 		<pathelement>TCP</pathelement>
 		<pathstring>Exchanged TCP segments</pathstring>
@@ -46,7 +46,7 @@
 	<viewtree>
 		<pathelement>NETWORK</pathelement>
 		<pathelement>TCP</pathelement>
-		<pathelement>HOST</pathelement>
 		<pathstring>Exchanged TCP segments</pathstring>
+		<pathstring>${host}</pathstring>
 	</viewtree>
 </graphdesc>

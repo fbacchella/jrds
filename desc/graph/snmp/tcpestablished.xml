@@ -3,7 +3,7 @@
 <graphdesc>
 	<name>tcpestablished</name>
 	<graphName>tcpest</graphName>
-	<graphTitle>Established TCP Connections TCP on {1}</graphTitle>
+	<graphTitle>Established TCP Connections TCP on ${host}</graphTitle>
 	<verticalLabel>Number</verticalLabel>
 	<add>
 		<name>CurrEstab</name>
@@ -11,15 +11,15 @@
 		<legend>ESTABLISHED or CLOSE-WAIT connections</legend>
 	</add>
 	<hosttree>
-		<pathelement>HOST</pathelement>
+		<pathstring>${host}</pathstring>
 		<pathelement>NETWORK</pathelement>
 		<pathelement>TCP</pathelement>
-		<pathstring>Established TCP Connections TCP</pathstring>
+		<pathstring>Established TCP Connections</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>NETWORK</pathelement>
 		<pathelement>TCP</pathelement>
-		<pathelement>HOST</pathelement>
-		<pathstring>Established TCP Connections TCP</pathstring>
+		<pathstring>Established TCP Connections</pathstring>
+		<pathstring>${host}</pathstring>
 	</viewtree>
 </graphdesc>

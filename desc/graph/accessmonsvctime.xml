@@ -4,7 +4,7 @@
 <graphdesc>
 	<name>AccessMonitorSvcTime</name>
 	<graphName>accessmonchsvctime-${label}</graphName>
-	<graphTitle>Service time for ${label}</graphTitle>
+	<graphTitle>Service time for ${label} on ${host}</graphTitle>
 	<verticalLabel>s</verticalLabel>
 	<add>
 		<name>status.200</name>

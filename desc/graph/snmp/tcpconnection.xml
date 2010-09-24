@@ -3,7 +3,7 @@
 <graphdesc>
 	<name>tcpconnection</name>
 	<graphName>tcp</graphName>
-	<graphTitle>TCP Connections on {1}</graphTitle>
+	<graphTitle>TCP Connections on ${host}</graphTitle>
 	<verticalLabel>Requests/s</verticalLabel>
 	<add>
 		<name>ActiveOpens</name>
@@ -26,15 +26,15 @@
 		<legend>Connections resets</legend>
 	</add>
 	<hosttree>
-		<pathelement>HOST</pathelement>
+		<pathstring>${host}</pathstring>
 		<pathelement>NETWORK</pathelement>
 		<pathelement>TCP</pathelement>
-		<pathstring>TCP Connections</pathstring>
+		<pathstring>New TCP Connections</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>NETWORK</pathelement>
 		<pathelement>TCP</pathelement>
-		<pathstring>TCP Connections</pathstring>
-		<pathelement>HOST</pathelement>
+		<pathstring>New TCP Connections</pathstring>
+		<pathstring>${host}</pathstring>
 	</viewtree>
 </graphdesc>
