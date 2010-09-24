@@ -351,15 +351,8 @@ public class ParamsBean implements Serializable {
 
 		}
 	}
-
-	public String makeObjectUrl(String file, Object o, boolean timeAbsolute) {
-		//We build the Url
-		StringBuilder urlBuffer = new StringBuilder();
-		urlBuffer.append(contextPath);
-
-		if(! contextPath.endsWith("/")) {
-			urlBuffer.append("/");
-		}
+	
+	public Map<String, Object> doArgsMap(Object o, boolean timeAbsolute) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		addPeriodArgs(args, timeAbsolute);
 		addMinMaxArgs(args);
@@ -380,9 +373,21 @@ public class ParamsBean implements Serializable {
 			addFilterArgs(args);
 			args.put("id", o.hashCode());
 		}
+		return args;
+	}
 
+	public String makeObjectUrl(String file, Object o, boolean timeAbsolute) {
+		Map<String, Object> args = doArgsMap(o, timeAbsolute);
+		logger.trace(jrds.Util.delayedFormatString("Params string:%s ", args));
+		//We build the Url
+		StringBuilder urlBuffer = new StringBuilder();
+		urlBuffer.append(contextPath);
+
+		if(! contextPath.endsWith("/")) {
+			urlBuffer.append("/");
+		}
 		urlBuffer.append(file + "?");
-		logger.trace("Params string: " + args);
+
 		for(Map.Entry<String, Object>e: args.entrySet()) {
 			try {
 				urlBuffer.append(e.getKey() + "="+ URLEncoder.encode(e.getValue().toString(), "UTF-8") + "&");

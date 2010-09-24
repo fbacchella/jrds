@@ -141,7 +141,7 @@ public class JSonGraph extends JSonData {
 			imgProps.put("width", Integer.toString(gd.getDimension().width));
 		}
 
-		doNode(w, graph.getQualifieName(), gn.hashCode(), "graph", null, imgProps);
+		doTree(w, graph.getQualifieName(), gn.hashCode(), "graph", null, imgProps);
 	}
 
 }

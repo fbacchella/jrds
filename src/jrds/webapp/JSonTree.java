@@ -101,7 +101,7 @@ public class JSonTree extends JSonData {
 			String filterName = filter.getName();
 			Map<String, String> href = new HashMap<String, String>();
 			href.put("filter", filterName);
-			doNode(w,filterName, filter.hashCode(), "filter", null, href);
+			doTree(w,filterName, filter.hashCode(), "filter", null, href);
 		}
 		return true;
 	}
@@ -130,13 +130,13 @@ public class JSonTree extends JSonData {
 				hasChild = true;
 				String graphid = base + "." + child.hashCode();
 				childsref.add(graphid );
-				doNode(w,leafName, graphid, "graph", null);
+				doTree(w,leafName, graphid, "graph", null);
 			}
 		}
 
 		if(hasChild) {
 			id = base + "." +  gt.getPath().hashCode();
-			doNode(w,gt.getName(), id, type, childsref);
+			doTree(w,gt.getName(), id, type, childsref);
 		}
 		return id;
 	}

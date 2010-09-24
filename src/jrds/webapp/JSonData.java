@@ -45,29 +45,31 @@ public abstract class JSonData extends JrdsServlet {
 
 	public abstract boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException, JSONException;
 
-	public JrdsJSONWriter doNode(JrdsJSONWriter w, String name, int id, String type, List<String> childsref) throws JSONException {
-		return doNode(w, name, Integer.toString(id), type, childsref, null);
+	public JrdsJSONWriter doTree(JrdsJSONWriter w, String name, int id, String type, List<String> childsref) throws JSONException {
+		return doTree(w, name, Integer.toString(id), type, childsref, null);
 	}
-	
-	public JrdsJSONWriter doNode(JrdsJSONWriter w,String name, int id, String type, List<String> childsref, Map<String, String> attributes) throws JSONException {
-		return doNode(w, name, Integer.toString(id), type, childsref, attributes);
+
+	public JrdsJSONWriter doTree(JrdsJSONWriter w,String name, int id, String type, List<String> childsref, Map<String, String> attributes) throws JSONException {
+		return doTree(w, name, Integer.toString(id), type, childsref, attributes);
 	}
-	
-	public JrdsJSONWriter doNode(JrdsJSONWriter w, String name, String id, String type, List<String> childsref) throws JSONException {
-		return doNode(w, name, id, type, childsref, null);
+
+	public JrdsJSONWriter doTree(JrdsJSONWriter w, String name, String id, String type, List<String> childsref) throws JSONException {
+		return doTree(w, name, id, type, childsref, null);
 	}
-	
-	public JrdsJSONWriter doNode(JrdsJSONWriter w, String name, String id, String type, List<String> childsref, Map<String, String> attributes) throws JSONException {
+
+	public JrdsJSONWriter doTree(JrdsJSONWriter w, String name, String id, String type, List<String> childsref, Map<String, ?> attributes) throws JSONException {
 		name = name.replace("'", " ").replace("\"", " ");
 		w.object();
 		w.key("name").value(name);
 		w.key("type").value(type);
 		w.key("id").value(id);
-		w.key("bidule").value("machin");
 
 		if(attributes != null && attributes.size() > 0) {
-			for(Map.Entry<String, String> e: attributes.entrySet()) {
-				w.key(e.getKey()).value(e.getValue().replace("'", " "));
+			for(Map.Entry<String, ?> e: attributes.entrySet()) {
+				if(e.getValue() instanceof String) {
+					String value = (String) e.getValue();
+					w.key(e.getKey()).value(value.replace("'", " "));
+				}
 			}
 		}
 		if(childsref != null && childsref.size() >0 ) {

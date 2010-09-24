@@ -158,7 +158,6 @@ public class Discover extends JrdsServlet {
 			prop.put(OutputKeys.OMIT_XML_DECLARATION, "no");
 			prop.put(OutputKeys.INDENT, "yes");
 			prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
-			prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
 			prop.put(OutputKeys.DOCTYPE_PUBLIC, "-//jrds//DTD Host//EN");
 			prop.put(OutputKeys.DOCTYPE_SYSTEM, "urn:jrds:host");
 			Util.serialize(hostDom, response.getOutputStream(), null, prop);
@@ -213,20 +212,26 @@ public class Discover extends JrdsServlet {
 		for(JrdsNode e: probdescs) {
 			String name = e.evaluate(CompiledXPath.get("/probedesc/name"));
 			String index = e.evaluate(CompiledXPath.get("/probedesc/index"));
+			String doesExistOid = e.evaluate(CompiledXPath.get("/probedesc/specific[@name='existOid']"));
+//			if(logger.isTraceEnabled()) {
+//				String className = e.evaluate(CompiledXPath.get("/probedesc/probeClass"));
+//				String classFileName = '/' + className.replace('.', '/') + ".class";
+//				URL url = this.getPropertiesManager().extensionClassLoader.getResource(classFileName);
+//				logger.trace("Probe " + classFileName + " class found in " + url);
+//			}
+
 			try {
-				logger.trace("Found probe" + name + " with index " + index);
-				if(! "".equals(index) ) {
+				if(index != null && ! "".equals(index) ) {
+					logger.trace(jrds.Util.delayedFormatString("Found probe %s with index %s", name, index));
 					String labelOid = e.evaluate(CompiledXPath.get("/probedesc/specific[@name='labelOid']"));
-					logger.debug("index OID for " + name + ": " + index);
-					logger.debug("label OID for " + name + ": " + labelOid);
+					logger.trace(jrds.Util.delayedFormatString("label OID for %s: %s", name, labelOid));
 					try {
 						enumerateIndexed(hostEleme, active, name, index, labelOid, withOid);
 					} catch (Exception e1) {
 						logger.error("Error discoverer " + name + "for index " + index + ": " +e1);
 					}
 				}
-				String doesExistOid = e.evaluate(CompiledXPath.get("/probedesc/specific[@name='existOid']"));
-				if(! "".equals(doesExistOid)) {
+				else if(! "".equals(doesExistOid)) {
 					doesExist(hostEleme, active, name, doesExistOid);
 				}
 			} catch (Exception e1) {

@@ -21,7 +21,7 @@ import org.junit.Test;
 
 public class TestPropertiesManager {
 	static final private Logger logger = Logger.getLogger(TestPropertiesManager.class);
-	static private final Random r= new Random();
+	static private final Random r = new Random();
 	static private final String[] dirs = new String[] {"configdir", "rrddir", "tmpdir"};
 
 	@BeforeClass

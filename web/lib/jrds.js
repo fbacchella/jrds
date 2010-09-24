@@ -563,15 +563,18 @@ function details(url, name)
 
 function popup(url,id)
 {
-	var img = document.getElementById(id);
+	var img;
+	if(id)
+		img = document.getElementById(id);
+	var width = "width=703";
+	var height;
+	var title;
 	if(img != null) {
-		var width = "width=" + img.width * 1.1;
-		var height = "height=" + img.height * 1.1;
-		var title = img.name;
+		height = "height=" + (img.height + 34);
+		title = img.name;
 	}
 	else {
-		var width = "width=750";
-		var height = "height=500";
+		height = "height=500";
 	}
 	return popupWin = window.open(url, "_blank" , height + "," + width + ",menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
 }
