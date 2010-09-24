@@ -13,8 +13,8 @@
 	<link href="dojo/resources/dojo.css" rel="stylesheet" type="text/css" />
 	<link href="dijit/themes/nihilo/nihilo.css" rel="stylesheet" type="text/css" />
 	<link href="lib/jrds.css" rel="stylesheet" type="text/css" />
-	<script type="text/javascript" src="dojo/dojo.js.uncompressed.js" djConfig="parseOnLoad:true, isDebug:true, locale:'en-us'">/* */ </script>
-	<script type="text/javascript" src="dojo/dojo-jrds.js.uncompressed.js">/* */ </script>
+	<script type="text/javascript" src="dojo/dojo.js" djConfig="parseOnLoad:true, isDebug:true, locale:'en-us'">/* */ </script>
+	<script type="text/javascript" src="dojo/dojo-jrds">/* */ </script>
 </head>
 <body class="nihilo fillspace">
 <div  dojoType="dijit.layout.BorderContainer" gutters="true"  class="fillspace">
