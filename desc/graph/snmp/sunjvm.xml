@@ -42,15 +42,16 @@
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>
-		<pathelement>SYSTEM</pathelement>
+		<pathelement>SERVICES</pathelement>
 		<pathstring>JVM</pathstring>
 		<pathstring>${label}</pathstring>
 		<pathstring>Memory usage</pathstring>
 	</hosttree>
 	<viewtree>
-		<pathelement>SYSTEM</pathelement>
+		<pathelement>SERVICES</pathelement>
 		<pathstring>JVM</pathstring>
 		<pathelement>HOST</pathelement>
+		<pathstring>Memory usage</pathstring>
 		<pathstring>${label}</pathstring>
 	</viewtree>
 </graphdesc>

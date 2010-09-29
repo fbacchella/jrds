@@ -13,15 +13,16 @@
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>
-		<pathelement>SYSTEM</pathelement>
-		<pathstring>JVM</pathstring>
+		<pathelement>SERVICES</pathelement>
+		<pathstring>Tomcat</pathstring>
 		<pathstring>${label}</pathstring>
 		<pathstring>Request count</pathstring>
 	</hosttree>
 	<viewtree>
-		<pathelement>SYSTEM</pathelement>
-		<pathstring>JVM</pathstring>
-		<pathelement>HOST</pathelement>
+		<pathelement>SERVICES</pathelement>
+		<pathstring>Tomcat</pathstring>
 		<pathstring>Request count</pathstring>
+		<pathelement>HOST</pathelement>
+		<pathstring>${label}</pathstring>
 	</viewtree>
 </graphdesc>
