@@ -80,6 +80,7 @@
 	<target name="munin" depends="compile" description="">
 	      <antcall target="compile.subprobes">
 	            <param name="subprobe" value="munin"/>
+            	<param name="subprobe.dir" value="probes-other"/>
 	       </antcall>
 	</target>
 
@@ -87,6 +88,7 @@
 	<target name="rstat" depends="compile" description="To use rstat, needs oncprc.jar from http://remotetea.sourceforge.net/">
 	      <antcall target="compile.subprobes">
 	            <param name="subprobe" value="rstat"/>
+        		<param name="subprobe.dir" value="probes-other"/>
 	       </antcall>
 	</target>
 	
@@ -99,18 +101,19 @@
 	<target name="jkstat" depends="compile" description="To use jkstat, one needs JKstat from http://www.petertribble.co.uk/Solaris/jkstat-0.29.tar.gz">
 	      <antcall target="compile.subprobes">
 	            <param name="subprobe" value="jkstat"/>
+    			<param name="subprobe.dir" value="probes-other"/>
 	       </antcall>
 	</target>
 
 	<target name="compile.subprobes" depends="appjar">
 		<mkdir dir="${build.home}/${subprobe}/classes"/>
-		<javac srcdir="probes-other/${subprobe}/src" destdir="${build.home}/${subprobe}/classes"
+		<javac srcdir="${subprobe.dir}/${subprobe}/src" destdir="${build.home}/${subprobe}/classes"
 			debug="${compile.debug}" deprecation="${compile.deprecation}"
 			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
 			<classpath refid="project.classpath"/>
 		</javac>
 		<jar destfile="${build.home}/${subprobe}/${subprobe}.jar" basedir="${build.home}/${subprobe}/classes">
-			<fileset dir="probes-other/${subprobe}">
+			<fileset dir="${subprobe.dir}/${subprobe}">
 				<include name="desc/**/*.xml" />
 			</fileset>
 		</jar>
@@ -159,13 +162,16 @@
 			</fileset>
 			<classpath refid="external.classpath"/>
 			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
-			<link href="http://java.sun.com/products/servlet/2.3/javadoc"/>
+			<link href="http://java.sun.com/products/servlet/2.5/javadoc"/>
 			<link href="http://www.snmp4j.org/doc"/>
-			<link href="http://jrds.fr/apidoc-rrd4j/"/>
+			<link href="http://rrd4j.googlecode.com/svn/trunk/javadoc/reference/"/>
 			<link href="http://www.junit.org/junit/javadoc/4.3"/>
-			<link href="http://www.mortbay.org/apidocs/"/>
+			<link href="http://jetty.codehaus.org/jetty/jetty-6/apidocs/"/>
 			<link href="http://ws.apache.org/xmlrpc/apidocs"/>
 			<link href="http://www.json.org/javadoc/"/>
+			<link href="http://logging.apache.org/log4j/1.2/apidocs/"/>
+			<link href="http://commons.apache.org/net/api-release/"/>
+			<link href="http://commons.apache.org/fileupload/apidocs/"/>
 		</javadoc>
 	</target>
 	
@@ -266,7 +272,7 @@
 			    </fileset>
 			</batchtest>
 		</junit>
-	    <junitreport todir="${testdir}/rawtestoutput">
+    <junitreport todir="${testdir}/rawtestoutput">
 	      <fileset dir="${testdir}/rawtestoutput"/>
 	      <report todir="${testdir}"/>
 	    </junitreport>
