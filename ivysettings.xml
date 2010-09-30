@@ -1,0 +1,15 @@
+<ivysettings>
+	<resolvers>
+		<url name="ivyrepo" m2compatible="false">
+			<ivy pattern="http://jrds.fr/maven2/[organisation]/[module]/ivys/ivy-[revision].xml" />
+			<artifact
+				pattern="http://jrds.fr/maven2/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]" />
+		</url>
+	</resolvers>
+	<settings defaultResolver="ivyrepo" />
+	<include url="${ivy.default.settings.dir}/ivysettings-public.xml" />
+	<include url="${ivy.default.settings.dir}/ivysettings-shared.xml" />
+	<include url="${ivy.default.settings.dir}/ivysettings-local.xml" />
+	<include url="${ivy.default.settings.dir}/ivysettings-main-chain.xml" />
+	<include url="${ivy.default.settings.dir}/ivysettings-default-chain.xml" />
+</ivysettings>
