@@ -6,6 +6,9 @@
 	<listener>
 		<listener-class>jrds.webapp.StartListener</listener-class>
 	</listener>
+	<listener>
+		<listener-class>org.apache.commons.fileupload.servlet.FileCleanerCleanup</listener-class>
+	</listener>
 	<servlet>
 		<servlet-name>CheckValues</servlet-name>
 		<servlet-class>jrds.webapp.CheckValues</servlet-class>
@@ -87,7 +90,8 @@
 			<param-name>enabledForExtensions</param-name>
 			<param-value>true</param-value>
 			<description>
-				Sets, whether the servlet supports vendor extensions for XML-RPC.
+				Sets, whether the servlet supports vendor extensions for
+				XML-RPC.
           </description>
 		</init-param>
 	</servlet>
@@ -96,7 +100,14 @@
 		<display-name>JSonPack</display-name>
 		<description></description>
 		<servlet-class>
-		jrds.webapp.JSonPack</servlet-class>
+			jrds.webapp.JSonPack</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>upload</servlet-name>
+		<display-name>upload</display-name>
+		<description></description>
+		<servlet-class>
+			jrds.webapp.Upload</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>CheckValues</servlet-name>
@@ -169,5 +180,9 @@
 	<servlet-mapping>
 		<servlet-name>JSonPack</servlet-name>
 		<url-pattern>/jsonpack/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>upload</servlet-name>
+		<url-pattern>/upload</url-pattern>
 	</servlet-mapping>
 </web-app>

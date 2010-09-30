@@ -1,12 +1,16 @@
-<html >
+<html>
 
 <head>
 	<title>JRDS</title>
 <link href="dojo/resources/dojo.css" rel="stylesheet" type="text/css" />
+<link href="dijit/themes/dijit.css" rel="stylesheet" type="text/css" />
 <link href="dijit/themes/nihilo/nihilo.css" rel="stylesheet" type="text/css" />
+<link href="dijit/themes/tundra/form/Button.css" rel="stylesheet" />
+<link href="dijit/themes/tundra/ProgressBar.css" rel="stylesheet" />
+<link href="dojox/form/resources/FileUploader.css" rel="stylesheet" />
 <link href="lib/jrds.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="dojo/dojo.js" djConfig="parseOnLoad:false, isDebug: false, locale:'en-us'"></script>
-<script type="text/javascript" src="dojo/dojo-jrds.js"></script>
+<script type="text/javascript" src="dojo/dojo.js.uncompressed.js" djConfig="parseOnLoad:false, isDebug: false, locale:'en-us'"></script>
+<script type="text/javascript" src="dojo/dojo-jrds.js.uncompressed.js"></script>
 <script type="text/javascript" src="lib/jrds.js"></script> 
 <script type="text/javascript">
 //Used to get a clean copy of the pane that will be in each tab
@@ -45,6 +49,16 @@ initIndex();
   						</div>
  					</form>
  					<pre id="discoverResponse"></pre>
+				</div>
+				<div dojoType="dijit.TitlePane" title="Upload elements">
+					<div style="padding-bottom: 5px;">
+						<div>Selected files: </div>
+						<div id="filesList">  </div>		
+						<div id="filesSelect" >Select Elements</div>
+						<div onClick="doUpload();" dojoType="dijit.form.Button">Upload</div>
+					</div>
+					<div>Uploaded: </div>
+					<div id="filesResult"></div>
 				</div>
 		</div> <!-- adminTab -->
 	</div>
