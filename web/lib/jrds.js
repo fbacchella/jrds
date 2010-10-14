@@ -1,25 +1,22 @@
+dojo.require("dojo.parser");
+dojo.require("dojo.data.ItemFileReadStore");
+dojo.require("dojo.number");
 dojo.require("dijit.layout.TabContainer");
 dojo.require("dijit.layout.ContentPane");
-dojo.require("dijit.form.Button");
 dojo.require("dijit.layout.BorderContainer");
-dojo.require("dijit.layout.ContentPane");
-dojo.require("dijit.form.DateTextBox");
 dojo.require("dijit.form.Button");
 dojo.require("dijit.form.TextBox");
+dojo.require("dijit.form.DateTextBox");
+dojo.require("dijit.form.TimeTextBox");
 dojo.require("dijit.form.Form");
 dojo.require("dijit.form.Select");
-dojo.require("dojo.parser");
-dojo.require("dijit.form.Button");
 dojo.require("dijit.form.ValidationTextBox");
-dojo.require("dojo.data.ItemFileReadStore");
 dojo.require("dijit.form.NumberTextBox");
 dojo.require("dijit.Tree");
-dojo.require("dojo.number");
-dojo.require("dijit.form.TimeTextBox");
-dojo.require("dojo.parser");
 dojo.require("dijit.Dialog");
 dojo.require("dojox.widget.Standby");
 dojo.require("dijit.TitlePane");
+dojo.require("dojox.form.FileUploader");
 
 var queryParams = {};
 
@@ -120,6 +117,24 @@ dojo.declare("DayHourTextBox", dijit.form.DateTextBox, {
 	}
 });
 
+dojo.declare('kgf.dijit.FixedFileUploader', dojox.form.FileUploader, {
+    // summary:
+    //    Private class containing fixes to FileUploader behavior.
+
+    getHiddenWidget: function() {
+      var widget = this.inherited(arguments);
+      if (widget && dojo.position(widget.domNode).h > 0) {
+        //false positive - sure the widget has onShow, but it's already shown!
+        //(workaround to Dojo bug #11039)
+        //TODO: will need to see if this check suffices for situations where
+        //it's actually hidden (haven't used anywhere like that yet).
+        return null;
+      }
+      return widget;
+    }
+  });
+
+
 function initIndex() {
 	initQuery();
 
@@ -137,6 +152,8 @@ function initIndex() {
 		dojo.connect(tabs,"_transition", transitTab);
 		setupCalendar();
 		setupDisplay();
+
+
 	});	
 }
 
@@ -198,7 +215,7 @@ function graphHistory() {
 	graphParams.id = queryParams.id;
 	graphParams.history = 1;
 	var graphImg = dojo.create("img");
-	dojo.attr(graphImg, "src", "graph?" + dojo.objToQuery(graphParams));		
+	dojo.attr(graphImg, "src", "graph?" + dojo.objectToQuery(graphParams));		
 	dojo.place(graphImg, graphPane);
 }
 
@@ -207,61 +224,63 @@ function doGraphList(result) {
 	dojo.empty(graphPane);
 	for(i in result.items) {
 		graph = result.items[i];
-		var  graphBlock = dojo.create("div")
-		dojo.attr(graphBlock, "class","graphblock");
-		dojo.place(graphBlock, graphPane);
+		var  graphBlock = dojo.create("div", {"class": "graphblock"}, graphPane);
 
-		var graphImg = dojo.create("img");
-		dojo.attr(graphImg, "class","graph");
-		dojo.attr(graphImg, "name", graph.name);
-		dojo.attr(graphImg, "title", graph.name);
-		dojo.attr(graphImg, "id", graph.id);
-		dojo.attr(graphImg, "src", graph.imghref);
+		var graphImg = dojo.create("img", {
+			"class": "graph",
+			name: graph.name,
+			title: graph.name,
+			id: graph.id,
+			src: "graph?" + dojo.objectToQuery(graph.graph)
+		}, 
+		graphBlock);
+		
 		if(graph.width)
 			dojo.attr(graphImg, "width", graph.width);
 		if(graph.height)
 			dojo.attr(graphImg, "height", graph.height);
 
-		var iconsList =  dojo.create("div");
-		dojo.attr(iconsList, "class","iconslist");
+		var iconsList =  dojo.create("div", {"class": "iconslist"}, graphBlock);
 
-		var application_double = dojo.create("img");
-		dojo.attr(application_double, "class","icon");
-		dojo.attr(application_double, "src","img/application_double.png");
-		dojo.attr(application_double, "heigth","16");
-		dojo.attr(application_double, "width","16");
-		dojo.attr(application_double, "title","Popup the graph");
-		dojo.attr(application_double, "onclick","popup('" + graph.popuparg + "'," + graph.id + ");");
-		var application_view_list = dojo.create("img");
-		dojo.attr(application_view_list, "class","icon");
-		dojo.attr(application_view_list, "src","img/application_view_list.png");
-		dojo.attr(application_view_list, "heigth","16");
-		dojo.attr(application_view_list, "width","16");
-		dojo.attr(application_view_list, "title","Graph details");
-		dojo.attr(application_view_list, "onclick","details('" + graph.detailsarg + "', '" + graph.probename + "');");
-		var time = dojo.create("img");
-		dojo.attr(time, "class","icon");
-		dojo.attr(time, "src","img/date.png");
-		dojo.attr(time, "heigth","16");
-		dojo.attr(time, "width","16");
-		dojo.attr(time, "title","Graph history");
-		dojo.attr(time, "onclick","history('" + graph.historyarg + "', '" + graph.probename + "');");
-		var disk = dojo.create("img");
-		dojo.attr(disk, "class","icon");
-		dojo.attr(disk, "src","img/disk.png");
-		dojo.attr(disk, "heigth","16");
-		dojo.attr(disk, "width","16");
-		dojo.attr(disk, "title","Save data");
-		dojo.attr(disk, "onclick","save('" + graph.savearg + "', '" + graph.probename + "');");
-		var link = dojo.create("img");
+		var application_double = dojo.create("img", {
+			"class": "icon",
+			src: "img/application_double.png",
+			height: 16,
+			width: 16,
+			title: "Popup the graph",
+			onclick: "popup('" +  dojo.objectToQuery(graph.graph) + "'," + graph.id + ");"
+		},
+		iconsList);
 
-		dojo.place(application_double, iconsList);
-		dojo.place(application_view_list, iconsList);
-		dojo.place(time, iconsList);
-		dojo.place(disk, iconsList);
+		var application_view_list = dojo.create("img", {
+			"class": "icon",
+			height: 16,
+			width: 16,
+			src: "img/application_view_list.png",
+			title: "Graph details",
+			onclick: "details('" + dojo.objectToQuery(graph.probe) + "', '" + graph.probename + "');"
+		},
+		iconsList);
 
-		dojo.place(graphImg, graphBlock);
-		dojo.place(iconsList, graphBlock);
+		var time = dojo.create("img", {
+			"class": "icon",
+			height: 16,
+			width: 16,
+			src: "img/date.png",
+			title: "Graph history",
+			onclick: "history('" + dojo.objectToQuery(graph.history) + "', '" + graph.probename + "');"
+		},
+		iconsList);
+
+		var disk = dojo.create("img", {
+			"class": "icon",
+			height: 16,
+			width: 16,
+			src: "img/disk.png",
+			title: "Save data",
+			onclick: "save('" + dojo.objectToQuery(graph.graph) + "', '" + graph.probename + "');"
+		},
+		iconsList);
 	}
 	if(this.standby != null)
 		this.standby.hide();
@@ -558,7 +577,7 @@ function download_onClick(url)
 
 function details(url, name)
 {
-	var detailsWin = window.open(url, name, "width=400,resizable=yes,menubar=no,scrollbars=yes");
+	var detailsWin = window.open("details?" + url, name, "width=400,resizable=yes,menubar=no,scrollbars=yes");
 }
 
 function popup(url,id)
@@ -576,17 +595,17 @@ function popup(url,id)
 	else {
 		height = "height=500";
 	}
-	return popupWin = window.open(url, "_blank" , height + "," + width + ",menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
+	return popupWin = window.open("popup.html?" + url, "_blank" , height + "," + width + ",menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
 }
 
 function save(url, name)
 {
-	var popupWin = window.open(url, name , "menubar=no,status=no,resizable=no,scrollbars=no");
+	var popupWin = window.open("download?" + url, name , "menubar=no,status=no,resizable=no,scrollbars=no");
 }
 
 function history(url, name)
 {
-	var historyWin = window.open(url, "_blank", "width=750,menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
+	var historyWin = window.open("history.html?" + url, "_blank", "width=750,menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
 }
 
 function sendlink()
@@ -859,12 +878,106 @@ function discoverHost(evt) {
 	return false;
 }
 
+var filesSelect;
+
+function doUpload(){
+	dojo.byId("filesList").innerHTML = "uploading...";
+	filesSelect.upload();
+}
+
 function setAdminTab() {
 	refreshStatus();
+	
+	//Setup the discoverer
 	var form = dojo.byId('discoverForm');
 	form.discoverHostName.value = '';
 	form.discoverSnmpCommunity.value = 'public';
 	form.discoverSnmpPort.value = '161';
 	dojo.style( dojo.byId('discoverResponse'), 'display', 'none');
+	
+	//Set up the uploader
+	var uploader = dijit.byId('filesSelect');
+	if(! uploader) {
+		filesSelect = new kgf.dijit.FixedFileUploader({
+			uploadUrl: 'upload',
+			selectMultipleFiles: true,
+			force: 'html',
+			fileListId: 'filesList',
+			fileMask: [],
+			onChange: function(a) {
+				dojo.style('filesList', 'height', 'auto');
+			},
+			onComplete: filesLoaded
+		}, 'filesSelect');
+		//The uploader set a bad lineHeight
+		dojo.style('filesSelect', 'lineHeight', '');
+	}
+	
+	else {
+		//Don't forget to clean the file list
+		var filesResult = dojo.byId('filesResult');
+		dojo.place('<div id="filesResult"></div>', filesResult, 'replace');
+	}
+}
 
+function filesLoaded(e) {
+	try {
+		var filesResult = dojo.byId('filesResult');
+		var result = '<textarea id="filesResult" rows="' + e.length + '" cols="100">';
+		dojo.forEach(e, function(f){
+			result += f.name;
+			if(parseBool(f.parsed)) {
+				result += ': OK';
+			}
+			else {
+				result += ': ' + f.error;
+			}
+			result += '\n';
+		});
+		result += "</textarea>";
+		dojo.place(result, filesResult, 'replace');
+	
+		var filesList = dojo.byId('filesList');
+		dojo.place('<div id="filesList" />', filesList, 'replace');
+		dojo.style(filesList, 'height', '20px');
+	}
+	catch(err) {
+		console.error(err);
+	}
+}
+
+function dateNavPrevious() {
+	console.log(queryParams);
+	if(queryParams.autoperiod == 0) {
+		var begin = dojo.date.locale.parse(queryParams.begin, 'yyyy-MM-dd HH:mm');
+		var end = dojo.date.locale.parse(queryParams.end, 'yyyy-MM-dd HH:mm');
+		console.log(end - begin);
+	}
+	console.log(queryParams);
+	var dayTimeFormat = {
+		datePattern: 'yyyy-MM-dd',
+		timePattern: 'HH:mm'
+	};
+	if(queryParams.autoperiod == 0) {
+		var begin = dojo.date.locale.parse(queryParams.begin, dayTimeFormat);
+		var end = dojo.date.locale.parse(queryParams.end, dayTimeFormat);
+		console.log(begin);
+		console.log(end);
+		console.log(end - begin);
+	}
+}
+
+function dateNavNext() {
+	console.log(queryParams);
+	var dayTimeFormat = {
+		datePattern: 'yyyy-MM-dd',
+		timePattern: 'HH:mm'
+	};
+	if(queryParams.autoperiod == 0) {
+		var begin = dojo.date.locale.parse(queryParams.begin, dayTimeFormat);
+		var end = dojo.date.locale.parse(queryParams.end, dayTimeFormat);
+		console.log(begin);
+		console.log(end);
+		console.log(end - begin);
+	}
 }

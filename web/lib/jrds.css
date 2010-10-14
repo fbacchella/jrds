@@ -49,12 +49,17 @@ body, input, option, select, tab, div, td, a, textarea {
 	background-color:#F5F5F5;
 	border:1px solid #AAAAAA;
 	margin:5px;
-	width:550px;
+	width:575px;
 	height:28px;
 }
 
 .paramslabel {
 	padding: 0.4em;
+}
+
+.dateNav {
+	display:inline-block;
+	vertical-align:middle;
 }
 
 .field {
@@ -131,3 +136,19 @@ body, input, option, select, tab, div, td, a, textarea {
 	height: 100%;
 	width: 100%;
 }
+
+#filesList {
+	border:1px solid #CCCCCC;
+	overflow-x:hidden;
+	overflow-y:auto;
+	width:200px;
+	height: 20px;
+}
+
+#filesSelect {
+	width: 100px;
+	text-align:center;
+	float: left;
+	margin:0.2em;
+}
+
