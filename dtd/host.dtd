@@ -23,6 +23,7 @@
 <!ATTLIST probe
 			type CDATA #REQUIRED
 			label CDATA #IMPLIED
+			connection CDATA #IMPLIED
 >
 <!ELEMENT arg EMPTY>
 <!ATTLIST arg
