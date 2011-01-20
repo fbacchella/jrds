@@ -6,12 +6,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+
+import org.apache.log4j.Level;
 
 import jrds.starter.Connection;
 import uk.co.petertribble.jkstat.api.JKstat;
 import uk.co.petertribble.jkstat.api.Kstat;
-import uk.co.petertribble.jkstat.api.KstatData;
 import uk.co.petertribble.jkstat.client.RemoteJKstat;
 
 public class KstatConnection extends Connection<JKstat> {
@@ -35,7 +36,7 @@ public class KstatConnection extends Connection<JKstat> {
 		}
 		Long uptime = (Long)ks.getData("boot_time");
 		long now = System.currentTimeMillis() / 1000;
-		return now - uptime.longValue() ;
+		return now - uptime.longValue();
 	}
 
 	@Override
@@ -46,7 +47,8 @@ public class KstatConnection extends Connection<JKstat> {
 			remoteJk = new RemoteJKstat(remoteUrl.toString());
 			return true;
 		} catch (MalformedURLException e) {
-			e.printStackTrace();			return false;
+		    this.log(Level.ERROR, "Malformed URL http://%s:%d/", getHostName(), port);
+			return false;
 		}
 	}
 
@@ -57,16 +59,17 @@ public class KstatConnection extends Connection<JKstat> {
 
 	public  static void main(String[] args) throws IOException {
 		int port = 3000;
-		String hostname = "192.168.1.21";
+		String hostname = args[0];
+		String[] kstatinfo = args[1].split(":");
 		URL remoteUrl = new URL("http", hostname, port, "/");
 		JKstat remoteJk = new RemoteJKstat(remoteUrl.toString());
-		String module ="zfs";
-		int instance = 0;
-		String name = "arcstats";
+		String module = kstatinfo[0];
+		int instance = Integer.parseInt(kstatinfo[1]);
+		String name = kstatinfo[2];
 		Kstat active  = remoteJk.getKstat(module, instance, name);
-		Map<String, KstatData> m =  active.getMap();
-		List<String> attr = new ArrayList<String>(m.keySet().size());
-		attr.addAll(m.keySet());
+		Set<java.lang.String> statistics = active.statistics();
+		List<String> attr = new ArrayList<String>(statistics.size());
+		attr.addAll(statistics);
 		Collections.sort(attr, String.CASE_INSENSITIVE_ORDER);
 		for(Object key: attr ) {
 			String keyName = key.toString();
