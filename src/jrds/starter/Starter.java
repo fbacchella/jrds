@@ -48,6 +48,8 @@ public abstract class Starter {
 			log(Level.DEBUG, "Starting connection took %d ms", end - begin);
 		} catch (Exception e) {
 			log(Level.ERROR, e, "Error while starting: %s", e.getMessage());
+        } catch (NoClassDefFoundError e) {
+            log(Level.ERROR, e, "Class %s not found", e.getMessage().replace('/', '.'));
 		}
 	}
 
