@@ -639,7 +639,15 @@ implements Cloneable, WithACL {
 		Color c = null;
 		if(gt.toPlot()) {
 			c = Color.WHITE;
-			if (color != null && ! "".equals(color)) {
+			//^#[0-9A-F]{6}$
+			if(color != null && color.toUpperCase().matches("^#[0-9A-F]{6}")) {
+			    int r = Integer.parseInt(color.substring(1, 3), 16);
+                int g = Integer.parseInt(color.substring(3, 5), 16);
+                int b = Integer.parseInt(color.substring(5, 7), 16);
+                logger.trace("Adding custom color with channels " + r + ", " + g + ", " + b);
+                c = new Color(r,g,b);
+			}
+			else if (color != null && ! "".equals(color)) {
 				c = Colors.valueOf(color.toUpperCase()).getColor();
 				if( c == null)
 					c = Color.getColor(color);
