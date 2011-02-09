@@ -36,7 +36,7 @@ public class JSonGraph extends JSonData {
             return false;
         }
 
-        List<GraphNode> graphs = getGraphs(root, params);
+        List<GraphNode> graphs = params.getGraphs(this);
         if(params.isSorted()) {
             Collections.sort(graphs, new Comparator<GraphNode>() {
                 public int compare(GraphNode g1, GraphNode g2) {
@@ -65,58 +65,6 @@ public class JSonGraph extends JSonData {
             }
         }
         return true;
-    }
-
-    private List<GraphNode> getGraphs(HostsList root, ParamsBean params) {
-        Integer id = params.getId();
-        Integer pid = params.getPid();
-        //Neither id or pid where specified, nothing can be done
-        if(id == null && pid == null)
-            return Collections.emptyList();
-
-        String dsName = params.getDsName();
-
-        if(id != null) {
-            GraphTree node = root.getNodeById(id);
-            if(node != null) {
-                logger.debug(jrds.Util.delayedFormatString("Tree found: %s", node));
-                Filter filter = params.getFilter();
-                return node.enumerateChildsGraph(filter);
-            }
-            else {
-                GraphNode gn = root.getGraphById(id);
-                if(gn != null) {
-                    logger.debug(jrds.Util.delayedFormatString("Graph found: %s", gn));
-                    return Collections.singletonList(gn);
-                }
-            }
-            logger.warn(jrds.Util.delayedFormatString("Id %d maps to nothing", id));
-        }
-        else if(pid != null && pid != 0 && dsName != null) {
-            if(! allowed(params, root.getDefaultRoles()))
-                return Collections.emptyList();
-            Probe<?, ?> p = params.getProbe();
-            if(p == null) {
-                logger.error("Looking for unknown probe");
-                return Collections.emptyList();
-            }
-            logger.debug(jrds.Util.delayedFormatString("Probe found: %s", p));
-
-            Graphics2D g2d = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
-            String graphDescName = p.getName() + "." + dsName;
-
-            GraphDesc gd = new GraphDesc();
-            gd.setName(graphDescName);
-            gd.setGraphName(p.getHost().getName() + "." + p.getName() + "." + dsName);
-            gd.setGraphTitle(p.getName() + "." + dsName + " on ${host}");
-            gd.add(dsName, GraphDesc.LINE);
-            gd.initializeLimits(g2d);
-
-            GraphNode gn = new GraphNode(p, gd);
-            gn.addACL(getConfig().getPropertiesManager().defaultACL);
-            return Collections.singletonList(gn);
-        }
-        return Collections.emptyList();
     }
 
     private void doGraph(GraphNode gn, Renderer r, ParamsBean params, JrdsJSONWriter w) throws IOException, JSONException {

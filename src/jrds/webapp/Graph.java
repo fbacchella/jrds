@@ -36,7 +36,12 @@ public final class Graph extends JrdsServlet {
 
 			ParamsBean p = new ParamsBean(req, hl, "host", "graphname");
 
-			jrds.Graph graph = p.getGraph();
+			jrds.Graph graph = p.getGraph(this);
+			
+			if(graph == null) {
+                res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;   
+			}
 
 			if(getPropertiesManager().security) {				
 				boolean allowed = graph.getACL().check(p);
