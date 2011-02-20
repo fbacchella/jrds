@@ -3,12 +3,18 @@ package jrds.probe.munin;
 import java.io.IOException;
 import java.net.Socket;
 
+import org.apache.log4j.Level;
+
 import jrds.starter.Connection;
 import jrds.starter.SocketFactory;
 
 public class MuninConnection extends Connection<Socket> {
 	Socket muninsSocket = null;
 	int port = 4949;
+
+    public MuninConnection() {
+        super();
+    }
 
 	public MuninConnection(Integer port) {
 		super();
@@ -25,14 +31,13 @@ public class MuninConnection extends Connection<Socket> {
 		return Long.MAX_VALUE;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public boolean startConnection() {
-		SocketFactory ss = (SocketFactory) getLevel().find(SocketFactory.makeKey(getLevel())); 
+		SocketFactory ss = getLevel().find(SocketFactory.class); 
 		try {
 			muninsSocket = ss.createSocket(getHostName(), port);
 		} catch (IOException e) {
-			e.printStackTrace();
+		    log(Level.ERROR, e, "Connection error", e);
 			return false;
 		}
 
