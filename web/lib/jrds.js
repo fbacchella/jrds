@@ -27,6 +27,9 @@ dojo.declare("jrdsTree", dijit.Tree, {
 			//so clone it !
 			this.attr('path', dojo.clone(queryParams.path));
 		}
+		if(this.standby != null) {
+			this.standby.hide();
+		}
 	},
 	getIconClass: function(item, opened){
 		if(item.type == 'filter')
@@ -183,7 +186,7 @@ function initQuery() {
 		preventCache: false,
 		load: function(response, ioArgs) {
 			queryParams = response;
-			if(queryParams.path) {
+			if(queryParams.path && queryParams.path.length > 1 ) {
 				var last = queryParams.path[queryParams.path.length -1];
 				queryParams.id = last.replace(/.*\./, "");
 			}
@@ -461,13 +464,7 @@ function getTree(isFilters, unfold) {
 		autoExpand: true == unfold,
 		isFilters: isFilters,
 		standby: treeStandby,
-		onLoad: function() {
-			if(this.standby != null) {
-				this.standby.hide();
-			}
-		}
 	}, treeOneDiv);
-
 }
 
 function doUnfold() {
@@ -481,8 +478,22 @@ function doUnfold() {
 	getTree(tree.isFilters, true != unfold);
 }
 
+function getTreeNodeUp(node) {
+	var nodeInfo = node.item.id;
+	if(nodeInfo instanceof Array) {
+		nodeInfo = nodeInfo[0];
+	}
+	if(! node.getParent()) {
+		return new Array(nodeInfo);
+	}
+	retValue = getTreeNodeUp(node.getParent());
+	retValue.push(nodeInfo);
+	return retValue;
+}
+
 function loadTree(item,  node){
-	var tree = dijit.byId("treeOne");
+	var tree = node.tree;
+
 	if(item.filter) {
 		queryParams.filter = item.filter[0];
 		delete queryParams.host;
@@ -505,15 +516,7 @@ function loadTree(item,  node){
 		queryParams.id = item.id[0].replace(/.*\./, "");
 		getGraphList();
 		
-		var path = new Array();
-		dojo.forEach(tree.attr('path'), function(entry, i){
-			if(i !=0)
-				path.push(entry.id[0]);
-			else
-				path.push(entry.id);
-			});
-		
-		queryParams.path = path;
+		queryParams.path = getTreeNodeUp(node);
 	}
 }
 
