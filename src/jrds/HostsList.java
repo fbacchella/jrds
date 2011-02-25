@@ -38,6 +38,8 @@ import jrds.starter.SocketFactory;
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 import jrds.webapp.ACL;
+import jrds.webapp.DiscoverAgent;
+import jrds.webapp.DiscoverAgentAnnotation;
 import jrds.webapp.ParamsBean;
 import jrds.webapp.RolesACL;
 
@@ -80,6 +82,7 @@ public class HostsList extends StarterNode {
 	// A global flag that tells globally that this HostsList can be used
 	volatile private boolean started = false;
 	private Stats stats = new Stats();
+	Set<DiscoverAgentAnnotation> daList = new HashSet<DiscoverAgentAnnotation>();
 
 	private Semaphore collectMutex = new Semaphore(1);
 
@@ -180,7 +183,17 @@ public class HostsList extends StarterNode {
 		logger.debug("Starting parsing descriptions");
 		ConfigObjectFactory conf = new ConfigObjectFactory(pm, pm.extensionClassLoader);
 		conf.setGraphDescMap(l.getRepository(Loader.ConfigType.GRAPHDESC));
-		conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
+		Collection<ProbeDesc> probesdesc = conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC)).values();
+		
+		for(ProbeDesc pd: probesdesc) {
+		    Class<?> pc = pd.getProbeClass();
+		    while(pc != null && pc != Probe.class) {
+	            if(pc.isAnnotationPresent(DiscoverAgentAnnotation.class)) {
+	                daList.add(pc.getAnnotation(DiscoverAgentAnnotation.class));
+	            }
+	            pc = pc.getSuperclass();
+		    }
+		}
 		conf.setMacroMap(l.getRepository(Loader.ConfigType.MACRODEF));
 		conf.setTabMap(l.getRepository(Loader.ConfigType.TAB));
 
@@ -662,4 +675,16 @@ public class HostsList extends StarterNode {
 		return defaultRoles;
 	}
 
+	public Set<DiscoverAgent> getDiscoverAgent() {
+	    Set<DiscoverAgent> daSet = new HashSet<DiscoverAgent>(daList.size());
+	    for(DiscoverAgentAnnotation daa: daList) {
+	        try {
+                daSet.add(daa.value().newInstance());
+            } catch (Exception e) {
+                logger.error("Error creating discover agent " + daa.value().getName() + ": " + e);
+            }
+	    }
+	    
+	    return daSet;
+	}
 }

@@ -10,11 +10,14 @@ import java.util.Set;
 
 import jrds.Probe;
 import jrds.ProbeDesc;
+import jrds.snmp.SnmpDiscoverAgent;
 import jrds.snmp.SnmpRequester;
 import jrds.snmp.SnmpStarter;
 
 import org.apache.log4j.Level;
 import org.snmp4j.smi.OID;
+
+import jrds.webapp.DiscoverAgentAnnotation;
 
 /**
  * A abstract class from which all snmp probes should be derived.<p>
@@ -22,6 +25,7 @@ import org.snmp4j.smi.OID;
  * <quote>snmpbulkwalk -OX -c public -v 2c hostname  enterprises | sed -e 's/\[.*\]//' -e 's/ =.*$//'|  grep '::' | uniq </quote>
  * @author bacchell
  */
+@DiscoverAgentAnnotation(SnmpDiscoverAgent.class)
 public abstract class SnmpProbe extends Probe<OID, Object> {
 	public final static String REQUESTERNAME = "requester";
 	public final static String UPTIMEOIDNAME = "uptimeOid";
