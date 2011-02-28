@@ -39,7 +39,6 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 	private String host = null;
 	private int	   port = 0;
 	private String file = null;
-	private String label;
 	private List<Object> argslist = null;
 	Starter resolver = null;
 
@@ -245,13 +244,5 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 	@Override
 	public String getSourceType() {
 		return "HTTP";
-	}
-
-	public String getLabel() {
-		return label;
-	}
-
-	public void setLabel(String label) {
-		this.label = label;
 	}
 }
