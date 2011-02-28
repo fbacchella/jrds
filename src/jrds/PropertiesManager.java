@@ -346,6 +346,8 @@ public class PropertiesManager extends Properties {
 			logger.debug(jrds.Util.delayedFormatString("Admin ACL is %s", adminACL));
 			logger.debug(jrds.Util.delayedFormatString("Default ACL is %s", defaultACL));
 		}
+		
+		readonly = parseBoolean(getProperty("readonly", "0"));
 
 	}
 
@@ -372,5 +374,6 @@ public class PropertiesManager extends Properties {
 	public String adminrole = "admin";
 	public ACL defaultACL = ACL.ALLOWEDACL;
 	public ACL adminACL = ACL.ALLOWEDACL;
+	public boolean readonly = false;
 	//public Set<Class<?>> preloadedClasses = new HashSet<Class<?>>();
 }
