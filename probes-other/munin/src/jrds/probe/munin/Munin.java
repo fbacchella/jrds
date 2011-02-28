@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jrds.ProbeConnected;
+import jrds.factories.ProbeMeta;
 
 import org.apache.log4j.Level;
 
@@ -23,6 +24,7 @@ import org.apache.log4j.Level;
  *
  * TODO 
  */
+@ProbeMeta(discoverAgent = MuninDiscoverAgent.class)
 public class Munin extends ProbeConnected<String, Number, MuninConnection> {
 	public Munin() {
 		super(MuninConnection.class.getName());

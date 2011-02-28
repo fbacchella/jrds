@@ -48,7 +48,6 @@ public class ProbeDesc implements Cloneable {
 	private Collection<String> graphesList = new ArrayList<String>();
 	private boolean uniqIndex = false;
 	private Class<? extends Probe<?,?>> probeClass = null;
-	private String preloadClass = null;
 	private List<Object> defaultsArgs = null;
 	private float uptimefactor = (float) 1.0;
 	private Map<String, String> properties = null;
@@ -451,20 +450,6 @@ public class ProbeDesc implements Cloneable {
 			graphsElement.appendChild(document.createElement("name")).setTextContent(graph);
 		}
 		return document;
-	}
-
-	/**
-	 * @return the preloadClass
-	 */
-	public String getPreloadClass() {
-		return preloadClass;
-	}
-
-	/**
-	 * @param preloadClass the preloadClass to set
-	 */
-	public void setPreloadClass(String preloadClass) {
-		this.preloadClass = preloadClass;
 	}
 
 	/* (non-Javadoc)
