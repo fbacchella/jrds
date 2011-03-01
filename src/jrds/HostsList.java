@@ -40,11 +40,9 @@ import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 import jrds.webapp.ACL;
 import jrds.webapp.DiscoverAgent;
-import jrds.webapp.DiscoverAgentAnnotation;
 import jrds.webapp.ParamsBean;
 import jrds.webapp.RolesACL;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -191,9 +189,6 @@ public class HostsList extends StarterNode {
         for(ProbeDesc pd: probesdesc) {
             Class<?> pc = pd.getProbeClass();
             while(pc != null && pc != Probe.class) {
-                if(pc.isAnnotationPresent(DiscoverAgentAnnotation.class)) {
-                    daList.add(pc.getAnnotation(DiscoverAgentAnnotation.class).value());
-                }
                 if(pc.isAnnotationPresent(ProbeMeta.class)) {
                     ProbeMeta meta = pc.getAnnotation(ProbeMeta.class);
                     daList.add(meta.discoverAgent());
@@ -218,8 +213,8 @@ public class HostsList extends StarterNode {
             }				
         }
 
+        //We try to load top level starter defined in probes
         logger.debug(jrds.Util.delayedFormatString("External top starters added %s", externalStarters));
-
         for(Class<? extends Starter> starterClass: externalStarters) {
             try {
                 starterClass.newInstance().register(this);

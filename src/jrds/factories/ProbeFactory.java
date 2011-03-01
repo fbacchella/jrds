@@ -73,14 +73,6 @@ public class ProbeFactory {
 		if(probeClass == null) {
 			logger.error("Invalid probe description " + pd.getName() + ", probe class name not found");
 		}
-		String preload = pd.getPreloadClass();
-		if(preload != null && ! "".equals(preload)) {
-			try {
-				preloadedClass.add(probeClass.getClassLoader().loadClass(preload));
-			} catch (ClassNotFoundException e) {
-				logger.error("Preload class " + preload + " for " + pd.getName() + "can 't be loaded");
-			}
-		}
 		Probe<?,?> retValue = null;
 		try {
 			Constructor<? extends Probe<?,?>> c = probeClass.getConstructor();
