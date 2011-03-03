@@ -232,7 +232,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 			header.copyStateTo(rrdDest.getHeader());
 			for (int i = 0; i < dsCount; i++) {
 				Datasource srcDs = rrdSource.getDatasource(i);
-				String dsName = srcDs.getDsName();
+				String dsName = srcDs.getName();
 				Datasource dstDS = rrdDest.getDatasource(dsName);
 				if (dstDS != null ) {
 					try {
@@ -255,7 +255,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 							dstArchive.getSteps() == srcArchive.getSteps() ) {
 						for (int k = 0; k < dsCount; k++) {
 							Datasource srcDs = rrdSource.getDatasource(k);
-							String dsName = srcDs.getDsName();
+							String dsName = srcDs.getName();
 							try {
 								int j = rrdDest.getDsIndex(dsName);
 								if (j >= 0 && ! badDs.contains(dsName)) {
