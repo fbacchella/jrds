@@ -138,6 +138,7 @@ public class DoSnmpProbe  extends CommandStarterImpl {
 		prop.put(OutputKeys.DOCTYPE_PUBLIC, "-//jrds//DTD Probe Description//EN");
 		prop.put(OutputKeys.DOCTYPE_SYSTEM, "urn:jrds:probedesc");
 		prop.put(OutputKeys.INDENT, "yes");
+		prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
 		jrds.Util.serialize(pd.dumpAsXml(), System.out, null, prop);
 		System.out.println();
 	}
