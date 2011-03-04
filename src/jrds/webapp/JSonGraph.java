@@ -1,7 +1,5 @@
 package jrds.webapp;
 
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,10 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jrds.Filter;
 import jrds.GraphDesc;
 import jrds.GraphNode;
-import jrds.GraphTree;
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.Renderer;
