@@ -4,7 +4,6 @@
 	<name>HpPdu</name>
 	<probeName>hppdu-${index}</probeName>
 	<probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
-	<preloadClass>jrds.snmp.MainStarter</preloadClass>
 	<index>.1.3.6.1.4.1.232.165.2.3.1.1.1</index>
 	<uniq>true</uniq>
 	<ds>
