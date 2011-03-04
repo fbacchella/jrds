@@ -3,6 +3,8 @@ package jrds.snmp;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -16,7 +18,7 @@ import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 import jrds.webapp.DiscoverAgent;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.Snmp;
 import org.snmp4j.Target;
@@ -30,8 +32,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class SnmpDiscoverAgent extends DiscoverAgent {
-    static final private Logger logger = Logger.getLogger(SnmpDiscoverAgent.class);
-
     //  private static final OID sysObjectID = new OID("1.3.6.1.2.1.1.2.0");
     //  private static final OID linuxOID = new OID("1.3.6.1.4.1.8072.3.2.10");
     //  private static final OID solarisOID = new OID("1.3.6.1.4.1.8072.3.2.3");
@@ -51,7 +51,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         OID2Probe.put(ip, "IpSnmp");
         OID2Probe.put(udpMIB, "UdpSnmp");
     }
-    
+
     //Works in progress, does nothing now
     //private static final Map<String, String> hides;
     //static {
@@ -93,20 +93,25 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         }
     }
 
+    public SnmpDiscoverAgent() {
+        super("SNMP");
+    }
+
     private Target makeSnmpTarget(HttpServletRequest request) throws UnknownHostException{
         String hostname = request.getParameter("host");
-        String community = request.getParameter("community");
+        String community = request.getParameter("discoverSnmpCommunity");
         if(community == null) {
             community = "public";
         }
-        IpAddress addr = new UdpAddress(InetAddress.getByName(hostname), 161);
+        int port = jrds.Util.parseStringNumber(request.getParameter("discoverSnmpPort"), new Integer(161));
+        IpAddress addr = new UdpAddress(InetAddress.getByName(hostname), port);
         Target hosttarget = new CommunityTarget(addr, new OctetString(community));
         hosttarget.setVersion(SnmpConstants.version2c);
         return hosttarget;
     }
 
     @Override
-    public void discover(String hostname, Document hostDom,
+    public void discover(String hostname, Element hostEleme,
             Collection<JrdsNode> probdescs, HttpServletRequest request) {
         Target hosttarget;
         try {
@@ -115,9 +120,10 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
             throw new RuntimeException("Host name unknown",e);
         }
 
+        Document hostDom = hostEleme.getOwnerDocument();
         boolean withOid = false;
-        String withOidStr = request.getParameter("withoid");
-        if(withOidStr != null)
+        String withOidStr = request.getParameter("discoverWithOid");
+        if(withOidStr != null && "true".equals(withOidStr.toLowerCase()))
             withOid = true;
 
         LocalSnmpStarter active = new LocalSnmpStarter();
@@ -131,53 +137,49 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         }
         snmpElem.setAttribute("version", Integer.toString( 1 + hosttarget.getVersion()));
 
-        Element hostEleme = hostDom.getDocumentElement();
-
         hostEleme.appendChild(snmpElem);
 
         for(JrdsNode e: probdescs) {
             String name = e.evaluate(CompiledXPath.get("/probedesc/name"));
             String index = e.evaluate(CompiledXPath.get("/probedesc/index"));
             String doesExistOid = e.evaluate(CompiledXPath.get("/probedesc/specific[@name='existOid']"));
-//          if(logger.isTraceEnabled()) {
-//              String className = e.evaluate(CompiledXPath.get("/probedesc/probeClass"));
-//              String classFileName = '/' + className.replace('.', '/') + ".class";
-//              URL url = this.getPropertiesManager().extensionClassLoader.getResource(classFileName);
-//              logger.trace("Probe " + classFileName + " class found in " + url);
-//          }
+            //          if(logger.isTraceEnabled()) {
+            //              String className = e.evaluate(CompiledXPath.get("/probedesc/probeClass"));
+            //              String classFileName = '/' + className.replace('.', '/') + ".class";
+            //              URL url = this.getPropertiesManager().extensionClassLoader.getResource(classFileName);
+            //              logger.trace("Probe " + classFileName + " class found in " + url);
+            //          }
 
             try {
                 if(index != null && ! "".equals(index) ) {
-                    logger.trace(jrds.Util.delayedFormatString("Found probe %s with index %s", name, index));
+                    log(Level.TRACE, "Found probe %s with index %s", name, index);
                     String labelOid = e.evaluate(CompiledXPath.get("/probedesc/specific[@name='labelOid']"));
-                    logger.trace(jrds.Util.delayedFormatString("label OID for %s: %s", name, labelOid));
+                    log(Level.TRACE, "label OID for %s: %s", name, labelOid);
                     try {
                         enumerateIndexed(hostEleme, active, name, index, labelOid, withOid);
                     } catch (Exception e1) {
-                        logger.error("Error discoverer " + name + " for index " + index + ": " +e1);
+                        log(Level.ERROR, e1, "Error discoverer %s for index %s: %s", name, index, e1);
                     }
                 }
                 else if(! "".equals(doesExistOid)) {
                     doesExist(hostEleme, active, name, doesExistOid);
                 }
             } catch (Exception e1) {
-                logger.error("Error detecting " + name + ": " +e1);
+                log(Level.ERROR, e1, "Error detecting %s: %s" , name, e1);
             }
         }
         active.doStop();
 
         //walksysORID(hostEleme, active);
-        
+
     }
     private void doesExist(Element hostEleme, SnmpStarter active, String name, String doesExistOid) throws IOException {
         OID OidExist = new OID(doesExistOid);
         String label = getLabel(active, Collections.singletonList(OidExist));
         if(label != null) {
-            Element rrdElem = hostEleme.getOwnerDocument().createElement("probe");
-            rrdElem.setAttribute("type", name);
-            hostEleme.appendChild(rrdElem);         
+            addProbe(hostEleme, name, null, null);
         }
-        logger.trace(name + " does exist: " + label);
+        log(Level.TRACE, "%s does exist: %s", name, label);
     }
 
     private String getLabel(SnmpStarter active, List<OID> labelsOID) throws IOException {
@@ -191,28 +193,26 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
     }
 
     private void enumerateIndexed(Element hostEleme, SnmpStarter active, String name, String indexOid, String labelOid, boolean withOid ) throws IOException {
-        logger.trace("Will enumerate " + indexOid);
+        log(Level.TRACE, "Will enumerate %s", indexOid);
         Set<OID> oidsSet = Collections.singleton(new OID(indexOid));
         Map<OID, Object> indexes= (Map<OID, Object>) SnmpRequester.TREE.doSnmpGet(active, oidsSet);
-        logger.trace("Elements :"  + indexes);
+        log(Level.TRACE, "Elements : %s", indexes);
         for(Map.Entry<OID, Object> e: indexes.entrySet()) {
             OID indexoid = e.getKey();
-            String indexfName = e.getValue().toString();
+            String indexName = e.getValue().toString();
             int index = indexoid.last();
-            Element rrdElem = hostEleme.getOwnerDocument().createElement("probe");
-            rrdElem.setAttribute("type", name);
-            Element arg1 = hostEleme.getOwnerDocument().createElement("arg");
-            arg1.setAttribute("type", "String");
-            arg1.setAttribute("value", indexfName.toString());
-            rrdElem.appendChild(arg1);
+            List<String> argsTypes = new ArrayList<String>(1);
+            argsTypes.add("String");
+            List<String> argsValues = new ArrayList<String>(1);
+            argsValues.add(indexName);
 
             if(withOid) {
-                Element arg2 = hostEleme.getOwnerDocument().createElement("arg");
-                arg2.setAttribute("type", "OID");
-                arg2.setAttribute("value", Integer.toString(index));
-                rrdElem.appendChild(arg2);
+                argsTypes.add("OID");
+                argsValues.add(Integer.toString(index));
             }
+            Element rrdElem = addProbe(hostEleme, name, argsTypes, argsValues);
 
+            //We try to auto-generate the label
             if (labelOid != null && ! "".equals(labelOid)) {
                 for(String lookin: labelOid.split(",")) {
                     OID Oidlabel = new OID(lookin.trim() + "." + index);
@@ -223,17 +223,15 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
                     }
                 }
             }
-            hostEleme.appendChild(rrdElem);
         }
     }
 
     @SuppressWarnings("unused")
     private void walksysORID(Element hostEleme, SnmpStarter active) throws IOException {
-        logger.trace("Will enumerate " + sysORID);
+        log(Level.TRACE, "Will enumerate " + sysORID);
         Set<OID> oidsSet = Collections.singleton(new OID(sysORID));
         Map<OID, Object> indexes= (Map<OID, Object>) SnmpRequester.TREE.doSnmpGet(active, oidsSet);
-        if(logger.isTraceEnabled())
-            logger.trace("Elements :"  + indexes);
+        log(Level.TRACE, "Elements: %s", indexes);
         for(Object value: indexes.values()) {
             if(value instanceof OID) {
                 String probe = OID2Probe.get(value);
@@ -247,6 +245,26 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
 
     }
 
+    @Override
+    public List<FieldInfo> getFields() {
+        FieldInfo community = new FieldInfo();
+        community.dojoType = DojoType.TextBox;
+        community.id = "discoverSnmpCommunity";
+        community.label = "SNMP community";
+
+        FieldInfo port = new FieldInfo();
+        port.dojoType = DojoType.TextBox;
+        port.id = "discoverSnmpPort";
+        port.label = "SNMP Port";
+
+        FieldInfo keepOID = new FieldInfo();
+        keepOID.dojoType = DojoType.ToggleButton;
+        keepOID.id = "discoverWithOid";
+        keepOID.label = " Keep index OID ";
+
+
+        return Arrays.asList(community, port, keepOID);
+    }
 
     //  private String operatingSystem(SnmpStarter active) throws IOException {
     //      Map<OID, Object> osType = SnmpRequester.RAW.doSnmpGet(active, Collections.singletonList(sysObjectID));

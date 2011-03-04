@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,21 +20,25 @@ import jrds.factories.xml.JrdsNode;
 import jrds.probe.IndexedProbe;
 import jrds.webapp.DiscoverAgent;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class MuninDiscoverAgent extends DiscoverAgent {
-    static final private Logger logger = Logger.getLogger(MuninDiscoverAgent.class);
+    public MuninDiscoverAgent() {
+        super("Munin");
+    }
 
     @Override
-    public void discover(String hostName, Document hostDom, Collection<JrdsNode> probdescs, HttpServletRequest request) {
+    public void discover(String hostName, Element hostElement, Collection<JrdsNode> probdescs, HttpServletRequest request) {
         try {
+            Document hostDom = hostElement.getOwnerDocument();
+            int port = jrds.Util.parseStringNumber(request.getParameter("discoverMuninPort"), new Integer(4949));
             Socket muninSocket = null;
             try {
-                muninSocket = new Socket(hostName, 4949);
+                muninSocket = new Socket(hostName, port);
             } catch (IOException e) {
-                logger.info("Munin not running on " + hostName);
+                log(Level.INFO, "Munin not running on %s", hostName);
                 return;
             }
             muninSocket.setTcpNoDelay(true);
@@ -47,12 +53,10 @@ public class MuninDiscoverAgent extends DiscoverAgent {
             Set<String> muninProbes = new HashSet<String>();
             for(String p: in.readLine().split(" ")) {
                 muninProbes.add(p);
-                if(p.lastIndexOf("_")>0 )
-                    muninProbes.add(p.substring(0, p.lastIndexOf("_") +1 ));
-                logger.trace("Munin probe found :" + p);
+                log(Level.TRACE, "Munin probe found : %s", p);
             }
-
-            logger.trace(muninProbes);
+            
+            log(Level.DEBUG, "Munin probes found: %s", muninProbes);
 
             Element cnxElement = hostDom.createElement("connection");
             cnxElement.setAttribute("type", "jrds.probe.munin.MuninConnection");
@@ -64,25 +68,36 @@ public class MuninDiscoverAgent extends DiscoverAgent {
                 String probe = e.evaluate(CompiledXPath.get("/probedesc/name"));
                 String probeClass = e.evaluate(CompiledXPath.get("/probedesc/probeClass"));
                 Class<?> c = cl.loadClass(probeClass);
-                String fetch = e.evaluate(CompiledXPath.get("/probedesc/specific[@name='fetch']"));
-                if(fetch != null && ! "".equals(fetch) &&  muninClass.isAssignableFrom(c)) {
-                    if( muninProbes.contains(fetch) ) {
-                        Element rrdElem = hostDom.createElement("probe");
-                        rrdElem.setAttribute("type", probe);
-                        hostDom.getDocumentElement().appendChild(rrdElem);
-                        muninProbes.remove(fetch);
-                        
+                String fetchValue = e.evaluate(CompiledXPath.get("/probedesc/specific[@name='fetch']"));
+                if(fetchValue != null && ! "".equals(fetchValue) &&  muninClass.isAssignableFrom(c)) {
+                    if( muninProbes.contains(fetchValue) ) {
+                        muninProbes.remove(fetchValue);
+                        addProbe(hostElement, probe, null, null);
                     }
                     else if(IndexedProbe.class.isAssignableFrom(c)) {
-                        Pattern indexedFetch = Pattern.compile(fetch + "_(.*)");
+                        Pattern indexedFetch = Pattern.compile(fetchValue.replace("${index}", "(.+)"));
+                        for(String mp: muninProbes) {
+                            Matcher m = indexedFetch.matcher(mp);
+                            if(m.matches()) {
+                                String index = m.group(1);
+                                log(Level.TRACE, "index found: %s for probe %s, with pattern %s and munin probe %s", index, probe, indexedFetch.pattern(), mp);
+                                addProbe(hostElement, probe, Collections.singletonList("String"), Collections.singletonList(index));
+                            }
+                        }
                     }
                 }
             }
         } catch (Exception e) {
-            logger.error("Generation Failed: ",e);
+            log(Level.ERROR, e, "Generation Failed: ",e);
         }
-
-
     }
-
+    
+    @Override
+    public List<FieldInfo> getFields() {
+        FieldInfo fi = new FieldInfo();
+        fi.dojoType = DojoType.TextBox;
+        fi.id = "discoverMuninPort";
+        fi.label = " Munin listening port";
+        return Collections.singletonList(fi);
+    }
 }
