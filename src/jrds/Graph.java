@@ -19,7 +19,8 @@ public class Graph implements WithACL {
 	static final private SimpleDateFormat lastUpdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 	static private final SimpleDateFormat exportDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-	private GraphNode node;
+	private final GraphNode node;
+    private final RrdGraphDef graphDef;
 	private Date start;
 	private Date end;
 	private double max = Double.NaN;
@@ -27,13 +28,14 @@ public class Graph implements WithACL {
 	private ACL acl = ACL.ALLOWEDACL;
 
 	public Graph(GraphNode node) {
-		super();
 		this.node = node;
+		graphDef = node.getEmptyGraphDef();
 		addACL(node.getACL());
 	}
 
 	public Graph(GraphNode node, Date begin, Date start) {
 		this.node = node;
+        graphDef = node.getEmptyGraphDef();
 		addACL(node.getACL());
 		setStart(start);
 		setEnd(end);
@@ -100,8 +102,6 @@ public class Graph implements WithACL {
 	 */
 	private RrdGraphDef graphFormat(RrdGraphDef graphDef) {
 		Date lastUpdate = node.getProbe().getLastUpdate();
-		graphDef.setAntiAliasing(true);
-		graphDef.setTextAntiAliasing(true);
 		graphDef.setTitle(node.getGraphTitle());
 		graphDef.comment("\\l");
 		graphDef.comment("\\l");
@@ -118,12 +118,58 @@ public class Graph implements WithACL {
 		graphDef.setFilename("-");
 		return graphDef;		
 	}
+	
+	private void fillGraphDef() {
+	    GraphDesc gd = node.getGraphDesc();
+        try {
+            long startsec = start.getTime()/1000;
+            long endsec = Util.endDate(node.getProbe(), end).getTime()/1000;
+            graphDef.setStartTime(startsec);
+            graphDef.setEndTime(endsec);
 
-	public RrdGraphDef getRrdGraphDef() throws IOException {
-		return node.getRrdGraphDef();
+            ProxyPlottableMap customData = node.getCustomData();
+            if(customData != null) {
+                long step = Math.max((endsec - startsec) / gd.getWidth(), 1);
+                customData.configure(startsec, endsec, step);
+            }
+            gd.fillGraphDef(graphDef, node.getProbe(), customData);
+        } catch (IllegalArgumentException e) {
+            logger.error("Impossible to create graph definition, invalid date definition from " + start + " to " + end + " : " + e);
+        }
+	}
+	
+	private void finishGraphDef() {
+        if( ! Double.isNaN(max) && ! Double.isNaN(min) ) {
+            graphDef.setMaxValue(max);
+            graphDef.setMinValue(min);
+            graphDef.setRigid(true);
+        }
+        Date lastUpdate = node.getProbe().getLastUpdate();
+        graphDef.comment("\\l");
+        graphDef.comment("\\l");
+        graphDef.comment("Last update: " + 
+                lastUpdateFormat.format(lastUpdate) + "\\L");
+        String unit = "SI";
+        if(! node.getGraphDesc().isSiUnit()) 
+            unit = "binary";
+        graphDef.comment("Unit type: " + unit + "\\r");
+        graphDef.comment("Period from " + lastUpdateFormat.format(start) +
+                " to " + lastUpdateFormat.format(end) + "\\L");
+        graphDef.comment("Source type: " + node.getProbe().getSourceType() + "\\r");
+        graphDef.setFilename("-");
+	}
+	
+	public RrdGraph getRrdGraph() throws IOException {
+	    fillGraphDef();
+	    finishGraphDef();
+	    return new RrdGraph(graphDef);
 	}
 
-	public RrdGraph getRrdGraph() throws
+	public RrdGraphDef getRrdGraphDef() throws IOException {
+		return graphDef;
+	}
+
+	public RrdGraph oldgetRrdGraph() throws
 	IOException {
 		GraphDesc gd = node.getGraphDesc();
 		RrdGraphDef tempGraphDef = getRrdGraphDef();

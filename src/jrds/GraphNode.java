@@ -128,13 +128,24 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
 		return gd;
 	}
 	
-	public RrdGraphDef getRrdGraphDef() throws IOException {
-		return getGraphDesc().getGraphDef(getProbe(), customData);
-	}
+    /**
+     * Provide a RrdGraphDef with template resolved for the node
+     * @return a RrdGraphDef with some default values
+     * @throws IOException
+     */
+    public RrdGraphDef getEmptyGraphDef() {
+        RrdGraphDef retValue = getGraphDesc().getEmptyGraphDef();
+        retValue.setTitle(getGraphTitle());
+        return retValue;
+    }
 
-	public RrdGraphDef getRrdGraphDef(Map<String, Plottable> ownData) throws IOException {
-		return getGraphDesc().getGraphDef(getProbe(), ownData);
-	}
+//    public RrdGraphDef getRrdGraphDef() throws IOException {
+//		return getGraphDesc().getGraphDef(getProbe(), customData);
+//	}
+//
+//	public RrdGraphDef getRrdGraphDef(Map<String, Plottable> ownData) throws IOException {
+//		return getGraphDesc().getGraphDef(getProbe(), ownData);
+//	}
 
 	public Graph getGraph() {
 		return new Graph(this);

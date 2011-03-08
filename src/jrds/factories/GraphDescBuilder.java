@@ -88,6 +88,9 @@ public class GraphDescBuilder extends ObjectBuilder {
 			String addrpn = elements.get("rpn");
 			String consFunc = elements.get("cf");
 			String reversed = elements.get("reversed");	
+            String percentile = elements.get("percentile"); 
+            if(elements.containsKey("percentile") && "".equals(percentile))
+                percentile="95";
 			String host = null;
 			String probe = null;
 			String dsName = null;
@@ -99,7 +102,7 @@ public class GraphDescBuilder extends ObjectBuilder {
 			else 
 				dsName = elements.get("dsName");
 
-			gd.add(addName, addrpn, addgraphType, addColor, addLegend, consFunc, reversed, host, probe, dsName);
+			gd.add(addName, addrpn, addgraphType, addColor, addLegend, consFunc, reversed, percentile, host, probe, dsName);
 		}
 
 		JrdsNode.FilterNode<Object> viewFilter = new JrdsNode.FilterNode<Object>() {
