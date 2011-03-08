@@ -148,6 +148,17 @@ function initIndex() {
 		var tempMainPane = dojo.byId('mainPane');
 		mainPane = dojo.clone(tempMainPane);
 		dojo.destroy(tempMainPane);
+
+		dojo.xhrGet( {
+			url: 'discoverhtml',
+			handleAs: "text",
+			sync: true,
+			load: function(response, ioArgs) {
+				var discoverAutoBlock = dojo.byId('discoverAutoBlock');
+				dojo.place(response, discoverAutoBlock, 'replace');
+			}
+		})
+
 		//The parse can be done
 		dojo.parser.parse();
 
@@ -854,15 +865,17 @@ function discoverHost(evt) {
 	try {
 		var queryArgs = { };
 		
-		queryArgs.host = this.attr('value').discoverHostName;
-		queryArgs.community = this.attr('value').discoverSnmpCommunity;
-		queryArgs.discoverSnmpPort = this.attr('value').discoverSnmpPort;
-		if(dijit.byId("discoverWithOid").attr('checked')) {
-			queryArgs.withoid = 1;
+		for(key in this.attr('value')) {
+			if(dijit.byId(key).attr('checked') == undefined)
+				queryArgs[key] = this.attr('value')[key];
+			else
+				queryArgs[key] = dijit.byId(key).attr('checked');
 		}
-			
+		queryArgs.host = this.attr('value').discoverHostName;
+
 		dojo.xhrGet( {
 			url: "discover?" + dojo.objectToQuery(queryArgs),
+			//url: "discover?" + dojo.objectToQuery(this.attr('value')),
 			handleAs: "text",
 			load: function(response, ioArgs) {
 				var codeTag = dojo.byId('discoverResponse');
@@ -891,13 +904,14 @@ function doUpload(){
 function setAdminTab() {
 	refreshStatus();
 	
-	//Setup the discoverer
-	var form = dojo.byId('discoverForm');
-	form.discoverHostName.value = '';
-	form.discoverSnmpCommunity.value = 'public';
-	form.discoverSnmpPort.value = '161';
-	dojo.style( dojo.byId('discoverResponse'), 'display', 'none');
 	
+			//Setup the discoverer
+			var form = dojo.byId('discoverForm');
+			form.discoverHostName.value = '';
+			form.discoverSnmpCommunity.value = 'public';
+			form.discoverSnmpPort.value = '161';
+			dojo.style( dojo.byId('discoverResponse'), 'display', 'none');
+
 	//Set up the uploader
 	var uploader = dijit.byId('filesSelect');
 	if(! uploader) {

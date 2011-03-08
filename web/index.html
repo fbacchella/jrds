@@ -37,14 +37,8 @@ initIndex();
 							<label for="discoverHostName">Host name</label>
 							<input dojoType="dijit.form.TextBox" trim="true" id="discoverHostName" name="discoverHostName"></input>
 						</div>
-						<div>
-						<label for "discoverSnmpCommunity">SNMP community</label>
-						<input dojoType="dijit.form.TextBox" trim="true" id="discoverSnmpCommunity" name="discoverSnmpCommunity"></input>
-						<label for="discoverSnmpPort">SNMP Port</label>
-						<input dojoType="dijit.form.TextBox" trim="true" id="discoverSnmpPort" name="discoverSnmpPort"></input>
-       					<button id="discoverWithOid" dojoType="dijit.form.ToggleButton"  name="discoverWithOid"
-  									iconClass="dijitCheckBoxIcon"> Keep index OID </button>
-  						</div>
+<div id="discoverAutoBlock">
+</div>
  					</form>
  					<pre id="discoverResponse"></pre>
 				</div>
