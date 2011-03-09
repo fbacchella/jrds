@@ -787,8 +787,6 @@ implements Cloneable, WithACL {
                     new DsDesc(name, dsName, rpn, GraphType.NONE, null, null, cf, host, probe));
             allds.add(
                     new DsDesc("rev_" + name, revRpn, graphType, color, null));
-            //            allds.add(
-            //                    new DsDesc("legend_" + name, dsName, rpn, null, GraphType.LEGEND, null, legend, cf, host, probe));
             allds.add(new DsDesc(name, GraphType.LEGEND, legend));
         }
         else {
