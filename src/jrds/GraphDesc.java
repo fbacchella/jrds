@@ -962,7 +962,7 @@ implements Cloneable, WithACL {
             int missingLength = Math.min(maxLengthLegend - legend.length(), manySpace.length()) + 2;
             if(missingLength > 0)
                 def.comment(manySpace.substring(0, missingLength));
-            def.gprint(ds, ConsolFun.LAST, "%6.2f%s");
+            def.gprint(ds, ConsolFun.MAX, "%6.2f%s");
             def.comment("\\l");
         }
         else if(gt == GraphType.COMMENT) {
