@@ -47,7 +47,6 @@ implements Cloneable, WithACL {
 
     public enum GraphType {
         NONE  {
-            public void draw(RrdGraphDef rgd, String sn, Color color) {}
             public String toString() {
                 return "none";
             }
@@ -61,13 +60,26 @@ implements Cloneable, WithACL {
                 return false;
             }
         },
-        LEGEND {
-            public void draw(RrdGraphDef rgd, String sn, Color color) {}
+        PERCENTILE  {
             public String toString() {
-                return "void";
+                return "percentile";
             }
             public boolean datasource() {
                 return true;
+            }
+            public boolean toPlot() {
+                return false;
+            }
+            public boolean legend() {
+                return false;
+            }
+        },
+        LEGEND {
+            public String toString() {
+                return "legend";
+            }
+            public boolean datasource() {
+                return false;
             }
             public boolean toPlot() {
                 return false;
@@ -77,13 +89,12 @@ implements Cloneable, WithACL {
             }
         },
         PERCENTILELEGEND {
-            public void draw(RrdGraphDef rgd, String sn, Color color) {};
             @Override
             public String toString() {
                 return "percentile legend";
             };
             public boolean datasource() {
-                return true;
+                return false;
             }
             public boolean toPlot() {
                 return false;
@@ -93,7 +104,6 @@ implements Cloneable, WithACL {
             };
         },
         COMMENT {
-            public void draw(RrdGraphDef rgd, String sn, Color color) {};
             public String toString() {
                 return "comment";
             }
@@ -162,9 +172,19 @@ implements Cloneable, WithACL {
             };
         };
 
-        public abstract void draw(RrdGraphDef rgd, String sn, Color color);
+        public void draw(RrdGraphDef rgd, String sn, Color color) {};
+
+        /**
+         * To check if it will generate a plot, for color calculation
+         * @return
+         */
         public abstract boolean toPlot();
         public abstract boolean datasource();
+
+        /**
+         * To check if it will generate a line in the legend block
+         * @return
+         */
         public abstract boolean legend();
     };
 
@@ -486,27 +506,26 @@ implements Cloneable, WithACL {
     };
 
     static private final class DsDesc {
-        public String name;
-        public String dsName;
-        public String rpn;
+        public final String name;
+        public String dsName = null;
+        public String rpn = null;
         public GraphType graphType;
         public Color color;
-        public String legend;
-        public ConsolFun cf;
-        public Integer percentile;
+        public String legend = null;
+        public ConsolFun cf = null;
+        public Integer percentile = null;
         public class DsPath  {
             String host;
             String probe;
         };
         public DsPath dspath = null;
-        public DsDesc(String name, String dsName,
-                String rpn, Integer percentile,
+        public DsDesc(String name, String dsName, String rpn,
                 GraphType graphType, Color color, String legend,
                 ConsolFun cf, String host, String probe) {
             this.name = name;
             this.dsName = dsName;
             this.rpn = rpn;
-            this.percentile = percentile;
+            this.percentile = null;
             this.graphType = graphType;
             this.color = color;
             this.legend = legend;
@@ -516,6 +535,37 @@ implements Cloneable, WithACL {
                 dspath.host = host;
                 dspath.probe = probe;
             }
+        }
+        public DsDesc(String name, String rpn,
+                GraphType graphType, Color color, String legend) {
+            this.name = name;
+            this.rpn = rpn;
+            this.graphType = graphType;
+            this.color = color;
+            this.legend = legend;
+        }
+        public DsDesc(String name, String dsName, String rpn,
+                GraphType graphType, Color color) {
+            this.name = name;
+            this.dsName = dsName;
+            this.rpn = rpn;
+            this.graphType = graphType;
+            this.color = color;
+        }
+        public DsDesc(String name, String dsName,
+                Integer percentile,
+                GraphType graphType, Color color) {
+            this.name = name;
+            this.dsName = dsName;
+            this.percentile = percentile;
+            this.graphType = graphType;
+            this.color = color;
+        }
+        public DsDesc(String dsName, GraphType graphType, String legend) {
+            this.name = dsName;
+            this.dsName = dsName;
+            this.graphType = graphType;
+            this.legend = legend;
         }
         public String toString() {
             return "DsDesc(" + name + "," + dsName + ",\"" + rpn + "\"," + graphType + "," + color + ",\"" + legend + "\"," + cf + ")";
@@ -707,7 +757,7 @@ implements Cloneable, WithACL {
         //If the name is missing, where do we find it ?
         else {
             if(rpn != null)
-                name = rpn;
+                name = Integer.toHexString(rpn.hashCode());
             else if(legend != null) {
                 name = legend;
             }
@@ -731,33 +781,38 @@ implements Cloneable, WithACL {
             ConsolFun cf, boolean reversed, Integer percentile,
             //The path to an external datastore
             String host, String probe) {
-        String finalName = name;
         if(reversed) {
-            allds.add(
-                    new DsDesc(name, dsName, rpn, null, GraphType.NONE, null, legend, cf, host, probe));
             String revRpn = "0, " + name + ", -";
-            finalName = "rev_" + name;
             allds.add(
-                    new DsDesc(finalName, finalName, revRpn, null, graphType, color, null, cf, host, probe));
-            String legendName = "legend_" + name;
+                    new DsDesc(name, dsName, rpn, GraphType.NONE, null, null, cf, host, probe));
             allds.add(
-                    new DsDesc(legendName, dsName, rpn, null, GraphType.LEGEND, null, legend, cf, host, probe));
-            if(percentile != null) {
-                allds.add(
-                        new DsDesc("percentile" + percentile + "_" + name, finalName, null, percentile, GraphType.LINE, color.darker(), null, ConsolFun.MAX, host, probe));
-                allds.add(
-                        new DsDesc("percentile" + percentile + "_" + legendName, name, null, percentile, GraphType.PERCENTILELEGEND, null, percentile + "th percentile", ConsolFun.MAX, host, probe));
-            }
+                    new DsDesc("rev_" + name, revRpn, graphType, color, null));
+            //            allds.add(
+            //                    new DsDesc("legend_" + name, dsName, rpn, null, GraphType.LEGEND, null, legend, cf, host, probe));
+            allds.add(new DsDesc(name, GraphType.LEGEND, legend));
         }
         else {
             allds.add(
-                    new DsDesc(name, dsName, rpn, null, graphType, color, legend, cf, host, probe));
-            if(percentile != null) {
+                    new DsDesc(name, dsName, rpn, graphType, color, legend, cf, host, probe));
+        }
+        if(percentile != null) {
+            String percentileName = "percentile" + percentile + "_" + name;
+            String percentileLegend = percentile + "th percentile";
+            Color percentilColor = color.darker();
+            if(!reversed) {
                 allds.add(
-                        new DsDesc("percentile" + percentile + "_" + name, name, null, percentile, GraphType.LINE, color.darker(), null, ConsolFun.MAX, host, probe));
-                allds.add(
-                        new DsDesc("percentile" + percentile + "_legend_" +  name, name, null, percentile, GraphType.PERCENTILELEGEND, null, percentile + "th percentile", ConsolFun.MAX, host, probe));
+                        new DsDesc(percentileName, name, percentile, GraphType.LINE, percentilColor));
             }
+            else {
+                String revPercentilRpn = "0, " + percentileName + ", -";
+                allds.add(
+                        new DsDesc(percentileName, name, percentile, GraphType.NONE, null));
+                allds.add(
+                        new DsDesc("rev_" + percentileName, revPercentilRpn, GraphType.LINE, percentilColor, null));
+
+            }
+            allds.add(new DsDesc(percentileName, GraphType.PERCENTILELEGEND, percentileLegend));
+            maxLengthLegend = Math.max(maxLengthLegend, percentileLegend.length());
         }
         if(legend != null) {
             maxLengthLegend = Math.max(maxLengthLegend, legend.length());
@@ -814,26 +869,40 @@ implements Cloneable, WithACL {
         Set<String> datasources = new HashSet<String>();
 
         for(DsDesc ds: allds) {
-            String rrdName = defRrdName;
-            Probe<?,?> probe = defProbe;
-            if(ds.dspath != null) {
-                if(logger.isTraceEnabled())
-                    logger.trace("External probe path: " + ds.dspath.host + "/" + ds.dspath.probe + "/" + ds.dsName);
-                probe = hl.getProbeByPath(ds.dspath.host, ds.dspath.probe);
-                if(probe == null) {
-                    logger.error("Invalide probe: " + ds.dspath.host + "/" + ds.dspath.probe);
-                    continue;
-                }
-                else 
-                    rrdName = probe.getRrdName();
-            }
             boolean complete = false;
-            if(ds.percentile != null) {
+            // not a data source, don't try to add it in datasources
+            if(! ds.graphType.datasource()) {
                 complete = true;
+            }
+            else if(ds.percentile != null) {
                 graphDef.percentile(ds.name, ds.dsName, ds.percentile);
                 datasources.add(ds.name);
+                complete = true;
             }
-            else if (ds.graphType.datasource() && ds.rpn == null) {
+            //A rpn datasource
+            else if (ds.rpn != null) {
+                complete = true;
+                if(! datasources.contains(ds.name)) {
+                    graphDef.datasource(ds.name, ds.rpn);
+                    datasources.add(ds.name);
+                }
+            }
+            else {
+                //First check where data will comme from
+                Probe<?,?> probe = defProbe;
+                String rrdName = defRrdName;
+                if(ds.dspath != null) {
+                    if(logger.isTraceEnabled())
+                        logger.trace("External probe path: " + ds.dspath.host + "/" + ds.dspath.probe + "/" + ds.dsName);
+                    probe = hl.getProbeByPath(ds.dspath.host, ds.dspath.probe);
+                    if(probe == null) {
+                        logger.error("Invalide probe: " + ds.dspath.host + "/" + ds.dspath.probe);
+                        continue;
+                    }
+                    else
+                        rrdName = probe.getRrdName();
+                }
+
                 // Used to check if the data source is provided one way or another
                 //Does the datas existe in the provided values
                 if(customData != null && customData.containsKey(ds.dsName)) {
@@ -851,18 +920,9 @@ implements Cloneable, WithACL {
                         datasources.add(ds.name);
                     }
                 }
-            }
-            //A rpn datasource
-            else if (ds.graphType.datasource()) {
-                complete = true;
-                if(! datasources.contains(ds.name)) {
-                    graphDef.datasource(ds.name, ds.rpn);
-                    datasources.add(ds.name);
+                else {
+                    logger.error("Incoherent definition for " + ds.name + " in " + name + " found: " + ds);
                 }
-            }
-            //No data source, so it's complete
-            else {
-                complete = true;
             }
             if (complete) {
                 toDo.add(ds);
