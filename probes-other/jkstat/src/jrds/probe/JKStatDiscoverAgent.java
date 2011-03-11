@@ -20,7 +20,6 @@ import uk.co.petertribble.jkstat.api.Kstat;
 import uk.co.petertribble.jkstat.client.RemoteJKstat;
 
 public class JKStatDiscoverAgent extends DiscoverAgent {
-    static final int DEFAULTPORT = 3000;
 
     public JKStatDiscoverAgent() {
         super("JKStat");
@@ -29,7 +28,7 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
     @Override
     public void discover(String hostname, Element hostElement,
             Collection<JrdsNode> probdescs, HttpServletRequest request) {
-        int port = jrds.Util.parseStringNumber(request.getParameter("discoverJKStatPort"), new Integer(DEFAULTPORT));
+        int port = jrds.Util.parseStringNumber(request.getParameter("discoverJKStatPort"), new Integer(KstatConnection.DEFAULTPORT));
         try {
             String hostName = hostname;
             URL remoteUrl = new URL("http", hostName, port, "/");
@@ -37,7 +36,7 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
             List<String> argsTypes = Collections.emptyList();
             List<String> argsValues = Collections.emptyList();
 
-            if(port != DEFAULTPORT) {
+            if(port != KstatConnection.DEFAULTPORT) {
                 argsTypes = Collections.singletonList("Integer");
                 argsValues = Collections.singletonList(Integer.toString(port).toString());
             }
