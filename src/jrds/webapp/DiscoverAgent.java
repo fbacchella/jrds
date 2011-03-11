@@ -87,18 +87,30 @@ public abstract class DiscoverAgent {
         Document hostDoc = hostElem.getOwnerDocument();
         Element rrdElem = hostDoc.createElement("probe");
         rrdElem.setAttribute("type", probe);
+        hostElem.appendChild(rrdElem);
+        addArgsList(hostDoc, rrdElem, argsTypes, argsValues);
+        return rrdElem;
+    }
+    
+    protected Element addConnexion(Element hostElem, String connexionClass, List<String> argsTypes, List<String> argsValues) {
+        Document hostDoc = hostElem.getOwnerDocument();
+        Element cnxElement = hostDoc.createElement("connection");
+        cnxElement.setAttribute("type", connexionClass);
+        hostDoc.getDocumentElement().appendChild(cnxElement);
+        addArgsList(hostDoc, cnxElement, argsTypes, argsValues);
+        return cnxElement;
+    }
+    
+    private void addArgsList(Document hostDoc, Element e, List<String> argsTypes, List<String> argsValues) {
         if(argsTypes != null && argsTypes.size() > 0 && argsTypes.size() == argsValues.size()) {
             for(int i=0; i < argsTypes.size(); i++) {
                 Element arg = hostDoc.createElement("arg");
                 arg.setAttribute("type", argsTypes.get(i));
                 arg.setAttribute("value", argsValues.get(i));
-                rrdElem.appendChild(arg);
+                e.appendChild(arg);
             }
         }
-        hostElem.appendChild(rrdElem);
-        return rrdElem;
     }
-
 
     protected void log(Level l, Throwable e, String format, Object... elements) {
         jrds.Util.log(this, namedLogger, l, e, format, elements);

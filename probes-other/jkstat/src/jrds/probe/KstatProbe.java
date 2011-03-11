@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import jrds.factories.ProbeMeta;
 import uk.co.petertribble.jkstat.api.JKstat;
 import uk.co.petertribble.jkstat.api.Kstat;
 
+@ProbeMeta(discoverAgent = JKStatDiscoverAgent.class)
 public class KstatProbe extends jrds.ProbeConnected<String, Number, KstatConnection> {
 
     private String module;
