@@ -33,6 +33,9 @@
 		<fileset dir="libtest">
 			<include name="*.jar"/>
 		</fileset>
+		<fileset dir="libprobes">
+			<include name="*.jar"/>
+		</fileset>
 	</path>
 
 	<!-- ==================== Run Classpath =========================== -->
@@ -59,12 +62,6 @@
 			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
 			<classpath refid="external.classpath"/>
 		</javac>
-<!--		<copy todir="${build.home}/classes">
-			<fileset dir="${src.home}">
-				<include name="**/*.xml"/>
-				<include name="**/*.xsl"/>
-			</fileset>
-		</copy>-->
 	</target>
 
 	<target name="compile.test" depends="compile">
@@ -80,7 +77,7 @@
 	<target name="munin" depends="compile" description="">
 	      <antcall target="compile.subprobes">
 	            <param name="subprobe" value="munin"/>
-            	<param name="subprobe.dir" value="probes-other"/>
+            	<param name="subprobe.dir" value="probes-other/munin"/>
 	       </antcall>
 	</target>
 
@@ -88,7 +85,7 @@
 	<target name="rstat" depends="compile" description="To use rstat, needs oncprc.jar from http://remotetea.sourceforge.net/">
 	      <antcall target="compile.subprobes">
 	            <param name="subprobe" value="rstat"/>
-        		<param name="subprobe.dir" value="probes-other"/>
+        		<param name="subprobe.dir" value="probes-other/rstat"/>
 	       </antcall>
 	</target>
 	
@@ -100,20 +97,20 @@
 		 jkstat.jar -->
 	<target name="jkstat" depends="compile" description="To use jkstat, one needs JKstat from http://www.petertribble.co.uk/Solaris/jkstat-0.29.tar.gz">
 	      <antcall target="compile.subprobes">
-	            <param name="subprobe" value="jkstat"/>
-    			<param name="subprobe.dir" value="probes-other"/>
+	            <param name="subprobe" value="jrdsjkstat"/>
+    			<param name="subprobe.dir" value="probes-other/jkstat"/>
 	       </antcall>
 	</target>
 
 	<target name="compile.subprobes" depends="appjar">
 		<mkdir dir="${build.home}/${subprobe}/classes"/>
-		<javac srcdir="${subprobe.dir}/${subprobe}/src" destdir="${build.home}/${subprobe}/classes"
+		<javac srcdir="${subprobe.dir}/src" destdir="${build.home}/${subprobe}/classes"
 			debug="${compile.debug}" deprecation="${compile.deprecation}"
 			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
 			<classpath refid="project.classpath"/>
 		</javac>
 		<jar destfile="${build.home}/${subprobe}/${subprobe}.jar" basedir="${build.home}/${subprobe}/classes">
-			<fileset dir="${subprobe.dir}/${subprobe}">
+			<fileset dir="${subprobe.dir}">
 				<include name="desc/**/*.xml" />
 			</fileset>
 		</jar>
