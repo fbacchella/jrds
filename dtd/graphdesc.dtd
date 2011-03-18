@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!ELEMENT graphdesc (name, graphName, graphTitle, properties?, unit?, verticalLabel, upperLimit?, lowerLimit?, add+, hosttree, viewtree)>
-<!ELEMENT graph (name, graphName, role*, graphTitle, properties?, unit?, verticalLabel, upperLimit?, lowerLimit?, (add|addpath)+, tree)>
-<!ELEMENT add ((name, (rpn|dsName)?) | legend | ((name | (name?, (rpn|dsName))), reversed?, graphType, color?, legend?))>
+<!ELEMENT graph (name, graphName, role*, graphTitle, properties?, unit?, verticalLabel, upperLimit?, lowerLimit?, logarithmic, (add|addpath)+, tree)>
+<!ELEMENT add ((name, (rpn|dsName)?) | legend | ((name | (name?, (rpn|dsName))), reversed?, percentile?, graphType, color?, legend?))>
 <!ELEMENT addpath (name?, path, reversed?, graphType?, color?, legend?)>
 <!ELEMENT viewtree (pathelement | pathstring)*>
 <!ELEMENT hosttree (pathelement | pathstring)*>
@@ -13,8 +13,10 @@
 <!ELEMENT graphType (#PCDATA)>
 <!ELEMENT upperLimit (#PCDATA)>
 <!ELEMENT lowerLimit (#PCDATA)>
+<!ELEMENT logarithmic EMPTY>
 <!ELEMENT legend (#PCDATA)>
 <!ELEMENT reversed (#PCDATA)>
+<!ELEMENT percentile (#PCDATA)>
 <!ELEMENT name (#PCDATA)>
 <!ELEMENT role (#PCDATA)>
 

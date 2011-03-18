@@ -544,14 +544,6 @@ implements Cloneable, WithACL {
             this.color = color;
             this.legend = legend;
         }
-        public DsDesc(String name, String dsName, String rpn,
-                GraphType graphType, Color color) {
-            this.name = name;
-            this.dsName = dsName;
-            this.rpn = rpn;
-            this.graphType = graphType;
-            this.color = color;
-        }
         public DsDesc(String name, String dsName,
                 Integer percentile,
                 GraphType graphType, Color color) {
@@ -574,7 +566,6 @@ implements Cloneable, WithACL {
 
     //	static final private String manySpace = "123456798ABCDEF0123465798ABCDEF0123456798ABCDEF0123465798ABCDEF0123456798ABCDEF0123465798ABCDEF0";
     static final private String manySpace = "                                                                      ";
-    //	private Map<Object, DsDesc> dsMap;
     private List<DsDesc> allds;
     private int width = 578;
     private int height = 206;
@@ -589,6 +580,7 @@ implements Cloneable, WithACL {
     private String graphTitle ="{0} on {1}";
     private int maxLengthLegend = 0;
     private boolean siUnit = true;
+    private boolean logarithmic = false;
     private Integer unitExponent = null;
     private ACL acl = ACL.ALLOWEDACL;
 
@@ -844,6 +836,7 @@ implements Cloneable, WithACL {
         if(unitExponent != null) {
             retValue.setUnitsExponent(unitExponent);
         }
+        retValue.setLogarithmic(logarithmic);
         retValue.setPoolUsed(true);
         retValue.setAntiAliasing(true);
         retValue.setTextAntiAliasing(true);
@@ -1367,20 +1360,29 @@ implements Cloneable, WithACL {
             root.appendChild(document.createElement("graphName")).setTextContent(graphName);
         if(graphTitle != null)
             root.appendChild(document.createElement("graphTitle")).setTextContent(graphTitle);
+        Element unit = document.createElement("unit");
+        if(siUnit) {
+            root.appendChild(unit).appendChild(document.createElement("SI"));
+        }
+        if(unitExponent != null && unitExponent == -3) {
+            root.appendChild(unit).appendChild(document.createElement("base")).setTextContent("m");
+        }
         if(verticalLabel != null)
             root.appendChild(document.createElement("verticalLabel")).setTextContent(verticalLabel);
         if(! (lowerLimit == 0))
             root.appendChild(document.createElement("lowerLimit")).setTextContent(Double.toString(lowerLimit));
         if(! Double.isNaN(upperLimit))
             root.appendChild(document.createElement("upperLimit")).setTextContent(Double.toString(upperLimit));
-
-        // private List<DsDesc> allds;
-
+        if(logarithmic)
+            root.appendChild(document.createElement("logarithmic"));
         for(DsDesc e: allds) {
             Element specElement = (Element) root.appendChild(document.createElement("add"));
             specElement.appendChild(document.createElement("name")).setTextContent(e.name);
-            if(! e.name.equals(e.dsName))
+            if(! e.name.equals(e.dsName) && e.dsName != null)
                 specElement.appendChild(document.createElement("dsName")).setTextContent(e.dsName);
+            if(e.rpn != null) {
+                specElement.appendChild(document.createElement("rpn")).setTextContent(e.rpn);
+            }
             specElement.appendChild(document.createElement("graphType")).setTextContent(e.graphType.toString());
             if(e.legend != null)
                 specElement.appendChild(document.createElement("legend")).setTextContent(e.legend);
@@ -1399,6 +1401,20 @@ implements Cloneable, WithACL {
             viewTreeElement.appendChild(pe);
         }
         return document;
+    }
+
+    /**
+     * @return the logarithmic
+     */
+    public boolean isLogarithmic() {
+        return logarithmic;
+    }
+
+    /**
+     * @param logarithmic the logarithmic to set
+     */
+    public void setLogarithmic(boolean logarithmic) {
+        this.logarithmic = logarithmic;
     }
 
 }

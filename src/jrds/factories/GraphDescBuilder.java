@@ -56,6 +56,9 @@ public class GraphDescBuilder extends ObjectBuilder {
 		if(subnode.checkPath(CompiledXPath.get("unit/SI"))) {
 			gd.setSiUnit(true);
 		}
+        if(subnode.checkPath(CompiledXPath.get("logarithmic"))) {
+            gd.setLogarithmic(true);
+        }
 
 		for(Node addnode: subnode.iterate(CompiledXPath.get("add|addpath"))) {
 			Map<String, String> elements = new HashMap<String, String>(10);
