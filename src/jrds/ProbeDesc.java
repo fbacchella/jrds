@@ -187,6 +187,12 @@ public class ProbeDesc implements Cloneable {
 		if(valuesMap.containsKey("defaultValue")) {
 			defaultValues.put(name, jrds.Util.parseStringNumber(valuesMap.get("defaultValue").toString(), Double.NaN));
 		}
+        if(valuesMap.containsKey("minValue")) {
+            min = jrds.Util.parseStringNumber(valuesMap.get("minValue").toString(), MINDEFAULT);
+        }
+        if(valuesMap.containsKey("maxValue")) {
+            max = jrds.Util.parseStringNumber(valuesMap.get("maxValue").toString(), MAXDEFAULT);
+        }
 		dsMap.put(name, new DsDesc(type, heartbeat, min, max, collectKey));
 	}
 	
@@ -438,12 +444,18 @@ public class ProbeDesc implements Cloneable {
 		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
 			Element dsElement = (Element) root.appendChild(document.createElement("ds"));
 			dsElement.appendChild(document.createElement("dsName")).setTextContent(e.getKey());
-			if(e.getValue().dsType != null)
-				dsElement.appendChild(document.createElement("dsType")).setTextContent(e.getValue().dsType.toString());
-			if(e.getValue().collectKey instanceof OID)
-				dsElement.appendChild(document.createElement("OID")).setTextContent(e.getValue().collectKey.toString());
-			if(e.getValue().collectKey instanceof String)
-				dsElement.appendChild(document.createElement("collect")).setTextContent(e.getValue().collectKey.toString());
+			DsDesc desc = e.getValue();
+			if(desc.dsType != null)
+				dsElement.appendChild(document.createElement("dsType")).setTextContent(desc.dsType.toString());
+			if(desc.collectKey instanceof OID)
+				dsElement.appendChild(document.createElement("OID")).setTextContent(desc.collectKey.toString());
+			if(desc.collectKey instanceof String)
+				dsElement.appendChild(document.createElement("collect")).setTextContent(desc.collectKey.toString());
+            if(desc.minValue != MINDEFAULT) 
+                dsElement.appendChild(document.createElement("minValue")).setTextContent(Double.toString(desc.minValue));
+            if(! Double.isNaN(desc.maxValue)) 
+                dsElement.appendChild(document.createElement("maxValue")).setTextContent(Double.toString(desc.maxValue));
+			
 		}
 		Element graphsElement = (Element) root.appendChild(document.createElement("graphs"));
 		for(String graph: graphesList) {
