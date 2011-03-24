@@ -4,9 +4,9 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,7 +26,7 @@ public @interface ProbeMeta {
 
         @Override
         public void discover(String hostname, Element hostElement,
-                Collection<JrdsNode> probdescs, HttpServletRequest request) {
+                Map<String,JrdsNode> probdescs, HttpServletRequest request) {
         }
 
         @Override
