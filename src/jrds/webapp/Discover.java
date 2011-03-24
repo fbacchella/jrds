@@ -62,7 +62,7 @@ public class Discover extends JrdsServlet {
 		l.importDir(pm.configdir);
 
 		try {
-			Document hostDom = generate(hostname, l.getRepository(Loader.ConfigType.PROBEDESC).values(), request);
+			Document hostDom = generate(hostname, l.getRepository(Loader.ConfigType.PROBEDESC), request);
 			response.setContentType(CONTENT_TYPE);
 			response.addHeader("Cache-Control", "no-cache");
 
@@ -82,7 +82,7 @@ public class Discover extends JrdsServlet {
 		}
 	}
 
-	private Document generate(String hostname, Collection<JrdsNode> probdescs, HttpServletRequest request) throws IOException, ParserConfigurationException {
+	private Document generate(String hostname, Map<String,JrdsNode> probdescs, HttpServletRequest request) throws IOException, ParserConfigurationException {
 	    
 		DocumentBuilder dbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 		Document hostDom = dbuilder.newDocument();
@@ -100,7 +100,11 @@ public class Discover extends JrdsServlet {
 			}
 
 		for(DiscoverAgent da: getHostsList().getDiscoverAgent()) {
-		    da.discover(hostname, hostEleme, probdescs, request);
+		    try {
+                da.discover(hostname, hostEleme, probdescs, request);
+            } catch (Exception e) {
+                logger.error("Discover failed for " + da + ": " + e);
+            }
 		}
 		return hostDom;
 	}

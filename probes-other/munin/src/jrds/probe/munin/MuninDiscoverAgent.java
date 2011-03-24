@@ -5,10 +5,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,9 +31,14 @@ public class MuninDiscoverAgent extends DiscoverAgent {
     }
 
     @Override
-    public void discover(String hostName, Element hostElement, Collection<JrdsNode> probdescs, HttpServletRequest request) {
+    public void discover(String hostName, Element hostElement, Map<String, JrdsNode> probdescs, HttpServletRequest request) {
         try {
             Document hostDom = hostElement.getOwnerDocument();
+
+            String hostTag = "";
+            if(request.getParameter("discoverMuninPort") != null) {
+                hostTag = request.getParameter("discoverMuninPort").trim();
+            }
             int port = jrds.Util.parseStringNumber(request.getParameter("discoverMuninPort"), new Integer(4949));
             Socket muninSocket = null;
             try {
@@ -55,7 +61,7 @@ public class MuninDiscoverAgent extends DiscoverAgent {
                 muninProbes.add(p);
                 log(Level.TRACE, "Munin probe found : %s", p);
             }
-            
+
             log(Level.DEBUG, "Munin probes found: %s", muninProbes);
 
             Element cnxElement = hostDom.createElement("connection");
@@ -64,7 +70,7 @@ public class MuninDiscoverAgent extends DiscoverAgent {
 
             ClassLoader cl = getClass().getClassLoader();
             Class<?> muninClass = cl.loadClass("jrds.probe.munin.Munin");
-            for(JrdsNode e: probdescs) {
+            for(JrdsNode e: probdescs.values()) {
                 String probe = e.evaluate(CompiledXPath.get("/probedesc/name"));
                 String probeClass = e.evaluate(CompiledXPath.get("/probedesc/probeClass"));
                 Class<?> c = cl.loadClass(probeClass);
@@ -72,8 +78,12 @@ public class MuninDiscoverAgent extends DiscoverAgent {
                 if(fetchValue != null && ! "".equals(fetchValue) &&  muninClass.isAssignableFrom(c)) {
                     if( muninProbes.contains(fetchValue) ) {
                         muninProbes.remove(fetchValue);
-                        addProbe(hostElement, probe, null, null);
+//                        if(probdescs.containsKey(probe + "_" + hostTag))
+//                            addProbe(hostElement, probe + "_" + hostTag, null, null);
+//                        else
+                            addProbe(hostElement, probe, null, null);
                     }
+
                     else if(IndexedProbe.class.isAssignableFrom(c)) {
                         Pattern indexedFetch = Pattern.compile(fetchValue.replace("${index}", "(.+)"));
                         for(String mp: muninProbes) {
@@ -91,13 +101,19 @@ public class MuninDiscoverAgent extends DiscoverAgent {
             log(Level.ERROR, e, "Generation Failed: ",e);
         }
     }
-    
+
     @Override
     public List<FieldInfo> getFields() {
-        FieldInfo fi = new FieldInfo();
-        fi.dojoType = DojoType.TextBox;
-        fi.id = "discoverMuninPort";
-        fi.label = " Munin listening port";
-        return Collections.singletonList(fi);
+        FieldInfo fi1 = new FieldInfo();
+        fi1.dojoType = DojoType.TextBox;
+        fi1.id = "discoverMuninPort";
+        fi1.label = "Munin listening port";
+
+        FieldInfo fi2 = new FieldInfo();
+        fi2.dojoType = DojoType.TextBox;
+        fi2.id = "discoverMuninTag";
+        fi2.label = "Munin host tag";
+
+        return Arrays.asList(fi1, fi2);
     }
 }

@@ -1,7 +1,7 @@
 package jrds.webapp;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -55,7 +55,7 @@ public abstract class DiscoverAgent {
         namedLogger = Logger.getLogger("jrds.DiscoverAgent." + name);
     }
 
-    public abstract void discover(String hostname, Element hostElement, Collection<JrdsNode> probdescs, HttpServletRequest request);
+    public abstract void discover(String hostname, Element hostElement, Map<String, JrdsNode> probdescs, HttpServletRequest request);
 
     public abstract List<FieldInfo> getFields();
 
