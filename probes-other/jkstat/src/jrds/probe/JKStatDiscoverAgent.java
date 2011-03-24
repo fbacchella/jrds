@@ -2,9 +2,15 @@ package jrds.probe;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,7 +33,7 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
 
     @Override
     public void discover(String hostname, Element hostElement,
-            Collection<JrdsNode> probdescs, HttpServletRequest request) {
+            Map<String, JrdsNode> probdescs, HttpServletRequest request) {
         int port = jrds.Util.parseStringNumber(request.getParameter("discoverJKStatPort"), new Integer(KstatConnection.DEFAULTPORT));
         try {
             String hostName = hostname;
@@ -44,7 +50,33 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
 
             ClassLoader cl = getClass().getClassLoader();
             Class<?> kstatClass = jrds.probe.KstatProbe.class;
-            for(JrdsNode e: probdescs) {
+            Map<String, Set<Kstat>> byClass = new HashMap<String, Set<Kstat>>();
+            Map<String, Kstat> byTriplet = new HashMap<String, Kstat>();
+            for(Kstat k : remoteJk.getKstats()) {
+                String kclass = k.getKstatClass();
+                if(! byClass.containsKey(kclass))
+                    byClass.put(kclass, new HashSet<Kstat>());
+                byClass.get(kclass).add(k);
+                byTriplet.put(k.getTriplet(), k);
+            }
+            log(Level.TRACE, "classes: %s", byClass);
+            log(Level.TRACE, "triplets: %s", byTriplet);
+
+            //We try to discover netcard, explicit check, the pattern is too complicated
+            for(Kstat diskKstat: byClass.get("net")) {
+                String module = diskKstat.getModule();
+                String instance = diskKstat.getInstance();
+                String kName = diskKstat.getName();
+                if("statistics".equals(kName)) {
+                    addProbe(hostElement, "KstatNetstats2", Arrays.asList("String", "Integer"), Arrays.asList(module, instance));                   
+                    byTriplet.remove(diskKstat.getTriplet());
+                }
+                else if(kName.equals(module + instance)) {
+                    addProbe(hostElement, "KstatNetstats", Arrays.asList("String", "Integer"), Arrays.asList(module, instance));                   
+                    byTriplet.remove(diskKstat.getTriplet());
+                }
+            }
+            for(JrdsNode e: probdescs.values()) {
                 String probe = e.evaluate(CompiledXPath.get("/probedesc/name"));
                 String probeClass = e.evaluate(CompiledXPath.get("/probedesc/probeClass"));
                 Class<?> c = cl.loadClass(probeClass);
@@ -55,8 +87,22 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
                 if(module != null && ! "".equals(module) &&  kstatClass.isAssignableFrom(c)) {
                     Kstat active  = remoteJk.getKstat(module, instance, name);
                     if(active != null) {
-                        log(Level.DEBUG, "probe found: %s:%d:%s", module, instance,name);
+                        log(Level.DEBUG, "probe found: %s:%d:%s", module, instance, name);
                         addProbe(hostElement, probe, null, null);
+                        byTriplet.remove(active.getTriplet());
+                    }
+                    else if(IndexedProbe.class.isAssignableFrom(c)) {
+                        String triplet = String.format("%s:(.+):%s", module, name);
+                        Pattern indexedFetch = Pattern.compile(triplet.replace("${instance}", "([0-9]+)").replace("{", "\\{").replace("}", "\\}").replace("$", "\\$"));
+                        log(Level.TRACE, "Search pattern is %s", indexedFetch);
+                        for(String mp: byTriplet.keySet()) {
+                            Matcher m = indexedFetch.matcher(mp);
+                            if(m.matches()) {
+                                String index = m.group(1);
+                                log(Level.TRACE, "index found: %s for probe %s, with pattern %s and kstat probe %s", index, probe, indexedFetch.pattern(), mp);
+                                addProbe(hostElement, probe, Collections.singletonList("Integer"), Collections.singletonList(index));
+                            }
+                        }
                     }
                 }
             }
@@ -75,5 +121,4 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
         fi.label = " JKstat listening port";
         return Collections.singletonList(fi);
     }
-
 }
