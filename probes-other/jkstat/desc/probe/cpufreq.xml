@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+	<!--
+		This probe expects an integer, the instance number of a CPU core
+	-->
+	<name>KstatCPUInfo</name>
+	<probeName>cpufreq-${index}</probeName>
+	<probeClass>jrds.probe.KstatProbeIndexed</probeClass>
+	<specific name="module">cpu_info</specific>
+	<specific name="name">cpu_info${instance}</specific>
+	<specific name="index">${instance}</specific>
+	<!-- Current clock speed of the core-->
+	<ds>
+		<dsName>current_clock_Hz</dsName>
+		<dsType>gauge</dsType>
+	</ds>
+	<graphs>
+		<name>KstatCurrentClockHz</name>
+	</graphs>
+</probedesc>
