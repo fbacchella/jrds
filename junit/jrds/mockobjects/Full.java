@@ -57,10 +57,10 @@ public class Full {
 	static public GraphDesc getGd() {
 		GraphDesc gd = new GraphDesc();
 
-		gd.add("sun", null, GraphDesc.LINE.toString(), "green", null, null, null, null, null, null);
-		gd.add("shade", null, GraphDesc.LINE.toString(), "blue", null, null, null, null, null, null);
-		gd.add("median", "sun,shade,+,2,/", GraphDesc.LINE.toString(), "magenta", null, null, null, null, null, null);
-		gd.add("diff", "sun,shade,-,ABS,-1,*", GraphDesc.AREA.toString(), "yellow", null, null, null, null, null, null);
+		gd.add("sun", null, GraphDesc.LINE.toString(), "green", null, null, null, null, null, null, null);
+		gd.add("shade", null, GraphDesc.LINE.toString(), "blue", null, null, null, null, null, null, null);
+		gd.add("median", "sun,shade,+,2,/", GraphDesc.LINE.toString(), "magenta", null, null, null, null, null, null, null);
+		gd.add("diff", "sun,shade,-,ABS,-1,*", GraphDesc.AREA.toString(), "yellow", null, null, null, null, null, null, null);
 
 		gd.setGraphTitle("Temperatures in May 2003");
 		gd.setVerticalLabel("temperature");

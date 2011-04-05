@@ -99,8 +99,8 @@ public class UtilTest {
 		//It should have auto-detected the doc type
 		Assert.assertTrue(outBuffer.contains(publicId));
 		Assert.assertTrue(outBuffer.contains(systemId));
-		logger.debug(outBuffer.contains(d.getInputEncoding()));
-		Assert.assertTrue("Output encoding "+ d.getInputEncoding() + " not found", outBuffer.contains(d.getInputEncoding()));
+		logger.debug(outBuffer.contains(d.getXmlEncoding()));
+		Assert.assertTrue("Output encoding "+ d.getXmlEncoding() + " not found", outBuffer.contains(d.getXmlEncoding()));
 	}
 
 	@Test

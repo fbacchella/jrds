@@ -1,6 +1,7 @@
 package jrds.factories;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -74,15 +75,17 @@ public class TestGraphDescBuilder {
 				
 		RrdGraphDef def = gd.getGraphDef(p);
 		RrdGraphInfo gi = new RrdGraph(def).getRrdGraphInfo();
+		
+		logger.debug(Arrays.asList(gi.getPrintLines()));
 
 		Assert.assertEquals("graph name failed", "graphName", gd.getGraphName());
 		Assert.assertEquals("graph title failed", "graphTitle", gd.getGraphTitle());
 		Assert.assertEquals("graph name failed", "name", gd.getName());
 		Assert.assertEquals("legeng count failed", 2, gd.getLegendLines());
 		
-		Assert.assertEquals("graph height invalid", 180 , gi.getHeight());
-		Assert.assertEquals("graph width invalid", 491 , gi.getWidth());
-		Assert.assertEquals("graph byte count invalid", 6000 , gi.getByteCount(), 1000);
+		Assert.assertEquals("graph height invalid", 286 , gi.getHeight());
+		Assert.assertEquals("graph width invalid", 669 , gi.getWidth());
+		Assert.assertEquals("graph byte count invalid", 12574 , gi.getByteCount(), 1000);
 	}
 
 	@Test
