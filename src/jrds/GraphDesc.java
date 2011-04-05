@@ -1375,7 +1375,24 @@ implements Cloneable, WithACL {
             root.appendChild(document.createElement("upperLimit")).setTextContent(Double.toString(upperLimit));
         if(logarithmic)
             root.appendChild(document.createElement("logarithmic"));
-        for(DsDesc e: allds) {
+        int i=0;
+        //it will contain the number of dsdesc to skip
+        int skip=0;
+        for(DsDesc curs: allds) {
+            DsDesc e = curs;
+            if(skip-- > 0) {
+                i++;
+                continue;
+            }
+            //System.out.println(allds.get(i+1).name);
+            boolean reversed = false;
+            if(i + 2 <= allds.size() && allds.get(i+1).name.startsWith("rev_")) {
+                reversed = true;
+                skip = 2;
+                DsDesc rev = allds.get(i+1);
+                DsDesc leg = allds.get(i+2);
+                e = new DsDesc(curs.name, curs.dsName, curs.rpn, rev.graphType, rev.color, leg.legend, curs.cf, null, null);
+            }
             Element specElement = (Element) root.appendChild(document.createElement("add"));
             specElement.appendChild(document.createElement("name")).setTextContent(e.name);
             if(! e.name.equals(e.dsName) && e.dsName != null)
@@ -1383,10 +1400,13 @@ implements Cloneable, WithACL {
             if(e.rpn != null) {
                 specElement.appendChild(document.createElement("rpn")).setTextContent(e.rpn);
             }
+            if(reversed) {
+                specElement.appendChild(document.createElement("reversed"));
+            }
             specElement.appendChild(document.createElement("graphType")).setTextContent(e.graphType.toString());
             if(e.legend != null)
                 specElement.appendChild(document.createElement("legend")).setTextContent(e.legend);
-
+            i++;
         }
         Element hostTreeElement =  (Element) root.appendChild(document.createElement("hosttree"));
         for(Object o: hostTree) {
