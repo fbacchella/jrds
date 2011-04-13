@@ -29,8 +29,8 @@ public abstract class JrdsServlet extends HttpServlet {
 		return getConfig().getPropertiesManager();
 	}
 
-	protected ParamsBean getParamsBean(HttpServletRequest request) {
-		return new ParamsBean(request, getHostsList());
+	protected ParamsBean getParamsBean(HttpServletRequest request, String... restPath) {
+		return new ParamsBean(request, getHostsList(), restPath);
 	}
 	
 	protected boolean allowed(ParamsBean params, Set<String> roles) {

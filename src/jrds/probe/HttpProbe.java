@@ -68,7 +68,13 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 		finishConfigure();
 	}
 
-	public void configure(Integer port, List<Object> argslist) {
+    public void configure(String file, List<Object> argslist) {
+        this.file = file;
+        this.argslist = argslist;
+        finishConfigure();
+    }
+
+    public void configure(Integer port, List<Object> argslist) {
 		this.port = port;
 		this.argslist = argslist;
 		finishConfigure();

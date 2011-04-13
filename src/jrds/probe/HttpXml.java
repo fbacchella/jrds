@@ -32,7 +32,12 @@ public class HttpXml extends HttpProbe {
 		finishConfig(args);
 	}
 
-	public void configure(Integer port, List<Object> args) {
+    public void configure(String file, List<Object> args) {
+        super.configure(file, args);
+        finishConfig(args);
+    }
+
+    public void configure(Integer port, List<Object> args) {
 		super.configure(port, args);
 		finishConfig(args);
 	}
@@ -48,6 +53,7 @@ public class HttpXml extends HttpProbe {
 	}
 
 	private void finishConfig(List<Object> args) {
+	    log(Level.TRACE, "Configuring collect xpath with %s", args);
 		xpaths = new HashSet<String>(getPd().getCollectStrings().size());
 		collectKeys = new HashMap<String, String>(xpaths.size());
 		for(Map.Entry<String, String> e:getPd().getCollectStrings().entrySet()) {
@@ -57,6 +63,7 @@ public class HttpXml extends HttpProbe {
 			xpaths.add(solved);
 			collectKeys.put(solved, dsName);
 		}
+        log(Level.TRACE, "collect xpath mapping %s", collectKeys);
 	}
 
 	/* (non-Javadoc)
@@ -95,6 +102,9 @@ public class HttpXml extends HttpProbe {
 		if(upTimePath != null) {
 			return xmlstarter.findUptime(d, upTimePath);
 		}
+		else if(getPd().getSpecific("nouptime") != null) {
+            return Long.MAX_VALUE;
+        }
 		else {
 			String startTimePath = getPd().getSpecific("startTimePath");
 			String currentTimePath = getPd().getSpecific("currentTimePath");

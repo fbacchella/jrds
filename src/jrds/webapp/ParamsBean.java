@@ -137,7 +137,7 @@ public class ParamsBean implements Serializable {
     }
 
     /**
-     * Set the authentication context, witout touching the requests parameters
+     * Set the authentication context, without touching the requests parameters
      * @param req
      * @param hl
      */
@@ -179,7 +179,8 @@ public class ParamsBean implements Serializable {
         } catch (JSONException e) {
             logger.error("JSON parsing exception " + e);
         }
-        logger.trace("Params unpacked: " + params);
+        if(logger.isTraceEnabled())
+            logger.trace("Params unpacked: " + params);
     }
 
     private void parseReq(HostsList hl) {
@@ -315,8 +316,10 @@ public class ParamsBean implements Serializable {
         if(g == null) {
             logger.warn("graph cache miss");
             jrds.GraphNode node = getGraphNode(caller);
-            g = node.getGraph();
-            configureGraph(g);
+            if(node != null) {
+                g = node.getGraph();
+                configureGraph(g);
+            }
         }
         return g;
     }
@@ -372,7 +375,7 @@ public class ParamsBean implements Serializable {
             logger.debug(jrds.Util.delayedFormatString("Graph found: %s", gn));
             return Collections.singletonList(gn);
         }
-       return Collections.emptyList();
+        return Collections.emptyList();
     }
 
     public Probe<?,?> getProbe() {

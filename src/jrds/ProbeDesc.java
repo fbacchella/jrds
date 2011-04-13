@@ -260,7 +260,7 @@ public class ProbeDesc implements Cloneable {
 			if(desc.dsType != null)
 				dsList.add(new DsDef(e.getKey(), desc.dsType, desc.heartbeat, desc.minValue, desc.maxValue));
 		}
-		return (DsDef[]) dsList.toArray(new DsDef[dsList.size()]);
+		return dsList.toArray(new DsDef[dsList.size()]);
 	}
 
 	public Collection<String> getDs() {
@@ -277,6 +277,9 @@ public class ProbeDesc implements Cloneable {
 		return (dd !=null && dd.dsType != null);
 	}
 
+	/**
+	 * @return The number of data store
+	 */
 	public int getSize()
 	{
 		return dsMap.size();
