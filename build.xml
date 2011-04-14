@@ -223,6 +223,7 @@
 				<include name="*.jar"/>
 			</tarfileset>
 		</tar>
+		<gzip src="${build.home}/${app.name}.tar" destfile="${build.home}/${app.name}.tar.gz"/>
 	</target>
 	
 	<target name="war" depends="appjar" description="Build JRDS war">
