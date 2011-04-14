@@ -454,7 +454,7 @@ public class HostsList extends StarterNode {
                 try {
                     tpool.awaitTermination(step - getTimeout() * 2 , TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
-                    logger.info("Collect interrupted");
+                    logger.warn("Collect interrupted");
                 }
                 stopCollect();
                 if( ! tpool.isTerminated()) {
@@ -463,13 +463,13 @@ public class HostsList extends StarterNode {
                     try {
                         emergencystop = tpool.awaitTermination(getTimeout(), TimeUnit.SECONDS);
                     } catch (InterruptedException e) {
-                        logger.info("Collect interrupted in last chance");
+                        logger.warn("Collect interrupted in last chance");
                     }
                     if(! emergencystop) {
                         //logger.info("Some probes are hanged");
 
                         //					if(! emergencystop) {
-                        logger.info("Some task still alive, needs to be killed");
+                        logger.warn("Some task still alive, needs to be killed");
                         //						//Last chance to commit results
                         List<Runnable> timedOut = tpool.shutdownNow();
                         if(! timedOut.isEmpty()) {
