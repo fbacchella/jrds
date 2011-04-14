@@ -3,3 +3,4 @@
 <!ATTLIST sum name CDATA #REQUIRED>
 <!ELEMENT role (#PCDATA)>
 <!ELEMENT element (#PCDATA)>
+<!ATTLIST element name CDATA #REQUIRED>
