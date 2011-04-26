@@ -15,32 +15,32 @@
 	</add>
 	<add>
 		<name>q-in.ptr</name>
-		<graphType>area</graphType>
+		<graphType>stack</graphType>
 		<legend>PTR queries</legend>
 	</add>
 	<add>
 		<name>q-in.aaaa</name>
-		<graphType>area</graphType>
+		<graphType>stack</graphType>
 		<legend>AAAA queries</legend>
 	</add>
 	<add>
 		<name>q-in.txt</name>
-		<graphType>area</graphType>
+		<graphType>stack</graphType>
 		<legend>TXT queries</legend>
 	</add>
 	<add>
 		<name>q-in.ns</name>
-		<graphType>area</graphType>
+		<graphType>stack</graphType>
 		<legend>NS queries</legend>
 	</add>
 	<add>
 		<name>q-in.mx</name>
-		<graphType>area</graphType>
+		<graphType>stack</graphType>
 		<legend>MX queries</legend>
 	</add>
 	<add>
 		<name>q-in.srv</name>
-		<graphType>area</graphType>
+		<graphType>stack</graphType>
 		<legend>SRV queries</legend>
 	</add>
 	<add>
