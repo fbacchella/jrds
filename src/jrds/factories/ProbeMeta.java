@@ -20,7 +20,7 @@ import org.w3c.dom.Element;
 @Target(ElementType.TYPE)
 public @interface ProbeMeta {
     public class EmptyDiscoverAgent extends DiscoverAgent {
-        protected EmptyDiscoverAgent(String name) {
+        public EmptyDiscoverAgent() {
             super("Empty");
         }
 

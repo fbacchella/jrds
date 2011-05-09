@@ -674,7 +674,7 @@ public class HostsList extends StarterNode {
             try {
                 daSet.add(daa.newInstance());
             } catch (Exception e) {
-                logger.error("Error creating discover agent " + daa.getName() + ": " + e);
+                logger.error("Error creating discover agent " + daa.getName() + ": " + e, e);
             }
         }
 

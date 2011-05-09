@@ -11,8 +11,8 @@
 	<dependencies>
 		<dependency org="rrd4j" name="rrd4j" rev="2.0.7" conf="lib->default" />
 		<dependency org="log4j" name="log4j" rev="1.2.16" conf="lib->default" />
-  		<dependency org="org.dojotoolkit" name="dojo" rev="1.5.0" conf="lib->default">
-	    	<artifact name="dojo" type="zip" url="http://jrds.fr/maven2/local/dojo-1.5.0.zip"/>
+  		<dependency org="org.dojotoolkit" name="dojo" rev="1.6.0" conf="lib->default">
+	    	<artifact name="dojo" type="zip" url="http://jrds.fr/maven2/local/dojo-1.6.0.zip"/>
 		</dependency>
 		<dependency org="org.snmp4j" name="snmp4j" rev="1.11.3"  conf="lib->default" />
 		<dependency org="org.snmp4j" name="snmp4j-agent" rev="1.4.3" conf="libtest->default">
@@ -25,11 +25,11 @@
 		    <exclude module="junit" />
 		    <exclude module="servlet-api" />
 	    </dependency>
-		<dependency org="commons-net" name="commons-net" rev="2.0"  conf="lib->default" />
+		<dependency org="commons-net" name="commons-net" rev="2.2"  conf="lib->default" />
 		<dependency org="commons-io" name="commons-io" rev="1.4"  conf="lib->default" />
 		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2"  conf="lib->default" />
 		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.1.1"  conf="lib->default" />
-		<dependency org="mysql" name="mysql-connector-java" rev="5.1.14"  conf="lib->default" />
+		<dependency org="mysql" name="mysql-connector-java" rev="5.1.16"  conf="lib->default" />
 		<dependency org="postgresql" name="postgresql" rev="8.4-702.jdbc4"  conf="lib->default" />
 		<dependency org="junit" name="junit" rev="4.8.2" conf="libtest->default" />
 		<dependency org="org.mortbay.jetty" name="jetty-servlet-tester" rev="6.1.26"  conf="libtest->default">

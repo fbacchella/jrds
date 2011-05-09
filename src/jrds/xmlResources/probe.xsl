@@ -10,16 +10,14 @@
 		<html class="fillspace">
 			<head>
 				<title>
-					<xsl:value-of select="@name" />
-					on
-					<xsl:value-of select="@host" />
+<xsl:value-of select="@name" /> on <xsl:value-of select="@host" />
 				</title>
 				<link href="dojo/resources/dojo.css" rel="stylesheet" type="text/css" />
 				<link href="dijit/themes/nihilo/nihilo.css" rel="stylesheet"
 					type="text/css" />
 				<link href="lib/jrds.css" rel="stylesheet" type="text/css" />
 				<script type="text/javascript" src="dojo/dojo.js"
-					djConfig="parseOnLoad:true, isDebug:true, locale:'en-us'">/* */ </script>
+					djConfig="parseOnLoad:true, isDebug:false, locale:'en-us'">/* */ </script>
 				<script type="text/javascript" src="dojo/dojo-jrds.js">/* */ </script>
 				<script type="text/javascript" src="lib/jrds.js">/* */ </script>
 			</head>
@@ -28,11 +26,7 @@
 					class="fillspace">
 					<div dojoType="dijit.layout.ContentPane" region="center">
 						<div dojoType="dijit.TitlePane" title="Probe instance name">
-							<p>
-								<xsl:value-of select="@host" />
-								/
-								<xsl:value-of select="@name" />
-							</p>
+							<p> <xsl:value-of select="@host" /> / <xsl:value-of select="@name" /> </p>
 						</div>
 						<xsl:apply-templates />
 					</div>
