@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import jrds.HostsList;
+import jrds.PropertiesManager;
 
 import org.apache.log4j.Logger;
 
@@ -88,6 +89,20 @@ public abstract class StarterNode implements StartersSet {
 		else {
 			return allStarters.get(key);
 		}
+	}
+	
+	/**
+	 * Called in the host list configuration, used to finished the configuration
+	 * of the starters
+	 * @param pm the configuration
+	 */
+	public void configureStarters(PropertiesManager pm) {
+	    if(allStarters == null)
+	        return;
+	    
+	    for(Starter s: allStarters.values()) {
+	        s.configure(pm);
+	    }
 	}
 
 	public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc) {

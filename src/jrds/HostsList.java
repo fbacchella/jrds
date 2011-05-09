@@ -35,7 +35,6 @@ import jrds.factories.ProbeMeta;
 import jrds.probe.ContainerProbe;
 import jrds.probe.SumProbe;
 import jrds.probe.VirtualProbe;
-import jrds.starter.SocketFactory;
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 import jrds.webapp.ACL;
@@ -126,7 +125,6 @@ public class HostsList extends StarterNode {
 
         addTree("All tags", GraphTree.TAGSROOT);
 
-        registerStarter(new SocketFactory());
         sumhost.setParent(this);
         customhost.setParent(this);
     }
@@ -154,8 +152,6 @@ public class HostsList extends StarterNode {
         started = true;
         rrdDir = pm.rrddir;
         tmpDir = pm.tmpdir;
-
-        find(SocketFactory.class).setTimeout(pm.timeout);
 
         renderer = new Renderer(50, step, tmpDir);
 
@@ -188,7 +184,7 @@ public class HostsList extends StarterNode {
         Set<Class<? extends Starter>> externalStarters = new HashSet<Class<? extends Starter>>();
         for(ProbeDesc pd: probesdesc) {
             Class<?> pc = pd.getProbeClass();
-            while(pc != null && pc != Probe.class) {
+            while(pc != null && pc != StarterNode.class) {
                 if(pc.isAnnotationPresent(ProbeMeta.class)) {
                     ProbeMeta meta = pc.getAnnotation(ProbeMeta.class);
                     daList.add(meta.discoverAgent());
@@ -204,9 +200,11 @@ public class HostsList extends StarterNode {
         Map<String, RdsHost> hosts = conf.setHostMap(l.getRepository(Loader.ConfigType.HOSTS));
         for(RdsHost h: hosts.values()) {
             addHost(h);
+            h.configureStarters(pm);
             for(Probe<?,?> p: h.getProbes()) {
                 p.setTimeout(getTimeout());
                 addProbe(p);
+                p.configureStarters(pm);
                 for(String hostTag: p.getTags()) {
                     hostsTags.add(hostTag);
                 }
@@ -217,11 +215,12 @@ public class HostsList extends StarterNode {
         logger.debug(jrds.Util.delayedFormatString("External top starters added %s", externalStarters));
         for(Class<? extends Starter> starterClass: externalStarters) {
             try {
-                this.registerStarter(starterClass.newInstance());                //starterClass.newInstance().register(this);
+                registerStarter(starterClass.newInstance());
             } catch (Exception e) {
                 logger.error("Starter " + starterClass + " failed to register");
             }
         }
+        configureStarters(pm);
 
         Tab tagsTab = new Tab("All tags");
         for(String tag: hostsTags) {

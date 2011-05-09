@@ -2,6 +2,8 @@ package jrds.starter;
 
 import java.util.Date;
 
+import jrds.PropertiesManager;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -37,7 +39,16 @@ public abstract class Starter {
 		this.level = level;
 	}
 
-	public final void doStart() {
+    /**
+     * It's called after the starter registration but in host list configuration
+     * A starter can uses it to tweaks it's configuration 
+     * It can be overriden to contains delayed initialization but it must begin with a call to super.configuration(pm)
+     * @param pm
+     */
+    public void configure(PropertiesManager pm) {
+    }
+
+    public final void doStart() {
 		log(Level.TRACE, "Starting");
 		try {
 			long begin = new Date().getTime();
@@ -122,6 +133,5 @@ public abstract class Starter {
 	public void log(Level l, String format, Object... elements) {
 		jrds.Util.log(this, namedLogger,l, null, format, elements);
 	}
-
 
 }

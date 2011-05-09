@@ -5,12 +5,22 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 
+import jrds.PropertiesManager;
 import jrds.RdsHost;
 
 public class SocketFactory extends Starter {
 	int timeout;
 	
-	public ServerSocket createServerSocket(int port) throws IOException {
+    /* (non-Javadoc)
+     * @see jrds.starter.Starter#configure(jrds.PropertiesManager)
+     */
+    @Override
+    public void configure(PropertiesManager pm) {
+        super.configure(pm);
+        timeout = pm.timeout;
+    }
+
+    public ServerSocket createServerSocket(int port) throws IOException {
 		if(! isStarted())
 			return null;
 		
@@ -84,15 +94,9 @@ public class SocketFactory extends Starter {
 		return timeout;
 	}
 
-	/**
-	 * @param timeout the timeout to set (in seconds)
-	 */
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
-	}
-
 	@Deprecated
 	public static Object makeKey(StarterNode level) {
 		return SocketFactory.class;
 	}
+
 }
