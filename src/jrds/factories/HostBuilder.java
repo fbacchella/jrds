@@ -21,7 +21,6 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
-import jrds.snmp.SnmpStarter;
 import jrds.starter.ChainedProperties;
 import jrds.starter.Connection;
 import jrds.starter.StarterNode;
@@ -86,12 +85,14 @@ public class HostBuilder extends ObjectBuilder {
 
 	private void parseFragment(JrdsNode fragment, RdsHost host, StarterNode ns, Map<String, Set<String>> collections) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
-		JrdsNode snmpNode = fragment.getChild(CompiledXPath.get("snmp"));
-		if(snmpNode != null) {
-			logger.trace("found a snmp starter");
-			SnmpStarter starter = snmpStarter(snmpNode, host);
-			starter.register(host);
-		}
+	    try {
+            Class<? extends HostBuilderAgent> c = (Class<? extends HostBuilderAgent>) pm.extensionClassLoader.loadClass("jrds.snmp.SnmpHostBuilderAgent");
+            c.getConstructor().newInstance().buildStarters(fragment, host);
+	    } catch (ClassNotFoundException e) {
+            logger.error("Class jrds.snmp.SnmpHostBuilderAgent not found");
+        } catch (InstantiationException e) {
+            logger.error("Class jrds.snmp.SnmpHostBuilderAgent not found");
+        }
 
 		makeConnexion(fragment, host);
 
@@ -181,26 +182,6 @@ public class HostBuilder extends ObjectBuilder {
 
 	}
 
-	public SnmpStarter snmpStarter(JrdsNode d, RdsHost host) {
-		SnmpStarter starter = new SnmpStarter();
-		Map<String,String> attributes = d.attrMap();
-		//Mandatory parameters
-		starter.setCommunity(attributes.get("community"));
-		starter.setVersion(attributes.get("version"));
-
-		//Optional parameters
-		String portStr = attributes.get("port");
-		int port = jrds.Util.parseStringNumber(portStr, 161);
-		starter.setPort(port);
-
-		String hostName = attributes.get("host");
-		if(hostName == null) {
-			hostName = host.getDnsName();
-		}
-		starter.setHostname(hostName);
-		return starter;
-	}
-
 	public Probe<?,?> makeProbe(JrdsNode probeNode, RdsHost host, StarterNode ns) {
 		Probe<?,?> p = null;
 		String type = probeNode.attrMap().get("type");
@@ -269,15 +250,24 @@ public class HostBuilder extends ObjectBuilder {
 		else {
 			return null;
 		}
-		JrdsNode snmpProbeNode = probeNode.getChild(CompiledXPath.get("snmp"));
-		if(snmpProbeNode != null) {
-			SnmpStarter starter = snmpStarter(snmpProbeNode, host);
-			starter.register(p);
-		}
+        try {
+            Class<? extends HostBuilderAgent> c = (Class<? extends HostBuilderAgent>) pm.extensionClassLoader.loadClass("jrds.snmp.SnmpHostBuilderAgent");
+            c.getConstructor().newInstance().buildStarters(probeNode, p, host);
+        } catch (ClassNotFoundException e) {
+            logger.error("Class jrds.snmp.SnmpHostBuilderAgent not found");
+        } catch (InstantiationException e) {
+            logger.error("Class jrds.snmp.SnmpHostBuilderAgent not found");
+        } catch (IllegalArgumentException e) {
+        } catch (SecurityException e) {
+        } catch (IllegalAccessException e) {
+        } catch (InvocationTargetException e) {
+        } catch (NoSuchMethodException e) {
+        }
+
 		Map<String, String> nodeprop = makeProperties(probeNode);
 		if(nodeprop != null && nodeprop.size() > 0) {
 			ChainedProperties temp = new ChainedProperties(nodeprop);
-			temp.register(p);
+			p.registerStarter(temp);
 		}
 		makeConnexion(probeNode, p);
 		return p;
@@ -306,7 +296,7 @@ public class HostBuilder extends ObjectBuilder {
 				o = (Connection<?>)theConst.newInstance(constArgsVal);
 				if(name !=null && ! "".equals(name))
 					o.setName(name.trim());
-				o.register(sNode);
+				sNode.registerStarter(o);
 				logger.debug("Connexion registred: " + o + " for " + sNode);
 			}
 			catch (NoClassDefFoundError ex) {
