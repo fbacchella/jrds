@@ -22,7 +22,7 @@ import org.w3c.dom.Document;
  * @author Fabrice Bacchella 
  * @version $Revision: 407 $,  $Date: 2007-02-22 18:48:03 +0100 (jeu., 22 févr. 2007) $
  */
-public class HttpXml extends HttpProbe {
+public class HttpXml extends HCHttpProbe {
 
 	private Set<String> xpaths = null;
 	private Map<String, String> collectKeys = null;

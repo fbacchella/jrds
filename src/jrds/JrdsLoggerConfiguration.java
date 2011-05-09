@@ -31,7 +31,7 @@ import org.apache.log4j.PatternLayout;
 public class JrdsLoggerConfiguration {
 	static public String APPENDER = "jrds";
 	static public final String DEFAULTLOGFILE = ConsoleAppender.SYSTEM_ERR;
-	static public final String[] rootLoggers = new String[] {"jrds", "org.mortbay.log"};
+	static public final String[] rootLoggers = new String[] {"jrds", "org.mortbay.log", "org.apache"};
 	
 	private JrdsLoggerConfiguration() {
 		

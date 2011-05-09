@@ -84,6 +84,7 @@ public abstract class StarterNode implements StartersSet {
 		if(! allStarters.containsKey(key)) {
 			s.initialize(this);
 			allStarters.put(key, s);
+			logger.debug(jrds.Util.delayedFormatString("registering %s in %s", s, this));
 			return s;
 		}
 		else {
