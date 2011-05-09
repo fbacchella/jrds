@@ -1,9 +1,6 @@
 package jrds;
 
 import java.awt.Color;
-import java.awt.color.ColorSpace;
-import java.awt.color.ICC_ColorSpace;
-import java.awt.color.ICC_Profile;
 import java.io.IOException;
 
 import org.apache.log4j.Level;

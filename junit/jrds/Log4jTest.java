@@ -23,11 +23,9 @@ public class Log4jTest {
 		protected void append(LoggingEvent arg0) {
 			logs.add(arg0);
 		}
-		@Override
 		public void close() {
 			logs.clear();
 		}
-		@Override
 		public boolean requiresLayout() {
 			return false;
 		}

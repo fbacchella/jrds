@@ -13,6 +13,7 @@ import java.util.Set;
 
 import jrds.ProbeDesc;
 import jrds.RdsHost;
+import jrds.factories.ProbeMeta;
 import jrds.starter.XmlProvider;
 
 import org.apache.log4j.Level;
@@ -22,6 +23,9 @@ import org.w3c.dom.Document;
  * @author Fabrice Bacchella 
  * @version $Revision: 407 $,  $Date: 2007-02-22 18:48:03 +0100 (jeu., 22 févr. 2007) $
  */
+@ProbeMeta(
+        topStarter=jrds.starter.XmlProvider.class
+)
 public class HttpXml extends HCHttpProbe {
 
 	private Set<String> xpaths = null;
@@ -90,7 +94,6 @@ public class HttpXml extends HCHttpProbe {
 	@Override
 	public void setHost(RdsHost monitoredHost) {
 		super.setHost(monitoredHost);
-		registerStarter(new XmlProvider());
 	}
 
 	public Map<String, Number> dom2Map(Document d, Map<String, Number> variables) {

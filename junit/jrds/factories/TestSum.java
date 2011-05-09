@@ -14,6 +14,7 @@ import jrds.RdsHost;
 import jrds.Tools;
 import jrds.factories.xml.JrdsNode;
 import jrds.graphe.Sum;
+import jrds.mockobjects.MockGraph;
 import jrds.mockobjects.MokeProbe;
 import jrds.probe.SumProbe;
 import jrds.webapp.ACL;
@@ -61,7 +62,7 @@ public class TestSum {
 		Tools.setLevel(new String[] {"jrds.factories.xml.CompiledXPath"}, Level.INFO);
 	}
 
-	private SumProbe doSumProbe(Document d, HostsList hl) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	private SumProbe doSumProbe(Document d, HostsList hl) throws Exception {
 		SumBuilder sm = new SumBuilder();
 		sm.setProperty(ObjectBuilder.properties.PM, pm);
 		SumProbe sp = sm.makeSum(new JrdsNode(d));
@@ -70,17 +71,19 @@ public class TestSum {
 		hl.addHost(host);
 		hl.addProbe(sp);
 
-		Probe<?, ?> mp = new MokeProbe<String, String>();
-		hl.addHost(mp.getHost());
-		hl.addProbe(mp);
+        jrds.GraphNode mg = new MockGraph();
+        mg.getGraphDesc().add("plot");
+        jrds.Util.serialize(mg.getGraphDesc().dumpAsXml(), System.out, null, null);
+
+		hl.addHost(mg.getProbe().getHost());
+		hl.addProbe(mg.getProbe());
 		
 		return sp;
 	}
 
 	@Test
 	public void testLoad() throws Exception {
-
-		Document d = Tools.parseString(goodSumSXml);
+	    Document d = Tools.parseString(goodSumSXml);
 		Tools.JrdsElement je = new Tools.JrdsElement(d);
 		je.addElement("element", "name=DummyHost/DummyProbe");
 
@@ -88,7 +91,9 @@ public class TestSum {
 		SumProbe sp = doSumProbe(d, hl);
 		Assert.assertEquals("name mismatch", "sumname", "sumname");
 		Sum s = (Sum) sp.getGraphList().toArray()[0];
-		logger.trace(s);
+		Document sumDocument = s.getGraphDesc().dumpAsXml();
+		jrds.Util.serialize(sumDocument, System.out, null, null);
+		logger.trace(sumDocument);
 	}
 
 	@Test

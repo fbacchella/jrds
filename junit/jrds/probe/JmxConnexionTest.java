@@ -50,8 +50,8 @@ public class JmxConnexionTest {
 			}	
 		};
 		Resolver r = new Resolver(cnx.getHostName());
-		r.register(host);
-		cnx.register(host);
+		host.registerStarter(r);
+		host.registerStarter(cnx);
 		boolean started = cnx.start();
 		Assert.assertFalse(started);
 		if(! started)

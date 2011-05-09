@@ -1,6 +1,5 @@
 package jrds;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import junit.framework.Assert;

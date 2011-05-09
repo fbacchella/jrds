@@ -14,12 +14,12 @@ public class MockGraph extends GraphNode {
 		super(theStore, new GraphDesc());
 	}
 
-	/* (non-Javadoc)
-	 * @see jrds.GraphNode#getName()
-	 */
-	@Override
-	public String getName() {
-		return "MockGraph";
-	}
+//	/* (non-Javadoc)
+//	 * @see jrds.GraphNode#getName()
+//	 */
+//	@Override
+//	public String getName() {
+//		return "MockGraph";
+//	}
 
 }
