@@ -90,7 +90,7 @@ public class HttpXml extends HttpProbe {
 	@Override
 	public void setHost(RdsHost monitoredHost) {
 		super.setHost(monitoredHost);
-		new XmlProvider().register(monitoredHost);
+		registerStarter(new XmlProvider());
 	}
 
 	public Map<String, Number> dom2Map(Document d, Map<String, Number> variables) {

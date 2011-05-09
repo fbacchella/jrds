@@ -32,7 +32,7 @@ public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
 	{
 		super();
 		name = newName;
-		new Resolver(name).register(this);
+		registerStarter(new Resolver(name));
 	}
 
 	public RdsHost(String name, String dnsName)
@@ -40,7 +40,7 @@ public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
 		super();
 		this.name = name;
 		this.dnsName = dnsName;
-		new Resolver(dnsName).register(this);
+        registerStarter(new Resolver(name));
 	}
 
 	/**
@@ -53,7 +53,7 @@ public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
 	{
 		this.name = name;
 		Starter resolver = new Resolver(name);
-		resolver.register(this);
+        registerStarter(resolver);
 	}
 
 	public String getName()
@@ -137,7 +137,7 @@ public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
 	 */
 	public void setDnsName(String dnsName) {
 		this.dnsName = dnsName;
-		new Resolver(dnsName).register(this);
+		registerStarter(new Resolver(dnsName));
 	}
 
 	/**

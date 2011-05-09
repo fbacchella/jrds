@@ -51,7 +51,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 		starter.setPasswd(passwd);
 		starter.setUser(user);
 		starter.setHost(getHost());
-		starter.register(getHost());
+		getHost().registerStarter(starter);
 	}
 
 	public void configure(int port, String user, String passwd, String dbName) {
@@ -61,7 +61,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 		starter.setPasswd(passwd);
 		starter.setUser(user);
 		starter.setHost(getHost());
-		starter.register(getHost());
+        getHost().registerStarter(starter);
 	}
 
 	@Override

@@ -63,7 +63,7 @@ public abstract class Connection<ConnectedType> extends Starter {
 		Resolver r = getLevel().find(Resolver.class);
 		if(r == null) {
 			r = new Resolver(hostName);
-			r.register(getLevel());
+			getLevel().registerStarter(r);
 		}
 		return r;
 	}
@@ -75,9 +75,8 @@ public abstract class Connection<ConnectedType> extends Starter {
 	public int getTimeout() {
 		SocketFactory sf = getLevel().find(SocketFactory.class);
 		return sf.getTimeout();
-
 	}
-
+	
 	/* (non-Javadoc)
 	 * @see jrds.Starter#start()
 	 */

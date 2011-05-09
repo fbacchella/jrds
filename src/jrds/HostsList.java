@@ -126,7 +126,7 @@ public class HostsList extends StarterNode {
 
         addTree("All tags", GraphTree.TAGSROOT);
 
-        new SocketFactory().register(this);
+        registerStarter(new SocketFactory());
         sumhost.setParent(this);
         customhost.setParent(this);
     }
@@ -217,7 +217,7 @@ public class HostsList extends StarterNode {
         logger.debug(jrds.Util.delayedFormatString("External top starters added %s", externalStarters));
         for(Class<? extends Starter> starterClass: externalStarters) {
             try {
-                starterClass.newInstance().register(this);
+                this.registerStarter(starterClass.newInstance());                //starterClass.newInstance().register(this);
             } catch (Exception e) {
                 logger.error("Starter " + starterClass + " failed to register");
             }

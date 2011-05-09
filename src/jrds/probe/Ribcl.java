@@ -59,7 +59,7 @@ public class Ribcl extends Probe<String, Number> {
 	@Override
 	public void setHost(RdsHost monitoredHost) {
 		super.setHost(monitoredHost);
-		new XmlProvider().register(monitoredHost);
+		this.registerStarter(new XmlProvider());
 	}
 
 	@Override

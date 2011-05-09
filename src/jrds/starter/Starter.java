@@ -5,7 +5,6 @@ import java.util.Date;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-
 public abstract class Starter {
 	long uptime = Long.MAX_VALUE;
 
@@ -21,7 +20,6 @@ public abstract class Starter {
 	/**
 	 * This method is called when the started is really registred<p/>
 	 * It can be overriden to contains delayed initialization but it must begin with a call to super.initialize(parent)
-	 * @param parent
 	 * @param level
 	 */
 	public void initialize(StarterNode level) {
@@ -108,16 +106,6 @@ public abstract class Starter {
 	}
 
 	/**
-	 * Register a node, keep the last one for a key
-	 * @param node
-	 * @return
-	 */
-	public final Starter register(StarterNode node) {
-		log(Level.TRACE,"Registering");
-		return node.registerStarter(this);
-	}
-
-	/**
 	 * @deprecated
 	 * Use getLevel instead.
 	 * @return the StarterNode for this starter
@@ -125,17 +113,6 @@ public abstract class Starter {
 	@Deprecated
 	public StartersSet getParent() {
 		return level;
-	}
-
-	@Deprecated
-	/**
-	 * @deprecated
-	 * Use a StarterNode type argument instead.
-	 * @return
-	 */
-	@SuppressWarnings("deprecation")
-	public final Starter register(StartersSet node) {
-		return register((StarterNode)node);
 	}
 
 	public void log(Level l, Throwable e, String format, Object... elements) {
