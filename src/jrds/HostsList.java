@@ -217,7 +217,7 @@ public class HostsList extends StarterNode {
             try {
                 registerStarter(starterClass.newInstance());
             } catch (Exception e) {
-                logger.error("Starter " + starterClass + " failed to register");
+                logger.error("Starter " + starterClass + " failed to register:" + e, e);
             }
         }
         configureStarters(pm);

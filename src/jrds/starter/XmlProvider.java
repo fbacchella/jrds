@@ -38,7 +38,6 @@ public class XmlProvider extends Starter {
         @Override
         protected DocumentBuilder initialValue() {
             DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
-            //DocumentBuilderFactory.newInstance();
             instance.setIgnoringComments(true);
             instance.setValidating(false);
             try {
@@ -73,8 +72,6 @@ public class XmlProvider extends Starter {
      */
     @Override
     public void stop() {
-        //xpather = null;
-        //dbuilder = null;
         log(Level.TRACE, "stopping XmlProvider %s@%s", getClass().getName(),Integer.toHexString(hashCode()) );
     }
 
@@ -179,13 +176,6 @@ public class XmlProvider extends Starter {
         } catch (UnsupportedOperationException e) {
         }
         return dbuilder.newDocument();
-    }
-
-    /**
-     * @return the xpather
-     */
-    public XPath getXpather() {
-        return localXpath.get();
     }
 
     public NodeList getNodeList(Document d, String xpath) throws XPathExpressionException {
