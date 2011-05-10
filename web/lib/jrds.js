@@ -1,23 +1,3 @@
-dojo.require("dojo.parser");
-dojo.require("dojo.data.ItemFileReadStore");
-dojo.require("dojo.number");
-dojo.require("dijit.layout.TabContainer");
-dojo.require("dijit.layout.ContentPane");
-dojo.require("dijit.layout.BorderContainer");
-dojo.require("dijit.form.Button");
-dojo.require("dijit.form.TextBox");
-dojo.require("dijit.form.DateTextBox");
-dojo.require("dijit.form.TimeTextBox");
-dojo.require("dijit.form.Form");
-dojo.require("dijit.form.Select");
-dojo.require("dijit.form.ValidationTextBox");
-dojo.require("dijit.form.NumberTextBox");
-dojo.require("dijit.Tree");
-dojo.require("dijit.Dialog");
-dojo.require("dojox.widget.Standby");
-dojo.require("dijit.TitlePane");
-dojo.require("dojox.form.FileUploader");
-
 var queryParams = {};
 
 dojo.declare("jrdsTree", dijit.Tree, {
@@ -60,7 +40,8 @@ dojo.declare("HourBox",dijit.form.TimeTextBox , {
 				queryParams[this.queryId] = elems[0] + ' ' + dojo.date.locale.format(date, this.hourFormat);
 			}
 			else {
-				queryParams[this.queryId] = '1970-01-01 ' + dojo.date.locale.format(date, this.hourFormat);
+				dateText = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
+				queryParams[this.queryId] = dateText + ' ' + dojo.date.locale.format(date, this.hourFormat);
 			}
 		}
 		return this.inherited(arguments);
@@ -166,8 +147,6 @@ function initIndex() {
 		dojo.connect(tabs,"_transition", transitTab);
 		setupCalendar();
 		setupDisplay();
-
-
 	});	
 }
 
@@ -354,7 +333,7 @@ function fileForms() {
 	}
 	else {
 		dojo.forEach(['begin', 'beginh', 'end', 'endh'], function(id, i) {
-			dijit.byId(id).attr('value', '');
+			dijit.byId(id).attr('value', null);
 		});
 	}
 
@@ -395,8 +374,6 @@ function setupDisplay() {
 			isFilters = false;
 		getTree(isFilters);
 	}
-
-	fileForms();
 
 	if(queryParams.id) {
 		getGraphList();
@@ -536,16 +513,6 @@ function toogleSort() {
 	getGraphList();
 }
 
-//function sort()
-//{
-//	if(! queryParams ) {
-//		queryParams.sort = 1;
-//	}
-//	else
-//		delete queryParams.sort;
-//	getGraphList();
-//}
-
 function setupCalendar() {
 	beginTimeTextBox = new HourBox( {
 		'class': 'field fieldHour', 
@@ -684,7 +651,7 @@ function setAutoperiod(value) {
 	if(value != 0) {
 		submitRenderForm();
 		dojo.forEach(['begin', 'beginh', 'end', 'endh'], function(id, i) {
-			dijit.byId(id).attr('value', '');
+			dijit.byId(id).attr('value', null);
 		});
 	}
 }
@@ -707,10 +674,10 @@ function submitRenderForm(evt) {
 
 function transitTab(newPage, oldPage){
 	try {
-	var newId = newPage.attr('id');
-	var oldId = oldPage.attr('id');
-	if(oldId != 'adminTab') {
-		oldPage.destroyDescendants(false);
+		var newId = newPage.attr('id');
+		var oldId = oldPage.attr('id');
+		if(oldId != 'adminTab') {
+			oldPage.destroyDescendants(false);
 	}
 	//Nothing special to do when showing adminTab
 	if(newId == 'adminTab') {
@@ -721,9 +688,7 @@ function transitTab(newPage, oldPage){
 	newPage.attr('content', dojo.clone(mainPane));
 
 	var treePane = dojo.byId('treePane');
-
 	var treeType = 'tree';
-	
 	var keepParams = newPage.keepParams;
 
 	//keepParams used during page setup, to keep queryParams fields
@@ -834,10 +799,13 @@ function updateStatus(statusInfo) {
 	dojo.create('span', {'class': 'statusvalue', innerHTML: statusInfo.Probes}, row2);
 
 	var lastCollect = statusInfo.LastCollect + "s ago";
-	var lastDuration = statusInfo.LastDuration + "s";
+	var lastDuration = (statusInfo.LastDuration / 1000).toFixed(0) + "s";
 	if(statusInfo.LastDuration == 0) {
 		lastCollect = 'not run';
-		lastDuration = 'not run'
+		lastDuration = 'not run';
+	}
+	else if(statusInfo.LastDuration < 1000) {
+		var lastDuration = statusInfo.LastDuration + "ms";
 	}
 	var row3 = dojo.create("div", {'class': "statusrow"}, statusNode);
 	dojo.create('span', {'class': 'statuslabel', innerHTML: 'Last collect'}, row3);
@@ -903,14 +871,13 @@ function doUpload(){
 
 function setAdminTab() {
 	refreshStatus();
-	
-	
-			//Setup the discoverer
-			var form = dojo.byId('discoverForm');
-			form.discoverHostName.value = '';
-			form.discoverSnmpCommunity.value = 'public';
-			form.discoverSnmpPort.value = '161';
-			dojo.style( dojo.byId('discoverResponse'), 'display', 'none');
+
+	//Setup the discoverer
+	var form = dojo.byId('discoverForm');
+	form.discoverHostName.value = '';
+	form.discoverSnmpCommunity.value = 'public';
+	form.discoverSnmpPort.value = '161';
+	dojo.style( dojo.byId('discoverResponse'), 'display', 'none');
 
 	//Set up the uploader
 	var uploader = dijit.byId('filesSelect');
@@ -929,7 +896,6 @@ function setAdminTab() {
 		//The uploader set a bad lineHeight
 		dojo.style('filesSelect', 'lineHeight', '');
 	}
-	
 	else {
 		//Don't forget to clean the file list
 		var filesResult = dojo.byId('filesResult');

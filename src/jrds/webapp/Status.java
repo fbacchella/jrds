@@ -63,7 +63,7 @@ public class Status extends JrdsServlet {
 				writer.key("Hosts").value(numHosts);
 				writer.key("Probes").value(numProbes);
 				writer.key("LastCollect").value(lastCollectAgo);
-				writer.key("LastDuration").value(runtime / 1000);
+				writer.key("LastDuration").value(runtime);
 				writer.key("Generation").value(generation);
 				writer.endObject();
 				writer.flush();
