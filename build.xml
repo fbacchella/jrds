@@ -169,6 +169,8 @@
 			<link href="http://logging.apache.org/log4j/1.2/apidocs/"/>
 			<link href="http://commons.apache.org/net/api-release/"/>
 			<link href="http://commons.apache.org/fileupload/apidocs/"/>
+			<link href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/"/>
+			<link href="http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/"/>
 		</javadoc>
 	</target>
 	
@@ -213,6 +215,7 @@
 			    <include name="dijit/themes/nihilo/**/*.*" />
 			    <include name="dojo/resources/blank.*" />
                 <include name="dojo/resources/dojo.css" />
+                <include name="dijit/themes/tundra/images/tabClose.png" />
 		    </tarfileset>
 			<tarfileset dir="${web.src}"/>
 			<tarfileset dir="libjetty" prefix="WEB-INF/lib"/>
@@ -234,6 +237,7 @@
 			    <include name="dijit/themes/nihilo/**/*.*" />
 			    <include name="dojo/resources/blank.*" />
                 <include name="dojo/resources/dojo.css" />
+                <include name="dijit/themes/tundra/images/tabClose.png" />
 		    </fileset>
 			<lib dir="lib">
 				<include name="*.jar"/>
