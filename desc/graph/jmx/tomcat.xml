@@ -2,20 +2,27 @@
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
 	"urn:jrds:graphdesc">
 <graphdesc>
-	<name>TomcatStats</name>
-	<graphName>tomcat-hits-${label}</graphName>
-	<graphTitle>Request count for ${label}</graphTitle>
+	<name>TomcatHits</name>
+	<graphName>tomcat-hits-${index}</graphName>
+	<graphTitle>Request count for ${index}</graphTitle>
 	<verticalLabel>Number</verticalLabel>
+	<add>
+		<name>errorCount</name>
+		<graphType>line</graphType>
+		<color>red</color>
+		<legend>Error count</legend>
+	</add>
 	<add>
 		<name>requestCount</name>
 		<graphType>line</graphType>
+		<color>green</color>
 		<legend>Request count</legend>
 	</add>
 	<hosttree>
 		<pathelement>HOST</pathelement>
 		<pathelement>SERVICES</pathelement>
 		<pathstring>Tomcat</pathstring>
-		<pathstring>${label}</pathstring>
+		<pathstring>Global request processor ${index}</pathstring>
 		<pathstring>Request count</pathstring>
 	</hosttree>
 	<viewtree>
@@ -23,6 +30,6 @@
 		<pathstring>Tomcat</pathstring>
 		<pathstring>Request count</pathstring>
 		<pathelement>HOST</pathelement>
-		<pathstring>${label}</pathstring>
+		<pathstring>Global request processor ${index}</pathstring>
 	</viewtree>
 </graphdesc>
