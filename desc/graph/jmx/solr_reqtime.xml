@@ -13,7 +13,7 @@
 		<name>searchTotalTime</name>
 	</add>
 	<add>
-		<name>searchTotalTime, 1000, *</name>
+		<rpn>searchTotalTime, 1000, *</rpn>
 		<graphType>line</graphType>
 		<legend>Response time</legend>
 	</add>
