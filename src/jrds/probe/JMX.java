@@ -1,7 +1,9 @@
 package jrds.probe;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -70,7 +72,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
                 } catch (AttributeNotFoundException e1) {
                     log(Level.ERROR, e1, "Invalide JMX attribue %s", attributeName);
                 } catch (InstanceNotFoundException e1) {
-                    log(Level.ERROR, e1, "JMX instance not found: ", e1.getMessage());
+                    log(Level.ERROR, e1, "JMX instance not found: %s", e1.getMessage());
                 } catch (MBeanException e1) {
                     log(Level.ERROR, e1, "JMX MBeanException: %s", e1);
                 } catch (ReflectionException e1) {
@@ -103,19 +105,20 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
      * @param jmxPath
      * @param o
      * @return
+     * @throws UnsupportedEncodingException 
      */
-    Number resolvJmxObject(Object o, String[] jmxPath) {
+    Number resolvJmxObject(Object o, String[] jmxPath) throws UnsupportedEncodingException {
         Object value = null;
         //Fast simple case
         if(o instanceof Number)
             return (Number) o;
         else if(o instanceof CompositeData && jmxPath.length == 2) {
-            String subKey = jmxPath[1];
+            String subKey = URLDecoder.decode(jmxPath[1], "UTF-8");
             CompositeData co = (CompositeData) o;
             value = co.get(subKey);
         }
         else if(o instanceof Map<?, ?> && jmxPath.length == 2) {
-            String subKey = jmxPath[1];
+            String subKey = URLDecoder.decode(jmxPath[1], "UTF-8");
             value = ((Map<?, ?>) o).get(subKey);
         }
         else if(o instanceof Collection<?>) {
