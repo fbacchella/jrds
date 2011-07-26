@@ -138,7 +138,7 @@ function initIndex() {
 				var discoverAutoBlock = dojo.byId('discoverAutoBlock');
 				dojo.place(response, discoverAutoBlock, 'replace');
 			}
-		})
+		});
 
 		//The parse can be done
 		dojo.parser.parse();
@@ -451,7 +451,7 @@ function getTree(isFilters, unfold) {
 		persist: false,
 		autoExpand: true == unfold,
 		isFilters: isFilters,
-		standby: treeStandby,
+		standby: treeStandby
 	}, treeOneDiv);
 }
 
