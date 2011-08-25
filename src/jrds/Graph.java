@@ -17,7 +17,6 @@ public class Graph implements WithACL {
 	static final private Logger logger = Logger.getLogger(Graph.class);
 
 	static final private SimpleDateFormat lastUpdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-	static private final SimpleDateFormat exportDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	private final GraphNode node;
     private final RrdGraphDef graphDef;
@@ -205,39 +204,18 @@ public class Graph implements WithACL {
 		out.write(buffer);
 	}
 
-	public void writeCsv(OutputStream out){
-		try {
-			DataProcessor dp = node.getGraphDesc().getPlottedDatas(node.getProbe(), null, start.getTime() / 1000, end.getTime() / 1000);
-			dp.processData();
-			String sources[] = dp.getSourceNames();
-			StringBuilder sourcesline = new StringBuilder();
-			sourcesline.append("Date,");
-			for(String name: sources) {
-				if(! name.startsWith("rev_"))
-					sourcesline.append(name + ",");
-			}
-			sourcesline.deleteCharAt(sourcesline.length() - 1);
-			sourcesline.append("\r\n");
-			out.write(sourcesline.toString().getBytes());
-			double[][] values = dp.getValues();
-			long[] ts = dp.getTimestamps();
-			for(int i=0; i < ts.length; i++) {
-				sourcesline.setLength(0);
-				sourcesline.append(exportDateFormat.format(org.rrd4j.core.Util.getDate(ts[i])) + ",");
-				for(int j = 0; j < sources.length; j++) {
-					if(! sources[j].startsWith("rev_"))
-						sourcesline.append(values[j][i]+",");
-				}
-				sourcesline.deleteCharAt(sourcesline.length() - 1);
-				sourcesline.append("\r\n");
-				out.write(sourcesline.toString().getBytes());
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	/**
+	 * Return the RRD4J's DataProcessor object for this graph
+	 * 
+	 * @return an already processed data processor
+	 * @throws IOException
+	 */
+	public DataProcessor getDataProcessor() throws IOException {
+	    DataProcessor dp = node.getGraphDesc().getPlottedDatas(node.getProbe(), null, start.getTime() / 1000, end.getTime() / 1000);
+        dp.processData();
+        return dp;
 	}
-
+	
 	public String getPngName() {
 		return node.getName().replaceAll("/","_").replaceAll(" ","_") + ".png";
 	}
