@@ -129,7 +129,7 @@ public class Download extends JrdsServlet {
             res.setContentType(CONTENT_TYPE);
             res.addHeader("content-disposition","attachment; filename=" + fileName);
             DateFormat exportDateFormat = humanDateFormat;
-            if("epoch".equals(params.getValue("date"))) {
+            if(params.getValue("epoch") != null) {
                 exportDateFormat = epochFormat;
             }
             writeCsv(out, sourceDp, exportDateFormat);
