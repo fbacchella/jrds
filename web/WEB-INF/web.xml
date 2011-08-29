@@ -133,6 +133,10 @@
 		<url-pattern>/download</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
+		<servlet-name>download</servlet-name>
+		<url-pattern>/download/*</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
 		<servlet-name>reload</servlet-name>
 		<url-pattern>/reload</url-pattern>
 	</servlet-mapping>
