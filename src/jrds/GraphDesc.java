@@ -577,11 +577,13 @@ implements Cloneable, WithACL {
     private List<?> hostTree = new ArrayList<Object>();
     private String graphName;
     private String name;
-    private String graphTitle ="{0} on {1}";
+    private String graphTitle ="{0} on ${host}";
     private int maxLengthLegend = 0;
     private boolean siUnit = true;
     private boolean logarithmic = false;
     private Integer unitExponent = null;
+    private boolean withLegend = true;
+    private boolean withValues = true; // To show the values block under the graph
     private ACL acl = ACL.ALLOWEDACL;
 
     public final class Dimension {
@@ -923,14 +925,16 @@ implements Cloneable, WithACL {
                 logger.error("No way to plot " + ds.name + " in " + name + " found");
             }
         }
-        /*The title line*/
-        graphDef.comment(""); //We simulate the color box
-        graphDef.comment(manySpace.substring(0, Math.min(maxLengthLegend, manySpace.length()) + 2));
-        graphDef.comment("Current");
-        graphDef.comment("  Average");
-        graphDef.comment("  Minimum");
-        graphDef.comment("  Maximum");
-        graphDef.comment("\\l");
+        // The title line, only if values block is required
+        if( withValues) {
+            graphDef.comment(""); //We simulate the color box
+            graphDef.comment(manySpace.substring(0, Math.min(maxLengthLegend, manySpace.length()) + 2));
+            graphDef.comment("Current");
+            graphDef.comment("  Average");
+            graphDef.comment("  Minimum");
+            graphDef.comment("  Maximum");
+            graphDef.comment("\\l");
+        }
 
         if(logger.isTraceEnabled()) {
             logger.trace("Datasource: " + datasources);
@@ -939,7 +943,7 @@ implements Cloneable, WithACL {
 
         for(DsDesc ds: toDo) {
             ds.graphType.draw(graphDef, ds.name, ds.color);
-            if(ds.graphType.legend())
+            if(withValues && ds.graphType.legend())
                 addLegend(graphDef, ds.name, ds.graphType, ds.legend);
         }
     }
@@ -1089,13 +1093,6 @@ implements Cloneable, WithACL {
     }
 
     /**
-     * @param upperLimit The upperLimit to set.
-     */
-    public void setLowerLimit(String lowerLimit) {
-        this.lowerLimit = Double.parseDouble(lowerLimit);
-    }
-
-    /**
      * @return Returns the upperLimit.
      */
     public double getUpperLimit() {
@@ -1107,13 +1104,6 @@ implements Cloneable, WithACL {
      */
     public void setUpperLimit(double upperLimit) {
         this.upperLimit = upperLimit;
-    }
-
-    /**
-     * @param upperLimit The upperLimit to set.
-     */
-    public void setUpperLimit(String upperLimit) {
-        this.upperLimit = Double.parseDouble(upperLimit);
     }
 
     /**
@@ -1436,5 +1426,34 @@ implements Cloneable, WithACL {
     public void setLogarithmic(boolean logarithmic) {
         this.logarithmic = logarithmic;
     }
+
+    /**
+     * @return the withLegend
+     */
+    public boolean withLegend() {
+        return withLegend;
+    }
+
+    /**
+     * @param withLegend the withLegend to set
+     */
+    public void setWithLegend(boolean withLegend) {
+        this.withLegend = withLegend;
+    }
+
+    /**
+     * @return the withValues
+     */
+    public boolean withValues() {
+        return withValues;
+    }
+
+    /**
+     * @param withValues the withValues to set
+     */
+    public void setWithValues(boolean withValues) {
+        this.withValues = withValues;
+    }
+
 
 }

@@ -29,9 +29,11 @@ public class GraphDescBuilder extends ObjectBuilder {
 			throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
 		} catch (IllegalAccessException e) {
 			throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
-		}
+		} catch (InstantiationException e) {
+            throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
+        }
 	}
-	public GraphDesc makeGraphDesc(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+	public GraphDesc makeGraphDesc(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 		GraphDesc gd = new GraphDesc();
 
 		JrdsNode subnode = n.getChild(CompiledXPath.get("(/graphdesc|/graph)"));
@@ -40,9 +42,12 @@ public class GraphDescBuilder extends ObjectBuilder {
 		subnode.setMethod(gd, CompiledXPath.get("graphName"), "setGraphName");
 		subnode.setMethod(gd, CompiledXPath.get("verticalLabel"), "setVerticalLabel");
 		subnode.setMethod(gd, CompiledXPath.get("graphTitle"), "setGraphTitle");
-		subnode.setMethod(gd, CompiledXPath.get("upperLimit"), "setUpperLimit");
-		subnode.setMethod(gd, CompiledXPath.get("lowerLimit"), "setLowerLimit");
+		subnode.setMethod(gd, CompiledXPath.get("upperLimit"), "setUpperLimit", Double.TYPE);
+		subnode.setMethod(gd, CompiledXPath.get("lowerLimit"), "setLowerLimit", Double.TYPE);
 		subnode.setMethod(gd, CompiledXPath.get("unit/base"), "setUnitExponent");
+        subnode.setMethod(gd, CompiledXPath.get("height"), "setHeight", Integer.TYPE);
+        subnode.setMethod(gd, CompiledXPath.get("width"), "setWidth", Integer.TYPE);
+
 
 		doACL(gd, n, CompiledXPath.get("/graph/role"));
 
@@ -50,15 +55,10 @@ public class GraphDescBuilder extends ObjectBuilder {
 		if(gd.getVerticalLabel() == null)
 			gd.setVerticalLabel("");
 
-		if(subnode.checkPath(CompiledXPath.get("unit/binary"))) {
-			gd.setSiUnit(false);
-		}
-		if(subnode.checkPath(CompiledXPath.get("unit/SI"))) {
-			gd.setSiUnit(true);
-		}
-        if(subnode.checkPath(CompiledXPath.get("logarithmic"))) {
-            gd.setLogarithmic(true);
-        }
+        subnode.callIfExist(gd, CompiledXPath.get("nolegend"), "setWithLegend", Boolean.TYPE, false);
+        subnode.callIfExist(gd, CompiledXPath.get("unit/binary"), "setSiUnit", Boolean.TYPE, false);
+        subnode.callIfExist(gd, CompiledXPath.get("unit/SI"), "setSiUnit", Boolean.TYPE, true);
+        subnode.callIfExist(gd, CompiledXPath.get("logarithmic"), "setLogarithmic", Boolean.TYPE, true);
 
 		for(Node addnode: subnode.iterate(CompiledXPath.get("add|addpath"))) {
 			Map<String, String> elements = new HashMap<String, String>(10);

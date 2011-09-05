@@ -35,11 +35,13 @@ public class ProbeDescBuilder extends ObjectBuilder {
 			throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
 		} catch (NoClassDefFoundError e) {
 			throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
-		}
+		} catch (InstantiationException e) {
+            throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
+        }
 	}
 
 	@SuppressWarnings("unchecked")
-	public ProbeDesc makeProbeDesc(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+	public ProbeDesc makeProbeDesc(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, InstantiationException {
 		ProbeDesc pd = new ProbeDesc();
 
 		JrdsNode probeDescNode = n.getChild(CompiledXPath.get("/probedesc"));

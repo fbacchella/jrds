@@ -4,8 +4,13 @@
 <graph>
 	<name>name</name>
 	<graphName>graphName</graphName>
-	<graphTitle>graphTitle</graphTitle>
+	<graphTitle/>
+	<height>800</height>
+	<width>600</width>
+	<nolegend />
 	<verticalLabel>verticalLabel</verticalLabel>
+	<upperLimit>NaN</upperLimit>
+	<lowerLimit>1000</lowerLimit>
 	<addpath>
 		<path>
 			<host>host1</host>

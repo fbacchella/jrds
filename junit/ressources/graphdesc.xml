@@ -16,6 +16,12 @@
 		<legend>legend1</legend>
 	</add>
 	<add>
+		<name>add3</name>
+		<reversed/>
+		<graphType>line</graphType>
+		<legend>legend3</legend>
+	</add>
+	<add>
 		<rpn>add1, add2, +</rpn>
 		<graphType>area</graphType>
 		<color>#010203</color>
@@ -29,4 +35,3 @@
 		<pathstring>viewtree2</pathstring>
 	</viewtree>
 </graphdesc>
-  

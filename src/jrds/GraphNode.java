@@ -6,7 +6,6 @@ package jrds;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.LinkedList;
-import java.util.Map;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
@@ -14,7 +13,6 @@ import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
 import org.apache.log4j.Logger;
-import org.rrd4j.data.Plottable;
 import org.rrd4j.graph.RrdGraphDef;
 
 /**

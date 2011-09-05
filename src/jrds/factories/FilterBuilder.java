@@ -24,10 +24,12 @@ public class FilterBuilder extends ObjectBuilder {
 			throw new InvocationTargetException(e, FilterBuilder.class.getName());
 		} catch (IllegalAccessException e) {
 			throw new InvocationTargetException(e, FilterBuilder.class.getName());
-		}
+		} catch (InstantiationException e) {
+            throw new InvocationTargetException(e, FilterBuilder.class.getName());
+        }
 	}
 
-	public Filter makeFilter(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+	public Filter makeFilter(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 		FilterXml f = new FilterXml();
 		n.setMethod(f, CompiledXPath.get("/filter/name"), "setName");
 		n.setMethod(f, CompiledXPath.get("/filter/path"), "addPath", false);
