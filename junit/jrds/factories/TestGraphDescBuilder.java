@@ -24,79 +24,95 @@ import org.rrd4j.DsType;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
 import org.rrd4j.graph.RrdGraphInfo;
+import org.w3c.dom.Document;
 
 
 public class TestGraphDescBuilder {
-	static final private Logger logger = Logger.getLogger(TestGraphDescBuilder.class);
+    static final private Logger logger = Logger.getLogger(TestGraphDescBuilder.class);
 
-	static final ObjectBuilder ob = new ObjectBuilder() {
-		@Override
-		Object build(JrdsNode n) {
-			return null;
-		}
-		
-	};
-	
-	@BeforeClass
-	static public void configure() throws ParserConfigurationException, IOException {
-		Tools.configure();
-		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"jrds.GraphDesc", "jrds.Grap"}, logger.getLevel());
+    static final ObjectBuilder ob = new ObjectBuilder() {
+        @Override
+        Object build(JrdsNode n) {
+            return null;
+        }
 
-		Tools.prepareXml();
-		PropertiesManager pm = new PropertiesManager();
-		pm.setProperty("configdir", "tmp");
-		pm.setProperty("rrddir", "tmp");
-		pm.update();
-		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, null);
-	}
-	
-	@Test
-	public void testGraphDesc() throws Exception {
-		JrdsNode d = new JrdsNode(Tools.parseRessource("graphdesc.xml"));
-		GraphDescBuilder gdbuild = new GraphDescBuilder();
-		gdbuild.setProperty(ObjectBuilder.properties.PM, new PropertiesManager());
-		GraphDesc gd = gdbuild.makeGraphDesc(d);
-		MokeProbe<String, Number> p = new MokeProbe<String, Number>();
+    };
 
-		ProbeDesc pd = p.getPd();
+    @BeforeClass
+    static public void configure() throws ParserConfigurationException, IOException {
+        Tools.configure();
+        logger.setLevel(Level.TRACE);
+        Tools.setLevel(new String[] {"jrds.GraphDesc", "jrds.Grap"}, logger.getLevel());
 
-		Map<String, Object> dsMap = new HashMap<String, Object>(2);
-		dsMap.put("dsName", "machin bidule");
-		dsMap.put("dsType", DsType.COUNTER);
-		pd.add(dsMap);
+        Tools.prepareXml();
+        PropertiesManager pm = new PropertiesManager();
+        pm.setProperty("configdir", "tmp");
+        pm.setProperty("rrddir", "tmp");
+        pm.update();
+        StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, null);
+    }
 
-		dsMap.clear();
-		dsMap.put("dsName", "add2");
-		dsMap.put("dsType", DsType.COUNTER);
-		pd.add(dsMap);
-		
-		p.checkStore();
-				
-		RrdGraphDef def = gd.getGraphDef(p);
-		RrdGraphInfo gi = new RrdGraph(def).getRrdGraphInfo();
-		
-		logger.debug(Arrays.asList(gi.getPrintLines()));
+    @Test
+    public void testGraphDesc() throws Exception {
+        JrdsNode d = new JrdsNode(Tools.parseRessource("graphdesc.xml"));
+        GraphDescBuilder gdbuild = new GraphDescBuilder();
+        gdbuild.setProperty(ObjectBuilder.properties.PM, new PropertiesManager());
+        GraphDesc gd = gdbuild.makeGraphDesc(d);
+        if(logger.isTraceEnabled()) {
+            Document gddom = gd.dumpAsXml();
+            jrds.Util.serialize(gddom, System.out, null, null);
+        }
+        MokeProbe<String, Number> p = new MokeProbe<String, Number>();
 
-		Assert.assertEquals("graph name failed", "graphName", gd.getGraphName());
-		Assert.assertEquals("graph title failed", "graphTitle", gd.getGraphTitle());
-		Assert.assertEquals("graph name failed", "name", gd.getName());
-		Assert.assertEquals("legeng count failed", 2, gd.getLegendLines());
-		
-		Assert.assertEquals("graph height invalid", 286 , gi.getHeight());
-		Assert.assertEquals("graph width invalid", 669 , gi.getWidth());
-		Assert.assertEquals("graph byte count invalid", 12574 , gi.getByteCount(), 1000);
-	}
+        ProbeDesc pd = p.getPd();
 
-	@Test
-	public void testCustomGraph() throws Exception {
-		JrdsNode d = new JrdsNode(Tools.parseRessource("customgraph.xml"));
-		GraphDescBuilder gdbuild = new GraphDescBuilder();
-		gdbuild.setProperty(ObjectBuilder.properties.PM, new PropertiesManager());
-		GraphDesc gd = gdbuild.makeGraphDesc(d);
-		Assert.assertEquals("graph name failed", "graphName", gd.getGraphName());
-		Assert.assertEquals("graph title failed", "graphTitle", gd.getGraphTitle());
-		Assert.assertEquals("graph name failed", "name", gd.getName());
-	}
+        Map<String, Object> dsMap = new HashMap<String, Object>(2);
+        dsMap.put("dsName", "machin bidule");
+        dsMap.put("dsType", DsType.COUNTER);
+        pd.add(dsMap);
+
+        dsMap.clear();
+        dsMap.put("dsName", "add2");
+        dsMap.put("dsType", DsType.COUNTER);
+        pd.add(dsMap);
+
+        dsMap.clear();
+        dsMap.put("dsName", "add3");
+        dsMap.put("dsType", DsType.COUNTER);
+        pd.add(dsMap);
+
+        p.checkStore();
+
+        RrdGraphDef def = gd.getGraphDef(p);
+        RrdGraphInfo gi = new RrdGraph(def).getRrdGraphInfo();
+
+        logger.debug(Arrays.asList(gi.getPrintLines()));
+
+        Assert.assertEquals("graph name failed", "graphName", gd.getGraphName());
+        Assert.assertEquals("graph title failed", "graphTitle", gd.getGraphTitle());
+        Assert.assertEquals("graph name failed", "name", gd.getName());
+        Assert.assertEquals("legeng count failed", 3, gd.getLegendLines());
+
+        Assert.assertTrue("graph height invalid", 206 < gi.getHeight());
+        Assert.assertTrue("graph width invalid", 578 < gi.getWidth());
+        Assert.assertEquals("graph byte count invalid", 12574 , gi.getByteCount(), 1000);
+    }
+
+    @Test
+    public void testCustomGraph() throws Exception {
+        JrdsNode d = new JrdsNode(Tools.parseRessource("customgraph.xml"));
+        GraphDescBuilder gdbuild = new GraphDescBuilder();
+        gdbuild.setProperty(ObjectBuilder.properties.PM, new PropertiesManager());
+        GraphDesc gd = gdbuild.makeGraphDesc(d);
+        Assert.assertEquals("graph name failed", "graphName", gd.getGraphName());
+        Assert.assertEquals("graph title failed", "", gd.getGraphTitle());
+        Assert.assertEquals("graph name failed", "name", gd.getName());
+        Assert.assertEquals("graph height invalid", 800, gd.getHeight());
+        Assert.assertEquals("graph width invalid", 600, gd.getWidth());
+        Assert.assertTrue("Lower limit is a number (not a NaN)" + gd.getUpperLimit() , Double.isNaN(gd.getUpperLimit()));
+        Assert.assertEquals("graph lower limit is invalid", 1000, gd.getLowerLimit(),0.1);
+        Assert.assertFalse("graph is with legend", gd.withLegend());
+        Assert.assertTrue("graph is without values", gd.withValues());
+    }
 
 }

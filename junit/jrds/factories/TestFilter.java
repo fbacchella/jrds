@@ -2,7 +2,6 @@ package jrds.factories;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
@@ -57,7 +56,7 @@ public class TestFilter {
 		Tools.setLevel(new String[] {"jrds.factories.xml.CompiledXPath"}, Level.INFO);
 	}
 	
-	private Filter doFilter(Document d) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+	private Filter doFilter(Document d) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 		FilterBuilder sm = new FilterBuilder();
 		sm.setProperty(ObjectBuilder.properties.PM, pm);
 		Filter sp = sm.makeFilter(new JrdsNode(d));
