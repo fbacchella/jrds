@@ -71,7 +71,7 @@ public class TestDescFactory {
 
 		Assert.assertEquals("name", gd.getName());
 		Assert.assertEquals("graphName", gd.getGraphName());
-		Assert.assertEquals("graphTitle", gd.getGraphTitle());
+		Assert.assertEquals("", gd.getGraphTitle());
 		Assert.assertTrue(gd.isSiUnit());
 		Assert.assertEquals("verticalLabel", gd.getVerticalLabel());
 		GraphNode gn = new GraphNode(GetMoke.getProbe(), gd);
