@@ -2,6 +2,7 @@ package jrds;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -288,18 +289,5 @@ public class UtilTest {
 		logger.trace(Arrays.asList(toSort));
 		Assert.assertEquals("[host2, host03, host10, linode, linux, Linux, redbus, telecity, zOS]", sorted);
 	}
-	
-	@Test
-	public void getPrimitive() {
-        Assert.assertNotSame(Boolean.class, jrds.Util.getPrimitiveClass(Boolean.class));
-        Assert.assertNotSame(Byte.class, jrds.Util.getPrimitiveClass(Byte.class));
-        Assert.assertNotSame(Double.class, jrds.Util.getPrimitiveClass(Double.class));
-        Assert.assertNotSame(Short.class, jrds.Util.getPrimitiveClass(Short.class));
-        Assert.assertNotSame(Integer.class, jrds.Util.getPrimitiveClass(Integer.class));
-        Assert.assertNotSame(Long.class, jrds.Util.getPrimitiveClass(Long.class));
-        Assert.assertNotSame(Float.class, jrds.Util.getPrimitiveClass(Float.class));
-        Assert.assertNotSame(Character.class, jrds.Util.getPrimitiveClass(Character.class));
-        Assert.assertSame(String.class, jrds.Util.getPrimitiveClass(String.class));
-        Assert.assertSame(this.getClass(), jrds.Util.getPrimitiveClass(this.getClass()));
-	}
+
 }

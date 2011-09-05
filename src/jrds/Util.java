@@ -557,7 +557,6 @@ public class Util {
         return null;
     }
 
-
     /**
      * A wrapper method to delay evaluation of log4j arguments
      * @param format
@@ -573,52 +572,5 @@ public class Util {
         };
     }
 
-    /**
-     * A utility method for a easy generation of an array
-     * @param <T>
-     * @param types
-     * @return
-     */
-    static public final <T> T[] makeArray(T... types) {
-        return types;
-    }
-
-    /**
-     * A utility method to get the possible primitive type associated with a class
-     * for example it returns the int class from an Integer
-     * @param c a class to find the native type
-     * @return the native class or the originating class
-     */
-    static public final Class<?> getPrimitiveClass(Class<?> c) {
-        try {
-            if (Boolean.class == c) {
-                return Boolean.class.getMethod("booleanValue").getReturnType();
-            }
-            else if (Character.class == c) {
-                return Character.class.getMethod("charValue").getReturnType();
-            }
-            else if (Byte.class == c) {
-                return Byte.class.getMethod("byteValue").getReturnType();
-            }
-            else if (Short.class == c) {
-                return Number.class.getMethod("shortValue").getReturnType();
-            }
-            else if(Integer.class == c) {
-                return Number.class.getMethod("intValue").getReturnType();
-            }
-            else if (Long.class == c) {
-                return Long.class.getMethod("longValue").getReturnType();
-            }
-            if(Float.class == c) {
-                return Number.class.getMethod("floatValue").getReturnType();
-            }
-            if(Double.class == c) {
-                return Number.class.getMethod("doubleValue").getReturnType();
-            }
-        } catch (Exception e) {
-        }
-        return c;
-    }
-
-}
+ }
 
