@@ -30,6 +30,11 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
 
     static {
         sourceTypeMapping.put("JRDS Agent", "jrds_agent");
+        sourceTypeMapping.put("SNMP", "SNMP");
+        sourceTypeMapping.put("Munin", "munin");
+        sourceTypeMapping.put("HttpXml", "httpxml");
+        sourceTypeMapping.put("kstat", "kstat");
+        sourceTypeMapping.put("JMX", "jmx");
     }
     String propFile = "jrds.properties";
 
