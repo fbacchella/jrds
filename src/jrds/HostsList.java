@@ -29,8 +29,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.factories.ConfigObjectFactory;
-import jrds.factories.Loader;
+import jrds.configuration.ConfigObjectFactory;
+import jrds.configuration.Loader;
 import jrds.factories.ProbeMeta;
 import jrds.probe.ContainerProbe;
 import jrds.probe.SumProbe;
