@@ -1,40 +1,20 @@
 package jrds.configuration;
 
 import java.io.IOException;
-import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.HostsList;
 import jrds.PropertiesManager;
-//import jrds.Tab;
 import jrds.Tools;
-import jrds.configuration.ConfigObjectFactory;
-import jrds.factories.xml.JrdsNode;
-import jrds.graphe.Sum;
-import jrds.probe.SumProbe;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 public class TestTab {
 	static final private Logger logger = Logger.getLogger(TestTab.class);
-
-	static final private String goodTabXml =
-		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
-		"<!DOCTYPE tab PUBLIC \"-//jrds//DTD Tab//EN\" \"urn:jrds:tab\">" +
-		"<tab name=\"tabname\">" +
-		"<filter>afilter</filter>" +
-		"<graph id=\"graphid\">" +
-		"<path>p1</path>" +
-		"<path>p2</path>" +
-		"</graph>" +
-		"</tab>";
 
 	static DocumentBuilder dbuilder;
 	static ConfigObjectFactory conf;

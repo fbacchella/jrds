@@ -13,13 +13,17 @@ import jrds.factories.xml.JrdsNode;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Node;
 
-public class ProbeDescBuilder extends ObjectBuilder {
+public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
 	static final private Logger logger = Logger.getLogger(ProbeDescBuilder.class);
 
 	private ClassLoader classLoader = ProbeDescBuilder.class.getClassLoader();
 
-	@Override
-	Object build(JrdsNode n) throws InvocationTargetException {
+    public ProbeDescBuilder() {
+        super(ConfigType.PROBEDESC);
+    }
+
+    @Override
+	ProbeDesc build(JrdsNode n) throws InvocationTargetException {
 		try {
 			return makeProbeDesc(n);
 		} catch (SecurityException e) {
@@ -72,9 +76,9 @@ public class ProbeDescBuilder extends ObjectBuilder {
 			pd.setUptimefactor(0);
 		}
 
-		List<String> graphs = (List<String>) probeDescNode.doTreeList(CompiledXPath.get("graphs/name"), new JrdsNode.FilterNode() {
+		List<String> graphs = probeDescNode.doTreeList(CompiledXPath.get("graphs/name"), new JrdsNode.FilterNode<String>() {
 			@Override
-			public Object filter(Node input) {
+			public String filter(Node input) {
 				if(logger.isTraceEnabled())
 					logger.trace("Adding graph: " + input.getTextContent());
 				return input.getTextContent();
@@ -123,16 +127,11 @@ public class ProbeDescBuilder extends ObjectBuilder {
 		return pd;
 	}
 
-	@Override
-	public
-	void setProperty(ObjectBuilder.properties name, Object o) {
-		switch(name) {
-		case CLASSLOADER:
-			classLoader = (ClassLoader) o;
-			break;
-		default:
-			super.setProperty(name, o);
-		}
-	}
+    /**
+     * @param classLoader the classLoader to set
+     */
+    void setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
 
 }

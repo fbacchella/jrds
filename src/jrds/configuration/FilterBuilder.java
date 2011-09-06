@@ -9,11 +9,16 @@ import jrds.factories.xml.JrdsNode;
 
 import org.apache.log4j.Logger;
 
-public class FilterBuilder extends ObjectBuilder {
-	static final private Logger logger = Logger.getLogger(FilterBuilder.class);
+public class FilterBuilder extends ConfigObjectBuilder<Filter> {
 
-	@Override
-	Object build(JrdsNode n) throws InvocationTargetException {
+    static final private Logger logger = Logger.getLogger(FilterBuilder.class);
+
+    public FilterBuilder() {
+        super(ConfigType.FILTER);
+    }
+
+    @Override
+	Filter build(JrdsNode n) throws InvocationTargetException {
 		try {
 			return makeFilter(n);
 		} catch (SecurityException e) {

@@ -31,16 +31,19 @@ import jrds.starter.StarterNode;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
-public class HostBuilder extends ObjectBuilder {
+public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
 	static final private Logger logger = Logger.getLogger(HostBuilder.class);
 
 	private ClassLoader classLoader = null;
-
 	private ProbeFactory pf;
 	private Map<String, Macro> macrosMap;
 
-	@Override
-	Object build(JrdsNode n) throws InvocationTargetException {
+    public HostBuilder() {
+        super(ConfigType.HOSTS);
+    }
+
+    @Override
+	RdsHost build(JrdsNode n) throws InvocationTargetException {
 		try {
 			return makeRdsHost(n);
 		} catch (SecurityException e) {
@@ -87,7 +90,6 @@ public class HostBuilder extends ObjectBuilder {
 	}
 
 	private void parseFragment(JrdsNode fragment, RdsHost host, StarterNode ns, Map<String, Set<String>> collections) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-
 	    try {
             Class<? extends HostBuilderAgent> c = (Class<? extends HostBuilderAgent>) pm.extensionClassLoader.loadClass("jrds.snmp.SnmpHostBuilderAgent");
             c.getConstructor().newInstance().buildStarters(fragment, host);
@@ -315,23 +317,25 @@ public class HostBuilder extends ObjectBuilder {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public
-	void setProperty(ObjectBuilder.properties name, Object o) {
-		switch(name) {
-		case CLASSLOADER:
-			classLoader = (ClassLoader) o;
-			break;
-		case MACRO:
-			macrosMap = (Map<String, Macro>) o;
-			break;
-		case PROBEFACTORY:
-			pf = (ProbeFactory) o;
-			break;
-		default:
-			super.setProperty(name, o);
-		}
-	}
+    /**
+     * @param pf the pf to set
+     */
+    void setProbeFactory(ProbeFactory pf) {
+        this.pf = pf;
+    }
+
+    /**
+     * @param macrosMap the macrosMap to set
+     */
+    void setMacros(Map<String, Macro> macrosMap) {
+        this.macrosMap = macrosMap;
+    }
+
+    /**
+     * @param classLoader the classLoader to set
+     */
+    void setClassLoader(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
 
 }

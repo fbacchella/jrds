@@ -19,13 +19,6 @@ import jrds.RdsHost;
 import jrds.StoreOpener;
 import jrds.Tab;
 import jrds.Tools;
-import jrds.configuration.ConfigObjectFactory;
-import jrds.configuration.FilterBuilder;
-import jrds.configuration.HostBuilder;
-import jrds.configuration.MacroBuilder;
-import jrds.configuration.ObjectBuilder;
-import jrds.configuration.TabBuilder;
-import jrds.configuration.Loader.ConfigType;
 import jrds.factories.ProbeFactory;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
@@ -104,8 +97,9 @@ public class TestLoadConfiguration {
 		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, null);
 
 		conf = new ConfigObjectFactory(pm);
-		conf.setGraphDescMap(l.getRepository(Loader.ConfigType.GRAPHDESC));
-		conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
+		conf.setLoader(l);
+		conf.setGraphDescMap();
+		conf.setProbeDescMap();
 
 		logger.setLevel(Level.TRACE);
 		Tools.setLevel(new String[] {"jrds.factories", "jrds.Probe.DummyProbe"}, logger.getLevel());
@@ -117,7 +111,7 @@ public class TestLoadConfiguration {
 		JrdsNode d = new JrdsNode(Tools.parseRessource("view1.xml"));
 
 		FilterBuilder fb = new FilterBuilder();
-		fb.setProperty(ObjectBuilder.properties.PM, pm);
+		fb.setPm(pm);
 		Filter f = fb.makeFilter(d);
 		Assert.assertEquals("Test view 1",f.getName());
 	}
@@ -128,8 +122,8 @@ public class TestLoadConfiguration {
 		JrdsNode pnode = new JrdsNode(d);
 
 		HostBuilder hb = new HostBuilder();
-		hb.setProperty(ObjectBuilder.properties.PROBEFACTORY, new MokeProbeFactory());
-		hb.setProperty(ObjectBuilder.properties.PM, pm);
+		hb.setProbeFactory(new MokeProbeFactory());
+        hb.setPm(pm);
 		
 		RdsHost host = new RdsHost();
 		host.setHostDir(pm.rrddir);
@@ -148,8 +142,8 @@ public class TestLoadConfiguration {
 
 		HostBuilder hb = new HostBuilder();
 		ProbeFactory pf =  new MokeProbeFactory();
-		hb.setProperty(ObjectBuilder.properties.PROBEFACTORY, pf);
-		hb.setProperty(ObjectBuilder.properties.PM, pm);
+        hb.setProbeFactory(pf);
+        hb.setPm(pm);
 		
 		RdsHost host = new RdsHost();
 		host.setHostDir(pm.rrddir);
@@ -198,9 +192,9 @@ public class TestLoadConfiguration {
 		System.out.println();
 		
 		HostBuilder hb = new HostBuilder();
-		hb.setProperty(ObjectBuilder.properties.PM, pm);
-		hb.setProperty(ObjectBuilder.properties.MACRO, macroMap);
-		hb.setProperty(ObjectBuilder.properties.PROBEFACTORY, new MokeProbeFactory());
+        hb.setPm(pm);
+        hb.setMacros(macroMap);
+        hb.setProbeFactory(new MokeProbeFactory());
 
 		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
 		
@@ -235,9 +229,9 @@ public class TestLoadConfiguration {
 		Tools.appendString(hostdoc.getDocumentElement(), "<macro name=\"macrodef\" />");
 
 		HostBuilder hb = new HostBuilder();
-		hb.setProperty(ObjectBuilder.properties.PM, pm);
-		hb.setProperty(ObjectBuilder.properties.MACRO, macroMap);
-		hb.setProperty(ObjectBuilder.properties.PROBEFACTORY, new MokeProbeFactory());
+        hb.setPm(pm);
+        hb.setMacros(macroMap);
+        hb.setProbeFactory(new MokeProbeFactory());
 
 		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
 		Assert.assertTrue("tag not found", host.getTags().contains(tagname));
@@ -263,9 +257,9 @@ public class TestLoadConfiguration {
 		System.out.println();
 
 		HostBuilder hb = new HostBuilder();
-		hb.setProperty(ObjectBuilder.properties.PM, pm);
-		hb.setProperty(ObjectBuilder.properties.MACRO, macroMap);
-		hb.setProperty(ObjectBuilder.properties.PROBEFACTORY, new MokeProbeFactory());
+        hb.setPm(pm);
+        hb.setMacros(macroMap);
+        hb.setProbeFactory(new MokeProbeFactory());
 
 		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
 		
@@ -291,7 +285,8 @@ public class TestLoadConfiguration {
 
 		Map<String, JrdsNode> hostDescMap = new HashMap<String, JrdsNode>();
 		hostDescMap.put("name", hostNode);
-		Map<String, RdsHost> hostMap = conf.setHostMap(hostDescMap);
+		conf.getLoader().setRepository(ConfigType.HOSTS, hostDescMap);
+		Map<String, RdsHost> hostMap = conf.setHostMap();
 		logger.trace(hostMap);
 		RdsHost h = hostMap.get("myhost");
 		Assert.assertNotNull(h);
@@ -309,7 +304,7 @@ public class TestLoadConfiguration {
 		JrdsNode pnode = new JrdsNode(Tools.parseString(propertiesXmlString));
 
 		HostBuilder hb = new HostBuilder();
-		hb.setProperty(ObjectBuilder.properties.PM, pm);
+        hb.setPm(pm);
 
 		Map<String, String> props = hb.makeProperties(pnode);
 		Assert.assertEquals(2, props.size());
@@ -322,7 +317,7 @@ public class TestLoadConfiguration {
 		JrdsNode tabNode = new JrdsNode(Tools.parseRessource("goodtab.xml"));
 		
 		TabBuilder tb = new TabBuilder();
-		Tab tab = tb.makeTab(tabNode);
+		Tab tab = tb.build(tabNode);
 		
 		Assert.assertEquals("Tab name not set", "goodtab", tab.getName());
 	}

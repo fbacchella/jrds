@@ -14,12 +14,16 @@ import jrds.factories.xml.JrdsNode;
 
 import org.w3c.dom.Node;
 
-public class GraphDescBuilder extends ObjectBuilder {
+public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
 	private final BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
 	private final Graphics2D g2d = img.createGraphics();
 
+    public GraphDescBuilder() {
+        super(ConfigType.GRAPHDESC);
+    }
+    
 	@Override
-	Object build(JrdsNode n) throws InvocationTargetException {
+	GraphDesc build(JrdsNode n) throws InvocationTargetException {
 		try {
 			return makeGraphDesc(n);
 		} catch (SecurityException e) {

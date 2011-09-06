@@ -13,7 +13,7 @@ import jrds.PropertiesManager;
 import jrds.StoreOpener;
 import jrds.Tools;
 import jrds.configuration.GraphDescBuilder;
-import jrds.configuration.ObjectBuilder;
+import jrds.configuration.ConfigObjectBuilder;
 import jrds.factories.xml.JrdsNode;
 import jrds.mockobjects.MokeProbe;
 
@@ -32,7 +32,7 @@ import org.w3c.dom.Document;
 public class TestGraphDescBuilder {
     static final private Logger logger = Logger.getLogger(TestGraphDescBuilder.class);
 
-    static final ObjectBuilder ob = new ObjectBuilder() {
+    static final ConfigObjectBuilder<Object> ob = new ConfigObjectBuilder<Object>(ConfigType.GRAPHDESC) {
         @Override
         Object build(JrdsNode n) {
             return null;
@@ -58,7 +58,7 @@ public class TestGraphDescBuilder {
     public void testGraphDesc() throws Exception {
         JrdsNode d = new JrdsNode(Tools.parseRessource("graphdesc.xml"));
         GraphDescBuilder gdbuild = new GraphDescBuilder();
-        gdbuild.setProperty(ObjectBuilder.properties.PM, new PropertiesManager());
+        gdbuild.setPm(new PropertiesManager());
         GraphDesc gd = gdbuild.makeGraphDesc(d);
         if(logger.isTraceEnabled()) {
             Document gddom = gd.dumpAsXml();
@@ -104,7 +104,7 @@ public class TestGraphDescBuilder {
     public void testCustomGraph() throws Exception {
         JrdsNode d = new JrdsNode(Tools.parseRessource("customgraph.xml"));
         GraphDescBuilder gdbuild = new GraphDescBuilder();
-        gdbuild.setProperty(ObjectBuilder.properties.PM, new PropertiesManager());
+        gdbuild.setPm(new PropertiesManager());
         GraphDesc gd = gdbuild.makeGraphDesc(d);
         Assert.assertEquals("graph name failed", "graphName", gd.getGraphName());
         Assert.assertEquals("graph title failed", "", gd.getGraphTitle());

@@ -5,7 +5,7 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Tools;
-import jrds.configuration.Loader.ConfigType;
+import jrds.configuration.ConfigType;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;

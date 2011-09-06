@@ -9,10 +9,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import jrds.Filter;
 import jrds.PropertiesManager;
 import jrds.Tools;
-import jrds.configuration.ConfigObjectFactory;
-import jrds.configuration.FilterBuilder;
-import jrds.configuration.ObjectBuilder;
-import jrds.configuration.Loader.ConfigType;
 import jrds.factories.xml.JrdsNode;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
@@ -52,8 +48,9 @@ public class TestFilter {
 		pm.update();
 
 		conf = new ConfigObjectFactory(pm);
-		conf.setGraphDescMap(l.getRepository(Loader.ConfigType.GRAPHDESC));
-		conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
+		conf.setLoader(l);
+		conf.setGraphDescMap();
+		conf.setProbeDescMap();
 
 		logger.setLevel(Level.TRACE);
 		Tools.setLevel(new String[] {"jrds.factories", "jrds.Filter", "jrds.FilterXml"}, logger.getLevel());
@@ -62,7 +59,7 @@ public class TestFilter {
 	
 	private Filter doFilter(Document d) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 		FilterBuilder sm = new FilterBuilder();
-		sm.setProperty(ObjectBuilder.properties.PM, pm);
+		sm.setPm(pm);
 		Filter sp = sm.makeFilter(new JrdsNode(d));
 		
 		return sp;

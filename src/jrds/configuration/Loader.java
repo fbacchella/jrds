@@ -19,102 +19,17 @@ import java.util.jar.JarFile;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpression;
 
-import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.EntityResolver;
 import jrds.factories.xml.JrdsNode;
 
 import org.apache.log4j.Logger;
-import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-public class Loader {
+class Loader {
 
-	public enum ConfigType {
-		FILTER {
-			final XPathExpression xpath = CompiledXPath.get("/filter/name");
-			public boolean memberof(Node d) {
-				return matchDocElement(d, "filter");
-			}
-			public XPathExpression getNameXpath() {
-				return xpath;
-			}
-		},
-		HOSTS {
-			final XPathExpression xpath = CompiledXPath.get("/host/@name");
-			public boolean memberof(Node d) {
-				return matchDocElement(d, "host");
-			}
-			public XPathExpression getNameXpath() {
-				return xpath;
-			}
-		},
-		SUM {
-			final XPathExpression xpath = CompiledXPath.get("/sum/@name");
-			public boolean memberof(Node d) {
-				return matchDocElement(d, "sum");
-			}
-			public XPathExpression getNameXpath() {
-				return xpath;
-			}
-		},
-		TAB {
-			final XPathExpression xpath = CompiledXPath.get("/tab/@name");
-			public boolean memberof(Node d) {
-				return matchDocElement(d, "tab");
-			}
-			public XPathExpression getNameXpath() {
-				return xpath;
-			}
-		},
-		MACRODEF {
-			final XPathExpression xpath = CompiledXPath.get("/macrodef/@name");
-			public boolean memberof(Node d) {
-				return matchDocElement(d, "macrodef");
-			}
-			public XPathExpression getNameXpath() {
-				return xpath;
-			}
-		},
-		GRAPH {
-			final XPathExpression xpath = CompiledXPath.get("/graph/name");
-			public boolean memberof(Node d) {
-				return matchDocElement(d, "graph");
-			}
-			public XPathExpression getNameXpath() {
-				return xpath;
-			}
-		},
-		GRAPHDESC {
-			final XPathExpression xpath = CompiledXPath.get("/graphdesc/name");
-			public boolean memberof(Node d) {
-				return matchDocElement(d, "graphdesc");
-			}
-			public XPathExpression getNameXpath() {
-				return xpath;
-			}
-		},
-		PROBEDESC {
-			final XPathExpression xpath = CompiledXPath.get("/probedesc/name");
-			public boolean memberof(Node d) {
-				return matchDocElement(d, "probedesc");
-			}
-			public XPathExpression getNameXpath() {
-				return xpath;
-			}
-		};
-
-		public abstract boolean memberof(Node d);
-		public abstract XPathExpression getNameXpath();
-
-		private static boolean matchDocElement(Node d, String rootElement) {
-			String root = d.getFirstChild().getNodeName();
-			return rootElement.equals(root);
-		}
-	}
 	static final private Logger logger = Logger.getLogger(Loader.class);
 
 	private final FileFilter filter = new  FileFilter(){
@@ -154,8 +69,6 @@ public class Loader {
 		}
 	}
 
-	public void setStrict() {
-	}
 	public Map<ConfigType, Map<String, JrdsNode>> getRepositories(){
 		return repositories;
 	}
@@ -164,7 +77,11 @@ public class Loader {
 		return repositories.get(t);
 	}
 
-	public void loadPaths(List<URL> list) {
+    public void setRepository(ConfigType t, Map<String, JrdsNode> mapnodes) {
+        repositories.put(t, mapnodes);
+    }
+
+    public void loadPaths(List<URL> list) {
 		for(URL u: list) {
 			importUrl(u);
 		}

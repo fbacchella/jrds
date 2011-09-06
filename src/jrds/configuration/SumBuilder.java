@@ -7,10 +7,14 @@ import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 import jrds.probe.SumProbe;
 
-public class SumBuilder extends ObjectBuilder {
+public class SumBuilder extends ConfigObjectBuilder<SumProbe> {
 
-	@Override
-	Object build(JrdsNode n) throws InvocationTargetException {
+	public SumBuilder() {
+        super(ConfigType.SUM);
+    }
+
+    @Override
+	SumProbe build(JrdsNode n) throws InvocationTargetException {
 		try {
 			return  makeSum(n);
 		} catch (SecurityException e) {

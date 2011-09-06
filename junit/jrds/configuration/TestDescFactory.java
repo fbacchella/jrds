@@ -9,12 +9,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.GraphDesc;
 import jrds.GraphNode;
+import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.Tools;
-import jrds.ProbeDesc;
-import jrds.configuration.GraphDescBuilder;
-import jrds.configuration.ObjectBuilder;
-import jrds.configuration.ProbeDescBuilder;
 import jrds.factories.xml.JrdsNode;
 import jrds.mockobjects.GetMoke;
 
@@ -69,7 +66,7 @@ public class TestDescFactory {
 	public void loadGraph()  throws Exception {
 		Document d = Tools.parseRessource("customgraph.xml");
 		GraphDescBuilder builder = new GraphDescBuilder();
-		builder.setProperty(ObjectBuilder.properties.PM, new PropertiesManager());
+		builder.setPm(new PropertiesManager());
 		GraphDesc gd = (GraphDesc) builder.build(new JrdsNode(d));
 
 		Assert.assertEquals("name", gd.getName());
@@ -89,7 +86,7 @@ public class TestDescFactory {
 		Document d = Tools.parseRessource(is);
 
 		GraphDescBuilder builder = new GraphDescBuilder();
-		builder.setProperty(ObjectBuilder.properties.PM, new PropertiesManager());
+        builder.setPm(new PropertiesManager());
 		GraphDesc gd = (GraphDesc) builder.build(new JrdsNode(d));
 
 		Assert.assertEquals("mokegraph", gd.getName());
@@ -108,7 +105,7 @@ public class TestDescFactory {
 		PropertiesManager pm = new PropertiesManager();
 
 		ProbeDescBuilder builder = new ProbeDescBuilder();
-		builder.setProperty(ObjectBuilder.properties.PM, pm);
+        builder.setPm(new PropertiesManager());
 		ProbeDesc pd = builder.makeProbeDesc(new JrdsNode(d));
 		Assert.assertEquals("name", pd.getName());
 		Assert.assertEquals("probename", pd.getProbeName());
@@ -141,10 +138,10 @@ public class TestDescFactory {
 		Document d = Tools.parseRessource("baddesc.xml");
 		PropertiesManager pm = new PropertiesManager();
 		
-		List<LoggingEvent> logged = Tools.getLockChecker("jrds.factories.ObjectBuilder");
+		List<LoggingEvent> logged = Tools.getLockChecker("jrds.configuration.ConfigObjectBuilder");
 
 		ProbeDescBuilder builder = new ProbeDescBuilder();
-		builder.setProperty(ObjectBuilder.properties.PM, pm);
+        builder.setPm(pm);
 		ProbeDesc pd = builder.makeProbeDesc(new JrdsNode(d));
 		logger.trace("Collect mapping: " + pd.getCollectMapping());
 		logger.trace("Collect oids: " + pd.getCollectOids());

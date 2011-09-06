@@ -154,7 +154,7 @@ public class JrdsNode implements Node {
         return callIfExist(o, xpath, method, new Class<?>[] {argType}, new Object[] {argValue});
     }
 
-    public static abstract class   FilterNode<T> {
+    public static abstract class FilterNode<T> {
         public abstract T filter(Node input);
     };
 

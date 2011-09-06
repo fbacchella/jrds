@@ -8,12 +8,9 @@ import java.util.Map;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
-import jrds.Tools;
 import jrds.ProbeDesc;
-import jrds.PropertiesManager;
 import jrds.RdsHost;
-import jrds.factories.ObjectBuilder;
-import jrds.factories.ProbeDescBuilder;
+import jrds.Tools;
 import jrds.factories.xml.JrdsNode;
 import jrds.starter.XmlProvider;
 
@@ -35,10 +32,8 @@ public class XmlProbeTest {
 		logger.setLevel(Level.TRACE);
 		Tools.setLevel(new String[] {"jrds.Probe.HttpXml", "jrds.Probe.HttpProbe", "jrds.starter.XmlProvider"}, logger.getLevel());
 		Tools.prepareXml(false);
-
-		ProbeDescBuilder builder = new ProbeDescBuilder();
-		builder.setProperty(ObjectBuilder.properties.PM, new PropertiesManager());
-		pd = builder.makeProbeDesc(new JrdsNode(Tools.parseRessource("httpxmlprobedesc.xml")));
+		
+		pd = jrds.configuration.GeneratorHelper.getProbeDesc(new JrdsNode(Tools.parseRessource("httpxmlprobedesc.xml")));
 	}
 
 	@Test

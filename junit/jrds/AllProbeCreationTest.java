@@ -7,8 +7,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.factories.ConfigObjectFactory;
-import jrds.factories.Loader;
+import jrds.configuration.ConfigObjectFactory;
 import jrds.factories.ProbeFactory;
 import jrds.mockobjects.DummyProbe;
 import jrds.mockobjects.DummyProbeIndexed;
@@ -44,12 +43,10 @@ public class AllProbeCreationTest {
 		
 		Assert.assertTrue(pm.rrddir.isDirectory());
 
-		Loader l = new Loader();
-		l.importDir(new File("desc"));
 		ConfigObjectFactory conf = new ConfigObjectFactory(pm);
 
-		Map<String, GraphDesc> graphDescMap = conf.setGraphDescMap(l.getRepository(Loader.ConfigType.GRAPHDESC));
-		Map<String, ProbeDesc> probeDescMap = conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
+		Map<String, GraphDesc> graphDescMap = conf.setGraphDescMap();
+		Map<String, ProbeDesc> probeDescMap = conf.setProbeDescMap();
 
 		ProbeFactory pf = new ProbeFactory(probeDescMap, graphDescMap, pm);
 

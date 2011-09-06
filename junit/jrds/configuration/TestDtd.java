@@ -1,16 +1,18 @@
-package jrds;
+package jrds.configuration;
 
 import java.net.URL;
 
-import jrds.factories.Loader;
+import jrds.PropertiesManager;
+import jrds.Tools;
+import jrds.configuration.Loader;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class DtdTest {
-	static final private Logger logger = Logger.getLogger(DtdTest.class);
+public class TestDtd {
+	static final private Logger logger = Logger.getLogger(TestDtd.class);
 	static final PropertiesManager pm = new PropertiesManager();
 	
 	@BeforeClass static public void configure() throws Exception {

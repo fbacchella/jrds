@@ -7,11 +7,15 @@ import jrds.factories.xml.JrdsNode;
 import org.apache.log4j.Logger;
 import org.w3c.dom.DocumentFragment;
 
-public class MacroBuilder extends ObjectBuilder {
+public class MacroBuilder extends ConfigObjectBuilder<Macro> {
 	static final private Logger logger = Logger.getLogger(MacroBuilder.class);
 
-	@Override
-	Object build(JrdsNode n) {
+    public MacroBuilder() {
+        super(ConfigType.MACRODEF);
+    }
+
+    @Override
+	Macro build(JrdsNode n) {
 		return makeMacro(n);
 	}
 	

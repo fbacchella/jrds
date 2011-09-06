@@ -8,7 +8,6 @@ package jrds;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -27,10 +26,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import jrds.configuration.ConfigObjectFactory;
-import jrds.configuration.Loader;
 import jrds.factories.ProbeMeta;
 import jrds.probe.ContainerProbe;
 import jrds.probe.SumProbe;
@@ -155,31 +151,10 @@ public class HostsList extends StarterNode {
 
         renderer = new Renderer(50, step, tmpDir);
 
-        Loader l;
-        try {
-            l = new Loader();
-            URL graphUrl = getClass().getResource("/desc");
-            if(graphUrl != null)
-                l.importUrl(graphUrl);
-            else {
-                logger.fatal("Default probes not found");
-            }
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException("Loader initialisation error",e);
-        }
-
-        logger.debug(jrds.Util.delayedFormatString("Scanning %s for probes libraries", pm.libspath));
-        for(URL lib: pm.libspath) {
-            logger.info(jrds.Util.delayedFormatString("Adding lib %s", lib));
-            l.importUrl(lib);
-        }
-
-        l.importDir(pm.configdir);
-
         logger.debug("Starting parsing descriptions");
         ConfigObjectFactory conf = new ConfigObjectFactory(pm, pm.extensionClassLoader);
-        conf.setGraphDescMap(l.getRepository(Loader.ConfigType.GRAPHDESC));
-        Collection<ProbeDesc> probesdesc = conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC)).values();
+        conf.setGraphDescMap();
+        Collection<ProbeDesc> probesdesc = conf.setProbeDescMap().values();
 
         Set<Class<? extends Starter>> externalStarters = new HashSet<Class<? extends Starter>>();
         for(ProbeDesc pd: probesdesc) {
@@ -193,11 +168,11 @@ public class HostsList extends StarterNode {
                 pc = pc.getSuperclass();
             }
         }
-        conf.setMacroMap(l.getRepository(Loader.ConfigType.MACRODEF));
-        conf.setTabMap(l.getRepository(Loader.ConfigType.TAB));
+        conf.setMacroMap();
+        conf.setTabMap();
 
         Set<String> hostsTags = new HashSet<String>();
-        Map<String, RdsHost> hosts = conf.setHostMap(l.getRepository(Loader.ConfigType.HOSTS));
+        Map<String, RdsHost> hosts = conf.setHostMap();
         for(RdsHost h: hosts.values()) {
             addHost(h);
             h.configureStarters(pm);
@@ -236,14 +211,14 @@ public class HostsList extends StarterNode {
 
         Tab filterTab = new Tab("All filters");
 
-        Map <String, Filter> f = conf.setFilterMap(l.getRepository(Loader.ConfigType.FILTER));
+        Map <String, Filter> f = conf.setFilterMap();
         for(Filter filter: f.values()) {
             addFilter(filter);
             filterTab.add(filter.getName());
         }
 
         Tab sumsTab = null;
-        Map<String, SumProbe> sums = conf.setSumMap(l.getRepository(Loader.ConfigType.SUM));
+        Map<String, SumProbe> sums = conf.setSumMap();
         if(sums.size() > 0) {
             sumsTab = new Tab("All sums");
             for(SumProbe s: sums.values()) {
@@ -257,7 +232,7 @@ public class HostsList extends StarterNode {
 
         logger.debug("Parsing graphs configuration");
         Tab customGraphsTab = null;
-        Map<String, GraphDesc> graphs = conf.setGrapMap(l.getRepository(Loader.ConfigType.GRAPH));
+        Map<String, GraphDesc> graphs = conf.setGrapMap();
         if(graphs.size() > 0) {
             customGraphsTab = new Tab("Custom graphs");
             if(! graphs.isEmpty()) {
@@ -274,7 +249,7 @@ public class HostsList extends StarterNode {
             }
         }
 
-        Map<String, Tab> externalTabMap = conf.setTabMap(l.getRepository(Loader.ConfigType.TAB));
+        Map<String, Tab> externalTabMap = conf.setTabMap();
         logger.debug(jrds.Util.delayedFormatString("Tabs to add: %s", externalTabMap.values()));
         for(Tab t: externalTabMap.values()) {
             t.setHostlist(this);

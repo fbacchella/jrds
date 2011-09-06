@@ -3,20 +3,16 @@ package jrds.standalone;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import jrds.Probe;
 import jrds.ProbeConnected;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
-import jrds.factories.ConfigObjectFactory;
-import jrds.factories.Loader;
+import jrds.configuration.ConfigObjectFactory;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.core.DsDef;
@@ -58,31 +54,9 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
 
         System.getProperties().setProperty("java.awt.headless","true");
 
-        Loader l;
-        try {
-            l = new Loader();
-            URL graphUrl = getClass().getResource("/desc");
-            if(graphUrl != null)
-                l.importUrl(graphUrl);
-            else {
-                logger.fatal("Default probes not found");
-            }
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException("Loader initialisation error",e);
-        }
-
-        logger.debug("Scanning " + pm.libspath + " for probes libraries");
-        System.out.println(pm.libspath);
-        for(URL lib: pm.libspath) {
-            logger.info("Adding lib " + lib);
-            l.importUrl(lib);
-        }
-
-        l.importDir(pm.configdir);
-
         logger.debug("Starting parsing descriptions");
         ConfigObjectFactory conf = new ConfigObjectFactory(pm, pm.extensionClassLoader);
-        Map<String, ProbeDesc> probesMap = conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
+        Map<String, ProbeDesc> probesMap = conf.setProbeDescMap();
         if(args.length == 0) {
             dumpAll(probesMap.values());
         }

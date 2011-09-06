@@ -23,23 +23,20 @@ import org.rrd4j.DsType;
 import org.snmp4j.smi.OID;
 import org.w3c.dom.Node;
 
-public abstract class ObjectBuilder {
-	static final private Logger logger = Logger.getLogger(ObjectBuilder.class);
+abstract class ConfigObjectBuilder<BuildObject> {
+	static final private Logger logger = Logger.getLogger(ConfigObjectBuilder.class);
 
 	public enum properties {
 		MACRO, GRAPHDESC, PROBEDESC, PROBEFACTORY, GRAPHFACTORY, LOADER, CLASSLOADER, PM, DEFAULTROLE, GRAPHMAP;
 	}
 
 	PropertiesManager pm;
-
-	abstract Object build(JrdsNode n) throws InvocationTargetException;
-
-	public void setProperty(properties name, Object o) {
-		switch(name) {
-		case PM:
-			pm = (PropertiesManager) o;
-			break;
-		}
+	public ConfigType ct;
+	
+	abstract BuildObject build(JrdsNode n) throws InvocationTargetException;
+	
+	public ConfigObjectBuilder(ConfigType ct) {
+	    this.ct = ct;
 	}
 
 	public Map<String, String> makeProperties(JrdsNode n) {
@@ -131,4 +128,11 @@ public abstract class ObjectBuilder {
 		logger.trace(jrds.Util.delayedFormatString("data store list build: %s", dsList));
 		return dsList;
 	}
+
+    /**
+     * @param pm the pm to set
+     */
+    void setPm(PropertiesManager pm) {
+        this.pm = pm;
+    }
 }

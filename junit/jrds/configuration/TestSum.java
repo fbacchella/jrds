@@ -1,25 +1,17 @@
 package jrds.configuration;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.HostsList;
-import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.RdsHost;
 import jrds.Tools;
-import jrds.configuration.ConfigObjectFactory;
-import jrds.configuration.ObjectBuilder;
-import jrds.configuration.SumBuilder;
-import jrds.configuration.Loader.ConfigType;
 import jrds.factories.xml.JrdsNode;
 import jrds.graphe.Sum;
 import jrds.mockobjects.MockGraph;
-import jrds.mockobjects.MokeProbe;
 import jrds.probe.SumProbe;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
@@ -58,8 +50,9 @@ public class TestSum {
 		pm.update();
 
 		conf = new ConfigObjectFactory(pm);
-		conf.setGraphDescMap(l.getRepository(Loader.ConfigType.GRAPHDESC));
-		conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
+		conf.setLoader(l);
+		conf.setGraphDescMap();
+		conf.setProbeDescMap();
 
 		logger.setLevel(Level.TRACE);
 		Tools.setLevel(new String[] {"jrds.factories", "jrds.probe.SumProbe","jrds.graphe.Sum"}, logger.getLevel());
@@ -68,7 +61,7 @@ public class TestSum {
 
 	private SumProbe doSumProbe(Document d, HostsList hl) throws Exception {
 		SumBuilder sm = new SumBuilder();
-		sm.setProperty(ObjectBuilder.properties.PM, pm);
+		sm.setPm(pm);
 		SumProbe sp = sm.makeSum(new JrdsNode(d));
 		RdsHost host = new RdsHost("SumHost");
 		sp.setHost(host);

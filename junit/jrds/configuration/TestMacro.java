@@ -1,7 +1,6 @@
 package jrds.configuration;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,11 +14,6 @@ import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.RdsHost;
 import jrds.Tools;
-import jrds.configuration.ConfigObjectFactory;
-import jrds.configuration.HostBuilder;
-import jrds.configuration.MacroBuilder;
-import jrds.configuration.ObjectBuilder;
-import jrds.configuration.Loader.ConfigType;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 import jrds.mockobjects.MokeProbe;
@@ -73,8 +67,9 @@ public class TestMacro {
 		pm.update();
 
 		conf = new ConfigObjectFactory(pm);
-		conf.setGraphDescMap(l.getRepository(Loader.ConfigType.GRAPHDESC));
-		conf.setProbeDescMap(l.getRepository(Loader.ConfigType.PROBEDESC));
+		conf.setLoader(l);
+		conf.setGraphDescMap();
+		conf.setProbeDescMap();
 
 		logger.setLevel(Level.TRACE);
 		Tools.setLevel(new String[] {"jrds.factories"}, logger.getLevel());
@@ -94,13 +89,13 @@ public class TestMacro {
 	
 	static HostBuilder getBuilder(Macro... macros) {
 		HostBuilder hb = new HostBuilder();
-		hb.setProperty(ObjectBuilder.properties.PM, pm);
+		hb.setPm(pm);
 		Map<String, Macro> mmap = new HashMap<String, Macro>(macros.length);
 		for(Macro m: macros) {
 			mmap.put(m.getName(), m);
 		}
-		hb.setProperty(ObjectBuilder.properties.MACRO, mmap);
-		hb.setProperty(ObjectBuilder.properties.PROBEFACTORY, new MokeProbeFactory());
+		hb.setMacros(mmap);
+		hb.setProbeFactory(new MokeProbeFactory());
 		return hb;
 	}
 
