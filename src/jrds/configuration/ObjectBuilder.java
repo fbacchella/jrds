@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.xml.xpath.XPathExpression;
 
 import jrds.PropertiesManager;
+import jrds.factories.NodeListIterator;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 import jrds.factories.xml.JrdsNode.FilterNode;

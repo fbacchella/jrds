@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -9,6 +9,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import jrds.Filter;
 import jrds.PropertiesManager;
 import jrds.Tools;
+import jrds.configuration.ConfigObjectFactory;
+import jrds.configuration.FilterBuilder;
+import jrds.configuration.ObjectBuilder;
+import jrds.configuration.Loader.ConfigType;
 import jrds.factories.xml.JrdsNode;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;

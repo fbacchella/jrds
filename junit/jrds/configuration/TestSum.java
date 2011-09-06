@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -12,6 +12,10 @@ import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.RdsHost;
 import jrds.Tools;
+import jrds.configuration.ConfigObjectFactory;
+import jrds.configuration.ObjectBuilder;
+import jrds.configuration.SumBuilder;
+import jrds.configuration.Loader.ConfigType;
 import jrds.factories.xml.JrdsNode;
 import jrds.graphe.Sum;
 import jrds.mockobjects.MockGraph;

@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -11,6 +11,9 @@ import jrds.Macro;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.Tab;
+import jrds.configuration.Loader.ConfigType;
+import jrds.configuration.ObjectBuilder.properties;
+import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsNode;
 import jrds.probe.SumProbe;
 

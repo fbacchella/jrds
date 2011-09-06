@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.Map;
 
 import jrds.Probe;
 import jrds.ProbeDesc;
+import jrds.factories.ArgFactory;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 

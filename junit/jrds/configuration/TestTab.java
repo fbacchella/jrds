@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import java.io.IOException;
 import java.net.URL;
@@ -10,6 +10,7 @@ import jrds.HostsList;
 import jrds.PropertiesManager;
 //import jrds.Tab;
 import jrds.Tools;
+import jrds.configuration.ConfigObjectFactory;
 import jrds.factories.xml.JrdsNode;
 import jrds.graphe.Sum;
 import jrds.probe.SumProbe;

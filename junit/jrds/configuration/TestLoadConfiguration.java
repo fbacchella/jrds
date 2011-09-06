@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +19,14 @@ import jrds.RdsHost;
 import jrds.StoreOpener;
 import jrds.Tab;
 import jrds.Tools;
+import jrds.configuration.ConfigObjectFactory;
+import jrds.configuration.FilterBuilder;
+import jrds.configuration.HostBuilder;
+import jrds.configuration.MacroBuilder;
+import jrds.configuration.ObjectBuilder;
+import jrds.configuration.TabBuilder;
+import jrds.configuration.Loader.ConfigType;
+import jrds.factories.ProbeFactory;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 import jrds.mockobjects.MokeProbe;

@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import jrds.Macro;
 import jrds.factories.xml.CompiledXPath;

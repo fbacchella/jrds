@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -7,7 +7,8 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Tools;
-import jrds.factories.Loader.ConfigType;
+import jrds.configuration.Loader;
+import jrds.configuration.Loader.ConfigType;
 import jrds.factories.xml.JrdsNode;
 import junit.framework.Assert;
 

@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -12,6 +12,9 @@ import jrds.GraphNode;
 import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.ProbeDesc;
+import jrds.configuration.GraphDescBuilder;
+import jrds.configuration.ObjectBuilder;
+import jrds.configuration.ProbeDescBuilder;
 import jrds.factories.xml.JrdsNode;
 import jrds.mockobjects.GetMoke;
 

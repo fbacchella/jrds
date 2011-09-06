@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.GraphDesc;
+import jrds.factories.NodeListIterator;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 

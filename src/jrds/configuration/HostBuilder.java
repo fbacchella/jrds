@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,6 +19,9 @@ import jrds.Macro;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
+import jrds.factories.ArgFactory;
+import jrds.factories.HostBuilderAgent;
+import jrds.factories.ProbeFactory;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 import jrds.starter.ChainedProperties;

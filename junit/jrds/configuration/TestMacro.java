@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import java.io.IOException;
 import java.net.URL;
@@ -15,6 +15,11 @@ import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.RdsHost;
 import jrds.Tools;
+import jrds.configuration.ConfigObjectFactory;
+import jrds.configuration.HostBuilder;
+import jrds.configuration.MacroBuilder;
+import jrds.configuration.ObjectBuilder;
+import jrds.configuration.Loader.ConfigType;
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
 import jrds.mockobjects.MokeProbe;

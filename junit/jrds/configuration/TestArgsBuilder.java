@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import java.io.IOException;
 import java.net.URL;
@@ -7,6 +7,8 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Tools;
+import jrds.configuration.ObjectBuilder;
+import jrds.factories.ArgFactory;
 import jrds.factories.xml.JrdsNode;
 import junit.framework.Assert;
 

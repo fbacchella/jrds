@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.configuration;
 
 import java.lang.reflect.InvocationTargetException;
 
