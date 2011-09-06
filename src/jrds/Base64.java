@@ -92,7 +92,6 @@ public class Base64
         -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9         // Decimal 244 - 255 */
     };
     
-    private final static byte BAD_ENCODING    = -9; // Indicates error in encoding
     private final static byte WHITE_SPACE_ENC = -5; // Indicates white space in encoding
     private final static byte EQUALS_SIGN_ENC = -1; // Indicates equals sign in encoding
     
@@ -249,7 +248,7 @@ public class Base64
     
     /**
      * Encodes a byte array into Base64 notation.
-     * Equivalen to calling
+     * Equivalent to calling
      * <code>encodeBytes( source, 0, source.length )</code>
      *
      * @param source The data to convert
@@ -820,9 +819,7 @@ public class Base64
         private int     position;
         private byte[]  buffer;
         private int     bufferLength;
-        private int     lineLength;
-        
-        
+                
         /**
          * Constructs a {@link Base64#OutputStream} in ENCODE mode.
          *
@@ -852,7 +849,6 @@ public class Base64
             this.bufferLength = encode ? 3 : 4;
             this.buffer       = new byte[ bufferLength ];
             this.position     = 0;
-            this.lineLength   = 0;
         }   // end constructor
         
         

@@ -290,7 +290,7 @@ public class Util {
                 env.put("connection.name", ((ConnectedProbe) o).getConnectionName());
             }
             if( o instanceof Probe) {
-                Probe p = ((Probe) o);
+                Probe<?,?> p = ((Probe<?,?>) o);
                 RdsHost host = p.getHost();
                 if(host != null)
                     env.put("host", host.getName());

@@ -451,7 +451,7 @@ public class ProbeDesc implements Cloneable {
 			if(desc.dsType != null)
 				dsElement.appendChild(document.createElement("dsType")).setTextContent(desc.dsType.toString());
 			if(desc.collectKey instanceof OID)
-				dsElement.appendChild(document.createElement("OID")).setTextContent(desc.collectKey.toString());
+				dsElement.appendChild(document.createElement("oid")).setTextContent(desc.collectKey.toString());
 			if(desc.collectKey instanceof String)
 				dsElement.appendChild(document.createElement("collect")).setTextContent(desc.collectKey.toString());
             if(desc.minValue != MINDEFAULT) 
