@@ -97,7 +97,7 @@ public class TestGraphDescBuilder {
 
         Assert.assertTrue("graph height invalid", 206 < gi.getHeight());
         Assert.assertTrue("graph width invalid", 578 < gi.getWidth());
-        Assert.assertEquals("graph byte count invalid", 12574 , gi.getByteCount(), 1000);
+        Assert.assertEquals("graph byte count invalid", 12574 , gi.getByteCount(), 2000);
     }
 
     @Test
