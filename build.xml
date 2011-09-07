@@ -147,7 +147,7 @@
 	</target>
 	
 	<target name="javadoc">
-		<javadoc destdir="${docs.build}" access="protected" use="true"
+		<javadoc encoding="UTF-8"  destdir="${docs.build}" access="protected" use="true"
 			notree="false" nonavbar="false" noindex="false" splitindex="true"
 			author="true" version="true" nodeprecatedlist="false"
 			nodeprecated="false"
@@ -158,7 +158,7 @@
 				<include name="*/src/**/*.java" />
 			</fileset>
 			<classpath refid="external.classpath"/>
-			<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+			<link href="http://download.oracle.com/javase/1.5.0/docs/api/"/>
 			<link href="http://java.sun.com/products/servlet/2.5/javadoc"/>
 			<link href="http://www.snmp4j.org/doc"/>
 			<link href="http://rrd4j.googlecode.com/svn/trunk/javadoc/reference/"/>
@@ -167,7 +167,7 @@
 			<link href="http://ws.apache.org/xmlrpc/apidocs"/>
 			<link href="http://www.json.org/javadoc/"/>
 			<link href="http://logging.apache.org/log4j/1.2/apidocs/"/>
-			<link href="http://commons.apache.org/net/api-release/"/>
+			<link href="http://commons.apache.org/net/api-3.0.1/"/>
 			<link href="http://commons.apache.org/fileupload/apidocs/"/>
 			<link href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/"/>
 			<link href="http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/"/>

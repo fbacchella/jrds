@@ -1,8 +1,3 @@
-/*
- * Created on 8 déc. 2004
- *
- * TODO 
- */
 package jrds.graphe;
 
 import java.awt.Color;

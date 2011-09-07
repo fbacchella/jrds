@@ -352,70 +352,70 @@ implements Cloneable, WithACL {
     static final public PathElement DATABASE = PathElement.DATABASE;
 
     public enum Colors {
-        //240 ° 
+        //240Â°
         BLUE {
             @Override
             public Color getColor() {
                 return Color.BLUE;
             }
         },
-        //120°
+        //120Â°
         GREEN {
             @Override
             public Color getColor() {
                 return Color.GREEN;
             }
         },
-        //0°
+        //0Â°
         RED {
             @Override
             public Color getColor() {
                 return Color.RED;
             }
         },
-        //180°
+        //180Â°
         CYAN {
             @Override
             public Color getColor() {
                 return Color.CYAN;
             }
         },
-        // 47°
+        // 47Â°
         ORANGE {
             @Override
             public Color getColor() {
                 return Color.ORANGE;
             }
         },
-        //180°
+        //180Â°
         TEAL {
             @Override
             public Color getColor() {
                 return new Color(0,128,128);
             }
         },
-        //60°
+        //60Â°
         YELLOW {
             @Override
             public Color getColor() {
                 return Color.YELLOW;
             }
         },
-        //300°
+        //300Â°
         MAGENTA {
             @Override
             public Color getColor() {
                 return Color.MAGENTA;
             }
         },
-        //0°
+        //0Â°
         PINK {
             @Override
             public Color getColor() {
                 return Color.PINK;
             }
         },
-        //0°
+        //0Â°
         BLACK {
             @Override
             public Color getColor() {
@@ -428,14 +428,14 @@ implements Cloneable, WithACL {
                 return new Color(0,0,128);
             }
         },
-        //0°
+        //0Â°
         GRAY {
             @Override
             public Color getColor() {
                 return Color.GRAY;
             }
         },
-        //0°
+        //0Â°
         LIGHT_GRAY {
             @Override
             public Color getColor() {
@@ -1343,7 +1343,7 @@ implements Cloneable, WithACL {
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.newDocument();
         Element root = 
-            (Element) document.createElement("graphdesc"); 
+                (Element) document.createElement("graphdesc"); 
         document.appendChild(root);
         root.appendChild(document.createElement("name")).setTextContent(name);
         if(graphName != null)

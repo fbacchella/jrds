@@ -1,8 +1,3 @@
-/*
- * Created on 16 déc. 2004
- *
- * TODO 
- */
 package jrds.probe.jdbc;
 
 import java.sql.ResultSet;
