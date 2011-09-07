@@ -100,7 +100,9 @@ public class ConfigObjectFactory {
 
     public Map<String, GraphDesc> setGrapMap() {
         Map<String, JrdsNode> nodemap = load.getRepository(ConfigType.GRAPH);
-        Map<String, GraphDesc> graphsMap = getObjectMap(new GraphDescBuilder(), nodemap);
+        GraphDescBuilder ob = new GraphDescBuilder();
+        ob.setPm(pm);
+        Map<String, GraphDesc> graphsMap = getObjectMap(ob, nodemap);
         logger.debug(jrds.Util.delayedFormatString("Graphs configured: %s", graphsMap.keySet()));
         return graphsMap;
     }

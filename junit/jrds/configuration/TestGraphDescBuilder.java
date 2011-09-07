@@ -93,7 +93,7 @@ public class TestGraphDescBuilder {
         Assert.assertEquals("graph name failed", "graphName", gd.getGraphName());
         Assert.assertEquals("graph title failed", "graphTitle", gd.getGraphTitle());
         Assert.assertEquals("graph name failed", "name", gd.getName());
-        Assert.assertEquals("legeng count failed", 3, gd.getLegendLines());
+        Assert.assertEquals("legend count failed", 3, gd.getLegendLines());
 
         Assert.assertTrue("graph height invalid", 206 < gi.getHeight());
         Assert.assertTrue("graph width invalid", 578 < gi.getWidth());
@@ -114,7 +114,8 @@ public class TestGraphDescBuilder {
         Assert.assertTrue("Lower limit is a number (not a NaN)" + gd.getUpperLimit() , Double.isNaN(gd.getUpperLimit()));
         Assert.assertEquals("graph lower limit is invalid", 1000, gd.getLowerLimit(),0.1);
         Assert.assertFalse("graph is with legend", gd.withLegend());
-        Assert.assertTrue("graph is without values", gd.withValues());
+        Assert.assertFalse("graph is with summary", gd.withSummary());
+        Assert.assertEquals("legend count failed", 0, gd.getLegendLines());
     }
 
 }

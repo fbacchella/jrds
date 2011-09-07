@@ -8,6 +8,7 @@
 	<height>800</height>
 	<width>600</width>
 	<nolegend />
+	<novalues />
 	<verticalLabel>verticalLabel</verticalLabel>
 	<upperLimit>NaN</upperLimit>
 	<lowerLimit>1000</lowerLimit>

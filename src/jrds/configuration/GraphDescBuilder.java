@@ -61,6 +61,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
 			gd.setVerticalLabel("");
 
         subnode.callIfExist(gd, CompiledXPath.get("nolegend"), "setWithLegend", Boolean.TYPE, false);
+        subnode.callIfExist(gd, CompiledXPath.get("novalues"), "setWithSummary", Boolean.TYPE, false);
         subnode.callIfExist(gd, CompiledXPath.get("unit/binary"), "setSiUnit", Boolean.TYPE, false);
         subnode.callIfExist(gd, CompiledXPath.get("unit/SI"), "setSiUnit", Boolean.TYPE, true);
         subnode.callIfExist(gd, CompiledXPath.get("logarithmic"), "setLogarithmic", Boolean.TYPE, true);

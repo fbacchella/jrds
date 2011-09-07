@@ -118,8 +118,8 @@ implements Cloneable, WithACL {
             }
         },
         LINE {
-            public void draw(RrdGraphDef rgd, String sn, Color color) {
-                rgd.line(sn, color, " \\g");
+            public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
+                rgd.line(sn, color, legend);
             };
             @Override
             public String toString() {
@@ -136,8 +136,8 @@ implements Cloneable, WithACL {
             };
         },
         AREA {
-            public void draw(RrdGraphDef rgd, String sn, Color color) {
-                rgd.area(sn, color, " \\g");
+            public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
+                rgd.area(sn, color, legend);
             };
             @Override
             public String toString() {
@@ -154,8 +154,8 @@ implements Cloneable, WithACL {
             };
         },
         STACK {
-            public void draw(RrdGraphDef rgd, String sn, Color color) {
-                rgd.stack(sn, color, " \\g");
+            public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
+                rgd.stack(sn, color, legend);
             };
             @Override
             public String toString() {
@@ -172,7 +172,7 @@ implements Cloneable, WithACL {
             };
         };
 
-        public void draw(RrdGraphDef rgd, String sn, Color color) {};
+        public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {};
 
         /**
          * To check if it will generate a plot, for color calculation
@@ -582,8 +582,8 @@ implements Cloneable, WithACL {
     private boolean siUnit = true;
     private boolean logarithmic = false;
     private Integer unitExponent = null;
-    private boolean withLegend = true;
-    private boolean withValues = true; // To show the values block under the graph
+    private boolean withLegend = true;  // To show the values block under the graph
+    private boolean withSummary = true; // To show the summary with last update, period, etc. information block
     private ACL acl = ACL.ALLOWEDACL;
 
     public final class Dimension {
@@ -926,7 +926,7 @@ implements Cloneable, WithACL {
             }
         }
         // The title line, only if values block is required
-        if( withValues) {
+        if( withSummary) {
             graphDef.comment(""); //We simulate the color box
             graphDef.comment(manySpace.substring(0, Math.min(maxLengthLegend, manySpace.length()) + 2));
             graphDef.comment("Current");
@@ -941,9 +941,10 @@ implements Cloneable, WithACL {
             logger.trace("Todo: " + toDo);
         }
 
+        String shortLegend = withSummary ? " \\g": null;
         for(DsDesc ds: toDo) {
-            ds.graphType.draw(graphDef, ds.name, ds.color);
-            if(withValues && ds.graphType.legend())
+            ds.graphType.draw(graphDef, ds.name, ds.color, shortLegend);
+            if(withSummary && ds.graphType.legend())
                 addLegend(graphDef, ds.name, ds.graphType, ds.legend);
         }
     }
@@ -1249,7 +1250,7 @@ implements Cloneable, WithACL {
     public int getLegendLines() {
         int numlegend = 0;
         for(DsDesc dd: allds) {
-            if (dd.graphType.legend() && dd.legend != null)
+            if (dd.graphType.legend() && dd.legend != null && withSummary)
                 numlegend++;
         }
         return numlegend;
@@ -1306,6 +1307,7 @@ implements Cloneable, WithACL {
     public void initializeLimits(Graphics2D g2d) {
         FontRenderContext frc  = g2d.getFontRenderContext();
         ImageParameters im = new ImageParameters();
+        int summaryLines =  withSummary ?5:0;
 
         im.xsize = getWidth();
         im.ysize = getHeight();
@@ -1313,10 +1315,11 @@ implements Cloneable, WithACL {
         im.xorigin = (int) (PADDING_LEFT + im.unitslength * getSmallFontCharWidth(frc));
         im.xorigin += getSmallFontHeight(frc);
         im.yorigin = PADDING_TOP + im.ysize;
-        im.yorigin += getLargeFontHeight(frc) + PADDING_TITLE;
+        if(graphTitle != null && ! "".equals(graphTitle))
+            im.yorigin += getLargeFontHeight(frc) + PADDING_TITLE;
         im.xgif = PADDING_RIGHT + im.xsize + im.xorigin;
         im.ygif = im.yorigin + (int) (PADDING_PLOT * getSmallFontHeight(frc));
-        im.ygif += ( (int) getSmallLeading(frc) + 5 ) * ( getLegendLines() + 5);
+        im.ygif += ( (int) getSmallLeading(frc) + summaryLines ) * ( getLegendLines() + summaryLines);
         im.ygif += PADDING_BOTTOM;
         setDimension(im.ygif, im.xgif);
     }
@@ -1444,15 +1447,15 @@ implements Cloneable, WithACL {
     /**
      * @return the withValues
      */
-    public boolean withValues() {
-        return withValues;
+    public boolean withSummary() {
+        return withSummary;
     }
 
     /**
      * @param withValues the withValues to set
      */
-    public void setWithValues(boolean withValues) {
-        this.withValues = withValues;
+    public void setWithSummary(boolean withSummary) {
+        this.withSummary = withSummary;
     }
 
 
