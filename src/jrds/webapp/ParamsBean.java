@@ -314,7 +314,7 @@ public class ParamsBean implements Serializable {
         if(gid != null)
             g = hostlist.getRenderer().getGraph(gid);
         if(g == null) {
-            logger.warn("graph cache miss");
+            logger.debug("graph cache miss");
             jrds.GraphNode node = getGraphNode(caller);
             if(node != null) {
                 g = node.getGraph();
