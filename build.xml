@@ -295,8 +295,9 @@
 	</target>
     <target name="resolve" description="--> retrieve dependencies with ivy">
         <ivy:retrieve type="jar,zip" pattern="[conf]/[artifact].[ext]" />
-    		<unzip src="lib/dojo.zip" dest="lib" >
-    			<regexpmapper from="dojo-[^/]*/(.*)" to="dojo/\1"/>
-    		</unzip>
+    	<unzip src="lib/dojo.zip" dest="lib" >
+    		<regexpmapper from="dojo-[^/]*/(.*)" to="dojo/\1"/>
+    	</unzip>
+    	<mkdir dir="libprobes"/>
     </target>		
 </project>
