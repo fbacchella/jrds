@@ -46,8 +46,10 @@ public class Graph implements WithACL {
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        result = PRIME * result + ((end == null) ? 0 : end.hashCode());
-        result = PRIME * result + ((start == null) ? 0 : start.hashCode());
+        //result = PRIME * result + ((end == null) ? 0 : end.hashCode());
+        //result = PRIME * result + ((start == null) ? 0 : start.hashCode());
+        result = PRIME * result + end.hashCode();
+        result = PRIME * result + start.hashCode();
         long temp;
         temp = Double.doubleToLongBits(max);
         result = PRIME * result + (int) (temp ^ (temp >>> 32));
@@ -242,7 +244,7 @@ public class Graph implements WithACL {
     }
 
     public void setPeriod(Period p) {
-        logger.trace("Period for graph:" + p);
+        logger.trace(jrds.Util.delayedFormatString("Period for graph: %s", p));
         setStart(p.getBegin());
         setEnd(p.getEnd());
     }

@@ -7,6 +7,9 @@
 package jrds.webapp;
 
 import java.io.IOException;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -35,6 +38,12 @@ public final class Graph extends JrdsServlet {
 			HostsList hl = getHostsList();
 
 			ParamsBean p = new ParamsBean(req, hl, "host", "graphname");
+			
+			//Let have a little cache control
+			boolean cache = true;
+			String cachecontrol = req.getHeader("Cache-Control");
+			if(cachecontrol != null && "no-cache".equals(cachecontrol.toLowerCase().trim()))
+			    cache = false;
 
 			jrds.Graph graph = p.getGraph(this);
 			
@@ -58,8 +67,23 @@ public final class Graph extends JrdsServlet {
 			}
 			res.setContentType("image/png");
 			ServletOutputStream out = res.getOutputStream();
-			res.addHeader("Cache-Control", "no-cache");
-			hl.getRenderer().send(graph, out);
+			if(p.period.getScale() != 0) {
+			    res.addDateHeader("Expires", graph.getEnd().getTime() + getPropertiesManager().step * 1000);
+			}
+			res.addDateHeader("Last-Modified", graph.getEnd().getTime());
+			res.addHeader("content-disposition","attachment; filename=" + graph.getPngName());
+			res.addHeader("ETag", jrds.Base64.encodeString(getServletName() + graph.hashCode()));
+			FileChannel indata = hl.getRenderer().sendInfo(graph);
+			//If a cache file exist, try to be smart, but only if caching is allowed
+			if(indata != null && cache) {
+			    res.addIntHeader("Content-Length", (int)indata.size());
+                WritableByteChannel outC = Channels.newChannel(out);
+                indata.transferTo(0, indata.size(), outC);
+                indata.close();
+			}
+			else {
+			    graph.writePng(out);
+			}
 
 			if(logger.isTraceEnabled()) {
 				jrds.GraphNode node = hl.getGraphById(p.getId());
