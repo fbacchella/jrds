@@ -24,10 +24,7 @@ import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 
-
 import org.rrd4j.DsType;
-
-import com.mysql.jdbc.Buffer;
 
 public class GetMoke {
     static public RdsHost getHost() {

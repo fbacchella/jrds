@@ -11,12 +11,11 @@ import jrds.PropertiesManager;
 import jrds.RdsHost;
 import jrds.Tools;
 import jrds.starter.Connection;
+import jrds.starter.Resolver;
 import jrds.starter.SocketFactory;
 import jrds.starter.Starter;
 import junit.framework.Assert;
-import jrds.starter.Resolver;
 
-import org.apache.http.client.HttpClient;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;

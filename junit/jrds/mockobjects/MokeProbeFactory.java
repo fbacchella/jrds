@@ -34,7 +34,6 @@ public class MokeProbeFactory extends ProbeFactory {
 	/* (non-Javadoc)
 	 * @see jrds.factories.ProbeFactory#configure(jrds.Probe, java.util.List)
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean configure(Probe<?, ?> p, List<?> constArgs) {
 		if(p instanceof MokeProbe) {
