@@ -35,7 +35,6 @@ import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 import jrds.webapp.ACL;
 import jrds.webapp.DiscoverAgent;
-import jrds.webapp.ParamsBean;
 import jrds.webapp.RolesACL;
 
 import org.apache.log4j.Logger;
@@ -65,6 +64,7 @@ public class HostsList extends StarterNode {
     private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
     private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
     private Map<String, Tab> tabs = new LinkedHashMap<String, Tab>();
+    private String firstTab = null;
     private Renderer renderer = null;
     private int numCollectors = 1;
     private int step;
@@ -197,30 +197,41 @@ public class HostsList extends StarterNode {
         }
         configureStarters(pm);
 
-        Tab tagsTab = new Tab("All tags");
-        for(String tag: hostsTags) {
-            Filter f = new FilterTag(tag);
-            filters.put(f.getName(), f);
-            tagsTab.add(f.getName());
-        }
-
         //Configure the default ACL of all automatic filters
         for(Filter filter: filters.values()) {
             filter.addACL(pm.defaultACL);
         }
 
-        Tab filterTab = new Tab("All filters");
+        Set<Tab> allTabs = new HashSet<Tab>();
 
+        //Let's build the tab for all the tags
+        Tab tagsTab = new Tab("All tags", "tagstab");
+        for(String tag: hostsTags) {
+            Filter f = new FilterTag(tag);
+            filters.put(f.getName(), f);
+            tagsTab.add(f.getName());
+        }
+        allTabs.add(tagsTab);
+
+        //Let's build the tab with all the filters
+        Tab filterTab = new Tab("All filters","filtertab");
         Map <String, Filter> f = conf.setFilterMap();
         for(Filter filter: f.values()) {
             addFilter(filter);
             filterTab.add(filter.getName());
         }
+        allTabs.add(filterTab);
 
+        //Let's build the tab with all the sums
         Tab sumsTab = null;
         Map<String, SumProbe> sums = conf.setSumMap();
         if(sums.size() > 0) {
-            sumsTab = new Tab("All sums");
+            sumsTab = new Tab("All sums", "sumstab") {
+                @Override
+                public String getJSTreetype() {
+                    return "graph";
+                }               
+            };
             for(SumProbe s: sums.values()) {
                 addVirtual(s, sumhost, Filter.SUM.getName());
                 GraphNode sum = s.getGraphList().iterator().next();
@@ -228,63 +239,39 @@ public class HostsList extends StarterNode {
                 graphMap.put(sum.getQualifieName().hashCode(), sum);
                 sumsTab.add(sum.getQualifieName(), Collections.singletonList(s.getName()));
             }
+            allTabs.add(sumsTab);
         }
 
         logger.debug("Parsing graphs configuration");
-        Tab customGraphsTab = null;
         Map<String, GraphDesc> graphs = conf.setGrapMap();
-        if(graphs.size() > 0) {
-            customGraphsTab = new Tab("Custom graphs");
-            if(! graphs.isEmpty()) {
-                ContainerProbe cp = new ContainerProbe(customhost.getName());
-                for(GraphDesc gd: graphs.values()) {
-                    logger.trace("Adding graph: " + gd.getGraphTitle());
-                    cp.addGraph(gd);
-
-                }
-                addVirtual(cp, customhost, Filter.CUSTOM.getName());
-                for(GraphNode gn: cp.getGraphList()) {
-                    customGraphsTab.add(gn.getQualifieName(), gn.getGraphDesc().getHostTree(gn));
-                }
+        //Let's build the tab with all the custom graphs
+        Tab customGraphsTab = null;
+        if(! graphs.isEmpty()) {
+            customGraphsTab = new Tab("Custom graphs", "customgraph");
+            ContainerProbe cp = new ContainerProbe(customhost.getName());
+            for(GraphDesc gd: graphs.values()) {
+                logger.trace("Adding graph: " + gd.getGraphTitle());
+                cp.addGraph(gd);
             }
+            addVirtual(cp, customhost, Filter.CUSTOM.getName());
+            for(GraphNode gn: cp.getGraphList()) {
+                customGraphsTab.add(gn.getQualifieName(), gn.getGraphDesc().getHostTree(gn));
+            }
+            allTabs.add(customGraphsTab);
         }
 
-        Map<String, Tab> externalTabMap = conf.setTabMap();
-        logger.debug(jrds.Util.delayedFormatString("Tabs to add: %s", externalTabMap.values()));
-        for(Tab t: externalTabMap.values()) {
+        //Let's build all the custom tabs
+        Map<String, Tab> customTabMap = conf.setTabMap();
+        logger.debug(jrds.Util.delayedFormatString("Tabs to add: %s", customTabMap.values()));
+        for(Tab t: customTabMap.values()) {
             t.setHostlist(this);
             GraphTree tabtree = t.getGraphTree();
             if(tabtree != null)
                 treeMap.put(t.getName(), tabtree);
+            allTabs.add(t);
         }
 
-        tabs.put(ParamsBean.DEFAULTTAB, filterTab);
-        tabs.putAll(externalTabMap);
-        if(sumsTab != null)
-            tabs.put("sumstab", sumsTab);
-        if(customGraphsTab != null)
-            tabs.put("customgraph", customGraphsTab);
-
-        tabs.put("servicestab", new Tab("All services") {
-            @Override
-            public GraphTree getGraphTree() {
-                return  hostlist.getGraphTreeByView().getByPath(GraphTree.VIEWROOT, "Services");
-            }		
-        });
-        tabs.put("hoststab", new Tab("All hosts") {
-            @Override
-            public GraphTree getGraphTree() {
-                return getHostList().getGraphTreeByHost();
-            }		
-        });
-        tabs.put("viewstab", new Tab("All views") {
-            @Override
-            public GraphTree getGraphTree() {
-                return getHostList().getGraphTreeByView();
-            }		
-        });
-
-        tabs.put("tagstab", tagsTab);
+        makeTabs(pm, conf, allTabs, customTabMap);
 
         //Hosts list adopts all tabs
         for(Tab t: tabs.values()) {
@@ -298,8 +285,66 @@ public class HostsList extends StarterNode {
                 checkRoles(gn, GraphTree.VIEWROOT, gn.getTreePathByView());
             }
         }
-
         started = true;
+    }
+
+    private void makeTabs(PropertiesManager pm, ConfigObjectFactory conf, Set<Tab> moretabs, Map<String, Tab> customTabMap){
+        moretabs.add(new Tab("Administration", "adminTab") {
+            @Override
+            public String getJSCallback() {
+                return "setAdminTab";
+            }
+            @Override
+            public String getJSTreetype() {
+                return null;
+            }
+
+        });
+        moretabs.add(new Tab("All services", "servicestab") {
+            @Override
+            public GraphTree getGraphTree() {
+                return  hostlist.getGraphTreeByView().getByPath(GraphTree.VIEWROOT, "Services");
+            }       
+        });
+        moretabs.add( new Tab("All hosts", "hoststab") {
+            @Override
+            public GraphTree getGraphTree() {
+                return getHostList().getGraphTreeByHost();
+            }       
+        });
+        moretabs.add(new Tab("All views", "viewstab") {
+            @Override
+            public GraphTree getGraphTree() {
+                return getHostList().getGraphTreeByView();
+            }       
+        });
+        Map<String, Tab> tabsmap = new HashMap<String, Tab>(moretabs.size());
+        for(Tab t: moretabs) {
+            if(t != null)
+                tabsmap.put(t.getId(), t);
+        }
+        logger.trace(jrds.Util.delayedFormatString("Looking for tabs list %s in %s", pm.tabsList, moretabs));
+        for(String tabid: pm.tabsList) {
+            if("@".equals(tabid)) {
+                for(Tab t: customTabMap.values()) {
+                    tabs.put(t.getId(), t);
+                }
+            }
+            else {
+                Tab t = tabsmap.get(tabid);
+                if(t == null) {
+                    logger.error("Non existent tab to add: %s" + tabid);
+                    continue;
+                }
+                tabs.put(tabid, t);
+            }
+        }
+        //Search for the first valid tab id
+        for(int i=0; i < pm.tabsList.size(); i++ ) {
+            firstTab = pm.tabsList.get(i);
+            if(tabs.containsKey(firstTab))
+                break;
+        }
     }
 
     public Collection<RdsHost> getHosts() {
@@ -398,7 +443,7 @@ public class HostsList extends StarterNode {
                         return t;
                     }
                 }
-                );
+                        );
                 startCollect();
                 for(final RdsHost oneHost: hostList) {
                     if( ! isCollectRunning())
@@ -654,5 +699,12 @@ public class HostsList extends StarterNode {
         }
 
         return daSet;
+    }
+
+    /**
+     * @return the first tab
+     */
+    public String getFirstTab() {
+        return firstTab;
     }
 }

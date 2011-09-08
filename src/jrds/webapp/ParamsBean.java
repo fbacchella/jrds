@@ -59,8 +59,6 @@ public class ParamsBean implements Serializable {
     static private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     static private final Pattern rangePattern = Pattern.compile("(-?\\d+(.\\d+)?)([a-zA-Z]{0,2})");
 
-    static public String DEFAULTTAB = "filtertab";
-
     String contextPath = "";
     String dsName = null;
     Period period = new Period();
@@ -266,9 +264,9 @@ public class ParamsBean implements Serializable {
 
         //If previous steps failed
         if(choiceType == null || choiceValue == null) {
-            tab = hl.getTab(DEFAULTTAB);
+            choiceValue = hostlist.getFirstTab();
+            tab = hl.getTab(choiceValue);
             choiceType = "tab";
-            choiceValue = DEFAULTTAB;
         }
     }
 

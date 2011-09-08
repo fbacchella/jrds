@@ -7,10 +7,12 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
 
 import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
@@ -242,5 +244,20 @@ final public class Tools {
 			logger.addAppender(ta);
 		}
 		return logs;
+	}
+	
+    static private final String[] dirs = new String[] {"configdir", "rrddir", "tmpdir"};
+    static private final Random r = new Random();
+	static public final PropertiesManager getCleanPM() {
+        File newtmpdir = new File(System.getProperty("java.io.tmpdir"), "jrds" + r.nextInt());;
+        PropertiesManager pm = new PropertiesManager();
+        Map<String, File> dirMap = new HashMap<String, File>(dirs.length);
+        for(String dirname: dirs) {
+            File dir = new File(newtmpdir, dirname);;
+            pm.setProperty(dirname, dir.getPath());
+            dirMap.put(dirname, dir);
+        }
+        pm.setProperty("autocreate", "true");
+        return pm;
 	}
 }

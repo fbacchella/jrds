@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -327,6 +328,16 @@ public class PropertiesManager extends Properties {
 		extensionClassLoader = doClassLoader(getProperty("classpath", ""));
 
 		rrdbackend = getProperty("rrdbackend", "NIO");
+		
+		// We search for the tabs list in the property tab
+		// spaces are non-significant
+		String tabsList = getProperty("tabs");
+		if(tabsList !=null && ! "".equals(tabsList.trim())) {
+		    this.tabsList = new ArrayList<String>();
+		    for(String tab: tabsList.split(",")) {
+		        this.tabsList.add(tab.trim());
+		    }
+		}
 
 		security = parseBoolean(getProperty("security", "false"));
 		if(security) {
@@ -375,5 +386,5 @@ public class PropertiesManager extends Properties {
 	public ACL defaultACL = ACL.ALLOWEDACL;
 	public ACL adminACL = ACL.ALLOWEDACL;
 	public boolean readonly = false;
-	//public Set<Class<?>> preloadedClasses = new HashSet<Class<?>>();
+	public List<String> tabsList = Arrays.asList("filtertab", "customgraph", "@", "sumstab", "viewstab", "hoststab", "tagstab", "adminTab");
 }

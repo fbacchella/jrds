@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import jrds.HostsList;
 import jrds.Tab;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -18,6 +19,7 @@ import org.json.JSONException;
  */
 public class JSonQueryParams extends JrdsServlet {
     private static final long serialVersionUID = 1L;
+    static final private Logger logger = Logger.getLogger(JSonQueryParams.class);
 
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -57,23 +59,26 @@ public class JSonQueryParams extends JrdsServlet {
 
             //Add the list of tabs
             w.key("tabslist");
-            w.array();
+            w.object();
             for(String id: root.getTabsId()) {
-                w.object();
                 Tab tab = root.getTab(id);
+                w.key(id);
+                w.object();
                 w.key("id").value(id);
                 w.key("label").value(tab.getName());
                 w.key("isFilters").value(tab.isFilters());
-                if(ParamsBean.DEFAULTTAB.equals(id))
-                    w.key("selected").value("true");
+                w.key("callback").value(tab.getJSCallback());
+                if(tab.getJSTreetype() != null)
+                    w.key("treeType").value(tab.getJSTreetype());
                 w.endObject();
             }
-            w.endArray();
+            w.endObject();
 
             w.endObject();
             w.newLine();
             w.flush();
         } catch (JSONException e) {
+            logger.fatal(e, e);
         }
     }
 

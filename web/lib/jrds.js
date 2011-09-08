@@ -19,8 +19,8 @@ dojo.declare("jrdsTree", dijit.Tree, {
 });	
 
 var hourFormat = {
-		timePattern: 'HH:mm',
-		selector: 'time'
+    timePattern: 'HH:mm',
+    selector: 'time'
 };
 
 var hourconstraints = {
@@ -143,9 +143,8 @@ function initIndex() {
 		//The parse can be done
 		dojo.parser.parse();
 
-		var tabs = dijit.byId("tabs");
-		dojo.connect(tabs,"_transition", transitTab);
 		setupCalendar();
+		setupTabs();
 		setupDisplay();
 	});	
 }
@@ -346,35 +345,6 @@ function fileForms() {
 }
 
 function setupDisplay() {
-	var tabWidget = dijit.byId('tabs');
-	var i = 0;
-	var isFilters;
-
-	dojo.forEach(queryParams.tabslist, function(key) {
-		var pane = new dijit.layout.ContentPane({
-	        title: key.label,
-	        id: key.id,
-	        isFilters: key.isFilters
-	    });
-		tabWidget.addChild(pane, i++);		
-	    if(key.selected && ! queryParams.tab) {
-	    	pane.keepParams = true;
-			tabWidget.selectChild(pane);
-			isFilters = key.isFilters;
-	    }	    	
-	});
-
-	//Tab was specified, so go to it, no need to load tree
-	if(queryParams.tab) {
-		tabWidget.selectChild(queryParams.tab);
-	}
-	//We're in the default tab, load the needed try now
-	else {
-		if(queryParams.host || queryParams.tree || queryParams.filter)
-			isFilters = false;
-		getTree(isFilters);
-	}
-
 	if(queryParams.id) {
 		getGraphList();
 	}
@@ -672,28 +642,71 @@ function submitRenderForm(evt) {
 	return false;	
 }
 
-function transitTab(newPage, oldPage){
-	try {
-		var newId = newPage.attr('id');
-		var oldId = oldPage.attr('id');
-		if(oldId != 'adminTab') {
-			oldPage.destroyDescendants(false);
-	}
-	//Nothing special to do when showing adminTab
-	if(newId == 'adminTab') {
-		setAdminTab();
-		return;
+function setupTabs() {
+    var tabWidget = dijit.byId('tabs');
+    dojo.connect(tabWidget,"_transition", transitTab);
+    var i = 0;
+    var isFilters;
+	
+    for(key in queryParams.tabslist) {
+        var pane = dijit.byId(key)
+        if(pane == undefined) {
+		    pane = new dijit.layout.ContentPane({
+	            title:  queryParams.tabslist[key].label,
+	            id: queryParams.tabslist[key].id,
+	            isFilters: queryParams.tabslist[key].isFilters,
+	            treeType: queryParams.tabslist[key].treeType,
+	            callback: queryParams.tabslist[key].callback
+	        });
+		    tabWidget.addChild(pane, i++);
+		}
+		else {
+		    pane.isFilters = queryParams.tabslist[key].isFilters;
+		    pane.treeType = queryParams.tabslist[key].treeType;
+		    pane.callback = queryParams.tabslist[key].callback;
+		}		
 	}
 
-	newPage.attr('content', dojo.clone(mainPane));
+	//Tab was specified, so go to it, no need to load tree
+	if(queryParams.tab) {
+		tabWidget.selectChild(queryParams.tab);
+	}
+	//We're in the default tab, load the needed try now
+	else {
+	    tabWidget.selectChild(tabWidget.getChildren()[0]);
+		if(queryParams.host || queryParams.tree || queryParams.filter)
+			isFilters = false;
+		getTree(isFilters);
+	}
+	
+    //adminTab is in index.html, so remove it if it's not in the explicit tab list
+	if(queryParams.tabslist['adminTab'] == undefined) {
+	    var adminTab = dijit.byId("adminTab");
+	    tabWidget.removeChild(adminTab);
+	}
+}
+
+function transitTab(newPage, oldPage){
+    var newId = newPage.attr('id');
+    var oldId = oldPage.attr('id');
+    if(oldId != 'adminTab') {
+        oldPage.destroyDescendants(false);
+    }
+    console.log(window[newPage.callback]);
+    window[newPage.callback](newPage);
+}
+
+function treeTabCallBack(newTab) {
+    console.log(newTab);
+	newTab.attr('content', dojo.clone(mainPane));
 
 	var treePane = dojo.byId('treePane');
 	var treeType = 'tree';
-	var keepParams = newPage.keepParams;
+	var keepParams = newTab.keepParams;
 
 	//keepParams used during page setup, to keep queryParams fields
 	if(keepParams) {
-		delete newPage.keepParams;
+		delete newTab.keepParams;
 	}
 	else {
 		if(queryParams.host)
@@ -702,13 +715,14 @@ function transitTab(newPage, oldPage){
 			delete queryParams.filter;
 		if(queryParams.id)
 			delete queryParams.id;
-		queryParams.tab = newPage.attr('id');
-		queryParams.landtab = newPage.attr('id');
+		queryParams.tab = newTab.attr('id');
+		queryParams.landtab = newTab.attr('id');
 	}
 	//To manage special tabs
-	if(newId == 'sumstab') {
-		treeType = 'graph';
-	}
+	//if(newId == 'sumstab') {
+	//	treeType = 'graph';
+	//}
+	treeType = newTab.treeType;
 
 	setupCalendar();
 	fileForms();
@@ -716,11 +730,7 @@ function transitTab(newPage, oldPage){
 	//We don't load tree during initial setup
 	//It's done later
 	if(! keepParams)
-		getTree(newPage.isFilters);
-	}
-	catch(err) {
-		alert(err.message);
-	}
+		getTree(newTab.isFilters);
 }
 
 function sendReload(evt) {

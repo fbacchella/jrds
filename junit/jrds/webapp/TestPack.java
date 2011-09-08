@@ -69,8 +69,6 @@ public class TestPack {
 	public void testPack1() throws IOException, Exception {
 		JrdsJSONObject params = new JrdsJSONObject( packunpack("{'begin':'2010-08-17 00:00','end':'2010-08-18 23:59', 'min':'0', 'max':'10', 'autoperiod':'0','filter':['All hosts'],'host':'','treeType':'tree','id':'-744958554','path':['All filters','bougie','Services','jdbc:postgresql://appartland.eu/postgres','xwiki']}"));
 		Assert.assertEquals("0", params.get("autoperiod"));
-		Assert.assertEquals(ParamsBean.DEFAULTTAB, params.get("tab"));
-
 	}
 
 	@Test
@@ -92,10 +90,5 @@ public class TestPack {
 		Assert.assertEquals("7", params.get("autoperiod"));
 		Assert.assertEquals(JSONArray.class, params.get("path").getClass());
 		Assert.assertEquals("[\"All filters\",\"fe1\",\"System\",\"ntp\"]", params.get("path").toString());
-
 	}
-
-
-	
-	
 }
