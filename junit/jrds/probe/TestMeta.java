@@ -18,11 +18,10 @@ import jrds.webapp.DiscoverAgent;
 import junit.framework.Assert;
 
 public class TestMeta{
-    @SuppressWarnings("unchecked")
     @ProbeMeta(
             discoverAgent = SnmpDiscoverAgent.class
     )
-    public abstract class DummyProbe1 extends Probe {
+    public abstract class DummyProbe1<A,B> extends Probe<A,B> {
         
     }
 
@@ -42,5 +41,6 @@ public class TestMeta{
         ProbeMeta  meta = DummyProbe1.class.getAnnotation(ProbeMeta.class);
         logger.debug(meta.discoverAgent());
         DiscoverAgent da = meta.discoverAgent().getConstructor().newInstance();
+        Assert.assertNotNull("a discover agent can't be build", da);
     }
 }

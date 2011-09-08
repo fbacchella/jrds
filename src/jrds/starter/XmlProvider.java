@@ -125,7 +125,7 @@ public class XmlProvider extends Starter {
                 double value = 0;
                 if(n != null) {
                     log(Level.TRACE, "%s", n);
-                    value = jrds.Util.parseStringNumber(n.getTextContent(), Double.class, Double.NaN).doubleValue();
+                    value = jrds.Util.parseStringNumber(n.getTextContent(), Double.NaN).doubleValue();
                     oldMap.put(xpath, Double.valueOf(value));
                 }
             } catch (XPathExpressionException e) {

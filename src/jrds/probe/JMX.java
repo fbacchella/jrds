@@ -138,7 +138,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
             return ((Number) value);
         }
         else if(value instanceof String) {
-            return jrds.Util.parseStringNumber((String) value, Double.class, Double.NaN);
+            return jrds.Util.parseStringNumber((String) value, Double.NaN);
         }
         return Double.NaN;
     }

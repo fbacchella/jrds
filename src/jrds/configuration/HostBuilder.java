@@ -143,9 +143,9 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
 			if(name != null)
 				set = collections.get(name);
 			else if(forattr.containsKey("min") && forattr.containsKey("max") && forattr.containsKey("step")) {
-				int min = jrds.Util.parseStringNumber(forattr.get("min"), Integer.class, Integer.MAX_VALUE).intValue();
-				int max = jrds.Util.parseStringNumber(forattr.get("max"), Integer.class, Integer.MIN_VALUE).intValue();
-				int step = jrds.Util.parseStringNumber(forattr.get("step"), Integer.class, Integer.MIN_VALUE).intValue();
+				int min = jrds.Util.parseStringNumber(forattr.get("min"), Integer.MAX_VALUE).intValue();
+				int max = jrds.Util.parseStringNumber(forattr.get("max"), Integer.MIN_VALUE).intValue();
+				int step = jrds.Util.parseStringNumber(forattr.get("step"), Integer.MIN_VALUE).intValue();
 				if( min > max || step <= 0) {
 					logger.error("invalid range from " + min + " to " + max + " with step " + step);
 					break;

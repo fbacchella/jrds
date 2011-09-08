@@ -193,19 +193,19 @@ public class ParamsBean implements Serializable {
         String host = getValue("host");
         String probe = getValue("probe");
 
-        gid = jrds.Util.parseStringNumber(getValue("gid"), Integer.class, null);
+        gid = jrds.Util.parseStringNumber(getValue("gid"), 0);
         //Many way to discover id (graph node id)
         String idStr = getValue("id");
         String graph =  getValue("graphname");
         if(idStr != null && ! "".equals(idStr))
-            id = Util.parseStringNumber(idStr, Integer.class, null);
+            id = Util.parseStringNumber(idStr, 0);
         else if(host != null && ! "".equals(host) && graph != null && ! "".equals(graph)) {
             id = (host + "/" + graph).hashCode();
         }
 
         String pidStr = getValue("pid");
         if(pidStr != null)
-            pid = jrds.Util.parseStringNumber(pidStr, Integer.class, null);
+            pid = jrds.Util.parseStringNumber(pidStr, 0);
         else if(host != null && ! "".equals(host) && probe != null && ! "".equals(probe) )
             pid = (host + "/" + probe).hashCode();
 
@@ -277,7 +277,7 @@ public class ParamsBean implements Serializable {
         jrds.GraphNode node = g.getNode();
         if(m.matches() && node != null) {
             String valueString = m.group(1);
-            Number value = jrds.Util.parseStringNumber(valueString, Double.class, Double.NaN);
+            Number value = jrds.Util.parseStringNumber(valueString, Double.NaN);
             String suffixString = m.group(3);
             if(! "".equals(suffixString)) {
                 try {
@@ -533,7 +533,7 @@ public class ParamsBean implements Serializable {
             if(scaleStr == null)
                 scaleStr = getValue("autoperiod");
 
-            int scale = jrds.Util.parseStringNumber(scaleStr, Integer.class, -1).intValue();
+            int scale = jrds.Util.parseStringNumber(scaleStr, -1).intValue();
 
             String end = getValue("end");
             String begin = getValue("begin");

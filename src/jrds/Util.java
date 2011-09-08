@@ -8,7 +8,6 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.util.Collections;
@@ -62,11 +61,15 @@ public class Util {
     }
 
     private static final String BASE64_CHARS =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+_=";
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+_=";
     private static final char[] BASE64_CHARSET = BASE64_CHARS.toCharArray();
 
     private static final Pattern varregexp = Pattern.compile("(.*?)\\$\\{([\\w\\.-]+)\\}(.*)");
 
+    /**
+     * The SI prefix as an enumeration, with factor provided.<p/>
+     * More informations can be found at <a target="_blank" href="http://en.wikipedia.org/wiki/SI_prefix">Wikipedia's page</a> 
+     */
     public enum SiPrefix {
         Y(24),
         Z(21),
@@ -94,9 +97,20 @@ public class Util {
         private SiPrefix(int exponent) {
             this.exponent = exponent;
         }
+        
+        /**
+         * Evaluate a value in the context of this prefix
+         * @param value the value to evalute
+         * @param isSi is the prefix metric or binary (power of 2)
+         * @return the raw value
+         */
         public double evaluate(double value, boolean isSi) {
             return Math.pow(isSi ? 10 : 1024, isSi ? exponent: exponent/3.0 ) * value;
         }
+        
+        /**
+         * @return the exponent for this prefix
+         */
         public int getExponent() {
             return exponent;
         }
@@ -118,6 +132,11 @@ public class Util {
         tFactory.setErrorListener(el);
     }
 
+    /**
+     * Return the md5 digest value of a string, encoded in base64
+     * @param The string to use
+     * @return the printable md5 digest value for s
+     */
     public static String stringSignature(String s)
     {
         byte[] digestval;
@@ -139,7 +158,7 @@ public class Util {
      * the input.
 
      */
-    public static String toBase64(byte[] buffer) {
+    private static String toBase64(byte[] buffer) {
         int len = buffer.length;
         int pos = 0;
         StringBuffer sb = new StringBuffer((int) (len * 1.4) + 3 );
@@ -336,6 +355,13 @@ public class Util {
         return jrds.Util.evaluateVariables(template, env, node);
     }
 
+    /**
+     * <p>A compact and exception free number parser.<p>
+     * <p>If the string can be parsed as the specified type, it return the default value<p>
+     * @param toParse The string to parse
+     * @param defaultVal A default value to use it the string can't be parsed
+     * @return An Number object using the same type than the default value.
+     */
     @SuppressWarnings("unchecked")
     public static <NumberClass extends Number> NumberClass parseStringNumber(String toParse, NumberClass defaultVal) {
         if(toParse == null || "".equals(toParse))
@@ -356,6 +382,7 @@ public class Util {
         return defaultVal;
     }
 
+    @Deprecated
     public static <NumberClass extends Number> NumberClass parseStringNumber(String toParse, Class<NumberClass> nc, NumberClass defaultVal) {
         if(toParse == null || "".equals(toParse))
             return defaultVal;
@@ -539,24 +566,6 @@ public class Util {
         return ! Collections.disjoint(allowedRoles, userRoles);
     }
 
-    static public Object callMethod(Class<?>clazz, Object instance, String method, Object[] args) {
-        Class<?> types[] = new Class<?>[args.length];
-        for(int i = 0; i < args.length; i++) {
-            types[i] = args[i].getClass();
-        }
-        return callMethod(clazz, instance, method, types, args);
-    }
-
-    static public Object callMethod(Class<?>clazz, Object instance, String method, Class<?>[] types, Object[] args) {
-        try {
-            Method m = clazz.getMethod(method, types);
-            return m.invoke(instance, args);
-        } catch (Exception e) {
-            new RuntimeException("method call", e.getCause() != null ? e.getCause() : e);
-        }
-        return null;
-    }
-
     /**
      * A wrapper method to delay evaluation of log4j arguments
      * @param format
@@ -572,5 +581,5 @@ public class Util {
         };
     }
 
- }
+}
 

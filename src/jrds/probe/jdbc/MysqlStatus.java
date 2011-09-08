@@ -18,34 +18,34 @@ import jrds.Util;
  *
  */
 public class MysqlStatus extends Mysql {
-	public void configure(int port, String user, String passwd) {
-		super.configure(port, user, passwd);
-	}
+    public void configure(int port, String user, String passwd) {
+        super.configure(port, user, passwd);
+    }
 
-	public void configure(String user, String passwd) {
-		super.configure(user, passwd);
-	}
+    public void configure(String user, String passwd) {
+        super.configure(user, passwd);
+    }
 
-	@Override
-	public List<String> getQueries() {
-		return Collections.singletonList("SHOW /*!50002 GLOBAL */ STATUS");
-	}
+    @Override
+    public List<String> getQueries() {
+        return Collections.singletonList("SHOW /*!50002 GLOBAL */ STATUS");
+    }
 
-	@Override
-	public Map<String, Number> parseRs(ResultSet rs) throws SQLException {
-		Map<String, Number> retValues = new HashMap<String, Number>(getPd().getSize());
-		Set<String> toCollect = getPd().getCollectStrings().keySet();
-		for(Map<String, Object> m: parseRsVerticaly(rs, false)) {
-			for(Map.Entry<String, Object> e: m.entrySet()) {
-				Double d = Double.NaN;
-				//We only keep the data in data stores list
-				if(toCollect.contains(e.getKey())) {
-					if(e.getValue() instanceof String)
-						d = Util.parseStringNumber((String)e.getValue(), Double.class, Double.NaN).doubleValue();
-					retValues.put(e.getKey(), d);
-				}
-			}
-		}
-		return retValues;
-	}
+    @Override
+    public Map<String, Number> parseRs(ResultSet rs) throws SQLException {
+        Map<String, Number> retValues = new HashMap<String, Number>(getPd().getSize());
+        Set<String> toCollect = getPd().getCollectStrings().keySet();
+        for(Map<String, Object> m: parseRsVerticaly(rs, false)) {
+            for(Map.Entry<String, Object> e: m.entrySet()) {
+                Double d = Double.NaN;
+                //We only keep the data in data stores list
+                if(toCollect.contains(e.getKey())) {
+                    if(e.getValue() instanceof String)
+                        d = Util.parseStringNumber((String)e.getValue(), Double.NaN).doubleValue();
+                    retValues.put(e.getKey(), d);
+                }
+            }
+        }
+        return retValues;
+    }
 }

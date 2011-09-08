@@ -36,7 +36,7 @@ public class RstatProbe3 extends Probe<String, Number> {
 	 * @see jrds.Probe#getNewSampleValues()
 	 */
 	public Map<String, Number> getNewSampleValues() {
-		Resolver r = (Resolver) getStarters().find(Resolver.makeKey(this));
+		Resolver r = find(Resolver.class);
 		if(! r.isStarted()) {
 			return Collections.emptyMap();
 		}

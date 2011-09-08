@@ -2,7 +2,6 @@ package jrds;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -125,28 +124,22 @@ public class UtilTest {
 	
 	@Test
 	public void testParseStringNumber1() {
-		double n = Util.parseStringNumber("1", Double.class, Double.NaN);
+		double n = Util.parseStringNumber("1", Double.NaN);
 		Assert.assertEquals(1.0, n, 0.001);
 	}
 	
 	@Test
 	public void testParseStringNumber2() {
-		double n = Util.parseStringNumber(null, Double.class, Double.NaN);
+		double n = Util.parseStringNumber(null, Double.NaN);
 		Assert.assertTrue(Double.isNaN(n));
 	}
 	
 	@Test
 	public void testParseStringNumber3() {
-		double n = Util.parseStringNumber("a", Double.class, Double.NaN);
+		double n = Util.parseStringNumber("a", Double.NaN);
 		Assert.assertTrue(Double.isNaN(n));
 	}
 	
-	@Test
-	public void testParseStringNumber4() {
-		Number n = Util.parseStringNumber("1", Integer.class, 1);
-		Assert.assertEquals(1, n);
-	}
-
 	@Test
 	public void testParseStringNumber5() {
 		int n = Util.parseStringNumber("1", 1);
@@ -157,12 +150,6 @@ public class UtilTest {
 	public void testParseStringNumber6() {
 		double n = Util.parseStringNumber("1", 1.0d);
 		Assert.assertEquals(1.0,n , 0.001);
-	}
-
-	@Test
-	public void testParseStringNumber7() {
-		Integer n = Util.parseStringNumber(null, Integer.class, null);
-		Assert.assertNull("null string parse to not null", n);
 	}
 
 	@SuppressWarnings("unchecked")

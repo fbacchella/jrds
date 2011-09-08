@@ -145,7 +145,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
 						switch(type) {
 						case Types.DATE: value = rs.getDate(i).getTime() / 1000; break;
 						case Types.TIME: value = rs.getTime(i).getTime() / 1000; break;
-						case Types.VARCHAR: value = Util.parseStringNumber(rs.getString(i), Double.class, Double.NaN); break;
+						case Types.VARCHAR: value = Util.parseStringNumber(rs.getString(i), Double.NaN); break;
 						case Types.TIMESTAMP: value = rs.getTimestamp(i).getTime() / 1000; break;
 						}
 						values.put(key, value);

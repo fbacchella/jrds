@@ -37,7 +37,7 @@ public class OracleActivityGraph extends GraphNode {
 	/**
 	 * @param theStore
 	 */
-	public OracleActivityGraph(Probe theStore) {
+	public OracleActivityGraph(Probe<?,?> theStore) {
 		super(theStore, gd);
 	}
 
