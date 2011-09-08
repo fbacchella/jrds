@@ -61,20 +61,8 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
 
 		pd.setHeartBeatDefault(pm.step * 2);
 
-		if(probeDescNode.checkPath(CompiledXPath.get("uniq")))
-			pd.setUniqIndex(true);
-
-		String uptimefactorStr = "";
-		try {
-			uptimefactorStr = probeDescNode.evaluate(CompiledXPath.get("uptimefactor")).trim();
-			if( uptimefactorStr != null && ! "".equals(uptimefactorStr)) {
-				float uptimefactor = Float.parseFloat(uptimefactorStr);
-				pd.setUptimefactor(uptimefactor);
-			}
-		} catch (NumberFormatException e) {
-			logger.warn("Uptime factor not valid " + uptimefactorStr);
-			pd.setUptimefactor(0);
-		}
+		probeDescNode.callIfExist(pd, CompiledXPath.get("uniq"), "setUniqIndex", Boolean.TYPE, true);
+		probeDescNode.setMethod(pd, CompiledXPath.get("uptimefactor"), "setUptimefactor", Float.TYPE);
 
 		List<String> graphs = probeDescNode.doTreeList(CompiledXPath.get("graphs/name"), new JrdsNode.FilterNode<String>() {
 			@Override

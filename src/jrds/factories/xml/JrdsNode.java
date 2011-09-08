@@ -116,6 +116,9 @@ public class JrdsNode implements Node {
         else if(argType == Double.TYPE) {
             c = Double.class.getConstructor(String.class);
         }
+        else if(argType == Float.TYPE) {
+            c = Float.class.getConstructor(String.class);
+        }
         Method m = o.getClass().getMethod(method, new Class[]{argType});
         for(Node n: new NodeListIterator(parent, xpath)) {
             String name = n.getTextContent().trim();
