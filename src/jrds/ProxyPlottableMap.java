@@ -5,7 +5,7 @@ import java.util.HashMap;
 import org.rrd4j.data.Plottable;
 
 public abstract class ProxyPlottableMap extends HashMap<String, ProxyPlottableMap.ProxyPlottable>{
-	public class ProxyPlottable extends Plottable {
+	public static class ProxyPlottable extends Plottable {
 		Plottable real = new Plottable() {};
 		@Override
 		public double getValue(long timestamp) {

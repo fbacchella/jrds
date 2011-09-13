@@ -33,19 +33,38 @@ public class Download extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(Download.class);
     private static final String CONTENT_TYPE = "text/csv";
     private static final SimpleDateFormat humanDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    protected static final DateFormat epochFormat = new DateFormat() {
+    protected static final ThreadLocal<DateFormat> epochFormat = 
+            new ThreadLocal<DateFormat> () {
         @Override
-        public StringBuffer format(Date date, StringBuffer toAppendTo,
-                FieldPosition arg2) {
-            return toAppendTo.append(date.getTime() / 1000);
-        }
-        @Override
-        public Date parse(String source, ParsePosition pos) {
-            pos.setIndex(source.length());
-            return new Date(Long.parseLong(source) * 1000);
-        }
-        
+        protected DateFormat initialValue() {
+            return new DateFormat() {
+                @Override
+                public StringBuffer format(Date date, StringBuffer toAppendTo,
+                        FieldPosition arg2) {
+                    return toAppendTo.append(date.getTime() / 1000);
+                }
+                @Override
+                public Date parse(String source, ParsePosition pos) {
+                    pos.setIndex(source.length());
+                    return new Date(Long.parseLong(source) * 1000);
+                }
+            };
+        };
     };
+
+    //    protected static final DateFormat epochFormat = new DateFormat() {
+    //        @Override
+    //        public StringBuffer format(Date date, StringBuffer toAppendTo,
+    //                FieldPosition arg2) {
+    //            return toAppendTo.append(date.getTime() / 1000);
+    //        }
+    //        @Override
+    //        public Date parse(String source, ParsePosition pos) {
+    //            pos.setIndex(source.length());
+    //            return new Date(Long.parseLong(source) * 1000);
+    //        }
+    //        
+    //    };
 
     public void doGet(HttpServletRequest req, HttpServletResponse res) {
 
@@ -130,7 +149,7 @@ public class Download extends JrdsServlet {
             res.addHeader("content-disposition","attachment; filename=" + fileName);
             DateFormat exportDateFormat = humanDateFormat;
             if(params.getValue("epoch") != null) {
-                exportDateFormat = epochFormat;
+                exportDateFormat = epochFormat.get();
             }
             writeCsv(out, sourceDp, exportDateFormat);
         } catch (IOException e) {

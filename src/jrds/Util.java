@@ -97,7 +97,7 @@ public class Util {
         private SiPrefix(int exponent) {
             this.exponent = exponent;
         }
-        
+
         /**
          * Evaluate a value in the context of this prefix
          * @param value the value to evalute
@@ -107,7 +107,7 @@ public class Util {
         public double evaluate(double value, boolean isSi) {
             return Math.pow(isSi ? 10 : 1024, isSi ? exponent: exponent/3.0 ) * value;
         }
-        
+
         /**
          * @return the exponent for this prefix
          */
@@ -526,10 +526,8 @@ public class Util {
                     int result;
 
                     if (Character.isDigit(space1[0]) && Character.isDigit(space2[0])) {
-                        Integer firstNumberToCompare = new Integer(Integer
-                                .parseInt(str1.trim()));
-                        Integer secondNumberToCompare = new Integer(Integer
-                                .parseInt(str2.trim()));
+                        Integer firstNumberToCompare = Integer.parseInt(str1.trim());
+                        Integer secondNumberToCompare = Integer.parseInt(str2.trim());
                         result = firstNumberToCompare.compareTo(secondNumberToCompare);
                     } else {
                         result = str1.compareTo(str2);

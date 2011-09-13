@@ -110,7 +110,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         if (description == null)
             description = "";
         String link= "[[sourcetype:" + sourceType + ":" + probeName.toLowerCase() + "|" + probeName + "]]";
-        return new String("| " + getSourceTypeLink(p) + " | " + link + " | " + description + " | " + classToLink(p.getClass()) + " | ");
+        return "| " + getSourceTypeLink(p) + " | " + link + " | " + description + " | " + classToLink(p.getClass()) + " | ";
 
     }
     private void dumpProbe(ProbeDesc pd) throws InstantiationException, IllegalAccessException {

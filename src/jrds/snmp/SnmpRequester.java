@@ -87,7 +87,7 @@ public abstract class SnmpRequester {
 
 			Target snmpTarget = starter.getTarget();
 			Snmp snmp = starter.getSnmp();
-			if(starter != null && starter.isStarted() && snmpTarget != null && snmp != null) {
+			if(starter.isStarted() && snmpTarget != null && snmp != null) {
 				PDUFactory localfactory = starter.getPdufactory();
 				TableUtils tableRet = new TableUtils(snmp, localfactory);
 				tableRet.setMaxNumColumnsPerPDU(30);
@@ -123,7 +123,7 @@ public abstract class SnmpRequester {
 
 			Target snmpTarget = starter.getTarget();
 			Snmp snmp = starter.getSnmp();
-			if(starter != null && starter.isStarted() && snmpTarget != null && snmp != null) {
+			if(starter.isStarted() && snmpTarget != null && snmp != null) {
 				TreeUtils treeRet = new TreeUtils(starter.getSnmp(), starter.getPdufactory());
 				for(OID rootOid : oids) {
 					List<TreeEvent> subOids = treeRet.getSubtree(snmpTarget, rootOid);

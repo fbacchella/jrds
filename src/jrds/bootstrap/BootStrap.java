@@ -109,6 +109,8 @@ public class BootStrap {
 			else if("file".equals(protocol)) {
 				rootUrl = me;
 			}
+			else
+			    return null;
 
 			File file = new File(rootUrl.getFile());
 			File baseClassPath = file.getParentFile();

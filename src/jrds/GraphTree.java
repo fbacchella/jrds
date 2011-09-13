@@ -124,7 +124,7 @@ public class GraphTree {
 	 */
 	public void addPath(String... path) {
 		if(path.length < 1) {
-			logger.error("Path is empty : " + path);
+			logger.error("Path is empty");
 		}
 		else
 			_addGraphByPath(new LinkedList<String>(Arrays.asList(path)), null);

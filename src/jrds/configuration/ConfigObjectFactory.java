@@ -1,6 +1,8 @@
 package jrds.configuration;
 
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,16 +49,18 @@ public class ConfigObjectFactory {
             load = new Loader();
             URL graphUrl = getClass().getResource("/desc");
             if(graphUrl != null)
-                load.importUrl(graphUrl);
+                load.importUrl(graphUrl.toURI());
             else {
                 logger.fatal("Default probes not found");
             }
         } catch (ParserConfigurationException e) {
             throw new RuntimeException("Loader initialisation error",e);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("URI syntax exception",e);
         }
 
         logger.debug(jrds.Util.delayedFormatString("Scanning %s for probes libraries", pm.libspath));
-        for(URL lib: pm.libspath) {
+        for(URI lib: pm.libspath) {
             logger.info(jrds.Util.delayedFormatString("Adding lib %s", lib));
             load.importUrl(lib);
         }
@@ -65,7 +69,7 @@ public class ConfigObjectFactory {
             load.importDir(pm.configdir);
     }
 
-    public void addUrl(URL ressourceUrl) {
+    public void addUrl(URI ressourceUrl) {
         load.importUrl(ressourceUrl);
     }
 

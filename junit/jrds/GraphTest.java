@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import jrds.mockobjects.GetMoke;
 
@@ -42,14 +43,14 @@ public class GraphTest {
 		Assert.assertEquals(g1, g2);
 	}
 
-	@BeforeClass static public void configure() throws IOException {
+	@BeforeClass static public void configure() throws IOException, URISyntaxException {
 		Tools.configure();
 		logger.setLevel(Level.ERROR);
 		Tools.setLevel(new String[] {"jrds.Graph"}, logger.getLevel());
 		PropertiesManager pm = new PropertiesManager();
 		//Not sure to find the descriptions in test environnement
 		if(PropertiesManager.class.getResource("/desc") == null)
-			pm.libspath.add(new URL("file:desc"));
+			pm.libspath.add(new URI("file:desc"));
 		hl = new HostsList(pm);
 	}
 

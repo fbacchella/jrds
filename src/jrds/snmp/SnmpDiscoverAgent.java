@@ -102,7 +102,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         if(community == null) {
             community = "public";
         }
-        int port = jrds.Util.parseStringNumber(request.getParameter("discoverSnmpPort"), new Integer(161));
+        int port = jrds.Util.parseStringNumber(request.getParameter("discoverSnmpPort"), 161);
         IpAddress addr = new UdpAddress(InetAddress.getByName(hostname), port);
         Target hosttarget = new CommunityTarget(addr, new OctetString(community));
         hosttarget.setVersion(SnmpConstants.version2c);

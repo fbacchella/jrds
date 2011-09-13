@@ -99,7 +99,7 @@ public class Period {
             PeriodItem pi = (PeriodItem) periodList.get(calPeriod);
             begin = pi.getBegin(end);
         }
-        return begin;
+        return new Date(begin.getTime());
     }
     /**
      * @param begin The begin to set.
@@ -111,7 +111,7 @@ public class Period {
     }
 
     public void setBegin(Date begin) {
-        this.begin = begin;
+        this.begin = new Date(begin.getTime());
         calPeriod = 0;
     }
 
@@ -119,7 +119,7 @@ public class Period {
      * @return Returns the end.
      */
     public Date getEnd() {
-        return end;
+        return new Date(end.getTime());
     }
 
     /**
@@ -132,7 +132,7 @@ public class Period {
     }
 
     public void setEnd(Date end) {
-        this.end = end;
+        this.end = new Date(end.getTime());
     }
 
     public void setScale(int scale) {

@@ -217,7 +217,7 @@ public class Graph implements WithACL {
      * @return the start
      */
     public Date getStart() {
-        return start;
+        return new Date(start.getTime());
     }
 
     /**
@@ -232,7 +232,7 @@ public class Graph implements WithACL {
      * @return the end
      */
     public Date getEnd() {
-        return end;
+        return new Date(end.getTime());
     }
 
     /**

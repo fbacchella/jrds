@@ -35,16 +35,23 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
 	
 	protected void updateSample(Sample oneSample) {
 		Process urlperfps = null;
+		InputStream stdout = null;
 		try {
 			urlperfps = Runtime.getRuntime().exec(getCmd());
-			InputStream stdout = urlperfps.getInputStream();
+			stdout = urlperfps.getInputStream();
 			BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(stdout));
 			String perfstring = stdoutReader.readLine();
 			if(perfstring != null)
 				oneSample.set(perfstring);
 		} catch (IOException e) {
 			log(Level.ERROR, e, "external command failed : %s", e);
+		} finally {
+		    try {
+                stdout.close();
+            } catch (IOException e) {
+            }
 		}
+		
 		try {
 			if(urlperfps != null) {
 				urlperfps.waitFor();

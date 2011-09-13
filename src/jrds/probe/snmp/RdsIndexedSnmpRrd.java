@@ -143,10 +143,9 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 
                         boolean found = false;
                         int newSuffixLength = 0;
-                        for(OID tryoid: somevars.keySet()) {
-                            String name = null;
-                            if(tryoid != null)
-                                name = somevars.get(tryoid).toString();
+                        for(Map.Entry<OID, Object> e: somevars.entrySet()) {
+                            OID tryoid = e.getKey();
+                            String name = e.getValue().toString();
                             if(name != null && matchIndex(somevars.get(tryoid))) {
                                 newSuffixLength = tryoid.size() - getIndexPrefixLength();
                                 int[] index = new int[ newSuffixLength ];

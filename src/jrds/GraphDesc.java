@@ -514,7 +514,7 @@ implements Cloneable, WithACL {
         public String legend = null;
         public ConsolFun cf = null;
         public Integer percentile = null;
-        public class DsPath  {
+        public static final class DsPath  {
             String host;
             String probe;
         };
@@ -586,7 +586,7 @@ implements Cloneable, WithACL {
     private boolean withSummary = true; // To show the summary with last update, period, etc. information block
     private ACL acl = ACL.ALLOWEDACL;
 
-    public final class Dimension {
+    public static final class Dimension {
         public int width = 0;
         public int height = 0;
     };
@@ -765,7 +765,7 @@ implements Cloneable, WithACL {
 
         Integer valPercentile = null;
         if(percentile != null && ! "".equals(percentile)) {
-            valPercentile = jrds.Util.parseStringNumber(percentile, new Integer(0));
+            valPercentile = jrds.Util.parseStringNumber(percentile, Integer.valueOf(0));
         }
         add(name, dsName, rpn, gt, c, legend, cf, reversed != null, valPercentile, host, probe);
     }
@@ -1256,7 +1256,7 @@ implements Cloneable, WithACL {
         return numlegend;
     }
 
-    private class ImageParameters {
+    private static final class ImageParameters {
         int xsize;
         int ysize;
         int unitslength;

@@ -56,7 +56,14 @@ public class ParamsBean implements Serializable {
 
     static final private Logger logger = Logger.getLogger(ParamsBean.class);
 
-    static private final DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    private static final ThreadLocal<DateFormat> df = 
+            new ThreadLocal<DateFormat> () {
+        @Override
+        protected DateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        }
+    };
+
     static private final Pattern rangePattern = Pattern.compile("(-?\\d+(.\\d+)?)([a-zA-Z]{0,2})");
 
     String contextPath = "";
@@ -573,7 +580,7 @@ public class ParamsBean implements Serializable {
     public String getStringBegin() {
         String formatted = "";
         if(period.getScale() == 0)
-            formatted = df.format(period.getBegin());
+            formatted = df.get().format(period.getBegin());
         return formatted;
     }
 
@@ -583,7 +590,7 @@ public class ParamsBean implements Serializable {
     public String getStringEnd() {
         String formatted = "";
         if(period.getScale() == 0)
-            formatted = df.format(period.getEnd());
+            formatted = df.get().format(period.getEnd());
         return formatted;
     }
 

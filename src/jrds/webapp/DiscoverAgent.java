@@ -43,7 +43,7 @@ public abstract class DiscoverAgent {
     };
     public abstract void  doNode(Element parent, FieldInfo fi);
     };
-    public class FieldInfo {
+    public static final class FieldInfo {
         public String id;
         public String label;
         public DojoType dojoType;

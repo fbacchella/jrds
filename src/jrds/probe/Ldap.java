@@ -121,7 +121,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
     protected Map<String, Set<String>> buildRequestInfo(Set<String> collectPaths) {
         Map<String, Set<String>> retValue = new HashMap<String, Set<String>>();
         for(String path: collectPaths) {
-            String[] parsed = jrds.Util.parseTemplate(path, this).toString().split("\\?");
+            String[] parsed = jrds.Util.parseTemplate(path, this).split("\\?");
             String rdn = null, field = null;
             if(parsed.length == 2) {
                 rdn = parsed[0];

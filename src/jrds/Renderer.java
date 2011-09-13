@@ -92,14 +92,16 @@ public class Renderer {
                 }
             }
             if(destFile.isFile())
-                destFile.delete();
+                if( ! destFile.delete()) {
+                    logger.warn("Failed to delete " + destFile.getPath());
+                }
         }
 
         private synchronized void writeImg() {
             running.lock();
-            if( ! finished) {
-                long starttime = System.currentTimeMillis();
-                try {
+            try {
+                if( ! finished) {
+                    long starttime = System.currentTimeMillis();
                     OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile));
                     long middletime = System.currentTimeMillis();
                     graph.writePng(out);
@@ -109,20 +111,21 @@ public class Renderer {
                         long duration2 = (endtime - middletime );
                         logger.trace("Graph " + graph.getQualifieName() + " renderding ran for (ms) " + duration1 + ":" + duration2);	
                     }
-                } catch (FileNotFoundException e) {
-                    logger.error("Error with temporary output file: " +e);
-                } catch (IOException e) {
-                    logger.error("Error with temporary output file: " +e);
-                    Throwable cause = e.getCause();
-                    if(cause != null)
-                        logger.error("    Cause was: " + cause);
-                } catch (Exception e) {
-                    logger.error("Run time rendering " + this, e);
                 }
+            } catch (FileNotFoundException e) {
+                logger.error("Error with temporary output file: " +e);
+            } catch (IOException e) {
+                logger.error("Error with temporary output file: " +e);
+                Throwable cause = e.getCause();
+                if(cause != null)
+                    logger.error("    Cause was: " + cause);
+            } catch (Exception e) {
+                logger.error("Run time rendering " + this, e);
+            } finally {						
                 //Always set to true, we do not try again in case of failure
                 finished = true;
-            }						
-            running.unlock();
+                running.unlock();
+            }
         }
 
         @Override

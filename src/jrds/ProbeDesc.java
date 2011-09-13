@@ -53,7 +53,7 @@ public class ProbeDesc implements Cloneable {
 	private Map<String, String> properties = null;
 	private Map<String, Double> defaultValues = new HashMap<String,Double>(0);
 
-	private final class DsDesc {
+	private static final class DsDesc {
 		public DsType dsType;
 		public long heartbeat;
 		public double minValue;
@@ -139,7 +139,7 @@ public class ProbeDesc implements Cloneable {
 		dsMap.put(name, new DsDesc(null, heartBeatDefault, MINDEFAULT, MAXDEFAULT, index));
 	}
 
-	public class Joined {
+	public static final class Joined {
 		Object keyhigh;
 		Object keylow;
 		Joined(Object keyhigh, Object keylow) {

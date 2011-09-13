@@ -47,7 +47,7 @@ import org.apache.log4j.Logger;
 public class HostsList extends StarterNode {
     static private final Logger logger = Logger.getLogger(HostsList.class);
 
-    public class Stats {
+    public static final class Stats {
         Stats() {
             lastCollect = new Date(0);
         }

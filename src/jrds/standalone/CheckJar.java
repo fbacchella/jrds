@@ -1,6 +1,7 @@
 package jrds.standalone;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collection;
@@ -31,8 +32,8 @@ public class CheckJar extends CommandStarterImpl {
 
         for(String jarfile: args) {
 
-            URL jarfileurl = new File(jarfile).toURI().toURL();
-            ClassLoader cl = URLClassLoader.newInstance(new URL[]{jarfileurl}, getClass().getClassLoader());
+            URI jarfileurl = new File(jarfile).toURI();
+            ClassLoader cl = URLClassLoader.newInstance(new URL[]{jarfileurl.toURL()}, getClass().getClassLoader());
             ConfigObjectFactory confjar = new ConfigObjectFactory(pm, cl);
             confjar.addUrl(jarfileurl);
 

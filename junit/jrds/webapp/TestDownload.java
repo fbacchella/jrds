@@ -26,8 +26,8 @@ public class TestDownload extends Download {
     @Test
     public void testEpochFormat() throws Exception
     {
-        Date start = epochFormat.parse("0");
-        String formatted = epochFormat.format(start);
+        Date start = epochFormat.get().parse("0");
+        String formatted = epochFormat.get().format(start);
         
         Assert.assertEquals("0", formatted);
         Assert.assertEquals(new Date(0), start);
@@ -40,7 +40,7 @@ public class TestDownload extends Download {
         DataProcessor dp =  new DataProcessor(1, 10000);
         dp.setStep(10000/2);
         dp.processData();
-        writeCsv(out, dp, epochFormat );
+        writeCsv(out, dp, epochFormat.get() );
         logger.debug(out.toString());
 
     }

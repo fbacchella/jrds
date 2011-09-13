@@ -4,8 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -215,13 +214,9 @@ final public class Tools {
 		}
 	}
 	
-	static public URL pathToUrl(String pathname) {
-		try {
-			File path = new File(pathname);
-			return path.toURI().toURL();
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
+	static public URI pathToUrl(String pathname) {
+        File path = new File(pathname);
+        return path.toURI();
 	}
 	
 	static public List<LoggingEvent> getLockChecker(String... loggers) {

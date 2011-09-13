@@ -89,7 +89,7 @@ public class TestLoadConfiguration {
 		Loader l = new Loader();
 		dbuilder = l.dbuilder;
 		File descdir = new File("desc");
-		l.importUrl(descdir.toURI().toURL());
+		l.importUrl(descdir.toURI());
 
 		pm.setProperty("configdir", "tmp");
 		pm.setProperty("rrddir", "tmp");

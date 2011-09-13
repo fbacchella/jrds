@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -77,8 +78,9 @@ public class PropertiesManager extends Properties {
 					else {
 						integer = Integer.valueOf(s);
 					}
+	        return integer.intValue();
 		}
-		return integer.intValue();
+		throw new NumberFormatException("Parsing null string");
 	}
 
 	private boolean parseBoolean(String s)
@@ -119,12 +121,20 @@ public class PropertiesManager extends Properties {
 	public void join(File propFile)
 	{
 		logger.debug("Using propertie file " + propFile.getAbsolutePath());
+		InputStream inputstream = null;
 		try {
-			InputStream inputstream = new FileInputStream(propFile);
+			inputstream = new FileInputStream(propFile);
 			load(inputstream);
 			inputstream.close();
 		} catch (IOException ex) {
 			logger.warn("Invalid properties file " + propFile.getAbsolutePath() + ": " + ex.getLocalizedMessage());
+		} finally {
+		    if(inputstream !=null) {
+		        try {
+                    inputstream.close();
+                } catch (IOException e) {
+                }
+		    }
 		}
 	}
 
@@ -144,7 +154,7 @@ public class PropertiesManager extends Properties {
 			}
 		};
 
-		Collection<URL> urls = new HashSet<URL>();
+		Collection<URI> urls = new HashSet<URI>();
 
 		if(extendedclasspath != null && ! "".equals(extendedclasspath)) {
 			for(String pathElement: extendedclasspath.split(";")) {
@@ -154,29 +164,28 @@ public class PropertiesManager extends Properties {
 
 				if(path.isDirectory()) {
 					for(File f: path.listFiles(filter)) {
-						try {
-							urls.add(f.toURI().toURL());
-						} catch (MalformedURLException e) {
-							logger.fatal("What is this library " + f);
-						}
+                        urls.add(f.toURI());
 					}
 				}
 				else if(filter.accept(path)) {
-					try {
-						urls.add(path.toURI().toURL());
-					} catch (MalformedURLException e) {
-						logger.fatal("What is this library " + path);
-					}
+                    urls.add(path.toURI());
 				}
 			}
 		}
 
-		for(URL u: libspath) {
+		for(URI u: libspath) {
 			urls.add(u);
 		}
 
 		URL[] arrayUrl = new URL[urls.size()];
-		urls.toArray(arrayUrl);
+		int i=0;
+		for(URI u: urls) {
+		    try {
+                arrayUrl[i++] = u.toURL();
+            } catch (MalformedURLException e) {
+                logger.error("Invalid URL in libs path: " + u);
+            }
+		}
 		if(logger.isDebugEnabled())
 			logger.debug("Internal class loader will look in:" + urls);
 		return  URLClassLoader.newInstance(arrayUrl, getClass().getClassLoader());
@@ -282,7 +291,7 @@ public class PropertiesManager extends Properties {
 			tmpdir = prepareDir(System.getProperty("javax.servlet.context.tempdir"), false);
 		if(tmpdir == null) {
 			String tmpDirPath = System.getProperty("java.io.tmpdir");
-			if(tmpDirPath != null || "".equals(tmpDirPath))
+			if(tmpDirPath != null && ! "".equals(tmpDirPath))
 				tmpdir = prepareDir(new File(tmpDirPath, "jrds"), true);
 		}
 		if(tmpdir == null) {
@@ -307,22 +316,14 @@ public class PropertiesManager extends Properties {
 						continue;
 					}
 					for(File f: foundFiles) {
-						try {
-							libspath.add(f.toURI().toURL());
-							noJarDir = false;
-						} catch (MalformedURLException e) {
-							logger.error("Invalid libs directory: " + f);
-						}
+                        libspath.add(f.toURI());
+                        noJarDir = false;
 					}
 				}
 
 				//If a jar was found previously, it's not a source directory, don't add it
 				if(lib.isFile() || (lib.isDirectory() && noJarDir))
-					try {
-						libspath.add(lib.toURI().toURL());
-					} catch (MalformedURLException e) {
-						logger.fatal("What is this library " + lib);
-					}
+                    libspath.add(lib.toURI());
 			}
 		}
 		extensionClassLoader = doClassLoader(getProperty("classpath", ""));
@@ -371,7 +372,7 @@ public class PropertiesManager extends Properties {
 	public int collectorThreads;
 	public int dbPoolSize;
 	public int syncPeriod;
-	public final Set<URL> libspath = new HashSet<URL>();
+	public final Set<URI> libspath = new HashSet<URI>();
 	public ClassLoader extensionClassLoader;
 	public final Map<Level, List<String>> loglevels = new HashMap<Level, List<String>>();
 	public Level loglevel;

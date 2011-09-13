@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
@@ -81,14 +82,16 @@ class Loader {
         repositories.put(t, mapnodes);
     }
 
-    public void loadPaths(List<URL> list) {
-		for(URL u: list) {
+    public void loadPaths(List<URI> list) {
+		for(URI u: list) {
 			importUrl(u);
 		}
 	}
 
-	public void importUrl(URL ressourceUrl) {
+	public void importUrl(URI ressourceUri) {
+	    URL ressourceUrl = null;
 		try {
+		    ressourceUrl = ressourceUri.toURL();
 			logger.debug("Importing " + ressourceUrl);
 			String protocol = ressourceUrl.getProtocol();
 			if("file".equals(protocol)) {
