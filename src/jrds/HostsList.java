@@ -333,7 +333,7 @@ public class HostsList extends StarterNode {
             else {
                 Tab t = tabsmap.get(tabid);
                 if(t == null) {
-                    logger.error("Non existent tab to add: %s" + tabid);
+                    logger.error("Non existent tab to add: " + tabid);
                     continue;
                 }
                 tabs.put(tabid, t);
