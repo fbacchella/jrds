@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ivy-module version="2.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
-	<info organisation="jrds" module="main" />
-	<configurations>
-    	<conf name="lib" />
-    	<conf name="libtest" />
-     	<conf name="libjetty" />
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="jrds" module="main" />
+    <configurations>
+        <conf name="lib" />
+        <conf name="libtest" />
+        <conf name="libjetty" />
     </configurations>
-	<dependencies>
-		<dependency org="org.rrd4j" name="rrd4j" rev="2.0.7" conf="lib->default" />
-		<dependency org="log4j" name="log4j" rev="1.2.16" conf="lib->default" />
-  		<dependency org="org.dojotoolkit" name="dojo" rev="1.6.1" conf="lib->default">
-	    	<artifact name="dojo" type="zip" url="http://jrds.fr/maven2/local/dojo-release-1.6.1.zip"/>
-		</dependency>
-		<dependency org="org.snmp4j" name="snmp4j" rev="1.11.3"  conf="lib->default" />
-		<dependency org="org.snmp4j" name="snmp4j-agent" rev="1.4.3" conf="libtest->default">
-		    <exclude module="log4j" />
-		    <exclude module="snmp4j" />
-	    </dependency>
-		<dependency org="org.json" name="json" rev="20090211" conf="lib->default"/>
-		<dependency org="org.mortbay.jetty" name="jetty" rev="6.1.26"  conf="libjetty->default" />
-		<dependency org="org.apache.xmlrpc" name="xmlrpc-server" rev="3.1.3" conf="lib->default">
-		    <exclude module="junit" />
-		    <exclude module="servlet-api" />
-	    </dependency>
-		<dependency org="commons-net" name="commons-net" rev="2.2"  conf="lib->default" />
-		<dependency org="commons-io" name="commons-io" rev="1.4"  conf="lib->default" />
-		<dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2"  conf="lib->default" />
-		<dependency org="org.apache.httpcomponents" name="httpclient" rev="4.1.1"  conf="lib->default" />
-		<dependency org="mysql" name="mysql-connector-java" rev="5.1.16"  conf="lib->default" />
-		<dependency org="postgresql" name="postgresql" rev="8.4-702.jdbc4"  conf="lib->default" />
-		<dependency org="junit" name="junit" rev="4.8.2" conf="libtest->default" />
-		<dependency org="org.mortbay.jetty" name="jetty-servlet-tester" rev="6.1.26"  conf="libtest->default">
-		    <exclude module="jetty" />
-	    </dependency>
-	</dependencies>
+    <dependencies>
+        <dependency org="org.rrd4j" name="rrd4j" rev="2.0.7" conf="lib->default" />
+        <dependency org="log4j" name="log4j" rev="1.2.16" conf="lib->default" />
+        <dependency org="org.dojotoolkit" name="dojo" rev="1.6.1" conf="lib->default">
+            <artifact name="dojo" type="zip" />
+        </dependency>
+        <dependency org="org.snmp4j" name="snmp4j" rev="1.11.3" conf="lib->default" />
+        <dependency org="org.snmp4j" name="snmp4j-agent" rev="1.4.3" conf="libtest->default">
+            <exclude module="log4j" />
+            <exclude module="snmp4j" />
+        </dependency>
+        <dependency org="org.json" name="json" rev="20090211" conf="lib->default" />
+        <dependency org="org.mortbay.jetty" name="jetty" rev="6.1.26" conf="libjetty->default" />
+        <dependency org="org.apache.xmlrpc" name="xmlrpc-server" rev="3.1.3" conf="lib->default">
+            <exclude module="junit" />
+            <exclude module="servlet-api" />
+        </dependency>
+        <dependency org="commons-net" name="commons-net" rev="2.2" conf="lib->default" />
+        <dependency org="commons-io" name="commons-io" rev="1.4" conf="lib->default" />
+        <dependency org="commons-fileupload" name="commons-fileupload" rev="1.2.2" conf="lib->default" />
+        <dependency org="org.apache.httpcomponents" name="httpclient" rev="4.1.1" conf="lib->default" />
+        <dependency org="mysql" name="mysql-connector-java" rev="5.1.16" conf="lib->default" />
+        <dependency org="postgresql" name="postgresql" rev="8.4-702.jdbc4" conf="lib->default" />
+        <dependency org="junit" name="junit" rev="4.8.2" conf="libtest->default" />
+        <dependency org="org.mortbay.jetty" name="jetty-servlet-tester" rev="6.1.26"
+                    conf="libtest->default">
+            <exclude module="jetty" />
+        </dependency>
+    </dependencies>
 </ivy-module>
