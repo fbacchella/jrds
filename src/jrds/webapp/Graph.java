@@ -52,6 +52,10 @@ public final class Graph extends JrdsServlet {
                 return;   
             }
 
+            //If the requested end is in the future, the graph should not be cached.
+            if(graph.getEnd().after(new Date()) )
+                cache = false;
+
             if(getPropertiesManager().security) {				
                 boolean allowed = graph.getACL().check(p);
                 logger.trace(jrds.Util.delayedFormatString("Looking if ACL %s allow access to %s", graph.getACL(), this));
@@ -66,8 +70,10 @@ public final class Graph extends JrdsServlet {
                 logger.warn("One graph failed, not ready");
             }
             res.setContentType("image/png");
-            if(p.period.getScale() != 0) {
-                res.addDateHeader("Expires", graph.getEnd().getTime() + getPropertiesManager().step * 1000);
+            // No caching, the date might be in the future, a period is requested
+            // So the image have short lifetime, just one step
+            if(p.period.getScale() != 0 || ! cache) {
+                res.addDateHeader("Expires", new Date().getTime() + getPropertiesManager().step * 1000);
             }
             res.addDateHeader("Last-Modified", graph.getEnd().getTime());
             res.addHeader("content-disposition","attachment; filename=" + graph.getPngName());
@@ -76,6 +82,7 @@ public final class Graph extends JrdsServlet {
             FileChannel indata = hl.getRenderer().sendInfo(graph);
             //If a cache file exist, try to be smart, but only if caching is allowed
             if(indata != null && cache) {
+                logger.debug(jrds.Util.delayedFormatString("graph %s is cached", graph));
                 if(indata.size() < Integer.MAX_VALUE)
                     res.setContentLength((int)indata.size());
                 WritableByteChannel outC = Channels.newChannel(out);
@@ -83,6 +90,7 @@ public final class Graph extends JrdsServlet {
                 indata.close();
             }
             else {
+                logger.debug(jrds.Util.delayedFormatString("graph %s not found in cache", graph));
                 graph.writePng(out);
             }
 
@@ -97,7 +105,12 @@ public final class Graph extends JrdsServlet {
                 logger.trace("Graph " + graph + " rendering, started at " + start + ", ran for " + duration1 + ":" + duration2 + "ms");
             }
         } catch (RuntimeException e) {
-            logger.error(e, e);
+            if(logger.isDebugEnabled())
+                logger.error(e, e);
+            else 
+                logger.error(e);
+
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid graph request");
         }							
     }
 }
