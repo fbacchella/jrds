@@ -120,7 +120,11 @@ public class Renderer {
                 if(cause != null)
                     logger.error("    Cause was: " + cause);
             } catch (Exception e) {
-                logger.error("Run time rendering " + this, e);
+                if(logger.isDebugEnabled())
+                    logger.error("Error rendering a graph: " + e, e);
+                else
+                    logger.error("Error rendering a graph: " + e);
+
             } finally {						
                 //Always set to true, we do not try again in case of failure
                 finished = true;
