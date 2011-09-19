@@ -19,7 +19,6 @@ public class Graph implements WithACL {
     static final private SimpleDateFormat lastUpdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
     private final GraphNode node;
-    private final RrdGraphDef graphDef;
     private Date start;
     private Date end;
     private double max = Double.NaN;
@@ -28,17 +27,16 @@ public class Graph implements WithACL {
 
     public Graph(GraphNode node) {
         this.node = node;
-        graphDef = node.getEmptyGraphDef();
         addACL(node.getACL());
     }
 
     public Graph(GraphNode node, Date begin, Date start) {
         this.node = node;
-        graphDef = node.getEmptyGraphDef();
         addACL(node.getACL());
         setStart(start);
         setEnd(end);
     }
+
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
@@ -93,7 +91,7 @@ public class Graph implements WithACL {
         return true;
     }
 
-    private void addlegend() {
+    private void addlegend(RrdGraphDef graphDef) {
         Date lastUpdate = node.getProbe().getLastUpdate();
         graphDef.comment("\\l");
         graphDef.comment("\\l");
@@ -108,7 +106,7 @@ public class Graph implements WithACL {
         graphDef.comment("Source type: " + node.getProbe().getSourceType() + "\\r");
     }
 
-    private void fillGraphDef() {
+    private void fillGraphDef(RrdGraphDef graphDef) {
         GraphDesc gd = node.getGraphDesc();
         try {
             long startsec = start.getTime()/1000;
@@ -123,13 +121,13 @@ public class Graph implements WithACL {
             }
             gd.fillGraphDef(graphDef, node.getProbe(), customData);
             if(gd.withLegend())
-                addlegend();
+                addlegend(graphDef);
         } catch (IllegalArgumentException e) {
             logger.error("Impossible to create graph definition, invalid date definition from " + start + " to " + end + " : " + e);
         }
     }
 
-    private void finishGraphDef() {
+    private void finishGraphDef(RrdGraphDef graphDef) {
         if( ! Double.isNaN(max) && ! Double.isNaN(min) ) {
             graphDef.setMaxValue(max);
             graphDef.setMinValue(min);
@@ -139,13 +137,14 @@ public class Graph implements WithACL {
     }
 
     public RrdGraph getRrdGraph() throws IOException {
-        fillGraphDef();
-        finishGraphDef();
-        
-        return new RrdGraph(graphDef);
+        return new RrdGraph(getRrdGraphDef());
     }
 
     public RrdGraphDef getRrdGraphDef() throws IOException {
+        RrdGraphDef graphDef = node.getEmptyGraphDef();
+        fillGraphDef(graphDef);
+        finishGraphDef(graphDef);
+
         return graphDef;
     }
 
