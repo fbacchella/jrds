@@ -242,6 +242,17 @@ public class HostsList extends StarterNode {
             allTabs.add(sumsTab);
         }
 
+        //Let's build all the custom tabs
+        Map<String, Tab> customTabMap = conf.setTabMap();
+        logger.debug(jrds.Util.delayedFormatString("Tabs to add: %s", customTabMap.values()));
+        for(Tab t: customTabMap.values()) {
+            t.setHostlist(this);
+            GraphTree tabtree = t.getGraphTree();
+            if(tabtree != null)
+                treeMap.put(t.getName(), tabtree);
+            allTabs.add(t);
+        }
+
         logger.debug("Parsing graphs configuration");
         Map<String, GraphDesc> graphs = conf.setGrapMap();
         //Let's build the tab with all the custom graphs
@@ -258,17 +269,6 @@ public class HostsList extends StarterNode {
                 customGraphsTab.add(gn.getQualifieName(), gn.getGraphDesc().getHostTree(gn));
             }
             allTabs.add(customGraphsTab);
-        }
-
-        //Let's build all the custom tabs
-        Map<String, Tab> customTabMap = conf.setTabMap();
-        logger.debug(jrds.Util.delayedFormatString("Tabs to add: %s", customTabMap.values()));
-        for(Tab t: customTabMap.values()) {
-            t.setHostlist(this);
-            GraphTree tabtree = t.getGraphTree();
-            if(tabtree != null)
-                treeMap.put(t.getName(), tabtree);
-            allTabs.add(t);
         }
 
         makeTabs(pm, conf, allTabs, customTabMap);

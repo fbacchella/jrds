@@ -9,6 +9,7 @@ import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.HostsList;
 import jrds.Probe;
+import jrds.PropertiesManager;
 import jrds.probe.SumProbe;
 
 import org.apache.log4j.Logger;
@@ -45,8 +46,7 @@ public class Sum extends GraphNode {
 			gd.setSiUnit(oldgd.isSiUnit());
 		}
 		gd.setName(theStore.getName());
-		gd.setHostTree(new Object[] {GraphDesc.TITLE});
-		gd.setViewTree(new Object[] {});
+		gd.addTree(PropertiesManager.HOSTSTAB, new Object[] {GraphDesc.TITLE});
 		logger.debug(getQualifieName());
 	}
 

@@ -8,6 +8,7 @@ package jrds.probe.jdbc;
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.GraphNode;
+import jrds.PropertiesManager;
 
 /**
  * @author bacchell
@@ -21,9 +22,9 @@ public class OracleGaugeGraph extends GraphNode {
         gd.add("logonscurr", GraphDesc.LINE, "logons current");
         gd.add("opcurscurr", GraphDesc.LINE, "opened cursors current");
         gd.setVerticalLabel("value");
-        gd.setHostTree(new Object[] {
+        gd.addTree(PropertiesManager.HOSTSTAB, new Object[] {
                 GraphDesc.HOST, GraphDesc.SERVICES, GraphDesc.DATABASE, GraphDesc.JDBC, "DB Open"});
-        gd.setViewTree(new Object[] {
+        gd.addTree(PropertiesManager.VIEWSTAB, new Object[] {
                 GraphDesc.SERVICES, GraphDesc.DATABASE, GraphDesc.JDBC, "DB Open"});
         gd.setGraphTitle("DB Open on {3}");
         gd.setGraphName("{4}");

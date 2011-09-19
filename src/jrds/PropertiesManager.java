@@ -387,5 +387,13 @@ public class PropertiesManager extends Properties {
 	public ACL defaultACL = ACL.ALLOWEDACL;
 	public ACL adminACL = ACL.ALLOWEDACL;
 	public boolean readonly = false;
-	public List<String> tabsList = Arrays.asList("filtertab", "customgraph", "@", "sumstab", "viewstab", "hoststab", "tagstab", "adminTab");
+	public static final String FILTERTAB = "filtertab";
+    public static final String CUSTOMGRAPHTAB = "customgraph";
+    public static final String SUMSTAB = "sumstab";
+    public static final String VIEWSTAB = "viewstab";
+    public static final String HOSTSTAB = "hoststab";
+    public static final String TAGSTAB = "tagstab";
+    public static final String ADMINTAB = "adminTab";
+
+	public List<String> tabsList = Arrays.asList(FILTERTAB, CUSTOMGRAPHTAB, "@", SUMSTAB, VIEWSTAB, HOSTSTAB, TAGSTAB, ADMINTAB);
 }

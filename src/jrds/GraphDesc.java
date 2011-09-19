@@ -8,6 +8,7 @@ import java.awt.font.LineMetrics;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -573,8 +574,9 @@ implements Cloneable, WithACL {
     private double lowerLimit = 0;
     private String verticalLabel = null;
     private int lastColor = 0;
-    private List<?> viewTree = new ArrayList<Object>();
-    private List<?> hostTree = new ArrayList<Object>();
+    private Map<String, List<?>> trees = new HashMap<String, List<?>>(2);
+    //private List<?> viewTree = new ArrayList<Object>();
+    //private List<?> hostTree = new ArrayList<Object>();
     private String graphName;
     private String name;
     private String graphTitle ="{0} on ${host}";
@@ -1129,34 +1131,22 @@ implements Cloneable, WithACL {
      * @return Returns the viewTree.
      */
     public LinkedList<String> getViewTree(GraphNode graph) {
-        return getTree(graph, viewTree);
-    }
-
-    /**
-     * @param viewTree The viewTree to set.
-     */
-    public void setViewTree(List<?> viewTree) {
-        this.viewTree = viewTree;
-        logger.trace("Adding view tree: " + viewTree);
-    }
-
-    /**
-     * @param viewTree The viewTree to set.
-     */
-    public void setViewTree(Object[] viewTree) {
-        this.viewTree = Arrays.asList(viewTree);
+        return getTree(graph, PropertiesManager.VIEWSTAB);
     }
 
     /**
      * @return Returns the hostTree.
      */
     public LinkedList<String> getHostTree(GraphNode graph) {
-        return getTree(graph, hostTree);
+        return getTree(graph, PropertiesManager.HOSTSTAB);
     }
 
-    private LinkedList<String> getTree(GraphNode graph, List<?> ElementsTree) {
+    private LinkedList<String> getTree(GraphNode graph, String tabname) {
+        List<?> elementsTree = trees.get(tabname);
         LinkedList<String> tree = new LinkedList<String>();
-        for (Object o: ElementsTree) {
+        if(elementsTree == null)
+            return tree;
+        for (Object o: elementsTree) {
             if (o instanceof String) {
                 String pathElem = jrds.Util.parseTemplate((String) o, graph.getProbe(), this, graph.getProbe().getHost());
                 tree.add(pathElem);
@@ -1167,19 +1157,27 @@ implements Cloneable, WithACL {
         return tree;
     }
 
+    public void addTree(String tab, List<?> tree) {
+        trees.put(tab, tree);
+        logger.trace(jrds.Util.delayedFormatString("Adding tree %s to tab %s", tree, tab));
+    }
+
+    public void addTree(String tab, Object[] tree) {        
+        addTree(tab, Arrays.asList(tree));
+    }
+
     /**
-     * @param hostTree The hostTree to set.
+     * @param viewTree The viewTree to set.
      */
-    public void setHostTree(List<?> hostTree) {
-        this.hostTree = hostTree;
-        logger.trace("Adding host tree: " + hostTree);
+    public void setViewTree(List<?> viewTree) {
+        addTree(PropertiesManager.VIEWSTAB, viewTree);
     }
 
     /**
      * @param hostTree The hostTree to set.
      */
-    public void setHostTree(Object[] hostTree) {
-        this.hostTree = Arrays.asList(hostTree);
+    public void setHostTree(List<?> hostTree) {
+        addTree(PropertiesManager.HOSTSTAB, hostTree);
     }
 
     /**
@@ -1401,17 +1399,23 @@ implements Cloneable, WithACL {
                 specElement.appendChild(document.createElement("legend")).setTextContent(e.legend);
             i++;
         }
-        Element hostTreeElement =  (Element) root.appendChild(document.createElement("hosttree"));
-        for(Object o: hostTree) {
-            Element pe = document.createElement("pathstring");
-            pe.setTextContent(o.toString());
-            hostTreeElement.appendChild(pe);
+        List<?> hostTree = trees.get(PropertiesManager.HOSTSTAB);
+        if(hostTree != null) {
+            Element hostTreeElement =  (Element) root.appendChild(document.createElement("hosttree"));
+            for(Object o: hostTree) {
+                Element pe = document.createElement("pathstring");
+                pe.setTextContent(o.toString());
+                hostTreeElement.appendChild(pe);
+            }
         }
-        Element viewTreeElement =  (Element) root.appendChild(document.createElement("viewtree"));
-        for(Object o: viewTree) {
-            Element pe = document.createElement("pathstring");
-            pe.setTextContent(o.toString());
-            viewTreeElement.appendChild(pe);
+        List<?> viewTree = trees.get(PropertiesManager.VIEWSTAB);
+        if(viewTree != null) {
+            Element viewTreeElement =  (Element) root.appendChild(document.createElement("viewtree"));
+            for(Object o: viewTree) {
+                Element pe = document.createElement("pathstring");
+                pe.setTextContent(o.toString());
+                viewTreeElement.appendChild(pe);
+            }
         }
         return document;
     }

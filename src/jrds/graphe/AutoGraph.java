@@ -9,6 +9,7 @@ import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.HostsList;
 import jrds.Probe;
+import jrds.PropertiesManager;
 import jrds.probe.SumProbe;
 
 import org.apache.log4j.Logger;
@@ -43,8 +44,7 @@ public class AutoGraph extends GraphNode {
 		gd.setGraphName(theStore.getName());
 		gd.setGraphTitle(theStore.getName());
 		gd.setName(theStore.getName());
-		gd.setHostTree(new Object[] {GraphDesc.TITLE});
-		gd.setViewTree(new Object[] {});
+		gd.addTree(PropertiesManager.HOSTSTAB, new Object[] {GraphDesc.TITLE});
 		logger.debug(this.getQualifieName());
 		this.op = op;
 		
