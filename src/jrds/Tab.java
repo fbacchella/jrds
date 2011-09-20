@@ -92,10 +92,6 @@ public class Tab {
         return "treeTabCallBack";
     }
 
-    public String getJSTreetype() {
-        return "tree";
-    }
-
     /**
      * @return the id
      */

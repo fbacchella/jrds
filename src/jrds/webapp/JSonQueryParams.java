@@ -68,8 +68,6 @@ public class JSonQueryParams extends JrdsServlet {
                 w.key("label").value(tab.getName());
                 w.key("isFilters").value(tab.isFilters());
                 w.key("callback").value(tab.getJSCallback());
-                if(tab.getJSTreetype() != null)
-                    w.key("treeType").value(tab.getJSTreetype());
                 w.endObject();
             }
             w.endObject();

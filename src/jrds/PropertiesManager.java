@@ -390,10 +390,11 @@ public class PropertiesManager extends Properties {
 	public static final String FILTERTAB = "filtertab";
     public static final String CUSTOMGRAPHTAB = "customgraph";
     public static final String SUMSTAB = "sumstab";
+    public static final String SERVICESTAB = "servicestab";
     public static final String VIEWSTAB = "viewstab";
     public static final String HOSTSTAB = "hoststab";
     public static final String TAGSTAB = "tagstab";
     public static final String ADMINTAB = "adminTab";
 
-	public List<String> tabsList = Arrays.asList(FILTERTAB, CUSTOMGRAPHTAB, "@", SUMSTAB, VIEWSTAB, HOSTSTAB, TAGSTAB, ADMINTAB);
+	public List<String> tabsList = Arrays.asList(FILTERTAB, CUSTOMGRAPHTAB, "@", SUMSTAB, SERVICESTAB, VIEWSTAB, HOSTSTAB, TAGSTAB, ADMINTAB);
 }

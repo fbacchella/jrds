@@ -655,14 +655,12 @@ function setupTabs() {
 	            title:  queryParams.tabslist[key].label,
 	            id: queryParams.tabslist[key].id,
 	            isFilters: queryParams.tabslist[key].isFilters,
-	            treeType: queryParams.tabslist[key].treeType,
 	            callback: queryParams.tabslist[key].callback
 	        });
 		    tabWidget.addChild(pane, i++);
 		}
 		else {
 		    pane.isFilters = queryParams.tabslist[key].isFilters;
-		    pane.treeType = queryParams.tabslist[key].treeType;
 		    pane.callback = queryParams.tabslist[key].callback;
 		}		
 	}
@@ -701,8 +699,7 @@ function treeTabCallBack(newTab) {
 	newTab.attr('content', dojo.clone(mainPane));
 
 	var treePane = dojo.byId('treePane');
-	var treeType = 'tree';
-	var keepParams = newTab.keepParams;
+    var keepParams = newTab.keepParams;
 
 	//keepParams used during page setup, to keep queryParams fields
 	if(keepParams) {
@@ -718,11 +715,6 @@ function treeTabCallBack(newTab) {
 		queryParams.tab = newTab.attr('id');
 		queryParams.landtab = newTab.attr('id');
 	}
-	//To manage special tabs
-	//if(newId == 'sumstab') {
-	//	treeType = 'graph';
-	//}
-	treeType = newTab.treeType;
 
 	setupCalendar();
 	fileForms();
