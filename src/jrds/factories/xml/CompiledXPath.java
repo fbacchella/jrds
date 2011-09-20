@@ -14,7 +14,7 @@ public class CompiledXPath {
 	static final private Logger logger = Logger.getLogger(CompiledXPath.class);
 
 	private static final XPath xpather = XPathFactory.newInstance().newXPath();
-	static final Map<String, XPathExpression> xpc = new HashMap<String, XPathExpression>();
+	private static final Map<String, XPathExpression> xpc = new HashMap<String, XPathExpression>();
 
 	public static XPathExpression get(String xpath)	{
 		XPathExpression e =  xpc.get(xpath);
