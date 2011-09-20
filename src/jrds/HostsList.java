@@ -205,7 +205,7 @@ public class HostsList extends StarterNode {
         Set<Tab> allTabs = new HashSet<Tab>();
 
         //Let's build the tab for all the tags
-        Tab tagsTab = new Tab("All tags", PropertiesManager.TAGSTAB);
+        Tab tagsTab = new Tab.Filters("All tags", PropertiesManager.TAGSTAB);
         for(String tag: hostsTags) {
             Filter f = new FilterTag(tag);
             filters.put(f.getName(), f);
@@ -214,7 +214,7 @@ public class HostsList extends StarterNode {
         allTabs.add(tagsTab);
 
         //Let's build the tab with all the filters
-        Tab filterTab = new Tab("All filters", PropertiesManager.FILTERTAB);
+        Tab filterTab = new Tab.Filters("All filters", PropertiesManager.FILTERTAB);
         Map <String, Filter> f = conf.setFilterMap();
         for(Filter filter: f.values()) {
             addFilter(filter);
@@ -226,7 +226,7 @@ public class HostsList extends StarterNode {
         Tab sumsTab = null;
         Map<String, SumProbe> sums = conf.setSumMap();
         if(sums.size() > 0) {
-            sumsTab = new Tab("All sums", PropertiesManager.SUMSTAB);
+            sumsTab = new Tab.DynamicTree("All sums", PropertiesManager.SUMSTAB);
             for(SumProbe s: sums.values()) {
                 addVirtual(s, sumhost, Filter.SUM.getName());
                 GraphNode sum = s.getGraphList().iterator().next();
@@ -253,7 +253,7 @@ public class HostsList extends StarterNode {
         //Let's build the tab with all the custom graphs
         Tab customGraphsTab = null;
         if(! graphs.isEmpty()) {
-            customGraphsTab = new Tab("Custom graphs", PropertiesManager.CUSTOMGRAPHTAB);
+            customGraphsTab = new Tab.DynamicTree("Custom graphs", PropertiesManager.CUSTOMGRAPHTAB);
             ContainerProbe cp = new ContainerProbe(customhost.getName());
             for(GraphDesc gd: graphs.values()) {
                 logger.trace("Adding graph: " + gd.getGraphTitle());
@@ -290,24 +290,9 @@ public class HostsList extends StarterNode {
                 return "setAdminTab";
             }
         });
-        moretabs.add(new Tab("All services", PropertiesManager.SERVICESTAB) {
-            @Override
-            public GraphTree getGraphTree() {
-                return  hostlist.getGraphTreeByView().getByPath(GraphTree.VIEWROOT, "Services");
-            }       
-        });
-        moretabs.add( new Tab("All hosts", PropertiesManager.HOSTSTAB) {
-            @Override
-            public GraphTree getGraphTree() {
-                return getHostList().getGraphTreeByHost();
-            }       
-        });
-        moretabs.add(new Tab("All views", PropertiesManager.VIEWSTAB) {
-            @Override
-            public GraphTree getGraphTree() {
-                return getHostList().getGraphTreeByView();
-            }       
-        });
+        moretabs.add(new Tab.StaticTree("All services", PropertiesManager.SERVICESTAB, getGraphTreeByView().getByPath(GraphTree.VIEWROOT, "Services")));
+        moretabs.add( new Tab.StaticTree("All hosts", PropertiesManager.HOSTSTAB, getGraphTreeByHost()));
+        moretabs.add(new Tab.StaticTree("All views", PropertiesManager.VIEWSTAB, getGraphTreeByView()));
         Map<String, Tab> tabsmap = new HashMap<String, Tab>(moretabs.size());
         for(Tab t: moretabs) {
             if(t != null)

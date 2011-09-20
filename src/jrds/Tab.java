@@ -9,47 +9,99 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 
-public class Tab {
-    static private final Logger logger = Logger.getLogger(Tab.class);
+public abstract class Tab {
+    public static final class Filters extends Tab {
+        private final Set<String> filters = new TreeSet<String>(jrds.Util.nodeComparator);
 
-    private final Set<String> filters = new TreeSet<String>(jrds.Util.nodeComparator);
-    private final Map<String, List<String>> paths = new TreeMap<String, List<String>>(jrds.Util.nodeComparator);
+        public Filters(String name) {
+            super(name);
+        }
+        public Filters(String name, String id) {
+            super(name, id);
+        }
+        public void add(String filter) {
+            filters.add(filter);
+        }
+        public Set<jrds.Filter> getFilters() {
+            Set<jrds.Filter> filtersset = new LinkedHashSet<jrds.Filter>(filters.size());
+            for(String filtername: filters) {
+                jrds.Filter f = hostlist.getFilter(filtername);
+                if(f != null)
+                    filtersset.add(f);
+            }
+            return filtersset;
+        }
+        public boolean isFilters() {
+            return true;
+        }
+    }
+    public static final class StaticTree extends Tab {
+        GraphTree gt;
+        public StaticTree(String name, GraphTree gt) {
+            super(name);
+            this.gt = gt;
+        }
+        public StaticTree(String name, String id, GraphTree gt) {
+            super(name, id);
+            this.gt = gt;
+        }
+        public GraphTree getGraphTree() {
+            return gt;
+        }
+    }
+    public static final class DynamicTree extends Tab {
+        private final Map<String, List<String>> paths = new TreeMap<String, List<String>>(jrds.Util.nodeComparator);
+        public DynamicTree(String name) {
+            super(name);
+        }
+        public DynamicTree(String name, String id) {
+            super(name, id);
+        }
+        public void add(String id, List<String> path) {
+            paths.put(id, path);
+        }
+        public GraphTree getGraphTree() {
+            GraphTree gt = GraphTree.makeGraph(name); 
+            for(Map.Entry<String , List<String>> e: paths.entrySet()) {
+                String id = e.getKey();
+                List<String> path = e.getValue();
+                GraphNode gn = hostlist.getGraphById(id.hashCode());
+                if(gn == null) {
+                    logger.warn(jrds.Util.delayedFormatString("Graph not found for %s: %s", name, id));
+                    continue;
+                }
+                gt.addGraphByPath(path, gn);
+            }
+            return gt;
+        }
+    }
 
-    private String name;
-    private String id;
+    static protected final Logger logger = Logger.getLogger(Tab.class);
+
+    protected String name;
+    protected String id;
     protected HostsList hostlist;
 
-    public Tab(String name) {
+    protected Tab(String name) {
         this.name = name;
         this.id = name;
     }
 
-    public Tab(String name, String id) {
+    protected Tab(String name, String id) {
         this.name = name;
         this.id = id;
     }
 
     public void add(String filter) {
-        filters.add(filter);
+        throw new RuntimeException("Not implemented");
     }
 
     public void add(String id, List<String> path) {
-        paths.put(id, path);
+        throw new RuntimeException("Not implemented");
     }
 
     public GraphTree getGraphTree() {
-        GraphTree gt = GraphTree.makeGraph(name); 
-        for(Map.Entry<String , List<String>> e: paths.entrySet()) {
-            String id = e.getKey();
-            List<String> path = e.getValue();
-            GraphNode gn = hostlist.getGraphById(id.hashCode());
-            if(gn == null) {
-                logger.warn(jrds.Util.delayedFormatString("Graph not found for %s: %s", name, id));
-                continue;
-            }
-            gt.addGraphByPath(path, gn);
-        }
-        return gt;
+        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -59,14 +111,8 @@ public class Tab {
         this.hostlist = hostlist;
     }
 
-    public Set<Filter> getFilters() {
-        Set<Filter> filtersset = new LinkedHashSet<Filter>(filters.size());
-        for(String filtername: filters) {
-            Filter f = hostlist.getFilter(filtername);
-            if(f != null)
-                filtersset.add(f);
-        }
-        return filtersset;
+    public Set<jrds.Filter> getFilters() {
+        throw new RuntimeException("Not implemented");
     }
 
     /* (non-Javadoc)
@@ -85,7 +131,7 @@ public class Tab {
     }
 
     public boolean isFilters() {
-        return ! filters.isEmpty();
+        return false;
     }
 
     public String getJSCallback() {
