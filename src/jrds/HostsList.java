@@ -55,7 +55,6 @@ public class HostsList extends StarterNode {
         public Date lastCollect;
     }
 
-    private RdsHost sumhost =  null;
     private RdsHost customhost =  null;
 
     private final Set<RdsHost> hostList = new HashSet<RdsHost>();
@@ -99,13 +98,8 @@ public class HostsList extends StarterNode {
     }
 
     private void init() {
-        addTree(Filter.SUM.getName(), GraphTree.SUMROOT);
-        filters.put(Filter.SUM.getName(), Filter.SUM);
-        sumhost =  new RdsHost("SumHost");
-
-        addTree(Filter.CUSTOM.getName(), Filter.CUSTOM.getName());
-        filters.put(Filter.CUSTOM.getName(), Filter.CUSTOM);
-        customhost =  new RdsHost("CustomHost");
+        customhost =  new RdsHost("CustomGraphHost");
+        customhost.setParent(this);
 
         filters.put(Filter.EVERYTHING.getName(), Filter.EVERYTHING);
 
@@ -120,9 +114,6 @@ public class HostsList extends StarterNode {
         filters.put(Filter.ALLSERVICES.getName(), Filter.ALLSERVICES);
 
         addTree("All tags", GraphTree.TAGSROOT);
-
-        sumhost.setParent(this);
-        customhost.setParent(this);
     }
 
     public void configure(PropertiesManager pm) {
@@ -222,22 +213,7 @@ public class HostsList extends StarterNode {
         }
         allTabs.add(filterTab);
 
-        //Let's build the tab with all the sums
-        Tab sumsTab = null;
-        Map<String, SumProbe> sums = conf.setSumMap();
-        if(sums.size() > 0) {
-            sumsTab = new Tab.DynamicTree("All sums", PropertiesManager.SUMSTAB);
-            for(SumProbe s: sums.values()) {
-                addVirtual(s, sumhost, Filter.SUM.getName());
-                GraphNode sum = s.getGraphList().iterator().next();
-                //String id = Integer.toString(sum.hashCode());
-                graphMap.put(sum.getQualifieName().hashCode(), sum);
-                sumsTab.add(sum.getQualifieName(), Collections.singletonList(s.getName()));
-            }
-            allTabs.add(sumsTab);
-        }
-
-        //Let's build all the custom tabs
+        //Let's build all the custom graph tabs
         Map<String, Tab> customTabMap = conf.setTabMap();
         logger.debug(jrds.Util.delayedFormatString("Tabs to add: %s", customTabMap.values()));
         for(Tab t: customTabMap.values()) {
@@ -251,19 +227,29 @@ public class HostsList extends StarterNode {
         logger.debug("Parsing graphs configuration");
         Map<String, GraphDesc> graphs = conf.setGrapMap();
         //Let's build the tab with all the custom graphs
-        Tab customGraphsTab = null;
+        Tab customGraphsTab = new Tab.DynamicTree("Custom graphs", PropertiesManager.CUSTOMGRAPHTAB);
+        ContainerProbe cp = new ContainerProbe(customhost.getName());
         if(! graphs.isEmpty()) {
-            customGraphsTab = new Tab.DynamicTree("Custom graphs", PropertiesManager.CUSTOMGRAPHTAB);
-            ContainerProbe cp = new ContainerProbe(customhost.getName());
             for(GraphDesc gd: graphs.values()) {
                 logger.trace("Adding graph: " + gd.getGraphTitle());
                 cp.addGraph(gd);
             }
-            addVirtual(cp, customhost, Filter.CUSTOM.getName());
+            addVirtual(cp, customhost);
             for(GraphNode gn: cp.getGraphList()) {
                 customGraphsTab.add(gn.getQualifieName(), gn.getGraphDesc().getHostTree(gn));
             }
             allTabs.add(customGraphsTab);
+        }
+
+        //Let's build the tab with all the sums
+        Map<String, SumProbe> sums = conf.setSumMap();
+        if(sums.size() > 0) {
+            for(SumProbe s: sums.values()) {
+                addVirtual(s, customhost);
+                GraphNode sum = s.getGraphList().iterator().next();
+                graphMap.put(sum.getQualifieName().hashCode(), sum);
+                customGraphsTab.add(sum.getQualifieName(), "Sums", s.getName());
+            }
         }
 
         makeTabs(pm, conf, allTabs, customTabMap);
@@ -584,13 +570,12 @@ public class HostsList extends StarterNode {
         return filters.keySet();
     }
 
-    private void addVirtual(VirtualProbe vprobe, RdsHost vhost, String root) {
+    private void addVirtual(VirtualProbe vprobe, RdsHost vhost) {
         try {
             vhost.getProbes().add(vprobe);
             vprobe.setHost(vhost);
             for(GraphNode currGraph: vprobe.getGraphList()) {
                 logger.trace("adding virtual graph: " + currGraph);
-                treeMap.get(root).addGraphByPath(currGraph.getTreePathByHost(), currGraph);
                 graphMap.put(currGraph.hashCode(), currGraph);
             }
             logger.debug("adding virtual probe " + vprobe.getName());

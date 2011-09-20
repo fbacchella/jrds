@@ -1,5 +1,6 @@
 package jrds;
 
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ public abstract class Tab {
         }
     }
     public static final class StaticTree extends Tab {
-        GraphTree gt;
+        private final GraphTree gt;
         public StaticTree(String name, GraphTree gt) {
             super(name);
             this.gt = gt;
@@ -96,6 +97,10 @@ public abstract class Tab {
         throw new RuntimeException("Not implemented");
     }
 
+    public void add(String id, String... path) {
+        add(id, Arrays.asList(path));
+    }
+    
     public void add(String id, List<String> path) {
         throw new RuntimeException("Not implemented");
     }
