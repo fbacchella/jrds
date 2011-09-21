@@ -15,6 +15,7 @@ public class TabBuilder extends ConfigObjectBuilder<Tab>  {
     static final private XPathExpression TABNAME = CompiledXPath.get("/tab/@name");
     static final private XPathExpression TABFILTER = CompiledXPath.get("/tab/filter");
     static final private XPathExpression TABGRAPH = CompiledXPath.get("/tab/graph");
+    static final private XPathExpression TABCGRAPH = CompiledXPath.get("/tab/cgraph");
     static final private XPathExpression PATH = CompiledXPath.get("path");
 
     static final private Logger logger = Logger.getLogger(TabBuilder.class);

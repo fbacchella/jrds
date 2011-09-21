@@ -5,16 +5,16 @@ import java.util.ArrayList;
 
 import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsNode;
-import jrds.probe.SumProbe;
+import jrds.graphe.Sum;
 
-public class SumBuilder extends ConfigObjectBuilder<SumProbe> {
+public class SumBuilder extends ConfigObjectBuilder<Sum> {
 
 	public SumBuilder() {
         super(ConfigType.SUM);
     }
 
     @Override
-	SumProbe build(JrdsNode n) throws InvocationTargetException {
+	Sum build(JrdsNode n) throws InvocationTargetException {
 		try {
 			return  makeSum(n);
 		} catch (SecurityException e) {
@@ -30,7 +30,7 @@ public class SumBuilder extends ConfigObjectBuilder<SumProbe> {
 		}
 	}
 
-	public SumProbe makeSum(JrdsNode n) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+	public Sum makeSum(JrdsNode n) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		String name = n.evaluate(CompiledXPath.get("/sum/@name"));
 		if(name != null && ! "".equals(name)) {
 			ArrayList<String> elements = new ArrayList<String>();
@@ -38,7 +38,7 @@ public class SumBuilder extends ConfigObjectBuilder<SumProbe> {
 				String elemName = elemNode.getTextContent();
 				elements.add(elemName);
 			}
-			SumProbe sp = new SumProbe(name, elements);
+			Sum sp = new Sum(name, elements);
 			doACL(sp, n,  CompiledXPath.get("/sum/role"));
 			return sp;
 		}

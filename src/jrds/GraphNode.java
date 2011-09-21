@@ -22,110 +22,136 @@ import org.rrd4j.graph.RrdGraphDef;
  */
 public class GraphNode implements Comparable<GraphNode>, WithACL {
 
-	static final private Logger logger = Logger.getLogger(GraphNode.class);
+    static final private Logger logger = Logger.getLogger(GraphNode.class);
 
-	protected Probe<?,?> probe;
-	private String viewPath = null;
-	private GraphDesc gd;
-	private String name = null;
-	private String graphTitle = null;
-	private ACL acl = ACL.ALLOWEDACL;
-	private ProxyPlottableMap customData = null;
+    protected Probe<?,?> probe;
+    private String viewPath = null;
+    private GraphDesc gd;
+    private String name = null;
+    private String graphTitle = null;
+    private ACL acl = ACL.ALLOWEDACL;
+    private ProxyPlottableMap customData = null;
 
-	/**
-	 *
-	 */
-	public GraphNode(Probe<?,?> theStore, GraphDesc gd) {
-		super();
-		this.probe = theStore;
-		this.gd = gd;
-		this.acl = gd.getACL();
-	}
+    /**
+     *
+     */
+    public GraphNode(Probe<?,?> theStore, GraphDesc gd) {
+        this.probe = theStore;
+        this.gd = gd;
+        this.acl = gd.getACL();
+    }
 
-	/**
-	 * @see java.lang.Object#hashCode()
-	 */
-	public int hashCode() {
-		return getQualifieName().hashCode();
-	}
+    /**
+     * A protected constructor
+     * child are allowed to build themselve in a strang way
+     * 
+     */
+    protected GraphNode() {
+    }
 
-	/**
-	 * @return Returns the theStore.
-	 */
-	public Probe<?,?> getProbe() {
-		return probe;
-	}
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        return getQualifieName().hashCode();
+    }
 
-	public LinkedList<String> getTreePathByHost() {
-		return gd.getHostTree(this);
-	}
+    /**
+     * @return Returns the theStore.
+     */
+    public Probe<?,?> getProbe() {
+        return probe;
+    }
 
-	public LinkedList<String> getTreePathByView() {
-		return gd.getViewTree(this);
-	}
+    /**
+     * To be called if the probe was not provided in the initial creation
+     * This should be called as soon as possible
+     * @param probe a custom generated probe
+     */
+    protected void setProbe(Probe<?,?> probe) {
+        this.probe = probe;
+    }
 
-	private final String parseTemplate(String template) {
-		//Don't lose time with an empty template
-		if(template == null || "".equals(template.trim())) {
-			return template;
-		}
+    public LinkedList<String> getTreePathByHost() {
+        return gd.getHostTree(this);
+    }
 
-		String index = "";
-		String url = "";
-		if( probe instanceof IndexedProbe) {
-			index =((IndexedProbe) probe).getIndexName();
-		}
-		if( probe instanceof UrlProbe) {
-			url =((UrlProbe) probe).getUrlAsString();
-		}
+    public LinkedList<String> getTreePathByView() {
+        return gd.getViewTree(this);
+    }
 
-		Object[] arguments = {
-				gd.getGraphName(),
-				probe.getHost().getName(),
-				index,
-				url,
-				probe.getName(),
-				Util.stringSignature(index),
-				Util.stringSignature(url)
-		};
-		String evaluted = jrds.Util.parseTemplate(template, probe, gd);
-		String formated;
-		try {
-			formated = MessageFormat.format(evaluted, arguments);
-			return formated;
-		} catch (IllegalArgumentException e) {
-			logger.error("Template invalid:" + template);
-		}
-		return evaluted;
+    private final String parseTemplate(String template) {
+        //Don't lose time with an empty template
+        if(template == null || "".equals(template.trim())) {
+            return template;
+        }
 
-	}
+        String index = "";
+        String url = "";
+        if( probe instanceof IndexedProbe) {
+            index =((IndexedProbe) probe).getIndexName();
+        }
+        if( probe instanceof UrlProbe) {
+            url =((UrlProbe) probe).getUrlAsString();
+        }
 
-	public String getGraphTitle() {
-		if(graphTitle == null) {
-			graphTitle = parseTemplate(gd.getGraphTitle());
-		}
-		return graphTitle;
-	}
+        Object[] arguments = {
+                gd.getGraphName(),
+                probe.getHost().getName(),
+                index,
+                url,
+                probe.getName(),
+                Util.stringSignature(index),
+                Util.stringSignature(url)
+        };
+        String evaluted = jrds.Util.parseTemplate(template, probe, gd);
+        String formated;
+        try {
+            formated = MessageFormat.format(evaluted, arguments);
+            return formated;
+        } catch (IllegalArgumentException e) {
+            logger.error("Template invalid:" + template);
+        }
+        return evaluted;
 
-	public String getName() {
-		if(name == null) {
-			name = parseTemplate(gd.getGraphName());
-		}
-		return name;
-	}
+    }
 
-	/**
-	 * Return a uniq name for the graph
-	 * @return
-	 */
-	public String getQualifieName() {
-		return probe.getHost().getName() + "/"  + getName();
-	}
+    public String getGraphTitle() {
+        if(graphTitle == null) {
+            graphTitle = parseTemplate(gd.getGraphTitle());
+        }
+        return graphTitle;
+    }
 
-	final public GraphDesc getGraphDesc() {
-		return gd;
-	}
-	
+    public String getName() {
+        if(name == null) {
+            name = parseTemplate(gd.getGraphName());
+        }
+        return name;
+    }
+
+    /**
+     * Return a uniq name for the graph
+     * @return
+     */
+    public String getQualifieName() {
+        return probe.getHost().getName() + "/"  + getName();
+    }
+
+    public GraphDesc getGraphDesc() {
+        return gd;
+    }
+
+    /**
+     * To be called if the graphdesc was not provided in the initial creation
+     * This should be called as soon as possible
+     * @param gd A custom generated GraphDesc
+     */
+    protected void setGraphDesc(GraphDesc gd) {
+        this.gd = gd;
+        this.acl = gd.getACL();
+    }
+
     /**
      * Provide a RrdGraphDef with template resolved for the node
      * @return a RrdGraphDef with some default values
@@ -137,55 +163,47 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
         return retValue;
     }
 
-//    public RrdGraphDef getRrdGraphDef() throws IOException {
-//		return getGraphDesc().getGraphDef(getProbe(), customData);
-//	}
-//
-//	public RrdGraphDef getRrdGraphDef(Map<String, Plottable> ownData) throws IOException {
-//		return getGraphDesc().getGraphDef(getProbe(), ownData);
-//	}
+    public Graph getGraph() {
+        return new Graph(this);
+    }
 
-	public Graph getGraph() {
-		return new Graph(this);
-	}
+    /* (non-Javadoc)
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
+    public int compareTo(GraphNode arg0) {
+        if (viewPath == null)
+            viewPath = this.getTreePathByView().toString();
 
-	/* (non-Javadoc)
-	 * @see java.lang.Comparable#compareTo(java.lang.Object)
-	 */
-	public int compareTo(GraphNode arg0) {
-		if (viewPath == null)
-			viewPath = this.getTreePathByView().toString();
+        String otherPath = arg0.getTreePathByView().toString();
 
-		String otherPath = arg0.getTreePathByView().toString();
+        return String.CASE_INSENSITIVE_ORDER.compare(viewPath, otherPath);
+    }
 
-		return String.CASE_INSENSITIVE_ORDER.compare(viewPath, otherPath);
-	}
+    @Override
+    public String toString() {
+        return probe.toString() + "/" + getName();
+    }
 
-	@Override
-	public String toString() {
-		return probe.toString() + "/" + getName();
-	}
-	
-	public void addACL(ACL acl) {
-		this.acl = this.acl.join(acl);
-	}
+    public void addACL(ACL acl) {
+        this.acl = this.acl.join(acl);
+    }
 
-	public ACL getACL() {
-		return acl;
-	}
+    public ACL getACL() {
+        return acl;
+    }
 
-	/**
-	 * @return the customData
-	 */
-	public ProxyPlottableMap getCustomData() {
-		return customData;
-	}
+    /**
+     * @return the customData
+     */
+    public ProxyPlottableMap getCustomData() {
+        return customData;
+    }
 
-	/**
-	 * @param customData the customData to set
-	 */
-	public void setCustomData(ProxyPlottableMap customData) {
-		this.customData = customData;
-	}
+    /**
+     * @param customData the customData to set
+     */
+    public void setCustomData(ProxyPlottableMap customData) {
+        this.customData = customData;
+    }
 
 }

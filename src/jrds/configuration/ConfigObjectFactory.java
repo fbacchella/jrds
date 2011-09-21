@@ -19,7 +19,7 @@ import jrds.RdsHost;
 import jrds.Tab;
 import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsNode;
-import jrds.probe.SumProbe;
+import jrds.graphe.Sum;
 
 import org.apache.log4j.Logger;
 
@@ -150,11 +150,11 @@ public class ConfigObjectFactory {
         return filtersMap;
     }
 
-    public Map<String, SumProbe> setSumMap() {
+    public Map<String, Sum> setSumMap() {
         SumBuilder ob =new SumBuilder();
         ob.setPm(pm);
         Map<String, JrdsNode> nodemap = load.getRepository(ConfigType.SUM);
-        Map<String, SumProbe> sumpsMap = getObjectMap(ob, nodemap);
+        Map<String, Sum> sumpsMap = getObjectMap(ob, nodemap);
         logger.debug(jrds.Util.delayedFormatString("Sums configured: %s", sumpsMap.keySet()));
         return sumpsMap;
     }

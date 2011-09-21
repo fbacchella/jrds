@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.probe.SumProbe;
+import jrds.graphe.Sum;
 import junit.framework.Assert;
 
 import org.apache.log4j.Level;
@@ -28,16 +28,14 @@ public class TestSum {
 	
 	@Test
 	public void emptysum() throws Exception {
-		ArrayList<String> graphlist = new ArrayList<String>();
+        HostsList hl = new HostsList();
+        hl.configure(new PropertiesManager());
+
+        ArrayList<String> graphlist = new ArrayList<String>();
 		graphlist.add("badhost/badgraph");
-		SumProbe s = new SumProbe("emptysum", graphlist);
-		RdsHost sumhost = new RdsHost();
-		HostsList hl = new HostsList();
-		hl.configure(new PropertiesManager());
-		hl.addHost(sumhost);
-		s.setHost(sumhost);
-		GraphNode gn = s.getGraphList().iterator().next();
-		Graph g = gn.getGraph();
+		Sum s = new Sum("emptysum", graphlist);
+		s.configure(hl);
+		Graph g = s.getGraph();
 		g.setPeriod(new Period());
 		RrdGraphDef rgd = g.getRrdGraphDef();
 		Assert.assertNotNull(rgd);

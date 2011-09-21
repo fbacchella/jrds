@@ -12,7 +12,6 @@ import jrds.Tools;
 import jrds.factories.xml.JrdsNode;
 import jrds.graphe.Sum;
 import jrds.mockobjects.MockGraph;
-import jrds.probe.SumProbe;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
 import junit.framework.Assert;
@@ -59,14 +58,16 @@ public class TestSum {
 		Tools.setLevel(new String[] {"jrds.factories.xml.CompiledXPath"}, Level.INFO);
 	}
 
-	private SumProbe doSumProbe(Document d, HostsList hl) throws Exception {
-		SumBuilder sm = new SumBuilder();
+	private Sum doSum(Document d, HostsList hl) throws Exception {
+        RdsHost host = new RdsHost("SumHost");
+
+        SumBuilder sm = new SumBuilder();
 		sm.setPm(pm);
-		SumProbe sp = sm.makeSum(new JrdsNode(d));
-		RdsHost host = new RdsHost("SumHost");
-		sp.setHost(host);
+		Sum sp = sm.makeSum(new JrdsNode(d));
+		sp.configure(hl);
+		sp.getProbe().setHost(host);
 		hl.addHost(host);
-		hl.addProbe(sp);
+		hl.addProbe(sp.getProbe());
 
         jrds.GraphNode mg = new MockGraph();
         mg.getGraphDesc().add("plot");
@@ -85,9 +86,7 @@ public class TestSum {
 		je.addElement("element", "name=DummyHost/DummyProbe");
 
 		HostsList hl = new HostsList();		
-		SumProbe sp = doSumProbe(d, hl);
-		Assert.assertEquals("name mismatch", "sumname", "sumname");
-		Sum s = (Sum) sp.getGraphList().toArray()[0];
+		Sum s = doSum(d, hl);
 		Document sumDocument = s.getGraphDesc().dumpAsXml();
 		jrds.Util.serialize(sumDocument, System.out, null, null);
 		logger.trace(sumDocument);
@@ -101,9 +100,8 @@ public class TestSum {
 		je.addElement("role").setTextContent("role1");
 
 		HostsList hl = new HostsList();
-		SumProbe sp = doSumProbe(d, hl);
+		Sum s = doSum(d, hl);
 
-		Sum s = (Sum) sp.getGraphList().toArray()[0];
 		ACL acl = s.getACL();
 		Assert.assertEquals("Not an role ACL", RolesACL.class, acl.getClass());
 

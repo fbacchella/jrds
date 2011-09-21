@@ -1,124 +1,126 @@
 package jrds.graphe;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import jrds.Graph;
+import jrds.AutonomousGraphNode;
 import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.HostsList;
-import jrds.Probe;
-import jrds.PropertiesManager;
-import jrds.probe.SumProbe;
+import jrds.ProxyPlottableMap;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.core.FetchData;
 import org.rrd4j.data.LinearInterpolator;
 import org.rrd4j.data.Plottable;
-import org.rrd4j.graph.RrdGraphDef;
 
-public class Sum extends GraphNode {
-	static final private Logger logger = Logger.getLogger(Sum.class);
-	static int i;
+public class Sum extends AutonomousGraphNode {
+    static final private Logger logger = Logger.getLogger(Sum.class);
+    static int i;
 
-	public Sum(Probe<?,?> theStore) {
-		super(theStore, new GraphDesc() {
-			String name = "sum" + i++;
-			@Override
-			public String getGraphName() {
-				return name;
-			}
-		});
-		SumProbe p = (SumProbe) theStore;
-		addACL(p.getACL());
-		GraphDesc gd = getGraphDesc();
-		gd.setGraphName(theStore.getName());
-		gd.setGraphTitle(theStore.getName());
+    String name;
+    ArrayList<String> graphList;
+    HostsList hl;
+    GraphDesc oldgd;
+    GraphDesc newgd;
 
-		String aname = p.getProbeList().iterator().next();
-		HostsList hl = p.getHostList();
-		GraphNode g = hl.getGraphById(aname.hashCode());
-		if(g != null){
-			GraphDesc oldgd = g.getGraphDesc();
-			gd.setVerticalLabel(oldgd.getVerticalLabel());
-			gd.setDimension(oldgd.getDimension().height, oldgd.getDimension().width);
-			gd.setSiUnit(oldgd.isSiUnit());
-		}
-		gd.setName(theStore.getName());
-		gd.addTree(PropertiesManager.HOSTSTAB, new Object[] {GraphDesc.TITLE});
-		logger.debug(getQualifieName());
-	}
+    public Sum(String name, ArrayList<String> graphList) {
+        super(name);
+        this.graphList = graphList;
+        GraphDesc gd = new GraphDesc();
+        gd.setGraphName(name);
+        gd.setGraphTitle(name);
+        gd.setName(name);
+        setGraphDesc(gd);
+    };
 
-	/* (non-Javadoc)
-	 * @see jrds.GraphNode#getGraph()
-	 */
-	@Override
-	public Graph getGraph() {
-		logger.debug("Wants to graph a sum");
-		return new Graph(this) {
+    public void configure(HostsList hl) {
+        super.configure(hl);
+        this.hl = hl;
 
-			/* (non-Javadoc)
-			 * @see jrds.Graph#getRrdGraphDef()
-			 */
-			@Override
-			public RrdGraphDef getRrdGraphDef() throws IOException {
-				SumProbe p = (SumProbe) getNode().getProbe();
-				double[][] allvalues = null;
-				GraphDesc tempgd = null;
-				FetchData fd = null;
-				HostsList hl = p.getHostList();
-				for(String name : p.getProbeList()) {
-					GraphNode g = hl.getGraphById(name.hashCode());
-					logger.trace("Looking for " + name + " in graph base, and found " + g);
-					if(g != null) {
-						tempgd = g.getGraphDesc();
-						fd = g.getProbe().fetchData(getStart(), getEnd());
-						if(allvalues != null) {
-							double[][] tempallvalues = fd.getValues();
-							for(int c = 0 ; c < tempallvalues.length ; c++) {
-								for(int r = 0 ; r < tempallvalues[c].length; r++) {
-									double v = tempallvalues[c][r];
-									if ( ! Double.isNaN(v) ) {
-										if(! Double.isNaN(allvalues[c][r]))
-											allvalues[c][r] += v;
-										else	
-											allvalues[c][r] = v;
+        String aname = graphList.get(0);
+        GraphNode g = hl.getGraphById(aname.hashCode());
+        if(g != null){
+            oldgd = g.getGraphDesc();
+            try {
+                newgd  = (GraphDesc) oldgd.clone();
+                newgd.setGraphTitle(name);
+                setGraphDesc(newgd);
+            } catch (CloneNotSupportedException e) {
+                logger.fatal("GraphDesc is supposed to be clonnable, what happened ?", e);
+                throw new RuntimeException("GraphDesc is supposed to be clonnable, what happened ?");
+            }
+        }
 
-									}
-								}
-							}
-						}
-						else {
-							allvalues = (double[][]) fd.getValues().clone();
-						}
-					}
-					else {
-						logger.error("Graph not found: " + name);
-					}
-				}
-				RrdGraphDef tempGraphDef = null;
-				if(allvalues != null) {
-					Map<String,Plottable> ownValues = new HashMap<String,Plottable>(allvalues.length);
-					long[] ts = fd.getTimestamps();
-					String[] dsNames = fd.getDsNames();
-					for(int i= 0; i < fd.getColumnCount(); i++) {
-						Plottable pl = new LinearInterpolator(ts, allvalues[i]);
-						ownValues.put(dsNames[i], pl);
-					}
-					tempGraphDef = tempgd.getGraphDef(p, ownValues);
-				}
-				else {
-					GraphNode node = getNode();
-					GraphDesc gd = node.getGraphDesc();
-					tempGraphDef = gd.getGraphDef(p);
-					logger.error("no data found for " + this);
-				}
-				if(tempGraphDef == null) {
-					logger.error("pseudo graph definition not generated for " + this);
-				}
-				return tempGraphDef;
-			}
-		};
-	}
+        logger.debug(getQualifieName());       
+    }
+
+    /* (non-Javadoc)
+     * @see jrds.GraphNode#getCustomData()
+     */
+    @Override
+    public ProxyPlottableMap getCustomData() {
+        ProxyPlottableMap sumdata = new ProxyPlottableMap() {
+            @Override
+            public void configure(long start, long end, long step) {
+                for(Map.Entry<String, Plottable> e: getSum(start, end).entrySet()) {
+                    ProxyPlottableMap.ProxyPlottable pp = new ProxyPlottableMap.ProxyPlottable();
+                    pp.setReal(e.getValue());
+                    put(e.getKey(), pp);
+                }
+            }
+            private Map<String,Plottable> getSum(long start, long end) {
+                Map<String,Plottable> ownValues = new HashMap<String,Plottable>();  
+
+                //Used to kept the last fetched data and analyse the
+                FetchData fd = null;
+
+                double[][] allvalues = null;
+                for(String name : graphList) {
+                    GraphNode g = hl.getGraphById(name.hashCode());
+                    logger.trace("Looking for " + name + " in graph base, and found " + g);
+                    if(g != null) {
+                        fd = g.getProbe().fetchData(new Date(start * 1000), new Date(end * 1000));
+                        
+                        //First pass, no data tu use
+                        if(allvalues == null) {
+                            allvalues = (double[][]) fd.getValues().clone();
+                        }
+                        //Next step, sum previous values
+                        else {
+                            double[][] tempallvalues = fd.getValues();
+                            for(int c = 0 ; c < tempallvalues.length ; c++) {
+                                for(int r = 0 ; r < tempallvalues[c].length; r++) {
+                                    double v = tempallvalues[c][r];
+                                    if ( ! Double.isNaN(v) ) {
+                                        if(! Double.isNaN(allvalues[c][r]))
+                                            allvalues[c][r] += v;
+                                        else    
+                                            allvalues[c][r] = v;
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        logger.error("Graph not found: " + name);
+                    }
+                }
+                if(fd != null) {
+                    long[] ts = fd.getTimestamps();
+                    String[] dsNames = fd.getDsNames();
+                    for(int i= 0; i < fd.getColumnCount(); i++) {
+                        Plottable pl = new LinearInterpolator(ts, allvalues[i]);
+                        ownValues.put(dsNames[i], pl);
+                    }
+                }
+                return ownValues;
+            }
+        };
+        return sumdata;
+    }
+
 }

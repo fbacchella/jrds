@@ -858,7 +858,6 @@ implements Cloneable, WithACL {
      */
     public void fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe,
             Map<String, ? extends Plottable> customData) {
-        String defRrdName = defProbe.getRrdName();
         HostsList hl = defProbe.getHostList();
         List<DsDesc> toDo = new ArrayList<DsDesc>();
         Set<String> datasources = new HashSet<String>();
@@ -882,10 +881,18 @@ implements Cloneable, WithACL {
                     datasources.add(ds.name);
                 }
             }
+            //Does the datas existe in the provided values
+            else if(customData != null && customData.containsKey(ds.dsName)) {
+                complete = true;
+                if( ! datasources.contains(ds.name)) {
+                    graphDef.datasource(ds.name, customData.get(ds.dsName));
+                    datasources.add(ds.name);
+                }
+            }
+            //Last bu common case, datasource refere to a rrd
+            //Or they might be on the associated rrd
             else {
-                //First check where data will comme from
                 Probe<?,?> probe = defProbe;
-                String rrdName = defRrdName;
                 if(ds.dspath != null) {
                     if(logger.isTraceEnabled())
                         logger.trace("External probe path: " + ds.dspath.host + "/" + ds.dspath.probe + "/" + ds.dsName);
@@ -894,26 +901,17 @@ implements Cloneable, WithACL {
                         logger.error("Invalide probe: " + ds.dspath.host + "/" + ds.dspath.probe);
                         continue;
                     }
-                    else
-                        rrdName = probe.getRrdName();
+                }
+                if(! probe.dsExist(ds.dsName)) {
+                    logger.error("Invalide datasource "  + ds.dsName + ", not found in " + probe);
+                    continue;
                 }
 
-                // Used to check if the data source is provided one way or another
-                //Does the datas existe in the provided values
-                if(customData != null && customData.containsKey(ds.dsName)) {
-                    complete = true;
-                    if( ! datasources.contains(ds.name)) {
-                        graphDef.datasource(ds.name, customData.get(ds.dsName));
-                        datasources.add(ds.name);
-                    }
-                }
-                //Or they might be on the associated rrd
-                else if(probe.dsExist(ds.dsName)) {
-                    complete = true;
-                    if( ! datasources.contains(ds.name)) {
-                        graphDef.datasource(ds.name, rrdName, ds.dsName, ds.cf);                
-                        datasources.add(ds.name);
-                    }
+                complete = true;
+                if( ! datasources.contains(ds.name)) {
+                    String rrdName = probe.getRrdName();
+                    graphDef.datasource(ds.name, rrdName, ds.dsName, ds.cf);                
+                    datasources.add(ds.name);
                 }
                 else {
                     logger.error("Incoherent definition for " + ds.name + " in " + name + " found: " + ds);
