@@ -690,12 +690,10 @@ function transitTab(newPage, oldPage){
     if(oldId != 'adminTab') {
         oldPage.destroyDescendants(false);
     }
-    console.log(window[newPage.callback]);
     window[newPage.callback](newPage);
 }
 
 function treeTabCallBack(newTab) {
-    console.log(newTab);
 	newTab.attr('content', dojo.clone(mainPane));
 
 	var treePane = dojo.byId('treePane');
