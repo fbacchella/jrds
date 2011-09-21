@@ -65,6 +65,7 @@ public class Util {
     private static final char[] BASE64_CHARSET = BASE64_CHARS.toCharArray();
 
     private static final Pattern varregexp = Pattern.compile("(.*?)\\$\\{([\\w\\.-]+)\\}(.*)");
+    private static final Pattern oldvarregexp = Pattern.compile("(.*?[^\\$])??\\{(\\d+)\\}(.*)");
 
     /**
      * The SI prefix as an enumeration, with factor provided.<p/>
@@ -280,6 +281,34 @@ public class Util {
             }
         }
         return in;
+    }
+    
+    /**
+     * A method to parse a template mixing old elements {x} with new variable ${variable}
+     * Should be not be used any more
+     * @param template The template to parse
+     * @param keys a array to match indexes elements
+     * @param arguments some object to extract value. from
+     * @return
+     */
+    public static String parseOldTemplate(String template, Object[] keys, Object... arguments) {
+        //Don't lose time with an empty template
+        if(template == null || "".equals(template.trim())) {
+            return template;
+        }
+
+        Matcher m = oldvarregexp.matcher(template);
+        String last = template;
+        StringBuffer buffer = new StringBuffer();
+        while(m.find()) {
+            if(m.group(1) !=  null)
+                buffer.append(m.group(1));
+            buffer .append(keys[Integer.parseInt(m.group(2))]);
+            last = m.group(3);
+            m = oldvarregexp.matcher(last);
+        }
+        buffer.append(last);
+        return jrds.Util.parseTemplate(buffer.toString(), arguments);
     }
 
     @SuppressWarnings("unchecked")

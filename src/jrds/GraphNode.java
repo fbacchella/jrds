@@ -4,15 +4,11 @@ package jrds;
 //$Id$
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.LinkedList;
 
-import jrds.probe.IndexedProbe;
-import jrds.probe.UrlProbe;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
-import org.apache.log4j.Logger;
 import org.rrd4j.graph.RrdGraphDef;
 
 /**
@@ -21,8 +17,6 @@ import org.rrd4j.graph.RrdGraphDef;
  * TODO
  */
 public class GraphNode implements Comparable<GraphNode>, WithACL {
-
-    static final private Logger logger = Logger.getLogger(GraphNode.class);
 
     protected Probe<?,?> probe;
     private String viewPath = null;
@@ -81,39 +75,16 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
     }
 
     private final String parseTemplate(String template) {
-        //Don't lose time with an empty template
-        if(template == null || "".equals(template.trim())) {
-            return template;
-        }
-
-        String index = "";
-        String url = "";
-        if( probe instanceof IndexedProbe) {
-            index =((IndexedProbe) probe).getIndexName();
-        }
-        if( probe instanceof UrlProbe) {
-            url =((UrlProbe) probe).getUrlAsString();
-        }
-
         Object[] arguments = {
-                gd.getGraphName(),
-                probe.getHost().getName(),
-                index,
-                url,
-                probe.getName(),
-                Util.stringSignature(index),
-                Util.stringSignature(url)
+                "${graphdesc.name}",
+                "${host}",
+                "${index}",
+                "${url}",
+                "${probename}",
+                "${index.signature}",
+                "${url.signature}"
         };
-        String evaluted = jrds.Util.parseTemplate(template, probe, gd);
-        String formated;
-        try {
-            formated = MessageFormat.format(evaluted, arguments);
-            return formated;
-        } catch (IllegalArgumentException e) {
-            logger.error("Template invalid:" + template);
-        }
-        return evaluted;
-
+        return jrds.Util.parseOldTemplate(template, arguments, probe, gd);
     }
 
     public String getGraphTitle() {

@@ -5,7 +5,6 @@ package jrds;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -142,37 +141,15 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     private final String parseTemplate(String template) {
-        String index = "";
-        String url = "";
-        int port = 0;
-        if( this instanceof IndexedProbe) {
-            index =((IndexedProbe) this).getIndexName();
-        }
-        if( this instanceof UrlProbe) {
-            url =((UrlProbe) this).getUrlAsString();
-            port = ((UrlProbe) this).getPort();
-        }
-        String hn = "<empty>";
-        if(getHost() != null)
-            hn = getHost().getName();
-
         Object[] arguments = {
-                hn,
-                index,
-                url,
-                port,
-                jrds.Util.stringSignature(index),
-                jrds.Util.stringSignature(url)
+                "${host}",
+                "${index}",
+                "${url}",
+                "${port}",
+                "${index.signature}",
+                "${url.signature}"
         };
-        String evaluted = jrds.Util.parseTemplate(template, this);
-        String formated;
-        try {
-            formated = MessageFormat.format(evaluted, arguments);
-            return formated;
-        } catch (IllegalArgumentException e) {
-            log(Level.ERROR, "Template invalid: %s",template);
-        }
-        return evaluted;
+        return jrds.Util.parseOldTemplate(template, arguments, this);
     }
 
     public void setName(String name) {
