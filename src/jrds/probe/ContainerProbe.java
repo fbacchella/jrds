@@ -12,7 +12,6 @@ import java.util.Map;
 
 import jrds.Probe;
 import jrds.ProbeDesc;
-import jrds.RdsHost;
 
 import org.apache.log4j.Level;
 
@@ -76,10 +75,12 @@ public class ContainerProbe extends  Probe<Object, Number> {
     }
 
     /* (non-Javadoc)
-     * @see jrds.Probe#getHost()
+     * @see jrds.Probe#getQualifiedName()
      */
     @Override
-    public RdsHost getHost() {
-        return new RdsHost(getName());
+    public String getQualifiedName() {
+        return "/"  + getName();
     }
+    
+    
 }
