@@ -81,6 +81,5 @@ public class ContainerProbe extends  Probe<Object, Number> {
     public String getQualifiedName() {
         return "/"  + getName();
     }
-    
-    
+
 }
