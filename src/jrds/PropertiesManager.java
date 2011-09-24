@@ -304,6 +304,8 @@ public class PropertiesManager extends Properties {
         collectorThreads = parseInteger(getProperty("collectorThreads", "1"));
         dbPoolSize = parseInteger(getProperty("dbPoolSize", "10")) + collectorThreads;
         syncPeriod = parseInteger(getProperty("syncPeriod", Integer.toString(step / 2)));
+        
+        strictparsing = parseBoolean(getProperty("strictparsing", "false"));
         String libspathString = getProperty("libspath", "");
         try {
             URL defaultLibURL = getClass().getResource("/desc");
@@ -382,6 +384,7 @@ public class PropertiesManager extends Properties {
     public int dbPoolSize;
     public int syncPeriod;
     public final Set<URI> libspath = new HashSet<URI>();
+    public boolean strictparsing = false;
     public ClassLoader extensionClassLoader;
     public final Map<Level, List<String>> loglevels = new HashMap<Level, List<String>>();
     public Level loglevel;

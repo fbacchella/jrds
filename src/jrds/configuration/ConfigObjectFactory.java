@@ -44,7 +44,7 @@ public class ConfigObjectFactory {
 
     private void init() {
         try {
-            load = new Loader();
+            load = new Loader(pm.strictparsing);
         } catch (ParserConfigurationException e) {
             throw new RuntimeException("Can't build loader parser", e);
         }
