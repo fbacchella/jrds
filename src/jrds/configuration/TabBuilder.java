@@ -14,8 +14,7 @@ import jrds.factories.xml.JrdsNode;
 public class TabBuilder extends ConfigObjectBuilder<Tab>  {
     static final private XPathExpression TABNAME = CompiledXPath.get("/tab/@name");
     static final private XPathExpression TABFILTER = CompiledXPath.get("/tab/filter");
-    static final private XPathExpression TABGRAPH = CompiledXPath.get("/tab/graph");
-    static final private XPathExpression TABCGRAPH = CompiledXPath.get("/tab/cgraph");
+    static final private XPathExpression TABGRAPH = CompiledXPath.get("/tab/graph|/tab/cgraph");
     static final private XPathExpression PATH = CompiledXPath.get("path");
 
     static final private Logger logger = Logger.getLogger(TabBuilder.class);
@@ -43,6 +42,8 @@ public class TabBuilder extends ConfigObjectBuilder<Tab>  {
             tab = new Tab.DynamicTree(name);
             for(JrdsNode elemNode: n.iterate(TABGRAPH)) {
                 String id = elemNode.attrMap().get("id");
+                if("cgraph".equals(elemNode.getNodeName()))
+                    id = "/" + id;
                 List<String> path = new ArrayList<String>();
                 for(JrdsNode pathNode: elemNode.iterate(PATH)) {
                     path.add(pathNode.getTextContent());

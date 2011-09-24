@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE tab PUBLIC "-//jrds//DTD Tab//EN" "urn:jrds:tab" >
 <tab name="goodtab">
-  <filter>filter</filter>
   <graph id="host/graph">
   	<path>services</path>
   	<path>tab</path>
   </graph>
+  <cgraph id="cgraph">
+    <path>services</path>
+    <path>tab</path>
+  </cgraph>
 </tab>
