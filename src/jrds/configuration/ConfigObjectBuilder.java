@@ -26,10 +26,6 @@ import org.w3c.dom.Node;
 abstract class ConfigObjectBuilder<BuildObject> {
 	static final private Logger logger = Logger.getLogger(ConfigObjectBuilder.class);
 
-	public enum Properties {
-		MACRO, GRAPHDESC, PROBEDESC, PROBEFACTORY, GRAPHFACTORY, LOADER, CLASSLOADER, PM, DEFAULTROLE, GRAPHMAP;
-	}
-
 	PropertiesManager pm;
 	public ConfigType ct;
 	
