@@ -162,7 +162,18 @@ final public class Tools {
 		return element;
 	}
 
-	static public void setLevel(String[] allLoggers, Level level) {
+    static public void setLevel(Level level, String... allLoggers) {
+        Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDER);
+        for(String loggerName: allLoggers) {
+            Logger l = Logger.getLogger(loggerName);
+            l.setLevel(level);
+            if(l.getAppender(JrdsLoggerConfiguration.APPENDER) != null) {
+                l.addAppender(app);
+            }
+        }
+    }
+
+    static public void setLevel(String[] allLoggers, Level level) {
 		Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDER);
 		for(String loggerName: allLoggers) {
 			Logger l = Logger.getLogger(loggerName);
