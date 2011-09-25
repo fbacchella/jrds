@@ -30,7 +30,7 @@
         <dependency org="org.apache.httpcomponents" name="httpclient" rev="4.1.1" conf="lib->default" />
         <dependency org="mysql" name="mysql-connector-java" rev="5.1.16" conf="lib->default" />
         <dependency org="postgresql" name="postgresql" rev="8.4-702.jdbc4" conf="lib->default" />
-        <dependency org="junit" name="junit" rev="4.8.2" conf="libtest->default" />
+        <dependency org="junit" name="junit" rev="4.9" conf="libtest->default" />
         <dependency org="org.mortbay.jetty" name="jetty-servlet-tester" rev="6.1.26"
                     conf="libtest->default">
             <exclude module="jetty" />
