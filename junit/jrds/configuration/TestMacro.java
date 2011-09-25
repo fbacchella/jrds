@@ -29,278 +29,285 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 
 public class TestMacro {
-	static final private Logger logger = Logger.getLogger(TestMacro.class);
+    static final private Logger logger = Logger.getLogger(TestMacro.class);
 
-	static final private String goodMacroXml =
-		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
-		"<!DOCTYPE macrodef PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
-		"<macrodef name=\"macrodef\">" +
-		"<probe type = \"MacroProbe1\">" +
-		"<arg type=\"String\" value=\"${a}\" />" +
-		"</probe>" + 
-		"<probe type = \"MacroProbe2\">" +
-		"<arg type=\"String\" value=\"/\" />" +
-		"</probe>" +
-		"</macrodef>";
+    static final private String goodMacroXml =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+                    "<!DOCTYPE macrodef PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
+                    "<macrodef name=\"macrodef\">" +
+                    "<probe type = \"MacroProbe1\">" +
+                    "<arg type=\"String\" value=\"${a}\" />" +
+                    "</probe>" + 
+                    "<probe type = \"MacroProbe2\">" +
+                    "<arg type=\"String\" value=\"/\" />" +
+                    "</probe>" +
+                    "</macrodef>";
 
-	static final private String goodHostXml = 
-		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
-		"<!DOCTYPE host PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
-		"<host name=\"myhost\">" +
-		"<macro name=\"macrodef\" />" +
-		"</host>";
+    static final private String goodHostXml = 
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+                    "<!DOCTYPE host PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
+                    "<host name=\"myhost\">" +
+                    "<macro name=\"macrodef\" />" +
+                    "</host>";
 
-	static DocumentBuilder dbuilder;
-	static ConfigObjectFactory conf;
-	static PropertiesManager pm = new PropertiesManager();
+    static DocumentBuilder dbuilder;
+    static Loader l;
+    static {
+        try {
+            Tools.configure();
+            Tools.prepareXml(false);
+            l = new Loader();
+            dbuilder = l.dbuilder;        
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    static ConfigObjectFactory conf;
+    static final PropertiesManager pm = new PropertiesManager();
 
-	@BeforeClass
-	static public void configure() throws ParserConfigurationException, IOException {
-		Tools.configure();
-		Tools.prepareXml(false);
-		Loader l = new Loader();
-		dbuilder = l.dbuilder;
-		l.importUrl(Tools.pathToUrl("desc"));
+    @BeforeClass
+    static public void configure() throws ParserConfigurationException, IOException {
+        pm.setProperty("configdir", "tmp/config");
+        pm.setProperty("rrddir", "tmp");
+        pm.setProperty("strictparsing", "true");
+        pm.update();
+        pm.libspath.clear();
 
-		pm.setProperty("configdir", "tmp");
-		pm.setProperty("rrddir", "tmp");
-		pm.update();
+        conf = new ConfigObjectFactory(pm);
+        conf.setLoader(l);
+        conf.setGraphDescMap();
+        conf.setProbeDescMap();
 
-		conf = new ConfigObjectFactory(pm);
-		conf.setLoader(l);
-		conf.setGraphDescMap();
-		conf.setProbeDescMap();
+        logger.setLevel(Level.TRACE);
+        Tools.setLevel(logger.getLevel(), "jrds.factories");
+        Tools.setLevel(Level.TRACE, "jrds.starter.ChainedProperties");
+        Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
+    }
 
-		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"jrds.factories"}, logger.getLevel());
-		Tools.setLevel(new String[] {"jrds.starter.ChainedProperties"}, Level.TRACE);
-		Tools.setLevel(new String[] {"jrds.factories.xml.CompiledXPath"}, Level.INFO);
-	}
-	
-	static Macro doMacro(Document d, String name) {
-		DocumentFragment df = d.createDocumentFragment();
-		df.appendChild(d.removeChild(d.getDocumentElement()));
-		
-		Macro m = new Macro();
-		m.setDf(df);
-		m.setName(name);
-		return m;
-	}
-	
-	static HostBuilder getBuilder(Macro... macros) {
-		HostBuilder hb = new HostBuilder();
-		hb.setPm(pm);
-		Map<String, Macro> mmap = new HashMap<String, Macro>(macros.length);
-		for(Macro m: macros) {
-			mmap.put(m.getName(), m);
-		}
-		hb.setMacros(mmap);
-		hb.setProbeFactory(new MokeProbeFactory());
-		return hb;
-	}
+    static Macro doMacro(Document d, String name) {
+        DocumentFragment df = d.createDocumentFragment();
+        df.appendChild(d.removeChild(d.getDocumentElement()));
 
-	@Test
-	public void testMacroLoad() throws Exception {
-		Document d = Tools.parseString(goodMacroXml);
+        Macro m = new Macro();
+        m.setDf(df);
+        m.setName(name);
+        return m;
+    }
 
-		MacroBuilder b = new MacroBuilder();
-		JrdsNode jn = new JrdsNode(d);
+    static HostBuilder getBuilder(Macro... macros) {
+        HostBuilder hb = new HostBuilder();
+        hb.setPm(pm);
+        Map<String, Macro> mmap = new HashMap<String, Macro>(macros.length);
+        for(Macro m: macros) {
+            mmap.put(m.getName(), m);
+        }
+        hb.setMacros(mmap);
+        hb.setProbeFactory(new MokeProbeFactory());
+        return hb;
+    }
 
-		Macro m = b.makeMacro(jn);
-		int macroProbesNumber = m.getDf().getChildNodes().getLength();
-		Assert.assertEquals("macrodef", m.getName());
-		Assert.assertEquals("Macro$macrodef", m.toString());
-		Assert.assertEquals(1, macroProbesNumber);
-		Assert.assertEquals(2, m.getDf().getChildNodes().item(0).getChildNodes().getLength());
-	}
-	
-	@Test
-	public void testMacroFill() throws Exception {
-		Document d = Tools.parseString(goodMacroXml);
-		Macro m = doMacro(d, "macrodef");
-		
-		Document hostdoc = Tools.parseString(goodHostXml);
+    @Test
+    public void testMacroLoad() throws Exception {
+        Document d = Tools.parseString(goodMacroXml);
 
-		HostBuilder hb = getBuilder(m);
+        MacroBuilder b = new MacroBuilder();
+        JrdsNode jn = new JrdsNode(d);
 
-		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
-		
-		logger.debug("probes:" + host.getProbes());
-		Collection<Probe<?,?>> probes = host.getProbes();
-		Collection<String> probesName = new ArrayList<String>(probes.size());
-		for(Probe<?,?> p: probes) {
-			probesName.add(p.toString());
-		}
-		logger.trace(probesName);
-		Assert.assertTrue("MacroProbe1 not found", probesName.contains("myhost/MacroProbe1"));
-		Assert.assertTrue("MacroProbe2 not found", probesName.contains("myhost/MacroProbe2"));
-	}
+        Macro m = b.makeMacro(jn);
+        int macroProbesNumber = m.getDf().getChildNodes().getLength();
+        Assert.assertEquals("macrodef", m.getName());
+        Assert.assertEquals("Macro$macrodef", m.toString());
+        Assert.assertEquals(1, macroProbesNumber);
+        Assert.assertEquals(2, m.getDf().getChildNodes().item(0).getChildNodes().getLength());
+    }
 
-	@Test
-	public void testMacroStarter() throws Exception {
-		Document d = Tools.parseString(goodMacroXml);
-		//Tools.appendString(d.getDocumentElement(), "<snmp community=\"public\" version=\"2\" />");
-		//Tools.addElement(d, "snmp", "community=public", "version=2");
-		//Tools.JrdsElement je = new Tools.JrdsElement(d);
-		//je.addElement("snmp", "community=public", "version=2");
-		new Tools.JrdsElement(d).addElement("snmp", "community=public", "version=2");
+    @Test
+    public void testMacroFill() throws Exception {
+        Document d = Tools.parseString(goodMacroXml);
+        Macro m = doMacro(d, "macrodef");
 
-		Macro m = doMacro(d, "macrodef");
-		
-		HostBuilder hb = getBuilder(m);
+        Document hostdoc = Tools.parseString(goodHostXml);
 
-		Document hostdoc = Tools.parseString(goodHostXml);
-		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
-		
-		Starter s = host.find(jrds.snmp.SnmpStarter.class);
-		
-		Assert.assertNotNull("SNMP starter not found", s);
-		Assert.assertEquals("Starter not found", jrds.snmp.SnmpStarter.class, s.getKey());
-	}
-	
-	@Test
-	public void testMacroTag() throws Exception {
-		Document d = Tools.parseString(goodMacroXml);
-		String tagname = "mytag";
-		new Tools.JrdsElement(d).addElement("tag").setTextContent(tagname);
+        HostBuilder hb = getBuilder(m);
 
-		Macro m = doMacro(d, "macrodef");
-		HostBuilder hb = getBuilder(m);
+        RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
 
-		Document hostdoc = Tools.parseString(goodHostXml);
-		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
-		Assert.assertTrue("tag not found", host.getTags().contains(tagname));
-	}
+        logger.debug("probes:" + host.getProbes());
+        Collection<Probe<?,?>> probes = host.getProbes();
+        Collection<String> probesName = new ArrayList<String>(probes.size());
+        for(Probe<?,?> p: probes) {
+            probesName.add(p.toString());
+        }
+        logger.trace(probesName);
+        Assert.assertTrue("MacroProbe1 not found", probesName.contains("myhost/MacroProbe1"));
+        Assert.assertTrue("MacroProbe2 not found", probesName.contains("myhost/MacroProbe2"));
+    }
 
-	@Test
-	public void testMacroFillwithProps1() throws Exception {
-		Document d = Tools.parseString(goodMacroXml);
-		new Tools.JrdsElement(d).addElement("entry", "key=a").setTextContent("bidule");
-		jrds.Util.serialize(d, System.out, null, null);
-		Macro m = doMacro(d, "macrodef");
+    @Test
+    public void testMacroStarter() throws Exception {
+        Document d = Tools.parseString(goodMacroXml);
+        //Tools.appendString(d.getDocumentElement(), "<snmp community=\"public\" version=\"2\" />");
+        //Tools.addElement(d, "snmp", "community=public", "version=2");
+        //Tools.JrdsElement je = new Tools.JrdsElement(d);
+        //je.addElement("snmp", "community=public", "version=2");
+        new Tools.JrdsElement(d).addElement("snmp", "community=public", "version=2");
 
-		Document hostdoc = Tools.parseString(goodHostXml);
-		new Tools.JrdsElement(hostdoc).addElement("probe", "type=MacroProbe3").addElement("arg", "type=String", "value=${a}");
+        Macro m = doMacro(d, "macrodef");
 
-		HostBuilder hb = getBuilder(m);
-		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
-		
-		Collection<Probe<?,?>> probes = host.getProbes();
-		boolean found = false;
-		for(Probe<?,?> p: probes) {
-			if("myhost/MacroProbe3".equals(p.toString()) ) {
-				MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
-				logger.trace("Args:" + mp.getArgs());
-				Assert.assertFalse(mp.getArgs().contains("bidule"));
-				found = true;
-			}
-		}
-		Assert.assertTrue("macro probe with properties not found", found);
-	}
+        HostBuilder hb = getBuilder(m);
 
-	@Test
-	public void testMacroFillwithProps2() throws Exception {
-		Document d = Tools.parseString(goodMacroXml);
-		new Tools.JrdsElement(d).addElement("probe", "type=MacroProbe3").addElement("arg", "type=String", "value=${a}");
-		//Tools.appendString(Tools.appendString(d.getDocumentElement(), "<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
-		Macro m = doMacro(d, "macrodef");
+        Document hostdoc = Tools.parseString(goodHostXml);
+        RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
 
-		Document hostdoc = Tools.parseString(goodHostXml);
-		new Tools.JrdsElement(hostdoc).addElement("properties").addElement("entry", "key=a").setTextContent("bidule");
-		//Tools.appendString(Tools.appendString(hostdoc.getDocumentElement(), "<properties />"), "<entry key=\"a\" >bidule</entry>");
+        Starter s = host.find(jrds.snmp.SnmpStarter.class);
 
-		HostBuilder hb = getBuilder(m);
-		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
-		
-		Collection<Probe<?,?>> probes = host.getProbes();
-		boolean found = false;
-		for(Probe<?,?> p: probes) {
-			if("myhost/MacroProbe3".equals(p.toString()) ) {
-				MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
-				logger.trace("Args:" + mp.getArgs());
-				Assert.assertTrue(mp.getArgs().contains("bidule"));
-				found = true;
-			}
-		}
-		Assert.assertTrue("macro probe with properties not found", found);
-	}
-	
-	@Test
-	public void testMacroFillwithProps3() throws Exception {
-		Document d = Tools.parseString(goodMacroXml);
-		new Tools.JrdsElement(d).addElement("probe", "type=MacroProbe3").addElement("arg", "type=String", "value=${a}");
-		Macro m = doMacro(d, "macrodef");
+        Assert.assertNotNull("SNMP starter not found", s);
+        Assert.assertEquals("Starter not found", jrds.snmp.SnmpStarter.class, s.getKey());
+    }
 
-		Document hostdoc = Tools.parseString(goodHostXml);
-		JrdsNode jhostdoc = new JrdsNode(hostdoc);
-		JrdsNode macronode = jhostdoc.getChild(CompiledXPath.get("/host/macro"));
-		new Tools.JrdsElement(macronode).addElement("properties").addElement("entry", "key=a").setTextContent("bidule");
+    @Test
+    public void testMacroTag() throws Exception {
+        Document d = Tools.parseString(goodMacroXml);
+        String tagname = "mytag";
+        new Tools.JrdsElement(d).addElement("tag").setTextContent(tagname);
 
-		HostBuilder hb = getBuilder(m);
-		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
-		
-		Collection<Probe<?,?>> probes = host.getProbes();
-		boolean found = false;
-		for(Probe<?,?> p: probes) {
-			if("myhost/MacroProbe3".equals(p.toString()) ) {
-				MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
-				logger.trace("Args:" + mp.getArgs());
-				Assert.assertTrue(mp.getArgs().contains("bidule"));
-				found = true;
-			}
-		}
-		Assert.assertTrue("macro probe with properties not found", found);
-	}
-	
-	@Test
-	public void testCollection() throws Exception {
-		Document d = Tools.parseString(goodMacroXml);
-		Tools.appendString(Tools.appendString(Tools.appendString(d.getDocumentElement(), "<for var=\"a\" collection=\"c\"/>"),"<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
-		Macro m = doMacro(d, "macrodef");
+        Macro m = doMacro(d, "macrodef");
+        HostBuilder hb = getBuilder(m);
 
-		Document hostdoc = Tools.parseString(goodHostXml);
-		Tools.appendString(Tools.appendString(hostdoc.getDocumentElement(), "<collection name=\"c\"/>"), "<element>bidule</element>");
+        Document hostdoc = Tools.parseString(goodHostXml);
+        RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
+        Assert.assertTrue("tag not found", host.getTags().contains(tagname));
+    }
 
-		HostBuilder hb = getBuilder(m);
-		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
+    @Test
+    public void testMacroFillwithProps1() throws Exception {
+        Document d = Tools.parseString(goodMacroXml);
+        new Tools.JrdsElement(d).addElement("entry", "key=a").setTextContent("bidule");
+        jrds.Util.serialize(d, System.out, null, null);
+        Macro m = doMacro(d, "macrodef");
 
-		Collection<Probe<?,?>> probes = host.getProbes();
-		boolean found = false;
-		for(Probe<?,?> p: probes) {
-			if("myhost/MacroProbe3".equals(p.toString()) ) {
-				MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
-				logger.trace("Args:" + mp.getArgs());
-				Assert.assertTrue(mp.getArgs().contains("bidule"));
-				found = true;
-			}
-		}
-		Assert.assertTrue("collection not found", found);
-	}
-	
-	@Test
-	public void testRecursive() throws Exception {
-		Document d1 = Tools.parseString(goodMacroXml);
-		Tools.appendString(d1.getDocumentElement(), "<macro name=\"macrodef2\" />");
-		Macro m1 = doMacro(d1, "macrodef");
+        Document hostdoc = Tools.parseString(goodHostXml);
+        new Tools.JrdsElement(hostdoc).addElement("probe", "type=MacroProbe3").addElement("arg", "type=String", "value=${a}");
 
-		Document d2 = Tools.parseString(goodMacroXml);
-		Tools.appendString(Tools.appendString(d2.getDocumentElement(), "<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"bidule\" />");
-		Macro m2 = doMacro(d2, "macrodef2");
+        HostBuilder hb = getBuilder(m);
+        RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
 
-		HostBuilder hb = getBuilder(m1, m2);
-		Document hostdoc = Tools.parseString(goodHostXml);
-		RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
+        Collection<Probe<?,?>> probes = host.getProbes();
+        boolean found = false;
+        for(Probe<?,?> p: probes) {
+            if("myhost/MacroProbe3".equals(p.toString()) ) {
+                MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
+                logger.trace("Args:" + mp.getArgs());
+                Assert.assertFalse(mp.getArgs().contains("bidule"));
+                found = true;
+            }
+        }
+        Assert.assertTrue("macro probe with properties not found", found);
+    }
 
-		Collection<Probe<?,?>> probes = host.getProbes();
-		boolean found = false;
-		for(Probe<?,?> p: probes) {
-			if("myhost/MacroProbe3".equals(p.toString()) ) {
-				MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
-				logger.trace("Args:" + mp.getArgs());
-				Assert.assertTrue(mp.getArgs().contains("bidule"));
-				found = true;
-			}
-		}
-		Assert.assertTrue("macro not recursive", found);
-	}
+    @Test
+    public void testMacroFillwithProps2() throws Exception {
+        Document d = Tools.parseString(goodMacroXml);
+        new Tools.JrdsElement(d).addElement("probe", "type=MacroProbe3").addElement("arg", "type=String", "value=${a}");
+        //Tools.appendString(Tools.appendString(d.getDocumentElement(), "<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
+        Macro m = doMacro(d, "macrodef");
+
+        Document hostdoc = Tools.parseString(goodHostXml);
+        new Tools.JrdsElement(hostdoc).addElement("properties").addElement("entry", "key=a").setTextContent("bidule");
+        //Tools.appendString(Tools.appendString(hostdoc.getDocumentElement(), "<properties />"), "<entry key=\"a\" >bidule</entry>");
+
+        HostBuilder hb = getBuilder(m);
+        RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
+
+        Collection<Probe<?,?>> probes = host.getProbes();
+        boolean found = false;
+        for(Probe<?,?> p: probes) {
+            if("myhost/MacroProbe3".equals(p.toString()) ) {
+                MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
+                logger.trace("Args:" + mp.getArgs());
+                Assert.assertTrue(mp.getArgs().contains("bidule"));
+                found = true;
+            }
+        }
+        Assert.assertTrue("macro probe with properties not found", found);
+    }
+
+    @Test
+    public void testMacroFillwithProps3() throws Exception {
+        Document d = Tools.parseString(goodMacroXml);
+        new Tools.JrdsElement(d).addElement("probe", "type=MacroProbe3").addElement("arg", "type=String", "value=${a}");
+        Macro m = doMacro(d, "macrodef");
+
+        Document hostdoc = Tools.parseString(goodHostXml);
+        JrdsNode jhostdoc = new JrdsNode(hostdoc);
+        JrdsNode macronode = jhostdoc.getChild(CompiledXPath.get("/host/macro"));
+        new Tools.JrdsElement(macronode).addElement("properties").addElement("entry", "key=a").setTextContent("bidule");
+
+        HostBuilder hb = getBuilder(m);
+        RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
+
+        Collection<Probe<?,?>> probes = host.getProbes();
+        boolean found = false;
+        for(Probe<?,?> p: probes) {
+            if("myhost/MacroProbe3".equals(p.toString()) ) {
+                MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
+                logger.trace("Args:" + mp.getArgs());
+                Assert.assertTrue(mp.getArgs().contains("bidule"));
+                found = true;
+            }
+        }
+        Assert.assertTrue("macro probe with properties not found", found);
+    }
+
+    @Test
+    public void testCollection() throws Exception {
+        Document d = Tools.parseString(goodMacroXml);
+        Tools.appendString(Tools.appendString(Tools.appendString(d.getDocumentElement(), "<for var=\"a\" collection=\"c\"/>"),"<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
+        Macro m = doMacro(d, "macrodef");
+
+        Document hostdoc = Tools.parseString(goodHostXml);
+        Tools.appendString(Tools.appendString(hostdoc.getDocumentElement(), "<collection name=\"c\"/>"), "<element>bidule</element>");
+
+        HostBuilder hb = getBuilder(m);
+        RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
+
+        Collection<Probe<?,?>> probes = host.getProbes();
+        boolean found = false;
+        for(Probe<?,?> p: probes) {
+            if("myhost/MacroProbe3".equals(p.toString()) ) {
+                MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
+                logger.trace("Args:" + mp.getArgs());
+                Assert.assertTrue(mp.getArgs().contains("bidule"));
+                found = true;
+            }
+        }
+        Assert.assertTrue("collection not found", found);
+    }
+
+    @Test
+    public void testRecursive() throws Exception {
+        Document d1 = Tools.parseString(goodMacroXml);
+        Tools.appendString(d1.getDocumentElement(), "<macro name=\"macrodef2\" />");
+        Macro m1 = doMacro(d1, "macrodef");
+
+        Document d2 = Tools.parseString(goodMacroXml);
+        Tools.appendString(Tools.appendString(d2.getDocumentElement(), "<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"bidule\" />");
+        Macro m2 = doMacro(d2, "macrodef2");
+
+        HostBuilder hb = getBuilder(m1, m2);
+        Document hostdoc = Tools.parseString(goodHostXml);
+        RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
+
+        Collection<Probe<?,?>> probes = host.getProbes();
+        boolean found = false;
+        for(Probe<?,?> p: probes) {
+            if("myhost/MacroProbe3".equals(p.toString()) ) {
+                MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
+                logger.trace("Args:" + mp.getArgs());
+                Assert.assertTrue(mp.getArgs().contains("bidule"));
+                found = true;
+            }
+        }
+        Assert.assertTrue("macro not recursive", found);
+    }
 }
