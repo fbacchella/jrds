@@ -44,5 +44,10 @@ public class TestSum {
 		logger.debug(graph.getRrdGraphInfo().getWidth());
 		logger.debug(rgd.toString());
 	}
+	
+	@Test
+	public void getSum() {
+	    
+	}
 
 }

@@ -94,7 +94,7 @@ public class TestLoadConfiguration {
 		pm.setProperty("configdir", "tmp");
 		pm.setProperty("rrddir", "tmp");
 		pm.update();
-		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, null);
+		StoreOpener.prepare("MEM");
 
 		conf = new ConfigObjectFactory(pm);
 		conf.setLoader(l);

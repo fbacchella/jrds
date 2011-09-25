@@ -35,7 +35,7 @@ public class TestProbe {
 		pm.setProperty("configdir", "tmp");
 		pm.setProperty("rrddir", "tmp");
 		pm.update();
-		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, null);
+		StoreOpener.prepare("MEM");
 	}
 	
 	@Test
