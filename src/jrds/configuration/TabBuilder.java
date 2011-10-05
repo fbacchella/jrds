@@ -41,7 +41,7 @@ public class TabBuilder extends ConfigObjectBuilder<Tab>  {
         else {
             tab = new Tab.DynamicTree(name);
             for(JrdsNode elemNode: n.iterate(TABGRAPH)) {
-                String id = elemNode.attrMap().get("id");
+                String id = elemNode.getAttributes("id");
                 if("cgraph".equals(elemNode.getNodeName()))
                     id = "/" + id;
                 List<String> path = new ArrayList<String>();

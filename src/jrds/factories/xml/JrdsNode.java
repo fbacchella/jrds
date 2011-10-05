@@ -25,6 +25,7 @@ import org.w3c.dom.UserDataHandler;
 public class JrdsNode implements Node {
 
     Node parent;
+    NamedNodeMap attrs = null;
 
     public JrdsNode(Node n){
         if(n == null)
@@ -195,8 +196,7 @@ public class JrdsNode implements Node {
     }
 
     public Map<String, String> attrMap() {
-        NamedNodeMap attrs = parent.getAttributes();
-        if(attrs == null)
+        if(! checkAttributes())
             return Collections.emptyMap();
         Map<String, String> retValues = new HashMap<String, String>(attrs.getLength());
         for(int i = 0; i < attrs.getLength(); i++) {
@@ -204,6 +204,26 @@ public class JrdsNode implements Node {
             retValues.put(attrNode.getNodeName(), attrNode.getNodeValue());
         }
         return retValues;
+    }
+
+    private boolean checkAttributes() {
+        if (parent.getNodeType() != Node.ELEMENT_NODE)
+            return false;
+        if( ! parent.hasAttributes())
+            return false;
+        if(attrs ==null)
+            attrs = parent.getAttributes();
+        return true;
+    }
+
+    public String getAttributes(String name) {
+        if(! checkAttributes())
+            return null;
+        Node value = attrs.getNamedItem(name);
+        if(value == null)
+            return null;
+        else
+            return value.getNodeValue();
     }
 
     public String evaluate(XPathExpression xpath) {

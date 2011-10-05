@@ -19,6 +19,7 @@ import jrds.Macro;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
+import jrds.Util;
 import jrds.factories.ArgFactory;
 import jrds.factories.HostBuilderAgent;
 import jrds.factories.ProbeFactory;
@@ -232,15 +233,15 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
 		//		}
 
 		ChainedProperties cp = ns.find(ChainedProperties.class);
-		String label = probeNode.evaluate(CompiledXPath.get("@label"));
+		String label = probeNode.getAttributes("label");
 		if(label != null && ! "".equals(label)) {
-			logger.trace("Adding label " + label + " to " + p);
+			logger.trace(Util.delayedFormatString("Adding label %s to %s", label, p));
 			p.setLabel(jrds.Util.parseTemplate(label, cp));;
 		}
 		if(p instanceof ConnectedProbe) {
-			String connexionName = probeNode.evaluate(CompiledXPath.get("@connection"));
+			String connexionName = probeNode.getAttributes("connection");
 			if(connexionName != null && ! "".equals(connexionName)) {
-				logger.trace("Adding connection " + connexionName + " to " + p);
+				logger.trace(Util.delayedFormatString("Adding connection %s to %s", connexionName, p));
 				((ConnectedProbe)p).setConnectionName(jrds.Util.parseTemplate(connexionName, cp));
 			}
 		}

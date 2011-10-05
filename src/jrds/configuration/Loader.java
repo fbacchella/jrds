@@ -21,6 +21,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.Util;
 import jrds.factories.xml.EntityResolver;
 import jrds.factories.xml.JrdsNode;
 
@@ -175,7 +176,7 @@ class Loader {
 		JrdsNode d = new JrdsNode(dbuilder.parse(xmlstream));
 		for(ConfigType t: ConfigType.values()) {
 			if(t.memberof(d)) {
-				logger.trace("Found a " + t);
+				logger.trace(Util.delayedFormatString("Found a %s", t));
 				JrdsNode n = d.getChild(t.getNameXpath());
 				//We check the Name
 				if(n != null && ! "".equals(n.getTextContent().trim())) {
