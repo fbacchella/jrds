@@ -23,9 +23,8 @@ public class TestArgsBuilder {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        logger.setLevel(Level.ERROR);
-        Tools.setLevel(new String[] {"jrds"}, logger.getLevel());
-        Tools.prepareXml();
+        Tools.setLevel(logger, Level.ERROR, "jrds");
+        Tools.prepareXml(false);
     }
 
     @SuppressWarnings("unchecked")

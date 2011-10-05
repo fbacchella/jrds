@@ -32,9 +32,7 @@ public class UtilTest {
     static public void configure() throws IOException, ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml();
-        logger.setLevel(Level.TRACE);
-        Tools.setLevel(new String[] {"jrds.Util"}, logger.getLevel());
-
+        Tools.setLevel(logger, Level.TRACE, "jrds.Util");
     }
 
     @Test

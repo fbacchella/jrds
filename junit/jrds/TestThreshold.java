@@ -22,8 +22,7 @@ public class TestThreshold {
 	@BeforeClass
 	static public void configure() throws IOException  {
 		Tools.configure();
-		logger.setLevel(Level.ERROR);
-		Tools.setLevel(new String[] {"jrds.Probe", Threshold.class.getName()}, logger.getLevel());
+		Tools.setLevel(logger, Level.ERROR, "jrds.Probe", Threshold.class.getName());
 
 		File rrdFile = new File("tmp/fullmock.rrd");
 		if(rrdFile.exists())

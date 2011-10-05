@@ -13,9 +13,7 @@ public class TestHostsList {
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
-        logger.setLevel(Level.TRACE);
-        Tools.setLevel(new String[] {HostsList.class.getName()}, logger.getLevel());
-        System.setProperty("java.io.tmpdir",  "tmp");
+        Tools.setLevel(logger, Level.TRACE, HostsList.class.getName());
     }
 
     @Test
@@ -26,6 +24,7 @@ public class TestHostsList {
         Assert.assertEquals("First tab not found", pm.tabsList.get(0), hl.getFirstTab());
         Assert.assertEquals("Missing tabs", pm.tabsList.size() - optionalstabs.length, hl.getTabsId().size());
     }
+    
     @Test
     public void testOther() {
         PropertiesManager pm = Tools.getCleanPM();

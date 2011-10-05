@@ -43,8 +43,8 @@ public class TestGraphDescBuilder {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        logger.setLevel(Level.TRACE);
-        Tools.setLevel(new String[] {"jrds.GraphDesc", "jrds.Grap"}, logger.getLevel());
+        Tools.setLevel(logger, Level.TRACE, "jrds.GraphDesc", "jrds.Graph");
+        Tools.setLevel(Level.INFO,"jrds.factories.xml.CompiledXPath");
 
         Tools.prepareXml();
         PropertiesManager pm = new PropertiesManager();

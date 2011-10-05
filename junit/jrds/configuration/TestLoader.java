@@ -22,8 +22,7 @@ public class TestLoader {
 	@BeforeClass
 	static public void configure() throws ParserConfigurationException, IOException {
 		Tools.configure();
-		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"jrds"}, logger.getLevel());
+		Tools.setLevel(logger, Level.TRACE, "jrds");
 		Tools.prepareXml();
 	}
 

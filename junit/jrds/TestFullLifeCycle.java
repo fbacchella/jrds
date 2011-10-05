@@ -15,79 +15,81 @@ import jrds.mockobjects.Full;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestFullLifeCycle {
-	static final private Logger logger = Logger.getLogger(TestFullLifeCycle.class);
+    static final private Logger logger = Logger.getLogger(TestFullLifeCycle.class);
 
-	@BeforeClass
-	static public void configure() throws IOException {
-		Tools.configure();
-		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"jrds.Graph", "jrds.GraphNode"}, logger.getLevel());
-	}
+    @BeforeClass
+    static public void configure() throws IOException {
+        Tools.configure();
+        Tools.setLevel(logger, Level.TRACE, "jrds.Graph", "jrds.GraphNode");
+    }
 
-	@Test
-	public void create() throws IOException {
-		int i=0;
-		logger.debug(i++);
-		PropertiesManager pm = new PropertiesManager();
-		pm.setProperty("configdir", "tmp");
-		pm.setProperty("rrddir", "tmp");
-		pm.setProperty("logevel", logger.getLevel().toString());
-		pm.update();
-		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, null);
+    @AfterClass
+    static public void clean() {
+        new File("tmp/fullmock.rrd").delete();
+    }
 
-		File rrdFile = new File("tmp", "fullmock.rrd");
-		if(rrdFile.exists())
-			rrdFile.delete();
+    @Test
+    public void create() throws IOException {
+        PropertiesManager pm = new PropertiesManager();
+        pm.setProperty("configdir", "tmp");
+        pm.setProperty("rrddir", "tmp");
+        pm.setProperty("logevel", logger.getLevel().toString());
+        pm.update();
 
-		Probe<?,?> p = Full.create();
-		logger.debug("Created " + p);
-		long endSec = Full.fill(p);
-		logger.debug("fill time: " + endSec);
+        File rrdFile = new File("tmp", "fullmock.rrd");
+        if(rrdFile.exists())
+            rrdFile.delete();
 
-		logger.debug(p.getLastUpdate());
+        Probe<?,?> p = Full.create();
+        logger.debug("Created " + p);
+        long endSec = Full.fill(p);
+        logger.debug("fill time: " + endSec);
 
-		Date end = org.rrd4j.core.Util.getDate(endSec);
-		Calendar calBegin = Calendar.getInstance();
-		calBegin.setTime(end);
-		calBegin.add(Calendar.MONTH, -1);
-		Date begin = calBegin.getTime();
+        logger.debug(p.getLastUpdate());
 
-		end = jrds.Util.normalize(end, p.getStep());
+        Date end = org.rrd4j.core.Util.getDate(endSec);
+        Calendar calBegin = Calendar.getInstance();
+        calBegin.setTime(end);
+        calBegin.add(Calendar.MONTH, -1);
+        Date begin = calBegin.getTime();
 
-		Period pr = new Period();
-		pr.setEnd(end);
-		pr.setBegin(begin);
+        end = jrds.Util.normalize(end, p.getStep());
 
-		Graphics2D g2d = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
+        Period pr = new Period();
+        pr.setEnd(end);
+        pr.setBegin(begin);
 
-		GraphDesc gd = Full.getGd();
-		gd.initializeLimits(g2d);
-		int h = gd.getDimension().height;
-		int w = gd.getDimension().width;
-		logger.trace(h + " " + w);
+        Graphics2D g2d = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
 
-		GraphNode gn = new GraphNode(p, Full.getGd());
-		Graph g = new Graph(gn);
-		g.setPeriod(pr);
+        GraphDesc gd = Full.getGd();
+        gd.initializeLimits(g2d);
+        int h = gd.getDimension().height;
+        int w = gd.getDimension().width;
+        logger.trace(h + " " + w);
 
-		File outputFile =  new File("tmp", "fullmock.png");
-		OutputStream out = new FileOutputStream(outputFile);
-		g.writePng(out);
-		BufferedImage img = ImageIO.read(outputFile);
-		Assert.assertEquals(h, img.getHeight());
-		Assert.assertEquals(w, img.getWidth());
-		
-		logger.trace(h + " " + w);
+        GraphNode gn = new GraphNode(p, Full.getGd());
+        Graph g = new Graph(gn);
+        g.setPeriod(pr);
 
-		StoreOpener.stop();
+        File outputFile =  new File("tmp", "fullmock.png");
+        OutputStream out = new FileOutputStream(outputFile);
+        g.writePng(out);
+        BufferedImage img = ImageIO.read(outputFile);
+        Assert.assertEquals(h, img.getHeight());
+        Assert.assertEquals(w, img.getWidth());
 
-		Assert.assertTrue(rrdFile.exists());
-		Assert.assertTrue(rrdFile.length() > 0);
+        logger.trace(h + " " + w);
 
-	}
+        StoreOpener.stop();
+
+        Assert.assertTrue(rrdFile.exists());
+        Assert.assertTrue(rrdFile.length() > 0);
+
+    }
 }

@@ -36,133 +36,167 @@ import org.mortbay.jetty.testing.ServletTester;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.Text;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 final public class Tools {
-	public static DocumentBuilder dbuilder = null;
-	public static XPath xpather = null;
-	
-	public static class JrdsElement extends JrdsNode
-	{
-		Element e;
-		public JrdsElement(Document d) {
-			super(d.getDocumentElement());
-			e = d.getDocumentElement();
-		}
+    public static DocumentBuilder dbuilder = null;
+    public static XPath xpather = null;
 
-		public JrdsElement(Element e) {
-			super(e);
-			this.e = e;
-		}
+    public static class JrdsElement extends JrdsNode
+    {
+        Element e;
+        public JrdsElement(Document d) {
+            super(d.getDocumentElement());
+            e = d.getDocumentElement();
+        }
 
-		public JrdsElement(JrdsNode jn) {
-			super(jn.getParent());
-			this.e = (Element)jn.getParent();
-		}
+        public JrdsElement(Element e) {
+            super(e);
+            this.e = e;
+        }
 
-		public JrdsElement addElement(String tag, String... attrs) {
-			Element newelement = getOwnerDocument().createElement(tag);
-			appendChild(newelement);
-			for(String attr: attrs) {
-				int pos = attr.indexOf('=');
-				String key = attr.substring(0, pos);
-				String value = attr.substring(pos +  1);
-				newelement.setAttribute(key, value);
-			}
-			return new JrdsElement(newelement);
-		}
-	}
+        public JrdsElement(JrdsNode jn) {
+            super(jn.getParent());
+            this.e = (Element)jn.getParent();
+        }
 
-	static final Appender app = new WriterAppender() {
-		public void doAppend(LoggingEvent event) {
-			System.out.println(event.getLevel() + ": " + event.getMessage());
-		}
-	};
+        public JrdsElement addElement(String tag, String... attrs) {
+            Element newelement = getOwnerDocument().createElement(tag);
+            appendChild(newelement);
+            for(String attr: attrs) {
+                int pos = attr.indexOf('=');
+                String key = attr.substring(0, pos);
+                String value = attr.substring(pos +  1);
+                newelement.setAttribute(key, value);
+            }
+            return new JrdsElement(newelement);
+        }
+        public JrdsElement addTextNode(String value) {
+            Text textnode = getOwnerDocument().createTextNode(value);
+            appendChild(textnode);
+            return this;
+        }
+    }
 
-	static public void configure() throws IOException {
-		Locale.setDefault(new Locale("POSIX"));
-		System.getProperties().setProperty("java.awt.headless","true");
-		LogManager.getLoggerRepository().resetConfiguration();
-		jrds.JrdsLoggerConfiguration.initLog4J();
-		app.setName(jrds.JrdsLoggerConfiguration.APPENDER);
-		app.setLayout(new PatternLayout("[%d] %5p %c : %m%n"));
-		jrds.JrdsLoggerConfiguration.putAppender(app);
-	}
+    static final Appender app = new WriterAppender() {
+        public void doAppend(LoggingEvent event) {
+            System.out.println(event.getLevel() + ": " + event.getMessage());
+        }
+    };
 
-	static public void prepareXml() throws ParserConfigurationException {
-		DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
-		instance.setIgnoringComments(true);
-		instance.setValidating(true);
-		instance.setExpandEntityReferences(false);
-		dbuilder = instance.newDocumentBuilder();
-		dbuilder.setEntityResolver(new EntityResolver());
-		xpather = XPathFactory.newInstance().newXPath();
-	}
+    static public void configure() throws IOException {
+        Locale.setDefault(new Locale("POSIX"));
+        System.getProperties().setProperty("java.awt.headless","true");
+        System.setProperty("java.io.tmpdir",  "tmp");
+        LogManager.getLoggerRepository().resetConfiguration();
+        jrds.JrdsLoggerConfiguration.initLog4J();
+        app.setName(jrds.JrdsLoggerConfiguration.APPENDER);
+        app.setLayout(new PatternLayout("[%d] %5p %c : %m%n"));
+        jrds.JrdsLoggerConfiguration.putAppender(app);
+        StoreOpener.prepare("MEM");
+    }
 
-	static public void prepareXml(boolean validating) throws ParserConfigurationException {
-		DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
-		instance.setIgnoringComments(true);
-		instance.setValidating(validating);
-		instance.setExpandEntityReferences(false);
-		dbuilder = instance.newDocumentBuilder();
-		dbuilder.setEntityResolver(new EntityResolver());
-		xpather = XPathFactory.newInstance().newXPath();
-	}
+    static public void prepareXml() throws ParserConfigurationException {
+        DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
+        instance.setIgnoringComments(true);
+        instance.setValidating(true);
+        instance.setExpandEntityReferences(false);
+        dbuilder = instance.newDocumentBuilder();
+        dbuilder.setEntityResolver(new EntityResolver());
+        dbuilder.setErrorHandler(new ErrorHandler() {
+            public void error(SAXParseException exception) throws SAXException {
+                throw exception;
+            }
+            public void fatalError(SAXParseException exception) throws SAXException {
+                throw exception;
+            }
+            public void warning(SAXParseException exception) throws SAXException {
+                throw exception;
+            }
+        });
+        xpather = XPathFactory.newInstance().newXPath();
+    }
 
-	static public Document parseRessource(String name) throws Exception {
-		InputStream is = Tools.class.getResourceAsStream("/ressources/" + name);
-		return parseRessource(is);
-	}
+    static public void prepareXml(boolean validating) throws ParserConfigurationException {
+        DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
+        instance.setIgnoringComments(true);
+        instance.setValidating(validating);
+        instance.setExpandEntityReferences(false);
+        dbuilder = instance.newDocumentBuilder();
+        dbuilder.setEntityResolver(new EntityResolver());
+        if(validating)
+            dbuilder.setErrorHandler(new ErrorHandler() {
+                public void error(SAXParseException exception) throws SAXException {
+                    throw exception;
+                }
+                public void fatalError(SAXParseException exception) throws SAXException {
+                    throw exception;
+                }
+                public void warning(SAXParseException exception) throws SAXException {
+                    throw exception;
+                }
+            });
+        xpather = XPathFactory.newInstance().newXPath();
+    }
 
-	static public Document parseRessource(InputStream is) throws Exception {
-		return Tools.dbuilder.parse(is);
-	}
+    static public Document parseRessource(String name) throws Exception {
+        InputStream is = Tools.class.getResourceAsStream("/ressources/" + name);
+        return parseRessource(is);
+    }
 
-	static public Document parseString(String s) throws Exception { 
-		InputStream is = new ByteArrayInputStream(s.getBytes());
-		Document d = Tools.parseRessource(is);
-		return d;
-	}
-	
-	static public JrdsNode addElement(Node node, String element, String... attrs) throws Exception { 
-		return addElement(new JrdsNode(node), element, attrs);
-	}
+    static public Document parseRessource(InputStream is) throws Exception {
+        return Tools.dbuilder.parse(is);
+    }
 
-	static public JrdsNode addElement(Document d, String element, String... attrs) throws Exception { 
-		return addElement(new JrdsNode(d.getDocumentElement()), element, attrs);
-	}
+    static public Document parseString(String s) throws Exception { 
+        InputStream is = new ByteArrayInputStream(s.getBytes());
+        Document d = Tools.parseRessource(is);
+        return d;
+    }
 
-	static public JrdsNode addElement(JrdsNode node, String element, String... attrs) throws Exception { 
-		Element e = node.getOwnerDocument().createElement(element);
-		node.appendChild(e);
-		for(String attr: attrs) {
-			int pos = attr.indexOf('=');
-			String key = attr.substring(0, pos - 1);
-			String value = attr.substring(pos +  1);
-			e.setAttribute(key, value);
-		}
-		return new JrdsNode(e);
-	}
+    static public Node parseStringElement(String s) throws Exception { 
+        InputStream is = new ByteArrayInputStream(s.getBytes());
+        Document d = Tools.parseRessource(is);
+        //		while(d.hasChildNodes()) {
+        //			Node n = d.removeChild(d.getChildNodes().item(0));
+        //			if(n.getNodeType() == Node.ELEMENT_NODE)
+        //				return n;
+        //		}
+        return d.removeChild(d.getDocumentElement());
+    }
 
+    static public Node AdoptElementString(Node n, String s) throws Exception {
+        Node element = parseStringElement(s);
+        n.getOwnerDocument().adoptNode(element);
+        n.appendChild(element);
+        return element;
+    }
 
-	static public Node parseStringElement(String s) throws Exception { 
-		InputStream is = new ByteArrayInputStream(s.getBytes());
-		Document d = Tools.parseRessource(is);
-//		while(d.hasChildNodes()) {
-//			Node n = d.removeChild(d.getChildNodes().item(0));
-//			if(n.getNodeType() == Node.ELEMENT_NODE)
-//				return n;
-//		}
-		return d.removeChild(d.getDocumentElement());
-	}
-	
-	static public Node AdoptElementString(Node n, String s) throws Exception {
-		Node element = parseStringElement(s);
-		n.getOwnerDocument().adoptNode(element);
-		n.appendChild(element);
-		return element;
-	}
+    static public void setLevel(Logger logger, Level level, String... allLoggers) {
+        Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDER);
+        //The system property override the code log level
+        if(System.getProperty("jrds.testloglevel") != null){
+            System.err.println("testloglevel overridden");
+            level = Level.toLevel(System.getProperty("jrds.testloglevel"));
+        }
+        logger.setLevel(level);
+        for(String loggerName: allLoggers) {
+            Logger l = Logger.getLogger(loggerName);
+            l.setLevel(level);
+            if(l.getAppender(JrdsLoggerConfiguration.APPENDER) != null) {
+                l.addAppender(app);
+            }
+        }
+    }
 
     static public void setLevel(Level level, String... allLoggers) {
+        setLevel(allLoggers, level);
+    }
+
+    static public void setLevel(String[] allLoggers, Level level) {
         Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDER);
         for(String loggerName: allLoggers) {
             Logger l = Logger.getLogger(loggerName);
@@ -173,88 +207,77 @@ final public class Tools {
         }
     }
 
-    static public void setLevel(String[] allLoggers, Level level) {
-		Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDER);
-		for(String loggerName: allLoggers) {
-			Logger l = Logger.getLogger(loggerName);
-			l.setLevel(level);
-			if(l.getAppender(JrdsLoggerConfiguration.APPENDER) != null) {
-				l.addAppender(app);
-			}
-		}
-	}
+    static public Element appendElement(Node n, String name, Map<String, String> attributes) {
+        Document d = n.getOwnerDocument();
+        Element e = d.createElement(name);
+        if(attributes != null)
+            for(Map.Entry<String, String> a: attributes.entrySet()) {
+                e.setAttribute(a.getKey(), a.getValue());
+            }
+        n.appendChild(e);
+        return e;
+    }
 
-	static public Element appendElement(Node n, String name, Map<String, String> attributes) {
-		Document d = n.getOwnerDocument();
-		Element e = d.createElement(name);
-		if(attributes != null)
-			for(Map.Entry<String, String> a: attributes.entrySet()) {
-				e.setAttribute(a.getKey(), a.getValue());
-			}
-		n.appendChild(e);
-		return e;
-	}
-	
-	static public Node appendString(Node n, String xmlString) throws Exception {
-		Document d = parseString(xmlString);
-		
-		Element docElem = d.getDocumentElement();
-		Node newNode = n.getOwnerDocument().importNode(docElem, true);
-		n.appendChild(newNode);
+    static public Node appendString(Node n, String xmlString) throws Exception {
+        Document d = parseString(xmlString);
 
-		return newNode;
-	}
-	
-	static public void getServer(Map<String, String> properties) {
-		ServletTester tester=new ServletTester();
-		tester.setContextPath("/");
-		ServletContext sc =  tester.getContext().getServletContext();
-		
-		for(Map.Entry<String, String> e: properties.entrySet()) {
-			System.setProperty("jrds." + e.getKey(), e.getValue());
-		}
+        Element docElem = d.getDocumentElement();
+        Node newNode = n.getOwnerDocument().importNode(docElem, true);
+        n.appendChild(newNode);
 
-		Configuration c = new Configuration(sc);
-		sc.setAttribute(Configuration.class.getName(), c);
+        return newNode;
+    }
 
-		Properties sp = System.getProperties();
-		for(Object  key: sp.keySet()) {
-			if(key.toString().startsWith("jrds.")) {
-				sp.remove(key);
-			}
-		}
-	}
-	
-	static public URI pathToUrl(String pathname) {
+    static public void getServer(Map<String, String> properties) {
+        ServletTester tester=new ServletTester();
+        tester.setContextPath("/");
+        ServletContext sc =  tester.getContext().getServletContext();
+
+        for(Map.Entry<String, String> e: properties.entrySet()) {
+            System.setProperty("jrds." + e.getKey(), e.getValue());
+        }
+
+        Configuration c = new Configuration(sc);
+        sc.setAttribute(Configuration.class.getName(), c);
+
+        Properties sp = System.getProperties();
+        for(Object  key: sp.keySet()) {
+            if(key.toString().startsWith("jrds.")) {
+                sp.remove(key);
+            }
+        }
+    }
+
+    static public URI pathToUrl(String pathname) {
         File path = new File(pathname);
         return path.toURI();
-	}
-	
-	static public List<LoggingEvent> getLockChecker(String... loggers) {
-		final List<LoggingEvent> logs = new ArrayList<LoggingEvent>();
-		Appender ta = new AppenderSkeleton() {
-			@Override
-			protected void append(LoggingEvent arg0) {
-				logs.add(arg0);
-			}
-			public void close() {
-				logs.clear();
-			}
-			public boolean requiresLayout() {
-				return false;
-			}
-		};
+    }
 
-		for(String loggername: loggers) {
-			Logger logger = Logger.getLogger(loggername);
-			logger.addAppender(ta);
-		}
-		return logs;
-	}
-	
+    static public List<LoggingEvent> getLockChecker(String... loggers) {
+        final List<LoggingEvent> logs = new ArrayList<LoggingEvent>();
+        Appender ta = new AppenderSkeleton() {
+            @Override
+            protected void append(LoggingEvent arg0) {
+                logs.add(arg0);
+            }
+            public void close() {
+                logs.clear();
+            }
+            public boolean requiresLayout() {
+                return false;
+            }
+        };
+
+        for(String loggername: loggers) {
+            Logger logger = Logger.getLogger(loggername);
+            logger.addAppender(ta);
+        }
+        return logs;
+    }
+
     static private final String[] dirs = new String[] {"configdir", "rrddir", "tmpdir"};
     static private final Random r = new Random();
-	static public final PropertiesManager getCleanPM() {
+    static public final PropertiesManager getCleanPM() {
         File newtmpdir = new File(System.getProperty("java.io.tmpdir"), "jrds" + r.nextInt());;
         PropertiesManager pm = new PropertiesManager();
         Map<String, File> dirMap = new HashMap<String, File>(dirs.length);
@@ -265,5 +288,13 @@ final public class Tools {
         }
         pm.setProperty("autocreate", "true");
         return pm;
-	}
+    }
+
+    static public final void shortPM(PropertiesManager pm) {
+        pm.setProperty("configdir", "tmp/config");
+        pm.setProperty("rrddir", "tmp");
+        pm.setProperty("strictparsing", "true");
+        pm.update();
+        pm.libspath.clear();
+    }
 }

@@ -17,15 +17,14 @@ public class TestDtd {
     @BeforeClass static public void configure() throws Exception {
         Tools.configure();
         Tools.prepareXml();
-        logger.setLevel(Level.TRACE);
-        Tools.setLevel(new String[] {"jrds.factories.xml", "org.apache"}, logger.getLevel());
+        
+        Tools.setLevel(logger, Level.TRACE, "jrds.factories.xml", "org.apache");
     }
 
     @Test
     public void scanPaths() throws Exception {
         Loader l = new Loader();
 
-        //pm.join(new File("jrds.properties"));
         pm.libspath.add(Tools.pathToUrl("build/classes"));
         pm.update();
 

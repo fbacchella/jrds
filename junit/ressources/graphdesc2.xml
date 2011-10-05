@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
+<!DOCTYPE graph PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graph>
+    <name>mokegraph</name>
+    <graphName>mokegraphname</graphName>
+    <graphTitle>mokegraphtitle</graphTitle>
+    <unit>
+        <SI />
+    </unit>
+    <verticalLabel>verticallabel</verticalLabel>
+    <addpath>
+        <name>addname</name>
+        <path>
+            <host>pathost</host>
+            <probe>pathprobe</probe>
+            <dsName>pathname</dsName>
+        </path>
+        <color>red</color>
+    </addpath>
+    <tree tab="tab1">
+        <pathelement>HOST</pathelement>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>moke</pathstring>
+    </tree>
+    <tree tab="tab2">
+        <pathelement>SERVICES</pathelement>
+        <pathstring>moke</pathstring>
+        <pathelement>HOST</pathelement>
+    </tree>
+</graph>

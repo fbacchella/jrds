@@ -30,7 +30,7 @@
 		<graphType>line</graphType>
 		<legend>legend1</legend>
 	</addpath>
-	<tree>
+	<tree tab="bidule">
 		<pathstring>hosttree1</pathstring>
 		<pathstring>hosttree2</pathstring>
 	</tree>

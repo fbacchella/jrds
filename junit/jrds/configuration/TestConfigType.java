@@ -18,7 +18,7 @@ public class TestConfigType {
 
 	@BeforeClass static public void configure() throws ParserConfigurationException, IOException {
 		Tools.configure();
-		Tools.setLevel(new String[] {"jrds"}, logger.getLevel());
+		Tools.setLevel(logger, logger.getLevel(),"jrds");
 		Tools.prepareXml();
 	}
 	

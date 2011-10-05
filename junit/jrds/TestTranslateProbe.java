@@ -21,8 +21,7 @@ public class TestTranslateProbe {
     static public void configure() throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, Exception  {
         Tools.configure();
         Tools.prepareXml();
-        logger.setLevel(Level.ERROR);
-        Tools.setLevel(new String[] {"jrds.Probe", Threshold.class.getName()}, logger.getLevel());
+        Tools.setLevel(logger, Level.ERROR, "jrds.Probe", Threshold.class.getName());
 
         pd = jrds.configuration.GeneratorHelper.getProbeDesc(new JrdsNode(Tools.parseRessource("fulldesc.xml")));
 

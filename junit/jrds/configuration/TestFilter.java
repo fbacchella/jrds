@@ -3,7 +3,6 @@ package jrds.configuration;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Filter;
@@ -30,17 +29,13 @@ public class TestFilter {
 		"<name>filtername</name>" +
 		"</filter>";
 
-	static DocumentBuilder dbuilder;
-	static ConfigObjectFactory conf;
-	static PropertiesManager pm = new PropertiesManager();
+	static private ConfigObjectFactory conf;
+	static private PropertiesManager pm = new PropertiesManager();
 
 	@BeforeClass
 	static public void configure() throws ParserConfigurationException, IOException {
 		Tools.configure();
 		Tools.prepareXml(false);
-		Loader l = new Loader();
-		dbuilder = l.dbuilder;
-		l.importUrl(Tools.pathToUrl("desc"));
 
 		pm.setProperty("configdir", "tmp");
 		pm.setProperty("rrddir", "tmp");
@@ -48,13 +43,12 @@ public class TestFilter {
 		pm.update();
 
 		conf = new ConfigObjectFactory(pm);
-		conf.setLoader(l);
 		conf.setGraphDescMap();
 		conf.setProbeDescMap();
 
 		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"jrds.factories", "jrds.Filter", "jrds.FilterXml"}, logger.getLevel());
-		Tools.setLevel(new String[] {"jrds.factories.xml.CompiledXPath"}, Level.INFO);
+		Tools.setLevel(logger, Level.TRACE, "jrds.factories", "jrds.Filter", "jrds.FilterXml");
+		Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
 	}
 	
 	private Filter doFilter(Document d) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {

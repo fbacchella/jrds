@@ -22,8 +22,7 @@ public class TestGraphTree {
 	static public void configure() throws IOException, ParserConfigurationException {
 		Tools.configure();
 		Tools.prepareXml();
-		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"jrds.GraphTree"}, logger.getLevel());
+		Tools.setLevel(logger, Level.TRACE, "jrds.GraphTree");
 	}
 	
 	private List<String> doList(String... pathelems) {

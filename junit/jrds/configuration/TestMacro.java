@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Macro;
@@ -50,41 +49,24 @@ public class TestMacro {
                     "<macro name=\"macrodef\" />" +
                     "</host>";
 
-    static DocumentBuilder dbuilder;
-    static Loader l;
-    static {
-        try {
-            Tools.configure();
-            Tools.prepareXml(false);
-            l = new Loader();
-            dbuilder = l.dbuilder;        
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-    static ConfigObjectFactory conf;
-    static final PropertiesManager pm = new PropertiesManager();
+    static private ConfigObjectFactory conf;
+    static private final PropertiesManager pm = new PropertiesManager();
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
-        pm.setProperty("configdir", "tmp/config");
-        pm.setProperty("rrddir", "tmp");
-        pm.setProperty("strictparsing", "true");
-        pm.update();
-        pm.libspath.clear();
+        Tools.configure();
+        Tools.prepareXml(false);
+        Tools.shortPM(pm);
 
         conf = new ConfigObjectFactory(pm);
-        conf.setLoader(l);
         conf.setGraphDescMap();
         conf.setProbeDescMap();
 
-        logger.setLevel(Level.TRACE);
-        Tools.setLevel(logger.getLevel(), "jrds.factories");
-        Tools.setLevel(Level.TRACE, "jrds.starter.ChainedProperties");
-        Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
+        Tools.setLevel(logger, Level.TRACE, "jrds.factories", "jrds.starter.ChainedProperties");
+        Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
     }
 
-    static Macro doMacro(Document d, String name) {
+    static private Macro doMacro(Document d, String name) {
         DocumentFragment df = d.createDocumentFragment();
         df.appendChild(d.removeChild(d.getDocumentElement()));
 
@@ -94,7 +76,7 @@ public class TestMacro {
         return m;
     }
 
-    static HostBuilder getBuilder(Macro... macros) {
+    static private HostBuilder getBuilder(Macro... macros) {
         HostBuilder hb = new HostBuilder();
         hb.setPm(pm);
         Map<String, Macro> mmap = new HashMap<String, Macro>(macros.length);
@@ -146,10 +128,6 @@ public class TestMacro {
     @Test
     public void testMacroStarter() throws Exception {
         Document d = Tools.parseString(goodMacroXml);
-        //Tools.appendString(d.getDocumentElement(), "<snmp community=\"public\" version=\"2\" />");
-        //Tools.addElement(d, "snmp", "community=public", "version=2");
-        //Tools.JrdsElement je = new Tools.JrdsElement(d);
-        //je.addElement("snmp", "community=public", "version=2");
         new Tools.JrdsElement(d).addElement("snmp", "community=public", "version=2");
 
         Macro m = doMacro(d, "macrodef");
@@ -209,12 +187,10 @@ public class TestMacro {
     public void testMacroFillwithProps2() throws Exception {
         Document d = Tools.parseString(goodMacroXml);
         new Tools.JrdsElement(d).addElement("probe", "type=MacroProbe3").addElement("arg", "type=String", "value=${a}");
-        //Tools.appendString(Tools.appendString(d.getDocumentElement(), "<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
         Macro m = doMacro(d, "macrodef");
 
         Document hostdoc = Tools.parseString(goodHostXml);
         new Tools.JrdsElement(hostdoc).addElement("properties").addElement("entry", "key=a").setTextContent("bidule");
-        //Tools.appendString(Tools.appendString(hostdoc.getDocumentElement(), "<properties />"), "<entry key=\"a\" >bidule</entry>");
 
         HostBuilder hb = getBuilder(m);
         RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));

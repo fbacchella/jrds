@@ -19,8 +19,7 @@ public class JarUrlPlay {
 	@BeforeClass
 	static public void configure() throws IOException {
 		Tools.configure();
-		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {}, logger.getLevel());
+		Tools.setLevel(logger, Level.TRACE);
 	}
 
 	@Test

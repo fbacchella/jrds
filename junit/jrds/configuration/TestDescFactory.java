@@ -1,8 +1,6 @@
 package jrds.configuration;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -26,40 +24,14 @@ import org.w3c.dom.Document;
 public class TestDescFactory {
 	static final private Logger logger = Logger.getLogger(TestDescFactory.class);
 
-	static final String graphDescXml = 
-		"<graphdesc>" +
-		"<name>mokegraph</name>" +
-		"<graphName>mokegraphname</graphName>" +
-		"<graphTitle>mokegraphtitle</graphTitle>" +
-		"<unit><SI/></unit>" +
-		"<verticalLabel>verticallabel</verticalLabel>" +
-		"<add>" + 
-		"<name>addname</name>" +
-		"<color>red</color>" +
-		"<path><host>pathost</host><probe>pathprobe</probe><name>pathname</name></path>" + 
-		"</add>" +
-		"<hosttree>"  +
-		"<pathelement>HOST</pathelement>" +
-		"<pathelement>SERVICES</pathelement>" +
-		"<pathstring>moke</pathstring>" +
-		"</hosttree>" +
-		"<viewtree>" +
-		"<pathelement>SERVICES</pathelement>" +
-		"<pathstring>moke</pathstring>" +
-		"<pathelement>HOST</pathelement>" +
-		"</viewtree>" +
-		"</graphdesc>";
-
 	static Loader l;
 
 	@BeforeClass
 	static public void configure() throws ParserConfigurationException, IOException {
 		Tools.configure();
-		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"jrds.factories"}, logger.getLevel());
-		Tools.setLevel(new String[] {"jrds.factories.xml.CompiledXPath"}, Level.INFO);
+		Tools.setLevel(logger, Level.TRACE, "jrds.factories");
+		Tools.setLevel(Level.INFO,"jrds.factories.xml.CompiledXPath");
 		Tools.prepareXml();
-
 	}
 
 	@Test
@@ -82,8 +54,7 @@ public class TestDescFactory {
 
 	@Test
 	public void loadGraphDesc() throws Exception {
-		InputStream is = new ByteArrayInputStream(graphDescXml.getBytes());
-		Document d = Tools.parseRessource(is);
+        Document d = Tools.parseRessource("graphdesc2.xml");
 
 		GraphDescBuilder builder = new GraphDescBuilder();
         builder.setPm(new PropertiesManager());
