@@ -266,7 +266,6 @@
 		<dsType>counter</dsType>
 		<collect>/isc/bind/statistics/views/view[name='%1$s']/resstat[name='QryRTT1600+']/counter</collect>
 	</ds>
-
 	<graphs>
 		<name>BindCache</name>
 	</graphs>
