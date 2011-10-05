@@ -11,6 +11,7 @@
 	<property name="web.build" value="${build.home}/webapp"/>
 	<property name="compile.deprecation" value="yes"/>
 	<property name="testdir" value="tmp"/>
+	<property name="jrds.testloglevel" value="ERROR"/>
 	
 	<property file="local.properties" />
 	
