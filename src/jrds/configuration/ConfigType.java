@@ -1,87 +1,94 @@
 package jrds.configuration;
 
-import javax.xml.xpath.XPathExpression;
-
-import jrds.factories.xml.CompiledXPath;
+import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
 
 import org.w3c.dom.Node;
 
 public enum ConfigType {
     FILTER {
-        final XPathExpression xpath = CompiledXPath.get("/filter/name");
         public boolean memberof(Node d) {
             return matchDocElement(d, "filter");
         }
-        public XPathExpression getNameXpath() {
-            return xpath;
+        public String getName(JrdsDocument d) {
+            return getNameByElement(d);
         }
     },
     HOSTS {
-        final XPathExpression xpath = CompiledXPath.get("/host/@name");
         public boolean memberof(Node d) {
             return matchDocElement(d, "host");
         }
-        public XPathExpression getNameXpath() {
-            return xpath;
+        public String getName(JrdsDocument d) {
+            return getNameByAttribute(d);
         }
     },
     SUM {
-        final XPathExpression xpath = CompiledXPath.get("/sum/@name");
         public boolean memberof(Node d) {
             return matchDocElement(d, "sum");
         }
-        public XPathExpression getNameXpath() {
-            return xpath;
+        public String getName(JrdsDocument d) {
+            return getNameByAttribute(d);
         }
     },
     TAB {
-        final XPathExpression xpath = CompiledXPath.get("/tab/@name");
         public boolean memberof(Node d) {
             return matchDocElement(d, "tab");
         }
-        public XPathExpression getNameXpath() {
-            return xpath;
+        public String getName(JrdsDocument d) {
+            return d.getRootElement().getAttribute("name");
         }
     },
     MACRODEF {
-        final XPathExpression xpath = CompiledXPath.get("/macrodef/@name");
         public boolean memberof(Node d) {
             return matchDocElement(d, "macrodef");
         }
-        public XPathExpression getNameXpath() {
-            return xpath;
+        public String getName(JrdsDocument d) {
+            return d.getRootElement().getAttribute("name");
         }
     },
     GRAPH {
-        final XPathExpression xpath = CompiledXPath.get("/graph/name");
         public boolean memberof(Node d) {
             return matchDocElement(d, "graph");
         }
-        public XPathExpression getNameXpath() {
-            return xpath;
+        public String getName(JrdsDocument d) {
+            return getNameByElement(d);
         }
     },
     GRAPHDESC {
-        final XPathExpression xpath = CompiledXPath.get("/graphdesc/name");
         public boolean memberof(Node d) {
             return matchDocElement(d, "graphdesc");
         }
-        public XPathExpression getNameXpath() {
-            return xpath;
+        public String getName(JrdsDocument d) {
+            return getNameByElement(d);
         }
     },
     PROBEDESC {
-        final XPathExpression xpath = CompiledXPath.get("/probedesc/name");
         public boolean memberof(Node d) {
             return matchDocElement(d, "probedesc");
         }
-        public XPathExpression getNameXpath() {
-            return xpath;
+        public String getName(JrdsDocument d) {
+            return getNameByElement(d);
         }
     };
 
     public abstract boolean memberof(Node d);
-    public abstract XPathExpression getNameXpath();
+    public abstract String getName(JrdsDocument d);
+    
+    private static String getNameByAttribute(JrdsDocument d) {
+        String name = d.getRootElement().getAttribute("name");
+        if(name != null) {
+            return name.trim();
+        }
+        return null;
+    }
+
+    private static String getNameByElement(JrdsDocument d) {
+        JrdsElement nameElement = d.getRootElement().getElementbyName("name");
+        if(nameElement != null) {
+            return nameElement.getTextContent() != null ? nameElement.getTextContent().trim() : null;
+        }
+        return null;
+    }
 
     private static boolean matchDocElement(Node d, String rootElement) {
         String root = d.getFirstChild().getNodeName();

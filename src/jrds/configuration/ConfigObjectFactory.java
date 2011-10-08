@@ -71,11 +71,10 @@ public class ConfigObjectFactory {
         Map<String, BuildObject> objectMap = new HashMap<String, BuildObject>();
         for(JrdsDocument n: nodeMap.values()) {
             BuildObject o = null;
-            String name;
-            name = n.evaluate(ob.ct.getNameXpath());
+            String name = ob.ct.getName(n);
             try {
                 o = ob.build(n);
-                if(o != null) {
+                if(o != null && name != null) {
                     objectMap.put(name, o);
                 }
             } catch (InvocationTargetException e) {

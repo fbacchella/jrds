@@ -24,7 +24,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import jrds.Util;
 import jrds.factories.xml.EntityResolver;
 import jrds.factories.xml.JrdsDocument;
-import jrds.factories.xml.AbstractJrdsNode;
 
 import org.apache.log4j.Logger;
 import org.xml.sax.ErrorHandler;
@@ -178,10 +177,9 @@ class Loader {
 		for(ConfigType t: ConfigType.values()) {
 			if(t.memberof(d)) {
 				logger.trace(Util.delayedFormatString("Found a %s", t));
-				AbstractJrdsNode<?> n = d.getChild(t.getNameXpath());
+				String name = t.getName(d);
 				//We check the Name
-				if(n != null && ! "".equals(n.getTextContent().trim())) {
-					String name = n.getTextContent().trim();
+				if(name != null && ! "".equals(name)) {
 					Map<String, JrdsDocument> rep = repositories.get(t);
 					//We warn for dual inclusion, none is loaded, as we don't know the good one
 					if(rep.containsKey(name)) {
