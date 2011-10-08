@@ -23,7 +23,6 @@ import jrds.Util;
 import jrds.factories.ArgFactory;
 import jrds.factories.HostBuilderAgent;
 import jrds.factories.ProbeFactory;
-import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.factories.xml.JrdsNode;
@@ -174,7 +173,9 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                 logger.error("Invalid host configuration, collection " + name + " not found");
             }
         }
-        for(JrdsElement probeNode: fragment.iterate(CompiledXPath.get("probe | rrd"), JrdsElement.class)) {
+        for(JrdsElement probeNode: fragment.getChildElements()) {
+            if(! "probe".equals(probeNode.getNodeName()) && ! "rrd".equals(probeNode.getNodeName()) )
+                continue;
             try {
                 makeProbe(probeNode, host, ns);
             } catch (Exception e) {
