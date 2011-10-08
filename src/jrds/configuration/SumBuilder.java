@@ -3,7 +3,6 @@ package jrds.configuration;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.graphe.Sum;
@@ -41,7 +40,7 @@ public class SumBuilder extends ConfigObjectBuilder<Sum> {
                 elements.add(elemName);
             }
             Sum sp = new Sum(name, elements);
-            doACL(sp, n,  CompiledXPath.get("/sum/role"));
+            doACL(sp, n, root.getChildElementsByName("role"));
             return sp;
         }
         return null;

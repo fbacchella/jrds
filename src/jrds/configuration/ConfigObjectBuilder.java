@@ -10,13 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.xpath.XPathExpression;
-
 import jrds.PropertiesManager;
 import jrds.Util;
-import jrds.factories.NodeListIterator;
-import jrds.factories.xml.AbstractJrdsNode.FilterNode;
-import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.webapp.RolesACL;
@@ -25,7 +20,6 @@ import jrds.webapp.WithACL;
 import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
 import org.snmp4j.smi.OID;
-import org.w3c.dom.Node;
 
 abstract class ConfigObjectBuilder<BuildObject> {
     static final private Logger logger = Logger.getLogger(ConfigObjectBuilder.class);
@@ -64,15 +58,12 @@ abstract class ConfigObjectBuilder<BuildObject> {
      * @param n  The DOM tree where the xpath will look into
      * @param xpath where to found the roles
      */
-    protected void doACL(WithACL object, JrdsDocument n, XPathExpression xpath) {
+    protected void doACL(WithACL object, JrdsDocument n, List<JrdsElement> roleElements) {
         if(pm.security){
-            List<String> roles = n.doTreeList(xpath, new FilterNode<String>() {
-                @Override
-                public String filter(Node input) {
-                    return input.getTextContent();
-                }
+            List<String> roles = new ArrayList<String>(roleElements.size());
+            for(JrdsElement e: roleElements) {
+                roles.add(e.getTextContent());
             }
-                    );
             if(roles.size() > 0) {				
                 object.addACL(new RolesACL(new HashSet<String>(roles)));
                 object.addACL(pm.adminACL);

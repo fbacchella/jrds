@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import jrds.Filter;
 import jrds.FilterXml;
 import jrds.Util;
-import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 
@@ -43,7 +42,7 @@ public class FilterBuilder extends ConfigObjectBuilder<Filter> {
 	    setMethod(root.getElementbyName("path"),f, "addPath");
 	    setMethod(root.getElementbyName("tag"),f, "addTag");
 	    setMethod(root.getElementbyName("qualifiedname"), f, "addGraph");
-		doACL(f, n, CompiledXPath.get("/filter/role"));
+		doACL(f, n, root.getChildElementsByName("role"));
 		logger.trace(Util.delayedFormatString("Filter loaded: %s", f.getName()));
 		return f;
 	}

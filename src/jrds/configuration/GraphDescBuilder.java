@@ -53,7 +53,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
 		setMethod(subnode.getElementbyName("height"), gd, "setHeight", Integer.TYPE);
 		setMethod(subnode.getElementbyName("width"), gd, "setWidth", Integer.TYPE);
 
-		doACL(gd, n, CompiledXPath.get("/graph/role"));
+		doACL(gd, n, subnode.getChildElementsByName("role"));
 
 		//Vertical label should never be empty
 		if(gd.getVerticalLabel() == null)
