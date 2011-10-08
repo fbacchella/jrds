@@ -3,6 +3,7 @@ package jrds.factories.xml;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +19,8 @@ import org.w3c.dom.TypeInfo;
 public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
 
     private NamedNodeMap attrs = null;
+    private JrdsElement nextOfTag = null;
+    private Map<String, JrdsElement> firstChildbyTag = new HashMap<String, JrdsElement>();
 
     public JrdsElement(Element n) {
         super(n);
@@ -118,31 +121,57 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
 
     public JrdsElement getElementbyName(String name) {
         NodeList childs = getParent().getChildNodes();
-        if("".equals(name.trim()))
-            name = null;
+        if(name == null || "".equals(name.trim()))
+            return null;
+        if(firstChildbyTag.containsKey(name))
+            return firstChildbyTag.get(name);
         for(int i=0; i < childs.getLength(); i++) {
             Node n = childs.item(i);
             if(n.getNodeType() != Node.ELEMENT_NODE)
                 continue;
-            if(name != null && n.getNodeName().equals(name)) {
+            String nodeName = n.getNodeName();
+            if( ! firstChildbyTag.containsKey(nodeName))
+                firstChildbyTag.put(nodeName, (JrdsElement) AbstractJrdsNode.build(n));
+            if(n.getNodeName().equals(name)) {
                 return new JrdsElement((Element) n);
             }
         }
         return null;
     }
 
-    public List<JrdsElement> getChildElementsByName(String name) {
-        NodeList childs = getParent().getChildNodes();
-        List<JrdsElement> elems = new ArrayList<JrdsElement>(childs.getLength());
-        if("".equals(name.trim()))
-            return Collections.emptyList();
-        for(int i=0; i < childs.getLength(); i++) {
-            Node n = childs.item(i);
-            if(n.getNodeType() == Node.ELEMENT_NODE && n.getNodeName().equals(name)) {
-                elems.add(new JrdsElement((Element) n));
+    public Iterable<JrdsElement> getChildElementsByName(final String name) {
+        final Iterator<JrdsElement> iter =  new Iterator<JrdsElement>() {
+            JrdsElement curs = getElementbyName(name);
+            public boolean hasNext() {
+                if(curs == null)
+                    return false;
+                Node nextnode = curs.getNextSibling();
+                while(nextnode != null) {
+                    if(nextnode.getNodeType() == Node.ELEMENT_NODE) {
+                        if(nextnode.getNodeName().equals(name)) {
+                            curs.nextOfTag = AbstractJrdsNode.build(nextnode);
+                            break;
+                        }
+                    }
+                    nextnode = nextnode.getNextSibling();
+                }
+                return true;
             }
-        }
-        return elems;
+            public JrdsElement next() {
+                JrdsElement step = curs;
+                curs = curs.nextOfTag;
+                return step;
+            }
+            public void remove() {
+                throw new UnsupportedOperationException("Cannot remove in a JrdsNode");
+            }
+        };
+        return new Iterable<JrdsElement>() {
+            public Iterator<JrdsElement> iterator() {
+                return iter;
+            }
+        };
+
     }
 
     public List<JrdsElement> getChildElements() {

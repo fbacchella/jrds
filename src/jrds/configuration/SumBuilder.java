@@ -40,7 +40,7 @@ public class SumBuilder extends ConfigObjectBuilder<Sum> {
                 elements.add(elemName);
             }
             Sum sp = new Sum(name, elements);
-            doACL(sp, n, root.getChildElementsByName("role"));
+            doACL(sp, n, root);
             return sp;
         }
         return null;

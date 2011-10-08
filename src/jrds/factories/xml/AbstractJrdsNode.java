@@ -613,4 +613,12 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
         return parent.equals(otherNode.getParent());
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return parent.hashCode();
+    }
+
 }

@@ -29,16 +29,19 @@ abstract class ConfigObjectBuilder<BuildObject> {
 
     abstract BuildObject build(JrdsDocument n) throws InvocationTargetException;
 
-    public ConfigObjectBuilder(ConfigType ct) {
+    protected ConfigObjectBuilder(ConfigType ct) {
         this.ct = ct;
     }
 
     public Map<String, String> makeProperties(JrdsElement n) {
         if(n == null)
             return Collections.emptyMap();
+        JrdsElement propElem = n.getElementbyName("properties");
+        if(propElem == null)
+            return Collections.emptyMap();
+
         Map<String, String> props = new HashMap<String, String>();
-        for(JrdsElement e: n.getChildElementsByName("properties")) {
-            JrdsElement propNode = e.getElementbyName("entry");
+        for(JrdsElement propNode: propElem.getChildElementsByName("entry")) {
             String key = propNode.getAttribute("key");
             if(key != null) {
                 String value = propNode.getTextContent();
@@ -58,10 +61,10 @@ abstract class ConfigObjectBuilder<BuildObject> {
      * @param n  The DOM tree where the xpath will look into
      * @param xpath where to found the roles
      */
-    protected void doACL(WithACL object, JrdsDocument n, List<JrdsElement> roleElements) {
+    protected void doACL(WithACL object, JrdsDocument n, JrdsElement roleElements) {
         if(pm.security){
-            List<String> roles = new ArrayList<String>(roleElements.size());
-            for(JrdsElement e: roleElements) {
+            List<String> roles = new ArrayList<String>();
+            for(JrdsElement e: roleElements.getChildElementsByName("role")) {
                 roles.add(e.getTextContent());
             }
             if(roles.size() > 0) {				
