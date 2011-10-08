@@ -43,6 +43,9 @@ public class EntityResolver implements org.xml.sax.EntityResolver {
 		else if("-//W3C//ENTITIES Special for XHTML//EN".equals(publicId)) {
 			realSystemId =  getClass().getResource("/ressources/xhtml-special.ent");
 		}
+        else if("-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN".equals(publicId)) {
+            realSystemId =  getClass().getResource("/ressources/xhtml-special.ent");
+        }
 		else {
 			realSystemId = new URL(systemId);
 		}

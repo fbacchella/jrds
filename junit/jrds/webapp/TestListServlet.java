@@ -6,9 +6,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 import jrds.Tools;
-import jrds.factories.NodeListIterator;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
+import jrds.factories.xml.NodeListIterator;
 import jrds.standalone.JettyLogger;
 
 import org.apache.log4j.Level;
@@ -22,7 +22,7 @@ public class TestListServlet {
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
-        Tools.prepareXml();
+        Tools.prepareXml(false);
         System.setProperty("org.mortbay.log.class", jrds.standalone.JettyLogger.class.getName());
         Tools.setLevel(logger, Level.TRACE, JettyLogger.class.getName(), Status.class.getName());
 
