@@ -16,7 +16,8 @@ import org.w3c.dom.Text;
 import org.w3c.dom.TypeInfo;
 
 public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
-    NamedNodeMap attrs = null;
+
+    private NamedNodeMap attrs = null;
 
     public JrdsElement(Element n) {
         super(n);

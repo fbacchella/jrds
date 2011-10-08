@@ -11,7 +11,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
-import jrds.factories.NodeListIterator;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.DOMException;

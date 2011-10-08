@@ -1,4 +1,4 @@
-package jrds.factories;
+package jrds.factories.xml;
 
 import java.util.Iterator;
 
@@ -6,7 +6,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
-import jrds.factories.xml.AbstractJrdsNode;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
