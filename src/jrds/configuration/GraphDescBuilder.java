@@ -8,9 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.GraphDesc;
-import jrds.factories.NodeListIterator;
 import jrds.factories.xml.CompiledXPath;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
+import jrds.factories.xml.AbstractJrdsNode;
 
 import org.w3c.dom.Node;
 
@@ -23,7 +24,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
     }
     
 	@Override
-	GraphDesc build(JrdsNode n) throws InvocationTargetException {
+	GraphDesc build(JrdsDocument n) throws InvocationTargetException {
 		try {
 			return makeGraphDesc(n);
 		} catch (SecurityException e) {
@@ -38,21 +39,19 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
             throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
         }
 	}
-	public GraphDesc makeGraphDesc(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+	public GraphDesc makeGraphDesc(JrdsDocument n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 		GraphDesc gd = new GraphDesc();
 
-		JrdsNode subnode = n.getChild(CompiledXPath.get("(/graphdesc|/graph)"));
-
-		subnode.setMethod(gd, CompiledXPath.get("name"), "setName");
-		subnode.setMethod(gd, CompiledXPath.get("graphName"), "setGraphName");
-		subnode.setMethod(gd, CompiledXPath.get("verticalLabel"), "setVerticalLabel");
-		subnode.setMethod(gd, CompiledXPath.get("graphTitle"), "setGraphTitle");
-		subnode.setMethod(gd, CompiledXPath.get("upperLimit"), "setUpperLimit", Double.TYPE);
-		subnode.setMethod(gd, CompiledXPath.get("lowerLimit"), "setLowerLimit", Double.TYPE);
-		subnode.setMethod(gd, CompiledXPath.get("unit/base"), "setUnitExponent");
-        subnode.setMethod(gd, CompiledXPath.get("height"), "setHeight", Integer.TYPE);
-        subnode.setMethod(gd, CompiledXPath.get("width"), "setWidth", Integer.TYPE);
-
+		JrdsElement subnode = n.getRootElement();
+		setMethod(subnode.getElementbyName("name"), gd, "setName");
+		setMethod(subnode.getElementbyName("graphName"), gd, "setGraphName");
+		setMethod(subnode.getElementbyName("verticalLabel"), gd, "setVerticalLabel");
+		setMethod(subnode.getElementbyName("graphTitle"), gd, "setGraphTitle");
+		setMethod(subnode.getElementbyName("upperLimit"), gd, "setUpperLimit", Double.TYPE);
+		setMethod(subnode.getElementbyName("lowerLimit"), gd, "setLowerLimit", Double.TYPE);
+		setMethod(subnode, gd, "setUnitExponent", "unit", "base");
+		setMethod(subnode.getElementbyName("height"), gd, "setHeight", Integer.TYPE);
+		setMethod(subnode.getElementbyName("width"), gd, "setWidth", Integer.TYPE);
 
 		doACL(gd, n, CompiledXPath.get("/graph/role"));
 
@@ -66,13 +65,13 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
         subnode.callIfExist(gd, CompiledXPath.get("unit/SI"), "setSiUnit", Boolean.TYPE, true);
         subnode.callIfExist(gd, CompiledXPath.get("logarithmic"), "setLogarithmic", Boolean.TYPE, true);
 
-		for(Node addnode: subnode.iterate(CompiledXPath.get("add|addpath"))) {
+		for(JrdsElement addnode: subnode.iterate(CompiledXPath.get("add|addpath"), JrdsElement.class)) {
 			Map<String, String> elements = new HashMap<String, String>(10);
 			boolean withPath = false;
-			for(JrdsNode child: new NodeListIterator(addnode.getChildNodes())) {
+			for(JrdsElement child: addnode.getChildElements()) {
 				if("path".equals(child.getNodeName())) {
 					withPath = true;
-					for(JrdsNode hostchild: new NodeListIterator(child.getChildNodes())) {
+					for(JrdsElement hostchild: child.getChildElements()) {
 						String key = hostchild.getNodeName();
 						String value = hostchild.getTextContent();
 						if(value != null) {
@@ -114,7 +113,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
 			gd.add(addName, addrpn, addgraphType, addColor, addLegend, consFunc, reversed, percentile, host, probe, dsName);
 		}
 
-		JrdsNode.FilterNode<Object> viewFilter = new JrdsNode.FilterNode<Object>() {
+		AbstractJrdsNode.FilterNode<Object> viewFilter = new AbstractJrdsNode.FilterNode<Object>() {
 			@Override
 			public Object filter(Node input) {
 				Object value = input.getTextContent();

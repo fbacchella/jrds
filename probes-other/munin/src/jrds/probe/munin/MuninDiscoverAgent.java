@@ -17,7 +17,8 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 import jrds.factories.xml.CompiledXPath;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.AbstractJrdsNode;
+import jrds.factories.xml.JrdsDocument;
 import jrds.probe.IndexedProbe;
 import jrds.webapp.DiscoverAgent;
 
@@ -31,7 +32,7 @@ public class MuninDiscoverAgent extends DiscoverAgent {
     }
 
     @Override
-    public void discover(String hostName, Element hostElement, Map<String, JrdsNode> probdescs, HttpServletRequest request) {
+    public void discover(String hostName, Element hostElement, Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
         try {
             Document hostDom = hostElement.getOwnerDocument();
 
@@ -70,7 +71,7 @@ public class MuninDiscoverAgent extends DiscoverAgent {
 
             ClassLoader cl = getClass().getClassLoader();
             Class<?> muninClass = cl.loadClass("jrds.probe.munin.Munin");
-            for(JrdsNode e: probdescs.values()) {
+            for(AbstractJrdsNode e: probdescs.values()) {
                 String probe = e.evaluate(CompiledXPath.get("/probedesc/name"));
                 String probeClass = e.evaluate(CompiledXPath.get("/probedesc/probeClass"));
                 Class<?> c = cl.loadClass(probeClass);

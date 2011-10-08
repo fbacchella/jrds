@@ -7,8 +7,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Tools;
-import jrds.configuration.Loader;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
 import junit.framework.Assert;
 
 import org.apache.log4j.Level;
@@ -47,7 +46,7 @@ public class TestLoader {
 		Loader l = new Loader();
 
 		l.importStream(getClass().getResourceAsStream("/ressources/view1.xml"));
-		Map<String, JrdsNode> rep = l.getRepository(ConfigType.FILTER);
+		Map<String, JrdsDocument> rep = l.getRepository(ConfigType.FILTER);
 		logger.trace(rep);
 		Assert.assertTrue(rep.containsKey("Test view 1"));
 	}
@@ -57,7 +56,7 @@ public class TestLoader {
 		Loader l = new Loader();
 
 		l.importStream(getClass().getResourceAsStream("/ressources/fulldesc.xml"));
-		Map<String, JrdsNode> rep = l.getRepository(ConfigType.PROBEDESC);
+		Map<String, JrdsDocument> rep = l.getRepository(ConfigType.PROBEDESC);
 		logger.trace(rep);
 		Assert.assertTrue(rep.containsKey("name"));
 
@@ -68,7 +67,7 @@ public class TestLoader {
 		Loader l = new Loader();
 
 		l.importStream(getClass().getResourceAsStream("/ressources/customgraph.xml"));
-		Map<String, JrdsNode> rep = l.getRepository(ConfigType.GRAPH);
+		Map<String, JrdsDocument> rep = l.getRepository(ConfigType.GRAPH);
 		logger.trace(rep);
 		Assert.assertTrue(rep.containsKey("name"));
 	}
@@ -78,7 +77,7 @@ public class TestLoader {
 		Loader l = new Loader();
 
 		l.importStream(getClass().getResourceAsStream("/ressources/goodtab.xml"));
-		Map<String, JrdsNode> rep = l.getRepository(ConfigType.TAB);
+		Map<String, JrdsDocument> rep = l.getRepository(ConfigType.TAB);
 		logger.trace(rep);
 		Assert.assertTrue(rep.containsKey("goodtab"));
 	}

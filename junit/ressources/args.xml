@@ -3,11 +3,11 @@
 	<arg type="String" value="string" />
 	<arg type="URL" value="http://localhost/" />
 	<list>
-		<arg type="Integer" value="1" />
+		<arg type="Integer" value="2" />
 		<arg type="String" value="string" />
 		<arg type="URL" value="http://localhost/" />
 		<list>
-			<arg type="Integer" value="1" />
+			<arg type="Integer" value="3" />
 			<arg type="String" value="string" />
 			<arg type="URL" value="http://localhost/" />
 		</list>

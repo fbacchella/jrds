@@ -4,8 +4,7 @@ import java.util.Map;
 
 import jrds.RdsHost;
 import jrds.factories.HostBuilderAgent;
-import jrds.factories.xml.CompiledXPath;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsElement;
 import jrds.starter.StarterNode;
 
 import org.apache.log4j.Logger;
@@ -14,17 +13,16 @@ public class SnmpHostBuilderAgent extends HostBuilderAgent {
     static final private Logger logger = Logger.getLogger(SnmpHostBuilderAgent.class);
 
     @Override
-    public void buildStarters(JrdsNode fragment, StarterNode sn, RdsHost host) {
-        JrdsNode snmpNode = fragment.getChild(CompiledXPath.get("snmp"));
+    public void buildStarters(JrdsElement fragment, StarterNode sn, RdsHost host) {
+        JrdsElement snmpNode = fragment.getElementbyName("snmp");
         if(snmpNode != null) {
             logger.trace("found a snmp starter");
             SnmpStarter starter = snmpStarter(snmpNode, host);
             sn.registerStarter(starter);
         }
-        
     }
     
-    private SnmpStarter snmpStarter(JrdsNode d, RdsHost host) {
+    private SnmpStarter snmpStarter(JrdsElement d, RdsHost host) {
         SnmpStarter starter = new SnmpStarter();
         Map<String,String> attributes = d.attrMap();
         //Mandatory parameters
@@ -43,6 +41,5 @@ public class SnmpHostBuilderAgent extends HostBuilderAgent {
         starter.setHostname(hostName);
         return starter;
     }
-
 
 }

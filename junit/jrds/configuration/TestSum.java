@@ -8,7 +8,8 @@ import jrds.HostsList;
 import jrds.PropertiesManager;
 import jrds.RdsHost;
 import jrds.Tools;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
 import jrds.graphe.Sum;
 import jrds.mockobjects.MockGraph;
 import jrds.webapp.ACL;
@@ -52,12 +53,12 @@ public class TestSum {
         Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
     }
 
-    private Sum doSum(Document d, HostsList hl) throws Exception {
+    private Sum doSum(JrdsDocument d, HostsList hl) throws Exception {
         RdsHost host = new RdsHost("SumHost");
 
         SumBuilder sm = new SumBuilder();
         sm.setPm(pm);
-        Sum sp = sm.makeSum(new JrdsNode(d));
+        Sum sp = sm.makeSum(d);
         sp.configure(hl);
         sp.getProbe().setHost(host);
         hl.addHost(host);
@@ -75,8 +76,8 @@ public class TestSum {
 
     @Test
     public void testLoad() throws Exception {
-        Document d = Tools.parseString(goodSumSXml);
-        Tools.JrdsElement je = new Tools.JrdsElement(d);
+        JrdsDocument d = Tools.parseString(goodSumSXml);
+        JrdsElement je = d.getRootElement();
         je.addElement("element", "name=DummyHost/DummyProbe");
 
         HostsList hl = new HostsList();		
@@ -88,8 +89,8 @@ public class TestSum {
 
     @Test
     public void testRoles() throws Exception {
-        Document d = Tools.parseString(goodSumSXml);
-        Tools.JrdsElement je = new Tools.JrdsElement(d);
+        JrdsDocument d = Tools.parseString(goodSumSXml);
+        JrdsElement je = d.getRootElement();
         je.addElement("element", "name=DummyHost/DummyProbe");
         je.addElement("role").setTextContent("role1");
 

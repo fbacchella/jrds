@@ -10,7 +10,7 @@ import jrds.GraphNode;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.Tools;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
 import jrds.mockobjects.GetMoke;
 
 import org.apache.log4j.Level;
@@ -19,7 +19,6 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 public class TestDescFactory {
 	static final private Logger logger = Logger.getLogger(TestDescFactory.class);
@@ -36,10 +35,10 @@ public class TestDescFactory {
 
 	@Test
 	public void loadGraph()  throws Exception {
-		Document d = Tools.parseRessource("customgraph.xml");
+		JrdsDocument d = Tools.parseRessource("customgraph.xml");
 		GraphDescBuilder builder = new GraphDescBuilder();
 		builder.setPm(new PropertiesManager());
-		GraphDesc gd = (GraphDesc) builder.build(new JrdsNode(d));
+		GraphDesc gd = (GraphDesc) builder.build(d);
 
 		Assert.assertEquals("name", gd.getName());
 		Assert.assertEquals("graphName", gd.getGraphName());
@@ -54,11 +53,11 @@ public class TestDescFactory {
 
 	@Test
 	public void loadGraphDesc() throws Exception {
-        Document d = Tools.parseRessource("graphdesc2.xml");
+	    JrdsDocument d = Tools.parseRessource("graphdesc2.xml");
 
 		GraphDescBuilder builder = new GraphDescBuilder();
         builder.setPm(new PropertiesManager());
-		GraphDesc gd = (GraphDesc) builder.build(new JrdsNode(d));
+		GraphDesc gd = (GraphDesc) builder.build(d);
 
 		Assert.assertEquals("mokegraph", gd.getName());
 		Assert.assertEquals("mokegraphname", gd.getGraphName());
@@ -72,12 +71,12 @@ public class TestDescFactory {
 
 	@Test
 	public void loadProbeDesc() throws Exception {
-		Document d = Tools.parseRessource("fulldesc.xml");
+	    JrdsDocument d = Tools.parseRessource("fulldesc.xml");
 		PropertiesManager pm = new PropertiesManager();
 
 		ProbeDescBuilder builder = new ProbeDescBuilder();
         builder.setPm(new PropertiesManager());
-		ProbeDesc pd = builder.makeProbeDesc(new JrdsNode(d));
+		ProbeDesc pd = builder.makeProbeDesc(d);
 		Assert.assertEquals("name", pd.getName());
 		Assert.assertEquals("probename", pd.getProbeName());
 		Assert.assertEquals(jrds.mockobjects.MokeProbe.class, pd.getProbeClass());
@@ -106,14 +105,14 @@ public class TestDescFactory {
 	
 	@Test
 	public void loadBadProbeDesc() throws Exception {
-		Document d = Tools.parseRessource("baddesc.xml");
+	    JrdsDocument d = Tools.parseRessource("baddesc.xml");
 		PropertiesManager pm = new PropertiesManager();
 		
 		List<LoggingEvent> logged = Tools.getLockChecker("jrds.configuration.ConfigObjectBuilder");
 
 		ProbeDescBuilder builder = new ProbeDescBuilder();
         builder.setPm(pm);
-		ProbeDesc pd = builder.makeProbeDesc(new JrdsNode(d));
+		ProbeDesc pd = builder.makeProbeDesc(d);
 		logger.trace("Collect mapping: " + pd.getCollectMapping());
 		logger.trace("Collect oids: " + pd.getCollectOids());
 		logger.trace("Collect strings: " + pd.getCollectStrings());

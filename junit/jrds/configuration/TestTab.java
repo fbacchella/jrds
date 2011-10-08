@@ -8,14 +8,13 @@ import jrds.HostsList;
 import jrds.PropertiesManager;
 import jrds.Tab;
 import jrds.Tools;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 public class TestTab {
     static final private Logger logger = Logger.getLogger(TestTab.class);
@@ -43,12 +42,12 @@ public class TestTab {
 
     @Test
     public void testLoad() throws Exception {
-        Document d = Tools.parseRessource("goodtab.xml");
+        JrdsDocument d = Tools.parseRessource("goodtab.xml");
 
         TabBuilder tb = new TabBuilder();
         tb.setPm(pm);
 
-        Tab tab = tb.build(new JrdsNode(d));
+        Tab tab = tb.build(d);
         tab.setHostlist(hl);
         Assert.assertEquals("goodtab", tab.getName());
         Assert.assertNotNull("No graph tree generated", tab.getGraphTree());

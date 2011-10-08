@@ -12,9 +12,7 @@ import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
 import jrds.Tools;
-import jrds.configuration.GraphDescBuilder;
-import jrds.configuration.ConfigObjectBuilder;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
 import jrds.mockobjects.MokeProbe;
 
 import org.apache.log4j.Level;
@@ -34,10 +32,9 @@ public class TestGraphDescBuilder {
 
     static final ConfigObjectBuilder<Object> ob = new ConfigObjectBuilder<Object>(ConfigType.GRAPHDESC) {
         @Override
-        Object build(JrdsNode n) {
+        Object build(JrdsDocument n) {
             return null;
         }
-
     };
 
     @BeforeClass
@@ -56,7 +53,7 @@ public class TestGraphDescBuilder {
 
     @Test
     public void testGraphDesc() throws Exception {
-        JrdsNode d = new JrdsNode(Tools.parseRessource("graphdesc.xml"));
+        JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
         gdbuild.setPm(new PropertiesManager());
         GraphDesc gd = gdbuild.makeGraphDesc(d);
@@ -102,7 +99,7 @@ public class TestGraphDescBuilder {
 
     @Test
     public void testCustomGraph() throws Exception {
-        JrdsNode d = new JrdsNode(Tools.parseRessource("customgraph.xml"));
+        JrdsDocument d = Tools.parseRessource("customgraph.xml");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
         gdbuild.setPm(new PropertiesManager());
         GraphDesc gd = gdbuild.makeGraphDesc(d);

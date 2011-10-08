@@ -9,10 +9,9 @@ package jrds.factories;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import jrds.factories.xml.CompiledXPath;
-import jrds.factories.xml.JrdsNode;
+import jrds.Util;
+import jrds.factories.xml.JrdsElement;
 
 import org.apache.log4j.Logger;
 
@@ -27,24 +26,19 @@ public final class ArgFactory {
 
 	static private final String[] argPackages = new String[] {"java.lang.", "java.net.", "org.snmp4j.smi.", "java.io", ""};
 
-	public static List<Object> makeArgs(JrdsNode n) {
-		return makeArgs(n, new Object[]{});
-	}
-	
-	public static List<Object> makeArgs(JrdsNode n, Object... arguments) {
+	public static List<Object> makeArgs(JrdsElement n, Object... arguments) {
 		List<Object> argsList = new ArrayList<Object>(5);
-		for(JrdsNode argNode: n.iterate(CompiledXPath.get("arg"))) {
-			Map<String,String> argMap = argNode.attrMap();
-			String type = argMap.get("type");
-			String value = argMap.get("value");
+		for(JrdsElement argNode: n.getChildElementsByName("arg")) {
+			String type = argNode.getAttribute("type");
+			String value = argNode.getAttribute("value");
 			value = jrds.Util.parseTemplate(value, arguments);
 			Object o = ArgFactory.makeArg(type, value);
 			argsList.add(o);
 		}
-		for(JrdsNode argNode: n.iterate(CompiledXPath.get("list"))) {
+		for(JrdsElement argNode: n.getChildElementsByName("list")) {
 			argsList.add(makeArgs(argNode, arguments));
 		}
-		logger.trace("arg vector: " + argsList);
+		logger.trace(Util.delayedFormatString("arg vector: %s", argsList));
 		return argsList;
 	}
 

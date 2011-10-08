@@ -1,6 +1,8 @@
 package jrds.configuration;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,9 +15,10 @@ import javax.xml.xpath.XPathExpression;
 import jrds.PropertiesManager;
 import jrds.Util;
 import jrds.factories.NodeListIterator;
+import jrds.factories.xml.AbstractJrdsNode.FilterNode;
 import jrds.factories.xml.CompiledXPath;
-import jrds.factories.xml.JrdsNode;
-import jrds.factories.xml.JrdsNode.FilterNode;
+import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
 import jrds.webapp.RolesACL;
 import jrds.webapp.WithACL;
 
@@ -30,23 +33,20 @@ abstract class ConfigObjectBuilder<BuildObject> {
     PropertiesManager pm;
     public ConfigType ct;
 
-    abstract BuildObject build(JrdsNode n) throws InvocationTargetException;
+    abstract BuildObject build(JrdsDocument n) throws InvocationTargetException;
 
     public ConfigObjectBuilder(ConfigType ct) {
         this.ct = ct;
     }
 
-    public Map<String, String> makeProperties(JrdsNode n) {
+    public Map<String, String> makeProperties(JrdsElement n) {
         if(n == null)
             return Collections.emptyMap();
-        NodeListIterator propsNodes = n.iterate(CompiledXPath.get("properties/entry"));
-        if(propsNodes.getLength() == 0) {
-            return Collections.emptyMap();
-        }
         Map<String, String> props = new HashMap<String, String>();
-        for(JrdsNode propNode: propsNodes) {
-            String key = propNode.getAttributes("key");
-            if(key !=null) {
+        for(JrdsElement e: n.getChildElementsByName("properties")) {
+            JrdsElement propNode = e.getElementbyName("entry");
+            String key = propNode.getAttribute("key");
+            if(key != null) {
                 String value = propNode.getTextContent();
                 logger.trace(Util.delayedFormatString("Adding propertie %s=%s", key, value));
                 props.put(key, value);
@@ -64,7 +64,7 @@ abstract class ConfigObjectBuilder<BuildObject> {
      * @param n  The DOM tree where the xpath will look into
      * @param xpath where to found the roles
      */
-    protected void doACL(WithACL object, JrdsNode n, XPathExpression xpath) {
+    protected void doACL(WithACL object, JrdsDocument n, XPathExpression xpath) {
         if(pm.security){
             List<String> roles = n.doTreeList(xpath, new FilterNode<String>() {
                 @Override
@@ -89,13 +89,13 @@ abstract class ConfigObjectBuilder<BuildObject> {
      * @param node a DOM node wrapped in a JrdsNode
      * @return a list of Map describing the data sources
      */
-    protected List<Map<String, Object>> doDsList(String name, JrdsNode node) {
+    protected List<Map<String, Object>> doDsList(String name, JrdsElement node) {
         if(node == null)
             return Collections.emptyList();
         List<Map<String, Object>> dsList = new ArrayList<Map<String, Object>>();
-        for(JrdsNode dsNode: node.iterate(CompiledXPath.get("ds"))) {
+        for(JrdsElement dsNode: node.getChildElementsByName("ds")) {
             Map<String, Object> dsMap = new HashMap<String, Object>(4);
-            for(JrdsNode dsContent: dsNode.iterate(CompiledXPath.get("*"))) {
+            for(JrdsElement dsContent: dsNode.getChildElements()) {
                 String element = dsContent.getNodeName();
                 String textValue = dsContent.getTextContent().trim();
                 Object value = textValue;
@@ -133,5 +133,52 @@ abstract class ConfigObjectBuilder<BuildObject> {
      */
     void setPm(PropertiesManager pm) {
         this.pm = pm;
+    }
+
+    public boolean setMethod(JrdsElement parent, Object o, String method, String...path) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        if (parent == null)
+            return false;
+        JrdsElement current = parent;
+        for(String tag: path) {
+            current = current.getElementbyName(tag);
+            if(current == null)
+                return false;
+        }
+        return setMethod(current, o, method);
+    }
+
+    public boolean setMethod(JrdsElement e, Object o, String method) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        return setMethod(e, o, method, String.class);
+    }
+
+    public boolean setMethod(JrdsElement element, Object o, String method, Class<?> argType) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException{
+        if(element == null)
+            return false;
+        Constructor<?> c = null;
+        if(! argType.isPrimitive() ) {
+            c = argType.getConstructor(String.class);
+        }
+        else if(argType == Integer.TYPE) {
+            c = Integer.class.getConstructor(String.class);
+        }
+        else if(argType == Double.TYPE) {
+            c = Double.class.getConstructor(String.class);
+        }
+        else if(argType == Float.TYPE) {
+            c = Float.class.getConstructor(String.class);
+        }
+
+        String name = element.getTextContent().trim();
+        if(name != null) {
+            Method m;
+            try {
+                m = o.getClass().getMethod(method, argType);
+            } catch (NoSuchMethodException e) {
+                m = o.getClass().getMethod(method, Object.class);
+            }
+            m.invoke(o, c.newInstance(name));
+            return true;
+        }
+        return false;
     }
 }

@@ -6,7 +6,8 @@ import jrds.Filter;
 import jrds.FilterXml;
 import jrds.Util;
 import jrds.factories.xml.CompiledXPath;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
 
 import org.apache.log4j.Logger;
 
@@ -19,7 +20,7 @@ public class FilterBuilder extends ConfigObjectBuilder<Filter> {
     }
 
     @Override
-	Filter build(JrdsNode n) throws InvocationTargetException {
+	Filter build(JrdsDocument n) throws InvocationTargetException {
 		try {
 			return makeFilter(n);
 		} catch (SecurityException e) {
@@ -35,14 +36,15 @@ public class FilterBuilder extends ConfigObjectBuilder<Filter> {
         }
 	}
 
-	public Filter makeFilter(JrdsNode n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-		FilterXml f = new FilterXml();
-		n.setMethod(f, CompiledXPath.get("/filter/name"), "setName");
-		n.setMethod(f, CompiledXPath.get("/filter/path"), "addPath", false);
-		n.setMethod(f, CompiledXPath.get("/filter/tag"), "addTag", false);
-		n.setMethod(f, CompiledXPath.get("/filter/qualifiedname"), "addGraph", false);
+	public Filter makeFilter(JrdsDocument n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+	    JrdsElement root = n.getRootElement();
+	    FilterXml f = new FilterXml();
+	    setMethod(root.getElementbyName("name"), f, "setName");
+	    setMethod(root.getElementbyName("path"),f, "addPath");
+	    setMethod(root.getElementbyName("tag"),f, "addTag");
+	    setMethod(root.getElementbyName("qualifiedname"), f, "addGraph");
 		doACL(f, n, CompiledXPath.get("/filter/role"));
-		logger.trace(Util.delayedFormatString("Filter loaded: %", f.getName()));
+		logger.trace(Util.delayedFormatString("Filter loaded: %s", f.getName()));
 		return f;
 	}
 

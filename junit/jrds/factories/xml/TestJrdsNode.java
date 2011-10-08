@@ -32,14 +32,14 @@ public class TestJrdsNode {
 
     @Test
     public void testCheckPath() throws Exception {
-        JrdsNode d = new JrdsNode(Tools.parseRessource("graphdesc.xml"));
+        JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         Assert.assertTrue("path not found", d.checkPath(CompiledXPath.get("/graphdesc")));
         Assert.assertFalse("path not found", d.checkPath(CompiledXPath.get("/graph")));
     }
 
     @Test
     public void testCallIfExist() throws Exception {
-        JrdsNode d = new JrdsNode(Tools.parseRessource("graphdesc.xml"));
+        JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         String dummy = "";
         Class<?>[] argsTypes = {String.class};
         Object[] argsValues = {"toto"};
@@ -50,7 +50,7 @@ public class TestJrdsNode {
 
     @Test
     public void testSetMethod() throws Exception {
-        JrdsNode d = new JrdsNode(Tools.parseRessource("customgraph.xml"));
+        JrdsDocument d = Tools.parseRessource("customgraph.xml");
         StringBuffer dummy = new StringBuffer();
         d.setMethod(dummy, CompiledXPath.get("/graph/height"), "append", Integer.TYPE);
         Assert.assertEquals("path not found", dummy.toString(), "800");

@@ -21,7 +21,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
 import jrds.factories.xml.EntityResolver;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
 import jrds.webapp.Configuration;
 
 import org.apache.log4j.Appender;
@@ -36,7 +36,6 @@ import org.mortbay.jetty.testing.ServletTester;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.Text;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -44,42 +43,6 @@ import org.xml.sax.SAXParseException;
 final public class Tools {
     public static DocumentBuilder dbuilder = null;
     public static XPath xpather = null;
-
-    public static class JrdsElement extends JrdsNode
-    {
-        Element e;
-        public JrdsElement(Document d) {
-            super(d.getDocumentElement());
-            e = d.getDocumentElement();
-        }
-
-        public JrdsElement(Element e) {
-            super(e);
-            this.e = e;
-        }
-
-        public JrdsElement(JrdsNode jn) {
-            super(jn.getParent());
-            this.e = (Element)jn.getParent();
-        }
-
-        public JrdsElement addElement(String tag, String... attrs) {
-            Element newelement = getOwnerDocument().createElement(tag);
-            appendChild(newelement);
-            for(String attr: attrs) {
-                int pos = attr.indexOf('=');
-                String key = attr.substring(0, pos);
-                String value = attr.substring(pos +  1);
-                newelement.setAttribute(key, value);
-            }
-            return new JrdsElement(newelement);
-        }
-        public JrdsElement addTextNode(String value) {
-            Text textnode = getOwnerDocument().createTextNode(value);
-            appendChild(textnode);
-            return this;
-        }
-    }
 
     static final Appender app = new WriterAppender() {
         public void doAppend(LoggingEvent event) {
@@ -142,18 +105,18 @@ final public class Tools {
         xpather = XPathFactory.newInstance().newXPath();
     }
 
-    static public Document parseRessource(String name) throws Exception {
+    static public JrdsDocument parseRessource(String name) throws Exception {
         InputStream is = Tools.class.getResourceAsStream("/ressources/" + name);
         return parseRessource(is);
     }
 
-    static public Document parseRessource(InputStream is) throws Exception {
-        return Tools.dbuilder.parse(is);
+    static public JrdsDocument parseRessource(InputStream is) throws Exception {
+        return new JrdsDocument(Tools.dbuilder.parse(is));
     }
 
-    static public Document parseString(String s) throws Exception { 
+    static public JrdsDocument parseString(String s) throws Exception { 
         InputStream is = new ByteArrayInputStream(s.getBytes());
-        Document d = Tools.parseRessource(is);
+        JrdsDocument d = Tools.parseRessource(is);
         return d;
     }
 

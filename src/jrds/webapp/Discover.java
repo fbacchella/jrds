@@ -17,7 +17,7 @@ import jrds.PropertiesManager;
 import jrds.Util;
 import jrds.configuration.ConfigObjectFactory;
 import jrds.configuration.ConfigType;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -64,7 +64,7 @@ public class Discover extends JrdsServlet {
         }
     }
 
-    private Document generate(String hostname, Map<String, JrdsNode> probdescs, HttpServletRequest request) throws IOException, ParserConfigurationException {
+    private Document generate(String hostname, Map<String, JrdsDocument> probdescs, HttpServletRequest request) throws IOException, ParserConfigurationException {
 
         DocumentBuilder dbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document hostDom = dbuilder.newDocument();

@@ -23,7 +23,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Util;
 import jrds.factories.xml.EntityResolver;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.AbstractJrdsNode;
 
 import org.apache.log4j.Logger;
 import org.xml.sax.ErrorHandler;
@@ -42,7 +43,7 @@ class Loader {
 
 	DocumentBuilder dbuilder = null;
 
-	final private Map<ConfigType, Map<String, JrdsNode>> repositories = new HashMap<ConfigType, Map<String, JrdsNode>>(ConfigType.values().length);
+	final private Map<ConfigType, Map<String, JrdsDocument>> repositories = new HashMap<ConfigType, Map<String, JrdsDocument>>(ConfigType.values().length);
 
 	public Loader() throws ParserConfigurationException {
 		this(false);
@@ -67,19 +68,19 @@ class Loader {
 		});
 
 		for(ConfigType t: ConfigType.values()) {
-			repositories.put(t, new  HashMap<String, JrdsNode>());
+			repositories.put(t, new  HashMap<String, JrdsDocument>());
 		}
 	}
 
-	public Map<ConfigType, Map<String, JrdsNode>> getRepositories(){
+	public Map<ConfigType, Map<String, JrdsDocument>> getRepositories(){
 		return repositories;
 	}
 
-	public Map<String, JrdsNode> getRepository(ConfigType t) {
+	public Map<String, JrdsDocument> getRepository(ConfigType t) {
 		return repositories.get(t);
 	}
 
-    public void setRepository(ConfigType t, Map<String, JrdsNode> mapnodes) {
+    public void setRepository(ConfigType t, Map<String, JrdsDocument> mapnodes) {
         repositories.put(t, mapnodes);
     }
 
@@ -173,15 +174,15 @@ class Loader {
 
 	boolean importStream(InputStream xmlstream) throws SAXException, IOException {
 		boolean known = false;
-		JrdsNode d = new JrdsNode(dbuilder.parse(xmlstream));
+		JrdsDocument d = new JrdsDocument(dbuilder.parse(xmlstream));
 		for(ConfigType t: ConfigType.values()) {
 			if(t.memberof(d)) {
 				logger.trace(Util.delayedFormatString("Found a %s", t));
-				JrdsNode n = d.getChild(t.getNameXpath());
+				AbstractJrdsNode<?> n = d.getChild(t.getNameXpath());
 				//We check the Name
 				if(n != null && ! "".equals(n.getTextContent().trim())) {
 					String name = n.getTextContent().trim();
-					Map<String, JrdsNode> rep = repositories.get(t);
+					Map<String, JrdsDocument> rep = repositories.get(t);
 					//We warn for dual inclusion, none is loaded, as we don't know the good one
 					if(rep.containsKey(name)) {
 						logger.error("Dual definition of " + t + " with name " + name);

@@ -6,64 +6,61 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.AbstractJrdsNode;
 
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class NodeListIterator implements Iterable<JrdsNode>, NodeList {
+public class NodeListIterator<N extends AbstractJrdsNode<?>> implements Iterable<N>, NodeList {
 
-	final Node d;
-	final XPathExpression path;
-	final NodeList nl;
+    private final NodeList nl;
 
-	public NodeListIterator(Node d, XPathExpression path) {
-		this.d = d;
-		this.path = path;
-		try {
-			this.nl = (NodeList)path.evaluate(d, XPathConstants.NODESET);
-		} catch (XPathExpressionException e) {
-			throw new RuntimeException("XPathExpressionException",e);
-		}
-	}
+    public NodeListIterator(Node d, XPathExpression path) {
+        try {
+            this.nl = (NodeList)path.evaluate(d, XPathConstants.NODESET);
+        } catch (XPathExpressionException e) {
+            throw new RuntimeException("XPathExpressionException",e);
+        }
+    }
 
-	public NodeListIterator(NodeList nl) {
-		if(nl == null) {
-			throw new NullPointerException("Node list invalid");
-		}
-		this.nl = nl;
-		d = null;
-		path = null;
-	}
+    public NodeListIterator(NodeList nl) {
+        if(nl == null) {
+            throw new NullPointerException("Node list invalid");
+        }
+        this.nl = nl;
+    }
 
-	public Iterator<JrdsNode> iterator() {
-		Iterator<JrdsNode> iter  = new Iterator<JrdsNode>() {
-			int i = 0;
-			int last = nl.getLength();
-			public boolean hasNext() {
-				return i < last;
-			}
-			public JrdsNode next() {
-				return new JrdsNode(nl.item(i++));
-			}
-			public void remove() {
-				throw new UnsupportedOperationException("Cannot remove in a JrdsNode");
-			}
+    public Iterator<N> iterator() {
+        Iterator<N> iter  = new Iterator<N>() {
+            int i = 0;
+            int last = nl.getLength();
+            public boolean hasNext() {
+                return i < last;
+            }
+            public N next() {
+                return AbstractJrdsNode.build(nl.item(i++));
+            }
+            public void remove() {
+                throw new UnsupportedOperationException("Cannot remove in a JrdsNode");
+            }
 
-		};
-		return iter;
-	}
+        };
+        return iter;
+    }
 
-	public int getLength() {
-		if(nl==null)
-			return 0;
-		return nl.getLength();
-	}
+    public int getLength() {
+        if(nl==null)
+            return 0;
+        return nl.getLength();
+    }
 
-	public Node item(int index) {
-		if(nl==null)
-			return null;
-		return nl.item(index);
-	}
+    /* (non-Javadoc)
+     * @see org.w3c.dom.NodeList#item(int)
+     */
+    public N item(int index) {
+        if(nl==null)
+            return null;
+        return AbstractJrdsNode.build(nl.item(index));
+    }
 
 }

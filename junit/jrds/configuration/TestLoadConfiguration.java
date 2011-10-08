@@ -18,10 +18,9 @@ import jrds.PropertiesManager;
 import jrds.RdsHost;
 import jrds.Tab;
 import jrds.Tools;
-import jrds.Tools.JrdsElement;
 import jrds.factories.ProbeFactory;
-import jrds.factories.xml.CompiledXPath;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
 import jrds.mockobjects.MokeProbe;
 import jrds.mockobjects.MokeProbeFactory;
 import jrds.snmp.SnmpStarter;
@@ -33,18 +32,18 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 public class TestLoadConfiguration {
     static final private Logger logger = Logger.getLogger(TestLoadConfiguration.class);
 
     static final private String propertiesXmlString = 
-            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
-                    "<!DOCTYPE properties PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
+                    "<host>" +
                     "<properties>" +
                     "<entry key=\"a\">1</entry>" +
                     "<entry key=\"b\">2</entry>" +
-                    "</properties>";
+                    "</properties>" +
+                    "</host>";
 
     static final private String goodProbeXml2 = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
@@ -85,7 +84,7 @@ public class TestLoadConfiguration {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.prepareXml();
+        Tools.prepareXml(false);
 
         pm.setProperty("configdir", "tmp/conf");
         pm.setProperty("rrddir", "tmp");
@@ -99,13 +98,13 @@ public class TestLoadConfiguration {
         conf.setGraphDescMap();
         conf.setProbeDescMap();
 
-        Tools.setLevel(logger, Level.TRACE, "jrds.factories", "jrds.Probe.DummyProbe");
+        Tools.setLevel(logger, Level.TRACE, "jrds", "jrds.configuration", "jrds.Probe.DummyProbe", "jrds.snmp");
         Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
     }
 
     @Test
     public void testFilter() throws Exception {
-        JrdsNode d = new JrdsNode(Tools.parseRessource("view1.xml"));
+        JrdsDocument d = Tools.parseRessource("view1.xml");
 
         FilterBuilder fb = new FilterBuilder();
         fb.setPm(pm);
@@ -115,8 +114,7 @@ public class TestLoadConfiguration {
 
     @Test
     public void testProbe2() throws Exception {
-        Document d = Tools.parseString(goodProbeXml2);
-        JrdsNode pnode = new JrdsNode(d);
+        JrdsDocument d = Tools.parseString(goodProbeXml2);
 
         HostBuilder hb = new HostBuilder();
         hb.setProbeFactory(new MokeProbeFactory());
@@ -126,7 +124,7 @@ public class TestLoadConfiguration {
         host.setHostDir(pm.rrddir);
         host.setName("testProbe2");
 
-        Probe<?,?> p = hb.makeProbe(pnode.getChild(CompiledXPath.get("/probe")), host, new StarterNode() {});
+        Probe<?,?> p = hb.makeProbe(d.getRootElement(), host, new StarterNode() {});
         jrds.Util.serialize(p.dumpAsXml(), System.out, null, null);
         Assert.assertNotNull(p);
         Assert.assertEquals(host.getName() + "/" + p.getName() , p.toString());
@@ -134,8 +132,7 @@ public class TestLoadConfiguration {
 
     @Test
     public void testDsreplace() throws Exception {
-        JrdsNode d = new JrdsNode(Tools.parseRessource("dsoverride.xml"));
-        JrdsNode pnode = new JrdsNode(d);
+        JrdsDocument d = Tools.parseRessource("dsoverride.xml");
 
         HostBuilder hb = new HostBuilder();
         ProbeFactory pf =  new MokeProbeFactory();
@@ -146,7 +143,7 @@ public class TestLoadConfiguration {
         host.setHostDir(pm.rrddir);
         host.setName("testDsreplace");
 
-        Probe<?,?> p = hb.makeProbe(pnode.getChild(CompiledXPath.get("/host/probe")), host, new StarterNode() {});
+        Probe<?,?> p = hb.makeProbe(d.getRootElement().getElementbyName("probe"), host, new StarterNode() {});
         ProbeDesc pd = p.getPd();
         Assert.assertNotNull(pd);
         Assert.assertEquals(1 , pd.getSize());
@@ -156,12 +153,11 @@ public class TestLoadConfiguration {
 
     @Test
     public void testMacroLoad() throws Exception {
-        Document d = Tools.parseString(goodMacroXml);
+        JrdsDocument d = Tools.parseString(goodMacroXml);
 
         MacroBuilder b = new MacroBuilder();
-        JrdsNode jn = new JrdsNode(d);
 
-        Macro m = b.makeMacro(jn);
+        Macro m = b.makeMacro(d);
         int macroProbesNumber = m.getDf().getChildNodes().getLength();
         Assert.assertEquals("macrodef", m.getName());
         Assert.assertEquals("Macro$macrodef", m.toString());
@@ -171,20 +167,19 @@ public class TestLoadConfiguration {
 
     @Test
     public void testMacroFill() throws Exception {
-        Document d = Tools.parseString(goodMacroXml);
+        JrdsDocument d = Tools.parseString(goodMacroXml);
 
         MacroBuilder b = new MacroBuilder();
-        JrdsNode jn = new JrdsNode(d);
 
-        Macro m = b.makeMacro(jn);
+        Macro m = b.makeMacro(d);
 
         Map<String, Macro> macroMap = new HashMap<String, Macro>();
         macroMap.put(m.getName(), m);
 
-        Document hostdoc = Tools.parseString(goodHostXml);
+        JrdsDocument hostdoc = Tools.parseString(goodHostXml);
         hostdoc.setDocumentURI("-//jrds//DTD Graph Description//EN");
 
-        new Tools.JrdsElement(hostdoc).addElement("macro", "name=macrodef");
+        hostdoc.getRootElement().addElement("macro", "name=macrodef");
         jrds.Util.serialize(hostdoc, System.out, null, null);
 
         HostBuilder hb = new HostBuilder();
@@ -192,7 +187,7 @@ public class TestLoadConfiguration {
         hb.setMacros(macroMap);
         hb.setProbeFactory(new MokeProbeFactory());
 
-        RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
+        RdsHost host = hb.makeRdsHost(hostdoc);
 
         logger.debug("probes:" + host.getProbes());
         Collection<Probe<?,?>> probes = host.getProbes();
@@ -206,50 +201,48 @@ public class TestLoadConfiguration {
 
     @Test
     public void testRecursiveMacro() throws Exception {
-        Document d = Tools.parseString(goodMacroXml);
+        JrdsDocument d = Tools.parseString(goodMacroXml);
         String tagname = "mytag";
 
-        JrdsElement je = new Tools.JrdsElement(d);
-        je.addElement("tag").addTextNode(tagname);
-        je.addElement("snmp", "community=public", "version=2");
+        JrdsElement root = d.getRootElement();
+        root.addElement("tag").addTextNode(tagname);
+        root.addElement("snmp", "community=public", "version=2");
 
         MacroBuilder b = new MacroBuilder();
-        JrdsNode jn = new JrdsNode(d);
 
-        Macro m = b.makeMacro(jn);
+        Macro m = b.makeMacro(d);
 
         Map<String, Macro> macroMap = new HashMap<String, Macro>();
         macroMap.put(m.getName(), m);
 
-        Document hostdoc = Tools.parseString(goodHostXml);
-
-        new Tools.JrdsElement(hostdoc).addElement("macro", "name=macrodef");
+        JrdsDocument hostdoc = Tools.parseString(goodHostXml);
+        hostdoc.getRootElement().addElement("macro", "name=macrodef");
 
         HostBuilder hb = new HostBuilder();
         hb.setPm(pm);
         hb.setMacros(macroMap);
         hb.setProbeFactory(new MokeProbeFactory());
 
-        RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
+        RdsHost host = hb.makeRdsHost(hostdoc);
+        logger.trace("dns name: " + host.getName());
         Assert.assertTrue("tag not found", host.getTags().contains(tagname));
         Assert.assertEquals("SNMP starter not found", "snmp:udp://myhost:161", host.find(SnmpStarter.class).toString());
     }
 
     @Test
     public void testMacroFillwithProps() throws Exception {
-        Document d = Tools.parseString(goodMacroXml);
+        JrdsDocument d = Tools.parseString(goodMacroXml);
 
         MacroBuilder b = new MacroBuilder();
-        JrdsNode jn = new JrdsNode(d);
 
-        Macro m = b.makeMacro(jn);
+        Macro m = b.makeMacro(d);
 
         Map<String, Macro> macroMap = new HashMap<String, Macro>();
         macroMap.put(m.getName(), m);
 
-        Document hostdoc = Tools.parseString(goodHostXml);
+        JrdsDocument hostdoc = Tools.parseString(goodHostXml);
 
-        JrdsElement je = new Tools.JrdsElement(hostdoc);
+        JrdsElement je = hostdoc.getRootElement();
         je.addElement("macro", "name=macrodef");
         je.addElement("properties").
         addElement("entry", "key=a").addTextNode("bidule");
@@ -259,7 +252,7 @@ public class TestLoadConfiguration {
         hb.setMacros(macroMap);
         hb.setProbeFactory(new MokeProbeFactory());
 
-        RdsHost host = hb.makeRdsHost(new JrdsNode(hostdoc));
+        RdsHost host = hb.makeRdsHost(hostdoc);
 
         Collection<Probe<?,?>> probes = host.getProbes();
         boolean found = false;
@@ -275,15 +268,15 @@ public class TestLoadConfiguration {
 
     @Test
     public void testHost() throws Exception {
-        JrdsNode hostNode = new JrdsNode(Tools.parseRessource("goodhost1.xml"));
+        JrdsDocument hostNode = Tools.parseRessource("goodhost1.xml");
 
         String tagname = "mytag";
 
-        JrdsElement je = new Tools.JrdsElement(hostNode.getChild(CompiledXPath.get("/host")));
+        jrds.factories.xml.JrdsElement je = hostNode.getRootElement();
         je.addElement("tag").addTextNode(tagname);
         je.addElement("snmp", "community=public", "version=2");
 
-        Map<String, JrdsNode> hostDescMap = new HashMap<String, JrdsNode>();
+        Map<String, JrdsDocument> hostDescMap = new HashMap<String, JrdsDocument>();
         hostDescMap.put("name", hostNode);
         conf.getLoader().setRepository(ConfigType.HOSTS, hostDescMap);
         Map<String, RdsHost> hostMap = conf.setHostMap();
@@ -301,12 +294,12 @@ public class TestLoadConfiguration {
 
     @Test
     public void testProperties() throws Exception {
-        JrdsNode pnode = new JrdsNode(Tools.parseString(propertiesXmlString));
+        JrdsDocument pnode = Tools.parseString(propertiesXmlString);
 
         HostBuilder hb = new HostBuilder();
         hb.setPm(pm);
 
-        Map<String, String> props = hb.makeProperties(pnode);
+        Map<String, String> props = hb.makeProperties(pnode.getRootElement());
         Assert.assertEquals(2, props.size());
         Assert.assertNotNull(props.get("a"));
         Assert.assertNotNull(props.get("b"));
@@ -314,7 +307,7 @@ public class TestLoadConfiguration {
 
     @Test
     public void testTab() throws Exception {
-        JrdsNode tabNode = new JrdsNode(Tools.parseRessource("goodtab.xml"));
+        JrdsDocument tabNode = Tools.parseRessource("goodtab.xml");
 
         TabBuilder tb = new TabBuilder();
         Tab tab = tb.build(tabNode);

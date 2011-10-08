@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-import jrds.factories.xml.JrdsNode;
 import jrds.mockobjects.MokeProbe;
 import jrds.thresholds.Threshold;
 
@@ -23,7 +22,7 @@ public class TestTranslateProbe {
         Tools.prepareXml();
         Tools.setLevel(logger, Level.ERROR, "jrds.Probe", Threshold.class.getName());
 
-        pd = jrds.configuration.GeneratorHelper.getProbeDesc(new JrdsNode(Tools.parseRessource("fulldesc.xml")));
+        pd = jrds.configuration.GeneratorHelper.getProbeDesc(Tools.parseRessource("fulldesc.xml"));
 
     }
 

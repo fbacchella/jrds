@@ -5,7 +5,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -55,7 +55,7 @@ public abstract class DiscoverAgent {
         namedLogger = Logger.getLogger("jrds.DiscoverAgent." + name);
     }
 
-    public abstract void discover(String hostname, Element hostElement, Map<String, JrdsNode> probdescs, HttpServletRequest request);
+    public abstract void discover(String hostname, Element hostElement, Map<String, JrdsDocument> probdescs, HttpServletRequest request);
 
     public abstract List<FieldInfo> getFields();
 

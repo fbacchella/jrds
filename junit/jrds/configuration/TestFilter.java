@@ -8,7 +8,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import jrds.Filter;
 import jrds.PropertiesManager;
 import jrds.Tools;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
 import junit.framework.Assert;
@@ -17,7 +18,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 public class TestFilter {
 	static final private Logger logger = Logger.getLogger(TestSum.class);
@@ -51,18 +51,18 @@ public class TestFilter {
 		Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
 	}
 	
-	private Filter doFilter(Document d) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+	private Filter doFilter(JrdsDocument d) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 		FilterBuilder sm = new FilterBuilder();
 		sm.setPm(pm);
-		Filter sp = sm.makeFilter(new JrdsNode(d));
+		Filter sp = sm.makeFilter(d);
 		
 		return sp;
 	}
 	
 	@Test
 	public void testLoad() throws Exception {
-		Document d = Tools.parseString(goodFilterXml);
-		Tools.JrdsElement je = new Tools.JrdsElement(d);
+		JrdsDocument d = Tools.parseString(goodFilterXml);
+		JrdsElement je = d.getRootElement();
 		je.addElement("path").setTextContent("^.*$");
 		Filter f = doFilter(d);
 		
@@ -71,8 +71,8 @@ public class TestFilter {
 
 	@Test
 	public void testACL() throws Exception {
-		Document d = Tools.parseString(goodFilterXml);
-		Tools.JrdsElement je = new Tools.JrdsElement(d);
+	    JrdsDocument d = Tools.parseString(goodFilterXml);
+		JrdsElement je = d.getRootElement();
 		je.addElement("role").setTextContent("role1");
 		je.addElement("path").setTextContent("^.*$");
 		Filter f = doFilter(d);

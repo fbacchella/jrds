@@ -11,7 +11,6 @@ import javax.xml.xpath.XPathFactory;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.Tools;
-import jrds.factories.xml.JrdsNode;
 import jrds.starter.XmlProvider;
 
 import org.apache.log4j.Level;
@@ -33,7 +32,7 @@ public class XmlProbeTest {
 		Tools.setLevel(new String[] {"jrds.Probe.HttpXml", "jrds.Probe.HttpProbe", "jrds.starter.XmlProvider"}, logger.getLevel());
 		Tools.prepareXml(false);
 		
-		pd = jrds.configuration.GeneratorHelper.getProbeDesc(new JrdsNode(Tools.parseRessource("httpxmlprobedesc.xml")));
+		pd = jrds.configuration.GeneratorHelper.getProbeDesc(Tools.parseRessource("httpxmlprobedesc.xml"));
 	}
 
 	@Test

@@ -8,14 +8,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Tools;
 import jrds.factories.ArgFactory;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
 import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 public class TestArgsBuilder {
     static final private Logger logger = Logger.getLogger(TestArgsBuilder.class);
@@ -23,15 +22,15 @@ public class TestArgsBuilder {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.ERROR, "jrds");
+        Tools.setLevel(logger, Level.TRACE, "jrds.factories");
         Tools.prepareXml(false);
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void test1() throws Exception {
-        Document d = Tools.parseRessource("args.xml");
-        List<Object> o = ArgFactory.makeArgs(new JrdsNode(d.getFirstChild()));
+        JrdsDocument d = Tools.parseRessource("args.xml");
+        List<Object> o = ArgFactory.makeArgs(d.getRootElement());
         Assert.assertEquals(1, o.get(0));
         Assert.assertEquals("string", o.get(1));
         Assert.assertEquals(new URL("http://localhost/"), o.get(2));

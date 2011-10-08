@@ -10,7 +10,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
 import jrds.starter.Starter;
 import jrds.webapp.DiscoverAgent;
 
@@ -26,7 +26,7 @@ public @interface ProbeMeta {
 
         @Override
         public void discover(String hostname, Element hostElement,
-                Map<String,JrdsNode> probdescs, HttpServletRequest request) {
+                Map<String,JrdsDocument> probdescs, HttpServletRequest request) {
         }
 
         @Override

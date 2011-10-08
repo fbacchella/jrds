@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 
 import jrds.factories.xml.CompiledXPath;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
 import jrds.webapp.DiscoverAgent;
 
 import org.apache.log4j.Level;
@@ -33,7 +33,7 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
 
     @Override
     public void discover(String hostname, Element hostElement,
-            Map<String, JrdsNode> probdescs, HttpServletRequest request) {
+            Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
         int port = jrds.Util.parseStringNumber(request.getParameter("discoverJKStatPort"), new Integer(KstatConnection.DEFAULTPORT));
         try {
             String hostName = hostname;
@@ -76,7 +76,7 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
                     byTriplet.remove(diskKstat.getTriplet());
                 }
             }
-            for(JrdsNode e: probdescs.values()) {
+            for(JrdsDocument e: probdescs.values()) {
                 String probe = e.evaluate(CompiledXPath.get("/probedesc/name"));
                 String probeClass = e.evaluate(CompiledXPath.get("/probedesc/probeClass"));
                 Class<?> c = cl.loadClass(probeClass);

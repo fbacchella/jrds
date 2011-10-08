@@ -16,7 +16,7 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.Tab;
 import jrds.factories.ProbeFactory;
-import jrds.factories.xml.JrdsNode;
+import jrds.factories.xml.JrdsDocument;
 import jrds.graphe.Sum;
 
 import org.apache.log4j.Logger;
@@ -63,13 +63,13 @@ public class ConfigObjectFactory {
         load.importUrl(ressourceUrl);
     }
 
-    public Map<String, JrdsNode> getNodeMap(ConfigType ct) {
+    public Map<String, JrdsDocument> getNodeMap(ConfigType ct) {
         return load.getRepository(ct);
     }
 
-    public <BuildObject> Map<String, BuildObject> getObjectMap(ConfigObjectBuilder<BuildObject> ob, Map<String, JrdsNode> nodeMap) {
+    public <BuildObject> Map<String, BuildObject> getObjectMap(ConfigObjectBuilder<BuildObject> ob, Map<String, JrdsDocument> nodeMap) {
         Map<String, BuildObject> objectMap = new HashMap<String, BuildObject>();
-        for(JrdsNode n: nodeMap.values()) {
+        for(JrdsDocument n: nodeMap.values()) {
             BuildObject o = null;
             String name;
             name = n.evaluate(ob.ct.getNameXpath());
@@ -86,14 +86,14 @@ public class ConfigObjectFactory {
     }
 
     public Map<String, Macro> setMacroMap() {
-        Map<String, JrdsNode> nodemap = load.getRepository(ConfigType.MACRODEF);
+        Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.MACRODEF);
         macrosmap = getObjectMap(new MacroBuilder(), nodemap);
         logger.debug(jrds.Util.delayedFormatString("Macro configured: %s", macrosmap.keySet()));
         return macrosmap;
     }
 
     public Map<String, GraphDesc> setGrapMap() {
-        Map<String, JrdsNode> nodemap = load.getRepository(ConfigType.GRAPH);
+        Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.GRAPH);
         GraphDescBuilder ob = new GraphDescBuilder();
         ob.setPm(pm);
         Map<String, GraphDesc> graphsMap = getObjectMap(ob, nodemap);
@@ -102,7 +102,7 @@ public class ConfigObjectFactory {
     }
 
     public Map<String, GraphDesc> setGraphDescMap() {
-        Map<String, JrdsNode> nodemap = load.getRepository(ConfigType.GRAPHDESC);
+        Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.GRAPHDESC);
         GraphDescBuilder ob = new GraphDescBuilder();
         ob.setPm(pm);
         graphDescMap = getObjectMap(ob, nodemap);
@@ -111,7 +111,7 @@ public class ConfigObjectFactory {
     }
 
     public Map<String, ProbeDesc> setProbeDescMap() {
-        Map<String, JrdsNode> nodemap = load.getRepository(ConfigType.PROBEDESC);
+        Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.PROBEDESC);
         ProbeDescBuilder ob = new ProbeDescBuilder();
         ob.setClassLoader(cl);
         ob.setPm(pm);
@@ -122,7 +122,7 @@ public class ConfigObjectFactory {
     }
 
     public Map<String, RdsHost> setHostMap() {
-        Map<String, JrdsNode> nodemap = load.getRepository(ConfigType.HOSTS);
+        Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.HOSTS);
         HostBuilder ob = new HostBuilder();
         ob.setClassLoader(cl);
         ob.setMacros(macrosmap);
@@ -134,7 +134,7 @@ public class ConfigObjectFactory {
     }
 
     public Map<String, Filter> setFilterMap() {
-        Map<String, JrdsNode> nodemap = load.getRepository(ConfigType.FILTER);
+        Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.FILTER);
         Map<String, Filter> filtersMap = getObjectMap(new FilterBuilder(), nodemap);
         logger.debug(jrds.Util.delayedFormatString("Filters configured: %s", filtersMap.keySet()));
         return filtersMap;
@@ -143,14 +143,14 @@ public class ConfigObjectFactory {
     public Map<String, Sum> setSumMap() {
         SumBuilder ob =new SumBuilder();
         ob.setPm(pm);
-        Map<String, JrdsNode> nodemap = load.getRepository(ConfigType.SUM);
+        Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.SUM);
         Map<String, Sum> sumpsMap = getObjectMap(ob, nodemap);
         logger.debug(jrds.Util.delayedFormatString("Sums configured: %s", sumpsMap.keySet()));
         return sumpsMap;
     }
 
     public Map<String, Tab> setTabMap() {
-        Map<String, JrdsNode> nodemap = load.getRepository(ConfigType.TAB);
+        Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.TAB);
         Map<String, Tab> tabsMap = getObjectMap(new TabBuilder(), nodemap);
         logger.debug(jrds.Util.delayedFormatString("Tabs configured: %s", tabsMap.keySet()));
         return tabsMap;
