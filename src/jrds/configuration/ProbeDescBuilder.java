@@ -1,6 +1,7 @@
 package jrds.configuration;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -8,13 +9,10 @@ import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.Util;
 import jrds.factories.ArgFactory;
-import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
-import jrds.factories.xml.AbstractJrdsNode;
 
 import org.apache.log4j.Logger;
-import org.w3c.dom.Node;
 
 public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
     static final private Logger logger = Logger.getLogger(ProbeDescBuilder.class);
@@ -68,19 +66,18 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
 
         pd.setHeartBeatDefault(pm.step * 2);
 
-        root.callIfExist(pd, CompiledXPath.get("uniq"), "setUniqIndex", Boolean.TYPE, true);
+        pd.setUniqIndex(root.getElementbyName("uniq") != null);
         setMethod(root.getElementbyName("uptimefactor"), pd, "setUptimefactor", Float.TYPE);
-
-        List<String> graphs = root.doTreeList(CompiledXPath.get("graphs/name"), new AbstractJrdsNode.FilterNode<String>() {
-            @Override
-            public String filter(Node input) {
-                if(logger.isTraceEnabled())
-                    logger.trace("Adding graph: " + input.getTextContent());
-                return input.getTextContent();
+        
+        JrdsElement graphsElement= root.getElementbyName("graphs");
+        if(graphsElement != null) {
+            List<String> graphs =  new ArrayList<String>();
+            for(JrdsElement e: graphsElement.getChildElementsByName("name")) {
+                graphs.add(e.getTextContent());
+                logger.trace(Util.delayedFormatString("Adding graph: %s", e.getTextContent()));
             }
-
-        });
-        pd.setGraphClasses(graphs);
+            pd.setGraphClasses(graphs);
+        }
 
         for(JrdsElement specificNode: root.getChildElementsByName("specific")) {
             Map<String, String> m = specificNode.attrMap();
@@ -88,7 +85,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
                 String name = m.get("name");
                 String value = specificNode.getTextContent().trim();
                 pd.addSpecific(name, value);
-                logger.trace("Specific added: " + name + "='" + value + "'");
+                logger.trace(Util.delayedFormatString("Specific added: %s='%s'", name, value));
             }
         }
 

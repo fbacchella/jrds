@@ -11,10 +11,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
 import jrds.starter.Starter;
 import jrds.webapp.DiscoverAgent;
-
-import org.w3c.dom.Element;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
@@ -25,7 +24,7 @@ public @interface ProbeMeta {
         }
 
         @Override
-        public void discover(String hostname, Element hostElement,
+        public void discover(String hostname, JrdsElement hostElement,
                 Map<String,JrdsDocument> probdescs, HttpServletRequest request) {
         }
 

@@ -13,6 +13,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import jrds.Probe;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.webapp.DiscoverAgent;
@@ -104,6 +105,9 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
     @Override
     public void discover(String hostname, JrdsElement hostEleme,
             Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
+        Class<? extends Probe<?,?>> snmpClass = jrds.probe.snmp.SnmpProbe.class;
+        ClassLoader cl = getClass().getClassLoader();
+
         Target hosttarget;
         try {
             hosttarget = makeSnmpTarget(request);
@@ -133,7 +137,18 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         for(JrdsDocument e: probdescs.values()) {
             JrdsElement root = e.getRootElement();
             JrdsElement buffer;
-            
+
+            buffer = root.getElementbyName("probeClass");
+            String probeClass = buffer == null ? null : buffer.getTextContent();
+            Class<?> c;
+            try {
+                c = cl.loadClass(probeClass);
+                if(! snmpClass.isAssignableFrom(c))
+                    continue;
+            } catch (ClassNotFoundException e2) {
+                continue;
+            }
+
             buffer = root.getElementbyName("name");
             String name = buffer == null ? null : buffer.getTextContent();
             buffer = root.getElementbyName("index");
@@ -153,7 +168,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
                         log(Level.ERROR, e1, "Error discoverer %s for index %s: %s", name, index, e1);
                     }
                 }
-                else if(! "".equals(doesExistOid)) {
+                else if(doesExistOid != null && ! "".equals(doesExistOid)) {
                     doesExist(hostEleme, active, name, doesExistOid);
                 }
             } catch (Exception e1) {

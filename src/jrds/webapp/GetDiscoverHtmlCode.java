@@ -31,6 +31,7 @@ public class GetDiscoverHtmlCode extends JrdsServlet {
         try {
             dbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             JrdsDocument hostDom = new JrdsDocument(dbuilder.newDocument());
+            hostDom.doRootElement("div");
             for(DiscoverAgent da: getHostsList().getDiscoverAgent()) {
                 da.doHtmlDiscoverFields(hostDom);
             }
@@ -44,7 +45,10 @@ public class GetDiscoverHtmlCode extends JrdsServlet {
             prop.put(OutputKeys.DOCTYPE_SYSTEM, "urn:jrds:host");
             Util.serialize(hostDom, resp.getOutputStream(), null, prop);
         } catch (ParserConfigurationException e) {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Parser configuration error");
         } catch (TransformerException e) {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Transformer exception error");
+
         }    
     }
 

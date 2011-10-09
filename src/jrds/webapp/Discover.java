@@ -81,8 +81,8 @@ public class Discover extends JrdsServlet {
         for(DiscoverAgent da: getHostsList().getDiscoverAgent()) {
             try {
                 da.discover(hostname, hostEleme, probdescs, request);
-            } catch (Exception e) {
-                logger.error("Discover failed for " + da + ": " + e);
+            } catch (Throwable e) {
+                logger.error("Discover failed for " + da + ": " + e, e);
             }
         }
         return hostDom;
