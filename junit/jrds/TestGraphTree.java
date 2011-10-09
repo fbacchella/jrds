@@ -43,7 +43,6 @@ public class TestGraphTree {
 	public void test2() {
 		GraphTree gt1 = GraphTree.makeGraph("root");
 		
-		GraphNode gn = new MockGraph();
 		gt1.addPath("a", "b");
 		
 		Assert.assertNotNull("Graph node not found" , gt1.getByPath("root", "a", "b"));

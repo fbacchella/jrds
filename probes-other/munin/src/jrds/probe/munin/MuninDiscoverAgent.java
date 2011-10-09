@@ -16,9 +16,8 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
-import jrds.factories.xml.CompiledXPath;
-import jrds.factories.xml.AbstractJrdsNode;
 import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
 import jrds.probe.IndexedProbe;
 import jrds.webapp.DiscoverAgent;
 
@@ -32,14 +31,10 @@ public class MuninDiscoverAgent extends DiscoverAgent {
     }
 
     @Override
-    public void discover(String hostName, Element hostElement, Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
+    public void discover(String hostName, JrdsElement hostElement, Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
         try {
             Document hostDom = hostElement.getOwnerDocument();
 
-            String hostTag = "";
-            if(request.getParameter("discoverMuninPort") != null) {
-                hostTag = request.getParameter("discoverMuninPort").trim();
-            }
             int port = jrds.Util.parseStringNumber(request.getParameter("discoverMuninPort"), new Integer(4949));
             Socket muninSocket = null;
             try {
@@ -71,17 +66,20 @@ public class MuninDiscoverAgent extends DiscoverAgent {
 
             ClassLoader cl = getClass().getClassLoader();
             Class<?> muninClass = cl.loadClass("jrds.probe.munin.Munin");
-            for(AbstractJrdsNode e: probdescs.values()) {
-                String probe = e.evaluate(CompiledXPath.get("/probedesc/name"));
-                String probeClass = e.evaluate(CompiledXPath.get("/probedesc/probeClass"));
+            for(JrdsDocument e: probdescs.values()) {
+                JrdsElement root = e.getRootElement();
+                JrdsElement buffer;
+                
+                buffer = root.getElementbyName("name");
+                String probe = buffer == null ? null : buffer.getTextContent();
+                buffer = root.getElementbyName("probeClass");
+                String probeClass = buffer == null ? null : buffer.getTextContent();
                 Class<?> c = cl.loadClass(probeClass);
-                String fetchValue = e.evaluate(CompiledXPath.get("/probedesc/specific[@name='fetch']"));
+                buffer = root.findByPath("specific[@name='fetch']");
+                String fetchValue = buffer == null ? null : buffer.getTextContent();
                 if(fetchValue != null && ! "".equals(fetchValue) &&  muninClass.isAssignableFrom(c)) {
                     if( muninProbes.contains(fetchValue) ) {
                         muninProbes.remove(fetchValue);
-//                        if(probdescs.containsKey(probe + "_" + hostTag))
-//                            addProbe(hostElement, probe + "_" + hostTag, null, null);
-//                        else
                             addProbe(hostElement, probe, null, null);
                     }
 

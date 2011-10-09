@@ -11,6 +11,7 @@ import javax.xml.transform.TransformerException;
 import jrds.Probe;
 import jrds.Tools;
 import jrds.factories.ProbeMeta;
+import jrds.factories.xml.JrdsDocument;
 import jrds.probe.TestMeta;
 import jrds.webapp.DiscoverAgent;
 import junit.framework.Assert;
@@ -19,7 +20,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.w3c.dom.Document;
 
 public class TestDiscoverAgent {
     static final private Logger logger = Logger.getLogger(TestMeta.class);
@@ -40,8 +40,8 @@ public class TestDiscoverAgent {
         ProbeMeta m = snmpProbeClass.getAnnotation(ProbeMeta.class);
         DiscoverAgent da = m.discoverAgent().newInstance();
         Assert.assertEquals(3, da.getFields().size());
-        Document d = Tools.dbuilder.newDocument();
-        d.appendChild(d.createElement("host"));
+        JrdsDocument d = new JrdsDocument(Tools.dbuilder.newDocument());
+        d.doRootElement("host");
         da.doHtmlDiscoverFields(d);
         Map<String, String> properties = new HashMap<String, String>();
         properties.put(OutputKeys.INDENT, "yes");

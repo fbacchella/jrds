@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -16,7 +17,7 @@ import org.w3c.dom.Element;
 public abstract class DiscoverAgent {
     protected enum DojoType { ToggleButton {
         @Override
-        public void doNode(Element parent, FieldInfo fi) {
+        public void doNode(JrdsElement parent, FieldInfo fi) {
             Element button = parent.getOwnerDocument().createElement("button");
             button.setAttribute("id", fi.id);
             button.setAttribute("name", fi.id);
@@ -27,7 +28,7 @@ public abstract class DiscoverAgent {
         }
     }, TextBox {
         @Override
-        public void doNode(Element parent, FieldInfo fi) {
+        public void doNode(JrdsElement parent, FieldInfo fi) {
             Element label = parent.getOwnerDocument().createElement("label");
             label.setAttribute("for", fi.id);
             label.setTextContent(fi.label);
@@ -41,7 +42,7 @@ public abstract class DiscoverAgent {
             parent.appendChild(input);
         }
     };
-    public abstract void  doNode(Element parent, FieldInfo fi);
+    public abstract void  doNode(JrdsElement parent, FieldInfo fi);
     };
     public static final class FieldInfo {
         public String id;
@@ -49,24 +50,22 @@ public abstract class DiscoverAgent {
         public DojoType dojoType;
     };
 
-    Logger namedLogger = null;
+    private final Logger namedLogger;
 
     protected DiscoverAgent(String name) {
         namedLogger = Logger.getLogger("jrds.DiscoverAgent." + name);
     }
 
-    public abstract void discover(String hostname, Element hostElement, Map<String, JrdsDocument> probdescs, HttpServletRequest request);
+    public abstract void discover(String hostname, JrdsElement hostElement, Map<String, JrdsDocument> probdescs, HttpServletRequest request);
 
     public abstract List<FieldInfo> getFields();
 
-    public void doHtmlDiscoverFields(Document document) {
+    public void doHtmlDiscoverFields(JrdsDocument document) {
         try {
             List<FieldInfo> fields = getFields();
             log(Level.DEBUG, "Fields: %s", fields);
 
-            Element localRoot = 
-                (Element) document.createElement("div");
-            document.getDocumentElement().appendChild(localRoot);
+            JrdsElement localRoot = document.getRootElement().addElement("div");
             for(FieldInfo f: fields) {
                 f.dojoType.doNode(localRoot, f);
             }
@@ -91,7 +90,7 @@ public abstract class DiscoverAgent {
         addArgsList(hostDoc, rrdElem, argsTypes, argsValues);
         return rrdElem;
     }
-    
+
     protected Element addConnexion(Element hostElem, String connexionClass, List<String> argsTypes, List<String> argsValues) {
         Document hostDoc = hostElem.getOwnerDocument();
         Element cnxElement = hostDoc.createElement("connection");
@@ -100,7 +99,7 @@ public abstract class DiscoverAgent {
         addArgsList(hostDoc, cnxElement, argsTypes, argsValues);
         return cnxElement;
     }
-    
+
     private void addArgsList(Document hostDoc, Element e, List<String> argsTypes, List<String> argsValues) {
         if(argsTypes != null && argsTypes.size() > 0 && argsTypes.size() == argsValues.size()) {
             for(int i=0; i < argsTypes.size(); i++) {

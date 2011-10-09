@@ -1,16 +1,8 @@
 package jrds.factories.xml;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
-
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.DOMException;
@@ -25,21 +17,29 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
     static final private Logger logger = Logger.getLogger(AbstractJrdsNode.class);
 
     private final NodeType parent;
-    
+
+    /**
+     * Wrap a DOM node object with an enhanced Jrds Node object
+     * If the null node is given, a null value is returned
+     * @param n A node
+     * @return a jrds node object
+     */
     @SuppressWarnings("unchecked")
     public static <N extends AbstractJrdsNode<?>> N build(Node n) {
-     if(n.getNodeType() == Node.ELEMENT_NODE)
-         return (N) new JrdsElement((Element) n);
-     if(n.getNodeType() == Node.DOCUMENT_NODE)
-         return (N) new JrdsDocument((Document) n);
-     if(n.getNodeType() == Node.DOCUMENT_FRAGMENT_NODE)
-         return (N) new JrdsNode(n);
-     if(n.getNodeType() == Node.TEXT_NODE)
-         return (N) new JrdsNode(n);
-     else {
-         logger.warn("Anonymous node created: " + n.getNodeType());
-         return (N) new JrdsNode(n);
-     }
+        if(n == null)
+            return null;
+        if(n.getNodeType() == Node.ELEMENT_NODE)
+            return (N) new JrdsElement((Element) n);
+        if(n.getNodeType() == Node.DOCUMENT_NODE)
+            return (N) new JrdsDocument((Document) n);
+        if(n.getNodeType() == Node.DOCUMENT_FRAGMENT_NODE)
+            return (N) new JrdsNode(n);
+        if(n.getNodeType() == Node.TEXT_NODE)
+            return (N) new JrdsNode(n);
+        else {
+            logger.warn("Anonymous node created: " + n.getNodeType());
+            return (N) new JrdsNode(n);
+        }
     }
 
     public AbstractJrdsNode(NodeType n){
@@ -47,9 +47,18 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
             throw new NullPointerException("The parent node is null");
         this.parent = n;
     }
-    
+
     public final NodeType getParent() {
         return parent;
+    }
+
+    public <T extends AbstractJrdsNode<?>> T findByPath(String xpathString) {
+        try {
+            XPathExpression xpath = CompiledXPath.get(xpathString);
+            return AbstractJrdsNode.build((Node) xpath.evaluate(parent, XPathConstants.NODE));
+        } catch (XPathExpressionException e) {
+            throw new RuntimeException("xpath evaluate failed", e);
+        }
     }
 
     /**
@@ -57,23 +66,23 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @return
      * @throws XPathExpressionException
      */
-    public boolean checkPath(XPathExpression xpath) {
-        Node n;
-        try {
-            n = (Node)xpath.evaluate(parent, XPathConstants.NODE);
-        } catch (XPathExpressionException e) {
-            throw new RuntimeException("xpath evaluate failed", e);
-        }
-        if(n == null)
-            return(false);
-        String value = n.getNodeValue();
-        if (value == null)
-            return true;
-        value = value.trim();
-        if("".equals(value) || "true".equals(value.toLowerCase()) || "yes".equals(value.toLowerCase()))
-            return true;
-        return false;
-    }
+    //    public boolean checkPath(XPathExpression xpath) {
+    //        Node n;
+    //        try {
+    //            n = (Node)xpath.evaluate(parent, XPathConstants.NODE);
+    //        } catch (XPathExpressionException e) {
+    //            throw new RuntimeException("xpath evaluate failed", e);
+    //        }
+    //        if(n == null)
+    //            return(false);
+    //        String value = n.getNodeValue();
+    //        if (value == null)
+    //            return true;
+    //        value = value.trim();
+    //        if("".equals(value) || "true".equals(value.toLowerCase()) || "yes".equals(value.toLowerCase()))
+    //            return true;
+    //        return false;
+    //    }
 
     /**
      * Apply a method on a object with the value found by the XPath
@@ -88,9 +97,9 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @throws InvocationTargetException
      * @throws InstantiationException 
      */
-    public void setMethod(Object o, XPathExpression xpath, String method) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        setMethod(o, xpath, method, true, String.class);
-    }
+    //    public void setMethod(Object o, XPathExpression xpath, String method) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    //        setMethod(o, xpath, method, true, String.class);
+    //    }
 
     /**
      * Apply a method on a object with the value found by the XPath
@@ -104,91 +113,91 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @throws NoSuchMethodException 
      * @throws SecurityException 
      */
-    public void setMethod(Object o, XPathExpression xpath, String method, boolean uniq) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException {
-        for(JrdsNode n: new NodeListIterator<JrdsNode>((Node)parent, xpath)) {
-            String name = n.getTextContent().trim();
-            Method m;
-            if(name != null && ! "".equals(name)) {
-                try {
-                    m = o.getClass().getMethod(method, String.class);
-                } catch (NoSuchMethodException e) {
-                    m = o.getClass().getMethod(method, Object.class);
-                }
-                m.invoke(o, name);
-                if(uniq)
-                    break;
-            }
-        }
-    }
+    //    public void setMethod(Object o, XPathExpression xpath, String method, boolean uniq) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException {
+    //        for(JrdsNode n: new NodeListIterator<JrdsNode>((Node)parent, xpath)) {
+    //            String name = n.getTextContent().trim();
+    //            Method m;
+    //            if(name != null && ! "".equals(name)) {
+    //                try {
+    //                    m = o.getClass().getMethod(method, String.class);
+    //                } catch (NoSuchMethodException e) {
+    //                    m = o.getClass().getMethod(method, Object.class);
+    //                }
+    //                m.invoke(o, name);
+    //                if(uniq)
+    //                    break;
+    //            }
+    //        }
+    //    }
 
-    public void setMethod(Object o, String method) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException {
-        String name = getTextContent().trim();
-        Method m;
-        if(name != null && ! "".equals(name)) {
-            try {
-                m = o.getClass().getMethod(method, String.class);
-            } catch (NoSuchMethodException e) {
-                m = o.getClass().getMethod(method, Object.class);
-            }
-            m.invoke(o, name);
-        }
-    }
+    //    public void setMethod(Object o, String method) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException {
+    //        String name = getTextContent().trim();
+    //        Method m;
+    //        if(name != null && ! "".equals(name)) {
+    //            try {
+    //                m = o.getClass().getMethod(method, String.class);
+    //            } catch (NoSuchMethodException e) {
+    //                m = o.getClass().getMethod(method, Object.class);
+    //            }
+    //            m.invoke(o, name);
+    //        }
+    //    }
 
-    public void setMethod(Object o, String method, Class<?> argType) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException, InstantiationException {
-        Constructor<?> c = null;
-        if(! argType.isPrimitive() ) {
-            c = argType.getConstructor(String.class);
-        }
-        else if(argType == Integer.TYPE) {
-            c = Integer.class.getConstructor(String.class);
-        }
-        else if(argType == Double.TYPE) {
-            c = Double.class.getConstructor(String.class);
-        }
-        else if(argType == Float.TYPE) {
-            c = Float.class.getConstructor(String.class);
-        }
+    //    public void setMethod(Object o, String method, Class<?> argType) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException, InstantiationException {
+    //        Constructor<?> c = null;
+    //        if(! argType.isPrimitive() ) {
+    //            c = argType.getConstructor(String.class);
+    //        }
+    //        else if(argType == Integer.TYPE) {
+    //            c = Integer.class.getConstructor(String.class);
+    //        }
+    //        else if(argType == Double.TYPE) {
+    //            c = Double.class.getConstructor(String.class);
+    //        }
+    //        else if(argType == Float.TYPE) {
+    //            c = Float.class.getConstructor(String.class);
+    //        }
+    //
+    //        String name = getTextContent().trim();
+    //        if(name != null && ! "".equals(name)) {
+    //            Method m;
+    //            try {
+    //                m = o.getClass().getMethod(method, argType);
+    //            } catch (NoSuchMethodException e) {
+    //                m = o.getClass().getMethod(method, Object.class);
+    //            }
+    //            m.invoke(o, c.newInstance(name));
+    //        }
+    //    }
 
-        String name = getTextContent().trim();
-        if(name != null && ! "".equals(name)) {
-            Method m;
-            try {
-                m = o.getClass().getMethod(method, argType);
-            } catch (NoSuchMethodException e) {
-                m = o.getClass().getMethod(method, Object.class);
-            }
-            m.invoke(o, c.newInstance(name));
-        }
-    }
+    //    public void setMethod(Object o, XPathExpression xpath, String method, Class<?> argType) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException, InstantiationException {
+    //        setMethod(o, xpath, method, true, argType);
+    //    }
 
-    public void setMethod(Object o, XPathExpression xpath, String method, Class<?> argType) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException, InstantiationException {
-        setMethod(o, xpath, method, true, argType);
-    }
-
-    public void setMethod(Object o, XPathExpression xpath, String method, boolean uniq, Class<?> argType) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException, InstantiationException {
-        Constructor<?> c = null;
-        if(! argType.isPrimitive() ) {
-            c = argType.getConstructor(String.class);
-        }
-        else if(argType == Integer.TYPE) {
-            c = Integer.class.getConstructor(String.class);
-        }
-        else if(argType == Double.TYPE) {
-            c = Double.class.getConstructor(String.class);
-        }
-        else if(argType == Float.TYPE) {
-            c = Float.class.getConstructor(String.class);
-        }
-        Method m = o.getClass().getMethod(method, argType);
-        for(AbstractJrdsNode<?> n: new NodeListIterator<AbstractJrdsNode<?>>(parent, xpath)) {
-            String name = n.getTextContent().trim();
-            if(name != null) {
-                m.invoke(o, c.newInstance(name));
-                if(uniq)
-                    break;
-            }
-        }
-    }
+    //    public void setMethod(Object o, XPathExpression xpath, String method, boolean uniq, Class<?> argType) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException, NoSuchMethodException, InstantiationException {
+    //        Constructor<?> c = null;
+    //        if(! argType.isPrimitive() ) {
+    //            c = argType.getConstructor(String.class);
+    //        }
+    //        else if(argType == Integer.TYPE) {
+    //            c = Integer.class.getConstructor(String.class);
+    //        }
+    //        else if(argType == Double.TYPE) {
+    //            c = Double.class.getConstructor(String.class);
+    //        }
+    //        else if(argType == Float.TYPE) {
+    //            c = Float.class.getConstructor(String.class);
+    //        }
+    //        Method m = o.getClass().getMethod(method, argType);
+    //        for(AbstractJrdsNode<?> n: new NodeListIterator<AbstractJrdsNode<?>>(parent, xpath)) {
+    //            String name = n.getTextContent().trim();
+    //            if(name != null) {
+    //                m.invoke(o, c.newInstance(name));
+    //                if(uniq)
+    //                    break;
+    //            }
+    //        }
+    //    }
 
     /**
      * Call a method with default arguments if an XPath is found
@@ -203,64 +212,64 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
-    public Object callIfExist(Object o, XPathExpression xpath, String method, Class<?>[] argsTypes, Object[] argsValues) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        if(argsTypes.length != argsValues.length)
-            throw new IllegalArgumentException("arguments values and types dont match");
-        if(checkPath(xpath)) {
-            Method m = o.getClass().getMethod(method, argsTypes);
-            return m.invoke(o, argsValues);
-        }
-        return null;
-    }
+    //    public Object callIfExist(Object o, XPathExpression xpath, String method, Class<?>[] argsTypes, Object[] argsValues) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    //        if(argsTypes.length != argsValues.length)
+    //            throw new IllegalArgumentException("arguments values and types dont match");
+    //        if(checkPath(xpath)) {
+    //            Method m = o.getClass().getMethod(method, argsTypes);
+    //            return m.invoke(o, argsValues);
+    //        }
+    //        return null;
+    //    }
 
-    public Object callIfExist(Object o, XPathExpression xpath, String method, Class<?> argType, Object argValue) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        return callIfExist(o, xpath, method, new Class<?>[] {argType}, new Object[] {argValue});
-    }
+    //    public Object callIfExist(Object o, XPathExpression xpath, String method, Class<?> argType, Object argValue) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    //        return callIfExist(o, xpath, method, new Class<?>[] {argType}, new Object[] {argValue});
+    //    }
 
-    public static abstract class FilterNode<T> {
-        public abstract T filter(Node input);
-    };
+    //    public static abstract class FilterNode<T> {
+    //        public abstract T filter(Node input);
+    //    };
 
-    public <T> List<T> doTreeList(XPathExpression xpath, FilterNode<T> f) {
-        NodeList list;
-        try {
-            list = (NodeList) xpath.evaluate(parent, XPathConstants.NODESET);
-        } catch (XPathExpressionException e) {
-            throw new RuntimeException("xpath evaluation failed", e);
-        }
-        if(list == null || list.getLength() == 0 ) {
-            return Collections.emptyList();
-        }
-        List<T> l = new ArrayList<T>(list.getLength());
-        for(int i=0; i < list.getLength(); i++) {
-            T o = f.filter(list.item(i));
-            l.add(o);
-        }
-        return l;
-    }
+    //    public <T> List<T> doTreeList(XPathExpression xpath, FilterNode<T> f) {
+    //        NodeList list;
+    //        try {
+    //            list = (NodeList) xpath.evaluate(parent, XPathConstants.NODESET);
+    //        } catch (XPathExpressionException e) {
+    //            throw new RuntimeException("xpath evaluation failed", e);
+    //        }
+    //        if(list == null || list.getLength() == 0 ) {
+    //            return Collections.emptyList();
+    //        }
+    //        List<T> l = new ArrayList<T>(list.getLength());
+    //        for(int i=0; i < list.getLength(); i++) {
+    //            T o = f.filter(list.item(i));
+    //            l.add(o);
+    //        }
+    //        return l;
+    //    }
 
-    public <N1 extends Node, N2 extends AbstractJrdsNode<N1>> NodeListIterator<N2> iterate(XPathExpression xpath, Class<N2> clazz) {
-        return new NodeListIterator<N2>(parent, xpath);
-    }
+    //    public <N1 extends Node, N2 extends AbstractJrdsNode<N1>> NodeListIterator<N2> iterate(XPathExpression xpath, Class<N2> clazz) {
+    //        return new NodeListIterator<N2>(parent, xpath);
+    //    }
 
-    public AbstractJrdsNode<?> getChild(XPathExpression xpath) {
-        try {
-            Node n = (Node) xpath.evaluate(parent, XPathConstants.NODE);
-            if(n == null)
-                return null;
-            return JrdsNode.build(n);
-        } catch (XPathExpressionException e) {
-            throw new RuntimeException("xpath evaluate failed", e);
-        }
-    }
+    //    public AbstractJrdsNode<?> getChild(XPathExpression xpath) {
+    //        try {
+    //            Node n = (Node) xpath.evaluate(parent, XPathConstants.NODE);
+    //            if(n == null)
+    //                return null;
+    //            return JrdsNode.build(n);
+    //        } catch (XPathExpressionException e) {
+    //            throw new RuntimeException("xpath evaluate failed", e);
+    //        }
+    //    }
 
-    public String evaluate(XPathExpression xpath) {
-        try {
-            return xpath.evaluate(parent);
-        } catch (XPathExpressionException e) {
-            throw new RuntimeException("xpath evaluate failed", e);
-        }
-    }
+    //    public String evaluate(XPathExpression xpath) {
+    //        try {
+    //            return xpath.evaluate(parent);
+    //        } catch (XPathExpressionException e) {
+    //            throw new RuntimeException("xpath evaluate failed", e);
+    //        }
+    //    }
 
     /**
      * @param newChild

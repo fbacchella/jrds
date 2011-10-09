@@ -14,12 +14,11 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
-import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
 import jrds.webapp.DiscoverAgent;
 
 import org.apache.log4j.Level;
-import org.w3c.dom.Element;
 
 import uk.co.petertribble.jkstat.api.JKstat;
 import uk.co.petertribble.jkstat.api.Kstat;
@@ -32,7 +31,7 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
     }
 
     @Override
-    public void discover(String hostname, Element hostElement,
+    public void discover(String hostname, JrdsElement hostElement,
             Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
         int port = jrds.Util.parseStringNumber(request.getParameter("discoverJKStatPort"), new Integer(KstatConnection.DEFAULTPORT));
         try {
@@ -77,12 +76,21 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
                 }
             }
             for(JrdsDocument e: probdescs.values()) {
-                String probe = e.evaluate(CompiledXPath.get("/probedesc/name"));
-                String probeClass = e.evaluate(CompiledXPath.get("/probedesc/probeClass"));
+                JrdsElement root = e.getRootElement();
+                JrdsElement buffer;
+
+                buffer = root.getElementbyName("name");
+                String probe = buffer == null ? null : buffer.getTextContent();
+                buffer = root.getElementbyName("probeClass");
+                String probeClass = buffer == null ? null : buffer.getTextContent();
                 Class<?> c = cl.loadClass(probeClass);
-                String module = e.evaluate(CompiledXPath.get("/probedesc/specific[@name='module']"));
-                String name = e.evaluate(CompiledXPath.get("/probedesc/specific[@name='name']"));
-                String instanceVal = e.evaluate(CompiledXPath.get("/probedesc/specific[@name='index']"));
+                buffer = root.findByPath("specific[@name='module']");
+                String module = buffer == null ? null : buffer.getTextContent();
+                buffer = root.findByPath("specific[@name='name']");
+                String name = buffer == null ? null : buffer.getTextContent();
+                
+                buffer = root.findByPath("specific[@name='index']");
+                String instanceVal = buffer == null ? null : buffer.getTextContent();
                 int instance = jrds.Util.parseStringNumber(instanceVal, new Integer(0));
                 if(module != null && ! "".equals(module) &&  kstatClass.isAssignableFrom(c)) {
                     Kstat active  = remoteJk.getKstat(module, instance, name);

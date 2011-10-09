@@ -13,9 +13,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import jrds.factories.xml.CompiledXPath;
 import jrds.factories.xml.JrdsDocument;
-import jrds.factories.xml.AbstractJrdsNode;
+import jrds.factories.xml.JrdsElement;
 import jrds.webapp.DiscoverAgent;
 
 import org.apache.log4j.Level;
@@ -51,14 +50,6 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         OID2Probe.put(ip, "IpSnmp");
         OID2Probe.put(udpMIB, "UdpSnmp");
     }
-
-    //Works in progress, does nothing now
-    //private static final Map<String, String> hides;
-    //static {
-    //  hides = new HashMap<String, String>();
-    //  hides.put("IfXSnmp", "IfSnmp");
-    //  hides.put("DiskIo64", "DiskIo");
-    //}
 
     static class LocalSnmpStarter extends SnmpStarter {
         Snmp snmp;
@@ -111,7 +102,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
     }
 
     @Override
-    public void discover(String hostname, Element hostEleme,
+    public void discover(String hostname, JrdsElement hostEleme,
             Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
         Target hosttarget;
         try {
@@ -139,21 +130,22 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
 
         hostEleme.appendChild(snmpElem);
 
-        for(AbstractJrdsNode e: probdescs.values()) {
-            String name = e.evaluate(CompiledXPath.get("/probedesc/name"));
-            String index = e.evaluate(CompiledXPath.get("/probedesc/index"));
-            String doesExistOid = e.evaluate(CompiledXPath.get("/probedesc/specific[@name='existOid']"));
-            //          if(logger.isTraceEnabled()) {
-            //              String className = e.evaluate(CompiledXPath.get("/probedesc/probeClass"));
-            //              String classFileName = '/' + className.replace('.', '/') + ".class";
-            //              URL url = this.getPropertiesManager().extensionClassLoader.getResource(classFileName);
-            //              logger.trace("Probe " + classFileName + " class found in " + url);
-            //          }
+        for(JrdsDocument e: probdescs.values()) {
+            JrdsElement root = e.getRootElement();
+            JrdsElement buffer;
+            
+            buffer = root.getElementbyName("name");
+            String name = buffer == null ? null : buffer.getTextContent();
+            buffer = root.getElementbyName("index");
+            String index = buffer == null ? null : buffer.getTextContent();
+            buffer = e.findByPath("specific[@name='existOid']");
+            String doesExistOid = buffer == null ? null : buffer.getTextContent();
 
             try {
                 if(index != null && ! "".equals(index) ) {
                     log(Level.TRACE, "Found probe %s with index %s", name, index);
-                    String labelOid = e.evaluate(CompiledXPath.get("/probedesc/specific[@name='labelOid']"));
+                    buffer = root.findByPath("specific[@name='labelOid']");
+                    String labelOid = buffer == null ? null : buffer.getTextContent();
                     log(Level.TRACE, "label OID for %s: %s", name, labelOid);
                     try {
                         enumerateIndexed(hostEleme, active, name, index, labelOid, withOid);
@@ -169,10 +161,8 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
             }
         }
         active.doStop();
-
-        //walksysORID(hostEleme, active);
-
     }
+
     private void doesExist(Element hostEleme, SnmpStarter active, String name, String doesExistOid) throws IOException {
         OID OidExist = new OID(doesExistOid);
         String label = getLabel(active, Collections.singletonList(OidExist));
@@ -265,13 +255,5 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
 
         return Arrays.asList(community, port, keepOID);
     }
-
-    //  private String operatingSystem(SnmpStarter active) throws IOException {
-    //      Map<OID, Object> osType = SnmpRequester.RAW.doSnmpGet(active, Collections.singletonList(sysObjectID));
-    //      OID  identity = (OID)osType.get(sysObjectID);
-    //      
-    //      return null;
-    //  }
-
 
 }

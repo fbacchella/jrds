@@ -18,10 +18,10 @@ import jrds.Util;
 import jrds.configuration.ConfigObjectFactory;
 import jrds.configuration.ConfigType;
 import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * Servlet implementation class AutoDetect
@@ -67,18 +67,15 @@ public class Discover extends JrdsServlet {
     private Document generate(String hostname, Map<String, JrdsDocument> probdescs, HttpServletRequest request) throws IOException, ParserConfigurationException {
 
         DocumentBuilder dbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document hostDom = dbuilder.newDocument();
+        JrdsDocument hostDom = new JrdsDocument(dbuilder.newDocument());
 
-        Element hostEleme = hostDom.createElement("host");
-        hostEleme.setAttribute("name", hostname);
-        hostDom.appendChild(hostEleme);
+        JrdsElement hostEleme = hostDom.doRootElement("host", "name=" + hostname);
 
         String[] tags = request.getParameterValues("tag");
         if(tags != null)
             for(String tag: tags) {
-                Element tagElem = hostDom.createElement("tag");
+                JrdsElement tagElem = hostEleme.addElement("tag");
                 tagElem.setTextContent(tag);
-                hostEleme.appendChild(tagElem);
             }
 
         for(DiscoverAgent da: getHostsList().getDiscoverAgent()) {
@@ -91,22 +88,4 @@ public class Discover extends JrdsServlet {
         return hostDom;
     }
 
-    //	@SuppressWarnings("unchecked")
-    //    private void runDiscoverClass(String discoverClass, String hostname, Document hostDom,
-    //            Collection<JrdsNode> probdescs, HttpServletRequest request) {
-    //        Class<? extends DiscoverAgent> dac;
-    //        try {
-    //            dac = (Class<? extends DiscoverAgent>) getPropertiesManager().extensionClassLoader.loadClass("jrds.snmp.SnmpDiscoverAgent");
-    //        } catch (ClassNotFoundException e1) {
-    //            logger.error("Discover class not found: " + discoverClass);
-    //            return;
-    //        }
-    //        try {
-    //            DiscoverAgent da = dac.getConstructor().newInstance();
-    //            da.discover(hostname, hostDom, probdescs, request); 
-    //        } catch (Exception e) {
-    //            logger.error("Generation Failed: ",e);
-    //        }
-    //	    
-    //	}
 }

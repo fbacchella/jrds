@@ -22,8 +22,21 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
     
     public JrdsDocument(Document n) {
         super(n);
-        // TODO Auto-generated constructor stub
     }
+    
+    public JrdsElement doRootElement(String tag, String... attrs) {
+        Element newelement = getOwnerDocument().createElement(tag);
+        appendChild(newelement);
+        for(String attr: attrs) {
+            int pos = attr.indexOf('=');
+            String key = attr.substring(0, pos);
+            String value = attr.substring(pos +  1);
+            newelement.setAttribute(key, value);
+        }
+        return new JrdsElement(newelement);
+
+    }
+    
     /**
      * @param arg0
      * @return
@@ -33,7 +46,6 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
     public Node adoptNode(Node arg0) throws DOMException {
         return getParent().adoptNode(arg0);
     }
-
 
     /**
      * @param arg0

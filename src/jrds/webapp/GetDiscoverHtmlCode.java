@@ -14,9 +14,7 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 
 import jrds.Util;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import jrds.factories.xml.JrdsDocument;
 
 public class GetDiscoverHtmlCode extends JrdsServlet {
 
@@ -32,9 +30,7 @@ public class GetDiscoverHtmlCode extends JrdsServlet {
         DocumentBuilder dbuilder;
         try {
             dbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document hostDom = dbuilder.newDocument();
-            Element root = hostDom.createElement("div");
-            hostDom.appendChild(root);
+            JrdsDocument hostDom = new JrdsDocument(dbuilder.newDocument());
             for(DiscoverAgent da: getHostsList().getDiscoverAgent()) {
                 da.doHtmlDiscoverFields(hostDom);
             }
