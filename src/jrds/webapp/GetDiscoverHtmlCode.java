@@ -13,10 +13,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 
+import org.apache.log4j.Logger;
+
 import jrds.Util;
 import jrds.factories.xml.JrdsDocument;
 
 public class GetDiscoverHtmlCode extends JrdsServlet {
+
+    static final private Logger logger = Logger.getLogger(GetDiscoverHtmlCode.class);
 
     private static final String CONTENT_TYPE = "application/xml";
     private static final long serialVersionUID = 1L;
@@ -33,6 +37,7 @@ public class GetDiscoverHtmlCode extends JrdsServlet {
             JrdsDocument hostDom = new JrdsDocument(dbuilder.newDocument());
             hostDom.doRootElement("div");
             for(DiscoverAgent da: getHostsList().getDiscoverAgent()) {
+                logger.debug(jrds.Util.delayedFormatString("Adding discover agent %s", da));
                 da.doHtmlDiscoverFields(hostDom);
             }
             resp.setContentType(CONTENT_TYPE);
@@ -41,8 +46,6 @@ public class GetDiscoverHtmlCode extends JrdsServlet {
             prop.put(OutputKeys.OMIT_XML_DECLARATION, "no");
             prop.put(OutputKeys.INDENT, "yes");
             prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
-            prop.put(OutputKeys.DOCTYPE_PUBLIC, "-//jrds//DTD Host//EN");
-            prop.put(OutputKeys.DOCTYPE_SYSTEM, "urn:jrds:host");
             Util.serialize(hostDom, resp.getOutputStream(), null, prop);
         } catch (ParserConfigurationException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Parser configuration error");

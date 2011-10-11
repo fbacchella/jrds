@@ -3,7 +3,6 @@ package jrds.webapp;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -29,7 +28,12 @@ public class Configuration {
     TimerTask collector;
     Thread shutDownHook;
 
-    public Configuration(Map<String, String> ctxt) {
+    /**
+     * A constructor used to simplify tests
+     * @param ctxt
+     */
+    Configuration(Properties ctxt) {
+        propertiesManager.join(ctxt);
         finishConfig();
     }
 
