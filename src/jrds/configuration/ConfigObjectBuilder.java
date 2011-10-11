@@ -129,22 +129,41 @@ abstract class ConfigObjectBuilder<BuildObject> {
         this.pm = pm;
     }
 
-//    public boolean setMethod(JrdsElement parent, Object o, String method, String...path) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
-//        if (parent == null)
-//            return false;
-//        JrdsElement current = parent;
-//        for(String tag: path) {
-//            current = current.getElementbyName(tag);
-//            if(current == null)
-//                return false;
-//        }
-//        return setMethod(current, o, method);
-//    }
-
+    /**
+     * Apply a method on a object with the value found in the XML element
+     * If the element is null, the method does nothing.
+     * @param element
+     * @param o
+     * @param method
+     * @return
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     */
     public boolean setMethod(JrdsElement e, Object o, String method) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
         return setMethod(e, o, method, String.class);
     }
 
+    /**
+     * Apply a method on a object with the value found in the XML element.<p>
+     * If the element is null, the method does nothing.<p>
+     * The text value of the element is parsed to the type given in the argument argType. This type must have a constructor
+     * that take a String argument.
+     * @param element
+     * @param o
+     * @param method
+     * @param argType
+     * @return
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     */
     public boolean setMethod(JrdsElement element, Object o, String method, Class<?> argType) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException{
         if(element == null)
             return false;
@@ -175,26 +194,5 @@ abstract class ConfigObjectBuilder<BuildObject> {
         }
         return false;
     }
-    
-//  public <T> List<T> doTreeList(XPathExpression xpath, FilterNode<T> f) {
-//  NodeList list;
-//  try {
-//      list = (NodeList) xpath.evaluate(parent, XPathConstants.NODESET);
-//  } catch (XPathExpressionException e) {
-//      throw new RuntimeException("xpath evaluation failed", e);
-//  }
-//  if(list == null || list.getLength() == 0 ) {
-//      return Collections.emptyList();
-//  }
-//  List<T> l = new ArrayList<T>(list.getLength());
-//  for(int i=0; i < list.getLength(); i++) {
-//      T o = f.filter(list.item(i));
-//      l.add(o);
-//  }
-//  return l;
-//}
 
-//public <N1 extends Node, N2 extends AbstractJrdsNode<N1>> NodeListIterator<N2> iterate(XPathExpression xpath, Class<N2> clazz) {
-//  return new NodeListIterator<N2>(parent, xpath);
-//}
 }
