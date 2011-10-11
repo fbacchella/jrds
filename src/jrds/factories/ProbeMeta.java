@@ -32,11 +32,23 @@ public @interface ProbeMeta {
         public List<FieldInfo> getFields() {
             return Collections.emptyList();
         }
+
+        /**
+         * This discover agent does nothing
+         *
+         */
+        @Override
+        public void doHtmlDiscoverFields(JrdsDocument document) {
+        }
     };
-    
+
+    /**
+     * @author bacchell
+     *
+     */
     public class EmptyStarter extends Starter {
     };
-    
+
     Class<? extends DiscoverAgent> discoverAgent() default EmptyDiscoverAgent.class;
     Class<? extends Starter> topStarter() default EmptyStarter.class;
 
