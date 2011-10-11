@@ -27,7 +27,8 @@ public class ToolsWebApp {
         HttpTester response = new HttpTester();
         request.setMethod("GET");
         request.setHeader("Host", queryURL.getHost());
-        request.setURI(queryURL.getPath());
+        String args = queryURL.getQuery();
+        request.setURI(queryURL.getPath()  + (args != null ? "?" + args : ""));
         request.setVersion("HTTP/1.0");
         response.parse(tester.getResponses(request.generate()));
 
