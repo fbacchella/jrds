@@ -272,9 +272,9 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
             Class<? extends HostBuilderAgent> c = (Class<? extends HostBuilderAgent>) pm.extensionClassLoader.loadClass("jrds.snmp.SnmpHostBuilderAgent");
             c.getConstructor().newInstance().buildStarters(node, p, host);
         } catch (ClassNotFoundException e) {
-            logger.error("Class jrds.snmp.SnmpHostBuilderAgent not found");
+            logger.debug("Class jrds.snmp.SnmpHostBuilderAgent not found");
         } catch (InstantiationException e) {
-            logger.error("Class jrds.snmp.SnmpHostBuilderAgent not found");
+            logger.error("Class jrds.snmp.SnmpHostBuilderAgent can't be instantiated");
         } catch (IllegalArgumentException e) {
         } catch (SecurityException e) {
         } catch (IllegalAccessException e) {
