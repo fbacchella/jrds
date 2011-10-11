@@ -28,6 +28,10 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
     public static <N extends AbstractJrdsNode<?>> N build(Node n) {
         if(n == null)
             return null;
+        Class<?> c = n.getClass();
+        if(AbstractJrdsNode.class.isAssignableFrom(c))
+            return (N) n;
+
         if(n.getNodeType() == Node.ELEMENT_NODE)
             return (N) new JrdsElement((Element) n);
         if(n.getNodeType() == Node.DOCUMENT_NODE)
@@ -42,7 +46,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
         }
     }
 
-    public AbstractJrdsNode(NodeType n){
+    protected AbstractJrdsNode(NodeType n){
         if(n == null)
             throw new NullPointerException("The parent node is null");
         this.parent = n;
