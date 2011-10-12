@@ -306,15 +306,18 @@ public class PropertiesManager extends Properties {
         syncPeriod = parseInteger(getProperty("syncPeriod", Integer.toString(step / 2)));
         
         strictparsing = parseBoolean(getProperty("strictparsing", "false"));
-        String libspathString = getProperty("libspath", "");
         try {
-            URL defaultLibURL = getClass().getResource("/desc");
-            if(defaultLibURL != null)
-                libspath.add(defaultLibURL.toURI());
+            Enumeration<URL> descurl = getClass().getClassLoader().getResources("desc");
+            while(descurl.hasMoreElements()) {
+                libspath.add(descurl.nextElement().toURI());
+            }
         } catch (URISyntaxException e) {
             throw new RuntimeException("URI syntax exception",e);
+        } catch (IOException e) {
+            throw new RuntimeException("Can't locate embedded desc",e);
         }
 
+        String libspathString = getProperty("libspath", "");
         if(! "".equals(libspathString)) {
             for(String libName: libspathString.split(";")) {
                 File lib = new File(libName);
