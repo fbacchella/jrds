@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+	<name>munin_if</name>
+	<graphName>if_${index}</graphName>
+	<graphTitle>${index} traffic</graphTitle>
+	<unit>
+		<SI />
+	</unit>
+	<verticalLabel>bits in (-) / out (+) per s</verticalLabel>
+	<add>
+		<name>down</name>
+		<graphType>none</graphType>
+	</add>
+	<add>
+		<name>rpn.down</name>
+		<rpn>down,8,*</rpn>
+		<graphType>line</graphType>
+		<legend>received</legend>
+	</add>
+	<add>
+		<name>up</name>
+		<graphType>none</graphType>
+	</add>
+	<add>
+		<name>rpn.up</name>
+		<rpn>up,8,*</rpn>
+		<reversed />
+		<graphType>line</graphType>
+		<legend>bps</legend>
+	</add>
+	<hosttree>
+		<pathstring>${host}</pathstring>
+		<pathstring>Network</pathstring>
+		<pathstring>Munin</pathstring>
+		<pathstring>Interfaces</pathstring>
+		<pathstring>${index}</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathstring>Network</pathstring>
+		<pathstring>Munin</pathstring>
+		<pathstring>Interfaces</pathstring>
+		<pathstring>${index}</pathstring>
+		<pathstring>${host}</pathstring>
+	</viewtree>
+</graphdesc>

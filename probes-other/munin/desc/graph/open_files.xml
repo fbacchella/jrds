@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+    <name>munin_open_files</name>
+    <graphName>open_files</graphName>
+    <graphTitle>File table usage</graphTitle>
+    <unit>
+        <SI/>
+    </unit>
+    <verticalLabel>number of open files</verticalLabel>
+    <add>
+        <name>max</name>
+        <graphType>line</graphType>
+        <legend>max open files</legend>
+    </add>
+    <add>
+        <name>used</name>
+        <graphType>line</graphType>
+        <legend>open files</legend>
+    </add>
+    <hosttree>
+        <pathstring>${host}</pathstring>
+        <pathstring>System</pathstring>
+        <pathstring>Munin</pathstring>
+        <pathstring>open_files</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathstring>System</pathstring>
+        <pathstring>Munin</pathstring>
+        <pathstring>open_files</pathstring>
+        <pathstring>${host}</pathstring>
+    </viewtree>
+</graphdesc>

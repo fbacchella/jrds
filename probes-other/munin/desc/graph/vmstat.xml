@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+    <name>munin_vmstat</name>
+    <graphName>vmstat</graphName>
+    <graphTitle>VMstat</graphTitle>
+    <unit>
+        <SI/>
+    </unit>
+    <verticalLabel>process states</verticalLabel>
+    <add>
+        <name>wait</name>
+        <graphType>line</graphType>
+        <legend>running</legend>
+    </add>
+    <add>
+        <name>sleep</name>
+        <graphType>line</graphType>
+        <legend>I/O sleep</legend>
+    </add>
+    <hosttree>
+        <pathstring>${host}</pathstring>
+        <pathstring>System</pathstring>
+        <pathstring>Munin</pathstring>
+        <pathstring>vmstat</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathstring>System</pathstring>
+        <pathstring>Munin</pathstring>
+        <pathstring>vmstat</pathstring>
+        <pathstring>${host}</pathstring>
+    </viewtree>
+</graphdesc>
