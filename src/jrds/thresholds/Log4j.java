@@ -3,7 +3,7 @@ package jrds.thresholds;
 import java.net.URL;
 import java.util.List;
 
-import jrds.Probe;
+import jrds.objects.probe.Probe;
 
 import org.apache.log4j.Hierarchy;
 import org.apache.log4j.Level;

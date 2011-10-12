@@ -20,9 +20,9 @@ import javax.management.ReflectionException;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 
-import jrds.ConnectedProbe;
-import jrds.ProbeConnected;
-import jrds.ProbeDesc;
+import jrds.objects.probe.ConnectedProbe;
+import jrds.objects.probe.ProbeConnected;
+import jrds.objects.probe.ProbeDesc;
 
 import org.apache.log4j.Level;
 

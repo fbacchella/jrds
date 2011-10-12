@@ -8,9 +8,9 @@ import java.util.Map;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
-import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.Tools;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.ProbeDesc;
 import jrds.starter.XmlProvider;
 
 import org.apache.log4j.Level;

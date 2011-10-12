@@ -16,12 +16,12 @@ import javax.servlet.http.HttpServletRequest;
 import jrds.GraphNode;
 import jrds.HostsList;
 import jrds.Period;
-import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.mockobjects.GetMoke;
 import jrds.mockobjects.MockGraph;
 import jrds.mockobjects.MokeProbe;
+import jrds.objects.probe.Probe;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -211,7 +211,7 @@ public class TestUrlParser {
         parameters.put("max", new String [] { String.valueOf(Double.NaN)} );
         parameters.put("min", new String [] { String.valueOf(Double.NaN)} );
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
-        jrds.Filter f = new jrds.FilterHost("host");
+        jrds.objects.Filter f = new jrds.objects.FilterHost("host");
         String url = pb.makeObjectUrl("root", f, true);
         logger.trace(url);
         Assert.assertTrue(url.contains("host=host"));
@@ -227,7 +227,7 @@ public class TestUrlParser {
     @Test
     public void checkUrl3() throws UnsupportedEncodingException {
         Map<String, String[]> parameters = new HashMap<String, String[]>();
-        jrds.Filter f = jrds.Filter.ALLHOSTS;
+        jrds.objects.Filter f = jrds.objects.Filter.ALLHOSTS;
         String filterName = f.getName();
         parameters.put("filter", new String [] { filterName } );
 
@@ -254,7 +254,7 @@ public class TestUrlParser {
         Map<String, String[]> parameters = new HashMap<String, String[]>();
         HttpServletRequest req = GetMoke.getRequest(parameters);
         ParamsBean pb = new ParamsBean(req, hl);
-        String buildurl = pb.makeObjectUrl("graph", jrds.Filter.ALLHOSTS, true);
+        String buildurl = pb.makeObjectUrl("graph", jrds.objects.Filter.ALLHOSTS, true);
         Assert.assertTrue("bad build url: "+ buildurl, buildurl.startsWith("/graph?"));
     }
 

@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.rrd4j.DsType;
 
-import jrds.ProbeDesc;
+import jrds.objects.probe.ProbeDesc;
 
 
 /**

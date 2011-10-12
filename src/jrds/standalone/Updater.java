@@ -8,10 +8,10 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import jrds.HostsList;
-import jrds.Probe;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
 import jrds.StoreOpener;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.Probe;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.core.RrdDb;

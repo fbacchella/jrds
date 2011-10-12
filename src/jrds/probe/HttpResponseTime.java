@@ -8,6 +8,8 @@ package jrds.probe;
 
 import java.net.URL;
 
+import jrds.objects.probe.UrlProbe;
+
 /**
  * @author bacchell
  *

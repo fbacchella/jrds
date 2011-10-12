@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import jrds.Probe;
-import jrds.ProbeDesc;
 import jrds.Util;
 import jrds.factories.ArgFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.ProbeDesc;
 
 import org.apache.log4j.Logger;
 

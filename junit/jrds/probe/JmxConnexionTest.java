@@ -17,9 +17,9 @@ import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.TabularData;
 
-import jrds.RdsHost;
 import jrds.Tools;
 import jrds.mockobjects.GetMoke;
+import jrds.objects.RdsHost;
 import jrds.starter.Connection;
 import jrds.starter.Resolver;
 import junit.framework.Assert;

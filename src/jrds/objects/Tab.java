@@ -1,4 +1,4 @@
-package jrds;
+package jrds.objects;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -8,11 +8,16 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import jrds.GraphNode;
+import jrds.GraphTree;
+import jrds.HostsList;
+import jrds.Util;
+
 import org.apache.log4j.Logger;
 
 public abstract class Tab {
     public static final class Filters extends Tab {
-        private final Set<String> filters = new TreeSet<String>(jrds.Util.nodeComparator);
+        private final Set<String> filters = new TreeSet<String>(Util.nodeComparator);
 
         public Filters(String name) {
             super(name);
@@ -23,10 +28,10 @@ public abstract class Tab {
         public void add(String filter) {
             filters.add(filter);
         }
-        public Set<jrds.Filter> getFilters() {
-            Set<jrds.Filter> filtersset = new LinkedHashSet<jrds.Filter>(filters.size());
+        public Set<jrds.objects.Filter> getFilters() {
+            Set<jrds.objects.Filter> filtersset = new LinkedHashSet<jrds.objects.Filter>(filters.size());
             for(String filtername: filters) {
-                jrds.Filter f = hostlist.getFilter(filtername);
+                jrds.objects.Filter f = hostlist.getFilter(filtername);
                 if(f != null)
                     filtersset.add(f);
             }
@@ -51,7 +56,7 @@ public abstract class Tab {
         }
     }
     public static final class DynamicTree extends Tab {
-        private final Map<String, List<String>> paths = new TreeMap<String, List<String>>(jrds.Util.nodeComparator);
+        private final Map<String, List<String>> paths = new TreeMap<String, List<String>>(Util.nodeComparator);
         public DynamicTree(String name) {
             super(name);
         }
@@ -116,7 +121,7 @@ public abstract class Tab {
         this.hostlist = hostlist;
     }
 
-    public Set<jrds.Filter> getFilters() {
+    public Set<jrds.objects.Filter> getFilters() {
         throw new RuntimeException("Not implemented");
     }
 
@@ -146,7 +151,7 @@ public abstract class Tab {
     /**
      * @return the id
      */
-    String getId() {
+    public String getId() {
         return id;
     }
 }

@@ -58,6 +58,7 @@
 	
 	<target name="compile">
 		<mkdir dir="${build.home}/classes"/>
+		<mkdir dir="${build.home}/probes"/>
 		<javac srcdir="${src.home}" destdir="${build.home}/classes"
 			debug="${compile.debug}" deprecation="${compile.deprecation}"
 			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
@@ -110,7 +111,7 @@
 			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
 			<classpath refid="project.classpath"/>
 		</javac>
-		<jar destfile="${build.home}/${subprobe}/${subprobe}.jar" basedir="${build.home}/${subprobe}/classes">
+		<jar destfile="${build.home}/probes/${subprobe}.jar" basedir="${build.home}/${subprobe}/classes">
 			<fileset dir="${subprobe.dir}">
 				<include name="desc/**/*.xml" />
 			</fileset>
@@ -123,17 +124,34 @@
 			<fileset dir="dtd">
 				<include name="**.dtd" />
 			</fileset>
-			<fileset dir=".">
-				<include name="desc/**/*.xml" />
-			</fileset>
 			<fileset dir="${build.home}/classes">
 				<include name="**/*.class" />
 				<include name="**/*.xsl" />
 				<exclude name="**/bootstrap/**" />
+				<exclude name="**/snmp/**" />
+				<exclude name="jrds/probe/**" />
 			</fileset>		
 			<fileset dir="${src.home}">
 				<include name="**/*.xml"/>
 				<include name="**/*.xsl"/>
+			</fileset>
+		</jar>
+		<jar destfile="${build.home}/probes/snmpprobes.jar" >
+			<fileset dir="${build.home}/classes">
+				<include name="**/snmp/**" />
+			</fileset>	
+			<fileset dir=".">
+				<include name="desc/*/snmp/**/*.xml" />
+			</fileset>
+		</jar>
+		<jar destfile="${build.home}/probes/other.jar" >
+			<fileset dir="${build.home}/classes">
+				<include name="jrds/probe/**/*.class" />
+				<exclude name="**/snmp/**" />
+			</fileset>	
+			<fileset dir=".">
+				<include name="desc/**/*.xml" />
+				<exclude name="desc/*/snmp/**" />
 			</fileset>
 		</jar>
 		<jar destfile="${build.home}/boot.jar" >
@@ -226,6 +244,9 @@
 			<tarfileset dir="${build.home}" prefix="WEB-INF/lib">
 				<include name="*.jar"/>
 			</tarfileset>
+			<tarfileset dir="${build.home}/probes" prefix="WEB-INF/lib">
+				<include name="*.jar"/>
+			</tarfileset>
 		</tar>
 		<gzip src="${build.home}/${app.name}.tar" destfile="${build.home}/${app.name}.tar.gz"/>
 	</target>
@@ -246,7 +267,10 @@
 			<lib dir="${build.home}">
 				<include name="*.jar"/>
 			</lib>
-    		</war>
+			<lib dir="${build.home}/probes">
+				<include name="*.jar"/>
+			</lib>
+    	</war>
 	</target>
 	
 	<target name="checkdtd">

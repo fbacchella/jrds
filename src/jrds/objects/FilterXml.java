@@ -1,8 +1,10 @@
-package jrds;
+package jrds.objects;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import jrds.GraphNode;
 
 import org.apache.log4j.Logger;
 

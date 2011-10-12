@@ -3,8 +3,8 @@ package jrds.mockobjects;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import jrds.Probe;
-import jrds.probe.UrlProbe;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.UrlProbe;
 
 public class DummyProbeIndexedUrl extends DummyProbeIndexed implements UrlProbe {
 	Class<? extends Probe<?,?>> originalProbe;

@@ -8,15 +8,15 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.Macro;
-import jrds.Probe;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.mockobjects.MokeProbe;
 import jrds.mockobjects.MokeProbeFactory;
+import jrds.objects.Macro;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.Probe;
 import jrds.starter.Starter;
 
 import org.apache.log4j.Level;

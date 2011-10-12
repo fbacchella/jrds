@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jrds.Filter;
 import jrds.GraphNode;
 import jrds.GraphTree;
 import jrds.HostsList;
-import jrds.Tab;
+import jrds.objects.Filter;
+import jrds.objects.Tab;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;

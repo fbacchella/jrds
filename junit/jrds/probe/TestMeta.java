@@ -10,9 +10,9 @@ import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import jrds.Probe;
 import jrds.Tools;
 import jrds.factories.ProbeMeta;
+import jrds.objects.probe.Probe;
 import jrds.snmp.SnmpDiscoverAgent;
 import jrds.webapp.DiscoverAgent;
 import junit.framework.Assert;

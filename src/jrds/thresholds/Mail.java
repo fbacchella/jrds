@@ -9,7 +9,7 @@ import org.apache.log4j.net.SMTPAppender;
 import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.spi.TriggeringEventEvaluator;
 
-import jrds.Probe;
+import jrds.objects.probe.Probe;
 
 public class Mail extends Action {
 	static final Logger mailloger = Logger.getLogger("maillogger");

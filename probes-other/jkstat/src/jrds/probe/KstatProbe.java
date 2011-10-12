@@ -10,7 +10,7 @@ import uk.co.petertribble.jkstat.api.JKstat;
 import uk.co.petertribble.jkstat.api.Kstat;
 
 @ProbeMeta(discoverAgent = JKStatDiscoverAgent.class)
-public class KstatProbe extends jrds.ProbeConnected<String, Number, KstatConnection> {
+public class KstatProbe extends jrds.objects.probe.ProbeConnected<String, Number, KstatConnection> {
 
     private String module;
     private int instance;

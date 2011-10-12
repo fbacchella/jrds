@@ -17,8 +17,8 @@ import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
 import org.snmp4j.smi.OID;
 
-import jrds.Probe;
-import jrds.ProbeDesc;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.ProbeDesc;
 import jrds.probe.snmp.RdsIndexedSnmpRrd;
 import jrds.probe.snmp.RdsSnmpSimple;
 

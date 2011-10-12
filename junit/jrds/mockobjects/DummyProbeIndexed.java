@@ -1,7 +1,7 @@
 package jrds.mockobjects;
 
-import jrds.Probe;
-import jrds.probe.IndexedProbe;
+import jrds.objects.probe.IndexedProbe;
+import jrds.objects.probe.Probe;
 
 public class DummyProbeIndexed extends DummyProbe implements IndexedProbe {
 	Class<? extends Probe<?,?>> originalProbe;

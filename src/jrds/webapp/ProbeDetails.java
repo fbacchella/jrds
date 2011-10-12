@@ -16,8 +16,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import jrds.Probe;
 import jrds.Util;
+import jrds.objects.probe.Probe;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;

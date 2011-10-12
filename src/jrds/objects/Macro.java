@@ -1,4 +1,4 @@
-package jrds;
+package jrds.objects;
 
 import org.w3c.dom.DocumentFragment;
 

@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 
 import jrds.HostsList;
-import jrds.RdsHost;
+import jrds.objects.RdsHost;
 
 /**
  * A few stats for jrds inner status

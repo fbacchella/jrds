@@ -8,10 +8,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 
-import jrds.Probe;
 import jrds.Tools;
 import jrds.factories.ProbeMeta;
 import jrds.factories.xml.JrdsDocument;
+import jrds.objects.probe.Probe;
 import jrds.probe.TestMeta;
 import jrds.webapp.DiscoverAgent;
 import junit.framework.Assert;

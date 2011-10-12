@@ -6,10 +6,10 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 
-import jrds.ProbeDesc;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
 import jrds.Tools;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.ProbeDesc;
 import jrds.starter.Connection;
 import jrds.starter.Resolver;
 import jrds.starter.SocketFactory;

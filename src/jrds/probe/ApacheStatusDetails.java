@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jrds.objects.probe.IndexedProbe;
+
 import org.apache.log4j.Level;
 
 /**

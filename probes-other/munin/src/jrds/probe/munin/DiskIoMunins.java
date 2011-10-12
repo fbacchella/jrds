@@ -1,6 +1,6 @@
 package jrds.probe.munin;
 
-import jrds.ProbeDesc;
+import jrds.objects.probe.ProbeDesc;
 
 import org.rrd4j.DsType;
 

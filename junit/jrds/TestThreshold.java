@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import jrds.mockobjects.Full;
+import jrds.objects.probe.Probe;
 import jrds.thresholds.Threshold;
 
 import org.apache.log4j.Level;

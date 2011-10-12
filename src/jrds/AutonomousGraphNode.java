@@ -1,6 +1,6 @@
 package jrds;
 
-import jrds.probe.ContainerProbe;
+import jrds.objects.probe.ContainerProbe;
 import jrds.webapp.WithACL;
 
 public class AutonomousGraphNode extends GraphNode implements WithACL  {

@@ -12,7 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Map;
 
-import jrds.Probe;
+import jrds.objects.probe.Probe;
 
 import org.apache.log4j.Level;
 import org.rrd4j.core.Sample;

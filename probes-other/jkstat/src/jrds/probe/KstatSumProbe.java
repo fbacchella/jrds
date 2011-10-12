@@ -3,7 +3,7 @@ package jrds.probe;
 import java.util.HashMap;
 import java.util.Map;
 
-import jrds.ProbeConnected;
+import jrds.objects.probe.ProbeConnected;
 import uk.co.petertribble.jkstat.api.JKstat;
 import uk.co.petertribble.jkstat.api.Kstat;
 

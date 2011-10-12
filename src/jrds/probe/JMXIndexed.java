@@ -1,5 +1,7 @@
 package jrds.probe;
 
+import jrds.objects.probe.IndexedProbe;
+
 
 public class JMXIndexed extends JMX implements IndexedProbe {
 	

@@ -19,9 +19,9 @@ import javax.net.ssl.X509TrustManager;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 
-import jrds.Probe;
-import jrds.RdsHost;
 import jrds.Util;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.Probe;
 import jrds.starter.SocketFactory;
 import jrds.starter.XmlProvider;
 

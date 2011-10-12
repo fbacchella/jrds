@@ -6,9 +6,9 @@
 package jrds.probe.jdbc;
 
 import jrds.GraphDesc;
-import jrds.Probe;
 import jrds.GraphNode;
 import jrds.PropertiesManager;
+import jrds.objects.probe.Probe;
 
 /**
  * @author bacchell

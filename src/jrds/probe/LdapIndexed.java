@@ -1,5 +1,7 @@
 package jrds.probe;
 
+import jrds.objects.probe.IndexedProbe;
+
 
 public class LdapIndexed extends Ldap implements IndexedProbe {
 	String index;

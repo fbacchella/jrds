@@ -17,9 +17,9 @@ import java.util.Set;
 
 import jrds.GraphDesc;
 import jrds.GraphNode;
-import jrds.Probe;
-import jrds.ProbeDesc;
 import jrds.PropertiesManager;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.ProbeDesc;
 
 import org.apache.log4j.Logger;
 

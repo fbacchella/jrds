@@ -3,9 +3,9 @@ package jrds.graphe;
 import java.awt.Color;
 
 import jrds.GraphDesc;
-import jrds.Probe;
 import jrds.GraphNode;
 import jrds.PropertiesManager;
+import jrds.objects.probe.Probe;
 
 
 /**

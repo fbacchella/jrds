@@ -10,10 +10,10 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.Probe;
-import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.Tools;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.ProbeDesc;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;

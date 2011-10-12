@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 
 import jrds.PropertiesManager;
-import jrds.RdsHost;
+import jrds.objects.RdsHost;
 
 public class SocketFactory extends Starter {
 	int timeout;

@@ -1,7 +1,7 @@
 /*
  * Created on 22 nov. 2004
  */
-package jrds;
+package jrds.objects.probe;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,9 +19,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.GraphDesc;
+import jrds.GraphNode;
+import jrds.StoreOpener;
 import jrds.factories.ProbeMeta;
-import jrds.probe.IndexedProbe;
-import jrds.probe.UrlProbe;
+import jrds.objects.RdsHost;
 import jrds.starter.StarterNode;
 
 import org.apache.log4j.Level;
@@ -156,7 +158,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         this.name = name;
     }
 
-    protected DsDef[] getDsDefs() {
+    public DsDef[] getDsDefs() {
         return getPd().getDsDefs();
     }
 

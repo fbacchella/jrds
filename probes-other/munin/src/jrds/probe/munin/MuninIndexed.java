@@ -1,6 +1,6 @@
 package jrds.probe.munin;
 
-import jrds.probe.IndexedProbe;
+import jrds.objects.probe.IndexedProbe;
 
 public class MuninIndexed extends Munin implements IndexedProbe {
 	String indexKey;

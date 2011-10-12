@@ -4,14 +4,12 @@ _##  $Id: BackEndCommiter.java 235 2006-03-01 21:29:48 +0100 (mer., 01 mars 2006
 _##
 _##########################################################################*/
 
-package jrds.probe;
+package jrds.objects.probe;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
-import jrds.Probe;
-import jrds.ProbeDesc;
 
 import org.apache.log4j.Level;
 
@@ -61,7 +59,7 @@ public class ContainerProbe extends  Probe<Object, Number> {
 
     /**
      * This method does nothing for a virtual probe
-     * @see jrds.Probe#collect()
+     * @see jrds.objects.probe.Probe#collect()
      */
     public void collect() {
     }

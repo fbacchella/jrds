@@ -1,4 +1,4 @@
-package jrds;
+package jrds.objects.probe;
 
 /**
  * This interface is used to indicate that a probe use a connexion

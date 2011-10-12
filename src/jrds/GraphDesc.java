@@ -20,8 +20,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Util.SiPrefix;
-import jrds.probe.IndexedProbe;
-import jrds.probe.UrlProbe;
+import jrds.objects.probe.IndexedProbe;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.UrlProbe;
 import jrds.probe.jdbc.JdbcProbe;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;

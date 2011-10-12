@@ -13,10 +13,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jrds.Probe;
 import jrds.Util;
-import jrds.probe.IndexedProbe;
-import jrds.probe.UrlProbe;
+import jrds.objects.probe.IndexedProbe;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.UrlProbe;
 
 import org.apache.log4j.Level;
 

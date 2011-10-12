@@ -5,11 +5,11 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.Filter;
 import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
+import jrds.objects.Filter;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
 import junit.framework.Assert;

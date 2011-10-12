@@ -8,8 +8,8 @@ import jrds.Graph;
 import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.HostsList;
-import jrds.Probe;
 import jrds.PropertiesManager;
+import jrds.objects.probe.Probe;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.core.FetchData;

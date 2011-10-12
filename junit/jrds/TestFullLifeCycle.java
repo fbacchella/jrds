@@ -12,6 +12,7 @@ import java.util.Date;
 import javax.imageio.ImageIO;
 
 import jrds.mockobjects.Full;
+import jrds.objects.probe.Probe;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

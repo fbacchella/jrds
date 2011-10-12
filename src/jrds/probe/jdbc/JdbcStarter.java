@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import jrds.RdsHost;
+import jrds.objects.RdsHost;
 import jrds.starter.Resolver;
 import jrds.starter.Starter;
 

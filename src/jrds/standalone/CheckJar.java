@@ -8,9 +8,9 @@ import java.util.Collection;
 import java.util.Map;
 
 import jrds.GraphDesc;
-import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.configuration.ConfigObjectFactory;
+import jrds.objects.probe.ProbeDesc;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Logger;

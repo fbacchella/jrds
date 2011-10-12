@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import jrds.Probe;
 import jrds.PropertiesManager;
+import jrds.objects.probe.Probe;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

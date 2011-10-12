@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.factories.ProbeMeta;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.ProbeDesc;
 import jrds.starter.XmlProvider;
 
 import org.apache.log4j.Level;

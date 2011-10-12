@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import jrds.Probe;
-import jrds.RdsHost;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.Probe;
 
 public abstract class Connection<ConnectedType> extends Starter {
 	

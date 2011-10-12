@@ -1,9 +1,9 @@
 package jrds.configuration;
 
-import jrds.Macro;
 import jrds.Util;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
+import jrds.objects.Macro;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.DocumentFragment;

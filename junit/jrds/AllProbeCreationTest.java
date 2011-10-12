@@ -13,6 +13,9 @@ import jrds.factories.ProbeFactory;
 import jrds.mockobjects.DummyProbe;
 import jrds.mockobjects.DummyProbeIndexed;
 import jrds.mockobjects.DummyProbeIndexedUrl;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.ProbeDesc;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -59,10 +62,10 @@ public class AllProbeCreationTest {
         host.setHostDir(pm.rrddir);
         for(ProbeDesc pd: probeDescMap.values()) {
             Class<? extends Probe<?,?>> originalClass = pd.getProbeClass();
-            if(jrds.probe.UrlProbe.class.isAssignableFrom(originalClass)) {
+            if(jrds.objects.probe.UrlProbe.class.isAssignableFrom(originalClass)) {
                 pd.setProbeClass(DummyProbeIndexedUrl.class);
             }
-            else if(jrds.probe.IndexedProbe.class.isAssignableFrom(originalClass)) {
+            else if(jrds.objects.probe.IndexedProbe.class.isAssignableFrom(originalClass)) {
                 pd.setProbeClass(DummyProbeIndexed.class);
             }
             else

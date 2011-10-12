@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import jrds.GraphNode;
 import jrds.HostsList;
-import jrds.Probe;
+import jrds.objects.probe.Probe;
 
 /**
  * A servlet wich show the last update values and time

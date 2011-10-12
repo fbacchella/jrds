@@ -2,9 +2,9 @@ package jrds.snmp;
 
 import java.util.Map;
 
-import jrds.RdsHost;
 import jrds.factories.HostBuilderAgent;
 import jrds.factories.xml.JrdsElement;
+import jrds.objects.RdsHost;
 import jrds.starter.StarterNode;
 
 import org.apache.log4j.Logger;

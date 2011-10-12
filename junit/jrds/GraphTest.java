@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import jrds.mockobjects.GetMoke;
+import jrds.objects.probe.Probe;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

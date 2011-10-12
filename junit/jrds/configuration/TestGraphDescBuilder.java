@@ -8,12 +8,12 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.GraphDesc;
-import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 import jrds.mockobjects.MokeProbe;
+import jrds.objects.probe.ProbeDesc;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

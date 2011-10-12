@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import jrds.RdsHost;
+import jrds.objects.RdsHost;
 import jrds.webapp.Configuration;
 import jrds.webapp.rpc.JrdsRequestProcessorFactoryFactory.InitializableRequestProcessor;
 import jrds.webapp.rpc.Role.RoleList;

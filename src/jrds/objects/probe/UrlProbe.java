@@ -3,7 +3,7 @@
  *
  * TODO 
  */
-package jrds.probe;
+package jrds.objects.probe;
 
 import java.net.URL;
 

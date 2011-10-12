@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jrds.probe.IndexedProbe;
+import jrds.objects.probe.IndexedProbe;
 import jrds.snmp.SnmpRequester;
 
 import org.apache.log4j.Level;

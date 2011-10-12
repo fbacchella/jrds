@@ -4,7 +4,7 @@ _##  $Id$
 _##
 _##########################################################################*/
 
-package jrds;
+package jrds.objects.probe;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +20,8 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import jrds.Util;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
@@ -185,13 +187,13 @@ public class ProbeDesc implements Cloneable {
 			collectKey = name;
 		}
 		if(valuesMap.containsKey("defaultValue")) {
-			defaultValues.put(name, jrds.Util.parseStringNumber(valuesMap.get("defaultValue").toString(), Double.NaN));
+			defaultValues.put(name, Util.parseStringNumber(valuesMap.get("defaultValue").toString(), Double.NaN));
 		}
         if(valuesMap.containsKey("minValue")) {
-            min = jrds.Util.parseStringNumber(valuesMap.get("minValue").toString(), MINDEFAULT);
+            min = Util.parseStringNumber(valuesMap.get("minValue").toString(), MINDEFAULT);
         }
         if(valuesMap.containsKey("maxValue")) {
-            max = jrds.Util.parseStringNumber(valuesMap.get("maxValue").toString(), MAXDEFAULT);
+            max = Util.parseStringNumber(valuesMap.get("maxValue").toString(), MAXDEFAULT);
         }
 		dsMap.put(name, new DsDesc(type, heartbeat, min, max, collectKey));
 	}

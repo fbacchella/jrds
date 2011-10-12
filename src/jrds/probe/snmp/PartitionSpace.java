@@ -37,7 +37,7 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
     /**
      * The want to store the value in octet, not in bloc size
      * The translation is done by the probe, not the graph
-     * @see jrds.Probe#filterValues(java.util.Map)
+     * @see jrds.objects.probe.Probe#filterValues(java.util.Map)
      */
     @Override
     public Map<OID, Number> filterValues(Map<OID, Object> snmpVars) {

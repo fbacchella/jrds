@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jrds.HostsList;
-import jrds.Tab;
+import jrds.objects.Tab;
 
 import org.apache.log4j.Logger;
 import org.json.JSONArray;

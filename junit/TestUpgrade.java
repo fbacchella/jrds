@@ -4,10 +4,10 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Tools;
-import jrds.Probe;
-import jrds.ProbeDesc;
 import jrds.mockobjects.DummyProbe;
 import jrds.mockobjects.GetMoke;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.ProbeDesc;
 
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;

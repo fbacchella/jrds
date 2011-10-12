@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jrds.mockobjects.MokeProbe;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.ProbeDesc;
 import jrds.thresholds.Threshold;
 
 import org.apache.log4j.Level;

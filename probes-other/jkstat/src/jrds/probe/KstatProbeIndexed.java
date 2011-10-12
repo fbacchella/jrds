@@ -3,6 +3,8 @@ package jrds.probe;
 import java.util.HashMap;
 import java.util.Map;
 
+import jrds.objects.probe.IndexedProbe;
+
 public class KstatProbeIndexed extends KstatProbe implements IndexedProbe {
 	String index;
 	

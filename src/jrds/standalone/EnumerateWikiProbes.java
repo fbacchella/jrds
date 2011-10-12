@@ -8,11 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import jrds.Probe;
-import jrds.ProbeConnected;
-import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.configuration.ConfigObjectFactory;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.ProbeConnected;
+import jrds.objects.probe.ProbeDesc;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.core.DsDef;

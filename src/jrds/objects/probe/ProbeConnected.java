@@ -1,4 +1,4 @@
-package jrds;
+package jrds.objects.probe;
 
 import java.util.Collections;
 import java.util.Map;

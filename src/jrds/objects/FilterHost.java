@@ -1,4 +1,7 @@
-package jrds;
+package jrds.objects;
+
+import jrds.GraphNode;
+import jrds.GraphTree;
 
 public class FilterHost extends Filter {
 	String hostname = "";

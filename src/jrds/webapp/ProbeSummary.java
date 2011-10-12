@@ -14,7 +14,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jrds.Probe;
+import jrds.objects.probe.Probe;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;

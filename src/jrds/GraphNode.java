@@ -6,6 +6,7 @@ package jrds;
 import java.io.IOException;
 import java.util.LinkedList;
 
+import jrds.objects.probe.Probe;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 

@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.Random;
 
 import jrds.GraphDesc;
-import jrds.Probe;
-import jrds.ProbeDesc;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.ProbeDesc;
 
 import org.rrd4j.DsType;
 import org.rrd4j.core.RrdDb;

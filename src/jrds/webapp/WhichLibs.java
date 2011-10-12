@@ -6,8 +6,10 @@
 
 package jrds.webapp;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -63,7 +65,19 @@ public final class WhichLibs extends JrdsServlet {
 			out.println();
 
 			PropertiesManager pm = getPropertiesManager();
-			out.println("Temp dir:" + pm.tmpdir);
+			out.println("Temp dir: " + pm.tmpdir);
+            out.println("current directory: " + new File(".").getCanonicalPath());
+            out.println("Probes descriptions found in: ");
+            Enumeration<URL> descurl = getPropertiesManager().extensionClassLoader.getResources("/desc");
+            while(descurl.hasMoreElements()) {
+                out.println("    " + descurl.nextElement());
+            }
+            out.println();
+            descurl = getPropertiesManager().extensionClassLoader.getResources("desc");
+            while(descurl.hasMoreElements()) {
+                out.println("    " + descurl.nextElement());
+            }
+            out.println();
 			out.println(resolv("String", ""));
 			out.println(resolv("jrds", this));
 			String transformerFactory = System.getProperties().getProperty("javax.xml.transform.TransformerFactory");

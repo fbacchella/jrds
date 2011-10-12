@@ -6,12 +6,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.HostsList;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.graphe.Sum;
 import jrds.mockobjects.MockGraph;
+import jrds.objects.RdsHost;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
 import junit.framework.Assert;

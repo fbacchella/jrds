@@ -1,7 +1,9 @@
-package jrds;
+package jrds.objects;
 
+import jrds.GraphNode;
+import jrds.GraphTree;
 import jrds.graphe.Sum;
-import jrds.probe.ContainerProbe;
+import jrds.objects.probe.ContainerProbe;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 

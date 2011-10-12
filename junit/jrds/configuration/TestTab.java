@@ -6,9 +6,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.HostsList;
 import jrds.PropertiesManager;
-import jrds.Tab;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
+import jrds.objects.Tab;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

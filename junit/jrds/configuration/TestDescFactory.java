@@ -7,11 +7,11 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.GraphDesc;
 import jrds.GraphNode;
-import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 import jrds.mockobjects.GetMoke;
+import jrds.objects.probe.ProbeDesc;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

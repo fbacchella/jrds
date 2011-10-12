@@ -1,6 +1,8 @@
-package jrds;
+package jrds.objects;
 
 import java.util.Set;
+
+import jrds.GraphNode;
 
 public class FilterTag extends Filter {
 	private String tag;

@@ -3,8 +3,8 @@ package jrds.starter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import jrds.Probe;
-import jrds.RdsHost;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.Probe;
 
 import org.apache.log4j.Level;
 

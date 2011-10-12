@@ -1,7 +1,7 @@
 package jrds.factories;
 
-import jrds.RdsHost;
 import jrds.factories.xml.JrdsElement;
+import jrds.objects.RdsHost;
 import jrds.starter.StarterNode;
 
 public abstract class HostBuilderAgent {

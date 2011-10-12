@@ -2,12 +2,12 @@ package jrds.webapp;
 
 import java.util.Properties;
 
-import jrds.Probe;
-import jrds.RdsHost;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.mockobjects.MokeProbe;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.Probe;
 import jrds.standalone.JettyLogger;
 
 import org.apache.log4j.Level;

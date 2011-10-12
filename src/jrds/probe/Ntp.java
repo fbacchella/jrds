@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import jrds.Probe;
+import jrds.objects.probe.Probe;
 import jrds.starter.Resolver;
 
 import org.apache.commons.net.ntp.NTPUDPClient;

@@ -31,17 +31,17 @@ import java.util.zip.GZIPInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import jrds.Base64;
-import jrds.Filter;
 import jrds.Graph;
 import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.GraphTree;
 import jrds.HostsList;
 import jrds.Period;
-import jrds.Probe;
-import jrds.Tab;
 import jrds.Util;
 import jrds.Util.SiPrefix;
+import jrds.objects.Filter;
+import jrds.objects.Tab;
+import jrds.objects.probe.Probe;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -411,10 +411,10 @@ public class ParamsBean implements Serializable {
     }
 
     private void addFilterArgs(Map<String, Object> args) {
-        if(f instanceof jrds.FilterHost) {
+        if(f instanceof jrds.objects.FilterHost) {
             args.put("host", f.getName());
         }
-        else if (f instanceof jrds.Filter){
+        else if (f instanceof jrds.objects.Filter){
             args.put("filter", f.getName());
 
         }
@@ -430,11 +430,11 @@ public class ParamsBean implements Serializable {
         Map<String, Object> args = new HashMap<String, Object>();
         addPeriodArgs(args, timeAbsolute);
         addMinMaxArgs(args);
-        if(o instanceof jrds.FilterHost) {
-            args.put("host", ((jrds.Filter)o).getName());
+        if(o instanceof jrds.objects.FilterHost) {
+            args.put("host", ((jrds.objects.Filter)o).getName());
         }
-        else if(o instanceof jrds.Filter) {
-            args.put("filter", ((jrds.Filter)o).getName());
+        else if(o instanceof jrds.objects.Filter) {
+            args.put("filter", ((jrds.objects.Filter)o).getName());
         }
         else if(o instanceof jrds.Graph) {
             //First check if it's a referenced graph
@@ -453,7 +453,7 @@ public class ParamsBean implements Serializable {
                 }
             }
         }
-        else if(o instanceof jrds.Probe<?,?>){
+        else if(o instanceof jrds.objects.probe.Probe<?,?>){
             args.put("pid", o.hashCode());
         }
         else {

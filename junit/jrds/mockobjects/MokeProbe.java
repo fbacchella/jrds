@@ -9,9 +9,9 @@ import java.util.Map;
 
 import org.rrd4j.DsType;
 
-import jrds.Probe;
-import jrds.ProbeDesc;
-import jrds.RdsHost;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.ProbeDesc;
 
 public class MokeProbe<A,B> extends Probe<A,B> {
 

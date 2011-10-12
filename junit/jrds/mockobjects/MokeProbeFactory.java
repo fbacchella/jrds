@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.GraphDesc;
-import jrds.Probe;
-import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.factories.ProbeFactory;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.ProbeDesc;
 
 public class MokeProbeFactory extends ProbeFactory {
 	static Map<String, ProbeDesc> probeDescMap = new HashMap<String, ProbeDesc>();

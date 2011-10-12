@@ -16,7 +16,7 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
 
-import jrds.ProbeConnected;
+import jrds.objects.probe.ProbeConnected;
 
 import org.apache.log4j.Level;
 

@@ -17,11 +17,11 @@ import java.util.Set;
 
 import org.apache.log4j.Level;
 
-import jrds.ProbeConnected;
-import jrds.ProbeDesc;
 import jrds.Util;
-import jrds.probe.IndexedProbe;
-import jrds.probe.UrlProbe;
+import jrds.objects.probe.IndexedProbe;
+import jrds.objects.probe.ProbeConnected;
+import jrds.objects.probe.ProbeDesc;
+import jrds.objects.probe.UrlProbe;
 
 public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnection> implements UrlProbe, IndexedProbe {
 	String query = null;

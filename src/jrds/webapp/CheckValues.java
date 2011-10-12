@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jrds.HostsList;
-import jrds.Probe;
+import jrds.objects.probe.Probe;
 
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;

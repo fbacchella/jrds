@@ -14,8 +14,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import jrds.ProbeConnected;
 import jrds.factories.ProbeMeta;
+import jrds.objects.probe.ProbeConnected;
 
 import org.apache.log4j.Level;
 

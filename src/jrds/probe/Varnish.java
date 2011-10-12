@@ -12,7 +12,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jrds.Probe;
+import jrds.objects.probe.IndexedProbe;
+import jrds.objects.probe.Probe;
 import jrds.starter.SocketFactory;
 
 import org.apache.log4j.Level;

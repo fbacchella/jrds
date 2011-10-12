@@ -2,9 +2,9 @@ package jrds.starter;
 
 import jrds.HostsList;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
 import jrds.Tools;
 import jrds.mockobjects.SnmpAgent;
+import jrds.objects.RdsHost;
 import jrds.probe.snmp.RdsSnmpSimple;
 import jrds.snmp.MainStarter;
 import jrds.snmp.SnmpStarter;

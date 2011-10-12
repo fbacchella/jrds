@@ -2,11 +2,11 @@ package jrds.configuration;
 
 import java.lang.reflect.InvocationTargetException;
 
-import jrds.Filter;
-import jrds.FilterXml;
 import jrds.Util;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
+import jrds.objects.Filter;
+import jrds.objects.FilterXml;
 
 import org.apache.log4j.Logger;
 

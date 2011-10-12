@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jrds.Period;
-import jrds.Probe;
+import jrds.objects.probe.Probe;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.core.FetchData;

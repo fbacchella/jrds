@@ -32,8 +32,12 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import jrds.probe.IndexedProbe;
-import jrds.probe.UrlProbe;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.ConnectedProbe;
+import jrds.objects.probe.IndexedProbe;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.ProbeDesc;
+import jrds.objects.probe.UrlProbe;
 import jrds.starter.ChainedProperties;
 import jrds.starter.StarterNode;
 

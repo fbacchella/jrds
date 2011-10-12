@@ -3,9 +3,9 @@ package jrds.configuration;
 import java.util.ArrayList;
 import java.util.List;
 
-import jrds.Tab;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
+import jrds.objects.Tab;
 
 import org.apache.log4j.Logger;
 

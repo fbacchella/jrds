@@ -15,8 +15,9 @@ import java.util.IllegalFormatConversionException;
 import java.util.List;
 import java.util.Map;
 
-import jrds.Probe;
-import jrds.RdsHost;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.UrlProbe;
 import jrds.starter.Resolver;
 import jrds.starter.Starter;
 

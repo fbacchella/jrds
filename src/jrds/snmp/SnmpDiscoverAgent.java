@@ -13,9 +13,9 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import jrds.Probe;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
+import jrds.objects.probe.Probe;
 import jrds.webapp.DiscoverAgent;
 
 import org.apache.log4j.Level;

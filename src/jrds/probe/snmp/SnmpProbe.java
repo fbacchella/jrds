@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import jrds.Probe;
-import jrds.ProbeDesc;
 import jrds.factories.ProbeMeta;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.ProbeDesc;
 import jrds.snmp.SnmpDiscoverAgent;
 import jrds.snmp.SnmpRequester;
 import jrds.snmp.SnmpStarter;

@@ -1,4 +1,4 @@
-package jrds;
+package jrds.objects;
 
 import java.io.File;
 import java.util.Collection;
@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import jrds.objects.probe.Probe;
 import jrds.starter.Resolver;
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;

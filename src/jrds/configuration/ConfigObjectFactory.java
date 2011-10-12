@@ -9,15 +9,15 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.Filter;
 import jrds.GraphDesc;
-import jrds.Macro;
-import jrds.ProbeDesc;
-import jrds.RdsHost;
-import jrds.Tab;
 import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.graphe.Sum;
+import jrds.objects.Filter;
+import jrds.objects.Macro;
+import jrds.objects.RdsHost;
+import jrds.objects.Tab;
+import jrds.objects.probe.ProbeDesc;
 
 import org.apache.log4j.Logger;
 

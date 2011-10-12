@@ -10,6 +10,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import jrds.mockobjects.MokeProbe;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.Probe;
+import jrds.objects.probe.ProbeDesc;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

@@ -15,6 +15,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.mockobjects.DummyProbe;
 import jrds.mockobjects.MokeProbe;
+import jrds.objects.RdsHost;
+import jrds.objects.probe.Probe;
 import jrds.xmlResources.ResourcesLocator;
 import junit.framework.Assert;
 

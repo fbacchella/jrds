@@ -2,7 +2,7 @@ package jrds.mockobjects;
 
 import jrds.GraphDesc;
 import jrds.GraphNode;
-import jrds.Probe;
+import jrds.objects.probe.Probe;
 
 public class MockGraph extends GraphNode {
 
