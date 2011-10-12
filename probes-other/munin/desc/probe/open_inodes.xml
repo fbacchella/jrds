@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>OpenInodesMunin</name>
+    <probeName>munin_open_inodes</probeName>
+    <probeClass>jrds.probe.munin.Munin</probeClass>
+    <specific name="fetch">open_inodes</specific>
+    <ds>
+        <dsName>max</dsName>
+        <dsType>GAUGE</dsType>
+        <collect>max</collect>
+    </ds>
+    <ds>
+        <dsName>used</dsName>
+        <dsType>GAUGE</dsType>
+        <collect>used</collect>
+    </ds>
+    <graphs>
+        <name>munin_open_inodes</name>
+    </graphs>
+</probedesc>

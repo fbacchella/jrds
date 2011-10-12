@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>ProcessesMunin</name>
+    <probeName>munin_processes</probeName>
+    <probeClass>jrds.probe.munin.Munin</probeClass>
+    <specific name="fetch">processes</specific>
+    <ds>
+        <dsName>processes</dsName>
+        <dsType>GAUGE</dsType>
+        <collect>processes</collect>
+    </ds>
+    <ds>
+        <dsName>runnable</dsName>
+        <dsType>GAUGE</dsType>
+        <collect>runnable</collect>
+    </ds>
+    <ds>
+        <dsName>zombie</dsName>
+        <dsType>GAUGE</dsType>
+        <collect>zombie</collect>
+    </ds>
+    <ds>
+        <dsName>stopped</dsName>
+        <dsType>GAUGE</dsType>
+        <collect>stopped</collect>
+    </ds>
+    <ds>
+        <dsName>uninterruptible</dsName>
+        <dsType>GAUGE</dsType>
+        <collect>uninterruptible</collect>
+    </ds>
+    <ds>
+        <dsName>sleeping</dsName>
+        <dsType>GAUGE</dsType>
+        <collect>sleeping</collect>
+    </ds>
+    <ds>
+        <dsName>dead</dsName>
+        <dsType>GAUGE</dsType>
+        <collect>dead</collect>
+    </ds>
+    <ds>
+        <dsName>paging</dsName>
+        <dsType>GAUGE</dsType>
+        <collect>paging</collect>
+    </ds>
+    <graphs>
+        <name>munin_processes</name>
+    </graphs>
+</probedesc>
