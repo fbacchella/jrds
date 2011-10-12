@@ -561,7 +561,7 @@ implements Cloneable, WithACL {
             this.legend = legend;
         }
         public String toString() {
-            return "DsDesc(" + name + "," + dsName + ",\"" + rpn + "\"," + graphType + "," + color + ",\"" + legend + "\"," + cf + ")";
+            return "DsDesc(" + name + "," + dsName + ",\"" + (rpn == null ? "" : rpn) + "\"," + graphType + "," + color + ",\"" + (legend == null ? "" : legend) + "\"," + cf + ")";
         }
     }
 
@@ -851,15 +851,16 @@ implements Cloneable, WithACL {
     }
 
     /**
-     * Fill a GraphDef with value as defined by the graph desc
+     * Fill a GraphDef with values as defined by the graph desc
      * @param graphDef the GraphDef to configure
      * @param defProbe The probe to get values from
-     * @param customData some custom data
+     * @param customData some custom data, they override existing values in the associated probe
      */
     public void fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe,
             Map<String, ? extends Plottable> customData) {
         HostsList hl = defProbe.getHostList();
         List<DsDesc> toDo = new ArrayList<DsDesc>();
+        //The datasources already found
         Set<String> datasources = new HashSet<String>();
 
         for(DsDesc ds: allds) {
@@ -868,6 +869,7 @@ implements Cloneable, WithACL {
             if(! ds.graphType.datasource()) {
                 complete = true;
             }
+            //The graph is a percentile
             else if(ds.percentile != null) {
                 graphDef.percentile(ds.name, ds.dsName, ds.percentile);
                 datasources.add(ds.name);
@@ -882,6 +884,7 @@ implements Cloneable, WithACL {
                 }
             }
             //Does the datas existe in the provided values
+            //It override existing values in the probe
             else if(customData != null && customData.containsKey(ds.dsName)) {
                 complete = true;
                 if( ! datasources.contains(ds.name)) {
@@ -889,7 +892,7 @@ implements Cloneable, WithACL {
                     datasources.add(ds.name);
                 }
             }
-            //Last bu common case, datasource refere to a rrd
+            //Last but common case, datasource refers to a rrd
             //Or they might be on the associated rrd
             else {
                 Probe<?,?> probe = defProbe;
@@ -914,7 +917,7 @@ implements Cloneable, WithACL {
                     datasources.add(ds.name);
                 }
                 else {
-                    logger.error("Incoherent definition for " + ds.name + " in " + name + " found: " + ds);
+                    logger.error("Datasource '" + ds.name + "' defined twice in " + name + ", for found: " + ds);
                 }
             }
             if (complete) {
