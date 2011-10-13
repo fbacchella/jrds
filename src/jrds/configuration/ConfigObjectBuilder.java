@@ -148,6 +148,31 @@ abstract class ConfigObjectBuilder<BuildObject> {
     }
 
     /**
+     * Apply a method on a object with the value found in a collection of XML elements
+     * If the element is null, the method does nothing.
+     * @param element
+     * @param o
+     * @param method
+     * @param argType
+     * @return true if a least one set method succed
+     * @throws SecurityException
+     * @throws NoSuchMethodException
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws InstantiationException
+     */
+    public boolean setMethod(Iterable<JrdsElement> e, Object o, String method, Class<?> argType) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        if(e == null)
+            return false;
+        boolean setted = false;
+        for(JrdsElement elem: e) {
+            setted |= setMethod(elem, o, method, argType);
+        }
+        return setted;
+    }
+
+    /**
      * Apply a method on a object with the value found in the XML element.<p>
      * If the element is null, the method does nothing.<p>
      * The text value of the element is parsed to the type given in the argument argType. This type must have a constructor
