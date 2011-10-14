@@ -19,8 +19,7 @@ public class TestDownload extends Download {
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
-        logger.setLevel(Level.TRACE);
-        Tools.setLevel(new String[] {"jrds.webapp.ParamsBean"}, logger.getLevel());
+        Tools.setLevel(logger, Level.TRACE, "jrds.webapp.ParamsBean");
     }
 
     @Test

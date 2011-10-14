@@ -25,9 +25,8 @@ public class TestPack {
 	@BeforeClass
 	static public void configure() throws Exception {
 		Tools.configure();
-		logger.setLevel(Level.TRACE);
 		System.setProperty("org.mortbay.log.class", jrds.standalone.JettyLogger.class.getName());
-		Tools.setLevel(new String[] {ParamsBean.class.getName(), JSonQueryParams.class.getName(), JSonPack.class.getName()}, logger.getLevel());
+        Tools.setLevel(logger, Level.TRACE, ParamsBean.class.getName(), JSonQueryParams.class.getName(), JSonPack.class.getName());
 		tester=new ServletTester();
 		tester.setContextPath("/");
 		ServletContext sc =  tester.getContext().getServletContext();
