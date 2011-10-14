@@ -20,8 +20,7 @@ public class TestConfiguration {
 	@BeforeClass
 	static public void configure() throws IOException {
 		Tools.configure();
-		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"jrds.HostList", "jrds.PropertiesManager", ParamsBean.class.getName(), Configuration.class.getName() }, logger.getLevel());
+		Tools.setLevel(logger, Level.TRACE, "jrds.HostList", "jrds.PropertiesManager", ParamsBean.class.getName(), Configuration.class.getName());
 		logger.trace(GetMoke.getResponse(null).getOutputStream().getClass());
 	}
 
