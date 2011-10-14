@@ -115,4 +115,12 @@ public class TestGraphDescBuilder {
         Assert.assertEquals("legend count failed", 0, gd.getLegendLines());
     }
 
+    @Test
+    public void testFullConfigpath() throws Exception {
+        PropertiesManager localpm = Tools.getEmptyProperties();
+        ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
+        conf.getNodeMap(ConfigType.GRAPHDESC).put("graphdesc", Tools.parseRessource("graphdesc.xml"));
+        Assert.assertNotNull("Graphdesc not build", conf.setGraphDescMap().get("name"));
+    }
+
 }

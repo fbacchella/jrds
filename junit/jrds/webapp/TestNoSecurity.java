@@ -61,10 +61,9 @@ public class TestNoSecurity  {
 	@BeforeClass
 	static public void configure() throws Exception {
 		Tools.configure();
-		logger.setLevel(Level.TRACE);
 		System.setProperty("org.mortbay.log.class", jrds.standalone.JettyLogger.class.getName());
-		Tools.setLevel(new String[] {JettyLogger.class.getName(), Status.class.getName(), "jrds.webapp.Configuration", "jrds.webapp.JrdsServlet"}, logger.getLevel());
-		tester=new ServletTester();
+		Tools.setLevel(logger, Level.TRACE, JettyLogger.class.getName(), Status.class.getName(), "jrds.webapp.Configuration", "jrds.webapp.JrdsServlet");
+		tester = new ServletTester();
 		tester.setContextPath("/");
 		ServletContext sc =  tester.getContext().getServletContext();
 

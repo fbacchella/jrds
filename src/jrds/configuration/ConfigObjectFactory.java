@@ -134,7 +134,9 @@ public class ConfigObjectFactory {
 
     public Map<String, Filter> setFilterMap() {
         Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.FILTER);
-        Map<String, Filter> filtersMap = getObjectMap(new FilterBuilder(), nodemap);
+        FilterBuilder ob = new FilterBuilder();
+        ob.setPm(pm);
+        Map<String, Filter> filtersMap = getObjectMap(ob, nodemap);
         logger.debug(jrds.Util.delayedFormatString("Filters configured: %s", filtersMap.keySet()));
         return filtersMap;
     }

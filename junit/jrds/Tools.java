@@ -120,29 +120,10 @@ final public class Tools {
         return d;
     }
 
-    static public Node parseStringElement(String s) throws Exception { 
-        InputStream is = new ByteArrayInputStream(s.getBytes());
-        Document d = Tools.parseRessource(is);
-        //		while(d.hasChildNodes()) {
-        //			Node n = d.removeChild(d.getChildNodes().item(0));
-        //			if(n.getNodeType() == Node.ELEMENT_NODE)
-        //				return n;
-        //		}
-        return d.removeChild(d.getDocumentElement());
-    }
-
-    static public Node AdoptElementString(Node n, String s) throws Exception {
-        Node element = parseStringElement(s);
-        n.getOwnerDocument().adoptNode(element);
-        n.appendChild(element);
-        return element;
-    }
-
     static public void setLevel(Logger logger, Level level, String... allLoggers) {
         Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDER);
         //The system property override the code log level
         if(System.getProperty("jrds.testloglevel") != null){
-            System.err.println("testloglevel overridden");
             level = Level.toLevel(System.getProperty("jrds.testloglevel"));
         }
         logger.setLevel(level);
@@ -257,7 +238,19 @@ final public class Tools {
         pm.setProperty("configdir", "tmp/config");
         pm.setProperty("rrddir", "tmp");
         pm.setProperty("strictparsing", "true");
+        pm.setProperty("autocreate", "true");
         pm.update();
         pm.libspath.clear();
+    }
+    
+    static public final PropertiesManager getEmptyProperties() {
+        PropertiesManager pm = new PropertiesManager();
+        pm.update();
+        pm.configdir = null;
+        pm.strictparsing = true;
+        pm.loglevel = Level.ERROR;
+        pm.extensionClassLoader = PropertiesManager.class.getClassLoader();
+        pm.libspath.clear();
+        return pm;
     }
 }

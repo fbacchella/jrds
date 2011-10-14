@@ -283,4 +283,13 @@ public class TestMacro {
         }
         Assert.assertTrue("macro not recursive", found);
     }
+    
+    @Test
+    public void testFullConfigpath() throws Exception {
+        PropertiesManager localpm = Tools.getEmptyProperties();
+        ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
+        conf.getNodeMap(ConfigType.MACRODEF).put("macrodef", Tools.parseString(goodMacroXml));
+        Assert.assertNotNull("Macro not build", conf.setMacroMap().get("macrodef"));
+    }
+
 }

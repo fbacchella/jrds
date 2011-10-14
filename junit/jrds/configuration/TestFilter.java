@@ -37,7 +37,9 @@ public class TestFilter {
 		Tools.configure();
 		Tools.prepareXml(false);
 
-		pm.setProperty("configdir", "tmp");
+		pm.setProperty("configdir", "tmp/empty");
+		pm.setProperty("strictparsing", "true");
+        pm.setProperty("autocreate", "true");
 		pm.setProperty("rrddir", "tmp");
 		pm.setProperty("security", "yes");
 		pm.update();
@@ -79,6 +81,15 @@ public class TestFilter {
 		
 		ACL acl = f.getACL();
 		Assert.assertEquals("Not an role ACL", RolesACL.class, acl.getClass());
+	}
+	
+	@Test
+	public void testFullConfigpath() throws Exception {
+	    PropertiesManager localpm = Tools.getEmptyProperties();
+        ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
+        conf.getNodeMap(ConfigType.FILTER).put("filtername", Tools.parseString(goodFilterXml));
+        
+        Assert.assertNotNull("Filter not build", conf.setFilterMap().get("filtername"));
 	}
 
 }
