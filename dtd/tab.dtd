@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+a new tab definition
+@title a new tab definition
+-->
 <!ELEMENT tab (filter+|(graph|cgraph)+)>
 <!ATTLIST tab name CDATA #REQUIRED>
 <!ELEMENT filter (#PCDATA)>
+<!-- a reference to a graph id to add, host/graphname -->
 <!ELEMENT graph (path)+>
 <!ATTLIST graph id CDATA #REQUIRED>
+<!-- a reference to a custom graph id -->
 <!ELEMENT cgraph (path)+>
 <!ATTLIST cgraph id CDATA #REQUIRED>
+<!-- For graph or custom graph added in a tab, the path for the dynamic tree -->
 <!ELEMENT path (#PCDATA)>

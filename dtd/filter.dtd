@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+Used to define a new filter
+@title A filter declaration
+@doctype filter PUBLIC "-//jrds//DTD Filter//EN" "urn:jrds:filter"
+-->
+
+<!ELEMENT filter (name, role*, (path | tag | qualifiedname)+)>
 <!ELEMENT path (#PCDATA)>
+<!-- All the tags that an host me match to have his graphs included -->
 <!ELEMENT tag (#PCDATA)>
 <!ELEMENT name (#PCDATA)>
 <!ELEMENT qualifiedname (#PCDATA)>
 <!ELEMENT role (#PCDATA)>
-<!ELEMENT filter (name, role*, (path | tag | qualifiedname)+)>

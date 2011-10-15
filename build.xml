@@ -1,4 +1,4 @@
-<project name="jrds" default="war" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" >
+<project name="jrds" default="war" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:dtddoc="antlib:DTDDoc" >
 	<!-- set global properties for this build -->
 	<property name="app.name" value="jrds"/>
 	<property name="app.path" value="/${app.name}"/>
@@ -184,8 +184,17 @@
 			<link href="http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/"/>
 		</javadoc>
 	</target>
+	<target name="dtddoc">
+        <dtddoc:dtddoc showHiddenTags="true"
+                showFixmeTags="false"
+                sourceDir="dtd"
+                destDir="${build.home}/dtddoc"
+                docTitle = "DTDDoc test title">
+            <include name="*.dtd"/>
+        </dtddoc:dtddoc>
+	</target>
 	
-	<target name="clean" description="clean up">
+    <target name="clean" description="clean up">
 		<delete dir="${build.home}"/>
 		<delete dir="${testdir}"/>
 	</target>
@@ -323,5 +332,6 @@
     		<regexpmapper from="dojo-[^/]*/(.*)" to="dojo/\1"/>
     	</unzip>
     	<mkdir dir="libprobes"/>
-    </target>		
+    </target>
+	
 </project>

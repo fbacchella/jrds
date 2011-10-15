@@ -1,56 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+Used to define a new host, or a macro, must go in the configuration directory
+@title an host declaration
+@doctype host PUBLIC "-//jrds//DTD Host//EN" "urn:jrds:host"
+-->
+<!-- a new host declaration -->
 <!ELEMENT host (tag|snmp|macro|connection|probe|collection|for|properties)+ >
+<!-- a new macro declaration -->
 <!ELEMENT macrodef (probe|tag|collection|for)+ >
+<!-- 
+@attr name the macro name
+-->
 <!ATTLIST macrodef
 	name CDATA #REQUIRED
 >
+<!--
+@attr name the name for the host
+@attr dnsName the name used for DNS resolution, if different from the name
+@attr hidden don' show the host in the graph tree
+-->
 <!ATTLIST host
 	name CDATA #REQUIRED
 	dnsName CDATA #IMPLIED
 	hidden (true|false) "false"
 >
+<!-- define a tag for the host, used by filters and the tag tab -->
 <!ELEMENT tag (#PCDATA)>
+<!-- include a macro in the host definition -->
 <!ELEMENT macro (properties?) >
+<!-- 
+@attr name the macro to call-->
 <!ATTLIST macro
 	name CDATA #REQUIRED
 >
+<!-- define a connection used by probes in this host -->
 <!ELEMENT connection (arg, list)* >
+<!-- 
+@attr type the class for this connnection
+@name name the name for this connection, if not defined, used the class name
+-->
 <!ATTLIST connection
 		type CDATA #REQUIRED
 		name CDATA #IMPLIED
 >
-<!ELEMENT probe ((arg| list)*, dslist?, threshold*, properties?) >
+<!-- add a probe to this host -->
+<!ELEMENT probe ((arg| list)*, dslist?, properties?) >
+<!--
+@attr type the probedesc to use
+@attr label an optionnal label what will appeares in the tree
+@attr connection the connection to used to collect data for this probe
+-->
 <!ATTLIST probe
 			type CDATA #REQUIRED
 			label CDATA #IMPLIED
 			connection CDATA #IMPLIED
 >
+<!-- the arguments needed by this probe -->
 <!ELEMENT arg EMPTY>
+<!--
+@arg type the java type for arg, the package can be ommited for common classes (String, Integer, URL). This class must have a constructor using a String argument
+@value the value for this probe, given to the string constructor for this class
+-->
 <!ATTLIST arg
 			type CDATA #REQUIRED
 			value CDATA #REQUIRED
 >
+<!-- Some probes can take a list has an argument -->
 <!ELEMENT list (arg, list)+ >
-<!ELEMENT threshold (action+ ) >
-<!ATTLIST threshold
-	name CDATA #REQUIRED
-	dsName CDATA #REQUIRED
-	value CDATA #REQUIRED
-	duration CDATA #REQUIRED
-	operation CDATA #REQUIRED
->
-<!ELEMENT action (arg, list)* >
-<!ATTLIST action
-	type CDATA #REQUIRED
->
 <!--from http://java.sun.com/dtd/properties.dtd -->
 <!ELEMENT properties ( comment?, entry* ) >
 <!ELEMENT comment (#PCDATA) >
 <!ELEMENT entry (#PCDATA) >
 <!ATTLIST entry key CDATA #REQUIRED>
+<!--
+Define a collection of value, than can be used in a for loop 
+-->
 <!ELEMENT collection (element+)>
+<!--
+@attr name the collection name, used in the for loop
+-->
 <!ATTLIST collection name CDATA #REQUIRED >
 <!ELEMENT element (#PCDATA)>
+<!--
+A for loop, if you want to easily declare many instance of the same probe with different arguemnts<p>
+It enumerate other a list, given it's name, or can be just a counter
+ -->
 <!ELEMENT for (probe+) >
 <!ATTLIST for 
 	var CDATA #REQUIRED
@@ -59,7 +93,12 @@
 	max CDATA #IMPLIED
 	step CDATA #IMPLIED
 >
+<!-- A fast declaration for a snmp connection -->
 <!ELEMENT snmp (#PCDATA) >
+<!--
+@attr community the snmp community
+@attr version the snmp version, 1 or 2, snmp version 3 is not (yet) supported
+-->
 <!ATTLIST snmp 
 	community CDATA #REQUIRED
 	version CDATA #REQUIRED

@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+A probe description declaration
+@doctype probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc"
+@title A probedesc declaration
+
+-->
 <!ELEMENT probedesc (name, probeName, probeClass, (snmpRequester | specific+)?, properties?, uptimefactor?, (index, uniq)?, defaultargs?, ds*, graphs)>
+<!-- a specific is a custom element for a probedescription -->
+<!ELEMENT specific (#PCDATA)>
+<!--
+@attr name the name for this specific, that will be used by the java class for this probedesc
+-->
 <!ATTLIST specific 
 			name CDATA #REQUIRED
 >
-<!ELEMENT specific (#PCDATA)>
+<!-- a new datasource for this probe -->
 <!ELEMENT ds ((dsName, dsType)?, (oid | (oidhigh, oidlow) | collect | (collecthigh, collectlow) )?, minValue?, maxValue?, defaultValue?)>
+<!-- some probes always take the same arguments, for an easy declaration, a default argument can be defined if not defined in the host -->
 <!ELEMENT defaultargs (arg | list)+ >
 <!ELEMENT arg EMPTY>
 <!ATTLIST arg
@@ -15,6 +27,7 @@
 <!ELEMENT graphs (name*)>
 <!ELEMENT dsName (#PCDATA)>
 <!ELEMENT dsType (#PCDATA)>
+<!-- the probe description name -->
 <!ELEMENT name (#PCDATA)>
 <!ELEMENT value (#PCDATA)>
 <!ELEMENT oid (#PCDATA)>
@@ -28,7 +41,9 @@
 <!ELEMENT uptimefactor (#PCDATA)>
 <!ELEMENT index (#PCDATA)>
 <!ELEMENT uniq (#PCDATA)>
+<!-- the java class backend for this probe -->
 <!ELEMENT probeClass (#PCDATA)>
+<!-- the probe instance name, will the rrd file name -->
 <!ELEMENT probeName (#PCDATA)>
 <!ELEMENT snmpRequester (#PCDATA)>
 <!ELEMENT collect (#PCDATA)>

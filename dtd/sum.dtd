@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+A special kind of custom graph, the sum values of differents graphs
+@title a sum custom graph
+-->
+
 <!ELEMENT sum (role*, element+)>
 <!ATTLIST sum name CDATA #REQUIRED>
 <!ELEMENT role (#PCDATA)>
