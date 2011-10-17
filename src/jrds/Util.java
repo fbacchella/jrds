@@ -444,7 +444,7 @@ public class Util {
         else
             transformer = tFactory.newTransformer();
 
-        String documentEncoding = d.getInputEncoding();
+        String documentEncoding = d.getXmlEncoding();
         if(documentEncoding == null)
             documentEncoding = "UTF-8";
         transformer.setOutputProperty(OutputKeys.ENCODING, documentEncoding);
