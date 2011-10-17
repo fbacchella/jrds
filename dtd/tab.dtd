@@ -1,16 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-a new tab definition
-@title a new tab definition
+A new tab definition.
+
+A filter can either contains a list of filter or a tree that will be build using graphs.
+@title A new tab definition
+@root tab
 -->
+<!-- the tab -->
 <!ELEMENT tab (filter+|(graph|cgraph)+)>
+<!-- @attr the tab name, the name that will be displayed -->
 <!ATTLIST tab name CDATA #REQUIRED>
+<!-- a filter te be added -->
 <!ELEMENT filter (#PCDATA)>
 <!-- a reference to a graph id to add, host/graphname -->
 <!ELEMENT graph (path)+>
+<!-- @attr the id to a graph -->
 <!ATTLIST graph id CDATA #REQUIRED>
 <!-- a reference to a custom graph id -->
 <!ELEMENT cgraph (path)+>
+<!-- @attr the id to a custom graph -->
 <!ATTLIST cgraph id CDATA #REQUIRED>
 <!-- For graph or custom graph added in a tab, the path for the dynamic tree -->
 <!ELEMENT path (#PCDATA)>
