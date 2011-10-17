@@ -226,7 +226,7 @@ function doGraphList(result) {
 			src: "graph?" + dojo.objectToQuery(graph.graph)
 		}, 
 		graphBlock);
-		
+
 		if(graph.width)
 			dojo.attr(graphImg, "width", graph.width);
 		if(graph.height)
@@ -240,7 +240,7 @@ function doGraphList(result) {
 			height: 16,
 			width: 16,
 			title: "Popup the graph",
-			onclick: "popup('" +  dojo.objectToQuery(graph.graph) + "'," + graph.id + ");"
+			onclick: function() { popup(dojo.objectToQuery(graph.graph),graph.id); }
 		},
 		iconsList);
 
@@ -250,7 +250,7 @@ function doGraphList(result) {
 			width: 16,
 			src: "img/application_view_list.png",
 			title: "Graph details",
-			onclick: "details('" + dojo.objectToQuery(graph.probe) + "', '" + graph.probename + "');"
+			onclick: function() {details(dojo.objectToQuery(graph.probe),graph.probename);}
 		},
 		iconsList);
 
@@ -260,7 +260,7 @@ function doGraphList(result) {
 			width: 16,
 			src: "img/date.png",
 			title: "Graph history",
-			onclick: "history('" + dojo.objectToQuery(graph.history) + "', '" + graph.probename + "');"
+			onclick: function() {history(dojo.objectToQuery(graph.history), graph.probename);}
 		},
 		iconsList);
 
@@ -270,7 +270,7 @@ function doGraphList(result) {
 			width: 16,
 			src: "img/disk.png",
 			title: "Save data",
-			onclick: "save('" + dojo.objectToQuery(graph.graph) + "', '" + graph.probename + "');"
+			onclick: function() {save(dojo.objectToQuery(graph.graph), graph.probename);}
 		},
 		iconsList);
 	}
