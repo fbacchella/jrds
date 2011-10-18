@@ -396,7 +396,7 @@ function getTree(isFilters, unfold) {
 
 	store.fetch({
 		onError: function(errData, request) {
-			console.log("on error detected in dojo.data.ItemFileReadStore");
+			console.log("on error detected in dojo.data.ItemFileReadStore:" + errData);
 			var standby = dijit.byId('standby.' );
 			if(standby != null) {
 				standby.hide();
@@ -671,7 +671,9 @@ function setupTabs() {
 	}
 	//We're in the default tab, load the needed try now
 	else {
-	    tabWidget.selectChild(tabWidget.getChildren()[0]);
+        var child = tabWidget.getChildren()[0];
+        child.keepParams = true;
+	    tabWidget.selectChild(child);
 		if(queryParams.host || queryParams.tree || queryParams.filter)
 			isFilters = false;
 		getTree(isFilters);
