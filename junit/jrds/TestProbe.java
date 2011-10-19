@@ -27,7 +27,7 @@ public class TestProbe {
     static public void configure() throws IOException {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, "jrds.Probe", "jrds.ProbeDesc", "jrds.Probe");
-        StoreOpener.prepare("MEM");
+        StoreOpener.prepare("FILE");
     }
 
     @AfterClass

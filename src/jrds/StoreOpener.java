@@ -21,8 +21,8 @@ public final class StoreOpener {
 
     private static final AtomicLong waitTime = new AtomicLong(0);
     private static final AtomicInteger lockCount = new AtomicInteger(0);
-    private static String backend = null;
-    private static Boolean usepool = null;
+    private static RrdBackendFactory backend = RrdBackendFactory.getDefaultFactory();
+    private static boolean usepool = false;
 
     /**
      * Retrieves the RrdDb instance matching a specific RRD datasource name
@@ -42,7 +42,7 @@ public final class StoreOpener {
         if(usepool)
             db = instance.requestRrdDb(cp);
         else
-            db = new RrdDb(cp);
+            db = new RrdDb(cp, backend);
         long finish = System.currentTimeMillis();
         waitTime.addAndGet(finish - start);
         lockCount.incrementAndGet();
@@ -67,30 +67,36 @@ public final class StoreOpener {
         }
     }
 
-    public static final void prepare() {
-        prepare(null);
-    }
-    
     public static final void prepare(String backend) {
         usepool = false;
-        if(backend !=  null & StoreOpener.backend != null)
-            RrdBackendFactory.setDefaultFactory(backend);
-        else if(StoreOpener.backend != null && ! StoreOpener.backend.equals(backend))
-            logger.warn("Trying to change backend, a restart is needed");
+        if(backend != null) {
+            StoreOpener.backend = RrdBackendFactory.getFactory(backend);
+            logger.trace(Util.delayedFormatString("Store backend set to %s", backend));
+        }
+        else
+            StoreOpener.backend = RrdBackendFactory.getDefaultFactory();
+
+        logger.debug(Util.delayedFormatString("Store backend used is %s",  StoreOpener.backend.getName()));
     }
-    
+
     public static final void prepare(int dbPoolSize, int syncPeriod, int timeout, String backend) {
-        if(backend !=  null & StoreOpener.backend != null)
-            RrdBackendFactory.setDefaultFactory(backend);
-        else if(StoreOpener.backend != null && ! StoreOpener.backend.equals(backend))
-            logger.warn("Trying to change backend, a restart is needed");
-        
-        RrdBackendFactory factory = RrdBackendFactory.getDefaultFactory();
-        if(factory instanceof RrdFileBackendFactory && instance == null) {
+        usepool = false;
+        if(backend != null) {
+            try {
+                RrdBackendFactory.setDefaultFactory(backend);
+                logger.trace(Util.delayedFormatString("Store backend set to %s", backend));
+            } catch (IllegalStateException e) {
+                logger.warn("Trying to change default backend, a restart is needed");
+            }
+        }
+        StoreOpener.backend = RrdBackendFactory.getDefaultFactory();
+
+        if(RrdFileBackendFactory.class.isAssignableFrom(StoreOpener.backend.getClass())) {
             instance = RrdDbPool.getInstance();
             instance.setCapacity(dbPoolSize);
             usepool = true;
         }
+        logger.debug(Util.delayedFormatString("Store backend used is %s",  StoreOpener.backend));
     }
 
     public static final void stop() {
