@@ -240,7 +240,7 @@ function doGraphList(result) {
                 src: "img/application_double.png",
                 height: 16,
                 width: 16,
-                title: "Popup the graph",
+                title: "Popup the graph"
             },
             iconsList);
         dojo.connect(application_double, "onclick", graph, function(){
@@ -253,7 +253,7 @@ function doGraphList(result) {
                 height: 16,
                 width: 16,
                 src: "img/application_view_list.png",
-                title: "Graph details",
+                title: "Graph details"
             },
             iconsList);
         dojo.connect(application_view_list, "onclick", graph, function(){
@@ -266,8 +266,7 @@ function doGraphList(result) {
                 height: 16,
                 width: 16,
                 src: "img/date.png",
-                title: "Graph history",
-                graph: graph,
+                title: "Graph history"
             },
             iconsList);
         dojo.connect(time, "onclick", graph, function(){
@@ -280,7 +279,7 @@ function doGraphList(result) {
                 height: 16,
                 width: 16,
                 src: "img/disk.png",
-                title: "Save data",
+                title: "Save data"
             },
             iconsList);
         dojo.connect(disk, "onclick", graph, function(){
