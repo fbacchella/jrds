@@ -1,7 +1,5 @@
 package jrds.probe;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,6 +20,7 @@ import org.apache.log4j.Level;
 
 import uk.co.petertribble.jkstat.api.JKstat;
 import uk.co.petertribble.jkstat.api.Kstat;
+import uk.co.petertribble.jkstat.client.KClientConfig;
 import uk.co.petertribble.jkstat.client.RemoteJKstat;
 
 public class JKStatDiscoverAgent extends DiscoverAgent {
@@ -36,14 +35,13 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
         int port = jrds.Util.parseStringNumber(request.getParameter("discoverJKStatPort"), new Integer(KstatConnection.DEFAULTPORT));
         try {
             String hostName = hostname;
-            URL remoteUrl = new URL("http", hostName, port, "/");
-            JKstat remoteJk = new RemoteJKstat(remoteUrl.toString());
+            JKstat remoteJk = new RemoteJKstat(new KClientConfig("http://" + hostName + ":" + port));
             List<String> argsTypes = Collections.emptyList();
             List<String> argsValues = Collections.emptyList();
 
             if(port != KstatConnection.DEFAULTPORT) {
                 argsTypes = Collections.singletonList("Integer");
-                argsValues = Collections.singletonList(Integer.toString(port).toString());
+                argsValues = Collections.singletonList(Integer.toString(port));
             }
             addConnexion(hostElement, KstatConnection.class.getName(), argsTypes, argsValues);
 
@@ -88,7 +86,7 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
                 String module = buffer == null ? null : buffer.getTextContent();
                 buffer = root.findByPath("specific[@name='name']");
                 String name = buffer == null ? null : buffer.getTextContent();
-                
+
                 buffer = root.findByPath("specific[@name='index']");
                 String instanceVal = buffer == null ? null : buffer.getTextContent();
                 int instance = jrds.Util.parseStringNumber(instanceVal, new Integer(0));
@@ -114,10 +112,8 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
                     }
                 }
             }
-        } catch (MalformedURLException e) {
-            this.log(Level.ERROR, "Malformed URL http://%s:%d/", hostname, port);
         } catch (ClassNotFoundException e) {
-            this.log(Level.ERROR, e.getMessage());
+            log(Level.ERROR, "jrdsjkstat missing a class : %s", e);
         }
     }
 
