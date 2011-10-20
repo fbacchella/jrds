@@ -38,7 +38,15 @@ public class Discover extends JrdsServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 
         String hostname = request.getParameter("host");
-
+        if(hostname == null || "".equals(hostname.trim())) {
+            try {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "hostname to scan not provided");
+            } catch (IOException e) {
+            }
+            return;               
+        }
+        hostname = hostname.trim();
+        
         PropertiesManager pm = getPropertiesManager();
 
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
@@ -81,6 +89,8 @@ public class Discover extends JrdsServlet {
         for(DiscoverAgent da: getHostsList().getDiscoverAgent()) {
             try {
                 da.discover(hostname, hostEleme, probdescs, request);
+            } catch (NoClassDefFoundError e) {
+                logger.error("Discover agent " + da + " failed to load class with " + da.getClass().getClassLoader(), e);
             } catch (Throwable e) {
                 logger.error("Discover failed for " + da + ": " + e, e);
             }
