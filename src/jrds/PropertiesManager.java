@@ -189,7 +189,15 @@ public class PropertiesManager extends Properties {
         }
         if(logger.isDebugEnabled())
             logger.debug("Internal class loader will look in:" + urls);
-        return  URLClassLoader.newInstance(arrayUrl, getClass().getClassLoader());
+        return new URLClassLoader(arrayUrl, getClass().getClassLoader()) {
+            /* (non-Javadoc)
+             * @see java.lang.Object#toString()
+             */
+            @Override
+            public String toString() {
+                return "JRDS' class loader";
+            }
+        };
     }
 
     private File prepareDir(File dir, boolean autocreate) {
@@ -304,7 +312,7 @@ public class PropertiesManager extends Properties {
         collectorThreads = parseInteger(getProperty("collectorThreads", "1"));
         dbPoolSize = parseInteger(getProperty("dbPoolSize", "10")) + collectorThreads;
         syncPeriod = parseInteger(getProperty("syncPeriod", Integer.toString(step / 2)));
-        
+
         strictparsing = parseBoolean(getProperty("strictparsing", "false"));
         try {
             Enumeration<URL> descurl = getClass().getClassLoader().getResources("desc");
