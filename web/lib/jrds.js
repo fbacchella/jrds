@@ -234,45 +234,58 @@ function doGraphList(result) {
 
 		var iconsList =  dojo.create("div", {"class": "iconslist"}, graphBlock);
 
+        //Create the popup button
 		var application_double = dojo.create("img", {
-			"class": "icon",
-			src: "img/application_double.png",
-			height: 16,
-			width: 16,
-			title: "Popup the graph",
-			onclick: function() { popup(dojo.objectToQuery(graph.graph),graph.id); }
-		},
-		iconsList);
+                "class": "icon",
+                src: "img/application_double.png",
+                height: 16,
+                width: 16,
+                title: "Popup the graph",
+            },
+            iconsList);
+        dojo.connect(application_double, "onclick", graph, function(){
+            popup(dojo.objectToQuery(this.graph),this.id);
+        });
 
+        //Create the probe's details button
 		var application_view_list = dojo.create("img", {
-			"class": "icon",
-			height: 16,
-			width: 16,
-			src: "img/application_view_list.png",
-			title: "Graph details",
-			onclick: function() {details(dojo.objectToQuery(graph.probe),graph.probename);}
-		},
-		iconsList);
+                "class": "icon",
+                height: 16,
+                width: 16,
+                src: "img/application_view_list.png",
+                title: "Graph details",
+            },
+            iconsList);
+        dojo.connect(application_view_list, "onclick", graph, function(){
+            details(dojo.objectToQuery(this.probe),this.probename);
+        });
 
+        //Create the history button
 		var time = dojo.create("img", {
-			"class": "icon",
-			height: 16,
-			width: 16,
-			src: "img/date.png",
-			title: "Graph history",
-			onclick: function() {history(dojo.objectToQuery(graph.history), graph.probename);}
-		},
-		iconsList);
+                "class": "icon",
+                height: 16,
+                width: 16,
+                src: "img/date.png",
+                title: "Graph history",
+                graph: graph,
+            },
+            iconsList);
+        dojo.connect(time, "onclick", graph, function(){
+            history(dojo.objectToQuery(this.history), this.probename);
+        });
 
+        //Create the save button
 		var disk = dojo.create("img", {
-			"class": "icon",
-			height: 16,
-			width: 16,
-			src: "img/disk.png",
-			title: "Save data",
-			onclick: function() {save(dojo.objectToQuery(graph.graph), graph.probename);}
-		},
-		iconsList);
+                "class": "icon",
+                height: 16,
+                width: 16,
+                src: "img/disk.png",
+                title: "Save data",
+            },
+            iconsList);
+        dojo.connect(disk, "onclick", graph, function(){
+            save(dojo.objectToQuery(this.graph), this.probename);
+        });
 	}
 	if(this.standby != null)
 		this.standby.hide();
