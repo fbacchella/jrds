@@ -12,6 +12,7 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.DailyRollingFileAppender;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 
@@ -95,11 +96,18 @@ public class JrdsLoggerConfiguration {
     }
 
     /**
-     * Replaced all the defined appender of a logger with the jrds' one
-     * @param logName a logger name
+     * Configure a logger by redirecting it to the jrds' appender and setting it's level
+     * if it's not already defined
+     * @param logname the logger name
+     * @param level the desired level
      */
-    static public void joinAppender(String logName) {
-        Logger logger = Logger.getLogger(logName);
+    static public void configureLogger(String logname, Level level) {
+        Logger externallogger = LogManager.getLoggerRepository().exists(logname);
+        if(externallogger == null) {
+            externallogger = Logger.getLogger(logname);
+            externallogger.setLevel(Level.ERROR);
+        }
+        Logger logger = Logger.getLogger(logname);
         Appender app = Logger.getLogger("jrds").getAppender(APPENDER);
         Appender oldApp = logger.getAppender(app.getName());
         if(oldApp != null)
