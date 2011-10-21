@@ -65,7 +65,7 @@ public class Munin extends ProbeConnected<String, Number, MuninConnection> {
 						String[] kvp = lastLine.split(" ");
 						if(kvp.length == 2) {
 							String name = kvp[0];
-							Number value = jrds.Util.parseStringNumber(kvp[1], Double.class, Double.NaN);
+							Number value = jrds.Util.parseStringNumber(kvp[1], Double.NaN);
 							if(name != null && value != null)
 								retValue.put(name.replace(".value", ""), value);
 						};

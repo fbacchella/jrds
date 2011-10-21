@@ -26,6 +26,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class MuninDiscoverAgent extends DiscoverAgent {
+    
     public MuninDiscoverAgent() {
         super("Munin");
     }
@@ -80,7 +81,7 @@ public class MuninDiscoverAgent extends DiscoverAgent {
                 if(fetchValue != null && ! "".equals(fetchValue) &&  muninClass.isAssignableFrom(c)) {
                     if( muninProbes.contains(fetchValue) ) {
                         muninProbes.remove(fetchValue);
-                            addProbe(hostElement, name, null, null);
+                        addProbe(hostElement, name, null, null);
                     }
 
                     else if(IndexedProbe.class.isAssignableFrom(c)) {
