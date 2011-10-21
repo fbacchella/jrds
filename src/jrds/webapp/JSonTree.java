@@ -95,7 +95,7 @@ public class JSonTree extends JSonData {
             logger.trace(jrds.Util.delayedFormatString("Trying with graph tree roots: %s", rootstry));
             GraphTree child = rootstry.iterator().next();
             Map<String, GraphTree> childTree = child.getChildsMap();
-            //Don't go too deep
+            //Don't go in empty nodes
             if(childTree.isEmpty())
                 break;
             //a graph found, stop here
