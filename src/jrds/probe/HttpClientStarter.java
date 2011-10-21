@@ -7,8 +7,11 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 
 public class HttpClientStarter extends Starter {
+    private static final String USERAGENT = "JRDS HTTP agent";
     HttpClient client = null;
     int maxConnect = 0;
     int timeout = 0;
@@ -30,9 +33,11 @@ public class HttpClientStarter extends Starter {
         cm.setDefaultMaxPerRoute(2);
 
         client = new DefaultHttpClient(cm);
-        client.getParams().setParameter(CoreConnectionPNames.SO_TIMEOUT, timeout);
-        client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
-        client.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
+        HttpParams params = client.getParams();
+        params.setParameter(CoreConnectionPNames.SO_TIMEOUT, timeout);
+        params.setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
+        params.setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, timeout);
+        HttpProtocolParams.setUserAgent(params, USERAGENT);
         return true;
     }
 
