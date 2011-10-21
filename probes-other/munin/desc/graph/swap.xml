@@ -1,23 +1,17 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
     <name>munin_swap</name>
     <graphName>swap</graphName>
     <graphTitle>Swap in/out</graphTitle>
-    <unit>
-        <SI/>
-    </unit>
     <verticalLabel>pages per s in (-) / out (+)</verticalLabel>
+    <upperLimit>100000.0</upperLimit>
     <add>
         <name>swap_out</name>
-        <reversed/>
         <graphType>line</graphType>
-        <legend>swap</legend>
     </add>
     <add>
         <name>swap_in</name>
-        <graphType>line</graphType>
-        <legend>swap</legend>
+        <graphType>none</graphType>
     </add>
     <hosttree>
         <pathstring>${host}</pathstring>

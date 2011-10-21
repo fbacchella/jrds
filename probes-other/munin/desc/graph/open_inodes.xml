@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
-    <name>munin_open_inodes</name>
+    <name>open_inodes</name>
     <graphName>open_inodes</graphName>
     <graphTitle>Inode table usage</graphTitle>
-    <unit>
-        <SI/>
-    </unit>
     <verticalLabel>number of open inodes</verticalLabel>
     <add>
         <name>max</name>
         <graphType>line</graphType>
-        <legend>inode table size</legend>
+        <legend>The size of the system inode table.</legend>
     </add>
     <add>
         <name>used</name>
         <graphType>line</graphType>
-        <legend>open inodes</legend>
+        <legend>The number of currently open inodes.</legend>
     </add>
     <hosttree>
         <pathstring>${host}</pathstring>

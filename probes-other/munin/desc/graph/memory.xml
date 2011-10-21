@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+    <name>munin-memory</name>
+    <graphName>memory</graphName>
+    <graphTitle>Memory usage</graphTitle>
+    <unit>
+    	<binary/>
+    </unit>
+    <verticalLabel>bytes</verticalLabel>
+    <add>
+        <name>cached</name>
+        <graphType>line</graphType>
+        <legend>Parked file data (file content) cache.</legend>
+    </add>
+    <add>
+        <name>buffers</name>
+        <graphType>line</graphType>
+        <legend>Block device (e.g. harddisk) cache.</legend>
+    </add>
+    <add>
+        <name>vmalloc_used</name>
+        <graphType>line</graphType>
+        <legend>Virtual memory used by the kernel.</legend>
+    </add>
+    <add>
+        <name>slab</name>
+        <graphType>line</graphType>
+        <legend>Memory used by the kernel.</legend>
+    </add>
+    <add>
+        <name>swap_cache</name>
+        <graphType>line</graphType>
+        <legend>Page both in swap and RAM</legend>
+    </add>
+    <add>
+        <name>inactive</name>
+        <graphType>line</graphType>
+        <legend>Memory not currently used.</legend>
+    </add>
+    <add>
+        <name>free</name>
+        <graphType>line</graphType>
+        <legend>Wasted memory..</legend>
+    </add>
+    <add>
+        <name>committed</name>
+        <graphType>line</graphType>
+        <legend>Committed memory.</legend>
+    </add>
+    <add>
+        <name>apps</name>
+        <graphType>line</graphType>
+        <legend>Memory used by user-space applications.</legend>
+    </add>
+    <add>
+        <name>page_tables</name>
+        <graphType>line</graphType>
+        <legend>Map between virtual and physical memory addresses.</legend>
+    </add>
+    <add>
+        <name>active</name>
+        <graphType>line</graphType>
+        <legend>Memory recently used</legend>
+    </add>
+    <add>
+        <name>swap</name>
+        <graphType>line</graphType>
+        <legend>Swap space used.</legend>
+    </add>
+    <add>
+        <name>mapped</name>
+        <graphType>line</graphType>
+        <legend>All mmap()ed pages.</legend>
+    </add>
+    <hosttree>
+        <pathstring>${host}</pathstring>
+        <pathstring>System</pathstring>
+        <pathstring>Munin</pathstring>
+        <pathstring>memory</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathstring>System</pathstring>
+        <pathstring>Munin</pathstring>
+        <pathstring>memory</pathstring>
+        <pathstring>${host}</pathstring>
+    </viewtree>
+</graphdesc>

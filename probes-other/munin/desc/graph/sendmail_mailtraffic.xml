@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+    <name>sendmail_mailtraffic</name>
+    <graphName>sendmail_mailtraffic</graphName>
+    <graphTitle>Sendmail email volumes</graphTitle>
+    <verticalLabel>bytes/s</verticalLabel>
+    <upperLimit>1000000.0</upperLimit>
+    <add>
+        <name>sent</name>
+        <graphType>line</graphType>
+    </add>
+    <add>
+        <name>received</name>
+        <graphType>line</graphType>
+    </add>
+    <hosttree>
+        <pathstring>${host}</pathstring>
+        <pathstring>Services</pathstring>
+        <pathstring>Sendmail</pathstring>
+        <pathstring>Munin</pathstring>
+        <pathstring>sendmail_mailtraffic</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathstring>Services</pathstring>
+        <pathstring>Sendmail</pathstring>
+        <pathstring>Munin</pathstring>
+        <pathstring>sendmail_mailtraffic</pathstring>
+        <pathstring>${host}</pathstring>
+    </viewtree>
+</graphdesc>

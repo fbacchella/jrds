@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+	<name>munin_interrupts</name>
+	<graphName>interrupts</graphName>
+	<graphTitle>Interrupts and context switches</graphTitle>
+	<verticalLabel>interrupts and ctx switches/s</verticalLabel>
+	<upperLimit>100000.0</upperLimit>
+	<add>
+		<name>ctx</name>
+		<graphType>line</graphType>
+		<legend>context switch</legend>
+	</add>
+	<add>
+		<name>intr</name>
+		<graphType>line</graphType>
+		<legend>Interrupts</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>LOAD</pathelement>
+		<pathstring>Interrupts</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>SYSTEM</pathelement>
+		<pathelement>LOAD</pathelement>
+		<pathstring>Interrupts</pathstring>
+		<pathelement>HOST</pathelement>
+	</viewtree>
+</graphdesc>

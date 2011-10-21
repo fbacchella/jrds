@@ -11,7 +11,7 @@
     <add>
         <name>load</name>
         <graphType>line</graphType>
-        <legend>load</legend>
+        <legend>Average load for the five minutes.</legend>
     </add>
     <hosttree>
         <pathstring>${host}</pathstring>

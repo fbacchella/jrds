@@ -4,14 +4,11 @@
     <name>munin_entropy</name>
     <graphName>entropy</graphName>
     <graphTitle>Available entropy</graphTitle>
-    <unit>
-        <SI/>
-    </unit>
-    <verticalLabel>entropy (bytes)</verticalLabel>
+    <verticalLabel>bytes</verticalLabel>
     <add>
         <name>entropy</name>
         <graphType>line</graphType>
-        <legend>entropy</legend>
+        <legend>The number of random bytes available.</legend>
     </add>
     <hosttree>
         <pathstring>${host}</pathstring>
