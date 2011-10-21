@@ -69,18 +69,18 @@ public class MuninDiscoverAgent extends DiscoverAgent {
             for(JrdsDocument e: probdescs.values()) {
                 JrdsElement root = e.getRootElement();
                 JrdsElement buffer;
-                
+
                 buffer = root.getElementbyName("name");
-                String probe = buffer == null ? null : buffer.getTextContent();
+                String name = buffer == null ? null : buffer.getTextContent();
                 buffer = root.getElementbyName("probeClass");
                 String probeClass = buffer == null ? null : buffer.getTextContent();
                 Class<?> c = cl.loadClass(probeClass);
-                buffer = root.findByPath("specific[@name='fetch']");
+                buffer = e.findByPath("specific[@name='fetch']");
                 String fetchValue = buffer == null ? null : buffer.getTextContent();
                 if(fetchValue != null && ! "".equals(fetchValue) &&  muninClass.isAssignableFrom(c)) {
                     if( muninProbes.contains(fetchValue) ) {
                         muninProbes.remove(fetchValue);
-                            addProbe(hostElement, probe, null, null);
+                            addProbe(hostElement, name, null, null);
                     }
 
                     else if(IndexedProbe.class.isAssignableFrom(c)) {
@@ -89,8 +89,8 @@ public class MuninDiscoverAgent extends DiscoverAgent {
                             Matcher m = indexedFetch.matcher(mp);
                             if(m.matches()) {
                                 String index = m.group(1);
-                                log(Level.TRACE, "index found: %s for probe %s, with pattern %s and munin probe %s", index, probe, indexedFetch.pattern(), mp);
-                                addProbe(hostElement, probe, Collections.singletonList("String"), Collections.singletonList(index));
+                                log(Level.TRACE, "index found: %s for probe %s, with pattern %s and munin probe %s", index, name, indexedFetch.pattern(), mp);
+                                addProbe(hostElement, name, Collections.singletonList("String"), Collections.singletonList(index));
                             }
                         }
                     }

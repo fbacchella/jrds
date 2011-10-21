@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>LoadMunin</name>
+    <probeName>munin_load</probeName>
+    <probeClass>jrds.probe.munin.Munin</probeClass>
+    <specific name="fetch">load</specific>
+    <ds>
+        <dsName>load</dsName>
+        <dsType>GAUGE</dsType>
+        <collect>load</collect>
+    </ds>
+    <graphs>
+        <name>munin_load</name>
+    </graphs>
+</probedesc>

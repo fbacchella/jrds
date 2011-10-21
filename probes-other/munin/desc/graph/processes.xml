@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+    <name>munin_processes</name>
+    <graphName>processes</graphName>
+    <graphTitle>Processes</graphTitle>
+    <unit>
+        <SI/>
+    </unit>
+    <verticalLabel>Number of processes</verticalLabel>
+    <add>
+        <name>processes</name>
+        <graphType>line</graphType>
+        <legend>total</legend>
+    </add>
+    <add>
+        <name>runnable</name>
+        <graphType>line</graphType>
+        <legend>runnable</legend>
+    </add>
+    <add>
+        <name>zombie</name>
+        <graphType>line</graphType>
+        <legend>zombie</legend>
+    </add>
+    <add>
+        <name>stopped</name>
+        <graphType>line</graphType>
+        <legend>stopped</legend>
+    </add>
+    <add>
+        <name>uninterruptible</name>
+        <graphType>line</graphType>
+        <legend>uninterruptible</legend>
+    </add>
+    <add>
+        <name>sleeping</name>
+        <graphType>area</graphType>
+        <legend>sleeping</legend>
+    </add>
+    <add>
+        <name>dead</name>
+        <graphType>line</graphType>
+        <legend>dead</legend>
+    </add>
+    <add>
+        <name>paging</name>
+        <graphType>line</graphType>
+        <legend>paging</legend>
+    </add>
+    <hosttree>
+        <pathstring>${host}</pathstring>
+        <pathstring>System</pathstring>
+        <pathstring>Munin</pathstring>
+        <pathstring>processes</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathstring>System</pathstring>
+        <pathstring>Munin</pathstring>
+        <pathstring>processes</pathstring>
+        <pathstring>${host}</pathstring>
+    </viewtree>
+</graphdesc>

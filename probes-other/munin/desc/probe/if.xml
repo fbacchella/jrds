@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>IfMunin</name>
+    <probeName>munin_if_${index}</probeName>
+    <probeClass>jrds.probe.munin.MuninIndexed</probeClass>
+    <specific name="fetch">if_${index}</specific>
+    <ds>
+        <dsName>down</dsName>
+        <dsType>COUNTER</dsType>
+        <collect>down</collect>
+    </ds>
+    <ds>
+        <dsName>up</dsName>
+        <dsType>COUNTER</dsType>
+        <collect>up</collect>
+    </ds>
+    <graphs>
+        <name>munin_if</name>
+    </graphs>
+</probedesc>

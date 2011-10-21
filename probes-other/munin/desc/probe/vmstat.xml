@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>VmstatMunin</name>
+    <probeName>munin_vmstat</probeName>
+    <probeClass>jrds.probe.munin.Munin</probeClass>
+    <specific name="fetch">vmstat</specific>
+    <ds>
+        <dsName>wait</dsName>
+        <dsType>GAUGE</dsType>
+        <collect>wait</collect>
+        <maxValue>500000.0</maxValue>
+    </ds>
+    <ds>
+        <dsName>sleep</dsName>
+        <dsType>GAUGE</dsType>
+        <collect>sleep</collect>
+        <maxValue>500000.0</maxValue>
+    </ds>
+    <graphs>
+        <name>munin_vmstat</name>
+    </graphs>
+</probedesc>
