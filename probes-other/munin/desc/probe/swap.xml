@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
-    <name>munin_swap</name>
+    <name>SwapMunin</name>
     <probeName>munin_swap</probeName>
     <probeClass>jrds.probe.munin.Munin</probeClass>
     <specific name="fetch">swap</specific>
