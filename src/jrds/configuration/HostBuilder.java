@@ -315,6 +315,10 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
             catch (ClassCastException ex) {
                 logger.warn("didn't get a Connection but a " + o.getClass().getName());
             }
+            catch (LinkageError ex) {
+                logger.warn("Incompatible code version during connection creation of type " + type +
+                        ": " + ex, ex);
+            }
             catch (Exception ex) {
                 logger.warn("Error during connection creation of type " + type +
                         ": " + ex, ex);
