@@ -443,10 +443,9 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * Store the values on the rrd backend.
-     * Overriding should be avoided.
      * @param oneSample
      */
-    private void updateSample(Sample oneSample) {
+    private boolean updateSample(Sample oneSample) {
         if(isCollectRunning()) {
             Map<KeyType, ValueType> sampleVals = getNewSampleValues();
             log(Level.TRACE, "Collected values: %s", sampleVals);
@@ -471,12 +470,14 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                         }
                     }
                     modifySample(oneSample, sampleVals);
+                    return true;
                 }
                 else {
                     log(Level.INFO, "uptime too low");
                 }
             }
         }
+        return false;
     }
 
     /**
@@ -505,10 +506,10 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                 if( isCollectRunning()) {
                     rrdDb = StoreOpener.getRrd(getRrdName());
                     Sample onesample = rrdDb.createSample();
-                    updateSample(onesample);
+                    boolean updated = updateSample(onesample);
                     //The collect might have been stopped
                     //during the reading of samples
-                    if( isCollectRunning()) {
+                    if( updated && isCollectRunning()) {
                         if(namedLogger.isDebugEnabled())
                             log(Level.DEBUG, "%s", onesample.dump());
                         onesample.update();
