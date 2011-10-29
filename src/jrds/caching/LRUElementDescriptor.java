@@ -20,43 +20,45 @@ package jrds.caching;
  */
 
 /**
- * This is a node in the double linked list. It is stored as the value in the
- * underlying map used by the LRUMap class.
+ * This serves as a placeholder in a double linked list. You can extend this to
+ * add functionality. This allows you to remove in constant time from a linked
+ * list.
  * <p>
- * @author aaronsm
+ * It simply holds the payload and a reference to the items before and after it
+ * in the list.
  */
-public class LRUElementDescriptor<K,V>
-extends DoubleLinkedListNode
+abstract class LRUElementDescriptor<K,V>
 {
-    /**
-     * <code>key</code>
-     */
-    private K key;
+
+    private final V payload;
+    private final K key;
+
+    /** Double Linked list references */
+    public LRUElementDescriptor<K,V> prev;
+
+    /** Double Linked list references */
+    public LRUElementDescriptor<K,V> next;
 
     /**
-     * @param key
      * @param payloadP
      */
-    public LRUElementDescriptor( K key, V payloadP )
+    public LRUElementDescriptor(K key,  V payload )
     {
-        super( payloadP );
-        this.setKey( key );
-    }
-
-    /**
-     * @param key
-     *            The key to set.
-     */
-    public void setKey( K key )
-    {
+        this.payload = payload;
         this.key = key;
     }
 
     /**
-     * @return Returns the key.
+     * @return the payload
      */
-    public K getKey()
-    {
+    V getPayload() {
+        return payload;
+    }
+
+    /**
+     * @return the key
+     */
+    K getKey() {
         return key;
     }
 

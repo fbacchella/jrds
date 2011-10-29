@@ -20,16 +20,17 @@ package jrds.caching;
  */
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+
+import jrds.caching.DoubleLinkedList.Node;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,16 +49,16 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * @author aaronsm
  */
-public class LRUMap<K,V>
-implements Map<K,V>
+public class LRUMap<K,V> implements Map<K,V>
 {
     private final static Log log = LogFactory.getLog( LRUMap.class );
 
     // double linked list for lru
-    private Deque<LRUElementDescriptor> list;
+    private DoubleLinkedList<K,V> list;
 
     /** Map where items are stored by key. */
-    protected Map<K,V> map;
+    protected Map<K,DoubleLinkedList.Node<K,V>> map;
+    protected Map<K,V> mapValue;
 
     int hitCnt = 0;
 
@@ -72,30 +73,19 @@ implements Map<K,V>
     private int chunkSize = 1;
 
     /**
-     * This creates an unbounded version. Setting the max objects will result in spooling on
-     * subsequent puts.
-     * <p>
-     * @param maxObjects
-     */
-    public LRUMap()
-    {
-        list = new LinkedList<LRUElementDescriptor>();
-
-        // normal hshtable is faster for
-        // sequential keys.
-        map = new HashMap<K,V>();
-        // map = new ConcurrentHashMap();
-    }
-
-    /**
      * This sets the size limit.
      * <p>
      * @param maxObjects
      */
-    public LRUMap( int maxObjects )
-    {
-        this();
+    public LRUMap( int maxObjects ) {
         this.maxObjects = maxObjects;
+        list = new DoubleLinkedList<K, V>();
+
+        // normal hshtable is faster for
+        // sequential keys.
+        map = new Hashtable<K,DoubleLinkedList.Node<K,V>>(maxObjects);
+        mapValue = new HashMap<K,V>(maxObjects);
+        // map = new ConcurrentHashMap();
     }
 
     /**
@@ -103,8 +93,7 @@ implements Map<K,V>
      * <p>
      * @see java.util.Map#size()
      */
-    public int size()
-    {
+    public int size() {
         return map.size();
     }
 
@@ -116,7 +105,7 @@ implements Map<K,V>
     public void clear()
     {
         map.clear();
-        list.clear();
+        list.removeAll();
     }
 
     /**
@@ -124,8 +113,7 @@ implements Map<K,V>
      * <p>
      * @see java.util.Map#isEmpty()
      */
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return map.size() == 0;
     }
 
@@ -134,8 +122,7 @@ implements Map<K,V>
      * <p>
      * @see java.util.Map#containsKey(java.lang.Object)
      */
-    public boolean containsKey( Object key )
-    {
+    public boolean containsKey( Object key ) {
         return map.containsKey( key );
     }
 
@@ -144,8 +131,7 @@ implements Map<K,V>
      * <p>
      * @see java.util.Map#containsValue(java.lang.Object)
      */
-    public boolean containsValue( Object value )
-    {
+    public boolean containsValue( Object value ) {
         return map.containsValue( value );
     }
 
@@ -155,56 +141,45 @@ implements Map<K,V>
      */
     public Collection<V> values()
     {
-        return map.values();
+        return mapValue.values();
     }
 
     /*
      * (non-Javadoc)
      * @see java.util.Map#putAll(java.util.Map)
      */
-    public void putAll( Map source )
+    public void putAll( Map<? extends K,? extends V> source )
     {
         if ( source != null )
-        {
-            Set entries = source.entrySet();
-            Iterator it = entries.iterator();
-            while ( it.hasNext() )
-            {
-                Entry entry = (Entry) it.next();
+            for(Map.Entry<? extends K,? extends V> entry: source.entrySet() ) {
                 put( entry.getKey(), entry.getValue() );
             }
-        }
     }
 
     /*
      * (non-Javadoc)
      * @see java.util.Map#get(java.lang.Object)
      */
-    public Object get( Object key )
-    {
-        Object retVal = null;
+    public V get( Object key ) {
+        V retVal = null;
 
         if ( log.isDebugEnabled() )
-        {
             log.debug( "getting item  for key " + key );
-        }
 
-        LRUElementDescriptor me = (LRUElementDescriptor) map.get( key );
+        DoubleLinkedList.Node<K, V> me = map.get( key );
 
-        if ( me != null )
-        {
+        if ( me != null ) {
             hitCnt++;
             if ( log.isDebugEnabled() )
             {
                 log.debug( "LRUMap hit for " + key );
             }
 
-            retVal = me.getPayload();
+            retVal = me.value;
 
-            list.addFirst( me );
+            list.makeFirst( me );
         }
-        else
-        {
+        else {
             missCnt++;
             log.debug( "LRUMap miss for " + key );
         }
@@ -221,24 +196,18 @@ implements Map<K,V>
      * @param key
      * @return Object
      */
-    public Object getQuiet( Object key )
-    {
+    public Object getQuiet( Object key ) {
         Object ce = null;
 
-        LRUElementDescriptor me = (LRUElementDescriptor) map.get( key );
-        if ( me != null )
-        {
+        DoubleLinkedList.Node<K,V> me = map.get( key );
+        if ( me != null ) {
             if ( log.isDebugEnabled() )
-            {
                 log.debug( "LRUMap quiet hit for " + key );
-            }
 
-            ce = me.getPayload();
+            ce = me.value;
         }
         else if ( log.isDebugEnabled() )
-        {
             log.debug( "LRUMap quiet miss for " + key );
-        }
 
         return ce;
     }
@@ -247,21 +216,21 @@ implements Map<K,V>
      * (non-Javadoc)
      * @see java.util.Map#remove(java.lang.Object)
      */
-    public Object remove( Object key )
-    {
-        if ( log.isDebugEnabled() )
-        {
+    public V remove( Object key ) {
+        if ( log.isDebugEnabled() ) {
             log.debug( "removing item for key: " + key );
         }
 
+        DoubleLinkedList.Node<K,V> me = null;
         // remove single item.
-        LRUElementDescriptor me = (LRUElementDescriptor) map.remove( key );
+        synchronized (this) {
+            mapValue.remove(key);
+            me = map.remove( key );
+        }
 
-        if ( me != null )
-        {
+        if ( me != null ) {
             list.remove( me );
-
-            return me.getPayload();
+            return me.value;
         }
 
         return null;
@@ -271,34 +240,30 @@ implements Map<K,V>
      * (non-Javadoc)
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
-    public Object put( Object key, Object value )
+    public V put( K key, V value )
     {
         putCnt++;
 
-        LRUElementDescriptor old = null;
+        DoubleLinkedList.Node<K,V> old = null;
         synchronized ( this )
         {
             // TODO address double synchronization of addFirst, use write lock
-            addFirst( key, value );
+            list.addFirst( key, value );
             // this must be synchronized
-            old = (LRUElementDescriptor) map.put( ( (LRUElementDescriptor) list.getFirst() ).getKey(), list.getFirst() );
+            old = map.put( list.getFirst().key, list.getFirst() );
+            mapValue.put(key, value);
 
             // If the node was the same as an existing node, remove it.
-            if ( old != null && ( (LRUElementDescriptor) list.getFirst() ).getKey().equals( old.getKey() ) )
-            {
+            if ( old != null && list.getFirst().key.equals( old.key ) )
                 list.remove( old );
-            }
         }
 
         int size = map.size();
         // If the element limit is reached, we need to spool
 
-        if ( this.maxObjects >= 0 && size > this.maxObjects )
+        if ( maxObjects >= 0 && size > maxObjects )
         {
-            if ( log.isDebugEnabled() )
-            {
-                log.debug( "In memory limit reached, removing least recently used." );
-            }
+            log.debug( "In memory limit reached, removing least recently used." );
 
             // Write the last 'chunkSize' items to disk.
             int chunkSizeCorrected = Math.min( size, getChunkSize() );
@@ -313,73 +278,47 @@ implements Map<K,V>
             // need to pre-queue the queuing. This would be a bit wasteful
             // and wouldn't save much time in this synchronous call.
 
-            for ( int i = 0; i < chunkSizeCorrected; i++ )
-            {
-                synchronized ( this )
-                {
-                    if ( list.getLast() != null )
-                    {
-                        if ( ( (LRUElementDescriptor) list.getLast() ) != null )
-                        {
-                            processRemovedLRU( ( (LRUElementDescriptor) list.getLast() ).getKey(),
-                                    ( (LRUElementDescriptor) list.getLast() ).getPayload() );
-                            if ( !map.containsKey( ( (LRUElementDescriptor) list.getLast() ).getKey() ) )
-                            {
+            for ( int i = 0; i < chunkSizeCorrected; i++ ) {
+                synchronized ( this ) {
+                    if ( list.getLast() != null ) {
+                        if ( list.getLast() != null ) {
+                            processRemovedLRU( ( list.getLast() ).value, list.getLast() .value );
+                            if ( !map.containsKey( list.getLast().value ) ) {
                                 log.error( "update: map does not contain key: "
-                                        + ( (LRUElementDescriptor) list.getLast() ).getKey() );
+                                        + list.getLast().key );
                                 verifyCache();
                             }
-                            if ( map.remove( ( (LRUElementDescriptor) list.getLast() ).getKey() ) == null )
-                            {
+                            mapValue.remove(list.getLast().key);
+                            if ( map.remove(list.getLast().key ) == null ) {
                                 log.warn( "update: remove failed for key: "
-                                        + ( (LRUElementDescriptor) list.getLast() ).getKey() );
+                                        + list.getLast().key );
                                 verifyCache();
                             }
                         }
-                        else
-                        {
+                        else {
                             throw new Error( "update: last.ce is null!" );
                         }
                         list.removeLast();
                     }
-                    else
-                    {
+                    else {
                         verifyCache();
                         throw new Error( "update: last is null!" );
                     }
                 }
             }
 
-            if ( log.isDebugEnabled() )
-            {
+            if ( log.isDebugEnabled() ) {
                 log.debug( "update: After spool map size: " + map.size() );
             }
-            if ( map.size() != dumpCacheSize() )
-            {
+            if ( map.size() != dumpCacheSize() ) {
                 log.error( "update: After spool, size mismatch: map.size() = " + map.size() + ", linked list size = "
                         + dumpCacheSize() );
             }
         }
 
         if ( old != null )
-        {
-            return old.getPayload();
-        }
+            return old.value;
         return null;
-    }
-
-    /**
-     * Adds a new node to the start of the link list.
-     * <p>
-     * @param key
-     * @param val The feature to be added to the First
-     */
-    private synchronized void addFirst( Object key, Object val )
-    {
-
-        LRUElementDescriptor me = new LRUElementDescriptor( key, val );
-        list.addFirst( me );
-        return;
     }
 
     /**
@@ -387,38 +326,34 @@ implements Map<K,V>
      * <p>
      * @return int
      */
-    private int dumpCacheSize()
-    {
+    private int dumpCacheSize() {
         return list.size();
     }
 
     /**
      * Dump the cache entries from first to list for debugging.
      */
-    public void dumpCacheEntries()
-    {
+    public void dumpCacheEntries() {
         log.debug( "dumpingCacheEntries" );
-        for ( LRUElementDescriptor me = (LRUElementDescriptor) list.getFirst(); me != null; me = (LRUElementDescriptor) me.next )
-        {
+        for(DoubleLinkedList.Node<K, V> me: list) {
             if ( log.isDebugEnabled() )
             {
-                log.debug( "dumpCacheEntries> key=" + me.getKey() + ", val=" + me.getPayload() );
+                log.debug( "dumpCacheEntries> key=" + me.key + ", val=" + me.value );
             }
+
         }
     }
 
     /**
      * Dump the cache map for debugging.
      */
-    public void dumpMap()
-    {
+    public void dumpMap() {
         log.debug( "dumpingMap" );
         for ( Iterator itr = map.entrySet().iterator(); itr.hasNext(); )
         {
             Map.Entry e = (Map.Entry) itr.next();
             LRUElementDescriptor me = (LRUElementDescriptor) e.getValue();
-            if ( log.isDebugEnabled() )
-            {
+            if ( log.isDebugEnabled() ) {
                 log.debug( "dumpMap> key=" + e.getKey() + ", val=" + me.getPayload() );
             }
         }
@@ -431,34 +366,32 @@ implements Map<K,V>
     protected void verifyCache()
     {
         if ( !log.isDebugEnabled() )
-        {
             return;
-        }
 
         boolean found = false;
         log.debug( "verifycache: mapContains " + map.size() + " elements, linked list contains " + dumpCacheSize()
                 + " elements" );
         log.debug( "verifycache: checking linked list by key " );
-        for ( LRUElementDescriptor li = (LRUElementDescriptor) list.getFirst(); li != null; li = (LRUElementDescriptor) li.next )
+        for ( DoubleLinkedList.Node<K,V> li: list)
         {
-            Object key = li.getKey();
+            Object key = li.key;
             if ( !map.containsKey( key ) )
             {
-                log.error( "verifycache: map does not contain key : " + li.getKey() );
-                log.error( "li.hashcode=" + li.getKey().hashCode() );
+                log.error( "verifycache: map does not contain key : " + li.key );
+                log.error( "li.hashcode=" + li.key.hashCode() );
                 log.error( "key class=" + key.getClass() );
                 log.error( "key hashcode=" + key.hashCode() );
                 log.error( "key toString=" + key.toString() );
                 dumpMap();
             }
-            else if ( map.get( li.getKey() ) == null )
+            else if ( map.get( li.key ) == null )
             {
-                log.error( "verifycache: linked list retrieval returned null for key: " + li.getKey() );
+                log.error( "verifycache: linked list retrieval returned null for key: " + li.key );
             }
         }
 
         log.debug( "verifycache: checking linked list by value " );
-        for ( LRUElementDescriptor li3 = (LRUElementDescriptor) list.getFirst(); li3 != null; li3 = (LRUElementDescriptor) li3.next )
+        for ( DoubleLinkedList.Node<K, V> li3: list)
         {
             if ( map.containsValue( li3 ) == false )
             {
@@ -472,33 +405,26 @@ implements Map<K,V>
         {
             found = false;
             Serializable val = null;
-            try
-            {
+            try {
                 val = (Serializable) itr2.next();
             }
-            catch ( NoSuchElementException nse )
-            {
+            catch ( NoSuchElementException nse ) {
                 log.error( "verifycache: no such element exception" );
             }
 
-            for ( LRUElementDescriptor li2 = (LRUElementDescriptor) list.getFirst(); li2 != null; li2 = (LRUElementDescriptor) li2.next )
-            {
-                if ( val.equals( li2.getKey() ) )
-                {
+            for ( DoubleLinkedList.Node<K,V> li2: list) {
+                if ( val.equals( li2.key ) ) {
                     found = true;
                     break;
                 }
             }
-            if ( !found )
-            {
+            if ( !found ) {
                 log.error( "verifycache: key not found in list : " + val );
                 dumpCacheEntries();
-                if ( map.containsKey( val ) )
-                {
+                if ( map.containsKey( val ) ) {
                     log.error( "verifycache: map contains key" );
                 }
-                else
-                {
+                else {
                     log.error( "verifycache: map does NOT contain key, what the HECK!" );
                 }
             }
@@ -510,27 +436,22 @@ implements Map<K,V>
      * <p>
      * @param key
      */
-    protected void verifyCache( Object key )
-    {
-        if ( !log.isDebugEnabled() )
-        {
+    protected void verifyCache( Object key ) {
+        if ( !log.isDebugEnabled() ) {
             return;
         }
 
         boolean found = false;
 
         // go through the linked list looking for the key
-        for ( LRUElementDescriptor li = (LRUElementDescriptor) list.getFirst(); li != null; li = (LRUElementDescriptor) li.next )
-        {
-            if ( li.getKey() == key )
-            {
+        for ( DoubleLinkedList.Node<K,V> li: list) {
+            if ( li.key == key ) {
                 found = true;
                 log.debug( "verifycache(key) key match: " + key );
                 break;
             }
         }
-        if ( !found )
-        {
+        if ( !found ) {
             log.error( "verifycache(key), couldn't find key! : " + key );
         }
     }
@@ -564,8 +485,7 @@ implements Map<K,V>
     /**
      * @return Returns the chunkSize.
      */
-    public int getChunkSize()
-    {
+    public int getChunkSize() {
         return chunkSize;
     }
 
@@ -579,31 +499,15 @@ implements Map<K,V>
      * <p>
      * @see java.util.Map#entrySet()
      */
-    public synchronized Set entrySet()
-    {
-        // todo, we should return a defensive copy
-        Set entries = map.entrySet();
-
-        Set unWrapped = new HashSet();
-
-        Iterator it = entries.iterator();
-        while ( it.hasNext() )
-        {
-            Entry pre = (Entry) it.next();
-            Entry post = new LRUMapEntry( pre.getKey(), ( (LRUElementDescriptor) pre.getValue() ).getPayload() );
-            unWrapped.add( post );
-        }
-
-        return unWrapped;
+    public synchronized Set<Map.Entry<K, V>> entrySet() {
+        return mapValue.entrySet();
     }
 
     /*
      * (non-Javadoc)
      * @see java.util.Map#keySet()
      */
-    public Set keySet()
-    {
-        // TODO fix this, it needs to return the keys inside the wrappers.
-        return map.keySet();
+    public Set<K> keySet() {
+        return mapValue.keySet();
     }
 }

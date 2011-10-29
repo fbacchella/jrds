@@ -27,11 +27,9 @@ import java.util.Map.Entry;
  * <p>
  * @author Aaron Smuts
  */
-public class LRUMapEntry
+abstract class LRUMapEntry
     implements Entry, Serializable
 {
-    private static final long serialVersionUID = -8176116317739129331L;
-
     private Object key;
 
     private Object value;

@@ -1,5 +1,8 @@
 package jrds.caching;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedByInterruptException;
@@ -8,18 +11,31 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
-import org.rrd4j.core.RrdFileBackend;
+import org.rrd4j.core.RrdBackend;
 
 /** 
  * JRobin backend which is used to store RRD data to ordinary disk files 
  * by using fast java.nio.* package ehanced with caching functionnalities.
  * @author Fabrice Bacchella
  */
-public class RrdCachedFileBackend extends RrdFileBackend {
+public class RrdCachedFileBackend extends RrdBackend {
     static final private Logger logger = Logger.getLogger(RrdCachedFileBackend.class);
 
+    private native static void prepare_fd(String filename, FileDescriptor fdobj, boolean readOnly);
+
+    private static final FileChannel DirectFile(File direct, boolean readOnly) throws IOException {
+      FileDescriptor fd = new FileDescriptor();
+      prepare_fd(direct.getCanonicalPath(), fd, readOnly);
+      return new FileInputStream(fd).getChannel();
+    }
+    
+    /**
+     * Read/write file status.
+     */
+    private final boolean readOnly;
+
     private static final int CACHE_LENGTH = 8192;
-    ByteBuffer byteBuffer;
+    private ByteBuffer byteBuffer;
     private int cacheSize;
     private long cacheStart;
     private boolean cacheDirty = false;
@@ -34,14 +50,30 @@ public class RrdCachedFileBackend extends RrdFileBackend {
     private static int readHit = 0;
     private static int access = 0;
 
+    /**
+     * Random access file handle.
+     */
     protected FileChannel channel;
+
+    /**
+     * Creates RrdFileBackend object for the given file path, backed by RandomAccessFile object.
+     *
+     * @param path     Path to a file
+     * @param readOnly True, if file should be open in a read-only mode. False otherwise
+     * @throws IOException Thrown in case of I/O error
+     */
+    protected RrdCachedFileBackend(String path, boolean readOnly) throws IOException {
+        super(path);
+        this.readOnly = readOnly;
+        this.channel = DirectFile(new File(path), readOnly);
+    }
 
     /**
      * @param path
      */
     public RrdCachedFileBackend(String path, boolean readOnly, int lockMode, int syncMode, int syncPeriod)
             throws IOException {
-        super(path, readOnly);
+        this(path, readOnly);
         this.syncMode = syncMode;
         if(syncMode == RrdCachedFileBackendFactory.SYNC_BACKGROUND && !readOnly) {
             createSyncTask(syncPeriod);
@@ -49,7 +81,6 @@ public class RrdCachedFileBackend extends RrdFileBackend {
         else if(syncMode == RrdCachedFileBackendFactory.SYNC_CENTRALIZED && !readOnly) {
             BackEndCommiter.getInstance().addBackEnd(this);
         }
-        channel = file.getChannel();
     }
 
     private void createSyncTask(int syncPeriod) {
@@ -287,6 +318,32 @@ public class RrdCachedFileBackend extends RrdFileBackend {
     public static int getCacheRequestsCount() {
         return access;
 
+    }
+
+    /**
+     * Returns RRD file length.
+     *
+     * @return File length.
+     * @throws IOException Thrown in case of I/O error.
+     */
+    public long getLength() throws IOException {
+        return channel.size();
+    }
+
+    /**
+     * Sets length of the underlying RRD file. This method is called only once, immediately
+     * after a new RRD file gets created.
+     *
+     * @param length Length of the RRD file
+     * @throws IOException Thrown in case of I/O error.
+     */
+    protected void setLength(long length) throws IOException {
+        if(channel.size() < length)
+            channel.truncate(length);
+        else {
+            channel.position(length);
+            channel.write(ByteBuffer.allocate(1));
+        }
     }
 
 }
