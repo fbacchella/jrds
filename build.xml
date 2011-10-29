@@ -1,9 +1,10 @@
-<project name="jrds" default="war" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" >
+<project name="jrds" default="war" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:cpptasks="antlib:net.sf.antcontrib.cpptasks" >
 	<!-- set global properties for this build -->
 	<property name="app.name" value="jrds"/>
 	<property name="app.path" value="/${app.name}"/>
 	<property name="app.version" value="0.1-dev"/>
 	<property name="build.home" value="${basedir}/build"/>
+	<property name="build.native" value="${basedir}/build/native"/>
 	<property name="docs.build" value="${build.home}/doc"/>
 	<property name="src.home" value="${basedir}/src"/>
 	<property name="src.junit" value="${basedir}/junit"/>
@@ -55,6 +56,19 @@
 		<path refid="project.classpath"/>
 	</path>
 	
+	<target name="jni" depends="compile">
+		<mkdir dir="${build.native}"/>
+		<javah outputFile="${build.native}/direct.h">
+			<class name="jrds.caching.FilePage" />
+			<classpath refid="test.classpath"/>
+		</javah>
+		<cpptasks:cc name="gcc" outtype="shared" outfile="${build.home}/native/direct"  optimize="speed" objdir="${build.home}/native" >
+			<includepath location="${build.native}" /> 
+			<includepath location="/System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers" /> 
+			<fileset dir="src" includes="**/*.c" />
+		</cpptasks:cc>
+	</target>
+
 	<target name="compile">
 		<mkdir dir="${build.home}/classes"/>
 		<mkdir dir="${build.home}/probes"/>

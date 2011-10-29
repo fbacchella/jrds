@@ -18,16 +18,19 @@ public class TestRrdCachedFileBackend {
     @BeforeClass
     static public void configure() throws IOException, ParserConfigurationException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE);
+        Tools.setLevel(logger, Level.TRACE, "jrds.caching.RrdCachedFileBackend", "jrds.caching.FilePage", "jrds.caching.PageCache");
     }
     
     @Test
     public void test1() throws IOException {
+        PageCache pc =  new PageCache(100, 30);
         String libname = System.mapLibraryName("direct");
         File cwd =  new File(".");
         File nativedir = new File(new File(new File(cwd,"build"), "native"), libname);
         Runtime.getRuntime().load(nativedir.getCanonicalPath());
-        RrdCachedFileBackend f = new RrdCachedFileBackend(nativedir.getCanonicalPath(), true);
-        f.read(0, new byte[100]);
+        RrdCachedFileBackend f = new RrdCachedFileBackend(new File("/tmp/passwd").getCanonicalPath(), true, pc);
+        byte[] buffer = new byte[1000];
+        f.read(1, buffer);
+        logger.debug(new String(buffer));
     }
 }

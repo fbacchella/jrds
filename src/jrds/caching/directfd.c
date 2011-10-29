@@ -14,7 +14,7 @@ file_extra_flags |=O_DIRECT;
 file_extra_flags |=O_DIRECTIO;
 #endif
 
-JNIEXPORT void JNICALL Java_jrds_caching_RrdCachedFileBackend_prepare_1fd(JNIEnv *env, jclass _ignore, jstring filename, jobject fdobj, jboolean readOnly) {
+JNIEXPORT void JNICALL Java_jrds_caching_FilePage_prepare_1fd(JNIEnv *env, jclass _ignore, jstring filename, jobject fdobj, jboolean readOnly) {
     jfieldID field_fd;
     jmethodID const_fdesc;
     jclass class_fdesc, class_ioex;
