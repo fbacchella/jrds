@@ -325,12 +325,11 @@ class LRUMap<K,V> implements Map<K,V>
      * Dump the cache map for debugging.
      */
     public void dumpMap() {
+        if(! logger.isDebugEnabled())
+            return;
         logger.debug( "dumpingMap" );
-        for ( Iterator itr = map.entrySet().iterator(); itr.hasNext(); )
-        {
-            Map.Entry e = (Map.Entry) itr.next();
-            LRUElementDescriptor me = (LRUElementDescriptor) e.getValue();
-            logger.debug( "dumpMap> key=" + e.getKey() + ", val=" + me.getPayload() );
+        for(Map.Entry<K, V> e: mapValue.entrySet()) {
+            logger.debug(Util.delayedFormatString("dumpMap> key=%s, val=%s", e.getKey(), e.getValue()) );
         }
     }
 
