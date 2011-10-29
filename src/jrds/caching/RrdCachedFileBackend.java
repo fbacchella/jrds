@@ -53,7 +53,7 @@ public class RrdCachedFileBackend extends RrdBackend {
     /**
      * Random access file handle.
      */
-    protected FileChannel channel;
+    protected final FileChannel channel;
 
     /**
      * Creates RrdFileBackend object for the given file path, backed by RandomAccessFile object.

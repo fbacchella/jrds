@@ -20,20 +20,17 @@ package jrds.caching;
  */
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import jrds.caching.DoubleLinkedList.Node;
+import jrds.Util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This is a simple LRUMap. It implements most of the map methods. It is not recommended that you
@@ -49,9 +46,9 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * @author aaronsm
  */
-public class LRUMap<K,V> implements Map<K,V>
+class LRUMap<K,V> implements Map<K,V>
 {
-    private final static Log log = LogFactory.getLog( LRUMap.class );
+    static final private Logger logger = Logger.getLogger(LRUMap.class);
 
     // double linked list for lru
     private DoubleLinkedList<K,V> list;
@@ -163,25 +160,19 @@ public class LRUMap<K,V> implements Map<K,V>
     public V get( Object key ) {
         V retVal = null;
 
-        if ( log.isDebugEnabled() )
-            log.debug( "getting item  for key " + key );
+        logger.debug(Util.delayedFormatString("getting item  for key %s", key));
 
         DoubleLinkedList.Node<K, V> me = map.get( key );
 
         if ( me != null ) {
+            logger.debug(Util.delayedFormatString("LRUMap hit for " + key ));
             hitCnt++;
-            if ( log.isDebugEnabled() )
-            {
-                log.debug( "LRUMap hit for " + key );
-            }
-
             retVal = me.value;
-
             list.makeFirst( me );
         }
         else {
             missCnt++;
-            log.debug( "LRUMap miss for " + key );
+            logger.debug(Util.delayedFormatString("LRUMap miss for %s", key));
         }
 
         // verifyCache();
@@ -196,18 +187,16 @@ public class LRUMap<K,V> implements Map<K,V>
      * @param key
      * @return Object
      */
-    public Object getQuiet( Object key ) {
-        Object ce = null;
+    public V getQuiet( Object key ) {
+        V ce = null;
 
-        DoubleLinkedList.Node<K,V> me = map.get( key );
+        DoubleLinkedList.Node<K,V> me = map.get(key);
         if ( me != null ) {
-            if ( log.isDebugEnabled() )
-                log.debug( "LRUMap quiet hit for " + key );
-
+            logger.debug(Util.delayedFormatString("LRUMap quiet hit for %s", key ));
             ce = me.value;
         }
-        else if ( log.isDebugEnabled() )
-            log.debug( "LRUMap quiet miss for " + key );
+        else
+            logger.debug(Util.delayedFormatString("LRUMap quiet miss for %s", key ));
 
         return ce;
     }
@@ -217,9 +206,7 @@ public class LRUMap<K,V> implements Map<K,V>
      * @see java.util.Map#remove(java.lang.Object)
      */
     public V remove( Object key ) {
-        if ( log.isDebugEnabled() ) {
-            log.debug( "removing item for key: " + key );
-        }
+        logger.debug(Util.delayedFormatString("removing item for key: %s",key ));
 
         DoubleLinkedList.Node<K,V> me = null;
         // remove single item.
@@ -263,16 +250,13 @@ public class LRUMap<K,V> implements Map<K,V>
 
         if ( maxObjects >= 0 && size > maxObjects )
         {
-            log.debug( "In memory limit reached, removing least recently used." );
+            logger.debug("In memory limit reached, removing least recently used.");
 
             // Write the last 'chunkSize' items to disk.
             int chunkSizeCorrected = Math.min( size, getChunkSize() );
 
-            if ( log.isDebugEnabled() )
-            {
-                log.debug( "About to remove the least recently used. map size: " + size + ", max objects: "
-                        + this.maxObjects + ", items to spool: " + chunkSizeCorrected );
-            }
+            logger.debug(Util.delayedFormatString("About to remove the least recently used. map size: " + size + ", max objects: "
+                    + this.maxObjects + ", items to spool: " + chunkSizeCorrected ));
 
             // The spool will put them in a disk event queue, so there is no
             // need to pre-queue the queuing. This would be a bit wasteful
@@ -282,16 +266,15 @@ public class LRUMap<K,V> implements Map<K,V>
                 synchronized ( this ) {
                     if ( list.getLast() != null ) {
                         if ( list.getLast() != null ) {
-                            processRemovedLRU( ( list.getLast() ).value, list.getLast() .value );
+                            processRemovedLRU(list.getLast().key, list.getLast().value );
                             if ( !map.containsKey( list.getLast().value ) ) {
-                                log.error( "update: map does not contain key: "
-                                        + list.getLast().key );
+                                logger.error(Util.delayedFormatString("update: map does not contain key: "
+                                        + list.getLast().key ));
                                 verifyCache();
                             }
                             mapValue.remove(list.getLast().key);
                             if ( map.remove(list.getLast().key ) == null ) {
-                                log.warn( "update: remove failed for key: "
-                                        + list.getLast().key );
+                                logger.warn(Util.delayedFormatString("update: remove failed for key: %s", list.getLast().key));
                                 verifyCache();
                             }
                         }
@@ -307,11 +290,9 @@ public class LRUMap<K,V> implements Map<K,V>
                 }
             }
 
-            if ( log.isDebugEnabled() ) {
-                log.debug( "update: After spool map size: " + map.size() );
-            }
+            logger.debug( "update: After spool map size: " + map.size() );
             if ( map.size() != dumpCacheSize() ) {
-                log.error( "update: After spool, size mismatch: map.size() = " + map.size() + ", linked list size = "
+                logger.error( "update: After spool, size mismatch: map.size() = " + map.size() + ", linked list size = "
                         + dumpCacheSize() );
             }
         }
@@ -334,13 +315,9 @@ public class LRUMap<K,V> implements Map<K,V>
      * Dump the cache entries from first to list for debugging.
      */
     public void dumpCacheEntries() {
-        log.debug( "dumpingCacheEntries" );
+        logger.debug( "dumpingCacheEntries" );
         for(DoubleLinkedList.Node<K, V> me: list) {
-            if ( log.isDebugEnabled() )
-            {
-                log.debug( "dumpCacheEntries> key=" + me.key + ", val=" + me.value );
-            }
-
+            logger.debug( "dumpCacheEntries> key=" + me.key + ", val=" + me.value );
         }
     }
 
@@ -348,14 +325,12 @@ public class LRUMap<K,V> implements Map<K,V>
      * Dump the cache map for debugging.
      */
     public void dumpMap() {
-        log.debug( "dumpingMap" );
+        logger.debug( "dumpingMap" );
         for ( Iterator itr = map.entrySet().iterator(); itr.hasNext(); )
         {
             Map.Entry e = (Map.Entry) itr.next();
             LRUElementDescriptor me = (LRUElementDescriptor) e.getValue();
-            if ( log.isDebugEnabled() ) {
-                log.debug( "dumpMap> key=" + e.getKey() + ", val=" + me.getPayload() );
-            }
+            logger.debug( "dumpMap> key=" + e.getKey() + ", val=" + me.getPayload() );
         }
     }
 
@@ -365,42 +340,42 @@ public class LRUMap<K,V> implements Map<K,V>
      */
     protected void verifyCache()
     {
-        if ( !log.isDebugEnabled() )
+        if ( !logger.isDebugEnabled() )
             return;
 
         boolean found = false;
-        log.debug( "verifycache: mapContains " + map.size() + " elements, linked list contains " + dumpCacheSize()
+        logger.debug( "verifycache: mapContains " + map.size() + " elements, linked list contains " + dumpCacheSize()
                 + " elements" );
-        log.debug( "verifycache: checking linked list by key " );
+        logger.debug( "verifycache: checking linked list by key " );
         for ( DoubleLinkedList.Node<K,V> li: list)
         {
             Object key = li.key;
             if ( !map.containsKey( key ) )
             {
-                log.error( "verifycache: map does not contain key : " + li.key );
-                log.error( "li.hashcode=" + li.key.hashCode() );
-                log.error( "key class=" + key.getClass() );
-                log.error( "key hashcode=" + key.hashCode() );
-                log.error( "key toString=" + key.toString() );
+                logger.error( "verifycache: map does not contain key : " + li.key );
+                logger.error( "li.hashcode=" + li.key.hashCode() );
+                logger.error( "key class=" + key.getClass() );
+                logger.error( "key hashcode=" + key.hashCode() );
+                logger.error( "key toString=" + key.toString() );
                 dumpMap();
             }
             else if ( map.get( li.key ) == null )
             {
-                log.error( "verifycache: linked list retrieval returned null for key: " + li.key );
+                logger.error( "verifycache: linked list retrieval returned null for key: " + li.key );
             }
         }
 
-        log.debug( "verifycache: checking linked list by value " );
+        logger.debug( "verifycache: checking linked list by value " );
         for ( DoubleLinkedList.Node<K, V> li3: list)
         {
             if ( map.containsValue( li3 ) == false )
             {
-                log.error( "verifycache: map does not contain value : " + li3 );
+                logger.error( "verifycache: map does not contain value : " + li3 );
                 dumpMap();
             }
         }
 
-        log.debug( "verifycache: checking via keysets!" );
+        logger.debug( "verifycache: checking via keysets!" );
         for ( Iterator itr2 = map.keySet().iterator(); itr2.hasNext(); )
         {
             found = false;
@@ -409,7 +384,7 @@ public class LRUMap<K,V> implements Map<K,V>
                 val = (Serializable) itr2.next();
             }
             catch ( NoSuchElementException nse ) {
-                log.error( "verifycache: no such element exception" );
+                logger.error( "verifycache: no such element exception" );
             }
 
             for ( DoubleLinkedList.Node<K,V> li2: list) {
@@ -419,13 +394,13 @@ public class LRUMap<K,V> implements Map<K,V>
                 }
             }
             if ( !found ) {
-                log.error( "verifycache: key not found in list : " + val );
+                logger.error( "verifycache: key not found in list : " + val );
                 dumpCacheEntries();
                 if ( map.containsKey( val ) ) {
-                    log.error( "verifycache: map contains key" );
+                    logger.error( "verifycache: map contains key" );
                 }
                 else {
-                    log.error( "verifycache: map does NOT contain key, what the HECK!" );
+                    logger.error( "verifycache: map does NOT contain key, what the HECK!" );
                 }
             }
         }
@@ -437,7 +412,7 @@ public class LRUMap<K,V> implements Map<K,V>
      * @param key
      */
     protected void verifyCache( Object key ) {
-        if ( !log.isDebugEnabled() ) {
+        if ( !logger.isDebugEnabled() ) {
             return;
         }
 
@@ -447,12 +422,12 @@ public class LRUMap<K,V> implements Map<K,V>
         for ( DoubleLinkedList.Node<K,V> li: list) {
             if ( li.key == key ) {
                 found = true;
-                log.debug( "verifycache(key) key match: " + key );
+                logger.debug( "verifycache(key) key match: " + key );
                 break;
             }
         }
         if ( !found ) {
-            log.error( "verifycache(key), couldn't find key! : " + key );
+            logger.error( "verifycache(key), couldn't find key! : " + key );
         }
     }
 
@@ -463,12 +438,11 @@ public class LRUMap<K,V> implements Map<K,V>
      * @param key
      * @param value
      */
-    protected void processRemovedLRU( Object key, Object value )
-    {
-        if ( log.isDebugEnabled() )
+    protected void processRemovedLRU( K key, V value ) {
+        if ( logger.isDebugEnabled() )
         {
-            log.debug( "Removing key: [" + key + "] from LRUMap store, value = [" + value + "]" );
-            log.debug( "LRUMap store size: '" + this.size() + "'." );
+            logger.debug( "Removing key: [" + key + "] from LRUMap store, value = [" + value + "]" );
+            logger.debug( "LRUMap store size: '" + this.size() + "'." );
         }
     }
 
