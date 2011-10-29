@@ -75,21 +75,6 @@ public class RrdCachedFileBackend extends RrdBackend {
             throws IOException {
         this(path, readOnly);
         this.syncMode = syncMode;
-        if(syncMode == RrdCachedFileBackendFactory.SYNC_BACKGROUND && !readOnly) {
-            createSyncTask(syncPeriod);
-        }
-        else if(syncMode == RrdCachedFileBackendFactory.SYNC_CENTRALIZED && !readOnly) {
-            BackEndCommiter.getInstance().addBackEnd(this);
-        }
-    }
-
-    private void createSyncTask(int syncPeriod) {
-        syncTask = new TimerTask() {
-            public void run() {
-                sync();
-            }
-        };
-        syncTimer.schedule(syncTask, syncPeriod * 1000L, syncPeriod * 1000L);
     }
 
     /**
@@ -286,9 +271,7 @@ public class RrdCachedFileBackend extends RrdBackend {
         if(syncTask != null) {
             syncTask.cancel();
         }
-        if(syncMode == RrdCachedFileBackendFactory.SYNC_CENTRALIZED) {
-            BackEndCommiter.getInstance().removeBackEnd(this);
-        }
+
 
         super.close(); // calls sync() eventually
         // release the buffer, make it eligible for GC as soon as possible

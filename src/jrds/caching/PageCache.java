@@ -5,6 +5,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeSet;
 
 public class PageCache {
@@ -14,8 +16,9 @@ public class PageCache {
     private final LRUMap<Integer, FilePage> pagecache;
     private final ByteBuffer pagecacheBuffer;
     private final TreeSet<Integer> freePages;
+    private final Timer syncTimer = new Timer(true);
 
-    public PageCache(int maxObjects) {
+    public PageCache(int maxObjects, int syncPeriod) {
         pagecacheBuffer = ByteBuffer.allocateDirect(maxObjects * PAGESIZE);
         freePages =  new TreeSet<Integer>();
         for(int i=0; i< maxObjects; i++ ) {
@@ -33,6 +36,7 @@ public class PageCache {
             }
             
         };
+        createSyncTask(syncPeriod);
     }
     
     /* (non-Javadoc)
@@ -42,6 +46,16 @@ public class PageCache {
     protected void finalize() throws Throwable {
         sync();
     }
+    
+    private void createSyncTask(int syncPeriod) {
+        TimerTask syncTask = new TimerTask() {
+            public void run() {
+                PageCache.this.sync();
+            }
+        };
+        syncTimer.schedule(syncTask, syncPeriod * 1000L, syncPeriod * 1000L);
+    }
+
 
     /**
      * @param pageIndex
