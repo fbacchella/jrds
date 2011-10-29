@@ -29,15 +29,13 @@ import org.apache.commons.logging.LogFactory;
  * the operations are so quick that course grained synchronization is more than
  * acceptible.
  */
-class DoubleLinkedList<K, V> implements Iterable<DoubleLinkedList.Node<K, V>>
+class DoubleLinkedList<PAYLOAD> implements Iterable<DoubleLinkedList.Node<PAYLOAD>>
 {
-    static final class Node<K, V> {
-        private Node<K,V> next;
-        private Node<K,V> prev;
-        final K key;
-        final V value;
-        private Node(K key, V value) {
-            this.key = key;
+    static class Node<PAYLOAD> {
+        private Node<PAYLOAD> next;
+        private Node<PAYLOAD> prev;
+        final PAYLOAD value;
+        protected Node(PAYLOAD value) {
             this.value = value;
         }
     }
@@ -48,10 +46,10 @@ class DoubleLinkedList<K, V> implements Iterable<DoubleLinkedList.Node<K, V>>
     private final static Log log = LogFactory.getLog( DoubleLinkedList.class );
 
     /** LRU double linked list head node */
-    private Node<K, V> first;
+    private Node<PAYLOAD> first;
 
     /** LRU double linked list tail node */
-    private Node<K, V> last;
+    private Node<PAYLOAD> last;
 
     /**
      * Default constructor.
@@ -67,9 +65,9 @@ class DoubleLinkedList<K, V> implements Iterable<DoubleLinkedList.Node<K, V>>
      * @param me
      *            The feature to be added to the Last
      */
-    public synchronized void addLast(K key,  V value )
+    public synchronized void addLast(PAYLOAD value )
     {
-        Node<K, V> n = new Node<K, V>(key, value);
+        Node<PAYLOAD> n = new Node<PAYLOAD>(value);
         if ( first == null )
         {
             // empty list.
@@ -90,9 +88,9 @@ class DoubleLinkedList<K, V> implements Iterable<DoubleLinkedList.Node<K, V>>
      * @param me
      *            The feature to be added to the First
      */
-    public synchronized void addFirst(K key,  V value )
+    public synchronized void addFirst(PAYLOAD value )
     {
-        Node<K, V> n = new Node<K, V>(key, value);
+        Node<PAYLOAD> n = new Node<PAYLOAD>(value);
         if ( last == null )
         {
             // empty list.
@@ -113,7 +111,7 @@ class DoubleLinkedList<K, V> implements Iterable<DoubleLinkedList.Node<K, V>>
      * <p>
      * @return The last node.
      */
-    public synchronized Node<K, V> getLast()
+    public synchronized Node<PAYLOAD> getLast()
     {
         if ( log.isDebugEnabled() )
         {
@@ -127,7 +125,7 @@ class DoubleLinkedList<K, V> implements Iterable<DoubleLinkedList.Node<K, V>>
      * <p>
      * @return DoubleLinkedListNode, the first node.
      */
-    public synchronized Node<K, V> getFirst()
+    public synchronized Node<PAYLOAD> getFirst()
     {
         if ( log.isDebugEnabled() )
         {
@@ -142,7 +140,7 @@ class DoubleLinkedList<K, V> implements Iterable<DoubleLinkedList.Node<K, V>>
      * @param ln
      *            The node to set as the head.
      */
-    public synchronized void makeFirst( Node<K, V> ln )
+    public synchronized void makeFirst( Node<PAYLOAD> ln )
     {
 
         if ( ln.prev == null )
@@ -174,13 +172,13 @@ class DoubleLinkedList<K, V> implements Iterable<DoubleLinkedList.Node<K, V>>
      */
     public synchronized void removeAll()
     {
-        for ( Node<K, V> me = first; me != null; )
+        for ( Node<PAYLOAD> me = first; me != null; )
         {
             if ( me.prev != null )
             {
                 me.prev = null;
             }
-            Node<K, V> next = me.next;
+            Node<PAYLOAD> next = me.next;
             me = next;
         }
         first = last = null;
@@ -195,7 +193,7 @@ class DoubleLinkedList<K, V> implements Iterable<DoubleLinkedList.Node<K, V>>
      *            Description of the Parameter
      * @return true if an element was removed.
      */
-    public synchronized boolean remove( Node<K, V> me )
+    public synchronized boolean remove( Node<PAYLOAD> me )
     {
         if ( log.isDebugEnabled() )
         {
@@ -248,13 +246,13 @@ class DoubleLinkedList<K, V> implements Iterable<DoubleLinkedList.Node<K, V>>
      * <p>
      * @return The last node if there was one to remove.
      */
-    public synchronized Node<K, V> removeLast()
+    public synchronized Node<PAYLOAD> removeLast()
     {
         if ( log.isDebugEnabled() )
         {
             log.debug( "removing last node" );
         }
-        Node<K, V> temp = last;
+        Node<PAYLOAD> temp = last;
         if ( last != null )
         {
             remove( last );
@@ -272,26 +270,25 @@ class DoubleLinkedList<K, V> implements Iterable<DoubleLinkedList.Node<K, V>>
         return size;
     }
 
-    // ///////////////////////////////////////////////////////////////////
     /**
      * Dump the cache entries from first to list for debugging.
      */
     public synchronized void debugDumpEntries()
     {
         log.debug( "dumping Entries" );
-        for ( Node<K, V> me = first; me != null; me = me.next )
+        for ( Node<PAYLOAD> me = first; me != null; me = me.next )
         {
             log.debug( "dump Entries> payload= '" + me.value + "'" );
         }
     }
 
-    public Iterator<DoubleLinkedList.Node<K, V>> iterator() {        
-        return new Iterator<DoubleLinkedList.Node<K, V>>() {
-            DoubleLinkedList.Node<K, V> curs = first;
+    public Iterator<DoubleLinkedList.Node<PAYLOAD>> iterator() {        
+        return new Iterator<DoubleLinkedList.Node<PAYLOAD>>() {
+            DoubleLinkedList.Node<PAYLOAD> curs = first;
             public boolean hasNext() {
                 return curs.next != null;
             }
-            public Node<K, V> next() {
+            public Node<PAYLOAD> next() {
                 curs = curs.next;
                 return curs;
             }

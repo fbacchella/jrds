@@ -19,7 +19,7 @@ public class TestLRUMap {
     @BeforeClass
     static public void configure() throws IOException, ParserConfigurationException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE);
+        Tools.setLevel(logger, Level.TRACE, "jrds.caching.LRUMap");
     }
     
     @Test
