@@ -28,7 +28,7 @@ public class TestRrdCachedFileBackend {
     @BeforeClass
     static public void configure() throws IOException, ParserConfigurationException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.caching.RrdCachedFileBackend", "jrds.caching.FilePage", "jrds.caching.PageCache");
+        Tools.setLevel(logger, Level.TRACE, "jrds.caching", "jrds.caching.RrdCachedFileBackend", "jrds.caching.FilePage", "jrds.caching.PageCache");
     }
 
     @Test
@@ -46,9 +46,11 @@ public class TestRrdCachedFileBackend {
 
     @Test
     public void reopen() throws IOException {
-        String rrdPath = "tmp/testcached.rrd";
+        File rrdFile = new File("tmp/testcached.rrd");
+        if(rrdFile.exists())
+            rrdFile.delete();
         // first, define the RRD
-        RrdDef rrdDef = new RrdDef(rrdPath, 300);
+        RrdDef rrdDef = new RrdDef(rrdFile.getCanonicalPath(), 300);
         rrdDef.addDatasource(new DsDef("toto", DsType.DERIVE, 5l, 0, 10000));
         rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 1, 600); // 1 step, 600 rows
         rrdDef.addArchive(ConsolFun.AVERAGE, 0.5, 6, 700); // 6 steps, 700 rows
@@ -60,7 +62,7 @@ public class TestRrdCachedFileBackend {
         
         factory.sync();
         
-        rrdDb = new RrdDb(rrdPath);
+        rrdDb = new RrdDb(rrdFile.getCanonicalPath());
 
     }
 }

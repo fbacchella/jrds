@@ -22,7 +22,7 @@ public class FilePage {
         prepare_fd(path, fd, readOnly);
         return new FileInputStream(fd).getChannel();
     }
-    
+
     private static final FileChannel DirectFileWrite(String path, boolean readOnly) throws IOException {
         FileDescriptor fd = new FileDescriptor();
         prepare_fd(path, fd, readOnly);
@@ -33,56 +33,37 @@ public class FilePage {
         System.load("/var/jrds/WEB-INF/lib/libdirect.dylib");
     }
 
-    static public final FilePage EMPTY = new FilePage() {
-        @Override
-        public synchronized void sync() throws IOException {
-        }
-        @Override
-        public void read(long offset, byte[] buffer) throws IOException {
-        }
-        @Override
-        public void write(long offset, byte[] buffer) {
-        }
-        @Override
-        public boolean isEmpty() {
-            return true;
-        }
-    };
-
     private final ByteBuffer page;
     private boolean dirty;
-    final String filepath;
-    private final long fileOffset;
+    String filepath;
+    private  long fileOffset;
     final int pageIndex;
     private int size;
 
     /**
      * Used to build an empty page
      */
-    private FilePage() {
-        page = null;
-        filepath = null;
-        fileOffset = 0;
-        pageIndex = 0;
-        this.size = 0;
-    }
-    
-     public FilePage(ByteBuffer pagecache, int pageIndex, File file,
-            long offset) throws IOException {
+    public FilePage(ByteBuffer pagecache, int pageIndex) {
         pagecache.position(pageIndex * PageCache.PAGESIZE);
         this.page = pagecache.slice();
         this.page.limit(PageCache.PAGESIZE);
+        this.pageIndex = pageIndex;
+        this.size = 0;
+    }
+
+    public void load(File file,
+            long offset) throws IOException {
         this.filepath = file.getCanonicalPath();
         this.fileOffset = (long) (Math.floor( offset /  PageCache.PAGESIZE) * PageCache.PAGESIZE);
         FileChannel channel = DirectFileRead(filepath, false);
         this.size = channel.read(page);
-        this.pageIndex = pageIndex;
         logger.debug(Util.delayedFormatString("Loaded %d bytes at offset %d from %s", size, fileOffset, file.getCanonicalPath()));
     }
 
     public synchronized void sync() throws IOException {
         if(dirty) {
             try {
+                logger.debug(Util.delayedFormatString("syncing %d to %s", fileOffset, filepath));
                 FileChannel channel = DirectFileWrite(filepath, false);
                 page.position(0);
                 page.limit(size + 1);
@@ -90,7 +71,7 @@ public class FilePage {
                 channel.force(true);
                 dirty = false;
             } catch (IOException e) {
-                logger.error(Util.delayedFormatString("sync failed for %s", filepath), e);
+                logger.error(Util.delayedFormatString("sync failed for %s: %s", filepath, e), e);
                 throw e;
             }
         }
@@ -165,6 +146,12 @@ public class FilePage {
     }
 
     public boolean isEmpty() {
-        return false;
+        return filepath == null;
+    }
+    
+    public void free() throws IOException {
+        if(filepath != null)
+            sync();
+        filepath = null;
     }
 }

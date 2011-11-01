@@ -29,8 +29,8 @@ public class PageCache {
         //Create the page cache in memory
         pagecache = new LRUMap<Integer, FilePage>(maxObjects);
         //And fill it with empty pages
-        for(int i=0; i < maxObjects; i++ ) {
-            pagecache.put(i, FilePage.EMPTY);
+        for(int i=2; i < maxObjects; i++ ) {
+            pagecache.put(i, new FilePage(pagecacheBuffer, i));
         }
 
         //createSyncTask(syncPeriod);
@@ -68,14 +68,14 @@ public class PageCache {
             m1 = files.get(canonicalPath);
             Integer index = m1.get(offsetPage);
             if(index == null) {
-                FilePage eldest = pagecache.removeEldest();
-                if(! eldest.isEmpty()) {
-                    eldest.sync();
-                    files.get(eldest.filepath).remove(eldest.pageIndex);
+                page = pagecache.removeEldest();
+                if(! page.isEmpty()) {
+                    files.get(page.filepath).remove(page.pageIndex);
+                    page.free();
                 }
-                index = eldest.pageIndex;
+                index = page.pageIndex;
 
-                page = new FilePage(pagecacheBuffer, index, file, offsetPage);
+                page.load(file, offsetPage);
                 pagecache.put(index, page);
                 m1.put(offsetPage, index);
                 logger.debug(Util.delayedFormatString("Loading page %d from %s", offset, file.getCanonicalPath()));

@@ -39,7 +39,7 @@ JNIEXPORT void JNICALL Java_jrds_caching_FilePage_prepare_1fd(JNIEnv *env, jclas
     else
         flags |= O_RDWR |O_CREAT;
     
-    fd = open(fname, flags,0444);
+    fd = open(fname, flags,0666);
 #if defined(solaris)
     directio(fd, DIRECTIO_ON);
 #endif
