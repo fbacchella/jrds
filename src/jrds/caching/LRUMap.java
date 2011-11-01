@@ -19,9 +19,8 @@ package jrds.caching;
  * under the License.
  */
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,7 +42,7 @@ import org.apache.log4j.Logger;
  * <p>
  * @author aaronsm
  */
-class LRUMap<K,V> implements Map<K,V> {
+class LRUMap<K,V> {
     static final private Logger logger = Logger.getLogger(LRUMap.class);
 
     static final class Payload<K,V> {
@@ -60,17 +59,10 @@ class LRUMap<K,V> implements Map<K,V> {
 
     /** Map where items are stored by key. */
     protected Map<K,DoubleLinkedList.Node<Payload<K,V>>> map;
-    protected Map<K,V> mapValue;
 
     private int hitCnt = 0;
     private int missCnt = 0;
     private int putCnt = 0;
-
-    // if the max is less than 0, there is no limit!
-    private final int maxObjects;
-
-    // make configurable
-    private int chunkSize = 1;
 
     /**
      * This sets the size limit.
@@ -78,13 +70,11 @@ class LRUMap<K,V> implements Map<K,V> {
      * @param maxObjects
      */
     public LRUMap( int maxObjects ) {
-        this.maxObjects = maxObjects;
         list = new DoubleLinkedList<Payload<K,V>>();
 
         // normal hshtable is faster for
         // sequential keys.
         map = new Hashtable<K,DoubleLinkedList.Node<Payload<K,V>>>(maxObjects);
-        mapValue = new HashMap<K,V>(maxObjects);
         // map = new ConcurrentHashMap();
     }
 
@@ -134,24 +124,23 @@ class LRUMap<K,V> implements Map<K,V> {
         return map.containsValue( value );
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.util.Map#values()
-     */
-    public Collection<V> values()
-    {
-        return mapValue.values();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see java.util.Map#putAll(java.util.Map)
-     */
-    public void putAll( Map<? extends K,? extends V> source ) {
-        if ( source != null )
-            for(Map.Entry<? extends K,? extends V> entry: source.entrySet() ) {
-                put( entry.getKey(), entry.getValue() );
+    public Iterable<V> values() {
+        final Iterator<DoubleLinkedList.Node<Payload<K,V>>> i = this.map.values().iterator();
+        return new Iterable<V>() {
+            public Iterator<V> iterator() {
+                return new Iterator<V>() {
+                    public boolean hasNext() {
+                        return i.hasNext();
+                    }
+                    public V next() {
+                        return i.next().value.value;
+                    }
+                    public void remove() {
+                    }
+                };
             }
+            
+        };
     }
 
     /*
@@ -212,7 +201,6 @@ class LRUMap<K,V> implements Map<K,V> {
         DoubleLinkedList.Node<Payload<K,V>> me = null;
         // remove single item.
         synchronized (this) {
-            mapValue.remove(key);
             me = map.remove( key );
         }
 
@@ -237,60 +225,10 @@ class LRUMap<K,V> implements Map<K,V> {
             list.addFirst( new Payload<K, V>(key, value) );
             // this must be synchronized
             old = map.put( list.getFirst().value.key, list.getFirst() );
-            mapValue.put(key, value);
 
             // If the node was the same as an existing node, remove it.
             if ( old != null && list.getFirst().value.key.equals( old.value.key ) )
                 list.remove( old );
-        }
-
-        int size = map.size();
-        // If the element limit is reached, we need to spool
-
-        if ( maxObjects >= 0 && size > maxObjects ) {
-            logger.debug("In memory limit reached, removing least recently used.");
-
-            // Write the last 'chunkSize' items to disk.
-            int chunkSizeCorrected = Math.min( size, getChunkSize() );
-
-            logger.debug(Util.delayedFormatString("About to remove the least recently used. map size: %d, max objects: %d, items to spool: %d", size, maxObjects, chunkSizeCorrected ));
-
-            // The spool will put them in a disk event queue, so there is no
-            // need to pre-queue the queuing. This would be a bit wasteful
-            // and wouldn't save much time in this synchronous call.
-
-            for ( int i = 0; i < chunkSizeCorrected; i++ ) {
-                synchronized ( this ) {
-                    if ( list.getLast() != null ) {
-                        if ( list.getLast() != null ) {
-                            processRemovedLRU(list.getLast().value.key, list.getLast().value.value );
-                            if ( !map.containsKey( list.getLast().value.key ) ) {
-                                logger.error(Util.delayedFormatString("update: map does not contain key: %s", list.getLast().value.key ));
-                                verifyCache();
-                            }
-                            mapValue.remove(list.getLast().value.key);
-                            if ( map.remove(list.getLast().value.key ) == null ) {
-                                logger.warn(Util.delayedFormatString("update: remove failed for key: %s", list.getLast().value.key));
-                                verifyCache();
-                            }
-                        }
-                        else {
-                            throw new Error( "update: last.ce is null!" );
-                        }
-                        list.removeLast();
-                    }
-                    else {
-                        verifyCache();
-                        throw new Error( "update: last is null!" );
-                    }
-                }
-            }
-
-            logger.debug( "update: After spool map size: " + map.size() );
-            if ( map.size() != dumpCacheSize() ) {
-                logger.error(Util.delayedFormatString( "update: After spool, size mismatch: map.size() = %d, linked list size = %d",
-                        map.size(), dumpCacheSize() ));
-            }
         }
 
         if ( old != null )
@@ -324,8 +262,8 @@ class LRUMap<K,V> implements Map<K,V> {
         if(! logger.isDebugEnabled())
             return;
         logger.debug( "dumpingMap" );
-        for(Map.Entry<K, V> e: mapValue.entrySet()) {
-            logger.debug(Util.delayedFormatString("dumpMap> key=%s, val=%s", e.getKey(), e.getValue()) );
+        for(Map.Entry<K, DoubleLinkedList.Node<Payload<K,V>>> e: map.entrySet()) {
+            logger.debug(Util.delayedFormatString("dumpMap> key=%s, val=%s", e.getKey(), e.getValue().value.value) );
         }
     }
 
@@ -430,42 +368,11 @@ class LRUMap<K,V> implements Map<K,V> {
         }
     }
 
-    /**
-     * The chunk size is the number of items to remove when the max is reached. By default it is 1.
-     * <p>
-     * @param chunkSize The chunkSize to set.
-     */
-    public void setChunkSize( int chunkSize )
-    {
-        this.chunkSize = chunkSize;
-    }
-
-    /**
-     * @return Returns the chunkSize.
-     */
-    public int getChunkSize() {
-        return chunkSize;
-    }
-
-    /**
-     * This returns a set of entries. Our LRUMapEntry is used since the value stored in the
-     * underlying map is a node in the double linked list. We wouldn't want to return this to the
-     * client, so we construct a new entry with the payload of the node.
-     * <p>
-     * TODO we should return out own set wrapper, so we can avoid the extra object creation if it
-     * isn't necessary.
-     * <p>
-     * @see java.util.Map#entrySet()
-     */
-    public synchronized Set<Map.Entry<K, V>> entrySet() {
-        return mapValue.entrySet();
-    }
-
     /*
      * (non-Javadoc)
      * @see java.util.Map#keySet()
      */
     public Set<K> keySet() {
-        return mapValue.keySet();
+        return map.keySet();
     }
 }
