@@ -5,13 +5,13 @@ import java.io.IOException;
 
 import org.rrd4j.core.RrdBackend;
 import org.rrd4j.core.RrdDb;
-import org.rrd4j.core.RrdFileBackendFactory;
+import org.rrd4j.core.RrdRandomAccessFileBackendFactory;
 
 /**
  * @author Fabrice Bacchella
  *
  */
-public class RrdCachedFileBackendFactory extends RrdFileBackendFactory {
+public class RrdCachedFileBackendFactory extends RrdRandomAccessFileBackendFactory {
     /** factory name, "CACHEDFILE" */
     public static final String NAME = "CACHEDFILE";
 
@@ -50,8 +50,12 @@ public class RrdCachedFileBackendFactory extends RrdFileBackendFactory {
      * Returns the name of this factory.
      * @return Factory name (equals to string "CACHEDFILE")
      */
-    public String getFactoryName() {
+    public String getName() {
         return NAME;
+    }
+    
+    public void sync() {
+        pagecache.sync();
     }
 
 }

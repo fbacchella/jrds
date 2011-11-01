@@ -2,22 +2,22 @@ package jrds.caching;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.channels.ClosedByInterruptException;
 
 import jrds.Util;
 
 import org.apache.log4j.Logger;
-import org.rrd4j.core.RrdBackend;
+import org.rrd4j.core.RrdFileBackend;
 
 /** 
  * JRobin backend which is used to store RRD data to ordinary disk files 
  * by using fast java.nio.* package ehanced with caching functionnalities.
  * @author Fabrice Bacchella
  */
-public class RrdCachedFileBackend extends RrdBackend {
+public class RrdCachedFileBackend extends RrdFileBackend {
     static final private Logger logger = Logger.getLogger(RrdCachedFileBackend.class);
 
-    private final boolean readOnly;
     private final File file;
     private final PageCache pagecache;
 
@@ -29,8 +29,7 @@ public class RrdCachedFileBackend extends RrdBackend {
      * @throws IOException Thrown in case of I/O error
      */
     protected RrdCachedFileBackend(String path, boolean readOnly, PageCache pagecache) throws IOException {
-        super(path);
-        this.readOnly = readOnly;
+        super(path, readOnly);
         this.file = new File(path);
         this.pagecache = pagecache;
     }
@@ -47,6 +46,7 @@ public class RrdCachedFileBackend extends RrdBackend {
             throw new ClosedByInterruptException();
         }
         else {
+            logger.trace(Util.delayedFormatString("Writing %d bytes at %d to %s", b.length, offset, file.getCanonicalPath()));
             pagecache.write(file, offset, b);
         }
     }
@@ -63,7 +63,7 @@ public class RrdCachedFileBackend extends RrdBackend {
             throw new ClosedByInterruptException();
         }
         else {
-            logger.debug(Util.delayedFormatString("Loading page %d from %s", offset, file.getCanonicalPath()));
+            logger.trace(Util.delayedFormatString("Loading %d bytes at %d from %s", b.length, offset, file.getCanonicalPath()));
             pagecache.read(file, offset, b);
         }
     }
@@ -95,13 +95,8 @@ public class RrdCachedFileBackend extends RrdBackend {
      * @throws IOException Thrown in case of I/O error.
      */
     protected void setLength(long length) throws IOException {
-//        file.
-//        if(channel.size() < length)
-//            channel.truncate(length);
-//        else {
-//            channel.position(length);
-//            channel.write(ByteBuffer.allocate(1));
-//        }
+        RandomAccessFile fd = new RandomAccessFile(file, "rw");
+        fd.setLength(length);
     }
 
 }

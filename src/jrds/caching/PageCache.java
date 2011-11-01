@@ -7,41 +7,34 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.TreeSet;
-
-import org.apache.log4j.Logger;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import jrds.Util;
+
+import org.apache.log4j.Logger;
 
 public class PageCache {
     static final private Logger logger = Logger.getLogger(PageCache.class);
 
     public final static int PAGESIZE = 4192;
-    private final Map<String, Map<Long, Integer>> files = new HashMap<String, Map<Long, Integer>>();
+    private final ConcurrentMap<String, Map<Long, Integer>> files = new ConcurrentHashMap<String, Map<Long, Integer>>();
     private final LRUMap<Integer, FilePage> pagecache;
     private final ByteBuffer pagecacheBuffer;
-    private final TreeSet<Integer> freePages;
     private final Timer syncTimer = new Timer(true);
 
     public PageCache(int maxObjects, int syncPeriod) {
         pagecacheBuffer = ByteBuffer.allocateDirect(maxObjects * PAGESIZE);
-        freePages =  new TreeSet<Integer>();
-        for(int i=0; i< maxObjects; i++ ) {
-            freePages.add(i);
+
+        //Create the page cache in memory
+        pagecache = new LRUMap<Integer, FilePage>(maxObjects);
+        //And fill it with empty pages
+        for(int i=0; i < maxObjects; i++ ) {
+            pagecache.put(i, FilePage.EMPTY);
         }
 
-        pagecache = new LRUMap<Integer, FilePage>(maxObjects) {
-            /* (non-Javadoc)
-             * @see jrds.caching.LRUMap#processRemovedLRU(java.lang.Object, java.lang.Object)
-             */
-            @Override
-            protected void processRemovedLRU(Integer key, FilePage value) {
-                PageCache.this.remove(key, false);
-                super.processRemovedLRU(key, value);
-            }
-
-        };
-        createSyncTask(syncPeriod);
+        //createSyncTask(syncPeriod);
+        logger.info(Util.delayedFormatString("created a page cache with %d %d pages, using %d of memory", maxObjects, PAGESIZE, maxObjects * PAGESIZE));
     }
 
     /* (non-Javadoc)
@@ -61,53 +54,47 @@ public class PageCache {
         syncTimer.schedule(syncTask, syncPeriod * 1000L, syncPeriod * 1000L);
     }
 
-    /**
-     * @param pageIndex
-     * @param removeFromLRU true if it's needed to remove the page from the boolean as this method can be called from inside the LRU
-     */
-    private void remove(Integer pageIndex, boolean removeFromLRU){
-        FilePage page = pagecache.get(pageIndex);
-        try {
-            page.sync();
-            files.get(page.filepath).remove(pageIndex);
-            if(removeFromLRU)
-                pagecache.remove(pageIndex);
-            freePages.add(pageIndex);
-        } catch (IOException e) {
-        }
-    }
-
     private FilePage find(File file, long offset) throws IOException {
+        String canonicalPath = file.getCanonicalPath();
         FilePage page = null;
-        Map<Long, Integer> m1 = files.get(file.getCanonicalFile());
+        Map<Long, Integer> m1 = files.get(canonicalPath);
         if(m1 == null) {
             m1 = new HashMap<Long, Integer>();
-            files.put(file.getCanonicalPath(), m1);
+            files.putIfAbsent(canonicalPath, m1);
         }
 
-        long offsetPage = offset % PAGESIZE;
-        Integer index = m1.get(offsetPage);
-        if(index == null) {
-            Integer firstFreeIndex = freePages.pollFirst();
-            page = new FilePage(pagecacheBuffer, firstFreeIndex, file, offset);
-            pagecache.put(firstFreeIndex, page);
-            logger.debug(Util.delayedFormatString("Loading page %d from %s", offset, file.getCanonicalPath()));
+        long offsetPage = (long) (Math.floor(offset / PAGESIZE) * PAGESIZE);
+        synchronized(this){
+            m1 = files.get(canonicalPath);
+            Integer index = m1.get(offsetPage);
+            if(index == null) {
+                FilePage eldest = pagecache.removeEldest();
+                if(! eldest.isEmpty()) {
+                    eldest.sync();
+                    files.get(eldest.filepath).remove(eldest.pageIndex);
+                }
+                index = eldest.pageIndex;
+
+                page = new FilePage(pagecacheBuffer, index, file, offsetPage);
+                pagecache.put(index, page);
+                m1.put(offsetPage, index);
+                logger.debug(Util.delayedFormatString("Loading page %d from %s", offset, file.getCanonicalPath()));
+            }
+            else 
+                page = pagecache.get(index);
         }
-        else 
-            page = pagecache.get(index);
 
         return page;
     }
 
     public void read(File file, long offset, byte[] buffer) throws IOException {
-        logger.debug(Util.delayedFormatString("Loading bytes %d from %s", offset, file.getCanonicalPath()));
+        logger.trace(Util.delayedFormatString("Loading %d bytes at offset %d from %s", buffer.length, offset, file.getCanonicalPath()));
         if(buffer.length == 0)
             return;
 
         long cacheStart = (long) (Math.floor( offset /  PAGESIZE) * PAGESIZE);
         long cacheEnd = (long) (Math.ceil( (offset + buffer.length - 1)  /  PAGESIZE) * PAGESIZE);
-        logger.debug(Util.delayedFormatString("from %d to %d", cacheStart, cacheEnd));
-        while(cacheEnd >= cacheStart) {
+        while(cacheStart <= cacheEnd) {
             FilePage current = find(file, cacheStart);
             current.read(offset, buffer);
             cacheStart += PAGESIZE;
@@ -115,12 +102,14 @@ public class PageCache {
     }
 
     public void write(File file, long offset, byte[] buffer) throws IOException {
+        logger.trace(Util.delayedFormatString("Writing %d bytes at offset %d to %s", buffer.length, offset, file.getCanonicalPath()));
         if(buffer.length == 0)
             return;
 
         long cacheStart = (long) (Math.floor( offset /  PAGESIZE) * PAGESIZE);
         long cacheEnd = (long) (Math.ceil( (offset + buffer.length - 1)  /  PAGESIZE) * PAGESIZE);
-        while(cacheEnd > cacheStart) {
+        while(cacheStart <= cacheEnd) {
+            logger.trace(Util.delayedFormatString("Writting at page %d", cacheStart));
             FilePage current = find(file, cacheStart);
             current.write(offset, buffer);
             cacheStart += PAGESIZE;
@@ -133,6 +122,7 @@ public class PageCache {
             try {
                 p.sync();
             } catch (IOException e) {
+                logger.error(Util.delayedFormatString("sync failed for %s:", p.filepath, e));
             }
         }
     }

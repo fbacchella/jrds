@@ -60,10 +60,6 @@ class LRUMap<K,V> {
     /** Map where items are stored by key. */
     protected Map<K,DoubleLinkedList.Node<Payload<K,V>>> map;
 
-    private int hitCnt = 0;
-    private int missCnt = 0;
-    private int putCnt = 0;
-
     /**
      * This sets the size limit.
      * <p>
@@ -111,7 +107,7 @@ class LRUMap<K,V> {
      * <p>
      * @see java.util.Map#containsKey(java.lang.Object)
      */
-    public boolean containsKey( Object key ) {
+    public boolean containsKey( K key ) {
         return map.containsKey( key );
     }
 
@@ -120,12 +116,12 @@ class LRUMap<K,V> {
      * <p>
      * @see java.util.Map#containsValue(java.lang.Object)
      */
-    public boolean containsValue( Object value ) {
+    public boolean containsValue( V value ) {
         return map.containsValue( value );
     }
 
     public Iterable<V> values() {
-        final Iterator<DoubleLinkedList.Node<Payload<K,V>>> i = this.map.values().iterator();
+        final Iterator<DoubleLinkedList.Node<Payload<K,V>>> i = map.values().iterator();
         return new Iterable<V>() {
             public Iterator<V> iterator() {
                 return new Iterator<V>() {
@@ -139,7 +135,6 @@ class LRUMap<K,V> {
                     }
                 };
             }
-            
         };
     }
 
@@ -155,14 +150,8 @@ class LRUMap<K,V> {
         DoubleLinkedList.Node<Payload<K,V>> me = map.get(key);
 
         if ( me != null ) {
-            logger.debug(Util.delayedFormatString("LRUMap hit for " + key ));
-            hitCnt++;
             retVal = me.value.value;
             list.makeFirst( me );
-        }
-        else {
-            missCnt++;
-            logger.debug(Util.delayedFormatString("LRUMap miss for %s", key));
         }
 
         // verifyCache();
@@ -172,23 +161,21 @@ class LRUMap<K,V> {
     /**
      * This gets an element out of the map without adjusting it's posisiton in the LRU. In other
      * words, this does not count as being used. If the element is the last item in the list, it
-     * will still be the last itme in the list.
+     * will still be the last item in the list.
      * <p>
      * @param key
      * @return Object
      */
     public V getQuiet( Object key ) {
-        V ce = null;
-
         DoubleLinkedList.Node<Payload<K,V>> me = map.get(key);
         if ( me != null ) {
-            logger.debug(Util.delayedFormatString("LRUMap quiet hit for %s", key ));
-            ce = me.value.value;
+            return  me.value.value;
         }
-        else
-            logger.debug(Util.delayedFormatString("LRUMap quiet miss for %s", key ));
-
-        return ce;
+        return null;
+    }
+    
+    public V removeEldest() {
+        return remove(list.getLast().value.key);
     }
 
     /*
@@ -196,17 +183,15 @@ class LRUMap<K,V> {
      * @see java.util.Map#remove(java.lang.Object)
      */
     public V remove( Object key ) {
-        logger.debug(Util.delayedFormatString("removing item for key: %s",key ));
+        logger.debug(Util.delayedFormatString("removing item for key: %s", key));
 
-        DoubleLinkedList.Node<Payload<K,V>> me = null;
         // remove single item.
         synchronized (this) {
-            me = map.remove( key );
-        }
-
-        if ( me != null ) {
-            list.remove( me );
-            return me.value.value;
+            DoubleLinkedList.Node<Payload<K,V>> me = map.remove(key);
+            if ( me != null ) {
+                list.remove(me);
+                return me.value.value;
+            }
         }
 
         return null;
@@ -217,7 +202,6 @@ class LRUMap<K,V> {
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
     public V put( K key, V value ) {
-        putCnt++;
 
         DoubleLinkedList.Node<Payload<K,V>> old = null;
         synchronized ( this ) {
@@ -228,6 +212,32 @@ class LRUMap<K,V> {
 
             // If the node was the same as an existing node, remove it.
             if ( old != null && list.getFirst().value.key.equals( old.value.key ) )
+                list.remove( old );
+        }
+
+        if ( old != null )
+            return old.value.value;
+        return null;
+    }
+
+
+    /**
+     * Add an new element and make it the oldest
+     * @param key
+     * @param value
+     * @return
+     */
+    public V putLast( K key, V value ) {
+
+        DoubleLinkedList.Node<Payload<K,V>> old = null;
+        synchronized ( this ) {
+            // TODO address double synchronization of addFirst, use write lock
+            list.addLast( new Payload<K, V>(key, value) );
+            // this must be synchronized
+            old = map.put( list.getLast().value.key, list.getLast() );
+
+            // If the node was the same as an existing node, remove it.
+            if ( old != null && list.getLast().value.key.equals( old.value.key ) )
                 list.remove( old );
         }
 
@@ -350,21 +360,6 @@ class LRUMap<K,V> {
         }
         if ( !found ) {
             logger.error( "verifycache(key), couldn't find key! : " + key );
-        }
-    }
-
-    /**
-     * This is called when an item is removed from the LRU. We just log some information.
-     * <p>
-     * Children can implement this method for special behavior.
-     * @param key
-     * @param value
-     */
-    protected void processRemovedLRU( K key, V value ) {
-        if ( logger.isDebugEnabled() )
-        {
-            logger.debug( "Removing key: [" + key + "] from LRUMap store, value = [" + value + "]" );
-            logger.debug( "LRUMap store size: '" + this.size() + "'." );
         }
     }
 

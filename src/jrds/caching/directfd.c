@@ -1,4 +1,6 @@
+#define _GNU_SOURCE
 #include <direct.h>
+
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
@@ -6,12 +8,12 @@
 #include <sys/types.h>
 #include <sys/fcntl.h>
 
-int file_extra_flags = 0;
 #if defined(linux) || defined(__AIX__) || defined(IRIX) || defined(IRIX64) || defined(Windows) || defined (__FreeBSD__)
-file_extra_flags |=O_DIRECT;
-#endif
-#if defined(TRU64)
-file_extra_flags |=O_DIRECTIO;
+int file_extra_flags = O_DIRECT;
+#elif defined(TRU64)
+int file_extra_flags = O_DIRECTIO;
+#else
+int file_extra_flags = 0;
 #endif
 
 JNIEXPORT void JNICALL Java_jrds_caching_FilePage_prepare_1fd(JNIEnv *env, jclass _ignore, jstring filename, jobject fdobj, jboolean readOnly) {
@@ -20,6 +22,7 @@ JNIEXPORT void JNICALL Java_jrds_caching_FilePage_prepare_1fd(JNIEnv *env, jclas
     jclass class_fdesc, class_ioex;
     int fd;
     char *fname;
+    int flags = file_extra_flags;
     
     //Prepare the introspection
     class_ioex = (*env)->FindClass(env, "java/io/IOException");
@@ -31,9 +34,14 @@ JNIEXPORT void JNICALL Java_jrds_caching_FilePage_prepare_1fd(JNIEnv *env, jclas
     
     fname = (*env)->GetStringUTFChars(env, filename, NULL);
     
-    fd = open(fname, O_RDWR | file_extra_flags);
+    if(readOnly == JNI_TRUE)
+        flags |= O_RDONLY;
+    else
+        flags |= O_RDWR |O_CREAT;
+    
+    fd = open(fname, flags,0444);
 #if defined(solaris)
-    int directio(fd, DIRECTIO_ON);
+    directio(fd, DIRECTIO_ON);
 #endif
     
     (*env)->ReleaseStringUTFChars(env, filename, fname);

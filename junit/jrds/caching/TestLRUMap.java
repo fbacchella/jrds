@@ -1,7 +1,6 @@
 package jrds.caching;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -24,7 +23,7 @@ public class TestLRUMap {
     
     @Test
     public void test1() {
-        Map<Integer, Integer> m = new LRUMap<Integer,Integer>(5);
+        LRUMap<Integer, Integer> m = new LRUMap<Integer,Integer>(5);
         int i=0;
         m.put(++i, i);
         m.put(++i, i);
@@ -32,9 +31,11 @@ public class TestLRUMap {
         m.put(++i, i);
         m.put(++i, i);
         m.put(++i, i);
-        Assert.assertNull("", m.get(1));
         Assert.assertEquals("", new Integer(4), m.get(4));
-        m.entrySet();
+        Assert.assertEquals("", new Integer(1), m.removeEldest());
+        m.putLast(++i, i);
+        Assert.assertEquals("", new Integer(i), m.removeEldest());
+        m.dumpMap();
     }
 
 }

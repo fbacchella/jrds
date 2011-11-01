@@ -3,68 +3,135 @@ package jrds.caching;
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
-import org.apache.log4j.Logger;
-
 import jrds.Util;
+
+import org.apache.log4j.Logger;
 
 public class FilePage {
     static final private Logger logger = Logger.getLogger(FilePage.class);
 
     private native static void prepare_fd(String filename, FileDescriptor fdobj, boolean readOnly);
 
-    private static final FileChannel DirectFile(File direct, boolean readOnly) throws IOException {
+    private static final FileChannel DirectFileRead(String path, boolean readOnly) throws IOException {
         FileDescriptor fd = new FileDescriptor();
-        prepare_fd(direct.getCanonicalPath(), fd, readOnly);
+        prepare_fd(path, fd, readOnly);
         return new FileInputStream(fd).getChannel();
     }
+    
+    private static final FileChannel DirectFileWrite(String path, boolean readOnly) throws IOException {
+        FileDescriptor fd = new FileDescriptor();
+        prepare_fd(path, fd, readOnly);
+        return new FileOutputStream(fd).getChannel();
+    }
+
+    static {
+        System.load("/var/jrds/WEB-INF/lib/libdirect.dylib");
+    }
+
+    static public final FilePage EMPTY = new FilePage() {
+        @Override
+        public synchronized void sync() throws IOException {
+        }
+        @Override
+        public void read(long offset, byte[] buffer) throws IOException {
+        }
+        @Override
+        public void write(long offset, byte[] buffer) {
+        }
+        @Override
+        public boolean isEmpty() {
+            return true;
+        }
+    };
 
     private final ByteBuffer page;
     private boolean dirty;
     final String filepath;
     private final long fileOffset;
+    final int pageIndex;
+    private int size;
 
-    public FilePage(ByteBuffer pagecache, int pageIndex, File file,
+    /**
+     * Used to build an empty page
+     */
+    private FilePage() {
+        page = null;
+        filepath = null;
+        fileOffset = 0;
+        pageIndex = 0;
+        this.size = 0;
+    }
+    
+     public FilePage(ByteBuffer pagecache, int pageIndex, File file,
             long offset) throws IOException {
-        logger.debug(Util.delayedFormatString("Loading page %d from %s", offset, file.getCanonicalPath()));
         pagecache.position(pageIndex * PageCache.PAGESIZE);
         this.page = pagecache.slice();
         this.page.limit(PageCache.PAGESIZE);
         this.filepath = file.getCanonicalPath();
         this.fileOffset = (long) (Math.floor( offset /  PageCache.PAGESIZE) * PageCache.PAGESIZE);
-        FileChannel channel = DirectFile(file, false);
-        channel.read(page);
+        FileChannel channel = DirectFileRead(filepath, false);
+        this.size = channel.read(page);
+        this.pageIndex = pageIndex;
+        logger.debug(Util.delayedFormatString("Loaded %d bytes at offset %d from %s", size, fileOffset, file.getCanonicalPath()));
     }
 
     public synchronized void sync() throws IOException {
         if(dirty) {
-            FileChannel channel = DirectFile(new File(filepath), false);
-            channel.write(page, fileOffset);
-            dirty = false;
+            try {
+                FileChannel channel = DirectFileWrite(filepath, false);
+                page.position(0);
+                page.limit(size + 1);
+                channel.write(page, fileOffset);
+                channel.force(true);
+                dirty = false;
+            } catch (IOException e) {
+                logger.error(Util.delayedFormatString("sync failed for %s", filepath), e);
+                throw e;
+            }
         }
     }
 
     public void read(long offset, byte[] buffer) throws IOException{
-        long offsetPageStart = (long) (Math.floor( offset /  PageCache.PAGESIZE) * PageCache.PAGESIZE);
-        long offsetPageEnd = (long) (Math.ceil( (offset + buffer.length - 1)  /  PageCache.PAGESIZE) * PageCache.PAGESIZE);
-        if(fileOffset < offsetPageStart ||  fileOffset > offsetPageEnd )
-            return;
-
         //The offset within the page
-        int pageOffset = (int) Math.max(0, offset - fileOffset);
-        int pageEnd = Math.min(PageCache.PAGESIZE, pageOffset + buffer.length - 1);
-        int bytesRead = pageEnd - pageOffset + 1;
+        int pageStartPos = (int) Math.max(0, offset - fileOffset);
+        int pageEndPos = (int) Math.min((long)PageCache.PAGESIZE - 1, offset + buffer.length - 1 - fileOffset);
+        int bytesRead = pageEndPos - pageStartPos + 1;
         int bufferOffset = (int) Math.max(0, fileOffset - offset);
-        page.position(pageOffset);
-        page.get(buffer, bufferOffset, bytesRead);
+        try {
+            page.limit(pageEndPos + 1);
+            page.position(pageStartPos);
+            page.get(buffer, bufferOffset, bytesRead);
+        } catch (Exception e) {
+            logger.error(Util.delayedFormatString("getting %d bytes at %d, starting at %d, from %d to %d %d %d", buffer.length, offset, fileOffset, pageStartPos, pageEndPos, bufferOffset, bytesRead));
+            logger.error(e, e);
+        }
         logger.debug(Util.delayedFormatString("read %d bytes from %s", bytesRead, filepath));
     }
 
     public void write(long offset, byte[] buffer) {
-        page.put(buffer, (int) offset, Math.min(0, PageCache.PAGESIZE));
+
+        //The offset within the page
+        int pageStartPos = (int) Math.max(0, offset - fileOffset);
+        int pageEndPos = (int) Math.min((long)PageCache.PAGESIZE - 1, offset + buffer.length - 1 - fileOffset);
+        int bytesWritten = pageEndPos - pageStartPos + 1;
+        int bufferOffset = (int) Math.max(0, fileOffset - offset);
+        try {
+            page.limit(pageEndPos + 1);
+            page.position(pageStartPos);
+            page.put(buffer, bufferOffset, bytesWritten);
+        } catch (Exception e) {
+            logger.error(Util.delayedFormatString("%d %d %d %d", pageStartPos, pageEndPos, bufferOffset, bytesWritten));
+            logger.error(e, e);
+        }
+        size = Math.max(size, pageEndPos);
+        logger.debug(Util.delayedFormatString("%d %d maps to %d %d", offset, buffer.length, pageStartPos, bytesWritten));
+        logger.debug(Util.delayedFormatString("write %d bytes to %s", bytesWritten, filepath));
+
         dirty = true;
     }
 
@@ -97,5 +164,7 @@ public class FilePage {
         return compared.fileOffset == this.fileOffset;
     }
 
-
+    public boolean isEmpty() {
+        return false;
+    }
 }
