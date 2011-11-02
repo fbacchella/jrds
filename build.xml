@@ -56,19 +56,14 @@
 		<path refid="project.classpath"/>
 	</path>
 	
-	<target name="jni" depends="compile">
-		<mkdir dir="${build.native}"/>
-		<javah outputFile="${build.native}/direct.h">
-			<class name="jrds.caching.FilePage" />
-			<classpath refid="test.classpath"/>
-		</javah>
-		<cpptasks:cc name="gcc" outtype="shared" outfile="${build.home}/native/direct"  optimize="speed" objdir="${build.home}/native" >
-			<includepath location="${build.native}" /> 
-			<includepath location="/System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers" /> 
-			<fileset dir="src" includes="**/*.c" />
-		</cpptasks:cc>
-	</target>
-
+	<!-- ==================== compile path =========================== -->
+	<path id="jni.include.path">
+			<pathelement path="${java.home}/include" />
+			<pathelement path="${java.home}/include/linux" />
+			<pathelement path="${java.home}/../include" />
+			<pathelement path="${java.home}/../include/linux" />
+	</path>
+	
 	<target name="compile">
 		<mkdir dir="${build.home}/classes"/>
 		<mkdir dir="${build.home}/probes"/>
@@ -77,6 +72,31 @@
 			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
 			<classpath refid="external.classpath"/>
 		</javac>
+	</target>
+
+	<target name="jni" depends="compile">
+		<condition property="os.isMacOSX">
+			<os name="Mac OS X"/>
+		</condition>
+		<mkdir dir="${build.native}"/>
+		<javah outputFile="${build.native}/direct.h">
+			<class name="jrds.caching.FilePage" />
+			<classpath refid="test.classpath"/>
+		</javah>
+		<cpptasks:cc name="gcc" outtype="shared" outfile="${build.native}/direct"  optimize="speed" objdir="${build.home}/native" >
+			<includepath>
+				<path path="${build.native}" />
+				<path refid="jni.include.path" />
+			</includepath>
+			<fileset dir="src" includes="**/*.c" />
+		</cpptasks:cc>
+		<antcall target="rename.dylib" />
+	</target>
+
+	<target name="rename.dylib" if="os.isMacOSX">
+	<!-- FIXME: this is a hack; the cpptask should have an option to change the
+	suffix or at least understand the override from dylib to jnilib -->
+	<move file="${build.native}/libdirect.dylib" tofile="${build.native}/libdirect.jnilib" />
 	</target>
 
 	<target name="compile.test" depends="compile">
@@ -255,6 +275,11 @@
 			</tarfileset>
 			<tarfileset dir="${build.home}/probes" prefix="WEB-INF/lib">
 				<include name="*.jar"/>
+			</tarfileset>
+			<tarfileset dir="${build.home}/native" prefix="WEB-INF/lib">
+				<include name="*.so"/>
+				<include name="*.dll"/>
+				<include name="*.dylib"/>
 			</tarfileset>
 		</tar>
 		<gzip src="${build.home}/${app.name}.tar" destfile="${build.home}/${app.name}.tar.gz"/>
