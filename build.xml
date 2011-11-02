@@ -94,9 +94,9 @@
 	</target>
 
 	<target name="rename.dylib" if="os.isMacOSX">
-	<!-- FIXME: this is a hack; the cpptask should have an option to change the
-	suffix or at least understand the override from dylib to jnilib -->
-	<move file="${build.native}/libdirect.dylib" tofile="${build.native}/libdirect.jnilib" />
+		<!-- FIXME: this is a hack; the cpptask should have an option to change the
+		suffix or at least understand the override from dylib to jnilib -->
+		<move file="${build.native}/libdirect.dylib" tofile="${build.native}/libdirect.jnilib" />
 	</target>
 
 	<target name="compile.test" depends="compile">
