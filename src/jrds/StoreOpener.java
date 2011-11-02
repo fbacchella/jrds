@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import jrds.caching.RrdCachedFileBackendFactory;
+
 import org.apache.log4j.Logger;
 import org.rrd4j.core.RrdBackendFactory;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDbPool;
-import org.rrd4j.core.RrdFileBackendFactory;
+import org.rrd4j.core.RrdRandomAccessFileBackendFactory;
 
 /**
  * A wrapper classe, to manage the rrdDb operations
@@ -23,6 +25,12 @@ public final class StoreOpener {
     private static final AtomicInteger lockCount = new AtomicInteger(0);
     private static RrdBackendFactory backend = RrdBackendFactory.getDefaultFactory();
     private static boolean usepool = false;
+
+    static {
+        RrdCachedFileBackendFactory cf = new RrdCachedFileBackendFactory();
+        RrdCachedFileBackendFactory.setPageCache(100, 30);
+        RrdBackendFactory.registerFactory(cf);
+    }
 
     /**
      * Retrieves the RrdDb instance matching a specific RRD datasource name
@@ -91,7 +99,7 @@ public final class StoreOpener {
         }
         StoreOpener.backend = RrdBackendFactory.getDefaultFactory();
 
-        if(RrdFileBackendFactory.class.isAssignableFrom(StoreOpener.backend.getClass())) {
+        if(RrdRandomAccessFileBackendFactory.class.isAssignableFrom(StoreOpener.backend.getClass())) {
             instance = RrdDbPool.getInstance();
             instance.setCapacity(dbPoolSize);
             usepool = true;

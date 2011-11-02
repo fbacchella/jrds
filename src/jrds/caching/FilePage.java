@@ -29,26 +29,27 @@ public class FilePage {
         return new FileOutputStream(fd).getChannel();
     }
 
-    static {
-        System.load("/var/jrds/WEB-INF/lib/libdirect.dylib");
-    }
-
     private final ByteBuffer page;
     private boolean dirty;
     String filepath;
     private  long fileOffset;
     final int pageIndex;
     private int size;
-
+    
     /**
      * Used to build an empty page
      */
     public FilePage(ByteBuffer pagecache, int pageIndex) {
-        pagecache.position(pageIndex * PageCache.PAGESIZE);
-        this.page = pagecache.slice();
-        this.page.limit(PageCache.PAGESIZE);
-        this.pageIndex = pageIndex;
-        this.size = 0;
+        try {
+            pagecache.position(pageIndex * PageCache.PAGESIZE);
+            this.page = pagecache.slice();
+            this.page.limit(0);
+            this.pageIndex = pageIndex;
+            this.size = 0;
+        } catch (RuntimeException e) {
+            logger.error(Util.delayedFormatString("page creation failed at %d", pageIndex));
+            throw e;
+        }
     }
 
     public void load(File file,
@@ -56,6 +57,7 @@ public class FilePage {
         this.filepath = file.getCanonicalPath();
         this.fileOffset = (long) (Math.floor( offset /  PageCache.PAGESIZE) * PageCache.PAGESIZE);
         FileChannel channel = DirectFileRead(filepath, false);
+        this.page.limit(PageCache.PAGESIZE);
         this.size = channel.read(page);
         logger.debug(Util.delayedFormatString("Loaded %d bytes at offset %d from %s", size, fileOffset, file.getCanonicalPath()));
     }
@@ -73,6 +75,9 @@ public class FilePage {
             } catch (IOException e) {
                 logger.error(Util.delayedFormatString("sync failed for %s: %s", filepath, e), e);
                 throw e;
+            } catch (RuntimeException e) {
+                logger.error(Util.delayedFormatString("sync failed for %s: %s", filepath, e), e);
+                throw e;
             }
         }
     }
@@ -88,10 +93,16 @@ public class FilePage {
             page.position(pageStartPos);
             page.get(buffer, bufferOffset, bytesRead);
         } catch (Exception e) {
-            logger.error(Util.delayedFormatString("getting %d bytes at %d, starting at %d, from %d to %d %d %d", buffer.length, offset, fileOffset, pageStartPos, pageEndPos, bufferOffset, bytesRead));
+            logger.error(Util.delayedFormatString("error getting %d bytes at %d, starting at %d, from %d to %d %d %d", buffer.length, offset, fileOffset, pageStartPos, pageEndPos, bufferOffset, bytesRead));
             logger.error(e, e);
         }
         logger.debug(Util.delayedFormatString("read %d bytes from %s", bytesRead, filepath));
+        if(logger.isDebugEnabled() && buffer.length == 4) {
+            assert buffer.length == 4 : "Invalid number of bytes for integer conversion";
+            int val =  ((buffer[0] << 24) & 0xFF000000) + ((buffer[1] << 16) & 0x00FF0000) +
+                    ((buffer[2] << 8) & 0x0000FF00) + ((buffer[3] << 0) & 0x000000FF);
+            logger.debug(Util.delayedFormatString("int value read: %d from %d %d %d %d", val, buffer[0], buffer[1], buffer[2], buffer[3]));
+        }
     }
 
     public void write(long offset, byte[] buffer) {
@@ -148,7 +159,7 @@ public class FilePage {
     public boolean isEmpty() {
         return filepath == null;
     }
-    
+
     public void free() throws IOException {
         if(filepath != null)
             sync();

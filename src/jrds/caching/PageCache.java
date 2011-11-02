@@ -3,10 +3,10 @@ package jrds.caching;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 public class PageCache {
     static final private Logger logger = Logger.getLogger(PageCache.class);
 
-    public final static int PAGESIZE = 4192;
+    public final static int PAGESIZE = 4096;
     private final ConcurrentMap<String, Map<Long, Integer>> files = new ConcurrentHashMap<String, Map<Long, Integer>>();
     private final LRUMap<Integer, FilePage> pagecache;
     private final ByteBuffer pagecacheBuffer;
@@ -29,11 +29,11 @@ public class PageCache {
         //Create the page cache in memory
         pagecache = new LRUMap<Integer, FilePage>(maxObjects);
         //And fill it with empty pages
-        for(int i=2; i < maxObjects; i++ ) {
+        for(int i=0; i < maxObjects; i++ ) {
             pagecache.put(i, new FilePage(pagecacheBuffer, i));
         }
 
-        //createSyncTask(syncPeriod);
+        createSyncTask(syncPeriod);
         logger.info(Util.delayedFormatString("created a page cache with %d %d pages, using %d of memory", maxObjects, PAGESIZE, maxObjects * PAGESIZE));
     }
 
@@ -59,7 +59,7 @@ public class PageCache {
         FilePage page = null;
         Map<Long, Integer> m1 = files.get(canonicalPath);
         if(m1 == null) {
-            m1 = new HashMap<Long, Integer>();
+            m1 = new TreeMap<Long, Integer>();
             files.putIfAbsent(canonicalPath, m1);
         }
 
@@ -78,7 +78,7 @@ public class PageCache {
                 page.load(file, offsetPage);
                 pagecache.put(index, page);
                 m1.put(offsetPage, index);
-                logger.debug(Util.delayedFormatString("Loading page %d from %s", offset, file.getCanonicalPath()));
+                logger.debug(Util.delayedFormatString("Loading at offset %d from %s", offsetPage, file.getCanonicalPath()));
             }
             else 
                 page = pagecache.get(index);
@@ -118,11 +118,14 @@ public class PageCache {
     }
 
     public void sync() {
-        for(FilePage p: pagecache.values()) {
-            try {
-                p.sync();
-            } catch (IOException e) {
-                logger.error(Util.delayedFormatString("sync failed for %s:", p.filepath, e));
+        for( Map<Long, Integer> p: files.values()) {
+            for(Integer index: p.values()) {
+                FilePage page = pagecache.getQuiet(index);
+                try {
+                    page.sync();
+                } catch (IOException e) {
+                    logger.error(Util.delayedFormatString("sync failed for %s:", page.filepath, e));
+                }
             }
         }
     }

@@ -22,6 +22,7 @@ public class TestFilePage {
     static public void configure() throws IOException, ParserConfigurationException {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, "jrds.caching.RrdCachedFileBackend", "jrds.caching.FilePage", "jrds.caching.PageCache");
+        RrdCachedFileBackendFactory.loadDirect(new File("build/native"));
     }
 
     @Test

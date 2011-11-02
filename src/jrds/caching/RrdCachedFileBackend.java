@@ -73,8 +73,6 @@ public class RrdCachedFileBackend extends RrdFileBackend {
      * @throws IOException Thrown in case of I/O error 
      */
     public void close() throws IOException {
-
-        super.close(); // calls sync() eventually
     }
 
     /**

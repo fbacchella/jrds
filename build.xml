@@ -279,7 +279,7 @@
 			<tarfileset dir="${build.home}/native" prefix="WEB-INF/lib">
 				<include name="*.so"/>
 				<include name="*.dll"/>
-				<include name="*.dylib"/>
+				<include name="*.jnilib"/>
 			</tarfileset>
 		</tar>
 		<gzip src="${build.home}/${app.name}.tar" destfile="${build.home}/${app.name}.tar.gz"/>
