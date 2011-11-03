@@ -165,4 +165,11 @@ public class FilePage {
             sync();
         filepath = null;
     }
+
+    /**
+     * @return the dirty
+     */
+    boolean isDirty() {
+        return dirty;
+    }
 }

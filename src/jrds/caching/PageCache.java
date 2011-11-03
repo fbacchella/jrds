@@ -68,9 +68,31 @@ public class PageCache {
             m1 = files.get(canonicalPath);
             Integer index = m1.get(offsetPage);
             if(index == null) {
+                //page is remove from the page cache, but it will be put back
                 page = pagecache.removeEldest();
                 if(! page.isEmpty()) {
-                    files.get(page.filepath).remove(page.pageIndex);
+                    final String filepath = page.filepath;
+                    //Remove page from page used by this file
+                    files.get(filepath).remove(page.pageIndex);
+                    //Launch a synchronization thread if needed for this file, to keep it on a coherent state on disk
+                    if(page.isDirty()) {
+                        Thread syncthread = new Thread() {
+                            @Override
+                            public void run() {
+                                Map<Long, Integer> p = PageCache.this.files.get(filepath);
+                                for(Integer index: p.values()) {
+                                    FilePage page = PageCache.this.pagecache.getQuiet(index);
+                                    try {
+                                        page.sync();
+                                    } catch (IOException e) {
+                                        logger.error(Util.delayedFormatString("sync failed for %s:", page.filepath, e));
+                                    }
+                                }
+                            }
+                        };
+                        syncthread.setDaemon(true);
+                        syncthread.start();
+                    }
                     page.free();
                 }
                 index = page.pageIndex;
@@ -92,8 +114,8 @@ public class PageCache {
         if(buffer.length == 0)
             return;
 
-        long cacheStart = (long) (Math.floor( offset /  PAGESIZE) * PAGESIZE);
-        long cacheEnd = (long) (Math.ceil( (offset + buffer.length - 1)  /  PAGESIZE) * PAGESIZE);
+        int cacheStart = (int) (Math.floor( offset /  PAGESIZE) * PAGESIZE);
+        int cacheEnd = (int) (Math.ceil( (offset + buffer.length - 1)  /  PAGESIZE) * PAGESIZE);
         while(cacheStart <= cacheEnd) {
             FilePage current = find(file, cacheStart);
             current.read(offset, buffer);
@@ -106,8 +128,8 @@ public class PageCache {
         if(buffer.length == 0)
             return;
 
-        long cacheStart = (long) (Math.floor( offset /  PAGESIZE) * PAGESIZE);
-        long cacheEnd = (long) (Math.ceil( (offset + buffer.length - 1)  /  PAGESIZE) * PAGESIZE);
+        int cacheStart = (int) (Math.floor( offset /  PAGESIZE) * PAGESIZE);
+        int cacheEnd = (int) (Math.ceil( (offset + buffer.length - 1)  /  PAGESIZE) * PAGESIZE);
         while(cacheStart <= cacheEnd) {
             logger.trace(Util.delayedFormatString("Writting at page %d", cacheStart));
             FilePage current = find(file, cacheStart);
