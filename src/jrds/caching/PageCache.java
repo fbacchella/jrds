@@ -73,7 +73,7 @@ public class PageCache {
                 if(! page.isEmpty()) {
                     final String filepath = page.filepath;
                     //Remove page from page used by this file
-                    files.get(filepath).remove(page.pageIndex);
+                    files.get(filepath).remove(page.fileOffset);
                     //Launch a synchronization thread if needed for this file, to keep it on a coherent state on disk
                     if(page.isDirty()) {
                         Thread syncthread = new Thread() {

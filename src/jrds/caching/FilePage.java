@@ -32,7 +32,7 @@ public class FilePage {
     private final ByteBuffer page;
     private boolean dirty;
     String filepath;
-    private  long fileOffset;
+    long fileOffset;
     final int pageIndex;
     private int size;
     
