@@ -12,8 +12,9 @@ import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TestLRUMap {
-    static final private Logger logger = Logger.getLogger(TestLRUMap.class);
+public class TestLRUArray {
+    static final private Logger logger = Logger.getLogger(TestLRUArray.class);
+    static final private int numElems = 5;
 
     @BeforeClass
     static public void configure() throws IOException, ParserConfigurationException {
@@ -23,17 +24,17 @@ public class TestLRUMap {
     
     @Test
     public void test1() {
-        LRUMap<Integer, Integer> m = new LRUMap<Integer,Integer>(5);
+        LRUArray<Integer> m = new LRUArray<Integer>(5);
         int i=0;
-        m.put(++i, i);
-        m.put(++i, i);
-        m.put(++i, i);
-        m.put(++i, i);
-        m.put(++i, i);
-        m.put(++i, i);
+        m.put(++i % numElems, i);
+        m.put(++i % numElems, i);
+        m.put(++i % numElems, i);
+        m.put(++i % numElems, i);
+        m.put(++i % numElems, i);
+        m.put(++i % numElems, i);
         Assert.assertEquals("", new Integer(4), m.get(4));
-        Assert.assertEquals("", new Integer(1), m.removeEldest());
-        m.putLast(++i, i);
+        Assert.assertEquals("", new Integer(2), m.removeEldest());
+        m.putLast(++i % numElems, i);
         Assert.assertEquals("", new Integer(i), m.removeEldest());
         m.dumpMap();
     }

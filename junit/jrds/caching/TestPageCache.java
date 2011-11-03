@@ -79,4 +79,18 @@ public class TestPageCache {
         checkcontent();
     }
 
+    @Test
+    public void fillBigger() throws IOException {
+        PageCache pc = new PageCache(numpages / 2,3600);
+        if(testFile.exists())
+            testFile.delete();
+        byte[] buffer = new byte[PageCache.PAGESIZE * numpages];
+        for(byte i= 0; i < numpages; i++) {
+            Arrays.fill(buffer, PageCache.PAGESIZE * i , PageCache.PAGESIZE * (i + 1), i);
+        }
+        pc.write(testFile, 0, buffer);
+        pc.sync();
+        checkcontent();
+    }
+
 }

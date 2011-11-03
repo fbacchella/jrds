@@ -19,7 +19,7 @@ public class PageCache {
 
     public final static int PAGESIZE = 4096;
     private final ConcurrentMap<String, Map<Long, Integer>> files = new ConcurrentHashMap<String, Map<Long, Integer>>();
-    private final LRUMap<Integer, FilePage> pagecache;
+    private final LRUArray<FilePage> pagecache;
     private final ByteBuffer pagecacheBuffer;
     private final Timer syncTimer = new Timer(true);
 
@@ -27,7 +27,7 @@ public class PageCache {
         pagecacheBuffer = ByteBuffer.allocateDirect(maxObjects * PAGESIZE);
 
         //Create the page cache in memory
-        pagecache = new LRUMap<Integer, FilePage>(maxObjects);
+        pagecache = new LRUArray<FilePage>(maxObjects);
         //And fill it with empty pages
         for(int i=0; i < maxObjects; i++ ) {
             pagecache.put(i, new FilePage(pagecacheBuffer, i));
