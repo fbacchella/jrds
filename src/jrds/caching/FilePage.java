@@ -73,8 +73,9 @@ public class FilePage {
         this.page.limit(PageCache.PAGESIZE);
         this.page.position(0);
         FileChannel channel = DirectFileRead(filepath, false);
-        this.size = channel.read(page);
+        this.size = channel.read(page, this.fileOffset);
         logger.debug(Util.delayedFormatString("Loaded %d bytes at offset %d from %s in page %d", size, fileOffset, filepath, pageIndex));
+        channel.close();
     }
 
     public synchronized void sync() throws IOException {
@@ -86,6 +87,7 @@ public class FilePage {
                 FileChannel channel = DirectFileWrite(filepath, false);
                 channel.write(page, fileOffset);
                 channel.force(true);
+                channel.close();
                 dirty = false;
             } catch (IOException e) {
                 logger.error(Util.delayedFormatString("sync failed for %s: %s", filepath, e), e);

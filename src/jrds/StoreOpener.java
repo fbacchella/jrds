@@ -6,6 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import jrds.caching.RrdCachedFileBackendFactory;
+import jrds.caching.RrdDebugRandomAccessFileBackendFactory;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.core.RrdBackendFactory;
@@ -30,6 +31,7 @@ public final class StoreOpener {
         RrdCachedFileBackendFactory cf = new RrdCachedFileBackendFactory();
         RrdCachedFileBackendFactory.setPageCache(100, 30);
         RrdBackendFactory.registerFactory(cf);
+        RrdBackendFactory.registerFactory(new RrdDebugRandomAccessFileBackendFactory());
     }
 
     /**

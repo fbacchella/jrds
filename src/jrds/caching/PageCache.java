@@ -19,18 +19,19 @@ public class PageCache {
 
     public final static int PAGESIZE = 512;
     private final ConcurrentMap<String, Map<Long, FilePage>> files = new ConcurrentHashMap<String, Map<Long, FilePage>>();
-    private final LRUArray<FilePage> pagecache;
-    //private final ByteBuffer pagecacheBuffer;
+    final LRUArray<FilePage> pagecache;
+    final ByteBuffer pagecacheBuffer;
     private final Timer syncTimer = new Timer(true);
 
     public PageCache(int maxObjects, int syncPeriod) {
         //pagecacheBuffer = ByteBuffer.allocateDirect(maxObjects * PAGESIZE);
+        pagecacheBuffer = ByteBuffer.allocate(maxObjects * PAGESIZE);
 
         //Create the page cache in memory
         pagecache = new LRUArray<FilePage>(maxObjects);
         //And fill it with empty pages
         for(int i = 0 ; i < maxObjects ; i++ ) {
-            pagecache.put(i, new FilePage(/*pagecacheBuffer,*/ i));
+            pagecache.put(i, new FilePage(pagecacheBuffer, i));
         }
 
         createSyncTask(syncPeriod);
@@ -62,7 +63,7 @@ public class PageCache {
             files.putIfAbsent(canonicalPath, m1);
         }
 
-        long offsetPage = offset - ( offset %  PAGESIZE );
+        long offsetPage = offsetPage(offset);
         FilePage page = null;
         synchronized(this){
             m1 = files.get(canonicalPath);
@@ -74,6 +75,7 @@ public class PageCache {
                 page = pagecache.removeEldest();
                 //We getting an already used page, it needs to be clean before reuse
                 if(! page.isEmpty()) {
+                    logger.trace(Util.delayedFormatString("Flushing page %d, used by file %s at offset %d", page.pageIndex, page.filepath, page.pageIndex));
                     final String filepath = page.filepath;
                     //Remove page from page used by this file
                     files.get(filepath).remove(page.fileOffset);
