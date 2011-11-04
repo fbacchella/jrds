@@ -66,6 +66,12 @@ public class RrdCachedFileBackend extends RrdFileBackend {
             logger.trace(Util.delayedFormatString("Loading %d bytes at %d from %s", b.length, offset, file.getCanonicalPath()));
             pagecache.read(file, offset, b);
         }
+        if(logger.isDebugEnabled() && b.length == 4) {
+            assert b.length == 4 : "Invalid number of bytes for integer conversion";
+            int val =  ((b[0] << 24) & 0xFF000000) + ((b[1] << 16) & 0x00FF0000) +
+                    ((b[2] << 8) & 0x0000FF00) + ((b[3] << 0) & 0x000000FF);
+            logger.debug(Util.delayedFormatString("int value read: %d from %d %d %d %d", val, b[0], b[1], b[2], b[3]));
+        }
     }
 
     /** 

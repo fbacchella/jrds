@@ -2,6 +2,7 @@ package jrds.caching;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -23,7 +24,7 @@ public class TestPageCache {
     @BeforeClass
     static public void configure() throws IOException, ParserConfigurationException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.caching.RrdCachedFileBackend", "jrds.caching.FilePage", "jrds.caching.PageCache");
+        Tools.setLevel(logger, Level.TRACE, "jrds.caching", "jrds.caching.RrdCachedFileBackend", "jrds.caching.FilePage", "jrds.caching.PageCache");
         RrdCachedFileBackendFactory.loadDirect(new File("build/native"));
     }
     
@@ -77,6 +78,27 @@ public class TestPageCache {
         pc.write(testFile, 0, buffer);
         pc.sync();
         checkcontent();
+    }
+    
+    @Test
+    public void readCountBigger() throws IOException {
+        if(testFile.exists())
+            testFile.delete();
+        byte[] buffer = new byte[PageCache.PAGESIZE * numpages];
+        for(byte i = 0; i < numpages; i++) {
+            Arrays.fill(buffer, PageCache.PAGESIZE * i , PageCache.PAGESIZE * (i + 1), (byte)(5 - i));
+        }
+        FileOutputStream out = new FileOutputStream(testFile);
+        out.write(buffer);
+        out.flush();
+        out.close();
+        Arrays.fill(buffer, (byte)0);
+        PageCache pc = new PageCache(numpages / 2,3600);
+        pc.read(testFile, 0, buffer);
+        for(int i = 0; i < buffer.length; i++) {
+            System.out.println("[" + i + "]=" + buffer[i]);
+            //Assert.assertEquals("missmatch at offset " + i, (byte)(numpages + 1 -  Math.floor(i / PageCache.PAGESIZE)), buffer[i]);
+        }
     }
 
     @Test
