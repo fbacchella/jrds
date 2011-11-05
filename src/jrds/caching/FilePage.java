@@ -112,17 +112,35 @@ public class FilePage {
         return cursor;
     }
 
-    public synchronized void sync() throws IOException {
+    /**
+     * Sync the content of the page cache
+     * @throws IOException
+     */
+    public void sync() throws IOException {
+        FileChannel channel = sync(null);
+        if(channel!= null) {
+            channel.force(true);
+            channel.close();
+        }
+    }
+
+    /**
+     * Sync the content of the page cache reusing an existing channel
+     * @param channel the channel to use. If it's null, a direct channle will be openned
+     * @return the channel used
+     * @throws IOException
+     */
+    public FileChannel sync(FileChannel channel) throws IOException {
         if(dirty) {
             try {
                 logger.debug(Util.delayedFormatString("syncing %d bytes at %d to %s", size, fileOffset, filepath));
-                FileChannel channel = DirectFileWrite(filepath, false);
+                if(channel == null)
+                    channel = DirectFileWrite(filepath, false);
                 ByteBuffer cursor = cloneState(0, size);
                 channel.write(cursor, fileOffset);
                 dirty = false;
                 lock.readLock().unlock();
-                channel.force(true);
-                channel.close();
+                return channel;
             } catch (IOException e) {
                 logger.error(Util.delayedFormatString("sync failed for %s: %s", filepath, e), e);
                 throw e;
@@ -134,6 +152,7 @@ public class FilePage {
                 throw e;
             }
         }
+        return null;
     }
 
     public void read(long offset, byte[] buffer) throws IOException{

@@ -3,6 +3,7 @@ package jrds.caching;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -85,13 +86,7 @@ public class PageCache {
                             @Override
                             public void run() {
                                 Map<Long, FilePage> pages = PageCache.this.files.get(filepath);
-                                for(FilePage page: pages.values()) {
-                                    try {
-                                        page.sync();
-                                    } catch (IOException e) {
-                                        logger.error(Util.delayedFormatString("sync failed for %s:", page.filepath, e));
-                                    }
-                                }
+                                syncFilePages(pages);
                             }
                         };
                         syncthread.setDaemon(true);
@@ -140,9 +135,33 @@ public class PageCache {
             cacheStart += PAGESIZE;
         }
     }
+    
+    /**
+     * Sync all pages from a single file
+     * @param pagepointer
+     */
+    private void syncFilePages(Map<Long, FilePage> pagepointer) {
+        FileChannel channel = null;
+        for(FilePage page: pagepointer.values()) {
+            try {
+                channel = page.sync(channel);
+            } catch (IOException e) {
+                logger.error(Util.delayedFormatString("sync failed for %s:", page.filepath, e));
+            }
+        }
+        if(channel!= null) {
+            try {
+                channel.force(true);
+                channel.close();
+            } catch (IOException e) {
+                logger.error(Util.delayedFormatString("sync failed for %s: %e", channel, e));
+            }
+        }       
+    }
 
     public void sync() {
         for( Map<Long, FilePage> p: files.values()) {
+            syncFilePages(p);
             //                    FilePage[] pages = new FilePage[p.size()];
             //                    //Need to run on a copy, to avoid concurent modifications;
             //                    synchronized(p) {
@@ -151,13 +170,6 @@ public class PageCache {
             //                            pages[i++] = page;
             //                        }
             //                    }
-            for(FilePage page:p.values()) {
-                try {
-                    page.sync();
-                } catch (IOException e) {
-                    logger.error(Util.delayedFormatString("sync failed for %s:", page.filepath, e));
-                }
-            }
         }
     }
 
