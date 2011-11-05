@@ -2,8 +2,8 @@ package jrds.caching;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -26,21 +26,40 @@ public class TestFilePage {
     }
 
     @Test
-    public void test1() throws IOException {
+    public void testWrite() throws IOException {
         File testFile = new File("tmp/testfilepage");
         if(testFile.exists())
             testFile.delete();
-        ByteBuffer pagecacheBuffer = ByteBuffer.allocateDirect(1 * PageCache.PAGESIZE);
-        FilePage page = new FilePage(pagecacheBuffer, 0);
+        
+        FilePage page = new FilePage(0);
         page.load(testFile, 0);
         page.write(0, getClass().getName().getBytes());
-        page.sync();
+        page.free();
 
         FileInputStream in = new FileInputStream(testFile);
         byte[] b = new byte[(int) testFile.length()];
         in.read(b);
         Assert.assertEquals("read does not match write", getClass().getName().trim(), new String(b).trim());
         testFile.delete();
+    }
+
+    @Test
+    public void testRead() throws IOException {
+        File testFile = new File("tmp/testfilepage");
+        if(testFile.exists())
+            testFile.delete();
+        
+        FileOutputStream in = new FileOutputStream(testFile);
+        in.write(getClass().getName().getBytes());
+        in.flush();
+        in.close();
+        
+        FilePage page = new FilePage(0);
+        page.load(testFile, 0);
+        byte[] b = new byte[(int) testFile.length()];
+        page.read(0, b);
+
+        Assert.assertEquals("write does not match read", getClass().getName().trim(), new String(b).trim());
     }
 
 }

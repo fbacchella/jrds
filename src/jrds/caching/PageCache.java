@@ -24,8 +24,7 @@ public class PageCache {
     private final Timer syncTimer = new Timer(true);
 
     public PageCache(int maxObjects, int syncPeriod) {
-        //pagecacheBuffer = ByteBuffer.allocateDirect(maxObjects * PAGESIZE);
-        pagecacheBuffer = ByteBuffer.allocate(maxObjects * PAGESIZE);
+        pagecacheBuffer = ByteBuffer.allocateDirect(maxObjects * PAGESIZE);
 
         //Create the page cache in memory
         pagecache = new LRUArray<FilePage>(maxObjects);
@@ -140,7 +139,15 @@ public class PageCache {
 
     public void sync() {
         for( Map<Long, FilePage> p: files.values()) {
-            for(FilePage page: p.values()) {
+            //                    FilePage[] pages = new FilePage[p.size()];
+            //                    //Need to run on a copy, to avoid concurent modifications;
+            //                    synchronized(p) {
+            //                        int i=0 ;
+            //                        for(FilePage page: p.values()) {
+            //                            pages[i++] = page;
+            //                        }
+            //                    }
+            for(FilePage page:p.values()) {
                 try {
                     page.sync();
                 } catch (IOException e) {

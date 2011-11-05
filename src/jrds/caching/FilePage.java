@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import jrds.Util;
 
@@ -18,18 +20,23 @@ public class FilePage {
     private native static void prepare_fd(String filename, FileDescriptor fdobj, boolean readOnly);
 
     private static final FileChannel DirectFileRead(String path, boolean readOnly) throws IOException {
+        if(path == null)
+            throw new NullPointerException();
         FileDescriptor fd = new FileDescriptor();
         prepare_fd(path, fd, readOnly);
         return new FileInputStream(fd).getChannel();
     }
 
     private static final FileChannel DirectFileWrite(String path, boolean readOnly) throws IOException {
+        if(path == null)
+            throw new NullPointerException();
         FileDescriptor fd = new FileDescriptor();
         prepare_fd(path, fd, readOnly);
         return new FileOutputStream(fd).getChannel();
     }
 
     private final ByteBuffer page;
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
     final int pageIndex;
     private boolean dirty;
     private int size;
@@ -68,27 +75,52 @@ public class FilePage {
 
     public void load(File file,
             long offset) throws IOException {
-        this.filepath = file.getCanonicalPath();
+        if(! isEmpty()) {
+            throw new IllegalStateException("Loading file page in a none empty cache page");
+        }
+        String canonicalpath = file.getCanonicalPath();
+        FileChannel channel = DirectFileRead(canonicalpath, false);
+        lock.writeLock().lock();
+        this.filepath = canonicalpath;
         this.fileOffset = PageCache.offsetPage(offset);
         this.page.limit(PageCache.PAGESIZE);
         this.page.position(0);
-        FileChannel channel = DirectFileRead(filepath, false);
         this.size = channel.read(page, this.fileOffset);
+        lock.writeLock().unlock();
         logger.debug(Util.delayedFormatString("Loaded %d bytes at offset %d from %s in page %d", size, fileOffset, filepath, pageIndex));
         channel.close();
+    }
+    
+    /**
+     * This methode duplicate the byte buffer and set the position for the copy
+     * So multiple read can run concurently and not overrite cursor
+     * <p>
+     * It also acquire the read lock
+     * @param position
+     * @param limit
+     * @return byte buffer whose limits can be safely modified
+     */
+    private ByteBuffer cloneState(int position, int limit) {
+        lock.writeLock().lock();
+        ByteBuffer cursor = page.duplicate();
+        lock.readLock().lock();
+        lock.writeLock().unlock();
+        cursor.limit(limit);
+        cursor.position(position);
+        return cursor;
     }
 
     public synchronized void sync() throws IOException {
         if(dirty) {
             try {
                 logger.debug(Util.delayedFormatString("syncing %d bytes at %d to %s", size, fileOffset, filepath));
-                page.position(0);
-                page.limit(size);
                 FileChannel channel = DirectFileWrite(filepath, false);
-                channel.write(page, fileOffset);
+                ByteBuffer cursor = cloneState(0, size);
+                channel.write(cursor, fileOffset);
+                dirty = false;
+                lock.readLock().unlock();
                 channel.force(true);
                 channel.close();
-                dirty = false;
             } catch (IOException e) {
                 logger.error(Util.delayedFormatString("sync failed for %s: %s", filepath, e), e);
                 throw e;
@@ -107,14 +139,14 @@ public class FilePage {
         int pageEndPos = (int) Math.min((long)PageCache.PAGESIZE, offset + buffer.length - fileOffset);
         int bytesRead = pageEndPos - pageStartPos;
         int bufferOffset = (int) Math.max(0, fileOffset - offset);
+        ByteBuffer cursor = cloneState(pageStartPos, pageEndPos);
         try {
-            page.limit(pageEndPos);
-            page.position(pageStartPos);
-            page.get(buffer, bufferOffset, bytesRead);
+            cursor.get(buffer, bufferOffset, bytesRead);
         } catch (Exception e) {
             logger.error(Util.delayedFormatString("error getting %d bytes at %d, starting at %d, from %d to %d %d %d", buffer.length, offset, fileOffset, pageStartPos, pageEndPos - 1, bufferOffset, bytesRead));
             logger.error(e, e);
         }
+        lock.readLock().unlock();
         logger.trace(Util.delayedFormatString("in page %d: read %d bytes at offset %d in file %s: relative to offset %d of file, from %d to %d (%d bytes) in position %d in buffer", pageIndex, buffer.length, offset, filepath, fileOffset, pageStartPos, pageEndPos - 1, bytesRead, bufferOffset));
     }
 
@@ -123,18 +155,20 @@ public class FilePage {
         int pageEndPos = (int) Math.min((long)PageCache.PAGESIZE, offset + buffer.length - fileOffset);
         int bytesWritten = pageEndPos - pageStartPos;
         int bufferOffset = (int) Math.max(0, fileOffset - offset);
+        lock.writeLock().lock();
         try {
             page.limit(pageEndPos);
             page.position(pageStartPos);
             page.put(buffer, bufferOffset, bytesWritten);
+            dirty = true;
         } catch (Exception e) {
             logger.error(Util.delayedFormatString("%d %d %d %d", pageStartPos, pageEndPos, bufferOffset, bytesWritten));
             logger.error(e, e);
         }
+        lock.writeLock().unlock();
         size = Math.max(size, pageEndPos);
         logger.debug(Util.delayedFormatString("in page %d: write %d bytes at %d from %s, in page %d of file from %d to %d to %d", pageIndex, bytesWritten, offset, filepath, fileOffset / PageCache.PAGESIZE, pageStartPos, pageEndPos, bufferOffset));
 
-        dirty = true;
     }
 
     /* (non-Javadoc)
@@ -173,9 +207,11 @@ public class FilePage {
     public void free() throws IOException {
         if(filepath != null)
             sync();
+        lock.writeLock().lock();
         filepath = null;
         page.limit(0);
         size = 0;
+        lock.writeLock().unlock();
     }
 
     /**
