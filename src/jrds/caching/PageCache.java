@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 public class PageCache {
     static final private Logger logger = Logger.getLogger(PageCache.class);
 
-    public final static int PAGESIZE = 512;
+    public final static int PAGESIZE = 4096;
     private final ConcurrentMap<String, Map<Long, FilePage>> files = new ConcurrentHashMap<String, Map<Long, FilePage>>();
     final LRUArray<FilePage> pagecache;
     final ByteBuffer pagecacheBuffer;
@@ -56,17 +56,17 @@ public class PageCache {
 
     private FilePage find(File file, long offset) throws IOException {
         String canonicalPath = file.getCanonicalPath();
-        Map<Long, FilePage> m1 = files.get(canonicalPath);
-        if(m1 == null) {
-            m1 = new TreeMap<Long, FilePage>();
-            files.putIfAbsent(canonicalPath, m1);
+        Map<Long, FilePage> fileCache = files.get(canonicalPath);
+        if(fileCache == null) {
+            fileCache = new TreeMap<Long, FilePage>();
+            files.putIfAbsent(canonicalPath, fileCache);
         }
 
         long offsetPage = offsetPage(offset);
         FilePage page = null;
-        synchronized(this){
-            m1 = files.get(canonicalPath);
-            page = m1.get(offsetPage);
+        fileCache = files.get(canonicalPath);
+        synchronized(fileCache){
+            page = fileCache.get(offsetPage);
             // Page is not cached
             // we need to free an old one and use it
             if(page == null) {
@@ -99,11 +99,15 @@ public class PageCache {
                     }
                 }
 
-                page.load(file, offsetPage);
                 pagecache.put(page.pageIndex, page);
-                m1.put(offsetPage, page);
-                logger.trace(Util.delayedFormatString("Loading at offset %d from %s in page %d", offsetPage, page.filepath, page.pageIndex));
+                fileCache.put(offsetPage, page);
             }
+            // The page gotten in the synchronized section was an empty one
+            // we need it to load it, but not in the synchronized section 
+            if(page.isEmpty())
+                page.load(file, offsetPage);
+
+            logger.trace(Util.delayedFormatString("Loading at offset %d from %s in page %d", offsetPage, page.filepath, page.pageIndex));
         }
 
         return page;

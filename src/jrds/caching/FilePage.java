@@ -42,7 +42,7 @@ public class FilePage {
     private int size;
     String filepath;
     long fileOffset;
-    
+
     /**
      * Used to build an empty page
      */
@@ -53,6 +53,7 @@ public class FilePage {
             this.page.limit(0);
             this.pageIndex = pageIndex;
             this.size = 0;
+            this.filepath = null;
             logger.trace(Util.delayedFormatString("Sliced at %d, capacity: %d", pagecache.position(), page.capacity()));
         } catch (RuntimeException e) {
             logger.error(Util.delayedFormatString("page creation failed at %d", pageIndex));
@@ -67,6 +68,7 @@ public class FilePage {
             this.page.limit(0);
             this.pageIndex = pageIndex;
             this.size = 0;
+            this.filepath = null;
         } catch (RuntimeException e) {
             logger.error(Util.delayedFormatString("page creation failed at %d", pageIndex));
             throw e;
@@ -90,7 +92,7 @@ public class FilePage {
         logger.debug(Util.delayedFormatString("Loaded %d bytes at offset %d from %s in page %d", size, fileOffset, filepath, pageIndex));
         channel.close();
     }
-    
+
     /**
      * This methode duplicate the byte buffer and set the position for the copy
      * So multiple read can run concurently and not overrite cursor
