@@ -11,10 +11,12 @@ import jrds.Util;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.core.RrdBackend;
-import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdFileBackendFactory;
 
 /**
+ * The factory for a RrdCachedFileBackend. It preloads the directIO JNI wrapper library by expecting it to be in the 
+ * same directory as the class' jar. An helper method loadDirect() can also be used.
+ * 
  * @author Fabrice Bacchella
  *
  */
@@ -40,6 +42,11 @@ public class RrdCachedFileBackendFactory extends RrdFileBackendFactory {
         }
     }
 
+    /**
+     * An help class that can be used to load the directIO JNI wrapper library.
+     * @param path
+     * @throws IOException
+     */
     static final public void loadDirect(File path) throws IOException {
         String directlib = System.mapLibraryName("direct");
         File directlibfile = new File(path,directlib);
@@ -47,12 +54,20 @@ public class RrdCachedFileBackendFactory extends RrdFileBackendFactory {
             System.load(directlibfile.getCanonicalPath());
     }
 
+    /**
+     * Defines the embedded page cache size. Its pages are 4096 bytes in size
+     * @param maxObjects the number of page
+     */
     public void setPageCache(int maxObjects) {
         if(pagecache != null)
             pagecache.sync();
         pagecache = new PageCache(maxObjects);
     }
 
+    /**
+     * Defines the synchronization period for the page scanner
+     * @param syncPeriod
+     */
     public void setSyncPeriod(int syncPeriod) {
         TimerTask syncTask = new TimerTask() {
             public void run() {
@@ -72,9 +87,6 @@ public class RrdCachedFileBackendFactory extends RrdFileBackendFactory {
      * @param path File path
      * @param readOnly True, if the file should be accessed in read/only mode.
      * False otherwise.
-     * @param lockMode One of the following constants: {@link RrdDb#NO_LOCKS},
-     * {@link RrdDb#EXCEPTION_IF_LOCKED} or {@link RrdDb#WAIT_IF_LOCKED}.
-     * @return RrdFileBackend object which handles all I/O operations for the given file path
      * @throws IOException Thrown in case of I/O error.
      */
     public RrdBackend open(String path, boolean readOnly) throws IOException {
@@ -89,12 +101,19 @@ public class RrdCachedFileBackendFactory extends RrdFileBackendFactory {
         return NAME;
     }
 
+    /**
+     * Synchronizes all the dirty page to the disk
+     */
     public void sync() {
         pagecache.sync();
     }
 
-    /* (non-Javadoc)
-     * @see org.rrd4j.core.RrdRandomAccessFileBackendFactory#shouldValidateHeader(java.lang.String)
+    /**
+     * Determines if the header should be validated.
+     *
+     * @param path Storage path
+     * @return True, if the header should be validated for this factory
+     * @throws IOException if header validation fails
      */
     @Override
     protected boolean shouldValidateHeader(String path) throws IOException {

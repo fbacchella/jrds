@@ -11,8 +11,12 @@ import org.apache.log4j.Logger;
 import org.rrd4j.core.RrdFileBackend;
 
 /** 
- * JRobin backend which is used to store RRD data to ordinary disk files 
- * by using fast java.nio.* package ehanced with caching functionnalities.
+ * A backend which is used to store RRD data to ordinary disk files 
+ * by using fast java.nio.* package enhanced with custom caching functionalities.
+ * <p>
+ * When available it use directio for file access, all caching is done with a embedded page cache.
+ * <p>
+ * The file state on disk is kept consistent, as all or no modifications are committed.
  * @author Fabrice Bacchella
  */
 public class RrdCachedFileBackend extends RrdFileBackend {
@@ -22,7 +26,7 @@ public class RrdCachedFileBackend extends RrdFileBackend {
     private final PageCache pagecache;
 
     /**
-     * Creates RrdFileBackend object for the given file path, backed by RandomAccessFile object.
+     * Creates RrdFileBackend object for the given file path.
      *
      * @param path     Path to a file
      * @param readOnly True, if file should be open in a read-only mode. False otherwise

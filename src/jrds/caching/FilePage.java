@@ -14,7 +14,7 @@ import jrds.Util;
 
 import org.apache.log4j.Logger;
 
-public class FilePage {
+class FilePage {
     static final private Logger logger = Logger.getLogger(FilePage.class);
 
     native static void prepare_fd(String filename, FileDescriptor fdobj, boolean readOnly) throws IOException ;

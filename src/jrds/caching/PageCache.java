@@ -13,7 +13,7 @@ import jrds.Util;
 
 import org.apache.log4j.Logger;
 
-public class PageCache {
+class PageCache {
     static final private Logger logger = Logger.getLogger(PageCache.class);
 
     public final static int PAGESIZE = 4096;
