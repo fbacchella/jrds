@@ -17,21 +17,21 @@ import org.apache.log4j.Logger;
 public class FilePage {
     static final private Logger logger = Logger.getLogger(FilePage.class);
 
-    private native static void prepare_fd(String filename, FileDescriptor fdobj, boolean readOnly);
+    native static void prepare_fd(String filename, FileDescriptor fdobj, boolean readOnly) throws IOException ;
 
-    private static final FileChannel DirectFileRead(String path, boolean readOnly) throws IOException {
+    private static final FileChannel DirectFileRead(String path) throws IOException {
         if(path == null)
             throw new NullPointerException();
         FileDescriptor fd = new FileDescriptor();
-        prepare_fd(path, fd, readOnly);
+        prepare_fd(path, fd, true);
         return new FileInputStream(fd).getChannel();
     }
 
-    private static final FileChannel DirectFileWrite(String path, boolean readOnly) throws IOException {
+    private static final FileChannel DirectFileWrite(String path) throws IOException {
         if(path == null)
             throw new NullPointerException();
         FileDescriptor fd = new FileDescriptor();
-        prepare_fd(path, fd, readOnly);
+        prepare_fd(path, fd, false);
         return new FileOutputStream(fd).getChannel();
     }
 
@@ -63,7 +63,6 @@ public class FilePage {
 
     public FilePage(int pageIndex) {
         try {
-
             this.page = ByteBuffer.allocateDirect(PageCache.PAGESIZE);
             this.page.limit(0);
             this.pageIndex = pageIndex;
@@ -80,8 +79,10 @@ public class FilePage {
         if(! isEmpty()) {
             throw new IllegalStateException("Loading file page in a none empty cache page");
         }
+        //Check if file exists, and create it if needed
+        file.createNewFile();
         String canonicalpath = file.getCanonicalPath();
-        FileChannel channel = DirectFileRead(canonicalpath, false);
+        FileChannel channel = DirectFileRead(canonicalpath);
         lock.writeLock().lock();
         this.filepath = canonicalpath;
         this.fileOffset = PageCache.offsetPage(offset);
@@ -135,7 +136,7 @@ public class FilePage {
             try {
                 logger.debug(Util.delayedFormatString("syncing %d bytes at %d to %s", size, fileOffset, filepath));
                 if(channel == null)
-                    channel = DirectFileWrite(filepath, false);
+                    channel = DirectFileWrite(filepath);
                 ByteBuffer cursor = cloneState(0, size);
                 channel.write(cursor, fileOffset);
                 dirty = false;

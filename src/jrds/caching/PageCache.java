@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -22,9 +20,8 @@ public class PageCache {
     private final ConcurrentMap<String, Map<Long, FilePage>> files = new ConcurrentHashMap<String, Map<Long, FilePage>>();
     final LRUArray<FilePage> pagecache;
     final ByteBuffer pagecacheBuffer;
-    private final Timer syncTimer = new Timer(true);
 
-    public PageCache(int maxObjects, int syncPeriod) {
+    public PageCache(int maxObjects) {
         pagecacheBuffer = ByteBuffer.allocateDirect(maxObjects * PAGESIZE);
 
         //Create the page cache in memory
@@ -34,7 +31,6 @@ public class PageCache {
             pagecache.put(i, new FilePage(pagecacheBuffer, i));
         }
 
-        createSyncTask(syncPeriod);
         logger.info(Util.delayedFormatString("created a page cache with %d %d pages, using %d of memory", maxObjects, PAGESIZE, maxObjects * PAGESIZE));
     }
 
@@ -44,15 +40,6 @@ public class PageCache {
     @Override
     protected void finalize() throws Throwable {
         sync();
-    }
-
-    private void createSyncTask(int syncPeriod) {
-        TimerTask syncTask = new TimerTask() {
-            public void run() {
-                PageCache.this.sync();
-            }
-        };
-        syncTimer.schedule(syncTask, syncPeriod * 1000L, syncPeriod * 1000L);
     }
 
     private FilePage find(File file, long offset) throws IOException {

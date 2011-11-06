@@ -3,6 +3,8 @@ package jrds.caching;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import jrds.StoreOpener;
 import jrds.Util;
@@ -22,7 +24,8 @@ public class RrdCachedFileBackendFactory extends RrdFileBackendFactory {
     /** factory name, "CACHEDFILE" */
     public static final String NAME = "CACHEDFILE";
 
-    private static PageCache pagecache = null;
+    private PageCache pagecache = null;
+    private Timer syncTimer = null;
 
     static {
         URL classURL = StoreOpener.class.getClassLoader().getResource("jrds/caching/RrdCachedFileBackendFactory.class");
@@ -44,10 +47,24 @@ public class RrdCachedFileBackendFactory extends RrdFileBackendFactory {
             System.load(directlibfile.getCanonicalPath());
     }
 
-    public static void setPageCache(int maxObjects, int syncPeriod) {
+    public void setPageCache(int maxObjects) {
         if(pagecache != null)
             pagecache.sync();
-        pagecache = new PageCache(maxObjects, syncPeriod);
+        pagecache = new PageCache(maxObjects);
+    }
+
+    public void setSyncPeriod(int syncPeriod) {
+        TimerTask syncTask = new TimerTask() {
+            public void run() {
+                PageCache pagecache = RrdCachedFileBackendFactory.this.pagecache;
+                if(pagecache !=null)
+                    pagecache.sync();
+            }
+        };
+        if(syncTimer == null)
+            syncTimer = new Timer(true);
+        syncTimer.schedule(syncTask, syncPeriod * 1000L, syncPeriod * 1000L);
+
     }
 
     /**
