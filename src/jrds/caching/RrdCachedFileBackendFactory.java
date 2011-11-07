@@ -77,7 +77,7 @@ public class RrdCachedFileBackendFactory extends RrdFileBackendFactory {
             }
         };
         if(syncTimer == null)
-            syncTimer = new Timer(true);
+            syncTimer = new Timer("RrdCachedFileBackendFactory-sync", true);
         syncTimer.schedule(syncTask, syncPeriod * 1000L, syncPeriod * 1000L);
 
     }

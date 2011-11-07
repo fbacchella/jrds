@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jrds.Util;
 
@@ -24,6 +25,7 @@ class PageCache {
     private final ConcurrentMap<String, Map<Long, FilePage>> files = new ConcurrentHashMap<String, Map<Long, FilePage>>();
     final LRUArray<FilePage> pagecache;
     final ByteBuffer pagecacheBuffer;
+    private final AtomicInteger synccounter = new AtomicInteger(0);
 
     public PageCache(int maxObjects) {
         int alignOffset = 0;
@@ -86,7 +88,10 @@ class PageCache {
                     logger.trace(Util.delayedFormatString("Flushing page %d, used by file %s at offset %d", page.pageIndex, page.filepath, page.pageIndex));
                     final String filepath = page.filepath;
                     //Remove page from page used by this file
-                    files.get(filepath).remove(page.fileOffset);
+                    Map<Long, FilePage> oldFileCache = files.get(filepath);
+                    synchronized(oldFileCache) {
+                        oldFileCache.remove(page.fileOffset);
+                    }
                     page.free();
                     //Launch a synchronization thread if needed for this file, to keep it on a coherent state on disk
                     if(page.isDirty()) {
@@ -95,11 +100,14 @@ class PageCache {
                             public void run() {
                                 Map<Long, FilePage> pages = PageCache.this.files.get(filepath);
                                 syncFilePages(pages);
+                                PageCache.this.synccounter.decrementAndGet();
                             }
                         };
+                        syncthread.setName("PageCacheSync-" + new File(filepath).getName() + "-" + synccounter.getAndIncrement());
                         syncthread.setDaemon(true);
                         syncthread.start();
                     }
+                    page.free();
                 }
 
                 pagecache.put(page.pageIndex, page);
