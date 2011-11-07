@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Arrays;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -76,18 +77,27 @@ class FilePage {
 
     public void load(File file,
             long offset) throws IOException {
+        lock.writeLock().lock();
         if(! isEmpty()) {
+            lock.writeLock().unlock();
             throw new IllegalStateException("Loading file page in a none empty cache page");
         }
         //Check if file exists, and create it if needed
         file.createNewFile();
         String canonicalpath = file.getCanonicalPath();
         FileChannel channel = DirectFileRead(canonicalpath);
-        lock.writeLock().lock();
         this.filepath = canonicalpath;
         this.fileOffset = PageCache.offsetPage(offset);
         this.page.limit(PageCache.PAGESIZE);
         this.page.position(0);
+        //if Linux, fill the page with zero before reading
+        if(PageCache.isLinux) {
+            byte[] zerobuffer = new byte[PageCache.PAGESIZE];
+            Arrays.fill(zerobuffer, (byte)0);
+            page.put(zerobuffer);
+            this.page.position(0);
+        }
+
         this.size = channel.read(page, this.fileOffset);
         lock.writeLock().unlock();
         logger.debug(Util.delayedFormatString("Loaded %d bytes at offset %d from %s in page %d", size, fileOffset, filepath, pageIndex));
@@ -137,8 +147,20 @@ class FilePage {
                 logger.debug(Util.delayedFormatString("syncing %d bytes at %d to %s", size, fileOffset, filepath));
                 if(channel == null)
                     channel = DirectFileWrite(filepath);
-                ByteBuffer cursor = cloneState(0, size);
+                //on Linux, he whole page is synched because of the way directio works on linux
+                ByteBuffer cursor = cloneState(0, PageCache.isLinux ? PageCache.PAGESIZE : size);
                 channel.write(cursor, fileOffset);
+                //on Linux, check if we need to truncate
+                if(PageCache.isLinux) {
+                    channel.force(true);
+                    long newsize = channel.size();
+                    long lastPageOffset = PageCache.offsetPage(newsize);
+                    if(lastPageOffset == this.fileOffset) {
+                        //We just written the last page
+                        //So truncate to the good file size 
+                        channel.truncate(lastPageOffset + size);
+                    }
+                }
                 dirty = false;
                 lock.readLock().unlock();
                 return channel;

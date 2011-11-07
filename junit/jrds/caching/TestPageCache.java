@@ -12,7 +12,9 @@ import jrds.Tools;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -26,6 +28,18 @@ public class TestPageCache {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, "jrds.caching");
         RrdCachedFileBackendFactory.loadDirect(new File("build/native"));
+    }
+
+    @Before
+    public void initialize() {
+        if(testFile.exists())
+            testFile.delete();        
+    }
+    
+    @After
+    public void finish() {
+        if(testFile.exists() && ! logger.isTraceEnabled())
+            testFile.delete();        
     }
 
     private byte[] fillBuffer(int size) {
@@ -61,9 +75,7 @@ public class TestPageCache {
 
     @Test
     public void fillSequential() throws IOException {
-        PageCache pc = new PageCache(numpages,3600);
-        if(testFile.exists())
-            testFile.delete();
+        PageCache pc = new PageCache(numpages);
         byte[] buffer = fillBuffer(PageCache.PAGESIZE);
         for(byte i= 0; i < numpages; i++) {
             pc.write(testFile, i * PageCache.PAGESIZE, buffer);
@@ -74,9 +86,7 @@ public class TestPageCache {
 
     @Test
     public void fillReverse() throws IOException {
-        PageCache pc = new PageCache(numpages,3600);
-        if(testFile.exists())
-            testFile.delete();
+        PageCache pc = new PageCache(numpages);
         byte[] buffer = fillBuffer(PageCache.PAGESIZE);
         for(int i = numpages - 1 ; i >= 0; i--) {
             pc.write(testFile, i * PageCache.PAGESIZE, buffer);
@@ -87,9 +97,7 @@ public class TestPageCache {
 
     @Test
     public void fillOnce() throws IOException {
-        PageCache pc = new PageCache(numpages,3600);
-        if(testFile.exists())
-            testFile.delete();
+        PageCache pc = new PageCache(numpages);
         byte[] buffer = fillBuffer(PageCache.PAGESIZE * numpages);
         pc.write(testFile, 0, buffer);
         pc.sync();
@@ -98,9 +106,7 @@ public class TestPageCache {
 
     @Test
     public void fillOnceBigger() throws IOException {
-        PageCache pc = new PageCache(numpages / 2,3600);
-        if(testFile.exists())
-            testFile.delete();
+        PageCache pc = new PageCache(numpages / 2);
         byte[] buffer = fillBuffer(PageCache.PAGESIZE * numpages);
         pc.write(testFile, 0, buffer);
         pc.sync();
@@ -109,8 +115,6 @@ public class TestPageCache {
 
     @Test
     public void readCountFits() throws IOException {
-        if(testFile.exists())
-            testFile.delete();
         byte[] buffer = new byte[PageCache.PAGESIZE * numpages];
         for(byte i = 0; i < numpages; i++) {
             Arrays.fill(buffer, PageCache.PAGESIZE * i , PageCache.PAGESIZE * (i + 1), (byte)(5 - i));
@@ -120,7 +124,7 @@ public class TestPageCache {
         out.flush();
         out.close();
         Arrays.fill(buffer, (byte)0);
-        PageCache pc = new PageCache(numpages, 3600);
+        PageCache pc = new PageCache(numpages);
         pc.read(testFile, 0, buffer);
         for(int i = 0; i < buffer.length; i++) {
             Assert.assertEquals("bad read at offset " + i, (byte)(numpages + 1 -  Math.floor(i / PageCache.PAGESIZE)), buffer[i]);
@@ -129,15 +133,13 @@ public class TestPageCache {
 
     @Test
     public void readCountOne() throws IOException {
-        if(testFile.exists())
-            testFile.delete();
         byte[] buffer = fillBuffer(PageCache.PAGESIZE * numpages);
         FileOutputStream out = new FileOutputStream(testFile);
         out.write(buffer);
         out.flush();
         out.close();
         buffer = new byte[1];
-        PageCache pc = new PageCache(numpages, 3600);
+        PageCache pc = new PageCache(numpages);
         pc.read(testFile, 0, buffer);
         for(int i = 0; i < PageCache.PAGESIZE * numpages; i++) {
             pc.read(testFile, i, buffer);
@@ -147,15 +149,13 @@ public class TestPageCache {
 
     @Test
     public void readCountBigger() throws IOException {
-        if(testFile.exists())
-            testFile.delete();
         byte[] buffer = fillBuffer(PageCache.PAGESIZE * numpages);
         FileOutputStream out = new FileOutputStream(testFile);
         out.write(buffer);
         out.flush();
         out.close();
         Arrays.fill(buffer, (byte)0);
-        PageCache pc = new PageCache(numpages / 2, 3600);
+        PageCache pc = new PageCache(numpages / 2);
         pc.read(testFile, 0, buffer);
         for(int i = 0; i < buffer.length; i++) {
             Assert.assertEquals("missmatch at offset " + i, (byte) (i % 127), buffer[i]);

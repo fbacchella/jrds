@@ -15,6 +15,8 @@ import org.apache.log4j.Logger;
 
 class PageCache {
     static final private Logger logger = Logger.getLogger(PageCache.class);
+    //flag to detect Linux, because of directio alignment problems
+    static final boolean isLinux = "Linux".matches(System.getProperty("os.name"));
 
     native static int getAlignOffset(ByteBuffer buffer);
 
@@ -24,9 +26,15 @@ class PageCache {
     final ByteBuffer pagecacheBuffer;
 
     public PageCache(int maxObjects) {
-        pagecacheBuffer = ByteBuffer.allocateDirect(maxObjects * PAGESIZE + PAGESIZE - 1);
-        int alignOffset = getAlignOffset(pagecacheBuffer);
-        logger.error("the offset to align is " + getAlignOffset(pagecacheBuffer));
+        int alignOffset = 0;
+        if(isLinux) {
+            pagecacheBuffer = ByteBuffer.allocateDirect(maxObjects * PAGESIZE + PAGESIZE - 1);
+            alignOffset = getAlignOffset(pagecacheBuffer);
+            logger.error("the offset to align is " + getAlignOffset(pagecacheBuffer));
+        }
+        else {
+            pagecacheBuffer = ByteBuffer.allocateDirect(maxObjects * PAGESIZE);
+        }
 
         //Create the page cache in memory
         pagecache = new LRUArray<FilePage>(maxObjects);
@@ -55,7 +63,7 @@ class PageCache {
      */
     private FilePage find(File file, long offset) throws IOException {
         String canonicalPath = file.getCanonicalPath();
-        
+
         //Locate the pages per file map
         Map<Long, FilePage> fileCache = files.get(canonicalPath);
         if(fileCache == null) {
