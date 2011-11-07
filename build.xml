@@ -165,6 +165,7 @@
 				<include name="**/*.xsl" />
 				<exclude name="**/bootstrap/**" />
 				<exclude name="**/snmp/**" />
+				<exclude name="jrds/caching/**" />
 			</fileset>		
 			<fileset dir="${src.home}">
 				<include name="**/*.xml"/>
@@ -182,6 +183,11 @@
 			<fileset dir=".">
 				<include name="desc/*/snmp/**/*.xml" />
 			</fileset>
+		</jar>
+		<jar destfile="${build.home}/cachingbe.jar" >
+			<fileset dir="${build.home}/classes">
+				<include name="jrds/caching/**" />
+			</fileset>	
 		</jar>
 		<jar destfile="${build.home}/boot.jar" >
 			<fileset dir="${build.home}/classes">
