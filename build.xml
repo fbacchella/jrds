@@ -58,10 +58,12 @@
 	
 	<!-- ==================== compile path =========================== -->
 	<path id="jni.include.path">
-			<pathelement path="${java.home}/include" />
-			<pathelement path="${java.home}/include/linux" />
-			<pathelement path="${java.home}/../include" />
-			<pathelement path="${java.home}/../include/linux" />
+		<pathelement path="${java.home}/include" />
+		<pathelement path="${java.home}/include/linux" />
+		<pathelement path="${java.home}/include/solaris" />
+		<pathelement path="${java.home}/../include" />
+		<pathelement path="${java.home}/../include/linux" />
+		<pathelement path="${java.home}/../include/solaris" />
 	</path>
 	
 	<target name="compile">
@@ -81,6 +83,7 @@
 		<mkdir dir="${build.native}"/>
 		<javah outputFile="${build.native}/direct.h">
 			<class name="jrds.caching.FilePage" />
+			<class name="jrds.caching.PageCache" />
 			<classpath refid="test.classpath"/>
 		</javah>
 		<cpptasks:cc name="gcc" outtype="shared" outfile="${build.native}/direct"  optimize="speed" objdir="${build.home}/native" >
