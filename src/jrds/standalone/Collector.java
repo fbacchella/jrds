@@ -40,7 +40,7 @@ public class Collector extends CommandStarterImpl {
 
 		System.getProperties().setProperty("java.awt.headless","true");
 		System.getProperties().putAll(pm);
-		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, pm.rrdbackend);
+		StoreOpener.prepare(pm.dbPoolSize, pm.timeout, pm.rrdbackend);
 
 		HostsList hl = new HostsList(pm);
 
