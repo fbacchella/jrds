@@ -149,22 +149,24 @@ class PageCache {
      * @param pagepointer
      */
     private void syncFilePages(Map<Long, FilePage> pagepointer) {
-        FileChannel channel = null;
-        for(FilePage page: pagepointer.values()) {
-            try {
-                channel = page.sync(channel);
-            } catch (IOException e) {
-                logger.error(Util.delayedFormatString("sync failed for %s:", page.filepath, e));
+        synchronized(pagepointer) {
+            FileChannel channel = null;
+            for(FilePage page: pagepointer.values()) {
+                try {
+                    channel = page.sync(channel);
+                } catch (IOException e) {
+                    logger.error(Util.delayedFormatString("sync failed for %s:", page.filepath, e));
+                }
+            }
+            if(channel!= null) {
+                try {
+                    channel.force(true);
+                    channel.close();
+                } catch (IOException e) {
+                    logger.error(Util.delayedFormatString("sync failed for %s: %e", channel, e));
+                }
             }
         }
-        if(channel!= null) {
-            try {
-                channel.force(true);
-                channel.close();
-            } catch (IOException e) {
-                logger.error(Util.delayedFormatString("sync failed for %s: %e", channel, e));
-            }
-        }       
     }
 
     public void sync() {
