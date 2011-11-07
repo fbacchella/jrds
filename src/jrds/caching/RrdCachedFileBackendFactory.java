@@ -72,7 +72,7 @@ public class RrdCachedFileBackendFactory extends RrdFileBackendFactory {
         TimerTask syncTask = new TimerTask() {
             public void run() {
                 PageCache pagecache = RrdCachedFileBackendFactory.this.pagecache;
-                if(pagecache !=null)
+                if(pagecache != null)
                     pagecache.sync();
             }
         };

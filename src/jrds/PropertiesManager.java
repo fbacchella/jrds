@@ -1,10 +1,12 @@
 package jrds;
 
+import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -25,11 +27,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jrds.factories.ArgFactory;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.rrd4j.core.RrdBackendFactory;
 
 /**
  * An less ugly class suposed to manage properties
@@ -311,7 +315,6 @@ public class PropertiesManager extends Properties {
         timeout = parseInteger(getProperty("timeout", "30"));
         collectorThreads = parseInteger(getProperty("collectorThreads", "1"));
         dbPoolSize = parseInteger(getProperty("dbPoolSize", "10")) + collectorThreads;
-        syncPeriod = parseInteger(getProperty("syncPeriod", Integer.toString(step / 2)));
 
         strictparsing = parseBoolean(getProperty("strictparsing", "false"));
         try {
@@ -350,7 +353,75 @@ public class PropertiesManager extends Properties {
         }
         extensionClassLoader = doClassLoader(getProperty("classpath", ""));
 
-        rrdbackend = getProperty("rrdbackend", "NIO");
+        //
+        //Choose and configure the backend
+        //
+        String rrdbackendClassName = getProperty("rrdbackendclass", "");
+        if(! "".equals(rrdbackendClassName)) {
+            try {
+                @SuppressWarnings("unchecked")
+                Class<RrdBackendFactory> factoryClass = (Class<RrdBackendFactory>) extensionClassLoader.loadClass(rrdbackendClassName);
+                RrdBackendFactory factory = factoryClass.getConstructor().newInstance();
+                try {
+                    RrdBackendFactory.getFactory(factory.getName());
+                } catch (IllegalArgumentException e) {
+                    RrdBackendFactory.registerFactory(factory);
+                }
+                rrdbackend = factory.getName();
+            } catch (ClassNotFoundException e) {
+                logger.fatal("Backend not configured: " + e.getMessage(), e);
+            } catch (IllegalArgumentException e) {
+                logger.fatal("Backend not configured: " + e.getMessage(), e);
+            } catch (SecurityException e) {
+                logger.fatal("Backend not configured: " + e.getMessage(), e);
+            } catch (InstantiationException e) {
+                logger.fatal("Backend not configured: " + e.getMessage(), e);
+            } catch (IllegalAccessException e) {
+                logger.fatal("Backend not configured: " + e.getMessage(), e);
+            } catch (InvocationTargetException e) {
+                logger.fatal("Backend not configured: " + e.getMessage(), e);
+            } catch (NoSuchMethodException e) {
+                logger.fatal("Backend not configured: " + e.getMessage(), e);
+            }
+        } else {
+            rrdbackend = getProperty("rrdbackend", "FILE");
+        }
+
+        // Analyze the backend properties
+        Map<String, String> backendPropsMap = new HashMap<String, String>();
+        for(Object o: Collections.list(keys())) {
+            String prop = (String) o;
+            if(prop.startsWith("rrdbackend.")) {
+                String value = this.getProperty(prop);
+                String bean = prop.replace("rrdbackend.", "");
+                backendPropsMap.put(bean, value);
+            }
+        }
+        if(backendPropsMap.size() > 0){
+            RrdBackendFactory factory = RrdBackendFactory.getFactory(rrdbackend);
+            logger.debug(Util.delayedFormatString("Configuring backend factory %s", factory.getClass()));
+            Map<String, PropertyDescriptor> beanProperties;
+            try {
+                beanProperties = ArgFactory.getBeanPropertiesMap(factory.getClass());
+                logger.debug(Util.delayedFormatString("Beans for the backend factory: %s", beanProperties.keySet()));
+                for(Map.Entry<String, String> e: backendPropsMap.entrySet()) {
+                    try {
+                        logger.trace(Util.delayedFormatString("Will set backend end bean '%s' to '%s'", e.getKey(), e.getValue()));
+                        ArgFactory.runBean(factory, beanProperties, e.getKey(), e.getValue());
+                    } catch (Exception e1) {
+                        logger.fatal(String.format("Backend bean %s not configured: %s", e.getKey(), e1.getMessage()), e1);
+                    }
+                }
+            } catch (InvocationTargetException e) {
+                logger.fatal(String.format("Backend bean %s not configured: %s", e.getMessage()), e);
+
+            }
+
+        }
+
+        //
+        // Tab configuration
+        //
 
         // We search for the tabs list in the property tab
         // spaces are non-significant
@@ -362,6 +433,9 @@ public class PropertiesManager extends Properties {
             }
         }
 
+        //
+        // Security configuration
+        //
         security = parseBoolean(getProperty("security", "false"));
         if(security) {
             userfile = getProperty("userfile", "users.properties");
@@ -393,7 +467,6 @@ public class PropertiesManager extends Properties {
     public int step;
     public int collectorThreads;
     public int dbPoolSize;
-    public int syncPeriod;
     public final Set<URI> libspath = new HashSet<URI>();
     public boolean strictparsing = false;
     public ClassLoader extensionClassLoader;

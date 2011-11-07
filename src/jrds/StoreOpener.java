@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import jrds.caching.RrdCachedFileBackendFactory;
-
 import org.apache.log4j.Logger;
 import org.rrd4j.core.RrdBackendFactory;
 import org.rrd4j.core.RrdDb;
@@ -25,12 +23,6 @@ public final class StoreOpener {
     private static final AtomicInteger lockCount = new AtomicInteger(0);
     private static RrdBackendFactory backend = RrdBackendFactory.getDefaultFactory();
     private static boolean usepool = false;
-
-    static {
-        RrdCachedFileBackendFactory cf = new RrdCachedFileBackendFactory();
-        RrdCachedFileBackendFactory.setPageCache(100, 30);
-        RrdBackendFactory.registerFactory(cf);
-    }
 
     /**
      * Retrieves the RrdDb instance matching a specific RRD datasource name
@@ -87,12 +79,14 @@ public final class StoreOpener {
         logger.debug(Util.delayedFormatString("Store backend used is %s",  StoreOpener.backend.getName()));
     }
 
-    public static final void prepare(int dbPoolSize, int syncPeriod, int timeout, String backend) {
+    public static final void prepare(int dbPoolSize, int timeout, String backend) {
         usepool = false;
         if(backend != null) {
             try {
                 RrdBackendFactory.setDefaultFactory(backend);
                 logger.trace(Util.delayedFormatString("Store backend set to %s", backend));
+            } catch (IllegalArgumentException e) {
+                logger.fatal("Backend not configured: " + e.getMessage());
             } catch (IllegalStateException e) {
                 logger.warn("Trying to change default backend, a restart is needed");
             }
