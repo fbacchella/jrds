@@ -142,7 +142,7 @@ class LRUArray<V> {
      * Remove the last element in the LRU
      * @return
      */
-    public V removeEldest() {
+    public synchronized V removeEldest() {
         return remove(list.getLast().value.key);
     }
 
