@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 /**
  * This is a generic thread safe double linked list. It's very simple and all
  * the operations are so quick that course grained synchronization is more than
- * acceptible.
+ * acceptable.
  */
 class DoubleLinkedList<PAYLOAD> implements Iterable<DoubleLinkedList.Node<PAYLOAD>>
 {

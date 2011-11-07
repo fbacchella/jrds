@@ -46,9 +46,9 @@ class FilePage {
     /**
      * Used to build an empty page
      */
-    public FilePage(ByteBuffer pagecache, int pageIndex) {
+    public FilePage(ByteBuffer pagecache, int alignOffset, int pageIndex) {
         try {
-            pagecache.position(pageIndex * PageCache.PAGESIZE);
+            pagecache.position(pageIndex * PageCache.PAGESIZE + alignOffset);
             this.page = pagecache.slice();
             this.page.limit(0);
             this.pageIndex = pageIndex;
@@ -95,13 +95,13 @@ class FilePage {
     }
 
     /**
-     * This methode duplicate the byte buffer and set the position for the copy
-     * So multiple read can run concurently and not overrite cursor
+     * This method duplicate the byte buffer and set the position for the copy
+     * So multiple read can run concurrently and not overwrite cursor
      * <p>
      * It also acquire the read lock
      * @param position
      * @param limit
-     * @return byte buffer whose limits can be safely modified
+     * @return byte buffer whose limits can be safely modified in multi thread context
      */
     private ByteBuffer cloneState(int position, int limit) {
         lock.writeLock().lock();

@@ -1,24 +1,5 @@
 package jrds.caching;
 
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-
 import java.lang.reflect.Array;
 import java.util.Iterator;
 
@@ -27,18 +8,10 @@ import jrds.Util;
 import org.apache.log4j.Logger;
 
 /**
- * This is a simple LRUMap. It implements most of the map methods. It is not recommended that you
- * use any but put, get, remove, and clear.
- * <p>
- * Children can implement the processRemovedLRU method if they want to handle the removal of the
- * lest recently used item.
- * <p>
- * This class was abstracted out of the LRU Memory cache. Put, remove, and get should be thread
- * safe. It uses a hashtable and our own double linked list.
- * <p>
- * Locking is done on the instance.
- * <p>
- * @author aaronsm
+ * A array that also provides a LRU access. It should be thread safe.
+ * @author Fabrice Bacchella
+ *
+ * @param <V> the stored type
  */
 class LRUArray<V> {
     static final private Logger logger = Logger.getLogger(LRUArray.class);
@@ -52,10 +25,10 @@ class LRUArray<V> {
         }
     }
 
-    // double linked list for lru
+    /** double linked list for LRU **/
     private final DoubleLinkedList<Payload<V>> list;
 
-    /** Map where items are stored by key. */
+    /** Array where the item are stored **/
     private final DoubleLinkedList.Node<Payload<V>>[] map;
 
     /**
@@ -70,18 +43,14 @@ class LRUArray<V> {
     }
 
     /**
-     * This simply returned the number of elements in the map.
-     * <p>
-     * @see java.util.Map#size()
+     * This simply returned the number of elements in the array.
      */
     public int size() {
         return map.length;
     }
 
     /**
-     * This removes all the items. It clears the map and the double linked list.
-     * <p>
-     * @see java.util.Map#clear()
+     * This removes all the items. It clears the array and the double linked list.
      */
     public void clear() {
         for(int i=0; i < map.length; i++) {
@@ -91,27 +60,21 @@ class LRUArray<V> {
     }
 
     /**
-     * Returns true if the map is empty.
-     * <p>
-     * @see java.util.Map#isEmpty()
+     * Returns true if the array is empty.
      */
     public boolean isEmpty() {
         return list.size() == 0;
     }
 
     /**
-     * Returns true if the map contains an element for the supplied key.
-     * <p>
-     * @see java.util.Map#containsKey(java.lang.Object)
+     * Returns true if the array contains an element for the supplied index.
      */
     public boolean containsKey( int key ) {
         return map[key] != null;
     }
 
     /**
-     * This is an expensive operation that determines if the object supplied is mapped to any key.
-     * <p>
-     * @see java.util.Map#containsValue(java.lang.Object)
+     * This is an expensive operation that determines if the object supplied is mapped to any index.
      */
     public boolean containsValue( V value ) {
         for(DoubleLinkedList.Node<Payload<V>> n: list) {
@@ -139,9 +102,10 @@ class LRUArray<V> {
         };
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.util.Map#get(java.lang.Object)
+    /**
+     * Get the element at the index and update the LRU
+     * @param the index
+     * @return the element
      */
     public V get(int key) {
         V retVal = null;
@@ -155,12 +119,11 @@ class LRUArray<V> {
             list.makeFirst( me );
         }
 
-        // verifyCache();
         return retVal;
     }
 
     /**
-     * This gets an element out of the map without adjusting it's posisiton in the LRU. In other
+     * This gets an element out of the array without adjusting it's position in the LRU. In other
      * words, this does not count as being used. If the element is the last item in the list, it
      * will still be the last item in the list.
      * <p>
@@ -174,14 +137,19 @@ class LRUArray<V> {
         }
         return null;
     }
-    
+
+    /**
+     * Remove the last element in the LRU
+     * @return
+     */
     public V removeEldest() {
         return remove(list.getLast().value.key);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.util.Map#remove(java.lang.Object)
+    /**
+     * Remove an element from the array and return it
+     * @param key
+     * @return
      */
     public V remove( int key ) {
         logger.debug(Util.delayedFormatString("removing item for key: %s", key));
@@ -199,9 +167,11 @@ class LRUArray<V> {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.util.Map#put(java.lang.Object, java.lang.Object)
+    /**
+     * Put the the given element at the index
+     * @param key
+     * @param value
+     * @return the old element
      */
     public V put( int key, V value ) {
 
@@ -278,7 +248,7 @@ class LRUArray<V> {
         logger.debug( "dumpingMap" );
         for(DoubleLinkedList.Node<Payload<V>> n: map) {
             logger.debug(Util.delayedFormatString("dumpMap> key=%s, val=%s", n.value.key, n.value.value) );
-            
+
         }
     }
 

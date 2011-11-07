@@ -16,19 +16,23 @@ import org.apache.log4j.Logger;
 class PageCache {
     static final private Logger logger = Logger.getLogger(PageCache.class);
 
+    native static int getAlignOffset(ByteBuffer buffer);
+
     public final static int PAGESIZE = 4096;
     private final ConcurrentMap<String, Map<Long, FilePage>> files = new ConcurrentHashMap<String, Map<Long, FilePage>>();
     final LRUArray<FilePage> pagecache;
     final ByteBuffer pagecacheBuffer;
 
     public PageCache(int maxObjects) {
-        pagecacheBuffer = ByteBuffer.allocateDirect(maxObjects * PAGESIZE);
+        pagecacheBuffer = ByteBuffer.allocateDirect(maxObjects * PAGESIZE + PAGESIZE - 1);
+        int alignOffset = getAlignOffset(pagecacheBuffer);
+        logger.error("the offset to align is " + getAlignOffset(pagecacheBuffer));
 
         //Create the page cache in memory
         pagecache = new LRUArray<FilePage>(maxObjects);
         //And fill it with empty pages
         for(int i = 0 ; i < maxObjects ; i++ ) {
-            pagecache.put(i, new FilePage(pagecacheBuffer, i));
+            pagecache.put(i, new FilePage(pagecacheBuffer, alignOffset, i));
         }
 
         logger.info(Util.delayedFormatString("created a page cache with %d %d pages, using %d of memory", maxObjects, PAGESIZE, maxObjects * PAGESIZE));
@@ -42,8 +46,17 @@ class PageCache {
         sync();
     }
 
+    /**
+     * Find the page that match the given offset and file. If it's not already in memory, it's loaded 
+     * @param file the file where to find data
+     * @param offset the offset in the file
+     * @return the page that will contains the given offset
+     * @throws IOException
+     */
     private FilePage find(File file, long offset) throws IOException {
         String canonicalPath = file.getCanonicalPath();
+        
+        //Locate the pages per file map
         Map<Long, FilePage> fileCache = files.get(canonicalPath);
         if(fileCache == null) {
             fileCache = new TreeMap<Long, FilePage>();
@@ -122,7 +135,7 @@ class PageCache {
             cacheStart += PAGESIZE;
         }
     }
-    
+
     /**
      * Sync all pages from a single file
      * @param pagepointer
@@ -149,14 +162,6 @@ class PageCache {
     public void sync() {
         for( Map<Long, FilePage> p: files.values()) {
             syncFilePages(p);
-            //                    FilePage[] pages = new FilePage[p.size()];
-            //                    //Need to run on a copy, to avoid concurent modifications;
-            //                    synchronized(p) {
-            //                        int i=0 ;
-            //                        for(FilePage page: p.values()) {
-            //                            pages[i++] = page;
-            //                        }
-            //                    }
         }
     }
 
