@@ -122,10 +122,13 @@ public final class ArgFactory {
         }
     }
 
-    static public void runBean(Object o, Map<String, PropertyDescriptor> beanProperties, String beanName, String beanValue) throws InvocationTargetException{
+    static public void beanSetter(Object o, Map<String, PropertyDescriptor> beanProperties, String beanName, String beanValue) throws InvocationTargetException{
         try {
             PropertyDescriptor pd = beanProperties.get(beanName);
             Method setMethod = pd.getWriteMethod();
+            if(setMethod == null) {
+                throw new InvocationTargetException(new NullPointerException(), String.format("Unknown bean %s", beanName));
+            }
             Class<?> setArgType = pd.getPropertyType();
             Object argInstance = ArgFactory.ConstructFromString(setArgType, beanValue);
             setMethod.invoke(o, argInstance);       

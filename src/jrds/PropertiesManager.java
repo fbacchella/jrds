@@ -407,7 +407,7 @@ public class PropertiesManager extends Properties {
                 for(Map.Entry<String, String> e: backendPropsMap.entrySet()) {
                     try {
                         logger.trace(Util.delayedFormatString("Will set backend end bean '%s' to '%s'", e.getKey(), e.getValue()));
-                        ArgFactory.runBean(factory, beanProperties, e.getKey(), e.getValue());
+                        ArgFactory.beanSetter(factory, beanProperties, e.getKey(), e.getValue());
                     } catch (Exception e1) {
                         logger.fatal(String.format("Backend bean %s not configured: %s", e.getKey(), e1.getMessage()), e1);
                     }
