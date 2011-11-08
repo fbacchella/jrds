@@ -23,16 +23,14 @@ import jrds.starter.Starter;
 import org.apache.log4j.Level;
 
 /**
-
  * A generic probe to collect an HTTP service
  * default generic : 
  * port to provide a default port to collect
  * file to provide a specific file to collect
  * 
- * Implemention should implement the parseStream method
+ * Implementation should implement the parseStream method
  *
  * @author Fabrice Bacchella 
- * @version $Revision$,  $Date$
  */
 public abstract class HttpProbe extends Probe<String, Number> implements UrlProbe {
     private URL url = null;
@@ -203,6 +201,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
     public int getPort() {
         return getUrl().getPort();
     }
+
     /**
      * @return Returns the url.
      */
