@@ -30,7 +30,7 @@ import org.w3c.dom.Document;
  * <li>currentTimePath – when no uptime is provided, the xpath to the current time of the agent</li>
  * <li>timePattern – when no uptime is provided, a pattern that will be used by SimpleDateFormat object to parse time</li>
  * </ul> 
- * This probe uses <a href="http://hc.apache.org/httpclient-3.x/">Apache Commons HttpClient</a>.
+ * This probe uses <a href="http://hc.apache.org/httpclient-3.x/">Apache's Commons HttpClient</a>.
  * @author Fabrice Bacchella 
  */
 @ProbeMeta(
