@@ -32,7 +32,7 @@ class PageCache {
         if(isLinux) {
             pagecacheBuffer = ByteBuffer.allocateDirect(maxObjects * PAGESIZE + PAGESIZE - 1);
             alignOffset = getAlignOffset(pagecacheBuffer);
-            logger.error("the offset to align is " + getAlignOffset(pagecacheBuffer));
+            logger.trace(Util.delayedFormatString("the offset to align is %d", alignOffset));
         }
         else {
             pagecacheBuffer = ByteBuffer.allocateDirect(maxObjects * PAGESIZE);

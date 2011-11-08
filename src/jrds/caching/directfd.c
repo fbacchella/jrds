@@ -8,7 +8,9 @@
 #include <fcntl.h>
 #include <stdio.h>
 //Don't use the GNU's strerror_r variant
+#ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
+#endif
 #include <string.h>
 #include <errno.h>
 #include <sys/types.h>
