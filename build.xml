@@ -4,7 +4,6 @@
 	<property name="app.path" value="/${app.name}"/>
 	<property name="app.version" value="0.1-dev"/>
 	<property name="build.home" value="${basedir}/build"/>
-	<property name="build.native" value="${basedir}/build/native"/>
 	<property name="docs.build" value="${build.home}/doc"/>
 	<property name="src.home" value="${basedir}/src"/>
 	<property name="src.junit" value="${basedir}/junit"/>
@@ -14,7 +13,15 @@
 	<property name="testdir" value="tmp"/>
 	
 	<property file="local.properties" />
-	
+
+	<!-- uses osArch and osName instead of os.name and os.arch, so they can be overriden -->
+	<!-- and beside of that, os.name for Mac Os contains a space -->
+	<property name="osArch" value="${os.arch}"/>
+	<condition property="osName" value="MacOsX" else="${os.name}" >
+		<os name="Mac OS X"/>
+	</condition>
+	<property name="build.native" value="${basedir}/build/native.${osName}.${osArch}"/>
+
 	<!--  ==================== Compilation Control Options ==================== -->
 	<property name="compile.debug" value="true"/>
 	<property name="compile.deprecation" value="false"/>
@@ -86,7 +93,7 @@
 			<class name="jrds.caching.PageCache" />
 			<classpath refid="test.classpath"/>
 		</javah>
-		<cpptasks:cc name="gcc" outtype="shared" outfile="${build.native}/direct"  optimize="speed" objdir="${build.home}/native" >
+		<cpptasks:cc name="gcc" outtype="shared" outfile="${build.native}/direct"  optimize="speed" objdir="${build.native}" >
 			<includepath>
 				<path path="${build.native}" />
 				<path refid="jni.include.path" />
@@ -285,7 +292,7 @@
 			<tarfileset dir="${build.home}/probes" prefix="WEB-INF/lib">
 				<include name="*.jar"/>
 			</tarfileset>
-			<tarfileset dir="${build.home}/native" prefix="WEB-INF/lib">
+			<tarfileset dir="${build.native}" prefix="WEB-INF/lib">
 				<include name="*.so"/>
 				<include name="*.dll"/>
 				<include name="*.jnilib"/>
@@ -315,6 +322,11 @@
 			</lib>
 			<lib dir="${build.home}/probes">
 				<include name="*.jar"/>
+			</lib>
+			<lib dir="${build.native}">
+				<include name="*.so"/>
+				<include name="*.dll"/>
+				<include name="*.jnilib"/>
 			</lib>
     	</war>
 	</target>
