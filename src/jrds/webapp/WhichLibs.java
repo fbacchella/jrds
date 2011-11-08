@@ -1,9 +1,3 @@
-/*##########################################################################
- _##
- _##  $Id: Graph.java 360 2006-08-23 09:31:58 +0000 (mer., 23 août 2006) fbacchella $
- _##
- _##########################################################################*/
-
 package jrds.webapp;
 
 import java.io.File;
@@ -25,12 +19,9 @@ import jrds.PropertiesManager;
 import jrds.StoreOpener;
 
 import org.apache.log4j.Logger;
-import org.snmp4j.transport.DefaultUdpTransportMapping;
-
 
 /**
  * @author Fabrice Bacchella
- * @version $Revision: 360 $
  */
 public final class WhichLibs extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(WhichLibs.class);
@@ -73,8 +64,8 @@ public final class WhichLibs extends JrdsServlet {
                 out.println("    " + file);
             }
             out.println();
-            out.println(resolv("String", ""));
-            out.println(resolv("jrds", this));
+            out.println(resolv("String", String.class));
+            out.println(resolv("jrds", WhichLibs.class));
             String transformerFactory = System.getProperties().getProperty("javax.xml.transform.TransformerFactory");
             try {
                 out.print(resolv("Xml Transformer", javax.xml.transform.TransformerFactory.newInstance()));
@@ -93,7 +84,8 @@ public final class WhichLibs extends JrdsServlet {
                 out.println("Invalid DOM parser configuration");
             }
             out.println(resolv("Servlet API", javax.servlet.ServletContext.class));
-            out.println(resolv("SNMP4J", DefaultUdpTransportMapping.class));
+            out.println(resolv("SNMP4J", "org.snmp4j.transport.DefaultUdpTransportMapping"));
+            out.println(resolv("Jrds Agent", "jrds.probe.RMI"));
             out.println(resolv("Log4j",logger.getClass()));
             out.println("Generation:" + getConfig().thisgeneration);
         } catch (RuntimeException e) {
@@ -119,6 +111,16 @@ public final class WhichLibs extends JrdsServlet {
             retValue = "Problem with " + c + ": " + e.getMessage();
         }
         return retValue.replaceFirst("!.*", "").replaceFirst("file:", "");
+    }
+
+    private String resolv(String name, String className) {
+        Class<?> c;
+        try {
+            c = getPropertiesManager().extensionClassLoader.loadClass(className);
+            return resolv(name, c);
+        } catch (ClassNotFoundException e1) {
+            return name + " not found";
+        }
     }
 
     private String locateJar(Class<?> c ) {
