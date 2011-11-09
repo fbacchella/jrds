@@ -78,8 +78,8 @@ public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
 
     }
 
-    public void  collectAll()
-    {
+    public void  collectAll() {
+        logger.debug(Util.delayedFormatString("Starting collect for %s", this));
         long start = System.currentTimeMillis();
         startCollect();
         for(Probe<?,?> currrd: allProbes) {
@@ -94,22 +94,19 @@ public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
         }
         stopCollect();
         long end = System.currentTimeMillis();
-        float elapsed = ((float)(end - start))/1000;
-        logger.debug("Collect time for " + name + ": " + elapsed + "s");
+        float elapsed = (end - start)/1000f;
+        logger.debug(Util.delayedFormatString("Collect time for %s: %ds", name, elapsed));
     }
 
-    public String toString()
-    {
+    public String toString() {
         return name;
     }
 
-    public int compareTo(RdsHost arg0)
-    {
+    public int compareTo(RdsHost arg0) {
         return String.CASE_INSENSITIVE_ORDER.compare(name, arg0.toString());
     }
 
-    public void addTag(String tag)
-    {
+    public void addTag(String tag) {
         if(tags == null)
             tags = new HashSet<String>();
         tags.add(tag);

@@ -282,7 +282,7 @@ public class Util {
         }
         return in;
     }
-    
+
     /**
      * A method to parse a template mixing old elements {x} with new variable ${variable}
      * Should be not be used any more
@@ -593,6 +593,19 @@ public class Util {
         return ! Collections.disjoint(allowedRoles, userRoles);
     }
 
+    private  static final class Formater {
+        private final String format;
+        private final Object[] args;
+        private Formater(final String format, final Object ...args) {
+            this.format = format;
+            this.args = args;
+        }
+        @Override
+        public final String toString() {
+            return String.format(format, args);
+        }        
+    }
+
     /**
      * A wrapper method to delay evaluation of log4j arguments
      * @param format
@@ -600,12 +613,7 @@ public class Util {
      * @return
      */
     static public Object delayedFormatString(final String format, final Object ...args) {
-        return new Object() {
-            @Override
-            public String toString() {
-                return String.format(format, args);
-            }
-        };
+        return new  Formater(format, args);
     }
 
 }
