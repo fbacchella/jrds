@@ -10,14 +10,13 @@ import jrds.starter.Resolver;
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
 
 /**
  * @author Fabrice Bacchella
  *
  */
 public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
-    static private final Logger logger = Logger.getLogger(RdsHost.class);
 
     private String name = null;
     private String dnsName = null;
@@ -74,7 +73,7 @@ public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
     }
 
     public void  collectAll() {
-        logger.debug(Util.delayedFormatString("Starting collect for %s", this));
+        log(Level.DEBUG, "Starting collect for %s", this);
         long start = System.currentTimeMillis();
         startCollect();
         for(Probe<?,?> currrd: allProbes) {
@@ -82,7 +81,7 @@ public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
                 break;
             long duration = (System.currentTimeMillis() - start) / 1000 ;
             if(duration > (currrd.getStep() / 2 )) {
-                logger.error("Collect for " + this + " ran too long: " + duration + "s");
+                log(Level.ERROR, "Collectan too long: %ds", duration);
                 break;
             }
             currrd.collect();
@@ -90,7 +89,7 @@ public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
         stopCollect();
         long end = System.currentTimeMillis();
         float elapsed = (end - start)/1000f;
-        logger.debug(Util.delayedFormatString("Collect time for %s: %ds", name, elapsed));
+        log(Level.DEBUG, "Collect time for %s: %fs", name, elapsed);
     }
 
     public String toString() {

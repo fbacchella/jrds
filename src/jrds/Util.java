@@ -571,7 +571,7 @@ public class Util {
         };
     }
 
-    static public void log(Object source, Logger namedLogger, Level l, Throwable e, String format, Object... args) {
+    static final public void log(Object source, Logger namedLogger, Level l, Throwable e, String format, Object... args) {
         if(namedLogger.isEnabledFor(l)) {
             StringBuilder line = new StringBuilder();
             if(source != null)
