@@ -13,10 +13,8 @@ import jrds.starter.StarterNode;
 import org.apache.log4j.Logger;
 
 /**
- * @author bacchell
+ * @author Fabrice Bacchella
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
     static private final Logger logger = Logger.getLogger(RdsHost.class);
@@ -49,15 +47,13 @@ public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
     public RdsHost() {
     }
 
-    public void setName(String name)
-    {
+    public void setName(String name) {
         this.name = name;
         Starter resolver = new Resolver(name);
         registerStarter(resolver);
     }
 
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
@@ -68,8 +64,7 @@ public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
         this.hostdir = hostdir;
     }
 
-    public File getHostDir()
-    {
+    public File getHostDir() {
         return hostdir;
     }
 
@@ -85,7 +80,7 @@ public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
         for(Probe<?,?> currrd: allProbes) {
             if(! isCollectRunning() )
                 break;
-            long duration = (System.currentTimeMillis() - start) /1000 ;
+            long duration = (System.currentTimeMillis() - start) / 1000 ;
             if(duration > (currrd.getStep() / 2 )) {
                 logger.error("Collect for " + this + " ran too long: " + duration + "s");
                 break;
