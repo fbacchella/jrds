@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.rrd4j.core.RrdBackendFactory;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDbPool;
-import org.rrd4j.core.RrdRandomAccessFileBackendFactory;
+import org.rrd4j.core.RrdFileBackendFactory;
 
 /**
  * A wrapper classe, to manage the rrdDb operations
@@ -75,6 +75,7 @@ public final class StoreOpener {
         }
         else
             StoreOpener.backend = RrdBackendFactory.getDefaultFactory();
+        StoreOpener.backend.start();
 
         logger.debug(Util.delayedFormatString("Store backend used is %s",  StoreOpener.backend.getName()));
     }
@@ -93,16 +94,20 @@ public final class StoreOpener {
         }
         StoreOpener.backend = RrdBackendFactory.getDefaultFactory();
 
-        if(RrdRandomAccessFileBackendFactory.class.isAssignableFrom(StoreOpener.backend.getClass())) {
+        if(RrdFileBackendFactory.class.isAssignableFrom(StoreOpener.backend.getClass())) {
             instance = RrdDbPool.getInstance();
             instance.setCapacity(dbPoolSize);
             usepool = true;
+        }
+        else {
+            RrdBackendFactory.getDefaultFactory().start();
         }
         logger.debug(Util.delayedFormatString("Store backend used is %s",  StoreOpener.backend));
     }
 
     public static final void stop() {
         RrdBackendFactory factory = RrdBackendFactory.getDefaultFactory();
+        factory.stop();
         if(factory instanceof RrdAccountingNioBackendFactory) {
             logger.info("backend opened: " + RrdAccountingNioBackend.getAccess());
             logger.info("backend bytes read: " + RrdAccountingNioBackend.getBytesRead());

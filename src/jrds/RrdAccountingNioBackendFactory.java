@@ -3,11 +3,11 @@ package jrds;
 import java.io.IOException;
 
 import org.rrd4j.core.RrdBackend;
+import org.rrd4j.core.RrdBackendMeta;
 import org.rrd4j.core.RrdNioBackendFactory;
 
+@RrdBackendMeta("ACCNIO")
 public class RrdAccountingNioBackendFactory extends RrdNioBackendFactory {
-	/** factory name, "NIO" */
-	public static final String NAME = "ACCNIO";
 
 	/**
 	 * Period in seconds between consecutive synchronizations when
@@ -17,7 +17,7 @@ public class RrdAccountingNioBackendFactory extends RrdNioBackendFactory {
 	 */
 	public static final int DEFAULT_SYNC_PERIOD = 300; // seconds
 
-	private static int syncPeriod = DEFAULT_SYNC_PERIOD;
+	private int syncPeriod = DEFAULT_SYNC_PERIOD;
 
 	/**
 	 * Returns time between two consecutive background synchronizations. If not changed via
@@ -25,7 +25,7 @@ public class RrdAccountingNioBackendFactory extends RrdNioBackendFactory {
 	 * See {@link #setSyncPeriod(int)} for more information.
 	 * @return Time in seconds between consecutive background synchronizations.
 	 */
-	public static int getSyncPeriod() {
+	public int getSyncPeriod() {
 		return syncPeriod;
 	}
 
@@ -33,8 +33,8 @@ public class RrdAccountingNioBackendFactory extends RrdNioBackendFactory {
 	 * Sets time between consecutive background synchronizations.
 	 * @param syncPeriod Time in seconds between consecutive background synchronizations.
 	 */
-	public static void setSyncPeriod(int syncPeriod) {
-		RrdAccountingNioBackendFactory.syncPeriod = syncPeriod;
+	public void setSyncPeriod(int syncPeriod) {
+		this.syncPeriod = syncPeriod;
 	}
 
 	/**
@@ -47,14 +47,6 @@ public class RrdAccountingNioBackendFactory extends RrdNioBackendFactory {
 	 */
 	protected RrdBackend open(String path, boolean readOnly) throws IOException {
 		return new RrdAccountingNioBackend(path, readOnly, null, syncPeriod);
-	}
-
-	/**
-	 * Returns the name of this factory.
-	 * @return Factory name (equals to string "NIO")
-	 */
-	public String getFactoryName() {
-		return NAME;    
 	}
 
 }

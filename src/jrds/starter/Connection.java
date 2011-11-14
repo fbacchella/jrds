@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import org.apache.log4j.Level;
+
 import jrds.Probe;
 import jrds.RdsHost;
 
@@ -82,6 +84,7 @@ public abstract class Connection<ConnectedType> extends Starter {
 	 */
 	@Override
 	public boolean start() {
+	    log(Level.TRACE, "starting the connection");
 		if(! getResolver().isStarted())
 			return false;
 		boolean started =  startConnection();

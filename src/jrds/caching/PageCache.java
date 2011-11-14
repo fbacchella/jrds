@@ -44,8 +44,6 @@ class PageCache {
         for(int i = 0 ; i < maxObjects ; i++ ) {
             pagecache.put(i, new FilePage(pagecacheBuffer, alignOffset, i));
         }
-
-        logger.info(Util.delayedFormatString("created a page cache with %d %d pages, using %d of memory", maxObjects, PAGESIZE, maxObjects * PAGESIZE));
     }
 
     /* (non-Javadoc)

@@ -9,12 +9,12 @@ import jrds.RdsHost;
 import org.apache.log4j.Level;
 
 public class Resolver extends Starter {
-	String hostname = "";
+	private final String hostname;
 	InetAddress address = null;
 
 	public Resolver(String hostname) {
-		log(Level.DEBUG, "New dns resolver");
 		this.hostname = hostname;
+        log(Level.DEBUG, "New dns resolver with name %s", hostname);
 	}
 
 	@Override
@@ -23,6 +23,8 @@ public class Resolver extends Starter {
 		try {
 			address = InetAddress.getByName(hostname);
 			started = true;
+	        log(Level.TRACE, "%s resolved to %s", hostname, address.getHostAddress());
+
 		} catch (UnknownHostException e) {
 			log(Level.ERROR, e,  "DNS host name %s can't be found", hostname);
 		}

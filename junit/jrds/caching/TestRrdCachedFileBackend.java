@@ -66,6 +66,7 @@ public class TestRrdCachedFileBackend {
         RrdCachedFileBackendFactory factory = new RrdCachedFileBackendFactory();
         factory.setPageCache(10);
         factory.setSyncPeriod(30);
+        factory.start();
         
         // first, define the RRD
         RrdDef rrdDef = new RrdDef(rrdFile.getCanonicalPath(), 300);
@@ -82,7 +83,7 @@ public class TestRrdCachedFileBackend {
         String dump = rrdDb.dump();
         rrdDb.close();
 
-        factory.sync();
+        factory.stopAndWait();
 
         rrdDb = new RrdDb(rrdFile.getCanonicalPath(), new RrdRandomAccessFileBackendFactory());
         Assert.assertEquals("arc count mismatch", rrdDef.getArcCount(), rrdDb.getArcCount());
@@ -122,6 +123,7 @@ public class TestRrdCachedFileBackend {
         RrdCachedFileBackendFactory factory = new RrdCachedFileBackendFactory();
         factory.setPageCache(10);
         factory.setSyncPeriod(30);
+        factory.start();
         
         rrdDb = new RrdDb(rrdFile.getCanonicalPath(), factory);
         Assert.assertEquals("arc count mismatch", rrdDef.getArcCount(), rrdDb.getArcCount());
@@ -135,7 +137,7 @@ public class TestRrdCachedFileBackend {
             Assert.fail("read whole file failed");
         }
 
-        factory.sync();
+        factory.stopAndWait();
 
     }
 }

@@ -361,26 +361,12 @@ public class PropertiesManager extends Properties {
             try {
                 @SuppressWarnings("unchecked")
                 Class<RrdBackendFactory> factoryClass = (Class<RrdBackendFactory>) extensionClassLoader.loadClass(rrdbackendClassName);
-                RrdBackendFactory factory = factoryClass.getConstructor().newInstance();
-                try {
-                    RrdBackendFactory.getFactory(factory.getName());
-                } catch (IllegalArgumentException e) {
-                    RrdBackendFactory.registerFactory(factory);
-                }
-                rrdbackend = factory.getName();
+                rrdbackend = RrdBackendFactory.registerFactory(factoryClass);
             } catch (ClassNotFoundException e) {
                 logger.fatal("Backend not configured: " + e.getMessage(), e);
             } catch (IllegalArgumentException e) {
                 logger.fatal("Backend not configured: " + e.getMessage(), e);
             } catch (SecurityException e) {
-                logger.fatal("Backend not configured: " + e.getMessage(), e);
-            } catch (InstantiationException e) {
-                logger.fatal("Backend not configured: " + e.getMessage(), e);
-            } catch (IllegalAccessException e) {
-                logger.fatal("Backend not configured: " + e.getMessage(), e);
-            } catch (InvocationTargetException e) {
-                logger.fatal("Backend not configured: " + e.getMessage(), e);
-            } catch (NoSuchMethodException e) {
                 logger.fatal("Backend not configured: " + e.getMessage(), e);
             }
         } else {
