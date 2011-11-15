@@ -69,7 +69,7 @@ public class RrdCachedFileBackendFactory extends RrdFileBackendFactory {
      * False otherwise.
      * @throws IOException Thrown in case of I/O error.
      */
-    public RrdBackend open(String path, boolean readOnly) throws IOException {
+    public RrdBackend doOpen(String path, boolean readOnly) throws IOException {
         return new RrdCachedFileBackend(path, readOnly, pagecache);
     }
 
