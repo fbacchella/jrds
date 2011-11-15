@@ -50,7 +50,6 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
 			objectname = new ObjectName(startTimeObjectName);
 			Object o = connection.getAttribute(objectname, startTimeAttribue);
 			long uptime = ((Number)o).longValue() / 1000;
-			log(Level.DEBUG, "Uptime for %s = %ld", this, uptime);
 			return uptime;
 		} catch (Exception e) {
 			log(Level.ERROR, e, "Uptime error for %s: %s", this, e);

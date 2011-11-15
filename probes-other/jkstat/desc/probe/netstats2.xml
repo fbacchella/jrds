@@ -7,8 +7,9 @@
 	<specific name="module">${device}</specific>
 	<specific name="name">statistics</specific>
 	<specific name="index">${device}${instance}</specific>
+	<specific name="class">net</specific>
 	<ds>
-		<dsName>Xmit_TCP_Seg_Contexts_Fail</dsName>
+		<dsName>XmitTCPSegContextsFail</dsName>
 		<dsType>counter</dsType>
 		<collect>Xmit_TCP_Seg_Contexts_Fail</collect>
 	</ds>
@@ -45,7 +46,7 @@
 		<collect>Total_Octets_Xmitd_Hi</collect>
 	</ds>
 	<ds>
-		<dsName>XmitTCPSegContexts</dsName>
+		<dsName>XmitTCPSegCtxt</dsName>
 		<dsType>counter</dsType>
 		<collect>Xmit_TCP_Seg_Contexts</collect>
 	</ds>
@@ -70,37 +71,37 @@
 		<dsType>counter</dsType>
 	</ds>
 	<ds>
-		<dsName>Reset Count</dsName>
+		<dsName>ResetCount</dsName>
 		<dsType>counter</dsType>
 	</ds>
 	<ds>
-		<dsName>Good_Pkts_Recvd</dsName>
+		<dsName>GoodPktsRecvd</dsName>
 		<dsType>counter</dsType>
 	</ds>
 	<ds>
-		<dsName>Tx No Buffer</dsName>
+		<dsName>TxNoBuffer</dsName>
 		<dsType>counter</dsType>
 	</ds>
 	<ds>
-		<dsName>Total_Octets_Xmitd_Lo</dsName>
+		<dsName>TotalOctetsXmitdLo</dsName>
 		<dsType>counter</dsType>
 		<collect>Total_Octets_Xmitd_Lo</collect>
 	</ds>
 	<ds>
-		<dsName>Rx Allocb Failure</dsName>
+		<dsName>RxAllocbFailure</dsName>
 		<dsType>counter</dsType>
 	</ds>
 	<ds>
-		<dsName>Tx Reschedule</dsName>
+		<dsName>TxReschedule</dsName>
 		<dsType>counter</dsType>
 	</ds>
 	<ds>
-		<dsName>Recv_Unsupport_FC_Pkts</dsName>
+		<dsName>RecvUnsupportFCPkts</dsName>
 		<dsType>counter</dsType>
 		<collect>Recv_Unsupport_FC_Pkts</collect>
 	</ds>
 	<ds>
-		<dsName>Good_Octets_Recvd_Hi</dsName>
+		<dsName>GoodOctetsRecvdHi</dsName>
 		<dsType>counter</dsType>
 	</ds>
 	<ds>

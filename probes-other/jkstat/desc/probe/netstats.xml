@@ -7,6 +7,7 @@
 	<specific name="module">${device}</specific>
 	<specific name="name">${device}${instance}</specific>
 	<specific name="index">${device}${instance}</specific>
+	<specific name="class">net</specific>
 	<ds>
 		<dsName>norcvbuf</dsName>
 		<dsType>gauge</dsType>
