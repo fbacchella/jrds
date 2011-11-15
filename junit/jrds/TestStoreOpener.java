@@ -28,9 +28,9 @@ public class TestStoreOpener {
 
     @Test
     public void test3() {
-        StoreOpener.prepare(1, 1, "NIO");
-        StoreOpener.prepare(1, 1, "FILE");
-        StoreOpener.prepare(1, 1, "MEMORY");
+        StoreOpener.prepare("NIO", 1 );
+        StoreOpener.prepare("FILE", 1 );
+        StoreOpener.prepare("MEMORY", 1);
     }
 
 }

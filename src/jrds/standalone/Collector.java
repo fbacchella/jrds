@@ -38,9 +38,9 @@ public class Collector extends CommandStarterImpl {
 		PropertiesManager pm = new PropertiesManager(new File(propFile));
 		jrds.JrdsLoggerConfiguration.configure(pm);
 
-		System.getProperties().setProperty("java.awt.headless","true");
-		System.getProperties().putAll(pm);
-		StoreOpener.prepare(pm.dbPoolSize, pm.timeout, pm.rrdbackend);
+        System.getProperties().setProperty("java.awt.headless","true");
+        System.getProperties().putAll(pm);
+        StoreOpener.prepare(pm.rrdbackend, pm.dbPoolSize );
 
 		HostsList hl = new HostsList(pm);
 

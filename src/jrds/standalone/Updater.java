@@ -29,8 +29,7 @@ public class Updater {
 		System.getProperties().setProperty("java.awt.headless","true");
 		System.getProperties().putAll(pm);
 		StoreOpener.prepare(pm.dbPoolSize, pm.timeout, pm.rrdbackend);
-
-		HostsList hl =  new HostsList(pm);
+        HostsList hl =  new HostsList(pm);
 
 		ExecutorService tpool =  Executors.newFixedThreadPool(3);
 

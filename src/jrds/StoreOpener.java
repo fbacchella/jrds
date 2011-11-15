@@ -21,7 +21,7 @@ public final class StoreOpener {
 
     private static final AtomicLong waitTime = new AtomicLong(0);
     private static final AtomicInteger lockCount = new AtomicInteger(0);
-    private static RrdBackendFactory backend = RrdBackendFactory.getDefaultFactory();
+    private static RrdBackendFactory backend;
     private static boolean usepool = false;
 
     /**
@@ -81,6 +81,7 @@ public final class StoreOpener {
     }
 
     public static final void prepare(int dbPoolSize, int timeout, String backend) {
+    public static final void prepare(String backend, int dbPoolSize) {
         usepool = false;
         if(backend != null) {
             try {
