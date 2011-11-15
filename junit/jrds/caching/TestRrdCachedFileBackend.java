@@ -30,7 +30,8 @@ public class TestRrdCachedFileBackend {
     static public void configure() throws IOException, ParserConfigurationException {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, "jrds.caching", "jrds.caching.RrdCachedFileBackend", "jrds.caching.FilePage", "jrds.caching.PageCache");
-        RrdCachedFileBackendFactory.loadDirect(new File("build/native"));
+        File libfile = new File(String.format("build/native.%s.%s", System.getProperty("os.name").replaceAll(" ", ""), System.getProperty("os.arch")));
+        RrdCachedFileBackendFactory.loadDirect(libfile);
     }
     
     @Before

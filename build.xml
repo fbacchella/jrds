@@ -17,7 +17,7 @@
 	<!-- uses osArch and osName instead of os.name and os.arch, so they can be overriden -->
 	<!-- and beside of that, os.name for Mac Os contains a space -->
 	<property name="osArch" value="${os.arch}"/>
-	<condition property="osName" value="MacOsX" else="${os.name}" >
+	<condition property="osName" value="MacOSX" else="${os.name}" >
 		<os name="Mac OS X"/>
 	</condition>
 	<property name="build.native" value="${basedir}/build/native.${osName}.${osArch}"/>
