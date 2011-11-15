@@ -55,7 +55,11 @@ public class RrdCachedFileBackend extends RrdFileBackend {
         }
         else {
             logger.trace(Util.delayedFormatString("Writing %d bytes at %d to %s", b.length, offset, file.getCanonicalPath()));
-            pagecache.write(file, offset, b);
+            try {
+                pagecache.write(file, offset, b);
+            } catch (InterruptedException e) {
+                throw new ClosedByInterruptException();
+            }
         }
     }
 
@@ -72,7 +76,11 @@ public class RrdCachedFileBackend extends RrdFileBackend {
         }
         else {
             logger.trace(Util.delayedFormatString("Loading %d bytes at %d from %s", b.length, offset, file.getCanonicalPath()));
-            pagecache.read(file, offset, b);
+            try {
+                pagecache.read(file, offset, b);
+            } catch (InterruptedException e) {
+                throw new ClosedByInterruptException();
+            }
         }
     }
 

@@ -75,7 +75,7 @@ public class TestPageCache {
     }
 
     @Test
-    public void fillSequential() throws IOException {
+    public void fillSequential() throws IOException, InterruptedException {
         PageCache pc = new PageCache(numpages);
         byte[] buffer = fillBuffer(PageCache.PAGESIZE);
         for(byte i= 0; i < numpages; i++) {
@@ -86,7 +86,7 @@ public class TestPageCache {
     }
 
     @Test
-    public void fillReverse() throws IOException {
+    public void fillReverse() throws IOException, InterruptedException {
         PageCache pc = new PageCache(numpages);
         byte[] buffer = fillBuffer(PageCache.PAGESIZE);
         for(int i = numpages - 1 ; i >= 0; i--) {
@@ -97,7 +97,7 @@ public class TestPageCache {
     }
 
     @Test
-    public void fillOnce() throws IOException {
+    public void fillOnce() throws IOException, InterruptedException {
         PageCache pc = new PageCache(numpages);
         byte[] buffer = fillBuffer(PageCache.PAGESIZE * numpages);
         pc.write(testFile, 0, buffer);
@@ -106,7 +106,7 @@ public class TestPageCache {
     }
 
     @Test
-    public void fillOnceBigger() throws IOException {
+    public void fillOnceBigger() throws IOException, InterruptedException {
         PageCache pc = new PageCache(numpages / 2);
         byte[] buffer = fillBuffer(PageCache.PAGESIZE * numpages);
         pc.write(testFile, 0, buffer);
@@ -115,7 +115,7 @@ public class TestPageCache {
     }
 
     @Test
-    public void readCountFits() throws IOException {
+    public void readCountFits() throws IOException, InterruptedException {
         byte[] buffer = new byte[PageCache.PAGESIZE * numpages];
         for(byte i = 0; i < numpages; i++) {
             Arrays.fill(buffer, PageCache.PAGESIZE * i , PageCache.PAGESIZE * (i + 1), (byte)(5 - i));
@@ -133,7 +133,7 @@ public class TestPageCache {
     }
 
     @Test
-    public void readCountOne() throws IOException {
+    public void readCountOne() throws IOException, InterruptedException {
         byte[] buffer = fillBuffer(PageCache.PAGESIZE * numpages);
         FileOutputStream out = new FileOutputStream(testFile);
         out.write(buffer);
@@ -149,7 +149,7 @@ public class TestPageCache {
     }
 
     @Test
-    public void readCountBigger() throws IOException {
+    public void readCountBigger() throws IOException, InterruptedException {
         byte[] buffer = fillBuffer(PageCache.PAGESIZE * numpages);
         FileOutputStream out = new FileOutputStream(testFile);
         out.write(buffer);
