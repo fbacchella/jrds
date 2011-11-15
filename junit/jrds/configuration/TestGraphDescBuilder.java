@@ -40,7 +40,7 @@ public class TestGraphDescBuilder {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        StoreOpener.prepare(10, 10, "FILE");
+        StoreOpener.prepare("FILE", 10);
         Tools.setLevel(logger, Level.TRACE, "jrds.GraphDesc", "jrds.Graph");
         Tools.setLevel(Level.INFO,"jrds.factories.xml.CompiledXPath");
 

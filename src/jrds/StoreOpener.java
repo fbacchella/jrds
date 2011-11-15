@@ -80,7 +80,6 @@ public final class StoreOpener {
         logger.debug(Util.delayedFormatString("Store backend used is %s",  StoreOpener.backend.getName()));
     }
 
-    public static final void prepare(int dbPoolSize, int timeout, String backend) {
     public static final void prepare(String backend, int dbPoolSize) {
         usepool = false;
         if(backend != null) {
