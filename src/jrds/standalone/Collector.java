@@ -23,36 +23,36 @@ import org.apache.log4j.Logger;
  * Window - Preferences - Java - Code Style - Code Templates
  */
 public class Collector extends CommandStarterImpl {
-	static final private Logger logger = Logger.getLogger(Collector.class);
+    static final private Logger logger = Logger.getLogger(Collector.class);
 
-	String propFile = "jrds.properties";
+    String propFile = "jrds.properties";
 
-	public void configure(Properties configuration) {
-		logger.debug("Configuration: " + configuration);
-		
-		propFile =  configuration.getProperty("propertiesFile", propFile);
-	}
+    public void configure(Properties configuration) {
+        logger.debug("Configuration: " + configuration);
 
-	public void start(String[] args) throws Exception {
+        propFile =  configuration.getProperty("propertiesFile", propFile);
+    }
 
-		PropertiesManager pm = new PropertiesManager(new File(propFile));
-		jrds.JrdsLoggerConfiguration.configure(pm);
+    public void start(String[] args) throws Exception {
 
-		System.getProperties().setProperty("java.awt.headless","true");
-		System.getProperties().putAll(pm);
-		StoreOpener.prepare(pm.dbPoolSize, pm.syncPeriod, pm.timeout, pm.rrdbackend);
+        PropertiesManager pm = new PropertiesManager(new File(propFile));
+        jrds.JrdsLoggerConfiguration.configure(pm);
 
-		HostsList hl = new HostsList(pm);
+        System.getProperties().setProperty("java.awt.headless","true");
+        System.getProperties().putAll(pm);
+        StoreOpener.prepare(pm.rrdbackend, pm.dbPoolSize );
 
-		logger.debug("Scanning dir");
+        HostsList hl = new HostsList(pm);
 
-		for(int i = 0; i< 1 ; i++) {
-			hl.collectAll();
-			System.gc();
-			//Thread.sleep(10 * 1000L);
-		}
-		StoreOpener.stop();
-	}
+        logger.debug("Scanning dir");
+
+        for(int i = 0; i< 1 ; i++) {
+            hl.collectAll();
+            System.gc();
+            //Thread.sleep(10 * 1000L);
+        }
+        StoreOpener.stop();
+    }
 
 }
 

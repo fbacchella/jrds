@@ -59,7 +59,6 @@ final public class Tools {
         app.setName(jrds.JrdsLoggerConfiguration.APPENDER);
         app.setLayout(new PatternLayout("[%d] %5p %c : %m%n"));
         jrds.JrdsLoggerConfiguration.putAppender(app);
-        StoreOpener.prepare("MEM");
     }
 
     static public void prepareXml() throws ParserConfigurationException {

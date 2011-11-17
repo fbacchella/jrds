@@ -1,8 +1,3 @@
-/*##########################################################################
-_##
-_##  $Id$
-_##
-_##########################################################################*/
 
 package jrds;
 
@@ -132,6 +127,7 @@ public class HostsList extends StarterNode {
         started = true;
         rrdDir = pm.rrddir;
         tmpDir = pm.tmpdir;
+        timeout = pm.timeout;
 
         renderer = new Renderer(50, step, tmpDir);
 

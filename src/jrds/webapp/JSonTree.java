@@ -85,15 +85,23 @@ public class JSonTree extends JSonData {
         return true;
     }
 
+    /**
+     * Look for the first level with many childs
+     * @param rootstry
+     * @return
+     */
     private Collection<GraphTree> findRoot(Collection<GraphTree> rootstry) {
-        //Look for the first level with many childs
         while(rootstry.size() == 1) {
             logger.trace(jrds.Util.delayedFormatString("Trying with graph tree roots: %s", rootstry));
             GraphTree child = rootstry.iterator().next();
             Map<String, GraphTree> childTree = child.getChildsMap();
-            //Don't go too deep
+            //Don't go in empty nodes
             if(childTree.isEmpty())
                 break;
+            //a graph found, stop here
+            if(child.getGraphsSet().size() > 0) {
+                break;
+            }
             rootstry = child.getChildsMap().values();
         }
         return rootstry;

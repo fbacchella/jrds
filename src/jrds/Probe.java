@@ -1,6 +1,3 @@
-/*
- * Created on 22 nov. 2004
- */
 package jrds;
 
 import java.io.File;
@@ -49,7 +46,7 @@ import org.w3c.dom.Element;
  */
 @ProbeMeta(
         topStarter=jrds.starter.SocketFactory.class
-)
+        )
 public abstract class Probe<KeyType, ValueType> extends StarterNode implements Comparable<Probe<KeyType, ValueType>>  {
 
     private int timeout = 30;
@@ -137,7 +134,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     public String getRrdName() {
         String rrdName = getName().replaceAll("/","_");
         return monitoredHost.getHostDir() +
-        Util.getFileSeparator() + rrdName + ".rrd";
+                Util.getFileSeparator() + rrdName + ".rrd";
     }
 
     private final String parseTemplate(String template) {
@@ -183,7 +180,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
-     * @throws RrdException
+     * Create the probe file
      * @throws IOException
      */
     protected void create() throws IOException {
@@ -274,7 +271,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     private static void copyFile(String sourcePath, String destPath)
-    throws IOException {
+            throws IOException {
         File source = new File(sourcePath);
         File dest = new File(destPath);
         File destOld = new File(destPath + ".old");
@@ -446,15 +443,18 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * Store the values on the rrd backend.
-     * Overriding should be avoided.
      * @param oneSample
      */
-    private void updateSample(Sample oneSample) {
+    private boolean updateSample(Sample oneSample) {
         if(isCollectRunning()) {
             Map<KeyType, ValueType> sampleVals = getNewSampleValues();
             log(Level.TRACE, "Collected values: %s", sampleVals);
             if (sampleVals != null) {
                 if(getUptime() * pd.getUptimefactor() >= pd.getHeartBeatDefault()) {
+                    //Set the default values that might be defined in the probe description
+                    for(Map.Entry<String, Double> e: getPd().getDefaultValues().entrySet()) {
+                        oneSample.setValue(e.getKey(), e.getValue());
+                    }
                     Map<?, String> nameMap = getCollectMapping();
                     log(Level.TRACE, "Collect keys: %s", nameMap);
                     Map<KeyType, Number>filteredSamples = filterValues(sampleVals);
@@ -470,19 +470,19 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                         }
                     }
                     modifySample(oneSample, sampleVals);
+                    return true;
                 }
                 else {
                     log(Level.INFO, "uptime too low");
                 }
             }
         }
+        return false;
     }
 
     /**
      * Launch an collect of values.
      * You should not try to override it
-     * @throws IOException
-     * @throws RrdException
      */
     public void collect() {
         long start = System.currentTimeMillis();
@@ -506,18 +506,14 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                 if( isCollectRunning()) {
                     rrdDb = StoreOpener.getRrd(getRrdName());
                     Sample onesample = rrdDb.createSample();
-                    for(Map.Entry<String, Double> e: getPd().getDefaultValues().entrySet()) {
-                        onesample.setValue(e.getKey(), e.getValue());
-                    }
-                    updateSample(onesample);
+                    boolean updated = updateSample(onesample);
                     //The collect might have been stopped
                     //during the reading of samples
-                    if( isCollectRunning()) {
+                    if( updated && isCollectRunning()) {
                         if(namedLogger.isDebugEnabled())
                             log(Level.DEBUG, "%s", onesample.dump());
                         onesample.update();
                         interrupted = false;
-                        //						checkThreshold(rrdDb);
                     }
                 }
             }
@@ -652,6 +648,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         }
         return retValues;
     }
+    
     /**
      * Return a uniq name for the graph
      * @return
@@ -734,9 +731,9 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         String host = getHost().getName();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.newDocument();  // Create from whole cloth
+        Document document = builder.newDocument();
         Element root = 
-            (Element) document.createElement("probe"); 
+                (Element) document.createElement("probe"); 
         document.appendChild(root);
         root.setAttribute("name", name);
         root.setAttribute("host", host);
@@ -774,6 +771,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                     return String.CASE_INSENSITIVE_ORDER.compare(arg0.getDsName(), arg1.getDsName());
                 }
             });
+        
         for(DsDef ds: dss) {
             String dsName = ds.getDsName();
 
@@ -786,28 +784,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         }
         return document;
     }
-
-    //	public void addThreshold(Threshold t) {
-    //		Set<Threshold> tset = thresholds.get(t.dsName);
-    //		if(tset == null) {
-    //			tset = new HashSet<Threshold>();
-    //			thresholds.put(t.dsName, tset);
-    //		}
-    //		logger.trace("Threshold added: " + t.name);
-    //		tset.add(t);
-    //	}
-    //
-    //
-    //	private void checkThreshold(RrdDb rrdDb) throws IOException {
-    //	rrdDb = StoreOpener.getRrd(getRrdName());
-    //		for(Set<Threshold> tset: thresholds.values()) {
-    //			for(Threshold t: tset) {
-    //				logger.trace("Threshold to " + this + ": " + t);
-    //				if(t.check(rrdDb)) 
-    //					t.run(this);
-    //			}
-    //		}
-    //	}
 
     /**
      * @return the time step (in seconds)

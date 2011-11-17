@@ -226,7 +226,7 @@ function doGraphList(result) {
 			src: "graph?" + dojo.objectToQuery(graph.graph)
 		}, 
 		graphBlock);
-		
+
 		if(graph.width)
 			dojo.attr(graphImg, "width", graph.width);
 		if(graph.height)
@@ -234,45 +234,57 @@ function doGraphList(result) {
 
 		var iconsList =  dojo.create("div", {"class": "iconslist"}, graphBlock);
 
+        //Create the popup button
 		var application_double = dojo.create("img", {
-			"class": "icon",
-			src: "img/application_double.png",
-			height: 16,
-			width: 16,
-			title: "Popup the graph",
-			onclick: "popup('" +  dojo.objectToQuery(graph.graph) + "'," + graph.id + ");"
-		},
-		iconsList);
+                "class": "icon",
+                src: "img/application_double.png",
+                height: 16,
+                width: 16,
+                title: "Popup the graph"
+            },
+            iconsList);
+        dojo.connect(application_double, "onclick", graph, function(){
+            popup(dojo.objectToQuery(this.graph),this.id);
+        });
 
+        //Create the probe's details button
 		var application_view_list = dojo.create("img", {
-			"class": "icon",
-			height: 16,
-			width: 16,
-			src: "img/application_view_list.png",
-			title: "Graph details",
-			onclick: "details('" + dojo.objectToQuery(graph.probe) + "', '" + graph.probename + "');"
-		},
-		iconsList);
+                "class": "icon",
+                height: 16,
+                width: 16,
+                src: "img/application_view_list.png",
+                title: "Graph details"
+            },
+            iconsList);
+        dojo.connect(application_view_list, "onclick", graph, function(){
+            details(dojo.objectToQuery(this.probe),this.probename);
+        });
 
+        //Create the history button
 		var time = dojo.create("img", {
-			"class": "icon",
-			height: 16,
-			width: 16,
-			src: "img/date.png",
-			title: "Graph history",
-			onclick: "history('" + dojo.objectToQuery(graph.history) + "', '" + graph.probename + "');"
-		},
-		iconsList);
+                "class": "icon",
+                height: 16,
+                width: 16,
+                src: "img/date.png",
+                title: "Graph history"
+            },
+            iconsList);
+        dojo.connect(time, "onclick", graph, function(){
+            history(dojo.objectToQuery(this.history), this.probename);
+        });
 
+        //Create the save button
 		var disk = dojo.create("img", {
-			"class": "icon",
-			height: 16,
-			width: 16,
-			src: "img/disk.png",
-			title: "Save data",
-			onclick: "save('" + dojo.objectToQuery(graph.graph) + "', '" + graph.probename + "');"
-		},
-		iconsList);
+                "class": "icon",
+                height: 16,
+                width: 16,
+                src: "img/disk.png",
+                title: "Save data"
+            },
+            iconsList);
+        dojo.connect(disk, "onclick", graph, function(){
+            save(dojo.objectToQuery(this.graph), this.probename);
+        });
 	}
 	if(this.standby != null)
 		this.standby.hide();
@@ -396,7 +408,7 @@ function getTree(isFilters, unfold) {
 
 	store.fetch({
 		onError: function(errData, request) {
-			console.log("on error detected in dojo.data.ItemFileReadStore");
+			console.log("on error detected in dojo.data.ItemFileReadStore:" + errData);
 			var standby = dijit.byId('standby.' );
 			if(standby != null) {
 				standby.hide();
@@ -671,7 +683,9 @@ function setupTabs() {
 	}
 	//We're in the default tab, load the needed try now
 	else {
-	    tabWidget.selectChild(tabWidget.getChildren()[0]);
+        var child = tabWidget.getChildren()[0];
+        child.keepParams = true;
+	    tabWidget.selectChild(child);
 		if(queryParams.host || queryParams.tree || queryParams.filter)
 			isFilters = false;
 		getTree(isFilters);

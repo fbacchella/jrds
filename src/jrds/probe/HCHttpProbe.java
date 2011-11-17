@@ -17,54 +17,53 @@ import org.apache.log4j.Level;
 
 /**
 
- * A generic probe to collect an HTTP service. It uses Apache Http Client's to provide a better isolation with other web app
- * in the same container
+ * A generic probe to collect an HTTP service. It uses <a href="http://hc.apache.org/httpclient-3.x/">Apache's Commons HttpClient</a>s to provide a better isolation with other web app
+ * in the same container. So it should used in preference to HttpProbe and deprecate it.
  * default generic : 
  * port to provide a default port to collect
  * file to provide a specific file to collect
  * 
- * Implemention should implement the parseStream method
+ * Implementation should implement the parseStream method
  *
  * @author Fabrice Bacchella 
- * @version $Revision: 1010 $,  $Date: 2011-04-13 17:32:57 +0200 (mer., 13 avr. 2011) $
  */
 @ProbeMeta(
         topStarter=jrds.probe.HttpClientStarter.class
-)
+        )
 public abstract class HCHttpProbe extends HttpProbe {
- 
+
     @Override
-	public Map<String, Number> getNewSampleValues() {
-		log(Level.DEBUG, "Getting %s", getUrl());
-		HttpClientStarter httpstarter = find(HttpClientStarter.class);
-		HttpClient cnx = httpstarter.getHttpClient();
-		try {
-	        HttpGet hg = new HttpGet(getUrl().toURI());
-	        HttpResponse response = cnx.execute(hg);
-	        if(response.getStatusLine().getStatusCode() != 200) {
-	            log(Level.ERROR, "Connection to %s fail with %s", getUrl(), response.getStatusLine().getReasonPhrase());
+    public Map<String, Number> getNewSampleValues() {
+        log(Level.DEBUG, "Getting %s", getUrl());
+        HttpClientStarter httpstarter = find(HttpClientStarter.class);
+        HttpClient cnx = httpstarter.getHttpClient();
+        try {
+            HttpGet hg = new HttpGet(getUrl().toURI());
+            HttpResponse response = cnx.execute(hg);
+            if(response.getStatusLine().getStatusCode() != 200) {
+                log(Level.ERROR, "Connection to %s fail with %s", getUrl(), response.getStatusLine().getReasonPhrase());
                 return Collections.emptyMap();
-	        }
-	        HttpEntity entity = response.getEntity();
-	        if(entity == null) {
+            }
+            HttpEntity entity = response.getEntity();
+            if(entity == null) {
                 log(Level.ERROR, "Not response body to %s",getUrl());
-	            return Collections.emptyMap();
-	        }
-	        InputStream is = entity.getContent();;
-			Map<String, Number> vars = parseStream(is);
-			is.close();
-			return vars;
+                return Collections.emptyMap();
+            }
+            InputStream is = entity.getContent();;
+            Map<String, Number> vars = parseStream(is);
+            is.close();
+            return vars;
         } catch (ClientProtocolException e) {
             log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e.getMessage());
         } catch (IllegalStateException e) {
             log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e.getMessage());
-		} catch (IOException e) {
-				log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e.getMessage());
-		} catch (URISyntaxException e) {
-		    log(Level.ERROR, "unable to parse %s", getUrl());
+        } catch (IOException e) {
+            log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e.getMessage());
+        } catch (URISyntaxException e) {
+            log(Level.ERROR, "unable to parse %s", getUrl());
         }
 
-		return Collections.emptyMap();
-	}
+        return Collections.emptyMap();
+    }
 
 }

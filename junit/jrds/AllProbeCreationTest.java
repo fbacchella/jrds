@@ -29,19 +29,21 @@ public class AllProbeCreationTest {
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
+        StoreOpener.prepare("FILE");
         Tools.setLevel(logger, Level.TRACE, "jrds.Util");
     }
 
     @Test
     public void makeProbe() throws ParserConfigurationException, IOException, URISyntaxException {
         PropertiesManager pm = new PropertiesManager();
-        pm.setProperty("rrddir", "tmp/allprobe");
-        pm.setProperty("tmpdir", "tmp/allprobe");
-        pm.setProperty("configdir", "tmp/allprobe");
+        pm.setProperty("rrddir", "tmp/AllProbeCreationTest");
+        pm.setProperty("tmpdir", "tmp/AllProbeCreationTest");
+        pm.setProperty("configdir", "tmp/AllProbeCreationTest");
         pm.setProperty("autocreate", "true");
         pm.update();
         pm.libspath.clear();
         pm.strictparsing = true;
+        pm.rrdbackend = "FILE";
         File descpath = new File(System.getProperty("user.dir"), "desc");
         if(descpath.exists())
             pm.libspath.add(descpath.toURI());
@@ -81,7 +83,7 @@ public class AllProbeCreationTest {
                 db.close();
             }
             File rrdFile = new File(p.getRrdName());
-            Assert.assertTrue(rrdFile.exists());
+            Assert.assertTrue(rrdFile + " not fond", rrdFile.exists());
             rrdFile.delete();
             //rrdFile.delete();
             /*for(GraphNode gn : p.getGraphList()) {

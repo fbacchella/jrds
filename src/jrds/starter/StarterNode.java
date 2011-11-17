@@ -8,216 +8,224 @@ import java.util.Map;
 import jrds.HostsList;
 import jrds.PropertiesManager;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 @SuppressWarnings("deprecation")
 public abstract class StarterNode implements StartersSet {
 
-	static final private Logger logger = Logger.getLogger(StarterNode.class);
-	private Map<Object, Starter> allStarters = null;
+    private Map<Object, Starter> allStarters = null;
 
-	private HostsList root = null;
-	private volatile boolean started = false;
-	private StarterNode parent = null;
+    private HostsList root = null;
+    private volatile boolean started = false;
+    private StarterNode parent = null;
 
-	public StarterNode() {
-		if (this instanceof HostsList) {
-			root = (HostsList) this;
-		}
-	}
+    public StarterNode() {
+        if (this instanceof HostsList) {
+            root = (HostsList) this;
+        }
+    }
 
-	public StarterNode(StarterNode parent) {
-		setParent(parent);
-	}
+    public StarterNode(StarterNode parent) {
+        setParent(parent);
+    }
 
-	public void setParent(StarterNode parent) {
-		root = parent.root;
-		this.parent = parent;
-	}
+    public void setParent(StarterNode parent) {
+        root = parent.root;
+        this.parent = parent;
+    }
 
-	public boolean isCollectRunning() {
-		if(Thread.interrupted())
-			started = false;
-		if(parent != null && ! parent.isCollectRunning())
-			return false;
-		return started;
-	}
+    public boolean isCollectRunning() {
+        if(Thread.interrupted()) {
+            started = false;
+            log(Level.TRACE, "thread is stopped", this);
+            return false;
+        }
+        if(parent != null && ! parent.isCollectRunning())
+            return false;
+        return started;
+    }
 
-	public boolean startCollect() {
-		if(parent != null && ! parent.isCollectRunning())
-			return false;
-		if(allStarters != null) {
-			if(logger.isDebugEnabled())
-				logger.debug("Starting " + allStarters.size() + " starters for "+ this);
-			for(Starter s: allStarters.values()) {
-				//If collect is stopped while we're starting, drop it
-				if(parent !=null && ! parent.isCollectRunning())
-					return false;
-				s.doStart();
-			}
-		}
-		started = true;
-		return isCollectRunning();
-	}
+    public boolean startCollect() {
+        if(parent != null && ! parent.isCollectRunning()) {
+            log(Level.TRACE, "parent of %s prevent starting", this);
+            return false;
+        }
+        if(allStarters != null) {
+            log(Level.DEBUG, "Starting %d starters for %s", allStarters.size(), this);
+            for(Starter s: allStarters.values()) {
+                //If collect is stopped while we're starting, drop it
+                if(parent !=null && ! parent.isCollectRunning())
+                    return false;
+                s.doStart();
+            }
+        }
+        started = true;
+        log(Level.DEBUG, "Starting for %s done", this);
+        return isCollectRunning();
+    }
 
-	public synchronized void stopCollect() {
-		started = false;
-		if(allStarters != null)
-			for(Starter s: allStarters.values()) {
-				try {
-					s.doStop();
-				} catch (Exception e) {
-					logger.error("Unable to stop timer " + s.getKey() +": " + e);
-				}
-			}
-	}
+    public synchronized void stopCollect() {
+        started = false;
+        if(allStarters != null)
+            for(Starter s: allStarters.values()) {
+                try {
+                    s.doStop();
+                } catch (Exception e) {
+                    log(Level.ERROR, e, "Unable to stop timer %s: %s", s.getKey(), e);
+                }
+            }
+    }
 
-	/**
-	 * @param s the starter to register
-	 * @return the starter that will be used
-	 */
-	public Starter registerStarter(Starter s) {
-		Object key = s.getKey();
-		if(allStarters == null)
-			//Must be a linked hashed map, order of insertion might be important
-			allStarters = new LinkedHashMap<Object, Starter>(2);
-		if(! allStarters.containsKey(key)) {
-			s.initialize(this);
-			allStarters.put(key, s);
-			logger.debug(jrds.Util.delayedFormatString("registering %s in %s", s, this));
-			return s;
-		}
-		else {
-			return allStarters.get(key);
-		}
-	}
-	
-	/**
-	 * Called in the host list configuration, used to finished the configuration
-	 * of the starters
-	 * @param pm the configuration
-	 */
-	public void configureStarters(PropertiesManager pm) {
-	    if(allStarters == null)
-	        return;
-	    
-	    for(Starter s: allStarters.values()) {
-	        s.configure(pm);
-	    }
-	}
+    /**
+     * @param s the starter to register
+     * @return the starter that will be used
+     */
+    public Starter registerStarter(Starter s) {
+        Object key = s.getKey();
+        if(allStarters == null)
+            //Must be a linked hashed map, order of insertion might be important
+            allStarters = new LinkedHashMap<Object, Starter>(2);
+        if(! allStarters.containsKey(key)) {
+            s.initialize(this);
+            allStarters.put(key, s);
+            log(Level.DEBUG, "registering %s", s);
+            return s;
+        }
+        else {
+            return allStarters.get(key);
+        }
+    }
 
-	public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc) {
-		Object key = null;
-		try {
-			Method m = sc.getMethod("makeKey", StarterNode.class);
-			logger.trace(m);
-			key = m.invoke(null, this);
-		} catch (SecurityException e) {
-			logger.error(e,e);
-		} catch (NoSuchMethodException e) {
-			//Not an error, the key is the the class
-			key = sc;
-		} catch (IllegalArgumentException e) {
-			logger.error(e,e);
-		} catch (IllegalAccessException e) {
-			logger.error(e,e);
-		} catch (InvocationTargetException e) {
-			logger.error("Error for " + this + " with " + sc, e.getCause());
-		}
-		if(logger.isTraceEnabled())
-			logger.trace(sc + " " + key);
-		return find(sc, key);
-	}
+    /**
+     * Called in the host list configuration, used to finished the configuration
+     * of the starters
+     * @param pm the configuration
+     */
+    public void configureStarters(PropertiesManager pm) {
+        if(allStarters == null)
+            return;
 
-	/* (non-Javadoc)
-	 * @see jrds.starter.StartersSet#find(java.lang.Object)
-	 */
-	@Deprecated
-	public Starter find(Object key) {
-		return find(Starter.class, key);
-	}
+        for(Starter s: allStarters.values()) {
+            s.configure(pm);
+        }
+    }
 
-	@SuppressWarnings("unchecked")
-	public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, Object key) {
-		StarterClass s = null;
-		if(allStarters != null && allStarters.containsKey(key)) {
-			Starter stemp = allStarters.get(key);
-			if(logger.isDebugEnabled())
-				logger.debug("Found " + key + ": " + stemp);
-			if(sc.isInstance(stemp)) {
-				s = (StarterClass) stemp;
-			}
-			else {
-				logger.error("Starter key error, got a " + stemp.getClass() + " expecting a " + sc);
-				return null;
-			}
-		}
-		else if(parent != null )
-			s = parent.find(sc, key);
-		return s;
-	}
+    public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc) {
+        Object key = null;
+        try {
+            Method m = sc.getMethod("makeKey", StarterNode.class);
+            key = m.invoke(null, this);
+        } catch (SecurityException e) {
+            log(Level.ERROR, e, e.getMessage());
+        } catch (NoSuchMethodException e) {
+            //Not an error, the key is the the class
+            key = sc;
+        } catch (IllegalArgumentException e) {
+            log(Level.ERROR, e, e.getMessage());
+        } catch (IllegalAccessException e) {
+            log(Level.ERROR, e, e.getMessage());
+        } catch (InvocationTargetException e) {
+            log(Level.ERROR, e, "Error for %s with %s: %s", this, sc, e);
+        }
+        return find(sc, key);
+    }
 
-	public boolean isStarted(Object key) {
-		boolean s = false;
-		Starter st = find(Starter.class, key);
-		if(st != null)
-			s = st.isStarted();
-		return s;
-	}
+    /* (non-Javadoc)
+     * @see jrds.starter.StartersSet#find(java.lang.Object)
+     */
+    @Deprecated
+    public Starter find(Object key) {
+        return find(Starter.class, key);
+    }
 
-	public HostsList getHostList() {
-		if(root == null && getParent() != null)
-			root = getParent().getHostList();
-		return root;
-	}
+    @SuppressWarnings("unchecked")
+    public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, Object key) {
+        StarterClass s = null;
+        if(allStarters != null && allStarters.containsKey(key)) {
+            Starter stemp = allStarters.get(key);
+            if(sc.isInstance(stemp)) {
+                s = (StarterClass) stemp;
+            }
+            else {
+                log(Level.ERROR, "Starter key error, got a %s expecting a %s", stemp.getClass(), sc);
+                return null;
+            }
+        }
+        else if(parent != null )
+            s = parent.find(sc, key);
+        return s;
+    }
 
-	/**
-	 * @return the parent
-	 */
-	public StarterNode getParent() {
-		return parent;
-	}
+    public boolean isStarted(Object key) {
+        boolean s = false;
+        Starter st = find(Starter.class, key);
+        if(st != null)
+            s = st.isStarted();
+        return s;
+    }
 
-	//Compatibily code
-	/**
-	 * @deprecated
-	 * Useless method, it return <code>this</code>
-	 * @return
-	 */
-	@Deprecated
-	public StartersSet getStarters() {
-		return this;
-	}
+    public HostsList getHostList() {
+        if(root == null && getParent() != null)
+            root = getParent().getHostList();
+        return root;
+    }
 
-	/**
-	 * @deprecated
-	 * Useless method, it return <code>this</code>
-	 * @return
-	 */
-	@Deprecated
-	public StarterNode getLevel() {
-		return this;
-	}
+    /**
+     * @return the parent
+     */
+    public StarterNode getParent() {
+        return parent;
+    }
 
-	@Deprecated
-	public void setParent(StartersSet s) {
-		setParent((StarterNode) s);
-	}
+    //Compatibily code
+    /**
+     * @deprecated
+     * Useless method, it return <code>this</code>
+     * @return
+     */
+    @Deprecated
+    public StartersSet getStarters() {
+        return this;
+    }
 
-	/* (non-Javadoc)
-	 * @see jrds.starter.StartersSet#registerStarter(jrds.starter.Starter, jrds.starter.StarterNode)
-	 */
-	@Deprecated
-	public Starter registerStarter(Starter s, StarterNode parent) {
-		return registerStarter(s);
-	};
+    /**
+     * @deprecated
+     * Useless method, it return <code>this</code>
+     * @return
+     */
+    @Deprecated
+    public StarterNode getLevel() {
+        return this;
+    }
 
-	/* (non-Javadoc)
-	 * @see jrds.starter.StartersSet#find(java.lang.Class, jrds.starter.StarterNode)
-	 */
-	@Deprecated
-	public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, StarterNode nope) {
-		return find(sc);
-	}
+    @Deprecated
+    public void setParent(StartersSet s) {
+        setParent((StarterNode) s);
+    }
+
+    /* (non-Javadoc)
+     * @see jrds.starter.StartersSet#registerStarter(jrds.starter.Starter, jrds.starter.StarterNode)
+     */
+    @Deprecated
+    public Starter registerStarter(Starter s, StarterNode parent) {
+        return registerStarter(s);
+    };
+
+    /* (non-Javadoc)
+     * @see jrds.starter.StartersSet#find(java.lang.Class, jrds.starter.StarterNode)
+     */
+    @Deprecated
+    public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, StarterNode nope) {
+        return find(sc);
+    }
+
+    public void log(Level l, Throwable e, String format, Object... elements) {
+        jrds.Util.log(this, Logger.getLogger(getClass()), l, e, format, elements);
+    }
+
+    public void log(Level l, String format, Object... elements) {
+        jrds.Util.log(this, Logger.getLogger(getClass()),l, null, format, elements);
+    }
 
 }

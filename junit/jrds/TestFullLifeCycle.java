@@ -26,6 +26,7 @@ public class TestFullLifeCycle {
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
+        StoreOpener.prepare("FILE");
         Tools.setLevel(logger, Level.TRACE, "jrds.Graph", "jrds.GraphNode");
     }
 

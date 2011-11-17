@@ -65,7 +65,7 @@ public class Configuration {
         propertiesManager.importSystemProps();
         propertiesManager.update();
 
-        StoreOpener.prepare(propertiesManager.dbPoolSize, propertiesManager.syncPeriod, propertiesManager.timeout, propertiesManager.rrdbackend);
+        StoreOpener.prepare(propertiesManager.rrdbackend, propertiesManager.dbPoolSize);
 
         hostsList = new HostsList(propertiesManager);
     }

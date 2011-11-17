@@ -24,14 +24,6 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
 
     static final private Map<String, String> sourceTypeMapping = new HashMap<String, String>();
 
-    static {
-        sourceTypeMapping.put("JRDS Agent", "jrds_agent");
-        sourceTypeMapping.put("SNMP", "SNMP");
-        sourceTypeMapping.put("Munin", "munin");
-        sourceTypeMapping.put("HttpXml", "httpxml");
-        sourceTypeMapping.put("kstat", "kstat");
-        sourceTypeMapping.put("JMX", "jmx");
-    }
     String propFile = "jrds.properties";
 
     public void configure(Properties configuration) {
@@ -47,7 +39,6 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
     }
 
     public void start(String args[]) throws Exception {
-
         PropertiesManager pm = new PropertiesManager(new File(propFile));
         pm.update();
         jrds.JrdsLoggerConfiguration.configure(pm);
@@ -68,7 +59,6 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
                 System.out.println("Unknwon probe");
             }
         }
-
     }
 
     /* (non-Javadoc)
@@ -94,11 +84,10 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
             }
         }
     }
-    
+
     private String getSourceTypeLink(Probe<?, ?> p) {
         String sourceType = p.getSourceType();
         return "[[sourcetype:" + sourceTypeMapping.get(sourceType) + ":|" + sourceType + "]]";
-
     }
 
     private String oneLine(Probe<?, ?> p) {
@@ -110,9 +99,9 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         if (description == null)
             description = "";
         String link= "[[sourcetype:" + sourceType + ":" + probeName.toLowerCase() + "|" + probeName + "]]";
-        return "| " + getSourceTypeLink(p) + " | " + link + " | " + description + " | " + classToLink(p.getClass()) + " | ";
-
+        return "| " + link + " | " + description + " | " + classToLink(p.getClass()) + " | ";
     }
+    
     private void dumpProbe(ProbeDesc pd) throws InstantiationException, IllegalAccessException {
         Class<? extends Probe<?, ?>> c = pd.getProbeClass();
         Probe<?,?> p = c.newInstance();
@@ -124,6 +113,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         System.out.println(doTitle("Source type"));
         System.out.println("");
         System.out.println(getSourceTypeLink(p));
+        System.out.println("");
         System.out.println(doTitle("Probe class"));
         System.out.println("");
         System.out.println(classToLink(pd.getProbeClass()));
@@ -146,6 +136,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         for(DsDef ds: pd.getDsDefs()) {
             System.out.println(String.format("| %s | %s | |",ds.getDsName(), ds.getDsType()));
         }
+        System.out.println("");
         System.out.println(doTitle("Graph provided"));
         System.out.println("");
         System.out.println("^ Name ^ Description ^");
@@ -162,7 +153,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
                 curs = curs.getSuperclass();
 
             ParameterizedType t = (ParameterizedType) curs.getGenericSuperclass();
-                typeArg = (Class<?>)t.getActualTypeArguments()[2];
+            typeArg = (Class<?>)t.getActualTypeArguments()[2];
 
             System.out.println(classToLink(typeArg));
             System.out.println("");

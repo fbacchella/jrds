@@ -20,8 +20,18 @@ import org.apache.log4j.Level;
 import org.w3c.dom.Document;
 
 /**
+ * This probe can be used to collect values read from an XML document extracted from a defined URL
+ * <p>
+ * The specific keywords it uses are
+ * <ul>
+ * <li>upTimePath – An xpath to the uptime</li>
+ * <li>nouptime – No uptime is provided</li>
+ * <li>startTimePath – when no uptime is provided, the xpath to the start time of the agent</li>
+ * <li>currentTimePath – when no uptime is provided, the xpath to the current time of the agent</li>
+ * <li>timePattern – when no uptime is provided, a pattern that will be used by SimpleDateFormat object to parse time</li>
+ * </ul> 
+ * This probe uses <a href="http://hc.apache.org/httpclient-3.x/">Apache's Commons HttpClient</a>.
  * @author Fabrice Bacchella 
- * @version $Revision: 407 $,  $Date: 2007-02-22 18:48:03 +0100 (jeu., 22 févr. 2007) $
  */
 @ProbeMeta(
         topStarter=jrds.starter.XmlProvider.class
@@ -31,26 +41,41 @@ public class HttpXml extends HCHttpProbe {
 	private Set<String> xpaths = null;
 	private Map<String, String> collectKeys = null;
 
+	/* (non-Javadoc)
+	 * @see jrds.probe.HttpProbe#configure(java.util.List)
+	 */
 	public void configure(List<Object> args) {
 		super.configure(args);
 		finishConfig(args);
 	}
 
+    /* (non-Javadoc)
+     * @see jrds.probe.HttpProbe#configure(java.lang.String, java.util.List)
+     */
     public void configure(String file, List<Object> args) {
         super.configure(file, args);
         finishConfig(args);
     }
 
+    /* (non-Javadoc)
+     * @see jrds.probe.HttpProbe#configure(java.lang.Integer, java.util.List)
+     */
     public void configure(Integer port, List<Object> args) {
 		super.configure(port, args);
 		finishConfig(args);
 	}
 
+	/* (non-Javadoc)
+	 * @see jrds.probe.HttpProbe#configure(java.net.URL, java.util.List)
+	 */
 	public void configure(URL url, List<Object> args) {
 		super.configure(url, args);
 		finishConfig(args);
 	}
 
+	/* (non-Javadoc)
+	 * @see jrds.probe.HttpProbe#configure(java.lang.Integer, java.lang.String, java.util.List)
+	 */
 	public void configure(Integer port, String file, List<Object> args) {
 		super.configure(port, file, args);
 		finishConfig(args);
@@ -96,10 +121,22 @@ public class HttpXml extends HCHttpProbe {
 		super.setHost(monitoredHost);
 	}
 
+	/**
+	 * A method that can be overriden to extract more values from the XML document 
+	 * @param d the XML document read from the URL
+	 * @param variables already parsed variables that can be overriden
+	 * @return a new set of variables, this implementation return variables without modifications
+	 */
 	public Map<String, Number> dom2Map(Document d, Map<String, Number> variables) {
 		return variables;
 	}
 
+	/**
+	 * Extract the the uptime from the XML document, reusing the XML provider utilites
+	 * @param xmlstarter
+	 * @param d
+	 * @return
+	 */
 	protected long findUptime(XmlProvider xmlstarter, Document d) {
 		String upTimePath = getPd().getSpecific("upTimePath");
 		if(upTimePath != null) {
@@ -144,6 +181,9 @@ public class HttpXml extends HCHttpProbe {
 		return vars; 
 	}
 
+	/* (non-Javadoc)
+	 * @see jrds.probe.HttpProbe#getSourceType()
+	 */
 	@Override
 	public String getSourceType() {
 		return "HttpXml";
