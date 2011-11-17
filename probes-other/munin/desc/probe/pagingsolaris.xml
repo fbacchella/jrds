@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>PagingSolarisMunin</name>
+    <probeName>paging_munin</probeName>
+    <probeClass>jrds.probe.munin.Munin</probeClass>
+    <specific name="fetch">paging_in, paging_out</specific>
+    <ds>
+        <dsName>pgin</dsName>
+        <dsType>counter</dsType>
+        <collect>user.pgin</collect>
+    </ds>
+    <ds>
+        <dsName>reclaim</dsName>
+        <dsType>counter</dsType>
+        <collect>system</collect>
+    </ds>
+    <ds>
+        <dsName>pgpgin</dsName>
+        <dsType>counter</dsType>
+        <collect>pgpgin</collect>
+    </ds>
+    <ds>
+        <dsName>pgout</dsName>
+        <dsType>counter</dsType>
+        <collect>pgout</collect>
+    </ds>
+    <ds>
+        <dsName>scan</dsName>
+        <dsType>counter</dsType>
+        <collect>scan</collect>
+    </ds>
+    <ds>
+        <dsName>pgpgout</dsName>
+        <dsType>counter</dsType>
+        <collect>pgpgout</collect>
+    </ds>
+    <ds>
+        <dsName>pgfree</dsName>
+        <dsType>counter</dsType>
+        <collect>pgfree</collect>
+    </ds>
+    <graphs>
+        <name>CpuSolarisMunin</name>
+    </graphs>
+</probedesc>

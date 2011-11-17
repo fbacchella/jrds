@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>SendmailTrafficMunin</name>
+    <probeName>munin_sendmail_mailtraffic</probeName>
+    <probeClass>jrds.probe.munin.Munin</probeClass>
+    <specific name="fetch">sendmail_mailtraffic</specific>
+    <ds>
+        <dsName>sent</dsName>
+        <dsType>DERIVE</dsType>
+        <collect>sent</collect>
+    </ds>
+    <ds>
+        <dsName>received</dsName>
+        <dsType>DERIVE</dsType>
+        <collect>received</collect>
+    </ds>
+    <graphs>
+        <name>sendmail_mailtraffic</name>
+    </graphs>
+</probedesc>

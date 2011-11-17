@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+	<name>NtpMunin</name>
+	<probeName>munin_ntp_${index}</probeName>
+	<probeClass>jrds.probe.munin.MuninIndexed</probeClass>
+	<specific name="fetch">ntp_${index}</specific>
+	<ds>
+		<dsName>jitter</dsName>
+		<dsType>GAUGE</dsType>
+		<collect>jitter</collect>
+	</ds>
+	<ds>
+		<dsName>delay</dsName>
+		<dsType>GAUGE</dsType>
+		<collect>delay</collect>
+	</ds>
+	<ds>
+		<dsName>offset</dsName>
+		<dsType>GAUGE</dsType>
+		<collect>offset</collect>
+	</ds>
+	<graphs />
+</probedesc>
+

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+	<name>InterruptsMunin</name>
+	<probeName>munin_interrupts</probeName>
+	<probeClass>jrds.probe.munin.Munin</probeClass>
+	<specific name="fetch">interrupts</specific>
+	<ds>
+		<dsName>ctx</dsName>
+		<dsType>DERIVE</dsType>
+		<collect>ctx</collect>
+	</ds>
+	<ds>
+		<dsName>intr</dsName>
+		<dsType>DERIVE</dsType>
+		<collect>intr</collect>
+	</ds>
+	<graphs>
+		<name>munin_interrupts</name>
+	</graphs>
+</probedesc>
+

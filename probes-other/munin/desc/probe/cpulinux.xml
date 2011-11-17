@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>CpuLinuxMunin</name>
+    <probeName>cpu_munin</probeName>
+    <probeClass>jrds.probe.munin.Munin</probeClass>
+    <specific name="fetch">cpu</specific>
+    <ds>
+        <dsName>user</dsName>
+        <dsType>counter</dsType>
+        <collect>user</collect>
+    </ds>
+    <ds>
+        <dsName>nice</dsName>
+        <dsType>counter</dsType>
+        <collect>nice</collect>
+    </ds>
+    <ds>
+        <dsName>system</dsName>
+        <dsType>counter</dsType>
+        <collect>system</collect>
+    </ds>
+    <ds>
+        <dsName>idle</dsName>
+        <dsType>counter</dsType>
+        <collect>idle</collect>
+    </ds>
+    <ds>
+        <dsName>iowait</dsName>
+        <dsType>counter</dsType>
+        <collect>iowait</collect>
+    </ds>
+    <ds>
+        <dsName>irq</dsName>
+        <dsType>counter</dsType>
+        <collect>irq</collect>
+    </ds>
+    <ds>
+        <dsName>softirq</dsName>
+        <dsType>counter</dsType>
+        <collect>softirq</collect>
+    </ds>
+    <graphs>
+        <name>CpuLinuxMunin</name>
+    </graphs>
+</probedesc>
