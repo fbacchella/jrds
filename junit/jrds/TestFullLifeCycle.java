@@ -15,13 +15,17 @@ import jrds.mockobjects.Full;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestFullLifeCycle {
     static final private Logger logger = Logger.getLogger(TestFullLifeCycle.class);
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws IOException {
@@ -30,24 +34,22 @@ public class TestFullLifeCycle {
         Tools.setLevel(logger, Level.TRACE, "jrds.Graph", "jrds.GraphNode");
     }
 
-    @AfterClass
-    static public void clean() {
-        new File("tmp/fullmock.rrd").delete();
-    }
-
     @Test
     public void create() throws IOException {
         PropertiesManager pm = new PropertiesManager();
-        pm.setProperty("configdir", "tmp");
-        pm.setProperty("rrddir", "tmp");
+        pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("logevel", logger.getLevel().toString());
+
         pm.update();
 
-        File rrdFile = new File("tmp", "fullmock.rrd");
-        if(rrdFile.exists())
-            rrdFile.delete();
+        //We don't want the file, just it's path
+        File rrdFile = testFolder.newFile("fullmock.rrd");
+        rrdFile.delete();
 
-        Probe<?,?> p = Full.create();
+        Probe<?,?> p = Full.create(testFolder);
+        logger.debug(p.getRrdDef().dump());
+
         logger.debug("Created " + p);
         long endSec = Full.fill(p);
         logger.debug("fill time: " + endSec);
