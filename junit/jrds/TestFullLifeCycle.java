@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Calendar;
-import java.util.Date;
 
 import javax.imageio.ImageIO;
 
@@ -56,17 +54,7 @@ public class TestFullLifeCycle {
 
         logger.debug(p.getLastUpdate());
 
-        Date end = org.rrd4j.core.Util.getDate(endSec);
-        Calendar calBegin = Calendar.getInstance();
-        calBegin.setTime(end);
-        calBegin.add(Calendar.MONTH, -1);
-        Date begin = calBegin.getTime();
-
-        end = jrds.Util.normalize(end, p.getStep());
-
-        Period pr = new Period();
-        pr.setEnd(end);
-        pr.setBegin(begin);
+        Period pr = Full.getPeriod(p, endSec);
 
         Graphics2D g2d = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
 

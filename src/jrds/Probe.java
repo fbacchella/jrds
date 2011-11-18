@@ -608,17 +608,41 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
-     * Return the probe datas for the given period
+     * Return the probe data for the given period
      * @param startDate
      * @param endDate
      * @return
      */
     public FetchData fetchData(Date startDate, Date endDate) {
+        return fetchData(startDate.getTime() /1000, endDate.getTime() / 1000);
+    }
+
+    /**
+     * Return the probe data for the given period
+     * @param fetchStart Starting timestamp for fetch request.
+     * @param fetchEnd   Ending timestamp for fetch request.
+     * @return Request object that should be used to actually fetch data from RRD
+     */
+    public FetchData fetchData(long fetchStart, long fetchEnd) {
+        return fetchData(ConsolFun.AVERAGE, fetchStart, fetchEnd, 1);
+    }
+
+    /**
+     * Return the probe data for the given period
+     * @param consolFun  Consolidation function to be used in fetch request. Allowed values are
+     *                   "AVERAGE", "MIN", "MAX" and "LAST" (these constants are conveniently defined in the
+     *                   {@link ConsolFun} class).
+     * @param fetchStart Starting timestamp for fetch request.
+     * @param fetchEnd   Ending timestamp for fetch request.
+     * @param resolution Fetch resolution.
+     * @return Request object that should be used to actually fetch data from RRD
+     */
+    public FetchData fetchData(ConsolFun consolFun, long fetchStart, long fetchEnd, long resolution) {
         FetchData retValue = null;
         RrdDb rrdDb = null;
         try {
             rrdDb = StoreOpener.getRrd(getRrdName());
-            FetchRequest fr = rrdDb.createFetchRequest(GraphDesc.DEFAULTCF, startDate.getTime() /1000, endDate.getTime() / 1000);
+            FetchRequest fr = rrdDb.createFetchRequest(consolFun, fetchStart, fetchEnd, resolution);
             retValue = fr.fetchData();
         } catch (Exception e) {
             log(Level.ERROR, e, "Unable to fetch data: %s", e.getMessage());

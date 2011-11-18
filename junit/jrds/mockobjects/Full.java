@@ -1,12 +1,15 @@
 package jrds.mockobjects;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
 import jrds.GraphDesc;
+import jrds.Period;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
@@ -23,9 +26,9 @@ public class Full {
 	static final Random RANDOM = new Random(SEED);
 	static final String FILE = "fullmock";
 
-	static final long START = Util.getTimestamp(2003, 4, 1);
-	static final long END = Util.getTimestamp(2003, 5, 1);
-	static final int STEP = 300;
+	static public final long START = Util.getTimestamp(2003, 4, 1);
+	static public final long END = Util.getTimestamp(2003, 5, 1);
+	static public final int STEP = 300;
 
 	static final int IMG_WIDTH = 500;
 	static final int IMG_HEIGHT = 300;
@@ -114,6 +117,21 @@ public class Full {
 		rrdDb.close();
 		
 		return t;
+	}
+	
+	static public Period getPeriod(Probe<?,?>p , long endSec) {
+        Date end = org.rrd4j.core.Util.getDate(endSec);
+        Calendar calBegin = Calendar.getInstance();
+        calBegin.setTime(end);
+        calBegin.add(Calendar.MONTH, -1);
+        Date begin = calBegin.getTime();
+
+        end = jrds.Util.normalize(end, p.getStep());
+
+        Period pr = new Period();
+        pr.setEnd(end);
+        pr.setBegin(begin);
+        return pr;
 	}
 	
 	static class GaugeSource {
