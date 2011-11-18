@@ -13,6 +13,7 @@ import org.apache.log4j.Level;
 import jrds.starter.Connection;
 import uk.co.petertribble.jkstat.api.JKstat;
 import uk.co.petertribble.jkstat.api.Kstat;
+import uk.co.petertribble.jkstat.client.KClientConfig;
 import uk.co.petertribble.jkstat.client.RemoteJKstat;
 
 public class KstatConnection extends Connection<JKstat> {
@@ -49,7 +50,7 @@ public class KstatConnection extends Connection<JKstat> {
         try {
             String hostName = getHostName();
             URL remoteUrl = new URL("http", hostName, port, "/");
-            remoteJk = new RemoteJKstat(remoteUrl.toString());
+            remoteJk = new RemoteJKstat(new KClientConfig(remoteUrl.toString()));
             return true;
         } catch (MalformedURLException e) {
             this.log(Level.ERROR, "Malformed URL http://%s:%d/", getHostName(), port);
@@ -67,7 +68,7 @@ public class KstatConnection extends Connection<JKstat> {
         String hostname = args[0];
         String[] kstatinfo = args[1].split(":");
         URL remoteUrl = new URL("http", hostname, port, "/");
-        JKstat remoteJk = new RemoteJKstat(remoteUrl.toString());
+        JKstat remoteJk = new RemoteJKstat(new KClientConfig(remoteUrl.toString()));
         String module = kstatinfo[0];
         int instance = Integer.parseInt(kstatinfo[1]);
         String name = kstatinfo[2];

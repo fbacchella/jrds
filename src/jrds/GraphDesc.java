@@ -890,6 +890,7 @@ implements Cloneable, WithACL {
                 if( ! datasources.contains(ds.name)) {
                     graphDef.datasource(ds.name, customData.get(ds.dsName));
                     datasources.add(ds.name);
+                    logger.trace(Util.delayedFormatString("custom data found for %s", ds.dsName));
                 }
             }
             //Last but common case, datasource refers to a rrd

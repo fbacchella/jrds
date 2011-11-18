@@ -257,7 +257,7 @@ function doGraphList(result) {
             },
             iconsList);
         dojo.connect(application_view_list, "onclick", graph, function(){
-            details(dojo.objectToQuery(this.probe),this.probename);
+            details(dojo.objectToQuery(this.probe));
         });
 
         //Create the history button
@@ -270,7 +270,7 @@ function doGraphList(result) {
             },
             iconsList);
         dojo.connect(time, "onclick", graph, function(){
-            history(dojo.objectToQuery(this.history), this.probename);
+            history(dojo.objectToQuery(this.history));
         });
 
         //Create the save button
@@ -283,7 +283,7 @@ function doGraphList(result) {
             },
             iconsList);
         dojo.connect(disk, "onclick", graph, function(){
-            save(dojo.objectToQuery(this.graph), this.probename);
+            save(dojo.objectToQuery(this.graph));
         });
 	}
 	if(this.standby != null)
@@ -533,14 +533,9 @@ function setupCalendar() {
 
 }
 
-function download_onClick(url)
+function details(url)
 {
-	var historyWin = window.open("download" + document.location.search, "download" + document.location.search, "menubar=no,status=no");
-}
-
-function details(url, name)
-{
-	var detailsWin = window.open("details?" + url, name, "width=400,resizable=yes,menubar=no,scrollbars=yes");
+	var detailsWin = window.open("details?" + url, "_blank", "width=400,resizable=yes,menubar=no,scrollbars=yes");
 }
 
 function popup(url,id)
@@ -558,15 +553,15 @@ function popup(url,id)
 	else {
 		height = "height=500";
 	}
-	return popupWin = window.open("popup.html?" + url, "_blank" , height + "," + width + ",menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
+	return popupWin = window.open("popup.html?" + url, "_blank", height + "," + width + ",menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
 }
 
-function save(url, name)
+function save(url)
 {
-	var popupWin = window.open("download?" + url, name , "menubar=no,status=no,resizable=no,scrollbars=no");
+	var popupWin = window.open("download?" + url, "_blank", "menubar=no,status=no,resizable=no,scrollbars=no");
 }
 
-function history(url, name)
+function history(url)
 {
 	var historyWin = window.open("history.html?" + url, "_blank", "width=750,menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
 }
