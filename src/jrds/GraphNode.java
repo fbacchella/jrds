@@ -24,7 +24,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
     private String name = null;
     private String graphTitle = null;
     private ACL acl = ACL.ALLOWEDACL;
-    private ProxyPlottableMap customData = null;
+    private PlottableMap customData = null;
 
     /**
      *
@@ -166,14 +166,14 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
     /**
      * @return the customData
      */
-    public ProxyPlottableMap getCustomData() {
+    public PlottableMap getCustomData() {
         return customData;
     }
 
     /**
      * @param customData the customData to set
      */
-    public void setCustomData(ProxyPlottableMap customData) {
+    public void setCustomData(PlottableMap customData) {
         this.customData = customData;
     }
 

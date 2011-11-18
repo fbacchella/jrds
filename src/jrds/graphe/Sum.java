@@ -1,30 +1,25 @@
 package jrds.graphe;
 
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import jrds.AutonomousGraphNode;
 import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.HostsList;
-import jrds.ProxyPlottableMap;
+import jrds.PlottableMap;
+import jrds.Util;
 
 import org.apache.log4j.Logger;
+import org.rrd4j.ConsolFun;
 import org.rrd4j.core.FetchData;
 import org.rrd4j.data.LinearInterpolator;
 import org.rrd4j.data.Plottable;
 
 public class Sum extends AutonomousGraphNode {
     static final private Logger logger = Logger.getLogger(Sum.class);
-    static int i;
 
-    String name;
-    ArrayList<String> graphList;
-    HostsList hl;
-    GraphDesc oldgd;
-    GraphDesc newgd;
+    private final ArrayList<String> graphList;
+    private HostsList hl;
 
     public Sum(String name, ArrayList<String> graphList) {
         super(name);
@@ -40,40 +35,41 @@ public class Sum extends AutonomousGraphNode {
         super.configure(hl);
         this.hl = hl;
 
-        String aname = graphList.get(0);
-        GraphNode g = hl.getGraphById(aname.hashCode());
+        GraphNode g = null;
+        //Check the sum consistency
+        for(String graphname: graphList) {
+            g = hl.getGraphById(graphname.hashCode());
+            if(g == null) {
+                logger.warn(Util.delayedFormatString("graph %s not found for sum %s", graphname, getName()));
+            }
+        }
+        //The last graph found is used to clone the graphdesc and use it
         if(g != null){
-            oldgd = g.getGraphDesc();
             try {
-                newgd  = (GraphDesc) oldgd.clone();
-                newgd.setGraphTitle(name);
+                GraphDesc oldgd = g.getGraphDesc();
+                GraphDesc newgd  = (GraphDesc) oldgd.clone();
+                newgd.setGraphTitle(getName());
                 setGraphDesc(newgd);
+                logger.debug(Util.delayedFormatString("Adding sum called %s", getQualifieName()));       
             } catch (CloneNotSupportedException e) {
                 logger.fatal("GraphDesc is supposed to be clonnable, what happened ?", e);
                 throw new RuntimeException("GraphDesc is supposed to be clonnable, what happened ?");
             }
         }
-
-        logger.debug(getQualifieName());       
+        else {
+            logger.error(Util.delayedFormatString("Not graph found in %s definition, unusable sum", getName()) );
+        }
     }
 
     /* (non-Javadoc)
      * @see jrds.GraphNode#getCustomData()
      */
     @Override
-    public ProxyPlottableMap getCustomData() {
-        ProxyPlottableMap sumdata = new ProxyPlottableMap() {
+    public PlottableMap getCustomData() {
+        PlottableMap sumdata = new PlottableMap() {
             @Override
             public void configure(long start, long end, long step) {
-                for(Map.Entry<String, Plottable> e: getSum(start, end).entrySet()) {
-                    ProxyPlottableMap.ProxyPlottable pp = new ProxyPlottableMap.ProxyPlottable();
-                    pp.setReal(e.getValue());
-                    put(e.getKey(), pp);
-                }
-            }
-            private Map<String,Plottable> getSum(long start, long end) {
-                Map<String,Plottable> ownValues = new HashMap<String,Plottable>();  
-
+                logger.debug(Util.delayedFormatString("Configuring the sum %s from %d to %d, step %d", Sum.this.getName(), start, end, step));
                 //Used to kept the last fetched data and analyse the
                 FetchData fd = null;
 
@@ -82,9 +78,9 @@ public class Sum extends AutonomousGraphNode {
                     GraphNode g = hl.getGraphById(name.hashCode());
                     logger.trace("Looking for " + name + " in graph base, and found " + g);
                     if(g != null) {
-                        fd = g.getProbe().fetchData(new Date(start * 1000), new Date(end * 1000));
+                        fd = g.getProbe().fetchData(ConsolFun.AVERAGE, start, end, step);
                         
-                        //First pass, no data tu use
+                        //First pass, no data to use
                         if(allvalues == null) {
                             allvalues = (double[][]) fd.getValues().clone();
                         }
@@ -114,10 +110,10 @@ public class Sum extends AutonomousGraphNode {
                     String[] dsNames = fd.getDsNames();
                     for(int i= 0; i < fd.getColumnCount(); i++) {
                         Plottable pl = new LinearInterpolator(ts, allvalues[i]);
-                        ownValues.put(dsNames[i], pl);
+                        put(dsNames[i], pl);
+                        logger.trace(Util.delayedFormatString("Added %s to sum plottables", dsNames[i]));
                     }
                 }
-                return ownValues;
             }
         };
         return sumdata;
