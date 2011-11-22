@@ -561,8 +561,8 @@ public class Util {
                             result = firstNumberToCompare.compareTo(secondNumberToCompare);
                         } catch (NumberFormatException e) {
                             //Something prevent the number parsing, do a string comparaison
-                        }
                             result = str1.compareTo(str2);
+                        }
                     } else {
                         result = str1.compareTo(str2);
                     }
