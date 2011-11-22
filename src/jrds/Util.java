@@ -555,9 +555,14 @@ public class Util {
                     int result;
 
                     if (Character.isDigit(space1[0]) && Character.isDigit(space2[0])) {
-                        Integer firstNumberToCompare = Integer.parseInt(str1.trim());
-                        Integer secondNumberToCompare = Integer.parseInt(str2.trim());
-                        result = firstNumberToCompare.compareTo(secondNumberToCompare);
+                        try {
+                            Long firstNumberToCompare = Long.parseLong(str1.trim());
+                            Long secondNumberToCompare = Long.parseLong(str2.trim());
+                            result = firstNumberToCompare.compareTo(secondNumberToCompare);
+                        } catch (NumberFormatException e) {
+                            //Something prevent the number parsing, do a string comparaison
+                            result = str1.compareTo(str2);
+                        }
                     } else {
                         result = str1.compareTo(str2);
                     }
