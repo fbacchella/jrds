@@ -200,7 +200,7 @@ public class PropertiesManager extends Properties {
         };
     }
 
-    private File prepareDir(File dir, boolean autocreate) {
+    private File prepareDir(File dir, boolean autocreate, boolean readOnly) {
         if(dir == null)
             return null;
         if( ! dir.exists()) {
@@ -218,19 +218,19 @@ public class PropertiesManager extends Properties {
             logger.error(dir + " exists but is not a Directory");
             return null;
         }
-        else if( ! dir.canWrite()) {
+        else if( ! dir.canWrite() && ! readOnly) {
             logger.error(dir + " exists can not be written");
             return null;
         }
         return dir;
     }
 
-    private File prepareDir(String path, boolean autocreate) {
+    private File prepareDir(String path, boolean autocreate, boolean readOnly) {
         if(path == null || "".equals(path)) {
             return null;
         }
         File dir = new File(path);
-        return prepareDir(dir, autocreate);
+        return prepareDir(dir, autocreate, readOnly);
     }
 
     @SuppressWarnings("unchecked")
@@ -292,16 +292,16 @@ public class PropertiesManager extends Properties {
 
         //Directories configuration
         autocreate = parseBoolean(getProperty("autocreate", "false"));
-        configdir = prepareDir(getProperty("configdir"), autocreate);
-        rrddir = prepareDir(getProperty("rrddir"), autocreate);
+        configdir = prepareDir(getProperty("configdir"), autocreate, true);
+        rrddir = prepareDir(getProperty("rrddir"), autocreate, false);
         //Different place to find the temp directory
-        tmpdir = prepareDir(getProperty("tmpdir"), autocreate);
+        tmpdir = prepareDir(getProperty("tmpdir"), autocreate, true);
         if(tmpdir == null)
-            tmpdir = prepareDir(System.getProperty("javax.servlet.context.tempdir"), false);
+            tmpdir = prepareDir(System.getProperty("javax.servlet.context.tempdir"), false, true);
         if(tmpdir == null) {
             String tmpDirPath = System.getProperty("java.io.tmpdir");
             if(tmpDirPath != null && ! "".equals(tmpDirPath))
-                tmpdir = prepareDir(new File(tmpDirPath, "jrds"), true);
+                tmpdir = prepareDir(new File(tmpDirPath, "jrds"), true, true);
         }
         if(tmpdir == null) {
             throw new RuntimeException("No temp dir defined");
