@@ -4,7 +4,7 @@
     <name>NumProcesses</name>
     <probeName>nprocesses</probeName>
     <probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
-    <snmpRequester>simple</snmpRequester>
+    <specific name="requester">simple</specific>
     <ds>
         <dsName>hrSystemProcesses</dsName>
         <dsType>gauge</dsType>

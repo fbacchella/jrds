@@ -322,12 +322,14 @@ public class Util {
         StarterNode node = null;
         for(Object o: arguments) {
             if(logger.isTraceEnabled())
-                logger.trace("Argument for template \"" + template + "\": " + o.getClass());
+                logger.trace(Util.delayedFormatString("Argument for template \"%s\": %s", template, o.getClass()));
             if( o instanceof IndexedProbe) {
                 String index = ((IndexedProbe) o).getIndexName();
-                env.put("index", index);
-                env.put("index.signature", stringSignature(index));
-                env.put("index.cleanpath", cleanPath(index));
+                if(index != null) {
+                    env.put("index", index);
+                    env.put("index.signature", stringSignature(index));
+                    env.put("index.cleanpath", cleanPath(index));
+                }
             }
             if(o instanceof UrlProbe) {
                 env.put("url", ((UrlProbe) o).getUrlAsString());

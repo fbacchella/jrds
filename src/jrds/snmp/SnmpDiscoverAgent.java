@@ -105,6 +105,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
     @Override
     public void discover(String hostname, JrdsElement hostEleme,
             Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
+        log(Level.DEBUG, "Trying discovering");
         Class<? extends Probe<?,?>> snmpClass = jrds.probe.snmp.SnmpProbe.class;
         ClassLoader cl = getClass().getClassLoader();
 
@@ -151,10 +152,19 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
 
             buffer = root.getElementbyName("name");
             String name = buffer == null ? null : buffer.getTextContent();
-            buffer = root.getElementbyName("index");
-            String index = buffer == null ? null : buffer.getTextContent();
-            buffer = e.findByPath("specific[@name='existOid']");
-            String doesExistOid = buffer == null ? null : buffer.getTextContent();
+            log(Level.TRACE, "Trying to discover probe %s", name);
+            String index = null;
+            String doesExistOid = null;
+            for(JrdsElement specific: root.getChildElementsByName("specific")) {
+                String specificName = specific.getAttribute("name");
+                String value = specific.getTextContent().trim();
+                if("existOid".equals(specificName)) {
+                    doesExistOid = value;
+                }
+                else if("indexOid".equals(specificName)) {
+                    index = value;
+                }
+            }
 
             try {
                 if(index != null && ! "".equals(index) ) {
@@ -170,6 +180,9 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
                 }
                 else if(doesExistOid != null && ! "".equals(doesExistOid)) {
                     doesExist(hostEleme, active, name, doesExistOid);
+                }
+                else {
+                    log(Level.DEBUG, "undiscoverable probe: %s", name);
                 }
             } catch (Exception e1) {
                 log(Level.ERROR, e1, "Error detecting %s: %s" , name, e1);
