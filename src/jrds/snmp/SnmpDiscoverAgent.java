@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +34,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class SnmpDiscoverAgent extends DiscoverAgent {
-    //  private static final OID sysObjectID = new OID("1.3.6.1.2.1.1.2.0");
+    //Used to check if snmp is on
+    private static final OID sysObjectID = new OID("1.3.6.1.2.1.1.2.0");
     //  private static final OID linuxOID = new OID("1.3.6.1.4.1.8072.3.2.10");
     //  private static final OID solarisOID = new OID("1.3.6.1.4.1.8072.3.2.3");
     //  private static final OID windowsNT_workstation_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.1");
@@ -52,11 +55,11 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         OID2Probe.put(udpMIB, "UdpSnmp");
     }
 
-    static class LocalSnmpStarter extends SnmpStarter {
+    static private class LocalSnmpStarter extends SnmpStarter {
         Snmp snmp;
         Target target;
         @Override
-        public boolean start() {
+        public final boolean start() {
             try {
                 snmp = new Snmp(new DefaultUdpTransportMapping());
                 snmp.listen();
@@ -65,22 +68,22 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
             return true;
         }
         @Override
-        public void stop() {
+        public final void stop() {
             try {
                 snmp.close();
             } catch (IOException e) {
             }
         }
         @Override
-        public Snmp getSnmp() {
+        public final Snmp getSnmp() {
             return snmp;
         }
         @Override
-        public Target getTarget() {
+        public final Target getTarget() {
             return target;
         }
         @Override
-        public boolean isStarted() {
+        public final boolean isStarted() {
             return true;
         }
     }
@@ -105,7 +108,6 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
     @Override
     public void discover(String hostname, JrdsElement hostEleme,
             Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
-        log(Level.DEBUG, "Trying discovering");
         Class<? extends Probe<?,?>> snmpClass = jrds.probe.snmp.SnmpProbe.class;
         ClassLoader cl = getClass().getClassLoader();
 
@@ -126,6 +128,16 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         active.target = hosttarget;
         active.doStart();
 
+        try {
+            if(SnmpRequester.RAW.doSnmpGet(active, Collections.singleton(sysObjectID)).size() < 0) {
+                log(Level.INFO, "SNMP not active on host %s", hostname);
+                return;
+            }
+        } catch (IOException e1) {
+            log(Level.INFO, "SNMP not active on host %s", hostname);
+            return;
+        }
+
         Element snmpElem = hostDom.createElement("snmp");
         if(hosttarget instanceof CommunityTarget) {
             CommunityTarget ct = (CommunityTarget) hosttarget;
@@ -135,11 +147,13 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
 
         hostEleme.appendChild(snmpElem);
 
+        //Sort descriptions
+        LinkedList<String> sortedProbeName = new LinkedList<String>();
         for(JrdsDocument e: probdescs.values()) {
             JrdsElement root = e.getRootElement();
-            JrdsElement buffer;
 
-            buffer = root.getElementbyName("probeClass");
+            //Don't add if it's not a snmp probe
+            JrdsElement buffer = root.getElementbyName("probeClass");
             String probeClass = buffer == null ? null : buffer.getTextContent();
             Class<?> c;
             try {
@@ -150,8 +164,50 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
                 continue;
             }
 
+            String name = root.getElementbyName("name").getTextContent();
+            
+            //Don' discover if asked to don't do
+            buffer = root.findByPath("specific[@name='nodiscover']");
+            if(buffer != null)
+                continue;
+
+            buffer = root.findByPath("specific[@name='hides']");
+            String hides = getHides(root);
+            if(hides != null) {
+                hides = hides.trim();
+                //Both are new, just add them in the good order
+                if(! sortedProbeName.contains(hides) && ! sortedProbeName.contains(name)) {
+                    sortedProbeName.add(name);
+                    sortedProbeName.add(hides);
+                }
+                //hidden exist but this one is new, add before
+                else if(sortedProbeName.contains(hides) && ! sortedProbeName.contains(name)) {
+                    int pos = sortedProbeName.indexOf(hides);
+                    sortedProbeName.add(pos, name);
+                }
+                //hidden exist but this one is new, add after
+                else if(! sortedProbeName.contains(hides) && sortedProbeName.contains(name)) {
+                    int pos = sortedProbeName.indexOf(name);
+                    sortedProbeName.add(pos + 1, hides);
+                }
+            }
+            //No hide, just put
+            else {
+                sortedProbeName.add(name);
+            }
+        }
+        
+        Set<String> done = new HashSet<String>();
+
+        log(Level.TRACE, "Will search for probes %s", sortedProbeName);
+        for(String name: sortedProbeName) {
+            JrdsDocument e = probdescs.get(name);
+            JrdsElement root = e.getRootElement();
+            JrdsElement buffer;
             buffer = root.getElementbyName("name");
-            String name = buffer == null ? null : buffer.getTextContent();
+            name = buffer == null ? null : buffer.getTextContent();
+            if(done.contains(name))
+                continue;
             log(Level.TRACE, "Trying to discover probe %s", name);
             String index = null;
             String doesExistOid = null;
@@ -173,7 +229,12 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
                     String labelOid = buffer == null ? null : buffer.getTextContent();
                     log(Level.TRACE, "label OID for %s: %s", name, labelOid);
                     try {
-                        enumerateIndexed(hostEleme, active, name, index, labelOid, withOid);
+                        if(enumerateIndexed(hostEleme, active, name, index, labelOid, withOid) > 0) {
+                            done.add(name);
+                            String hides = getHides(root);
+                            if(hides != null)
+                                done.add(hides);
+                        }
                     } catch (Exception e1) {
                         log(Level.ERROR, e1, "Error discoverer %s for index %s: %s", name, index, e1);
                     }
@@ -187,6 +248,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
             } catch (Exception e1) {
                 log(Level.ERROR, e1, "Error detecting %s: %s" , name, e1);
             }
+
         }
         active.doStop();
     }
@@ -199,6 +261,18 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         }
         log(Level.TRACE, "%s does exist: %s", name, label);
     }
+    
+    private String getHides(JrdsElement root) {
+        JrdsElement buffer = root.findByPath("specific[@name='hides']");
+        String hides = buffer == null ? null : buffer.getTextContent();
+        if(hides != null && ! hides.trim().isEmpty()) {
+            return hides.trim();
+        }
+        else {
+            return null;
+        }
+       
+    }
 
     private String getLabel(SnmpStarter active, List<OID> labelsOID) throws IOException {
         Map<OID, Object> ifLabel = SnmpRequester.RAW.doSnmpGet(active, labelsOID);
@@ -210,12 +284,14 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         return null;
     }
 
-    private void enumerateIndexed(Element hostEleme, SnmpStarter active, String name, String indexOid, String labelOid, boolean withOid ) throws IOException {
+    private int enumerateIndexed(Element hostEleme, SnmpStarter active, String name, String indexOid, String labelOid, boolean withOid ) throws IOException {
+        int count = 0;
         log(Level.TRACE, "Will enumerate %s", indexOid);
         Set<OID> oidsSet = Collections.singleton(new OID(indexOid));
-        Map<OID, Object> indexes= (Map<OID, Object>) SnmpRequester.TREE.doSnmpGet(active, oidsSet);
+        Map<OID, Object> indexes = SnmpRequester.TREE.doSnmpGet(active, oidsSet);
         log(Level.TRACE, "Elements : %s", indexes);
         for(Map.Entry<OID, Object> e: indexes.entrySet()) {
+            count++;
             OID indexoid = e.getKey();
             String indexName = e.getValue().toString();
             int index = indexoid.last();
@@ -242,6 +318,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
                 }
             }
         }
+        return count;
     }
 
     @SuppressWarnings("unused")
