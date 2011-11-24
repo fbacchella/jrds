@@ -29,7 +29,6 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
 import org.apache.log4j.spi.LoggingEvent;
 import org.mortbay.jetty.testing.ServletTester;
@@ -56,9 +55,9 @@ final public class Tools {
         System.setProperty("java.io.tmpdir",  "tmp");
         LogManager.getLoggerRepository().resetConfiguration();
         jrds.JrdsLoggerConfiguration.initLog4J();
-        app.setName(jrds.JrdsLoggerConfiguration.APPENDER);
-        app.setLayout(new PatternLayout("[%d] %5p %c : %m%n"));
-        jrds.JrdsLoggerConfiguration.putAppender(app);
+        //app.setName(jrds.JrdsLoggerConfiguration.APPENDER);
+        //app.setLayout(new PatternLayout("[%d] %5p %c : %m%n"));
+        //jrds.JrdsLoggerConfiguration.putAppender(app);
     }
 
     static public void prepareXml() throws ParserConfigurationException {
@@ -120,7 +119,7 @@ final public class Tools {
     }
 
     static public void setLevel(Logger logger, Level level, String... allLoggers) {
-        Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDER);
+        Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDERNAME);
         //The system property override the code log level
         if(System.getProperty("jrds.testloglevel") != null){
             level = Level.toLevel(System.getProperty("jrds.testloglevel"));
@@ -129,7 +128,7 @@ final public class Tools {
         for(String loggerName: allLoggers) {
             Logger l = Logger.getLogger(loggerName);
             l.setLevel(level);
-            if(l.getAppender(JrdsLoggerConfiguration.APPENDER) != null) {
+            if(l.getAppender(JrdsLoggerConfiguration.APPENDERNAME) != null) {
                 l.addAppender(app);
             }
         }
@@ -140,11 +139,11 @@ final public class Tools {
     }
 
     static public void setLevel(String[] allLoggers, Level level) {
-        Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDER);
+        Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDERNAME);
         for(String loggerName: allLoggers) {
             Logger l = Logger.getLogger(loggerName);
             l.setLevel(level);
-            if(l.getAppender(JrdsLoggerConfiguration.APPENDER) != null) {
+            if(l.getAppender(JrdsLoggerConfiguration.APPENDERNAME) != null) {
                 l.addAppender(app);
             }
         }

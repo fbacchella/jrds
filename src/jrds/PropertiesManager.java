@@ -273,7 +273,11 @@ public class PropertiesManager extends Properties {
                 Level l = Level.toLevel(ls);
                 String param = getProperty("log." + ls, "");
                 if(! "".equals(param)) {
-                    List<String> loggerList = Arrays.asList(param.split(","));
+                    String[] loggersName = param.split(",");
+                    List<String> loggerList = new ArrayList<String>(loggersName.length);
+                    for(String logger: loggersName) {
+                        loggerList.add(logger.trim());
+                    }
                     loglevels.put(l, loggerList);
                 }
 
