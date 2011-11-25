@@ -30,6 +30,7 @@ import jrds.webapp.ACL;
 import jrds.webapp.DiscoverAgent;
 import jrds.webapp.RolesACL;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -157,11 +158,15 @@ public class HostsList extends StarterNode {
             addHost(h);
             h.configureStarters(pm);
             for(Probe<?,?> p: h.getProbes()) {
-                p.setTimeout(getTimeout());
-                addProbe(p);
-                p.configureStarters(pm);
-                for(String hostTag: p.getTags()) {
-                    hostsTags.add(hostTag);
+                try {
+                    p.setTimeout(getTimeout());
+                    addProbe(p);
+                    p.configureStarters(pm);
+                    for(String hostTag: p.getTags()) {
+                        hostsTags.add(hostTag);
+                    }
+                } catch (Exception e) {
+                    log(Level.ERROR, e, "Probe is failing: %s", e);
                 }
             }				
         }

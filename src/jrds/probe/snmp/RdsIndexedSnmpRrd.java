@@ -27,7 +27,7 @@ import org.snmp4j.smi.OID;
  */
 public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 
-    static public final String INDEXOIDNAME="index";
+    static public final String INDEXOIDNAME="indexOid";
 
     Object key;
     String indexKey;

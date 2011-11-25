@@ -4,7 +4,7 @@
 	<name>CpuRaw</name>
 	<probeName>cpuraw</probeName>
 	<probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
-    <snmpRequester>simple</snmpRequester>
+    <specific name="requester">simple</specific>
 	<ds>
 		<dsName>ssCpuRawUser </dsName>
 		<dsType>counter</dsType>

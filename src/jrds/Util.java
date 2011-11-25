@@ -322,12 +322,14 @@ public class Util {
         StarterNode node = null;
         for(Object o: arguments) {
             if(logger.isTraceEnabled())
-                logger.trace("Argument for template \"" + template + "\": " + o.getClass());
+                logger.trace(Util.delayedFormatString("Argument for template \"%s\": %s", template, o.getClass()));
             if( o instanceof IndexedProbe) {
                 String index = ((IndexedProbe) o).getIndexName();
-                env.put("index", index);
-                env.put("index.signature", stringSignature(index));
-                env.put("index.cleanpath", cleanPath(index));
+                if(index != null) {
+                    env.put("index", index);
+                    env.put("index.signature", stringSignature(index));
+                    env.put("index.cleanpath", cleanPath(index));
+                }
             }
             if(o instanceof UrlProbe) {
                 env.put("url", ((UrlProbe) o).getUrlAsString());
@@ -555,9 +557,14 @@ public class Util {
                     int result;
 
                     if (Character.isDigit(space1[0]) && Character.isDigit(space2[0])) {
-                        Integer firstNumberToCompare = Integer.parseInt(str1.trim());
-                        Integer secondNumberToCompare = Integer.parseInt(str2.trim());
-                        result = firstNumberToCompare.compareTo(secondNumberToCompare);
+                        try {
+                            Long firstNumberToCompare = Long.parseLong(str1.trim());
+                            Long secondNumberToCompare = Long.parseLong(str2.trim());
+                            result = firstNumberToCompare.compareTo(secondNumberToCompare);
+                        } catch (NumberFormatException e) {
+                            //Something prevent the number parsing, do a string comparaison
+                            result = str1.compareTo(str2);
+                        }
                     } else {
                         result = str1.compareTo(str2);
                     }

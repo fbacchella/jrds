@@ -53,7 +53,8 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
         JrdsElement root = n.getRootElement();
         setMethod(root.getElementbyName("probeName"), pd, "setProbeName");
         setMethod(root.getElementbyName("name"), pd, "setName");
-
+        setMethod(root.getElementbyName("index"), pd, "setIndex");
+        
         logger.trace(Util.delayedFormatString("Creating probe description %s", pd.getName()));
 
         JrdsElement classElem = root.getElementbyName("probeClass");
@@ -96,14 +97,6 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
                 pd.addSpecific("requester", snmpRequester);
                 logger.trace(Util.delayedFormatString("Specific added: requester='%s'", snmpRequester));
 
-            }
-        }
-
-        JrdsElement indexElem = root.getElementbyName("index");
-        if(indexElem != null) {
-            String index = indexElem.getTextContent().trim();
-            if(! "".equals(index))	{
-                pd.addSpecific(jrds.probe.snmp.RdsIndexedSnmpRrd.INDEXOIDNAME, index);
             }
         }
 

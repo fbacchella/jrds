@@ -4,7 +4,7 @@
     <name>VIPF5</name>
     <probeName>vipf5-${index}</probeName>
     <probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
-    <specific name="index">1.3.6.1.4.1.3375.2.2.10.1.2.1.1</specific>
+    <specific name="indexOid">1.3.6.1.4.1.3375.2.2.10.1.2.1.1</specific>
     <specific name="labelOid">1.3.6.1.4.1.3375.2.2.10.1.2.1.1</specific>
     <ds>
         <dsName>ClientPktsIn</dsName>

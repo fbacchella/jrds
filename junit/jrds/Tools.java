@@ -26,11 +26,10 @@ import jrds.webapp.Configuration;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.WriterAppender;
 import org.apache.log4j.spi.LoggingEvent;
 import org.mortbay.jetty.testing.ServletTester;
 import org.w3c.dom.Document;
@@ -44,21 +43,14 @@ final public class Tools {
     public static DocumentBuilder dbuilder = null;
     public static XPath xpather = null;
 
-    static final Appender app = new WriterAppender() {
-        public void doAppend(LoggingEvent event) {
-            System.out.println(event.getLevel() + ": " + event.getMessage());
-        }
-    };
-
     static public void configure() throws IOException {
         Locale.setDefault(new Locale("POSIX"));
         System.getProperties().setProperty("java.awt.headless","true");
         System.setProperty("java.io.tmpdir",  "tmp");
         LogManager.getLoggerRepository().resetConfiguration();
-        jrds.JrdsLoggerConfiguration.initLog4J();
-        app.setName(jrds.JrdsLoggerConfiguration.APPENDER);
-        app.setLayout(new PatternLayout("[%d] %5p %c : %m%n"));
-        jrds.JrdsLoggerConfiguration.putAppender(app);
+        JrdsLoggerConfiguration.jrdsAppender = new ConsoleAppender(new org.apache.log4j.SimpleLayout(), ConsoleAppender.SYSTEM_OUT);
+        JrdsLoggerConfiguration.jrdsAppender.setName(JrdsLoggerConfiguration.APPENDERNAME);
+        JrdsLoggerConfiguration.initLog4J();
     }
 
     static public void prepareXml() throws ParserConfigurationException {
@@ -120,16 +112,17 @@ final public class Tools {
     }
 
     static public void setLevel(Logger logger, Level level, String... allLoggers) {
-        Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDER);
+        Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDERNAME);
         //The system property override the code log level
         if(System.getProperty("jrds.testloglevel") != null){
             level = Level.toLevel(System.getProperty("jrds.testloglevel"));
+            logger.setLevel(level);
         }
         logger.setLevel(level);
         for(String loggerName: allLoggers) {
             Logger l = Logger.getLogger(loggerName);
             l.setLevel(level);
-            if(l.getAppender(JrdsLoggerConfiguration.APPENDER) != null) {
+            if(l.getAppender(JrdsLoggerConfiguration.APPENDERNAME) != null) {
                 l.addAppender(app);
             }
         }
@@ -140,11 +133,11 @@ final public class Tools {
     }
 
     static public void setLevel(String[] allLoggers, Level level) {
-        Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDER);
+        Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDERNAME);
         for(String loggerName: allLoggers) {
             Logger l = Logger.getLogger(loggerName);
             l.setLevel(level);
-            if(l.getAppender(JrdsLoggerConfiguration.APPENDER) != null) {
+            if(l.getAppender(JrdsLoggerConfiguration.APPENDERNAME) != null) {
                 l.addAppender(app);
             }
         }
@@ -241,7 +234,7 @@ final public class Tools {
         pm.update();
         pm.libspath.clear();
     }
-    
+
     static public final PropertiesManager getEmptyProperties() {
         PropertiesManager pm = new PropertiesManager();
         pm.update();

@@ -27,8 +27,7 @@ public class ApacheHttpClientTest {
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
-        logger.setLevel(Level.TRACE);
-        Tools.setLevel(new String[] {HCHttpProbe.class.getName(),HttpClientStarter.class.getName(), Resolver.class.getName(), Connection.class.getName(), "jrds.Starter" }, logger.getLevel());
+        Tools.setLevel(logger, Level.TRACE, logger.getName(), HCHttpProbe.class.getName(),HttpClientStarter.class.getName(), Resolver.class.getName(), Connection.class.getName(), "jrds.Starter");
     }
 
     private  RdsHost addConnection(Starter cnx) {
