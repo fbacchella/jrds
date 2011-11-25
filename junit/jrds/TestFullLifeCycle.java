@@ -35,6 +35,7 @@ public class TestFullLifeCycle {
     @Test
     public void create() throws IOException {
         PropertiesManager pm = new PropertiesManager();
+        pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("logevel", logger.getLevel().toString());

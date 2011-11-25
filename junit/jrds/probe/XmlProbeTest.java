@@ -29,7 +29,7 @@ public class XmlProbeTest {
 		Tools.configure();
 
 		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"jrds.Probe.HttpXml", "jrds.Probe.HttpProbe", "jrds.starter.XmlProvider"}, logger.getLevel());
+		Tools.setLevel(logger, Level.TRACE,"jrds.Probe.HttpXml", "jrds.Probe.HttpProbe", "jrds.starter.XmlProvider");
 		Tools.prepareXml(false);
 		
 		pd = jrds.configuration.GeneratorHelper.getProbeDesc(Tools.parseRessource("httpxmlprobedesc.xml"));
