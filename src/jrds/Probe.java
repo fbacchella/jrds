@@ -707,7 +707,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     public abstract String getSourceType();
 
     /**
-     * This function reads all the specified arguments
+     * This function it used by the probe to read all the specific it needs from the probe description
+     * It's called once during the probe initialization
      * Every override should finish by:
      * return super();
      * @return

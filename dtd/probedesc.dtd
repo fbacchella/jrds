@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT probedesc (name, probeName, probeClass, index?, specific*, properties?, uptimefactor?, uniq?, defaultargs?, ds*, graphs)>
+<!ELEMENT probedesc (name, probeName, probeClass, index?, specific*, properties?, uptimefactor?, defaultargs?, ds*, graphs)>
 <!ATTLIST specific 
 			name CDATA #REQUIRED
 >
