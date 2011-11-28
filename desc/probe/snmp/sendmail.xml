@@ -5,7 +5,6 @@
     <probeName>sendmailsnmp</probeName>
 	<probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
     <specific name="indexOid"></specific>
-	<uniq>true</uniq>
 	<defaultargs>
 		<arg type="String" value="1" />
 	</defaultargs>

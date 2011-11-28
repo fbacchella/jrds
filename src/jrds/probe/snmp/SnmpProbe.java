@@ -95,6 +95,10 @@ public abstract class SnmpProbe extends Probe<OID, Object> {
 		return nameMap;
 	}
 
+	/**
+	 * Used to define the OID to collect
+	 * @return a set of OID to collect
+	 */
 	protected abstract Set<OID> getOidSet();
 
 

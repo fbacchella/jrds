@@ -50,7 +50,6 @@ public class ProbeDesc implements Cloneable {
     private String probeName;
     private String name;
     private Collection<String> graphesList = new ArrayList<String>();
-    private boolean uniqIndex = false;
     private Class<? extends Probe<?,?>> probeClass = null;
     private List<Object> defaultsArgs = null;
     private float uptimefactor = (float) 1.0;
@@ -161,20 +160,27 @@ public class ProbeDesc implements Cloneable {
         return highlowcollectmap;
     }
 
-    public void add(Map<String, Object> valuesMap)
-    {
+    public void add(Map<String, Object> valuesMap) {
         long heartbeat = heartBeatDefault;
         double min = MINDEFAULT;
         double max = MAXDEFAULT;
         Object collectKey = null;
         String name = null;
         DsType type = null;
+        
+        //Where to look for the added name
         if(valuesMap.containsKey("dsName")) {
             name = (String) valuesMap.get("dsName");
         }
+        else if(valuesMap.containsKey("collect")) {
+            name = valuesMap.get("collect").toString();
+        }
+
         if(valuesMap.containsKey("dsType")) {
             type = (DsType) valuesMap.get("dsType");
         }
+        
+        //Where to look for the collect info
         if(valuesMap.containsKey("collect")) {
             collectKey = valuesMap.get("collect");
         }
@@ -188,6 +194,7 @@ public class ProbeDesc implements Cloneable {
         else {
             collectKey = name;
         }
+        
         if(valuesMap.containsKey("defaultValue")) {
             defaultValues.put(name, jrds.Util.parseStringNumber(valuesMap.get("defaultValue").toString(), Double.NaN));
         }
@@ -354,22 +361,6 @@ public class ProbeDesc implements Cloneable {
      */
     public void setGraphClasses(String[] graphClasses) {
         this.graphesList = Arrays.asList(graphClasses);
-    }
-
-    /**
-     * @return Returns the unicity of the index.
-     */
-    public boolean isUniqIndex() {
-        return uniqIndex;
-    }
-
-    /**
-     * @param uniqIndex The value of the unicity index.
-     * It's used to avoid doing too much GET if the indes is found only ounce.<p>
-     * Default value is false.
-     */
-    public void setUniqIndex(boolean uniqIndex) {
-        this.uniqIndex = uniqIndex;
     }
 
     public Class<? extends Probe<?,?>> getProbeClass() {

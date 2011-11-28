@@ -49,6 +49,12 @@ import org.w3c.dom.Element;
         )
 public abstract class Probe<KeyType, ValueType> extends StarterNode implements Comparable<Probe<KeyType, ValueType>>  {
 
+    private static final ArcDef[] DEFAULTARC = {
+            new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 3),
+            new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 24 * 365), 
+            new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 365 * 2)
+    };
+
     private int timeout = 30;
     private long step = -1;
     private String name = null;
@@ -157,21 +163,10 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         return getPd().getDsDefs();
     }
 
-    protected ArcDef[] getArcDefs() {
-        ArcDef[] defaultArc = new ArcDef[3];
-        //Five minutes step
-        defaultArc[0] = new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 3);
-        //One hour step
-        defaultArc[1] = new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 24 * 365);
-        //One day step
-        defaultArc[2] = new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 365 * 2);
-        return defaultArc;
-    }
-
     public RrdDef getRrdDef() {
         RrdDef def = new RrdDef(getRrdName());
         def.setVersion(2);
-        def.addArchive(getArcDefs());
+        def.addArchive(DEFAULTARC);
         def.addDatasource(getDsDefs());
         if(step > 0) {
             def.setStep(step);
@@ -672,7 +667,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         }
         return retValues;
     }
-    
+
     /**
      * Return a uniq name for the graph
      * @return
@@ -707,7 +702,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     public abstract String getSourceType();
 
     /**
-     * This function reads all the specified arguments
+     * This function it used by the probe to read all the specific it needs from the probe description
+     * It's called once during the probe initialization
      * Every override should finish by:
      * return super();
      * @return
@@ -795,7 +791,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                     return String.CASE_INSENSITIVE_ORDER.compare(arg0.getDsName(), arg1.getDsName());
                 }
             });
-        
+
         for(DsDef ds: dss) {
             String dsName = ds.getDsName();
 

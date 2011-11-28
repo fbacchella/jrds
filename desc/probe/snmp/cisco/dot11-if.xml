@@ -7,7 +7,6 @@
 	<specific name="labelOid">1.3.6.1.2.1.31.1.1.1.18</specific>
 	<!-- Dummy index, OID suffix should always be used -->
     <specific name="indexOid">1.3.6.1.4.1.9.9.272.1.1.2.1.1.6</specific>
-	<uniq>true</uniq>
 	<ds>
 		<dsName>ActiveClients</dsName>
 		<dsType>gauge</dsType>
