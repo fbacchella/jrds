@@ -67,7 +67,6 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
 
         pd.setHeartBeatDefault(pm.step * 2);
 
-        pd.setUniqIndex(root.getElementbyName("uniq") != null);
         setMethod(root.getElementbyName("uptimefactor"), pd, "setUptimefactor", Float.TYPE);
         
         JrdsElement graphsElement= root.getElementbyName("graphs");
