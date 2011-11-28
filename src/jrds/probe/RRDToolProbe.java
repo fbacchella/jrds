@@ -14,8 +14,13 @@ import jrds.GraphNode;
 import jrds.Probe;
 import jrds.graphe.RRDToolGraphNode;
 
+/**
+ * A class wrapper to use rrdtool's files
+ * @author Fabrice Bacchella
+ *
+ */
 public class RRDToolProbe extends Probe<String, Double> {
-    File rrdpath;
+    private File rrdpath;
 
     public Boolean configure(File rrdpath) {
         this.rrdpath = rrdpath;
