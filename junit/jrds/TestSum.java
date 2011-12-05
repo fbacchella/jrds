@@ -31,7 +31,7 @@ public class TestSum {
     @BeforeClass
     static public void configure() throws IOException, ParserConfigurationException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE);
+        Tools.setLevel(logger, Level.TRACE, "jrds.graphe.Sum");
         Tools.prepareXml();
     }
 
@@ -61,6 +61,7 @@ public class TestSum {
         pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("logevel", logger.getLevel().toString());
         pm.setProperty("rrdbackend", "FILE");
+        pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("tabs", PropertiesManager.HOSTSTAB);
 
         pm.update();
@@ -103,8 +104,7 @@ public class TestSum {
         
         Graph g = new Graph(s);
         g.setPeriod(pr);
-        File outputFile =  new File("tmp", "sum.png");
-        outputFile.delete();
+        File outputFile =  new File(testFolder.getRoot(), "sum.png");
         OutputStream out = new FileOutputStream(outputFile);
         g.writePng(out);
 
