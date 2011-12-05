@@ -6,32 +6,26 @@
 
 package jrds.probe;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Level;
+import jrds.Util;
 
 /**
  * A class to probe the apache status from the /server-status URL
  * @author Fabrice Bacchella 
- * @version $Revision: 475 $,  $Date: 2009-05-15 22:04:03 +0200 (Fri, 15 May 2009) $
  */
-public class ApacheStatusDetails extends HCHttpProbe implements IndexedProbe {
+public class ApacheStatusDetails extends ApacheStatus {
 
     //"_" Waiting for Connection, "S" Starting up, "R" Reading Request,
     //"W" Sending Reply, "K" Keepalive (read), "D" DNS Lookup,
     //"C" Closing connection, "L" Logging, "G" Gracefully finishing,
     //"I" Idle cleanup of worker, "." Open slot with no current process
+    //Can't be within the enum, it's defined after the first call toll add
     static private final Map<Character, WorkerStat> map = new HashMap<Character, WorkerStat>();
-    enum WorkerStat {
+
+    static enum WorkerStat {
         WAITING('_'),
         STARTING('S'),
         READING('R'),
@@ -44,65 +38,15 @@ public class ApacheStatusDetails extends HCHttpProbe implements IndexedProbe {
         IDLE('I'),
         OPEN('.');
 
-
-        static WorkerStat resolv(char key) {
+        private final static WorkerStat resolv(char key) {
             return map.get(key);
         }
-        static synchronized void add(char key, WorkerStat value) {
+        private final static synchronized void add(char key, WorkerStat value) {
             map.put(key, value);
         }
-        WorkerStat(char key) {
+        private WorkerStat(char key) {
             WorkerStat.add(key, this);
         }
-    }
-
-    public void configure(Integer port) {
-        try {
-            configure(new URL("http", getHost().getDnsName(), port, "/server-status?auto"));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * @return Returns the url.
-     */
-    public String getUrlAsString() {
-        String retValue = "";
-        try {
-            URL tempUrl = new URL("http", getUrl().getHost(), getUrl().getPort(), "/");
-            retValue = tempUrl.toString();
-        } catch (MalformedURLException e) {
-        }
-        return retValue;
-    }
-
-    public String getIndexName() {
-        int port = getUrl().getPort();
-        if(port <= 0)
-            port = 80;
-        return Integer.toString(port);
-    }
-
-    /* (non-Javadoc)
-     * @see jrds.probe.HttpProbe#parseStream(java.io.InputStream)
-     */
-    @Override
-    protected Map<String, Number> parseStream(InputStream stream) {
-        Map<String, Number> vars = java.util.Collections.emptyMap();
-        log(Level.DEBUG, "Getting %s", getUrl());
-        try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(stream));
-            List<String> lines = new ArrayList<String>();
-            String lastLine;
-            while((lastLine = in.readLine()) != null)
-                lines.add(lastLine);
-            in.close();
-            vars = parseLines(lines);
-        } catch (IOException e) {
-            log(Level.ERROR, e, "Unable to read url %s because: %s", getUrl(), e.getMessage());
-        }
-        return vars;
     }
 
     /* (non-Javadoc)
@@ -111,15 +55,14 @@ public class ApacheStatusDetails extends HCHttpProbe implements IndexedProbe {
     protected Map<String, Number> parseLines(List<String> lines) {
         Map<String, Number> retValue = new HashMap<String, Number>(lines.size());
         for(String l: lines) {
-            String[] kvp = l.split(": ");
-            try {
-                if("Scoreboard".equals(kvp[0].trim())) {
-                    parseScoreboard(kvp[1].trim(), retValue);
-                }
-                else
-                    retValue.put(kvp[0], Double.valueOf(kvp[1]));
+            String[] kvp = l.split(":");
+            if("Scoreboard".equals(kvp[0].trim())) {
+                parseScoreboard(kvp[1].trim(), retValue);
             }
-            catch (java.lang.NumberFormatException ex) {};
+            else {
+                Double value = Util.parseStringNumber(kvp[1].trim(), Double.NaN);
+                retValue.put(kvp[0].trim(), value);
+            }
         }
         Number uptimeNumber = retValue.remove("Uptime");
         if(uptimeNumber != null)
@@ -131,11 +74,12 @@ public class ApacheStatusDetails extends HCHttpProbe implements IndexedProbe {
         int workers[] = new int[WorkerStat.values().length];
         for(char c: scoreboard.toCharArray()) {
             WorkerStat worker = WorkerStat.resolv(c);
-            workers[worker.ordinal()]++;
+            if(worker != null)
+                workers[worker.ordinal()]++;
         }
         for(WorkerStat worker: WorkerStat.values()) {
             retValue.put(worker.toString(), workers[worker.ordinal()]);
         }
-
     }
+    
 }

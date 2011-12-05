@@ -17,18 +17,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jrds.Util;
+
 import org.apache.log4j.Level;
 
 /**
- * A class to probe the apache status from the /server-status URL
+ * A class to probe the apache status from the mod_status
  * @author Fabrice Bacchella 
- * @version $Revision$,  $Date$
  */
 public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
 
     public void configure(Integer port) {
         try {
             configure(new URL("http", getHost().getDnsName(), port, "/server-status?auto"));
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("MalformedURLException",e);
+        }
+    }
+
+    public void configure(Integer port, String statuspath) {
+        try {
+            configure(new URL("http", getHost().getDnsName(), port, statuspath + "?auto"));
         } catch (MalformedURLException e) {
             throw new RuntimeException("MalformedURLException",e);
         }
@@ -43,6 +52,7 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
             URL tempUrl = new URL("http", getUrl().getHost(), getUrl().getPort(), "/");
             retValue = tempUrl.toString();
         } catch (MalformedURLException e) {
+            throw new RuntimeException("MalformedURLException",e);
         }
         return retValue;
     }
@@ -81,11 +91,9 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
     protected Map<String, Number> parseLines(List<String> lines) {
         Map<String, Number> retValue = new HashMap<String, Number>(lines.size());
         for(String l: lines) {
-            String[] kvp = l.split(": ");
-            try {
-                retValue.put(kvp[0], Double.valueOf(kvp[1]));
-            }
-            catch (java.lang.NumberFormatException ex) {};
+            String[] kvp = l.split(":");
+            Double value = Util.parseStringNumber(kvp[1].trim(), Double.NaN);
+            retValue.put(kvp[0].trim(), value);
         }
         Number uptimeNumber = retValue.remove("Uptime");
         if(uptimeNumber != null)
