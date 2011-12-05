@@ -337,7 +337,9 @@ public class Util {
                 env.put("url.signature", jrds.Util.stringSignature(((UrlProbe) o).getUrlAsString()));
             }
             if(o instanceof ConnectedProbe) {
-                env.put("connection.name", ((ConnectedProbe) o).getConnectionName());
+                ConnectedProbe cp = (ConnectedProbe) o;
+                env.put("connection.name", cp.getConnectionName());
+                env.put("connection.name.signature", stringSignature(cp.getConnectionName()));
             }
             if( o instanceof Probe) {
                 Probe<?,?> p = ((Probe<?,?>) o);
