@@ -39,7 +39,7 @@ public final class HttpResponseTime extends ExternalCmdProbe implements UrlProbe
 	/* (non-Javadoc)
 	 * @see jrds.probe.UrlProbe#getPort()
 	 */
-	public int getPort() {
+	public Integer getPort() {
 		return getUrl().getPort();
 	}
 }

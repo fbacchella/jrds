@@ -164,7 +164,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
 		return "JDBC";
 	}
 
-	public int getPort() {
+	public Integer getPort() {
 		return 0;
 	}
 

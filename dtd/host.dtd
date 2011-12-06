@@ -19,7 +19,7 @@
 		type CDATA #REQUIRED
 		name CDATA #IMPLIED
 >
-<!ELEMENT probe ((arg| list)*, dslist?, threshold*, properties?) >
+<!ELEMENT probe ((arg| attr)*, list*, dslist?, threshold*, properties?) >
 <!ATTLIST probe
 			type CDATA #REQUIRED
 			label CDATA #IMPLIED
@@ -30,6 +30,11 @@
 			type CDATA #REQUIRED
 			value CDATA #REQUIRED
 >
+<!ELEMENT attr (#PCDATA)>
+<!ATTLIST attr
+			name CDATA #REQUIRED
+>
+
 <!ELEMENT list (arg, list)+ >
 <!ELEMENT threshold (action+ ) >
 <!ATTLIST threshold

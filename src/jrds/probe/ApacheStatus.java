@@ -27,19 +27,21 @@ import org.apache.log4j.Level;
  */
 public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
 
-    public void configure(Integer port) {
-        try {
-            configure(new URL("http", getHost().getDnsName(), port, "/server-status?auto"));
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("MalformedURLException",e);
-        }
+    public ApacheStatus() {
+        super();
+        this.file = "/server-status";
     }
 
-    public void configure(Integer port, String statuspath) {
-        try {
-            configure(new URL("http", getHost().getDnsName(), port, statuspath + "?auto"));
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("MalformedURLException",e);
+    public void configure() {
+        if(this.url == null) {
+            try {
+                configure(new URL("http", getHost().getDnsName(), port, file + "?auto"));
+            } catch (MalformedURLException e) {
+                throw new RuntimeException("MalformedURLException",e);
+            }
+        }
+        else {
+            configure();
         }
     }
 
@@ -100,4 +102,5 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
             setUptime(uptimeNumber.longValue());
         return retValue;
     }
+
 }

@@ -1,9 +1,3 @@
-/*##########################################################################
-_##
-_##  $Id$
-_##
-_##########################################################################*/
-
 package jrds.probe.snmp;
 
 import java.io.IOException;
@@ -13,6 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import jrds.factories.ProbeBean;
 import jrds.probe.IndexedProbe;
 import jrds.snmp.SnmpRequester;
 
@@ -23,6 +18,7 @@ import org.snmp4j.smi.OID;
 /**
  * @author Fabrice Bacchella
  */
+@ProbeBean({"index",  "Oid"})
 public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 
     static public final String INDEXOIDNAME="indexOid";
@@ -33,7 +29,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 
     static final SnmpRequester indexFinder = SnmpRequester.TABULAR;
     static final SnmpRequester valueFinder = SnmpRequester.RAW;
-
+    
     public boolean configure(String indexKey) {
         this.key = indexKey;
         this.indexKey = indexKey;
@@ -176,6 +172,35 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
         if(indexArray != null)
             retValue = makeIndexed(getOidNameMap().keySet(), indexArray);
         return retValue;
+    }
+
+    /**
+     * @return the indexKey
+     */
+    public String getIndex() {
+        return indexKey;
+    }
+
+    /**
+     * @param indexKey the indexKey to set
+     */
+    public void setIndex(String indexKey) {
+        this.indexKey = indexKey;
+        this.key = indexKey;
+    }
+
+    /**
+     * @return the indexOid
+     */
+    public OID getOid() {
+        return indexOid;
+    }
+
+    /**
+     * @param indexOid the indexOid to set
+     */
+    public void setOid(OID indexOid) {
+        this.indexOid = indexOid;
     }
 
 }

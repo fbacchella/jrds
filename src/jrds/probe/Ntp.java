@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jrds.Probe;
+import jrds.factories.ProbeBean;
 import jrds.starter.Resolver;
 
 import org.apache.commons.net.ntp.NTPUDPClient;
@@ -13,9 +14,10 @@ import org.apache.commons.net.ntp.NtpV3Packet;
 import org.apache.commons.net.ntp.TimeInfo;
 import org.apache.log4j.Level;
 
+@ProbeBean({"port"})
 public class Ntp extends Probe<String, Number> {
 	static final NTPUDPClient client = new NTPUDPClient();
-	int port = NTPUDPClient.DEFAULT_PORT;
+	Integer port = NTPUDPClient.DEFAULT_PORT;
 
 	public Boolean configure() {
 		return true;
@@ -69,5 +71,19 @@ public class Ntp extends Probe<String, Number> {
 	public long getUptime() {
 		return Long.MAX_VALUE;
 	}
+
+    /**
+     * @return the port
+     */
+    public Integer getPort() {
+        return port;
+    }
+
+    /**
+     * @param port the port to set
+     */
+    public void setPort(Integer port) {
+        this.port = port;
+    }
 
 }

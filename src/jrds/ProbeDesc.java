@@ -6,7 +6,9 @@ _##########################################################################*/
 
 package jrds;
 
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -20,6 +22,9 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import jrds.factories.ArgFactory;
+import jrds.factories.ProbeBean;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
@@ -55,6 +60,7 @@ public class ProbeDesc implements Cloneable {
     private float uptimefactor = (float) 1.0;
     private Map<String, String> properties = null;
     private Map<String, Double> defaultValues = new HashMap<String,Double>(0);
+    private final Map<String, PropertyDescriptor> beans = new HashMap<String, PropertyDescriptor>();
 
     private static final class DsDesc {
         public DsType dsType;
@@ -367,8 +373,30 @@ public class ProbeDesc implements Cloneable {
         return probeClass;
     }
 
+    @SuppressWarnings("unchecked")
     public void setProbeClass(Class<? extends Probe<?,?>> probeClass) {
         this.probeClass = probeClass;
+        while(probeClass != null && Probe.class.isAssignableFrom(probeClass)) {
+            if(probeClass.isAnnotationPresent(ProbeBean.class)) {
+                try {
+                    ProbeBean beansAnnotation = probeClass.getAnnotation(ProbeBean.class);
+                    Map<String, PropertyDescriptor> tryBeans = ArgFactory.getBeanPropertiesMap(probeClass);
+                    if(beansAnnotation != null) {
+                        for(String bean: beansAnnotation.value()) {
+                            PropertyDescriptor foundBean = tryBeans.get(bean);
+                            if(foundBean !=null && foundBean.getWriteMethod() != null)
+                                beans.put(bean, tryBeans.get(bean));
+                        }
+                    }
+                } catch (InvocationTargetException e) {
+                }
+            }
+            probeClass = (Class<? extends Probe<?, ?>>) probeClass.getSuperclass();
+        }
+    }
+    
+    public PropertyDescriptor getBean(String name) {
+        return beans.get(name);
     }
 
     public String getName() {

@@ -1,5 +1,6 @@
 package jrds.configuration;
 
+import java.beans.PropertyDescriptor;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
@@ -187,7 +188,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
         }
     }
 
-    public Probe<?,?> makeProbe(JrdsElement probeNode, RdsHost host, StarterNode ns) {
+    public Probe<?,?> makeProbe(JrdsElement probeNode, RdsHost host, StarterNode ns) throws InvocationTargetException {
         Probe<?,?> p = null;
         String type = probeNode.attrMap().get("type");
 
@@ -211,26 +212,6 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
             return null;
         p.setHost(host);
 
-
-
-        //		for(JrdsNode thresholdNode: probeNode.iterate(CompiledXPath.get("threshold"))) {
-        //			Map<String, String> thresholdAttr = thresholdNode.attrMap();
-        //			String name = thresholdAttr.get("name").trim();
-        //			String dsName = thresholdAttr.get("dsName").trim();
-        //			double value = Double.parseDouble(thresholdAttr.get("value").trim());
-        //			long duration = Long.parseLong(thresholdAttr.get("duration").trim());
-        //			String operationStr = thresholdAttr.get("limit").trim();
-        //			Comparator operation = Comparator.valueOf(operationStr.toUpperCase());
-        //
-        //			Threshold t= new Threshold(name, dsName, value, duration, operation);
-        //			for(JrdsNode actionNode: thresholdNode.iterate(CompiledXPath.get("action"))) {
-        //				String actionType = actionNode.getChild(CompiledXPath.get("@type")).getTextContent().trim().toUpperCase();
-        //				Threshold.Action a = Threshold.Action.valueOf(actionType);
-        //				t.addAction(a, makeArgs(actionNode));
-        //			}
-        //			p.addThreshold(t);
-        //		}
-
         ChainedProperties cp = ns.find(ChainedProperties.class);
         String label = probeNode.getAttribute("label");
         if(label != null && ! "".equals(label)) {
@@ -244,6 +225,37 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                 ((ConnectedProbe)p).setConnectionName(jrds.Util.parseTemplate(connexionName, cp));
             }
         }
+        
+        ProbeDesc pd = p.getPd();
+        //Resolve the beans
+        for(JrdsElement attrNode: probeNode.getChildElementsByName("attr")) {
+            String name = attrNode.getAttribute("name");
+            PropertyDescriptor bean = pd.getBean(name);
+            if(bean == null) {
+                logger.error(String.format("Can't configure %s for %s, unknown attribute: %s", pd.getName(), host, name));
+                return null;
+            }
+            String textValue = attrNode.getTextContent();
+            logger.trace(Util.delayedFormatString("Fond attribute %s with value %s", name, textValue));
+            try {
+                Constructor<?> c = bean.getPropertyType().getConstructor(String.class);
+                Object value = c.newInstance(textValue);
+                bean.getWriteMethod().invoke(p, value);
+            } catch (IllegalArgumentException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (SecurityException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (InstantiationException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (IllegalAccessException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (InvocationTargetException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (NoSuchMethodException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            }
+        }
+        
         List<Object> args = ArgFactory.makeArgs(probeNode, cp, host);
         if( !pf.configure(p, args)) {
             logger.error(p + " configuration failed");

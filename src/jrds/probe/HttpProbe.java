@@ -17,6 +17,7 @@ import java.util.Map;
 
 import jrds.Probe;
 import jrds.RdsHost;
+import jrds.factories.ProbeBean;
 import jrds.starter.Resolver;
 import jrds.starter.Starter;
 
@@ -32,12 +33,13 @@ import org.apache.log4j.Level;
  *
  * @author Fabrice Bacchella 
  */
+@ProbeBean({"port",  "file", "url"})
 public abstract class HttpProbe extends Probe<String, Number> implements UrlProbe {
-    private URL url = null;
-    private String host = null;
-    private int	   port = 0;
-    private String file = null;
-    private List<Object> argslist = null;
+    protected URL url = null;
+    protected String host = null;
+    protected Integer port = 0;
+    protected String file = null;
+    protected List<Object> argslist = null;
     Starter resolver = null;
 
     public void configure(URL url) {
@@ -198,8 +200,8 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
         return getUrl().toString();
     }
 
-    public int getPort() {
-        return getUrl().getPort();
+    public Integer getPort() {
+        return port;
     }
 
     /**
@@ -250,4 +252,26 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
     public String getSourceType() {
         return "HTTP";
     }
+    
+    /**
+     * @param port the port to set
+     */
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
+    /**
+     * @return the path
+     */
+    public String getFile() {
+        return file;
+    }
+
+    /**
+     * @param path the path to set
+     */
+    public void setFile(String path) {
+        this.file = path;
+    }
+
 }

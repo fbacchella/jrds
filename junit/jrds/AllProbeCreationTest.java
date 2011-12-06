@@ -2,6 +2,7 @@ package jrds;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Map;
@@ -39,7 +40,7 @@ public class AllProbeCreationTest {
     }
 
     @Test
-    public void makeProbe() throws ParserConfigurationException, IOException, URISyntaxException {
+    public void makeProbe() throws ParserConfigurationException, IOException, URISyntaxException, InvocationTargetException {
         PropertiesManager pm = new PropertiesManager();
         pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());

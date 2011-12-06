@@ -23,7 +23,7 @@ public class DummyProbeIndexedUrl extends DummyProbeIndexed implements UrlProbe 
 		}
 	}
 
-	public int getPort() {
+	public Integer getPort() {
 		return url.getPort();
 	}
 

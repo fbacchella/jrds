@@ -184,7 +184,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
     /**
      * @return Returns the port.
      */
-    public int getPort() {
+    public Integer getPort() {
         return port;
     }
     /**
