@@ -1,4 +1,4 @@
-<project name="jrds" default="war" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:cpptasks="antlib:net.sf.antcontrib.cpptasks" >
+<project name="jrds" default="war" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant" >
 	<!-- set global properties for this build -->
 	<property name="app.name" value="jrds"/>
 	<property name="app.path" value="/${app.name}"/>
@@ -13,14 +13,6 @@
 	<property name="testdir" value="tmp"/>
 	
 	<property file="local.properties" />
-
-	<!-- uses osArch and osName instead of os.name and os.arch, so they can be overriden -->
-	<!-- and beside of that, os.name for Mac Os contains a space -->
-	<property name="osArch" value="${os.arch}"/>
-	<condition property="osName" value="MacOSX" else="${os.name}" >
-		<os name="Mac OS X"/>
-	</condition>
-	<property name="build.native" value="${basedir}/build/native.${osName}.${osArch}"/>
 
 	<!--  ==================== Compilation Control Options ==================== -->
 	<property name="compile.debug" value="true"/>
@@ -63,16 +55,6 @@
 		<path refid="project.classpath"/>
 	</path>
 	
-	<!-- ==================== compile path =========================== -->
-	<path id="jni.include.path">
-		<pathelement path="${java.home}/include" />
-		<pathelement path="${java.home}/include/linux" />
-		<pathelement path="${java.home}/include/solaris" />
-		<pathelement path="${java.home}/../include" />
-		<pathelement path="${java.home}/../include/linux" />
-		<pathelement path="${java.home}/../include/solaris" />
-	</path>
-	
 	<target name="compile">
 		<mkdir dir="${build.home}/classes"/>
 		<mkdir dir="${build.home}/probes"/>
@@ -81,32 +63,6 @@
 			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
 			<classpath refid="external.classpath"/>
 		</javac>
-	</target>
-
-	<target name="jni" depends="compile">
-		<condition property="os.isMacOSX">
-			<os name="Mac OS X"/>
-		</condition>
-		<mkdir dir="${build.native}"/>
-		<javah outputFile="${build.native}/direct.h">
-			<class name="jrds.caching.FilePage" />
-			<class name="jrds.caching.PageCache" />
-			<classpath refid="test.classpath"/>
-		</javah>
-		<cpptasks:cc name="gcc" outtype="shared" outfile="${build.native}/direct"  optimize="speed" objdir="${build.native}" >
-			<includepath>
-				<path path="${build.native}" />
-				<path refid="jni.include.path" />
-			</includepath>
-			<fileset dir="src" includes="**/*.c" />
-		</cpptasks:cc>
-		<antcall target="rename.dylib" />
-	</target>
-
-	<target name="rename.dylib" if="os.isMacOSX">
-		<!-- FIXME: this is a hack; the cpptask should have an option to change the
-		suffix or at least understand the override from dylib to jnilib -->
-		<move file="${build.native}/libdirect.dylib" tofile="${build.native}/libdirect.jnilib" />
 	</target>
 
 	<target name="compile.test" depends="compile">
