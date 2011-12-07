@@ -248,11 +248,6 @@
 			<tarfileset dir="${build.home}/probes" prefix="WEB-INF/lib">
 				<include name="*.jar"/>
 			</tarfileset>
-			<tarfileset dir="${build.native}" prefix="WEB-INF/lib">
-				<include name="*.so"/>
-				<include name="*.dll"/>
-				<include name="*.jnilib"/>
-			</tarfileset>
 		</tar>
 		<gzip src="${build.home}/${app.name}.tar" destfile="${build.home}/${app.name}.tar.gz"/>
 	</target>
@@ -278,11 +273,6 @@
 			</lib>
 			<lib dir="${build.home}/probes">
 				<include name="*.jar"/>
-			</lib>
-			<lib dir="${build.native}">
-				<include name="*.so"/>
-				<include name="*.dll"/>
-				<include name="*.jnilib"/>
 			</lib>
     	</war>
 	</target>
