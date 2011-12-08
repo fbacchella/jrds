@@ -10,7 +10,7 @@
 	<property name="web.src" value="${basedir}/web"/>
 	<property name="web.build" value="${build.home}/webapp"/>
 	<property name="compile.deprecation" value="yes"/>
-	<property name="testdir" value="tmp"/>
+	<property name="testdir" value="${build.home}/tests"/>
 	
 	<property file="local.properties" />
 
