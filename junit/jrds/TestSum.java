@@ -19,6 +19,11 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.rrd4j.ConsolFun;
+import org.rrd4j.core.FetchData;
+import org.rrd4j.core.RrdDb;
+import org.rrd4j.data.DataProcessor;
+import org.rrd4j.data.LinearInterpolator;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
 
@@ -76,8 +81,9 @@ public class TestSum {
 
         Probe<?,?> p = Full.create(testFolder);
         long endSec = Full.fill(p);
-        
         Period pr = Full.getPeriod(p, endSec);
+        long begin = pr.getBegin().getTime() / 1000;
+        long end = pr.getEnd().getTime() / 1000;
 
         GraphDesc gd = Full.getGd();
         gd.setGraphName("SumTest");
@@ -86,25 +92,29 @@ public class TestSum {
 
         hl.addHost(p.getHost());
         hl.addProbe(p);
-        logger.trace(p.getGraphList());
-
+        
         ArrayList<String> glist = new ArrayList<String>();
         glist.add("Empty/SumTest");
         Sum s = new Sum("A sum test", glist);
         s.configure(hl);
-        Util.serialize(s.getGraphDesc().dumpAsXml(), System.out, null, null);
         PlottableMap ppm = s.getCustomData();
-        long begin = pr.getBegin().getTime() / 1000;
-        long end = pr.getEnd().getTime() / 1000;
-
         ppm.configure(begin, end, Full.STEP);
+        
+        RrdDb db = new RrdDb(p.getRrdName());
+        FetchData fd = db.createFetchRequest(ConsolFun.AVERAGE, begin, end).fetchData();        
+        DataProcessor dp =  new DataProcessor(begin, end);
+        dp.addDatasource("shade", fd);
+        dp.setFetchRequestResolution(Full.STEP);
+        dp.processData();    
+        LinearInterpolator li = new LinearInterpolator(dp.getTimestamps(), dp.getValues("shade"));
+        
         for(long i = begin; i < end - Full.STEP; i += Full.STEP) {
-            Assert.assertFalse(Util.delayedFormatString("a NaN found in the sum at step %d", i).toString(), Double.isNaN(ppm.get("shade").getValue(i)));
+            Assert.assertEquals("Sum get wrong value", ppm.get("shade").getValue(i), li.getValue(i), 1e-7);
         }
         
         Graph g = new Graph(s);
         g.setPeriod(pr);
-        File outputFile =  new File(testFolder.getRoot(), "sum.png");
+        File outputFile =  new File("tmp", "sum.png");
         OutputStream out = new FileOutputStream(outputFile);
         g.writePng(out);
 

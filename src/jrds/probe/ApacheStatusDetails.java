@@ -56,6 +56,8 @@ public class ApacheStatusDetails extends ApacheStatus {
         Map<String, Number> retValue = new HashMap<String, Number>(lines.size());
         for(String l: lines) {
             String[] kvp = l.split(":");
+            if(kvp.length !=2)
+                continue;
             if("Scoreboard".equals(kvp[0].trim())) {
                 parseScoreboard(kvp[1].trim(), retValue);
             }

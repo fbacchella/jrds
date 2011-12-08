@@ -72,7 +72,6 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
     @Override
     protected Map<String, Number> parseStream(InputStream stream) {
         Map<String, Number> vars = java.util.Collections.emptyMap();
-        log(Level.DEBUG,"Getting %s", getUrl());
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(stream));
             List<String> lines = new ArrayList<String>();
@@ -94,6 +93,8 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
         Map<String, Number> retValue = new HashMap<String, Number>(lines.size());
         for(String l: lines) {
             String[] kvp = l.split(":");
+            if(kvp.length !=2)
+                continue;
             Double value = Util.parseStringNumber(kvp[1].trim(), Double.NaN);
             retValue.put(kvp[0].trim(), value);
         }
