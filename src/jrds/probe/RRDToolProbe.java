@@ -12,6 +12,7 @@ import org.rrd4j.core.jrrd.RRDatabase;
 import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.Probe;
+import jrds.factories.ProbeBean;
 import jrds.graphe.RRDToolGraphNode;
 
 /**
@@ -19,6 +20,7 @@ import jrds.graphe.RRDToolGraphNode;
  * @author Fabrice Bacchella
  *
  */
+@ProbeBean({"rrdfile"})
 public class RRDToolProbe extends Probe<String, Double> {
     private File rrdpath;
 
@@ -29,6 +31,14 @@ public class RRDToolProbe extends Probe<String, Double> {
         } catch (IOException e) {
         }
         return rrdpath.canRead();
+    }
+    
+    public void setRrdFile(File rrdpath) {
+        this.rrdpath = rrdpath;
+    }
+    
+    public File getRrdFile() {
+        return rrdpath;
     }
 
     /* (non-Javadoc)

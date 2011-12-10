@@ -173,7 +173,7 @@ public class ProbeDesc implements Cloneable {
         Object collectKey = null;
         String name = null;
         DsType type = null;
-        
+
         //Where to look for the added name
         if(valuesMap.containsKey("dsName")) {
             name = (String) valuesMap.get("dsName");
@@ -185,7 +185,7 @@ public class ProbeDesc implements Cloneable {
         if(valuesMap.containsKey("dsType")) {
             type = (DsType) valuesMap.get("dsType");
         }
-        
+
         //Where to look for the collect info
         if(valuesMap.containsKey("collect")) {
             collectKey = valuesMap.get("collect");
@@ -200,7 +200,7 @@ public class ProbeDesc implements Cloneable {
         else {
             collectKey = name;
         }
-        
+
         if(valuesMap.containsKey("defaultValue")) {
             defaultValues.put(name, jrds.Util.parseStringNumber(valuesMap.get("defaultValue").toString(), Double.NaN));
         }
@@ -374,29 +374,33 @@ public class ProbeDesc implements Cloneable {
     }
 
     @SuppressWarnings("unchecked")
-    public void setProbeClass(Class<? extends Probe<?,?>> probeClass) {
+    public void setProbeClass(Class<? extends Probe<?,?>> probeClass) throws InvocationTargetException {
         this.probeClass = probeClass;
         while(probeClass != null && Probe.class.isAssignableFrom(probeClass)) {
             if(probeClass.isAnnotationPresent(ProbeBean.class)) {
-                try {
-                    ProbeBean beansAnnotation = probeClass.getAnnotation(ProbeBean.class);
-                    Map<String, PropertyDescriptor> tryBeans = ArgFactory.getBeanPropertiesMap(probeClass);
-                    if(beansAnnotation != null) {
-                        for(String bean: beansAnnotation.value()) {
-                            PropertyDescriptor foundBean = tryBeans.get(bean);
-                            if(foundBean !=null && foundBean.getWriteMethod() != null)
-                                beans.put(bean, tryBeans.get(bean));
+                ProbeBean beansAnnotation = probeClass.getAnnotation(ProbeBean.class);
+                Map<String, PropertyDescriptor> tryBeans = ArgFactory.getBeanPropertiesMap(probeClass);
+                if(beansAnnotation != null) {
+                    for(String bean: beansAnnotation.value()) {
+                        PropertyDescriptor foundBean = tryBeans.get(bean);
+                        if(foundBean !=null && foundBean.getWriteMethod() != null)
+                            beans.put(bean, tryBeans.get(bean));
+                        else {
+                            throw new IllegalArgumentException("bean " + bean + " declared without setter");
                         }
                     }
-                } catch (InvocationTargetException e) {
                 }
             }
             probeClass = (Class<? extends Probe<?, ?>>) probeClass.getSuperclass();
         }
     }
-    
+
     public PropertyDescriptor getBean(String name) {
         return beans.get(name);
+    }
+
+    public Collection<PropertyDescriptor> getBeans() {
+        return beans.values();
     }
 
     public String getName() {

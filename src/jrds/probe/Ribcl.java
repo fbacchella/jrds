@@ -220,14 +220,14 @@ public class Ribcl extends Probe<String, Number> {
     /**
      * @return the passwd
      */
-    public String getPasswd() {
+    public String getPassword() {
         return passwd;
     }
 
     /**
      * @param passwd the passwd to set
      */
-    public void setPasswd(String passwd) {
+    public void setPassword(String passwd) {
         this.passwd = passwd;
     }
 

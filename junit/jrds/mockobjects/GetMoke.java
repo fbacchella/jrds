@@ -56,7 +56,6 @@ public class GetMoke {
         return gd;
     }
 
-    @SuppressWarnings("deprecation")
     static public HttpServletResponse getResponse(final OutputStream os) {
         return new HttpServletResponse() {
             private String encoding = null;
@@ -103,7 +102,6 @@ public class GetMoke {
         };
     }
 
-    @SuppressWarnings("deprecation")
     static public HttpServletRequest getRequest(final Map<String, String[]> p,  String... ctxPathArgs) {
         StringBuffer buffer = new StringBuffer("/");
         if( ctxPathArgs != null && ctxPathArgs.length > 0) {

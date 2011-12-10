@@ -18,7 +18,7 @@ import org.snmp4j.smi.OID;
 /**
  * @author Fabrice Bacchella
  */
-@ProbeBean({"index",  "Oid"})
+@ProbeBean({"index",  "oid"})
 public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 
     static public final String INDEXOIDNAME="indexOid";
