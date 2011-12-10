@@ -10,13 +10,16 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jrds.Util;
 import jrds.factories.xml.JrdsElement;
@@ -154,6 +157,25 @@ public final class ArgFactory {
         } catch (IntrospectionException e) {
             throw new InvocationTargetException(e, c.getName());
         }
+    }
+    
+    /**
+     * Enumerate the hierarchy of annotation for a class, until a certain class type is reached
+     * @param searched the Class where the annotation is searched
+     * @param annontationClass the annotation class
+     * @param stop a class that will stop (included) the search 
+     * @return
+     */
+    static public <T extends Annotation> Set<T> enumerateAnnotation(Class<?> searched, Class<T> annontationClass, Class<?> stop) {
+        Set<T> annotations =  new HashSet<T>();
+        while(searched != null && stop.isAssignableFrom(searched)) {
+            if(searched.isAnnotationPresent(annontationClass)) {
+                T annotation = searched.getAnnotation(annontationClass);
+                annotations.add(annotation);
+            }
+            searched = searched.getSuperclass();
+        }
+        return annotations;
     }
 
 }

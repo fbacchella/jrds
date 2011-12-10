@@ -2,7 +2,6 @@ package jrds.configuration;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,8 +11,6 @@ import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.Tools;
-import jrds.configuration.ConfigObjectFactory;
-import jrds.configuration.ConfigType;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import junit.framework.Assert;

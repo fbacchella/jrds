@@ -373,26 +373,19 @@ public class ProbeDesc implements Cloneable {
         return probeClass;
     }
 
-    @SuppressWarnings("unchecked")
     public void setProbeClass(Class<? extends Probe<?,?>> probeClass) throws InvocationTargetException {
-        this.probeClass = probeClass;
-        while(probeClass != null && Probe.class.isAssignableFrom(probeClass)) {
-            if(probeClass.isAnnotationPresent(ProbeBean.class)) {
-                ProbeBean beansAnnotation = probeClass.getAnnotation(ProbeBean.class);
-                Map<String, PropertyDescriptor> tryBeans = ArgFactory.getBeanPropertiesMap(probeClass);
-                if(beansAnnotation != null) {
-                    for(String bean: beansAnnotation.value()) {
-                        PropertyDescriptor foundBean = tryBeans.get(bean);
-                        if(foundBean !=null && foundBean.getWriteMethod() != null)
-                            beans.put(bean, tryBeans.get(bean));
-                        else {
-                            throw new IllegalArgumentException("bean " + bean + " declared without setter");
-                        }
-                    }
+        Map<String, PropertyDescriptor> tryBeans = ArgFactory.getBeanPropertiesMap(probeClass);
+        for(ProbeBean beansAnnotation: ArgFactory.enumerateAnnotation(probeClass, ProbeBean.class, Probe.class)) {
+            for(String bean: beansAnnotation.value()) {
+                PropertyDescriptor foundBean = tryBeans.get(bean);
+                if(foundBean !=null && foundBean.getWriteMethod() != null)
+                    beans.put(bean, tryBeans.get(bean));
+                else {
+                    throw new IllegalArgumentException("bean " + bean + " declared without setter");
                 }
             }
-            probeClass = (Class<? extends Probe<?, ?>>) probeClass.getSuperclass();
         }
+        this.probeClass = probeClass;
     }
 
     public PropertyDescriptor getBean(String name) {
