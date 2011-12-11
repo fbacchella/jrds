@@ -35,14 +35,12 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
     public void configure() {
         if(this.url == null) {
             try {
-                configure(new URL("http", getHost().getDnsName(), port, file + "?auto"));
+                url = new URL("http", getHost().getDnsName(), port, file + "?auto");
             } catch (MalformedURLException e) {
                 throw new RuntimeException("MalformedURLException",e);
             }
         }
-        else {
-            configure();
-        }
+        super.configure();
     }
 
     /**

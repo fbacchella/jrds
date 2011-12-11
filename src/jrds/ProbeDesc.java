@@ -388,8 +388,8 @@ public class ProbeDesc implements Cloneable {
         this.probeClass = probeClass;
     }
 
-    public PropertyDescriptor getBean(String name) {
-        return beans.get(name);
+    public Map<String, PropertyDescriptor> getBeanMap() {
+        return beans;
     }
 
     public Collection<PropertyDescriptor> getBeans() {

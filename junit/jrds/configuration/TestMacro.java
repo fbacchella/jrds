@@ -61,7 +61,7 @@ public class TestMacro {
         conf.setGraphDescMap();
         conf.setProbeDescMap();
 
-        Tools.setLevel(logger, Level.TRACE, "jrds.factories", "jrds.starter.ChainedProperties", "jrds.factories.xml");
+        Tools.setLevel(logger, Level.TRACE, "jrds.configuration.HostBuilder", "jrds.factories", "jrds.starter.ChainedProperties", "jrds.factories.xml");
         Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
     }
 

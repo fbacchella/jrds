@@ -45,7 +45,6 @@ public class MokeProbe<A,B> extends Probe<A,B> {
 			pd = new ProbeDesc();
 			pd.setName(probeType);
 			pd.setProbeName("dummyprobe");
-			setPd(pd);
 			Map<String, Object> dsMap = new HashMap<String, Object>();
 			dsMap.put("dsName", "ds0");
 			dsMap.put("dsType", DsType.COUNTER);

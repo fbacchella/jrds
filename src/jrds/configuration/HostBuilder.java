@@ -23,12 +23,14 @@ import jrds.RdsHost;
 import jrds.Util;
 import jrds.factories.ArgFactory;
 import jrds.factories.HostBuilderAgent;
+import jrds.factories.ProbeBean;
 import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.factories.xml.JrdsNode;
 import jrds.starter.ChainedProperties;
 import jrds.starter.Connection;
+import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 
 import org.apache.log4j.Logger;
@@ -39,6 +41,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
     private ClassLoader classLoader = null;
     private ProbeFactory pf;
     private Map<String, Macro> macrosMap;
+    private final Map<Class<?>, Map<String, PropertyDescriptor>> connectionsBeanCache = new HashMap<Class<?>, Map<String, PropertyDescriptor>>();
 
     public HostBuilder() {
         super(ConfigType.HOSTS);
@@ -225,37 +228,16 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                 ((ConnectedProbe)p).setConnectionName(jrds.Util.parseTemplate(connexionName, cp));
             }
         }
-        
+
         ProbeDesc pd = p.getPd();
         //Resolve the beans
-        for(JrdsElement attrNode: probeNode.getChildElementsByName("attr")) {
-            String name = attrNode.getAttribute("name");
-            PropertyDescriptor bean = pd.getBean(name);
-            if(bean == null) {
-                logger.error(String.format("Can't configure %s for %s, unknown attribute: %s", pd.getName(), host, name));
-                return null;
-            }
-            String textValue = attrNode.getTextContent();
-            logger.trace(Util.delayedFormatString("Fond attribute %s with value %s", name, textValue));
-            try {
-                Constructor<?> c = bean.getPropertyType().getConstructor(String.class);
-                Object value = c.newInstance(textValue);
-                bean.getWriteMethod().invoke(p, value);
-            } catch (IllegalArgumentException e) {
-                throw new InvocationTargetException(e, HostBuilder.class.getName());
-            } catch (SecurityException e) {
-                throw new InvocationTargetException(e, HostBuilder.class.getName());
-            } catch (InstantiationException e) {
-                throw new InvocationTargetException(e, HostBuilder.class.getName());
-            } catch (IllegalAccessException e) {
-                throw new InvocationTargetException(e, HostBuilder.class.getName());
-            } catch (InvocationTargetException e) {
-                throw new InvocationTargetException(e, HostBuilder.class.getName());
-            } catch (NoSuchMethodException e) {
-                throw new InvocationTargetException(e, HostBuilder.class.getName());
-            }
+        try {
+            setAttributes(probeNode, p, pd.getBeanMap());
+        } catch (IllegalArgumentException e) {
+            logger.error(String.format("Can't configure %s for %s: %s", pd.getName(), host, e));
+            return null;
         }
-        
+
         List<Object> args = ArgFactory.makeArgs(probeNode, cp, host);
         if( !pf.configure(p, args)) {
             logger.error(p + " configuration failed");
@@ -295,7 +277,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
         }
     }
 
-    public void makeConnexion(JrdsElement domNode, StarterNode sNode) {
+    private void makeConnexion(JrdsElement domNode, StarterNode sNode) {
         for(JrdsElement cnxNode: domNode.getChildElementsByName("connection")) {
             List<Object> args = ArgFactory.makeArgs(cnxNode);
             String type = cnxNode.attrMap().get("type");
@@ -316,7 +298,24 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                 }
                 Constructor<?> theConst = connectionClass.getConstructor(constArgsType);
                 o = (Connection<?>)theConst.newInstance(constArgsVal);
-                if(name !=null && ! "".equals(name))
+                Map<String, PropertyDescriptor> beans = connectionsBeanCache.get(connectionClass);
+                if(beans == null) {
+                    beans = new  HashMap<String, PropertyDescriptor>();
+                    Map<String, PropertyDescriptor> tryBeans = ArgFactory.getBeanPropertiesMap(connectionClass);
+                    for(ProbeBean beansAnnotation: ArgFactory.enumerateAnnotation(connectionClass, ProbeBean.class, Starter.class)) {
+                        for(String bean: beansAnnotation.value()) {
+                            PropertyDescriptor foundBean = tryBeans.get(bean);
+                            if(foundBean !=null && foundBean.getWriteMethod() != null)
+                                beans.put(bean, tryBeans.get(bean));
+                            else {
+                                throw new IllegalArgumentException("bean " + bean + " declared without setter");
+                            }
+                        }
+                    }
+                    connectionsBeanCache.put(connectionClass, beans);
+                }
+                setAttributes(cnxNode, o, beans);
+                if(name != null && ! name.trim().isEmpty())
                     o.setName(name.trim());
                 sNode.registerStarter(o);
                 logger.debug(Util.delayedFormatString("Connexion registred: %s for %s", o, sNode));
@@ -336,6 +335,37 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                         ": " + ex, ex);
             }
         }
+    }
+
+    private void setAttributes(JrdsElement probeNode, Object o, Map<String, PropertyDescriptor> beans) throws IllegalArgumentException, InvocationTargetException {
+        //Resolve the beans
+        for(JrdsElement attrNode: probeNode.getChildElementsByName("attr")) {
+            String name = attrNode.getAttribute("name");
+            PropertyDescriptor bean = beans.get(name);
+            if(bean == null) {
+                throw new IllegalArgumentException("Unknonw bean " + bean);
+            }
+            String textValue = attrNode.getTextContent();
+            logger.trace(Util.delayedFormatString("Fond attribute %s with value %s", name, textValue));
+            try {
+                Constructor<?> c = bean.getPropertyType().getConstructor(String.class);
+                Object value = c.newInstance(textValue);
+                bean.getWriteMethod().invoke(o, value);
+            } catch (IllegalArgumentException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (SecurityException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (InstantiationException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (IllegalAccessException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (InvocationTargetException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (NoSuchMethodException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            }
+        }
+
     }
 
     /**
