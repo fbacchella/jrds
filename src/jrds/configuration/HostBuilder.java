@@ -101,7 +101,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
         }
 
         Map<String, String> hostprop = makeProperties(fragment);
-        if(hostprop != null) {
+        if(hostprop != null && ! hostprop.isEmpty()) {
             ChainedProperties temp = new ChainedProperties(hostprop);
             ns.registerStarter(temp);
         }

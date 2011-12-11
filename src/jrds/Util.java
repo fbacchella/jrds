@@ -598,11 +598,11 @@ public class Util {
         }
     }
 
-    static	public boolean rolesAllowed(Set<String> allowedRoles, Set<String> userRoles) {
+    static public boolean rolesAllowed(Set<String> allowedRoles, Set<String> userRoles) {
         return ! Collections.disjoint(allowedRoles, userRoles);
     }
 
-    private  static final class Formater {
+    private static final class Formater {
         private final String format;
         private final Object[] args;
         private Formater(final String format, final Object ...args) {
@@ -622,7 +622,7 @@ public class Util {
      * @return
      */
     static public Object delayedFormatString(final String format, final Object ...args) {
-        return new  Formater(format, args);
+        return new Formater(format, args);
     }
 
 }
