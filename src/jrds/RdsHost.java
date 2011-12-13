@@ -81,7 +81,7 @@ public class RdsHost  extends StarterNode implements Comparable<RdsHost> {
                 break;
             long duration = (System.currentTimeMillis() - start) / 1000 ;
             if(duration > (currrd.getStep() / 2 )) {
-                log(Level.ERROR, "Collectan too long: %ds", duration);
+                log(Level.ERROR, "Collect too slow: %ds", duration);
                 break;
             }
             currrd.collect();
