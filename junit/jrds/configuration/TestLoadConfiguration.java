@@ -31,10 +31,15 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestLoadConfiguration {
     static final private Logger logger = Logger.getLogger(TestLoadConfiguration.class);
+
+    @Rule
+    public final TemporaryFolder testFolder = new TemporaryFolder();
 
     static final private String propertiesXmlString = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" +
@@ -78,34 +83,36 @@ public class TestLoadConfiguration {
                     "</host>";
 
     static DocumentBuilder dbuilder;
-    static ConfigObjectFactory conf;
-    static PropertiesManager pm = new PropertiesManager();
+    //static ConfigObjectFactory conf;
+    //static PropertiesManager pm = new PropertiesManager();
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.prepareXml(false);
+        Tools.setLevel(logger, Level.TRACE, "jrds", "jrds.configuration", "jrds.Probe.DummyProbe", "jrds.snmp");
+        Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
+    }
 
-        pm.setProperty("configdir", "tmp/conf");
-        pm.setProperty("rrddir", "tmp");
+    private ConfigObjectFactory prepare(PropertiesManager pm) throws IOException {
+        pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
         pm.update();
         pm.libspath.clear();
         File descpath = new File(System.getProperty("user.dir"), "desc");
         if(descpath.exists())
             pm.libspath.add(descpath.toURI());
 
-        conf = new ConfigObjectFactory(pm);
+        ConfigObjectFactory conf = new ConfigObjectFactory(pm);
         conf.setGraphDescMap();
         conf.setProbeDescMap();
-
-        Tools.setLevel(logger, Level.TRACE, "jrds", "jrds.configuration", "jrds.Probe.DummyProbe", "jrds.snmp");
-        Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
+        return conf;     
     }
 
     @Test
     public void testFilter() throws Exception {
         JrdsDocument d = Tools.parseRessource("view1.xml");
-
+        PropertiesManager pm = new PropertiesManager();
         FilterBuilder fb = new FilterBuilder();
         fb.setPm(pm);
         Filter f = fb.makeFilter(d);
@@ -115,7 +122,10 @@ public class TestLoadConfiguration {
     @Test
     public void testProbe2() throws Exception {
         JrdsDocument d = Tools.parseString(goodProbeXml2);
-
+        PropertiesManager pm = new PropertiesManager();
+        pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
+        pm.update();
         HostBuilder hb = new HostBuilder();
         hb.setProbeFactory(new MokeProbeFactory());
         hb.setPm(pm);
@@ -133,7 +143,10 @@ public class TestLoadConfiguration {
     @Test
     public void testDsreplace() throws Exception {
         JrdsDocument d = Tools.parseRessource("dsoverride.xml");
-
+        PropertiesManager pm = new PropertiesManager();
+        pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
+        pm.update();
         HostBuilder hb = new HostBuilder();
         ProbeFactory pf =  new MokeProbeFactory();
         hb.setProbeFactory(pf);
@@ -181,7 +194,7 @@ public class TestLoadConfiguration {
 
         hostdoc.getRootElement().addElement("macro", "name=macrodef");
         jrds.Util.serialize(hostdoc, System.out, null, null);
-
+        PropertiesManager pm = new PropertiesManager();
         HostBuilder hb = new HostBuilder();
         hb.setPm(pm);
         hb.setMacros(macroMap);
@@ -217,7 +230,7 @@ public class TestLoadConfiguration {
 
         JrdsDocument hostdoc = Tools.parseString(goodHostXml);
         hostdoc.getRootElement().addElement("macro", "name=macrodef");
-
+        PropertiesManager pm = new PropertiesManager();
         HostBuilder hb = new HostBuilder();
         hb.setPm(pm);
         hb.setMacros(macroMap);
@@ -246,7 +259,7 @@ public class TestLoadConfiguration {
         je.addElement("macro", "name=macrodef");
         je.addElement("properties").
         addElement("entry", "key=a").addTextNode("bidule");
-
+        PropertiesManager pm = new PropertiesManager();
         HostBuilder hb = new HostBuilder();
         hb.setPm(pm);
         hb.setMacros(macroMap);
@@ -275,9 +288,10 @@ public class TestLoadConfiguration {
         jrds.factories.xml.JrdsElement je = hostNode.getRootElement();
         je.addElement("tag").addTextNode(tagname);
         je.addElement("snmp", "community=public", "version=2");
-
+        PropertiesManager pm = new PropertiesManager();
         Map<String, JrdsDocument> hostDescMap = new HashMap<String, JrdsDocument>();
         hostDescMap.put("name", hostNode);
+        ConfigObjectFactory conf = prepare(pm);
         conf.getLoader().setRepository(ConfigType.HOSTS, hostDescMap);
         Map<String, RdsHost> hostMap = conf.setHostMap();
         logger.trace(hostMap);
@@ -295,7 +309,7 @@ public class TestLoadConfiguration {
     @Test
     public void testProperties() throws Exception {
         JrdsDocument pnode = Tools.parseString(propertiesXmlString);
-
+        PropertiesManager pm = new PropertiesManager();
         HostBuilder hb = new HostBuilder();
         hb.setPm(pm);
 

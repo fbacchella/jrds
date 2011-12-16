@@ -26,6 +26,7 @@ public class MokeProbe<A,B> extends Probe<A,B> {
 	}
 
 	public MokeProbe(ProbeDesc pd) {
+	    probeType = pd.getName();
 		setPd(pd);
 	}
 
