@@ -16,7 +16,7 @@ import jrds.starter.Connection;
 
 import org.apache.log4j.Level;
 
-@ProbeBean({"port, user, password"})
+@ProbeBean({"port", "user", "password"})
 public class JMXConnection extends Connection<MBeanServerConnection> {
 
 	final static String startTimeObjectName = "java.lang:type=Runtime";
