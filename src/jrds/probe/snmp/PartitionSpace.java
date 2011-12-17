@@ -23,18 +23,6 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
     static final private OID usedOid = new OID(".1.3.6.1.2.1.25.2.3.1.6");
 
     /**
-     * @param monitoredHost
-     * @param indexKey
-     */
-    public boolean configure(String indexKey) {
-        return super.configure(indexKey);
-    }
-
-    public boolean configure(String keyName, OID indexKey) {
-        return super.configure(keyName, indexKey);
-    }
-
-    /**
      * The want to store the value in octet, not in bloc size
      * The translation is done by the probe, not the graph
      * @see jrds.Probe#filterValues(java.util.Map)

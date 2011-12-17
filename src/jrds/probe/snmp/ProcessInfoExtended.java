@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import jrds.factories.ProbeBean;
 import jrds.snmp.SnmpVars;
 import jrds.snmp.TabularIterator;
 
@@ -28,6 +29,7 @@ import org.snmp4j.smi.OID;
  * @author Fabrice Bacchella 
  * @version $Revision: 321 $,  $Date: 2006-08-14 14:03:04 +0000 (lun., 14 août 2006) $
  */
+@ProbeBean({"index",  "pattern"})
 public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
     static final private OID hrSWRunPath = new OID(".1.3.6.1.2.1.25.4.2.1.4");
     static final private OID hrSWRunParameters = new OID(".1.3.6.1.2.1.25.4.2.1.5");
@@ -39,7 +41,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
     static final private String NUM = "Number";
     static final private String CPU = "Cpu";
 
-    private Pattern pattern;
+    private Pattern pattern = null;
 
     /**
      * @param monitoredHost
@@ -144,6 +146,20 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
     @Override
     public int getSuffixLength() {
         return 0;
+    }
+
+    /**
+     * @return the pattern
+     */
+    public String getPattern() {
+        return pattern.pattern();
+    }
+
+    /**
+     * @param pattern the pattern to set
+     */
+    public void setPattern(String patternString) {
+        this.pattern = Pattern.compile(patternString);
     }
 
 }
