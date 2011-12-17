@@ -14,7 +14,7 @@
 <!ATTLIST macro
 	name CDATA #REQUIRED
 >
-<!ELEMENT connection (arg|list)* >
+<!ELEMENT connection ((arg| attr)*,list*) >
 <!ATTLIST connection
 		type CDATA #REQUIRED
 		name CDATA #IMPLIED
