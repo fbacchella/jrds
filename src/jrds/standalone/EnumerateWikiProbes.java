@@ -1,17 +1,22 @@
 package jrds.standalone;
 
+import java.beans.PropertyDescriptor;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import jrds.Probe;
 import jrds.ProbeConnected;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.configuration.ConfigObjectFactory;
+import jrds.factories.ArgFactory;
+import jrds.factories.ProbeBean;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.core.DsDef;
@@ -88,7 +93,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         if(withProbe) {
             probePath = p.getPd().getName().toLowerCase();
         }
-        return String.format("[[sourcetype:%s:%s|%s]]", sourceType, probePath, sourceType);
+        return String.format("[[sourcetype:%s:%s|%s]]", sourceType, probePath, p.getPd().getName());
     }
 
     private String oneLine(Probe<?, ?> p) {
@@ -128,6 +133,42 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
                 System.out.println();
             }
         }
+
+        //Enumerates the beans informations
+        try {
+            Set<ProbeBean> beansAnnotations = ArgFactory.enumerateAnnotation(pd.getProbeClass(), ProbeBean.class, Probe.class);
+            if(! beansAnnotations.isEmpty()) {
+                Map<String, PropertyDescriptor> tryBeans = ArgFactory.getBeanPropertiesMap(pd.getProbeClass());
+                System.out.println();
+                System.out.println(doTitle("Attributes"));
+                System.out.println();
+                System.out.println("^ Name ^ Default value ^ Description ^");
+                for(ProbeBean beansAnnotation: beansAnnotations) {
+                    for(String bean: beansAnnotation.value()) {
+                        PropertyDescriptor foundBean = tryBeans.get(bean);
+                        if(foundBean == null || foundBean.getWriteMethod() == null) {
+                            continue;
+                        }
+                        Method readMethod = foundBean.getReadMethod();
+                        String defaultValue = "";
+                        if(readMethod != null) {
+                            try {
+                                Object o = readMethod.invoke(p);
+                                if(o != null)
+                                    defaultValue = o.toString();
+                            } catch (Exception e) {
+                            }
+                        }
+                        if(foundBean != null && foundBean.getWriteMethod() != null)
+                            System.out.println("| " + foundBean.getName() + " | " + defaultValue + " | | ");
+                    }
+                }
+                System.out.println();
+            }
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
         System.out.println(doTitle("Data stores"));
         System.out.println();
         System.out.println("^ Name ^ Type ^ Description ^");
