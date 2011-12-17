@@ -343,7 +343,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
             String name = attrNode.getAttribute("name");
             PropertyDescriptor bean = beans.get(name);
             if(bean == null) {
-                throw new IllegalArgumentException("Unknonw bean " + bean);
+                throw new IllegalArgumentException("Unknonw bean " + name);
             }
             String textValue = attrNode.getTextContent();
             logger.trace(Util.delayedFormatString("Fond attribute %s with value %s", name, textValue));
