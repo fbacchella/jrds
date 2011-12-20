@@ -34,7 +34,6 @@
 <!ATTLIST attr
 			name CDATA #REQUIRED
 >
-
 <!ELEMENT list (arg, list)+ >
 <!ELEMENT threshold (action+ ) >
 <!ATTLIST threshold
