@@ -23,7 +23,7 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
 
     static final private Pattern statlinepattern = Pattern.compile("^\\s+(\\d+)\\s+(.*)$");
 
-    private Integer port = 6081;
+    private int port = 6081;
     private Boolean welcome = false;
 
     public void configure(Integer port) {

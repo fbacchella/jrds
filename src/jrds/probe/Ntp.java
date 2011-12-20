@@ -17,7 +17,7 @@ import org.apache.log4j.Level;
 @ProbeBean({"port"})
 public class Ntp extends Probe<String, Number> {
 	static final NTPUDPClient client = new NTPUDPClient();
-	Integer port = NTPUDPClient.DEFAULT_PORT;
+	int port = NTPUDPClient.DEFAULT_PORT;
 
 	public Boolean configure() {
 		return true;
@@ -28,7 +28,6 @@ public class Ntp extends Probe<String, Number> {
 		return configure();
 	}
 
-	
 	/* (non-Javadoc)
 	 * @see jrds.Probe#setTimeout(int)
 	 */

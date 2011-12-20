@@ -37,8 +37,8 @@ import org.apache.log4j.Level;
 public abstract class HttpProbe extends Probe<String, Number> implements UrlProbe {
     protected URL url = null;
     protected String host = null;
-    protected Integer port = 0;
-    protected String file = null;
+    protected int port = 80;
+    protected String file = "/";
     protected List<Object> argslist = null;
     Starter resolver = null;
 
@@ -210,18 +210,6 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
     public URL getUrl() {
         if(url == null) {
             try {
-                if(port == 0) {
-                    String portStr = getPd().getSpecific("port");
-                    if(portStr != null && ! "".equals(portStr) && argslist != null)
-                        portStr = String.format(portStr, argslist.toArray());
-                    port = jrds.Util.parseStringNumber(portStr, 80).intValue();
-                }
-                if(file == null) {
-                    file = getPd().getSpecific("file");
-                    if(file == null || "".equals(file)) {
-                        file = "/";
-                    }
-                }
                 if(argslist != null) {
                     try {
                         String urlString = String.format("http://" + host + ":" + port + file, argslist.toArray());

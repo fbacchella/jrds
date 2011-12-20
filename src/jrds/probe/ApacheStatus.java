@@ -29,7 +29,6 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
 
     public ApacheStatus() {
         super();
-        this.file = "/server-status";
     }
 
     public void configure() {
