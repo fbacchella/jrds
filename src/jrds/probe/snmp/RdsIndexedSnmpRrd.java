@@ -1,6 +1,7 @@
 package jrds.probe.snmp;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,22 +24,19 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 
     static public final String INDEXOIDNAME="indexOid";
 
-    Object key;
+    OID key;
     String indexKey;
     private OID indexOid;
 
     static final SnmpRequester indexFinder = SnmpRequester.TABULAR;
     static final SnmpRequester valueFinder = SnmpRequester.RAW;
-    
+
     public boolean configure(String indexKey) {
-        this.key = indexKey;
         this.indexKey = indexKey;
         return configure();
     }
 
     public boolean configure(Integer indexKey) {
-        configure();
-        this.key = indexKey;
         this.indexKey = String.valueOf(indexKey);
         return configure();
     }
@@ -48,8 +46,8 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
      * @param indexKey
      */
     public boolean configure(OID indexKey) {
-        this.key = indexKey;
         this.indexKey = indexKey.toString();
+        this.key = indexKey;
         return configure();
     }
 
@@ -70,8 +68,12 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
     public boolean readSpecific() {
         getPd().addSpecific(REQUESTERNAME, "RAW");
         String oidString =  getPd().getSpecific(INDEXOIDNAME);
-        if(oidString != null && oidString.length() > 0) 
+        if(oidString != null && oidString.length() > 0) {
             indexOid = new OID(oidString);
+        }
+        //else {
+        //    log(Level.ERROR,"No index OID specified");
+        //}
         return super.readSpecific();
     }
 
@@ -79,24 +81,30 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
         return indexKey;
     }
 
-    public Set<OID> makeIndexed(Collection<OID> oids, int[] index)
+    /**
+     * Build a set of OID to collect by appending the OID index to the given set of OID
+     * @param oids the OID used for the base
+     * @param index the OID suffix to append
+     * @return a set of OID that will be collected
+     */
+    protected Set<OID> makeIndexed(Collection<OID> oids, int[] index)
     {
         Set<OID> oidToGet = new HashSet<OID>(oids.size());
         for(OID oidCurs: oids) {
-                OID oidBuf = new OID(oidCurs);
-                for(int i = 0; i <index.length; i++) {
-                    oidBuf.append(index[i]);
-                }
-                oidToGet.add(oidBuf);
+            OID oidBuf = new OID(oidCurs.getValue(), index);
+            oidToGet.add(oidBuf);
         }
         return oidToGet;
     }
 
-    public Collection<OID> getIndexSet() {
-        Collection<OID> retValue = null;
+    /**
+     * Return the set of indexes OID
+     * @return the set of OID used as indexes
+     */
+    protected Collection<OID> getIndexSet() {
         if(indexOid != null)
-            retValue = Collections.singleton(indexOid);
-        return retValue;
+            return  Collections.singleton(indexOid);
+        return Collections.emptySet();
     }
 
     public int getIndexPrefixLength() {
@@ -105,47 +113,28 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
 
     /**
      * Generate the index suffix for the probe
-     * @return
+     * @return the OID suffix for the index
      */
     public int[] setIndexValue() 
     {
-        Collection<OID> soidSet = getIndexSet();
-
         //If we already have the key, no need to search for it
-        if(key instanceof OID) {
-            OID suffixOid = (OID) key;
-            return suffixOid.getValue();
-        }
-        //If no index OID, the indexKey is already the snmp suffix.
-        else if(soidSet == null || soidSet.size() == 0) {
-            OID suffixOid = new OID(indexKey);
-            setSuffixLength(suffixOid.size());
-            return suffixOid.getValue();
+        if(key != null) {
+            return key.getValue();
         }
         else {
             try {
+                Collection<OID> soidSet = getIndexSet();
                 Map<OID, Object> somevars = indexFinder.doSnmpGet(getSnmpStarter(), soidSet);
 
-                boolean found = false;
-                int newSuffixLength = 0;
                 for(Map.Entry<OID, Object> e: somevars.entrySet()) {
                     OID tryoid = e.getKey();
-                    String name = e.getValue().toString();
-                    if(name != null && matchIndex(somevars.get(tryoid))) {
-                        newSuffixLength = tryoid.size() - getIndexPrefixLength();
-                        int[] index = new int[ newSuffixLength ];
-                        for(int i = 0; i < index.length ; i++) {
-                            index[i] = tryoid.get(i + getIndexPrefixLength());
-                        }
+                    if(e.getValue() != null && matchIndex(somevars.get(tryoid))) {
+                        int[] index = Arrays.copyOfRange(tryoid.getValue(), getIndexPrefixLength(), tryoid.size());
+                        setSuffixLength(tryoid.size() - getIndexPrefixLength());
                         return index;
                     }
                 }
-                if(found) {
-                    setSuffixLength(newSuffixLength);
-                }
-                else  {
-                    log(Level.ERROR, "index for %s not found", indexKey);
-                }
+                log(Level.ERROR, "index for %s not found", indexKey);
             } catch (IOException e) {
                 log(Level.ERROR, e, "index for %s not found because of %s", indexKey, e);
             }
@@ -160,7 +149,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
      * @return
      */
     public boolean matchIndex(Object readKey) {
-        return key.equals(readKey);
+        return indexKey.equals(readKey.toString());
     }
 
     /**
@@ -186,21 +175,20 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
      */
     public void setIndex(String indexKey) {
         this.indexKey = indexKey;
-        this.key = indexKey;
     }
 
     /**
      * @return the indexOid
      */
     public OID getOid() {
-        return indexOid;
+        return key;
     }
 
     /**
      * @param indexOid the indexOid to set
      */
     public void setOid(OID indexOid) {
-        this.indexOid = indexOid;
+        this.key = indexOid;
     }
 
 }
