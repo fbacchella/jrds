@@ -65,11 +65,11 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
                 String instance = diskKstat.getInstance();
                 String kName = diskKstat.getName();
                 if("statistics".equals(kName)) {
-                    addProbe(hostElement, "KstatNetstats2", Arrays.asList("String", "Integer"), Arrays.asList(module, instance));                   
+                    addProbe(hostElement, "KstatNetstats2", Arrays.asList("String", "Integer"), Arrays.asList(module, instance), null);                   
                     byTriplet.remove(diskKstat.getTriplet());
                 }
                 else if(kName.equals(module + instance)) {
-                    addProbe(hostElement, "KstatNetstats", Arrays.asList("String", "Integer"), Arrays.asList(module, instance));                   
+                    addProbe(hostElement, "KstatNetstats", Arrays.asList("String", "Integer"), Arrays.asList(module, instance), null);                   
                     byTriplet.remove(diskKstat.getTriplet());
                 }
             }
@@ -94,7 +94,7 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
                     Kstat active  = remoteJk.getKstat(module, instance, name);
                     if(active != null) {
                         log(Level.DEBUG, "probe found: %s:%d:%s", module, instance, name);
-                        addProbe(hostElement, probe, null, null);
+                        addProbe(hostElement, probe, null, null, null);
                         byTriplet.remove(active.getTriplet());
                     }
                     else if(IndexedProbe.class.isAssignableFrom(c)) {
@@ -106,7 +106,7 @@ public class JKStatDiscoverAgent extends DiscoverAgent {
                             if(m.matches()) {
                                 String index = m.group(1);
                                 log(Level.TRACE, "index found: %s for probe %s, with pattern %s and kstat probe %s", index, probe, indexedFetch.pattern(), mp);
-                                addProbe(hostElement, probe, Collections.singletonList("Integer"), Collections.singletonList(index));
+                                addProbe(hostElement, probe, Collections.singletonList("Integer"), Collections.singletonList(index), null);
                             }
                         }
                     }

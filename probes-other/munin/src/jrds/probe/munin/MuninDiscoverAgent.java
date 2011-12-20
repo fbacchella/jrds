@@ -81,7 +81,7 @@ public class MuninDiscoverAgent extends DiscoverAgent {
                 if(fetchValue != null && ! "".equals(fetchValue) &&  muninClass.isAssignableFrom(c)) {
                     if( muninProbes.contains(fetchValue) ) {
                         muninProbes.remove(fetchValue);
-                        addProbe(hostElement, name, null, null);
+                        addProbe(hostElement, name, null, null, null);
                     }
 
                     else if(IndexedProbe.class.isAssignableFrom(c)) {
@@ -91,7 +91,7 @@ public class MuninDiscoverAgent extends DiscoverAgent {
                             if(m.matches()) {
                                 String index = m.group(1);
                                 log(Level.TRACE, "index found: %s for probe %s, with pattern %s and munin probe %s", index, name, indexedFetch.pattern(), mp);
-                                addProbe(hostElement, name, Collections.singletonList("String"), Collections.singletonList(index));
+                                addProbe(hostElement, name, Collections.singletonList("String"), Collections.singletonList(index), null);
                             }
                         }
                     }

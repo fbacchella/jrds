@@ -82,12 +82,12 @@ public abstract class DiscoverAgent {
      * @param argsValues a list of value for the argument
      * @return the generated element for this probe
      */
-    public Element addProbe(Element hostElem, String probe, List<String> argsTypes, List<String> argsValues) {
+    public Element addProbe(Element hostElem, String probe, List<String> argsTypes, List<String> argsValues, Map<String, String> beans) {
         Document hostDoc = hostElem.getOwnerDocument();
         Element rrdElem = hostDoc.createElement("probe");
         rrdElem.setAttribute("type", probe);
         hostElem.appendChild(rrdElem);
-        addArgsList(hostDoc, rrdElem, argsTypes, argsValues);
+        addArgsList(hostDoc, rrdElem, argsTypes, argsValues, beans);
         return rrdElem;
     }
 
@@ -96,11 +96,20 @@ public abstract class DiscoverAgent {
         Element cnxElement = hostDoc.createElement("connection");
         cnxElement.setAttribute("type", connexionClass);
         hostDoc.getDocumentElement().appendChild(cnxElement);
-        addArgsList(hostDoc, cnxElement, argsTypes, argsValues);
+        addArgsList(hostDoc, cnxElement, argsTypes, argsValues, null);
         return cnxElement;
     }
 
-    private void addArgsList(Document hostDoc, Element e, List<String> argsTypes, List<String> argsValues) {
+    private void addArgsList(Document hostDoc, Element e, List<String> argsTypes, List<String> argsValues, Map<String, String> beans) {
+        if(beans != null && ! beans.isEmpty()) {
+            for(Map.Entry<String, String> bean: beans.entrySet()) {
+                Element arg = hostDoc.createElement("attr");
+                arg.setAttribute("name", bean.getKey());
+                arg.setTextContent(bean.getValue());
+                e.appendChild(arg);
+                
+            }
+        }
         if(argsTypes != null && argsTypes.size() > 0 && argsTypes.size() == argsValues.size()) {
             for(int i=0; i < argsTypes.size(); i++) {
                 Element arg = hostDoc.createElement("arg");

@@ -3,7 +3,6 @@ package jrds.snmp;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -257,7 +256,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         OID OidExist = new OID(doesExistOid);
         String label = getLabel(active, Collections.singletonList(OidExist));
         if(label != null) {
-            addProbe(hostEleme, name, null, null);
+            addProbe(hostEleme, name, null, null, null);
         }
         log(Level.TRACE, "%s does exist: %s", name, label);
     }
@@ -291,20 +290,17 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         Map<OID, Object> indexes = SnmpRequester.TREE.doSnmpGet(active, oidsSet);
         log(Level.TRACE, "Elements : %s", indexes);
         for(Map.Entry<OID, Object> e: indexes.entrySet()) {
+            Map<String, String> beans = new HashMap<String, String>(2);
             count++;
             OID indexoid = e.getKey();
             String indexName = e.getValue().toString();
             int index = indexoid.last();
-            List<String> argsTypes = new ArrayList<String>(1);
-            argsTypes.add("String");
-            List<String> argsValues = new ArrayList<String>(1);
-            argsValues.add(indexName);
+            beans.put("index", indexName);
 
             if(withOid) {
-                argsTypes.add("OID");
-                argsValues.add(Integer.toString(index));
+                beans.put("oid", Integer.toString(index));
             }
-            Element rrdElem = addProbe(hostEleme, name, argsTypes, argsValues);
+            Element rrdElem = addProbe(hostEleme, name, null, null, beans);
 
             //We try to auto-generate the label
             if (labelOid != null && ! "".equals(labelOid)) {
