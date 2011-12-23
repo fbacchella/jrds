@@ -2,15 +2,13 @@ package jrds.probe;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.Tools;
-import jrds.ProbeDesc;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
@@ -41,6 +39,8 @@ public class HttpTest {
 		ProbeDesc pd = new ProbeDesc();
 		p.setHost(webserver);
 		p.setPd(pd);
+		p.setFile("/");
+		p.setPort(80);
 		p.configure();
 		Assert.assertEquals("http://" + HOST + ":80/", p.getUrlAsString());
 	}
@@ -56,6 +56,8 @@ public class HttpTest {
 		p.setHost(webserver);
 		ProbeDesc pd = new ProbeDesc();
 		p.setPd(pd);		
+        p.setFile("/file");
+        p.setPort(80);
 		p.configure("/file");
 		Assert.assertEquals("http://" + HOST + ":80/file", p.getUrlAsString());
 	}
@@ -71,67 +73,10 @@ public class HttpTest {
 		p.setHost(webserver);
 		ProbeDesc pd = new ProbeDesc();
 		p.setPd(pd);		
-		p.configure(81, "/file");
+        p.setFile("/file");
+        p.setPort(81);
+        p.configure();
 		Assert.assertEquals("http://" + HOST + ":81/file", p.getUrlAsString());
-	}
-
-	@Test
-	public void build4() {
-		HttpProbe p = new HttpProbe() {
-			@Override
-			protected Map<String, Number> parseStream(InputStream stream) {
-				return null;
-			}
-		};
-		p.setHost(webserver);
-		ProbeDesc pd = new ProbeDesc();
-		pd.addSpecific("port", "81");
-		pd.addSpecific("file", "/file");
-		p.setPd(pd);
-		p.configure();
-		Assert.assertEquals("http://" + HOST + ":81/file", p.getUrlAsString());
-	}
-
-	@Test
-	public void build5() {
-		List<Object> args = new ArrayList<Object>();
-		args.add("/search");
-		args.add("81");
-		args.add("linux");
-
-		ProbeDesc pd = new ProbeDesc();
-		pd.addSpecific("port", "%2$s");
-		pd.addSpecific("file", "%1$s?q=%3$s");
-
-		HttpProbe p = new HttpProbe() {
-			@Override
-			protected Map<String, Number> parseStream(InputStream stream) {
-				return null;
-			}
-		};
-		p.setHost(webserver);
-		p.setPd(pd);
-		p.configure(args);
-		Assert.assertEquals("http://" + HOST + ":81/search?q=linux", p.getUrlAsString());
-		
 	}
 	
-	@Test
-	public void build6() {
-		List<Object> args = new ArrayList<Object>();
-		HttpProbe p = new HttpProbe() {
-			@Override
-			protected Map<String, Number> parseStream(InputStream stream) {
-				return null;
-			}
-		};
-		p.setHost(webserver);
-		ProbeDesc pd = new ProbeDesc();
-		pd.addSpecific("port", "81");
-		pd.addSpecific("file", "/file");
-		p.setPd(pd);
-		p.configure(args);
-		Assert.assertEquals("http://" + HOST + ":81/file", p.getUrlAsString());
-	}
-
 }
