@@ -8,7 +8,6 @@ import java.util.Map;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.Util;
-import jrds.factories.ArgFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 
@@ -54,7 +53,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
         setMethod(root.getElementbyName("probeName"), pd, "setProbeName");
         setMethod(root.getElementbyName("name"), pd, "setName");
         setMethod(root.getElementbyName("index"), pd, "setIndex");
-        
+
         logger.trace(Util.delayedFormatString("Creating probe description %s", pd.getName()));
 
         JrdsElement classElem = root.getElementbyName("probeClass");
@@ -68,7 +67,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
         pd.setHeartBeatDefault(pm.step * 2);
 
         setMethod(root.getElementbyName("uptimefactor"), pd, "setUptimefactor", Float.TYPE);
-        
+
         JrdsElement graphsElement= root.getElementbyName("graphs");
         if(graphsElement != null) {
             List<String> graphs =  new ArrayList<String>();
@@ -99,12 +98,15 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
             }
         }
 
-        //Populating default argument vector
+        //Populating the default arguments map
         JrdsElement argsNode = root.getElementbyName("defaultargs");
-        if(argsNode != null)
-            for(Object o:  ArgFactory.makeArgs(argsNode)) {
-                pd.addDefaultArg(o);
+        if(argsNode != null) {
+            for(JrdsElement attr: argsNode.getChildElementsByName("attr")) {
+                String beanName = attr.getAttribute("name");
+                String beanValue = attr.getTextContent();
+                pd.addDefaultArg(beanName, beanValue);
             }
+        }
 
         for(Map<String, Object> dsMap: doDsList(pd.getName(), root)) {
             pd.add(dsMap);			

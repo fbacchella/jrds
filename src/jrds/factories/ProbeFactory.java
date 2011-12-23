@@ -1,9 +1,3 @@
-/*##########################################################################
- _##
- _##  $Id$
- _##
- _##########################################################################*/
-
 package jrds.factories;
 
 import java.lang.reflect.Constructor;
@@ -94,9 +88,6 @@ public class ProbeFactory {
     }
 
     public boolean configure(Probe<?, ?> p,  List<?> constArgs) {
-        List<?> defaultsArgs = p.getPd().getDefaultArgs();
-        if(defaultsArgs != null && constArgs != null && constArgs.size() <= 0)
-            constArgs = defaultsArgs;
         Class<?>[] constArgsType = new Class[constArgs.size()];
         Object[] constArgsVal = new Object[constArgs.size()];
         int index = 0;

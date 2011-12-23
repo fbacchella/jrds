@@ -283,7 +283,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         return null;
     }
 
-    private int enumerateIndexed(Element hostEleme, SnmpStarter active, String name, String indexOid, String labelOid, boolean withOid ) throws IOException {
+    private int enumerateIndexed(JrdsElement hostEleme, SnmpStarter active, String name, String indexOid, String labelOid, boolean withOid ) throws IOException {
         int count = 0;
         log(Level.TRACE, "Will enumerate %s", indexOid);
         Set<OID> oidsSet = Collections.singleton(new OID(indexOid));

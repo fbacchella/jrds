@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -56,7 +55,7 @@ public class ProbeDesc implements Cloneable {
     private String name;
     private Collection<String> graphesList = new ArrayList<String>();
     private Class<? extends Probe<?,?>> probeClass = null;
-    private List<Object> defaultsArgs = null;
+    private Map<String, String> defaultsArgs = null;
     private float uptimefactor = (float) 1.0;
     private Map<String, String> properties = null;
     private Map<String, Double> defaultValues = new HashMap<String,Double>(0);
@@ -412,14 +411,16 @@ public class ProbeDesc implements Cloneable {
         specific.put(name, value);
     }
 
-    public void addDefaultArg(Object o){
+    public void addDefaultArg(String beanName, String beanValue) throws InvocationTargetException{
         if(defaultsArgs == null) 
-            defaultsArgs = new LinkedList<Object>();
-        defaultsArgs.add(o);
-        logger.trace("Adding " + o + " (" + o.getClass() + ") to default args");
+            defaultsArgs = new HashMap<String, String>();
+        if(beans.containsKey(beanName)) {
+            defaultsArgs.put(beanName, beanValue);
+            logger.trace(Util.delayedFormatString("Adding bean %s=%s (%s) to default args", beanName, beanValue));
+        }
     }
 
-    public List<Object> getDefaultArgs() {
+    public Map<String, String> getDefaultArgs() {
         return defaultsArgs;
     }
 

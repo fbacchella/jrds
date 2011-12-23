@@ -230,6 +230,32 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
         }
 
         ProbeDesc pd = p.getPd();
+        List<Object> args = ArgFactory.makeArgs(probeNode, cp, host);
+        //Prepare the probe with the default beans values
+        Map<String, String> defaultBeans = pd.getDefaultArgs();
+        if(defaultBeans!=null) {
+            for(Map.Entry<String, String> e: defaultBeans.entrySet()) {
+                try {
+                    String beanName = e.getKey();
+                    String beanValue = e.getValue();
+                    PropertyDescriptor bean = pd.getBeanMap().get(beanName);
+                    Object value;
+                    //If the last argument is a list, give it to the template parser
+                    Object lastArgs = args.isEmpty() ? null : args.get(args.size() - 1);
+                    if(lastArgs instanceof List) {
+                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), Util.parseTemplate(beanValue, p, lastArgs));
+                    }
+                    else {
+                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), jrds.Util.parseTemplate(beanValue, p));
+                    }
+                    logger.trace(jrds.Util.delayedFormatString("Adding bean %s=%s (%s) to default args", beanName, value, value.getClass()));
+                    bean.getWriteMethod().invoke(p, value);
+                } catch (Exception ex) {
+                    throw new RuntimeException("Invalid default bean " + e.getKey(), ex);
+                }
+            }
+        }
+
         //Resolve the beans
         try {
             setAttributes(probeNode, p, pd.getBeanMap());
@@ -238,7 +264,6 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
             return null;
         }
 
-        List<Object> args = ArgFactory.makeArgs(probeNode, cp, host);
         if( !pf.configure(p, args)) {
             logger.error(p + " configuration failed");
             return null;
@@ -345,7 +370,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
             if(bean == null) {
                 throw new IllegalArgumentException("Unknonw bean " + name);
             }
-            String textValue = attrNode.getTextContent();
+            String textValue = Util.parseTemplate(attrNode.getTextContent(), o);
             logger.trace(Util.delayedFormatString("Fond attribute %s with value %s", name, textValue));
             try {
                 Constructor<?> c = bean.getPropertyType().getConstructor(String.class);
