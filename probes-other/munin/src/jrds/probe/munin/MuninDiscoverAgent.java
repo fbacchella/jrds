@@ -83,7 +83,6 @@ public class MuninDiscoverAgent extends DiscoverAgent {
                         muninProbes.remove(fetchValue);
                         addProbe(hostElement, name, null, null, null);
                     }
-
                     else if(IndexedProbe.class.isAssignableFrom(c)) {
                         Pattern indexedFetch = Pattern.compile(fetchValue.replace("${index}", "(.+)"));
                         for(String mp: muninProbes) {
