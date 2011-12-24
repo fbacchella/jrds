@@ -6,7 +6,8 @@
 	<probeName>apachestatus_${index}</probeName>
 	<probeClass>jrds.probe.ApacheStatus</probeClass>
 	<defaultargs>
-		<arg type="Integer" value="80"/>
+		<attr name="port">80</attr>
+		<attr name="file">/server-status</attr>
 	</defaultargs>
 	<ds>
 		<dsName>Total Accesses</dsName>

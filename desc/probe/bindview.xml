@@ -8,7 +8,7 @@
 	<specific name="currentTimePath">/isc/bind/statistics/server/current-time</specific>
 	<specific name="timePattern">yyyy-MM-dd'T'HH:mm:ss'Z'</specific>
 	<defaultargs>
-		<arg type="String" value="_default" />
+        <attr name="file">_default</attr>
 	</defaultargs>
 
 	<!-- cache info -->

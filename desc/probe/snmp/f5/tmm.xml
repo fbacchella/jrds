@@ -7,7 +7,7 @@
 	<probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
     <specific name="indexOid">1.3.6.1.4.1.3375.2.1.8.2.3.1.1</specific>
 	<defaultargs>
-		<arg type="String" value="1.0" />
+        <attr name="index">1.0</attr>
 	</defaultargs>
 	<ds>
 		<dsName>ClientPktsIn</dsName>

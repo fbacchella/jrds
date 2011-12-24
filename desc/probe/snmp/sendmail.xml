@@ -6,7 +6,7 @@
 	<probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
     <specific name="indexOid"></specific>
 	<defaultargs>
-		<arg type="String" value="1" />
+        <attr name="index">1</attr>
 	</defaultargs>
     <ds>
         <dsName>mtaReceivedMsg</dsName>

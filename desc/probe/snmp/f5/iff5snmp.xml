@@ -6,7 +6,7 @@
 	<probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
     <specific name="indexOid">1.3.6.1.4.1.3375.2.1.2.4.1.2.1.1</specific>
 	<defaultargs>
-		<arg type="String" value="eth0" />
+        <attr name="index">eth0</attr>
 	</defaultargs>
 	<ds>
 		<dsName>ifInMulticastPkts</dsName>
