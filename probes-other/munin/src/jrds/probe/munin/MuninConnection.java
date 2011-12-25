@@ -33,11 +33,17 @@ public class MuninConnection extends Connection<MuninConnection.SocketChannels> 
         this.port = port;
     }
 
+    /* (non-Javadoc)
+     * @see jrds.starter.Connection#getConnection()
+     */
     @Override
     public SocketChannels getConnection() {
         return channel;
     }
 
+    /* (non-Javadoc)
+     * @see jrds.starter.Connection#setUptime()
+     */
     @Override
     public long setUptime() {
         return Long.MAX_VALUE;
@@ -62,7 +68,6 @@ public class MuninConnection extends Connection<MuninConnection.SocketChannels> 
     public void stopConnection() {
         try {
             channel.out.println("quit");
-            channel.out.close();
             int avalaible = channel.muninsSocket.getInputStream().available();
             while(avalaible > 0) {
                 channel.muninsSocket.getInputStream().read(new byte[avalaible]);
