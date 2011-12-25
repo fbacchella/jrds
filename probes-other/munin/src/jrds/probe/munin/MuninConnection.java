@@ -5,17 +5,18 @@ import java.net.Socket;
 
 import org.apache.log4j.Level;
 
+import jrds.factories.ProbeBean;
 import jrds.starter.Connection;
 import jrds.starter.SocketFactory;
 
+@ProbeBean({"port"})
 public class MuninConnection extends Connection<Socket> {
-    private final int DEFAULTMUNINPORT = 4949;
+    static final int DEFAULTMUNINPORT = 4949;
     private Socket muninsSocket = null;
-    private final int port;
+    private int port = DEFAULTMUNINPORT;
 
     public MuninConnection() {
         super();
-        port = DEFAULTMUNINPORT;
     }
 
     public MuninConnection(Integer port) {
@@ -51,6 +52,20 @@ public class MuninConnection extends Connection<Socket> {
             muninsSocket.close();
         } catch (IOException e) {
         }		
+    }
+
+    /**
+     * @return the port
+     */
+    public int getPort() {
+        return port;
+    }
+
+    /**
+     * @param port the port to set
+     */
+    public void setPort(int port) {
+        this.port = port;
     }
 
 }
