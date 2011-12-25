@@ -6,13 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.starter.Starter;
+import jrds.webapp.Discover.ProbeDescSummary;
 import jrds.webapp.DiscoverAgent;
 
 @Retention(RetentionPolicy.RUNTIME)
@@ -21,11 +21,6 @@ public @interface ProbeMeta {
     public class EmptyDiscoverAgent extends DiscoverAgent {
         public EmptyDiscoverAgent() {
             super("Empty");
-        }
-
-        @Override
-        public void discover(String hostname, JrdsElement hostElement,
-                Map<String,JrdsDocument> probdescs, HttpServletRequest request) {
         }
 
         @Override
@@ -39,6 +34,27 @@ public @interface ProbeMeta {
          */
         @Override
         public void doHtmlDiscoverFields(JrdsDocument document) {
+        }
+
+        @Override
+        public boolean exist(String hostname, HttpServletRequest request) {
+            return false;
+        }
+
+        @Override
+        public void addConnection(JrdsElement hostElement,
+                HttpServletRequest request) {
+        }
+
+        @Override
+        public boolean isGoodProbeDesc(ProbeDescSummary summary) {
+            return false;
+        }
+
+        @Override
+        public void addProbe(JrdsElement hostElement,
+                ProbeDescSummary summary, HttpServletRequest request) {
+            return;
         }
     };
 

@@ -19,6 +19,7 @@ import jrds.configuration.ConfigObjectFactory;
 import jrds.configuration.ConfigType;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
+import jrds.probe.IndexedProbe;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
@@ -31,6 +32,27 @@ public class Discover extends JrdsServlet {
 
     private static final String CONTENT_TYPE = "application/xml";
     private static final long serialVersionUID = 1L;
+    
+    public static final class ProbeDescSummary {
+        public final Class<?> clazz;
+        public final String name;
+        public final Map<String, String> specifics = new HashMap<String, String>();
+        public final JrdsDocument xml;
+        public final boolean isIndexed;
+        ProbeDescSummary(JrdsDocument probdesc, ClassLoader cl) throws ClassNotFoundException {
+            xml = probdesc;
+            JrdsElement root = probdesc.getRootElement();
+            JrdsElement buffer = root.getElementbyName("probeClass");
+            String probeClass = buffer == null ? null : buffer.getTextContent().trim();
+            clazz = cl.loadClass(probeClass);
+            isIndexed = IndexedProbe.class.isAssignableFrom(clazz);
+            buffer =  probdesc.getRootElement().getElementbyName("name");
+            name = buffer == null ? null : buffer.getTextContent();
+            for(JrdsElement specificElement: root.getChildElementsByName("specific") ) {
+                specifics.put(specificElement.getAttribute("name"), specificElement.getTextContent().trim());
+            }            
+        }
+    }
 
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -46,7 +68,7 @@ public class Discover extends JrdsServlet {
             return;               
         }
         hostname = hostname.trim();
-        
+
         PropertiesManager pm = getPropertiesManager();
 
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
@@ -88,7 +110,24 @@ public class Discover extends JrdsServlet {
 
         for(DiscoverAgent da: getHostsList().getDiscoverAgent()) {
             try {
-                da.discover(hostname, hostEleme, probdescs, request);
+                if(da.exist(hostname, request)) {
+                    da.addConnection(hostEleme, request);
+                    da.discoverPre(hostname, hostEleme, probdescs, request);
+                    for(JrdsDocument probeDescDocument: probdescs.values()) {
+                        try {
+                            ProbeDescSummary summary = new ProbeDescSummary(probeDescDocument, getPropertiesManager().extensionClassLoader);
+                            boolean valid = false;
+                            for(Class<?> c: da.validClasses) {
+                                valid |= c.isAssignableFrom(summary.clazz);
+                            }
+                            if (valid && da.isGoodProbeDesc(summary)) {
+                                da.addProbe(hostEleme, summary, request);
+                            }
+                        } catch (Exception e) {
+                        }
+                    }
+                    da.discoverPost(hostname, hostEleme, probdescs, request);
+                }
             } catch (NoClassDefFoundError e) {
                 logger.error("Discover agent " + da + " failed to load class with " + da.getClass().getClassLoader(), e);
             } catch (Throwable e) {
