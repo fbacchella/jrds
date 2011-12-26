@@ -121,6 +121,8 @@ public class SnmpVars extends HashMap<OID, Object> {
 
 	public void join(VariableBinding[] newVars)
 	{
+	    if(newVars == null)
+	        return;
 		for (int i = 0 ; i < newVars.length ; i++) {
 			addVariable(newVars[i])	;
 		}

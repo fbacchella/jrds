@@ -106,50 +106,42 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         log(Level.TRACE, "Will search for probes %s", sortedProbeName);
         for(String name: sortedProbeName) {
             ProbeDescSummary summary = summaries.get(name);
-            name = summary.name;
             if(done.contains(name))
                 continue;
             log(Level.TRACE, "Trying to discover probe %s", name);
-            String doesExistOid = summary.specifics.get("existOid");
-            String index =  summary.specifics.get("indexOid");
 
             try {
-                if(index != null && ! "".equals(index) ) {
-                    log(Level.TRACE, "Found probe %s with index %s", name, index);
-                    String labelOid = summary.specifics.get("labelOid");
-                    log(Level.TRACE, "label OID for %s: %s", name, labelOid);
-                    try {
-                        if(enumerateIndexed(hostEleme, active, name, index, labelOid, withOid) > 0) {
-                            done.add(name);
-                            String hides = summary.specifics.get("hides");
-                            if(hides != null && ! hides.isEmpty())
-                                done.add(hides);
-                        }
-                    } catch (Exception e1) {
-                        log(Level.ERROR, e1, "Error discoverer %s for index %s: %s", name, index, e1);
-                    }
-                }
-                else if(doesExistOid != null && ! "".equals(doesExistOid)) {
-                    doesExist(hostEleme, active, name, doesExistOid);
+                boolean found = false;
+                if(summary.isIndexed ) {
+                    found = (enumerateIndexed(hostEleme, summary, withOid) > 0);
                 }
                 else {
-                    log(Level.DEBUG, "undiscoverable probe: %s", name);
+                    found = doesExist(hostEleme, summary);
+                }
+                if(found) {
+                    done.add(summary.name);
+                    String hides = summary.specifics.get("hides");
+                    if(hides != null && ! hides.isEmpty())
+                        done.add(hides);
                 }
             } catch (Exception e1) {
-                log(Level.ERROR, e1, "Error detecting %s: %s" , name, e1);
+                log(Level.ERROR, e1, "Error detecting %s: %s" , summary.name, e1);
             }
-
         }
         active.doStop();
     }
 
-    private void doesExist(JrdsElement hostEleme, SnmpStarter active, String name, String doesExistOid) throws IOException {
-        OID OidExist = new OID(doesExistOid);
-        String label = getLabel(active, Collections.singletonList(OidExist));
-        if(label != null) {
-            addProbe(hostEleme, name, null, null, null);
+    private boolean doesExist(JrdsElement hostEleme, ProbeDescSummary summary) throws IOException {
+        OID OidExist = new OID(summary.specifics.get("existOid"));
+        Map<OID, Object> found = SnmpRequester.RAW.doSnmpGet(active, Collections.singletonList(OidExist));
+        if(found.size() > 0) {
+            addProbe(hostEleme, summary.name, null, null, null);
+            log(Level.TRACE, "%s does exist: %s", summary.name, found.values());
+            return true;
         }
-        log(Level.TRACE, "%s does exist: %s", name, label);
+        else {
+            return false;
+        }
     }
 
     private String getLabel(SnmpStarter active, List<OID> labelsOID) throws IOException {
@@ -162,15 +154,16 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         return null;
     }
 
-    private int enumerateIndexed(JrdsElement hostEleme, SnmpStarter active, String name, String indexOid, String labelOid, boolean withOid ) throws IOException {
+    private int enumerateIndexed(JrdsElement hostEleme, ProbeDescSummary summary, boolean withOid) throws IOException {
+        OID indexOid = new OID(summary.specifics.get("indexOid"));
         int count = 0;
         log(Level.TRACE, "Will enumerate %s", indexOid);
-        Set<OID> oidsSet = Collections.singleton(new OID(indexOid));
+        Set<OID> oidsSet = Collections.singleton(indexOid);
         Map<OID, Object> indexes = SnmpRequester.TREE.doSnmpGet(active, oidsSet);
         log(Level.TRACE, "Elements : %s", indexes);
         for(Map.Entry<OID, Object> e: indexes.entrySet()) {
-            Map<String, String> beans = new HashMap<String, String>(2);
             count++;
+            Map<String, String> beans = new HashMap<String, String>(2);
             OID indexoid = e.getKey();
             String indexName = e.getValue().toString();
             int index = indexoid.last();
@@ -179,15 +172,16 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
             if(withOid) {
                 beans.put("oid", Integer.toString(index));
             }
-            JrdsElement rrdElem = addProbe(hostEleme, name, null, null, beans);
+            JrdsElement rrdElem = addProbe(hostEleme, summary.name, null, null, beans);
 
             //We try to auto-generate the label
-            if (labelOid != null && ! "".equals(labelOid)) {
-                for(String lookin: labelOid.split(",")) {
+            String label = summary.specifics.get("labelOid");
+            if (label != null && ! label.isEmpty()) {
+                for(String lookin: label.split(",")) {
                     OID Oidlabel = new OID(lookin.trim() + "." + index);
-                    String label = getLabel(active, Collections.singletonList(Oidlabel));
-                    if(label != null) {
-                        rrdElem.setAttribute("label", label);
+                    String labelValue = getLabel(active, Collections.singletonList(Oidlabel));
+                    if(labelValue != null) {
+                        rrdElem.setAttribute("label", labelValue);
                         break;
                     }
                 }
@@ -253,6 +247,16 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
 
     @Override
     public boolean isGoodProbeDesc(ProbeDescSummary summary) {
+        String index =  summary.specifics.get("indexOid");
+        //drop indexed probes without index oid
+        if(summary.isIndexed && (index == null || index.isEmpty()))
+            return false;
+
+        String doesExistOid = summary.specifics.get("existOid");
+        //drop indexed probes without OID to check presence
+        if(!summary.isIndexed && (doesExistOid == null || doesExistOid.isEmpty()))
+            return false;
+
         return true;
     }
 
