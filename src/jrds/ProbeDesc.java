@@ -6,6 +6,7 @@ _##########################################################################*/
 
 package jrds;
 
+import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -373,12 +374,16 @@ public class ProbeDesc implements Cloneable {
     }
 
     public void setProbeClass(Class<? extends Probe<?,?>> probeClass) throws InvocationTargetException {
-        Map<String, PropertyDescriptor> tryBeans = ArgFactory.getBeanPropertiesMap(probeClass);
         for(ProbeBean beansAnnotation: ArgFactory.enumerateAnnotation(probeClass, ProbeBean.class, Probe.class)) {
             for(String bean: beansAnnotation.value()) {
-                PropertyDescriptor foundBean = tryBeans.get(bean);
+                PropertyDescriptor foundBean = null;
+                try {
+                    foundBean = new PropertyDescriptor(bean, probeClass);
+                } catch (IntrospectionException e) {
+                    throw new IllegalArgumentException("invalid bean " + bean, e);
+                }
                 if(foundBean !=null && foundBean.getWriteMethod() != null)
-                    beans.put(bean, tryBeans.get(bean));
+                    beans.put(bean, foundBean);
                 else {
                     throw new IllegalArgumentException("bean " + bean + " declared without setter");
                 }

@@ -1,5 +1,6 @@
 package jrds;
 
+import java.beans.PropertyDescriptor;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -8,6 +9,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.util.Collections;
@@ -354,6 +356,17 @@ public class Util {
                 String label = p.getLabel();
                 if(label != null) {
                     env.put("label", label);
+                }
+                for(PropertyDescriptor bean: p.getPd().getBeans()) {
+                    Method getter = bean.getReadMethod();
+                    if(getter != null) {
+                        try {
+                            Object val = getter.invoke(p);
+                            env.put("bean." + bean.getName(), val);
+                            env.put("bean." + bean.getName() + ".signature", stringSignature(val.toString()));
+                        } catch (Exception e) {
+                        }
+                    }
                 }
             } 
             if( o instanceof RdsHost) {

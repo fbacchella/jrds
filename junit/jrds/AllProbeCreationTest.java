@@ -5,17 +5,12 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.configuration.ConfigObjectFactory;
 import jrds.factories.ProbeFactory;
-import jrds.mockobjects.DummyProbe;
-import jrds.mockobjects.DummyProbeIndexed;
-import jrds.mockobjects.DummyProbeIndexedUrl;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -24,9 +19,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.rrd4j.core.RrdDb;
-import org.rrd4j.core.RrdDef;
-import org.rrd4j.core.Sample;
 
 public class AllProbeCreationTest {
     static final private Logger logger = Logger.getLogger(AllProbeCreationTest.class);

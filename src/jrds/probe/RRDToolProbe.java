@@ -33,11 +33,11 @@ public class RRDToolProbe extends Probe<String, Double> {
         return rrdpath.canRead();
     }
     
-    public void setRrdFile(File rrdpath) {
+    public void setRrdfile(File rrdpath) {
         this.rrdpath = rrdpath;
     }
     
-    public File getRrdFile() {
+    public File getRrdfile() {
         return rrdpath;
     }
 

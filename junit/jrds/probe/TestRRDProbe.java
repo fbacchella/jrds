@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
 import jrds.Graph;
@@ -13,6 +14,7 @@ import jrds.GraphNode;
 import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.Tools;
+import jrds.Util;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -33,6 +35,20 @@ public class TestRRDProbe {
         Tools.setLevel(logger, Level.TRACE, "jrds.Probe.RRDToolGraphNode", "jrds.graphe.RRDToolGraphNode");
     }
 
+    @Test
+    public void testBean() throws IOException, InvocationTargetException, IllegalArgumentException, IllegalAccessException {
+        RRDToolProbe p = new RRDToolProbe();
+        p.setHost(new RdsHost("toto"));
+        ProbeDesc pd = new ProbeDesc();
+        pd.setProbeClass(p.getClass());
+        pd.setName("Rrdtool");  
+        pd.setProbeName("rrdtool");
+        p.setPd(pd);
+        p.setRrdfile(rrdfile);
+        Assert.assertEquals("invalid rrdfile bean", p.getRrdfile(), pd.getBeanMap().get("rrdfile").getReadMethod().invoke(p));
+        Assert.assertEquals("invalid rrdfile bean template ", p.getRrdfile().toString(), Util.parseTemplate("${bean.rrdfile}", p));
+    }
+    
     @Test
     public void test1() throws IOException {
         RRDToolProbe p = new RRDToolProbe();
