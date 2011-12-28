@@ -1,5 +1,6 @@
 package jrds.configuration;
 
+import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -326,12 +327,20 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                 Map<String, PropertyDescriptor> beans = connectionsBeanCache.get(connectionClass);
                 if(beans == null) {
                     beans = new  HashMap<String, PropertyDescriptor>();
-                    Map<String, PropertyDescriptor> tryBeans = ArgFactory.getBeanPropertiesMap(connectionClass);
                     for(ProbeBean beansAnnotation: ArgFactory.enumerateAnnotation(connectionClass, ProbeBean.class, Starter.class)) {
                         for(String bean: beansAnnotation.value()) {
-                            PropertyDescriptor foundBean = tryBeans.get(bean);
-                            if(foundBean !=null && foundBean.getWriteMethod() != null)
-                                beans.put(bean, tryBeans.get(bean));
+                            //Bean already found, don't work on it again
+                            if(beans.containsKey(bean)) {
+                                continue;
+                            }
+                            PropertyDescriptor foundBean = null;
+                            try {
+                                foundBean = new PropertyDescriptor(bean, connectionClass);
+                            } catch (IntrospectionException e) {
+                                throw new IllegalArgumentException("invalid bean " + bean, e);
+                            }
+                            if(foundBean != null && foundBean.getWriteMethod() != null)
+                                beans.put(bean, foundBean);
                             else {
                                 throw new IllegalArgumentException("bean " + bean + " declared without setter");
                             }
