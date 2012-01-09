@@ -244,10 +244,10 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                     //If the last argument is a list, give it to the template parser
                     Object lastArgs = args.isEmpty() ? null : args.get(args.size() - 1);
                     if(lastArgs instanceof List) {
-                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), Util.parseTemplate(beanValue, p, lastArgs));
+                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), Util.parseTemplate(beanValue, host, lastArgs));
                     }
                     else {
-                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), jrds.Util.parseTemplate(beanValue, p));
+                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), jrds.Util.parseTemplate(beanValue, host));
                     }
                     logger.trace(jrds.Util.delayedFormatString("Adding bean %s=%s (%s) to default args", beanName, value, value.getClass()));
                     bean.getWriteMethod().invoke(p, value);
@@ -259,7 +259,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
 
         //Resolve the beans
         try {
-            setAttributes(probeNode, p, pd.getBeanMap());
+            setAttributes(probeNode, p, pd.getBeanMap(), host);
         } catch (IllegalArgumentException e) {
             logger.error(String.format("Can't configure %s for %s: %s", pd.getName(), host, e));
             return null;
@@ -348,7 +348,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                     }
                     connectionsBeanCache.put(connectionClass, beans);
                 }
-                setAttributes(cnxNode, o, beans);
+                setAttributes(cnxNode, o, beans, sNode);
                 if(name != null && ! name.trim().isEmpty())
                     o.setName(name.trim());
                 sNode.registerStarter(o);
@@ -371,7 +371,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
         }
     }
 
-    private void setAttributes(JrdsElement probeNode, Object o, Map<String, PropertyDescriptor> beans) throws IllegalArgumentException, InvocationTargetException {
+    private void setAttributes(JrdsElement probeNode, Object o, Map<String, PropertyDescriptor> beans, Object... context) throws IllegalArgumentException, InvocationTargetException {
         //Resolve the beans
         for(JrdsElement attrNode: probeNode.getChildElementsByName("attr")) {
             String name = attrNode.getAttribute("name");
@@ -380,7 +380,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                 logger.error("Unknonw bean " + name);
                 continue;
             }
-            String textValue = Util.parseTemplate(attrNode.getTextContent(), o);
+            String textValue = Util.parseTemplate(attrNode.getTextContent(), context);
             logger.trace(Util.delayedFormatString("Fond attribute %s with value %s", name, textValue));
             try {
                 Constructor<?> c = bean.getPropertyType().getConstructor(String.class);
