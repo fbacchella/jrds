@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.Probe;
-import jrds.RdsHost;
 import jrds.factories.ProbeBean;
 import jrds.starter.Resolver;
 import jrds.starter.Starter;
@@ -33,85 +32,91 @@ import org.apache.log4j.Level;
  *
  * @author Fabrice Bacchella 
  */
-@ProbeBean({"port",  "file", "url"})
+@ProbeBean({"port",  "file", "url", "urlhost"})
 public abstract class HttpProbe extends Probe<String, Number> implements UrlProbe {
     protected URL url = null;
-    protected String host = null;
+    protected String urlhost = null;
     protected int port = 80;
     protected String file = "/";
-    protected List<Object> argslist = null;
     Starter resolver = null;
 
-    public void configure(URL url) {
+    public Boolean configure(URL url) {
         this.url = url;
-        finishConfigure();
+        return finishConfigure(null);
     }
 
-    public void configure(Integer port, String file) {
+    public Boolean configure(Integer port, String file) {
         this.port = port;
         this.file = file;
-        finishConfigure();
+        return finishConfigure(null);
     }
 
-    public void configure(Integer port) {
+    public Boolean configure(Integer port) {
         this.port = port;
-        finishConfigure();
+        return finishConfigure(null);
     }
 
-    public void configure(String file) {
+    public Boolean configure(String file) {
         this.file = file;
-        finishConfigure();
+        return finishConfigure(null);
     }
 
-    public void configure(List<Object> argslist) {
-        this.argslist = argslist;
-        finishConfigure();
+    public Boolean configure(List<Object> argslist) {
+        return finishConfigure(argslist);
     }
 
-    public void configure(String file, List<Object> argslist) {
+    public Boolean configure(String file, List<Object> argslist) {
         this.file = file;
-        this.argslist = argslist;
-        finishConfigure();
+        return finishConfigure(argslist);
     }
 
-    public void configure(Integer port, List<Object> argslist) {
+    public Boolean configure(Integer port, List<Object> argslist) {
         this.port = port;
-        this.argslist = argslist;
-        finishConfigure();
+        return finishConfigure(argslist);
     }
 
-    public void configure(URL url, List<Object> argslist) {
+    public Boolean configure(URL url, List<Object> argslist) {
         this.url = url;
-        this.argslist = argslist;
-        finishConfigure();
+        return finishConfigure(argslist);
     }
 
-    public void configure(Integer port, String file, List<Object> argslist) {
+    public Boolean configure(Integer port, String file, List<Object> argslist) {
         this.port = port;
         this.file = file;
-        this.argslist = argslist;
-        finishConfigure();
+        return finishConfigure(argslist);
     }
 
-    public void configure() {
-        finishConfigure();
+    public Boolean configure() {
+        return finishConfigure(null);
     }
 
-    private void finishConfigure() {
-        RdsHost monitoredHost = getHost();
-        log(Level.TRACE, "Set host to %s", monitoredHost);
-        host = monitoredHost.getDnsName();
-        try {
-            if(url != null)
-                setUrl(new URL(getUrl().getProtocol(), host, getUrl().getPort(), getUrl().getFile()));
-        } catch (MalformedURLException e) {
-            log(Level.ERROR, e, "URL " + "http://%d:%s%s is invalid", host, getUrl().getPort(), getUrl().getFile());
+    private boolean finishConfigure(List<Object> argslist) {
+        if(url == null) {
+            try {
+                if(urlhost == null)
+                    urlhost = getHost().getDnsName();
+                if(argslist != null) {
+                    try {
+                        String urlString = String.format("http://" + urlhost + ":" + port + file, argslist.toArray());
+                        url = new URL(urlString);
+                    } catch (IllegalFormatConversionException e) {
+                        log(Level.ERROR, "Illegal format string: http://%s:%d%s, args %d", urlhost, port, file, argslist.size());
+                        return false;
+                    }
+                }
+                else {
+                    url = new URL("http", urlhost, port, file);
+                }
+            } catch (MalformedURLException e) {
+                log(Level.ERROR, e, "URL http://%s:%s%s is invalid", urlhost, port, file);
+                return false;
+            }
         }
-        URL tempurl = getUrl();
-        if("http".equals(tempurl.getProtocol())) {
+        if("http".equals(url.getProtocol())) {
             resolver = getHost().registerStarter(new Resolver(url.getHost()));
         }
         log(Level.DEBUG, "URL to collect is %s", getUrl());
+        return true;
     }
 
     /* (non-Javadoc)
@@ -208,24 +213,6 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
      * @return Returns the url.
      */
     public URL getUrl() {
-        if(url == null) {
-            try {
-                if(argslist != null) {
-                    try {
-                        String urlString = String.format("http://" + host + ":" + port + file, argslist.toArray());
-                        url = new URL(urlString);
-                    } catch (IllegalFormatConversionException e) {
-                        log(Level.ERROR, "Illegal format string: http://%s:%d%s, args %d", host, port, file, argslist.size());
-                        return null;
-                    }
-                }
-                else {
-                    url = new URL("http", host, port, file);
-                }
-            } catch (MalformedURLException e) {
-                log(Level.ERROR, e, "URL http://%s:%s%s is invalid",host , port, file);
-            }
-        }
         return url;
     }
 
@@ -240,7 +227,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
     public String getSourceType() {
         return "HTTP";
     }
-    
+
     /**
      * @param port the port to set
      */
@@ -260,6 +247,20 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
      */
     public void setFile(String path) {
         this.file = path;
+    }
+
+    /**
+     * @return the urlhost
+     */
+    public String getUrlhost() {
+        return urlhost;
+    }
+
+    /**
+     * @param urlhost the urlhost to set
+     */
+    public void setUrlhost(String urlhost) {
+        this.urlhost = urlhost;
     }
 
 }
