@@ -57,7 +57,11 @@ public abstract class StarterNode implements StartersSet {
                 //If collect is stopped while we're starting, drop it
                 if(parent !=null && ! parent.isCollectRunning())
                     return false;
-                s.doStart();
+                try {
+                    s.doStart();
+                } catch (Exception e) {
+                    log(Level.ERROR, e, "starting %s failed: %s", s, e);
+                }
             }
         }
         started = true;
