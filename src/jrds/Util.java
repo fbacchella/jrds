@@ -362,8 +362,8 @@ public class Util {
                     if(getter != null) {
                         try {
                             Object val = getter.invoke(p);
-                            env.put("bean." + bean.getName(), val);
-                            env.put("bean." + bean.getName() + ".signature", stringSignature(val.toString()));
+                            env.put("attr." + bean.getName(), val);
+                            env.put("attr." + bean.getName() + ".signature", stringSignature(val.toString()));
                         } catch (Exception e) {
                         }
                     }

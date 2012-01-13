@@ -46,7 +46,7 @@ public class TestRRDProbe {
         p.setPd(pd);
         p.setRrdfile(rrdfile);
         Assert.assertEquals("invalid rrdfile bean", p.getRrdfile(), pd.getBeanMap().get("rrdfile").getReadMethod().invoke(p));
-        Assert.assertEquals("invalid rrdfile bean template ", p.getRrdfile().toString(), Util.parseTemplate("${bean.rrdfile}", p));
+        Assert.assertEquals("invalid rrdfile bean template ", p.getRrdfile().toString(), Util.parseTemplate("${attr.rrdfile}", p));
     }
     
     @Test

@@ -39,9 +39,9 @@ public class HttpTest {
         Assert.assertEquals("invalid port bean", p.getPort(), beans.get("port").getReadMethod().invoke(p));
         Assert.assertEquals("invalid file bean", p.getFile(), beans.get("file").getReadMethod().invoke(p));
 
-        Assert.assertEquals("invalid url bean template", p.getUrl().toString(), Util.parseTemplate("${bean.url}", p));
-        Assert.assertEquals("invalid port bean template", p.getPort().toString(), Util.parseTemplate("${bean.port}", p));
-        Assert.assertEquals("invalid file bean template", p.getFile().toString(), Util.parseTemplate("${bean.file}", p));
+        Assert.assertEquals("invalid url bean template", p.getUrl().toString(), Util.parseTemplate("${attr.url}", p));
+        Assert.assertEquals("invalid port bean template", p.getPort().toString(), Util.parseTemplate("${attr.port}", p));
+        Assert.assertEquals("invalid file bean template", p.getFile().toString(), Util.parseTemplate("${attr.file}", p));
     }
 
     @Test
