@@ -31,6 +31,11 @@ public class MokeProbeFactory extends ProbeFactory {
     }
     
     public Probe<?,?> makeProbe(String type) {
+        ProbeDesc pd = generateProbeDesc(type);
+        return new MokeProbe<String, Number>(pd);
+    }
+    
+    protected ProbeDesc generateProbeDesc(String type) {
         ProbeDesc pd = new ProbeDesc();
         pd = new ProbeDesc();
         pd.setName(type);
@@ -49,8 +54,7 @@ public class MokeProbeFactory extends ProbeFactory {
         dsMap.put("dsName", "ds2");
         dsMap.put("dsType", DsType.COUNTER);
         pd.add(dsMap);
-
-        return new MokeProbe<String, Number>(pd);
+        return pd;
     }
 
     /* (non-Javadoc)

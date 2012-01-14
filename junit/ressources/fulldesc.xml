@@ -12,6 +12,7 @@
 	</properties>
 	<uptimefactor>0.5</uptimefactor>
 	<defaultargs>
+        <attr name="hostInfo">beanvalue</attr>
 	</defaultargs>
 	<ds>
 		<dsName>a</dsName>

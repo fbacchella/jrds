@@ -376,6 +376,10 @@ public class ProbeDesc implements Cloneable {
     public void setProbeClass(Class<? extends Probe<?,?>> probeClass) throws InvocationTargetException {
         for(ProbeBean beansAnnotation: ArgFactory.enumerateAnnotation(probeClass, ProbeBean.class, Probe.class)) {
             for(String bean: beansAnnotation.value()) {
+                //Bean already found, don't work on it again
+                if(beans.containsKey(bean)) {
+                    continue;
+                }
                 PropertyDescriptor foundBean = null;
                 try {
                     foundBean = new PropertyDescriptor(bean, probeClass);
@@ -419,9 +423,9 @@ public class ProbeDesc implements Cloneable {
     public void addDefaultArg(String beanName, String beanValue) throws InvocationTargetException{
         if(defaultsArgs == null) 
             defaultsArgs = new HashMap<String, String>();
-        if(beans.containsKey(beanName)) {
+        if( beans.containsKey(beanName)) {
             defaultsArgs.put(beanName, beanValue);
-            logger.trace(Util.delayedFormatString("Adding bean %s=%s (%s) to default args", beanName, beanValue));
+            logger.trace(Util.delayedFormatString("Adding bean %s=%s to default args", beanName, beanValue));
         }
     }
 
