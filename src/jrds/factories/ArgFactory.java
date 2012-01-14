@@ -1,9 +1,3 @@
-/*##########################################################################
- _##
- _##  $Id: ProbeFactory.java 373 2006-12-31 00:06:06Z fbacchella $
- _##
- _##########################################################################*/
-
 package jrds.factories;
 
 import java.beans.BeanInfo;
@@ -29,13 +23,12 @@ import org.apache.log4j.Logger;
 /**
  * A class to build args from a string constructor
  * @author Fabrice Bacchella 
- * @version $Revision: 373 $,  $Date: 2006-12-31 01:06:06 +0100 (Sun, 31 Dec 2006) $
  */
 
 public final class ArgFactory {
     static private final Logger logger = Logger.getLogger(ArgFactory.class);
 
-    static private final String[] argPackages = new String[] {"java.lang.", "java.net.", "org.snmp4j.smi.", "java.io", ""};
+    static private final String[] argPackages = new String[] {"java.lang.", "java.net.", "org.snmp4j.smi.", "java.io.", ""};
 
     /**
      * This method build a list from an XML enumeration of element.
@@ -51,8 +44,9 @@ public final class ArgFactory {
      * @param sequence an XML element that contains as sequence of <code>arg</code> or <code>list</code> elements.
      * @param arguments some object that will be used by a call to <code>jrds.Util.parseTemplate</code> for the arg values
      * @return
+     * @throws InvocationTargetException 
      */
-    public static List<Object> makeArgs(JrdsElement sequence, Object... arguments) {
+    public static final List<Object> makeArgs(JrdsElement sequence, Object... arguments) throws InvocationTargetException {
         List<JrdsElement> elements = sequence.getChildElements();
         List<Object> argsList = new ArrayList<Object>(elements.size());
         for(JrdsElement listNode: elements) {
@@ -66,7 +60,7 @@ public final class ArgFactory {
                 else
                     value = listNode.getTextContent();
                 value = jrds.Util.parseTemplate(value, arguments);
-                Object o = ArgFactory.makeArg(type, value);
+                Object o = ArgFactory.ConstructFromString(resolvClass(type), value);
                 argsList.add(o);                
             }
             else if("list".equals(localName)) {
@@ -77,33 +71,31 @@ public final class ArgFactory {
         return argsList;
     }
 
-    /**
-     * Create an objet providing the class name and a String argument. So the class must have
-     * a constructor taking only a string as an argument.
-     * @param className
-     * @param value
-     * @return
-     */
-    public static final Object makeArg(String className, String value) {
-        Object retValue = null;
-        Class<?> classType = resolvClass(className);
-        if (classType != null) {
-            Class<?>[] argsType = { String.class };
-            Object[] args = { value };
-
-            try {
-                Constructor<?> theConst = classType.getConstructor(argsType);
-                retValue = theConst.newInstance(args);
-            }
-            catch (Exception ex) {
-                logger.warn("Error during of creation :" + className + ": ", ex);
-            }
-        }
-        return retValue;
-    }
-
-    private static final Class<?> resolvClass(String name) {
+    static final Class<?> resolvClass(String name) {
         Class<?> retValue = null;
+        if("int".equals(name))
+            return Integer.TYPE;
+        else if("double".equals(name)) {
+            return Double.TYPE;
+        }
+        else if("float".equals(name)) {
+            return Float.TYPE;
+        }
+        else if("byte".equals(name)) {
+            return Byte.TYPE;
+        }
+        else if("long".equals(name)) {
+            return Long.TYPE;
+        }
+        else if("short".equals(name)) {
+            return Short.TYPE;
+        }
+        else if("boolean".equals(name)) {
+            return Boolean.TYPE;
+        }
+        else if("char".equals(name)) {
+            return Character.TYPE;
+        }
         for (String packageTry: argPackages) {
             try {
                 retValue = Class.forName(packageTry + name);
@@ -114,10 +106,20 @@ public final class ArgFactory {
             }
         }
         if (retValue == null)
-            logger.warn("Class " + name + " not found");
+            throw new RuntimeException("Class " + name + " not found");
         return retValue;
     }
 
+    /**
+     * Create an object providing the class and a String argument. So the class must have
+     * a constructor taking only a string as an argument.
+     * 
+     * It can manage native type and return an boxed object 
+     * @param clazz
+     * @param value
+     * @return
+     * @throws InvocationTargetException 
+     */
     public static Object ConstructFromString(Class<?> clazz, String value) throws InvocationTargetException {
         try {
             Constructor<?> c = null;
@@ -132,6 +134,21 @@ public final class ArgFactory {
             }
             else if(clazz == Float.TYPE) {
                 c = Float.class.getConstructor(String.class);
+            }
+            else if(clazz == Byte.TYPE) {
+                c = Byte.class.getConstructor(String.class);
+            }
+            else if(clazz == Long.TYPE) {
+                c = Long.class.getConstructor(String.class);
+            }
+            else if(clazz == Short.TYPE) {
+                c = Short.class.getConstructor(String.class);
+            }
+            else if(clazz == Boolean.TYPE) {
+                c = Boolean.class.getConstructor(String.class);
+            }
+            else if(clazz == Character.TYPE) {
+                c = Character.class.getConstructor(String.class);
             }
             return c.newInstance(value);
         } catch (SecurityException e) {
@@ -182,7 +199,7 @@ public final class ArgFactory {
             throw new InvocationTargetException(e, c.getName());
         }
     }
-    
+
     /**
      * Enumerate the hierarchy of annotation for a class, until a certain class type is reached
      * @param searched the Class where the annotation is searched

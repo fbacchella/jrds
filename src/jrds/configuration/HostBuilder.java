@@ -305,14 +305,15 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
 
     private void makeConnexion(JrdsElement domNode, StarterNode sNode) {
         for(JrdsElement cnxNode: domNode.getChildElementsByName("connection")) {
-            List<Object> args = ArgFactory.makeArgs(cnxNode);
             String type = cnxNode.attrMap().get("type");
             if(type == null) {
-                logger.equals("No type declared");
+                logger.error("No type declared for a connection");
+                continue;
             }
             String name = cnxNode.attrMap().get("name");
             Connection<?> o = null;
             try {
+                List<Object> args = ArgFactory.makeArgs(cnxNode);
                 Class<?> connectionClass = classLoader.loadClass(type);
                 Class<?>[] constArgsType = new Class[args.size()];
                 Object[] constArgsVal = new Object[args.size()];
