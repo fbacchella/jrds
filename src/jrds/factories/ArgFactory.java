@@ -37,19 +37,43 @@ public final class ArgFactory {
 
     static private final String[] argPackages = new String[] {"java.lang.", "java.net.", "org.snmp4j.smi.", "java.io", ""};
 
-    public static List<Object> makeArgs(JrdsElement n, Object... arguments) {
-        List<Object> argsList = new ArrayList<Object>(5);
-        for(JrdsElement argNode: n.getChildElementsByName("arg")) {
-            String type = argNode.getAttribute("type");
-            String value = argNode.getAttribute("value");
-            value = jrds.Util.parseTemplate(value, arguments);
-            Object o = ArgFactory.makeArg(type, value);
-            argsList.add(o);
+    /**
+     * This method build a list from an XML enumeration of element.
+     * 
+     * The enumeration is made of :<p/>
+     * <code>&lt;arg type="type" value="value"></code><p/>
+     * or<p/>
+     * <code>&lt;arg type="type">value&lt;/value></code><p/>
+     * This method is recursive, so it if finds some <code>list</code> elements instead of an <code>arg</code>, it will build a sub-list.
+     * 
+     * Unknown element will be silently ignored.
+     * 
+     * @param sequence an XML element that contains as sequence of <code>arg</code> or <code>list</code> elements.
+     * @param arguments some object that will be used by a call to <code>jrds.Util.parseTemplate</code> for the arg values
+     * @return
+     */
+    public static List<Object> makeArgs(JrdsElement sequence, Object... arguments) {
+        List<JrdsElement> elements = sequence.getChildElements();
+        List<Object> argsList = new ArrayList<Object>(elements.size());
+        for(JrdsElement listNode: elements) {
+            String localName = listNode.getNodeName();
+            logger.trace(Util.delayedFormatString("Element to check: %s", localName));
+            if("arg".equals(localName)) {
+                String type = listNode.getAttribute("type");
+                String value = null;
+                if(listNode.hasAttribute("value"))
+                    value = listNode.getAttribute("value");
+                else
+                    value = listNode.getTextContent();
+                value = jrds.Util.parseTemplate(value, arguments);
+                Object o = ArgFactory.makeArg(type, value);
+                argsList.add(o);                
+            }
+            else if("list".equals(localName)) {
+                argsList.add(makeArgs(listNode, arguments));                
+            }
         }
-        for(JrdsElement argNode: n.getChildElementsByName("list")) {
-            argsList.add(makeArgs(argNode, arguments));
-        }
-        logger.trace(Util.delayedFormatString("arg vector: %s", argsList));
+        logger.debug(Util.delayedFormatString("arg vector: %s", argsList));
         return argsList;
     }
 
