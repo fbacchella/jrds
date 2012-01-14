@@ -1,6 +1,5 @@
 package jrds;
 
-import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -404,23 +403,14 @@ public class PropertiesManager extends Properties {
         if(backendPropsMap.size() > 0){
             RrdBackendFactory factory = RrdBackendFactory.getFactory(rrdbackend);
             logger.debug(Util.delayedFormatString("Configuring backend factory %s", factory.getClass()));
-            Map<String, PropertyDescriptor> beanProperties;
-            try {
-                beanProperties = ArgFactory.getBeanPropertiesMap(factory.getClass());
-                logger.debug(Util.delayedFormatString("Beans for the backend factory: %s", beanProperties.keySet()));
-                for(Map.Entry<String, String> e: backendPropsMap.entrySet()) {
-                    try {
-                        logger.trace(Util.delayedFormatString("Will set backend end bean '%s' to '%s'", e.getKey(), e.getValue()));
-                        ArgFactory.beanSetter(factory, beanProperties, e.getKey(), e.getValue());
-                    } catch (Exception e1) {
-                        logger.fatal(String.format("Backend bean %s not configured: %s", e.getKey(), e1.getMessage()), e1);
-                    }
+            for(Map.Entry<String, String> e: backendPropsMap.entrySet()) {
+                try {
+                    logger.trace(Util.delayedFormatString("Will set backend end bean '%s' to '%s'", e.getKey(), e.getValue()));
+                    ArgFactory.beanSetter(factory, e.getKey(), e.getValue());
+                } catch (InvocationTargetException e1) {
+                    logger.fatal(String.format("Backend bean %s not configured: %s", e.getKey(), e1.getMessage()), e1);
                 }
-            } catch (InvocationTargetException e) {
-                logger.fatal(String.format("Backend bean %s not configured: %s", e.getMessage()), e);
-
             }
-
         }
 
         //

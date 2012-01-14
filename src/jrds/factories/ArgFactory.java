@@ -1,14 +1,13 @@
 package jrds.factories;
 
-import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
-import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -166,38 +165,57 @@ public final class ArgFactory {
         }
     }
 
-    static public void beanSetter(Object o, Map<String, PropertyDescriptor> beanProperties, String beanName, String beanValue) throws InvocationTargetException{
+    /**
+     * Given an object, a bean name and a bean value, try to set the bean.
+     * 
+     * The bean type is expect to have a constructor taking a String argument
+     * @param o the object to set
+     * @param beanName the bean to set
+     * @param beanValue the bean value
+     * @throws InvocationTargetException
+     */
+    static public void beanSetter(Object o, String beanName, String beanValue) throws InvocationTargetException{
         try {
-            PropertyDescriptor pd = beanProperties.get(beanName);
-            Method setMethod = pd.getWriteMethod();
+            PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
+            Method setMethod = bean.getWriteMethod();
             if(setMethod == null) {
                 throw new InvocationTargetException(new NullPointerException(), String.format("Unknown bean %s", beanName));
             }
-            Class<?> setArgType = pd.getPropertyType();
+            Class<?> setArgType = bean.getPropertyType();
             Object argInstance = ArgFactory.ConstructFromString(setArgType, beanValue);
             setMethod.invoke(o, argInstance);       
-        } catch (NullPointerException e) {
-            throw new InvocationTargetException(e, beanName);
-        } catch (SecurityException e) {
-            throw new InvocationTargetException(e, beanName);
-        } catch (IllegalArgumentException e) {
-            throw new InvocationTargetException(e, beanName);
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             throw new InvocationTargetException(e, beanName);
         }
     }
 
-    static public Map<String, PropertyDescriptor> getBeanPropertiesMap(Class<?> c) throws InvocationTargetException {
-        try {
-            BeanInfo bi = Introspector.getBeanInfo(c);
-            Map<String, PropertyDescriptor> beanProperties = new HashMap<String, PropertyDescriptor>();
-            for(PropertyDescriptor pd: bi.getPropertyDescriptors()) {
-                beanProperties.put(pd.getName(), pd);
+    /**
+     * Extract a map of the beans of an class. Only the beans listed in the ProbeBean class will be return
+     * @param c a class to extract beans from
+     * @return
+     * @throws InvocationTargetException
+     */
+    static public Map<String, PropertyDescriptor> getBeanPropertiesMap(Class<?> c, Class<?> topClass) throws InvocationTargetException {
+        Set<ProbeBean> beansAnnotations = ArgFactory.enumerateAnnotation(c, ProbeBean.class, topClass);
+        if(beansAnnotations.isEmpty())
+            return Collections.emptyMap();
+        Map<String, PropertyDescriptor> beanProperties = new HashMap<String, PropertyDescriptor>();
+        for(ProbeBean annotation: beansAnnotations) {
+            for(String beanName: annotation.value()) {
+                //Bean already found, don't work on it again
+                if( beanProperties.containsKey(beanName)) {
+                    continue;
+                }
+                try {
+                    PropertyDescriptor bean = new PropertyDescriptor(beanName, c);
+                    beanProperties.put(bean.getName(), bean);
+                } catch (IntrospectionException e) {
+                    throw new InvocationTargetException(e, "invalid bean " + beanName + " for " + c.getName());
+                }
+
             }
-            return beanProperties;
-        } catch (IntrospectionException e) {
-            throw new InvocationTargetException(e, c.getName());
         }
+        return beanProperties;
     }
 
     /**

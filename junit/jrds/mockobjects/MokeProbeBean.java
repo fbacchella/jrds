@@ -4,7 +4,7 @@ import jrds.ProbeDesc;
 import jrds.factories.ProbeBean;
 
 @ProbeBean({"hostInfo"})
-public class MokeProbeBean<A,B> extends MokeProbe<A, B> {
+public class MokeProbeBean extends MokeProbe<String, Number> {
     String HostInfo;
 
     public MokeProbeBean() {

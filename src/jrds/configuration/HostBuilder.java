@@ -1,6 +1,5 @@
 package jrds.configuration;
 
-import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -24,7 +23,6 @@ import jrds.RdsHost;
 import jrds.Util;
 import jrds.factories.ArgFactory;
 import jrds.factories.HostBuilderAgent;
-import jrds.factories.ProbeBean;
 import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
@@ -327,26 +325,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                 o = (Connection<?>)theConst.newInstance(constArgsVal);
                 Map<String, PropertyDescriptor> beans = connectionsBeanCache.get(connectionClass);
                 if(beans == null) {
-                    beans = new  HashMap<String, PropertyDescriptor>();
-                    for(ProbeBean beansAnnotation: ArgFactory.enumerateAnnotation(connectionClass, ProbeBean.class, Starter.class)) {
-                        for(String bean: beansAnnotation.value()) {
-                            //Bean already found, don't work on it again
-                            if(beans.containsKey(bean)) {
-                                continue;
-                            }
-                            PropertyDescriptor foundBean = null;
-                            try {
-                                foundBean = new PropertyDescriptor(bean, connectionClass);
-                            } catch (IntrospectionException e) {
-                                throw new IllegalArgumentException("invalid bean " + bean, e);
-                            }
-                            if(foundBean != null && foundBean.getWriteMethod() != null)
-                                beans.put(bean, foundBean);
-                            else {
-                                throw new IllegalArgumentException("bean " + bean + " declared without setter");
-                            }
-                        }
-                    }
+                    beans = ArgFactory.getBeanPropertiesMap(connectionClass, Starter.class);
                     connectionsBeanCache.put(connectionClass, beans);
                 }
                 setAttributes(cnxNode, o, beans, sNode);

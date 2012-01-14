@@ -1,18 +1,12 @@
-/*##########################################################################
-_##
-_##  $Id$
-_##
-_##########################################################################*/
-
 package jrds;
 
-import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -24,7 +18,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.factories.ArgFactory;
-import jrds.factories.ProbeBean;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
@@ -60,7 +53,7 @@ public class ProbeDesc implements Cloneable {
     private float uptimefactor = (float) 1.0;
     private Map<String, String> properties = null;
     private Map<String, Double> defaultValues = new HashMap<String,Double>(0);
-    private final Map<String, PropertyDescriptor> beans = new HashMap<String, PropertyDescriptor>();
+    private Map<String, PropertyDescriptor> beans = Collections.emptyMap();
 
     private static final class DsDesc {
         public DsType dsType;
@@ -374,25 +367,7 @@ public class ProbeDesc implements Cloneable {
     }
 
     public void setProbeClass(Class<? extends Probe<?,?>> probeClass) throws InvocationTargetException {
-        for(ProbeBean beansAnnotation: ArgFactory.enumerateAnnotation(probeClass, ProbeBean.class, Probe.class)) {
-            for(String bean: beansAnnotation.value()) {
-                //Bean already found, don't work on it again
-                if(beans.containsKey(bean)) {
-                    continue;
-                }
-                PropertyDescriptor foundBean = null;
-                try {
-                    foundBean = new PropertyDescriptor(bean, probeClass);
-                } catch (IntrospectionException e) {
-                    throw new IllegalArgumentException("invalid bean " + bean, e);
-                }
-                if(foundBean !=null && foundBean.getWriteMethod() != null)
-                    beans.put(bean, foundBean);
-                else {
-                    throw new IllegalArgumentException("bean " + bean + " declared without setter");
-                }
-            }
-        }
+        beans = ArgFactory.getBeanPropertiesMap(probeClass, Probe.class);
         this.probeClass = probeClass;
     }
 

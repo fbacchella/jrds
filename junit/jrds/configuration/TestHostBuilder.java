@@ -1,6 +1,5 @@
 package jrds.configuration;
 
-import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
@@ -60,10 +59,13 @@ public class TestHostBuilder {
             public Probe<?, ?> makeProbe(String type) {
                 logger.trace(type);
                 ProbeDesc pd = generateProbeDesc(type);
-                Probe<?, ?> p = new MokeProbeBean<String, Number>(pd);
                 try {
-                    PropertyDescriptor beanInfo = new PropertyDescriptor("hostInfo", p.getClass());
-                    pd.getBeanMap().put(beanInfo.getName(), beanInfo);
+                    pd.setProbeClass(MokeProbeBean.class);
+                } catch (InvocationTargetException e1) {
+                    throw new RuntimeException(e1);
+                }
+                Probe<?, ?> p = new MokeProbeBean(pd);
+                try {
                     pd.addDefaultArg("hostInfo", "${host}");
                 } catch (Exception e) {
                     throw new RuntimeException(e.getMessage(), e);
