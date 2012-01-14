@@ -5,8 +5,7 @@
 	<probeName>cyrusmaster-${index}</probeName>
 	<probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
 	<specific name="uptimeOid">1.3.6.1.4.1.3.6.1.1.3</specific>
-	<index>1.3.6.1.4.1.3.6.1.2.1.3</index>
-	<uniq>true</uniq>
+    <specific name="indexOid">1.3.6.1.4.1.3.6.1.2.1.3</specific>
 	<ds>
 		<dsName>serviceForks</dsName>
 		<dsType>counter</dsType>

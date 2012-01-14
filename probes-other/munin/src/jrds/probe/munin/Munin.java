@@ -5,11 +5,7 @@
  */
 package jrds.probe.munin;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,9 +16,8 @@ import jrds.factories.ProbeMeta;
 import org.apache.log4j.Level;
 
 /**
- * @author bacchell
+ * @author Fabrice Bacchella
  *
- * TODO 
  */
 @ProbeMeta(discoverAgent = MuninDiscoverAgent.class)
 public class Munin extends ProbeConnected<String, Number, MuninConnection> {
@@ -33,16 +28,7 @@ public class Munin extends ProbeConnected<String, Number, MuninConnection> {
 
 	@Override
 	public Map<String, Number> getNewSampleValuesConnected(MuninConnection cnx) {
-		Socket muninSocket = cnx.getConnection();
-		PrintWriter out = null;
-		BufferedReader in = null;
-		try {
-			out = new PrintWriter(muninSocket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(muninSocket.getInputStream()));
-		} catch (IOException e) {
-			log(Level.ERROR, e, "Unable to connect to munin because: ", e);
-			return Collections.emptyMap();
-		}
+	    MuninConnection.SocketChannels muninSocket = cnx.getConnection();
 
 		Map<String, Number> retValue = new HashMap<String, Number>();
 		String fetchList = getPd().getSpecific("fetch");
@@ -53,10 +39,10 @@ public class Munin extends ProbeConnected<String, Number, MuninConnection> {
 
 		try {
 			for(String currentFetch: fetchList.split(",")) {
-				out.println("fetch " + jrds.Util.parseTemplate(currentFetch.trim(), this));
+			    muninSocket.out.println("fetch " + jrds.Util.parseTemplate(currentFetch.trim(), this));
 				String lastLine;
 				boolean dotFound = false;
-				while(! dotFound && ( lastLine = in.readLine()) != null ) {
+				while(! dotFound && ( lastLine = muninSocket.in.readLine()) != null ) {
 					lastLine.replaceFirst("#.*", "");
 					if(".".equals(lastLine)) {
 						dotFound = true;

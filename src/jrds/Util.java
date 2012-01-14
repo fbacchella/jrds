@@ -1,5 +1,6 @@
 package jrds;
 
+import java.beans.PropertyDescriptor;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -8,6 +9,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.util.Collections;
@@ -322,12 +324,14 @@ public class Util {
         StarterNode node = null;
         for(Object o: arguments) {
             if(logger.isTraceEnabled())
-                logger.trace("Argument for template \"" + template + "\": " + o.getClass());
+                logger.trace(Util.delayedFormatString("Argument for template \"%s\": %s", template, o.getClass()));
             if( o instanceof IndexedProbe) {
                 String index = ((IndexedProbe) o).getIndexName();
-                env.put("index", index);
-                env.put("index.signature", stringSignature(index));
-                env.put("index.cleanpath", cleanPath(index));
+                if(index != null) {
+                    env.put("index", index);
+                    env.put("index.signature", stringSignature(index));
+                    env.put("index.cleanpath", cleanPath(index));
+                }
             }
             if(o instanceof UrlProbe) {
                 env.put("url", ((UrlProbe) o).getUrlAsString());
@@ -335,7 +339,9 @@ public class Util {
                 env.put("url.signature", jrds.Util.stringSignature(((UrlProbe) o).getUrlAsString()));
             }
             if(o instanceof ConnectedProbe) {
-                env.put("connection.name", ((ConnectedProbe) o).getConnectionName());
+                ConnectedProbe cp = (ConnectedProbe) o;
+                env.put("connection.name", cp.getConnectionName());
+                env.put("connection.name.signature", stringSignature(cp.getConnectionName()));
             }
             if( o instanceof Probe) {
                 Probe<?,?> p = ((Probe<?,?>) o);
@@ -350,6 +356,17 @@ public class Util {
                 String label = p.getLabel();
                 if(label != null) {
                     env.put("label", label);
+                }
+                for(PropertyDescriptor bean: p.getPd().getBeans()) {
+                    Method getter = bean.getReadMethod();
+                    if(getter != null) {
+                        try {
+                            Object val = getter.invoke(p);
+                            env.put("attr." + bean.getName(), val);
+                            env.put("attr." + bean.getName() + ".signature", stringSignature(val.toString()));
+                        } catch (Exception e) {
+                        }
+                    }
                 }
             } 
             if( o instanceof RdsHost) {
@@ -555,9 +572,14 @@ public class Util {
                     int result;
 
                     if (Character.isDigit(space1[0]) && Character.isDigit(space2[0])) {
-                        Integer firstNumberToCompare = Integer.parseInt(str1.trim());
-                        Integer secondNumberToCompare = Integer.parseInt(str2.trim());
-                        result = firstNumberToCompare.compareTo(secondNumberToCompare);
+                        try {
+                            Long firstNumberToCompare = Long.parseLong(str1.trim());
+                            Long secondNumberToCompare = Long.parseLong(str2.trim());
+                            result = firstNumberToCompare.compareTo(secondNumberToCompare);
+                        } catch (NumberFormatException e) {
+                            //Something prevent the number parsing, do a string comparaison
+                            result = str1.compareTo(str2);
+                        }
                     } else {
                         result = str1.compareTo(str2);
                     }
@@ -589,11 +611,11 @@ public class Util {
         }
     }
 
-    static	public boolean rolesAllowed(Set<String> allowedRoles, Set<String> userRoles) {
+    static public boolean rolesAllowed(Set<String> allowedRoles, Set<String> userRoles) {
         return ! Collections.disjoint(allowedRoles, userRoles);
     }
 
-    private  static final class Formater {
+    private static final class Formater {
         private final String format;
         private final Object[] args;
         private Formater(final String format, final Object ...args) {
@@ -613,7 +635,7 @@ public class Util {
      * @return
      */
     static public Object delayedFormatString(final String format, final Object ...args) {
-        return new  Formater(format, args);
+        return new Formater(format, args);
     }
 
 }

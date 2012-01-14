@@ -10,36 +10,36 @@
 	</unit>
 	<verticalLabel>Bytes</verticalLabel>
 	<add>
-		<legend>Heap Memory</legend>
-	</add>
-	<add>
-		<name>Eden Space</name>
-		<graphType>area</graphType>
-		<legend>Eden Space</legend>
-	</add>
-	<add>
-		<name>Survivor Space</name>
-		<graphType>stack</graphType>
-		<legend>Survivor Space</legend>
-	</add>
-	<add>
-		<name>Old Gen</name>
-		<graphType>stack</graphType>
-		<legend>Old Gen</legend>
-	</add>
-	<add>
 		<legend>Non Heap Memory</legend>
 	</add>
+    <add>
+        <name>Perm Gen</name>
+        <graphType>area</graphType>
+        <legend>Perm Gen</legend>
+    </add>
 	<add>
 		<name>Code Cache</name>
 		<graphType>stack</graphType>
 		<legend>Code Cache</legend>
 	</add>
-	<add>
-		<name>Perm Gen</name>
-		<graphType>stack</graphType>
-		<legend>Perm Gen</legend>
-	</add>
+    <add>
+        <legend>Heap Memory</legend>
+    </add>
+    <add>
+        <name>Old Gen</name>
+        <graphType>stack</graphType>
+        <legend>Old Gen</legend>
+    </add>
+    <add>
+        <name>Survivor Space</name>
+        <graphType>stack</graphType>
+        <legend>Survivor Space</legend>
+    </add>
+    <add>
+        <name>Eden Space</name>
+        <graphType>stack</graphType>
+        <legend>Eden Space</legend>
+    </add>
 	<hosttree>
 		<pathelement>HOST</pathelement>
 		<pathelement>SERVICES</pathelement>

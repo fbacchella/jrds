@@ -19,7 +19,7 @@
 	</for>
 	<for var="i" min="0" max="3" step="1">
 		<probe type="IfXSnmp">
-			<arg type="String" value="eth${i}" />
+			<arg type="String">eth${i}</arg>
 		</probe>
 	</for>
 </host>

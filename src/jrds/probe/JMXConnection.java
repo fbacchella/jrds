@@ -11,10 +11,12 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 
+import jrds.factories.ProbeBean;
 import jrds.starter.Connection;
 
 import org.apache.log4j.Level;
 
+@ProbeBean({"port", "user", "password"})
 public class JMXConnection extends Connection<MBeanServerConnection> {
 
 	final static String startTimeObjectName = "java.lang:type=Runtime";
@@ -26,7 +28,11 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
 	private JMXConnector connector;
 	private MBeanServerConnection connection;
 
-	public JMXConnection(Integer port) {
+    public JMXConnection() {
+        super();
+    }
+
+    public JMXConnection(Integer port) {
 		super();
 		this.port = port;
 	}
@@ -102,5 +108,47 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
 	public String toString() {
 		return "service:jmx:rmi:///jndi/rmi://" + getHostName() + ":" + port + "/jmxrmi";
 	}
+
+    /**
+     * @return the port
+     */
+    public Integer getPort() {
+        return port;
+    }
+
+    /**
+     * @param port the port to set
+     */
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
+    /**
+     * @return the user
+     */
+    public String getUser() {
+        return user;
+    }
+
+    /**
+     * @param user the user to set
+     */
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
 }

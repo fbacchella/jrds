@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.rrd4j.core.RrdBackendFactory;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDbPool;
-import org.rrd4j.core.RrdFileBackendFactory;
+import org.rrd4j.core.RrdRandomAccessFileBackendFactory;
 
 /**
  * A wrapper classe, to manage the rrdDb operations
@@ -84,14 +84,16 @@ public final class StoreOpener {
         if(backend != null) {
             try {
                 RrdBackendFactory.setDefaultFactory(backend);
-                logger.debug(Util.delayedFormatString("Store backend set to %s", backend));
+                logger.trace(Util.delayedFormatString("Store backend set to %s", backend));
+            } catch (IllegalArgumentException e) {
+                logger.fatal("Backend not configured: " + e.getMessage());
             } catch (IllegalStateException e) {
                 logger.warn("Trying to change default backend, a restart is needed");
             }
         }
         StoreOpener.backend = RrdBackendFactory.getDefaultFactory();
 
-        if(RrdFileBackendFactory.class.isAssignableFrom(StoreOpener.backend.getClass())) {
+        if(RrdRandomAccessFileBackendFactory.class.isAssignableFrom(StoreOpener.backend.getClass())) {
             instance = RrdDbPool.getInstance();
             instance.setCapacity(dbPoolSize);
             usepool = true;

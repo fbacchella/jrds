@@ -11,10 +11,8 @@ import java.util.Map;
 import org.rrd4j.core.Sample;
 import org.snmp4j.smi.OID;
 
-
 /**
  * @author Fabrice Bacchella 
- * @version $Revision$,  $Date$
  */
 public class ProcessStatusHostResources extends RdsSnmpSimple {
     static final private String RUNNING="running";

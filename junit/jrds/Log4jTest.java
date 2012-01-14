@@ -54,7 +54,7 @@ public class Log4jTest {
         Logger l = Logger.getLogger("jrds");
         l.setAdditivity(false);
         ta.setName(TANAME);
-        JrdsLoggerConfiguration.putAppender(ta);
+        JrdsLoggerConfiguration.jrdsAppender = ta;
         Logger.getRootLogger().addAppender(ta);
         JrdsLoggerConfiguration.initLog4J();
         Assert.assertNotNull(LogManager.getLoggerRepository().exists("jrds"));

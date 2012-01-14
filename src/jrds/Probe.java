@@ -49,6 +49,12 @@ import org.w3c.dom.Element;
         )
 public abstract class Probe<KeyType, ValueType> extends StarterNode implements Comparable<Probe<KeyType, ValueType>>  {
 
+    private static final ArcDef[] DEFAULTARC = {
+            new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 3),
+            new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 24 * 365), 
+            new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 365 * 2)
+    };
+
     private int timeout = 30;
     private long step = -1;
     private String name = null;
@@ -157,21 +163,10 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         return getPd().getDsDefs();
     }
 
-    protected ArcDef[] getArcDefs() {
-        ArcDef[] defaultArc = new ArcDef[3];
-        //Five minutes step
-        defaultArc[0] = new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 3);
-        //One hour step
-        defaultArc[1] = new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 24 * 365);
-        //One day step
-        defaultArc[2] = new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 365 * 2);
-        return defaultArc;
-    }
-
     public RrdDef getRrdDef() {
         RrdDef def = new RrdDef(getRrdName());
         def.setVersion(2);
-        def.addArchive(getArcDefs());
+        def.addArchive(DEFAULTARC);
         def.addDatasource(getDsDefs());
         if(step > 0) {
             def.setStep(step);
@@ -608,17 +603,41 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
-     * Return the probe datas for the given period
+     * Return the probe data for the given period
      * @param startDate
      * @param endDate
      * @return
      */
     public FetchData fetchData(Date startDate, Date endDate) {
+        return fetchData(startDate.getTime() /1000, endDate.getTime() / 1000);
+    }
+
+    /**
+     * Return the probe data for the given period
+     * @param fetchStart Starting timestamp for fetch request.
+     * @param fetchEnd   Ending timestamp for fetch request.
+     * @return Request object that should be used to actually fetch data from RRD
+     */
+    public FetchData fetchData(long fetchStart, long fetchEnd) {
+        return fetchData(ConsolFun.AVERAGE, fetchStart, fetchEnd, 1);
+    }
+
+    /**
+     * Return the probe data for the given period
+     * @param consolFun  Consolidation function to be used in fetch request. Allowed values are
+     *                   "AVERAGE", "MIN", "MAX" and "LAST" (these constants are conveniently defined in the
+     *                   {@link ConsolFun} class).
+     * @param fetchStart Starting timestamp for fetch request.
+     * @param fetchEnd   Ending timestamp for fetch request.
+     * @param resolution Fetch resolution.
+     * @return Request object that should be used to actually fetch data from RRD
+     */
+    public FetchData fetchData(ConsolFun consolFun, long fetchStart, long fetchEnd, long resolution) {
         FetchData retValue = null;
         RrdDb rrdDb = null;
         try {
             rrdDb = StoreOpener.getRrd(getRrdName());
-            FetchRequest fr = rrdDb.createFetchRequest(GraphDesc.DEFAULTCF, startDate.getTime() /1000, endDate.getTime() / 1000);
+            FetchRequest fr = rrdDb.createFetchRequest(consolFun, fetchStart, fetchEnd, resolution);
             retValue = fr.fetchData();
         } catch (Exception e) {
             log(Level.ERROR, e, "Unable to fetch data: %s", e.getMessage());
@@ -648,7 +667,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         }
         return retValues;
     }
-    
+
     /**
      * Return a uniq name for the graph
      * @return
@@ -683,7 +702,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     public abstract String getSourceType();
 
     /**
-     * This function reads all the specified arguments
+     * This function it used by the probe to read all the specific it needs from the probe description
+     * It's called once during the probe initialization
      * Every override should finish by:
      * return super();
      * @return
@@ -771,7 +791,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                     return String.CASE_INSENSITIVE_ORDER.compare(arg0.getDsName(), arg1.getDsName());
                 }
             });
-        
+
         for(DsDef ds: dss) {
             String dsName = ds.getDsName();
 

@@ -10,14 +10,17 @@
 	<property name="web.src" value="${basedir}/web"/>
 	<property name="web.build" value="${build.home}/webapp"/>
 	<property name="compile.deprecation" value="yes"/>
-	<property name="testdir" value="tmp"/>
+	<property name="testdir" value="${build.home}/tests"/>
 	
 	<property file="local.properties" />
-	
+
 	<!--  ==================== Compilation Control Options ==================== -->
 	<property name="compile.debug" value="true"/>
 	<property name="compile.deprecation" value="false"/>
 	<property name="compile.optimize" value="true"/>
+	<property name="encoding" value="iso-8859-1"/>
+	<property name="javac.source" value="1.6"/>
+	<property name="javac.target" value="1.6"/>
 	
 	<!-- ===================== External jar Classpath =========================== -->
 	<path id="external.classpath">
@@ -59,8 +62,8 @@
 		<mkdir dir="${build.home}/classes"/>
 		<mkdir dir="${build.home}/probes"/>
 		<javac srcdir="${src.home}" destdir="${build.home}/classes"
-			debug="${compile.debug}" deprecation="${compile.deprecation}"
-			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
+			debug="${compile.debug}" deprecation="${compile.deprecation}" includeantruntime="false"
+			optimize="${compile.optimize}" encoding="${encoding}" target="${javac.target}" source="${javac.source}">
 			<classpath refid="external.classpath"/>
 		</javac>
 	</target>
@@ -68,8 +71,8 @@
 	<target name="compile.test" depends="compile">
 		<mkdir dir="${build.home}/classes-junit"/>
 		<javac srcdir="${src.junit}" destdir="${build.home}/classes-junit"
-			debug="${compile.debug}" deprecation="${compile.deprecation}"
-			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
+			debug="${compile.debug}" deprecation="${compile.deprecation}" includeantruntime="false"
+			optimize="${compile.optimize}" encoding="${encoding}" target="${javac.target}" source="${javac.source}">
 			<classpath refid="test.classpath"/>
 		</javac>
 	</target>
@@ -106,8 +109,8 @@
 	<target name="compile.subprobes" depends="appjar">
 		<mkdir dir="${build.home}/${subprobe}/classes"/>
 		<javac srcdir="${subprobe.dir}/src" destdir="${build.home}/${subprobe}/classes"
-			debug="${compile.debug}" deprecation="${compile.deprecation}"
-			optimize="${compile.optimize}" encoding="iso-8859-1" target="1.5" source="1.5">
+			debug="${compile.debug}" deprecation="${compile.deprecation}" includeantruntime="false"
+			optimize="${compile.optimize}" encoding="${encoding}" target="${javac.target}" source="${javac.source}">
 			<classpath refid="project.classpath"/>
 		</javac>
 		<jar destfile="${build.home}/probes/${subprobe}.jar" basedir="${build.home}/${subprobe}/classes">
@@ -128,6 +131,7 @@
 				<include name="**/*.xsl" />
 				<exclude name="**/bootstrap/**" />
 				<exclude name="**/snmp/**" />
+				<exclude name="jrds/caching/**" />
 			</fileset>		
 			<fileset dir="${src.home}">
 				<include name="**/*.xml"/>
@@ -146,6 +150,11 @@
 				<include name="desc/*/snmp/**/*.xml" />
 			</fileset>
 		</jar>
+		<jar destfile="${build.home}/cachingbe.jar" >
+			<fileset dir="${build.home}/classes">
+				<include name="jrds/caching/**" />
+			</fileset>	
+		</jar>
 		<jar destfile="${build.home}/boot.jar" >
 			<fileset dir="${build.home}/classes">
 				<include name="**/bootstrap/**" />
@@ -158,7 +167,7 @@
 	</target>
 	
 	<target name="javadoc">
-		<javadoc encoding="UTF-8"  destdir="${docs.build}" access="protected" use="true"
+		<javadoc encoding="${encoding}"  destdir="${docs.build}" access="protected" use="true"
 			notree="false" nonavbar="false" noindex="false" splitindex="true"
 			author="true" version="true" nodeprecatedlist="false"
 			nodeprecated="false"

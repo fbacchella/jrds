@@ -14,21 +14,24 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.Probe;
+import jrds.ProbeDesc;
+import jrds.RdsHost;
 import jrds.Util;
+import jrds.factories.ProbeBean;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Level;
 
+@ProbeBean({"port", "user", "password"})
 public abstract class JdbcProbe extends Probe<String, Number> implements UrlProbe, IndexedProbe {
-    private String label;
 
     static final void registerDriver(String JdbcDriver) {
         try {
             Driver jdbcDriver = (Driver) Class.forName (JdbcDriver).newInstance();
             DriverManager.registerDriver(jdbcDriver);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Can't register JDBC driver " + JdbcDriver, e);
         }	
     }
 
@@ -37,16 +40,34 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
             Driver jdbcDriver = (Driver) JdbcDriver.newInstance();
             DriverManager.registerDriver(jdbcDriver);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Can't register JDBC driver " + JdbcDriver, e);
         }	
     }
 
     private int port;
-    protected JdbcStarter starter;
+    protected final JdbcStarter starter;
+
+    public JdbcProbe() {
+        super();
+        starter = setStarter();
+    }
+
+    public JdbcProbe(ProbeDesc pd) {
+        super(pd);
+        starter = setStarter();
+    }
+
+    public JdbcProbe(RdsHost monitoredHost, ProbeDesc pd) {
+        super(monitoredHost, pd);
+        starter = setStarter();
+    }
+
+    public void configure() {
+        getHost().registerStarter(starter);        
+    }
 
     public void configure(int port, String user, String passwd) {
         this.port = port;
-        starter = setStarter();
         starter.setPasswd(passwd);
         starter.setUser(user);
         starter.setHost(getHost());
@@ -55,7 +76,6 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 
     public void configure(int port, String user, String passwd, String dbName) {
         this.port = port;
-        starter = setStarter();
         starter.setDbName(dbName);
         starter.setPasswd(passwd);
         starter.setUser(user);
@@ -70,8 +90,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 
     abstract JdbcStarter setStarter();
 
-    public Map<String, Number> getNewSampleValues()
-    {
+    public Map<String, Number> getNewSampleValues() {
         Map<String, Number> retValue = new HashMap<String, Number>(getPd().getSize());
 
         for(String query: getQueries()) {
@@ -184,14 +203,40 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
     /**
      * @return Returns the port.
      */
-    public int getPort() {
+    public Integer getPort() {
         return port;
     }
     /**
      * @param port The port to set.
      */
-    public void setPort(int port) {
+    public void setPort(Integer port) {
         this.port = port;
+    }
+
+    /**
+     * @return Returns the user.
+     */
+    public String getUser() {
+        return starter.getUser();
+    }
+    /**
+     * @param user The user to set.
+     */
+    public void setUser(String user) {
+        starter.setUser(user);
+    }
+
+    /**
+     * @return Returns the user.
+     */
+    public String getPassword() {
+        return starter.getPasswd();
+    }
+    /**
+     * @param password The user to set.
+     */
+    public void setPassword(String password) {
+        starter.setPasswd(password);
     }
 
     /**
@@ -199,6 +244,13 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
      */
     public String getDbName() {
         return starter.getDbName();
+    }
+
+    /**
+     * @param dbName
+     */
+    public void setDbName(String dbName) {
+        starter.setDbName(dbName);
     }
 
     public String getUrlAsString() {
@@ -222,14 +274,6 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 
     public String getIndexName() {
         return starter.getDbName();
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     /* (non-Javadoc)

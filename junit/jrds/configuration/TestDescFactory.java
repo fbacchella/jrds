@@ -89,14 +89,6 @@ public class TestDescFactory {
 		logger.trace(pd.getCollectOids());
 		logger.trace(pd.getCollectStrings());
 		logger.trace(pd.getDefaultArgs());
-		int base = 80;
-		List<Object> defaultargs = pd.getDefaultArgs();
-		for(Object o: defaultargs) {
-			if(o instanceof Integer)
-				Assert.assertEquals(base++, ((Integer)o).intValue());
-		}
-		Assert.assertEquals(82, base);
-		Assert.assertTrue(defaultargs.get(2) instanceof List<?>);
 		//A collect string "" should not be collected
 		Assert.assertEquals(3, pd.getCollectMapping().size());
 		Assert.assertEquals(1, pd.getCollectOids().size());

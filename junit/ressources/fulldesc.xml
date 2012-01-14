@@ -12,11 +12,7 @@
 	</properties>
 	<uptimefactor>0.5</uptimefactor>
 	<defaultargs>
-		<arg type="Integer" value="80"/>
-		<arg type="Integer" value="81"/>
-		<list>
-					<arg type="Integer" value="80"/>
-		</list>
+        <attr name="hostInfo">beanvalue</attr>
 	</defaultargs>
 	<ds>
 		<dsName>a</dsName>

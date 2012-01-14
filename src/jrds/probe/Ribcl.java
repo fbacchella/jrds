@@ -22,6 +22,7 @@ import javax.xml.transform.TransformerException;
 import jrds.Probe;
 import jrds.RdsHost;
 import jrds.Util;
+import jrds.factories.ProbeBean;
 import jrds.starter.SocketFactory;
 import jrds.starter.XmlProvider;
 
@@ -29,11 +30,12 @@ import org.apache.log4j.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+@ProbeBean({"user", "password", "iloHost"})
 public class Ribcl extends Probe<String, Number> {
 	private String user;
 	private String passwd;
 	private String iloHost;
-	private int port = 443;
+	private Integer port = 443;
 
 	static final private String encoding = "ISO-8859-1";
 	static final private String eol = "\r\n";
@@ -200,5 +202,61 @@ public class Ribcl extends Probe<String, Number> {
 	public boolean isStarted(Object key) {
 		return super.isStarted(key) && find(XmlProvider.class).isStarted() && find(SocketFactory.class).isStarted();
 	}
+
+    /**
+     * @return the user
+     */
+    public String getUser() {
+        return user;
+    }
+
+    /**
+     * @param user the user to set
+     */
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    /**
+     * @return the passwd
+     */
+    public String getPassword() {
+        return passwd;
+    }
+
+    /**
+     * @param passwd the passwd to set
+     */
+    public void setPassword(String passwd) {
+        this.passwd = passwd;
+    }
+
+    /**
+     * @return the iloHost
+     */
+    public String getIloHost() {
+        return iloHost;
+    }
+
+    /**
+     * @param iloHost the iloHost to set
+     */
+    public void setIloHost(String iloHost) {
+        this.iloHost = iloHost;
+    }
+
+    /**
+     * @return the port
+     */
+    public Integer getPort() {
+        return port;
+    }
+
+    /**
+     * @param port the port to set
+     */
+    public void setPort(Integer port) {
+        this.port = port;
+    }
 
 }

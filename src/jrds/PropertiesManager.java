@@ -5,6 +5,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -25,11 +26,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jrds.factories.ArgFactory;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.rrd4j.core.RrdBackendFactory;
 
 /**
  * An less ugly class suposed to manage properties
@@ -200,7 +203,7 @@ public class PropertiesManager extends Properties {
         };
     }
 
-    private File prepareDir(File dir, boolean autocreate) {
+    private File prepareDir(File dir, boolean autocreate, boolean readOnly) {
         if(dir == null)
             return null;
         if( ! dir.exists()) {
@@ -218,19 +221,19 @@ public class PropertiesManager extends Properties {
             logger.error(dir + " exists but is not a Directory");
             return null;
         }
-        else if( ! dir.canWrite()) {
+        else if( ! dir.canWrite() && ! readOnly) {
             logger.error(dir + " exists can not be written");
             return null;
         }
         return dir;
     }
 
-    private File prepareDir(String path, boolean autocreate) {
+    private File prepareDir(String path, boolean autocreate, boolean readOnly) {
         if(path == null || "".equals(path)) {
             return null;
         }
         File dir = new File(path);
-        return prepareDir(dir, autocreate);
+        return prepareDir(dir, autocreate, readOnly);
     }
 
     @SuppressWarnings("unchecked")
@@ -273,7 +276,11 @@ public class PropertiesManager extends Properties {
                 Level l = Level.toLevel(ls);
                 String param = getProperty("log." + ls, "");
                 if(! "".equals(param)) {
-                    List<String> loggerList = Arrays.asList(param.split(","));
+                    String[] loggersName = param.split(",");
+                    List<String> loggerList = new ArrayList<String>(loggersName.length);
+                    for(String logger: loggersName) {
+                        loggerList.add(logger.trim());
+                    }
                     loglevels.put(l, loggerList);
                 }
 
@@ -292,16 +299,16 @@ public class PropertiesManager extends Properties {
 
         //Directories configuration
         autocreate = parseBoolean(getProperty("autocreate", "false"));
-        configdir = prepareDir(getProperty("configdir"), autocreate);
-        rrddir = prepareDir(getProperty("rrddir"), autocreate);
+        configdir = prepareDir(getProperty("configdir"), autocreate, true);
+        rrddir = prepareDir(getProperty("rrddir"), autocreate, false);
         //Different place to find the temp directory
-        tmpdir = prepareDir(getProperty("tmpdir"), autocreate);
+        tmpdir = prepareDir(getProperty("tmpdir"), autocreate, true);
         if(tmpdir == null)
-            tmpdir = prepareDir(System.getProperty("javax.servlet.context.tempdir"), false);
+            tmpdir = prepareDir(System.getProperty("javax.servlet.context.tempdir"), false, true);
         if(tmpdir == null) {
             String tmpDirPath = System.getProperty("java.io.tmpdir");
             if(tmpDirPath != null && ! "".equals(tmpDirPath))
-                tmpdir = prepareDir(new File(tmpDirPath, "jrds"), true);
+                tmpdir = prepareDir(new File(tmpDirPath, "jrds"), true, true);
         }
         if(tmpdir == null) {
             throw new RuntimeException("No temp dir defined");
@@ -311,7 +318,6 @@ public class PropertiesManager extends Properties {
         timeout = parseInteger(getProperty("timeout", "30"));
         collectorThreads = parseInteger(getProperty("collectorThreads", "1"));
         dbPoolSize = parseInteger(getProperty("dbPoolSize", "10")) + collectorThreads;
-        syncPeriod = parseInteger(getProperty("syncPeriod", Integer.toString(step / 2)));
 
         strictparsing = parseBoolean(getProperty("strictparsing", "false"));
         try {
@@ -350,7 +356,66 @@ public class PropertiesManager extends Properties {
         }
         extensionClassLoader = doClassLoader(getProperty("classpath", ""));
 
-        rrdbackend = getProperty("rrdbackend", "NIO");
+        //
+        //Choose and configure the backend
+        //
+        String rrdbackendClassName = getProperty("rrdbackendclass", "");
+        if(! "".equals(rrdbackendClassName)) {
+            try {
+                @SuppressWarnings("unchecked")
+                Class<RrdBackendFactory> factoryClass = (Class<RrdBackendFactory>) extensionClassLoader.loadClass(rrdbackendClassName);
+                RrdBackendFactory factory = factoryClass.getConstructor().newInstance();
+                try {
+                    RrdBackendFactory.getFactory(factory.getName());
+                } catch (IllegalArgumentException e) {
+                    RrdBackendFactory.registerFactory(factory);
+                }
+                rrdbackend = factory.getName();
+            } catch (ClassNotFoundException e) {
+                logger.fatal("Backend not configured: " + e.getMessage(), e);
+            } catch (IllegalArgumentException e) {
+                logger.fatal("Backend not configured: " + e.getMessage(), e);
+            } catch (SecurityException e) {
+                logger.fatal("Backend not configured: " + e.getMessage(), e);
+            } catch (InstantiationException e) {
+                logger.fatal("Backend not configured: " + e.getMessage(), e);
+            } catch (IllegalAccessException e) {
+                logger.fatal("Backend not configured: " + e.getMessage(), e);
+            } catch (InvocationTargetException e) {
+                logger.fatal("Backend not configured: " + e.getMessage(), e);
+            } catch (NoSuchMethodException e) {
+                logger.fatal("Backend not configured: " + e.getMessage(), e);
+            }
+        } else {
+            rrdbackend = getProperty("rrdbackend", "FILE");
+        }
+
+        // Analyze the backend properties
+        Map<String, String> backendPropsMap = new HashMap<String, String>();
+        for(Object o: Collections.list(keys())) {
+            String prop = (String) o;
+            if(prop.startsWith("rrdbackend.")) {
+                String value = this.getProperty(prop);
+                String bean = prop.replace("rrdbackend.", "");
+                backendPropsMap.put(bean, value);
+            }
+        }
+        if(backendPropsMap.size() > 0){
+            RrdBackendFactory factory = RrdBackendFactory.getFactory(rrdbackend);
+            logger.debug(Util.delayedFormatString("Configuring backend factory %s", factory.getClass()));
+            for(Map.Entry<String, String> e: backendPropsMap.entrySet()) {
+                try {
+                    logger.trace(Util.delayedFormatString("Will set backend end bean '%s' to '%s'", e.getKey(), e.getValue()));
+                    ArgFactory.beanSetter(factory, e.getKey(), e.getValue());
+                } catch (InvocationTargetException e1) {
+                    logger.fatal(String.format("Backend bean %s not configured: %s", e.getKey(), e1.getMessage()), e1);
+                }
+            }
+        }
+
+        //
+        // Tab configuration
+        //
 
         // We search for the tabs list in the property tab
         // spaces are non-significant
@@ -362,6 +427,9 @@ public class PropertiesManager extends Properties {
             }
         }
 
+        //
+        // Security configuration
+        //
         security = parseBoolean(getProperty("security", "false"));
         if(security) {
             userfile = getProperty("userfile", "users.properties");
@@ -393,7 +461,6 @@ public class PropertiesManager extends Properties {
     public int step;
     public int collectorThreads;
     public int dbPoolSize;
-    public int syncPeriod;
     public final Set<URI> libspath = new HashSet<URI>();
     public boolean strictparsing = false;
     public ClassLoader extensionClassLoader;

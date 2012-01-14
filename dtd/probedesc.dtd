@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT probedesc (name, probeName, probeClass, (snmpRequester | specific+)?, properties?, uptimefactor?, (index, uniq)?, defaultargs?, ds*, graphs)>
+<!ELEMENT probedesc (name, probeName, probeClass, index?, specific*, properties?, uptimefactor?, defaultargs?, ds*, graphs)>
 <!ATTLIST specific 
 			name CDATA #REQUIRED
 >
 <!ELEMENT specific (#PCDATA)>
 <!ELEMENT ds ((dsName, dsType)?, (oid | (oidhigh, oidlow) | collect | (collecthigh, collectlow) )?, minValue?, maxValue?, defaultValue?)>
-<!ELEMENT defaultargs (arg | list)+ >
+<!ELEMENT defaultargs (attr)*>
 <!ELEMENT arg EMPTY>
 <!ATTLIST arg
 			type CDATA #REQUIRED
 			value CDATA #REQUIRED
 >
-<!ELEMENT list (arg | list)+ >
+<!ELEMENT attr (#PCDATA)>
+<!ATTLIST attr
+			name CDATA #REQUIRED
+>
 <!ELEMENT graphs (name*)>
 <!ELEMENT dsName (#PCDATA)>
 <!ELEMENT dsType (#PCDATA)>

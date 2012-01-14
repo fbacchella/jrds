@@ -4,7 +4,7 @@
 	<name>CiscoIPSec</name>
 	<probeName>ciscoipsec</probeName>
 	<probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
-	<snmpRequester>simple</snmpRequester>
+  <specific name="requester">simple</specific>
 	<ds>
 		<dsName>ActiveTunnels</dsName>
 		<dsType>gauge</dsType>

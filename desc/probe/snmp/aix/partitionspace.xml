@@ -5,8 +5,7 @@
     <probeName>fs-${index.cleanpath}</probeName>
     <probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
     <specific name="description">Graph space used and free for a mountpoint on an AIX server</specific>
-    <index>1.3.6.1.4.1.2.6.191.6.2.1.3</index>
-    <uniq>true</uniq>
+    <specific name="indexOid">1.3.6.1.4.1.2.6.191.6.2.1.3</specific>
     <ds>
         <dsName>aixFsSize</dsName>
         <dsType>gauge</dsType>

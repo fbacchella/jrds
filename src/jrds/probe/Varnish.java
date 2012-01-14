@@ -13,16 +13,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jrds.Probe;
+import jrds.factories.ProbeBean;
 import jrds.starter.SocketFactory;
 
 import org.apache.log4j.Level;
 
+@ProbeBean({"port", "welcome"})
 public class Varnish extends Probe<String, Number> implements IndexedProbe {
 
     static final private Pattern statlinepattern = Pattern.compile("^\\s+(\\d+)\\s+(.*)$");
 
     private int port = 6081;
-    private boolean welcome = false;
+    private Boolean welcome = false;
 
     public void configure(Integer port) {
         this.port = port;
@@ -35,9 +37,6 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
 
     public void configure(Boolean welcome) {
         this.welcome = welcome;
-    }
-
-    public void configure() {
     }
 
     @Override
@@ -141,6 +140,34 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
 
     public String getIndexName() {
         return Integer.toString(port);
+    }
+
+    /**
+     * @return the port
+     */
+    public Integer getPort() {
+        return port;
+    }
+
+    /**
+     * @param port the port to set
+     */
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
+    /**
+     * @return the welcome
+     */
+    public Boolean getWelcome() {
+        return welcome;
+    }
+
+    /**
+     * @param welcome the welcome to set
+     */
+    public void setWelcome(Boolean welcome) {
+        this.welcome = welcome;
     }
 
 }

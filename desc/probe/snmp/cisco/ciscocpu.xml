@@ -4,7 +4,7 @@
   <name>ciscocpuload</name>
   <probeName>ciscocpuload</probeName>
   <probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
-  <snmpRequester>simple</snmpRequester>
+  <specific name="requester">simple</specific>
   <ds>
     <dsName>la1</dsName>
     <dsType>gauge</dsType>

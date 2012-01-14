@@ -3,19 +3,20 @@ package jrds.snmp;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import jrds.Probe;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
+import jrds.webapp.Discover.ProbeDescSummary;
 import jrds.webapp.DiscoverAgent;
 
 import org.apache.log4j.Level;
@@ -32,31 +33,14 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 public class SnmpDiscoverAgent extends DiscoverAgent {
-    //  private static final OID sysObjectID = new OID("1.3.6.1.2.1.1.2.0");
-    //  private static final OID linuxOID = new OID("1.3.6.1.4.1.8072.3.2.10");
-    //  private static final OID solarisOID = new OID("1.3.6.1.4.1.8072.3.2.3");
-    //  private static final OID windowsNT_workstation_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.1");
-    //  private static final OID windowsNT_server_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.2");
-    //  private static final OID windowsNT_dc_OID = new OID("1.3.6.1.4.1.311.1.1.3.1.3");
-    private static final OID sysORID = new OID("1.3.6.1.2.1.1.9.1.2");
-    //  private static final OID ifMIB = new OID("1.3.6.1.2.1.31");
-    //  private static final OID snmpMIB = new OID("1.3.6.1.6.3.1");
-    private static final OID tcpMIB = new OID("1.3.6.1.2.1.49");
-    private static final OID ip = new OID("1.3.6.1.2.1.4");
-    private static final OID udpMIB = new OID("1.3.6.1.2.1.50");
-    private static final Map<OID, String> OID2Probe;
-    static {
-        OID2Probe = new HashMap<OID, String>(5);
-        OID2Probe.put(tcpMIB, "TcpSnmp");
-        OID2Probe.put(ip, "IpSnmp");
-        OID2Probe.put(udpMIB, "UdpSnmp");
-    }
+    //Used to check if snmp is on
+    static private final OID sysObjectID = new OID("1.3.6.1.2.1.1.2.0");
 
-    static class LocalSnmpStarter extends SnmpStarter {
+    static private class LocalSnmpStarter extends SnmpStarter {
         Snmp snmp;
         Target target;
         @Override
-        public boolean start() {
+        public final boolean start() {
             try {
                 snmp = new Snmp(new DefaultUdpTransportMapping());
                 snmp.listen();
@@ -65,28 +49,34 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
             return true;
         }
         @Override
-        public void stop() {
+        public final void stop() {
             try {
                 snmp.close();
             } catch (IOException e) {
             }
         }
         @Override
-        public Snmp getSnmp() {
+        public final Snmp getSnmp() {
             return snmp;
         }
         @Override
-        public Target getTarget() {
+        public final Target getTarget() {
             return target;
         }
         @Override
-        public boolean isStarted() {
+        public final boolean isStarted() {
             return true;
         }
     }
 
+    private Target hosttarget;
+    private LocalSnmpStarter active;
+    //Sort descriptions
+    private final LinkedList<String> sortedProbeName = new LinkedList<String>();
+    private final Map<String, ProbeDescSummary> summaries = new HashMap<String, ProbeDescSummary>();
+
     public SnmpDiscoverAgent() {
-        super("SNMP");
+        super("SNMP", jrds.probe.snmp.SnmpProbe.class);
     }
 
     private Target makeSnmpTarget(HttpServletRequest request) throws UnknownHostException{
@@ -103,88 +93,55 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
     }
 
     @Override
-    public void discover(String hostname, JrdsElement hostEleme,
+    public void discoverPost(String hostname, JrdsElement hostEleme,
             Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
-        Class<? extends Probe<?,?>> snmpClass = jrds.probe.snmp.SnmpProbe.class;
-        ClassLoader cl = getClass().getClassLoader();
 
-        Target hosttarget;
-        try {
-            hosttarget = makeSnmpTarget(request);
-        } catch (UnknownHostException e) {
-            throw new RuntimeException("Host name unknown",e);
-        }
-
-        Document hostDom = hostEleme.getOwnerDocument();
         boolean withOid = false;
         String withOidStr = request.getParameter("discoverWithOid");
         if(withOidStr != null && "true".equals(withOidStr.toLowerCase()))
             withOid = true;
 
-        LocalSnmpStarter active = new LocalSnmpStarter();
-        active.target = hosttarget;
-        active.doStart();
+        Set<String> done = new HashSet<String>();
 
-        Element snmpElem = hostDom.createElement("snmp");
-        if(hosttarget instanceof CommunityTarget) {
-            CommunityTarget ct = (CommunityTarget) hosttarget;
-            snmpElem.setAttribute("community", ct.getCommunity().toString());
-        }
-        snmpElem.setAttribute("version", Integer.toString( 1 + hosttarget.getVersion()));
-
-        hostEleme.appendChild(snmpElem);
-
-        for(JrdsDocument e: probdescs.values()) {
-            JrdsElement root = e.getRootElement();
-            JrdsElement buffer;
-
-            buffer = root.getElementbyName("probeClass");
-            String probeClass = buffer == null ? null : buffer.getTextContent();
-            Class<?> c;
-            try {
-                c = cl.loadClass(probeClass);
-                if(! snmpClass.isAssignableFrom(c))
-                    continue;
-            } catch (ClassNotFoundException e2) {
+        log(Level.TRACE, "Will search for probes %s", sortedProbeName);
+        for(String name: sortedProbeName) {
+            ProbeDescSummary summary = summaries.get(name);
+            if(done.contains(name))
                 continue;
-            }
-
-            buffer = root.getElementbyName("name");
-            String name = buffer == null ? null : buffer.getTextContent();
-            buffer = root.getElementbyName("index");
-            String index = buffer == null ? null : buffer.getTextContent();
-            buffer = e.findByPath("specific[@name='existOid']");
-            String doesExistOid = buffer == null ? null : buffer.getTextContent();
+            log(Level.TRACE, "Trying to discover probe %s", name);
 
             try {
-                if(index != null && ! "".equals(index) ) {
-                    log(Level.TRACE, "Found probe %s with index %s", name, index);
-                    buffer = root.findByPath("specific[@name='labelOid']");
-                    String labelOid = buffer == null ? null : buffer.getTextContent();
-                    log(Level.TRACE, "label OID for %s: %s", name, labelOid);
-                    try {
-                        enumerateIndexed(hostEleme, active, name, index, labelOid, withOid);
-                    } catch (Exception e1) {
-                        log(Level.ERROR, e1, "Error discoverer %s for index %s: %s", name, index, e1);
-                    }
+                boolean found = false;
+                if(summary.isIndexed ) {
+                    found = (enumerateIndexed(hostEleme, summary, withOid) > 0);
                 }
-                else if(doesExistOid != null && ! "".equals(doesExistOid)) {
-                    doesExist(hostEleme, active, name, doesExistOid);
+                else {
+                    found = doesExist(hostEleme, summary);
+                }
+                if(found) {
+                    done.add(summary.name);
+                    String hides = summary.specifics.get("hides");
+                    if(hides != null && ! hides.isEmpty())
+                        done.add(hides);
                 }
             } catch (Exception e1) {
-                log(Level.ERROR, e1, "Error detecting %s: %s" , name, e1);
+                log(Level.ERROR, e1, "Error detecting %s: %s" , summary.name, e1);
             }
         }
         active.doStop();
     }
 
-    private void doesExist(Element hostEleme, SnmpStarter active, String name, String doesExistOid) throws IOException {
-        OID OidExist = new OID(doesExistOid);
-        String label = getLabel(active, Collections.singletonList(OidExist));
-        if(label != null) {
-            addProbe(hostEleme, name, null, null);
+    private boolean doesExist(JrdsElement hostEleme, ProbeDescSummary summary) throws IOException {
+        OID OidExist = new OID(summary.specifics.get("existOid"));
+        Map<OID, Object> found = SnmpRequester.RAW.doSnmpGet(active, Collections.singletonList(OidExist));
+        if(found.size() > 0) {
+            addProbe(hostEleme, summary.name, null, null, null);
+            log(Level.TRACE, "%s does exist: %s", summary.name, found.values());
+            return true;
         }
-        log(Level.TRACE, "%s does exist: %s", name, label);
+        else {
+            return false;
+        }
     }
 
     private String getLabel(SnmpStarter active, List<OID> labelsOID) throws IOException {
@@ -197,57 +154,40 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         return null;
     }
 
-    private void enumerateIndexed(Element hostEleme, SnmpStarter active, String name, String indexOid, String labelOid, boolean withOid ) throws IOException {
+    private int enumerateIndexed(JrdsElement hostEleme, ProbeDescSummary summary, boolean withOid) throws IOException {
+        OID indexOid = new OID(summary.specifics.get("indexOid"));
+        int count = 0;
         log(Level.TRACE, "Will enumerate %s", indexOid);
-        Set<OID> oidsSet = Collections.singleton(new OID(indexOid));
-        Map<OID, Object> indexes= (Map<OID, Object>) SnmpRequester.TREE.doSnmpGet(active, oidsSet);
+        Set<OID> oidsSet = Collections.singleton(indexOid);
+        Map<OID, Object> indexes = SnmpRequester.TREE.doSnmpGet(active, oidsSet);
         log(Level.TRACE, "Elements : %s", indexes);
         for(Map.Entry<OID, Object> e: indexes.entrySet()) {
+            count++;
+            Map<String, String> beans = new HashMap<String, String>(2);
             OID indexoid = e.getKey();
             String indexName = e.getValue().toString();
             int index = indexoid.last();
-            List<String> argsTypes = new ArrayList<String>(1);
-            argsTypes.add("String");
-            List<String> argsValues = new ArrayList<String>(1);
-            argsValues.add(indexName);
+            beans.put("index", indexName);
 
             if(withOid) {
-                argsTypes.add("OID");
-                argsValues.add(Integer.toString(index));
+                beans.put("oid", Integer.toString(index));
             }
-            Element rrdElem = addProbe(hostEleme, name, argsTypes, argsValues);
+            JrdsElement rrdElem = addProbe(hostEleme, summary.name, null, null, beans);
 
             //We try to auto-generate the label
-            if (labelOid != null && ! "".equals(labelOid)) {
-                for(String lookin: labelOid.split(",")) {
+            String label = summary.specifics.get("labelOid");
+            if (label != null && ! label.isEmpty()) {
+                for(String lookin: label.split(",")) {
                     OID Oidlabel = new OID(lookin.trim() + "." + index);
-                    String label = getLabel(active, Collections.singletonList(Oidlabel));
-                    if(label != null) {
-                        rrdElem.setAttribute("label", label);
+                    String labelValue = getLabel(active, Collections.singletonList(Oidlabel));
+                    if(labelValue != null) {
+                        rrdElem.setAttribute("label", labelValue);
                         break;
                     }
                 }
             }
         }
-    }
-
-    @SuppressWarnings("unused")
-    private void walksysORID(Element hostEleme, SnmpStarter active) throws IOException {
-        log(Level.TRACE, "Will enumerate " + sysORID);
-        Set<OID> oidsSet = Collections.singleton(new OID(sysORID));
-        Map<OID, Object> indexes= (Map<OID, Object>) SnmpRequester.TREE.doSnmpGet(active, oidsSet);
-        log(Level.TRACE, "Elements: %s", indexes);
-        for(Object value: indexes.values()) {
-            if(value instanceof OID) {
-                String probe = OID2Probe.get(value);
-                if(probe != null) {
-                    Element rrdElem = hostEleme.getOwnerDocument().createElement("probe");
-                    rrdElem.setAttribute("type", probe);
-                    hostEleme.appendChild(rrdElem);         
-                }
-            }
-        }
-
+        return count;
     }
 
     @Override
@@ -267,8 +207,92 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         keepOID.id = "discoverWithOid";
         keepOID.label = " Keep index OID ";
 
-
         return Arrays.asList(community, port, keepOID);
+    }
+
+    @Override
+    public boolean exist(String hostname, HttpServletRequest request) {
+        try {
+            hosttarget = makeSnmpTarget(request);
+            active = new LocalSnmpStarter();
+            active.target = hosttarget;
+            active.doStart();
+            if(SnmpRequester.RAW.doSnmpGet(active, Collections.singleton(sysObjectID)).size() < 0) {
+                log(Level.INFO, "SNMP not active on host %s", hostname);
+                return false;
+            }
+            return true;
+        } catch (UnknownHostException e) {
+            log(Level.INFO, "Host name %s unknown", hostname);
+            return false;
+        } catch (IOException e1) {
+            log(Level.INFO, "SNMP not active on host %s", hostname);
+            return false;
+        }
+    }
+
+    @Override
+    public void addConnection(JrdsElement hostElement,
+            HttpServletRequest request) {
+        Document hostDom = hostElement.getOwnerDocument();
+        Element snmpElem = hostDom.createElement("snmp");
+        if(hosttarget instanceof CommunityTarget) {
+            CommunityTarget ct = (CommunityTarget) hosttarget;
+            snmpElem.setAttribute("community", ct.getCommunity().toString());
+        }
+        snmpElem.setAttribute("version", Integer.toString( 1 + hosttarget.getVersion()));
+
+        hostElement.appendChild(snmpElem);
+    }
+
+    @Override
+    public boolean isGoodProbeDesc(ProbeDescSummary summary) {
+        String index =  summary.specifics.get("indexOid");
+        //drop indexed probes without index oid
+        if(summary.isIndexed && (index == null || index.isEmpty()))
+            return false;
+
+        String doesExistOid = summary.specifics.get("existOid");
+        //drop indexed probes without OID to check presence
+        if(!summary.isIndexed && (doesExistOid == null || doesExistOid.isEmpty()))
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public void addProbe(JrdsElement hostElement, ProbeDescSummary summary,
+            HttpServletRequest request) {
+        String name = summary.name;
+
+        //Don't discover if asked to don't do
+        if(summary.specifics.get("nodiscover") != null)
+            return;
+
+        summaries.put(summary.name, summary);
+        String hides = summary.specifics.get("hides");
+        if(hides != null) {
+            //Both are new, just add them in the good order
+            if(! sortedProbeName.contains(hides) && ! sortedProbeName.contains(name)) {
+                sortedProbeName.add(name);
+                sortedProbeName.add(hides);
+            }
+            //hidden exist but this one is new, add before
+            else if(sortedProbeName.contains(hides) && ! sortedProbeName.contains(name)) {
+                int pos = sortedProbeName.indexOf(hides);
+                sortedProbeName.add(pos, name);
+            }
+            //hidden exist but this one is new, add after
+            else if(! sortedProbeName.contains(hides) && sortedProbeName.contains(name)) {
+                int pos = sortedProbeName.indexOf(name);
+                sortedProbeName.add(pos + 1, hides);
+            }
+        }
+        //No hide, just put
+        else {
+            sortedProbeName.add(name);
+        }
+        return;
     }
 
 }

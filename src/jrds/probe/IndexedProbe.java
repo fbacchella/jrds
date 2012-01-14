@@ -1,15 +1,10 @@
-/*
- * Created on 7 janv. 2005
- *
- * TODO 
- */
 package jrds.probe;
 
 /**
- * @author bacchell
+ * @author Fabrice Bacchella
  *
- * TODO 
  */
+
 public interface IndexedProbe {
 	public String getIndexName();
 }

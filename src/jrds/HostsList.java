@@ -22,6 +22,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import jrds.configuration.ConfigObjectFactory;
+import jrds.factories.ArgFactory;
 import jrds.factories.ProbeMeta;
 import jrds.graphe.Sum;
 import jrds.starter.Starter;
@@ -30,6 +31,7 @@ import jrds.webapp.ACL;
 import jrds.webapp.DiscoverAgent;
 import jrds.webapp.RolesACL;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -138,14 +140,9 @@ public class HostsList extends StarterNode {
 
         Set<Class<? extends Starter>> externalStarters = new HashSet<Class<? extends Starter>>();
         for(ProbeDesc pd: probesdesc) {
-            Class<?> pc = pd.getProbeClass();
-            while(pc != null && pc != StarterNode.class) {
-                if(pc.isAnnotationPresent(ProbeMeta.class)) {
-                    ProbeMeta meta = pc.getAnnotation(ProbeMeta.class);
-                    daList.add(meta.discoverAgent());
-                    externalStarters.add(meta.topStarter());
-                }
-                pc = pc.getSuperclass();
+            for(ProbeMeta meta: ArgFactory.enumerateAnnotation(pd.getProbeClass(), ProbeMeta.class, StarterNode.class)) {
+                daList.add(meta.discoverAgent());
+                externalStarters.add(meta.topStarter());
             }
         }
         conf.setMacroMap();
@@ -157,11 +154,15 @@ public class HostsList extends StarterNode {
             addHost(h);
             h.configureStarters(pm);
             for(Probe<?,?> p: h.getProbes()) {
-                p.setTimeout(getTimeout());
-                addProbe(p);
-                p.configureStarters(pm);
-                for(String hostTag: p.getTags()) {
-                    hostsTags.add(hostTag);
+                try {
+                    p.setTimeout(getTimeout());
+                    addProbe(p);
+                    p.configureStarters(pm);
+                    for(String hostTag: p.getTags()) {
+                        hostsTags.add(hostTag);
+                    }
+                } catch (Exception e) {
+                    log(Level.ERROR, e, "Probe is failing: %s", e);
                 }
             }				
         }

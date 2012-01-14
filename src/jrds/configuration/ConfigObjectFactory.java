@@ -5,7 +5,6 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -157,9 +156,6 @@ public class ConfigObjectFactory {
         return tabsMap;
     }
 
-    public Set<Class<?>> getPreloadedClass() {
-        return pf.getPreloadedClass();
-    }
     /**
      * @return the load
      */

@@ -4,10 +4,9 @@
     <name>sendmailSnmp</name>
     <probeName>sendmailsnmp</probeName>
 	<probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
-	<index />
-	<uniq>true</uniq>
+    <specific name="indexOid"></specific>
 	<defaultargs>
-		<arg type="String" value="1" />
+        <attr name="index">1</attr>
 	</defaultargs>
     <ds>
         <dsName>mtaReceivedMsg</dsName>

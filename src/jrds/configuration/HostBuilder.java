@@ -1,5 +1,6 @@
 package jrds.configuration;
 
+import java.beans.PropertyDescriptor;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
@@ -28,6 +29,7 @@ import jrds.factories.xml.JrdsElement;
 import jrds.factories.xml.JrdsNode;
 import jrds.starter.ChainedProperties;
 import jrds.starter.Connection;
+import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 
 import org.apache.log4j.Logger;
@@ -38,6 +40,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
     private ClassLoader classLoader = null;
     private ProbeFactory pf;
     private Map<String, Macro> macrosMap;
+    private final Map<Class<?>, Map<String, PropertyDescriptor>> connectionsBeanCache = new HashMap<Class<?>, Map<String, PropertyDescriptor>>();
 
     public HostBuilder() {
         super(ConfigType.HOSTS);
@@ -101,7 +104,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
         }
 
         Map<String, String> hostprop = makeProperties(fragment);
-        if(hostprop != null) {
+        if(hostprop != null && ! hostprop.isEmpty()) {
             ChainedProperties temp = new ChainedProperties(hostprop);
             ns.registerStarter(temp);
         }
@@ -187,7 +190,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
         }
     }
 
-    public Probe<?,?> makeProbe(JrdsElement probeNode, RdsHost host, StarterNode ns) {
+    public Probe<?,?> makeProbe(JrdsElement probeNode, RdsHost host, StarterNode ns) throws InvocationTargetException {
         Probe<?,?> p = null;
         String type = probeNode.attrMap().get("type");
 
@@ -211,26 +214,6 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
             return null;
         p.setHost(host);
 
-
-
-        //		for(JrdsNode thresholdNode: probeNode.iterate(CompiledXPath.get("threshold"))) {
-        //			Map<String, String> thresholdAttr = thresholdNode.attrMap();
-        //			String name = thresholdAttr.get("name").trim();
-        //			String dsName = thresholdAttr.get("dsName").trim();
-        //			double value = Double.parseDouble(thresholdAttr.get("value").trim());
-        //			long duration = Long.parseLong(thresholdAttr.get("duration").trim());
-        //			String operationStr = thresholdAttr.get("limit").trim();
-        //			Comparator operation = Comparator.valueOf(operationStr.toUpperCase());
-        //
-        //			Threshold t= new Threshold(name, dsName, value, duration, operation);
-        //			for(JrdsNode actionNode: thresholdNode.iterate(CompiledXPath.get("action"))) {
-        //				String actionType = actionNode.getChild(CompiledXPath.get("@type")).getTextContent().trim().toUpperCase();
-        //				Threshold.Action a = Threshold.Action.valueOf(actionType);
-        //				t.addAction(a, makeArgs(actionNode));
-        //			}
-        //			p.addThreshold(t);
-        //		}
-
         ChainedProperties cp = ns.find(ChainedProperties.class);
         String label = probeNode.getAttribute("label");
         if(label != null && ! "".equals(label)) {
@@ -244,7 +227,42 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                 ((ConnectedProbe)p).setConnectionName(jrds.Util.parseTemplate(connexionName, cp));
             }
         }
+
+        ProbeDesc pd = p.getPd();
         List<Object> args = ArgFactory.makeArgs(probeNode, cp, host);
+        //Prepare the probe with the default beans values
+        Map<String, String> defaultBeans = pd.getDefaultArgs();
+        if(defaultBeans!=null) {
+            for(Map.Entry<String, String> e: defaultBeans.entrySet()) {
+                try {
+                    String beanName = e.getKey();
+                    String beanValue = e.getValue();
+                    PropertyDescriptor bean = pd.getBeanMap().get(beanName);
+                    Object value;
+                    //If the last argument is a list, give it to the template parser
+                    Object lastArgs = args.isEmpty() ? null : args.get(args.size() - 1);
+                    if(lastArgs instanceof List) {
+                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), Util.parseTemplate(beanValue, host, lastArgs));
+                    }
+                    else {
+                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), jrds.Util.parseTemplate(beanValue, host));
+                    }
+                    logger.trace(jrds.Util.delayedFormatString("Adding bean %s=%s (%s) to default args", beanName, value, value.getClass()));
+                    bean.getWriteMethod().invoke(p, value);
+                } catch (Exception ex) {
+                    throw new RuntimeException("Invalid default bean " + e.getKey(), ex);
+                }
+            }
+        }
+
+        //Resolve the beans
+        try {
+            setAttributes(probeNode, p, pd.getBeanMap(), host);
+        } catch (IllegalArgumentException e) {
+            logger.error(String.format("Can't configure %s for %s: %s", pd.getName(), host, e));
+            return null;
+        }
+
         if( !pf.configure(p, args)) {
             logger.error(p + " configuration failed");
             return null;
@@ -283,16 +301,17 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
         }
     }
 
-    public void makeConnexion(JrdsElement domNode, StarterNode sNode) {
+    private void makeConnexion(JrdsElement domNode, StarterNode sNode) {
         for(JrdsElement cnxNode: domNode.getChildElementsByName("connection")) {
-            List<Object> args = ArgFactory.makeArgs(cnxNode);
             String type = cnxNode.attrMap().get("type");
             if(type == null) {
-                logger.equals("No type declared");
+                logger.error("No type declared for a connection");
+                continue;
             }
             String name = cnxNode.attrMap().get("name");
             Connection<?> o = null;
             try {
+                List<Object> args = ArgFactory.makeArgs(cnxNode);
                 Class<?> connectionClass = classLoader.loadClass(type);
                 Class<?>[] constArgsType = new Class[args.size()];
                 Object[] constArgsVal = new Object[args.size()];
@@ -304,7 +323,13 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                 }
                 Constructor<?> theConst = connectionClass.getConstructor(constArgsType);
                 o = (Connection<?>)theConst.newInstance(constArgsVal);
-                if(name !=null && ! "".equals(name))
+                Map<String, PropertyDescriptor> beans = connectionsBeanCache.get(connectionClass);
+                if(beans == null) {
+                    beans = ArgFactory.getBeanPropertiesMap(connectionClass, Starter.class);
+                    connectionsBeanCache.put(connectionClass, beans);
+                }
+                setAttributes(cnxNode, o, beans, sNode);
+                if(name != null && ! name.trim().isEmpty())
                     o.setName(name.trim());
                 sNode.registerStarter(o);
                 logger.debug(Util.delayedFormatString("Connexion registred: %s for %s", o, sNode));
@@ -324,6 +349,38 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                         ": " + ex, ex);
             }
         }
+    }
+
+    private void setAttributes(JrdsElement probeNode, Object o, Map<String, PropertyDescriptor> beans, Object... context) throws IllegalArgumentException, InvocationTargetException {
+        //Resolve the beans
+        for(JrdsElement attrNode: probeNode.getChildElementsByName("attr")) {
+            String name = attrNode.getAttribute("name");
+            PropertyDescriptor bean = beans.get(name);
+            if(bean == null) {
+                logger.error("Unknonw bean " + name);
+                continue;
+            }
+            String textValue = Util.parseTemplate(attrNode.getTextContent(), context);
+            logger.trace(Util.delayedFormatString("Fond attribute %s with value %s", name, textValue));
+            try {
+                Constructor<?> c = bean.getPropertyType().getConstructor(String.class);
+                Object value = c.newInstance(textValue);
+                bean.getWriteMethod().invoke(o, value);
+            } catch (IllegalArgumentException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (SecurityException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (InstantiationException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (IllegalAccessException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (InvocationTargetException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            } catch (NoSuchMethodException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            }
+        }
+
     }
 
     /**

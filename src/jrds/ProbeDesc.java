@@ -1,25 +1,23 @@
-/*##########################################################################
-_##
-_##  $Id$
-_##
-_##########################################################################*/
-
 package jrds;
 
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import jrds.factories.ArgFactory;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
@@ -34,447 +32,471 @@ import org.w3c.dom.Element;
  * @author Fabrice Bacchella
  * @version $Revision$
  */
+/**
+ * @author bacchell
+ *
+ */
 public class ProbeDesc implements Cloneable {
-	static final private Logger logger = Logger.getLogger(ProbeDesc.class);
+    static final private Logger logger = Logger.getLogger(ProbeDesc.class);
 
-	static public final double MINDEFAULT = 0;
-	static public final double MAXDEFAULT = Double.NaN;
+    static public final double MINDEFAULT = 0;
+    static public final double MAXDEFAULT = Double.NaN;
 
-	private long heartBeatDefault = 600;
-	private Map<String, DsDesc> dsMap;
-	private Map<String, String> specific = new HashMap<String, String>();;
-	private String probeName;
-	private String name;
-	private Collection<String> graphesList = new ArrayList<String>();
-	private boolean uniqIndex = false;
-	private Class<? extends Probe<?,?>> probeClass = null;
-	private List<Object> defaultsArgs = null;
-	private float uptimefactor = (float) 1.0;
-	private Map<String, String> properties = null;
-	private Map<String, Double> defaultValues = new HashMap<String,Double>(0);
+    private long heartBeatDefault = 600;
+    private Map<String, DsDesc> dsMap;
+    private Map<String, String> specific = new HashMap<String, String>();;
+    private String probeName;
+    private String name;
+    private Collection<String> graphesList = new ArrayList<String>();
+    private Class<? extends Probe<?,?>> probeClass = null;
+    private Map<String, String> defaultsArgs = null;
+    private float uptimefactor = (float) 1.0;
+    private Map<String, String> properties = null;
+    private Map<String, Double> defaultValues = new HashMap<String,Double>(0);
+    private Map<String, PropertyDescriptor> beans = Collections.emptyMap();
 
-	private static final class DsDesc {
-		public DsType dsType;
-		public long heartbeat;
-		public double minValue;
-		public double maxValue;
-		public Object collectKey;
-		public DsDesc(DsType dsType, long heartbeat, double minValue, double maxValue, Object key)
-		{
-			this.dsType = dsType;
-			this.heartbeat = heartbeat;
-			this.minValue = minValue;
-			this.maxValue = maxValue;
-			this.collectKey = key;
-		}
-	}
+    private static final class DsDesc {
+        public DsType dsType;
+        public long heartbeat;
+        public double minValue;
+        public double maxValue;
+        public Object collectKey;
+        public DsDesc(DsType dsType, long heartbeat, double minValue, double maxValue, Object key)
+        {
+            this.dsType = dsType;
+            this.heartbeat = heartbeat;
+            this.minValue = minValue;
+            this.maxValue = maxValue;
+            this.collectKey = key;
+        }
+    }
 
-	/**
-	 * Create a new Probe Description, with <it>size<it> elements in prevision
-	 * @param size estimated elements number
-	 */
-	public ProbeDesc(int size) {
-		dsMap = new LinkedHashMap<String, DsDesc>(size);
-	}
+    /**
+     * Create a new Probe Description, with <it>size<it> elements in prevision
+     * @param size estimated elements number
+     */
+    public ProbeDesc(int size) {
+        dsMap = new LinkedHashMap<String, DsDesc>(size);
+    }
 
-	/**
-	 * Create a new Probe Description
-	 */
-	public ProbeDesc() {
-		dsMap = new LinkedHashMap<String, DsDesc>();
-	}
+    /**
+     * Create a new Probe Description
+     */
+    public ProbeDesc() {
+        dsMap = new LinkedHashMap<String, DsDesc>();
+    }
 
-	//Differets way to add a munins probe
-	/**
-	 * A datastore that is stored but not collected
-	 * @param name the datastore name
-	 * @param dsType
-	 */
-	public void add(String name, DsType dsType)
-	{
-		dsMap.put(name, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, name));
-	}
+    //Differets way to add a munins probe
+    /**
+     * A datastore that is stored but not collected
+     * @param name the datastore name
+     * @param dsType
+     */
+    public void add(String name, DsType dsType)
+    {
+        dsMap.put(name, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, name));
+    }
 
-	public void add(String name, DsType dsType, double min, double max)
-	{
-		dsMap.put(name, new DsDesc(dsType, heartBeatDefault, min, max, name));
-	}
+    public void add(String name, DsType dsType, double min, double max)
+    {
+        dsMap.put(name, new DsDesc(dsType, heartBeatDefault, min, max, name));
+    }
 
-	public void add(String dsName, DsType dsType, String probeName)
-	{
-		dsMap.put(dsName, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, probeName));
-	}
+    public void add(String dsName, DsType dsType, String probeName)
+    {
+        dsMap.put(dsName, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, probeName));
+    }
 
-	public void add(String dsName, DsType dsType, String probeName, double min, double max)
-	{
-		dsMap.put(dsName, new DsDesc(dsType, heartBeatDefault, min, max, probeName));
-	}
+    public void add(String dsName, DsType dsType, String probeName, double min, double max)
+    {
+        dsMap.put(dsName, new DsDesc(dsType, heartBeatDefault, min, max, probeName));
+    }
 
-	/** Add a SNMP probe what will be stored
-	 * @param name
-	 * @param dsType
-	 * @param oid
-	 */
-	public void add(String name, DsType dsType, OID oid)
-	{
-		dsMap.put(name, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, oid));
-	}
+    /** Add a SNMP probe what will be stored
+     * @param name
+     * @param dsType
+     * @param oid
+     */
+    public void add(String name, DsType dsType, OID oid)
+    {
+        dsMap.put(name, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, oid));
+    }
 
-	public void add(String name, DsType dsType, OID oid, double min, double max)
-	{
-		dsMap.put(name, new DsDesc(dsType, heartBeatDefault, min, max, oid));
-	}
+    public void add(String name, DsType dsType, OID oid, double min, double max)
+    {
+        dsMap.put(name, new DsDesc(dsType, heartBeatDefault, min, max, oid));
+    }
 
-	/**Add a SNMP probe not to be stored
-	 * @param name
-	 * @param oid
-	 */
-	public void add(String name, OID oid)
-	{
-		dsMap.put(name, new DsDesc(null, heartBeatDefault, MINDEFAULT, MAXDEFAULT, oid));
-	}
+    /**Add a SNMP probe not to be stored
+     * @param name
+     * @param oid
+     */
+    public void add(String name, OID oid)
+    {
+        dsMap.put(name, new DsDesc(null, heartBeatDefault, MINDEFAULT, MAXDEFAULT, oid));
+    }
 
-	public void add(String name, DsType dsType, Object index, double min, double max)
-	{
-		dsMap.put(name, new DsDesc(null, heartBeatDefault, MINDEFAULT, MAXDEFAULT, index));
-	}
+    public void add(String name, DsType dsType, Object index, double min, double max)
+    {
+        dsMap.put(name, new DsDesc(null, heartBeatDefault, MINDEFAULT, MAXDEFAULT, index));
+    }
 
-	public static final class Joined {
-		Object keyhigh;
-		Object keylow;
-		Joined(Object keyhigh, Object keylow) {
-			this.keyhigh = keyhigh;
-			this.keylow = keylow;
-		}
-	}
-	
-	Map<String, Joined> highlowcollectmap = new HashMap<String, Joined>();
-		
-	/**
-	 * @return the highlowcollectmap
-	 */
-	public Map<String, Joined> getHighlowcollectmap() {
-		return highlowcollectmap;
-	}
+    public static final class Joined {
+        Object keyhigh;
+        Object keylow;
+        Joined(Object keyhigh, Object keylow) {
+            this.keyhigh = keyhigh;
+            this.keylow = keylow;
+        }
+    }
 
-	public void add(Map<String, Object> valuesMap)
-	{
-		long heartbeat = heartBeatDefault;
-		double min = MINDEFAULT;
-		double max = MAXDEFAULT;
-		Object collectKey = null;
-		String name = null;
-		DsType type = null;
-		if(valuesMap.containsKey("dsName")) {
-			name = (String) valuesMap.get("dsName");
-		}
-		if(valuesMap.containsKey("dsType")) {
-			type = (DsType) valuesMap.get("dsType");
-		}
-		if(valuesMap.containsKey("collect")) {
-			collectKey = valuesMap.get("collect");
-		}
-		else if(valuesMap.containsKey("collecthigh") && valuesMap.containsKey("collectlow")) {
-			Object keyHigh = valuesMap.get("collecthigh");
-			Object keyLow = valuesMap.get("collectlow");
-			dsMap.put(name + "high", new DsDesc(null, heartbeat, min, max, keyHigh));
-			dsMap.put(name + "low", new DsDesc(null, heartbeat, min, max, keyLow));
-			highlowcollectmap.put(name, new Joined(keyHigh, keyLow));
-		}
-		else {
-			collectKey = name;
-		}
-		if(valuesMap.containsKey("defaultValue")) {
-			defaultValues.put(name, jrds.Util.parseStringNumber(valuesMap.get("defaultValue").toString(), Double.NaN));
-		}
+    Map<String, Joined> highlowcollectmap = new HashMap<String, Joined>();
+
+    /**
+     * @return the highlowcollectmap
+     */
+    public Map<String, Joined> getHighlowcollectmap() {
+        return highlowcollectmap;
+    }
+
+    public void add(Map<String, Object> valuesMap) {
+        long heartbeat = heartBeatDefault;
+        double min = MINDEFAULT;
+        double max = MAXDEFAULT;
+        Object collectKey = null;
+        String name = null;
+        DsType type = null;
+
+        //Where to look for the added name
+        if(valuesMap.containsKey("dsName")) {
+            name = (String) valuesMap.get("dsName");
+        }
+        else if(valuesMap.containsKey("collect")) {
+            name = valuesMap.get("collect").toString();
+        }
+
+        if(valuesMap.containsKey("dsType")) {
+            type = (DsType) valuesMap.get("dsType");
+        }
+
+        //Where to look for the collect info
+        if(valuesMap.containsKey("collect")) {
+            collectKey = valuesMap.get("collect");
+        }
+        else if(valuesMap.containsKey("collecthigh") && valuesMap.containsKey("collectlow")) {
+            Object keyHigh = valuesMap.get("collecthigh");
+            Object keyLow = valuesMap.get("collectlow");
+            dsMap.put(name + "high", new DsDesc(null, heartbeat, min, max, keyHigh));
+            dsMap.put(name + "low", new DsDesc(null, heartbeat, min, max, keyLow));
+            highlowcollectmap.put(name, new Joined(keyHigh, keyLow));
+        }
+        else {
+            collectKey = name;
+        }
+
+        if(valuesMap.containsKey("defaultValue")) {
+            defaultValues.put(name, jrds.Util.parseStringNumber(valuesMap.get("defaultValue").toString(), Double.NaN));
+        }
         if(valuesMap.containsKey("minValue")) {
             min = jrds.Util.parseStringNumber(valuesMap.get("minValue").toString(), MINDEFAULT);
         }
         if(valuesMap.containsKey("maxValue")) {
             max = jrds.Util.parseStringNumber(valuesMap.get("maxValue").toString(), MAXDEFAULT);
         }
-		dsMap.put(name, new DsDesc(type, heartbeat, min, max, collectKey));
-	}
-	
-	/**
-	 * Replace all the data source for this probe description with the list provided
-	 * @param dsList a list of data source description as a map.
-	 */
-	public void replaceDs(List<Map<String, Object>> dsList) {
-		defaultValues = new HashMap<String,Double>(0);
-		dsMap = new HashMap<String, DsDesc>(dsList.size());
-		for(Map<String, Object> dsinfo: dsList) {
-			add(dsinfo);
-		}
-	}
+        dsMap.put(name, new DsDesc(type, heartbeat, min, max, collectKey));
+    }
 
-	/**
-	 * Return a map that translate an OID to the datastore name
-	 * @return a Map of collect oids to datastore name
-	 */
-	public Map<OID, String> getCollectOids()
-	{
-		Map<OID, String> retValue = new LinkedHashMap<OID, String>(dsMap.size());
-		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
-			DsDesc dd = e.getValue();
-			if(dd.collectKey != null && dd.collectKey instanceof OID)
-				retValue.put((OID)dd.collectKey, e.getKey());
-		}
-		return retValue;
-	}
+    /**
+     * Replace all the data source for this probe description with the list provided
+     * @param dsList a list of data source description as a map.
+     */
+    public void replaceDs(List<Map<String, Object>> dsList) {
+        defaultValues = new HashMap<String,Double>(0);
+        dsMap = new HashMap<String, DsDesc>(dsList.size());
+        for(Map<String, Object> dsinfo: dsList) {
+            add(dsinfo);
+        }
+    }
 
-	/**
-	 * Return a map that translate the probe technical name  as a string to the datastore name
-	 * @return a Map of collect names to datastore name
-	 */
-	public Map<String, String> getCollectStrings()
-	{
-		Map<String, String> retValue = new LinkedHashMap<String, String>(dsMap.size());
-		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
-			DsDesc dd =  e.getValue();
-			if(dd.collectKey != null  && dd.collectKey instanceof String  && ! "".equals((String) dd.collectKey))
-				retValue.put((String)dd.collectKey, e.getKey());
-		}
-		return retValue;
-	}
+    /**
+     * Return a map that translate an OID to the datastore name
+     * @return a Map of collect oids to datastore name
+     */
+    public Map<OID, String> getCollectOids()
+    {
+        Map<OID, String> retValue = new LinkedHashMap<OID, String>(dsMap.size());
+        for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
+            DsDesc dd = e.getValue();
+            if(dd.collectKey != null && dd.collectKey instanceof OID)
+                retValue.put((OID)dd.collectKey, e.getKey());
+        }
+        return retValue;
+    }
 
-	/**
-	 * Return a map that translate the probe technical name to the datastore name
-	 * @return a Map of collect names to datastore name
-	 */
-	public Map<Object, String> getCollectMapping() {
-		Map<Object, String> retValue = new LinkedHashMap<Object, String>(dsMap.size());
-		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
-			DsDesc dd = e.getValue();
-			if(dd.collectKey != null && dd.dsType != null)
-				retValue.put(dd.collectKey, e.getKey());
-		}
-		return retValue;
-	}
+    /**
+     * Return a map that translate the probe technical name  as a string to the datastore name
+     * @return a Map of collect names to datastore name
+     */
+    public Map<String, String> getCollectStrings()
+    {
+        Map<String, String> retValue = new LinkedHashMap<String, String>(dsMap.size());
+        for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
+            DsDesc dd =  e.getValue();
+            if(dd.collectKey != null  && dd.collectKey instanceof String  && ! "".equals((String) dd.collectKey))
+                retValue.put((String)dd.collectKey, e.getKey());
+        }
+        return retValue;
+    }
 
-	public DsDef[] getDsDefs() 
-	{
-		List<DsDef> dsList = new ArrayList<DsDef>(dsMap.size());
-		for(Map.Entry<String, DsDesc> e: dsMap.entrySet() ) {
-			DsDesc desc = e.getValue();
-			if(desc.dsType != null)
-				dsList.add(new DsDef(e.getKey(), desc.dsType, desc.heartbeat, desc.minValue, desc.maxValue));
-		}
-		return dsList.toArray(new DsDef[dsList.size()]);
-	}
+    /**
+     * Return a map that translate the probe technical name to the datastore name
+     * @return a Map of collect names to datastore name
+     */
+    public Map<Object, String> getCollectMapping() {
+        Map<Object, String> retValue = new LinkedHashMap<Object, String>(dsMap.size());
+        for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
+            DsDesc dd = e.getValue();
+            if(dd.collectKey != null && dd.dsType != null)
+                retValue.put(dd.collectKey, e.getKey());
+        }
+        return retValue;
+    }
 
-	public Collection<String> getDs() {
-		HashSet<String> dsList = new HashSet<String>(dsMap.size());
-		for(Map.Entry<String, DsDesc> e: dsMap.entrySet() ) {
-			if(e.getValue().dsType != null)
-				dsList.add(e.getKey());
-		}
-		return dsList;
-	}
+    public DsDef[] getDsDefs() 
+    {
+        List<DsDef> dsList = new ArrayList<DsDef>(dsMap.size());
+        for(Map.Entry<String, DsDesc> e: dsMap.entrySet() ) {
+            DsDesc desc = e.getValue();
+            if(desc.dsType != null)
+                dsList.add(new DsDef(e.getKey(), desc.dsType, desc.heartbeat, desc.minValue, desc.maxValue));
+        }
+        return dsList.toArray(new DsDef[dsList.size()]);
+    }
 
-	public boolean dsExist(String dsName) {
-		DsDesc dd = dsMap.get(dsName);
-		return (dd !=null && dd.dsType != null);
-	}
+    public Collection<String> getDs() {
+        HashSet<String> dsList = new HashSet<String>(dsMap.size());
+        for(Map.Entry<String, DsDesc> e: dsMap.entrySet() ) {
+            if(e.getValue().dsType != null)
+                dsList.add(e.getKey());
+        }
+        return dsList;
+    }
 
-	/**
-	 * @return The number of data store
-	 */
-	public int getSize()
-	{
-		return dsMap.size();
-	}
+    public boolean dsExist(String dsName) {
+        DsDesc dd = dsMap.get(dsName);
+        return (dd !=null && dd.dsType != null);
+    }
 
-	/**
-	 * @return Returns the rrdName.
-	 */
-	public String getProbeName() {
-		return probeName;
-	}
+    /**
+     * @return The number of data store
+     */
+    public int getSize()
+    {
+        return dsMap.size();
+    }
 
-	/**
-	 * @param probeName The rrdName to set.
-	 */
-	public void setProbeName(String probeName) {
-		this.probeName = probeName;
-	}
+    /**
+     * @return Returns the rrdName.
+     */
+    public String getProbeName() {
+        return probeName;
+    }
+
+    /**
+     * @param probeName The rrdName to set.
+     */
+    public void setProbeName(String probeName) {
+        this.probeName = probeName;
+    }
 
 
-	/**
-	 * @return the uptimefactor
-	 */
-	public float getUptimefactor() {
-		return uptimefactor;
-	}
+    /**
+     * @return the uptimefactor
+     */
+    public float getUptimefactor() {
+        return uptimefactor;
+    }
 
-	/**
-	 * @param uptimefactor the uptimefactor to set
-	 */
-	public void setUptimefactor(float uptimefactor) {
-		this.uptimefactor = uptimefactor;
-	}
+    /**
+     * Used to set à string template
+     * @param index
+     */
+    public void setIndex(String index) {
+        if(index != null && ! index.isEmpty())
+            specific.put("index", index);
+    }
 
-	/**
-	 * @return Returns the graphClasses.
-	 */
-	public Collection<String> getGraphClasses() {
-		return graphesList;
-	}
+    /**
+     * Return the string template or null
+     * @return
+     */
+    public String getIndex() {
+        return specific.get("index");
+    }
 
-	/**
-	 * @param graphClasses The graphClasses to set.
-	 */
-	public void setGraphClasses(Collection<String> graphClasses) {
-		this.graphesList = graphClasses;
-	}
+    /**
+     * @param uptimefactor the uptimefactor to set
+     */
+    public void setUptimefactor(float uptimefactor) {
+        this.uptimefactor = uptimefactor;
+    }
 
-	/**
-	 * @param graphClasses The graphClasses to set.
-	 */
-	public void setGraphClasses(String[] graphClasses) {
-		this.graphesList = Arrays.asList(graphClasses);
-	}
+    /**
+     * @return Returns the graphClasses.
+     */
+    public Collection<String> getGraphClasses() {
+        return graphesList;
+    }
 
-	/**
-	 * @return Returns the unicity of the index.
-	 */
-	public boolean isUniqIndex() {
-		return uniqIndex;
-	}
+    /**
+     * @param graphClasses The graphClasses to set.
+     */
+    public void setGraphClasses(Collection<String> graphClasses) {
+        this.graphesList = graphClasses;
+    }
 
-	/**
-	 * @param uniqIndex The value of the unicity index.
-	 * It's used to avoid doing too much GET if the indes is found only ounce.<p>
-	 * Default value is false.
-	 */
-	public void setUniqIndex(boolean uniqIndex) {
-		this.uniqIndex = uniqIndex;
-	}
+    /**
+     * @param graphClasses The graphClasses to set.
+     */
+    public void setGraphClasses(String[] graphClasses) {
+        this.graphesList = Arrays.asList(graphClasses);
+    }
 
-	public Class<? extends Probe<?,?>> getProbeClass() {
-		return probeClass;
-	}
+    public Class<? extends Probe<?,?>> getProbeClass() {
+        return probeClass;
+    }
 
-	public void setProbeClass(Class<? extends Probe<?,?>> probeClass) {
-		this.probeClass = probeClass;
-	}
+    public void setProbeClass(Class<? extends Probe<?,?>> probeClass) throws InvocationTargetException {
+        beans = ArgFactory.getBeanPropertiesMap(probeClass, Probe.class);
+        this.probeClass = probeClass;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public Map<String, PropertyDescriptor> getBeanMap() {
+        return beans;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public Collection<PropertyDescriptor> getBeans() {
+        return beans.values();
+    }
 
-	public String getSpecific(String name) {
-		return specific.get(name);
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void addSpecific(String name, String value) {
-		specific.put(name, value);
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void addDefaultArg(Object o){
-		if(defaultsArgs == null) 
-			defaultsArgs = new LinkedList<Object>();
-		defaultsArgs.add(o);
-		logger.trace("Adding " + o + " (" + o.getClass() + ") to default args");
-	}
+    public String getSpecific(String name) {
+        return specific.get(name);
+    }
 
-	public List<Object> getDefaultArgs() {
-		return defaultsArgs;
-	}
+    public void addSpecific(String name, String value) {
+        specific.put(name, value);
+    }
 
-	/**
-	 * @return the properties
-	 */
-	public Map<String, String> getProperties() {
-		return properties;
-	}
+    public void addDefaultArg(String beanName, String beanValue) throws InvocationTargetException{
+        if(defaultsArgs == null) 
+            defaultsArgs = new HashMap<String, String>();
+        if( beans.containsKey(beanName)) {
+            defaultsArgs.put(beanName, beanValue);
+            logger.trace(Util.delayedFormatString("Adding bean %s=%s to default args", beanName, beanValue));
+        }
+    }
 
-	/**
-	 * @param properties the properties to set
-	 */
-	public void setProperties(Map<String, String> properties) {
-		this.properties = properties;
-	}
+    public Map<String, String> getDefaultArgs() {
+        return defaultsArgs;
+    }
 
-	/**
-	 * @return the heartBeatDefault
-	 */
-	public long getHeartBeatDefault() {
-		return heartBeatDefault;
-	}
+    /**
+     * @return the properties
+     */
+    public Map<String, String> getProperties() {
+        return properties;
+    }
 
-	/**
-	 * @param heartBeatDefault the heartBeatDefault to set
-	 */
-	public void setHeartBeatDefault(long heartBeatDefault) {
-		this.heartBeatDefault = heartBeatDefault;
-	}
+    /**
+     * @param properties the properties to set
+     */
+    public void setProperties(Map<String, String> properties) {
+        this.properties = properties;
+    }
 
-	/**
-	 * @return the defaultValues
-	 */
-	public Map<String, Double> getDefaultValues() {
-		return defaultValues;
-	}
+    /**
+     * @return the heartBeatDefault
+     */
+    public long getHeartBeatDefault() {
+        return heartBeatDefault;
+    }
 
-	public Document dumpAsXml() throws ParserConfigurationException, IOException {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder = factory.newDocumentBuilder();
-		Document document = builder.newDocument();
-		Element root = 
-			(Element) document.createElement("probedesc"); 
-		document.appendChild(root);
-		root.appendChild(document.createElement("name")).setTextContent(name);
-		if(probeName != null)
-			root.appendChild(document.createElement("probeName")).setTextContent(probeName);
-		root.appendChild(document.createElement("probeClass")).setTextContent(probeClass.getName());
-		
-		//Setting specific values
-		for(Map.Entry<String, String> e: specific.entrySet()) {
-			Element specElement = (Element) root.appendChild(document.createElement("specific"));
-			specElement.setAttribute("name", e.getKey());
-			specElement.setTextContent(e.getValue());
-		}
-		//Setting the uptime factor
-		if(uptimefactor != 1.0)
-			root.appendChild(document.createElement("uptimefactor")).setTextContent(Float.toString(uptimefactor));
+    /**
+     * @param heartBeatDefault the heartBeatDefault to set
+     */
+    public void setHeartBeatDefault(long heartBeatDefault) {
+        this.heartBeatDefault = heartBeatDefault;
+    }
 
-		//Adding all the datastores
-		for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
-			Element dsElement = (Element) root.appendChild(document.createElement("ds"));
-			dsElement.appendChild(document.createElement("dsName")).setTextContent(e.getKey());
-			DsDesc desc = e.getValue();
-			if(desc.dsType != null)
-				dsElement.appendChild(document.createElement("dsType")).setTextContent(desc.dsType.toString());
-			if(desc.collectKey instanceof OID)
-				dsElement.appendChild(document.createElement("oid")).setTextContent(desc.collectKey.toString());
-			if(desc.collectKey instanceof String)
-				dsElement.appendChild(document.createElement("collect")).setTextContent(desc.collectKey.toString());
+    /**
+     * @return the defaultValues
+     */
+    public Map<String, Double> getDefaultValues() {
+        return defaultValues;
+    }
+
+    public Document dumpAsXml() throws ParserConfigurationException, IOException {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.newDocument();
+        Element root = 
+                (Element) document.createElement("probedesc"); 
+        document.appendChild(root);
+        root.appendChild(document.createElement("name")).setTextContent(name);
+        if(probeName != null)
+            root.appendChild(document.createElement("probeName")).setTextContent(probeName);
+        root.appendChild(document.createElement("probeClass")).setTextContent(probeClass.getName());
+
+        //Setting specific values
+        for(Map.Entry<String, String> e: specific.entrySet()) {
+            Element specElement = (Element) root.appendChild(document.createElement("specific"));
+            specElement.setAttribute("name", e.getKey());
+            specElement.setTextContent(e.getValue());
+        }
+        //Setting the uptime factor
+        if(uptimefactor != 1.0)
+            root.appendChild(document.createElement("uptimefactor")).setTextContent(Float.toString(uptimefactor));
+
+        //Adding all the datastores
+        for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
+            Element dsElement = (Element) root.appendChild(document.createElement("ds"));
+            dsElement.appendChild(document.createElement("dsName")).setTextContent(e.getKey());
+            DsDesc desc = e.getValue();
+            if(desc.dsType != null)
+                dsElement.appendChild(document.createElement("dsType")).setTextContent(desc.dsType.toString());
+            if(desc.collectKey instanceof OID)
+                dsElement.appendChild(document.createElement("oid")).setTextContent(desc.collectKey.toString());
+            if(desc.collectKey instanceof String)
+                dsElement.appendChild(document.createElement("collect")).setTextContent(desc.collectKey.toString());
             if(desc.minValue != MINDEFAULT) 
                 dsElement.appendChild(document.createElement("minValue")).setTextContent(Double.toString(desc.minValue));
             if(! Double.isNaN(desc.maxValue)) 
                 dsElement.appendChild(document.createElement("maxValue")).setTextContent(Double.toString(desc.maxValue));
-			
-		}
-		Element graphsElement = (Element) root.appendChild(document.createElement("graphs"));
-		for(String graph: graphesList) {
-			graphsElement.appendChild(document.createElement("name")).setTextContent(graph);
-		}
-		return document;
-	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#clone()
-	 */
-	@Override
-	public Object clone() throws CloneNotSupportedException {
-		ProbeDesc newpd = (ProbeDesc) super.clone();
-		return newpd;
-	}
-	
-	
+        }
+        Element graphsElement = (Element) root.appendChild(document.createElement("graphs"));
+        for(String graph: graphesList) {
+            graphsElement.appendChild(document.createElement("name")).setTextContent(graph);
+        }
+        return document;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        ProbeDesc newpd = (ProbeDesc) super.clone();
+        return newpd;
+    }
+
+
 }

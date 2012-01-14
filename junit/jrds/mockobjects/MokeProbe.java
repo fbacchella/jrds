@@ -1,6 +1,7 @@
 package jrds.mockobjects;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ public class MokeProbe<A,B> extends Probe<A,B> {
 	}
 
 	public MokeProbe(ProbeDesc pd) {
+	    probeType = pd.getName();
 		setPd(pd);
 	}
 
@@ -37,13 +39,13 @@ public class MokeProbe<A,B> extends Probe<A,B> {
 		configure();
 	}
 
-	public void configure() {
+	@SuppressWarnings("unchecked")
+    public void configure() {
 		ProbeDesc pd = getPd();
 		if(pd == null) {
 			pd = new ProbeDesc();
 			pd.setName(probeType);
 			pd.setProbeName("dummyprobe");
-			setPd(pd);
 			Map<String, Object> dsMap = new HashMap<String, Object>();
 			dsMap.put("dsName", "ds0");
 			dsMap.put("dsType", DsType.COUNTER);
@@ -61,7 +63,11 @@ public class MokeProbe<A,B> extends Probe<A,B> {
 			setPd(pd);
 		}
 		if(pd.getProbeClass() == null)
-			pd.setProbeClass((Class<? extends Probe<?,?>>) this.getClass());
+            try {
+                pd.setProbeClass((Class<? extends Probe<?,?>>) this.getClass());
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException("Can't build moke probe", e);
+            }
 		if(getHost() == null) {
 			RdsHost host = new RdsHost();
 			host.setName("DummyHost");

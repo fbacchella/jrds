@@ -114,7 +114,7 @@ public class Graph implements WithACL {
             graphDef.setStartTime(startsec);
             graphDef.setEndTime(endsec);
 
-            ProxyPlottableMap customData = node.getCustomData();
+            PlottableMap customData = node.getCustomData();
             if(customData != null) {
                 long step = Math.max((endsec - startsec) / gd.getWidth(), 1);
                 customData.configure(startsec, endsec, step);

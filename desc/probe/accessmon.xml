@@ -12,8 +12,8 @@ http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
 	<specific name="upTimePath">/stats/@uptime</specific>
 	<uptimefactor>1.0</uptimefactor>
 	<defaultargs>
-		<arg type="Integer" value="8080" />
-		<arg type="String" value="/_default" />
+		<attr name="port">8080</attr>
+		<attr name="file">/_default</attr>
 	</defaultargs>
 	<ds>
 		<dsName>status.200</dsName>

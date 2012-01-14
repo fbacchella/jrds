@@ -4,7 +4,7 @@
   <name>CiscoPix</name>
   <probeName>ciscopix</probeName>
   <probeClass>jrds.probe.snmp.Raw</probeClass>
-  <snmpRequester>raw</snmpRequester>
+  <specific name="requester">raw</specific>
   <ds>
     <dsName>ciscoMemoryPoolUsed</dsName>
     <dsType>gauge</dsType>
