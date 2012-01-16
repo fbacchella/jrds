@@ -18,7 +18,7 @@ import org.snmp4j.smi.OID;
  */
 public class RdsSnmpSimple extends SnmpProbe  {
 
-	/* (non-Javadoc)
+    /* (non-Javadoc)
 	 * @see com.aol.jrds.snmp.SnmpPreparator#makeOidSet()
 	 */
 	public Set<OID> getOidSet() {

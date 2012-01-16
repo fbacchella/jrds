@@ -124,7 +124,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
         else {
             try {
                 Collection<OID> soidSet = getIndexSet();
-                Map<OID, Object> somevars = indexFinder.doSnmpGet(getSnmpStarter(), soidSet);
+                Map<OID, Object> somevars = indexFinder.doSnmpGet(getConnection(), soidSet);
 
                 for(Map.Entry<OID, Object> e: somevars.entrySet()) {
                     OID tryoid = e.getKey();

@@ -135,10 +135,10 @@ public class TestMacro {
         JrdsDocument hostdoc = Tools.parseString(goodHostXml);
         RdsHost host = hb.makeRdsHost(hostdoc);
 
-        Starter s = host.find(jrds.snmp.SnmpStarter.class);
+        Starter s = host.find(jrds.snmp.SnmpConnection.class);
 
         Assert.assertNotNull("SNMP starter not found", s);
-        Assert.assertEquals("Starter not found", jrds.snmp.SnmpStarter.class, s.getKey());
+        Assert.assertEquals("Starter not found", jrds.snmp.SnmpConnection.class, s.getKey());
     }
 
     @Test
