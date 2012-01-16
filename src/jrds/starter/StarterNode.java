@@ -1,6 +1,5 @@
 package jrds.starter;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -93,7 +92,7 @@ public abstract class StarterNode implements StartersSet {
         if(! allStarters.containsKey(key)) {
             s.initialize(this);
             allStarters.put(key, s);
-            log(Level.DEBUG, "registering %s", s);
+            log(Level.DEBUG, "registering %s with key %s", s, key);
             return s;
         }
         else {
@@ -120,19 +119,19 @@ public abstract class StarterNode implements StartersSet {
         try {
             Method m = sc.getMethod("makeKey", StarterNode.class);
             key = m.invoke(null, this);
-        } catch (SecurityException e) {
-            log(Level.ERROR, e, e.getMessage());
         } catch (NoSuchMethodException e) {
             //Not an error, the key is the the class
-            key = sc;
-        } catch (IllegalArgumentException e) {
-            log(Level.ERROR, e, e.getMessage());
-        } catch (IllegalAccessException e) {
-            log(Level.ERROR, e, e.getMessage());
-        } catch (InvocationTargetException e) {
+            key = sc.getName();
+        } catch (Exception e) {
             log(Level.ERROR, e, "Error for %s with %s: %s", this, sc, e);
+            return null;
         }
         return find(sc, key);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public <StarterClass extends Starter> StarterClass find(String key) {
+        return (StarterClass) find(Starter.class, key);        
     }
 
     /* (non-Javadoc)
@@ -146,6 +145,7 @@ public abstract class StarterNode implements StartersSet {
     @SuppressWarnings("unchecked")
     public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, Object key) {
         StarterClass s = null;
+        log(Level.TRACE, "Looking for starter %s with key %s in %s", sc, key, allStarters);
         if(allStarters != null && allStarters.containsKey(key)) {
             Starter stemp = allStarters.get(key);
             if(sc.isInstance(stemp)) {

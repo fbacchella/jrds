@@ -14,9 +14,9 @@ public class TabularIterator implements Iterator<SnmpVars>, Iterable<SnmpVars> {
 	Iterator<TableEvent> tabIterator;
 
 	@SuppressWarnings("unchecked")
-	public TabularIterator(SnmpStarter starter, Collection<OID> oids) {
+	public TabularIterator(SnmpConnection starter, Collection<OID> oids) {
 		if(starter != null && starter.isStarted()) {
-			Target snmpTarget = starter.getTarget();
+			Target snmpTarget = starter.getConnection();
 			if(snmpTarget != null) {
 				DefaultPDUFactory localfactory = new DefaultPDUFactory();
 				TableUtils tableRet = new TableUtils(starter.getSnmp(), localfactory);

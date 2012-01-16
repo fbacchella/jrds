@@ -23,7 +23,7 @@ import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.mockobjects.MokeProbe;
 import jrds.mockobjects.MokeProbeFactory;
-import jrds.snmp.SnmpStarter;
+import jrds.snmp.SnmpConnection;
 import jrds.starter.ChainedProperties;
 import jrds.starter.StarterNode;
 
@@ -239,7 +239,7 @@ public class TestLoadConfiguration {
         RdsHost host = hb.makeRdsHost(hostdoc);
         logger.trace("dns name: " + host.getName());
         Assert.assertTrue("tag not found", host.getTags().contains(tagname));
-        Assert.assertEquals("SNMP starter not found", "snmp:udp://myhost:161", host.find(SnmpStarter.class).toString());
+        Assert.assertEquals("SNMP starter not found", "snmp:udp://myhost:161", host.find(SnmpConnection.class).toString());
     }
 
     @Test
@@ -302,8 +302,8 @@ public class TestLoadConfiguration {
         Collection<Probe<?,?>> probes = h.getProbes();
         Assert.assertEquals(7, probes.size());
         Assert.assertTrue("tag not found", h.getTags().contains(tagname));
-        Assert.assertEquals("SNMP starter not found", "snmp:udp://myhost:161", h.find(SnmpStarter.class).toString());
-        logger.trace(h.find(SnmpStarter.class));
+        Assert.assertEquals("SNMP starter not found", "snmp:udp://myhost:161", h.find(SnmpConnection.class).toString());
+        logger.trace(h.find(SnmpConnection.class));
     }
 
     @Test

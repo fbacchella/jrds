@@ -36,7 +36,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
     //Used to check if snmp is on
     static private final OID sysObjectID = new OID("1.3.6.1.2.1.1.2.0");
 
-    static private class LocalSnmpStarter extends SnmpStarter {
+    static private class LocalSnmpConnection extends SnmpConnection {
         Snmp snmp;
         Target target;
         @Override
@@ -59,18 +59,22 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         public final Snmp getSnmp() {
             return snmp;
         }
-        @Override
-        public final Target getTarget() {
-            return target;
-        }
+
         @Override
         public final boolean isStarted() {
             return true;
         }
+        /* (non-Javadoc)
+         * @see jrds.snmp.SnmpConnection#getConnection()
+         */
+        @Override
+        public Target getConnection() {
+            return target;
+        }
     }
 
     private Target hosttarget;
-    private LocalSnmpStarter active;
+    private LocalSnmpConnection active;
     //Sort descriptions
     private final LinkedList<String> sortedProbeName = new LinkedList<String>();
     private final Map<String, ProbeDescSummary> summaries = new HashMap<String, ProbeDescSummary>();
@@ -144,7 +148,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         }
     }
 
-    private String getLabel(SnmpStarter active, List<OID> labelsOID) throws IOException {
+    private String getLabel(LocalSnmpConnection active, List<OID> labelsOID) throws IOException {
         Map<OID, Object> ifLabel = SnmpRequester.RAW.doSnmpGet(active, labelsOID);
         for(Map.Entry<OID, Object> labelEntry: ifLabel.entrySet()) {
             String label = labelEntry.getValue().toString();
@@ -214,7 +218,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
     public boolean exist(String hostname, HttpServletRequest request) {
         try {
             hosttarget = makeSnmpTarget(request);
-            active = new LocalSnmpStarter();
+            active = new LocalSnmpConnection();
             active.target = hosttarget;
             active.doStart();
             if(SnmpRequester.RAW.doSnmpGet(active, Collections.singleton(sysObjectID)).size() < 0) {

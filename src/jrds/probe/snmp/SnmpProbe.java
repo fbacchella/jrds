@@ -8,12 +8,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import jrds.Probe;
-import jrds.ProbeDesc;
+import jrds.ProbeConnected;
 import jrds.factories.ProbeMeta;
+import jrds.snmp.SnmpConnection;
 import jrds.snmp.SnmpDiscoverAgent;
 import jrds.snmp.SnmpRequester;
-import jrds.snmp.SnmpStarter;
 
 import org.apache.log4j.Level;
 import org.snmp4j.smi.OID;
@@ -23,42 +22,30 @@ import org.snmp4j.smi.OID;
  * An usefull command to browse the content of an snmp agent :<p>
  * <quote>snmpbulkwalk -OX -c public -v 2c hostname  enterprises | sed -e 's/\[.*\]//' -e 's/ =.*$//'|  grep '::' | uniq </quote>
  * @author bacchell
+ * @param <SnmpConnection>
  */
 @ProbeMeta(
         topStarter=jrds.snmp.MainStarter.class,
         discoverAgent=SnmpDiscoverAgent.class
         )
-public abstract class SnmpProbe extends Probe<OID, Object> {
-	public final static String REQUESTERNAME = "requester";
+public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnection> {
+    public final static String REQUESTERNAME = "requester";
 	public final static String UPTIMEOIDNAME = "uptimeOid";
 	private Map<OID, String> nameMap = null;
 	private SnmpRequester requester;
 	private int suffixLength = 1;
 	private OID uptimeoid = null;
 
-	/* (non-Javadoc)
-	 * @see jrds.Probe#setPd(jrds.ProbeDesc)
-	 */
-	@Override
-	public void setPd(ProbeDesc pd) {
-		super.setPd(pd);
-		nameMap = getPd().getCollectOids();
-	}
-
-	public boolean configure() {
-		SnmpStarter snmp = getSnmpStarter();
-		if(snmp == null) {
-			log(Level.ERROR, "No snmp connection configured");
-			return false;
-		}
-		return true;
-	}
+    public SnmpProbe() {
+        super(SnmpConnection.class.getName());
+    }
 
 	/* (non-Javadoc)
 	 * @see jrds.Probe#readSpecific()
 	 */
 	@Override
 	public boolean readSpecific() {
+        nameMap = getPd().getCollectOids();
 		boolean readOK = false;
 		String requesterName =  getPd().getSpecific(REQUESTERNAME);
 		String uptimeOidName =  getPd().getSpecific(UPTIMEOIDNAME);
@@ -106,12 +93,12 @@ public abstract class SnmpProbe extends Probe<OID, Object> {
 	 * @see com.aol.jrds.Probe#getNewSampleValues()
 	 */
 	@Override
-	public Map<OID, Object> getNewSampleValues() {
+	public Map<OID, Object> getNewSampleValuesConnected(SnmpConnection cnx) {
 		Map<OID, Object> retValue = Collections.emptyMap();
 		Collection<OID> oids = getOidSet();
-		if(oids != null && getSnmpStarter().isStarted()) {
+		if(oids != null) {
 			try {
-				Map<OID, Object> rawValues = requester.doSnmpGet(getSnmpStarter(), oids);
+				Map<OID, Object> rawValues = requester.doSnmpGet(cnx, oids);
 				retValue = new HashMap<OID, Object>(rawValues.size());
 				for(Map.Entry<OID, Object> e: rawValues.entrySet()) {
 					OID oid = new OID(e.getKey());
@@ -150,23 +137,9 @@ public abstract class SnmpProbe extends Probe<OID, Object> {
 		return retValue;
 	}
 
-	public SnmpStarter getSnmpStarter() {
-		return find(SnmpStarter.class);
-	}
-
 	@Override
 	public String getSourceType() {
 		return "SNMP";
-	}
-
-	@Override
-	public boolean isCollectRunning() {
-		return super.isCollectRunning() && getSnmpStarter().isStarted();
-	}
-
-	@Override
-	public long getUptime() {
-		return getSnmpStarter().getUptime();
 	}
 
 	public int getSuffixLength() {

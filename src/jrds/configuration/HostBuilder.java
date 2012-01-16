@@ -23,7 +23,6 @@ import jrds.ProbeDesc;
 import jrds.RdsHost;
 import jrds.Util;
 import jrds.factories.ArgFactory;
-import jrds.factories.HostBuilderAgent;
 import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
@@ -286,19 +285,41 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     }
 
     @SuppressWarnings("unchecked")
+    /**
+     * A compatibility method, snmp starter should be managed as a connection
+     * @param node
+     * @param p
+     * @param host
+     */
     private void parseSnmp(JrdsElement node, StarterNode p, HostInfo host) {
         try {
-            Class<? extends HostBuilderAgent> c = (Class<? extends HostBuilderAgent>) pm.extensionClassLoader.loadClass("jrds.snmp.SnmpHostBuilderAgent");
-            c.getConstructor().newInstance().buildStarters(node, p, host);
+            JrdsElement snmpNode = node.getElementbyName("snmp");
+            if(snmpNode != null) {
+                logger.trace("found a snmp starter");
+                String connectionClassName = "jrds.snmp.SnmpConnection";
+                Class<?> connectionClass = pm.extensionClassLoader.loadClass(connectionClassName);
+                Connection<?> cnx = (Connection<?>)connectionClass.newInstance();
+
+                Map<String, PropertyDescriptor> beans = connectionsBeanCache.get(connectionClass);
+                if(beans == null) {
+                    beans = ArgFactory.getBeanPropertiesMap(connectionClass, Starter.class);
+                    connectionsBeanCache.put(connectionClass, beans);
+                }
+
+                for(Map.Entry<String, String> attr: snmpNode.attrMap().entrySet()) {
+                    if(beans.containsKey(attr.getKey())) {
+                        PropertyDescriptor bean = beans.get(attr.getKey());
+                        Constructor<?> c = bean.getPropertyType().getConstructor(String.class);
+                        Object value = c.newInstance(attr.getValue());
+                        bean.getWriteMethod().invoke(cnx, value);
+                    }
+                }
+                p.registerStarter(cnx);
+            }
         } catch (ClassNotFoundException e) {
-            logger.debug("Class jrds.snmp.SnmpHostBuilderAgent not found");
-        } catch (InstantiationException e) {
-            logger.error("Class jrds.snmp.SnmpHostBuilderAgent can't be instantiated");
-        } catch (IllegalArgumentException e) {
-        } catch (SecurityException e) {
-        } catch (IllegalAccessException e) {
-        } catch (InvocationTargetException e) {
-        } catch (NoSuchMethodException e) {
+            logger.debug("Class jrds.snmp.SnmpConnection not found");
+        } catch (Exception e) {
+            logger.error("Error creating SNMP connection: " + e.getMessage(), e);
         }
     }
 
