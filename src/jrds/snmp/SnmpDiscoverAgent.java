@@ -29,8 +29,6 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 public class SnmpDiscoverAgent extends DiscoverAgent {
     //Used to check if snmp is on
@@ -238,15 +236,12 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
     @Override
     public void addConnection(JrdsElement hostElement,
             HttpServletRequest request) {
-        Document hostDom = hostElement.getOwnerDocument();
-        Element snmpElem = hostDom.createElement("snmp");
+        JrdsElement snmpElem = hostElement.addElement("connection", "type=jrds.snmp.SnmpConnection");
         if(hosttarget instanceof CommunityTarget) {
             CommunityTarget ct = (CommunityTarget) hosttarget;
-            snmpElem.setAttribute("community", ct.getCommunity().toString());
+            snmpElem.addElement("attr", "name=community").setTextContent(ct.getCommunity().toString());
         }
-        snmpElem.setAttribute("version", Integer.toString( 1 + hosttarget.getVersion()));
-
-        hostElement.appendChild(snmpElem);
+        snmpElem.addElement("attr", "name=version").setTextContent(Integer.toString( 1 + hosttarget.getVersion()));
     }
 
     @Override
