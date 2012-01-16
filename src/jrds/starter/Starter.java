@@ -28,17 +28,6 @@ public abstract class Starter {
 		this.level = level;
 	}
 
-	/**
-	 * @param level
-	 * @param none
-	 * @deprecated
-	 * The second argument is ignored, just remove it
-	 */
-	@SuppressWarnings("deprecation")
-	public void initialize(jrds.starter.StarterNode level ,jrds.starter.StartersSet none) {
-		this.level = level;
-	}
-
     /**
      * It's called after the starter registration but in host list configuration
      * A starter can uses it to tweaks it's configuration 
@@ -77,7 +66,7 @@ public abstract class Starter {
 	}
 
 	public Object getKey() {
-		return getClass();
+		return getClass().getName();
 	}
 
 	public StarterNode getLevel() {

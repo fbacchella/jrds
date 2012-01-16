@@ -121,12 +121,17 @@ public abstract class StarterNode implements StartersSet {
             key = m.invoke(null, this);
         } catch (NoSuchMethodException e) {
             //Not an error, the key is the the class
-            key = sc;
+            key = sc.getName();
         } catch (Exception e) {
             log(Level.ERROR, e, "Error for %s with %s: %s", this, sc, e);
             return null;
         }
         return find(sc, key);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public <StarterClass extends Starter> StarterClass find(String key) {
+        return (StarterClass) find(Starter.class, key);        
     }
 
     /* (non-Javadoc)

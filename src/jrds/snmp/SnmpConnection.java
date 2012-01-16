@@ -188,4 +188,9 @@ public class SnmpConnection extends Connection<Target> {
         return pdufactory;
     }
 
+    @Override
+    public String toString() {
+        return "snmp:" + proto + "://" + getHostName() + ":" + port;
+    }
+
 }

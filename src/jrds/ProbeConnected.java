@@ -39,9 +39,8 @@ public abstract class ProbeConnected<KeyType, ValueType, ConnectionClass extends
 		this.connectionName = connectionName;
 	}
 
-	@SuppressWarnings({ "unchecked", "deprecation" })
 	public ConnectionClass getConnection() {
-		return (ConnectionClass) find(getConnectionName());
+		return  find(getConnectionName());
 	}
 
 	/* (non-Javadoc)

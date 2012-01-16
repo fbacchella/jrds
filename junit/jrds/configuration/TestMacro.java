@@ -138,7 +138,7 @@ public class TestMacro {
         Starter s = host.find(jrds.snmp.SnmpConnection.class);
 
         Assert.assertNotNull("SNMP starter not found", s);
-        Assert.assertEquals("Starter not found", jrds.snmp.SnmpConnection.class, s.getKey());
+        Assert.assertEquals("Starter not found", "jrds.snmp.SnmpConnection", s.getKey());
     }
 
     @Test
