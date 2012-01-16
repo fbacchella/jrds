@@ -15,7 +15,6 @@ import java.util.Map;
 
 import jrds.Probe;
 import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.Util;
 import jrds.factories.ProbeBean;
 import jrds.probe.IndexedProbe;
@@ -54,11 +53,6 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 
     public JdbcProbe(ProbeDesc pd) {
         super(pd);
-        starter = setStarter();
-    }
-
-    public JdbcProbe(RdsHost monitoredHost, ProbeDesc pd) {
-        super(monitoredHost, pd);
         starter = setStarter();
     }
 

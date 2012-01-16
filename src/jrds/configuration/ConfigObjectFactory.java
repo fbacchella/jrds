@@ -10,9 +10,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Filter;
 import jrds.GraphDesc;
+import jrds.HostInfo;
 import jrds.Macro;
 import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.Tab;
 import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsDocument;
@@ -119,14 +119,14 @@ public class ConfigObjectFactory {
         return probeDescMap;
     }
 
-    public Map<String, RdsHost> setHostMap() {
+    public Map<String, HostInfo> setHostMap() {
         Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.HOSTS);
         HostBuilder ob = new HostBuilder();
         ob.setClassLoader(cl);
         ob.setMacros(macrosmap);
         ob.setProbeFactory(pf);
         ob.setPm(pm);
-        Map<String, RdsHost> hostsMap = getObjectMap(ob, nodemap);
+        Map<String, HostInfo> hostsMap = getObjectMap(ob, nodemap);
         logger.debug(jrds.Util.delayedFormatString("Hosts configured: %s", hostsMap.keySet()));
         return hostsMap;
     }

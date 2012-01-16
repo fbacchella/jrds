@@ -2,7 +2,7 @@ package jrds.snmp;
 
 import java.util.Map;
 
-import jrds.RdsHost;
+import jrds.HostInfo;
 import jrds.factories.HostBuilderAgent;
 import jrds.factories.xml.JrdsElement;
 import jrds.starter.StarterNode;
@@ -13,7 +13,7 @@ public class SnmpHostBuilderAgent extends HostBuilderAgent {
     static final private Logger logger = Logger.getLogger(SnmpHostBuilderAgent.class);
 
     @Override
-    public void buildStarters(JrdsElement fragment, StarterNode sn, RdsHost host) {
+    public void buildStarters(JrdsElement fragment, StarterNode sn, HostInfo host) {
         JrdsElement snmpNode = fragment.getElementbyName("snmp");
         if(snmpNode != null) {
             logger.trace("found a snmp starter");
@@ -22,7 +22,7 @@ public class SnmpHostBuilderAgent extends HostBuilderAgent {
         }
     }
     
-    private SnmpStarter snmpStarter(JrdsElement d, RdsHost host) {
+    private SnmpStarter snmpStarter(JrdsElement d, HostInfo host) {
         SnmpStarter starter = new SnmpStarter();
         Map<String,String> attributes = d.attrMap();
         //Mandatory parameters

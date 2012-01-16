@@ -69,19 +69,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     private Logger namedLogger = Logger.getLogger("jrds.Probe.EmptyProbe");
     private volatile boolean running = false;
 
-    //	private Map<String, Set<Threshold>> thresholds = new HashMap<String, Set<Threshold>>();
-
-    /**
-     * The constructor that should be called by derived class
-     * @param monitoredHost
-     * @param pd
-     */
-    public Probe(RdsHost monitoredHost, ProbeDesc pd) {
-        super(monitoredHost);
-        setPd(pd);
-        setHost(monitoredHost);
-    }
-
     /**
      * A special case constructor, mainly used by virtual probe
      * @param monitoredHost

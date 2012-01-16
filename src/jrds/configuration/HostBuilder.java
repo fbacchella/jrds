@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jrds.ConnectedProbe;
+import jrds.HostInfo;
 import jrds.Macro;
 import jrds.Probe;
 import jrds.ProbeDesc;
@@ -34,7 +35,7 @@ import jrds.starter.StarterNode;
 
 import org.apache.log4j.Logger;
 
-public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
+public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     static final private Logger logger = Logger.getLogger(HostBuilder.class);
 
     private ClassLoader classLoader = null;
@@ -47,7 +48,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
     }
 
     @Override
-    RdsHost build(JrdsDocument n) throws InvocationTargetException {
+    HostInfo build(JrdsDocument n) throws InvocationTargetException {
         try {
             return makeRdsHost(n);
         } catch (SecurityException e) {
@@ -65,19 +66,19 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
         }
     }
 
-    public RdsHost makeRdsHost(JrdsDocument n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+    public HostInfo makeRdsHost(JrdsDocument n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
         JrdsElement hostNode = n.getRootElement();
         String hostName = hostNode.getAttribute("name");
         String dnsHostname = hostNode.getAttribute("dnsName");
-        RdsHost host = null;
+        HostInfo host = null;
         if(hostName == null) {
             return null;
         }
         else if(dnsHostname != null) {
-            host = new RdsHost(hostName, dnsHostname);
+            host = new HostInfo(hostName, dnsHostname);
         }
         else
-            host = new RdsHost(hostName);
+            host = new HostInfo(hostName);
         host.setHostDir(new File(pm.rrddir, host.getName()));
 
         String hidden = hostNode.getAttribute("hidden");
@@ -91,7 +92,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
         return host;
     }
 
-    private void parseFragment(JrdsElement fragment, RdsHost host, StarterNode ns, Map<String, Set<String>> collections) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private void parseFragment(JrdsElement fragment, HostInfo host, StarterNode ns, Map<String, Set<String>> collections) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         parseSnmp(fragment, host, host);
 
         makeConnexion(fragment, host);
@@ -285,7 +286,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
     }
 
     @SuppressWarnings("unchecked")
-    private void parseSnmp(JrdsElement node, StarterNode p, RdsHost host) {
+    private void parseSnmp(JrdsElement node, StarterNode p, HostInfo host) {
         try {
             Class<? extends HostBuilderAgent> c = (Class<? extends HostBuilderAgent>) pm.extensionClassLoader.loadClass("jrds.snmp.SnmpHostBuilderAgent");
             c.getConstructor().newInstance().buildStarters(node, p, host);

@@ -6,7 +6,6 @@ import java.sql.Statement;
 import java.util.Properties;
 
 import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.Util;
 
 import org.apache.log4j.Level;
@@ -25,11 +24,6 @@ public abstract class Mysql extends JdbcProbe {
 
     public Mysql(ProbeDesc pd) {
         super(pd);
-        this.setPort(PORT);
-    }
-
-    public Mysql(RdsHost monitoredHost, ProbeDesc pd) {
-        super(monitoredHost, pd);
         this.setPort(PORT);
     }
 
