@@ -19,7 +19,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.log4j.Logger;
@@ -27,12 +26,11 @@ import org.apache.log4j.Logger;
 public class Renderer {
     final int PRIME = 31;
     final File tmpDir;
-    int step;
 
     public class RendererRun implements Runnable {
-        public Graph graph;
-        public boolean finished = false;
-        public final ReentrantLock running = new ReentrantLock(); 
+        Graph graph;
+        boolean finished = false;
+        final ReentrantLock running = new ReentrantLock(); 
         File destFile;
 
         public RendererRun(Graph graph) throws IOException {
@@ -124,7 +122,6 @@ public class Renderer {
                     logger.error("Error rendering a graph: " + e, e);
                 else
                     logger.error("Error rendering a graph: " + e);
-
             } finally {						
                 //Always set to true, we do not try again in case of failure
                 finished = true;
@@ -147,15 +144,15 @@ public class Renderer {
         public String toString() {
             return Integer.toString(i++);
         }
-
     };
 
     private final ExecutorService tpool =  Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 3, 
             new ThreadFactory() {
         public Thread newThread(Runnable r) {
-            Thread t = new Thread(r, "RendererThread" + counter);
+            String threadName = "RendererThread" + counter;
+            Thread t = new Thread(r, threadName);
             t.setDaemon(true);
-            logger.debug("New thread name:" + t.getName());
+            logger.debug(Util.delayedFormatString("New thread name: %s", threadName));
             return t;
         }
     }
@@ -163,10 +160,9 @@ public class Renderer {
     private int cacheSize;
     private Map<Integer, RendererRun> rendered;
 
-    public Renderer(int cacheSize, int step, File tmpDir) {
+    public Renderer(int cacheSize, File tmpDir) {
         this.tmpDir = tmpDir;
         this.cacheSize = cacheSize;
-        this.step = step;
         Map<Integer, RendererRun> m = new LinkedHashMap<Integer, RendererRun>(cacheSize + 5 , hashTableLoadFactor, true) {
             /* (non-Javadoc)
              * @see java.util.LinkedHashMap#removeEldestEntry(java.util.Map.Entry)
@@ -271,7 +267,7 @@ public class Renderer {
         }
     }
 
-    public  FileChannel sendInfo(Graph graph) {
+    public FileChannel sendInfo(Graph graph) {
         RendererRun runRender = null;
         try {
             runRender = rendered.get(graph.hashCode());
@@ -295,12 +291,7 @@ public class Renderer {
     }
 
     public void finish() {
-        tpool.shutdown();
-        try {
-            tpool.awaitTermination(step - 10, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            logger.info("Rendering interrupted");
-        }
+        tpool.shutdownNow();
         for(RendererRun rr: rendered.values()) {
             rr.clean();
         }
