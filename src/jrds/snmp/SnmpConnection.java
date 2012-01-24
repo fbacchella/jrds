@@ -24,18 +24,20 @@ import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.util.DefaultPDUFactory;
 import org.snmp4j.util.PDUFactory;
 
-@ProbeBean({"community", "port", "version"})
+@ProbeBean({"community", "port", "version", "ping"})
 public class SnmpConnection extends Connection<Target> {
     static final String TCP = "tcp";
     static final String UDP = "udp";
     static final private OID hrSystemUptime = new OID(".1.3.6.1.2.1.25.1.1.0");
     static final private OID sysUpTimeInstance = new OID(".1.3.6.1.2.1.1.3.0");
+    static final private OID sysDescr = new OID("1.3.6.1.2.1.1.1.0");
     static final private PDUFactory pdufactory = new DefaultPDUFactory(PDU.GET);
 
     private int version = SnmpConstants.version2c;
     private String proto = UDP;
     private int port = 161;
     private String community = "public";
+    private OID ping = sysDescr;
     //A default value for the uptime OID, from the HOST-RESSOURCES MIB
     private OID uptimeOid = hrSystemUptime;
     private Target snmpTarget;
@@ -50,10 +52,10 @@ public class SnmpConnection extends Connection<Target> {
         Resolver resolver = getLevel().find(Resolver.class);
         if(!resolver.isStarted())
             return false;
-        
+
         if(! getLevel().find(MainStarter.class).isStarted())
             return false;
-        
+
         Address address;
 
         if(UDP.equals(proto.toLowerCase())) {
@@ -68,10 +70,30 @@ public class SnmpConnection extends Connection<Target> {
         if(community != null && address != null) {
             snmpTarget = new CommunityTarget(address, new OctetString(community));
             snmpTarget.setVersion(version);
-            snmpTarget.setTimeout(getLevel().getHostList().getTimeout() * 1000 / 2);
+            snmpTarget.setTimeout(getLevel().getTimeout() * 1000 / 2);
             snmpTarget.setRetries(1);
-            return true;
         }
+        //Do a "snmp ping", to check if host is reachable
+        try {
+            PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
+            requestPDU.addOID(new VariableBinding(ping));
+            Snmp snmp = getSnmp();
+            ResponseEvent re = snmp.send(requestPDU, snmpTarget);
+            if(re == null)
+                throw new IOException("SNMP Timeout");
+            PDU response = re.getResponse();
+            if(response == null || re.getError() != null ) {
+                Exception snmpException = re.getError();
+                if(snmpException == null)
+                    snmpException = new IOException("SNMP Timeout");
+                throw snmpException;
+            }
+            //Everything went fine, host is reachable, authentication is working
+            return true;
+        } catch (Exception e) {
+            log(Level.ERROR, e, "Unable to reach host: %s", e);
+        }
+        snmpTarget = null;
         return false;
     }
 
@@ -112,7 +134,7 @@ public class SnmpConnection extends Connection<Target> {
         }
         return 0;
     }
-    
+
     public Snmp getSnmp() {
         Snmp retValue = null;
         retValue = getLevel().find(MainStarter.class).snmp;
@@ -185,6 +207,20 @@ public class SnmpConnection extends Connection<Target> {
     @Override
     public String toString() {
         return "snmp:" + proto + "://" + getHostName() + ":" + port;
+    }
+
+    /**
+     * @return the ping
+     */
+    public OID getPing() {
+        return ping;
+    }
+
+    /**
+     * @param ping the ping to set
+     */
+    public void setPing(OID ping) {
+        this.ping = ping;
     }
 
 }
