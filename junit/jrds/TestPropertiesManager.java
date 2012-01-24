@@ -8,21 +8,24 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
-import jrds.webapp.RolesACL;
 import jrds.webapp.ACL.AdminACL;
+import jrds.webapp.RolesACL;
 import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestPropertiesManager {
     static final private Logger logger = Logger.getLogger(TestPropertiesManager.class);
-    static private final Random r = new Random();
     static private final String[] dirs = new String[] {"configdir", "rrddir", "tmpdir"};
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws IOException {
@@ -32,83 +35,61 @@ public class TestPropertiesManager {
     }
 
     @Test
-    public void testEmpty() {
+    public void testTmpDir() throws IOException {
         String oldtmpdirpath = System.getProperty("java.io.tmpdir");
-        File newtmpdir = new File(System.getProperty("java.io.tmpdir"), "jrds" + r.nextInt());;
+        File newtmpdir = testFolder.newFile("tmp");
+        newtmpdir.delete();
         System.setProperty("java.io.tmpdir", newtmpdir.getPath());
         PropertiesManager pm = new PropertiesManager();
         System.setProperty("java.io.tmpdir", oldtmpdirpath);
         File jrdstmpdir = new File(newtmpdir, "jrds");
         Assert.assertEquals(jrdstmpdir, pm.tmpdir);
-        Assert.assertFalse(newtmpdir.exists());
-        Assert.assertFalse(jrdstmpdir.exists());
-        Assert.assertNull(pm.rrddir);
-        Assert.assertNull(pm.configdir);
+        Assert.assertFalse("tmpdir should not be created", newtmpdir.exists());
     }
 
     @Test
-    public void testConfig1() {
-        File tmpdir = new File(System.getProperty("java.io.tmpdir"),"jrds"); 
-        boolean toclean = tmpdir.isDirectory();
-        PropertiesManager pm = new PropertiesManager();
-        pm.update();
-        File descpath = new File(System.getProperty("user.dir"), "desc");
-        if(descpath.exists())
-            pm.libspath.add(descpath.toURI());
-        Assert.assertEquals(tmpdir, pm.tmpdir);
-        Assert.assertTrue(tmpdir.isDirectory());
-        if(toclean)
-            tmpdir.delete();
-        Assert.assertNull(pm.rrddir);
-        Assert.assertNull(pm.configdir);
-    }
-
-    @Test
-    public void testConfig2() throws IOException {
+    public void testConfigAutoCreate() throws IOException, IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
         PropertiesManager pm = new PropertiesManager();
 
         Map<String, File> dirMap = new HashMap<String, File>(dirs.length);
         for(String dirname: dirs) {
-            File dir = new File(System.getProperty("java.io.tmpdir"), "jrds" + r.nextInt());;
+            File dir = testFolder.newFolder(dirname);
             pm.setProperty(dirname, dir.getPath());
             dirMap.put(dirname, dir);
         }
         pm.setProperty("autocreate", "true");
         pm.update();
 
-        Assert.assertEquals(dirMap.get("tmpdir"), pm.tmpdir);
-        Assert.assertEquals(dirMap.get("configdir"), pm.configdir);
-        Assert.assertEquals(dirMap.get("rrddir"), pm.rrddir);
-
-        for(File dir : dirMap.values()) {
+        //Match the given name and was created
+        for(Map.Entry<String, File> e: dirMap.entrySet()) {
+            File dir = e.getValue();
+            Assert.assertEquals(dir.getPath(), pm.getClass().getDeclaredField(e.getKey()).get(pm).toString());
             Assert.assertTrue(dir.isDirectory());
-            dir.delete();
         }
     }
 
     @Test
-    public void testConfig3() throws IOException {
-        File tmpdir = new File(System.getProperty("java.io.tmpdir"),"jrds"); 
+    public void testConfigNoAutoCreate() throws IOException, IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
         PropertiesManager pm = new PropertiesManager();
 
         Map<String, File> dirMap = new HashMap<String, File>(dirs.length);
         for(String dirname: dirs) {
-            File dir = new File(System.getProperty("java.io.tmpdir"), "jrds" + r.nextInt());;
+            File dir = testFolder.newFolder(dirname);
+            dir.delete();
             pm.setProperty(dirname, dir.getPath());
             dirMap.put(dirname, dir);
         }
-        dirMap.put("tmpdir", tmpdir);
         pm.setProperty("autocreate", "false");
         pm.update();
 
-        Assert.assertEquals(dirMap.get("tmpdir"), pm.tmpdir);
-        Assert.assertEquals(null, pm.configdir);
-        Assert.assertEquals(null, pm.rrddir);
+        Assert.assertEquals("tmp/jrds", pm.tmpdir.toString());
+        Assert.assertNull(pm.configdir);
+        Assert.assertNull(pm.rrddir);
 
-        Assert.assertTrue(tmpdir.exists());
-        for(File dir : dirMap.values()) {
-            logger.trace(dir);
-            Assert.assertTrue(dir.equals(tmpdir) || ! dir.exists());
+        //None was created
+        for(Map.Entry<String, File> e: dirMap.entrySet()) {
+            File dir = e.getValue();
+            Assert.assertFalse(dir.exists());
         }
     }
 
@@ -133,18 +114,19 @@ public class TestPropertiesManager {
 
     @Test
     public void testlog4jpropfile() throws IOException {
-
         InputStream is = Tools.class.getResourceAsStream("/ressources/log4j.properties");
         ReadableByteChannel isChannel = Channels.newChannel(is);
-        FileChannel tmpProp = new java.io.FileOutputStream("tmp/log4j.properties").getChannel();
+        File log4jprops = testFolder.newFile("log4j.properties");
+        FileChannel tmpProp = new java.io.FileOutputStream(log4jprops).getChannel();
         tmpProp.transferFrom(isChannel, 0, 4096);
         PropertiesManager pm = new PropertiesManager();
-        pm.setProperty("log4jpropfile", "tmp/log4j.properties");
+        pm.setProperty("log4jpropfile", log4jprops.getCanonicalPath());
         pm.update();
         logger.debug("log file created");
 
         File logFile = new File("tmp/log4j.log");
         Assert.assertTrue("Log4j file not created", logFile.canRead());
-
+        logFile.delete();
     }
+    
 }
