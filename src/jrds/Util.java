@@ -12,6 +12,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.MessageDigest;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -285,6 +286,67 @@ public class Util {
         return in;
     }
 
+    static String findVariables(String in, int index, Map<String, Integer> indexes, Object... arguments) {
+        Matcher m = varregexp.matcher(in);
+        if(m.find()) {
+            StringBuilder out = new StringBuilder();
+            if(m.groupCount() == 3) {
+                String before = m.group(1);
+                String var = m.group(2);
+                String after = m.group(3);
+                out.append(before);
+                String toAppend = null;
+                if(var.startsWith("system.")) {
+                    toAppend = System.getProperty(var.replace("system.", ""));
+                }
+                else if(var.matches("^\\d+$")) {
+                    for(Object o: arguments) {
+                        if(o instanceof List) {
+                            List <?> l = (List<?>)o;
+                            toAppend = l.get(Integer.parseInt(var) - 1).toString();
+                            break;
+                        }
+                    }
+                }
+                else if(var.matches("^attr\\.*\\.signature$")) {
+                    String beanName = var.replace("attr.", "").replace(".signature", "");
+                    for(Object o: arguments) {
+                        try {
+                            PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
+                            Method read = bean.getReadMethod();
+                            if(read != null)
+                                toAppend = stringSignature(read.invoke(o).toString());
+                            break;
+                        } catch (Exception e) {
+                        }
+                    }
+                }
+                else if(var.matches("^attr\\.*$")) {
+                    String beanName = var.replace("attr.", "");
+                    for(Object o: arguments) {
+                        try {
+                            PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
+                            toAppend = bean.getReadMethod().invoke(o).toString();
+                            break;
+                        } catch (Exception e) {
+                        }
+                    }
+                }
+                else  {
+                    if(! indexes.containsKey(var)) {
+                        indexes.put(var, index++);
+                    };
+                    toAppend = '{'  + indexes.get(var).toString() + '}';
+                }
+                out.append(toAppend);
+                if(after.length() > 0)
+                    out.append(findVariables(after, index, indexes));
+                return out.toString();
+            }
+        }
+        return in;
+    }
+
     /**
      * A method to parse a template mixing old elements {x} with new variable ${variable}
      * Should be not be used any more
@@ -305,12 +367,98 @@ public class Util {
         while(m.find()) {
             if(m.group(1) !=  null)
                 buffer.append(m.group(1));
-            buffer .append(keys[Integer.parseInt(m.group(2))]);
+            buffer.append(keys[Integer.parseInt(m.group(2))]);
             last = m.group(3);
             m = oldvarregexp.matcher(last);
         }
         buffer.append(last);
         return jrds.Util.parseTemplate(buffer.toString(), arguments);
+    }
+
+    private enum evaluate {
+        index {
+            @Override
+            String toString(Object o) {
+                return  ((IndexedProbe) o).getIndexName();
+            }
+        },
+        index_signature {
+            @Override
+            String toString(Object o) {
+                return  stringSignature(((IndexedProbe) o).getIndexName());
+            }
+        },
+        index_cleanpath {
+            @Override
+            String toString(Object o) {
+                return  cleanPath(((IndexedProbe) o).getIndexName());
+            }
+        },
+        url {
+            @Override
+            String toString(Object o) {
+                return ((UrlProbe) o).getUrlAsString();
+            }
+        },
+        url_signature {
+            @Override
+            String toString(Object o) {
+                return stringSignature(((UrlProbe) o).getUrlAsString());
+            }
+        },
+        port {
+            @Override
+            String toString(Object o) {
+                return Integer.toString(((UrlProbe) o).getPort());
+            }
+        },
+        host {
+            @Override
+            String toString(Object o) {
+                return ((RdsHost) o).getName();
+            }
+        },
+        probename {
+            @Override
+            String toString(Object o) {
+                return ((Probe<?,?>) o).getName();
+            }
+        },
+        label {
+            @Override
+            String toString(Object o) {
+                return ((Probe<?,?>) o).getLabel();
+            }
+        },
+        connection_name {
+            @Override
+            String toString(Object o) {
+                ConnectedProbe cp = (ConnectedProbe) o;
+                return cp.getConnectionName();
+            }
+        },
+        connection_name_signature {
+            @Override
+            String toString(Object o) {
+                ConnectedProbe cp = (ConnectedProbe) o;
+                return stringSignature(cp.getConnectionName());
+            }
+        },
+        probedesc_name {
+            @Override
+            String toString(Object o) {
+                ProbeDesc pd = (ProbeDesc) o;
+                return pd.getName();
+            }
+        };
+        abstract String toString(Object o);
+    }
+
+    private static void check(Object o, Map<String, Integer> indexes, Object[] values, evaluate e) {
+        String name = e.name().replace('_', '.');
+        if(indexes.containsKey(name)) {
+            values[indexes.get(name)] = e.toString(o);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -320,57 +468,37 @@ public class Util {
             return template;
         }
 
+        Map<String, Integer> indexes =  new HashMap<String, Integer>();
+        String message = findVariables(template, 0, indexes, arguments);
+        Object[] values = new Object[indexes.size()];
+
         Map<String, Object> env = new HashMap<String, Object>();
-        StarterNode node = null;
         for(Object o: arguments) {
             if(logger.isTraceEnabled())
                 logger.trace(Util.delayedFormatString("Argument for template \"%s\": %s", template, o.getClass()));
             if( o instanceof IndexedProbe) {
-                String index = ((IndexedProbe) o).getIndexName();
-                if(index != null) {
-                    env.put("index", index);
-                    env.put("index.signature", stringSignature(index));
-                    env.put("index.cleanpath", cleanPath(index));
-                }
+                check(o, indexes, values, evaluate.index);
+                check(o, indexes, values, evaluate.index_signature);
+                check(o, indexes, values, evaluate.index_cleanpath);
             }
             if(o instanceof UrlProbe) {
-                env.put("url", ((UrlProbe) o).getUrlAsString());
-                env.put("port", ((UrlProbe) o).getPort());
-                env.put("url.signature", jrds.Util.stringSignature(((UrlProbe) o).getUrlAsString()));
+                check(o, indexes, values, evaluate.url);
+                check(o, indexes, values, evaluate.port);
+                check(o, indexes, values, evaluate.url_signature);
             }
             if(o instanceof ConnectedProbe) {
-                ConnectedProbe cp = (ConnectedProbe) o;
-                env.put("connection.name", cp.getConnectionName());
-                env.put("connection.name.signature", stringSignature(cp.getConnectionName()));
+                check(o, indexes, values, evaluate.connection_name);
+                check(o, indexes, values, evaluate.connection_name_signature);
             }
             if( o instanceof Probe) {
                 Probe<?,?> p = ((Probe<?,?>) o);
                 RdsHost host = p.getHost();
-                if(host != null)
-                    env.put("host", host.getName());
-                String probename=p.getName();
-                //It might be called just for evaluate probename
-                //So no problem if it's null
-                if(probename != null)
-                    env.put("probename", probename);
-                String label = p.getLabel();
-                if(label != null) {
-                    env.put("label", label);
-                }
-                for(PropertyDescriptor bean: p.getPd().getBeans()) {
-                    Method getter = bean.getReadMethod();
-                    if(getter != null) {
-                        try {
-                            Object val = getter.invoke(p);
-                            env.put("attr." + bean.getName(), val);
-                            env.put("attr." + bean.getName() + ".signature", stringSignature(val.toString()));
-                        } catch (Exception e) {
-                        }
-                    }
-                }
+                check(host, indexes, values, evaluate.host);
+                check(p, indexes, values, evaluate.probename);
+                check(p, indexes, values, evaluate.label);
             } 
             if( o instanceof RdsHost) {
-                env.put("host", ((RdsHost) o).getName());
+                check(o, indexes, values, evaluate.host);
             }
             if(o instanceof GraphDesc) {
                 GraphDesc gd = (GraphDesc) o;
@@ -378,27 +506,17 @@ public class Util {
                 env.put("graphdesc.name", gd.getGraphName());
             }
             if(o instanceof ProbeDesc) {
-                ProbeDesc pd = (ProbeDesc) o;
-                env.put("probedesc.name", pd.getName());
-            }
-            if(o instanceof StarterNode) {
-                node = (StarterNode) o;
+                check(o, indexes, values, evaluate.probedesc_name);
             }
             if(o instanceof Map) {
                 Map<? extends String, ?> tempMap = (Map<? extends String, ?>)o;
                 env.putAll(tempMap);
             }
-            if(o instanceof List) {
-                int rank=1;
-                for(Object listElem: (List<? extends Object>) o) {
-                    env.put(String.valueOf(rank++), listElem.toString());
-                }
-            }
         }
         if(logger.isDebugEnabled())
             logger.debug("Properties to use for parsing template \"" + template + "\": " + env);
 
-        return jrds.Util.evaluateVariables(template, env, node);
+        return MessageFormat.format(message, values);
     }
 
     /**
