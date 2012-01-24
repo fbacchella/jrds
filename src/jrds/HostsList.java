@@ -13,18 +13,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 
+import jrds.PropertiesManager.TimerInfo;
 import jrds.configuration.ConfigObjectFactory;
 import jrds.factories.ArgFactory;
 import jrds.factories.ProbeMeta;
 import jrds.graphe.Sum;
+import jrds.starter.HostStarter;
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 import jrds.webapp.ACL;
@@ -32,15 +29,12 @@ import jrds.webapp.DiscoverAgent;
 import jrds.webapp.RolesACL;
 
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 /**
  * The central repository of all informations : hosts, graph, and everything else
  * @author Fabrice Bacchella 
- * @version $Revision$,  $Date$
  */
 public class HostsList extends StarterNode {
-    static private final Logger logger = Logger.getLogger(HostsList.class);
 
     public static final class Stats {
         Stats() {
@@ -50,7 +44,8 @@ public class HostsList extends StarterNode {
         public Date lastCollect;
     }
 
-    private final Set<RdsHost> hostList = new HashSet<RdsHost>();
+    private final Set<HostInfo> hostList = new HashSet<HostInfo>();
+    private final Map<String, jrds.starter.Timer> timers = new HashMap<String, jrds.starter.Timer>();
     private final Map<Integer, GraphNode> graphMap = new HashMap<Integer, GraphNode>();
     private final Map<Integer, Probe<?,?>> probeMap= new HashMap<Integer, Probe<?,?>>();
     private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
@@ -58,11 +53,8 @@ public class HostsList extends StarterNode {
     private Map<String, Tab> tabs = new LinkedHashMap<String, Tab>();
     private String firstTab = null;
     private Renderer renderer = null;
-    private int numCollectors = 1;
-    private int step;
-    private File rrdDir = null;
+    private Timer collectTimer;
     private File tmpDir = null;
-    private int timeout = 10;
     // The list of roles known to jrds
     private Set<String> roles = new HashSet<String>();
     private Set<String> defaultRoles = Collections.emptySet();
@@ -70,8 +62,6 @@ public class HostsList extends StarterNode {
     volatile private boolean started = false;
     private Stats stats = new Stats();
     private Set<Class<? extends DiscoverAgent>> daList = new HashSet<Class<? extends DiscoverAgent>>();
-
-    private Semaphore collectMutex = new Semaphore(1);
 
     /**
      *  
@@ -111,29 +101,35 @@ public class HostsList extends StarterNode {
         try {
             jrds.JrdsLoggerConfiguration.configure(pm);
         } catch (IOException e1) {
-            logger.error("Unable to set log file to " + pm.logfile);
+            log(Level.ERROR, e1, "Unable to set log file to " + pm.logfile);
         }
 
         if(pm.rrddir == null) {
-            logger.error("Probes directory not configured, can't configure");
+            log(Level.ERROR, "Probes directory not configured, can't configure");
             return;
         }
 
         if(pm.configdir == null) {
-            logger.error("Configuration directory not configured, can't configure");
+            log(Level.ERROR, "Configuration directory not configured, can't configure");
             return;
         }
 
-        numCollectors = pm.collectorThreads;
-        step = pm.step;
-        started = true;
-        rrdDir = pm.rrddir;
-        tmpDir = pm.tmpdir;
-        timeout = pm.timeout;
+        setTimeout(pm.timeout);
+        setStep(pm.step);
+        
+        collectTimer = new Timer("jrds-main-timer", true);
+        log(Level.TRACE, "timers to build %s", pm.timers);
 
-        renderer = new Renderer(50, step, tmpDir);
+        for(Map.Entry<String, TimerInfo> e: pm.timers.entrySet()) {
+            jrds.starter.Timer t = new jrds.starter.Timer(e.getKey(), e.getValue());
+            t.setParent(this);
+            timers.put(e.getKey(), t);
+        }
+        log(Level.DEBUG, "timers %s", timers);
 
-        logger.debug("Starting parsing descriptions");
+        renderer = new Renderer(50, tmpDir);
+        
+        log(Level.DEBUG, "Starting parsing descriptions");
         ConfigObjectFactory conf = new ConfigObjectFactory(pm, pm.extensionClassLoader);
         conf.setGraphDescMap();
         Collection<ProbeDesc> probesdesc = conf.setProbeDescMap().values();
@@ -149,34 +145,33 @@ public class HostsList extends StarterNode {
         conf.setTabMap();
 
         Set<String> hostsTags = new HashSet<String>();
-        Map<String, RdsHost> hosts = conf.setHostMap();
-        for(RdsHost h: hosts.values()) {
-            addHost(h);
-            h.configureStarters(pm);
-            for(Probe<?,?> p: h.getProbes()) {
-                try {
-                    p.setTimeout(getTimeout());
-                    addProbe(p);
-                    p.configureStarters(pm);
-                    for(String hostTag: p.getTags()) {
-                        hostsTags.add(hostTag);
-                    }
-                } catch (Exception e) {
-                    log(Level.ERROR, e, "Probe is failing: %s", e);
-                }
-            }				
-        }
+        conf.setHostMap(timers);
 
         //We try to load top level starter defined in probes
-        logger.debug(jrds.Util.delayedFormatString("External top starters added %s", externalStarters));
-        for(Class<? extends Starter> starterClass: externalStarters) {
-            try {
-                registerStarter(starterClass.newInstance());
-            } catch (Exception e) {
-                logger.error("Starter " + starterClass + " failed to register:" + e, e);
+        log(Level.DEBUG, "External top starters added %s", externalStarters);
+        for(jrds.starter.Timer timer: timers.values()) {
+            for(HostStarter host: timer.getAllHosts()) {
+                hostList.add(host.getHost());
+                hostsTags.addAll(host.getTags());
+                host.configureStarters(pm);
+                for(Probe<?,?> p: host.getAllProbes()) {
+                    p.configureStarters(pm);
+                    try {
+                        addProbe(p);
+                    } catch (Exception e) {
+                        log(Level.ERROR, e, "Error inserting probe " + p);
+                    }
+                }
             }
+            for(Class<? extends Starter> starterClass: externalStarters) {
+                try {
+                    timer.registerStarter(starterClass.newInstance());
+                } catch (Exception e) {
+                    log(Level.ERROR, e, "Starter %s failed to register: %s", starterClass, e);
+                }
+            }
+            timer.configureStarters(pm);            
         }
-        configureStarters(pm);
 
         //Configure the default ACL of all automatic filters
         for(Filter filter: filters.values()) {
@@ -205,7 +200,7 @@ public class HostsList extends StarterNode {
 
         //Let's build all the custom graph tabs
         Map<String, Tab> customTabMap = conf.setTabMap();
-        logger.debug(jrds.Util.delayedFormatString("Tabs to add: %s", customTabMap.values()));
+        log(Level.DEBUG, "Tabs to add: %s", customTabMap.values());
         for(Tab t: customTabMap.values()) {
             t.setHostlist(this);
             GraphTree tabtree = t.getGraphTree();
@@ -214,7 +209,7 @@ public class HostsList extends StarterNode {
             allTabs.add(t);
         }
 
-        logger.debug("Parsing graphs configuration");
+        log(Level.DEBUG, "Parsing graphs configuration");
         Map<String, GraphDesc> graphs = conf.setGrapMap();
         //Let's build the tab with all the custom graphs
         Tab customGraphsTab = new Tab.DynamicTree("Custom graphs", PropertiesManager.CUSTOMGRAPHTAB);
@@ -253,6 +248,9 @@ public class HostsList extends StarterNode {
             }
         }
         started = true;
+        for(jrds.starter.Timer t: timers.values()) {
+            t.startTimer(collectTimer);  
+        }
     }
 
     private void makeTabs(PropertiesManager pm, ConfigObjectFactory conf, Set<Tab> moretabs, Map<String, Tab> customTabMap){
@@ -270,7 +268,7 @@ public class HostsList extends StarterNode {
             if(t != null)
                 tabsmap.put(t.getId(), t);
         }
-        logger.trace(jrds.Util.delayedFormatString("Looking for tabs list %s in %s", pm.tabsList, moretabs));
+        log(Level.TRACE, "Looking for tabs list %s in %s", pm.tabsList, moretabs);
         for(String tabid: pm.tabsList) {
             if("@".equals(tabid)) {
                 for(Tab t: customTabMap.values()) {
@@ -280,7 +278,7 @@ public class HostsList extends StarterNode {
             else {
                 Tab t = tabsmap.get(tabid);
                 if(t == null) {
-                    logger.error("Non existent tab to add: " + tabid);
+                    log(Level.ERROR, "Non existent tab to add: " + tabid);
                     continue;
                 }
                 tabs.put(tabid, t);
@@ -294,9 +292,8 @@ public class HostsList extends StarterNode {
         }
     }
 
-    public Collection<RdsHost> getHosts() {
+    public Collection<HostInfo> getHosts() {
         return hostList;
-
     }
 
     public Set<String> getTabsId() {
@@ -348,129 +345,16 @@ public class HostsList extends StarterNode {
         }
         for(Filter f: filters.values()) {
             if(f.acceptGraph(gn, path.toString())) {
-                logger.trace(jrds.Util.delayedFormatString("Adding ACL %s to %s", f.getACL(), gn));
+                log(Level.TRACE, "Adding ACL %s to %s", f.getACL(), gn);
                 gn.addACL(f.getACL());
             }
         }
     }
 
-    public void addHost(RdsHost newhost) {
+    public void addHost(HostInfo newhost) {
         hostList.add(newhost);
-        newhost.setParent(this);
     }
 
-    public void collectAll() {
-        if(started) {
-            logger.debug("One collect is launched");
-            Date start = new Date();
-            try {
-                if( ! collectMutex.tryAcquire(getTimeout(), TimeUnit.SECONDS)) {
-                    logger.fatal("A collect failed because a start time out");
-                    return;
-                }
-            } catch (InterruptedException e) {
-                logger.fatal("A collect start was interrupted");
-                return;
-            }
-            try {
-                final Object counter = new Object() {
-                    int i = 0;
-                    @Override
-                    public String toString() {
-                        return Integer.toString(i++);
-                    }
-
-                };
-                ExecutorService tpool =  Executors.newFixedThreadPool(numCollectors, 
-                        new ThreadFactory() {
-                    public Thread newThread(Runnable r) {
-                        Thread t = new Thread(r, "CollectorThread" + counter);
-                        t.setDaemon(true);
-                        logger.debug("New thread name:" + t.getName());
-                        return t;
-                    }
-                }
-                        );
-                startCollect();
-                for(final RdsHost oneHost: hostList) {
-                    if( ! isCollectRunning())
-                        break;
-                    logger.debug("Collect all stats for host " + oneHost.getName());
-                    Runnable runCollect = new Runnable() {
-                        private RdsHost host = oneHost;
-
-                        public void run() {
-                            Thread.currentThread().setName("JrdsCollect-" + host.getName());
-                            host.collectAll();
-                            Thread.currentThread().setName("JrdsCollect-" + host.getName() + ":finished");
-                        }
-                        @Override
-                        public String toString() {
-                            return Thread.currentThread().toString();
-                        }
-                    };
-                    try {
-                        tpool.execute(runCollect);
-                    }
-                    catch(RejectedExecutionException ex) {
-                        logger.debug("collector thread dropped for host " + oneHost.getName());
-                    }
-                }
-                tpool.shutdown();
-                try {
-                    tpool.awaitTermination(step - getTimeout() * 2 , TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    logger.warn("Collect interrupted");
-                }
-                stopCollect();
-                if( ! tpool.isTerminated()) {
-                    //Second chance, we wait for the time out
-                    boolean emergencystop = false;
-                    try {
-                        emergencystop = tpool.awaitTermination(getTimeout(), TimeUnit.SECONDS);
-                    } catch (InterruptedException e) {
-                        logger.warn("Collect interrupted in last chance");
-                    }
-                    if(! emergencystop) {
-                        //logger.info("Some probes are hanged");
-
-                        //					if(! emergencystop) {
-                        logger.warn("Some task still alive, needs to be killed");
-                        //						//Last chance to commit results
-                        List<Runnable> timedOut = tpool.shutdownNow();
-                        if(! timedOut.isEmpty()) {
-                            logger.warn("Still " + timedOut.size() + " waiting probes: ");
-                            for(Runnable r: timedOut) {
-                                logger.warn(r.toString());
-                            }
-                        }
-                    }
-                }
-            } catch (RuntimeException e) {
-                logger.error("problem while collecting data: ", e);
-            }
-            finally {
-                //StoreOpener.
-                collectMutex.release();				
-            }
-            Date end = new Date();
-            long duration = end.getTime() - start.getTime();
-            synchronized(stats) {
-                stats.lastCollect = start;
-                stats.runtime = duration;
-            }
-            System.gc();
-            logger.info("Collect started at "  + start + " ran for " + duration + "ms");
-        }
-    }
-
-    public void lockCollect() throws InterruptedException {
-        collectMutex.acquire();
-    }
-
-    public void releaseCollect() {
-        collectMutex.release();
-    }
 
     public GraphTree getGraphTree(String name) {
         return treeMap.get(name);
@@ -536,13 +420,13 @@ public class HostsList extends StarterNode {
         return node;
     }
 
-    public void addFilter(Filter newFilter) {
+    private void addFilter(Filter newFilter) {
         filters.put(newFilter.getName(), newFilter);
         ACL acl = newFilter.getACL();
         if(acl instanceof RolesACL) {
             roles.addAll(((RolesACL) acl).getRoles());
         }
-        logger.debug(jrds.Util.delayedFormatString("Filter %s added with ACL %s", newFilter.getName(), newFilter.getACL()));
+        log(Level.DEBUG, "Filter %s added with ACL %s", newFilter.getName(), newFilter.getACL());
     }
 
     public Filter getFilter(String name) {
@@ -550,10 +434,6 @@ public class HostsList extends StarterNode {
         if(name != null)
             retValue = filters.get(name);
         return retValue;
-    }
-
-    public Collection<String> getAllFiltersNames() {
-        return filters.keySet();
     }
 
     @Override
@@ -568,22 +448,6 @@ public class HostsList extends StarterNode {
         return renderer;
     }
 
-    public int getStep() {
-        return step;
-    }
-
-    public File getRrdDir() {
-        return rrdDir;
-    }
-
-    public File getTmpdir() {
-        return tmpDir;
-    }
-
-    public int getTimeout() {
-        return timeout;
-    }
-
     /**
      * @return the stats
      */
@@ -595,7 +459,9 @@ public class HostsList extends StarterNode {
      * @param started the started to set
      */
     public void finished() {
-        this.started = false;
+        started = false;
+        if(collectTimer != null)
+            collectTimer.cancel();
     }
 
     /* (non-Javadoc)
@@ -603,7 +469,7 @@ public class HostsList extends StarterNode {
      */
     @Override
     public boolean isCollectRunning() {
-        return started && super.isCollectRunning();
+        return started;
     }
 
     /**
@@ -626,7 +492,7 @@ public class HostsList extends StarterNode {
             try {
                 daSet.add(daa.newInstance());
             } catch (Exception e) {
-                logger.error("Error creating discover agent " + daa.getName() + ": " + e, e);
+                log(Level.ERROR, e, "Error creating discover agent " + daa.getName() + ": " + e);
             }
         }
 

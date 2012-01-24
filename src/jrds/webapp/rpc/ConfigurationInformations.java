@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import jrds.RdsHost;
+import jrds.HostInfo;
 import jrds.webapp.Configuration;
 import jrds.webapp.rpc.JrdsRequestProcessorFactoryFactory.InitializableRequestProcessor;
 import jrds.webapp.rpc.Role.RoleList;
@@ -25,9 +25,9 @@ public class ConfigurationInformations implements InitializableRequestProcessor 
 
 	@Role(RoleList.USER)
 	public Object[] getHostsName() {
-		Collection<RdsHost> hostsList = config.getHostsList().getHosts();
+		Collection<HostInfo> hostsList = config.getHostsList().getHosts();
 		Set<String> hosts = new HashSet<String>(hostsList.size());
-		for(RdsHost host: hostsList) {
+		for(HostInfo host: hostsList) {
 			hosts.add(host.getName());
 		}
 		return hosts.toArray();

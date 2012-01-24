@@ -17,6 +17,7 @@ import jrds.Tab;
 import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.graphe.Sum;
+import jrds.starter.Timer;
 
 import org.apache.log4j.Logger;
 
@@ -27,7 +28,7 @@ public class ConfigObjectFactory {
     private ClassLoader cl = this.getClass().getClassLoader();
     private Map<String, GraphDesc> graphDescMap = Collections.emptyMap();
     Map<String, Macro> macrosmap = Collections.emptyMap();
-    private jrds.PropertiesManager pm = null;
+    private final jrds.PropertiesManager pm;
     private Loader load = null;
 
     public ConfigObjectFactory(jrds.PropertiesManager pm){
@@ -114,18 +115,19 @@ public class ConfigObjectFactory {
         ob.setClassLoader(cl);
         ob.setPm(pm);
         Map<String, ProbeDesc> probeDescMap = getObjectMap(ob, nodemap);
-        pf = new ProbeFactory(probeDescMap, graphDescMap, pm);
+        pf = new ProbeFactory(probeDescMap, graphDescMap);
         logger.debug(jrds.Util.delayedFormatString("Probe description configured: %s", probeDescMap.keySet()));
         return probeDescMap;
     }
 
-    public Map<String, HostInfo> setHostMap() {
+    public Map<String, HostInfo> setHostMap(Map<String, Timer> timers) {
         Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.HOSTS);
         HostBuilder ob = new HostBuilder();
         ob.setClassLoader(cl);
         ob.setMacros(macrosmap);
         ob.setProbeFactory(pf);
         ob.setPm(pm);
+        ob.setTimers(timers);
         Map<String, HostInfo> hostsMap = getObjectMap(ob, nodemap);
         logger.debug(jrds.Util.delayedFormatString("Hosts configured: %s", hostsMap.keySet()));
         return hostsMap;

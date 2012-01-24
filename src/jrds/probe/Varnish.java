@@ -46,7 +46,7 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
             SocketFactory ss = find(SocketFactory.class); 
             if(! ss.isStarted())
                 return java.util.Collections.emptyMap();
-            s = ss.createSocket(getHost(), port);
+            s = ss.createSocket(this, port);
         } catch (Exception e) {
             log(Level.ERROR, e, "Connect error %s", e);
             return java.util.Collections.emptyMap();

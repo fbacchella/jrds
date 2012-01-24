@@ -2,10 +2,10 @@
 <!DOCTYPE host PUBLIC "-//jrds//DTD Host//EN"
                            "urn:jrds:host">
 <host name="myhost">
-	<snmp community="public" version="2" />
-	<properties>
-		<entry key="bidule1">toto1</entry>
-	</properties>
+    <connection type="jrds.snmp.SnmpConnection" >
+        <attr name="community">public</attr>
+        <attr name="version">2</attr>
+    </connection>
 	<probe type="TcpSnmp">
 	</probe>
 	<collection name="partitions">

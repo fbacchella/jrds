@@ -17,10 +17,10 @@ import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.CompositeType;
 import javax.management.openmbean.TabularData;
 
-import jrds.RdsHost;
+import jrds.HostInfo;
 import jrds.Tools;
-import jrds.mockobjects.GetMoke;
 import jrds.starter.Connection;
+import jrds.starter.HostStarter;
 import jrds.starter.Resolver;
 import junit.framework.Assert;
 
@@ -40,9 +40,8 @@ public class JmxConnexionTest {
 
 	@Test
 	public void build1() throws MalformedObjectNameException, NullPointerException, AttributeNotFoundException, InstanceNotFoundException, MBeanException, ReflectionException, IOException, IntrospectionException {
-		
-		
-		RdsHost host = GetMoke.getHost("localhost");
+
+		HostStarter host = new HostStarter(new HostInfo("localhost"));
 		Connection<MBeanServerConnection> cnx = new JMXConnection(8998) {
 			@Override
 			public String getHostName() {

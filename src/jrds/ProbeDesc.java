@@ -33,7 +33,7 @@ import org.w3c.dom.Element;
  * @version $Revision$
  */
 /**
- * @author bacchell
+ * @author Fabrice Bacchella
  *
  */
 public class ProbeDesc implements Cloneable {
@@ -51,7 +51,6 @@ public class ProbeDesc implements Cloneable {
     private Class<? extends Probe<?,?>> probeClass = null;
     private Map<String, String> defaultsArgs = null;
     private float uptimefactor = (float) 1.0;
-    private Map<String, String> properties = null;
     private Map<String, Double> defaultValues = new HashMap<String,Double>(0);
     private Map<String, PropertyDescriptor> beans = Collections.emptyMap();
 
@@ -406,20 +405,6 @@ public class ProbeDesc implements Cloneable {
 
     public Map<String, String> getDefaultArgs() {
         return defaultsArgs;
-    }
-
-    /**
-     * @return the properties
-     */
-    public Map<String, String> getProperties() {
-        return properties;
-    }
-
-    /**
-     * @param properties the properties to set
-     */
-    public void setProperties(Map<String, String> properties) {
-        this.properties = properties;
     }
 
     /**

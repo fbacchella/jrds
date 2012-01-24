@@ -2,19 +2,22 @@ package jrds.webapp;
 
 import java.util.Properties;
 
+import jrds.HostInfo;
 import jrds.Probe;
-import jrds.RdsHost;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.mockobjects.MokeProbe;
 import jrds.standalone.JettyLogger;
+import jrds.starter.HostStarter;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mortbay.jetty.testing.HttpTester;
 import org.mortbay.jetty.testing.ServletTester;
 
@@ -22,6 +25,9 @@ public class TestDiscover  {
     static final private Logger logger = Logger.getLogger(TestDiscover.class);
 
     static ServletTester tester = null;
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws Exception {
@@ -40,11 +46,11 @@ public class TestDiscover  {
         tester = ToolsWebApp.getTestServer(config);
         Configuration c = (Configuration) tester.getAttribute(Configuration.class.getName());
 
-        RdsHost h = new RdsHost();
+        HostStarter h = new HostStarter(new HostInfo("localhost"));
         Probe<?,?> p = new MokeProbe<String, Number>();
         p.setHost(h);
-        h.getProbes().add(p);
-        c.getHostsList().addHost(h);
+        h.addProbe(p);
+        c.getHostsList().addHost(h.getHost());
         c.getHostsList().addProbe(p);
         tester.addServlet(GetDiscoverHtmlCode.class, "/discoverhtml");
 
@@ -52,8 +58,7 @@ public class TestDiscover  {
     }
 
     @Test
-    public void testDiscover() throws Exception
-    {
+    public void testDiscover() throws Exception {
         HttpTester response = ToolsWebApp.doRequestGet(tester, "http://localhost/discoverhtml", 200);
 
         logger.trace(response.getContent());

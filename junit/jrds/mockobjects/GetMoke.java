@@ -22,17 +22,14 @@ import javax.servlet.http.HttpSession;
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.ProbeDesc;
-import jrds.RdsHost;
+import jrds.HostInfo;
+import jrds.starter.HostStarter;
 
 import org.rrd4j.DsType;
 
 public class GetMoke {
-    static public RdsHost getHost() {
-        return new RdsHost("MokeHost");
-    }
-
-    static public RdsHost getHost(String name) {
-        return new RdsHost(name);
+    static public HostInfo getHost() {
+        return new HostInfo("MokeHost");
     }
 
     static public ProbeDesc getPd() {
@@ -46,7 +43,7 @@ public class GetMoke {
     static public Probe<?,?> getProbe() {
         Probe<?,?> p = new MokeProbe<String, Number>();
         p.setPd(getPd());
-        p.setHost(getHost());
+        p.setHost(new HostStarter(getHost()));
         return p;
     }
 

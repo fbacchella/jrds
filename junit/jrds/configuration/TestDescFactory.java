@@ -83,7 +83,6 @@ public class TestDescFactory {
 		Assert.assertEquals("specificvalue1", pd.getSpecific("specificname1"));
 		Assert.assertEquals("specificvalue2", pd.getSpecific("specificname2"));
 		Assert.assertEquals(0.5, pd.getUptimefactor(), 0);
-		Assert.assertEquals("value", pd.getProperties().get("key"));
 		Assert.assertEquals((long) pm.step * 2, pd.getHeartBeatDefault());
 		logger.trace(pd.getCollectMapping());
 		logger.trace(pd.getCollectOids());

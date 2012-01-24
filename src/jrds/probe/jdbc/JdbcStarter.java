@@ -6,23 +6,21 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import jrds.RdsHost;
+import jrds.HostInfo;
 import jrds.starter.Resolver;
 import jrds.starter.Starter;
 
 import org.apache.log4j.Level;
 
 public abstract class JdbcStarter extends Starter {
-	private Starter resolver = null;
 	private Connection con;
 	private String url;
 	private String user;
 	private String passwd;
 	private String dbName = "";;
 
-	public void setHost(RdsHost monitoredHost) {
+	public void setHost(HostInfo monitoredHost) {
 		this.url = getUrlAsString();
-		resolver = monitoredHost.find(Resolver.class);
 	}
 	
 	public abstract String getUrlAsString();
@@ -30,6 +28,7 @@ public abstract class JdbcStarter extends Starter {
 	@Override
 	public boolean start() {
 		boolean started = false;
+		Starter resolver = getLevel().find(Resolver.class);
 		if(resolver.isStarted()) {
 			Properties p = getProperties();
 			p.put("user", user);

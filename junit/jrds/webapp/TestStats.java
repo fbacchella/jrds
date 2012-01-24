@@ -2,11 +2,12 @@ package jrds.webapp;
 
 import javax.servlet.ServletContext;
 
+import jrds.HostInfo;
 import jrds.Probe;
-import jrds.RdsHost;
 import jrds.Tools;
 import jrds.mockobjects.MokeProbe;
 import jrds.standalone.JettyLogger;
+import jrds.starter.HostStarter;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -65,11 +66,11 @@ public class TestStats  {
 
 		Configuration c = new Configuration(sc);
 		sc.setAttribute(Configuration.class.getName(), c);
-		RdsHost h = new RdsHost();
+		HostStarter h = new HostStarter(new HostInfo("localhost"));
 		Probe<?,?> p = new MokeProbe<String, Number>();
 		p.setHost(h);
-		h.getProbes().add(p);
-		c.getHostsList().addHost(h);
+		h.addProbe(p);
+		c.getHostsList().addHost(h.getHost());
 		c.getHostsList().addProbe(p);
 		tester.addServlet(Status.class, "/status");
 
@@ -83,6 +84,5 @@ public class TestStats  {
 			oldvalues[i] = System.getProperty(prop);
 			System.setProperty(prop, oldvalues[i]);
 		}
-		
 	}
 }

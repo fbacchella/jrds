@@ -16,7 +16,6 @@ import org.snmp4j.Target;
 import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.smi.Address;
-import org.snmp4j.smi.GenericAddress;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.TcpAddress;
@@ -35,7 +34,6 @@ public class SnmpConnection extends Connection<Target> {
 
     private int version = SnmpConstants.version2c;
     private String proto = UDP;
-    private String hostname = null;
     private int port = 161;
     private String community = "public";
     //A default value for the uptime OID, from the HOST-RESSOURCES MIB
@@ -65,11 +63,7 @@ public class SnmpConnection extends Connection<Target> {
             address = new TcpAddress(resolver.getInetAddress(), port);
         }
         else {
-            String addrStr = proto + ":" + hostname + "/" + port;
-            address= GenericAddress.parse(addrStr);
-            if(address == null) {
-                log(Level.WARN, "Address " + addrStr + " not solvable");
-            }
+            return false;
         }
         if(community != null && address != null) {
             snmpTarget = new CommunityTarget(address, new OctetString(community));

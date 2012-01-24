@@ -1,7 +1,6 @@
 package jrds;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,29 +9,30 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import jrds.mockobjects.MokeProbe;
+import jrds.starter.HostStarter;
+import jrds.starter.StarterNode;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
 import org.rrd4j.core.Sample;
 
 public class TestProbe {
     static final private Logger logger = Logger.getLogger(TestProbe.class);
 
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.Probe", "jrds.ProbeDesc", "jrds.Probe");
+        Tools.setLevel(logger, Level.TRACE, "jrds.Probe", "jrds.ProbeDesc");
         StoreOpener.prepare("FILE");
-    }
-
-    @AfterClass
-    static public void clean() {
-        new File("tmp/DummyProbe.rrd").delete();
     }
 
     @Test
@@ -47,12 +47,7 @@ public class TestProbe {
         dsMap.put("collectlow", "low");
         pd.add(dsMap);
 
-        RdsHost host = new RdsHost() {
-            @Override
-            public boolean isCollectRunning() {
-                return true;
-            }
-        };
+        HostStarter host = new HostStarter(new HostInfo("DummyHost"));
         MokeProbe<String, Long> p = new MokeProbe<String, Long>(pd) {
             @Override
             public boolean isCollectRunning() {
@@ -64,13 +59,12 @@ public class TestProbe {
                 super.modifySample(oneSample, values);
             }			
         };
-        host.setName("DummyHost");
-        host.setHostDir(new File("tmp"));
+        host.getHost().setHostDir(testFolder.newFolder("testHighLow"));
         p.setHost(host);
+        p.setParent(new StarterNode() {});
         p.configure();
-        System.out.println();
         Map<String, Long> val = new HashMap<String, Long>();
-        long high =  255L;
+        long high = 255L;
         long low = 64L;
         val.put("high", high);
         val.put("low", low);
@@ -97,12 +91,7 @@ public class TestProbe {
         pd.add(dsMap);
         System.out.println();
 
-        RdsHost host = new RdsHost() {
-            @Override
-            public boolean isCollectRunning() {
-                return true;
-            }
-        };
+        HostStarter host = new HostStarter(new HostInfo("DummyHost"));
         MokeProbe<String, Long> p = new MokeProbe<String, Long>(pd) {
             @Override
             public boolean isCollectRunning() {
@@ -114,9 +103,9 @@ public class TestProbe {
                 super.modifySample(oneSample, values);
             }			
         };
-        host.setName("DummyHost");
-        host.setHostDir(new File("tmp"));
+        host.getHost().setHostDir(testFolder.newFolder("testDefault"));
         p.setHost(host);
+        p.setParent(new StarterNode() {});
         p.configure();
         System.out.println();
         Map<String, Long> val = new HashMap<String, Long>();

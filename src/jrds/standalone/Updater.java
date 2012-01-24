@@ -7,10 +7,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import jrds.HostInfo;
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
 import jrds.StoreOpener;
 
 import org.apache.log4j.Logger;
@@ -33,7 +33,7 @@ public class Updater {
 
 		ExecutorService tpool =  Executors.newFixedThreadPool(3);
 
-		for(RdsHost host: hl.getHosts()) {
+		for(HostInfo host: hl.getHosts()) {
 			for(final Probe<?,?> p: host.getProbes()) {
 				final Runnable runUpgrade = new Runnable() {
 					private Probe<?,?> lp = p;

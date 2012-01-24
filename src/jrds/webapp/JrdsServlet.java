@@ -21,6 +21,11 @@ public abstract class JrdsServlet extends HttpServlet {
 		return (Configuration) ctxt.getAttribute(Configuration.class.getName());
 	}
 	
+	protected void setConfig(Configuration config) {
+        ServletContext ctxt = getServletContext();
+        ctxt.setAttribute(Configuration.class.getName(), config);
+	}
+	
 	protected HostsList getHostsList() {
 		return getConfig().getHostsList();
 	}

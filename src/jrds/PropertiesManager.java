@@ -27,6 +27,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jrds.factories.ArgFactory;
+import jrds.starter.Timer;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
 
@@ -42,6 +43,12 @@ import org.rrd4j.core.RrdBackendFactory;
  */
 public class PropertiesManager extends Properties {
     private final Logger logger = Logger.getLogger(PropertiesManager.class);
+
+    public static final class TimerInfo {
+        public int step;
+        public int timeout;
+        public int numCollectors;
+    }
 
     private final FileFilter filter = new  FileFilter(){
         public boolean accept(File file) {
@@ -254,8 +261,7 @@ public class PropertiesManager extends Properties {
         }		
     }
 
-    public void update()
-    {
+    public void update() {
 
         Locale.setDefault(new Locale("POSIX"));
 
@@ -314,10 +320,31 @@ public class PropertiesManager extends Properties {
             throw new RuntimeException("No temp dir defined");
         }
 
+        // Configure the timers
         step = parseInteger(getProperty("step", "300"));
-        timeout = parseInteger(getProperty("timeout", "30"));
-        collectorThreads = parseInteger(getProperty("collectorThreads", "1"));
-        dbPoolSize = parseInteger(getProperty("dbPoolSize", "10")) + collectorThreads;
+        timeout = parseInteger(getProperty("timeout", "10"));
+        numCollectors = parseInteger(getProperty("collectorThreads", "1"));
+        String propertiesList = getProperty("timers", "");
+        if(! propertiesList.trim().isEmpty()) {
+            for(String timerName: propertiesList.split(",")) {
+                timerName = timerName.trim();
+                TimerInfo ti = new TimerInfo();
+                ti.step = parseInteger(getProperty("timer." + timerName + ".step", Integer.toString(step)));
+                ti.timeout = parseInteger(getProperty("timer." + timerName + ".timeout", Integer.toString(timeout)));
+                ti.numCollectors = parseInteger(getProperty("timer." + timerName + ".numCollectors", Integer.toString(numCollectors)));
+
+                timers.put(timerName, ti);
+            }
+        }
+        //Add the default timer
+        TimerInfo ti = new TimerInfo();
+        ti.step = step;
+        ti.timeout = timeout;
+        ti.numCollectors = numCollectors;
+        timers.put(Timer.DEFAULTNAME, ti);
+
+
+        dbPoolSize = parseInteger(getProperty("dbPoolSize", "10")) + numCollectors;
 
         strictparsing = parseBoolean(getProperty("strictparsing", "false"));
         try {
@@ -420,7 +447,7 @@ public class PropertiesManager extends Properties {
         // We search for the tabs list in the property tab
         // spaces are non-significant
         String tabsList = getProperty("tabs");
-        if(tabsList !=null && ! "".equals(tabsList.trim())) {
+        if(tabsList != null && ! "".equals(tabsList.trim())) {
             this.tabsList = new ArrayList<String>();
             for(String tab: tabsList.split(",")) {
                 this.tabsList.add(tab.trim());
@@ -459,7 +486,8 @@ public class PropertiesManager extends Properties {
     public String urlpngroot;
     public String logfile;
     public int step;
-    public int collectorThreads;
+    public Map<String, TimerInfo> timers = new HashMap<String, TimerInfo>();
+    public int numCollectors;
     public int dbPoolSize;
     public final Set<URI> libspath = new HashSet<URI>();
     public boolean strictparsing = false;

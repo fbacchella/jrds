@@ -2,11 +2,12 @@ package jrds.webapp;
 
 import java.util.Properties;
 
+import jrds.HostInfo;
 import jrds.Probe;
-import jrds.RdsHost;
 import jrds.Tools;
 import jrds.mockobjects.MokeProbe;
 import jrds.standalone.JettyLogger;
+import jrds.starter.HostStarter;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -40,11 +41,11 @@ public class TestTree {
         tester = ToolsWebApp.getTestServer(config);
         Configuration c = (Configuration) tester.getAttribute(Configuration.class.getName());
 
-        RdsHost h = new RdsHost();
+        HostStarter h = new HostStarter(new HostInfo("localhost"));
         Probe<?,?> p = new MokeProbe<String, Number>();
         p.setHost(h);
-        h.getProbes().add(p);
-        c.getHostsList().addHost(h);
+        h.addProbe(p);
+        c.getHostsList().addHost(h.getHost());
         c.getHostsList().addProbe(p);
         tester.addServlet(JSonTree.class, "/jsontree");
         

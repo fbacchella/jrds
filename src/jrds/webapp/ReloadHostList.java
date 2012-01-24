@@ -35,7 +35,9 @@ public class ReloadHostList extends JrdsServlet {
 				Configuration newConfig = new Configuration(ctxt);
 				oldConfig.stop();
 				newConfig.start();
-				ctxt.setAttribute(Configuration.class.getName(), newConfig);
+				setConfig(newConfig);
+				//Avoid a memory leak in perm gen
+				java.beans.Introspector.flushCaches();
 				logger.info("Configuration rescaned");
 			}
 		};

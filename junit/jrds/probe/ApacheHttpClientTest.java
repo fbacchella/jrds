@@ -8,10 +8,11 @@ import java.util.Map;
 
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
+import jrds.HostInfo;
 import jrds.StoreOpener;
 import jrds.Tools;
 import jrds.starter.Connection;
+import jrds.starter.HostStarter;
 import jrds.starter.Resolver;
 import jrds.starter.SocketFactory;
 import jrds.starter.Starter;
@@ -39,17 +40,11 @@ public class ApacheHttpClientTest {
         StoreOpener.prepare("FILE");
     }
 
-    private  RdsHost addConnection(Starter cnx) throws IOException {
-        PropertiesManager pm = new PropertiesManager();
-        pm.put("autocreate", "yes");
-        pm.put("timeout", "1");
-        pm.put("collectorThreads", "1");
-        pm.put("tmpdir", testFolder.getRoot().getCanonicalPath());
-        pm.put("rrddir", testFolder.getRoot().getCanonicalPath());
-        pm.update();
+    private  HostStarter addConnection(Starter cnx) throws IOException {
+        PropertiesManager pm = Tools.makePm(testFolder, "timeout=1", "collectorThreads=1");
 
-        RdsHost localhost = new RdsHost("localhost");
-        localhost.setHostDir(testFolder.getRoot());
+        HostStarter localhost = new HostStarter(new HostInfo("localhost"));
+        localhost.getHost().setHostDir(testFolder.getRoot());
         localhost.registerStarter(new SocketFactory());
         localhost.registerStarter(cnx);
         cnx.configure(pm);
@@ -59,7 +54,7 @@ public class ApacheHttpClientTest {
     @Test
     public void testStart() throws IOException {
         HttpClientStarter cnx = new HttpClientStarter();
-        RdsHost localhost = addConnection(cnx);
+        HostStarter localhost = addConnection(cnx);
         localhost.find(Resolver.class).doStart();
         logger.debug("resolver started for localhost:" + localhost.find(Resolver.class).isStarted());
         cnx.doStart();
@@ -70,7 +65,7 @@ public class ApacheHttpClientTest {
     @Test
     public void testConnect() throws IOException {
         HttpClientStarter cnx = new HttpClientStarter();
-        RdsHost localhost = addConnection(cnx);
+        HostStarter localhost = addConnection(cnx);
         localhost.find(Resolver.class).doStart();
         cnx.doStart();
         HCHttpProbe p = new HCHttpProbe() {
@@ -93,7 +88,7 @@ public class ApacheHttpClientTest {
         p.setHost(localhost);
         p.configure(new URL("http://localhost:4141"));
         p.checkStore();
-        localhost.getProbes().add(p);
+        localhost.addProbe(p);
         localhost.collectAll();
         Assert.assertTrue("Didn't try to collect", collected);
     }

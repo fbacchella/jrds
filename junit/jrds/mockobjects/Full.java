@@ -9,10 +9,11 @@ import java.util.Map;
 import java.util.Random;
 
 import jrds.GraphDesc;
+import jrds.HostInfo;
 import jrds.Period;
 import jrds.Probe;
 import jrds.ProbeDesc;
-import jrds.RdsHost;
+import jrds.starter.HostStarter;
 import junit.framework.Assert;
 
 import org.junit.rules.TemporaryFolder;
@@ -82,12 +83,13 @@ public class Full {
 		return p;
 
 	}
-	static public Probe<?,?> create(TemporaryFolder testFolder) {
-		RdsHost host = new RdsHost("Empty");
+	static public Probe<?,?> create(TemporaryFolder testFolder, int step) {
+		HostInfo host = new HostInfo("Empty");
 		host.setHostDir(testFolder.getRoot());
 		
 		Probe<?,?> p = getProbe();
-		p.setHost(host);
+		p.setHost(new HostStarter(host));
+		p.setStep(step);
 		
 		Assert.assertTrue("Fail creating probe", p.checkStore());
 		
@@ -119,7 +121,7 @@ public class Full {
 		return t;
 	}
 	
-	static public Period getPeriod(Probe<?,?>p , long endSec) {
+	static public Period getPeriod(Probe<?,?> p, long endSec) {
         Date end = org.rrd4j.core.Util.getDate(endSec);
         Calendar calBegin = Calendar.getInstance();
         calBegin.setTime(end);

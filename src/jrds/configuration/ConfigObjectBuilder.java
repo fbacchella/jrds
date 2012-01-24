@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.PropertiesManager;
-import jrds.Util;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.webapp.RolesACL;
@@ -31,26 +30,6 @@ abstract class ConfigObjectBuilder<BuildObject> {
 
     protected ConfigObjectBuilder(ConfigType ct) {
         this.ct = ct;
-    }
-
-    public Map<String, String> makeProperties(JrdsElement n) {
-        if(n == null)
-            return Collections.emptyMap();
-        JrdsElement propElem = n.getElementbyName("properties");
-        if(propElem == null)
-            return Collections.emptyMap();
-
-        Map<String, String> props = new HashMap<String, String>();
-        for(JrdsElement propNode: propElem.getChildElementsByName("entry")) {
-            String key = propNode.getAttribute("key");
-            if(key != null) {
-                String value = propNode.getTextContent();
-                logger.trace(Util.delayedFormatString("Adding propertie %s=%s", key, value));
-                props.put(key, value);
-            }
-        }
-        logger.debug(Util.delayedFormatString("Properties map: %s", props));
-        return props;
     }
 
     /**

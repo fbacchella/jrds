@@ -11,7 +11,6 @@ import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.Probe;
 import jrds.ProbeDesc;
-import jrds.PropertiesManager;
 
 import org.apache.log4j.Logger;
 
@@ -25,16 +24,14 @@ public class ProbeFactory {
     final private List<String> probePackages = new ArrayList<String>(5);
     private Map<String, ProbeDesc> probeDescMap;
     private Map<String, GraphDesc> graphDescMap;
-    private PropertiesManager pm;
 
     /**
      * Private constructor
      * @param b 
      */
-    public ProbeFactory(Map<String, ProbeDesc> probeDescMap, Map<String, GraphDesc> graphDescMap, PropertiesManager pm) {
+    public ProbeFactory(Map<String, ProbeDesc> probeDescMap, Map<String, GraphDesc> graphDescMap) {
         this.probeDescMap = probeDescMap;
         this.graphDescMap = graphDescMap;
-        this.pm = pm;
 
         probePackages.add("");
     }
@@ -124,10 +121,6 @@ public class ProbeFactory {
                     if(newGraph != null)
                         p.addGraph(newGraph);
                 }
-            }
-            if(pm != null) {
-                logger.trace("Setting time step to " + pm.step + " for " + p);
-                p.setStep(pm.step);
             }
             return true;
         } catch (SecurityException e) {

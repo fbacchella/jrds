@@ -5,14 +5,15 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.HostInfo;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 import jrds.mockobjects.MokeProbeBean;
 import jrds.mockobjects.MokeProbeFactory;
+import jrds.starter.ConnectionInfo;
 import jrds.starter.StarterNode;
 
 import org.apache.log4j.Level;
@@ -45,7 +46,7 @@ public class TestHostBuilder {
         host.doRootElement("host", "name=name");
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
         conf.getNodeMap(ConfigType.HOSTS).put("name", host);
-        Assert.assertNotNull("Probedesc not build", conf.setHostMap().get("name"));
+        Assert.assertNotNull("Probedesc not build", conf.setHostMap(Tools.getSimpleTimerMap()).get("name"));
     }
 
     @Test
@@ -74,20 +75,32 @@ public class TestHostBuilder {
             }
         });
         hb.setPm(localpm);
+        hb.setTimers(Tools.getSimpleTimerMap());
 
-        RdsHost host = new RdsHost();
-        host.setName("localhost");
+        HostInfo host = new HostInfo("localhost");
         host.setHostDir(testFolder.getRoot());
 
         JrdsDocument probeNode = new JrdsDocument(Tools.dbuilder.newDocument());
         probeNode.doRootElement("probe", "type=probetype");
 
-        StarterNode ns = new StarterNode() {};
-
-        Probe<?, ?> p = hb.makeProbe(probeNode.getRootElement(), host, ns);
+        Probe<?, ?> p = hb.makeProbe(probeNode.getRootElement(), host, null);
         Assert.assertEquals("localhost", p.getPd().getBeanMap().get("hostInfo").getReadMethod().invoke(p));
         logger.trace(p.getName());
 
     }
 
+    @Test
+    public void testConnectionInfo() throws Exception {
+        PropertiesManager pm = Tools.getEmptyProperties();
+
+        HostBuilder hb = new HostBuilder();
+        hb.setPm(pm);
+        hb.setClassLoader(this.getClass().getClassLoader());
+
+        JrdsDocument cnxdoc = Tools.parseRessource("goodhost1.xml");
+        for(ConnectionInfo ci: hb.makeConnexion(cnxdoc.getRootElement(), new HostInfo("localhost"))) {
+            logger.trace(ci.getName());
+            ci.register(new StarterNode() {});
+        }
+    }
 }

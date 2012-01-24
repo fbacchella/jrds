@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -22,6 +23,7 @@ import javax.xml.xpath.XPathFactory;
 
 import jrds.factories.xml.EntityResolver;
 import jrds.factories.xml.JrdsDocument;
+import jrds.starter.Timer;
 import jrds.webapp.Configuration;
 
 import org.apache.log4j.Appender;
@@ -31,6 +33,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.junit.rules.TemporaryFolder;
 import org.mortbay.jetty.testing.ServletTester;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -213,6 +216,7 @@ final public class Tools {
 
     static private final String[] dirs = new String[] {"configdir", "rrddir", "tmpdir"};
     static private final Random r = new Random();
+    
     static public final PropertiesManager getCleanPM() {
         File newtmpdir = new File(System.getProperty("java.io.tmpdir"), "jrds" + r.nextInt());;
         PropertiesManager pm = new PropertiesManager();
@@ -234,6 +238,28 @@ final public class Tools {
         pm.update();
         pm.libspath.clear();
     }
+    
+    static public final PropertiesManager makePm(TemporaryFolder testFolder, String... props) throws IOException {
+        PropertiesManager pm = new PropertiesManager();
+        pm.setProperty("tmpdir", testFolder.newFolder("tmp").getCanonicalPath());
+        pm.setProperty("configdir", testFolder.newFolder("config").getCanonicalPath());
+        pm.setProperty("rrddir", testFolder.newFolder("rrddir").getCanonicalPath());
+        pm.setProperty("strictparsing", "true");
+        pm.setProperty("autocreate", "true");
+        pm.setProperty("tabs", "hoststab");
+        for(String prop: props) {
+            int pos = prop.indexOf('=');
+            if(pos == 0 || pos == (prop.length() - 1) )
+                continue;
+            String key = prop.substring(0, pos);
+            String value = prop.substring(pos +  1);
+            pm.setProperty(key, value);
+        }
+        pm.update();
+        pm.libspath.clear();
+        
+        return pm;
+    }
 
     static public final PropertiesManager getEmptyProperties() {
         PropertiesManager pm = new PropertiesManager();
@@ -244,5 +270,14 @@ final public class Tools {
         pm.extensionClassLoader = PropertiesManager.class.getClassLoader();
         pm.libspath.clear();
         return pm;
+    }
+    
+    static public final Map<String, Timer> getSimpleTimerMap() {
+        PropertiesManager.TimerInfo ti = new PropertiesManager.TimerInfo();
+        ti.numCollectors = 1;
+        ti.step = 300;
+        ti.timeout = 10;
+        Timer t = new Timer(Timer.DEFAULTNAME, ti);
+        return Collections.singletonMap(t.getName(), t);
     }
 }

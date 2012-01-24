@@ -20,10 +20,10 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 
 import jrds.Probe;
-import jrds.RdsHost;
 import jrds.Util;
 import jrds.factories.ProbeBean;
 import jrds.starter.SocketFactory;
+import jrds.starter.StarterNode;
 import jrds.starter.XmlProvider;
 
 import org.apache.log4j.Level;
@@ -55,14 +55,14 @@ public class Ribcl extends Probe<String, Number> {
 		this.passwd = passwd;
 	}
 
-	/* (non-Javadoc)
-	 * @see jrds.probe.Probe#setHost(jrds.RdsHost)
-	 */
-	@Override
-	public void setHost(RdsHost monitoredHost) {
-		super.setHost(monitoredHost);
-		this.registerStarter(new XmlProvider());
-	}
+    /* (non-Javadoc)
+     * @see jrds.starter.StarterNode#setParent(jrds.starter.StarterNode)
+     */
+    @Override
+    public void setParent(StarterNode parent) {
+        super.setParent(parent);
+        registerStarter(new XmlProvider());
+    }
 
 	@Override
 	public Map<String, Number> getNewSampleValues() {

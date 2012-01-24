@@ -44,7 +44,7 @@ public abstract class Filter implements WithACL {
 	static final public Filter ALLHOSTS = new Filter() {
 		@Override
 		public boolean acceptGraph(GraphNode graph, String path) {
-			RdsHost host = graph.getProbe().getHost();
+		    HostInfo host = graph.getProbe().getHost();
 			return (! host.isHidden()) && path.startsWith("/" + GraphTree.HOSTROOT + "/");
 		}
 		@Override

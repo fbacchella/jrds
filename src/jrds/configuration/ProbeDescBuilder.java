@@ -112,10 +112,6 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
             pd.add(dsMap);			
         }
 
-        Map<String, String> props = makeProperties(root);
-        if(props != null)
-            pd.setProperties(props);
-
         return pd;
     }
 

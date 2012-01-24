@@ -36,8 +36,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
-import jrds.starter.ChainedProperties;
-import jrds.starter.StarterNode;
+import jrds.starter.HostStarter;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -233,13 +232,6 @@ public class Util {
         return org.rrd4j.core.Util.getDate(org.rrd4j.core.Util.normalize(timestamp, step));
     }
 
-    public static String evaluateVariables(String in, Map<String, Object> variables, StarterNode node) {
-        ChainedProperties props = null;
-        if(node != null)
-            props = node.find(ChainedProperties.class);
-        return evaluateVariables(in, variables, props);
-    }
-
     /**
      * Evaluate a string containing variables in the form ${varname}
      * 
@@ -252,7 +244,7 @@ public class Util {
      * @param props
      * @return
      */
-    public static String evaluateVariables(String in, Map<String, Object> variables, Map<String,String> props) {
+    public static String evaluateVariables(String in, Map<String, Object> variables) {
         Matcher m = varregexp.matcher(in);
         if(m.find()) {
             StringBuilder out = new StringBuilder();
@@ -268,17 +260,12 @@ public class Util {
                 else if(variables.containsKey(var)) {
                     toAppend = variables.get(var).toString();
                 }
-                else if(props != null) {
-                    String propsValue = props.get(var);
-                    if(propsValue != null)
-                        toAppend = propsValue;
-                }
                 if(toAppend == null) {
                     toAppend = "${" + var + "}";
                 }
                 out.append(toAppend);
                 if(after.length() > 0)
-                    out.append(evaluateVariables(after, variables, props));
+                    out.append(evaluateVariables(after, variables));
                 return out.toString();
             }
         }
@@ -321,8 +308,9 @@ public class Util {
         }
 
         Map<String, Object> env = new HashMap<String, Object>();
-        StarterNode node = null;
         for(Object o: arguments) {
+            if(o == null)
+                continue;
             if(logger.isTraceEnabled())
                 logger.trace(Util.delayedFormatString("Argument for template \"%s\": %s", template, o.getClass()));
             if( o instanceof IndexedProbe) {
@@ -343,9 +331,9 @@ public class Util {
                 env.put("connection.name", cp.getConnectionName());
                 env.put("connection.name.signature", stringSignature(cp.getConnectionName()));
             }
-            if( o instanceof Probe) {
+            if(o instanceof Probe) {
                 Probe<?,?> p = ((Probe<?,?>) o);
-                RdsHost host = p.getHost();
+                HostInfo host = p.getHost();
                 if(host != null)
                     env.put("host", host.getName());
                 String probename=p.getName();
@@ -369,8 +357,11 @@ public class Util {
                     }
                 }
             } 
-            if( o instanceof RdsHost) {
-                env.put("host", ((RdsHost) o).getName());
+            if( o instanceof HostStarter) {
+                env.put("host", ((HostStarter) o).getName());
+            }
+            if( o instanceof HostInfo) {
+                env.put("host", ((HostInfo) o).getName());
             }
             if(o instanceof GraphDesc) {
                 GraphDesc gd = (GraphDesc) o;
@@ -380,9 +371,6 @@ public class Util {
             if(o instanceof ProbeDesc) {
                 ProbeDesc pd = (ProbeDesc) o;
                 env.put("probedesc.name", pd.getName());
-            }
-            if(o instanceof StarterNode) {
-                node = (StarterNode) o;
             }
             if(o instanceof Map) {
                 Map<? extends String, ?> tempMap = (Map<? extends String, ?>)o;
@@ -398,7 +386,7 @@ public class Util {
         if(logger.isDebugEnabled())
             logger.debug("Properties to use for parsing template \"" + template + "\": " + env);
 
-        return jrds.Util.evaluateVariables(template, env, node);
+        return jrds.Util.evaluateVariables(template, env);
     }
 
     /**

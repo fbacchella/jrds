@@ -19,6 +19,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import jrds.factories.ProbeMeta;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
+import jrds.starter.HostStarter;
 import jrds.starter.StarterNode;
 
 import org.apache.log4j.Level;
@@ -55,14 +56,10 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 365 * 2)
     };
 
-    private int timeout = 30;
-    private long step = -1;
     private String name = null;
-    private RdsHost monitoredHost;
+    private HostInfo monitoredHost;
     private Collection<GraphNode> graphList = new ArrayList<GraphNode>();
-    private String stringValue = null;
     private ProbeDesc pd;
-    private Set<String> tags = null;
     private long uptime = Long.MAX_VALUE;
     private boolean finished = false;
     private String label = null;
@@ -88,12 +85,12 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         super();
     }
 
-    public RdsHost getHost() {
+    public HostInfo getHost() {
         return monitoredHost;
     }
 
-    public void setHost(RdsHost monitoredHost) {
-        this.monitoredHost = monitoredHost;
+    public void setHost(HostStarter monitoredHost) {
+        this.monitoredHost = monitoredHost.getHost();
         setParent(monitoredHost);
     }
 
@@ -124,6 +121,10 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getRrdName() {
         String rrdName = getName().replaceAll("/","_");
         return monitoredHost.getHostDir() +
@@ -142,10 +143,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         return jrds.Util.parseOldTemplate(template, arguments, this);
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     protected DsDef[] getDsDefs() {
         return getPd().getDsDefs();
     }
@@ -155,9 +152,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         def.setVersion(2);
         def.addArchive(DEFAULTARC);
         def.addDatasource(getDsDefs());
-        if(step > 0) {
-            def.setStep(step);
-        }
+        def.setStep(getStep());
         return def;
     }
 
@@ -477,11 +472,11 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             log(Level.ERROR, "Hanged from a previous collect");
             return;
         }
+        startCollect();
         //We only collect if the HostsList allow it
-        if(getParent().isCollectRunning()) {
+        if(isCollectRunning()) {
             running = true;
             log(Level.DEBUG,"launching collect");
-            startCollect();
             RrdDb rrdDb = null;
             try {
                 //No collect if the thread was interrupted
@@ -527,7 +522,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             if(interrupted) {
                 long end = System.currentTimeMillis();
                 float elapsed = ((float)(end - start))/1000;
-                log(Level.INFO, "Interrupted after %.2fs", elapsed);
+                log(Level.DEBUG, "Interrupted after %.2fs", elapsed);
             }
             running = false;
         }
@@ -542,8 +537,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         String hn = "<empty>";
         if(getHost() != null)
             hn = getHost().getName();
-        stringValue = hn + "/" + getName();
-        return stringValue;
+        return hn + "/" + getName();
     }
 
     /**
@@ -656,7 +650,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
-     * Return a uniq name for the graph
+     * Return a unique name for the graph
      * @return
      */
     public String getQualifiedName() {
@@ -667,23 +661,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         return getQualifiedName().hashCode();
     }
 
-    public void addTag(String tag) {
-        if(tags == null)
-            tags = new HashSet<String>();
-        tags.add(tag);
-    }
-
     public Set<String> getTags() {
-        int tagsize = 0;
-        if(tags != null)
-            tagsize = tags.size();
-        Set<String> ptags = getHost().getTags();
-        Set<String> alltags = new HashSet<String>(ptags.size() + tagsize);
-        if(ptags.size() > 0)
-            alltags.addAll(ptags);
-        if(tags != null)
-            alltags.addAll(tags);
-        return alltags;
+        return getHost().getTags();
     }
 
     public abstract String getSourceType();
@@ -718,14 +697,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     public void setUptime(long uptime) {
         log(Level.TRACE, "Setting uptime to: %d", uptime);
         this.uptime = uptime;
-    }
-
-    public int getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
     }
 
     public Document dumpAsXml() throws ParserConfigurationException, IOException {
@@ -790,20 +761,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             dsElement.appendChild(dsNameElement);
         }
         return document;
-    }
-
-    /**
-     * @return the time step (in seconds)
-     */
-    public long getStep() {
-        return step;
-    }
-
-    /**
-     * @param step the time step to set (in seconds)
-     */
-    public void setStep(long step) {
-        this.step = step;
     }
 
     public String getLabel() {
