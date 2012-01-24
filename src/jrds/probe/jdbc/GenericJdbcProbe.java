@@ -40,13 +40,13 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
     public Boolean configure(List<? extends Object> args) {
         if(super.configure()) {
             ProbeDesc pd =  getPd();
-            query = jrds.Util.parseTemplate(pd.getSpecific("query"), this, args);
-            keyColumn = jrds.Util.parseTemplate(pd.getSpecific("key"), this, args);
-            uptimeQuery = jrds.Util.parseTemplate(pd.getSpecific("uptimeQuery"), this, args);
-            uptimeRow = jrds.Util.parseTemplate(pd.getSpecific("uptimeRow"), this, args);
+            query = jrds.Util.parseTemplate(pd.getSpecific("query"), getHost(), args);
+            keyColumn = jrds.Util.parseTemplate(pd.getSpecific("key"), getHost(), args);
+            uptimeQuery = jrds.Util.parseTemplate(pd.getSpecific("uptimeQuery"), getHost(), args);
+            uptimeRow = jrds.Util.parseTemplate(pd.getSpecific("uptimeRow"), getHost(), args);
             String indexTemplate = pd.getSpecific("index");
             if(indexTemplate != null && ! "".equals(indexTemplate))
-                index = jrds.Util.parseTemplate(indexTemplate, this, args);
+                index = jrds.Util.parseTemplate(indexTemplate, getHost(), args);
             setName(jrds.Util.parseTemplate(pd.getProbeName(), args));
             return true;
         }
