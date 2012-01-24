@@ -71,9 +71,6 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
         if(oidString != null && oidString.length() > 0) {
             indexOid = new OID(oidString);
         }
-        //else {
-        //    log(Level.ERROR,"No index OID specified");
-        //}
         return super.readSpecific();
     }
 

@@ -69,7 +69,9 @@ public class TestSnmpStarter {
 	@Test
 	public void testSucess() throws IOException {
         HostStarter n1 = new HostStarter(new HostInfo("127.0.0.1"));
+        n1.setTimeout(2);
         RdsSnmpSimple n2 = new RdsSnmpSimple();
+        n2.setTimeout(2);
         HostsList hl = registerHost(n1, n2);
 		
 		agent.run();
