@@ -37,8 +37,6 @@ import javax.xml.transform.stream.StreamSource;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
-import jrds.starter.ChainedProperties;
-import jrds.starter.StarterNode;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -234,13 +232,6 @@ public class Util {
         return org.rrd4j.core.Util.getDate(org.rrd4j.core.Util.normalize(timestamp, step));
     }
 
-    public static String evaluateVariables(String in, Map<String, Object> variables, StarterNode node) {
-        ChainedProperties props = null;
-        if(node != null)
-            props = node.find(ChainedProperties.class);
-        return evaluateVariables(in, variables, props);
-    }
-
     /**
      * Evaluate a string containing variables in the form ${varname}
      * 
@@ -285,7 +276,11 @@ public class Util {
         }
         return in;
     }
-
+    
+    static private final Pattern digit = Pattern.compile("\\d+");
+    static private final Pattern attrSignature = Pattern.compile("attr\\.(.*)\\.signature");
+    static private final Pattern attr = Pattern.compile("attr\\.(.*)");
+    
     static String findVariables(String in, int index, Map<String, Integer> indexes, Object... arguments) {
         Matcher m = varregexp.matcher(in);
         if(m.find()) {
@@ -296,10 +291,12 @@ public class Util {
                 String after = m.group(3);
                 out.append(before);
                 String toAppend = null;
+                Matcher varMatcher;
+                //The variable refering to a system variable are directly resolved
                 if(var.startsWith("system.")) {
                     toAppend = System.getProperty(var.replace("system.", ""));
                 }
-                else if(var.matches("^\\d+$")) {
+                else if(digit.matcher(var).matches()) {
                     for(Object o: arguments) {
                         if(o instanceof List) {
                             List <?> l = (List<?>)o;
@@ -308,8 +305,9 @@ public class Util {
                         }
                     }
                 }
-                else if(var.matches("^attr\\.*\\.signature$")) {
-                    String beanName = var.replace("attr.", "").replace(".signature", "");
+                //bean signatures are directly resolved
+                else if((varMatcher=attrSignature.matcher(var)).matches()) {
+                    String beanName = varMatcher.group(1);
                     for(Object o: arguments) {
                         try {
                             PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
@@ -321,8 +319,9 @@ public class Util {
                         }
                     }
                 }
-                else if(var.matches("^attr\\.*$")) {
-                    String beanName = var.replace("attr.", "");
+                //beans are directly resolved
+                else if((varMatcher=attr.matcher(var)).matches()) {
+                    String beanName = varMatcher.group(1);
                     for(Object o: arguments) {
                         try {
                             PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
@@ -332,6 +331,7 @@ public class Util {
                         }
                     }
                 }
+                //Common case, replace the variable with it's index, for MessageFormat
                 else  {
                     if(! indexes.containsKey(var)) {
                         indexes.put(var, index++);
@@ -450,6 +450,20 @@ public class Util {
                 ProbeDesc pd = (ProbeDesc) o;
                 return pd.getName();
             }
+        },
+        graphdesc_title {
+            @Override
+            String toString(Object o) {
+                GraphDesc gd = (GraphDesc) o;
+                return gd.getGraphTitle();
+            }
+        },
+        graphdesc_name {
+            @Override
+            String toString(Object o) {
+                GraphDesc gd = (GraphDesc) o;
+                return gd.getGraphName();
+            }
         };
         abstract String toString(Object o);
     }
@@ -461,7 +475,6 @@ public class Util {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static String parseTemplate(String template, Object... arguments) {
         //Don't lose time with an empty template
         if(template == null || "".equals(template.trim())) {
@@ -501,16 +514,21 @@ public class Util {
                 check(o, indexes, values, evaluate.host);
             }
             if(o instanceof GraphDesc) {
-                GraphDesc gd = (GraphDesc) o;
-                env.put("graphdesc.title", gd.getGraphTitle());
-                env.put("graphdesc.name", gd.getGraphName());
+                check(o, indexes, values, evaluate.graphdesc_name);
+                check(o, indexes, values, evaluate.graphdesc_title);
             }
             if(o instanceof ProbeDesc) {
                 check(o, indexes, values, evaluate.probedesc_name);
             }
             if(o instanceof Map) {
+                @SuppressWarnings("unchecked")
                 Map<? extends String, ?> tempMap = (Map<? extends String, ?>)o;
-                env.putAll(tempMap);
+                for(Map.Entry<String, Integer> e: indexes.entrySet()) {
+                    //Check if the given map contains a key to an empty slot in the values
+                    if(tempMap.containsKey(e.getKey()) && values[e.getValue()] == null) {
+                        values[e.getValue()] = tempMap.get(e.getKey());
+                    }
+                }
             }
         }
         if(logger.isDebugEnabled())
