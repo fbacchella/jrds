@@ -21,12 +21,24 @@ public class Timer extends StarterNode {
 
     public final static String DEFAULTNAME = "_default";
 
-    public static final class Stats {
+    public static final class Stats implements Cloneable {
         Stats() {
             lastCollect = new Date(0);
         }
         public long runtime = 0;
         public Date lastCollect;
+        /* (non-Javadoc)
+         * @see java.lang.Object#clone()
+         */
+        @Override
+        public Object clone() throws CloneNotSupportedException {
+            Stats newstates = new Stats();
+            synchronized(this) {
+                newstates.runtime = runtime;
+                newstates.lastCollect = new Date(lastCollect.getTime());
+            }
+            return newstates;
+        }
     }
 
     private final Map<String, HostStarter> hostList = new HashMap<String, HostStarter>();
@@ -192,6 +204,13 @@ public class Timer extends StarterNode {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * @return the stats
+     */
+    public Stats getStats() {
+        return stats;
     }
 
 }

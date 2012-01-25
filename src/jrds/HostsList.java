@@ -505,4 +505,11 @@ public class HostsList extends StarterNode {
     public String getFirstTab() {
         return firstTab;
     }
+
+    /**
+     * @return the timers
+     */
+    public Iterable<jrds.starter.Timer> getTimers() {
+        return timers.values();
+    }
 }
