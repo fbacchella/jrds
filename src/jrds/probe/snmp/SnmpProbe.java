@@ -52,7 +52,7 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
 		try {
 			if(requesterName != null) {
 				log(Level.TRACE, "Setting requester to %s", requesterName);
-				requester = (SnmpRequester) SnmpRequester.class.getField(requesterName.toUpperCase()).get(null);
+				requester = SnmpRequester.valueOf(requesterName.toUpperCase());
 				readOK = true;
 			}
 			else {

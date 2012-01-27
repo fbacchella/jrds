@@ -40,7 +40,7 @@ public abstract class ProbeConnected<KeyType, ValueType, ConnectionClass extends
 	}
 
 	public ConnectionClass getConnection() {
-		return  find(getConnectionName());
+		return find(getConnectionName());
 	}
 
 	/* (non-Javadoc)

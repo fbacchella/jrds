@@ -46,7 +46,9 @@ public class TestFullLifeCycle {
         File rrdFile = testFolder.newFile("fullmock.rrd");
         rrdFile.delete();
 
-        Probe<?,?> p = Full.create(testFolder);
+        Probe<?,?> p = Full.create(testFolder, pm.step);
+        p.setStep(pm.step);
+        p.setTimeout(pm.timeout);
         logger.debug(p.getRrdDef().dump());
 
         logger.debug("Created " + p);

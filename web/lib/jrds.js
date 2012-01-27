@@ -806,23 +806,33 @@ function updateStatus(statusInfo) {
 	var row2 = dojo.create("div", {'class': "statusrow"}, statusNode);
 	dojo.create('span', {'class': 'statuslabel', innerHTML: 'Probes'}, row2);
 	dojo.create('span', {'class': 'statusvalue', innerHTML: statusInfo.Probes}, row2);
+    
+    for(i in statusInfo.Timers) {
+        stats = statusInfo.Timers[i]
+        var name = stats.Name;
+        var lastCollect = stats.LastCollect + "s ago";
+        if(stats.LastDuration == 0) {
+            lastCollect = 'not run';
+            lastDuration = 'not run';
+        }
+        else if(stats.LastDuration < 1000) {
+            var lastDuration = stats.LastDuration + "ms";
+        }
+        else {
+            var lastDuration = (stats.LastDuration / 1000).toFixed(0) + "s";
+        }
+        var rowa = dojo.create("div", {'class': "statusrow"}, statusNode);
+        dojo.create('span', {'class': 'statuslabel', innerHTML: 'Timer'}, rowa);
+        dojo.create('span', {'class': 'statusvalue', innerHTML: name}, rowa);
 
-	var lastCollect = statusInfo.LastCollect + "s ago";
-	var lastDuration = (statusInfo.LastDuration / 1000).toFixed(0) + "s";
-	if(statusInfo.LastDuration == 0) {
-		lastCollect = 'not run';
-		lastDuration = 'not run';
-	}
-	else if(statusInfo.LastDuration < 1000) {
-		var lastDuration = statusInfo.LastDuration + "ms";
-	}
-	var row3 = dojo.create("div", {'class': "statusrow"}, statusNode);
-	dojo.create('span', {'class': 'statuslabel', innerHTML: 'Last collect'}, row3);
-	dojo.create('span', {'class': 'statusvalue', innerHTML: lastCollect}, row3);
+        var rowb = dojo.create("div", {'class': "statusrow"}, statusNode);
+        dojo.create('span', {'class': 'statuslabel', 'style': 'text-align: right;', innerHTML: 'Last collect'}, rowb);
+        dojo.create('span', {'class': 'statusvalue', innerHTML: lastCollect}, rowb);
 
-	var row4 = dojo.create("div", {'class': "statusrow"}, statusNode);
-	dojo.create('span', {'class': 'statuslabel', innerHTML: 'Last duration'}, row4);
-	dojo.create('span', {'class': 'statusvalue', innerHTML: lastDuration}, row4);
+        var rowc = dojo.create("div", {'class': "statusrow"}, statusNode);
+        dojo.create('span', {'class': 'statuslabel', 'style': 'text-align: right;', innerHTML: 'Last duration'}, rowc);
+        dojo.create('span', {'class': 'statusvalue', innerHTML: lastDuration}, rowc);
+    }
 
 	var row5 = dojo.create("div", {'class': "statusrow"}, statusNode);
 	dojo.create('span', {'class': 'statuslabel', innerHTML: 'Generation'}, row5);

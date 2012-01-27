@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT host (tag|snmp|macro|connection|probe|collection|for|properties)+ >
+<!ELEMENT host (tag|snmp|macro|connection|probe|collection|for)+ >
 <!ELEMENT macrodef (probe|tag|collection|for)+ >
 <!ATTLIST macrodef
 	name CDATA #REQUIRED
@@ -14,16 +14,23 @@
 <!ATTLIST macro
 	name CDATA #REQUIRED
 >
-<!ELEMENT connection ((arg| attr)*,list*) >
+<!--from http://java.sun.com/dtd/properties.dtd -->
+<!ELEMENT properties ( comment?, entry* ) >
+<!ELEMENT comment (#PCDATA) >
+<!ELEMENT entry (#PCDATA) >
+<!ATTLIST entry key CDATA #REQUIRED>
+
+<!ELEMENT connection (attr*,(arg|list)*) >
 <!ATTLIST connection
 		type CDATA #REQUIRED
 		name CDATA #IMPLIED
 >
-<!ELEMENT probe ((arg| attr)*, list*, dslist?, threshold*, properties?) >
+<!ELEMENT probe (attr*,(arg|list)*, dslist?, threshold*) >
 <!ATTLIST probe
 			type CDATA #REQUIRED
 			label CDATA #IMPLIED
 			connection CDATA #IMPLIED
+			timer CDATA #IMPLIED
 >
 <!ELEMENT arg (#PCDATA)>
 <!ATTLIST arg
@@ -34,7 +41,7 @@
 <!ATTLIST attr
 			name CDATA #REQUIRED
 >
-<!ELEMENT list (arg, list)+ >
+<!ELEMENT list (arg|list)+ >
 <!ELEMENT threshold (action+ ) >
 <!ATTLIST threshold
 	name CDATA #REQUIRED
@@ -47,11 +54,6 @@
 <!ATTLIST action
 	type CDATA #REQUIRED
 >
-<!--from http://java.sun.com/dtd/properties.dtd -->
-<!ELEMENT properties ( comment?, entry* ) >
-<!ELEMENT comment (#PCDATA) >
-<!ELEMENT entry (#PCDATA) >
-<!ATTLIST entry key CDATA #REQUIRED>
 <!ELEMENT collection (element+)>
 <!ATTLIST collection name CDATA #REQUIRED >
 <!ELEMENT element (#PCDATA)>

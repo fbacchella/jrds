@@ -104,16 +104,17 @@ public class Jetty extends CommandStarterImpl {
             } catch (IOException e) {
                 throw new RuntimeException("Jetty server failed to configure authentication", e);
             }
-
-
         }
+        
+        //Properties are not needed any more
+        pm = null;
+        
         HandlerCollection handlers = new HandlerList();
-        handlers.setHandlers(new Handler[]{staticFiles,webapp});
+        handlers.setHandlers(new Handler[]{staticFiles, webapp});
         server.setHandler(handlers);
 
         Thread finish = new Thread() {
-            public void run()
-            {
+            public void run() {
                 try {
                     server.stop();
                 } catch (Exception e) {

@@ -8,11 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.rrd4j.DsType;
-
+import jrds.HostInfo;
+import jrds.starter.HostStarter;
 import jrds.Probe;
 import jrds.ProbeDesc;
-import jrds.RdsHost;
+
+import org.rrd4j.DsType;
 
 public class MokeProbe<A,B> extends Probe<A,B> {
 
@@ -23,15 +24,18 @@ public class MokeProbe<A,B> extends Probe<A,B> {
 	
 	public MokeProbe(String probeType) {
 		this.probeType = probeType;
+        setStep(300);
 	}
 
 	public MokeProbe(ProbeDesc pd) {
 	    probeType = pd.getName();
 		setPd(pd);
+        setStep(300);
 	}
 
 	public MokeProbe() {
 		configure();
+		setStep(300);
 	}
 
 	public void configure(Class<? extends Probe<?,?>> originalProbe) {
@@ -69,10 +73,9 @@ public class MokeProbe<A,B> extends Probe<A,B> {
                 throw new RuntimeException("Can't build moke probe", e);
             }
 		if(getHost() == null) {
-			RdsHost host = new RdsHost();
-			host.setName("DummyHost");
+			HostInfo host = new HostInfo("DummyHost");
 			host.setHostDir(new File("tmp"));
-			setHost(host);
+			setHost(new HostStarter(host));
 		}
 	}
 	

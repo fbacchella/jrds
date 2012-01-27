@@ -7,9 +7,6 @@
 	<probeClass>jrds.mockobjects.MokeProbe</probeClass>
 	<specific name="specificname1">specificvalue1</specific>
 	<specific name="specificname2">specificvalue2</specific>
-	<properties>
-		<entry key="key">value</entry>
-	</properties>
 	<uptimefactor>0.5</uptimefactor>
 	<defaultargs>
         <attr name="hostInfo">beanvalue</attr>

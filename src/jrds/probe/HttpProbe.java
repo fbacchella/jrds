@@ -113,7 +113,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
             }
         }
         if("http".equals(url.getProtocol())) {
-            resolver = getHost().registerStarter(new Resolver(url.getHost()));
+            resolver = getParent().registerStarter(new Resolver(url.getHost()));
         }
         log(Level.DEBUG, "URL to collect is %s", getUrl());
         return true;

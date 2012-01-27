@@ -7,9 +7,10 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.RdsHost;
+import jrds.HostInfo;
 import jrds.Tools;
 import jrds.factories.ArgFactory;
+import jrds.starter.HostStarter;
 import jrds.starter.Starter;
 import junit.framework.Assert;
 
@@ -36,7 +37,7 @@ public class TestSnmpConnection {
         beans.get("community").getWriteMethod().invoke(cnx, "public");
         beans.get("version").getWriteMethod().invoke(cnx, 1);
         
-        RdsHost host = new RdsHost("localhost");
+        HostStarter host = new HostStarter(new HostInfo("localhost"));
         host.registerStarter(cnx);
         Assert.assertEquals("SNMP connection not found", "snmp:udp://localhost:161", host.find(SnmpConnection.class).toString());
     }

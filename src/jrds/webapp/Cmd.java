@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jrds.Util;
+import jrds.starter.Timer;
 
 import org.apache.log4j.Logger;
 
@@ -15,65 +16,70 @@ import org.apache.log4j.Logger;
  * Servlet implementation class Cmd
  */
 public class Cmd extends JrdsServlet {
-	static final private Logger logger = Logger.getLogger(Cmd.class);
-	private static final long serialVersionUID = 1L;
+    static final private Logger logger = Logger.getLogger(Cmd.class);
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		ParamsBean params = new ParamsBean(req, getHostsList(), "command", "arg");
+    /**
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+     */
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        ParamsBean params = new ParamsBean(req, getHostsList(), "command", "arg");
 
-		String command = params.getValue("command");
-		if(command == null || "".equals(command)) {
-			command = req.getServletPath().substring(1);
-		}
-		logger.debug(Util.delayedFormatString("Command found: %s", command));
+        String command = params.getValue("command");
+        if(command == null || "".equals(command)) {
+            command = req.getServletPath().substring(1);
+        }
+        logger.debug(Util.delayedFormatString("Command found: %s", command));
 
-		if(! allowed(params, getPropertiesManager().adminACL, req, res))
-			return;
+        if(! allowed(params, getPropertiesManager().adminACL, req, res))
+            return;
 
-		if("reload".equalsIgnoreCase(command)) {
-			ServletContext ctxt = getServletContext();
-			reload(ctxt);
-			res.sendRedirect(req.getContextPath() + "/");
-		}
-		if("pause".equalsIgnoreCase(command)) {
-			ServletContext ctxt = getServletContext();
-			pause(ctxt, params.getValue("arg"));
-			res.sendRedirect(req.getContextPath() + "/");
-		}
-	}
+        if("reload".equalsIgnoreCase(command)) {
+            ServletContext ctxt = getServletContext();
+            reload(ctxt);
+            res.sendRedirect(req.getContextPath() + "/");
+        }
+        else if("pause".equalsIgnoreCase(command)) {
+            ServletContext ctxt = getServletContext();
+            pause(ctxt, params.getValue("arg"));
+            res.sendRedirect(req.getContextPath() + "/");
+        }
+    }
 
-	private void reload(final ServletContext ctxt) {
-		Thread configthread = new Thread("jrds-new-config") {
-			@Override
-			public void run() {
-				Configuration oldConfig = getConfig();
-				Configuration newConfig = new Configuration(ctxt);
-				oldConfig.stop();
-				newConfig.start();
-				ctxt.setAttribute(Configuration.class.getName(), newConfig);
-				logger.info("Configuration rescaned");
-			}
-		};
-		configthread.start();
-	}
+    private void reload(final ServletContext ctxt) {
+        Thread configthread = new Thread("jrds-new-config") {
+            @Override
+            public void run() {
+                Configuration oldConfig = getConfig();
+                Configuration newConfig = new Configuration(ctxt);
+                oldConfig.stop();
+                newConfig.start();
+                ctxt.setAttribute(Configuration.class.getName(), newConfig);
+                logger.info("Configuration rescaned");
+            }
+        };
+        configthread.start();
+    }
 
-	private void pause(final ServletContext ctxt, final String arg) {		
-		Thread configthread = new Thread("jrds-pause") {
-			@Override
-			public void run() {
-				Configuration config = getConfig();
-				try {
-					config.getHostsList().lockCollect();
-					Thread.sleep(jrds.Util.parseStringNumber(arg, 1) * 1000 );
-				} catch (InterruptedException e) {
-				}
-				config.getHostsList().releaseCollect();
-				logger.info("collect restarted");
-			}
-		};
-		configthread.start();
-	}
+    private void pause(final ServletContext ctxt, final String arg) {       
+        Thread configthread = new Thread("jrds-pause") {
+            @Override
+            public void run() {
+                Configuration config = getConfig();
+                try {
+                    for(Timer t: config.getHostsList().getTimers()) {
+                        t.lockCollect();
+                    }
+                    Thread.sleep(jrds.Util.parseStringNumber(arg, 1) * 1000 );
+                } catch (InterruptedException e) {
+                }
+                for(Timer t: config.getHostsList().getTimers()) {
+                    t.releaseCollect();
+                }
+                logger.info("collect restarted");
+            }
+        };
+        configthread.start();
+    }
+
 }

@@ -35,14 +35,7 @@ public class AllProbeCreationTest {
 
     @Test
     public void makeProbe() throws ParserConfigurationException, IOException, URISyntaxException, InvocationTargetException {
-        PropertiesManager pm = new PropertiesManager();
-        pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
-        pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
-        pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
-        pm.setProperty("autocreate", "true");
-        pm.update();
-        pm.libspath.clear();
-        pm.strictparsing = true;
+        PropertiesManager pm = Tools.makePm(testFolder);
         pm.rrdbackend = "FILE";
         File descpath = new File("desc");
         if(descpath.exists())
@@ -55,9 +48,9 @@ public class AllProbeCreationTest {
         Map<String, GraphDesc> graphDescMap = conf.setGraphDescMap();
         Map<String, ProbeDesc> probeDescMap = conf.setProbeDescMap();
 
-        ProbeFactory pf = new ProbeFactory(probeDescMap, graphDescMap, pm);
+        ProbeFactory pf = new ProbeFactory(probeDescMap, graphDescMap);
 
-        RdsHost host = new RdsHost("Empty");
+        HostInfo host = new HostInfo("Empty");
         host.setHostDir(pm.rrddir);
         for(ProbeDesc pd: probeDescMap.values()) {
             logger.trace("Will create probedesc " + pd.getName());

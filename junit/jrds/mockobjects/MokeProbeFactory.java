@@ -20,7 +20,7 @@ public class MokeProbeFactory extends ProbeFactory {
     static boolean legacymode = false;
 
     public MokeProbeFactory() {
-        super(probeDescMap, graphDescMap, pm);
+        super(probeDescMap, graphDescMap);
     }
 
     /* (non-Javadoc)

@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletContext;
@@ -13,6 +11,7 @@ import javax.servlet.ServletContext;
 import jrds.HostsList;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
+import jrds.starter.Timer;
 
 import org.apache.log4j.Logger;
 
@@ -21,11 +20,9 @@ public class Configuration {
 
     static final private AtomicInteger generation = new AtomicInteger(0);
 
-    private PropertiesManager propertiesManager = new PropertiesManager();
-    private HostsList hostsList = null;
-    private Timer collectTimer;
-    public int thisgeneration = generation.incrementAndGet();
-    TimerTask collector;
+    private final PropertiesManager propertiesManager = new PropertiesManager();
+    private final HostsList hostsList;
+    public final int thisgeneration = generation.incrementAndGet();
     Thread shutDownHook;
 
     /**
@@ -34,7 +31,7 @@ public class Configuration {
      */
     Configuration(Properties ctxt) {
         propertiesManager.join(ctxt);
-        finishConfig();
+        hostsList = finishConfig();
     }
 
     @SuppressWarnings("unchecked")
@@ -57,48 +54,34 @@ public class Configuration {
         String localPropFile = ctxt.getInitParameter("propertiesFile");
         if(localPropFile != null)
             propertiesManager.join(new File(localPropFile));
-        finishConfig();
+        hostsList = finishConfig();
     }
 
-    private void finishConfig() {
-
+    private HostsList finishConfig() {
         propertiesManager.importSystemProps();
         propertiesManager.update();
 
         StoreOpener.prepare(propertiesManager.rrdbackend, propertiesManager.dbPoolSize);
 
-        hostsList = new HostsList(propertiesManager);
+        return new HostsList(propertiesManager);
     }
 
     public void start() {
         //If in read-only mode, no scheduler
         if(propertiesManager.readonly)
             return;
-        collectTimer = new Timer("jrds-main-timer", true);
-        collector = new TimerTask () {
-            public void run() {
-                try {
-                    hostsList.collectAll();
-                } catch (RuntimeException e) {
-                    logger.fatal("A fatal error occured during collect: ",e);
-                }
-            }
-        };
-        collectTimer.schedule(collector, 5000L, propertiesManager.step * 1000L);
         // Add a shutdown hook, the shutdown signal might be send before the listener is stopped
         shutDownHook = new Thread("Collect-Shutdown") {
             @Override
             public void run() {
-                if(hostsList != null)
-                    hostsList.finished();
+                hostsList.finished();
+                hostsList.getRenderer().finish();
             }
         };
         Runtime.getRuntime().addShutdownHook(shutDownHook);
     }
 
     public void stop() {
-        if(collector != null)
-            collector.cancel();
         hostsList.finished();
         Thread.yield();
         //We don't care if it failed, just try
@@ -107,15 +90,16 @@ public class Configuration {
                 Runtime.getRuntime().removeShutdownHook(shutDownHook);
         } catch (Exception e1) {
         }
+        hostsList.getRenderer().finish();
+        //Everything is stopped, wait for collect termination
         try {
-            hostsList.lockCollect();
+            for(Timer t: hostsList.getTimers()) {
+                t.lockCollect();
+                //Release it, it will not restart
+                t.releaseCollect();
+            }
         } catch (InterruptedException e) {
         }
-        hostsList.getRenderer().finish();
-        if(collectTimer != null)
-            collectTimer.cancel();
-        collectTimer = null;
-        hostsList.releaseCollect();
     }
 
     @SuppressWarnings("unchecked")
@@ -141,14 +125,14 @@ public class Configuration {
     /**
      * @return the hostsList
      */
-    public HostsList getHostsList() {
+    final public HostsList getHostsList() {
         return hostsList;
     }
 
     /**
      * @return the propertiesManager
      */
-    public PropertiesManager getPropertiesManager() {
+    final public PropertiesManager getPropertiesManager() {
         return propertiesManager;
     }
 

@@ -16,39 +16,39 @@ import java.util.Map;
 import java.util.Set;
 
 import jrds.ConnectedProbe;
+import jrds.HostInfo;
 import jrds.Macro;
 import jrds.Probe;
 import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.Util;
 import jrds.factories.ArgFactory;
 import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.factories.xml.JrdsNode;
-import jrds.starter.ChainedProperties;
 import jrds.starter.Connection;
-import jrds.starter.Starter;
-import jrds.starter.StarterNode;
+import jrds.starter.ConnectionInfo;
+import jrds.starter.HostStarter;
+import jrds.starter.Timer;
 
 import org.apache.log4j.Logger;
 
-public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
+public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     static final private Logger logger = Logger.getLogger(HostBuilder.class);
 
     private ClassLoader classLoader = null;
     private ProbeFactory pf;
     private Map<String, Macro> macrosMap;
-    private final Map<Class<?>, Map<String, PropertyDescriptor>> connectionsBeanCache = new HashMap<Class<?>, Map<String, PropertyDescriptor>>();
+    private Map<String, Timer> timers = Collections.emptyMap();
 
     public HostBuilder() {
         super(ConfigType.HOSTS);
     }
 
     @Override
-    RdsHost build(JrdsDocument n) throws InvocationTargetException {
+    HostInfo build(JrdsDocument n) throws InvocationTargetException {
         try {
-            return makeRdsHost(n);
+            return makeHost(n);
         } catch (SecurityException e) {
             throw new InvocationTargetException(e, HostBuilder.class.getName());
         } catch (IllegalArgumentException e) {
@@ -64,48 +64,45 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
         }
     }
 
-    public RdsHost makeRdsHost(JrdsDocument n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+    public HostInfo makeHost(JrdsDocument n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
         JrdsElement hostNode = n.getRootElement();
         String hostName = hostNode.getAttribute("name");
         String dnsHostname = hostNode.getAttribute("dnsName");
-        RdsHost host = null;
         if(hostName == null) {
             return null;
         }
-        else if(dnsHostname != null) {
-            host = new RdsHost(hostName, dnsHostname);
+
+        HostInfo host = null;
+        if(dnsHostname != null) {
+            host = new HostInfo(hostName, dnsHostname);
         }
-        else
-            host = new RdsHost(hostName);
+        else {
+            host = new HostInfo(hostName);
+        }
         host.setHostDir(new File(pm.rrddir, host.getName()));
 
         String hidden = hostNode.getAttribute("hidden");
         host.setHidden(hidden != null && Boolean.parseBoolean(hidden));
 
-        StarterNode ns = new StarterNode() {};
         Map<String, Set<String>> collections = new HashMap<String, Set<String>>();
 
-        parseFragment(hostNode, host, ns, collections);
+        parseFragment(hostNode, host, collections, null);
 
         return host;
     }
 
-    private void parseFragment(JrdsElement fragment, RdsHost host, StarterNode ns, Map<String, Set<String>> collections) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-        parseSnmp(fragment, host, host);
+    private void parseFragment(JrdsElement fragment, HostInfo host, Map<String, Set<String>> collections, Map<String, String> properties) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
-        makeConnexion(fragment, host);
+        for(ConnectionInfo cnx: makeConnexion(fragment, host)) {
+            host.addConnection(cnx);
+        }
+
         for(JrdsElement tagElem: fragment.getChildElementsByName("tag")) {
             try {
                 logger.trace(Util.delayedFormatString("adding tag %s to %s", tagElem, host));
                 setMethod(tagElem, host, "addTag");
             } catch (InstantiationException e) {
             }
-        }
-
-        Map<String, String> hostprop = makeProperties(fragment);
-        if(hostprop != null && ! hostprop.isEmpty()) {
-            ChainedProperties temp = new ChainedProperties(hostprop);
-            ns.registerStarter(temp);
         }
 
         for(JrdsElement collectionNode: fragment.getChildElementsByName("collection")) {
@@ -122,16 +119,16 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
             Macro m = macrosMap.get(name);
             logger.trace(Util.delayedFormatString("Adding macro %s: %s", name, m));
             if(m != null) {
-                Map<String, String> properties = makeProperties(macroNode);
-                StarterNode macrosnode = new StarterNode(ns) {};
-                ChainedProperties temp = new ChainedProperties(properties);
-                macrosnode.registerStarter(temp);
-
+                Map<String, String> macroProps = makeProperties(macroNode);
+                Map<String, String> newProps = new HashMap<String, String>((properties !=null ? properties.size():0) + macroProps.size());
+                if(properties != null)
+                    newProps.putAll(properties);
+                newProps.putAll(macroProps);
                 JrdsDocument hostdoc = (JrdsDocument) fragment.getOwnerDocument();
                 //Make a copy of the document fragment
                 JrdsNode newDf = JrdsNode.build(hostdoc.importNode(m.getDf(), true));
                 JrdsElement macrodef = JrdsNode.build( newDf.getFirstChild());
-                parseFragment(macrodef, host, macrosnode, collections);
+                parseFragment(macrodef, host, collections, newProps);
             }
             else {
                 logger.error("Unknown macro:" + name);
@@ -163,12 +160,16 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                 logger.trace(Util.delayedFormatString("for using %s", set));
 
                 for(String i: set) {
-                    Map<String, String> properties = new HashMap<String, String>(1);
-                    properties.put(iterprop, i);
-                    StarterNode fornode = new StarterNode(ns) {};
-                    ChainedProperties temp = new ChainedProperties(properties);
-                    fornode.registerStarter(temp);
-                    parseFragment(forNode, host, fornode, collections);
+                    Map<String, String> temp;
+                    if(properties != null) {
+                        temp = new HashMap<String, String>(properties.size() +1);
+                        temp.putAll(properties);
+                        temp.put(iterprop, i);
+                    }
+                    else {
+                        temp = Collections.singletonMap(iterprop, i);
+                    }
+                    parseFragment(forNode, host, collections, temp);
                 }
             }
             else {
@@ -179,7 +180,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
             if(! "probe".equals(probeNode.getNodeName()) && ! "rrd".equals(probeNode.getNodeName()) )
                 continue;
             try {
-                makeProbe(probeNode, host, ns);
+                makeProbe(probeNode, host, properties);
             } catch (Exception e) {
                 logger.error("Probe creation failed for host " + host.getName() + ": ");
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();  
@@ -189,7 +190,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
         }
     }
 
-    public Probe<?,?> makeProbe(JrdsElement probeNode, RdsHost host, StarterNode ns) throws InvocationTargetException {
+    public Probe<?,?> makeProbe(JrdsElement probeNode, HostInfo host, Map<String, String> properties) throws InvocationTargetException {
         Probe<?,?> p = null;
         String type = probeNode.attrMap().get("type");
 
@@ -211,27 +212,59 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
         }
         if(p == null)
             return null;
-        p.setHost(host);
 
-        ChainedProperties cp = ns.find(ChainedProperties.class);
+        String timerName = probeNode.getAttribute("timer");
+        if(timerName == null)
+            timerName = Timer.DEFAULTNAME;
+        Timer timer = timers.get(timerName);
+        if(timer == null) {
+            logger.error("Invalid timer '" + timerName + "' for probe " + host.getName() + "/" + type);
+            return null;
+        }
+        else {
+            logger.trace(Util.delayedFormatString("probe %s/%s added to timer %s", host, type, timer));
+        }
+        p.setStep(timer.getStep());
+        p.setTimeout(timer.getTimeout());
+
+        //The label is set
         String label = probeNode.getAttribute("label");
         if(label != null && ! "".equals(label)) {
             logger.trace(Util.delayedFormatString("Adding label %s to %s", label, p));
-            p.setLabel(jrds.Util.parseTemplate(label, cp));;
+            p.setLabel(jrds.Util.parseTemplate(label, host, properties));;
         }
+
+        //The host is set
+        HostStarter shost = timer.getHost(host);
+        p.setHost(shost);
+
+        //A connected probe, register the needed connection
+        //It can be defined within the node, referenced by it's name, or it's implied name
         if(p instanceof ConnectedProbe) {
+            String connectionName = null;
+            ConnectedProbe cp = (ConnectedProbe) p;
+            for(ConnectionInfo ci: makeConnexion(probeNode, host)) {
+                ci.register(p);
+            }
             String connexionName = probeNode.getAttribute("connection");
             if(connexionName != null && ! "".equals(connexionName)) {
                 logger.trace(Util.delayedFormatString("Adding connection %s to %s", connexionName, p));
-                ((ConnectedProbe)p).setConnectionName(jrds.Util.parseTemplate(connexionName, cp));
+                connectionName = jrds.Util.parseTemplate(connexionName, host);
+                cp.setConnectionName(connectionName);
             }
+            else {
+                connectionName = cp.getConnectionName();
+            }
+            ConnectionInfo ci = host.getConnection(connectionName);
+            if(ci != null && p.find(connectionName) == null)
+                ci.register(shost);
         }
 
         ProbeDesc pd = p.getPd();
-        List<Object> args = ArgFactory.makeArgs(probeNode, cp, host);
+        List<Object> args = ArgFactory.makeArgs(probeNode, host, properties);
         //Prepare the probe with the default beans values
         Map<String, String> defaultBeans = pd.getDefaultArgs();
-        if(defaultBeans!=null) {
+        if(defaultBeans != null) {
             for(Map.Entry<String, String> e: defaultBeans.entrySet()) {
                 try {
                     String beanName = e.getKey();
@@ -267,99 +300,86 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
             return null;
         }
         if(p != null && p.checkStore()) {
-            host.getProbes().add(p);
+            shost.addProbe(p);
         }
         else {
             return null;
         }
-        parseSnmp(probeNode, p, host);
 
-        Map<String, String> nodeprop = makeProperties(probeNode);
-        if(nodeprop != null && nodeprop.size() > 0) {
-            ChainedProperties temp = new ChainedProperties(nodeprop);
-            p.registerStarter(temp);
-        }
-        makeConnexion(probeNode, p);
+        for(ConnectionInfo cnx: makeConnexion(probeNode, host))
+            cnx.register(p);
+
         return p;
     }
 
+    @SuppressWarnings("unchecked")
     /**
      * A compatibility method, snmp starter should be managed as a connection
      * @param node
      * @param p
      * @param host
      */
-    private void parseSnmp(JrdsElement node, StarterNode p, RdsHost host) {
-
+    private ConnectionInfo parseSnmp(JrdsElement node) {
         try {
             JrdsElement snmpNode = node.getElementbyName("snmp");
             if(snmpNode != null) {
                 logger.trace("found a snmp starter");
                 String connectionClassName = "jrds.snmp.SnmpConnection";
-                Class<?> connectionClass = pm.extensionClassLoader.loadClass(connectionClassName);
-                Connection<?> cnx = (Connection<?>)connectionClass.newInstance();
-                
-                Map<String, PropertyDescriptor> beans = connectionsBeanCache.get(connectionClass);
-                if(beans == null) {
-                    beans = ArgFactory.getBeanPropertiesMap(connectionClass, Starter.class);
-                    connectionsBeanCache.put(connectionClass, beans);
-                }
-                
-                for(Map.Entry<String, String> attr: snmpNode.attrMap().entrySet()) {
-                    if(beans.containsKey(attr.getKey())) {
-                        PropertyDescriptor bean = beans.get(attr.getKey());
-                        Constructor<?> c = bean.getPropertyType().getConstructor(String.class);
-                        Object value = c.newInstance(attr.getValue());
-                        bean.getWriteMethod().invoke(cnx, value);
-                    }
-                }
-                p.registerStarter(cnx);
+                Class<? extends Connection<?>> connectionClass = (Class<? extends Connection<?>>) pm.extensionClassLoader.loadClass(connectionClassName);
+
+                Map<String, String> attrs = new HashMap<String, String>();
+                attrs.putAll(snmpNode.attrMap());
+                return new ConnectionInfo(connectionClass, connectionClassName, Collections.emptyList(), attrs);
             }
         } catch (ClassNotFoundException e) {
             logger.debug("Class jrds.snmp.SnmpConnection not found");
         } catch (Exception e) {
             logger.error("Error creating SNMP connection: " + e.getMessage(), e);
         }
+        return null;
     }
 
-    private void makeConnexion(JrdsElement domNode, StarterNode sNode) {
+    Set<ConnectionInfo> makeConnexion(JrdsElement domNode, HostInfo host) {
+        Set<ConnectionInfo> connectionSet = new HashSet<ConnectionInfo>();
+
+        //For a connect probe, the connection can be defined within the probe
+        ConnectionInfo cnxSnmp = parseSnmp(domNode);
+        if(cnxSnmp != null)
+            connectionSet.add(cnxSnmp);
+
         for(JrdsElement cnxNode: domNode.getChildElementsByName("connection")) {
-            String type = cnxNode.attrMap().get("type");
+            String type = cnxNode.getAttribute("type");
             if(type == null) {
                 logger.error("No type declared for a connection");
                 continue;
             }
-            String name = cnxNode.attrMap().get("name");
-            Connection<?> o = null;
+            String name = cnxNode.getAttribute("name");
+            if(name == null)
+                name = type;
+
             try {
+                //Load the class for the connection
+                @SuppressWarnings("unchecked")
+                Class<? extends Connection<?>> connectionClass = (Class<? extends Connection<?>>) classLoader.loadClass(type);
+
+                //Build the arguments vector for the connection
                 List<Object> args = ArgFactory.makeArgs(cnxNode);
-                Class<?> connectionClass = classLoader.loadClass(type);
-                Class<?>[] constArgsType = new Class[args.size()];
-                Object[] constArgsVal = new Object[args.size()];
-                int index = 0;
-                for (Object arg: args) {
-                    constArgsType[index] = arg.getClass();
-                    constArgsVal[index] = arg;
-                    index++;
+
+                //Resolve the bean for the connection
+                Map<String, String> attrs = new HashMap<String, String>();
+                for(JrdsElement attrNode: domNode.getChildElementsByName("attr")) {
+                    String attrName = attrNode.getAttribute("name");
+                    String textValue = Util.parseTemplate(attrNode.getTextContent(), host);
+                    attrs.put(attrName, textValue);
                 }
-                Constructor<?> theConst = connectionClass.getConstructor(constArgsType);
-                o = (Connection<?>)theConst.newInstance(constArgsVal);
-                Map<String, PropertyDescriptor> beans = connectionsBeanCache.get(connectionClass);
-                if(beans == null) {
-                    beans = ArgFactory.getBeanPropertiesMap(connectionClass, Starter.class);
-                    connectionsBeanCache.put(connectionClass, beans);
-                }
-                setAttributes(cnxNode, o, beans, sNode);
-                if(name != null && ! name.trim().isEmpty())
-                    o.setName(name.trim());
-                sNode.registerStarter(o);
-                logger.debug(Util.delayedFormatString("Connexion registred: %s for %s", o, sNode));
+                ConnectionInfo cnx = new ConnectionInfo(connectionClass, name, args, attrs);
+                connectionSet.add(cnx);
             }
             catch (NoClassDefFoundError ex) {
                 logger.warn("Connection class not found: " + type+ ": " + ex);
             }
             catch (ClassCastException ex) {
-                logger.warn("didn't get a Connection but a " + o.getClass().getName());
+                logger.warn(type + " is not a connection");
             }
             catch (LinkageError ex) {
                 logger.warn("Incompatible code version during connection creation of type " + type +
@@ -370,6 +390,7 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                         ": " + ex, ex);
             }
         }
+        return connectionSet;
     }
 
     private void setAttributes(JrdsElement probeNode, Object o, Map<String, PropertyDescriptor> beans, Object... context) throws IllegalArgumentException, InvocationTargetException {
@@ -401,7 +422,26 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
                 throw new InvocationTargetException(e, HostBuilder.class.getName());
             }
         }
+    }
 
+    private Map<String, String> makeProperties(JrdsElement n) {
+        if(n == null)
+            return Collections.emptyMap();
+        JrdsElement propElem = n.getElementbyName("properties");
+        if(propElem == null)
+            return Collections.emptyMap();
+
+        Map<String, String> props = new HashMap<String, String>();
+        for(JrdsElement propNode: propElem.getChildElementsByName("entry")) {
+            String key = propNode.getAttribute("key");
+            if(key != null) {
+                String value = propNode.getTextContent();
+                logger.trace(Util.delayedFormatString("Adding propertie %s=%s", key, value));
+                props.put(key, value);
+            }
+        }
+        logger.debug(Util.delayedFormatString("Properties map: %s", props));
+        return props;
     }
 
     /**
@@ -423,6 +463,13 @@ public class HostBuilder extends ConfigObjectBuilder<RdsHost> {
      */
     void setClassLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
+    }
+
+    /**
+     * @param rootNode the rootNode to set
+     */
+    public void setTimers(Map<String, Timer> timers) {
+        this.timers = timers;
     }
 
 }

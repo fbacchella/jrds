@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.factories.ProbeMeta;
 import jrds.starter.XmlProvider;
 
@@ -116,14 +115,6 @@ public class HttpXml extends HCHttpProbe {
     @Override
     public Map<String, String> getCollectMapping() {
         return collectKeys;
-    }
-
-    /* (non-Javadoc)
-     * @see jrds.probe.HttpProbe#setHost(jrds.RdsHost)
-     */
-    @Override
-    public void setHost(RdsHost monitoredHost) {
-        super.setHost(monitoredHost);
     }
 
     /**

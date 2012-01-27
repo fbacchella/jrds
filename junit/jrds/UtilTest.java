@@ -15,6 +15,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.mockobjects.DummyProbe;
 import jrds.mockobjects.MokeProbe;
+import jrds.starter.HostStarter;
 import jrds.xmlResources.ResourcesLocator;
 import junit.framework.Assert;
 
@@ -154,7 +155,7 @@ public class UtilTest {
     @Test
     public void evaluateVariable1() {
         System.setProperty("jrds.unittest", "true");
-        String evaluated = Util.evaluateVariables("${system.jrds.unittest}", Collections.EMPTY_MAP, Collections.EMPTY_MAP);
+        String evaluated = Util.evaluateVariables("${system.jrds.unittest}", Collections.EMPTY_MAP);
         Assert.assertEquals("true", evaluated);
     }
 
@@ -162,11 +163,10 @@ public class UtilTest {
     @Test
     public void evaluateVariable2() {
         System.setProperty("jrds.unittest", "true");
-        String evaluated = Util.evaluateVariables("${novar}", Collections.EMPTY_MAP, Collections.EMPTY_MAP);
+        String evaluated = Util.evaluateVariables("${novar}", Collections.EMPTY_MAP);
         Assert.assertEquals("${novar}", evaluated);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void evaluateVariable3() {
         Map<String, Object> var = new HashMap<String, Object>();
@@ -174,25 +174,24 @@ public class UtilTest {
         var.put("a", "v1");
         var.put("b", 1);
 
-        String evaluated = Util.evaluateVariables("${a} ${b}", var, Collections.EMPTY_MAP);
+        String evaluated = Util.evaluateVariables("${a} ${b}", var);
         Assert.assertEquals("v1 1", evaluated);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void evaluateVariable4() {
         Map<String, Object> var = new HashMap<String, Object>();
 
         var.put("FSID", "248ba235");
 
-        String evaluated = Util.evaluateVariables("C:\\ Label:  Serial Number ${FSID}", var, Collections.EMPTY_MAP);
+        String evaluated = Util.evaluateVariables("C:\\ Label:  Serial Number ${FSID}", var);
         Assert.assertEquals("C:\\ Label:  Serial Number 248ba235", evaluated);
     }
 
     @Test
     public void testParseOldTemplate1() {
         Probe<?,?> p = new MokeProbe<String, Number>();
-        p.setHost(new RdsHost("Moke"));
+        p.setHost(new HostStarter(new HostInfo("Moke")));
         p.setLabel("label");
         Object[] keys = {
                 "${host}",
@@ -206,7 +205,7 @@ public class UtilTest {
     @Test
     public void testParseOldTemplate2() {
         Probe<?,?> p = new MokeProbe<String, Number>();
-        p.setHost(new RdsHost("Moke"));
+        p.setHost(new HostStarter(new HostInfo("Moke")));
         p.setLabel("label");
         Object[] keys = {
                 "${host}",
@@ -220,7 +219,7 @@ public class UtilTest {
     @Test
     public void testParseTemplate1() {
         Probe<?,?> p = new MokeProbe<String, Number>();
-        p.setHost(new RdsHost("Moke"));
+        p.setHost(new HostStarter(new HostInfo("Moke")));
         p.setLabel("label");
         String parsed = Util.parseTemplate("${host} ${probename} ${label}", p);
         Assert.assertEquals("Moke DummyProbe label", parsed);
@@ -249,6 +248,10 @@ public class UtilTest {
             public Date getLastUpdate() {
                 return new Date();
             }
+            @Override
+            public int getStep() {
+                return 300;
+            }
         };
         Date now = new Date();
 
@@ -266,6 +269,10 @@ public class UtilTest {
                 calBegin.setTime(now);
                 calBegin.add(Calendar.MONTH, -4);
                 return calBegin.getTime();
+            }
+            @Override
+            public int getStep() {
+                return 300;
             }
         };
 
@@ -285,6 +292,10 @@ public class UtilTest {
                 calBegin.setTime(now);
                 calBegin.add(Calendar.MONTH, 4);
                 return calBegin.getTime();
+            }
+            @Override
+            public int getStep() {
+                return 300;
             }
         };
 

@@ -34,7 +34,7 @@ public class HttpClientStarter extends Starter {
     @Override
     public void configure(PropertiesManager pm) {
         super.configure(pm);
-        maxConnect = pm.collectorThreads;
+        maxConnect = pm.numCollectors;
         timeout = pm.timeout * 1000;
         Scheme http = new Scheme("http", 80, PlainSocketFactory.getSocketFactory());
         registry.register(http);

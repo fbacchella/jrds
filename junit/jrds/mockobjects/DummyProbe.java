@@ -10,10 +10,11 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.HostInfo;
 import jrds.Probe;
 import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.Tools;
+import jrds.starter.HostStarter;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
@@ -38,10 +39,9 @@ public class DummyProbe extends Probe<String, Number> {
 		pd.setProbeName("dummyprobe");
 		setPd(pd);
 		if(getHost() == null) {
-			RdsHost host = new RdsHost();
-			host.setName("DummyHost");
+		    HostInfo host = new HostInfo("DummyHost");
 			host.setHostDir(new File("tmp"));
-			setHost(host);
+			setHost(new HostStarter(host));
 		}
 		Map<String, Object> dsMap = new HashMap<String, Object>();
 		dsMap.put("dsName", "ds0");

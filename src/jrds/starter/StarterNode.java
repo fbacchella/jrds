@@ -18,6 +18,8 @@ public abstract class StarterNode implements StartersSet {
     private HostsList root = null;
     private volatile boolean started = false;
     private StarterNode parent = null;
+    private int timeout = -1;
+    private int step = -1;
 
     public StarterNode() {
         if (this instanceof HostsList) {
@@ -54,7 +56,7 @@ public abstract class StarterNode implements StartersSet {
             log(Level.DEBUG, "Starting %d starters for %s", allStarters.size(), this);
             for(Starter s: allStarters.values()) {
                 //If collect is stopped while we're starting, drop it
-                if(parent !=null && ! parent.isCollectRunning())
+                if(parent != null && ! parent.isCollectRunning())
                     return false;
                 try {
                     s.doStart();
@@ -158,6 +160,8 @@ public abstract class StarterNode implements StartersSet {
         }
         else if(parent != null )
             s = parent.find(sc, key);
+        else
+            log(Level.DEBUG, "Starter class %s not found for key %s", sc.getName(), key);
         return s;
     }
 
@@ -181,7 +185,7 @@ public abstract class StarterNode implements StartersSet {
     public StarterNode getParent() {
         return parent;
     }
-
+    
     //Compatibily code
     /**
      * @deprecated
@@ -230,6 +234,34 @@ public abstract class StarterNode implements StartersSet {
 
     public void log(Level l, String format, Object... elements) {
         jrds.Util.log(this, Logger.getLogger(getClass()),l, null, format, elements);
+    }
+
+    /**
+     * @return the timeout
+     */
+    public int getTimeout() {
+        return timeout;
+    }
+
+    /**
+     * @param timeout the timeout to set
+     */
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
+    /**
+     * @return the step
+     */
+    public int getStep() {
+        return step;
+    }
+
+    /**
+     * @param step the step to set
+     */
+    public void setStep(int step) {
+        this.step = step;
     }
 
 }

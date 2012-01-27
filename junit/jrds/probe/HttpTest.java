@@ -9,10 +9,11 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.HostInfo;
 import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.Tools;
 import jrds.Util;
+import jrds.starter.HostStarter;
 import junit.framework.Assert;
 
 import org.apache.log4j.Level;
@@ -23,14 +24,13 @@ import org.junit.Test;
 public class HttpTest {
     static final private Logger logger = Logger.getLogger(HttpTest.class);
 
-    static final private RdsHost webserver = new RdsHost();
     static final private String HOST = "testhost";
+    static final private HostStarter webserver = new HostStarter(new HostInfo(HOST));
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, "jrds.Util");
-        webserver.setName(HOST);
     }
     
     private void validateBean(HttpProbe p) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {

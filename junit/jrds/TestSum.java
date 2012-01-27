@@ -79,7 +79,8 @@ public class TestSum {
         File rrdFile = testFolder.newFile("fullmock.rrd");
         rrdFile.delete();
 
-        Probe<?,?> p = Full.create(testFolder);
+        Probe<?,?> p = Full.create(testFolder, Full.STEP);
+        p.setTimeout(pm.timeout);
         long endSec = Full.fill(p);
         Period pr = Full.getPeriod(p, endSec);
         long begin = pr.getBegin().getTime() / 1000;

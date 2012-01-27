@@ -7,7 +7,6 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Level;
 
 import jrds.Probe;
-import jrds.RdsHost;
 
 public abstract class Connection<ConnectedType> extends Starter {
 
@@ -51,11 +50,12 @@ public abstract class Connection<ConnectedType> extends Starter {
      * @return
      */
     public String getHostName() {
-        if(getLevel() instanceof RdsHost) {
-            return ((RdsHost)getLevel()).getDnsName();
+        StarterNode level = getLevel();
+        if( level instanceof HostStarter) {
+            return ((HostStarter) level).getDnsName();
         }
-        if(getLevel() instanceof Probe<?, ?>) {
-            return ((Probe<?,?>)getLevel()).getHost().getDnsName();
+        if(level instanceof Probe<?, ?>) {
+            return ((Probe<?,?>)level).getHost().getDnsName();
         }
         return null;
     }

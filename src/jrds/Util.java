@@ -37,6 +37,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
+import jrds.starter.HostStarter;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -244,7 +245,7 @@ public class Util {
      * @param props
      * @return
      */
-    public static String evaluateVariables(String in, Map<String, Object> variables, Map<String,String> props) {
+    public static String evaluateVariables(String in, Map<String, Object> variables) {
         Matcher m = varregexp.matcher(in);
         if(m.find()) {
             StringBuilder out = new StringBuilder();
@@ -260,27 +261,22 @@ public class Util {
                 else if(variables.containsKey(var)) {
                     toAppend = variables.get(var).toString();
                 }
-                else if(props != null) {
-                    String propsValue = props.get(var);
-                    if(propsValue != null)
-                        toAppend = propsValue;
-                }
                 if(toAppend == null) {
                     toAppend = "${" + var + "}";
                 }
                 out.append(toAppend);
                 if(after.length() > 0)
-                    out.append(evaluateVariables(after, variables, props));
+                    out.append(evaluateVariables(after, variables));
                 return out.toString();
             }
         }
         return in;
     }
-    
+
     static private final Pattern digit = Pattern.compile("\\d+");
     static private final Pattern attrSignature = Pattern.compile("attr\\.(.*)\\.signature");
     static private final Pattern attr = Pattern.compile("attr\\.(.*)");
-    
+
     static String findVariables(String in, int index, Map<String, Integer> indexes, Object... arguments) {
         Matcher m = varregexp.matcher(in);
         if(m.find()) {
@@ -415,7 +411,7 @@ public class Util {
         host {
             @Override
             String toString(Object o) {
-                return ((RdsHost) o).getName();
+                return ((HostInfo) o).getName();
             }
         },
         probename {
@@ -485,8 +481,9 @@ public class Util {
         String message = findVariables(template, 0, indexes, arguments);
         Object[] values = new Object[indexes.size()];
 
-        Map<String, Object> env = new HashMap<String, Object>();
         for(Object o: arguments) {
+            if(o == null)
+                continue;
             if(logger.isTraceEnabled())
                 logger.trace(Util.delayedFormatString("Argument for template \"%s\": %s", template, o.getClass()));
             if( o instanceof IndexedProbe) {
@@ -503,14 +500,17 @@ public class Util {
                 check(o, indexes, values, evaluate.connection_name);
                 check(o, indexes, values, evaluate.connection_name_signature);
             }
-            if( o instanceof Probe) {
+            if(o instanceof Probe) {
                 Probe<?,?> p = ((Probe<?,?>) o);
-                RdsHost host = p.getHost();
+                HostInfo host = p.getHost();
                 check(host, indexes, values, evaluate.host);
                 check(p, indexes, values, evaluate.probename);
                 check(p, indexes, values, evaluate.label);
             } 
-            if( o instanceof RdsHost) {
+            if( o instanceof HostStarter) {
+                check(((HostStarter)o).getHost(), indexes, values, evaluate.host);
+            }
+            if( o instanceof HostInfo) {
                 check(o, indexes, values, evaluate.host);
             }
             if(o instanceof GraphDesc) {
@@ -531,9 +531,6 @@ public class Util {
                 }
             }
         }
-        if(logger.isDebugEnabled())
-            logger.debug("Properties to use for parsing template \"" + template + "\": " + env);
-
         return MessageFormat.format(message, values);
     }
 

@@ -3,8 +3,8 @@ package jrds.starter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import jrds.HostInfo;
 import jrds.Probe;
-import jrds.RdsHost;
 
 import org.apache.log4j.Level;
 
@@ -44,9 +44,9 @@ public class Resolver extends Starter {
 	}
 
 	public static Object makeKey(StarterNode node) {
-		RdsHost host = null;
-		if(node instanceof RdsHost)
-			host =(RdsHost)node;
+		HostInfo host = null;
+		if(node instanceof HostStarter)
+			host = ((HostStarter)node).getHost();
 		else if(node instanceof Probe<?,?>) {
 			Probe<?,?> p = (Probe<?,?>) node;
 			host = p.getHost();

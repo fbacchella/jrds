@@ -12,9 +12,10 @@ import jrds.Graph;
 import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.ProbeDesc;
-import jrds.RdsHost;
+import jrds.HostInfo;
 import jrds.Tools;
 import jrds.Util;
+import jrds.starter.HostStarter;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -38,7 +39,7 @@ public class TestRRDProbe {
     @Test
     public void testBean() throws IOException, InvocationTargetException, IllegalArgumentException, IllegalAccessException {
         RRDToolProbe p = new RRDToolProbe();
-        p.setHost(new RdsHost("toto"));
+        p.setHost(new HostStarter(new HostInfo("toto")));
         ProbeDesc pd = new ProbeDesc();
         pd.setProbeClass(p.getClass());
         pd.setName("Rrdtool");  
@@ -52,7 +53,7 @@ public class TestRRDProbe {
     @Test
     public void test1() throws IOException {
         RRDToolProbe p = new RRDToolProbe();
-        p.setHost(new RdsHost("toto"));
+        p.setHost(new HostStarter(new HostInfo("toto")));
         ProbeDesc pd = new ProbeDesc();
         pd.setName("Rrdtool");	
         pd.setProbeName("rrdtool");

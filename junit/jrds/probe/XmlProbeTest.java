@@ -8,9 +8,10 @@ import java.util.Map;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
+import jrds.HostInfo;
 import jrds.ProbeDesc;
-import jrds.RdsHost;
 import jrds.Tools;
+import jrds.starter.HostStarter;
 import jrds.starter.XmlProvider;
 
 import org.apache.log4j.Level;
@@ -43,9 +44,10 @@ public class XmlProbeTest {
 				return "Moke";
 			}
 		};
-		p.setHost(new RdsHost("moke"));
+		HostStarter host = new HostStarter(new HostInfo("moke"));
+		p.setHost(host);
 		p.setPd(pd);
-		p.getHost().registerStarter(new XmlProvider());
+		host.registerStarter(new XmlProvider());
 		long l;
 		String uptimeXml;
 
@@ -87,7 +89,8 @@ public class XmlProbeTest {
 				return "Moke";
 			}
 		};
-		p.setHost(new RdsHost("moke"));
+        HostStarter host = new HostStarter(new HostInfo("moke"));
+        p.setHost(host);
 		p.setPd(pd);
 		p.configure(url, args);
 		Map<String, String> keys = p.getCollectMapping();

@@ -185,7 +185,7 @@ public final class ArgFactory {
             Object argInstance = ArgFactory.ConstructFromString(setArgType, beanValue);
             setMethod.invoke(o, argInstance);       
         } catch (Exception e) {
-            throw new InvocationTargetException(e, beanName);
+            throw new InvocationTargetException(e, "invalid bean name '" + beanName + "' for " + o);
         }
     }
 

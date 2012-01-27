@@ -6,12 +6,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.HostsList;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
+import jrds.HostInfo;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.graphe.Sum;
 import jrds.mockobjects.MockGraph;
+import jrds.starter.HostStarter;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
 import junit.framework.Assert;
@@ -54,13 +55,13 @@ public class TestSum {
     }
 
     private Sum doSum(JrdsDocument d, HostsList hl) throws Exception {
-        RdsHost host = new RdsHost("SumHost");
+        HostInfo host = new HostInfo("SumHost");
 
         SumBuilder sm = new SumBuilder();
         sm.setPm(pm);
         Sum sp = sm.makeSum(d);
         sp.configure(hl);
-        sp.getProbe().setHost(host);
+        sp.getProbe().setHost(new HostStarter(host));
         hl.addHost(host);
         hl.addProbe(sp.getProbe());
 

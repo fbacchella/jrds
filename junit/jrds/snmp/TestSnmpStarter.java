@@ -1,42 +1,58 @@
-package jrds.starter;
+package jrds.snmp;
 
+import java.io.IOException;
+
+import jrds.HostInfo;
 import jrds.HostsList;
-import jrds.PropertiesManager;
-import jrds.RdsHost;
 import jrds.Tools;
 import jrds.mockobjects.SnmpAgent;
 import jrds.probe.snmp.RdsSnmpSimple;
 import jrds.snmp.MainStarter;
 import jrds.snmp.SnmpConnection;
+import jrds.starter.HostStarter;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestSnmpStarter {
 	static private final Logger logger = Logger.getLogger(TestSnmpStarter.class);
 	static private SnmpAgent agent;
 
-	@BeforeClass
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
+    @BeforeClass
 	static public void configure() throws Exception {
 		Tools.configure();
 
-		logger.setLevel(Level.TRACE);
-		Tools.setLevel(new String[] {"org.hostslist", "org.snmp4j.agent.request.SnmpRequest", "org.snmp4j", "jrds.snmp", "jrds.Starter.SnmpConnection", "jrds.starter", "jrds.mockobjects"}, logger.getLevel());
+		Tools.setLevel(logger, Level.TRACE, "org.snmp4j.agent.request.SnmpRequest", "org.snmp4j", "jrds.snmp", "jrds.Starter.SnmpConnection", "jrds.starter", "jrds.mockobjects");
 		agent = new SnmpAgent();
 	}
 	
-	private HostsList registerHost(RdsHost h, RdsSnmpSimple probe) {
-		HostsList hl = new HostsList(new PropertiesManager()) {
+	private HostsList registerHost(HostStarter h, RdsSnmpSimple probe) throws IOException {
+		HostsList hl = new HostsList(Tools.makePm(testFolder)) {
 			@Override
 			public boolean isCollectRunning() {
 				return true;
 			}
+            @Override
+            public int getTimeout() {
+                return 1;
+            }
+            @Override
+            public int getStep() {
+                return 300;
+            }
 		};
-		hl.addHost(h);
+		hl.addHost(h.getHost());
+		h.setParent(hl);
 		
-		hl.registerStarter(new MainStarter());
+		h.registerStarter(new MainStarter());
 		
 		SnmpConnection snmp = new SnmpConnection();
 		snmp.setPort(agent.getPort());
@@ -45,15 +61,18 @@ public class TestSnmpStarter {
 
 		probe.setHost(h);
 		probe.configure();
+        h.addProbe(probe);
 
 		return hl;
 	}
 
 	@Test
-	public void testSucess() {
-		RdsHost n1 = new RdsHost("127.0.0.1");
-		RdsSnmpSimple n2 = new RdsSnmpSimple();
-		HostsList hl = registerHost(n1, n2);
+	public void testSucess() throws IOException {
+        HostStarter n1 = new HostStarter(new HostInfo("127.0.0.1"));
+        n1.setTimeout(2);
+        RdsSnmpSimple n2 = new RdsSnmpSimple();
+        n2.setTimeout(2);
+        HostsList hl = registerHost(n1, n2);
 		
 		agent.run();
 		logger.debug("Starting at level 1");
@@ -67,6 +86,7 @@ public class TestSnmpStarter {
 		logger.debug("Starting at level 3");
 		n2.startCollect();
 
+		n2.isCollectRunning();
 		Assert.assertTrue(n2.isCollectRunning());
 
 		logger.debug("Stopping at level 2");
@@ -81,10 +101,11 @@ public class TestSnmpStarter {
 	}
 	
 	@Test
-	public void testFail() {
-		RdsHost n1 = new RdsHost("127.0.0.1");
-		RdsSnmpSimple n2 = new RdsSnmpSimple();
-		HostsList hl = registerHost(n1, n2);
+	public void testFail() throws IOException {
+        HostInfo h = new HostInfo("127.0.0.1");
+        HostStarter n1 = new HostStarter(h);
+        RdsSnmpSimple n2 = new RdsSnmpSimple();
+        HostsList hl = registerHost(n1, n2);
 
 		logger.debug("Starting at level 1");
 		hl.startCollect();

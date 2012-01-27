@@ -8,22 +8,23 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.HostInfo;
 import jrds.Macro;
 import jrds.Probe;
 import jrds.PropertiesManager;
-import jrds.RdsHost;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
-import jrds.factories.xml.JrdsElement;
 import jrds.mockobjects.MokeProbe;
 import jrds.mockobjects.MokeProbeFactory;
-import jrds.starter.Starter;
+import jrds.starter.ConnectionInfo;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.w3c.dom.DocumentFragment;
 
 public class TestMacro {
@@ -48,18 +49,13 @@ public class TestMacro {
                     "<macro name=\"macrodef\" />" +
                     "</host>";
 
-    static private ConfigObjectFactory conf;
-    static private final PropertiesManager pm = new PropertiesManager();
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.prepareXml(false);
-        Tools.shortPM(pm);
-
-        conf = new ConfigObjectFactory(pm);
-        conf.setGraphDescMap();
-        conf.setProbeDescMap();
 
         Tools.setLevel(logger, Level.TRACE, "jrds.configuration.HostBuilder", "jrds.factories", "jrds.starter.ChainedProperties", "jrds.factories.xml");
         Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
@@ -75,9 +71,10 @@ public class TestMacro {
         return m;
     }
 
-    static private HostBuilder getBuilder(Macro... macros) {
+    private HostBuilder getBuilder(Macro... macros) throws IOException {
         HostBuilder hb = new HostBuilder();
-        hb.setPm(pm);
+        hb.setPm(Tools.makePm(testFolder));
+        hb.setTimers(Tools.getSimpleTimerMap());
         Map<String, Macro> mmap = new HashMap<String, Macro>(macros.length);
         for(Macro m: macros) {
             mmap.put(m.getName(), m);
@@ -110,12 +107,10 @@ public class TestMacro {
 
         HostBuilder hb = getBuilder(m);
 
-        RdsHost host = hb.makeRdsHost(hostdoc);
+        HostInfo host = hb.makeHost(hostdoc);
 
-        logger.debug("probes:" + host.getProbes());
-        Collection<Probe<?,?>> probes = host.getProbes();
-        Collection<String> probesName = new ArrayList<String>(probes.size());
-        for(Probe<?,?> p: probes) {
+        Collection<String> probesName = new ArrayList<String>();
+        for(Probe<?,?> p: host.getProbes()) {
             probesName.add(p.toString());
         }
         logger.trace(probesName);
@@ -133,12 +128,17 @@ public class TestMacro {
         HostBuilder hb = getBuilder(m);
 
         JrdsDocument hostdoc = Tools.parseString(goodHostXml);
-        RdsHost host = hb.makeRdsHost(hostdoc);
+        HostInfo host = hb.makeHost(hostdoc);
 
-        Starter s = host.find(jrds.snmp.SnmpConnection.class);
-
-        Assert.assertNotNull("SNMP starter not found", s);
-        Assert.assertEquals("Starter not found", "jrds.snmp.SnmpConnection", s.getKey());
+        ConnectionInfo found = null;
+        for(ConnectionInfo ci: host.getConnections()) {
+            if("jrds.snmp.SnmpConnection".equals(ci.getName())) {
+                found = ci;
+                break;
+            }
+        }
+        Assert.assertNotNull("SNMP starter not found", found);
+        Assert.assertEquals("Starter not found", "jrds.snmp.SnmpConnection", found.getName());
     }
 
     @Test
@@ -151,7 +151,7 @@ public class TestMacro {
         HostBuilder hb = getBuilder(m);
 
         JrdsDocument hostdoc = Tools.parseString(goodHostXml);
-        RdsHost host = hb.makeRdsHost(hostdoc);
+        HostInfo host = hb.makeHost(hostdoc);
         Assert.assertTrue("tag not found", host.getTags().contains(tagname));
     }
 
@@ -166,66 +166,14 @@ public class TestMacro {
         hostdoc.getRootElement().addElement("probe", "type=MacroProbe3").addElement("arg", "type=String", "value=${a}");
 
         HostBuilder hb = getBuilder(m);
-        RdsHost host = hb.makeRdsHost(hostdoc);
+        HostInfo host = hb.makeHost(hostdoc);
 
-        Collection<Probe<?,?>> probes = host.getProbes();
         boolean found = false;
-        for(Probe<?,?> p: probes) {
+        for(Probe<?,?> p: host.getProbes()) {
             if("myhost/MacroProbe3".equals(p.toString()) ) {
                 MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
                 logger.trace("Args:" + mp.getArgs());
                 Assert.assertFalse(mp.getArgs().contains("bidule"));
-                found = true;
-            }
-        }
-        Assert.assertTrue("macro probe with properties not found", found);
-    }
-
-    @Test
-    public void testMacroFillwithProps2() throws Exception {
-        JrdsDocument d = Tools.parseString(goodMacroXml);
-        d.getRootElement().addElement("probe", "type=MacroProbe3").addElement("arg", "type=String", "value=${a}");
-        Macro m = doMacro(d, "macrodef");
-
-        JrdsDocument hostdoc = Tools.parseString(goodHostXml);
-        hostdoc.getRootElement().addElement("properties").addElement("entry", "key=a").setTextContent("bidule");
-
-        HostBuilder hb = getBuilder(m);
-        RdsHost host = hb.makeRdsHost(hostdoc);
-
-        Collection<Probe<?,?>> probes = host.getProbes();
-        boolean found = false;
-        for(Probe<?,?> p: probes) {
-            if("myhost/MacroProbe3".equals(p.toString()) ) {
-                MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
-                logger.trace("Args:" + mp.getArgs());
-                Assert.assertTrue(mp.getArgs().contains("bidule"));
-                found = true;
-            }
-        }
-        Assert.assertTrue("macro probe with properties not found", found);
-    }
-
-    @Test
-    public void testMacroFillwithProps3() throws Exception {
-        JrdsDocument d = Tools.parseString(goodMacroXml);
-        d.getRootElement().addElement("probe", "type=MacroProbe3").addElement("arg", "type=String", "value=${a}");
-        Macro m = doMacro(d, "macrodef");
-
-        JrdsDocument hostdoc = Tools.parseString(goodHostXml);
-        JrdsElement macronode = hostdoc.getRootElement().getElementbyName("macro");
-        macronode.addElement("properties").addElement("entry", "key=a").setTextContent("bidule");
-
-        HostBuilder hb = getBuilder(m);
-        RdsHost host = hb.makeRdsHost(hostdoc);
-
-        Collection<Probe<?,?>> probes = host.getProbes();
-        boolean found = false;
-        for(Probe<?,?> p: probes) {
-            if("myhost/MacroProbe3".equals(p.toString()) ) {
-                MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
-                logger.trace("Args:" + mp.getArgs());
-                Assert.assertTrue(mp.getArgs().contains("bidule"));
                 found = true;
             }
         }
@@ -242,11 +190,10 @@ public class TestMacro {
         Tools.appendString(Tools.appendString(hostdoc.getDocumentElement(), "<collection name=\"c\"/>"), "<element>bidule</element>");
 
         HostBuilder hb = getBuilder(m);
-        RdsHost host = hb.makeRdsHost(hostdoc);
+        HostInfo host = hb.makeHost(hostdoc);
 
-        Collection<Probe<?,?>> probes = host.getProbes();
         boolean found = false;
-        for(Probe<?,?> p: probes) {
+        for(Probe<?,?> p: host.getProbes()) {
             if("myhost/MacroProbe3".equals(p.toString()) ) {
                 MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
                 logger.trace("Args:" + mp.getArgs());
@@ -269,11 +216,10 @@ public class TestMacro {
 
         HostBuilder hb = getBuilder(m1, m2);
         JrdsDocument hostdoc = Tools.parseString(goodHostXml);
-        RdsHost host = hb.makeRdsHost(hostdoc);
+        HostInfo host = hb.makeHost(hostdoc);
 
-        Collection<Probe<?,?>> probes = host.getProbes();
         boolean found = false;
-        for(Probe<?,?> p: probes) {
+        for(Probe<?,?> p: host.getProbes()) {
             if("myhost/MacroProbe3".equals(p.toString()) ) {
                 MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
                 logger.trace("Args:" + mp.getArgs());
@@ -283,7 +229,7 @@ public class TestMacro {
         }
         Assert.assertTrue("macro not recursive", found);
     }
-    
+
     @Test
     public void testFullConfigpath() throws Exception {
         PropertiesManager localpm = Tools.getEmptyProperties();
