@@ -3,77 +3,83 @@ package jrds.configuration;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 
-import org.w3c.dom.Node;
-
 public enum ConfigType {
     FILTER {
-        public boolean memberof(Node d) {
-            return matchDocElement(d, "filter");
-        }
         public String getName(JrdsDocument d) {
             return getNameByElement(d);
+        }
+        @Override
+        public String getRootNode() {
+            return "filter";
         }
     },
     HOSTS {
-        public boolean memberof(Node d) {
-            return matchDocElement(d, "host");
-        }
         public String getName(JrdsDocument d) {
             return getNameByAttribute(d);
+        }
+        @Override
+        public String getRootNode() {
+            return "host";
         }
     },
     SUM {
-        public boolean memberof(Node d) {
-            return matchDocElement(d, "sum");
-        }
         public String getName(JrdsDocument d) {
             return getNameByAttribute(d);
         }
+        @Override
+        public String getRootNode() {
+            return "sum";
+        }
     },
     TAB {
-        public boolean memberof(Node d) {
-            return matchDocElement(d, "tab");
-        }
         public String getName(JrdsDocument d) {
-            return d.getRootElement().getAttribute("name");
+            return getNameByAttribute(d);
+        }
+        @Override
+        public String getRootNode() {
+            return "tab";
         }
     },
     MACRODEF {
-        public boolean memberof(Node d) {
-            return matchDocElement(d, "macrodef");
-        }
         public String getName(JrdsDocument d) {
-            return d.getRootElement().getAttribute("name");
+            return getNameByAttribute(d);
+        }
+        @Override
+        public String getRootNode() {
+            return "macrodef";
         }
     },
     GRAPH {
-        public boolean memberof(Node d) {
-            return matchDocElement(d, "graph");
-        }
         public String getName(JrdsDocument d) {
             return getNameByElement(d);
+        }
+        @Override
+        public String getRootNode() {
+            return "graph";
         }
     },
     GRAPHDESC {
-        public boolean memberof(Node d) {
-            return matchDocElement(d, "graphdesc");
-        }
         public String getName(JrdsDocument d) {
             return getNameByElement(d);
+        }
+        @Override
+        public String getRootNode() {
+            return "graphdesc";
         }
     },
     PROBEDESC {
-        public boolean memberof(Node d) {
-            return matchDocElement(d, "probedesc");
-        }
         public String getName(JrdsDocument d) {
             return getNameByElement(d);
         }
+        @Override
+        public String getRootNode() {
+            return "probedesc";
+        }
     };
 
-    public abstract boolean memberof(Node d);
     public abstract String getName(JrdsDocument d);
-    
+    public abstract String getRootNode();
+
     private static String getNameByAttribute(JrdsDocument d) {
         String name = d.getRootElement().getAttribute("name");
         if(name != null) {
@@ -90,8 +96,4 @@ public enum ConfigType {
         return null;
     }
 
-    private static boolean matchDocElement(Node d, String rootElement) {
-        String root = d.getFirstChild().getNodeName();
-        return rootElement.equals(root);
-    }
 }

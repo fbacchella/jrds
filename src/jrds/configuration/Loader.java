@@ -43,6 +43,7 @@ class Loader {
     DocumentBuilder dbuilder = null;
 
     final private Map<ConfigType, Map<String, JrdsDocument>> repositories = new HashMap<ConfigType, Map<String, JrdsDocument>>(ConfigType.values().length);
+    final private Map<String, ConfigType> nodesTypes = new HashMap<String, ConfigType>(ConfigType.values().length);
 
     public Loader() throws ParserConfigurationException {
         this(false);
@@ -73,11 +74,8 @@ class Loader {
 
         for(ConfigType t: ConfigType.values()) {
             repositories.put(t, new  HashMap<String, JrdsDocument>());
+            nodesTypes.put(t.getRootNode(), t);
         }
-    }
-
-    public Map<ConfigType, Map<String, JrdsDocument>> getRepositories(){
-        return repositories;
     }
 
     public Map<String, JrdsDocument> getRepository(ConfigType t) {
@@ -177,28 +175,24 @@ class Loader {
     }
 
     boolean importStream(InputStream xmlstream) throws SAXException, IOException {
-        boolean known = false;
         JrdsDocument d = new JrdsDocument(dbuilder.parse(xmlstream));
-        for(ConfigType t: ConfigType.values()) {
-            if(t.memberof(d)) {
-                logger.trace(Util.delayedFormatString("Found a %s", t));
-                String name = t.getName(d);
-                //We check the Name
-                if(name != null && ! "".equals(name)) {
-                    Map<String, JrdsDocument> rep = repositories.get(t);
-                    //We warn for dual inclusion, none is loaded, as we don't know the good one
-                    if(rep.containsKey(name)) {
-                        logger.error("Dual definition of " + t + " with name " + name);
-                        rep.remove(name);
-                    }
-                    else {
-                        rep.put(name, d);
-                        known = true;
-                    }
-                }
-                break;
+        ConfigType t = nodesTypes.get(d.getRootElement().getNodeName());
+        if(t == null)
+            return false;
+        logger.trace(Util.delayedFormatString("Found a %s", t));
+        String name = t.getName(d);
+        //We check the Name
+        if(name != null && ! "".equals(name)) {
+            Map<String, JrdsDocument> rep = repositories.get(t);
+            //We warn for dual inclusion, none is loaded, as we don't know the good one
+            if(rep.containsKey(name)) {
+                logger.error("Dual definition of " + t + " with name " + name);
+                rep.remove(name);
+            }
+            else {
+                rep.put(name, d);
             }
         }
-        return known;
+        return true;
     }
 }
