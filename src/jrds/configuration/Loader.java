@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -73,7 +74,8 @@ class Loader {
         });
 
         for(ConfigType t: ConfigType.values()) {
-            repositories.put(t, new  HashMap<String, JrdsDocument>());
+            //A ConcurrentHashMap hash to destroy DOM within the iterator in the ConfigObjectFactory
+            repositories.put(t, new ConcurrentHashMap<String, JrdsDocument>());
             nodesTypes.put(t.getRootNode(), t);
         }
     }

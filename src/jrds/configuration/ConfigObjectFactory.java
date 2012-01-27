@@ -69,7 +69,8 @@ public class ConfigObjectFactory {
 
     public <BuildObject> Map<String, BuildObject> getObjectMap(ConfigObjectBuilder<BuildObject> ob, Map<String, JrdsDocument> nodeMap) {
         Map<String, BuildObject> objectMap = new HashMap<String, BuildObject>();
-        for(JrdsDocument n: nodeMap.values()) {
+        for(Map.Entry<String, JrdsDocument> e: nodeMap.entrySet()) {
+            JrdsDocument n = e.getValue();
             BuildObject o = null;
             String name = ob.ct.getName(n);
             try {
@@ -77,9 +78,11 @@ public class ConfigObjectFactory {
                 if(o != null && name != null) {
                     objectMap.put(name, o);
                 }
-            } catch (InvocationTargetException e) {
-                logger.error("Fatal error for object of type " + ob.ct + " and name " + name + ":" + e.getCause());
+            } catch (InvocationTargetException ex) {
+                logger.error("Fatal error for object of type " + ob.ct + " and name " + name + ":" + ex.getCause());
             }
+            //Remove DOM document after they'been used
+            nodeMap.remove(e.getKey());
         }
         return objectMap;
     }
