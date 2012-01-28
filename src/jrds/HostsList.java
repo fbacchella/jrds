@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -15,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jrds.PropertiesManager.TimerInfo;
 import jrds.configuration.ConfigObjectFactory;
@@ -36,14 +36,9 @@ import org.apache.log4j.Level;
  */
 public class HostsList extends StarterNode {
 
-    public static final class Stats {
-        Stats() {
-            lastCollect = new Date(0);
-        }
-        public long runtime = 0;
-        public Date lastCollect;
-    }
+    static final private AtomicInteger generation = new AtomicInteger(0);
 
+    private final int thisgeneration = generation.incrementAndGet();
     private final Set<HostInfo> hostList = new HashSet<HostInfo>();
     private final Map<String, jrds.starter.Timer> timers = new HashMap<String, jrds.starter.Timer>();
     private final Map<Integer, GraphNode> graphMap = new HashMap<Integer, GraphNode>();
@@ -60,7 +55,6 @@ public class HostsList extends StarterNode {
     private Set<String> defaultRoles = Collections.emptySet();
     // A global flag that tells globally that this HostsList can be used
     volatile private boolean started = false;
-    private Stats stats = new Stats();
     private Set<Class<? extends DiscoverAgent>> daList = new HashSet<Class<? extends DiscoverAgent>>();
 
     /**
@@ -116,8 +110,7 @@ public class HostsList extends StarterNode {
 
         setTimeout(pm.timeout);
         setStep(pm.step);
-        
-        collectTimer = new Timer("jrds-main-timer", true);
+
         log(Level.TRACE, "timers to build %s", pm.timers);
 
         for(Map.Entry<String, TimerInfo> e: pm.timers.entrySet()) {
@@ -128,7 +121,7 @@ public class HostsList extends StarterNode {
         log(Level.DEBUG, "timers %s", timers);
 
         renderer = new Renderer(50, tmpDir);
-        
+
         log(Level.DEBUG, "Starting parsing descriptions");
         ConfigObjectFactory conf = new ConfigObjectFactory(pm, pm.extensionClassLoader);
         conf.setGraphDescMap();
@@ -247,9 +240,24 @@ public class HostsList extends StarterNode {
             }
         }
         started = true;
+    }
+
+    public void startTimers() {
+        if(started)
+            collectTimer = new Timer("jrds-main-timer/" + thisgeneration, true);
         for(jrds.starter.Timer t: timers.values()) {
             t.startTimer(collectTimer);  
         }
+    }
+
+    /**
+     * @param started the started to set
+     */
+    public void stopTimers() {
+        started = false;
+        if(collectTimer != null)
+            collectTimer.cancel();
+        collectTimer = null;
     }
 
     private void makeTabs(PropertiesManager pm, ConfigObjectFactory conf, Set<Tab> moretabs, Map<String, Tab> customTabMap){
@@ -447,22 +455,6 @@ public class HostsList extends StarterNode {
         return renderer;
     }
 
-    /**
-     * @return the stats
-     */
-    public Stats getStats() {
-        return stats;
-    }
-
-    /**
-     * @param started the started to set
-     */
-    public void finished() {
-        started = false;
-        if(collectTimer != null)
-            collectTimer.cancel();
-    }
-
     /* (non-Javadoc)
      * @see jrds.starter.StarterNode#isCollectRunning()
      */
@@ -510,5 +502,12 @@ public class HostsList extends StarterNode {
      */
     public Iterable<jrds.starter.Timer> getTimers() {
         return timers.values();
+    }
+
+    /**
+     * @return the thisgeneration
+     */
+    public int getGeneration() {
+        return thisgeneration;
     }
 }

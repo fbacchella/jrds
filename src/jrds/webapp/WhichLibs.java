@@ -87,7 +87,7 @@ public final class WhichLibs extends JrdsServlet {
             out.println(resolv("SNMP4J", "org.snmp4j.transport.DefaultUdpTransportMapping"));
             out.println(resolv("Jrds Agent", "jrds.probe.RMI"));
             out.println(resolv("Log4j",logger.getClass()));
-            out.println("Generation:" + getConfig().thisgeneration);
+            out.println("Generation:" + hl.getGeneration());
         } catch (RuntimeException e) {
             logger.error(e, e);
         }                           

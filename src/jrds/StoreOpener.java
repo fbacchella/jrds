@@ -94,9 +94,12 @@ public final class StoreOpener {
         StoreOpener.backend = RrdBackendFactory.getDefaultFactory();
 
         if(RrdRandomAccessFileBackendFactory.class.isAssignableFrom(StoreOpener.backend.getClass())) {
-            instance = RrdDbPool.getInstance();
-            instance.setCapacity(dbPoolSize);
-            usepool = true;
+            try {
+                instance = RrdDbPool.getInstance();
+                instance.setCapacity(dbPoolSize);
+                usepool = true;
+            } catch (Exception e) {
+            }
         }
         logger.debug(Util.delayedFormatString("Store backend used is %s",  StoreOpener.backend));
     }

@@ -40,7 +40,7 @@ public class Status extends JrdsServlet {
         Collection<HostInfo> hosts = hl.getHosts();
         int numHosts = hosts.size();
         int numProbes = 0;
-        int generation = getConfig().thisgeneration;
+        int generation = hl.getGeneration();
         for(HostInfo h: hosts) {
             numProbes += h.getNumProbes();
         }

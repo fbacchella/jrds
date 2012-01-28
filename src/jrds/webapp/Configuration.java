@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletContext;
 
@@ -18,11 +17,8 @@ import org.apache.log4j.Logger;
 public class Configuration {
     static private final Logger logger = Logger.getLogger(Configuration.class);
 
-    static final private AtomicInteger generation = new AtomicInteger(0);
-
     private final PropertiesManager propertiesManager = new PropertiesManager();
     private final HostsList hostsList;
-    public final int thisgeneration = generation.incrementAndGet();
     Thread shutDownHook;
 
     /**
@@ -74,15 +70,16 @@ public class Configuration {
         shutDownHook = new Thread("Collect-Shutdown") {
             @Override
             public void run() {
-                hostsList.finished();
+                hostsList.stopTimers();
                 hostsList.getRenderer().finish();
             }
         };
         Runtime.getRuntime().addShutdownHook(shutDownHook);
+        hostsList.startTimers();
     }
 
     public void stop() {
-        hostsList.finished();
+        hostsList.stopTimers();
         Thread.yield();
         //We don't care if it failed, just try
         try {
@@ -95,6 +92,8 @@ public class Configuration {
         try {
             for(Timer t: hostsList.getTimers()) {
                 t.lockCollect();
+            }
+            for(Timer t: hostsList.getTimers()) {
                 //Release it, it will not restart
                 t.releaseCollect();
             }
