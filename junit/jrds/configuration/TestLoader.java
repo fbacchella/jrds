@@ -29,6 +29,7 @@ public class TestLoader {
 	public void doLoadJar() throws ParserConfigurationException, MalformedURLException  {
 		Loader l = new Loader();
 		l.importUrl(Tools.pathToUrl("desc"));
+		l.done();
 		Assert.assertFalse("graph desc list is empty", l.getRepository(ConfigType.GRAPHDESC).isEmpty());
 		Assert.assertFalse("probe desc list is empty", l.getRepository(ConfigType.PROBEDESC).isEmpty());
 	}
@@ -36,8 +37,9 @@ public class TestLoader {
 	@Test
 	public void doLoadHost() throws Exception  {
 		Loader l = new Loader();
+		l.importStream(getClass().getResourceAsStream("/ressources/host1.xml"), "");
+        l.done();
 
-		l.importStream(getClass().getResourceAsStream("/ressources/host1.xml"));
 		Assert.assertTrue(l.getRepository(ConfigType.HOSTS).containsKey("name"));
 	}
 	
@@ -45,8 +47,10 @@ public class TestLoader {
 	public void doLoadView() throws Exception  {
 		Loader l = new Loader();
 
-		l.importStream(getClass().getResourceAsStream("/ressources/view1.xml"));
-		Map<String, JrdsDocument> rep = l.getRepository(ConfigType.FILTER);
+		l.importStream(getClass().getResourceAsStream("/ressources/view1.xml"), "");
+        l.done();
+
+        Map<String, JrdsDocument> rep = l.getRepository(ConfigType.FILTER);
 		logger.trace(rep);
 		Assert.assertTrue(rep.containsKey("Test view 1"));
 	}
@@ -55,8 +59,10 @@ public class TestLoader {
 	public void doLoadProbeDesc() throws Exception {
 		Loader l = new Loader();
 
-		l.importStream(getClass().getResourceAsStream("/ressources/fulldesc.xml"));
-		Map<String, JrdsDocument> rep = l.getRepository(ConfigType.PROBEDESC);
+		l.importStream(getClass().getResourceAsStream("/ressources/fulldesc.xml"), "");
+        l.done();
+
+        Map<String, JrdsDocument> rep = l.getRepository(ConfigType.PROBEDESC);
 		logger.trace(rep);
 		Assert.assertTrue(rep.containsKey("name"));
 
@@ -66,8 +72,10 @@ public class TestLoader {
 	public void doLoadGraph()  throws Exception {
 		Loader l = new Loader();
 
-		l.importStream(getClass().getResourceAsStream("/ressources/customgraph.xml"));
-		Map<String, JrdsDocument> rep = l.getRepository(ConfigType.GRAPH);
+		l.importStream(getClass().getResourceAsStream("/ressources/customgraph.xml"), "");
+        l.done();
+
+        Map<String, JrdsDocument> rep = l.getRepository(ConfigType.GRAPH);
 		logger.trace(rep);
 		Assert.assertTrue(rep.containsKey("name"));
 	}
@@ -76,8 +84,10 @@ public class TestLoader {
 	public void doLoadTab()  throws Exception {
 		Loader l = new Loader();
 
-		l.importStream(getClass().getResourceAsStream("/ressources/goodtab.xml"));
-		Map<String, JrdsDocument> rep = l.getRepository(ConfigType.TAB);
+		l.importStream(getClass().getResourceAsStream("/ressources/goodtab.xml"), "");
+        l.done();
+
+        Map<String, JrdsDocument> rep = l.getRepository(ConfigType.TAB);
 		logger.trace(rep);
 		Assert.assertTrue(rep.containsKey("goodtab"));
 	}

@@ -142,7 +142,6 @@ public class HostsList extends StarterNode {
             }
         }
         conf.setMacroMap();
-        conf.setTabMap();
 
         Set<String> hostsTags = new HashSet<String>();
         conf.setHostMap(timers);

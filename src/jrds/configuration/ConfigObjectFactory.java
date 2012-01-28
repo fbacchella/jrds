@@ -57,6 +57,8 @@ public class ConfigObjectFactory {
 
         if(pm.configdir !=null)
             load.importDir(pm.configdir);
+        
+        load.done();
     }
 
     public void addUrl(URI ressourceUrl) {
@@ -69,6 +71,7 @@ public class ConfigObjectFactory {
 
     public <BuildObject> Map<String, BuildObject> getObjectMap(ConfigObjectBuilder<BuildObject> ob, Map<String, JrdsDocument> nodeMap) {
         Map<String, BuildObject> objectMap = new HashMap<String, BuildObject>();
+
         for(Map.Entry<String, JrdsDocument> e: nodeMap.entrySet()) {
             JrdsDocument n = e.getValue();
             BuildObject o = null;
@@ -81,7 +84,7 @@ public class ConfigObjectFactory {
             } catch (InvocationTargetException ex) {
                 logger.error("Fatal error for object of type " + ob.ct + " and name " + name + ":" + ex.getCause());
             }
-            //Remove DOM document after they'been used
+            //Remove DOM object as soon as it's not needed any more
             nodeMap.remove(e.getKey());
         }
         return objectMap;
@@ -146,9 +149,9 @@ public class ConfigObjectFactory {
     }
 
     public Map<String, Sum> setSumMap() {
-        SumBuilder ob =new SumBuilder();
-        ob.setPm(pm);
         Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.SUM);
+        SumBuilder ob = new SumBuilder();
+        ob.setPm(pm);
         Map<String, Sum> sumpsMap = getObjectMap(ob, nodemap);
         logger.debug(jrds.Util.delayedFormatString("Sums configured: %s", sumpsMap.keySet()));
         return sumpsMap;
@@ -156,7 +159,8 @@ public class ConfigObjectFactory {
 
     public Map<String, Tab> setTabMap() {
         Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.TAB);
-        Map<String, Tab> tabsMap = getObjectMap(new TabBuilder(), nodemap);
+        TabBuilder ob = new TabBuilder();
+        Map<String, Tab> tabsMap = getObjectMap(ob, nodemap);
         logger.debug(jrds.Util.delayedFormatString("Tabs configured: %s", tabsMap.keySet()));
         return tabsMap;
     }
@@ -167,10 +171,5 @@ public class ConfigObjectFactory {
     Loader getLoader() {
         return load;
     }
-    /**
-     * @param load the load to set
-     */
-    void setLoader(Loader load) {
-        this.load = load;
-    }
+
 }

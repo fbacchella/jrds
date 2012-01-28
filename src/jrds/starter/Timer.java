@@ -11,6 +11,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import jrds.HostInfo;
 import jrds.PropertiesManager;
@@ -99,17 +100,11 @@ public class Timer extends StarterNode {
             return;
         }
         try {
-            final Object counter = new Object() {
-                int i = 0;
-                @Override
-                public String toString() {
-                    return Integer.toString(i++);
-                }
-            };
+            final AtomicInteger counter = new AtomicInteger(0);
             ExecutorService tpool =  Executors.newFixedThreadPool(numCollectors, 
                     new ThreadFactory() {
                 public Thread newThread(Runnable r) {
-                    Thread t = new Thread(r, Timer.this.name  + "/CollectorThread" + counter);
+                    Thread t = new Thread(r, Timer.this.name  + "/CollectorThread" + counter.getAndIncrement());
                     t.setDaemon(true);
                     log(Level.DEBUG, "New thread name:" + t.getName());
                     return t;

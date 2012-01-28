@@ -12,9 +12,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -35,23 +39,58 @@ class Loader {
 
     static final private Logger logger = Logger.getLogger(Loader.class);
 
-    private final FileFilter filter = new  FileFilter(){
+    private static final FileFilter filter = new FileFilter(){
         public boolean accept(File file) {
-            return  (! file.isHidden()) && (file.isDirectory()) || (file.isFile() && file.getName().endsWith(".xml"));
+            return (! file.isHidden()) && (file.isDirectory()) || (file.isFile() && file.getName().endsWith(".xml"));
         }
     };
 
-    DocumentBuilder dbuilder = null;
+    private final AtomicInteger threadCount = new AtomicInteger(0);
+    private final ExecutorService tpool =  Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2, 
+            new ThreadFactory() {
+        public Thread newThread(Runnable r) {
+            String threadName = "DomParser" + threadCount.getAndIncrement();
+            Thread t = new Thread(r, threadName);
+            t.setDaemon(true);
+            logger.debug(Util.delayedFormatString("New thread name: %s", threadName));
+            return t;
+        }
+    });
+
+    private final ThreadLocal<DocumentBuilder> localDocumentBuilder = new ThreadLocal<DocumentBuilder>(){
+        @Override
+        protected DocumentBuilder initialValue() {
+            try {
+                DocumentBuilder dbuilder = instance.newDocumentBuilder();
+                dbuilder.setEntityResolver(new EntityResolver());
+                dbuilder.setErrorHandler(new ErrorHandler() {
+                    public void error(SAXParseException exception) throws SAXException {
+                        throw exception;
+                    }
+                    public void fatalError(SAXParseException exception) throws SAXException {
+                        throw exception;
+                    }
+                    public void warning(SAXParseException exception) throws SAXException {
+                        throw exception;
+                    }
+                });
+                return dbuilder;
+            } catch (ParserConfigurationException e) {
+                throw new RuntimeException("Can't get document builder instance", e);
+            }
+        }
+    };
 
     final private Map<ConfigType, Map<String, JrdsDocument>> repositories = new HashMap<ConfigType, Map<String, JrdsDocument>>(ConfigType.values().length);
     final private Map<String, ConfigType> nodesTypes = new HashMap<String, ConfigType>(ConfigType.values().length);
+    private final DocumentBuilderFactory instance;
 
     public Loader() throws ParserConfigurationException {
         this(false);
     }
 
     public Loader(boolean strict) throws ParserConfigurationException {
-        DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
+        instance = DocumentBuilderFactory.newInstance();
         //Focus on content, not structure
         instance.setIgnoringComments(true);
         instance.setValidating(strict);
@@ -59,22 +98,7 @@ class Loader {
         instance.setCoalescing(true);
         instance.setExpandEntityReferences(true);
 
-        dbuilder = instance.newDocumentBuilder();
-        dbuilder.setEntityResolver(new EntityResolver());
-        dbuilder.setErrorHandler(new ErrorHandler() {
-            public void error(SAXParseException exception) throws SAXException {
-                throw exception;
-            }
-            public void fatalError(SAXParseException exception) throws SAXException {
-                throw exception;
-            }
-            public void warning(SAXParseException exception) throws SAXException {
-                throw exception;
-            }
-        });
-
         for(ConfigType t: ConfigType.values()) {
-            //A ConcurrentHashMap hash to destroy DOM within the iterator in the ConfigObjectFactory
             repositories.put(t, new ConcurrentHashMap<String, JrdsDocument>());
             nodesTypes.put(t.getRootNode(), t);
         }
@@ -86,12 +110,6 @@ class Loader {
 
     public void setRepository(ConfigType t, Map<String, JrdsDocument> mapnodes) {
         repositories.put(t, mapnodes);
-    }
-
-    public void loadPaths(List<URI> list) {
-        for(URI u: list) {
-            importUrl(u);
-        }
     }
 
     public void importUrl(URI ressourceUri) {
@@ -141,14 +159,7 @@ class Loader {
             else {
                 try {
                     logger.trace("Will import " + f);
-                    if (! importStream(new FileInputStream(f)))
-                        logger.warn("Unknown type for " + f);
-                } catch (FileNotFoundException e) {
-                    logger.error("File not found: " + f);
-                } catch (SAXParseException e) {
-                    logger.error("Invalid xml document " + f + " (line " + e.getLineNumber() + "): " + e.getMessage());
-                } catch (SAXException e) {
-                    logger.error("Invalid xml document " + f  + ": " + e);
+                    importStream(new FileInputStream(f), f);
                 } catch (IOException e) {
                     logger.error("IO error with " + f + ": " + e);
                 }
@@ -163,38 +174,62 @@ class Loader {
             String name = je.getName();
             if( !je.isDirectory() && name.endsWith(".xml") && (name.startsWith("desc/") || name.startsWith("graph/") || name.startsWith("probe/"))) {
                 logger.trace("Will import jar entry " + je);
-                try {
-                    if(! importStream(jarfile.getInputStream(je))) {
-                        logger.warn("Unknown type " + je + " in jar " + jarfile);
-                    }
-                } catch (SAXParseException e) {
-                    logger.error("Invalid xml document " + je + " in " + jarfile + " (line " + e.getLineNumber() + "): " + e.getMessage());
-                } catch (SAXException e) {
-                    logger.error("Invalid xml document " + je + " in " + jarfile + ": " + e);
-                }
+                importStream(jarfile.getInputStream(je), je + " in " + jarfile);
             }
         }
     }
 
-    boolean importStream(InputStream xmlstream) throws SAXException, IOException {
-        JrdsDocument d = new JrdsDocument(dbuilder.parse(xmlstream));
-        ConfigType t = nodesTypes.get(d.getRootElement().getNodeName());
-        if(t == null)
-            return false;
-        logger.trace(Util.delayedFormatString("Found a %s", t));
-        String name = t.getName(d);
-        //We check the Name
-        if(name != null && ! "".equals(name)) {
-            Map<String, JrdsDocument> rep = repositories.get(t);
-            //We warn for dual inclusion, none is loaded, as we don't know the good one
-            if(rep.containsKey(name)) {
-                logger.error("Dual definition of " + t + " with name " + name);
-                rep.remove(name);
+    /**
+     * Schedule within the thread pool a dom parsing
+     * @param xmlstream the xml object to parse
+     * @param source a identifier for the source
+     */
+    void importStream(final InputStream xmlstream, final Object source) {
+        Runnable importer = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JrdsDocument d = new JrdsDocument(localDocumentBuilder.get().parse(xmlstream));
+
+                    ConfigType t = nodesTypes.get(d.getRootElement().getNodeName());
+                    if(t == null) {
+                        logger.error("Invalid type " + d.getRootElement().getNodeName() + " for: " + source);
+                        return;
+                    }
+                    String name = t.getName(d);
+                    logger.trace(Util.delayedFormatString("Found a %s with name %s", t.getRootNode(), name));
+                    //We check the Name
+                    if(name != null && ! "".equals(name)) {
+                        Map<String, JrdsDocument> rep = repositories.get(t);
+                        //We warn for dual inclusion, none is loaded, as we don't know the good one
+                        if(rep.containsKey(name)) {
+                            logger.error("Dual definition of " + t + " with name " + name);
+                            rep.remove(name);
+                        }
+                        else {
+                            rep.put(name, d);
+                        }
+                    }
+                } catch (FileNotFoundException e) {
+                    logger.error("File not found: " + source);
+                } catch (SAXParseException e) {
+                    logger.error("Invalid xml document " + source + " (line " + e.getLineNumber() + "): " + e.getMessage());
+                } catch (SAXException e) {
+                    logger.error("Invalid xml document " + source  + ": " + e);
+                } catch (IOException e) {
+                    logger.error("IO error with " + source + ": " + e);
+                }
             }
-            else {
-                rep.put(name, d);
-            }
+        };
+        tpool.execute(importer);
+    }
+
+    public void done() {
+        tpool.shutdown();
+        try {
+            tpool.awaitTermination(1000, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            logger.error(e);
         }
-        return true;
     }
 }

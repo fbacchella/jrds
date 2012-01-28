@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import jrds.Util;
 import jrds.factories.xml.JrdsElement;
@@ -28,6 +29,7 @@ public final class ArgFactory {
     static private final Logger logger = Logger.getLogger(ArgFactory.class);
 
     static private final String[] argPackages = new String[] {"java.lang.", "java.net.", "org.snmp4j.smi.", "java.io.", ""};
+    static private final Map<String, Class<?>> classCache = new ConcurrentHashMap<String, Class<?>>();
 
     /**
      * This method build a list from an XML enumeration of element.
@@ -71,6 +73,8 @@ public final class ArgFactory {
     }
 
     static final Class<?> resolvClass(String name) {
+        if(classCache.containsKey(name))
+            return classCache.get(name);
         Class<?> retValue = null;
         if("int".equals(name))
             return Integer.TYPE;
@@ -106,6 +110,7 @@ public final class ArgFactory {
         }
         if (retValue == null)
             throw new RuntimeException("Class " + name + " not found");
+        classCache.put(name, retValue);
         return retValue;
     }
 
