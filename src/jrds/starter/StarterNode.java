@@ -130,7 +130,7 @@ public abstract class StarterNode implements StartersSet {
         }
         return find(sc, key);
     }
-    
+
     @SuppressWarnings("unchecked")
     public <StarterClass extends Starter> StarterClass find(String key) {
         return (StarterClass) find(Starter.class, key);        
@@ -185,7 +185,7 @@ public abstract class StarterNode implements StartersSet {
     public StarterNode getParent() {
         return parent;
     }
-    
+
     //Compatibily code
     /**
      * @deprecated
@@ -233,7 +233,7 @@ public abstract class StarterNode implements StartersSet {
     }
 
     public void log(Level l, String format, Object... elements) {
-        jrds.Util.log(this, Logger.getLogger(getClass()),l, null, format, elements);
+        jrds.Util.log(this, Logger.getLogger(getClass()), l, null, format, elements);
     }
 
     /**

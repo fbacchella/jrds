@@ -83,14 +83,14 @@ public class Timer extends StarterNode {
                         try {
                             Timer.this.collectAll();
                         } catch (RuntimeException e) {
-                            Timer.this.log(Level.FATAL,"A fatal error occured during collect: ", e);
+                            Timer.this.log(Level.FATAL, e, "A fatal error occured during collect: %s", e.getMessage());
                         }
                     }
                 };
                 subcollector.start();
             }
         };
-        collectTimer.schedule(collector, Timer.this.getTimeout() * 1000L, Timer.this.getStep() * 1000L);
+        collectTimer.scheduleAtFixedRate(collector, getTimeout() * 1000L, getStep() * 1000L);
     }
 
     public void collectAll() {

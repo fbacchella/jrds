@@ -1,9 +1,3 @@
-/*##########################################################################
-_##
-_##  $Id: ProcessInfo.java 321 2006-08-14 14:03:04 +0000 (lun., 14 août 2006) fbacchella $
-_##
-_##########################################################################*/
-
 package jrds.probe.snmp;
 
 import java.util.ArrayList;
@@ -23,11 +17,9 @@ import org.apache.log4j.Level;
 import org.rrd4j.core.Sample;
 import org.snmp4j.smi.OID;
 
-
 /**
  * A class to probe info about a process, using MIB-II
  * @author Fabrice Bacchella 
- * @version $Revision: 321 $,  $Date: 2006-08-14 14:03:04 +0000 (lun., 14 août 2006) $
  */
 @ProbeBean({"index",  "pattern"})
 public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
@@ -75,7 +67,6 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
         return retValue;
     }
 
-    @SuppressWarnings("unchecked")
     public Collection<int[]> getProcsOID() {
         boolean found = false;
         Collection<OID> soidSet= getIndexSet();

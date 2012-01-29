@@ -47,13 +47,12 @@ public enum SnmpRequester {
      *  A requester used to read an array of oid
      */
     TABULAR() {
-        @SuppressWarnings("unchecked")
         @Override
         public Map<OID, Object> doSnmpGet(SnmpConnection cnx, Collection<OID> oids) {
 
             Target snmpTarget = cnx.getConnection();
             Snmp snmp = cnx.getSnmp();
-            
+
             if(cnx.isStarted() && snmpTarget != null && snmp != null) {
                 TableUtils tableRet = new TableUtils(snmp, cnx.getPdufactory());
                 tableRet.setMaxNumColumnsPerPDU(30);
@@ -87,7 +86,6 @@ public enum SnmpRequester {
                 SnmpVars retValue = new SnmpVars();
                 TreeUtils treeRet = new TreeUtils(snmp, cnx.getPdufactory());
                 for(OID rootOid : oids) {
-                    @SuppressWarnings("unchecked")
                     List<TreeEvent> subOids = treeRet.getSubtree(snmpTarget, rootOid);
                     for(TreeEvent te: subOids) {
                         retValue.join(te.getVariableBindings());
@@ -129,7 +127,7 @@ public enum SnmpRequester {
         Map<OID, Object> snmpVars = Collections.emptyMap();
 
         Target snmpTarget = cnx.getConnection();
-        
+
         PDU requestPDU = cnx.getPdufactory().createPDU(snmpTarget);
         requestPDU.addAll(vars);
 
@@ -168,5 +166,5 @@ public enum SnmpRequester {
         };
         return snmpVars;
     }
-    
+
 }

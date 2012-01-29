@@ -331,7 +331,7 @@ public class PropertiesManager extends Properties {
                 TimerInfo ti = new TimerInfo();
                 ti.step = parseInteger(getProperty("timer." + timerName + ".step", Integer.toString(step)));
                 ti.timeout = parseInteger(getProperty("timer." + timerName + ".timeout", Integer.toString(timeout)));
-                ti.numCollectors = parseInteger(getProperty("timer." + timerName + ".numCollectors", Integer.toString(numCollectors)));
+                ti.numCollectors = parseInteger(getProperty("timer." + timerName + ".collectorThreads", Integer.toString(numCollectors)));
 
                 timers.put(timerName, ti);
             }

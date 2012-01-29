@@ -151,7 +151,7 @@ public class HostsList extends StarterNode {
                     try {
                         addProbe(p);
                     } catch (Exception e) {
-                        log(Level.ERROR, e, "Error inserting probe " + p);
+                        log(Level.ERROR, e, "Error inserting probe " + p + ": " + e.getMessage());
                     }
                 }
             }
