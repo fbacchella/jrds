@@ -20,76 +20,62 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestFilter {
-	static final private Logger logger = Logger.getLogger(TestSum.class);
+    static final private Logger logger = Logger.getLogger(TestSum.class);
 
-	static final private String goodFilterXml =
-		"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
-		"<!DOCTYPE filter PUBLIC \"-//jrds//DTD Filter//EN\" \"urn:jrds:filter\">" +
-		"<filter>" +
-		"<name>filtername</name>" +
-		"</filter>";
+    static final private String goodFilterXml =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+            "<!DOCTYPE filter PUBLIC \"-//jrds//DTD Filter//EN\" \"urn:jrds:filter\">" +
+            "<filter>" +
+            "<name>filtername</name>" +
+            "</filter>";
 
-	static private ConfigObjectFactory conf;
-	static private PropertiesManager pm = new PropertiesManager();
+    @BeforeClass
+    static public void configure() throws ParserConfigurationException, IOException {
+        Tools.configure();
+        Tools.prepareXml(false);
 
-	@BeforeClass
-	static public void configure() throws ParserConfigurationException, IOException {
-		Tools.configure();
-		Tools.prepareXml(false);
+        logger.setLevel(Level.TRACE);
+        Tools.setLevel(logger, Level.TRACE, "jrds.factories", "jrds.Filter", "jrds.FilterXml");
+        Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
+    }
 
-		pm.setProperty("configdir", "tmp/empty");
-		pm.setProperty("strictparsing", "true");
-        pm.setProperty("autocreate", "true");
-		pm.setProperty("rrddir", "tmp");
-		pm.setProperty("security", "yes");
-		pm.update();
+    private Filter doFilter(JrdsDocument d) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
+        FilterBuilder sm = new FilterBuilder();
+        sm.setPm(Tools.makePm("security=true"));
+        Filter sp = sm.makeFilter(d);
 
-		conf = new ConfigObjectFactory(pm);
-		conf.setGraphDescMap();
-		conf.setProbeDescMap();
+        return sp;
+    }
 
-		logger.setLevel(Level.TRACE);
-		Tools.setLevel(logger, Level.TRACE, "jrds.factories", "jrds.Filter", "jrds.FilterXml");
-		Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
-	}
-	
-	private Filter doFilter(JrdsDocument d) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-		FilterBuilder sm = new FilterBuilder();
-		sm.setPm(pm);
-		Filter sp = sm.makeFilter(d);
-		
-		return sp;
-	}
-	
-	@Test
-	public void testLoad() throws Exception {
-		JrdsDocument d = Tools.parseString(goodFilterXml);
-		JrdsElement je = d.getRootElement();
-		je.addElement("path").setTextContent("^.*$");
-		Filter f = doFilter(d);
-		
-		Assert.assertEquals("Filter name not match", f.getName(), "filtername");
-	}
+    @Test
+    public void testLoad() throws Exception {
+        JrdsDocument d = Tools.parseString(goodFilterXml);
+        JrdsElement je = d.getRootElement();
+        je.addElement("path").setTextContent("^.*$");
+        Filter f = doFilter(d);
 
-	@Test
-	public void testACL() throws Exception {
-	    JrdsDocument d = Tools.parseString(goodFilterXml);
-		JrdsElement je = d.getRootElement();
-		je.addElement("role").setTextContent("role1");
-		je.addElement("path").setTextContent("^.*$");
-		Filter f = doFilter(d);
-		
-		ACL acl = f.getACL();
-		Assert.assertEquals("Not an role ACL", RolesACL.class, acl.getClass());
-	}
-	
-	@Test
-	public void testFullConfigpath() throws Exception {
-	    PropertiesManager localpm = Tools.getEmptyProperties();
-        ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
+        Assert.assertEquals("Filter name not match", f.getName(), "filtername");
+    }
+
+    @Test
+    public void testACL() throws Exception {
+        JrdsDocument d = Tools.parseString(goodFilterXml);
+        JrdsElement je = d.getRootElement();
+        je.addElement("role").setTextContent("role1");
+        je.addElement("path").setTextContent("^.*$");
+        Filter f = doFilter(d);
+
+        ACL acl = f.getACL();
+        Assert.assertEquals("Not an role ACL", RolesACL.class, acl.getClass());
+    }
+
+    @Test
+    public void testFullConfigpath() throws Exception {
+        PropertiesManager localpm = Tools.makePm();
+        ConfigObjectFactory conf = new ConfigObjectFactory(localpm);
         conf.getNodeMap(ConfigType.FILTER).put("filtername", Tools.parseString(goodFilterXml));
-        
+
         Assert.assertNotNull("Filter not build", conf.setFilterMap().get("filtername"));
-	}
+    }
 
 }

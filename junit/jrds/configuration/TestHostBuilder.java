@@ -41,7 +41,7 @@ public class TestHostBuilder {
 
     @Test
     public void testFullConfigpath() throws Exception {
-        PropertiesManager localpm = Tools.getEmptyProperties();
+        PropertiesManager localpm = Tools.makePm();
         JrdsDocument host = new JrdsDocument(Tools.dbuilder.newDocument());
         host.doRootElement("host", "name=name");
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
@@ -50,8 +50,8 @@ public class TestHostBuilder {
     }
 
     @Test
-    public void testNewProbe() throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
-        PropertiesManager localpm = Tools.getEmptyProperties();
+    public void testNewProbe() throws InvocationTargetException, IllegalArgumentException, IllegalAccessException, IOException {
+        PropertiesManager localpm = Tools.makePm();
 
         HostBuilder hb = new HostBuilder();
         //Generate a probe with a bean hostInfo with a default value of ${host}
@@ -91,7 +91,7 @@ public class TestHostBuilder {
 
     @Test
     public void testConnectionInfo() throws Exception {
-        PropertiesManager pm = Tools.getEmptyProperties();
+        PropertiesManager pm = Tools.makePm();
 
         HostBuilder hb = new HostBuilder();
         hb.setPm(pm);

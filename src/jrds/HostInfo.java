@@ -1,21 +1,14 @@
 package jrds;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
 import jrds.starter.ConnectionInfo;
-import jrds.starter.HostStarter;
-import jrds.starter.StarterNode;
 
 public class HostInfo {
-    static final private Logger logger = Logger.getLogger(HostInfo.class);
 
     private String name = null;
     private String dnsName = null;
@@ -109,48 +102,25 @@ public class HostInfo {
     public void addConnection(ConnectionInfo cnx) {
         cnxList.put(cnx.getName(), cnx);
     }
-    
+
     public Iterable<ConnectionInfo> getConnections() {
-        return new Iterable<ConnectionInfo>() {
-            @Override
-            public Iterator<ConnectionInfo> iterator() {
-                return cnxList.values().iterator();
-            }
-        };        
+        return cnxList.values();
     }
-    
+
     public ConnectionInfo getConnection(String name) {
         return cnxList.get(name);
     }
-    
+
     public void addProbe(Probe<?,?> p) {
         probesList.add(p);
     }
-    
+
     public Iterable<Probe<?,?>> getProbes() {
-        return new Iterable<Probe<?,?>>() {
-            @Override
-            public Iterator<Probe<?,?>> iterator() {
-                return probesList.iterator();
-            }
-        };
-    }
-    
-    public int getNumProbes() {
-        return probesList.size();
+        return probesList;
     }
 
-    public HostStarter makeHost(StarterNode top) {
-        HostStarter hs = new HostStarter(this);
-        hs.setParent(top);
-        for(ConnectionInfo cnx: cnxList.values()) {
-            try {
-                cnx.register(hs);
-            } catch (InvocationTargetException e) {
-                logger.error("Can instantiate connection " + cnx.getName());
-            }
-        }
-        return hs;
+    public int getNumProbes() {
+        return probesList.size();
     }
 
     /* (non-Javadoc)
@@ -160,5 +130,5 @@ public class HostInfo {
     public String toString() {
         return name;
     }
-    
+
 }

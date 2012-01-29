@@ -18,10 +18,15 @@ import junit.framework.Assert;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestBeans {
     static final private Logger logger = Logger.getLogger(TestBeans.class);
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
@@ -29,14 +34,15 @@ public class TestBeans {
         logger.setLevel(Level.DEBUG);
         Tools.setLevel(logger, Level.TRACE, "jrds.Util");
     }
-    
+
     @Test
-    public void enumerateProbe() {
-        PropertiesManager pm = new PropertiesManager();
+    public void enumerateProbe() throws IOException {
+        PropertiesManager pm = Tools.makePm(testFolder, "autocreate=false", "strictparsing=true");
+        // = new PropertiesManager();
         pm.update();
         pm.libspath.clear();
-        pm.strictparsing = true;
-        pm.rrdbackend = "FILE";
+        //pm.strictparsing = true;
+        //pm.rrdbackend = "FILE";
         File descpath = new File("desc");
         if(descpath.exists())
             pm.libspath.add(descpath.toURI());

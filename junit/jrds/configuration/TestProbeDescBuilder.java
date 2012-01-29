@@ -29,15 +29,15 @@ public class TestProbeDescBuilder {
 
     @Test
     public void testFullConfigpath() throws Exception {
-        PropertiesManager localpm = Tools.getEmptyProperties();
+        PropertiesManager localpm = Tools.makePm();
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
         conf.getNodeMap(ConfigType.PROBEDESC).put("name", Tools.parseRessource("httpxmlprobedesc.xml"));
         Assert.assertNotNull("Probedesc not build", conf.setProbeDescMap().get("name"));
     }
-    
+
     @Test
     public void testDefaultArgs() throws Exception {
-        PropertiesManager localpm = Tools.getEmptyProperties();
+        PropertiesManager localpm = Tools.makePm();
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
         JrdsDocument pddoc = Tools.parseRessource("fulldesc.xml");
         pddoc.getRootElement().getElementbyName("probeClass").setTextContent("jrds.mockobjects.MokeProbeBean");

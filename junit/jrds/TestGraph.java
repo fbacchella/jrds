@@ -12,15 +12,15 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class GraphTest {
-    static final Logger logger = Logger.getLogger(GraphTest.class);
+public class TestGraph {
+    static final Logger logger = Logger.getLogger(TestGraph.class);
     static HostsList hl;
 
     @BeforeClass
     static public void configure() throws IOException, URISyntaxException {
         Tools.configure();
         Tools.setLevel(logger, Level.ERROR, "jrds.Graph");
-        PropertiesManager pm = Tools.getCleanPM();
+        PropertiesManager pm = Tools.makePm();
         hl = new HostsList(pm);
     }
 

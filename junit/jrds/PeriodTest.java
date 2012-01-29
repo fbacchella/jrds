@@ -32,10 +32,10 @@ public class PeriodTest {
     public void empty() {
         Date now = new Date();
         Period p = new Period();
-        logger.trace("7" + " == " + p.getScale());
         Assert.assertTrue(p.getEnd().compareTo(now) >= 0);
         Assert.assertEquals(new Integer(7), new Integer(p.getScale()));
     }
+    
     @Test
     public void scale() {
         Date now = new Date();

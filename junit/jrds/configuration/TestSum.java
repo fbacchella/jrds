@@ -4,9 +4,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.HostsList;
-import jrds.PropertiesManager;
 import jrds.HostInfo;
+import jrds.HostsList;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
@@ -20,7 +19,9 @@ import junit.framework.Assert;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.w3c.dom.Document;
 
 public class TestSum {
@@ -32,23 +33,14 @@ public class TestSum {
                     "<sum name=\"sumname\">" +
                     "</sum>";
 
-    static private ConfigObjectFactory conf;
-    static private final PropertiesManager pm = new PropertiesManager();
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.prepareXml(false);
-
-        pm.setProperty("configdir", "tmp");
-        pm.setProperty("rrddir", "tmp");
-        pm.setProperty("security", "true");
-        pm.update();
-        pm.libspath.clear();
-
-        conf = new ConfigObjectFactory(pm);
-        conf.setGraphDescMap();
-        conf.setProbeDescMap();
 
         Tools.setLevel(logger, Level.TRACE, "jrds.factories", "jrds.probe.SumProbe","jrds.graphe.Sum");
         Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
@@ -58,7 +50,7 @@ public class TestSum {
         HostInfo host = new HostInfo("SumHost");
 
         SumBuilder sm = new SumBuilder();
-        sm.setPm(pm);
+        sm.setPm(Tools.makePm(testFolder, "security=yes"));
         Sum sp = sm.makeSum(d);
         sp.configure(hl);
         sp.getProbe().setHost(new HostStarter(host));

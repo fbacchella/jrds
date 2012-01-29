@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE host PUBLIC "-//jrds//DTD Host//EN"
+                           "urn:jrds:host">
+<host name="myhost" dnsName="fqnd.jrds.fr">
+    <tag>a tag</tag>
+    <snmp community="public" version="2" />
+    <connection type="connection1">
+        <attr name="community">public</attr>
+        <attr name="version">2</attr>
+    </connection>
+    <probe type="TcpSnmp">
+        <connection type="jrds.snmp.SnmpConnection">
+            <attr name="community">public</attr>
+            <attr name="version">2</attr>
+        </connection>
+    </probe>
+    <probe type="probeType" timer="another" />
+    <probe type="probeType2" timer="another">
+        <list>
+            <arg type="Integer">1</arg>
+            <arg type="String">2</arg>
+        </list>
+    </probe>
+    <probe type="probeType3">
+        <attr name="attr1"></attr>
+    </probe>
+    <collection name="partitions">
+        <element>/</element>
+        <element>/data</element>
+    </collection>
+    <for var="i" collection="partitions">
+        <probe type="PartitionSpace">
+            <arg type="String" value="${i}" />
+        </probe>
+    </for>
+    <for var="i" min="0" max="3" step="1">
+        <probe type="IfXSnmp">
+            <arg type="String">eth${i}</arg>
+        </probe>
+    </for>
+    <macro name="macro" />
+</host>

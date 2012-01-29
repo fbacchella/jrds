@@ -19,7 +19,7 @@ import org.junit.Test;
 public class TestTab {
     static final private Logger logger = Logger.getLogger(TestTab.class);
 
-    static final private PropertiesManager pm = new PropertiesManager();
+    static private PropertiesManager pm = null;
     static final private HostsList hl = new HostsList();
 
     @BeforeClass
@@ -27,12 +27,7 @@ public class TestTab {
         Tools.configure();
         Tools.prepareXml(true);
 
-        pm.setProperty("configdir", "tmp/conf");
-        pm.setProperty("rrddir", "tmp");
-        pm.setProperty("security", "true");
-        pm.setProperty("strictparsing", "true");
-        pm.update();
-        pm.libspath.clear();
+        pm = Tools.makePm("security=true");
 
         hl.configure(pm);
 

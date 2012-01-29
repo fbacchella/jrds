@@ -19,7 +19,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
@@ -37,6 +39,9 @@ public class TestGraphDescBuilder {
         }
     };
 
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
@@ -45,23 +50,20 @@ public class TestGraphDescBuilder {
         Tools.setLevel(Level.INFO,"jrds.factories.xml.CompiledXPath");
 
         Tools.prepareXml();
-        PropertiesManager pm = new PropertiesManager();
-        pm.setProperty("configdir", "tmp");
-        pm.setProperty("rrddir", "tmp");
-        pm.update();
     }
 
     @Test
     public void testGraphDesc() throws Exception {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
-        gdbuild.setPm(new PropertiesManager());
+        gdbuild.setPm(Tools.makePm());
         GraphDesc gd = gdbuild.makeGraphDesc(d);
         if(logger.isTraceEnabled()) {
             Document gddom = gd.dumpAsXml();
             jrds.Util.serialize(gddom, System.out, null, null);
         }
         MokeProbe<String, Number> p = new MokeProbe<String, Number>();
+        p.getHost().setHostDir(testFolder.getRoot());
 
         ProbeDesc pd = p.getPd();
 
@@ -101,7 +103,7 @@ public class TestGraphDescBuilder {
     public void testCustomGraph() throws Exception {
         JrdsDocument d = Tools.parseRessource("customgraph.xml");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
-        gdbuild.setPm(new PropertiesManager());
+        gdbuild.setPm(Tools.makePm());
         GraphDesc gd = gdbuild.makeGraphDesc(d);
         Assert.assertEquals("graph name failed", "graphName", gd.getGraphName());
         Assert.assertEquals("graph title failed", "", gd.getGraphTitle());
@@ -117,8 +119,8 @@ public class TestGraphDescBuilder {
 
     @Test
     public void testFullConfigpath() throws Exception {
-        PropertiesManager localpm = Tools.getEmptyProperties();
-        ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
+        PropertiesManager localpm = Tools.makePm();
+        ConfigObjectFactory conf = new ConfigObjectFactory(localpm);
         conf.getNodeMap(ConfigType.GRAPHDESC).put("graphdesc", Tools.parseRessource("graphdesc.xml"));
         Assert.assertNotNull("Graphdesc not build", conf.setGraphDescMap().get("name"));
     }

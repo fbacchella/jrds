@@ -25,7 +25,7 @@
 		type CDATA #REQUIRED
 		name CDATA #IMPLIED
 >
-<!ELEMENT probe (attr*,(arg|list)*, dslist?, threshold*) >
+<!ELEMENT probe (attr*,(arg|list)*, connection?, dslist?, threshold*) >
 <!ATTLIST probe
 			type CDATA #REQUIRED
 			label CDATA #IMPLIED

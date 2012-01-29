@@ -1,11 +1,11 @@
 package jrds;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map;
 
 import jrds.starter.ConnectionInfo;
 import jrds.starter.HostStarter;
-import jrds.starter.StarterNode;
 import junit.framework.Assert;
 
 import org.apache.log4j.Level;
@@ -23,14 +23,14 @@ public class TestHostInfo {
     }
     
     @Test
-    public void instantiate() {
+    public void instantiate() throws InvocationTargetException {
         Map<String, String> empty = Collections.emptyMap();
         ConnectionInfo ci = new ConnectionInfo(jrds.snmp.SnmpConnection.class, "jrds.snmp.SnmpConnection", Collections.emptyList(), empty);
-        StarterNode sn = new StarterNode() {};
         
         HostInfo hi = new HostInfo("localhost");
         hi.addConnection(ci);
-        HostStarter hs = hi.makeHost(sn);
+        HostStarter hs = new HostStarter(hi);
+        ci.register(hs);
         Assert.assertEquals("connection not found", "snmp:udp://localhost:161", hs.find(jrds.snmp.SnmpConnection.class).toString());
     }
 

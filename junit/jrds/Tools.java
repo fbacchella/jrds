@@ -7,12 +7,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Random;
 
 import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
@@ -57,24 +55,7 @@ final public class Tools {
     }
 
     static public void prepareXml() throws ParserConfigurationException {
-        DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
-        instance.setIgnoringComments(true);
-        instance.setValidating(true);
-        instance.setExpandEntityReferences(false);
-        dbuilder = instance.newDocumentBuilder();
-        dbuilder.setEntityResolver(new EntityResolver());
-        dbuilder.setErrorHandler(new ErrorHandler() {
-            public void error(SAXParseException exception) throws SAXException {
-                throw exception;
-            }
-            public void fatalError(SAXParseException exception) throws SAXException {
-                throw exception;
-            }
-            public void warning(SAXParseException exception) throws SAXException {
-                throw exception;
-            }
-        });
-        xpather = XPathFactory.newInstance().newXPath();
+        prepareXml(true);
     }
 
     static public void prepareXml(boolean validating) throws ParserConfigurationException {
@@ -214,38 +195,9 @@ final public class Tools {
         return logs;
     }
 
-    static private final String[] dirs = new String[] {"configdir", "rrddir", "tmpdir"};
-    static private final Random r = new Random();
-    
-    static public final PropertiesManager getCleanPM() {
-        File newtmpdir = new File(System.getProperty("java.io.tmpdir"), "jrds" + r.nextInt());;
-        PropertiesManager pm = new PropertiesManager();
-        Map<String, File> dirMap = new HashMap<String, File>(dirs.length);
-        for(String dirname: dirs) {
-            File dir = new File(newtmpdir, dirname);;
-            pm.setProperty(dirname, dir.getPath());
-            dirMap.put(dirname, dir);
-        }
-        pm.setProperty("autocreate", "true");
-        return pm;
-    }
+    static private final PropertiesManager finishPm(PropertiesManager pm, String... props) {
+        pm.setProperty("strictparsing", "true");
 
-    static public final void shortPM(PropertiesManager pm) {
-        pm.setProperty("configdir", "tmp/config");
-        pm.setProperty("rrddir", "tmp");
-        pm.setProperty("strictparsing", "true");
-        pm.setProperty("autocreate", "true");
-        pm.update();
-        pm.libspath.clear();
-    }
-    
-    static public final PropertiesManager makePm(TemporaryFolder testFolder, String... props) throws IOException {
-        PropertiesManager pm = new PropertiesManager();
-        pm.setProperty("tmpdir", testFolder.newFolder("tmp").getCanonicalPath());
-        pm.setProperty("configdir", testFolder.newFolder("config").getCanonicalPath());
-        pm.setProperty("rrddir", testFolder.newFolder("rrddir").getCanonicalPath());
-        pm.setProperty("strictparsing", "true");
-        pm.setProperty("autocreate", "true");
         pm.setProperty("tabs", "hoststab");
         for(String prop: props) {
             int pos = prop.indexOf('=');
@@ -257,21 +209,30 @@ final public class Tools {
         }
         pm.update();
         pm.libspath.clear();
-        
+
         return pm;
     }
 
-    static public final PropertiesManager getEmptyProperties() {
+    static public final PropertiesManager makePm(String... props) throws IOException {
         PropertiesManager pm = new PropertiesManager();
-        pm.update();
-        pm.configdir = null;
-        pm.strictparsing = true;
-        pm.loglevel = Level.ERROR;
-        pm.extensionClassLoader = PropertiesManager.class.getClassLoader();
-        pm.libspath.clear();
-        return pm;
+        pm.setProperty("tmpdir", new File("tmp").getPath());
+        pm.setProperty("configdir", new File("tmp").getPath());
+        pm.setProperty("rrddir", new File("tmp").getPath());
+        pm.setProperty("autocreate", "false");
+
+        return finishPm(pm, props);
     }
-    
+
+    static public final PropertiesManager makePm(TemporaryFolder testFolder, String... props) throws IOException {
+        PropertiesManager pm = new PropertiesManager();
+        pm.setProperty("tmpdir", testFolder.newFolder("tmp").getCanonicalPath());
+        pm.setProperty("configdir", testFolder.newFolder("config").getCanonicalPath());
+        pm.setProperty("rrddir", testFolder.newFolder("rrddir").getCanonicalPath());
+        pm.setProperty("autocreate", "true");
+
+        return finishPm(pm, props);
+    }
+
     static public final Map<String, Timer> getSimpleTimerMap() {
         PropertiesManager.TimerInfo ti = new PropertiesManager.TimerInfo();
         ti.numCollectors = 1;
