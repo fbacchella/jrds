@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import jrds.ProbeDesc;
+import jrds.Util;
 import jrds.factories.ProbeMeta;
 import jrds.starter.XmlProvider;
 
@@ -92,7 +93,7 @@ public class HttpXml extends HCHttpProbe {
         for(Map.Entry<String, String> e:getPd().getCollectStrings().entrySet()) {
             String xpath = e.getKey();
             String dsName = e.getValue();
-            String solved = String.format(xpath, args.toArray());
+            String solved = Util.parseTemplate(String.format(xpath, args.toArray()), this, args);
             xpaths.add(solved);
             collectKeys.put(solved, dsName);
         }

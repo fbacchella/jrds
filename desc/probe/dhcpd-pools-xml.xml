@@ -8,12 +8,12 @@
 	<ds>
 		<dsName>used</dsName>
 		<dsType>gauge</dsType>
-		<collect>/dhcpstatus/subnet[range='%1$s']/used</collect>
+		<collect>/dhcpstatus/subnet[range="{$1}"]/used</collect>
 	</ds>
 	<ds>
 		<dsName>free</dsName>
 		<dsType>gauge</dsType>
-		<collect>/dhcpstatus/subnet[range='%1$s']/free</collect>
+		<collect>/dhcpstatus/subnet[range="{$1}"]/free</collect>
 	</ds>
 	<graphs>
 		<name>DhcpdPools</name>

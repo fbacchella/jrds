@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.Probe;
+import jrds.Util;
 import jrds.factories.ProbeBean;
 import jrds.starter.Resolver;
 import jrds.starter.Starter;
@@ -98,7 +99,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
                 if(argslist != null) {
                     try {
                         String urlString = String.format("http://" + urlhost + ":" + port + file, argslist.toArray());
-                        url = new URL(urlString);
+                        url = new URL(Util.parseTemplate(urlString, getHost(), argslist));
                     } catch (IllegalFormatConversionException e) {
                         log(Level.ERROR, "Illegal format string: http://%s:%d%s, args %d", urlhost, port, file, argslist.size());
                         return false;
@@ -108,7 +109,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
                     url = new URL("http", urlhost, port, file);
                 }
             } catch (MalformedURLException e) {
-                log(Level.ERROR, e, "URL http://%s:%s%s is invalid", urlhost, port, file);
+                log(Level.ERROR, e, "URL 'http://%s:%s%s' is invalid", urlhost, port, file);
                 return false;
             }
         }
