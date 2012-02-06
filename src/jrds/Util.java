@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UnknownFormatConversionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,9 +65,6 @@ public class Util {
     private static final String BASE64_CHARS =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+_=";
     private static final char[] BASE64_CHARSET = BASE64_CHARS.toCharArray();
-
-    private static final Pattern varregexp = Pattern.compile("(.*?)\\$\\{([\\w\\.-]+)\\}(.*)");
-    private static final Pattern oldvarregexp = Pattern.compile("(.*?[^\\$])??\\{(\\d+)\\}(.*)");
 
     /**
      * The SI prefix as an enumeration, with factor provided.<p/>
@@ -232,113 +230,80 @@ public class Util {
         return org.rrd4j.core.Util.getDate(org.rrd4j.core.Util.normalize(timestamp, step));
     }
 
-    /**
-     * Evaluate a string containing variables in the form ${varname}
-     * 
-     * variable is map of variable name pointing to object that will be evaluted
-     * with their toString method to get variable names
-     * 
-     * Any variable starting with system. is a system property
-     * @param in
-     * @param variables
-     * @param props
-     * @return
-     */
-    public static String evaluateVariables(String in, Map<String, Object> variables) {
-        Matcher m = varregexp.matcher(in);
-        if(m.find()) {
-            StringBuilder out = new StringBuilder();
-            if(m.groupCount() == 3) {
-                String before = m.group(1);
-                String var = m.group(2);
-                String after = m.group(3);
-                out.append(before);
-                String toAppend = null;
-                if(var.startsWith("system.")) {
-                    toAppend = System.getProperty(var.replace("system.", ""));
-                }
-                else if(variables.containsKey(var)) {
-                    toAppend = variables.get(var).toString();
-                }
-                if(toAppend == null) {
-                    toAppend = "${" + var + "}";
-                }
-                out.append(toAppend);
-                if(after.length() > 0)
-                    out.append(evaluateVariables(after, variables));
-                return out.toString();
-            }
-        }
-        return in;
-    }
+    private static final Pattern varregexp = Pattern.compile("(.*?)(\\$\\{([\\w\\.-]+)\\}|%)(.*)");
+    private static final Pattern oldvarregexp = Pattern.compile("(.*?[^\\$])??\\{(\\d+)\\}(.*)");
 
     static private final Pattern digit = Pattern.compile("\\d+");
     static private final Pattern attrSignature = Pattern.compile("attr\\.(.*)\\.signature");
     static private final Pattern attr = Pattern.compile("attr\\.(.*)");
 
-    static String findVariables(String in, int index, Map<String, Integer> indexes, Object... arguments) {
+    static private final String findVariables(String in, int index, Map<String, Integer> indexes, Object... arguments) {
         Matcher m = varregexp.matcher(in);
         if(m.find()) {
             StringBuilder out = new StringBuilder();
-            if(m.groupCount() == 3) {
-                String before = m.group(1);
-                String var = m.group(2);
-                String after = m.group(3);
-                out.append(before);
-                String toAppend = null;
-                Matcher varMatcher;
-                //The variable referring to a system variable are directly resolved
-                if(var.startsWith("system.")) {
-                    toAppend = System.getProperty(var.replace("system.", ""));
-                }
-                else if(digit.matcher(var).matches()) {
-                    for(Object o: arguments) {
-                        if(o instanceof List) {
-                            List <?> l = (List<?>)o;
-                            toAppend = l.get(Integer.parseInt(var) - 1).toString();
-                            break;
-                        }
-                    }
-                }
-                //bean signatures are directly resolved
-                else if((varMatcher=attrSignature.matcher(var)).matches()) {
-                    String beanName = varMatcher.group(1);
-                    for(Object o: arguments) {
-                        try {
-                            PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
-                            Method read = bean.getReadMethod();
-                            if(read != null)
-                                toAppend = stringSignature(read.invoke(o).toString());
-                            break;
-                        } catch (Exception e) {
-                        }
-                    }
-                }
-                //beans are directly resolved
-                else if((varMatcher=attr.matcher(var)).matches()) {
-                    String beanName = varMatcher.group(1);
-                    for(Object o: arguments) {
-                        try {
-                            PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
-                            toAppend = bean.getReadMethod().invoke(o).toString();
-                            break;
-                        } catch (Exception e) {
-                        }
-                    }
-                }
-                //Common case, replace the variable with it's index, for MessageFormat
-                else  {
-                    if(! indexes.containsKey(var)) {
-                        indexes.put(var, index++);
-                    };
-                    int slot = indexes.get(var) + 1;
-                    toAppend = "%"  + Integer.toString(slot) + "$s";
-                }
-                out.append(toAppend);
-                if(after.length() > 0)
-                    out.append(findVariables(after, index, indexes));
-                return out.toString();
+            String before = m.group(1);
+            String percent = m.group(2);
+            String var = m.group(3);
+            String after = m.group(4);
+            out.append(before);
+            String toAppend = null;
+            Matcher varMatcher;
+            //We just found a lonely %, replace it with %% for latter String.format
+            if("%".equals(percent)) {
+                toAppend = "%%";
             }
+            //The variable referring to a system variable are directly resolved
+            else if(var.startsWith("system.")) {
+                toAppend = System.getProperty(var.replace("system.", ""));
+            }
+            //We found a ${\d+}, directly resolve with the first list argument
+            else if(digit.matcher(var).matches()) {
+                for(Object o: arguments) {
+                    if(o instanceof List) {
+                        List <?> l = (List<?>)o;
+                        toAppend = l.get(Integer.parseInt(var) - 1).toString();
+                        break;
+                    }
+                }
+            }
+            //bean signatures are directly resolved
+            else if((varMatcher=attrSignature.matcher(var)).matches()) {
+                String beanName = varMatcher.group(1);
+                for(Object o: arguments) {
+                    try {
+                        PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
+                        Method read = bean.getReadMethod();
+                        if(read != null)
+                            toAppend = stringSignature(read.invoke(o).toString());
+                        break;
+                    } catch (Exception e) {
+                    }
+                }
+            }
+            //beans are directly resolved
+            else if((varMatcher=attr.matcher(var)).matches()) {
+                String beanName = varMatcher.group(1);
+                for(Object o: arguments) {
+                    try {
+                        PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
+                        toAppend = bean.getReadMethod().invoke(o).toString();
+                        break;
+                    } catch (Exception e) {
+                    }
+                }
+            }
+            //Common case, replace the variable with it's index, for MessageFormat
+            else  {
+                if(! indexes.containsKey(var)) {
+                    indexes.put(var, index++);
+                };
+                int slot = indexes.get(var) + 1;
+                toAppend = "%"  + Integer.toString(slot) + "$s";
+            }
+            out.append(toAppend);
+            if(after.length() > 0)
+                out.append(findVariables(after, index, indexes));
+            return out.toString();
         }
         return in;
     }
@@ -471,7 +436,7 @@ public class Util {
         }
     }
 
-    public static String parseTemplate(String template, Object... arguments) {
+    public static final String parseTemplate(String template, Object... arguments) {
         //Don't lose time with an empty template
         if(template == null || "".equals(template.trim())) {
             return template;
@@ -531,7 +496,12 @@ public class Util {
                 }
             }
         }
-        return String.format(message, values);
+        try {
+            return String.format(message, values);
+        } catch (UnknownFormatConversionException e) {
+            logger.error("Unable for format " + message);
+            throw e;
+        }
     }
 
     /**

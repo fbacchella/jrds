@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -151,43 +150,6 @@ public class UtilTest {
         Assert.assertEquals(1.0,n , 0.001);
     }
 
-    @SuppressWarnings("unchecked")
-    @Test
-    public void evaluateVariable1() {
-        System.setProperty("jrds.unittest", "true");
-        String evaluated = Util.evaluateVariables("${system.jrds.unittest}", Collections.EMPTY_MAP);
-        Assert.assertEquals("true", evaluated);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Test
-    public void evaluateVariable2() {
-        System.setProperty("jrds.unittest", "true");
-        String evaluated = Util.evaluateVariables("${novar}", Collections.EMPTY_MAP);
-        Assert.assertEquals("${novar}", evaluated);
-    }
-
-    @Test
-    public void evaluateVariable3() {
-        Map<String, Object> var = new HashMap<String, Object>();
-
-        var.put("a", "v1");
-        var.put("b", 1);
-
-        String evaluated = Util.evaluateVariables("'${a}' ${b}", var);
-        Assert.assertEquals("'v1' 1", evaluated);
-    }
-
-    @Test
-    public void evaluateVariable4() {
-        Map<String, Object> var = new HashMap<String, Object>();
-
-        var.put("FSID", "248ba235");
-
-        String evaluated = Util.evaluateVariables("C:\\ Label:  Serial Number ${FSID}", var);
-        Assert.assertEquals("C:\\ Label:  Serial Number 248ba235", evaluated);
-    }
-
     @Test
     public void testParseOldTemplate1() {
         Probe<?,?> p = new MokeProbe<String, Number>();
@@ -239,6 +201,12 @@ public class UtilTest {
 
         String parsed = Util.parseTemplate("${1}", args);
         Assert.assertEquals("unittest", parsed);
+    }
+
+    @Test
+    public void testParseTemplate4() {
+        String parsed = Util.parseTemplate("%string");
+        Assert.assertEquals("%string", parsed);
     }
 
     @Test
