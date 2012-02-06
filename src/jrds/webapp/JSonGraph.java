@@ -33,7 +33,7 @@ public class JSonGraph extends JSonData {
         }
 
         List<GraphNode> graphs = params.getGraphs(this);
-        if(params.isSorted()) {
+        if(params.isSorted() && graphs.size() > 1) {
             Collections.sort(graphs, new Comparator<GraphNode>() {
                 public int compare(GraphNode g1, GraphNode g2) {
                     int order = String.CASE_INSENSITIVE_ORDER.compare(g1.getName(), g2.getName());

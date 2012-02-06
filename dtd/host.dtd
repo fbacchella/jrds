@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!ELEMENT host (tag|snmp|macro|connection|probe|collection|for)+ >
-<!ELEMENT macrodef (probe|tag|collection|for)+ >
+<!ELEMENT macrodef (probe|tag|collection|for|connection)+ >
 <!ATTLIST macrodef
 	name CDATA #REQUIRED
 >

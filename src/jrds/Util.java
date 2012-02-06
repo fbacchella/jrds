@@ -288,7 +288,7 @@ public class Util {
                 out.append(before);
                 String toAppend = null;
                 Matcher varMatcher;
-                //The variable refering to a system variable are directly resolved
+                //The variable referring to a system variable are directly resolved
                 if(var.startsWith("system.")) {
                     toAppend = System.getProperty(var.replace("system.", ""));
                 }
