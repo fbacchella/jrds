@@ -174,8 +174,8 @@ public class UtilTest {
         var.put("a", "v1");
         var.put("b", 1);
 
-        String evaluated = Util.evaluateVariables("${a} ${b}", var);
-        Assert.assertEquals("v1 1", evaluated);
+        String evaluated = Util.evaluateVariables("'${a}' ${b}", var);
+        Assert.assertEquals("'v1' 1", evaluated);
     }
 
     @Test
@@ -221,8 +221,8 @@ public class UtilTest {
         Probe<?,?> p = new MokeProbe<String, Number>();
         p.setHost(new HostStarter(new HostInfo("Moke")));
         p.setLabel("label");
-        String parsed = Util.parseTemplate("${host} ${probename} ${label}", p);
-        Assert.assertEquals("Moke DummyProbe label", parsed);
+        String parsed = Util.parseTemplate("'${host}' \"${probename}\" ${label}", p);
+        Assert.assertEquals("'Moke' \"DummyProbe\" label", parsed);
     }
 
     @Test

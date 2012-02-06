@@ -12,7 +12,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.MessageDigest;
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -332,7 +331,8 @@ public class Util {
                     if(! indexes.containsKey(var)) {
                         indexes.put(var, index++);
                     };
-                    toAppend = '{'  + indexes.get(var).toString() + '}';
+                    int slot = indexes.get(var) + 1;
+                    toAppend = "%"  + Integer.toString(slot) + "$s";
                 }
                 out.append(toAppend);
                 if(after.length() > 0)
@@ -531,7 +531,7 @@ public class Util {
                 }
             }
         }
-        return MessageFormat.format(message, values);
+        return String.format(message, values);
     }
 
     /**
