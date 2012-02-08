@@ -4,7 +4,6 @@ import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,7 +46,7 @@ public class ProbeDesc implements Cloneable {
     private Map<String, String> specific = new HashMap<String, String>();;
     private String probeName;
     private String name;
-    private Collection<String> graphesList = new ArrayList<String>();
+    private final Collection<String> graphesList = new ArrayList<String>();
     private Class<? extends Probe<?,?>> probeClass = null;
     private Map<String, String> defaultsArgs = null;
     private float uptimefactor = (float) 1.0;
@@ -341,24 +340,17 @@ public class ProbeDesc implements Cloneable {
     }
 
     /**
-     * @return Returns the graphClasses.
+     * @return Returns the list of graph names.
      */
     public Collection<String> getGraphClasses() {
         return graphesList;
     }
 
     /**
-     * @param graphClasses The graphClasses to set.
+     * @param graph a graph name to add.
      */
-    public void setGraphClasses(Collection<String> graphClasses) {
-        this.graphesList = graphClasses;
-    }
-
-    /**
-     * @param graphClasses The graphClasses to set.
-     */
-    public void setGraphClasses(String[] graphClasses) {
-        this.graphesList = Arrays.asList(graphClasses);
+    public void addGraph(String graph) {
+        this.graphesList.add(graph);
     }
 
     public Class<? extends Probe<?,?>> getProbeClass() {

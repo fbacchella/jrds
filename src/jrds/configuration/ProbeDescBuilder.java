@@ -1,10 +1,10 @@
 package jrds.configuration;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 
+import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.Util;
@@ -17,6 +17,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
     static final private Logger logger = Logger.getLogger(ProbeDescBuilder.class);
 
     private ClassLoader classLoader = ProbeDescBuilder.class.getClassLoader();
+    private Map<String, GraphDesc> graphDescMap = Collections.emptyMap();
 
     public ProbeDescBuilder() {
         super(ConfigType.PROBEDESC);
@@ -68,14 +69,24 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
 
         setMethod(root.getElementbyName("uptimefactor"), pd, "setUptimefactor", Float.TYPE);
 
+        boolean withgraphs = false;
         JrdsElement graphsElement= root.getElementbyName("graphs");
         if(graphsElement != null) {
-            List<String> graphs =  new ArrayList<String>();
             for(JrdsElement e: graphsElement.getChildElementsByName("name")) {
-                graphs.add(e.getTextContent());
-                logger.trace(Util.delayedFormatString("Adding graph: %s", e.getTextContent()));
+                String graphName = e.getTextContent();
+                graphName = graphName != null ? graphName.trim() : "";
+                if(graphDescMap.containsKey(graphName)) {
+                    pd.addGraph(graphName);
+                    withgraphs = true;
+                    logger.trace(Util.delayedFormatString("Adding graph: %s", graphName));
+                }
+                else {
+                    logger.warn(Util.delayedFormatString("Unknown graph %s for probe %s", graphName, pd.getName()));
+                }
             }
-            pd.setGraphClasses(graphs);
+        }
+        if(! withgraphs) {
+            logger.warn(Util.delayedFormatString("No valid graph found for %s", pd.getName()));
         }
 
         for(JrdsElement specificNode: root.getChildElementsByName("specific")) {
@@ -120,6 +131,10 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
      */
     void setClassLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
+    }
+
+    public void setGraphDescMap(Map<String, GraphDesc> graphDescMap) {
+        this.graphDescMap = graphDescMap;
     }
 
 }

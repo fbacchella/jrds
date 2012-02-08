@@ -3,7 +3,6 @@ package jrds.factories;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +10,7 @@ import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.Probe;
 import jrds.ProbeDesc;
+import jrds.Util;
 
 import org.apache.log4j.Logger;
 
@@ -111,15 +111,13 @@ public class ProbeFactory {
             if(name == null)
                 name = jrds.Util.parseTemplate(p.getPd().getProbeName(), p);
             p.setName(name);
-            Collection<?> graphClasses = p.getPd().getGraphClasses();
-            if(graphClasses != null) {
-                for (Object o:  graphClasses ) {
-                    GraphDesc gd = graphDescMap.get(o);
-                    if(gd == null)
-                        continue;
-                    GraphNode newGraph = new GraphNode(p, gd);
-                    if(newGraph != null)
-                        p.addGraph(newGraph);
+            for (String graphName:  p.getPd().getGraphClasses() ) {
+                GraphDesc gd = graphDescMap.get(graphName);
+                if(gd != null) {
+                    p.addGraph(new GraphNode(p, gd));
+                }
+                else {
+                    logger.warn(Util.delayedFormatString("Unknown graph %s for probe %s", graphName, p));
                 }
             }
             return true;

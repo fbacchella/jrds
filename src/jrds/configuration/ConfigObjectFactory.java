@@ -33,6 +33,7 @@ public class ConfigObjectFactory {
 
     public ConfigObjectFactory(jrds.PropertiesManager pm){
         this.pm = pm;
+        this.cl = pm.extensionClassLoader;
         init();
     }
 
@@ -120,6 +121,7 @@ public class ConfigObjectFactory {
         ProbeDescBuilder ob = new ProbeDescBuilder();
         ob.setClassLoader(cl);
         ob.setPm(pm);
+        ob.setGraphDescMap(graphDescMap);
         Map<String, ProbeDesc> probeDescMap = getObjectMap(ob, nodemap);
         pf = new ProbeFactory(probeDescMap, graphDescMap);
         logger.debug(jrds.Util.delayedFormatString("Probe description configured: %s", probeDescMap.keySet()));

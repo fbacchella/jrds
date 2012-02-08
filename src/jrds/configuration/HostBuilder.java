@@ -201,8 +201,6 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             try {
                 ProbeDesc pd = (ProbeDesc) oldpd.clone();
                 pd.replaceDs(dsList);
-                List<String> empty = Collections.emptyList();
-                pd.setGraphClasses(empty);
                 p = pf.makeProbe(pd);
             } catch (CloneNotSupportedException e) {
             }

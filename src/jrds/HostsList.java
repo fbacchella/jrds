@@ -123,7 +123,7 @@ public class HostsList extends StarterNode {
         renderer = new Renderer(50, tmpDir);
 
         log(Level.DEBUG, "Starting parsing descriptions");
-        ConfigObjectFactory conf = new ConfigObjectFactory(pm, pm.extensionClassLoader);
+        ConfigObjectFactory conf = new ConfigObjectFactory(pm);
         conf.setGraphDescMap();
         Collection<ProbeDesc> probesdesc = conf.setProbeDescMap().values();
 

@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -13,14 +12,14 @@ import java.util.regex.Pattern;
 
 import javax.xml.transform.OutputKeys;
 
-import org.apache.log4j.Logger;
-import org.rrd4j.DsType;
-import org.snmp4j.smi.OID;
-
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.probe.snmp.RdsIndexedSnmpRrd;
 import jrds.probe.snmp.RdsSnmpSimple;
+
+import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
+import org.snmp4j.smi.OID;
 
 public class DoSnmpProbe  extends CommandStarterImpl {
     static final private Logger logger = Logger.getLogger(DoSnmpProbe.class);
@@ -113,7 +112,10 @@ public class DoSnmpProbe  extends CommandStarterImpl {
                 pd.setProbeClass((Class<? extends Probe<?, ?>>) c);
             }
             else if("--graphs".equals(cmd.toLowerCase())) {
-                pd.setGraphClasses(Arrays.asList(args[++i].split(",")));
+                String graphsList = args[++i];
+                for(String g: graphsList.split(","))  {
+                    pd.addGraph(g.trim());
+                }
             }
             else if("--collect".equals(cmd.toLowerCase())) {
                 for(String collectarg: args[++i].split(",")) {
