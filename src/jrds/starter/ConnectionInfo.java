@@ -7,6 +7,7 @@ import java.util.Map;
 import jrds.Util;
 import jrds.factories.ArgFactory;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 public class ConnectionInfo {
@@ -39,6 +40,7 @@ public class ConnectionInfo {
             for(Map.Entry<String, String> e: beansValue.entrySet()) {
                 String textValue = Util.parseTemplate(e.getValue(), cnx);
                 ArgFactory.beanSetter(cnx, e.getKey(), textValue);
+                cnx.log(Level.TRACE, "Setting bean '%s' to value '%s' for %s", e.getKey(), textValue, node);
             }
             if(name != null && ! name.trim().isEmpty())
                 cnx.setName(name.trim());

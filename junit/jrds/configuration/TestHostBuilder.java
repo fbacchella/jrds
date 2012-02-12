@@ -13,6 +13,7 @@ import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 import jrds.mockobjects.MokeProbeBean;
 import jrds.mockobjects.MokeProbeFactory;
+import jrds.probe.JMXConnection;
 import jrds.starter.ConnectionInfo;
 import jrds.starter.StarterNode;
 
@@ -33,7 +34,7 @@ public class TestHostBuilder {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.RdsHost");
+        Tools.setLevel(logger, Level.TRACE, "jrds.RdsHost", "jrds.starter", "jrds.Starter");
         Tools.setLevel(Level.INFO,"jrds.factories.xml.CompiledXPath");
 
         Tools.prepareXml();
@@ -97,10 +98,15 @@ public class TestHostBuilder {
         hb.setPm(pm);
         hb.setClassLoader(this.getClass().getClassLoader());
 
-        JrdsDocument cnxdoc = Tools.parseRessource("goodhost1.xml");
+        JrdsDocument cnxdoc = new JrdsDocument(Tools.dbuilder.newDocument());
+        cnxdoc.doRootElement("host").addElement("connection", "type=jrds.probe.JMXConnection").addElement("attr", "name=port").setTextContent("8999");
         for(ConnectionInfo ci: hb.makeConnexion(cnxdoc.getRootElement(), new HostInfo("localhost"))) {
             logger.trace(ci.getName());
-            ci.register(new StarterNode() {});
+            StarterNode  sn = new StarterNode() {};
+            ci.register(sn);
+            JMXConnection cnx = sn.find(JMXConnection.class);
+            Assert.assertEquals("Attributed not setted", new Integer(8999), cnx.getPort());
         }
     }
+
 }

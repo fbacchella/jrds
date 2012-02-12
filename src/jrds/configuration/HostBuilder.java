@@ -365,7 +365,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
                 //Resolve the bean for the connection
                 Map<String, String> attrs = new HashMap<String, String>();
-                for(JrdsElement attrNode: domNode.getChildElementsByName("attr")) {
+                for(JrdsElement attrNode: cnxNode.getChildElementsByName("attr")) {
                     String attrName = attrNode.getAttribute("name");
                     String textValue = Util.parseTemplate(attrNode.getTextContent(), host);
                     attrs.put(attrName, textValue);
