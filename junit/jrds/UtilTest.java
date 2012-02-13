@@ -197,10 +197,10 @@ public class UtilTest {
 
     @Test
     public void testParseTemplate3() {
-        List<String> args = Arrays.asList("unittest");
+        List<String> args = Arrays.asList("unittest1", "unittest2");
 
-        String parsed = Util.parseTemplate("${1}", args);
-        Assert.assertEquals("unittest", parsed);
+        String parsed = Util.parseTemplate("${1} ${2}", args);
+        Assert.assertEquals("unittest1 unittest2", parsed);
     }
 
     @Test

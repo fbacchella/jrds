@@ -302,7 +302,7 @@ public class Util {
             }
             out.append(toAppend);
             if(after.length() > 0)
-                out.append(findVariables(after, index, indexes));
+                out.append(findVariables(after, index, indexes, arguments));
             return out.toString();
         }
         return in;
