@@ -49,7 +49,6 @@ public class HostsList extends StarterNode {
     private String firstTab = null;
     private Renderer renderer = null;
     private Timer collectTimer;
-    private File tmpDir = null;
     // The list of roles known to jrds
     private Set<String> roles = new HashSet<String>();
     private Set<String> defaultRoles = Collections.emptySet();
@@ -120,7 +119,7 @@ public class HostsList extends StarterNode {
         }
         log(Level.DEBUG, "timers %s", timers);
 
-        renderer = new Renderer(50, tmpDir);
+        renderer = new Renderer(50, pm.tmpdir);
 
         log(Level.DEBUG, "Starting parsing descriptions");
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
