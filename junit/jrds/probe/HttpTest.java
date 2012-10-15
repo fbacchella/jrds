@@ -101,5 +101,25 @@ public class HttpTest {
         Assert.assertEquals("http://" + HOST + ":81/file", pd.getBeanMap().get("url").getReadMethod().invoke(p).toString());
         validateBean(p);
     }
+    
+    @Test
+    public void build4() throws IntrospectionException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+        HttpProbe p = new HttpProbe() {
+            @Override
+            protected Map<String, Number> parseStream(InputStream stream) {
+                return null;
+            }
+        };
+        p.setHost(webserver);
+        ProbeDesc pd = new ProbeDesc();
+        pd.setProbeClass(p.getClass());
+        pd.addSpecific("port", "81");
+        pd.addSpecific("file", "/file");
+        p.setPd(pd);        
+        p.configure();
+        Assert.assertEquals("http://" + HOST + ":81/file", p.getUrlAsString());
+        Assert.assertEquals("http://" + HOST + ":81/file", pd.getBeanMap().get("url").getReadMethod().invoke(p).toString());
+        validateBean(p);
+    }
 
 }
