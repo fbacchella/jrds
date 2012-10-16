@@ -41,23 +41,6 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
     protected String file = "/";
     Starter resolver = null;
 
-    /* (non-Javadoc)
-     * @see jrds.Probe#readSpecific()
-     */
-    @Override
-    public boolean readSpecific() {
-        if (getPd().getSpecific("port") != null) {
-            port = Util.parseStringNumber(getPd().getSpecific("port") , 80);
-        }
-        if (getPd().getSpecific("file") != null) {
-            file = getPd().getSpecific("file");
-        }
-        if (getPd().getSpecific("urlhost") != null) {
-            urlhost = getPd().getSpecific("urlhost");
-        }
-        return super.readSpecific();
-    }
-
     public Boolean configure(URL url) {
         this.url = url;
         return finishConfigure(null);
