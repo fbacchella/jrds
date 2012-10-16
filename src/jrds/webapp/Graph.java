@@ -76,7 +76,7 @@ public final class Graph extends JrdsServlet {
                 res.addDateHeader("Expires", new Date().getTime() + getPropertiesManager().step * 1000);
             }
             res.addDateHeader("Last-Modified", graph.getEnd().getTime());
-            res.addHeader("content-disposition","attachment; filename=" + graph.getPngName());
+            res.addHeader("content-disposition","inline; filename=" + graph.getPngName());
             res.addHeader("ETag", jrds.Base64.encodeString(getServletName() + graph.hashCode()));
             ServletOutputStream out = res.getOutputStream();
             FileChannel indata = hl.getRenderer().sendInfo(graph);
