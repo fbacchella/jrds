@@ -47,9 +47,8 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
 	public boolean readSpecific() {
         nameMap = getPd().getCollectOids();
 		boolean readOK = false;
-		String requesterName =  getPd().getSpecific(REQUESTERNAME);
-		String uptimeOidName =  getPd().getSpecific(UPTIMEOIDNAME);
 		try {
+	        String requesterName =  getPd().getSpecific(REQUESTERNAME);
 			if(requesterName != null) {
 				log(Level.TRACE, "Setting requester to %s", requesterName);
 				requester = SnmpRequester.valueOf(requesterName.toUpperCase());
@@ -58,11 +57,10 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
 			else {
 				log(Level.ERROR, "No requester found");
 			}
+	        String uptimeOidName =  getPd().getSpecific(UPTIMEOIDNAME);
 			if(uptimeOidName != null) {
 				log(Level.TRACE, "Setting uptime OID to %s", uptimeOidName);
 				uptimeoid = new OID(uptimeOidName);
-				if(uptimeoid == null)
-					readOK = false;
 			}
 		} catch (Exception e) {
 			log(Level.ERROR, e, "Unable to read specific: %s", e.getMessage());
@@ -113,7 +111,22 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
 		return retValue;
 	}
 
-	/**
+    /**
+     * SnmpProbes can used either the default uptime from the standard MIBs or
+     * use a specific one, defined using the uptimeOid specific
+     * @see jrds.ProbeConnected#setUptime(jrds.starter.Connection)
+     */
+    @Override
+    protected void setUptime(SnmpConnection cnx) {
+        //If no uptimeoid, just use the snmp default
+        if(uptimeoid == null)
+            super.setUptime(cnx);
+        else {
+            cnx.readUptime(Collections.singleton(uptimeoid));
+        }
+    }
+
+    /**
 	 * Prepare the SnmpVars to be stored by a probe. In the general case, for a snmp probe
 	 * the last element of the OID is removed.
 	 * If the value is a date, the value is the second since epoch

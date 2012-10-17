@@ -108,7 +108,10 @@ public class SnmpConnection extends Connection<Target> {
         upTimesOids.add(uptimeOid);
         //Fallback uptime OID, it should be always defined, from SNMPv2-MIB
         upTimesOids.add(sysUpTimeInstance);
+        return readUptime(upTimesOids);
+    }
 
+    public long readUptime(Set<OID> upTimesOids) {
         try {
             for(OID uptimeoid: upTimesOids) {
                 PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
@@ -132,9 +135,9 @@ public class SnmpConnection extends Connection<Target> {
         } catch (Exception e) {
             log(Level.ERROR, e, "Unable to get uptime: %s", e);
         }
-        return 0;
+        return 0;        
     }
-
+    
     public Snmp getSnmp() {
         Snmp retValue = null;
         retValue = getLevel().find(MainStarter.class).snmp;
