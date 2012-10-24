@@ -1230,6 +1230,10 @@ implements Cloneable, WithACL {
             }
         }
     }
+    
+    public Integer getUnitExponent() {
+        return unitExponent;
+    }
 
     /**
      * @return the dimension of the graphic object

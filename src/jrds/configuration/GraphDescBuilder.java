@@ -62,10 +62,10 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
 
         JrdsElement unitElem = subnode.getElementbyName("unit");
         if(unitElem != null) {
-            setMethod(subnode.getElementbyName("base"), gd, "setUnitExponent");
-            if(subnode.getElementbyName("binary") != null)
+            setMethod(unitElem.getElementbyName("base"), gd, "setUnitExponent");
+            if(unitElem.getElementbyName("binary") != null)
                 gd.setSiUnit(false);
-            else if(subnode.getElementbyName("SI") != null)
+            else if(unitElem.getElementbyName("SI") != null)
                 gd.setSiUnit(true);
         }
 

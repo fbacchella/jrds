@@ -93,10 +93,12 @@ public class TestGraphDescBuilder {
         Assert.assertEquals("graph title failed", "graphTitle", gd.getGraphTitle());
         Assert.assertEquals("graph name failed", "name", gd.getName());
         Assert.assertEquals("legend count failed", 3, gd.getLegendLines());
+        Assert.assertFalse("Graph unit should be binary", gd.isSiUnit());
+        Assert.assertEquals("Graph unit scale should be fixed", 0, gd.getUnitExponent().intValue());
 
         Assert.assertTrue("graph height invalid", 206 < gi.getHeight());
         Assert.assertTrue("graph width invalid", 578 < gi.getWidth());
-        Assert.assertEquals("graph byte count invalid", 12574 , gi.getByteCount(), 2000);
+        Assert.assertEquals("graph byte count invalid", 12574 , gi.getByteCount(), 4000);
     }
 
     @Test

@@ -5,6 +5,10 @@
 	<name>name</name>
 	<graphName>graphName</graphName>
 	<graphTitle>graphTitle</graphTitle>
+    <unit>
+        <binary />
+        <base />
+    </unit>
 	<verticalLabel>verticalLabel</verticalLabel>
 	<add>
 		<name>add1</name>
