@@ -2,6 +2,7 @@ package jrds.configuration;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,12 +36,35 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
             throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
         } catch (InstantiationException e) {
             throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
+        } catch (ClassNotFoundException e) {
+            throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
+        } catch (ClassCastException e) {
+            throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
         }
     }
-    public GraphDesc makeGraphDesc(JrdsDocument n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        GraphDesc gd = new GraphDesc();
-
+    public GraphDesc makeGraphDesc(JrdsDocument n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException {
         JrdsElement subnode = n.getRootElement();
+
+        GraphDesc gd;
+        
+        //Identify the optionnal custom GraphDesc class
+        JrdsElement gdClass = subnode.getElementbyName("descClass");
+        if(gdClass != null) {
+            String className = gdClass.getTextContent().trim();
+            if(! "".equals(className)) {
+                @SuppressWarnings("unchecked")
+                Class<GraphDesc> clazz = (Class<GraphDesc>) pm.extensionClassLoader.loadClass(className);
+                Constructor<GraphDesc> c  = clazz .getConstructor();
+                gd = c.newInstance();
+            }
+            else {
+                throw new IllegalArgumentException("Empty descClass");
+            }
+        }
+        else {
+            gd = new GraphDesc();
+        }
+
         setMethod(subnode.getElementbyName("name"), gd, "setName");
         setMethod(subnode.getElementbyName("graphName"), gd, "setGraphName");
         setMethod(subnode.getElementbyName("verticalLabel"), gd, "setVerticalLabel");

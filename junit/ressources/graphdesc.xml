@@ -3,6 +3,7 @@
                            "urn:jrds:graphdesc">
 <graphdesc>
 	<name>name</name>
+    <descClass>jrds.GraphDesc</descClass>
 	<graphName>graphName</graphName>
 	<graphTitle>graphTitle</graphTitle>
     <unit>
