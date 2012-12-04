@@ -4,6 +4,7 @@ package jrds;
 //$Id$
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 
 import jrds.webapp.ACL;
