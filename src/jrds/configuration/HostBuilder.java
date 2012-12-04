@@ -210,6 +210,8 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         }
         if(p == null)
             return null;
+        
+        p.readProperties(pm);
 
         String timerName = probeNode.getAttribute("timer");
         if(timerName == null)

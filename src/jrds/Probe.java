@@ -679,6 +679,16 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
+     * A probe can override it to extract custom values from the properties.
+     * It will be read just after it's created and before configuration.
+     * 
+     * @param pm
+     */
+    public void readProperties(PropertiesManager pm) {
+        
+    }
+
+    /**
      * This function should return the uptime of the probe
      * If it's not overriden or fixed with setUptime, it will return Long.MAX_VALUE
      * that's make it useless, as it used to make the probe pause 
