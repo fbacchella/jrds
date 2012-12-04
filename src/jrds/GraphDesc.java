@@ -80,7 +80,7 @@ implements Cloneable, WithACL {
                 return "legend";
             }
             public boolean datasource() {
-                return false;
+                return true;
             }
             public boolean toPlot() {
                 return false;
