@@ -1,35 +1,36 @@
-/*
- * Created on 22 nov. 2004
- *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
- */
 package jrds.probe;
 
 import java.net.URL;
 
+import jrds.factories.ProbeBean;
+
 /**
- * @author bacchell
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author Fabrice Bacchella
  */
+@ProbeBean({"url"})
 public final class HttpResponseTime extends ExternalCmdProbe implements UrlProbe {
 	private URL url;
-	
+
 	public void configure(URL url)
-	{
-		this.url = url;
-	}
+    {
+        this.url = url;
+    }
 
 	/**
-	 * @return Returns the url.
-	 */
-	public URL getUrl() {
-		return url;
-	}
+     * @return the url
+     */
+    public URL getUrl() {
+        return url;
+    }
 
-	/* (non-Javadoc)
+    /**
+     * @param url the url to set
+     */
+    public void setUrl(URL url) {
+        this.url = url;
+    }
+
+    /* (non-Javadoc)
 	 * @see jrds.probe.UrlProbe#getUrlAsString()
 	 */
 	public String getUrlAsString() {

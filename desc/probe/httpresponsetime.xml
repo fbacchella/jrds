@@ -4,6 +4,8 @@
     <name>HttpResponseTime</name>
     <probeName>url-${url.signature}</probeName>
     <probeClass>jrds.probe.HttpResponseTime</probeClass>
+    <specific name="command">httptest</specific>
+    <specific name="arguments">${url}</specific>
     <ds>
         <dsName>Connect</dsName>
         <dsType>gauge</dsType>
