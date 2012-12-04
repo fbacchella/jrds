@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jrds.Graph;
 import jrds.GraphDesc;
+import jrds.GraphNode;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 
@@ -45,24 +47,25 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
     public GraphDesc makeGraphDesc(JrdsDocument n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException {
         JrdsElement subnode = n.getRootElement();
 
-        GraphDesc gd;
-        
+        GraphDesc gd = new GraphDesc();
+
         //Identify the optionnal custom GraphDesc class
-        JrdsElement gdClass = subnode.getElementbyName("descClass");
-        if(gdClass != null) {
-            String className = gdClass.getTextContent().trim();
+        JrdsElement graphClass = subnode.getElementbyName("graphClass");
+        if(graphClass != null) {
+            String className = graphClass.getTextContent().trim();
             if(! "".equals(className)) {
                 @SuppressWarnings("unchecked")
-                Class<GraphDesc> clazz = (Class<GraphDesc>) pm.extensionClassLoader.loadClass(className);
-                Constructor<GraphDesc> c  = clazz .getConstructor();
-                gd = c.newInstance();
+                Class<Graph> clazz = (Class<Graph>) pm.extensionClassLoader.loadClass(className);
+                // Check a valid constructor
+                Constructor<Graph> c = clazz.getConstructor(GraphNode.class);
+                if (c !=null )
+                    gd.setGraphClass(clazz);
+                else
+                    throw new IllegalArgumentException("Invalid constructor");
             }
             else {
-                throw new IllegalArgumentException("Empty descClass");
+                throw new IllegalArgumentException("Empty graphClass");
             }
-        }
-        else {
-            gd = new GraphDesc();
         }
 
         setMethod(subnode.getElementbyName("name"), gd, "setName");

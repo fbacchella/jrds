@@ -587,6 +587,7 @@ implements Cloneable, WithACL {
     private boolean withLegend = true;  // To show the values block under the graph
     private boolean withSummary = true; // To show the summary with last update, period, etc. information block
     private ACL acl = ACL.ALLOWEDACL;
+    private Class<Graph> graphClass = Graph.class;
 
     public static final class Dimension {
         public int width = 0;
@@ -1014,7 +1015,7 @@ implements Cloneable, WithACL {
         return retValue;
     }
 
-    private void addLegend(RrdGraphDef def, String ds, GraphType gt, String legend) {
+    protected void addLegend(RrdGraphDef def, String ds, GraphType gt, String legend) {
         if(legend == null)
             return;
         if(gt == GraphType.PERCENTILELEGEND) {
@@ -1466,6 +1467,20 @@ implements Cloneable, WithACL {
      */
     public void setWithSummary(boolean withSummary) {
         this.withSummary = withSummary;
+    }
+
+    /**
+     * @return the graphClass
+     */
+    public Class<Graph> getGraphClass() {
+        return graphClass;
+    }
+
+    /**
+     * @param graphClass the graphClass to set
+     */
+    public void setGraphClass(Class<Graph> graphClass) {
+        this.graphClass = graphClass;
     }
 
 

@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.data.DataProcessor;
+import org.rrd4j.data.Plottable;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
 
@@ -91,7 +93,7 @@ public class Graph implements WithACL {
         return true;
     }
 
-    private void addlegend(RrdGraphDef graphDef) {
+    protected void addlegend(RrdGraphDef graphDef) {
         Date lastUpdate = node.getProbe().getLastUpdate();
         graphDef.comment("\\l");
         graphDef.comment("\\l");
@@ -106,28 +108,41 @@ public class Graph implements WithACL {
         graphDef.comment("Source type: " + node.getProbe().getSourceType() + "\\r");
     }
 
-    private void fillGraphDef(RrdGraphDef graphDef) {
+    protected void fillGraphDef(RrdGraphDef graphDef) {
         GraphDesc gd = node.getGraphDesc();
         try {
-            long startsec = start.getTime()/1000;
-            long endsec = Util.endDate(node.getProbe(), end).getTime()/1000;
+            long startsec = getStartSec();
+            long endsec = getEndSec();
             graphDef.setStartTime(startsec);
             graphDef.setEndTime(endsec);
-
             PlottableMap customData = node.getCustomData();
             if(customData != null) {
                 long step = Math.max((endsec - startsec) / gd.getWidth(), 1);
                 customData.configure(startsec, endsec, step);
             }
-            gd.fillGraphDef(graphDef, node.getProbe(), customData);
+            setGraphDefData(graphDef, node.getProbe(), customData);
             if(gd.withLegend())
                 addlegend(graphDef);
         } catch (IllegalArgumentException e) {
             logger.error("Impossible to create graph definition, invalid date definition from " + start + " to " + end + " : " + e);
         }
     }
+    
+    protected void setGraphDefData(RrdGraphDef graphDef, Probe<?, ?> defProbe,
+            Map<String, ? extends Plottable> customData) {
+        GraphDesc gd = node.getGraphDesc();
+        gd.fillGraphDef(graphDef, node.getProbe(), customData);        
+    }
 
-    private void finishGraphDef(RrdGraphDef graphDef) {
+    protected long getStartSec() {
+        return start.getTime()/1000;
+    }
+
+    protected long getEndSec() {
+        return Util.endDate(node.getProbe(), end).getTime()/1000;
+    }
+
+    protected void finishGraphDef(RrdGraphDef graphDef) {
         if( ! Double.isNaN(max) && ! Double.isNaN(min) ) {
             graphDef.setMaxValue(max);
             graphDef.setMinValue(min);

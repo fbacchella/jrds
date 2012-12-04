@@ -135,7 +135,19 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
     }
 
     public Graph getGraph() {
-        return new Graph(this);
+        Class<Graph>  gclass = gd.getGraphClass();
+        
+        //Exceptions can't happen, it was checked at configuration time
+        try {
+            return gclass.getConstructor(GraphNode.class).newInstance(this);
+        } catch (IllegalArgumentException e) {
+        } catch (SecurityException e) {
+        } catch (InstantiationException e) {
+        } catch (IllegalAccessException e) {
+        } catch (InvocationTargetException e) {
+        } catch (NoSuchMethodException e) {
+        }
+        return null;
     }
 
     /* (non-Javadoc)

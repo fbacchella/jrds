@@ -101,10 +101,10 @@ public class TestGraphDescBuilder {
         Assert.assertEquals("graph byte count invalid", 12574 , gi.getByteCount(), 4000);
     }
     
-    @Test(expected=ClassCastException.class)
+    @Test(expected=NoSuchMethodException.class)
     public void testBadGraphDescClass()  throws Exception {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
-        d.getRootElement().getElementbyName("descClass").setTextContent(String.class.getName());
+        d.getRootElement().getElementbyName("graphClass").setTextContent(String.class.getName());
         GraphDescBuilder gdbuild = new GraphDescBuilder();
         gdbuild.setPm(Tools.makePm());
         @SuppressWarnings("unused")
@@ -114,7 +114,7 @@ public class TestGraphDescBuilder {
     @Test(expected=IllegalArgumentException.class)
     public void testEmptyGraphDescClass()  throws Exception {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
-        d.getRootElement().getElementbyName("descClass").setTextContent("");
+        d.getRootElement().getElementbyName("graphClass").setTextContent("");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
         gdbuild.setPm(Tools.makePm());
         @SuppressWarnings("unused")
