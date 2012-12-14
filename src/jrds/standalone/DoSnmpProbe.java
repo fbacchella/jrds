@@ -40,16 +40,13 @@ public class DoSnmpProbe  extends CommandStarterImpl {
             argstomethod.put("name", ProbeDesc.class.getMethod("setName", String.class));
             argstomethod.put("probename", ProbeDesc.class.getMethod("setProbeName", String.class));
             argstomethod.put("uptimefactor", ProbeDesc.class.getMethod("setUptimefactor", float.class));
-            argstomethod.put("uniqindex", ProbeDesc.class.getMethod("setUniqIndex", boolean.class));
 
             typeMapper.put("uptimefactor", Float.class.getMethod("valueOf", String.class));
             typeMapper.put("uniqindex", Boolean.class.getMethod("valueOf", String.class));
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
 
     public void configure(Properties configuration) {
         logger.debug("Configuration: " + configuration);
