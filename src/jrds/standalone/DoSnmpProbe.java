@@ -25,7 +25,7 @@ public class DoSnmpProbe  extends CommandStarterImpl {
     static final private Logger logger = Logger.getLogger(DoSnmpProbe.class);
     static final Pattern oidPattern = Pattern.compile("^(.\\d+)+$");
     static final Pattern namePattern = Pattern.compile("^(.+)\\s+OBJECT-TYPE$");
-    static final Pattern syntaxPattern = Pattern.compile(".*SYNTAX\\s+([a-zA-Z]+).*");
+    static final Pattern syntaxPattern = Pattern.compile(".*SYNTAX\\s+([a-zA-Z0-9]+).*");
 
     private static final class OidInfo {
         OID oid;
