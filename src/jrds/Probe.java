@@ -96,10 +96,10 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     public void setPd(ProbeDesc pd) {
         this.pd = pd;
+        namedLogger =  Logger.getLogger("jrds.Probe." + pd.getName());
         if( ! readSpecific()) {
             throw new RuntimeException("Creation failed");
         }
-        namedLogger =  Logger.getLogger("jrds.Probe." + pd.getName());
     }
 
     public void addGraph(GraphDesc gd) {
@@ -450,7 +450,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                     return true;
                 }
                 else {
-                    log(Level.INFO, "uptime too low");
+                    log(Level.INFO, "uptime too low: %f", getUptime() * pd.getUptimefactor());
                 }
             }
         }
@@ -496,7 +496,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             }
             catch (ArithmeticException ex) {
                 log(Level.WARN, ex, "Error while storing sample: %s", ex.getMessage());
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 Throwable rootCause = e;
                 Throwable upCause;
                 StringBuilder message = new StringBuilder();
@@ -570,7 +571,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             rrdDb = StoreOpener.getRrd(getRrdName());
             lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
         } catch (Exception e) {
-            log(Level.ERROR, e, "Unable to get last update date: %s", e);
+            throw new RuntimeException("Unable to get last update date for " + getQualifiedName(), e);
         }
         finally {
             if(rrdDb != null)
@@ -677,7 +678,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     public boolean readSpecific() {
         return true;
     }
-
+    
     /**
      * A probe can override it to extract custom values from the properties.
      * It will be read just after it's created and before configuration.
@@ -705,7 +706,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * @param uptime in seconds
      */
     public void setUptime(long uptime) {
-        log(Level.TRACE, "Setting uptime to: %d", uptime);
+        log(Level.TRACE, "Setting probe uptime to: %d", uptime);
         this.uptime = uptime;
     }
 

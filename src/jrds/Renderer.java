@@ -21,6 +21,7 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 public class Renderer {
@@ -174,7 +175,7 @@ public class Renderer {
                     return true;
                 }
                 else if (rr != null &&  size() > Renderer.this.cacheSize){
-                    logger.info("Graph queue too short, it's now " +  size() + " instead of " + Renderer.this.cacheSize);
+                    Util.log(null, logger, Level.DEBUG, null, "Graph queue too short, it's now %d instead of %d", size(), Renderer.this.cacheSize);
                 }
                 return false;
             }
