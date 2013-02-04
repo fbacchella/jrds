@@ -3,7 +3,7 @@
 <graphdesc>
 	<name>processstatushostsresources</name>
 	<graphName>pslist</graphName>
-	<graphTitle>Number of process on {1}</graphTitle>
+	<graphTitle>Number of process on ${host}</graphTitle>
 	<verticalLabel>Number (cumulated)</verticalLabel>
 	<add>
 		<name>running</name>
@@ -13,20 +13,20 @@
 	</add>
 	<add>
 		<name>runnable</name>
-		<graphType>area</graphType>
-		<color>yellow</color>
+		<graphType>stack</graphType>
+		<color>black</color>
 		<legend>Runnable</legend>
 	</add>
 	<add>
 		<name>notRunnable</name>
-		<graphType>area</graphType>
+		<graphType>stack</graphType>
 		<color>blue</color>
 		<legend>notRunnable</legend>
 	</add>
 	<add>
 		<name>invalid</name>
-		<graphType>area</graphType>
-		<color>orange</color>
+		<graphType>stack</graphType>
+		<color>red</color>
 		<legend>invalid</legend>
 	</add>
 	<hosttree>

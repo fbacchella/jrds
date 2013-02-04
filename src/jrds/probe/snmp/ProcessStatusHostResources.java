@@ -8,6 +8,7 @@ package jrds.probe.snmp;
 
 import java.util.Map;
 
+import org.apache.log4j.Level;
 import org.rrd4j.core.Sample;
 import org.snmp4j.smi.OID;
 
@@ -52,6 +53,14 @@ public class ProcessStatusHostResources extends RdsSnmpSimple {
         oneSample.setValue(RUNNABLE, runnable);
         oneSample.setValue(NOTRUNNABLE, notRunnable);
         oneSample.setValue(INVALID, invalid);
+    }
+
+    /* (non-Javadoc)
+     * @see jrds.probe.snmp.SnmpProbe#getSuffixLength()
+     */
+    @Override
+    public int getSuffixLength() {
+        return 0;
     }
 
 }
