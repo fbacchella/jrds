@@ -47,6 +47,8 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
 
         logger.debug("Starting parsing descriptions");
         ConfigObjectFactory conf = new ConfigObjectFactory(pm, pm.extensionClassLoader);
+        //Needed for the probe's graph list
+        conf.setGraphDescMap();
         Map<String, ProbeDesc> probesMap = conf.setProbeDescMap();
         if(args.length == 0) {
             dumpAll(probesMap.values());
