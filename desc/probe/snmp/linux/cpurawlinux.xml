@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
-    <name>CpuRawTimeLinux</name>
+    <name>CpuRawLinux2</name>
     <probeName>cpurawlinux</probeName>
     <probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
     <specific name="requester">simple</specific>
-	<specific name="existOid">1.3.6.1.4.1.2021.11.56.0</specific>
-    <specific name="hides">CpuRawTimeSolaris</specific>
+    <specific name="existOid">1.3.6.1.4.1.2021.11.56.0</specific>
+    <specific name="hides">CpuRawTimeSolaris, CpuRawTimeLinux</specific>
     <ds>
         <dsName>ssCpuRawUser</dsName>
         <dsType>counter</dsType>
@@ -33,14 +33,32 @@
         <oid>1.3.6.1.4.1.2021.11.54</oid>
     </ds>
     <ds>
-        <dsName>ssCpuRawKernel</dsName>
-        <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.2021.11.55</oid>
-    </ds>
-    <ds>
         <dsName>ssCpuRawInterrupt</dsName>
         <dsType>counter</dsType>
         <oid>1.3.6.1.4.1.2021.11.56</oid>
+    </ds>
+    <ds>
+        <dsName>ssCpuRawSoftIRQ</dsName>
+        <dsType>counter</dsType>
+        <oid>1.3.6.1.4.1.2021.11.61</oid>
+    </ds>
+    <ds>
+        <dsName>ssCpuRawSteal</dsName>
+        <dsType>counter</dsType>
+        <oid>1.3.6.1.4.1.2021.11.64</oid>
+        <defaultValue>0</defaultValue>
+    </ds>
+    <ds>
+        <dsName>ssCpuRawGuest</dsName>
+        <dsType>counter</dsType>
+        <oid>1.3.6.1.4.1.2021.11.65</oid>
+        <defaultValue>0</defaultValue>
+    </ds>
+    <ds>
+        <dsName>ssCpuRawGuestNice</dsName>
+        <dsType>counter</dsType>
+        <oid>1.3.6.1.4.1.2021.11.66</oid>
+        <defaultValue>0</defaultValue>
     </ds>
     <ds>
         <dsName>ssRawInterrupts</dsName>
@@ -53,8 +71,7 @@
         <oid>1.3.6.1.4.1.2021.11.60</oid>
     </ds>
     <graphs>
-        <name>CpuRawTimeLinux</name>
-        <name>cpurawkilinux</name>
+        <name>CpuRawTimeLinux2</name>
         <name>InterruptsCount</name>
     </graphs>
 </probedesc>
