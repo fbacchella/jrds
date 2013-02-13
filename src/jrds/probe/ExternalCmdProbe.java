@@ -56,9 +56,10 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
             pathelements.addAll(Arrays.asList(envPath.split(System.getProperty("path.separator"))));
         }
         String cmdname = getPd().getSpecific("command");
-        log(Level.TRACE, "will look for %s in %s", cmdname, pathelements);
+        log(Level.DEBUG, "will look for %s in %s", cmdname, pathelements);
         for(String pathdir: pathelements) {
             File tryfile = new File(pathdir, cmdname);
+            log(Level.TRACE, "trying if %s can execute", tryfile);
             if(tryfile.canExecute()) {
                 log(Level.DEBUG, "will use %s as a command", tryfile.getAbsolutePath());
                 cmd = tryfile.getAbsolutePath();
@@ -110,6 +111,18 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         try {
             if(urlperfps != null) {
                 urlperfps.waitFor();
+                if(urlperfps.exitValue() !=0 ) {
+                    
+                    InputStream stderr = urlperfps.getErrorStream();
+                    BufferedReader stderrtReader = new BufferedReader(new InputStreamReader(stderr));
+                    String errostring = stderrtReader.readLine();
+                    if(errostring == null) {
+                        errostring = "";                        
+                    }
+
+                    log(Level.ERROR," command %s failed with %s", cmd, errostring);
+                    perfstring = "";
+                }
                 urlperfps.getInputStream().close();
                 urlperfps.getErrorStream().close();
                 urlperfps.getOutputStream().close();
