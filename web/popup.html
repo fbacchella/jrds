@@ -4,13 +4,29 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html;charset=utf-8">
 		<title>JRDS</title>
+<link href="dojo/resources/dojo.css" rel="stylesheet" type="text/css" />
 <link href="dijit/themes/nihilo/nihilo.css" rel="stylesheet" type="text/css" />
 <link href="lib/jrds.css" rel="stylesheet" type="text/css" />
-<script type="text/javascript" src="dojo/dojo.js" djConfig="parseOnLoad:true, locale:'en-us'"></script>
-<script type="text/javascript" src="dojo/dojo-jrds.js"></script>
+<script type="text/javascript" src="dojo/dojo.js" data-dojo-config="parseOnLoad: false, locale:'en-us'"></script>
 <script type="text/javascript" src="lib/jrds.js"></script>
 <script type="text/javascript" >
-initPopup();
+amdVector = [
+             "dojo",
+             "dijit",
+             "dojox",
+             "dojo/parser",
+             "dojox/widget/Standby",
+             "dojo/domReady!"
+             ]
+
+var dojo, dijit, dojox;
+require(amdVector, function(local_dojo, local_dijit, local_dojox) {
+	dojo = local_dojo;
+	dijit = local_dijit;
+	dojox = local_dojox;
+	initPopup();
+});
+
 </script>
 
 

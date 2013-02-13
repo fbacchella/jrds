@@ -64,6 +64,7 @@ body, input, option, select, tab, div, td, a, textarea {
 
 .field {
 	margin: 5px;
+	display:inline-block;
 	width: 100px;
 }
 

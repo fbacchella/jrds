@@ -1,6 +1,111 @@
 var queryParams = {};
 
-dojo.declare("jrdsTree", dijit.Tree, {
+var hourFormat = {
+    timePattern: 'HH:mm',
+    selector: 'time'
+};
+
+var hourconstraints = {
+		timePattern:'HH:mm',
+		clickableIncrement:'T00:30:00',
+		visibleIncrement:'T00:30:00',
+		visibleRange:'T05:00:00'
+};
+
+define( "jrds/HourBox",
+		[ "dojo/_base/declare",
+		  "dojo",
+    	  "dijit/form/TimeTextBox",
+    	  "dojo/date",
+    	  "dojo/date/locale"
+    	],
+    	function(declare, dojo) {
+	return declare("HourBox", dijit.form.TimeTextBox , {
+		onChange: function(date) {
+			if(date) {
+				dijit.byId('autoperiod').attr('value', 0); 
+				var queryDate = queryParams[this.queryId];
+				if(queryDate) {
+					var elems = queryDate.split(' ');
+					queryParams[this.queryId] = elems[0] + ' ' + dojo.date.locale.format(date, this.hourFormat);
+				}
+				else {
+					dateText = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
+					queryParams[this.queryId] = dateText + ' ' + dojo.date.locale.format(date, this.hourFormat);
+				}
+			}
+			return this.inherited(arguments);
+		}
+	});
+});
+
+define("jrds/DayHourTextBox",
+       [ "dojo/_base/declare",
+         "dojo",
+ 		 "dijit",
+         "dojo/date/locale",
+         "dijit/form/DateTextBox"
+       ],
+       function(declare, dojo, dijit) {
+return declare("DayHourTextBox", dijit.form.DateTextBox, {
+		dayFormat: {
+			selector: 'date', 
+			datePattern: 'yyyy-MM-dd'
+		},
+		hourFormat: hourFormat,        
+		dateStr: '',
+		format: function(date) {
+			if(date)
+				return dojo.date.locale.format(date, this.dayFormat);
+			else
+				return '';
+		},
+		parse: function(date) {
+			if(date)
+				return dojo.date.locale.parse(date, this.dayFormat);
+			else
+				return '';
+		},
+		serialize: function(date) {
+			if(date)
+				return dojo.date.locale.format(date, this.dayFormat);
+			else
+				return '';
+		},
+		onChange: function(date) {
+			if(date) {
+				queryParams.autoperiod = 0;
+	
+				//Let's try to keep the existing hour
+				var hour = this.resetHour;
+				if(queryParams[this.id]) {
+					var dateArray = queryParams[this.id].split(' ');
+					if(dateArray.length == 2) {
+						hour = dateArray[1];
+					}
+				}
+				//If hour in form not defined, set it.
+				if(! this.timeBox.attr('value') ) {
+					this.timeBox.attr('value', dojo.date.locale.parse(hour, this.hourFormat));
+				}
+				var sdate = dojo.date.locale.format(date, this.dayFormat);
+				queryParams[this.id] = sdate + ' ' + hour;
+				dijit.byId('autoperiod').attr('value', 0); 
+			}
+			return this.inherited(arguments);
+		}
+	});
+       }
+);
+
+define("jrds/jrdsTree",
+       [ "dojo/_base/declare",
+         "dojo",
+ 		 "dijit",
+         "dijit/Tree"
+       ],
+       function(declare, dojo, dijit) {
+return declare("jrdsTree", dijit.Tree, {
 	onLoad: function() {
 		if(queryParams.path != null) {
 			//This operation destroy the array used as an argument
@@ -16,115 +121,56 @@ dojo.declare("jrdsTree", dijit.Tree, {
 			return "filterFolder";
 		return this.inherited(arguments);
 	}
-});	
-
-var hourFormat = {
-    timePattern: 'HH:mm',
-    selector: 'time'
-};
-
-var hourconstraints = {
-		timePattern:'HH:mm',
-		clickableIncrement:'T00:30:00',
-		visibleIncrement:'T00:30:00',
-		visibleRange:'T05:00:00'
-};
-
-dojo.declare("HourBox",dijit.form.TimeTextBox , {
-	onChange: function(date) {
-		if(date) {
-			dijit.byId('autoperiod').attr('value', 0); 
-			var queryDate = queryParams[this.queryId];
-			if(queryDate) {
-				var elems = queryDate.split(' ');
-				queryParams[this.queryId] = elems[0] + ' ' + dojo.date.locale.format(date, this.hourFormat);
-			}
-			else {
-				dateText = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
-				queryParams[this.queryId] = dateText + ' ' + dojo.date.locale.format(date, this.hourFormat);
-			}
-		}
-		return this.inherited(arguments);
-	}
 });
+});
+
+define("jrds/MinMaxTextBox",
+       [ "dojo/_base/declare",
+         "dijit",
+         "dijit/form/ValidationTextBox" ],
+       function(declare, dijit) {
+return declare("jrds.MinMaxTextBox", dijit.form.ValidationTextBox, {
+		regExp: "(-?\d+(.\d+)?)([a-zA-Z]{0,2})",
+		trim: true,
+		onFocus: function() {setAutoscale(false);},
+		onChange: function() {updateScale();}
+});
+});
+
+function declare_FixedFileUploader(declare, dojo, dojox) {
+	return declare('kgf.dijit.FixedFileUploader', dojox.form.FileUploader, {
+	    // summary:
+	    //    Private class containing fixes to FileUploader behavior.
+	
+	    getHiddenWidget: function() {
+	      var widget = this.inherited(arguments);
+	      if (widget && dojo.position(widget.domNode).h > 0) {
+	        //false positive - sure the widget has onShow, but it's already shown!
+	        //(workaround to Dojo bug #11039)
+	        //TODO: will need to see if this check suffices for situations where
+	        //it's actually hidden (haven't used anywhere like that yet).
+	        return null;
+	      }
+	      return widget;
+	    }
+	});
+}
+
+define("jrds/FixedFileUploader",
+       [ "dojo/_base/declare",
+         "dojo",
+         "dojox",
+         "dojox/form/FileUploader" ],
+       declare_FixedFileUploader);
 
 function dayRegExp() {
 	return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
 };
 
-dojo.declare("DayHourTextBox", dijit.form.DateTextBox, {
-	dayFormat: {
-		selector: 'date', 
-		datePattern: 'yyyy-MM-dd'
-	},
-	hourFormat: hourFormat,        
-	dateStr: '',
-	format: function(date) {
-		if(date)
-			return dojo.date.locale.format(date, this.dayFormat);
-		else
-			return '';
-	},
-	parse: function(date) {
-		if(date)
-			return dojo.date.locale.parse(date, this.dayFormat);
-		else
-			return '';
-	},
-	serialize: function(date) {
-		if(date)
-			return dojo.date.locale.format(date, this.dayFormat);
-		else
-			return '';
-	},
-	onChange: function(date) {
-		if(date) {
-			queryParams.autoperiod = 0;
-
-			//Let's try to keep the existing hour
-			var hour = this.resetHour;
-			if(queryParams[this.id]) {
-				var dateArray = queryParams[this.id].split(' ');
-				if(dateArray.length == 2) {
-					hour = dateArray[1];
-				}
-			}
-			//If hour in form not defined, set it.
-			if(! this.timeBox.attr('value') ) {
-				this.timeBox.attr('value', dojo.date.locale.parse(hour, this.hourFormat));
-			}
-			var sdate = dojo.date.locale.format(date, this.dayFormat);
-			queryParams[this.id] = sdate + ' ' + hour;
-			dijit.byId('autoperiod').attr('value', 0); 
-		}
-		return this.inherited(arguments);
-	}
-});
-
-dojo.declare('kgf.dijit.FixedFileUploader', dojox.form.FileUploader, {
-    // summary:
-    //    Private class containing fixes to FileUploader behavior.
-
-    getHiddenWidget: function() {
-      var widget = this.inherited(arguments);
-      if (widget && dojo.position(widget.domNode).h > 0) {
-        //false positive - sure the widget has onShow, but it's already shown!
-        //(workaround to Dojo bug #11039)
-        //TODO: will need to see if this check suffices for situations where
-        //it's actually hidden (haven't used anywhere like that yet).
-        return null;
-      }
-      return widget;
-    }
-  });
-
-
 function initIndex() {
 	initQuery();
-
 	dojo.cookie("treeOneSaveStateCookie", null, {expires: -1});
 
-	dojo.addOnLoad(function(){
 		//The copy is saved
 		var tempMainPane = dojo.byId('mainPane');
 		mainPane = dojo.clone(tempMainPane);
@@ -146,24 +192,21 @@ function initIndex() {
 		setupCalendar();
 		setupTabs();
 		setupDisplay();
-	});	
 }
 
 function initPopup() {
 	initQuery();
 
-	dojo.addOnLoad(function(){
-		getGraphList();
-	});
+	dojo.parser.parse();
+	getGraphList();
 }
 
 function initHistory() {
 	initQuery();
 
-	dojo.addOnLoad(function(){
-		queryParams.history = 1;
-		getGraphList();
-	});
+	queryParams.history = 1;
+	dojo.parser.parse();
+	getGraphList();
 }
 
 function initQuery() {
@@ -367,9 +410,9 @@ function startStandBy(pane) {
 		return null;
 	var standbyName = 'standby.' + pane;
 	var standby = dijit.byId(standbyName);
-	if(standby != null) {
+	if(standby) {
 		standby.destroyRecursive(false);
-	}
+	};
 	standby = new dojox.widget.Standby({
 		target: pane,
 		id: standbyName

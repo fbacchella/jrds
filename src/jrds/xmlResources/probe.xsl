@@ -13,19 +13,17 @@
 <xsl:value-of select="@name" /> on <xsl:value-of select="@host" />
 				</title>
 				<link href="dojo/resources/dojo.css" rel="stylesheet" type="text/css" />
-				<link href="dijit/themes/nihilo/nihilo.css" rel="stylesheet"
-					type="text/css" />
+				<link href="dijit/themes/nihilo/nihilo.css" rel="stylesheet" type="text/css" />
 				<link href="lib/jrds.css" rel="stylesheet" type="text/css" />
 				<script type="text/javascript" src="dojo/dojo.js"
 					djConfig="parseOnLoad:true, isDebug:false, locale:'en-us'">/* */ </script>
-				<script type="text/javascript" src="dojo/dojo-jrds.js">/* */ </script>
 				<script type="text/javascript" src="lib/jrds.js">/* */ </script>
 			</head>
 			<body class="nihilo fillspace">
-				<div dojoType="dijit.layout.BorderContainer" gutters="true"
+				<div data-dojo-type="dijit/layout/BorderContainer" gutters="true"
 					class="fillspace">
-					<div dojoType="dijit.layout.ContentPane" region="center">
-						<div dojoType="dijit.TitlePane" title="Probe instance name">
+					<div data-dojo-type="dijit/layout/ContentPane" region="center">
+						<div data-dojo-type="dijit/TitlePane" title="Probe instance name">
 							<p> <xsl:value-of select="@host" /> / <xsl:value-of select="@name" /> </p>
 						</div>
 						<xsl:apply-templates />
@@ -36,25 +34,25 @@
 	</xsl:template>
 
 	<xsl:template match="probeName">
-		<div dojoType="dijit.TitlePane" title="Probe name">
+		<div data-dojo-type="dijit/TitlePane" title="Probe name">
 			<xsl:apply-templates />
 		</div>
 	</xsl:template>
 
 	<xsl:template match="index">
-		<div dojoType="dijit.TitlePane" title="Index">
+		<div data-dojo-type="dijit/TitlePane" title="Index">
 			<xsl:apply-templates />
 		</div>
 	</xsl:template>
 
 	<xsl:template match="url">
-		<div dojoType="dijit.TitlePane" title="Index">
+		<div data-dojo-type="dijit/TitlePane" title="Index">
 			<xsl:apply-templates />
 		</div>
 	</xsl:template>
 
 	<xsl:template match="ds">
-		<div dojoType="dijit.TitlePane" title="Data stores">
+		<div data-dojo-type="dijit/TitlePane" title="Data stores">
 			<ul>
 				<xsl:apply-templates>
 				</xsl:apply-templates>
@@ -72,7 +70,7 @@
 	</xsl:template>
 
 	<xsl:template match="graphs">
-		<div dojoType="dijit.TitlePane" title="Graphs">
+		<div data-dojo-type="dijit/TitlePane" title="Graphs">
 			<ul>
 				<xsl:apply-templates>
 				</xsl:apply-templates>
