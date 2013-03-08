@@ -554,11 +554,12 @@ implements Cloneable, WithACL {
             this.graphType = graphType;
             this.color = color;
         }
-        public DsDesc(String dsName, GraphType graphType, String legend) {
+        public DsDesc(String dsName, GraphType graphType, String legend, ConsolFun cf) {
             this.name = dsName;
             this.dsName = dsName;
             this.graphType = graphType;
             this.legend = legend;
+            this.cf = cf;
         }
         public String toString() {
             return "DsDesc(" + name + "," + dsName + ",\"" + (rpn == null ? "" : rpn) + "\"," + graphType + "," + color + ",\"" + (legend == null ? "" : legend) + "\"," + cf + ")";
@@ -784,7 +785,7 @@ implements Cloneable, WithACL {
                     new DsDesc(name, dsName, rpn, GraphType.NONE, null, null, cf, host, probe));
             allds.add(
                     new DsDesc("rev_" + name, revRpn, graphType, color, null));
-            allds.add(new DsDesc(name, GraphType.LEGEND, legend));
+            allds.add(new DsDesc(name, GraphType.LEGEND, legend, cf));
         }
         else {
             allds.add(
@@ -806,7 +807,7 @@ implements Cloneable, WithACL {
                         new DsDesc("rev_" + percentileName, revPercentilRpn, GraphType.LINE, percentilColor, null));
 
             }
-            allds.add(new DsDesc(percentileName, GraphType.PERCENTILELEGEND, percentileLegend));
+            allds.add(new DsDesc(percentileName, GraphType.PERCENTILELEGEND, percentileLegend, cf));
             maxLengthLegend = Math.max(maxLengthLegend, percentileLegend.length());
         }
         if(legend != null) {
@@ -872,9 +873,9 @@ implements Cloneable, WithACL {
             }
             //The graph is a percentile
             else if(ds.percentile != null) {
+                complete = true;
                 graphDef.percentile(ds.name, ds.dsName, ds.percentile);
                 datasources.add(ds.name);
-                complete = true;
             }
             //A rpn datasource
             else if (ds.rpn != null) {
@@ -883,6 +884,9 @@ implements Cloneable, WithACL {
                     graphDef.datasource(ds.name, ds.rpn);
                     datasources.add(ds.name);
                 }
+            }
+            else if(ds.graphType == GraphType.LEGEND) {
+                complete = true;                
             }
             //Does the datas existe in the provided values
             //It override existing values in the probe
