@@ -127,17 +127,32 @@ public abstract class DiscoverAgent {
      * This method add a probe to the current host document
      * @param hostDom the host document
      * @param probe the Name of the probe
+     * @param label the label of the probe
+     * @param argsTypes a list of type for the argument
+     * @param argsValues a list of value for the argument
+     * @return the generated element for this probe
+     */
+    public JrdsElement addProbe(JrdsElement hostElement, String probe, String label, List<String> argsTypes, List<String> argsValues, Map<String, String> beans) {
+        JrdsElement probeElement = hostElement.addElement("probe");
+        probeElement.setAttribute("type", probe);
+        addArgsList(probeElement, argsTypes, argsValues, beans);
+        if(label != null) {
+            probeElement.setAttribute("label", label);
+        }
+        return probeElement;
+    }
+
+    /**
+     * This method add a probe to the current host document
+     * @param hostDom the host document
+     * @param probe the Name of the probe
      * @param argsTypes a list of type for the argument
      * @param argsValues a list of value for the argument
      * @return the generated element for this probe
      */
     public JrdsElement addProbe(JrdsElement hostElement, String probe, List<String> argsTypes, List<String> argsValues, Map<String, String> beans) {
-        JrdsElement probeElement = hostElement.addElement("probe");
-        probeElement.setAttribute("type", probe);
-        addArgsList(probeElement, argsTypes, argsValues, beans);
-        return probeElement;
+        return addProbe(hostElement, probe, null, argsTypes, argsValues, beans);
     }
-
 
     protected Element addConnexion(JrdsElement hostElem, String connexionClass, List<String> argsTypes, List<String> argsValues, Map<String, String> beans) {
         JrdsElement cnxElement = hostElem.addElement("type", String.format("type=%s", connexionClass));

@@ -137,7 +137,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         OID OidExist = new OID(summary.specifics.get("existOid"));
         Map<OID, Object> found = SnmpRequester.RAW.doSnmpGet(active, Collections.singletonList(OidExist));
         if(found.size() > 0) {
-            addProbe(hostEleme, summary.name, null, null, null);
+            addProbe(hostEleme, summary.name, null, null, null, null);
             log(Level.TRACE, "%s does exist: %s", summary.name, found.values());
             return true;
         }
@@ -174,20 +174,19 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
             if(withOid) {
                 beans.put("oid", Integer.toString(index));
             }
-            JrdsElement rrdElem = addProbe(hostEleme, summary.name, null, null, beans);
-
             //We try to auto-generate the label
             String label = summary.specifics.get("labelOid");
+            String labelValue = null;
             if (label != null && ! label.isEmpty()) {
                 for(String lookin: label.split(",")) {
                     OID Oidlabel = new OID(lookin.trim() + "." + index);
-                    String labelValue = getLabel(active, Collections.singletonList(Oidlabel));
-                    if(labelValue != null) {
-                        rrdElem.setAttribute("label", labelValue);
-                        break;
-                    }
+                    labelValue = getLabel(active, Collections.singletonList(Oidlabel));
+                    break;
                 }
             }
+
+            addProbe(hostEleme, summary.name, labelValue, null, null, beans);
+
         }
         return count;
     }
