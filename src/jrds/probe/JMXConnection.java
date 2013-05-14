@@ -16,98 +16,134 @@ import jrds.starter.Connection;
 
 import org.apache.log4j.Level;
 
-@ProbeBean({"port", "user", "password"})
+@ProbeBean({"url", "protocol", "port", "path", "user", "password"})
 public class JMXConnection extends Connection<MBeanServerConnection> {
+    private static enum PROTOCOL {
+        rmi {
+            @Override
+            public JMXServiceURL getURL(JMXConnection cnx) throws MalformedURLException {
+                return new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + cnx.getHostName() + ":" + cnx.port + cnx.path);
+            }
+        },
+        iiop {
+            @Override
+            public JMXServiceURL getURL(JMXConnection cnx) throws MalformedURLException {
+                return new JMXServiceURL("service:jmx:iiop:///jndi/iiop://" + cnx.getHostName() + ":" + cnx.port + cnx.path);
+            }
+        },
+        jmxmp {
+            @Override
+            public JMXServiceURL getURL(JMXConnection cnx) throws MalformedURLException {
+                return new JMXServiceURL("service:jmx:jmxmp://" + cnx.getHostName() + ":" + cnx.port);
+            }
 
-	final static String startTimeObjectName = "java.lang:type=Runtime";
-	final static String startTimeAttribue = "Uptime";
+        };
+        abstract public JMXServiceURL getURL(JMXConnection cnx)  throws MalformedURLException ;
+    };
 
-	private int port;
-	private String user = null;
-	private String password = null;
-	private JMXConnector connector;
-	private MBeanServerConnection connection;
+    final static String startTimeObjectName = "java.lang:type=Runtime";
+    final static String startTimeAttribue = "Uptime";
+
+    private JMXServiceURL url = null;
+    private PROTOCOL protocol  = PROTOCOL.rmi;
+    private int port;
+    private String path = "/jmxrmi";
+    private String user = null;
+    private String password = null;
+
+    private JMXConnector connector;
+    private MBeanServerConnection connection;
 
     public JMXConnection() {
         super();
     }
 
     public JMXConnection(Integer port) {
-		super();
-		this.port = port;
-	}
+        super();
+        this.port = port;
+    }
 
-	public JMXConnection(Integer port, String user, String password) {
-		super();
-		this.port = port;
-		this.user = user;
-		this.password = password;
-	}
+    public JMXConnection(Integer port, String user, String password) {
+        super();
+        this.port = port;
+        this.user = user;
+        this.password = password;
+    }
 
-	@Override
-	public MBeanServerConnection getConnection() {
-		return connection;
-	}
+    @Override
+    public MBeanServerConnection getConnection() {
+        return connection;
+    }
 
-	@Override
-	public long setUptime() {
-		ObjectName objectname;
-		try {
-			objectname = new ObjectName(startTimeObjectName);
-			Object o = connection.getAttribute(objectname, startTimeAttribue);
-			long uptime = ((Number)o).longValue() / 1000;
-			return uptime;
-		} catch (Exception e) {
-			log(Level.ERROR, e, "Uptime error for %s: %s", this, e);
-		}
-		return 0;
-	}
+    @Override
+    public long setUptime() {
+        ObjectName objectname;
+        try {
+            objectname = new ObjectName(startTimeObjectName);
+            Object o = connection.getAttribute(objectname, startTimeAttribue);
+            long uptime = ((Number)o).longValue() / 1000;
+            return uptime;
+        } catch (Exception e) {
+            log(Level.ERROR, e, "Uptime error for %s: %s", this, e);
+        }
+        return 0;
+    }
 
-	/* (non-Javadoc)
-	 * @see jrds.Starter#start()
-	 */
-	@Override
-	public boolean startConnection() {
-		String uri = "service:jmx:rmi:///jndi/rmi://" + getHostName() + ":" + port + "/jmxrmi";
-		try {
-			JMXServiceURL jmxserviceurl = new JMXServiceURL(uri);
-			Map<String, Object> attributes = null;
-			if(user != null && password != null ) {
-				String[] credentials = new String[]{user, password};
-				attributes = new HashMap<String, Object>();
-				attributes.put("jmx.remote.credentials", credentials);
-			}
-			connector = JMXConnectorFactory.connect(jmxserviceurl, attributes);
-			connection = connector.getMBeanServerConnection();
-			return true;
-		} catch (MalformedURLException e) {
-			log(Level.ERROR, e, "Invalid jmx URL %s: %s", uri, e);
-		} catch (IOException e) {
-			log(Level.ERROR, e, "Communication error with %s: %s", uri, e);
-		}
-		return false;
-	}
+    /* (non-Javadoc)
+     * @see jrds.Starter#start()
+     */
+    @Override
+    public boolean startConnection() {
+        try {
+            if (url == null) {
+                url = protocol.getURL(this);
+            }
+            Map<String, Object> attributes = null;
+            if(user != null && password != null ) {
+                String[] credentials = new String[]{user, password};
+                attributes = new HashMap<String, Object>();
+                attributes.put("jmx.remote.credentials", credentials);
+            }
+            connector = JMXConnectorFactory.connect(url, attributes);
+            connection = connector.getMBeanServerConnection();
+            return true;
+        } catch (MalformedURLException e) {
+            log(Level.ERROR, e, "Invalid jmx URL %s: %s", protocol.toString(), e);
+        } catch (IOException e) {
+            log(Level.ERROR, e, "Communication error with %s: %s", protocol.toString(), e);
+        }
+        return false;
+    }
 
-	/* (non-Javadoc)
-	 * @see jrds.Starter#stop()
-	 */
-	@Override
-	public void stopConnection() {
-		try {
-			connector.close();
-		} catch (IOException e) {
-			log(Level.ERROR, e, "JMXConnector to %s close failed because of: %s", this, e );
-		}
-		connection = null;
-	}
+    /* (non-Javadoc)
+     * @see jrds.Starter#stop()
+     */
+    @Override
+    public void stopConnection() {
+        try {
+            connector.close();
+        } catch (IOException e) {
+            log(Level.ERROR, e, "JMXConnector to %s close failed because of: %s", this, e );
+        }
+        connection = null;
+    }
 
-	/* (non-Javadoc)
-	 * @see jrds.Starter#toString()
-	 */
-	@Override
-	public String toString() {
-		return "service:jmx:rmi:///jndi/rmi://" + getHostName() + ":" + port + "/jmxrmi";
-	}
+    /* (non-Javadoc)
+     * @see jrds.Starter#toString()
+     */
+    @Override
+    public String toString() {
+        if (url == null) {
+            try {
+                return protocol.getURL(this).toString();
+            } catch (MalformedURLException e) {
+                return "";
+            }
+        }
+        else {
+            return url.toString();
+        }
+    }
 
     /**
      * @return the port
@@ -149,6 +185,49 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    /**
+     * @return the protocol
+     */
+    public String getProtocol() {
+        return protocol.name();
+    }
+
+    /**
+     * @param protocol the protocol to set
+     */
+    public void setProtocol(String protocol) {
+        this.protocol = PROTOCOL.valueOf(protocol.trim().toLowerCase());
+    }
+
+    /**
+     * @return the url
+     */
+    public String getUrl() {
+        return url.toString();
+    }
+
+    /**
+     * @param url the url to set
+     * @throws MalformedURLException 
+     */
+    public void setUrl(String url) throws MalformedURLException {
+        this.url = new JMXServiceURL(url);
+    }
+
+    /**
+     * @return the path
+     */
+    public String getPath() {
+        return path;
+    }
+
+    /**
+     * @param path the path to set
+     */
+    public void setPath(String path) {
+        this.path = path;
     }
 
 }
