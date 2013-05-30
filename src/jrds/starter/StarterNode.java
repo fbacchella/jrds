@@ -1,8 +1,10 @@
 package jrds.starter;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import jrds.HostsList;
 import jrds.PropertiesManager;
@@ -111,8 +113,19 @@ public abstract class StarterNode implements StartersSet {
         if(allStarters == null)
             return;
 
-        for(Starter s: allStarters.values()) {
-            s.configure(pm);
+        //A set with failed starters
+        Set<Object> failed = new HashSet<Object>();
+        for(Map.Entry<Object, Starter> me: allStarters.entrySet()) {
+            try {
+                me.getValue().configure(pm);
+            } catch (Exception e) {
+                failed.add(me.getKey());
+                log(Level.ERROR, e, "Starter %s failed to configure for %s", me.getValue(), this);
+            }
+        }
+        // Failed starter are removed
+        for(Object k: failed) {
+            allStarters.remove(k);
         }
     }
 
