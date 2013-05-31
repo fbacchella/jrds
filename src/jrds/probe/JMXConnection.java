@@ -1,11 +1,13 @@
 package jrds.probe;
 
 import java.io.IOException;
+import java.lang.management.RuntimeMXBean;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.management.MBeanServerConnection;
+import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
@@ -74,15 +76,30 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
     public MBeanServerConnection getConnection() {
         return connection;
     }
+    
+    /**
+     * Resolve a mbean interface, given the interface and it's name
+     * @param name
+     * @param interfaceClass
+     * @return
+     */
+    public <T> T getMBean(String name,  Class<T> interfaceClass) {
+        MBeanServerConnection mbsc = getConnection();
+        try {
+            ObjectName mbeanName = new ObjectName(name);
+            return javax.management.JMX.newMBeanProxy(mbsc, mbeanName, 
+                    interfaceClass, true);        
+        } catch (MalformedObjectNameException e) {
+            throw new RuntimeException("wrong mbean name: " + name, e);
+        }
+    }
 
     @Override
     public long setUptime() {
-        ObjectName objectname;
         try {
-            objectname = new ObjectName(startTimeObjectName);
-            Object o = connection.getAttribute(objectname, startTimeAttribue);
-            long uptime = ((Number)o).longValue() / 1000;
-            return uptime;
+            RuntimeMXBean mxbean = getMBean(startTimeObjectName, RuntimeMXBean.class);
+            if (mxbean != null)
+                return mxbean.getUptime() /1000;
         } catch (Exception e) {
             log(Level.ERROR, e, "Uptime error for %s: %s", this, e);
         }
@@ -98,6 +115,7 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
             if (url == null) {
                 url = protocol.getURL(this);
             }
+            log(Level.TRACE, "connecting to %s", url);
             Map<String, Object> attributes = null;
             if(user != null && password != null ) {
                 String[] credentials = new String[]{user, password};
@@ -106,6 +124,7 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
             }
             connector = JMXConnectorFactory.connect(url, attributes);
             connection = connector.getMBeanServerConnection();
+            log(Level.DEBUG, "connected to %s", connection);
             return true;
         } catch (MalformedURLException e) {
             log(Level.ERROR, e, "Invalid jmx URL %s: %s", protocol.toString(), e);
