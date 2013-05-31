@@ -96,7 +96,7 @@ public abstract class StarterNode implements StartersSet {
         if(! allStarters.containsKey(key)) {
             s.initialize(this);
             allStarters.put(key, s);
-            log(Level.DEBUG, "registering %s with key %s", s, key);
+            log(Level.DEBUG, "registering %s with key %s", s.getClass().getName(), key);
             return s;
         }
         else {
@@ -160,7 +160,8 @@ public abstract class StarterNode implements StartersSet {
     @SuppressWarnings("unchecked")
     public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, Object key) {
         StarterClass s = null;
-        log(Level.TRACE, "Looking for starter %s with key %s in %s", sc, key, allStarters);
+        if(allStarters != null)
+            log(Level.TRACE, "Looking for starter %s with key %s in %s", sc, key, allStarters);
         if(allStarters != null && allStarters.containsKey(key)) {
             Starter stemp = allStarters.get(key);
             if(sc.isInstance(stemp)) {

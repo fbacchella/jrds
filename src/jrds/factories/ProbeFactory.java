@@ -123,7 +123,7 @@ public class ProbeFactory {
             return true;
         } catch (SecurityException e) {
         } catch (NoSuchMethodException e) {
-            logger.warn("Probe arguments not matching configurators for" + p.getPd().getName() + ": " + e.getMessage());
+            logger.warn("Probe arguments not matching configurators for " + p.getPd().getName() + ": " + e.getMessage());
             return false;
         } catch (Exception ex) {
             Throwable showException = ex;

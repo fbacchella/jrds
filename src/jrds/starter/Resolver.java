@@ -13,8 +13,8 @@ public class Resolver extends Starter {
 	InetAddress address = null;
 
 	public Resolver(String hostname) {
-		log(Level.DEBUG, "New dns resolver");
 		this.hostname = hostname;
+        log(Level.DEBUG, "New dns resolver");
 	}
 
 	@Override

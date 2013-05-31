@@ -17,11 +17,6 @@ public abstract class ProbeConnected<KeyType, ValueType, ConnectionClass extends
     }
 
     public Boolean configure() {
-        ConnectionClass cnx = getConnection();
-        if(cnx == null) {
-            log(Level.ERROR, "No connection configured with name %s", getConnectionName());
-            return false;
-        }
         return true;
     }
 

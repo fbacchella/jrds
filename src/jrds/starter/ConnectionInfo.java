@@ -59,4 +59,13 @@ public class ConnectionInfo {
         return name;
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return type.getCanonicalName() + (name == null ? "" : ("/" + name));
+    }
+
+    
 }
