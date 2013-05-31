@@ -3,9 +3,11 @@ package jrds.starter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jrds.Util;
 import jrds.factories.ArgFactory;
+import jrds.factories.ConnectionName;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -22,7 +24,18 @@ public class ConnectionInfo {
         super();
         this.args = args;
         this.beansValue = beansValue;
-        this.name = name;
+        if(name == null) {
+            Set<ConnectionName> names = ArgFactory.enumerateAnnotation(type, ConnectionName.class, Connection.class);
+            if (names.size() == 1) {
+                this.name = names.iterator().next().value();
+            }
+            else {
+                this.name = name;
+            }
+        }
+        else {
+            this.name = name;
+        }
         this.type = type;
     }
 
@@ -67,5 +80,12 @@ public class ConnectionInfo {
         return type.getCanonicalName() + (name == null ? "" : ("/" + name));
     }
 
-    
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return name == null ? type.hashCode() : name.hashCode();
+    }
+
 }
