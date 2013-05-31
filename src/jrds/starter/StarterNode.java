@@ -120,7 +120,7 @@ public abstract class StarterNode implements StartersSet {
                 me.getValue().configure(pm);
             } catch (Exception e) {
                 failed.add(me.getKey());
-                log(Level.ERROR, e, "Starter %s failed to configure for %s", me.getValue(), this);
+                log(Level.ERROR, e, "Starter %s failed to configure: %s", me.getValue(), e);
             }
         }
         // Failed starter are removed

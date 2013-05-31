@@ -35,6 +35,7 @@ public abstract class Starter {
      * @param pm
      */
     public void configure(PropertiesManager pm) {
+        log(Level.DEBUG, "registred to %s", getLevel());
     }
 
     public final void doStart() {
