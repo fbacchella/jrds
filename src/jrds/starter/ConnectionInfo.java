@@ -26,11 +26,11 @@ public class ConnectionInfo {
         this.beansValue = beansValue;
         if(name == null) {
             Set<ConnectionName> names = ArgFactory.enumerateAnnotation(type, ConnectionName.class, Connection.class);
-            if (names.size() == 1) {
+            if ( ! names.isEmpty()) {
                 this.name = names.iterator().next().value();
             }
             else {
-                this.name = name;
+                this.name = type.getCanonicalName();
             }
         }
         else {
