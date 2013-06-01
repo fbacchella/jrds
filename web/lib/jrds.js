@@ -133,7 +133,12 @@ return declare("jrds.MinMaxTextBox", dijit.form.ValidationTextBox, {
 		regExp: "(-?\\d+(.\\d+)?)([a-zA-Z]{0,2})",
 		trim: true,
 		onFocus: function() {setAutoscale(false);},
-		onChange: updateScale
+		onChange: function(value) {
+			//value==0 is not a null value, keep it
+			if(! value && value != 0 )
+				value = null;
+			queryParams[this.id] = value;			
+		}
 });
 });
 
@@ -157,14 +162,6 @@ function resetScale() {
 function setAutoscale(value) {
 	var autoscale = dijit.byId("autoscale");
 	autoscale.attr('checked',value);
-}
-
-//Called upon edited scale text boxes
-function updateScale(value) {
-	//value==0 is not a null value, keep it
-	if(! value && value != 0 )
-		value = null;
-	queryParams[this.id] = value;
 }
 
 function declare_FixedFileUploader(declare, dojo, dojox) {
