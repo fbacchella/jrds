@@ -130,12 +130,42 @@ define("jrds/MinMaxTextBox",
          "dijit/form/ValidationTextBox" ],
        function(declare, dijit) {
 return declare("jrds.MinMaxTextBox", dijit.form.ValidationTextBox, {
-		regExp: "(-?\d+(.\d+)?)([a-zA-Z]{0,2})",
+		regExp: "(-?\\d+(.\\d+)?)([a-zA-Z]{0,2})",
 		trim: true,
 		onFocus: function() {setAutoscale(false);},
-		onChange: function() {updateScale();}
+		onChange: updateScale
 });
 });
+
+//called onChange for scale button
+function resetScale() {
+	if(dijit.byId("autoscale").attr('checked')) {
+		delete queryParams.max;
+		delete queryParams.min;
+		dijit.byId("max").attr('value', '');
+		dijit.byId("min").attr('value', '');
+		if(queryParams.id && queryParams.id != 0 )
+			getGraphList();
+	}
+	else {
+		dijit.byId("max").attr('value', queryParams.max);
+		dijit.byId("min").attr('value', queryParams.min);
+	}
+}
+
+//Called upon startup and focus on scale text boxes, will propagate good values using onChange function : resetScale and updateScale, 
+function setAutoscale(value) {
+	var autoscale = dijit.byId("autoscale");
+	autoscale.attr('checked',value);
+}
+
+//Called upon edited scale text boxes
+function updateScale(value) {
+	//value==0 is not a null value, keep it
+	if(! value && value != 0 )
+		value = null;
+	queryParams[this.id] = value;
+}
 
 function declare_FixedFileUploader(declare, dojo, dojox) {
 	return declare('kgf.dijit.FixedFileUploader', dojox.form.FileUploader, {
@@ -633,36 +663,6 @@ function linkdialog(data, ioargs) {
 	    content: "<a target='_blank' href='" + data +"'>" + data +"</a>"
 	});	  
 	myDialog.show();
-}
-
-//called onChange for scale button
-function resetScale() {
-	if(dijit.byId("autoscale").attr('checked')) {
-		delete queryParams.max;
-		delete queryParams.min;
-		dijit.byId("max").attr('value', '');
-		dijit.byId("min").attr('value', '');
-		if(queryParams.id && queryParams.id != 0 )
-			getGraphList();
-	}
-	else {
-		dijit.byId("max").attr('value', queryParams.max);
-		dijit.byId("min").attr('value', queryParams.min);
-	}
-}
-
-//Called upon startup and focus on scale text boxes, will propagate good values using onChange function : resetScale and updateScale, 
-function setAutoscale(value) {
-	var autoscale = dijit.byId("autoscale");
-	autoscale.attr('checked',value);
-}
-
-//Called upon edited scale text boxes
-function updateScale(value) {
-	//value==0 is not a null value, keep it
-	if(! value && value != 0 )
-		value = null;
-	queryParams[this.id] = value;
 }
 
 function setAutoperiod(value) {
