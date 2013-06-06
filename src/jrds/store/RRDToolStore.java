@@ -73,7 +73,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
     }
 
     @Override
-    public Extractor<DataChunk> fetchData() {
+    public AbstractExtractor<DataChunk> fetchData() {
         final RRDatabase db;
         try {
             db = new RRDatabase(rrdpath);
@@ -81,7 +81,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
             return null;
         }
 
-        return new Extractor<DataChunk>() {
+        return new AbstractExtractor<DataChunk>() {
 
             @Override
             public String[] getNames() {

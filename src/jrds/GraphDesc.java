@@ -860,13 +860,13 @@ implements Cloneable, WithACL {
      * @param defProbe The probe to get values from
      * @param customData some custom data, they override existing values in the associated probe
      */
-    public Extractor<?> fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei,
+    public Extractor fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei,
             Map<String, ? extends Plottable> customData) {
         HostsList hl = defProbe.getHostList();
         List<DsDesc> toDo = new ArrayList<DsDesc>();
         //The datasources already found
         Set<String> datasources = new HashSet<String>();
-        Extractor<?> extract = defProbe.fetchData(); 
+        Extractor extract = defProbe.fetchData(); 
         
         for(DsDesc ds: allds) {
             boolean complete = false;
@@ -989,7 +989,7 @@ implements Cloneable, WithACL {
      */
     public DataProcessor getPlottedDatas(Probe<?,?> probe, ExtractInfo ei, Map<?, ?> ownData) throws IOException {
         DataProcessor retValue = ei.getDataProcessor();
-        Extractor<?> extract = probe.fetchData();
+        Extractor extract = probe.fetchData();
         String lastName = null;
         for(DsDesc ds: allds) {
             boolean stack = ds.graphType == GraphType.STACK;

@@ -2,7 +2,7 @@ package jrds.store;
 
 import org.rrd4j.data.Plottable;
 
-public class EmptyExtractor extends Extractor<Object> {
+public class EmptyExtractor extends AbstractExtractor<Object> {
 
     @Override
     public String[] getNames() {

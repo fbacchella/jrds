@@ -73,7 +73,7 @@ public final class CheckValues extends JrdsServlet {
             }
             Date paste = new Date(lastupdate.getTime() - period * 1000);
             
-            Extractor<?> fd = p.fetchData();
+            Extractor fd = p.fetchData();
 
             String ds = params.getValue("dsname");
             

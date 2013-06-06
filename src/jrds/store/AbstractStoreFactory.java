@@ -7,12 +7,12 @@ import java.util.Map;
 import jrds.Probe;
 import jrds.factories.ArgFactory;
 
-public abstract class AbstractStoreFactory<Store extends AbstractStore<?,?>> {
+public abstract class AbstractStoreFactory<StoreType extends AbstractStore<?,?>> implements StoreFactory {
 
-    public abstract Store create(Probe<?,? > p);
+    public abstract StoreType create(Probe<?,? > p);
 
-    public Store configure(Probe<?,? > p, Map<String, String> properties) throws InvocationTargetException {
-        Store s = create(p);
+    public StoreType configure(Probe<?,? > p, Map<String, String> properties) throws InvocationTargetException {
+        StoreType s = create(p);
         for(PropertyDescriptor bean: ArgFactory.getBeanPropertiesMap(s.getClass(), AbstractStore.class).values()) {
             String beanName = bean.getName();
             if(properties.containsKey(beanName)) {

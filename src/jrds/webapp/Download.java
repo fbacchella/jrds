@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 
 import jrds.store.ExtractInfo;
 import jrds.store.Extractor;
+
 import org.rrd4j.data.DataProcessor;
 
 /**
@@ -116,7 +117,7 @@ public class Download extends JrdsServlet {
                 return;   
             }
             Period p = params.getPeriod();
-            Extractor<?> fd = probe.fetchData();
+            Extractor fd = probe.fetchData();
             ExtractInfo ei = ExtractInfo.get()
                                 .make(p.getBegin(), p.getEnd())
                                 .make(probe.getStep());

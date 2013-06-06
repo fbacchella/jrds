@@ -131,7 +131,7 @@ public class Graph implements WithACL {
         }
     }
     
-    protected Extractor<?> setGraphDefData(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei,
+    protected Extractor setGraphDefData(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei,
             Map<String, ? extends Plottable> customData) {
         GraphDesc gd = node.getGraphDesc();
         return gd.fillGraphDef(graphDef, node.getProbe(), ei, customData);        

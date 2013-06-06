@@ -46,7 +46,7 @@ public final class ProbeSummary extends JrdsServlet {
 			Date begin = params.getPeriod().getBegin();
 			Date end = params.getPeriod().getEnd();
 			
-			Extractor<?> fetched = probe.fetchData();
+			Extractor fetched = probe.fetchData();
 			ExtractInfo ei = ExtractInfo.get().make(begin, end);
 			String names[] = fetched.getDsNames();
 			for(int i= 0; i< names.length ; i++) {

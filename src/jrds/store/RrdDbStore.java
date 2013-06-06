@@ -252,10 +252,10 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
     }
 
     @Override
-    public jrds.store.Extractor<FetchData> fetchData() {
+    public AbstractExtractor<FetchData> fetchData() {
         try {
             final RrdDb rrdDb = StoreOpener.getRrd(getRrdName());
-            return new jrds.store.Extractor<FetchData>() {
+            return new jrds.store.AbstractExtractor<FetchData>() {
                 @Override
                 public String[] getNames() {
                     try {
@@ -349,10 +349,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
         try {
             rrdDb = StoreOpener.getRrd(getRrdName());
             Sample onesample = rrdDb.createSample(sample.getTime().getTime() / 1000);
-            @SuppressWarnings("unchecked")
-            // Bug in jvm ? sample.entrySet() can't be directly called in the for
-            Set<Map.Entry<String, Number>> es = sample.entrySet();
-            for(Map.Entry<String, Number> e: es) {
+            for(Map.Entry<String, Number> e: sample.entrySet()) {
                 onesample.setValue(e.getKey(), e.getValue().doubleValue());
             }
             if(p.getNamedLogger().isDebugEnabled())

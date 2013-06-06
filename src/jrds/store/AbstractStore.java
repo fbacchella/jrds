@@ -3,11 +3,12 @@ package jrds.store;
 import java.util.Date;
 import java.util.Map;
 
+import jrds.JrdsSample;
 import jrds.Probe;
 
 import org.apache.log4j.Level;
 
-public abstract class AbstractStore<StoreObject, DataSource> {
+public abstract class AbstractStore<StoreObject, DataSource> implements Store {
     protected final Probe<?, ?> p;
 
     public AbstractStore(Probe<?, ?> p) {
@@ -15,7 +16,7 @@ public abstract class AbstractStore<StoreObject, DataSource> {
         this.p = p;
     }
 
-    public abstract void commit(Probe.JrdsSample sample);
+    public abstract void commit(JrdsSample sample);
     public abstract Map<String, Number> getLastValues();
     public abstract boolean checkStoreFile();
     public abstract Date getLastUpdate();
@@ -30,5 +31,4 @@ public abstract class AbstractStore<StoreObject, DataSource> {
         p.log(l, format, elements);
     }
 
-    public abstract Extractor<DataSource> fetchData();
 }

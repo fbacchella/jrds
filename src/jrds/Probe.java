@@ -21,9 +21,9 @@ import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.starter.HostStarter;
 import jrds.starter.StarterNode;
-import jrds.store.AbstractStore;
-import jrds.store.AbstractStoreFactory;
 import jrds.store.Extractor;
+import jrds.store.Store;
+import jrds.store.StoreFactory;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -82,8 +82,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     private String label = null;
     private Logger namedLogger = Logger.getLogger("jrds.Probe.EmptyProbe");
     private volatile boolean running = false;
-    private Set<AbstractStore<?, ?>> stores = new HashSet<AbstractStore<?, ?>>();
-    private AbstractStore<?, ?> mainStore;
+    private Set<Store> stores = new HashSet<Store>();
+    private Store mainStore;
 
     /**
      * A special case constructor, mainly used by virtual probe
@@ -282,7 +282,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                     //during the reading of samples
                     if( sample.size() > 0 && isCollectRunning()) {
                         mainStore.commit(sample);
-                        for(AbstractStore<?, ?> store: stores) {
+                        for(Store store: stores) {
                             store.commit(sample);
                         }
                         interrupted = false;
@@ -551,21 +551,21 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     /**
      * @return the stores
      */
-    public Set<AbstractStore<?, ?>> getStores() {
+    public Set<Store> getStores() {
         return stores;
     }
 
     /**
      * @param stores the stores to set
      */
-    public void addStore(AbstractStoreFactory<?> factory) {
+    public void addStore(StoreFactory factory) {
         stores.add(factory.create(this));
     }
 
     /**
      * @return the mainStore
      */
-    public AbstractStore<?, ?> getMainStore() {
+    public Store getMainStore() {
         return mainStore;
     }
 
@@ -573,7 +573,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * @param mainStore the mainStore to set
      * @throws InvocationTargetException 
      */
-    public void setMainStore(AbstractStoreFactory<?> factory, Map<String, String> args) throws InvocationTargetException {
+    public void setMainStore(StoreFactory factory, Map<String, String> args) throws InvocationTargetException {
         this.mainStore = factory.configure(this, args);
     }
 
@@ -581,7 +581,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         return mainStore.getLastValues();
     }
 
-    public Extractor<?> fetchData() {
+    public Extractor fetchData() {
         return mainStore.fetchData();
     }
 

@@ -15,6 +15,7 @@ import org.rrd4j.ConsolFun;
 
 import jrds.store.ExtractInfo;
 import jrds.store.Extractor;
+
 import org.rrd4j.data.LinearInterpolator;
 import org.rrd4j.data.Plottable;
 
@@ -78,7 +79,7 @@ public class Sum extends AutonomousGraphNode {
                         .make(ConsolFun.AVERAGE);
                 logger.debug(Util.delayedFormatString("Configuring the sum %s from %d to %d, step %d", Sum.this.getName(), start, end, step));
                 //Used to kept the last fetched data and analyse the
-                Extractor<?> fd = null;
+                Extractor fd = null;
 
                 double[][] allvalues = null;
                 for(String name : graphList) {

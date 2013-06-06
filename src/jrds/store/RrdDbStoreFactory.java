@@ -1,7 +1,6 @@
 package jrds.store;
 
 import jrds.Probe;
-import jrds.factories.ProbeBean;
 
 public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
 
