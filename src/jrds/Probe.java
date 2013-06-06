@@ -1,7 +1,7 @@
 package jrds;
 
-import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,21 +21,13 @@ import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.starter.HostStarter;
 import jrds.starter.StarterNode;
+import jrds.store.AbstractStore;
+import jrds.store.AbstractStoreFactory;
+import jrds.store.Extractor;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.rrd4j.ConsolFun;
-import org.rrd4j.core.ArcDef;
-import org.rrd4j.core.Archive;
-import org.rrd4j.core.Datasource;
 import org.rrd4j.core.DsDef;
-import org.rrd4j.core.FetchData;
-import org.rrd4j.core.FetchRequest;
-import org.rrd4j.core.Header;
-import org.rrd4j.core.RrdDb;
-import org.rrd4j.core.RrdDef;
-import org.rrd4j.core.Sample;
-import org.rrd4j.core.Util;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -50,11 +42,36 @@ import org.w3c.dom.Element;
         )
 public abstract class Probe<KeyType, ValueType> extends StarterNode implements Comparable<Probe<KeyType, ValueType>>  {
 
-    private static final ArcDef[] DEFAULTARC = {
-            new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 3),
-            new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 24 * 365), 
-            new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 365 * 2)
-    };
+    public class JrdsSample extends HashMap<String, Number> {
+        Date time;
+
+        /**
+         * @return the time
+         */
+        public JrdsSample() {
+            super(Probe.this.pd.getSize());
+            time = new Date();
+        }
+
+        public Date getTime() {
+            return time;
+        }
+
+        /**
+         * @param time the time to set
+         */
+        public void setTime(Date time) {
+            this.time = time;
+        }
+
+        public void put(Map.Entry<String, Double> e) {
+            this.put(e.getKey(), e.getValue());
+        }
+
+        public Probe<KeyType,ValueType> getProbe() {
+            return Probe.this;
+        }
+    }
 
     private String name = null;
     private HostInfo monitoredHost;
@@ -65,6 +82,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     private String label = null;
     private Logger namedLogger = Logger.getLogger("jrds.Probe.EmptyProbe");
     private volatile boolean running = false;
+    private Set<AbstractStore<?, ?>> stores = new HashSet<AbstractStore<?, ?>>();
+    private AbstractStore<?, ?> mainStore;
 
     /**
      * A special case constructor, mainly used by virtual probe
@@ -125,236 +144,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         this.name = name;
     }
 
-    public String getRrdName() {
-        String rrdName = getName().replaceAll("/","_");
-        return monitoredHost.getHostDir() +
-                Util.getFileSeparator() + rrdName + ".rrd";
-    }
-
-    private final String parseTemplate(String template) {
-        Object[] arguments = {
-                "${host}",
-                "${index}",
-                "${url}",
-                "${port}",
-                "${index.signature}",
-                "${url.signature}"
-        };
-        return jrds.Util.parseOldTemplate(template, arguments, this);
-    }
-
-    protected DsDef[] getDsDefs() {
-        return getPd().getDsDefs();
-    }
-
-    public RrdDef getRrdDef() {
-        RrdDef def = new RrdDef(getRrdName());
-        def.setVersion(2);
-        def.addArchive(DEFAULTARC);
-        def.addDatasource(getDsDefs());
-        def.setStep(getStep());
-        return def;
-    }
-
-    /**
-     * Create the probe file
-     * @throws IOException
-     */
-    protected void create() throws IOException {
-        log(Level.INFO, "Need to create rrd");
-        RrdDef def = getRrdDef();
-        RrdDb rrdDb = new RrdDb(def);
-        rrdDb.close();
-    }
-
-    private void upgrade() {
-        RrdDb rrdSource = null;
-        try {
-            log(Level.WARN,"Definition is changed, the store needs to be upgraded");
-            File source = new File(getRrdName());
-            rrdSource = new RrdDb(source.getCanonicalPath());
-
-            RrdDef rrdDef = getRrdDef();
-            File dest = File.createTempFile("JRDS_", ".tmp", source.getParentFile());
-            rrdDef.setPath(dest.getCanonicalPath());
-            RrdDb rrdDest = new RrdDb(rrdDef);
-
-            log(Level.DEBUG, "updating %s to %s",source, dest);
-
-            Set<String> badDs = new HashSet<String>();
-            Header header = rrdSource.getHeader();
-            int dsCount = header.getDsCount();;
-            header.copyStateTo(rrdDest.getHeader());
-            for (int i = 0; i < dsCount; i++) {
-                Datasource srcDs = rrdSource.getDatasource(i);
-                String dsName = srcDs.getName();
-                Datasource dstDS = rrdDest.getDatasource(dsName);
-                if (dstDS != null ) {
-                    try {
-                        srcDs.copyStateTo(dstDS);
-                        log(Level.TRACE, "Update %s", dsName);
-                    } catch (RuntimeException e) {
-                        badDs.add(dsName);
-                        log(Level.ERROR, e, "Datasource %s can't be upgraded: %s", dsName,  e.getMessage());
-                    }
-                }
-            }
-            int robinMigrated = 0;
-            for (int i = 0; i < rrdSource.getArcCount(); i++) {
-                Archive srcArchive = rrdSource.getArchive(i);
-                ConsolFun consolFun = srcArchive.getConsolFun();
-                int steps = srcArchive.getSteps();
-                Archive dstArchive = rrdDest.getArchive(consolFun, steps);
-                if (dstArchive != null) {
-                    if ( dstArchive.getConsolFun().equals(srcArchive.getConsolFun())  &&
-                            dstArchive.getSteps() == srcArchive.getSteps() ) {
-                        for (int k = 0; k < dsCount; k++) {
-                            Datasource srcDs = rrdSource.getDatasource(k);
-                            String dsName = srcDs.getName();
-                            try {
-                                int j = rrdDest.getDsIndex(dsName);
-                                if (j >= 0 && ! badDs.contains(dsName)) {
-                                    log(Level.TRACE, "Upgrade of %s from %s", dsName, srcArchive);
-                                    srcArchive.getArcState(k).copyStateTo(dstArchive.getArcState(j));
-                                    srcArchive.getRobin(k).copyStateTo(dstArchive.getRobin(j));
-                                    robinMigrated++;
-                                }
-                            }
-                            catch (IllegalArgumentException e) {
-                                log(Level.TRACE, "Datastore %s removed", dsName);
-                            }
-
-                        }
-                        log(Level.TRACE, "Update %s", srcArchive);
-                    }
-                }
-            }
-            log(Level.DEBUG, "Robin migrated: %s", robinMigrated);
-
-            rrdDest.close();
-            rrdSource.close();
-            log(Level.DEBUG, "Size difference : %d", (dest.length() - source.length()));
-            copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
-        } catch (IOException e) {
-            log(Level.ERROR, e, "Upgrade failed: %s", e);
-        }
-        finally {
-            if(rrdSource != null)
-                try {
-                    rrdSource.close();
-                } catch (IOException e) {
-                }
-        }
-    }
-
-    private static void copyFile(String sourcePath, String destPath)
-            throws IOException {
-        File source = new File(sourcePath);
-        File dest = new File(destPath);
-        File destOld = new File(destPath + ".old");
-        if (!dest.renameTo(destOld)) {
-            throw new IOException("Could not rename file " + destPath + " from " + destOld);
-        }
-        if (!source.renameTo(dest)) {
-            throw new IOException("Could not rename file " + destPath + " from " + sourcePath);
-        }
-        deleteFile(destOld);
-    }
-
-    private static void deleteFile(File file) throws IOException {
-        if (file.exists() && !file.delete()) {
-            throw new IOException("Could not delete file: " + file.getCanonicalPath());
-        }
-    }
-
-    /**
-     * Check the final status of the probe. It must be called once before an probe can be used
-     * 
-     * Open the rrd backend of the probe.
-     * it's created if it's needed
-     * @throws IOException
-     * @throws RrdException
-     */
-    public boolean checkStore()  {
-        if(pd == null) {
-            log(Level.ERROR, "Missing Probe description");
-            return false;
-        }
-        if(monitoredHost == null) {
-            log(Level.ERROR, "Missing host");
-            return false;
-        }
-
-        //Name can be set by other means
-        if(name == null)
-            name = parseTemplate(getPd().getProbeName());
-
-        finished = checkStoreFile();
-        return finished;
-    }
-
-    protected boolean checkStoreFile() {
-        File rrdFile = new File(getRrdName());
-
-        File rrdDir = monitoredHost.getHostDir();
-        if (!rrdDir.isDirectory()) {
-            if( ! rrdDir.mkdir()) {
-                try {
-                    log(Level.ERROR, "prode dir %s creation failed ", rrdDir.getCanonicalPath());
-                } catch (IOException e) {
-                }
-                return false;
-            }
-        }
-
-        boolean retValue = false;
-        RrdDb rrdDb = null;
-        try {
-            if ( rrdFile.isFile() ) {
-                rrdDb = new RrdDb(getRrdName());
-                //old definition
-                RrdDef tmpdef = rrdDb.getRrdDef();
-                Date startTime = new Date();
-                tmpdef.setStartTime(startTime);
-                String oldDef = tmpdef.dump();
-                long oldstep = tmpdef.getStep();
-                log(Level.TRACE, "Definition found: %s\n", oldDef);
-
-                //new definition
-                tmpdef = getRrdDef();
-                tmpdef.setStartTime(startTime);
-                String newDef = tmpdef.dump();
-                long newstep = tmpdef.getStep();
-
-                if(newstep != oldstep ) {
-                    log(Level.ERROR, "step changed, you're in trouble" );
-                    return false;
-                }
-                else if(! newDef.equals(oldDef)) {
-
-                    rrdDb.close();
-                    rrdDb = null;
-                    upgrade();
-                    rrdDb = new RrdDb(getRrdName());
-                }
-                log(Level.TRACE, "******");
-            } else
-                create();
-            retValue = true;
-        } catch (Exception e) {
-            log(Level.ERROR, e, "Store %s unusable: %s", getRrdName(), e);
-        }
-        finally {
-            if(rrdDb != null)
-                try {
-                    rrdDb.close();
-                } catch (IOException e) {
-                }
-
-        }
-        return retValue;
-    }
-
     /**
      * The method that return a map of data collected.<br>
      * It should return return as raw as possible, they can even be opaque data tied to the probe.
@@ -393,14 +182,14 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * The sample itself can be modified<br>
-     * @param oneSample
+     * @param sample
      * @param values
      */
-    public void modifySample(Sample oneSample, Map<KeyType, ValueType> values) {
+    public void modifySample(JrdsSample sample, Map<KeyType, ValueType> values) {
         for(Map.Entry<String, ProbeDesc.Joined> e: getPd().getHighlowcollectmap().entrySet()) {
             Long joined = joinCounter32(values.get(e.getValue().keyhigh), values.get(e.getValue().keylow));
             if(joined != null)
-                oneSample.setValue(e.getKey(), joined.doubleValue());
+                sample.put(e.getKey(), joined.doubleValue());
         }
     }
 
@@ -422,15 +211,16 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * Store the values on the rrd backend.
      * @param oneSample
      */
-    private boolean updateSample(Sample oneSample) {
+    private JrdsSample updateSample() {
+        JrdsSample sample = newSample();
         if(isCollectRunning()) {
             Map<KeyType, ValueType> sampleVals = getNewSampleValues();
             log(Level.TRACE, "Collected values: %s", sampleVals);
-            if (sampleVals != null) {
+            if (sampleVals != null && ! sampleVals.isEmpty()) {
                 if(getUptime() * pd.getUptimefactor() >= pd.getHeartBeatDefault()) {
                     //Set the default values that might be defined in the probe description
                     for(Map.Entry<String, Double> e: getPd().getDefaultValues().entrySet()) {
-                        oneSample.setValue(e.getKey(), e.getValue());
+                        sample.put(e);
                     }
                     Map<?, String> nameMap = getCollectMapping();
                     log(Level.TRACE, "Collect keys: %s", nameMap);
@@ -438,23 +228,30 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                     log(Level.TRACE, "Filtered values: %s", filteredSamples);
                     for(Map.Entry<KeyType, Number> e: filteredSamples.entrySet()) {
                         String dsName = nameMap.get(e.getKey());
-                        double value = e.getValue().doubleValue();
                         if (dsName != null) {
-                            oneSample.setValue(dsName, value);
+                            sample.put(dsName, e.getValue());
                         }
                         else {
                             log(Level.TRACE, "Dropped entry: %s", e.getKey());
                         }
                     }
-                    modifySample(oneSample, sampleVals);
-                    return true;
+                    modifySample(sample, sampleVals);
+                    return sample;
                 }
                 else {
-                    log(Level.INFO, "uptime too low: %f", getUptime() * pd.getUptimefactor());
+                    log(Level.INFO, "uptime too low: %.0f", getUptime() * pd.getUptimefactor());
                 }
             }
         }
-        return false;
+        return sample;
+    }
+
+    /**
+     * Return a new JrdsSample. It can be overridden if a smarter sample is needed
+     * @return
+     */
+    public JrdsSample newSample() {
+        return this.new JrdsSample();
     }
 
     /**
@@ -477,19 +274,17 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         if(isCollectRunning()) {
             running = true;
             log(Level.DEBUG,"launching collect");
-            RrdDb rrdDb = null;
             try {
                 //No collect if the thread was interrupted
                 if( isCollectRunning()) {
-                    rrdDb = StoreOpener.getRrd(getRrdName());
-                    Sample onesample = rrdDb.createSample();
-                    boolean updated = updateSample(onesample);
+                    JrdsSample sample = updateSample();                    
                     //The collect might have been stopped
                     //during the reading of samples
-                    if( updated && isCollectRunning()) {
-                        if(namedLogger.isDebugEnabled())
-                            log(Level.DEBUG, "%s", onesample.dump());
-                        onesample.update();
+                    if( sample.size() > 0 && isCollectRunning()) {
+                        mainStore.commit(sample);
+                        for(AbstractStore<?, ?> store: stores) {
+                            store.commit(sample);
+                        }
                         interrupted = false;
                     }
                 }
@@ -516,8 +311,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                 log(Level.ERROR, e, "Error while collecting: %s", message);
             }
             finally  {
-                if(rrdDb != null)
-                    StoreOpener.releaseRrd(rrdDb);
                 stopCollect();
             }
             if(interrupted) {
@@ -560,94 +353,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         return pd;
     }
 
-    /**
-     * Return the date of the last update of the rrd backend
-     * @return The date
-     */
-    public Date getLastUpdate() {
-        Date lastUpdate = null;
-        RrdDb rrdDb = null;
-        try {
-            rrdDb = StoreOpener.getRrd(getRrdName());
-            lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to get last update date for " + getQualifiedName(), e);
-        }
-        finally {
-            if(rrdDb != null)
-                StoreOpener.releaseRrd(rrdDb);
-        }
-        return lastUpdate;
-    }
-
     public boolean dsExist(String dsName) {
         return pd.dsExist(dsName);
-    }
-
-    /**
-     * Return the probe data for the given period
-     * @param startDate
-     * @param endDate
-     * @return
-     */
-    public FetchData fetchData(Date startDate, Date endDate) {
-        return fetchData(startDate.getTime() /1000, endDate.getTime() / 1000);
-    }
-
-    /**
-     * Return the probe data for the given period
-     * @param fetchStart Starting timestamp for fetch request.
-     * @param fetchEnd   Ending timestamp for fetch request.
-     * @return Request object that should be used to actually fetch data from RRD
-     */
-    public FetchData fetchData(long fetchStart, long fetchEnd) {
-        return fetchData(ConsolFun.AVERAGE, fetchStart, fetchEnd, 1);
-    }
-
-    /**
-     * Return the probe data for the given period
-     * @param consolFun  Consolidation function to be used in fetch request. Allowed values are
-     *                   "AVERAGE", "MIN", "MAX" and "LAST" (these constants are conveniently defined in the
-     *                   {@link ConsolFun} class).
-     * @param fetchStart Starting timestamp for fetch request.
-     * @param fetchEnd   Ending timestamp for fetch request.
-     * @param resolution Fetch resolution.
-     * @return Request object that should be used to actually fetch data from RRD
-     */
-    public FetchData fetchData(ConsolFun consolFun, long fetchStart, long fetchEnd, long resolution) {
-        FetchData retValue = null;
-        RrdDb rrdDb = null;
-        try {
-            rrdDb = StoreOpener.getRrd(getRrdName());
-            FetchRequest fr = rrdDb.createFetchRequest(consolFun, fetchStart, fetchEnd, resolution);
-            retValue = fr.fetchData();
-        } catch (Exception e) {
-            log(Level.ERROR, e, "Unable to fetch data: %s", e.getMessage());
-        }
-        finally {
-            if(rrdDb != null)
-                StoreOpener.releaseRrd(rrdDb);
-        }
-        return retValue;
-    }
-
-    public Map<String, Number> getLastValues() {
-        Map<String, Number> retValues = new HashMap<String, Number>();
-        RrdDb rrdDb = null;
-        try {
-            rrdDb = StoreOpener.getRrd(getRrdName());
-            String[] dsNames = rrdDb.getDsNames();
-            for(int i = 0; i < dsNames.length ; i ++) {
-                retValues.put(dsNames[i], rrdDb.getDatasource(i).getLastValue());
-            }
-        } catch (Exception e) {
-            log(Level.ERROR, e, "Unable to get last values: %s", e.getMessage());
-        }
-        finally {
-            if(rrdDb != null)
-                StoreOpener.releaseRrd(rrdDb);
-        }
-        return retValues;
     }
 
     /**
@@ -678,7 +385,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     public boolean readSpecific() {
         return true;
     }
-    
+
     /**
      * A probe can override it to extract custom values from the properties.
      * It will be read just after it's created and before configuration.
@@ -686,7 +393,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * @param pm
      */
     public void readProperties(PropertiesManager pm) {
-        
+
     }
 
     /**
@@ -752,7 +459,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             graph.setTextContent(qualifiedGraphName);
             graph.setAttribute("id", String.valueOf(gn.hashCode()));
         }
-        DsDef[] dss= getDsDefs();
+        DsDef[] dss= new DsDef[0]; //getDsDefs();
 
         if (sorted)
             Arrays.sort(dss, new Comparator<DsDef>() {
@@ -795,6 +502,87 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      */
     public Logger getNamedLogger() {
         return namedLogger;
+    }
+
+    public Date getLastUpdate() {
+        return mainStore.getLastUpdate();
+    }
+
+    /**
+     * Check the final status of the probe. It must be called once before an probe can be used
+     * 
+     * Open the rrd backend of the probe.
+     * it's created if it's needed
+     * @throws IOException
+     * @throws RrdException
+     */
+    public boolean checkStore()  {
+        ProbeDesc pd = getPd();
+        if(pd == null) {
+            log(Level.ERROR, "Missing Probe description");
+            return false;
+        }
+        if(getHost() == null) {
+            log(Level.ERROR, "Missing host");
+            return false;
+        }
+
+        //Name can be set by other means
+        if(name == null)
+            name = parseTemplate(pd.getProbeName());
+
+        finished = mainStore.checkStoreFile();
+        return finished;
+    }
+
+    private final String parseTemplate(String template) {
+        Object[] arguments = {
+                "${host}",
+                "${index}",
+                "${url}",
+                "${port}",
+                "${index.signature}",
+                "${url.signature}"
+        };
+        return jrds.Util.parseOldTemplate(template, arguments, this);
+    }
+
+
+    /**
+     * @return the stores
+     */
+    public Set<AbstractStore<?, ?>> getStores() {
+        return stores;
+    }
+
+    /**
+     * @param stores the stores to set
+     */
+    public void addStore(AbstractStoreFactory<?> factory) {
+        stores.add(factory.create(this));
+    }
+
+    /**
+     * @return the mainStore
+     */
+    public AbstractStore<?, ?> getMainStore() {
+        return mainStore;
+    }
+
+    /**
+     * @param mainStore the mainStore to set
+     * @throws InvocationTargetException 
+     */
+    public void setMainStore(AbstractStoreFactory<?> factory, Map<String, String> args) throws InvocationTargetException {
+        this.mainStore = factory.configure(this, args);
+    }
+
+    public Map<String, Number> getLastValues() {
+        return mainStore.getLastValues();
+    }
+
+    public Extractor<?> fetchData() {
+        return mainStore.fetchData();
     }
 
 }

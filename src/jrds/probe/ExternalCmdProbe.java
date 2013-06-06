@@ -13,7 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +22,7 @@ import jrds.PropertiesManager;
 import jrds.Util;
 
 import org.apache.log4j.Level;
-import org.rrd4j.core.Sample;
+import org.rrd4j.core.DsDef;
 
 /**
  * This abstract class can be used to parse the results of an external command
@@ -31,8 +31,8 @@ import org.rrd4j.core.Sample;
  */
 public abstract class ExternalCmdProbe extends Probe<String, Number> {
 
-	protected String cmd = null;
-	
+    protected String cmd = null;
+
     @Override
     public void readProperties(PropertiesManager pm) {        
         cmd = resolvCmdPath(pm.getProperty("path",""));
@@ -47,7 +47,7 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         }
         return true;
     }
-    
+
     protected String resolvCmdPath(String path) {
         List<String> pathelements = new ArrayList<String>();
         pathelements.addAll(Arrays.asList(path.split(";")));
@@ -71,24 +71,38 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         }
         return cmd;
     }
-    
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.Probe#getNewSampleValues()
-	 */
-	public Map<String, Number> getNewSampleValues() {
-		return Collections.emptyMap();
-	}
-	
-	/* (non-Javadoc)
-     * @see jrds.Probe#modifySample(org.rrd4j.core.Sample, java.util.Map)
+
+    /* (non-Javadoc)
+     * @see com.aol.jrds.Probe#getNewSampleValues()
      */
-    @Override
-    public void modifySample(Sample oneSample, Map<String, Number> values) {
+    public Map<String, Number> getNewSampleValues() {
         String perfstring = launchCmd();
-        if(! perfstring.isEmpty())
-            oneSample.set(perfstring);
-	}
-    
+        String values[] = perfstring.split(":");
+        DsDef[] defs = getPd().getDsDefs();
+        int n = values.length;
+        if (values.length != defs.length + 1) {
+            throw new IllegalArgumentException("Invalid number of values specified (found " +
+                    values.length + ", " + defs.length + " allowed)");
+        }
+        long time;
+        String timeToken = values[0];
+        if(timeToken.equalsIgnoreCase("N") || timeToken.equalsIgnoreCase("NOW")) {
+            time =  System.currentTimeMillis() / 1000;
+        }
+        else {
+            time = jrds.Util.parseStringNumber(timeToken, Long.MAX_VALUE);
+            if(time == Long.MAX_VALUE) {
+                throw new IllegalArgumentException("Invalid sample timestamp: " + timeToken);
+            }
+        }
+        Map<String, Number> retValues = new HashMap<String, Number>(n - 1);
+        for(int i=0; i< defs.length; i++) {
+            double value = jrds.Util.parseStringNumber(values[i + 1], Double.NaN);
+            retValues.put(defs[i].getDsName(), value);
+        }
+        return retValues;
+    }
+
     protected String launchCmd() {
         String perfstring = "";
         Process urlperfps = null;
@@ -107,12 +121,12 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
             } catch (IOException e) {
             }
         }
-        
+
         try {
             if(urlperfps != null) {
                 urlperfps.waitFor();
                 if(urlperfps.exitValue() !=0 ) {
-                    
+
                     InputStream stderr = urlperfps.getErrorStream();
                     BufferedReader stderrtReader = new BufferedReader(new InputStreamReader(stderr));
                     String errostring = stderrtReader.readLine();
@@ -135,16 +149,16 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         log(Level.DEBUG, "returned line: %s", perfstring);
         return perfstring;
     }
-    
-	/**
-	 * @return Returns the cmd.
-	 */
-	public String getCmd() {
-		return cmd;
-	}
 
-	@Override
-	public String getSourceType() {
-		return "external command";
-	}
+    /**
+     * @return Returns the cmd.
+     */
+    public String getCmd() {
+        return cmd;
+    }
+
+    @Override
+    public String getSourceType() {
+        return "external command";
+    }
 }

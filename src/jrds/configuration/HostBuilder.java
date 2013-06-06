@@ -313,6 +313,14 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 }
             }
         }
+        
+        try {
+            Map<String, String> empty = Collections.emptyMap();
+            p.setMainStore(pm.storefactory, empty);
+        } catch (InvocationTargetException e) {
+            logger.error(Util.delayedFormatString("Failed to configure the store for the probe %s", pm.storefactory.getClass().getCanonicalName(), p));
+            return null;
+        }
 
         if(p.checkStore()) {
             shost.addProbe(p);

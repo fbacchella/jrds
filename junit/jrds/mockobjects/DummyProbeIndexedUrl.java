@@ -1,5 +1,6 @@
 package jrds.mockobjects;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -10,11 +11,11 @@ public class DummyProbeIndexedUrl extends DummyProbeIndexed implements UrlProbe 
 	Class<? extends Probe<?,?>> originalProbe;
 	URL url;
 
-	public void configure (Class<? extends Probe<?,?>> originalProbe) {
+	public void configure (Class<? extends Probe<?,?>> originalProbe) throws InvocationTargetException {
 		super.configure(originalProbe);
 	}
 
-	public void configure () {
+	public void configure () throws InvocationTargetException {
 		super.configure();
 		try {
 			url = new URL("http://localhost/");

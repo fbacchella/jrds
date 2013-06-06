@@ -28,6 +28,8 @@ import java.util.regex.Pattern;
 
 import jrds.factories.ArgFactory;
 import jrds.starter.Timer;
+import jrds.store.AbstractStoreFactory;
+import jrds.store.RrdDbStoreFactory;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
 
@@ -505,6 +507,7 @@ public class PropertiesManager extends Properties {
     public ACL defaultACL = ACL.ALLOWEDACL;
     public ACL adminACL = ACL.ALLOWEDACL;
     public boolean readonly = false;
+    public AbstractStoreFactory storefactory = new RrdDbStoreFactory();
     public static final String FILTERTAB = "filtertab";
     public static final String CUSTOMGRAPHTAB = "customgraph";
     public static final String SUMSTAB = "sumstab";

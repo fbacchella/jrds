@@ -1,6 +1,7 @@
 package jrds.mockobjects;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -66,7 +67,7 @@ public class Full {
 		return gd;
 	}
 	
-	static public Probe<?,?> getProbe() {
+	static public Probe<?,?> getProbe() throws InvocationTargetException {
 		Probe<?,?> p = new Probe<String, Number>() {
 
 			@Override
@@ -79,11 +80,13 @@ public class Full {
 				return "fullmoke";
 			}
 		};
+		Map<String, String> empty = Collections.emptyMap();
+		p.setMainStore(new jrds.store.RrdDbStoreFactory(), empty);
 		p.setPd(getPd());
 		return p;
 
 	}
-	static public Probe<?,?> create(TemporaryFolder testFolder, int step) {
+	static public Probe<?,?> create(TemporaryFolder testFolder, int step) throws InvocationTargetException {
 		HostInfo host = new HostInfo("Empty");
 		host.setHostDir(testFolder.getRoot());
 		
@@ -100,12 +103,11 @@ public class Full {
 		long start = System.currentTimeMillis() / 1000;
 		long end = start + 3600 * 24 * 30;
 
-		String rrdPath = p.getRrdName();
 		// update database
 		GaugeSource sunSource = new GaugeSource(1200, 20);
 		GaugeSource shadeSource = new GaugeSource(300, 10);
 		long t = start;
-		RrdDb rrdDb = new RrdDb(rrdPath);
+		RrdDb rrdDb = (RrdDb) p.getMainStore().getStoreObject();
 		Sample sample = rrdDb.createSample();
 
 		while (t <= end + 86400L) {

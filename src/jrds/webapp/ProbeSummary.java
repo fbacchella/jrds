@@ -18,7 +18,9 @@ import jrds.Probe;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
-import org.rrd4j.core.FetchData;
+
+import jrds.store.ExtractInfo;
+import jrds.store.Extractor;
 
 /**
  * A servlet wich show the last update values and time
@@ -43,17 +45,19 @@ public final class ProbeSummary extends JrdsServlet {
 		if(probe != null) {
 			Date begin = params.getPeriod().getBegin();
 			Date end = params.getPeriod().getEnd();
-			FetchData fetched = probe.fetchData(begin, end);
+			
+			Extractor<?> fetched = probe.fetchData();
+			ExtractInfo ei = ExtractInfo.get().make(begin, end);
 			String names[] = fetched.getDsNames();
 			for(int i= 0; i< names.length ; i++) {
 				String dsName = names[i];
 				try {
 					out.print(dsName + " ");
-					out.print(fetched.getAggregate(dsName, ConsolFun.AVERAGE) + " ");
-					out.print(fetched.getAggregate(dsName, ConsolFun.MIN) + " ");
-					out.println(fetched.getAggregate(dsName, ConsolFun.MAX));
+					out.print(fetched.getValue(ei.make(ConsolFun.AVERAGE)) + " ");
+					out.print(fetched.getValue(ei.make(ConsolFun.MIN)) + " ");
+					out.println(fetched.getValue(ei.make(ConsolFun.MAX)));
 				} catch (IOException e) {
-					logger.error("Probe file " + probe.getRrdName() + "unusable: " + e);
+					logger.error("Probe " + probe + "unusable: " + e);
 				}
 			}
 		}

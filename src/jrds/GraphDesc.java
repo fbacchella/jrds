@@ -23,6 +23,8 @@ import jrds.Util.SiPrefix;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.probe.jdbc.JdbcProbe;
+import jrds.store.ExtractInfo;
+import jrds.store.Extractor;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
@@ -824,7 +826,7 @@ implements Cloneable, WithACL {
      * @throws RrdException
      */
     public RrdGraphDef getGraphDef(Probe<?,?> probe) throws IOException {
-        return getGraphDef(probe, null);
+        return getGraphDef(probe, ExtractInfo.get(), null);
     }
 
     public RrdGraphDef getEmptyGraphDef() {
@@ -858,13 +860,14 @@ implements Cloneable, WithACL {
      * @param defProbe The probe to get values from
      * @param customData some custom data, they override existing values in the associated probe
      */
-    public void fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe,
+    public Extractor<?> fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei,
             Map<String, ? extends Plottable> customData) {
         HostsList hl = defProbe.getHostList();
         List<DsDesc> toDo = new ArrayList<DsDesc>();
         //The datasources already found
         Set<String> datasources = new HashSet<String>();
-
+        Extractor<?> extract = defProbe.fetchData(); 
+        
         for(DsDesc ds: allds) {
             boolean complete = false;
             // not a data source, don't try to add it in datasources
@@ -917,13 +920,13 @@ implements Cloneable, WithACL {
                 }
 
                 complete = true;
-                if( ! datasources.contains(ds.name)) {
-                    String rrdName = probe.getRrdName();
-                    graphDef.datasource(ds.name, rrdName, ds.dsName, ds.cf);                
+                if( ! datasources.contains(ds.name)) {                    
+                    graphDef.datasource(ds.name, extract.getPlottable(ei.make(ds.dsName).make(ds.cf)));                
                     datasources.add(ds.name);
                 }
                 else {
                     logger.error("Datasource '" + ds.name + "' defined twice in " + name + ", for found: " + ds);
+                    logger.error("New one is " + ds);
                 }
             }
             if (complete) {
@@ -956,6 +959,8 @@ implements Cloneable, WithACL {
             if(withSummary && ds.graphType.legend())
                 addLegend(graphDef, ds.name, ds.graphType, ds.legend);
         }
+        
+        return extract;
     }
 
     /**
@@ -967,9 +972,9 @@ implements Cloneable, WithACL {
      * @throws IOException
      * @throws RrdException
      */
-    public RrdGraphDef getGraphDef(Probe<?,?> defProbe, Map<String, ? extends Plottable> ownData) throws IOException {
+    public RrdGraphDef getGraphDef(Probe<?,?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> ownData) throws IOException {
         RrdGraphDef retValue = getEmptyGraphDef();
-        fillGraphDef(retValue, defProbe, ownData);
+        fillGraphDef(retValue, defProbe, ei, ownData);
         return retValue;
     }
 
@@ -982,10 +987,9 @@ implements Cloneable, WithACL {
      * @throws IOException
      * @throws RrdException
      */
-    public DataProcessor getPlottedDatas(Probe<?,?> probe, Map<?, ?> ownData, long start, long end) throws IOException {
-        DataProcessor retValue = new DataProcessor(start, end);
-        String rrdName = probe.getRrdName();
-
+    public DataProcessor getPlottedDatas(Probe<?,?> probe, ExtractInfo ei, Map<?, ?> ownData) throws IOException {
+        DataProcessor retValue = ei.getDataProcessor();
+        Extractor<?> extract = probe.fetchData();
         String lastName = null;
         for(DsDesc ds: allds) {
             boolean stack = ds.graphType == GraphType.STACK;
@@ -997,7 +1001,7 @@ implements Cloneable, WithACL {
                 }
                 //Or they might be on the associated rrd
                 else if(probe.dsExist(ds.dsName)) {
-                    retValue.addDatasource(ds.name, rrdName, ds.dsName, ds.cf);                             
+                    retValue.addDatasource(ds.name, extract.getPlottable(ei.make(ds.dsName).make(ds.cf)));
                 }
             }
             else if(ds.rpn != null){

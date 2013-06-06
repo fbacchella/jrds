@@ -2,6 +2,7 @@ package jrds.probe;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
@@ -16,6 +17,7 @@ import jrds.starter.HostStarter;
 import jrds.starter.Resolver;
 import jrds.starter.SocketFactory;
 import jrds.starter.Starter;
+import jrds.store.RrdDbStoreFactory;
 import junit.framework.Assert;
 
 import org.apache.log4j.Level;
@@ -63,7 +65,7 @@ public class ApacheHttpClientTest {
     }
 
     @Test
-    public void testConnect() throws IOException {
+    public void testConnect() throws IOException, InvocationTargetException {
         HttpClientStarter cnx = new HttpClientStarter();
         HostStarter localhost = addConnection(cnx);
         localhost.find(Resolver.class).doStart();
@@ -82,6 +84,8 @@ public class ApacheHttpClientTest {
                 super.collect();
             }
         };
+        Map<String, String> empty = Collections.emptyMap();
+        p.setMainStore(new RrdDbStoreFactory(), empty);
         p.setName("toto");
         p.setPd(new ProbeDesc());
         p.getPd().add("test", DsType.COUNTER);

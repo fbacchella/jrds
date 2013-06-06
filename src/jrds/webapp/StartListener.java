@@ -2,6 +2,10 @@ package jrds.webapp;
 
 import java.io.IOException;
 
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.MBeanRegistrationException;
+import javax.management.MalformedObjectNameException;
+import javax.management.NotCompliantMBeanException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -45,6 +49,24 @@ public class StartListener implements ServletContextListener {
 			Configuration c = new Configuration(ctxt);
 			c.start();
 			ctxt.setAttribute(Configuration.class.getName(), c);
+			try {
+                jrds.jmx.Management.register(ctxt);
+            } catch (MalformedObjectNameException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InstanceAlreadyExistsException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (MBeanRegistrationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (NotCompliantMBeanException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (NullPointerException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
 			started = true;
 			logger.info("Application jrds started");
 		}

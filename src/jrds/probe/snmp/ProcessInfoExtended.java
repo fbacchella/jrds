@@ -14,7 +14,6 @@ import jrds.snmp.SnmpVars;
 import jrds.snmp.TabularIterator;
 
 import org.apache.log4j.Level;
-import org.rrd4j.core.Sample;
 import org.snmp4j.smi.OID;
 
 /**
@@ -103,7 +102,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
      * @see jrds.Probe#modifySample(org.rrd4j.core.Sample, java.util.Map)
      */
     @Override
-    public void modifySample(Sample oneSample, Map<OID, Object> snmpVars) {
+    public void modifySample(JrdsSample oneSample, Map<OID, Object> snmpVars) {
         log(Level.TRACE, "Will uses snmp values from %s", snmpVars);
         double max = 0;
         double min = Double.MAX_VALUE;
@@ -124,11 +123,11 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
             }
         }
         average /= nbvalue;
-        oneSample.setValue(NUM, nbvalue);
-        oneSample.setValue(MAX, max);
-        oneSample.setValue(MIN, min);
-        oneSample.setValue(AVERAGE, average);
-        oneSample.setValue(CPU, cpuUsed);		
+        oneSample.put(NUM, nbvalue);
+        oneSample.put(MAX, max);
+        oneSample.put(MIN, min);
+        oneSample.put(AVERAGE, average);
+        oneSample.put(CPU, cpuUsed);		
     }
 
     /* (non-Javadoc)

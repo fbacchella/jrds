@@ -19,7 +19,9 @@ import jrds.Period;
 import jrds.Probe;
 
 import org.apache.log4j.Logger;
-import org.rrd4j.core.FetchData;
+
+import jrds.store.ExtractInfo;
+import jrds.store.Extractor;
 import org.rrd4j.data.DataProcessor;
 
 /**
@@ -52,20 +54,6 @@ public class Download extends JrdsServlet {
         };
     };
 
-    //    protected static final DateFormat epochFormat = new DateFormat() {
-    //        @Override
-    //        public StringBuffer format(Date date, StringBuffer toAppendTo,
-    //                FieldPosition arg2) {
-    //            return toAppendTo.append(date.getTime() / 1000);
-    //        }
-    //        @Override
-    //        public Date parse(String source, ParsePosition pos) {
-    //            pos.setIndex(source.length());
-    //            return new Date(Long.parseLong(source) * 1000);
-    //        }
-    //        
-    //    };
-
     public void doGet(HttpServletRequest req, HttpServletResponse res) {
 
         ParamsBean params;
@@ -93,7 +81,6 @@ public class Download extends JrdsServlet {
         } else {
             params = getParamsBean(req);
         }
-
 
         DataProcessor sourceDp = null;
         String fileName = null;
@@ -129,14 +116,17 @@ public class Download extends JrdsServlet {
                 return;   
             }
             Period p = params.getPeriod();
-            FetchData fd = probe.fetchData(p.getBegin(), p.getEnd());
+            Extractor<?> fd = probe.fetchData();
+            ExtractInfo ei = ExtractInfo.get()
+                                .make(p.getBegin(), p.getEnd())
+                                .make(probe.getStep());
             sourceDp = new DataProcessor(p.getBegin(), p.getEnd());
             for(String dsName: fd.getDsNames()) {
-                sourceDp.addDatasource(dsName, fd);
+                sourceDp.addDatasource(dsName, fd.getPlottable(ei.make(dsName)));
             }
             try {
                 sourceDp.processData();
-                fileName = probe.getRrdName().replaceFirst("\\.rrd",".csv");
+                fileName = probe.getName().replaceFirst("\\.rrd",".csv");
             } catch (IOException e) {
                 logger.error("Unable to process probe data");
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);

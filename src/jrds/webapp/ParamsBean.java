@@ -65,6 +65,9 @@ public class ParamsBean implements Serializable {
     };
 
     static private final Pattern rangePattern = Pattern.compile("(-?\\d+(.\\d+)?)([a-zA-Z]{0,2})");
+    //static private final Pattern splitPattern = Pattern.compile("/((.+)(/[^/].*+)/?)|/(.*)");
+    //static private final Pattern splitPattern = Pattern.compile("/([^/]*)(?=/[^/])");
+    static private final Pattern splitPattern = Pattern.compile("/([^/].*[^/]|[^/])/([^/].*[^/]|[^/])/([^/].*[^/]|[^/])");
 
     String contextPath = "";
     String dsName = null;
@@ -101,6 +104,20 @@ public class ParamsBean implements Serializable {
         contextPath = req.getContextPath();
         String probeInfo = req.getPathInfo();
         if (probeInfo != null) {
+            Matcher m = splitPattern.matcher(probeInfo.trim());
+            while(m.find()) {
+                StringBuilder sb = new StringBuilder();
+                for(int i=0 ; i <= m.groupCount(); i++) {
+                    sb.append(m.group(i));
+                    sb.append(" ");
+                }
+                logger.trace(sb);
+                String next = m.group(2);
+                if(next != null)
+                    m = splitPattern.matcher(next);
+                else
+                    break;
+            }
             params = new HashMap<String, String[]>(restPath.length);
             String[] path = probeInfo.trim().split("/");
             logger.trace(jrds.Util.delayedFormatString("mapping %s to %s", Arrays.asList(path), Arrays.asList(restPath)));

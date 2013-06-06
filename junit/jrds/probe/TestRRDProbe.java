@@ -6,7 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 import jrds.Graph;
 import jrds.GraphDesc;
@@ -16,6 +18,7 @@ import jrds.HostInfo;
 import jrds.Tools;
 import jrds.Util;
 import jrds.starter.HostStarter;
+import jrds.store.RrdDbStoreFactory;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -51,13 +54,15 @@ public class TestRRDProbe {
     }
     
     @Test
-    public void test1() throws IOException {
+    public void test1() throws IOException, InvocationTargetException {
         RRDToolProbe p = new RRDToolProbe();
         p.setHost(new HostStarter(new HostInfo("toto")));
         ProbeDesc pd = new ProbeDesc();
         pd.setName("Rrdtool");	
         pd.setProbeName("rrdtool");
         p.setPd(pd);
+        Map<String, String> empty = Collections.emptyMap();
+        p.setMainStore(new RrdDbStoreFactory(), empty);
 
         Assert.assertTrue("rrd native file can't be read", rrdfile.canRead());
         Assert.assertTrue("Configuration of the probe failed", p.configure(rrdfile));

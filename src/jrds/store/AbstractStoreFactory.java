@@ -1,0 +1,26 @@
+package jrds.store;
+
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Map;
+
+import jrds.Probe;
+import jrds.factories.ArgFactory;
+
+public abstract class AbstractStoreFactory<Store extends AbstractStore<?,?>> {
+
+    public abstract Store create(Probe<?,? > p);
+
+    public Store configure(Probe<?,? > p, Map<String, String> properties) throws InvocationTargetException {
+        Store s = create(p);
+        for(PropertyDescriptor bean: ArgFactory.getBeanPropertiesMap(s.getClass(), AbstractStore.class).values()) {
+            String beanName = bean.getName();
+            if(properties.containsKey(beanName)) {
+                String beanValue = properties.get(beanName);
+                ArgFactory.beanSetter(s, bean.getName(), beanValue);                    
+            }
+        }
+        return s;
+    }
+
+}

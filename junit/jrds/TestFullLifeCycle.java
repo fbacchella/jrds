@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.imageio.ImageIO;
 
@@ -33,7 +34,7 @@ public class TestFullLifeCycle {
     }
 
     @Test
-    public void create() throws IOException {
+    public void create() throws IOException, InvocationTargetException {
         PropertiesManager pm = new PropertiesManager();
         pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
@@ -49,7 +50,7 @@ public class TestFullLifeCycle {
         Probe<?,?> p = Full.create(testFolder, pm.step);
         p.setStep(pm.step);
         p.setTimeout(pm.timeout);
-        logger.debug(p.getRrdDef().dump());
+        //logger.debug(p.getRrdDef().dump());
 
         logger.debug("Created " + p);
         long endSec = Full.fill(p);

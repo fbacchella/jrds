@@ -72,8 +72,9 @@ public final class Graph extends JrdsServlet {
             res.setContentType("image/png");
             // No caching, the date might be in the future, a period is requested
             // So the image have short lifetime, just one step
+            int graphStep = graph.getNode().getProbe().getStep();
             if(p.period.getScale() != 0 || ! cache) {
-                res.addDateHeader("Expires", new Date().getTime() + getPropertiesManager().step * 1000);
+                res.addDateHeader("Expires", new Date().getTime() + graphStep * 1000);
             }
             res.addDateHeader("Last-Modified", graph.getEnd().getTime());
             res.addHeader("content-disposition","inline; filename=" + graph.getPngName());

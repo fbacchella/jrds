@@ -48,12 +48,12 @@ public final class WhichLibs extends JrdsServlet {
             out.println("    Server info: " + ctxt.getServerInfo());
             out.println();
 
-            String[] openned = StoreOpener.getInstance().getOpenFiles();
-            out.println("" + StoreOpener.getInstance().getOpenFileCount() + " opened rrd: ");
-            for(String rrdPath: openned) {
-                out.println("   " + rrdPath + ": " + StoreOpener.getOpenCount(rrdPath));
-            }
-            out.println();
+            //String[] openned = StoreOpener.getInstance().getOpenFiles();
+            //out.println("" + StoreOpener.getInstance().getOpenFileCount() + " opened rrd: ");
+            //for(String rrdPath: openned) {
+            //    out.println("   " + rrdPath + ": " + StoreOpener.getOpenCount(rrdPath));
+            //}
+            //out.println();
 
             PropertiesManager pm = getPropertiesManager();
             out.println("Temp dir: " + pm.tmpdir);

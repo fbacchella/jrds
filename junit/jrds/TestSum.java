@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -60,7 +61,7 @@ public class TestSum {
     }
 
     @Test
-    public void getSum() throws IOException, TransformerException, ParserConfigurationException {
+    public void getSum() throws IOException, TransformerException, ParserConfigurationException, InvocationTargetException {
         PropertiesManager pm = new PropertiesManager();
         pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
@@ -101,7 +102,7 @@ public class TestSum {
         PlottableMap ppm = s.getCustomData();
         ppm.configure(begin, end, Full.STEP);
         
-        RrdDb db = new RrdDb(p.getRrdName());
+        RrdDb db = (RrdDb) p.getMainStore().getStoreObject();
         FetchData fd = db.createFetchRequest(ConsolFun.AVERAGE, begin, end).fetchData();        
         DataProcessor dp =  new DataProcessor(begin, end);
         dp.addDatasource("shade", fd);

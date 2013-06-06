@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.rrd4j.core.DsDef;
+import org.rrd4j.core.RrdDb;
 import org.w3c.dom.Document;
 
 public class UtilTest {
@@ -103,21 +104,24 @@ public class UtilTest {
 
     @Test
     public void testSerialization4() throws Exception {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
         DummyProbe p = new DummyProbe();
         p.configure();
         Document d = p.dumpAsXml();
+        Util.serialize(d, System.out, null, null);
         URL xsl = ResourcesLocator.getResourceUrl("/jrds/xmlResources/probe.xsl");
         Assert.assertNotNull("xls transformation not found", xsl);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         out.reset();
         Util.serialize(d, out, xsl, null);
         String outBuffer = out.toString();
         logger.debug("testSerialization4: " + outBuffer);
         Assert.assertTrue("HTML doctype not found", outBuffer.contains("DOCTYPE html"));
         Assert.assertTrue("probe id not found in HTML", outBuffer.contains("pid=" + p.hashCode()));
-        for(DsDef ds: p.getDsDefs()) {
+        RrdDb db = (RrdDb) p.getMainStore().getStoreObject();
+        for(DsDef ds: db.getRrdDef().getDsDefs()) {
             Assert.assertTrue(outBuffer.contains("dsName=" + ds.getDsName()));
         }
+        p.getMainStore().closeStoreObject(db);
     }
 
     @Test

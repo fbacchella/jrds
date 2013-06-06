@@ -18,7 +18,9 @@ import jrds.HostsList;
 import jrds.Probe;
 
 import org.rrd4j.ConsolFun;
-import org.rrd4j.core.FetchData;
+
+import jrds.store.ExtractInfo;
+import jrds.store.Extractor;
 
 /**
  * A servlet wich return datastore values from a probe.
@@ -70,15 +72,21 @@ public final class CheckValues extends JrdsServlet {
                 return;
             }
             Date paste = new Date(lastupdate.getTime() - period * 1000);
-            FetchData fd = p.fetchData(paste, lastupdate);
+            
+            Extractor<?> fd = p.fetchData();
 
             String ds = params.getValue("dsname");
+            
+            ExtractInfo ei = ExtractInfo.get().
+                                make(paste, lastupdate).
+                                make(cf).
+                                make(p.getStep());
             if(ds != null && !  "".equals(ds.trim())) {
-                out.print(fd.getAggregate(ds.trim(), cf));
+                out.print(fd.getValue(ei.make(ds.trim())));
             }
             else {
                 for(String dsName: fd.getDsNames()) {
-                    double val = fd.getAggregate(dsName, cf);
+                    double val = fd.getValue(ei.make(dsName));
                     out.println(dsName + ": " + val);
                 }
                 out.println("Last update: " + p.getLastUpdate());

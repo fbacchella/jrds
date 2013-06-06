@@ -67,14 +67,6 @@ public class ContainerProbe extends  Probe<Object, Number> {
     }
 
     /* (non-Javadoc)
-     * @see jrds.Probe#getRrdName()
-     */
-    @Override
-    public String getRrdName() {
-        return getName();
-    }
-
-    /* (non-Javadoc)
      * @see jrds.Probe#getQualifiedName()
      */
     @Override

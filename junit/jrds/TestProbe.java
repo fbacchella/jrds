@@ -2,6 +2,9 @@ package jrds;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +23,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
-import org.rrd4j.core.Sample;
 
 public class TestProbe {
     static final private Logger logger = Logger.getLogger(TestProbe.class);
@@ -36,7 +38,7 @@ public class TestProbe {
     }
 
     @Test
-    public void testHighLow() throws TransformerException, IOException, ParserConfigurationException {
+    public void testHighLow() throws TransformerException, IOException, ParserConfigurationException, InvocationTargetException {
         ProbeDesc pd = new ProbeDesc();
         pd.setName("empty");
         pd.setProbeName("empty");
@@ -54,13 +56,15 @@ public class TestProbe {
                 return true;
             }			
             @Override
-            public void modifySample(Sample oneSample, Map<String, Long> values) {
-                oneSample.setTime(getLastUpdate().getTime() + 1000);
+            public void modifySample(JrdsSample oneSample, Map<String, Long> values) {
+                oneSample.time = new Date((getLastUpdate().getTime() + 1000) * 1000);
                 super.modifySample(oneSample, values);
             }			
         };
         host.getHost().setHostDir(testFolder.newFolder("testHighLow"));
         p.setHost(host);
+        Map<String, String> empty =  Collections.emptyMap();
+        p.setMainStore(new jrds.store.RrdDbStoreFactory(), empty);
         p.setParent(new StarterNode() {});
         p.configure();
         Map<String, Long> val = new HashMap<String, Long>();
@@ -75,7 +79,7 @@ public class TestProbe {
     }
 
     @Test
-    public void testDefault() throws TransformerException, IOException, ParserConfigurationException {
+    public void testDefault() throws TransformerException, IOException, ParserConfigurationException, InvocationTargetException {
         ProbeDesc pd = new ProbeDesc();
         pd.setName("empty");
         pd.setProbeName("empty");
@@ -98,12 +102,14 @@ public class TestProbe {
                 return true;
             }
             @Override
-            public void modifySample(Sample oneSample, Map<String, Long> values) {
-                oneSample.setTime(getLastUpdate().getTime() + 1000);
+            public void modifySample(JrdsSample oneSample, Map<String, Long> values) {
+                oneSample.time = new Date((getLastUpdate().getTime() + 1000) * 1000);
                 super.modifySample(oneSample, values);
             }			
         };
         host.getHost().setHostDir(testFolder.newFolder("testDefault"));
+        Map<String, String> empty =  Collections.emptyMap();
+        p.setMainStore(new jrds.store.RrdDbStoreFactory(), empty);
         p.setHost(host);
         p.setParent(new StarterNode() {});
         p.configure();

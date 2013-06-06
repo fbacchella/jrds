@@ -6,7 +6,12 @@ import org.rrd4j.data.Plottable;
 
 public abstract class PlottableMap extends HashMap<String, Plottable>{
 	public static class ProxyPlottable extends Plottable {
-		Plottable real = new Plottable() {};
+		Plottable real = new Plottable() {
+
+            @Override
+            public double getValue(long timestamp) {
+                return Double.NaN;
+            }};
 		@Override
 		public double getValue(long timestamp) {
 			return real.getValue(timestamp);

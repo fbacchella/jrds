@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import jrds.store.ExtractInfo;
+import jrds.store.Extractor;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
@@ -113,6 +115,7 @@ public class Graph implements WithACL {
         try {
             long startsec = getStartSec();
             long endsec = getEndSec();
+            ExtractInfo ei = ExtractInfo.get().make(start, end);
             graphDef.setStartTime(startsec);
             graphDef.setEndTime(endsec);
             PlottableMap customData = node.getCustomData();
@@ -120,7 +123,7 @@ public class Graph implements WithACL {
                 long step = Math.max((endsec - startsec) / gd.getWidth(), 1);
                 customData.configure(startsec, endsec, step);
             }
-            setGraphDefData(graphDef, node.getProbe(), customData);
+            setGraphDefData(graphDef, node.getProbe(), ei, customData);
             if(gd.withLegend())
                 addlegend(graphDef);
         } catch (IllegalArgumentException e) {
@@ -128,10 +131,10 @@ public class Graph implements WithACL {
         }
     }
     
-    protected void setGraphDefData(RrdGraphDef graphDef, Probe<?, ?> defProbe,
+    protected Extractor<?> setGraphDefData(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei,
             Map<String, ? extends Plottable> customData) {
         GraphDesc gd = node.getGraphDesc();
-        gd.fillGraphDef(graphDef, node.getProbe(), customData);        
+        return gd.fillGraphDef(graphDef, node.getProbe(), ei, customData);        
     }
 
     protected long getStartSec() {
@@ -175,7 +178,8 @@ public class Graph implements WithACL {
      * @throws IOException
      */
     public DataProcessor getDataProcessor() throws IOException {
-        DataProcessor dp = node.getGraphDesc().getPlottedDatas(node.getProbe(), null, start.getTime() / 1000, end.getTime() / 1000);
+        ExtractInfo ei = ExtractInfo.get().make(start, end);
+        DataProcessor dp = node.getGraphDesc().getPlottedDatas(node.getProbe(), ei, null);
         dp.processData();
         return dp;
     }

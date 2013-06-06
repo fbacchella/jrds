@@ -75,21 +75,6 @@ public class RRDToolProbe extends Probe<String, Double> {
     }
 
     /* (non-Javadoc)
-     * @see jrds.Probe#checkStoreFile()
-     */
-    @Override
-    protected boolean checkStoreFile() {
-        return rrdpath.canRead();
-    }
-
-    /* (non-Javadoc)
-     * @see jrds.Probe#create()
-     */
-    @Override
-    protected void create() throws IOException {
-    }
-
-    /* (non-Javadoc)
      * @see jrds.Probe#getLastUpdate()
      */
     @Override
