@@ -105,14 +105,6 @@ public final class StoreOpener {
     }
 
     public static final void stop() {
-        RrdBackendFactory factory = RrdBackendFactory.getDefaultFactory();
-        if(factory instanceof RrdAccountingNioBackendFactory) {
-            logger.info("backend opened: " + RrdAccountingNioBackend.getAccess());
-            logger.info("backend bytes read: " + RrdAccountingNioBackend.getBytesRead());
-            logger.info("backend reads: " + RrdAccountingNioBackend.getReadOp());
-            logger.info("backend bytes written: " + RrdAccountingNioBackend.getBytesWritten());
-            logger.info("backend reads: " + RrdAccountingNioBackend.getWriteOp());
-        }
         logger.info("Average wait time: " +  waitTime.doubleValue() / lockCount.doubleValue() + " ms");
 
     }
