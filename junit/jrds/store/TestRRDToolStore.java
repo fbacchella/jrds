@@ -40,7 +40,7 @@ public class TestRRDToolStore {
                                             .set(GenerateProbe.FACTORYCONFIG, factoryArgs);
         Probe<?,?> p = GenerateProbe.fillProbe(new GenerateProbe.EmptyProbe(), testFolder, args);
         Assert.assertTrue(p.getMainStore().checkStoreFile());
-        Extractor<?> e = p.getMainStore().fetchData();
+        Extractor e = p.getMainStore().fetchData();
         String[] dsNames = e.getNames();
         Assert.assertEquals("data source speed not found", "speed", dsNames[0]);
         Assert.assertEquals("data source weight not found", "weight", dsNames[1]);

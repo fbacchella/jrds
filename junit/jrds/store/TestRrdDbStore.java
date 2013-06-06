@@ -40,7 +40,7 @@ public class TestRrdDbStore {
         Probe<?,?> p = GenerateProbe.quickProbe(testFolder);
         p.getPd().add("test", DsType.COUNTER);
         Assert.assertTrue("Probe file creation failed", p.checkStore());
-        Extractor<?> e = p.getMainStore().fetchData();
+        Extractor e = p.getMainStore().fetchData();
         String[] dsNames = e.getNames();
         Assert.assertEquals("data source test not found", "test", dsNames[0]);
     }
@@ -51,7 +51,7 @@ public class TestRrdDbStore {
         p.setStep(30);
         p.getPd().add("test", DsType.GAUGE);
         Assert.assertTrue("Probe file creation failed", p.checkStore());
-        Extractor<?> e = p.getMainStore().fetchData();
+        Extractor e = p.getMainStore().fetchData();
         String[] dsNames = e.getNames();
         Assert.assertEquals("data source test not found", "test", dsNames[0]);
         long start = p.getLastUpdate().getTime();
@@ -63,7 +63,7 @@ public class TestRrdDbStore {
             s.put("test", i);
             p.getMainStore().commit(s);
         }
-        Extractor<?> ex = p.getMainStore().fetchData();
+        Extractor ex = p.getMainStore().fetchData();
         ExtractInfo ei = ExtractInfo.get().make(new Date(start), new Date(start + 30 * p.getStep() *  1000));
         double[][] values = ex.getValues(ei);
         Plottable pl = ex.getPlottable(ei.make("test"));
@@ -78,7 +78,6 @@ public class TestRrdDbStore {
             Assert.assertEquals("Wrong values plotted", i, pl.getValue(sampletime / 1000), 1e-10);
 
         }
-
     }
 
 }

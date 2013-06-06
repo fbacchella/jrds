@@ -22,8 +22,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.rrd4j.core.DsDef;
-import org.rrd4j.core.RrdDb;
 import org.w3c.dom.Document;
 
 public class UtilTest {
@@ -117,11 +115,10 @@ public class UtilTest {
         logger.debug("testSerialization4: " + outBuffer);
         Assert.assertTrue("HTML doctype not found", outBuffer.contains("DOCTYPE html"));
         Assert.assertTrue("probe id not found in HTML", outBuffer.contains("pid=" + p.hashCode()));
-        RrdDb db = (RrdDb) p.getMainStore().getStoreObject();
-        for(DsDef ds: db.getRrdDef().getDsDefs()) {
-            Assert.assertTrue(outBuffer.contains("dsName=" + ds.getDsName()));
+        
+        for(String dsName: p.getPd().getDs()) {
+            Assert.assertTrue(outBuffer.contains("dsName=" + dsName));
         }
-        p.getMainStore().closeStoreObject(db);
     }
 
     @Test
