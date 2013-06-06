@@ -42,13 +42,13 @@ import org.w3c.dom.Element;
         )
 public abstract class Probe<KeyType, ValueType> extends StarterNode implements Comparable<Probe<KeyType, ValueType>>  {
 
-    public class JrdsSample extends HashMap<String, Number> {
+    private class LocalJrdsSample extends HashMap<String, Number> implements JrdsSample {
         Date time;
 
         /**
          * @return the time
          */
-        public JrdsSample() {
+        public LocalJrdsSample() {
             super(Probe.this.pd.getSize());
             time = new Date();
         }
@@ -251,7 +251,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * @return
      */
     public JrdsSample newSample() {
-        return this.new JrdsSample();
+        return this.new LocalJrdsSample();
     }
 
     /**

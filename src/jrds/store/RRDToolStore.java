@@ -6,8 +6,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
+import jrds.JrdsSample;
 import jrds.Probe;
-import jrds.Probe.JrdsSample;
 import jrds.factories.ProbeBean;
 
 import org.apache.log4j.Level;

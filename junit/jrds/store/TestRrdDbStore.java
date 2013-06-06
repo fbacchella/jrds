@@ -5,8 +5,8 @@ import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.JrdsSample;
 import jrds.Probe;
-import jrds.Probe.JrdsSample;
 import jrds.StoreOpener;
 import jrds.Tools;
 import jrds.mockobjects.GenerateProbe;

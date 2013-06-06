@@ -57,7 +57,7 @@ public class TestProbe {
             }			
             @Override
             public void modifySample(JrdsSample oneSample, Map<String, Long> values) {
-                oneSample.time = new Date((getLastUpdate().getTime() + 1000) * 1000);
+                oneSample.setTime(new Date((getLastUpdate().getTime() + 1000) * 1000));
                 super.modifySample(oneSample, values);
             }			
         };
@@ -103,7 +103,7 @@ public class TestProbe {
             }
             @Override
             public void modifySample(JrdsSample oneSample, Map<String, Long> values) {
-                oneSample.time = new Date((getLastUpdate().getTime() + 1000) * 1000);
+                oneSample.setTime(new Date((getLastUpdate().getTime() + 1000) * 1000));
                 super.modifySample(oneSample, values);
             }			
         };

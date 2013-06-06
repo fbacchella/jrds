@@ -8,6 +8,8 @@ package jrds.probe.snmp;
 
 import java.util.Map;
 
+import jrds.JrdsSample;
+
 import org.snmp4j.smi.OID;
 
 /**

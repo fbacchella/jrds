@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import jrds.JrdsSample;
 import jrds.Probe;
 import jrds.StoreOpener;
 
@@ -343,7 +344,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
         return retValues;
     }
 
-    public void commit(Probe.JrdsSample sample) {
+    public void commit(JrdsSample sample) {
         RrdDb rrdDb = null;
         try {
             rrdDb = StoreOpener.getRrd(getRrdName());

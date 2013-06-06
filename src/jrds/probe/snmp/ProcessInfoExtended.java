@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import jrds.JrdsSample;
 import jrds.factories.ProbeBean;
 import jrds.snmp.SnmpVars;
 import jrds.snmp.TabularIterator;

@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
+import jrds.JrdsSample;
+
 import org.snmp4j.smi.OID;
 
 public class CpqDaPhyDrv extends RdsIndexedSnmpRrd {

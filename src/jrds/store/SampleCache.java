@@ -3,8 +3,8 @@ package jrds.store;
 import java.util.Date;
 import java.util.Map;
 
+import jrds.JrdsSample;
 import jrds.Probe;
-import jrds.Probe.JrdsSample;
 
 public class SampleCache extends AbstractStore<Map<String, Number>, Object> {
     private final Map<String, Number> cache;
