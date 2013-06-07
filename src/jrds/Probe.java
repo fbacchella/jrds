@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,7 +26,6 @@ import jrds.store.StoreFactory;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.rrd4j.core.DsDef;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -459,17 +457,12 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             graph.setTextContent(qualifiedGraphName);
             graph.setAttribute("id", String.valueOf(gn.hashCode()));
         }
-        DsDef[] dss= new DsDef[0]; //getDsDefs();
+        String[] dss = getPd().getDs().toArray(new String[]{});
 
         if (sorted)
-            Arrays.sort(dss, new Comparator<DsDef>() {
-                public int compare(DsDef arg0, DsDef arg1) {
-                    return String.CASE_INSENSITIVE_ORDER.compare(arg0.getDsName(), arg1.getDsName());
-                }
-            });
-
-        for(DsDef ds: dss) {
-            String dsName = ds.getDsName();
+            Arrays.sort(dss);
+ 
+        for(String dsName: dss) {
 
             Element dsNameElement = document.createElement("name");
 

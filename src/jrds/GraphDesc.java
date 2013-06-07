@@ -817,18 +817,6 @@ implements Cloneable, WithACL {
         }
     }
 
-    /**
-     * return the RrdGraphDef for this graph, used the indicated probe
-     *
-     * @param probe Probe
-     * @return RrdGraphDef
-     * @throws IOException
-     * @throws RrdException
-     */
-    public RrdGraphDef getGraphDef(Probe<?,?> probe) throws IOException {
-        return getGraphDef(probe, ExtractInfo.get(), null);
-    }
-
     public RrdGraphDef getEmptyGraphDef() {
         RrdGraphDef retValue = new RrdGraphDef();
         if( ! Double.isNaN(lowerLimit))

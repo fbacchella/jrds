@@ -319,10 +319,8 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
                 }
             };
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new RuntimeException("Failed to access rrd file  " + getRrdName(), e);
         }
-        return null;
     }
 
     public Map<String, Number> getLastValues() {
