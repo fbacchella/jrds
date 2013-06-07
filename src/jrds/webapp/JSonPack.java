@@ -83,12 +83,18 @@ public class JSonPack extends HttpServlet {
         gzipBuffer.write(paramsClean.toString().getBytes());
         gzipBuffer.close();
 
-        String referer = request.getHeader("Referer");
-        URL refererUrl = new URL(referer);
-
         char separator = '?';
-        if( refererUrl.getQuery() != null)
-            separator = '&';
+        String referer = request.getHeader("Referer");
+        try {
+            URL refererUrl = new URL(referer);
+            if( refererUrl.getQuery() != null)
+                separator = '&';
+        } catch (Exception e) {
+            String host = request.getHeader("Host");
+            String contextPath = request.getContextPath();
+            referer = "http://" + host + contextPath + "/";
+        }
+
         String packedurl = referer + separator + "p=" + new String(packedDataBuffer.toByteArray()).substring(GZIPHEADER.length()).replace('=', '!').replace('/', '$').replace('+', '*');
 
         response.getOutputStream().print(packedurl);

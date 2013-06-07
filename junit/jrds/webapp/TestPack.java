@@ -43,7 +43,8 @@ public class TestPack {
 		HttpTester request = new HttpTester();
 		HttpTester response = new HttpTester();
 		request.setMethod("POST");
-		request.setHeader("Host","tester");
+        request.setHeader("Host","tester");
+		request.setHeader("Referer","http://tester/");
 		request.setURI("/jsonpack");
 		request.setVersion("HTTP/1.0");
 		request.setContent(inparams);
