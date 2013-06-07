@@ -142,6 +142,38 @@ return declare("jrds.MinMaxTextBox", dijit.form.ValidationTextBox, {
 });
 });
 
+define("jrds/StateURLButton",
+		[ "dojo/_base/declare",
+		  "dijit/form/Button",
+		  "dijit/Dialog",
+		  "dojo"],
+		function(declare, button, dialog, dojo) {
+return declare("jrds.StateURLButton", button, {
+	onClick: function(){
+	    var xhrArgs = {
+	            url: "jsonpack",
+	            postData: dojo.toJson(queryParams),
+	            handleAs: "text",
+	            preventCache: false,
+	            load: function(data, ioargs) {
+	            	// create the dialog:
+	            	var myDialog = new dialog({
+	            		title: "Graph context",
+	            	    content: "<a target='_blank' href='" + data +"'>" + data +"</a>"
+	            	});	  
+	            	myDialog.show();
+	            },
+	            error: function(error) {
+	            	console.log(error);
+	            }
+	        }
+	        //Call the asynchronous xhrPost
+	        var deferred = dojo.xhrPost(xhrArgs);
+	    }
+
+});
+});
+
 //called onChange for scale button
 function resetScale() {
 	if(dijit.byId("autoscale").attr('checked')) {
@@ -198,27 +230,27 @@ function initIndex() {
 	initQuery();
 	dojo.cookie("treeOneSaveStateCookie", null, {expires: -1});
 
-		//The copy is saved
-		var tempMainPane = dojo.byId('mainPane');
-		mainPane = dojo.clone(tempMainPane);
-		dojo.destroy(tempMainPane);
+	//The copy is saved
+	var tempMainPane = dojo.byId('mainPane');
+	mainPane = dojo.clone(tempMainPane);
+	dojo.destroy(tempMainPane);
 
-		dojo.xhrGet( {
-			url: 'discoverhtml',
-			handleAs: "text",
-			sync: true,
-			load: function(response, ioArgs) {
-				var discoverAutoBlock = dojo.byId('discoverAutoBlock');
-				dojo.place(response, discoverAutoBlock, 'replace');
-			}
-		});
+	dojo.xhrGet( {
+		url: 'discoverhtml',
+		handleAs: "text",
+		sync: true,
+		load: function(response, ioArgs) {
+			var discoverAutoBlock = dojo.byId('discoverAutoBlock');
+			dojo.place(response, discoverAutoBlock, 'replace');
+		}
+	});
 
-		//The parse can be done
-		dojo.parser.parse();
+	//The parse can be done
+	dojo.parser.parse();
 
-		setupCalendar();
-		setupTabs();
-		setupDisplay();
+	setupCalendar();
+	setupTabs();
+	setupDisplay();
 }
 
 function initPopup() {
@@ -523,7 +555,7 @@ function getTreeNodeUp(node) {
 	if(nodeInfo instanceof Array) {
 		nodeInfo = nodeInfo[0];
 	}
-	if(! node.getParent()) {
+	if(node.item.root) {
 		return new Array(nodeInfo);
 	}
 	retValue = getTreeNodeUp(node.getParent());
@@ -555,8 +587,7 @@ function loadTree(item,  node){
 	else {
 		queryParams.id = item.id[0].replace(/.*\./, "");
 		getGraphList();
-		
-		queryParams.path = getTreeNodeUp(node);
+		queryParams.path = getTreeNodeUp(node);		
 	}
 }
 
@@ -636,31 +667,6 @@ function history(url)
 	var historyWin = window.open("history.html?" + url, "_blank", "width=750,menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
 }
 
-function sendlink()
-{
-    var xhrArgs = {
-        url: "jsonpack",
-        postData: dojo.toJson(queryParams),
-        handleAs: "text",
-        preventCache: false,
-        load: function(data, ioargs) {
-            linkdialog(data, ioargs);
-        },
-        error: function(error) {
-        }
-    }
-    //Call the asynchronous xhrPost
-    var deferred = dojo.xhrPost(xhrArgs);
-}
-
-function linkdialog(data, ioargs) {
-	// create the dialog:
-	var myDialog = new dijit.Dialog({
-		title: "Graph context",
-	    content: "<a target='_blank' href='" + data +"'>" + data +"</a>"
-	});	  
-	myDialog.show();
-}
 
 function setAutoperiod(value) {
 	queryParams.autoperiod = value;
@@ -714,7 +720,10 @@ function setupTabs() {
 
 	//Tab was specified, so go to it, no need to load tree
 	if(queryParams.tab) {
+		//We keep the old id, because switching tabs reset it
+		oldId = queryParams.id;
 		tabWidget.selectChild(queryParams.tab);
+		queryParams.id = oldId;
 	}
 	//We're in the default tab, load the needed try now
 	else {
@@ -989,7 +998,6 @@ function filesLoaded(e) {
 }
 
 function dateNavPrevious() {
-	console.log(queryParams);
 	if(queryParams.autoperiod == 0) {
 		var begin = dojo.date.locale.parse(queryParams.begin, 'yyyy-MM-dd HH:mm');
 		var end = dojo.date.locale.parse(queryParams.end, 'yyyy-MM-dd HH:mm');
