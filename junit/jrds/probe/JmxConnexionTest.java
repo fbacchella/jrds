@@ -42,6 +42,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JmxConnexionTest {
+    static private final Object lock = new Object();
     static final private int JMX_PORT = 8998;
     static final private Logger logger = Logger.getLogger(JmxConnexionTest.class);
     static private final class JrdsMBeanInfo {
@@ -53,14 +54,15 @@ public class JmxConnexionTest {
 
         public JrdsMBeanInfo(String protocol, String host, int port) throws Exception {
             String path = "/";
-
             if (protocol == "rmi") {
-                rmiRegistry = java.rmi.registry.LocateRegistry.createRegistry(port);
+                rmiRegistry = java.rmi.registry.LocateRegistry
+                        .createRegistry(port);
                 path = "/jndi/rmi://" + host + ":" + port + "/jmxrmi";
             }
             url = new JMXServiceURL(protocol, host, port, path);
             mbs = ManagementFactory.getPlatformMBeanServer();
-            cs = JMXConnectorServerFactory.newJMXConnectorServer(url, null, mbs);
+            cs = JMXConnectorServerFactory.newJMXConnectorServer(url, null,
+                    mbs);
             cs.start();
             JMXServiceURL addr = cs.getAddress();
             cc = JMXConnectorFactory.connect(addr);
@@ -79,8 +81,7 @@ public class JmxConnexionTest {
             logger.debug("Domains: " + domains);
         }
 
-        for(Object nameObject: mbean.queryNames(null, null)) {
-            ObjectName name = (ObjectName) nameObject;
+        for(ObjectName name: mbean.queryNames(null, null)) {
             logger.debug(name);
             MBeanInfo info = mbean.getMBeanInfo(name);
             MBeanAttributeInfo[] attrs = info.getAttributes();
@@ -116,7 +117,7 @@ public class JmxConnexionTest {
     }
 
     @BeforeClass
-    static public void configure() throws Exception {
+    static synchronized public void configure() throws Exception {
         Tools.configure();
         logger.setLevel(Level.TRACE);
         Tools.setLevel(new String[] {JmxConnexionTest.class.getName(),jrds.probe.JMXConnection.class.getName(), "jrds.Starter", "sun.management.jmxremote" }, logger.getLevel());
@@ -126,15 +127,21 @@ public class JmxConnexionTest {
     };
 
     @After
-    public void finished() throws Exception {
+    public synchronized void finished() throws Exception {
         mbi.cc.close();
         mbi.cs.stop();
         if(mbi.rmiRegistry != null) {
             UnicastRemoteObject.unexportObject(mbi.rmiRegistry,true);  
         }
+        for(ObjectName nameObject: mbi.mbs.queryNames(null, null)) {
+            try {
+                mbi.mbs.unregisterMBean(nameObject);
+            } catch (Exception e) {
+            }
+        }
     }
 
-    private JMXConnection getCnx(String proto, int port) {
+    private synchronized JMXConnection getCnx(String proto, int port) {
         JMXConnection cnx = new JMXConnection() {
             @Override
             public String getHostName() {
@@ -147,7 +154,7 @@ public class JmxConnexionTest {
     }
 
     @SuppressWarnings("unused")
-    private void doTest(String proto, int port) throws Exception {
+    private synchronized void doTest(String proto, int port) throws Exception {
         mbi = new JrdsMBeanInfo(proto, "localhost", port);
 
         HostStarter host = new HostStarter(new HostInfo("localhost")) {
@@ -168,13 +175,17 @@ public class JmxConnexionTest {
     }
 
     @Test
-    public void ConnectJmxmpTest() throws Exception {
-        doTest("jmxmp", JMX_PORT);
+    public synchronized void ConnectJmxmpTest() throws Exception {
+        synchronized (lock) {
+            doTest("jmxmp", JMX_PORT);
+        }
     }
 
     @Test
     public void ConnectRmiTest() throws Exception {
-        doTest("rmi", JMX_PORT + 1);
+        synchronized (lock) {
+            doTest("rmi", JMX_PORT + 1);
+        }
     }
 
 }
