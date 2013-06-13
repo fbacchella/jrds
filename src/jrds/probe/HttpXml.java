@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -165,7 +164,7 @@ public class HttpXml extends HCHttpProbe {
         XmlProvider xmlstarter  = find(XmlProvider.class);
         if(xmlstarter == null) {
             log(Level.ERROR, "XML Provider not found");
-            return Collections.emptyMap();
+            return null;
         }
 
         Document d = xmlstarter.getDocument(stream);

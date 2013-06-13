@@ -5,7 +5,6 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.URLDecoder;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -88,7 +87,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
             log(Level.ERROR, e, "JMX error: %s", e);
         }
 
-        return Collections.emptyMap();
+        return null;
     }
 
     @Override

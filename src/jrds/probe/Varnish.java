@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -45,15 +44,15 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
         try {
             SocketFactory ss = find(SocketFactory.class); 
             if(! ss.isStarted())
-                return java.util.Collections.emptyMap();
+                return null;
             s = ss.createSocket(this, port);
         } catch (Exception e) {
             log(Level.ERROR, e, "Connect error %s", e);
-            return java.util.Collections.emptyMap();
+            return null;
         }
 
         if(s == null)
-            return java.util.Collections.emptyMap();
+            return null;
 
         try {
             PrintWriter outputSocket =  new PrintWriter(s.getOutputStream());
@@ -93,7 +92,7 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
             log(Level.ERROR, e, "Socket error %s", e);
         }
 
-        return Collections.emptyMap();
+        return null;
     }
 
     private BufferedReader getAnswer(BufferedReader in, PrintWriter out, String command) throws IOException {

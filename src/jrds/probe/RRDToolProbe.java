@@ -2,18 +2,17 @@ package jrds.probe;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
-
-import org.apache.log4j.Level;
-import org.rrd4j.core.jrrd.RRDatabase;
 
 import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.Probe;
 import jrds.factories.ProbeBean;
 import jrds.graphe.RRDToolGraphNode;
+
+import org.apache.log4j.Level;
+import org.rrd4j.core.jrrd.RRDatabase;
 
 /**
  * A class wrapper to use rrdtool's files
@@ -32,11 +31,11 @@ public class RRDToolProbe extends Probe<String, Double> {
         }
         return rrdpath.canRead();
     }
-    
+
     public void setRrdfile(File rrdpath) {
         this.rrdpath = rrdpath;
     }
-    
+
     public File getRrdfile() {
         return rrdpath;
     }
@@ -59,7 +58,7 @@ public class RRDToolProbe extends Probe<String, Double> {
 
     @Override
     public Map<String, Double> getNewSampleValues() {
-        return Collections.emptyMap();
+        return null;
     }
 
     @Override

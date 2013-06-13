@@ -31,8 +31,8 @@ import org.rrd4j.core.Sample;
  */
 public abstract class ExternalCmdProbe extends Probe<String, Number> {
 
-	protected String cmd = null;
-	
+    protected String cmd = null;
+
     @Override
     public void readProperties(PropertiesManager pm) {        
         cmd = resolvCmdPath(pm.getProperty("path",""));
@@ -47,7 +47,7 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         }
         return true;
     }
-    
+
     protected String resolvCmdPath(String path) {
         List<String> pathelements = new ArrayList<String>();
         pathelements.addAll(Arrays.asList(path.split(";")));
@@ -71,15 +71,15 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         }
         return cmd;
     }
-    
-	/* (non-Javadoc)
-	 * @see com.aol.jrds.Probe#getNewSampleValues()
-	 */
-	public Map<String, Number> getNewSampleValues() {
-		return Collections.emptyMap();
-	}
-	
-	/* (non-Javadoc)
+
+    /* (non-Javadoc)
+     * @see com.aol.jrds.Probe#getNewSampleValues()
+     */
+    public Map<String, Number> getNewSampleValues() {
+        return Collections.emptyMap();
+    }
+
+    /* (non-Javadoc)
      * @see jrds.Probe#modifySample(org.rrd4j.core.Sample, java.util.Map)
      */
     @Override
@@ -87,8 +87,8 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         String perfstring = launchCmd();
         if(! perfstring.isEmpty())
             oneSample.set(perfstring);
-	}
-    
+    }
+
     protected String launchCmd() {
         String perfstring = "";
         Process urlperfps = null;
@@ -103,16 +103,17 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
             log(Level.ERROR, e, "external command failed : %s", e);
         } finally {
             try {
-                stdout.close();
+                if(stdout != null)
+                    stdout.close();
             } catch (IOException e) {
             }
         }
-        
+
         try {
             if(urlperfps != null) {
                 urlperfps.waitFor();
                 if(urlperfps.exitValue() !=0 ) {
-                    
+
                     InputStream stderr = urlperfps.getErrorStream();
                     BufferedReader stderrtReader = new BufferedReader(new InputStreamReader(stderr));
                     String errostring = stderrtReader.readLine();
@@ -135,16 +136,16 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         log(Level.DEBUG, "returned line: %s", perfstring);
         return perfstring;
     }
-    
-	/**
-	 * @return Returns the cmd.
-	 */
-	public String getCmd() {
-		return cmd;
-	}
 
-	@Override
-	public String getSourceType() {
-		return "external command";
-	}
+    /**
+     * @return Returns the cmd.
+     */
+    public String getCmd() {
+        return cmd;
+    }
+
+    @Override
+    public String getSourceType() {
+        return "external command";
+    }
 }

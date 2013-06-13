@@ -3,7 +3,6 @@ package jrds.probe;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +31,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
     public Map<String, Number> getNewSampleValuesConnected(LdapConnection cnx) {
         uptime = findUptime(cnx);
         if(uptime < 0) {
-            return Collections.emptyMap();
+            return null;
         }
 
         Set<String> collected = getCollectMapping().keySet();

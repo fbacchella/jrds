@@ -1,7 +1,6 @@
 package jrds.probe;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +40,7 @@ public class Ntp extends Probe<String, Number> {
 	public Map<String, Number> getNewSampleValues() {
 		Resolver resolv = find(Resolver.class); 
 		if(! resolv.isStarted())
-			return Collections.emptyMap();
+			return null;
 		try {
 			TimeInfo ti = client.getTime(resolv.getInetAddress(), port);
 			ti.computeDetails();
@@ -55,7 +54,7 @@ public class Ntp extends Probe<String, Number> {
 		} catch (IOException e) {
 			log(Level.ERROR, e, "NTP IO exception %s", e);
 		}
-		return Collections.emptyMap();
+		return null;
 	}
 
 	@Override

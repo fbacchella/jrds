@@ -32,7 +32,7 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
     }
 
     public Boolean configure() {
-        
+
         if(this.url == null) {
             file = file + "?auto"; 
         }
@@ -65,7 +65,7 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
      */
     @Override
     protected Map<String, Number> parseStream(InputStream stream) {
-        Map<String, Number> vars = java.util.Collections.emptyMap();
+        Map<String, Number> vars = null;
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(stream));
             List<String> lines = new ArrayList<String>();
