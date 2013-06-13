@@ -3,8 +3,11 @@ package jrds.probe;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Array;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Random;
 import java.util.Set;
 
 import javax.management.AttributeNotFoundException;
@@ -28,8 +31,6 @@ import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
 
 import jrds.HostInfo;
-import jrds.JrdsLoggerConfiguration;
-import jrds.JuliToLog4jHandler;
 import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.starter.HostStarter;
@@ -42,8 +43,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JmxConnexionTest {
-    static private final Object lock = new Object();
-    static final private int JMX_PORT = 8998;
     static final private Logger logger = Logger.getLogger(JmxConnexionTest.class);
     static private final class JrdsMBeanInfo {
         MBeanServer mbs;
@@ -71,7 +70,7 @@ public class JmxConnexionTest {
 
     private JrdsMBeanInfo mbi;
 
-    static private final void enumerate(MBeanServerConnection mbean) throws InstanceNotFoundException, IntrospectionException, AttributeNotFoundException, ReflectionException, MBeanException, IllegalArgumentException, IOException {
+    static private void enumerate(MBeanServerConnection mbean) throws InstanceNotFoundException, IntrospectionException, AttributeNotFoundException, ReflectionException, MBeanException, IllegalArgumentException, IOException {
         Set<ObjectInstance> s = mbean.queryMBeans(null, null);
         for(ObjectInstance o : s) {
             logger.debug("Class: " + o.getClassName());
@@ -113,35 +112,51 @@ public class JmxConnexionTest {
                 }
             }
         }
-
     }
 
     @BeforeClass
-    static synchronized public void configure() throws Exception {
+    static public void configure() throws Exception {
         Tools.configure();
         logger.setLevel(Level.TRACE);
-        Tools.setLevel(new String[] {JmxConnexionTest.class.getName(),jrds.probe.JMXConnection.class.getName(), "jrds.Starter", "sun.management.jmxremote" }, logger.getLevel());
-        JrdsLoggerConfiguration.configureLogger("sun.management", Level.TRACE);
-        java.util.logging.Logger.getLogger("sun.management").setLevel(java.util.logging.Level.FINEST);
-        java.util.logging.Logger.getLogger("sun.management").addHandler(new JuliToLog4jHandler());
+        Tools.setLevel(new String[] {JmxConnexionTest.class.getName(), JMXConnection.class.getName(), "jrds.Starter"}, logger.getLevel());
     };
 
     @After
-    public synchronized void finished() throws Exception {
+    public void finished() throws Exception {
         mbi.cc.close();
         mbi.cs.stop();
         if(mbi.rmiRegistry != null) {
             UnicastRemoteObject.unexportObject(mbi.rmiRegistry,true);  
         }
-        for(ObjectName nameObject: mbi.mbs.queryNames(null, null)) {
-            try {
-                mbi.mbs.unregisterMBean(nameObject);
-            } catch (Exception e) {
-            }
-        }
     }
 
-    private synchronized JMXConnection getCnx(String proto, int port) {
+    private int findPort() {
+        Random r = new Random();
+        int port = -1;
+        ServerSocket serverSocket = null;
+        for(int i=0; i < 10; i++) {
+            port = r.nextInt(32767) + 32767;
+            try {
+                InetSocketAddress sa = new InetSocketAddress("localhost", port);
+                serverSocket = new ServerSocket();
+                serverSocket.setReuseAddress(true);
+                serverSocket.bind(sa);
+                break;
+            } 
+            catch (IOException e) {
+            }
+            finally {
+                if(serverSocket != null)
+                    try {
+                        serverSocket.close();
+                    } catch (IOException e) {
+                    }
+            }
+        }
+        return port;
+    }
+
+    private JMXConnection getCnx(String proto, int port) {
         JMXConnection cnx = new JMXConnection() {
             @Override
             public String getHostName() {
@@ -154,7 +169,7 @@ public class JmxConnexionTest {
     }
 
     @SuppressWarnings("unused")
-    private synchronized void doTest(String proto, int port) throws Exception {
+    private void doTest(String proto, int port) throws Exception {
         mbi = new JrdsMBeanInfo(proto, "localhost", port);
 
         HostStarter host = new HostStarter(new HostInfo("localhost")) {
@@ -175,17 +190,17 @@ public class JmxConnexionTest {
     }
 
     @Test
-    public synchronized void ConnectJmxmpTest() throws Exception {
-        synchronized (lock) {
-            doTest("jmxmp", JMX_PORT);
-        }
+    public void ConnectJmxmpTest() throws Exception {
+        int port = findPort();
+        Assert.assertTrue("can't allocate port " + port, port >= 32767);
+        doTest("jmxmp", port);
     }
 
     @Test
     public void ConnectRmiTest() throws Exception {
-        synchronized (lock) {
-            doTest("rmi", JMX_PORT + 1);
-        }
+        int port = findPort();
+        Assert.assertTrue("can't allocate port " + port, port >= 32767);
+        doTest("rmi", port);
     }
 
 }
