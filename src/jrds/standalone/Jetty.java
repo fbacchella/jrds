@@ -6,7 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import javax.management.MBeanServer;
+
 import jrds.PropertiesManager;
+import jrds.jmx.Management;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -48,13 +51,17 @@ public class Jetty extends CommandStarterImpl {
     public void start(String args[]) {
         Logger.getRootLogger().setLevel(Level.ERROR);
 
-
         PropertiesManager pm = new PropertiesManager();
         File propFile = new File(propFileName);
         if(propFile.isFile())
             pm.join(propFile);
         pm.importSystemProps();
         pm.update();
+
+        if(pm.withjmx) {
+            doJmx(pm);
+            Management.register(propFile);
+        }
 
         System.setProperty("org.mortbay.log.class", jrds.standalone.JettyLogger.class.getName());
 
@@ -105,13 +112,19 @@ public class Jetty extends CommandStarterImpl {
                 throw new RuntimeException("Jetty server failed to configure authentication", e);
             }
         }
-        
-        //Properties are not needed any more
-        pm = null;
-        
+
         HandlerCollection handlers = new HandlerList();
         handlers.setHandlers(new Handler[]{staticFiles, webapp});
         server.setHandler(handlers);
+
+        if(pm.withjmx) {
+            MBeanServer mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
+            server.getContainer().addEventListener(new org.mortbay.management.MBeanContainer(mbs));
+            handlers.addHandler(new org.mortbay.jetty.handler.StatisticsHandler());    
+        }
+
+        //Properties are not needed any more
+        pm = null;
 
         Thread finish = new Thread() {
             public void run() {

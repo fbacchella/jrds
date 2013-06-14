@@ -50,7 +50,7 @@ public class PropertiesManager extends Properties {
         public int numCollectors;
     }
 
-    private final FileFilter filter = new  FileFilter(){
+    private final FileFilter filter = new  FileFilter() {
         public boolean accept(File file) {
             return (! file.isHidden()) && (file.isFile() && file.getName().endsWith(".jar"));
         }
@@ -59,14 +59,12 @@ public class PropertiesManager extends Properties {
     //The default constructor cannot build directories, canact is used to detect that
     private boolean canact = false;
 
-    public PropertiesManager()
-    {
+    public PropertiesManager() {
         update();
         canact = true;
     }
 
-    public PropertiesManager(File propFile)
-    {
+    public PropertiesManager(File propFile) {
         canact = true;
         join(propFile);
         update();
@@ -94,8 +92,7 @@ public class PropertiesManager extends Properties {
         throw new NumberFormatException("Parsing null string");
     }
 
-    private boolean parseBoolean(String s)
-    {
+    private boolean parseBoolean(String s) {
         s = s.toLowerCase().trim();
         boolean retValue = false;
         if("1".equals(s))
@@ -129,8 +126,7 @@ public class PropertiesManager extends Properties {
         putAll(moreProperties);
     }
 
-    public void join(File propFile)
-    {
+    public void join(File propFile) {
         logger.debug("Using propertie file " + propFile.getAbsolutePath());
         InputStream inputstream = null;
         try {
@@ -149,8 +145,7 @@ public class PropertiesManager extends Properties {
         }
     }
 
-    public void join(InputStream propStream)
-    {
+    public void join(InputStream propStream) {
         try {
             load(propStream);
         } catch (IOException ex) {
@@ -343,7 +338,6 @@ public class PropertiesManager extends Properties {
         ti.numCollectors = numCollectors;
         timers.put(Timer.DEFAULTNAME, ti);
 
-
         dbPoolSize = parseInteger(getProperty("dbPoolSize", "10")) + numCollectors;
 
         strictparsing = parseBoolean(getProperty("strictparsing", "false"));
@@ -478,6 +472,22 @@ public class PropertiesManager extends Properties {
 
         readonly = parseBoolean(getProperty("readonly", "0"));
 
+        withjmx = parseBoolean(getProperty("jmx", "0"));
+        if(withjmx) {
+            jmxprops = new HashMap<String, String>();
+            jmxprops.put("protocol", "rmi");
+            Pattern regex = Pattern.compile("^jmx\\.");
+
+            for(Map.Entry<Object, Object> e: entrySet()) {
+                String key = (String) e.getKey();
+                Matcher m = regex.matcher(key);
+                if(m.find()) {
+                    String value =  (String) e.getValue();
+                    jmxprops.put(m.replaceFirst(""), value);
+                }
+            }
+        }
+
     }
 
     public File configdir;
@@ -505,6 +515,8 @@ public class PropertiesManager extends Properties {
     public ACL defaultACL = ACL.ALLOWEDACL;
     public ACL adminACL = ACL.ALLOWEDACL;
     public boolean readonly = false;
+    public boolean withjmx = false;
+    public Map<String, String> jmxprops = Collections.emptyMap();
     public static final String FILTERTAB = "filtertab";
     public static final String CUSTOMGRAPHTAB = "customgraph";
     public static final String SUMSTAB = "sumstab";
