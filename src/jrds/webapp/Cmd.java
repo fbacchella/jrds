@@ -7,6 +7,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jrds.Configuration;
+import jrds.HostsList;
 import jrds.Util;
 import jrds.starter.Timer;
 
@@ -50,11 +52,8 @@ public class Cmd extends JrdsServlet {
         Thread configthread = new Thread("jrds-new-config") {
             @Override
             public void run() {
-                Configuration oldConfig = getConfig();
-                Configuration newConfig = new Configuration(ctxt);
-                oldConfig.stop();
-                newConfig.start();
-                ctxt.setAttribute(Configuration.class.getName(), newConfig);
+                StartListener sl = (StartListener) ctxt.getAttribute(StartListener.class.getName());
+                sl.configure(ctxt);
                 logger.info("Configuration rescaned");
             }
         };
@@ -65,15 +64,15 @@ public class Cmd extends JrdsServlet {
         Thread configthread = new Thread("jrds-pause") {
             @Override
             public void run() {
-                Configuration config = getConfig();
+                HostsList hl = Configuration.get().getHostsList();
                 try {
-                    for(Timer t: config.getHostsList().getTimers()) {
+                    for(Timer t: hl.getTimers()) {
                         t.lockCollect();
                     }
                     Thread.sleep(jrds.Util.parseStringNumber(arg, 1) * 1000 );
                 } catch (InterruptedException e) {
                 }
-                for(Timer t: config.getHostsList().getTimers()) {
+                for(Timer t: hl.getTimers()) {
                     t.releaseCollect();
                 }
                 logger.info("collect restarted");

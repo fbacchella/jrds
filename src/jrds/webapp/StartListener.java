@@ -1,6 +1,11 @@
 package jrds.webapp;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -42,9 +47,8 @@ public class StartListener implements ServletContextListener {
 			System.setProperty("java.awt.headless","true");
 
 			ServletContext ctxt = arg0.getServletContext();
-			Configuration c = new Configuration(ctxt);
-			c.start();
-			ctxt.setAttribute(Configuration.class.getName(), c);
+			ctxt.setAttribute(StartListener.class.getName(), this);
+            configure(ctxt);
 			started = true;
 			logger.info("Application jrds started");
 		}
@@ -57,12 +61,40 @@ public class StartListener implements ServletContextListener {
 		if(started) {
 			logger.info("Application jrds will stop");
 			started = false;
-			ServletContext ctxt = arg0.getServletContext();
-			Configuration c = (Configuration) ctxt.getAttribute(Configuration.class.getName());
-			c.stop();
+			jrds.Configuration.get().stop();
 			StoreOpener.stop();
 			logger.info("Application jrds stopped");
 		}
 	}
+
+    public void configure(ServletContext ctxt) {
+        Properties p = new Properties();
+
+        InputStream propStream = ctxt.getResourceAsStream("/WEB-INF/jrds.properties");
+        if(propStream != null) {
+            try {
+                p.load(propStream);
+            } catch (IOException ex) {
+                logger.warn("Invalid properties stream " + propStream + ": " + ex);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        Enumeration<String> params = (Enumeration<String>)ctxt.getInitParameterNames();
+        for(String attr: jrds.Util.iterate(params)) {
+            String value = ctxt.getInitParameter(attr);
+            if(value != null)
+                p.setProperty(attr, value);
+        }
+
+        String localPropFile = ctxt.getInitParameter("propertiesFile");
+        if(localPropFile != null)
+            try {
+                p.load(new FileReader(localPropFile));
+            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
+            }
+        jrds.Configuration.configure(p);
+    }
 
 }

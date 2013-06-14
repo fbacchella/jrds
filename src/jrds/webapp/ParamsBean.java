@@ -31,6 +31,7 @@ import java.util.zip.GZIPInputStream;
 import javax.servlet.http.HttpServletRequest;
 
 import jrds.Base64;
+import jrds.Configuration;
 import jrds.Filter;
 import jrds.Graph;
 import jrds.GraphDesc;
@@ -357,7 +358,7 @@ public class ParamsBean implements Serializable {
             gd.initializeLimits(g2d);
 
             gn = new GraphNode(p, gd);
-            gn.addACL(caller.getConfig().getPropertiesManager().defaultACL);
+            gn.addACL(Configuration.get().getPropertiesManager().defaultACL);
         }
         return gn;
     }

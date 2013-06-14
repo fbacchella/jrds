@@ -27,12 +27,12 @@ public class TestDownload extends Download {
     {
         Date start = epochFormat.get().parse("0");
         String formatted = epochFormat.get().format(start);
-        
+
         Assert.assertEquals("0", formatted);
         Assert.assertEquals(new Date(0), start);
 
     }
-    
+
     @Test
     public void testwriteCsv() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -41,6 +41,5 @@ public class TestDownload extends Download {
         dp.processData();
         writeCsv(out, dp, epochFormat.get() );
         logger.debug(out.toString());
-
     }
 }

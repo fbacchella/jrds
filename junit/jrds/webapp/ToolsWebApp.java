@@ -4,9 +4,16 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 
-import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServlet;
+
+import jrds.Configuration;
+import jrds.HostInfo;
+import jrds.Probe;
+import jrds.mockobjects.MokeProbe;
+import jrds.starter.HostStarter;
 
 import org.junit.Assert;
+import org.junit.rules.TemporaryFolder;
 import org.mortbay.jetty.testing.HttpTester;
 import org.mortbay.jetty.testing.ServletTester;
 
@@ -14,9 +21,31 @@ public class ToolsWebApp {
     static ServletTester getTestServer(Properties ctxt) {
         ServletTester tester = new ServletTester();
         tester.setContextPath("/");
-        ServletContext sc =  tester.getContext().getServletContext();
-        Configuration c = new Configuration(ctxt);
-        sc.setAttribute(Configuration.class.getName(), c);
+        Configuration.configure(ctxt);
+
+        return tester;
+    }
+
+    static ServletTester getMonoServlet(TemporaryFolder testFolder, Properties props, Class< ? extends HttpServlet> sclass, String path) throws IOException {
+        String root = testFolder.getRoot().getCanonicalPath();
+        Properties config = new Properties();
+        config.put("tmpdir", root);
+        config.put("configdir", root + "/config");
+        config.put("autocreate", "true");
+        config.put("rrddir", root);
+        config.put("libspath", "build/probes");
+        config.putAll(props);
+
+        ServletTester tester = ToolsWebApp.getTestServer(config);
+
+        Configuration c = Configuration.get();
+        HostStarter h = new HostStarter(new HostInfo("localhost"));
+        Probe<?,?> p = new MokeProbe<String, Number>();
+        p.setHost(h);
+        h.addProbe(p);
+        c.getHostsList().addHost(h.getHost());
+        c.getHostsList().addProbe(p);
+        tester.addServlet(sclass, path);
 
         return tester;
     }
@@ -36,4 +65,5 @@ public class ToolsWebApp {
 
         return response;
     }
+
 }

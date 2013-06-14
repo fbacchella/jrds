@@ -25,7 +25,6 @@ public class TestListServlet {
         Tools.prepareXml(false);
         System.setProperty("org.mortbay.log.class", jrds.standalone.JettyLogger.class.getName());
         Tools.setLevel(logger, Level.TRACE, JettyLogger.class.getName(), Status.class.getName());
-
     }
 
     @Test 
@@ -44,6 +43,6 @@ public class TestListServlet {
             String className = n.getTextContent().trim();
             getClass().getClassLoader().loadClass(className);
         }
-   }
+    }
 
 }

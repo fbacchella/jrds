@@ -12,7 +12,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,7 +21,6 @@ import javax.xml.xpath.XPathFactory;
 import jrds.factories.xml.EntityResolver;
 import jrds.factories.xml.JrdsDocument;
 import jrds.starter.Timer;
-import jrds.webapp.Configuration;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
@@ -151,14 +149,10 @@ final public class Tools {
     static public void getServer(Map<String, String> properties) {
         ServletTester tester=new ServletTester();
         tester.setContextPath("/");
-        ServletContext sc =  tester.getContext().getServletContext();
 
         for(Map.Entry<String, String> e: properties.entrySet()) {
             System.setProperty("jrds." + e.getKey(), e.getValue());
         }
-
-        Configuration c = new Configuration(sc);
-        sc.setAttribute(Configuration.class.getName(), c);
 
         Properties sp = System.getProperties();
         for(Object  key: sp.keySet()) {

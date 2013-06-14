@@ -2,18 +2,15 @@ package jrds.webapp;
 
 import java.util.Properties;
 
-import jrds.HostInfo;
-import jrds.Probe;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
-import jrds.mockobjects.MokeProbe;
 import jrds.standalone.JettyLogger;
-import jrds.starter.HostStarter;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,25 +33,12 @@ public class TestDiscover  {
         System.setProperty("org.mortbay.log.class", "jrds.standalone.JettyLogger");
         Tools.setLevel(logger, Level.TRACE, JettyLogger.class.getName(), GetDiscoverHtmlCode.class.getName(), "jrds.webapp.Configuration", "jrds.webapp.JrdsServlet");
         Tools.setLevel(Level.INFO, "jrds.standalone.JettyLogger");
-        Properties config = new Properties();
-        config.put("tmpdir", "tmp");
-        config.put("configdir", "tmp/config");
-        config.put("autocreate", "true");
-        config.put("rrddir", "tmp");
-        config.put("libspath", "build/probes");
+    }
 
-        tester = ToolsWebApp.getTestServer(config);
-        Configuration c = (Configuration) tester.getAttribute(Configuration.class.getName());
-
-        HostStarter h = new HostStarter(new HostInfo("localhost"));
-        Probe<?,?> p = new MokeProbe<String, Number>();
-        p.setHost(h);
-        h.addProbe(p);
-        c.getHostsList().addHost(h.getHost());
-        c.getHostsList().addProbe(p);
-        tester.addServlet(GetDiscoverHtmlCode.class, "/discoverhtml");
-
-        tester.start();
+    @Before
+    public void prepare() throws Exception {
+        tester = ToolsWebApp.getMonoServlet(testFolder, new Properties(), GetDiscoverHtmlCode.class, "/discoverhtml");
+        tester.start();        
     }
 
     @Test

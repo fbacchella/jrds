@@ -2,8 +2,7 @@ package jrds.webapp;
 
 import java.io.IOException;
 import java.net.URL;
-
-import javax.servlet.ServletContext;
+import java.util.Properties;
 
 import jrds.Period;
 import jrds.Tools;
@@ -12,34 +11,38 @@ import junit.framework.Assert;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mortbay.jetty.testing.HttpTester;
 import org.mortbay.jetty.testing.ServletTester;
 
 public class TestPack {
 	static final private Logger logger = Logger.getLogger(TestPack.class);
 
-	static ServletTester tester = null;
+	ServletTester tester = null;
 
-	@BeforeClass
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
+    @BeforeClass
 	static public void configure() throws Exception {
 		Tools.configure();
 		System.setProperty("org.mortbay.log.class", jrds.standalone.JettyLogger.class.getName());
         Tools.setLevel(logger, Level.TRACE, ParamsBean.class.getName(), JSonQueryParams.class.getName(), JSonPack.class.getName());
-		tester=new ServletTester();
-		tester.setContextPath("/");
-		ServletContext sc =  tester.getContext().getServletContext();
-		Configuration c = new Configuration(sc);
-		sc.setAttribute(Configuration.class.getName(), c);
-
-		tester.addServlet(JSonPack.class, "/jsonpack");
-		tester.addServlet(JSonQueryParams.class, "/queryparams");
-
-		tester.start();
 	}
 	
-	private String packunpack(String inparams) throws IOException, Exception {
+    @Before
+    public void launchServer() throws Exception {
+        tester = ToolsWebApp.getMonoServlet(testFolder, new Properties(), JSonPack.class, "/jsonpack");
+        tester.addServlet(JSonQueryParams.class, "/queryparams");
+
+        tester.start();
+    }
+
+    private String packunpack(String inparams) throws IOException, Exception {
 		HttpTester request = new HttpTester();
 		HttpTester response = new HttpTester();
 		request.setMethod("POST");
@@ -53,16 +56,11 @@ public class TestPack {
 		Assert.assertEquals(200, response.getStatus());
 		
 		URL packedurl = new URL(response.getContent());
-		request = new HttpTester();
-		request.setMethod("GET");
-		request.setHeader("Host","tester");
-		request.setURI("/queryparams?" + packedurl.getQuery());
-		request.setVersion("HTTP/1.0");
-		response.parse(tester.getResponses(request.generate()));
-		Assert.assertEquals(200, response.getStatus());
-		logger.trace("queryparams returned: " + response.getContent());
-		return(response.getContent());
 		
+		response = ToolsWebApp.doRequestGet(tester, "http://tester/queryparams?" + packedurl.getQuery(), 200);
+		logger.trace("queryparams returned: " + response.getContent());
+		
+		return(response.getContent());
 	}
 	
 	@Test
@@ -84,6 +82,7 @@ public class TestPack {
 //		Assert.assertEquals(3600 * 1000, p.getEnd().getTime());
 
 	}
+	
 	@Test
 	public void testPack3() throws IOException, Exception {
 		JrdsJSONObject params = new JrdsJSONObject( packunpack("{'filter':['All hosts'],'host':'','treeType':'tree','id':'-1025598675','path':['All filters','fe1','System','ntp']}"));
