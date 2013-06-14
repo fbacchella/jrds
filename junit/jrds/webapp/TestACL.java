@@ -19,7 +19,6 @@ import org.junit.Test;
 public class TestACL {
 	static final private Logger logger = Logger.getLogger(TestPropertiesManager.class);
 
-
 	@BeforeClass
 	static public void configure() throws IOException {
 		Tools.configure();

@@ -3,7 +3,6 @@ package jrds.probe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.util.Collections;
 import java.util.Map;
 
 import jrds.factories.ProbeMeta;
@@ -42,12 +41,12 @@ public abstract class HCHttpProbe extends HttpProbe {
             HttpResponse response = cnx.execute(hg);
             if(response.getStatusLine().getStatusCode() != 200) {
                 log(Level.ERROR, "Connection to %s fail with %s", getUrl(), response.getStatusLine().getReasonPhrase());
-                return Collections.emptyMap();
+                return null;
             }
             HttpEntity entity = response.getEntity();
             if(entity == null) {
                 log(Level.ERROR, "Not response body to %s",getUrl());
-                return Collections.emptyMap();
+                return null;
             }
             InputStream is = entity.getContent();;
             Map<String, Number> vars = parseStream(is);
@@ -63,7 +62,7 @@ public abstract class HCHttpProbe extends HttpProbe {
             log(Level.ERROR, "unable to parse %s", getUrl());
         }
 
-        return Collections.emptyMap();
+        return null;
     }
 
 }

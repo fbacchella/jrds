@@ -7,15 +7,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
-
 /**
  * This servlet reload the host list file
  * @author Fabrice Bacchella
  * @version $Revision$
  */
 public class ReloadHostList extends JrdsServlet {
-	static final private Logger logger = Logger.getLogger(ReloadHostList.class);
 
 	/* (non-Javadoc)
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
@@ -31,14 +28,8 @@ public class ReloadHostList extends JrdsServlet {
 		Thread configthread = new Thread("jrds-new-config") {
 			@Override
 			public void run() {
-				Configuration oldConfig = getConfig();
-				Configuration newConfig = new Configuration(ctxt);
-				oldConfig.stop();
-				newConfig.start();
-				setConfig(newConfig);
-				//Avoid a memory leak in perm gen
-				java.beans.Introspector.flushCaches();
-				logger.info("Configuration rescaned");
+			    StartListener sl = (StartListener) ctxt.getAttribute(StartListener.class.getName());
+			    sl.configure(ctxt);
 			}
 		};
 		if(params.getValue("sync") != null) {

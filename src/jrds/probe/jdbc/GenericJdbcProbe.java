@@ -67,11 +67,11 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
 
     @Override
     public Map<String, Number> getNewSampleValuesConnected(JdbcConnection cnx) {
-        Map<String, Number> values = Collections.emptyMap();
+        Map<String, Number> values = null;
         Statement stmt = cnx.getConnection();
         if(stmt != null && uptimeQuery != null && ! "".equals(uptimeQuery)) {
             if( ! doUptimeQuery(stmt))
-                return Collections.emptyMap();
+                return null;
         }
         try {
             try {
@@ -95,7 +95,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
         } catch (SQLException e) {
             log(Level.ERROR, e, "SQL exception while getting values: ", e.getMessage());
         }
-        return Collections.emptyMap();
+        return null;
     }
 
     private boolean doUptimeQuery(Statement stmt) {
@@ -116,7 +116,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
     }
 
     private Map<String, Number> getValuesFromRS(ResultSet rs, Set<String> collectKeys) {
-        Map<String, Number> values = Collections.emptyMap();
+        Map<String, Number> values = null;
         try {
             ResultSetMetaData meta = rs.getMetaData();
             int columnCount = meta.getColumnCount();

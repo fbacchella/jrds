@@ -2,27 +2,29 @@ package jrds.webapp;
 
 import java.util.Properties;
 
-import jrds.HostInfo;
-import jrds.Probe;
 import jrds.Tools;
-import jrds.mockobjects.MokeProbe;
 import jrds.standalone.JettyLogger;
-import jrds.starter.HostStarter;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.mortbay.jetty.testing.HttpTester;
 import org.mortbay.jetty.testing.ServletTester;
 
 public class TestQueryParams {
-    
+
     static final private Logger logger = Logger.getLogger(TestQueryParams.class);
 
-    static ServletTester tester = null;
+    ServletTester tester = null;
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws Exception {
@@ -31,36 +33,23 @@ public class TestQueryParams {
         System.setProperty("org.mortbay.log.class", "jrds.standalone.JettyLogger");
         Tools.setLevel(logger, Level.TRACE, JettyLogger.class.getName(), GetDiscoverHtmlCode.class.getName(), "jrds.webapp.Configuration", "jrds.webapp.JrdsServlet");
         Tools.setLevel(Level.INFO, "jrds.standalone.JettyLogger");
-        Properties config = new Properties();
-        config.put("tmpdir", "tmp");
-        config.put("configdir", "tmp/config");
-        config.put("autocreate", "true");
-        config.put("rrddir", "tmp");
-        config.put("libspath", "build/probes");
+    }
 
-        tester = ToolsWebApp.getTestServer(config);
-        Configuration c = (Configuration) tester.getAttribute(Configuration.class.getName());
-
-        HostStarter h = new HostStarter(new HostInfo("localhost"));
-        Probe<?,?> p = new MokeProbe<String, Number>();
-        p.setHost(h);
-        h.addProbe(p);
-        c.getHostsList().addHost(h.getHost());
-        c.getHostsList().addProbe(p);
-        tester.addServlet(JSonQueryParams.class, "/queryparams");
-
+    @Before
+    public void prepare() throws Exception {
+        tester = ToolsWebApp.getMonoServlet(testFolder, new Properties(), JSonQueryParams.class, "/queryparams");
         tester.start();
     }
-    
+
     @Test
-    public void testDiscover() throws Exception
+    public void testQueries() throws Exception
     {
         HttpTester response = ToolsWebApp.doRequestGet(tester, "http://localhost/queryparams", 200);
 
         logger.trace(response.getContent());
         JSONObject qp = new JSONObject(response.getContent());
         for(String key: new String[] {"tab", "tabslist", "autoperiod"}) {
-           Assert.assertTrue(key + " not found", qp.has(key)); 
+            Assert.assertTrue(key + " not found", qp.has(key)); 
         }
     }
 

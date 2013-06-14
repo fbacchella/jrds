@@ -80,12 +80,12 @@ public class TestUrlParser {
 
         p.addGraph(gn);
         hl.addProbe(p);
-        
+
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters, "DummyHost", "MockGraphInstance"), hl, "host", "graphname");
         Assert.assertEquals("Graph not found by path", new Integer(gn.hashCode()), pb.getId());        
         Assert.assertEquals("begin definition invalid", pb.getBegin(), begin.getTime());
         Assert.assertEquals("end definition invalid", pb.getEnd(), end.getTime());
-   }
+    }
 
     /**
      * Test that missing rest argument can be provided as cgi parameters
@@ -107,12 +107,12 @@ public class TestUrlParser {
 
         p.addGraph(gn);
         hl.addProbe(p);
-        
+
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters, "DummyHost"), hl, "host", "graphname");
         Assert.assertEquals("Graph not found by path", new Integer(gn.hashCode()), pb.getId());        
         Assert.assertEquals("begin definition invalid", pb.getBegin(), begin.getTime());
         Assert.assertEquals("end definition invalid", pb.getEnd(), end.getTime());
-   }
+    }
 
     @Test
     public void checkSortedTrue() {

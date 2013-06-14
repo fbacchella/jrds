@@ -10,7 +10,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.IllegalFormatConversionException;
 import java.util.List;
 import java.util.Map;
@@ -170,7 +169,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
             cnx.connect();
         } catch (IOException e) {
             log(Level.ERROR, e, "Connection to %s failed: %s", getUrl(), e.getMessage());
-            return Collections.emptyMap();
+            return null;
         }
         try {
             InputStream is = cnx.getInputStream();
@@ -196,7 +195,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
             }
         }
 
-        return Collections.emptyMap();
+        return null;
     }
 
     /**

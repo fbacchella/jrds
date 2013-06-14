@@ -15,7 +15,7 @@ import jrds.ProbeDesc;
 
 import org.apache.log4j.Level;
 
-public class ContainerProbe extends  Probe<Object, Number> {
+public class ContainerProbe extends Probe<Object, Number> {
     static final ProbeDesc pd = new ProbeDesc(0) {
         @Override
         public String getName() {

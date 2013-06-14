@@ -147,8 +147,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * It should return return as raw as possible, they can even be opaque data tied to the probe.
      * the key is resolved using the <code>ProbeDesc</code>. A key not associated with an existent datastore will generate a warning
      * but will not prevent the other values to be stored.<br>
-     * the value should be a <code>java.lang.Number<code><br>
-     * @return the map of collected object
+     * @return the map of collected object or null if the collect failed
      */
     public abstract Map<KeyType, ValueType> getNewSampleValues();
 
@@ -213,8 +212,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         JrdsSample sample = newSample();
         if(isCollectRunning()) {
             Map<KeyType, ValueType> sampleVals = getNewSampleValues();
-            log(Level.TRACE, "Collected values: %s", sampleVals);
-            if (sampleVals != null && ! sampleVals.isEmpty()) {
+            if (sampleVals != null) {
+                log(Level.TRACE, "Collected values: %s", sampleVals);
                 if(getUptime() * pd.getUptimefactor() >= pd.getHeartBeatDefault()) {
                     //Set the default values that might be defined in the probe description
                     for(Map.Entry<String, Double> e: getPd().getDefaultValues().entrySet()) {

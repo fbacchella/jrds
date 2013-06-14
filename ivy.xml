@@ -20,6 +20,7 @@
         </dependency>
         <dependency org="org.json" name="json" rev="20090211" conf="lib->default" />
         <dependency org="org.mortbay.jetty" name="jetty" rev="6.1.26" conf="libjetty->default" />
+        <dependency org="org.mortbay.jetty" name="jetty-management" rev="6.1.26" conf="libjetty->default" />
         <dependency org="org.apache.xmlrpc" name="xmlrpc-server" rev="3.1.3" conf="lib->default">
             <exclude module="junit" />
             <exclude module="servlet-api" />

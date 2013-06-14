@@ -117,7 +117,8 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
             log(Level.ERROR, e, "external command failed : %s", e);
         } finally {
             try {
-                stdout.close();
+                if(stdout != null)
+                    stdout.close();
             } catch (IOException e) {
             }
         }

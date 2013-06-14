@@ -8,14 +8,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jrds.Configuration;
 import jrds.HostsList;
 import jrds.PropertiesManager;
-import jrds.webapp.Configuration;
 import jrds.webapp.ParamsBean;
 
 import org.apache.log4j.Logger;
@@ -197,17 +196,12 @@ public class JrdsXmlRpcServlet extends XmlRpcServlet {
 		return server;
 	}
 
-	private Configuration getConfig() {
-		ServletContext ctxt = getServletContext();
-		return (Configuration) ctxt.getAttribute(Configuration.class.getName());
-	}
-
 	private HostsList getHostsList() {
-		return getConfig().getHostsList();
+		return Configuration.get().getHostsList();
 	}
 
 	private PropertiesManager getPropertiesManager() {
-		return getConfig().getPropertiesManager();
+		return Configuration.get().getPropertiesManager();
 	}
 
 }

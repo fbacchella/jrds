@@ -3,38 +3,41 @@ package jrds.webapp;
 import java.io.File;
 import java.io.IOException;
 
-import jrds.PropertiesManager;
+import jrds.Configuration;
 import jrds.Tools;
-import jrds.mockobjects.GetMoke;
 import jrds.mockobjects.MokeServletContext;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestConfiguration {
 	static final private Logger logger = Logger.getLogger(TestConfiguration.class);
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
 	@BeforeClass
 	static public void configure() throws IOException {
 		Tools.configure();
 		Tools.setLevel(logger, Level.TRACE, "jrds.HostList", "jrds.PropertiesManager", ParamsBean.class.getName(), Configuration.class.getName());
-		logger.trace(GetMoke.getResponse(null).getOutputStream().getClass());
 	}
 
 	@Test
-	public void test1() {
+	public void test1() throws IOException {
 		MokeServletContext sc = new MokeServletContext();
-		sc.initParameters.put("tmpdir", "tmp");
-		sc.initParameters.put("rrddir", "tmp");
-		sc.initParameters.put("configdir", "tmp/config");
+		File tempRoot = testFolder.getRoot();
+		File configDir = new File(tempRoot, "config");
+		sc.initParameters.put("tmpdir", tempRoot.getPath());
+		sc.initParameters.put("rrddir", tempRoot.getPath());
+		sc.initParameters.put("configdir", configDir.getPath());
 		sc.initParameters.put("autocreate", "true");
-		Configuration c = new Configuration(sc);
-		@SuppressWarnings("unused")
-		PropertiesManager pm = c.getPropertiesManager();
-		logger.trace(c.getHostsList().getHosts());
-		Assert.assertTrue("confid dir not created", new File("tmp/config").isDirectory());
+        StartListener sl = new StartListener();
+        sl.configure(sc);
+		Assert.assertTrue("confid dir " + configDir + " not created", configDir.isDirectory());
 	}
 }
