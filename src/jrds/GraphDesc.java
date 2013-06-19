@@ -754,7 +754,9 @@ implements Cloneable, WithACL {
         }
         //If the name is missing, where do we find it ?
         else {
-            if(rpn != null)
+            if(dsName != null)
+                name = dsName;
+            else if(rpn != null)
                 name = Integer.toHexString(rpn.hashCode());
             else if(legend != null) {
                 name = legend;
