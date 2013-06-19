@@ -5,7 +5,6 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,7 +25,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jrds.factories.ArgFactory;
 import jrds.starter.Timer;
 import jrds.store.RrdDbStoreFactory;
 import jrds.store.StoreFactory;
@@ -35,7 +33,6 @@ import jrds.webapp.RolesACL;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.rrd4j.core.RrdBackendFactory;
 
 /**
  * An less ugly class suposed to manage properties
@@ -62,7 +59,6 @@ public class PropertiesManager extends Properties {
     private boolean canact = false;
 
     public PropertiesManager() {
-        update();
         canact = true;
     }
 
@@ -72,7 +68,7 @@ public class PropertiesManager extends Properties {
         update();
     }
 
-    private int parseInteger(String s) throws NumberFormatException {
+    public int parseInteger(String s) throws NumberFormatException {
         Integer integer = null;
         if (s != null) {
             if (s.startsWith("#")) {
@@ -94,7 +90,7 @@ public class PropertiesManager extends Properties {
         throw new NumberFormatException("Parsing null string");
     }
 
-    private boolean parseBoolean(String s) {
+    public boolean parseBoolean(String s) {
         s = s.toLowerCase().trim();
         boolean retValue = false;
         if("1".equals(s))
@@ -111,6 +107,21 @@ public class PropertiesManager extends Properties {
             retValue = true;
 
         return retValue;
+    }
+
+    public Map<String, String> subKey(String prefix) {
+        Pattern regex = Pattern.compile("^" + prefix + "\\.");
+        Map<String, String> props = new HashMap<String, String>();
+
+        for(Map.Entry<Object, Object> e: entrySet()) {
+            String key = (String) e.getKey();
+            Matcher m = regex.matcher(key);
+            if(m.find()) {
+                String value =  (String) e.getValue();
+                props.put(m.replaceFirst(""), value);
+            }
+        }
+        return props;
     }
 
     public void join(URL url) {
@@ -340,8 +351,6 @@ public class PropertiesManager extends Properties {
         ti.numCollectors = numCollectors;
         timers.put(Timer.DEFAULTNAME, ti);
 
-        dbPoolSize = parseInteger(getProperty("dbPoolSize", "10")) + numCollectors;
-
         strictparsing = parseBoolean(getProperty("strictparsing", "false"));
         try {
             Enumeration<URL> descurl = getClass().getClassLoader().getResources("desc");
@@ -378,63 +387,6 @@ public class PropertiesManager extends Properties {
             }
         }
         extensionClassLoader = doClassLoader(getProperty("classpath", ""));
-
-        //
-        //Choose and configure the backend
-        //
-        String rrdbackendClassName = getProperty("rrdbackendclass", "");
-        if(! "".equals(rrdbackendClassName)) {
-            try {
-                @SuppressWarnings("unchecked")
-                Class<RrdBackendFactory> factoryClass = (Class<RrdBackendFactory>) extensionClassLoader.loadClass(rrdbackendClassName);
-                RrdBackendFactory factory = factoryClass.getConstructor().newInstance();
-                try {
-                    RrdBackendFactory.getFactory(factory.getName());
-                } catch (IllegalArgumentException e) {
-                    RrdBackendFactory.registerFactory(factory);
-                }
-                rrdbackend = factory.getName();
-            } catch (ClassNotFoundException e) {
-                logger.fatal("Backend not configured: " + e.getMessage(), e);
-            } catch (IllegalArgumentException e) {
-                logger.fatal("Backend not configured: " + e.getMessage(), e);
-            } catch (SecurityException e) {
-                logger.fatal("Backend not configured: " + e.getMessage(), e);
-            } catch (InstantiationException e) {
-                logger.fatal("Backend not configured: " + e.getMessage(), e);
-            } catch (IllegalAccessException e) {
-                logger.fatal("Backend not configured: " + e.getMessage(), e);
-            } catch (InvocationTargetException e) {
-                logger.fatal("Backend not configured: " + e.getMessage(), e);
-            } catch (NoSuchMethodException e) {
-                logger.fatal("Backend not configured: " + e.getMessage(), e);
-            }
-        } else {
-            rrdbackend = getProperty("rrdbackend", "FILE");
-        }
-
-        // Analyze the backend properties
-        Map<String, String> backendPropsMap = new HashMap<String, String>();
-        for(Object o: Collections.list(keys())) {
-            String prop = (String) o;
-            if(prop.startsWith("rrdbackend.")) {
-                String value = this.getProperty(prop);
-                String bean = prop.replace("rrdbackend.", "");
-                backendPropsMap.put(bean, value);
-            }
-        }
-        if(backendPropsMap.size() > 0){
-            RrdBackendFactory factory = RrdBackendFactory.getFactory(rrdbackend);
-            logger.debug(Util.delayedFormatString("Configuring backend factory %s", factory.getClass()));
-            for(Map.Entry<String, String> e: backendPropsMap.entrySet()) {
-                try {
-                    logger.trace(Util.delayedFormatString("Will set backend end bean '%s' to '%s'", e.getKey(), e.getValue()));
-                    ArgFactory.beanSetter(factory, e.getKey(), e.getValue());
-                } catch (InvocationTargetException e1) {
-                    logger.fatal(String.format("Backend bean %s not configured: %s", e.getKey(), e1.getMessage()), e1);
-                }
-            }
-        }
 
         //
         // Tab configuration
@@ -476,20 +428,18 @@ public class PropertiesManager extends Properties {
 
         withjmx = parseBoolean(getProperty("jmx", "0"));
         if(withjmx) {
-            jmxprops = new HashMap<String, String>();
-            jmxprops.put("protocol", "rmi");
-            Pattern regex = Pattern.compile("^jmx\\.");
-
-            for(Map.Entry<Object, Object> e: entrySet()) {
-                String key = (String) e.getKey();
-                Matcher m = regex.matcher(key);
-                if(m.find()) {
-                    String value =  (String) e.getValue();
-                    jmxprops.put(m.replaceFirst(""), value);
-                }
+            jmxprops = subKey("jmx");
+            if(! jmxprops.containsKey("protocol")) {
+                jmxprops.put("protocol", "rmi");
             }
         }
 
+        String storefactoryclassname = getProperty("storefactory", RrdDbStoreFactory.class.getName());
+        try {
+            storefactory = (StoreFactory) extensionClassLoader.loadClass(storefactoryclassname).getConstructor().newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public File configdir;
@@ -500,7 +450,6 @@ public class PropertiesManager extends Properties {
     public int step;
     public Map<String, TimerInfo> timers = new HashMap<String, TimerInfo>();
     public int numCollectors;
-    public int dbPoolSize;
     public final Set<URI> libspath = new HashSet<URI>();
     public boolean strictparsing = false;
     public ClassLoader extensionClassLoader;
@@ -509,15 +458,14 @@ public class PropertiesManager extends Properties {
     public boolean legacymode;
     public boolean autocreate;
     public int timeout;
-    public String rrdbackend;
     public boolean security = false;
-    public String userfile = "/tmp/bidule";
+    public String userfile = "/dev/zero";
     public Set<String> defaultRoles = Collections.emptySet();
     public String adminrole = "admin";
     public ACL defaultACL = ACL.ALLOWEDACL;
     public ACL adminACL = ACL.ALLOWEDACL;
     public boolean readonly = false;
-    public StoreFactory storefactory = new RrdDbStoreFactory();
+    public StoreFactory storefactory = null;
     public boolean withjmx = false;
     public Map<String, String> jmxprops = Collections.emptyMap();
     public static final String FILTERTAB = "filtertab";

@@ -11,7 +11,7 @@ import jrds.HostInfo;
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.PropertiesManager;
-import jrds.StoreOpener;
+import jrds.store.RrdDbStoreFactory;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.core.RrdDb;
@@ -25,10 +25,11 @@ public class Updater {
 
         PropertiesManager pm = new PropertiesManager(new File("jrds.properties"));
         //jrds.log.JrdsLoggerFactory.setOutputFile(pm.logfile);
+        final RrdDbStoreFactory factory = new RrdDbStoreFactory();
+        factory.configureStore(pm);
 
         System.getProperties().setProperty("java.awt.headless","true");
         System.getProperties().putAll(pm);
-        StoreOpener.prepare(pm.rrdbackend, pm.dbPoolSize);
         HostsList hl =  new HostsList(pm);
 
         ExecutorService tpool =  Executors.newFixedThreadPool(3);
@@ -46,12 +47,12 @@ public class Updater {
                             File source = new File(db.getCanonicalPath());
                             File dest = File.createTempFile("JRDS_", ".tmp", source.getParentFile());
                             logger.debug("updating " +  source  + " to "  + dest);
-                            RrdDb rrdSource = StoreOpener.getRrd(source.getCanonicalPath());
+                            RrdDb rrdSource = factory.getRrd(source.getCanonicalPath());
                             rrdDef.setPath(dest.getCanonicalPath());
                             RrdDb rrdDest = new RrdDb(rrdDef);
                             rrdSource.copyStateTo(rrdDest);
                             rrdDest.close();
-                            StoreOpener.releaseRrd(rrdSource);
+                            factory.releaseRrd(rrdSource);
                             logger.debug("Size difference : " + (dest.length() - source.length()));
                             copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
                         } catch (IOException e) {
@@ -75,7 +76,7 @@ public class Updater {
         } catch (InterruptedException e) {
             logger.info("Collect interrupted");
         }
-        StoreOpener.stop();
+        factory.stop();
     }
     
     private static void copyFile(String sourcePath, String destPath)

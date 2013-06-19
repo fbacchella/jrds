@@ -5,7 +5,6 @@ import java.util.Properties;
 
 import jrds.HostsList;
 import jrds.PropertiesManager;
-import jrds.StoreOpener;
 import jrds.starter.Timer;
 
 import org.apache.log4j.Logger;
@@ -33,7 +32,7 @@ public class Collector extends CommandStarterImpl {
 
         System.getProperties().setProperty("java.awt.headless","true");
         System.getProperties().putAll(pm);
-        StoreOpener.prepare(pm.rrdbackend, pm.dbPoolSize );
+
 
         HostsList hl = new HostsList(pm);
 
@@ -42,7 +41,6 @@ public class Collector extends CommandStarterImpl {
         for(Timer t: hl.getTimers()) {
             t.collectAll();
         }
-        StoreOpener.stop();
     }
 
 }

@@ -5,11 +5,16 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import jrds.Probe;
+import jrds.PropertiesManager;
 import jrds.factories.ArgFactory;
 
 public abstract class AbstractStoreFactory<StoreType extends AbstractStore<?,?>> implements StoreFactory {
 
     public abstract StoreType create(Probe<?,? > p);
+    
+    public void configureStore(PropertiesManager pm) {
+        
+    }
 
     public StoreType configure(Probe<?,? > p, Map<String, String> properties) throws InvocationTargetException {
         StoreType s = create(p);
@@ -21,6 +26,14 @@ public abstract class AbstractStoreFactory<StoreType extends AbstractStore<?,?>>
             }
         }
         return s;
+    }
+
+    @Override
+    public void start() {
+    }
+
+    @Override
+    public void stop() {
     }
 
 }

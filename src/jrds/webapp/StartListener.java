@@ -7,15 +7,9 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-
-import jrds.StoreOpener;
 
 import org.apache.log4j.Logger;
 
@@ -66,7 +60,6 @@ public class StartListener implements ServletContextListener {
 			logger.info("Application jrds will stop");
 			started = false;
 			jrds.Configuration.get().stop();
-			StoreOpener.stop();
 			logger.info("Application jrds stopped");
 		}
 	}

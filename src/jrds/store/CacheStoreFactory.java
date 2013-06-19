@@ -59,4 +59,10 @@ public class CacheStoreFactory extends AbstractStoreFactory<SampleCache> impleme
         return cache.get(host).get(probe);
     }
 
+    @Override
+    public void stop() {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

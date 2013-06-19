@@ -42,8 +42,6 @@ public class Configuration {
         propertiesManager.importSystemProps();
         propertiesManager.update();
 
-        StoreOpener.prepare(propertiesManager.rrdbackend, propertiesManager.dbPoolSize);
-
         hostsList = new HostsList(propertiesManager);
     }
 
@@ -87,6 +85,7 @@ public class Configuration {
             }
         } catch (InterruptedException e) {
         }
+        propertiesManager.storefactory.stop();
     }
 
     /**

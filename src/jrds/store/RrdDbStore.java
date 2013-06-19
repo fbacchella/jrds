@@ -10,7 +10,6 @@ import java.util.Set;
 
 import jrds.JrdsSample;
 import jrds.Probe;
-import jrds.StoreOpener;
 
 import org.apache.log4j.Level;
 import org.rrd4j.ConsolFun;
@@ -35,8 +34,9 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
         new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 365 * 2)
     };
 
-    public RrdDbStore(Probe<?, ?> p) {
+    public RrdDbStore(Probe<?, ?> p, RrdDbStoreFactory factory) {
         super(p);
+        this.factory = factory;
     }
 
     protected DsDef[] getDsDefs() {
@@ -239,14 +239,14 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
         Date lastUpdate = null;
         RrdDb rrdDb = null;
         try {
-            rrdDb = StoreOpener.getRrd(getRrdName());
+            rrdDb = factory.getRrd(getRrdName());
             lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
         } catch (Exception e) {
             throw new RuntimeException("Unable to get last update date for " + p.getQualifiedName(), e);
         }
         finally {
             if(rrdDb != null)
-                StoreOpener.releaseRrd(rrdDb);
+                factory.releaseRrd(rrdDb);
         }
         return lastUpdate;
     }
@@ -254,8 +254,17 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
     @Override
     public AbstractExtractor<FetchData> fetchData() {
         try {
-            final RrdDb rrdDb = StoreOpener.getRrd(getRrdName());
+            final RrdDb rrdDb = factory.getRrd(getRrdName());
             return new jrds.store.AbstractExtractor<FetchData>() {
+                /* (non-Javadoc)
+                 * @see java.lang.Object#finalize()
+                 */
+                @Override
+                protected void finalize() throws Throwable {
+                    super.finalize();
+                    factory.releaseRrd(rrdDb);
+                }
+
                 @Override
                 public String[] getNames() {
                     try {
@@ -327,7 +336,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
         Map<String, Number> retValues = new HashMap<String, Number>();
         RrdDb rrdDb = null;
         try {
-            rrdDb = StoreOpener.getRrd(getRrdName());
+            rrdDb = factory.getRrd(getRrdName());
             String[] dsNames = rrdDb.getDsNames();
             for(int i = 0; i < dsNames.length ; i ++) {
                 retValues.put(dsNames[i], rrdDb.getDatasource(i).getLastValue());
@@ -337,7 +346,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
         }
         finally {
             if(rrdDb != null)
-                StoreOpener.releaseRrd(rrdDb);
+                factory.releaseRrd(rrdDb);
         }
         return retValues;
     }
@@ -345,7 +354,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
     public void commit(JrdsSample sample) {
         RrdDb rrdDb = null;
         try {
-            rrdDb = StoreOpener.getRrd(getRrdName());
+            rrdDb = factory.getRrd(getRrdName());
             Sample onesample = rrdDb.createSample(sample.getTime().getTime() / 1000);
             for(Map.Entry<String, Number> e: sample.entrySet()) {
                 onesample.setValue(e.getKey(), e.getValue().doubleValue());
@@ -358,14 +367,14 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
         }            
         finally  {
             if(rrdDb != null)
-                StoreOpener.releaseRrd(rrdDb);
+                factory.releaseRrd(rrdDb);
         }
     }
 
     @Override
     public RrdDb getStoreObject() {
         try {
-            return StoreOpener.getRrd(getRrdName());
+            return factory.getRrd(getRrdName());
         } catch (IOException e) {
             return null;
         }
@@ -374,7 +383,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
     @Override
     public void closeStoreObject(Object rrdDb) {
         if(rrdDb != null)
-            StoreOpener.releaseRrd((RrdDb) rrdDb);
+            factory.releaseRrd((RrdDb) rrdDb);
     }
 
 }
