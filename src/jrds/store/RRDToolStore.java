@@ -2,6 +2,7 @@ package jrds.store;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -14,7 +15,8 @@ import org.apache.log4j.Level;
 import org.rrd4j.core.jrrd.ConsolidationFunctionType;
 import org.rrd4j.core.jrrd.DataChunk;
 import org.rrd4j.core.jrrd.RRDatabase;
-import org.rrd4j.data.Plottable;
+import org.rrd4j.data.DataProcessor;
+import org.rrd4j.graph.RrdGraphDef;
 
 @ProbeBean({"rrdfile"})
 public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
@@ -33,11 +35,11 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
         }
         return rrdpath.canRead();
     }
-    
+
     public void setRrdfile(String rrdpath) {
         this.rrdpath = new File(rrdpath);
     }
-    
+
     public String getRrdfile() {
         return rrdpath.getPath();
     }
@@ -94,32 +96,6 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
             }
 
             @Override
-            public double[][] getValues(ExtractInfo ei) {
-                getSource(ei).getData();
-                return null;
-            }
-
-            @Override
-            protected DataChunk newPlottableSource(ExtractInfo ei) {
-                try {
-                    return db.getData(ConsolidationFunctionType.AVERAGE, ei.start, ei.end, ei.step);
-                } catch (IOException e) {
-                    return null;
-                }
-            }
-
-            @Override
-            protected Plottable newPlottable(DataChunk s, ExtractInfo ei) {
-                return s.toPlottable(ei.ds);
-            }
-
-            @Override
-            public long[] getTimestamps(ExtractInfo ei) {
-                // TODO Auto-generated method stub
-                return null;
-            }
-
-            @Override
             public int getColumnCount() {
                 return db.getDataSourcesName().size();
             }
@@ -129,16 +105,31 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
                 return 0;
             }
 
+
             @Override
-            public double getValue(ExtractInfo ei) {
-                throw new UnsupportedOperationException();
+            public void fill(RrdGraphDef gd, ExtractInfo ei, Collection<String> sources) {
+                try {
+                    DataChunk dc = db.getData(ConsolidationFunctionType.AVERAGE, ei.start, ei.end, ei.step);
+                    for(String source: sources) {
+                        gd.datasource(source, dc.toPlottable(source));
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to access rrd file  " + db.toString(), e);
+                }
             }
 
             @Override
-            public double[] getSourceValues(ExtractInfo ei) {
-                throw new UnsupportedOperationException();
+            public void fill(DataProcessor dp, ExtractInfo ei, Collection<String> sources) {
+                try {
+                    DataChunk dc = db.getData(ConsolidationFunctionType.AVERAGE, ei.start, ei.end, ei.step);
+                    for(String source: sources) {
+                        dp.addDatasource(source, dc.toPlottable(source));
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to access rrd file  " + db.toString(), e);
+                }
             }
-            
+
         };
     }
 

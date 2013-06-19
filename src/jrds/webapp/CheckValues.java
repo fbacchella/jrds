@@ -1,12 +1,8 @@
-/*##########################################################################
- _##
- _##  $Id: Graph.java 236 2006-03-02 15:59:34 +0100 (jeu., 02 mars 2006) fbacchella $
- _##
- _##########################################################################*/
-
 package jrds.webapp;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -18,6 +14,7 @@ import jrds.HostsList;
 import jrds.Probe;
 
 import org.rrd4j.ConsolFun;
+import org.rrd4j.data.DataProcessor;
 
 import jrds.store.ExtractInfo;
 import jrds.store.Extractor;
@@ -72,21 +69,25 @@ public final class CheckValues extends JrdsServlet {
                 return;
             }
             Date paste = new Date(lastupdate.getTime() - period * 1000);
-            
+
             Extractor fd = p.fetchData();
 
             String ds = params.getValue("dsname");
-            
+
             ExtractInfo ei = ExtractInfo.get().
-                                make(paste, lastupdate).
-                                make(cf).
-                                make(p.getStep());
+                    make(paste, lastupdate).
+                    make(cf).
+                    make(p.getStep());
+            DataProcessor dp = ei.getDataProcessor();
             if(ds != null && !  "".equals(ds.trim())) {
-                out.print(fd.getValue(ei.make(ds.trim())));
+                fd.fill(dp, ei, Collections.singleton(ds.trim()));
+                double val = dp.getAggregate(ds.trim(), cf);
+                out.print(val);
             }
             else {
+                fd.fill(dp, ei, Arrays.asList(fd.getDsNames()));
                 for(String dsName: fd.getDsNames()) {
-                    double val = fd.getValue(ei.make(dsName));
+                    double val = dp.getAggregate(dsName, cf);
                     out.println(dsName + ": " + val);
                 }
                 out.println("Last update: " + p.getLastUpdate());

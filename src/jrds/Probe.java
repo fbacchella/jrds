@@ -20,12 +20,14 @@ import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.starter.HostStarter;
 import jrds.starter.StarterNode;
+import jrds.store.ExtractInfo;
 import jrds.store.Extractor;
 import jrds.store.Store;
 import jrds.store.StoreFactory;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.rrd4j.data.DataProcessor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -460,7 +462,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
         if (sorted)
             Arrays.sort(dss);
- 
+
         for(String dsName: dss) {
 
             Element dsNameElement = document.createElement("name");
@@ -575,6 +577,13 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     public Extractor fetchData() {
         return mainStore.fetchData();
+    }
+
+    public DataProcessor extract(ExtractInfo ei) {
+        Extractor ex = mainStore.fetchData();
+        DataProcessor dp = ei.getDataProcessor();
+        ex.fill(dp, ei, pd.getDs());
+        return dp;
     }
 
 }

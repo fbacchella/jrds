@@ -1,8 +1,5 @@
 package jrds.webapp;
 
-//----------------------------------------------------------------------------
-//$Id$
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DateFormat;
@@ -17,12 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import jrds.Period;
 import jrds.Probe;
+import jrds.store.ExtractInfo;
 
 import org.apache.log4j.Logger;
-
-import jrds.store.ExtractInfo;
-import jrds.store.Extractor;
-
 import org.rrd4j.data.DataProcessor;
 
 /**
@@ -85,9 +79,8 @@ public class Download extends JrdsServlet {
 
         DataProcessor sourceDp = null;
         String fileName = null;
-        jrds.Graph graph;
         if("graph".equals(cmd)) {
-            graph = params.getGraph(this);
+            jrds.Graph graph = params.getGraph(this);
             if(graph == null) {
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 return;   
@@ -117,14 +110,10 @@ public class Download extends JrdsServlet {
                 return;   
             }
             Period p = params.getPeriod();
-            Extractor fd = probe.fetchData();
             ExtractInfo ei = ExtractInfo.get()
-                                .make(p.getBegin(), p.getEnd())
-                                .make(probe.getStep());
-            sourceDp = new DataProcessor(p.getBegin(), p.getEnd());
-            for(String dsName: fd.getDsNames()) {
-                sourceDp.addDatasource(dsName, fd.getPlottable(ei.make(dsName)));
-            }
+                    .make(p.getBegin(), p.getEnd())
+                    .make(probe.getStep());
+            sourceDp = probe.extract(ei);
             try {
                 sourceDp.processData();
                 fileName = probe.getName().replaceFirst("\\.rrd",".csv");

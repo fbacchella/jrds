@@ -2,6 +2,7 @@ package jrds.store;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,15 +19,17 @@ import org.rrd4j.core.Archive;
 import org.rrd4j.core.Datasource;
 import org.rrd4j.core.DsDef;
 import org.rrd4j.core.FetchData;
+import org.rrd4j.core.FetchRequest;
 import org.rrd4j.core.Header;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDef;
 import org.rrd4j.core.Sample;
 import org.rrd4j.core.Util;
-import org.rrd4j.data.LinearInterpolator;
-import org.rrd4j.data.Plottable;
+import org.rrd4j.data.DataProcessor;
+import org.rrd4j.graph.RrdGraphDef;
 
 public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
+    private final RrdDbStoreFactory factory;
 
     private static final ArcDef[] DEFAULTARC = {
         new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 3),
@@ -284,30 +287,6 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
                 }
 
                 @Override
-                public double[][] getValues(ExtractInfo ei) {
-                    return getSource(ei).getValues();
-                }
-
-                @Override
-                protected FetchData newPlottableSource(ExtractInfo ei) {
-                    try {
-                        return rrdDb.createFetchRequest(ei.cf, ei.start.getTime() / 1000L, ei.end.getTime() / 1000L).fetchData();
-                    } catch (IOException e) {
-                        return null;
-                    }
-                }
-
-                @Override
-                protected Plottable newPlottable(FetchData source, ExtractInfo ei) {
-                    return new LinearInterpolator(source.getTimestamps(), source.getValues(ei.ds));
-                }
-
-                @Override
-                public long[] getTimestamps(ExtractInfo ei) {
-                     return getSource(ei).getTimestamps();
-                }
-
-                @Override
                 public int getColumnCount() {
                     return rrdDb.getDsCount();
                 }
@@ -318,14 +297,33 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
                 }
 
                 @Override
-                public double getValue(ExtractInfo ei) {
-                    return getSource(ei).getAggregate(ei.ds, ei.cf);
+                public void fill(RrdGraphDef gd, ExtractInfo ei,
+                        Collection<String> sources) {
+                    try {
+                        FetchRequest fr = rrdDb.createFetchRequest(ei.cf, ei.start.getTime() / 1000, ei.end.getTime() / 1000, 1);
+                        FetchData fd = fr.fetchData();
+                        for(String source: sources) {
+                            gd.datasource(source, fd);
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to access rrd file  " + getRrdName(), e);
+                    }
                 }
 
                 @Override
-                public double[] getSourceValues(ExtractInfo ei) {
-                    return getSource(ei).getValues(ei.ds);
+                public void fill(DataProcessor dp, ExtractInfo ei,
+                        Collection<String> sources) {
+                    try {
+                        FetchRequest fr = rrdDb.createFetchRequest(ei.cf, ei.start.getTime() / 1000, ei.end.getTime() / 1000, 1);
+                        FetchData fd = fr.fetchData();
+                        for(String source: sources) {
+                            dp.addDatasource(source, fd);
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException("Failed to access rrd file  " + getRrdName(), e);
+                    }
                 }
+
             };
         } catch (IOException e) {
             throw new RuntimeException("Failed to access rrd file  " + getRrdName(), e);

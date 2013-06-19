@@ -1,15 +1,17 @@
 package jrds;
 
-//----------------------------------------------------------------------------
-//$Id$
-
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Map;
 
+import jrds.store.ExtractInfo;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
+import org.rrd4j.data.DataProcessor;
+import org.rrd4j.data.Plottable;
 import org.rrd4j.graph.RrdGraphDef;
 
 /**
@@ -137,7 +139,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
 
     public Graph getGraph() {
         Class<Graph>  gclass = gd.getGraphClass();
-        
+
         //Exceptions can't happen, it was checked at configuration time
         try {
             return gclass.getConstructor(GraphNode.class).newInstance(this);
@@ -188,6 +190,13 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
      */
     public void setCustomData(PlottableMap customData) {
         this.customData = customData;
+    }
+
+    public DataProcessor getPlottedDate(ExtractInfo ei) throws IOException {
+        Map<String, ? extends Plottable> pmap = Collections.emptyMap();
+        if(customData != null)
+            pmap = customData;
+        return gd.getPlottedDatas(probe, ei, pmap);
     }
 
 }

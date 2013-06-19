@@ -1,17 +1,16 @@
 package jrds.store;
 
-import org.rrd4j.data.Plottable;
+import java.util.Collection;
+
+import org.rrd4j.data.DataProcessor;
+import org.rrd4j.graph.RrdGraphDef;
 
 public interface Extractor {
 
-    public  String[] getNames();
-    public  String[] getDsNames();
-    public  double[][] getValues(ExtractInfo ei);
-    public  double[] getSourceValues(ExtractInfo ei);
-    public  Plottable getPlottable(ExtractInfo ei);
-    public  long[] getTimestamps(ExtractInfo ei);
-    public  int getColumnCount();
-    public  double getValue(ExtractInfo ei);
-    
+    public String[] getNames();
+    public String[] getDsNames();
+    public void fill(DataProcessor dp, ExtractInfo ei, Collection<String> sources);
+    public void fill(RrdGraphDef gd, ExtractInfo ei, Collection<String> sources);
+    public int getColumnCount();
 
 }

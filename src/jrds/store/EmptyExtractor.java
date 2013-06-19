@@ -1,6 +1,9 @@
 package jrds.store;
 
-import org.rrd4j.data.Plottable;
+import java.util.Collection;
+
+import org.rrd4j.data.DataProcessor;
+import org.rrd4j.graph.RrdGraphDef;
 
 public class EmptyExtractor extends AbstractExtractor<Object> {
 
@@ -15,31 +18,6 @@ public class EmptyExtractor extends AbstractExtractor<Object> {
     }
 
     @Override
-    public double[][] getValues(ExtractInfo ei) {
-        return new double[][]{};
-    }
-
-    @Override
-    protected Object newPlottableSource(ExtractInfo ei) {
-        return null;
-    }
-
-    @Override
-    protected Plottable newPlottable(Object s, ExtractInfo ei) {
-        return new Plottable() {
-            @Override
-            public double getValue(long timestamp) {
-                return Double.NaN;
-            }
-        };
-    }
-
-    @Override
-    public long[] getTimestamps(ExtractInfo ei) {
-        return new long[]{};
-    }
-
-    @Override
     public int getColumnCount() {
         return 0;
     }
@@ -50,13 +28,12 @@ public class EmptyExtractor extends AbstractExtractor<Object> {
     }
 
     @Override
-    public double getValue(ExtractInfo ei) {
-        return Double.NaN;
+    public void fill(RrdGraphDef gd, ExtractInfo ei, Collection<String> sources) {
     }
 
     @Override
-    public double[] getSourceValues(ExtractInfo ei) {
-        return new double[]{};
+    public void fill(DataProcessor dp, ExtractInfo ei, Collection<String> sources) {
+
     }
 
 }

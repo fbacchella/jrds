@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.Map;
 
 import jrds.store.ExtractInfo;
-import jrds.store.Extractor;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
@@ -130,11 +129,11 @@ public class Graph implements WithACL {
             logger.error("Impossible to create graph definition, invalid date definition from " + start + " to " + end + " : " + e);
         }
     }
-    
-    protected Extractor setGraphDefData(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei,
+
+    protected void setGraphDefData(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei,
             Map<String, ? extends Plottable> customData) {
         GraphDesc gd = node.getGraphDesc();
-        return gd.fillGraphDef(graphDef, node.getProbe(), ei, customData);        
+        gd.fillGraphDef(graphDef, node.getProbe(), ei, customData);        
     }
 
     protected long getStartSec() {

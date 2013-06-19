@@ -1,5 +1,6 @@
 package jrds.graphe;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -9,13 +10,11 @@ import jrds.GraphNode;
 import jrds.HostsList;
 import jrds.PlottableMap;
 import jrds.Util;
+import jrds.store.ExtractInfo;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
-
-import jrds.store.ExtractInfo;
-import jrds.store.Extractor;
-
+import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.LinearInterpolator;
 import org.rrd4j.data.Plottable;
 
@@ -79,22 +78,27 @@ public class Sum extends AutonomousGraphNode {
                         .make(ConsolFun.AVERAGE);
                 logger.debug(Util.delayedFormatString("Configuring the sum %s from %d to %d, step %d", Sum.this.getName(), start, end, step));
                 //Used to kept the last fetched data and analyse the
-                Extractor fd = null;
+                DataProcessor dp = null;
 
                 double[][] allvalues = null;
                 for(String name : graphList) {
                     GraphNode g = hl.getGraphById(name.hashCode());
                     logger.trace("Looking for " + name + " in graph base, and found " + g);
                     if(g != null) {
-                        fd = g.getProbe().fetchData();
-                        
+                        try {
+                            dp = g.getPlottedDate(ei);
+                        } catch (IOException e) {
+                            logger.error("Failed to read " + g.getProbe());
+                            continue;
+                        }
+
                         //First pass, no data to use
                         if(allvalues == null) {
-                            allvalues = (double[][]) fd.getValues(ei).clone();
+                            allvalues = (double[][]) dp.getValues().clone();
                         }
                         //Next step, sum previous values
                         else {
-                            double[][] tempallvalues = fd.getValues(ei);
+                            double[][] tempallvalues = dp.getValues();
                             for(int c = 0 ; c < tempallvalues.length ; c++) {
                                 for(int r = 0 ; r < tempallvalues[c].length; r++) {
                                     double v = tempallvalues[c][r];
@@ -113,10 +117,10 @@ public class Sum extends AutonomousGraphNode {
                         logger.error("Graph not found: " + name);
                     }
                 }
-                if(fd != null) {
-                    long[] ts = fd.getTimestamps(ei);
-                    String[] dsNames = fd.getDsNames();
-                    for(int i= 0; i < fd.getColumnCount(); i++) {
+                if(dp != null) {
+                    long[] ts = dp.getTimestamps();
+                    String[] dsNames = dp.getSourceNames();
+                    for(int i= 0; i < dsNames.length; i++) {
                         Plottable pl = new LinearInterpolator(ts, allvalues[i]);
                         put(dsNames[i], pl);
                         logger.trace(Util.delayedFormatString("Added %s to sum plottables", dsNames[i]));

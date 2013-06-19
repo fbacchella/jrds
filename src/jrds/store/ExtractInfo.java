@@ -11,11 +11,11 @@ public class ExtractInfo {
     final Long step;
     final String ds;
     final ConsolFun cf;
-    
+
     public static final ExtractInfo get() {
         return new ExtractInfo();
     }
-    
+
     private ExtractInfo() {
         start = new Date();
         end = new Date();
@@ -23,7 +23,7 @@ public class ExtractInfo {
         ds = "";
         cf = ConsolFun.AVERAGE;
     }
-    
+
     private ExtractInfo(Date start, Date end, long step,
             String ds, ConsolFun cf) {
         super();
@@ -57,4 +57,5 @@ public class ExtractInfo {
     public final DataProcessor getDataProcessor() {
         return new DataProcessor(start, end);
     }
+
 }

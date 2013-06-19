@@ -704,8 +704,6 @@ implements Cloneable, WithACL {
             String consFunc, String reversed, String percentile,
             //The path to an external datastore
             String host, String probe, String dsName) {
-        if(logger.isTraceEnabled())
-            logger.trace("Adding " + name + ", " + rpn + ", " + graphType + ", " + color + ", " + legend + ", " + consFunc + ", " + reversed + ", " + host + ", " + probe);
         GraphType gt = null;
         if(graphType == null || "".equals(graphType)) {
             if(legend != null)
@@ -773,6 +771,9 @@ implements Cloneable, WithACL {
         if(percentile != null && ! "".equals(percentile)) {
             valPercentile = jrds.Util.parseStringNumber(percentile, Integer.valueOf(0));
         }
+        logger.trace(Util.delayedFormatString(
+                "Adding '%s': %s/'%s', %s, %s, '%s', %s, %s, %d, %s, %s",
+                name, dsName, rpn, graphType, color, legend, consFunc, reversed, valPercentile, host, probe));
         add(name, dsName, rpn, gt, c, legend, cf, reversed != null, valPercentile, host, probe);
     }
 
@@ -848,14 +849,17 @@ implements Cloneable, WithACL {
      * @param defProbe The probe to get values from
      * @param customData some custom data, they override existing values in the associated probe
      */
-    public Extractor fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei,
+    public void fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei,
             Map<String, ? extends Plottable> customData) {
         HostsList hl = defProbe.getHostList();
         List<DsDesc> toDo = new ArrayList<DsDesc>();
         //The datasources already found
         Set<String> datasources = new HashSet<String>();
-        Extractor extract = defProbe.fetchData(); 
-        
+
+        //date source name sorted by probe
+        Map<Probe<?,?>,Set<String>> probeDS = new HashMap<Probe<?,?>,Set<String>>(1);
+        probeDS.put(defProbe, new HashSet<String>());
+
         for(DsDesc ds: allds) {
             boolean complete = false;
             // not a data source, don't try to add it in datasources
@@ -865,8 +869,10 @@ implements Cloneable, WithACL {
             //The graph is a percentile
             else if(ds.percentile != null) {
                 complete = true;
-                graphDef.percentile(ds.name, ds.dsName, ds.percentile);
-                datasources.add(ds.name);
+                if(! datasources.contains(ds.name)) {
+                    graphDef.percentile(ds.name, ds.dsName, ds.percentile);
+                    datasources.add(ds.name);
+                }
             }
             //A rpn datasource
             else if (ds.rpn != null) {
@@ -906,14 +912,19 @@ implements Cloneable, WithACL {
                     logger.error("Invalide datasource "  + ds.dsName + ", not found in " + probe);
                     continue;
                 }
-
                 complete = true;
-                if( ! datasources.contains(ds.name)) {                    
-                    graphDef.datasource(ds.name, extract.getPlottable(ei.make(ds.dsName).make(ds.cf)));                
-                    datasources.add(ds.name);
+
+                //Add the dsName for the probe found
+                if( !probeDS.containsKey(probe)) {
+                    probeDS.put(probe, new HashSet<String>());
+                }
+                Set<String> storeSources = probeDS.get(probe);
+                if( ! datasources.contains(ds.dsName)) {                    
+                    storeSources.add(ds.dsName);                
+                    datasources.add(ds.dsName);
                 }
                 else {
-                    logger.error("Datasource '" + ds.name + "' defined twice in " + name + ", for found: " + ds);
+                    logger.error("Datasource '" + ds.dsName + "' defined twice in " + name + ", for found: " + ds);
                     logger.error("New one is " + ds);
                 }
             }
@@ -925,6 +936,16 @@ implements Cloneable, WithACL {
                 logger.error("No way to plot " + ds.name + " in " + name + " found");
             }
         }
+
+        // Fill the graphdef with extracted data
+        for(Map.Entry<Probe<?,?>,Set<String>> e: probeDS.entrySet()) {
+            Extractor x = e.getKey().fetchData();
+            if(e.getValue().size() > 0) {
+                x.fill(graphDef, ei, e.getValue());
+                logger.trace(Util.delayedFormatString("Data sources to fetch: %s", e.getValue()));
+            }
+        }
+
         // The title line, only if values block is required
         if( withSummary) {
             graphDef.comment(""); //We simulate the color box
@@ -936,10 +957,8 @@ implements Cloneable, WithACL {
             graphDef.comment("\\l");
         }
 
-        if(logger.isTraceEnabled()) {
-            logger.trace("Datasource: " + datasources);
-            logger.trace("Todo: " + toDo);
-        }
+        logger.trace(Util.delayedFormatString("Datasource: %s", datasources));
+        logger.trace(Util.delayedFormatString("Todo: : %s", toDo));
 
         String shortLegend = withSummary ? " \\g": null;
         for(DsDesc ds: toDo) {
@@ -947,8 +966,7 @@ implements Cloneable, WithACL {
             if(withSummary && ds.graphType.legend())
                 addLegend(graphDef, ds.name, ds.graphType, ds.legend);
         }
-        
-        return extract;
+
     }
 
     /**
@@ -975,39 +993,92 @@ implements Cloneable, WithACL {
      * @throws IOException
      * @throws RrdException
      */
-    public DataProcessor getPlottedDatas(Probe<?,?> probe, ExtractInfo ei, Map<?, ?> ownData) throws IOException {
+    public DataProcessor getPlottedDatas(Probe<?,?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData) throws IOException {
         DataProcessor retValue = ei.getDataProcessor();
-        Extractor extract = probe.fetchData();
-        String lastName = null;
+
+        HostsList hl = defProbe.getHostList();
+
+        //The datasources already found
+        Set<String> datasources = new HashSet<String>();
+
+        //date source name sorted by probe
+        Map<Probe<?,?>,Set<String>> probeDS = new HashMap<Probe<?,?>,Set<String>>(1);
+        probeDS.put(defProbe, new HashSet<String>());
+
         for(DsDesc ds: allds) {
-            boolean stack = ds.graphType == GraphType.STACK;
-            boolean plotted = stack || ds.graphType == GraphType.LINE  || ds.graphType == GraphType.AREA;
-            if (ds.rpn == null && ds.dsName != null) {
-                //Does the datas existe in the provided values
-                if(ownData != null && ownData.containsKey(ds.dsName) && ds.graphType == GraphType.LINE) {
-                    retValue.addDatasource(ds.name, (Plottable) ownData.get(ds.dsName));
+            // not a data source, don't try to add it in datasources
+            if(! ds.graphType.datasource()) {
+                continue;
+            }
+            //The graph is a percentile
+            else if(ds.percentile != null) {
+                if(! datasources.contains(ds.name)) {
+                    retValue.addDatasource(ds.name, ds.dsName, ds.percentile);
+                    datasources.add(ds.name);
                 }
-                //Or they might be on the associated rrd
-                else if(probe.dsExist(ds.dsName)) {
-                    retValue.addDatasource(ds.name, extract.getPlottable(ei.make(ds.dsName).make(ds.cf)));
+            }
+            //A rpn datasource
+            else if (ds.rpn != null) {
+                if(! datasources.contains(ds.name)) {
+                    retValue.addDatasource(ds.name, ds.rpn);
+                    datasources.add(ds.name);
                 }
             }
-            else if(ds.rpn != null){
-                retValue.addDatasource(ds.name, ds.rpn);
+            else if(ds.graphType == GraphType.LEGEND) {
+                continue;
             }
-            if(plotted && stack) {
-                retValue.addDatasource("Plotted" + ds.name, lastName + ", " +  ds.name + ", +");
+            //Does the datas existe in the provided values
+            //It override existing values in the probe
+            else if(customData != null && customData.containsKey(ds.dsName)) {
+                if( ! datasources.contains(ds.name)) {
+                    retValue.addDatasource(ds.name, customData.get(ds.dsName));
+                    datasources.add(ds.name);
+                    logger.trace(Util.delayedFormatString("custom data found for %s", ds.dsName));
+                }
             }
-            else if(plotted) {
-                retValue.addDatasource("Plotted" + ds.name, ds.name);
+            //Last but common case, datasource refers to a rrd
+            //Or they might be on the associated rrd
+            else {
+                Probe<?,?> probe = defProbe;
+                if(ds.dspath != null) {
+                    if(logger.isTraceEnabled())
+                        logger.trace("External probe path: " + ds.dspath.host + "/" + ds.dspath.probe + "/" + ds.dsName);
+                    probe = hl.getProbeByPath(ds.dspath.host, ds.dspath.probe);
+                    if(probe == null) {
+                        logger.error("Invalide probe: " + ds.dspath.host + "/" + ds.dspath.probe);
+                        continue;
+                    }
+                }
+                if(! probe.dsExist(ds.dsName)) {
+                    logger.error("Invalide datasource "  + ds.dsName + ", not found in " + probe);
+                    continue;
+                }
+
+                //Add the dsName for the probe found
+                if( !probeDS.containsKey(probe)) {
+                    probeDS.put(probe, new HashSet<String>());
+                }
+                Set<String> storeSources = probeDS.get(probe);
+                if( ! datasources.contains(ds.dsName)) {                    
+                    storeSources.add(ds.dsName);                
+                    datasources.add(ds.dsName);
+                }
+                else {
+                    logger.error("Datasource '" + ds.dsName + "' defined twice in " + name + ", for found: " + ds);
+                    logger.error("New one is " + ds);
+                }
             }
-            lastName = ds.name; 
         }
-        if(logger.isTraceEnabled()) {
-            logger.trace("Datastore for " + getName());
-            for(String s: retValue.getSourceNames())
-                logger.trace("\t" + s);
+
+        // Fill the graphdef with extracted data
+        for(Map.Entry<Probe<?,?>,Set<String>> e: probeDS.entrySet()) {
+            Extractor x = e.getKey().fetchData();
+            if(e.getValue().size() > 0) {
+                x.fill(retValue, ei, e.getValue());
+                logger.trace(Util.delayedFormatString("Data sources to fetch: %s", e.getValue()));
+            }
         }
+
         return retValue;
     }
 
@@ -1227,7 +1298,7 @@ implements Cloneable, WithACL {
             }
         }
     }
-    
+
     public Integer getUnitExponent() {
         return unitExponent;
     }
