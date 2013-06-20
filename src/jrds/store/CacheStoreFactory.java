@@ -4,41 +4,36 @@ import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
+import javax.management.StandardMBean;
 
 import jrds.Probe;
 
 public class CacheStoreFactory extends AbstractStoreFactory<CacheStore> implements SampleCacheMBean  {
     private final Map<String, Map<String, Map<String, Number>>> cache = new HashMap<String, Map<String, Map<String, Number>>>();
-
-    public CacheStoreFactory() {
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        ObjectName name;
-        try {
-            name = new ObjectName("jrds:type=SampleCache");
-            mbs.registerMBean(this, name);         
-        } catch (MalformedObjectNameException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NullPointerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InstanceAlreadyExistsException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (MBeanRegistrationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NotCompliantMBeanException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+    @SuppressWarnings("unused")
+    private final CacheMBean mbean;
+    private final class CacheMBean extends StandardMBean implements SampleCacheMBean {
+        protected CacheMBean() {
+            super(SampleCacheMBean.class, false);
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            try {
+                ObjectName name = new ObjectName("jrds:type=SampleCache");
+                mbs.registerMBean(this, name);         
+            } catch (Exception e) {
+                throw new RuntimeException("Can't register cache mbean", e);
+            }
         }
 
+        @Override
+        public Map<String, Number> getValues(String host, String probe) {
+            return CacheStoreFactory.this.getValues(host, probe);
+        } 
+    }
+
+    public CacheStoreFactory() {
+        mbean = new CacheMBean();
     }
 
     @Override

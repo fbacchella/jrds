@@ -39,7 +39,6 @@ public class TestRRDToolStore {
         GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start(2)
                 .set(StoreFactory.class, new RRDToolStoreFactory())
                 .set(GenerateProbe.FACTORYCONFIG, factoryArgs);
-        logger.debug(factoryArgs);
         Probe<?,?> p = GenerateProbe.fillProbe(new GenerateProbe.EmptyProbe(), testFolder, args);
         p.getPd().add("speed", DsType.GAUGE);
         p.getPd().add("weight", DsType.GAUGE);
@@ -49,6 +48,7 @@ public class TestRRDToolStore {
         String[] dsNames = dp.getSourceNames();
         Assert.assertEquals("data source weight not found", "weight", dsNames[0]);
         Assert.assertEquals("data source speed not found", "speed", dsNames[1]);
+        Assert.assertEquals("Missing last values",2, p.getMainStore().getLastValues().size());
     }
 
 }

@@ -38,6 +38,7 @@ public abstract class AbstractExtractor<Source> implements Extractor {
         return sources.values().toArray(new String[] {});
     }
 
+    @Override
     public abstract String getPath();
 
     @Override
@@ -51,7 +52,5 @@ public abstract class AbstractExtractor<Source> implements Extractor {
      */
     @Override
     public abstract int getColumnCount();
-
-    protected abstract int getSignature(ExtractInfo ei);
 
 }

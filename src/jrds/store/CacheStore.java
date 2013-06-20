@@ -6,8 +6,9 @@ import java.util.Map;
 import jrds.JrdsSample;
 import jrds.Probe;
 
-public class CacheStore extends AbstractStore<Map<String, Number>, Object> {
+public class CacheStore extends AbstractStore<Map<String, Number>> {
     private final Map<String, Number> cache;
+    private Date lastUpdate = new Date(0);
 
     public CacheStore(Probe<?,?> p, Map<String, Number> cache) {
         super(p);
@@ -17,6 +18,7 @@ public class CacheStore extends AbstractStore<Map<String, Number>, Object> {
     @Override
     public void commit(JrdsSample sample) {
         cache.putAll(sample);
+        lastUpdate = new Date();
     }
 
     @Override
@@ -31,8 +33,7 @@ public class CacheStore extends AbstractStore<Map<String, Number>, Object> {
 
     @Override
     public Date getLastUpdate() {
-        // TODO Auto-generated method stub
-        return null;
+        return lastUpdate;
     }
 
     @Override

@@ -11,11 +11,6 @@ public class EmptyExtractor extends AbstractExtractor<Object> {
     }
 
     @Override
-    protected int getSignature(ExtractInfo ei) {
-        return ExtractInfo.get().hashCode();
-    }
-
-    @Override
     public void fill(RrdGraphDef gd, ExtractInfo ei) {
     }
 

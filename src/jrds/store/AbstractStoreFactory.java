@@ -8,14 +8,17 @@ import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.factories.ArgFactory;
 
-public abstract class AbstractStoreFactory<StoreType extends AbstractStore<?,?>> implements StoreFactory {
+public abstract class AbstractStoreFactory<StoreType extends AbstractStore<?>> implements StoreFactory {
 
+    @Override
     public abstract StoreType create(Probe<?,? > p);
     
+    @Override
     public void configureStore(PropertiesManager pm) {
         
     }
-
+    
+    @Override
     public StoreType configure(Probe<?,? > p, Map<String, String> properties) throws InvocationTargetException {
         StoreType s = create(p);
         for(PropertyDescriptor bean: ArgFactory.getBeanPropertiesMap(s.getClass(), AbstractStore.class).values()) {

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import jrds.JrdsSample;
@@ -13,12 +14,13 @@ import jrds.factories.ProbeBean;
 import org.apache.log4j.Level;
 import org.rrd4j.core.jrrd.ConsolidationFunctionType;
 import org.rrd4j.core.jrrd.DataChunk;
+import org.rrd4j.core.jrrd.DataSource;
 import org.rrd4j.core.jrrd.RRDatabase;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.graph.RrdGraphDef;
 
 @ProbeBean({"rrdfile"})
-public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
+public class RRDToolStore extends AbstractStore<RRDatabase> {
 
     public RRDToolStore(Probe<?, ?> p) {
         super(p);
@@ -28,10 +30,6 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
 
     public Boolean configure(File rrdpath) {
         this.rrdpath = rrdpath;
-        try {
-            log(Level.TRACE, "rrd is %s", rrdpath.getCanonicalPath());
-        } catch (IOException e) {
-        }
         return rrdpath.canRead();
     }
 
@@ -64,8 +62,9 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
             RRDatabase db = new RRDatabase(rrdpath);
             return db.getLastUpdate();
         } catch (IOException e) {
+            log(Level.ERROR, e, "invalid rrd file %s: %s", rrdpath, e.getMessage());
+            return new Date(0);
         }
-        return new Date(0);
     }
 
     @Override
@@ -74,7 +73,19 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
 
     @Override
     public Map<String, Number> getLastValues() {
-        return Collections.emptyMap();
+        RRDatabase db;
+        try {
+            db = new RRDatabase(rrdpath);
+            Map<String, Number> values = new HashMap<String, Number>(db.getDataSourcesName().size());
+            for(int i = db.getDataSourcesName().size() - 1; i>=0; i--) {
+                DataSource source = db.getDataSource(i);
+                values.put(source.getName(), source.getPDPStatusBlock().getValue());
+            }
+            return values;
+        } catch (IOException e) {
+            log(Level.ERROR, e, "invalid rrd file %s: %s", rrdpath, e.getMessage());
+            return Collections.emptyMap();
+        }
     }
 
     @Override
@@ -83,19 +94,20 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
         try {
             db = new RRDatabase(rrdpath);
         } catch (IOException e1) {
-            return null;
+            throw new RuntimeException("Failed to access rrd file  " + getPath(), e1);
         }
 
         return new AbstractExtractor<DataChunk>() {
 
             @Override
-            public int getColumnCount() {
-                return db.getDataSourcesName().size();
+            protected void finalize() throws Throwable {
+                super.finalize();
+                db.close();
             }
 
             @Override
-            protected int getSignature(ExtractInfo ei) {
-                return 0;
+            public int getColumnCount() {
+                return db.getDataSourcesName().size();
             }
 
             @Override
@@ -135,6 +147,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
         try {
             return new RRDatabase(rrdpath);
         } catch (IOException e) {
+            log(Level.ERROR, e, "invalid rrd file %s: %s", rrdpath, e.getMessage());
             return null;
         }
     }
@@ -144,6 +157,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
         try {
             ((RRDatabase) object).close();
         } catch (IOException e) {
+            log(Level.ERROR, e, "invalid rrd file %s: %s", rrdpath, e.getMessage());
         }
     }
 

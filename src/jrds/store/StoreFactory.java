@@ -7,6 +7,7 @@ import jrds.Probe;
 import jrds.PropertiesManager;
 
 public interface StoreFactory {
+    
     public void configureStore(PropertiesManager pm);
     public void start();
 

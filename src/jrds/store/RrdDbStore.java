@@ -26,7 +26,7 @@ import org.rrd4j.core.Util;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.graph.RrdGraphDef;
 
-public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
+public class RrdDbStore extends AbstractStore<RrdDb> {
     private final RrdDbStoreFactory factory;
 
     private static final ArcDef[] DEFAULTARC = {
@@ -253,51 +253,48 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
 
     @Override
     public AbstractExtractor<FetchData> getExtractor() {
+        final RrdDb rrdDb;
         try {
-            final RrdDb rrdDb = factory.getRrd(getPath());
-            return new jrds.store.AbstractExtractor<FetchData>() {
-                /* (non-Javadoc)
-                 * @see java.lang.Object#finalize()
-                 */
-                @Override
-                protected void finalize() throws Throwable {
-                    super.finalize();
-                    factory.releaseRrd(rrdDb);
-                }
-
-                @Override
-                public int getColumnCount() {
-                    return rrdDb.getDsCount();
-                }
-
-                @Override
-                protected int getSignature(ExtractInfo ei) {
-                    return ExtractInfo.get().make(ei.start, ei.end).make(ei.step).make(ei.cf).hashCode();
-                }
-
-                @Override
-                public void fill(RrdGraphDef gd, ExtractInfo ei) {
-                    for(Map.Entry<String, String> e: sources.entrySet()) {
-                        gd.datasource(e.getKey(), RrdDbStore.this.getPath(), e.getValue(), ei.cf);
-                    }
-                }
-
-                @Override
-                public void fill(DataProcessor dp, ExtractInfo ei) {
-                    for(Map.Entry<String, String> e: sources.entrySet()) {
-                        dp.addDatasource(e.getKey(), RrdDbStore.this.getPath(), e.getValue(), ei.cf);
-                    }
-                }
-
-                @Override
-                public String getPath() {
-                    return RrdDbStore.this.getPath();
-                }
-
-            };
+            rrdDb = factory.getRrd(getPath());
         } catch (IOException e) {
             throw new RuntimeException("Failed to access rrd file  " + getPath(), e);
         }
+
+        return new jrds.store.AbstractExtractor<FetchData>() {
+            /* (non-Javadoc)
+             * @see java.lang.Object#finalize()
+             */
+            @Override
+            protected void finalize() throws Throwable {
+                super.finalize();
+                factory.releaseRrd(rrdDb);
+            }
+
+            @Override
+            public int getColumnCount() {
+                return rrdDb.getDsCount();
+            }
+
+            @Override
+            public void fill(RrdGraphDef gd, ExtractInfo ei) {
+                for(Map.Entry<String, String> e: sources.entrySet()) {
+                    gd.datasource(e.getKey(), RrdDbStore.this.getPath(), e.getValue(), ei.cf);
+                }
+            }
+
+            @Override
+            public void fill(DataProcessor dp, ExtractInfo ei) {
+                for(Map.Entry<String, String> e: sources.entrySet()) {
+                    dp.addDatasource(e.getKey(), RrdDbStore.this.getPath(), e.getValue(), ei.cf);
+                }
+            }
+
+            @Override
+            public String getPath() {
+                return RrdDbStore.this.getPath();
+            }
+
+        };
     }
 
     public Map<String, Number> getLastValues() {
@@ -344,6 +341,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
         try {
             return factory.getRrd(getPath());
         } catch (IOException e) {
+            log(Level.ERROR, e, "Failed to access rrd file %s: %s ", getPath(), e.getMessage());
             return null;
         }
     }

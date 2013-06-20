@@ -8,7 +8,7 @@ import jrds.Probe;
 
 import org.apache.log4j.Level;
 
-public abstract class AbstractStore<StoreObject, DataSource> implements Store {
+public abstract class AbstractStore<StoreObject> implements Store {
     protected final Probe<?, ?> p;
 
     public AbstractStore(Probe<?, ?> p) {
@@ -16,11 +16,22 @@ public abstract class AbstractStore<StoreObject, DataSource> implements Store {
         this.p = p;
     }
 
+    @Override
     public abstract void commit(JrdsSample sample);
+    
+    @Override
     public abstract Map<String, Number> getLastValues();
+    
+    @Override
     public abstract boolean checkStoreFile();
+    
+    @Override
     public abstract Date getLastUpdate();
+    
+    @Override
     public abstract StoreObject getStoreObject();
+    
+    @Override
     public abstract void closeStoreObject(Object object);
 
     public void log(Level l, Throwable e, String format, Object... elements) {
