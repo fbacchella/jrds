@@ -11,11 +11,8 @@ import jrds.HostInfo;
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.PropertiesManager;
-import jrds.store.RrdDbStoreFactory;
 
 import org.apache.log4j.Logger;
-import org.rrd4j.core.RrdDb;
-import org.rrd4j.core.RrdDef;
 
 public class Updater {
     static final private Logger logger = Logger.getLogger(Updater.class);
@@ -24,9 +21,7 @@ public class Updater {
         jrds.JrdsLoggerConfiguration.initLog4J();
 
         PropertiesManager pm = new PropertiesManager(new File("jrds.properties"));
-        //jrds.log.JrdsLoggerFactory.setOutputFile(pm.logfile);
-        final RrdDbStoreFactory factory = new RrdDbStoreFactory();
-        factory.configureStore(pm);
+        pm.configureStores();
 
         System.getProperties().setProperty("java.awt.headless","true");
         System.getProperties().putAll(pm);
@@ -40,26 +35,7 @@ public class Updater {
                     private Probe<?,?> lp = p;
 
                     public void run() {
-                        RrdDb db = null;
-                        try {
-                            db = (RrdDb) lp.getMainStore().getStoreObject();
-                            RrdDef rrdDef = db.getRrdDef();
-                            File source = new File(db.getCanonicalPath());
-                            File dest = File.createTempFile("JRDS_", ".tmp", source.getParentFile());
-                            logger.debug("updating " +  source  + " to "  + dest);
-                            RrdDb rrdSource = factory.getRrd(source.getCanonicalPath());
-                            rrdDef.setPath(dest.getCanonicalPath());
-                            RrdDb rrdDest = new RrdDb(rrdDef);
-                            rrdSource.copyStateTo(rrdDest);
-                            rrdDest.close();
-                            factory.releaseRrd(rrdSource);
-                            logger.debug("Size difference : " + (dest.length() - source.length()));
-                            copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        if(db != null)
-                            p.getMainStore().closeStoreObject(db);
+                        lp.checkStore();
                     }
                 };
                 try {
@@ -76,23 +52,7 @@ public class Updater {
         } catch (InterruptedException e) {
             logger.info("Collect interrupted");
         }
-        factory.stop();
-    }
-    
-    private static void copyFile(String sourcePath, String destPath)
-            throws IOException {
-        File source = new File(sourcePath);
-        File dest = new File(destPath);
-        deleteFile(dest);
-        if (!source.renameTo(dest)) {
-            throw new IOException("Could not create file " + destPath + " from " + sourcePath);
-        }
-    }
-    
-    private static void deleteFile(File file) throws IOException {
-        if (file.exists() && !file.delete()) {
-            throw new IOException("Could not delete file: " + file.getCanonicalPath());
-        }
+        pm.storefactory.stop();
     }
 
 }
