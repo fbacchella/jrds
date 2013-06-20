@@ -252,6 +252,52 @@ public class PropertiesManager extends Properties {
         return prepareDir(dir, autocreate, readOnly);
     }
 
+    public void configureStores() {
+        Map<String, Properties> storesConfig = new HashMap<String, Properties>(1);
+        storesConfig.put(StoreFactory.DEFAULTNAME, new Properties());
+        Properties defaultStore = storesConfig.get(StoreFactory.DEFAULTNAME);
+        String defaultstorefactoryclassname = getProperty("storefactory", RrdDbStoreFactory.class.getName()); 
+        defaultStore.put("factory", defaultstorefactoryclassname);
+        for(String oldProps: new String[] { "rrdbackend", "dbPoolSize", "usepool"}) {
+            if(getProperty(oldProps) != null)
+                defaultStore.put(StoreFactory.DEFAULTNAME, getProperty(oldProps));
+        }
+
+        String propertiesListStores = getProperty("stores", "");
+        if(! propertiesListStores.trim().isEmpty()) {
+            for(String storeName: propertiesListStores.split(",")) {
+                storeName = storeName.trim();
+                Map<String, String> storeInfo = subKey("store." + storeName);
+                Properties props = new Properties();
+                props.putAll(storeInfo);
+                storesConfig.put(storeName, props);
+            }
+        }
+
+        for(Map.Entry<String, Properties> e: storesConfig.entrySet()) {
+            String storeName = e.getKey();
+            Properties storesInfo = e.getValue();
+            try {
+                String storefactoryclassname = storesInfo.getProperty("factory");
+                if(storefactoryclassname != null && ! storefactoryclassname.isEmpty()) {
+                    StoreFactory sf = (StoreFactory) extensionClassLoader.loadClass(storefactoryclassname).getConstructor().newInstance();
+                    sf.configureStore(this, storesInfo);
+                    sf.start();
+                    if(storeName == StoreFactory.DEFAULTNAME)
+                        storefactory = sf;
+                    else
+                        stores.put(storeName, sf);
+                }
+                else {
+                    logger.error(Util.delayedFormatString("store factory %s invalid, no factory given", storeName));
+                }
+            } catch (Exception e1) {
+                logger.error(Util.delayedFormatString("store factory %s failed to configure: %s", storeName, e1.getMessage()));
+            }
+        }
+
+    }
+
     @SuppressWarnings("unchecked")
     public void importSystemProps() {
         String localPropFile = System.getProperty("jrds.propertiesFile");
@@ -435,12 +481,6 @@ public class PropertiesManager extends Properties {
             }
         }
 
-        String storefactoryclassname = getProperty("storefactory", RrdDbStoreFactory.class.getName());
-        try {
-            storefactory = (StoreFactory) extensionClassLoader.loadClass(storefactoryclassname).getConstructor().newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public File configdir;
@@ -466,7 +506,6 @@ public class PropertiesManager extends Properties {
     public ACL defaultACL = ACL.ALLOWEDACL;
     public ACL adminACL = ACL.ALLOWEDACL;
     public boolean readonly = false;
-    public StoreFactory storefactory = null;
     public boolean withjmx = false;
     public Map<String, String> jmxprops = Collections.emptyMap();
     public static final String FILTERTAB = "filtertab";
@@ -477,6 +516,8 @@ public class PropertiesManager extends Properties {
     public static final String HOSTSTAB = "hoststab";
     public static final String TAGSTAB = "tagstab";
     public static final String ADMINTAB = "adminTab";
+    public Map<String, StoreFactory> stores = new HashMap<String, StoreFactory>();
+    public StoreFactory storefactory = null;
 
     public List<String> tabsList = Arrays.asList(FILTERTAB, CUSTOMGRAPHTAB, "@", SUMSTAB, SERVICESTAB, VIEWSTAB, HOSTSTAB, TAGSTAB, ADMINTAB);
 }

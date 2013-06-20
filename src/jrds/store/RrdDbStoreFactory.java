@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -27,19 +28,19 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
     private final AtomicInteger lockCount = new AtomicInteger(0);
     private boolean usepool = false;
     private int dbPoolSize = 0;
-    
+
     String backendName = null;
 
     /* (non-Javadoc)
      * @see jrds.store.AbstractStoreFactory#configureStore(jrds.PropertiesManager)
      */
     @Override
-    public void configureStore(PropertiesManager pm) {
-        super.configureStore(pm);
+    public void configureStore(PropertiesManager pm, Properties props) {
+        super.configureStore(pm, props);
 
         String backendName = null;
         //Choose and configure the backend
-        String rrdbackendClassName = pm.getProperty("rrdbackendclass", "");
+        String rrdbackendClassName = props.getProperty("rrdbackendclass", "");
         if(! "".equals(rrdbackendClassName)) {
             try {
                 @SuppressWarnings("unchecked")
@@ -55,7 +56,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
                 throw new RuntimeException("Failed to configure RrdDbStoreFactory:" + e.getMessage(), e);
             }
         } else {
-            backendName = pm.getProperty("rrdbackend", "FILE");
+            backendName = props.getProperty("rrdbackend", "FILE");
             backendFactory = RrdBackendFactory.getFactory(backendName);
         }
 
@@ -74,8 +75,8 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
             }
         }
 
-        dbPoolSize = Util.parseStringNumber(pm.getProperty("dbPoolSize"), 10) + pm.numCollectors;
-        usepool = pm.parseBoolean(pm.getProperty("usepool", "true"));
+        dbPoolSize = Util.parseStringNumber(props.getProperty("dbPoolSize"), 10) + pm.numCollectors;
+        usepool = pm.parseBoolean(props.getProperty("usepool", "true"));
 
         logger.debug(Util.delayedFormatString("Store backend used is %s",  backendName));
 

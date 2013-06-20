@@ -3,6 +3,7 @@ package jrds.store;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
+import java.util.Properties;
 
 import jrds.Probe;
 import jrds.PropertiesManager;
@@ -12,12 +13,12 @@ public abstract class AbstractStoreFactory<StoreType extends AbstractStore<?>> i
 
     @Override
     public abstract StoreType create(Probe<?,? > p);
-    
+
     @Override
-    public void configureStore(PropertiesManager pm) {
-        
+    public void configureStore(PropertiesManager pm, Properties props) {
+
     }
-    
+
     @Override
     public StoreType configure(Probe<?,? > p, Map<String, String> properties) throws InvocationTargetException {
         StoreType s = create(p);

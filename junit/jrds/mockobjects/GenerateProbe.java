@@ -3,6 +3,7 @@ package jrds.mockobjects;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import jrds.HostInfo;
 import jrds.Probe;
@@ -116,7 +117,7 @@ public class GenerateProbe {
         if(sf == null) {
             sf = pm.storefactory;
         }
-        sf.configureStore(pm);
+        sf.configureStore(pm, new Properties());
         sf.start();
 
         @SuppressWarnings("unchecked")

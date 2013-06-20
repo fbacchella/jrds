@@ -106,9 +106,7 @@ public class HostsList extends StarterNode {
             return;
         }
 
-        pm.storefactory.configureStore(pm);
-        pm.storefactory.start();
-
+        pm.configureStores();
         setTimeout(pm.timeout);
         setStep(pm.step);
 
