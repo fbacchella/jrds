@@ -7,7 +7,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.JrdsSample;
 import jrds.Probe;
-import jrds.StoreOpener;
 import jrds.Tools;
 import jrds.mockobjects.GenerateProbe;
 import junit.framework.Assert;
@@ -19,7 +18,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
-import org.rrd4j.data.Plottable;
+import org.rrd4j.data.DataProcessor;
 
 public class TestRrdDbStore {
     static final private Logger logger = Logger.getLogger(TestRrdDbStore.class);
@@ -32,26 +31,29 @@ public class TestRrdDbStore {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE);
         Tools.prepareXml(false);
-        StoreOpener.prepare("FILE");
     }
 
     @Test
     public void testCreate() throws Exception {
-        Probe<?,?> p = GenerateProbe.quickProbe(testFolder);
+        @SuppressWarnings("unchecked")
+        Probe<?,?> p = GenerateProbe.quickProbe(testFolder, GenerateProbe.ChainedMap.start(0));
         p.getPd().add("test", DsType.COUNTER);
         Assert.assertTrue("Probe file creation failed", p.checkStore());
-        Extractor e = p.getMainStore().fetchData();
+        Extractor e = p.getMainStore().getExtractor();
+        e.addSource("test", "test");
         String[] dsNames = e.getNames();
         Assert.assertEquals("data source test not found", "test", dsNames[0]);
     }
 
     @Test
     public void testFill() throws Exception {
+        @SuppressWarnings("unchecked")
         Probe<?,?> p = GenerateProbe.quickProbe(testFolder);
         p.setStep(30);
         p.getPd().add("test", DsType.GAUGE);
         Assert.assertTrue("Probe file creation failed", p.checkStore());
-        Extractor e = p.getMainStore().fetchData();
+        Extractor e = p.getMainStore().getExtractor();
+        e.addSource("test", "test");
         String[] dsNames = e.getNames();
         Assert.assertEquals("data source test not found", "test", dsNames[0]);
         long start = p.getLastUpdate().getTime();
@@ -63,19 +65,15 @@ public class TestRrdDbStore {
             s.put("test", i);
             p.getMainStore().commit(s);
         }
-        Extractor ex = p.getMainStore().fetchData();
         ExtractInfo ei = ExtractInfo.get().make(new Date(start), new Date(start + 30 * p.getStep() *  1000));
-        double[][] values = ex.getValues(ei);
-        Plottable pl = ex.getPlottable(ei.make("test"));
+        DataProcessor dp = p.extract(ei);
+        double[][] values = dp.getValues();
         for(int i=1; i <= 30; i++) {
 
             //Check raw values
             Assert.assertEquals("Wrong values stored", i, values[0][i], 1e-10);
             long sampletime = i * p.getStep() * 1000 + start;
             sampletime = (sampletime) - (sampletime % (p.getStep() * 1000)) ;
-
-            //Check plotted values
-            Assert.assertEquals("Wrong values plotted", i, pl.getValue(sampletime / 1000), 1e-10);
 
         }
     }

@@ -113,9 +113,8 @@ public class Download extends JrdsServlet {
             ExtractInfo ei = ExtractInfo.get()
                     .make(p.getBegin(), p.getEnd())
                     .make(probe.getStep());
-            sourceDp = probe.extract(ei);
             try {
-                sourceDp.processData();
+                sourceDp = probe.extract(ei);
                 fileName = probe.getName().replaceFirst("\\.rrd",".csv");
             } catch (IOException e) {
                 logger.error("Unable to process probe data");

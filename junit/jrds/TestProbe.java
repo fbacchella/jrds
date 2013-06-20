@@ -2,8 +2,6 @@ package jrds;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +9,8 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import jrds.mockobjects.GenerateProbe;
 import jrds.mockobjects.MokeProbe;
-import jrds.starter.HostStarter;
-import jrds.starter.StarterNode;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -27,6 +24,22 @@ import org.rrd4j.DsType;
 public class TestProbe {
     static final private Logger logger = Logger.getLogger(TestProbe.class);
 
+    static public final class DummyProbe extends MokeProbe<String, Long> {
+        public DummyProbe() {
+            super();
+        }
+        @Override
+        public boolean isCollectRunning() {
+            return true;
+        }           
+        @Override
+        public void modifySample(JrdsSample oneSample, Map<String, Long> values) {
+            oneSample.setTime(new Date((getLastUpdate().getTime() + 1000) * 1000));
+            super.modifySample(oneSample, values);
+        }           
+    };
+
+
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
@@ -34,11 +47,10 @@ public class TestProbe {
     static public void configure() throws IOException {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, "jrds.Probe", "jrds.ProbeDesc");
-        StoreOpener.prepare("FILE");
     }
 
     @Test
-    public void testHighLow() throws TransformerException, IOException, ParserConfigurationException, InvocationTargetException {
+    public void testHighLow() throws Exception {
         ProbeDesc pd = new ProbeDesc();
         pd.setName("empty");
         pd.setProbeName("empty");
@@ -49,37 +61,25 @@ public class TestProbe {
         dsMap.put("collectlow", "low");
         pd.add(dsMap);
 
-        HostStarter host = new HostStarter(new HostInfo("DummyHost"));
-        MokeProbe<String, Long> p = new MokeProbe<String, Long>(pd) {
-            @Override
-            public boolean isCollectRunning() {
-                return true;
-            }			
-            @Override
-            public void modifySample(JrdsSample oneSample, Map<String, Long> values) {
-                oneSample.setTime(new Date((getLastUpdate().getTime() + 1000) * 1000));
-                super.modifySample(oneSample, values);
-            }			
-        };
-        host.getHost().setHostDir(testFolder.newFolder("testHighLow"));
-        p.setHost(host);
-        Map<String, String> empty =  Collections.emptyMap();
-        p.setMainStore(new jrds.store.RrdDbStoreFactory(), empty);
-        p.setParent(new StarterNode() {});
+        GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
+        args.set(ProbeDesc.class, pd).set(Probe.class, DummyProbe.class);
+
+        @SuppressWarnings("unchecked")
+        MokeProbe<String, Number> p = (MokeProbe<String, Number>) GenerateProbe.quickProbe(testFolder, args);
         p.configure();
-        Map<String, Long> val = new HashMap<String, Long>();
+        Assert.assertTrue("Failed to create storage", p.checkStore());
+        Map<String, Number> val = new HashMap<String, Number>();
         long high = 255L;
         long low = 64L;
         val.put("high", high);
         val.put("low", low);
-        p.checkStore();
         p.injectValues(val);
         p.collect();
         Assert.assertEquals("32 + 32 to 64 failed", (high << 32) + low, p.getLastValues().get("ds0").doubleValue(), 0.1);
     }
 
     @Test
-    public void testDefault() throws TransformerException, IOException, ParserConfigurationException, InvocationTargetException {
+    public void testDefault() throws Exception {
         ProbeDesc pd = new ProbeDesc();
         pd.setName("empty");
         pd.setProbeName("empty");
@@ -93,28 +93,15 @@ public class TestProbe {
         dsMap.put("dsType", DsType.COUNTER);
         dsMap.put("defaultValue", "1");
         pd.add(dsMap);
-        System.out.println();
 
-        HostStarter host = new HostStarter(new HostInfo("DummyHost"));
-        MokeProbe<String, Long> p = new MokeProbe<String, Long>(pd) {
-            @Override
-            public boolean isCollectRunning() {
-                return true;
-            }
-            @Override
-            public void modifySample(JrdsSample oneSample, Map<String, Long> values) {
-                oneSample.setTime(new Date((getLastUpdate().getTime() + 1000) * 1000));
-                super.modifySample(oneSample, values);
-            }			
-        };
-        host.getHost().setHostDir(testFolder.newFolder("testDefault"));
-        Map<String, String> empty =  Collections.emptyMap();
-        p.setMainStore(new jrds.store.RrdDbStoreFactory(), empty);
-        p.setHost(host);
-        p.setParent(new StarterNode() {});
+        GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
+        args.set(ProbeDesc.class, pd).set(Probe.class, DummyProbe.class);
+
+        @SuppressWarnings("unchecked")
+        MokeProbe<String, Number> p = (MokeProbe<String, Number>) GenerateProbe.quickProbe(testFolder, args);
         p.configure();
-        System.out.println();
-        Map<String, Long> val = new HashMap<String, Long>();
+        Assert.assertTrue("Failed to create storage", p.checkStore());
+        Map<String, Number> val = new HashMap<String, Number>();
         val.put("ds1", 2L);
 
         p.checkStore();

@@ -1,33 +1,50 @@
 package jrds.store;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.graph.RrdGraphDef;
 
 public abstract class AbstractExtractor<Source> implements Extractor {
 
+    protected Map<String, String> sources = new HashMap<String, String>();
+
     public AbstractExtractor() {
         super();
+    }
+
+    /* (non-Javadoc)
+     * @see jrds.store.Extractor#addSource(java.lang.String, java.lang.String)
+     */
+    @Override
+    public void addSource(String name, String dsName) {
+        sources.put(name, dsName);
     }
 
     /* (non-Javadoc)
      * @see jrds.store.ExtractorInterface#getNames()
      */
     @Override
-    public abstract String[] getNames();
+    public final String[] getNames() {
+        return sources.keySet().toArray(new String[] {});
+    }
 
     /* (non-Javadoc)
      * @see jrds.store.ExtractorInterface#getDsNames()
      */
     @Override
-    public abstract String[] getDsNames();
+    public final String[] getDsNames() {
+        return sources.values().toArray(new String[] {});
+    }
+
+    public abstract String getPath();
 
     @Override
-    public abstract void fill(DataProcessor dp, ExtractInfo ei, Collection<String> sources);
+    public abstract void fill(DataProcessor dp, ExtractInfo ei);
 
     @Override
-    public abstract void fill(RrdGraphDef gd, ExtractInfo ei, Collection<String> sources);
+    public abstract void fill(RrdGraphDef gd, ExtractInfo ei);
 
     /* (non-Javadoc)
      * @see jrds.store.ExtractorInterface#getColumnCount()

@@ -12,6 +12,7 @@ public interface Store {
     public Date getLastUpdate();
     public Object getStoreObject();
     public void closeStoreObject(Object object);
-    public Extractor fetchData();
+    public Extractor getExtractor();
+    public String getPath();
 
 }

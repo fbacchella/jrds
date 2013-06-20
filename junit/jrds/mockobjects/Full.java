@@ -11,6 +11,7 @@ import java.util.Random;
 
 import jrds.GraphDesc;
 import jrds.HostInfo;
+import jrds.JrdsSample;
 import jrds.Period;
 import jrds.Probe;
 import jrds.ProbeDesc;
@@ -19,8 +20,6 @@ import junit.framework.Assert;
 
 import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
-import org.rrd4j.core.RrdDb;
-import org.rrd4j.core.Sample;
 import org.rrd4j.core.Util;
 
 public class Full {
@@ -107,19 +106,19 @@ public class Full {
 		GaugeSource sunSource = new GaugeSource(1200, 20);
 		GaugeSource shadeSource = new GaugeSource(300, 10);
 		long t = start;
-		RrdDb rrdDb = (RrdDb) p.getMainStore().getStoreObject();
-		Sample sample = rrdDb.createSample();
+		
+		//Keep an handle to the object, for faster run
+		Object o = p.getMainStore().getStoreObject();
 
 		while (t <= end + 86400L) {
-			sample.setTime(t);
-			sample.setValue("sun", sunSource.getValue());
-			sample.setValue("shade", shadeSource.getValue());
-			sample.update();
+	        JrdsSample sample = p.newSample();
+		    sample.setTime(new Date(t * 1000));
+			sample.put("sun", sunSource.getValue());
+			sample.put("shade", shadeSource.getValue());
+			p.getMainStore().commit(sample);
 			t += RANDOM.nextDouble() * STEP + 1;
 		}
-
-		rrdDb.close();
-		
+		p.getMainStore().closeStoreObject(o);
 		return t;
 	}
 	

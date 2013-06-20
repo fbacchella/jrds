@@ -2,7 +2,6 @@ package jrds.store;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -41,6 +40,10 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
     }
 
     public String getRrdfile() {
+        return getPath();
+    }
+
+    public String getPath() {
         return rrdpath.getPath();
     }
 
@@ -75,7 +78,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
     }
 
     @Override
-    public AbstractExtractor<DataChunk> fetchData() {
+    public AbstractExtractor<DataChunk> getExtractor() {
         final RRDatabase db;
         try {
             db = new RRDatabase(rrdpath);
@@ -84,16 +87,6 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
         }
 
         return new AbstractExtractor<DataChunk>() {
-
-            @Override
-            public String[] getNames() {
-                return db.getDataSourcesName().toArray(new String[] {});
-            }
-
-            @Override
-            public String[] getDsNames() {
-                return db.getDataSourcesName().toArray(new String[] {});
-            }
 
             @Override
             public int getColumnCount() {
@@ -105,13 +98,12 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
                 return 0;
             }
 
-
             @Override
-            public void fill(RrdGraphDef gd, ExtractInfo ei, Collection<String> sources) {
+            public void fill(RrdGraphDef gd, ExtractInfo ei) {
                 try {
                     DataChunk dc = db.getData(ConsolidationFunctionType.AVERAGE, ei.start, ei.end, ei.step);
-                    for(String source: sources) {
-                        gd.datasource(source, dc.toPlottable(source));
+                    for(Map.Entry<String, String> e: sources.entrySet()) {
+                        gd.datasource(e.getKey(), dc.toPlottable(e.getValue()));
                     }
                 } catch (IOException e) {
                     throw new RuntimeException("Failed to access rrd file  " + db.toString(), e);
@@ -119,15 +111,20 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
             }
 
             @Override
-            public void fill(DataProcessor dp, ExtractInfo ei, Collection<String> sources) {
+            public void fill(DataProcessor dp, ExtractInfo ei) {
                 try {
                     DataChunk dc = db.getData(ConsolidationFunctionType.AVERAGE, ei.start, ei.end, ei.step);
-                    for(String source: sources) {
-                        dp.addDatasource(source, dc.toPlottable(source));
+                    for(Map.Entry<String, String> e: sources.entrySet()) {
+                        dp.addDatasource(e.getKey(), dc.toPlottable(e.getValue()));
                     }
                 } catch (IOException e) {
-                    throw new RuntimeException("Failed to access rrd file  " + db.toString(), e);
+                    throw new RuntimeException("Failed to access rrd file  " + RRDToolStore.this.getPath(), e);
                 }
+            }
+
+            @Override
+            public String getPath() {
+                return RRDToolStore.this.getPath();
             }
 
         };
@@ -147,8 +144,6 @@ public class RRDToolStore extends AbstractStore<RRDatabase, DataChunk> {
         try {
             ((RRDatabase) object).close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
     }
 

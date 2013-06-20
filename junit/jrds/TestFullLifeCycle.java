@@ -6,11 +6,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 
 import javax.imageio.ImageIO;
 
 import jrds.mockobjects.Full;
+import jrds.mockobjects.GenerateProbe;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -29,30 +29,18 @@ public class TestFullLifeCycle {
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
-        StoreOpener.prepare("FILE");
         Tools.setLevel(logger, Level.TRACE, "jrds.Graph", "jrds.GraphNode");
     }
 
     @Test
-    public void create() throws IOException, InvocationTargetException {
-        PropertiesManager pm = new PropertiesManager();
-        pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
-        pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
-        pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
-        pm.setProperty("logevel", logger.getLevel().toString());
+    public void create() throws Exception {
+        @SuppressWarnings("unchecked")
+        Probe<?,?> p = GenerateProbe.quickProbe(testFolder);
+        p.setPd(Full.getPd());
+        File rrdFile = new File(p.getMainStore().getPath());
+        Assert.assertTrue("Failed to create probe " + rrdFile.getAbsolutePath(), p.checkStore());
 
-        pm.update();
-
-        //We don't want the file, just it's path
-        File rrdFile = testFolder.newFile("fullmock.rrd");
-        rrdFile.delete();
-
-        Probe<?,?> p = Full.create(testFolder, pm.step);
-        p.setStep(pm.step);
-        p.setTimeout(pm.timeout);
-        //logger.debug(p.getRrdDef().dump());
-
-        logger.debug("Created " + p);
+        logger.debug("Created " + p + " stored in " + p.getMainStore().getStoreObject());
         long endSec = Full.fill(p);
         logger.debug("fill time: " + endSec);
 
@@ -66,23 +54,17 @@ public class TestFullLifeCycle {
         gd.initializeLimits(g2d);
         int h = gd.getDimension().height;
         int w = gd.getDimension().width;
-        logger.trace(h + " " + w);
 
         GraphNode gn = new GraphNode(p, Full.getGd());
         Graph g = new Graph(gn);
         g.setPeriod(pr);
 
-        File outputFile =  new File("tmp", "fullmock.png");
+        File outputFile =  testFolder.newFile();
         OutputStream out = new FileOutputStream(outputFile);
         g.writePng(out);
         BufferedImage img = ImageIO.read(outputFile);
         Assert.assertEquals(h, img.getHeight());
         Assert.assertEquals(w, img.getWidth());
-
-        logger.trace(h + " " + w);
-
-        StoreOpener.stop();
-
         Assert.assertTrue(rrdFile.exists());
         Assert.assertTrue(rrdFile.length() > 0);
 

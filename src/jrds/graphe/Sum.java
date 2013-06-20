@@ -43,7 +43,7 @@ public class Sum extends AutonomousGraphNode {
         for(String graphname: graphList) {
             g = hl.getGraphById(graphname.hashCode());
             if(g == null) {
-                logger.warn(Util.delayedFormatString("graph %s not found for sum %s", graphname, getName()));
+                logger.warn(Util.delayedFormatString("graph %s not found for sum '%s'", graphname, getName()));
             }
         }
         //The last graph found is used to clone the graphdesc and use it
@@ -84,37 +84,37 @@ public class Sum extends AutonomousGraphNode {
                 for(String name : graphList) {
                     GraphNode g = hl.getGraphById(name.hashCode());
                     logger.trace("Looking for " + name + " in graph base, and found " + g);
-                    if(g != null) {
-                        try {
-                            dp = g.getPlottedDate(ei);
-                        } catch (IOException e) {
-                            logger.error("Failed to read " + g.getProbe());
-                            continue;
-                        }
+                    if(g == null) {
+                        logger.error("Graph not found: " + name);
+                        continue;
+                    }
 
-                        //First pass, no data to use
-                        if(allvalues == null) {
-                            allvalues = (double[][]) dp.getValues().clone();
-                        }
-                        //Next step, sum previous values
-                        else {
-                            double[][] tempallvalues = dp.getValues();
-                            for(int c = 0 ; c < tempallvalues.length ; c++) {
-                                for(int r = 0 ; r < tempallvalues[c].length; r++) {
-                                    double v = tempallvalues[c][r];
-                                    if ( ! Double.isNaN(v) ) {
-                                        if(! Double.isNaN(allvalues[c][r]))
-                                            allvalues[c][r] += v;
-                                        else    
-                                            allvalues[c][r] = v;
+                    try {
+                        dp = g.getPlottedDate(ei);
+                    } catch (IOException e) {
+                        logger.error("Failed to read " + g.getProbe());
+                        continue;
+                    }
 
-                                    }
+                    //First pass, no data to use
+                    if(allvalues == null) {
+                        allvalues = (double[][]) dp.getValues().clone();
+                    }
+                    //Next step, sum previous values
+                    else {
+                        double[][] tempallvalues = dp.getValues();
+                        for(int c = 0 ; c < tempallvalues.length ; c++) {
+                            for(int r = 0 ; r < tempallvalues[c].length; r++) {
+                                double v = tempallvalues[c][r];
+                                if ( ! Double.isNaN(v) ) {
+                                    if(! Double.isNaN(allvalues[c][r]))
+                                        allvalues[c][r] += v;
+                                    else    
+                                        allvalues[c][r] = v;
+
                                 }
                             }
                         }
-                    }
-                    else {
-                        logger.error("Graph not found: " + name);
                     }
                 }
                 if(dp != null) {
@@ -125,6 +125,10 @@ public class Sum extends AutonomousGraphNode {
                         put(dsNames[i], pl);
                         logger.trace(Util.delayedFormatString("Added %s to sum plottables", dsNames[i]));
                     }
+                }
+                else {
+                    logger.error(Util.delayedFormatString("Sum %s unusable, not graph found", Sum.this));
+
                 }
             }
         };

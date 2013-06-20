@@ -13,7 +13,7 @@ import javax.management.ObjectName;
 
 import jrds.Probe;
 
-public class CacheStoreFactory extends AbstractStoreFactory<SampleCache> implements SampleCacheMBean  {
+public class CacheStoreFactory extends AbstractStoreFactory<CacheStore> implements SampleCacheMBean  {
     private final Map<String, Map<String, Map<String, Number>>> cache = new HashMap<String, Map<String, Map<String, Number>>>();
 
     public CacheStoreFactory() {
@@ -40,9 +40,9 @@ public class CacheStoreFactory extends AbstractStoreFactory<SampleCache> impleme
         }
 
     }
-    
+
     @Override
-    public SampleCache create(Probe<?, ?> p) {
+    public CacheStore create(Probe<?, ?> p) {
         String hostname = p.getHost().getName();
         String probeName = p.getName();
         if(! cache.containsKey(hostname))
@@ -50,8 +50,8 @@ public class CacheStoreFactory extends AbstractStoreFactory<SampleCache> impleme
         Map<String, Map<String, Number>> probes = cache.get(hostname);
         if(! probes.containsKey(probeName))
             probes.put(probeName, new HashMap<String, Number>(p.getPd().getDsDefs().length));
-        
-        return null;
+
+        return new CacheStore(p, probes.get(probeName));
     }
 
     @Override
@@ -61,8 +61,7 @@ public class CacheStoreFactory extends AbstractStoreFactory<SampleCache> impleme
 
     @Override
     public void stop() {
-        // TODO Auto-generated method stub
-        
+        cache.clear();
     }
 
 }

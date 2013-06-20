@@ -10,7 +10,6 @@ import java.util.Map;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.HostInfo;
-import jrds.StoreOpener;
 import jrds.Tools;
 import jrds.starter.Connection;
 import jrds.starter.HostStarter;
@@ -39,7 +38,6 @@ public class ApacheHttpClientTest {
     static public void configure() throws Exception {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, HCHttpProbe.class.getName(), HttpClientStarter.class.getName(), Resolver.class.getName(), Connection.class.getName(), "jrds.Starter");
-        StoreOpener.prepare("FILE");
     }
 
     private  HostStarter addConnection(Starter cnx) throws IOException {

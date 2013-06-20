@@ -203,7 +203,8 @@ final public class Tools {
         }
         pm.update();
         pm.libspath.clear();
-
+        pm.storefactory.configureStore(pm);
+        pm.storefactory.start();
         return pm;
     }
 
@@ -213,6 +214,7 @@ final public class Tools {
         pm.setProperty("configdir", new File("tmp").getPath());
         pm.setProperty("rrddir", new File("tmp").getPath());
         pm.setProperty("autocreate", "false");
+        pm.setProperty("usepool", "false");
 
         return finishPm(pm, props);
     }
@@ -223,6 +225,7 @@ final public class Tools {
         pm.setProperty("configdir", testFolder.newFolder("config").getCanonicalPath());
         pm.setProperty("rrddir", testFolder.newFolder("rrddir").getCanonicalPath());
         pm.setProperty("autocreate", "true");
+        pm.setProperty("usepool", "false");
 
         return finishPm(pm, props);
     }

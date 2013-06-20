@@ -4,14 +4,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
+import jrds.TestProbe.DummyProbe;
 import jrds.graphe.Sum;
 import jrds.mockobjects.Full;
+import jrds.mockobjects.GenerateProbe;
+import jrds.mockobjects.MokeProbe;
+import jrds.store.ExtractInfo;
 import junit.framework.Assert;
 
 import org.apache.log4j.Level;
@@ -20,9 +22,6 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.rrd4j.ConsolFun;
-import org.rrd4j.core.FetchData;
-import org.rrd4j.core.RrdDb;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.LinearInterpolator;
 import org.rrd4j.graph.RrdGraph;
@@ -61,27 +60,17 @@ public class TestSum {
     }
 
     @Test
-    public void getSum() throws IOException, TransformerException, ParserConfigurationException, InvocationTargetException {
-        PropertiesManager pm = new PropertiesManager();
-        pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
-        pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
-        pm.setProperty("logevel", logger.getLevel().toString());
-        pm.setProperty("rrdbackend", "FILE");
-        pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
-        pm.setProperty("tabs", PropertiesManager.HOSTSTAB);
-
-        pm.update();
-
-        StoreOpener.prepare(pm.rrdbackend);
-
+    public void getSum() throws Exception {
+        PropertiesManager pm = Tools.makePm(testFolder);        
         HostsList hl = new HostsList(pm);
 
-        //We don't want the file, just it's path
-        File rrdFile = testFolder.newFile("fullmock.rrd");
-        rrdFile.delete();
+        GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
+        args.set(ProbeDesc.class, Full.getPd()).set(Probe.class, DummyProbe.class).set(PropertiesManager.class, pm);
 
-        Probe<?,?> p = Full.create(testFolder, Full.STEP);
-        p.setTimeout(pm.timeout);
+        @SuppressWarnings("unchecked")
+        Probe<String, Number> p = (MokeProbe<String, Number>) GenerateProbe.quickProbe(testFolder, args);
+
+        p.checkStore();
         long endSec = Full.fill(p);
         Period pr = Full.getPeriod(p, endSec);
         long begin = pr.getBegin().getTime() / 1000;
@@ -94,26 +83,24 @@ public class TestSum {
 
         hl.addHost(p.getHost());
         hl.addProbe(p);
-        
+
         ArrayList<String> glist = new ArrayList<String>();
-        glist.add("Empty/SumTest");
+        glist.add(p.getGraphList().iterator().next().getQualifieName());
         Sum s = new Sum("A sum test", glist);
         s.configure(hl);
         PlottableMap ppm = s.getCustomData();
         ppm.configure(begin, end, Full.STEP);
-        
-        RrdDb db = (RrdDb) p.getMainStore().getStoreObject();
-        FetchData fd = db.createFetchRequest(ConsolFun.AVERAGE, begin, end).fetchData();        
-        DataProcessor dp =  new DataProcessor(begin, end);
-        dp.addDatasource("shade", fd);
-        dp.setFetchRequestResolution(Full.STEP);
-        dp.processData();    
+
+        ExtractInfo ei = ExtractInfo.get().make(pr.getBegin(), pr.getEnd());
+        DataProcessor dp = p.extract(ei);
+
         LinearInterpolator li = new LinearInterpolator(dp.getTimestamps(), dp.getValues("shade"));
-        
+        Assert.assertTrue("datasource shade not found", ppm.containsKey("shade"));
+        Assert.assertTrue("datasource shade not found", ppm.containsKey("sun"));
         for(long i = begin; i < end - Full.STEP; i += Full.STEP) {
             Assert.assertEquals("Sum get wrong value", ppm.get("shade").getValue(i), li.getValue(i), 1e-7);
         }
-        
+
         Graph g = new Graph(s);
         g.setPeriod(pr);
         File outputFile =  new File("tmp", "sum.png");

@@ -576,14 +576,15 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     public Extractor fetchData() {
-        return mainStore.fetchData();
+        return mainStore.getExtractor();
     }
 
-    public DataProcessor extract(ExtractInfo ei) {
-        Extractor ex = mainStore.fetchData();
-        DataProcessor dp = ei.getDataProcessor();
-        ex.fill(dp, ei, pd.getDs());
-        return dp;
+    public DataProcessor extract(ExtractInfo ei) throws IOException {
+        Extractor ex = mainStore.getExtractor();
+        for(String dsName: pd.getDs()) {
+            ex.addSource(dsName, dsName);
+        }
+        return ei.getDataProcessor(ex);
     }
 
 }

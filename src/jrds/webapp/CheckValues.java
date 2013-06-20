@@ -1,8 +1,6 @@
 package jrds.webapp;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -12,12 +10,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import jrds.HostsList;
 import jrds.Probe;
+import jrds.store.ExtractInfo;
+import jrds.store.Extractor;
 
 import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
-
-import jrds.store.ExtractInfo;
-import jrds.store.Extractor;
 
 /**
  * A servlet wich return datastore values from a probe.
@@ -70,7 +67,7 @@ public final class CheckValues extends JrdsServlet {
             }
             Date paste = new Date(lastupdate.getTime() - period * 1000);
 
-            Extractor fd = p.fetchData();
+            Extractor ex = p.fetchData();
 
             String ds = params.getValue("dsname");
 
@@ -78,15 +75,19 @@ public final class CheckValues extends JrdsServlet {
                     make(paste, lastupdate).
                     make(cf).
                     make(p.getStep());
-            DataProcessor dp = ei.getDataProcessor();
             if(ds != null && !  "".equals(ds.trim())) {
-                fd.fill(dp, ei, Collections.singleton(ds.trim()));
-                double val = dp.getAggregate(ds.trim(), cf);
+                String dsName = ds.trim();
+                ex.addSource(dsName, dsName);
+                DataProcessor dp = ei.getDataProcessor(ex);
+                double val = dp.getAggregate(dsName, cf);
                 out.print(val);
             }
             else {
-                fd.fill(dp, ei, Arrays.asList(fd.getDsNames()));
-                for(String dsName: fd.getDsNames()) {
+                for(String dsName: p.getPd().getDs()) {
+                    ex.addSource(dsName, dsName);
+                }
+                DataProcessor dp = ei.getDataProcessor(ex);
+                for(String dsName: ex.getDsNames()) {
                     double val = dp.getAggregate(dsName, cf);
                     out.println(dsName + ": " + val);
                 }

@@ -44,7 +44,7 @@ public class TestPropertiesManager {
         System.setProperty("java.io.tmpdir", oldtmpdirpath);
         File jrdstmpdir = new File(newtmpdir, "jrds");
         Assert.assertEquals(jrdstmpdir, pm.tmpdir);
-        Assert.assertFalse("tmpdir should not be created", newtmpdir.exists());
+        Assert.assertFalse("tmpdir " + newtmpdir  + " should not be created", newtmpdir.exists());
     }
 
     @Test
@@ -128,5 +128,5 @@ public class TestPropertiesManager {
         Assert.assertTrue("Log4j file not created", logFile.canRead());
         logFile.delete();
     }
-    
+
 }

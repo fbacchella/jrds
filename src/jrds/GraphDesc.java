@@ -858,9 +858,9 @@ implements Cloneable, WithACL {
         //The datasources already found
         Set<String> datasources = new HashSet<String>();
 
-        //date source name sorted by probe
-        Map<Probe<?,?>,Set<String>> probeDS = new HashMap<Probe<?,?>,Set<String>>(1);
-        probeDS.put(defProbe, new HashSet<String>());
+        //The needed extractors
+        Map<Probe<?,?>, Extractor> probeDS = new HashMap<Probe<?,?>, Extractor>(1);
+        probeDS.put(defProbe, defProbe.getMainStore().getExtractor());
 
         for(DsDesc ds: allds) {
             boolean complete = false;
@@ -918,12 +918,15 @@ implements Cloneable, WithACL {
 
                 //Add the dsName for the probe found
                 if( !probeDS.containsKey(probe)) {
-                    probeDS.put(probe, new HashSet<String>());
+                    probeDS.put(probe, defProbe.getMainStore().getExtractor());
                 }
-                Set<String> storeSources = probeDS.get(probe);
-                if( ! datasources.contains(ds.dsName)) {                    
-                    storeSources.add(ds.dsName);                
+                Extractor ex = probeDS.get(probe);
+                if( ! datasources.contains(ds.dsName)) {
+                    ex.addSource(ds.name, ds.dsName);
                     datasources.add(ds.dsName);
+                    if(ds.dsName != ds.name) {
+                        graphDef.datasource(ds.name, ds.dsName);
+                    }
                 }
                 else {
                     logger.error("Datasource '" + ds.dsName + "' defined twice in " + name + ", for found: " + ds);
@@ -940,12 +943,8 @@ implements Cloneable, WithACL {
         }
 
         // Fill the graphdef with extracted data
-        for(Map.Entry<Probe<?,?>,Set<String>> e: probeDS.entrySet()) {
-            Extractor x = e.getKey().fetchData();
-            if(e.getValue().size() > 0) {
-                x.fill(graphDef, ei, e.getValue());
-                logger.trace(Util.delayedFormatString("Data sources to fetch: %s", e.getValue()));
-            }
+        for(Extractor x: probeDS.values()) {
+            x.fill(graphDef, ei);
         }
 
         // The title line, only if values block is required
@@ -1003,9 +1002,9 @@ implements Cloneable, WithACL {
         //The datasources already found
         Set<String> datasources = new HashSet<String>();
 
-        //date source name sorted by probe
-        Map<Probe<?,?>,Set<String>> probeDS = new HashMap<Probe<?,?>,Set<String>>(1);
-        probeDS.put(defProbe, new HashSet<String>());
+        //The needed extractors
+        Map<Probe<?,?>, Extractor> probeDS = new HashMap<Probe<?,?>, Extractor>(1);
+        probeDS.put(defProbe, defProbe.getMainStore().getExtractor());
 
         for(DsDesc ds: allds) {
             // not a data source, don't try to add it in datasources
@@ -1058,11 +1057,11 @@ implements Cloneable, WithACL {
 
                 //Add the dsName for the probe found
                 if( !probeDS.containsKey(probe)) {
-                    probeDS.put(probe, new HashSet<String>());
+                    probeDS.put(probe, probe.fetchData());
                 }
-                Set<String> storeSources = probeDS.get(probe);
-                if( ! datasources.contains(ds.dsName)) {                    
-                    storeSources.add(ds.dsName);                
+                Extractor ex = probeDS.get(probe);
+                if( ! datasources.contains(ds.dsName)) {
+                    ex.addSource(ds.dsName, ds.name);
                     datasources.add(ds.dsName);
                 }
                 else {
@@ -1072,13 +1071,9 @@ implements Cloneable, WithACL {
             }
         }
 
-        // Fill the graphdef with extracted data
-        for(Map.Entry<Probe<?,?>,Set<String>> e: probeDS.entrySet()) {
-            Extractor x = e.getKey().fetchData();
-            if(e.getValue().size() > 0) {
-                x.fill(retValue, ei, e.getValue());
-                logger.trace(Util.delayedFormatString("Data sources to fetch: %s", e.getValue()));
-            }
+        // Fill the dataprocessor with extracted data
+        for(Extractor x: probeDS.values()) {
+            x.fill(retValue, ei);
         }
 
         return retValue;

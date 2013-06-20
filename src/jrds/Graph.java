@@ -31,6 +31,9 @@ public class Graph implements WithACL {
     public Graph(GraphNode node) {
         this.node = node;
         addACL(node.getACL());
+        Period p = new Period();
+        setStart(p.getBegin());
+        setEnd(p.getEnd());
     }
 
     public Graph(GraphNode node, Date begin, Date start) {

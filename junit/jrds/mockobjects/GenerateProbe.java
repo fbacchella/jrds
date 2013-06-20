@@ -7,15 +7,21 @@ import java.util.Map;
 import jrds.HostInfo;
 import jrds.Probe;
 import jrds.ProbeDesc;
+import jrds.PropertiesManager;
+import jrds.Tools;
 import jrds.starter.HostStarter;
-import jrds.store.AbstractStoreFactory;
+import jrds.store.StoreFactory;
 
 import org.junit.rules.TemporaryFolder;
 
 public class GenerateProbe {
     static public final String FACTORYCONFIG = "factoryconfig";
-    
-    public static final class ChainedMap extends HashMap<String, Object> {
+
+    public static class ChainedMap<ValueClass> extends HashMap<String, ValueClass> {
+        public static final class ChainedProperties extends ChainedMap<String> {
+
+        };
+
         private ChainedMap() {
             super();
         }
@@ -24,32 +30,26 @@ public class GenerateProbe {
             super(size);
         }
 
-        public static ChainedMap start() {
-            return new ChainedMap();
+        public static <ValueClass> ChainedMap<ValueClass> start() {
+            return new ChainedMap<ValueClass>();
         }
 
-        public static ChainedMap start(int size) {
-            return new ChainedMap(size);
+        public static <ValueClass> ChainedMap<ValueClass> start(int size) {
+            return new ChainedMap<ValueClass>(size);
         }
 
-        public ChainedMap set(String key, Object value) {
+        public ChainedMap<ValueClass> set(String key, ValueClass value) {
             put(key, value);
             return this;
         }
 
-        public ChainedMap set(Class clazz, Object value) {
+        public ChainedMap<ValueClass> set(Class<?> clazz, ValueClass value) {
             put(clazz.getCanonicalName(), value);
             return this;
         }
 
-        @SuppressWarnings("unchecked")
-        public <ValueType> ValueType get(Class<ValueType> c) {
-            return (ValueType) get(c.getCanonicalName());
-        }
-
-        @SuppressWarnings("unchecked")
-        public <ValueType> ValueType get(String key, Class<ValueType> c) {
-            return (ValueType) get(key);
+        public ValueClass get(Class<ValueClass> c) {
+            return get(c.getCanonicalName());
         }
 
     }
@@ -67,20 +67,35 @@ public class GenerateProbe {
     }
 
     @SuppressWarnings("unchecked")
-    public static final Probe<String, Number> quickProbe(TemporaryFolder folder) throws Exception {
-        return (Probe<String, Number>) fillProbe(new EmptyProbe(), folder, new ChainedMap(0) );
+    public static final Probe<String, Number> quickProbe(TemporaryFolder folder, ChainedMap<Object>... args) throws Exception {
+        ChainedMap<Object> arg = new ChainedMap<Object>(0);
+        for(int i=0; i< args.length; i++) {
+            arg.putAll(args[i]);
+        }
+        Class<?> probeClass = (Class<Probe<?, ?>>) arg.get(Probe.class.getCanonicalName());
+        if(probeClass == null) {
+            probeClass = EmptyProbe.class;
+        }
+        Probe<?,?> probe  = (Probe<?, ?>) probeClass.getConstructor().newInstance();
+        return (Probe<String, Number>) fillProbe(probe, folder, arg );
     }
-    
-    public static final Probe<?, ?> fillProbe(Probe<?,?> p, TemporaryFolder folder, ChainedMap args) throws Exception {
-        ProbeDesc pd = args.get(ProbeDesc.class);
+
+    public static final Probe<?, ?> fillProbe(Probe<?,?> p, TemporaryFolder folder, ChainedMap<Object> args) throws Exception {
+
+        PropertiesManager pm = (PropertiesManager) args.get(PropertiesManager.class);
+        if(pm == null) {
+            pm = Tools.makePm(folder);
+        }
+
+        ProbeDesc pd = (ProbeDesc) args.get(ProbeDesc.class.getCanonicalName());
         if(pd == null) {
             pd = new ProbeDesc();
         }
         p.setPd(pd);
-        
-        HostStarter hs = args.get(HostStarter.class);
+
+        HostStarter hs = (HostStarter) args.get(HostStarter.class);
         if(hs == null) {
-            HostInfo hi = args.get(HostInfo.class);
+            HostInfo hi = (HostInfo) args.get(HostInfo.class);
             if(hi == null) {
                 hi = new HostInfo("localhost");
                 hi.setHostDir(folder.newFolder());
@@ -88,25 +103,29 @@ public class GenerateProbe {
             }
         }
         p.setHost(hs);
-        
-        String name = args.get("name", String.class);
+
+        String name = (String) args.get("name");
         if(name == null) {
             name = "EmptyProbe";
         }
         p.setName(name);
-        p.getPd().setName(name);
-        
-        AbstractStoreFactory<?> sf = args.get(AbstractStoreFactory.class);
+        p.setStep(pm.step);
+        p.setTimeout(pm.timeout);
+
+        StoreFactory sf = (StoreFactory) args.get(StoreFactory.class.getCanonicalName());
+        if(sf == null) {
+            sf = pm.storefactory;
+        }
+        sf.configureStore(pm);
+        sf.start();
+
         @SuppressWarnings("unchecked")
         Map<String, String> factoryArgs = (Map<String, String>) args.get(FACTORYCONFIG);
-        if(sf == null) {
-            sf = new jrds.store.RrdDbStoreFactory();
-        }
         if(factoryArgs == null) {
             factoryArgs = Collections.emptyMap();
         }
         p.setMainStore(sf, factoryArgs);
-       
-          return p;
+
+        return p;
     }
 }

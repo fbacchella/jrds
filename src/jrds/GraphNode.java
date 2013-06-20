@@ -196,7 +196,9 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
         Map<String, ? extends Plottable> pmap = Collections.emptyMap();
         if(customData != null)
             pmap = customData;
-        return gd.getPlottedDatas(probe, ei, pmap);
+        DataProcessor dp = gd.getPlottedDatas(probe, ei, pmap);
+        dp.processData();
+        return dp;
     }
 
 }

@@ -1,21 +1,19 @@
 package jrds.webapp;
 
 import java.io.IOException;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jrds.Period;
 import jrds.Probe;
+import jrds.store.ExtractInfo;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
-
-import jrds.store.ExtractInfo;
-import jrds.store.Extractor;
 
 /**
  * A servlet wich show the last update values and time
@@ -38,15 +36,11 @@ public final class ProbeSummary extends JrdsServlet {
 
         Probe<?,?> probe = params.getProbe();
         if(probe != null) {
-            Date begin = params.getPeriod().getBegin();
-            Date end = params.getPeriod().getEnd();
+            Period p = params.getPeriod();
 
-            Extractor fetched = probe.fetchData();
-            ExtractInfo ei = ExtractInfo.get().make(begin, end);
-            String names[] = fetched.getDsNames();
+            ExtractInfo ei = ExtractInfo.get().make(p.getBegin(), p.getEnd());
             DataProcessor dp = probe.extract(ei);
-            for(int i= 0; i< names.length ; i++) {
-                String dsName = names[i];
+            for(String dsName: probe.getPd().getDs()) {
                 try {
                     out.print(dsName + " ");
                     out.print(dp.getAggregate(dsName, ConsolFun.AVERAGE) + " ");

@@ -1,17 +1,12 @@
-import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Probe;
 import jrds.ProbeDesc;
-import jrds.StoreOpener;
 import jrds.Tools;
-import jrds.mockobjects.DummyProbe;
 import jrds.mockobjects.GenerateProbe;
 import jrds.mockobjects.GetMoke;
-import jrds.store.RrdDbStoreFactory;
 
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
@@ -33,23 +28,21 @@ public class TestUpgrade {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.setLevel(new String[] {"jrds"}, logger.getLevel());
+        Tools.setLevel(logger.getLevel(), "jrds" );
     }
 
     @Test
     public void bidule() throws Exception {
-        
-        StoreOpener.prepare(null);
+
         ProbeDesc pd = GetMoke.getPd();
         pd.add("MokeDs2", DsType.GAUGE);
-        
+
+        @SuppressWarnings("unchecked")
         Probe<String,Number> p = GenerateProbe.quickProbe(testFolder);
         p.setPd(pd);
         p.setStep(300);
         p.setName("dummy");
         p.getMainStore().checkStoreFile();
-        System.out.println(p.getMainStore());
-        System.out.println(p.getMainStore().getStoreObject());
 
         RrdDef def = ((RrdDb) p.getMainStore().getStoreObject()).getRrdDef();
         def.setStep(300);

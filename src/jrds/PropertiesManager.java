@@ -59,6 +59,7 @@ public class PropertiesManager extends Properties {
     private boolean canact = false;
 
     public PropertiesManager() {
+        update();
         canact = true;
     }
 

@@ -1,5 +1,6 @@
 package jrds.store;
 
+import java.io.IOException;
 import java.util.Date;
 
 import org.rrd4j.ConsolFun;
@@ -56,6 +57,17 @@ public class ExtractInfo {
 
     public final DataProcessor getDataProcessor() {
         return new DataProcessor(start, end);
+    }
+
+    public final DataProcessor getDataProcessor(Extractor ex) {
+        DataProcessor dp = new DataProcessor(start, end);
+        ex.fill(dp, this);
+        try {
+            dp.processData();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to access rrd file  " + ex.getPath(), e);
+        }
+        return dp;
     }
 
 }

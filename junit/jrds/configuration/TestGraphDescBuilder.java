@@ -2,18 +2,22 @@ package jrds.configuration;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.GraphDesc;
+import jrds.Period;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
-import jrds.StoreOpener;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
+import jrds.mockobjects.GenerateProbe;
+import jrds.mockobjects.GenerateProbe.ChainedMap;
 import jrds.mockobjects.MokeProbe;
+import jrds.store.ExtractInfo;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -23,6 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
+import org.rrd4j.data.Plottable;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
 import org.rrd4j.graph.RrdGraphInfo;
@@ -45,7 +50,6 @@ public class TestGraphDescBuilder {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        StoreOpener.prepare("MEMORY");
         Tools.setLevel(logger, Level.TRACE, "jrds.GraphDesc", "jrds.Graph");
         Tools.setLevel(Level.INFO,"jrds.factories.xml.CompiledXPath");
 
@@ -54,6 +58,8 @@ public class TestGraphDescBuilder {
 
     @Test
     public void testGraphDesc() throws Exception {
+
+        PropertiesManager pm = Tools.makePm();
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
         gdbuild.setPm(Tools.makePm());
@@ -64,27 +70,28 @@ public class TestGraphDescBuilder {
         }
         MokeProbe<String, Number> p = new MokeProbe<String, Number>();
         p.getHost().setHostDir(testFolder.getRoot());
+        p.setMainStore(pm.storefactory, new HashMap<String, String>(0));
 
         ProbeDesc pd = p.getPd();
 
-        Map<String, Object> dsMap = new HashMap<String, Object>(2);
-        dsMap.put("dsName", "machin bidule");
-        dsMap.put("dsType", DsType.COUNTER);
+        ChainedMap<Object> dsMap = GenerateProbe.ChainedMap.start();
+        dsMap.set("dsName", "machin bidule").set("dsType", DsType.COUNTER);
         pd.add(dsMap);
 
         dsMap.clear();
-        dsMap.put("dsName", "add2");
-        dsMap.put("dsType", DsType.COUNTER);
+        dsMap.set("dsName", "add2").set("dsType", DsType.COUNTER);
         pd.add(dsMap);
 
         dsMap.clear();
-        dsMap.put("dsName", "add3");
-        dsMap.put("dsType", DsType.COUNTER);
+        dsMap.set("dsName", "add3").set("dsType", DsType.COUNTER);
         pd.add(dsMap);
 
         p.checkStore();
 
-        RrdGraphDef def = gd.getGraphDef(p);
+        Period pr = new Period();
+        ExtractInfo ei = ExtractInfo.get().make(pr.getBegin(), pr.getEnd());
+        Map<String, Plottable> empty = Collections.emptyMap();
+        RrdGraphDef def = gd.getGraphDef(p, ei, empty);
         RrdGraphInfo gi = new RrdGraph(def).getRrdGraphInfo();
 
         logger.debug(Arrays.asList(gi.getPrintLines()));
@@ -100,7 +107,7 @@ public class TestGraphDescBuilder {
         Assert.assertTrue("graph width invalid", 578 < gi.getWidth());
         Assert.assertEquals("graph byte count invalid", 12574 , gi.getByteCount(), 4000);
     }
-    
+
     @Test(expected=NoSuchMethodException.class)
     public void testBadGraphDescClass()  throws Exception {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");

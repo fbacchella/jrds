@@ -1,17 +1,16 @@
-/*##########################################################################
-_##
-_##  $Id: BackEndCommiter.java 235 2006-03-01 21:29:48 +0100 (mer., 01 mars 2006) fbacchella $
-_##
-_##########################################################################*/
-
 package jrds.probe;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
+import jrds.JrdsSample;
 import jrds.Probe;
 import jrds.ProbeDesc;
+import jrds.store.EmptyExtractor;
+import jrds.store.Extractor;
+import jrds.store.Store;
 
 import org.apache.log4j.Level;
 
@@ -72,6 +71,54 @@ public class ContainerProbe extends Probe<Object, Number> {
     @Override
     public String getQualifiedName() {
         return "/"  + getName();
+    }
+
+    /* (non-Javadoc)
+     * @see jrds.Probe#getMainStore()
+     */
+    @Override
+    public Store getMainStore() {
+        return new Store(){
+
+            @Override
+            public void commit(JrdsSample sample) {
+            }
+
+            @Override
+            public Map<String, Number> getLastValues() {
+                return Collections.emptyMap();
+            }
+
+            @Override
+            public boolean checkStoreFile() {
+                return true;
+            }
+
+            @Override
+            public Date getLastUpdate() {
+                return new Date();
+            }
+
+            @Override
+            public Object getStoreObject() {
+                return null;
+            }
+
+            @Override
+            public void closeStoreObject(Object object) {                
+            }
+
+            @Override
+            public Extractor getExtractor() {
+                return new EmptyExtractor();
+            }
+
+            @Override
+            public String getPath() {
+                return "";
+            }
+
+        };
     }
 
 }

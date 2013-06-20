@@ -24,7 +24,7 @@ public abstract class AbstractStore<StoreObject, DataSource> implements Store {
     public abstract void closeStoreObject(Object object);
 
     public void log(Level l, Throwable e, String format, Object... elements) {
-        p.log(l, format, elements);
+        p.log(l, e, format, elements);
     }
 
     public void log(Level l, String format, Object... elements) {

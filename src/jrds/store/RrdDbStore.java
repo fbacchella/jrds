@@ -2,7 +2,6 @@ package jrds.store;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,7 +18,6 @@ import org.rrd4j.core.Archive;
 import org.rrd4j.core.Datasource;
 import org.rrd4j.core.DsDef;
 import org.rrd4j.core.FetchData;
-import org.rrd4j.core.FetchRequest;
 import org.rrd4j.core.Header;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDef;
@@ -47,7 +45,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
     }
 
     public RrdDef getRrdDef() {
-        RrdDef def = new RrdDef(getRrdName());
+        RrdDef def = new RrdDef(getPath());
         def.setVersion(2);
         def.addArchive(DEFAULTARC);
         def.addDatasource(getDsDefs());
@@ -55,7 +53,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
         return def;
     }
 
-    public String getRrdName() {
+    public String getPath() {
         String rrdName = p.getName().replaceAll("/","_");
         return p.getHost().getHostDir() +
                 Util.getFileSeparator() + rrdName + ".rrd";
@@ -76,7 +74,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
         RrdDb rrdSource = null;
         try {
             log(Level.WARN,"Definition is changed, the store needs to be upgraded");
-            File source = new File(getRrdName());
+            File source = new File(getPath());
             rrdSource = new RrdDb(source.getCanonicalPath());
 
             RrdDef rrdDef = getRrdDef();
@@ -173,7 +171,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
     }
 
     public boolean checkStoreFile() {
-        File rrdFile = new File(getRrdName());
+        File rrdFile = new File(getPath());
 
         File rrdDir = p.getHost().getHostDir();
         if (!rrdDir.isDirectory()) {
@@ -190,7 +188,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
         RrdDb rrdDb = null;
         try {
             if ( rrdFile.isFile() ) {
-                rrdDb = new RrdDb(getRrdName());
+                rrdDb = new RrdDb(getPath());
                 //old definition
                 RrdDef tmpdef = rrdDb.getRrdDef();
                 Date startTime = new Date();
@@ -210,18 +208,17 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
                     return false;
                 }
                 else if(! newDef.equals(oldDef)) {
-
                     rrdDb.close();
                     rrdDb = null;
                     upgrade();
-                    rrdDb = new RrdDb(getRrdName());
+                    rrdDb = new RrdDb(getPath());
                 }
                 log(Level.TRACE, "******");
             } else
                 create();
             retValue = true;
         } catch (Exception e) {
-            log(Level.ERROR, e, "Store %s unusable: %s", getRrdName(), e);
+            log(Level.ERROR, e, "Store %s unusable: %s", getPath(), e);
         }
         finally {
             if(rrdDb != null)
@@ -242,7 +239,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
         Date lastUpdate = null;
         RrdDb rrdDb = null;
         try {
-            rrdDb = factory.getRrd(getRrdName());
+            rrdDb = factory.getRrd(getPath());
             lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
         } catch (Exception e) {
             throw new RuntimeException("Unable to get last update date for " + p.getQualifiedName(), e);
@@ -255,9 +252,9 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
     }
 
     @Override
-    public AbstractExtractor<FetchData> fetchData() {
+    public AbstractExtractor<FetchData> getExtractor() {
         try {
-            final RrdDb rrdDb = factory.getRrd(getRrdName());
+            final RrdDb rrdDb = factory.getRrd(getPath());
             return new jrds.store.AbstractExtractor<FetchData>() {
                 /* (non-Javadoc)
                  * @see java.lang.Object#finalize()
@@ -266,24 +263,6 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
                 protected void finalize() throws Throwable {
                     super.finalize();
                     factory.releaseRrd(rrdDb);
-                }
-
-                @Override
-                public String[] getNames() {
-                    try {
-                        return rrdDb.getDsNames();
-                    } catch (IOException e) {
-                        return null;
-                    }
-                }
-
-                @Override
-                public String[] getDsNames() {
-                    try {
-                        return rrdDb.getDsNames();
-                    } catch (IOException e) {
-                        return null;
-                    }
                 }
 
                 @Override
@@ -297,36 +276,27 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
                 }
 
                 @Override
-                public void fill(RrdGraphDef gd, ExtractInfo ei,
-                        Collection<String> sources) {
-                    try {
-                        FetchRequest fr = rrdDb.createFetchRequest(ei.cf, ei.start.getTime() / 1000, ei.end.getTime() / 1000, 1);
-                        FetchData fd = fr.fetchData();
-                        for(String source: sources) {
-                            gd.datasource(source, fd);
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException("Failed to access rrd file  " + getRrdName(), e);
+                public void fill(RrdGraphDef gd, ExtractInfo ei) {
+                    for(Map.Entry<String, String> e: sources.entrySet()) {
+                        gd.datasource(e.getKey(), RrdDbStore.this.getPath(), e.getValue(), ei.cf);
                     }
                 }
 
                 @Override
-                public void fill(DataProcessor dp, ExtractInfo ei,
-                        Collection<String> sources) {
-                    try {
-                        FetchRequest fr = rrdDb.createFetchRequest(ei.cf, ei.start.getTime() / 1000, ei.end.getTime() / 1000, 1);
-                        FetchData fd = fr.fetchData();
-                        for(String source: sources) {
-                            dp.addDatasource(source, fd);
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException("Failed to access rrd file  " + getRrdName(), e);
+                public void fill(DataProcessor dp, ExtractInfo ei) {
+                    for(Map.Entry<String, String> e: sources.entrySet()) {
+                        dp.addDatasource(e.getKey(), RrdDbStore.this.getPath(), e.getValue(), ei.cf);
                     }
+                }
+
+                @Override
+                public String getPath() {
+                    return RrdDbStore.this.getPath();
                 }
 
             };
         } catch (IOException e) {
-            throw new RuntimeException("Failed to access rrd file  " + getRrdName(), e);
+            throw new RuntimeException("Failed to access rrd file  " + getPath(), e);
         }
     }
 
@@ -334,7 +304,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
         Map<String, Number> retValues = new HashMap<String, Number>();
         RrdDb rrdDb = null;
         try {
-            rrdDb = factory.getRrd(getRrdName());
+            rrdDb = factory.getRrd(getPath());
             String[] dsNames = rrdDb.getDsNames();
             for(int i = 0; i < dsNames.length ; i ++) {
                 retValues.put(dsNames[i], rrdDb.getDatasource(i).getLastValue());
@@ -352,7 +322,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
     public void commit(JrdsSample sample) {
         RrdDb rrdDb = null;
         try {
-            rrdDb = factory.getRrd(getRrdName());
+            rrdDb = factory.getRrd(getPath());
             Sample onesample = rrdDb.createSample(sample.getTime().getTime() / 1000);
             for(Map.Entry<String, Number> e: sample.entrySet()) {
                 onesample.setValue(e.getKey(), e.getValue().doubleValue());
@@ -372,7 +342,7 @@ public class RrdDbStore extends AbstractStore<RrdDb, FetchData> {
     @Override
     public RrdDb getStoreObject() {
         try {
-            return factory.getRrd(getRrdName());
+            return factory.getRrd(getPath());
         } catch (IOException e) {
             return null;
         }

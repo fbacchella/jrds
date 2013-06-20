@@ -6,10 +6,10 @@ import java.util.Map;
 import jrds.JrdsSample;
 import jrds.Probe;
 
-public class SampleCache extends AbstractStore<Map<String, Number>, Object> {
+public class CacheStore extends AbstractStore<Map<String, Number>, Object> {
     private final Map<String, Number> cache;
 
-    public SampleCache(Probe<?,?> p, Map<String, Number> cache) {
+    public CacheStore(Probe<?,?> p, Map<String, Number> cache) {
         super(p);
         this.cache = cache;
     }
@@ -36,7 +36,7 @@ public class SampleCache extends AbstractStore<Map<String, Number>, Object> {
     }
 
     @Override
-    public EmptyExtractor fetchData() {
+    public EmptyExtractor getExtractor() {
         return new EmptyExtractor();
     }
 
@@ -48,6 +48,11 @@ public class SampleCache extends AbstractStore<Map<String, Number>, Object> {
     @Override
     public void closeStoreObject(Object object) {
 
+    }
+
+    @Override
+    public String getPath() {
+        return p.getQualifiedName();
     }
 
 }

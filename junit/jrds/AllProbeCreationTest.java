@@ -29,14 +29,13 @@ public class AllProbeCreationTest {
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
-        StoreOpener.prepare("FILE");
         Tools.setLevel(logger, Level.TRACE, "jrds.Util");
     }
 
     @Test
     public void makeProbe() throws ParserConfigurationException, IOException, URISyntaxException, InvocationTargetException {
         PropertiesManager pm = Tools.makePm(testFolder);
-        pm.rrdbackend = "FILE";
+
         File descpath = new File("desc");
         if(descpath.exists())
             pm.libspath.add(descpath.toURI());
