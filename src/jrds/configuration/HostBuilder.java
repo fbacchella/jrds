@@ -30,6 +30,7 @@ import jrds.starter.Connection;
 import jrds.starter.ConnectionInfo;
 import jrds.starter.HostStarter;
 import jrds.starter.Timer;
+import jrds.store.StoreFactory;
 
 import org.apache.log4j.Logger;
 
@@ -313,10 +314,13 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 }
             }
         }
-        
+
         try {
             Map<String, String> empty = Collections.emptyMap();
             p.setMainStore(pm.storefactory, empty);
+            for(StoreFactory sf: pm.stores.values()) {
+                p.addStore(sf);
+            }
         } catch (InvocationTargetException e) {
             logger.error(Util.delayedFormatString("Failed to configure the store for the probe %s", pm.storefactory.getClass().getCanonicalName(), p));
             return null;
