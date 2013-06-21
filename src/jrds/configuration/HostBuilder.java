@@ -315,15 +315,22 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             }
         }
 
+        //try {
+        Map<String, String> empty = Collections.emptyMap();
+        
         try {
-            Map<String, String> empty = Collections.emptyMap();
-            p.setMainStore(pm.storefactory, empty);
-            for(StoreFactory sf: pm.stores.values()) {
-                p.addStore(sf);
-            }
-        } catch (InvocationTargetException e) {
-            logger.error(Util.delayedFormatString("Failed to configure the store for the probe %s", pm.storefactory.getClass().getCanonicalName(), p));
+            p.setMainStore(pm.defaultStore, empty);
+        } catch (Exception e1) {
+            logger.error(Util.delayedFormatString("Failed to configure the default store for the probe %s", pm.defaultStore.getClass(), p));
             return null;
+        }
+
+        for(Map.Entry<String, StoreFactory> e: pm.stores.entrySet()) {
+            try {
+                p.addStore(e.getValue());
+            } catch (Exception e1) {
+                logger.warn(Util.delayedFormatString("Failed to configure the store %s for the probe %s", e.getKey(), e.getValue().getClass().getCanonicalName(), p));
+            }                    
         }
 
         if(p.checkStore()) {

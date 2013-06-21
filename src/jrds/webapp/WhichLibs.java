@@ -48,8 +48,8 @@ public final class WhichLibs extends JrdsServlet {
             out.println("    Server info: " + ctxt.getServerInfo());
             out.println();
 
-            if(getPropertiesManager().storefactory instanceof RrdDbStoreFactory) {
-                RrdDbStoreFactory factory = (RrdDbStoreFactory) getPropertiesManager().storefactory;
+            if(getPropertiesManager().defaultStore instanceof RrdDbStoreFactory) {
+                RrdDbStoreFactory factory = (RrdDbStoreFactory) getPropertiesManager().defaultStore;
                 String[] openned = factory.getOpenFiles();
                 out.println("" + openned.length + " opened rrd: ");
                 for(String rrdPath: openned) {

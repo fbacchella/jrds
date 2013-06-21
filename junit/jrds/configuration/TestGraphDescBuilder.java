@@ -70,7 +70,8 @@ public class TestGraphDescBuilder {
         }
         MokeProbe<String, Number> p = new MokeProbe<String, Number>();
         p.getHost().setHostDir(testFolder.getRoot());
-        p.setMainStore(pm.storefactory, new HashMap<String, String>(0));
+
+        p.setMainStore(pm.defaultStore, new HashMap<String, String>(0));
 
         ProbeDesc pd = p.getPd();
 

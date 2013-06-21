@@ -11,6 +11,7 @@ import jrds.HostInfo;
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.PropertiesManager;
+import jrds.store.StoreFactory;
 
 import org.apache.log4j.Logger;
 
@@ -52,7 +53,10 @@ public class Updater {
         } catch (InterruptedException e) {
             logger.info("Collect interrupted");
         }
-        pm.storefactory.stop();
+        for(StoreFactory sf: pm.stores.values()) {
+            sf.stop();
+        }
+        pm.defaultStore.stop();
     }
 
 }

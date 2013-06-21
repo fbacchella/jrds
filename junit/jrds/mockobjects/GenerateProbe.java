@@ -115,7 +115,7 @@ public class GenerateProbe {
 
         StoreFactory sf = (StoreFactory) args.get(StoreFactory.class.getCanonicalName());
         if(sf == null) {
-            sf = pm.storefactory;
+            sf = pm.defaultStore;
         }
         sf.configureStore(pm, new Properties());
         sf.start();

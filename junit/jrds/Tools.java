@@ -204,8 +204,8 @@ final public class Tools {
         pm.update();
         pm.configureStores();
         pm.libspath.clear();
-        pm.storefactory.configureStore(pm, new Properties());
-        pm.storefactory.start();
+        pm.defaultStore.configureStore(pm, new Properties());
+        pm.defaultStore.start();
         return pm;
     }
 

@@ -253,14 +253,21 @@ public class PropertiesManager extends Properties {
     }
 
     public void configureStores() {
+        String defaultStorename = getProperty("defaultstore", StoreFactory.DEFAULTNAME);
         Map<String, Properties> storesConfig = new HashMap<String, Properties>(1);
-        storesConfig.put(StoreFactory.DEFAULTNAME, new Properties());
-        Properties defaultStore = storesConfig.get(StoreFactory.DEFAULTNAME);
-        String defaultstorefactoryclassname = getProperty("storefactory", RrdDbStoreFactory.class.getName()); 
-        defaultStore.put("factory", defaultstorefactoryclassname);
+        storesConfig.put(defaultStorename, new Properties());
+
+        Properties defaultStoreProps = storesConfig.get(defaultStorename);
+        //Put old values in the default factory properties
         for(String oldProps: new String[] { "rrdbackend", "dbPoolSize", "usepool"}) {
             if(getProperty(oldProps) != null)
-                defaultStore.put(StoreFactory.DEFAULTNAME, getProperty(oldProps));
+                defaultStoreProps.put(defaultStorename, getProperty(oldProps));
+        }
+        
+        //Simple case, just the store factory
+        if(getProperty("storefactory") !=  null) {
+            String defaultstorefactoryclassname = getProperty("storefactory"); 
+            defaultStoreProps.put("factory", defaultstorefactoryclassname);            
         }
 
         String propertiesListStores = getProperty("stores", "");
@@ -273,7 +280,13 @@ public class PropertiesManager extends Properties {
                 storesConfig.put(storeName, props);
             }
         }
+        
+        //Ensure that the default store was not forgotten
+        if(defaultStoreProps.get("factory") ==  null) {
+            defaultStoreProps.put("factory", RrdDbStoreFactory.class.getName());
+        }
 
+        //Ok, now configure and store the factories
         for(Map.Entry<String, Properties> e: storesConfig.entrySet()) {
             String storeName = e.getKey();
             Properties storesInfo = e.getValue();
@@ -283,10 +296,7 @@ public class PropertiesManager extends Properties {
                     StoreFactory sf = (StoreFactory) extensionClassLoader.loadClass(storefactoryclassname).getConstructor().newInstance();
                     sf.configureStore(this, storesInfo);
                     sf.start();
-                    if(storeName == StoreFactory.DEFAULTNAME)
-                        storefactory = sf;
-                    else
-                        stores.put(storeName, sf);
+                    stores.put(storeName, sf);
                 }
                 else {
                     logger.error(Util.delayedFormatString("store factory %s invalid, no factory given", storeName));
@@ -295,6 +305,8 @@ public class PropertiesManager extends Properties {
                 logger.error(Util.delayedFormatString("store factory %s failed to configure: %s", storeName, e1.getMessage()));
             }
         }
+        
+        defaultStore = stores.remove(defaultStorename);
 
     }
 
@@ -517,7 +529,7 @@ public class PropertiesManager extends Properties {
     public static final String TAGSTAB = "tagstab";
     public static final String ADMINTAB = "adminTab";
     public Map<String, StoreFactory> stores = new HashMap<String, StoreFactory>();
-    public StoreFactory storefactory = null;
+    public StoreFactory defaultStore;
 
     public List<String> tabsList = Arrays.asList(FILTERTAB, CUSTOMGRAPHTAB, "@", SUMSTAB, SERVICESTAB, VIEWSTAB, HOSTSTAB, TAGSTAB, ADMINTAB);
 }

@@ -3,6 +3,7 @@ package jrds;
 import java.util.Properties;
 
 import jrds.starter.Timer;
+import jrds.store.StoreFactory;
 
 import org.apache.log4j.Logger;
 
@@ -85,7 +86,10 @@ public class Configuration {
             }
         } catch (InterruptedException e) {
         }
-        propertiesManager.storefactory.stop();
+        for(StoreFactory sf: propertiesManager.stores.values()) {
+            sf.stop();
+        }
+        propertiesManager.defaultStore.stop();
     }
 
     /**
