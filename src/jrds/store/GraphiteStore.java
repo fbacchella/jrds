@@ -34,7 +34,7 @@ public class GraphiteStore extends AbstractStore<GraphiteConnection> {
         try {
             cnx.send(p, sample);
             lastUpdate = sample.getTime();
-        } catch (IOException e) {
+        } catch (Exception e) {
             log(Level.ERROR, e, "Failed to send sample to graphite server: %s", e.getMessage());
         }
     }
@@ -48,11 +48,9 @@ public class GraphiteStore extends AbstractStore<GraphiteConnection> {
     public boolean checkStoreFile() {
         try {
             cnx.ensureGraphiteConnection();
-            return true;
         } catch (IOException e) {
-            log(Level.ERROR, e, "Failed connection to graphite server: %s", e.getMessage());
-            return false;
         }
+        return true;
     }
 
     @Override
@@ -67,7 +65,7 @@ public class GraphiteStore extends AbstractStore<GraphiteConnection> {
 
     @Override
     public void closeStoreObject(Object object) {
-        
+
     }
 
 }
