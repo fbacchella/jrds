@@ -128,5 +128,35 @@ public class TestPropertiesManager {
         Assert.assertTrue("Log4j file not created", logFile.canRead());
         logFile.delete();
     }
+    
+
+    @Test
+    public void testDefaultStore() {
+        PropertiesManager pm = new PropertiesManager();
+        pm.update();
+        pm.configureStores();
+        Assert.assertEquals("Default store configuration failed", jrds.store.RrdDbStoreFactory.class, pm.defaultStore.getClass());
+    }
+
+    @Test
+    public void testDefaultStoreEmpty() {
+        PropertiesManager pm = new PropertiesManager();
+        pm.setProperty("storefactory", jrds.store.CacheStoreFactory.class.getCanonicalName());
+        pm.update();
+        pm.configureStores();
+        Assert.assertEquals("Default store configuration failed", jrds.store.CacheStoreFactory.class, pm.defaultStore.getClass());
+    }
+
+    @Test
+    public void testDefaultStoreList() {
+        PropertiesManager pm = new PropertiesManager();
+        pm.setProperty("stores", "cache");
+        pm.setProperty("rrdbackend", "NIO");
+        pm.setProperty("store.cache.factory", jrds.store.CacheStoreFactory.class.getCanonicalName());
+        pm.update();
+        pm.configureStores();
+        Assert.assertEquals("Addition store configuration failed", 1, pm.stores.size());
+        Assert.assertEquals("Addition store configuration failed", jrds.store.CacheStoreFactory.class, pm.stores.get("cache").getClass());
+    }
 
 }

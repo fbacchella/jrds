@@ -261,7 +261,7 @@ public class PropertiesManager extends Properties {
         //Put old values in the default factory properties
         for(String oldProps: new String[] { "rrdbackend", "dbPoolSize", "usepool"}) {
             if(getProperty(oldProps) != null)
-                defaultStoreProps.put(defaultStorename, getProperty(oldProps));
+                defaultStoreProps.put(oldProps, getProperty(oldProps));
         }
         
         //Simple case, just the store factory
@@ -285,6 +285,8 @@ public class PropertiesManager extends Properties {
         if(defaultStoreProps.get("factory") ==  null) {
             defaultStoreProps.put("factory", RrdDbStoreFactory.class.getName());
         }
+        
+        logger.trace(Util.delayedFormatString("Stores configuration: %s", storesConfig));
 
         //Ok, now configure and store the factories
         for(Map.Entry<String, Properties> e: storesConfig.entrySet()) {
@@ -305,6 +307,7 @@ public class PropertiesManager extends Properties {
                 logger.error(Util.delayedFormatString("store factory %s failed to configure: %s", storeName, e1.getMessage()));
             }
         }
+        logger.debug(Util.delayedFormatString("Stores configured: %s", stores));
         
         defaultStore = stores.remove(defaultStorename);
 
