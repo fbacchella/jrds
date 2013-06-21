@@ -9,6 +9,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.Map;
 
+import jrds.mockobjects.EmptyStoreFactory;
 import jrds.webapp.ACL.AdminACL;
 import jrds.webapp.RolesACL;
 import junit.framework.Assert;
@@ -152,11 +153,11 @@ public class TestPropertiesManager {
         PropertiesManager pm = new PropertiesManager();
         pm.setProperty("stores", "cache");
         pm.setProperty("rrdbackend", "NIO");
-        pm.setProperty("store.cache.factory", jrds.store.CacheStoreFactory.class.getCanonicalName());
+        pm.setProperty("store.cache.factory", EmptyStoreFactory.class.getCanonicalName());
         pm.update();
         pm.configureStores();
         Assert.assertEquals("Addition store configuration failed", 1, pm.stores.size());
-        Assert.assertEquals("Addition store configuration failed", jrds.store.CacheStoreFactory.class, pm.stores.get("cache").getClass());
+        Assert.assertEquals("Addition store configuration failed", EmptyStoreFactory.class, pm.stores.get("cache").getClass());
     }
 
 }
