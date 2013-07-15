@@ -304,13 +304,14 @@ public class PropertiesManager extends Properties {
                     logger.error(Util.delayedFormatString("store factory %s invalid, no factory given", storeName));
                 }
             } catch (Exception e1) {
-                logger.error(Util.delayedFormatString("store factory %s failed to configure: %s", storeName, e1.getMessage()));
+                jrds.Util.log(getClass().getCanonicalName(), logger, Level.ERROR, e1, "store factory %s failed to configure: %s", storeName, e1);
             }
         }
         logger.debug(Util.delayedFormatString("Stores configured: %s", stores));
+        logger.debug(Util.delayedFormatString("default store: %s", defaultStorename));
         
         defaultStore = stores.remove(defaultStorename);
-
+ 
     }
 
     @SuppressWarnings("unchecked")
