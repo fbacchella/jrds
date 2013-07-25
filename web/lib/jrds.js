@@ -353,7 +353,10 @@ function cleanParams(paramslist) {
 	// Only interesting values from query params are kept
 	dojo.forEach(paramslist, function(key){
 		value = queryParams[key];
-		if(value)
+		if(key == 'begin' || key == 'end') {
+			cleaned[key] = value.getTime();
+		}
+		else if(value)
 			cleaned[key] = value;
 	});
 	return cleaned;
