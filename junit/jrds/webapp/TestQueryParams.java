@@ -48,7 +48,7 @@ public class TestQueryParams {
 
         logger.trace(response.getContent());
         JSONObject qp = new JSONObject(response.getContent());
-        for(String key: new String[] {"tab", "tabslist", "autoperiod"}) {
+        for(String key: new String[] {"tab", "tabslist", "autoperiod", "begin", "end"}) {
             Assert.assertTrue(key + " not found", qp.has(key)); 
         }
     }
