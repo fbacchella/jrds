@@ -36,6 +36,7 @@
                     conf="libtest->default">
             <exclude module="jetty" />
         </dependency>
+        <dependency org="joda-time" name="joda-time" rev="2.2" conf="libtest->default" />
         <dependency org="org.glassfish.external" name="opendmk_jmxremote_optional_jar" rev="1.0-b01-ea" conf="libtest->default" />
     </dependencies>
 </ivy-module>

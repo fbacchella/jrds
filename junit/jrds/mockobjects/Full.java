@@ -1,6 +1,7 @@
 package jrds.mockobjects;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -130,9 +131,11 @@ public class Full {
 
         end = jrds.Util.normalize(end, p.getStep());
 
-        Period pr = new Period();
-        pr.setEnd(end);
-        pr.setBegin(begin);
+        Period pr = null;
+        try {
+            pr = new Period(Long.toString(begin.getTime()), Long.toString(end.getTime()));
+        } catch (ParseException e) {
+        }
         return pr;
 	}
 	
