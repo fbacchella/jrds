@@ -157,8 +157,9 @@ public class TestUrlParser {
         Period p = pb.getPeriod();
 
         Date now = new Date();
-
-        Assert.assertTrue(p.getEnd().compareTo(now) >= 0);
+        long offset = Math.abs(now.getTime() - p.getEnd().getTime());
+        logger.debug("end offset:" + offset);
+        Assert.assertTrue(offset > 980 && offset < 1200);
         Assert.assertEquals(7, p.getScale());
         String url = pb.makeObjectUrl("root", "", false);
         logger.trace(url);
@@ -178,7 +179,8 @@ public class TestUrlParser {
         Date begin = calBegin.getTime();
 
         long delta = p.getBegin().getTime() - begin.getTime();
-        Assert.assertTrue(p.getEnd().compareTo(now) >= 0);
+        long offset = Math.abs(now.getTime() - p.getEnd().getTime());
+        Assert.assertTrue(offset > 980 && offset < 1200);
         Assert.assertTrue(delta < 10 && delta > -10);
         Assert.assertEquals(4, p.getScale());
         String url = pb.makeObjectUrl("root", "", false);
