@@ -168,26 +168,44 @@ public class PeriodTest {
     }
 
     @Test
-    public void factorminus() throws ParseException {
-        begin = fullISOFORMAT.parse("2007-01-01T00:00:00");
-        end = fullISOFORMAT.parse("2007-01-31T23:59:59");
-        Period p = new Period("2007-03-01 00:00:00", "2007-03-31 23:59:59");
-        logger.trace(p.getBegin(-2));
-        logger.trace(p.getEnd(-2));
-        Assert.assertEquals(begin, p.getBegin(-2));
-        Assert.assertEquals(end, p.getEnd(-2));
+    public void previousFull() throws ParseException {
+        begin = fullISOFORMAT.parse("2007-03-01T00:00:00");
+        end = fullISOFORMAT.parse("2007-03-01T23:59:59");
+        Period p = new Period("2007-03-02 00:00:00", "2007-03-02 23:59:59").previous();
+        logger.trace(p.getBegin());
+        logger.trace(p.getEnd());
+        Assert.assertEquals(begin, p.getBegin());
+        Assert.assertEquals(end, p.getEnd());
         Assert.assertEquals(0, p.getScale());
     }
 
     @Test
-    public void factorplus() throws ParseException {
-        begin = fullISOFORMAT.parse("2007-05-01T00:00:00");
-        end = fullISOFORMAT.parse("2007-05-31T23:59:59");
-        Period p = new Period("2007-03-01 00:00:00", "2007-03-31 23:59:59");
-        logger.trace(p.getBegin(2));
-        logger.trace(p.getEnd(2));
-        Assert.assertEquals(begin, p.getBegin(2));
-        Assert.assertEquals(end, p.getEnd(2));
+    public void nextFull() throws ParseException {
+        begin = fullISOFORMAT.parse("2007-03-03T00:00:00");
+        end = fullISOFORMAT.parse("2007-03-03T23:59:59");
+        Period p = new Period("2007-03-02 00:00:00", "2007-03-02 23:59:59").next();
+        logger.trace(p.getBegin());
+        logger.trace(p.getEnd());
+        Assert.assertEquals(begin, p.getBegin());
+        Assert.assertEquals(end, p.getEnd());
+        Assert.assertEquals(0, p.getScale());
+    }
+
+    @Test
+    public void previousScale() throws ParseException {
+        Period p = new Period().previous();
+        long offsetDay = 86400 * 1000 - (p.getEnd().getTime() - p.getBegin().getTime());
+        Assert.assertTrue("offset to large: " + offsetDay, Math.abs(offsetDay) < 1100) ;
+        Assert.assertEquals(0, p.getScale());
+    }
+
+    @Test
+    public void nextScale() throws ParseException {
+        Period p = new Period().next();
+        logger.trace(p.getBegin());
+        logger.trace(p.getEnd());
+        long offsetDay = 86400 * 1000 - (p.getEnd().getTime() - p.getBegin().getTime());
+        Assert.assertTrue("offset to large: " + offsetDay, Math.abs(offsetDay) < 1100) ;
         Assert.assertEquals(0, p.getScale());
     }
 

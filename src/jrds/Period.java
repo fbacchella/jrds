@@ -28,23 +28,23 @@ public class Period {
 
     public enum PeriodItem {
         MANUAL("Manual", new org.joda.time.Period()),
-        HOUR("Last Hour", org.joda.time.Period.hours(-1)),
-        HOURS2("Last 2 Hours", org.joda.time.Period.hours(-2)),
-        HOURS3("Last 3 Hours", org.joda.time.Period.hours(-3)),
-        HOURS4("Last 4 Hours", org.joda.time.Period.hours(-4)),
-        HOURS6("Last 6 Hours", org.joda.time.Period.hours(-6)),
-        HOURS12("Last 12 Hours", org.joda.time.Period.hours(-12)),
-        DAY("Last Day", org.joda.time.Period.days(-1)),
-        DAYS2("Last 2 Days", org.joda.time.Period.days(-2)),
-        WEEK("Last Week", org.joda.time.Period.weeks(-1)),
-        WEEKS2("Last 2 Weeks", org.joda.time.Period.weeks(-2)),
-        MONTH("Last Month", org.joda.time.Period.months(-1)),
-        MONTH2("Last 2 Months", org.joda.time.Period.months(-2)),
-        MONTH3("Last 3 Months", org.joda.time.Period.months(-3)),
-        MONTH4("Last 4 Months", org.joda.time.Period.months(-4)),
-        MONTH6("Last 6 Months", org.joda.time.Period.months(-6)),
-        YEAR("Last Year", org.joda.time.Period.years(-1)),
-        YEARS2("Last 2 Years", org.joda.time.Period.years(-2));
+        HOUR("Last Hour", org.joda.time.Period.hours(1)),
+        HOURS2("Last 2 Hours", org.joda.time.Period.hours(2)),
+        HOURS3("Last 3 Hours", org.joda.time.Period.hours(3)),
+        HOURS4("Last 4 Hours", org.joda.time.Period.hours(4)),
+        HOURS6("Last 6 Hours", org.joda.time.Period.hours(6)),
+        HOURS12("Last 12 Hours", org.joda.time.Period.hours(12)),
+        DAY("Last Day", org.joda.time.Period.days(1)),
+        DAYS2("Last 2 Days", org.joda.time.Period.days(2)),
+        WEEK("Last Week", org.joda.time.Period.weeks(1)),
+        WEEKS2("Last 2 Weeks", org.joda.time.Period.weeks(2)),
+        MONTH("Last Month", org.joda.time.Period.months(1)),
+        MONTH2("Last 2 Months", org.joda.time.Period.months(2)),
+        MONTH3("Last 3 Months", org.joda.time.Period.months(3)),
+        MONTH4("Last 4 Months", org.joda.time.Period.months(4)),
+        MONTH6("Last 6 Months", org.joda.time.Period.months(6)),
+        YEAR("Last Year", org.joda.time.Period.years(1)),
+        YEARS2("Last 2 Years", org.joda.time.Period.years(2));
         public final String name;
         public final org.joda.time.Period p;
         PeriodItem(String name, org.joda.time.Period p) {
@@ -65,7 +65,7 @@ public class Period {
         calPeriod = 7;
         period = PeriodItem.values()[calPeriod].p;
         end = new DateTime().minusSeconds(1);
-        begin = new DateTime().plus(period);
+        begin = new DateTime().minus(period);
     }
 
     public Period(int p) {
@@ -75,7 +75,7 @@ public class Period {
         calPeriod = p;
         period = PeriodItem.values()[calPeriod].p;
         end = new DateTime().minusSeconds(1);
-        begin = new DateTime().plus(period);
+        begin = new DateTime().minus(period);
     }
 
     public Period(String begin, String end) throws ParseException {
@@ -86,36 +86,36 @@ public class Period {
         logger.trace(Util.delayedFormatString("Period is %s", period));
     }
 
-    /**
-     * This function return the begin of a period, with an offset
-     * @param count
-     * @return the calculated begin date
-     */
-    public Date getBegin(int count) {
-        return begin.plus(period.multipliedBy(count)).toDate();
+    private Period(DateTime begin, DateTime end) {
+        this.begin = begin;
+        this.end = end;
+        this.calPeriod = 0;
+        period = (new org.joda.time.Period(this.begin, this.end.plusSeconds(1)));
+        logger.trace(Util.delayedFormatString("Period is %s", period));        
+    }
+
+    public Period previous() {
+        Period next = new Period(begin.minus(period), end.minus(period));
+        return next;
+    }
+
+    public Period next() {
+        Period next = new Period(begin.plus(period), end.plus(period));
+        return next;
     }
 
     /**
      * @return Returns the begin of the period.
      */
     public Date getBegin() {
-        return getBegin(0);
-    }
-
-    /**
-     * This function return the end of a period, with an offset
-     * @param count
-     * @return the calculated end date
-     */
-    public Date getEnd(int count) {
-        return end.plus(period.multipliedBy(count)).toDate();
+        return begin.toDate();
     }
 
     /**
      * @return Returns the end of the period.
      */
     public Date getEnd() {
-        return getEnd(0);
+        return end.toDate();
     }
 
     /**

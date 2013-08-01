@@ -49,7 +49,7 @@ body, input, option, select, tab, div, td, a, textarea {
 	background-color:#F5F5F5;
 	border:1px solid #AAAAAA;
 	margin:5px;
-	width:575px;
+	width:635px;
 	height:28px;
 }
 
@@ -73,11 +73,32 @@ body, input, option, select, tab, div, td, a, textarea {
 }
 
 .fieldDay {
-	width: 70px
+	width: 80px
 }
 
 #autoperiod {
 	width: 100px;
+}
+
+.periodNavigation .dijitButtonNode {
+	border: 0px none;
+	background: none;
+}
+
+.previousPeriodNavigation {
+	background-image: url("../img/date_previous.png");
+    background-repeat: no-repeat;
+    height: 16px;
+    text-align: center;
+    width: 16px;
+}
+
+.nextPeriodNavigation {
+	background-image: url("../img/date_next.png");
+    background-repeat: no-repeat;
+    height: 16px;
+    text-align: center;
+    width: 16px;
 }
 
 .iconslist {

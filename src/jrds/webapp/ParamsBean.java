@@ -156,7 +156,7 @@ public class ParamsBean implements Serializable {
                     roles.add(role);
             }
         }
-        logger.trace("Found user "  + user + " with roles " + roles);		
+        logger.trace(Util.delayedFormatString("Found user %s with roles %s", user, roles));		
     }
 
     private void unpack(String packed) {
@@ -541,7 +541,7 @@ public class ParamsBean implements Serializable {
             if(scaleStr == null)
                 scaleStr = getValue("autoperiod");
 
-            int scale = jrds.Util.parseStringNumber(scaleStr, -1).intValue();
+            int scale = jrds.Util.parseStringNumber(scaleStr, -1);
 
             String end = getValue("end");
             String begin = getValue("begin");
@@ -551,6 +551,10 @@ public class ParamsBean implements Serializable {
                 p = new Period(begin, end);
             else
                 p = new Period();
+            if(params.containsKey("periodnext"))
+                p = p.next();
+            else if(params.containsKey("periodprevious"))
+                p = p.previous();
         } catch (NumberFormatException e) {
             logger.error("Period cannot be parsed");
         } catch (ParseException e) {
@@ -700,4 +704,5 @@ public class ParamsBean implements Serializable {
     public Tab getTab() {
         return tab;
     }
+
 }

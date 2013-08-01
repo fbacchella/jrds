@@ -20,17 +20,16 @@ define( "jrds/Autoperiod",
 return declare("Autoperiod", dijit.form.Select, {
 	onChange: function(value) {
 		queryParams.autoperiod = value;
-
 		//value = 0 means manual time period, so don't mess with the period fields
 		if(value != 0) {
-			submitRenderForm();
+            getGraphList();
 			// Refresh queryParams with the new time values
 			var iq = dojo.xhrGet( {
 				content:  {autoperiod: queryParams.autoperiod},
 				sync: true,
 				url: "queryparams",
 				handleAs: "json",
-				preventCache: false,
+				preventCache: true,
 				load: function(response, ioArgs) {
 					queryParams.begin = new Date(response.begin);
 		            dijit.byId('begin').set('value', new Date(response.begin));
@@ -76,7 +75,6 @@ return declare("HourBox", dijit.form.TimeTextBox, {
 		newDate.setSeconds(date.getSeconds());
 		newDate.setMilliseconds(date.getMilliseconds());
 		queryParams[this.queryId] = newDate;
-
 		return this.inherited(arguments);
 	}
 });
@@ -147,12 +145,51 @@ return declare("DayHourTextBox", dijit.form.DateTextBox, {
 				}				
 			}
 			queryParams[this.id] = newDate;
-
 			return this.inherited(arguments);
 		}
 	});
        }
 );
+
+define("jrds/PeriodNavigation",
+		[ "dojo/_base/declare",
+		  "dijit/form/Button",
+		  "dojo"],
+		function(declare, button, dojo) {
+return declare("PeriodNavigation", button, {
+	class: 'periodNavigation',
+	onClick: function(arguments) {
+		content = {};
+		content.autoperiod = queryParams.autoperiod;
+		content.begin = queryParams.begin.getTime();
+		content.end = queryParams.end.getTime();
+		content[this.id] = '';
+		dojo.xhrGet( {
+			content:  content,
+			sync: false,
+			url: "queryparams",
+			handleAs: "json",
+			preventCache: true,
+			load: function(response, ioArgs) {
+				queryParams.begin = new Date(response.begin);
+	            dijit.byId('begin').set('value', new Date(response.begin));
+	            dijit.byId('beginh').set('value', new Date(response.begin));
+				queryParams.end = new Date(response.end);
+	            dijit.byId('end').set('value', new Date(response.end));
+	            dijit.byId('endh').set('value', new Date(response.end));
+	            queryParams.autoperiod = 0;
+	            dijit.byId('autoperiod').set('value', 0);
+	            getGraphList();
+				return response;
+			},
+			error: function(response, ioArgs) {
+				console.error("init query failed with " + response.message);
+				return response;
+			}
+		});
+	}
+});
+});
 
 define("jrds/jrdsTree",
        [ "dojo/_base/declare",
@@ -302,8 +339,8 @@ function initIndex() {
 	});
 
 	//The parse can be done
-	dojo.parser.parse();
-
+	dojo.parser.parse()
+	
 	setupCalendar();
 	setupTabs();
 	setupDisplay();
@@ -462,7 +499,7 @@ function getGraphList() {
 	var graphStandby = startStandBy('graphPane');
 
 	return dojo.xhrGet( {
-		content: cleanParams(['id', 'begin', 'end', 'min', 'max', 'sort', 'autoperiod', 'history', 'filter', 'pid', 'dsName']),
+		content: cleanParams(['id', 'begin', 'end', 'min', 'max', 'sort', 'autoperiod', 'periodnext', 'periodprevious', 'history', 'filter', 'pid', 'dsName']),
 		url: "jsongraph",
 		handleAs: "json",
 		load: doGraphList,
@@ -1028,40 +1065,5 @@ function filesLoaded(e) {
 	}
 	catch(err) {
 		console.error(err);
-	}
-}
-
-function dateNavPrevious() {
-	if(queryParams.autoperiod == 0) {
-		var begin = dojo.date.locale.parse(queryParams.begin, 'yyyy-MM-dd HH:mm');
-		var end = dojo.date.locale.parse(queryParams.end, 'yyyy-MM-dd HH:mm');
-		console.log(end - begin);
-	}
-	console.log(queryParams);
-	var dayTimeFormat = {
-		datePattern: 'yyyy-MM-dd',
-		timePattern: 'HH:mm'
-	};
-	if(queryParams.autoperiod == 0) {
-		var begin = dojo.date.locale.parse(queryParams.begin, dayTimeFormat);
-		var end = dojo.date.locale.parse(queryParams.end, dayTimeFormat);
-		console.log(begin);
-		console.log(end);
-		console.log(end - begin);
-	}
-}
-
-function dateNavNext() {
-	console.log(queryParams);
-	var dayTimeFormat = {
-		datePattern: 'yyyy-MM-dd',
-		timePattern: 'HH:mm'
-	};
-	if(queryParams.autoperiod == 0) {
-		var begin = dojo.date.locale.parse(queryParams.begin, dayTimeFormat);
-		var end = dojo.date.locale.parse(queryParams.end, dayTimeFormat);
-		console.log(begin);
-		console.log(end);
-		console.log(end - begin);
 	}
 }

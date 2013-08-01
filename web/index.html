@@ -148,11 +148,13 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
 								<option value="17" id="period.17">Last 2 Years</option>
        						</select>
           					<label class="paramslabel" for="begin">Begin</label>
-          					<input type="text" name="begin" id="begin" />
+          					<button id="periodprevious" data-dojo-type="jrds/PeriodNavigation" data-dojo-props="iconClass: 'previousPeriodNavigation', showLabel: false" type="button">previous</button>
+          					<input type="text" name="begin" id="begin" class="fieldDay" />
           					<input type="text" name="beginh" id="beginh"/>
           					<label class="paramslabel" for="end">End</label>
-          					<input type="text" name="end" id="end" />
+          					<input type="text" name="end" id="end"  class="fieldDay" />
           					<input type="text" name="endh" id="endh"/>
+          					<button id="periodnext" data-dojo-type="jrds/PeriodNavigation" data-dojo-props="iconClass: 'nextPeriodNavigation', showLabel: false" type="button">next</button>
         				</div>
         				<div data-dojo-type="dijit/layout/ContentPane" class="formblock" >
         					<span class="linelabel">Vertical scale</span>
