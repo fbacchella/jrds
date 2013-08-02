@@ -219,6 +219,8 @@
 	<target name="jetty" depends="appjar" description="Build JRDS for jetty">
 		<tar destfile="${build.home}/${app.name}.tar">
 			<tarfileset dir="lib/dojo">
+				<include name="dijit/themes/nihilo/nihilo.css" />
+				<include name="dijit/themes/nihilo/images/treeExpand_loading.gif" />
 				<include name="dijit/themes/nihilo/images/tabContainerSprite.gif" />
 				<include name="dijit/themes/nihilo/images/spriteRoundedIconsSmall.png" />
 				<include name="dijit/themes/nihilo/images/titleBar.png" />
@@ -228,6 +230,7 @@
 				<include name="dijit/themes/nihilo/images/validationInputBg.png" />
 				<include name="dojox/widget/Standby/images/loading.gif" />
 				<include name="dojo/resources/blank.gif" />
+				<include name="dojo/resources/dojo.css" />
 				<include name="dijit/themes/nihilo/images/spriteDivIcons.gif" />
 				<include name="dijit/themes/nihilo/images/buttonHover.png" />
 				<include name="dijit/themes/nihilo/images/spriteTree.gif" />
@@ -257,6 +260,8 @@
 		<war destfile="${build.home}/${app.name}.war" webxml="${basedir}/web/WEB-INF/web.xml" duplicate="preserve">
 			<fileset dir="${web.src}" />
 			<fileset dir="lib/dojo">
+				<include name="dijit/themes/nihilo/nihilo.css" />
+				<include name="dijit/themes/nihilo/images/treeExpand_loading.gif" />
 				<include name="dijit/themes/nihilo/images/tabContainerSprite.gif" />
 				<include name="dijit/themes/nihilo/images/spriteRoundedIconsSmall.png" />
 				<include name="dijit/themes/nihilo/images/titleBar.png" />
@@ -266,6 +271,7 @@
 				<include name="dijit/themes/nihilo/images/validationInputBg.png" />
 				<include name="dojox/widget/Standby/images/loading.gif" />
 				<include name="dojo/resources/blank.gif" />
+				<include name="dojo/resources/dojo.css" />
 				<include name="dijit/themes/nihilo/images/spriteDivIcons.gif" />
 				<include name="dijit/themes/nihilo/images/buttonHover.png" />
 				<include name="dijit/themes/nihilo/images/spriteTree.gif" />
