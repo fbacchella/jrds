@@ -226,6 +226,7 @@
 				<include name="dijit/themes/nihilo/images/titleBar.png" />
 				<include name="dijit/themes/nihilo/images/spriteCheckbox.gif" />
 				<include name="dijit/themes/nihilo/images/buttonEnabled.png" />
+				<include name="dijit/themes/nihilo/images/buttonActive.png" />
 				<include name="dijit/themes/nihilo/images/spriteArrows.png" />
 				<include name="dijit/themes/nihilo/images/validationInputBg.png" />
 				<include name="dojox/widget/Standby/images/loading.gif" />
@@ -267,6 +268,7 @@
 				<include name="dijit/themes/nihilo/images/titleBar.png" />
 				<include name="dijit/themes/nihilo/images/spriteCheckbox.gif" />
 				<include name="dijit/themes/nihilo/images/buttonEnabled.png" />
+				<include name="dijit/themes/nihilo/images/buttonActive.png" />
 				<include name="dijit/themes/nihilo/images/spriteArrows.png" />
 				<include name="dijit/themes/nihilo/images/validationInputBg.png" />
 				<include name="dojox/widget/Standby/images/loading.gif" />
