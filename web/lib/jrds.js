@@ -265,7 +265,6 @@ return declare("jrds.AutoscaleReset", button, {
 			delete queryParams.min;
 			dijit.byId("max").set('value', '');
 			dijit.byId("min").set('value', '');
-			if(queryParams.id && queryParams.id != 0 )
 				getGraphList();
 		}
 		else {
@@ -274,7 +273,6 @@ return declare("jrds.AutoscaleReset", button, {
 			if(queryParams.max != undefined && queryParams.min != undefined ) {
 				dijit.byId("max").set('value', queryParams.max);
 				dijit.byId("min").set('value', queryParams.min);				
-				if(queryParams.id && queryParams.id != 0 )
 					getGraphList();
 			}
 		}
@@ -314,31 +312,27 @@ return declare("jrds.ToogleSort", button, {
 });
 });
 
-function declare_FixedFileUploader(declare, dojo, dojox) {
-	return declare('kgf.dijit.FixedFileUploader', dojox.form.FileUploader, {
-	    // summary:
-	    //    Private class containing fixes to FileUploader behavior.
-	
-	    getHiddenWidget: function() {
-	      var widget = this.inherited(arguments);
-	      if (widget && dojo.position(widget.domNode).h > 0) {
-	        //false positive - sure the widget has onShow, but it's already shown!
-	        //(workaround to Dojo bug #11039)
-	        //TODO: will need to see if this check suffices for situations where
-	        //it's actually hidden (haven't used anywhere like that yet).
-	        return null;
-	      }
-	      return widget;
+define("jrds/ReloadButton",
+		[ "dojo/_base/declare",
+		  "dijit/form/Button" ],
+		function(declare, button) {
+return declare("jrds.ReloadButton", button, {
+	onClick: function() {
+		dojo.xhrGet( {
+			sync: false,
+			url: "reload?sync",
+			handleAs: "text",
+			preventCache: true,
+			load: function(response, ioArgs) {
+				refreshStatus();
+			},
+			error: function(response, ioArgs) {
+				console.error(response);
 	    }
 	});
 }
-
-define("jrds/FixedFileUploader",
-       [ "dojo/_base/declare",
-         "dojo",
-         "dojox",
-         "dojox/form/FileUploader" ],
-       declare_FixedFileUploader);
+});
+});
 
 function dayRegExp() {
 	return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
@@ -892,21 +886,6 @@ function treeTabCallBack(newTab) {
 		getTree(newTab.isFilters);
 }
 
-function sendReload(evt) {
-	var iq = dojo.xhrGet( {
-		sync: true,
-		url: "reload?sync",
-		handleAs: "text",
-		preventCache: true,
-		load: function(response, ioArgs) {
-			refreshStatus();
-		},
-		error: function(response, ioArgs) {
-			console.error(response);
-		}
-	});
-}
-
 function searchHost(evt) {
 	try {
 		queryParams.host = this.attr('value').host;
@@ -1052,29 +1031,6 @@ function setAdminTab() {
 	form.discoverSnmpCommunity.value = 'public';
 	form.discoverSnmpPort.value = '161';
 	dojo.style( dojo.byId('discoverResponse'), 'display', 'none');
-
-	//Set up the uploader
-	var uploader = dijit.byId('filesSelect');
-	if(! uploader) {
-		filesSelect = new kgf.dijit.FixedFileUploader({
-			uploadUrl: 'upload',
-			selectMultipleFiles: true,
-			force: 'html',
-			fileListId: 'filesList',
-			fileMask: [],
-			onChange: function(a) {
-				dojo.style('filesList', 'height', 'auto');
-			},
-			onComplete: filesLoaded
-		}, 'filesSelect');
-		//The uploader set a bad lineHeight
-		dojo.style('filesSelect', 'lineHeight', '');
-	}
-	else {
-		//Don't forget to clean the file list
-		var filesResult = dojo.byId('filesResult');
-		dojo.place('<div id="filesResult"></div>', filesResult, 'replace');
-	}
 }
 
 function filesLoaded(e) {
