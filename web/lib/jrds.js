@@ -217,24 +217,6 @@ return declare("jrdsTree", dijit.Tree, {
 });
 });
 
-define("jrds/MinMaxTextBox",
-       [ "dojo/_base/declare",
-         "dijit",
-         "dijit/form/ValidationTextBox" ],
-       function(declare, dijit) {
-return declare("jrds.MinMaxTextBox", dijit.form.ValidationTextBox, {
-		regExp: "(-?\\d+(.\\d+)?)([a-zA-Z]{0,2})",
-		trim: true,
-		onFocus: function() {setAutoscale(false);},
-		onChange: function(value) {
-			//value==0 is not a null value, keep it
-			if(! value && value != 0 )
-				value = null;
-			queryParams[this.id] = value;			
-		}
-});
-});
-
 define("jrds/StateURLButton",
 		[ "dojo/_base/declare",
 		  "dijit/form/Button",
@@ -263,31 +245,74 @@ return declare("jrds.StateURLButton", button, {
 	        //Call the asynchronous xhrPost
 	        var deferred = dojo.xhrPost(xhrArgs);
 	    }
-
 });
 });
 
-//called onChange for scale button
-function resetScale() {
-	if(dijit.byId("autoscale").attr('checked')) {
-		delete queryParams.max;
-		delete queryParams.min;
-		dijit.byId("max").attr('value', '');
-		dijit.byId("min").attr('value', '');
-		if(queryParams.id && queryParams.id != 0 )
-			getGraphList();
-	}
-	else {
-		dijit.byId("max").set('value', queryParams.max);
-		dijit.byId("min").set('value', queryParams.min);
-	}
-}
+define("jrds/AutoscaleReset",
+		[ "dojo/_base/declare",
+		  "dijit/form/ToggleButton" ],
+		function(declare, button) {
+return declare("jrds.AutoscaleReset", button, {
+	constructor: function() {
+		this.oldmax = queryParams.max;
+		this.oldmin = queryParams.min;		
+	},
+	onChange: function(checked) {
+		if(checked) {
+			this.oldmax = queryParams.max;
+			this.oldmin = queryParams.min;
+			delete queryParams.max;
+			delete queryParams.min;
+			dijit.byId("max").set('value', '');
+			dijit.byId("min").set('value', '');
+			if(queryParams.id && queryParams.id != 0 )
+				getGraphList();
+		}
+		else {
+			queryParams.max = this.oldmax;
+			queryParams.min = this.oldmin;
+			if(queryParams.max != undefined && queryParams.min != undefined ) {
+				dijit.byId("max").set('value', queryParams.max);
+				dijit.byId("min").set('value', queryParams.min);				
+				if(queryParams.id && queryParams.id != 0 )
+					getGraphList();
+			}
+		}
+	},
+	iconClass: "dijitCheckBoxIcon",
+});
+});
 
-//Called upon startup and focus on scale text boxes, will propagate good values using onChange function : resetScale and updateScale, 
-function setAutoscale(value) {
-	var autoscale = dijit.byId("autoscale");
-	autoscale.set('checked',value);
-}
+define("jrds/MinMaxTextBox",
+	       [ "dojo/_base/declare",
+	         "dijit",
+	         "dijit/form/ValidationTextBox" ],
+	       function(declare, dijit) {
+return declare("jrds.MinMaxTextBox", dijit.form.ValidationTextBox, {
+		regExp: "(-?\\d+(.\\d+)?)([a-zA-Z]{0,2})",
+		trim: true,
+		onFocus: function() {
+			dijit.byId("autoscale").set('checked',false);
+		},
+		onChange: function(value) {
+			if(value != undefined && value != "")
+				queryParams[this.id] = value;			
+		}
+});
+});
+
+define("jrds/ToogleSort",
+		[ "dojo/_base/declare",
+		  "dijit/form/ToggleButton" ],
+		function(declare, button) {
+return declare("jrds.ToogleSort", button, {
+	onChange: function(checked) {
+		queryParams.sort = checked;
+		getGraphList();		
+	},
+	iconClass: "dijitCheckBoxIcon",
+});
+});
 
 function declare_FixedFileUploader(declare, dojo, dojox) {
 	return declare('kgf.dijit.FixedFileUploader', dojox.form.FileUploader, {
@@ -369,13 +394,23 @@ function initQuery() {
 		handleAs: "json",
 		preventCache: false,
 		load: function(response, ioArgs) {
-			queryParams = response;
-			if(queryParams.path && queryParams.path.length > 1 ) {
-				var last = queryParams.path[queryParams.path.length -1];
-				queryParams.id = last.replace(/.*\./, "");
+			for(var key in response) {
+				value = response[key];
+				if(key == 'begin' || key == 'end') {
+					queryParams[key] = new Date(value);
+				}
+				else if(key == 'sorted' || key == 'autoscale') {
+					queryParams[key] = parseBool(value);
+				}
+				else if(key == 'path' && value.length > 1) {
+					var last = value[value.length -1];
+					queryParams.id = last.replace(/.*\./, "");
+					queryParams.path = value;
+				}
+				else if(value)
+					queryParams[key] = value;
+
 			}
-			queryParams.begin = new Date(queryParams.begin);
-			queryParams.end = new Date(queryParams.end);
 			return response;
 		},
 		error: function(response, ioArgs) {
@@ -534,9 +569,19 @@ function fileForms() {
 	var autoperiod = dijit.byId('autoperiod'); 
 	autoperiod.attr('value', queryParams.autoperiod);
 
-	setAutoscale(queryParams.max == null || queryParams.min == null);
-		
-	dijit.byId("sorted").attr('checked', parseBool(queryParams.sort));
+	if(queryParams.max != undefined && queryParams.min != undefined) {
+		dijit.byId("autoscale").set('checked', false);
+		dijit.byId("min").set('value', queryParams.min);
+		dijit.byId("max").set('value', queryParams.max);
+	}
+	else {
+		dijit.byId("autoscale").set('checked', true);
+		dijit.byId("min").set('value', '');
+		dijit.byId("max").set('value', '');
+	}
+
+	dijit.byId("sorted").set('checked', parseBool(queryParams.sort));
+	
 }
 
 function setupDisplay() {
@@ -670,11 +715,6 @@ function loadTree(item,  node){
 		getGraphList();
 		queryParams.path = getTreeNodeUp(node);		
 	}
-}
-
-function toogleSort() {
-	queryParams.sort = dijit.byId("sorted").attr('checked');
-	getGraphList();
 }
 
 function setupCalendar() {
@@ -1002,11 +1042,6 @@ function discoverHost(evt) {
 }
 
 var filesSelect;
-
-function doUpload(){
-	dojo.byId("filesList").innerHTML = "uploading...";
-	filesSelect.upload();
-}
 
 function setAdminTab() {
 	refreshStatus();

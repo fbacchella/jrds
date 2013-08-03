@@ -18,24 +18,8 @@ amdVector = [
  "dijit",
  "dojox",
  "dojo/cookie",
-// "dojo/number",
  "dojo/parser",
  "dojo/data/ItemFileReadStore",
-// "dijit/Dialog",
-// "dijit/TitlePane",
-// "dijit/layout/BorderContainer",
-// "dijit/layout/ContentPane",
-// "dijit/layout/TabContainer",
-// "dijit/form/ValidationTextBox",
-// "dijit/form/TimeTextBox",
-// "dijit/form/DateTextBox",
-// "dijit/form/Button",
-// "dijit/form/TextBox",
-// "dijit/form/Select",
-// "dojox/form/FileUploader",
-// "dijit/form/Form",
-// "dijit/form/NumberTextBox",
-// "dijit/Tree",
  "dojox/widget/Standby",
  "jrds/HourBox",
  "jrds/DayHourTextBox",
@@ -56,17 +40,6 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
 }
 );
 
-//require([ "dijit/layout/TabContainer",
-//          "dijit/layout/ContentPane",
-//          "dijit/TitlePane",
-//          "dijit/form/Button",
-//          "dijit/form/Form",
-//          "dijit/form/Button",
-//          "dijit/form/TextBox",
-//          "dijit/layout/BorderContainer",
-//          "dijit/form/Select",
-//        ]);
-
 </script>
 <script type="text/javascript">
 //Used to get a clean copy of the pane that will be in each tab
@@ -77,37 +50,25 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
 <body class="nihilo">
 	<div id='tabs' data-dojo-type="dijit/layout/TabContainer" style="width: 100%; height: 100%;" region="center">
   		<div data-dojo-type="dijit/layout/ContentPane" title="Administration" id="adminTab" selected="false">
-				<div id="statusPane" data-dojo-type="dijit/TitlePane" title="Status">
-					<div id="status" >
+			<div id="statusPane" data-dojo-type="dijit/TitlePane" title="Status">
+				<div id="status" >
+				</div>
+			</div>
+			<div data-dojo-type="dijit/TitlePane" title="Command">
+				<button data-dojo-type="dijit/form/Button" type="button" onClick="sendReload"> Reload </button>
+			</div>
+			<div data-dojo-type="dijit/TitlePane" title="Discover an host">
+				<form action="" data-dojo-type="dijit/form/Form"  id="discoverForm" method="" onSubmit=discoverHost>
+					<button type="submit" data-dojo-type="dijit/form/Button" >Discover</button>
+					<div>
+						<label for="discoverHostName">Host name</label>
+						<input data-dojo-type="dijit/form/TextBox" trim="true" id="discoverHostName" name="discoverHostName"></input>
 					</div>
-<!-- dojoType="dijit.form.Button" type="button" onClick="refreshStatus"-->
-<!--					<button id="refreshButton"> Refresh </button>-->
-				</div>
-				<div data-dojo-type="dijit/TitlePane" title="Command">
-					<button data-dojo-type="dijit/form/Button" type="button" onClick="sendReload"> Reload </button>
-				</div>
-				<div data-dojo-type="dijit/TitlePane" title="Discover an host">
-					<form action="" data-dojo-type="dijit/form/Form"  id="discoverForm" method="" onSubmit=discoverHost>
-						<button type="submit" data-dojo-type="dijit/form/Button" >Discover</button>
-						<div>
-							<label for="discoverHostName">Host name</label>
-							<input data-dojo-type="dijit/form/TextBox" trim="true" id="discoverHostName" name="discoverHostName"></input>
-						</div>
-<div id="discoverAutoBlock">
-</div>
- 					</form>
- 					<pre id="discoverResponse"></pre>
-				</div>
-				<div data-dojo-type="dijit/TitlePane" title="Upload elements">
-					<div style="padding-bottom: 5px;">
-						<div>Selected files: </div>
-						<div id="filesList">  </div>		
-						<div id="filesSelect" >Select Elements</div>
-						<div onClick="doUpload();" data-dojo-type="dijit/form/Button">Upload</div>
+					<div id="discoverAutoBlock">
 					</div>
-					<div>Uploaded: </div>
-					<div id="filesResult"></div>
-				</div>
+				</form>
+				<pre id="discoverResponse"></pre>
+			</div>
 		</div> <!-- adminTab -->
 	</div>
   <!--  The content of tab panes, it can be any where, it will be destroyed -->
@@ -158,9 +119,7 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
         				</div>
         				<div data-dojo-type="dijit/layout/ContentPane" class="formblock" >
         					<span class="linelabel">Vertical scale</span>
-          					<button id="autoscale" data-dojo-type="dijit/form/ToggleButton"  checked name="autoscale"
-  				  					onChange="resetScale();" 
-  				  					iconClass="dijitCheckBoxIcon"> Auto </button>
+          					<button id="autoscale" data-dojo-type="jrds/AutoscaleReset"> Auto </button>
           					<label class="paramslabel" for="min">Min</label>
           					<input id="min" type="text" name="min" class="field"
     			 					data-dojo-type="jrds/MinMaxTextBox"
@@ -170,12 +129,11 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
     			 					data-dojo-type="jrds/MinMaxTextBox"
     			 					size="14" />
         				</div>
-				        <div data-dojo-type="dijit/layout/ContentPane" class="formblock" > <span class="linelabel">Sort</span>
-        					<button id="sorted" data-dojo-type="dijit/form/ToggleButton"  name="sorted"
-  									onChange="toogleSort();" 
-  									iconClass="dijitCheckBoxIcon"> Sorted graphs </button>
+				        <div data-dojo-type="dijit/layout/ContentPane" class="formblock" >
+				        	<span class="linelabel">Sort</span>
+        					<button id="sorted" data-dojo-type="jrds/ToogleSort"> Sorted graphs </button>
         				</div>
-				        <button type="submit" data-dojo-type="dijit/form/Button" >Render</button>
+				        <button type="submit" data-dojo-type="dijit/form/Button" >Refresh</button>
 				        <button data-dojo-type="jrds/StateURLButton" >State URL</button>
 					</form>
 				</div> <!-- "paramsPane" -->
