@@ -21,11 +21,12 @@ amdVector = [
  "dojo/parser",
  "dojo/data/ItemFileReadStore",
  "dojox/widget/Standby",
- "jrds/HourBox",
- "jrds/DayHourTextBox",
+ "jrds/TimeTextBox",
+ "jrds/DateTextBox",
  "jrds/jrdsTree",
  "jrds/ToogleSort",
  "jrds/ReloadButton",
+ "jrds/RootButton",
  "dijit/layout/ContentPane",
  "dojo/domReady!"
 ]
@@ -74,7 +75,7 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
 		<div id="mainPane" data-dojo-type="dijit/layout/BorderContainer" design="sidebar" gutters="false" >
 			<div id="treePane" data-dojo-type="dijit/layout/ContentPane" region="leading" splitter="true" >
 				<form data-dojo-type="dijit/form/Form" id="hostForm" action="" method="" onSubmit="searchHost">
-					<a id="toroot" href="javascript:goHome()"><img src="img/back_to_album.png" alt="" height="14" width="16" border="0" /></a>
+					<button id="toroot" data-dojo-type="jrds/RootButton" data-dojo-props="iconClass: 'rootButtonIcon', showLabel: false" type="button">go root</button>
       				<label for="host">Only host</label>
       				<input id="host" type="text" name="host" size="24" data-dojo-type="dijit/form/TextBox" trim="true" required="true" />
         			<button type="submit" data-dojo-type="dijit/form/Button">Search</button>
@@ -84,7 +85,7 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
 			<div id="centerPane" data-dojo-type="dijit/layout/ContentPane" region="center">
 				<div data-dojo-type="dijit/layout/ContentPane" id="paramsPane" >
 					<form data-dojo-type="dijit/form/Form" id="dateForm" name="dateForm" action="" method="" onSubmit="submitRenderForm">
-						<div  data-dojo-type="dijit/layout/ContentPane" class="formblock" >
+						<div data-dojo-type="dijit/layout/ContentPane" class="formblock" >
 							<span class="linelabel">Time scale</span>
        						<select id="autoperiod" name="autoperiod" data-dojo-type="jrds/Autoperiod">
 								<option value="0" id="period.0">Manual</option>
@@ -106,14 +107,14 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
 								<option value="16" id="period.16">Last Year</option>
 								<option value="17" id="period.17">Last 2 Years</option>
        						</select>
-          					<label class="paramslabel" for="begin">Begin</label>
-          					<button id="periodprevious" data-dojo-type="jrds/PeriodNavigation" data-dojo-props="iconClass: 'previousPeriodNavigation', showLabel: false" type="button">previous</button>
-          					<input type="text" name="begin" id="begin" class="fieldDay" />
-          					<input type="text" name="beginh" id="beginh"/>
-          					<label class="paramslabel" for="end">End</label>
-          					<input type="text" name="end" id="end"  class="fieldDay" />
-          					<input type="text" name="endh" id="endh"/>
-          					<button id="periodnext" data-dojo-type="jrds/PeriodNavigation" data-dojo-props="iconClass: 'nextPeriodNavigation', showLabel: false" type="button">next</button>
+          					<label class="paramslabel" for="begin">From</label>
+          					<button id="periodprevious" type="button" data-dojo-type="jrds/PeriodNavigation" data-dojo-props="iconClass: 'previousPeriodNavigation'">previous</button>
+          					<input type="text" name="begin" id="begin" data-dojo-type="jrds/DateTextBox" data-dojo-props="resetHour: '00:00', timeBoxName: 'beginh'" />
+          					<input type="text" name="beginh" id="beginh" data-dojo-type="jrds/TimeTextBox" data-dojo-props="queryId: 'begin'" />
+          					<label class="paramslabel" for="end">To</label>
+          					<input type="text" name="end" id="end" data-dojo-type="jrds/DateTextBox" data-dojo-props="resetHour: '23:59', timeBoxName: 'endh'" />
+          					<input type="text" name="endh" id="endh"  data-dojo-type="jrds/TimeTextBox" data-dojo-props="queryId: 'end'"/>
+          					<button id="periodnext" type="button" data-dojo-type="jrds/PeriodNavigation" data-dojo-props="iconClass: 'nextPeriodNavigation'">next</button>
         				</div>
         				<div data-dojo-type="dijit/layout/ContentPane" class="formblock" >
         					<span class="linelabel">Vertical scale</span>

@@ -33,6 +33,19 @@ body, input, option, select, tab, div, td, a, textarea {
 	padding:5px;
 	width:330px;
 }
+
+.rootButtonIcon {
+	background-image: url("../img/back_to_album.png");
+    background-repeat: no-repeat;
+    height: 14px;
+    width: 16px;
+}
+
+.rootButton .dijitButtonNode {
+	border: 0px none;
+	background: none;
+}
+
 #graphPane {
 	width:703px;
 }
@@ -115,6 +128,7 @@ body, input, option, select, tab, div, td, a, textarea {
 	border:0 none;
 	width: 703px;
 }
+
 .filterFolder {
 	background: url('../img/folder_go.png') no-repeat top left;
 }
