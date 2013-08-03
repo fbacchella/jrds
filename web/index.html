@@ -74,7 +74,7 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
    <div data-dojo-type="dijit/layout/ContentPane" id='mainTab' title="Main tree" selected="true"">
 		<div id="mainPane" data-dojo-type="dijit/layout/BorderContainer" design="sidebar" gutters="false" >
 			<div id="treePane" data-dojo-type="dijit/layout/ContentPane" region="leading" splitter="true" >
-				<form data-dojo-type="dijit/form/Form" id="hostForm" action="" method="" onSubmit="searchHost">
+				<form id="hostForm" action="" method="" data-dojo-type="jrds/HostForm">
 					<button id="toroot" data-dojo-type="jrds/RootButton" data-dojo-props="iconClass: 'rootButtonIcon', showLabel: false" type="button">go root</button>
       				<label for="host">Only host</label>
       				<input id="host" type="text" name="host" size="24" data-dojo-type="dijit/form/TextBox" trim="true" required="true" />

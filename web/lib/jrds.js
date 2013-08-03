@@ -369,6 +369,28 @@ return declare("jrds.ReloadButton", button, {
 });
 });
 
+define("jrds/HostForm",
+		[ "dojo/_base/declare",
+		  "dijit/form/Form" ],
+		function(declare, button) {
+return declare("jrds.HostForm", button, {
+	onSubmit: function(){
+		try {
+			queryParams.host = this.attr('value').host;
+			delete queryParams.filter;
+			delete queryParams.id;
+			delete queryParams.tab;
+			getTree(false);
+		}
+		catch(err) {
+			console.error(err);
+		}
+		return false;		
+	}
+});
+});
+
+
 function initIndex() {
 	initQuery();
 	dojo.cookie("treeOneSaveStateCookie", null, {expires: -1});
@@ -875,20 +897,6 @@ function treeTabCallBack(newTab) {
 		getTree(newTab.isFilters);
 }
 
-function searchHost(evt) {
-	try {
-		queryParams.host = this.attr('value').host;
-		delete queryParams.filter;
-		delete queryParams.id;
-		delete queryParams.tab;
-		getTree(false);
-	}
-	catch(err) {
-		console.error(err);
-	}
-	return false;
-}
-
 function refreshStatus() {
 	dojo.xhrGet( {
 		url: "status?json",
@@ -993,8 +1001,6 @@ function discoverHost(evt) {
 	}
 	return false;
 }
-
-var filesSelect;
 
 function setAdminTab() {
 	refreshStatus();
