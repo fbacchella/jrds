@@ -51,9 +51,9 @@ import org.w3c.dom.Element;
 public abstract class Probe<KeyType, ValueType> extends StarterNode implements Comparable<Probe<KeyType, ValueType>>  {
 
     private static final ArcDef[] DEFAULTARC = {
-            new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 3),
-            new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 24 * 365), 
-            new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 365 * 2)
+        new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 3),
+        new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 24 * 365), 
+        new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 365 * 2)
     };
 
     private String name = null;
@@ -68,7 +68,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * A special case constructor, mainly used by virtual probe
-     * @param monitoredHost
      * @param pd
      */
     public Probe(ProbeDesc pd) {
@@ -76,11 +75,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         setPd(pd);
     }
 
-    /**
-     * A special case constructor, mainly used by virtual probe
-     * @param monitoredHost
-     * @param pd
-     */
     public Probe() {
         super();
     }
@@ -677,7 +671,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     public boolean readSpecific() {
         return true;
     }
-    
+
     /**
      * A probe can override it to extract custom values from the properties.
      * It will be read just after it's created and before configuration.
@@ -685,7 +679,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * @param pm
      */
     public void readProperties(PropertiesManager pm) {
-        
+
     }
 
     /**
