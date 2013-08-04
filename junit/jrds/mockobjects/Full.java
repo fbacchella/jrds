@@ -2,6 +2,7 @@ package jrds.mockobjects;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -16,7 +17,7 @@ import jrds.Period;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.starter.HostStarter;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
@@ -131,9 +132,11 @@ public class Full {
 
         end = jrds.Util.normalize(end, p.getStep());
 
-        Period pr = new Period();
-        pr.setEnd(end);
-        pr.setBegin(begin);
+        Period pr = null;
+        try {
+            pr = new Period(Long.toString(begin.getTime()), Long.toString(end.getTime()));
+        } catch (ParseException e) {
+        }
         return pr;
 	}
 	
