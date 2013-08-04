@@ -390,6 +390,80 @@ return declare("jrds.HostForm", button, {
 });
 });
 
+define("jrds/RenderForm",
+		[ "dojo/_base/declare",
+		  "dijit/form/Form" ],
+		function(declare, form) {
+return declare("jrds.RenderForm", form, {
+	onSubmit: function(){
+		try {
+			if( queryParams.id == null )
+				return false;
+			if(queryParams.autoperiod == 0 && (queryParams.begin == null || queryParams.end == null) )
+				return false;
+			if( (queryParams.max != null && queryParams.min == null) || (queryParams.max == null && queryParams.min != null) )
+				return false;
+			getGraphList();
+		}
+		catch(err) {
+			console.error(err);
+		}
+		return false;	
+	}
+});
+});
+
+define("jrds/DiscoverHostForm",
+		[ "dojo/_base/declare",
+		  "dijit/form/Form",
+		  "dojo/dom-style",
+		  "dojo",
+		  "dojo/dom" ],
+		function(declare, form, dojoStyle, dojo) {
+return declare("jrds.DiscoverHostForm", form, {
+	onSubmit: function(){
+		// try/catch is mandatory, failure here really submit the form
+		try {
+			if(document.activeElement.id == 'discoverClear') {
+				dojo.place("<pre id='discoverResponse' />", dojo.byId('discoverResponse'), "replace");
+				dojoStyle.set( dojo.byId('discoverResponse'), 'display', 'none');
+			}
+			else {
+				if(! this.validate()) {
+		            return false;
+				}
+				var queryArgs = { };
+				formValues = this.get('value');
+				for(key in formValues) {
+					if(dijit.byId(key).get('checked') == undefined)
+						queryArgs[key] = formValues[key];
+					else
+						queryArgs[key] = dijit.byId(key).get('checked');
+				}
+				queryArgs.host = formValues.discoverHostName;
+
+				dojo.xhrGet( {
+					url: "discover?" + dojo.objectToQuery(queryArgs),
+					handleAs: "text",
+					load: function(response, ioArgs) {
+						var codeTag = dojo.byId('discoverResponse');
+						dojoStyle.set( codeTag, 'display', 'block');
+						var toPlace = response.replace(/</g, "&lt;").replace(/>/g,"&gt;").replace('/\n/mg','<br>');
+						dojo.place("<pre id='discoverResponse'>" + toPlace + "</pre>", codeTag, "replace");
+					},
+					error: function(response, ioArgs) {
+						console.error(response);
+					}
+				});			
+			}
+		}
+		catch(err) {
+			console.error(err);
+		}
+		return false;
+	}
+});
+});
 
 function initIndex() {
 	initQuery();
@@ -763,13 +837,11 @@ function loadTree(item,  node){
 	}
 }
 
-function details(url)
-{
+function details(url) {
 	var detailsWin = window.open("details?" + url, "_blank", "width=400,resizable=yes,menubar=no,scrollbars=yes");
 }
 
-function popup(url,id)
-{
+function popup(url,id) {
 	var img;
 	if(id)
 		img = document.getElementById(id);
@@ -786,30 +858,12 @@ function popup(url,id)
 	return popupWin = window.open("popup.html?" + url, "_blank", height + "," + width + ",menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
 }
 
-function save(url)
-{
+function save(url) {
 	var popupWin = window.open("download?" + url, "_blank", "menubar=no,status=no,resizable=no,scrollbars=no");
 }
 
-function history(url)
-{
+function history(url) {
 	var historyWin = window.open("history.html?" + url, "_blank", "width=750,menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
-}
-
-function submitRenderForm(evt) {
-	try {
-		if( queryParams.id == null )
-			return false;
-		if(queryParams.autoperiod == 0 && (queryParams.begin == null || queryParams.end == null) )
-			return false;
-		if( (queryParams.max != null && queryParams.min == null) || (queryParams.max == null && queryParams.min != null) )
-			return false;
-		getGraphList();
-	}
-	catch(err) {
-		console.error(err);
-	}
-	return false;	
 }
 
 function setupTabs() {
@@ -859,7 +913,7 @@ function setupTabs() {
 	}
 }
 
-function transitTab(newPage, oldPage){
+function transitTab(newPage, oldPage) {
     var newId = newPage.attr('id');
     var oldId = oldPage.attr('id');
     if(oldId != 'adminTab') {
@@ -967,39 +1021,6 @@ function updateStatus(statusInfo) {
         label: "Refresh",
         onClick: refreshStatus
     }, "refreshButton");
-}
-
-function discoverHost(evt) {
-	try {
-		var queryArgs = { };
-		
-		for(key in this.attr('value')) {
-			if(dijit.byId(key).attr('checked') == undefined)
-				queryArgs[key] = this.attr('value')[key];
-			else
-				queryArgs[key] = dijit.byId(key).attr('checked');
-		}
-		queryArgs.host = this.attr('value').discoverHostName;
-
-		dojo.xhrGet( {
-			url: "discover?" + dojo.objectToQuery(queryArgs),
-			//url: "discover?" + dojo.objectToQuery(this.attr('value')),
-			handleAs: "text",
-			load: function(response, ioArgs) {
-				var codeTag = dojo.byId('discoverResponse');
-				dojo.style( codeTag, 'display', 'block');
-				var toPlace = response.replace(/</g, "&lt;").replace(/>/g,"&gt;").replace('/\n/mg','<br>');
-				dojo.place("<pre id='discoverResponse'>" + toPlace + "</pre>", codeTag, "replace");
-			},
-			error: function(response, ioArgs) {
-			}
-		});
-	}
-	catch(err) {
-		console.log(err);
-		console.error(err);
-	}
-	return false;
 }
 
 function setAdminTab() {

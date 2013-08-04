@@ -49,9 +49,11 @@ body, input, option, select, tab, div, td, a, textarea {
 #graphPane {
 	width:703px;
 }
+
 #paramsPane {
 	width:703px;
 }
+
 .box {
 	background-color: white;
 	border: 2px solid black;
@@ -188,9 +190,6 @@ body, input, option, select, tab, div, td, a, textarea {
 	margin:0.2em;
 }
 
-/* BUG http://bugs.dojotoolkit.org/ticket/13109 */
- body .dijitContentPane .dijitAlignTop, body .dijitContentPane .dijitAlignBottom, body .dijitContentPane .dijitAlignLeft, body .dijitContentPane .dijitAlignRight {
-overflow: auto !important;
+#discoverResponse {
+	border-width: 1px;
 }
-
-

@@ -21,13 +21,24 @@ amdVector = [
  "dojo/parser",
  "dojo/data/ItemFileReadStore",
  "dojox/widget/Standby",
+ "jrds/HostForm",
+ "jrds/Autoperiod",
  "jrds/TimeTextBox",
  "jrds/DateTextBox",
  "jrds/jrdsTree",
+ "jrds/DiscoverHostForm",
+ "jrds/PeriodNavigation",
+ "jrds/StateURLButton",
  "jrds/ToogleSort",
  "jrds/ReloadButton",
+ "jrds/RenderForm",
  "jrds/RootButton",
+ "jrds/AutoscaleReset",
+ "jrds/MinMaxTextBox",
+ "dijit/layout/BorderContainer",
  "dijit/layout/ContentPane",
+ "dijit/layout/TabContainer",
+ "dijit/TitlePane",
  "dojo/domReady!"
 ]
 
@@ -57,11 +68,12 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
 				<button data-dojo-type="jrds.ReloadButton" type="button"> Reload </button>
 			</div>
 			<div data-dojo-type="dijit/TitlePane" title="Discover an host">
-				<form action="" data-dojo-type="dijit/form/Form"  id="discoverForm" method="" onSubmit=discoverHost>
-					<button type="submit" data-dojo-type="dijit/form/Button" >Discover</button>
+				<form action=""  id="discoverForm" method="" data-dojo-type="jrds/DiscoverHostForm">
+					<button type="submit" name="discoverHost" id="discoverHost" data-dojo-type="dijit/form/Button" >Discover</button>
+					<button type="submit" name="discoverClear" id="discoverClear" data-dojo-type="dijit/form/Button" >Clear Host</button>
 					<div>
 						<label for="discoverHostName">Host name</label>
-						<input data-dojo-type="dijit/form/TextBox" trim="true" id="discoverHostName" name="discoverHostName"></input>
+						<input id="discoverHostName" name="discoverHostName" trim="true" required="true" data-dojo-type="dijit/form/ValidationTextBox" ></input>
 					</div>
 					<div id="discoverAutoBlock">
 					</div>
@@ -84,7 +96,7 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
 			</div> <!-- treePane -->
 			<div id="centerPane" data-dojo-type="dijit/layout/ContentPane" region="center">
 				<div data-dojo-type="dijit/layout/ContentPane" id="paramsPane" >
-					<form data-dojo-type="dijit/form/Form" id="dateForm" name="dateForm" action="" method="" onSubmit="submitRenderForm">
+					<form id="dateForm" name="dateForm" action="" method="" data-dojo-type="jrds/RenderForm" >
 						<div data-dojo-type="dijit/layout/ContentPane" class="formblock" >
 							<span class="linelabel">Time scale</span>
        						<select id="autoperiod" name="autoperiod" data-dojo-type="jrds/Autoperiod">
