@@ -1,5 +1,7 @@
 // cd $DOJOSRC
 // LANG=C $DOJOSRC/util/buildscripts/build.sh  --profile $JRDS_HOME/jrds.profile.js --bin java basePath=$PWD
+// rsync -av release/jrds/dojo/dojo.js $JRDS_HOME/web/dojo/dojo.js
+// rsync -av release/jrds/dojo/nls/dojo_en-us.js $JRDS_HOME/web/dojo/nls/dojo_en-us.js
 // rsync -av --exclude '*.js.uncompressed.js' --delete release/jrds/{dojo,dojox,dijit} /var/jrds/
 dependencies = [
     "dojo/main",

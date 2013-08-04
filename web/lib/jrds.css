@@ -33,12 +33,27 @@ body, input, option, select, tab, div, td, a, textarea {
 	padding:5px;
 	width:330px;
 }
+
+.rootButtonIcon {
+	background-image: url("../img/back_to_album.png");
+    background-repeat: no-repeat;
+    height: 14px;
+    width: 16px;
+}
+
+.rootButton .dijitButtonNode {
+	border: 0px none;
+	background: none;
+}
+
 #graphPane {
 	width:703px;
 }
+
 #paramsPane {
 	width:703px;
 }
+
 .box {
 	background-color: white;
 	border: 2px solid black;
@@ -49,7 +64,7 @@ body, input, option, select, tab, div, td, a, textarea {
 	background-color:#F5F5F5;
 	border:1px solid #AAAAAA;
 	margin:5px;
-	width:575px;
+	width:635px;
 	height:28px;
 }
 
@@ -73,11 +88,32 @@ body, input, option, select, tab, div, td, a, textarea {
 }
 
 .fieldDay {
-	width: 70px
+	width: 80px
 }
 
 #autoperiod {
 	width: 100px;
+}
+
+.periodNavigation .dijitButtonNode {
+	border: 0px none;
+	background: none;
+}
+
+.previousPeriodNavigation {
+	background-image: url("../img/date_previous.png");
+    background-repeat: no-repeat;
+    height: 16px;
+    text-align: center;
+    width: 16px;
+}
+
+.nextPeriodNavigation {
+	background-image: url("../img/date_next.png");
+    background-repeat: no-repeat;
+    height: 16px;
+    text-align: center;
+    width: 16px;
 }
 
 .iconslist {
@@ -94,6 +130,7 @@ body, input, option, select, tab, div, td, a, textarea {
 	border:0 none;
 	width: 703px;
 }
+
 .filterFolder {
 	background: url('../img/folder_go.png') no-repeat top left;
 }
@@ -153,9 +190,6 @@ body, input, option, select, tab, div, td, a, textarea {
 	margin:0.2em;
 }
 
-/* BUG http://bugs.dojotoolkit.org/ticket/13109 */
- body .dijitContentPane .dijitAlignTop, body .dijitContentPane .dijitAlignBottom, body .dijitContentPane .dijitAlignLeft, body .dijitContentPane .dijitAlignRight {
-overflow: auto !important;
+#discoverResponse {
+	border-width: 1px;
 }
-
-

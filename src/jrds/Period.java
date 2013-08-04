@@ -1,14 +1,7 @@
-/*##########################################################################
- _##
- _##  $Id$
- _##
- _##########################################################################*/
-
 package jrds;
 
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -16,12 +9,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDate;
+import org.joda.time.LocalTime;
 
 /**
- * This class manage a thread that runs in the background and is used to commit to disk the RRD datas modifications.
+ * Class used to manage a time interval
  *
  * @author Fabrice Bacchella
- * @version $Revision$
  */
 public class Period {
     static final private Logger logger = Logger.getLogger(Period.class);
@@ -30,115 +26,96 @@ public class Period {
     static private final Pattern datePatternBoth = Pattern.compile( dateRegexpBoth+ "[T ]?" + timeRegexp + "(.*)");
     static private final Pattern secondsPattern = Pattern.compile( "\\d+");
 
-    private static class PeriodItem {
-        String name;
-        int unit;
-        int number;
-        PeriodItem(String name, int unit, int number) {
+    public enum PeriodItem {
+        MANUAL("Manual", new org.joda.time.Period()),
+        HOUR("Last Hour", org.joda.time.Period.hours(1)),
+        HOURS2("Last 2 Hours", org.joda.time.Period.hours(2)),
+        HOURS3("Last 3 Hours", org.joda.time.Period.hours(3)),
+        HOURS4("Last 4 Hours", org.joda.time.Period.hours(4)),
+        HOURS6("Last 6 Hours", org.joda.time.Period.hours(6)),
+        HOURS12("Last 12 Hours", org.joda.time.Period.hours(12)),
+        DAY("Last Day", org.joda.time.Period.days(1)),
+        DAYS2("Last 2 Days", org.joda.time.Period.days(2)),
+        WEEK("Last Week", org.joda.time.Period.weeks(1)),
+        WEEKS2("Last 2 Weeks", org.joda.time.Period.weeks(2)),
+        MONTH("Last Month", org.joda.time.Period.months(1)),
+        MONTH2("Last 2 Months", org.joda.time.Period.months(2)),
+        MONTH3("Last 3 Months", org.joda.time.Period.months(3)),
+        MONTH4("Last 4 Months", org.joda.time.Period.months(4)),
+        MONTH6("Last 6 Months", org.joda.time.Period.months(6)),
+        YEAR("Last Year", org.joda.time.Period.years(1)),
+        YEARS2("Last 2 Years", org.joda.time.Period.years(2));
+        public final String name;
+        public final org.joda.time.Period p;
+        PeriodItem(String name, org.joda.time.Period p) {
             this.name = name;
-            this.unit = unit;
-            this.number = number;
+            this.p = p;
         }
-        Date getBegin(Date end) {
-            Calendar calBegin = Calendar.getInstance();
-            calBegin.setTime(end);
-            calBegin.add(unit, number);
-            return calBegin.getTime();
-        }
-    }
-    static final private List<Period.PeriodItem> periodList = new ArrayList<Period.PeriodItem>(18);
-    static {
-        periodList.add(new Period.PeriodItem("Manual", Calendar.HOUR, -1));
-        periodList.add(new Period.PeriodItem("Last Hour", Calendar.HOUR, -1));
-        periodList.add(new Period.PeriodItem("Last 2 Hours", Calendar.HOUR, -2));
-        periodList.add(new Period.PeriodItem("Last 3 Hours", Calendar.HOUR, -3));
-        periodList.add(new Period.PeriodItem("Last 4 Hours", Calendar.HOUR, -4));
-        periodList.add(new Period.PeriodItem("Last 6 Hours", Calendar.HOUR, -6));
-        periodList.add(new Period.PeriodItem("Last 12 Hours", Calendar.HOUR, -12));
-        periodList.add(new Period.PeriodItem("Last Day", Calendar.DAY_OF_MONTH, -1));
-        periodList.add(new Period.PeriodItem("Last 2 Days", Calendar.DAY_OF_MONTH, -2));
-        periodList.add(new Period.PeriodItem("Last Week", Calendar.WEEK_OF_MONTH, -1));
-        periodList.add(new Period.PeriodItem("Last 2 Weeks", Calendar.WEEK_OF_MONTH, -2));
-        periodList.add(new Period.PeriodItem("Last Month", Calendar.MONTH, -1));
-        periodList.add(new Period.PeriodItem("Last 2 Months", Calendar.MONTH, -2));
-        periodList.add(new Period.PeriodItem("Last 3 Months", Calendar.MONTH, -3));
-        periodList.add(new Period.PeriodItem("Last 4 Months", Calendar.MONTH, -4));
-        periodList.add(new Period.PeriodItem("Last 6 Months", Calendar.MONTH, -6));
-        periodList.add(new Period.PeriodItem("Last Year", Calendar.YEAR, -1));
-        periodList.add(new Period.PeriodItem("Last 2 Years", Calendar.YEAR, -2));
     }
 
-    private Date begin = null;
-    private Date end = null;
-    private int calPeriod = 7;
+    /**
+     * 
+     */
+    private final DateTime begin;
+    private final DateTime end;
+    private final int calPeriod;
+    private final org.joda.time.Period period;
 
     public Period() {
-        end = new Date();
+        calPeriod = 7;
+        period = PeriodItem.values()[calPeriod].p;
+        end = new DateTime().minusSeconds(1);
+        begin = new DateTime().minus(period);
     }
 
     public Period(int p) {
+        if(p > PeriodItem.values().length) {
+            throw new RuntimeException("Period invalid: " + p);
+        }
         calPeriod = p;
-        end = new Date();
+        period = PeriodItem.values()[calPeriod].p;
+        end = new DateTime().minusSeconds(1);
+        begin = new DateTime().minus(period);
     }
 
     public Period(String begin, String end) throws ParseException {
-        setBegin(begin);
-        setEnd(end);
+        this.begin = string2Date(begin, true);
+        this.end = string2Date(end, false);
         this.calPeriod = 0;
+        period = (new org.joda.time.Period(this.begin, this.end.plusSeconds(1)));
+        logger.trace(Util.delayedFormatString("Period is %s", period));
+    }
+
+    private Period(DateTime begin, DateTime end) {
+        this.begin = begin;
+        this.end = end;
+        this.calPeriod = 0;
+        period = (new org.joda.time.Period(this.begin, this.end.plusSeconds(1)));
+        logger.trace(Util.delayedFormatString("Period is %s", period));        
+    }
+
+    public Period previous() {
+        Period next = new Period(begin.minus(period), end.minus(period));
+        return next;
+    }
+
+    public Period next() {
+        Period next = new Period(begin.plus(period), end.plus(period));
+        return next;
     }
 
     /**
-     * @return Returns the begin.
+     * @return Returns the begin of the period.
      */
     public Date getBegin() {
-        if(calPeriod != 0) {
-            if(calPeriod > periodList.size()) {
-                logger.info("Period invalid: " + calPeriod);
-                calPeriod = periodList.size();
-            }
-            PeriodItem pi = (PeriodItem) periodList.get(calPeriod);
-            begin = pi.getBegin(end);
-        }
-        return new Date(begin.getTime());
-    }
-    /**
-     * @param begin The begin to set.
-     * @throws ParseException 
-     */
-    public void setBegin(String begin) throws ParseException {
-        this.begin = string2Date(begin, true);
-        calPeriod = 0;
-    }
-
-    public void setBegin(Date begin) {
-        this.begin = new Date(begin.getTime());
-        calPeriod = 0;
+        return begin.toDate();
     }
 
     /**
-     * @return Returns the end.
+     * @return Returns the end of the period.
      */
     public Date getEnd() {
-        return new Date(end.getTime());
-    }
-
-    /**
-     * @param end The end to set.
-     * @throws ParseException 
-     */
-    public void setEnd(String end) throws ParseException {
-        this.end = string2Date(end, false);
-        calPeriod = 0;
-    }
-
-    public void setEnd(Date end) {
-        this.end = new Date(end.getTime());
-    }
-
-    public void setScale(int scale) {
-        calPeriod = scale;
-        end = new Date();
-        begin = null;
+        return end.toDate();
     }
 
     /**
@@ -157,27 +134,16 @@ public class Period {
      * @param end The calculated end date
      * @throws ParseException 
      */
-    private Date string2Date(String date, boolean isBegin) throws ParseException{
-        Date foundDate = null;
+    private DateTime string2Date(String date, boolean isBegin) throws ParseException{
         if(date == null) {
             throw new ParseException("Null string to parse", 0);
         }
         Matcher dateMatcher = datePatternBoth.matcher(date);
         if("NOW".compareToIgnoreCase(date) == 0) {
-            return new Date();
+            return new DateTime();
         }
         else if(secondsPattern.matcher(date).matches()) {
-            try {
-                long value = Long.parseLong(date);
-                if(value == 0)
-                    foundDate = new Date();
-                else if(value > 0)
-                    foundDate = new Date(value);
-                else
-                    calPeriod = (int) value;
-            } catch (NumberFormatException e) {
-                throw new ParseException("Not a long: " + e.getMessage(), 0);
-            }				
+            return new DateTime(Util.parseStringNumber(date, Long.MIN_VALUE).longValue());
         }
         else if(date.length() >= 4 && dateMatcher.find()) {
             try {
@@ -194,69 +160,72 @@ public class Period {
                 if(dateFound == null && timeFound == null && secondFound == null) {
                     throw new ParseException("Invalid string to parse: " + date, 0);
                 }
-                Calendar cal = Calendar.getInstance();
-                cal.setLenient(false);
-                cal.setTime(new Date());
-                cal.set(Calendar.MILLISECOND, 0);
+
+                DateTimeZone tz = DateTimeZone.getDefault();
 
                 if( timeZoneFound != null &&  ! "".equals(timeZoneFound)) {
-                    cal.setTimeZone(TimeZone.getTimeZone(timeZoneFound));
+                    tz = DateTimeZone.forTimeZone(TimeZone.getTimeZone(timeZoneFound));
                 }
 
+                LocalDate jdate = new LocalDate(tz);
                 if(dateFound != null && ! "".equals(dateFound)) {
-                    String year = dateMatcher.group(2);
-                    cal.set(Calendar.YEAR, jrds.Util.parseStringNumber(year, 1970).intValue());
-                    String month = dateMatcher.group(3);
-                    cal.set(Calendar.MONTH, jrds.Util.parseStringNumber(month, 1).intValue() - 1);
-                    String day = dateMatcher.group(4);
-                    cal.set(Calendar.DAY_OF_MONTH, jrds.Util.parseStringNumber(day, 1).intValue());
+                    int year = jrds.Util.parseStringNumber(dateMatcher.group(2), 1970);
+                    int month = jrds.Util.parseStringNumber(dateMatcher.group(3), 1);
+                    int day = jrds.Util.parseStringNumber(dateMatcher.group(4), 1);
+                    jdate = new LocalDate(year, month, day);
                 }
 
+                int hour;
+                int minute;
+                int second;
                 if(timeFound == null || "".equals(timeFound)) {
                     if(isBegin) {
-                        cal.set(Calendar.HOUR_OF_DAY, 00);
-                        cal.set(Calendar.MINUTE, 00);
+                        hour = 0;
+                        minute = 0;
                     }
                     else {
-                        cal.set(Calendar.HOUR_OF_DAY, 23);
-                        cal.set(Calendar.MINUTE, 59);
+                        hour = 23;
+                        minute = 59;
                     }
                 }
                 else {
-                    String hour = dateMatcher.group(6);
-                    cal.set(Calendar.HOUR_OF_DAY, jrds.Util.parseStringNumber(hour, 0).intValue());
-
-                    String minute = dateMatcher.group(7);
-                    cal.set(Calendar.MINUTE, jrds.Util.parseStringNumber(minute, 0).intValue());
+                    hour = jrds.Util.parseStringNumber(dateMatcher.group(6), 0);
+                    minute = jrds.Util.parseStringNumber(dateMatcher.group(7), 0);
                 }
 
                 if(secondFound == null || "".equals(secondFound)) {
                     if(isBegin)
-                        cal.set(Calendar.SECOND, 00);
+                        second = 0;
                     else
-                        cal.set(Calendar.SECOND, 59);
+                        second = 59;
                 }
                 else {
-                    String seconds = dateMatcher.group(9);
-                    cal.set(Calendar.SECOND, jrds.Util.parseStringNumber(seconds, 0).intValue());
+                    second = jrds.Util.parseStringNumber(dateMatcher.group(9), 0);
                 }
-
-                return cal.getTime();
+                LocalTime jtime = new LocalTime(hour, minute, second);
+                DateTime dt = jdate.toDateTime(jtime, tz);
+                return dt;
             } catch (Exception e) {
-                throw new ParseException("Invalid string to parse: " + date, 0);
+                ParseException newex = new ParseException("Invalid string to parse: " + date, 0);
+                newex.initCause(e);
+                throw newex;
             }
         }
         else {
             throw new ParseException("Invalid string to parse: " + date, 0);
         }
-        return foundDate;
     }
 
+    /**
+     * Return the list of period label
+     * 
+     * @return a list of string label
+     */
     static public List<String> getPeriodNames() {
-        List<String> periodName = new ArrayList<String>(periodList.size());
-        for(Period.PeriodItem pi: periodList) 
+        List<String> periodName = new ArrayList<String>(PeriodItem.values().length);
+        for(PeriodItem pi: PeriodItem.values()) 
             periodName.add(pi.name);
-                return periodName;
+        return periodName;
     }
 
     /* (non-Javadoc)
@@ -304,7 +273,7 @@ public class Period {
      */
     @Override
     public String toString() {
-        return "b=" + begin + ", e=" + end + ", s=" + periodList.get(calPeriod).name;
+        return "b=" + begin + ", e=" + end + ", s=" + PeriodItem.values()[calPeriod].name;
     }
 
 }

@@ -1,18 +1,71 @@
 var queryParams = {};
 
-var hourFormat = {
-    timePattern: 'HH:mm',
-    selector: 'time'
-};
+define("jrds/RootButton",
+		[ "dojo/_base/declare",
+		  "dijit/form/Button",
+		  "dojo",
+		  "dijit" ],
+		function(declare, button, dojo, dijit) {
+return declare("jrds.RootButton", button, {
+	class: 'rootButton',
+	onClick: function() {
+		var tabs = dijit.byId('tabs');
+		var tabSelected = tabs.attr('selectedChildWidget');
+		if(tabSelected.id !=  queryParams.landtab)
+			tabs.selectChild(queryParams.landtab);
+		else {
+			delete queryParams.host;
+			delete queryParams.filter;
+			delete queryParams.id;
+			queryParams.tab = queryParams.landtab;
+			fileForms();
+			getTree(tabSelected.isFilters);
+		}		
+	}
+});
+});
 
-var hourconstraints = {
-		timePattern:'HH:mm',
-		clickableIncrement:'T00:30:00',
-		visibleIncrement:'T00:30:00',
-		visibleRange:'T05:00:00'
-};
 
-define( "jrds/HourBox",
+
+define( "jrds/Autoperiod",
+		[ "dojo/_base/declare",
+		  "dijit",
+		  "dijit/form/Select" ],
+    	function(declare, dijit) {
+return declare("Autoperiod", dijit.form.Select, {
+	onChange: function(value) {
+		queryParams.autoperiod = value;
+		//value = 0 means manual time period, so don't mess with the period fields
+		if(value != 0) {
+            getGraphList();
+			// Refresh queryParams with the new time values
+			var iq = dojo.xhrGet( {
+				content:  {autoperiod: queryParams.autoperiod},
+				sync: true,
+				url: "queryparams",
+				handleAs: "json",
+				preventCache: true,
+				load: function(response, ioArgs) {
+					queryParams.begin = new Date(response.begin);
+		            dijit.byId('begin').set('value', new Date(response.begin));
+		            dijit.byId('beginh').set('value', new Date(response.begin));
+					queryParams.end = new Date(response.end);
+		            dijit.byId('end').set('value', new Date(response.end));
+		            dijit.byId('endh').set('value', new Date(response.end));
+					return response;
+				},
+				error: function(response, ioArgs) {
+					console.error("init query failed with " + response.message);
+					return response;
+				}
+			});
+		}
+		return this.inherited(arguments);
+	}
+});
+});
+
+define( "jrds/TimeTextBox",
 		[ "dojo/_base/declare",
 		  "dojo",
     	  "dijit/form/TimeTextBox",
@@ -20,26 +73,40 @@ define( "jrds/HourBox",
     	  "dojo/date/locale"
     	],
     	function(declare, dojo) {
-	return declare("HourBox", dijit.form.TimeTextBox , {
-		onChange: function(date) {
-			if(date) {
-				dijit.byId('autoperiod').attr('value', 0); 
-				var queryDate = queryParams[this.queryId];
-				if(queryDate) {
-					var elems = queryDate.split(' ');
-					queryParams[this.queryId] = elems[0] + ' ' + dojo.date.locale.format(date, this.hourFormat);
-				}
-				else {
-					dateText = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
-					queryParams[this.queryId] = dateText + ' ' + dojo.date.locale.format(date, this.hourFormat);
-				}
-			}
-			return this.inherited(arguments);
+return declare("jrds.TimeTextBox", dijit.form.TimeTextBox, {
+	class: 'field fieldHour',
+	postCreate: function() {
+		this.set('value', queryParams[this.queryId]);
+		this.set('constraints',{
+			timePattern:'HH:mm',
+			clickableIncrement:'T00:30:00',
+			visibleIncrement:'T00:30:00',
+			visibleRange:'T05:00:00'
+		})
+		return this.inherited(arguments);
+	},
+	onFocus: function(date) {
+		dijit.byId('autoperiod').attr('value', 0);
+		this.set('value', queryParams[this.queryId]);
+	},
+	onChange: function(date) {
+		if(date == null) {
+			arguments[0] = queryParams[this.queryId];
+			date = arguments[0];
 		}
-	});
+		oldDate = queryParams[this.queryId];
+		newDate = new Date(oldDate.getTime());
+		newDate.setHours(date.getHours());
+		newDate.setMinutes(date.getMinutes());
+		newDate.setSeconds(date.getSeconds());
+		newDate.setMilliseconds(date.getMilliseconds());
+		queryParams[this.queryId] = newDate;
+		return this.inherited(arguments);
+	}
+});
 });
 
-define("jrds/DayHourTextBox",
+define("jrds/DateTextBox",
        [ "dojo/_base/declare",
          "dojo",
  		 "dijit",
@@ -47,56 +114,117 @@ define("jrds/DayHourTextBox",
          "dijit/form/DateTextBox"
        ],
        function(declare, dojo, dijit) {
-return declare("DayHourTextBox", dijit.form.DateTextBox, {
-		dayFormat: {
-			selector: 'date', 
-			datePattern: 'yyyy-MM-dd'
-		},
-		hourFormat: hourFormat,        
-		dateStr: '',
-		format: function(date) {
-			if(date)
-				return dojo.date.locale.format(date, this.dayFormat);
-			else
-				return '';
-		},
-		parse: function(date) {
-			if(date)
-				return dojo.date.locale.parse(date, this.dayFormat);
-			else
-				return '';
-		},
-		serialize: function(date) {
-			if(date)
-				return dojo.date.locale.format(date, this.dayFormat);
-			else
-				return '';
-		},
-		onChange: function(date) {
-			if(date) {
-				queryParams.autoperiod = 0;
-	
-				//Let's try to keep the existing hour
-				var hour = this.resetHour;
-				if(queryParams[this.id]) {
-					var dateArray = queryParams[this.id].split(' ');
-					if(dateArray.length == 2) {
-						hour = dateArray[1];
-					}
-				}
-				//If hour in form not defined, set it.
-				if(! this.timeBox.attr('value') ) {
-					this.timeBox.attr('value', dojo.date.locale.parse(hour, this.hourFormat));
-				}
-				var sdate = dojo.date.locale.format(date, this.dayFormat);
-				queryParams[this.id] = sdate + ' ' + hour;
-				dijit.byId('autoperiod').attr('value', 0); 
-			}
+return declare("jrds.DateTextBox", dijit.form.DateTextBox, {
+	class: 'field fieldDay', 
+	dayFormat: {
+		selector: 'date', 
+		datePattern: 'yyyy-MM-dd'
+	},
+	dateStr: '',
+	regExp: "\\d\\d\\d\\d-\\d\\d-\\d\\d",
+	postCreate: function() {
+		this.set('timeBox', dijit.byId(this.timeBoxName));
+		this.set('value',queryParams[this.id]);
+		return this.inherited(arguments);
+	},
+	format: function(date) {
+		if(date)
+			return dojo.date.locale.format(date, this.dayFormat);
+		else
+			return '';
+	},
+	parse: function(date) {
+		if(date)
+			return dojo.date.locale.parse(date, this.dayFormat);
+		else
+			return '';
+	},
+	serialize: function(date) {
+		if(date)
+			return dojo.date.locale.format(date, this.dayFormat);
+		else
+			return '';
+	},
+	onFocus: function(date) {
+		dijit.byId('autoperiod').attr('value', 0);
+		this.set('value', queryParams[this.queryId]);
+	},
+	onChange: function(date) {
+		//Call with drop down, do nothing on this case
+		if(date == undefined)
 			return this.inherited(arguments);
+		oldDate = queryParams[this.id];
+		newDate = new Date(oldDate.getTime());
+		newDate.setFullYear(date.getFullYear());
+		newDate.setMonth(date.getMonth());
+		newDate.setDate(date.getDate());
+		// If hour = 0 and minute = 0, was set from drop down, not from set('value',...)
+		// So ensure that hour and minute are updated to good value
+		if(date.getHours() == 0 && date.getMinutes() == 0 ) {
+			if(this.id == 'begin') {
+				newDate.setHours(0);
+				newDate.setMinutes(0);
+				newDate.setSeconds(0);
+				newDate.setMilliseconds(0);
+	            dijit.byId('beginh').set('value', newDate);
+			}
+			else {
+				newDate.setHours(23);
+				newDate.setMinutes(59);
+				newDate.setSeconds(59);
+				newDate.setMilliseconds(999);				
+	            dijit.byId('endh').set('value', newDate);
+			}				
 		}
-	});
-       }
-);
+		queryParams[this.id] = newDate;
+		return this.inherited(arguments);
+	}
+});
+});
+
+define("jrds/PeriodNavigation",
+		[ "dojo/_base/declare",
+		  "dijit/form/Button",
+		  "dojo"],
+		function(declare, button, dojo) {
+return declare("PeriodNavigation", button, {
+	class: 'periodNavigation',
+	postCreate: function() {
+		this.set('showLabel', false);
+		return this.inherited(arguments);
+	},
+	onClick: function(arguments) {
+		content = {};
+		content.autoperiod = queryParams.autoperiod;
+		content.begin = queryParams.begin.getTime();
+		content.end = queryParams.end.getTime();
+		content[this.id] = '';
+		dojo.xhrGet( {
+			content:  content,
+			sync: false,
+			url: "queryparams",
+			handleAs: "json",
+			preventCache: true,
+			load: function(response, ioArgs) {
+				queryParams.begin = new Date(response.begin);
+	            dijit.byId('begin').set('value', new Date(response.begin));
+	            dijit.byId('beginh').set('value', new Date(response.begin));
+				queryParams.end = new Date(response.end);
+	            dijit.byId('end').set('value', new Date(response.end));
+	            dijit.byId('endh').set('value', new Date(response.end));
+	            queryParams.autoperiod = 0;
+	            dijit.byId('autoperiod').set('value', 0);
+	            getGraphList();
+				return response;
+			},
+			error: function(response, ioArgs) {
+				console.error("init query failed with " + response.message);
+				return response;
+			}
+		});
+	}
+});
+});
 
 define("jrds/jrdsTree",
        [ "dojo/_base/declare",
@@ -121,24 +249,6 @@ return declare("jrdsTree", dijit.Tree, {
 			return "filterFolder";
 		return this.inherited(arguments);
 	}
-});
-});
-
-define("jrds/MinMaxTextBox",
-       [ "dojo/_base/declare",
-         "dijit",
-         "dijit/form/ValidationTextBox" ],
-       function(declare, dijit) {
-return declare("jrds.MinMaxTextBox", dijit.form.ValidationTextBox, {
-		regExp: "(-?\\d+(.\\d+)?)([a-zA-Z]{0,2})",
-		trim: true,
-		onFocus: function() {setAutoscale(false);},
-		onChange: function(value) {
-			//value==0 is not a null value, keep it
-			if(! value && value != 0 )
-				value = null;
-			queryParams[this.id] = value;			
-		}
 });
 });
 
@@ -170,61 +280,190 @@ return declare("jrds.StateURLButton", button, {
 	        //Call the asynchronous xhrPost
 	        var deferred = dojo.xhrPost(xhrArgs);
 	    }
-
 });
 });
 
-//called onChange for scale button
-function resetScale() {
-	if(dijit.byId("autoscale").attr('checked')) {
-		delete queryParams.max;
-		delete queryParams.min;
-		dijit.byId("max").attr('value', '');
-		dijit.byId("min").attr('value', '');
-		if(queryParams.id && queryParams.id != 0 )
+define("jrds/AutoscaleReset",
+		[ "dojo/_base/declare",
+		  "dijit/form/ToggleButton" ],
+		function(declare, button) {
+return declare("jrds.AutoscaleReset", button, {
+	constructor: function() {
+		this.oldmax = queryParams.max;
+		this.oldmin = queryParams.min;		
+	},
+	onChange: function(checked) {
+		if(checked) {
+			this.oldmax = queryParams.max;
+			this.oldmin = queryParams.min;
+			delete queryParams.max;
+			delete queryParams.min;
+			dijit.byId("max").set('value', '');
+			dijit.byId("min").set('value', '');
 			getGraphList();
+		}
+		else {
+			queryParams.max = this.oldmax;
+			queryParams.min = this.oldmin;
+			if(queryParams.max != undefined && queryParams.min != undefined ) {
+				dijit.byId("max").set('value', queryParams.max);
+				dijit.byId("min").set('value', queryParams.min);				
+				getGraphList();
+			}
+		}
+	},
+	iconClass: "dijitCheckBoxIcon",
+});
+});
+
+define("jrds/MinMaxTextBox",
+	       [ "dojo/_base/declare",
+	         "dijit",
+	         "dijit/form/ValidationTextBox" ],
+	       function(declare, dijit) {
+return declare("jrds.MinMaxTextBox", dijit.form.ValidationTextBox, {
+		regExp: "(-?\\d+(.\\d+)?)([a-zA-Z]{0,2})",
+		trim: true,
+		onFocus: function() {
+			dijit.byId("autoscale").set('checked',false);
+		},
+		onChange: function(value) {
+			if(value != undefined && value != "")
+				queryParams[this.id] = value;			
+		}
+});
+});
+
+define("jrds/ToogleSort",
+		[ "dojo/_base/declare",
+		  "dijit/form/ToggleButton" ],
+		function(declare, button) {
+return declare("jrds.ToogleSort", button, {
+	onChange: function(checked) {
+		queryParams.sort = checked;
+		getGraphList();		
+	},
+	iconClass: "dijitCheckBoxIcon",
+});
+});
+
+define("jrds/ReloadButton",
+		[ "dojo/_base/declare",
+		  "dijit/form/Button" ],
+		function(declare, button) {
+return declare("jrds.ReloadButton", button, {
+	onClick: function() {
+		dojo.xhrGet( {
+			sync: false,
+			url: "reload?sync",
+			handleAs: "text",
+			preventCache: true,
+			load: function(response, ioArgs) {
+				refreshStatus();
+			},
+			error: function(response, ioArgs) {
+				console.error(response);
+			}
+		});		
 	}
-	else {
-		dijit.byId("max").attr('value', queryParams.max);
-		dijit.byId("min").attr('value', queryParams.min);
+});
+});
+
+define("jrds/HostForm",
+		[ "dojo/_base/declare",
+		  "dijit/form/Form" ],
+		function(declare, button) {
+return declare("jrds.HostForm", button, {
+	onSubmit: function(){
+		try {
+			queryParams.host = this.attr('value').host;
+			delete queryParams.filter;
+			delete queryParams.id;
+			delete queryParams.tab;
+			getTree(false);
+		}
+		catch(err) {
+			console.error(err);
+		}
+		return false;		
 	}
-}
+});
+});
 
-//Called upon startup and focus on scale text boxes, will propagate good values using onChange function : resetScale and updateScale, 
-function setAutoscale(value) {
-	var autoscale = dijit.byId("autoscale");
-	autoscale.attr('checked',value);
-}
+define("jrds/RenderForm",
+		[ "dojo/_base/declare",
+		  "dijit/form/Form" ],
+		function(declare, form) {
+return declare("jrds.RenderForm", form, {
+	onSubmit: function(){
+		try {
+			if( queryParams.id == null )
+				return false;
+			if(queryParams.autoperiod == 0 && (queryParams.begin == null || queryParams.end == null) )
+				return false;
+			if( (queryParams.max != null && queryParams.min == null) || (queryParams.max == null && queryParams.min != null) )
+				return false;
+			getGraphList();
+		}
+		catch(err) {
+			console.error(err);
+		}
+		return false;	
+	}
+});
+});
 
-function declare_FixedFileUploader(declare, dojo, dojox) {
-	return declare('kgf.dijit.FixedFileUploader', dojox.form.FileUploader, {
-	    // summary:
-	    //    Private class containing fixes to FileUploader behavior.
-	
-	    getHiddenWidget: function() {
-	      var widget = this.inherited(arguments);
-	      if (widget && dojo.position(widget.domNode).h > 0) {
-	        //false positive - sure the widget has onShow, but it's already shown!
-	        //(workaround to Dojo bug #11039)
-	        //TODO: will need to see if this check suffices for situations where
-	        //it's actually hidden (haven't used anywhere like that yet).
-	        return null;
-	      }
-	      return widget;
-	    }
-	});
-}
+define("jrds/DiscoverHostForm",
+		[ "dojo/_base/declare",
+		  "dijit/form/Form",
+		  "dojo/dom-style",
+		  "dojo",
+		  "dojo/dom" ],
+		function(declare, form, dojoStyle, dojo) {
+return declare("jrds.DiscoverHostForm", form, {
+	onSubmit: function(){
+		// try/catch is mandatory, failure here really submit the form
+		try {
+			if(document.activeElement.id == 'discoverClear') {
+				dojo.place("<pre id='discoverResponse' />", dojo.byId('discoverResponse'), "replace");
+				dojoStyle.set( dojo.byId('discoverResponse'), 'display', 'none');
+			}
+			else {
+				if(! this.validate()) {
+		            return false;
+				}
+				var queryArgs = { };
+				formValues = this.get('value');
+				for(key in formValues) {
+					if(dijit.byId(key).get('checked') == undefined)
+						queryArgs[key] = formValues[key];
+					else
+						queryArgs[key] = dijit.byId(key).get('checked');
+				}
+				queryArgs.host = formValues.discoverHostName;
 
-define("jrds/FixedFileUploader",
-       [ "dojo/_base/declare",
-         "dojo",
-         "dojox",
-         "dojox/form/FileUploader" ],
-       declare_FixedFileUploader);
-
-function dayRegExp() {
-	return "\\d\\d\\d\\d-\\d\\d-\\d\\d";
-};
+				dojo.xhrGet( {
+					url: "discover?" + dojo.objectToQuery(queryArgs),
+					handleAs: "text",
+					load: function(response, ioArgs) {
+						var codeTag = dojo.byId('discoverResponse');
+						dojoStyle.set( codeTag, 'display', 'block');
+						var toPlace = response.replace(/</g, "&lt;").replace(/>/g,"&gt;").replace('/\n/mg','<br>');
+						dojo.place("<pre id='discoverResponse'>" + toPlace + "</pre>", codeTag, "replace");
+					},
+					error: function(response, ioArgs) {
+						console.error(response);
+					}
+				});			
+			}
+		}
+		catch(err) {
+			console.error(err);
+		}
+		return false;
+	}
+});
+});
 
 function initIndex() {
 	initQuery();
@@ -246,9 +485,8 @@ function initIndex() {
 	});
 
 	//The parse can be done
-	dojo.parser.parse();
-
-	setupCalendar();
+	dojo.parser.parse()
+	
 	setupTabs();
 	setupDisplay();
 }
@@ -276,10 +514,22 @@ function initQuery() {
 		handleAs: "json",
 		preventCache: false,
 		load: function(response, ioArgs) {
-			queryParams = response;
-			if(queryParams.path && queryParams.path.length > 1 ) {
-				var last = queryParams.path[queryParams.path.length -1];
-				queryParams.id = last.replace(/.*\./, "");
+			for(var key in response) {
+				value = response[key];
+				if(key == 'begin' || key == 'end') {
+					queryParams[key] = new Date(value);
+				}
+				else if(key == 'sorted' || key == 'autoscale') {
+					queryParams[key] = parseBool(value);
+				}
+				else if(key == 'path' && value.length > 1) {
+					var last = value[value.length -1];
+					queryParams.id = last.replace(/.*\./, "");
+					queryParams.path = value;
+				}
+				else if(value)
+					queryParams[key] = value;
+
 			}
 			return response;
 		},
@@ -295,7 +545,10 @@ function cleanParams(paramslist) {
 	// Only interesting values from query params are kept
 	dojo.forEach(paramslist, function(key){
 		value = queryParams[key];
-		if(value)
+		if(key == 'begin' || key == 'end') {
+			cleaned[key] = value.getTime();
+		}
+		else if(value)
 			cleaned[key] = value;
 	});
 	return cleaned;
@@ -401,7 +654,7 @@ function getGraphList() {
 	var graphStandby = startStandBy('graphPane');
 
 	return dojo.xhrGet( {
-		content: cleanParams(['id', 'begin', 'end', 'min', 'max', 'sort', 'autoperiod', 'history', 'filter', 'pid', 'dsName']),
+		content: cleanParams(['id', 'begin', 'end', 'min', 'max', 'sort', 'autoperiod', 'periodnext', 'periodprevious', 'history', 'filter', 'pid', 'dsName']),
 		url: "jsongraph",
 		handleAs: "json",
 		load: doGraphList,
@@ -433,29 +686,22 @@ function fileForms() {
 		dojo.byId("hostForm").host.value = '';
 	}
 
-	var dateForm = dojo.byId("dateForm");
-	if(queryParams.begin && queryParams.end) {
-		var beginarray = queryParams.begin.split(" ");
-		var endarray = queryParams.end.split(" ");
-		if(beginarray.length == 2 && endarray.length == 2) {
-			dijit.byId('begin').attr('value', new Date(beginarray[0]));
-			dijit.byId('beginh').attr('value', new Date(beginarray[1]));
-			dijit.byId('end').attr('value', new Date(endarray[0]));
-			dijit.byId('endh').attr('value', new Date(endarray[1]));
-		}
-	}
-	else {
-		dojo.forEach(['begin', 'beginh', 'end', 'endh'], function(id, i) {
-			dijit.byId(id).attr('value', null);
-		});
-	}
-
 	var autoperiod = dijit.byId('autoperiod'); 
 	autoperiod.attr('value', queryParams.autoperiod);
 
-	setAutoscale(queryParams.max == null || queryParams.min == null);
-		
-	dijit.byId("sorted").attr('checked', parseBool(queryParams.sort));
+	if(queryParams.max != undefined && queryParams.min != undefined) {
+		dijit.byId("autoscale").set('checked', false);
+		dijit.byId("min").set('value', queryParams.min);
+		dijit.byId("max").set('value', queryParams.max);
+	}
+	else {
+		dijit.byId("autoscale").set('checked', true);
+		dijit.byId("min").set('value', '');
+		dijit.byId("max").set('value', '');
+	}
+
+	dijit.byId("sorted").set('checked', parseBool(queryParams.sort));
+	
 }
 
 function setupDisplay() {
@@ -591,56 +837,11 @@ function loadTree(item,  node){
 	}
 }
 
-function toogleSort() {
-	queryParams.sort = dijit.byId("sorted").attr('checked');
-	getGraphList();
-}
-
-function setupCalendar() {
-	beginTimeTextBox = new HourBox( {
-		'class': 'field fieldHour', 
-		hourFormat: hourFormat,  
-		constraints: hourconstraints,
-		name: 'beginh',
-		value: '',
-		queryId: 'begin'
-	}, 'beginh');
-	endTimeTextBox = new HourBox( {
-		'class': 'field fieldHour', 
-		hourFormat: hourFormat,  
-		constraints: hourconstraints,
-		name: 'endh',
-		value: '',
-		queryId: 'end'
-	}, 'endh');
-
-	new DayHourTextBox({
-		'class': 'field fieldDay', 
-		//A bug in dojo 1.4+ ?
-		regExpGen: dayRegExp,
-		name: "begin",
-		resetHour: '00:00',
-		timeBox: beginTimeTextBox
-		}, "begin");
-	
-	new DayHourTextBox({
-		'class': 'field fieldDay', 
-		//A bug in dojo 1.4+ ?
-		regExpGen: dayRegExp,
-		name: "end",
-		resetHour: '23:59',
-		timeBox: endTimeTextBox
-	}, "end");
-
-}
-
-function details(url)
-{
+function details(url) {
 	var detailsWin = window.open("details?" + url, "_blank", "width=400,resizable=yes,menubar=no,scrollbars=yes");
 }
 
-function popup(url,id)
-{
+function popup(url,id) {
 	var img;
 	if(id)
 		img = document.getElementById(id);
@@ -657,42 +858,12 @@ function popup(url,id)
 	return popupWin = window.open("popup.html?" + url, "_blank", height + "," + width + ",menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
 }
 
-function save(url)
-{
+function save(url) {
 	var popupWin = window.open("download?" + url, "_blank", "menubar=no,status=no,resizable=no,scrollbars=no");
 }
 
-function history(url)
-{
+function history(url) {
 	var historyWin = window.open("history.html?" + url, "_blank", "width=750,menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
-}
-
-
-function setAutoperiod(value) {
-	queryParams.autoperiod = value;
-	//value = 0 means manual time period, so don't mess with the period fields
-	if(value != 0) {
-		submitRenderForm();
-		dojo.forEach(['begin', 'beginh', 'end', 'endh'], function(id, i) {
-			dijit.byId(id).attr('value', null);
-		});
-	}
-}
-
-function submitRenderForm(evt) {
-	try {
-		if( queryParams.id == null )
-			return false;
-		if(queryParams.autoperiod == 0 && (queryParams.begin == null || queryParams.end == null) )
-			return false;
-		if( (queryParams.max != null && queryParams.min == null) || (queryParams.max == null && queryParams.min != null) )
-			return false;
-		getGraphList();
-	}
-	catch(err) {
-		console.error(err);
-	}
-	return false;	
 }
 
 function setupTabs() {
@@ -742,7 +913,7 @@ function setupTabs() {
 	}
 }
 
-function transitTab(newPage, oldPage){
+function transitTab(newPage, oldPage) {
     var newId = newPage.attr('id');
     var oldId = oldPage.attr('id');
     if(oldId != 'adminTab') {
@@ -772,57 +943,12 @@ function treeTabCallBack(newTab) {
 		queryParams.landtab = newTab.attr('id');
 	}
 
-	setupCalendar();
 	fileForms();
 	
 	//We don't load tree during initial setup
 	//It's done later
 	if(! keepParams)
 		getTree(newTab.isFilters);
-}
-
-function sendReload(evt) {
-	var iq = dojo.xhrGet( {
-		sync: true,
-		url: "reload?sync",
-		handleAs: "text",
-		preventCache: true,
-		load: function(response, ioArgs) {
-			refreshStatus();
-		},
-		error: function(response, ioArgs) {
-			console.error(response);
-		}
-	});
-}
-
-function searchHost(evt) {
-	try {
-		queryParams.host = this.attr('value').host;
-		delete queryParams.filter;
-		delete queryParams.id;
-		delete queryParams.tab;
-		getTree(false);
-	}
-	catch(err) {
-		console.error(err);
-	}
-	return false;
-}
-
-function goHome(evt) {
-	var tabs = dijit.byId('tabs');
-	var tabSelected = tabs.attr('selectedChildWidget');
-	if(tabSelected.id !=  queryParams.landtab)
-		tabs.selectChild(queryParams.landtab);
-	else {
-		delete queryParams.host;
-		delete queryParams.filter;
-		delete queryParams.id;
-		queryParams.tab = queryParams.landtab;
-		fileForms();
-		getTree(tabSelected.isFilters);
-	}		
 }
 
 function refreshStatus() {
@@ -897,46 +1023,6 @@ function updateStatus(statusInfo) {
     }, "refreshButton");
 }
 
-function discoverHost(evt) {
-	try {
-		var queryArgs = { };
-		
-		for(key in this.attr('value')) {
-			if(dijit.byId(key).attr('checked') == undefined)
-				queryArgs[key] = this.attr('value')[key];
-			else
-				queryArgs[key] = dijit.byId(key).attr('checked');
-		}
-		queryArgs.host = this.attr('value').discoverHostName;
-
-		dojo.xhrGet( {
-			url: "discover?" + dojo.objectToQuery(queryArgs),
-			//url: "discover?" + dojo.objectToQuery(this.attr('value')),
-			handleAs: "text",
-			load: function(response, ioArgs) {
-				var codeTag = dojo.byId('discoverResponse');
-				dojo.style( codeTag, 'display', 'block');
-				var toPlace = response.replace(/</g, "&lt;").replace(/>/g,"&gt;").replace('/\n/mg','<br>');
-				dojo.place("<pre id='discoverResponse'>" + toPlace + "</pre>", codeTag, "replace");
-			},
-			error: function(response, ioArgs) {
-			}
-		});
-	}
-	catch(err) {
-		console.log(err);
-		console.error(err);
-	}
-	return false;
-}
-
-var filesSelect;
-
-function doUpload(){
-	dojo.byId("filesList").innerHTML = "uploading...";
-	filesSelect.upload();
-}
-
 function setAdminTab() {
 	refreshStatus();
 
@@ -946,29 +1032,6 @@ function setAdminTab() {
 	form.discoverSnmpCommunity.value = 'public';
 	form.discoverSnmpPort.value = '161';
 	dojo.style( dojo.byId('discoverResponse'), 'display', 'none');
-
-	//Set up the uploader
-	var uploader = dijit.byId('filesSelect');
-	if(! uploader) {
-		filesSelect = new kgf.dijit.FixedFileUploader({
-			uploadUrl: 'upload',
-			selectMultipleFiles: true,
-			force: 'html',
-			fileListId: 'filesList',
-			fileMask: [],
-			onChange: function(a) {
-				dojo.style('filesList', 'height', 'auto');
-			},
-			onComplete: filesLoaded
-		}, 'filesSelect');
-		//The uploader set a bad lineHeight
-		dojo.style('filesSelect', 'lineHeight', '');
-	}
-	else {
-		//Don't forget to clean the file list
-		var filesResult = dojo.byId('filesResult');
-		dojo.place('<div id="filesResult"></div>', filesResult, 'replace');
-	}
 }
 
 function filesLoaded(e) {
@@ -994,40 +1057,5 @@ function filesLoaded(e) {
 	}
 	catch(err) {
 		console.error(err);
-	}
-}
-
-function dateNavPrevious() {
-	if(queryParams.autoperiod == 0) {
-		var begin = dojo.date.locale.parse(queryParams.begin, 'yyyy-MM-dd HH:mm');
-		var end = dojo.date.locale.parse(queryParams.end, 'yyyy-MM-dd HH:mm');
-		console.log(end - begin);
-	}
-	console.log(queryParams);
-	var dayTimeFormat = {
-		datePattern: 'yyyy-MM-dd',
-		timePattern: 'HH:mm'
-	};
-	if(queryParams.autoperiod == 0) {
-		var begin = dojo.date.locale.parse(queryParams.begin, dayTimeFormat);
-		var end = dojo.date.locale.parse(queryParams.end, dayTimeFormat);
-		console.log(begin);
-		console.log(end);
-		console.log(end - begin);
-	}
-}
-
-function dateNavNext() {
-	console.log(queryParams);
-	var dayTimeFormat = {
-		datePattern: 'yyyy-MM-dd',
-		timePattern: 'HH:mm'
-	};
-	if(queryParams.autoperiod == 0) {
-		var begin = dojo.date.locale.parse(queryParams.begin, dayTimeFormat);
-		var end = dojo.date.locale.parse(queryParams.end, dayTimeFormat);
-		console.log(begin);
-		console.log(end);
-		console.log(end - begin);
 	}
 }

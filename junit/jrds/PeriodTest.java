@@ -31,37 +31,39 @@ public class PeriodTest {
     @Test
     public void empty() {
         Date now = new Date();
+
+        Calendar calBegin = Calendar.getInstance();
+        calBegin.setTime(now);
+        Date end = calBegin.getTime();
+        calBegin.add(Calendar.DAY_OF_MONTH, -1);
+        Date begin = calBegin.getTime();
+
         Period p = new Period();
-        Assert.assertTrue(p.getEnd().compareTo(now) >= 0);
-        Assert.assertEquals(new Integer(7), new Integer(p.getScale()));
+        long deltaBegin = p.getBegin().getTime() - begin.getTime();
+        long deltaEnd = p.getEnd().getTime() - end.getTime();
+        Assert.assertTrue(deltaEnd < 1100 && deltaEnd > -1100);
+        Assert.assertTrue(deltaBegin < 100 && deltaBegin > -100);
+        Assert.assertEquals(7, p.getScale());
     }
-    
+
     @Test
     public void scale() {
         Date now = new Date();
 
         Calendar calBegin = Calendar.getInstance();
         calBegin.setTime(now);
+        Date end = calBegin.getTime();
         calBegin.add(Calendar.HOUR, -4);
         Date begin = calBegin.getTime();
 
         Period p = new Period(4);
-        long delta = p.getBegin().getTime() - begin.getTime();
-        Assert.assertTrue(p.getEnd().compareTo(now) >= 0);
-        logger.trace(delta);
-        Assert.assertTrue(delta < 10 && delta > -10);
+        long deltaBegin = p.getBegin().getTime() - begin.getTime();
+        long deltaEnd = p.getEnd().getTime() - end.getTime();
+        Assert.assertTrue(deltaEnd < 1100 && deltaEnd > -1100);
+        Assert.assertTrue(deltaBegin < 100 && deltaBegin > -100);
         Assert.assertEquals(new Integer(4), new Integer(p.getScale()));
     }
-    @Test
-    public void setScale() throws ParseException {
-        Date now = new Date();
-        begin = fullISOFORMAT.parse("1900-01-01T00:00:00");
-        end = fullISOFORMAT.parse("1900-12-31T23:59:59");
-        Period p = new Period("2007-01-01", "2007-12-31");
-        p.setScale(1);
-        Assert.assertTrue(p.getEnd().compareTo(now) >= 0);
-        Assert.assertEquals(1, p.getScale());
-    }
+
     @Test
     public void now() throws ParseException {
         Date now = new Date();
@@ -70,6 +72,7 @@ public class PeriodTest {
         Assert.assertTrue(p.getBegin().compareTo(now) >= 0);
         Assert.assertEquals(0, p.getScale());
     }
+
     @Test public void shortFormat() throws ParseException {
         begin = fullISOFORMAT.parse("2007-01-01T00:00:00");
         end = fullISOFORMAT.parse("2007-12-31T23:59:59");
@@ -78,6 +81,7 @@ public class PeriodTest {
         Assert.assertEquals(p.getEnd(), end);
         Assert.assertEquals(0, p.getScale());
     }
+
     @Test
     public void mixedFormat() throws ParseException {
         begin = fullISOFORMAT.parse("2007-01-01T00:00:00");
@@ -87,6 +91,7 @@ public class PeriodTest {
         Assert.assertEquals(p.getEnd(), end);
         Assert.assertEquals(0, p.getScale());
     }
+
     @Test
     public void hourShortFormat() throws ParseException {
         Calendar cal = Calendar.getInstance();
@@ -108,6 +113,7 @@ public class PeriodTest {
         Assert.assertEquals(end, p.getEnd());
         Assert.assertEquals(0, p.getScale());
     }
+
     @Test
     public void hourLongFormat() throws ParseException {
         Calendar cal = Calendar.getInstance();
@@ -129,6 +135,7 @@ public class PeriodTest {
         Assert.assertEquals(end, p.getEnd());
         Assert.assertEquals(0, p.getScale());
     }
+
     @Test
     public void fullIsoFormat() throws ParseException {
         begin = fullISOFORMAT.parse("2007-01-01T00:00:00");
@@ -141,12 +148,15 @@ public class PeriodTest {
     @Test
     public void StrictIsoFormat() throws ParseException {
         begin = strictISOFORMAT.parse("20070101T00:00:00+0000");
-        end = fullISOFORMAT.parse("2007-12-31T23:59:59");
-        Period p = new Period("20070101T00:00:00Z", "20071231T23:59:59");
-        Assert.assertEquals(begin, p.getBegin());
+        end = strictISOFORMAT.parse("20071231T23:59:59+0000");
+        Period p = new Period("20070101T00:00:00Z", "20071231T23:59:59Z");
+        System.out.println(begin.getTime() - p.getBegin().getTime());
+        System.out.println(p.getBegin().getTime());
         Assert.assertEquals(end, p.getEnd());
+        Assert.assertEquals(begin, p.getBegin());
         Assert.assertEquals(0, p.getScale());
     }
+
     @Test
     public void spaceSeparator() throws ParseException {
         begin = fullISOFORMAT.parse("2007-02-01T00:15:31");
@@ -156,6 +166,49 @@ public class PeriodTest {
         Assert.assertEquals(end, p.getEnd());
         Assert.assertEquals(0, p.getScale());
     }
+
+    @Test
+    public void previousFull() throws ParseException {
+        begin = fullISOFORMAT.parse("2007-03-01T00:00:00");
+        end = fullISOFORMAT.parse("2007-03-01T23:59:59");
+        Period p = new Period("2007-03-02 00:00:00", "2007-03-02 23:59:59").previous();
+        logger.trace(p.getBegin());
+        logger.trace(p.getEnd());
+        Assert.assertEquals(begin, p.getBegin());
+        Assert.assertEquals(end, p.getEnd());
+        Assert.assertEquals(0, p.getScale());
+    }
+
+    @Test
+    public void nextFull() throws ParseException {
+        begin = fullISOFORMAT.parse("2007-03-03T00:00:00");
+        end = fullISOFORMAT.parse("2007-03-03T23:59:59");
+        Period p = new Period("2007-03-02 00:00:00", "2007-03-02 23:59:59").next();
+        logger.trace(p.getBegin());
+        logger.trace(p.getEnd());
+        Assert.assertEquals(begin, p.getBegin());
+        Assert.assertEquals(end, p.getEnd());
+        Assert.assertEquals(0, p.getScale());
+    }
+
+    @Test
+    public void previousScale() throws ParseException {
+        Period p = new Period().previous();
+        long offsetDay = 86400 * 1000 - (p.getEnd().getTime() - p.getBegin().getTime());
+        Assert.assertTrue("offset to large: " + offsetDay, Math.abs(offsetDay) < 1100) ;
+        Assert.assertEquals(0, p.getScale());
+    }
+
+    @Test
+    public void nextScale() throws ParseException {
+        Period p = new Period().next();
+        logger.trace(p.getBegin());
+        logger.trace(p.getEnd());
+        long offsetDay = 86400 * 1000 - (p.getEnd().getTime() - p.getBegin().getTime());
+        Assert.assertTrue("offset to large: " + offsetDay, Math.abs(offsetDay) < 1100) ;
+        Assert.assertEquals(0, p.getScale());
+    }
+
     @Test
     public void fromLong() throws ParseException {
         begin = new Date(1);
@@ -165,6 +218,7 @@ public class PeriodTest {
         Assert.assertEquals(end, p.getEnd());
         Assert.assertEquals(0, p.getScale());
     }
+
     @Test(expected=ParseException.class)
     public void invalid1() throws ParseException{
         Period p = new Period("a1", "2007-01");
@@ -172,6 +226,7 @@ public class PeriodTest {
         Assert.assertNull(p.getEnd());
         Assert.assertEquals(0, p.getScale());
     }
+
     @Test(expected=ParseException.class)
     public void invalid2() throws ParseException{
         Period p = new Period(" ", "");
@@ -179,12 +234,14 @@ public class PeriodTest {
         Assert.assertNull(p.getEnd());
         Assert.assertEquals(0, p.getScale());
     }
+
     @Test(expected=ParseException.class) public void nullargs() throws ParseException{
         Period p = new Period(null, null);
         Assert.assertNull(p.getBegin());
         Assert.assertNull(p.getEnd());
         Assert.assertEquals(0, p.getScale());
     }
+
     @Test(expected=ParseException.class)
     public void invaliddate() throws ParseException{
         @SuppressWarnings("unused")

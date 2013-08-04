@@ -67,7 +67,7 @@ public final class Graph extends JrdsServlet {
 
             Date middle = new Date();
             if( ! hl.getRenderer().isReady(graph)) {
-                logger.warn("One graph failed, not ready");
+                logger.warn("One graph not ready, synchronous rendering");
             }
             res.setContentType("image/png");
             // No caching, the date might be in the future, a period is requested
