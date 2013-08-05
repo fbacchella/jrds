@@ -14,10 +14,10 @@ import jrds.mockobjects.MockGraph;
 import jrds.starter.HostStarter;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -52,7 +52,10 @@ public class TestSum {
         SumBuilder sm = new SumBuilder();
         sm.setPm(Tools.makePm(testFolder, "security=yes"));
         Sum sp = sm.makeSum(d);
-        sp.configure(hl);
+        try {
+            sp.configure(hl);
+        } catch (Exception e) {
+        }
         sp.getProbe().setHost(new HostStarter(host));
         hl.addHost(host);
         hl.addProbe(sp.getProbe());

@@ -11,10 +11,10 @@ import javax.xml.transform.TransformerException;
 
 import jrds.graphe.Sum;
 import jrds.mockobjects.Full;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -24,8 +24,6 @@ import org.rrd4j.core.FetchData;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.LinearInterpolator;
-import org.rrd4j.graph.RrdGraph;
-import org.rrd4j.graph.RrdGraphDef;
 
 public class TestSum {
     static final private Logger logger = Logger.getLogger(TestSum.class);
@@ -40,7 +38,7 @@ public class TestSum {
         Tools.prepareXml();
     }
 
-    @Test
+    @Test(expected=RuntimeException.class)
     public void emptysum() throws Exception {
         HostsList hl = new HostsList();
         hl.configure(new PropertiesManager());
@@ -49,14 +47,6 @@ public class TestSum {
         graphlist.add("badhost/badgraph");
         Sum s = new Sum("emptysum", graphlist);
         s.configure(hl);
-        Graph g = s.getGraph();
-        g.setPeriod(new Period());
-        RrdGraphDef rgd = g.getRrdGraphDef();
-        Assert.assertNotNull(rgd);
-        RrdGraph graph = new RrdGraph(rgd);
-        logger.debug(graph.getRrdGraphInfo().getHeight());
-        logger.debug(graph.getRrdGraphInfo().getWidth());
-        logger.debug(rgd.toString());
     }
 
     @Test
@@ -93,14 +83,14 @@ public class TestSum {
 
         hl.addHost(p.getHost());
         hl.addProbe(p);
-        
+
         ArrayList<String> glist = new ArrayList<String>();
         glist.add("Empty/SumTest");
         Sum s = new Sum("A sum test", glist);
         s.configure(hl);
         PlottableMap ppm = s.getCustomData();
         ppm.configure(begin, end, Full.STEP);
-        
+
         RrdDb db = new RrdDb(p.getRrdName());
         FetchData fd = db.createFetchRequest(ConsolFun.AVERAGE, begin, end).fetchData();        
         DataProcessor dp =  new DataProcessor(begin, end);
@@ -108,11 +98,11 @@ public class TestSum {
         dp.setFetchRequestResolution(Full.STEP);
         dp.processData();    
         LinearInterpolator li = new LinearInterpolator(dp.getTimestamps(), dp.getValues("shade"));
-        
+
         for(long i = begin; i < end - Full.STEP; i += Full.STEP) {
             Assert.assertEquals("Sum get wrong value", ppm.get("shade").getValue(i), li.getValue(i), 1e-7);
         }
-        
+
         Graph g = new Graph(s);
         g.setPeriod(pr);
         File outputFile =  new File("tmp", "sum.png");
