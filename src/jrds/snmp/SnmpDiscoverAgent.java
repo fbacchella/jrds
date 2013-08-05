@@ -108,6 +108,11 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         log(Level.TRACE, "Will search for probes %s", sortedProbeName);
         for(String name: sortedProbeName) {
             ProbeDescSummary summary = summaries.get(name);
+            if(summary == null) {
+                log(Level.ERROR, "ProbeDesc not valid for %s", name);
+                done.add(name);
+                continue;
+            }
             if(done.contains(name))
                 continue;
             log(Level.TRACE, "Trying to discover probe %s", name);
