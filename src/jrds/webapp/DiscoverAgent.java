@@ -48,7 +48,7 @@ public abstract class DiscoverAgent {
         };
         public abstract void  doNode(JrdsElement parent, FieldInfo fi);
     };
-    
+
     public static final class FieldInfo {
         public String id;
         public String label;

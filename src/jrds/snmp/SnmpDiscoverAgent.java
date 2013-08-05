@@ -105,16 +105,18 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
 
         Set<String> done = new HashSet<String>();
 
-        log(Level.TRACE, "Will search for probes %s", sortedProbeName);
+        log(Level.DEBUG, "Will search for probes %s", sortedProbeName);
         for(String name: sortedProbeName) {
             ProbeDescSummary summary = summaries.get(name);
             if(summary == null) {
-                log(Level.ERROR, "ProbeDesc not valid for %s", name);
+                log(Level.ERROR, "ProbeDesc not valid for %s, skip it", name);
                 done.add(name);
                 continue;
             }
-            if(done.contains(name))
+            if(done.contains(name)) {
+                log(Level.TRACE, "ProbeDesc %s already done, it must be hidden", name);                
                 continue;
+            }
             log(Level.TRACE, "Trying to discover probe %s", name);
 
             try {
@@ -126,13 +128,19 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
                     found = doesExist(hostEleme, summary);
                 }
                 if(found) {
-                    done.add(summary.name);
-                    String hides = summary.specifics.get("hides");
-                    if(hides != null && ! hides.isEmpty())
-                        done.add(hides);
+                    log(Level.DEBUG, "%s found", name);
+                    done.add(name);
+                    //Add all the hidden probes desc to the already done one
+                    String hidesStr = summary.specifics.get("hides");
+                    if(hidesStr != null && ! hidesStr.isEmpty()) {
+                        for(String hides: hidesStr.split(",")) {
+                            log(Level.DEBUG, "%s hides %s", name, hides.trim());
+                            done.add(hides.trim());
+                        }
+                    }
                 }
             } catch (Exception e1) {
-                log(Level.ERROR, e1, "Error detecting %s: %s" , summary.name, e1);
+                log(Level.ERROR, e1, "Error detecting %s: %s" , name, e1);
             }
         }
         active.doStop();
@@ -151,9 +159,9 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         }
     }
 
-    private String getLabel(LocalSnmpConnection active, List<OID> labelsOID) throws IOException {
-        Map<OID, Object> ifLabel = SnmpRequester.RAW.doSnmpGet(active, labelsOID);
-        for(Map.Entry<OID, Object> labelEntry: ifLabel.entrySet()) {
+    private String getLabel(LocalSnmpConnection active, OID labelOID) throws IOException {
+        Map<OID, Object> rowLabel = SnmpRequester.RAW.doSnmpGet(active, Collections.singletonList(labelOID));
+        for(Map.Entry<OID, Object> labelEntry: rowLabel.entrySet()) {
             String label = labelEntry.getValue().toString();
             if(label.length() >= 1)
                 return label;
@@ -171,22 +179,29 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         for(Map.Entry<OID, Object> e: indexes.entrySet()) {
             count++;
             Map<String, String> beans = new HashMap<String, String>(2);
-            OID indexoid = e.getKey();
+            OID rowOid = e.getKey();
             String indexName = e.getValue().toString();
-            int index = indexoid.last();
             beans.put("index", indexName);
 
+
+            int[] index = Arrays.copyOfRange(rowOid.getValue(), indexOid.size(), rowOid.size());
+
+            //If we wanted to generate a static oid
             if(withOid) {
-                beans.put("oid", Integer.toString(index));
+                OID suffixOid = new OID(index);
+                beans.put("oid", suffixOid.toString());
             }
+
             //We try to auto-generate the label
             String label = summary.specifics.get("labelOid");
             String labelValue = null;
             if (label != null && ! label.isEmpty()) {
+                OID suffixOid = new OID(index);
                 for(String lookin: label.split(",")) {
-                    OID Oidlabel = new OID(lookin.trim() + "." + index);
-                    labelValue = getLabel(active, Collections.singletonList(Oidlabel));
-                    break;
+                    OID labelOID = new OID(lookin.trim() + "." + suffixOid.toString());
+                    labelValue = getLabel(active, labelOID);
+                    if (labelValue != null)
+                        break;
                 }
             }
 
@@ -273,22 +288,20 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
             return;
 
         summaries.put(summary.name, summary);
-        String hides = summary.specifics.get("hides");
-        if(hides != null) {
-            //Both are new, just add them in the good order
-            if(! sortedProbeName.contains(hides) && ! sortedProbeName.contains(name)) {
+        String hidesStr = summary.specifics.get("hides");
+        if(hidesStr != null && ! hidesStr.trim().isEmpty()) {
+            int pos = Integer.MAX_VALUE;
+            for(String hides: hidesStr.split(",")) {
+                int hidesPos = sortedProbeName.indexOf(hides.trim());
+                pos = hidesPos != -1 ? Math.min(pos, hidesPos): pos;
+            }
+            if(pos > sortedProbeName.size()) {
+                // No hides found, add at the end
                 sortedProbeName.add(name);
-                sortedProbeName.add(hides);
             }
-            //hidden exist but this one is new, add before
-            else if(sortedProbeName.contains(hides) && ! sortedProbeName.contains(name)) {
-                int pos = sortedProbeName.indexOf(hides);
+            else {
+                // add before the first hidden probe
                 sortedProbeName.add(pos, name);
-            }
-            //hidden exist but this one is new, add after
-            else if(! sortedProbeName.contains(hides) && sortedProbeName.contains(name)) {
-                int pos = sortedProbeName.indexOf(name);
-                sortedProbeName.add(pos + 1, hides);
             }
         }
         //No hide, just put
