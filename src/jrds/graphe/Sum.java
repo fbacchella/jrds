@@ -52,12 +52,11 @@ public class Sum extends AutonomousGraphNode {
                 setGraphDesc(newgd);
                 logger.debug(Util.delayedFormatString("Adding sum called %s", getQualifieName()));       
             } catch (CloneNotSupportedException e) {
-                logger.fatal("GraphDesc is supposed to be clonnable, what happened ?", e);
-                throw new RuntimeException("GraphDesc is supposed to be clonnable, what happened ?");
+                throw new RuntimeException(String.format("GraphDesc is supposed to be clonnable, what happened with %s ?", getName()));
             }
         }
         else {
-            logger.error(Util.delayedFormatString("Not graph found in %s definition, unusable sum", getName()) );
+            throw new RuntimeException(String.format("Not graph found in %s definition, unusable sum", getName()));
         }
     }
 
@@ -79,7 +78,7 @@ public class Sum extends AutonomousGraphNode {
                     logger.trace("Looking for " + name + " in graph base, and found " + g);
                     if(g != null) {
                         fd = g.getProbe().fetchData(ConsolFun.AVERAGE, start, end, step);
-                        
+
                         //First pass, no data to use
                         if(allvalues == null) {
                             allvalues = (double[][]) fd.getValues().clone();
@@ -95,7 +94,6 @@ public class Sum extends AutonomousGraphNode {
                                             allvalues[c][r] += v;
                                         else    
                                             allvalues[c][r] = v;
-
                                     }
                                 }
                             }

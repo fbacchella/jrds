@@ -1,7 +1,6 @@
 
 package jrds;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -216,12 +215,18 @@ public class HostsList extends StarterNode {
 
         //Let's build the tab with all the sums
         Map<String, Sum> sums = conf.setSumMap();
+        Tab sumGraphsTab = new Tab.DynamicTree("Sums", PropertiesManager.SUMSTAB);
         if(sums.size() > 0) {
             for(Sum s: sums.values()) {
-                s.configure(this);
-                graphMap.put(s.getQualifieName().hashCode(), s);
-                customGraphsTab.add(s.getQualifieName(), "Sums", s.getName());
+                try {
+                    s.configure(this);
+                    graphMap.put(s.getQualifieName().hashCode(), s);
+                    sumGraphsTab.add(s.getQualifieName(), "Sums", s.getName());
+                } catch (Exception e1) {
+                    log(Level.ERROR, e1, "failed sum: %s", e1);
+                }
             }
+            allTabs.add(sumGraphsTab);
         }
 
         makeTabs(pm, conf, allTabs, customTabMap);
