@@ -37,6 +37,7 @@ amdVector = [
  "jrds/MinMaxTextBox",
  "jrds/Tabs",
  "jrds/TabContent",
+ "jrds/StatusButton",
  "dijit/layout/BorderContainer",
  "dijit/layout/ContentPane",
  "dijit/TitlePane",
@@ -64,6 +65,7 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
 			<div id="statusPane" data-dojo-type="dijit/TitlePane" title="Status">
 				<div id="status" >
 				</div>
+				<button id="refreshButton" data-dojo-type="jrds/StatusButton"> Refresh </button>
 			</div>
 			<div data-dojo-type="dijit/TitlePane" title="Command">
 				<button data-dojo-type="jrds.ReloadButton" type="button"> Reload </button>
