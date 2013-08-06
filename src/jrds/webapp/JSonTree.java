@@ -27,11 +27,12 @@ public class JSonTree extends JSonData {
 
     @Override
     public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException, JSONException {
-        Filter f = params.getFilter();
-        GraphTree tree = params.getTree();
-        Tab tab = params.getTab();
-        if(tab != null) {
+
+        if(ParamsBean.TABCHOICE.equals(params.getChoiceType() ) ) {
+            Tab tab = params.getTab();
             logger.debug(jrds.Util.delayedFormatString("Tab specified: %s", tab));
+            if(tab == null)
+                return false;
             if(tab.isFilters()){
                 Set<Filter> fset = tab.getFilters();
                 if(fset != null && fset.size() !=0) {
@@ -47,16 +48,26 @@ public class JSonTree extends JSonData {
                 }
             }
         }
-        else if(tree != null) {
+        else if(ParamsBean.TREECHOICE.equals(params.getChoiceType() ) ) {
+            GraphTree tree = params.getTree();
             logger.debug(jrds.Util.delayedFormatString("Tree specified: %s", tree));
+            if(tree == null)
+                return false;
             return evaluateTree(params, w, root, tree);
         }
-        else if( f != null) {
-            logger.debug(jrds.Util.delayedFormatString("Filter specified: %s", f));
-            return evaluateFilter(params, w, root, f);
+        else if(ParamsBean.FILTERCHOICE.equals(params.getChoiceType() ) ) {
+            Filter filter = params.getFilter();
+            logger.debug(jrds.Util.delayedFormatString("Filter specified: %s", filter));
+            if(filter == null)
+                return false;
+            return evaluateFilter(params, w, root, filter);
         }
-        logger.error("What to do ? No enough context");
-        return false;
+        //Nothing requested, wrong query
+        else {
+            return false;
+        }
+        //No error, but nothing to do
+        return true;
     }
 
     private boolean evaluateTree(ParamsBean params, JrdsJSONWriter w, HostsList root, GraphTree trytree) throws IOException, JSONException {

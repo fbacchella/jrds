@@ -347,28 +347,6 @@ return declare("jrds.ToogleSort", button, {
 });
 });
 
-define("jrds/ReloadButton",
-		[ "dojo/_base/declare",
-		  "dijit/form/Button" ],
-		function(declare, button) {
-return declare("jrds.ReloadButton", button, {
-	onClick: function() {
-		dojo.xhrGet( {
-			sync: false,
-			url: "reload?sync",
-			handleAs: "text",
-			preventCache: true,
-			load: function(response, ioArgs) {
-				refreshStatus();
-			},
-			error: function(response, ioArgs) {
-				console.error(response);
-			}
-		});		
-	}
-});
-});
-
 define("jrds/HostForm",
 		[ "dojo/_base/declare",
 		  "dijit/form/Form" ],
@@ -447,6 +425,7 @@ return declare("jrds.DiscoverHostForm", form, {
 						queryArgs[key] = dijit.byId(key).get('checked');
 				}
 				queryArgs.host = formValues.discoverHostName;
+				delete queryArgs.discoverHostName;
 
 				dojo.xhrGet( {
 					url: "discover?" + dojo.objectToQuery(queryArgs),
@@ -467,6 +446,118 @@ return declare("jrds.DiscoverHostForm", form, {
 			console.error(err);
 		}
 		return false;
+	}
+});
+});
+
+define("jrds/TabContent",
+		[ "dojo/_base/declare",
+		  "dijit/layout/ContentPane" ],
+		function(declare, layout) {
+return declare("jrds.TabContent", layout, {
+});
+});
+
+define("jrds/Tabs",
+		[ "dojo/_base/declare",
+		  "dijit/layout/TabContainer" ],
+		function(declare, layout) {
+return declare("jrds.Tabs", layout, {
+	postCreate: function() {
+		this.watch("selectedChildWidget", this.transitTab);
+		return this.inherited(arguments);
+	},
+	transitTab: function(name, oldPage, newPage) {
+	    var newId = newPage.attr('id');
+	    var oldId = oldPage.attr('id');
+	    if(oldId != 'adminTab') {
+	        oldPage.destroyDescendants(false);
+	    }
+	    this[newPage.callback](newPage);
+	},
+	setAdminTab: function () {
+		dijit.byId('refreshButton').refreshStatus();
+		dojo.place("<pre id='discoverResponse' />", dojo.byId('discoverResponse'), "replace");
+		dojo.style( dojo.byId('discoverResponse'), 'display', 'none');
+	},
+	treeTabCallBack: function(newTab) {
+		newTab.attr('content', dojo.clone(mainPane));
+
+		var treePane = dojo.byId('treePane');
+	    var keepParams = newTab.keepParams;
+
+		//keepParams used during page setup, to keep queryParams fields
+		if(keepParams) {
+			delete newTab.keepParams;
+		}
+		else {
+			if(queryParams.host)
+				delete queryParams.host;
+			if(queryParams.filter)
+				delete queryParams.filter;
+			if(queryParams.id)
+				delete queryParams.id;
+			queryParams.tab = newTab.attr('id');
+			queryParams.landtab = newTab.attr('id');
+		}
+
+		fileForms();
+		
+		//We don't load tree during initial setup
+		//It's done later
+		if(! keepParams)
+			getTree(newTab.isFilters);
+	}
+});
+});
+
+define("jrds/StatusButton",
+		[ "dojo/_base/declare",
+		  "dijit/form/Button" ],
+		function(declare, StatusButton) {
+return declare("jrds.StatusButton", StatusButton, {
+	'class': 'refreshbutton',
+    onClick: function() {
+    	this.refreshStatus();
+    },
+    onShow: function() {
+    	this.refreshStatus();
+    },
+    refreshStatus: function() {
+    	dojo.xhrGet( {
+    		url: "status?json",
+    		handleAs: "json",
+    		preventCache: true,
+    		load: function(response, ioArgs) {
+    			updateStatus(response);
+    		},
+    		error: function(response, ioArgs) {
+    			console.error("can't refresh status " + response.message);
+    			return response;
+    		}
+    	});
+    }
+});
+});
+
+define("jrds/ReloadButton",
+		[ "dojo/_base/declare",
+		  "dijit/form/Button" ],
+		function(declare, button) {
+return declare("jrds.ReloadButton", button, {
+	onClick: function() {
+		dojo.xhrGet( {
+			sync: false,
+			url: "reload?sync",
+			handleAs: "text",
+			preventCache: true,
+			load: function(response, ioArgs) {
+				dijit.byId('refreshButton').refreshStatus();
+			},
+			error: function(response, ioArgs) {
+				console.error(response);
+			}
+		});		
 	}
 });
 });
@@ -874,14 +965,13 @@ function history(url) {
 
 function setupTabs() {
     var tabWidget = dijit.byId('tabs');
-    dojo.connect(tabWidget,"_transition", transitTab);
     var i = 0;
     var isFilters;
 	
     for(key in queryParams.tabslist) {
         var pane = dijit.byId(key)
         if(pane == undefined) {
-		    pane = new dijit.layout.ContentPane({
+		    pane = new jrds.TabContent ({
 	            title:  queryParams.tabslist[key].label,
 	            id: queryParams.tabslist[key].id,
 	            isFilters: queryParams.tabslist[key].isFilters,
@@ -919,64 +1009,7 @@ function setupTabs() {
 	}
 }
 
-function transitTab(newPage, oldPage) {
-    var newId = newPage.attr('id');
-    var oldId = oldPage.attr('id');
-    if(oldId != 'adminTab') {
-        oldPage.destroyDescendants(false);
-    }
-    window[newPage.callback](newPage);
-}
-
-function treeTabCallBack(newTab) {
-	newTab.attr('content', dojo.clone(mainPane));
-
-	var treePane = dojo.byId('treePane');
-    var keepParams = newTab.keepParams;
-
-	//keepParams used during page setup, to keep queryParams fields
-	if(keepParams) {
-		delete newTab.keepParams;
-	}
-	else {
-		if(queryParams.host)
-			delete queryParams.host;
-		if(queryParams.filter)
-			delete queryParams.filter;
-		if(queryParams.id)
-			delete queryParams.id;
-		queryParams.tab = newTab.attr('id');
-		queryParams.landtab = newTab.attr('id');
-	}
-
-	fileForms();
-	
-	//We don't load tree during initial setup
-	//It's done later
-	if(! keepParams)
-		getTree(newTab.isFilters);
-}
-
-function refreshStatus() {
-	dojo.xhrGet( {
-		url: "status?json",
-		handleAs: "json",
-		preventCache: true,
-		load: function(response, ioArgs) {
-			updateStatus(response);
-		},
-		error: function(response, ioArgs) {
-			console.error("can't refresh status " + response.message);
-			return response;
-		}
-	});
-}
-
 function updateStatus(statusInfo) {
-	var oldButton = dijit.byId('refreshButton');
-	if(oldButton != null)
-		oldButton.destroyRecursive(false);
-
 	var statusNode = dojo.byId('status');
 	statusNode.innerHTML = '';
 
@@ -1018,26 +1051,6 @@ function updateStatus(statusInfo) {
 	var row5 = dojo.create("div", {'class': "statusrow"}, statusNode);
 	dojo.create('span', {'class': 'statuslabel', innerHTML: 'Generation'}, row5);
 	dojo.create('span', {'class': 'statusvalue', innerHTML: statusInfo.Generation}, row5);
-
-	var button = dojo.create("button", {id: 'refreshButton'});
-	dojo.place(button, statusNode, 'after');
-
-   	new dijit.form.Button({
-   		'class': 'refreshbutton',
-        label: "Refresh",
-        onClick: refreshStatus
-    }, "refreshButton");
-}
-
-function setAdminTab() {
-	refreshStatus();
-
-	//Setup the discoverer
-	var form = dojo.byId('discoverForm');
-	form.discoverHostName.value = '';
-	form.discoverSnmpCommunity.value = 'public';
-	form.discoverSnmpPort.value = '161';
-	dojo.style( dojo.byId('discoverResponse'), 'display', 'none');
 }
 
 function filesLoaded(e) {

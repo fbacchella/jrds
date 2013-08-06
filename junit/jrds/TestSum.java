@@ -11,21 +11,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import jrds.TestProbe.DummyProbe;
 import jrds.graphe.Sum;
 import jrds.mockobjects.Full;
-import jrds.mockobjects.GenerateProbe;
-import jrds.mockobjects.MokeProbe;
-import jrds.store.ExtractInfo;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.LinearInterpolator;
-import org.rrd4j.graph.RrdGraph;
-import org.rrd4j.graph.RrdGraphDef;
 
 public class TestSum {
     static final private Logger logger = Logger.getLogger(TestSum.class);
@@ -40,7 +35,7 @@ public class TestSum {
         Tools.prepareXml();
     }
 
-    @Test
+    @Test(expected=RuntimeException.class)
     public void emptysum() throws Exception {
         HostsList hl = new HostsList();
         hl.configure(new PropertiesManager());
@@ -49,14 +44,6 @@ public class TestSum {
         graphlist.add("badhost/badgraph");
         Sum s = new Sum("emptysum", graphlist);
         s.configure(hl);
-        Graph g = s.getGraph();
-        g.setPeriod(new Period());
-        RrdGraphDef rgd = g.getRrdGraphDef();
-        Assert.assertNotNull(rgd);
-        RrdGraph graph = new RrdGraph(rgd);
-        logger.debug(graph.getRrdGraphInfo().getHeight());
-        logger.debug(graph.getRrdGraphInfo().getWidth());
-        logger.debug(rgd.toString());
     }
 
     @Test

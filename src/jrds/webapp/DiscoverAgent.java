@@ -24,6 +24,8 @@ public abstract class DiscoverAgent {
                 Element button = parent.getOwnerDocument().createElement("button");
                 button.setAttribute("id", fi.id);
                 button.setAttribute("name", fi.id);
+                button.setAttribute("value", fi.value );
+
                 button.setAttribute("iconClass", "dijitCheckBoxIcon");
                 button.setAttribute("dojoType", "dijit.form.ToggleButton");
                 button.setTextContent(fi.label);
@@ -43,6 +45,7 @@ public abstract class DiscoverAgent {
                 input.setAttribute("trim", "true");
                 input.setAttribute("id", fi.id);
                 input.setAttribute("name", fi.id);
+                input.setAttribute("value", fi.value);
                 parent.appendChild(input);
             }
         };
@@ -52,6 +55,7 @@ public abstract class DiscoverAgent {
     public static final class FieldInfo {
         public String id;
         public String label;
+        public String value = "";
         public DojoType dojoType;
     };
 

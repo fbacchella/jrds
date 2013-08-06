@@ -1,6 +1,11 @@
 package jrds;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -39,5 +44,46 @@ public class TestHostsList {
         HostsList hl = new HostsList(pm);
         Assert.assertEquals("First tab not found", pm.tabsList.get(0), hl.getFirstTab());
         Assert.assertEquals("Missing tabs", pm.tabsList.size(), hl.getTabsId().size());
+    }
+    
+    @Test
+    public void testTagsTab() throws IOException {
+        PropertiesManager pm = Tools.makePm(testFolder);
+        pm.setProperty("tabs", "filtertab");
+        pm.update();
+        HostsList hl = new HostsList(pm);
+        Set<String> hostsTags = Collections.singleton("tag");
+        Set<Tab> tabs = new HashSet<Tab>();
+        hl.doTagsTabs(hostsTags, tabs);
+        Tab tab = (Tab) tabs.toArray()[0];
+        Assert.assertTrue(tab.isFilters());
+    }
+    
+    @Test
+    public void testCustomGraph() throws IOException {
+        PropertiesManager pm = Tools.makePm(testFolder);
+        pm.setProperty("tabs", "filtertab");
+        pm.update();
+        HostsList hl = new HostsList(pm);
+        GraphDesc gd = new GraphDesc();
+        gd.setName("truc");
+        gd.setGraphTitle("title");
+        Map<String, GraphDesc> gdmap = new HashMap<String, GraphDesc>();
+        gdmap.put(gd.getName(), gd);
+        Set<Tab> tabs = new HashSet<Tab>();
+        Map<Integer, GraphNode> graphMap = new HashMap<Integer, GraphNode>();
+        hl.doCustomGraphs(gdmap, graphMap, tabs);
+        hl.addGraphs(graphMap.values());
+        boolean found = false;
+        GraphNode node = null;
+        for(Tab t: tabs) {
+            if(PropertiesManager.CUSTOMGRAPHTAB.equals(t.id)) {
+                found = true;
+                t.setHostlist(hl);
+                node = t.getGraphTree().enumerateChildsGraph().get(0);
+            }
+        }
+        Assert.assertNotNull(graphMap.get(node.hashCode()));
+        Assert.assertTrue(found);
     }
 }

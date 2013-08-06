@@ -210,6 +210,9 @@ class Loader {
                             rep.put(name, d);
                         }
                     }
+                    else {
+                        logger.error("name not found in " + source);
+                    }
                 } catch (FileNotFoundException e) {
                     logger.error("File not found: " + source);
                 } catch (SAXParseException e) {

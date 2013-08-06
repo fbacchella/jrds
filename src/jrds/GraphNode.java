@@ -109,7 +109,11 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
      * @return
      */
     public String getQualifieName() {
-        return probe.getHost().getName() + "/"  + getName();
+        if (probe.getHost() != null) {
+            return probe.getHost().getName() + "/"  + getName();
+        } else {
+            return "/"  + getName();
+        }
     }
 
     public GraphDesc getGraphDesc() {

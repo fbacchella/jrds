@@ -31,6 +31,7 @@ public class Sum extends AutonomousGraphNode {
         gd.setGraphTitle(name);
         gd.setName(name);
         setGraphDesc(gd);
+        getProbe().addGraph(this);
     };
 
     public void configure(HostsList hl) {
