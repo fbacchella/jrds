@@ -20,6 +20,7 @@ public class MainStarter extends Starter {
         //Don't care about strict conformity
         SNMP4JSettings.setAllowSNMPv2InV1(true);
         org.snmp4j.log.LogFactory.setLogFactory(new Log4jLogFactory());
+        SNMP4JSettings.setThreadFactory(new ThreadFactory());
         //If not already configured, we filter it
         JrdsLoggerConfiguration.configureLogger("org.snmp4j", Level.ERROR);
     }
