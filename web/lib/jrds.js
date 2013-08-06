@@ -472,6 +472,67 @@ return declare("jrds.DiscoverHostForm", form, {
 });
 });
 
+define("jrds/TabContent",
+		[ "dojo/_base/declare",
+		  "dijit/layout/ContentPane" ],
+		function(declare, layout) {
+return declare("jrds.TabContent", layout, {
+});
+});
+
+define("jrds/Tabs",
+		[ "dojo/_base/declare",
+		  "dijit/layout/TabContainer" ],
+		function(declare, layout) {
+return declare("jrds.Tabs", layout, {
+	postCreate: function() {
+		this.watch("selectedChildWidget", this.transitTab);
+		return this.inherited(arguments);
+	},
+	transitTab: function(name, oldPage, newPage) {
+	    var newId = newPage.attr('id');
+	    var oldId = oldPage.attr('id');
+	    if(oldId != 'adminTab') {
+	        oldPage.destroyDescendants(false);
+	    }
+	    this[newPage.callback](newPage);
+	},
+	setAdminTab: function () {
+		refreshStatus();
+		dojo.place("<pre id='discoverResponse' />", dojo.byId('discoverResponse'), "replace");
+		dojo.style( dojo.byId('discoverResponse'), 'display', 'none');
+	},
+	treeTabCallBack: function(newTab) {
+		newTab.attr('content', dojo.clone(mainPane));
+
+		var treePane = dojo.byId('treePane');
+	    var keepParams = newTab.keepParams;
+
+		//keepParams used during page setup, to keep queryParams fields
+		if(keepParams) {
+			delete newTab.keepParams;
+		}
+		else {
+			if(queryParams.host)
+				delete queryParams.host;
+			if(queryParams.filter)
+				delete queryParams.filter;
+			if(queryParams.id)
+				delete queryParams.id;
+			queryParams.tab = newTab.attr('id');
+			queryParams.landtab = newTab.attr('id');
+		}
+
+		fileForms();
+		
+		//We don't load tree during initial setup
+		//It's done later
+		if(! keepParams)
+			getTree(newTab.isFilters);
+	}
+});
+});
+
 function initIndex() {
 	initQuery();
 	dojo.cookie("treeOneSaveStateCookie", null, {expires: -1});
@@ -875,14 +936,13 @@ function history(url) {
 
 function setupTabs() {
     var tabWidget = dijit.byId('tabs');
-    dojo.connect(tabWidget,"_transition", transitTab);
     var i = 0;
     var isFilters;
 	
     for(key in queryParams.tabslist) {
         var pane = dijit.byId(key)
         if(pane == undefined) {
-		    pane = new dijit.layout.ContentPane({
+		    pane = new jrds.TabContent ({
 	            title:  queryParams.tabslist[key].label,
 	            id: queryParams.tabslist[key].id,
 	            isFilters: queryParams.tabslist[key].isFilters,
@@ -920,43 +980,7 @@ function setupTabs() {
 	}
 }
 
-function transitTab(newPage, oldPage) {
-    var newId = newPage.attr('id');
-    var oldId = oldPage.attr('id');
-    if(oldId != 'adminTab') {
-        oldPage.destroyDescendants(false);
-    }
-    window[newPage.callback](newPage);
-}
 
-function treeTabCallBack(newTab) {
-	newTab.attr('content', dojo.clone(mainPane));
-
-	var treePane = dojo.byId('treePane');
-    var keepParams = newTab.keepParams;
-
-	//keepParams used during page setup, to keep queryParams fields
-	if(keepParams) {
-		delete newTab.keepParams;
-	}
-	else {
-		if(queryParams.host)
-			delete queryParams.host;
-		if(queryParams.filter)
-			delete queryParams.filter;
-		if(queryParams.id)
-			delete queryParams.id;
-		queryParams.tab = newTab.attr('id');
-		queryParams.landtab = newTab.attr('id');
-	}
-
-	fileForms();
-	
-	//We don't load tree during initial setup
-	//It's done later
-	if(! keepParams)
-		getTree(newTab.isFilters);
-}
 
 function refreshStatus() {
 	dojo.xhrGet( {
@@ -1028,17 +1052,6 @@ function updateStatus(statusInfo) {
         label: "Refresh",
         onClick: refreshStatus
     }, "refreshButton");
-}
-
-function setAdminTab() {
-	refreshStatus();
-
-	//Setup the discoverer
-	var form = dojo.byId('discoverForm');
-	form.discoverHostName.value = '';
-	form.discoverSnmpCommunity.value = 'public';
-	form.discoverSnmpPort.value = '161';
-	dojo.style( dojo.byId('discoverResponse'), 'display', 'none');
 }
 
 function filesLoaded(e) {
