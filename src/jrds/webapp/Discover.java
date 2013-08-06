@@ -1,7 +1,10 @@
 package jrds.webapp;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServlet;
@@ -32,15 +35,13 @@ public class Discover extends JrdsServlet {
 
     private static final String CONTENT_TYPE = "application/xml";
     private static final long serialVersionUID = 1L;
-    
+
     public static final class ProbeDescSummary {
         public final Class<?> clazz;
         public final String name;
         public final Map<String, String> specifics = new HashMap<String, String>();
-        public final JrdsDocument xml;
         public final boolean isIndexed;
         ProbeDescSummary(JrdsDocument probdesc, ClassLoader cl) throws ClassNotFoundException {
-            xml = probdesc;
             JrdsElement root = probdesc.getRootElement();
             JrdsElement buffer = root.getElementbyName("probeClass");
             String probeClass = buffer == null ? null : buffer.getTextContent().trim();
@@ -108,12 +109,18 @@ public class Discover extends JrdsServlet {
                 tagElem.setTextContent(tag);
             }
 
+        List<String> probeDescsName = new ArrayList<String>();
+        probeDescsName.addAll(probdescs.keySet());
+        Collections.sort(probeDescsName);
+
         for(DiscoverAgent da: getHostsList().getDiscoverAgent()) {
             try {
                 if(da.exist(hostname, request)) {
                     da.addConnection(hostEleme, request);
                     da.discoverPre(hostname, hostEleme, probdescs, request);
-                    for(JrdsDocument probeDescDocument: probdescs.values()) {
+                    for(String probeDescName: probeDescsName) {
+                        JrdsDocument probeDescDocument = probdescs.get(probeDescName);
+                        //for(JrdsDocument probeDescDocument: probdescs.values()) {
                         try {
                             ProbeDescSummary summary = new ProbeDescSummary(probeDescDocument, getPropertiesManager().extensionClassLoader);
                             boolean valid = false;

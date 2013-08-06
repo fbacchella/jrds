@@ -432,6 +432,12 @@ return declare("jrds.DiscoverHostForm", form, {
 				if(! this.validate()) {
 		            return false;
 				}
+				
+				//Clean the result box before discover
+				// TODO wait wheel for the pane
+				dojo.place("<pre id='discoverResponse' />", dojo.byId('discoverResponse'), "replace");
+				dojoStyle.set( dojo.byId('discoverResponse'), 'display', 'none');
+
 				var queryArgs = { };
 				formValues = this.get('value');
 				for(key in formValues) {
