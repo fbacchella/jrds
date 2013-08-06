@@ -217,16 +217,19 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         community.dojoType = DojoType.TextBox;
         community.id = "discoverSnmpCommunity";
         community.label = "SNMP community";
+        community.value = "public";
 
         FieldInfo port = new FieldInfo();
         port.dojoType = DojoType.TextBox;
         port.id = "discoverSnmpPort";
         port.label = "SNMP Port";
+        port.value = "161";
 
         FieldInfo keepOID = new FieldInfo();
         keepOID.dojoType = DojoType.ToggleButton;
         keepOID.id = "discoverWithOid";
         keepOID.label = " Keep index OID ";
+        keepOID.value = "false";
 
         return Arrays.asList(community, port, keepOID);
     }

@@ -447,6 +447,7 @@ return declare("jrds.DiscoverHostForm", form, {
 						queryArgs[key] = dijit.byId(key).get('checked');
 				}
 				queryArgs.host = formValues.discoverHostName;
+				delete queryArgs.discoverHostName;
 
 				dojo.xhrGet( {
 					url: "discover?" + dojo.objectToQuery(queryArgs),
