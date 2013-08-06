@@ -1,6 +1,5 @@
 package jrds.graphe;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -55,12 +54,11 @@ public class Sum extends AutonomousGraphNode {
                 setGraphDesc(newgd);
                 logger.debug(Util.delayedFormatString("Adding sum called %s", getQualifieName()));       
             } catch (CloneNotSupportedException e) {
-                logger.fatal("GraphDesc is supposed to be clonnable, what happened ?", e);
-                throw new RuntimeException("GraphDesc is supposed to be clonnable, what happened ?");
+                throw new RuntimeException(String.format("GraphDesc is supposed to be clonnable, what happened with %s ?", getName()));
             }
         }
         else {
-            logger.error(Util.delayedFormatString("Not graph found in %s definition, unusable sum", getName()) );
+            throw new RuntimeException(String.format("Not graph found in %s definition, unusable sum", getName()));
         }
     }
 
@@ -84,34 +82,25 @@ public class Sum extends AutonomousGraphNode {
                 for(String name : graphList) {
                     GraphNode g = hl.getGraphById(name.hashCode());
                     logger.trace("Looking for " + name + " in graph base, and found " + g);
-                    if(g == null) {
-                        logger.error("Graph not found: " + name);
-                        continue;
-                    }
+                    if(g != null) {
+                        fd = g.getProbe().fetchData(ConsolFun.AVERAGE, start, end, step);
 
-                    try {
-                        dp = g.getPlottedDate(ei);
-                    } catch (IOException e) {
-                        logger.error("Failed to read " + g.getProbe());
-                        continue;
-                    }
-
-                    //First pass, no data to use
-                    if(allvalues == null) {
-                        allvalues = (double[][]) dp.getValues().clone();
-                    }
-                    //Next step, sum previous values
-                    else {
-                        double[][] tempallvalues = dp.getValues();
-                        for(int c = 0 ; c < tempallvalues.length ; c++) {
-                            for(int r = 0 ; r < tempallvalues[c].length; r++) {
-                                double v = tempallvalues[c][r];
-                                if ( ! Double.isNaN(v) ) {
-                                    if(! Double.isNaN(allvalues[c][r]))
-                                        allvalues[c][r] += v;
-                                    else    
-                                        allvalues[c][r] = v;
-
+                        //First pass, no data to use
+                        if(allvalues == null) {
+                            allvalues = (double[][]) fd.getValues().clone();
+                        }
+                        //Next step, sum previous values
+                        else {
+                            double[][] tempallvalues = fd.getValues();
+                            for(int c = 0 ; c < tempallvalues.length ; c++) {
+                                for(int r = 0 ; r < tempallvalues[c].length; r++) {
+                                    double v = tempallvalues[c][r];
+                                    if ( ! Double.isNaN(v) ) {
+                                        if(! Double.isNaN(allvalues[c][r]))
+                                            allvalues[c][r] += v;
+                                        else    
+                                            allvalues[c][r] = v;
+                                    }
                                 }
                             }
                         }
