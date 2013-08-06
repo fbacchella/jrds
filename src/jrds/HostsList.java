@@ -2,6 +2,7 @@
 package jrds;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -312,7 +313,7 @@ public class HostsList extends StarterNode {
                 AutonomousGraphNode gn = new AutonomousGraphNode(gd);
                 gn.configure(this);
                 graphMap.put(gn.getQualifieName().hashCode(), gn);
-                customGraphsTab.add(gn.getQualifieName(), gn.getGraphDesc().getHostTree(gn));
+                customGraphsTab.add(gn.getQualifieName(), Arrays.asList(new String[] {gd.getName()}));
             }
             tabs.add(customGraphsTab);
         }

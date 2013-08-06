@@ -67,12 +67,23 @@ public class TestHostsList {
         HostsList hl = new HostsList(pm);
         GraphDesc gd = new GraphDesc();
         gd.setName("truc");
+        gd.setGraphTitle("title");
         Map<String, GraphDesc> gdmap = new HashMap<String, GraphDesc>();
         gdmap.put(gd.getName(), gd);
         Set<Tab> tabs = new HashSet<Tab>();
         Map<Integer, GraphNode> graphMap = new HashMap<Integer, GraphNode>();
         hl.doCustomGraphs(gdmap, graphMap, tabs);
-        logger.trace(graphMap);
-        logger.trace(tabs);
+        hl.addGraphs(graphMap.values());
+        boolean found = false;
+        GraphNode node = null;
+        for(Tab t: tabs) {
+            if(PropertiesManager.CUSTOMGRAPHTAB.equals(t.id)) {
+                found = true;
+                t.setHostlist(hl);
+                node = t.getGraphTree().enumerateChildsGraph().get(0);
+            }
+        }
+        Assert.assertNotNull(graphMap.get(node.hashCode()));
+        Assert.assertTrue(found);
     }
 }
