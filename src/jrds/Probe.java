@@ -710,7 +710,9 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     public Document dumpAsXml(boolean sorted) throws ParserConfigurationException, IOException {
         String probeName = getPd().getName();
         String name = getName();
-        String host = getHost().getName();
+        String host = "";
+        if(getHost() != null)
+            host = getHost().getName();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.newDocument();
