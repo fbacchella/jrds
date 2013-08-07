@@ -30,7 +30,7 @@ public class JSonTree extends JSonData {
 
         if(ParamsBean.TABCHOICE.equals(params.getChoiceType() ) ) {
             Tab tab = params.getTab();
-            logger.debug(jrds.Util.delayedFormatString("Tab specified: %s", tab));
+            logger.debug(jrds.Util.delayedFormatString("Tab specified: %s", params.getChoiceValue()));
             if(tab == null)
                 return false;
             if(tab.isFilters()){
@@ -48,16 +48,23 @@ public class JSonTree extends JSonData {
                 }
             }
         }
+        else if(ParamsBean.HOSTCHOICE.equals(params.getChoiceType() ) ) {
+            GraphTree tree = params.getTree();
+            logger.debug(jrds.Util.delayedFormatString("Host specified: %s", params.getChoiceValue()));
+            if(tree == null)
+                return false;
+            return evaluateTree(params, w, root, tree);
+        }
         else if(ParamsBean.TREECHOICE.equals(params.getChoiceType() ) ) {
             GraphTree tree = params.getTree();
-            logger.debug(jrds.Util.delayedFormatString("Tree specified: %s", tree));
+            logger.debug(jrds.Util.delayedFormatString("Tree specified: %s", params.getChoiceValue()));
             if(tree == null)
                 return false;
             return evaluateTree(params, w, root, tree);
         }
         else if(ParamsBean.FILTERCHOICE.equals(params.getChoiceType() ) ) {
             Filter filter = params.getFilter();
-            logger.debug(jrds.Util.delayedFormatString("Filter specified: %s", filter));
+            logger.debug(jrds.Util.delayedFormatString("Filter specified: %s", params.getChoiceValue()));
             if(filter == null)
                 return false;
             return evaluateFilter(params, w, root, filter);
