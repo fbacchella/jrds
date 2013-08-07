@@ -230,6 +230,7 @@
 				<include name="dijit/themes/nihilo/images/spriteArrows.png" />
 				<include name="dijit/themes/nihilo/images/validationInputBg.png" />
 				<include name="dijit/themes/nihilo/images/accordionItemActive.png" />
+				<include name="dijit/themes/nihilo/images/warning.png" />
 				<include name="dojox/widget/Standby/images/loading.gif" />
 				<include name="dojo/resources/blank.gif" />
 				<include name="dojo/resources/dojo.css" />
