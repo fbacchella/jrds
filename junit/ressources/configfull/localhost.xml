@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE host PUBLIC "-//jrds//DTD Host//EN" "urn:jrds:host">
+<host name="localhost">
+    <tag>localhost</tag>
+    <connection type="jrds.snmp.SnmpConnection">
+        <attr name="community">public</attr>
+        <attr name="version">2</attr>
+    </connection>
+    <probe type="IfXSnmp" label="loopback">
+        <attr name="index">lo0</attr>
+    </probe>
+</host>

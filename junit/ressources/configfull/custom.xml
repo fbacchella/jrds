@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE graph PUBLIC "-//jrds//DTD Graph Description//EN"
+                           "urn:jrds:graphdesc">
+<graph>
+        <name>name</name>
+        <graphName>graphName</graphName>
+        <graphTitle/>
+        <nolegend />
+        <novalues />
+        <verticalLabel>bytes</verticalLabel>
+       <addpath>
+                <path>
+                        <host>localhost</host>
+                        <probe>ifx-lo0</probe>
+                        <dsName>ifHCInOctets</dsName>
+                </path>
+                <graphType>line</graphType>
+                <legend>a legend</legend>
+        </addpath>
+</graph>
