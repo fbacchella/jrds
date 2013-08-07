@@ -508,14 +508,14 @@ public class ParamsBean implements Serializable {
 
         return parambuff.toString();
     }
-    
+
     /**
      * @return the id
      */
     public Integer getId() {
         return id;
     }
-    
+
     /**
      * @param id the id to set
      */

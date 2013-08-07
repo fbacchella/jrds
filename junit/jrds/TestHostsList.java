@@ -35,7 +35,7 @@ public class TestHostsList {
         Assert.assertEquals("First tab not found", pm.tabsList.get(0), hl.getFirstTab());
         Assert.assertEquals("Missing tabs", pm.tabsList.size() - optionalstabs.length, hl.getTabsId().size());
     }
-    
+
     @Test
     public void testOther() throws IOException {
         PropertiesManager pm = Tools.makePm(testFolder);
@@ -45,7 +45,7 @@ public class TestHostsList {
         Assert.assertEquals("First tab not found", pm.tabsList.get(0), hl.getFirstTab());
         Assert.assertEquals("Missing tabs", pm.tabsList.size(), hl.getTabsId().size());
     }
-    
+
     @Test
     public void testTagsTab() throws IOException {
         PropertiesManager pm = Tools.makePm(testFolder);
@@ -58,7 +58,7 @@ public class TestHostsList {
         Tab tab = (Tab) tabs.toArray()[0];
         Assert.assertTrue(tab.isFilters());
     }
-    
+
     @Test
     public void testCustomGraph() throws IOException {
         PropertiesManager pm = Tools.makePm(testFolder);
@@ -72,7 +72,8 @@ public class TestHostsList {
         gdmap.put(gd.getName(), gd);
         Set<Tab> tabs = new HashSet<Tab>();
         Map<Integer, GraphNode> graphMap = new HashMap<Integer, GraphNode>();
-        hl.doCustomGraphs(gdmap, graphMap, tabs);
+        Map<String, GraphTree> graphTrees = new HashMap<String, GraphTree>();
+        hl.doCustomGraphs(gdmap, graphMap, graphTrees, tabs);
         hl.addGraphs(graphMap.values());
         boolean found = false;
         GraphNode node = null;
@@ -85,5 +86,6 @@ public class TestHostsList {
         }
         Assert.assertNotNull(graphMap.get(node.hashCode()));
         Assert.assertTrue(found);
+        Assert.assertNotEquals(graphTrees.size(),0);
     }
 }
