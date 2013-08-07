@@ -30,6 +30,7 @@ public class TestReadElements {
         List<JSONObject> graphs = new ArrayList<JSONObject>();
         List<JSONObject> trees = new ArrayList<JSONObject>();
         List<JSONObject> filters = new ArrayList<JSONObject>();
+        List<JSONObject> nodes = new ArrayList<JSONObject>();
     }
 
     @Rule
@@ -80,7 +81,6 @@ public class TestReadElements {
     private TreeContent scantree(JSONObject tree) throws IOException, Exception {
         TreeContent result = new TreeContent();
         int size = tree.getJSONArray("items").length();
-        List<JSONObject> graphs = new ArrayList<JSONObject>(size);
         for(int i=0;i < size ; i++) {
             JSONObject item = tree.getJSONArray("items").getJSONObject(i);
             String type = item.getString("type");
@@ -90,10 +90,22 @@ public class TestReadElements {
                 result.graphs.add(graphdetails);
             }
             else if("tree".equals(type)) {
+                String id = item.getString("id").split("\\.")[1];
+                JSONObject subtree = jsonquery("/jsontree?tree=" + id);
+                logger.debug("subtree:  " +subtree.toString(2));
+                TreeContent subresult = scantree(subtree);
+                result.graphs.addAll(subresult.graphs);
+                result.filters.addAll(subresult.filters);
                 result.trees.add(item);
             }
             else if("filter".equals(type)) {
                 result.filters.add(item);
+            }
+            else if("node".equals(type)) {
+                result.nodes.add(item);
+             }
+            else {
+                Assert.fail(type);
             }
         }
         return result;
@@ -102,51 +114,71 @@ public class TestReadElements {
     @Test
     public void testQueryHost() throws IOException, Exception {
         JSONObject tree = jsonquery("/jsontree?host=localhost");
-        logger.trace(tree);
         Assert.assertEquals(4, tree.getJSONArray("items").length());   
-        Assert.assertEquals(3,  scantree(tree).graphs.size());
-        Assert.assertEquals(1,  scantree(tree).trees.size());
-        Assert.assertEquals(0,  scantree(tree).filters.size());
+        Assert.assertEquals(3, scantree(tree).graphs.size());
+        Assert.assertEquals(1, scantree(tree).trees.size());
+        Assert.assertEquals(0, scantree(tree).filters.size());
+        Assert.assertEquals(0, scantree(tree).nodes.size());
+    }
+
+    @Test
+    public void testQueryFilter() throws IOException, Exception {
+        JSONObject tree = jsonquery("/jsontree?filter=Localhost");
+        Assert.assertEquals(20, tree.getJSONArray("items").length());   
+        Assert.assertEquals(6, scantree(tree).graphs.size());
+        Assert.assertEquals(2, scantree(tree).trees.size());
+        Assert.assertEquals(0, scantree(tree).filters.size());
+        Assert.assertEquals(12, scantree(tree).nodes.size());
     }
 
     @Test
     public void testServicesTab() throws IOException, Exception {
         JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.SERVICESTAB);
-        logger.trace(tree);
         Assert.assertEquals(0, tree.getJSONArray("items").length());
-        Assert.assertEquals(0,  scantree(tree).graphs.size());
-        Assert.assertEquals(0,  scantree(tree).trees.size());
-        Assert.assertEquals(0,  scantree(tree).filters.size());
+        Assert.assertEquals(0, scantree(tree).graphs.size());
+        Assert.assertEquals(0, scantree(tree).trees.size());
+        Assert.assertEquals(0, scantree(tree).filters.size());
+        Assert.assertEquals(0, scantree(tree).nodes.size());
     }
 
     @Test
     public void testViewTab() throws IOException, Exception {
         JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.VIEWSTAB);
-        logger.trace(tree);
         Assert.assertEquals(11, tree.getJSONArray("items").length());        
-        Assert.assertEquals(3,  scantree(tree).graphs.size());
-        Assert.assertEquals(1,  scantree(tree).trees.size());
-        Assert.assertEquals(0,  scantree(tree).filters.size());
+        Assert.assertEquals(3, scantree(tree).graphs.size());
+        Assert.assertEquals(1, scantree(tree).trees.size());
+        Assert.assertEquals(0, scantree(tree).filters.size());
+        Assert.assertEquals(7, scantree(tree).nodes.size());
     }
 
     @Test
     public void testHostTab() throws IOException, Exception {
         JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.HOSTSTAB);
-        logger.trace(tree);
         Assert.assertEquals(4, tree.getJSONArray("items").length());        
-        Assert.assertEquals(3,  scantree(tree).graphs.size());
-        Assert.assertEquals(1,  scantree(tree).trees.size());
-        Assert.assertEquals(0,  scantree(tree).filters.size());
+        Assert.assertEquals(3, scantree(tree).graphs.size());
+        Assert.assertEquals(1, scantree(tree).trees.size());
+        Assert.assertEquals(0, scantree(tree).filters.size());
+        Assert.assertEquals(0, scantree(tree).nodes.size());
     }
 
     @Test
     public void testTagsTab() throws IOException, Exception {
         JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.TAGSTAB);
-        logger.trace(tree);
         Assert.assertEquals(1, tree.getJSONArray("items").length());        
-        Assert.assertEquals(0,  scantree(tree).graphs.size());
-        Assert.assertEquals(0,  scantree(tree).trees.size());
-        Assert.assertEquals(1,  scantree(tree).filters.size());
+        Assert.assertEquals(0, scantree(tree).graphs.size());
+        Assert.assertEquals(0, scantree(tree).trees.size());
+        Assert.assertEquals(1, scantree(tree).filters.size());
+        Assert.assertEquals(0, scantree(tree).nodes.size());
+    }
+
+    @Test
+    public void testCustomTab() throws IOException, Exception {
+        JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.CUSTOMGRAPHTAB);
+        Assert.assertEquals(2, tree.getJSONArray("items").length());        
+        Assert.assertEquals(1, scantree(tree).graphs.size());
+        Assert.assertEquals(1, scantree(tree).trees.size());
+        Assert.assertEquals(0, scantree(tree).filters.size());
+        Assert.assertEquals(0, scantree(tree).nodes.size());
     }
 
     @Test

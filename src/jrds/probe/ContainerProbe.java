@@ -1,21 +1,18 @@
-/*##########################################################################
-_##
-_##  $Id: BackEndCommiter.java 235 2006-03-01 21:29:48 +0100 (mer., 01 mars 2006) fbacchella $
-_##
-_##########################################################################*/
-
 package jrds.probe;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 
+import jrds.HostInfo;
 import jrds.Probe;
 import jrds.ProbeDesc;
 
 import org.apache.log4j.Level;
 
 public class ContainerProbe extends Probe<Object, Number> {
+    static private final HostInfo ContainerHost = new HostInfo("ContainerHost");
+
     static final ProbeDesc pd = new ProbeDesc(0) {
         @Override
         public String getName() {
@@ -33,6 +30,7 @@ public class ContainerProbe extends Probe<Object, Number> {
     public ContainerProbe(String name) {
         super(pd);
         setName(name);
+        this.monitoredHost = ContainerHost;
     }
 
     //An array list is needed, the introspection is picky

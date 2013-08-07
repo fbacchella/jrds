@@ -57,7 +57,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     };
 
     private String name = null;
-    private HostInfo monitoredHost;
+    protected HostInfo monitoredHost;
     private Collection<GraphNode> graphList = new ArrayList<GraphNode>();
     private ProbeDesc pd;
     private long uptime = Long.MAX_VALUE;
