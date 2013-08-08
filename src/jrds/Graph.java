@@ -188,8 +188,8 @@ public class Graph implements WithACL {
      * Return a uniq name for the graph
      * @return
      */
-    public String getQualifieName() {
-        return node.getQualifieName();
+    public String getQualifiedName() {
+        return node.getQualifiedName();
     }
 
     /**

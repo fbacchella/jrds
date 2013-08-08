@@ -24,10 +24,10 @@ public class AutonomousGraphNode extends GraphNode implements WithACL  {
     }
 
     /* (non-Javadoc)
-     * @see jrds.GraphNode#getQualifieName()
+     * @see jrds.GraphNode#getQualifiedName()
      */
     @Override
-    public String getQualifieName() {
+    public String getQualifiedName() {
         return "/" + name;
     }
 

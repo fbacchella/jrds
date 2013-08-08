@@ -108,7 +108,7 @@ public class Renderer {
                         long endtime = System.currentTimeMillis();
                         long duration1 = (middletime - starttime );
                         long duration2 = (endtime - middletime );
-                        logger.trace("Graph " + graph.getQualifieName() + " renderding ran for (ms) " + duration1 + ":" + duration2);	
+                        logger.trace("Graph " + graph.getQualifiedName() + " renderding ran for (ms) " + duration1 + ":" + duration2);	
                     }
                 }
             } catch (FileNotFoundException e) {
