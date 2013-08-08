@@ -53,7 +53,7 @@ public class ParamsBean implements Serializable {
     static public final String TREECHOICE = "tree";    
     static public final String TABCHOICE = "tab";
     static public final String FILTERCHOICE = "filter";
-    static public final String HOSTCHOICE = "filter";
+    static public final String HOSTCHOICE = "host";
 
     private static final ThreadLocal<DateFormat> df = 
             new ThreadLocal<DateFormat> () {
@@ -525,14 +525,14 @@ public class ParamsBean implements Serializable {
 
         return parambuff.toString();
     }
-    
+
     /**
      * @return the id
      */
     public Integer getId() {
         return id;
     }
-    
+
     /**
      * @param id the id to set
      */

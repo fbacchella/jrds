@@ -74,7 +74,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     private String name = null;
-    private HostInfo monitoredHost;
+    protected HostInfo monitoredHost;
     private Collection<GraphNode> graphList = new ArrayList<GraphNode>();
     private ProbeDesc pd;
     private long uptime = Long.MAX_VALUE;
@@ -455,7 +455,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
         Element graphs = (Element) root.appendChild(document.createElement("graphs"));
         for(GraphNode gn: this.graphList) {
-            String qualifiedGraphName = gn.getQualifieName();
+            String qualifiedGraphName = gn.getQualifiedName();
             Element graph = (Element) graphs.appendChild(document.createElement("graphname"));
             graph.setTextContent(qualifiedGraphName);
             graph.setAttribute("id", String.valueOf(gn.hashCode()));

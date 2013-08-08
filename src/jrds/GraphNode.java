@@ -50,7 +50,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
      * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
-        return getQualifieName().hashCode();
+        return getQualifiedName().hashCode();
     }
 
     /**
@@ -108,7 +108,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
      * Return a uniq name for the graph
      * @return
      */
-    public String getQualifieName() {
+    public String getQualifiedName() {
         if (probe.getHost() != null) {
             return probe.getHost().getName() + "/"  + getName();
         } else {

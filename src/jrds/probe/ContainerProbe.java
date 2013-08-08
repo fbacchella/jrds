@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-import jrds.JrdsSample;
+import jrds.HostInfo;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.store.EmptyExtractor;
@@ -15,6 +15,8 @@ import jrds.store.Store;
 import org.apache.log4j.Level;
 
 public class ContainerProbe extends Probe<Object, Number> {
+    static private final HostInfo ContainerHost = new HostInfo("ContainerHost");
+
     static final ProbeDesc pd = new ProbeDesc(0) {
         @Override
         public String getName() {
@@ -32,6 +34,7 @@ public class ContainerProbe extends Probe<Object, Number> {
     public ContainerProbe(String name) {
         super(pd);
         setName(name);
+        this.monitoredHost = ContainerHost;
     }
 
     //An array list is needed, the introspection is picky

@@ -178,16 +178,16 @@ public class HostsList extends StarterNode {
         //Let's build the tab with all the filters
         doFilterTabs(conf.setFilterMap(), allTabs);
 
+        //Build all the sums and add them to all the graphs
+        doSums(conf.setSumMap(), graphMap, treeMap, allTabs);
+
         //Let's build the tab with all the custom graph and add them to all graph
-        doCustomGraphs(conf.setGrapMap(), graphMap, allTabs);
+        doCustomGraphs(conf.setGrapMap(), graphMap, treeMap, allTabs);
 
         //Resolve the custom tabs and generate the associated tree
         Map<String, Tab> customTabMap = conf.setTabMap();
         doCustomTabs(customTabMap, treeMap, allTabs);
 
-
-        //Build all the sums and add them to all the graphs
-        doSums(conf.setSumMap(), graphMap, allTabs);
 
         //Add the always here tabs
         allTabs.add(new Tab.StaticTree("All services", PropertiesManager.SERVICESTAB, getGraphTreeByView().getByPath(GraphTree.VIEWROOT, "Services")));
@@ -288,34 +288,40 @@ public class HostsList extends StarterNode {
         tabs.add(filterTab);
     }
 
-    void doSums(Map<String, Sum> sums, Map<Integer, GraphNode> graphMap, Set<Tab> tabs) {
+    void doSums(Map<String, Sum> sums, Map<Integer, GraphNode> graphMap, Map<String, GraphTree> treeMap, Set<Tab> tabs) {
         //Let's build the tab with all the sums
         if(sums.size() > 0) {
             Tab sumGraphsTab = new Tab.DynamicTree("Sums", PropertiesManager.SUMSTAB);
+            sumGraphsTab.setHostlist(this);
             for(Sum s: sums.values()) {
                 try {
                     s.configure(this);
-                    graphMap.put(s.getQualifieName().hashCode(), s);
-                    sumGraphsTab.add(s.getQualifieName(), "Sums", s.getName());
+                    graphMap.put(s.getQualifiedName().hashCode(), s);
+                    sumGraphsTab.add(s.getQualifiedName(), "Sums", s.getName());
                 } catch (Exception e1) {
                     log(Level.ERROR, e1, "failed sum: %s", e1);
                 }
             }
+            GraphTree tree = sumGraphsTab.getGraphTree();
+            treeMap.put(tree.getName(), tree);
             tabs.add(sumGraphsTab);
         }
     }
 
-    void doCustomGraphs(Map<String, GraphDesc> graphs, Map<Integer, GraphNode> graphMap, Set<Tab> tabs) {
+    void doCustomGraphs(Map<String, GraphDesc> graphs, Map<Integer, GraphNode> graphMap, Map<String, GraphTree> treeMap, Set<Tab> tabs) {
         log(Level.DEBUG, "Parsing graphs configuration");
         //Let's build the tab with all the custom graphs
         if(! graphs.isEmpty()) {
             Tab customGraphsTab = new Tab.DynamicTree("Custom graphs", PropertiesManager.CUSTOMGRAPHTAB);
+            customGraphsTab.setHostlist(this);
             for(GraphDesc gd: graphs.values()) {
                 AutonomousGraphNode gn = new AutonomousGraphNode(gd);
                 gn.configure(this);
-                graphMap.put(gn.getQualifieName().hashCode(), gn);
-                customGraphsTab.add(gn.getQualifieName(), Arrays.asList(new String[] {gd.getName()}));
+                graphMap.put(gn.getQualifiedName().hashCode(), gn);
+                customGraphsTab.add(gn.getQualifiedName(), Arrays.asList(new String[] {gd.getName()}));
             }
+            GraphTree tree = customGraphsTab.getGraphTree();
+            treeMap.put(tree.getName(), tree);
             tabs.add(customGraphsTab);
         }
     }

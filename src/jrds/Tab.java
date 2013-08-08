@@ -100,7 +100,7 @@ public abstract class Tab {
     public void add(String id, String... path) {
         add(id, Arrays.asList(path));
     }
-    
+
     public void add(String id, List<String> path) {
         throw new RuntimeException("Not implemented");
     }

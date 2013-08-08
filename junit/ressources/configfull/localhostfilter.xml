@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE filter PUBLIC "-//jrds//DTD Filter//EN" "urn:jrds:filter">
+<filter>
+        <name>Localhost</name>
+        <tag>localhost</tag>
+</filter>

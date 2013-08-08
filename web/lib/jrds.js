@@ -585,7 +585,7 @@ function initIndex() {
 	dojo.parser.parse()
 	
 	setupTabs();
-	setupDisplay();
+	getGraphList();
 }
 
 function initPopup() {
@@ -649,18 +649,6 @@ function cleanParams(paramslist) {
 			cleaned[key] = value;
 	});
 	return cleaned;
-}
-
-function graphHistory() {
-	var graphPane = dojo.byId("graphPane");
-	dojo.empty(graphPane);
-
-	var graphParams = {};
-	graphParams.id = queryParams.id;
-	graphParams.history = 1;
-	var graphImg = dojo.create("img");
-	dojo.attr(graphImg, "src", "graph?" + dojo.objectToQuery(graphParams));		
-	dojo.place(graphImg, graphPane);
 }
 
 function doGraphList(result) {
@@ -799,12 +787,6 @@ function fileForms() {
 
 	dijit.byId("sorted").set('checked', parseBool(queryParams.sort));
 	
-}
-
-function setupDisplay() {
-	if(queryParams.id) {
-		getGraphList();
-	}
 }
 
 function startStandBy(pane) {
