@@ -59,14 +59,14 @@ public class FilterXml extends Filter {
         boolean accepted = false;
 
         //An explicit graph is always accepted
-        if (names.contains(graph.getQualifieName()))
+        if (names.contains(graph.getQualifiedName()))
             accepted = true;
         //if neither tags or path, it's refused
         else if(! tags.isEmpty() || ! goodPaths.isEmpty())
             accepted  = (acceptPath(path) &&  acceptTag(graph.getProbe()) ) ;
 
         if(logger.isTraceEnabled())
-            logger.trace(Util.delayedFormatString("Tried to accept : %s=%s, %s: %b", path, graph.getQualifieName(), graph.getProbe() != null ? graph.getProbe().getTags(): "", accepted));
+            logger.trace(Util.delayedFormatString("Tried to accept : %s=%s, %s: %b", path, graph.getQualifiedName(), graph.getProbe() != null ? graph.getProbe().getTags(): "", accepted));
 
         return accepted;
     }
