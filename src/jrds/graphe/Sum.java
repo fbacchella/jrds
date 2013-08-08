@@ -51,7 +51,7 @@ public class Sum extends AutonomousGraphNode {
                 GraphDesc newgd  = (GraphDesc) oldgd.clone();
                 newgd.setGraphTitle(getName());
                 setGraphDesc(newgd);
-                logger.debug(Util.delayedFormatString("Adding sum called %s", getQualifieName()));       
+                logger.debug(Util.delayedFormatString("Adding sum called %s", getQualifiedName()));       
             } catch (CloneNotSupportedException e) {
                 throw new RuntimeException(String.format("GraphDesc is supposed to be clonnable, what happened with %s ?", getName()));
             }

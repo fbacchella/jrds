@@ -71,9 +71,9 @@ public class JSonGraph extends JSonData {
         r.render(graph);
         Probe<?,?> p = gn.getProbe();
         imgProps.put("probename", p.getName());
-        imgProps.put("qualifiedname", graph.getQualifieName());
+        imgProps.put("qualifiedname", graph.getQualifiedName());
 
-        imgProps.put("qualifiedname", graph.getQualifieName());
+        imgProps.put("qualifiedname", graph.getQualifiedName());
         GraphDesc gd = gn.getGraphDesc();
         if(gd !=null && gd.getDimension() != null) {
             imgProps.put("height", gd.getDimension().height);
@@ -83,7 +83,7 @@ public class JSonGraph extends JSonData {
         imgProps.put("history",params.doArgsMap(graph, false));
         imgProps.put("probe",params.doArgsMap(p, true));
         imgProps.put("graphnode",params.doArgsMap(gn, true));
-        doTree(w, graph.getQualifieName(), gn.hashCode(), "graph", null, imgProps);
+        doTree(w, graph.getQualifiedName(), gn.hashCode(), "graph", null, imgProps);
     }
 
 }

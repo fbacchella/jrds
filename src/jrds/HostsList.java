@@ -295,8 +295,8 @@ public class HostsList extends StarterNode {
             for(Sum s: sums.values()) {
                 try {
                     s.configure(this);
-                    graphMap.put(s.getQualifieName().hashCode(), s);
-                    sumGraphsTab.add(s.getQualifieName(), "Sums", s.getName());
+                    graphMap.put(s.getQualifiedName().hashCode(), s);
+                    sumGraphsTab.add(s.getQualifiedName(), "Sums", s.getName());
                 } catch (Exception e1) {
                     log(Level.ERROR, e1, "failed sum: %s", e1);
                 }
@@ -316,8 +316,8 @@ public class HostsList extends StarterNode {
             for(GraphDesc gd: graphs.values()) {
                 AutonomousGraphNode gn = new AutonomousGraphNode(gd);
                 gn.configure(this);
-                graphMap.put(gn.getQualifieName().hashCode(), gn);
-                customGraphsTab.add(gn.getQualifieName(), Arrays.asList(new String[] {gd.getName()}));
+                graphMap.put(gn.getQualifiedName().hashCode(), gn);
+                customGraphsTab.add(gn.getQualifiedName(), Arrays.asList(new String[] {gd.getName()}));
             }
             GraphTree tree = customGraphsTab.getGraphTree();
             treeMap.put(tree.getName(), tree);
