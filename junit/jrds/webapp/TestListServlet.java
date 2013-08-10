@@ -4,6 +4,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Properties;
+
+import javax.servlet.ServletContextListener;
+import javax.servlet.http.HttpServlet;
 
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
@@ -15,6 +19,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mortbay.jetty.testing.ServletTester;
 
 public class TestListServlet {
     static final private Logger logger = Logger.getLogger(TestListServlet.class);
@@ -30,6 +35,8 @@ public class TestListServlet {
     @Test 
     public void testListServlet() throws Exception
     {
+        ServletTester tester = ToolsWebApp.getTestServer(new Properties());
+
         File cwd = new File (".");
         ClassLoader cl = new URLClassLoader(new URL[] {cwd.toURI().toURL()});
 
@@ -37,11 +44,14 @@ public class TestListServlet {
         JrdsDocument webxml = Tools.parseRessource(webxmlStream);
         for(JrdsElement n: new NodeListIterator<JrdsElement>(webxml, Tools.xpather.compile("/web-app/servlet/servlet-class"))) {
             String servletClassName = n.getTextContent().trim();
-            getClass().getClassLoader().loadClass(servletClassName);
+            @SuppressWarnings("unchecked")
+            Class< ? extends HttpServlet> sclass = (Class<? extends HttpServlet>) getClass().getClassLoader().loadClass(servletClassName);
+            tester.addServlet(sclass, "/" + sclass.getCanonicalName());
         }
         for(JrdsElement n: new NodeListIterator<JrdsElement>(webxml, Tools.xpather.compile("/web-app/listener/listener-class"))) {
             String className = n.getTextContent().trim();
-            getClass().getClassLoader().loadClass(className);
+            @SuppressWarnings({ "unused", "unchecked" })
+            Class<ServletContextListener> sclass = (Class<ServletContextListener>) getClass().getClassLoader().loadClass(className);
         }
     }
 
