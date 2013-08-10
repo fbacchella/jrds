@@ -730,7 +730,7 @@ function doGraphList(result) {
             iconsList);
         dojo.connect(application_view_list, "onclick", graph, function(){
             url = dojo.objectToQuery(this.probe);
-        	var detailsWin = window.open("details?" + url, "_blank", "width=400,resizable=yes,menubar=no,scrollbars=yes");
+        	var detailsWin = window.open("details.html?" + url, "_blank", "width=400,resizable=yes,menubar=no,scrollbars=yes");
         });
 
         //Create the history button
