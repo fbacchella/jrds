@@ -9,10 +9,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import jrds.Tools;
 import jrds.factories.ArgFactory;
 import jrds.factories.xml.JrdsDocument;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

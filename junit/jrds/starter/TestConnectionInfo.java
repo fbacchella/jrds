@@ -2,7 +2,6 @@ package jrds.starter;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
-import java.util.Map;
 
 import jrds.Tools;
 
@@ -19,13 +18,12 @@ public class TestConnectionInfo {
         Tools.configure();
 
         logger.setLevel(Level.TRACE);
-        Tools.setLevel(logger, Level.TRACE, "jrds.Starter", "jrds.starter.ConnectionInfo");
+        Tools.setLevel(logger, Level.TRACE, "jrds.starter", "jrds.Starter", "jrds.starter.ConnectionInfo");
     }
 
     @Test
     public void testRegister() throws InvocationTargetException {
-        Map<String, String> empty = Collections.emptyMap();
-        ConnectionInfo ci = new ConnectionInfo(jrds.snmp.SnmpConnection.class, "jrds.snmp.SnmpConnection", Collections.emptyList(), empty);
+        ConnectionInfo ci = new ConnectionInfo(jrds.snmp.SnmpConnection.class, "jrds.snmp.SnmpConnection", Collections.emptyList(), Collections.singletonMap("port", "162"));
         StarterNode sn = new StarterNode() {};
         ci.register(sn);
     }

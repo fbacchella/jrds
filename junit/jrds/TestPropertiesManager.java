@@ -11,10 +11,10 @@ import java.util.Map;
 
 import jrds.webapp.ACL.AdminACL;
 import jrds.webapp.RolesACL;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;

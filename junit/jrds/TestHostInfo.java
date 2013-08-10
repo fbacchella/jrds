@@ -6,10 +6,10 @@ import java.util.Map;
 
 import jrds.starter.ConnectionInfo;
 import jrds.starter.HostStarter;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -21,12 +21,12 @@ public class TestHostInfo {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, "jrds.starter.ConnectionInfo", "jrds.snmp.SnmpConnection", "jrds.HostInfo");
     }
-    
+
     @Test
     public void instantiate() throws InvocationTargetException {
         Map<String, String> empty = Collections.emptyMap();
         ConnectionInfo ci = new ConnectionInfo(jrds.snmp.SnmpConnection.class, "jrds.snmp.SnmpConnection", Collections.emptyList(), empty);
-        
+
         HostInfo hi = new HostInfo("localhost");
         hi.addConnection(ci);
         HostStarter hs = new HostStarter(hi);

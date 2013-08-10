@@ -15,127 +15,112 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 public class MokeServletContext implements ServletContext {
-	public Map<String, Object> attributes = new HashMap<String, Object>();
-	public Map<String, String> initParameters = new HashMap<String, String>();
+    public Map<String, Object> attributes = new HashMap<String, Object>();
+    public Map<String, String> initParameters = new HashMap<String, String>();
 
-	public Object getAttribute(String name) {
-		return attributes.get(name);
-	}
+    public Object getAttribute(String name) {
+        return attributes.get(name);
+    }
 
-	@SuppressWarnings("unchecked")
-	public Enumeration getAttributeNames() {
-		return Collections.enumeration(attributes.keySet());
-	}
+    @SuppressWarnings({ "rawtypes" })
+    public Enumeration getAttributeNames() {
+        return Collections.enumeration(attributes.keySet());
+    }
 
-	public ServletContext getContext(String uripath) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public ServletContext getContext(String uripath) {
+        return null;
+    }
 
-	public String getContextPath() {
-		return null;
-	}
+    public String getContextPath() {
+        return null;
+    }
 
-	public String getInitParameter(String name) {
-		return initParameters.get(name);
-	}
+    public String getInitParameter(String name) {
+        return initParameters.get(name);
+    }
 
-	public Enumeration getInitParameterNames() {
-		return Collections.enumeration(initParameters.keySet());
-	}
+    @SuppressWarnings("rawtypes")
+    public Enumeration getInitParameterNames() {
+        return Collections.enumeration(initParameters.keySet());
+    }
 
-	public int getMajorVersion() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    public int getMajorVersion() {
+        return 0;
+    }
 
-	public String getMimeType(String file) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public String getMimeType(String file) {
+        return null;
+    }
 
-	public int getMinorVersion() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    public int getMinorVersion() {
+        return 0;
+    }
 
-	public RequestDispatcher getNamedDispatcher(String name) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public RequestDispatcher getNamedDispatcher(String name) {
+        return null;
+    }
 
-	public String getRealPath(String path) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public String getRealPath(String path) {
+        return null;
+    }
 
-	public RequestDispatcher getRequestDispatcher(String path) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public RequestDispatcher getRequestDispatcher(String path) {
+        return null;
+    }
 
-	public URL getResource(String path) throws MalformedURLException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public URL getResource(String path) throws MalformedURLException {
+        return null;
+    }
 
-	public InputStream getResourceAsStream(String path) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public InputStream getResourceAsStream(String path) {
+        return null;
+    }
 
-	public Set getResourcePaths(String arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @SuppressWarnings("rawtypes")
+    public Set getResourcePaths(String arg0) {
+        return null;
+    }
 
-	public String getServerInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public String getServerInfo() {
+        return null;
+    }
 
-	public Servlet getServlet(String name) throws ServletException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public Servlet getServlet(String name) throws ServletException {
+        return null;
+    }
 
-	public String getServletContextName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public String getServletContextName() {
+        return null;
+    }
 
-	public Enumeration getServletNames() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @SuppressWarnings("rawtypes")
+    public Enumeration getServletNames() {
+        return null;
+    }
 
-	public Enumeration getServlets() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @SuppressWarnings("rawtypes")
+    public Enumeration getServlets() {
+        return null;
+    }
 
-	public void log(String msg) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void log(String msg) {
 
-	public void log(Exception exception, String msg) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	public void log(String message, Throwable throwable) {
-		// TODO Auto-generated method stub
-		
-	}
+    public void log(Exception exception, String msg) {
 
-	public void removeAttribute(String name) {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	public void setAttribute(String name, Object object) {
-		attributes.put(name, object);
-	}
+    public void log(String message, Throwable throwable) {
+
+    }
+
+    public void removeAttribute(String name) {
+
+    }
+
+    public void setAttribute(String name, Object object) {
+        attributes.put(name, object);
+    }
 
 }

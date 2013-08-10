@@ -119,9 +119,9 @@ public class GetMoke {
             public Cookie[] getCookies() { return null; }
             public long getDateHeader(String arg0)  { return 0; }
             public String getHeader(String arg0) { return null; }
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({ "rawtypes" })
             public Enumeration getHeaderNames() { return null; }
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({ "rawtypes" })
             public Enumeration getHeaders(String arg0) { return null; }
             public int getIntHeader(String arg0) { return 0; }
             public String getMethod() { return null; }
@@ -142,7 +142,7 @@ public class GetMoke {
             public boolean isRequestedSessionIdValid() { return false; }
             public boolean isUserInRole(String arg0)  { return false; }
             public Object getAttribute(String arg0) { return null; }
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({ "rawtypes" })
             public Enumeration getAttributeNames() { return null; }
             public String getCharacterEncoding() { return null; }
             public int getContentLength() { return 0; }
@@ -152,7 +152,7 @@ public class GetMoke {
             public String getLocalName() { return null; }
             public int getLocalPort() { return 0; }
             public Locale getLocale()  { return null; }
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({ "rawtypes" })
             public Enumeration getLocales() { return null; }
             public String getParameter(String arg0) { 
                 String[] array = parameters.get(arg0);
@@ -160,9 +160,9 @@ public class GetMoke {
                     return array[0];
                 return null;
             }
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({ "rawtypes" })
             public Map getParameterMap() { return parameters; }
-            @SuppressWarnings("unchecked")
+            @SuppressWarnings({ "rawtypes" })
             public Enumeration getParameterNames()  { return null; }
             public String[] getParameterValues(String arg0) { return null; }
             public String getProtocol() { return null; }

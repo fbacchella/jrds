@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 
 import jrds.HostInfo;
 import jrds.Macro;
@@ -159,7 +160,6 @@ public class TestMacro {
     public void testMacroFillwithProps1() throws Exception {
         JrdsDocument d = Tools.parseString(goodMacroXml);
         d.getRootElement().addElement("entry", "key=a").setTextContent("bidule");
-        jrds.Util.serialize(d, System.out, null, null);
         Macro m = doMacro(d, "macrodef");
 
         JrdsDocument hostdoc = Tools.parseString(goodHostXml);
@@ -181,9 +181,50 @@ public class TestMacro {
     }
 
     @Test
+    public void testMacroFillwithProps2() throws Exception {
+        Map<String, String> prop = new HashMap<String, String>();
+        prop.put(OutputKeys.INDENT, "yes");
+        prop.put(OutputKeys.INDENT, "yes");
+        prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
+
+        JrdsDocument d = Tools.parseString(goodMacroXml);
+        d.getRootElement().addElement("probe", "type=MacroProbe3").addElement("attr", "name=val").addTextNode("${a}");
+        jrds.Util.serialize(d, System.out, null, prop);
+        System.out.println();
+
+        Macro m = doMacro(d, "macrodef");
+        m.getDf();
+
+        JrdsDocument hostdoc = Tools.parseString(goodHostXml);
+        hostdoc.getRootElement().getChildElementsByName("macro").iterator().next().addElement("arg", "type=String", "value=${a}");
+        jrds.Util.serialize(hostdoc, System.out, null, prop);
+        System.out.println();
+
+        HostBuilder hb = getBuilder(m);
+        HostInfo host = hb.makeHost(hostdoc);
+
+        boolean found = false;
+        for(Probe<?,?> p: host.getProbes()) {
+            if("myhost/MacroProbe1".equals(p.toString()) ) {
+                MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
+                logger.trace("Args:" + mp.getArgs());
+                Assert.assertFalse(mp.getArgs().contains("bidule"));
+                found = true;
+            }
+            else if ("myhost/MacroProbe2".equals(p.toString())) {
+                @SuppressWarnings("unused")
+                MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
+            }
+        }
+        Assert.assertTrue("macro probe with properties not found", found);
+    }
+
+    @Test
     public void testCollection() throws Exception {
         JrdsDocument d = Tools.parseString(goodMacroXml);
         Tools.appendString(Tools.appendString(Tools.appendString(d.getDocumentElement(), "<for var=\"a\" collection=\"c\"/>"),"<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
+        jrds.Util.serialize(d, System.err, null, null);
+
         Macro m = doMacro(d, "macrodef");
 
         JrdsDocument hostdoc = Tools.parseString(goodHostXml);

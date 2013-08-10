@@ -80,11 +80,13 @@ public class DismanPlay {
 		add(pdu, snmpTrapOID, mteTriggerFired);
 		add(pdu, snmpTrapOID, new TimeTicks(1000));
 
-		TransportMapping transport = new DefaultUdpTransportMapping();
+		@SuppressWarnings("rawtypes")
+        TransportMapping transport = new DefaultUdpTransportMapping();
 		transport.listen();
 		Snmp snmp = new Snmp(transport);
 		
-		ResponseEvent respEv = snmp.send(pdu, target);
+		@SuppressWarnings("unused")
+        ResponseEvent respEv = snmp.send(pdu, target);
 		//PDU response = respEv.getResponse();
 	}
 	

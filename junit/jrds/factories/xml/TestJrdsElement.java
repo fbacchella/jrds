@@ -7,10 +7,10 @@ import javax.xml.transform.TransformerException;
 
 import jrds.Tools;
 import jrds.Util;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

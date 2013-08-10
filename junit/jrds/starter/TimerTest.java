@@ -4,10 +4,10 @@ import java.io.IOException;
 
 import jrds.PropertiesManager;
 import jrds.Tools;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
