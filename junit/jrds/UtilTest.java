@@ -2,7 +2,6 @@ package jrds;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -12,17 +11,14 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.mockobjects.DummyProbe;
 import jrds.mockobjects.MokeProbe;
 import jrds.starter.HostStarter;
-import jrds.xmlResources.ResourcesLocator;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.rrd4j.core.DsDef;
 import org.w3c.dom.Document;
 
 public class UtilTest {
@@ -39,10 +35,10 @@ public class UtilTest {
     public void testSiPrefix1() {
         Assert.assertEquals(3, jrds.Util.SiPrefix.k.getExponent());
         Assert.assertEquals(0, jrds.Util.SiPrefix.FIXED.getExponent());
-        Assert.assertEquals(34.0, jrds.Util.SiPrefix.FIXED.evaluate(34, true));
-        Assert.assertEquals(0.001, jrds.Util.SiPrefix.m.evaluate(1, true));
-        Assert.assertEquals(1024.0, jrds.Util.SiPrefix.k.evaluate(1, false));
-        Assert.assertEquals(1024 * 1024.0, jrds.Util.SiPrefix.M.evaluate(1, false));
+        Assert.assertEquals(34.0, jrds.Util.SiPrefix.FIXED.evaluate(34, true), 1e-10);
+        Assert.assertEquals(0.001, jrds.Util.SiPrefix.m.evaluate(1, true), 1e-10);
+        Assert.assertEquals(1024.0, jrds.Util.SiPrefix.k.evaluate(1, false), 1e-10);
+        Assert.assertEquals(1024 * 1024.0, jrds.Util.SiPrefix.M.evaluate(1, false), 1e-10);
     }
 
     @Test
@@ -99,25 +95,6 @@ public class UtilTest {
         Assert.assertTrue(outBuffer.contains(systemId));
         logger.debug(outBuffer.contains(d.getXmlEncoding()));
         Assert.assertTrue("Output encoding "+ d.getXmlEncoding() + " not found", outBuffer.contains(d.getXmlEncoding()));
-    }
-
-    @Test
-    public void testSerialization4() throws Exception {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        DummyProbe p = new DummyProbe();
-        p.configure();
-        Document d = p.dumpAsXml();
-        URL xsl = ResourcesLocator.getResourceUrl("/jrds/xmlResources/probe.xsl");
-        Assert.assertNotNull("xls transformation not found", xsl);
-        out.reset();
-        Util.serialize(d, out, xsl, null);
-        String outBuffer = out.toString();
-        logger.debug("testSerialization4: " + outBuffer);
-        Assert.assertTrue("HTML doctype not found", outBuffer.contains("DOCTYPE html"));
-        Assert.assertTrue("probe id not found in HTML", outBuffer.contains("pid=" + p.hashCode()));
-        for(DsDef ds: p.getDsDefs()) {
-            Assert.assertTrue(outBuffer.contains("dsName=" + ds.getDsName()));
-        }
     }
 
     @Test

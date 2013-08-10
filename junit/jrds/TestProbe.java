@@ -1,6 +1,5 @@
 package jrds;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -118,14 +117,4 @@ public class TestProbe {
         Assert.assertEquals("Default value overwrite read value", 2, p.getLastValues().get("ds1").doubleValue(), 0.1);
     }
 
-    @Test
-    public void testDump() throws TransformerException, IOException, ParserConfigurationException {
-        Probe<String, Long> p = new MokeProbe<String, Long>();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        jrds.Util.serialize(p.dumpAsXml(), out, jrds.xmlResources.ResourcesLocator.getResourceUrl("probe.xsl"), null);
-        String serialized = out.toString();
-        Assert.assertTrue("Serialization failed", serialized.contains("-//W3C//DTD HTML 4.01 Transitional//EN"));
-        Assert.assertTrue("Serialization failed", serialized.contains("DummyProbe"));
-    }
 }
