@@ -99,6 +99,7 @@ public final class StoreOpener {
                 instance.setCapacity(dbPoolSize);
                 usepool = true;
             } catch (Exception e) {
+                logger.fatal("Failed to configure rrddb pool: " + e.getMessage());
             }
         }
         logger.debug(Util.delayedFormatString("Store backend used is %s",  StoreOpener.backend));

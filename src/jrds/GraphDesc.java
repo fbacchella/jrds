@@ -1226,6 +1226,7 @@ implements Cloneable, WithACL {
         try {
             unitExponent = SiPrefix.valueOf(exponent).getExponent();
         } catch (IllegalArgumentException e1) {
+            throw new RuntimeException("wrong unit exponent: " + exponent);
         }
         if(unitExponent == null) {
             try {
