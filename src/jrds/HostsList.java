@@ -388,7 +388,7 @@ public class HostsList extends StarterNode {
     private void checkRoles(GraphNode gn, String root, List<String> pathList) {
         StringBuilder path = new StringBuilder("/" + root);
         for(String pathElem: pathList) {
-            path.append("/").append(pathElem);
+            path.append('/').append(pathElem);
         }
         for(Filter f: filters.values()) {
             if(f.acceptGraph(gn, path.toString())) {

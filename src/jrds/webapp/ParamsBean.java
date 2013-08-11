@@ -460,7 +460,7 @@ public class ParamsBean implements Serializable {
         urlBuffer.append(contextPath);
 
         if(! contextPath.endsWith("/")) {
-            urlBuffer.append("/");
+            urlBuffer.append('/');
         }
         urlBuffer.append(file + "?");
 
@@ -493,7 +493,7 @@ public class ParamsBean implements Serializable {
             Object value = param.getValue();
             if(value != null && ! "".equals(value)) {
                 parambuff.append(key);
-                parambuff.append("=");
+                parambuff.append('=');
                 parambuff.append(value);
                 parambuff.append('&');
             }

@@ -191,7 +191,7 @@ public class GraphTree {
 			retValue = new StringBuilder();
 		else
 			retValue = parent._getPath();
-		retValue.append("/");
+		retValue.append('/');
 		retValue.append(name);
 		return retValue;
 	}
