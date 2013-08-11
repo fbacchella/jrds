@@ -20,7 +20,7 @@ public class KstatProbeIndexed extends KstatProbe implements IndexedProbe {
     private Boolean setup(int instance, Map<String, String> vars) {
         String module = jrds.Util.parseTemplate(getPd().getSpecific("module"), vars);
         String name = jrds.Util.parseTemplate(getPd().getSpecific("name"), vars);
-        index = jrds.Util.parseTemplate(getPd().getSpecific("index"), vars);;
+        index = jrds.Util.parseTemplate(getPd().getSpecific("index"), vars);
         return setup(module, instance, name);
     }
 

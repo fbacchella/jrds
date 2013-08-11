@@ -177,7 +177,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
             Set<String> badDs = new HashSet<String>();
             Header header = rrdSource.getHeader();
-            int dsCount = header.getDsCount();;
+            int dsCount = header.getDsCount();
             header.copyStateTo(rrdDest.getHeader());
             for (int i = 0; i < dsCount; i++) {
                 Datasource srcDs = rrdSource.getDatasource(i);

@@ -296,7 +296,7 @@ public class Util {
             else  {
                 if(! indexes.containsKey(var)) {
                     indexes.put(var, index++);
-                };
+                }
                 int slot = indexes.get(var) + 1;
                 toAppend = "%"  + Integer.toString(slot) + "$s";
             }
