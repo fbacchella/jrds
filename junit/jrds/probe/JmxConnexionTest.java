@@ -53,7 +53,7 @@ public class JmxConnexionTest {
 
         public JrdsMBeanInfo(String protocol, String host, int port) throws Exception {
             String path = "/";
-            if (protocol == "rmi") {
+            if ("rmi".equals(protocol)) {
                 rmiRegistry = java.rmi.registry.LocateRegistry
                         .createRegistry(port);
                 path = "/jndi/rmi://" + host + ":" + port + "/jmxrmi";
