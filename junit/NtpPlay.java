@@ -12,7 +12,7 @@ public class NtpPlay {
 	public void play() throws UnknownHostException, IOException {
 		NTPUDPClient cl = new NTPUDPClient();
 		
-		TimeInfo ti = cl.getTime(InetAddress.getByName("ntp1.prod.exalead.com"));
+		TimeInfo ti = cl.getTime(InetAddress.getByName("0.europe.pool.ntp.org"));
 		
 		ti.computeDetails();
 		
