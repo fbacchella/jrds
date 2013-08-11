@@ -33,7 +33,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
     static final private String NUM = "Number";
     static final private String CPU = "Cpu";
 
-    private Pattern pattern = null;
+    private Pattern pattern = Pattern.compile("^$");
 
     /**
      * @param monitoredHost
