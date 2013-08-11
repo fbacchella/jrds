@@ -18,13 +18,6 @@ import jrds.Util;
  *
  */
 public class MysqlStatus extends Mysql {
-    public void configure(int port, String user, String passwd) {
-        super.configure(port, user, passwd);
-    }
-
-    public void configure(String user, String passwd) {
-        super.configure(user, passwd);
-    }
 
     @Override
     public List<String> getQueries() {

@@ -1236,7 +1236,7 @@ implements Cloneable, WithACL {
             }
         }
     }
-    
+
     public Integer getUnitExponent() {
         return unitExponent;
     }
