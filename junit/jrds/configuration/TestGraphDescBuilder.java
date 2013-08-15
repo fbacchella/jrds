@@ -1,13 +1,17 @@
 package jrds.configuration;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 
 import jrds.GraphDesc;
+import jrds.GraphNode;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
@@ -57,10 +61,16 @@ public class TestGraphDescBuilder {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
         gdbuild.setPm(Tools.makePm());
-        GraphDesc gd = gdbuild.makeGraphDesc(d);
+        GraphDesc gd = gdbuild.build(d);
         if(logger.isTraceEnabled()) {
             Document gddom = gd.dumpAsXml();
-            jrds.Util.serialize(gddom, System.out, null, null);
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            Map<String, String> prop = new HashMap<String, String>(3);
+            prop.put(OutputKeys.OMIT_XML_DECLARATION, "no");
+            prop.put(OutputKeys.INDENT, "yes");
+            prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
+            jrds.Util.serialize(gddom, os, null, prop);
+            logger.trace(new String(os.toByteArray(),"UTF-8"));
         }
         MokeProbe<String, Number> p = new MokeProbe<String, Number>();
         p.getHost().setHostDir(testFolder.getRoot());
@@ -68,7 +78,12 @@ public class TestGraphDescBuilder {
         ProbeDesc pd = p.getPd();
 
         Map<String, Object> dsMap = new HashMap<String, Object>(2);
-        dsMap.put("dsName", "machin bidule");
+        dsMap.put("dsName", "space separated");
+        dsMap.put("dsType", DsType.COUNTER);
+        pd.add(dsMap);
+
+        dsMap.clear();
+        dsMap.put("dsName", "add1");
         dsMap.put("dsType", DsType.COUNTER);
         pd.add(dsMap);
 
@@ -91,14 +106,23 @@ public class TestGraphDescBuilder {
 
         Assert.assertEquals("graph name failed", "graphName", gd.getGraphName());
         Assert.assertEquals("graph title failed", "graphTitle", gd.getGraphTitle());
-        Assert.assertEquals("graph name failed", "name", gd.getName());
-        Assert.assertEquals("legend count failed", 3, gd.getLegendLines());
+        Assert.assertEquals("graph name failed", "graphdesctest", gd.getName());
+        Assert.assertEquals("legend count failed", 5, gd.getLegendLines());
         Assert.assertFalse("Graph unit should be binary", gd.isSiUnit());
         Assert.assertEquals("Graph unit scale should be fixed", 0, gd.getUnitExponent().intValue());
 
         Assert.assertTrue("graph height invalid", 206 < gi.getHeight());
         Assert.assertTrue("graph width invalid", 578 < gi.getWidth());
         Assert.assertEquals("graph byte count invalid", 12574 , gi.getByteCount(), 4000);
+        
+        for(String treename: new String[]{PropertiesManager.HOSTSTAB, PropertiesManager.VIEWSTAB, "tab"}) {
+            List<String> tree = gd.getTree(new GraphNode(p, gd), treename);
+            Assert.assertEquals("not enough element in tree " +  treename, 2, tree.size());
+            int i = 1;
+            for(String element: tree) {
+                Assert.assertEquals("wrong tree element", treename + i++, element);
+            }
+        }
     }
     
     @Test(expected=NoSuchMethodException.class)
@@ -140,11 +164,21 @@ public class TestGraphDescBuilder {
     }
 
     @Test
+    public void testGraphDescBuilderParse()
+        throws Exception {
+        JrdsDocument d = Tools.parseRessource("graphdesc.xml");
+        GraphDescBuilder gdbuild = new GraphDescBuilder();
+        gdbuild.setPm(Tools.makePm());
+        @SuppressWarnings("unused")
+        GraphDesc gd = gdbuild.build(d);
+    }
+
+    @Test
     public void testFullConfigpath() throws Exception {
         PropertiesManager localpm = Tools.makePm();
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm);
         conf.getNodeMap(ConfigType.GRAPHDESC).put("graphdesc", Tools.parseRessource("graphdesc.xml"));
-        Assert.assertNotNull("Graphdesc not build", conf.setGraphDescMap().get("name"));
+        Assert.assertNotNull("Graphdesc not build", conf.setGraphDescMap().get("graphdesctest"));
     }
 
 }

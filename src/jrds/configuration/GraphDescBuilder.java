@@ -13,6 +13,7 @@ import java.util.Map;
 import jrds.Graph;
 import jrds.GraphDesc;
 import jrds.GraphNode;
+import jrds.PropertiesManager;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 
@@ -28,23 +29,11 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
     GraphDesc build(JrdsDocument n) throws InvocationTargetException {
         try {
             return makeGraphDesc(n);
-        } catch (SecurityException e) {
-            throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
-        } catch (IllegalArgumentException e) {
-            throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
-        } catch (NoSuchMethodException e) {
-            throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
-        } catch (IllegalAccessException e) {
-            throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
-        } catch (InstantiationException e) {
-            throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
-        } catch (ClassNotFoundException e) {
-            throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
-        } catch (ClassCastException e) {
+        } catch (Exception e) {
             throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
         }
     }
-    public GraphDesc makeGraphDesc(JrdsDocument n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, ClassNotFoundException {
+    public GraphDesc makeGraphDesc(JrdsDocument n) throws Exception {
         JrdsElement subnode = n.getRootElement();
 
         GraphDesc gd = new GraphDesc();
@@ -145,9 +134,13 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
 
             gd.add(addName, addrpn, addgraphType, addColor, addLegend, consFunc, reversed, percentile, host, probe, dsName);
         }
-
-        gd.setHostTree(enumerateTree(subnode.getElementbyName("hosttree")));
-        gd.setViewTree(enumerateTree(subnode.getElementbyName("viewtree")));
+        
+        gd.setTree(PropertiesManager.HOSTSTAB, enumerateTree(subnode.getElementbyName("hosttree")));
+        gd.setTree(PropertiesManager.VIEWSTAB, enumerateTree(subnode.getElementbyName("viewtree")));
+        for(JrdsElement treenode: subnode.getChildElementsByName("tree")) {
+            String treetab = treenode.getAttribute("tab");
+            gd.setTree(treetab, enumerateTree(treenode));
+        }
 
         gd.initializeLimits(g2d);
         return gd;
