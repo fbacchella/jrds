@@ -600,36 +600,9 @@ implements Cloneable, WithACL {
         allds = new ArrayList<DsDesc>();
     }
 
-    public void add(String name, GraphType graphType, Color color,
-            String legend) {
-        add(name, name, null, graphType, color, legend, DEFAULTCF, false, null, null, null);
-    }
-
-    public void add(String name, GraphType graphType, String legend) {
-        add(name, name, null, graphType,
-                Colors.resolveIndex(lastColor), legend,
-                DEFAULTCF, false, null, null, null);
-        if(graphType.toPlot())
-            lastColor++;
-    }
-
     public void add(String name, GraphType graphType) {
         add(name, name, null, graphType,
                 Colors.resolveIndex(lastColor), name,
-                DEFAULTCF, false, null, null, null);
-        if(graphType.toPlot())
-            lastColor++;
-    }
-
-    public void add(String name, String rpn, GraphType graphType, Color color,
-            String legend) {
-        add(name, null, rpn, graphType, color, legend,
-                DEFAULTCF, false, null, null, null);
-    }
-
-    public void add(String name, String rpn, GraphType graphType, String legend) {
-        add(name, null, rpn, graphType,
-                Colors.resolveIndex(lastColor), legend,
                 DEFAULTCF, false, null, null, null);
         if(graphType.toPlot())
             lastColor++;
@@ -642,10 +615,6 @@ implements Cloneable, WithACL {
      */
     public void add(String name) {
         add(name, name, null, GraphType.NONE, null, null, DEFAULTCF, false, null, null, null);
-    }
-
-    public void add(String name, String rpn) {
-        add(name, null, rpn, GraphType.NONE, null, null, DEFAULTCF, false, null, null, null);
     }
 
     /**
