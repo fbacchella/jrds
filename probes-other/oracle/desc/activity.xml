@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+    <name>OracleActivityGraph</name>
+    <graphName>${url}</graphName>
+    <graphTitle>DB activity on ${host}</graphTitle>
+    <verticalLabel>operation/s</verticalLabel>
+    <add>
+        <name>logonscum</name>
+        <graphType>line</graphType>
+        <legend>logon/s</legend>
+    </add>
+    <add>
+        <name>opcurcum</name>
+        <graphType>line</graphType>
+        <legend>opened cursors/s</legend>
+    </add>
+    <add>
+        <name>usercommit</name>
+        <graphType>line</graphType>
+        <legend>user commits/s</legend>
+    </add>
+    <add>
+        <name>userrollbacks</name>
+        <graphType>line</graphType>
+        <legend>user rollbacks/s</legend>
+    </add>
+    <add>
+        <name>usercalls</name>
+        <graphType>line</graphType>
+        <legend>user calls</legend>
+    </add>
+    <add>
+        <name>msgsent</name>
+        <graphType>line</graphType>
+        <legend>messages sent/s</legend>
+    </add>
+    <add>
+        <name>msgrcvd</name>
+        <graphType>line</graphType>
+        <legend>messages received/s</legend>
+    </add>
+    <hosttree>
+        <pathstring>${host}</pathstring>
+        <pathstring>Services</pathstring>
+        <pathstring>Databases</pathstring>
+        <pathstring>${url}</pathstring>
+        <pathstring>DB activity</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathstring>Services</pathstring>
+        <pathstring>Databases</pathstring>
+        <pathstring>${url}</pathstring>
+        <pathstring>DB activity</pathstring>
+    </viewtree>
+</graphdesc>
