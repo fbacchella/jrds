@@ -21,14 +21,17 @@ import javax.xml.transform.TransformerException;
 import jrds.Probe;
 import jrds.Util;
 import jrds.factories.ProbeBean;
+import jrds.factories.ProbeMeta;
 import jrds.starter.SocketFactory;
-import jrds.starter.StarterNode;
 import jrds.starter.XmlProvider;
 
 import org.apache.log4j.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+@ProbeMeta(
+        topStarter=jrds.starter.XmlProvider.class
+        )
 @ProbeBean({"user", "password", "iloHost"})
 public class Ribcl extends Probe<String, Number> {
 	private String user;
@@ -53,15 +56,6 @@ public class Ribcl extends Probe<String, Number> {
 		this.user = user;
 		this.passwd = passwd;
 	}
-
-    /* (non-Javadoc)
-     * @see jrds.starter.StarterNode#setParent(jrds.starter.StarterNode)
-     */
-    @Override
-    public void setParent(StarterNode parent) {
-        super.setParent(parent);
-        registerStarter(new XmlProvider());
-    }
 
 	@Override
 	public Map<String, Number> getNewSampleValues() {

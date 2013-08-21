@@ -55,26 +55,6 @@ public class XmlProvider extends Starter {
         }        
     };
 
-    /* (non-Javadoc)
-     * @see jrds.Starter#start()
-     */
-    @Override
-    public boolean start() {
-        //Just to check we can get an xpath and a document builder
-        DocumentBuilder dbuilder = localDocumentBuilder.get();
-        XPath  xpather = localXpath.get();
-        log(Level.TRACE, "starting XmlProvider %s@%s %s %s " , getClass().getName(), Integer.toHexString(hashCode()), xpather, dbuilder);
-        return dbuilder != null && xpather != null;
-    }
-
-    /* (non-Javadoc)
-     * @see jrds.Starter#stop()
-     */
-    @Override
-    public void stop() {
-        log(Level.TRACE, "stopping XmlProvider %s@%s", getClass().getName(),Integer.toHexString(hashCode()) );
-    }
-
     public long findUptimeByDate(Document d, String startTimePath, String currentTimePath, DateFormat pattern) {
         XPath  xpather = localXpath.get();
         try {
