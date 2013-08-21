@@ -71,7 +71,7 @@ public class CheckJar extends CommandStarterImpl {
                     if(pc.isAnnotationPresent(ProbeMeta.class)) {
                         ProbeMeta meta = pc.getAnnotation(ProbeMeta.class);
                         daList.add(meta.discoverAgent());
-                        externalStarters.add(meta.topStarter());
+                        externalStarters.add(meta.timerStarter());
                     }
                     pc = pc.getSuperclass();
                 }

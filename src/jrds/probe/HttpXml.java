@@ -33,7 +33,7 @@ import org.w3c.dom.Document;
  * @author Fabrice Bacchella 
  */
 @ProbeMeta(
-        topStarter=jrds.starter.XmlProvider.class
+        timerStarter=jrds.starter.XmlProvider.class
         )
 public class HttpXml extends HCHttpProbe {
 
