@@ -26,9 +26,11 @@ import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.factories.xml.JrdsNode;
+import jrds.probe.PassiveProbe;
 import jrds.starter.Connection;
 import jrds.starter.ConnectionInfo;
 import jrds.starter.HostStarter;
+import jrds.starter.Listener;
 import jrds.starter.Timer;
 
 import org.apache.log4j.Logger;
@@ -40,6 +42,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     private ProbeFactory pf;
     private Map<String, Macro> macrosMap;
     private Map<String, Timer> timers = Collections.emptyMap();
+    private Map<String, Listener<?, ?>> listeners = Collections.emptyMap();
 
     public HostBuilder() {
         super(ConfigType.HOSTS);
@@ -314,6 +317,21 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             }
         }
 
+        //A passive probe, perhaps a specific listener is defined
+        if(p instanceof PassiveProbe) {
+            PassiveProbe<?> pp = (PassiveProbe<?>) p;
+            String listenerName = probeNode.getAttribute("listener");
+            if(listenerName != null && ! listenerName.trim().isEmpty()) {
+                Listener<?, ?> l = listeners.get(listenerName);
+                if(l != null) {
+                    pp.setListener(l);
+                }
+                else {
+                    logger.error(Util.delayedFormatString("Listener name not found for %s: %s", pp, listenerName));
+                }
+            }
+        }
+
         if(p.checkStore()) {
             shost.addProbe(p);
         }
@@ -487,6 +505,10 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
      */
     public void setTimers(Map<String, Timer> timers) {
         this.timers = timers;
+    }
+
+    public void setListeners(Map<String, Listener<?, ?>> listenerMap) {
+        listeners = listenerMap;
     }
 
 }

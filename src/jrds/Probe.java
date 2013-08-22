@@ -418,33 +418,38 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     private boolean updateSample(Sample oneSample) {
         if(isCollectRunning()) {
             Map<KeyType, ValueType> sampleVals = getNewSampleValues();
-            if (sampleVals != null) {
-                log(Level.TRACE, "Collected values: %s", sampleVals);
-                if(getUptime() * pd.getUptimefactor() >= pd.getHeartBeatDefault()) {
-                    //Set the default values that might be defined in the probe description
-                    for(Map.Entry<String, Double> e: getPd().getDefaultValues().entrySet()) {
-                        oneSample.setValue(e.getKey(), e.getValue());
-                    }
-                    Map<?, String> nameMap = getCollectMapping();
-                    log(Level.TRACE, "Collect keys: %s", nameMap);
-                    Map<KeyType, Number>filteredSamples = filterValues(sampleVals);
-                    log(Level.TRACE, "Filtered values: %s", filteredSamples);
-                    for(Map.Entry<KeyType, Number> e: filteredSamples.entrySet()) {
-                        String dsName = nameMap.get(e.getKey());
-                        double value = e.getValue().doubleValue();
-                        if (dsName != null) {
-                            oneSample.setValue(dsName, value);
-                        }
-                        else {
-                            log(Level.TRACE, "Dropped entry: %s", e.getKey());
-                        }
-                    }
-                    modifySample(oneSample, sampleVals);
-                    return true;
+            return injectSample(oneSample, sampleVals);
+        }
+        return false;
+    }
+
+    public boolean injectSample(Sample oneSample, Map<KeyType, ValueType> sampleVals) {
+        if (sampleVals != null) {
+            log(Level.TRACE, "Collected values: %s", sampleVals);
+            if(getUptime() * pd.getUptimefactor() >= pd.getHeartBeatDefault()) {
+                //Set the default values that might be defined in the probe description
+                for(Map.Entry<String, Double> e: getPd().getDefaultValues().entrySet()) {
+                    oneSample.setValue(e.getKey(), e.getValue());
                 }
-                else {
-                    log(Level.INFO, "uptime too low: %f", getUptime() * pd.getUptimefactor());
+                Map<?, String> nameMap = getCollectMapping();
+                log(Level.TRACE, "Collect keys: %s", nameMap);
+                Map<KeyType, Number>filteredSamples = filterValues(sampleVals);
+                log(Level.TRACE, "Filtered values: %s", filteredSamples);
+                for(Map.Entry<KeyType, Number> e: filteredSamples.entrySet()) {
+                    String dsName = nameMap.get(e.getKey());
+                    double value = e.getValue().doubleValue();
+                    if (dsName != null) {
+                        oneSample.setValue(dsName, value);
+                    }
+                    else {
+                        log(Level.TRACE, "Dropped entry: %s", e.getKey());
+                    }
                 }
+                modifySample(oneSample, sampleVals);
+                return true;
+            }
+            else {
+                log(Level.INFO, "uptime too low: %f", getUptime() * pd.getUptimefactor());
             }
         }
         return false;

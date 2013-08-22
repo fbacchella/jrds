@@ -22,6 +22,7 @@ import jrds.factories.ArgFactory;
 import jrds.factories.ProbeMeta;
 import jrds.graphe.Sum;
 import jrds.starter.HostStarter;
+import jrds.starter.Listener;
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 import jrds.webapp.ACL;
@@ -127,6 +128,10 @@ public class HostsList extends StarterNode {
         conf.setGraphDescMap();
         conf.setProbeDescMap();
         conf.setMacroMap();
+        for(Listener<?,?> l: conf.setListenerMap().values()) {
+            registerStarter(l);
+            topStarters.add(l);
+        }
 
         Set<String> hostsTags = new HashSet<String>();
         conf.setHostMap(timers);
