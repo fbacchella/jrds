@@ -10,6 +10,7 @@ import jrds.factories.ProbeBean;
 import jrds.probe.PassiveProbe;
 
 public class ListenerTest {
+    @SuppressWarnings("rawtypes")
     @ProbeBean({"dummy"})
     public static final class PassiveListener extends Listener {
 
@@ -46,6 +47,12 @@ public class ListenerTest {
             // TODO Auto-generated method stub
             return null;
         }
+
+        @Override
+        public String getSourceType() {
+            // TODO Auto-generated method stub
+            return null;
+        }
         
     };
     
@@ -59,6 +66,7 @@ public class ListenerTest {
         Tools.setLevel(new String[] {StarterNode.class.toString(), Starter.class.toString()}, logger.getLevel());
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Test
     public void test1() {
         PassiveProbe pp = new PassiveProbe();
