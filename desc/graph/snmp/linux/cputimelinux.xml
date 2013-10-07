@@ -60,20 +60,14 @@
     <rpn>CpuRawNice, CpuRawUser, +, CpuRawSystem,+, CpuRawWait, +, CpuRawIdle, +, CpuRawInterrupt, +, CpuRawSoftIRQ, +</rpn>
   </add>
   <add>
-    <rpn>CpuRawInterrupt, total, /, 100, *</rpn>
+    <rpn>CpuRawInterrupt, CpuRawSoftIRQ, +, total, /, 100, *</rpn>
     <graphType>area</graphType>
     <color>black</color>
-    <legend>Time spent processing hardware interrupts</legend>
-  </add>
-  <add>
-    <rpn>CpuRawSoftIRQ, total, /, 100, *</rpn>
-    <graphType>area</graphType>
-    <color>gray</color>
-    <legend>Time spent processing software interrupts</legend>
+    <legend>Time processing interrupts</legend>
   </add>
   <add>
     <rpn>CpuRawSystem, total, /, 100, *</rpn>
-    <graphType>area</graphType>
+    <graphType>stack</graphType>
     <color>red</color>
     <legend>System CPU time</legend>
   </add>
