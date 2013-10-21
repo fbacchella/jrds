@@ -175,7 +175,13 @@ public class Graph implements WithACL {
      * @throws IOException
      */
     public DataProcessor getDataProcessor() throws IOException {
-        DataProcessor dp = node.getGraphDesc().getPlottedDatas(node.getProbe(), null, start.getTime() / 1000, end.getTime() / 1000);
+        PlottableMap customData = node.getCustomData();
+        if(customData != null) {
+            long startsec = getStartSec();
+            long endsec = getEndSec();
+            customData.configure(startsec, endsec, 1);            
+        }
+        DataProcessor dp = node.getGraphDesc().getPlottedDatas(node.getProbe(), customData, start.getTime() / 1000, end.getTime() / 1000);
         dp.processData();
         return dp;
     }

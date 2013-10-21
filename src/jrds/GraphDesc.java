@@ -909,18 +909,18 @@ implements Cloneable, WithACL {
      * @throws IOException
      * @throws RrdException
      */
-    public DataProcessor getPlottedDatas(Probe<?,?> probe, Map<?, ?> ownData, long start, long end) throws IOException {
+    public DataProcessor getPlottedDatas(Probe<?,?> probe, Map<String, Plottable> ownData, long start, long end) throws IOException {
         DataProcessor retValue = new DataProcessor(start, end);
         String rrdName = probe.getRrdName();
 
         String lastName = null;
-        for(DsDesc ds: allds) {
+        for(DsDesc ds: allds) {            
             boolean stack = ds.graphType == GraphType.STACK;
             boolean plotted = stack || ds.graphType == GraphType.LINE  || ds.graphType == GraphType.AREA;
             if (ds.rpn == null && ds.dsName != null) {
                 //Does the datas existe in the provided values
-                if(ownData != null && ownData.containsKey(ds.dsName) && ds.graphType == GraphType.LINE) {
-                    retValue.addDatasource(ds.name, (Plottable) ownData.get(ds.dsName));
+                if(ownData != null && ownData.containsKey(ds.dsName)) {
+                    retValue.addDatasource(ds.name, ownData.get(ds.dsName));
                 }
                 //Or they might be on the associated rrd
                 else if(probe.dsExist(ds.dsName)) {
