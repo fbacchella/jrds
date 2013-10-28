@@ -2,7 +2,7 @@
 	<!-- set global properties for this build -->
 	<property name="app.name" value="jrds" />
 	<property name="app.path" value="/${app.name}" />
-	<property name="app.version" value="0.1-dev" />
+	<property name="app.version" value="0.1-p1" />
 	<property name="build.home" value="${basedir}/build" />
 	<property name="docs.build" value="${build.home}/doc" />
 	<property name="src.home" value="${basedir}/src" />
