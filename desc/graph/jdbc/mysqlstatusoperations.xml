@@ -21,7 +21,7 @@
     <name>Com_replace</name>
   </add>
   <add>
-    <name>Qcache_hits</name>
+    <name>Qcache_inserts</name>
   </add>
   <add>
     <name>select</name>
