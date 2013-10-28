@@ -32,9 +32,9 @@ As there is no index to discriminate between jvm, label is used and is mandatory
 		<collect>java.lang:type=MemoryPool,name=Survivor Space/Usage/used</collect>
 	</ds>
 	<ds>
-		<dsName>Old Gen</dsName>
+		<dsName>Tenured Gen</dsName>
 		<dsType>gauge</dsType>
-		<collect>java.lang:type=MemoryPool,name=Old Gen/Usage/used</collect>
+		<collect>java.lang:type=MemoryPool,name=Tenured Gen/Usage/used</collect>
 	</ds>
 	<ds>
 		<dsName>Perm Gen</dsName>
