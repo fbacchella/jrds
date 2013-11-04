@@ -2,7 +2,7 @@
 	<!-- set global properties for this build -->
 	<property name="app.name" value="jrds" />
 	<property name="app.path" value="/${app.name}" />
-	<property name="app.version" value="0.1-dev" />
+	<property name="app.version" value="0.1-p1" />
 	<property name="build.home" value="${basedir}/build" />
 	<property name="docs.build" value="${build.home}/doc" />
 	<property name="src.home" value="${basedir}/src" />
@@ -139,7 +139,7 @@
 	</target>
 
 	<target name="appjar" depends="compile">
-		<jar destfile="${build.home}/jrds.jar" manifest="${basedir}/web/META-INF/MANIFEST.MF">
+		<jar destfile="${build.home}/${app.name}-${app.version}.jar" manifest="${basedir}/web/META-INF/MANIFEST.MF">
 			<fileset dir="dtd">
 				<include name="**.dtd" />
 			</fileset>
@@ -201,7 +201,7 @@
 	</target>
 
 	<target name="srctar" depends="javadoc">
-		<tar destfile="${build.home}/${app.name}-src.tar">
+		<tar destfile="${build.home}/${app.name}-${app.version}-src.tar">
 			<tarfileset dir="." prefix="jrds">
 				<include name="build" />
 				<include name="build/classes" />
@@ -217,21 +217,21 @@
 	</target>
 
 	<target name="apptar" depends="appjar">
-		<tar destfile="${build.home}/${app.name}.tar">
+		<tar destfile="${build.home}/${app.name}-${app.version}.tar">
 			<tarfileset dir="." prefix="jrds">
 				<include name="lib/**" />
 			</tarfileset>
 			<tarfileset dir="${build.home}" prefix="jrds/lib">
-				<include name="jrds.jar" />
+				<include name="${app.name}-${app.version}.jar" />
 			</tarfileset>
 			<tarfileset dir="${build.home}" prefix="jrds">
-				<include name="jrds.war" />
+				<include name="${app.name}-${app.version}.war" />
 			</tarfileset>
 		</tar>
 	</target>
 
 	<target name="jetty" depends="appjar" description="Build JRDS for jetty">
-		<tar destfile="${build.home}/${app.name}.tar">
+		<tar destfile="${build.home}/${app.name}-${app.version}.tar">
 			<tarfileset refid="dojofileset" />
 			<tarfileset dir="${web.src}" />
 			<tarfileset dir="libjetty" prefix="WEB-INF/lib" />
@@ -248,11 +248,11 @@
 				<include name="*.jar" />
 			</tarfileset>
 		</tar>
-		<gzip src="${build.home}/${app.name}.tar" destfile="${build.home}/${app.name}.tar.gz" />
+		<gzip src="${build.home}/${app.name}-${app.version}.tar" destfile="${build.home}/${app.name}-${app.version}.tar.gz" />
 	</target>
 
 	<target name="war" depends="appjar" description="Build JRDS war">
-		<war destfile="${build.home}/${app.name}.war" webxml="${basedir}/web/WEB-INF/web.xml" duplicate="preserve">
+		<war destfile="${build.home}/${app.name}-${app.version}.war" webxml="${basedir}/web/WEB-INF/web.xml" duplicate="preserve">
 			<fileset refid="dojofileset" />
 			<fileset dir="${web.src}" />
 			<lib dir="lib">

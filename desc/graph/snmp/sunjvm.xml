@@ -26,9 +26,9 @@
         <legend>Heap Memory</legend>
     </add>
     <add>
-        <name>Old Gen</name>
+        <name>Tenured Gen</name>
         <graphType>stack</graphType>
-        <legend>Old Gen</legend>
+        <legend>Tenured Gen</legend>
     </add>
     <add>
         <name>Survivor Space</name>
