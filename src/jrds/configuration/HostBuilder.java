@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 
 import jrds.ConnectedProbe;
+import jrds.GraphDesc;
+import jrds.GraphNode;
 import jrds.HostInfo;
 import jrds.Macro;
 import jrds.Probe;
@@ -26,6 +28,7 @@ import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.factories.xml.JrdsNode;
+import jrds.probe.ContainerProbe;
 import jrds.probe.PassiveProbe;
 import jrds.starter.Connection;
 import jrds.starter.ConnectionInfo;
@@ -43,6 +46,8 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     private Map<String, Macro> macrosMap;
     private Map<String, Timer> timers = Collections.emptyMap();
     private Map<String, Listener<?, ?>> listeners = Collections.emptyMap();
+
+    private Map<String, GraphDesc> graphDescMap;
 
     public HostBuilder() {
         super(ConfigType.HOSTS);
@@ -192,6 +197,31 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();  
                 e.printStackTrace(new PrintStream(buffer));
                 logger.error(buffer);
+            }
+        }
+
+        // Extract all the graph added at host level
+        if(fragment.getElementbyName("graph") != null) {
+            // They will be stored in a specific container probe
+            Probe<?,?> graphprobe = new ContainerProbe("_NodeLevelGraph_", host);
+            host.addProbe(graphprobe);
+            for(JrdsElement graphNode: fragment.getChildElementsByName("graph")) {
+                GraphDesc gd = graphDescMap.get(graphNode.getAttribute("type"));
+                if(gd == null) {
+                    logger.error(String.format("Graph %s not found for host %s", graphNode.getAttribute("type"), host.getName())); 
+                    continue;
+                }
+                // Read the beans value for this graph and store them in a map
+                // The map is used for template parsing and will be used for graph instanciation
+                Map<String, String> attrs = new HashMap<String, String>(0);
+                for(JrdsElement attrNode: graphNode.getChildElementsByName("attr")) {
+                    String name = attrNode.getAttribute("name");
+                    String value = Util.parseTemplate(attrNode.getTextContent(), host, gd);
+                    attrs.put(name, value);
+                }                
+                GraphNode gn = new GraphNode(graphprobe, gd);
+                gn.setBeans(attrs);
+                graphprobe.addGraph(gn);
             }
         }
     }
@@ -509,6 +539,10 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
     public void setListeners(Map<String, Listener<?, ?>> listenerMap) {
         listeners = listenerMap;
+    }
+
+    public void setGraphDescMap(Map<String, GraphDesc> graphDescMap) {
+        this.graphDescMap = graphDescMap;
     }
 
 }

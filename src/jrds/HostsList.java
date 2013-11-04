@@ -134,21 +134,19 @@ public class HostsList extends StarterNode {
         }
 
         Set<String> hostsTags = new HashSet<String>();
-        conf.setHostMap(timers);
-
+        Map <String, HostInfo> allHosts = conf.setHostMap(timers);
+        hostList.addAll(allHosts.values());
         Set<Class<? extends Starter>> topStarterClasses = new HashSet<Class<? extends Starter>>();
 
         //We try to load top level starter defined in probes
         for(jrds.starter.Timer timer: timers.values()) {
             Set<Class<? extends Starter>> timerStarterClasses = new HashSet<Class<? extends Starter>>();
             for(HostStarter host: timer.getAllHosts()) {
-                hostList.add(host.getHost());
                 hostsTags.addAll(host.getTags());
                 host.configureStarters(pm);
                 for(Probe<?,?> p: host.getAllProbes()) {
                     p.configureStarters(pm);
                     try {
-                        addProbe(p);
                         for(ProbeMeta meta: ArgFactory.enumerateAnnotation(p.getClass(), ProbeMeta.class, StarterNode.class)) {
                             daList.add(meta.discoverAgent());
                             timerStarterClasses.add(meta.timerStarter());
@@ -179,6 +177,18 @@ public class HostsList extends StarterNode {
             } catch (Exception e1) {
                 log(Level.ERROR, e1, "Starter %s failed to register: %s", starterClass, e1);
             }           
+        }
+
+        for(HostInfo host: hostList) {
+            for(Probe<?,?> p: host.getProbes()) {
+                addProbe(p);
+                // Some probe are done outside of a starter
+                // Don't forget them
+                if(p.getHostList() == null) {
+                    log(Level.INFO, p.toString());
+                    p.setParent(this);
+                }
+            }
         }
 
         //Configure the default ACL of all automatic filters

@@ -33,6 +33,12 @@ public class ContainerProbe extends Probe<Object, Number> {
         this.monitoredHost = ContainerHost;
     }
 
+    public ContainerProbe(String name, HostInfo monitoredHost) {
+        super(pd);
+        setName(name);
+        this.monitoredHost = monitoredHost;
+    }
+
     //An array list is needed, the introspection is picky
     public void configure(String name, ArrayList<String> graphList) {
         log(Level.DEBUG, "new container: %s", name);

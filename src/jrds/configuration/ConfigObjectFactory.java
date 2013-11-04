@@ -139,6 +139,7 @@ public class ConfigObjectFactory {
         ob.setPm(pm);
         ob.setTimers(timers);
         ob.setListeners(listenerMap);
+        ob.setGraphDescMap(graphDescMap);
         Map<String, HostInfo> hostsMap = getObjectMap(ob, nodemap);
         logger.debug(jrds.Util.delayedFormatString("Hosts configured: %s", hostsMap.keySet()));
         return hostsMap;

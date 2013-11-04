@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+                           "urn:jrds:graphdesc">
+<graphdesc>
+	<name>NodeGraph</name>
+	<graphName>nodegraph</graphName>
+	<graphTitle />
+	<verticalLabel>bytes</verticalLabel>
+	<addpath>
+		<path>
+			<probe>ifx-lo0</probe>
+			<dsName>ifHCInOctets</dsName>
+		</path>
+		<graphType>line</graphType>
+		<legend>a legend</legend>
+	</addpath>
+	<hosttree>
+	   <pathstring>NodeGraph</pathstring>
+	</hosttree>
+</graphdesc>
