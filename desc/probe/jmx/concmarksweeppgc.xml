@@ -10,38 +10,60 @@ Dcom.sun.management.jmxremote.ssl=false
 More informations can be found at http://java.sun.com/javase/6/docs/technotes/guides/management/agent.html
 
 As there is no index to discriminate between jvm, label is used and is mandatory
- -->
+-->
 <probedesc>
-	<name>JMXConcMarkSweepGC</name>
-	<probeName>jvmpool-${label}</probeName>
-	<probeClass>jrds.probe.JMX</probeClass>
-	<uptimefactor>1</uptimefactor>
-	<ds>
-		<dsName>Code Cache</dsName>
-		<dsType>gauge</dsType>
-		<collect>java.lang:type=MemoryPool,name=Code Cache/Usage/used</collect>
-	</ds>
-	<ds>
-		<dsName>Eden Space</dsName>
-		<dsType>gauge</dsType>
-		<collect>java.lang:type=MemoryPool,name=Par Eden Space/Usage/used</collect>
-	</ds>
-	<ds>
-		<dsName>Survivor Space</dsName>
-		<dsType>gauge</dsType>
-		<collect>java.lang:type=MemoryPool,name=Par Survivor Space/Usage/used</collect>
-	</ds>
-	<ds>
-		<dsName>Old Gen</dsName>
-		<dsType>gauge</dsType>
-		<collect>java.lang:type=MemoryPool,name=CMS Old Gen/Usage/used</collect>
-	</ds>
-	<ds>
-		<dsName>Perm Gen</dsName>
-		<dsType>gauge</dsType>
-		<collect>java.lang:type=MemoryPool,name=CMS Perm Gen/Usage/used</collect>
-	</ds>
-	<graphs>
-		<name>SunJVM5MemoryPool</name>
-	</graphs>
+    <name>JMXConcMarkSweepGC</name>
+    <probeName>jvmpool-${label}</probeName>
+    <probeClass>jrds.probe.JMX</probeClass>
+    <uptimefactor>1</uptimefactor>
+    <ds>
+        <dsName>Code Cache</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=Code Cache/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>Eden Space</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=Par Eden Space/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>Survivor Space</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=Par Survivor Space/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>Old Gen</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=CMS Old Gen/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>Perm Gen</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=CMS Perm Gen/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>MS Coll Count</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=ConcurrentMarkSweep/CollectionCount</collect>
+    </ds>
+    <ds>
+        <dsName>MS Coll Time</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=ConcurrentMarkSweep/CollectionTime</collect>
+    </ds>
+    <ds>
+        <dsName>Copy Coll Count</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=ParNew/CollectionCount</collect>
+    </ds>
+    <ds>
+        <dsName>Copy Coll Time</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=ParNew/CollectionTime</collect>
+    </ds>
+    <graphs>
+        <name>SunJVM5MemoryPool</name>
+        <name>SunJVM5GCCount</name>
+        <name>SunJVM5GCTime</name>
+    </graphs>
 </probedesc>
