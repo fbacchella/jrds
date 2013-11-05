@@ -6,7 +6,7 @@
 	<graphName>jvmsun5gctime-${label}</graphName>
 	<graphTitle>JVM GC time for ${label} on ${host}</graphTitle>
 	<unit>
-		<binary />
+		<SI />
 	</unit>
 	<verticalLabel>s</verticalLabel>
 	<add>

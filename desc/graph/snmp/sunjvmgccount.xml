@@ -6,7 +6,7 @@
 	<graphName>jvmsun5gccount-${label}</graphName>
 	<graphTitle>JVM GC count for ${label} on ${host}</graphTitle>
 	<unit>
-		<binary />
+		<SI />
 	</unit>
 	<verticalLabel>Collections/s</verticalLabel>
 	<add>
