@@ -7,7 +7,7 @@ define("jrds/RootButton",
 		  "dijit" ],
 		function(declare, button, dojo, dijit) {
 return declare("jrds.RootButton", button, {
-	class: 'rootButton',
+	'class': 'rootButton',
 	onClick: function() {
 		var tabs = dijit.byId('tabs');
 		var tabSelected = tabs.attr('selectedChildWidget');
@@ -74,7 +74,7 @@ define( "jrds/TimeTextBox",
     	],
     	function(declare, dojo) {
 return declare("jrds.TimeTextBox", dijit.form.TimeTextBox, {
-	class: 'field fieldHour',
+	'class': 'field fieldHour',
 	postCreate: function() {
 		this.set('value', queryParams[this.queryId]);
 		constraint = this.get('constraints');
@@ -134,7 +134,7 @@ define("jrds/DateTextBox",
        ],
        function(declare, dojo, dijit) {
 return declare("jrds.DateTextBox", dijit.form.DateTextBox, {
-	class: 'field fieldDay', 
+	'class': 'field fieldDay', 
 	dayFormat: {
 		selector: 'date', 
 		datePattern: 'yyyy-MM-dd'
@@ -220,7 +220,7 @@ define("jrds/PeriodNavigation",
 		  "dojo"],
 		function(declare, button, dojo) {
 return declare("PeriodNavigation", button, {
-	class: 'periodNavigation',
+	'class': 'periodNavigation',
 	postCreate: function() {
 		this.set('showLabel', false);
 		return this.inherited(arguments);
