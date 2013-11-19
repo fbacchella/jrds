@@ -210,7 +210,7 @@ return declare("jrds.DateTextBox", dijit.form.DateTextBox, {
 			dijit.byId('begin').constraints.max = newDate;			
 		}
 		return this.inherited(arguments);
-	},
+	}
 });
 });
 
@@ -344,7 +344,7 @@ return declare("jrds.AutoscaleReset", button, {
 			}
 		}
 	},
-	iconClass: "dijitCheckBoxIcon",
+	iconClass: "dijitCheckBoxIcon"
 });
 });
 
@@ -375,7 +375,7 @@ return declare("jrds.ToogleSort", button, {
 		queryParams.sort = checked;
 		getGraphList();		
 	},
-	iconClass: "dijitCheckBoxIcon",
+	iconClass: "dijitCheckBoxIcon"
 });
 });
 
