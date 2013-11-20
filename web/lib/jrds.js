@@ -68,12 +68,14 @@ return declare("Autoperiod", dijit.form.Select, {
 define( "jrds/TimeTextBox",
 		[ "dojo/_base/declare",
 		  "dojo",
+		  "dijit",
+		  "dijit/form",
     	  "dijit/form/TimeTextBox",
     	  "dojo/date",
     	  "dojo/date/locale"
     	],
-    	function(declare, dojo) {
-return declare("jrds.TimeTextBox", dijit.form.TimeTextBox, {
+    	function(declare, dojo, dijit, form, timeTextBox) {
+return declare("jrds.TimeTextBox", timeTextBox, {
 	'class': 'field fieldHour',
 	postCreate: function() {
 		this.set('value', queryParams[this.queryId]);

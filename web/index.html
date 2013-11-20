@@ -22,6 +22,11 @@ amdVector = [
  "dojo/parser",
  "dojo/data/ItemFileReadStore",
  "dojox/widget/Standby",
+ "dijit/form",
+ "dijit/form/TimeTextBox",
+ "dijit/layout/BorderContainer",
+ "dijit/layout/ContentPane",
+ "dijit/TitlePane",
  "jrds/HostForm",
  "jrds/Autoperiod",
  "jrds/TimeTextBox",
@@ -39,9 +44,6 @@ amdVector = [
  "jrds/Tabs",
  "jrds/TabContent",
  "jrds/StatusButton",
- "dijit/layout/BorderContainer",
- "dijit/layout/ContentPane",
- "dijit/TitlePane",
  "dojo/domReady!"
 ]
 
@@ -96,7 +98,7 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
       				<input id="host" type="text" name="host" size="24" data-dojo-type="dijit/form/TextBox" trim="true" required="true" />
         			<button type="submit" data-dojo-type="dijit/form/Button">Search</button>
 				</form>
-				<img id=foldButton class="dijitTreeIcon dijitFolderClosed" alt="" src="dojo/resources/blank.gif" onClick="doUnfold();" />
+				<img id="foldButton" class="dijitTreeIcon dijitFolderClosed" alt="" src="dojo/resources/blank.gif" onClick="doUnfold();" />
 			</div> <!-- treePane -->
 			<div id="centerPane" data-dojo-type="dijit/layout/ContentPane" region="center">
 				<div data-dojo-type="dijit/layout/ContentPane" id="paramsPane" >
