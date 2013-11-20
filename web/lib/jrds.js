@@ -69,12 +69,11 @@ define( "jrds/TimeTextBox",
 		[ "dojo/_base/declare",
 		  "dojo",
 		  "dijit",
-		  "dijit/form",
     	  "dijit/form/TimeTextBox",
     	  "dojo/date",
     	  "dojo/date/locale"
     	],
-    	function(declare, dojo, dijit, form, timeTextBox) {
+    	function(declare, dojo, dijit, timeTextBox) {
 return declare("jrds.TimeTextBox", timeTextBox, {
 	'class': 'field fieldHour',
 	postCreate: function() {
