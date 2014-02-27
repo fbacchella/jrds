@@ -117,14 +117,20 @@ public class UtilTest {
 
     @Test
     public void testParseStringNumber5() {
-        int n = Util.parseStringNumber("1", 1);
+        int n = Util.parseStringNumber("1", 2);
         Assert.assertEquals(1, n);
     }
 
     @Test
     public void testParseStringNumber6() {
-        double n = Util.parseStringNumber("1", 1.0d);
+        double n = Util.parseStringNumber("1", 2.0d);
         Assert.assertEquals(1.0,n , 0.001);
+    }
+
+    @Test
+    public void testParseStringNumber7() {
+        double n = Util.parseStringNumber("1.33427403132E11", 1.0d);
+        Assert.assertEquals(1.33427403132E11, n, 1e-10);
     }
 
     @Test
