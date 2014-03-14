@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE host PUBLIC "-//jrds//DTD Host//EN"
                            "urn:jrds:host">
-<host name="myhost" dnsName="fqnd.jrds.fr">
+<host name="myhost" dnsName="fqdn.jrds.fr">
     <tag>a tag</tag>
-    <snmp community="public" version="2" />
+    <connection type="jrds.snmp.SnmpConnection">
+        <attr name="community">public</attr>
+        <attr name="version">2</attr>
+    </connection>
     <connection type="connection1">
         <attr name="community">public</attr>
         <attr name="version">2</attr>
