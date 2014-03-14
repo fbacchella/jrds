@@ -122,6 +122,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 set.add(e.getTextContent());
             }
             collections.put(name, set);
+            logger.trace(Util.delayedFormatString("adding collection %s with name %s to %s", set, name, host));
         }
 
         for(JrdsElement macroNode: fragment.getChildElementsByName("macro")) {
@@ -167,8 +168,6 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             }
 
             if(set != null) {
-                logger.trace(Util.delayedFormatString("for using %s", set));
-
                 for(String i: set) {
                     Map<String, String> temp;
                     if(properties != null) {
@@ -179,6 +178,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                     else {
                         temp = Collections.singletonMap(iterprop, i);
                     }
+                    logger.trace(Util.delayedFormatString("for using %s", temp));
                     parseFragment(forNode, host, collections, temp);
                 }
             }
@@ -303,7 +303,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
         //Resolve the beans
         try {
-            setAttributes(probeNode, p, pd.getBeanMap(), host);
+            setAttributes(probeNode, p, pd.getBeanMap(), host, properties);
         } catch (IllegalArgumentException e) {
             logger.error(String.format("Can't configure %s for %s: %s", pd.getName(), host, e));
             return null;
@@ -440,8 +440,11 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 connectionSet.add(cnx);
                 logger.debug(Util.delayedFormatString("Added connection %s to node %s", cnx, parent));
             }
+            catch (ClassNotFoundException ex) {
+                logger.warn("Connection class not found: " + type + " for " + parent);
+            }
             catch (NoClassDefFoundError ex) {
-                logger.warn("Connection class not found: " + type+ ": " + ex);
+                logger.warn("Connection class not found: " + type + ": " + ex);
             }
             catch (ClassCastException ex) {
                 logger.warn(type + " is not a connection");
