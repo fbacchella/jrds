@@ -112,8 +112,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
      * Generate the index suffix for the probe
      * @return the OID suffix for the index
      */
-    public int[] setIndexValue() 
-    {
+    public int[] setIndexValue() {
         //If we already have the key, no need to search for it
         if(key != null) {
             return key.getValue();
@@ -127,7 +126,6 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
                     OID tryoid = e.getKey();
                     if(e.getValue() != null && matchIndex(somevars.get(tryoid))) {
                         int[] index = Arrays.copyOfRange(tryoid.getValue(), getIndexPrefixLength(), tryoid.size());
-                        setSuffixLength(tryoid.size() - getIndexPrefixLength());
                         return index;
                     }
                 }
@@ -155,8 +153,10 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
     public Set<OID> getOidSet() {
         Set<OID> retValue = null;
         int[] indexArray = setIndexValue();
-        if(indexArray != null)
+        if(indexArray != null && indexArray.length > 0) {
+            setSuffixLength(indexArray.length);
             retValue = makeIndexed(getOidNameMap().keySet(), indexArray);
+        }
         return retValue;
     }
 
