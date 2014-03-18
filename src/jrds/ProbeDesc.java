@@ -19,7 +19,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import jrds.factories.ArgFactory;
 
 import org.apache.log4j.Logger;
+import org.rrd4j.ConsolFun;
 import org.rrd4j.DsType;
+import org.rrd4j.core.ArcDef;
 import org.rrd4j.core.DsDef;
 import org.snmp4j.smi.OID;
 import org.w3c.dom.Document;
@@ -41,9 +43,17 @@ public class ProbeDesc implements Cloneable {
     static public final double MINDEFAULT = 0;
     static public final double MAXDEFAULT = Double.NaN;
 
+    private static final ArcDef[] DEFAULTARC = {
+            new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 3),
+            new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 24 * 365),
+            new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 365 * 2)
+    };
+
+
     private long heartBeatDefault = 600;
+    private ArcDef[] archives;
     private Map<String, DsDesc> dsMap;
-    private Map<String, String> specific = new HashMap<String, String>();;
+    private Map<String, String> specific = new HashMap<String, String>();
     private String probeName;
     private String name;
     private final Collection<String> graphesList = new ArrayList<String>();
@@ -411,6 +421,21 @@ public class ProbeDesc implements Cloneable {
      */
     public void setHeartBeatDefault(long heartBeatDefault) {
         this.heartBeatDefault = heartBeatDefault;
+    }
+
+    public ArcDef[] getArchives() {
+        if(archives == null)
+            return DEFAULTARC;
+        return archives;
+    }
+
+    public void setArchives(ArcDef[] archives) {
+        if(archives == null || archives.length == 0){
+            this.archives = null;
+        }
+        else {
+            this.archives = archives;
+        }
     }
 
     /**

@@ -32,4 +32,18 @@
 	</ds>
 	<graphs>
 	</graphs>
+    <archive>
+        <consolFun>AVERAGE</consolFun>
+        <xff>0.5</xff>
+        <steps>2</steps>
+        <rows>3000</rows>
+    </archive>
+
+    <archive>
+        <consolFun>MIN</consolFun>
+        <xff>0.7</xff>
+        <steps>10</steps>
+        <rows>5000</rows>
+    </archive>
+
 </probedesc>
