@@ -43,6 +43,13 @@ public class JrdsLoggerConfiguration {
     };
 
     /**
+     * Force an external log4j configuration, must be called before initLog4j
+     */
+    static public void setExternal() {
+        logOwner = false;        
+    }
+
+    /**
      * The method used to prepare a minimal set of logging configuration.
      * This should be used once. It does nothing if it detect that a appender already exist for the logger <code>jrds</code>.
      * The default logger is the system error output and the default level is error.
@@ -123,12 +130,12 @@ public class JrdsLoggerConfiguration {
             logger.addAppender(jrdsAppender); 
             logger.setAdditivity(false);
         }
-        
+
         //Keep the new logger name
         rootLoggers.add(logname);
     }
-    
-    static public synchronized boolean isLogOwner() {
+
+    static private synchronized boolean isLogOwner() {
         // logOwner == null mean we don't know yet
         // if will be set to false if a logger called jrds already exist
         if(logOwner == null ) {

@@ -257,12 +257,15 @@ public class PropertiesManager extends Properties {
 
         //**********************
         // The log configuration
-        
+
         //Log configuration is done early
         boolean nologging = parseBoolean(getProperty("nologging", "false"));
         String log4jXmlFile = getProperty("log4jxmlfile", "");
         String log4jPropFile = getProperty("log4jpropfile", "");
-        if(log4jXmlFile != null && ! "".equals(log4jXmlFile.trim())) {
+        if (nologging) {
+            JrdsLoggerConfiguration.setExternal();
+        }
+        else if(log4jXmlFile != null && ! "".equals(log4jXmlFile.trim())) {
             File xmlfile = new File(log4jXmlFile.trim());
             if ( ! xmlfile.canRead()) {
                 logger.error("log4j xml file " + xmlfile.getPath() + " can't be read, log4j not configured");
@@ -286,6 +289,7 @@ public class PropertiesManager extends Properties {
                 logger.info("configured with " + propfile.getPath());
             }
         }
+        //the logging setup was not previously captured
         if(! nologging) {
             for(String ls: new String[]{ "trace", "debug", "info", "error", "fatal", "warn"}) {
                 Level l = Level.toLevel(ls);
