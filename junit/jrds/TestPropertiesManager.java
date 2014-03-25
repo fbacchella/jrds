@@ -1,10 +1,10 @@
 package jrds;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,10 +41,12 @@ public class TestPropertiesManager {
         newtmpdir.delete();
         System.setProperty("java.io.tmpdir", newtmpdir.getPath());
         PropertiesManager pm = new PropertiesManager();
+        Assert.assertFalse("tmpdir should not be created yet", newtmpdir.exists());
+        pm.update();
         System.setProperty("java.io.tmpdir", oldtmpdirpath);
         File jrdstmpdir = new File(newtmpdir, "jrds");
         Assert.assertEquals(jrdstmpdir, pm.tmpdir);
-        Assert.assertFalse("tmpdir should not be created", newtmpdir.exists());
+        Assert.assertTrue("tmpdir should have been created", newtmpdir.exists());
     }
 
     @Test
@@ -117,8 +119,8 @@ public class TestPropertiesManager {
         InputStream is = Tools.class.getResourceAsStream("/ressources/log4j.properties");
         ReadableByteChannel isChannel = Channels.newChannel(is);
         File log4jprops = testFolder.newFile("log4j.properties");
-        FileChannel tmpProp = new java.io.FileOutputStream(log4jprops).getChannel();
-        tmpProp.transferFrom(isChannel, 0, 4096);
+        FileOutputStream fos = new java.io.FileOutputStream(log4jprops);
+        fos.getChannel().transferFrom(isChannel, 0, 4096);
         PropertiesManager pm = new PropertiesManager();
         pm.setProperty("log4jpropfile", log4jprops.getCanonicalPath());
         pm.update();
@@ -127,6 +129,7 @@ public class TestPropertiesManager {
         File logFile = new File("tmp/log4j.log");
         Assert.assertTrue("Log4j file not created", logFile.canRead());
         logFile.delete();
+        fos.close();
     }
-    
+
 }
