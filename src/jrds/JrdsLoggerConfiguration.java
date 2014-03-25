@@ -1,6 +1,3 @@
-/*-------------------------------------------------------------
- * $Id: $
- */
 package jrds;
 
 import java.io.IOException;
@@ -29,17 +26,17 @@ import org.apache.log4j.PatternLayout;
  * </ul>
  * 
  * @author Fabrice Bacchella 
- * @version $Revision: 575 $,  $Date: 2009-08-22 22:38:42 +0200 (Sat, 22 Aug 2009) $
  */
 public class JrdsLoggerConfiguration {
-    static public final String APPENDERNAME = "jrds";
-    //Used to check if jrds "own" the log configuration
-    static private boolean logOwner = false;
+    static public final String APPENDERNAME = "jrdsAppender";
     static public final String DEFAULTLOGFILE = ConsoleAppender.SYSTEM_ERR;
     static public final String DEFAULTLAYOUT =  "[%d] %5p %c : %m%n";
     static public Appender jrdsAppender = null;
     //The managed loggers list
-    static private final Set<String> rootLoggers = new HashSet<String>(Arrays.asList(new String[] {"jrds", "org.mortbay.log", "org.apache"}));
+    static public final Set<String> rootLoggers = new HashSet<String>(Arrays.asList(new String[] {"jrds", "org.mortbay.log", "org.apache"}));
+    // Used to check if jrds "own" the log configuration
+    // null = we don't know yet
+    static private Boolean logOwner = null;
 
     private JrdsLoggerConfiguration() {
 
@@ -52,10 +49,9 @@ public class JrdsLoggerConfiguration {
      * @throws IOException
      */
     static public void initLog4J() throws IOException {
-        //If already configured, don't do that again
-        if(LogManager.getLoggerRepository().exists("jrds") != null )
+        //Do nothing if jrds is not allowed to setup logs
+        if(! isLogOwner())
             return;
-        logOwner = true;
         if(jrdsAppender == null) {
             jrdsAppender = new ConsoleAppender(new org.apache.log4j.SimpleLayout(), DEFAULTLOGFILE);
             jrdsAppender.setName(APPENDERNAME);
@@ -79,7 +75,8 @@ public class JrdsLoggerConfiguration {
      * @throws IOException
      */
     static public void configure(PropertiesManager pm) throws IOException {
-        if(! logOwner)
+        //Do nothing if jrds is not allowed to setup logs
+        if(! isLogOwner())
             return;
 
         if(pm.logfile != null && ! "".equals(pm.logfile)) {
@@ -107,8 +104,8 @@ public class JrdsLoggerConfiguration {
      * @param level the desired default level for this logger
      */
     static public void configureLogger(String logname, Level level) {
-        //Do nothing is jrds is not allowed to setup logs
-        if(! logOwner)
+        //Do nothing if jrds is not allowed to setup logs
+        if(! isLogOwner())
             return;
         Logger externallogger = LogManager.getLoggerRepository().exists(logname);
         //Change level only for new logger
@@ -118,14 +115,26 @@ public class JrdsLoggerConfiguration {
         }
 
         //Replace the appender, not optionally add it
-        Logger logger = Logger.getLogger(logname);
-        Appender oldApp = logger.getAppender(jrdsAppender.getName());
-        if(oldApp != null)
-            logger.removeAppender(oldApp);
-        logger.addAppender(jrdsAppender);
-
+        if(jrdsAppender != null) {
+            Logger logger = Logger.getLogger(logname);
+            Appender oldApp = logger.getAppender(jrdsAppender.getName());
+            if(oldApp != null)
+                logger.removeAppender(oldApp);
+            logger.addAppender(jrdsAppender); 
+            logger.setAdditivity(false);
+        }
+        
         //Keep the new logger name
         rootLoggers.add(logname);
+    }
+    
+    static public synchronized boolean isLogOwner() {
+        // logOwner == null mean we don't know yet
+        // if will be set to false if a logger called jrds already exist
+        if(logOwner == null ) {
+            logOwner = LogManager.getLoggerRepository().exists("jrds") == null;
+        }
+        return logOwner;
     }
 
 }

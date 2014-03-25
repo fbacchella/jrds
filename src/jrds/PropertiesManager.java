@@ -31,12 +31,15 @@ import jrds.starter.Timer;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.xml.DOMConfigurator;
 import org.rrd4j.core.RrdBackendFactory;
 
 /**
- * An less ugly class suposed to manage properties
+ * An less ugly class supposed to manage properties
  * should be reworked
  * @author Fabrice Bacchella
  */
@@ -207,7 +210,7 @@ public class PropertiesManager extends Properties {
                 return null;
             }
             if ( autocreate && !dir.mkdirs()) {
-                    logger.error(dir + " doesn't exists and can't be created");
+                logger.error(dir + " doesn't exists and can't be created");
                 return null;
             }
         }
@@ -252,18 +255,37 @@ public class PropertiesManager extends Properties {
 
         Locale.setDefault(new Locale("POSIX"));
 
+        //**********************
+        // The log configuration
+        
+        //Log configuration is done early
         boolean nologging = parseBoolean(getProperty("nologging", "false"));
         String log4jXmlFile = getProperty("log4jxmlfile", "");
         String log4jPropFile = getProperty("log4jpropfile", "");
         if(log4jXmlFile != null && ! "".equals(log4jXmlFile.trim())) {
-            org.apache.log4j.xml.DOMConfigurator.configure(log4jXmlFile.trim());
-            nologging = true;
+            File xmlfile = new File(log4jXmlFile.trim());
+            if ( ! xmlfile.canRead()) {
+                logger.error("log4j xml file " + xmlfile.getPath() + " can't be read, log4j not configured");
+            }
+            else {
+                BasicConfigurator.resetConfiguration();
+                DOMConfigurator.configure(xmlfile.getPath());
+                nologging = true;                
+                logger.info("configured with " + xmlfile.getPath());
+            }
         }
         else if(log4jPropFile != null && ! "".equals(log4jPropFile.trim())) {
-            org.apache.log4j.PropertyConfigurator.configure(log4jPropFile.trim());
-            nologging = true;
+            File propfile = new File(log4jPropFile.trim());
+            if ( ! propfile.canRead()) {
+                logger.error("log4j properties file " + propfile.getPath() + " can't be read, log4j not configured");
+            }
+            else {
+                BasicConfigurator.resetConfiguration();
+                PropertyConfigurator.configure(propfile.getPath());
+                nologging = true; 
+                logger.info("configured with " + propfile.getPath());
+            }
         }
-
         if(! nologging) {
             for(String ls: new String[]{ "trace", "debug", "info", "error", "fatal", "warn"}) {
                 Level l = Level.toLevel(ls);
@@ -281,13 +303,13 @@ public class PropertiesManager extends Properties {
             loglevel = Level.toLevel(getProperty("loglevel", "info"));
             logfile = getProperty("logfile");
 
-            //Let's configure the log fast
             try {
-                jrds.JrdsLoggerConfiguration.configure(this);
+                JrdsLoggerConfiguration.configure(this);
             } catch (IOException e1) {
                 logger.error("Unable to set log file to " + this.logfile + ": " + e1);
             }
         }
+
         legacymode = parseBoolean(getProperty("legacymode", "1"));
 
         //Directories configuration
