@@ -25,7 +25,6 @@ import jrds.starter.StarterNode;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
-import org.rrd4j.core.ArcDef;
 import org.rrd4j.core.Archive;
 import org.rrd4j.core.Datasource;
 import org.rrd4j.core.DsDef;
@@ -42,19 +41,13 @@ import org.w3c.dom.Element;
 /**
  * A abstract class that needs to be derived for specific probe.<br>
  * the derived class must construct a <code>ProbeDesc</code> and
- * can overid some method as needed
+ * can override some method as needed
  * @author Fabrice Bacchella
  */
 @ProbeMeta(
         topStarter=jrds.starter.SocketFactory.class
         )
 public abstract class Probe<KeyType, ValueType> extends StarterNode implements Comparable<Probe<KeyType, ValueType>>  {
-
-    private static final ArcDef[] DEFAULTARC = {
-        new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 3),
-        new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 24 * 365), 
-        new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 365 * 2)
-    };
 
     private String name = null;
     protected HostInfo monitoredHost;
@@ -65,6 +58,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     private String label = null;
     private Logger namedLogger = Logger.getLogger("jrds.Probe.EmptyProbe");
     private volatile boolean running = false;
+    private ArchivesSet archives = ArchivesSet.DEFAULT;
 
     /**
      * A special case constructor, mainly used by virtual probe
@@ -94,6 +88,14 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         if( ! readSpecific()) {
             throw new RuntimeException("Creation failed");
         }
+    }
+
+    /**
+     * Define the archive set to use for this probe
+     * @param archives
+     */
+    public void setArchives(ArchivesSet archives) {
+        this.archives = archives;
     }
 
     public void addGraph(GraphDesc gd) {
@@ -144,7 +146,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     public RrdDef getRrdDef() {
         RrdDef def = new RrdDef(getRrdName());
         def.setVersion(2);
-        def.addArchive(DEFAULTARC);
+        def.addArchive(archives.getArchives());
         def.addDatasource(getDsDefs());
         def.setStep(getStep());
         return def;

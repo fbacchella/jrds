@@ -36,6 +36,9 @@ public class EntityResolver implements org.xml.sax.EntityResolver {
         else if("-//jrds//DTD Listener//EN".equals(publicId)) {
             realSystemId =  getClass().getResource("/listener.dtd");
         }
+        else if("-//jrds//DTD Archives Set//EN".equals(publicId)) {
+            realSystemId =  getClass().getResource("/archives.dtd");
+        }
         else if("-//W3C//DTD XHTML 1.0 Strict//EN".equals(publicId)) {
             realSystemId =  getClass().getResource("/ressources/xhtml1-strict.dtd");
         }
@@ -57,7 +60,7 @@ public class EntityResolver implements org.xml.sax.EntityResolver {
 
         logger.trace(Util.delayedFormatString("Resolving \"%s\" \"%s\" to %s", publicId, systemId, realSystemId));
         if(realSystemId == null) {
-            logger.error("Failed to resolve " + publicId + " " + systemId);
+            throw new SAXException("Failed to resolve " + publicId + " " + systemId);
         }
         return new InputSource(realSystemId.openStream());
     }

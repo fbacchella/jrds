@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jrds.ArchivesSet;
 import jrds.ConnectedProbe;
 import jrds.GraphDesc;
 import jrds.GraphNode;
@@ -46,6 +47,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     private Map<String, Macro> macrosMap;
     private Map<String, Timer> timers = Collections.emptyMap();
     private Map<String, Listener<?, ?>> listeners = Collections.emptyMap();
+    private Map<String, ArchivesSet> archivessetmap = Collections.singletonMap(ArchivesSet.DEFAULT.getName(), ArchivesSet.DEFAULT);
 
     private Map<String, GraphDesc> graphDescMap;
 
@@ -262,6 +264,22 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         }
         p.setStep(timer.getStep());
         p.setTimeout(timer.getTimeout());
+
+        // Identify the archive to use
+        String archivesName = null;
+        // Check if a custom archives list is defined
+        if (probeNode.hasAttribute("archivesset")) {
+            archivesName = probeNode.getAttribute("archivesset");
+        }
+        else {
+            archivesName = pm.archives;
+        }
+        if(archivesName == null || "".equals(archivesName) || ! archivessetmap.containsKey(archivesName)) {
+            logger.error("invalid archives set name: " + archivesName);
+            return null;
+        }
+        ArchivesSet archives = archivessetmap.get(archivesName);
+        p.setArchives(archives);
 
         //The label is set
         String label = probeNode.getAttribute("label");
@@ -546,6 +564,11 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
     public void setGraphDescMap(Map<String, GraphDesc> graphDescMap) {
         this.graphDescMap = graphDescMap;
+    }
+
+    public void setArchivesSetMap(Map<String, ArchivesSet> archivessetmap) {
+        logger.debug(Util.delayedFormatString("will look for archives in %s", archivessetmap));
+        this.archivessetmap = archivessetmap;        
     }
 
 }

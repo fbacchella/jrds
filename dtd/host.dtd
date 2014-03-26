@@ -32,6 +32,7 @@
 			connection CDATA #IMPLIED
 			timer CDATA #IMPLIED
 			listener CDATA #IMPLIED
+			archivesset CDATA #IMPLIED
 >
 <!ELEMENT graph (attr*) >
 <!ATTLIST graph
