@@ -1,7 +1,9 @@
 package jrds.configuration;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import jrds.GraphDesc;
@@ -12,6 +14,8 @@ import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 
 import org.apache.log4j.Logger;
+import org.rrd4j.ConsolFun;
+import org.rrd4j.core.ArcDef;
 
 public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
     static final private Logger logger = Logger.getLogger(ProbeDescBuilder.class);
@@ -46,6 +50,27 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
         }
     }
 
+    private String getArchChildContent(JrdsElement archiveElement, String name){
+        return archiveElement.getChildElementsByName(name).iterator().next().getTextContent();
+    }
+
+    private ArcDef getArchDef(JrdsElement archiveElement){
+        ConsolFun consolFun = ConsolFun.valueOf(getArchChildContent(archiveElement, "consolFun"));
+        double xff = Double.parseDouble(getArchChildContent(archiveElement, "xff"));
+        int steps = Integer.parseInt(getArchChildContent(archiveElement,"steps"));
+        int rows = Integer.parseInt(getArchChildContent(archiveElement,"rows"));
+        return new ArcDef(consolFun,xff,steps,rows);
+    }
+    private List<ArcDef> getArchiveDefs(Iterable<JrdsElement> archiveElements){
+        List<ArcDef> archives = new ArrayList<ArcDef>();
+        for(JrdsElement archiveElement : archiveElements){
+            ArcDef arcDef = getArchDef(archiveElement);
+            archives.add(arcDef);
+            logger.trace(Util.delayedFormatString("Adding archive: %s",arcDef.dump()));
+        }
+        return archives;
+    }
+
     @SuppressWarnings("unchecked")
     public ProbeDesc makeProbeDesc(JrdsDocument n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, InstantiationException {
         ProbeDesc pd = new ProbeDesc();
@@ -56,6 +81,8 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
         setMethod(root.getElementbyName("index"), pd, "setIndex");
 
         logger.trace(Util.delayedFormatString("Creating probe description %s", pd.getName()));
+
+        pd.setArchives(getArchiveDefs(root.getChildElementsByName("archive")).toArray(new ArcDef[]{}));
 
         JrdsElement classElem = root.getElementbyName("probeClass");
         if(classElem == null) {

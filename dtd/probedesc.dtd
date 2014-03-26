@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT probedesc (name, probeName, probeClass, index?, specific*, uptimefactor?, defaultargs?, ds*, graphs)>
+<!ELEMENT probedesc (name, probeName, probeClass, index?, specific*, uptimefactor?, defaultargs?, ds*, graphs,archive*)>
 <!ATTLIST specific 
 			name CDATA #REQUIRED
 >
 <!ELEMENT specific (#PCDATA)>
 <!ELEMENT ds ((dsName, dsType)?, (oid | (oidhigh, oidlow) | collect | (collecthigh, collectlow) )?, minValue?, maxValue?, defaultValue?)>
+<!ELEMENT archive (consolFun, xff, steps, rows)>
 <!ELEMENT defaultargs (attr)*>
 <!ELEMENT arg EMPTY>
 <!ATTLIST arg
@@ -35,3 +36,7 @@
 <!ELEMENT probeName (#PCDATA)>
 <!ELEMENT snmpRequester (#PCDATA)>
 <!ELEMENT collect (#PCDATA)>
+<!ELEMENT consolFun (#PCDATA)>
+<!ELEMENT xff (#PCDATA)>
+<!ELEMENT steps (#PCDATA)>
+<!ELEMENT rows (#PCDATA)>

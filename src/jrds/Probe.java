@@ -50,11 +50,7 @@ import org.w3c.dom.Element;
         )
 public abstract class Probe<KeyType, ValueType> extends StarterNode implements Comparable<Probe<KeyType, ValueType>>  {
 
-    private static final ArcDef[] DEFAULTARC = {
-        new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 3),
-        new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 24 * 365), 
-        new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 365 * 2)
-    };
+
 
     private String name = null;
     protected HostInfo monitoredHost;
@@ -144,7 +140,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     public RrdDef getRrdDef() {
         RrdDef def = new RrdDef(getRrdName());
         def.setVersion(2);
-        def.addArchive(DEFAULTARC);
+        def.addArchive(pd.getArchives());
         def.addDatasource(getDsDefs());
         def.setStep(getStep());
         return def;
