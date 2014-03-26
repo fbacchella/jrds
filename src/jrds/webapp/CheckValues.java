@@ -1,9 +1,3 @@
-/*##########################################################################
- _##
- _##  $Id: Graph.java 236 2006-03-02 15:59:34 +0100 (jeu., 02 mars 2006) fbacchella $
- _##
- _##########################################################################*/
-
 package jrds.webapp;
 
 import java.io.IOException;
@@ -37,7 +31,6 @@ import org.rrd4j.core.FetchData;
  * If there is only one value generated, it's displayed as is. Else the name is also shown as well as the last update value
  * in the form <code>datastore: value</code>
  * @author Fabrice Bacchella
- * @version $Revision: 236 $
  */
 public final class CheckValues extends JrdsServlet {
 
@@ -50,7 +43,7 @@ public final class CheckValues extends JrdsServlet {
 
         ParamsBean params = new ParamsBean(req, hl, "host", "probe", "dsname", "period", "cf");
 
-        int period = jrds.Util.parseStringNumber(params.getValue("period"), hl.getStep()).intValue();
+        long period = jrds.Util.parseStringNumber(params.getValue("period"), new Long(hl.getStep()));
         String cfName = params.getValue("cf");
         if(cfName == null || "".equals(cfName.trim()))
             cfName = "AVERAGE";
