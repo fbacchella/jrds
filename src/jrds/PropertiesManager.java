@@ -506,7 +506,7 @@ public class PropertiesManager extends Properties {
             }
         }
 
-        archives = getProperty("archives", ArchivesSet.DEFAULT.getName());
+        archivesSet = getProperty("archivesset", ArchivesSet.DEFAULT.getName());
         
     }
 
@@ -537,7 +537,7 @@ public class PropertiesManager extends Properties {
     public boolean readonly = false;
     public boolean withjmx = false;
     public Map<String, String> jmxprops = Collections.emptyMap();
-    public String archives;
+    public String archivesSet;
     public static final String FILTERTAB = "filtertab";
     public static final String CUSTOMGRAPHTAB = "customgraph";
     public static final String SUMSTAB = "sumstab";
