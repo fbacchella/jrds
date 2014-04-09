@@ -77,12 +77,21 @@ return declare("jrds.TimeTextBox", dijit.form.TimeTextBox, {
 	class: 'field fieldHour',
 	postCreate: function() {
 		this.set('value', queryParams[this.queryId]);
-		this.set('constraints',{
-			timePattern:'HH:mm',
-			clickableIncrement:'T00:30:00',
-			visibleIncrement:'T00:30:00',
-			visibleRange:'T05:00:00'
-		})
+		constraint = this.get('constraints');
+		constraint.timePattern = 'HH:mm';
+		constraint.clickableIncrement = 'T00:30:00';
+		constraint.visibleIncrement = 'T00:30:00';
+		constraint.visibleRange = 'T05:00:00';
+		if(this.id == 'beginh') {
+			this.constraints.max = new Date(queryParams.end);
+			this.constraints.max.setSeconds(59);
+			this.constraints.max.setMilliseconds(999);
+		}
+		else {
+			this.constraints.min = new Date(queryParams.begin);			
+			this.constraints.min.setSeconds(0);
+			this.constraints.min.setMilliseconds(0);
+		}
 		return this.inherited(arguments);
 	},
 	onFocus: function(date) {
@@ -101,6 +110,16 @@ return declare("jrds.TimeTextBox", dijit.form.TimeTextBox, {
 		newDate.setSeconds(date.getSeconds());
 		newDate.setMilliseconds(date.getMilliseconds());
 		queryParams[this.queryId] = newDate;
+		if(this.id == 'beginh') {
+			dijit.byId('endh').constraints.min = new Date(newDate);
+			dijit.byId('endh').constraints.min.setSeconds(0);
+			dijit.byId('endh').constraints.min.setMilliseconds(0);
+		}
+		else {
+			dijit.byId('beginh').constraints.max = new Date(newDate);			
+			dijit.byId('beginh').constraints.max.setSeconds(59);
+			dijit.byId('beginh').constraints.max.setMilliseconds(999);
+		}
 		return this.inherited(arguments);
 	}
 });
@@ -120,11 +139,18 @@ return declare("jrds.DateTextBox", dijit.form.DateTextBox, {
 		selector: 'date', 
 		datePattern: 'yyyy-MM-dd'
 	},
-	dateStr: '',
 	regExp: "\\d\\d\\d\\d-\\d\\d-\\d\\d",
 	postCreate: function() {
 		this.set('timeBox', dijit.byId(this.timeBoxName));
 		this.set('value',queryParams[this.id]);
+		constraint = this.get('constraints');
+		constraint.timePattern = 'yyyy-MM-dd';
+		if(this.id == 'begin') {
+			this.constraints.max = queryParams.end
+		}
+		else {
+			this.constraints.min = queryParams.begin;			
+		}
 		return this.inherited(arguments);
 	},
 	format: function(date) {
@@ -177,8 +203,14 @@ return declare("jrds.DateTextBox", dijit.form.DateTextBox, {
 			}				
 		}
 		queryParams[this.id] = newDate;
+		if(this.id == 'begin') {
+			dijit.byId('end').constraints.min = newDate;
+		}
+		else {
+			dijit.byId('begin').constraints.max = newDate;			
+		}
 		return this.inherited(arguments);
-	}
+	},
 });
 });
 
@@ -697,7 +729,8 @@ function doGraphList(result) {
             },
             iconsList);
         dojo.connect(application_view_list, "onclick", graph, function(){
-            details(dojo.objectToQuery(this.probe));
+            url = dojo.objectToQuery(this.probe);
+        	var detailsWin = window.open("details?" + url, "_blank", "width=400,resizable=yes,menubar=no,scrollbars=yes");
         });
 
         //Create the history button
@@ -710,7 +743,8 @@ function doGraphList(result) {
             },
             iconsList);
         dojo.connect(time, "onclick", graph, function(){
-            history(dojo.objectToQuery(this.history));
+            url = dojo.objectToQuery(this.history);
+        	var historyWin = window.open("history.html?" + url, "_blank", "width=750,menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
         });
 
         //Create the save button
@@ -723,7 +757,8 @@ function doGraphList(result) {
             },
             iconsList);
         dojo.connect(disk, "onclick", graph, function(){
-            save(dojo.objectToQuery(this.graph));
+            url = dojo.objectToQuery(this.graph);
+        	var popupWin = window.open("download?" + url, "_blank", "menubar=no,status=no,resizable=no,scrollbars=no");
         });
 	}
 	if(this.standby != null)
@@ -916,10 +951,6 @@ function loadTree(item,  node){
 	}
 }
 
-function details(url) {
-	var detailsWin = window.open("details?" + url, "_blank", "width=400,resizable=yes,menubar=no,scrollbars=yes");
-}
-
 function popup(url,id) {
 	var img;
 	if(id)
@@ -935,14 +966,6 @@ function popup(url,id) {
 		height = "height=500";
 	}
 	return popupWin = window.open("popup.html?" + url, "_blank", height + "," + width + ",menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
-}
-
-function save(url) {
-	var popupWin = window.open("download?" + url, "_blank", "menubar=no,status=no,resizable=no,scrollbars=no");
-}
-
-function history(url) {
-	var historyWin = window.open("history.html?" + url, "_blank", "width=750,menubar=no,status=no,resizable=yes,scrollbars=yes,location=yes");
 }
 
 function setupTabs() {
