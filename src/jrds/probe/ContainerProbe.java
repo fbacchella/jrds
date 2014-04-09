@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Map;
 
 import jrds.HostInfo;
+import jrds.JrdsSample;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.store.EmptyExtractor;

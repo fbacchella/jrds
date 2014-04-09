@@ -11,6 +11,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import jrds.TestProbe.DummyProbe;
 import jrds.graphe.Sum;
 import jrds.mockobjects.Full;
+import jrds.mockobjects.GenerateProbe;
+import jrds.mockobjects.MokeProbe;
+import jrds.store.ExtractInfo;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -72,7 +75,7 @@ public class TestSum {
         hl.addProbe(p);
 
         ArrayList<String> glist = new ArrayList<String>();
-        glist.add(p.getGraphList().iterator().next().getQualifieName());
+        glist.add(p.getGraphList().iterator().next().getQualifiedName());
         Sum s = new Sum("A sum test", glist);
         s.configure(hl);
         PlottableMap ppm = s.getCustomData();

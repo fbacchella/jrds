@@ -1,5 +1,6 @@
 package jrds.graphe;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -83,16 +84,28 @@ public class Sum extends AutonomousGraphNode {
                 for(String name : graphList) {
                     GraphNode g = hl.getGraphById(name.hashCode());
                     logger.trace("Looking for " + name + " in graph base, and found " + g);
+                    if(g == null) {
+                        logger.error("Graph not found: " + name);
+                        continue;
+                    }
+
+                    try {
+                        dp = g.getPlottedDate(ei);
+                    } catch (IOException e) {
+                        logger.error("Failed to read " + g.getProbe());
+                        continue;
+                    }
+
                     if(g != null) {
-                        fd = g.getProbe().fetchData(ConsolFun.AVERAGE, start, end, step);
+                        g.getProbe().fetchData().fill(dp, ei);
 
                         //First pass, no data to use
                         if(allvalues == null) {
-                            allvalues = (double[][]) fd.getValues().clone();
+                            allvalues = (double[][]) dp.getValues().clone();
                         }
                         //Next step, sum previous values
                         else {
-                            double[][] tempallvalues = fd.getValues();
+                            double[][] tempallvalues = dp.getValues();
                             for(int c = 0 ; c < tempallvalues.length ; c++) {
                                 for(int r = 0 ; r < tempallvalues[c].length; r++) {
                                     double v = tempallvalues[c][r];
