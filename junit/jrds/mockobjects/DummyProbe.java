@@ -1,7 +1,5 @@
 package jrds.mockobjects;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -18,13 +16,8 @@ import jrds.Tools;
 import jrds.starter.HostStarter;
 import jrds.store.RrdDbStoreFactory;
 
-import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Test;
 import org.rrd4j.DsType;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 
 public class DummyProbe extends Probe<String, Number> {
 
@@ -77,28 +70,6 @@ public class DummyProbe extends Probe<String, Number> {
     static public void prepare() throws IOException, ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml();
-        //Logger.getLogger(EntityResolver.class).setLevel(Level.TRACE);
-        //Logger.getLogger(DummyProbe.class).setLevel(Level.TRACE);
-    }
-
-    @Test(expected=NullPointerException.class)
-    public void GetDetails() throws Exception, IOException
-    {
-        for(Class<?> c : this.getClass().getInterfaces()) {
-            System.out.println(c);
-        }
-
-        configure();
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        Document xmlDesc = dumpAsXml(true);
-        jrds.Util.serialize(xmlDesc, os, jrds.xmlResources.ResourcesLocator.getResourceUrl("probe.xsl"), null);
-        Logger.getLogger(this.getClass()).trace(os.toString());
-        Document d = Tools.dbuilder.parse(new ByteArrayInputStream(os.toByteArray()));
-        NodeList nl = d.getElementsByTagName("a");
-        for(int i=0; i < nl.getLength(); i++) {
-            String expected = "ds" + i;
-            Assert.assertEquals(expected, nl.item(i).getTextContent());
-        }
     }
 
 }

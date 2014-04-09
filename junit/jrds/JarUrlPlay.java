@@ -6,8 +6,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 
-import jrds.xmlResources.ResourcesLocator;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 import org.junit.BeforeClass;
@@ -24,7 +22,7 @@ public class JarUrlPlay {
 
 	@Test
 	public void play() throws IOException, URISyntaxException {
-		Object[] cList = new Object[]{ getClass(), String.class, "/DejaVuSansMono-Bold.ttf", "/jrds/xmlResources/jrds.xsl", logger.getClass()} ;
+		Object[] cList = new Object[]{ getClass(), String.class, "/DejaVuSansMono-Bold.ttf", logger.getClass()} ;
 		for(Object o: cList) {
 			String path = ressourcePath(o);
 			URL rsrcUrl = this.getClass().getResource(path);
@@ -49,8 +47,6 @@ public class JarUrlPlay {
 			logger.debug("    Root url: " + rootUrl);
 			URLConnection cnx = rootUrl.openConnection();
 			logger.debug("    Root connection: " + cnx);
-			//cnx.connect();
-			//logger.debug("    content type: " + cnx.getContentType());
 		}
 	}
 
@@ -67,12 +63,11 @@ public class JarUrlPlay {
 	
 	@Test
 	public void loader() {
-		String[] cList = new String[]{ "filter.dtd", "/filter.dtd", "jrds", "/jrds", "/DejaVuSansMono-Bold.ttf", "/jrds/xmlResources/jrds.xsl", "jrds.xsl", "/desc", "desc", "/ressources/args.xml", "ressources/args.xml"} ;
+		String[] cList = new String[]{ "filter.dtd", "/filter.dtd", "jrds", "/jrds", "/DejaVuSansMono-Bold.ttf", "/desc", "desc", "/ressources/args.xml", "ressources/args.xml"} ;
 		for(String ressource: cList) {
 			logger.trace("Looking for " + ressource);
 			logger.trace("    using class loader: " + getClass().getClassLoader().getResource(ressource));
 			logger.trace("    using test class: " + getClass().getResource(ressource));
-			logger.trace("    using resources locator: " + ResourcesLocator.getResourceUrl(ressource));
 		}
 	}
 	
