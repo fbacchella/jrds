@@ -58,20 +58,13 @@ public class TestReadElements {
         tester = ToolsWebApp.getMonoServlet(testFolder, prop, JSonTree.class, "/jsontree");
         tester.addServlet(JSonQueryParams.class, "/queryparams");
         tester.addServlet(JSonGraph.class, "/jsongraph");
+        tester.addServlet(JSonDetails.class, "/details");
         tester.start();        
     }
 
     private JSONObject jsonquery(String query) throws IOException, Exception {
-        HttpTester request = new HttpTester();
-        HttpTester response = new HttpTester();
-        request.setMethod("GET");
-        request.setHeader("Host","tester");
-        request.setHeader("Referer","http://tester/");
-        request.setURI(query);
-        request.setVersion("HTTP/1.0");
-
-        response.parse(tester.getResponses(request.generate()));
-        Assert.assertEquals(200, response.getStatus());
+        String url = String.format("http://tester%s", query);
+        HttpTester response = ToolsWebApp.doRequestGet(tester, url, 200);
         JSONObject content = new JSONObject(response.getContent());
         logger.debug(content);
 
@@ -200,6 +193,18 @@ public class TestReadElements {
             Assert.assertNotEquals(null, jsontab.get("isFilters"));
             Assert.assertNotEquals(null, jsontab.get("label"));
         }
+    }
+    
+    @Test
+    public void testDetails() throws IOException, Exception {
+        JSONObject details = jsonquery("/details?pid=-554902849");
+        Assert.assertEquals(-554902849, details.get("pid"));        
+        Assert.assertEquals("lo0", details.get("index"));        
+        Assert.assertEquals("localhost/ifx-lo0", details.get("probequalifiedname"));        
+        Assert.assertEquals("ifx-lo0", details.get("probeinstancename"));        
+        Assert.assertEquals("localhost", details.get("hostname"));        
+        Assert.assertEquals(17, details.getJSONArray("datastores").length());        
+        Assert.assertEquals(3, details.getJSONArray("graphs").length());        
     }
 
 }

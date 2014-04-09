@@ -31,7 +31,7 @@
 	</servlet>
 	<servlet>
 		<servlet-name>probedetails</servlet-name>
-		<servlet-class>jrds.webapp.ProbeDetails</servlet-class>
+		<servlet-class>jrds.webapp.JSonDetails</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>whichlibs</servlet-name>
