@@ -5,6 +5,8 @@
  */
 package jrds.probe.jdbc;
 
+import java.util.Arrays;
+
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.GraphNode;
@@ -27,10 +29,10 @@ public class OracleActivityGraph extends GraphNode {
         gd.add("msgsent", GraphDesc.LINE, "messages sent/s");
         gd.add("msgrcvd", GraphDesc.LINE, "messages received/s");
         gd.setVerticalLabel("operation/s");
-        gd.addTree(PropertiesManager.HOSTSTAB, new Object[] {
-                GraphDesc.HOST, GraphDesc.SERVICES, GraphDesc.DATABASE, GraphDesc.JDBC, "DB activity"});
-        gd.addTree(PropertiesManager.VIEWSTAB, new Object[] {
-                GraphDesc.SERVICES, GraphDesc.DATABASE, GraphDesc.JDBC, "DB activity"});
+        gd.setTree(PropertiesManager.HOSTSTAB, Arrays.asList(new Object[] {
+                GraphDesc.HOST, GraphDesc.SERVICES, GraphDesc.DATABASE, GraphDesc.JDBC, "DB activity"}));
+        gd.setTree(PropertiesManager.VIEWSTAB, Arrays.asList(new Object[] {
+                GraphDesc.SERVICES, GraphDesc.DATABASE, GraphDesc.JDBC, "DB activity"}));
         gd.setGraphTitle("DB activity on {3}");
         gd.setGraphName("{4}");
     }
