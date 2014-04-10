@@ -12,11 +12,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 
 import jrds.GraphDesc;
-<<<<<<< HEAD
 import jrds.Period;
-=======
 import jrds.GraphNode;
->>>>>>> 5b7c0f53cffc1445daf5898200708d5801fe5e0b
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.Tools;
