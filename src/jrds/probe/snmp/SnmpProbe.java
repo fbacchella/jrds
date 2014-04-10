@@ -20,12 +20,12 @@ import org.snmp4j.smi.OID;
 /**
  * A abstract class from which all snmp probes should be derived.<p>
  * An usefull command to browse the content of an snmp agent :<p>
- * <quote>snmpbulkwalk -OX -c public -v 2c hostname  enterprises | sed -e 's/\[.*\]//' -e 's/ =.*$//'|  grep '::' | uniq </quote>
+ * <quote>snmpbulkwalk -OX -c public -v 2c hostname  . | sed -e 's/\[.*\]//' -e 's/ =.*$//'|  grep '::' | uniq </quote>
  * @author bacchell
  * @param <SnmpConnection>
  */
 @ProbeMeta(
-        topStarter=jrds.snmp.MainStarter.class,
+        timerStarter=jrds.snmp.MainStarter.class,
         discoverAgent=SnmpDiscoverAgent.class
         )
 public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnection> {
