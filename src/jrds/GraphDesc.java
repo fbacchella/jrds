@@ -758,11 +758,14 @@ implements Cloneable, WithACL {
                 name = dsName;
             else if(rpn != null)
                 name = Integer.toHexString(rpn.hashCode());
-            else if(legend != null) {
-                name = legend;
-            }
             else if(host != null) {
                 name = host + "/" + probe + "/" + dsName;
+            }
+            else if(dsName != null) {
+                name = dsName;
+            }
+            else if(legend != null) {
+                name = legend;
             }
         }
         //Auto generated legend
