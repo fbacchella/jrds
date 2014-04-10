@@ -33,7 +33,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
     static final private String NUM = "Number";
     static final private String CPU = "Cpu";
 
-    private Pattern pattern = null;
+    private Pattern pattern = Pattern.compile("^$");
 
     /**
      * @param monitoredHost
@@ -79,7 +79,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
             StringBuffer cmdBuf = new StringBuffer();
             for(OID oid: lk) {
                 cmdBuf.append(s.get(oid));
-                cmdBuf.append(" ");
+                cmdBuf.append(' ');
             }
             if(pattern.matcher(cmdBuf.toString().trim()).matches()) {
                 int[] index = new int[1];

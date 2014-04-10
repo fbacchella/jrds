@@ -108,7 +108,7 @@ public class GetMoke {
         StringBuffer buffer = new StringBuffer("/");
         if( ctxPathArgs != null && ctxPathArgs.length > 0) {
             for(String element: ctxPathArgs)
-                buffer.append("/").append(element); 
+                buffer.append('/').append(element); 
         }
         buffer.delete(0, 1);
         final String pathInfo = buffer.toString();

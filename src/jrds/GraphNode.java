@@ -40,7 +40,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
 
     /**
      * A protected constructor
-     * child are allowed to build themselve in a strang way
+     * child are allowed to build themselves in a strange way
      * 
      */
     protected GraphNode() {
