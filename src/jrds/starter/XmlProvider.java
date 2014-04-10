@@ -102,11 +102,11 @@ public class XmlProvider extends Starter {
                 if(xpath == null || "".equals(xpath))
                     continue;
                 Node n = (Node)xpather.evaluate(xpath, d, XPathConstants.NODE);
-                double value = 0;
+                Double value = 0.0d;
                 if(n != null) {
                     log(Level.TRACE, "%s", n);
-                    value = jrds.Util.parseStringNumber(n.getTextContent(), Double.NaN).doubleValue();
-                    oldMap.put(xpath, Double.valueOf(value));
+                    value = jrds.Util.parseStringNumber(n.getTextContent(), Double.NaN);
+                    oldMap.put(xpath, value);
                 }
             } catch (XPathExpressionException e) {
                 log(Level.ERROR, "Invalid XPATH : " + xpath + " for " + this);

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -21,6 +22,9 @@ amdVector = [
  "dojo/parser",
  "dojo/data/ItemFileReadStore",
  "dojox/widget/Standby",
+ "dijit/layout/BorderContainer",
+ "dijit/layout/ContentPane",
+ "dijit/TitlePane",
  "jrds/HostForm",
  "jrds/Autoperiod",
  "jrds/TimeTextBox",
@@ -38,9 +42,6 @@ amdVector = [
  "jrds/Tabs",
  "jrds/TabContent",
  "jrds/StatusButton",
- "dijit/layout/BorderContainer",
- "dijit/layout/ContentPane",
- "dijit/TitlePane",
  "dojo/domReady!"
 ]
 
@@ -76,7 +77,7 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
 					<button type="submit" id="discoverClear" data-dojo-type="dijit/form/Button" >Clear Host</button>
 					<div>
 						<label for="discoverHostName">Host name</label>
-						<input id="discoverHostName" name="discoverHostName" trim="true" required="true" data-dojo-type="dijit/form/ValidationTextBox" ></input>
+						<input id="discoverHostName" name="discoverHostName" trim="true" required="true" data-dojo-type="dijit/form/ValidationTextBox" />
 					</div>
 					<div id="discoverAutoBlock">
 					</div>
@@ -86,20 +87,20 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
 		</div> <!-- adminTab -->
 	</div>
   <!--  The content of tab panes, it can be any where, it will be destroyed -->
-   <div data-dojo-type="dijit/layout/ContentPane" id='mainTab' title="Main tree" selected="true"">
+   <div data-dojo-type="dijit/layout/ContentPane" id='mainTab' title="Main tree" selected="true">
 		<div id="mainPane" data-dojo-type="dijit/layout/BorderContainer" design="sidebar" gutters="false" >
 			<div id="treePane" data-dojo-type="dijit/layout/ContentPane" region="leading" splitter="true" >
-				<form id="hostForm" action="" method="" data-dojo-type="jrds/HostForm">
+				<form id="hostForm" data-dojo-type="jrds/HostForm">
 					<button id="toroot" data-dojo-type="jrds/RootButton" data-dojo-props="iconClass: 'rootButtonIcon', showLabel: false" type="button">go root</button>
       				<label for="host">Only host</label>
       				<input id="host" type="text" name="host" size="24" data-dojo-type="dijit/form/TextBox" trim="true" required="true" />
         			<button type="submit" data-dojo-type="dijit/form/Button">Search</button>
 				</form>
-				<img id=foldButton class="dijitTreeIcon dijitFolderClosed" alt="" src="dojo/resources/blank.gif" onClick="doUnfold();" />
+				<img id="foldButton" class="dijitTreeIcon dijitFolderClosed" alt="" src="dojo/resources/blank.gif" onClick="doUnfold();" />
 			</div> <!-- treePane -->
 			<div id="centerPane" data-dojo-type="dijit/layout/ContentPane" region="center">
 				<div data-dojo-type="dijit/layout/ContentPane" id="paramsPane" >
-					<form id="dateForm" name="dateForm" action="" method="" data-dojo-type="jrds/RenderForm" >
+					<form id="dateForm" name="dateForm" data-dojo-type="jrds/RenderForm" >
 						<div data-dojo-type="dijit/layout/ContentPane" class="formblock" >
 							<span class="linelabel">Time scale</span>
        						<select id="autoperiod" name="autoperiod" data-dojo-type="jrds/Autoperiod">

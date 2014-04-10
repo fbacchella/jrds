@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+    "urn:jrds:graphdesc">
+<graphdesc>
+	<name>SunJVM5GCCount</name>
+	<graphName>jvmsun5gccount-${label}</graphName>
+	<graphTitle>JVM GC count for ${label} on ${host}</graphTitle>
+	<unit>
+		<SI />
+	</unit>
+	<verticalLabel>Collections/s</verticalLabel>
+	<add>
+		<name>MS Coll Count</name>
+		<graphType>line</graphType>
+		<legend>Major (Mark and sweep) collections count</legend>
+	</add>
+	<add>
+		<name>Copy Coll Count</name>
+		<graphType>line</graphType>
+		<legend>Minor collection count</legend>
+	</add>
+    <hosttree>
+        <pathelement>HOST</pathelement>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>JVM</pathstring>
+        <pathstring>${label}</pathstring>
+        <pathstring>GC Count</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>JVM</pathstring>
+        <pathelement>HOST</pathelement>
+        <pathstring>GC Count</pathstring>
+        <pathstring>${label}</pathstring>
+    </viewtree>
+</graphdesc>

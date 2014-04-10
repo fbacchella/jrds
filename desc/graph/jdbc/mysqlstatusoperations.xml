@@ -15,7 +15,7 @@
     <name>Com_select</name>
   </add>
   <add>
-    <name>Com_insert</name>
+    <name>Com_inserts</name>
   </add>
   <add>
     <name>Com_replace</name>
@@ -31,7 +31,7 @@
   </add>
   <add>
     <name>insert</name>
-	<rpn>Com_insert,Com_replace,+</rpn>
+	<rpn>Com_inserts,Com_replace,+</rpn>
 	<graphType>stack</graphType>
 	<legend>Insert</legend>
   </add>

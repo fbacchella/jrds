@@ -88,7 +88,7 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
 
 
     /* (non-Javadoc)
-     * @see com.aol.jrds.Probe#getNewSampleValues()
+     * @see jrds.Probe#getNewSampleValues()
      */
     @Override
     public Map<OID, Object> getNewSampleValuesConnected(SnmpConnection cnx) {
@@ -160,6 +160,7 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
     }
 
     public void setSuffixLength(int suffixLength) {
+        log(Level.TRACE, "suffix length is %s", suffixLength);
         this.suffixLength = suffixLength;
     }
 

@@ -7,24 +7,23 @@ define("jrds/RootButton",
 		  "dijit" ],
 		function(declare, button, dojo, dijit) {
 return declare("jrds.RootButton", button, {
-	class: 'rootButton',
+	'class': 'rootButton',
 	onClick: function() {
 		var tabs = dijit.byId('tabs');
 		var tabSelected = tabs.attr('selectedChildWidget');
-		if(tabSelected.id !=  queryParams.landtab)
+		if(tabSelected.id !==  queryParams.landtab) {
 			tabs.selectChild(queryParams.landtab);
-		else {
+		} else {
 			delete queryParams.host;
 			delete queryParams.filter;
 			delete queryParams.id;
 			queryParams.tab = queryParams.landtab;
 			fileForms();
 			getTree(tabSelected.isFilters);
-		}		
+		}
 	}
 });
 });
-
 
 
 define( "jrds/Autoperiod",
@@ -36,7 +35,7 @@ return declare("Autoperiod", dijit.form.Select, {
 	onChange: function(value) {
 		queryParams.autoperiod = value;
 		//value = 0 means manual time period, so don't mess with the period fields
-		if(value != 0) {
+		if(value !== 0) {
             getGraphList();
 			// Refresh queryParams with the new time values
 			var iq = dojo.xhrGet( {
@@ -65,65 +64,75 @@ return declare("Autoperiod", dijit.form.Select, {
 });
 });
 
-define( "jrds/TimeTextBox",
-		[ "dojo/_base/declare",
-		  "dojo",
-    	  "dijit/form/TimeTextBox",
-    	  "dojo/date",
-    	  "dojo/date/locale"
-    	],
-    	function(declare, dojo) {
-return declare("jrds.TimeTextBox", dijit.form.TimeTextBox, {
-	class: 'field fieldHour',
-	postCreate: function() {
-		this.set('value', queryParams[this.queryId]);
-		constraint = this.get('constraints');
-		constraint.timePattern = 'HH:mm';
-		constraint.clickableIncrement = 'T00:30:00';
-		constraint.visibleIncrement = 'T00:30:00';
-		constraint.visibleRange = 'T05:00:00';
-		if(this.id == 'beginh') {
-			this.constraints.max = new Date(queryParams.end);
-			this.constraints.max.setSeconds(59);
-			this.constraints.max.setMilliseconds(999);
-		}
-		else {
-			this.constraints.min = new Date(queryParams.begin);			
-			this.constraints.min.setSeconds(0);
-			this.constraints.min.setMilliseconds(0);
-		}
-		return this.inherited(arguments);
-	},
-	onFocus: function(date) {
-		dijit.byId('autoperiod').attr('value', 0);
-		this.set('value', queryParams[this.queryId]);
-	},
-	onChange: function(date) {
-		if(date == null) {
-			arguments[0] = queryParams[this.queryId];
-			date = arguments[0];
-		}
-		oldDate = queryParams[this.queryId];
-		newDate = new Date(oldDate.getTime());
-		newDate.setHours(date.getHours());
-		newDate.setMinutes(date.getMinutes());
-		newDate.setSeconds(date.getSeconds());
-		newDate.setMilliseconds(date.getMilliseconds());
-		queryParams[this.queryId] = newDate;
-		if(this.id == 'beginh') {
-			dijit.byId('endh').constraints.min = new Date(newDate);
-			dijit.byId('endh').constraints.min.setSeconds(0);
-			dijit.byId('endh').constraints.min.setMilliseconds(0);
-		}
-		else {
-			dijit.byId('beginh').constraints.max = new Date(newDate);			
-			dijit.byId('beginh').constraints.max.setSeconds(59);
-			dijit.byId('beginh').constraints.max.setMilliseconds(999);
-		}
-		return this.inherited(arguments);
+define(
+	"jrds/TimeTextBox",
+	[
+		"dojo/_base/declare",
+		"dojo",
+		"dijit",
+		"dijit/form/TimeTextBox",
+		"dojo/date",
+		"dojo/date/locale"
+	],
+	function(declare, dojo, dijit, timeTextBox) {
+		var minTime = new Date(1970, 0, 1, 0, 0, 0),
+			maxTime = new Date(1970, 0, 1, 23, 59, 59, 999);
+		return declare("jrds.TimeTextBox", timeTextBox, {
+			'class': 'field fieldHour',
+			postCreate: function() {
+				var date = queryParams[this.queryId];
+				this.set('oldvalue', new Date(0,0,0));
+				this.set('value', date);
+				var constraint = this.get('constraints');
+				constraint.timePattern = 'HH:mm';
+				constraint.clickableIncrement = 'T00:30:00';
+				constraint.visibleIncrement = 'T00:30:00';
+				constraint.visibleRange = 'T05:00:00';
+				constraint.min = minTime;
+				constraint.max = maxTime;
+
+				return this.inherited(arguments);
+			},
+			onFocus: function(date) {
+				dijit.byId('autoperiod').set('value', 0);
+			},
+			onChange: function(date) {
+				var newDate = new Date(1970, 0, 1, date.getHours(), date.getMinutes(), 0);
+
+				if (this.get('oldvalue') !== newDate) {
+					this.set('value', newDate);
+					this.set('oldvalue', newDate);
+
+					this.checkInterval();
+
+					queryParams[this.queryId] = dijit.byId(this.queryId).get('value');
+					queryParams[this.queryId].setHours(newDate.getHours());
+					queryParams[this.queryId].setMinutes(newDate.getMinutes());
+				}
+			},
+			checkInterval: function() {
+				var beginDay = new Date(dijit.byId('begin').get('value').getTime());
+				var endDay = new Date(dijit.byId('end').get('value').getTime());
+				if (beginDay.getTime() === endDay.getTime()) {
+					if (this.id === 'beginh') {
+						dijit.byId('endh').get('constraints').min = this.get('value');
+						if (dijit.byId('beginh').get('value') > dijit.byId('endh').get('value')) {
+							dijit.byId('endh').set('value', this.get('value'));
+						}
+					} else if (this.id === 'endh') {
+						dijit.byId('beginh').get('constraints').max = this.get('value');
+						if (dijit.byId('beginh').get('value') > dijit.byId('endh').get('value')) {
+							dijit.byId('beginh').set('value', this.get('value'));
+						}
+					}
+				} else {
+					dijit.byId('endh').get('constraints').min = minTime;
+					dijit.byId('beginh').get('constraints').max = maxTime;
+				}
+			}
+		});
 	}
-});
-});
+);
 
 define("jrds/DateTextBox",
        [ "dojo/_base/declare",
@@ -134,19 +143,19 @@ define("jrds/DateTextBox",
        ],
        function(declare, dojo, dijit) {
 return declare("jrds.DateTextBox", dijit.form.DateTextBox, {
-	class: 'field fieldDay', 
+	'class': 'field fieldDay', 
 	dayFormat: {
 		selector: 'date', 
 		datePattern: 'yyyy-MM-dd'
 	},
 	regExp: "\\d\\d\\d\\d-\\d\\d-\\d\\d",
 	postCreate: function() {
-		this.set('timeBox', dijit.byId(this.timeBoxName));
+		this.set('oldvalue', new Date(0, 0, 0, 0, 0, 0));
 		this.set('value',queryParams[this.id]);
-		constraint = this.get('constraints');
+		var constraint = this.get('constraints');
 		constraint.timePattern = 'yyyy-MM-dd';
 		if(this.id == 'begin') {
-			this.constraints.max = queryParams.end
+			this.constraints.max = queryParams.end;
 		}
 		else {
 			this.constraints.min = queryParams.begin;			
@@ -179,38 +188,32 @@ return declare("jrds.DateTextBox", dijit.form.DateTextBox, {
 		//Call with drop down, do nothing on this case
 		if(date == undefined)
 			return this.inherited(arguments);
-		oldDate = queryParams[this.id];
-		newDate = new Date(oldDate.getTime());
-		newDate.setFullYear(date.getFullYear());
-		newDate.setMonth(date.getMonth());
-		newDate.setDate(date.getDate());
-		// If hour = 0 and minute = 0, was set from drop down, not from set('value',...)
-		// So ensure that hour and minute are updated to good value
-		if(date.getHours() == 0 && date.getMinutes() == 0 ) {
+		var oldDate = this.get('oldvalue');
+		date.setHours(0);
+		date.setMinutes(0);
+		date.setSeconds(0);
+		date.setMilliseconds(0);
+
+		if (date.getTime() !== oldDate.getTime()) {
+			this.set('value', date);
+			this.set('oldvalue', date);
+
+			dijit.byId('beginh').checkInterval();
+			dijit.byId('endh').checkInterval();
+
 			if(this.id == 'begin') {
-				newDate.setHours(0);
-				newDate.setMinutes(0);
-				newDate.setSeconds(0);
-				newDate.setMilliseconds(0);
-	            dijit.byId('beginh').set('value', newDate);
+				dijit.byId('end').get('constraints').min = date;
 			}
 			else {
-				newDate.setHours(23);
-				newDate.setMinutes(59);
-				newDate.setSeconds(59);
-				newDate.setMilliseconds(999);				
-	            dijit.byId('endh').set('value', newDate);
-			}				
+				dijit.byId('begin').get('constraints').max = date;			
+			}
+
+			var newDate = new Date(date.getTime());
+			newDate.setHours(dijit.byId(this.get('timeBoxName')).get('value').getHours());
+			newDate.setMinutes(dijit.byId(this.get('timeBoxName')).get('value').getMinutes());
+			queryParams[this.id] = newDate;
 		}
-		queryParams[this.id] = newDate;
-		if(this.id == 'begin') {
-			dijit.byId('end').constraints.min = newDate;
-		}
-		else {
-			dijit.byId('begin').constraints.max = newDate;			
-		}
-		return this.inherited(arguments);
-	},
+	}
 });
 });
 
@@ -220,7 +223,7 @@ define("jrds/PeriodNavigation",
 		  "dojo"],
 		function(declare, button, dojo) {
 return declare("PeriodNavigation", button, {
-	class: 'periodNavigation',
+	'class': 'periodNavigation',
 	postCreate: function() {
 		this.set('showLabel', false);
 		return this.inherited(arguments);
@@ -344,7 +347,7 @@ return declare("jrds.AutoscaleReset", button, {
 			}
 		}
 	},
-	iconClass: "dijitCheckBoxIcon",
+	iconClass: "dijitCheckBoxIcon"
 });
 });
 
@@ -366,39 +369,47 @@ return declare("jrds.MinMaxTextBox", dijit.form.ValidationTextBox, {
 });
 });
 
-define("jrds/ToogleSort",
-		[ "dojo/_base/declare",
-		  "dijit/form/ToggleButton" ],
-		function(declare, button) {
-return declare("jrds.ToogleSort", button, {
-	onChange: function(checked) {
-		queryParams.sort = checked;
-		getGraphList();		
-	},
-	iconClass: "dijitCheckBoxIcon",
-});
-});
-
-define("jrds/HostForm",
-		[ "dojo/_base/declare",
-		  "dijit/form/Form" ],
-		function(declare, button) {
-return declare("jrds.HostForm", button, {
-	onSubmit: function(){
-		try {
-			queryParams.host = this.attr('value').host;
-			delete queryParams.filter;
-			delete queryParams.id;
-			delete queryParams.tab;
-			getTree(false);
-		}
-		catch(err) {
-			console.error(err);
-		}
-		return false;		
+define(
+	"jrds/ToogleSort",
+	[
+		"dojo/_base/declare",
+		"dijit/form/ToggleButton"
+	],
+	function(declare, button) {
+		return declare("jrds.ToogleSort", button, {
+			onChange: function(checked) {
+				queryParams.sort = checked;
+				getGraphList();		
+			},
+			iconClass: "dijitCheckBoxIcon"
+		});
 	}
-});
-});
+);
+
+define(
+	"jrds/HostForm",
+	[
+		"dojo/_base/declare",
+	  	"dijit/form/Form"
+	],
+	function(declare, form) {
+		return declare("jrds.HostForm", form, {
+			onSubmit: function(){
+				try {
+					queryParams.host = this.attr('value').host;
+					delete queryParams.filter;
+					delete queryParams.id;
+					delete queryParams.tab;
+					getTree(false);
+				}
+				catch(err) {
+					console.error(err);
+				}
+				return false;		
+			}
+		});
+	}
+);
 
 define("jrds/RenderForm",
 		[ "dojo/_base/declare",

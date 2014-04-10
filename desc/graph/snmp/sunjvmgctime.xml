@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+    "urn:jrds:graphdesc">
+<graphdesc>
+	<name>SunJVM5GCTime</name>
+	<graphName>jvmsun5gctime-${label}</graphName>
+	<graphTitle>JVM GC time for ${label} on ${host}</graphTitle>
+	<unit>
+		<SI />
+	</unit>
+	<verticalLabel>s</verticalLabel>
+	<add>
+        <name>majorcolltime</name>
+	   <dsName>MS Coll Time</dsName>
+	</add>
+    <add>
+        <rpn>majorcolltime, 1000, /</rpn>
+		<graphType>area</graphType>
+		<legend>Major (Mark and sweep) collection time</legend>
+	</add>
+	<add>
+	   <name>minorcolltime</name>
+		<dsName>Copy Coll Time</dsName>
+	</add>
+	<add>
+	   <rpn>minorcolltime, 1000, /</rpn>
+		<graphType>stack</graphType>
+		<legend>Minor collection time</legend>
+	</add>
+	<hosttree>
+		<pathelement>HOST</pathelement>
+		<pathelement>SERVICES</pathelement>
+		<pathstring>JVM</pathstring>
+		<pathstring>${label}</pathstring>
+		<pathstring>GC Time</pathstring>
+	</hosttree>
+	<viewtree>
+		<pathelement>SERVICES</pathelement>
+		<pathstring>JVM</pathstring>
+		<pathelement>HOST</pathelement>
+		<pathstring>GC Time</pathstring>
+		<pathstring>${label}</pathstring>
+	</viewtree>
+</graphdesc>

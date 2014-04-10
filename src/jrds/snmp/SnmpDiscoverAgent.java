@@ -150,7 +150,8 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
     private boolean doesExist(JrdsElement hostEleme, ProbeDescSummary summary) throws IOException {
         OID OidExist = new OID(summary.specifics.get("existOid"));
         Map<OID, Object> found = SnmpRequester.RAW.doSnmpGet(active, Collections.singletonList(OidExist));
-        if(found.size() > 0) {
+        // Some broken SNMP implementation return null value (thanks AIX), that's no good
+        if(found.size() > 0 && found.values().iterator().next() != null) {            
             addProbe(hostEleme, summary.name, null, null, null, null);
             log(Level.TRACE, "%s does exist: %s", summary.name, found.values());
             return true;
@@ -163,6 +164,10 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
     private String getLabel(LocalSnmpConnection active, OID labelOID) throws IOException {
         Map<OID, Object> rowLabel = SnmpRequester.RAW.doSnmpGet(active, Collections.singletonList(labelOID));
         for(Map.Entry<OID, Object> labelEntry: rowLabel.entrySet()) {
+            if(labelEntry.getValue() == null) {
+                log(Level.ERROR, "null label at %s", labelEntry.getKey());
+                continue;
+            }
             String label = labelEntry.getValue().toString();
             if(label.length() >= 1)
                 return label;

@@ -137,11 +137,9 @@ public class SnmpConnection extends Connection<Target> {
         }
         return 0;        
     }
-    
+
     public Snmp getSnmp() {
-        Snmp retValue = null;
-        retValue = getLevel().find(MainStarter.class).snmp;
-        return retValue;
+        return getLevel().find(MainStarter.class).snmp;
     }
 
     /**
