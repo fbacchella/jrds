@@ -36,12 +36,6 @@ public class StartListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent arg0) {
         //Resin and some others launch the listener twice !
         if( ! started ) {
-            try {
-                jrds.JrdsLoggerConfiguration.initLog4J();
-            } catch (IOException e2) {
-                throw new RuntimeException("Log configuration failed", e2);
-            }
-
             System.setProperty("java.awt.headless","true");
 
             ServletContext ctxt = arg0.getServletContext();

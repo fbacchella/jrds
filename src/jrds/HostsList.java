@@ -1,7 +1,6 @@
 
 package jrds;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -93,11 +92,6 @@ public class HostsList extends StarterNode {
 
     public void configure(PropertiesManager pm) {
         started = false;
-        try {
-            jrds.JrdsLoggerConfiguration.configure(pm);
-        } catch (IOException e1) {
-            log(Level.ERROR, e1, "Unable to set log file to " + pm.logfile);
-        }
 
         if(pm.rrddir == null) {
             log(Level.ERROR, "Probes directory not configured, can't configure");
@@ -186,7 +180,6 @@ public class HostsList extends StarterNode {
                 // Some probe are done outside of a starter
                 // Don't forget them
                 if(p.getHostList() == null) {
-                    log(Level.INFO, p.toString());
                     p.setParent(this);
                 }
             }
