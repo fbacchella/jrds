@@ -34,11 +34,11 @@ import jrds.HostInfo;
 import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.starter.HostStarter;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

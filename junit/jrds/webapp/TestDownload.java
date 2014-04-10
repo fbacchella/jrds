@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.util.Date;
 
 import jrds.Tools;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.rrd4j.data.DataProcessor;

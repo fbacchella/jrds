@@ -7,6 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -15,7 +16,6 @@ import jrds.Tools;
 import jrds.factories.ProbeMeta;
 import jrds.snmp.SnmpDiscoverAgent;
 import jrds.webapp.DiscoverAgent;
-import junit.framework.Assert;
 
 public class TestMeta{
     @ProbeMeta(

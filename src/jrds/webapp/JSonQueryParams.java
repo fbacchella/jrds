@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import jrds.HostsList;
 import jrds.Tab;
+import jrds.Util;
 
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
@@ -75,6 +76,7 @@ public class JSonQueryParams extends JrdsServlet {
     }
 
     private final void doVariable(JrdsJSONWriter w, String key, Object value) throws JSONException {
+        logger.trace(Util.delayedFormatString("resolving %s with %s", key, value));
         if(value == null) 
             return;
         if(value instanceof String && "".equals(value.toString().trim())) {

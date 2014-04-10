@@ -24,41 +24,40 @@ import org.snmp4j.util.TreeUtils;
 
 
 public class SnmpWalk {
-	static final private Logger logger = Logger.getLogger(SnmpWalk.class);
+    static final private Logger logger = Logger.getLogger(SnmpWalk.class);
 
-	static class ActiveSnmp {
-		Snmp snmp;
-		static final PDUFactory factory = new DefaultPDUFactory();
-		AbstractTarget target;
-	}
+    static class ActiveSnmp {
+        Snmp snmp;
+        static final PDUFactory factory = new DefaultPDUFactory();
+        AbstractTarget target;
+    }
 
-	@BeforeClass
-	static public void configure() throws IOException {
-		Tools.configure();
-		logger.setLevel(Level.DEBUG);
-		Tools.setLevel(new String[] {"jrds"}, logger.getLevel());
-		logger.addAppender(Logger.getLogger("jrds").getAppender("jrds"));
-	}
+    @BeforeClass
+    static public void configure() throws IOException {
+        Tools.configure();
+        logger.setLevel(Level.DEBUG);
+        Tools.setLevel(new String[] {"jrds"}, logger.getLevel());
+        logger.addAppender(Logger.getLogger("jrds").getAppender("jrds"));
+    }
 
-	@SuppressWarnings("unchecked")
-	@Test
-	public void testWalk() throws Exception {
-		ActiveSnmp active = new ActiveSnmp();
-		active.snmp = new Snmp(new DefaultUdpTransportMapping());
-		active.snmp.listen();
-		
-		IpAddress ip = new UdpAddress(java.net.InetAddress.getByName("localhost"), 161);
-		CommunityTarget snmpTarget = new CommunityTarget(ip, new OctetString("public"));
-		snmpTarget.setVersion(SnmpConstants.version2c);
-		active.target = snmpTarget;
-		
-		TreeUtils tree = new TreeUtils(active.snmp, ActiveSnmp.factory);
-		List<TreeEvent> tempAllIfs = tree.getSubtree(active.target, new OID("1.3.6.1.2.1.2.2.1.2"));
-		for(TreeEvent te: tempAllIfs) {
-			logger.trace(te);
-			for(VariableBinding var: te.getVariableBindings()) {
-				logger.trace(var.getOid() + "=" + var.getVariable());
-			}
-		}
-	}
+    @Test
+    public void testWalk() throws Exception {
+        ActiveSnmp active = new ActiveSnmp();
+        active.snmp = new Snmp(new DefaultUdpTransportMapping());
+        active.snmp.listen();
+
+        IpAddress ip = new UdpAddress(java.net.InetAddress.getByName("localhost"), 161);
+        CommunityTarget snmpTarget = new CommunityTarget(ip, new OctetString("public"));
+        snmpTarget.setVersion(SnmpConstants.version2c);
+        active.target = snmpTarget;
+
+        TreeUtils tree = new TreeUtils(active.snmp, ActiveSnmp.factory);
+        List<TreeEvent> tempAllIfs = tree.getSubtree(active.target, new OID("1.3.6.1.2.1.2.2.1.2"));
+        for(TreeEvent te: tempAllIfs) {
+            logger.trace(te);
+            for(VariableBinding var: te.getVariableBindings()) {
+                logger.trace(var.getOid() + "=" + var.getVariable());
+            }
+        }
+    }
 }

@@ -12,10 +12,10 @@ import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -24,10 +24,10 @@ public class TestFilter {
 
     static final private String goodFilterXml =
             "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
-            "<!DOCTYPE filter PUBLIC \"-//jrds//DTD Filter//EN\" \"urn:jrds:filter\">" +
-            "<filter>" +
-            "<name>filtername</name>" +
-            "</filter>";
+                    "<!DOCTYPE filter PUBLIC \"-//jrds//DTD Filter//EN\" \"urn:jrds:filter\">" +
+                    "<filter>" +
+                    "<name>filtername</name>" +
+                    "</filter>";
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {

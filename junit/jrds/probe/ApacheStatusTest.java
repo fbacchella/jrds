@@ -9,8 +9,8 @@ import java.util.Set;
 import jrds.Probe;
 import jrds.factories.ArgFactory;
 import jrds.factories.ProbeBean;
-import junit.framework.Assert;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class ApacheStatusTest extends ApacheStatusDetails {
