@@ -143,10 +143,7 @@ public class XmlProvider extends Starter {
         Document d = null;
         log(Level.TRACE, "%s %s %s started %s@%s", stream, dbuilder, isStarted(), getClass().getName(), Integer.toHexString(hashCode()));
         try {
-            try {
-                dbuilder.reset();
-            } catch (UnsupportedOperationException e) {
-            }
+            dbuilder.reset();
             d = dbuilder.parse(stream);
             log(Level.TRACE, "just parsed a %s", d.getDocumentElement().getTagName());
         } catch (SAXException e) {
@@ -171,10 +168,7 @@ public class XmlProvider extends Starter {
      */
     public Document getDocument() {
         DocumentBuilder dbuilder = localDocumentBuilder.get();
-        try {
-            dbuilder.reset();
-        } catch (UnsupportedOperationException e) {
-        }
+        dbuilder.reset();
         return dbuilder.newDocument();
     }
 

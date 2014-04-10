@@ -105,6 +105,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 logger.trace(Util.delayedFormatString("adding tag %s to %s", tagElem, host));
                 setMethod(tagElem, host, "addTag");
             } catch (InstantiationException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
             }
         }
 
@@ -207,6 +208,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 pd.replaceDs(dsList);
                 p = pf.makeProbe(pd);
             } catch (CloneNotSupportedException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
             }
         }
         else {

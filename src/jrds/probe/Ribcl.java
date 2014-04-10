@@ -141,6 +141,7 @@ public class Ribcl extends Probe<String, Number> {
 		try {
 			Util.serialize(ribclQ, out, null, properties);
 		} catch (TransformerException e) {
+		    log(Level.ERROR,e, "Serialisation failed: %s", e.getMessage());
 		} catch (IOException e) {
 			log(Level.FATAL, e, "Unable to serialize in memory");
 			throw new Error(e);
