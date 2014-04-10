@@ -919,6 +919,7 @@ implements Cloneable, WithACL {
      * @throws IOException
      * @throws RrdException
      */
+    //<<<<<<< HEAD
     public DataProcessor getPlottedDatas(Probe<?,?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData) throws IOException {
         DataProcessor retValue = ei.getDataProcessor();
 
@@ -931,77 +932,167 @@ implements Cloneable, WithACL {
         Map<Probe<?,?>, Extractor> probeDS = new HashMap<Probe<?,?>, Extractor>(1);
         probeDS.put(defProbe, defProbe.getMainStore().getExtractor());
 
-        for(DsDesc ds: allds) {
-            // not a data source, don't try to add it in datasources
-            if(! ds.graphType.datasource()) {
-                continue;
-            }
-            //The graph is a percentile
-            else if(ds.percentile != null) {
-                if(! datasources.contains(ds.name)) {
-                    retValue.addDatasource(ds.name, ds.dsName, ds.percentile);
-                    datasources.add(ds.name);
-                }
-            }
-            //A rpn datasource
-            else if (ds.rpn != null) {
-                if(! datasources.contains(ds.name)) {
-                    retValue.addDatasource(ds.name, ds.rpn);
-                    datasources.add(ds.name);
-                }
-            }
-            else if(ds.graphType == GraphType.LEGEND) {
-                continue;
-            }
-            //Does the datas existe in the provided values
-            //It override existing values in the probe
-            else if(customData != null && customData.containsKey(ds.dsName)) {
-                if( ! datasources.contains(ds.name)) {
+        String lastName = null;
+        for(DsDesc ds: allds) {            
+            boolean stack = ds.graphType == GraphType.STACK;
+            boolean plotted = stack || ds.graphType == GraphType.LINE  || ds.graphType == GraphType.AREA;
+            if (ds.rpn == null && ds.dsName != null) {
+                //Does the datas exists in the provided values
+                if(customData != null && customData.containsKey(ds.dsName)) {
                     retValue.addDatasource(ds.name, customData.get(ds.dsName));
-                    datasources.add(ds.name);
-                    logger.trace(Util.delayedFormatString("custom data found for %s", ds.dsName));
-                }
-            }
-            //Last but common case, datasource refers to a rrd
-            //Or they might be on the associated rrd
-            else {
-                Probe<?,?> probe = defProbe;
-                if(ds.dspath != null) {
-                    if(logger.isTraceEnabled())
-                        logger.trace("External probe path: " + ds.dspath.host + "/" + ds.dspath.probe + "/" + ds.dsName);
-                    probe = hl.getProbeByPath(ds.dspath.host, ds.dspath.probe);
-                    if(probe == null) {
-                        logger.error("Invalide probe: " + ds.dspath.host + "/" + ds.dspath.probe);
-                        continue;
-                    }
-                }
-                if(! probe.dsExist(ds.dsName)) {
-                    logger.error("Invalide datasource "  + ds.dsName + ", not found in " + probe);
-                    continue;
-                }
-
-                //Add the dsName for the probe found
-                if( !probeDS.containsKey(probe)) {
-                    probeDS.put(probe, probe.fetchData());
-                }
-                Extractor ex = probeDS.get(probe);
-                if( ! datasources.contains(ds.dsName)) {
-                    ex.addSource(ds.dsName, ds.name);
-                    datasources.add(ds.dsName);
                 }
                 else {
-                    logger.error("Datasource '" + ds.dsName + "' defined twice in " + name + ", for found: " + ds);
-                    logger.error("New one is " + ds);
+                    Probe<?,?> probe = defProbe;
+                    if(ds.dspath != null) {
+                        if(logger.isTraceEnabled())
+                            logger.trace("External probe path: " + ds.dspath.host + "/" + ds.dspath.probe + "/" + ds.dsName);
+                        probe = hl.getProbeByPath(ds.dspath.host, ds.dspath.probe);
+                        if(probe == null) {
+                            logger.error("Invalide probe: " + ds.dspath.host + "/" + ds.dspath.probe);
+                            continue;
+                        }
+                    }
+                    if(! probe.dsExist(ds.dsName)) {
+                        logger.error("Invalide datasource "  + ds.dsName + ", not found in " + probe);
+                        continue;
+                    }
+
+                    //Add the dsName for the probe found
+                    if( !probeDS.containsKey(probe)) {
+                        probeDS.put(probe, probe.fetchData());
+                    }
+                    Extractor ex = probeDS.get(probe);
+                    if( ! datasources.contains(ds.dsName)) {
+                        ex.addSource(ds.dsName, ds.name);
+                        datasources.add(ds.dsName);
+                    }
+                    else {
+                        logger.error("Datasource '" + ds.dsName + "' defined twice in " + name + ", for found: " + ds);
+                        logger.error("New one is " + ds);
+                    }
                 }
             }
+            else if(ds.rpn != null){
+                retValue.addDatasource(ds.name, ds.rpn);
+            }
+
+            if(plotted && stack) {
+                retValue.addDatasource("Plotted" + ds.name, lastName + ", " +  ds.name + ", +");
+            }
+            else if(plotted) {
+                retValue.addDatasource("Plotted" + ds.name, ds.name);
+            }
+            lastName = ds.name; 
+        }
+        if(logger.isTraceEnabled()) {
+            logger.trace("Datastore for " + getName());
+            for(String s: retValue.getSourceNames())
+                logger.trace("\t" + s);
         }
 
         // Fill the dataprocessor with extracted data
         for(Extractor x: probeDS.values()) {
             x.fill(retValue, ei);
         }
-
         return retValue;
+        //        DataProcessor retValue = ei.getDataProcessor();
+        //
+        //        HostsList hl = defProbe.getHostList();
+        //
+        //        //The datasources already found
+        //        Set<String> datasources = new HashSet<String>();
+        //
+        //        //The needed extractors
+        //        Map<Probe<?,?>, Extractor> probeDS = new HashMap<Probe<?,?>, Extractor>(1);
+        //        probeDS.put(defProbe, defProbe.getMainStore().getExtractor());
+        //
+        //        for(DsDesc ds: allds) {
+        //            boolean stack = ds.graphType == GraphType.STACK;
+        //            boolean plotted = stack || ds.graphType == GraphType.LINE  || ds.graphType == GraphType.AREA;
+        //            // not a data source, don't try to add it in datasources
+        //            if(! ds.graphType.datasource()) {
+        //                continue;
+        //            }
+        //            //The graph is a percentile
+        //            else if(ds.percentile != null) {
+        //                if(! datasources.contains(ds.name)) {
+        //                    retValue.addDatasource(ds.name, ds.dsName, ds.percentile);
+        //                    datasources.add(ds.name);
+        ////=======
+        ////    public DataProcessor getPlottedDatas(Probe<?,?> probe, Map<String, Plottable> ownData, long start, long end) throws IOException {
+        ////        DataProcessor retValue = new DataProcessor(start, end);
+        ////        String rrdName = probe.getRrdName();
+        ////
+        ////        String lastName = null;
+        ////        for(DsDesc ds: allds) {            
+        ////            boolean stack = ds.graphType == GraphType.STACK;
+        ////            boolean plotted = stack || ds.graphType == GraphType.LINE  || ds.graphType == GraphType.AREA;
+        ////            if (ds.rpn == null && ds.dsName != null) {
+        ////                //Does the datas existe in the provided values
+        ////                if(ownData != null && ownData.containsKey(ds.dsName)) {
+        ////                    retValue.addDatasource(ds.name, ownData.get(ds.dsName));
+        ////>>>>>>> dba92835c66471009d1c6a758c60b60ac181e58d
+        //                }
+        //            }
+        //            //A rpn datasource
+        //            else if (ds.rpn != null) {
+        //                if(! datasources.contains(ds.name)) {
+        //                    retValue.addDatasource(ds.name, ds.rpn);
+        //                    datasources.add(ds.name);
+        //                }
+        //            }
+        //            else if(ds.graphType == GraphType.LEGEND) {
+        //                continue;
+        //            }
+        //            //Does the datas existe in the provided values
+        //            //It override existing values in the probe
+        //            else if(customData != null && customData.containsKey(ds.dsName)) {
+        //                if( ! datasources.contains(ds.name)) {
+        //                    retValue.addDatasource(ds.name, customData.get(ds.dsName));
+        //                    datasources.add(ds.name);
+        //                    logger.trace(Util.delayedFormatString("custom data found for %s", ds.dsName));
+        //                }
+        //            }
+        //            //Last but common case, datasource refers to a rrd
+        //            //Or they might be on the associated rrd
+        //            else {
+        //                Probe<?,?> probe = defProbe;
+        //                if(ds.dspath != null) {
+        //                    if(logger.isTraceEnabled())
+        //                        logger.trace("External probe path: " + ds.dspath.host + "/" + ds.dspath.probe + "/" + ds.dsName);
+        //                    probe = hl.getProbeByPath(ds.dspath.host, ds.dspath.probe);
+        //                    if(probe == null) {
+        //                        logger.error("Invalide probe: " + ds.dspath.host + "/" + ds.dspath.probe);
+        //                        continue;
+        //                    }
+        //                }
+        //                if(! probe.dsExist(ds.dsName)) {
+        //                    logger.error("Invalide datasource "  + ds.dsName + ", not found in " + probe);
+        //                    continue;
+        //                }
+        //
+        //                //Add the dsName for the probe found
+        //                if( !probeDS.containsKey(probe)) {
+        //                    probeDS.put(probe, probe.fetchData());
+        //                }
+        //                Extractor ex = probeDS.get(probe);
+        //                if( ! datasources.contains(ds.dsName)) {
+        //                    ex.addSource(ds.dsName, ds.name);
+        //                    datasources.add(ds.dsName);
+        //                }
+        //                else {
+        //                    logger.error("Datasource '" + ds.dsName + "' defined twice in " + name + ", for found: " + ds);
+        //                    logger.error("New one is " + ds);
+        //                }
+        //            }
+        //        }
+        //
+        //        // Fill the dataprocessor with extracted data
+        //        for(Extractor x: probeDS.values()) {
+        //            x.fill(retValue, ei);
+        //        }
+        //
+        //        return retValue;
     }
 
     protected void addLegend(RrdGraphDef def, String ds, GraphType gt, String legend) {
