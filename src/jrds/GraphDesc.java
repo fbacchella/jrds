@@ -46,7 +46,7 @@ implements Cloneable, WithACL {
 
     static public final ConsolFun DEFAULTCF = ConsolFun.AVERAGE;
 
-    //  static final private String manySpace = "123456798ABCDEF0123465798ABCDEF0123456798ABCDEF0123465798ABCDEF0123456798ABCDEF0123465798ABCDEF0";
+    //  static final private String manySpace = "123456798ABCDEF0123465798ABCDEF0123456798ABCDEF0123465798ABCDEF0123456798ABCDEF0123465798ABCDEF0  ";
     static final private String MANYSPACE = "                                                                      ";
 
     public enum GraphType {
@@ -875,7 +875,7 @@ implements Cloneable, WithACL {
         // The title line, only if values block is required
         if( withSummary) {
             graphDef.comment(""); //We simulate the color box
-            graphDef.comment(MANYSPACE.substring(0, Math.min(maxLengthLegend, MANYSPACE.length()) + 2));
+            graphDef.comment(MANYSPACE.substring(0, Math.min(maxLengthLegend, MANYSPACE.length() - 2) + 2));
             graphDef.comment("Current");
             graphDef.comment("  Average");
             graphDef.comment("  Minimum");

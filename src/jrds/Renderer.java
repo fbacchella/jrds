@@ -70,9 +70,10 @@ public class Renderer {
         public void send(OutputStream out) throws IOException {
             if(isReady()){
                 WritableByteChannel outC = Channels.newChannel(out);
-                FileChannel inC = new FileInputStream(destFile).getChannel();
+                FileInputStream inStream = new FileInputStream(destFile);
+                FileChannel inC = inStream.getChannel();
                 inC.transferTo(0, destFile.length(), outC);
-                inC.close();
+                inStream.close();
             }
         }
 
@@ -91,7 +92,7 @@ public class Renderer {
                 }
             }
             if(destFile.isFile())
-                if( ! destFile.delete()) {
+                if( ! destFile.delete() && destFile.isFile()) {
                     logger.warn("Failed to delete " + destFile.getPath());
                 }
         }
@@ -119,10 +120,18 @@ public class Renderer {
                 if(cause != null)
                     logger.error("    Cause was: " + cause);
             } catch (Exception e) {
+                String message = "";
+                try {
+                    String graphName = graph.getQualifiedName();
+                    message = String.format("Error rendering graph %s: %s", graphName, e.getMessage());
+                } catch (Exception e1) {
+                    String graphName = graph.getNode().getProbe().getName() + "/" + graph.getNode().getGraphDesc().getGraphName();
+                    message = String.format("Error rendering incomplete graph %s: %s", graphName, e.getMessage());
+                }
                 if(logger.isDebugEnabled())
-                    logger.error("Error rendering a graph: " + e, e);
+                    logger.error(message, e);
                 else
-                    logger.error("Error rendering a graph: " + e);
+                    logger.error(message);
             } finally {						
                 //Always set to true, we do not try again in case of failure
                 finished = true;
@@ -165,6 +174,8 @@ public class Renderer {
         this.tmpDir = tmpDir;
         this.cacheSize = cacheSize;
         Map<Integer, RendererRun> m = new LinkedHashMap<Integer, RendererRun>(cacheSize + 5 , hashTableLoadFactor, true) {
+            private static final long serialVersionUID = 1L;
+
             /* (non-Javadoc)
              * @see java.util.LinkedHashMap#removeEldestEntry(java.util.Map.Entry)
              */
