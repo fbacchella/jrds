@@ -40,6 +40,7 @@ public class HostsList extends StarterNode {
 
     private final int thisgeneration = generation.incrementAndGet();
     private final Set<HostInfo> hostList = new HashSet<HostInfo>();
+    private final Set<Starter> topStarters = new HashSet<Starter>();
     private final Map<String, jrds.starter.Timer> timers = new HashMap<String, jrds.starter.Timer>();
     private final Map<Integer, GraphNode> graphMap = new HashMap<Integer, GraphNode>();
     private final Map<Integer, Probe<?,?>> probeMap= new HashMap<Integer, Probe<?,?>>();
@@ -125,23 +126,17 @@ public class HostsList extends StarterNode {
         log(Level.DEBUG, "Starting parsing descriptions");
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
         conf.setGraphDescMap();
-        Collection<ProbeDesc> probesdesc = conf.setProbeDescMap().values();
-
-        Set<Class<? extends Starter>> externalStarters = new HashSet<Class<? extends Starter>>();
-        for(ProbeDesc pd: probesdesc) {
-            for(ProbeMeta meta: ArgFactory.enumerateAnnotation(pd.getProbeClass(), ProbeMeta.class, StarterNode.class)) {
-                daList.add(meta.discoverAgent());
-                externalStarters.add(meta.topStarter());
-            }
-        }
+        conf.setProbeDescMap();
         conf.setMacroMap();
 
         Set<String> hostsTags = new HashSet<String>();
         conf.setHostMap(timers);
 
+        Set<Class<? extends Starter>> topStarterClasses = new HashSet<Class<? extends Starter>>();
+
         //We try to load top level starter defined in probes
-        log(Level.DEBUG, "External top starters added %s", externalStarters);
         for(jrds.starter.Timer timer: timers.values()) {
+            Set<Class<? extends Starter>> timerStarterClasses = new HashSet<Class<? extends Starter>>();
             for(HostStarter host: timer.getAllHosts()) {
                 hostList.add(host.getHost());
                 hostsTags.addAll(host.getTags());
@@ -150,12 +145,18 @@ public class HostsList extends StarterNode {
                     p.configureStarters(pm);
                     try {
                         addProbe(p);
+                        for(ProbeMeta meta: ArgFactory.enumerateAnnotation(p.getClass(), ProbeMeta.class, StarterNode.class)) {
+                            daList.add(meta.discoverAgent());
+                            timerStarterClasses.add(meta.timerStarter());
+                            topStarterClasses.add(meta.topStarter());
+                        }
                     } catch (Exception e) {
                         log(Level.ERROR, e, "Error inserting probe " + p + ": " + e.getMessage());
                     }
                 }
             }
-            for(Class<? extends Starter> starterClass: externalStarters) {
+            log(Level.DEBUG, "timer starters added %s for timer %s", timerStarterClasses, timer.getName());
+            for(Class<? extends Starter> starterClass: timerStarterClasses) {
                 try {
                     timer.registerStarter(starterClass.newInstance());
                 } catch (Exception e) {
@@ -163,6 +164,17 @@ public class HostsList extends StarterNode {
                 }
             }
             timer.configureStarters(pm);            
+        }
+
+        log(Level.DEBUG, "top starters added %s", topStarterClasses);
+        for(Class<? extends Starter> starterClass: topStarterClasses) {
+            try {
+                Starter top = starterClass.newInstance();
+                topStarters.add(top);
+                registerStarter(top);
+            } catch (Exception e1) {
+                log(Level.ERROR, e1, "Starter %s failed to register: %s", starterClass, e1);
+            }           
         }
 
         //Configure the default ACL of all automatic filters
@@ -223,6 +235,9 @@ public class HostsList extends StarterNode {
         for(jrds.starter.Timer t: timers.values()) {
             t.startTimer(collectTimer);  
         }
+        for(Starter s: this.topStarters) {
+            s.doStart();
+        }
     }
 
     /**
@@ -233,6 +248,9 @@ public class HostsList extends StarterNode {
         if(collectTimer != null)
             collectTimer.cancel();
         collectTimer = null;
+        for(Starter s: this.topStarters) {
+            s.doStop();
+        }
     }
 
     String makeTabs(List<String> tabsList, Set<Tab> moretabs, Map<String, Tab> customTabMap, Map<String, Tab> tabs){

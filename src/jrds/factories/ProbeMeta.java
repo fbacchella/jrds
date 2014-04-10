@@ -66,6 +66,7 @@ public @interface ProbeMeta {
     };
 
     Class<? extends DiscoverAgent> discoverAgent() default EmptyDiscoverAgent.class;
+    Class<? extends Starter> timerStarter() default EmptyStarter.class;
     Class<? extends Starter> topStarter() default EmptyStarter.class;
 
 }

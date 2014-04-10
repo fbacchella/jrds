@@ -27,7 +27,7 @@ import org.apache.log4j.Level;
  * @author Fabrice Bacchella 
  */
 @ProbeMeta(
-        topStarter=jrds.probe.HttpClientStarter.class
+        timerStarter=jrds.probe.HttpClientStarter.class
         )
 public abstract class HCHttpProbe extends HttpProbe {
 

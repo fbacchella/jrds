@@ -1,7 +1,8 @@
 package jrds.standalone;
 
 import java.io.File;
-import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,11 +28,11 @@ public class CheckJar extends CommandStarterImpl {
 
     public void start(String[] args) throws Exception {
         PropertiesManager pm = new PropertiesManager();
+        pm.importSystemProps();
         pm.update();
         pm.configdir = null;
         pm.strictparsing = true;
         pm.loglevel = Level.ERROR;
-        pm.extensionClassLoader = getClass().getClassLoader();
 
         System.getProperties().setProperty("java.awt.headless","true");
 
@@ -44,11 +45,24 @@ public class CheckJar extends CommandStarterImpl {
 
         for(String jarfile: args) {
             System.out.println("checking " + jarfile);
-            URI jarfileurl = new File(jarfile).toURI();
-            pm.libspath.clear();
-            pm.libspath.add(jarfileurl);
 
-            ConfigObjectFactory confjar = new ConfigObjectFactory(pm, pm.extensionClassLoader);
+            //pm.setProperty("libspath", (new File(jarfile).getCanonicalPath()));
+            //pm.update();
+            pm.libspath.clear();
+            URL jarfileurl = new File(jarfile).toURI().toURL();
+            pm.libspath.add(jarfileurl.toURI());
+            pm.extensionClassLoader = new URLClassLoader(new URL[] { jarfileurl }, getClass().getClassLoader()) {
+                /* (non-Javadoc)
+                 * @see java.lang.Object#toString()
+                 */
+                @Override
+                public String toString() {
+                    return "JRDS' class loader";
+                }
+            };
+
+
+            ConfigObjectFactory confjar = new ConfigObjectFactory(pm);
 
             Map<String, GraphDesc> grapMapjar = confjar.setGraphDescMap();
             for(ProbeDesc pd: confjar.setProbeDescMap().values()) {
@@ -57,7 +71,7 @@ public class CheckJar extends CommandStarterImpl {
                     if(pc.isAnnotationPresent(ProbeMeta.class)) {
                         ProbeMeta meta = pc.getAnnotation(ProbeMeta.class);
                         daList.add(meta.discoverAgent());
-                        externalStarters.add(meta.topStarter());
+                        externalStarters.add(meta.timerStarter());
                     }
                     pc = pc.getSuperclass();
                 }
