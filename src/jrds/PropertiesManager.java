@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
  * An less ugly class suposed to manage properties
  * should be reworked
  * @author Fabrice Bacchella
- * @version $Revision$,  $Date$
  */
 public class PropertiesManager extends Properties {
     private final Logger logger = Logger.getLogger(PropertiesManager.class);
@@ -55,16 +54,10 @@ public class PropertiesManager extends Properties {
         }
     };
 
-    //The default constructor cannot build directories, canact is used to detect that
-    private boolean canact = false;
-
     public PropertiesManager() {
-        update();
-        canact = true;
     }
 
     public PropertiesManager(File propFile) {
-        canact = true;
         join(propFile);
         update();
     }
@@ -227,8 +220,7 @@ public class PropertiesManager extends Properties {
                 logger.error(dir + " doesn't exists");
                 return null;
             }
-            if ( autocreate && canact && !dir.mkdirs()) {
-                if(canact)
+            if ( autocreate && !dir.mkdirs()) {
                     logger.error(dir + " doesn't exists and can't be created");
                 return null;
             }

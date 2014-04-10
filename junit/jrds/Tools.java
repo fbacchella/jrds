@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -237,6 +237,8 @@ final public class Tools {
         ti.step = 300;
         ti.timeout = 10;
         Timer t = new Timer(Timer.DEFAULTNAME, ti);
-        return Collections.singletonMap(t.getName(), t);
+        Map<String, Timer> timerMap = new HashMap<String, Timer>(1);
+        timerMap.put(t.getName(), t);
+        return timerMap;
     }
 }
