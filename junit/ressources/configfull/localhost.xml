@@ -9,4 +9,5 @@
     <probe type="IfXSnmp" label="loopback">
         <attr name="index">lo0</attr>
     </probe>
+    <graph type="NodeGraph" />
 </host>

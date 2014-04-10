@@ -1,25 +1,29 @@
 package jrds;
 
+import java.beans.PropertyDescriptor;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
 
+import jrds.configuration.HostBuilder;
+import jrds.factories.ArgFactory;
 import jrds.store.ExtractInfo;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
+import org.apache.log4j.Logger;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.Plottable;
-import org.rrd4j.graph.RrdGraphDef;
 
 /**
- * @author bacchell
- * @version $Revision$
- * TODO
+ * @author Fabrice Bacchella
+ *
  */
 public class GraphNode implements Comparable<GraphNode>, WithACL {
+
+    static final private Logger logger = Logger.getLogger(GraphNode.class);
 
     protected Probe<?,?> probe;
     private String viewPath = null;
@@ -28,6 +32,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
     private String graphTitle = null;
     private ACL acl = ACL.ALLOWEDACL;
     private PlottableMap customData = null;
+    private Map<String, String> beans = Collections.emptyMap();
 
     /**
      *
@@ -130,31 +135,31 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
         this.acl = gd.getACL();
     }
 
-    /**
-     * Provide a RrdGraphDef with template resolved for the node
-     * @return a RrdGraphDef with some default values
-     * @throws IOException
-     */
-    public RrdGraphDef getEmptyGraphDef() {
-        RrdGraphDef retValue = getGraphDesc().getEmptyGraphDef();
-        retValue.setTitle(getGraphTitle());
-        return retValue;
-    }
-
     public Graph getGraph() {
         Class<Graph>  gclass = gd.getGraphClass();
 
-        //Exceptions can't happen, it was checked at configuration time
         try {
-            return gclass.getConstructor(GraphNode.class).newInstance(this);
-        } catch (IllegalArgumentException e) {
-        } catch (SecurityException e) {
-        } catch (InstantiationException e) {
-        } catch (IllegalAccessException e) {
-        } catch (InvocationTargetException e) {
-        } catch (NoSuchMethodException e) {
+            Graph g =  gclass.getConstructor(GraphNode.class).newInstance(this);
+            Map<String, PropertyDescriptor> beansList = ArgFactory.getBeanPropertiesMap(gclass, Graph.class);
+
+            //Resolve the beans
+            for(Map.Entry<String, String> e: beans.entrySet()) {
+                String name = Util.parseTemplate(e.getKey(), probe);
+                String textValue = Util.parseTemplate(e.getValue(), probe);
+                PropertyDescriptor bean = beansList.get(name);
+                if(bean == null) {
+                    logger.error(String.format("Unknonw bean for %s: %s", gd.getName() , name));
+                    continue;
+                }
+                logger.trace(Util.delayedFormatString("Found attribute %s with value %s", name, textValue));
+                Constructor<?> c = bean.getPropertyType().getConstructor(String.class);
+                Object value = c.newInstance(textValue);
+                bean.getWriteMethod().invoke(g, value);
+            }
+            return g;
+        } catch (Exception e) {
+            throw new RuntimeException(HostBuilder.class.getName(), e);
         }
-        return null;
     }
 
     /* (non-Javadoc)
@@ -203,6 +208,14 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
         DataProcessor dp = gd.getPlottedDatas(probe, ei, pmap);
         dp.processData();
         return dp;
+    }
+
+    public Map<String, String> getBeans() {
+        return beans;
+    }
+
+    public void setBeans(Map<String, String> beans) {
+        this.beans = beans;
     }
 
 }

@@ -37,7 +37,7 @@ public class Graph implements WithACL {
     }
 
     public Graph(GraphNode node, Date begin, Date start) {
-        this.node = node;
+        this(node);
         addACL(node.getACL());
         setStart(start);
         setEnd(end);
@@ -104,7 +104,7 @@ public class Graph implements WithACL {
         graphDef.comment("Last update: " + 
                 lastUpdateFormat.format(lastUpdate) + "\\L");
         String unit = "SI";
-        if(! node.getGraphDesc().isSiUnit()) 
+        if(! getGraphDesc().isSiUnit()) 
             unit = "binary";
         graphDef.comment("Unit type: " + unit + "\\r");
         graphDef.comment("Period from " + lastUpdateFormat.format(start) +
@@ -113,7 +113,7 @@ public class Graph implements WithACL {
     }
 
     protected void fillGraphDef(RrdGraphDef graphDef) {
-        GraphDesc gd = node.getGraphDesc();
+        GraphDesc gd = getGraphDesc();
         try {
             long startsec = getStartSec();
             long endsec = getEndSec();
@@ -139,6 +139,10 @@ public class Graph implements WithACL {
         gd.fillGraphDef(graphDef, node.getProbe(), ei, customData);        
     }
 
+    protected GraphDesc getGraphDesc() {
+        return node.getGraphDesc();
+    }
+
     protected long getStartSec() {
         return start.getTime()/1000;
     }
@@ -160,8 +164,19 @@ public class Graph implements WithACL {
         return new RrdGraph(getRrdGraphDef());
     }
 
+    /**
+     * Provide a RrdGraphDef with template resolved for the node
+     * @return a RrdGraphDef with some default values
+     * @throws IOException
+     */
+    public RrdGraphDef getEmptyGraphDef() {
+        RrdGraphDef retValue = getGraphDesc().getEmptyGraphDef();
+        retValue.setTitle(node.getGraphTitle());
+        return retValue;
+    }
+
     public RrdGraphDef getRrdGraphDef() throws IOException {
-        RrdGraphDef graphDef = node.getEmptyGraphDef();
+        RrdGraphDef graphDef = getEmptyGraphDef();
         fillGraphDef(graphDef);
         finishGraphDef(graphDef);
 

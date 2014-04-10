@@ -117,8 +117,8 @@ public class TestReadElements {
     @Test
     public void testQueryFilter() throws IOException, Exception {
         JSONObject tree = jsonquery("/jsontree?filter=Localhost");
-        Assert.assertEquals(20, tree.getJSONArray("items").length());   
-        Assert.assertEquals(6, scantree(tree).graphs.size());
+        Assert.assertEquals(21, tree.getJSONArray("items").length());   
+        Assert.assertEquals(7, scantree(tree).graphs.size());
         Assert.assertEquals(2, scantree(tree).trees.size());
         Assert.assertEquals(0, scantree(tree).filters.size());
         Assert.assertEquals(12, scantree(tree).nodes.size());
@@ -147,11 +147,11 @@ public class TestReadElements {
     @Test
     public void testHostTab() throws IOException, Exception {
         JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.HOSTSTAB);
-        Assert.assertEquals(4, tree.getJSONArray("items").length());        
-        Assert.assertEquals(3, scantree(tree).graphs.size());
+        Assert.assertEquals(9, tree.getJSONArray("items").length());        
+        Assert.assertEquals(4, scantree(tree).graphs.size());
         Assert.assertEquals(1, scantree(tree).trees.size());
         Assert.assertEquals(0, scantree(tree).filters.size());
-        Assert.assertEquals(0, scantree(tree).nodes.size());
+        Assert.assertEquals(4, scantree(tree).nodes.size());
     }
 
     @Test

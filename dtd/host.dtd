@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT host (tag|snmp|macro|connection|probe|collection|for)+ >
+<!ELEMENT host (tag|snmp|macro|connection|probe|graph|collection|for)+ >
 <!ELEMENT macrodef (probe|tag|collection|for|connection)+ >
 <!ATTLIST macrodef
 	name CDATA #REQUIRED
@@ -32,6 +32,11 @@
 			connection CDATA #IMPLIED
 			timer CDATA #IMPLIED
 			listener CDATA #IMPLIED
+>
+<!ELEMENT graph (attr*) >
+<!ATTLIST graph
+			type CDATA #REQUIRED	
+			label CDATA #IMPLIED
 >
 <!ELEMENT arg (#PCDATA)>
 <!ATTLIST arg
