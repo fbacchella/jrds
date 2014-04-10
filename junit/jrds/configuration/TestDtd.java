@@ -63,4 +63,9 @@ public class TestDtd {
         Tools.parseRessource("view1.xml");
     }
 
+    @Test
+    public void checkListener() throws Exception {
+        Tools.parseRessource("configfull/listener.xml");
+    }
+
 }

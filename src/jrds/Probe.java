@@ -34,7 +34,7 @@ import org.w3c.dom.Element;
 /**
  * A abstract class that needs to be derived for specific probe.<br>
  * the derived class must construct a <code>ProbeDesc</code> and
- * can overid some method as needed
+ * can override some method as needed
  * @author Fabrice Bacchella
  */
 @ProbeMeta(
@@ -207,43 +207,51 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
-     * Store the values on the rrd backend.
-     * @param oneSample
+     * Return an new sample with collected values
+     * @param oneSample or null if collect failed
      */
     private JrdsSample updateSample() {
         JrdsSample sample = newSample();
         if(isCollectRunning()) {
             Map<KeyType, ValueType> sampleVals = getNewSampleValues();
-            if (sampleVals != null) {
-                log(Level.TRACE, "Collected values: %s", sampleVals);
-                if(getUptime() * pd.getUptimefactor() >= pd.getHeartBeatDefault()) {
-                    //Set the default values that might be defined in the probe description
-                    for(Map.Entry<String, Double> e: getPd().getDefaultValues().entrySet()) {
-                        sample.put(e);
-                    }
-                    Map<?, String> nameMap = getCollectMapping();
-                    log(Level.TRACE, "Collect keys: %s", nameMap);
-                    Map<KeyType, Number>filteredSamples = filterValues(sampleVals);
-                    log(Level.TRACE, "Filtered values: %s", filteredSamples);
-                    for(Map.Entry<KeyType, Number> e: filteredSamples.entrySet()) {
-                        String dsName = nameMap.get(e.getKey());
-                        if (dsName != null) {
-                            sample.put(dsName, e.getValue());
-                        }
-                        else {
-                            log(Level.TRACE, "Dropped entry: %s", e.getKey());
-                        }
-                    }
-                    modifySample(sample, sampleVals);
-                    return sample;
-                }
-                else {
-                    log(Level.INFO, "uptime too low: %.0f", getUptime() * pd.getUptimefactor());
-                }
+            if (sampleVals != null && sampleVals.size() != 0 && injectSample(sample, sampleVals)) {
+                return sample;
             }
         }
-        return sample;
+        return null;
     }
+
+    /**
+     * Store the collected values in the sample
+     * @param oneSample
+     */
+    public boolean injectSample(JrdsSample oneSample, Map<KeyType, ValueType> sampleVals) {
+        log(Level.TRACE, "Collected values: %s", sampleVals);
+        if(getUptime() * pd.getUptimefactor() < pd.getHeartBeatDefault()) {
+            log(Level.INFO, "uptime too low: %.0f", getUptime() * pd.getUptimefactor());
+            return false;
+        }
+        //Set the default values that might be defined in the probe description
+        for(Map.Entry<String, Double> e: getPd().getDefaultValues().entrySet()) {
+            oneSample.put(e);
+        }
+        Map<?, String> nameMap = getCollectMapping();
+        log(Level.TRACE, "Collect keys: %s", nameMap);
+        Map<KeyType, Number>filteredSamples = filterValues(sampleVals);
+        log(Level.TRACE, "Filtered values: %s", filteredSamples);
+        for(Map.Entry<KeyType, Number> e: filteredSamples.entrySet()) {
+            String dsName = nameMap.get(e.getKey());
+            if (dsName != null) {
+                oneSample.put(dsName, e.getValue());
+            }
+            else {
+                log(Level.TRACE, "Dropped entry: %s", e.getKey());
+            }
+        }
+        modifySample(oneSample, sampleVals);
+        return true;
+    }
+
 
     /**
      * Return a new JrdsSample. It can be overridden if a smarter sample is needed
@@ -251,6 +259,14 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      */
     public JrdsSample newSample() {
         return this.new LocalJrdsSample();
+    }
+
+    public void storeSample(JrdsSample sample) {
+        mainStore.commit(sample);
+        for(Store store: stores) {
+            store.commit(sample);
+        }
+
     }
 
     /**
@@ -279,11 +295,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                     JrdsSample sample = updateSample();                    
                     //The collect might have been stopped
                     //during the reading of samples
-                    if( sample.size() > 0 && isCollectRunning()) {
-                        mainStore.commit(sample);
-                        for(Store store: stores) {
-                            store.commit(sample);
-                        }
+                    if( sample!= null && sample.size() > 0 && isCollectRunning()) {
+                        storeSample(sample);
                         interrupted = false;
                     }
                 }

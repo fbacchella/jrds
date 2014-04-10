@@ -75,6 +75,19 @@ public enum ConfigType {
         public String getRootNode() {
             return "probedesc";
         }
+    },
+    LISTENER {
+        public String getName(JrdsDocument d) {
+            String name = getNameByAttribute(d);
+            if (name == null || name.isEmpty()) {
+                name  = d.getRootElement().getAttribute("class");
+            }
+            return name != null ? name.trim() : null;
+        }
+        @Override
+        public String getRootNode() {
+            return "listener";
+        }
     };
 
     public abstract String getName(JrdsDocument d);

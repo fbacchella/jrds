@@ -31,6 +31,7 @@
 			label CDATA #IMPLIED
 			connection CDATA #IMPLIED
 			timer CDATA #IMPLIED
+			listener CDATA #IMPLIED
 >
 <!ELEMENT arg (#PCDATA)>
 <!ATTLIST arg

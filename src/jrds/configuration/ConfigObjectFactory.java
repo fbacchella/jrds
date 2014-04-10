@@ -17,6 +17,7 @@ import jrds.Tab;
 import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.graphe.Sum;
+import jrds.starter.Listener;
 import jrds.starter.Timer;
 
 import org.apache.log4j.Logger;
@@ -27,6 +28,7 @@ public class ConfigObjectFactory {
     private ProbeFactory pf;
     private ClassLoader cl = this.getClass().getClassLoader();
     private Map<String, GraphDesc> graphDescMap = Collections.emptyMap();
+    private Map<String, Listener<?, ?>> listenerMap = Collections.emptyMap();
     Map<String, Macro> macrosmap = Collections.emptyMap();
     private final jrds.PropertiesManager pm;
     private Loader load = null;
@@ -58,7 +60,7 @@ public class ConfigObjectFactory {
 
         if(pm.configdir !=null)
             load.importDir(pm.configdir);
-        
+
         load.done();
     }
 
@@ -136,6 +138,7 @@ public class ConfigObjectFactory {
         ob.setProbeFactory(pf);
         ob.setPm(pm);
         ob.setTimers(timers);
+        ob.setListeners(listenerMap);
         Map<String, HostInfo> hostsMap = getObjectMap(ob, nodemap);
         logger.debug(jrds.Util.delayedFormatString("Hosts configured: %s", hostsMap.keySet()));
         return hostsMap;
@@ -167,8 +170,17 @@ public class ConfigObjectFactory {
         return tabsMap;
     }
 
+    public Map<String, Listener<?,?>> setListenerMap() {
+        Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.LISTENER);
+        ListenerBuilder ob = new ListenerBuilder();
+        ob.setClassLoader(cl);
+        listenerMap = getObjectMap(ob, nodemap);
+        logger.debug(jrds.Util.delayedFormatString("listener configured: %s", listenerMap.keySet()));
+        return listenerMap;
+    }
+
     /**
-     * @return the load
+     * @return the loader
      */
     Loader getLoader() {
         return load;
