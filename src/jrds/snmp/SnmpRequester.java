@@ -163,7 +163,7 @@ public enum SnmpRequester {
                 else
                     doAgain = false;
             }
-        };
+        }
         return snmpVars;
     }
 
