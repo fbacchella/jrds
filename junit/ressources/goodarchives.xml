@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE archivesset PUBLIC "-//jrds//DTD Archives Set //EN"
+                           "urn:jrds:archivesset">
+<archivesset name="newarchives">
+    <archive>
+        <consolFun>average</consolFun>
+        <xff>0.5</xff>
+        <steps>1</steps>
+        <rows>2</rows>
+    </archive>
+    <archive>
+        <consolFun>max</consolFun>
+        <xff>0.5</xff>
+        <steps>2</steps>
+        <rows>2</rows>
+    </archive>
+</archivesset>

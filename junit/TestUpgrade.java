@@ -2,6 +2,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.ArchivesSet;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.Tools;
@@ -42,7 +43,7 @@ public class TestUpgrade {
         p.setPd(pd);
         p.setStep(300);
         p.setName("dummy");
-        p.getMainStore().checkStoreFile();
+        p.getMainStore().checkStoreFile(ArchivesSet.DEFAULT);
 
         RrdDef def = ((RrdDb) p.getMainStore().getStoreObject()).getRrdDef();
         def.setStep(300);

@@ -3,6 +3,7 @@ package jrds.store;
 import java.util.Date;
 import java.util.Map;
 
+import jrds.ArchivesSet;
 import jrds.JrdsSample;
 import jrds.Probe;
 
@@ -23,7 +24,7 @@ public abstract class AbstractStore<StoreObject> implements Store {
     public abstract Map<String, Number> getLastValues();
     
     @Override
-    public abstract boolean checkStoreFile();
+    public abstract boolean checkStoreFile(ArchivesSet archives);
     
     @Override
     public abstract Date getLastUpdate();

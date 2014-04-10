@@ -8,6 +8,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.ArchivesSet;
 import jrds.Filter;
 import jrds.GraphDesc;
 import jrds.HostInfo;
@@ -30,6 +31,7 @@ public class ConfigObjectFactory {
     private Map<String, GraphDesc> graphDescMap = Collections.emptyMap();
     private Map<String, Listener<?, ?>> listenerMap = Collections.emptyMap();
     Map<String, Macro> macrosmap = Collections.emptyMap();
+    Map<String, ArchivesSet> archivessetmap =  Collections.singletonMap(ArchivesSet.DEFAULT.getName(), ArchivesSet.DEFAULT);
     private final jrds.PropertiesManager pm;
     private Loader load = null;
 
@@ -93,6 +95,14 @@ public class ConfigObjectFactory {
         return objectMap;
     }
 
+    public Map<String, ArchivesSet> setArchiveSetMap() {
+        Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.ARCHIVESSET);
+        archivessetmap = getObjectMap(new ArchivesSetBuilder(), nodemap);
+        archivessetmap.put(ArchivesSet.DEFAULT.getName(), ArchivesSet.DEFAULT);
+        logger.debug(jrds.Util.delayedFormatString("Archives set configured: %s", archivessetmap.keySet()));
+        return archivessetmap;
+    }
+
     public Map<String, Macro> setMacroMap() {
         Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.MACRODEF);
         macrosmap = getObjectMap(new MacroBuilder(), nodemap);
@@ -140,6 +150,7 @@ public class ConfigObjectFactory {
         ob.setTimers(timers);
         ob.setListeners(listenerMap);
         ob.setGraphDescMap(graphDescMap);
+        ob.setArchivesSetMap(archivessetmap);
         Map<String, HostInfo> hostsMap = getObjectMap(ob, nodemap);
         logger.debug(jrds.Util.delayedFormatString("Hosts configured: %s", hostsMap.keySet()));
         return hostsMap;

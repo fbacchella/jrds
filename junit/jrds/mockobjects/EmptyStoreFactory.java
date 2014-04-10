@@ -3,6 +3,7 @@ package jrds.mockobjects;
 import java.util.Date;
 import java.util.Map;
 
+import jrds.ArchivesSet;
 import jrds.JrdsSample;
 import jrds.Probe;
 import jrds.store.AbstractStore;
@@ -28,7 +29,7 @@ public class EmptyStoreFactory extends AbstractStoreFactory<EmptyStoreFactory.Em
 
         @Override
         public void commit(JrdsSample sample) {
-            
+
         }
 
         @Override
@@ -37,7 +38,7 @@ public class EmptyStoreFactory extends AbstractStoreFactory<EmptyStoreFactory.Em
         }
 
         @Override
-        public boolean checkStoreFile() {
+        public boolean checkStoreFile(ArchivesSet archives) {
             return false;
         }
 
@@ -53,9 +54,9 @@ public class EmptyStoreFactory extends AbstractStoreFactory<EmptyStoreFactory.Em
 
         @Override
         public void closeStoreObject(Object object) {
-            
+
         }
-        
+
     }
     @Override
     public EmptyStore create(Probe<?, ?> p) {

@@ -3,6 +3,7 @@ package jrds.store;
 import java.util.Date;
 import java.util.Map;
 
+import jrds.ArchivesSet;
 import jrds.JrdsSample;
 import jrds.Probe;
 
@@ -27,7 +28,7 @@ public class CacheStore extends AbstractStore<Map<String, Number>> {
     }
 
     @Override
-    public boolean checkStoreFile() {
+    public boolean checkStoreFile(ArchivesSet archives) {
         return true;
     }
 

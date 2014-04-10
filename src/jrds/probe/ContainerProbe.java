@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
+import jrds.ArchivesSet;
 import jrds.HostInfo;
 import jrds.JrdsSample;
 import jrds.Probe;
@@ -100,7 +101,7 @@ public class ContainerProbe extends Probe<Object, Number> {
             }
 
             @Override
-            public boolean checkStoreFile() {
+            public boolean checkStoreFile(ArchivesSet archives) {
                 return true;
             }
 

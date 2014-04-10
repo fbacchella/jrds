@@ -120,6 +120,7 @@ public class HostsList extends StarterNode {
 
         log(Level.DEBUG, "Starting parsing descriptions");
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
+        conf.setArchiveSetMap();
         conf.setGraphDescMap();
         conf.setProbeDescMap();
         conf.setMacroMap();

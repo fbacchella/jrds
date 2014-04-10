@@ -40,6 +40,15 @@ public enum ConfigType {
             return "tab";
         }
     },
+    ARCHIVESSET {
+        public String getName(JrdsDocument d) {
+            return getNameByAttribute(d);
+        }
+        @Override
+        public String getRootNode() {
+            return "archivesset";
+        }
+    },
     MACRODEF {
         public String getName(JrdsDocument d) {
             return getNameByAttribute(d);

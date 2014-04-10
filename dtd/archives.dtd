@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!ELEMENT archivesset (archive+)>
+<!ATTLIST archivesset name CDATA #REQUIRED>
+<!ELEMENT archive (consolFun, xff, steps, rows)>
+<!ELEMENT consolFun (#PCDATA)>
+<!ELEMENT xff (#PCDATA)>
+<!ELEMENT steps (#PCDATA)>
+<!ELEMENT rows (#PCDATA)>

@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import jrds.ArchivesSet;
 import jrds.JrdsSample;
 import jrds.Probe;
 
@@ -29,12 +30,6 @@ import org.rrd4j.graph.RrdGraphDef;
 public class RrdDbStore extends AbstractStore<RrdDb> {
     private final RrdDbStoreFactory factory;
 
-    private static final ArcDef[] DEFAULTARC = {
-        new ArcDef(ConsolFun.AVERAGE, 0.5, 1, 12 * 24 * 30 * 3),
-        new ArcDef(ConsolFun.AVERAGE, 0.5, 12, 24 * 365), 
-        new ArcDef(ConsolFun.AVERAGE, 0.5, 288, 365 * 2)
-    };
-
     public RrdDbStore(Probe<?, ?> p, RrdDbStoreFactory factory) {
         super(p);
         this.factory = factory;
@@ -47,7 +42,6 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     public RrdDef getRrdDef() {
         RrdDef def = new RrdDef(getPath());
         def.setVersion(2);
-        def.addArchive(DEFAULTARC);
         def.addDatasource(getDsDefs());
         def.setStep(p.getStep());
         return def;
@@ -170,7 +164,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
         }
     }
 
-    public boolean checkStoreFile() {
+    public boolean checkStoreFile(ArchivesSet archives) {
         File rrdFile = new File(getPath());
 
         File rrdDir = p.getHost().getHostDir();
@@ -191,6 +185,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 rrdDb = new RrdDb(getPath());
                 //old definition
                 RrdDef tmpdef = rrdDb.getRrdDef();
+                tmpdef.addArchive(archives.getArchives());
                 Date startTime = new Date();
                 tmpdef.setStartTime(startTime);
                 String oldDef = tmpdef.dump();

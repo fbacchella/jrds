@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.log4j.Level;
 
+import jrds.ArchivesSet;
 import jrds.JrdsSample;
 import jrds.Probe;
 
@@ -45,7 +46,7 @@ public class GraphiteStore extends AbstractStore<GraphiteConnection> {
     }
 
     @Override
-    public boolean checkStoreFile() {
+    public boolean checkStoreFile(ArchivesSet archives) {
         try {
             cnx.ensureGraphiteConnection();
         } catch (IOException e) {

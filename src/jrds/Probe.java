@@ -84,6 +84,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     private volatile boolean running = false;
     private Set<Store> stores = new HashSet<Store>();
     private Store mainStore;
+    private ArchivesSet archives = ArchivesSet.DEFAULT;
 
     /**
      * A special case constructor, mainly used by virtual probe
@@ -119,6 +120,14 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         if( ! readSpecific()) {
             throw new RuntimeException("Creation failed");
         }
+    }
+
+    /**
+     * Define the archive set to use for this probe
+     * @param archives
+     */
+    public void setArchives(ArchivesSet archives) {
+        this.archives = archives;
     }
 
     public void addGraph(GraphDesc gd) {
@@ -540,7 +549,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         if(name == null)
             name = parseTemplate(pd.getProbeName());
 
-        finished = mainStore.checkStoreFile();
+        finished = mainStore.checkStoreFile(archives);
         return finished;
     }
 

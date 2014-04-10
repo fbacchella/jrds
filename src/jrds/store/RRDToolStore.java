@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import jrds.ArchivesSet;
 import jrds.JrdsSample;
 import jrds.Probe;
 import jrds.factories.ProbeBean;
@@ -49,7 +50,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
      * @see jrds.Probe#checkStoreFile()
      */
     @Override
-    public boolean checkStoreFile() {
+    public boolean checkStoreFile(ArchivesSet archives) {
         return rrdpath.canRead();
     }
 
