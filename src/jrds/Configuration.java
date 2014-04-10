@@ -38,6 +38,10 @@ public class Configuration {
         return conf;
     }
 
+    public static final synchronized void stopConf() {
+        conf.stop();
+    }
+
     private Configuration(Properties p) {
         propertiesManager.join(p);
         propertiesManager.importSystemProps();
@@ -46,7 +50,7 @@ public class Configuration {
         hostsList = new HostsList(propertiesManager);
     }
 
-    public void start() {
+    private void start() {
         //If in read-only mode, no scheduler
         if(propertiesManager.readonly)
             return;
@@ -65,7 +69,7 @@ public class Configuration {
         hostsList.startTimers();
     }
 
-    public void stop() {
+    private void stop() {
         hostsList.stopTimers();
         Thread.yield();
         //We don't care if it failed, just try
@@ -74,7 +78,6 @@ public class Configuration {
                 Runtime.getRuntime().removeShutdownHook(shutDownHook);
         } catch (Exception e1) {
         }
-        hostsList.getRenderer().finish();
         //Everything is stopped, wait for collect termination
         try {
             for(Timer t: hostsList.getTimers()) {
@@ -90,6 +93,9 @@ public class Configuration {
             sf.stop();
         }
         propertiesManager.defaultStore.stop();
+        if(hostsList.getRenderer() != null) {
+            hostsList.getRenderer().finish();            
+        }
     }
 
     /**

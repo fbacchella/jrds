@@ -1,9 +1,11 @@
 package jrds.webapp;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,7 +21,6 @@ import org.apache.log4j.Logger;
  */
 public class Cmd extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(Cmd.class);
-    private static final long serialVersionUID = 1L;
 
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
@@ -38,7 +39,10 @@ public class Cmd extends JrdsServlet {
 
         if("reload".equalsIgnoreCase(command)) {
             ServletContext ctxt = getServletContext();
-            reload(ctxt);
+            //only one reload allowed to run, just ignore synchronous reload
+            if ( ReloadHostList.reloading.tryAcquire()) {
+                reload(ctxt);
+            }
             res.sendRedirect(req.getContextPath() + "/");
         }
         else if("pause".equalsIgnoreCase(command)) {
@@ -53,7 +57,9 @@ public class Cmd extends JrdsServlet {
             @Override
             public void run() {
                 StartListener sl = (StartListener) ctxt.getAttribute(StartListener.class.getName());
-                sl.configure(ctxt);
+                Properties p = sl.readProperties(ctxt);
+                Configuration.switchConf(p);
+                ReloadHostList.reloading.release();
                 logger.info("Configuration rescaned");
             }
         };

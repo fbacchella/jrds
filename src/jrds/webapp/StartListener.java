@@ -27,44 +27,45 @@ import org.apache.log4j.Logger;
  * @version $Revision$,  $Date$
  */
 public class StartListener implements ServletContextListener {
-	static private final Logger logger = Logger.getLogger(StartListener.class);
-	static private boolean started = false;
+    static private final Logger logger = Logger.getLogger(StartListener.class);
+    static private boolean started = false;
 
-	/* (non-Javadoc)
-	 * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
-	 */
-	public void contextInitialized(ServletContextEvent arg0) {
-		//Resin and some others launch the listener twice !
-		if( ! started ) {
-			try {
-				jrds.JrdsLoggerConfiguration.initLog4J();
-			} catch (IOException e2) {
-				throw new RuntimeException("Log configuration failed", e2);
-			}
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
+     */
+    public void contextInitialized(ServletContextEvent arg0) {
+        //Resin and some others launch the listener twice !
+        if( ! started ) {
+            try {
+                jrds.JrdsLoggerConfiguration.initLog4J();
+            } catch (IOException e2) {
+                throw new RuntimeException("Log configuration failed", e2);
+            }
 
-			System.setProperty("java.awt.headless","true");
+            System.setProperty("java.awt.headless","true");
 
-			ServletContext ctxt = arg0.getServletContext();
-			ctxt.setAttribute(StartListener.class.getName(), this);
-            configure(ctxt);
-			started = true;
-			logger.info("Application jrds started");
-		}
-	}
+            ServletContext ctxt = arg0.getServletContext();
+            ctxt.setAttribute(StartListener.class.getName(), this);
+            Properties p = readProperties(ctxt);
+            jrds.Configuration.configure(p);
+            started = true;
+            logger.info("Application jrds started");
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
-	 */
-	public void contextDestroyed(ServletContextEvent arg0) {
-		if(started) {
-			logger.info("Application jrds will stop");
-			started = false;
-			jrds.Configuration.get().stop();
-			logger.info("Application jrds stopped");
-		}
-	}
+    /* (non-Javadoc)
+     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
+     */
+    public void contextDestroyed(ServletContextEvent arg0) {
+        if(started) {
+            logger.info("Application jrds will stop");
+            started = false;
+            jrds.Configuration.stopConf();
+            logger.info("Application jrds stopped");
+        }
+    }
 
-    public void configure(ServletContext ctxt) {
+    public Properties readProperties(ServletContext ctxt) {
         Properties p = new Properties();
 
         InputStream propStream = ctxt.getResourceAsStream("/WEB-INF/jrds.properties");
@@ -91,7 +92,7 @@ public class StartListener implements ServletContextListener {
             } catch (FileNotFoundException e) {
             } catch (IOException e) {
             }
-        jrds.Configuration.configure(p);
+        return p;
     }
 
 }
