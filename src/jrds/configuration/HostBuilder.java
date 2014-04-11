@@ -275,7 +275,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             archivesName = probeNode.getAttribute("archivesset");
         }
         else {
-            archivesName = pm.archives;
+            archivesName = pm.archivesSet;
         }
         if(archivesName == null || "".equals(archivesName) || ! archivessetmap.containsKey(archivesName)) {
             logger.error("invalid archives set name: " + archivesName);
