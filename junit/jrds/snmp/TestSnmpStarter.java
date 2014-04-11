@@ -7,8 +7,6 @@ import jrds.HostsList;
 import jrds.Tools;
 import jrds.mockobjects.SnmpAgent;
 import jrds.probe.snmp.RdsSnmpSimple;
-import jrds.snmp.MainStarter;
-import jrds.snmp.SnmpConnection;
 import jrds.starter.HostStarter;
 
 import org.apache.log4j.Level;

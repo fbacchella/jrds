@@ -371,9 +371,8 @@ public class Base64
         int    count    = decode4to3( fourBytes, 0, outBuff1, 0 );
         byte[] outBuff2 = new byte[ count ];
         
-        for( int i = 0; i < count; i++ )
-            outBuff2[i] = outBuff1[i];
-        
+        System.arraycopy(outBuff1, 0, outBuff2, 0, count);
+
         return outBuff2;
     }
     

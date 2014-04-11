@@ -54,7 +54,6 @@ public @interface ProbeMeta {
         @Override
         public void addProbe(JrdsElement hostElement,
                 ProbeDescSummary summary, HttpServletRequest request) {
-            return;
         }
     };
 

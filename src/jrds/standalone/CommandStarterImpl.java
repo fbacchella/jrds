@@ -53,7 +53,7 @@ public abstract class CommandStarterImpl implements CommandStarter {
             JMXConnectorServer cs;
 
             String path = "/";
-            if (protocol == "rmi") {
+            if ("rmi".equals(protocol)) {
                 java.rmi.registry.LocateRegistry.createRegistry(port);
                 path = "/jndi/rmi://" + "0.0.0.0" + ":" + port + "/jmxrmi";
             }
