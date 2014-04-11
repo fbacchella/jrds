@@ -3,13 +3,16 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.ArchivesSet;
+import jrds.JrdsLoggerConfiguration;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.Tools;
 import jrds.mockobjects.GenerateProbe;
 import jrds.mockobjects.GetMoke;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,6 +32,7 @@ public class TestUpgrade {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
+        JrdsLoggerConfiguration.configureLogger(TestUpgrade.class.getCanonicalName(), Level.DEBUG);
         Tools.setLevel(logger.getLevel(), "jrds" );
     }
 
@@ -43,7 +47,8 @@ public class TestUpgrade {
         p.setPd(pd);
         p.setStep(300);
         p.setName("dummy");
-        p.getMainStore().checkStoreFile(ArchivesSet.DEFAULT);
+        boolean checked = p.getMainStore().checkStoreFile(ArchivesSet.DEFAULT);
+        Assert.assertTrue(checked);
 
         RrdDef def = ((RrdDb) p.getMainStore().getStoreObject()).getRrdDef();
         def.setStep(300);

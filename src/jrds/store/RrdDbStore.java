@@ -14,7 +14,6 @@ import jrds.Probe;
 
 import org.apache.log4j.Level;
 import org.rrd4j.ConsolFun;
-import org.rrd4j.core.ArcDef;
 import org.rrd4j.core.Archive;
 import org.rrd4j.core.Datasource;
 import org.rrd4j.core.DsDef;
@@ -39,10 +38,11 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
         return p.getPd().getDsDefs();
     }
 
-    public RrdDef getRrdDef() {
+    public RrdDef getRrdDef(ArchivesSet archives) {
         RrdDef def = new RrdDef(getPath());
         def.setVersion(2);
         def.addDatasource(getDsDefs());
+        def.addArchive(archives.getArchives());
         def.setStep(p.getStep());
         return def;
     }
@@ -57,21 +57,21 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
      * Create the probe file
      * @throws IOException
      */
-    protected void create() throws IOException {
+    protected void create(ArchivesSet archives) throws IOException {
         log(Level.INFO, "Need to create rrd");
-        RrdDef def = getRrdDef();
+        RrdDef def = getRrdDef(archives);
         RrdDb rrdDb = new RrdDb(def);
         rrdDb.close();
     }
 
-    private void upgrade() {
+    private void upgrade(ArchivesSet archives) {
         RrdDb rrdSource = null;
         try {
             log(Level.WARN,"Definition is changed, the store needs to be upgraded");
             File source = new File(getPath());
             rrdSource = new RrdDb(source.getCanonicalPath());
 
-            RrdDef rrdDef = getRrdDef();
+            RrdDef rrdDef = getRrdDef(archives);
             File dest = File.createTempFile("JRDS_", ".tmp", source.getParentFile());
             rrdDef.setPath(dest.getCanonicalPath());
             RrdDb rrdDest = new RrdDb(rrdDef);
@@ -185,7 +185,6 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 rrdDb = new RrdDb(getPath());
                 //old definition
                 RrdDef tmpdef = rrdDb.getRrdDef();
-                tmpdef.addArchive(archives.getArchives());
                 Date startTime = new Date();
                 tmpdef.setStartTime(startTime);
                 String oldDef = tmpdef.dump();
@@ -193,7 +192,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 log(Level.TRACE, "Definition found: %s\n", oldDef);
 
                 //new definition
-                tmpdef = getRrdDef();
+                tmpdef = getRrdDef(archives);
                 tmpdef.setStartTime(startTime);
                 String newDef = tmpdef.dump();
                 long newstep = tmpdef.getStep();
@@ -205,12 +204,12 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 else if(! newDef.equals(oldDef)) {
                     rrdDb.close();
                     rrdDb = null;
-                    upgrade();
+                    upgrade(archives);
                     rrdDb = new RrdDb(getPath());
                 }
                 log(Level.TRACE, "******");
             } else
-                create();
+                create(archives);
             retValue = true;
         } catch (Exception e) {
             log(Level.ERROR, e, "Store %s unusable: %s", getPath(), e);

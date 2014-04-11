@@ -863,16 +863,15 @@ implements Cloneable, WithACL {
                     probeDS.put(probe, defProbe.getMainStore().getExtractor());
                 }
                 Extractor ex = probeDS.get(probe);
-                if( ! datasources.contains(ds.dsName)) {
+                if( ! datasources.contains(ds.name)) {
                     ex.addSource(ds.name, ds.dsName);
-                    datasources.add(ds.dsName);
+                    datasources.add(ds.name);
                     if(ds.dsName != ds.name) {
                         graphDef.datasource(ds.name, ds.dsName);
                     }
                 }
                 else {
                     logger.error("Datasource '" + ds.dsName + "' defined twice in " + name + ", for found: " + ds);
-                    logger.error("New one is " + ds);
                 }
             }
             if (complete) {

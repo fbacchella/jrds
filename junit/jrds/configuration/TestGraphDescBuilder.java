@@ -37,7 +37,6 @@ import org.rrd4j.graph.RrdGraphDef;
 import org.rrd4j.graph.RrdGraphInfo;
 import org.w3c.dom.Document;
 
-
 public class TestGraphDescBuilder {
     static final private Logger logger = Logger.getLogger(TestGraphDescBuilder.class);
 
@@ -88,7 +87,7 @@ public class TestGraphDescBuilder {
         ChainedMap<Object> dsMap = GenerateProbe.ChainedMap.start();
         dsMap.set("dsName", "space separated").set("dsType", DsType.COUNTER);
         pd.add(dsMap);
-        
+
         dsMap.clear();
         dsMap.set("dsName", "add1").set("dsType", DsType.COUNTER);
         pd.add(dsMap);
@@ -102,6 +101,19 @@ public class TestGraphDescBuilder {
         pd.add(dsMap);
 
         p.checkStore();
+
+        if(logger.isTraceEnabled()) {
+            Document gddom = p.dumpAsXml(true);
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            Map<String, String> prop = new HashMap<String, String>(3);
+            prop.put(OutputKeys.OMIT_XML_DECLARATION, "no");
+            prop.put(OutputKeys.INDENT, "yes");
+            prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
+            jrds.Util.serialize(gddom, os, null, prop);
+            logger.trace(new String(os.toByteArray(),"UTF-8"));
+        }
+
+        logger.trace("Probe preparation done");
 
         Period pr = new Period();
         ExtractInfo ei = ExtractInfo.get().make(pr.getBegin(), pr.getEnd());
@@ -121,7 +133,7 @@ public class TestGraphDescBuilder {
         Assert.assertTrue("graph height invalid", 206 < gi.getHeight());
         Assert.assertTrue("graph width invalid", 578 < gi.getWidth());
         Assert.assertEquals("graph byte count invalid", 12574 , gi.getByteCount(), 4000);
-        
+
         for(String treename: new String[]{PropertiesManager.HOSTSTAB, PropertiesManager.VIEWSTAB, "tab"}) {
             List<String> tree = gd.getTree(new GraphNode(p, gd), treename);
             Assert.assertEquals("not enough element in tree " +  treename, 2, tree.size());
@@ -172,7 +184,7 @@ public class TestGraphDescBuilder {
 
     @Test
     public void testGraphDescBuilderParse()
-        throws Exception {
+            throws Exception {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
         gdbuild.setPm(Tools.makePm());

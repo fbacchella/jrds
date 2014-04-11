@@ -83,7 +83,7 @@ public class GenerateProbe {
 
     public static final Probe<?, ?> fillProbe(Probe<?,?> p, TemporaryFolder folder, ChainedMap<Object> args) throws Exception {
 
-        PropertiesManager pm = (PropertiesManager) args.get(PropertiesManager.class);
+        PropertiesManager pm = (PropertiesManager) args.get(PropertiesManager.class.getCanonicalName());
         if(pm == null) {
             pm = Tools.makePm(folder);
         }
