@@ -45,7 +45,7 @@ public class Log4jTest {
         JrdsLoggerConfiguration.initLog4J();
         Logger jrdsLogger = LogManager.getLoggerRepository().exists("jrds");
         Assert.assertNotNull(jrdsLogger);
-        PropertiesManager pm = Tools.makePm(testFolder);
+        PropertiesManager pm = Tools.makePm(testFolder, "loglevel=warn");
         JrdsLoggerConfiguration.configure(pm);
         Assert.assertEquals(pm.loglevel, jrdsLogger.getLevel());
     }
@@ -58,13 +58,11 @@ public class Log4jTest {
         Logger.getRootLogger().addAppender(ta);
         JrdsLoggerConfiguration.initLog4J();
         Assert.assertNotNull(LogManager.getLoggerRepository().exists("jrds"));
-        PropertiesManager pm = Tools.makePm(testFolder);
+        PropertiesManager pm = Tools.makePm(testFolder, "loglevel=error");
         JrdsLoggerConfiguration.configure(pm);
         Logger l = Logger.getLogger("jrds");
-        l.setAdditivity(false);
         l.error("A message");
         l.debug("A debug message");
-        System.out.println(logs.get(0).getLoggerName() + ": " + logs.get(0).getMessage());
         Assert.assertEquals(1, logs.size());
     }
 
