@@ -35,10 +35,6 @@ public class ExtractInfo {
         this.cf = cf;
     }
 
-    public final ExtractInfo make(Object source) {
-        return new ExtractInfo(this.start, this.end, this.step, this.ds, this.cf);
-    }
-
     public final ExtractInfo make(Date start, Date end) {
         return new ExtractInfo(start, end, this.step, this.ds, this.cf);
     }

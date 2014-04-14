@@ -17,7 +17,7 @@ import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
 
 /**
- * A servlet wich return datastore values from a probe.
+ * A servlet which returns datastore values from a probe.
  * It can be used in many way :
  * The simplest way is by using a URL of the form :
  * http://<it>server</it>/values/<it>host</it>/<it>probe.</it>
@@ -72,7 +72,6 @@ public final class CheckValues extends JrdsServlet {
 
             ExtractInfo ei = ExtractInfo.get().
                     make(paste, lastupdate).
-                    make(cf).
                     make(p.getStep());
             if(ds != null && !  "".equals(ds.trim())) {
                 String dsName = ds.trim();
