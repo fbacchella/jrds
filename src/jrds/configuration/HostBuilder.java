@@ -306,10 +306,10 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                     //If the last argument is a list, give it to the template parser
                     Object lastArgs = args.isEmpty() ? null : args.get(args.size() - 1);
                     if(lastArgs instanceof List) {
-                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), Util.parseTemplate(beanValue, host, lastArgs));
+                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), Util.parseTemplate(beanValue, host, lastArgs, properties));
                     }
                     else {
-                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), jrds.Util.parseTemplate(beanValue, host));
+                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), jrds.Util.parseTemplate(beanValue, host, properties));
                     }
                     logger.trace(jrds.Util.delayedFormatString("Adding bean %s=%s (%s) to default args", beanName, value, value.getClass()));
                     bean.getWriteMethod().invoke(p, value);
@@ -344,7 +344,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             String connexionName = probeNode.getAttribute("connection");
             if(connexionName != null && ! "".equals(connexionName)) {
                 logger.trace(Util.delayedFormatString("Adding connection %s to %s", connexionName, p));
-                connectionName = jrds.Util.parseTemplate(connexionName, host);
+                connectionName = jrds.Util.parseTemplate(connexionName, host, properties);
                 cp.setConnectionName(connectionName);
             }
             else {
