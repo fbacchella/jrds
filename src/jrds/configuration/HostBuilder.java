@@ -105,7 +105,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
         // Find the connection for this host
         // Will the registered latter, in the starter node, one for each timer
-        for(ConnectionInfo cnx: makeConnexion(fragment, host)) {
+        for(ConnectionInfo cnx: makeConnexion(fragment, host, properties)) {
             host.addConnection(cnx);
         }
 
@@ -338,7 +338,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             String connectionName = null;
             ConnectedProbe cp = (ConnectedProbe) p;
             //Register the connections defined within the probe
-            for(ConnectionInfo ci: makeConnexion(probeNode, p)) {
+            for(ConnectionInfo ci: makeConnexion(probeNode, p, properties)) {
                 ci.register(p);
             }
             String connexionName = probeNode.getAttribute("connection");
@@ -423,7 +423,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
      * @param host
      * @return
      */
-    Set<ConnectionInfo> makeConnexion(JrdsElement domNode, Object parent) {
+    Set<ConnectionInfo> makeConnexion(JrdsElement domNode, Object parent, Map<String, String> properties) {
         Set<ConnectionInfo> connectionSet = new HashSet<ConnectionInfo>();
 
         //Check for the old SNMP connection node
@@ -451,7 +451,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 Map<String, String> attrs = new HashMap<String, String>();
                 for(JrdsElement attrNode: cnxNode.getChildElementsByName("attr")) {
                     String attrName = attrNode.getAttribute("name");
-                    String textValue = Util.parseTemplate(attrNode.getTextContent(), parent);
+                    String textValue = Util.parseTemplate(attrNode.getTextContent(), parent, properties);
                     attrs.put(attrName, textValue);
                 }
                 ConnectionInfo cnx = new ConnectionInfo(connectionClass, name, args, attrs);
