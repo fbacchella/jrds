@@ -397,7 +397,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
      * @param p
      * @param host
      */
-    private ConnectionInfo parseSnmp(JrdsElement node) {
+    private ConnectionInfo parseSnmp(JrdsElement node, Object parent, Map<String, String> properties) {
         try {
             JrdsElement snmpNode = node.getElementbyName("snmp");
             if(snmpNode != null) {
@@ -406,7 +406,9 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 Class<? extends Connection<?>> connectionClass = (Class<? extends Connection<?>>) pm.extensionClassLoader.loadClass(connectionClassName);
 
                 Map<String, String> attrs = new HashMap<String, String>();
-                attrs.putAll(snmpNode.attrMap());
+                for(Map.Entry<String, String> e: snmpNode.attrMap().entrySet()) {
+                    attrs.put(e.getKey(), Util.parseTemplate(e.getValue(), parent, properties));
+                }
                 return new ConnectionInfo(connectionClass, connectionClassName, Collections.emptyList(), attrs);
             }
         } catch (ClassNotFoundException e) {
@@ -427,7 +429,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         Set<ConnectionInfo> connectionSet = new HashSet<ConnectionInfo>();
 
         //Check for the old SNMP connection node
-        ConnectionInfo cnxSnmp = parseSnmp(domNode);
+        ConnectionInfo cnxSnmp = parseSnmp(domNode, parent, properties);
         if(cnxSnmp != null)
             connectionSet.add(cnxSnmp);
 
@@ -437,7 +439,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 logger.error("No type declared for a connection");
                 continue;
             }
-            String name = cnxNode.getAttribute("name");
+            String name = Util.parseTemplate(cnxNode.getAttribute("name"), parent, properties);
 
             try {
                 //Load the class for the connection
@@ -456,7 +458,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 }
                 ConnectionInfo cnx = new ConnectionInfo(connectionClass, name, args, attrs);
                 connectionSet.add(cnx);
-                logger.debug(Util.delayedFormatString("Added connection %s to node %s", cnx, parent));
+                logger.debug(Util.delayedFormatString("Added connection %s to node %s with beans %s", cnx, parent, attrs));
             }
             catch (ClassNotFoundException ex) {
                 logger.warn("Connection class not found: " + type + " for " + parent);
