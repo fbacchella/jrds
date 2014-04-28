@@ -4,7 +4,7 @@
     <name>SunJVM5Process</name>
     <probeName>jmxprocess-${connection.name}</probeName>
     <probeClass>jrds.probe.JMX</probeClass>
-    <uptimefactor>1</uptimefactor>
+    <specific name="mbeanNames">java.lang:type=OperatingSystem</specific>
     <ds>
         <dsName>ProcessCpuTime</dsName>
         <dsType>counter</dsType>

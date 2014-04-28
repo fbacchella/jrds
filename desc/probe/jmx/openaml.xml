@@ -4,6 +4,7 @@
     <name>OpenAM</name>
     <probeName>openam</probeName>
     <probeClass>jrds.probe.JMX</probeClass>
+    <specific name="mbeanNames">SUN_OPENSSO_SERVER_MIB_SsoServerInstance:name=com.sun.identity.monitoring.SsoServerAuthSvc</specific>
     <ds>
         <dsName>authFailure</dsName>
         <dsType>counter</dsType>

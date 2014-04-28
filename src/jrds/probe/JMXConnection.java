@@ -76,7 +76,7 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
     public MBeanServerConnection getConnection() {
         return connection;
     }
-    
+
     /**
      * Resolve a mbean interface, given the interface and it's name
      * @param name

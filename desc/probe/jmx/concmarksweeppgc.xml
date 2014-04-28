@@ -15,7 +15,7 @@ As there is no index to discriminate between jvm, label is used and is mandatory
     <name>JMXConcMarkSweepGC</name>
     <probeName>jvmpool-${label}</probeName>
     <probeClass>jrds.probe.JMX</probeClass>
-    <uptimefactor>1</uptimefactor>
+    <specific name="mbeanNames">java.lang:type=GarbageCollector,name=ConcurrentMarkSweep;java.lang:type=GarbageCollector,name=ParNew</specific>
     <ds>
         <dsName>Code Cache</dsName>
         <dsType>gauge</dsType>

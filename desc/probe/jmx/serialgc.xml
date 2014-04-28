@@ -15,7 +15,7 @@ As there is no index to discriminate between jvm, label is used and is mandatory
     <name>JMXSerialGC</name>
     <probeName>jvmpool-${label}</probeName>
     <probeClass>jrds.probe.JMX</probeClass>
-    <uptimefactor>1</uptimefactor>
+    <specific name="mbeanNames">java.lang:type=GarbageCollector,name=Copy;java.lang:type=GarbageCollector,name=MarkSweepCompact</specific>
     <ds>
         <dsName>Code Cache</dsName>
         <dsType>gauge</dsType>
@@ -44,22 +44,22 @@ As there is no index to discriminate between jvm, label is used and is mandatory
     <ds>
         <dsName>MS Coll Count</dsName>
         <dsType>counter</dsType>
-        <collect>java.lang:type=GarbageCollector,name=PS MarkSweep/CollectionCount</collect>
+        <collect>java.lang:type=GarbageCollector,name=MarkSweepCompactCollectionCount</collect>
     </ds>
     <ds>
         <dsName>MS Coll Time</dsName>
         <dsType>counter</dsType>
-        <collect>java.lang:type=GarbageCollector,name=PS MarkSweep/CollectionTime</collect>
+        <collect>java.lang:type=GarbageCollector,name=MarkSweepCompact/CollectionTime</collect>
     </ds>
     <ds>
         <dsName>Copy Coll Count</dsName>
         <dsType>counter</dsType>
-        <collect>java.lang:type=GarbageCollector,name=PS Scavenge/CollectionCount</collect>
+        <collect>java.lang:type=GarbageCollector,name=Copy/CollectionCount</collect>
     </ds>
     <ds>
         <dsName>Copy Coll Time</dsName>
         <dsType>counter</dsType>
-        <collect>java.lang:type=GarbageCollector,name=PS Scavenge/CollectionTime</collect>
+        <collect>java.lang:type=GarbageCollector,name=Copy/CollectionTime</collect>
     </ds>
     <graphs>
         <name>SunJVM5MemoryPool</name>

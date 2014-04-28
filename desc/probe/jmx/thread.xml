@@ -15,6 +15,7 @@ As there is no index to discriminate between jvm, label is used and is mandatory
 	<name>JMXThread</name>
 	<probeName>jvmthread-${label}</probeName>
 	<probeClass>jrds.probe.JMX</probeClass>
+	<specific name="mbeanNames">java.lang:type=Threading</specific>
 	<ds>
 		<dsName>DaemonThreadCount</dsName>
 		<dsType>gauge</dsType>

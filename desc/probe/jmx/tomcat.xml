@@ -9,43 +9,45 @@ Dcom.sun.management.jmxremote.ssl=false
 
 More informations can be found at http://java.sun.com/javase/6/docs/technotes/guides/management/agent.html
 
- -->
+-->
 <probedesc>
-	<name>TomcatGRP</name>
-	<probeName>TomcatGRP-${index}</probeName>
-	<probeClass>jrds.probe.JMXIndexed</probeClass>
-	<!-- monitor HTTP hits -->
-	<ds>
-		<dsName>bytesSent</dsName>
-		<dsType>counter</dsType>
-		<collect>Catalina:type=GlobalRequestProcessor,name=${index}/bytesSent</collect>
-	</ds>
-	<ds>
-		<dsName>bytesReceived</dsName>
-		<dsType>counter</dsType>
-		<collect>Catalina:type=GlobalRequestProcessor,name=${index}/bytesReceived</collect>
-	</ds>
-	<ds>
-		<dsName>processingTime</dsName>
-		<dsType>counter</dsType>
-		<collect>Catalina:type=GlobalRequestProcessor,name=${index}/processingTime</collect>
-	</ds>
-	<ds>
-		<dsName>errorCount</dsName>
-		<dsType>counter</dsType>
-		<collect>Catalina:type=GlobalRequestProcessor,name=${index}/errorCount</collect>
-	</ds>
-	<ds>
-		<dsName>maxTime</dsName>
-		<dsType>counter</dsType>
-		<collect>Catalina:type=GlobalRequestProcessor,name=${index}/maxTime</collect>
-	</ds>
-	<ds>
-		<dsName>requestCount</dsName>
-		<dsType>counter</dsType>
-		<collect>Catalina:type=GlobalRequestProcessor,name=${index}/requestCount</collect>
-	</ds>
-	<graphs>
-		<name>TomcatHits</name>
-	</graphs>
+    <name>TomcatGRP</name>
+    <probeName>TomcatGRP-${index}</probeName>
+    <probeClass>jrds.probe.JMXIndexed</probeClass>
+    <specific name="mbeanNames">Catalina:type=GlobalRequestProcessor,name=*</specific>
+    <specific name="mbeanIndex">Catalina:type=GlobalRequestProcessor,name=(.*)</specific>
+    <!-- monitor HTTP hits -->
+    <ds>
+        <dsName>bytesSent</dsName>
+        <dsType>counter</dsType>
+        <collect>Catalina:type=GlobalRequestProcessor,name=${index}/bytesSent</collect>
+    </ds>
+    <ds>
+        <dsName>bytesReceived</dsName>
+        <dsType>counter</dsType>
+        <collect>Catalina:type=GlobalRequestProcessor,name=${index}/bytesReceived</collect>
+    </ds>
+    <ds>
+        <dsName>processingTime</dsName>
+        <dsType>counter</dsType>
+        <collect>Catalina:type=GlobalRequestProcessor,name=${index}/processingTime</collect>
+    </ds>
+    <ds>
+        <dsName>errorCount</dsName>
+        <dsType>counter</dsType>
+        <collect>Catalina:type=GlobalRequestProcessor,name=${index}/errorCount</collect>
+    </ds>
+    <ds>
+        <dsName>maxTime</dsName>
+        <dsType>counter</dsType>
+        <collect>Catalina:type=GlobalRequestProcessor,name=${index}/maxTime</collect>
+    </ds>
+    <ds>
+        <dsName>requestCount</dsName>
+        <dsType>counter</dsType>
+        <collect>Catalina:type=GlobalRequestProcessor,name=${index}/requestCount</collect>
+    </ds>
+    <graphs>
+        <name>TomcatHits</name>
+    </graphs>
 </probedesc>
