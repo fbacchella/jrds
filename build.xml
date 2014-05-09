@@ -19,8 +19,8 @@
 	<property name="compile.deprecation" value="false" />
 	<property name="compile.optimize" value="true" />
 	<property name="encoding" value="iso-8859-1" />
-	<property name="javac.source" value="1.6" />
-	<property name="javac.target" value="1.6" />
+	<property name="javac.source" value="1.7" />
+	<property name="javac.target" value="1.7" />
 
 	<!-- ===================== External jar Classpath =========================== -->
 	<path id="external.classpath">
@@ -183,7 +183,7 @@
 			<link href="http://java.sun.com/products/servlet/2.5/javadoc" />
 			<link href="http://www.snmp4j.org/doc" />
 			<link href="http://rrd4j.googlecode.com/git/javadoc/reference/" />
-			<link href="http://www.junit.org/junit/javadoc/4.3" />
+			<link href="http://junit.org/javadoc/4.11/" />
 			<link href="http://jetty.codehaus.org/jetty/jetty-6/apidocs/" />
 			<link href="http://ws.apache.org/xmlrpc/apidocs" />
 			<link href="http://www.json.org/javadoc/" />
