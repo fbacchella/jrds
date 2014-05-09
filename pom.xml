@@ -35,12 +35,12 @@
         <dependency>
             <groupId>org.snmp4j</groupId>
             <artifactId>snmp4j</artifactId>
-            <version>2.2.2</version>
+            <version>2.2.5</version>
         </dependency>
         <dependency>
             <groupId>org.snmp4j</groupId>
             <artifactId>snmp4j-agent</artifactId>
-            <version>2.0.6</version>
+            <version>2.1.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -139,22 +139,26 @@
     </dependencies>
     <repositories>
         <repository>
-            <id>jrds</id>
-            <name>jrds Java Packages</name>
-            <url>http://jrds.fr/maven2</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots />
-        </repository>
-        <repository>
             <id>sonaytpe</id>
             <name>Sonatype's snapshots</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
             <layout>default</layout>
             <releases>
                 <enabled>false</enabled>
+            </releases>
+            <snapshots />
+        </repository>
+        <repository>
+            <id>snmp4j</id>
+            <url>https://oosnmp.net/dist/release</url>
+        </repository>
+        <repository>
+            <id>jrds</id>
+            <name>jrds Java Packages</name>
+            <url>http://jrds.fr/maven2</url>
+            <layout>default</layout>
+            <releases>
+                <enabled>true</enabled>
             </releases>
             <snapshots />
         </repository>
@@ -275,56 +279,56 @@
                         </resource>
                         <resrouce>
                             <directory>${dojo.unpacked.dir}/dojo-release-${dojo.version}</directory>
-							<include>dijit/themes/nihilo/nihilo.css</include>
-							<include>dijit/themes/nihilo/images/treeExpand_loading.gif</include>
-							<include>dijit/themes/nihilo/images/tabContainerSprite.gif</include>
-							<include>dijit/themes/nihilo/images/spriteRoundedIconsSmall.png</include>
-							<include>dijit/themes/nihilo/images/titleBar.png</include>
-							<include>dijit/themes/nihilo/images/spriteCheckbox.gif</include>
-							<include>dijit/themes/nihilo/images/buttonEnabled.png</include>
-							<include>dijit/themes/nihilo/images/buttonActive.png</include>
-							<include>dijit/themes/nihilo/images/spriteArrows.png</include>
-							<include>dijit/themes/nihilo/images/validationInputBg.png</include>
-							<include>dijit/themes/nihilo/images/accordionItemActive.png</include>
-							<include>dijit/themes/nihilo/images/warning.png</include>
-							<include>dojox/widget/Standby/images/loading.gif</include>
-							<include>dojo/resources/blank.gif</include>
-							<include>dojo/resources/dojo.css</include>
-							<include>dijit/themes/nihilo/images/spriteDivIcons.gif</include>
-							<include>dijit/themes/nihilo/images/buttonHover.png</include>
-							<include>dijit/themes/nihilo/images/spriteTree.gif</include>
-							<include>dijit/themes/nihilo/images/treeHover.png</include>
-							<include>dijit/themes/nihilo/images/treeI.gif</include>
-							<include>dijit/themes/nihilo/images/treeI_half.gif</include>
+                            <include>dijit/themes/nihilo/nihilo.css</include>
+                            <include>dijit/themes/nihilo/images/treeExpand_loading.gif</include>
+                            <include>dijit/themes/nihilo/images/tabContainerSprite.gif</include>
+                            <include>dijit/themes/nihilo/images/spriteRoundedIconsSmall.png</include>
+                            <include>dijit/themes/nihilo/images/titleBar.png</include>
+                            <include>dijit/themes/nihilo/images/spriteCheckbox.gif</include>
+                            <include>dijit/themes/nihilo/images/buttonEnabled.png</include>
+                            <include>dijit/themes/nihilo/images/buttonActive.png</include>
+                            <include>dijit/themes/nihilo/images/spriteArrows.png</include>
+                            <include>dijit/themes/nihilo/images/validationInputBg.png</include>
+                            <include>dijit/themes/nihilo/images/accordionItemActive.png</include>
+                            <include>dijit/themes/nihilo/images/warning.png</include>
+                            <include>dojox/widget/Standby/images/loading.gif</include>
+                            <include>dojo/resources/blank.gif</include>
+                            <include>dojo/resources/dojo.css</include>
+                            <include>dijit/themes/nihilo/images/spriteDivIcons.gif</include>
+                            <include>dijit/themes/nihilo/images/buttonHover.png</include>
+                            <include>dijit/themes/nihilo/images/spriteTree.gif</include>
+                            <include>dijit/themes/nihilo/images/treeHover.png</include>
+                            <include>dijit/themes/nihilo/images/treeI.gif</include>
+                            <include>dijit/themes/nihilo/images/treeI_half.gif</include>
                         </resrouce>
                     </webResources>
                 </configuration>
             </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.9.1</version>
-                    <configuration>
-                        <aggregate>true</aggregate>
-                        <detectLinks />
-                        <links>
-                            <link>http://download.oracle.com/javase/1.7.0/docs/api/</link>
-                            <link>http://java.sun.com/products/servlet/2.5/javadoc</link>
-                            <link>http://www.snmp4j.org/doc</link>
-                            <link>http://rrd4j.googlecode.com/git/javadoc/</link>
-                            <link>http://junit.org/javadoc/4.11/</link>
-                            <link>http://jetty.codehaus.org/jetty/jetty-6/apidocs/</link>
-                            <link>http://ws.apache.org/xmlrpc/apidocs</link>
-                            <link>http://www.json.org/javadoc/</link>
-                            <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
-                            <link>http://commons.apache.org/proper/commons-net/javadocs/api-3.3/</link>
-                            <link>http://commons.apache.org/fileupload/apidocs/</link>
-                            <link>http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/</link>
-                            <link>http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/</link>
-                        </links>
-                        <bootclasspath>${sun.boot.class.path}</bootclasspath>
-                    </configuration>
-                </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <configuration>
+                    <aggregate>true</aggregate>
+                    <detectLinks />
+                    <links>
+                        <link>http://download.oracle.com/javase/1.7.0/docs/api/</link>
+                        <link>http://java.sun.com/products/servlet/2.5/javadoc</link>
+                        <link>http://www.snmp4j.org/doc</link>
+                        <link>http://rrd4j.googlecode.com/git/javadoc/</link>
+                        <link>http://junit.org/javadoc/4.11/</link>
+                        <link>http://jetty.codehaus.org/jetty/jetty-6/apidocs/</link>
+                        <link>http://ws.apache.org/xmlrpc/apidocs</link>
+                        <link>http://www.json.org/javadoc/</link>
+                        <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
+                        <link>http://commons.apache.org/proper/commons-net/javadocs/api-3.3/</link>
+                        <link>http://commons.apache.org/fileupload/apidocs/</link>
+                        <link>http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/</link>
+                        <link>http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/</link>
+                    </links>
+                    <bootclasspath>${sun.boot.class.path}</bootclasspath>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
