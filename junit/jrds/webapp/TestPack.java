@@ -75,12 +75,10 @@ public class TestPack {
         Assert.assertEquals(0, params.get("autoperiod"));
         Assert.assertEquals("0", params.get("min"));
         Assert.assertEquals("10", params.get("max"));
-
-        Period p = new Period(params.getString("begin"), params.getString("end"));
+        Period p = new Period(params.get("begin").toString(), params.get("end").toString());
         logger.trace(p);
-        //		Assert.assertEquals(60 *1000, p.getBegin().getTime());
-        //		Assert.assertEquals(3600 * 1000, p.getEnd().getTime());
-
+        Assert.assertEquals(1, p.getBegin().getTime());
+        Assert.assertEquals(60000, p.getEnd().getTime());
     }
 
     @Test
