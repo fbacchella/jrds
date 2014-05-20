@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
 
 import jrds.PropertiesManager;
-import jrds.jmx.Management;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -60,13 +60,12 @@ public class Jetty extends CommandStarterImpl {
 
         if(pm.withjmx) {
             doJmx(pm);
-            Management.register(propFile);
         }
 
         System.setProperty("org.mortbay.log.class", jrds.standalone.JettyLogger.class.getName());
 
         final Server server = new Server();
-        Connector connector=new SelectChannelConnector();
+        Connector connector = new SelectChannelConnector();
         connector.setPort(port);
 
         //Let's try to start the connector before the application
@@ -117,7 +116,7 @@ public class Jetty extends CommandStarterImpl {
         handlers.setHandlers(new Handler[]{staticFiles, webapp});
         server.setHandler(handlers);
 
-        if(pm.withjmx) {
+        if(pm.withjmx || MBeanServerFactory.findMBeanServer(null).size() > 0) {
             MBeanServer mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
             server.getContainer().addEventListener(new org.mortbay.management.MBeanContainer(mbs));
             handlers.addHandler(new org.mortbay.jetty.handler.StatisticsHandler());    

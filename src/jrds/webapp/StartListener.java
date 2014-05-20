@@ -7,11 +7,13 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Properties;
 
+import javax.management.MBeanServerFactory;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import jrds.StoreOpener;
+import jrds.jmx.Management;
 
 import org.apache.log4j.Logger;
 
@@ -44,6 +46,10 @@ public class StartListener implements ServletContextListener {
             ctxt.setAttribute(StartListener.class.getName(), this);
             Properties p = readProperties(ctxt);
             jrds.Configuration.configure(p);
+            //Register the mbean in MBeanServer if jmx activated
+            if(MBeanServerFactory.findMBeanServer(null).size() > 0) {
+                Management.register(ctxt);
+            }
             started = true;
             logger.info("Application jrds started");
         }
@@ -58,6 +64,9 @@ public class StartListener implements ServletContextListener {
             started = false;
             jrds.Configuration.stopConf();
             StoreOpener.stop();
+            if(MBeanServerFactory.findMBeanServer(null).size() > 0) {
+                Management.unregister();
+            }
             logger.info("Application jrds stopped");
         }
     }
