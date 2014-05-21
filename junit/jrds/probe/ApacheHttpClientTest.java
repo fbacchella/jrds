@@ -14,6 +14,7 @@ import jrds.Tools;
 import jrds.starter.Connection;
 import jrds.starter.HostStarter;
 import jrds.starter.Resolver;
+import jrds.starter.SSLStarter;
 import jrds.starter.SocketFactory;
 import jrds.starter.Starter;
 
@@ -45,6 +46,7 @@ public class ApacheHttpClientTest {
 
         HostStarter localhost = new HostStarter(new HostInfo("localhost"));
         localhost.getHost().setHostDir(testFolder.getRoot());
+        localhost.registerStarter(new SSLStarter());
         localhost.registerStarter(new SocketFactory());
         localhost.registerStarter(cnx);
         cnx.configure(pm);
@@ -55,6 +57,7 @@ public class ApacheHttpClientTest {
     public void testStart() throws IOException {
         HttpClientStarter cnx = new HttpClientStarter();
         HostStarter localhost = addConnection(cnx);
+        localhost.find(SSLStarter.class).doStart();
         localhost.find(Resolver.class).doStart();
         logger.debug("resolver started for localhost:" + localhost.find(Resolver.class).isStarted());
         cnx.doStart();
