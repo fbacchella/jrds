@@ -75,7 +75,7 @@ public class SSLStarter extends Starter {
 
     public Socket connect(String host, int port) throws NoSuchAlgorithmException, KeyManagementException, UnknownHostException, IOException {
         SocketFactory ss = getLevel().find(SocketFactory.class); 
-        Socket s = ss.createSocket();
+        Socket s = ss.createSocket(host, port);
 
         SSLSocketFactory ssf = getContext().getSocketFactory();
         s = ssf.createSocket(s, host, port, true);
