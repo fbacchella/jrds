@@ -237,6 +237,12 @@ public final class ArgFactory {
                 T annotation = searched.getAnnotation(annontationClass);
                 annotations.add(annotation);
             }
+            for(Class<?> i: searched.getInterfaces()) {
+                if(i.isAnnotationPresent(annontationClass)) {
+                    T annotation = i.getAnnotation(annontationClass);
+                    annotations.add(annotation);
+                }
+            }
             searched = searched.getSuperclass();
         }
         return annotations;
