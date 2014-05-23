@@ -76,8 +76,7 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
         if(! isCollectRunning())
             return Collections.emptyMap();
 
-        Map<String, Number> vars = new HashMap<String, Number>();
-
+        StringBuffer message = new StringBuffer();
         try {
             OutputStream outputSocket = s.getOutputStream();
             InputStream inputSocket = s.getInputStream();
@@ -87,34 +86,45 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
 
             byte[] buffer = new byte[4096];
             int n;
-            StringBuffer message = null;
             while((n = inputSocket.read(buffer)) > 0) {
                 String messageBuffer = new String(buffer, 0, n, encoding);
-                log(Level.TRACE, "message content: %s", messageBuffer);
-                if(messageBuffer.startsWith("<?xml version=\"1.0\"?>")) {
-                    if(message != null)
-                        parse(message.toString(), vars, xmlstarter);
-                    message = new StringBuffer(messageBuffer);
-                }
-                else if(message != null){
-                    message.append(messageBuffer);
-                }
-                else {
-                    log(Level.ERROR, "invalid response from %s: %s", iloHost, messageBuffer);
-                    break;
-                }
+                message.append(messageBuffer);
             }
-            s.close();
         } catch (IOException e) {
             log(Level.ERROR, e, "SSL socket error %s", e);
         }
+        finally {
+            try {
+                s.close();
+            } catch (IOException e) {
+                log(Level.ERROR, e, "SSL socket error %s", e);
+            }            
+        }
 
-        return vars;
+        if(message.length() > 0) {
+            return parseRibcl(message.toString(), xmlstarter);            
+        }
+        else {
+            return Collections.emptyMap();
+        }
     }
 
     @Override
     public String getSourceType() {
         return "RIBCL";
+    }
+
+    Map<String, Number> parseRibcl(String message, XmlProvider xmlstarter) {
+        int start = 0;
+        int end = 0;
+        Map<String, Number> vars = new HashMap<String, Number>();
+        while(start >= 0) {
+            int nextstart = message.indexOf("<?xml ", end + 2);
+            end = (nextstart != - 1 ? nextstart : message.length()) - 1;
+            parse(message.substring(start, end), vars, xmlstarter);                    
+            start = nextstart;
+        }
+        return vars;
     }
 
     protected Document makeDocument(XmlProvider xmlstarter) {
@@ -146,11 +156,9 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
         try {
             Util.serialize(ribclQ, out, null, properties);
         } catch (TransformerException e) {
-            log(Level.FATAL, e, "Unable to serialize in memory");
-            throw new Error(e);
+            throw new RuntimeException("Unable to serialize in memory", e);
         } catch (IOException e) {
-            log(Level.FATAL, e, "Unable to serialize in memory");
-            throw new Error(e);
+            throw new RuntimeException("Unable to serialize in memory", e);
         }
     }
 

@@ -3,7 +3,6 @@ package jrds.probe;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import jrds.factories.ProbeMeta;
@@ -53,6 +52,9 @@ public class RibclHttp extends Ribcl {
             bufferStream.reset();
             entity.writeTo(bufferStream);
             log(Level.DEBUG, "http response was\n%s\n%s", response.getStatusLine(), bufferStream);
+            if(response.getStatusLine().getStatusCode() != 200) {
+                log(Level.ERROR, "Request error: %d %s", response.getStatusLine().getStatusCode(), response.getStatusLine().getReasonPhrase()); 
+            }
         } catch (ClientProtocolException e1) {
             log(Level.ERROR, e1, "HTTP protocol failed: %s", e1.getMessage()); 
             return Collections.emptyMap();
@@ -61,17 +63,7 @@ public class RibclHttp extends Ribcl {
             return Collections.emptyMap();
         }
 
-        String xmlresponse = bufferStream.toString();
-        int start = 0;
-        int end = 0;
-        Map<String, Number> vars = new HashMap<String, Number>();
-        while(start >= 0) {
-            int nextstart = xmlresponse.indexOf("<?xml ", end + 2);
-            end = (nextstart != - 1 ? nextstart : xmlresponse.length()) - 1;
-            parse(xmlresponse.substring(start, end), vars, xmlstarter);                    
-            start = nextstart;
-        }
-        return vars;
+        return parseRibcl(bufferStream.toString(), xmlstarter);
     }
 
     @Override
