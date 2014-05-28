@@ -10,6 +10,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -17,7 +18,6 @@ import jrds.factories.xml.EntityResolver;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.log4j.Logger;
@@ -26,9 +26,6 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-/**
- * Servlet implementation class Upload
- */
 public class Upload extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(Upload.class);
 
@@ -43,6 +40,9 @@ public class Upload extends JrdsServlet {
             DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
             instance.setIgnoringComments(true);
             instance.setValidating(true);
+            instance.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            instance.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
             DocumentBuilder dbuilder = instance.newDocumentBuilder();
             dbuilder.setEntityResolver(new EntityResolver());
             dbuilder.setErrorHandler(new ErrorHandler() {
@@ -53,11 +53,11 @@ public class Upload extends JrdsServlet {
                     throw exception;
                 }
                 public void warning(SAXParseException exception) throws SAXException {
-                    throw exception;
+                    logger.warn(exception.getMessage());
                 }
             });
 
-            List<FileItem> items = extracted(request, upload);
+            List<FileItem> items = upload.parseRequest(request);
 
             response.setContentType("text/html");
 
@@ -90,6 +90,7 @@ public class Upload extends JrdsServlet {
                     } catch (Exception e) {
                         w.key("error").value(e.getMessage());
                         w.key("parsed").value(false);
+                        logger.error("upload file failed: " + e, e);
                     }
                     uploadedStream.close();
                     w.endObject();
@@ -99,15 +100,9 @@ public class Upload extends JrdsServlet {
             outputWriter.println("</textarea>");
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            logger.error("upload file failed: " + e);
+            logger.error("upload file failed: " + e, e);
         }
         response.flushBuffer();
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<FileItem> extracted(HttpServletRequest request, ServletFileUpload upload)
-            throws FileUploadException {
-        return upload.parseRequest(request);
     }
 
 }
