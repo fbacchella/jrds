@@ -29,7 +29,7 @@ import org.apache.log4j.Level;
 @ProbeMeta(
         timerStarter=jrds.probe.HttpClientStarter.class
         )
-public abstract class HCHttpProbe extends HttpProbe {
+public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
 
     @Override
     public Map<String, Number> getNewSampleValues() {
