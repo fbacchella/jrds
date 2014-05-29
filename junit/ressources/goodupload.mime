@@ -1,0 +1,11 @@
+------------------------------84223b7e8d58
+Content-Disposition: form-data; name="truc"; filename="localhost.xml"
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE host PUBLIC "-//jrds//DTD Host//EN" "urn:jrds:host">
+<host name="localhost" dnsName="localhost">
+    <tag>localhost</tag>
+</host>
+
+------------------------------84223b7e8d58--
