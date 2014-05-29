@@ -49,15 +49,9 @@
             <version>20140107</version>
         </dependency>
         <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
-            <version>6.1.26</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>servlet-api</artifactId>
-                    <groupId>org.mortbay.jetty</groupId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>9.2.0.v20140526</version>
         </dependency>
         <dependency>
             <groupId>org.apache.xmlrpc</groupId>
@@ -112,23 +106,11 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty-servlet-tester</artifactId>
-            <version>6.1.26</version>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
-            <artifactId>servlet-api</artifactId>
-            <groupId>org.mortbay.jetty</groupId>
-            <version>2.5-20081211</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty-management</artifactId>
-            <version>6.1.26</version>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-jmx</artifactId>
+            <version>9.2.0.v20140526</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -141,6 +123,21 @@
         	<artifactId>opendmk_jmxremote_optional_jar</artifactId>
         	<version>1.0-b01-ea</version>
         	<scope>test</scope>
+        </dependency>
+        <dependency>
+        	<groupId>org.eclipse.jetty</groupId>
+        	<artifactId>jetty-webapp</artifactId>
+        	<version>9.2.0.v20140526</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.slf4j</groupId>
+        	<artifactId>slf4j-log4j12</artifactId>
+        	<version>1.7.7</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.slf4j</groupId>
+        	<artifactId>slf4j-api</artifactId>
+        	<version>1.7.7</version>
         </dependency>
     </dependencies>
     <repositories>
