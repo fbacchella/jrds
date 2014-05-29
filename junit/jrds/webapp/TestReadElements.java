@@ -11,6 +11,8 @@ import jrds.Tools;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.eclipse.jetty.http.HttpTester.Response;
+import org.eclipse.jetty.servlet.ServletTester;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,14 +20,12 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mortbay.jetty.testing.HttpTester;
-import org.mortbay.jetty.testing.ServletTester;
 
 public class TestReadElements {
     static final private Logger logger = Logger.getLogger(TestReadElements.class);
 
     static ServletTester tester = null;
-    
+
     private final class TreeContent {
         List<JSONObject> graphs = new ArrayList<JSONObject>();
         List<JSONObject> trees = new ArrayList<JSONObject>();
@@ -38,10 +38,10 @@ public class TestReadElements {
 
     @BeforeClass
     static public void configure() throws Exception {
+        System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
+        System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
-        logger.setLevel(Level.TRACE);
-        System.setProperty("org.mortbay.log.class", "jrds.standalone.JettyLogger");
-        Tools.setLevel(logger.getLevel(), TestReadElements.class.getName(), "jrds.webapp");
+        Tools.setLevel(logger, Level.TRACE, TestReadElements.class.getName(), "jrds.webapp");
     }
 
     @Before
@@ -64,7 +64,7 @@ public class TestReadElements {
 
     private JSONObject jsonquery(String query) throws IOException, Exception {
         String url = String.format("http://tester%s", query);
-        HttpTester response = ToolsWebApp.doRequestGet(tester, url, 200);
+        Response response = ToolsWebApp.doRequestGet(tester, url, 200);
         JSONObject content = new JSONObject(response.getContent());
         logger.debug(content);
 
@@ -96,7 +96,7 @@ public class TestReadElements {
             }
             else if("node".equals(type)) {
                 result.nodes.add(item);
-             }
+            }
             else {
                 Assert.fail(type);
             }
@@ -194,7 +194,7 @@ public class TestReadElements {
             Assert.assertNotEquals(null, jsontab.get("label"));
         }
     }
-    
+
     @Test
     public void testDetails() throws IOException, Exception {
         JSONObject details = jsonquery("/details?pid=-554902849");

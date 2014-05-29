@@ -3,16 +3,15 @@ package jrds.webapp;
 import java.util.Properties;
 
 import jrds.Tools;
-import jrds.standalone.JettyLogger;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mortbay.jetty.testing.ServletTester;
 
 public class TestSecurity  {
     static final private Logger logger = Logger.getLogger(TestSecurity.class);
@@ -24,9 +23,10 @@ public class TestSecurity  {
 
     @BeforeClass
     static public void configure() throws Exception {
+        System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
+        System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
-        System.setProperty("org.mortbay.log.class", jrds.standalone.JettyLogger.class.getName());
-        Tools.setLevel(logger, Level.TRACE, JettyLogger.class.getName(), Status.class.getName(), "jrds.webapp.Configuration", "jrds.webapp.JrdsServlet");
+        Tools.setLevel(logger, Level.TRACE, Status.class.getName(), "jrds.webapp.Configuration", "jrds.webapp.JrdsServlet");
     }
 
     @Before
