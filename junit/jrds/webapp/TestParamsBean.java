@@ -21,13 +21,13 @@ public class TestParamsBean {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
-    
+
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, "jrds.webapp.ParamsBean");
     }
-    
+
     @Test
     public void testone() throws IOException {
         PropertiesManager pm = Tools.makePm(testFolder, "tabs=filtertab,customgraph,@,sumstab,servicestab,viewstab,hoststab,tagstab,adminTab");
@@ -35,6 +35,6 @@ public class TestParamsBean {
         Map<String, String[]> props = Collections.emptyMap();
         @SuppressWarnings("unused")
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(props, "Dummy//Host", "MockGraphInstance", "detailInfo"), hl, "host", "graphname", "detail");
-
     }
+    
 }

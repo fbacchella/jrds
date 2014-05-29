@@ -3,10 +3,10 @@ package jrds.webapp;
 import java.util.Properties;
 
 import jrds.Tools;
-import jrds.standalone.JettyLogger;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.eclipse.jetty.http.HttpTester.Response;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,25 +14,23 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mortbay.jetty.testing.HttpTester;
-import org.mortbay.jetty.testing.ServletTester;
 
 public class TestTree {
 
     static final private Logger logger = Logger.getLogger(TestQueryParams.class);
 
-    ServletTester tester = null;
+    org.eclipse.jetty.servlet.ServletTester tester = null;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws Exception {
+        System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
+        System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
         Tools.prepareXml(false);
-        System.setProperty("org.mortbay.log.class", "jrds.standalone.JettyLogger");
-        Tools.setLevel(logger, Level.TRACE, JettyLogger.class.getName(), GetDiscoverHtmlCode.class.getName(), "jrds.webapp.Configuration", "jrds.webapp.JrdsServlet");
-        Tools.setLevel(Level.INFO, "jrds.standalone.JettyLogger");
+        Tools.setLevel(logger, Level.TRACE, GetDiscoverHtmlCode.class.getName(), "jrds.webapp.Configuration", "jrds.webapp.JrdsServlet");
     }
 
     @Before
@@ -45,7 +43,7 @@ public class TestTree {
     @Test
     public void testDiscover() throws Exception
     {
-        HttpTester response = ToolsWebApp.doRequestGet(tester, "http://localhost/jsontree?tab=hoststab", 200);
+        Response response = ToolsWebApp.doRequestGet(tester, "http://localhost/jsontree?tab=hoststab", 200);
 
         logger.trace(response.getContent());
         JSONObject qp = new JSONObject(response.getContent());

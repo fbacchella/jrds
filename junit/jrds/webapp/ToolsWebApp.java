@@ -12,10 +12,12 @@ import jrds.Probe;
 import jrds.mockobjects.MokeProbe;
 import jrds.starter.HostStarter;
 
+import org.eclipse.jetty.http.HttpTester;
+import org.eclipse.jetty.http.HttpTester.Request;
+import org.eclipse.jetty.http.HttpTester.Response;
+import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Assert;
 import org.junit.rules.TemporaryFolder;
-import org.mortbay.jetty.testing.HttpTester;
-import org.mortbay.jetty.testing.ServletTester;
 
 public class ToolsWebApp {
     static ServletTester getTestServer(Properties ctxt) {
@@ -50,16 +52,37 @@ public class ToolsWebApp {
         return tester;
     }
 
-    static HttpTester doRequestGet(ServletTester tester, String query, int expectedStatus) throws IOException, Exception {
+    static Response doRequestGet(ServletTester tester, String query, int expectedStatus) throws IOException, Exception {
         URL queryURL = new URL(query);
-        HttpTester request = new HttpTester();
-        HttpTester response = new HttpTester();
+        Request request = HttpTester.newRequest();
         request.setMethod("GET");
         request.setHeader("Host", queryURL.getHost());
         String args = queryURL.getQuery();
         request.setURI(queryURL.getPath()  + (args != null ? "?" + args : ""));
         request.setVersion("HTTP/1.0");
-        response.parse(tester.getResponses(request.generate()));
+        Response response = HttpTester.parseResponse(tester.getResponses(request.generate()));
+        Assert.assertEquals(expectedStatus,response.getStatus());
+
+        return response;
+    }
+    
+    static abstract class MakePostContent {
+        abstract void fillRequest(Request r);
+    }
+
+    static Response doRequestPost(ServletTester tester, String query, MakePostContent filler, int expectedStatus) throws IOException, Exception {
+        URL queryURL = new URL(query);
+        Request request = HttpTester.newRequest();
+        request.setMethod("POST");
+        String args = queryURL.getQuery();
+        request.setURI(queryURL.getPath()  + (args != null ? "?" + args : ""));
+        request.setVersion("HTTP/1.0");
+
+        request.setHeader("Host", queryURL.getHost());
+        //request.setHeader("Content-Type", "multipart/form-data; boundary=----------------------------84223b7e8d58");
+        //request.setContent(content);
+        filler.fillRequest(request);
+        Response response = HttpTester.parseResponse(tester.getResponses(request.generate()));
         Assert.assertEquals(expectedStatus,response.getStatus());
 
         return response;

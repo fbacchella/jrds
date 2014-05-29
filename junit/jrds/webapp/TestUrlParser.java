@@ -36,6 +36,8 @@ public class TestUrlParser {
 
     @BeforeClass
     static public void configure() throws IOException {
+        System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
+        System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, ParamsBean.class.getName());
         hl = new HostsList(new PropertiesManager());
