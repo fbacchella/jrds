@@ -2,8 +2,7 @@ package jrds.standalone;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
 import java.util.Properties;
 
 import javax.management.MBeanServer;
@@ -13,21 +12,23 @@ import jrds.PropertiesManager;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.HandlerCollection;
-import org.mortbay.jetty.handler.HandlerList;
-import org.mortbay.jetty.handler.ResourceHandler;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.security.Authenticator;
-import org.mortbay.jetty.security.BasicAuthenticator;
-import org.mortbay.jetty.security.Constraint;
-import org.mortbay.jetty.security.ConstraintMapping;
-import org.mortbay.jetty.security.HashUserRealm;
-import org.mortbay.jetty.security.SecurityHandler;
-import org.mortbay.jetty.security.UserRealm;
-import org.mortbay.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.jmx.MBeanContainer;
+import org.eclipse.jetty.security.Authenticator;
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.LoginService;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.server.handler.StatisticsHandler;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 public class Jetty extends CommandStarterImpl {
 
@@ -62,54 +63,51 @@ public class Jetty extends CommandStarterImpl {
             doJmx(pm);
         }
 
-        System.setProperty("org.mortbay.log.class", jrds.standalone.JettyLogger.class.getName());
+        System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
+        System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
 
         final Server server = new Server();
-        Connector connector = new SelectChannelConnector();
+        ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);
 
         //Let's try to start the connector before the application
         try {
             connector.open();
         } catch (IOException e) {
+            connector.close();
             throw new RuntimeException("Jetty server failed to start", e);
         }
         server.setConnectors(new Connector[]{connector});
 
-        final WebAppContext webapp = new WebAppContext(webRoot, "/");
+        WebAppContext webapp = new WebAppContext();
+        webapp.setContextPath("/");
+        webapp.setResourceBase(webRoot);
         webapp.setClassLoader(getClass().getClassLoader());
-        Map<String, Object> initParams = new HashMap<String, Object>();
-        initParams.put("propertiesFile", propFileName);
-        webapp.setInitParams(initParams);
+        webapp.setInitParameter("propertiesFile", propFileName);
 
         ResourceHandler staticFiles=new ResourceHandler();
         staticFiles.setWelcomeFiles(new String[]{"index.html"});
         staticFiles.setResourceBase(webRoot);
 
         if(pm.security) {
-            try {
-                UserRealm myrealm = new HashUserRealm("jrds",pm.userfile);
-                server.setUserRealms(new UserRealm[] {myrealm});
+            LoginService loginService = new HashLoginService("jrds",pm.userfile);
+            server.addBean(loginService); 
 
-                Authenticator auth = new BasicAuthenticator();
-                Constraint constraint = new Constraint();
-                constraint.setName("jrds");;
-                constraint.setRoles(new String[]{Constraint.ANY_ROLE});
-                constraint.setAuthenticate(true);
-                constraint.setDataConstraint(Constraint.DC_NONE);
+            Authenticator auth = new BasicAuthenticator();
+            Constraint constraint = new Constraint();
+            constraint.setName("jrds");;
+            constraint.setRoles(new String[]{Constraint.ANY_ROLE});
+            constraint.setAuthenticate(true);
+            constraint.setDataConstraint(Constraint.DC_NONE);
 
-                ConstraintMapping cm = new ConstraintMapping();
-                cm.setConstraint(constraint);
-                cm.setPathSpec("/*");
+            ConstraintMapping cm = new ConstraintMapping();
+            cm.setConstraint(constraint);
+            cm.setPathSpec("/*");
 
-                SecurityHandler sh = new SecurityHandler();
-                sh.setUserRealm(myrealm);
-                sh.setConstraintMappings(new ConstraintMapping[]{cm});
-                sh.setAuthenticator(auth);
-                webapp.setSecurityHandler(sh);
-            } catch (IOException e) {
-                throw new RuntimeException("Jetty server failed to configure authentication", e);
-            }
+            ConstraintSecurityHandler sh = new ConstraintSecurityHandler();
+            sh.setConstraintMappings(Collections.singletonList(cm));
+            sh.setAuthenticator(auth);
+            webapp.setSecurityHandler(sh);
         }
 
         HandlerCollection handlers = new HandlerList();
@@ -118,8 +116,8 @@ public class Jetty extends CommandStarterImpl {
 
         if(pm.withjmx || MBeanServerFactory.findMBeanServer(null).size() > 0) {
             MBeanServer mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
-            server.getContainer().addEventListener(new org.mortbay.management.MBeanContainer(mbs));
-            handlers.addHandler(new org.mortbay.jetty.handler.StatisticsHandler());    
+            server.addBean(new MBeanContainer(mbs));
+            handlers.addHandler(new StatisticsHandler());    
         }
 
         //Properties are not needed any more
@@ -137,7 +135,7 @@ public class Jetty extends CommandStarterImpl {
         Runtime.getRuntime().addShutdownHook(finish);
 
         try {
-            server.start();
+            server.start();            
             server.join();
         } catch (Exception e) {
             throw new RuntimeException("Jetty server failed to start", e);
