@@ -43,8 +43,8 @@ public class TestUpload {
     }
 
     @Test
-    public void testXXE() throws Exception {
-        InputStream is = Tools.class.getResourceAsStream("/ressources/xxetesting.mime");
+    public void testXXE1() throws Exception {
+        InputStream is = Tools.class.getResourceAsStream("/ressources/xxetesting1.mime");
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         byte[] buffer = new byte[8192];
@@ -73,6 +73,41 @@ public class TestUpload {
         JSONObject jobject = new JSONObject("{ \"vector\": " + content.substring(content.indexOf('['), content.lastIndexOf(']') + 1) + "}");
         Assert.assertEquals(1, jobject.getJSONArray("vector").length());
         // If parsing is secure, it doesn't fail on a non existent file
+        Assert.assertEquals(Boolean.TRUE, jobject.getJSONArray("vector").getJSONObject(0).get("parsed"));
+    }
+
+    @Test
+    public void testXXE2() throws Exception {
+        InputStream is = Tools.class.getResourceAsStream("/ressources/xxetesting2.mime");
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        byte[] buffer = new byte[8192];
+        int len;
+        while ((len = is.read(buffer)) > -1 ) {
+            baos.write(buffer, 0, len);
+        }
+        baos.flush();
+
+        logger.debug("Sending " + baos.toString("UTF-8"));
+
+        Response response = ToolsWebApp.doRequestPost(tester, "http://tester/upload", new ToolsWebApp.MakePostContent() {
+            @Override
+            void fillRequest(Request r) {
+                r.setHeader("Content-Type", "multipart/form-data; boundary=----------------------------84223b7e8d58");
+                try {
+                    r.setContent(baos.toString("UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }, 200);
+        Assert.assertEquals(200, response.getStatus());
+        String content =  response.getContent();
+        logger.debug("got " + content);
+        JSONObject jobject = new JSONObject("{ \"vector\": " + content.substring(content.indexOf('['), content.lastIndexOf(']') + 1) + "}");
+        Assert.assertEquals(1, jobject.getJSONArray("vector").length());
+        // If parsing is secure, it doesn't fail on a non existent file
+        logger.debug(jobject.getJSONArray("vector").getJSONObject(0));
         Assert.assertEquals(Boolean.TRUE, jobject.getJSONArray("vector").getJSONObject(0).get("parsed"));
     }
 
