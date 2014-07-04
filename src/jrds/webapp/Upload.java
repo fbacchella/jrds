@@ -41,6 +41,7 @@ public class Upload extends JrdsServlet {
             instance.setIgnoringComments(true);
             instance.setValidating(true);
             instance.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            instance.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
             instance.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 
             DocumentBuilder dbuilder = instance.newDocumentBuilder();

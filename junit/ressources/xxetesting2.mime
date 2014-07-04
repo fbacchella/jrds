@@ -1,0 +1,12 @@
+------------------------------84223b7e8d58
+Content-Disposition: form-data; name="truc"; filename="localhost.xml"
+Content-Type: application/xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE foo [  
+  <!ELEMENT foo ANY >
+  <!ENTITY % remote SYSTEM "http://localhost/jrds.fr" >
+  %remote;
+  ]><foo></foo>
+ 
+------------------------------84223b7e8d58--
