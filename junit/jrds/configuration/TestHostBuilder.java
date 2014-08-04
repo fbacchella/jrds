@@ -44,7 +44,7 @@ public class TestHostBuilder {
         Tools.setLevel(logger, Level.TRACE, "jrds.RdsHost", "jrds.starter", "jrds.Starter", "jrds.configuration.HostBuilder");
         Tools.setLevel(Level.INFO,"jrds.factories.xml.CompiledXPath");
 
-        Tools.prepareXml();
+        Tools.prepareXml(false);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class TestHostBuilder {
         probeNode.doRootElement("probe", "type=probetype");
 
         Probe<?, ?> p = hb.makeProbe(probeNode.getRootElement(), host, null);
-        Assert.assertEquals("localhost", p.getPd().getBeanMap().get("hostInfo").getReadMethod().invoke(p));
+        Assert.assertEquals("localhost", p.getPd().getBean("hostInfo").get(p));
         logger.trace(p.getName());
 
     }

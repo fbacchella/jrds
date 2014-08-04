@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map;
 
+import jrds.GenericBean;
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.ProbeDesc;
@@ -107,6 +108,12 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
                 logger.trace(Util.delayedFormatString("Specific added: requester='%s'", snmpRequester));
 
             }
+        }
+
+        //Populating the custom beans map
+        for(JrdsElement attr: root.getChildElementsByName("customattr")) {
+            String beanName = attr.getAttribute("name");
+            pd.addBean(new GenericBean.CustomBean(beanName));
         }
 
         //Populating the default arguments map

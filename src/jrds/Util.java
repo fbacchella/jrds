@@ -270,13 +270,20 @@ public class Util {
             else if((varMatcher=attrSignature.matcher(var)).matches()) {
                 String beanName = varMatcher.group(1);
                 for(Object o: arguments) {
-                    try {
-                        PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
-                        Method read = bean.getReadMethod();
-                        if(read != null)
-                            toAppend = stringSignature(read.invoke(o).toString());
-                        break;
-                    } catch (Exception e) {
+                    // probe manage it's beans
+                    if(o instanceof Probe) {
+                        GenericBean bean = ((Probe<?,?>) o).getPd().getBean(beanName);
+                        toAppend = stringSignature(bean.get(o).toString());
+                    } else {
+                        try {
+                            PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
+                            Method read = bean.getReadMethod();
+                            if(read != null)
+                                toAppend = stringSignature(read.invoke(o).toString());
+                            break;
+                        } catch (Exception e) {
+                            logger.warn(Util.delayedFormatString("can't output bean %s for %s", beanName, o));
+                        }                        
                     }
                 }
             }
@@ -284,11 +291,20 @@ public class Util {
             else if((varMatcher=attr.matcher(var)).matches()) {
                 String beanName = varMatcher.group(1);
                 for(Object o: arguments) {
-                    try {
-                        PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
-                        toAppend = bean.getReadMethod().invoke(o).toString();
-                        break;
-                    } catch (Exception e) {
+                    // probe manage it's beans
+                    if(o instanceof Probe) {
+                        GenericBean bean = ((Probe<?,?>) o).getPd().getBean(beanName);
+                        toAppend = bean.get(o).toString();
+                    } else {
+                        try {
+                            PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
+                            Method read = bean.getReadMethod();
+                            if(read != null)
+                                toAppend = read.invoke(o).toString();
+                            break;
+                        } catch (Exception e) {
+                            logger.warn(Util.delayedFormatString("can't output bean %s for %s", beanName, o));
+                        }                        
                     }
                 }
             }
@@ -317,7 +333,7 @@ public class Util {
      * @return
      */
     public static String parseOldTemplate(String template, Object[] keys, Object... arguments) {
-        //Don't lose time with an empty template
+        //Don't loose time with an empty template
         if(template == null || "".equals(template.trim())) {
             return template;
         }

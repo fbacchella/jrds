@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import jrds.GenericBean;
 import jrds.Util;
 import jrds.factories.xml.JrdsElement;
 
@@ -200,11 +201,11 @@ public final class ArgFactory {
      * @return
      * @throws InvocationTargetException
      */
-    static public Map<String, PropertyDescriptor> getBeanPropertiesMap(Class<?> c, Class<?> topClass) throws InvocationTargetException {
+    static public Map<String, GenericBean> getBeanPropertiesMap(Class<?> c, Class<?> topClass) throws InvocationTargetException {
         Set<ProbeBean> beansAnnotations = ArgFactory.enumerateAnnotation(c, ProbeBean.class, topClass);
         if(beansAnnotations.isEmpty())
             return Collections.emptyMap();
-        Map<String, PropertyDescriptor> beanProperties = new HashMap<String, PropertyDescriptor>();
+        Map<String, GenericBean> beanProperties = new HashMap<String, GenericBean>();
         for(ProbeBean annotation: beansAnnotations) {
             for(String beanName: annotation.value()) {
                 //Bean already found, don't work on it again
@@ -213,7 +214,7 @@ public final class ArgFactory {
                 }
                 try {
                     PropertyDescriptor bean = new PropertyDescriptor(beanName, c);
-                    beanProperties.put(bean.getName(), bean);
+                    beanProperties.put(bean.getName(), new GenericBean.JavaBean(bean));
                 } catch (IntrospectionException e) {
                     throw new InvocationTargetException(e, "invalid bean " + beanName + " for " + c.getName());
                 }

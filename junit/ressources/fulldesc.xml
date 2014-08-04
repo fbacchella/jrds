@@ -5,6 +5,8 @@
 	<name>name</name>
 	<probeName>probename</probeName>
 	<probeClass>jrds.mockobjects.MokeProbe</probeClass>
+	<customattr name="customattr1" />
+    <customattr name="customattr2" />
 	<specific name="specificname1">specificvalue1</specific>
 	<specific name="specificname2">specificvalue2</specific>
 	<uptimefactor>0.5</uptimefactor>

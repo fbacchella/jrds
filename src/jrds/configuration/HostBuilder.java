@@ -1,10 +1,8 @@
 package jrds.configuration;
 
-import java.beans.PropertyDescriptor;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +15,7 @@ import java.util.Set;
 
 import jrds.ArchivesSet;
 import jrds.ConnectedProbe;
+import jrds.GenericBean;
 import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.HostInfo;
@@ -304,18 +303,19 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 try {
                     String beanName = e.getKey();
                     String beanValue = e.getValue();
-                    PropertyDescriptor bean = pd.getBeanMap().get(beanName);
-                    Object value;
+                    GenericBean bean = pd.getBean(beanName);
+                    String value;
                     //If the last argument is a list, give it to the template parser
                     Object lastArgs = args.isEmpty() ? null : args.get(args.size() - 1);
+
                     if(lastArgs instanceof List) {
-                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), Util.parseTemplate(beanValue, host, lastArgs, properties));
+                        value = Util.parseTemplate(beanValue, host, lastArgs, properties);
                     }
                     else {
-                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), jrds.Util.parseTemplate(beanValue, host, properties));
+                        value = jrds.Util.parseTemplate(beanValue, host, properties);
                     }
                     logger.trace(jrds.Util.delayedFormatString("Adding bean %s=%s (%s) to default args", beanName, value, value.getClass()));
-                    bean.getWriteMethod().invoke(p, value);
+                    bean.set(p, value);
                 } catch (Exception ex) {
                     throw new RuntimeException("Invalid default bean " + e.getKey(), ex);
                 }
@@ -324,7 +324,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
         //Resolve the beans
         try {
-            setAttributes(probeNode, p, pd.getBeanMap(), host, properties);
+            setAttributes(probeNode, p, host, properties);
         } catch (IllegalArgumentException e) {
             logger.error(String.format("Can't configure %s for %s: %s", pd.getName(), host, e));
             return null;
@@ -502,11 +502,11 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         return connectionSet;
     }
 
-    private void setAttributes(JrdsElement probeNode, Object o, Map<String, PropertyDescriptor> beans, Object... context) throws IllegalArgumentException, InvocationTargetException {
+    private void setAttributes(JrdsElement probeNode, Probe<?, ?> p, Object... context) throws IllegalArgumentException, InvocationTargetException {
         //Resolve the beans
         for(JrdsElement attrNode: probeNode.getChildElementsByName("attr")) {
             String name = attrNode.getAttribute("name");
-            PropertyDescriptor bean = beans.get(name);
+            GenericBean bean = p.getPd().getBean(name);
             if(bean == null) {
                 //Context[0] should be the host
                 logger.error("Unknown bean '" + name + "' for " + context[0]);
@@ -514,23 +514,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             }
             String textValue = Util.parseTemplate(attrNode.getTextContent(), context);
             logger.trace(Util.delayedFormatString("Found attribute %s with value %s", name, textValue));
-            try {
-                Constructor<?> c = bean.getPropertyType().getConstructor(String.class);
-                Object value = c.newInstance(textValue);
-                bean.getWriteMethod().invoke(o, value);
-            } catch (IllegalArgumentException e) {
-                throw new InvocationTargetException(e, HostBuilder.class.getName());
-            } catch (SecurityException e) {
-                throw new InvocationTargetException(e, HostBuilder.class.getName());
-            } catch (InstantiationException e) {
-                throw new InvocationTargetException(e, HostBuilder.class.getName());
-            } catch (IllegalAccessException e) {
-                throw new InvocationTargetException(e, HostBuilder.class.getName());
-            } catch (InvocationTargetException e) {
-                throw new InvocationTargetException(e, HostBuilder.class.getName());
-            } catch (NoSuchMethodException e) {
-                throw new InvocationTargetException(e, HostBuilder.class.getName());
-            }
+            bean.set(p, textValue);
         }
     }
 
