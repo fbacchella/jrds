@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,6 +60,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     private Logger namedLogger = Logger.getLogger("jrds.Probe.EmptyProbe");
     private volatile boolean running = false;
     private ArchivesSet archives = ArchivesSet.DEFAULT;
+    private Map<String, String> customBeans = Collections.emptyMap();
 
     /**
      * A special case constructor, mainly used by virtual probe
@@ -88,6 +90,18 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         if( ! readSpecific()) {
             throw new RuntimeException("Creation failed");
         }
+    }
+
+    public void setBean(String key, String value) {
+        //if beans size == 0, it's the empty Map
+        if(customBeans.size() == 0) {
+            customBeans = new HashMap<String, String>(); 
+        }
+        customBeans.put(key, value);
+    }
+
+    public String getBean(String key) {
+        return customBeans.get(key);
     }
 
     /**

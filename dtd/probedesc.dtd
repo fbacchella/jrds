@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!ELEMENT probedesc (name, probeName, probeClass, index?, specific*, uptimefactor?, defaultargs?, ds*, graphs)>
+<!ELEMENT probedesc (name, probeName, probeClass, index?, customattr*, specific*, uptimefactor?, defaultargs?, ds*, graphs)>
 <!ATTLIST specific 
 			name CDATA #REQUIRED
+>
+<!ELEMENT customattr EMPTY>
+<!ATTLIST customattr
+            name CDATA #REQUIRED
 >
 <!ELEMENT specific (#PCDATA)>
 <!ELEMENT ds ((dsName, dsType)?, (oid | (oidhigh, oidlow) | collect | (collecthigh, collectlow) )?, minValue?, maxValue?, defaultValue?)>

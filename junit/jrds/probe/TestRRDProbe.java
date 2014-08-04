@@ -46,10 +46,10 @@ public class TestRRDProbe {
         pd.setProbeName("rrdtool");
         p.setPd(pd);
         p.setRrdfile(rrdfile);
-        Assert.assertEquals("invalid rrdfile bean", p.getRrdfile(), pd.getBeanMap().get("rrdfile").getReadMethod().invoke(p));
+        Assert.assertEquals("invalid rrdfile bean", p.getRrdfile(), pd.getBean("rrdfile").get(p));
         Assert.assertEquals("invalid rrdfile bean template ", p.getRrdfile().toString(), Util.parseTemplate("${attr.rrdfile}", p));
     }
-    
+
     @Test
     public void test1() throws IOException {
         RRDToolProbe p = new RRDToolProbe();

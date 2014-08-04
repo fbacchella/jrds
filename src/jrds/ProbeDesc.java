@@ -1,13 +1,12 @@
 package jrds;
 
-import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +50,7 @@ public class ProbeDesc implements Cloneable {
     private Map<String, String> defaultsArgs = null;
     private float uptimefactor = (float) 1.0;
     private Map<String, Double> defaultValues = new HashMap<String,Double>(0);
-    private Map<String, PropertyDescriptor> beans = Collections.emptyMap();
+    private Map<String, GenericBean> beans = new HashMap<String, GenericBean>(0);
 
     private static final class DsDesc {
         public DsType dsType;
@@ -358,16 +357,24 @@ public class ProbeDesc implements Cloneable {
     }
 
     public void setProbeClass(Class<? extends Probe<?,?>> probeClass) throws InvocationTargetException {
-        beans = ArgFactory.getBeanPropertiesMap(probeClass, Probe.class);
+        beans.putAll(ArgFactory.getBeanPropertiesMap(probeClass, Probe.class));
         this.probeClass = probeClass;
     }
 
-    public Map<String, PropertyDescriptor> getBeanMap() {
-        return beans;
+    public Iterable<GenericBean> getBeans() {
+        return new Iterable<GenericBean>() {
+            public Iterator<GenericBean> iterator() {
+                return beans.values().iterator();
+            }
+        };
     }
 
-    public Collection<PropertyDescriptor> getBeans() {
-        return beans.values();
+    public GenericBean getBean(String name) {
+        return beans.get(name);
+    }
+
+    public void addBean(GenericBean bean) {   
+        beans.put(bean.getName(), bean);
     }
 
     public String getName() {
@@ -474,6 +481,5 @@ public class ProbeDesc implements Cloneable {
         ProbeDesc newpd = (ProbeDesc) super.clone();
         return newpd;
     }
-
 
 }

@@ -1,7 +1,6 @@
 package jrds.probe;
 
 import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -32,12 +31,11 @@ public class HttpTest {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, "jrds.Util");
     }
-    
+
     private void validateBean(HttpProbe p) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        Map<String, PropertyDescriptor> beans = p.getPd().getBeanMap();
-        Assert.assertEquals("invalid url bean", p.getUrl(), beans.get("url").getReadMethod().invoke(p));
-        Assert.assertEquals("invalid port bean", p.getPort(), beans.get("port").getReadMethod().invoke(p));
-        Assert.assertEquals("invalid file bean", p.getFile(), beans.get("file").getReadMethod().invoke(p));
+        Assert.assertEquals("invalid url bean", p.getUrl(), p.getPd().getBean("url").get(p));
+        Assert.assertEquals("invalid port bean", p.getPort(), p.getPd().getBean("port").get(p));
+        Assert.assertEquals("invalid file bean", p.getFile(), p.getPd().getBean("file").get(p));
 
         Assert.assertEquals("invalid url bean template", p.getUrl().toString(), Util.parseTemplate("${attr.url}", p));
         Assert.assertEquals("invalid port bean template", p.getPort().toString(), Util.parseTemplate("${attr.port}", p));
@@ -98,8 +96,8 @@ public class HttpTest {
         p.setPort(81);
         p.configure();
         Assert.assertEquals("http://" + HOST + ":81/file", p.getUrlAsString());
-        Assert.assertEquals("http://" + HOST + ":81/file", pd.getBeanMap().get("url").getReadMethod().invoke(p).toString());
+        Assert.assertEquals("http://" + HOST + ":81/file", pd.getBean("url").get(p).toString());
         validateBean(p);
     }
-    
+
 }

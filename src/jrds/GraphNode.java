@@ -1,7 +1,5 @@
 package jrds;
 
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
@@ -136,21 +134,19 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
 
         try {
             Graph g =  gclass.getConstructor(GraphNode.class).newInstance(this);
-            Map<String, PropertyDescriptor> beansList = ArgFactory.getBeanPropertiesMap(gclass, Graph.class);
+            Map<String, GenericBean> beansList = ArgFactory.getBeanPropertiesMap(gclass, Graph.class);
 
             //Resolve the beans
             for(Map.Entry<String, String> e: beans.entrySet()) {
                 String name = Util.parseTemplate(e.getKey(), probe);
                 String textValue = Util.parseTemplate(e.getValue(), probe);
-                PropertyDescriptor bean = beansList.get(name);
+                GenericBean bean = beansList.get(name);
                 if(bean == null) {
                     logger.error(String.format("Unknonw bean for %s: %s", gd.getName() , name));
                     continue;
                 }
                 logger.trace(Util.delayedFormatString("Found attribute %s with value %s", name, textValue));
-                Constructor<?> c = bean.getPropertyType().getConstructor(String.class);
-                Object value = c.newInstance(textValue);
-                bean.getWriteMethod().invoke(g, value);
+                bean.set(g, textValue);
             }
             return g;
         } catch (Exception e) {

@@ -1,12 +1,12 @@
 package jrds.snmp;
 
-import java.beans.PropertyDescriptor;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.GenericBean;
 import jrds.HostInfo;
 import jrds.Tools;
 import jrds.factories.ArgFactory;
@@ -33,10 +33,10 @@ public class TestSnmpConnection {
     @Test
     public void testBuild() throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
         SnmpConnection cnx = new SnmpConnection();;
-        Map<String, PropertyDescriptor> beans = ArgFactory.getBeanPropertiesMap(cnx.getClass(), Starter.class);
-        beans.get("community").getWriteMethod().invoke(cnx, "public");
-        beans.get("version").getWriteMethod().invoke(cnx, 1);
-        
+        Map<String, GenericBean> beans = ArgFactory.getBeanPropertiesMap(cnx.getClass(), Starter.class);
+        beans.get("community").set(cnx, "public");
+        beans.get("version").set(cnx, "1");
+
         HostStarter host = new HostStarter(new HostInfo("localhost"));
         host.registerStarter(cnx);
         Assert.assertEquals("SNMP connection not found", "snmp:udp://localhost:161", host.find(SnmpConnection.class).toString());
