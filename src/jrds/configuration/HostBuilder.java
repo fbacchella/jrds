@@ -215,7 +215,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                     continue;
                 }
                 // Read the beans value for this graph and store them in a map
-                // The map is used for template parsing and will be used for graph instanciation
+                // The map is used for template parsing and will be used for graph instantiation
                 Map<String, String> attrs = new HashMap<String, String>(0);
                 for(JrdsElement attrNode: graphNode.getChildElementsByName("attr")) {
                     String name = attrNode.getAttribute("name");

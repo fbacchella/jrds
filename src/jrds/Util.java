@@ -333,7 +333,7 @@ public class Util {
      * @return
      */
     public static String parseOldTemplate(String template, Object[] keys, Object... arguments) {
-        //Don't loose time with an empty template
+        //Don't lose time with an empty template
         if(template == null || "".equals(template.trim())) {
             return template;
         }

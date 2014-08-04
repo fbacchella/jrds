@@ -1,11 +1,9 @@
 package jrds;
 
-import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -13,7 +11,6 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.configuration.ConfigObjectFactory;
-import jrds.factories.ArgFactory;
 import jrds.factories.ProbeFactory;
 import jrds.starter.HostStarter;
 
@@ -62,27 +59,13 @@ public class AllProbeCreationTest {
             logger.trace("Will create probedesc " + pd.getName());
             Probe<?,?> p = pf.makeProbe(pd.getName());
             p.setHost(hs);
-            for(PropertyDescriptor bean: pd.getBeans()) {
+            for(GenericBean bean: pd.getBeans()) {
                 try {
-                    Class<?> beanType = bean.getPropertyType();
-                    if( beanType == URL.class) {
-                        ArgFactory.beanSetter(p, bean.getName(), "http://localhost");
+                    if( "index".equals(bean.getName())) {
+                        bean.set(p, "index");
                     }
-                    else if( "index".equals(bean.getName())) {
-                        ArgFactory.beanSetter(p, bean.getName(), "index");
-                    }
-                    logger.trace(String.format("%s = (%s) %s", bean.getName(), beanType.getCanonicalName(), bean.getReadMethod().invoke(p)));
                 } catch (IllegalArgumentException e) {
                     logger.error("bean read error for '" + bean.getName() + "': " + e.getMessage());
-                } catch (IllegalAccessException e) {
-                    logger.error("bean read error for '" + bean.getName() + "': " + e.getMessage());
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                    Throwable t = e;
-                    while(t.getCause() != null)
-                        t = t.getCause();
-                    logger.error("bean read error for '" + bean.getName() + "': " + t);
-                    Assert.fail();
                 }
             }
             p.configureStarters(pm);

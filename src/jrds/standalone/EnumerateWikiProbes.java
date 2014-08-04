@@ -1,20 +1,21 @@
 package jrds.standalone;
 
-import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import jrds.GenericBean;
 import jrds.Probe;
 import jrds.ProbeConnected;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.configuration.ConfigObjectFactory;
-import jrds.factories.ArgFactory;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.core.DsDef;
@@ -135,21 +136,21 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         }
 
         //Enumerates the beans informations
-        Map<String, PropertyDescriptor> tryBeans = ArgFactory.getBeanPropertiesMap(pd.getProbeClass(), Probe.class);
+        List<GenericBean> tryBeans = new ArrayList<GenericBean>();
+        for(GenericBean bean: pd.getBeans()) {
+            tryBeans.add(bean);
+        }
+        Map<String, String> defaultBeans = pd.getDefaultArgs();
         if(! tryBeans.isEmpty()) {
-            System.out.println();
             System.out.println(doTitle("Attributes"));
             System.out.println();
             System.out.println("^ Name ^ Default value ^ Description ^");
-            for(PropertyDescriptor bean: tryBeans.values()) {
-                Method readMethod = bean.getReadMethod();
+            for(GenericBean bean: tryBeans) {                
                 String defaultValue = "";
-                if(readMethod != null) {
-                    Object o = readMethod.invoke(p);
-                    if(o != null)
-                        defaultValue = o.toString();
-                }
-                if(bean != null && bean.getWriteMethod() != null)
+                String o = defaultBeans.get(bean.getName());
+                if(o != null)
+                    defaultValue = o.toString();
+                if(bean != null )
                     System.out.println("| " + bean.getName() + " | " + defaultValue + " | | ");
             }
         }
