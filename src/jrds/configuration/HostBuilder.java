@@ -297,34 +297,35 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         ProbeDesc pd = p.getPd();
         List<Object> args = ArgFactory.makeArgs(probeNode, host, properties);
         //Prepare the probe with the default beans values
-        Map<String, String> defaultBeans = pd.getDefaultArgs();
-        if(defaultBeans != null) {
-            for(Map.Entry<String, String> e: defaultBeans.entrySet()) {
-                try {
-                    String beanName = e.getKey();
-                    String beanValue = e.getValue();
-                    GenericBean bean = pd.getBean(beanName);
-                    String value;
-                    //If the last argument is a list, give it to the template parser
-                    Object lastArgs = args.isEmpty() ? null : args.get(args.size() - 1);
+        Map<String, ProbeDesc.DefaultBean> defaultBeans = pd.getDefaultBeans();
+        for(Map.Entry<String, ProbeDesc.DefaultBean> e: defaultBeans.entrySet()) {
+            if(e.getValue().delayed) {
+                continue;
+            }
+            try {
+                String beanName = e.getKey();
+                String beanValue = e.getValue().value;
+                GenericBean bean = pd.getBean(beanName);
+                String value;
+                //If the last argument is a list, give it to the template parser
+                Object lastArgs = args.isEmpty() ? null : args.get(args.size() - 1);
 
-                    if(lastArgs instanceof List) {
-                        value = Util.parseTemplate(beanValue, host, lastArgs, properties);
-                    }
-                    else {
-                        value = jrds.Util.parseTemplate(beanValue, host, properties);
-                    }
-                    logger.trace(jrds.Util.delayedFormatString("Adding bean %s=%s (%s) to default args", beanName, value, value.getClass()));
-                    bean.set(p, value);
-                } catch (Exception ex) {
-                    throw new RuntimeException("Invalid default bean " + e.getKey(), ex);
+                if(lastArgs instanceof List) {
+                    value = Util.parseTemplate(beanValue, host, lastArgs, properties);
                 }
+                else {
+                    value = jrds.Util.parseTemplate(beanValue, host, properties);
+                }
+                logger.trace(jrds.Util.delayedFormatString("Adding attribute %s=%s (%s) to default args", beanName, value, value.getClass()));
+                bean.set(p, value);
+            } catch (Exception ex) {
+                throw new RuntimeException("Invalid default bean " + e.getKey(), ex);
             }
         }
 
         //Resolve the beans
         try {
-            setAttributes(probeNode, p, host, properties);
+            setAttributes(defaultBeans, probeNode, p, host, properties);
         } catch (IllegalArgumentException e) {
             logger.error(String.format("Can't configure %s for %s: %s", pd.getName(), host, e));
             return null;
@@ -333,6 +334,32 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         if( !pf.configure(p, args)) {
             logger.error(p + " configuration failed");
             return null;
+        }
+
+        // Now evaluate the delayed default value parsing
+        for(Map.Entry<String, ProbeDesc.DefaultBean> e: defaultBeans.entrySet()) {
+            if(! e.getValue().delayed) {
+                continue;
+            }
+            try {
+                String beanName = e.getKey();
+                String beanValue = e.getValue().value;
+                GenericBean bean = pd.getBean(beanName);
+                String value;
+                //If the last argument is a list, give it to the template parser
+                Object lastArgs = args.isEmpty() ? null : args.get(args.size() - 1);
+
+                if(lastArgs instanceof List) {
+                    value = Util.parseTemplate(beanValue, p, host, lastArgs, properties);
+                }
+                else {
+                    value = jrds.Util.parseTemplate(beanValue, p, host, properties);
+                }
+                logger.trace(jrds.Util.delayedFormatString("Adding delayed attribute %s=%s (%s) to default args", beanName, value, value.getClass()));
+                bean.set(p, value);
+            } catch (Exception ex) {
+                throw new RuntimeException("Invalid default bean " + e.getKey(), ex);
+            }
         }
 
         //A connected probe, register the needed connection
@@ -502,7 +529,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         return connectionSet;
     }
 
-    private void setAttributes(JrdsElement probeNode, Probe<?, ?> p, Object... context) throws IllegalArgumentException, InvocationTargetException {
+    private void setAttributes(Map<String, ProbeDesc.DefaultBean> defaultBeans, JrdsElement probeNode, Probe<?, ?> p, Object... context) throws IllegalArgumentException, InvocationTargetException {
         //Resolve the beans
         for(JrdsElement attrNode: probeNode.getChildElementsByName("attr")) {
             String name = attrNode.getAttribute("name");
@@ -515,6 +542,9 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             String textValue = Util.parseTemplate(attrNode.getTextContent(), context);
             logger.trace(Util.delayedFormatString("Found attribute %s with value %s", name, textValue));
             bean.set(p, textValue);
+            if(defaultBeans.containsKey(name)) {
+                defaultBeans.remove(name);
+            }
         }
     }
 

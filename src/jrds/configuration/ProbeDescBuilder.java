@@ -121,8 +121,10 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
         if(argsNode != null) {
             for(JrdsElement attr: argsNode.getChildElementsByName("attr")) {
                 String beanName = attr.getAttribute("name");
+                String finalBeanString = attr.getAttribute("delayed");
+                boolean finalBean = "true".equalsIgnoreCase(finalBeanString);
                 String beanValue = attr.getTextContent();
-                pd.addDefaultArg(beanName, beanValue);
+                pd.addDefaultBean(beanName, beanValue, finalBean);
             }
         }
 

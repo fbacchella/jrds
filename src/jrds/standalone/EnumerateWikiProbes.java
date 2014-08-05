@@ -140,15 +140,16 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         for(GenericBean bean: pd.getBeans()) {
             tryBeans.add(bean);
         }
-        Map<String, String> defaultBeans = pd.getDefaultArgs();
+        Map<String, ProbeDesc.DefaultBean> defaultBeans = pd.getDefaultBeans();
         if(! tryBeans.isEmpty()) {
             System.out.println(doTitle("Attributes"));
             System.out.println();
             System.out.println("^ Name ^ Default value ^ Description ^");
             for(GenericBean bean: tryBeans) {                
                 String defaultValue = "";
-                String o = defaultBeans.get(bean.getName());
-                if(o != null)
+                ProbeDesc.DefaultBean currentAttribute = defaultBeans.get(bean.getName());
+                String o = currentAttribute.value;
+                if(o != null && ! currentAttribute.delayed)
                     defaultValue = o.toString();
                 if(bean != null )
                     System.out.println("| " + bean.getName() + " | " + defaultValue + " | | ");

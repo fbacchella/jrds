@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE host PUBLIC "-//jrds//DTD Host//EN"
+                           "urn:jrds:host">
+<host name="myhost" dnsName="fqdn.jrds.fr">
+    <probe type="name">
+        <attr name="customattr4">value4</attr>
+    </probe>
+</host>

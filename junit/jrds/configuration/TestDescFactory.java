@@ -86,7 +86,7 @@ public class TestDescFactory {
         logger.trace(pd.getCollectMapping());
         logger.trace(pd.getCollectOids());
         logger.trace(pd.getCollectStrings());
-        logger.trace(pd.getDefaultArgs());
+        logger.trace(pd.getDefaultBeans());
         //A collect string "" should not be collected
         Assert.assertEquals(3, pd.getCollectMapping().size());
         Assert.assertEquals(1, pd.getCollectOids().size());

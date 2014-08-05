@@ -1,5 +1,6 @@
 package jrds;
 
+import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.io.CharArrayWriter;
 import java.io.IOException;
@@ -270,10 +271,22 @@ public class Util {
             else if((varMatcher=attrSignature.matcher(var)).matches()) {
                 String beanName = varMatcher.group(1);
                 for(Object o: arguments) {
+                    if(o == null) {
+                        continue;
+                    }
                     // probe manage it's beans
                     if(o instanceof Probe) {
                         GenericBean bean = ((Probe<?,?>) o).getPd().getBean(beanName);
-                        toAppend = stringSignature(bean.get(o).toString());
+                        if(bean != null) {
+                            Object beanValue = bean.get(o);
+                            if(beanValue != null) {
+                                toAppend = stringSignature(beanValue.toString());                                                         
+                            }
+                            else {
+                                toAppend = "";
+                            }
+                            break;
+                        }
                     } else {
                         try {
                             PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
@@ -281,6 +294,8 @@ public class Util {
                             if(read != null)
                                 toAppend = stringSignature(read.invoke(o).toString());
                             break;
+                        } catch (IntrospectionException e) {
+                            // not a bean, skip it
                         } catch (Exception e) {
                             logger.warn(Util.delayedFormatString("can't output bean %s for %s", beanName, o));
                         }                        
@@ -291,10 +306,22 @@ public class Util {
             else if((varMatcher=attr.matcher(var)).matches()) {
                 String beanName = varMatcher.group(1);
                 for(Object o: arguments) {
+                    if(o == null) {
+                        continue;
+                    }
                     // probe manage it's beans
                     if(o instanceof Probe) {
                         GenericBean bean = ((Probe<?,?>) o).getPd().getBean(beanName);
-                        toAppend = bean.get(o).toString();
+                        if(bean != null) {
+                            Object beanValue = bean.get(o);
+                            if(beanValue != null) {
+                                toAppend = beanValue.toString();                                                            
+                            }
+                            else {
+                                toAppend = "";
+                            }
+                            break;
+                        }
                     } else {
                         try {
                             PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
@@ -302,8 +329,10 @@ public class Util {
                             if(read != null)
                                 toAppend = read.invoke(o).toString();
                             break;
+                        } catch (IntrospectionException e) {
+                            // not a bean, skip it
                         } catch (Exception e) {
-                            logger.warn(Util.delayedFormatString("can't output bean %s for %s", beanName, o));
+                            logger.warn(Util.delayedFormatString("can't output bean %s for %s", beanName, o), e);
                         }                        
                     }
                 }
