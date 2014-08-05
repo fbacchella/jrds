@@ -328,11 +328,6 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             return null;
         }
 
-        if( !pf.configure(p, args)) {
-            logger.error(p + " configuration failed");
-            return null;
-        }
-
         // Now evaluate the delayed default value parsing
         for(Map.Entry<String, ProbeDesc.DefaultBean> e: defaultBeans.entrySet()) {
             if(! e.getValue().delayed) {
@@ -357,6 +352,11 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             } catch (Exception ex) {
                 throw new RuntimeException("Invalid default bean " + e.getKey(), ex);
             }
+        }
+
+        if( !pf.configure(p, args)) {
+            logger.error(p + " configuration failed");
+            return null;
         }
 
         //A connected probe, register the needed connection
