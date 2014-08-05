@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN"
+    "urn:jrds:probedesc">
+<probedesc>
+    <name>name</name>
+    <probeName>probename</probeName>
+    <probeClass>jrds.mockobjects.MokeProbe</probeClass>
+    <customattr name="customattr1" />
+    <customattr name="customattr2" />
+    <customattr name="customattr3" />
+    <customattr name="customattr4" />
+    <defaultargs>
+        <attr name="customattr1">defaultattr1</attr>
+        <attr name="customattr2" delayed="true">defaultattr2</attr>
+        <attr name="customattr3" delayed="true">${attr.customattr1}</attr>
+        <attr name="customattr4" delayed="true">badvalue</attr>
+    </defaultargs>
+    <ds>
+    	<dsName>empty</dsName>
+    	<dsType>gauge</dsType>
+    </ds>
+    <graphs>
+    </graphs>
+</probedesc>

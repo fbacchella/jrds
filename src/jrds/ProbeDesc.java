@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,6 +38,15 @@ import org.w3c.dom.Element;
 public class ProbeDesc implements Cloneable {
     static final private Logger logger = Logger.getLogger(ProbeDesc.class);
 
+    public static class DefaultBean {
+        public final String value;
+        public final boolean delayed;
+        DefaultBean(String value, boolean delayed) {
+            this.value = value;
+            this.delayed = delayed;
+        }
+    }
+
     static public final double MINDEFAULT = 0;
     static public final double MAXDEFAULT = Double.NaN;
 
@@ -47,7 +57,7 @@ public class ProbeDesc implements Cloneable {
     private String name;
     private final Collection<String> graphesList = new ArrayList<String>();
     private Class<? extends Probe<?,?>> probeClass = null;
-    private Map<String, String> defaultsArgs = null;
+    private Map<String, ProbeDesc.DefaultBean> defaultsBeans = Collections.emptyMap();
     private float uptimefactor = (float) 1.0;
     private Map<String, Double> defaultValues = new HashMap<String,Double>(0);
     private Map<String, GenericBean> beans = new HashMap<String, GenericBean>(0);
@@ -393,17 +403,20 @@ public class ProbeDesc implements Cloneable {
         specific.put(name, value);
     }
 
-    public void addDefaultArg(String beanName, String beanValue) throws InvocationTargetException{
-        if(defaultsArgs == null) 
-            defaultsArgs = new HashMap<String, String>();
+    public void addDefaultBean(String beanName, String beanValue, boolean finalBean) throws InvocationTargetException{
+        ProbeDesc.DefaultBean attr = new  ProbeDesc.DefaultBean(beanValue, finalBean);
+        if(defaultsBeans.size() == 0) 
+            defaultsBeans = new HashMap<String, ProbeDesc.DefaultBean>();
         if( beans.containsKey(beanName)) {
-            defaultsArgs.put(beanName, beanValue);
-            logger.trace(Util.delayedFormatString("Adding bean %s=%s to default args", beanName, beanValue));
+            defaultsBeans.put(beanName, attr);
+            logger.trace(Util.delayedFormatString("Adding bean %s=%s to default beans", beanName, beanValue));
         }
     }
 
-    public Map<String, String> getDefaultArgs() {
-        return defaultsArgs;
+    public Map<String, ProbeDesc.DefaultBean> getDefaultBeans() {
+        Map<String, ProbeDesc.DefaultBean> beans = new HashMap<String, ProbeDesc.DefaultBean>(defaultsBeans.size());
+        beans.putAll(defaultsBeans);
+        return beans;
     }
 
     /**

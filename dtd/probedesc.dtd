@@ -18,6 +18,7 @@
 <!ELEMENT attr (#PCDATA)>
 <!ATTLIST attr
 			name CDATA #REQUIRED
+			delayed  (true|false) "false"
 >
 <!ELEMENT graphs (name*)>
 <!ELEMENT dsName (#PCDATA)>

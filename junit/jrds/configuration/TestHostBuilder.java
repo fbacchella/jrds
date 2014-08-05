@@ -15,6 +15,7 @@ import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.Tools;
+import jrds.Util;
 import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.mockobjects.MokeProbeBean;
@@ -75,7 +76,7 @@ public class TestHostBuilder {
                 }
                 Probe<?, ?> p = new MokeProbeBean(pd);
                 try {
-                    pd.addDefaultArg("hostInfo", "${host}");
+                    pd.addDefaultBean("hostInfo", "${host}", false);
                 } catch (Exception e) {
                     throw new RuntimeException(e.getMessage(), e);
                 }
@@ -157,6 +158,41 @@ public class TestHostBuilder {
         Assert.assertTrue(probes.containsKey("myhost/ifx-eth1"));
         Assert.assertTrue(probes.containsKey("myhost/ifx-eth2"));
         Assert.assertTrue(probes.containsKey("myhost/ifx-eth3"));
+    }
+
+    @Test
+    public void testAttributesParsing() throws Exception {
+        PropertiesManager pm = Tools.makePm(testFolder);
+        File descpath = new File("desc");
+        if(descpath.exists())
+            pm.libspath.add(descpath.toURI());
+
+        ConfigObjectFactory conf = new ConfigObjectFactory(pm);
+        JrdsDocument pddoc = Tools.parseRessource("beans.xml");
+        conf.getNodeMap(ConfigType.PROBEDESC).put("name", pddoc);
+
+        Map<String, GraphDesc> graphDescMap = conf.setGraphDescMap();
+        Map<String, ProbeDesc> probeDescMap = conf.setProbeDescMap();
+        ProbeFactory pf = new ProbeFactory(probeDescMap, graphDescMap);
+
+        HostBuilder hb = new HostBuilder();
+        hb.setPm(pm);
+        hb.setClassLoader(this.getClass().getClassLoader());
+        hb.setMacros(new HashMap<String, Macro>(0));
+        hb.setProbeFactory(pf);
+        Map<String, Timer> timerMap = Tools.getSimpleTimerMap();
+        timerMap.put("another", timerMap.get(Timer.DEFAULTNAME));
+        hb.setTimers(timerMap);
+
+        JrdsDocument fullhost = Tools.parseRessource("attrhost.xml");
+
+        HostInfo hi = hb.build(fullhost);
+
+        Probe<?,?> p = hi.getProbes().iterator().next();
+        Assert.assertEquals("${attr.customattr1} failed", "defaultattr1", Util.parseTemplate("${attr.customattr1}", p));
+        Assert.assertEquals("${attr.customattr3} failed", "defaultattr2", Util.parseTemplate("${attr.customattr2}", p));
+        Assert.assertEquals("${attr.customattr3} failed", "defaultattr1", Util.parseTemplate("${attr.customattr3}", p));
+        Assert.assertEquals("${attr.customattr4} failed", "value4", Util.parseTemplate("${attr.customattr4}", p));
     }
 
 }
