@@ -35,8 +35,11 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
 
     private Pattern pattern = Pattern.compile("^$");
 
+
     /**
-     * @param monitoredHost
+     * @param indexName
+     * @param patternString
+     * @return
      */
     public boolean configure(String indexName, String patternString) {
         try {
@@ -147,7 +150,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
     }
 
     /**
-     * @param pattern the pattern to set
+     * @param patternString the pattern to set
      */
     public void setPattern(String patternString) {
         this.pattern = Pattern.compile(patternString);

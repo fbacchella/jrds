@@ -473,7 +473,7 @@ public class Base64
     
     /**
      * Attempts to decode Base64 data and deserialize a Java
-     * Object within. Returns <tt>null if there was an error.
+     * Object within. Returns <tt>null</tt> if there was an error.
      *
      * @param encodedObject The Base64 data to decode
      * @return The decoded and deserialized object
@@ -565,66 +565,13 @@ public class Base64
         System.arraycopy( outBuff, 0, out, 0, outBuffPosn ); 
         return out;
     }   // end decode
-    
-    
-/*    
-    public static byte[] decode2( String s )
-    {
-        int    sbL     = s.length();
-        char[] sb      = new char[ sbL ];
-        s.getChars( 0, sbL, sb, 0 );
-        int    sbL34   = sbL * 3 / 4;
-        byte[] outBuff = new byte[ sbL34 ]; // Upper limit on size of output
-        int    outBuffPosn = 0;
-        
-        byte[] b4        = new byte[4];
-        int    b4Posn    = 0;
-        int    i         = 0;
-        byte   sbiCrop   = 0;
-        byte   sbiDecode = 0;
-        for( i = 0; i < sbL; i++ )
-        {
-            sbiCrop = (byte)(sb[i] & 0x7f); // Only the low seven bits
-            sbiDecode = DECODABET[ sbiCrop ];
-            
-            if( sbiDecode >= WHITE_SPACE_ENC ) // White space, Equals sign or better
-            {
-                if( sbiDecode >= EQUALS_SIGN_ENC )
-                {
-                    b4[ b4Posn++ ] = sbiCrop;
-                    if( b4Posn > 3 )
-                    {
-                        outBuffPosn += decode4to3( b4, 0, outBuff, outBuffPosn );
-                        b4Posn = 0;
-                        
-                        // If that was the equals sign, break out of 'for' loop
-                        if( sbiCrop == EQUALS_SIGN )
-                            break;
-                    }   // end if: quartet built
-                    
-                }   // end if: equals sign or better
-                
-            }   // end if: white space, equals sign or better
-            else
-            {
-                System.err.println( "Bad Base64 input character at " + i + ": " + sb[i] + "(decimal)" );
-                return null;
-            }   // end else: 
-        }   // each input character
-                                   
-        byte[] finalOut = new byte[ outBuffPosn ];
-        System.arraycopy( outBuff, 0, finalOut, 0, outBuffPosn );
-        return finalOut;
-    }   // end decode
-*/    
-    
-    
+
     /* ********  I N N E R   C L A S S   I N P U T S T R E A M  ******** */
     
     
     
     /**
-     * A {@link Base64#InputStream} will read data from another
+     * A {@link #InputStream} will read data from another
      * {@link java.io.InputStream}, given in the constructor,
      * and encode/decode to/from Base64 notation on the fly.
      *
@@ -642,7 +589,7 @@ public class Base64
         
         
         /**
-         * Constructs a {@link Base64#InputStream} in DECODE mode.
+         * Constructs a {@link #InputStream} in DECODE mode.
          *
          * @param in the {@link java.io.InputStream} from which to read data.
          * @since 1.3
@@ -653,7 +600,7 @@ public class Base64
         
         
         /**
-         * Constructs a {@link Base64#InputStream} in
+         * Constructs a {@link #InputStream} in
          * either ENCODE or DECODE mode.
          *
          * @param in the {@link java.io.InputStream} from which to read data.
@@ -804,7 +751,7 @@ public class Base64
     
     
     /**
-     * A {@link Base64#OutputStream} will write data to another
+     * A {@link #OutputStream} will write data to another
      * {@link java.io.OutputStream}, given in the constructor,
      * and encode/decode to/from Base64 notation on the fly.
      *
@@ -820,7 +767,7 @@ public class Base64
         private int     bufferLength;
                 
         /**
-         * Constructs a {@link Base64#OutputStream} in ENCODE mode.
+         * Constructs a {@link #OutputStream} in ENCODE mode.
          *
          * @param out the {@link java.io.OutputStream} to which data will be written.
          * @since 1.3
@@ -832,7 +779,7 @@ public class Base64
         
         
         /**
-         * Constructs a {@link Base64#OutputStream} in
+         * Constructs a {@link #OutputStream} in
          * either ENCODE or DECODE mode.
          *
          * @param out the {@link java.io.OutputStream} to which data will be written.

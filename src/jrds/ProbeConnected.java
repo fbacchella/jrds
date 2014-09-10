@@ -44,7 +44,7 @@ public abstract class ProbeConnected<KeyType, ValueType, ConnectionClass extends
      * It should return return as raw as possible, they can even be opaque data tied to the probe.
      * the key is resolved using the <code>ProbeDesc</code>. A key not associated with an existent datastore will generate a warning
      * but will not prevent the other values to be stored.<br>
-     * the value should be a <code>java.lang.Number<code><br>
+     * the value should be a <code>java.lang.Number</code><br>
      * It also set the uptime for the probe, using connection data. One should override setUptime if a probe use a specific uptime, that can't be provided
      * using the connection.
      * @return the map of collected object

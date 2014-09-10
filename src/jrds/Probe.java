@@ -91,7 +91,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * A special case constructor, mainly used by virtual probe
-     * @param monitoredHost
      * @param pd
      */
     public Probe(ProbeDesc pd) {
@@ -99,11 +98,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         setPd(pd);
     }
 
-    /**
-     * A special case constructor, mainly used by virtual probe
-     * @param monitoredHost
-     * @param pd
-     */
     public Probe() {
         super();
     }

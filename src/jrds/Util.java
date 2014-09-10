@@ -68,7 +68,7 @@ public class Util {
     private static final char[] BASE64_CHARSET = BASE64_CHARS.toCharArray();
 
     /**
-     * The SI prefix as an enumeration, with factor provided.<p/>
+     * The SI prefix as an enumeration, with factor provided.<p>
      * More informations can be found at <a target="_blank" href="http://en.wikipedia.org/wiki/SI_prefix">Wikipedia's page</a> 
      */
     public enum SiPrefix {
@@ -135,7 +135,7 @@ public class Util {
 
     /**
      * Return the md5 digest value of a string, encoded in base64
-     * @param The string to use
+     * @param s The string to use
      * @return the printable md5 digest value for s
      */
     public static String stringSignature(String s)
@@ -657,13 +657,13 @@ public class Util {
         };
     }
 
+    public static final Comparator<String> nodeComparator = jrds.Util.AlphanumericSorting();
+
     /**
      * Return an alpha numeric sorter where host2 is before host10
      * Copied from http://sanjaal.com/java/tag/sample-alphanumeric-sorting/
      * @return
      */
-    public static final Comparator<String> nodeComparator = jrds.Util.AlphanumericSorting();
-
     private static Comparator<String> AlphanumericSorting() {
         return new Comparator<String>() {
 

@@ -35,10 +35,10 @@ public final class ArgFactory {
     /**
      * This method build a list from an XML enumeration of element.
      * 
-     * The enumeration is made of :<p/>
-     * <code>&lt;arg type="type" value="value"></code><p/>
-     * or<p/>
-     * <code>&lt;arg type="type">value&lt;/value></code><p/>
+     * The enumeration is made of :<p>
+     * <code>&lt;arg type="type" value="value"&gt;</code><p>
+     * or<p>
+     * <code>&lt;arg type="type"&gt;value&lt;/value&gt;</code><p>
      * This method is recursive, so it if finds some <code>list</code> elements instead of an <code>arg</code>, it will build a sub-list.
      * 
      * Unknown element will be silently ignored.

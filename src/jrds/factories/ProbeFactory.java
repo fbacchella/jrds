@@ -26,8 +26,8 @@ public class ProbeFactory {
     private Map<String, GraphDesc> graphDescMap;
 
     /**
-     * Private constructor
-     * @param b 
+     * @param probeDescMap
+     * @param graphDescMap
      */
     public ProbeFactory(Map<String, ProbeDesc> probeDescMap, Map<String, GraphDesc> graphDescMap) {
         this.probeDescMap = probeDescMap;
@@ -52,7 +52,7 @@ public class ProbeFactory {
 
     /**
      * Create an probe, provided a probe description
-     * @param ProbeDesc a probe description
+     * @param pd a probe description
      * @return A probe
      */
     public  Probe<?,?> makeProbe(ProbeDesc pd) {

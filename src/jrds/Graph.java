@@ -167,7 +167,6 @@ public class Graph implements WithACL {
     /**
      * Provide a RrdGraphDef with template resolved for the node
      * @return a RrdGraphDef with some default values
-     * @throws IOException
      */
     public RrdGraphDef getEmptyGraphDef() {
         RrdGraphDef retValue = getGraphDesc().getEmptyGraphDef();

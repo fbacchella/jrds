@@ -38,7 +38,7 @@ abstract class ConfigObjectBuilder<BuildObject> {
      * 
      * @param object The object to add a role to
      * @param n  The DOM tree where the xpath will look into
-     * @param xpath where to found the roles
+     * @param roleElements the role element
      */
     protected void doACL(WithACL object, JrdsDocument n, JrdsElement roleElements) {
         if(pm.security){
@@ -111,7 +111,7 @@ abstract class ConfigObjectBuilder<BuildObject> {
     /**
      * Apply a method on a object with the value found in the XML element
      * If the element is null, the method does nothing.
-     * @param element
+     * @param e
      * @param o
      * @param method
      * @return
@@ -129,7 +129,7 @@ abstract class ConfigObjectBuilder<BuildObject> {
     /**
      * Apply a method on a object with the value found in a collection of XML elements
      * If the element is null, the method does nothing.
-     * @param element
+     * @param e
      * @param o
      * @param method
      * @param argType

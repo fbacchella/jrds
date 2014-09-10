@@ -590,7 +590,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     }
 
     /**
-     * @param rootNode the rootNode to set
+     * @param timers
      */
     public void setTimers(Map<String, Timer> timers) {
         this.timers = timers;
