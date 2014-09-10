@@ -18,8 +18,8 @@ import org.rrd4j.core.FetchData;
  * A servlet wich return datastore values from a probe.
  * It can be used in many way :
  * The simplest way is by using a URL of the form :
- * http://<it>server</it>/values/<it>host</it>/<it>probe.</it>
- * It will return all datastores values for this probe. By adding a /<it>datastore</i>, one can choose only 
+ * http://<em>server</em>/values/<em>host</em>/<em>probe.</em>
+ * It will return all datastores values for this probe. By adding a /<em>datastore</em>, one can choose only 
  * one data store.<p>
  * It's possible to refine the query with some arguments, using REST syntax.<p>
  * The argument can be:

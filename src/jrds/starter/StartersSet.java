@@ -19,7 +19,7 @@ public interface StartersSet {
 	/**
 	 * @param key
 	 * @deprecated
-	 * Use the generic variant instead : <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc);
+	 * Use the generic variant instead : &lt;StarterClass extends Starter&gt; StarterClass find(Class&lt;StarterClass&gt; sc);
 	 * @return
 	 */
 	public Starter find(Object key);

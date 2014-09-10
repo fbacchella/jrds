@@ -31,7 +31,6 @@ public final class StoreOpener {
      * @param rrdFile Name of the RRD datasource.
      * @return RrdDb instance of the datasource.
      * @throws IOException Thrown in case of I/O error.
-     * @throws InterruptedException 
      */
     public final static RrdDb getRrd(String rrdFile)
             throws IOException {

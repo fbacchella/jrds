@@ -74,10 +74,10 @@ public class JrdsLoggerConfiguration {
      * This method prepare the log4j environment using the configuration in jrds.properties.
      * it uses the following properties
      * <ul>
-     * <li> <code>logfile</code>, used to define the log file, if not defined, no appender is created
-     * <li> <code>loglevel</code>, used to define the default loglevel
-     * <li> <code>log.&lt;level&gt;</code>, followed by a comma separated list of logger, to set the level of those logger to <code>level</code>
-     * </li>
+     * <li> <code>logfile</code>, used to define the log file, if not defined, no appender is created</li>
+     * <li> <code>loglevel</code>, used to define the default loglevel</li>
+     * <li> <code>log.&lt;level&gt;</code>, followed by a comma separated list of logger, to set the level of those logger to <code>level</code></li>
+     * </ul>
      * @param pm a configured PropertiesManager object
      * @throws IOException
      */

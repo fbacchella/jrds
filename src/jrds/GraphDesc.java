@@ -641,7 +641,7 @@ implements Cloneable, WithACL {
      * @param reversed
      * @param host
      * @param probe
-     * @param subDsName
+     * @param dsName
      */
     public void add(String name, String rpn,
             String graphType, String color, String legend,
@@ -760,7 +760,6 @@ implements Cloneable, WithACL {
      * @param probe Probe
      * @return RrdGraphDef
      * @throws IOException
-     * @throws RrdException
      */
     public RrdGraphDef getGraphDef(Probe<?,?> probe) throws IOException {
         return getGraphDef(probe, null);
@@ -904,12 +903,11 @@ implements Cloneable, WithACL {
 
     /**
      * return the RrdGraphDef for this graph, used the indicated probe
-     * any data can be overined of a provided map of Plottable
-     * @param probe
-     * @param ownData data used to overied probe's own values
+     * any data can be overridden of a provided map of {@link org.rrd4j.data.Plottable}
+     * @param defProbe
+     * @param ownData data used to override probe's own values
      * @return
      * @throws IOException
-     * @throws RrdException
      */
     public RrdGraphDef getGraphDef(Probe<?,?> defProbe, Map<String, ? extends Plottable> ownData) throws IOException {
         RrdGraphDef retValue = getEmptyGraphDef();
@@ -924,7 +922,6 @@ implements Cloneable, WithACL {
      * @param ownData data used to override probe's own values
      * @return
      * @throws IOException
-     * @throws RrdException
      */
     public DataProcessor getPlottedDatas(Probe<?,?> probe, Map<String, Plottable> ownData, long start, long end) throws IOException {
         DataProcessor retValue = new DataProcessor(start, end);
@@ -1178,7 +1175,8 @@ implements Cloneable, WithACL {
     }
 
     /**
-     * @param dimension the dimension of the graphic object to set
+     * @param height the height of the graphic object to set
+     * @param width the height of the graphic object to set
      */
     public void setDimension(int height, int width) {
         dimension = new Dimension();
@@ -1407,7 +1405,7 @@ implements Cloneable, WithACL {
     }
 
     /**
-     * @param withValues the withValues to set
+     * @param withSummary the withValues to set
      */
     public void setWithSummary(boolean withSummary) {
         this.withSummary = withSummary;

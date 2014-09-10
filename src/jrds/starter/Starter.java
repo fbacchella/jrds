@@ -20,7 +20,7 @@ public abstract class Starter {
 	}
 
     /**
-	 * This method is called when the started is really registred<p/>
+	 * This method is called when the started is really registred<p>
 	 * It can be overriden to contains delayed initialization but it must begin with a call to super.initialize(parent)
 	 * @param level
 	 */

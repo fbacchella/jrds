@@ -14,8 +14,7 @@ import org.apache.log4j.Level;
  * For example :
  * HOST-RESOURCES-MIB::hrStorageDescr.2 = STRING: C:\ Label:Win2003  Serial Number 123abc
  * But we only want c:\
- * @param monitoredHost
- * @param indexKey
+
  * @author Fabrice Bacchella 
  */
 public class PartitionSpaceWindows extends PartitionSpace {
@@ -23,7 +22,7 @@ public class PartitionSpaceWindows extends PartitionSpace {
 
     /**
      *only compare with String found before " " 
-     * @see jrds.probe.snmp.RdsIndexedSnmpRrd#matchIndex(java.lang.String, java.lang.String)
+     * @see jrds.probe.snmp.RdsIndexedSnmpRrd#matchIndex(java.lang.Object)
      */
     public boolean matchIndex(String key) {
         int nameIndex = key.indexOf(separator);

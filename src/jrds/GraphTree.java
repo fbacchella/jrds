@@ -153,7 +153,7 @@ public class GraphTree {
 	}
 
 	/**
-	 * @param Filter, can be null
+	 * @param f, can be null
 	 * @return
 	 */
 	public List<GraphNode> enumerateChildsGraph(Filter f) {

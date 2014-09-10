@@ -138,9 +138,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
     }
 
     /**
-     * This method check if the tried value match the index
-     * @param index the index value 
-     * @param key the found key tried
+     * @param readKey
      * @return
      */
     public boolean matchIndex(Object readKey) {

@@ -130,7 +130,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
     }
 
     /**
-     * @param A stream collected from the http source
+     * @param stream A stream collected from the http source
      * @return a map of collected value
      */
     protected abstract Map<String, Number> parseStream(InputStream stream);

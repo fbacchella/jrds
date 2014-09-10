@@ -20,9 +20,8 @@ import org.snmp4j.smi.OID;
 /**
  * A abstract class from which all snmp probes should be derived.<p>
  * An usefull command to browse the content of an snmp agent :<p>
- * <quote>snmpbulkwalk -OX -c public -v 2c hostname  . | sed -e 's/\[.*\]//' -e 's/ =.*$//'|  grep '::' | uniq </quote>
- * @author bacchell
- * @param <SnmpConnection>
+ * <code>snmpbulkwalk -OX -c public -v 2c hostname  . | sed -e 's/\[.*\]//' -e 's/ =.*$//'|  grep '::' | uniq </code>
+ * @author Fabrice Bacchella
  */
 @ProbeMeta(
         timerStarter=jrds.snmp.MainStarter.class,

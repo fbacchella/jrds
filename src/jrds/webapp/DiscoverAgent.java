@@ -73,7 +73,7 @@ public abstract class DiscoverAgent {
     /**
      * Do some specific discover that can't be done on enumerated probes
      * @param hostname
-     * @param hostElement
+     * @param hostEleme
      * @param probdescs
      * @param request
      */
@@ -90,7 +90,6 @@ public abstract class DiscoverAgent {
      * @param hostElement
      * @param summary
      * @param request
-     * @return
      */
     public abstract void addProbe(JrdsElement hostElement, ProbeDescSummary summary, HttpServletRequest request);
 
@@ -129,7 +128,7 @@ public abstract class DiscoverAgent {
 
     /**
      * This method add a probe to the current host document
-     * @param hostDom the host document
+     * @param hostElement the host element
      * @param probe the Name of the probe
      * @param label the label of the probe
      * @param argsTypes a list of type for the argument
@@ -148,7 +147,7 @@ public abstract class DiscoverAgent {
 
     /**
      * This method add a probe to the current host document
-     * @param hostDom the host document
+     * @param hostElement the host element
      * @param probe the Name of the probe
      * @param argsTypes a list of type for the argument
      * @param argsValues a list of value for the argument

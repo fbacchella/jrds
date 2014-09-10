@@ -248,9 +248,6 @@ public class HostsList extends StarterNode {
         }
     }
 
-    /**
-     * @param started the started to set
-     */
     public void stopTimers() {
         started = false;
         if(collectTimer != null)

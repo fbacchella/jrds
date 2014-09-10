@@ -282,8 +282,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * 
      * Open the rrd backend of the probe.
      * it's created if it's needed
-     * @throws IOException
-     * @throws RrdException
      */
     public boolean checkStore()  {
         if(pd == null) {

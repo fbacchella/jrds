@@ -79,7 +79,7 @@ public class ProbeDesc implements Cloneable {
     }
 
     /**
-     * Create a new Probe Description, with <it>size<it> elements in prevision
+     * Create a new Probe Description, with <em>size</em> elements in prevision
      * @param size estimated elements number
      */
     public ProbeDesc(int size) {
