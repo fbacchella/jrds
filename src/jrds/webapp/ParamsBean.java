@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -24,7 +25,6 @@ import java.util.zip.GZIPInputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
-import jrds.Base64;
 import jrds.Configuration;
 import jrds.Filter;
 import jrds.Graph;
@@ -37,6 +37,7 @@ import jrds.Probe;
 import jrds.Tab;
 import jrds.Util;
 import jrds.Util.SiPrefix;
+import net.iharder.Base64;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -162,8 +163,9 @@ public class ParamsBean implements Serializable {
         formatedpack = JSonPack.GZIPHEADER +  packed.replace('!', '=').replace('$', '/').replace('*', '+');
         logger.trace(formatedpack);
         ByteArrayOutputStream outbuffer = new ByteArrayOutputStream(formatedpack.length());
-        ByteArrayInputStream inbuffer = new ByteArrayInputStream(Base64.decode(formatedpack));
-        try {
+        try {            
+            InputStream inbuffer = new Base64.InputStream( new ByteArrayInputStream(formatedpack.getBytes()), Base64.DECODE );
+
             byte[] copybuffer = new byte[1500];
             GZIPInputStream os = new GZIPInputStream(inbuffer);
             int realread = os.read(copybuffer);
@@ -171,6 +173,8 @@ public class ParamsBean implements Serializable {
                 outbuffer.write(copybuffer, 0, realread );
                 realread = os.read(copybuffer);
             }
+            os.close();
+
             JrdsJSONObject json = new JrdsJSONObject(outbuffer.toString());
             for(String key: json) {
                 Object value = json.get(key);
