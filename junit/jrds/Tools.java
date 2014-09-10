@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,7 +29,6 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.rules.TemporaryFolder;
-import org.mortbay.jetty.testing.ServletTester;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -144,22 +142,6 @@ final public class Tools {
         n.appendChild(newNode);
 
         return newNode;
-    }
-
-    static public void getServer(Map<String, String> properties) {
-        ServletTester tester=new ServletTester();
-        tester.setContextPath("/");
-
-        for(Map.Entry<String, String> e: properties.entrySet()) {
-            System.setProperty("jrds." + e.getKey(), e.getValue());
-        }
-
-        Properties sp = System.getProperties();
-        for(Object  key: sp.keySet()) {
-            if(key.toString().startsWith("jrds.")) {
-                sp.remove(key);
-            }
-        }
     }
 
     static public URI pathToUrl(String pathname) {
