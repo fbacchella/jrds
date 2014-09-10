@@ -14,7 +14,7 @@ public class ExternalCmdIndexed extends ExternalCmdProbe implements IndexedProbe
     }
 
     /**
-     * @param host the host to set
+     * @param node the host to set
      */
     public void setNode(String node) {
         this.node = node;
