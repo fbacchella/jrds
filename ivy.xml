@@ -43,6 +43,6 @@
         <dependency org="junit" name="junit" rev="4.11" conf="libtest->default"/>
         <dependency org="joda-time" name="joda-time" rev="2.3" conf="lib->default"/>
         <dependency org="org.glassfish.external" name="opendmk_jmxremote_optional_jar" rev="1.0-b01-ea" conf="libtest->default"/>
-        <dependency org="net.iharder" name="base64" rev="2.3.8" conf="libtest->default"/>
+        <dependency org="net.iharder" name="base64" rev="2.3.8" conf="lib->default"/>
     </dependencies>
 </ivy-module>
