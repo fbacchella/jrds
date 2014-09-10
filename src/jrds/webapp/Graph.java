@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jrds.HostsList;
+import net.iharder.Base64;
 
 import org.apache.log4j.Logger;
 
@@ -77,8 +78,9 @@ public final class Graph extends JrdsServlet {
                 res.addDateHeader("Expires", new Date().getTime() + graphStep * 1000);
             }
             res.addDateHeader("Last-Modified", graph.getEnd().getTime());
-            res.addHeader("content-disposition","inline; filename=" + graph.getPngName());
-            res.addHeader("ETag", jrds.Base64.encodeString(getServletName() + graph.hashCode()));
+            res.addHeader("Content-disposition","inline; filename=" + graph.getPngName());
+            String eTagBaseString = getServletName() + graph.hashCode();
+            res.addHeader("ETag", Base64.encodeBytes(eTagBaseString.getBytes()));
             ServletOutputStream out = res.getOutputStream();
             FileChannel indata = hl.getRenderer().sendInfo(graph);
             //If a cache file exist, try to be smart, but only if caching is allowed

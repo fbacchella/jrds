@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jrds.Util;
-import jrds.Base64.OutputStream;
+import net.iharder.Base64;
 
 import org.apache.log4j.Logger;
 import org.json.JSONException;
@@ -79,7 +79,7 @@ public class JSonPack extends HttpServlet {
         }
 
         ByteArrayOutputStream packedDataBuffer = new ByteArrayOutputStream(len);
-        GZIPOutputStream gzipBuffer = new GZIPOutputStream(new OutputStream(packedDataBuffer), len);
+        GZIPOutputStream gzipBuffer = new GZIPOutputStream(new Base64.OutputStream(packedDataBuffer), len);
         gzipBuffer.write(paramsClean.toString().getBytes());
         gzipBuffer.close();
 
