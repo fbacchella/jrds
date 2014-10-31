@@ -379,6 +379,12 @@ public class Util {
                 return ((HostInfo) o).getName();
             }
         },
+        dnsname {
+            @Override
+            String toString(Object o) {
+                return ((HostInfo) o).getDnsName();
+            }
+        },
         probename {
             @Override
             String toString(Object o) {
@@ -477,6 +483,7 @@ public class Util {
             }
             if( o instanceof HostInfo) {
                 check(o, indexes, values, evaluate.host);
+                check(o, indexes, values, evaluate.dnsname);
             }
             if(o instanceof GraphDesc) {
                 check(o, indexes, values, evaluate.graphdesc_name);
