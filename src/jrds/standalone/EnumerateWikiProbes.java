@@ -1,6 +1,5 @@
 package jrds.standalone;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -40,9 +39,9 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
     }
 
     public void start(String args[]) throws Exception {
-        PropertiesManager pm = new PropertiesManager(new File(propFile));
+        PropertiesManager pm = new PropertiesManager();
+        pm.importSystemProps();
         pm.update();
-        jrds.JrdsLoggerConfiguration.configure(pm);
 
         System.getProperties().setProperty("java.awt.headless","true");
 
@@ -145,12 +144,13 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
             System.out.println(doTitle("Attributes"));
             System.out.println();
             System.out.println("^ Name ^ Default value ^ Description ^");
-            for(GenericBean bean: tryBeans) {                
+            for(GenericBean bean: tryBeans) { 
                 String defaultValue = "";
                 ProbeDesc.DefaultBean currentAttribute = defaultBeans.get(bean.getName());
-                String o = currentAttribute.value;
-                if(o != null && ! currentAttribute.delayed)
-                    defaultValue = o.toString();
+                if(currentAttribute != null && ! currentAttribute.delayed) {
+                    String o = currentAttribute.value;
+                    defaultValue = o.toString();                    
+                }
                 if(bean != null )
                     System.out.println("| " + bean.getName() + " | " + defaultValue + " | | ");
             }
