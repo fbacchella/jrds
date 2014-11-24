@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0   
     http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -8,6 +7,9 @@
     <version>1.0-SNAPSHOT</version>
     <name>JRDS</name>
     <url>http://jrds.fr</url>
+    <prerequisites>
+        <maven>2.2.1</maven>
+    </prerequisites>
     <properties>
         <!-- The project should have a source encoding set. -->
         <project.build.sourceEncoding>ISO8859-15</project.build.sourceEncoding>
@@ -52,6 +54,7 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
             <version>9.2.0.v20140526</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.xmlrpc</groupId>
@@ -63,7 +66,7 @@
                     <groupId>javax.servlet</groupId>
                 </exclusion>
             </exclusions>
-        </dependency>       
+        </dependency>
         <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
@@ -106,7 +109,6 @@
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-jmx</artifactId>
@@ -128,6 +130,7 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
             <version>9.2.0.v20140526</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -174,7 +177,10 @@
     <build>
         <resources>
             <resource>
-                <directory>desc</directory>
+                <directory>.</directory>
+                <includes>
+                    <include>desc/**</include>
+                </includes>
             </resource>
             <resource>
                 <directory>dtd</directory>
@@ -207,7 +213,7 @@
                                 <artifactItem>
                                     <groupId>org.dojotoolkit</groupId>
                                     <artifactId>dojo</artifactId>
-                                    <!--<classifier>sources</classifier>-->
+                                    <!--<classifier>sources</classifier> -->
                                     <version>${dojo.version}</version>
                                     <type>zip</type>
                                     <outputDirectory>
@@ -221,16 +227,29 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <source>${buildSource}</source>
+                    <target>${buildTarget}</target>
+                    <showWarnings>true</showWarnings>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.5</version>
                 <executions>
                     <execution>
                         <id>default-jar</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
                         <configuration>
                             <excludes>
-                                <!-- Exclude the converter and inspector from the default build. -->
+                                <!-- Exclude the converter and inspector 
+                                    from the default build. -->
                                 <exclude>**/bootstrap/*</exclude>
-                                <exclude>**/snmp/*</exclude>
                             </excludes>
                         </configuration>
                     </execution>
@@ -256,6 +275,20 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>core</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <!-- Exclude the converter and inspector 
+                                    from the default build. -->
+                                <exclude>**/bootstrap/*</exclude>
+                                <exclude>**/snmp/*</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>snmpprobes</id>
                         <goals>
                             <goal>jar</goal>
@@ -277,7 +310,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.4</version>
+                <version>2.5</version>
                 <configuration>
                     <webXml>${webapp.root}/WEB-INF/web.xml</webXml>
                     <archiveClasses>true</archiveClasses>
@@ -285,7 +318,7 @@
                         <resource>
                             <directory>${webapp.root}</directory>
                         </resource>
-                        <resrouce>
+                        <resource>
                             <directory>${dojo.unpacked.dir}/dojo-release-${dojo.version}</directory>
                             <include>dijit/themes/nihilo/nihilo.css</include>
                             <include>dijit/themes/nihilo/images/treeExpand_loading.gif</include>
@@ -308,14 +341,14 @@
                             <include>dijit/themes/nihilo/images/treeHover.png</include>
                             <include>dijit/themes/nihilo/images/treeI.gif</include>
                             <include>dijit/themes/nihilo/images/treeI_half.gif</include>
-                        </resrouce>
+                        </resource>
                     </webResources>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.7.1.201405082137</version>
+                <version>0.7.2.201409121644</version>
                 <configuration>
                     <destfile>${basedir}/target/coverage-reports/jacoco-unit.exec</destfile>
                     <datafile>${basedir}/target/coverage-reports/jacoco-unit.exec</datafile>
@@ -345,7 +378,8 @@
         </plugins>
         <pluginManagement>
             <plugins>
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <!--This plugin's configuration is used to store Eclipse 
+                    m2e settings only. It has no influence on the Maven build itself. -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
@@ -401,14 +435,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
+                <version>2.10.1</version>
                 <configuration>
                     <links>
-                        <link>http://java.sun.com/products/servlet/3.0/javadoc/</link>
+                        <link>https://docs.oracle.com/javaee/7/api/</link>
                         <link>http://www.snmp4j.org/doc/</link>
-                        <link>http://rrd4j.googlecode.com/git/javadoc/</link>
-                        <link>http://junit.org/javadoc/4.11/</link>
-                        <link>http://jetty.codehaus.org/jetty/jetty-6/apidocs/</link>
+                        <link>http://jrds.fr/jenkins/job/rrd4j/site/apidocs/</link>
+                        <link>http://junit.org/apidocs/</link>
+                        <link>http://download.eclipse.org/jetty/stable-9/apidocs/</link>
                         <link>http://ws.apache.org/xmlrpc/apidocs/</link>
                         <link>http://www.json.org/javadoc/</link>
                         <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
@@ -436,4 +470,5 @@
             <email>fbacchella@spamcop.net</email>
         </developer>
     </developers>
+    <packaging>war</packaging>
 </project>
