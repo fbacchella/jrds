@@ -96,9 +96,10 @@ final public class Tools {
         //The system property override the code log level
         if(System.getProperty("jrds.testloglevel") != null){
             level = Level.toLevel(System.getProperty("jrds.testloglevel"));
-            logger.setLevel(level);
         }
-        logger.setLevel(level);
+        if(logger != null) {
+            logger.setLevel(level);            
+        }
         for(String loggerName: allLoggers) {
             Logger l = Logger.getLogger(loggerName);
             l.setLevel(level);
@@ -113,14 +114,7 @@ final public class Tools {
     }
 
     static public void setLevel(String[] allLoggers, Level level) {
-        Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDERNAME);
-        for(String loggerName: allLoggers) {
-            Logger l = Logger.getLogger(loggerName);
-            l.setLevel(level);
-            if(l.getAppender(JrdsLoggerConfiguration.APPENDERNAME) != null) {
-                l.addAppender(app);
-            }
-        }
+        setLevel(null, level, allLoggers);
     }
 
     static public Element appendElement(Node n, String name, Map<String, String> attributes) {
