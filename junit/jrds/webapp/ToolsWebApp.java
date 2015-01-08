@@ -35,7 +35,9 @@ public class ToolsWebApp {
         config.put("configdir", root + "/config");
         config.put("autocreate", "true");
         config.put("rrddir", root);
-        config.put("libspath", "desc");
+        if(! Boolean.parseBoolean(System.getProperty("maven"))) {
+            config.put("libspath", "desc");
+        }
         config.putAll(props);
 
         ServletTester tester = ToolsWebApp.getTestServer(config);
@@ -79,8 +81,6 @@ public class ToolsWebApp {
         request.setVersion("HTTP/1.0");
 
         request.setHeader("Host", queryURL.getHost());
-        //request.setHeader("Content-Type", "multipart/form-data; boundary=----------------------------84223b7e8d58");
-        //request.setContent(content);
         filler.fillRequest(request);
         Response response = HttpTester.parseResponse(tester.getResponses(request.generate()));
         Assert.assertEquals(expectedStatus,response.getStatus());
