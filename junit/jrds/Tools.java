@@ -169,6 +169,7 @@ final public class Tools {
         for(String loggername: loggers) {
             Logger logger = Logger.getLogger(loggername);
             logger.addAppender(ta);
+            logger.setLevel(Level.TRACE);
         }
         return logs;
     }
