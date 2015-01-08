@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -44,8 +45,15 @@ final public class Tools {
         Locale.setDefault(new Locale("POSIX"));
         System.getProperties().setProperty("java.awt.headless","true");
         System.setProperty("java.io.tmpdir",  "tmp");
-        LogManager.getLoggerRepository().resetConfiguration();
-        JrdsLoggerConfiguration.jrdsAppender = new ConsoleAppender(new org.apache.log4j.SimpleLayout(), ConsoleAppender.SYSTEM_OUT);
+        LogManager.resetConfiguration();
+        //resetConfiguration is not enough
+        @SuppressWarnings("unchecked")
+        ArrayList<Logger> loggers = (ArrayList<Logger>)Collections.list(LogManager.getCurrentLoggers());
+        for (Logger l: loggers) {
+            l.removeAllAppenders();
+            l.setLevel(Level.OFF);
+        }
+        JrdsLoggerConfiguration.jrdsAppender = new ConsoleAppender(new org.apache.log4j.PatternLayout(JrdsLoggerConfiguration.DEFAULTLAYOUT), ConsoleAppender.SYSTEM_OUT);
         JrdsLoggerConfiguration.jrdsAppender.setName(JrdsLoggerConfiguration.APPENDERNAME);
         JrdsLoggerConfiguration.initLog4J();
     }

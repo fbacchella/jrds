@@ -53,7 +53,6 @@ public class TestReadElements {
         prop.setProperty("strictparsing", "true");
         prop.setProperty("readonly", "true");
         prop.put("configdir", configDirURL.getFile());
-        prop.put("log.trace", "jrds.webapp");
 
         tester = ToolsWebApp.getMonoServlet(testFolder, prop, JSonTree.class, "/jsontree");
         tester.addServlet(JSonQueryParams.class, "/queryparams");
