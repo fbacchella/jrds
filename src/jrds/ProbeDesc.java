@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -61,6 +62,7 @@ public class ProbeDesc implements Cloneable {
     private float uptimefactor = (float) 1.0;
     private Map<String, Double> defaultValues = new HashMap<String,Double>(0);
     private Map<String, GenericBean> beans = new HashMap<String, GenericBean>(0);
+    private final Set<Object> optionals = new HashSet<Object>(0);
 
     private static final class DsDesc {
         public DsType dsType;
@@ -210,6 +212,13 @@ public class ProbeDesc implements Cloneable {
         if(valuesMap.containsKey("maxValue")) {
             max = jrds.Util.parseStringNumber(valuesMap.get("maxValue").toString(), MAXDEFAULT);
         }
+        if (valuesMap.containsKey("optional") && valuesMap.get("optional") instanceof Boolean) {
+            boolean optional = (Boolean) valuesMap.get("optional");
+            if (optional) {
+                optionals.add(name);
+            }
+        }
+
         dsMap.put(name, new DsDesc(type, heartbeat, min, max, collectKey));
     }
 
@@ -493,6 +502,10 @@ public class ProbeDesc implements Cloneable {
     public Object clone() throws CloneNotSupportedException {
         ProbeDesc newpd = (ProbeDesc) super.clone();
         return newpd;
+    }
+    
+    public boolean isOptional(Object dsName){
+        return optionals.contains(dsName);
     }
 
 }

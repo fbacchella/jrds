@@ -72,9 +72,10 @@ abstract class ConfigObjectBuilder<BuildObject> {
                 String element = dsContent.getNodeName();
                 String textValue = dsContent.getTextContent().trim();
                 Object value = textValue;
-                if( element.startsWith("collect")) {
-                    if("".equals(value))
+                if (element.startsWith("collect")) {
+                    if ("".equals(value))
                         value = null;
+                    dsMap.put("optional", Boolean.valueOf(dsContent.getAttribute("optional")));
                 }
                 else if("dsType".equals(element)) {
                     if( !"NONE".equals(textValue.toUpperCase()))
