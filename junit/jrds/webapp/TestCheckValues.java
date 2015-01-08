@@ -30,7 +30,7 @@ public class TestCheckValues {
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, TestCheckValues.class.getName(), "jrds.webapp.CheckValues");
+        Tools.setLevel(logger, Level.TRACE, TestCheckValues.class.getName(), "jrds.webapp.CheckValues", "jrds.webapp");
     }
 
     @Before
@@ -41,7 +41,6 @@ public class TestCheckValues {
         prop.setProperty("strictparsing", "true");
         prop.setProperty("readonly", "true");
         prop.put("configdir", configDirURL.getFile());
-        prop.put("log.trace", "jrds.webapp");
 
         tester = ToolsWebApp.getMonoServlet(testFolder, prop, CheckValues.class, "/values/*");
         tester.start();        
