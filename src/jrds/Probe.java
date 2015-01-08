@@ -424,6 +424,16 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         }
         return retValues;
     }
+    
+    /**
+     * Return true if is collect key was marked optionnal in the probe description
+     * 
+     * @param collect
+     * @return
+     */
+    public boolean isOptional(KeyType collect ) {
+        return getPd().isOptional(getCollectMapping().get(collect));
+    }
 
     /**
      * Store the values on the rrd backend.

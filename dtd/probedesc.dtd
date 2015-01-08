@@ -40,3 +40,6 @@
 <!ELEMENT probeName (#PCDATA)>
 <!ELEMENT snmpRequester (#PCDATA)>
 <!ELEMENT collect (#PCDATA)>
+<!ATTLIST collect
+            optional (true|false) "false"
+>
