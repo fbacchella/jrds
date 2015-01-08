@@ -39,6 +39,7 @@ public class TestConfiguration {
         sc.initParameters.put("autocreate", "true");
         StartListener sl = new StartListener();
         Properties p = sl.readProperties(sc);
+        Configuration.configure(p);
         Configuration.switchConf(p);
         Assert.assertTrue("confid dir " + configDir + " not created", configDir.isDirectory());
     }
