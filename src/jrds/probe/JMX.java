@@ -75,7 +75,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
                     log(Level.ERROR, e1, "Invalide JMX attribue %s", attributeName);
                 } catch (InstanceNotFoundException e1) {
                     Level l = Level.ERROR;
-                    if (getPd().isOptional(getCollectMapping().get(collect))) {
+                    if(isOptional(collect)) {
                         l = Level.DEBUG;
                     }
                     log(l, "JMX instance not found: %s", e1.getMessage());

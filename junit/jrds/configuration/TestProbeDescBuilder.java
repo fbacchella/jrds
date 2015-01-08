@@ -34,7 +34,28 @@ public class TestProbeDescBuilder {
         PropertiesManager localpm = Tools.makePm();
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
         conf.getNodeMap(ConfigType.PROBEDESC).put("name", Tools.parseRessource("httpxmlprobedesc.xml"));
-        Assert.assertNotNull("Probedesc not build", conf.setProbeDescMap().get("name"));
+
+        ProbeDesc pd = conf.setProbeDescMap().get("name");        
+        Assert.assertNotNull("Probedesc not build", pd);
+    }
+
+    @Test
+    public void testOptional() throws Exception {
+        PropertiesManager localpm = Tools.makePm();
+        ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
+        JrdsDocument pddoc = Tools.parseRessource("httpxmlprobedesc.xml");
+        pddoc.getRootElement().getElementbyName("probeClass").setTextContent("jrds.mockobjects.MokeProbeBean");
+
+        conf.getNodeMap(ConfigType.PROBEDESC).put("name", pddoc);
+
+        ProbeDesc pd = conf.setProbeDescMap().get("name");        
+        Assert.assertNotNull("Probedesc not build", pd);
+
+        @SuppressWarnings("unchecked")
+        Probe<String, String> p = (Probe<String, String>) pd.getProbeClass().getConstructor().newInstance();
+        p.setPd(pd);
+        p.setLabel("goodlabel");
+        Assert.assertTrue("optional resolution broken", p.isOptional("goodlabel"));
     }
 
     @Test
@@ -60,7 +81,8 @@ public class TestProbeDescBuilder {
         Assert.assertNotNull("custom bean customattr1 not found", pd.getBean("customattr1"));
         Assert.assertNotNull("custom bean customattr2 not found", pd.getBean("customattr2"));
 
-        Probe<?,?> p = pd.getProbeClass().getConstructor().newInstance();
+        @SuppressWarnings("unchecked")
+        Probe<String, String> p = (Probe<String, String>) pd.getProbeClass().getConstructor().newInstance();
         p.setPd(pd);        
         pd.getBean("customattr1").set(p, "value1");
         pd.getBean("customattr2").set(p, "value2");
@@ -70,5 +92,6 @@ public class TestProbeDescBuilder {
 
         Assert.assertEquals("value1", Util.parseTemplate("${attr.customattr1}", p));
         Assert.assertEquals("value2", Util.parseTemplate("${attr.customattr2}", p));
+
     }
 }

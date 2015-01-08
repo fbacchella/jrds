@@ -28,8 +28,13 @@
 	<ds>
 		<dsName>d</dsName>
 		<dsType>counter</dsType>
-		<collect>%2$s</collect>
+		<collect optional="false">%2$s</collect>
 	</ds>
+    <ds>
+        <dsName>e</dsName>
+        <dsType>counter</dsType>
+        <collect optional="true">${label}</collect>
+    </ds>
 	<graphs>
 	</graphs>
 </probedesc>

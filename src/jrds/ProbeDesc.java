@@ -62,7 +62,7 @@ public class ProbeDesc implements Cloneable {
     private float uptimefactor = (float) 1.0;
     private Map<String, Double> defaultValues = new HashMap<String,Double>(0);
     private Map<String, GenericBean> beans = new HashMap<String, GenericBean>(0);
-    private final Set<Object> optionals = new HashSet<Object>(0);
+    private final Set<String> optionals = new HashSet<String>(0);
 
     private static final class DsDesc {
         public DsType dsType;
@@ -504,7 +504,12 @@ public class ProbeDesc implements Cloneable {
         return newpd;
     }
     
-    public boolean isOptional(Object dsName){
+    /**
+     * Return true if the given datasource was associated with an optional collect string
+     * @param dsName
+     * @return
+     */
+    boolean isOptional(String dsName){
         return optionals.contains(dsName);
     }
 
