@@ -30,7 +30,7 @@ public interface GenericBean {
             } catch (IllegalArgumentException e) {
                 throw new IllegalStateException("Invalid bean " + bean.getName(), e);
             } catch (InvocationTargetException e) {
-                throw new IllegalStateException("Invalid bean " + bean.getName(), e);
+                throw new IllegalStateException("Invalid bean " + bean.getName(), e.getCause());
             }
         }
 

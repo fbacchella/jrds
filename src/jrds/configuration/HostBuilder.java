@@ -302,24 +302,10 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             if(e.getValue().delayed) {
                 continue;
             }
-            try {
-                String beanName = e.getKey();
-                String beanValue = e.getValue().value;
-                GenericBean bean = pd.getBean(beanName);
-                String value;
-                //If the last argument is a list, give it to the template parser
-                Object lastArgs = args.isEmpty() ? null : args.get(args.size() - 1);
-
-                if(lastArgs instanceof List) {
-                    value = Util.parseTemplate(beanValue, host, lastArgs, properties);
-                }
-                else {
-                    value = jrds.Util.parseTemplate(beanValue, host, properties);
-                }
-                logger.trace(jrds.Util.delayedFormatString("Adding attribute %s=%s (%s) to default args", beanName, value, value.getClass()));
-                bean.set(p, value);
-            } catch (Exception ex) {
-                throw new RuntimeException("Invalid default bean " + e.getKey(), ex);
+            String beanName = e.getKey();
+            String beanValue = e.getValue().value;
+            if(! resolveDefaultBean(p, args, properties, beanName, beanValue)) {
+                return null;
             }
         }
 
@@ -336,24 +322,10 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             if(! e.getValue().delayed) {
                 continue;
             }
-            try {
-                String beanName = e.getKey();
-                String beanValue = e.getValue().value;
-                GenericBean bean = pd.getBean(beanName);
-                String value;
-                //If the last argument is a list, give it to the template parser
-                Object lastArgs = args.isEmpty() ? null : args.get(args.size() - 1);
-
-                if(lastArgs instanceof List) {
-                    value = Util.parseTemplate(beanValue, p, host, lastArgs, properties);
-                }
-                else {
-                    value = jrds.Util.parseTemplate(beanValue, p, host, properties);
-                }
-                logger.trace(jrds.Util.delayedFormatString("Adding delayed attribute %s=%s (%s) to default args", beanName, value, value.getClass()));
-                bean.set(p, value);
-            } catch (Exception ex) {
-                throw new RuntimeException("Invalid default bean " + e.getKey(), ex);
+            String beanName = e.getKey();
+            String beanValue = e.getValue().value;
+            if(! resolveDefaultBean(p, args, properties, beanName, beanValue)) {
+                return null;
             }
         }
 
@@ -436,6 +408,43 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         }
 
         return p;
+    }
+
+    private boolean resolveDefaultBean(Probe<?,?> p, List<Object> args, Map<String, String> properties, String beanName, String beanValue) {
+        HostInfo host = p.getHost();
+        ProbeDesc pd = p.getPd();
+        GenericBean bean = pd.getBean(beanName);
+        String value;
+        //If the last argument is a list, give it to the template parser
+        Object lastArgs = args.isEmpty() ? null : args.get(args.size() - 1);
+
+        try {
+            if(lastArgs instanceof List) {
+                value = Util.parseTemplate(beanValue, host, p, lastArgs, properties);
+            }
+            else {
+                value = Util.parseTemplate(beanValue, host, p, properties);
+            }
+        } catch (Exception e) {
+            Throwable root = e;
+            while(root.getCause() != null) {
+                root = e.getCause();
+            }
+            logger.error(String.format("Probe %s: invalid bean %s template '%s': %s", pd.getName(), beanName, beanValue, root.getMessage()));
+            return false;
+        }
+        logger.trace(Util.delayedFormatString("Adding attribute %s=%s (%s) to default args", beanName, value, value.getClass()));
+        try {
+            bean.set(p, value);
+        } catch (Exception e) {
+            Throwable root = e;
+            while(root.getCause() != null) {
+                root = e.getCause();
+            }
+            logger.error(String.format("Probe %s: invalid bean %s value '%s': %s", pd.getName(), beanName, beanValue, root.getMessage()));
+            return false;
+        }
+        return true;
     }
 
     @SuppressWarnings("unchecked")
