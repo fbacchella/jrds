@@ -108,11 +108,10 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         }
 
         for(JrdsElement tagElem: fragment.getChildElementsByName("tag")) {
-            try {
-                logger.trace(Util.delayedFormatString("adding tag %s to %s", tagElem, host));
-                setMethod(tagElem, host, "addTag");
-            } catch (InstantiationException e) {
-                throw new InvocationTargetException(e, HostBuilder.class.getName());
+            logger.trace(Util.delayedFormatString("adding tag %s to %s", tagElem, host));
+            String textContent = tagElem.getTextContent();
+            if(textContent != null) {
+                host.addTag(Util.parseTemplate(textContent.trim(), host, properties));                
             }
         }
 
