@@ -166,8 +166,6 @@ public final class ArgFactory {
             throw new InvocationTargetException(e, clazz.getName());
         } catch (IllegalAccessException e) {
             throw new InvocationTargetException(e, clazz.getName());
-        } catch (InvocationTargetException e) {
-            throw new InvocationTargetException(e, clazz.getName());
         }
     }
 
@@ -190,6 +188,8 @@ public final class ArgFactory {
             Class<?> setArgType = bean.getPropertyType();
             Object argInstance = ArgFactory.ConstructFromString(setArgType, beanValue);
             setMethod.invoke(o, argInstance);       
+        } catch (InvocationTargetException e) {
+            throw new InvocationTargetException(e.getCause(), "invalid bean '" + beanName + "' for " + o);
         } catch (Exception e) {
             throw new InvocationTargetException(e, "invalid bean '" + beanName + "' for " + o);
         }

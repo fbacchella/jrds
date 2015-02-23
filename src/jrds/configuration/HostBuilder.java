@@ -66,8 +66,6 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             throw new InvocationTargetException(e, HostBuilder.class.getName());
         } catch (IllegalAccessException e) {
             throw new InvocationTargetException(e, HostBuilder.class.getName());
-        } catch (InvocationTargetException e) {
-            throw new InvocationTargetException(e, HostBuilder.class.getName());
         } catch (ClassNotFoundException e) {
             throw new InvocationTargetException(e, HostBuilder.class.getName());
         }
