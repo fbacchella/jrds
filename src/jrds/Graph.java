@@ -46,8 +46,6 @@ public class Graph implements WithACL {
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        //result = PRIME * result + ((end == null) ? 0 : end.hashCode());
-        //result = PRIME * result + ((start == null) ? 0 : start.hashCode());
         result = PRIME * result + end.hashCode();
         result = PRIME * result + start.hashCode();
         long temp;
@@ -57,6 +55,17 @@ public class Graph implements WithACL {
         result = PRIME * result + (int) (temp ^ (temp >>> 32));
         result = PRIME * result + ((node == null) ? 0 : node.hashCode());
         return result;
+    }
+    
+    public long longHashCode() {
+        final long PRIME = 31;
+        long result = 1;
+        result = PRIME * result + end.getTime();
+        result = PRIME * result + start.getTime();
+        result = PRIME * result + Double.doubleToLongBits(max);
+        result = PRIME * result + Double.doubleToLongBits(min);
+        result = PRIME * result + ((node == null) ? 0 : node.hashCode());
+        return result;       
     }
 
     /* (non-Javadoc)

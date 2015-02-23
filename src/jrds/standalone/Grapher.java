@@ -47,7 +47,7 @@ public class Grapher {
         HostsList hl = new HostsList(pm);
 
         Period p = new Period();
-        Renderer r = new Renderer(10, pm.tmpdir);
+        Renderer r = new Renderer(10, 10, pm.tmpdir);
         Collection<Integer> done = new HashSet<Integer>();
         logger.debug(hl.getTrees());
         for(GraphTree graphTree: hl.getTrees()) {

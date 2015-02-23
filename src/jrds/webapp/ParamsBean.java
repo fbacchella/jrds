@@ -127,7 +127,6 @@ public class ParamsBean implements Serializable {
         parseReq(hl);
     }
 
-    @SuppressWarnings("unchecked")
     //Not a really useful method, just to reduce warning
     private Map<String, String[]> getReqParamsMap(HttpServletRequest req) {
         logger.trace(jrds.Util.delayedFormatString("Parameter map for %s: %s", req, req.getParameterMap()));
@@ -309,15 +308,17 @@ public class ParamsBean implements Serializable {
 
     public jrds.Graph getGraph(JrdsServlet caller) {
         jrds.Graph g = null;
-        if(gid != null)
-            g = hostlist.getRenderer().getGraph(gid);
+        if(gid != null) {
+            g = hostlist.getRenderer().getGraph(gid);            
+        }
         if(g == null) {
             logger.debug("graph cache miss");
             jrds.GraphNode node = getGraphNode(caller);
             if(node != null) {
                 g = node.getGraph();
                 configureGraph(g);
-            }
+                hostlist.getRenderer().render(g);
+            }            
         }
         return g;
     }

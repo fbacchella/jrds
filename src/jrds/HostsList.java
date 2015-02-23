@@ -115,7 +115,7 @@ public class HostsList extends StarterNode {
         }
         log(Level.DEBUG, "timers %s", timers);
 
-        renderer = new Renderer(50, pm.tmpdir);
+        renderer = new Renderer(50, pm.renderthreads, pm.tmpdir);
 
         log(Level.DEBUG, "Starting parsing descriptions");
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);

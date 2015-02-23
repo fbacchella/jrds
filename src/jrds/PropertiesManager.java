@@ -508,6 +508,8 @@ public class PropertiesManager extends Properties {
 
         archivesSet = getProperty("archivesset", ArchivesSet.DEFAULT.getName());
         
+        renderthreads = parseInteger(getProperty("renderthreads", Integer.toString(renderthreads)));
+        
     }
 
     public File configdir;
@@ -538,6 +540,7 @@ public class PropertiesManager extends Properties {
     public boolean withjmx = false;
     public Map<String, String> jmxprops = Collections.emptyMap();
     public String archivesSet;
+    public int renderthreads = Math.round(Runtime.getRuntime().availableProcessors() * 1.5f);
     public static final String FILTERTAB = "filtertab";
     public static final String CUSTOMGRAPHTAB = "customgraph";
     public static final String SUMSTAB = "sumstab";

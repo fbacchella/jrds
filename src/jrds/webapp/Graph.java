@@ -53,10 +53,6 @@ public final class Graph extends JrdsServlet {
                 return;   
             }
 
-            //If the requested end is in the future, the graph should not be cached.
-            if(graph.getEnd().after(new Date()) )
-                cache = false;
-
             if(getPropertiesManager().security) {				
                 boolean allowed = graph.getACL().check(p);
                 logger.trace(jrds.Util.delayedFormatString("Looking if ACL %s allow access to %s", graph.getACL(), this));
@@ -81,19 +77,24 @@ public final class Graph extends JrdsServlet {
             String eTagBaseString = getServletName() + graph.hashCode();
             res.addHeader("ETag", Base64.encodeBytes(eTagBaseString.getBytes()));
             ServletOutputStream out = res.getOutputStream();
-            FileChannel indata = hl.getRenderer().sendInfo(graph);
-            //If a cache file exist, try to be smart, but only if caching is allowed
-            if(indata != null && cache) {
-                logger.debug(jrds.Util.delayedFormatString("graph %s is cached", graph));
-                if(indata.size() < Integer.MAX_VALUE)
-                    res.setContentLength((int)indata.size());
-                WritableByteChannel outC = Channels.newChannel(out);
-                indata.transferTo(0, indata.size(), outC);
-                indata.close();
-            }
-            else {
-                logger.debug(jrds.Util.delayedFormatString("graph %s not found in cache", graph));
-                graph.writePng(out);
+            // Not cache, synchronous rendering
+            if( ! cache) {
+                graph.writePng(out);                
+            } else {
+                FileChannel indata = hl.getRenderer().sendInfo(graph);
+                //If a cache file exist, try to be smart, but only if caching is allowed
+                if(indata != null) {
+                    logger.debug(jrds.Util.delayedFormatString("graph %s is cached", graph));
+                    if(indata.size() < Integer.MAX_VALUE)
+                        res.setContentLength((int)indata.size());
+                    WritableByteChannel outC = Channels.newChannel(out);
+                    indata.transferTo(0, indata.size(), outC);
+                    indata.close();
+                }
+                else {
+                    logger.debug(jrds.Util.delayedFormatString("graph %s not found in cache", graph));
+                    graph.writePng(out);
+                }                
             }
 
             if(logger.isTraceEnabled()) {
