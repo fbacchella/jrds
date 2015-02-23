@@ -130,7 +130,9 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             Macro m = macrosMap.get(name);
             logger.trace(Util.delayedFormatString("Adding macro %s: %s", name, m));
             if(m != null) {
-                Map<String, String> macroProps = makeProperties(macroNode);
+                Map<String, String> macroProps = makeProperties(macroNode, properties, host);
+                logger.trace(Util.delayedFormatString("properties inherited for macro %s: %s", m, properties));
+                logger.trace(Util.delayedFormatString("local properties for macro %s: %s", m, macroProps));
                 Map<String, String> newProps = new HashMap<String, String>((properties !=null ? properties.size():0) + macroProps.size());
                 if(properties != null)
                     newProps.putAll(properties);
@@ -554,7 +556,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         }
     }
 
-    private Map<String, String> makeProperties(JrdsElement n) {
+    private Map<String, String> makeProperties(JrdsElement n, Object... o) {
         if(n == null)
             return Collections.emptyMap();
         JrdsElement propElem = n.getElementbyName("properties");
@@ -566,6 +568,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             String key = propNode.getAttribute("key");
             if(key != null) {
                 String value = propNode.getTextContent();
+                value = Util.parseTemplate(value, o);
                 logger.trace(Util.delayedFormatString("Adding propertie %s=%s", key, value));
                 props.put(key, value);
             }
