@@ -12,6 +12,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Level;
 
 /**
@@ -41,6 +42,7 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
             HttpResponse response = cnx.execute(hg);
             if(response.getStatusLine().getStatusCode() != 200) {
                 log(Level.ERROR, "Connection to %s fail with %s", getUrl(), response.getStatusLine().getReasonPhrase());
+                EntityUtils.consumeQuietly(response.getEntity());
                 return null;
             }
             HttpEntity entity = response.getEntity();
@@ -50,6 +52,7 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
             }
             InputStream is = entity.getContent();
             Map<String, Number> vars = parseStream(is);
+            EntityUtils.consumeQuietly(entity);
             is.close();
             return vars;
         } catch (ClientProtocolException e) {
