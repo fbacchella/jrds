@@ -716,7 +716,6 @@ public class Util {
                 e.printStackTrace(new PrintWriter(w));
                 namedLogger.log(l, "Error stack: ");
                 namedLogger.log(l, w);
-
             }
         }
     }
