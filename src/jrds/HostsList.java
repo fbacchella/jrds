@@ -256,13 +256,27 @@ public class HostsList extends StarterNode {
         }
     }
 
-    public void stopTimers() {
+    /**
+     * Ensure that all collects are stopped, some slow probes might need a little help
+     */
+    public void stop() {
         started = false;
         if(collectTimer != null)
             collectTimer.cancel();
         collectTimer = null;
         for(Starter s: this.topStarters) {
             s.doStop();
+        }
+        for(jrds.starter.Timer t: timers.values()) {
+            t.stopCollect();
+            for(HostStarter h: t.getAllHosts()) {
+                h.stopCollect();
+            }
+        }
+        for(HostInfo h: hostList) {
+            for(Probe<?,?> p: h.getProbes()) {
+                p.stopCollect();
+            }            
         }
     }
 

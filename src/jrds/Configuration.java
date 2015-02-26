@@ -59,7 +59,7 @@ public class Configuration {
             @Override
             public void run() {
                 if(hostsList != null) {
-                    hostsList.stopTimers();
+                    hostsList.stop();
                     if(hostsList.getRenderer() != null)
                         hostsList.getRenderer().finish();                    
                 }
@@ -70,7 +70,7 @@ public class Configuration {
     }
 
     private void stop() {
-        hostsList.stopTimers();
+        hostsList.stop();
         Thread.yield();
         //We don't care if it failed, just try
         try {
