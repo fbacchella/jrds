@@ -122,7 +122,14 @@ public class HostsList extends StarterNode {
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
         conf.setArchiveSetMap();
         conf.setGraphDescMap();
-        conf.setProbeDescMap();
+        Map<String, ProbeDesc> allProbeDesc = conf.setProbeDescMap();
+        for(ProbeDesc pd: allProbeDesc.values()) {
+            for(ProbeMeta meta: ArgFactory.enumerateAnnotation(pd.getProbeClass(), ProbeMeta.class, StarterNode.class)) {
+                log(Level.TRACE, "new probe meta: %s", meta);
+                daList.add(meta.discoverAgent());
+            }           
+        }
+        log(Level.DEBUG, "Discover agents classes are %s", daList);
         conf.setMacroMap();
         for(Listener<?,?> l: conf.setListenerMap().values()) {
             registerStarter(l);
@@ -144,7 +151,7 @@ public class HostsList extends StarterNode {
                     p.configureStarters(pm);
                     try {
                         for(ProbeMeta meta: ArgFactory.enumerateAnnotation(p.getClass(), ProbeMeta.class, StarterNode.class)) {
-                            daList.add(meta.discoverAgent());
+                            log(Level.TRACE, "another probe meta: %s", meta);
                             timerStarterClasses.add(meta.timerStarter());
                             topStarterClasses.add(meta.topStarter());
                         }
