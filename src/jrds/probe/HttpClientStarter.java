@@ -2,6 +2,12 @@ package jrds.probe;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
 
@@ -11,16 +17,18 @@ import jrds.starter.SocketFactory;
 import jrds.starter.Starter;
 
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.AbstractVerifier;
-import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
+import org.apache.http.ssl.SSLContexts;
+import org.apache.http.ssl.TrustStrategy;
 import org.apache.log4j.Level;
 
 public class HttpClientStarter extends Starter {
@@ -28,7 +36,7 @@ public class HttpClientStarter extends Starter {
 
     private CloseableHttpClient client = null;
     private int maxConnect = 0;
-    private Class<? extends AbstractVerifier> verifier = AllowAllHostnameVerifier.class;
+    private int timeout = 0;
 
     /* (non-Javadoc)
      * @see jrds.starter.Starter#configure(jrds.PropertiesManager)
@@ -37,12 +45,11 @@ public class HttpClientStarter extends Starter {
     public void configure(PropertiesManager pm) {
         super.configure(pm);
         maxConnect = pm.numCollectors;
+        timeout  = pm.timeout;
     }
 
     @Override
     public boolean start() {
-
-        HttpClientBuilder builder = HttpClientBuilder.create();
 
         RegistryBuilder<ConnectionSocketFactory> r = RegistryBuilder.<ConnectionSocketFactory>create();
 
@@ -59,12 +66,23 @@ public class HttpClientStarter extends Starter {
         // Register https
         r.register("https", getSSLSocketFactory());
 
+        HttpClientBuilder builder = HttpClientBuilder.create();
+        builder.setUserAgent(USERAGENT);
+        builder.setConnectionTimeToLive(timeout, TimeUnit.SECONDS);
+        builder.evictIdleConnections((long)timeout, TimeUnit.SECONDS);
+        
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(r.build());        
         cm.setMaxTotal(maxConnect * 2);
         cm.setDefaultMaxPerRoute(2);
+        cm.setValidateAfterInactivity(timeout * 1000);
         builder.setConnectionManager(cm);
 
-        builder.setUserAgent(USERAGENT);
+        RequestConfig rc = RequestConfig.custom()
+                .setConnectionRequestTimeout(timeout * 1000)
+                .setConnectTimeout(timeout * 1000)
+                .setSocketTimeout(timeout * 1000)
+                .build();
+        builder.setDefaultRequestConfig(rc);
 
         client = builder.build();
 
@@ -72,17 +90,23 @@ public class HttpClientStarter extends Starter {
     }
 
     private final SSLConnectionSocketFactory getSSLSocketFactory() {
-        AbstractVerifier verifierInstance = null;
-        try {
-            verifierInstance = verifier.newInstance();
-        } catch (InstantiationException e) {
-            throw new RuntimeException("failed to set a SSL context", e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("failed to set a SSL context", e);
-        }
         SSLStarter sslstarter = getLevel().find(SSLStarter.class);
         SSLContext sc = sslstarter.getContext();
-        return new SSLConnectionSocketFactory(sc, sslstarter.getSupportedProtocols(), sslstarter.getSupportedCipherSuites(), verifierInstance);
+        try {
+            sc = SSLContexts.custom()
+                    .loadTrustMaterial(new TrustStrategy() {
+                        @Override
+                        public boolean isTrusted(X509Certificate[] chain,
+                                String authType) throws CertificateException {
+                            log(Level.TRACE, "trying to check certificates chain %s with authentication methode %s", chain, authType);
+                            return true;
+                        }
+                    })
+                    .build();
+        } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
+            throw new RuntimeException("failed to set a SSL context", e);
+        }
+        return new SSLConnectionSocketFactory(sc, NoopHostnameVerifier.INSTANCE);
     }
 
     @Override
