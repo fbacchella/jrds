@@ -37,6 +37,7 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
         log(Level.DEBUG, "Getting %s", getUrl());
         HttpClientStarter httpstarter = find(HttpClientStarter.class);
         HttpClient cnx = httpstarter.getHttpClient();
+        HttpEntity entity = null;
         try {
             HttpGet hg = new HttpGet(getUrl().toURI());
             HttpResponse response = cnx.execute(hg);
@@ -45,14 +46,13 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
                 EntityUtils.consumeQuietly(response.getEntity());
                 return null;
             }
-            HttpEntity entity = response.getEntity();
+            entity = response.getEntity();
             if(entity == null) {
                 log(Level.ERROR, "Not response body to %s",getUrl());
                 return null;
             }
             InputStream is = entity.getContent();
             Map<String, Number> vars = parseStream(is);
-            EntityUtils.consumeQuietly(entity);
             is.close();
             return vars;
         } catch (ClientProtocolException e) {
@@ -63,6 +63,10 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
             log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e.getMessage());
         } catch (URISyntaxException e) {
             log(Level.ERROR, "unable to parse %s", getUrl());
+        } finally {
+            if(entity != null) {
+                EntityUtils.consumeQuietly(entity);                
+            }
         }
 
         return null;
