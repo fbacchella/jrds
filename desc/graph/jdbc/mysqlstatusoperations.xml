@@ -15,13 +15,10 @@
     <name>Com_select</name>
   </add>
   <add>
-    <name>Com_inserts</name>
+    <name>Com_insert</name>
   </add>
   <add>
     <name>Com_replace</name>
-  </add>
-  <add>
-    <name>Qcache_hits</name>
   </add>
   <add>
     <name>select</name>
