@@ -18,7 +18,7 @@ public class JrdsJSONWriter {
 
     public JrdsJSONWriter(HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
-        response.addDateHeader("Last-Modifed", new Date().getTime());
+        response.addDateHeader("Last-Modified", new Date().getTime());
         ServletOutputStream out = response.getOutputStream();
         w = new OutputStreamWriter(out);
         jw = new JSONWriter(w);
