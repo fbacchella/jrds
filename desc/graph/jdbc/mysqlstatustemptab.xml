@@ -12,7 +12,7 @@
 		<name>Created_tmp_tables</name>
 	</add>
 	<add>
-		<rpn>Created_tmp_disk_tab, Created_tmp_tables, /, 100 *</rpn>
+		<rpn>Created_tmp_disk_tab, Created_tmp_tables, /, 100, *</rpn>
 		<graphType>line</graphType>
 		<legend>Temporary tables %</legend>
 	</add>
