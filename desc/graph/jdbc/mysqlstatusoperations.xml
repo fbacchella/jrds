@@ -28,7 +28,7 @@
   </add>
   <add>
     <name>insert</name>
-	<rpn>Com_inserts,Com_replace,+</rpn>
+	<rpn>Com_insert,Com_replace,+</rpn>
 	<graphType>stack</graphType>
 	<legend>Insert</legend>
   </add>
