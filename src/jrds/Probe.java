@@ -26,6 +26,7 @@ import jrds.store.ExtractInfo;
 import jrds.store.Extractor;
 import jrds.store.Store;
 import jrds.store.StoreFactory;
+import jrds.starter.Timer;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -223,7 +224,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         }
         return retValues;
     }
-    
+
     /**
      * Return true if is collect key was marked optionnal in the probe description
      * 
@@ -353,8 +354,13 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             finally  {
                 stopCollect();
             }
+            long end = System.currentTimeMillis();
+            log(Level.DEBUG, "collect ran for %dms", (end - start));
+            Timer timer = (Timer) getParent().getParent();
+            if( (end - start) > (timer.getSlowCollectTime() * 1000)) {
+                log(Level.WARN, "slow collect time %.0fs for probe %s", 1.0 * (end - start) / 1000, this);
+            }
             if(interrupted) {
-                long end = System.currentTimeMillis();
                 float elapsed = ((float)(end - start))/1000;
                 log(Level.DEBUG, "Interrupted after %.2fs", elapsed);
             }

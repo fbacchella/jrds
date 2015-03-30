@@ -49,6 +49,7 @@ public class PropertiesManager extends Properties {
         public int step;
         public int timeout;
         public int numCollectors;
+        public int slowCollectTime;
     }
 
     private final FileFilter filter = new  FileFilter() {
@@ -413,6 +414,7 @@ public class PropertiesManager extends Properties {
         step = parseInteger(getProperty("step", "300"));
         timeout = parseInteger(getProperty("timeout", "10"));
         numCollectors = parseInteger(getProperty("collectorThreads", "1"));
+        slowcollecttime = parseInteger(getProperty("slowcollecttime", Integer.toString(timeout + 1)));
         String propertiesList = getProperty("timers", "");
         if(! propertiesList.trim().isEmpty()) {
             for(String timerName: propertiesList.split(",")) {
@@ -421,6 +423,7 @@ public class PropertiesManager extends Properties {
                 ti.step = parseInteger(getProperty("timer." + timerName + ".step", Integer.toString(step)));
                 ti.timeout = parseInteger(getProperty("timer." + timerName + ".timeout", Integer.toString(timeout)));
                 ti.numCollectors = parseInteger(getProperty("timer." + timerName + ".collectorThreads", Integer.toString(numCollectors)));
+                ti.slowCollectTime = parseInteger(getProperty("timer." + timerName + ".slowcollecttime", Integer.toString(ti.timeout + 1)));
 
                 timers.put(timerName, ti);
             }
@@ -430,6 +433,7 @@ public class PropertiesManager extends Properties {
         ti.step = step;
         ti.timeout = timeout;
         ti.numCollectors = numCollectors;
+        ti.slowCollectTime = slowcollecttime;
         timers.put(Timer.DEFAULTNAME, ti);
 
         strictparsing = parseBoolean(getProperty("strictparsing", "false"));
@@ -515,6 +519,7 @@ public class PropertiesManager extends Properties {
             }
         }
         archivesSet = getProperty("archivesset", ArchivesSet.DEFAULT.getName());
+
     }
 
     public File configdir;
@@ -522,6 +527,7 @@ public class PropertiesManager extends Properties {
     public File tmpdir;
     public String urlpngroot;
     public String logfile;
+    public int slowcollecttime;
     public int step;
     public Map<String, TimerInfo> timers = new HashMap<String, TimerInfo>();
     public int numCollectors;
