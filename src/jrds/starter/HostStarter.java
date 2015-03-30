@@ -18,18 +18,19 @@ public class HostStarter extends StarterNode {
         this.host = host;
         registerStarter(new Resolver(host.getDnsName()));
     }
-    
+
     public void addProbe(Probe<?,?> p){
         host.addProbe(p);
         allProbes.add(p);
     }
-    
+
     public Iterable<Probe<?,?>> getAllProbes() {
         return allProbes;
     }
-    
+
     public void collectAll() {
         log(Level.DEBUG, "Starting collect");
+        Timer timer = (Timer) getParent();
         long start = System.currentTimeMillis();
         startCollect();
         for(Probe<?,?> probe: allProbes) {
@@ -37,7 +38,7 @@ public class HostStarter extends StarterNode {
                 break;
             long duration = (System.currentTimeMillis() - start) / 1000 ;
             if(duration > (probe.getStep() / 2 )) {
-                log(Level.ERROR, "Collect too slow: %ds", duration);
+                log(Level.ERROR, "Collect too slow: %ds for timer %s", duration, timer);
                 break;
             }
             log(Level.TRACE, "Starting collect for %s", probe);

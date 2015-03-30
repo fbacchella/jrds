@@ -54,6 +54,7 @@ public class Timer extends StarterNode {
         this.name = name;
         setTimeout(ti.timeout);
         setStep(ti.step);
+        setSlowCollectTime(ti.slowCollectTime);
         this.numCollectors = ti.numCollectors;
     }
 

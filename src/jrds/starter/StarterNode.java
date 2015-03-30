@@ -22,6 +22,7 @@ public abstract class StarterNode implements StartersSet {
     private StarterNode parent = null;
     private int timeout = -1;
     private int step = -1;
+    private int slowCollectTime = -1;
 
     public StarterNode() {
         if (this instanceof HostsList) {
@@ -276,6 +277,14 @@ public abstract class StarterNode implements StartersSet {
      */
     public void setStep(int step) {
         this.step = step;
+    }
+
+    public int getSlowCollectTime() {
+        return slowCollectTime;
+    }
+
+    public void setSlowCollectTime(int slowCollectTime) {
+        this.slowCollectTime = slowCollectTime;
     }
 
 }
