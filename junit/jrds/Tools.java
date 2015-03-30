@@ -18,6 +18,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
+import jrds.PropertiesManager.TimerInfo;
 import jrds.factories.xml.EntityResolver;
 import jrds.factories.xml.JrdsDocument;
 import jrds.starter.Timer;
@@ -221,5 +222,14 @@ final public class Tools {
         Map<String, Timer> timerMap = new HashMap<String, Timer>(1);
         timerMap.put(t.getName(), t);
         return timerMap;
+    }
+    
+    static public final Timer getDefaultTimer() {
+        TimerInfo ti = new PropertiesManager.TimerInfo();
+        ti.numCollectors = 1;
+        ti.slowCollectTime = 5;
+        ti.step = 300;
+        ti.timeout = 10;
+        return new Timer("TimerTester", ti);
     }
 }

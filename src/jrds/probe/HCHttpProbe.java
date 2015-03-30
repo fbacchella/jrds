@@ -51,7 +51,7 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
                 log(Level.ERROR, "Not response body to %s",getUrl());
                 return null;
             }
-            InputStream is = entity.getContent();;
+            InputStream is = entity.getContent();
             Map<String, Number> vars = parseStream(is);
             is.close();
             return vars;
