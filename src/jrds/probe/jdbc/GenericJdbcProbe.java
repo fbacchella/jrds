@@ -37,7 +37,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
     /* (non-Javadoc)
      * @see jrds.ProbeConnected#configure()
      */
-    public Boolean configure(List<? extends Object> args) {
+    public Boolean configure(List<?> args) {
         if(super.configure()) {
             ProbeDesc pd =  getPd();
             query = jrds.Util.parseTemplate(pd.getSpecific("query"), getHost(), args);
@@ -62,7 +62,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
     }
 
     public Boolean configure(String... args) {
-        return configure((List<? extends Object>)Arrays.asList(args));
+        return configure((List<?>)Arrays.asList(args));
     }
 
     @Override
