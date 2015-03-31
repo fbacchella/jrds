@@ -5,8 +5,6 @@ import javax.servlet.ServletContext;
 
 import jrds.Configuration;
 
-import org.apache.xmlrpc.XmlRpcException;
-import org.apache.xmlrpc.XmlRpcRequest;
 import org.apache.xmlrpc.server.RequestProcessorFactoryFactory;
 
 public class JrdsRequestProcessorFactoryFactory extends RequestProcessorFactoryFactory.RequestSpecificProcessorFactoryFactory {
