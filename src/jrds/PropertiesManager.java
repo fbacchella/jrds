@@ -416,6 +416,9 @@ public class PropertiesManager extends Properties {
         numCollectors = parseInteger(getProperty("collectorThreads", "1"));
         slowcollecttime = parseInteger(getProperty("slowcollecttime", Integer.toString(timeout + 1)));
         String propertiesList = getProperty("timers", "");
+        if(timeout * 2 >= step) {
+            logger.warn("useless default timer, step must be more than twice the timeout");
+        }
         if(! propertiesList.trim().isEmpty()) {
             for(String timerName: propertiesList.split(",")) {
                 timerName = timerName.trim();
@@ -424,6 +427,10 @@ public class PropertiesManager extends Properties {
                 ti.timeout = parseInteger(getProperty("timer." + timerName + ".timeout", Integer.toString(timeout)));
                 ti.numCollectors = parseInteger(getProperty("timer." + timerName + ".collectorThreads", Integer.toString(numCollectors)));
                 ti.slowCollectTime = parseInteger(getProperty("timer." + timerName + ".slowcollecttime", Integer.toString(ti.timeout + 1)));
+                if(ti.timeout * 2 >= ti.step) {
+                    logger.warn("useless timer " + timerName + ", step must be more than twice the timeout");
+                    break;
+                }
 
                 timers.put(timerName, ti);
             }
