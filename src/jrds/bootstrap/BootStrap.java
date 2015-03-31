@@ -16,7 +16,7 @@ import java.util.Properties;
 
 
 public class BootStrap {
-    static final private String[] propertiesList = { "jetty.port", "propertiesFile", "loglevel"};
+    static final private String[] propertiesList = { "jetty.host", "jetty.port", "propertiesFile", "loglevel"};
     static final private String defaultCommand = "jetty";
     static final Map<String, String> cmdClasses = new HashMap<String, String>();
     static {
