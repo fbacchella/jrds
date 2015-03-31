@@ -62,7 +62,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
     }
 
     public Boolean configure(String... args) {
-        return configure((List<?>)Arrays.asList(args));
+        return configure(Arrays.asList(args));
     }
 
     @Override

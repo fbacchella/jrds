@@ -38,7 +38,7 @@ public class ProbeFactory {
      * @return A probe
      */
     public  Probe<?,?> makeProbe(String probeName) {
-        ProbeDesc pd = (ProbeDesc) probeDescMap.get(probeName);
+        ProbeDesc pd = probeDescMap.get(probeName);
         if(pd == null) {
             logger.error("Probe named " + probeName + " not found");
             return null;

@@ -101,7 +101,7 @@ public class Sum extends AutonomousGraphNode {
 
                         //First pass, no data to use
                         if(allvalues == null) {
-                            allvalues = (double[][]) dp.getValues().clone();
+                            allvalues = dp.getValues().clone();
                         }
                         //Next step, sum previous values
                         else {

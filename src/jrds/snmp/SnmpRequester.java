@@ -61,7 +61,7 @@ public enum SnmpRequester {
                 OID[] oidTab= new OID[oids.size()];
                 oids.toArray(oidTab);
                 SnmpVars retValue = new SnmpVars();
-                for(TableEvent te: (Iterable<TableEvent>)tableRet.getTable(snmpTarget, oidTab, null, null)) {
+                for(TableEvent te: tableRet.getTable(snmpTarget, oidTab, null, null)) {
                     if(! cnx.isStarted()) {
                         retValue = new SnmpVars();
                         break;

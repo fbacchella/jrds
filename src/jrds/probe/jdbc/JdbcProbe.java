@@ -123,7 +123,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
                 Object oValue = rs.getObject(i);
                 if(numFilter) {
                     if(oValue instanceof Number)
-                        oValue = (Number) oValue;
+                        oValue = oValue;
                     else
                         oValue = new Double(Double.NaN);
                 }

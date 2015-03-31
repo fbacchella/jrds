@@ -1365,8 +1365,8 @@ implements Cloneable, WithACL {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.newDocument();
-        Element root = 
-                (Element) document.createElement("graphdesc"); 
+        Element root =
+                document.createElement("graphdesc");
         document.appendChild(root);
         root.appendChild(document.createElement("name")).setTextContent(name);
         if(graphName != null)

@@ -160,7 +160,7 @@ public class GraphTree {
 		List<GraphNode> retValue  = new ArrayList<GraphNode>();
 		if(graphsSet != null) {
 			if(f == null)
-				retValue.addAll((Collection<GraphNode>) graphsSet.values());
+				retValue.addAll(graphsSet.values());
 			else {
 				for(GraphNode g: graphsSet.values()) {
 					String path = this.getPath() + "/" + g.getName();
