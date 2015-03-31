@@ -5,6 +5,8 @@
   <name>JMXSolR</name>
   <probeName>jmxsolr-${index.cleanpath}</probeName>
   <probeClass>jrds.probe.JMXIndexed</probeClass>
+    <specific name="mbeanNames">*:type=search,id=org.apache.solr.handler.component.SearchHandler</specific>
+    <specific name="mbeanIndex">(.*):type=search,id=org.apache.solr.handler.component.SearchHandler</specific>
 
   <!-- search -->
   <ds>

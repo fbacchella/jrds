@@ -5,6 +5,10 @@
 			<artifact
 				pattern="http://jrds.fr/maven2/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]" />
 		</url>
+        <filesystem name="build">
+            <ivy pattern="${buildir}/ivy/[organisation]/[module]/ivys/ivy.xml"/>
+            <artifact pattern="${buildir}/ivy/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"/>
+        </filesystem>
 	</resolvers>
 	<settings defaultResolver="ivyrepo" />
 	<include url="${ivy.default.settings.dir}/ivysettings-public.xml" />

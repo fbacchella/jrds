@@ -270,6 +270,25 @@
 		</war>
 	</target>
 
+	<target name="publish" depends="war,jetty" >
+        <property name="buildir" value="${build.home}"/>
+		<ivy:info file="ivy.xml" />
+		<ivy:buildnumber organisation="${ivy.organisation}" module="${ivy.module}"
+		                 revision="${module.version.prefix}" defaultBuildNumber="1"
+			             revSep=""/>
+		<ivy:publish organisation="fr.jrds" module="jrds"
+		             resolver="build" update="true" overwrite="true">
+			<artifacts pattern="${build.home}/[artifact].[ext]" />
+		</ivy:publish>
+	</target>
+	
+    <target name="pom" depends="war,jetty,publish" >
+        <property name="buildir" value="${build.home}"/>
+        <ivy:makepom ivyfile="${build.home}/ivy.xml" pomfile="${build.home}/pom.xml" conf="lib">
+            <mapping conf="lib" scope="compile"/>
+        </ivy:makepom>
+    </target>
+    
 	<target name="checkdtd">
 		<xmlvalidate>
 			<xmlcatalog>
@@ -316,7 +335,10 @@
 		</java>
 	</target>
 	<target name="resolve" description="--> retrieve dependencies with ivy">
-		<ivy:retrieve type="jar,zip,bundle" pattern="[conf]/[artifact].[ext]" />
+        <property name="buildir" value="${build.home}"/>
+        <ivy:info file="ivy.xml" />
+        <ivy:findrevision organisation="${ivy.organisation}" module="${ivy.module}" revision="latest.integration" />
+		<ivy:retrieve type="jar,zip,bundle" pattern="[conf]/[artifact].[ext]" conf="lib,libtest,libjetty" />
 		<unzip src="lib/dojo.zip" dest="lib">
 			<regexpmapper from="dojo-[^/]*/(.*)" to="dojo/\1" />
 		</unzip>

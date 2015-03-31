@@ -107,7 +107,7 @@ public class TestHostBuilder {
 
         JrdsDocument cnxdoc = new JrdsDocument(Tools.dbuilder.newDocument());
         cnxdoc.doRootElement("host").addElement("connection", "type=jrds.probe.JMXConnection").addElement("attr", "name=port").setTextContent("8999");
-        for(ConnectionInfo ci: hb.makeConnexion(cnxdoc.getRootElement(), new HostInfo("localhost"))) {
+        for(ConnectionInfo ci: hb.makeConnexion(cnxdoc.getRootElement(), new HostInfo("localhost"), new HashMap<String, String>(0))) {
             logger.trace(ci.getName());
             StarterNode  sn = new StarterNode() {};
             ci.register(sn);

@@ -22,14 +22,17 @@ import javax.management.openmbean.TabularData;
 import jrds.ConnectedProbe;
 import jrds.ProbeConnected;
 import jrds.ProbeDesc;
+import jrds.factories.ProbeMeta;
 
 import org.apache.log4j.Level;
 
 /**
  * 
  * @author Fabrice Bacchella 
- * @version $Revision: 407 $,  $Date: 2007-02-22 18:48:03 +0100 (jeu., 22 févr. 2007) $
  */
+@ProbeMeta(
+        discoverAgent=JmxDiscoverAgent.class
+        )
 public class JMX extends ProbeConnected<String, Double, JMXConnection> implements ConnectedProbe {
     private Map<String, String> collectKeys = null;
 
@@ -62,7 +65,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
                 ObjectName mbeanName = new ObjectName(collect.substring(0, attrSplit));
                 String[] jmxPath = collect.substring(attrSplit+1).split("/");
                 String attributeName =  jmxPath[0];
-                log(Level.TRACE, "mbean name= %s, attributeName = %s", mbeanName, attributeName);                 
+                log(Level.TRACE, "mbean name = %s, attributeName = %s", mbeanName, attributeName);                 
                 try {
                     Object attr = mbean.getAttribute(mbeanName, attributeName);
                     Number v = resolvJmxObject(attr, jmxPath);

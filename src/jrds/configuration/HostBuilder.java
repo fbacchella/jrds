@@ -106,7 +106,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
         // Find the connection for this host
         // Will the registered latter, in the starter node, one for each timer
-        for(ConnectionInfo cnx: makeConnexion(fragment, host)) {
+        for(ConnectionInfo cnx: makeConnexion(fragment, host, properties)) {
             host.addConnection(cnx);
         }
 
@@ -309,10 +309,10 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                     //If the last argument is a list, give it to the template parser
                     Object lastArgs = args.isEmpty() ? null : args.get(args.size() - 1);
                     if(lastArgs instanceof List) {
-                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), Util.parseTemplate(beanValue, host, lastArgs));
+                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), Util.parseTemplate(beanValue, host, lastArgs, properties));
                     }
                     else {
-                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), jrds.Util.parseTemplate(beanValue, host));
+                        value = ArgFactory.ConstructFromString(bean.getPropertyType(), jrds.Util.parseTemplate(beanValue, host, properties));
                     }
                     logger.trace(jrds.Util.delayedFormatString("Adding bean %s=%s (%s) to default args", beanName, value, value.getClass()));
                     bean.getWriteMethod().invoke(p, value);
@@ -341,13 +341,13 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             String connectionName = null;
             ConnectedProbe cp = (ConnectedProbe) p;
             //Register the connections defined within the probe
-            for(ConnectionInfo ci: makeConnexion(probeNode, p)) {
+            for(ConnectionInfo ci: makeConnexion(probeNode, p, properties)) {
                 ci.register(p);
             }
             String connexionName = probeNode.getAttribute("connection");
             if(connexionName != null && ! "".equals(connexionName)) {
                 logger.trace(Util.delayedFormatString("Adding connection %s to %s", connexionName, p));
-                connectionName = jrds.Util.parseTemplate(connexionName, host);
+                connectionName = jrds.Util.parseTemplate(connexionName, host, properties);
                 cp.setConnectionName(connectionName);
             }
             else {
@@ -418,7 +418,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
      * @param p
      * @param host
      */
-    private ConnectionInfo parseSnmp(JrdsElement node) {
+    private ConnectionInfo parseSnmp(JrdsElement node, Object parent, Map<String, String> properties) {
         try {
             JrdsElement snmpNode = node.getElementbyName("snmp");
             if(snmpNode != null) {
@@ -427,7 +427,9 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 Class<? extends Connection<?>> connectionClass = (Class<? extends Connection<?>>) pm.extensionClassLoader.loadClass(connectionClassName);
 
                 Map<String, String> attrs = new HashMap<String, String>();
-                attrs.putAll(snmpNode.attrMap());
+                for(Map.Entry<String, String> e: snmpNode.attrMap().entrySet()) {
+                    attrs.put(e.getKey(), Util.parseTemplate(e.getValue(), parent, properties));
+                }
                 return new ConnectionInfo(connectionClass, connectionClassName, Collections.emptyList(), attrs);
             }
         } catch (ClassNotFoundException e) {
@@ -444,11 +446,11 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
      * @param host
      * @return
      */
-    Set<ConnectionInfo> makeConnexion(JrdsElement domNode, Object parent) {
+    Set<ConnectionInfo> makeConnexion(JrdsElement domNode, Object parent, Map<String, String> properties) {
         Set<ConnectionInfo> connectionSet = new HashSet<ConnectionInfo>();
 
         //Check for the old SNMP connection node
-        ConnectionInfo cnxSnmp = parseSnmp(domNode);
+        ConnectionInfo cnxSnmp = parseSnmp(domNode, parent, properties);
         if(cnxSnmp != null)
             connectionSet.add(cnxSnmp);
 
@@ -458,7 +460,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 logger.error("No type declared for a connection");
                 continue;
             }
-            String name = cnxNode.getAttribute("name");
+            String name = Util.parseTemplate(cnxNode.getAttribute("name"), parent, properties);
 
             try {
                 //Load the class for the connection
@@ -472,12 +474,12 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 Map<String, String> attrs = new HashMap<String, String>();
                 for(JrdsElement attrNode: cnxNode.getChildElementsByName("attr")) {
                     String attrName = attrNode.getAttribute("name");
-                    String textValue = Util.parseTemplate(attrNode.getTextContent(), parent);
+                    String textValue = Util.parseTemplate(attrNode.getTextContent(), parent, properties);
                     attrs.put(attrName, textValue);
                 }
                 ConnectionInfo cnx = new ConnectionInfo(connectionClass, name, args, attrs);
                 connectionSet.add(cnx);
-                logger.debug(Util.delayedFormatString("Added connection %s to node %s", cnx, parent));
+                logger.debug(Util.delayedFormatString("Added connection %s to node %s with beans %s", cnx, parent, attrs));
             }
             catch (ClassNotFoundException ex) {
                 logger.warn("Connection class not found: " + type + " for " + parent);

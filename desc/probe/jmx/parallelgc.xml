@@ -15,7 +15,7 @@ As there is no index to discriminate between jvm, label is used and is mandatory
     <name>JMXParallelGC</name>
     <probeName>jvmpool-${label}</probeName>
     <probeClass>jrds.probe.JMX</probeClass>
-    <uptimefactor>1</uptimefactor>
+    <specific name="mbeanNames">java.lang:type=GarbageCollector,name=PS Scavenge;java.lang:type=GarbageCollector,name=PS MarkSweep</specific>
     <ds>
         <dsName>Code Cache</dsName>
         <dsType>gauge</dsType>
