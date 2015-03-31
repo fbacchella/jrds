@@ -43,7 +43,6 @@ function(dojo, dom, domconstruct, array, on, parser) {
 			}
 			ulds = dom.byId('datastores');
 			array.forEach(response.datastores, function(ds) {
-				console.log(ds);
 				li = dojo.create("li", null, ulds, 'last');
 				a = dojo.create("a", {href: "popup.html?pid=" + response.pid + "&dsName=" + ds.name}, li);
 				a.innerHTML = ds.name;
