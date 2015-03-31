@@ -2,7 +2,6 @@ package jrds.factories;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +20,6 @@ import org.apache.log4j.Logger;
 public class ProbeFactory {
 
     private final Logger logger = Logger.getLogger(ProbeFactory.class);
-    final private List<String> probePackages = new ArrayList<String>(5);
     private Map<String, ProbeDesc> probeDescMap;
     private Map<String, GraphDesc> graphDescMap;
 
@@ -32,8 +30,6 @@ public class ProbeFactory {
     public ProbeFactory(Map<String, ProbeDesc> probeDescMap, Map<String, GraphDesc> graphDescMap) {
         this.probeDescMap = probeDescMap;
         this.graphDescMap = graphDescMap;
-
-        probePackages.add("");
     }
 
     /**

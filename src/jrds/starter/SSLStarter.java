@@ -29,7 +29,8 @@ public class SSLStarter extends Starter {
         }
     };
 
-    private String SSLProtocol = "SSL";
+    private final static String SSLProtocol = "SSL";
+
     private String[] supportedProtocols = null;
     private String[] supportedCipherSuites = null;
     private TrustManager[] trustManagers = new TrustManager[]{trustAllCerts};
