@@ -46,7 +46,7 @@ public class Jetty extends CommandStarterImpl {
         logger.debug("Configuration: " + configuration);
 
         host = configuration.getProperty("jetty.host");
-        port = jrds.Util.parseStringNumber((String) configuration.getProperty("jetty.port"), port).intValue();
+        port = jrds.Util.parseStringNumber(configuration.getProperty("jetty.port"), port).intValue();
         propFileName =  configuration.getProperty("propertiesFile", propFileName);
         webRoot = configuration.getProperty("webRoot", webRoot);
     }

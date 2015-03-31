@@ -113,7 +113,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
         double average = 0;
         int nbvalue = 0;
         double cpuUsed = 0;
-        for(Map.Entry<OID, Object> e: ((Map<OID, Object>)snmpVars).entrySet()) {
+        for(Map.Entry<OID, Object> e: snmpVars.entrySet()) {
             OID oid = e.getKey();
             if(oid.startsWith(hrSWRunPerfMem)) {
                 double value = ((Number)e.getValue()).doubleValue() * 1024;
