@@ -53,7 +53,7 @@ public class ProbeDesc implements Cloneable {
 
     private long heartBeatDefault = 600;
     private Map<String, DsDesc> dsMap;
-    private Map<String, String> specific = new HashMap<String, String>();;
+    private Map<String, String> specific = new HashMap<String, String>();
     private String probeName;
     private String name;
     private final Collection<String> graphesList = new ArrayList<String>();

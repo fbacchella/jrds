@@ -49,8 +49,8 @@ public class Download extends JrdsServlet {
                     return new Date(Long.parseLong(source) * 1000);
                 }
             };
-        };
-    };
+        }
+            };
 
     //    protected static final DateFormat epochFormat = new DateFormat() {
     //        @Override

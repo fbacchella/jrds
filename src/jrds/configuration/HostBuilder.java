@@ -284,7 +284,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         String label = probeNode.getAttribute("label");
         if(label != null && ! "".equals(label)) {
             logger.trace(Util.delayedFormatString("Adding label %s to %s", label, p));
-            p.setLabel(jrds.Util.parseTemplate(label, host, properties));;
+            p.setLabel(jrds.Util.parseTemplate(label, host, properties));
         }
 
         //The host is set

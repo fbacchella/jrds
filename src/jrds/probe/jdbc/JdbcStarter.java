@@ -17,9 +17,9 @@ public abstract class JdbcStarter extends Starter {
 	private String url;
 	private String user;
 	private String passwd;
-	private String dbName = "";;
+	private String dbName = "";
 
-	public void setHost(HostInfo monitoredHost) {
+    public void setHost(HostInfo monitoredHost) {
 		this.url = getUrlAsString();
 	}
 	

@@ -94,16 +94,18 @@ implements Cloneable, WithACL {
             @Override
             public String toString() {
                 return "percentile legend";
-            };
+            }
+
             public boolean datasource() {
                 return false;
             }
             public boolean toPlot() {
                 return false;
-            };
+            }
+
             public boolean legend() {
                 return true;
-            };
+            }
         },
         COMMENT {
             public String toString() {
@@ -122,59 +124,68 @@ implements Cloneable, WithACL {
         LINE {
             public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
                 rgd.line(sn, color, legend);
-            };
+            }
+
             @Override
             public String toString() {
                 return "line";
-            };
+            }
+
             public boolean datasource() {
                 return true;
             }
             public boolean toPlot() {
                 return true;
-            };
+            }
+
             public boolean legend() {
                 return true;
-            };
+            }
         },
         AREA {
             public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
                 rgd.area(sn, color, legend);
-            };
+            }
+
             @Override
             public String toString() {
                 return "area";
-            };
+            }
+
             public boolean datasource() {
                 return true;
             }
             public boolean toPlot() {
                 return true;
-            };
+            }
+
             public boolean legend() {
                 return true;
-            };
+            }
         },
         STACK {
             public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
                 rgd.stack(sn, color, legend);
-            };
+            }
+
             @Override
             public String toString() {
                 return "stack";
-            };
+            }
+
             public boolean datasource() {
                 return true;
             }
             public boolean toPlot() {
                 return true;
-            };
+            }
+
             public boolean legend() {
                 return true;
-            };
+            }
         };
 
-        public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {};
+        public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {}
 
         /**
          * To check if it will generate a plot, for color calculation
@@ -188,7 +199,7 @@ implements Cloneable, WithACL {
          * @return
          */
         public abstract boolean legend();
-    };
+    }
 
     //Old name kept
     static final public GraphType NONE = GraphType.NONE;
@@ -482,7 +493,7 @@ implements Cloneable, WithACL {
         public static final Color resolveIndex(int i) {
             return Colors.values()[ i % Colors.length].getColor();
         }
-    };
+    }
 
     static private final class DsDesc {
         final String name;
@@ -500,7 +511,8 @@ implements Cloneable, WithACL {
                 this.host = host;
                 this.probe = probe;
             }
-        };
+        }
+
         final DsPath dspath;
         DsDesc(String name, String dsName, String rpn,
                 GraphType graphType, Color color, String legend,
@@ -596,7 +608,8 @@ implements Cloneable, WithACL {
     public static final class Dimension {
         public int width = 0;
         public int height = 0;
-    };
+    }
+
     private Dimension dimension = null;
 
 

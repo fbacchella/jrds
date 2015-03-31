@@ -100,7 +100,7 @@ public class Jetty extends CommandStarterImpl {
 
             Authenticator auth = new BasicAuthenticator();
             Constraint constraint = new Constraint();
-            constraint.setName("jrds");;
+            constraint.setName("jrds");
             constraint.setRoles(new String[]{Constraint.ANY_ROLE});
             constraint.setAuthenticate(true);
             constraint.setDataConstraint(Constraint.DC_NONE);

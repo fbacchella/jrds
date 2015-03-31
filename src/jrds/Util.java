@@ -112,7 +112,7 @@ public class Util {
         public int getExponent() {
             return exponent;
         }
-    };
+    }
 
     static final private ErrorListener el = new ErrorListener() {
         public void error(TransformerException e) throws TransformerException {
@@ -296,7 +296,7 @@ public class Util {
             else  {
                 if(! indexes.containsKey(var)) {
                     indexes.put(var, index++);
-                };
+                }
                 int slot = indexes.get(var) + 1;
                 toAppend = "%"  + Integer.toString(slot) + "$s";
             }

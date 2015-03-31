@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 public class AutoGraph extends GraphNode {
     public enum Operation {
         SUM, MIN, MAX, AVERAGE
-    };
+    }
 
     static final private Logger logger = Logger.getLogger(AutoGraph.class);
     static int i;

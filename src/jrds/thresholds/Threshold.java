@@ -29,9 +29,9 @@ public class Threshold {
 			}
 		};
 		public abstract boolean check(double a, double b);
-	};
+	}
 
-	public enum Action {
+    public enum Action {
 		LOG{
 			@Override
 			public void run(Threshold t, Probe<?,?> p, List<Object> args) {

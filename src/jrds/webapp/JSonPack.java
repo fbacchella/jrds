@@ -53,7 +53,7 @@ public class JSonPack extends HttpServlet {
         int read;
         while((read = postDataStream.read(bufferin)) > 0 ) {
             postDataBuffer.write(bufferin, 0, read);
-        };
+        }
         String postData = postDataBuffer.toString();
         logger.debug(Util.delayedFormatString("Post data: %s", postData));
 

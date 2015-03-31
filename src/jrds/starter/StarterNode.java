@@ -233,7 +233,7 @@ public abstract class StarterNode implements StartersSet {
     @Deprecated
     public Starter registerStarter(Starter s, StarterNode parent) {
         return registerStarter(s);
-    };
+    }
 
     /* (non-Javadoc)
      * @see jrds.starter.StartersSet#find(java.lang.Class, jrds.starter.StarterNode)
