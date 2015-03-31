@@ -9,7 +9,6 @@ import javax.xml.transform.TransformerException;
 
 import jrds.mockobjects.MokeProbe;
 import jrds.starter.HostStarter;
-import jrds.starter.StarterNode;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -47,6 +46,7 @@ public class TestProbe {
         pd.add(dsMap);
 
         HostStarter host = new HostStarter(new HostInfo("DummyHost"));
+        host.setParent(Tools.getDefaultTimer());
         MokeProbe<String, Long> p = new MokeProbe<String, Long>(pd) {
             @Override
             public boolean isCollectRunning() {
@@ -60,7 +60,6 @@ public class TestProbe {
         };
         host.getHost().setHostDir(testFolder.newFolder("testHighLow"));
         p.setHost(host);
-        p.setParent(new StarterNode() {});
         p.configure();
         Map<String, Long> val = new HashMap<String, Long>();
         long high = 255L;
@@ -91,6 +90,7 @@ public class TestProbe {
         System.out.println();
 
         HostStarter host = new HostStarter(new HostInfo("DummyHost"));
+        host.setParent(Tools.getDefaultTimer());
         MokeProbe<String, Long> p = new MokeProbe<String, Long>(pd) {
             @Override
             public boolean isCollectRunning() {
@@ -104,7 +104,6 @@ public class TestProbe {
         };
         host.getHost().setHostDir(testFolder.newFolder("testDefault"));
         p.setHost(host);
-        p.setParent(new StarterNode() {});
         p.configure();
         System.out.println();
         Map<String, Long> val = new HashMap<String, Long>();
