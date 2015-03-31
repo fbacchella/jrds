@@ -35,6 +35,7 @@ public class Jetty extends CommandStarterImpl {
     static private final Logger logger = Logger.getLogger(Jetty.class);
 
     int port = 8080;
+    String host;
     String propFileName = "jrds.properties";
     String webRoot = ".";
 
@@ -44,6 +45,7 @@ public class Jetty extends CommandStarterImpl {
     public void configure(Properties configuration) {
         logger.debug("Configuration: " + configuration);
 
+        host = configuration.getProperty("jetty.host");
         port = jrds.Util.parseStringNumber((String) configuration.getProperty("jetty.port"), port).intValue();
         propFileName =  configuration.getProperty("propertiesFile", propFileName);
         webRoot = configuration.getProperty("webRoot", webRoot);
@@ -68,6 +70,9 @@ public class Jetty extends CommandStarterImpl {
 
         final Server server = new Server();
         ServerConnector connector = new ServerConnector(server);
+        if (host != null) {
+            connector.setHost(host);
+        }
         connector.setPort(port);
 
         //Let's try to start the connector before the application
