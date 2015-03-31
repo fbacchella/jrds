@@ -32,13 +32,14 @@ import org.apache.log4j.Level;
  *
  * @author Fabrice Bacchella 
  */
-@ProbeBean({"port",  "file", "url", "urlhost"})
+@ProbeBean({"port",  "file", "url", "urlhost", "scheme"})
 public abstract class HttpProbe extends Probe<String, Number> implements UrlProbe {
     protected URL url = null;
     protected String urlhost = null;
-    protected int port = 80;
+    protected int port = -1;
     protected String file = "/";
-    Starter resolver = null;
+    protected String scheme = null;
+    private Starter resolver = null;
 
     public Boolean configure(URL url) {
         this.url = url;
@@ -92,27 +93,37 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 
     private boolean finishConfigure(List<Object> argslist) {
         if(url == null) {
+            if(port <= 0 && (scheme == null ||scheme.isEmpty())) {
+                port = 80;
+                scheme = "http";
+            } else if (scheme == null || scheme.isEmpty()) {
+                if(port == 443) {
+                    scheme = "https";
+                } else {
+                    scheme = "http";                    
+                }
+            }
             try {
                 if(urlhost == null)
                     urlhost = getHost().getDnsName();
                 if(argslist != null) {
                     try {
-                        String urlString = String.format("http://" + urlhost + ":" + port + file, argslist.toArray());
+                        String urlString = String.format(scheme + "://" + urlhost + ":" + port + file, argslist.toArray());
                         url = new URL(Util.parseTemplate(urlString, getHost(), argslist));
                     } catch (IllegalFormatConversionException e) {
-                        log(Level.ERROR, "Illegal format string: http://%s:%d%s, args %d", urlhost, port, file, argslist.size());
+                        log(Level.ERROR, "Illegal format string: %s://%s:%d%s, args %d", scheme, urlhost, port, file, argslist.size());
                         return false;
                     }
                 }
                 else {
-                    url = new URL("http", urlhost, port, file);
+                    url = new URL(scheme, urlhost, port, file);
                 }
             } catch (MalformedURLException e) {
-                log(Level.ERROR, e, "URL 'http://%s:%s%s' is invalid", urlhost, port, file);
+                log(Level.ERROR, e, "URL '%s://%s:%s%s' is invalid", scheme, urlhost, port, file);
                 return false;
             }
         }
-        if("http".equals(url.getProtocol())) {
+        if("http".equals(url.getProtocol()) || "https".equals(url.getProtocol())) {
             resolver = getParent().registerStarter(new Resolver(url.getHost()));
         }
         log(Level.DEBUG, "URL to collect is %s", getUrl());
@@ -261,6 +272,14 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
      */
     public void setUrlhost(String urlhost) {
         this.urlhost = urlhost;
+    }
+
+    public String getScheme() {
+        return scheme;
+    }
+
+    public void setScheme(String scheme) {
+        this.scheme = scheme;
     }
 
 }
