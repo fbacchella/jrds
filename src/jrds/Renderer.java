@@ -168,7 +168,7 @@ public class Renderer {
     }
             );
     private int cacheSize;
-    private Map<Integer, RendererRun> rendered;
+    private final Map<Integer, RendererRun> rendered;
 
     public Renderer(int cacheSize, File tmpDir) {
         this.tmpDir = tmpDir;
