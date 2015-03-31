@@ -14,6 +14,7 @@ import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
 import jrds.Tools;
+import jrds.mockobjects.MockHttpServer;
 import jrds.starter.Connection;
 import jrds.starter.HostStarter;
 import jrds.starter.Resolver;
@@ -24,17 +25,9 @@ import jrds.starter.Timer;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.eclipse.jetty.server.Connector;
-import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.HandlerCollection;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,50 +40,49 @@ public class ApacheHttpClientTest {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
-    private boolean collected = false;
-    private Server server = null;
-    private boolean shouldFail = true;
+    private volatile boolean shouldFail = true;
+    private final ResourceHandler staticFiles = new ResourceHandler() {
+        @Override
+        public void handle(String target, Request baseRequest,
+                HttpServletRequest request, HttpServletResponse response)
+                        throws IOException, ServletException {
+            if(ApacheHttpClientTest.this.shouldFail) {
+                response.setStatus(404);                    
+            } else {
+                response.setStatus(200);                    
+            }
+            response.getOutputStream().println("an empty line");
+            response.flushBuffer();
+        }
+    };
+
+    private static class TestHttpProbe extends HCHttpProbe {
+        boolean collected;
+
+        public TestHttpProbe() {
+            ProbeDesc pd = new ProbeDesc();
+            pd.setName("ApacheHttpClientTester");
+            pd.add("test", DsType.COUNTER);
+            setPd(pd);
+        }
+
+        @Override
+        public String getName() {
+            return "ApacheHttpClient";
+        }
+
+        @Override
+        protected Map<String, Number> parseStream(InputStream stream) {
+            collected = true;
+            return Collections.emptyMap();
+        }
+    }
 
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, HCHttpProbe.class.getName(), HttpClientStarter.class.getName(), Resolver.class.getName(), Connection.class.getName(), "jrds.Starter", "jrds.Probe.ApacheHttpClientTester");
         StoreOpener.prepare("FILE");
-    }
-
-    @Before
-    public void startServer() throws Exception {
-
-        server = new Server(0);
-        ServerConnector connector = new ServerConnector(server);
-        server.setConnectors(new Connector[]{connector});
-
-        ResourceHandler staticFiles = new ResourceHandler() {
-            @Override
-            public void handle(String target, Request baseRequest,
-                    HttpServletRequest request, HttpServletResponse response)
-                            throws IOException, ServletException {
-                if(shouldFail) {
-                    response.setStatus(404);                    
-                } else {
-                    response.setStatus(200);                    
-                }
-                response.getOutputStream().println("an empty line");
-                response.flushBuffer();
-            }
-        };
-
-        HandlerCollection handlers = new HandlerList();
-        handlers.setHandlers(new Handler[]{staticFiles});
-        server.setHandler(handlers);
-        server.start();
-
-    }
-
-    @After
-    public void finish() throws Exception {
-        server.stop();
-        server = null;
     }
 
     private  HostStarter addConnection(Starter cnx) throws IOException {
@@ -108,7 +100,11 @@ public class ApacheHttpClientTest {
     }
 
     @Test
-    public void testStart() throws IOException {
+    public void testStart() throws Exception {
+        MockHttpServer server = new MockHttpServer(false);
+        server.addResourceHandler(staticFiles);
+        server.start();
+
         HttpClientStarter cnx = new HttpClientStarter();
         HostStarter localhost = addConnection(cnx);
         localhost.find(SSLStarter.class).doStart();
@@ -117,41 +113,57 @@ public class ApacheHttpClientTest {
         cnx.doStart();
         Assert.assertTrue("Apache HttpClient failed to start" , cnx.isStarted());
         cnx.stop();
+        server.stop();
     }
 
     @Test
-    public void testConnect() throws IOException, InterruptedException {
+    public void testConnectTwice() throws Exception {
+        MockHttpServer server = new MockHttpServer(false);
+        server.addResourceHandler(staticFiles);
+        server.start();
+
         HttpClientStarter cnx = new HttpClientStarter();
         HostStarter localhost = addConnection(cnx);
         localhost.find(Resolver.class).doStart();
         cnx.doStart();
-        HCHttpProbe p = new HCHttpProbe() {
-            @Override
-            public String getName() {
-                return "ApacheHttpClient";
-            }
-            @Override
-            protected Map<String, Number> parseStream(InputStream stream) {
-                ApacheHttpClientTest.this.collected = true;
-                return Collections.emptyMap();
-            }
-        };
-        p.setName("toto");
-        ProbeDesc pd = new ProbeDesc();
-        pd.add("test", DsType.COUNTER);
-        pd.setName("ApacheHttpClientTester");
-        p.setPd(pd);
+        TestHttpProbe p = new TestHttpProbe();
         p.setHost(localhost);
-        p.configure(server.getURI().toURL());
+        p.setPort(server.getURI().toURL().getPort());
+        p.configure();
         p.checkStore();
         localhost.addProbe(p);
         localhost.getParent().startCollect();
         // Run twice, to detect failure management in the probe
         localhost.collectAll();
+        shouldFail = false;
         Thread.sleep(1500);
+        localhost.collectAll();
+        Assert.assertTrue("Didn't try to collect", p.collected);
+        server.stop();
+    }
+
+    @Test
+    public void testConnectSSL() throws Exception {
+        MockHttpServer server = new MockHttpServer(true);
+        server.addResourceHandler(staticFiles);
+        server.start();
+
+        HttpClientStarter cnx = new HttpClientStarter();
+        HostStarter localhost = addConnection(cnx);
+        localhost.find(Resolver.class).doStart();
+        cnx.doStart();
+        TestHttpProbe p = new TestHttpProbe();
+        p.setHost(localhost);
+        p.setPort(server.getURI().toURL().getPort());
+        p.setScheme("https");
+        p.configure();
+        p.checkStore();
+        localhost.addProbe(p);
+        localhost.getParent().startCollect();
         shouldFail = false;
         localhost.collectAll();
-        Assert.assertTrue("Didn't try to collect", collected);
+        Assert.assertTrue("Didn't try to collect", p.collected);
+        server.stop();
     }
 
 }

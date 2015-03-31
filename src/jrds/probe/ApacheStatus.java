@@ -1,9 +1,3 @@
-/*##########################################################################
- _##
- _##  $Id$
- _##
- _##########################################################################*/
-
 package jrds.probe;
 
 import java.io.BufferedReader;
@@ -31,21 +25,13 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
         super();
     }
 
-    public Boolean configure() {
-
-        if(this.url == null) {
-            file = file + "?auto"; 
-        }
-        return super.configure();
-    }
-
     /**
      * @return Returns the url.
      */
     public String getUrlAsString() {
         String retValue = "";
         try {
-            URL tempUrl = new URL("http", getUrl().getHost(), getUrl().getPort(), "/");
+            URL tempUrl = new URL(getScheme(), getUrl().getHost(), getUrl().getPort(), "/");
             retValue = tempUrl.toString();
         } catch (MalformedURLException e) {
             throw new RuntimeException("MalformedURLException",e);
@@ -54,7 +40,7 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
     }
 
     public String getIndexName() {
-        int port = getUrl().getPort();
+        int port = getPort();
         if(port <= 0)
             port = 80;
         return Integer.toString(port);
@@ -87,14 +73,15 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
         Map<String, Number> retValue = new HashMap<String, Number>(lines.size());
         for(String l: lines) {
             String[] kvp = l.split(":");
-            if(kvp.length !=2)
+            if(kvp.length != 2)
                 continue;
             Double value = Util.parseStringNumber(kvp[1].trim(), Double.NaN);
             retValue.put(kvp[0].trim(), value);
         }
         Number uptimeNumber = retValue.remove("Uptime");
-        if(uptimeNumber != null)
-            setUptime(uptimeNumber.longValue());
+        if(uptimeNumber != null) {
+            setUptime(uptimeNumber.longValue());            
+        }
         return retValue;
     }
 
