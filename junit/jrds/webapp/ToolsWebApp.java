@@ -33,7 +33,7 @@ public class ToolsWebApp {
         config.put("configdir", root + "/config");
         config.put("autocreate", "true");
         config.put("rrddir", root);
-        config.put("libspath", "build/probes");
+        config.put("libspath", "desc");
         config.putAll(props);
 
         ServletTester tester = ToolsWebApp.getTestServer(config);
@@ -60,7 +60,6 @@ public class ToolsWebApp {
         request.setURI(queryURL.getPath()  + (args != null ? "?" + args : ""));
         request.setVersion("HTTP/1.0");
         response.parse(tester.getResponses(request.generate()));
-
         Assert.assertEquals(expectedStatus,response.getStatus());
 
         return response;

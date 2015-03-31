@@ -508,11 +508,12 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             String name = attrNode.getAttribute("name");
             PropertyDescriptor bean = beans.get(name);
             if(bean == null) {
-                logger.error("Unknonw bean " + name);
+                //Context[0] should be the host
+                logger.error("Unknown bean '" + name + "' for " + context[0]);
                 continue;
             }
             String textValue = Util.parseTemplate(attrNode.getTextContent(), context);
-            logger.trace(Util.delayedFormatString("Fond attribute %s with value %s", name, textValue));
+            logger.trace(Util.delayedFormatString("Found attribute %s with value %s", name, textValue));
             try {
                 Constructor<?> c = bean.getPropertyType().getConstructor(String.class);
                 Object value = c.newInstance(textValue);

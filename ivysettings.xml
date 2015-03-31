@@ -1,6 +1,6 @@
 <ivysettings>
 	<resolvers>
-		<url name="ivyrepo" m2compatible="false">
+		<url name="ivyrepo" m2compatible="true">
 			<ivy pattern="http://jrds.fr/maven2/[organisation]/[module]/ivys/ivy-[revision].xml" />
 			<artifact
 				pattern="http://jrds.fr/maven2/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]" />
@@ -8,6 +8,9 @@
         <filesystem name="build">
             <ivy pattern="${buildir}/ivy/[organisation]/[module]/ivys/ivy.xml"/>
             <artifact pattern="${buildir}/ivy/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"/>
+        </filesystem>
+        <filesystem name="mavenbuild" m2compatible="true">
+            <artifact pattern="${buildir}/maven/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"/>
         </filesystem>
 	</resolvers>
 	<settings defaultResolver="ivyrepo" />
