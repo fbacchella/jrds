@@ -98,7 +98,7 @@ public class Management extends StandardMBean implements ManagementMBean {
         else if(ctxt != null) {
             StartListener sl = (StartListener) ctxt.getAttribute(StartListener.class.getName());
             Properties p = sl.readProperties(ctxt);
-            pm.join(p);; 
+            pm.join(p);
         }
         pm.importSystemProps();
         Configuration.switchConf(pm);

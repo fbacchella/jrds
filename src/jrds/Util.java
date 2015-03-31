@@ -112,7 +112,7 @@ public class Util {
         public int getExponent() {
             return exponent;
         }
-    };
+    }
 
     static final private ErrorListener el = new ErrorListener() {
         public void error(TransformerException e) throws TransformerException {

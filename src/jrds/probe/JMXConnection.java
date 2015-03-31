@@ -41,7 +41,7 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
 
         };
         abstract public JMXServiceURL getURL(JMXConnection cnx)  throws MalformedURLException ;
-    };
+    }
 
     final static String startTimeObjectName = "java.lang:type=Runtime";
     final static String startTimeAttribue = "Uptime";

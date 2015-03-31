@@ -144,7 +144,7 @@ public class Renderer {
             return graph.toString();
         }
 
-    };
+    }
 
     static private final Logger logger = Logger.getLogger(Renderer.class);
     static private final float hashTableLoadFactor = 0.75f;

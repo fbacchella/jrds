@@ -39,7 +39,7 @@ public abstract class ACL {
         public String toString() {
             return "admin role: \"" + adminRole + "\"";
         }
-    };
+    }
 
     public abstract boolean check(ParamsBean params);	
     public abstract ACL join(ACL acl);

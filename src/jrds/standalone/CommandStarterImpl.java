@@ -87,5 +87,5 @@ public abstract class CommandStarterImpl implements CommandStarter {
             throw new RuntimeException("jmx remote access failed to configure", e);
         }
 
-    };
+    }
 }
