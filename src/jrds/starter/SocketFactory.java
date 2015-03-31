@@ -1,9 +1,11 @@
 package jrds.starter;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
 
 public class SocketFactory extends Starter {
 
@@ -32,14 +34,9 @@ public class SocketFactory extends Starter {
         if(! isStarted())
             return null;
 
-        Socket s = new Socket(host, port) {
-            public void connect(SocketAddress endpoint) throws IOException {
-                super.connect(endpoint, getTimeout() * 1000);
-            }
+        Socket s = getSocket();
+        s.connect(new InetSocketAddress(host, port), getTimeout());
 
-        };
-        s.setSoTimeout(getTimeout() * 1000);
-        s.setTcpNoDelay(true);
         return s;
     }
 
@@ -51,11 +48,28 @@ public class SocketFactory extends Starter {
         if(r == null || ! r.isStarted())
             return null;
 
-        Socket s = new Socket(r.getInetAddress(), port) {
+        Socket s = getSocket();
+        s.connect(new InetSocketAddress(r.getInetAddress(), port), getTimeout());
+        return s;
+    }
+
+    public Socket createSocket() throws IOException {
+        if(! isStarted())
+            return null;
+        return getSocket();
+    }
+
+    private Socket getSocket() throws SocketException {
+        Socket s = new Socket() {
             public void connect(SocketAddress endpoint) throws IOException {
                 super.connect(endpoint, getTimeout() * 1000);
             }
 
+            @Override
+            public void connect(SocketAddress endpoint, int timeout)
+                    throws IOException {
+                super.connect(endpoint, getTimeout() * 1000);
+            }
         };
         s.setSoTimeout(getTimeout() * 1000);
         s.setTcpNoDelay(true);
