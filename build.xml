@@ -304,7 +304,7 @@
 		<mkdir dir="tmp" />
 		<delete dir="${testdir}" />
 		<mkdir dir="${testdir}/rawtestoutput" />
-		<junit printsummary="yes" showoutput="no" failureproperty="junit.failure">
+		<junit printsummary="yes" showoutput="no" failureproperty="junit.failure" fork="true">
 			<sysproperty key="jrds.testloglevel" value="ERROR" />
 			<formatter type="xml" />
 			<classpath refid="test.classpath" />
