@@ -373,14 +373,12 @@ public class HostsList extends StarterNode {
 
     void doCustomTabs(Map<String, Tab> customTabMap, Map<String, GraphTree> treeMap, Set<Tab> tabs) {
         if(! customTabMap.isEmpty()) {
-            Set<Tab> customTabs = new HashSet<Tab>(customTabMap.size());
             log(Level.DEBUG, "Tabs to add: %s", customTabMap.values());
             for(Tab t: customTabMap.values()) {
                 t.setHostlist(this);
                 GraphTree tabtree = t.getGraphTree();
                 if(tabtree != null)
                     treeMap.put(t.getName(), tabtree);
-                customTabs.add(t);
             }
         }
     }
