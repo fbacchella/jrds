@@ -86,11 +86,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
 
     @Override
     public boolean exist(String hostname, HttpServletRequest request) {
-        MBeanServerConnection mbsc = connect(hostname, request);
-        if(mbsc == null) {
-            return false;
-        }
-        return true;
+        return connect(hostname, request) != null;
     }
 
     @Override
