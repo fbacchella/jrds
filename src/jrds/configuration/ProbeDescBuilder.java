@@ -102,11 +102,13 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
 
         JrdsElement requesterElement = root.getElementbyName("snmpRequester");
         if(requesterElement != null) {
-            String snmpRequester = requesterElement.getTextContent().trim();
-            if(snmpRequester != null && ! "".equals(snmpRequester)) {
-                pd.addSpecific("requester", snmpRequester);
-                logger.trace(Util.delayedFormatString("Specific added: requester='%s'", snmpRequester));
-
+            String snmpRequester = requesterElement.getTextContent();
+            if (snmpRequester != null) {
+                snmpRequester = snmpRequester.trim();
+                if (!snmpRequester.isEmpty()) {
+                    pd.addSpecific("requester", snmpRequester);
+                    logger.trace(Util.delayedFormatString("Specific added: requester='%s'", snmpRequester));
+                }
             }
         }
 
