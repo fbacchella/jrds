@@ -32,9 +32,7 @@ public class FilterXml extends Filter {
      * @param path
      */
     public void addPath(String path) {
-        Pattern p = Pattern.compile(path);
-        if(p != null)
-            goodPaths.add(p);
+        goodPaths.add(Pattern.compile(path));
     }
 
     /**
@@ -42,9 +40,7 @@ public class FilterXml extends Filter {
      * @param tag
      */
     public void addTag(String tag) {
-        Pattern p = Pattern.compile(tag);
-        if(p != null)
-            tags.add(p);
+        tags.add(Pattern.compile(tag));
     }
 
     /**

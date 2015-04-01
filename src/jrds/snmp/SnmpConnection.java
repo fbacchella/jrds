@@ -67,7 +67,7 @@ public class SnmpConnection extends Connection<Target> {
         else {
             return false;
         }
-        if(community != null && address != null) {
+        if(community != null) {
             snmpTarget = new CommunityTarget(address, new OctetString(community));
             snmpTarget.setVersion(version);
             snmpTarget.setTimeout(getLevel().getTimeout() * 1000 / 2);
