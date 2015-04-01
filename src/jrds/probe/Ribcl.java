@@ -76,7 +76,7 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
         if(! isCollectRunning())
             return Collections.emptyMap();
 
-        StringBuffer message = new StringBuffer();
+        StringBuilder message = new StringBuilder();
         try {
             OutputStream outputSocket = s.getOutputStream();
             InputStream inputSocket = s.getInputStream();

@@ -79,7 +79,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
         for(SnmpVars s: ti) {
             List<OID> lk = new ArrayList<OID>(s.keySet());
             Collections.sort(lk);
-            StringBuffer cmdBuf = new StringBuffer();
+            StringBuilder cmdBuf = new StringBuilder();
             for(OID oid: lk) {
                 cmdBuf.append(s.get(oid));
                 cmdBuf.append(' ');

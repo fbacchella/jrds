@@ -324,7 +324,7 @@ public class Util {
 
         Matcher m = oldvarregexp.matcher(template);
         String last = template;
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         while(m.find()) {
             if(m.group(1) !=  null)
                 buffer.append(m.group(1));

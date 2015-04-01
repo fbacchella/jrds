@@ -224,7 +224,7 @@ implements Cloneable, WithACL {
         },
         INDEX {
             public String resolve(GraphNode graph) {
-                StringBuffer retValue = new StringBuffer("empty");
+                StringBuilder retValue = new StringBuilder("empty");
                 if(graph.getProbe() instanceof IndexedProbe) {
                     retValue.setLength(0);
                     IndexedProbe ip = (IndexedProbe) graph.getProbe();
