@@ -89,7 +89,9 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
                 }
             }
             finally {
-                stmt.close();	
+                if (stmt != null) {
+                    stmt.close();
+                }
             }
             return values;
         } catch (SQLException e) {
