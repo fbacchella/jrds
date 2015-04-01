@@ -121,11 +121,8 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
             for (int i = 1; i <= colCount; i++) {
                 String key = rsmd.getColumnLabel(i);
                 Object oValue = rs.getObject(i);
-                if(numFilter) {
-                    if(oValue instanceof Number)
-                        oValue = oValue;
-                    else
-                        oValue = new Double(Double.NaN);
+                if(numFilter && !(oValue instanceof Number)) {
+                    oValue = Double.NaN;
                 }
                 row.put(key, oValue);
             }
