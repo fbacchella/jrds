@@ -181,7 +181,6 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
         message = message.replaceAll("<RIBCL VERSION=\"[0-9\\.]+\"/>", "<RIBCL >");
         Document d = xmlstarter.getDocument(new StringReader(message));
         xmlstarter.fileFromXpaths(d, getPd().getCollectStrings().keySet(), vars);
-        return;
     }
 
     /* (non-Javadoc)
