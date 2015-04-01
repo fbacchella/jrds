@@ -36,7 +36,7 @@ public class AutoGraph extends GraphNode {
         gd.setGraphName(theStore.getName());
         gd.setGraphTitle(theStore.getName());
         gd.setName(theStore.getName());
-        gd.setTree(PropertiesManager.HOSTSTAB, Arrays.asList(GraphDesc.TITLE));
+        gd.setTree(PropertiesManager.HOSTSTAB, Arrays.<Object>asList(GraphDesc.TITLE));
         logger.debug(this.getQualifiedName());
         this.op = op;
 
