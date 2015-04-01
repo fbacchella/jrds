@@ -33,7 +33,7 @@ public class ArchivesSet extends ArrayList<ArcDef> {
     }
 
     public ArcDef[] getArchives() {
-        return toArray(new ArcDef[]{});
+        return toArray(new ArcDef[size()]);
     }
 
     private static final ArcDef[] DEFAULTARC = {
