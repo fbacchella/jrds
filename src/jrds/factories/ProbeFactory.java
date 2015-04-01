@@ -55,8 +55,9 @@ public class ProbeFactory {
         Class<? extends Probe<?,?>> probeClass = pd.getProbeClass();
         if(probeClass == null) {
             logger.error("Invalid probe description " + pd.getName() + ", probe class name not found");
+            return null;
         }
-        Probe<?,?> retValue = null;
+        Probe<?,?> retValue;
         try {
             Constructor<? extends Probe<?,?>> c = probeClass.getConstructor();
             retValue = c.newInstance();
@@ -66,7 +67,7 @@ public class ProbeFactory {
             return null;
         }
         catch (ClassCastException ex) {
-            logger.warn("didn't get a Probe but a " + retValue.getClass().getName());
+            logger.warn("Error during probe instantiation: " + ex.getMessage());
             return null;
         } catch (Exception ex) {
             Throwable showException = ex;
