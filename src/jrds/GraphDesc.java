@@ -716,7 +716,7 @@ implements Cloneable, WithACL {
             name = Integer.toHexString((int)(Math.random() * Integer.MAX_VALUE));
         }
         //Auto generated legend
-        if(legend == null && name != null && gt.legend())
+        if(legend == null && gt.legend())
             legend = name;
 
         Integer valPercentile = null;
