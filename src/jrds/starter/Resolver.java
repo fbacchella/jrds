@@ -44,7 +44,7 @@ public class Resolver extends Starter {
 	}
 
 	public static Object makeKey(StarterNode node) {
-		HostInfo host = null;
+		HostInfo host;
 		if(node instanceof HostStarter)
 			host = ((HostStarter)node).getHost();
 		else if(node instanceof Probe<?,?>) {

@@ -77,8 +77,10 @@ public class Download extends JrdsServlet {
             params = getParamsBean(req);
         }
 
-        DataProcessor sourceDp = null;
-        String fileName = null;
+
+        DataProcessor sourceDp;
+        String fileName;
+        jrds.Graph graph;
         if("graph".equals(cmd)) {
             jrds.Graph graph = params.getGraph(this);
             if(graph == null) {

@@ -131,7 +131,7 @@ public abstract class StarterNode implements StartersSet {
     }
 
     public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc) {
-        Object key = null;
+        Object key;
         try {
             Method m = sc.getMethod("makeKey", StarterNode.class);
             key = m.invoke(null, this);

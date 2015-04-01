@@ -80,7 +80,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             return null;
         }
 
-        HostInfo host = null;
+        HostInfo host;
         if(dnsHostname != null) {
             host = new HostInfo(hostName, dnsHostname);
         }
@@ -267,7 +267,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         p.setTimeout(timer.getTimeout());
 
         // Identify the archive to use
-        String archivesName = null;
+        String archivesName;
         // Check if a custom archives list is defined
         if (probeNode.hasAttribute("archivesset")) {
             archivesName = probeNode.getAttribute("archivesset");
@@ -336,7 +336,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         //A connected probe, register the needed connection
         //It can be defined within the node, referenced by it's name, or it's implied name
         if(p instanceof ConnectedProbe) {
-            String connectionName = null;
+            String connectionName;
             ConnectedProbe cp = (ConnectedProbe) p;
             //Register the connections defined within the probe
             for(ConnectionInfo ci: makeConnexion(probeNode, p, properties)) {

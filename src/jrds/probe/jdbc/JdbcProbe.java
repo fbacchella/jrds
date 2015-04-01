@@ -164,7 +164,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
     {
         Map<String, Object> values = new HashMap<String, Object>();
         log(Level.DEBUG, "Getting %s", query); 
-        Statement stmt = null;
+        Statement stmt;
         try {
             stmt = starter.getStatment();
             if(stmt.execute(query)) {

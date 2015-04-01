@@ -134,7 +134,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
                     String key = keyValue + meta.getColumnLabel(i);
                     if(! collectKeys.contains(key))
                         continue;
-                    Number value = Double.NaN;
+                    Number value;
                     Object oValue = rs.getObject(i);
                     log(Level.TRACE, "type info for %s: type %d, %s = %s",  key, meta.getColumnType(i), oValue.getClass(), oValue.toString());
                     if(oValue instanceof Number) {

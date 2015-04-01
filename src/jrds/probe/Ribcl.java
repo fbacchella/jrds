@@ -59,7 +59,7 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
 
     @Override
     public Map<String, Number> getNewSampleValues() {
-        Socket s = null;
+        Socket s;
         try {
             s = connect();
         } catch (Exception e) {

@@ -79,7 +79,7 @@ public class ConfigObjectFactory {
 
         for(Map.Entry<String, JrdsDocument> e: nodeMap.entrySet()) {
             JrdsDocument n = e.getValue();
-            BuildObject o = null;
+            BuildObject o;
             String name = ob.ct.getName(n);
             try {
                 o = ob.build(n);

@@ -114,7 +114,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
      * @throws UnsupportedEncodingException 
      */
     Number resolvJmxObject(Object o, String[] jmxPath) throws UnsupportedEncodingException {
-        Object value = null;
+        Object value;
         //Fast simple case
         if(o instanceof Number)
             return (Number) o;

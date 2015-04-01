@@ -120,7 +120,7 @@ public class Renderer {
                 if(cause != null)
                     logger.error("    Cause was: " + cause);
             } catch (Exception e) {
-                String message = "";
+                String message;
                 try {
                     String graphName = graph.getQualifiedName();
                     message = String.format("Error rendering graph %s: %s", graphName, e.getMessage());
@@ -246,8 +246,7 @@ public class Renderer {
     }
 
     public boolean isReady(Graph graph) {
-        RendererRun runRender = null;
-        runRender = rendered.get(graph.hashCode());
+        RendererRun runRender = rendered.get(graph.hashCode());
         if( runRender == null) {
             try {
                 render(graph);

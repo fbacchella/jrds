@@ -563,7 +563,7 @@ public class Util {
     public static void serialize(Document d, OutputStream out, URL transformerLocation, Map<String, String> properties) throws TransformerException, IOException {
         Source source = new DOMSource(d);
 
-        Transformer transformer = null;
+        Transformer transformer;
         if(transformerLocation != null) {
             Source stylesource = new StreamSource(transformerLocation.toString());
             transformer = tFactory.newTransformer(stylesource);

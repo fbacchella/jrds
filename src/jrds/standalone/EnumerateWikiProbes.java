@@ -173,7 +173,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         if(ProbeConnected.class.isAssignableFrom(c)) {
             System.out.println(doTitle("Connection class"));
 
-            Class<?> typeArg = null;
+            Class<?> typeArg;
             Class<?> curs = c;
             while(! ParameterizedType.class.isAssignableFrom(curs.getGenericSuperclass().getClass()))
                 curs = curs.getSuperclass();
