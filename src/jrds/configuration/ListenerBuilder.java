@@ -19,10 +19,11 @@ public class ListenerBuilder extends ConfigObjectBuilder<Listener<?,?>> {
     Listener build(JrdsDocument n) throws InvocationTargetException {
         JrdsElement root = n.getRootElement();
         String className = root.getAttribute("class");
-        if(className != null)
+        if(className != null) {
             className = className.trim();
-        if(className.isEmpty())
-            return null;
+            if (className.isEmpty())
+                return null;
+        }
         try {
             @SuppressWarnings("unchecked")
             Class<? extends Listener> starterClass = (Class<? extends Listener>) classLoader.loadClass(className);
