@@ -172,7 +172,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
      */
     public Map<String, Number> getNewSampleValues() {
         log(Level.DEBUG, "Getting %s", getUrl());
-        URLConnection cnx = null;
+        URLConnection cnx;
         try {
             cnx = getUrl().openConnection();
             cnx.setConnectTimeout(getTimeout() * 1000);

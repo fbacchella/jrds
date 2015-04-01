@@ -95,8 +95,8 @@ public class Download extends JrdsServlet {
         }
 
 
-        DataProcessor sourceDp = null;
-        String fileName = null;
+        DataProcessor sourceDp;
+        String fileName;
         jrds.Graph graph;
         if("graph".equals(cmd)) {
             graph = params.getGraph(this);

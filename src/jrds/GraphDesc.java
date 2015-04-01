@@ -663,7 +663,7 @@ implements Cloneable, WithACL {
             String host, String probe, String dsName) {
         if(logger.isTraceEnabled())
             logger.trace("Adding " + name + ", " + rpn + ", " + graphType + ", " + color + ", " + legend + ", " + consFunc + ", " + reversed + ", " + host + ", " + probe);
-        GraphType gt = null;
+        GraphType gt;
         if(graphType == null || "".equals(graphType)) {
             if(legend != null)
                 gt = GraphType.COMMENT;
@@ -682,7 +682,6 @@ implements Cloneable, WithACL {
 
         Color c = null;
         if(gt.toPlot()) {
-            c = Color.WHITE;
             if(color != null && color.toUpperCase().matches("^#[0-9A-F]{6}")) {
                 int r = Integer.parseInt(color.substring(1, 3), 16);
                 int g = Integer.parseInt(color.substring(3, 5), 16);
@@ -817,7 +816,7 @@ implements Cloneable, WithACL {
         Set<String> datasources = new HashSet<String>();
 
         for(DsDesc ds: allds) {
-            boolean complete = false;
+            boolean complete;
             // not a data source, don't try to add it in datasources
             if(! ds.graphType.datasource()) {
                 complete = true;

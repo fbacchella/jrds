@@ -94,7 +94,7 @@ public final class WhichLibs extends JrdsServlet {
     }
 
     private String resolv(String name, Object o) {
-        String retValue = "";
+        String retValue;
         if(o != null)
             retValue = resolv(name, o.getClass());
         else
@@ -104,7 +104,7 @@ public final class WhichLibs extends JrdsServlet {
 
 
     private String resolv(String name, Class<?> c) {
-        String retValue = "";
+        String retValue;
         try {
             retValue = name + " found in " + locateJar(c);
         } catch (RuntimeException e) {

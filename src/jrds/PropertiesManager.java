@@ -69,7 +69,7 @@ public class PropertiesManager extends Properties {
     }
 
     private int parseInteger(String s) throws NumberFormatException {
-        Integer integer = null;
+        Integer integer;
         if (s != null) {
             if (s.startsWith("#")) {
                 integer = Integer.valueOf(s.substring(1), 16);

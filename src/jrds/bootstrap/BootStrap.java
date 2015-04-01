@@ -100,7 +100,7 @@ public class BootStrap {
             String path = ressourcePath(BootStrap.class);
             URL me = BootStrap.class.getResource(path);
             String protocol = me.getProtocol();
-            URL rootUrl = null;
+            URL rootUrl;
             if("jar".equals(protocol)) {
                 JarURLConnection cnx = (JarURLConnection) me.openConnection();
                 rootUrl = cnx.getJarFileURL();

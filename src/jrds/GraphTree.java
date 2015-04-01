@@ -185,7 +185,7 @@ public class GraphTree {
 	}
 
 	private StringBuilder _getPath() {
-		StringBuilder retValue = null;
+		StringBuilder retValue;
 		if(parent == null)
 			retValue = new StringBuilder();
 		else

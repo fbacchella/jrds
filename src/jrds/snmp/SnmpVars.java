@@ -80,7 +80,7 @@ public class SnmpVars extends HashMap<OID, Object> {
         else {
             errors.put(vb.getOid(), vb.getSyntax());
             int exception = vb.getSyntax();
-            String exceptionName = "";
+            String exceptionName;
             switch(exception) {
             case SMIConstants.EXCEPTION_END_OF_MIB_VIEW:
                 exceptionName = "End of mib view";

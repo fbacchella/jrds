@@ -120,7 +120,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
             log(Level.TRACE, "Trying to discover probe %s", name);
 
             try {
-                boolean found = false;
+                boolean found;
                 if(summary.isIndexed ) {
                     found = (enumerateIndexed(hostEleme, summary, withOid) > 0);
                 }
