@@ -230,7 +230,7 @@ implements Cloneable, WithACL {
                     //Check to see if a label is defined and needed to add
                     String label = graph.getProbe().getLabel();
                     if(label != null) {
-                        retValue.append(" (" + label + ")");
+                        retValue.append(" (").append(label).append(")");
                     }
                 }
                 else {
