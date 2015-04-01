@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import jrds.PropertiesManager;
+import jrds.factories.ArgFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.webapp.RolesACL;
@@ -172,32 +173,19 @@ abstract class ConfigObjectBuilder<BuildObject> {
     public boolean setMethod(JrdsElement element, Object o, String method, Class<?> argType) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException{
         if(element == null)
             return false;
-        Constructor<?> c = null;
-        if(! argType.isPrimitive() ) {
-            c = argType.getConstructor(String.class);
-        }
-        else if(argType == Integer.TYPE) {
-            c = Integer.class.getConstructor(String.class);
-        }
-        else if(argType == Double.TYPE) {
-            c = Double.class.getConstructor(String.class);
-        }
-        else if(argType == Float.TYPE) {
-            c = Float.class.getConstructor(String.class);
-        }
 
-        String name = element.getTextContent().trim();
-        if(name != null) {
-            Method m;
-            try {
-                m = o.getClass().getMethod(method, argType);
-            } catch (NoSuchMethodException e) {
-                m = o.getClass().getMethod(method, Object.class);
-            }
-            m.invoke(o, c.newInstance(name));
-            return true;
+        String name = element.getTextContent();
+        if(name == null)
+            return false;
+
+        Method m;
+        try {
+            m = o.getClass().getMethod(method, argType);
+        } catch (NoSuchMethodException e) {
+            m = o.getClass().getMethod(method, Object.class);
         }
-        return false;
+        m.invoke(o, ArgFactory.ConstructFromString(argType, name.trim()));
+        return true;
     }
 
 }
