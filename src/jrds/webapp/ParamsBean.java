@@ -423,8 +423,10 @@ public class ParamsBean implements Serializable {
     private void addFilterArgs(Map<String, Object> args) {
         if(filter instanceof jrds.FilterHost) {
             args.put("host", filter.getName());
-        } else {
+        }
+        else if (filter instanceof jrds.Filter){
             args.put("filter", filter.getName());
+
         }
     }
 
