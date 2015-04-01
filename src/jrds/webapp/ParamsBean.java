@@ -483,11 +483,11 @@ public class ParamsBean implements Serializable {
         if(! contextPath.endsWith("/")) {
             urlBuffer.append('/');
         }
-        urlBuffer.append(file + "?");
+        urlBuffer.append(file).append("?");
 
         for(Map.Entry<String, Object>e: args.entrySet()) {
             try {
-                urlBuffer.append(e.getKey() + "="+ URLEncoder.encode(e.getValue().toString(), "UTF-8") + "&");
+                urlBuffer.append(e.getKey()).append("=").append(URLEncoder.encode(e.getValue().toString(), "UTF-8")).append("&");
             } catch (UnsupportedEncodingException e1) {
             }
         }
@@ -506,9 +506,9 @@ public class ParamsBean implements Serializable {
 
         parambuff.append('&');
         if(id != 0)
-            parambuff.append("id=" + id + '&');
+            parambuff.append("id=").append(id).append('&');
         if(gid != 0)
-            parambuff.append("gid=" + gid + '&');
+            parambuff.append("gid=").append(gid).append('&');
         for(Map.Entry<String, Object> param: args.entrySet()) {
             String key = param.getKey();
             Object value = param.getValue();
@@ -647,7 +647,7 @@ public class ParamsBean implements Serializable {
     public String getPeriodUrl() {
         StringBuilder parambuff = new StringBuilder();
         if(period != null)
-            parambuff.append("begin=" + period.getBegin().getTime() + "&end=" + period.getEnd().getTime());
+            parambuff.append("begin=").append(period.getBegin().getTime()).append("&end=").append(period.getEnd().getTime());
         return parambuff.toString();
     }
 

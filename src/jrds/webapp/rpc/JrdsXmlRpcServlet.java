@@ -175,7 +175,7 @@ public class JrdsXmlRpcServlet extends XmlRpcServlet {
 					p.readAuthorization(pRequest, hl);
 					StringBuilder roleStr = new  StringBuilder();
 					for(String role: p.getRoles()) {
-						roleStr.append(role +",");
+						roleStr.append(role).append(",");
 					}
 					requestconfig.setBasicPassword(roleStr.toString());
 				}

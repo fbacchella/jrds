@@ -707,7 +707,7 @@ public class Util {
         if(namedLogger.isEnabledFor(l)) {
             StringBuilder line = new StringBuilder();
             if(source != null)
-                line.append("[" + source.toString() + "] ");
+                line.append("[").append(source.toString()).append("] ");
             line.append(String.format(format, args));
             namedLogger.log(l, line.toString());
             //NPE should never happen, so it's always logged

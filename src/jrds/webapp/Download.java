@@ -143,7 +143,7 @@ public class Download extends JrdsServlet {
         sourcesline.append("Date,");
         for(String name: sources) {
             if(! name.startsWith("rev_"))
-                sourcesline.append(name + ",");
+                sourcesline.append(name).append(",");
         }
         sourcesline.deleteCharAt(sourcesline.length() - 1);
         sourcesline.append("\r\n");
@@ -152,10 +152,10 @@ public class Download extends JrdsServlet {
         long[] ts = dp.getTimestamps();
         for(int i=0; i < ts.length; i++) {
             sourcesline.setLength(0);
-            sourcesline.append(exportDateFormat.format(org.rrd4j.core.Util.getDate(ts[i])) + ",");
+            sourcesline.append(exportDateFormat.format(org.rrd4j.core.Util.getDate(ts[i]))).append(",");
             for(int j = 0; j < sources.length; j++) {
                 if(! sources[j].startsWith("rev_"))
-                    sourcesline.append(values[j][i]+",");
+                    sourcesline.append(values[j][i]).append(",");
             }
             sourcesline.deleteCharAt(sourcesline.length() - 1);
             sourcesline.append("\r\n");
