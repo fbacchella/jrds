@@ -31,6 +31,7 @@ import jrds.starter.Timer;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -129,16 +130,10 @@ public class PropertiesManager extends Properties {
         try {
             inputstream = new FileInputStream(propFile);
             load(inputstream);
-            inputstream.close();
         } catch (IOException ex) {
             logger.warn("Invalid properties file " + propFile.getAbsolutePath() + ": " + ex.getLocalizedMessage());
         } finally {
-            if(inputstream !=null) {
-                try {
-                    inputstream.close();
-                } catch (IOException e) {
-                }
-            }
+            IOUtils.closeQuietly(inputstream);
         }
     }
 
