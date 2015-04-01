@@ -115,7 +115,6 @@ public class XmlProvider extends Starter {
             }
         }
         log(Level.TRACE, "Values found: %s", oldMap);
-        return;
     }
 
     public Document getDocument(InputSource stream) {

@@ -317,7 +317,6 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         else {
             sortedProbeName.add(name);
         }
-        return;
     }
 
 }
