@@ -21,6 +21,7 @@ import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.Util;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.rrd4j.core.DsDef;
 
@@ -116,11 +117,7 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         } catch (IOException e) {
             log(Level.ERROR, e, "external command failed : %s", e);
         } finally {
-            try {
-                if(stdout != null)
-                    stdout.close();
-            } catch (IOException e) {
-            }
+            IOUtils.closeQuietly(stdout);
         }
 
         try {
