@@ -148,8 +148,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
                 String defaultValue = "";
                 ProbeDesc.DefaultBean currentAttribute = defaultBeans.get(bean.getName());
                 if(currentAttribute != null && ! currentAttribute.delayed) {
-                    String o = currentAttribute.value;
-                    defaultValue = o.toString();                    
+                    defaultValue = currentAttribute.value;
                 }
                 if(bean != null )
                     System.out.println("| " + bean.getName() + " | " + defaultValue + " | | ");
