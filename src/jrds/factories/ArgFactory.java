@@ -154,6 +154,8 @@ public final class ArgFactory {
             }
             else if(clazz == Character.TYPE) {
                 c = Character.class.getConstructor(String.class);
+            } else {
+                throw new IllegalArgumentException("no single String constructor found");
             }
             return c.newInstance(value);
         } catch (SecurityException e) {
