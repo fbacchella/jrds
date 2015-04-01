@@ -281,10 +281,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
 
         String doesExistOid = summary.specifics.get("existOid");
         //drop indexed probes without OID to check presence
-        if(!summary.isIndexed && (doesExistOid == null || doesExistOid.isEmpty()))
-            return false;
-
-        return true;
+        return !(!summary.isIndexed && (doesExistOid == null || doesExistOid.isEmpty()));
     }
 
     @Override
