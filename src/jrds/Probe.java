@@ -369,7 +369,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
-     * Return the string value of the probe as a path constitued of
+     * Return the string value of the probe as a path constituted of
      * the host name / the probe name
      * @see java.lang.Object#toString()
      */

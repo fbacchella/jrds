@@ -98,7 +98,7 @@ public class HttpClientStarter extends Starter {
                         @Override
                         public boolean isTrusted(X509Certificate[] chain,
                                 String authType) throws CertificateException {
-                            log(Level.TRACE, "trying to check certificates chain %s with authentication methode %s", chain, authType);
+                            log(Level.TRACE, "trying to check certificates chain %s with authentication method %s", chain, authType);
                             return true;
                         }
                     })

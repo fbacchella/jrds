@@ -148,7 +148,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
                 String textValue = Util.parseTemplate(e.getValue(), probe);
                 GenericBean bean = beansList.get(name);
                 if(bean == null) {
-                    logger.error(String.format("Unknonw bean for %s: %s", gd.getName() , name));
+                    logger.error(String.format("Unknown bean for %s: %s", gd.getName() , name));
                     continue;
                 }
                 logger.trace(Util.delayedFormatString("Found attribute %s with value %s", name, textValue));
