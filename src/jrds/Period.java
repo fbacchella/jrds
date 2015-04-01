@@ -128,10 +128,8 @@ public class Period {
     /**
      * Calculate date from string parameters coming from the URL
      *
-     * @param sbegin String
-     * @param send String
-     * @param begin The calculated begin date
-     * @param end The calculated end date
+     * @param date
+     * @param isBegin
      * @throws ParseException 
      */
     private DateTime string2Date(String date, boolean isBegin) throws ParseException{

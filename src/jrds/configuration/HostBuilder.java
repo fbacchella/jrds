@@ -458,7 +458,8 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     /**
      * Enumerate the connections found in an XML node
      * @param domNode a node to parse
-     * @param host
+     * @param parent
+     * @param properties
      * @return
      */
     Set<ConnectionInfo> makeConnexion(JrdsElement domNode, Object parent, Map<String, String> properties) {
