@@ -97,7 +97,7 @@ public class PeriodTest {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, 1);
         cal.set(Calendar.MINUTE, 12);
-        cal.set(Calendar.SECOND, 00);
+        cal.set(Calendar.SECOND, 0);
         cal.set(Calendar.MILLISECOND, 0);
         Date begin = cal.getTime();
 
