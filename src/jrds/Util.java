@@ -193,7 +193,7 @@ public class Util {
     static private final Pattern attrSignature = Pattern.compile("attr\\.(.*)\\.signature");
     static private final Pattern attr = Pattern.compile("attr\\.(.*)");
 
-    static private final String findVariables(String in, int index, Map<String, Integer> indexes, Object... arguments) {
+    static private String findVariables(String in, int index, Map<String, Integer> indexes, Object... arguments) {
         Matcher m = varregexp.matcher(in);
         if(m.find()) {
             StringBuilder out = new StringBuilder();

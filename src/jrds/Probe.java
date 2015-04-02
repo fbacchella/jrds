@@ -142,7 +142,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                 Util.getFileSeparator() + rrdName + ".rrd";
     }
 
-    private final String parseTemplate(String template) {
+    private String parseTemplate(String template) {
         Object[] arguments = {
                 "${host}",
                 "${index}",
