@@ -17,7 +17,7 @@
         <buildTarget>1.7</buildTarget>
         <!-- current year. -->
         <year>2014</year>
-        <dojo.version>1.9.3</dojo.version>
+        <dojo.version>1.10.4</dojo.version>
         <dojo.unpacked.dir>${project.basedir}/target/dojo-unpacked</dojo.unpacked.dir>
         <webapp.root>${project.basedir}/web</webapp.root>
         <jrds.testloglevel>ERROR</jrds.testloglevel>
