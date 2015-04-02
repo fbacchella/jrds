@@ -89,7 +89,7 @@ public class HttpClientStarter extends Starter {
         return true;
     }
 
-    private final SSLConnectionSocketFactory getSSLSocketFactory() {
+    private SSLConnectionSocketFactory getSSLSocketFactory() {
         SSLStarter sslstarter = getLevel().find(SSLStarter.class);
         SSLContext sc = sslstarter.getContext();
         try {
