@@ -49,7 +49,9 @@ public class TrapListener extends Listener<CommandResponderEvent, OID> {
             }
             snmp = new Snmp(transport);
             snmp.addCommandResponder(trapReceiver);
-            transport.listen();
+            if (transport != null) {
+                transport.listen();
+            }
             return super.start();
         } catch (IOException e) {
             log(Level.ERROR, e, "failed to start the trap listener: %s", e.getMessage());
