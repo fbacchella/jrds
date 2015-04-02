@@ -69,7 +69,7 @@ public class Sum extends AutonomousGraphNode {
      */
     @Override
     public PlottableMap getCustomData() {
-        PlottableMap sumdata = new PlottableMap() {
+        return new PlottableMap() {
             @Override
             public void configure(long start, long end, long step) {
                 ExtractInfo ei = ExtractInfo.get()
@@ -112,7 +112,7 @@ public class Sum extends AutonomousGraphNode {
                                     if ( ! Double.isNaN(v) ) {
                                         if(! Double.isNaN(allvalues[c][r]))
                                             allvalues[c][r] += v;
-                                        else    
+                                        else
                                             allvalues[c][r] = v;
                                     }
                                 }
@@ -135,7 +135,6 @@ public class Sum extends AutonomousGraphNode {
                 }
             }
         };
-        return sumdata;
     }
 
 }
