@@ -60,7 +60,7 @@ public class BootStrap {
             if(args.length > 1)
                 commandName = args[1].trim().toLowerCase();
             else
-                doHelp(null);
+                doHelp();
         }
         else {
             if(args.length > 1)
@@ -156,20 +156,17 @@ public class BootStrap {
         return null;
     }
 
-    static private void doHelp(CommandStarter command) {
-        if(command == null) {
-            System.out.println("Lists of available command:");
-            for(String commandName: cmdClasses.keySet()) {
-                System.out.println("    " + commandName);
-            }
-            System.out.println("");
-            System.out.println("Lists of configuration propreties:");
-            for(String propName: propertiesList) {
-                System.out.println("    " + propName);
-            }
-            System.out.println(String.format("A class path can be auto build with the propery libspath, a list of directory or jar, separated by a %s", File.pathSeparatorChar));
-
+    static private void doHelp() {
+        System.out.println("Lists of available command:");
+        for(String commandName: cmdClasses.keySet()) {
+            System.out.println("    " + commandName);
         }
+        System.out.println("");
+        System.out.println("Lists of configuration propreties:");
+        for(String propName: propertiesList) {
+            System.out.println("    " + propName);
+        }
+        System.out.println(String.format("A class path can be auto build with the propery libspath, a list of directory or jar, separated by a %s", File.pathSeparatorChar));
         System.exit(0);
     }
 
