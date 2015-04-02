@@ -219,7 +219,7 @@ public class PropertiesManager extends Properties {
                 logger.error(dir + " doesn't exists");
                 return null;
             }
-            if ( autocreate && !dir.mkdirs()) {
+            if (!dir.mkdirs()) {
                 logger.error(dir + " doesn't exists and can't be created");
                 return null;
             }
