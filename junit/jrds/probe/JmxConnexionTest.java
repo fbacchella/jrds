@@ -119,7 +119,7 @@ public class JmxConnexionTest {
         Tools.configure();
         logger.setLevel(Level.TRACE);
         Tools.setLevel(new String[] {JmxConnexionTest.class.getName(), JMXConnection.class.getName(), "jrds.Starter"}, logger.getLevel());
-    };
+    }
 
     @After
     public void finished() throws Exception {

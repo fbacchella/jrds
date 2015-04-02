@@ -53,8 +53,8 @@ public class ListenerTest {
             // TODO Auto-generated method stub
             return null;
         }
-
-    };
+        
+    }
 
     static Logger logger = Logger.getLogger(ListenerTest.class);
 

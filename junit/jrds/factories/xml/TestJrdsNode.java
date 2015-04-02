@@ -18,7 +18,7 @@ public class TestJrdsNode {
         static <T> T[] convert(T... types) {
             return types;
         }
-    };
+    }
 
     static final private Logger logger = Logger.getLogger(TestJrdsNode.class);
 

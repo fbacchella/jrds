@@ -32,7 +32,7 @@ public class TestSnmpConnection {
 
     @Test
     public void testBuild() throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
-        SnmpConnection cnx = new SnmpConnection();;
+        SnmpConnection cnx = new SnmpConnection();
         Map<String, GenericBean> beans = ArgFactory.getBeanPropertiesMap(cnx.getClass(), Starter.class);
         beans.get("community").set(cnx, "public");
         beans.get("version").set(cnx, "1");
