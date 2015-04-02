@@ -112,9 +112,8 @@ public class BootStrap {
                 return null;
 
             File file = new File(rootUrl.getFile());
-            File baseClassPath = file.getParentFile();
 
-            return baseClassPath;
+            return file.getParentFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -188,8 +187,7 @@ public class BootStrap {
             return null;
         }
         try {
-            CommandStarter cmd = cmdStarter.newInstance();
-            return cmd;
+            return cmdStarter.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }

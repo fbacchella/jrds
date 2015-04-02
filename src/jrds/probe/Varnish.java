@@ -127,9 +127,7 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
         }
         in.readLine();
 
-        BufferedReader answerbuffer = new BufferedReader(new CharArrayReader(cbuf));
-
-        return answerbuffer;
+        return new BufferedReader(new CharArrayReader(cbuf));
     }
 
     @Override

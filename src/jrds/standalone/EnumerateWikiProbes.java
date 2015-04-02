@@ -34,8 +34,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         String className = c.getName();
         String classurlpath = className.replace('.', '/');
         String newurl = String.format(JAVADOCURLTEMPLATES, classurlpath);
-        String classLine = String.format("[[%s|%s]]", newurl, className);
-        return classLine;
+        return String.format("[[%s|%s]]", newurl, className);
     }
 
     public void start(String args[]) throws Exception {

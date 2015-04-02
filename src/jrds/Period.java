@@ -95,13 +95,11 @@ public class Period {
     }
 
     public Period previous() {
-        Period next = new Period(begin.minus(period), end.minus(period));
-        return next;
+        return new Period(begin.minus(period), end.minus(period));
     }
 
     public Period next() {
-        Period next = new Period(begin.plus(period), end.plus(period));
-        return next;
+        return new Period(begin.plus(period), end.plus(period));
     }
 
     /**
@@ -201,8 +199,7 @@ public class Period {
                     second = jrds.Util.parseStringNumber(dateMatcher.group(9), 0);
                 }
                 LocalTime jtime = new LocalTime(hour, minute, second);
-                DateTime dt = jdate.toDateTime(jtime, tz);
-                return dt;
+                return jdate.toDateTime(jtime, tz);
             } catch (Exception e) {
                 ParseException newex = new ParseException("Invalid string to parse: " + date, 0);
                 newex.initCause(e);

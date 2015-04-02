@@ -526,8 +526,7 @@ public class Util {
         try {
             Class<NumberClass> clazz = (Class<NumberClass>) defaultVal.getClass();
             Constructor<NumberClass> c = clazz.getConstructor(String.class);
-            NumberClass n = c.newInstance(toParse);
-            return n;
+            return c.newInstance(toParse);
         } catch (SecurityException e) {
         } catch (NoSuchMethodException e) {
         } catch (IllegalArgumentException e) {
@@ -548,8 +547,7 @@ public class Util {
 
         try {
             Constructor<NumberClass> c = nc.getConstructor(String.class);
-            NumberClass n = c.newInstance(toParse);
-            return n;
+            return c.newInstance(toParse);
         } catch (SecurityException e) {
         } catch (NoSuchMethodException e) {
         } catch (IllegalArgumentException e) {

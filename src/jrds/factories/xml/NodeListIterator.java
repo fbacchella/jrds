@@ -30,7 +30,7 @@ public class NodeListIterator<N extends AbstractJrdsNode<?>> implements Iterable
     }
 
     public Iterator<N> iterator() {
-        Iterator<N> iter  = new Iterator<N>() {
+        return new Iterator<N>() {
             int i = 0;
             int last = nl.getLength();
             public boolean hasNext() {
@@ -44,7 +44,6 @@ public class NodeListIterator<N extends AbstractJrdsNode<?>> implements Iterable
             }
 
         };
-        return iter;
     }
 
     public int getLength() {
