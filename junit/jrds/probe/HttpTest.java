@@ -39,7 +39,7 @@ public class HttpTest {
 
         Assert.assertEquals("invalid url bean template", p.getUrl().toString(), Util.parseTemplate("${attr.url}", p));
         Assert.assertEquals("invalid port bean template", p.getPort().toString(), Util.parseTemplate("${attr.port}", p));
-        Assert.assertEquals("invalid file bean template", p.getFile().toString(), Util.parseTemplate("${attr.file}", p));
+        Assert.assertEquals("invalid file bean template", p.getFile(), Util.parseTemplate("${attr.file}", p));
     }
 
     @Test
