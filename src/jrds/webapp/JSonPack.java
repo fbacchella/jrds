@@ -26,7 +26,7 @@ import org.json.JSONException;
  */
 public class JSonPack extends HttpServlet {
     static final private Logger logger = Logger.getLogger(JSonPack.class);
-    static final public List<String> JSONKEYS =  Arrays.asList(new String[] {"id", "autoperiod", "filter", "host", "path", "begin", "end", "max", "min", "tab", "sort", "tree"});
+    static final public List<String> JSONKEYS =  Arrays.asList("id", "autoperiod", "filter", "host", "path", "begin", "end", "max", "min", "tab", "sort", "tree");
     static final public Map<String, Integer> JSONDICT = new HashMap<String, Integer>(JSONKEYS.size());
     static {
         for(int i= JSONKEYS.size() -1; i >= 0; i--) {
@@ -53,7 +53,7 @@ public class JSonPack extends HttpServlet {
         int read;
         while((read = postDataStream.read(bufferin)) > 0 ) {
             postDataBuffer.write(bufferin, 0, read);
-        };
+        }
         String postData = postDataBuffer.toString();
         logger.debug(Util.delayedFormatString("Post data: %s", postData));
 

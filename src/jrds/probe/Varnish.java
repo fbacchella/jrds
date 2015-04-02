@@ -40,7 +40,7 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
 
     @Override
     public Map<String, Number> getNewSampleValues() {
-        Socket s = null;
+        Socket s;
         try {
             SocketFactory ss = find(SocketFactory.class); 
             if(! ss.isStarted())
@@ -124,7 +124,7 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
         if( readchar != size ) {
             log(Level.ERROR, "read failed, not enough byte, got %d expected %d", readchar, size);
             return new BufferedReader(new CharArrayReader(new char[0]));
-        };
+        }
         in.readLine();
 
         BufferedReader answerbuffer = new BufferedReader(new CharArrayReader(cbuf));

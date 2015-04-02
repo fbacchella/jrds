@@ -62,7 +62,7 @@ public interface GenericBean {
 
         public void set(Object o, String in) {
             Probe<?, ?> p = (Probe<?, ?>) o;
-            p.setBean(name, in);;
+            p.setBean(name, in);
         }
 
         public Object get(Object o) {

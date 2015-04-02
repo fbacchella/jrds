@@ -8,7 +8,6 @@ package jrds;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -160,7 +159,7 @@ public class GraphTree {
 		List<GraphNode> retValue  = new ArrayList<GraphNode>();
 		if(graphsSet != null) {
 			if(f == null)
-				retValue.addAll((Collection<GraphNode>) graphsSet.values());
+				retValue.addAll(graphsSet.values());
 			else {
 				for(GraphNode g: graphsSet.values()) {
 					String path = this.getPath() + "/" + g.getName();
@@ -186,7 +185,7 @@ public class GraphTree {
 	}
 
 	private StringBuilder _getPath() {
-		StringBuilder retValue = null;
+		StringBuilder retValue;
 		if(parent == null)
 			retValue = new StringBuilder();
 		else

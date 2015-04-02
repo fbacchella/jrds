@@ -20,7 +20,7 @@ public class ContainerProbe extends Probe<Object, Number> {
         }
         @Override
         public Class<? extends Probe<?,?>> getProbeClass() {
-            return (Class<? extends Probe<?, ?>>) ContainerProbe.class;
+            return ContainerProbe.class;
         }
         public String getProbeName() {
             return "ContainerProbeDesc";

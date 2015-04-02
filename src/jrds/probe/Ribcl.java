@@ -59,7 +59,7 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
 
     @Override
     public Map<String, Number> getNewSampleValues() {
-        Socket s = null;
+        Socket s;
         try {
             s = connect();
         } catch (Exception e) {
@@ -76,7 +76,7 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
         if(! isCollectRunning())
             return Collections.emptyMap();
 
-        StringBuffer message = new StringBuffer();
+        StringBuilder message = new StringBuilder();
         try {
             OutputStream outputSocket = s.getOutputStream();
             InputStream inputSocket = s.getInputStream();
@@ -181,7 +181,6 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
         message = message.replaceAll("<RIBCL VERSION=\"[0-9\\.]+\"/>", "<RIBCL >");
         Document d = xmlstarter.getDocument(new StringReader(message));
         xmlstarter.fileFromXpaths(d, getPd().getCollectStrings().keySet(), vars);
-        return;
     }
 
     /* (non-Javadoc)

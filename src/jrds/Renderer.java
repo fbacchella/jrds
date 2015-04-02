@@ -120,7 +120,7 @@ public class Renderer {
                 if(cause != null)
                     logger.error("    Cause was: " + cause);
             } catch (Exception e) {
-                String message = "";
+                String message;
                 try {
                     String graphName = graph.getQualifiedName();
                     message = String.format("Error rendering graph %s: %s", graphName, e.getMessage());
@@ -144,7 +144,7 @@ public class Renderer {
             return graph.toString();
         }
 
-    };
+    }
 
     static private final Logger logger = Logger.getLogger(Renderer.class);
     static private final float hashTableLoadFactor = 0.75f;
@@ -168,7 +168,7 @@ public class Renderer {
     }
             );
     private int cacheSize;
-    private Map<Integer, RendererRun> rendered;
+    private final Map<Integer, RendererRun> rendered;
 
     public Renderer(int cacheSize, File tmpDir) {
         this.tmpDir = tmpDir;
@@ -246,8 +246,7 @@ public class Renderer {
     }
 
     public boolean isReady(Graph graph) {
-        RendererRun runRender = null;
-        runRender = rendered.get(graph.hashCode());
+        RendererRun runRender = rendered.get(graph.hashCode());
         if( runRender == null) {
             try {
                 render(graph);

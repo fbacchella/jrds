@@ -54,16 +54,15 @@ public @interface ProbeMeta {
         @Override
         public void addProbe(JrdsElement hostElement,
                 ProbeDescSummary summary, HttpServletRequest request) {
-            return;
         }
-    };
+    }
 
     /**
      * @author bacchell
      *
      */
     public class EmptyStarter extends Starter {
-    };
+    }
 
     Class<? extends DiscoverAgent> discoverAgent() default EmptyDiscoverAgent.class;
     Class<? extends Starter> timerStarter() default EmptyStarter.class;

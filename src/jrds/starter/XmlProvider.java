@@ -102,7 +102,7 @@ public class XmlProvider extends Starter {
                 if(xpath == null || "".equals(xpath))
                     continue;
                 Node n = (Node)xpather.evaluate(xpath, d, XPathConstants.NODE);
-                Double value = 0.0d;
+                Double value;
                 if(n != null) {
                     log(Level.TRACE, "%s", n);
                     value = jrds.Util.parseStringNumber(n.getTextContent(), Double.NaN);
@@ -115,7 +115,6 @@ public class XmlProvider extends Starter {
             }
         }
         log(Level.TRACE, "Values found: %s", oldMap);
-        return;
     }
 
     public Document getDocument(InputSource stream) {

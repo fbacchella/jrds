@@ -29,9 +29,9 @@ public class Threshold {
 			}
 		};
 		public abstract boolean check(double a, double b);
-	};
+	}
 
-	public enum Action {
+    public enum Action {
 		LOG{
 			@Override
 			public void run(Threshold t, Probe<?,?> p, List<Object> args) {
@@ -112,7 +112,7 @@ public class Threshold {
 				return false;
 			return operation.check(collected, value);
 		} catch (IOException e) {
-			logger.equals("Check failed for " + this);
+			logger.error("check failed for " + this);
 		}
 
 		return false;
@@ -124,4 +124,9 @@ public class Threshold {
 			a.run(this, p, actionsArgs.get(i++));
 		}
 	}
+
+    @Override
+    public String toString() {
+        return "Threshold{name=" + name + ", dsName=" + dsName + ", value= " + value + ", duration=" + duration + "}";
+    }
 }

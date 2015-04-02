@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 public class AutoGraph extends GraphNode {
     public enum Operation {
         SUM, MIN, MAX, AVERAGE
-    };
+    }
 
     static final private Logger logger = Logger.getLogger(AutoGraph.class);
     static int i;
@@ -36,7 +36,7 @@ public class AutoGraph extends GraphNode {
         gd.setGraphName(theStore.getName());
         gd.setGraphTitle(theStore.getName());
         gd.setName(theStore.getName());
-        gd.setTree(PropertiesManager.HOSTSTAB, Arrays.asList(new Object[]{GraphDesc.TITLE}));
+        gd.setTree(PropertiesManager.HOSTSTAB, Arrays.<Object>asList(GraphDesc.TITLE));
         logger.debug(this.getQualifiedName());
         this.op = op;
 

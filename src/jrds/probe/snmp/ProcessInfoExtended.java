@@ -79,7 +79,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
         for(SnmpVars s: ti) {
             List<OID> lk = new ArrayList<OID>(s.keySet());
             Collections.sort(lk);
-            StringBuffer cmdBuf = new StringBuffer();
+            StringBuilder cmdBuf = new StringBuilder();
             for(OID oid: lk) {
                 cmdBuf.append(s.get(oid));
                 cmdBuf.append(" ");
@@ -113,7 +113,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
         double average = 0;
         int nbvalue = 0;
         double cpuUsed = 0;
-        for(Map.Entry<OID, Object> e: ((Map<OID, Object>)snmpVars).entrySet()) {
+        for(Map.Entry<OID, Object> e: snmpVars.entrySet()) {
             OID oid = e.getKey();
             if(oid.startsWith(hrSWRunPerfMem)) {
                 double value = ((Number)e.getValue()).doubleValue() * 1024;

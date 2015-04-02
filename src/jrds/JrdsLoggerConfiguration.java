@@ -40,7 +40,7 @@ public class JrdsLoggerConfiguration {
 
     private JrdsLoggerConfiguration() {
 
-    };
+    }
 
     /**
      * Force an external log4j configuration, must be called before initLog4j

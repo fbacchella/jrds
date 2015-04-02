@@ -155,7 +155,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
 
     protected Map<String, Object>doSearchFielsEntry(LdapConnection cnx, String base, Set<String> fields) {
         SearchControls sc = new SearchControls();
-        String[] attributeFilter = fields.toArray(new String[]{});
+        String[] attributeFilter = fields.toArray(new String[fields.size()]);
         sc.setReturningAttributes(attributeFilter);
         sc.setSearchScope(SearchControls.OBJECT_SCOPE);
         sc.setReturningObjFlag(false);
@@ -164,7 +164,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
 
         Map<String, Object> retValues = new HashMap<String, Object>();
         try {
-            Attributes attributesList = dctx.getAttributes(base, fields.toArray(new String[0]));
+            Attributes attributesList = dctx.getAttributes(base, fields.toArray(new String[fields.size()]));
             for(Attribute a: jrds.Util.iterate(attributesList.getAll())) {
                 log(Level.TRACE, "collect name: %s?%s", base, a.getID());
                 retValues.put(a.getID(), a.get());

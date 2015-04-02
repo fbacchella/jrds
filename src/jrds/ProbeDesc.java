@@ -53,7 +53,7 @@ public class ProbeDesc implements Cloneable {
 
     private long heartBeatDefault = 600;
     private Map<String, DsDesc> dsMap;
-    private Map<String, String> specific = new HashMap<String, String>();;
+    private Map<String, String> specific = new HashMap<String, String>();
     private String probeName;
     private String name;
     private final Collection<String> graphesList = new ArrayList<String>();
@@ -258,7 +258,7 @@ public class ProbeDesc implements Cloneable {
         Map<String, String> retValue = new LinkedHashMap<String, String>(dsMap.size());
         for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
             DsDesc dd =  e.getValue();
-            if(dd.collectKey != null  && dd.collectKey instanceof String  && ! "".equals((String) dd.collectKey))
+            if(dd.collectKey != null  && dd.collectKey instanceof String  && ! "".equals(dd.collectKey))
                 retValue.put((String)dd.collectKey, e.getKey());
         }
         return retValue;
@@ -453,8 +453,8 @@ public class ProbeDesc implements Cloneable {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.newDocument();
-        Element root = 
-                (Element) document.createElement("probedesc"); 
+        Element root =
+                document.createElement("probedesc");
         document.appendChild(root);
         root.appendChild(document.createElement("name")).setTextContent(name);
         if(probeName != null)

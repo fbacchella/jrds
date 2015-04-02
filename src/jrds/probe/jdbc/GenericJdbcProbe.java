@@ -37,7 +37,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
     /* (non-Javadoc)
      * @see jrds.ProbeConnected#configure()
      */
-    public Boolean configure(List<? extends Object> args) {
+    public Boolean configure(List<?> args) {
         if(super.configure()) {
             ProbeDesc pd =  getPd();
             query = jrds.Util.parseTemplate(pd.getSpecific("query"), getHost(), args);
@@ -62,7 +62,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
     }
 
     public Boolean configure(String... args) {
-        return configure((List<? extends Object>)Arrays.asList(args));
+        return configure(Arrays.asList(args));
     }
 
     @Override
@@ -89,7 +89,9 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
                 }
             }
             finally {
-                stmt.close();	
+                if (stmt != null) {
+                    stmt.close();
+                }
             }
             return values;
         } catch (SQLException e) {
@@ -132,7 +134,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
                     String key = keyValue + meta.getColumnLabel(i);
                     if(! collectKeys.contains(key))
                         continue;
-                    Number value = Double.NaN;
+                    Number value;
                     Object oValue = rs.getObject(i);
                     log(Level.TRACE, "type info for %s: type %d, %s = %s",  key, meta.getColumnType(i), oValue.getClass(), oValue.toString());
                     if(oValue instanceof Number) {

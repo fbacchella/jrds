@@ -194,7 +194,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
             Set<String> badDs = new HashSet<String>();
             Header header = rrdSource.getHeader();
-            int dsCount = header.getDsCount();;
+            int dsCount = header.getDsCount();
             header.copyStateTo(rrdDest.getHeader());
             for (int i = 0; i < dsCount; i++) {
                 Datasource srcDs = rrdSource.getDatasource(i);
@@ -309,7 +309,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         if (!rrdDir.isDirectory()) {
             if( ! rrdDir.mkdir()) {
                 try {
-                    log(Level.ERROR, "prode dir %s creation failed ", rrdDir.getCanonicalPath());
+                    log(Level.ERROR, "probe dir %s creation failed ", rrdDir.getCanonicalPath());
                 } catch (IOException e) {
                 }
                 return false;
@@ -558,7 +558,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
-     * Return the string value of the probe as a path constitued of
+     * Return the string value of the probe as a path constituted of
      * the host name / the probe name
      * @see java.lang.Object#toString()
      */

@@ -79,7 +79,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             return null;
         }
 
-        HostInfo host = null;
+        HostInfo host;
         if(dnsHostname != null) {
             host = new HostInfo(hostName, dnsHostname);
         }
@@ -265,7 +265,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         p.setTimeout(timer.getTimeout());
 
         // Identify the archive to use
-        String archivesName = null;
+        String archivesName;
         // Check if a custom archives list is defined
         if (probeNode.hasAttribute("archivesset")) {
             archivesName = probeNode.getAttribute("archivesset");
@@ -284,7 +284,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         String label = probeNode.getAttribute("label");
         if(label != null && ! "".equals(label)) {
             logger.trace(Util.delayedFormatString("Adding label %s to %s", label, p));
-            p.setLabel(jrds.Util.parseTemplate(label, host, properties));;
+            p.setLabel(jrds.Util.parseTemplate(label, host, properties));
         }
 
         //The host is set
@@ -334,7 +334,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         //A connected probe, register the needed connection
         //It can be defined within the node, referenced by it's name, or it's implied name
         if(p instanceof ConnectedProbe) {
-            String connectionName = null;
+            String connectionName;
             ConnectedProbe cp = (ConnectedProbe) p;
             //Register the connections defined within the probe
             for(ConnectionInfo ci: makeConnexion(probeNode, p, properties)) {
@@ -458,7 +458,8 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     /**
      * Enumerate the connections found in an XML node
      * @param domNode a node to parse
-     * @param host
+     * @param parent
+     * @param properties
      * @return
      */
     Set<ConnectionInfo> makeConnexion(JrdsElement domNode, Object parent, Map<String, String> properties) {

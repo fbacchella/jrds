@@ -46,7 +46,7 @@ public final class Last extends JrdsServlet {
 				out.println("Last update:" + p.getLastUpdate());
 				Map<String, Number> lastValues = p.getLastValues();
 				for(Map.Entry<String, Number> e: lastValues.entrySet()) {
-					String dsName = (String) e.getKey();
+					String dsName = e.getKey();
 						out.println(dsName + ": " + e.getValue());
 				}
 			}

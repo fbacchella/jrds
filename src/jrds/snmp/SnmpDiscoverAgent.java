@@ -120,7 +120,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
             log(Level.TRACE, "Trying to discover probe %s", name);
 
             try {
-                boolean found = false;
+                boolean found;
                 if(summary.isIndexed ) {
                     found = (enumerateIndexed(hostEleme, summary, withOid) > 0);
                 }
@@ -280,10 +280,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
 
         String doesExistOid = summary.specifics.get("existOid");
         //drop indexed probes without OID to check presence
-        if(!summary.isIndexed && (doesExistOid == null || doesExistOid.isEmpty()))
-            return false;
-
-        return true;
+        return !(!summary.isIndexed && (doesExistOid == null || doesExistOid.isEmpty()));
     }
 
     @Override
@@ -316,7 +313,6 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         else {
             sortedProbeName.add(name);
         }
-        return;
     }
 
 }

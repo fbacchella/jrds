@@ -30,7 +30,7 @@ public class Sum extends AutonomousGraphNode {
         gd.setName(name);
         setGraphDesc(gd);
         getProbe().addGraph(this);
-    };
+    }
 
     public void configure(HostsList hl) {
         super.configure(hl);
@@ -82,7 +82,7 @@ public class Sum extends AutonomousGraphNode {
 
                         //First pass, no data to use
                         if(allvalues == null) {
-                            allvalues = (double[][]) fd.getValues().clone();
+                            allvalues = fd.getValues().clone();
                         }
                         //Next step, sum previous values
                         else {

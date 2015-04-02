@@ -53,7 +53,7 @@ public abstract class CommandStarterImpl implements CommandStarter {
             JMXConnectorServer cs;
 
             String path = "/";
-            if (protocol == "rmi") {
+            if (protocol.equals("rmi")) {
                 java.rmi.registry.LocateRegistry.createRegistry(port);
                 path = "/jndi/rmi://" + "0.0.0.0" + ":" + port + "/jmxrmi";
             }
@@ -87,5 +87,5 @@ public abstract class CommandStarterImpl implements CommandStarter {
             throw new RuntimeException("jmx remote access failed to configure", e);
         }
 
-    };
+    }
 }

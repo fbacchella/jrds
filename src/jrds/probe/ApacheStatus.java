@@ -29,14 +29,11 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
      * @return Returns the url.
      */
     public String getUrlAsString() {
-        String retValue = "";
         try {
-            URL tempUrl = new URL(getScheme(), getUrl().getHost(), getUrl().getPort(), "/");
-            retValue = tempUrl.toString();
+            return new URL(getScheme(), getUrl().getHost(), getUrl().getPort(), "/").toString();
         } catch (MalformedURLException e) {
             throw new RuntimeException("MalformedURLException",e);
         }
-        return retValue;
     }
 
     public String getIndexName() {

@@ -94,16 +94,18 @@ implements Cloneable, WithACL {
             @Override
             public String toString() {
                 return "percentile legend";
-            };
+            }
+
             public boolean datasource() {
                 return false;
             }
             public boolean toPlot() {
                 return false;
-            };
+            }
+
             public boolean legend() {
                 return true;
-            };
+            }
         },
         COMMENT {
             public String toString() {
@@ -122,59 +124,68 @@ implements Cloneable, WithACL {
         LINE {
             public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
                 rgd.line(sn, color, legend);
-            };
+            }
+
             @Override
             public String toString() {
                 return "line";
-            };
+            }
+
             public boolean datasource() {
                 return true;
             }
             public boolean toPlot() {
                 return true;
-            };
+            }
+
             public boolean legend() {
                 return true;
-            };
+            }
         },
         AREA {
             public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
                 rgd.area(sn, color, legend);
-            };
+            }
+
             @Override
             public String toString() {
                 return "area";
-            };
+            }
+
             public boolean datasource() {
                 return true;
             }
             public boolean toPlot() {
                 return true;
-            };
+            }
+
             public boolean legend() {
                 return true;
-            };
+            }
         },
         STACK {
             public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
                 rgd.stack(sn, color, legend);
-            };
+            }
+
             @Override
             public String toString() {
                 return "stack";
-            };
+            }
+
             public boolean datasource() {
                 return true;
             }
             public boolean toPlot() {
                 return true;
-            };
+            }
+
             public boolean legend() {
                 return true;
-            };
+            }
         };
 
-        public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {};
+        public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {}
 
         /**
          * To check if it will generate a plot, for color calculation
@@ -188,7 +199,7 @@ implements Cloneable, WithACL {
          * @return
          */
         public abstract boolean legend();
-    };
+    }
 
     //Old name kept
     static final public GraphType NONE = GraphType.NONE;
@@ -211,7 +222,7 @@ implements Cloneable, WithACL {
         },
         INDEX {
             public String resolve(GraphNode graph) {
-                StringBuffer retValue = new StringBuffer("empty");
+                StringBuilder retValue = new StringBuilder("empty");
                 if(graph.getProbe() instanceof IndexedProbe) {
                     retValue.setLength(0);
                     IndexedProbe ip = (IndexedProbe) graph.getProbe();
@@ -219,7 +230,7 @@ implements Cloneable, WithACL {
                     //Check to see if a label is defined and needed to add
                     String label = graph.getProbe().getLabel();
                     if(label != null) {
-                        retValue.append(" (" + label + ")");
+                        retValue.append(" (").append(label).append(")");
                     }
                 }
                 else {
@@ -482,7 +493,7 @@ implements Cloneable, WithACL {
         public static final Color resolveIndex(int i) {
             return Colors.values()[ i % Colors.length].getColor();
         }
-    };
+    }
 
     static private final class DsDesc {
         final String name;
@@ -500,7 +511,8 @@ implements Cloneable, WithACL {
                 this.host = host;
                 this.probe = probe;
             }
-        };
+        }
+
         final DsPath dspath;
         DsDesc(String name, String dsName, String rpn,
                 GraphType graphType, Color color, String legend,
@@ -596,7 +608,8 @@ implements Cloneable, WithACL {
     public static final class Dimension {
         public int width = 0;
         public int height = 0;
-    };
+    }
+
     private Dimension dimension = null;
 
 
@@ -650,7 +663,7 @@ implements Cloneable, WithACL {
             String host, String probe, String dsName) {
         if(logger.isTraceEnabled())
             logger.trace("Adding " + name + ", " + rpn + ", " + graphType + ", " + color + ", " + legend + ", " + consFunc + ", " + reversed + ", " + host + ", " + probe);
-        GraphType gt = null;
+        GraphType gt;
         if(graphType == null || "".equals(graphType)) {
             if(legend != null)
                 gt = GraphType.COMMENT;
@@ -669,7 +682,6 @@ implements Cloneable, WithACL {
 
         Color c = null;
         if(gt.toPlot()) {
-            c = Color.WHITE;
             if(color != null && color.toUpperCase().matches("^#[0-9A-F]{6}")) {
                 int r = Integer.parseInt(color.substring(1, 3), 16);
                 int g = Integer.parseInt(color.substring(3, 5), 16);
@@ -703,7 +715,7 @@ implements Cloneable, WithACL {
             name = Integer.toHexString((int)(Math.random() * Integer.MAX_VALUE));
         }
         //Auto generated legend
-        if(legend == null && name != null && gt.legend())
+        if(legend == null && gt.legend())
             legend = name;
 
         Integer valPercentile = null;
@@ -804,7 +816,7 @@ implements Cloneable, WithACL {
         Set<String> datasources = new HashSet<String>();
 
         for(DsDesc ds: allds) {
-            boolean complete = false;
+            boolean complete;
             // not a data source, don't try to add it in datasources
             if(! ds.graphType.datasource()) {
                 complete = true;
@@ -1290,8 +1302,8 @@ implements Cloneable, WithACL {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.newDocument();
-        Element root = 
-                (Element) document.createElement("graphdesc"); 
+        Element root =
+                document.createElement("graphdesc");
         document.appendChild(root);
         root.appendChild(document.createElement("name")).setTextContent(name);
         if(graphName != null)

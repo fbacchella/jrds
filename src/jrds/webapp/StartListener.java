@@ -84,7 +84,7 @@ public class StartListener implements ServletContextListener {
         }
 
         @SuppressWarnings("unchecked")
-        Enumeration<String> params = (Enumeration<String>)ctxt.getInitParameterNames();
+        Enumeration<String> params = ctxt.getInitParameterNames();
         for(String attr: jrds.Util.iterate(params)) {
             String value = ctxt.getInitParameter(attr);
             if(value != null)

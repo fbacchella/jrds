@@ -123,7 +123,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
                 percentile="95";
             String host = null;
             String probe = null;
-            String dsName = null;
+            String dsName;
             if(withPath) {
                 host = elements.get("pathhost");
                 probe = elements.get("pathprobe");

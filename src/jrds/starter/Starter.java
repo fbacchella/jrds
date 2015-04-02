@@ -82,7 +82,7 @@ public abstract class Starter {
     @Override
     public String toString() {
         String levelString = "''";
-        String keyString = "";
+        String keyString;
         if(level != null)
             levelString = level.toString();
         Object key = getKey();

@@ -119,13 +119,13 @@ public class JrdsXmlRpcServlet extends XmlRpcServlet {
 					}
 				}
 			} catch (IllegalArgumentException e) {
-				System.out.println(e);
+                logger.error("Failed to map XML-RPC handler", e);
 			} catch (SecurityException e) {
-				System.out.println(e);
+                logger.error("Failed to map XML-RPC handler", e);
 			} catch (IllegalAccessException e) {
-				System.out.println(e);
+                logger.error("Failed to map XML-RPC handler", e);
 			} catch (NoSuchFieldException e) {
-				System.out.println(e);
+                logger.error("Failed to map XML-RPC handler", e);
 			}
 		}
 		
@@ -175,7 +175,7 @@ public class JrdsXmlRpcServlet extends XmlRpcServlet {
 					p.readAuthorization(pRequest, hl);
 					StringBuilder roleStr = new  StringBuilder();
 					for(String role: p.getRoles()) {
-						roleStr.append(role +",");
+						roleStr.append(role).append(",");
 					}
 					requestconfig.setBasicPassword(roleStr.toString());
 				}

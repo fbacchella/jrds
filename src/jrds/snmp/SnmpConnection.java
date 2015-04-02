@@ -67,7 +67,7 @@ public class SnmpConnection extends Connection<Target> {
         else {
             return false;
         }
-        if(community != null && address != null) {
+        if(community != null) {
             snmpTarget = new CommunityTarget(address, new OctetString(community));
             snmpTarget.setVersion(version);
             snmpTarget.setTimeout(getLevel().getTimeout() * 1000 / 2);
@@ -77,17 +77,10 @@ public class SnmpConnection extends Connection<Target> {
         try {
             PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
             requestPDU.addOID(new VariableBinding(ping));
-            Snmp snmp = getSnmp();
-            ResponseEvent re = snmp.send(requestPDU, snmpTarget);
-            if(re == null)
-                throw new IOException("SNMP Timeout");
-            PDU response = re.getResponse();
-            if(response == null || re.getError() != null ) {
-                Exception snmpException = re.getError();
-                if(snmpException == null)
-                    snmpException = new IOException("SNMP Timeout");
-                throw snmpException;
-            }
+
+            // we don't care about the response
+            request(requestPDU, snmpTarget);
+
             //Everything went fine, host is reachable, authentication is working
             return true;
         } catch (Exception e) {
@@ -116,17 +109,7 @@ public class SnmpConnection extends Connection<Target> {
             for(OID uptimeoid: upTimesOids) {
                 PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
                 requestPDU.addOID(new VariableBinding(uptimeoid));
-                Snmp snmp = getSnmp();
-                ResponseEvent re = snmp.send(requestPDU, snmpTarget);
-                if(re == null)
-                    throw new IOException("SNMP Timeout");
-                PDU response = re.getResponse();
-                if(response == null || re.getError() != null ) {
-                    Exception snmpException = re.getError();
-                    if(snmpException == null)
-                        snmpException = new IOException("SNMP Timeout");
-                    throw snmpException;
-                }
+                PDU response = request(requestPDU, snmpTarget);
                 Object value = new SnmpVars(response).get(uptimeoid);
                 if(value instanceof Number) {
                     return ((Number) value).longValue();
@@ -136,6 +119,21 @@ public class SnmpConnection extends Connection<Target> {
             log(Level.ERROR, e, "Unable to get uptime: %s", e);
         }
         return 0;        
+    }
+
+    private PDU request(PDU requestPDU, Target target) throws Exception {
+        Snmp snmp = getSnmp();
+        ResponseEvent re = snmp.send(requestPDU, target);
+        if(re == null)
+            throw new IOException("SNMP Timeout");
+        PDU response = re.getResponse();
+        if(response == null || re.getError() != null ) {
+            Exception snmpException = re.getError();
+            if(snmpException == null)
+                snmpException = new IOException("SNMP Timeout");
+            throw snmpException;
+        }
+        return response;
     }
 
     public Snmp getSnmp() {

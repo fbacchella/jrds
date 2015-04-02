@@ -112,7 +112,7 @@ public class Util {
         public int getExponent() {
             return exponent;
         }
-    };
+    }
 
     static final private ErrorListener el = new ErrorListener() {
         public void error(TransformerException e) throws TransformerException {
@@ -296,7 +296,7 @@ public class Util {
             else  {
                 if(! indexes.containsKey(var)) {
                     indexes.put(var, index++);
-                };
+                }
                 int slot = indexes.get(var) + 1;
                 toAppend = "%"  + Integer.toString(slot) + "$s";
             }
@@ -324,7 +324,7 @@ public class Util {
 
         Matcher m = oldvarregexp.matcher(template);
         String last = template;
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         while(m.find()) {
             if(m.group(1) !=  null)
                 buffer.append(m.group(1));
@@ -563,7 +563,7 @@ public class Util {
     public static void serialize(Document d, OutputStream out, URL transformerLocation, Map<String, String> properties) throws TransformerException, IOException {
         Source source = new DOMSource(d);
 
-        Transformer transformer = null;
+        Transformer transformer;
         if(transformerLocation != null) {
             Source stylesource = new StreamSource(transformerLocation.toString());
             transformer = tFactory.newTransformer(stylesource);
@@ -707,7 +707,7 @@ public class Util {
         if(namedLogger.isEnabledFor(l)) {
             StringBuilder line = new StringBuilder();
             if(source != null)
-                line.append("[" + source.toString() + "] ");
+                line.append("[").append(source.toString()).append("] ");
             line.append(String.format(format, args));
             namedLogger.log(l, line.toString());
             //NPE should never happen, so it's always logged

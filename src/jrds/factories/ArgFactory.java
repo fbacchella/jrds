@@ -56,7 +56,7 @@ public final class ArgFactory {
             logger.trace(Util.delayedFormatString("Element to check: %s", localName));
             if("arg".equals(localName)) {
                 String type = listNode.getAttribute("type");
-                String value = null;
+                String value;
                 if(listNode.hasAttribute("value"))
                     value = listNode.getAttribute("value");
                 else
@@ -127,7 +127,7 @@ public final class ArgFactory {
      */
     public static Object ConstructFromString(Class<?> clazz, String value) throws InvocationTargetException {
         try {
-            Constructor<?> c = null;
+            Constructor<?> c;
             if(! clazz.isPrimitive() ) {
                 c = clazz.getConstructor(String.class);
             }
@@ -154,6 +154,8 @@ public final class ArgFactory {
             }
             else if(clazz == Character.TYPE) {
                 c = Character.class.getConstructor(String.class);
+            } else {
+                throw new IllegalArgumentException("no single String constructor found");
             }
             return c.newInstance(value);
         } catch (SecurityException e) {

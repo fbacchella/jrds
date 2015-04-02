@@ -59,11 +59,9 @@ public class Configuration {
         shutDownHook = new Thread("Collect-Shutdown") {
             @Override
             public void run() {
-                if(hostsList != null) {
-                    hostsList.stop();
-                    if(hostsList.getRenderer() != null)
-                        hostsList.getRenderer().finish();                    
-                }
+                hostsList.stop();
+                if(hostsList.getRenderer() != null)
+                    hostsList.getRenderer().finish();
             }
         };
         Runtime.getRuntime().addShutdownHook(shutDownHook);

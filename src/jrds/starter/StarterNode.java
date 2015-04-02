@@ -131,7 +131,7 @@ public abstract class StarterNode implements StartersSet {
     }
 
     public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc) {
-        Object key = null;
+        Object key;
         try {
             Method m = sc.getMethod("makeKey", StarterNode.class);
             key = m.invoke(null, this);
@@ -233,7 +233,7 @@ public abstract class StarterNode implements StartersSet {
     @Deprecated
     public Starter registerStarter(Starter s, StarterNode parent) {
         return registerStarter(s);
-    };
+    }
 
     /* (non-Javadoc)
      * @see jrds.starter.StartersSet#find(java.lang.Class, jrds.starter.StarterNode)
