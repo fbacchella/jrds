@@ -96,8 +96,7 @@ final public class Tools {
 
     static public JrdsDocument parseString(String s) throws Exception { 
         InputStream is = new ByteArrayInputStream(s.getBytes());
-        JrdsDocument d = Tools.parseRessource(is);
-        return d;
+        return Tools.parseRessource(is);
     }
 
     static public void setLevel(Logger logger, Level level, String... allLoggers) {
