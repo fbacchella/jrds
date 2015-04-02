@@ -30,6 +30,7 @@ dependencies = [
     "dijit/main",
     "dijit/layout/BorderContainer",
     "dijit/layout/ContentPane",
+    "dijit/layout/LayoutContainer",
     "dijit/layout/TabContainer",
     "dijit/form/Button",
     "dijit/form/ComboButton",

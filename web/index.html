@@ -24,6 +24,7 @@ amdVector = [
  "dojox/widget/Standby",
  "dijit/layout/BorderContainer",
  "dijit/layout/ContentPane",
+ "dijit/layout/LayoutContainer",
  "dijit/TitlePane",
  "jrds/HostForm",
  "jrds/Autoperiod",
@@ -148,8 +149,10 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
 				        	<span class="linelabel">Sort</span>
         					<button id="sorted" data-dojo-type="jrds/ToogleSort"> Sorted graphs </button>
         				</div>
-				        <button type="submit" data-dojo-type="dijit/form/Button" >Refresh</button>
-				        <button data-dojo-type="jrds/StateURLButton" >State URL</button>
+        				<div id="dateFormButtons">
+                            <button id="refreshGraphsButton" type="submit" data-dojo-type="dijit/form/Button" >Refresh</button>
+                            <button data-dojo-type="jrds/StateURLButton" >State URL</button>
+        				</div>
 					</form>
 				</div> <!-- "paramsPane" -->
 				<div  data-dojo-type="dijit/layout/ContentPane" id="graphPane">
