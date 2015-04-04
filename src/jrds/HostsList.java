@@ -224,7 +224,7 @@ public class HostsList extends StarterNode {
         allTabs.add(new Tab("Administration", PropertiesManager.ADMINTAB) {
             @Override
             public String getJSCallback() {
-                return "setAdminTab";
+                return "adminTabCallback";
             }
         });
 

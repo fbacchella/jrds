@@ -518,15 +518,15 @@ return declare("jrds.Tabs", layout, {
 	    }
 	    this[newPage.callback](newPage);
 	},
-	setAdminTab: function () {
+	adminTabCallback: function () {
 		dijit.byId('refreshButton').refreshStatus();
+		//Empty and hide an eventually filled discover response
 		dojo.place("<pre id='discoverResponse' />", dojo.byId('discoverResponse'), "replace");
 		dojo.style( dojo.byId('discoverResponse'), 'display', 'none');
 	},
 	treeTabCallBack: function(newTab) {
 		newTab.attr('content', dojo.clone(mainPane));
 
-		var treePane = dojo.byId('treePane');
 	    var keepParams = newTab.keepParams;
 
 		//keepParams used during page setup, to keep queryParams fields
