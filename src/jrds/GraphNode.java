@@ -76,7 +76,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
         return gd.getViewTree(this);
     }
 
-    private final String parseTemplate(String template) {
+    private String parseTemplate(String template) {
         Object[] arguments = {
                 "${graphdesc.name}",
                 "${host}",

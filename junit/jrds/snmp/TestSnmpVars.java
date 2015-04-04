@@ -41,7 +41,6 @@ public class TestSnmpVars {
     @Test
     public void conversionCounter64() {
         jrds.snmp.SnmpVars vars = new jrds.snmp.SnmpVars();
-        vars = new jrds.snmp.SnmpVars();
         OID oid1 = new OID("4");
         VariableBinding vb = new VariableBinding(oid1, new Counter64(1));
         vars.addVariable(vb);
@@ -74,7 +73,6 @@ public class TestSnmpVars {
     @Test
     public void conversionOctetString() {
         jrds.snmp.SnmpVars vars = new jrds.snmp.SnmpVars();
-        vars = new jrds.snmp.SnmpVars();
         OID oid1 = new OID("8");
         VariableBinding vb = new VariableBinding(oid1, new org.snmp4j.smi.OctetString("a"));
         vars.addVariable(vb);

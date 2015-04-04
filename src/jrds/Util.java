@@ -193,7 +193,7 @@ public class Util {
     static private final Pattern attrSignature = Pattern.compile("attr\\.(.*)\\.signature");
     static private final Pattern attr = Pattern.compile("attr\\.(.*)");
 
-    static private final String findVariables(String in, int index, Map<String, Integer> indexes, Object... arguments) {
+    static private String findVariables(String in, int index, Map<String, Integer> indexes, Object... arguments) {
         Matcher m = varregexp.matcher(in);
         if(m.find()) {
             StringBuilder out = new StringBuilder();
@@ -526,8 +526,7 @@ public class Util {
         try {
             Class<NumberClass> clazz = (Class<NumberClass>) defaultVal.getClass();
             Constructor<NumberClass> c = clazz.getConstructor(String.class);
-            NumberClass n = c.newInstance(toParse);
-            return n;
+            return c.newInstance(toParse);
         } catch (SecurityException e) {
         } catch (NoSuchMethodException e) {
         } catch (IllegalArgumentException e) {
@@ -548,8 +547,7 @@ public class Util {
 
         try {
             Constructor<NumberClass> c = nc.getConstructor(String.class);
-            NumberClass n = c.newInstance(toParse);
-            return n;
+            return c.newInstance(toParse);
         } catch (SecurityException e) {
         } catch (NoSuchMethodException e) {
         } catch (IllegalArgumentException e) {

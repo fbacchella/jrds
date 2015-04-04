@@ -75,7 +75,7 @@ public class JSonQueryParams extends JrdsServlet {
         }
     }
 
-    private final void doVariable(JrdsJSONWriter w, String key, Object value) throws JSONException {
+    private void doVariable(JrdsJSONWriter w, String key, Object value) throws JSONException {
         logger.trace(Util.delayedFormatString("resolving %s with %s", key, value));
         if(value == null) 
             return;

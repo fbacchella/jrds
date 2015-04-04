@@ -500,8 +500,7 @@ public class ProbeDesc implements Cloneable {
      */
     @Override
     public Object clone() throws CloneNotSupportedException {
-        ProbeDesc newpd = (ProbeDesc) super.clone();
-        return newpd;
+        return (ProbeDesc) super.clone();
     }
     
     /**

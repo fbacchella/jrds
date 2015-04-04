@@ -52,26 +52,26 @@ public class XmlProbeTest {
 		String uptimeXml;
 
 		p.find(XmlProvider.class).start();
-		uptimeXml = new String("<?xml version=\"1.0\" ?><element />");
+		uptimeXml = "<?xml version=\"1.0\" ?><element />";
 		l = p.findUptime(p.find(XmlProvider.class), Tools.parseString(uptimeXml));
 		Assert.assertEquals(0, l, 0.0001);
 		p.find(XmlProvider.class).stop();
 
 		p.find(XmlProvider.class).start();
-		uptimeXml = new String("<?xml version=\"1.0\" ?><element uptime=\"1125\" />");
+		uptimeXml = "<?xml version=\"1.0\" ?><element uptime=\"1125\" />";
 		l = p.findUptime(p.find(XmlProvider.class), Tools.parseString(uptimeXml));
 		Assert.assertEquals((long) 1125, l);
 		p.find(XmlProvider.class).stop();
 
 		p.find(XmlProvider.class).start();
-		uptimeXml = new String("<?xml version=\"1.0\" ?><element />");
+		uptimeXml = "<?xml version=\"1.0\" ?><element />";
 		l = p.findUptime(p.find(XmlProvider.class), Tools.parseString(uptimeXml));
 		Assert.assertEquals((long)0, l);
 		p.find(XmlProvider.class).stop();
 
 		pd.addSpecific("upTimePath", "A/element/@uptime");
 		p.find(XmlProvider.class).start();
-		uptimeXml = new String("<?xml version=\"1.0\" ?><element />");
+		uptimeXml = "<?xml version=\"1.0\" ?><element />";
 		l = p.findUptime(p.find(XmlProvider.class), Tools.parseString(uptimeXml));
 		Assert.assertEquals((long)0, l);
 		p.find(XmlProvider.class).stop();

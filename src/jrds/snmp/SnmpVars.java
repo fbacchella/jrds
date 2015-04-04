@@ -174,7 +174,7 @@ public class SnmpVars extends HashMap<OID, Object> {
         return retvalue;
     }
 
-    private final Object resolvOpaque(Opaque var) {
+    private Object resolvOpaque(Opaque var) {
 
         //If not resolved, we will return the data as an array of bytes
         Object value = var.getValue();

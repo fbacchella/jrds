@@ -38,10 +38,10 @@ public class ApacheStatusDetails extends ApacheStatus {
         IDLE('I'),
         OPEN('.');
 
-        private final static WorkerStat resolv(char key) {
+        private static WorkerStat resolv(char key) {
             return map.get(key);
         }
-        private final static synchronized void add(char key, WorkerStat value) {
+        private static synchronized void add(char key, WorkerStat value) {
             map.put(key, value);
         }
         private WorkerStat(char key) {
