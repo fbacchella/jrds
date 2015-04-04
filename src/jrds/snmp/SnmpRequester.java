@@ -125,7 +125,7 @@ public enum SnmpRequester {
      */
     public abstract Map<OID, Object> doSnmpGet(SnmpConnection cnx, Collection<OID> oidsSet) throws IOException;
 
-    private static final Map<OID, Object> doRequest(SnmpConnection cnx, VariableBinding[] vars) throws IOException {
+    private static Map<OID, Object> doRequest(SnmpConnection cnx, VariableBinding[] vars) throws IOException {
         Snmp snmp = cnx.getSnmp();
         if(snmp == null) {
             logger.warn(Util.delayedFormatString("invalid snmp connection state for %s", cnx));

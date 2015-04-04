@@ -125,8 +125,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
                 for(Map.Entry<OID, Object> e: somevars.entrySet()) {
                     OID tryoid = e.getKey();
                     if(e.getValue() != null && matchIndex(somevars.get(tryoid))) {
-                        int[] index = Arrays.copyOfRange(tryoid.getValue(), getIndexPrefixLength(), tryoid.size());
-                        return index;
+                        return Arrays.copyOfRange(tryoid.getValue(), getIndexPrefixLength(), tryoid.size());
                     }
                 }
                 log(Level.ERROR, "index for %s not found", indexKey);

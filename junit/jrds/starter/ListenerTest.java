@@ -54,8 +54,8 @@ public class ListenerTest {
             return null;
         }
         
-    };
-    
+    }
+
     static Logger logger = Logger.getLogger(ListenerTest.class);
 
     @BeforeClass

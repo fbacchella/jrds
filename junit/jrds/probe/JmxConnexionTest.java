@@ -53,7 +53,7 @@ public class JmxConnexionTest {
 
         public JrdsMBeanInfo(String protocol, String host, int port) throws Exception {
             String path = "/";
-            if (protocol == "rmi") {
+            if (protocol.equals("rmi")) {
                 rmiRegistry = java.rmi.registry.LocateRegistry
                         .createRegistry(port);
                 path = "/jndi/rmi://" + host + ":" + port + "/jmxrmi";
@@ -119,7 +119,7 @@ public class JmxConnexionTest {
         Tools.configure();
         logger.setLevel(Level.TRACE);
         Tools.setLevel(new String[] {JmxConnexionTest.class.getName(), JMXConnection.class.getName(), "jrds.Starter"}, logger.getLevel());
-    };
+    }
 
     @After
     public void finished() throws Exception {

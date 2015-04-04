@@ -86,8 +86,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
         Map<String, Object> retValues = doMultiSearch(cnx, requestInfo);
         log(Level.TRACE, "will search uptime in %s", retValues);
         if(retValues.containsKey("upTimePath")) {
-            long uptime = jrds.Util.parseStringNumber(retValues.get("upTimePath").toString(), -1L);
-            return uptime;
+            return jrds.Util.parseStringNumber(retValues.get("upTimePath").toString(), -1L);
         }
         else {
             Object startTimePath = retValues.get(getPd().getSpecific("startTimePath"));
@@ -102,8 +101,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
                         current = df.parse(currentTimePath.toString());
                     else
                         current = new Date();
-                    long uptime = ( current.getTime() - start.getTime()) / 1000;
-                    return uptime;
+                    return ( current.getTime() - start.getTime()) / 1000;
                 } catch (ParseException e) {
                     log(Level.ERROR,"Date not parsed with pattern " + ((SimpleDateFormat) df).toPattern() + ": " + e);
                 }
