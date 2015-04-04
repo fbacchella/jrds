@@ -269,6 +269,12 @@ define("jrds/jrdsTree",
        ],
        function(declare, dojo, dijit) {
 return declare("jrdsTree", dijit.Tree, {
+	focusNode: function(a) {
+		// avoid error on empty trees
+		if (a.domNode != null) {
+			this.inherited(arguments);
+		}
+	},
 	onLoad: function() {
 		if(queryParams.path != null) {
 			//This operation destroy the array used as an argument
