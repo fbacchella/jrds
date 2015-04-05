@@ -97,7 +97,7 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
       				<input id="host" type="text" name="host" size="24" data-dojo-type="dijit/form/TextBox" trim="true" required="true" />
         			<button type="submit" data-dojo-type="dijit/form/Button">Search</button>
 				</form>
-				<img id="foldButton" class="dijitTreeIcon dijitFolderClosed" alt="" src="dojo/resources/blank.gif" onClick="doUnfold();" />
+				<img id="foldButton" class="dijitTreeIcon dijitFolderClosed" alt="" src="dojo/resources/blank.gif" onClick="toggleFold();">
 			</div> <!-- treePane -->
 			<div id="centerPane" data-dojo-type="dijit/layout/LayoutContainer" region="center">
 				<div data-dojo-type="dijit/layout/ContentPane" id="paramsPane" region="top">
