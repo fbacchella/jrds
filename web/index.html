@@ -99,10 +99,10 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
 				</form>
 				<img id="foldButton" class="dijitTreeIcon dijitFolderClosed" alt="" src="dojo/resources/blank.gif" onClick="doUnfold();" />
 			</div> <!-- treePane -->
-			<div id="centerPane" data-dojo-type="dijit/layout/LayoutContainer" region="center">
-				<div data-dojo-type="dijit/layout/ContentPane" id="paramsPane" region="top">
+			<div id="centerPane" data-dojo-type="dijit/layout/ContentPane" region="center">
+				<div id="paramsPane">
 					<form id="dateForm" name="dateForm" data-dojo-type="jrds/RenderForm" >
-						<div data-dojo-type="dijit/layout/ContentPane" class="formblock" >
+						<div class="formblock" >
 							<span class="linelabel">Time scale</span>
        						<select id="autoperiod" name="autoperiod" data-dojo-type="jrds/Autoperiod">
 								<option value="0" id="period.0">Manual</option>
@@ -133,7 +133,7 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
           					<input type="text" name="endh" id="endh"  data-dojo-type="jrds/TimeTextBox" data-dojo-props="queryId: 'end'"/>
           					<button id="periodnext" type="button" data-dojo-type="jrds/PeriodNavigation" data-dojo-props="iconClass: 'nextPeriodNavigation'">next</button>
         				</div>
-        				<div data-dojo-type="dijit/layout/ContentPane" class="formblock" >
+        				<div class="formblock" >
         					<span class="linelabel">Vertical scale</span>
           					<button id="autoscale" data-dojo-type="jrds/AutoscaleReset"> Auto </button>
           					<label class="paramslabel" for="min">Min</label>
@@ -145,7 +145,7 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
     			 					data-dojo-type="jrds/MinMaxTextBox"
     			 					size="14" />
         				</div>
-				        <div data-dojo-type="dijit/layout/ContentPane" class="formblock" >
+				        <div class="formblock" >
 				        	<span class="linelabel">Sort</span>
         					<button id="sorted" data-dojo-type="jrds/ToogleSort"> Sorted graphs </button>
         				</div>
@@ -155,7 +155,7 @@ require(amdVector, function(local_dojo, local_dijit, local_dojox) {
         				</div>
 					</form>
 				</div> <!-- "paramsPane" -->
-				<div  data-dojo-type="dijit/layout/ContentPane" id="graphPane" region="center">
+				<div id="graphPane">
 					<div class='graphblock'>
 					</div>
 				</div> <!-- graphPane -->
