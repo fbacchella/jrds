@@ -840,21 +840,21 @@ function startStandBy(pane) {
 		return null;
 	var standbyName = 'standby.' + pane;
 	var standby = dijit.byId(standbyName);
-	if(standby) {
-		standby.destroyRecursive(false);
-	};
-	standby = new dojox.widget.Standby({
-		target: pane,
-		id: standbyName
-	});
-	document.body.appendChild(standby.domNode);
+	if(!standby) {
+		standby = new dojox.widget.Standby({
+			target: pane,
+			id: standbyName,
+			duration: 0
+		});
+		document.body.appendChild(standby.domNode);
+	}
 	standby.show();
 	return standby;
 }
 
 function getTree(isFilters) {
 	var treeStandby = startStandBy('treePane');
-	
+
 	var foldbutton = dojo.byId('foldButton');
 	var treeType;
 	if(isFilters) {
