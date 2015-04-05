@@ -285,6 +285,14 @@ return declare("jrdsTree", dijit.Tree, {
 			this.standby.hide();
 		}
 	},
+	_onExpandoClick: function(a) {
+		a = a.node;
+		if (a.deferredExpando != undefined && !a.deferredExpando.isFulfilled()) {
+			return;
+		}
+		this.focusNode(a);
+		a.deferredExpando = a.isExpanded ? this._collapseNode(a) : this._expandNode(a)
+	},
 	getIconClass: function(item, opened){
 		if(item.type == 'filter')
 			return "filterFolder";
