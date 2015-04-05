@@ -94,6 +94,11 @@ body, input, option, select, tab, div, td, a, textarea {
 	vertical-align:middle;
 }
 
+.dijitTreeExpandoLoading {
+	background-image: none !important;
+	display: none !important;
+}
+
 .field {
 	margin: 5px;
 	width: 100px;
