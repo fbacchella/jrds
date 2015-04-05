@@ -94,6 +94,12 @@ body, input, option, select, tab, div, td, a, textarea {
 	vertical-align:middle;
 }
 
+#foldButton,
+.dijitTreeExpando,
+.dijitTreeContent {
+	cursor: pointer;
+}
+
 .dijitTreeExpandoLoading {
 	background-image: none !important;
 	display: none !important;
