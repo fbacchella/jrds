@@ -101,8 +101,12 @@ body, input, option, select, tab, div, td, a, textarea {
 
 #foldButton,
 .dijitTreeExpando,
-.dijitTreeContent {
+.dijitTreeRow {
 	cursor: pointer;
+}
+
+.dijitTreeContainer {
+	width: 100%;
 }
 
 .dijitTreeExpandoLoading {
