@@ -938,22 +938,7 @@ function toggleFold() {
 	}
 }
 
-function getTreeNodeUp(node) {
-	var nodeInfo = node.item.id;
-	if(nodeInfo instanceof Array) {
-		nodeInfo = nodeInfo[0];
-	}
-	if(node.item.root) {
-		return new Array(nodeInfo);
-	}
-	retValue = getTreeNodeUp(node.getParent());
-	retValue.push(nodeInfo);
-	return retValue;
-}
-
 function loadTree(item,  node){
-	var tree = node.tree;
-
 	if(item.filter) {
 		queryParams.filter = item.filter[0];
 		delete queryParams.host;
@@ -975,7 +960,7 @@ function loadTree(item,  node){
 	else {
 		queryParams.id = item.id[0].replace(/.*\./, "");
 		getGraphList();
-		queryParams.path = getTreeNodeUp(node);		
+		queryParams.path = node.getTreePath().map(function(node) { return node.id instanceof Array ? node.id[0] : node.id; });
 	}
 }
 
