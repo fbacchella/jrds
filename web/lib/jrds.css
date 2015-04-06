@@ -12,6 +12,11 @@ body, input, option, select, tab, div, td, a, textarea {
 	margin:0;
 	padding:0;
 }
+
+:focus {
+	outline:none;
+}
+
 .linelabel {
 	display:inline-block;
 	padding:0.4em;
@@ -92,6 +97,21 @@ body, input, option, select, tab, div, td, a, textarea {
 .dateNav {
 	display:inline-block;
 	vertical-align:middle;
+}
+
+#foldButton,
+.dijitTreeExpando,
+.dijitTreeRow {
+	cursor: pointer;
+}
+
+.dijitTreeContainer {
+	width: 100%;
+}
+
+.dijitTreeExpandoLoading {
+	background-image: none !important;
+	display: none !important;
 }
 
 .field {

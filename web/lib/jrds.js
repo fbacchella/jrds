@@ -285,6 +285,14 @@ return declare("jrdsTree", dijit.Tree, {
 			this.standby.hide();
 		}
 	},
+	_onExpandoClick: function(a) {
+		a = a.node;
+		if (a.deferredExpando != undefined && !a.deferredExpando.isFulfilled()) {
+			return;
+		}
+		this.focusNode(a);
+		a.deferredExpando = a.isExpanded ? this._collapseNode(a) : this._expandNode(a)
+	},
 	getIconClass: function(item, opened){
 		if(item.type == 'filter')
 			return "filterFolder";
@@ -846,21 +854,21 @@ function startStandBy(pane) {
 		return null;
 	var standbyName = 'standby.' + pane;
 	var standby = dijit.byId(standbyName);
-	if(standby) {
-		standby.destroyRecursive(false);
-	};
-	standby = new dojox.widget.Standby({
-		target: pane,
-		id: standbyName
-	});
-	document.body.appendChild(standby.domNode);
+	if(!standby) {
+		standby = new dojox.widget.Standby({
+			target: pane,
+			id: standbyName,
+			duration: 0
+		});
+		document.body.appendChild(standby.domNode);
+	}
 	standby.show();
 	return standby;
 }
 
-function getTree(isFilters, unfold) {	
+function getTree(isFilters) {
 	var treeStandby = startStandBy('treePane');
-	
+
 	var foldbutton = dojo.byId('foldButton');
 	var treeType;
 	if(isFilters) {
@@ -910,39 +918,27 @@ function getTree(isFilters, unfold) {
 		showRoot: false,
 		onClick: loadTree,
 		persist: false,
-		autoExpand: true == unfold,
+		autoExpand: false,
 		isFilters: isFilters,
 		standby: treeStandby
 	}, treeOneDiv);
 }
 
-function doUnfold() {
-	var foldbutton = dojo.byId('foldButton');
-	dojo.toggleClass(foldbutton, "dijitFolderClosed");
-	dojo.toggleClass(foldbutton, "dijitFolderOpened");
+function toggleFold() {
 	var tree = dijit.byId('treeOne');
-	var unfold = tree.attr('autoExpand');
-	var model = tree.attr('model');
-	var type = model.query.type;
-	getTree(tree.isFilters, true != unfold);
-}
-
-function getTreeNodeUp(node) {
-	var nodeInfo = node.item.id;
-	if(nodeInfo instanceof Array) {
-		nodeInfo = nodeInfo[0];
+	var foldbutton = dojo.byId('foldButton');
+	if (dojo.hasClass(foldbutton, 'dijitFolderClosed')) {
+		tree.expandAll();
+		dojo.removeClass(foldbutton, "dijitFolderClosed");
+		dojo.addClass(foldbutton, "dijitFolderOpened");
+	} else {
+		tree.collapseAll();
+		dojo.addClass(foldbutton, "dijitFolderClosed");
+		dojo.removeClass(foldbutton, "dijitFolderOpened");
 	}
-	if(node.item.root) {
-		return new Array(nodeInfo);
-	}
-	retValue = getTreeNodeUp(node.getParent());
-	retValue.push(nodeInfo);
-	return retValue;
 }
 
 function loadTree(item,  node){
-	var tree = node.tree;
-
 	if(item.filter) {
 		queryParams.filter = item.filter[0];
 		delete queryParams.host;
@@ -964,7 +960,7 @@ function loadTree(item,  node){
 	else {
 		queryParams.id = item.id[0].replace(/.*\./, "");
 		getGraphList();
-		queryParams.path = getTreeNodeUp(node);		
+		queryParams.path = node.getTreePath().map(function(node) { return node.id instanceof Array ? node.id[0] : node.id; });
 	}
 }
 
