@@ -79,7 +79,7 @@ public class JSonTree extends JSonData {
 
     private boolean evaluateTree(ParamsBean params, JrdsJSONWriter w, HostsList root, GraphTree trytree) throws IOException, JSONException {
         for(GraphTree tree: findRoot(Collections.singleton(trytree))) {
-            sub(params, w, tree, "tree", Filter.EVERYTHING, "", tree.hashCode());
+            sub(params, w, tree, "tree", Filter.EVERYTHING, "", tree.getPath().hashCode());
         }
         return true;
     }
@@ -98,7 +98,7 @@ public class JSonTree extends JSonData {
         }
 
         for(GraphTree tree: findRoot(rootToDo)) {
-            sub(params, w, tree, "tree", f, "", tree.hashCode());
+            sub(params, w, tree, "tree", f, "", tree.getPath().hashCode());
         }
         return true;
     }
