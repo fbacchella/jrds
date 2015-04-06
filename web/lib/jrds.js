@@ -279,7 +279,12 @@ return declare("jrdsTree", dijit.Tree, {
 		if(queryParams.path != null) {
 			//This operation destroy the array used as an argument
 			//so clone it !
-			this.attr('path', dojo.clone(queryParams.path));
+			var tree = this;
+			this.attr('path', dojo.clone(queryParams.path)).then(function() {
+				if (tree.selectedNode.isExpandable && !tree.selectedNode.isExpanded) {
+					tree._expandNode(tree.selectedNode);
+				}
+			});
 		}
 		if(this.standby != null) {
 			this.standby.hide();
