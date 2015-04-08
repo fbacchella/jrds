@@ -629,7 +629,7 @@ function initIndex() {
 	dojo.cookie("treeOneSaveStateCookie", null, {expires: -1});
 
 	//The copy is saved
-	var tempMainPane = dojo.byId('mainPane');
+	var tempMainPane = dojo.byId('mainTab');
 	mainPane = dojo.clone(tempMainPane);
 	dojo.destroy(tempMainPane);
 
