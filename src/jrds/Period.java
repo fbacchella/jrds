@@ -26,7 +26,7 @@ public class Period {
     static private final Pattern datePatternBoth = Pattern.compile( dateRegexpBoth+ "[T ]?" + timeRegexp + "(.*)");
     static private final Pattern secondsPattern = Pattern.compile( "\\d+");
 
-    public enum PeriodItem {
+    public enum Scale {
         MANUAL("Manual", new org.joda.time.Period()),
         HOUR("Last Hour", org.joda.time.Period.hours(1)),
         HOURS2("Last 2 Hours", org.joda.time.Period.hours(2)),
@@ -47,9 +47,19 @@ public class Period {
         YEARS2("Last 2 Years", org.joda.time.Period.years(2));
         public final String name;
         public final org.joda.time.Period p;
-        PeriodItem(String name, org.joda.time.Period p) {
+        Scale(String name, org.joda.time.Period p) {
             this.name = name;
             this.p = p;
+        }
+        public static Scale valueOfOrdinal(int ordinal) {
+            if (ordinal < 0) {
+                throw new IllegalArgumentException("Period invalid: " + ordinal);
+            }
+            final Scale[] scales = values();
+            if (ordinal > scales.length) {
+                throw new IllegalArgumentException("Period invalid: " + ordinal);
+            }
+            return scales[ordinal];
         }
     }
 
@@ -58,48 +68,39 @@ public class Period {
      */
     private final DateTime begin;
     private final DateTime end;
-    private final int calPeriod;
+    private final Scale scale;
     private final org.joda.time.Period period;
 
     public Period() {
-        calPeriod = 7;
-        period = PeriodItem.values()[calPeriod].p;
-        end = new DateTime().minusSeconds(1);
-        begin = new DateTime().minus(period);
+        this(Scale.DAY);
     }
 
-    public Period(int p) {
-        if(p > PeriodItem.values().length) {
-            throw new RuntimeException("Period invalid: " + p);
-        }
-        calPeriod = p;
-        period = PeriodItem.values()[calPeriod].p;
-        end = new DateTime().minusSeconds(1);
-        begin = new DateTime().minus(period);
+    public Period(int ordinal) {
+        this(Scale.valueOfOrdinal(ordinal));
+    }
+
+    public Period(Scale scale) {
+        this(scale, new DateTime().minus(scale.p), new DateTime().minusSeconds(1));
     }
 
     public Period(String begin, String end) throws ParseException {
-        this.begin = string2Date(begin, true);
-        this.end = string2Date(end, false);
-        this.calPeriod = 0;
-        period = (new org.joda.time.Period(this.begin, this.end.plusSeconds(1)));
+        this(Scale.MANUAL, string2Date(begin, true), string2Date(end, false));
+    }
+
+    private Period(Scale scale, DateTime begin, DateTime end) {
+        this.scale = scale;
+        this.begin = begin;
+        this.end = end;
+        this.period = new org.joda.time.Period(begin, end.plusSeconds(1));
         logger.trace(Util.delayedFormatString("Period is %s", period));
     }
 
-    private Period(DateTime begin, DateTime end) {
-        this.begin = begin;
-        this.end = end;
-        this.calPeriod = 0;
-        period = (new org.joda.time.Period(this.begin, this.end.plusSeconds(1)));
-        logger.trace(Util.delayedFormatString("Period is %s", period));        
-    }
-
     public Period previous() {
-        return new Period(begin.minus(period), end.minus(period));
+        return new Period(Scale.MANUAL, begin.minus(period), end.minus(period));
     }
 
     public Period next() {
-        return new Period(begin.plus(period), end.plus(period));
+        return new Period(Scale.MANUAL, begin.plus(period), end.plus(period));
     }
 
     /**
@@ -117,10 +118,11 @@ public class Period {
     }
 
     /**
-     * @return the calPeriod
+     * @return the period's scale ordinal
      */
     public int getScale() {
-        return calPeriod;
+        // should return the enum instead of ordinal here..
+        return scale.ordinal();
     }
 
     /**
@@ -130,7 +132,7 @@ public class Period {
      * @param isBegin
      * @throws ParseException 
      */
-    private DateTime string2Date(String date, boolean isBegin) throws ParseException{
+    private static DateTime string2Date(String date, boolean isBegin) throws ParseException{
         if(date == null) {
             throw new ParseException("Null string to parse", 0);
         }
@@ -217,8 +219,8 @@ public class Period {
      * @return a list of string label
      */
     static public List<String> getPeriodNames() {
-        List<String> periodName = new ArrayList<String>(PeriodItem.values().length);
-        for(PeriodItem pi: PeriodItem.values()) 
+        List<String> periodName = new ArrayList<String>(Scale.YEARS2.ordinal() + 1);
+        for(Scale pi: Scale.values())
             periodName.add(pi.name);
         return periodName;
     }
@@ -231,7 +233,7 @@ public class Period {
         final int PRIME = 31;
         int result = 1;
         result = PRIME * result + ((begin == null) ? 0 : begin.hashCode());
-        result = PRIME * result + calPeriod;
+        result = PRIME * result + scale.ordinal();
         result = PRIME * result + ((end == null) ? 0 : end.hashCode());
         return result;
     }
@@ -253,7 +255,7 @@ public class Period {
                 return false;
         } else if (!begin.equals(other.begin))
             return false;
-        if (calPeriod != other.calPeriod)
+        if (scale != other.scale)
             return false;
         if (end == null) {
             if (other.end != null)
@@ -268,7 +270,7 @@ public class Period {
      */
     @Override
     public String toString() {
-        return "b=" + begin + ", e=" + end + ", s=" + PeriodItem.values()[calPeriod].name;
+        return "b=" + begin + ", e=" + end + ", s=" + scale.name;
     }
 
 }
