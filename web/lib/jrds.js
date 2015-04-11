@@ -117,12 +117,12 @@ define(
 				var endDay = new Date(dijit.byId('end').get('value').getTime());
 				if (beginDay.getTime() === endDay.getTime()) {
 					if (this.id === 'beginh') {
-						dijit.byId('endh').get('constraints').min = this.get('value');
+						dijit.byId('endh').get('constraints').min = new Date(this.get('value').getTime() + 60000);
 						if (dijit.byId('beginh').get('value') > dijit.byId('endh').get('value')) {
 							dijit.byId('endh').set('value', this.get('value'));
 						}
 					} else if (this.id === 'endh') {
-						dijit.byId('beginh').get('constraints').max = this.get('value');
+						dijit.byId('beginh').get('constraints').max = new Date(this.get('value').getTime() - 60000);
 						if (dijit.byId('beginh').get('value') > dijit.byId('endh').get('value')) {
 							dijit.byId('beginh').set('value', this.get('value'));
 						}
@@ -160,7 +160,7 @@ return declare("jrds.DateTextBox", dijit.form.DateTextBox, {
 			this.constraints.max = queryParams.end;
 		}
 		else {
-			this.constraints.min = queryParams.begin;			
+			this.constraints.min = queryParams.begin;
 		}
 		return this.inherited(arguments);
 	},
