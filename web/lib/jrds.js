@@ -35,7 +35,7 @@ return declare("Autoperiod", dijit.form.Select, {
 	onChange: function(value) {
 		queryParams.autoperiod = value;
 		//value = 0 means manual time period, so don't mess with the period fields
-		if(value !== 0) {
+		if(value != 0) {
             getGraphList();
 			// Refresh queryParams with the new time values
 			var iq = dojo.xhrGet( {
