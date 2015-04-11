@@ -108,6 +108,8 @@ define(
 					queryParams[this.queryId] = dijit.byId(this.queryId).get('value');
 					queryParams[this.queryId].setHours(newDate.getHours());
 					queryParams[this.queryId].setMinutes(newDate.getMinutes());
+
+					getGraphList();
 				}
 			},
 			checkInterval: function() {
@@ -212,6 +214,7 @@ return declare("jrds.DateTextBox", dijit.form.DateTextBox, {
 			newDate.setHours(dijit.byId(this.get('timeBoxName')).get('value').getHours());
 			newDate.setMinutes(dijit.byId(this.get('timeBoxName')).get('value').getMinutes());
 			queryParams[this.id] = newDate;
+			getGraphList();
 		}
 	}
 });
