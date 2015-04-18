@@ -503,6 +503,7 @@ define("jrds/Tabs",
 		  "dijit/layout/TabContainer" ],
 		function(declare, layout) {
 return declare("jrds.Tabs", layout, {
+	_onKeyDown: function() {},
 	postCreate: function() {
 		this.watch("selectedChildWidget", this.transitTab);
 		return this.inherited(arguments);
