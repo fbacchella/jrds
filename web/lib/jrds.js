@@ -182,6 +182,15 @@ return declare("jrds.DateTextBox", dijit.form.DateTextBox, {
 	},
 	onChange: function(date) {
 		this._setQueryParams(date);
+		if (val('begin').getTime() == val('end').getTime()) {
+			if (val('beginh').getTime() >= val('endh').getTime()) {
+				if (this.id == 'begin') {
+					dijit.byId('beginh').setDate(new Date(val('endh').getTime() - 60000));
+				} else {
+					dijit.byId('endh').setDate(new Date(val('beginh').getTime() + 60000));
+				}
+			}
+		}
 		updateDateConstraints();
 		getGraphList();
 	}
