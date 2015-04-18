@@ -80,7 +80,7 @@ public class Period {
     }
 
     public Period(Scale scale) {
-        this(scale, new DateTime().minus(scale.p), new DateTime().minusSeconds(1));
+        this(scale, new DateTime().minus(scale.p), new DateTime());
     }
 
     public Period(String begin, String end) throws ParseException {
@@ -89,10 +89,28 @@ public class Period {
 
     private Period(Scale scale, DateTime begin, DateTime end) {
         this.scale = scale;
+
+        // drop milliseconds, rrd4j precision is second anyway
+        begin = begin.withMillisOfSecond(0);
+        end = end.withMillisOfSecond(0);
+
+        long interval = end.getMillis() - begin.getMillis();
+        logger.trace(interval);
+        logger.trace(Util.delayedFormatString("initially, interval %d, begin is %s, end is %s", interval / 1000, begin, end));
+
         this.begin = begin;
-        this.end = end;
-        this.period = new org.joda.time.Period(begin, end.plusSeconds(1));
-        logger.trace(Util.delayedFormatString("Period is %s", period));
+        if (begin.getSecondOfMinute() == end.getSecondOfMinute()) {
+            // second for end and begin are the same, that's mathematically wrong
+            // but that's the way human and joda's period manage this
+            // set end to one second less
+            this.period = new org.joda.time.Period(begin, end);
+            this.end = end.minusSeconds(1);
+        } else {
+            this.end = end.plusSeconds(1);
+            this.period = new org.joda.time.Period(begin, end);
+        }
+
+        logger.trace(Util.delayedFormatString("now Period is %s, begin is %s, end is %s", period, begin, end));
     }
 
     public Period previous() {
