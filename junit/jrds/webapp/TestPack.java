@@ -68,13 +68,13 @@ public class TestPack {
 
     @Test
     public void testPack2() throws IOException, Exception {
-        JrdsJSONObject params = new JrdsJSONObject( packunpack("{'begin':'1','end':'60000', 'min':'0', 'max':'10', 'autoperiod':'0','filter':'','host':'hosttest','treeType':'tree','id':'-744958554','path':['All filters','bougie','Services','jdbc:postgresql://appartland.eu/postgres','xwiki']}"));
+        JrdsJSONObject params = new JrdsJSONObject( packunpack("{'begin':'1000','end':'60000', 'min':'0', 'max':'10', 'autoperiod':'0','filter':'','host':'hosttest','treeType':'tree','id':'-744958554','path':['All filters','bougie','Services','jdbc:postgresql://appartland.eu/postgres','xwiki']}"));
         Assert.assertEquals(0, params.get("autoperiod"));
         Assert.assertEquals("0", params.get("min"));
         Assert.assertEquals("10", params.get("max"));
         Period p = new Period(params.get("begin").toString(), params.get("end").toString());
         logger.trace(p);
-        Assert.assertEquals(1, p.getBegin().getTime());
+        Assert.assertEquals(1000, p.getBegin().getTime());
         Assert.assertEquals(60000, p.getEnd().getTime());
     }
 
