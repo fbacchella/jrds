@@ -116,8 +116,7 @@ body, input, option, select, tab, div, td, a, textarea {
 }
 
 .dijitTimePickerMarker.dijitTimePickerItemDisabled, .dijitTimePickerItemDisabled .dijitTimePickerItemInner {
-	color: #888;
-	cursor: default;
+	display: none;
 }
 
 .periodNavigation .dijitButtonNode {
