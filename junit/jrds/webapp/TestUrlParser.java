@@ -158,10 +158,11 @@ public class TestUrlParser {
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
         Period p = pb.getPeriod();
 
-        Date now = new Date();
+        //Period drop milliseconds
+        Date now = new Date((long) (Math.floor(new Date().getTime() / 1000) * 1000L));
         long offset = Math.abs(now.getTime() - p.getEnd().getTime());
         logger.debug("end offset:" + offset);
-        Assert.assertTrue(offset > 980 && offset < 1200);
+        Assert.assertTrue("bad value for offset:" + offset, offset > 980 && offset < 1200);
         Assert.assertEquals(7, p.getScale());
         String url = pb.makeObjectUrl("root", "", false);
         logger.trace(url);
@@ -174,16 +175,17 @@ public class TestUrlParser {
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
         Period p = pb.getPeriod();
 
-        Date now = new Date();
+        //Period drop milliseconds
+        Date now = new Date((long) (Math.floor(new Date().getTime() / 1000) * 1000L));
         Calendar calBegin = Calendar.getInstance();
         calBegin.setTime(now);
         calBegin.add(Calendar.HOUR, -4);
         Date begin = calBegin.getTime();
 
-        long delta = p.getBegin().getTime() - begin.getTime();
+        long delta = Math.abs(p.getBegin().getTime() - begin.getTime());
         long offset = Math.abs(now.getTime() - p.getEnd().getTime());
-        Assert.assertTrue(offset > 980 && offset < 1200);
-        Assert.assertTrue(delta < 10 && delta > -10);
+        Assert.assertTrue("bad value for offset:" + offset, offset > 980 && offset < 1200);
+        Assert.assertTrue("delta begin is too high: " + delta, delta < 1000);
         Assert.assertEquals(4, p.getScale());
         String url = pb.makeObjectUrl("root", "", false);
         logger.trace(url);
