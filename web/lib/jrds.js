@@ -857,6 +857,8 @@ function fileForms() {
 	}
 
 	dijit.byId("sorted").set('checked', parseBool(queryParams.sort));
+
+	updateDateConstraints();
 }
 
 function startStandBy(pane) {
