@@ -95,7 +95,6 @@ define(
 				constraint.timePattern = 'HH:mm';
 				constraint.clickableIncrement = 'T00:30:00';
 				constraint.visibleIncrement = 'T00:30:00';
-				constraint.visibleRange = 'T05:00:00';
 				this._setValue(queryParams[this.queryId]);
 				return this.inherited(arguments);
 			},
