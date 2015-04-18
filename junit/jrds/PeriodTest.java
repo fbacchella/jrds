@@ -39,10 +39,11 @@ public class PeriodTest {
         Date begin = calBegin.getTime();
 
         Period p = new Period();
-        long deltaBegin = p.getBegin().getTime() - begin.getTime();
-        long deltaEnd = p.getEnd().getTime() - end.getTime();
-        Assert.assertTrue(deltaEnd < 1100 && deltaEnd > -1100);
-        Assert.assertTrue(deltaBegin < 100 && deltaBegin > -100);
+        long deltaBegin = Math.abs(p.getBegin().getTime() - begin.getTime());
+        long deltaEnd = Math.abs(p.getEnd().getTime() + 1000 - end.getTime());
+        logger.debug("delta being is " + deltaBegin +", delta end is " + deltaEnd);
+        Assert.assertTrue("Delta end is too wide: " + deltaEnd, deltaEnd < 1000);
+        Assert.assertTrue("Delta begin is too wide: " + deltaBegin, deltaBegin < 1000);
         Assert.assertEquals(7, p.getScale());
     }
 
@@ -57,10 +58,10 @@ public class PeriodTest {
         Date begin = calBegin.getTime();
 
         Period p = new Period(4);
-        long deltaBegin = p.getBegin().getTime() - begin.getTime();
-        long deltaEnd = p.getEnd().getTime() - end.getTime();
-        Assert.assertTrue(deltaEnd < 1100 && deltaEnd > -1100);
-        Assert.assertTrue(deltaBegin < 100 && deltaBegin > -100);
+        long deltaBegin = Math.abs(p.getBegin().getTime() - begin.getTime());
+        long deltaEnd = Math.abs(p.getEnd().getTime() + 1000 - end.getTime());
+        Assert.assertTrue("Delta end is too wide: " + deltaEnd, deltaEnd < 1000);
+        Assert.assertTrue("Delta begin is too wide: " + deltaBegin, deltaBegin < 1000);
         Assert.assertEquals(new Integer(4), new Integer(p.getScale()));
     }
 
@@ -68,8 +69,14 @@ public class PeriodTest {
     public void now() throws ParseException {
         Date now = new Date();
         Period p = new Period("NOW","now");
-        Assert.assertTrue(p.getEnd().compareTo(now) >= 0);
-        Assert.assertTrue(p.getBegin().compareTo(now) >= 0);
+        long deltaBegin = p.getBegin().getTime() - now.getTime();
+        // Don't forget that end was 1s less
+        long deltaEnd = p.getEnd().getTime() + 1000 - now.getTime();
+        logger.debug("delta being is " + deltaBegin +", delta end is " + deltaEnd);
+        logger.debug(p.getEnd());
+        // Less than 1 second appart
+        Assert.assertTrue(Math.abs(deltaBegin)  < 999);
+        Assert.assertTrue(Math.abs(deltaEnd)  < 999);
         Assert.assertEquals(0, p.getScale());
     }
 
@@ -192,6 +199,19 @@ public class PeriodTest {
     }
 
     @Test
+    public void nextFullWithOneSecond() throws ParseException {
+        begin = fullISOFORMAT.parse("2007-03-03T00:00:00");
+        end = fullISOFORMAT.parse("2007-03-03T23:59:59");
+        Period p = new Period("2007-03-02 00:00:00", "2007-03-03T00:00:00").next();
+        logger.trace(p.getBegin());
+        logger.trace(p.getEnd());
+        Assert.assertEquals(begin, p.getBegin());
+        Assert.assertEquals(end, p.getEnd());
+        Assert.assertEquals(0, p.getScale());
+    }
+
+
+    @Test
     public void previousScale() throws ParseException {
         Period p = new Period().previous();
         long offsetDay = 86400 * 1000 - (p.getEnd().getTime() - p.getBegin().getTime());
@@ -211,9 +231,9 @@ public class PeriodTest {
 
     @Test
     public void fromLong() throws ParseException {
-        begin = new Date(1);
+        begin = new Date(1000);
         end = new Date(100000);
-        Period p = new Period("1", "100000");
+        Period p = new Period("1000", "100000");
         Assert.assertEquals(begin, p.getBegin());
         Assert.assertEquals(end, p.getEnd());
         Assert.assertEquals(0, p.getScale());
@@ -235,7 +255,8 @@ public class PeriodTest {
         Assert.assertEquals(0, p.getScale());
     }
 
-    @Test(expected=ParseException.class) public void nullargs() throws ParseException{
+    @Test(expected=ParseException.class)
+    public void nullargs() throws ParseException{
         Period p = new Period(null, null);
         Assert.assertNull(p.getBegin());
         Assert.assertNull(p.getEnd());
