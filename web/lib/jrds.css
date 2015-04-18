@@ -111,6 +111,14 @@ body, input, option, select, tab, div, td, a, textarea {
 	width: 100px;
 }
 
+#autoperiod .dijitArrowButton {
+	width: 12px;
+}
+
+.dijitTimePickerMarker.dijitTimePickerItemDisabled, .dijitTimePickerItemDisabled .dijitTimePickerItemInner {
+	display: none;
+}
+
 .periodNavigation .dijitButtonNode {
 	border: 0px none;
 	background: none;

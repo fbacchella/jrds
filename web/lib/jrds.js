@@ -25,41 +25,54 @@ return declare("jrds.RootButton", button, {
 });
 });
 
-
 define( "jrds/Autoperiod",
 		[ "dojo/_base/declare",
 		  "dijit",
 		  "dijit/form/Select" ],
     	function(declare, dijit) {
 return declare("Autoperiod", dijit.form.Select, {
-	onChange: function(value) {
-		queryParams.autoperiod = value;
-		//value = 0 means manual time period, so don't mess with the period fields
-		if(value !== 0) {
-            getGraphList();
-			// Refresh queryParams with the new time values
-			var iq = dojo.xhrGet( {
-				content:  {autoperiod: queryParams.autoperiod},
-				sync: true,
-				url: "queryparams",
-				handleAs: "json",
-				preventCache: true,
-				load: function(response, ioArgs) {
-					queryParams.begin = new Date(response.begin);
-		            dijit.byId('begin').set('value', new Date(response.begin));
-		            dijit.byId('beginh').set('value', new Date(response.begin));
-					queryParams.end = new Date(response.end);
-		            dijit.byId('end').set('value', new Date(response.end));
-		            dijit.byId('endh').set('value', new Date(response.end));
-					return response;
-				},
-				error: function(response, ioArgs) {
-					console.error("init query failed with " + response.message);
-					return response;
-				}
-			});
-		}
+	postCreate: function() {
+		this.set('value', queryParams.autoperiod, false);
 		return this.inherited(arguments);
+	},
+	_setQueryParams: function(value) {
+		queryParams.autoperiod = value;
+	},
+	setPeriod: function(value) {
+		this.set('value', value, false);
+		this._setQueryParams(value);
+	},
+	onChange: function(value) {
+		this._setQueryParams(value);
+		if (value == 0) {
+			// manual time period
+			return;
+		}
+
+		// refresh graph with new new time period
+		getGraphList();
+
+		// refresh begin/end filters for new period
+		dojo.xhrGet({
+			content: { autoperiod: value },
+			sync: true,
+			url: "queryparams",
+			handleAs: "json",
+			preventCache: true,
+			load: function(response) {
+				removeDateConstraints();
+				dijit.byId('begin').setDate(new Date(response.begin));
+				dijit.byId('end').setDate(new Date(response.end));
+				dijit.byId('beginh').setDate(new Date(response.begin));
+				dijit.byId('endh').setDate(new Date(response.end));
+				updateDateConstraints();
+				return response;
+			},
+			error: function(response) {
+				console.error("init query failed with " + response.message);
+				return response;
+			}
+		});
 	}
 });
 });
@@ -75,60 +88,34 @@ define(
 		"dojo/date/locale"
 	],
 	function(declare, dojo, dijit, timeTextBox) {
-		var minTime = new Date(1970, 0, 1, 0, 0, 0),
-			maxTime = new Date(1970, 0, 1, 23, 59, 59, 999);
 		return declare("jrds.TimeTextBox", timeTextBox, {
 			'class': 'field fieldHour',
 			postCreate: function() {
-				var date = queryParams[this.queryId];
-				this.set('oldvalue', new Date(0,0,0));
-				this.set('value', date);
 				var constraint = this.get('constraints');
 				constraint.timePattern = 'HH:mm';
 				constraint.clickableIncrement = 'T00:30:00';
 				constraint.visibleIncrement = 'T00:30:00';
-				constraint.visibleRange = 'T05:00:00';
-				constraint.min = minTime;
-				constraint.max = maxTime;
-
+				this._setValue(queryParams[this.queryId]);
 				return this.inherited(arguments);
 			},
-			onFocus: function(date) {
-				dijit.byId('autoperiod').set('value', 0);
+			_setValue: function(date) {
+				this.set('value', new Date(1970, 0, 1, date.getHours(), date.getMinutes(), 0), false);
+			},
+			_setQueryParams: function(date) {
+				queryParams[this.queryId].setHours(date.getHours());
+				queryParams[this.queryId].setMinutes(date.getMinutes());
+			},
+			onFocus: function() {
+				dijit.byId('autoperiod').setPeriod(0);
+			},
+			setDate: function(date) {
+				this._setValue(date);
+				this._setQueryParams(date);
 			},
 			onChange: function(date) {
-				var newDate = new Date(1970, 0, 1, date.getHours(), date.getMinutes(), 0);
-
-				if (this.get('oldvalue') !== newDate) {
-					this.set('value', newDate);
-					this.set('oldvalue', newDate);
-
-					this.checkInterval();
-
-					queryParams[this.queryId] = dijit.byId(this.queryId).get('value');
-					queryParams[this.queryId].setHours(newDate.getHours());
-					queryParams[this.queryId].setMinutes(newDate.getMinutes());
-				}
-			},
-			checkInterval: function() {
-				var beginDay = new Date(dijit.byId('begin').get('value').getTime());
-				var endDay = new Date(dijit.byId('end').get('value').getTime());
-				if (beginDay.getTime() === endDay.getTime()) {
-					if (this.id === 'beginh') {
-						dijit.byId('endh').get('constraints').min = this.get('value');
-						if (dijit.byId('beginh').get('value') > dijit.byId('endh').get('value')) {
-							dijit.byId('endh').set('value', this.get('value'));
-						}
-					} else if (this.id === 'endh') {
-						dijit.byId('beginh').get('constraints').max = this.get('value');
-						if (dijit.byId('beginh').get('value') > dijit.byId('endh').get('value')) {
-							dijit.byId('beginh').set('value', this.get('value'));
-						}
-					}
-				} else {
-					dijit.byId('endh').get('constraints').min = minTime;
-					dijit.byId('beginh').get('constraints').max = maxTime;
-				}
+				this._setQueryParams(date);
+				updateDateConstraints();
+				getGraphList();
 			}
 		});
 	}
@@ -150,16 +137,8 @@ return declare("jrds.DateTextBox", dijit.form.DateTextBox, {
 	},
 	regExp: "\\d\\d\\d\\d-\\d\\d-\\d\\d",
 	postCreate: function() {
-		this.set('oldvalue', new Date(0, 0, 0, 0, 0, 0));
-		this.set('value',queryParams[this.id]);
-		var constraint = this.get('constraints');
-		constraint.timePattern = 'yyyy-MM-dd';
-		if(this.id == 'begin') {
-			this.constraints.max = queryParams.end;
-		}
-		else {
-			this.constraints.min = queryParams.begin;			
-		}
+		this.get('constraints').timePattern = 'yyyy-MM-dd';
+		this._setValue(queryParams[this.id]);
 		return this.inherited(arguments);
 	},
 	format: function(date) {
@@ -180,39 +159,39 @@ return declare("jrds.DateTextBox", dijit.form.DateTextBox, {
 		else
 			return '';
 	},
-	onFocus: function(date) {
-		dijit.byId('autoperiod').attr('value', 0);
-		this.set('value', queryParams[this.queryId]);
+	_setValue: function(date) {
+		var newDate = new Date(date.getTime());
+		newDate.setHours(0);
+		newDate.setMinutes(0);
+		newDate.setSeconds(0);
+		newDate.setMilliseconds(0);
+		this.set('value', newDate, false);
+	},
+	_setQueryParams: function(date) {
+		queryParams[this.id].setFullYear(date.getFullYear());
+		queryParams[this.id].setMonth(date.getMonth());
+		queryParams[this.id].setDate(date.getDate());
+	},
+	onFocus: function() {
+		dijit.byId('autoperiod').setPeriod(0);
+	},
+	setDate: function(date) {
+		this._setValue(date);
+		this._setQueryParams(date);
 	},
 	onChange: function(date) {
-		//Call with drop down, do nothing on this case
-		if(date == undefined)
-			return this.inherited(arguments);
-		var oldDate = this.get('oldvalue');
-		date.setHours(0);
-		date.setMinutes(0);
-		date.setSeconds(0);
-		date.setMilliseconds(0);
-
-		if (date.getTime() !== oldDate.getTime()) {
-			this.set('value', date);
-			this.set('oldvalue', date);
-
-			dijit.byId('beginh').checkInterval();
-			dijit.byId('endh').checkInterval();
-
-			if(this.id == 'begin') {
-				dijit.byId('end').get('constraints').min = date;
+		this._setQueryParams(date);
+		if (val('begin').getTime() == val('end').getTime()) {
+			if (val('beginh').getTime() >= val('endh').getTime()) {
+				if (this.id == 'begin') {
+					dijit.byId('beginh').setDate(new Date(val('endh').getTime() - 60000));
+				} else {
+					dijit.byId('endh').setDate(new Date(val('beginh').getTime() + 60000));
+				}
 			}
-			else {
-				dijit.byId('begin').get('constraints').max = date;			
-			}
-
-			var newDate = new Date(date.getTime());
-			newDate.setHours(dijit.byId(this.get('timeBoxName')).get('value').getHours());
-			newDate.setMinutes(dijit.byId(this.get('timeBoxName')).get('value').getMinutes());
-			queryParams[this.id] = newDate;
 		}
+		updateDateConstraints();
+		getGraphList();
 	}
 });
 });
@@ -228,31 +207,30 @@ return declare("PeriodNavigation", button, {
 		this.set('showLabel', false);
 		return this.inherited(arguments);
 	},
-	onClick: function(arguments) {
-		content = {};
+	onClick: function() {
+		var content = {};
 		content.autoperiod = queryParams.autoperiod;
 		content.begin = queryParams.begin.getTime();
 		content.end = queryParams.end.getTime();
 		content[this.id] = '';
 		dojo.xhrGet( {
-			content:  content,
+			content: content,
 			sync: false,
 			url: "queryparams",
 			handleAs: "json",
 			preventCache: true,
-			load: function(response, ioArgs) {
-				queryParams.begin = new Date(response.begin);
-	            dijit.byId('begin').set('value', new Date(response.begin));
-	            dijit.byId('beginh').set('value', new Date(response.begin));
-				queryParams.end = new Date(response.end);
-	            dijit.byId('end').set('value', new Date(response.end));
-	            dijit.byId('endh').set('value', new Date(response.end));
-	            queryParams.autoperiod = 0;
-	            dijit.byId('autoperiod').set('value', 0);
-	            getGraphList();
+			load: function(response) {
+				removeDateConstraints();
+				dijit.byId('autoperiod').setPeriod(0);
+				dijit.byId('begin').setDate(new Date(response.begin));
+				dijit.byId('end').setDate(new Date(response.end));
+				dijit.byId('beginh').setDate(new Date(response.begin));
+				dijit.byId('endh').setDate(new Date(response.end));
+				updateDateConstraints();
+				getGraphList();
 				return response;
 			},
-			error: function(response, ioArgs) {
+			error: function(response) {
 				console.error("init query failed with " + response.message);
 				return response;
 			}
@@ -332,7 +310,7 @@ return declare("jrds.StateURLButton", button, {
 	            }
 	        }
 	        //Call the asynchronous xhrPost
-	        var deferred = dojo.xhrPost(xhrArgs);
+	        dojo.xhrPost(xhrArgs);
 	    }
 });
 });
@@ -646,7 +624,7 @@ function initIndex() {
 
 	//The parse can be done
 	dojo.parser.parse()
-	
+
 	setupTabs();
 	getGraphList();
 }
@@ -829,6 +807,37 @@ function parseBool(stringbool){
     }
 }
 
+function constraints(id) {
+	return dijit.byId(id).get('constraints');
+}
+
+function val(id) {
+	return dijit.byId(id).get('value');
+}
+
+function updateDateConstraints() {
+	var beginDay = new Date(val('begin').getTime());
+	var endDay = new Date(val('end').getTime());
+
+	constraints('begin').max = endDay;
+	constraints('end').min = beginDay;
+
+	if (beginDay.getTime() == endDay.getTime()) {
+		constraints('beginh').max = new Date(val('endh').getTime() - 60000);
+		constraints('endh').min = new Date(val('beginh').getTime() + 60000);
+	} else {
+		constraints('beginh').max = new Date(1970, 0, 1, 23, 59, 59, 999);
+		constraints('endh').min = new Date(1970, 0, 1, 0, 0, 0);
+	}
+}
+
+function removeDateConstraints() {
+	delete constraints('begin').max;
+	delete constraints('beginh').max;
+	delete constraints('end').min;
+	delete constraints('endh').min;
+}
+
 function fileForms() {
 	if(queryParams.host) {
 		dojo.byId("hostForm").host.value = queryParams.host;
@@ -836,9 +845,6 @@ function fileForms() {
 	else {
 		dojo.byId("hostForm").host.value = '';
 	}
-
-	var autoperiod = dijit.byId('autoperiod'); 
-	autoperiod.attr('value', queryParams.autoperiod);
 
 	if(queryParams.max != undefined && queryParams.min != undefined) {
 		dijit.byId("autoscale").set('checked', false);
@@ -852,7 +858,8 @@ function fileForms() {
 	}
 
 	dijit.byId("sorted").set('checked', parseBool(queryParams.sort));
-	
+
+	updateDateConstraints();
 }
 
 function startStandBy(pane) {
