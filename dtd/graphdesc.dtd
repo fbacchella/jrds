@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!ELEMENT graphdesc (name, graphName?, graphClass?, graphTitle?, unit?, verticalLabel?, upperLimit?, lowerLimit?, logarithmic?, (add|addpath)*, hosttree?, viewtree?, tree*)>
-<!ELEMENT graph (name, graphName, role*, graphTitle, properties?, height?, width?, nolegend?, novalues?, unit?, verticalLabel, upperLimit?, lowerLimit?, logarithmic?, (add|addpath)+, tree*)>
+<!ELEMENT graph (name, graphName, role*, graphTitle, height?, width?, nolegend?, novalues?, unit?, verticalLabel, upperLimit?, lowerLimit?, logarithmic?, (add|addpath)+, tree*)>
 <!ELEMENT add ((name, (rpn|dsName)?) | legend | ((name | (name?, (rpn|dsName))), reversed?, percentile?, graphType, color?, legend?))>
 <!ELEMENT addpath (name?, path, reversed?, graphType?, color?, legend?)>
 <!ELEMENT viewtree (pathelement | pathstring)*>
