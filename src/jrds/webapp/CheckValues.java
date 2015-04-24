@@ -10,12 +10,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import jrds.HostsList;
 import jrds.Probe;
+import jrds.store.ExtractInfo;
+import jrds.store.Extractor;
 
 import org.rrd4j.ConsolFun;
-import org.rrd4j.core.FetchData;
+import org.rrd4j.data.DataProcessor;
 
 /**
- * A servlet wich return datastore values from a probe.
+ * A servlet which returns datastore values from a probe.
  * It can be used in many way :
  * The simplest way is by using a URL of the form :
  * http://<em>server</em>/values/<em>host</em>/<em>probe.</em>
@@ -63,15 +65,28 @@ public final class CheckValues extends JrdsServlet {
                 return;
             }
             Date paste = new Date(lastupdate.getTime() - period * 1000);
-            FetchData fd = p.fetchData(paste, lastupdate);
+
+            Extractor ex = p.fetchData();
 
             String ds = params.getValue("dsname");
+
+            ExtractInfo ei = ExtractInfo.get().
+                    make(paste, lastupdate).
+                    make(p.getStep());
             if(ds != null && !  "".equals(ds.trim())) {
-                out.print(fd.getAggregate(ds.trim(), cf));
+                String dsName = ds.trim();
+                ex.addSource(dsName, dsName);
+                DataProcessor dp = ei.getDataProcessor(ex);
+                double val = dp.getAggregate(dsName, cf);
+                out.print(val);
             }
             else {
-                for(String dsName: fd.getDsNames()) {
-                    double val = fd.getAggregate(dsName, cf);
+                for(String dsName: p.getPd().getDs()) {
+                    ex.addSource(dsName, dsName);
+                }
+                DataProcessor dp = ei.getDataProcessor(ex);
+                for(String dsName: ex.getDsNames()) {
+                    double val = dp.getAggregate(dsName, cf);
                     out.println(dsName + ": " + val);
                 }
                 out.println("Last update: " + p.getLastUpdate());

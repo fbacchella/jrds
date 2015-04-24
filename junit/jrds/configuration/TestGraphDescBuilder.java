@@ -3,6 +3,7 @@ package jrds.configuration;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,13 +12,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 
 import jrds.GraphDesc;
+import jrds.Period;
 import jrds.GraphNode;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
-import jrds.StoreOpener;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
+import jrds.mockobjects.GenerateProbe;
+import jrds.mockobjects.GenerateProbe.ChainedMap;
 import jrds.mockobjects.MokeProbe;
+import jrds.store.ExtractInfo;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -27,11 +31,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
+import org.rrd4j.data.Plottable;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
 import org.rrd4j.graph.RrdGraphInfo;
 import org.w3c.dom.Document;
-
 
 public class TestGraphDescBuilder {
     static final private Logger logger = Logger.getLogger(TestGraphDescBuilder.class);
@@ -49,7 +53,6 @@ public class TestGraphDescBuilder {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        StoreOpener.prepare("MEMORY");
         Tools.setLevel(logger, Level.TRACE, "jrds.GraphDesc", "jrds.Graph");
         Tools.setLevel(Level.INFO,"jrds.factories.xml.CompiledXPath");
 
@@ -58,6 +61,8 @@ public class TestGraphDescBuilder {
 
     @Test
     public void testGraphDesc() throws Exception {
+
+        PropertiesManager pm = Tools.makePm();
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
         gdbuild.setPm(Tools.makePm());
@@ -75,31 +80,45 @@ public class TestGraphDescBuilder {
         MokeProbe<String, Number> p = new MokeProbe<String, Number>();
         p.getHost().setHostDir(testFolder.getRoot());
 
+        p.setMainStore(pm.defaultStore, new HashMap<String, String>(0));
+
         ProbeDesc pd = p.getPd();
 
-        Map<String, Object> dsMap = new HashMap<String, Object>(2);
-        dsMap.put("dsName", "space separated");
-        dsMap.put("dsType", DsType.COUNTER);
+        ChainedMap<Object> dsMap = GenerateProbe.ChainedMap.start();
+        dsMap.set("dsName", "space separated").set("dsType", DsType.COUNTER);
         pd.add(dsMap);
 
         dsMap.clear();
-        dsMap.put("dsName", "add1");
-        dsMap.put("dsType", DsType.COUNTER);
+        dsMap.set("dsName", "add1").set("dsType", DsType.COUNTER);
         pd.add(dsMap);
 
         dsMap.clear();
-        dsMap.put("dsName", "add2");
-        dsMap.put("dsType", DsType.COUNTER);
+        dsMap.set("dsName", "add2").set("dsType", DsType.COUNTER);
         pd.add(dsMap);
 
         dsMap.clear();
-        dsMap.put("dsName", "add3");
-        dsMap.put("dsType", DsType.COUNTER);
+        dsMap.set("dsName", "add3").set("dsType", DsType.COUNTER);
         pd.add(dsMap);
 
         p.checkStore();
 
-        RrdGraphDef def = gd.getGraphDef(p);
+        if(logger.isTraceEnabled()) {
+            Document gddom = p.dumpAsXml(true);
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            Map<String, String> prop = new HashMap<String, String>(3);
+            prop.put(OutputKeys.OMIT_XML_DECLARATION, "no");
+            prop.put(OutputKeys.INDENT, "yes");
+            prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
+            jrds.Util.serialize(gddom, os, null, prop);
+            logger.trace(new String(os.toByteArray(),"UTF-8"));
+        }
+
+        logger.trace("Probe preparation done");
+
+        Period pr = new Period();
+        ExtractInfo ei = ExtractInfo.get().make(pr.getBegin(), pr.getEnd());
+        Map<String, Plottable> empty = Collections.emptyMap();
+        RrdGraphDef def = gd.getGraphDef(p, ei, empty);
         RrdGraphInfo gi = new RrdGraph(def).getRrdGraphInfo();
 
         logger.debug(Arrays.asList(gi.getPrintLines()));
@@ -114,7 +133,7 @@ public class TestGraphDescBuilder {
         Assert.assertTrue("graph height invalid", 206 < gi.getHeight());
         Assert.assertTrue("graph width invalid", 578 < gi.getWidth());
         Assert.assertEquals("graph byte count invalid", 12574 , gi.getByteCount(), 4000);
-        
+
         for(String treename: new String[]{PropertiesManager.HOSTSTAB, PropertiesManager.VIEWSTAB, "tab"}) {
             List<String> tree = gd.getTree(new GraphNode(p, gd), treename);
             Assert.assertEquals("not enough element in tree " +  treename, 2, tree.size());
@@ -124,7 +143,7 @@ public class TestGraphDescBuilder {
             }
         }
     }
-    
+
     @Test(expected=NoSuchMethodException.class)
     public void testBadGraphDescClass()  throws Exception {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
@@ -165,7 +184,7 @@ public class TestGraphDescBuilder {
 
     @Test
     public void testGraphDescBuilderParse()
-        throws Exception {
+            throws Exception {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
         gdbuild.setPm(Tools.makePm());

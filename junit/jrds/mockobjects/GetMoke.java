@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
@@ -34,6 +36,7 @@ import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.HostInfo;
 import jrds.starter.HostStarter;
+import jrds.store.RrdDbStoreFactory;
 
 import org.rrd4j.DsType;
 
@@ -50,10 +53,12 @@ public class GetMoke {
         return pd;
     }
 
-    static public Probe<?,?> getProbe() {
+    static public Probe<?,?> getProbe() throws InvocationTargetException {
         Probe<?,?> p = new MokeProbe<String, Number>();
         p.setPd(getPd());
         p.setHost(new HostStarter(getHost()));
+        Map<String, String> empty = Collections.emptyMap();
+        p.setMainStore(new RrdDbStoreFactory(), empty);
         return p;
     }
 
@@ -128,7 +133,7 @@ public class GetMoke {
         StringBuffer buffer = new StringBuffer("/");
         if( ctxPathArgs != null && ctxPathArgs.length > 0) {
             for(String element: ctxPathArgs)
-                buffer.append("/").append(element); 
+                buffer.append('/').append(element); 
         }
         buffer.delete(0, 1);
         final String pathInfo = buffer.toString();

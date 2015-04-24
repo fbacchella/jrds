@@ -1,15 +1,21 @@
 package jrds;
 
+import java.beans.PropertyDescriptor;
+import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
 
 import jrds.configuration.HostBuilder;
 import jrds.factories.ArgFactory;
+import jrds.store.ExtractInfo;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
 import org.apache.log4j.Logger;
+import org.rrd4j.data.DataProcessor;
+import org.rrd4j.data.Plottable;
 
 /**
  * @author Fabrice Bacchella
@@ -191,6 +197,15 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
      */
     public void setCustomData(PlottableMap customData) {
         this.customData = customData;
+    }
+
+    public DataProcessor getPlottedDate(ExtractInfo ei) throws IOException {
+        Map<String, ? extends Plottable> pmap = Collections.emptyMap();
+        if(customData != null)
+            pmap = customData;
+        DataProcessor dp = gd.getPlottedDatas(probe, ei, pmap);
+        dp.processData();
+        return dp;
     }
 
     public Map<String, String> getBeans() {

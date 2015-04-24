@@ -4,7 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.rrd4j.core.Sample;
+import jrds.JrdsSample;
+
 import org.snmp4j.smi.OID;
 
 public class CpqDaPhyDrv extends RdsIndexedSnmpRrd {
@@ -40,8 +41,8 @@ public class CpqDaPhyDrv extends RdsIndexedSnmpRrd {
 	 * @see jrds.Probe#modifySample(org.rrd4j.core.Sample, java.util.Map)
 	 */
 	@Override
-	public void modifySample(Sample oneSample, Map<OID, Object> values) {
-		oneSample.setValue(READ, joinCounter32((Long)values.get(cpqDaPhyDrvHReads), (Long)values.get(cpqDaPhyDrvReads)));
-		oneSample.setValue(WRITE, joinCounter32((Long)values.get(cpqDaPhyDrvHWrites), (Long)values.get(cpqDaPhyDrvWrites)));
+	public void modifySample(JrdsSample oneSample, Map<OID, Object> values) {
+		oneSample.put(READ, joinCounter32((Long)values.get(cpqDaPhyDrvHReads), (Long)values.get(cpqDaPhyDrvReads)));
+		oneSample.put(WRITE, joinCounter32((Long)values.get(cpqDaPhyDrvHWrites), (Long)values.get(cpqDaPhyDrvWrites)));
 	}
 }

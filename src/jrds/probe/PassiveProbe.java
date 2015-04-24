@@ -1,18 +1,15 @@
 package jrds.probe;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-import org.apache.log4j.Level;
-import org.rrd4j.core.RrdDb;
-import org.rrd4j.core.Sample;
-
+import jrds.JrdsSample;
 import jrds.Probe;
-import jrds.StoreOpener;
 import jrds.starter.Listener;
 import jrds.starter.StarterNode;
+
+import org.apache.log4j.Level;
 
 public class PassiveProbe<KeyType> extends Probe<KeyType, Number> {
 
@@ -30,15 +27,10 @@ public class PassiveProbe<KeyType> extends Probe<KeyType, Number> {
      * @param rawValues
      */
     public void store(Date time, Map<KeyType, Number> rawValues) {
-        try {
-            RrdDb rrdDb = StoreOpener.getRrd(getRrdName());
-            Sample sample = rrdDb.createSample();
-            sample.setTime(time.getTime() / 1000);
-            injectSample(sample, rawValues);
-            StoreOpener.releaseRrd(rrdDb);
-        } catch (IOException e) {
-            log(Level.ERROR, e, "Failed to store sample: %s", e.getMessage());
-        }
+        JrdsSample sample = newSample();
+        sample.setTime(time);
+        injectSample(sample, rawValues);
+        storeSample(sample);
     }
 
     /* (non-Javadoc)

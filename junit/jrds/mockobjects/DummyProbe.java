@@ -2,6 +2,7 @@ package jrds.mockobjects;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.Tools;
 import jrds.starter.HostStarter;
+import jrds.store.RrdDbStoreFactory;
 
 import org.junit.BeforeClass;
 import org.rrd4j.DsType;
@@ -21,12 +23,14 @@ public class DummyProbe extends Probe<String, Number> {
 
     Class<? extends Probe<?,?>> originalProbe;
 
-    public void configure(Class<? extends Probe<?,?>> originalProbe) {
+    public void configure(Class<? extends Probe<?,?>> originalProbe) throws InvocationTargetException {
         this.originalProbe = originalProbe;
         configure();
     }
 
-    public void configure() {
+    public void configure() throws InvocationTargetException {
+        Map<String, String> empty = Collections.emptyMap();
+        setMainStore( new RrdDbStoreFactory(), empty);
         ProbeDesc pd = new ProbeDesc();
         pd.setName("DummyProbe");
         pd.setProbeName("dummyprobe");

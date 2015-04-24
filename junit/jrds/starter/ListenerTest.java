@@ -17,9 +17,9 @@ public class ListenerTest {
         @Override
         public void register(PassiveProbe p) {
         }
-        
+
         public void setDummy(String dummy) {
-            
+
         }
 
         public String getDummy() {

@@ -17,7 +17,6 @@ import jrds.HostsList;
 import jrds.Period;
 import jrds.PropertiesManager;
 import jrds.Renderer;
-import jrds.StoreOpener;
 
 import org.apache.log4j.Logger;
 
@@ -42,7 +41,6 @@ public class Grapher {
 
         System.getProperties().setProperty("java.awt.headless","true");
         System.getProperties().putAll(pm);
-        StoreOpener.prepare(pm.rrdbackend, pm.dbPoolSize);
 
         HostsList hl = new HostsList(pm);
 
@@ -73,6 +71,5 @@ public class Grapher {
             rr.clean();
         }
         r.finish();
-        StoreOpener.stop();
     }
 }

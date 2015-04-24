@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -187,8 +188,10 @@ final public class Tools {
             pm.setProperty(key, value);
         }
         pm.update();
+        pm.configureStores();
         pm.libspath.clear();
-
+        pm.defaultStore.configureStore(pm, new Properties());
+        pm.defaultStore.start();
         return pm;
     }
 
@@ -198,6 +201,7 @@ final public class Tools {
         pm.setProperty("configdir", new File("tmp").getPath());
         pm.setProperty("rrddir", new File("tmp").getPath());
         pm.setProperty("autocreate", "false");
+        pm.setProperty("usepool", "false");
 
         return finishPm(pm, props);
     }
@@ -208,6 +212,7 @@ final public class Tools {
         pm.setProperty("configdir", testFolder.newFolder("config").getCanonicalPath());
         pm.setProperty("rrddir", testFolder.newFolder("rrddir").getCanonicalPath());
         pm.setProperty("autocreate", "true");
+        pm.setProperty("usepool", "false");
 
         return finishPm(pm, props);
     }
@@ -222,7 +227,7 @@ final public class Tools {
         timerMap.put(t.getName(), t);
         return timerMap;
     }
-    
+
     static public final Timer getDefaultTimer() {
         TimerInfo ti = new PropertiesManager.TimerInfo();
         ti.numCollectors = 1;

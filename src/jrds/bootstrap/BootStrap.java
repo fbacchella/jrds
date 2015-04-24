@@ -21,6 +21,7 @@ public class BootStrap {
     static final Map<String, String> cmdClasses = new HashMap<String, String>();
     static {
         cmdClasses.put("jetty", "jrds.standalone.Jetty");
+        cmdClasses.put("jmxserver", "jrds.standalone.JMX");
         cmdClasses.put("wikidoc", "jrds.standalone.EnumerateWikiProbes");
         cmdClasses.put("checkjar", "jrds.standalone.CheckJar");
         cmdClasses.put("collect", "jrds.standalone.Collector");

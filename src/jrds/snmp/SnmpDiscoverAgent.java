@@ -43,6 +43,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
                 snmp = new Snmp(new DefaultUdpTransportMapping());
                 snmp.listen();
             } catch (IOException e) {
+                log(Level.ERROR, e, "Discovery SNMP listener failed to start: %s", e.getMessage());
             }
             return true;
         }

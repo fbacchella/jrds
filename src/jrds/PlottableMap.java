@@ -4,17 +4,21 @@ import java.util.HashMap;
 
 import org.rrd4j.data.Plottable;
 
-@SuppressWarnings("serial")
 public abstract class PlottableMap extends HashMap<String, Plottable>{
     public static class ProxyPlottable extends Plottable {
-        Plottable real = new Plottable() {};
-        @Override
-        public double getValue(long timestamp) {
-            return real.getValue(timestamp);
-        }
-        public void setReal(Plottable real) {
-            this.real = real;
-        }
+        Plottable real = new Plottable() {
+
+            @Override
+            public double getValue(long timestamp) {
+                return Double.NaN;
+            }};
+            @Override
+            public double getValue(long timestamp) {
+                return real.getValue(timestamp);
+            }
+            public void setReal(Plottable real) {
+                this.real = real;
+            }
     }
     /**
      * Fill the map with the appropriate Plottable, for the given time span specification

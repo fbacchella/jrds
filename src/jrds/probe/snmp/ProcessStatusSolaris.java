@@ -8,7 +8,8 @@ package jrds.probe.snmp;
 
 import java.util.Map;
 
-import org.rrd4j.core.Sample;
+import jrds.JrdsSample;
+
 import org.snmp4j.smi.OID;
 
 /**
@@ -28,7 +29,7 @@ public class ProcessStatusSolaris extends RdsSnmpSimple {
      * @see jrds.Probe#modifySample(org.rrd4j.core.Sample, java.util.Map)
      */
     @Override
-    public void modifySample(Sample oneSample, Map<OID, Object> snmpVars) {
+    public void modifySample(JrdsSample oneSample, Map<OID, Object> snmpVars) {
         int runnable = 0;
         int stopped = 0;
         int inPageWait = 0;
@@ -54,12 +55,12 @@ public class ProcessStatusSolaris extends RdsSnmpSimple {
                 zombie++;
 
         }
-        oneSample.setValue(RUNNABLE, runnable);
-        oneSample.setValue(STOPPED, stopped);
-        oneSample.setValue(INPAGEWAIT, inPageWait);
-        oneSample.setValue(NONINTERRUPTABLEWAIT, nonInterruptableWait);
-        oneSample.setValue(SLEEPING, sleeping);
-        oneSample.setValue(IDLE, idle);
-        oneSample.setValue(ZOMBIE, zombie);
+        oneSample.put(RUNNABLE, runnable);
+        oneSample.put(STOPPED, stopped);
+        oneSample.put(INPAGEWAIT, inPageWait);
+        oneSample.put(NONINTERRUPTABLEWAIT, nonInterruptableWait);
+        oneSample.put(SLEEPING, sleeping);
+        oneSample.put(IDLE, idle);
+        oneSample.put(ZOMBIE, zombie);
     }
 }

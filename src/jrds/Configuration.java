@@ -3,6 +3,7 @@ package jrds;
 import java.util.Properties;
 
 import jrds.starter.Timer;
+import jrds.store.StoreFactory;
 
 import org.apache.log4j.Logger;
 
@@ -46,8 +47,6 @@ public class Configuration {
         propertiesManager.importSystemProps();
         propertiesManager.update();
 
-        StoreOpener.prepare(propertiesManager.rrdbackend, propertiesManager.dbPoolSize);
-
         hostsList = new HostsList(propertiesManager);
     }
 
@@ -88,6 +87,10 @@ public class Configuration {
             }
         } catch (InterruptedException e) {
         }
+        for(StoreFactory sf: propertiesManager.stores.values()) {
+            sf.stop();
+        }
+        propertiesManager.defaultStore.stop();
         if(hostsList.getRenderer() != null) {
             hostsList.getRenderer().finish();            
         }

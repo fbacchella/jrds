@@ -33,12 +33,12 @@ public class TestArchivesSetBuilder {
         JrdsDocument d = Tools.parseRessource("goodarchives.xml");
 
         ArchivesSetBuilder asb = new ArchivesSetBuilder();
-        
+
         ArchivesSet arcset = asb.build(d);
         ArcDef[] arcs = arcset.getArchives();
-        
+
         Assert.assertEquals("wrong name for archives set", "newarchives", arcset.getName());
-        
+
         Assert.assertEquals("not enough archives", 2, arcs.length);
         Assert.assertEquals("not enough archives", ConsolFun.AVERAGE, arcs[0].getConsolFun());
         Assert.assertEquals("not enough archives", ConsolFun.MAX, arcs[1].getConsolFun());

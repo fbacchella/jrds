@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import jrds.store.ExtractInfo;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
@@ -30,6 +31,9 @@ public class Graph implements WithACL {
     public Graph(GraphNode node) {
         this.node = node;
         addACL(node.getACL());
+        Period p = new Period();
+        setStart(p.getBegin());
+        setEnd(p.getEnd());
     }
 
     public Graph(GraphNode node, Date begin, Date start) {
@@ -113,6 +117,7 @@ public class Graph implements WithACL {
         try {
             long startsec = getStartSec();
             long endsec = getEndSec();
+            ExtractInfo ei = ExtractInfo.get().make(start, end);
             graphDef.setStartTime(startsec);
             graphDef.setEndTime(endsec);
             PlottableMap customData = node.getCustomData();
@@ -120,20 +125,20 @@ public class Graph implements WithACL {
                 long step = Math.max((endsec - startsec) / gd.getWidth(), 1);
                 customData.configure(startsec, endsec, step);
             }
-            setGraphDefData(graphDef, node.getProbe(), customData);
+            setGraphDefData(graphDef, node.getProbe(), ei, customData);
             if(gd.withLegend())
                 addlegend(graphDef);
         } catch (IllegalArgumentException e) {
             logger.error("Impossible to create graph definition, invalid date definition from " + start + " to " + end + " : " + e);
         }
     }
-    
-    protected void setGraphDefData(RrdGraphDef graphDef, Probe<?, ?> defProbe,
+
+    protected void setGraphDefData(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei,
             Map<String, ? extends Plottable> customData) {
-        GraphDesc gd = getGraphDesc();
-        gd.fillGraphDef(graphDef, node.getProbe(), customData);        
+        GraphDesc gd = node.getGraphDesc();
+        gd.fillGraphDef(graphDef, node.getProbe(), ei, customData);        
     }
-    
+
     protected GraphDesc getGraphDesc() {
         return node.getGraphDesc();
     }
@@ -189,13 +194,8 @@ public class Graph implements WithACL {
      * @throws IOException
      */
     public DataProcessor getDataProcessor() throws IOException {
-        PlottableMap customData = node.getCustomData();
-        if(customData != null) {
-            long startsec = getStartSec();
-            long endsec = getEndSec();
-            customData.configure(startsec, endsec, 1);            
-        }
-        DataProcessor dp = getGraphDesc().getPlottedDatas(node.getProbe(), customData, start.getTime() / 1000, end.getTime() / 1000);
+        ExtractInfo ei = ExtractInfo.get().make(start, end);
+        DataProcessor dp = node.getGraphDesc().getPlottedDatas(node.getProbe(), ei, null);
         dp.processData();
         return dp;
     }

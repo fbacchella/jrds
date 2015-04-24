@@ -36,6 +36,7 @@ public class SocketFactory extends Starter {
 
         Socket s = getSocket();
         s.connect(new InetSocketAddress(host, port), getTimeout());
+
         return s;
     }
 

@@ -8,7 +8,8 @@ package jrds.probe.snmp;
 
 import java.util.Map;
 
-import org.rrd4j.core.Sample;
+import jrds.JrdsSample;
+
 import org.snmp4j.smi.OID;
 
 /**
@@ -28,7 +29,7 @@ public class ProcessStatusHostResources extends RdsSnmpSimple {
      * @see jrds.Probe#modifySample(org.rrd4j.core.Sample, java.util.Map)
      */
     @Override
-    public void modifySample(Sample oneSample, Map<OID, Object> snmpVars) {
+    public void modifySample(JrdsSample oneSample, Map<OID, Object> snmpVars) {
         int running = 0;
         int runnable = 0;
         int notRunnable = 0;
@@ -48,10 +49,10 @@ public class ProcessStatusHostResources extends RdsSnmpSimple {
             else if(INVALIDINDEX == state)
                 invalid++;
         }
-        oneSample.setValue(RUNNING, running);
-        oneSample.setValue(RUNNABLE, runnable);
-        oneSample.setValue(NOTRUNNABLE, notRunnable);
-        oneSample.setValue(INVALID, invalid);
+        oneSample.put(RUNNING, running);
+        oneSample.put(RUNNABLE, runnable);
+        oneSample.put(NOTRUNNABLE, notRunnable);
+        oneSample.put(INVALID, invalid);
     }
 
     /* (non-Javadoc)

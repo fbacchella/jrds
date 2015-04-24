@@ -35,6 +35,7 @@ import jrds.starter.ConnectionInfo;
 import jrds.starter.HostStarter;
 import jrds.starter.Listener;
 import jrds.starter.Timer;
+import jrds.store.StoreFactory;
 
 import org.apache.log4j.Logger;
 
@@ -240,6 +241,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 pd.replaceDs(dsList);
                 p = pf.makeProbe(pd);
             } catch (CloneNotSupportedException e) {
+                throw new InvocationTargetException(e, HostBuilder.class.getName());
             }
         }
         else {
@@ -361,6 +363,24 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                     logger.error(Util.delayedFormatString("Failed to find a connection %s for a probe %s", connectionName, cp));
                     return null;
                 }
+            }
+        }
+
+        //try {
+        Map<String, String> empty = Collections.emptyMap();
+
+        try {
+            p.setMainStore(pm.defaultStore, empty);
+        } catch (Exception e1) {
+            logger.error(Util.delayedFormatString("Failed to configure the default store for the probe %s", pm.defaultStore.getClass(), p));
+            return null;
+        }
+
+        for(Map.Entry<String, StoreFactory> e: pm.stores.entrySet()) {
+            try {
+                p.addStore(e.getValue());
+            } catch (Exception e1) {
+                logger.warn(Util.delayedFormatString("Failed to configure the store %s for the probe %s", e.getKey(), e.getValue().getClass().getCanonicalName(), p));
             }
         }
 
