@@ -10,6 +10,7 @@ import jrds.store.ExtractInfo;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.Plottable;
@@ -50,8 +51,6 @@ public class Graph implements WithACL {
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        //result = PRIME * result + ((end == null) ? 0 : end.hashCode());
-        //result = PRIME * result + ((start == null) ? 0 : start.hashCode());
         result = PRIME * result + end.hashCode();
         result = PRIME * result + start.hashCode();
         long temp;
@@ -128,8 +127,8 @@ public class Graph implements WithACL {
             setGraphDefData(graphDef, node.getProbe(), ei, customData);
             if(gd.withLegend())
                 addlegend(graphDef);
-        } catch (IllegalArgumentException e) {
-            logger.error("Impossible to create graph definition, invalid date definition from " + start + " to " + end + " : " + e);
+        } catch (RuntimeException e) {
+            Util.log(this, logger, Level.ERROR, e, "Impossible to create graph definition: ", e);
         }
     }
 
