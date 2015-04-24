@@ -47,7 +47,7 @@ public class Download extends JrdsServlet {
                 }
             };
         }
-            };
+    };
 
     public void doGet(HttpServletRequest req, HttpServletResponse res) {
 
@@ -80,7 +80,6 @@ public class Download extends JrdsServlet {
 
         DataProcessor sourceDp;
         String fileName;
-        jrds.Graph graph;
         if("graph".equals(cmd)) {
             jrds.Graph graph = params.getGraph(this);
             if(graph == null) {

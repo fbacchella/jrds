@@ -94,8 +94,8 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
         final RRDatabase db;
         try {
             db = new RRDatabase(rrdpath);
-        } catch (IOException e1) {
-            throw new RuntimeException("Failed to access rrd file  " + getPath(), e1);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to access rrd file  " + getPath(), e);
         }
 
         return new AbstractExtractor<DataChunk>() {

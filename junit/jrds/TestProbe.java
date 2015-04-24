@@ -5,9 +5,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import jrds.mockobjects.GenerateProbe;
 import jrds.mockobjects.MokeProbe;
 import jrds.starter.HostStarter;
@@ -61,21 +58,16 @@ public class TestProbe {
         dsMap.put("collectlow", "low");
         pd.add(dsMap);
 
+        GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
+        args.set(ProbeDesc.class, pd).set(Probe.class, DummyProbe.class);
+        @SuppressWarnings("unchecked")
+        MokeProbe<String, Number> p = (MokeProbe<String, Number>) GenerateProbe.quickProbe(testFolder, args);
+
         HostStarter host = new HostStarter(new HostInfo("DummyHost"));
         host.setParent(Tools.getDefaultTimer());
-        MokeProbe<String, Long> p = new MokeProbe<String, Long>(pd) {
-            @Override
-            public boolean isCollectRunning() {
-                return true;
-            }			
-            @Override
-            public void modifySample(Sample oneSample, Map<String, Long> values) {
-                oneSample.setTime(getLastUpdate().getTime() + 1000);
-                super.modifySample(oneSample, values);
-            }			
-        };
-        host.getHost().setHostDir(testFolder.newFolder("testHighLow"));
+        host.getHost().setHostDir(testFolder.newFolder("testDefault"));
         p.setHost(host);
+
         p.configure();
         Assert.assertTrue("Failed to create storage", p.checkStore());
         Map<String, Number> val = new HashMap<String, Number>();
@@ -104,22 +96,16 @@ public class TestProbe {
         dsMap.put("defaultValue", "1");
         pd.add(dsMap);
 
+        GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
+        args.set(ProbeDesc.class, pd).set(Probe.class, DummyProbe.class);
+        @SuppressWarnings("unchecked")
+        MokeProbe<String, Number> p = (MokeProbe<String, Number>) GenerateProbe.quickProbe(testFolder, args);
+
         HostStarter host = new HostStarter(new HostInfo("DummyHost"));
         host.setParent(Tools.getDefaultTimer());
-        MokeProbe<String, Long> p = new MokeProbe<String, Long>(pd) {
-            @Override
-            public boolean isCollectRunning() {
-                return true;
-            }
-            @Override
-            public void modifySample(Sample oneSample, Map<String, Long> values) {
-                oneSample.setTime(getLastUpdate().getTime() + 1000);
-                super.modifySample(oneSample, values);
-            }			
-        };
         host.getHost().setHostDir(testFolder.newFolder("testDefault"));
         p.setHost(host);
-        p.configure();
+
         Assert.assertTrue("Failed to create storage", p.checkStore());
         Map<String, Number> val = new HashMap<String, Number>();
         val.put("ds1", 2L);

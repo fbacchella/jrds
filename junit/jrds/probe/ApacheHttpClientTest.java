@@ -38,6 +38,8 @@ import org.rrd4j.DsType;
 public class ApacheHttpClientTest {
     static final private Logger logger = Logger.getLogger(ApacheHttpClientTest.class);
 
+    static private final Map<String, String> empty = Collections.emptyMap();
+
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
@@ -128,6 +130,7 @@ public class ApacheHttpClientTest {
         localhost.find(Resolver.class).doStart();
         cnx.doStart();
         TestHttpProbe p = new TestHttpProbe();
+        p.setMainStore(new RrdDbStoreFactory(), empty);
         p.setHost(localhost);
         p.setPort(server.getURI().toURL().getPort());
         p.configure();
@@ -154,6 +157,7 @@ public class ApacheHttpClientTest {
         localhost.find(Resolver.class).doStart();
         cnx.doStart();
         TestHttpProbe p = new TestHttpProbe();
+        p.setMainStore(new RrdDbStoreFactory(), empty);
         p.setHost(localhost);
         p.setPort(server.getURI().toURL().getPort());
         p.setScheme("https");

@@ -9,10 +9,10 @@ import jrds.JrdsSample;
 import jrds.Probe;
 import jrds.Tools;
 import jrds.mockobjects.GenerateProbe;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;

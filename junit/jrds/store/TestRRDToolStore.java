@@ -9,10 +9,10 @@ import jrds.Period;
 import jrds.Probe;
 import jrds.Tools;
 import jrds.mockobjects.GenerateProbe;
-import junit.framework.Assert;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public class TestRRDToolStore {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE);
+        Tools.setLevel(logger, Level.TRACE, RRDToolStore.class.getCanonicalName(), "jrds.Probe");
     }
 
     @Test
@@ -43,7 +43,7 @@ public class TestRRDToolStore {
         p.getPd().add("speed", DsType.GAUGE);
         p.getPd().add("weight", DsType.GAUGE);
         Assert.assertTrue(p.checkStore());
-        Period period = new Period();
+        Period period = new Period("1999-03-07T13:00:00", "1999-03-07T13:15:00");
         DataProcessor dp = p.extract(ExtractInfo.get().make(period.getBegin(), period.getEnd()));
         String[] dsNames = dp.getSourceNames();
         Assert.assertEquals("data source weight not found", "weight", dsNames[0]);
