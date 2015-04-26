@@ -59,7 +59,12 @@ public class Jetty extends CommandStarterImpl {
         if(propFile.isFile())
             pm.join(propFile);
         pm.importSystemProps();
-        pm.update();
+        try {
+            pm.update();
+        } catch (IllegalArgumentException e) {
+            System.err.println("invalid configuration, can't start: " + e.getMessage());
+            System.exit(1);
+        }
 
         if(pm.withjmx) {
             doJmx(pm);

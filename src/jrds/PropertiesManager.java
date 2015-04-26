@@ -211,33 +211,30 @@ public class PropertiesManager extends Properties {
         };
     }
 
-    private File prepareDir(File dir, boolean autocreate, boolean readOnly) {
-        if(dir == null)
-            return null;
+    private File prepareDir(File dir, boolean autocreate, boolean readOnly) throws IOException {
+        if(dir == null) {
+            throw new IOException("path not defined");
+        }
         if( ! dir.exists()) {
             if(! autocreate) {
-                logger.error(dir + " doesn't exists");
-                return null;
+                throw new IOException(dir + " doesn't exist");
             }
             if ( autocreate &&  !dir.mkdirs()) {
-                logger.error(dir + " doesn't exists and can't be created");
-                return null;
+                throw new IOException(dir + " doesn't exist and can't be created");
             }
         }
         else if( ! dir.isDirectory()) {
-            logger.error(dir + " exists but is not a Directory");
-            return null;
+            throw new IOException(dir + " exists but is not a directory");
         }
         else if( ! dir.canWrite() && ! readOnly) {
-            logger.error(dir + " exists can not be written");
-            return null;
+            throw new IOException(dir + " exists can't be written");
         }
         return dir;
     }
 
-    private File prepareDir(String path, boolean autocreate, boolean readOnly) {
-        if(path == null || "".equals(path)) {
-            return null;
+    private File prepareDir(String path, boolean autocreate, boolean readOnly) throws IOException {
+        if(path == null || path.isEmpty()) {
+            throw new IOException("path not defined");
         }
         File dir = new File(path);
         return prepareDir(dir, autocreate, readOnly);
@@ -390,19 +387,37 @@ public class PropertiesManager extends Properties {
 
         //Directories configuration
         autocreate = parseBoolean(getProperty("autocreate", "false"));
-        configdir = prepareDir(getProperty("configdir"), autocreate, true);
-        rrddir = prepareDir(getProperty("rrddir"), autocreate, false);
-        //Different place to find the temp directory
-        tmpdir = prepareDir(getProperty("tmpdir"), autocreate, true);
-        if(tmpdir == null)
-            tmpdir = prepareDir(System.getProperty("javax.servlet.context.tempdir"), false, true);
-        if(tmpdir == null) {
-            String tmpDirPath = System.getProperty("java.io.tmpdir");
-            if(tmpDirPath != null && ! "".equals(tmpDirPath))
-                tmpdir = prepareDir(new File(tmpDirPath, "jrds"), true, true);
+        try {
+            configdir = prepareDir(getProperty("configdir"), autocreate, true);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("configuration directory invalid: " + e.getMessage(), e);
         }
-        if(tmpdir == null) {
-            throw new RuntimeException("No temp dir defined");
+        try {
+            rrddir = prepareDir(getProperty("rrddir"), autocreate, false);
+        } catch (IOException e) {
+            // rrddir is mandatory only if default store is rrd
+            if(RrdDbStoreFactory.class.getName().equals(getProperty("storefactory", RrdDbStoreFactory.class.getName()))) {
+                throw new IllegalArgumentException("probe storage directory invalid: " + e.getMessage(), e);                
+            }
+        }
+
+        //Different place to find the temp directory
+        try {
+            String tmpDirProperty = getProperty("tmpdir", "");
+            if(tmpDirProperty.isEmpty()) {
+                tmpDirProperty = System.getProperty("javax.servlet.context.tempdir", "");
+            }
+            if(tmpDirProperty.isEmpty()) {
+                File tempDirPath = new File(System.getProperty("java.io.tmpdir"), "jrds");
+                tempDirPath.mkdir();
+                tmpDirProperty = tempDirPath.getCanonicalPath();
+            }
+            if(tmpDirProperty == null) {
+                throw new IllegalArgumentException("No temp directory path found");
+            }
+            tmpdir = prepareDir(tmpDirProperty, autocreate, true);
+        } catch (IOException e) {
+            throw new IllegalArgumentException("No temp directory defined: " + e.getLocalizedMessage(), e);
         }
 
         // Configure the timers
