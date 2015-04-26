@@ -40,13 +40,15 @@ public class TestPropertiesManager {
         String oldtmpdirpath = System.getProperty("java.io.tmpdir");
         File newtmpdir = testFolder.newFile("tmp");
         newtmpdir.delete();
+        newtmpdir.mkdir();
         System.setProperty("java.io.tmpdir", newtmpdir.getPath());
         PropertiesManager pm = new PropertiesManager();
-        Assert.assertFalse("tmpdir should not be created yet", newtmpdir.exists());
+        pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
         pm.update();
         System.setProperty("java.io.tmpdir", oldtmpdirpath);
         File jrdstmpdir = new File(newtmpdir, "jrds");
-        Assert.assertEquals(jrdstmpdir, pm.tmpdir);
+        Assert.assertEquals(jrdstmpdir.getCanonicalPath(), pm.tmpdir.getCanonicalPath());
         Assert.assertTrue("tmpdir should have been created", newtmpdir.exists());
     }
 
@@ -71,7 +73,7 @@ public class TestPropertiesManager {
         }
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testConfigNoAutoCreate() throws IOException, IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
         PropertiesManager pm = new PropertiesManager();
 
@@ -84,21 +86,13 @@ public class TestPropertiesManager {
         }
         pm.setProperty("autocreate", "false");
         pm.update();
-
-        Assert.assertEquals("tmp/jrds", pm.tmpdir.toString());
-        Assert.assertNull(pm.configdir);
-        Assert.assertNull(pm.rrddir);
-
-        //None was created
-        for(Map.Entry<String, File> e: dirMap.entrySet()) {
-            File dir = e.getValue();
-            Assert.assertFalse(dir.exists());
-        }
     }
 
     @Test
-    public void testSecurity() {
+    public void testSecurity() throws IOException {
         PropertiesManager pm = new PropertiesManager();
+        pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("security", "true");
         pm.setProperty("adminrole", "role1");
         pm.setProperty("defaultroles", " role2 ,role3");
@@ -123,6 +117,8 @@ public class TestPropertiesManager {
         FileOutputStream fos = new java.io.FileOutputStream(log4jprops);
         fos.getChannel().transferFrom(isChannel, 0, 4096);
         PropertiesManager pm = new PropertiesManager();
+        pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("log4jpropfile", log4jprops.getCanonicalPath());
         pm.update();
         logger.debug("log file created");
@@ -134,16 +130,20 @@ public class TestPropertiesManager {
     }
 
     @Test
-    public void testDefaultStore() {
+    public void testDefaultStore() throws IOException {
         PropertiesManager pm = new PropertiesManager();
+        pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
         pm.update();
         pm.configureStores();
         Assert.assertEquals("Default store configuration failed", jrds.store.RrdDbStoreFactory.class, pm.defaultStore.getClass());
     }
 
     @Test
-    public void testDefaultStoreEmpty() {
+    public void testDefaultStoreEmpty() throws IOException {
         PropertiesManager pm = new PropertiesManager();
+        pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("storefactory", jrds.store.CacheStoreFactory.class.getCanonicalName());
         pm.update();
         pm.configureStores();
@@ -151,8 +151,10 @@ public class TestPropertiesManager {
     }
 
     @Test
-    public void testDefaultStoreList() {
+    public void testDefaultStoreList() throws IOException {
         PropertiesManager pm = new PropertiesManager();
+        pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("stores", "cache");
         pm.setProperty("rrdbackend", "NIO");
         pm.setProperty("store.cache.factory", EmptyStoreFactory.class.getCanonicalName());

@@ -18,10 +18,15 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestListServlet {
     static final private Logger logger = Logger.getLogger(TestListServlet.class);
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws Exception {
@@ -35,7 +40,16 @@ public class TestListServlet {
     @Test 
     public void testListServlet() throws Exception
     {
-        ServletTester tester = ToolsWebApp.getTestServer(new Properties());
+        Properties config = new Properties();
+        config.put("tmpdir", testFolder + "/tmp");
+        config.put("configdir", testFolder + "/config");
+        config.put("autocreate", "true");
+        config.put("rrddir", testFolder + "/rrd");
+        if(! Boolean.parseBoolean(System.getProperty("maven"))) {
+            config.put("libspath", "desc");
+        }
+
+        ServletTester tester = ToolsWebApp.getTestServer(config);
         File cwd = new File (".");
 
         URLClassLoader cl = new URLClassLoader(new URL[] {cwd.toURI().toURL()});

@@ -417,7 +417,7 @@ public class PropertiesManager extends Properties {
             }
             tmpdir = prepareDir(tmpDirProperty, autocreate, true);
         } catch (IOException e) {
-            throw new IllegalArgumentException("No temp directory defined: " + e.getLocalizedMessage(), e);
+            throw new IllegalArgumentException("No temp directory defined: " + e.getMessage(), e);
         }
 
         // Configure the timers
