@@ -134,7 +134,7 @@ public class Graph implements WithACL {
 
     protected void setGraphDefData(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei,
             Map<String, ? extends Plottable> customData) {
-        GraphDesc gd = node.getGraphDesc();
+        GraphDesc gd = getGraphDesc();
         gd.fillGraphDef(graphDef, node.getProbe(), ei, customData);        
     }
 
@@ -194,7 +194,7 @@ public class Graph implements WithACL {
      */
     public DataProcessor getDataProcessor() throws IOException {
         ExtractInfo ei = ExtractInfo.get().make(start, end);
-        DataProcessor dp = node.getGraphDesc().getPlottedDatas(node.getProbe(), ei, null);
+        DataProcessor dp = getGraphDesc().getPlottedDatas(node.getProbe(), ei, null);
         dp.processData();
         return dp;
     }

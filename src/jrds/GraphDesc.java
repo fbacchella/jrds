@@ -27,6 +27,7 @@ import jrds.store.Extractor;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
@@ -815,7 +816,7 @@ implements Cloneable, WithACL {
 
         for(DsDesc ds: allds) {
             boolean complete;
-            // not a data source, don't try to add it in datasources
+            //Not a data source, don't try to add it in datasources
             if(! ds.graphType.datasource()) {
                 complete = true;
             }
@@ -835,6 +836,7 @@ implements Cloneable, WithACL {
                     datasources.add(ds.name);
                 }
             }
+            //A legend
             else if(ds.graphType == GraphType.LEGEND) {
                 complete = true;                
             }
@@ -858,8 +860,7 @@ implements Cloneable, WithACL {
                     if(pathHost == null) {
                         pathHost = defProbe.getHost().getName();
                     }
-                    if(logger.isTraceEnabled())
-                        logger.trace("External probe path: " + pathHost + "/" + ds.dspath.probe + "/" + ds.dsName);
+                    logger.trace(jrds.Util.delayedFormatString("External probe path: %s/%s/%s", pathHost, ds.dspath.probe, ds.dsName));
                     probe = hl.getProbeByPath(pathHost, ds.dspath.probe);
                     if(probe == null) {
                         logger.error("Invalide probe: " + pathHost + "/" + ds.dspath.probe);
@@ -874,15 +875,12 @@ implements Cloneable, WithACL {
 
                 //Add the dsName for the probe found
                 if( !probeDS.containsKey(probe)) {
-                    probeDS.put(probe, defProbe.getMainStore().getExtractor());
+                    probeDS.put(probe, probe.getMainStore().getExtractor());
                 }
                 Extractor ex = probeDS.get(probe);
                 if( ! datasources.contains(ds.name)) {
                     ex.addSource(ds.name, ds.dsName);
                     datasources.add(ds.name);
-                    if(ds.dsName != ds.name) {
-                        graphDef.datasource(ds.name, ds.dsName);
-                    }
                 }
                 else {
                     logger.error("Datasource '" + ds.dsName + "' defined twice in " + name + ", for found: " + ds);
@@ -971,8 +969,7 @@ implements Cloneable, WithACL {
                 else {
                     Probe<?,?> probe = defProbe;
                     if(ds.dspath != null) {
-                        if(logger.isTraceEnabled())
-                            logger.trace("External probe path: " + ds.dspath.host + "/" + ds.dspath.probe + "/" + ds.dsName);
+                        logger.trace(jrds.Util.delayedFormatString("External probe path: %s/%s/%s", ds.dspath.host, ds.dspath.probe, ds.dsName));
                         probe = hl.getProbeByPath(ds.dspath.host, ds.dspath.probe);
                         if(probe == null) {
                             logger.error("Invalide probe: " + ds.dspath.host + "/" + ds.dspath.probe);
@@ -983,7 +980,7 @@ implements Cloneable, WithACL {
                         logger.error("Invalide datasource "  + ds.dsName + ", not found in " + probe);
                         continue;
                     }
-
+                    logger.trace(Util.delayedFormatString("ds '%s' found in probe %s", ds.dsName, probe));
                     //Add the dsName for the probe found
                     if( !probeDS.containsKey(probe)) {
                         probeDS.put(probe, probe.fetchData());
@@ -994,25 +991,24 @@ implements Cloneable, WithACL {
                         datasources.add(ds.dsName);
                     }
                     else {
-                        logger.error("Datasource '" + ds.dsName + "' defined twice in " + name + ", for found: " + ds);
-                        logger.error("New one is " + ds);
+                        logger.error("Datasource '" + ds.dsName + "' defined twice in " + name);
                     }
                 }
             }
             else if(ds.rpn != null){
                 retValue.addDatasource(ds.name, ds.rpn);
+                datasources.add(ds.dsName);
             }
 
             if(plotted && stack) {
                 retValue.addDatasource("Plotted" + ds.name, lastName + ", " +  ds.name + ", +");
-            }
-            else if(plotted) {
+            } else if(plotted ) {
                 retValue.addDatasource("Plotted" + ds.name, ds.name);
             }
             lastName = ds.name; 
         }
         if(logger.isTraceEnabled()) {
-            logger.trace("Datastore for " + getName());
+            logger.trace("Datasource for " + getName());
             for(String s: retValue.getSourceNames())
                 logger.trace("\t" + s);
         }
