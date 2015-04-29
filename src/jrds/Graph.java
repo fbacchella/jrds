@@ -194,9 +194,7 @@ public class Graph implements WithACL {
      */
     public DataProcessor getDataProcessor() throws IOException {
         ExtractInfo ei = ExtractInfo.get().make(start, end);
-        DataProcessor dp = getGraphDesc().getPlottedDatas(node.getProbe(), ei, null);
-        dp.processData();
-        return dp;
+        return getNode().getPlottedDate(ei);
     }
 
     public String getPngName() {

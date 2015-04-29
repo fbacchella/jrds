@@ -23,12 +23,11 @@ import org.rrd4j.data.DataProcessor;
  * This servlet is used to download the values of a graph as an xml file
  *
  * @author Fabrice Bacchella
- * @version $Revision$
  */
 
 public class Download extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(Download.class);
-    private static final String CONTENT_TYPE = "text/csv";
+    static final String CONTENT_TYPE = "text/csv";
     private static final SimpleDateFormat humanDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     protected static final ThreadLocal<DateFormat> epochFormat = 
             new ThreadLocal<DateFormat> () {
@@ -66,6 +65,7 @@ public class Download extends JrdsServlet {
                     params = getParamsBean(req, "cmd", "host", "graphname");                   
                 }
                 else {
+                    logger.error(jrds.Util.delayedFormatString("Invalid command: %s", cmd));
                     res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     return;
                 }

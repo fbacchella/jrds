@@ -131,7 +131,6 @@ public class Sum extends AutonomousGraphNode {
                 }
                 else {
                     logger.error(Util.delayedFormatString("Sum %s unusable, not graph found", Sum.this));
-
                 }
             }
         };

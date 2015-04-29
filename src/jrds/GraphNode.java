@@ -1,8 +1,6 @@
 package jrds;
 
-import java.beans.PropertyDescriptor;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
@@ -15,7 +13,6 @@ import jrds.webapp.WithACL;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.data.DataProcessor;
-import org.rrd4j.data.Plottable;
 
 /**
  * @author Fabrice Bacchella
@@ -31,7 +28,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
     private String name = null;
     private String graphTitle = null;
     private ACL acl = ACL.ALLOWEDACL;
-    private PlottableMap customData = null;
+    private PlottableMap customData = PlottableMap.Empty;
     private Map<String, String> beans = Collections.emptyMap();
 
     /**
@@ -200,10 +197,9 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
     }
 
     public DataProcessor getPlottedDate(ExtractInfo ei) throws IOException {
-        Map<String, ? extends Plottable> pmap = Collections.emptyMap();
-        if(customData != null)
-            pmap = customData;
-        DataProcessor dp = gd.getPlottedDatas(probe, ei, pmap);
+        PlottableMap pm = getCustomData();
+        pm.configure(ei);
+        DataProcessor dp = gd.getPlottedDatas(probe, ei, pm);
         dp.processData();
         return dp;
     }

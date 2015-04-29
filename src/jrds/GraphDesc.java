@@ -27,7 +27,6 @@ import jrds.store.Extractor;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
@@ -983,7 +982,7 @@ implements Cloneable, WithACL {
                     logger.trace(Util.delayedFormatString("ds '%s' found in probe %s", ds.dsName, probe));
                     //Add the dsName for the probe found
                     if( !probeDS.containsKey(probe)) {
-                        probeDS.put(probe, probe.fetchData());
+                        probeDS.put(probe, probe.getMainStore().getExtractor());
                     }
                     Extractor ex = probeDS.get(probe);
                     if( ! datasources.contains(ds.dsName)) {

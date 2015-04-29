@@ -7,19 +7,33 @@ import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
 
 public class ExtractInfo {
-    final Date start;
-    final Date end;
-    final Long step;
-    final String ds;
-    final ConsolFun cf;
+    private final class ImmutableDate extends Date {
+        ImmutableDate() {
+            super();
+        }
+        ImmutableDate(Date date) {
+            super(date.getTime());
+        }
+        @Override
+        public void setTime(long time) {
+            throw new UnsupportedOperationException("read only date");
+        }
+    };
+
+
+    public final Date start;
+    public final Date end;
+    public final Long step;
+    public final String ds;
+    public final ConsolFun cf;
 
     public static final ExtractInfo get() {
         return new ExtractInfo();
     }
 
     private ExtractInfo() {
-        start = new Date();
-        end = new Date();
+        start = new ImmutableDate();
+        end = new ImmutableDate();
         step = new Long(0);
         ds = "";
         cf = ConsolFun.AVERAGE;
@@ -36,7 +50,7 @@ public class ExtractInfo {
     }
 
     public final ExtractInfo make(Date start, Date end) {
-        return new ExtractInfo(start, end, this.step, this.ds, this.cf);
+        return new ExtractInfo(new ImmutableDate(start), new ImmutableDate(end), this.step, this.ds, this.cf);
     }
 
     public final ExtractInfo make(long step) {
