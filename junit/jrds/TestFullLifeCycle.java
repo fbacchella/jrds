@@ -53,7 +53,7 @@ public class TestFullLifeCycle {
         GraphDesc gd = Full.getGd();
         gd.initializeLimits(g2d);
 
-        GraphNode gn = new GraphNode(p, Full.getGd());
+        GraphNode gn = new GraphNode(p, gd);
         Graph g = new Graph(gn);
         g.setPeriod(pr);
 
@@ -68,6 +68,6 @@ public class TestFullLifeCycle {
         Assert.assertEquals(w, img.getWidth());
         Assert.assertTrue(rrdFile.exists());
         Assert.assertTrue(rrdFile.length() > 0);
-
     }
+
 }
