@@ -1,9 +1,3 @@
-/*##########################################################################
- _##
- _##  $Id$
- _##
- _##########################################################################*/
-
 package jrds.webapp;
 
 import java.io.IOException;
@@ -99,7 +93,7 @@ public final class Graph extends JrdsServlet {
 
             if(logger.isTraceEnabled()) {
                 jrds.GraphNode node = hl.getGraphById(p.getId());
-                int wh = node.getGraphDesc().getDimension().height;
+                int wh = graph.getDimension().height;
                 int rh = graph.getRrdGraph().getRrdGraphInfo().getHeight();
                 logger.trace("Delta height:" + (rh - wh) + " for " + node.getGraphDesc());
                 Date finish = new Date();

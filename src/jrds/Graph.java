@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
+import jrds.GraphDesc.Dimension;
 import jrds.store.ExtractInfo;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
@@ -287,4 +288,14 @@ public class Graph implements WithACL {
     public ACL getACL() {
         return acl;
     }
+
+    /**
+     * Return the dimension calculated by the graph desc
+     * can (and should) be overridden with custom graph classes 
+     * @return the dimension of the graphic object
+     */
+    public Dimension getDimension() {
+        return getGraphDesc().getDimension();
+    }
+
 }

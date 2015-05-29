@@ -52,12 +52,13 @@ public class TestFullLifeCycle {
 
         GraphDesc gd = Full.getGd();
         gd.initializeLimits(g2d);
-        int h = gd.getDimension().height;
-        int w = gd.getDimension().width;
 
         GraphNode gn = new GraphNode(p, Full.getGd());
         Graph g = new Graph(gn);
         g.setPeriod(pr);
+
+        int h = g.getDimension().height;
+        int w = g.getDimension().width;
 
         File outputFile =  testFolder.newFile();
         OutputStream out = new FileOutputStream(outputFile);

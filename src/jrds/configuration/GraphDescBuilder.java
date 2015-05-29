@@ -134,7 +134,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
 
             gd.add(addName, addrpn, addgraphType, addColor, addLegend, consFunc, reversed, percentile, host, probe, dsName);
         }
-        
+
         gd.setTree(PropertiesManager.HOSTSTAB, enumerateTree(subnode.getElementbyName("hosttree")));
         gd.setTree(PropertiesManager.VIEWSTAB, enumerateTree(subnode.getElementbyName("viewtree")));
         for(JrdsElement treenode: subnode.getChildElementsByName("tree")) {
@@ -142,7 +142,10 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
             gd.setTree(treetab, enumerateTree(treenode));
         }
 
-        gd.initializeLimits(g2d);
+        // If the class is not jrds.Graph, it's difficult to evaluate dimensions
+        if(gd.getGraphClass() == jrds.Graph.class) {
+            gd.initializeLimits(g2d);            
+        }
         return gd;
     }
 

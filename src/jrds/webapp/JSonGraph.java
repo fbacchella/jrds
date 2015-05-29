@@ -7,13 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jrds.GraphDesc;
+import jrds.GraphDesc.Dimension;
 import jrds.GraphNode;
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.Renderer;
-
 import jrds.Util;
+
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 
@@ -74,11 +74,10 @@ public class JSonGraph extends JSonData {
         imgProps.put("probename", p.getName());
         imgProps.put("qualifiedname", graph.getQualifiedName());
 
-        imgProps.put("qualifiedname", graph.getQualifiedName());
-        GraphDesc gd = gn.getGraphDesc();
-        if(gd !=null && gd.getDimension() != null) {
-            imgProps.put("height", gd.getDimension().height);
-            imgProps.put("width", gd.getDimension().width);
+        Dimension d = graph.getDimension();
+        if(d != null) {
+            imgProps.put("height", d.height);
+            imgProps.put("width", d.width);
         }
         imgProps.put("graph",params.doArgsMap(graph, true));
         imgProps.put("history",params.doArgsMap(graph, false));
