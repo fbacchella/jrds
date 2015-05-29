@@ -82,12 +82,12 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
                     logger.trace(Util.delayedFormatString("Adding graph: %s", graphName));
                 }
                 else {
-                    logger.warn(Util.delayedFormatString("Unknown graph %s for probe %s", graphName, pd.getName()));
+                    logger.info(Util.delayedFormatString("Missing graph %s for probe %s", graphName, pd.getName()));
                 }
             }
         }
         if(! withgraphs) {
-            logger.warn(Util.delayedFormatString("No valid graph found for %s", pd.getName()));
+            logger.debug(Util.delayedFormatString("No graph defined for probe %s", pd.getName()));
         }
 
         for(JrdsElement specificNode: root.getChildElementsByName("specific")) {
