@@ -16,7 +16,7 @@
         <buildSource>1.7</buildSource>
         <buildTarget>1.7</buildTarget>
         <!-- current year. -->
-        <year>2014</year>
+        <year>2015</year>
         <dojo.version>1.10.4</dojo.version>
         <dojo.unpacked.dir>${project.basedir}/target/dojo-unpacked</dojo.unpacked.dir>
         <webapp.root>${project.basedir}/web</webapp.root>
@@ -181,18 +181,18 @@
     <build>
         <resources>
             <resource>
-                <directory>.</directory>
+                <directory>${project.basedir}</directory>
                 <includes>
                     <include>desc/**</include>
                 </includes>
             </resource>
             <resource>
-                <directory>dtd</directory>
+                <directory>${project.basedir}/dtd</directory>
             </resource>
         </resources>
         <testResources>
             <testResource>
-                <directory>junit</directory>
+                <directory>${project.basedir}/junit</directory>
                 <includes>
                     <include>ressources/**/*</include>
                 </includes>
@@ -485,5 +485,5 @@
             <email>fbacchella@spamcop.net</email>
         </developer>
     </developers>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 </project>
