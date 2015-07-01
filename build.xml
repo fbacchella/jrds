@@ -12,8 +12,6 @@
 	<property name="compile.deprecation" value="yes" />
 	<property name="testdir" value="${build.home}/tests" />
 
-	<property file="local.properties" />
-
 	<!--  ==================== Compilation Control Options ==================== -->
 	<property name="compile.debug" value="true" />
 	<property name="compile.deprecation" value="false" />
@@ -24,9 +22,6 @@
 
 	<!-- ===================== External jar Classpath =========================== -->
 	<path id="external.classpath">
-		<fileset dir="${appserv.servlet-api}">
-			<include name="*.jar" />
-		</fileset>
 		<fileset dir="lib">
 			<include name="*.jar" />
 		</fileset>
