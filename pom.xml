@@ -170,7 +170,7 @@
         <repository>
             <id>jrds</id>
             <name>jrds Java Packages</name>
-            <url>http://jrds.fr/jenkins/plugin/repository/everything/</url>
+            <url>http://jrds.fr/maven2/</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
