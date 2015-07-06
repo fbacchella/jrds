@@ -1,334 +1,334 @@
 <project name="jrds" default="war" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-	<!-- set global properties for this build -->
-	<property name="app.name" value="jrds" />
-	<property name="app.path" value="/${app.name}" />
-	<property name="app.version" value="0.1-dev" />
-	<property name="build.home" value="${basedir}/build" />
-	<property name="docs.build" value="${build.home}/doc" />
-	<property name="src.home" value="${basedir}/src" />
-	<property name="src.junit" value="${basedir}/junit" />
-	<property name="web.src" value="${basedir}/web" />
-	<property name="web.build" value="${build.home}/webapp" />
-	<property name="compile.deprecation" value="yes" />
-	<property name="testdir" value="${build.home}/tests" />
+    <!-- set global properties for this build -->
+    <property name="app.name" value="jrds" />
+    <property name="app.path" value="/${app.name}" />
+    <property name="app.version" value="0.1-dev" />
+    <property name="build.home" value="${basedir}/build" />
+    <property name="docs.build" value="${build.home}/doc" />
+    <property name="src.home" value="${basedir}/src" />
+    <property name="src.junit" value="${basedir}/junit" />
+    <property name="web.src" value="${basedir}/web" />
+    <property name="web.build" value="${build.home}/webapp" />
+    <property name="compile.deprecation" value="yes" />
+    <property name="testdir" value="${build.home}/tests" />
 
-	<!--  ==================== Compilation Control Options ==================== -->
-	<property name="compile.debug" value="true" />
-	<property name="compile.deprecation" value="false" />
-	<property name="compile.optimize" value="true" />
-	<property name="encoding" value="iso-8859-1" />
-	<property name="javac.source" value="1.7" />
-	<property name="javac.target" value="1.7" />
+    <!--  ==================== Compilation Control Options ==================== -->
+    <property name="compile.debug" value="true" />
+    <property name="compile.deprecation" value="false" />
+    <property name="compile.optimize" value="true" />
+    <property name="encoding" value="iso-8859-1" />
+    <property name="javac.source" value="1.7" />
+    <property name="javac.target" value="1.7" />
 
-	<!-- ===================== External jar Classpath =========================== -->
-	<path id="external.classpath">
-		<fileset dir="lib">
-			<include name="*.jar" />
-		</fileset>
-		<fileset dir="libjetty">
-			<include name="*.jar" />
-		</fileset>
-		<fileset dir="libtest">
-			<include name="*.jar" />
-		</fileset>
-		<fileset dir="libprobes">
-			<include name="*.jar" />
-		</fileset>
-	</path>
+    <!-- ===================== External jar Classpath =========================== -->
+    <path id="external.classpath">
+        <fileset dir="lib">
+            <include name="*.jar" />
+        </fileset>
+        <fileset dir="libjetty">
+            <include name="*.jar" />
+        </fileset>
+        <fileset dir="libtest">
+            <include name="*.jar" />
+        </fileset>
+        <fileset dir="libprobes">
+            <include name="*.jar" />
+        </fileset>
+    </path>
 
-	<!-- ==================== Run Classpath =========================== -->
-	<path id="project.classpath">
-		<path refid="external.classpath" />
-		<fileset dir="${build.home}/">
-			<include name="*.jar" />
-		</fileset>
-	</path>
+    <!-- ==================== Run Classpath =========================== -->
+    <path id="project.classpath">
+        <path refid="external.classpath" />
+        <fileset dir="${build.home}/">
+            <include name="*.jar" />
+        </fileset>
+    </path>
 
-	<!-- ==================== Test Classpath =========================== -->
-	<path id="test.classpath">
-		<pathelement path="${build.home}/classes" />
-		<pathelement path="${build.home}/classes-junit" />
-		<pathelement path="junit" />
-		<pathelement path="dtd" />
-		<path refid="project.classpath" />
-	</path>
+    <!-- ==================== Test Classpath =========================== -->
+    <path id="test.classpath">
+        <pathelement path="${build.home}/classes" />
+        <pathelement path="${build.home}/classes-junit" />
+        <pathelement path="junit" />
+        <pathelement path="dtd" />
+        <path refid="project.classpath" />
+    </path>
 
-	<!-- ==================== Dojo fileset =========================== -->
-	<fileset dir="lib/dojo" id="dojofileset">
-		<include name="dijit/themes/nihilo/nihilo.css" />
-		<include name="dijit/themes/nihilo/images/treeExpand_loading.gif" />
-		<include name="dijit/themes/nihilo/images/tabContainerSprite.gif" />
-		<include name="dijit/themes/nihilo/images/spriteRoundedIconsSmall.png" />
-		<include name="dijit/themes/nihilo/images/titleBar.png" />
-		<include name="dijit/themes/nihilo/images/spriteCheckbox.gif" />
-		<include name="dijit/themes/nihilo/images/buttonEnabled.png" />
-		<include name="dijit/themes/nihilo/images/buttonActive.png" />
-		<include name="dijit/themes/nihilo/images/spriteArrows.png" />
-		<include name="dijit/themes/nihilo/images/validationInputBg.png" />
-		<include name="dijit/themes/nihilo/images/accordionItemActive.png" />
-		<include name="dijit/themes/nihilo/images/warning.png" />
-		<include name="dojox/widget/Standby/images/loading.gif" />
-		<include name="dojo/resources/blank.gif" />
-		<include name="dojo/resources/dojo.css" />
-		<include name="dijit/themes/nihilo/images/spriteDivIcons.gif" />
-		<include name="dijit/themes/nihilo/images/buttonHover.png" />
-		<include name="dijit/themes/nihilo/images/spriteTree.gif" />
-		<include name="dijit/themes/nihilo/images/treeHover.png" />
-		<include name="dijit/themes/nihilo/images/treeI.gif" />
-		<include name="dijit/themes/nihilo/images/treeI_half.gif" />
-	</fileset>
+    <!-- ==================== Dojo fileset =========================== -->
+    <fileset dir="lib/dojo" id="dojofileset">
+        <include name="dijit/themes/nihilo/nihilo.css" />
+        <include name="dijit/themes/nihilo/images/treeExpand_loading.gif" />
+        <include name="dijit/themes/nihilo/images/tabContainerSprite.gif" />
+        <include name="dijit/themes/nihilo/images/spriteRoundedIconsSmall.png" />
+        <include name="dijit/themes/nihilo/images/titleBar.png" />
+        <include name="dijit/themes/nihilo/images/spriteCheckbox.gif" />
+        <include name="dijit/themes/nihilo/images/buttonEnabled.png" />
+        <include name="dijit/themes/nihilo/images/buttonActive.png" />
+        <include name="dijit/themes/nihilo/images/spriteArrows.png" />
+        <include name="dijit/themes/nihilo/images/validationInputBg.png" />
+        <include name="dijit/themes/nihilo/images/accordionItemActive.png" />
+        <include name="dijit/themes/nihilo/images/warning.png" />
+        <include name="dojox/widget/Standby/images/loading.gif" />
+        <include name="dojo/resources/blank.gif" />
+        <include name="dojo/resources/dojo.css" />
+        <include name="dijit/themes/nihilo/images/spriteDivIcons.gif" />
+        <include name="dijit/themes/nihilo/images/buttonHover.png" />
+        <include name="dijit/themes/nihilo/images/spriteTree.gif" />
+        <include name="dijit/themes/nihilo/images/treeHover.png" />
+        <include name="dijit/themes/nihilo/images/treeI.gif" />
+        <include name="dijit/themes/nihilo/images/treeI_half.gif" />
+    </fileset>
 
-	<target name="compile">
-		<mkdir dir="${build.home}/classes" />
-		<mkdir dir="${build.home}/probes" />
-		<javac srcdir="${src.home}" destdir="${build.home}/classes" debug="${compile.debug}" deprecation="${compile.deprecation}" includeantruntime="false" optimize="${compile.optimize}" encoding="${encoding}" target="${javac.target}" source="${javac.source}">
-			<classpath refid="external.classpath" />
-		</javac>
-	</target>
+    <target name="compile">
+        <mkdir dir="${build.home}/classes" />
+        <mkdir dir="${build.home}/probes" />
+        <javac srcdir="${src.home}" destdir="${build.home}/classes" debug="${compile.debug}" deprecation="${compile.deprecation}" includeantruntime="false" optimize="${compile.optimize}" encoding="${encoding}" target="${javac.target}" source="${javac.source}">
+            <classpath refid="external.classpath" />
+        </javac>
+    </target>
 
-	<target name="compile.test" depends="compile">
-		<mkdir dir="${build.home}/classes-junit" />
-		<javac srcdir="${src.junit}" destdir="${build.home}/classes-junit" debug="${compile.debug}" deprecation="${compile.deprecation}" includeantruntime="false" optimize="${compile.optimize}" encoding="${encoding}" target="${javac.target}" source="${javac.source}">
-			<classpath refid="test.classpath" />
-		</javac>
-	</target>
+    <target name="compile.test" depends="compile">
+        <mkdir dir="${build.home}/classes-junit" />
+        <javac srcdir="${src.junit}" destdir="${build.home}/classes-junit" debug="${compile.debug}" deprecation="${compile.deprecation}" includeantruntime="false" optimize="${compile.optimize}" encoding="${encoding}" target="${javac.target}" source="${javac.source}">
+            <classpath refid="test.classpath" />
+        </javac>
+    </target>
 
-	<target name="munin" depends="compile" description="">
-		<antcall target="compile.subprobes">
-			<param name="subprobe" value="munin" />
-			<param name="subprobe.dir" value="probes-other/munin" />
-		</antcall>
-	</target>
+    <target name="munin" depends="compile" description="">
+        <antcall target="compile.subprobes">
+            <param name="subprobe" value="munin" />
+            <param name="subprobe.dir" value="probes-other/munin" />
+        </antcall>
+    </target>
 
-	<!-- See http://remotetea.sourceforge.net, needs  oncprc.jar-->
-	<target name="rstat" depends="compile" description="To use rstat, needs oncprc.jar from http://remotetea.sourceforge.net/">
-		<antcall target="compile.subprobes">
-			<param name="subprobe" value="rstat" />
-			<param name="subprobe.dir" value="probes-other/rstat" />
-		</antcall>
-	</target>
+    <!-- See http://remotetea.sourceforge.net, needs  oncprc.jar-->
+    <target name="rstat" depends="compile" description="To use rstat, needs oncprc.jar from http://remotetea.sourceforge.net/">
+        <antcall target="compile.subprobes">
+            <param name="subprobe" value="rstat" />
+            <param name="subprobe.dir" value="probes-other/rstat" />
+        </antcall>
+    </target>
 
-	<!-- See http://www.petertribble.co.uk/Solaris/jkstat.html for more informations -->
-	<!-- the followings jars are needed and are provided with jkstat :
+    <!-- See http://www.petertribble.co.uk/Solaris/jkstat.html for more informations -->
+    <!-- the followings jars are needed and are provided with jkstat :
     ws-commons-util-x.y.z.jar
     xmlrpc-common-x.y.z.jar
     xmlrpc-client-x.y.z.jar
     jkstat.jar -->
-	<target name="jkstat" depends="compile" description="To use jkstat, one needs JKstat from http://www.petertribble.co.uk/Solaris/jkstat-0.29.tar.gz">
-		<antcall target="compile.subprobes">
-			<param name="subprobe" value="jrdsjkstat" />
-			<param name="subprobe.dir" value="probes-other/jkstat" />
-		</antcall>
-	</target>
+    <target name="jkstat" depends="compile" description="To use jkstat, one needs JKstat from http://www.petertribble.co.uk/Solaris/jkstat-0.29.tar.gz">
+        <antcall target="compile.subprobes">
+            <param name="subprobe" value="jrdsjkstat" />
+            <param name="subprobe.dir" value="probes-other/jkstat" />
+        </antcall>
+    </target>
 
-	<target name="compile.subprobes" depends="appjar">
-		<mkdir dir="${build.home}/${subprobe}/classes" />
-		<javac srcdir="${subprobe.dir}/src" destdir="${build.home}/${subprobe}/classes" debug="${compile.debug}" deprecation="${compile.deprecation}" includeantruntime="false" optimize="${compile.optimize}" encoding="${encoding}" target="${javac.target}" source="${javac.source}">
-			<classpath refid="project.classpath" />
-		</javac>
-		<jar destfile="${build.home}/probes/${subprobe}.jar" basedir="${build.home}/${subprobe}/classes">
-			<fileset dir="${subprobe.dir}">
-				<include name="desc/**/*.xml" />
-			</fileset>
-		</jar>
-	</target>
+    <target name="compile.subprobes" depends="appjar">
+        <mkdir dir="${build.home}/${subprobe}/classes" />
+        <javac srcdir="${subprobe.dir}/src" destdir="${build.home}/${subprobe}/classes" debug="${compile.debug}" deprecation="${compile.deprecation}" includeantruntime="false" optimize="${compile.optimize}" encoding="${encoding}" target="${javac.target}" source="${javac.source}">
+            <classpath refid="project.classpath" />
+        </javac>
+        <jar destfile="${build.home}/probes/${subprobe}.jar" basedir="${build.home}/${subprobe}/classes">
+            <fileset dir="${subprobe.dir}">
+                <include name="desc/**/*.xml" />
+            </fileset>
+        </jar>
+    </target>
 
-	<target name="appjar" depends="compile">
-		<jar destfile="${build.home}/jrds.jar" manifest="${basedir}/web/META-INF/MANIFEST.MF">
-			<fileset dir="dtd">
-				<include name="**.dtd" />
-			</fileset>
-			<fileset dir="${build.home}/classes">
-				<include name="**/*.class" />
-				<exclude name="**/bootstrap/**" />
-				<exclude name="**/snmp/**" />
-			</fileset>
-			<fileset dir=".">
-				<include name="desc/**/*.xml" />
-				<exclude name="**/snmp/**" />
-			</fileset>
-		</jar>
-		<jar destfile="${build.home}/probes/snmpprobes.jar">
-			<fileset dir="${build.home}/classes">
-				<include name="**/snmp/**" />
-			</fileset>
-			<fileset dir=".">
-				<include name="desc/*/snmp/**/*.xml" />
-			</fileset>
-		</jar>
-		<jar destfile="${build.home}/boot.jar">
-			<fileset dir="${build.home}/classes">
-				<include name="**/bootstrap/**" />
-			</fileset>
-			<manifest>
-				<attribute name="Built-By" value="${user.name}" />
-				<attribute name="Main-Class" value="jrds.bootstrap.BootStrap" />
-			</manifest>
-		</jar>
-	</target>
+    <target name="appjar" depends="compile">
+        <jar destfile="${build.home}/jrds.jar" manifest="${basedir}/web/META-INF/MANIFEST.MF">
+            <fileset dir="dtd">
+                <include name="**.dtd" />
+            </fileset>
+            <fileset dir="${build.home}/classes">
+                <include name="**/*.class" />
+                <exclude name="**/bootstrap/**" />
+                <exclude name="**/snmp/**" />
+            </fileset>
+            <fileset dir=".">
+                <include name="desc/**/*.xml" />
+                <exclude name="**/snmp/**" />
+            </fileset>
+        </jar>
+        <jar destfile="${build.home}/probes/snmpprobes.jar">
+            <fileset dir="${build.home}/classes">
+                <include name="**/snmp/**" />
+            </fileset>
+            <fileset dir=".">
+                <include name="desc/*/snmp/**/*.xml" />
+            </fileset>
+        </jar>
+        <jar destfile="${build.home}/boot.jar">
+            <fileset dir="${build.home}/classes">
+                <include name="**/bootstrap/**" />
+            </fileset>
+            <manifest>
+                <attribute name="Built-By" value="${user.name}" />
+                <attribute name="Main-Class" value="jrds.bootstrap.BootStrap" />
+            </manifest>
+        </jar>
+    </target>
 
-	<target name="javadoc">
-		<javadoc encoding="${encoding}" destdir="${docs.build}" access="protected" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="true" nodeprecatedlist="false" nodeprecated="false" packagenames="jrds,jrds.*,jrds.probe.*,jrds.factories.*,jrds.webapp">
-			<fileset dir="src" />
-			<fileset dir="probes-other">
-				<include name="*/src/**/*.java" />
-			</fileset>
-			<classpath refid="external.classpath" />
-			<link href="http://docs.oracle.com/javase/7/docs/api/" />
-			<link href="http://java.sun.com/products/servlet/2.5/javadoc" />
-			<link href="http://www.snmp4j.org/doc/" />
-			<link href="http://rrd4j.googlecode.com/git/javadoc/" />
-			<link href="http://junit.org/javadoc/4.11/" />
-			<link href="http://jetty.codehaus.org/jetty/jetty-6/apidocs/" />
-			<link href="http://ws.apache.org/xmlrpc/apidocs/" />
-			<link href="http://www.json.org/javadoc/" />
-			<link href="http://logging.apache.org/log4j/1.2/apidocs/" />
-			<link href="http://commons.apache.org/proper/commons-net/javadocs/api-3.3/" />
-			<link href="http://commons.apache.org/fileupload/apidocs/" />
-			<link href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/" />
-			<link href="http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/" />
-		</javadoc>
-	</target>
+    <target name="javadoc">
+        <javadoc encoding="${encoding}" destdir="${docs.build}" access="protected" use="true" notree="false" nonavbar="false" noindex="false" splitindex="true" author="true" version="true" nodeprecatedlist="false" nodeprecated="false" packagenames="jrds,jrds.*,jrds.probe.*,jrds.factories.*,jrds.webapp">
+            <fileset dir="src" />
+            <fileset dir="probes-other">
+                <include name="*/src/**/*.java" />
+            </fileset>
+            <classpath refid="external.classpath" />
+            <link href="http://docs.oracle.com/javase/7/docs/api/" />
+            <link href="http://java.sun.com/products/servlet/2.5/javadoc" />
+            <link href="http://www.snmp4j.org/doc/" />
+            <link href="http://rrd4j.googlecode.com/git/javadoc/" />
+            <link href="http://junit.org/javadoc/4.11/" />
+            <link href="http://jetty.codehaus.org/jetty/jetty-6/apidocs/" />
+            <link href="http://ws.apache.org/xmlrpc/apidocs/" />
+            <link href="http://www.json.org/javadoc/" />
+            <link href="http://logging.apache.org/log4j/1.2/apidocs/" />
+            <link href="http://commons.apache.org/proper/commons-net/javadocs/api-3.3/" />
+            <link href="http://commons.apache.org/fileupload/apidocs/" />
+            <link href="http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/" />
+            <link href="http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/" />
+        </javadoc>
+    </target>
 
-	<target name="clean" description="clean up">
-		<delete dir="${build.home}" />
-		<delete dir="${testdir}" />
-	</target>
+    <target name="clean" description="clean up">
+        <delete dir="${build.home}" />
+        <delete dir="${testdir}" />
+    </target>
 
-	<target name="srctar" depends="javadoc">
-		<tar destfile="${build.home}/${app.name}-src.tar">
-			<tarfileset dir="." prefix="jrds">
-				<include name="build" />
-				<include name="build/classes" />
-				<include name="MANIFEST.MF" />
-				<include name="src/**" />
-				<include name="web/**" />
-				<include name="build.xml" />
-				<include name="web.xml" />
-				<include name="lib/**" />
-				<include name="${docs.build}/**" />
-			</tarfileset>
-		</tar>
-	</target>
+    <target name="srctar" depends="javadoc">
+        <tar destfile="${build.home}/${app.name}-src.tar">
+            <tarfileset dir="." prefix="jrds">
+                <include name="build" />
+                <include name="build/classes" />
+                <include name="MANIFEST.MF" />
+                <include name="src/**" />
+                <include name="web/**" />
+                <include name="build.xml" />
+                <include name="web.xml" />
+                <include name="lib/**" />
+                <include name="${docs.build}/**" />
+            </tarfileset>
+        </tar>
+    </target>
 
-	<target name="apptar" depends="appjar">
-		<tar destfile="${build.home}/${app.name}.tar">
-			<tarfileset dir="." prefix="jrds">
-				<include name="lib/**" />
-			</tarfileset>
-			<tarfileset dir="${build.home}" prefix="jrds/lib">
-				<include name="jrds.jar" />
-			</tarfileset>
-			<tarfileset dir="${build.home}" prefix="jrds">
-				<include name="jrds.war" />
-			</tarfileset>
-		</tar>
-	</target>
+    <target name="apptar" depends="appjar">
+        <tar destfile="${build.home}/${app.name}.tar">
+            <tarfileset dir="." prefix="jrds">
+                <include name="lib/**" />
+            </tarfileset>
+            <tarfileset dir="${build.home}" prefix="jrds/lib">
+                <include name="jrds.jar" />
+            </tarfileset>
+            <tarfileset dir="${build.home}" prefix="jrds">
+                <include name="jrds.war" />
+            </tarfileset>
+        </tar>
+    </target>
 
-	<target name="jetty" depends="appjar" description="Build JRDS for jetty">
-		<tar destfile="${build.home}/${app.name}.tar">
-			<tarfileset refid="dojofileset" />
-			<tarfileset dir="${web.src}" />
-			<tarfileset dir="libjetty" prefix="WEB-INF/lib" />
-			<tarfileset dir="lib" prefix="WEB-INF/lib">
-				<include name="*.jar" />
-			</tarfileset>
-			<tarfileset dir="libprobes" prefix="WEB-INF/lib">
-				<include name="*.jar" />
-			</tarfileset>
-			<tarfileset dir="${build.home}" prefix="WEB-INF/lib">
-				<include name="*.jar" />
-			</tarfileset>
-			<tarfileset dir="${build.home}/probes" prefix="WEB-INF/lib">
-				<include name="*.jar" />
-			</tarfileset>
-		</tar>
-		<gzip src="${build.home}/${app.name}.tar" destfile="${build.home}/${app.name}.tar.gz" />
-	</target>
+    <target name="jetty" depends="appjar" description="Build JRDS for jetty">
+        <tar destfile="${build.home}/${app.name}.tar">
+            <tarfileset refid="dojofileset" />
+            <tarfileset dir="${web.src}" />
+            <tarfileset dir="libjetty" prefix="WEB-INF/lib" />
+            <tarfileset dir="lib" prefix="WEB-INF/lib">
+                <include name="*.jar" />
+            </tarfileset>
+            <tarfileset dir="libprobes" prefix="WEB-INF/lib">
+                <include name="*.jar" />
+            </tarfileset>
+            <tarfileset dir="${build.home}" prefix="WEB-INF/lib">
+                <include name="*.jar" />
+            </tarfileset>
+            <tarfileset dir="${build.home}/probes" prefix="WEB-INF/lib">
+                <include name="*.jar" />
+            </tarfileset>
+        </tar>
+        <gzip src="${build.home}/${app.name}.tar" destfile="${build.home}/${app.name}.tar.gz" />
+    </target>
 
-	<target name="war" depends="appjar" description="Build JRDS war">
-		<war destfile="${build.home}/${app.name}.war" webxml="${basedir}/web/WEB-INF/web.xml" duplicate="preserve">
-			<fileset refid="dojofileset" />
-			<fileset dir="${web.src}" />
-			<lib dir="lib">
-				<include name="*.jar" />
-			</lib>
-			<lib dir="libprobes">
-				<include name="*.jar" />
-			</lib>
-			<lib dir="${build.home}">
-				<include name="*.jar" />
-			</lib>
-			<lib dir="${build.home}/probes">
-				<include name="*.jar" />
-			</lib>
-		</war>
-	</target>
+    <target name="war" depends="appjar" description="Build JRDS war">
+        <war destfile="${build.home}/${app.name}.war" webxml="${basedir}/web/WEB-INF/web.xml" duplicate="preserve">
+            <fileset refid="dojofileset" />
+            <fileset dir="${web.src}" />
+            <lib dir="lib">
+                <include name="*.jar" />
+            </lib>
+            <lib dir="libprobes">
+                <include name="*.jar" />
+            </lib>
+            <lib dir="${build.home}">
+                <include name="*.jar" />
+            </lib>
+            <lib dir="${build.home}/probes">
+                <include name="*.jar" />
+            </lib>
+        </war>
+    </target>
 
-	<target name="publish" depends="war,jetty" >
-        <property name="buildir" value="${build.home}"/>
-		<ivy:info file="ivy.xml" />
-		<ivy:buildnumber organisation="${ivy.organisation}" module="${ivy.module}" resolver="ivyrepo"
-		                   />
-		<echoproperties prefix="" />
-		<ivy:publish organisation="fr.jrds" module="jrds"
-		             resolver="build" update="true" overwrite="true">
-			<artifacts pattern="${build.home}/[artifact].[ext]" />
-		</ivy:publish>
-	</target>
-	
-	<target name="checkdtd">
-		<xmlvalidate>
-			<xmlcatalog>
-				<dtd publicId="-//jrds//DTD Graph Description//EN" location="dtd/graphdesc.dtd" />
-				<dtd publicId="-//jrds//DTD Probe Description//EN" location="dtd/probedesc.dtd" />
-			</xmlcatalog>
-			<fileset dir="desc" includes="**/*.xml" />
-			<fileset dir="desc" includes="**/*.xml" />
-		</xmlvalidate>
-	</target>
-
-	<target name="test" depends="compile.test, checkdtd, appjar">
-		<mkdir dir="tmp" />
-		<delete dir="${testdir}" />
-		<mkdir dir="${testdir}/rawtestoutput" />
-		<junit printsummary="yes" showoutput="no" failureproperty="junit.failure" fork="true">
-			<sysproperty key="jrds.testloglevel" value="ERROR" />
-			<formatter type="xml" />
-			<classpath refid="test.classpath" />
-			<batchtest todir="${testdir}/rawtestoutput">
-				<fileset dir="junit">
-					<include name="**/*Test*.java" />
-					<exclude name="**/TestUtil.java" />
-				</fileset>
-			</batchtest>
-		</junit>
-		<junitreport todir="${testdir}/rawtestoutput">
-			<fileset dir="${testdir}/rawtestoutput" />
-			<report todir="${testdir}" />
-		</junitreport>
-		<fail if="junit.failure" message="Unit test(s) failed.  See reports!" />
-	</target>
-
-	<!--  ==================== A few target to run jrds ==================== -->
-	<target name="collect" depends="appjar">
-		<java classname="jrds.standalone.Collector" fork="true" maxmemory="512m">
-			<classpath refid="project.classpath" />
-		</java>
-	</target>
-
-	<target name="graph" depends="appjar">
-		<java classname="jrds.standalone.Grapher" fork="true" maxmemory="128m">
-			<classpath refid="project.classpath" />
-		</java>
-	</target>
-	<target name="resolve" description="--> retrieve dependencies with ivy">
+    <target name="publish" depends="war,jetty" >
         <property name="buildir" value="${build.home}"/>
         <ivy:info file="ivy.xml" />
-		<ivy:retrieve type="jar,zip,bundle" pattern="[conf]/[artifact].[ext]" conf="lib,libtest,libjetty" />
-		<unzip src="lib/dojo.zip" dest="lib">
-			<regexpmapper from="dojo-[^/]*/(.*)" to="dojo/\1" />
-		</unzip>
-		<mkdir dir="libprobes" />
-	</target>
+        <ivy:buildnumber organisation="${ivy.organisation}" module="${ivy.module}" resolver="ivyrepo"
+                           />
+        <echoproperties prefix="" />
+        <ivy:publish organisation="fr.jrds" module="jrds"
+                     resolver="build" update="true" overwrite="true">
+            <artifacts pattern="${build.home}/[artifact].[ext]" />
+        </ivy:publish>
+    </target>
+    
+    <target name="checkdtd">
+        <xmlvalidate>
+            <xmlcatalog>
+                <dtd publicId="-//jrds//DTD Graph Description//EN" location="dtd/graphdesc.dtd" />
+                <dtd publicId="-//jrds//DTD Probe Description//EN" location="dtd/probedesc.dtd" />
+            </xmlcatalog>
+            <fileset dir="desc" includes="**/*.xml" />
+            <fileset dir="desc" includes="**/*.xml" />
+        </xmlvalidate>
+    </target>
+
+    <target name="test" depends="compile.test, checkdtd, appjar">
+        <mkdir dir="tmp" />
+        <delete dir="${testdir}" />
+        <mkdir dir="${testdir}/rawtestoutput" />
+        <junit printsummary="yes" showoutput="no" failureproperty="junit.failure" fork="true">
+            <sysproperty key="jrds.testloglevel" value="ERROR" />
+            <formatter type="xml" />
+            <classpath refid="test.classpath" />
+            <batchtest todir="${testdir}/rawtestoutput">
+                <fileset dir="junit">
+                    <include name="**/*Test*.java" />
+                    <exclude name="**/TestUtil.java" />
+                </fileset>
+            </batchtest>
+        </junit>
+        <junitreport todir="${testdir}/rawtestoutput">
+            <fileset dir="${testdir}/rawtestoutput" />
+            <report todir="${testdir}" />
+        </junitreport>
+        <fail if="junit.failure" message="Unit test(s) failed.  See reports!" />
+    </target>
+
+    <!--  ==================== A few target to run jrds ==================== -->
+    <target name="collect" depends="appjar">
+        <java classname="jrds.standalone.Collector" fork="true" maxmemory="512m">
+            <classpath refid="project.classpath" />
+        </java>
+    </target>
+
+    <target name="graph" depends="appjar">
+        <java classname="jrds.standalone.Grapher" fork="true" maxmemory="128m">
+            <classpath refid="project.classpath" />
+        </java>
+    </target>
+    <target name="resolve" description="--> retrieve dependencies with ivy">
+        <property name="buildir" value="${build.home}"/>
+        <ivy:info file="ivy.xml" />
+        <ivy:retrieve type="jar,zip,bundle" pattern="[conf]/[artifact].[ext]" conf="lib,libtest,libjetty" />
+        <unzip src="lib/dojo.zip" dest="lib">
+            <regexpmapper from="dojo-[^/]*/(.*)" to="dojo/\1" />
+        </unzip>
+        <mkdir dir="libprobes" />
+    </target>
 </project>
