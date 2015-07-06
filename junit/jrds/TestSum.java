@@ -19,17 +19,12 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.LinearInterpolator;
 
-public class TestSum {
+public class TestSum extends FolderSaver {
     static final private Logger logger = Logger.getLogger(TestSum.class);
-
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws IOException, ParserConfigurationException {
@@ -93,10 +88,9 @@ public class TestSum {
 
         Graph g = new Graph(s);
         g.setPeriod(pr);
-        File outputFile =  new File("tmp", "sum.png");
+        File outputFile =  new File(testFolder.getRoot(), "sum.png");
         OutputStream out = new FileOutputStream(outputFile);
         g.writePng(out);
-
     }
 
 }

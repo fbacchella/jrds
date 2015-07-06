@@ -17,16 +17,11 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
-public class TestPropertiesManager {
+public class TestPropertiesManager extends FolderSaver {
     static final private Logger logger = Logger.getLogger(TestPropertiesManager.class);
     static private final String[] dirs = new String[] {"configdir", "rrddir", "tmpdir"};
-
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws IOException {
@@ -93,6 +88,7 @@ public class TestPropertiesManager {
         PropertiesManager pm = new PropertiesManager();
         pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("security", "true");
         pm.setProperty("adminrole", "role1");
         pm.setProperty("defaultroles", " role2 ,role3");
@@ -119,6 +115,7 @@ public class TestPropertiesManager {
         PropertiesManager pm = new PropertiesManager();
         pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("log4jpropfile", log4jprops.getCanonicalPath());
         pm.update();
         logger.debug("log file created");
@@ -134,6 +131,7 @@ public class TestPropertiesManager {
         PropertiesManager pm = new PropertiesManager();
         pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
         pm.update();
         pm.configureStores();
         Assert.assertEquals("Default store configuration failed", jrds.store.RrdDbStoreFactory.class, pm.defaultStore.getClass());
@@ -144,6 +142,7 @@ public class TestPropertiesManager {
         PropertiesManager pm = new PropertiesManager();
         pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("storefactory", jrds.store.CacheStoreFactory.class.getCanonicalName());
         pm.update();
         pm.configureStores();
@@ -155,6 +154,7 @@ public class TestPropertiesManager {
         PropertiesManager pm = new PropertiesManager();
         pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
+        pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
         pm.setProperty("stores", "cache");
         pm.setProperty("rrdbackend", "NIO");
         pm.setProperty("store.cache.factory", EmptyStoreFactory.class.getCanonicalName());
