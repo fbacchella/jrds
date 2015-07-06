@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
+import jrds.FolderSaver;
 import jrds.Graph;
 import jrds.GraphDesc;
 import jrds.GraphNode;
@@ -26,7 +27,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TestRRDProbe {
+public class TestRRDProbe extends FolderSaver {
     static final private Logger logger = Logger.getLogger(TestRRDProbe.class);
     static final private File rrdfile = new File("junit/ressources/rrdtool.rrd");
     static final private long start = 920802300;
@@ -77,7 +78,7 @@ public class TestRRDProbe {
             Graph g = gn.getGraph();
             g.setEnd(new Date(end * 1000));
             g.setStart(new Date(start * 1000));
-            File outputFile =  new File("tmp", "rrdtool.png");
+            File outputFile =  new File(testFolder.getRoot(), "rrdtool.png");
             OutputStream out = new FileOutputStream(outputFile);
             g.writePng(out);
             Assert.assertTrue("graph not created", outputFile.canRead());
