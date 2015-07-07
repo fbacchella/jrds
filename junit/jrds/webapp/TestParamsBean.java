@@ -36,5 +36,5 @@ public class TestParamsBean {
         @SuppressWarnings("unused")
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(props, "Dummy//Host", "MockGraphInstance", "detailInfo"), hl, "host", "graphname", "detail");
     }
-    
+
 }

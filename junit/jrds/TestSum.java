@@ -19,12 +19,17 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.LinearInterpolator;
 
-public class TestSum extends FolderSaver {
+public class TestSum {
     static final private Logger logger = Logger.getLogger(TestSum.class);
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws IOException, ParserConfigurationException {

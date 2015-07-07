@@ -17,11 +17,16 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-public class TestPropertiesManager extends FolderSaver {
+public class TestPropertiesManager {
     static final private Logger logger = Logger.getLogger(TestPropertiesManager.class);
     static private final String[] dirs = new String[] {"configdir", "rrddir", "tmpdir"};
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws IOException {
