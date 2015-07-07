@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-import jrds.FolderSaver;
 import jrds.Graph;
 import jrds.GraphDesc;
 import jrds.GraphNode;
@@ -25,14 +24,18 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
-public class TestRRDProbe extends FolderSaver {
+public class TestRRDProbe {
     static final private Logger logger = Logger.getLogger(TestRRDProbe.class);
     static final private File rrdfile = new File("junit/ressources/rrdtool.rrd");
     static final private long start = 920802300;
     static final private long end = 920808900;
 
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws Exception {
