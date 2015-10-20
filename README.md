@@ -6,7 +6,7 @@ number of machines in a very short time. It's fully written in java and avoid ca
 performances. It uses [RRD4J](http://code.google.com/p/rrd4j/), a clone of [rrdtool](http://oss.oetiker.ch/rrdtool/|)
 written in java.
 
-The site if is [jrds.fr](http://jrds.fr)
+The site is [jrds.fr](http://jrds.fr)
 
 How it works?
 =============
