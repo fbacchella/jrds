@@ -11,7 +11,7 @@ The site if is [jrds.fr](http://jrds.fr)
 How it works?
 =============
 
-JRDS is a java web application, that can run in any serlvet server like tomcat or resin. It can also run in a standalone
+JRDS is a java web application, that can run in any servlet server like tomcat or resin. It can also run in a standalone
 mode, using jetty.
 
 It uses threads to parallelize work. Each host is collected within the same thread and the number of simultaneous threads
@@ -19,4 +19,4 @@ can be configured. It use only one thread for each host to avoid overload of a s
 
 It use mainly snmp to collect data, but can be easily extended. There is also some jdbc probes, a agent using RMI for the
 communication, and it can also parse XML data collected with HTTP. The currently available probes can be found
-[here](http://jrds.fr/sourcetype/start). Additionnals collectors can be used using external jars.
+[here](http://jrds.fr/sourcetype/start). Additional collectors can be used using external jars.
