@@ -8,8 +8,6 @@ written in java.
 
 The site if is [jrds.fr](http://jrds.fr)
 
-A [live demo can be found here](http://jrds.appartland.eu/) (thanks to bougie).
-      
 How it works?
 =============
 
