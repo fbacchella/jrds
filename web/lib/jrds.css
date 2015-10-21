@@ -1,5 +1,5 @@
 html, body {
-	width:100%; height:100%; margin:0; padding:0; overflow:hidden; 
+	width:100%; height:100%; margin:0; padding:0; overflow:hidden;
 }
 /* Define Polices */
 body, input, option, select, tab, div, td, a, textarea, .link a {
@@ -32,19 +32,19 @@ body, input, option, select, tab, div, td, a, textarea {
 }
 
 #treePane {
-	background-color:#DDDDDD;
-	border:1px solid black;
+	background-color:#F5F5F5;
+	border-right:1px solid #CCC;
 	float:left;
-	margin:5px;
+	margin:0;
 	padding:5px;
 	width:330px;
 }
 
 .rootButtonIcon {
 	background-image: url("../img/back_to_album.png");
-    background-repeat: no-repeat;
-    height: 14px;
-    width: 16px;
+	background-repeat: no-repeat;
+	height: 14px;
+	width: 16px;
 }
 
 .rootButton .dijitButtonNode {
@@ -64,7 +64,7 @@ body, input, option, select, tab, div, td, a, textarea {
 }
 .formblock {
 	background-color:#F5F5F5;
-	border:1px solid #AAAAAA;
+	border:1px solid #CCC;
 	margin:5px;
 	width:695px;
 	height:28px;
@@ -93,6 +93,28 @@ body, input, option, select, tab, div, td, a, textarea {
 	background-image: none !important;
 	display: none !important;
 }
+
+
+.nihilo .dijitTabContainerTop-dijitContentPane,
+.nihilo .dijitTabContainerLeft-dijitContentPane,
+.nihilo .dijitTabContainerRight-dijitContentPane,
+.nihilo .dijitTabContainerBottom-dijitContentPane,
+.nihilo .dijitAccordionContainer-dijitContentPane {
+	padding: 0;
+}
+
+.dijitBorderContainerPane, .dijitBorderContainerNoGutterPane {
+	margin: 10px 0 0 10px;
+}
+
+.dijitTabChecked {
+	font-weight: bold;
+}
+
+.dijitTabController {
+	background-color: #f5f5f5;
+}
+
 
 .field {
 	margin: 5px;
@@ -189,7 +211,7 @@ body, input, option, select, tab, div, td, a, textarea {
 	vertical-align:top;
 }
 
-.fillspace { 
+.fillspace {
 	height: 100%;
 	width: 100%;
 }
