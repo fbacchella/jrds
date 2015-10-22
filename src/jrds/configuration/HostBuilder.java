@@ -152,13 +152,14 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             Map<String, String> forattr = forNode.attrMap();
             String iterprop = forattr.get("var");
             Collection<String> set = null;
-            String name = forNode.attrMap().get("collection");
-            if(name != null)
-                set = collections.get(name);
+            String name = Util.parseTemplate(forNode.attrMap().get("collection"), this, properties);
+            if(name != null) {
+                set = collections.get(name);                
+            }
             else if(forattr.containsKey("min") && forattr.containsKey("max") && forattr.containsKey("step")) {
-                int min = Util.parseStringNumber(forattr.get("min"), Integer.MAX_VALUE);
-                int max = Util.parseStringNumber(forattr.get("max"), Integer.MIN_VALUE);
-                int step = Util.parseStringNumber(forattr.get("step"), Integer.MIN_VALUE);
+                int min = Util.parseStringNumber(Util.parseTemplate(forattr.get("min"), this, properties), Integer.MAX_VALUE);
+                int max = Util.parseStringNumber(Util.parseTemplate(forattr.get("max"), this, properties), Integer.MIN_VALUE);
+                int step = Util.parseStringNumber(Util.parseTemplate(forattr.get("step"), this, properties), Integer.MIN_VALUE);
                 if( min > max || step <= 0) {
                     logger.error("invalid range from " + min + " to " + max + " with step " + step);
                     break;
