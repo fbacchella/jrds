@@ -116,10 +116,9 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
                 url = protocol.getURL(this);
             }
             log(Level.TRACE, "connecting to %s", url);
-            Map<String, Object> attributes = null;
+            Map<String, Object> attributes = new HashMap<String, Object>();
             if(user != null && password != null ) {
                 String[] credentials = new String[]{user, password};
-                attributes = new HashMap<String, Object>();
                 attributes.put("jmx.remote.credentials", credentials);
             }
             attributes.put("sun.rmi.transport.tcp.responseTimeout", getTimeout() * 1000);
