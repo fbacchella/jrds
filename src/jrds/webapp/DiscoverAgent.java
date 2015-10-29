@@ -49,7 +49,7 @@ public abstract class DiscoverAgent {
                 parent.appendChild(input);
             }
         };
-        public abstract void  doNode(JrdsElement parent, FieldInfo fi);
+        public abstract void doNode(JrdsElement parent, FieldInfo fi);
     }
 
     public static final class FieldInfo {
@@ -61,6 +61,7 @@ public abstract class DiscoverAgent {
 
     private final Logger namedLogger;
     final Set<Class<?>> validClasses;
+    private int timeout;
 
     protected DiscoverAgent(String name, Class<?>... validClasses) {
         namedLogger = Logger.getLogger("jrds.DiscoverAgent." + name);
@@ -169,7 +170,6 @@ public abstract class DiscoverAgent {
                 JrdsElement arg = element.addElement("attr");
                 arg.setAttribute("name", bean.getKey());
                 arg.setTextContent(bean.getValue());
-
             }
         }
         if(argsTypes != null && argsTypes.size() > 0 && argsTypes.size() == argsValues.size()) {
@@ -190,5 +190,12 @@ public abstract class DiscoverAgent {
         jrds.Util.log(this, namedLogger, l, null, format, elements);
     }
 
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
 
 }

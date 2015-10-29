@@ -114,6 +114,7 @@ public class Discover extends JrdsServlet {
         Collections.sort(probeDescsName);
 
         for(DiscoverAgent da: getHostsList().getDiscoverAgent()) {
+            da.setTimeout(getPropertiesManager().timeout);
             try {
                 if(da.exist(hostname, request)) {
                     da.addConnection(hostEleme, request);
@@ -123,6 +124,11 @@ public class Discover extends JrdsServlet {
                         //for(JrdsDocument probeDescDocument: probdescs.values()) {
                         try {
                             ProbeDescSummary summary = new ProbeDescSummary(probeDescDocument, getPropertiesManager().extensionClassLoader);
+
+                            //Don't discover if asked to don't do
+                            if(summary.specifics.get("nodiscover") != null)
+                                continue;
+
                             boolean valid = false;
                             for(Class<?> c: da.validClasses) {
                                 valid |= c.isAssignableFrom(summary.clazz);
@@ -131,6 +137,7 @@ public class Discover extends JrdsServlet {
                                 da.addProbe(hostEleme, summary, request);
                             }
                         } catch (Exception e) {
+                            logger.error("Can't try to discover probe " + probeDescName + ": " + e.getMessage());
                         }
                     }
                     da.discoverPost(hostname, hostEleme, probdescs, request);

@@ -289,10 +289,6 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
             HttpServletRequest request) {
         String name = summary.name;
 
-        //Don't discover if asked to don't do
-        if(summary.specifics.get("nodiscover") != null)
-            return;
-
         summaries.put(summary.name, summary);
         String hidesStr = summary.specifics.get("hides");
         if(hidesStr != null && ! hidesStr.trim().isEmpty()) {
