@@ -40,9 +40,10 @@
         <dependency org="org.apache.httpcomponents" name="httpclient" rev="4.4" conf="lib->default"/>
         <dependency org="mysql" name="mysql-connector-java" rev="5.1.30" conf="lib->default"/>
         <dependency org="postgresql" name="postgresql" rev="8.4-702.jdbc4" conf="lib->default"/>
-        <dependency org="junit" name="junit" rev="4.11" conf="libtest->default"/>
+        <dependency org="junit" name="junit" rev="4.12" conf="libtest->default"/>
         <dependency org="joda-time" name="joda-time" rev="2.3" conf="lib->default"/>
         <dependency org="org.glassfish.external" name="opendmk_jmxremote_optional_jar" rev="1.0-b01-ea" conf="libtest->default"/>
         <dependency org="net.iharder" name="base64" rev="2.3.8" conf="lib->default"/>
+        <dependency org="fr.jrds.verax" name="vxIPMI" rev="1.0.17.1" conf="lib->default"/>
     </dependencies>
 </ivy-module>

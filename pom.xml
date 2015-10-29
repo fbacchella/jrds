@@ -151,6 +151,11 @@
             <artifactId>base64</artifactId>
             <version>2.3.8</version>
         </dependency>
+        <dependency>
+            <groupId>fr.jrds.verax</groupId>
+            <artifactId>vxIPMI</artifactId>
+            <version>1.0.17.1</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
@@ -164,18 +169,18 @@
             <snapshots />
         </repository>
         <repository>
-            <id>snmp4j</id>
-            <url>https://oosnmp.net/dist/release</url>
-        </repository>
-        <repository>
             <id>jrds</id>
             <name>jrds Java Packages</name>
-            <url>http://jrds.fr/maven2/</url>
+            <url>http://jrds.fr/jenkins/plugin/repository/everything</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
             </releases>
             <snapshots />
+        </repository>
+        <repository>
+            <id>snmp4j</id>
+            <url>https://oosnmp.net/dist/release</url>
         </repository>
     </repositories>
     <build>
@@ -371,8 +376,8 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.7.2.201409121644</version>
                 <configuration>
-                    <destfile>${basedir}/target/coverage-reports/jacoco-unit.exec</destfile>
-                    <datafile>${basedir}/target/coverage-reports/jacoco-unit.exec</datafile>
+                    <destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
+                    <dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
                 </configuration>
                 <executions>
                     <execution>
