@@ -75,8 +75,7 @@ public abstract class Connection<ConnectedType> extends Starter {
      * @return the connection timeout in second
      */
     public int getTimeout() {
-        SocketFactory sf = getLevel().find(SocketFactory.class);
-        return sf.getTimeout();
+        return getLevel().getTimeout();
     }
 
     /* (non-Javadoc)
