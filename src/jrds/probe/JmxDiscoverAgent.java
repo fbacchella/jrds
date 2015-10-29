@@ -30,6 +30,12 @@ public class JmxDiscoverAgent extends DiscoverAgent {
         public String getHostName() {
             return JmxDiscoverAgent.this.hostname;
         }
+
+        @Override
+        public int getTimeout() {
+            return JmxDiscoverAgent.this.getTimeout();
+        }
+
     };
 
     public JmxDiscoverAgent() {
@@ -169,6 +175,5 @@ public class JmxDiscoverAgent extends DiscoverAgent {
             hostElement.addElement("probe", "type=" + summary.name);            
         }
     }
-
 
 }

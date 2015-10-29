@@ -122,6 +122,10 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
                 attributes = new HashMap<String, Object>();
                 attributes.put("jmx.remote.credentials", credentials);
             }
+            attributes.put("sun.rmi.transport.tcp.responseTimeout", getTimeout() * 1000);
+            attributes.put("jmx.remote.x.request.timeout", getTimeout() * 1000);
+            attributes.put("jmx.remote.x.server.side.connecting.timeout", getTimeout() * 1000);
+            attributes.put("jmx.remote.x.client.connected.state.timeout", getTimeout() * 1000);
             connector = JMXConnectorFactory.connect(url, attributes);
             connection = connector.getMBeanServerConnection();
             log(Level.DEBUG, "connected to %s", connection);
