@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>IpmiSensorTemperature</name>
+    <probeName>ipmisensor-${index}</probeName>
+    <probeClass>jrds.probe.ipmi.IpmiProbe</probeClass>
+    <specific name="SensorType">1</specific>
+    <specific name="BaseUnit">DegreesC</specific>
+    <ds>
+        <dsName>temp</dsName>
+        <dsType>gauge</dsType>
+    </ds>
+    <graphs>
+        <name>Temperature</name>
+    </graphs>
+</probedesc>
