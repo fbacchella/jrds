@@ -14,6 +14,8 @@ import com.veraxsystems.vxipmi.coding.commands.sdr.GetSdr;
 import com.veraxsystems.vxipmi.coding.commands.sdr.GetSdrResponseData;
 import com.veraxsystems.vxipmi.coding.commands.sdr.GetSensorReading;
 import com.veraxsystems.vxipmi.coding.commands.sdr.GetSensorReadingResponseData;
+import com.veraxsystems.vxipmi.coding.commands.sdr.ReserveSdrRepository;
+import com.veraxsystems.vxipmi.coding.commands.sdr.ReserveSdrRepositoryResponseData;
 import com.veraxsystems.vxipmi.coding.commands.sdr.record.SensorRecord;
 import com.veraxsystems.vxipmi.coding.commands.session.GetChannelAuthenticationCapabilitiesResponseData;
 import com.veraxsystems.vxipmi.coding.payload.CompletionCode;
@@ -176,6 +178,11 @@ public class Handle {
     public GetSensorReadingResponseData getSensorReading(int recordReadingId) throws Exception {
         return (GetSensorReadingResponseData) sendMessage(new GetSensorReading(IpmiVersion.V20, getCipherSuite(),
                 AuthenticationType.RMCPPlus, recordReadingId));
+    }
+
+    public int reserveSdrRepository() throws Exception {
+        return ((ReserveSdrRepositoryResponseData) sendMessage(new ReserveSdrRepository(IpmiVersion.V20, handle.getCipherSuite(),
+                AuthenticationType.RMCPPlus))).getReservationId();    
     }
 
 }

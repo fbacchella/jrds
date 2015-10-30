@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+import jrds.JrdsLoggerConfiguration;
 import jrds.PropertiesManager;
 import jrds.factories.ProbeBean;
 import jrds.starter.Connection;
@@ -18,6 +19,11 @@ import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 
 @ProbeBean({"bmcname", "user", "password"})
 public class IpmiConnection extends Connection<Handle> {
+
+    static {
+        //If not already configured, we filter it
+        JrdsLoggerConfiguration.configureLogger("com.veraxsystems.vxipmi", Level.ERROR);
+    }
 
     String bmcname;
     String user;
@@ -68,14 +74,16 @@ public class IpmiConnection extends Connection<Handle> {
             connector.getChannelAuthenticationCapabilities(handle, cs, PrivilegeLevel.User);
             connector.openSession(handle, user, password, "".getBytes());
             jrdsHandle = new Handle(mainStarter.connector, handle);
+        } catch (InterruptedException e) {
+            return false;
         } catch (FileNotFoundException e) {
-            log(Level.ERROR, "invalid ipmi connection: %s", e);
+            log(Level.ERROR, "invalid IPMI connection: %s", e.getMessage());
             return false;
         } catch (IOException e) {
-            log(Level.ERROR, "invalid ipmi connection: %s", e);
+            log(Level.ERROR, "IPMI network error: %s", e.getMessage());
             return false;
         } catch (Exception e) {
-            log(Level.ERROR, "invalid ipmi connection: %s", e);
+            log(Level.ERROR, "invalid IPMI connection: %s", e.getMessage());
             return false;
         }
         return true;
