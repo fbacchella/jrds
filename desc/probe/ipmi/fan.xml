@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
-    <name>IpmiFansSpeed</name>
+    <name>IpmiFanSpeed</name>
     <probeName>ipmisensor-${index}</probeName>
     <probeClass>jrds.probe.ipmi.IpmiProbe</probeClass>
     <specific name="SensorType">4</specific>
