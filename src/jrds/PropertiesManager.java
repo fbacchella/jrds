@@ -331,10 +331,7 @@ public class PropertiesManager extends Properties {
         boolean nologging = parseBoolean(getProperty("nologging", "false"));
         String log4jXmlFile = getProperty("log4jxmlfile", "");
         String log4jPropFile = getProperty("log4jpropfile", "");
-        if (nologging) {
-            JrdsLoggerConfiguration.setExternal();
-        }
-        else if(log4jXmlFile != null && ! "".equals(log4jXmlFile.trim())) {
+        if(log4jXmlFile != null && ! log4jXmlFile.trim().isEmpty()) {
             File xmlfile = new File(log4jXmlFile.trim());
             if ( ! xmlfile.canRead()) {
                 logger.error("log4j xml file " + xmlfile.getPath() + " can't be read, log4j not configured");
@@ -346,7 +343,7 @@ public class PropertiesManager extends Properties {
                 logger.info("configured with " + xmlfile.getPath());
             }
         }
-        else if(log4jPropFile != null && ! "".equals(log4jPropFile.trim())) {
+        else if(log4jPropFile != null && ! log4jPropFile.trim().isEmpty()) {
             File propfile = new File(log4jPropFile.trim());
             if ( ! propfile.canRead()) {
                 logger.error("log4j properties file " + propfile.getPath() + " can't be read, log4j not configured");
@@ -371,7 +368,6 @@ public class PropertiesManager extends Properties {
                     }
                     loglevels.put(l, loggerList);
                 }
-
             }
             loglevel = Level.toLevel(getProperty("loglevel", "info"));
             logfile = getProperty("logfile");
@@ -381,6 +377,8 @@ public class PropertiesManager extends Properties {
             } catch (IOException e1) {
                 logger.error("Unable to set log file to " + this.logfile + ": " + e1);
             }
+        } else {
+            JrdsLoggerConfiguration.setExternal();
         }
 
         legacymode = parseBoolean(getProperty("legacymode", "1"));
