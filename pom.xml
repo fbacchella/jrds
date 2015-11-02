@@ -358,6 +358,8 @@
                             <include>dijit/themes/nihilo/images/validationInputBg.png</include>
                             <include>dijit/themes/nihilo/images/accordionItemActive.png</include>
                             <include>dijit/themes/nihilo/images/warning.png</include>
+                            <include>dijit/themes/nihilo/images/tooltipConnectorRight.png</include>
+                            <include>dijit/themes/nihilo/images/tooltipConnectorLeft.png</include>
                             <include>dojox/widget/Standby/images/loading.gif</include>
                             <include>dojo/resources/blank.gif</include>
                             <include>dojo/resources/dojo.css</include>

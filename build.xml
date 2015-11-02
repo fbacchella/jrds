@@ -67,6 +67,8 @@
         <include name="dijit/themes/nihilo/images/validationInputBg.png" />
         <include name="dijit/themes/nihilo/images/accordionItemActive.png" />
         <include name="dijit/themes/nihilo/images/warning.png" />
+        <include name="dijit/themes/nihilo/images/tooltipConnectorRight.png" />
+        <include name="dijit/themes/nihilo/images/tooltipConnectorLeft.png" />
         <include name="dojox/widget/Standby/images/loading.gif" />
         <include name="dojo/resources/blank.gif" />
         <include name="dojo/resources/dojo.css" />
