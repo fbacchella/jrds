@@ -905,13 +905,13 @@ function getTree(isFilters) {
 	var store = new dojo.data.ItemFileReadStore({
 		url: "jsontree?" + dojo.objectToQuery(cleanParams(['host', 'filter', 'tree', 'tab']))
 	});
+	store.standby = treeStandby;
 
 	store.fetch({
 		onError: function(errData, request) {
 			console.log("on error detected in dojo.data.ItemFileReadStore:" + errData);
-			var standby = dijit.byId('standby.' );
-			if(standby != null) {
-				standby.hide();
+			if(request.store.standby != null) {
+				request.store.standby.hide();
 			}
 		}
 	});
