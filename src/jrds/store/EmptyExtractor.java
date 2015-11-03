@@ -24,4 +24,8 @@ public class EmptyExtractor extends AbstractExtractor<Object> {
         return "";
     }
 
+    @Override
+    public void release() {
+    }
+
 }

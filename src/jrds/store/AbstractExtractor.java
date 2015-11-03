@@ -13,6 +13,8 @@ public abstract class AbstractExtractor<Source> implements Extractor {
     public AbstractExtractor() {
         super();
     }
+    
+    public abstract void release();
 
     /* (non-Javadoc)
      * @see jrds.store.Extractor#addSource(java.lang.String, java.lang.String)

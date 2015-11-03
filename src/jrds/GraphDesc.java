@@ -614,7 +614,6 @@ implements Cloneable, WithACL {
 
     private Dimension dimension = null;
 
-
     /**
      * A constructor wich pre allocate the desired size
      * @param size the estimated number of graph that will be created
@@ -897,6 +896,7 @@ implements Cloneable, WithACL {
         // Fill the graphdef with extracted data
         for(Extractor x: probeDS.values()) {
             x.fill(graphDef, ei);
+            x.release();
         }
 
         // The title line, only if values block is required
@@ -1015,6 +1015,7 @@ implements Cloneable, WithACL {
         // Fill the dataprocessor with extracted data
         for(Extractor x: probeDS.values()) {
             x.fill(retValue, ei);
+            x.release();
         }
         return retValue;
     }

@@ -5,6 +5,7 @@ import org.rrd4j.graph.RrdGraphDef;
 
 public interface Extractor {
 
+    public abstract void release();
     public String[] getNames();
     public String[] getDsNames();
     public void fill(DataProcessor dp, ExtractInfo ei);

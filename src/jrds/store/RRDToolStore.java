@@ -140,6 +140,15 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
                 return RRDToolStore.this.getPath();
             }
 
+            @Override
+            public void release() {
+                try {
+                    db.close();
+                } catch (IOException e) {
+                    log(Level.ERROR," failed to close %s: s%", db, e);
+                }
+            }
+
         };
     }
 

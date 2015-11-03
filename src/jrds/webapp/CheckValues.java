@@ -92,6 +92,7 @@ public final class CheckValues extends JrdsServlet {
                 out.println("Last update: " + p.getLastUpdate());
                 out.println("Last update age (ms): " + (new Date().getTime() - p.getLastUpdate().getTime()));
             }
+            ex.release();
         }
         else {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, "No matching probe");

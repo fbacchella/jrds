@@ -11,6 +11,7 @@ import jrds.HostsList;
 import jrds.PlottableMap;
 import jrds.Util;
 import jrds.store.ExtractInfo;
+import jrds.store.Extractor;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.ConsolFun;
@@ -97,8 +98,9 @@ public class Sum extends AutonomousGraphNode {
                     }
 
                     if(g != null) {
-                        g.getProbe().fetchData().fill(dp, ei);
-
+                        Extractor ex = g.getProbe().fetchData();
+                        ex.fill(dp, ei);
+                        ex.release();
                         //First pass, no data to use
                         if(allvalues == null) {
                             allvalues = dp.getValues().clone();

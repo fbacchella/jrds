@@ -255,13 +255,24 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
         }
 
         return new jrds.store.AbstractExtractor<FetchData>() {
+            boolean released = false;
+            
+            public void release() {
+                factory.releaseRrd(rrdDb);
+                released = true;
+            }
+            
             /* (non-Javadoc)
              * @see java.lang.Object#finalize()
              */
             @Override
             protected void finalize() throws Throwable {
+                if(! released) {
+                    log(Level.WARN,"%s was not release properly", rrdDb.getCanonicalPath());
+                    factory.releaseRrd(rrdDb);
+                    released = true;
+                }
                 super.finalize();
-                factory.releaseRrd(rrdDb);
             }
 
             @Override
