@@ -272,7 +272,6 @@
         <ivy:info file="ivy.xml" />
         <ivy:buildnumber organisation="${ivy.organisation}" module="${ivy.module}" resolver="ivyrepo"
                            />
-        <echoproperties prefix="" />
         <ivy:publish organisation="fr.jrds" module="jrds"
                      resolver="build" update="true" overwrite="true">
             <artifacts pattern="${build.home}/[artifact].[ext]" />
@@ -324,6 +323,7 @@
             <classpath refid="project.classpath" />
         </java>
     </target>
+	
     <target name="resolve" description="--> retrieve dependencies with ivy">
         <property name="buildir" value="${build.home}"/>
         <ivy:info file="ivy.xml" />
@@ -332,5 +332,6 @@
             <regexpmapper from="dojo-[^/]*/(.*)" to="dojo/\1" />
         </unzip>
         <mkdir dir="libprobes" />
+        <ivy:report conf="lib,libjetty,libtest" xml="true" xsl="false" graph="false"/>
     </target>
 </project>
