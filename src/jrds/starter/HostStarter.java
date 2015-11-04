@@ -33,6 +33,7 @@ public class HostStarter extends StarterNode {
         Timer timer = (Timer) getParent();
         long start = System.currentTimeMillis();
         startCollect();
+        String oldThreadName = Thread.currentThread().getName();
         for(Probe<?,?> probe: allProbes) {
             if(! isCollectRunning() )
                 break;
@@ -42,7 +43,11 @@ public class HostStarter extends StarterNode {
                 break;
             }
             log(Level.TRACE, "Starting collect for %s", probe);
+            log(Level.DEBUG, "Collect all stats for host " + host.getName());
+            String threadName = oldThreadName + "/" + probe.getName();
+            Thread.currentThread().setName(threadName);
             probe.collect();
+            Thread.currentThread().setName(threadName + ":finished");
         }
         stopCollect();
         long end = System.currentTimeMillis();
