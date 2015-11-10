@@ -264,19 +264,18 @@ public class HostsList extends StarterNode {
         if(collectTimer != null)
             collectTimer.cancel();
         collectTimer = null;
-        for(Starter s: this.topStarters) {
+        for(Starter s: topStarters) {
             s.doStop();
         }
         for(jrds.starter.Timer t: timers.values()) {
             t.stopCollect();
             for(HostStarter h: t.getAllHosts()) {
                 h.stopCollect();
+                for(Probe<?,?> p: h.getAllProbes()) {
+                    p.stopCollect();                    
+                }
             }
-        }
-        for(HostInfo h: hostList) {
-            for(Probe<?,?> p: h.getProbes()) {
-                p.stopCollect();
-            }            
+            t.interrupt();
         }
     }
 

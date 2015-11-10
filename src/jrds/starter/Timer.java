@@ -47,6 +47,7 @@ public class Timer extends StarterNode {
     private final Stats stats = new Stats();
     private final int numCollectors;
     private final String name;
+    private ExecutorService tpool = null;
 
     public Timer(String name, PropertiesManager.TimerInfo ti) {
         super();
@@ -85,7 +86,7 @@ public class Timer extends StarterNode {
                         } catch (RuntimeException e) {
                             Timer.this.log(Level.FATAL, e, "A fatal error occured during collect: %s", e.getMessage());
                         }
-                    }
+                    }                    
                 };
                 subcollector.start();
             }
@@ -107,12 +108,12 @@ public class Timer extends StarterNode {
         }
         try {
             final AtomicInteger counter = new AtomicInteger(0);
-            ExecutorService tpool =  Executors.newFixedThreadPool(numCollectors, 
+            tpool =  Executors.newFixedThreadPool(numCollectors, 
                     new ThreadFactory() {
                 public Thread newThread(Runnable r) {
                     Thread t = new Thread(r, Timer.this.name  + "/CollectorThread" + counter.getAndIncrement());
                     t.setDaemon(true);
-                    log(Level.DEBUG, "New thread name:" + t.getName());
+                    log(Level.DEBUG, "New thread name: %s", t.getName());
                     return t;
                 }
             }
@@ -123,8 +124,8 @@ public class Timer extends StarterNode {
                     break;
                 Runnable runCollect = new Runnable() {
                     public void run() {
-                        log(Level.DEBUG, "Collect all stats for host " + host.getName());
-                        String threadName = Timer.this.name  + "/" + "JrdsCollect-" + host.getName();
+                        log(Level.DEBUG, "Collect all stats for host %s", host.getName());
+                        String threadName = Timer.this.name  + "/" + "JrdsCollect-%s" + host.getName();
                         Thread.currentThread().setName(threadName);
                         host.collectAll();
                         Thread.currentThread().setName(threadName + ":finished");
@@ -138,7 +139,7 @@ public class Timer extends StarterNode {
                     tpool.execute(runCollect);
                 }
                 catch(RejectedExecutionException ex) {
-                    log(Level.DEBUG, "collector thread dropped for host " + host.getName());
+                    log(Level.DEBUG, "collector thread dropped for host %s", host.getName());
                 }
             }
             tpool.shutdown();
@@ -172,6 +173,10 @@ public class Timer extends StarterNode {
             log(Level.ERROR, "problem while collecting data: ", e);
         }
         finally {
+            synchronized (this) {
+                tpool.shutdown();
+                tpool = null;
+            }
             collectMutex.release();             
         }
         Date end = new Date();
@@ -212,6 +217,13 @@ public class Timer extends StarterNode {
      */
     public Stats getStats() {
         return stats;
+    }
+
+    public synchronized void interrupt() {
+        log(Level.DEBUG, "timer interrupted");
+        if(tpool != null) {
+            tpool.shutdownNow();
+        }
     }
 
 }
