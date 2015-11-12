@@ -125,7 +125,7 @@ public class Timer extends StarterNode {
                 Runnable runCollect = new Runnable() {
                     public void run() {
                         log(Level.DEBUG, "Collect all stats for host %s", host.getName());
-                        String threadName = Timer.this.name  + "/" + "JrdsCollect-%s" + host.getName();
+                        String threadName = Timer.this.name  + "/" + "JrdsCollect-" + host.getName();
                         Thread.currentThread().setName(threadName);
                         host.collectAll();
                         Thread.currentThread().setName(threadName + ":finished");
