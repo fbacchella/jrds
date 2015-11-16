@@ -9,12 +9,13 @@ import java.nio.channels.InterruptedByTimeoutException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.rmi.server.RMIClientSocketFactory;
 import java.util.Date;
 import java.util.Set;
 
 import org.apache.log4j.Level;
 
-public class SocketFactory extends Starter {
+public class SocketFactory extends Starter implements RMIClientSocketFactory {
 
     private final Selector selector;
 
@@ -81,6 +82,7 @@ public class SocketFactory extends Starter {
     }
 
     private Socket tryConnect(SocketChannel s, InetSocketAddress addr) throws IOException {
+        log(Level.DEBUG,"creating a connect to %s", addr);
         SelectionKey key = s.register(selector, SelectionKey.OP_CONNECT);  
         long timeout = getTimeout() * 1000;
         try {

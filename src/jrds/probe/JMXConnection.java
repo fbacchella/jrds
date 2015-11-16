@@ -3,6 +3,7 @@ package jrds.probe;
 import java.io.IOException;
 import java.lang.management.RuntimeMXBean;
 import java.net.MalformedURLException;
+import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,14 +13,19 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
+import javax.management.remote.generic.GenericConnectorServer;
 
 import jrds.factories.ProbeBean;
 import jrds.starter.Connection;
+import jrds.starter.SocketFactory;
 
 import org.apache.log4j.Level;
 
+import com.sun.jmx.remote.socket.SocketConnection;
+
 @ProbeBean({"url", "protocol", "port", "path", "user", "password"})
 public class JMXConnection extends Connection<MBeanServerConnection> {
+
     private static enum PROTOCOL {
         rmi {
             @Override
@@ -121,10 +127,20 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
                 String[] credentials = new String[]{user, password};
                 attributes.put("jmx.remote.credentials", credentials);
             }
-            attributes.put("sun.rmi.transport.tcp.responseTimeout", getTimeout() * 1000);
             attributes.put("jmx.remote.x.request.timeout", getTimeout() * 1000);
             attributes.put("jmx.remote.x.server.side.connecting.timeout", getTimeout() * 1000);
             attributes.put("jmx.remote.x.client.connected.state.timeout", getTimeout() * 1000);
+            if(protocol == PROTOCOL.rmi) {
+                attributes.put("sun.rmi.transport.tcp.responseTimeout", getTimeout() * 1000);
+            }
+            if(protocol == PROTOCOL.jmxmp) {
+                SocketFactory sf = getLevel().find(SocketFactory.class); 
+                if( ! sf.isStarted()) {
+                    return false;
+                }
+                Socket s = sf.createSocket(url.getHost(), url.getPort());
+                attributes.put(GenericConnectorServer.MESSAGE_CONNECTION_SERVER, new SocketConnection(s));
+            }
             connector = JMXConnectorFactory.connect(url, attributes);
             connection = connector.getMBeanServerConnection();
             log(Level.DEBUG, "connected to %s", connection);
