@@ -13,9 +13,12 @@ public class HostStarter extends StarterNode {
     private HostInfo host;
     private final Set<Probe<?,?>> allProbes = new TreeSet<Probe<?,?>>();
 
+    private String runningname;
+
     public HostStarter(HostInfo host) {
         super();
         this.host = host;
+        this.runningname = host.getName() + ":notrunning";
         registerStarter(new Resolver(host.getDnsName()));
     }
 
@@ -44,10 +47,9 @@ public class HostStarter extends StarterNode {
             }
             log(Level.TRACE, "Starting collect for %s", probe);
             log(Level.DEBUG, "Collect all stats for host " + host.getName());
-            String threadName = oldThreadName + "/" + probe.getName();
-            Thread.currentThread().setName(threadName);
+            setRunningname(oldThreadName + "/" + probe.getName());
             probe.collect();
-            Thread.currentThread().setName(threadName + ":finished");
+            setRunningname(oldThreadName + ":finished");
         }
         stopCollect();
         long end = System.currentTimeMillis();
@@ -104,6 +106,15 @@ public class HostStarter extends StarterNode {
         else
             parentEquals = other.getParent() == null;
         return host.equals(other.getHost()) && parentEquals;
+    }
+
+    public String getRunningname() {
+        return runningname;
+    }
+
+    public void setRunningname(String runningname) {
+        Thread.currentThread().setName(runningname);
+        this.runningname = runningname;
     }
 
 }
