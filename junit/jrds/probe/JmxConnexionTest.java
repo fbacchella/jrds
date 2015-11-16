@@ -34,6 +34,7 @@ import jrds.HostInfo;
 import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.starter.HostStarter;
+import jrds.starter.SocketFactory;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -179,6 +180,7 @@ public class JmxConnexionTest {
         };
         host.setTimeout(1);
         JMXConnection cnx = getCnx(proto, port);
+        host.registerStarter(new SocketFactory());
         host.registerStarter(cnx);
 
         host.configureStarters(new PropertiesManager());
