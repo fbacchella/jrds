@@ -103,6 +103,7 @@ public abstract class Connection<ConnectedType> extends Starter {
 
     public abstract boolean startConnection();
     public abstract void stopConnection();
+
     /**
      * Return the uptime of the end point of the connexion
      * it's called once after the connexion start

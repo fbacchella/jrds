@@ -90,10 +90,10 @@ public class Configuration {
         for(StoreFactory sf: propertiesManager.stores.values()) {
             sf.stop();
         }
-        propertiesManager.defaultStore.stop();
         if(hostsList.getRenderer() != null) {
             hostsList.getRenderer().finish();            
         }
+        propertiesManager.defaultStore.stop();
     }
 
     /**

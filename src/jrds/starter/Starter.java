@@ -8,10 +8,10 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 public abstract class Starter {
-    long uptime = Long.MAX_VALUE;
+    private StarterNode level;  
+    private final Logger namedLogger;
 
-    private StarterNode level;	
-    private Logger namedLogger = null;
+    private long uptime = Long.MAX_VALUE;
     volatile private boolean started = false;
 
     public Starter() {
@@ -54,7 +54,7 @@ public abstract class Starter {
 
     public final void doStop() {
         if(started) {
-            log(Level.TRACE, "Stopping");
+            log(Level.DEBUG, "Stopping");
             started = false;
             stop();
         }

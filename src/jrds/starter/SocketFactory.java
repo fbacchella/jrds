@@ -82,7 +82,7 @@ public class SocketFactory extends Starter implements RMIClientSocketFactory {
     }
 
     private Socket tryConnect(SocketChannel s, InetSocketAddress addr) throws IOException {
-        log(Level.DEBUG,"creating a connect to %s", addr);
+        log(Level.DEBUG,"connecting a socket channel to %s", addr);
         SelectionKey key = s.register(selector, SelectionKey.OP_CONNECT);  
         long timeout = getTimeout() * 1000;
         try {
