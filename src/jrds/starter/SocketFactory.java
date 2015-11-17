@@ -92,7 +92,6 @@ public class SocketFactory extends Starter implements RMIClientSocketFactory {
                 selector.select(timeout);
                 long end = new Date().getTime();
                 timeout -= (end - start);
-                log(Level.WARN, "connect selected ?");        
             }
         } finally {
             key.cancel();
