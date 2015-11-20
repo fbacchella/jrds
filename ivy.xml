@@ -24,7 +24,7 @@
             <exclude module="log4j"/>
             <exclude module="snmp4j"/>
         </dependency>
-        <dependency org="org.json" name="json" rev="20150729" conf="lib->default"/>
+        <dependency org="org.json" name="json" rev="20140107" conf="lib->default"/>
         <dependency org="org.eclipse.jetty" name="jetty-server" rev="9.2.13.v20150730" conf="libjetty->default"/>
         <dependency org="org.eclipse.jetty" name="jetty-webapp" rev="9.2.13.v20150730" conf="libjetty->default"/>
         <dependency org="org.eclipse.jetty" name="jetty-jmx" rev="9.2.13.v20150730" conf="libjetty->default"/>

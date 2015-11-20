@@ -48,7 +48,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20150729</version>
+            <version>20140107</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
