@@ -13,6 +13,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Handler;
 
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
@@ -21,11 +22,14 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.management.remote.generic.GenericConnector;
+import javax.management.remote.message.Message;
 
 import org.apache.log4j.Level;
 
 import com.sun.jmx.remote.socket.SocketConnection;
 
+import jrds.JrdsLoggerConfiguration;
+import jrds.JuliToLog4jHandler;
 import jrds.PropertiesManager;
 import jrds.factories.ProbeBean;
 import jrds.starter.Connection;
@@ -33,6 +37,16 @@ import jrds.starter.SocketFactory;
 
 @ProbeBean({"url", "protocol", "port", "path", "user", "password"})
 public class JMXConnection extends Connection<MBeanServerConnection> {
+    static {
+        //If not already configured, we filter it
+        JrdsLoggerConfiguration.configureLogger("javax.management", Level.FATAL);
+        java.util.logging.Logger jilogger = java.util.logging.Logger.getLogger("javax.management");
+        jilogger.setUseParentHandlers(false);
+        for(Handler h : jilogger.getHandlers()) {
+            jilogger.removeHandler(h);
+        }
+        jilogger.addHandler(new JuliToLog4jHandler());          
+    }
 
     private static enum PROTOCOL {
         rmi {
@@ -173,7 +187,42 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
                     return false;
                 }
                 Socket s = sf.createSocket(url.getHost(), url.getPort());
-                attributes.put(GenericConnector.MESSAGE_CONNECTION, new SocketConnection(s));
+                // A custom class is needed, to catch log messages
+                attributes.put(GenericConnector.MESSAGE_CONNECTION, new SocketConnection(s) {
+
+                    @SuppressWarnings("rawtypes")
+                    @Override
+                    public void connect(Map env) throws IOException {
+                        try {
+                            super.connect(env);
+                        } catch (Exception e) {
+                            log(Level.ERROR, e, "failed to read message: %s", e);
+                            throw e;
+                        }
+                    }
+
+                    @Override
+                    public void writeMessage(Message msg) throws IOException {
+                        try {
+                            super.writeMessage(msg);
+                        } catch (Exception e) {
+                            log(Level.ERROR, e, "failed to read message: %s", e);
+                            throw e;
+                        }
+                    }
+
+                    @Override
+                    public Message readMessage()
+                            throws IOException, ClassNotFoundException {
+                        try {
+                            return super.readMessage();
+                        } catch (Exception e) {
+                            log(Level.ERROR, e, "failed to read message: %s", e);
+                            throw e;
+                        }
+                    }
+
+                });
             }
             // connect can hang in a read !
             // So separate creation from connection, and then it might be possible to do close
