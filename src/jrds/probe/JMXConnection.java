@@ -20,7 +20,7 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
-import javax.management.remote.generic.GenericConnectorServer;
+import javax.management.remote.generic.GenericConnector;
 
 import org.apache.log4j.Level;
 
@@ -167,13 +167,13 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
             if(protocol == PROTOCOL.rmi) {
                 attributes.put("sun.rmi.transport.tcp.responseTimeout", getTimeout() * 1000);
             }
-            if(protocol == PROTOCOL.jmxmp) {
+            else if(protocol == PROTOCOL.jmxmp) {
                 SocketFactory sf = getLevel().find(SocketFactory.class); 
                 if( ! sf.isStarted()) {
                     return false;
                 }
                 Socket s = sf.createSocket(url.getHost(), url.getPort());
-                attributes.put(GenericConnectorServer.MESSAGE_CONNECTION_SERVER, new SocketConnection(s));
+                attributes.put(GenericConnector.MESSAGE_CONNECTION, new SocketConnection(s));
             }
             // connect can hang in a read !
             // So separate creation from connection, and then it might be possible to do close
@@ -181,7 +181,6 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
             connector = JMXConnectorFactory.newJMXConnector(url, attributes);
             connector.connect();
             connection = connector.getMBeanServerConnection();                
-            log(Level.DEBUG, "connected to %s", connection);
             return true;
         } catch (IOException e) {
             log(Level.ERROR, e, "Communication error with %s: %s", protocol.toString(), e);
