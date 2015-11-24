@@ -9,11 +9,11 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RunnableFuture;
 import java.util.concurrent.Semaphore;
@@ -28,7 +28,6 @@ import jrds.PropertiesManager;
 import org.apache.log4j.Level;
 
 public class Timer extends StarterNode {
-
 
     private class CollectCallable implements Callable<Object> {
 
@@ -134,6 +133,16 @@ public class Timer extends StarterNode {
     }
 
     public void collectAll() {
+        // Build the list of host that will be collected
+        Set<Callable<Object>> toSchedule = new HashSet<Callable<Object>>();
+        for(final HostStarter host: hostList.values()) {
+            Callable<Object> runCollect = new CollectCallable(host);
+            toSchedule.add(runCollect);
+        }
+        if(toSchedule.size() == 0) {
+            log(Level.INFO, "skipping timer, empty");
+            return;
+        }
         log(Level.DEBUG, "One collect is launched");
         Date start = new Date();
         try {
@@ -152,7 +161,6 @@ public class Timer extends StarterNode {
                 Thread t = new Thread(r);
                 t.setName(Timer.this.name + "/CollectorThread" + counter.getAndIncrement());
                 t.setDaemon(true);
-                log(Level.DEBUG, "New thread name: %s", getName());     
                 return t;
             }
         };
@@ -161,7 +169,7 @@ public class Timer extends StarterNode {
             // Callable.toString
             tpool = new ThreadPoolExecutor(numCollectors, numCollectors,
                     0L, TimeUnit.MILLISECONDS,
-                    new LinkedBlockingQueue<Runnable>(),
+                    new ArrayBlockingQueue<Runnable>(toSchedule.size()),
                     tf) {
 
                 @Override
@@ -174,13 +182,7 @@ public class Timer extends StarterNode {
                         }
                     };
                 }
-
             };
-        }
-        Set<Callable<Object>> toSchedule = new HashSet<Callable<Object>>();
-        for(final HostStarter host: hostList.values()) {
-            Callable<Object> runCollect = new CollectCallable(host);
-            toSchedule.add(runCollect);
         }
         running.clear();
         startCollect();
@@ -281,7 +283,7 @@ public class Timer extends StarterNode {
                     running.remove(waiting);
                 } else {
                     waiting.cancel(true);
-                    log(Level.WARN, "%s blocked", waiting.toString());
+                    log(Level.INFO, "%s blocked", waiting.toString());
                     Thread.sleep(10);
                 }
             } catch (NoSuchElementException | InterruptedException e) {
