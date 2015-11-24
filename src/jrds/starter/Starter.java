@@ -50,13 +50,20 @@ public abstract class Starter {
         } catch (NoClassDefFoundError e) {
             log(Level.ERROR, e, e.getMessage().replace('/', '.'));
         }
+        if(! started) {
+            log(Level.ERROR, "starting failed");
+        }
     }
 
     public final void doStop() {
+        log(Level.DEBUG, "Stopping");
         if(started) {
-            log(Level.DEBUG, "Stopping");
-            started = false;
-            stop();
+            try {
+                stop();
+            } catch (Exception e) {
+                log(Level.ERROR, e, "Unmannaged error while stopping: %s", e.getMessage());
+            }
+            started = false;            
         }
     }
 
