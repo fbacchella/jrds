@@ -13,7 +13,6 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Handler;
 
 import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
@@ -28,7 +27,6 @@ import org.apache.log4j.Level;
 
 import com.sun.jmx.remote.socket.SocketConnection;
 
-import jrds.JrdsLoggerConfiguration;
 import jrds.JuliToLog4jHandler;
 import jrds.PropertiesManager;
 import jrds.factories.ProbeBean;
@@ -39,13 +37,7 @@ import jrds.starter.SocketFactory;
 public class JMXConnection extends Connection<MBeanServerConnection> {
     static {
         //If not already configured, we filter it
-        JrdsLoggerConfiguration.configureLogger("javax.management", Level.FATAL);
-        java.util.logging.Logger jilogger = java.util.logging.Logger.getLogger("javax.management");
-        jilogger.setUseParentHandlers(false);
-        for(Handler h : jilogger.getHandlers()) {
-            jilogger.removeHandler(h);
-        }
-        jilogger.addHandler(new JuliToLog4jHandler());          
+        JuliToLog4jHandler.catchLogger("javax.management", Level.FATAL);
     }
 
     private static enum PROTOCOL {
