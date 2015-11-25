@@ -1,5 +1,6 @@
 package jrds.probe;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.lang.management.RuntimeMXBean;
 import java.net.MalformedURLException;
@@ -187,6 +188,9 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
                     public void connect(Map env) throws IOException {
                         try {
                             super.connect(env);
+                        } catch (EOFException e) {
+                            // don't log this one
+                            throw e;
                         } catch (Exception e) {
                             log(Level.ERROR, e, "failed to read message: %s", e);
                             throw e;
@@ -197,6 +201,9 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
                     public void writeMessage(Message msg) throws IOException {
                         try {
                             super.writeMessage(msg);
+                        } catch (EOFException e) {
+                            // don't log this one
+                            throw e;
                         } catch (Exception e) {
                             log(Level.ERROR, e, "failed to read message: %s", e);
                             throw e;
@@ -208,6 +215,9 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
                             throws IOException, ClassNotFoundException {
                         try {
                             return super.readMessage();
+                        } catch (EOFException e) {
+                            // don't log this one
+                            throw e;
                         } catch (Exception e) {
                             log(Level.ERROR, e, "failed to read message: %s", e);
                             throw e;
