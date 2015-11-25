@@ -27,6 +27,8 @@ public class JuliToLog4jHandler extends Handler {
             jilogger.removeHandler(h);
         }
         jilogger.addHandler(new JuliToLog4jHandler());
+        //Log4j will filter
+        jilogger.setLevel(Level.ALL);
     }
 
     private JuliToLog4jHandler() {
