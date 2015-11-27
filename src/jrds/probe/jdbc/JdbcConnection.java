@@ -126,7 +126,7 @@ public class JdbcConnection extends Connection<Statement> {
     /**
      * @return the passwd
      */
-    public String getPasswordd() {
+    public String getPassword() {
         return passwd;
     }
 
