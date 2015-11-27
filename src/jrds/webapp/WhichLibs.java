@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.security.Principal;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -14,15 +15,16 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
+import org.apache.log4j.Logger;
+
 import jrds.HostsList;
 import jrds.PropertiesManager;
 import jrds.store.RrdDbStoreFactory;
 
-import org.apache.log4j.Logger;
-
 /**
  * @author Fabrice Bacchella
  */
+@ServletSecurity
 public final class WhichLibs extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(WhichLibs.class);
     /**
@@ -91,6 +93,13 @@ public final class WhichLibs extends JrdsServlet {
             out.println(resolv("Jrds Agent", "jrds.probe.RMI"));
             out.println(resolv("Log4j",logger.getClass()));
             out.println("Generation:" + hl.getGeneration());
+
+            Principal p = req.getUserPrincipal();
+            if(p == null) {
+                out.println("Anonymous user");
+            } else {
+                out.println("Principal: " + p.getName() + " (" + p.getClass().getSimpleName() + ")");
+            }
         } catch (RuntimeException e) {
             logger.error(e, e);
         }                           

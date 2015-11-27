@@ -26,6 +26,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+@ServletSecurity
 public class Upload extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(Upload.class);
 

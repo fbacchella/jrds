@@ -4,18 +4,28 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.EnumSet;
 import java.util.Enumeration;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.management.MBeanServerFactory;
+import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-
-import jrds.StoreOpener;
-import jrds.jmx.Management;
+import javax.servlet.ServletRegistration;
+import javax.servlet.http.HttpServlet;
 
 import org.apache.log4j.Logger;
+
+import jrds.Configuration;
+import jrds.PropertiesManager;
+import jrds.StoreOpener;
+import jrds.factories.ArgFactory;
+import jrds.jmx.Management;
 
 /**
  * Used to start the application.<p>
@@ -45,7 +55,23 @@ public class StartListener implements ServletContextListener {
             ServletContext ctxt = arg0.getServletContext();
             ctxt.setAttribute(StartListener.class.getName(), this);
             Properties p = readProperties(ctxt);
-            jrds.Configuration.configure(p);
+            Configuration conf = jrds.Configuration.configure(p);
+            PropertiesManager pm = conf.getPropertiesManager();
+            if(pm.security) {
+                FilterRegistration filter = ctxt.addFilter("jrdssecurity", SecurityFilter.class);
+                for(Entry<String, ? extends ServletRegistration> e: ctxt.getServletRegistrations().entrySet()) {
+                    try {
+                        @SuppressWarnings("unchecked")
+                        Class<HttpServlet> servletClass = (Class<HttpServlet>) getClass().getClassLoader().loadClass(e.getValue().getClassName());
+                        Set<ServletSecurity> securitySet = ArgFactory.enumerateAnnotation(servletClass, ServletSecurity.class, HttpServlet.class);
+                        if(securitySet.size() > 0) {
+                            filter.addMappingForServletNames(EnumSet.of(DispatcherType.REQUEST), false, e.getKey());
+                            logger.debug("adding security to servlet " + e.getKey());
+                        }
+                    } catch (ClassNotFoundException ex) {
+                    }
+                }
+            }
             //Register the mbean in MBeanServer if jmx activated
             if(MBeanServerFactory.findMBeanServer(null).size() > 0) {
                 Management.register(ctxt);
@@ -83,7 +109,6 @@ public class StartListener implements ServletContextListener {
             }
         }
 
-        @SuppressWarnings("unchecked")
         Enumeration<String> params = ctxt.getInitParameterNames();
         for(String attr: jrds.Util.iterate(params)) {
             String value = ctxt.getInitParameter(attr);

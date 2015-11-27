@@ -16,6 +16,7 @@ import jrds.Configuration;
  * @author Fabrice Bacchella
  * @version $Revision$
  */
+@ServletSecurity
 public class ReloadHostList extends JrdsServlet {
 
     static final Semaphore reloading = new Semaphore(1);
@@ -36,7 +37,6 @@ public class ReloadHostList extends JrdsServlet {
 
         //Check permissions
         if(! allowed(params, getPropertiesManager().adminACL, req, res)) {
-            res.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;            
         }
 

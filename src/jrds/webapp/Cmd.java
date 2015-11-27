@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 /**
  * Servlet implementation class Cmd
  */
+@ServletSecurity
 public class Cmd extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(Cmd.class);
 

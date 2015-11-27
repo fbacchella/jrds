@@ -42,10 +42,9 @@ public abstract class JrdsServlet extends HttpServlet {
     }
 
     protected boolean allowed(ParamsBean params, ACL acl, HttpServletRequest req, HttpServletResponse res) {
-        if(getPropertiesManager().security) {				
-            boolean allowed = acl.check(params);
+        if(getPropertiesManager().security) {
             logger.trace(jrds.Util.delayedFormatString("Looking if ACL %s allow access to %s", acl, req.getServletPath()));
-            if(! allowed) {
+            if( ! acl.check(params) ) {
                 res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return false;
             }
