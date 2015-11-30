@@ -22,6 +22,7 @@ import org.json.JSONException;
 /**
  * Servlet implementation class JSonTree
  */
+@ServletSecurity
 public class JSonTree extends JSonData {
     static final private Logger logger = Logger.getLogger(JSonTree.class);
 

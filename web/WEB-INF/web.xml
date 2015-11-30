@@ -117,12 +117,6 @@
         <servlet-class>
             jrds.webapp.GetDiscoverHtmlCode</servlet-class>
     </servlet>
-    <servlet>
-        <servlet-name>GetGraph</servlet-name>
-        <display-name>GetGraph</display-name>
-        <description></description>
-        <servlet-class>jrds.webapp.GetGraph</servlet-class>
-    </servlet>
     <servlet-mapping>
         <servlet-name>CheckValues</servlet-name>
         <url-pattern>/values/*</url-pattern>
@@ -207,10 +201,6 @@
     <servlet-mapping>
         <servlet-name>GetDiscoverHtmlCode</servlet-name>
         <url-pattern>/discoverhtml</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>GetGraph</servlet-name>
-        <url-pattern>/getgraph</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>

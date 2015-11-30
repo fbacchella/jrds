@@ -30,6 +30,7 @@ import org.w3c.dom.Document;
 /**
  * Servlet implementation class AutoDetect
  */
+@ServletSecurity
 public class Discover extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(Discover.class);
 

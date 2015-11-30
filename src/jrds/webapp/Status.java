@@ -10,17 +10,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONException;
+
 import jrds.HostInfo;
 import jrds.HostsList;
 import jrds.starter.Timer;
 import jrds.starter.Timer.Stats;
 
-import org.json.JSONException;
-
 /**
  * A few stats for jrds inner status
  * @author Fabrice Bacchella
  */
+@ServletSecurity
 public class Status extends JrdsServlet {
 
     /**
@@ -32,8 +33,7 @@ public class Status extends JrdsServlet {
         HostsList hl = getHostsList();
 
         ParamsBean params = new ParamsBean(req, hl);
-        if(! allowed(params, getPropertiesManager().defaultRoles)) {
-            res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        if(! allowed(params, ACL.ALLOWEDACL, req, res)) {
             return;
         }
 
