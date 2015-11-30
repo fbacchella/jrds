@@ -42,7 +42,6 @@ public final class CheckValues extends JrdsServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse res)
             throws ServletException, IOException {
         HostsList hl = getHostsList();
-
         ParamsBean params = new ParamsBean(req, hl, "host", "probe", "dsname", "period", "cf");
 
         long period = jrds.Util.parseStringNumber(params.getValue("period"), new Long(hl.getStep()));

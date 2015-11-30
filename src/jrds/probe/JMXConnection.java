@@ -231,7 +231,7 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
             // on a connecting probe
             connector = JMXConnectorFactory.newJMXConnector(url, attributes);
             connector.connect();
-            connection = connector.getMBeanServerConnection();                
+            connection = connector.getMBeanServerConnection(); 
             return true;
         } catch (IOException e) {
             log(Level.ERROR, e, "Communication error with %s: %s", protocol.toString(), e);

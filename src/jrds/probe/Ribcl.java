@@ -166,9 +166,9 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
         if(port == 23) {
             SocketFactory ss = find(SocketFactory.class);
             return ss.createSocket(iloHost, port);
-        }               
-
-        return find(SSLStarter.class).connect(iloHost, port);
+        } else {
+            return find(SSLStarter.class).connect(iloHost, port);
+        }
     }
 
     public void parse(String message, Map<String, Number> vars, XmlProvider xmlstarter) {
