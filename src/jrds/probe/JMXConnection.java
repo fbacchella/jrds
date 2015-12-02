@@ -1,10 +1,10 @@
 package jrds.probe;
 
-import java.io.EOFException;
 import java.io.IOException;
 import java.lang.management.RuntimeMXBean;
 import java.net.MalformedURLException;
 import java.net.Socket;
+import java.rmi.server.RMIClientSocketFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,6 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import javax.management.remote.generic.GenericConnector;
-import javax.management.remote.message.Message;
 
 import org.apache.log4j.Level;
 
@@ -39,6 +38,14 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
     static {
         //If not already configured, we filter it
         JuliToLog4jHandler.catchLogger("javax.management", Level.FATAL);
+        JuliToLog4jHandler.catchLogger("sun.rmi", Level.ERROR);
+    }
+
+    public class RmiSocketFactory implements RMIClientSocketFactory {
+        public Socket createSocket(String host, int port) throws IOException {
+            log(Level.DEBUG, "creating a RMI socket to %s:%d", host, port);
+            return getLevel().find(SocketFactory.class).createSocket(host, port);
+        }
     }
 
     private static enum PROTOCOL {
@@ -173,58 +180,12 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
             attributes.put("jmx.remote.x.client.connected.state.timeout", getTimeout() * 1000);
             if(protocol == PROTOCOL.rmi) {
                 attributes.put("sun.rmi.transport.tcp.responseTimeout", getTimeout() * 1000);
+                attributes.put("com.sun.jndi.rmi.factory.socket", getLevel().find(JmxSocketFactory.class));
             }
             else if(protocol == PROTOCOL.jmxmp) {
-                SocketFactory sf = getLevel().find(SocketFactory.class); 
-                if( ! sf.isStarted()) {
-                    return false;
-                }
-                Socket s = sf.createSocket(url.getHost(), url.getPort());
-                // A custom class is needed, to catch log messages
-                attributes.put(GenericConnector.MESSAGE_CONNECTION, new SocketConnection(s) {
-
-                    @SuppressWarnings("rawtypes")
-                    @Override
-                    public void connect(Map env) throws IOException {
-                        try {
-                            super.connect(env);
-                        } catch (EOFException e) {
-                            // don't log this one
-                            throw e;
-                        } catch (Exception e) {
-                            log(Level.ERROR, e, "failed to read message: %s", e);
-                            throw e;
-                        }
-                    }
-
-                    @Override
-                    public void writeMessage(Message msg) throws IOException {
-                        try {
-                            super.writeMessage(msg);
-                        } catch (EOFException e) {
-                            // don't log this one
-                            throw e;
-                        } catch (Exception e) {
-                            log(Level.ERROR, e, "failed to read message: %s", e);
-                            throw e;
-                        }
-                    }
-
-                    @Override
-                    public Message readMessage()
-                            throws IOException, ClassNotFoundException {
-                        try {
-                            return super.readMessage();
-                        } catch (EOFException e) {
-                            // don't log this one
-                            throw e;
-                        } catch (Exception e) {
-                            log(Level.ERROR, e, "failed to read message: %s", e);
-                            throw e;
-                        }
-                    }
-
-                });
+                JmxSocketFactory jsf = getLevel().find(JmxSocketFactory.class);
+                SocketConnection sc = jsf.createSocketConnection(url);
+                attributes.put(GenericConnector.MESSAGE_CONNECTION, sc);
             }
             // connect can hang in a read !
             // So separate creation from connection, and then it might be possible to do close

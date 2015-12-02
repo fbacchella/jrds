@@ -31,7 +31,8 @@ import org.apache.log4j.Level;
  * @author Fabrice Bacchella 
  */
 @ProbeMeta(
-        discoverAgent=JmxDiscoverAgent.class
+        discoverAgent=JmxDiscoverAgent.class,
+        topStarter=JmxSocketFactory.class
         )
 public class JMX extends ProbeConnected<String, Double, JMXConnection> implements ConnectedProbe {
     private Map<String, String> collectKeys = null;
