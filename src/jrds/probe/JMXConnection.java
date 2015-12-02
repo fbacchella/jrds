@@ -36,7 +36,6 @@ import jrds.starter.SocketFactory;
 @ProbeBean({"url", "protocol", "port", "path", "user", "password"})
 public class JMXConnection extends Connection<MBeanServerConnection> {
     static {
-        //If not already configured, we filter it
         JuliToLog4jHandler.catchLogger("javax.management", Level.FATAL);
         JuliToLog4jHandler.catchLogger("sun.rmi", Level.ERROR);
     }

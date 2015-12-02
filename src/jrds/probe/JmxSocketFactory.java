@@ -10,6 +10,7 @@ import javax.management.remote.JMXServiceURL;
 import javax.management.remote.message.Message;
 
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 import com.sun.jmx.remote.socket.SocketConnection;
 
@@ -18,22 +19,30 @@ import jrds.starter.Starter;
 
 public class JmxSocketFactory extends Starter implements RMIClientSocketFactory {
     
+    private static final Logger sclogger = Logger.getLogger("jrds.probe.JmxSocketFactory.JrdsSocketConnection");
+
     private final class JrdsSocketConnection extends SocketConnection {
 
-        public JrdsSocketConnection(Socket socket) throws IOException {
-            super(socket);
+        private final String host;
+        private final int port;
+        
+        public JrdsSocketConnection(String host, int port) throws IOException {
+            super(getLevel().find(SocketFactory.class).createSocket(host, port));
+            this.host = host;
+            this.port = port;
         }
 
         @SuppressWarnings("rawtypes")
         @Override
         public void connect(Map env) throws IOException {
             try {
+                dolog(Level.TRACE, "connect");
                 super.connect(env);
             } catch (EOFException e) {
                 // don't log this one
                 throw e;
             } catch (Exception e) {
-                log(Level.ERROR, e, "failed to read message: %s", e);
+                dolog(Level.ERROR, e, "failed to connect: %s", e);
                 throw e;
             }
         }
@@ -41,12 +50,13 @@ public class JmxSocketFactory extends Starter implements RMIClientSocketFactory 
         @Override
         public void writeMessage(Message msg) throws IOException {
             try {
+                dolog(Level.TRACE, "writeMessage");
                 super.writeMessage(msg);
             } catch (EOFException e) {
                 // don't log this one
                 throw e;
             } catch (Exception e) {
-                log(Level.ERROR, e, "failed to read message: %s", e);
+                dolog(Level.ERROR, e, "failed to write message: %s", e);
                 throw e;
             }
         }
@@ -55,16 +65,25 @@ public class JmxSocketFactory extends Starter implements RMIClientSocketFactory 
         public Message readMessage()
                 throws IOException, ClassNotFoundException {
             try {
+                dolog(Level.TRACE, "readMessage");
                 return super.readMessage();
             } catch (EOFException e) {
                 // don't log this one
                 throw e;
             } catch (Exception e) {
-                log(Level.ERROR, e, "failed to read message: %s", e);
+                dolog(Level.ERROR, e, "failed to read message: %s", e);
                 throw e;
             }
         }
         
+        private void dolog(Level l, Throwable e, String format, Object... elements) {
+            jrds.Util.log(this, sclogger, l, e, "socket " + host + ":" + port + ": " + format, elements);            
+        }
+
+        private void dolog(Level l, String format, Object... elements) {
+            jrds.Util.log(this, sclogger, l, null, "socket " + host + ":" + port + ": " + format, elements);            
+        }
+
     };
 
     public Socket createSocket(String host, int port) throws IOException {
@@ -76,9 +95,7 @@ public class JmxSocketFactory extends Starter implements RMIClientSocketFactory 
         log(Level.DEBUG, "creating a JMXMP socket to %s", url);
         String host = url.getHost();
         int port = url.getPort();
-        SocketFactory sf = getLevel().find(SocketFactory.class); 
-        Socket s = sf.createSocket(host, port);
-        return new JrdsSocketConnection(s);
+        return new JrdsSocketConnection(host, port);
     }
 
 }
