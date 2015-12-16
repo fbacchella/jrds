@@ -129,7 +129,7 @@ public class Graph implements WithACL {
             if(gd.withLegend())
                 addlegend(graphDef);
         } catch (RuntimeException e) {
-            Util.log(this, logger, Level.ERROR, e, "Impossible to create graph definition: ", e);
+            Util.log(this, logger, Level.ERROR, e, "Impossible to create graph definition: %s", e.getMessage());
         }
     }
 
