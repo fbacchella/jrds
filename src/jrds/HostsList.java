@@ -164,8 +164,8 @@ public class HostsList extends StarterNode {
             for(Class<? extends Starter> starterClass: timerStarterClasses) {
                 try {
                     timer.registerStarter(starterClass.newInstance());
-                } catch (Exception e) {
-                    log(Level.ERROR, e, "Starter %s failed to register: %s", starterClass, e);
+                } catch (Throwable e) {
+                    log(Level.ERROR, e, "Starter %s failed to register for timer %s: %s", starterClass, timer.getName(), e.getMessage());
                 }
             }
             timer.configureStarters(pm);            
@@ -177,8 +177,8 @@ public class HostsList extends StarterNode {
                 Starter top = starterClass.newInstance();
                 topStarters.add(top);
                 registerStarter(top);
-            } catch (Exception e1) {
-                log(Level.ERROR, e1, "Starter %s failed to register: %s", starterClass, e1);
+            } catch (Throwable e) {
+                log(Level.ERROR, e, "Top level starter %s failed to register: %s", starterClass, e.getMessage());
             }           
         }
 
