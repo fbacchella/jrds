@@ -20,7 +20,7 @@ import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.mockobjects.MokeProbeBean;
 import jrds.mockobjects.MokeProbeFactory;
-import jrds.probe.JMXConnection;
+import jrds.probe.JMXRMIConnection;
 import jrds.starter.ConnectionInfo;
 import jrds.starter.StarterNode;
 import jrds.starter.Timer;
@@ -112,7 +112,7 @@ public class TestHostBuilder {
             logger.trace(ci.getName());
             StarterNode  sn = new StarterNode() {};
             ci.register(sn);
-            JMXConnection cnx = sn.find(JMXConnection.class);
+            JMXRMIConnection cnx = sn.find(JMXRMIConnection.class);
             Assert.assertEquals("Attributed not setted", new Integer(8999), cnx.getPort());
         }
     }

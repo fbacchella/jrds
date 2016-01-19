@@ -25,7 +25,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
 
     private String hostname;
 
-    private final JMXConnection cnx = new JMXConnection() {
+    private final JMXRMIConnection cnx = new JMXRMIConnection() {
         @Override
         public String getHostName() {
             return JmxDiscoverAgent.this.hostname;

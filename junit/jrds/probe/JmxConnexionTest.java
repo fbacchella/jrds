@@ -119,7 +119,7 @@ public class JmxConnexionTest {
     static public void configure() throws Exception {
         Tools.configure();
         logger.setLevel(Level.TRACE);
-        Tools.setLevel(new String[] {JmxConnexionTest.class.getName(), JMXConnection.class.getName(), "jrds.Starter"}, logger.getLevel());
+        Tools.setLevel(new String[] {JmxConnexionTest.class.getName(), JMXRMIConnection.class.getName(), "jrds.Starter"}, logger.getLevel());
     }
 
     @After
@@ -157,8 +157,8 @@ public class JmxConnexionTest {
         return port;
     }
 
-    private JMXConnection getCnx(String proto, int port) {
-        JMXConnection cnx = new JMXConnection() {
+    private JMXRMIConnection getCnx(String proto, int port) {
+        JMXRMIConnection cnx = new JMXRMIConnection() {
             @Override
             public String getHostName() {
                 return "localhost";
@@ -179,7 +179,7 @@ public class JmxConnexionTest {
             }
         };
         host.setTimeout(1);
-        JMXConnection cnx = getCnx(proto, port);
+        JMXRMIConnection cnx = getCnx(proto, port);
         host.registerStarter(new SocketFactory());
         host.registerStarter(new JmxSocketFactory());
         host.registerStarter(cnx);

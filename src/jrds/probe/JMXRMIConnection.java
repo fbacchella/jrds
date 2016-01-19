@@ -25,16 +25,15 @@ import javax.management.remote.generic.GenericConnector;
 
 import org.apache.log4j.Level;
 
-import com.sun.jmx.remote.socket.SocketConnection;
-
 import jrds.JuliToLog4jHandler;
 import jrds.PropertiesManager;
 import jrds.factories.ProbeBean;
+import jrds.jmx.JrdsSocketConnection;
 import jrds.starter.Connection;
 import jrds.starter.SocketFactory;
 
 @ProbeBean({"url", "protocol", "port", "path", "user", "password"})
-public class JMXConnection extends Connection<MBeanServerConnection> {
+public class JMXRMIConnection extends Connection<MBeanServerConnection> {
     static {
         JuliToLog4jHandler.catchLogger("javax.management", Level.FATAL);
         JuliToLog4jHandler.catchLogger("sun.rmi", Level.ERROR);
@@ -50,24 +49,24 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
     private static enum PROTOCOL {
         rmi {
             @Override
-            public JMXServiceURL getURL(JMXConnection cnx) throws MalformedURLException {
+            public JMXServiceURL getURL(JMXRMIConnection cnx) throws MalformedURLException {
                 return new JMXServiceURL("service:jmx:rmi:///jndi/rmi://" + cnx.getHostName() + ":" + cnx.port + cnx.path);
             }
         },
         iiop {
             @Override
-            public JMXServiceURL getURL(JMXConnection cnx) throws MalformedURLException {
+            public JMXServiceURL getURL(JMXRMIConnection cnx) throws MalformedURLException {
                 return new JMXServiceURL("service:jmx:iiop:///jndi/iiop://" + cnx.getHostName() + ":" + cnx.port + cnx.path);
             }
         },
         jmxmp {
             @Override
-            public JMXServiceURL getURL(JMXConnection cnx) throws MalformedURLException {
+            public JMXServiceURL getURL(JMXRMIConnection cnx) throws MalformedURLException {
                 return new JMXServiceURL("service:jmx:jmxmp://" + cnx.getHostName() + ":" + cnx.port);
             }
 
         };
-        abstract public JMXServiceURL getURL(JMXConnection cnx)  throws MalformedURLException ;
+        abstract public JMXServiceURL getURL(JMXRMIConnection cnx)  throws MalformedURLException ;
     }
 
     final static String startTimeObjectName = "java.lang:type=Runtime";
@@ -93,16 +92,16 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
     private JMXConnector connector;
     private MBeanServerConnection connection;
 
-    public JMXConnection() {
+    public JMXRMIConnection() {
         super();
     }
 
-    public JMXConnection(Integer port) {
+    public JMXRMIConnection(Integer port) {
         super();
         this.port = port;
     }
 
-    public JMXConnection(Integer port, String user, String password) {
+    public JMXRMIConnection(Integer port, String user, String password) {
         super();
         this.port = port;
         this.user = user;
@@ -182,8 +181,7 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
                 attributes.put("com.sun.jndi.rmi.factory.socket", getLevel().find(JmxSocketFactory.class));
             }
             else if(protocol == PROTOCOL.jmxmp) {
-                JmxSocketFactory jsf = getLevel().find(JmxSocketFactory.class);
-                SocketConnection sc = jsf.createSocketConnection(url);
+                Object sc = JrdsSocketConnection.create(url, getLevel().find(SocketFactory.class));
                 attributes.put(GenericConnector.MESSAGE_CONNECTION, sc);
             }
             // connect can hang in a read !
