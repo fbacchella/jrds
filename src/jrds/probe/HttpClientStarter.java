@@ -71,7 +71,7 @@ public class HttpClientStarter extends Starter {
         builder.setConnectionTimeToLive(timeout, TimeUnit.SECONDS);
         builder.evictIdleConnections((long)timeout, TimeUnit.SECONDS);
         
-        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(r.build());        
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(r.build());
         cm.setMaxTotal(maxConnect * 2);
         cm.setDefaultMaxPerRoute(2);
         cm.setValidateAfterInactivity(timeout * 1000);

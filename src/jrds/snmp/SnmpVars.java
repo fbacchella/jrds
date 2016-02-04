@@ -85,7 +85,7 @@ public class SnmpVars extends HashMap<OID, Object> {
             case SMIConstants.EXCEPTION_END_OF_MIB_VIEW:
                 exceptionName = "End of mib view";
                 break;
-            case SMIConstants.EXCEPTION_NO_SUCH_INSTANCE:            
+            case SMIConstants.EXCEPTION_NO_SUCH_INSTANCE:
                 exceptionName = "No such instance";
                 break;
             case SMIConstants.EXCEPTION_NO_SUCH_OBJECT: 

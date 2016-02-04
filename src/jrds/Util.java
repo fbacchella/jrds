@@ -235,7 +235,7 @@ public class Util {
                         if(bean != null) {
                             Object beanValue = bean.get(o);
                             if(beanValue != null) {
-                                toAppend = stringSignature(beanValue.toString());                                                         
+                                toAppend = stringSignature(beanValue.toString());
                             }
                             else {
                                 toAppend = "";

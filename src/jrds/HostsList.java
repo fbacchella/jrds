@@ -168,7 +168,7 @@ public class HostsList extends StarterNode {
                     log(Level.ERROR, e, "Starter %s failed to register for timer %s: %s", starterClass, timer.getName(), e.getMessage());
                 }
             }
-            timer.configureStarters(pm);            
+            timer.configureStarters(pm);
         }
 
         log(Level.DEBUG, "top starters added %s", topStarterClasses);

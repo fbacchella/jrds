@@ -65,7 +65,7 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
             log(Level.ERROR, "unable to parse %s", getUrl());
         } finally {
             if(entity != null) {
-                EntityUtils.consumeQuietly(entity);                
+                EntityUtils.consumeQuietly(entity);
             }
         }
 
