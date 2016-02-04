@@ -111,7 +111,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             logger.trace(Util.delayedFormatString("adding tag %s to %s", tagElem, host));
             String textContent = tagElem.getTextContent();
             if(textContent != null) {
-                host.addTag(Util.parseTemplate(textContent.trim(), host, properties));                
+                host.addTag(Util.parseTemplate(textContent.trim(), host, properties));
             }
         }
 
@@ -154,7 +154,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             Collection<String> set = null;
             String name = Util.parseTemplate(forNode.attrMap().get("collection"), this, properties);
             if(name != null) {
-                set = collections.get(name);                
+                set = collections.get(name);
             }
             else if(forattr.containsKey("min") && forattr.containsKey("max") && forattr.containsKey("step")) {
                 int min = Util.parseStringNumber(Util.parseTemplate(forattr.get("min"), this, properties), Integer.MAX_VALUE);
@@ -195,9 +195,16 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 continue;
             try {
                 makeProbe(probeNode, host, properties);
+            } catch (InvocationTargetException e) {
+                logger.error("Probe creation failed for host " + host.getName() + ": " + e.getMessage());
+                if(logger.isDebugEnabled()) {
+                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                    e.printStackTrace(new PrintStream(buffer));
+                    logger.debug(buffer);
+                }
             } catch (Exception e) {
                 logger.error("Probe creation failed for host " + host.getName() + ": ");
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();  
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 e.printStackTrace(new PrintStream(buffer));
                 logger.error(buffer);
             }
@@ -221,7 +228,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                     String name = attrNode.getAttribute("name");
                     String value = Util.parseTemplate(attrNode.getTextContent(), host, gd);
                     attrs.put(name, value);
-                }                
+                }
                 GraphNode gn = new GraphNode(graphprobe, gd);
                 gn.setBeans(attrs);
                 graphprobe.addGraph(gn);
@@ -617,7 +624,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
     public void setArchivesSetMap(Map<String, ArchivesSet> archivessetmap) {
         logger.debug(Util.delayedFormatString("will look for archives in %s", archivessetmap));
-        this.archivessetmap = archivessetmap;        
+        this.archivessetmap = archivessetmap;
     }
 
 }
