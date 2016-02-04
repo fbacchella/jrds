@@ -34,11 +34,11 @@ import org.apache.log4j.Level;
         discoverAgent=JmxDiscoverAgent.class,
         topStarter=JmxSocketFactory.class
         )
-public class JMX extends ProbeConnected<String, Double, JMXRMIConnection> implements ConnectedProbe {
+public class JMX extends ProbeConnected<String, Double, JMXConnection> implements ConnectedProbe {
     private Map<String, String> collectKeys = null;
 
     public JMX() {
-        super(JMXRMIConnection.class.getName());
+        super(JMXConnection.class.getName());
     }
 
     @Override
@@ -53,7 +53,7 @@ public class JMX extends ProbeConnected<String, Double, JMXRMIConnection> implem
     }
 
     @Override
-    public Map<String, Double> getNewSampleValuesConnected(JMXRMIConnection cnx) {
+    public Map<String, Double> getNewSampleValuesConnected(JMXConnection cnx) {
         MBeanServerConnection mbean =  cnx.getConnection();
         try {
             Set<String> collectKeys = getCollectMapping().keySet();
