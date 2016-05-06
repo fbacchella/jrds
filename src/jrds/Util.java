@@ -211,6 +211,8 @@ public class Util {
             //The variable referring to a system variable are directly resolved
             else if(var.startsWith("system.")) {
                 toAppend = System.getProperty(var.replace("system.", ""));
+                // Will be used as a format string, protect %
+                toAppend = toAppend.replace("%", "%%");
             }
             //We found a ${\d+}, directly resolve with the first list argument
             else if(digit.matcher(var).matches()) {
@@ -221,6 +223,8 @@ public class Util {
                         break;
                     }
                 }
+                // Will be used as a format string, protect %
+                toAppend = toAppend.replace("%", "%%");
             }
             //bean signatures are directly resolved
             else if((varMatcher=attrSignature.matcher(var)).matches()) {
@@ -253,9 +257,11 @@ public class Util {
                             // not a bean, skip it
                         } catch (Exception e) {
                             logger.warn(Util.delayedFormatString("can't output bean %s for %s", beanName, o));
-                        }                        
+                        }
                     }
                 }
+                // Will be used as a format string, protect %
+                toAppend = toAppend.replace("%", "%%");
             }
             //beans are directly resolved
             else if((varMatcher=attr.matcher(var)).matches()) {
@@ -270,7 +276,7 @@ public class Util {
                         if(bean != null) {
                             Object beanValue = bean.get(o);
                             if(beanValue != null) {
-                                toAppend = beanValue.toString();                                                            
+                                toAppend = beanValue.toString();
                             }
                             else {
                                 toAppend = "";
@@ -288,9 +294,11 @@ public class Util {
                             // not a bean, skip it
                         } catch (Exception e) {
                             logger.warn(Util.delayedFormatString("can't output bean %s for %s", beanName, o), e);
-                        }                        
+                        }
                     }
                 }
+                // Will be used as a format string, protect %
+                toAppend = toAppend.replace("%", "%%");
             }
             //Common case, replace the variable with it's index, for MessageFormat
             else  {
@@ -298,11 +306,12 @@ public class Util {
                     indexes.put(var, index++);
                 }
                 int slot = indexes.get(var) + 1;
-                toAppend = "%"  + Integer.toString(slot) + "$s";
+                toAppend = "%" + Integer.toString(slot) + "$s";
             }
             out.append(toAppend);
-            if(after.length() > 0)
+            if(after.length() > 0) {
                 out.append(findVariables(after, index, indexes, arguments));
+            }
             return out.toString();
         }
         return in;
