@@ -4,6 +4,8 @@ import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -56,7 +58,7 @@ public class HttpTest {
         p.setPd(pd);
         p.setFile("/");
         p.setPort(80);
-        p.configure();
+        Assert.assertTrue(p.configure());
         Assert.assertEquals("http://" + HOST + ":80/", p.getUrlAsString());
         validateBean(p);
     }
@@ -72,10 +74,10 @@ public class HttpTest {
         p.setHost(webserver);
         ProbeDesc pd = new ProbeDesc();
         pd.setProbeClass(p.getClass());
-        p.setPd(pd);		
+        p.setPd(pd);
         p.setFile("/file");
         p.setPort(80);
-        p.configure("/file");
+        Assert.assertTrue(p.configure("/file"));
         Assert.assertEquals("http://" + HOST + ":80/file", p.getUrlAsString());
         validateBean(p);
     }
@@ -91,12 +93,53 @@ public class HttpTest {
         p.setHost(webserver);
         ProbeDesc pd = new ProbeDesc();
         pd.setProbeClass(p.getClass());
-        p.setPd(pd);		
+        p.setPd(pd);
         p.setFile("/file");
         p.setPort(81);
-        p.configure();
+        Assert.assertTrue(p.configure());
         Assert.assertEquals("http://" + HOST + ":81/file", p.getUrlAsString());
         Assert.assertEquals("http://" + HOST + ":81/file", pd.getBean("url").get(p).toString());
+        validateBean(p);
+    }
+
+    @Test
+    public void build4() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+        HttpProbe p = new HttpProbe() {
+            @Override
+            protected Map<String, Number> parseStream(InputStream stream) {
+                return null;
+            }
+        };
+        ProbeDesc pd = new ProbeDesc();
+        pd.setProbeClass(p.getClass());
+        p.setHost(webserver);
+        p.setPd(pd);
+        p.setFile("/");
+        p.setPort(80);
+        p.setLogin("login@domain");
+        p.setPassword("password");
+        Assert.assertTrue(p.configure());
+        Assert.assertEquals("http://login%40domain:password@" + HOST + ":80/", p.getUrlAsString());
+        validateBean(p);
+    }
+    
+    @Test
+    public void build5() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+        HttpProbe p = new HttpProbe() {
+            @Override
+            protected Map<String, Number> parseStream(InputStream stream) {
+                return null;
+            }
+        };
+        ProbeDesc pd = new ProbeDesc();
+        pd.setProbeClass(p.getClass());
+        p.setHost(webserver);
+        p.setPd(pd);
+        p.setFile("/${1}");
+        p.setPort(80);
+        List<Object> args = Arrays.asList((Object)"file");
+        Assert.assertTrue(p.configure(args));
+        Assert.assertEquals("http://" + HOST + ":80/file", p.getUrlAsString());
         validateBean(p);
     }
 

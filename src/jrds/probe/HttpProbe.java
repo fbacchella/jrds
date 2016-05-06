@@ -4,11 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.IllegalFormatConversionException;
 import java.util.List;
@@ -32,13 +34,15 @@ import org.apache.log4j.Level;
  *
  * @author Fabrice Bacchella 
  */
-@ProbeBean({"port",  "file", "url", "urlhost", "scheme"})
+@ProbeBean({"port",  "file", "url", "urlhost", "scheme", "login", "password"})
 public abstract class HttpProbe extends Probe<String, Number> implements UrlProbe {
     protected URL url = null;
     protected String urlhost = null;
     protected int port = -1;
     protected String file = "/";
     protected String scheme = null;
+    protected String login = null;
+    protected String password = null;
     private Starter resolver = null;
 
     public Boolean configure(URL url) {
@@ -100,26 +104,43 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
                 if(port == 443) {
                     scheme = "https";
                 } else {
-                    scheme = "http";                    
+                    scheme = "http";
                 }
             }
+            // Check if authentication elements were given, and construct the authentication part if needed
+            String userInfo = "";
             try {
-                if(urlhost == null)
-                    urlhost = getHost().getDnsName();
-                if(argslist != null) {
-                    try {
-                        String urlString = String.format(scheme + "://" + urlhost + ":" + port + file, argslist.toArray());
-                        url = new URL(Util.parseTemplate(urlString, getHost(), argslist));
-                    } catch (IllegalFormatConversionException e) {
-                        log(Level.ERROR, "Illegal format string: %s://%s:%d%s, args %d", scheme, urlhost, port, file, argslist.size());
-                        return false;
-                    }
+                if( login != null) {
+                    userInfo = URLEncoder.encode(login, "UTF-8");
                 }
-                else {
-                    url = new URL(scheme, urlhost, port, file);
+                if( password != null) {
+                    userInfo = userInfo + ":" + URLEncoder.encode(password, "UTF-8");
                 }
+                if(! userInfo.isEmpty()) {
+                    userInfo += '@';
+                }
+            } catch (UnsupportedEncodingException e1) {
+                // never reached catch
+            }
+            if(urlhost == null) {
+                urlhost = getHost().getDnsName();
+            }
+            String urlString;
+            if(argslist != null) {
+                try {
+                    urlString = String.format(scheme + "://" + userInfo + urlhost + ":" + port + file, argslist.toArray());
+                    urlString = Util.parseTemplate(urlString, getHost(), argslist);
+                } catch (IllegalFormatConversionException e) {
+                    log(Level.ERROR, "Illegal format string: %s://%s%s:%d%s, args %d", scheme, userInfo, urlhost, port, file, argslist.size());
+                    return false;
+                }
+            } else {
+                urlString = Util.parseTemplate(scheme + "://" + userInfo + urlhost + ":" + port + file, getHost());
+            }
+            try {
+                url = new URL(urlString);
             } catch (MalformedURLException e) {
-                log(Level.ERROR, e, "URL '%s://%s:%s%s' is invalid", scheme, urlhost, port, file);
+                log(Level.ERROR, e, "URL '%s:/%s/%s:%s%s' is invalid", scheme, userInfo, urlhost, port, file);
                 return false;
             }
         }
@@ -280,6 +301,22 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 
     public void setScheme(String scheme) {
         this.scheme = scheme;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
 }
