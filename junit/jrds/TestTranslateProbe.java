@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import jrds.mockobjects.MokeProbe;
-import jrds.thresholds.Threshold;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -20,7 +19,7 @@ public class TestTranslateProbe {
     static public void configure() throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, Exception  {
         Tools.configure();
         Tools.prepareXml();
-        Tools.setLevel(logger, Level.ERROR, "jrds.Probe", Threshold.class.getName());
+        Tools.setLevel(logger, Level.ERROR, "jrds.Probe");
 
         pd = jrds.configuration.GeneratorHelper.getProbeDesc(Tools.parseRessource("fulldesc.xml"));
 

@@ -1,9 +1,0 @@
-<appender name="bidule" threshold="all"
-	class="org.apache.log4j.net.SMTPAppender">
-	<param name="from" value="root@localhost" />
-	<param name="subject" value="Threshold reached" />
-	<param name="SMTPHost" value="localhost" />
-	<param name="Name" value="Jrds Thresold logger" />
-	<param name="To" value="Destination" />
-	<layout class="org.apache.log4j.SimpleLayout" />
-</appender>
