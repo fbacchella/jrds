@@ -49,7 +49,7 @@ public class TestRRDProbe {
         p.setHost(new HostStarter(new HostInfo("toto")));
         ProbeDesc pd = new ProbeDesc();
         pd.setProbeClass(p.getClass());
-        pd.setName("Rrdtool");  
+        pd.setName("Rrdtool");
         pd.setProbeName("rrdtool");
         p.setPd(pd);
         p.setRrdfile(rrdfile);
@@ -62,7 +62,7 @@ public class TestRRDProbe {
         RRDToolProbe p = new RRDToolProbe();
         p.setHost(new HostStarter(new HostInfo("toto")));
         ProbeDesc pd = new ProbeDesc();
-        pd.setName("Rrdtool");	
+        pd.setName("Rrdtool");
         pd.setProbeName("rrdtool");
         p.setPd(pd);
         Map<String, String> empty = Collections.emptyMap();
@@ -81,7 +81,7 @@ public class TestRRDProbe {
             Graph g = gn.getGraph();
             g.setEnd(new Date(end * 1000));
             g.setStart(new Date(start * 1000));
-            File outputFile =  new File(testFolder.getRoot(), "rrdtool.png");
+            File outputFile = new File(testFolder.getRoot(), "rrdtool.png");
             OutputStream out = new FileOutputStream(outputFile);
             g.writePng(out);
             Assert.assertTrue("graph not created", outputFile.canRead());

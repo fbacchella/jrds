@@ -22,7 +22,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
 
     static final private Logger logger = Logger.getLogger(GraphNode.class);
 
-    protected Probe<?,?> probe;
+    protected Probe<?, ?> probe;
     private String viewPath = null;
     private GraphDesc gd;
     private String name = null;
@@ -34,15 +34,15 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
     /**
      *
      */
-    public GraphNode(Probe<?,?> theStore, GraphDesc gd) {
+    public GraphNode(Probe<?, ?> theStore, GraphDesc gd) {
         this.probe = theStore;
         this.gd = gd;
         this.acl = gd.getACL();
     }
 
     /**
-     * A protected constructor
-     * child are allowed to build themselves in a strange way
+     * A protected constructor child are allowed to build themselves in a
+     * strange way
      * 
      */
     protected GraphNode() {
@@ -58,16 +58,17 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
     /**
      * @return Returns the theStore.
      */
-    public Probe<?,?> getProbe() {
+    public Probe<?, ?> getProbe() {
         return probe;
     }
 
     /**
-     * To be called if the probe was not provided in the initial creation
-     * This should be called as soon as possible
+     * To be called if the probe was not provided in the initial creation This
+     * should be called as soon as possible
+     * 
      * @param probe a custom generated probe
      */
-    protected void setProbe(Probe<?,?> probe) {
+    protected void setProbe(Probe<?, ?> probe) {
         this.probe = probe;
     }
 
@@ -108,13 +109,14 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
 
     /**
      * Return a uniq name for the graph
+     * 
      * @return
      */
     public String getQualifiedName() {
-        if (probe.getHost() != null) {
-            return probe.getHost().getName() + "/"  + getName();
+        if(probe.getHost() != null) {
+            return probe.getHost().getName() + "/" + getName();
         } else {
-            return "/"  + getName();
+            return "/" + getName();
         }
     }
 
@@ -125,6 +127,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
     /**
      * To be called if the graphdesc was not provided in the initial creation
      * This should be called as soon as possible
+     * 
      * @param gd A custom generated GraphDesc
      */
     protected void setGraphDesc(GraphDesc gd) {
@@ -133,19 +136,19 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
     }
 
     public Graph getGraph() {
-        Class<Graph>  gclass = gd.getGraphClass();
+        Class<Graph> gclass = gd.getGraphClass();
 
         try {
-            Graph g =  gclass.getConstructor(GraphNode.class).newInstance(this);
+            Graph g = gclass.getConstructor(GraphNode.class).newInstance(this);
             Map<String, GenericBean> beansList = ArgFactory.getBeanPropertiesMap(gclass, Graph.class);
 
-            //Resolve the beans
+            // Resolve the beans
             for(Map.Entry<String, String> e: beans.entrySet()) {
                 String name = Util.parseTemplate(e.getKey(), probe);
                 String textValue = Util.parseTemplate(e.getValue(), probe);
                 GenericBean bean = beansList.get(name);
                 if(bean == null) {
-                    logger.error(String.format("Unknown bean for %s: %s", gd.getName() , name));
+                    logger.error(String.format("Unknown bean for %s: %s", gd.getName(), name));
                     continue;
                 }
                 logger.trace(Util.delayedFormatString("Found attribute %s with value %s", name, textValue));
@@ -157,11 +160,13 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     public int compareTo(GraphNode arg0) {
-        if (viewPath == null)
+        if(viewPath == null)
             viewPath = this.getTreePathByView().toString();
 
         String otherPath = arg0.getTreePathByView().toString();

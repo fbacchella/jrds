@@ -17,7 +17,7 @@ import jrds.starter.SocketFactory;
 
 import org.apache.log4j.Level;
 
-@ProbeBean({"port", "welcome"})
+@ProbeBean({ "port", "welcome" })
 public class Varnish extends Probe<String, Number> implements IndexedProbe {
 
     static final private Pattern statlinepattern = Pattern.compile("^\\s+(\\d+)\\s+(.*)$");
@@ -42,8 +42,8 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
     public Map<String, Number> getNewSampleValues() {
         Socket s;
         try {
-            SocketFactory ss = find(SocketFactory.class); 
-            if(! ss.isStarted())
+            SocketFactory ss = find(SocketFactory.class);
+            if(!ss.isStarted())
                 return null;
             s = ss.createSocket(this, port);
         } catch (Exception e) {
@@ -55,7 +55,7 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
             return null;
 
         try {
-            PrintWriter outputSocket =  new PrintWriter(s.getOutputStream());
+            PrintWriter outputSocket = new PrintWriter(s.getOutputStream());
             BufferedReader inputSocket = new BufferedReader(new InputStreamReader(s.getInputStream()));
 
             if(welcome) {
@@ -66,16 +66,15 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
             BufferedReader statsbuffer = getAnswer(inputSocket, outputSocket, getPd().getSpecific("command"));
 
             Map<String, Number> vars = new HashMap<String, Number>();
-            while(statsbuffer.ready()) {
+            while (statsbuffer.ready()) {
                 String statsline = statsbuffer.readLine();
                 Matcher m = statlinepattern.matcher(statsline);
                 if(m.matches()) {
                     Number value = jrds.Util.parseStringNumber(m.group(1), -1L);
                     String key = m.group(2);
                     vars.put(key, value);
-                }
-                else {
-                    log(Level.DEBUG,"Invalid line: %s", statsline);
+                } else {
+                    log(Level.DEBUG, "Invalid line: %s", statsline);
                 }
             }
 
@@ -84,7 +83,7 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
             s.close();
 
             Number uptime = vars.remove(getPd().getSpecific("uptime"));
-            if (uptime != null) {
+            if(uptime != null) {
                 setUptime(uptime.longValue());
             }
             return vars;
@@ -96,32 +95,32 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
     }
 
     private BufferedReader getAnswer(BufferedReader in, PrintWriter out, String command) throws IOException {
-        if(command != null && ! "".equals(command)) {
+        if(command != null && !"".equals(command)) {
             log(Level.TRACE, "Send command '%s'", command);
             out.println(command);
             out.flush();
         }
 
-        //We read a possible status line
-        //The format is : 'status size \n'
-        String statusline  = in.readLine().trim();
+        // We read a possible status line
+        // The format is : 'status size \n'
+        String statusline = in.readLine().trim();
         log(Level.TRACE, "Read status line '%s'", statusline);
         String[] statusinfo = statusline.split(" ");
         if(statusinfo.length != 2) {
             return new BufferedReader(new CharArrayReader(new char[0]));
         }
         int statuscode = jrds.Util.parseStringNumber(statusinfo[0], -1).intValue();
-        int size =  jrds.Util.parseStringNumber(statusinfo[1], -1).intValue();
+        int size = jrds.Util.parseStringNumber(statusinfo[1], -1).intValue();
         log(Level.TRACE, "status code: %d", statuscode);
         if((statuscode != 200 && statuscode != 500) || size < 1) {
             log(Level.ERROR, "communication error, code: %d, byte expected: %d", statuscode, size);
             return new BufferedReader(new CharArrayReader(new char[0]));
         }
 
-        //We read the data
-        char[] cbuf= new char[size];
+        // We read the data
+        char[] cbuf = new char[size];
         int readchar = in.read(cbuf);
-        if( readchar != size ) {
+        if(readchar != size) {
             log(Level.ERROR, "read failed, not enough byte, got %d expected %d", readchar, size);
             return new BufferedReader(new CharArrayReader(new char[0]));
         }

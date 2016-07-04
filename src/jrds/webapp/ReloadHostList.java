@@ -13,6 +13,7 @@ import jrds.Configuration;
 
 /**
  * This servlet reload the host list file
+ * 
  * @author Fabrice Bacchella
  * @version $Revision$
  */
@@ -21,23 +22,25 @@ public class ReloadHostList extends JrdsServlet {
 
     static final Semaphore reloading = new Semaphore(1);
 
-    /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.
+     * HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
-    protected void doGet(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
-        //only one reload allowed to run, just ignore synchronous reload
-        if (! reloading.tryAcquire()) {
+        // only one reload allowed to run, just ignore synchronous reload
+        if(!reloading.tryAcquire()) {
             res.sendRedirect(req.getContextPath() + "/");
             return;
         }
 
         ParamsBean params = new ParamsBean(req, getHostsList());
 
-        //Check permissions
-        if(! allowed(params, getPropertiesManager().adminACL, req, res)) {
-            return;            
+        // Check permissions
+        if(!allowed(params, getPropertiesManager().adminACL, req, res)) {
+            return;
         }
 
         final ServletContext ctxt = getServletContext();
@@ -52,9 +55,8 @@ public class ReloadHostList extends JrdsServlet {
         };
         if(params.getValue("sync") != null) {
             configthread.run();
-        }
-        else {
-            configthread.start();            
+        } else {
+            configthread.start();
         }
         res.sendRedirect(req.getContextPath() + "/");
     }

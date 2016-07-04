@@ -18,12 +18,13 @@ public class JSonDetails extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(JSonDetails.class);
 
     /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+     *      response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             ParamsBean params = getParamsBean(request);
-            Probe<?,?> p = params.getProbe();
+            Probe<?, ?> p = params.getProbe();
 
             JrdsJSONWriter w = new JrdsJSONWriter(response);
             w.object();
@@ -33,7 +34,7 @@ public class JSonDetails extends JrdsServlet {
             w.key("hostname").value(p.getHost().getName());
             w.key("pid").value(params.getPid());
             if(p instanceof IndexedProbe) {
-                w.key("index").value(((IndexedProbe)p).getIndexName());
+                w.key("index").value(((IndexedProbe) p).getIndexName());
             }
             w.key("datastores");
             w.array();
@@ -56,7 +57,7 @@ public class JSonDetails extends JrdsServlet {
             w.endObject();
             w.flush();
         } catch (Exception e) {
-            logger.warn("Failed request: " + request.getRequestURI() + "?" + request.getQueryString() +": " + e, e);
+            logger.warn("Failed request: " + request.getRequestURI() + "?" + request.getQueryString() + ": " + e, e);
         }
     }
 

@@ -16,7 +16,7 @@ public class HostInfo {
     private File hostdir = null;
     private boolean hidden = false;
     private final Map<String, ConnectionInfo> cnxList = new HashMap<String, ConnectionInfo>();
-    private final Set<Probe<?,?>> probesList = new HashSet<Probe<?,?>>();
+    private final Set<Probe<?, ?>> probesList = new HashSet<Probe<?, ?>>();
 
     public HostInfo(String name) {
         super();
@@ -72,6 +72,7 @@ public class HostInfo {
 
     /**
      * Is the host to be shown in the host list ?
+     * 
      * @return the hidden
      */
     public boolean isHidden() {
@@ -111,11 +112,11 @@ public class HostInfo {
         return cnxList.get(name);
     }
 
-    public void addProbe(Probe<?,?> p) {
+    public void addProbe(Probe<?, ?> p) {
         probesList.add(p);
     }
 
-    public Iterable<Probe<?,?>> getProbes() {
+    public Iterable<Probe<?, ?>> getProbes() {
         return probesList;
     }
 
@@ -123,7 +124,9 @@ public class HostInfo {
         return probesList.size();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     @Override

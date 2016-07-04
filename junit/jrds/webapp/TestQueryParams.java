@@ -41,14 +41,13 @@ public class TestQueryParams {
     }
 
     @Test
-    public void testQueries() throws Exception
-    {
+    public void testQueries() throws Exception {
         Response response = ToolsWebApp.doRequestGet(tester, "http://localhost/queryparams", 200);
 
         logger.trace(response.getContent());
         JSONObject qp = new JSONObject(response.getContent());
-        for(String key: new String[] {"tab", "tabslist", "autoperiod", "begin", "end"}) {
-            Assert.assertTrue(key + " not found", qp.has(key)); 
+        for(String key: new String[] { "tab", "tabslist", "autoperiod", "begin", "end" }) {
+            Assert.assertTrue(key + " not found", qp.has(key));
         }
     }
 

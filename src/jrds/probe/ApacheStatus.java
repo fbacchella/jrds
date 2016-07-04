@@ -17,7 +17,8 @@ import org.apache.log4j.Level;
 
 /**
  * A class to probe the apache status from the mod_status
- * @author Fabrice Bacchella 
+ * 
+ * @author Fabrice Bacchella
  */
 public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
 
@@ -32,7 +33,7 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
         try {
             return new URL(getScheme(), getUrl().getHost(), getUrl().getPort(), "/").toString();
         } catch (MalformedURLException e) {
-            throw new RuntimeException("MalformedURLException",e);
+            throw new RuntimeException("MalformedURLException", e);
         }
     }
 
@@ -43,7 +44,9 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
         return Integer.toString(port);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.probe.HttpProbe#parseStream(java.io.InputStream)
      */
     @Override
@@ -53,17 +56,19 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
             BufferedReader in = new BufferedReader(new InputStreamReader(stream));
             List<String> lines = new ArrayList<String>();
             String lastLine;
-            while((lastLine = in.readLine()) != null)
+            while ((lastLine = in.readLine()) != null)
                 lines.add(lastLine);
             in.close();
             vars = parseLines(lines);
         } catch (IOException e) {
-            log(Level.ERROR,e ,  "Unable to read url %s because %s", getUrl(), e.getMessage());
+            log(Level.ERROR, e, "Unable to read url %s because %s", getUrl(), e.getMessage());
         }
         return vars;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.aol.jrds.HttpProbe#parseLines(java.util.List)
      */
     protected Map<String, Number> parseLines(List<String> lines) {
@@ -77,7 +82,7 @@ public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
         }
         Number uptimeNumber = retValue.remove("Uptime");
         if(uptimeNumber != null) {
-            setUptime(uptimeNumber.longValue());            
+            setUptime(uptimeNumber.longValue());
         }
         return retValue;
     }

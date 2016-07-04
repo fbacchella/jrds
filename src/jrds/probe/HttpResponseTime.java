@@ -7,16 +7,15 @@ import jrds.factories.ProbeBean;
 /**
  * @author Fabrice Bacchella
  */
-@ProbeBean({"url"})
+@ProbeBean({ "url" })
 public final class HttpResponseTime extends ExternalCmdProbe implements UrlProbe {
-	private URL url;
+    private URL url;
 
-	public void configure(URL url)
-    {
+    public void configure(URL url) {
         this.url = url;
     }
 
-	/**
+    /**
      * @return the url
      */
     public URL getUrl() {
@@ -30,17 +29,21 @@ public final class HttpResponseTime extends ExternalCmdProbe implements UrlProbe
         this.url = url;
     }
 
-    /* (non-Javadoc)
-	 * @see jrds.probe.UrlProbe#getUrlAsString()
-	 */
-	public String getUrlAsString() {
-		return getUrl().toString();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see jrds.probe.UrlProbe#getUrlAsString()
+     */
+    public String getUrlAsString() {
+        return getUrl().toString();
+    }
 
-	/* (non-Javadoc)
-	 * @see jrds.probe.UrlProbe#getPort()
-	 */
-	public Integer getPort() {
-		return getUrl().getPort();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see jrds.probe.UrlProbe#getPort()
+     */
+    public Integer getPort() {
+        return getUrl().getPort();
+    }
 }

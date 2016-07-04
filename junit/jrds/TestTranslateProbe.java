@@ -16,7 +16,7 @@ public class TestTranslateProbe {
     static ProbeDesc pd;
 
     @BeforeClass
-    static public void configure() throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, Exception  {
+    static public void configure() throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, Exception {
         Tools.configure();
         Tools.prepareXml();
         Tools.setLevel(logger, Level.ERROR, "jrds.Probe");
@@ -31,16 +31,15 @@ public class TestTranslateProbe {
         p.setPd(pd);
 
         Map<String, String> nameMap = p.getCollectMapping();
-        Map<String, Number>filteredSamples = new HashMap<String, Number>();
+        Map<String, Number> filteredSamples = new HashMap<String, Number>();
         Map<String, Number> resultSample = new HashMap<String, Number>();
 
         for(Map.Entry<String, Number> e: filteredSamples.entrySet()) {
             String dsName = nameMap.get(e.getKey());
             double value = e.getValue().doubleValue();
-            if (dsName != null) {
+            if(dsName != null) {
                 resultSample.put(dsName, value);
-            }
-            else {
+            } else {
                 logger.debug("Dropped entry: " + e.getKey());
             }
         }

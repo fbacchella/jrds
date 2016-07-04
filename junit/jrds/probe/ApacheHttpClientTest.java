@@ -46,13 +46,11 @@ public class ApacheHttpClientTest {
     private volatile boolean shouldFail = true;
     private final ResourceHandler staticFiles = new ResourceHandler() {
         @Override
-        public void handle(String target, Request baseRequest,
-                HttpServletRequest request, HttpServletResponse response)
-                        throws IOException, ServletException {
+        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
             if(ApacheHttpClientTest.this.shouldFail) {
-                response.setStatus(404);                    
+                response.setStatus(404);
             } else {
-                response.setStatus(200);                    
+                response.setStatus(200);
             }
             response.getOutputStream().println("an empty line");
             response.flushBuffer();
@@ -88,7 +86,7 @@ public class ApacheHttpClientTest {
         StoreOpener.prepare("FILE");
     }
 
-    private  HostStarter addConnection(Starter cnx) throws IOException {
+    private HostStarter addConnection(Starter cnx) throws IOException {
         PropertiesManager pm = Tools.makePm(testFolder, "timeout=1", "collectorThreads=1");
 
         HostStarter localhost = new HostStarter(new HostInfo("localhost"));
@@ -114,7 +112,7 @@ public class ApacheHttpClientTest {
         localhost.find(Resolver.class).doStart();
         logger.debug("resolver started for localhost:" + localhost.find(Resolver.class).isStarted());
         cnx.doStart();
-        Assert.assertTrue("Apache HttpClient failed to start" , cnx.isStarted());
+        Assert.assertTrue("Apache HttpClient failed to start", cnx.isStarted());
         cnx.stop();
         server.stop();
     }

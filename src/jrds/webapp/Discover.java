@@ -42,22 +42,24 @@ public class Discover extends JrdsServlet {
         public final String name;
         public final Map<String, String> specifics = new HashMap<String, String>();
         public final boolean isIndexed;
+
         ProbeDescSummary(JrdsDocument probdesc, ClassLoader cl) throws ClassNotFoundException {
             JrdsElement root = probdesc.getRootElement();
             JrdsElement buffer = root.getElementbyName("probeClass");
             String probeClass = buffer == null ? null : buffer.getTextContent().trim();
             clazz = cl.loadClass(probeClass);
             isIndexed = IndexedProbe.class.isAssignableFrom(clazz);
-            buffer =  probdesc.getRootElement().getElementbyName("name");
+            buffer = probdesc.getRootElement().getElementbyName("name");
             name = buffer == null ? null : buffer.getTextContent();
-            for(JrdsElement specificElement: root.getChildElementsByName("specific") ) {
+            for(JrdsElement specificElement: root.getChildElementsByName("specific")) {
                 specifics.put(specificElement.getAttribute("name"), specificElement.getTextContent().trim());
-            }            
+            }
         }
     }
 
     /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+     *      response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
 
@@ -67,7 +69,7 @@ public class Discover extends JrdsServlet {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "hostname to scan not provided");
             } catch (IOException e) {
             }
-            return;               
+            return;
         }
         hostname = hostname.trim();
 
@@ -122,11 +124,12 @@ public class Discover extends JrdsServlet {
                     da.discoverPre(hostname, hostEleme, probdescs, request);
                     for(String probeDescName: probeDescsName) {
                         JrdsDocument probeDescDocument = probdescs.get(probeDescName);
-                        //for(JrdsDocument probeDescDocument: probdescs.values()) {
+                        // for(JrdsDocument probeDescDocument:
+                        // probdescs.values()) {
                         try {
                             ProbeDescSummary summary = new ProbeDescSummary(probeDescDocument, getPropertiesManager().extensionClassLoader);
 
-                            //Don't discover if asked to don't do
+                            // Don't discover if asked to don't do
                             if(summary.specifics.get("nodiscover") != null)
                                 continue;
 
@@ -134,7 +137,7 @@ public class Discover extends JrdsServlet {
                             for(Class<?> c: da.validClasses) {
                                 valid |= c.isAssignableFrom(summary.clazz);
                             }
-                            if (valid && da.isGoodProbeDesc(summary)) {
+                            if(valid && da.isGoodProbeDesc(summary)) {
                                 da.addProbe(hostEleme, summary, request);
                             }
                         } catch (Exception e) {

@@ -49,8 +49,7 @@ public class IpmiDiscoverAgent extends DiscoverAgent {
     }
 
     @Override
-    public void addProbe(JrdsElement hostElement, ProbeDescSummary summary,
-            HttpServletRequest request) {
+    public void addProbe(JrdsElement hostElement, ProbeDescSummary summary, HttpServletRequest request) {
         String sensorTypeSpecific = summary.specifics.get("SensorType");
         if(sensorTypeSpecific == null || sensorTypeSpecific.trim().isEmpty()) {
             return;
@@ -97,13 +96,12 @@ public class IpmiDiscoverAgent extends DiscoverAgent {
 
     @Override
     public boolean exist(String hostname, HttpServletRequest request) {
-        makeHandle(hostname, request);      
+        makeHandle(hostname, request);
         return jrdsHandle != null;
     }
 
     @Override
-    public void addConnection(JrdsElement hostElement,
-            HttpServletRequest request) {
+    public void addConnection(JrdsElement hostElement, HttpServletRequest request) {
         String bmcname = request.getParameter("discoverIpmiBmcName");
         String user = request.getParameter("discoverIpmiUsername");
         String password = request.getParameter("discoverIpmiPassword");
@@ -120,8 +118,7 @@ public class IpmiDiscoverAgent extends DiscoverAgent {
     }
 
     @Override
-    public void discoverPre(String hostname, JrdsElement hostEleme,
-            Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
+    public void discoverPre(String hostname, JrdsElement hostEleme, Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
         super.discoverPre(hostname, hostEleme, probdescs, request);
 
         // Id 0 indicates first record in SDR. Next IDs can be retrieved from
@@ -145,7 +142,7 @@ public class IpmiDiscoverAgent extends DiscoverAgent {
                 // repository (see #getSensorData for details).
                 record = jrdsHandle.getSensorData(reservationId, nextRecId);
                 String name;
-                switch (record.getClass().getName()){
+                switch (record.getClass().getName()) {
                 case "com.veraxsystems.vxipmi.coding.commands.sdr.record.ManagementControllerDeviceLocatorRecord":
                     name = ((com.veraxsystems.vxipmi.coding.commands.sdr.record.ManagementControllerDeviceLocatorRecord) record).getName();
                     break;
@@ -163,18 +160,19 @@ public class IpmiDiscoverAgent extends DiscoverAgent {
                     int recordReadingId = TypeConverter.byteToInt(fsr.getSensorNumber());
                     GetSensorReadingResponseData data2 = jrdsHandle.getSensorReading(recordReadingId);
                     if(data2.isSensorStateValid()) {
-                        sdr.add(fsr);                            
+                        sdr.add(fsr);
                     }
                     break;
                 case "com.veraxsystems.vxipmi.coding.commands.sdr.record.OemRecord":
                     name = "";
-                    //log(Level.DEBUG, "%s", new String(((com.veraxsystems.vxipmi.coding.commands.sdr.record.OemRecord)record).getOemData()));
+                    // log(Level.DEBUG, "%s", new
+                    // String(((com.veraxsystems.vxipmi.coding.commands.sdr.record.OemRecord)record).getOemData()));
                     break;
                 case "com.veraxsystems.vxipmi.coding.commands.sdr.record.FruDeviceLocatorRecord":
                     name = ((com.veraxsystems.vxipmi.coding.commands.sdr.record.FruDeviceLocatorRecord) record).getName();
                     break;
                 default:
-                    name="";
+                    name = "";
                 }
                 log(Level.TRACE, "%s: %d %s", record, record.getId(), name);
             } catch (IPMIException e) {
@@ -182,20 +180,21 @@ public class IpmiDiscoverAgent extends DiscoverAgent {
                     lastReservationId = reservationId;
                     // If the cause of the failure was canceling of the
                     // reservation, we get new reservationId and retry. This can
-                    // happen many times during getting all sensors, since BMC can't
-                    // manage parallel sessions and invalidates old one if new one
+                    // happen many times during getting all sensors, since BMC
+                    // can't
+                    // manage parallel sessions and invalidates old one if new
+                    // one
                     // appears.
                     try {
-                        reservationId = ((ReserveSdrRepositoryResponseData) jrdsHandle
-                                .sendMessage(new ReserveSdrRepository(IpmiVersion.V20, jrdsHandle.getCipherSuite(),
-                                        AuthenticationType.RMCPPlus))).getReservationId();
+                        reservationId = ((ReserveSdrRepositoryResponseData) jrdsHandle.sendMessage(new ReserveSdrRepository(IpmiVersion.V20, jrdsHandle.getCipherSuite(), AuthenticationType.RMCPPlus))).getReservationId();
                     } catch (Exception e1) {
                         log(Level.ERROR, e, "general failure: %s", e.getMessage());
                         break;
-                    }               
-                    // If getting sensor data failed, we check if it already failed
+                    }
+                    // If getting sensor data failed, we check if it already
+                    // failed
                     // with this reservation ID.
-                    if (lastReservationId == reservationId) {
+                    if(lastReservationId == reservationId) {
                         log(Level.ERROR, "%s", e.getMessage());
                         break;
                     }
@@ -222,11 +221,11 @@ public class IpmiDiscoverAgent extends DiscoverAgent {
             CipherSuite cs;
             // Get cipher suites supported by the remote host
             List<CipherSuite> suites = connector.getAllCipherSuites(handle);
-            if (suites.size() > 3) {
+            if(suites.size() > 3) {
                 cs = suites.get(3);
-            } else if (suites.size() > 2) {
+            } else if(suites.size() > 2) {
                 cs = suites.get(2);
-            } else if (suites.size() > 1) {
+            } else if(suites.size() > 1) {
                 cs = suites.get(1);
             } else {
                 cs = suites.get(0);
@@ -252,12 +251,11 @@ public class IpmiDiscoverAgent extends DiscoverAgent {
             jrdsHandle = null;
         } catch (Exception e) {
             jrdsHandle = null;
-        }       
+        }
     }
 
     @Override
-    public void discoverPost(String hostname, JrdsElement hostEleme,
-            Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
+    public void discoverPost(String hostname, JrdsElement hostEleme, Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
         super.discoverPost(hostname, hostEleme, probdescs, request);
         jrdsHandle.connector.tearDown();
     }

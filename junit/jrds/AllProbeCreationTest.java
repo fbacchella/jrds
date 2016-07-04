@@ -57,11 +57,11 @@ public class AllProbeCreationTest {
         HostStarter hs = new HostStarter(host);
         for(ProbeDesc pd: probeDescMap.values()) {
             logger.trace("Will create probedesc " + pd.getName());
-            Probe<?,?> p = pf.makeProbe(pd.getName());
+            Probe<?, ?> p = pf.makeProbe(pd.getName());
             p.setHost(hs);
             for(GenericBean bean: pd.getBeans()) {
                 try {
-                    if( "index".equals(bean.getName())) {
+                    if("index".equals(bean.getName())) {
                         bean.set(p, "index");
                     }
                 } catch (IllegalArgumentException e) {

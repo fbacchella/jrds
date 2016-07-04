@@ -39,16 +39,14 @@ public class TestTree {
         tester.start();
     }
 
-
     @Test
-    public void testDiscover() throws Exception
-    {
+    public void testDiscover() throws Exception {
         Response response = ToolsWebApp.doRequestGet(tester, "http://localhost/jsontree?tab=hoststab", 200);
 
         logger.trace(response.getContent());
         JSONObject qp = new JSONObject(response.getContent());
-        for(String key: new String[] {"identifier", "label", "items"}) {
-            Assert.assertTrue(key + " not found", qp.has(key)); 
+        for(String key: new String[] { "identifier", "label", "items" }) {
+            Assert.assertTrue(key + " not found", qp.has(key));
         }
     }
 

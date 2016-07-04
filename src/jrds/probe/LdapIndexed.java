@@ -2,20 +2,20 @@ package jrds.probe;
 
 import jrds.factories.ProbeBean;
 
-
-@ProbeBean({"index"})
+@ProbeBean({ "index" })
 public class LdapIndexed extends Ldap implements IndexedProbe {
-	private String index;
-	
-	public boolean configure(String index) {
-		this.index = index;
-		return true;
-	}
-	public String getIndexName() {
-		return index;
-	}
+    private String index;
 
-	/**
+    public boolean configure(String index) {
+        this.index = index;
+        return true;
+    }
+
+    public String getIndexName() {
+        return index;
+    }
+
+    /**
      * @return the index
      */
     public String getIndex() {

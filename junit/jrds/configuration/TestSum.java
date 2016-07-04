@@ -42,7 +42,7 @@ public class TestSum {
         Tools.configure();
         Tools.prepareXml(false);
 
-        Tools.setLevel(logger, Level.TRACE, "jrds.factories", "jrds.probe.SumProbe","jrds.graphe.Sum");
+        Tools.setLevel(logger, Level.TRACE, "jrds.factories", "jrds.probe.SumProbe", "jrds.graphe.Sum");
         Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
     }
 
@@ -76,7 +76,7 @@ public class TestSum {
         JrdsElement je = d.getRootElement();
         je.addElement("element", "name=DummyHost/DummyProbe");
 
-        HostsList hl = new HostsList();		
+        HostsList hl = new HostsList();
         Sum s = doSum(d, hl);
         Document sumDocument = s.getGraphDesc().dumpAsXml();
         jrds.Util.serialize(sumDocument, System.out, null, null);

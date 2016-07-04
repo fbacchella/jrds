@@ -19,8 +19,9 @@ import org.junit.Test;
 
 public class TestArgFactory {
     static final private Logger logger = Logger.getLogger(ArgFactory.class);
-    
+
     static final private Class<?> OIDCLASS;
+
     static {
         try {
             OIDCLASS = Class.forName("org.snmp4j.smi.OID");
@@ -52,6 +53,7 @@ public class TestArgFactory {
         Assert.assertEquals("Wrong value", new Integer(1), l.get(0));
         Assert.assertEquals("Wrong value", "1", l.get(1));
     }
+
     @Test
     public void testArgsRecurse() throws Exception {
         JrdsDocument d = Tools.parseString("<body><list><arg type=\"Integer\">1</arg><arg type=\"String\">1</arg></list><arg type=\"Integer\">1</arg></body>");
@@ -65,24 +67,24 @@ public class TestArgFactory {
     public void testResolve() {
         Class<?> c = ArgFactory.resolvClass("Integer");
         Assert.assertEquals("can't resolve type Integer", c, Integer.class);
-        
+
         c = ArgFactory.resolvClass("int");
         Assert.assertEquals("can't resolve type File", c, Integer.TYPE);
-        
+
         c = ArgFactory.resolvClass("URL");
         Assert.assertEquals("can't resolve type URL", c, URL.class);
-        
+
         c = ArgFactory.resolvClass("File");
         Assert.assertEquals("can't resolve type File", c, File.class);
-        
+
         c = ArgFactory.resolvClass("OID");
         Assert.assertEquals("can't resolve type File", c, OIDCLASS);
     }
-    
+
     @Test
     public void testConstruct() throws InvocationTargetException {
         Object o;
-        
+
         o = ArgFactory.ConstructFromString(Integer.class, "1");
         Assert.assertEquals("can't build type Integer", o.getClass(), Integer.class);
 

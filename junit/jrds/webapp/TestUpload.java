@@ -49,7 +49,7 @@ public class TestUpload {
 
         byte[] buffer = new byte[8192];
         int len;
-        while ((len = is.read(buffer)) > -1 ) {
+        while ((len = is.read(buffer)) > -1) {
             baos.write(buffer, 0, len);
         }
         baos.flush();
@@ -68,7 +68,7 @@ public class TestUpload {
             }
         }, 200);
         Assert.assertEquals(200, response.getStatus());
-        String content =  response.getContent();
+        String content = response.getContent();
         logger.debug("got " + content);
         JSONObject jobject = new JSONObject("{ \"vector\": " + content.substring(content.indexOf('['), content.lastIndexOf(']') + 1) + "}");
         Assert.assertEquals(1, jobject.getJSONArray("vector").length());
@@ -83,7 +83,7 @@ public class TestUpload {
 
         byte[] buffer = new byte[8192];
         int len;
-        while ((len = is.read(buffer)) > -1 ) {
+        while ((len = is.read(buffer)) > -1) {
             baos.write(buffer, 0, len);
         }
         baos.flush();
@@ -102,7 +102,7 @@ public class TestUpload {
             }
         }, 200);
         Assert.assertEquals(200, response.getStatus());
-        String content =  response.getContent();
+        String content = response.getContent();
         logger.debug("got " + content);
         JSONObject jobject = new JSONObject("{ \"vector\": " + content.substring(content.indexOf('['), content.lastIndexOf(']') + 1) + "}");
         Assert.assertEquals(1, jobject.getJSONArray("vector").length());
@@ -118,7 +118,7 @@ public class TestUpload {
 
         byte[] buffer = new byte[8192];
         int len;
-        while ((len = is.read(buffer)) > -1 ) {
+        while ((len = is.read(buffer)) > -1) {
             baos.write(buffer, 0, len);
         }
         baos.flush();
@@ -136,7 +136,7 @@ public class TestUpload {
                 }
             }
         }, 200);
-        String content =  response.getContent();
+        String content = response.getContent();
         JSONObject jobject = new JSONObject("{ \"vector\": " + content.substring(content.indexOf('['), content.lastIndexOf(']') + 1) + "}");
         Assert.assertEquals(1, jobject.getJSONArray("vector").length());
         Assert.assertEquals(Boolean.TRUE, jobject.getJSONArray("vector").getJSONObject(0).get("parsed"));

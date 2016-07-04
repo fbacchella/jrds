@@ -20,7 +20,7 @@ import org.rrd4j.core.jrrd.RRDatabase;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.graph.RrdGraphDef;
 
-@ProbeBean({"rrdfile"})
+@ProbeBean({ "rrdfile" })
 public class RRDToolStore extends AbstractStore<RRDatabase> {
 
     public RRDToolStore(Probe<?, ?> p) {
@@ -46,7 +46,9 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
         return rrdpath.getPath();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#checkStoreFile()
      */
     @Override
@@ -54,7 +56,9 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
         return rrdpath.canRead();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#getLastUpdate()
      */
     @Override
@@ -78,7 +82,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
         try {
             db = new RRDatabase(rrdpath);
             Map<String, Number> values = new HashMap<String, Number>(db.getDataSourcesName().size());
-            for(int i = db.getDataSourcesName().size() - 1; i>=0; i--) {
+            for(int i = db.getDataSourcesName().size() - 1; i >= 0; i--) {
                 DataSource source = db.getDataSource(i);
                 values.put(source.getName(), source.getPDPStatusBlock().getValue());
             }
@@ -145,7 +149,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
                 try {
                     db.close();
                 } catch (IOException e) {
-                    log(Level.ERROR," failed to close %s: s%", db, e);
+                    log(Level.ERROR, " failed to close %s: s%", db, e);
                 }
             }
 
@@ -163,7 +167,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
     }
 
     @Override
-    public void closeStoreObject(Object  object) {
+    public void closeStoreObject(Object object) {
         try {
             ((RRDatabase) object).close();
         } catch (IOException e) {

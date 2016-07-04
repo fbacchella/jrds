@@ -22,16 +22,16 @@ import jrds.probe.UrlProbe;
 
 import org.apache.log4j.Level;
 
-@ProbeBean({"port", "user", "password"})
+@ProbeBean({ "port", "user", "password" })
 public abstract class JdbcProbe extends Probe<String, Number> implements UrlProbe, IndexedProbe {
 
     static final void registerDriver(String JdbcDriver) {
         try {
-            Driver jdbcDriver = (Driver) Class.forName (JdbcDriver).newInstance();
+            Driver jdbcDriver = (Driver) Class.forName(JdbcDriver).newInstance();
             DriverManager.registerDriver(jdbcDriver);
         } catch (Exception e) {
             throw new RuntimeException("Can't register JDBC driver " + JdbcDriver, e);
-        }	
+        }
     }
 
     static final void registerDriver(Class<?> JdbcDriver) {
@@ -40,7 +40,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
             DriverManager.registerDriver(jdbcDriver);
         } catch (Exception e) {
             throw new RuntimeException("Can't register JDBC driver " + JdbcDriver, e);
-        }	
+        }
     }
 
     private int port;
@@ -57,7 +57,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
     }
 
     public void configure() {
-        registerStarter(starter);        
+        registerStarter(starter);
     }
 
     public void configure(int port, String user, String passwd) {
@@ -88,7 +88,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
         Map<String, Number> retValue = new HashMap<String, Number>(getPd().getSize());
 
         for(String query: getQueries()) {
-            log(Level.DEBUG, "Getting %s", query); 
+            log(Level.DEBUG, "Getting %s", query);
             retValue.putAll(select2Map(query));
         }
         return retValue;
@@ -101,9 +101,9 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
         ResultSetMetaData rsmd = rs.getMetaData();
         int colCount = rsmd.getColumnCount();
         log(Level.DEBUG, "Columns: %d", colCount);
-        while(rs.next())  {
+        while (rs.next()) {
             Map<String, Object> row = new HashMap<String, Object>(colCount);
-            String key =  rs.getObject(1).toString();
+            String key = rs.getObject(1).toString();
             Object oValue = rs.getObject(2).toString();
             row.put(key, oValue);
             values.add(row);
@@ -116,9 +116,9 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
         ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
         ResultSetMetaData rsmd = rs.getMetaData();
         int colCount = rsmd.getColumnCount();
-        while(rs.next()) {
+        while (rs.next()) {
             Map<String, Object> row = new HashMap<String, Object>(colCount);
-            for (int i = 1; i <= colCount; i++) {
+            for(int i = 1; i <= colCount; i++) {
                 String key = rsmd.getColumnLabel(i);
                 Object oValue = rs.getObject(i);
                 if(numFilter && !(oValue instanceof Number)) {
@@ -135,22 +135,21 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
     public abstract Map<String, Number> parseRs(ResultSet rs) throws SQLException;
 
     /**
-     * Parse all the collumns of a query and return a List of Map
-     * where the column name is the key
+     * Parse all the collumns of a query and return a List of Map where the
+     * column name is the key
+     * 
      * @param query
-     * @return a List of Map of values 
+     * @return a List of Map of values
      */
-    public Map<String, Number> select2Map(String query)
-    {
+    public Map<String, Number> select2Map(String query) {
         Map<String, Number> values = new HashMap<String, Number>();
         try {
             Statement stmt = starter.getStatment();
             if(stmt.execute(query)) {
                 do {
                     values = parseRs(stmt.getResultSet());
-                } while(stmt.getMoreResults());
-            }
-            else {
+                } while (stmt.getMoreResults());
+            } else {
                 log(Level.WARN, "Not a select query");
             }
             stmt.close();
@@ -160,17 +159,16 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
         return values;
     }
 
-    public Map<String, Object> select2Map(String query, String keyCol, String valCol)
-    {
+    public Map<String, Object> select2Map(String query, String keyCol, String valCol) {
         Map<String, Object> values = new HashMap<String, Object>();
-        log(Level.DEBUG, "Getting %s", query); 
+        log(Level.DEBUG, "Getting %s", query);
         Statement stmt;
         try {
             stmt = starter.getStatment();
             if(stmt.execute(query)) {
                 do {
                     ResultSet rs = stmt.getResultSet();
-                    while(rs.next()) {
+                    while (rs.next()) {
                         String key = rs.getString(keyCol);
                         Number value;
                         Object oValue = rs.getObject(valCol);
@@ -181,7 +179,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 
                         values.put(key, value);
                     }
-                } while(stmt.getMoreResults());
+                } while (stmt.getMoreResults());
             }
             stmt.close();
         } catch (SQLException e) {
@@ -196,6 +194,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
     public Integer getPort() {
         return port;
     }
+
     /**
      * @param port The port to set.
      */
@@ -209,6 +208,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
     public String getUser() {
         return starter.getUser();
     }
+
     /**
      * @param user The user to set.
      */
@@ -222,6 +222,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
     public String getPassword() {
         return starter.getPasswd();
     }
+
     /**
      * @param password The user to set.
      */
@@ -266,10 +267,12 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
         return starter.getDbName();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.probe.UrlProbe#getUrl()
      */
-    public URL getUrl(){
+    public URL getUrl() {
         URL newurl = null;
         try {
             newurl = new URL(getUrlAsString());

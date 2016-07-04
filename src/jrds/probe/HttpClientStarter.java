@@ -38,20 +38,22 @@ public class HttpClientStarter extends Starter {
     private int maxConnect = 0;
     private int timeout = 0;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.starter.Starter#configure(jrds.PropertiesManager)
      */
     @Override
     public void configure(PropertiesManager pm) {
         super.configure(pm);
         maxConnect = pm.numCollectors;
-        timeout  = pm.timeout;
+        timeout = pm.timeout;
     }
 
     @Override
     public boolean start() {
 
-        RegistryBuilder<ConnectionSocketFactory> r = RegistryBuilder.<ConnectionSocketFactory>create();
+        RegistryBuilder<ConnectionSocketFactory> r = RegistryBuilder.<ConnectionSocketFactory> create();
 
         // Register http and his plain socket factory
         final SocketFactory ss = getLevel().find(SocketFactory.class);
@@ -69,8 +71,8 @@ public class HttpClientStarter extends Starter {
         HttpClientBuilder builder = HttpClientBuilder.create();
         builder.setUserAgent(USERAGENT);
         builder.setConnectionTimeToLive(timeout, TimeUnit.SECONDS);
-        builder.evictIdleConnections((long)timeout, TimeUnit.SECONDS);
-        
+        builder.evictIdleConnections((long) timeout, TimeUnit.SECONDS);
+
         PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(r.build());
         cm.setMaxTotal(maxConnect * 2);
         cm.setDefaultMaxPerRoute(2);
@@ -93,16 +95,13 @@ public class HttpClientStarter extends Starter {
         SSLStarter sslstarter = getLevel().find(SSLStarter.class);
         SSLContext sc = sslstarter.getContext();
         try {
-            sc = SSLContexts.custom()
-                    .loadTrustMaterial(new TrustStrategy() {
-                        @Override
-                        public boolean isTrusted(X509Certificate[] chain,
-                                String authType) throws CertificateException {
-                            log(Level.TRACE, "trying to check certificates chain %s with authentication method %s", chain, authType);
-                            return true;
-                        }
-                    })
-                    .build();
+            sc = SSLContexts.custom().loadTrustMaterial(new TrustStrategy() {
+                @Override
+                public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                    log(Level.TRACE, "trying to check certificates chain %s with authentication method %s", chain, authType);
+                    return true;
+                }
+            }).build();
         } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
             throw new RuntimeException("failed to set a SSL context", e);
         }

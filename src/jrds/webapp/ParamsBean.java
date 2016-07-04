@@ -51,13 +51,12 @@ public class ParamsBean implements Serializable {
 
     static final private Logger logger = Logger.getLogger(ParamsBean.class);
 
-    static public final String TREECHOICE = "tree";    
+    static public final String TREECHOICE = "tree";
     static public final String TABCHOICE = "tab";
     static public final String FILTERCHOICE = "filter";
     static public final String HOSTCHOICE = "host";
 
-    private static final ThreadLocal<DateFormat> df = 
-            new ThreadLocal<DateFormat> () {
+    private static final ThreadLocal<DateFormat> df = new ThreadLocal<DateFormat>() {
         @Override
         protected DateFormat initialValue() {
             return new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -65,8 +64,10 @@ public class ParamsBean implements Serializable {
     };
 
     static private final Pattern rangePattern = Pattern.compile("(-?\\d+(.\\d+)?)([a-zA-Z]{0,2})");
-    //static private final Pattern splitPattern = Pattern.compile("/((.+)(/[^/].*+)/?)|/(.*)");
-    //static private final Pattern splitPattern = Pattern.compile("/([^/]*)(?=/[^/])");
+    // static private final Pattern splitPattern =
+    // Pattern.compile("/((.+)(/[^/].*+)/?)|/(.*)");
+    // static private final Pattern splitPattern =
+    // Pattern.compile("/([^/]*)(?=/[^/])");
     static private final Pattern splitPattern = Pattern.compile("/([^/].*[^/]|[^/])/([^/].*[^/]|[^/])/([^/].*[^/]|[^/])");
 
     String contextPath = "";
@@ -83,31 +84,31 @@ public class ParamsBean implements Serializable {
     private HostsList hostlist;
     String user = null;
     Set<String> roles = Collections.emptySet();
-    private Map<String, String[]> params  = Collections.emptyMap();
+    private Map<String, String[]> params = Collections.emptyMap();
     private GraphTree tree = null;
     private Tab tab = null;
     private String choiceType = null;
     private String choiceValue = null;
 
-    public ParamsBean(){
+    public ParamsBean() {
 
     }
 
     public ParamsBean(HttpServletRequest req, HostsList hl) {
         contextPath = req.getContextPath();
-        params =  getReqParamsMap(req);
+        params = getReqParamsMap(req);
         readAuthorization(req, hl);
         parseReq(hl);
     }
 
-    public ParamsBean(HttpServletRequest req, HostsList hl, String... restPath ) {
+    public ParamsBean(HttpServletRequest req, HostsList hl, String... restPath) {
         contextPath = req.getContextPath();
         String probeInfo = req.getPathInfo();
-        if (probeInfo != null) {
+        if(probeInfo != null) {
             Matcher m = splitPattern.matcher(probeInfo.trim());
-            while(m.find()) {
+            while (m.find()) {
                 StringBuilder sb = new StringBuilder();
-                for(int i=0 ; i <= m.groupCount(); i++) {
+                for(int i = 0; i <= m.groupCount(); i++) {
                     sb.append(m.group(i));
                     sb.append(" ");
                 }
@@ -121,16 +122,15 @@ public class ParamsBean implements Serializable {
             params = new HashMap<String, String[]>(restPath.length);
             String[] path = probeInfo.trim().split("/");
             logger.trace(jrds.Util.delayedFormatString("mapping %s to %s", Arrays.asList(path), Arrays.asList(restPath)));
-            int elem = Math.min(path.length -1 , restPath.length);
-            for(int i=0; i < elem; i++) {
+            int elem = Math.min(path.length - 1, restPath.length);
+            for(int i = 0; i < elem; i++) {
                 String value = path[i + 1];
                 String key = restPath[i].toLowerCase();
-                params.put(key, new String[] {value});
+                params.put(key, new String[] { value });
             }
             params.putAll(getReqParamsMap(req));
-        }
-        else {
-            params =  getReqParamsMap(req);
+        } else {
+            params = getReqParamsMap(req);
         }
         if(logger.isTraceEnabled()) {
             logger.trace("params map:");
@@ -145,7 +145,7 @@ public class ParamsBean implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    //Not a really useful method, just to reduce warning
+    // Not a really useful method, just to reduce warning
     private Map<String, String[]> getReqParamsMap(HttpServletRequest req) {
         logger.trace(jrds.Util.delayedFormatString("Parameter map for %s: %s", req, req.getParameterMap()));
         return new HashMap<String, String[]>(req.getParameterMap());
@@ -160,6 +160,7 @@ public class ParamsBean implements Serializable {
 
     /**
      * Set the authentication context, without touching the requests parameters
+     * 
      * @param req
      * @param hl
      */
@@ -172,22 +173,22 @@ public class ParamsBean implements Serializable {
                     roles.add(role);
             }
         }
-        logger.trace(Util.delayedFormatString("Found user %s with roles %s", user, roles));		
+        logger.trace(Util.delayedFormatString("Found user %s with roles %s", user, roles));
     }
 
     private void unpack(String packed) {
         String formatedpack;
-        formatedpack = JSonPack.GZIPHEADER +  packed.replace('!', '=').replace('$', '/').replace('*', '+');
+        formatedpack = JSonPack.GZIPHEADER + packed.replace('!', '=').replace('$', '/').replace('*', '+');
         logger.trace(formatedpack);
         ByteArrayOutputStream outbuffer = new ByteArrayOutputStream(formatedpack.length());
-        try {            
-            InputStream inbuffer = new Base64.InputStream( new ByteArrayInputStream(formatedpack.getBytes()), Base64.DECODE );
+        try {
+            InputStream inbuffer = new Base64.InputStream(new ByteArrayInputStream(formatedpack.getBytes()), Base64.DECODE);
 
             byte[] copybuffer = new byte[1500];
             GZIPInputStream os = new GZIPInputStream(inbuffer);
             int realread = os.read(copybuffer);
-            while(realread > 0) {
-                outbuffer.write(copybuffer, 0, realread );
+            while (realread > 0) {
+                outbuffer.write(copybuffer, 0, realread);
                 realread = os.read(copybuffer);
             }
             os.close();
@@ -196,7 +197,7 @@ public class ParamsBean implements Serializable {
             for(String key: json) {
                 Object value = json.get(key);
                 String newkey = JSonPack.JSONKEYS.get(new Integer(key));
-                params.put(newkey, new String[] {value.toString()});
+                params.put(newkey, new String[] { value.toString() });
                 logger.trace(jrds.Util.delayedFormatString("adding %s = %s", newkey, value));
             }
         } catch (IOException e) {
@@ -208,10 +209,10 @@ public class ParamsBean implements Serializable {
     }
 
     private void parseReq(HostsList hl) {
-        hostlist =	hl;
+        hostlist = hl;
 
         String packed = getValue("p");
-        if(packed != null && ! "".equals(packed))
+        if(packed != null && !"".equals(packed))
             unpack(packed);
 
         period = makePeriod();
@@ -220,22 +221,22 @@ public class ParamsBean implements Serializable {
         String probe = getValue("probe");
 
         gid = jrds.Util.parseStringNumber(getValue("gid"), 0);
-        //Many way to discover id (graph node id)
+        // Many way to discover id (graph node id)
         String idStr = getValue("id");
-        String graph =  getValue("graphname");
-        if(idStr != null && ! "".equals(idStr))
+        String graph = getValue("graphname");
+        if(idStr != null && !"".equals(idStr))
             id = Util.parseStringNumber(idStr, 0);
-        else if(host != null && ! "".equals(host) && graph != null && ! "".equals(graph)) {
+        else if(host != null && !"".equals(host) && graph != null && !"".equals(graph)) {
             id = (host + "/" + graph).hashCode();
         }
 
         String pidStr = getValue("pid");
         if(pidStr != null)
             pid = jrds.Util.parseStringNumber(pidStr, 0);
-        else if(host != null && ! "".equals(host) && probe != null && ! "".equals(probe) )
+        else if(host != null && !"".equals(host) && probe != null && !"".equals(probe))
             pid = (host + "/" + probe).hashCode();
 
-        dsName =  getValue("dsName");
+        dsName = getValue("dsName");
         if("".equals(dsName))
             dsName = null;
 
@@ -246,11 +247,11 @@ public class ParamsBean implements Serializable {
         if("1".equals(historyArg))
             history = true;
 
-        //max and min should only go together
-        //it's up to the gui (aka js code) to manage default value
+        // max and min should only go together
+        // it's up to the gui (aka js code) to manage default value
         String minStr = getValue("min");
         String maxStr = getValue("max");
-        if(minStr != null && maxStr != null && ! "".equals(minStr) && ! "".equals(maxStr)) {
+        if(minStr != null && maxStr != null && !"".equals(minStr) && !"".equals(maxStr)) {
             maxArg = maxStr;
             minArg = minStr;
         }
@@ -258,28 +259,25 @@ public class ParamsBean implements Serializable {
         String paramHostFilter = getValue("host");
         String treeName = getValue("tree");
         String tabName = getValue("tab");
-        if(paramFilterName != null && ! "".equals(paramFilterName)) {
+        if(paramFilterName != null && !"".equals(paramFilterName)) {
             filter = hostlist.getFilter(paramFilterName);
             choiceType = FILTERCHOICE;
             choiceValue = paramFilterName;
-        }
-        else if(paramHostFilter != null && ! "".equals(paramHostFilter)) {
+        } else if(paramHostFilter != null && !"".equals(paramHostFilter)) {
             tree = hl.getGraphTreeByHost().getByPath(GraphTree.HOSTROOT, paramHostFilter);
             choiceType = HOSTCHOICE;
             choiceValue = paramHostFilter;
-        }
-        else if(treeName != null && ! "".equals(treeName)) {
+        } else if(treeName != null && !"".equals(treeName)) {
             tree = hl.getGraphTree(treeName);
             choiceType = TREECHOICE;
             choiceValue = treeName;
-        }
-        else if(tabName != null && ! "".equals(tabName)) {
+        } else if(tabName != null && !"".equals(tabName)) {
             tab = hl.getTab(tabName);
             choiceType = TABCHOICE;
             choiceValue = tabName;
         }
 
-        //If previous steps failed
+        // If previous steps failed
         if(choiceType == null || choiceValue == null) {
             tab = hl.getTab(choiceValue);
             choiceValue = hostlist.getFirstTab();
@@ -287,24 +285,23 @@ public class ParamsBean implements Serializable {
         }
     }
 
-    private double parseRangeArg(String rangeArg, Graph g){
+    private double parseRangeArg(String rangeArg, Graph g) {
         if(rangeArg == null)
             return Double.NaN;
-        Matcher  m = rangePattern.matcher(rangeArg);
+        Matcher m = rangePattern.matcher(rangeArg);
         jrds.GraphNode node = g.getNode();
         if(m.matches() && node != null) {
             String valueString = m.group(1);
             Number value = jrds.Util.parseStringNumber(valueString, Double.NaN);
             String suffixString = m.group(3);
-            if(! "".equals(suffixString)) {
+            if(!"".equals(suffixString)) {
                 try {
                     SiPrefix suffix = SiPrefix.valueOf(suffixString);
                     return suffix.evaluate(value.doubleValue(), node.getGraphDesc().isSiUnit());
                 } catch (java.lang.IllegalArgumentException e) {
                     logger.info("Illegal SI suffix " + suffixString);
                 }
-            }
-            else
+            } else
                 return value.doubleValue();
         }
         return Double.NaN;
@@ -318,9 +315,9 @@ public class ParamsBean implements Serializable {
         g.setPeriod(period);
         double max = parseRangeArg(maxArg, g);
         double min = parseRangeArg(minArg, g);
-        if(! Double.isNaN(max))
+        if(!Double.isNaN(max))
             g.setMax(max);
-        if(! Double.isNaN(min))
+        if(!Double.isNaN(min))
             g.setMin(min);
     }
 
@@ -345,9 +342,8 @@ public class ParamsBean implements Serializable {
             gn = hostlist.getGraphById(id);
         if(gn != null) {
             logger.debug(jrds.Util.delayedFormatString("Graph found: %s", gn));
-        }
-        else if(pid != null && pid != 0 && dsName != null) {
-            if(! caller.allowed(this, hostlist.getDefaultRoles()))
+        } else if(pid != null && pid != 0 && dsName != null) {
+            if(!caller.allowed(this, hostlist.getDefaultRoles()))
                 return null;
             Probe<?, ?> p = getProbe();
             if(p == null) {
@@ -373,7 +369,7 @@ public class ParamsBean implements Serializable {
     }
 
     public List<GraphNode> getGraphs(JrdsServlet caller) {
-        //Neither id or pid where specified, nothing can be done
+        // Neither id or pid where specified, nothing can be done
         if(id == null && pid == null)
             return Collections.emptyList();
 
@@ -393,8 +389,8 @@ public class ParamsBean implements Serializable {
         return Collections.emptyList();
     }
 
-    public Probe<?,?> getProbe() {
-        Probe<?,?> p = hostlist.getProbeById(pid);
+    public Probe<?, ?> getProbe() {
+        Probe<?, ?> p = hostlist.getProbeById(pid);
         if(p == null) {
             jrds.GraphNode node = hostlist.getGraphById(pid);
             if(node != null)
@@ -404,27 +400,25 @@ public class ParamsBean implements Serializable {
     }
 
     private void addPeriodArgs(Map<String, Object> args, boolean timeAbsolute) {
-        if(! timeAbsolute && period.getScale() != 0) {
-            args.put("scale",period.getScale());
-        }
-        else {
+        if(!timeAbsolute && period.getScale() != 0) {
+            args.put("scale", period.getScale());
+        } else {
             args.put("begin", period.getBegin().getTime());
             args.put("end", period.getEnd().getTime());
-        }		
+        }
     }
 
     private void addMinMaxArgs(Map<String, Object> args) {
-        if( maxArg != null)
+        if(maxArg != null)
             args.put("max", maxArg);
-        if(minArg !=null)
+        if(minArg != null)
             args.put("min", minArg);
     }
 
     private void addFilterArgs(Map<String, Object> args) {
         if(filter instanceof jrds.FilterHost) {
             args.put("host", filter.getName());
-        }
-        else if (filter instanceof jrds.Filter){
+        } else if(filter instanceof jrds.Filter) {
             args.put("filter", filter.getName());
 
         }
@@ -432,8 +426,10 @@ public class ParamsBean implements Serializable {
 
     /**
      * Construct a args list for a url's cgi arguments
+     * 
      * @param o The object to build the arguments for
-     * @param timeAbsolute should the time be display as an absolute range or a relative period
+     * @param timeAbsolute should the time be display as an absolute range or a
+     *            relative period
      * @return
      */
     public Map<String, Object> doArgsMap(Object o, boolean timeAbsolute) {
@@ -441,32 +437,28 @@ public class ParamsBean implements Serializable {
         addPeriodArgs(args, timeAbsolute);
         addMinMaxArgs(args);
         if(o instanceof jrds.FilterHost) {
-            args.put("host", ((jrds.Filter)o).getName());
-        }
-        else if(o instanceof jrds.Filter) {
-            args.put("filter", ((jrds.Filter)o).getName());
-        }
-        else if(o instanceof jrds.Graph) {
-            //First check if it's a referenced graph
-            Graph g =  (jrds.Graph)o;
+            args.put("host", ((jrds.Filter) o).getName());
+        } else if(o instanceof jrds.Filter) {
+            args.put("filter", ((jrds.Filter) o).getName());
+        } else if(o instanceof jrds.Graph) {
+            // First check if it's a referenced graph
+            Graph g = (jrds.Graph) o;
             args.put("gid", g.hashCode());
             if(hostlist.getGraphById(g.getNode().hashCode()) != null) {
-                args.put("id", g.getNode().hashCode());	
+                args.put("id", g.getNode().hashCode());
             }
             // Else let's try to keep the args that can be used
             else {
-                String[] graphargs = {"pid", "dsName"};
+                String[] graphargs = { "pid", "dsName" };
                 for(String arg: graphargs) {
                     if(params.containsKey(arg)) {
                         args.put(arg, params.get(arg)[0]);
                     }
                 }
             }
-        }
-        else if(o instanceof jrds.Probe<?,?>){
+        } else if(o instanceof jrds.Probe<?, ?>) {
             args.put("pid", o.hashCode());
-        }
-        else {
+        } else {
             addFilterArgs(args);
             args.put("id", o.hashCode());
         }
@@ -476,16 +468,16 @@ public class ParamsBean implements Serializable {
     public String makeObjectUrl(String file, Object o, boolean timeAbsolute) {
         Map<String, Object> args = doArgsMap(o, timeAbsolute);
         logger.trace(jrds.Util.delayedFormatString("Params string:%s ", args));
-        //We build the Url
+        // We build the Url
         StringBuilder urlBuffer = new StringBuilder();
         urlBuffer.append(contextPath);
 
-        if(! contextPath.endsWith("/")) {
+        if(!contextPath.endsWith("/")) {
             urlBuffer.append('/');
         }
         urlBuffer.append(file).append("?");
 
-        for(Map.Entry<String, Object>e: args.entrySet()) {
+        for(Map.Entry<String, Object> e: args.entrySet()) {
             try {
                 urlBuffer.append(e.getKey()).append("=").append(URLEncoder.encode(e.getValue().toString(), "UTF-8")).append("&");
             } catch (UnsupportedEncodingException e1) {
@@ -512,19 +504,18 @@ public class ParamsBean implements Serializable {
         for(Map.Entry<String, Object> param: args.entrySet()) {
             String key = param.getKey();
             Object value = param.getValue();
-            if(value != null && ! "".equals(value)) {
+            if(value != null && !"".equals(value)) {
                 parambuff.append(key);
                 parambuff.append('=');
                 parambuff.append(value);
                 parambuff.append('&');
-            }
-            else if(value == null) {
+            } else if(value == null) {
                 parambuff.append(key);
                 parambuff.append('&');
             }
         }
 
-        //Remove the extra &
+        // Remove the extra &
         parambuff.deleteCharAt(parambuff.length() - 1);
 
         return parambuff.toString();
@@ -548,7 +539,7 @@ public class ParamsBean implements Serializable {
         Period p = null;
         try {
             String scaleStr = getValue("scale");
-            //Changed name for this attribute
+            // Changed name for this attribute
             if(scaleStr == null)
                 scaleStr = getValue("autoperiod");
 
@@ -558,7 +549,7 @@ public class ParamsBean implements Serializable {
             String begin = getValue("begin");
             if(scale > 0)
                 p = new Period(scale);
-            else if(end != null && begin !=null)
+            else if(end != null && begin != null)
                 p = new Period(begin, end);
             else
                 p = new Period();

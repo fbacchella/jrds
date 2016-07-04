@@ -17,12 +17,15 @@ public abstract class Tab {
         public Filters(String name) {
             super(name);
         }
+
         public Filters(String name, String id) {
             super(name, id);
         }
+
         public void add(String filter) {
             filters.add(filter);
         }
+
         public Set<jrds.Filter> getFilters() {
             Set<jrds.Filter> filtersset = new LinkedHashSet<jrds.Filter>(filters.size());
             for(String filtername: filters) {
@@ -32,38 +35,48 @@ public abstract class Tab {
             }
             return filtersset;
         }
+
         public boolean isFilters() {
             return true;
         }
     }
+
     public static final class StaticTree extends Tab {
         private final GraphTree gt;
+
         public StaticTree(String name, GraphTree gt) {
             super(name);
             this.gt = gt;
         }
+
         public StaticTree(String name, String id, GraphTree gt) {
             super(name, id);
             this.gt = gt;
         }
+
         public GraphTree getGraphTree() {
             return gt;
         }
     }
+
     public static final class DynamicTree extends Tab {
         private final Map<String, List<String>> paths = new TreeMap<String, List<String>>(jrds.Util.nodeComparator);
+
         public DynamicTree(String name) {
             super(name);
         }
+
         public DynamicTree(String name, String id) {
             super(name, id);
         }
+
         public void add(String id, List<String> path) {
             paths.put(id, path);
         }
+
         public GraphTree getGraphTree() {
-            GraphTree gt = GraphTree.makeGraph(name); 
-            for(Map.Entry<String , List<String>> e: paths.entrySet()) {
+            GraphTree gt = GraphTree.makeGraph(name);
+            for(Map.Entry<String, List<String>> e: paths.entrySet()) {
                 String id = e.getKey();
                 List<String> path = e.getValue();
                 GraphNode gn = hostlist.getGraphById(id.hashCode());
@@ -120,7 +133,9 @@ public abstract class Tab {
         throw new RuntimeException("Not implemented");
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#toString()
      */
     @Override

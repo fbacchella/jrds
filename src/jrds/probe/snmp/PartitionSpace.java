@@ -11,11 +11,10 @@ import java.util.Map;
 
 import org.snmp4j.smi.OID;
 
-
 /**
  * @author bacchell
  *
- * TODO 
+ *         TODO
  */
 public class PartitionSpace extends RdsIndexedSnmpRrd {
     static final private OID allocUnitOid = new OID(".1.3.6.1.2.1.25.2.3.1.4");
@@ -23,8 +22,9 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
     static final private OID usedOid = new OID(".1.3.6.1.2.1.25.2.3.1.6");
 
     /**
-     * The want to store the value in octet, not in bloc size
-     * The translation is done by the probe, not the graph
+     * The want to store the value in octet, not in bloc size The translation is
+     * done by the probe, not the graph
+     * 
      * @see jrds.Probe#filterValues(java.util.Map)
      */
     @Override
@@ -34,14 +34,12 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
         long used = 0;
         for(Map.Entry<OID, Object> e: snmpVars.entrySet()) {
             OID oid = new OID(e.getKey());
-            Number value = (Number)e.getValue();
+            Number value = (Number) e.getValue();
             if(allocUnitOid.equals(oid)) {
                 allocUnit = value.intValue();
-            }
-            else if(totalOid.equals(oid)) {
+            } else if(totalOid.equals(oid)) {
                 total = value.longValue();
-            }
-            else if(usedOid.equals(oid)) {
+            } else if(usedOid.equals(oid)) {
                 used = value.longValue();
             }
         }

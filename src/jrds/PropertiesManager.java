@@ -39,8 +39,8 @@ import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.xml.DOMConfigurator;
 
 /**
- * An less ugly class supposed to manage properties
- * should be reworked
+ * An less ugly class supposed to manage properties should be reworked
+ * 
  * @author Fabrice Bacchella
  */
 public class PropertiesManager extends Properties {
@@ -53,9 +53,9 @@ public class PropertiesManager extends Properties {
         public int slowCollectTime;
     }
 
-    private final FileFilter filter = new  FileFilter() {
+    private final FileFilter filter = new FileFilter() {
         public boolean accept(File file) {
-            return (! file.isHidden()) && (file.isFile() && file.getName().endsWith(".jar"));
+            return (!file.isHidden()) && (file.isFile() && file.getName().endsWith(".jar"));
         }
     };
 
@@ -69,21 +69,16 @@ public class PropertiesManager extends Properties {
 
     private int parseInteger(String s) throws NumberFormatException {
         Integer integer;
-        if (s != null) {
-            if (s.startsWith("#")) {
+        if(s != null) {
+            if(s.startsWith("#")) {
                 integer = Integer.valueOf(s.substring(1), 16);
+            } else if(s.startsWith("0x")) {
+                integer = Integer.valueOf(s.substring(2), 16);
+            } else if(s.startsWith("0") && s.length() > 1) {
+                integer = Integer.valueOf(s.substring(1), 8);
+            } else {
+                integer = Integer.valueOf(s);
             }
-            else
-                if (s.startsWith("0x")) {
-                    integer = Integer.valueOf(s.substring(2), 16);
-                }
-                else
-                    if (s.startsWith("0") && s.length() > 1) {
-                        integer = Integer.valueOf(s.substring(1), 8);
-                    }
-                    else {
-                        integer = Integer.valueOf(s);
-                    }
             return integer.intValue();
         }
         throw new NumberFormatException("Parsing null string");
@@ -116,7 +111,7 @@ public class PropertiesManager extends Properties {
             String key = (String) e.getKey();
             Matcher m = regex.matcher(key);
             if(m.find()) {
-                String value =  (String) e.getValue();
+                String value = (String) e.getValue();
                 props.put(m.replaceFirst(""), value);
             }
         }
@@ -128,8 +123,7 @@ public class PropertiesManager extends Properties {
             InputStream inputstream = url.openStream();
             load(inputstream);
             inputstream.close();
-        }
-        catch (IOException ex) {
+        } catch (IOException ex) {
             logger.warn("Invalid URL: " + ex.getLocalizedMessage());
         }
     }
@@ -160,15 +154,15 @@ public class PropertiesManager extends Properties {
     }
 
     private ClassLoader doClassLoader(String extendedclasspath) {
-        FileFilter filter = new  FileFilter(){
+        FileFilter filter = new FileFilter() {
             public boolean accept(File file) {
-                return  (! file.isHidden()) && file.isFile() && file.getName().endsWith(".jar");
+                return (!file.isHidden()) && file.isFile() && file.getName().endsWith(".jar");
             }
         };
 
         Collection<URI> urls = new HashSet<URI>();
 
-        if(extendedclasspath != null && ! "".equals(extendedclasspath)) {
+        if(extendedclasspath != null && !"".equals(extendedclasspath)) {
             for(String pathElement: extendedclasspath.split(";")) {
                 logger.debug("Setting class directories to: " + pathElement);
 
@@ -178,8 +172,7 @@ public class PropertiesManager extends Properties {
                     for(File f: path.listFiles(filter)) {
                         urls.add(f.toURI());
                     }
-                }
-                else if(filter.accept(path)) {
+                } else if(filter.accept(path)) {
                     urls.add(path.toURI());
                 }
             }
@@ -190,7 +183,7 @@ public class PropertiesManager extends Properties {
         }
 
         URL[] arrayUrl = new URL[urls.size()];
-        int i=0;
+        int i = 0;
         for(URI u: urls) {
             try {
                 arrayUrl[i++] = u.toURL();
@@ -201,7 +194,9 @@ public class PropertiesManager extends Properties {
         if(logger.isDebugEnabled())
             logger.debug("Internal class loader will look in:" + urls);
         return new URLClassLoader(arrayUrl, getClass().getClassLoader()) {
-            /* (non-Javadoc)
+            /*
+             * (non-Javadoc)
+             * 
              * @see java.lang.Object#toString()
              */
             @Override
@@ -215,18 +210,16 @@ public class PropertiesManager extends Properties {
         if(dir == null) {
             throw new IOException("path not defined");
         }
-        if( ! dir.exists()) {
-            if(! autocreate) {
+        if(!dir.exists()) {
+            if(!autocreate) {
                 throw new IOException(dir + " doesn't exist");
             }
-            if ( autocreate &&  !dir.mkdirs()) {
+            if(autocreate && !dir.mkdirs()) {
                 throw new IOException(dir + " doesn't exist and can't be created");
             }
-        }
-        else if( ! dir.isDirectory()) {
+        } else if(!dir.isDirectory()) {
             throw new IOException(dir + " exists but is not a directory");
-        }
-        else if( ! dir.canWrite() && ! readOnly) {
+        } else if(!dir.canWrite() && !readOnly) {
             throw new IOException(dir + " exists can't be written");
         }
         return dir;
@@ -246,20 +239,20 @@ public class PropertiesManager extends Properties {
         storesConfig.put(defaultStorename, new Properties());
 
         Properties defaultStoreProps = storesConfig.get(defaultStorename);
-        //Put old values in the default factory properties
-        for(String oldProps: new String[] { "rrdbackend", "dbPoolSize", "usepool"}) {
+        // Put old values in the default factory properties
+        for(String oldProps: new String[] { "rrdbackend", "dbPoolSize", "usepool" }) {
             if(getProperty(oldProps) != null)
                 defaultStoreProps.put(oldProps, getProperty(oldProps));
         }
 
-        //Simple case, just the store factory
-        if(getProperty("storefactory") !=  null) {
-            String defaultstorefactoryclassname = getProperty("storefactory"); 
-            defaultStoreProps.put("factory", defaultstorefactoryclassname);            
+        // Simple case, just the store factory
+        if(getProperty("storefactory") != null) {
+            String defaultstorefactoryclassname = getProperty("storefactory");
+            defaultStoreProps.put("factory", defaultstorefactoryclassname);
         }
 
         String propertiesListStores = getProperty("stores", "");
-        if(! propertiesListStores.trim().isEmpty()) {
+        if(!propertiesListStores.trim().isEmpty()) {
             for(String storeName: propertiesListStores.split(",")) {
                 storeName = storeName.trim();
                 Map<String, String> storeInfo = subKey("store." + storeName);
@@ -269,26 +262,25 @@ public class PropertiesManager extends Properties {
             }
         }
 
-        //Ensure that the default store was not forgotten
-        if(defaultStoreProps.get("factory") ==  null) {
+        // Ensure that the default store was not forgotten
+        if(defaultStoreProps.get("factory") == null) {
             defaultStoreProps.put("factory", RrdDbStoreFactory.class.getName());
         }
 
         logger.trace(Util.delayedFormatString("Stores configuration: %s", storesConfig));
 
-        //Ok, now configure and store the factories
+        // Ok, now configure and store the factories
         for(Map.Entry<String, Properties> e: storesConfig.entrySet()) {
             String storeName = e.getKey();
             Properties storesInfo = e.getValue();
             try {
                 String storefactoryclassname = storesInfo.getProperty("factory");
-                if(storefactoryclassname != null && ! storefactoryclassname.isEmpty()) {
+                if(storefactoryclassname != null && !storefactoryclassname.isEmpty()) {
                     StoreFactory sf = (StoreFactory) extensionClassLoader.loadClass(storefactoryclassname).getConstructor().newInstance();
                     sf.configureStore(this, storesInfo);
                     sf.start();
                     stores.put(storeName, sf);
-                }
-                else {
+                } else {
                     logger.error(Util.delayedFormatString("store factory %s invalid, no factory given", storeName));
                 }
             } catch (Exception e1) {
@@ -310,57 +302,54 @@ public class PropertiesManager extends Properties {
 
         Pattern jrdsPropPattern = Pattern.compile("jrds\\.(.+)");
         Properties p = System.getProperties();
-        for(String name: Collections.list((Enumeration<String>) p.propertyNames() )) {
+        for(String name: Collections.list((Enumeration<String>) p.propertyNames())) {
             Matcher m = jrdsPropPattern.matcher(name);
             if(m.matches()) {
                 String prop = System.getProperty(name);
                 if(prop != null)
                     setProperty(m.group(1), prop);
             }
-        }		
+        }
     }
 
     public void update() {
 
         Locale.setDefault(new Locale("POSIX"));
 
-        //**********************
+        // **********************
         // The log configuration
 
-        //Log configuration is done early
+        // Log configuration is done early
         boolean nologging = parseBoolean(getProperty("nologging", "false"));
         String log4jXmlFile = getProperty("log4jxmlfile", "");
         String log4jPropFile = getProperty("log4jpropfile", "");
-        if(log4jXmlFile != null && ! log4jXmlFile.trim().isEmpty()) {
+        if(log4jXmlFile != null && !log4jXmlFile.trim().isEmpty()) {
             File xmlfile = new File(log4jXmlFile.trim());
-            if ( ! xmlfile.canRead()) {
+            if(!xmlfile.canRead()) {
                 logger.error("log4j xml file " + xmlfile.getPath() + " can't be read, log4j not configured");
-            }
-            else {
+            } else {
                 BasicConfigurator.resetConfiguration();
                 DOMConfigurator.configure(xmlfile.getPath());
-                nologging = true;                
+                nologging = true;
                 logger.info("configured with " + xmlfile.getPath());
             }
-        }
-        else if(log4jPropFile != null && ! log4jPropFile.trim().isEmpty()) {
+        } else if(log4jPropFile != null && !log4jPropFile.trim().isEmpty()) {
             File propfile = new File(log4jPropFile.trim());
-            if ( ! propfile.canRead()) {
+            if(!propfile.canRead()) {
                 logger.error("log4j properties file " + propfile.getPath() + " can't be read, log4j not configured");
-            }
-            else {
+            } else {
                 BasicConfigurator.resetConfiguration();
                 PropertyConfigurator.configure(propfile.getPath());
-                nologging = true; 
+                nologging = true;
                 logger.info("configured with " + propfile.getPath());
             }
         }
-        //the logging setup was not previously captured
-        if(! nologging) {
-            for(String ls: new String[]{ "trace", "debug", "info", "error", "fatal", "warn"}) {
+        // the logging setup was not previously captured
+        if(!nologging) {
+            for(String ls: new String[] { "trace", "debug", "info", "error", "fatal", "warn" }) {
                 Level l = Level.toLevel(ls);
                 String param = getProperty("log." + ls, "");
-                if(! "".equals(param)) {
+                if(!"".equals(param)) {
                     String[] loggersName = param.split(",");
                     List<String> loggerList = new ArrayList<String>(loggersName.length);
                     for(String logger: loggersName) {
@@ -383,7 +372,7 @@ public class PropertiesManager extends Properties {
 
         legacymode = parseBoolean(getProperty("legacymode", "1"));
 
-        //Directories configuration
+        // Directories configuration
         autocreate = parseBoolean(getProperty("autocreate", "false"));
         try {
             configdir = prepareDir(getProperty("configdir"), autocreate, true);
@@ -395,11 +384,11 @@ public class PropertiesManager extends Properties {
         } catch (IOException e) {
             // rrddir is mandatory only if default store is rrd
             if(RrdDbStoreFactory.class.getName().equals(getProperty("storefactory", RrdDbStoreFactory.class.getName()))) {
-                throw new IllegalArgumentException("probe storage directory invalid: " + e.getMessage(), e);                
+                throw new IllegalArgumentException("probe storage directory invalid: " + e.getMessage(), e);
             }
         }
 
-        //Different place to find the temp directory
+        // Different place to find the temp directory
         try {
             String tmpDirProperty = getProperty("tmpdir", "");
             if(tmpDirProperty.isEmpty()) {
@@ -427,7 +416,7 @@ public class PropertiesManager extends Properties {
         if(timeout * 2 >= step) {
             logger.warn("useless default timer, step must be more than twice the timeout");
         }
-        if(! propertiesList.trim().isEmpty()) {
+        if(!propertiesList.trim().isEmpty()) {
             for(String timerName: propertiesList.split(",")) {
                 timerName = timerName.trim();
                 TimerInfo ti = new TimerInfo();
@@ -443,7 +432,7 @@ public class PropertiesManager extends Properties {
                 timers.put(timerName, ti);
             }
         }
-        //Add the default timer
+        // Add the default timer
         TimerInfo ti = new TimerInfo();
         ti.step = step;
         ti.timeout = timeout;
@@ -454,17 +443,17 @@ public class PropertiesManager extends Properties {
         strictparsing = parseBoolean(getProperty("strictparsing", "false"));
         try {
             Enumeration<URL> descurl = getClass().getClassLoader().getResources("desc");
-            while(descurl.hasMoreElements()) {
+            while (descurl.hasMoreElements()) {
                 libspath.add(descurl.nextElement().toURI());
             }
         } catch (URISyntaxException e) {
-            throw new RuntimeException("URI syntax exception",e);
+            throw new RuntimeException("URI syntax exception", e);
         } catch (IOException e) {
-            throw new RuntimeException("Can't locate embedded desc",e);
+            throw new RuntimeException("Can't locate embedded desc", e);
         }
 
         String libspathString = getProperty("libspath", "");
-        if(! "".equals(libspathString)) {
+        if(!"".equals(libspathString)) {
             for(String libName: libspathString.split(";")) {
                 File lib = new File(libName);
 
@@ -481,7 +470,8 @@ public class PropertiesManager extends Properties {
                     }
                 }
 
-                //If a jar was found previously, it's not a source directory, don't add it
+                // If a jar was found previously, it's not a source directory,
+                // don't add it
                 if(lib.isFile() || (lib.isDirectory() && noJarDir))
                     libspath.add(lib.toURI());
             }
@@ -495,7 +485,7 @@ public class PropertiesManager extends Properties {
         // We search for the tabs list in the property tab
         // spaces are non-significant
         String tabsList = getProperty("tabs");
-        if(tabsList != null && ! "".equals(tabsList.trim())) {
+        if(tabsList != null && !"".equals(tabsList.trim())) {
             this.tabsList = new ArrayList<String>();
             for(String tab: tabsList.split(",")) {
                 this.tabsList.add(tab.trim());
@@ -512,9 +502,9 @@ public class PropertiesManager extends Properties {
             adminrole = getProperty("adminrole", adminrole);
             adminACL = new ACL.AdminACL(adminrole);
 
-            String  defaultRolesString = getProperty("defaultroles", "ANONYMOUS");
+            String defaultRolesString = getProperty("defaultroles", "ANONYMOUS");
             defaultRoles = new HashSet<String>();
-            for(String aRole:  defaultRolesString.split(",") ) {
+            for(String aRole: defaultRolesString.split(",")) {
                 defaultRoles.add(aRole.trim());
             }
             defaultACL = new RolesACL(defaultRoles);
@@ -529,7 +519,7 @@ public class PropertiesManager extends Properties {
         withjmx = parseBoolean(getProperty("jmx", "0"));
         if(withjmx) {
             jmxprops = subKey("jmx");
-            if(! jmxprops.containsKey("protocol")) {
+            if(!jmxprops.containsKey("protocol")) {
                 jmxprops.put("protocol", "rmi");
             }
         }

@@ -19,8 +19,9 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
     private final NodeType parent;
 
     /**
-     * Wrap a DOM node object with an enhanced Jrds Node object
-     * If the null node is given, a null value is returned
+     * Wrap a DOM node object with an enhanced Jrds Node object If the null node
+     * is given, a null value is returned
+     * 
      * @param n A node
      * @return a jrds node object
      */
@@ -46,7 +47,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
         }
     }
 
-    protected AbstractJrdsNode(NodeType n){
+    protected AbstractJrdsNode(NodeType n) {
         if(n == null)
             throw new NullPointerException("The parent node is null");
         this.parent = n;
@@ -199,6 +200,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
 
     /**
      * If it's a document, it return itself
+     * 
      * @return
      * @see org.w3c.dom.Node#getOwnerDocument()
      */
@@ -393,13 +395,16 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @param data
      * @param handler
      * @return
-     * @see org.w3c.dom.Node#setUserData(java.lang.String, java.lang.Object, org.w3c.dom.UserDataHandler)
+     * @see org.w3c.dom.Node#setUserData(java.lang.String, java.lang.Object,
+     *      org.w3c.dom.UserDataHandler)
      */
     public Object setUserData(String key, Object data, UserDataHandler handler) {
         return parent.setUserData(key, data, handler);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     @Override
@@ -407,7 +412,9 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
         return parent.toString();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -416,12 +423,13 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
         if(AbstractJrdsNode.class.isAssignableFrom(c)) {
             JrdsNode otherNode = (JrdsNode) arg0;
             return parent.equals(otherNode.getParent());
-        }
-        else
+        } else
             return parent.equals(arg0);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override

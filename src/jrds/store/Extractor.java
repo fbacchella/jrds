@@ -13,5 +13,4 @@ public interface Extractor {
     public int getColumnCount();
     public void addSource(String name, String dsName);
     public String getPath();
-
 }

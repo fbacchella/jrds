@@ -8,7 +8,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 public abstract class Starter {
-    private StarterNode level;  
+    private StarterNode level;
     private final Logger namedLogger;
 
     private long uptime = Long.MAX_VALUE;
@@ -16,12 +16,15 @@ public abstract class Starter {
 
     public Starter() {
         String[] classElements = getClass().getName().split("\\.");
-        namedLogger = Logger.getLogger("jrds.Starter."  + classElements[classElements.length - 1 ].replaceAll("\\$", ".\\$"));
+        namedLogger = Logger.getLogger("jrds.Starter." + classElements[classElements.length - 1].replaceAll("\\$", ".\\$"));
     }
 
     /**
-     * This method is called when the started is really registred<p>
-     * It can be overriden to contains delayed initialization but it must begin with a call to super.initialize(parent)
+     * This method is called when the started is really registred
+     * <p>
+     * It can be overriden to contains delayed initialization but it must begin
+     * with a call to super.initialize(parent)
+     * 
      * @param level
      */
     public void initialize(StarterNode level) {
@@ -30,8 +33,10 @@ public abstract class Starter {
 
     /**
      * It's called after the starter registration but in host list configuration
-     * A starter can uses it to tweaks it's configuration 
-     * It can be overriden to contains delayed initialization but it must begin with a call to super.configuration(pm)
+     * A starter can uses it to tweaks it's configuration It can be overriden to
+     * contains delayed initialization but it must begin with a call to
+     * super.configuration(pm)
+     * 
      * @param pm
      */
     public void configure(PropertiesManager pm) {
@@ -50,7 +55,7 @@ public abstract class Starter {
         } catch (NoClassDefFoundError e) {
             log(Level.ERROR, e, e.getMessage().replace('/', '.'));
         }
-        if(! started) {
+        if(!started) {
             log(Level.ERROR, "starting failed");
         }
     }
@@ -63,7 +68,7 @@ public abstract class Starter {
             } catch (Exception e) {
                 log(Level.ERROR, e, "Unmannaged error while stopping: %s", e.getMessage());
             }
-            started = false;            
+            started = false;
         }
     }
 
@@ -95,8 +100,7 @@ public abstract class Starter {
         Object key = getKey();
         if(key instanceof Class<?>) {
             keyString = ((Class<?>) key).getName();
-        }
-        else {
+        } else {
             keyString = key.toString();
         }
         return keyString + "@" + levelString;
@@ -104,6 +108,7 @@ public abstract class Starter {
 
     /**
      * Return uptime for the starter, default value is max value
+     * 
      * @return
      */
     public long getUptime() {
@@ -115,8 +120,7 @@ public abstract class Starter {
     }
 
     /**
-     * @deprecated
-     * Use getLevel instead.
+     * @deprecated Use getLevel instead.
      * @return the StarterNode for this starter
      */
     @Deprecated
@@ -129,7 +133,7 @@ public abstract class Starter {
     }
 
     public void log(Level l, String format, Object... elements) {
-        jrds.Util.log(this, namedLogger,l, null, format, elements);
+        jrds.Util.log(this, namedLogger, l, null, format, elements);
     }
 
 }

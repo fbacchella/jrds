@@ -22,6 +22,7 @@ public class TestSnmpVars {
         vars.addVariable(vb);
         Assert.assertEquals(vars.get(oid1), (long) 1);
     }
+
     @Test
     public void conversionInteger32() {
         jrds.snmp.SnmpVars vars = new jrds.snmp.SnmpVars();
@@ -30,6 +31,7 @@ public class TestSnmpVars {
         vars.addVariable(vb);
         Assert.assertEquals(1, vars.get(oid1));
     }
+
     @Test
     public void conversionCounter32() {
         jrds.snmp.SnmpVars vars = new jrds.snmp.SnmpVars();
@@ -38,6 +40,7 @@ public class TestSnmpVars {
         vars.addVariable(vb);
         Assert.assertEquals(vars.get(oid1), (long) 1);
     }
+
     @Test
     public void conversionCounter64() {
         jrds.snmp.SnmpVars vars = new jrds.snmp.SnmpVars();
@@ -46,6 +49,7 @@ public class TestSnmpVars {
         vars.addVariable(vb);
         Assert.assertEquals(vars.get(oid1), (long) 1);
     }
+
     @Test
     public void conversionGauge32() {
         jrds.snmp.SnmpVars vars = new jrds.snmp.SnmpVars();
@@ -54,6 +58,7 @@ public class TestSnmpVars {
         vars.addVariable(vb);
         Assert.assertEquals(vars.get(oid1), (long) 1);
     }
+
     @Test
     public void conversionNull() {
         jrds.snmp.SnmpVars vars = new jrds.snmp.SnmpVars();
@@ -62,6 +67,7 @@ public class TestSnmpVars {
         vars.addVariable(vb);
         Assert.assertEquals(vars.get(oid1), null);
     }
+
     @Test
     public void conversionTimeTicks() {
         jrds.snmp.SnmpVars vars = new jrds.snmp.SnmpVars();
@@ -70,6 +76,7 @@ public class TestSnmpVars {
         vars.addVariable(vb);
         Assert.assertEquals(vars.get(oid1), (double) 0.01);
     }
+
     @Test
     public void conversionOctetString() {
         jrds.snmp.SnmpVars vars = new jrds.snmp.SnmpVars();
@@ -78,6 +85,7 @@ public class TestSnmpVars {
         vars.addVariable(vb);
         Assert.assertEquals(vars.get(oid1), "a");
     }
+
     @Test
     public void conversionIpAddress() throws UnknownHostException {
         jrds.snmp.SnmpVars vars = new jrds.snmp.SnmpVars();

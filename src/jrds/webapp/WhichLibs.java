@@ -27,15 +27,16 @@ import jrds.store.RrdDbStoreFactory;
 @ServletSecurity
 public final class WhichLibs extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(WhichLibs.class);
+
     /**
-     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
+     *      javax.servlet.http.HttpServletResponse)
      */
-    public void doGet(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         HostsList hl = getHostsList();
 
         ParamsBean params = new ParamsBean(req, hl);
-        if(! allowed(params, getPropertiesManager().adminACL, req, res))
+        if(!allowed(params, getPropertiesManager().adminACL, req, res))
             return;
 
         try {
@@ -57,14 +58,14 @@ public final class WhichLibs extends JrdsServlet {
                 for(String rrdPath: openned) {
                     out.println("   " + rrdPath + ": " + factory.getOpenCount(rrdPath));
                 }
-                out.println();          
+                out.println();
             }
 
             PropertiesManager pm = getPropertiesManager();
             out.println("Temp dir: " + pm.tmpdir);
             out.println("current directory: " + new File(".").getCanonicalPath());
             out.println("Probes descriptions found in: ");
-            for(URI descuri: getPropertiesManager().libspath ) {
+            for(URI descuri: getPropertiesManager().libspath) {
                 String file = descuri.toString().replace("jar:", "").replace("file:", "").replace("!/desc", "");
                 out.println("    " + file);
             }
@@ -79,19 +80,18 @@ public final class WhichLibs extends JrdsServlet {
             }
             if(transformerFactory != null) {
                 out.println("Set by sytem property javax.xml.transform.TransformerFactory: " + transformerFactory);
-            }
-            else {
+            } else {
                 out.println();
             }
             try {
-                out.println(resolv("DOM implementation",  DocumentBuilderFactory.newInstance().newDocumentBuilder().getDOMImplementation()));
+                out.println(resolv("DOM implementation", DocumentBuilderFactory.newInstance().newDocumentBuilder().getDOMImplementation()));
             } catch (ParserConfigurationException e) {
                 out.println("Invalid DOM parser configuration");
             }
             out.println(resolv("Servlet API", javax.servlet.ServletContext.class));
             out.println(resolv("SNMP4J", "org.snmp4j.transport.DefaultUdpTransportMapping"));
             out.println(resolv("Jrds Agent", "jrds.probe.RMI"));
-            out.println(resolv("Log4j",logger.getClass()));
+            out.println(resolv("Log4j", logger.getClass()));
             out.println("Generation:" + hl.getGeneration());
 
             Principal p = req.getUserPrincipal();
@@ -102,7 +102,7 @@ public final class WhichLibs extends JrdsServlet {
             }
         } catch (RuntimeException e) {
             logger.error(e, e);
-        }                           
+        }
     }
 
     private String resolv(String name, Object o) {
@@ -113,7 +113,6 @@ public final class WhichLibs extends JrdsServlet {
             retValue = name + " not found";
         return retValue;
     }
-
 
     private String resolv(String name, Class<?> c) {
         String retValue;
@@ -135,8 +134,8 @@ public final class WhichLibs extends JrdsServlet {
         }
     }
 
-    private String locateJar(Class<?> c ) {
-        String retValue="Not found";
+    private String locateJar(Class<?> c) {
+        String retValue = "Not found";
         String cName = c.getName();
         int lastDot = cName.lastIndexOf('.');
         if(lastDot > 1) {

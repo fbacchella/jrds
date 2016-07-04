@@ -39,7 +39,7 @@ public class Jetty extends CommandStarterImpl {
     String propFileName = "jrds.properties";
     String webRoot = ".";
 
-    public Jetty()  {
+    public Jetty() {
     }
 
     public void configure(Properties configuration) {
@@ -47,7 +47,7 @@ public class Jetty extends CommandStarterImpl {
 
         host = configuration.getProperty("jetty.host");
         port = jrds.Util.parseStringNumber(configuration.getProperty("jetty.port"), port).intValue();
-        propFileName =  configuration.getProperty("propertiesFile", propFileName);
+        propFileName = configuration.getProperty("propertiesFile", propFileName);
         webRoot = configuration.getProperty("webRoot", webRoot);
     }
 
@@ -75,19 +75,19 @@ public class Jetty extends CommandStarterImpl {
 
         final Server server = new Server();
         ServerConnector connector = new ServerConnector(server);
-        if (host != null) {
+        if(host != null) {
             connector.setHost(host);
         }
         connector.setPort(port);
 
-        //Let's try to start the connector before the application
+        // Let's try to start the connector before the application
         try {
             connector.open();
         } catch (IOException e) {
             connector.close();
             throw new RuntimeException("Jetty server failed to start", e);
         }
-        server.setConnectors(new Connector[]{connector});
+        server.setConnectors(new Connector[] { connector });
 
         WebAppContext webapp = new WebAppContext();
         webapp.setContextPath("/");
@@ -95,18 +95,18 @@ public class Jetty extends CommandStarterImpl {
         webapp.setClassLoader(getClass().getClassLoader());
         webapp.setInitParameter("propertiesFile", propFileName);
 
-        ResourceHandler staticFiles=new ResourceHandler();
-        staticFiles.setWelcomeFiles(new String[]{"index.html"});
+        ResourceHandler staticFiles = new ResourceHandler();
+        staticFiles.setWelcomeFiles(new String[] { "index.html" });
         staticFiles.setResourceBase(webRoot);
 
         if(pm.security) {
-            LoginService loginService = new HashLoginService("jrds",pm.userfile);
-            server.addBean(loginService); 
+            LoginService loginService = new HashLoginService("jrds", pm.userfile);
+            server.addBean(loginService);
 
             Authenticator auth = new BasicAuthenticator();
             Constraint constraint = new Constraint();
             constraint.setName("jrds");
-            constraint.setRoles(new String[]{Constraint.ANY_ROLE});
+            constraint.setRoles(new String[] { Constraint.ANY_ROLE });
             constraint.setAuthenticate(true);
             constraint.setDataConstraint(Constraint.DC_NONE);
 
@@ -121,16 +121,16 @@ public class Jetty extends CommandStarterImpl {
         }
 
         HandlerCollection handlers = new HandlerList();
-        handlers.setHandlers(new Handler[]{staticFiles, webapp});
+        handlers.setHandlers(new Handler[] { staticFiles, webapp });
         server.setHandler(handlers);
 
         if(pm.withjmx || MBeanServerFactory.findMBeanServer(null).size() > 0) {
             MBeanServer mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
             server.addBean(new MBeanContainer(mbs));
-            handlers.addHandler(new StatisticsHandler());    
+            handlers.addHandler(new StatisticsHandler());
         }
 
-        //Properties are not needed any more
+        // Properties are not needed any more
         pm = null;
 
         Thread finish = new Thread() {
@@ -145,14 +145,16 @@ public class Jetty extends CommandStarterImpl {
         Runtime.getRuntime().addShutdownHook(finish);
 
         try {
-            server.start();            
+            server.start();
             server.join();
         } catch (Exception e) {
             throw new RuntimeException("Jetty server failed to start", e);
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.standalone.CommandStarterImpl#help()
      */
     @Override

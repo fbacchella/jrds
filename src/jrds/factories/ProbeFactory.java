@@ -15,7 +15,8 @@ import org.apache.log4j.Logger;
 
 /**
  * A class to find probe by their names
- * @author Fabrice Bacchella 
+ * 
+ * @author Fabrice Bacchella
  */
 public class ProbeFactory {
 
@@ -33,11 +34,13 @@ public class ProbeFactory {
     }
 
     /**
-     * Create an probe, provided the probe name. It will be found in the probe description map already provided
+     * Create an probe, provided the probe name. It will be found in the probe
+     * description map already provided
+     * 
      * @param probeName the probe name
      * @return A probe
      */
-    public  Probe<?,?> makeProbe(String probeName) {
+    public Probe<?, ?> makeProbe(String probeName) {
         ProbeDesc pd = probeDescMap.get(probeName);
         if(pd == null) {
             logger.error("Probe named " + probeName + " not found");
@@ -48,25 +51,24 @@ public class ProbeFactory {
 
     /**
      * Create an probe, provided a probe description
+     * 
      * @param pd a probe description
      * @return A probe
      */
-    public  Probe<?,?> makeProbe(ProbeDesc pd) {
-        Class<? extends Probe<?,?>> probeClass = pd.getProbeClass();
+    public Probe<?, ?> makeProbe(ProbeDesc pd) {
+        Class<? extends Probe<?, ?>> probeClass = pd.getProbeClass();
         if(probeClass == null) {
             logger.error("Invalid probe description " + pd.getName() + ", probe class name not found");
             return null;
         }
-        Probe<?,?> retValue;
+        Probe<?, ?> retValue;
         try {
-            Constructor<? extends Probe<?,?>> c = probeClass.getConstructor();
+            Constructor<? extends Probe<?, ?>> c = probeClass.getConstructor();
             retValue = c.newInstance();
-        }
-        catch (LinkageError ex) {
-            logger.warn("Error creating probe's " + pd.getName() +": " + ex);
+        } catch (LinkageError ex) {
+            logger.warn("Error creating probe's " + pd.getName() + ": " + ex);
             return null;
-        }
-        catch (ClassCastException ex) {
+        } catch (ClassCastException ex) {
             logger.warn("Error during probe instantiation: " + ex.getMessage());
             return null;
         } catch (Exception ex) {
@@ -81,11 +83,11 @@ public class ProbeFactory {
         return retValue;
     }
 
-    public boolean configure(Probe<?, ?> p,  List<?> constArgs) {
+    public boolean configure(Probe<?, ?> p, List<?> constArgs) {
         Class<?>[] constArgsType = new Class[constArgs.size()];
         Object[] constArgsVal = new Object[constArgs.size()];
         int index = 0;
-        for (Object arg: constArgs) {
+        for(Object arg: constArgs) {
             constArgsType[index] = arg.getClass();
             if(arg instanceof List<?>) {
                 constArgsType[index] = List.class;
@@ -100,7 +102,7 @@ public class ProbeFactory {
                 if(logger.isTraceEnabled())
                     logger.trace("Result of configuration for " + p + ": " + result);
                 Boolean configured = (Boolean) result;
-                if(! configured.booleanValue()) {
+                if(!configured.booleanValue()) {
                     return false;
                 }
             }
@@ -108,12 +110,11 @@ public class ProbeFactory {
             if(name == null)
                 name = jrds.Util.parseTemplate(p.getPd().getProbeName(), p);
             p.setName(name);
-            for (String graphName:  p.getPd().getGraphClasses() ) {
+            for(String graphName: p.getPd().getGraphClasses()) {
                 GraphDesc gd = graphDescMap.get(graphName);
                 if(gd != null) {
                     p.addGraph(new GraphNode(p, gd));
-                }
-                else {
+                } else {
                     logger.warn(Util.delayedFormatString("Unknown graph %s for probe %s", graphName, p));
                 }
             }
@@ -127,8 +128,7 @@ public class ProbeFactory {
             Throwable t = ex.getCause();
             if(t != null)
                 showException = t;
-            logger.warn("Error during probe creation of type " + p.getPd().getName() + " with args " + constArgs +
-                    ": ", showException);
+            logger.warn("Error during probe creation of type " + p.getPd().getName() + " with args " + constArgs + ": ", showException);
             return false;
         }
         return false;

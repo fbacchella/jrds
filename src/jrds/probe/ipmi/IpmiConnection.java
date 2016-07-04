@@ -17,11 +17,11 @@ import jrds.factories.ProbeBean;
 import jrds.starter.Connection;
 import jrds.starter.Resolver;
 
-@ProbeBean({"bmcname", "user", "password"})
+@ProbeBean({ "bmcname", "user", "password" })
 public class IpmiConnection extends Connection<Handle> {
 
     static {
-        //If not already configured, we filter it
+        // If not already configured, we filter it
         JuliToLog4jHandler.catchLogger("com.veraxsystems.vxipmi", Level.FATAL);
     }
 
@@ -62,11 +62,11 @@ public class IpmiConnection extends Connection<Handle> {
             CipherSuite cs;
             // Get cipher suites supported by the remote host
             List<CipherSuite> suites = connector.getAllCipherSuites(handle);
-            if (suites.size() > 3) {
+            if(suites.size() > 3) {
                 cs = suites.get(3);
-            } else if (suites.size() > 2) {
+            } else if(suites.size() > 2) {
                 cs = suites.get(2);
-            } else if (suites.size() > 1) {
+            } else if(suites.size() > 1) {
                 cs = suites.get(1);
             } else {
                 cs = suites.get(0);

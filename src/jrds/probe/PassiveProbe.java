@@ -18,12 +18,13 @@ public class PassiveProbe<KeyType> extends Probe<KeyType, Number> {
     public void configure() {
         setName(jrds.Util.parseTemplate(getPd().getProbeName(), this));
         if(listener != null) {
-            listener.register(this);                
+            listener.register(this);
         }
     }
 
     /**
      * Used by the listener starter to store value
+     * 
      * @param rawValues
      */
     public void store(Date time, Map<KeyType, Number> rawValues) {
@@ -33,7 +34,9 @@ public class PassiveProbe<KeyType> extends Probe<KeyType, Number> {
         storeSample(sample);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#collect()
      */
     @Override
@@ -50,7 +53,9 @@ public class PassiveProbe<KeyType> extends Probe<KeyType, Number> {
         return listener.getSourceType();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.starter.StarterNode#setParent(jrds.starter.StarterNode)
      */
     @Override
@@ -64,7 +69,7 @@ public class PassiveProbe<KeyType> extends Probe<KeyType, Number> {
                 listener = parent.find(listenerClass);
             } catch (ClassNotFoundException e) {
                 log(Level.ERROR, e, "Can't find listener class: %s", e.getMessage());
-            }            
+            }
         }
     }
 

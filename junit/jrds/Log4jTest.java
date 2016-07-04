@@ -26,9 +26,11 @@ public class Log4jTest {
         protected void append(LoggingEvent arg0) {
             logs.add(arg0);
         }
+
         public void close() {
             logs.clear();
         }
+
         public boolean requiresLayout() {
             return false;
         }
@@ -36,7 +38,7 @@ public class Log4jTest {
 
     @BeforeClass
     static public void configure() throws IOException {
-        System.setProperty("java.io.tmpdir",  "tmp");
+        System.setProperty("java.io.tmpdir", "tmp");
     }
 
     @Test

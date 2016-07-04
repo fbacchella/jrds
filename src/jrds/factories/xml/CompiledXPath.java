@@ -11,24 +11,24 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.log4j.Logger;
 
 public class CompiledXPath {
-	static final private Logger logger = Logger.getLogger(CompiledXPath.class);
+    static final private Logger logger = Logger.getLogger(CompiledXPath.class);
 
-	private static final XPath xpather = XPathFactory.newInstance().newXPath();
-	private static final Map<String, XPathExpression> xpc = new HashMap<String, XPathExpression>();
+    private static final XPath xpather = XPathFactory.newInstance().newXPath();
+    private static final Map<String, XPathExpression> xpc = new HashMap<String, XPathExpression>();
 
-	public static XPathExpression get(String xpath)	{
-		XPathExpression e =  xpc.get(xpath);
-		if(e == null) {
-			logger.debug("Uncompiled xpath: " + xpath);
-			try {
-				e = xpather.compile(xpath);
-				xpc.put(xpath, e);
-			} catch (XPathExpressionException e1) {
-				logger.error("invalid xpath:" + xpath);
-				throw new RuntimeException("Invalid xpath " + xpath, e1);
-			}
-		}
-		return e;
-	}
+    public static XPathExpression get(String xpath) {
+        XPathExpression e = xpc.get(xpath);
+        if(e == null) {
+            logger.debug("Uncompiled xpath: " + xpath);
+            try {
+                e = xpather.compile(xpath);
+                xpc.put(xpath, e);
+            } catch (XPathExpressionException e1) {
+                logger.error("invalid xpath:" + xpath);
+                throw new RuntimeException("Invalid xpath " + xpath, e1);
+            }
+        }
+        return e;
+    }
 
 }

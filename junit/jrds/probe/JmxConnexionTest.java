@@ -45,6 +45,7 @@ import org.junit.Test;
 
 public class JmxConnexionTest {
     static final private Logger logger = Logger.getLogger(JmxConnexionTest.class);
+
     static private final class JrdsMBeanInfo {
         MBeanServer mbs;
         JMXServiceURL url;
@@ -54,15 +55,13 @@ public class JmxConnexionTest {
 
         public JrdsMBeanInfo(String protocol, String host, int port) throws Exception {
             String path = "/";
-            if (protocol.equals("rmi")) {
-                rmiRegistry = java.rmi.registry.LocateRegistry
-                        .createRegistry(port);
+            if(protocol.equals("rmi")) {
+                rmiRegistry = java.rmi.registry.LocateRegistry.createRegistry(port);
                 path = "/jndi/rmi://" + host + ":" + port + "/jmxrmi";
             }
             url = new JMXServiceURL(protocol, host, port, path);
             mbs = ManagementFactory.getPlatformMBeanServer();
-            cs = JMXConnectorServerFactory.newJMXConnectorServer(url, null,
-                    mbs);
+            cs = JMXConnectorServerFactory.newJMXConnectorServer(url, null, mbs);
             cs.start();
             JMXServiceURL addr = cs.getAddress();
             cc = JMXConnectorFactory.connect(addr);
@@ -73,7 +72,7 @@ public class JmxConnexionTest {
 
     static private void enumerate(MBeanServerConnection mbean) throws InstanceNotFoundException, IntrospectionException, AttributeNotFoundException, ReflectionException, MBeanException, IllegalArgumentException, IOException {
         Set<ObjectInstance> s = mbean.queryMBeans(null, null);
-        for(ObjectInstance o : s) {
+        for(ObjectInstance o: s) {
             logger.debug("Class: " + o.getClassName());
         }
 
@@ -85,30 +84,27 @@ public class JmxConnexionTest {
             logger.debug(name);
             MBeanInfo info = mbean.getMBeanInfo(name);
             MBeanAttributeInfo[] attrs = info.getAttributes();
-            for(MBeanAttributeInfo attr : attrs) {
+            for(MBeanAttributeInfo attr: attrs) {
                 if("javax.management.openmbean.TabularData".equals(attr.getType())) {
                     TabularData td = (TabularData) mbean.getAttribute(name, attr.getName());
-                    logger.debug("    TabularData["  + td.size() +"] " + attr.getName());
+                    logger.debug("    TabularData[" + td.size() + "] " + attr.getName());
 
-                }
-                else if("javax.management.openmbean.CompositeData".equals(attr.getType())) {
+                } else if("javax.management.openmbean.CompositeData".equals(attr.getType())) {
                     CompositeData cd = (CompositeData) mbean.getAttribute(name, attr.getName());
                     if(cd != null) {
                         CompositeType ct = cd.getCompositeType();
                         for(Object key: ct.keySet()) {
-                            Object value = cd.get((String)key);
-                            logger.debug("    "  + "    " + value.getClass().getName() + " " + key);
+                            Object value = cd.get((String) key);
+                            logger.debug("    " + "    " + value.getClass().getName() + " " + key);
 
                         }
                     }
-                }
-                else if(attr.getType().startsWith("[")) {
+                } else if(attr.getType().startsWith("[")) {
                     Object o = mbean.getAttribute(name, attr.getName());
                     if(o == null)
                         continue;
                     logger.debug("    " + o.getClass().getComponentType().getName() + "[" + Array.getLength(o) + "]" + " " + attr.getName());
-                }
-                else {
+                } else {
                     logger.debug("    " + attr.getType() + " " + attr.getName());
                 }
             }
@@ -119,7 +115,7 @@ public class JmxConnexionTest {
     static public void configure() throws Exception {
         Tools.configure();
         logger.setLevel(Level.TRACE);
-        Tools.setLevel(new String[] {JmxConnexionTest.class.getName(), JMXConnection.class.getName(), "jrds.Starter"}, logger.getLevel());
+        Tools.setLevel(new String[] { JmxConnexionTest.class.getName(), JMXConnection.class.getName(), "jrds.Starter" }, logger.getLevel());
     }
 
     @After
@@ -127,7 +123,7 @@ public class JmxConnexionTest {
         mbi.cc.close();
         mbi.cs.stop();
         if(mbi.rmiRegistry != null) {
-            UnicastRemoteObject.unexportObject(mbi.rmiRegistry,true);  
+            UnicastRemoteObject.unexportObject(mbi.rmiRegistry, true);
         }
     }
 
@@ -135,7 +131,7 @@ public class JmxConnexionTest {
         Random r = new Random();
         int port = -1;
         ServerSocket serverSocket = null;
-        for(int i=0; i < 10; i++) {
+        for(int i = 0; i < 10; i++) {
             port = r.nextInt(32767) + 32767;
             try {
                 InetSocketAddress sa = new InetSocketAddress("localhost", port);
@@ -143,10 +139,8 @@ public class JmxConnexionTest {
                 serverSocket.setReuseAddress(true);
                 serverSocket.bind(sa);
                 break;
-            } 
-            catch (IOException e) {
-            }
-            finally {
+            } catch (IOException e) {
+            } finally {
                 if(serverSocket != null)
                     try {
                         serverSocket.close();
@@ -162,7 +156,7 @@ public class JmxConnexionTest {
             @Override
             public String getHostName() {
                 return "localhost";
-            }   
+            }
         };
         cnx.setPort(port);
         cnx.setProtocol(proto);

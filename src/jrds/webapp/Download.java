@@ -29,16 +29,15 @@ public class Download extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(Download.class);
     static final String CONTENT_TYPE = "text/csv";
     private static final SimpleDateFormat humanDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    protected static final ThreadLocal<DateFormat> epochFormat = 
-            new ThreadLocal<DateFormat> () {
+    protected static final ThreadLocal<DateFormat> epochFormat = new ThreadLocal<DateFormat>() {
         @Override
         protected DateFormat initialValue() {
             return new DateFormat() {
                 @Override
-                public StringBuffer format(Date date, StringBuffer toAppendTo,
-                        FieldPosition arg2) {
+                public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition arg2) {
                     return toAppendTo.append(date.getTime() / 1000);
                 }
+
                 @Override
                 public Date parse(String source, ParsePosition pos) {
                     pos.setIndex(source.length());
@@ -59,24 +58,20 @@ public class Download extends JrdsServlet {
             if(cmds.length == 4) {
                 cmd = cmds[1];
                 if("probe".equals(cmd)) {
-                    params = getParamsBean(req, "cmd", "host", "probe");	                
-                }
-                else if("graph".equals(cmd)) {
-                    params = getParamsBean(req, "cmd", "host", "graphname");                   
-                }
-                else {
+                    params = getParamsBean(req, "cmd", "host", "probe");
+                } else if("graph".equals(cmd)) {
+                    params = getParamsBean(req, "cmd", "host", "graphname");
+                } else {
                     logger.error(jrds.Util.delayedFormatString("Invalid command: %s", cmd));
                     res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     return;
                 }
-            }
-            else {
+            } else {
                 params = getParamsBean(req);
             }
         } else {
             params = getParamsBean(req);
         }
-
 
         DataProcessor sourceDp;
         String fileName;
@@ -84,12 +79,12 @@ public class Download extends JrdsServlet {
             jrds.Graph graph = params.getGraph(this);
             if(graph == null) {
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return;   
+                return;
             }
-            if(getPropertiesManager().security) {               
+            if(getPropertiesManager().security) {
                 boolean allowed = graph.getACL().check(params);
                 logger.trace(jrds.Util.delayedFormatString("Looking if ACL %s allow access to %s", graph.getACL(), this));
-                if(! allowed) {
+                if(!allowed) {
                     res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     return;
                 }
@@ -97,26 +92,23 @@ public class Download extends JrdsServlet {
 
             try {
                 sourceDp = graph.getDataProcessor();
-                fileName = graph.getPngName().replaceFirst("\\.png",".csv");
+                fileName = graph.getPngName().replaceFirst("\\.png", ".csv");
             } catch (IOException e) {
                 logger.error("Unable to process graph data");
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-        }
-        else {
+        } else {
             Probe<?, ?> probe = params.getProbe();
             if(probe == null) {
                 res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                return;   
+                return;
             }
             Period p = params.getPeriod();
-            ExtractInfo ei = ExtractInfo.get()
-                    .make(p.getBegin(), p.getEnd())
-                    .make(probe.getStep());
+            ExtractInfo ei = ExtractInfo.get().make(p.getBegin(), p.getEnd()).make(probe.getStep());
             try {
                 sourceDp = probe.extract(ei);
-                fileName = probe.getName().replaceFirst("\\.rrd",".csv");
+                fileName = probe.getName().replaceFirst("\\.rrd", ".csv");
             } catch (IOException e) {
                 logger.error("Unable to process probe data");
                 res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -126,7 +118,7 @@ public class Download extends JrdsServlet {
         try {
             ServletOutputStream out = res.getOutputStream();
             res.setContentType(CONTENT_TYPE);
-            res.addHeader("content-disposition","attachment; filename=" + fileName);
+            res.addHeader("content-disposition", "attachment; filename=" + fileName);
             DateFormat exportDateFormat = humanDateFormat;
             if(params.getValue("epoch") != null) {
                 exportDateFormat = epochFormat.get();
@@ -143,7 +135,7 @@ public class Download extends JrdsServlet {
         StringBuilder sourcesline = new StringBuilder();
         sourcesline.append("Date,");
         for(String name: sources) {
-            if(! name.startsWith("rev_"))
+            if(!name.startsWith("rev_"))
                 sourcesline.append(name).append(",");
         }
         sourcesline.deleteCharAt(sourcesline.length() - 1);
@@ -151,11 +143,11 @@ public class Download extends JrdsServlet {
         out.write(sourcesline.toString().getBytes());
         double[][] values = dp.getValues();
         long[] ts = dp.getTimestamps();
-        for(int i=0; i < ts.length; i++) {
+        for(int i = 0; i < ts.length; i++) {
             sourcesline.setLength(0);
             sourcesline.append(exportDateFormat.format(org.rrd4j.core.Util.getDate(ts[i]))).append(",");
             for(int j = 0; j < sources.length; j++) {
-                if(! sources[j].startsWith("rev_"))
+                if(!sources[j].startsWith("rev_"))
                     sourcesline.append(values[j][i]).append(",");
             }
             sourcesline.deleteCharAt(sourcesline.length() - 1);

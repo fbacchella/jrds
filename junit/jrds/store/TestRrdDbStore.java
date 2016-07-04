@@ -36,7 +36,7 @@ public class TestRrdDbStore {
     @Test
     public void testCreate() throws Exception {
         @SuppressWarnings("unchecked")
-        Probe<?,?> p = GenerateProbe.quickProbe(testFolder, GenerateProbe.ChainedMap.start(0));
+        Probe<?, ?> p = GenerateProbe.quickProbe(testFolder, GenerateProbe.ChainedMap.start(0));
         p.getPd().add("test", DsType.COUNTER);
         Assert.assertTrue("Probe file creation failed", p.checkStore());
         Extractor e = p.getMainStore().getExtractor();
@@ -49,7 +49,7 @@ public class TestRrdDbStore {
     @Test
     public void testFill() throws Exception {
         @SuppressWarnings("unchecked")
-        Probe<?,?> p = GenerateProbe.quickProbe(testFolder);
+        Probe<?, ?> p = GenerateProbe.quickProbe(testFolder);
         p.setStep(30);
         p.getPd().add("test", DsType.GAUGE);
         Assert.assertTrue("Probe file creation failed", p.checkStore());
@@ -61,20 +61,20 @@ public class TestRrdDbStore {
         for(int i = 1; i <= 30; i++) {
             JrdsSample s = p.newSample();
             long sampletime = i * p.getStep() * 1000 + start;
-            sampletime = (sampletime) - (sampletime % (p.getStep() * 1000)) ;
+            sampletime = (sampletime) - (sampletime % (p.getStep() * 1000));
             s.setTime(new Date(sampletime));
             s.put("test", i);
             p.getMainStore().commit(s);
         }
-        ExtractInfo ei = ExtractInfo.get().make(new Date(start), new Date(start + 30 * p.getStep() *  1000));
+        ExtractInfo ei = ExtractInfo.get().make(new Date(start), new Date(start + 30 * p.getStep() * 1000));
         DataProcessor dp = p.extract(ei);
         double[][] values = dp.getValues();
-        for(int i=1; i <= 30; i++) {
+        for(int i = 1; i <= 30; i++) {
 
-            //Check raw values
+            // Check raw values
             Assert.assertEquals("Wrong values stored", i, values[0][i], 1e-10);
             long sampletime = i * p.getStep() * 1000 + start;
-            sampletime = (sampletime) - (sampletime % (p.getStep() * 1000)) ;
+            sampletime = (sampletime) - (sampletime % (p.getStep() * 1000));
 
         }
     }

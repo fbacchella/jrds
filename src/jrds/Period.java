@@ -23,8 +23,8 @@ public class Period {
     static final private Logger logger = Logger.getLogger(Period.class);
     static private final String dateRegexpBoth = "((\\d\\d\\d\\d)-?(\\d\\d)-?(\\d\\d))?";
     static private final String timeRegexp = "((\\d?\\d):(\\d\\d))?(:(\\d\\d))?";
-    static private final Pattern datePatternBoth = Pattern.compile( dateRegexpBoth+ "[T ]?" + timeRegexp + "(.*)");
-    static private final Pattern secondsPattern = Pattern.compile( "\\d+");
+    static private final Pattern datePatternBoth = Pattern.compile(dateRegexpBoth + "[T ]?" + timeRegexp + "(.*)");
+    static private final Pattern secondsPattern = Pattern.compile("\\d+");
 
     public enum Scale {
         MANUAL("Manual", new org.joda.time.Period()),
@@ -47,16 +47,18 @@ public class Period {
         YEARS2("Last 2 Years", org.joda.time.Period.years(2));
         public final String name;
         public final org.joda.time.Period p;
+
         Scale(String name, org.joda.time.Period p) {
             this.name = name;
             this.p = p;
         }
+
         public static Scale valueOfOrdinal(int ordinal) {
-            if (ordinal < 0) {
+            if(ordinal < 0) {
                 throw new IllegalArgumentException("Period invalid: " + ordinal);
             }
             final Scale[] scales = values();
-            if (ordinal > scales.length) {
+            if(ordinal > scales.length) {
                 throw new IllegalArgumentException("Period invalid: " + ordinal);
             }
             return scales[ordinal];
@@ -95,22 +97,23 @@ public class Period {
         begin = begin.withMillisOfSecond(0);
 
         long interval = end.getMillis() - begin.getMillis();
-        logger.trace(Util.delayedFormatString("initially, interval %d, begin is %s, end is %s", interval / 1000, begin, end));        
+        logger.trace(Util.delayedFormatString("initially, interval %d, begin is %s, end is %s", interval / 1000, begin, end));
 
         if(begin.getSecondOfMinute() == end.getSecondOfMinute()) {
-            // second for end and begin are the same, that's mathematically wrong
+            // second for end and begin are the same, that's mathematically
+            // wrong
             // but that's the way human and joda's period manage this
             // set end to one second less
             period = new org.joda.time.Period(begin, end);
             end = end.minusSeconds(1);
         } else {
-            period = new org.joda.time.Period(begin, end.plusSeconds(1));            
+            period = new org.joda.time.Period(begin, end.plusSeconds(1));
         }
 
         this.begin = begin;
         this.end = end;
 
-        logger.trace(Util.delayedFormatString("now Period is %s, begin is %s, end is %s", period, begin, end));        
+        logger.trace(Util.delayedFormatString("now Period is %s, begin is %s, end is %s", period, begin, end));
     }
 
     public Period previous() {
@@ -148,25 +151,23 @@ public class Period {
      *
      * @param date
      * @param isBegin
-     * @throws ParseException 
+     * @throws ParseException
      */
-    private static DateTime string2Date(String date, boolean isBegin) throws ParseException{
+    private static DateTime string2Date(String date, boolean isBegin) throws ParseException {
         if(date == null) {
             throw new ParseException("Null string to parse", 0);
         }
         Matcher dateMatcher = datePatternBoth.matcher(date);
         if("NOW".compareToIgnoreCase(date) == 0) {
             return new DateTime();
-        }
-        else if(secondsPattern.matcher(date).matches()) {
+        } else if(secondsPattern.matcher(date).matches()) {
             return new DateTime(Util.parseStringNumber(date, Long.MIN_VALUE).longValue());
-        }
-        else if(date.length() >= 4 && dateMatcher.find()) {
+        } else if(date.length() >= 4 && dateMatcher.find()) {
             try {
                 if(logger.isTraceEnabled()) {
                     logger.trace("Matching " + date);
                     for(int i = 1; i <= dateMatcher.groupCount(); i++) {
-                        logger.trace(i +": " + "'" + dateMatcher.group(i) + "'");
+                        logger.trace(i + ": " + "'" + dateMatcher.group(i) + "'");
                     }
                 }
                 String dateFound = dateMatcher.group(1);
@@ -179,12 +180,12 @@ public class Period {
 
                 DateTimeZone tz = DateTimeZone.getDefault();
 
-                if( timeZoneFound != null &&  ! "".equals(timeZoneFound)) {
+                if(timeZoneFound != null && !"".equals(timeZoneFound)) {
                     tz = DateTimeZone.forTimeZone(TimeZone.getTimeZone(timeZoneFound));
                 }
 
                 LocalDate jdate = new LocalDate(tz);
-                if(dateFound != null && ! "".equals(dateFound)) {
+                if(dateFound != null && !"".equals(dateFound)) {
                     int year = jrds.Util.parseStringNumber(dateMatcher.group(2), 1970);
                     int month = jrds.Util.parseStringNumber(dateMatcher.group(3), 1);
                     int day = jrds.Util.parseStringNumber(dateMatcher.group(4), 1);
@@ -198,13 +199,11 @@ public class Period {
                     if(isBegin) {
                         hour = 0;
                         minute = 0;
-                    }
-                    else {
+                    } else {
                         hour = 23;
                         minute = 59;
                     }
-                }
-                else {
+                } else {
                     hour = jrds.Util.parseStringNumber(dateMatcher.group(6), 0);
                     minute = jrds.Util.parseStringNumber(dateMatcher.group(7), 0);
                 }
@@ -214,8 +213,7 @@ public class Period {
                         second = 0;
                     else
                         second = 59;
-                }
-                else {
+                } else {
                     second = jrds.Util.parseStringNumber(dateMatcher.group(9), 0);
                 }
                 LocalTime jtime = new LocalTime(hour, minute, second);
@@ -225,8 +223,7 @@ public class Period {
                 newex.initCause(e);
                 throw newex;
             }
-        }
-        else {
+        } else {
             throw new ParseException("Invalid string to parse: " + date, 0);
         }
     }
@@ -243,7 +240,9 @@ public class Period {
         return periodName;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -256,34 +255,38 @@ public class Period {
         return result;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if(this == obj)
             return true;
-        if (obj == null)
+        if(obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if(getClass() != obj.getClass())
             return false;
         final Period other = (Period) obj;
-        if (begin == null) {
-            if (other.begin != null)
+        if(begin == null) {
+            if(other.begin != null)
                 return false;
-        } else if (!begin.equals(other.begin))
+        } else if(!begin.equals(other.begin))
             return false;
-        if (scale != other.scale)
+        if(scale != other.scale)
             return false;
-        if (end == null) {
-            if (other.end != null)
+        if(end == null) {
+            if(other.end != null)
                 return false;
-        } else if (!end.equals(other.end))
+        } else if(!end.equals(other.end))
             return false;
         return true;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     @Override

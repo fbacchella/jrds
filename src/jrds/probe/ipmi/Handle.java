@@ -28,6 +28,7 @@ public class Handle {
 
     public static final class MutableInteger {
         public int value;
+
         MutableInteger(int value) {
             this.value = value;
         }
@@ -38,9 +39,10 @@ public class Handle {
     // Size of the initial GetSdr message to get record header and size
     private static final int INITIAL_CHUNK_SIZE = 8;
     /**
-     * Chunk size depending on buffer size of the IPMI server. Bigger values will improve performance. If server is
-     * returning "Cannot return number of requested data bytes." error during GetSdr command, CHUNK_SIZE should be
-     * decreased.
+     * Chunk size depending on buffer size of the IPMI server. Bigger values
+     * will improve performance. If server is returning
+     * "Cannot return number of requested data bytes." error during GetSdr
+     * command, CHUNK_SIZE should be decreased.
      */
     private static final int CHUNK_SIZE = 16;
 
@@ -95,8 +97,7 @@ public class Handle {
         connector.openSession(handle, username, password, bmcKey);
     }
 
-    ResponseData sendMessage(IpmiCommandCoder arg1)
-            throws Exception {
+    ResponseData sendMessage(IpmiCommandCoder arg1) throws Exception {
         return connector.sendMessage(handle, arg1);
     }
 
@@ -147,7 +148,7 @@ public class Handle {
                 // error.
                 while (read < recSize) {
                     int bytesToRead = CHUNK_SIZE;
-                    if (recSize - read < bytesToRead) {
+                    if(recSize - read < bytesToRead) {
                         bytesToRead = recSize - read;
                     }
                     GetSdrResponseData part = (GetSdrResponseData) connector.sendMessage(handle, new GetSdr(

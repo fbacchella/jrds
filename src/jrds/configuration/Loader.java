@@ -39,15 +39,14 @@ class Loader {
 
     static final private Logger logger = Logger.getLogger(Loader.class);
 
-    private static final FileFilter filter = new FileFilter(){
+    private static final FileFilter filter = new FileFilter() {
         public boolean accept(File file) {
-            return (! file.isHidden()) && (file.isDirectory()) || (file.isFile() && file.getName().endsWith(".xml"));
+            return (!file.isHidden()) && (file.isDirectory()) || (file.isFile() && file.getName().endsWith(".xml"));
         }
     };
 
     private final AtomicInteger threadCount = new AtomicInteger(0);
-    private final ExecutorService tpool =  Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2, 
-            new ThreadFactory() {
+    private final ExecutorService tpool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2, new ThreadFactory() {
         public Thread newThread(Runnable r) {
             String threadName = "DomParser" + threadCount.getAndIncrement();
             Thread t = new Thread(r, threadName);
@@ -57,7 +56,7 @@ class Loader {
         }
     });
 
-    private final ThreadLocal<DocumentBuilder> localDocumentBuilder = new ThreadLocal<DocumentBuilder>(){
+    private final ThreadLocal<DocumentBuilder> localDocumentBuilder = new ThreadLocal<DocumentBuilder>() {
         @Override
         protected DocumentBuilder initialValue() {
             try {
@@ -67,9 +66,11 @@ class Loader {
                     public void error(SAXParseException exception) throws SAXException {
                         throw exception;
                     }
+
                     public void fatalError(SAXParseException exception) throws SAXException {
                         throw exception;
                     }
+
                     public void warning(SAXParseException exception) throws SAXException {
                         throw exception;
                     }
@@ -91,7 +92,7 @@ class Loader {
 
     public Loader(boolean strict) throws ParserConfigurationException {
         instance = DocumentBuilderFactory.newInstance();
-        //Focus on content, not structure
+        // Focus on content, not structure
         instance.setIgnoringComments(true);
         instance.setValidating(strict);
         instance.setIgnoringElementContentWhitespace(true);
@@ -125,28 +126,26 @@ class Loader {
                     importDir(imported);
                 else if(fileName.endsWith(".jar"))
                     importJar(new JarFile(imported));
-            }
-            else if("jar".equals(protocol)) {
-                JarURLConnection cnx = (JarURLConnection)ressourceUrl.openConnection();
+            } else if("jar".equals(protocol)) {
+                JarURLConnection cnx = (JarURLConnection) ressourceUrl.openConnection();
                 importJar(cnx.getJarFile());
-            }
-            else {
-                logger.error("ressource " + ressourceUrl + " can't be loaded" );
+            } else {
+                logger.error("ressource " + ressourceUrl + " can't be loaded");
             }
         } catch (IOException e) {
             logger.error("Invalid URL " + ressourceUrl + ": " + e);
-        } catch (URISyntaxException e){
+        } catch (URISyntaxException e) {
             logger.error("Invalid URL " + ressourceUrl + ": " + e);
         }
     }
 
     public void importDir(File path) {
         logger.trace("Importing directory " + path);
-        if(! path.isDirectory()) {
+        if(!path.isDirectory()) {
             logger.warn(path + " is not a directory");
             return;
         }
-        //listFiles can return null
+        // listFiles can return null
         File[] foundFiles = path.listFiles(filter);
         if(foundFiles == null) {
             logger.error("Failed to import " + path);
@@ -155,8 +154,7 @@ class Loader {
         for(File f: foundFiles) {
             if(f.isDirectory()) {
                 importDir(f);
-            }
-            else {
+            } else {
                 try {
                     logger.trace("Will import " + f);
                     importStream(new FileInputStream(f), f);
@@ -172,7 +170,7 @@ class Loader {
             logger.trace("Importing jar " + jarfile.getName());
         for(JarEntry je: Collections.list(jarfile.entries())) {
             String name = je.getName();
-            if( !je.isDirectory() && name.endsWith(".xml") && (name.startsWith("desc/") || name.startsWith("graph/") || name.startsWith("probe/"))) {
+            if(!je.isDirectory() && name.endsWith(".xml") && (name.startsWith("desc/") || name.startsWith("graph/") || name.startsWith("probe/"))) {
                 logger.trace("Will import jar entry " + je);
                 importStream(jarfile.getInputStream(je), je + " in " + jarfile);
             }
@@ -181,6 +179,7 @@ class Loader {
 
     /**
      * Schedule within the thread pool a dom parsing
+     * 
      * @param xmlstream the xml object to parse
      * @param source a identifier for the source
      */
@@ -198,19 +197,18 @@ class Loader {
                     }
                     String name = t.getName(d);
                     logger.trace(Util.delayedFormatString("Found a %s with name %s", t.getRootNode(), name));
-                    //We check the Name
-                    if(name != null && ! "".equals(name)) {
+                    // We check the Name
+                    if(name != null && !"".equals(name)) {
                         Map<String, JrdsDocument> rep = repositories.get(t);
-                        //We warn for dual inclusion, none is loaded, as we don't know the good one
+                        // We warn for dual inclusion, none is loaded, as we
+                        // don't know the good one
                         if(rep.containsKey(name)) {
                             logger.error("Dual definition of " + t + " with name " + name);
                             rep.remove(name);
-                        }
-                        else {
+                        } else {
                             rep.put(name, d);
                         }
-                    }
-                    else {
+                    } else {
                         logger.error("name not found in " + source);
                     }
                 } catch (FileNotFoundException e) {
@@ -218,7 +216,7 @@ class Loader {
                 } catch (SAXParseException e) {
                     logger.error("Invalid xml document " + source + " (line " + e.getLineNumber() + "): " + e.getMessage());
                 } catch (SAXException e) {
-                    logger.error("Invalid xml document " + source  + ": " + e);
+                    logger.error("Invalid xml document " + source + ": " + e);
                 } catch (IOException e) {
                     logger.error("IO error with " + source + ": " + e);
                 }

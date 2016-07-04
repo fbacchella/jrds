@@ -7,55 +7,55 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 public class RolesACL extends ACL {
-	static final private Logger logger = Logger.getLogger(ACL.class.getName() + ".RolesACL");
+    static final private Logger logger = Logger.getLogger(ACL.class.getName() + ".RolesACL");
 
-	Set<String> roles;
-	
-	/**
-	 * @return the roles
-	 */
-	public Set<String> getRoles() {
-		return roles;
-	}
+    Set<String> roles;
 
-	public RolesACL(Set<String> roles) {
-		super();
-		this.roles = roles;
-	}
+    /**
+     * @return the roles
+     */
+    public Set<String> getRoles() {
+        return roles;
+    }
 
-	public boolean check(ParamsBean params) {
-		if(roles.contains("ANONYMOUS"))
-			return true;
-		if(logger.isTraceEnabled()) {
-			logger.trace("Checking if roles " + params.getRoles() + " in roles " + roles);
-			logger.trace("Disjoint: " +  Collections.disjoint(roles, params.getRoles()));
-		}
-		return ! Collections.disjoint(roles, params.getRoles());
-	}
+    public RolesACL(Set<String> roles) {
+        super();
+        this.roles = roles;
+    }
 
-	@Override
-	public ACL join(ACL acl) {
-		if(acl instanceof RolesACL) {
-			Set<String> newRoles = new HashSet<String>(roles);
-			newRoles.addAll(((RolesACL) acl).getRoles());
-			return new RolesACL(newRoles);
-		}
-		else if(acl instanceof AdminACL) {
-			Set<String> newRoles = new HashSet<String>(roles);
-			newRoles.add(((AdminACL)acl).getAdminRole());
-			return new RolesACL(newRoles);
-		}
-		else {
-			return this;
-		}
-	}
+    public boolean check(ParamsBean params) {
+        if(roles.contains("ANONYMOUS"))
+            return true;
+        if(logger.isTraceEnabled()) {
+            logger.trace("Checking if roles " + params.getRoles() + " in roles " + roles);
+            logger.trace("Disjoint: " + Collections.disjoint(roles, params.getRoles()));
+        }
+        return !Collections.disjoint(roles, params.getRoles());
+    }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "roles " + roles;
-	}
-	
+    @Override
+    public ACL join(ACL acl) {
+        if(acl instanceof RolesACL) {
+            Set<String> newRoles = new HashSet<String>(roles);
+            newRoles.addAll(((RolesACL) acl).getRoles());
+            return new RolesACL(newRoles);
+        } else if(acl instanceof AdminACL) {
+            Set<String> newRoles = new HashSet<String>(roles);
+            newRoles.add(((AdminACL) acl).getAdminRole());
+            return new RolesACL(newRoles);
+        } else {
+            return this;
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "roles " + roles;
+    }
+
 }

@@ -43,7 +43,7 @@ public class TestHostBuilder {
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, "jrds.RdsHost", "jrds.starter", "jrds.Starter", "jrds.configuration.HostBuilder");
-        Tools.setLevel(Level.INFO,"jrds.factories.xml.CompiledXPath");
+        Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
 
         Tools.prepareXml(false);
     }
@@ -63,7 +63,7 @@ public class TestHostBuilder {
         PropertiesManager localpm = Tools.makePm();
 
         HostBuilder hb = new HostBuilder();
-        //Generate a probe with a bean hostInfo with a default value of ${host}
+        // Generate a probe with a bean hostInfo with a default value of ${host}
         hb.setProbeFactory(new MokeProbeFactory() {
             @Override
             public Probe<?, ?> makeProbe(String type) {
@@ -145,11 +145,11 @@ public class TestHostBuilder {
 
         Assert.assertEquals("fqdn.jrds.fr", hi.getDnsName());
 
-        Map<String, Probe<?,?>> probes = new HashMap<String, Probe<?,?>>(hi.getNumProbes());
+        Map<String, Probe<?, ?>> probes = new HashMap<String, Probe<?, ?>>(hi.getNumProbes());
 
-        for(Probe<?,?> p: hi.getProbes()) {
+        for(Probe<?, ?> p: hi.getProbes()) {
             String name = p.getQualifiedName();
-            probes.put(name, p);            
+            probes.put(name, p);
         }
         Assert.assertTrue(probes.containsKey("myhost/tcp_snmp"));
         Assert.assertTrue(probes.containsKey("myhost/fs-_"));
@@ -188,7 +188,7 @@ public class TestHostBuilder {
 
         HostInfo hi = hb.build(fullhost);
 
-        Probe<?,?> p = hi.getProbes().iterator().next();
+        Probe<?, ?> p = hi.getProbes().iterator().next();
         Assert.assertEquals("${attr.customattr1} failed", "defaultattr1", Util.parseTemplate("${attr.customattr1}", p));
         Assert.assertEquals("${attr.customattr3} failed", "defaultattr2", Util.parseTemplate("${attr.customattr2}", p));
         Assert.assertEquals("${attr.customattr3} failed", "defaultattr1", Util.parseTemplate("${attr.customattr3}", p));

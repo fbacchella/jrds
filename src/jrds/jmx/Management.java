@@ -39,7 +39,7 @@ public class Management extends StandardMBean implements ManagementMBean {
             throw new RuntimeException("jrds mbean failed to register", e);
         } catch (NullPointerException e) {
             throw new RuntimeException("jrds mbean failed to register", e);
-        } 
+        }
     }
 
     static public final void register(ServletContext ctxt) {
@@ -57,7 +57,7 @@ public class Management extends StandardMBean implements ManagementMBean {
             throw new RuntimeException("jrds mbean failed to register", e);
         } catch (NullPointerException e) {
             throw new RuntimeException("jrds mbean failed to register", e);
-        } 
+        }
     }
 
     static public final void unregister() {
@@ -93,7 +93,7 @@ public class Management extends StandardMBean implements ManagementMBean {
     @Override
     public void reload() {
         PropertiesManager pm = new PropertiesManager();
-        if(configfile!= null && configfile.isFile())
+        if(configfile != null && configfile.isFile())
             pm.join(configfile);
         else if(ctxt != null) {
             StartListener sl = (StartListener) ctxt.getAttribute(StartListener.class.getName());
@@ -113,7 +113,7 @@ public class Management extends StandardMBean implements ManagementMBean {
 
     @Override
     public int getProbesCount() {
-        Configuration c =  Configuration.get();
+        Configuration c = Configuration.get();
         HostsList hl = c.getHostsList();
         Collection<HostInfo> hosts = hl.getHosts();
         int numProbes = 0;
@@ -130,7 +130,7 @@ public class Management extends StandardMBean implements ManagementMBean {
 
     @Override
     public Map<String, Number> getLastValues(String host, String probeName) {
-        Probe<?,?> p =  Configuration.get().getHostsList().getProbeByPath(host, probeName);
+        Probe<?, ?> p = Configuration.get().getHostsList().getProbeByPath(host, probeName);
         return p.getLastValues();
     }
 

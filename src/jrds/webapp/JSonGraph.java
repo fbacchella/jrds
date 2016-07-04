@@ -23,11 +23,10 @@ import org.json.JSONException;
 public class JSonGraph extends JSonData {
     static final private Logger logger = Logger.getLogger(JSonGraph.class);
     private static final long serialVersionUID = 1L;
-    private int periodHistory[] = {7, 9, 11, 16};
+    private int periodHistory[] = { 7, 9, 11, 16 };
 
     @Override
-    public boolean generate(JrdsJSONWriter w, HostsList root,
-            ParamsBean params) throws IOException, JSONException {
+    public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException, JSONException {
 
         if(params.getPeriod() == null) {
             return false;
@@ -45,18 +44,17 @@ public class JSonGraph extends JSonData {
             });
         }
         logger.debug(jrds.Util.delayedFormatString("Graphs returned: %s", graphs));
-        if( ! graphs.isEmpty()) {
+        if(!graphs.isEmpty()) {
             Renderer r = root.getRenderer();
             for(GraphNode gn: graphs) {
-                if(! gn.getACL().check(params))
+                if(!gn.getACL().check(params))
                     continue;
                 if(params.isHistory()) {
                     for(int p: periodHistory) {
                         params.setScale(p);
                         doGraph(gn, r, params, w);
                     }
-                }
-                else {
+                } else {
                     doGraph(gn, r, params, w);
                 }
             }
@@ -70,7 +68,7 @@ public class JSonGraph extends JSonData {
 
         Map<String, Object> imgProps = new HashMap<String, Object>();
         r.render(graph);
-        Probe<?,?> p = gn.getProbe();
+        Probe<?, ?> p = gn.getProbe();
         imgProps.put("probename", p.getName());
         imgProps.put("qualifiedname", graph.getQualifiedName());
 
@@ -79,10 +77,10 @@ public class JSonGraph extends JSonData {
             imgProps.put("height", d.height);
             imgProps.put("width", d.width);
         }
-        imgProps.put("graph",params.doArgsMap(graph, true));
-        imgProps.put("history",params.doArgsMap(graph, false));
-        imgProps.put("probe",params.doArgsMap(p, true));
-        imgProps.put("graphnode",params.doArgsMap(gn, true));
+        imgProps.put("graph", params.doArgsMap(graph, true));
+        imgProps.put("history", params.doArgsMap(graph, false));
+        imgProps.put("probe", params.doArgsMap(p, true));
+        imgProps.put("graphnode", params.doArgsMap(gn, true));
         doTree(w, graph.getQualifiedName(), gn.hashCode(), "graph", null, imgProps);
     }
 

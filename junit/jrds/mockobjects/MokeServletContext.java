@@ -152,33 +152,27 @@ public class MokeServletContext implements ServletContext {
     public void addListener(Class<? extends EventListener> arg0) {
     }
 
-    public javax.servlet.ServletRegistration.Dynamic addServlet(String arg0,
-            String arg1) {
+    public javax.servlet.ServletRegistration.Dynamic addServlet(String arg0, String arg1) {
         return null;
     }
 
-    public javax.servlet.ServletRegistration.Dynamic addServlet(String arg0,
-            Servlet arg1) {
+    public javax.servlet.ServletRegistration.Dynamic addServlet(String arg0, Servlet arg1) {
         return null;
     }
 
-    public javax.servlet.ServletRegistration.Dynamic addServlet(String arg0,
-            Class<? extends Servlet> arg1) {
+    public javax.servlet.ServletRegistration.Dynamic addServlet(String arg0, Class<? extends Servlet> arg1) {
         return null;
     }
 
-    public <T extends Filter> T createFilter(Class<T> arg0)
-            throws ServletException {
+    public <T extends Filter> T createFilter(Class<T> arg0) throws ServletException {
         return null;
     }
 
-    public <T extends EventListener> T createListener(Class<T> arg0)
-            throws ServletException {
+    public <T extends EventListener> T createListener(Class<T> arg0) throws ServletException {
         return null;
     }
 
-    public <T extends Servlet> T createServlet(Class<T> arg0)
-            throws ServletException {
+    public <T extends Servlet> T createServlet(Class<T> arg0) throws ServletException {
         return null;
     }
 
@@ -238,7 +232,7 @@ public class MokeServletContext implements ServletContext {
     }
 
     public void setSessionTrackingModes(Set<SessionTrackingMode> arg0) {
-        
+
     }
 
 }

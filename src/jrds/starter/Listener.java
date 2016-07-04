@@ -11,14 +11,14 @@ import org.apache.log4j.Level;
 public abstract class Listener<Message, KeyType> extends Starter {
 
     Thread listenerThread = null;
-    private final Map<String, Map<String,PassiveProbe<KeyType>>> probes = new HashMap<String, Map<String,PassiveProbe<KeyType>>>();
+    private final Map<String, Map<String, PassiveProbe<KeyType>>> probes = new HashMap<String, Map<String, PassiveProbe<KeyType>>>();
 
     public boolean start() {
         listenerThread = new Thread() {
             @Override
             public void run() {
                 long lastsleep = 500;
-                while (Listener.this.isStarted() && ! isInterrupted()) {
+                while (Listener.this.isStarted() && !isInterrupted()) {
                     Date startListen = new Date();
                     try {
                         Listener.this.listen();
@@ -27,9 +27,9 @@ public abstract class Listener<Message, KeyType> extends Starter {
                         break;
                     } catch (Exception e) {
                         Date failedListen = new Date();
-                        if ( (failedListen.getTime() - startListen.getTime() < lastsleep))
+                        if((failedListen.getTime() - startListen.getTime() < lastsleep))
                             lastsleep *= 2;
-                        else 
+                        else
                             lastsleep = 500;
                         try {
                             Thread.sleep(lastsleep);
@@ -57,14 +57,17 @@ public abstract class Listener<Message, KeyType> extends Starter {
     public void register(PassiveProbe<KeyType> p) {
         log(Level.DEBUG, "adding %s", p);
         String hostname = getHost(p);
-        if(! probes.containsKey(p.getHost().getDnsName())) {
+        if(!probes.containsKey(p.getHost().getDnsName())) {
             probes.put(hostname, new HashMap<String, PassiveProbe<KeyType>>());
         }
-        probes.get(hostname).put(p.getName(), p);        
+        probes.get(hostname).put(p.getName(), p);
     }
 
     /**
-     * This method should be call to identify the probe used to store a received external input. It uses result from identifyHost and identifyProbe to find it.
+     * This method should be call to identify the probe used to store a received
+     * external input. It uses result from identifyHost and identifyProbe to
+     * find it.
+     * 
      * @param message the external input
      * @return the probe where values will be stored
      */
@@ -72,12 +75,12 @@ public abstract class Listener<Message, KeyType> extends Starter {
         String hostname = identifyHost(message);
         String probename = identifyProbe(message);
         log(Level.DEBUG, "looking for %s in %s", message, probes);
-        if(! probes.containsKey(hostname)) {
+        if(!probes.containsKey(hostname)) {
             log(Level.WARN, "unregistered sender: %s", hostname);
             return null;
         }
         PassiveProbe<KeyType> pp = probes.get(hostname).get(probename);
-        if( pp == null) {
+        if(pp == null) {
             log(Level.WARN, "unregistered probe: %s", probename);
             return null;
         }
@@ -85,14 +88,18 @@ public abstract class Listener<Message, KeyType> extends Starter {
     }
 
     /**
-     * The method used to wait on external input and feed back the result to the probe, using {@link jrds.probe.PassiveProbe#store(Date, Map)}.
-     * There is no need to manage exceptions and interruption in it. This method is called again in case of failure, with adaptative sleep between each call.
+     * The method used to wait on external input and feed back the result to the
+     * probe, using {@link jrds.probe.PassiveProbe#store(Date, Map)}. There is
+     * no need to manage exceptions and interruption in it. This method is
+     * called again in case of failure, with adaptative sleep between each call.
+     * 
      * @throws Exception
      */
     protected abstract void listen() throws Exception;
 
     /**
      * Extract the string to identify the host from a message
+     * 
      * @param message
      * @return
      */
@@ -100,14 +107,16 @@ public abstract class Listener<Message, KeyType> extends Starter {
 
     /**
      * Extract the string to identify the probe from a message
+     * 
      * @param message
      * @return
      */
     protected abstract String identifyProbe(Message message);
 
     /**
-     * Extract the string that will identity the host from the host.
-     * This method is the inversion of  identifyHost(Message message)
+     * Extract the string that will identity the host from the host. This method
+     * is the inversion of identifyHost(Message message)
+     * 
      * @param pp
      * @return
      */

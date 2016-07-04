@@ -21,7 +21,9 @@ public class RRDToolGraphNode extends GraphNode {
         this.rrdpath = rrdpath;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.GraphNode#getGraph()
      */
     @Override

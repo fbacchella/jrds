@@ -19,24 +19,24 @@ import org.w3c.dom.Text;
 public class JrdsDocument extends AbstractJrdsNode<Document> implements Document {
 
     Document parent;
-    
+
     public JrdsDocument(Document n) {
         super(n);
     }
-    
+
     public JrdsElement doRootElement(String tag, String... attrs) {
         Element newelement = getOwnerDocument().createElement(tag);
         appendChild(newelement);
         for(String attr: attrs) {
             int pos = attr.indexOf('=');
             String key = attr.substring(0, pos);
-            String value = attr.substring(pos +  1);
+            String value = attr.substring(pos + 1);
             newelement.setAttribute(key, value);
         }
         return new JrdsElement(newelement);
 
     }
-    
+
     /**
      * @param arg0
      * @return
@@ -62,7 +62,8 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @param arg1
      * @return
      * @throws DOMException
-     * @see org.w3c.dom.Document#createAttributeNS(java.lang.String, java.lang.String)
+     * @see org.w3c.dom.Document#createAttributeNS(java.lang.String,
+     *      java.lang.String)
      */
     public Attr createAttributeNS(String arg0, String arg1) throws DOMException {
         return getParent().createAttributeNS(arg0, arg1);
@@ -110,10 +111,10 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @param arg1
      * @return
      * @throws DOMException
-     * @see org.w3c.dom.Document#createElementNS(java.lang.String, java.lang.String)
+     * @see org.w3c.dom.Document#createElementNS(java.lang.String,
+     *      java.lang.String)
      */
-    public Element createElementNS(String arg0, String arg1)
-            throws DOMException {
+    public Element createElementNS(String arg0, String arg1) throws DOMException {
         return getParent().createElementNS(arg0, arg1);
     }
 
@@ -123,8 +124,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @throws DOMException
      * @see org.w3c.dom.Document#createEntityReference(java.lang.String)
      */
-    public EntityReference createEntityReference(String arg0)
-            throws DOMException {
+    public EntityReference createEntityReference(String arg0) throws DOMException {
         return getParent().createEntityReference(arg0);
     }
 
@@ -133,10 +133,10 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @param arg1
      * @return
      * @throws DOMException
-     * @see org.w3c.dom.Document#createProcessingInstruction(java.lang.String, java.lang.String)
+     * @see org.w3c.dom.Document#createProcessingInstruction(java.lang.String,
+     *      java.lang.String)
      */
-    public ProcessingInstruction createProcessingInstruction(String arg0,
-            String arg1) throws DOMException {
+    public ProcessingInstruction createProcessingInstruction(String arg0, String arg1) throws DOMException {
         return getParent().createProcessingInstruction(arg0, arg1);
     }
 
@@ -164,7 +164,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
     public Element getDocumentElement() {
         return getParent().getDocumentElement();
     }
-    
+
     public JrdsElement getRootElement() {
         return new JrdsElement(getParent().getDocumentElement());
 
@@ -208,12 +208,12 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @param arg0
      * @param arg1
      * @return
-     * @see org.w3c.dom.Document#getElementsByTagNameNS(java.lang.String, java.lang.String)
+     * @see org.w3c.dom.Document#getElementsByTagNameNS(java.lang.String,
+     *      java.lang.String)
      */
     public NodeList getElementsByTagNameNS(String arg0, String arg1) {
         return getParent().getElementsByTagNameNS(arg0, arg1);
     }
-
 
     /**
      * @return
@@ -230,6 +230,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
     public String getInputEncoding() {
         return getParent().getInputEncoding();
     }
+
     /**
      * @return
      * @see org.w3c.dom.Document#getStrictErrorChecking()
@@ -287,10 +288,10 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @param arg2
      * @return
      * @throws DOMException
-     * @see org.w3c.dom.Document#renameNode(org.w3c.dom.Node, java.lang.String, java.lang.String)
+     * @see org.w3c.dom.Document#renameNode(org.w3c.dom.Node, java.lang.String,
+     *      java.lang.String)
      */
-    public Node renameNode(Node arg0, String arg1, String arg2)
-            throws DOMException {
+    public Node renameNode(Node arg0, String arg1, String arg2) throws DOMException {
         return getParent().renameNode(arg0, arg1, arg2);
     }
 

@@ -51,8 +51,7 @@ public class TestDownload extends Download {
     }
 
     @Test
-    public void testEpochFormat() throws Exception
-    {
+    public void testEpochFormat() throws Exception {
         Date start = epochFormat.get().parse("0");
         String formatted = epochFormat.get().format(start);
 
@@ -64,10 +63,10 @@ public class TestDownload extends Download {
     @Test
     public void testwriteCsv() throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        DataProcessor dp =  new DataProcessor(1, 10000);
-        dp.setStep(10000/2);
+        DataProcessor dp = new DataProcessor(1, 10000);
+        dp.setStep(10000 / 2);
         dp.processData();
-        writeCsv(out, dp, epochFormat.get() );
+        writeCsv(out, dp, epochFormat.get());
         logger.debug(out.toString());
     }
 
@@ -108,7 +107,8 @@ public class TestDownload extends Download {
         int id = s.getQualifiedName().hashCode();
 
         Response response = ToolsWebApp.doRequestGet(tester, "http://localhost/download?id=" + id, 200);
-        Assert.assertEquals("Invalid content type", Download.CONTENT_TYPE, response.get("Content-Type"));;
+        Assert.assertEquals("Invalid content type", Download.CONTENT_TYPE, response.get("Content-Type"));
+        ;
 
     }
 

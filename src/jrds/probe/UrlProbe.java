@@ -2,7 +2,6 @@ package jrds.probe;
 
 import java.net.URL;
 
-
 /**
  * @author Fabrice Bacchella
  *

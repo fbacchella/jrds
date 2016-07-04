@@ -74,7 +74,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
     private MBeanServerConnection connect(String hostname, HttpServletRequest request) {
         this.hostname = hostname;
         String protocolName = request.getParameter("discoverJmxProtocol");
-        if(protocolName != null && ! protocolName.trim().isEmpty()) {
+        if(protocolName != null && !protocolName.trim().isEmpty()) {
             cnx.setProtocol(protocolName.trim());
         }
         Integer port = jrds.Util.parseStringNumber(request.getParameter("discoverJmxPort"), 0);
@@ -84,7 +84,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
         cnx.setUser(request.getParameter("discoverJmxUser"));
         cnx.setPassword(request.getParameter("discoverJmxPassword"));
         if(cnx.startConnection()) {
-            return cnx.getConnection();            
+            return cnx.getConnection();
         } else {
             return null;
         }
@@ -103,7 +103,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
 
     @Override
     public boolean isGoodProbeDesc(ProbeDescSummary summary) {
-        MBeanServerConnection mbean =  cnx.getConnection();
+        MBeanServerConnection mbean = cnx.getConnection();
         boolean valid = true;
         boolean enumerated = false;
         for(String name: summary.specifics.get("mbeanNames").split(" *; *")) {
@@ -111,14 +111,12 @@ public class JmxDiscoverAgent extends DiscoverAgent {
             try {
                 Set<ObjectName> mbeanNames = mbean.queryNames(new ObjectName(name), null);
                 log(Level.TRACE, "%s", "found mbeans %s for %s", mbeanNames, summary.name);
-                if( mbeanNames.size() > 1 && ! summary.isIndexed ) {
+                if(mbeanNames.size() > 1 && !summary.isIndexed) {
                     log(Level.WARN, "not indexed probe %s return more than one mbean", summary.name);
                     valid = false;
-                }
-                else if (mbeanNames.size() > 0){
+                } else if(mbeanNames.size() > 0) {
                     valid &= true;
-                }
-                else {
+                } else {
                     valid = false;
                 }
             } catch (MalformedObjectNameException e) {
@@ -131,15 +129,14 @@ public class JmxDiscoverAgent extends DiscoverAgent {
     }
 
     @Override
-    public void addConnection(JrdsElement hostElement,
-            HttpServletRequest request) {
+    public void addConnection(JrdsElement hostElement, HttpServletRequest request) {
         JrdsElement cnxElem = hostElement.addElement("connection", "type=jrds.probe.JMXConnection");
         cnxElem.addElement("attr", "name=protocol").setTextContent(cnx.getProtocol());
         cnxElem.addElement("attr", "name=port").setTextContent(cnx.getPort().toString());
     }
 
     private Set<String> enumerateIndexes(ProbeDescSummary summary) {
-        MBeanServerConnection mbean =  cnx.getConnection();
+        MBeanServerConnection mbean = cnx.getConnection();
         Set<String> indexes = new HashSet<String>();
         for(String name: summary.specifics.get("mbeanNames").split(" *; *")) {
             try {
@@ -148,7 +145,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
                 for(ObjectName oneMbean: mbeanNames) {
                     log(Level.DEBUG, "%s", oneMbean.getCanonicalName());
                     Matcher m = p.matcher(oneMbean.toString());
-                    if(m.matches() && ! m.group(1).isEmpty()) {
+                    if(m.matches() && !m.group(1).isEmpty()) {
                         log(Level.DEBUG, "index found: %s for %s", m.group(1), summary.name);
                         indexes.add(m.group(1));
                     }
@@ -163,16 +160,14 @@ public class JmxDiscoverAgent extends DiscoverAgent {
     }
 
     @Override
-    public void addProbe(JrdsElement hostElement, ProbeDescSummary summary,
-            HttpServletRequest request) {
+    public void addProbe(JrdsElement hostElement, ProbeDescSummary summary, HttpServletRequest request) {
         if(summary.isIndexed) {
             for(String index: enumerateIndexes(summary)) {
-                hostElement.addElement("probe", "type=" + summary.name).addElement("attr", "name=index").setTextContent(index);           
+                hostElement.addElement("probe", "type=" + summary.name).addElement("attr", "name=index").setTextContent(index);
 
             }
-        }
-        else {
-            hostElement.addElement("probe", "type=" + summary.name);            
+        } else {
+            hostElement.addElement("probe", "type=" + summary.name);
         }
     }
 

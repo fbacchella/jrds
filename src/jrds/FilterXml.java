@@ -8,7 +8,8 @@ import org.apache.log4j.Logger;
 
 /**
  * This a a filter generated using an XML config file
- * @author Fabrice Bacchella 
+ * 
+ * @author Fabrice Bacchella
  */
 public class FilterXml extends Filter {
     static private final Logger logger = Logger.getLogger(FilterXml.class);
@@ -20,6 +21,7 @@ public class FilterXml extends Filter {
 
     /**
      * Build a XML based filter, given is name
+     * 
      * @param name
      */
     public FilterXml(String name) {
@@ -27,8 +29,10 @@ public class FilterXml extends Filter {
     }
 
     /**
-     * Add a path regular expression used to match a graph. Any graph that match at least one graph will be accepted.
-     * If no path is defined, any graph will match
+     * Add a path regular expression used to match a graph. Any graph that match
+     * at least one graph will be accepted. If no path is defined, any graph
+     * will match
+     * 
      * @param path
      */
     public void addPath(String path) {
@@ -36,7 +40,9 @@ public class FilterXml extends Filter {
     }
 
     /**
-     * Add a tag regular expression to filter hosts to get graph from. All the tags added must be match
+     * Add a tag regular expression to filter hosts to get graph from. All the
+     * tags added must be match
+     * 
      * @param tag
      */
     public void addTag(String tag) {
@@ -45,6 +51,7 @@ public class FilterXml extends Filter {
 
     /**
      * Add an explicit graph to match
+     * 
      * @param qualifiedName
      */
     public void addGraph(String qualifiedName) {
@@ -54,30 +61,31 @@ public class FilterXml extends Filter {
     public boolean acceptGraph(GraphNode graph, String path) {
         boolean accepted = false;
 
-        //An explicit graph is always accepted
-        if (names.contains(graph.getQualifiedName()))
+        // An explicit graph is always accepted
+        if(names.contains(graph.getQualifiedName()))
             accepted = true;
-        //if neither tags or path, it's refused
-        else if(! tags.isEmpty() || ! goodPaths.isEmpty())
-            accepted  = (acceptPath(path) &&  acceptTag(graph.getProbe()) ) ;
+        // if neither tags or path, it's refused
+        else if(!tags.isEmpty() || !goodPaths.isEmpty())
+            accepted = (acceptPath(path) && acceptTag(graph.getProbe()));
 
         if(logger.isTraceEnabled())
-            logger.trace(Util.delayedFormatString("Tried to accept : %s=%s, %s: %b", path, graph.getQualifiedName(), graph.getProbe() != null ? graph.getProbe().getTags(): "", accepted));
+            logger.trace(Util.delayedFormatString("Tried to accept : %s=%s, %s: %b", path, graph.getQualifiedName(), graph.getProbe() != null ? graph.getProbe().getTags() : "", accepted));
 
         return accepted;
     }
 
     /**
      * Return if a graph path match one of the required one.
+     * 
      * @param path
      * @return true if one pattern match or no pattern is defined
      */
     private boolean acceptPath(String path) {
         if(goodPaths.isEmpty())
             return true;
-        //If no path in filter, return true
+        // If no path in filter, return true
         boolean valid = true;
-        for(Pattern pathp : goodPaths) {
+        for(Pattern pathp: goodPaths) {
             valid = pathp.matcher(path).find();
             if(valid)
                 break;
@@ -86,23 +94,24 @@ public class FilterXml extends Filter {
     }
 
     /**
-     * Return if a probe match all the required tags
-     * if the probe is null, matches only if no tags are required
+     * Return if a probe match all the required tags if the probe is null,
+     * matches only if no tags are required
+     * 
      * @param p
      * @return
      */
-    private boolean acceptTag(Probe<?,?> p) {
+    private boolean acceptTag(Probe<?, ?> p) {
         if(tags.isEmpty())
             return true;
         if(p == null)
             return false;
         Set<String> probeTags = p.getTags();
-        //All the tags must be matched
+        // All the tags must be matched
         boolean valid = false;
         for(String tag: probeTags) {
             for(Pattern tagp: tags) {
                 valid = tagp.matcher(tag).matches();
-                if(! valid)
+                if(!valid)
                     break;
             }
             if(valid)

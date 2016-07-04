@@ -16,35 +16,36 @@ import org.json.JSONException;
  * Servlet implementation class JSonPeriod
  */
 public class JSonPeriod extends JrdsServlet {
-	static final private Logger logger = Logger.getLogger(JSonPeriod.class);
+    static final private Logger logger = Logger.getLogger(JSonPeriod.class);
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ParamsBean params = getParamsBean(request);
+    /**
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+     *      response)
+     */
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ParamsBean params = getParamsBean(request);
 
-		try {
-			JrdsJSONWriter w = new JrdsJSONWriter(response);
-			w.object();
+        try {
+            JrdsJSONWriter w = new JrdsJSONWriter(response);
+            w.object();
 
-			Period p = params.getPeriod();
-			
-			w.key("begin").value(params.getStringBegin());
-			w.key("end").value(params.getStringEnd());
+            Period p = params.getPeriod();
 
-			int scale = p.getScale();
-			if(scale != 0) {
-				w.key("scale").value(scale);
-			}
-			w.endObject();
-			w.newLine();
-			w.flush();
-		} catch (JSONException e) {
-			logger.warn("Failed request: " + request.getRequestURI() + "?" + request.getQueryString() +": " + e, e);
-		}
-	}
+            w.key("begin").value(params.getStringBegin());
+            w.key("end").value(params.getStringEnd());
+
+            int scale = p.getScale();
+            if(scale != 0) {
+                w.key("scale").value(scale);
+            }
+            w.endObject();
+            w.newLine();
+            w.flush();
+        } catch (JSONException e) {
+            logger.warn("Failed request: " + request.getRequestURI() + "?" + request.getQueryString() + ": " + e, e);
+        }
+    }
 
 }

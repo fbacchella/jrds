@@ -53,7 +53,7 @@ public class ListenerTest {
             // TODO Auto-generated method stub
             return null;
         }
-        
+
     }
 
     static Logger logger = Logger.getLogger(ListenerTest.class);
@@ -63,7 +63,7 @@ public class ListenerTest {
         Tools.configure();
 
         logger.setLevel(Level.TRACE);
-        Tools.setLevel(new String[] {StarterNode.class.toString(), Starter.class.toString()}, logger.getLevel());
+        Tools.setLevel(new String[] { StarterNode.class.toString(), Starter.class.toString() }, logger.getLevel());
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

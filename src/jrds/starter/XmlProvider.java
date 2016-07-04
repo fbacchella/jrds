@@ -26,15 +26,15 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * @author bacchell
- * A provider is used for XML to solve multi thread problems
+ * @author bacchell A provider is used for XML to solve multi thread problems
  * 
- * As each one is parsed by one and only one thread, it we used one provider by host,
- * we can simply solved the concurency problem and reuse factory and parser without too many risks
+ *         As each one is parsed by one and only one thread, it we used one
+ *         provider by host, we can simply solved the concurency problem and
+ *         reuse factory and parser without too many risks
  * 
  */
 public class XmlProvider extends Starter {
-    private ThreadLocal<DocumentBuilder> localDocumentBuilder = new ThreadLocal<DocumentBuilder>(){
+    private ThreadLocal<DocumentBuilder> localDocumentBuilder = new ThreadLocal<DocumentBuilder>() {
         @Override
         protected DocumentBuilder initialValue() {
             DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
@@ -52,11 +52,11 @@ public class XmlProvider extends Starter {
         @Override
         protected XPath initialValue() {
             return XPathFactory.newInstance().newXPath();
-        }        
+        }
     };
 
     public long findUptimeByDate(Document d, String startTimePath, String currentTimePath, DateFormat pattern) {
-        XPath  xpather = localXpath.get();
+        XPath xpather = localXpath.get();
         try {
             Node startTimeNode = (Node) xpather.evaluate(startTimePath, d, XPathConstants.NODE);
             String startTimeString = startTimeNode.getTextContent();
@@ -80,7 +80,7 @@ public class XmlProvider extends Starter {
             return 0;
         }
         try {
-            XPath  xpather = localXpath.get();
+            XPath xpather = localXpath.get();
             Node upTimeNode = (Node) xpather.evaluate(upTimePath, d, XPathConstants.NODE);
             if(upTimeNode != null) {
                 log(Level.TRACE, "Will parse uptime: %s", upTimeNode.getTextContent());
@@ -101,7 +101,7 @@ public class XmlProvider extends Starter {
                 log(Level.TRACE, "Will search the xpath \"%s\"", xpath);
                 if(xpath == null || "".equals(xpath))
                     continue;
-                Node n = (Node)xpather.evaluate(xpath, d, XPathConstants.NODE);
+                Node n = (Node) xpather.evaluate(xpath, d, XPathConstants.NODE);
                 Double value;
                 if(n != null) {
                     log(Level.TRACE, "%s", n);
@@ -143,6 +143,7 @@ public class XmlProvider extends Starter {
 
     /**
      * Used to get an empty document
+     * 
      * @return an empty document
      */
     public Document getDocument() {
@@ -152,11 +153,11 @@ public class XmlProvider extends Starter {
     }
 
     public NodeList getNodeList(Document d, String xpath) throws XPathExpressionException {
-        return  (NodeList) localXpath.get().evaluate(xpath, d, XPathConstants.NODESET);
+        return (NodeList) localXpath.get().evaluate(xpath, d, XPathConstants.NODESET);
     }
 
     public Node getNode(Document d, String xpath) throws XPathExpressionException {
-        return  (Node) localXpath.get().evaluate(xpath, d, XPathConstants.NODE);
+        return (Node) localXpath.get().evaluate(xpath, d, XPathConstants.NODE);
     }
 
 }

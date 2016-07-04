@@ -22,9 +22,10 @@ public class JrdsSocketConnection extends SocketConnection {
     private final int port;
 
     /**
-     * Used to create a SocketConnection
-     * But it wraps it in a generic object as jmpxmp implementation is optionnal
-     * So it allows to use it in generic class that don't reference any classes from jmxmp.jar
+     * Used to create a SocketConnection But it wraps it in a generic object as
+     * jmpxmp implementation is optionnal So it allows to use it in generic
+     * class that don't reference any classes from jmxmp.jar
+     * 
      * @param url The url to the jmxmp agent
      * @param sf a custom socket factory
      * @return a com.sun.jmx.remote.socket.SocketConnection to a jmpxmp agent
@@ -73,8 +74,7 @@ public class JrdsSocketConnection extends SocketConnection {
     }
 
     @Override
-    public Message readMessage()
-            throws IOException, ClassNotFoundException {
+    public Message readMessage() throws IOException, ClassNotFoundException {
         try {
             dolog(Level.TRACE, "readMessage");
             return super.readMessage();
@@ -88,11 +88,11 @@ public class JrdsSocketConnection extends SocketConnection {
     }
 
     private void dolog(Level l, Throwable e, String format, Object... elements) {
-        jrds.Util.log(this, logger, l, e, "socket " + host + ":" + port + ": " + format, elements);            
+        jrds.Util.log(this, logger, l, e, "socket " + host + ":" + port + ": " + format, elements);
     }
 
     private void dolog(Level l, String format, Object... elements) {
-        jrds.Util.log(this, logger, l, null, "socket " + host + ":" + port + ": " + format, elements);            
+        jrds.Util.log(this, logger, l, null, "socket " + host + ":" + port + ": " + format, elements);
     }
 
 }

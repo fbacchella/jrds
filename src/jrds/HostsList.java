@@ -31,8 +31,10 @@ import jrds.webapp.RolesACL;
 import org.apache.log4j.Level;
 
 /**
- * The central repository of all informations : hosts, graph, and everything else
- * @author Fabrice Bacchella 
+ * The central repository of all informations : hosts, graph, and everything
+ * else
+ * 
+ * @author Fabrice Bacchella
  */
 public class HostsList extends StarterNode {
 
@@ -43,7 +45,7 @@ public class HostsList extends StarterNode {
     private final Set<Starter> topStarters = new HashSet<Starter>();
     private final Map<String, jrds.starter.Timer> timers = new HashMap<String, jrds.starter.Timer>();
     private final Map<Integer, GraphNode> graphMap = new HashMap<Integer, GraphNode>();
-    private final Map<Integer, Probe<?,?>> probeMap= new HashMap<Integer, Probe<?,?>>();
+    private final Map<Integer, Probe<?, ?>> probeMap = new HashMap<Integer, Probe<?, ?>>();
     private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
     private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
     private Map<String, Tab> tabs = new LinkedHashMap<String, Tab>();
@@ -127,27 +129,27 @@ public class HostsList extends StarterNode {
             for(ProbeMeta meta: ArgFactory.enumerateAnnotation(pd.getProbeClass(), ProbeMeta.class, StarterNode.class)) {
                 log(Level.TRACE, "new probe meta: %s", meta);
                 daList.add(meta.discoverAgent());
-            }           
+            }
         }
         log(Level.DEBUG, "Discover agents classes are %s", daList);
         conf.setMacroMap();
-        for(Listener<?,?> l: conf.setListenerMap().values()) {
+        for(Listener<?, ?> l: conf.setListenerMap().values()) {
             registerStarter(l);
             topStarters.add(l);
         }
 
         Set<String> hostsTags = new HashSet<String>();
-        Map <String, HostInfo> allHosts = conf.setHostMap(timers);
+        Map<String, HostInfo> allHosts = conf.setHostMap(timers);
         hostList.addAll(allHosts.values());
         Set<Class<? extends Starter>> topStarterClasses = new HashSet<Class<? extends Starter>>();
 
-        //We try to load top level starter defined in probes
+        // We try to load top level starter defined in probes
         for(jrds.starter.Timer timer: timers.values()) {
             Set<Class<? extends Starter>> timerStarterClasses = new HashSet<Class<? extends Starter>>();
             for(HostStarter host: timer.getAllHosts()) {
                 hostsTags.addAll(host.getTags());
                 host.configureStarters(pm);
-                for(Probe<?,?> p: host.getAllProbes()) {
+                for(Probe<?, ?> p: host.getAllProbes()) {
                     p.configureStarters(pm);
                     try {
                         for(ProbeMeta meta: ArgFactory.enumerateAnnotation(p.getClass(), ProbeMeta.class, StarterNode.class)) {
@@ -179,11 +181,11 @@ public class HostsList extends StarterNode {
                 registerStarter(top);
             } catch (Throwable e) {
                 log(Level.ERROR, e, "Top level starter %s failed to register: %s", starterClass, e.getMessage());
-            }           
+            }
         }
 
         for(HostInfo host: hostList) {
-            for(Probe<?,?> p: host.getProbes()) {
+            for(Probe<?, ?> p: host.getProbes()) {
                 addProbe(p);
                 // Some probe are done outside of a starter
                 // Don't forget them
@@ -193,33 +195,33 @@ public class HostsList extends StarterNode {
             }
         }
 
-        //Configure the default ACL of all automatic filters
+        // Configure the default ACL of all automatic filters
         for(Filter filter: filters.values()) {
             filter.addACL(pm.defaultACL);
         }
 
         Set<Tab> allTabs = new HashSet<Tab>();
 
-        //Let's build the tab for all the tags
+        // Let's build the tab for all the tags
         doTagsTabs(hostsTags, allTabs);
 
-        //Let's build the tab with all the filters
+        // Let's build the tab with all the filters
         doFilterTabs(conf.setFilterMap(), allTabs);
 
-        //Build all the sums and add them to all the graphs
+        // Build all the sums and add them to all the graphs
         doSums(conf.setSumMap(), graphMap, treeMap, allTabs);
 
-        //Let's build the tab with all the custom graph and add them to all graph
+        // Let's build the tab with all the custom graph and add them to all
+        // graph
         doCustomGraphs(conf.setGrapMap(), graphMap, treeMap, allTabs);
 
-        //Resolve the custom tabs and generate the associated tree
+        // Resolve the custom tabs and generate the associated tree
         Map<String, Tab> customTabMap = conf.setTabMap();
         doCustomTabs(customTabMap, treeMap, allTabs);
 
-
-        //Add the always here tabs
+        // Add the always here tabs
         allTabs.add(new Tab.StaticTree("All services", PropertiesManager.SERVICESTAB, getGraphTreeByView().getByPath(GraphTree.VIEWROOT, "Services")));
-        allTabs.add( new Tab.StaticTree("All hosts", PropertiesManager.HOSTSTAB, getGraphTreeByHost()));
+        allTabs.add(new Tab.StaticTree("All hosts", PropertiesManager.HOSTSTAB, getGraphTreeByHost()));
         allTabs.add(new Tab.StaticTree("All views", PropertiesManager.VIEWSTAB, getGraphTreeByView()));
         allTabs.add(new Tab("Administration", PropertiesManager.ADMINTAB) {
             @Override
@@ -230,7 +232,7 @@ public class HostsList extends StarterNode {
 
         firstTab = makeTabs(pm.tabsList, allTabs, customTabMap, tabs);
 
-        //Hosts list adopts all tabs
+        // Hosts list adopts all tabs
         for(Tab t: tabs.values()) {
             t.setHostlist(this);
         }
@@ -249,7 +251,7 @@ public class HostsList extends StarterNode {
         if(started)
             collectTimer = new Timer("jrds-main-timer/" + thisgeneration, true);
         for(jrds.starter.Timer t: timers.values()) {
-            t.startTimer(collectTimer);  
+            t.startTimer(collectTimer);
         }
         for(Starter s: this.topStarters) {
             s.doStart();
@@ -257,7 +259,8 @@ public class HostsList extends StarterNode {
     }
 
     /**
-     * Ensure that all collects are stopped, some slow probes might need a little help
+     * Ensure that all collects are stopped, some slow probes might need a
+     * little help
      */
     public void stop() {
         started = false;
@@ -271,15 +274,15 @@ public class HostsList extends StarterNode {
             t.stopCollect();
             for(HostStarter h: t.getAllHosts()) {
                 h.stopCollect();
-                for(Probe<?,?> p: h.getAllProbes()) {
-                    p.stopCollect();                    
+                for(Probe<?, ?> p: h.getAllProbes()) {
+                    p.stopCollect();
                 }
             }
             t.interrupt();
         }
     }
 
-    String makeTabs(List<String> tabsList, Set<Tab> moretabs, Map<String, Tab> customTabMap, Map<String, Tab> tabs){
+    String makeTabs(List<String> tabsList, Set<Tab> moretabs, Map<String, Tab> customTabMap, Map<String, Tab> tabs) {
         Map<String, Tab> tabsmap = new HashMap<String, Tab>(moretabs.size());
         for(Tab t: moretabs) {
             if(t != null)
@@ -289,23 +292,23 @@ public class HostsList extends StarterNode {
         log(Level.TRACE, "Looking for tabs list %s in %s", tabsList, moretabs);
         String firstTab = null;
         for(String tabid: tabsList) {
-            //@ is a magic place holder, used to replace if with the custom tabs list
+            // @ is a magic place holder, used to replace if with the custom
+            // tabs list
             if("@".equals(tabid)) {
                 for(Tab t: customTabMap.values()) {
                     tabs.put(t.getId(), t);
                 }
-            }
-            else {
+            } else {
                 Tab t = tabsmap.get(tabid);
                 if(t != null) {
                     tabs.put(tabid, t);
 
-                    //store the first tab
-                    if(firstTab ==  null )
+                    // store the first tab
+                    if(firstTab == null)
                         firstTab = tabid;
-                }
-                else {
-                    // Not a problem, some automatic tab might be empty (sum, customgraph, tags)
+                } else {
+                    // Not a problem, some automatic tab might be empty (sum,
+                    // customgraph, tags)
                     log(Level.DEBUG, "Non existent tab to add: " + tabid);
                 }
             }
@@ -323,7 +326,7 @@ public class HostsList extends StarterNode {
         tabs.add(tagsTab);
     }
 
-    void doFilterTabs(Map <String, Filter> f, Set<Tab> tabs) {
+    void doFilterTabs(Map<String, Filter> f, Set<Tab> tabs) {
         Tab filterTab = new Tab.Filters("All filters", PropertiesManager.FILTERTAB);
         for(Filter filter: f.values()) {
             addFilter(filter);
@@ -333,7 +336,7 @@ public class HostsList extends StarterNode {
     }
 
     void doSums(Map<String, Sum> sums, Map<Integer, GraphNode> graphMap, Map<String, GraphTree> treeMap, Set<Tab> tabs) {
-        //Let's build the tab with all the sums
+        // Let's build the tab with all the sums
         if(sums.size() > 0) {
             Tab sumGraphsTab = new Tab.DynamicTree("Sums", PropertiesManager.SUMSTAB);
             sumGraphsTab.setHostlist(this);
@@ -354,15 +357,15 @@ public class HostsList extends StarterNode {
 
     void doCustomGraphs(Map<String, GraphDesc> graphs, Map<Integer, GraphNode> graphMap, Map<String, GraphTree> treeMap, Set<Tab> tabs) {
         log(Level.DEBUG, "Parsing graphs configuration");
-        //Let's build the tab with all the custom graphs
-        if(! graphs.isEmpty()) {
+        // Let's build the tab with all the custom graphs
+        if(!graphs.isEmpty()) {
             Tab customGraphsTab = new Tab.DynamicTree("Custom graphs", PropertiesManager.CUSTOMGRAPHTAB);
             customGraphsTab.setHostlist(this);
             for(GraphDesc gd: graphs.values()) {
                 AutonomousGraphNode gn = new AutonomousGraphNode(gd);
                 gn.configure(this);
                 graphMap.put(gn.getQualifiedName().hashCode(), gn);
-                customGraphsTab.add(gn.getQualifiedName(), Arrays.asList(new String[] {gd.getName()}));
+                customGraphsTab.add(gn.getQualifiedName(), Arrays.asList(new String[] { gd.getName() }));
             }
             GraphTree tree = customGraphsTab.getGraphTree();
             treeMap.put(tree.getName(), tree);
@@ -371,7 +374,7 @@ public class HostsList extends StarterNode {
     }
 
     void doCustomTabs(Map<String, Tab> customTabMap, Map<String, GraphTree> treeMap, Set<Tab> tabs) {
-        if(! customTabMap.isEmpty()) {
+        if(!customTabMap.isEmpty()) {
             log(Level.DEBUG, "Tabs to add: %s", customTabMap.values());
             for(Tab t: customTabMap.values()) {
                 t.setHostlist(this);
@@ -396,12 +399,13 @@ public class HostsList extends StarterNode {
 
     /**
      * Create a new graph tree
+     * 
      * @param label The name of the tree
      * @param root The name of the first element in the tree
      * @return a graph tree
      */
     private GraphTree addTree(String label, String root) {
-        if( ! treeMap.containsKey(label)) {
+        if(!treeMap.containsKey(label)) {
             GraphTree newTree = GraphTree.makeGraph(root);
             treeMap.put(label, newTree);
             return newTree;
@@ -425,6 +429,7 @@ public class HostsList extends StarterNode {
 
     /**
      * Generate the list of roles that might view this node, using the filters
+     * 
      * @param gn
      * @param pathList
      */
@@ -444,7 +449,6 @@ public class HostsList extends StarterNode {
     public void addHost(HostInfo newhost) {
         hostList.add(newhost);
     }
-
 
     public GraphTree getGraphTree(String name) {
         return treeMap.get(name);
@@ -468,6 +472,7 @@ public class HostsList extends StarterNode {
 
     /**
      * Return a graph identified by his hash value
+     * 
      * @param id the hash value of the graph
      * @return the graph found or null of nothing found
      */
@@ -477,25 +482,27 @@ public class HostsList extends StarterNode {
 
     /**
      * Return a probe identified by his hash value
+     * 
      * @param id the hash value of the probe
      * @return the probe found or null of nothing found
      */
-    public Probe<?,?> getProbeById(int id) {
+    public Probe<?, ?> getProbeById(int id) {
         return probeMap.get(id);
     }
 
     /**
      * Return a probe identified by path
+     * 
      * @param host the host
      * @param probeName the probe name: the probeName element of a probedesc
      * @return the graph found or null of nothing found
      */
-    public Probe<?,?> getProbeByPath(String host, String probeName) {
+    public Probe<?, ?> getProbeByPath(String host, String probeName) {
         String path = host + "/" + probeName;
         return probeMap.get(path.hashCode());
     }
 
-    public void addProbe(Probe<?,?> p) {
+    public void addProbe(Probe<?, ?> p) {
         probeMap.put(p.hashCode(), p);
         addGraphs(p.getGraphList());
     }
@@ -538,7 +545,9 @@ public class HostsList extends StarterNode {
         return renderer;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.starter.StarterNode#isCollectRunning()
      */
     @Override

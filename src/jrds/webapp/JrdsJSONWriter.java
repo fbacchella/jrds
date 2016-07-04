@@ -82,6 +82,7 @@ public class JrdsJSONWriter {
     public JSONWriter object() throws JSONException {
         return jw.object();
     }
+
     /**
      * @param arg0
      * @return
@@ -124,7 +125,8 @@ public class JrdsJSONWriter {
 
     /**
      * Write a line separator. It prints both CR an LF
-     * @throws IOException 
+     * 
+     * @throws IOException
      */
     public void newLine() throws IOException {
         w.write("\r\n");

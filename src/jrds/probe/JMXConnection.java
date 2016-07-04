@@ -32,7 +32,7 @@ import jrds.jmx.JrdsSocketConnection;
 import jrds.starter.Connection;
 import jrds.starter.SocketFactory;
 
-@ProbeBean({"url", "protocol", "port", "path", "user", "password"})
+@ProbeBean({ "url", "protocol", "port", "path", "user", "password" })
 public class JMXConnection extends Connection<MBeanServerConnection> {
     static {
         JuliToLog4jHandler.catchLogger("javax.management", Level.FATAL);
@@ -66,7 +66,7 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
             }
 
         };
-        abstract public JMXServiceURL getURL(JMXConnection cnx)  throws MalformedURLException ;
+        abstract public JMXServiceURL getURL(JMXConnection cnx) throws MalformedURLException;
     }
 
     final static String startTimeObjectName = "java.lang:type=Runtime";
@@ -79,12 +79,12 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
             Thread t = new Thread(r, "Closer" + closed.getAndIncrement());
             t.setDaemon(true);
             return t;
-        }      
+        }
     };
     private final static ExecutorService closer = new ThreadPoolExecutor(0, 4, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), closerFactory);
 
     private JMXServiceURL url = null;
-    private PROTOCOL protocol  = PROTOCOL.rmi;
+    private PROTOCOL protocol = PROTOCOL.rmi;
     private int port;
     private String path = "/jmxrmi";
     private String user = null;
@@ -111,15 +111,15 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
     @Override
     public void configure(PropertiesManager pm) {
         super.configure(pm);
-        if (url == null) {
+        if(url == null) {
             try {
                 url = protocol.getURL(this);
             } catch (MalformedURLException e) {
                 throw new RuntimeException(String.format("Invalid jmx URL %s: %s", protocol.toString()), e);
             }
         }
-        // connector is always set, so close in Stop() always works 
-        Map<String,?> dummy = Collections.emptyMap();
+        // connector is always set, so close in Stop() always works
+        Map<String, ?> dummy = Collections.emptyMap();
         try {
             connector = JMXConnectorFactory.newJMXConnector(url, dummy);
         } catch (IOException e) {
@@ -134,16 +134,16 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
 
     /**
      * Resolve a mbean interface, given the interface and it's name
+     * 
      * @param name
      * @param interfaceClass
      * @return
      */
-    public <T> T getMBean(String name,  Class<T> interfaceClass) {
+    public <T> T getMBean(String name, Class<T> interfaceClass) {
         MBeanServerConnection mbsc = getConnection();
         try {
             ObjectName mbeanName = new ObjectName(name);
-            return javax.management.JMX.newMBeanProxy(mbsc, mbeanName, 
-                    interfaceClass, true);        
+            return javax.management.JMX.newMBeanProxy(mbsc, mbeanName, interfaceClass, true);
         } catch (MalformedObjectNameException e) {
             throw new RuntimeException("wrong mbean name: " + name, e);
         }
@@ -153,15 +153,17 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
     public long setUptime() {
         try {
             RuntimeMXBean mxbean = getMBean(startTimeObjectName, RuntimeMXBean.class);
-            if (mxbean != null)
-                return mxbean.getUptime() /1000;
+            if(mxbean != null)
+                return mxbean.getUptime() / 1000;
         } catch (Exception e) {
             log(Level.ERROR, e, "Uptime error for %s: %s", this, e);
         }
         return 0;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Starter#start()
      */
     @Override
@@ -169,8 +171,8 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
         try {
             log(Level.TRACE, "connecting to %s", url);
             Map<String, Object> attributes = new HashMap<String, Object>();
-            if(user != null && password != null ) {
-                String[] credentials = new String[]{user, password};
+            if(user != null && password != null) {
+                String[] credentials = new String[] { user, password };
                 attributes.put("jmx.remote.credentials", credentials);
             }
             attributes.put("jmx.remote.x.request.timeout", getTimeout() * 1000);
@@ -179,17 +181,17 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
             if(protocol == PROTOCOL.rmi) {
                 attributes.put("sun.rmi.transport.tcp.responseTimeout", getTimeout() * 1000);
                 attributes.put("com.sun.jndi.rmi.factory.socket", getLevel().find(JmxSocketFactory.class));
-            }
-            else if(protocol == PROTOCOL.jmxmp) {
+            } else if(protocol == PROTOCOL.jmxmp) {
                 Object sc = JrdsSocketConnection.create(url, getLevel().find(SocketFactory.class));
                 attributes.put(GenericConnector.MESSAGE_CONNECTION, sc);
             }
             // connect can hang in a read !
-            // So separate creation from connection, and then it might be possible to do close
+            // So separate creation from connection, and then it might be
+            // possible to do close
             // on a connecting probe
             connector = JMXConnectorFactory.newJMXConnector(url, attributes);
             connector.connect();
-            connection = connector.getMBeanServerConnection(); 
+            connection = connector.getMBeanServerConnection();
             return true;
         } catch (IOException e) {
             log(Level.ERROR, e, "Communication error with %s: %s", protocol.toString(), e);
@@ -197,7 +199,9 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
         return false;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Starter#stop()
      */
     @Override
@@ -211,26 +215,27 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
                 try {
                     current.close();
                 } catch (IOException e) {
-                    log(Level.ERROR, e, "JMXConnector to %s close failed because of: %s", this, e );
-                }            
+                    log(Level.ERROR, e, "JMXConnector to %s close failed because of: %s", this, e);
+                }
             }
         });
-        connection = null;                
+        connection = null;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Starter#toString()
      */
     @Override
     public String toString() {
-        if (url == null) {
+        if(url == null) {
             try {
                 return protocol.getURL(this).toString();
             } catch (MalformedURLException e) {
                 return "";
             }
-        }
-        else {
+        } else {
             return url.toString();
         }
     }
@@ -300,7 +305,7 @@ public class JMXConnection extends Connection<MBeanServerConnection> {
 
     /**
      * @param url the url to set
-     * @throws MalformedURLException 
+     * @throws MalformedURLException
      */
     public void setUrl(String url) throws MalformedURLException {
         this.url = new JMXServiceURL(url);

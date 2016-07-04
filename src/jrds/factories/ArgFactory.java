@@ -23,30 +23,38 @@ import org.apache.log4j.Logger;
 
 /**
  * A class to build args from a string constructor
- * @author Fabrice Bacchella 
+ * 
+ * @author Fabrice Bacchella
  */
 
 public final class ArgFactory {
     static private final Logger logger = Logger.getLogger(ArgFactory.class);
 
-    static private final String[] argPackages = new String[] {"java.lang.", "java.net.", "org.snmp4j.smi.", "java.io.", ""};
+    static private final String[] argPackages = new String[] { "java.lang.", "java.net.", "org.snmp4j.smi.", "java.io.", "" };
     static private final Map<String, Class<?>> classCache = new ConcurrentHashMap<String, Class<?>>();
 
     /**
      * This method build a list from an XML enumeration of element.
      * 
-     * The enumeration is made of :<p>
-     * <code>&lt;arg type="type" value="value"&gt;</code><p>
-     * or<p>
-     * <code>&lt;arg type="type"&gt;value&lt;/value&gt;</code><p>
-     * This method is recursive, so it if finds some <code>list</code> elements instead of an <code>arg</code>, it will build a sub-list.
+     * The enumeration is made of :
+     * <p>
+     * <code>&lt;arg type="type" value="value"&gt;</code>
+     * <p>
+     * or
+     * <p>
+     * <code>&lt;arg type="type"&gt;value&lt;/value&gt;</code>
+     * <p>
+     * This method is recursive, so it if finds some <code>list</code> elements
+     * instead of an <code>arg</code>, it will build a sub-list.
      * 
      * Unknown element will be silently ignored.
      * 
-     * @param sequence an XML element that contains as sequence of <code>arg</code> or <code>list</code> elements.
-     * @param arguments some object that will be used by a call to <code>jrds.Util.parseTemplate</code> for the arg values
+     * @param sequence an XML element that contains as sequence of
+     *            <code>arg</code> or <code>list</code> elements.
+     * @param arguments some object that will be used by a call to
+     *            <code>jrds.Util.parseTemplate</code> for the arg values
      * @return
-     * @throws InvocationTargetException 
+     * @throws InvocationTargetException
      */
     public static final List<Object> makeArgs(JrdsElement sequence, Object... arguments) throws InvocationTargetException {
         List<JrdsElement> elements = sequence.getChildElements();
@@ -63,10 +71,9 @@ public final class ArgFactory {
                     value = listNode.getTextContent();
                 value = jrds.Util.parseTemplate(value, arguments);
                 Object o = ArgFactory.ConstructFromString(resolvClass(type), value);
-                argsList.add(o);                
-            }
-            else if("list".equals(localName)) {
-                argsList.add(makeArgs(listNode, arguments));                
+                argsList.add(o);
+            } else if("list".equals(localName)) {
+                argsList.add(makeArgs(listNode, arguments));
             }
         }
         logger.debug(Util.delayedFormatString("arg vector: %s", argsList));
@@ -81,78 +88,63 @@ public final class ArgFactory {
             return Integer.TYPE;
         else if("double".equals(name)) {
             return Double.TYPE;
-        }
-        else if("float".equals(name)) {
+        } else if("float".equals(name)) {
             return Float.TYPE;
-        }
-        else if("byte".equals(name)) {
+        } else if("byte".equals(name)) {
             return Byte.TYPE;
-        }
-        else if("long".equals(name)) {
+        } else if("long".equals(name)) {
             return Long.TYPE;
-        }
-        else if("short".equals(name)) {
+        } else if("short".equals(name)) {
             return Short.TYPE;
-        }
-        else if("boolean".equals(name)) {
+        } else if("boolean".equals(name)) {
             return Boolean.TYPE;
-        }
-        else if("char".equals(name)) {
+        } else if("char".equals(name)) {
             return Character.TYPE;
         }
-        for (String packageTry: argPackages) {
+        for(String packageTry: argPackages) {
             try {
                 retValue = Class.forName(packageTry + name);
-            }
-            catch (ClassNotFoundException ex) {
-            }
-            catch (NoClassDefFoundError ex) {
+            } catch (ClassNotFoundException ex) {
+            } catch (NoClassDefFoundError ex) {
             }
         }
-        if (retValue == null)
+        if(retValue == null)
             throw new RuntimeException("Class " + name + " not found");
         classCache.put(name, retValue);
         return retValue;
     }
 
     /**
-     * Create an object providing the class and a String argument. So the class must have
-     * a constructor taking only a string as an argument.
+     * Create an object providing the class and a String argument. So the class
+     * must have a constructor taking only a string as an argument.
      * 
-     * It can manage native type and return an boxed object 
+     * It can manage native type and return an boxed object
+     * 
      * @param clazz
      * @param value
      * @return
-     * @throws InvocationTargetException 
+     * @throws InvocationTargetException
      */
     public static Object ConstructFromString(Class<?> clazz, String value) throws InvocationTargetException {
         try {
             Constructor<?> c;
-            if(! clazz.isPrimitive() ) {
+            if(!clazz.isPrimitive()) {
                 c = clazz.getConstructor(String.class);
-            }
-            else if(clazz == Integer.TYPE) {
+            } else if(clazz == Integer.TYPE) {
                 c = Integer.class.getConstructor(String.class);
-            }
-            else if(clazz == Double.TYPE) {
+            } else if(clazz == Double.TYPE) {
                 c = Double.class.getConstructor(String.class);
-            }
-            else if(clazz == Float.TYPE) {
+            } else if(clazz == Float.TYPE) {
                 c = Float.class.getConstructor(String.class);
-            }
-            else if(clazz == Byte.TYPE) {
+            } else if(clazz == Byte.TYPE) {
                 c = Byte.class.getConstructor(String.class);
-            }
-            else if(clazz == Long.TYPE) {
+            } else if(clazz == Long.TYPE) {
                 c = Long.class.getConstructor(String.class);
-            }
-            else if(clazz == Short.TYPE) {
+            } else if(clazz == Short.TYPE) {
                 c = Short.class.getConstructor(String.class);
-            }
-            else if(clazz == Boolean.TYPE) {
+            } else if(clazz == Boolean.TYPE) {
                 c = Boolean.class.getConstructor(String.class);
-            }
-            else if(clazz == Character.TYPE) {
+            } else if(clazz == Character.TYPE) {
                 c = Character.class.getConstructor(String.class);
             } else {
                 throw new IllegalArgumentException("no single String constructor found");
@@ -175,12 +167,13 @@ public final class ArgFactory {
      * Given an object, a bean name and a bean value, try to set the bean.
      * 
      * The bean type is expect to have a constructor taking a String argument
+     * 
      * @param o the object to set
      * @param beanName the bean to set
      * @param beanValue the bean value
      * @throws InvocationTargetException
      */
-    static public void beanSetter(Object o, String beanName, String beanValue) throws InvocationTargetException{
+    static public void beanSetter(Object o, String beanName, String beanValue) throws InvocationTargetException {
         try {
             PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
             Method setMethod = bean.getWriteMethod();
@@ -189,7 +182,7 @@ public final class ArgFactory {
             }
             Class<?> setArgType = bean.getPropertyType();
             Object argInstance = ArgFactory.ConstructFromString(setArgType, beanValue);
-            setMethod.invoke(o, argInstance);       
+            setMethod.invoke(o, argInstance);
         } catch (InvocationTargetException e) {
             throw new InvocationTargetException(e.getCause(), "invalid bean '" + beanName + "' for " + o);
         } catch (Exception e) {
@@ -198,7 +191,9 @@ public final class ArgFactory {
     }
 
     /**
-     * Extract a map of the beans of an class. Only the beans listed in the ProbeBean class will be return
+     * Extract a map of the beans of an class. Only the beans listed in the
+     * ProbeBean class will be return
+     * 
      * @param c a class to extract beans from
      * @return
      * @throws InvocationTargetException
@@ -210,8 +205,8 @@ public final class ArgFactory {
         Map<String, GenericBean> beanProperties = new HashMap<String, GenericBean>();
         for(ProbeBean annotation: beansAnnotations) {
             for(String beanName: annotation.value()) {
-                //Bean already found, don't work on it again
-                if( beanProperties.containsKey(beanName)) {
+                // Bean already found, don't work on it again
+                if(beanProperties.containsKey(beanName)) {
                     continue;
                 }
                 try {
@@ -227,15 +222,17 @@ public final class ArgFactory {
     }
 
     /**
-     * Enumerate the hierarchy of annotation for a class, until a certain class type is reached
+     * Enumerate the hierarchy of annotation for a class, until a certain class
+     * type is reached
+     * 
      * @param searched the Class where the annotation is searched
      * @param annontationClass the annotation class
-     * @param stop a class that will stop (included) the search 
+     * @param stop a class that will stop (included) the search
      * @return
      */
     static public <T extends Annotation> Set<T> enumerateAnnotation(Class<?> searched, Class<T> annontationClass, Class<?> stop) {
-        Set<T> annotations =  new LinkedHashSet<T>();
-        while(searched != null && stop.isAssignableFrom(searched)) {
+        Set<T> annotations = new LinkedHashSet<T>();
+        while (searched != null && stop.isAssignableFrom(searched)) {
             if(searched.isAnnotationPresent(annontationClass)) {
                 T annotation = searched.getAnnotation(annontationClass);
                 annotations.add(annotation);

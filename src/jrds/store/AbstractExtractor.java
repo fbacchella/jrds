@@ -13,10 +13,12 @@ public abstract class AbstractExtractor<Source> implements Extractor {
     public AbstractExtractor() {
         super();
     }
-    
+
     public abstract void release();
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.store.Extractor#addSource(java.lang.String, java.lang.String)
      */
     @Override
@@ -24,7 +26,9 @@ public abstract class AbstractExtractor<Source> implements Extractor {
         sources.put(name, dsName);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.store.ExtractorInterface#getNames()
      */
     @Override
@@ -32,7 +36,9 @@ public abstract class AbstractExtractor<Source> implements Extractor {
         return sources.keySet().toArray(new String[] {});
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.store.ExtractorInterface#getDsNames()
      */
     @Override
@@ -49,7 +55,9 @@ public abstract class AbstractExtractor<Source> implements Extractor {
     @Override
     public abstract void fill(RrdGraphDef gd, ExtractInfo ei);
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.store.ExtractorInterface#getColumnCount()
      */
     @Override

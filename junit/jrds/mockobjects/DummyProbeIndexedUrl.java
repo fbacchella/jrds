@@ -8,10 +8,10 @@ import jrds.Probe;
 import jrds.probe.UrlProbe;
 
 public class DummyProbeIndexedUrl extends DummyProbeIndexed implements UrlProbe {
-    Class<? extends Probe<?,?>> originalProbe;
+    Class<? extends Probe<?, ?>> originalProbe;
     URL url;
 
-    public void configure () throws InvocationTargetException {
+    public void configure() throws InvocationTargetException {
         super.configure();
         try {
             url = new URL("http://localhost/");

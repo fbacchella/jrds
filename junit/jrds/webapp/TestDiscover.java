@@ -17,7 +17,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class TestDiscover  {
+public class TestDiscover {
     static final private Logger logger = Logger.getLogger(TestDiscover.class);
 
     static ServletTester tester = null;
@@ -38,7 +38,7 @@ public class TestDiscover  {
     @Before
     public void prepare() throws Exception {
         tester = ToolsWebApp.getMonoServlet(testFolder, new Properties(), GetDiscoverHtmlCode.class, "/discoverhtml");
-        tester.start();        
+        tester.start();
     }
 
     @Test
@@ -47,7 +47,7 @@ public class TestDiscover  {
 
         logger.trace(response.getContent());
         JrdsDocument doc = new JrdsDocument(Tools.parseString(response.getContent()));
-        JrdsElement root =  doc.getRootElement();
+        JrdsElement root = doc.getRootElement();
         Assert.assertEquals("root element is not a div", "div", root.getNodeName());
         for(JrdsElement e: root.getChildElements()) {
             Assert.assertEquals("root element is not a div", "div", e.getNodeName());

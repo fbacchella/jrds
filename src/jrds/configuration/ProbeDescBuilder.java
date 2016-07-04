@@ -63,7 +63,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
             throw new RuntimeException("Probe " + pd.getProbeName() + "defined without class");
         }
         String className = classElem.getTextContent().trim();
-        Class<? extends Probe<?,?>> c = (Class<? extends Probe<?,?>>) classLoader.loadClass(className);
+        Class<? extends Probe<?, ?>> c = (Class<? extends Probe<?, ?>>) classLoader.loadClass(className);
         pd.setProbeClass(c);
 
         pd.setHeartBeatDefault(pm.step * 2);
@@ -71,7 +71,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
         setMethod(root.getElementbyName("uptimefactor"), pd, "setUptimefactor", Float.TYPE);
 
         boolean withgraphs = false;
-        JrdsElement graphsElement= root.getElementbyName("graphs");
+        JrdsElement graphsElement = root.getElementbyName("graphs");
         if(graphsElement != null) {
             for(JrdsElement e: graphsElement.getChildElementsByName("name")) {
                 String graphName = e.getTextContent();
@@ -80,13 +80,12 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
                     pd.addGraph(graphName);
                     withgraphs = true;
                     logger.trace(Util.delayedFormatString("Adding graph: %s", graphName));
-                }
-                else {
+                } else {
                     logger.info(Util.delayedFormatString("Missing graph %s for probe %s", graphName, pd.getName()));
                 }
             }
         }
-        if(! withgraphs) {
+        if(!withgraphs) {
             logger.debug(Util.delayedFormatString("No graph defined for probe %s", pd.getName()));
         }
 
@@ -103,22 +102,22 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
         JrdsElement requesterElement = root.getElementbyName("snmpRequester");
         if(requesterElement != null) {
             String snmpRequester = requesterElement.getTextContent();
-            if (snmpRequester != null) {
+            if(snmpRequester != null) {
                 snmpRequester = snmpRequester.trim();
-                if (!snmpRequester.isEmpty()) {
+                if(!snmpRequester.isEmpty()) {
                     pd.addSpecific("requester", snmpRequester);
                     logger.trace(Util.delayedFormatString("Specific added: requester='%s'", snmpRequester));
                 }
             }
         }
 
-        //Populating the custom beans map
+        // Populating the custom beans map
         for(JrdsElement attr: root.getChildElementsByName("customattr")) {
             String beanName = attr.getAttribute("name");
             pd.addBean(new GenericBean.CustomBean(beanName));
         }
 
-        //Populating the default arguments map
+        // Populating the default arguments map
         JrdsElement argsNode = root.getElementbyName("defaultargs");
         if(argsNode != null) {
             for(JrdsElement attr: argsNode.getChildElementsByName("attr")) {
@@ -131,7 +130,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
         }
 
         for(Map<String, Object> dsMap: doDsList(pd.getName(), root)) {
-            pd.add(dsMap);			
+            pd.add(dsMap);
         }
 
         return pd;

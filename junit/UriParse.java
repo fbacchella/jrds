@@ -13,10 +13,11 @@ import org.junit.Test;
 
 public class UriParse {
     static final private Logger logger = Logger.getLogger(UriParse.class);
+
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
-        Tools.setLevel(new String[] {"jrds"}, logger.getLevel());
+        Tools.setLevel(new String[] { "jrds" }, logger.getLevel());
     }
 
     @SuppressWarnings("unused")
@@ -24,7 +25,7 @@ public class UriParse {
     public void uritest() throws URISyntaxException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         logger.trace("start");
         Class<?> c = "".getClass();
-        String retValue="Not found";
+        String retValue = "Not found";
         String cName = c.getCanonicalName();
         logger.trace(logger.getClass().getPackage().getName());
         logger.trace(c.getResource(logger.getClass().getPackage().getName()));

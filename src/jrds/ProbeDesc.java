@@ -42,6 +42,7 @@ public class ProbeDesc implements Cloneable {
     public static class DefaultBean {
         public final String value;
         public final boolean delayed;
+
         DefaultBean(String value, boolean delayed) {
             this.value = value;
             this.delayed = delayed;
@@ -57,10 +58,10 @@ public class ProbeDesc implements Cloneable {
     private String probeName;
     private String name;
     private final Collection<String> graphesList = new ArrayList<String>();
-    private Class<? extends Probe<?,?>> probeClass = null;
+    private Class<? extends Probe<?, ?>> probeClass = null;
     private Map<String, ProbeDesc.DefaultBean> defaultsBeans = Collections.emptyMap();
     private float uptimefactor = (float) 1.0;
-    private Map<String, Double> defaultValues = new HashMap<String,Double>(0);
+    private Map<String, Double> defaultValues = new HashMap<String, Double>(0);
     private Map<String, GenericBean> beans = new HashMap<String, GenericBean>(0);
     private final Set<String> optionals = new HashSet<String>(0);
 
@@ -70,8 +71,8 @@ public class ProbeDesc implements Cloneable {
         public double minValue;
         public double maxValue;
         public Object collectKey;
-        public DsDesc(DsType dsType, long heartbeat, double minValue, double maxValue, Object key)
-        {
+
+        public DsDesc(DsType dsType, long heartbeat, double minValue, double maxValue, Object key) {
             this.dsType = dsType;
             this.heartbeat = heartbeat;
             this.minValue = minValue;
@@ -82,6 +83,7 @@ public class ProbeDesc implements Cloneable {
 
     /**
      * Create a new Probe Description, with <em>size</em> elements in prevision
+     * 
      * @param size estimated elements number
      */
     public ProbeDesc(int size) {
@@ -95,64 +97,62 @@ public class ProbeDesc implements Cloneable {
         dsMap = new LinkedHashMap<String, DsDesc>();
     }
 
-    //Differets way to add a munins probe
+    // Differets way to add a munins probe
     /**
      * A datastore that is stored but not collected
+     * 
      * @param name the datastore name
      * @param dsType
      */
-    public void add(String name, DsType dsType)
-    {
+    public void add(String name, DsType dsType) {
         dsMap.put(name, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, name));
     }
 
-    public void add(String name, DsType dsType, double min, double max)
-    {
+    public void add(String name, DsType dsType, double min, double max) {
         dsMap.put(name, new DsDesc(dsType, heartBeatDefault, min, max, name));
     }
 
-    public void add(String dsName, DsType dsType, String probeName)
-    {
+    public void add(String dsName, DsType dsType, String probeName) {
         dsMap.put(dsName, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, probeName));
     }
 
-    public void add(String dsName, DsType dsType, String probeName, double min, double max)
-    {
+    public void add(String dsName, DsType dsType, String probeName, double min, double max) {
         dsMap.put(dsName, new DsDesc(dsType, heartBeatDefault, min, max, probeName));
     }
 
-    /** Add a SNMP probe what will be stored
+    /**
+     * Add a SNMP probe what will be stored
+     * 
      * @param name
      * @param dsType
      * @param oid
      */
-    public void add(String name, DsType dsType, OID oid)
-    {
+    public void add(String name, DsType dsType, OID oid) {
         dsMap.put(name, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, oid));
     }
 
-    public void add(String name, DsType dsType, OID oid, double min, double max)
-    {
+    public void add(String name, DsType dsType, OID oid, double min, double max) {
         dsMap.put(name, new DsDesc(dsType, heartBeatDefault, min, max, oid));
     }
 
-    /**Add a SNMP probe not to be stored
+    /**
+     * Add a SNMP probe not to be stored
+     * 
      * @param name
      * @param oid
      */
-    public void add(String name, OID oid)
-    {
+    public void add(String name, OID oid) {
         dsMap.put(name, new DsDesc(null, heartBeatDefault, MINDEFAULT, MAXDEFAULT, oid));
     }
 
-    public void add(String name, DsType dsType, Object index, double min, double max)
-    {
+    public void add(String name, DsType dsType, Object index, double min, double max) {
         dsMap.put(name, new DsDesc(null, heartBeatDefault, MINDEFAULT, MAXDEFAULT, index));
     }
 
     public static final class Joined {
         Object keyhigh;
         Object keylow;
+
         Joined(Object keyhigh, Object keylow) {
             this.keyhigh = keyhigh;
             this.keylow = keylow;
@@ -176,11 +176,10 @@ public class ProbeDesc implements Cloneable {
         String name = null;
         DsType type = null;
 
-        //Where to look for the added name
+        // Where to look for the added name
         if(valuesMap.containsKey("dsName")) {
             name = (String) valuesMap.get("dsName");
-        }
-        else if(valuesMap.containsKey("collect")) {
+        } else if(valuesMap.containsKey("collect")) {
             name = valuesMap.get("collect").toString();
         }
 
@@ -188,18 +187,16 @@ public class ProbeDesc implements Cloneable {
             type = (DsType) valuesMap.get("dsType");
         }
 
-        //Where to look for the collect info
+        // Where to look for the collect info
         if(valuesMap.containsKey("collect")) {
             collectKey = valuesMap.get("collect");
-        }
-        else if(valuesMap.containsKey("collecthigh") && valuesMap.containsKey("collectlow")) {
+        } else if(valuesMap.containsKey("collecthigh") && valuesMap.containsKey("collectlow")) {
             Object keyHigh = valuesMap.get("collecthigh");
             Object keyLow = valuesMap.get("collectlow");
             dsMap.put(name + "high", new DsDesc(null, heartbeat, min, max, keyHigh));
             dsMap.put(name + "low", new DsDesc(null, heartbeat, min, max, keyLow));
             highlowcollectmap.put(name, new Joined(keyHigh, keyLow));
-        }
-        else {
+        } else {
             collectKey = name;
         }
 
@@ -212,9 +209,9 @@ public class ProbeDesc implements Cloneable {
         if(valuesMap.containsKey("maxValue")) {
             max = jrds.Util.parseStringNumber(valuesMap.get("maxValue").toString(), MAXDEFAULT);
         }
-        if (valuesMap.containsKey("optional") && valuesMap.get("optional") instanceof Boolean) {
+        if(valuesMap.containsKey("optional") && valuesMap.get("optional") instanceof Boolean) {
             boolean optional = (Boolean) valuesMap.get("optional");
-            if (optional) {
+            if(optional) {
                 optionals.add(name);
             }
         }
@@ -223,11 +220,13 @@ public class ProbeDesc implements Cloneable {
     }
 
     /**
-     * Replace all the data source for this probe description with the list provided
+     * Replace all the data source for this probe description with the list
+     * provided
+     * 
      * @param dsList a list of data source description as a map.
      */
     public void replaceDs(List<Map<String, Object>> dsList) {
-        defaultValues = new HashMap<String,Double>(0);
+        defaultValues = new HashMap<String, Double>(0);
         dsMap = new HashMap<String, DsDesc>(dsList.size());
         for(Map<String, Object> dsinfo: dsList) {
             add(dsinfo);
@@ -236,36 +235,39 @@ public class ProbeDesc implements Cloneable {
 
     /**
      * Return a map that translate an OID to the datastore name
+     * 
      * @return a Map of collect oids to datastore name
      */
-    public Map<OID, String> getCollectOids()
-    {
+    public Map<OID, String> getCollectOids() {
         Map<OID, String> retValue = new LinkedHashMap<OID, String>(dsMap.size());
         for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
             DsDesc dd = e.getValue();
             if(dd.collectKey != null && dd.collectKey instanceof OID)
-                retValue.put((OID)dd.collectKey, e.getKey());
+                retValue.put((OID) dd.collectKey, e.getKey());
         }
         return retValue;
     }
 
     /**
-     * Return a map that translate the probe technical name  as a string to the datastore name
+     * Return a map that translate the probe technical name as a string to the
+     * datastore name
+     * 
      * @return a Map of collect names to datastore name
      */
-    public Map<String, String> getCollectStrings()
-    {
+    public Map<String, String> getCollectStrings() {
         Map<String, String> retValue = new LinkedHashMap<String, String>(dsMap.size());
         for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
-            DsDesc dd =  e.getValue();
-            if(dd.collectKey != null  && dd.collectKey instanceof String  && ! "".equals(dd.collectKey))
-                retValue.put((String)dd.collectKey, e.getKey());
+            DsDesc dd = e.getValue();
+            if(dd.collectKey != null && dd.collectKey instanceof String && !"".equals(dd.collectKey))
+                retValue.put((String) dd.collectKey, e.getKey());
         }
         return retValue;
     }
 
     /**
-     * Return a map that translate the probe technical name to the datastore name
+     * Return a map that translate the probe technical name to the datastore
+     * name
+     * 
      * @return a Map of collect names to datastore name
      */
     public Map<Object, String> getCollectMapping() {
@@ -278,10 +280,9 @@ public class ProbeDesc implements Cloneable {
         return retValue;
     }
 
-    public DsDef[] getDsDefs() 
-    {
+    public DsDef[] getDsDefs() {
         List<DsDef> dsList = new ArrayList<DsDef>(dsMap.size());
-        for(Map.Entry<String, DsDesc> e: dsMap.entrySet() ) {
+        for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
             DsDesc desc = e.getValue();
             if(desc.dsType != null)
                 dsList.add(new DsDef(e.getKey(), desc.dsType, desc.heartbeat, desc.minValue, desc.maxValue));
@@ -291,7 +292,7 @@ public class ProbeDesc implements Cloneable {
 
     public Collection<String> getDs() {
         HashSet<String> dsList = new HashSet<String>(dsMap.size());
-        for(Map.Entry<String, DsDesc> e: dsMap.entrySet() ) {
+        for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
             if(e.getValue().dsType != null)
                 dsList.add(e.getKey());
         }
@@ -300,14 +301,13 @@ public class ProbeDesc implements Cloneable {
 
     public boolean dsExist(String dsName) {
         DsDesc dd = dsMap.get(dsName);
-        return (dd !=null && dd.dsType != null);
+        return (dd != null && dd.dsType != null);
     }
 
     /**
      * @return The number of data store
      */
-    public int getSize()
-    {
+    public int getSize() {
         return dsMap.size();
     }
 
@@ -325,7 +325,6 @@ public class ProbeDesc implements Cloneable {
         this.probeName = probeName;
     }
 
-
     /**
      * @return the uptimefactor
      */
@@ -335,15 +334,17 @@ public class ProbeDesc implements Cloneable {
 
     /**
      * Used to set à string template
+     * 
      * @param index
      */
     public void setIndex(String index) {
-        if(index != null && ! index.isEmpty())
+        if(index != null && !index.isEmpty())
             specific.put("index", index);
     }
 
     /**
      * Return the string template or null
+     * 
      * @return
      */
     public String getIndex() {
@@ -371,11 +372,11 @@ public class ProbeDesc implements Cloneable {
         this.graphesList.add(graph);
     }
 
-    public Class<? extends Probe<?,?>> getProbeClass() {
+    public Class<? extends Probe<?, ?>> getProbeClass() {
         return probeClass;
     }
 
-    public void setProbeClass(Class<? extends Probe<?,?>> probeClass) throws InvocationTargetException {
+    public void setProbeClass(Class<? extends Probe<?, ?>> probeClass) throws InvocationTargetException {
         beans.putAll(ArgFactory.getBeanPropertiesMap(probeClass, Probe.class));
         this.probeClass = probeClass;
     }
@@ -392,7 +393,7 @@ public class ProbeDesc implements Cloneable {
         return beans.get(name);
     }
 
-    public void addBean(GenericBean bean) {   
+    public void addBean(GenericBean bean) {
         beans.put(bean.getName(), bean);
     }
 
@@ -412,11 +413,11 @@ public class ProbeDesc implements Cloneable {
         specific.put(name, value);
     }
 
-    public void addDefaultBean(String beanName, String beanValue, boolean finalBean) throws InvocationTargetException{
-        ProbeDesc.DefaultBean attr = new  ProbeDesc.DefaultBean(beanValue, finalBean);
-        if(defaultsBeans.size() == 0) 
+    public void addDefaultBean(String beanName, String beanValue, boolean finalBean) throws InvocationTargetException {
+        ProbeDesc.DefaultBean attr = new ProbeDesc.DefaultBean(beanValue, finalBean);
+        if(defaultsBeans.size() == 0)
             defaultsBeans = new HashMap<String, ProbeDesc.DefaultBean>();
-        if( beans.containsKey(beanName)) {
+        if(beans.containsKey(beanName)) {
             defaultsBeans.put(beanName, attr);
             logger.trace(Util.delayedFormatString("Adding bean %s=%s to default beans", beanName, beanValue));
         }
@@ -453,25 +454,24 @@ public class ProbeDesc implements Cloneable {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.newDocument();
-        Element root =
-                document.createElement("probedesc");
+        Element root = document.createElement("probedesc");
         document.appendChild(root);
         root.appendChild(document.createElement("name")).setTextContent(name);
         if(probeName != null)
             root.appendChild(document.createElement("probeName")).setTextContent(probeName);
         root.appendChild(document.createElement("probeClass")).setTextContent(probeClass.getName());
 
-        //Setting specific values
+        // Setting specific values
         for(Map.Entry<String, String> e: specific.entrySet()) {
             Element specElement = (Element) root.appendChild(document.createElement("specific"));
             specElement.setAttribute("name", e.getKey());
             specElement.setTextContent(e.getValue());
         }
-        //Setting the uptime factor
+        // Setting the uptime factor
         if(uptimefactor != 1.0)
             root.appendChild(document.createElement("uptimefactor")).setTextContent(Float.toString(uptimefactor));
 
-        //Adding all the datastores
+        // Adding all the datastores
         for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
             Element dsElement = (Element) root.appendChild(document.createElement("ds"));
             dsElement.appendChild(document.createElement("dsName")).setTextContent(e.getKey());
@@ -482,9 +482,9 @@ public class ProbeDesc implements Cloneable {
                 dsElement.appendChild(document.createElement("oid")).setTextContent(desc.collectKey.toString());
             if(desc.collectKey instanceof String)
                 dsElement.appendChild(document.createElement("collect")).setTextContent(desc.collectKey.toString());
-            if(desc.minValue != MINDEFAULT) 
+            if(desc.minValue != MINDEFAULT)
                 dsElement.appendChild(document.createElement("minValue")).setTextContent(Double.toString(desc.minValue));
-            if(! Double.isNaN(desc.maxValue)) 
+            if(!Double.isNaN(desc.maxValue))
                 dsElement.appendChild(document.createElement("maxValue")).setTextContent(Double.toString(desc.maxValue));
 
         }
@@ -495,20 +495,24 @@ public class ProbeDesc implements Cloneable {
         return document;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#clone()
      */
     @Override
     public Object clone() throws CloneNotSupportedException {
         return (ProbeDesc) super.clone();
     }
-    
+
     /**
-     * Return true if the given datasource was associated with an optional collect string
+     * Return true if the given datasource was associated with an optional
+     * collect string
+     * 
      * @param dsName
      * @return
      */
-    boolean isOptional(String dsName){
+    boolean isOptional(String dsName) {
         return optionals.contains(dsName);
     }
 

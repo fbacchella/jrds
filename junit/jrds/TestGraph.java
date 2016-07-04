@@ -22,7 +22,7 @@ public class TestGraph {
     static final Logger logger = Logger.getLogger(TestGraph.class);
     HostsList hl;
     PropertiesManager pm;
-    Probe<?,?> p;
+    Probe<?, ?> p;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -38,14 +38,13 @@ public class TestGraph {
     public void prepare() throws Exception {
         pm = Tools.makePm(testFolder);
         hl = new HostsList(pm);
-        GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start().
-                set(PropertiesManager.class, pm);
+        GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start().set(PropertiesManager.class, pm);
         p = GenerateProbe.quickProbe(testFolder, args);
         p.getPd().add("data", DsType.GAUGE);
-        Assert.assertTrue("Failed to create probe " + p.getMainStore().getPath(),p.checkStore());
+        Assert.assertTrue("Failed to create probe " + p.getMainStore().getPath(), p.checkStore());
     }
 
-    @Test 
+    @Test
     public void getBytes() throws Exception {
         GraphNode gn = new GraphNode(p, GetMoke.getGraphDesc());
         Period pr = new Period();

@@ -38,42 +38,50 @@ import org.w3c.dom.Element;
 
 /**
  * A classed used to store the static description of a graph
+ * 
  * @author Fabrice Bacchella
  */
-public class GraphDesc
-implements Cloneable, WithACL {
+public class GraphDesc implements Cloneable, WithACL {
     static final private Logger logger = Logger.getLogger(GraphDesc.class);
 
     static public final ConsolFun DEFAULTCF = ConsolFun.AVERAGE;
 
-    //  static final private String manySpace = "123456798ABCDEF0123465798ABCDEF0123456798ABCDEF0123465798ABCDEF0123456798ABCDEF0123465798ABCDEF0  ";
+    // static final private String manySpace =
+    // "123456798ABCDEF0123465798ABCDEF0123456798ABCDEF0123465798ABCDEF0123456798ABCDEF0123465798ABCDEF0
+    // ";
     static final private String MANYSPACE = "                                                                      ";
 
     public enum GraphType {
-        NONE  {
+        NONE {
             public String toString() {
                 return "none";
             }
+
             public boolean datasource() {
                 return true;
             }
+
             public boolean toPlot() {
                 return false;
             }
+
             public boolean legend() {
                 return false;
             }
         },
-        PERCENTILE  {
+        PERCENTILE {
             public String toString() {
                 return "percentile";
             }
+
             public boolean datasource() {
                 return true;
             }
+
             public boolean toPlot() {
                 return false;
             }
+
             public boolean legend() {
                 return false;
             }
@@ -82,12 +90,15 @@ implements Cloneable, WithACL {
             public String toString() {
                 return "legend";
             }
+
             public boolean datasource() {
                 return true;
             }
+
             public boolean toPlot() {
                 return false;
             }
+
             public boolean legend() {
                 return true;
             }
@@ -101,6 +112,7 @@ implements Cloneable, WithACL {
             public boolean datasource() {
                 return false;
             }
+
             public boolean toPlot() {
                 return false;
             }
@@ -113,12 +125,15 @@ implements Cloneable, WithACL {
             public String toString() {
                 return "comment";
             }
+
             public boolean datasource() {
                 return false;
             }
+
             public boolean toPlot() {
                 return false;
             }
+
             public boolean legend() {
                 return true;
             }
@@ -136,6 +151,7 @@ implements Cloneable, WithACL {
             public boolean datasource() {
                 return true;
             }
+
             public boolean toPlot() {
                 return true;
             }
@@ -157,6 +173,7 @@ implements Cloneable, WithACL {
             public boolean datasource() {
                 return true;
             }
+
             public boolean toPlot() {
                 return true;
             }
@@ -178,6 +195,7 @@ implements Cloneable, WithACL {
             public boolean datasource() {
                 return true;
             }
+
             public boolean toPlot() {
                 return true;
             }
@@ -187,23 +205,27 @@ implements Cloneable, WithACL {
             }
         };
 
-        public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {}
+        public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
+        }
 
         /**
          * To check if it will generate a plot, for color calculation
+         * 
          * @return
          */
         public abstract boolean toPlot();
+
         public abstract boolean datasource();
 
         /**
          * To check if it will generate a line in the legend block
+         * 
          * @return
          */
         public abstract boolean legend();
     }
 
-    //Old name kept
+    // Old name kept
     static final public GraphType NONE = GraphType.NONE;
     static final public GraphType DATASOURCE = GraphType.NONE;
     static final public GraphType LINE = GraphType.LINE;
@@ -229,13 +251,12 @@ implements Cloneable, WithACL {
                     retValue.setLength(0);
                     IndexedProbe ip = (IndexedProbe) graph.getProbe();
                     retValue.append(ip.getIndexName());
-                    //Check to see if a label is defined and needed to add
+                    // Check to see if a label is defined and needed to add
                     String label = graph.getProbe().getLabel();
                     if(label != null) {
                         retValue.append(" (").append(label).append(")");
                     }
-                }
-                else {
+                } else {
                     logger.debug("Bad graph definition for " + graph);
                 }
                 return retValue.toString();
@@ -244,16 +265,16 @@ implements Cloneable, WithACL {
         URL {
             public String resolve(GraphNode graph) {
                 String url = "";
-                Probe<?,?> probe = graph.getProbe();
-                if( probe instanceof UrlProbe) {
-                    url =((UrlProbe) probe).getUrlAsString();
+                Probe<?, ?> probe = graph.getProbe();
+                if(probe instanceof UrlProbe) {
+                    url = ((UrlProbe) probe).getUrlAsString();
                 }
                 return url;
             }
         },
         JDBC {
             public String resolve(GraphNode graph) {
-                return ( (JdbcProbe) graph.getProbe()).getUrlAsString();
+                return ((JdbcProbe) graph.getProbe()).getUrlAsString();
             }
         },
         DISK {
@@ -311,7 +332,7 @@ implements Cloneable, WithACL {
                 return "Memory";
             }
         },
-        DATABASE{
+        DATABASE {
             public String resolve(GraphNode graph) {
                 return "Databases";
             }
@@ -344,28 +365,28 @@ implements Cloneable, WithACL {
     static final public PathElement DATABASE = PathElement.DATABASE;
 
     public enum Colors {
-        //240°
+        // 240°
         BLUE {
             @Override
             public Color getColor() {
                 return Color.BLUE;
             }
         },
-        //120°
+        // 120°
         GREEN {
             @Override
             public Color getColor() {
                 return Color.GREEN;
             }
         },
-        //0°
+        // 0°
         RED {
             @Override
             public Color getColor() {
                 return Color.RED;
             }
         },
-        //180°
+        // 180°
         CYAN {
             @Override
             public Color getColor() {
@@ -379,35 +400,35 @@ implements Cloneable, WithACL {
                 return Color.ORANGE;
             }
         },
-        //180°
+        // 180°
         TEAL {
             @Override
             public Color getColor() {
-                return new Color(0,128,128);
+                return new Color(0, 128, 128);
             }
         },
-        //60°
+        // 60°
         YELLOW {
             @Override
             public Color getColor() {
                 return Color.YELLOW;
             }
         },
-        //300°
+        // 300°
         MAGENTA {
             @Override
             public Color getColor() {
                 return Color.MAGENTA;
             }
         },
-        //0°
+        // 0°
         PINK {
             @Override
             public Color getColor() {
                 return Color.PINK;
             }
         },
-        //0°
+        // 0°
         BLACK {
             @Override
             public Color getColor() {
@@ -417,17 +438,17 @@ implements Cloneable, WithACL {
         NAVY {
             @Override
             public Color getColor() {
-                return new Color(0,0,128);
+                return new Color(0, 0, 128);
             }
         },
-        //0°
+        // 0°
         GRAY {
             @Override
             public Color getColor() {
                 return Color.GRAY;
             }
         },
-        //0°
+        // 0°
         LIGHT_GRAY {
             @Override
             public Color getColor() {
@@ -443,10 +464,10 @@ implements Cloneable, WithACL {
         FUCHSIA {
             @Override
             public Color getColor() {
-                return new Color(255,0,255);
+                return new Color(255, 0, 255);
             }
         },
-        //Netscape alias for cyan
+        // Netscape alias for cyan
         AQUA {
             @Override
             public Color getColor() {
@@ -456,31 +477,31 @@ implements Cloneable, WithACL {
         LIME {
             @Override
             public Color getColor() {
-                return new Color(204,255,0);
+                return new Color(204, 255, 0);
             }
         },
         MAROON {
             @Override
             public Color getColor() {
-                return new Color(128,0,0);
+                return new Color(128, 0, 0);
             }
         },
         OLIVE {
             @Override
             public Color getColor() {
-                return new Color(128,128,0);
+                return new Color(128, 128, 0);
             }
         },
         PURPLE {
             @Override
             public Color getColor() {
-                return new Color(128,0,128);
+                return new Color(128, 0, 128);
             }
         },
         SILVER {
             @Override
             public Color getColor() {
-                return new Color(192,192,192);
+                return new Color(192, 192, 192);
             }
         },
         WHITE {
@@ -491,9 +512,11 @@ implements Cloneable, WithACL {
         };
 
         public abstract Color getColor();
+
         public static final int length = Colors.values().length;
+
         public static final Color resolveIndex(int i) {
-            return Colors.values()[ i % Colors.length].getColor();
+            return Colors.values()[i % Colors.length].getColor();
         }
     }
 
@@ -506,9 +529,11 @@ implements Cloneable, WithACL {
         final String legend;
         final ConsolFun cf;
         final Integer percentile;
-        static final class DsPath  {
+
+        static final class DsPath {
             public final String host;
             public final String probe;
+
             DsPath(String host, String probe) {
                 this.host = host;
                 this.probe = probe;
@@ -529,13 +554,12 @@ implements Cloneable, WithACL {
             this.cf = cf;
             if(probe != null) {
                 this.dspath = new DsPath(host, probe);
-            }
-            else {
+            } else {
                 this.dspath = null;
             }
         }
-        public DsDesc(String name, String rpn,
-                GraphType graphType, Color color, String legend) {
+
+        public DsDesc(String name, String rpn, GraphType graphType, Color color, String legend) {
             this.name = name;
             this.rpn = rpn;
             this.graphType = graphType;
@@ -546,9 +570,8 @@ implements Cloneable, WithACL {
             this.percentile = null;
             this.dspath = null;
         }
-        public DsDesc(String name, String dsName,
-                Integer percentile,
-                GraphType graphType, Color color) {
+
+        public DsDesc(String name, String dsName, Integer percentile, GraphType graphType, Color color) {
             this.name = name;
             this.dsName = dsName;
             this.percentile = percentile;
@@ -559,6 +582,7 @@ implements Cloneable, WithACL {
             this.cf = null;
             this.dspath = null;
         }
+
         public DsDesc(String dsName, GraphType graphType, String legend, ConsolFun cf) {
             this.name = dsName;
             this.dsName = dsName;
@@ -570,6 +594,7 @@ implements Cloneable, WithACL {
             this.percentile = null;
             this.dspath = null;
         }
+
         public String toString() {
             return String.format("DsDesc(%s,[%s/%s/%s],\"%s\",%s,Color[%d, %d, %d],\"%s\",%s)",
                     name,
@@ -597,13 +622,15 @@ implements Cloneable, WithACL {
     private Map<String, List<?>> trees = new HashMap<String, List<?>>(2);
     private String graphName;
     private String name;
-    private String graphTitle ="${graphdesc.name} on ${host}";
+    private String graphTitle = "${graphdesc.name} on ${host}";
     private int maxLengthLegend = 0;
     private boolean siUnit = true;
     private boolean logarithmic = false;
     private Integer unitExponent = null;
-    private boolean withLegend = true;  // To show the values block under the graph
-    private boolean withSummary = true; // To show the summary with last update, period, etc. information block
+    private boolean withLegend = true; // To show the values block under the
+                                       // graph
+    private boolean withSummary = true; // To show the summary with last update,
+                                        // period, etc. information block
     private ACL acl = ACL.ALLOWEDACL;
     private Class<Graph> graphClass = Graph.class;
 
@@ -616,6 +643,7 @@ implements Cloneable, WithACL {
 
     /**
      * A constructor wich pre allocate the desired size
+     * 
      * @param size the estimated number of graph that will be created
      */
     public GraphDesc(int size) {
@@ -627,9 +655,7 @@ implements Cloneable, WithACL {
     }
 
     public void add(String name, GraphType graphType) {
-        add(name, name, null, graphType,
-                Colors.resolveIndex(lastColor), name,
-                DEFAULTCF, false, null, null, null);
+        add(name, name, null, graphType, Colors.resolveIndex(lastColor), name, DEFAULTCF, false, null, null, null);
         if(graphType.toPlot())
             lastColor++;
     }
@@ -645,6 +671,7 @@ implements Cloneable, WithACL {
 
     /**
      * Add a plot, but only uses String as parameters, for the GraphFactory
+     * 
      * @param name Name of the plot
      * @param dsName the datastore to use
      * @param rpn The RPN, used instead of the datastore
@@ -670,14 +697,13 @@ implements Cloneable, WithACL {
                 gt = GraphType.COMMENT;
             else
                 gt = GraphType.NONE;
-        }
-        else
+        } else
             gt = GraphType.valueOf(graphType.toUpperCase());
 
-        ConsolFun cf  = null;
+        ConsolFun cf = null;
         if(gt != GraphType.COMMENT) {
             cf = DEFAULTCF;
-            if (consFunc != null && ! "".equals(consFunc))
+            if(consFunc != null && !"".equals(consFunc))
                 cf = ConsolFun.valueOf(consFunc.toUpperCase());
         }
 
@@ -687,18 +713,16 @@ implements Cloneable, WithACL {
                 int r = Integer.parseInt(color.substring(1, 3), 16);
                 int g = Integer.parseInt(color.substring(3, 5), 16);
                 int b = Integer.parseInt(color.substring(5, 7), 16);
-                c = new Color(r,g,b);
-            }
-            else if (color != null && ! "".equals(color)) {
+                c = new Color(r, g, b);
+            } else if(color != null && !"".equals(color)) {
                 c = Colors.valueOf(color.toUpperCase()).getColor();
-                if( c == null)
+                if(c == null)
                     c = Color.getColor(color);
-                if (c == null) {
+                if(c == null) {
                     logger.error("Cannot read color " + color);
                     c = Color.white;
                 }
-            }
-            else {
+            } else {
                 c = Colors.resolveIndex(lastColor);
                 if(gt.toPlot())
                     lastColor++;
@@ -711,16 +735,16 @@ implements Cloneable, WithACL {
                 dsName = name;
             }
         }
-        //If the name is missing, generate one ?
+        // If the name is missing, generate one ?
         else {
-            name = Integer.toHexString((int)(Math.random() * Integer.MAX_VALUE));
+            name = Integer.toHexString((int) (Math.random() * Integer.MAX_VALUE));
         }
-        //Auto generated legend
+        // Auto generated legend
         if(legend == null && gt.legend())
             legend = name;
 
         Integer valPercentile = null;
-        if(percentile != null && ! "".equals(percentile)) {
+        if(percentile != null && !"".equals(percentile)) {
             valPercentile = jrds.Util.parseStringNumber(percentile, Integer.valueOf(0));
         }
         logger.trace(Util.delayedFormatString(
@@ -736,30 +760,22 @@ implements Cloneable, WithACL {
             String host, String probe) {
         if(reversed) {
             String revRpn = "0, " + name + ", -";
-            allds.add(
-                    new DsDesc(name, dsName, rpn, GraphType.NONE, null, null, cf, host, probe));
-            allds.add(
-                    new DsDesc("rev_" + name, revRpn, graphType, color, null));
+            allds.add(new DsDesc(name, dsName, rpn, GraphType.NONE, null, null, cf, host, probe));
+            allds.add(new DsDesc("rev_" + name, revRpn, graphType, color, null));
             allds.add(new DsDesc(name, GraphType.LEGEND, legend, cf));
-        }
-        else {
-            allds.add(
-                    new DsDesc(name, dsName, rpn, graphType, color, legend, cf, host, probe));
+        } else {
+            allds.add(new DsDesc(name, dsName, rpn, graphType, color, legend, cf, host, probe));
         }
         if(percentile != null) {
             String percentileName = "percentile" + percentile + "_" + name;
             String percentileLegend = percentile + "th percentile";
             Color percentilColor = color.darker();
             if(!reversed) {
-                allds.add(
-                        new DsDesc(percentileName, name, percentile, GraphType.LINE, percentilColor));
-            }
-            else {
+                allds.add(new DsDesc(percentileName, name, percentile, GraphType.LINE, percentilColor));
+            } else {
                 String revPercentilRpn = "0, " + percentileName + ", -";
-                allds.add(
-                        new DsDesc(percentileName, name, percentile, GraphType.NONE, null));
-                allds.add(
-                        new DsDesc("rev_" + percentileName, revPercentilRpn, GraphType.LINE, percentilColor, null));
+                allds.add(new DsDesc(percentileName, name, percentile, GraphType.NONE, null));
+                allds.add(new DsDesc("rev_" + percentileName, revPercentilRpn, GraphType.LINE, percentilColor, null));
 
             }
             allds.add(new DsDesc(percentileName, GraphType.PERCENTILELEGEND, percentileLegend, cf));
@@ -772,15 +788,15 @@ implements Cloneable, WithACL {
 
     public RrdGraphDef getEmptyGraphDef() {
         RrdGraphDef retValue = new RrdGraphDef();
-        if( ! Double.isNaN(lowerLimit))
+        if(!Double.isNaN(lowerLimit))
             retValue.setMinValue(lowerLimit);
-        if( ! Double.isNaN(upperLimit))
+        if(!Double.isNaN(upperLimit))
             retValue.setMaxValue(upperLimit);
-        if (verticalLabel != null)
+        if(verticalLabel != null)
             retValue.setVerticalLabel(verticalLabel);
         if(this.siUnit)
             retValue.setBase(1000);
-        else    
+        else
             retValue.setBase(1024);
         if(unitExponent != null) {
             retValue.setUnitsExponent(unitExponent);
@@ -797,61 +813,62 @@ implements Cloneable, WithACL {
 
     /**
      * Fill a GraphDef with values as defined by the graph desc
+     * 
      * @param graphDef the GraphDef to configure
      * @param defProbe The probe to get values from
-     * @param customData some custom data, they override existing values in the associated probe
+     * @param customData some custom data, they override existing values in the
+     *            associated probe
      */
-    public void fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei,
-            Map<String, ? extends Plottable> customData) {
+    public void fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData) {
         HostsList hl = defProbe.getHostList();
         List<DsDesc> toDo = new ArrayList<DsDesc>();
-        //The datasources already found
+        // The datasources already found
         Set<String> datasources = new HashSet<String>();
 
-        //The needed extractors
-        Map<Probe<?,?>, Extractor> probeDS = new HashMap<Probe<?,?>, Extractor>(1);
+        // The needed extractors
+        Map<Probe<?, ?>, Extractor> probeDS = new HashMap<Probe<?, ?>, Extractor>(1);
         probeDS.put(defProbe, defProbe.getMainStore().getExtractor());
 
         for(DsDesc ds: allds) {
             boolean complete;
-            //Not a data source, don't try to add it in datasources
-            if(! ds.graphType.datasource()) {
+            // Not a data source, don't try to add it in datasources
+            if(!ds.graphType.datasource()) {
                 complete = true;
             }
-            //The graph is a percentile
+            // The graph is a percentile
             else if(ds.percentile != null) {
                 complete = true;
-                if(! datasources.contains(ds.name)) {
+                if(!datasources.contains(ds.name)) {
                     graphDef.percentile(ds.name, ds.dsName, ds.percentile);
                     datasources.add(ds.name);
                 }
             }
-            //A rpn datasource
-            else if (ds.rpn != null) {
+            // A rpn datasource
+            else if(ds.rpn != null) {
                 complete = true;
-                if(! datasources.contains(ds.name)) {
+                if(!datasources.contains(ds.name)) {
                     graphDef.datasource(ds.name, ds.rpn);
                     datasources.add(ds.name);
                 }
             }
-            //A legend
+            // A legend
             else if(ds.graphType == GraphType.LEGEND) {
-                complete = true;                
+                complete = true;
             }
-            //Does the datas existe in the provided values
-            //It override existing values in the probe
+            // Does the datas existe in the provided values
+            // It override existing values in the probe
             else if(customData != null && customData.containsKey(ds.dsName)) {
                 complete = true;
-                if( ! datasources.contains(ds.name)) {
+                if(!datasources.contains(ds.name)) {
                     graphDef.datasource(ds.name, customData.get(ds.dsName));
                     datasources.add(ds.name);
                     logger.trace(Util.delayedFormatString("custom data found for %s", ds.dsName));
                 }
             }
-            //Last but common case, datasource refers to a rrd
-            //Or they might be on the associated rrd
+            // Last but common case, datasource refers to a rrd
+            // Or they might be on the associated rrd
             else {
-                Probe<?,?> probe = defProbe;
+                Probe<?, ?> probe = defProbe;
                 if(ds.dspath != null) {
                     // If the host is not defined, use the current host
                     String pathHost = ds.dspath.host;
@@ -865,29 +882,27 @@ implements Cloneable, WithACL {
                         continue;
                     }
                 }
-                if(! probe.dsExist(ds.dsName)) {
-                    logger.error("Invalide datasource "  + ds.dsName + ", not found in " + probe);
+                if(!probe.dsExist(ds.dsName)) {
+                    logger.error("Invalide datasource " + ds.dsName + ", not found in " + probe);
                     continue;
                 }
                 complete = true;
 
-                //Add the dsName for the probe found
-                if( !probeDS.containsKey(probe)) {
+                // Add the dsName for the probe found
+                if(!probeDS.containsKey(probe)) {
                     probeDS.put(probe, probe.getMainStore().getExtractor());
                 }
                 Extractor ex = probeDS.get(probe);
-                if( ! datasources.contains(ds.name)) {
+                if(!datasources.contains(ds.name)) {
                     ex.addSource(ds.name, ds.dsName);
                     datasources.add(ds.name);
-                }
-                else {
+                } else {
                     logger.error("Datasource '" + ds.dsName + "' defined twice in " + name + ", for found: " + ds);
                 }
             }
-            if (complete) {
+            if(complete) {
                 toDo.add(ds);
-            }
-            else {
+            } else {
                 logger.debug("Error for " + ds);
                 logger.error("No way to plot " + ds.name + " in " + name + " found");
             }
@@ -900,8 +915,8 @@ implements Cloneable, WithACL {
         }
 
         // The title line, only if values block is required
-        if( withSummary) {
-            graphDef.comment(""); //We simulate the color box
+        if(withSummary) {
+            graphDef.comment(""); // We simulate the color box
             graphDef.comment(MANYSPACE.substring(0, Math.min(maxLengthLegend, MANYSPACE.length() - 2) + 2));
             graphDef.comment("Current");
             graphDef.comment("  Average");
@@ -913,7 +928,7 @@ implements Cloneable, WithACL {
         logger.trace(Util.delayedFormatString("Datasource: %s", datasources));
         logger.trace(Util.delayedFormatString("Todo: : %s", toDo));
 
-        String shortLegend = withSummary ? " \\g": null;
+        String shortLegend = withSummary ? " \\g" : null;
         for(DsDesc ds: toDo) {
             ds.graphType.draw(graphDef, ds.name, ds.color, shortLegend);
             if(withSummary && ds.graphType.legend())
@@ -923,50 +938,51 @@ implements Cloneable, WithACL {
     }
 
     /**
-     * return the RrdGraphDef for this graph, used the indicated probe
-     * any data can be overridden of a provided map of {@link org.rrd4j.data.Plottable}
+     * return the RrdGraphDef for this graph, used the indicated probe any data
+     * can be overridden of a provided map of {@link org.rrd4j.data.Plottable}
+     * 
      * @param defProbe
      * @param ownData data used to override probe's own values
      * @return
      * @throws IOException
      */
-    public RrdGraphDef getGraphDef(Probe<?,?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> ownData) throws IOException {
+    public RrdGraphDef getGraphDef(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> ownData) throws IOException {
         RrdGraphDef retValue = getEmptyGraphDef();
         fillGraphDef(retValue, defProbe, ei, ownData);
         return retValue;
     }
 
     /**
-     * return the RrdGraphDef for this graph, used the indicated probe
-     * any data can be overridden of a provided map of Plottable
+     * return the RrdGraphDef for this graph, used the indicated probe any data
+     * can be overridden of a provided map of Plottable
+     * 
      * @param probe
      * @param ownData data used to override probe's own values
      * @return
      * @throws IOException
      */
-    public DataProcessor getPlottedDatas(Probe<?,?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData) throws IOException {
+    public DataProcessor getPlottedDatas(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData) throws IOException {
         DataProcessor retValue = ei.getDataProcessor();
 
         HostsList hl = defProbe.getHostList();
 
-        //The datasources already found
+        // The datasources already found
         Set<String> datasources = new HashSet<String>();
 
-        //The needed extractors
-        Map<Probe<?,?>, Extractor> probeDS = new HashMap<Probe<?,?>, Extractor>(1);
+        // The needed extractors
+        Map<Probe<?, ?>, Extractor> probeDS = new HashMap<Probe<?, ?>, Extractor>(1);
         probeDS.put(defProbe, defProbe.getMainStore().getExtractor());
 
         String lastName = null;
-        for(DsDesc ds: allds) {            
+        for(DsDesc ds: allds) {
             boolean stack = ds.graphType == GraphType.STACK;
-            boolean plotted = stack || ds.graphType == GraphType.LINE  || ds.graphType == GraphType.AREA;
-            if (ds.rpn == null && ds.dsName != null) {
-                //Does the datas exists in the provided values
+            boolean plotted = stack || ds.graphType == GraphType.LINE || ds.graphType == GraphType.AREA;
+            if(ds.rpn == null && ds.dsName != null) {
+                // Does the datas exists in the provided values
                 if(customData != null && customData.containsKey(ds.dsName)) {
                     retValue.addDatasource(ds.name, customData.get(ds.dsName));
-                }
-                else {
-                    Probe<?,?> probe = defProbe;
+                } else {
+                    Probe<?, ?> probe = defProbe;
                     if(ds.dspath != null) {
                         logger.trace(jrds.Util.delayedFormatString("External probe path: %s/%s/%s", ds.dspath.host, ds.dspath.probe, ds.dsName));
                         probe = hl.getProbeByPath(ds.dspath.host, ds.dspath.probe);
@@ -975,36 +991,34 @@ implements Cloneable, WithACL {
                             continue;
                         }
                     }
-                    if(! probe.dsExist(ds.dsName)) {
-                        logger.error("Invalide datasource "  + ds.dsName + ", not found in " + probe);
+                    if(!probe.dsExist(ds.dsName)) {
+                        logger.error("Invalide datasource " + ds.dsName + ", not found in " + probe);
                         continue;
                     }
                     logger.trace(Util.delayedFormatString("ds '%s' found in probe %s", ds.dsName, probe));
-                    //Add the dsName for the probe found
-                    if( !probeDS.containsKey(probe)) {
+                    // Add the dsName for the probe found
+                    if(!probeDS.containsKey(probe)) {
                         probeDS.put(probe, probe.getMainStore().getExtractor());
                     }
                     Extractor ex = probeDS.get(probe);
-                    if( ! datasources.contains(ds.dsName)) {
+                    if(!datasources.contains(ds.dsName)) {
                         ex.addSource(ds.dsName, ds.name);
                         datasources.add(ds.dsName);
-                    }
-                    else {
+                    } else {
                         logger.error("Datasource '" + ds.dsName + "' defined twice in " + name);
                     }
                 }
-            }
-            else if(ds.rpn != null){
+            } else if(ds.rpn != null) {
                 retValue.addDatasource(ds.name, ds.rpn);
                 datasources.add(ds.dsName);
             }
 
             if(plotted && stack) {
-                retValue.addDatasource("Plotted" + ds.name, lastName + ", " +  ds.name + ", +");
-            } else if(plotted ) {
+                retValue.addDatasource("Plotted" + ds.name, lastName + ", " + ds.name + ", +");
+            } else if(plotted) {
                 retValue.addDatasource("Plotted" + ds.name, ds.name);
             }
-            lastName = ds.name; 
+            lastName = ds.name;
         }
         if(logger.isTraceEnabled()) {
             logger.trace("Datasource for " + getName());
@@ -1030,11 +1044,9 @@ implements Cloneable, WithACL {
                 def.comment(MANYSPACE.substring(0, missingLength));
             def.gprint(ds, ConsolFun.MAX, "%6.2f%s");
             def.comment("\\l");
-        }
-        else if(gt == GraphType.COMMENT) {
+        } else if(gt == GraphType.COMMENT) {
             def.comment(legend + "\\l");
-        }
-        else if(gt != GraphType.NONE) {
+        } else if(gt != GraphType.NONE) {
             def.comment(legend + "\\g");
             int missingLength = Math.min(maxLengthLegend - legend.length(), MANYSPACE.length()) + 2;
             if(missingLength > 0)
@@ -1154,13 +1166,12 @@ implements Cloneable, WithACL {
         LinkedList<String> tree = new LinkedList<String>();
         if(elementsTree == null)
             return tree;
-        for (Object o: elementsTree) {
-            if (o instanceof String) {
+        for(Object o: elementsTree) {
+            if(o instanceof String) {
                 String pathElem = jrds.Util.parseTemplate((String) o, graph.getProbe(), this, graph.getProbe().getHost());
                 tree.add(pathElem);
-            }
-            else if (o instanceof PathElement)
-                tree.add( ( (PathElement) o).resolve(graph));
+            } else if(o instanceof PathElement)
+                tree.add(((PathElement) o).resolve(graph));
         }
         return tree;
     }
@@ -1170,7 +1181,7 @@ implements Cloneable, WithACL {
         logger.trace(jrds.Util.delayedFormatString("Adding tree %s to tab %s", tree, tab));
     }
 
-    public void setTree(String tab, List<?> tree) {        
+    public void setTree(String tab, List<?> tree) {
         addTree(tab, tree);
     }
 
@@ -1180,6 +1191,7 @@ implements Cloneable, WithACL {
     public String getGraphTitle() {
         return graphTitle;
     }
+
     /**
      * @param graphTitle The graphTitle to set.
      */
@@ -1248,7 +1260,7 @@ implements Cloneable, WithACL {
     public int getLegendLines() {
         int numlegend = 0;
         for(DsDesc dd: allds) {
-            if (dd.graphType.legend() && dd.legend != null && withSummary)
+            if(dd.graphType.legend() && dd.legend != null && withSummary)
                 numlegend++;
         }
         return numlegend;
@@ -1268,8 +1280,8 @@ implements Cloneable, WithACL {
     static private final int PADDING_TOP = 12; // pix
     static private final int PADDING_TITLE = 6; // pix
     static private final int PADDING_RIGHT = 16; // pix
-    static private final int PADDING_PLOT = 2; //chars
-    static private final int PADDING_BOTTOM = 6; //pix
+    static private final int PADDING_PLOT = 2; // chars
+    static private final int PADDING_BOTTOM = 6; // pix
 
     static private final int DEFAULT_UNITS_LENGTH = 9;
 
@@ -1303,9 +1315,9 @@ implements Cloneable, WithACL {
     }
 
     public void initializeLimits(Graphics2D g2d) {
-        FontRenderContext frc  = g2d.getFontRenderContext();
+        FontRenderContext frc = g2d.getFontRenderContext();
         ImageParameters im = new ImageParameters();
-        int summaryLines =  withSummary ?5:0;
+        int summaryLines = withSummary ? 5 : 0;
 
         im.xsize = getWidth();
         im.ysize = getHeight();
@@ -1313,11 +1325,11 @@ implements Cloneable, WithACL {
         im.xorigin = (int) (PADDING_LEFT + im.unitslength * getSmallFontCharWidth(frc));
         im.xorigin += getSmallFontHeight(frc);
         im.yorigin = PADDING_TOP + im.ysize;
-        if(graphTitle != null && ! "".equals(graphTitle))
+        if(graphTitle != null && !"".equals(graphTitle))
             im.yorigin += getLargeFontHeight(frc) + PADDING_TITLE;
         im.xgif = PADDING_RIGHT + im.xsize + im.xorigin;
         im.ygif = im.yorigin + (int) (PADDING_PLOT * getSmallFontHeight(frc));
-        im.ygif += ( (int) getSmallLeading(frc) + summaryLines ) * ( getLegendLines() + summaryLines);
+        im.ygif += ((int) getSmallLeading(frc) + summaryLines) * (getLegendLines() + summaryLines);
         im.ygif += PADDING_BOTTOM;
         setDimension(im.ygif, im.xgif);
     }
@@ -1330,12 +1342,14 @@ implements Cloneable, WithACL {
         return acl;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#clone()
      */
     @Override
     public Object clone() throws CloneNotSupportedException {
-        GraphDesc newgd =  (GraphDesc) super.clone();
+        GraphDesc newgd = (GraphDesc) super.clone();
         newgd.allds = new ArrayList<DsDesc>(allds.size());
         newgd.allds.addAll(allds);
         newgd.trees = new HashMap<String, List<?>>(trees.size());
@@ -1351,8 +1365,7 @@ implements Cloneable, WithACL {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.newDocument();
-        Element root =
-                document.createElement("graphdesc");
+        Element root = document.createElement("graphdesc");
         document.appendChild(root);
         root.appendChild(document.createElement("name")).setTextContent(name);
         if(graphName != null)
@@ -1370,7 +1383,7 @@ implements Cloneable, WithACL {
             for(SiPrefix unity: SiPrefix.values()) {
                 if(unitExponent == unity.getExponent()) {
                     String suffix = unity.toString();
-                    if (unity == SiPrefix.FIXED) {
+                    if(unity == SiPrefix.FIXED) {
                         suffix = "";
                     }
                     root.appendChild(unit).appendChild(document.createElement("base")).setTextContent(suffix);
@@ -1380,15 +1393,15 @@ implements Cloneable, WithACL {
         }
         if(verticalLabel != null)
             root.appendChild(document.createElement("verticalLabel")).setTextContent(verticalLabel);
-        if(! (lowerLimit == 0))
+        if(!(lowerLimit == 0))
             root.appendChild(document.createElement("lowerLimit")).setTextContent(Double.toString(lowerLimit));
-        if(! Double.isNaN(upperLimit))
+        if(!Double.isNaN(upperLimit))
             root.appendChild(document.createElement("upperLimit")).setTextContent(Double.toString(upperLimit));
         if(logarithmic)
             root.appendChild(document.createElement("logarithmic"));
-        int i=0;
-        //it will contain the number of dsdesc to skip
-        int skip=0;
+        int i = 0;
+        // it will contain the number of dsdesc to skip
+        int skip = 0;
         for(DsDesc curs: allds) {
             DsDesc e = curs;
             if(skip-- > 0) {
@@ -1396,16 +1409,16 @@ implements Cloneable, WithACL {
                 continue;
             }
             boolean reversed = false;
-            if(i + 2 <= allds.size() && allds.get(i+1).name.startsWith("rev_")) {
+            if(i + 2 <= allds.size() && allds.get(i + 1).name.startsWith("rev_")) {
                 reversed = true;
                 skip = 2;
-                DsDesc rev = allds.get(i+1);
-                DsDesc leg = allds.get(i+2);
+                DsDesc rev = allds.get(i + 1);
+                DsDesc leg = allds.get(i + 2);
                 e = new DsDesc(curs.name, curs.dsName, curs.rpn, rev.graphType, rev.color, leg.legend, curs.cf, null, null);
             }
             Element specElement = (Element) root.appendChild(document.createElement("add"));
             specElement.appendChild(document.createElement("name")).setTextContent(e.name);
-            if(! e.name.equals(e.dsName) && e.dsName != null)
+            if(!e.name.equals(e.dsName) && e.dsName != null)
                 specElement.appendChild(document.createElement("dsName")).setTextContent(e.dsName);
             if(e.rpn != null) {
                 specElement.appendChild(document.createElement("rpn")).setTextContent(e.rpn);
@@ -1419,13 +1432,13 @@ implements Cloneable, WithACL {
             i++;
         }
         for(Map.Entry<String, List<?>> e: trees.entrySet()) {
-            Element hostTreeElement =  (Element) root.appendChild(document.createElement("tree"));
+            Element hostTreeElement = (Element) root.appendChild(document.createElement("tree"));
             hostTreeElement.setAttribute("tab", e.getKey());
             for(Object o: e.getValue()) {
                 Element pe = document.createElement("pathstring");
                 pe.setTextContent(o.toString());
                 hostTreeElement.appendChild(pe);
-            }            
+            }
         }
         return document;
     }
@@ -1485,6 +1498,5 @@ implements Cloneable, WithACL {
     public void setGraphClass(Class<Graph> graphClass) {
         this.graphClass = graphClass;
     }
-
 
 }

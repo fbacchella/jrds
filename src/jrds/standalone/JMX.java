@@ -19,12 +19,12 @@ public class JMX extends CommandStarterImpl {
         logger.debug("Configuration: " + configuration);
 
         port = jrds.Util.parseStringNumber((String) configuration.getProperty("jmx.port"), port).intValue();
-        propFileName =  configuration.getProperty("propertiesFile", propFileName);
+        propFileName = configuration.getProperty("propertiesFile", propFileName);
     }
 
     @Override
     public void start(String[] args) throws Exception {
-        System.setProperty("java.awt.headless","true");
+        System.setProperty("java.awt.headless", "true");
 
         jrds.JrdsLoggerConfiguration.initLog4J();
 
@@ -34,7 +34,7 @@ public class JMX extends CommandStarterImpl {
             pm.load(new FileReader(propFile));
         pm.setProperty("withjmx", "yes");
         jrds.Configuration.configure(pm);
-        
+
         jrds.JrdsLoggerConfiguration.configure(jrds.Configuration.get().getPropertiesManager());
 
         if(jrds.Configuration.get().getPropertiesManager().withjmx) {
@@ -42,7 +42,7 @@ public class JMX extends CommandStarterImpl {
             Management.register(propFile);
         }
 
-        //Make it wait on himself to wait forever
+        // Make it wait on himself to wait forever
         try {
             Thread.currentThread().join();
             System.out.print("joined");
@@ -51,7 +51,9 @@ public class JMX extends CommandStarterImpl {
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.standalone.CommandStarterImpl#help()
      */
     @Override

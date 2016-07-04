@@ -53,8 +53,8 @@ public class GetMoke {
         return pd;
     }
 
-    static public Probe<?,?> getProbe() throws InvocationTargetException {
-        Probe<?,?> p = new MokeProbe<String, Number>();
+    static public Probe<?, ?> getProbe() throws InvocationTargetException {
+        Probe<?, ?> p = new MokeProbe<String, Number>();
         p.setPd(getPd());
         p.setHost(new HostStarter(getHost()));
         Map<String, String> empty = Collections.emptyMap();
@@ -74,6 +74,7 @@ public class GetMoke {
             private String type = null;
             private final ServletOutputStream internalOs = new ServletOutputStream() {
                 private DataOutputStream stream = new DataOutputStream(os);
+
                 @Override
                 public void write(int b) throws IOException { stream.write(b); }
                 public void write(byte[] theData) throws IOException { stream.write(theData); }
@@ -83,10 +84,11 @@ public class GetMoke {
                     // TODO Auto-generated method stub
                     return false;
                 }
+
                 @Override
                 public void setWriteListener(WriteListener arg0) {
                     // TODO Auto-generated method stub
-                    
+
                 }
             };
             public void addCookie(Cookie arg0) { }
@@ -129,11 +131,11 @@ public class GetMoke {
         };
     }
 
-    static public HttpServletRequest getRequest(final Map<String, String[]> p,  String... ctxPathArgs) {
+    static public HttpServletRequest getRequest(final Map<String, String[]> p, String... ctxPathArgs) {
         StringBuffer buffer = new StringBuffer("/");
-        if( ctxPathArgs != null && ctxPathArgs.length > 0) {
+        if(ctxPathArgs != null && ctxPathArgs.length > 0) {
             for(String element: ctxPathArgs)
-                buffer.append('/').append(element); 
+                buffer.append('/').append(element);
         }
         buffer.delete(0, 1);
         final String pathInfo = buffer.toString();

@@ -28,14 +28,14 @@ public class ToolsWebApp {
         return tester;
     }
 
-    static ServletTester getMonoServlet(TemporaryFolder testFolder, Properties props, Class< ? extends HttpServlet> sclass, String path) throws IOException {
+    static ServletTester getMonoServlet(TemporaryFolder testFolder, Properties props, Class<? extends HttpServlet> sclass, String path) throws IOException {
         String root = testFolder.getRoot().getCanonicalPath();
         Properties config = new Properties();
         config.put("tmpdir", root);
         config.put("configdir", root + "/config");
         config.put("autocreate", "true");
         config.put("rrddir", root);
-        if(! Boolean.parseBoolean(System.getProperty("maven"))) {
+        if(!Boolean.parseBoolean(System.getProperty("maven"))) {
             config.put("libspath", "desc");
         }
         config.putAll(props);
@@ -44,7 +44,7 @@ public class ToolsWebApp {
 
         Configuration c = Configuration.get();
         HostStarter h = new HostStarter(new HostInfo("localhost"));
-        Probe<?,?> p = new MokeProbe<String, Number>();
+        Probe<?, ?> p = new MokeProbe<String, Number>();
         p.setHost(h);
         h.addProbe(p);
         c.getHostsList().addHost(h.getHost());
@@ -60,14 +60,14 @@ public class ToolsWebApp {
         request.setMethod("GET");
         request.setHeader("Host", queryURL.getHost());
         String args = queryURL.getQuery();
-        request.setURI(queryURL.getPath()  + (args != null ? "?" + args : ""));
+        request.setURI(queryURL.getPath() + (args != null ? "?" + args : ""));
         request.setVersion("HTTP/1.0");
         Response response = HttpTester.parseResponse(tester.getResponses(request.generate()));
-        Assert.assertEquals(expectedStatus,response.getStatus());
+        Assert.assertEquals(expectedStatus, response.getStatus());
 
         return response;
     }
-    
+
     static abstract class MakePostContent {
         abstract void fillRequest(Request r);
     }
@@ -77,13 +77,13 @@ public class ToolsWebApp {
         Request request = HttpTester.newRequest();
         request.setMethod("POST");
         String args = queryURL.getQuery();
-        request.setURI(queryURL.getPath()  + (args != null ? "?" + args : ""));
+        request.setURI(queryURL.getPath() + (args != null ? "?" + args : ""));
         request.setVersion("HTTP/1.0");
 
         request.setHeader("Host", queryURL.getHost());
         filler.fillRequest(request);
         Response response = HttpTester.parseResponse(tester.getResponses(request.generate()));
-        Assert.assertEquals(expectedStatus,response.getStatus());
+        Assert.assertEquals(expectedStatus, response.getStatus());
 
         return response;
     }

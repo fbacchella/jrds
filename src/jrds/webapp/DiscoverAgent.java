@@ -24,7 +24,7 @@ public abstract class DiscoverAgent {
                 Element button = parent.getOwnerDocument().createElement("button");
                 button.setAttribute("id", fi.id);
                 button.setAttribute("name", fi.id);
-                button.setAttribute("value", fi.value );
+                button.setAttribute("value", fi.value);
 
                 button.setAttribute("iconClass", "dijitCheckBoxIcon");
                 button.setAttribute("dojoType", "dijit.form.ToggleButton");
@@ -73,21 +73,21 @@ public abstract class DiscoverAgent {
 
     /**
      * Do some specific discover that can't be done on enumerated probes
+     * 
      * @param hostname
      * @param hostEleme
      * @param probdescs
      * @param request
      */
-    public void discoverPre(String hostname, JrdsElement hostEleme,
-            Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
+    public void discoverPre(String hostname, JrdsElement hostEleme, Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
     }
 
-    public void discoverPost(String hostname, JrdsElement hostEleme,
-            Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
+    public void discoverPost(String hostname, JrdsElement hostEleme, Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
     }
 
     /**
      * Try to add the indicated probe
+     * 
      * @param hostElement
      * @param summary
      * @param request
@@ -97,7 +97,9 @@ public abstract class DiscoverAgent {
     public abstract List<FieldInfo> getFields();
 
     /**
-     * Return try if we should try to discover the probes for this host using this agent
+     * Return try if we should try to discover the probes for this host using
+     * this agent
+     * 
      * @param hostname
      * @param request
      * @return
@@ -106,6 +108,7 @@ public abstract class DiscoverAgent {
 
     /**
      * Add the connection for this agent to the host if needed
+     * 
      * @param hostElement
      * @param request
      */
@@ -129,6 +132,7 @@ public abstract class DiscoverAgent {
 
     /**
      * This method add a probe to the current host document
+     * 
      * @param hostElement the host element
      * @param probe the Name of the probe
      * @param label the label of the probe
@@ -148,6 +152,7 @@ public abstract class DiscoverAgent {
 
     /**
      * This method add a probe to the current host document
+     * 
      * @param hostElement the host element
      * @param probe the Name of the probe
      * @param argsTypes a list of type for the argument
@@ -165,7 +170,7 @@ public abstract class DiscoverAgent {
     }
 
     private void addArgsList(JrdsElement element, List<String> argsTypes, List<String> argsValues, Map<String, String> beans) {
-        if(beans != null && ! beans.isEmpty()) {
+        if(beans != null && !beans.isEmpty()) {
             for(Map.Entry<String, String> bean: beans.entrySet()) {
                 JrdsElement arg = element.addElement("attr");
                 arg.setAttribute("name", bean.getKey());
@@ -173,7 +178,7 @@ public abstract class DiscoverAgent {
             }
         }
         if(argsTypes != null && argsTypes.size() > 0 && argsTypes.size() == argsValues.size()) {
-            for(int i=0; i < argsTypes.size(); i++) {
+            for(int i = 0; i < argsTypes.size(); i++) {
                 Element arg = element.addElement("arg");
                 arg.setAttribute("type", argsTypes.get(i));
                 arg.setAttribute("value", argsValues.get(i));

@@ -30,13 +30,13 @@ public class TestDiscoverAgent {
         Tools.prepareXml();
 
         logger.setLevel(Level.DEBUG);
-        Tools.setLevel(new String[] {"jrds.DiscoverAgent.SNMP"}, logger.getLevel());
+        Tools.setLevel(new String[] { "jrds.DiscoverAgent.SNMP" }, logger.getLevel());
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void getHtmlCode() throws ClassNotFoundException, InstantiationException, IllegalAccessException, TransformerException, IOException {
-        Class<? extends Probe<?,?>> snmpProbeClass = (Class<? extends Probe<?,?>>) Class.forName("jrds.probe.snmp.SnmpProbe");
+        Class<? extends Probe<?, ?>> snmpProbeClass = (Class<? extends Probe<?, ?>>) Class.forName("jrds.probe.snmp.SnmpProbe");
         ProbeMeta m = snmpProbeClass.getAnnotation(ProbeMeta.class);
         DiscoverAgent da = m.discoverAgent().newInstance();
         Assert.assertEquals(3, da.getFields().size());

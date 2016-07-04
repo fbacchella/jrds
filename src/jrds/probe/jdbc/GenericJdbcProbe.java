@@ -34,18 +34,20 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
         super(JdbcConnection.class.getName());
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.ProbeConnected#configure()
      */
     public Boolean configure(List<?> args) {
         if(super.configure()) {
-            ProbeDesc pd =  getPd();
+            ProbeDesc pd = getPd();
             query = jrds.Util.parseTemplate(pd.getSpecific("query"), getHost(), args);
             keyColumn = jrds.Util.parseTemplate(pd.getSpecific("key"), getHost(), args);
             uptimeQuery = jrds.Util.parseTemplate(pd.getSpecific("uptimeQuery"), getHost(), args);
             uptimeRow = jrds.Util.parseTemplate(pd.getSpecific("uptimeRow"), getHost(), args);
             String indexTemplate = pd.getSpecific("index");
-            if(indexTemplate != null && ! "".equals(indexTemplate))
+            if(indexTemplate != null && !"".equals(indexTemplate))
                 index = jrds.Util.parseTemplate(indexTemplate, getHost(), args);
             setName(jrds.Util.parseTemplate(pd.getProbeName(), args));
             return true;
@@ -69,8 +71,8 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
     public Map<String, Number> getNewSampleValuesConnected(JdbcConnection cnx) {
         Map<String, Number> values = null;
         Statement stmt = cnx.getConnection();
-        if(stmt != null && uptimeQuery != null && ! "".equals(uptimeQuery)) {
-            if( ! doUptimeQuery(stmt))
+        if(stmt != null && uptimeQuery != null && !"".equals(uptimeQuery)) {
+            if(!doUptimeQuery(stmt))
                 return null;
         }
         try {
@@ -87,9 +89,8 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
                         values.remove(uptimeRow);
                     }
                 }
-            }
-            finally {
-                if (stmt != null) {
+            } finally {
+                if(stmt != null) {
                     stmt.close();
                 }
             }
@@ -123,32 +124,39 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
             ResultSetMetaData meta = rs.getMetaData();
             int columnCount = meta.getColumnCount();
             values = new HashMap<String, Number>(columnCount);
-            while(rs.next()) {
+            while (rs.next()) {
                 String keyValue = "";
                 if(keyColumn != null) {
                     keyValue = rs.getString(keyColumn) + ".";
                     log(Level.TRACE, "found a row with key %s", rs.getString(keyColumn));
                 }
 
-                for(int i = 1; i <= columnCount ; i++) {
+                for(int i = 1; i <= columnCount; i++) {
                     String key = keyValue + meta.getColumnLabel(i);
-                    if(! collectKeys.contains(key))
+                    if(!collectKeys.contains(key))
                         continue;
                     Number value;
                     Object oValue = rs.getObject(i);
-                    log(Level.TRACE, "type info for %s: type %d, %s = %s",  key, meta.getColumnType(i), oValue.getClass(), oValue.toString());
+                    log(Level.TRACE, "type info for %s: type %d, %s = %s", key, meta.getColumnType(i), oValue.getClass(), oValue.toString());
                     if(oValue instanceof Number) {
                         value = ((Number) oValue);
                         values.put(key, value);
-                    }
-                    else {
+                    } else {
                         int type = meta.getColumnType(i);
                         value = Double.NaN;
-                        switch(type) {
-                        case Types.DATE: value = rs.getDate(i).getTime() / 1000; break;
-                        case Types.TIME: value = rs.getTime(i).getTime() / 1000; break;
-                        case Types.VARCHAR: value = Util.parseStringNumber(rs.getString(i), Double.NaN); break;
-                        case Types.TIMESTAMP: value = rs.getTimestamp(i).getTime() / 1000; break;
+                        switch (type) {
+                        case Types.DATE:
+                            value = rs.getDate(i).getTime() / 1000;
+                            break;
+                        case Types.TIME:
+                            value = rs.getTime(i).getTime() / 1000;
+                            break;
+                        case Types.VARCHAR:
+                            value = Util.parseStringNumber(rs.getString(i), Double.NaN);
+                            break;
+                        case Types.TIMESTAMP:
+                            value = rs.getTimestamp(i).getTime() / 1000;
+                            break;
                         }
                         values.put(key, value);
                     }

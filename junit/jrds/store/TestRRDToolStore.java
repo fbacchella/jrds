@@ -48,7 +48,7 @@ public class TestRRDToolStore {
         String[] dsNames = dp.getSourceNames();
         Assert.assertEquals("data source weight not found", "weight", dsNames[0]);
         Assert.assertEquals("data source speed not found", "speed", dsNames[1]);
-        Assert.assertEquals("Missing last values",2, p.getMainStore().getLastValues().size());
+        Assert.assertEquals("Missing last values", 2, p.getMainStore().getLastValues().size());
     }
 
 }

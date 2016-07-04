@@ -22,7 +22,6 @@ import org.snmp4j.util.PDUFactory;
 import org.snmp4j.util.TreeEvent;
 import org.snmp4j.util.TreeUtils;
 
-
 public class SnmpWalk {
     static final private Logger logger = Logger.getLogger(SnmpWalk.class);
 
@@ -36,7 +35,7 @@ public class SnmpWalk {
     static public void configure() throws IOException {
         Tools.configure();
         logger.setLevel(Level.DEBUG);
-        Tools.setLevel(new String[] {"jrds"}, logger.getLevel());
+        Tools.setLevel(new String[] { "jrds" }, logger.getLevel());
         logger.addAppender(Logger.getLogger("jrds").getAppender("jrds"));
     }
 

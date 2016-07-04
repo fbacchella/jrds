@@ -12,11 +12,12 @@ public interface StoreFactory {
     public final static String DEFAULTNAME = "_default";
 
     public void configureStore(PropertiesManager pm, Properties props);
+
     public void start();
 
-    public abstract Store create(Probe<?,? > p);
+    public abstract Store create(Probe<?, ?> p);
 
-    public Store configure(Probe<?,? > p, Map<String, String> properties) throws InvocationTargetException;
+    public Store configure(Probe<?, ?> p, Map<String, String> properties) throws InvocationTargetException;
 
     public void stop();
 

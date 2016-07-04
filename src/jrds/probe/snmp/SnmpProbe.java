@@ -18,9 +18,12 @@ import org.apache.log4j.Level;
 import org.snmp4j.smi.OID;
 
 /**
- * A abstract class from which all snmp probes should be derived.<p>
- * An usefull command to browse the content of an snmp agent :<p>
+ * A abstract class from which all snmp probes should be derived.
+ * <p>
+ * An usefull command to browse the content of an snmp agent :
+ * <p>
  * <code>snmpbulkwalk -OX -c public -v 2c hostname  . | sed -e 's/\[.*\]//' -e 's/ =.*$//'|  grep '::' | uniq </code>
+ * 
  * @author Fabrice Bacchella
  */
 @ProbeMeta(
@@ -39,7 +42,9 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
         super(SnmpConnection.class.getName());
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#readSpecific()
      */
     @Override
@@ -47,16 +52,15 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
         nameMap = getPd().getCollectOids();
         boolean readOK = false;
         try {
-            String requesterName =  getPd().getSpecific(REQUESTERNAME);
+            String requesterName = getPd().getSpecific(REQUESTERNAME);
             if(requesterName != null) {
                 log(Level.TRACE, "Setting requester to %s", requesterName);
                 requester = SnmpRequester.valueOf(requesterName.toUpperCase());
                 readOK = true;
-            }
-            else {
+            } else {
                 log(Level.ERROR, "No requester found");
             }
-            String uptimeOidName =  getPd().getSpecific(UPTIMEOIDNAME);
+            String uptimeOidName = getPd().getSpecific(UPTIMEOIDNAME);
             if(uptimeOidName != null) {
                 log(Level.TRACE, "Setting uptime OID to %s", uptimeOidName);
                 uptimeoid = new OID(uptimeOidName);
@@ -67,13 +71,11 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
         return readOK && super.readSpecific();
     }
 
-    private Map<OID, String> initNameMap()
-    {
+    private Map<OID, String> initNameMap() {
         return getPd().getCollectOids();
     }
 
-    public Map<OID, String> getOidNameMap()
-    {
+    public Map<OID, String> getOidNameMap() {
         if(nameMap == null)
             nameMap = initNameMap();
         return nameMap;
@@ -81,12 +83,14 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
 
     /**
      * Used to define the OID to collect
+     * 
      * @return a set of OID to collect
      */
     protected abstract Set<OID> getOidSet();
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#getNewSampleValues()
      */
     @Override
@@ -113,11 +117,12 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
     /**
      * SnmpProbes can used either the default uptime from the standard MIBs or
      * use a specific one, defined using the uptimeOid specific
+     * 
      * @see jrds.ProbeConnected#setUptime(jrds.starter.Connection)
      */
     @Override
     protected void setUptime(SnmpConnection cnx) {
-        //If no uptimeoid, just use the snmp default
+        // If no uptimeoid, just use the snmp default
         if(uptimeoid == null)
             super.setUptime(cnx);
         else {
@@ -126,22 +131,23 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
     }
 
     /**
-     * Prepare the SnmpVars to be stored by a probe. In the general case, for a snmp probe
-     * the last element of the OID is removed.
-     * If the value is a date, the value is the second since epoch
+     * Prepare the SnmpVars to be stored by a probe. In the general case, for a
+     * snmp probe the last element of the OID is removed. If the value is a
+     * date, the value is the second since epoch
+     * 
      * @param snmpVars
      * @return a Map of all the identified vars
      */
     @Override
-    public Map<OID, Number> filterValues(Map<OID, Object>snmpVars) {
+    public Map<OID, Number> filterValues(Map<OID, Object> snmpVars) {
         Map<OID, Number> retValue = new HashMap<OID, Number>(snmpVars.size());
         for(Map.Entry<OID, Object> e: snmpVars.entrySet()) {
             OID oid = e.getKey();
             Object o = e.getValue();
-            if( o instanceof Number) {
-                retValue.put(oid, (Number)o);
+            if(o instanceof Number) {
+                retValue.put(oid, (Number) o);
             }
-            if( o instanceof Date) {
+            if(o instanceof Date) {
                 Date value = (Date) o;
                 retValue.put(oid, new Double(value.getTime()));
             }

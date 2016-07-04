@@ -24,7 +24,7 @@ import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.util.DefaultPDUFactory;
 import org.snmp4j.util.PDUFactory;
 
-@ProbeBean({"community", "port", "version", "ping"})
+@ProbeBean({ "community", "port", "version", "ping" })
 public class SnmpConnection extends Connection<Target> {
     static final String TCP = "tcp";
     static final String UDP = "udp";
@@ -38,7 +38,7 @@ public class SnmpConnection extends Connection<Target> {
     private int port = 161;
     private String community = "public";
     private OID ping = sysDescr;
-    //A default value for the uptime OID, from the HOST-RESSOURCES MIB
+    // A default value for the uptime OID, from the HOST-RESSOURCES MIB
     private OID uptimeOid = hrSystemUptime;
     private Target snmpTarget;
 
@@ -53,18 +53,16 @@ public class SnmpConnection extends Connection<Target> {
         if(!resolver.isStarted())
             return false;
 
-        if(! getLevel().find(MainStarter.class).isStarted())
+        if(!getLevel().find(MainStarter.class).isStarted())
             return false;
 
         Address address;
 
         if(UDP.equals(proto.toLowerCase())) {
             address = new UdpAddress(resolver.getInetAddress(), port);
-        }
-        else if(TCP.equals(proto.toLowerCase())) {
+        } else if(TCP.equals(proto.toLowerCase())) {
             address = new TcpAddress(resolver.getInetAddress(), port);
-        }
-        else {
+        } else {
             return false;
         }
         if(community != null) {
@@ -73,7 +71,7 @@ public class SnmpConnection extends Connection<Target> {
             snmpTarget.setTimeout(getLevel().getTimeout() * 1000 / 2);
             snmpTarget.setRetries(1);
         }
-        //Do a "snmp ping", to check if host is reachable
+        // Do a "snmp ping", to check if host is reachable
         try {
             PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
             requestPDU.addOID(new VariableBinding(ping));
@@ -81,7 +79,8 @@ public class SnmpConnection extends Connection<Target> {
             // we don't care about the response
             request(requestPDU, snmpTarget);
 
-            //Everything went fine, host is reachable, authentication is working
+            // Everything went fine, host is reachable, authentication is
+            // working
             return true;
         } catch (Exception e) {
             log(Level.ERROR, e, "Unable to reach host: %s", e);
@@ -92,14 +91,14 @@ public class SnmpConnection extends Connection<Target> {
 
     @Override
     public void stopConnection() {
-        snmpTarget = null;        
+        snmpTarget = null;
     }
 
     @Override
     public long setUptime() {
         Set<OID> upTimesOids = new HashSet<OID>(2);
         upTimesOids.add(uptimeOid);
-        //Fallback uptime OID, it should be always defined, from SNMPv2-MIB
+        // Fallback uptime OID, it should be always defined, from SNMPv2-MIB
         upTimesOids.add(sysUpTimeInstance);
         return readUptime(upTimesOids);
     }
@@ -118,7 +117,7 @@ public class SnmpConnection extends Connection<Target> {
         } catch (Exception e) {
             log(Level.ERROR, e, "Unable to get uptime: %s", e);
         }
-        return 0;        
+        return 0;
     }
 
     private PDU request(PDU requestPDU, Target target) throws Exception {
@@ -127,7 +126,7 @@ public class SnmpConnection extends Connection<Target> {
         if(re == null)
             throw new IOException("SNMP Timeout");
         PDU response = re.getResponse();
-        if(response == null || re.getError() != null ) {
+        if(response == null || re.getError() != null) {
             Exception snmpException = re.getError();
             if(snmpException == null)
                 snmpException = new IOException("SNMP Timeout");

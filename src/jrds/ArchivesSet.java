@@ -18,7 +18,7 @@ public class ArchivesSet extends ArrayList<ArcDef> {
 
     private final String name;
 
-    public ArchivesSet(String name){
+    public ArchivesSet(String name) {
         super();
         this.name = name;
     }
@@ -29,7 +29,7 @@ public class ArchivesSet extends ArrayList<ArcDef> {
 
     public void addArchive(ArcDef arcDef) {
         add(arcDef);
-        logger.trace(Util.delayedFormatString("Adding archive: %s", arcDef.dump()));       
+        logger.trace(Util.delayedFormatString("Adding archive: %s", arcDef.dump()));
     }
 
     public ArcDef[] getArchives() {
@@ -46,10 +46,10 @@ public class ArchivesSet extends ArrayList<ArcDef> {
         {
             this.addAll(Arrays.asList(DEFAULTARC));
         }
+
         public ArcDef[] getArchives() {
             return DEFAULTARC;
         }
-
 
     };
 

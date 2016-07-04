@@ -24,7 +24,7 @@ public class TestProbeDescBuilder {
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, "jrds.ProbeDesc");
-        Tools.setLevel(Level.INFO,"jrds.factories.xml.CompiledXPath");
+        Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
 
         Tools.prepareXml();
     }
@@ -35,7 +35,7 @@ public class TestProbeDescBuilder {
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
         conf.getNodeMap(ConfigType.PROBEDESC).put("name", Tools.parseRessource("httpxmlprobedesc.xml"));
 
-        ProbeDesc pd = conf.setProbeDescMap().get("name");        
+        ProbeDesc pd = conf.setProbeDescMap().get("name");
         Assert.assertNotNull("Probedesc not build", pd);
     }
 
@@ -48,7 +48,7 @@ public class TestProbeDescBuilder {
 
         conf.getNodeMap(ConfigType.PROBEDESC).put("name", pddoc);
 
-        ProbeDesc pd = conf.setProbeDescMap().get("name");        
+        ProbeDesc pd = conf.setProbeDescMap().get("name");
         Assert.assertNotNull("Probedesc not build", pd);
 
         @SuppressWarnings("unchecked")
@@ -83,7 +83,7 @@ public class TestProbeDescBuilder {
 
         @SuppressWarnings("unchecked")
         Probe<String, String> p = (Probe<String, String>) pd.getProbeClass().getConstructor().newInstance();
-        p.setPd(pd);        
+        p.setPd(pd);
         pd.getBean("customattr1").set(p, "value1");
         pd.getBean("customattr2").set(p, "value2");
 

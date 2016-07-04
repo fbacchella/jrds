@@ -19,37 +19,45 @@ import org.apache.log4j.Level;
 import org.w3c.dom.Document;
 
 /**
- * This probe can be used to collect values read from an XML document extracted from a defined URL
+ * This probe can be used to collect values read from an XML document extracted
+ * from a defined URL
  * <p>
  * The specific keywords it uses are
  * <ul>
  * <li>upTimePath – An xpath to the uptime</li>
  * <li>nouptime – No uptime is provided</li>
- * <li>startTimePath – when no uptime is provided, the xpath to the start time of the agent</li>
- * <li>currentTimePath – when no uptime is provided, the xpath to the current time of the agent</li>
- * <li>timePattern – when no uptime is provided, a pattern that will be used by SimpleDateFormat object to parse time</li>
- * </ul> 
- * This probe uses <a href="http://hc.apache.org/httpclient-3.x/">Apache's Commons HttpClient</a>.
- * @author Fabrice Bacchella 
+ * <li>startTimePath – when no uptime is provided, the xpath to the start time
+ * of the agent</li>
+ * <li>currentTimePath – when no uptime is provided, the xpath to the current
+ * time of the agent</li>
+ * <li>timePattern – when no uptime is provided, a pattern that will be used by
+ * SimpleDateFormat object to parse time</li>
+ * </ul>
+ * This probe uses <a href="http://hc.apache.org/httpclient-3.x/">Apache's
+ * Commons HttpClient</a>.
+ * 
+ * @author Fabrice Bacchella
  */
-@ProbeMeta(
-        topStarter=jrds.starter.XmlProvider.class
-        )
+@ProbeMeta(topStarter = jrds.starter.XmlProvider.class)
 public class HttpXml extends HCHttpProbe {
 
     private Set<String> xpaths = null;
     private Map<String, String> collectKeys = null;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.probe.HttpProbe#configure(java.util.List)
      */
-    public Boolean  configure(List<Object> args) {
+    public Boolean configure(List<Object> args) {
         boolean done = super.configure(args);
         finishConfig(args);
         return done;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.probe.HttpProbe#configure(java.lang.String, java.util.List)
      */
     public Boolean configure(String file, List<Object> args) {
@@ -58,7 +66,9 @@ public class HttpXml extends HCHttpProbe {
         return done;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.probe.HttpProbe#configure(java.lang.Integer, java.util.List)
      */
     public Boolean configure(Integer port, List<Object> args) {
@@ -67,7 +77,9 @@ public class HttpXml extends HCHttpProbe {
         return done;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.probe.HttpProbe#configure(java.net.URL, java.util.List)
      */
     public Boolean configure(URL url, List<Object> args) {
@@ -76,8 +88,11 @@ public class HttpXml extends HCHttpProbe {
         return done;
     }
 
-    /* (non-Javadoc)
-     * @see jrds.probe.HttpProbe#configure(java.lang.Integer, java.lang.String, java.util.List)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see jrds.probe.HttpProbe#configure(java.lang.Integer, java.lang.String,
+     * java.util.List)
      */
     public Boolean configure(Integer port, String file, List<Object> args) {
         boolean done = super.configure(port, file, args);
@@ -89,7 +104,7 @@ public class HttpXml extends HCHttpProbe {
         log(Level.TRACE, "Configuring collect xpath with %s", args);
         xpaths = new HashSet<String>(getPd().getCollectStrings().size());
         collectKeys = new HashMap<String, String>(xpaths.size());
-        for(Map.Entry<String, String> e:getPd().getCollectStrings().entrySet()) {
+        for(Map.Entry<String, String> e: getPd().getCollectStrings().entrySet()) {
             String xpath = e.getKey();
             String dsName = e.getValue();
             String solved = Util.parseTemplate(String.format(xpath, args.toArray()), this, args);
@@ -99,7 +114,9 @@ public class HttpXml extends HCHttpProbe {
         log(Level.TRACE, "collect xpath mapping %s", collectKeys);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#setPd(jrds.ProbeDesc)
      */
     @Override
@@ -109,7 +126,9 @@ public class HttpXml extends HCHttpProbe {
         collectKeys = getPd().getCollectStrings();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#getCollectkeys()
      */
     @Override
@@ -118,17 +137,22 @@ public class HttpXml extends HCHttpProbe {
     }
 
     /**
-     * A method that can be overriden to extract more values from the XML document 
+     * A method that can be overriden to extract more values from the XML
+     * document
+     * 
      * @param d the XML document read from the URL
      * @param variables already parsed variables that can be overriden
-     * @return a new set of variables, this implementation return variables without modifications
+     * @return a new set of variables, this implementation return variables
+     *         without modifications
      */
     public Map<String, Number> dom2Map(Document d, Map<String, Number> variables) {
         return variables;
     }
 
     /**
-     * Extract the the uptime from the XML document, reusing the XML provider utilites
+     * Extract the the uptime from the XML document, reusing the XML provider
+     * utilites
+     * 
      * @param xmlstarter
      * @param d
      * @return
@@ -137,31 +161,30 @@ public class HttpXml extends HCHttpProbe {
         String upTimePath = getPd().getSpecific("upTimePath");
         if(upTimePath != null) {
             return xmlstarter.findUptime(d, upTimePath);
-        }
-        else if(getPd().getSpecific("nouptime") != null) {
+        } else if(getPd().getSpecific("nouptime") != null) {
             return Long.MAX_VALUE;
-        }
-        else {
+        } else {
             String startTimePath = getPd().getSpecific("startTimePath");
             String currentTimePath = getPd().getSpecific("currentTimePath");
             String timePattern = getPd().getSpecific("timePattern");
-            if(startTimePath != null && currentTimePath != null && timePattern !=null) {
+            if(startTimePath != null && currentTimePath != null && timePattern != null) {
                 DateFormat df = new SimpleDateFormat(timePattern);
                 return xmlstarter.findUptimeByDate(d, startTimePath, currentTimePath, df);
-            }
-            else {
+            } else {
                 log(Level.ERROR, "No xpath for the uptime");
                 return 0;
             }
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.probe.HttpProbe#parseStream(java.io.InputStream)
      */
     @Override
     protected Map<String, Number> parseStream(InputStream stream) {
-        XmlProvider xmlstarter  = find(XmlProvider.class);
+        XmlProvider xmlstarter = find(XmlProvider.class);
         if(xmlstarter == null) {
             log(Level.ERROR, "XML Provider not found");
             return null;
@@ -174,10 +197,12 @@ public class HttpXml extends HCHttpProbe {
         log(Level.TRACE, "%s", vars);
         vars = dom2Map(d, vars);
         log(Level.TRACE, "%s", vars);
-        return vars; 
+        return vars;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.probe.HttpProbe#getSourceType()
      */
     @Override

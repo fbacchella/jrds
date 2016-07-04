@@ -7,7 +7,7 @@ import jrds.factories.xml.JrdsElement;
 import jrds.starter.Listener;
 
 @SuppressWarnings("rawtypes")
-public class ListenerBuilder extends ConfigObjectBuilder<Listener<?,?>> {
+public class ListenerBuilder extends ConfigObjectBuilder<Listener<?, ?>> {
 
     private ClassLoader classLoader = ListenerBuilder.class.getClassLoader();
 
@@ -21,7 +21,7 @@ public class ListenerBuilder extends ConfigObjectBuilder<Listener<?,?>> {
         String className = root.getAttribute("class");
         if(className != null) {
             className = className.trim();
-            if (className.isEmpty())
+            if(className.isEmpty())
                 return null;
         }
         try {

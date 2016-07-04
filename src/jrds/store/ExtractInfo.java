@@ -11,15 +11,16 @@ public class ExtractInfo {
         ImmutableDate() {
             super();
         }
+
         ImmutableDate(Date date) {
             super(date.getTime());
         }
+
         @Override
         public void setTime(long time) {
             throw new UnsupportedOperationException("read only date");
         }
     };
-
 
     public final Date start;
     public final Date end;
@@ -39,8 +40,7 @@ public class ExtractInfo {
         cf = ConsolFun.AVERAGE;
     }
 
-    private ExtractInfo(Date start, Date end, long step,
-            String ds, ConsolFun cf) {
+    private ExtractInfo(Date start, Date end, long step, String ds, ConsolFun cf) {
         super();
         this.start = start;
         this.end = end;

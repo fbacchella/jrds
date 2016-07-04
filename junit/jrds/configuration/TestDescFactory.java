@@ -29,12 +29,12 @@ public class TestDescFactory {
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, "jrds.factories");
-        Tools.setLevel(Level.INFO,"jrds.factories.xml.CompiledXPath");
+        Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
         Tools.prepareXml();
     }
 
     @Test
-    public void loadGraph()  throws Exception {
+    public void loadGraph() throws Exception {
         JrdsDocument d = Tools.parseRessource("customgraph.xml");
         GraphDescBuilder builder = new GraphDescBuilder();
         builder.setPm(new PropertiesManager());
@@ -87,7 +87,7 @@ public class TestDescFactory {
         logger.trace(pd.getCollectOids());
         logger.trace(pd.getCollectStrings());
         logger.trace(pd.getDefaultBeans());
-        //A collect string "" should not be collected
+        // A collect string "" should not be collected
         Assert.assertEquals(3, pd.getCollectMapping().size());
         Assert.assertEquals(1, pd.getCollectOids().size());
         Assert.assertEquals(3, pd.getCollectStrings().size());
@@ -110,7 +110,7 @@ public class TestDescFactory {
         Assert.assertEquals(1, pd.getCollectStrings().size());
         boolean found = false;
         for(LoggingEvent le: logged) {
-            String  message = le.getRenderedMessage();
+            String message = le.getRenderedMessage();
             if(message.contains("Invalid ds type specified")) {
                 found = true;
                 break;

@@ -9,7 +9,7 @@ import jrds.factories.xml.JrdsElement;
 
 import org.apache.log4j.Logger;
 
-public class TabBuilder extends ConfigObjectBuilder<Tab>  {
+public class TabBuilder extends ConfigObjectBuilder<Tab> {
 
     static final private Logger logger = Logger.getLogger(TabBuilder.class);
 
@@ -32,11 +32,10 @@ public class TabBuilder extends ConfigObjectBuilder<Tab>  {
                 String elemName = elemNode.getTextContent();
                 tab.add(elemName);
             }
-        }
-        else {
+        } else {
             tab = new Tab.DynamicTree(name);
-            for(JrdsElement elemNode: root.getChildElements() ) {
-                if(! "graph".equals(elemNode.getNodeName()) && !  "cgraph".equals(elemNode.getNodeName()))
+            for(JrdsElement elemNode: root.getChildElements()) {
+                if(!"graph".equals(elemNode.getNodeName()) && !"cgraph".equals(elemNode.getNodeName()))
                     continue;
                 String id = elemNode.getAttribute("id");
                 if("cgraph".equals(elemNode.getNodeName()))

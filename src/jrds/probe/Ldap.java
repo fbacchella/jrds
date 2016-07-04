@@ -22,7 +22,8 @@ import org.apache.log4j.Level;
 public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
     private long uptime;
 
-    final static String[] upTimeSpecifics = {"upTimePath", "startTimePath", "currentTimePath"};
+    final static String[] upTimeSpecifics = { "upTimePath", "startTimePath", "currentTimePath" };
+
     public Ldap() {
         super(LdapConnection.class.getName());
     }
@@ -53,8 +54,9 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
         return "LDAP";
     }
 
-    /* This method is called with a value extracted from the connection
-     * But the uptime value is manager by the probe, not the connection
+    /*
+     * This method is called with a value extracted from the connection But the
+     * uptime value is manager by the probe, not the connection
      * 
      * @see jrds.Probe#setUptime(long)
      */
@@ -65,7 +67,9 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#getUptime()
      */
     @Override
@@ -77,7 +81,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
         Set<String> collectPaths = new HashSet<String>(upTimeSpecifics.length);
         for(String s: upTimeSpecifics) {
             String v = getPd().getSpecific(s);
-            if(v != null && ! "".equals(v.trim()))
+            if(v != null && !"".equals(v.trim()))
                 collectPaths.add(v.trim());
         }
 
@@ -87,12 +91,11 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
         log(Level.TRACE, "will search uptime in %s", retValues);
         if(retValues.containsKey("upTimePath")) {
             return jrds.Util.parseStringNumber(retValues.get("upTimePath").toString(), -1L);
-        }
-        else {
+        } else {
             Object startTimePath = retValues.get(getPd().getSpecific("startTimePath"));
             Object currentTimePath = retValues.get(getPd().getSpecific("currentTimePath"));
             Object timePattern = getPd().getSpecific("timePattern");
-            if(startTimePath != null && timePattern !=null) {
+            if(startTimePath != null && timePattern != null) {
                 DateFormat df = new SimpleDateFormat(timePattern.toString());
                 try {
                     Date start = df.parse(startTimePath.toString());
@@ -101,19 +104,17 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
                         current = df.parse(currentTimePath.toString());
                     else
                         current = new Date();
-                    return ( current.getTime() - start.getTime()) / 1000;
+                    return (current.getTime() - start.getTime()) / 1000;
                 } catch (ParseException e) {
-                    log(Level.ERROR,"Date not parsed with pattern " + ((SimpleDateFormat) df).toPattern() + ": " + e);
+                    log(Level.ERROR, "Date not parsed with pattern " + ((SimpleDateFormat) df).toPattern() + ": " + e);
                 }
-            }
-            else {
+            } else {
                 log(Level.ERROR, "No informations for the uptime");
                 return -1;
             }
         }
         return -1;
     }
-
 
     protected Map<String, Set<String>> buildRequestInfo(Set<String> collectPaths) {
         Map<String, Set<String>> retValue = new HashMap<String, Set<String>>();
@@ -123,12 +124,11 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
             if(parsed.length == 2) {
                 rdn = parsed[0];
                 field = parsed[1];
-            }
-            else if(parsed.length == 1) {
+            } else if(parsed.length == 1) {
                 rdn = ".";
                 field = parsed[0];
             }
-            if( ! retValue.containsKey(rdn)) {
+            if(!retValue.containsKey(rdn)) {
                 retValue.put(rdn, new HashSet<String>());
             }
             retValue.get(rdn).add(field);
@@ -138,7 +138,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
         return retValue;
     }
 
-    protected  Map<String, Object> doMultiSearch(LdapConnection cnx, Map<String, Set<String>> requestInfo) {
+    protected Map<String, Object> doMultiSearch(LdapConnection cnx, Map<String, Set<String>> requestInfo) {
         Map<String, Object> retValues = new HashMap<String, Object>();
 
         for(Map.Entry<String, Set<String>> e: requestInfo.entrySet()) {
@@ -151,7 +151,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
         return retValues;
     }
 
-    protected Map<String, Object>doSearchFielsEntry(LdapConnection cnx, String base, Set<String> fields) {
+    protected Map<String, Object> doSearchFielsEntry(LdapConnection cnx, String base, Set<String> fields) {
         SearchControls sc = new SearchControls();
         String[] attributeFilter = fields.toArray(new String[fields.size()]);
         sc.setReturningAttributes(attributeFilter);

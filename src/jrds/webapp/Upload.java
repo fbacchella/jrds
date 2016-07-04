@@ -31,7 +31,8 @@ public class Upload extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(Upload.class);
 
     /**
-     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+     * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+     *      response)
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         FileItemFactory factory = new DiskFileItemFactory();
@@ -51,9 +52,11 @@ public class Upload extends JrdsServlet {
                 public void error(SAXParseException exception) throws SAXException {
                     throw exception;
                 }
+
                 public void fatalError(SAXParseException exception) throws SAXException {
                     throw exception;
                 }
+
                 public void warning(SAXParseException exception) throws SAXException {
                     logger.warn(exception.getMessage());
                 }
@@ -73,7 +76,7 @@ public class Upload extends JrdsServlet {
                 logger.debug(jrds.Util.delayedFormatString("Item send: %s", item));
 
                 // Process a file upload
-                if (!item.isFormField()) {
+                if(!item.isFormField()) {
                     w.object();
                     String fileName = item.getName();
                     w.key("name").value(fileName);
@@ -81,11 +84,10 @@ public class Upload extends JrdsServlet {
                     try {
                         dbuilder.parse(uploadedStream);
                         File destination = new File(getPropertiesManager().configdir, fileName);
-                        if(! destination.exists()) {
+                        if(!destination.exists()) {
                             item.write(destination);
                             w.key("parsed").value(true);
-                        }
-                        else {
+                        } else {
                             w.key("error").value("file existe");
                             w.key("parsed").value(false);
                         }

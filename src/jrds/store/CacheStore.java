@@ -11,7 +11,7 @@ public class CacheStore extends AbstractStore<Map<String, Number>> {
     private final Map<String, Number> cache;
     private Date lastUpdate = new Date(0);
 
-    public CacheStore(Probe<?,?> p, Map<String, Number> cache) {
+    public CacheStore(Probe<?, ?> p, Map<String, Number> cache) {
         super(p);
         this.cache = cache;
     }

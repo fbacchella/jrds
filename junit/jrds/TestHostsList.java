@@ -17,7 +17,7 @@ import org.junit.rules.TemporaryFolder;
 
 public class TestHostsList {
     static final private Logger logger = Logger.getLogger(TestHostsList.class);
-    static final private String[] optionalstabs = {"@", "sumstab", "customgraph" }; 
+    static final private String[] optionalstabs = { "@", "sumstab", "customgraph" };
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -86,6 +86,6 @@ public class TestHostsList {
         }
         Assert.assertNotNull(graphMap.get(node.hashCode()));
         Assert.assertTrue(found);
-        Assert.assertNotEquals(graphTrees.size(),0);
+        Assert.assertNotEquals(graphTrees.size(), 0);
     }
 }

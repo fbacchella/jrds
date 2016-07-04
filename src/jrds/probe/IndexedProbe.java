@@ -6,5 +6,5 @@ package jrds.probe;
  */
 
 public interface IndexedProbe {
-	public String getIndexName();
+    public String getIndexName();
 }

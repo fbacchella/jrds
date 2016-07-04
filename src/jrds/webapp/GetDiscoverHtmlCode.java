@@ -25,12 +25,14 @@ public class GetDiscoverHtmlCode extends JrdsServlet {
     private static final String CONTENT_TYPE = "application/xml";
     private static final long serialVersionUID = 1L;
 
-    /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.
+     * HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         DocumentBuilder dbuilder;
         try {
             dbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -52,7 +54,7 @@ public class GetDiscoverHtmlCode extends JrdsServlet {
         } catch (TransformerException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Transformer exception error");
 
-        }    
+        }
     }
 
 }

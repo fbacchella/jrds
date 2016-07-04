@@ -111,7 +111,7 @@ public class TestMacro {
         HostInfo host = hb.makeHost(hostdoc);
 
         Collection<String> probesName = new ArrayList<String>();
-        for(Probe<?,?> p: host.getProbes()) {
+        for(Probe<?, ?> p: host.getProbes()) {
             probesName.add(p.toString());
         }
         logger.trace(probesName);
@@ -169,9 +169,9 @@ public class TestMacro {
         HostInfo host = hb.makeHost(hostdoc);
 
         boolean found = false;
-        for(Probe<?,?> p: host.getProbes()) {
-            if("myhost/MacroProbe3".equals(p.toString()) ) {
-                MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
+        for(Probe<?, ?> p: host.getProbes()) {
+            if("myhost/MacroProbe3".equals(p.toString())) {
+                MokeProbe<?, ?> mp = (MokeProbe<?, ?>) p;
                 logger.trace("Args:" + mp.getArgs());
                 Assert.assertFalse(mp.getArgs().contains("bidule"));
                 found = true;
@@ -204,16 +204,15 @@ public class TestMacro {
         HostInfo host = hb.makeHost(hostdoc);
 
         boolean found = false;
-        for(Probe<?,?> p: host.getProbes()) {
-            if("myhost/MacroProbe1".equals(p.toString()) ) {
-                MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
+        for(Probe<?, ?> p: host.getProbes()) {
+            if("myhost/MacroProbe1".equals(p.toString())) {
+                MokeProbe<?, ?> mp = (MokeProbe<?, ?>) p;
                 logger.trace("Args:" + mp.getArgs());
                 Assert.assertFalse(mp.getArgs().contains("bidule"));
                 found = true;
-            }
-            else if ("myhost/MacroProbe2".equals(p.toString())) {
+            } else if("myhost/MacroProbe2".equals(p.toString())) {
                 @SuppressWarnings("unused")
-                MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
+                MokeProbe<?, ?> mp = (MokeProbe<?, ?>) p;
             }
         }
         Assert.assertTrue("macro probe with properties not found", found);
@@ -222,7 +221,7 @@ public class TestMacro {
     @Test
     public void testCollection() throws Exception {
         JrdsDocument d = Tools.parseString(goodMacroXml);
-        Tools.appendString(Tools.appendString(Tools.appendString(d.getDocumentElement(), "<for var=\"a\" collection=\"c\"/>"),"<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
+        Tools.appendString(Tools.appendString(Tools.appendString(d.getDocumentElement(), "<for var=\"a\" collection=\"c\"/>"), "<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
         jrds.Util.serialize(d, System.err, null, null);
 
         Macro m = doMacro(d, "macrodef");
@@ -234,9 +233,9 @@ public class TestMacro {
         HostInfo host = hb.makeHost(hostdoc);
 
         boolean found = false;
-        for(Probe<?,?> p: host.getProbes()) {
-            if("myhost/MacroProbe3".equals(p.toString()) ) {
-                MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
+        for(Probe<?, ?> p: host.getProbes()) {
+            if("myhost/MacroProbe3".equals(p.toString())) {
+                MokeProbe<?, ?> mp = (MokeProbe<?, ?>) p;
                 logger.trace("Args:" + mp.getArgs());
                 Assert.assertTrue(mp.getArgs().contains("bidule"));
                 found = true;
@@ -260,9 +259,9 @@ public class TestMacro {
         HostInfo host = hb.makeHost(hostdoc);
 
         boolean found = false;
-        for(Probe<?,?> p: host.getProbes()) {
-            if("myhost/MacroProbe3".equals(p.toString()) ) {
-                MokeProbe<?,?> mp = (MokeProbe<?,?>) p;
+        for(Probe<?, ?> p: host.getProbes()) {
+            if("myhost/MacroProbe3".equals(p.toString())) {
+                MokeProbe<?, ?> mp = (MokeProbe<?, ?>) p;
                 logger.trace("Args:" + mp.getArgs());
                 Assert.assertTrue(mp.getArgs().contains("bidule"));
                 found = true;

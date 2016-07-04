@@ -32,8 +32,7 @@ public final class StoreOpener {
      * @return RrdDb instance of the datasource.
      * @throws IOException Thrown in case of I/O error.
      */
-    public final static RrdDb getRrd(String rrdFile)
-            throws IOException {
+    public final static RrdDb getRrd(String rrdFile) throws IOException {
         File f = new File(rrdFile);
         String cp = f.getCanonicalPath();
         long start = System.currentTimeMillis();
@@ -51,7 +50,7 @@ public final class StoreOpener {
     /**
      * @param db
      */
-    public final static void releaseRrd(RrdDb db)  {
+    public final static void releaseRrd(RrdDb db) {
         try {
             long start = System.currentTimeMillis();
             if(usepool)
@@ -71,12 +70,11 @@ public final class StoreOpener {
         if(backend != null) {
             StoreOpener.backend = RrdBackendFactory.getFactory(backend);
             logger.trace(Util.delayedFormatString("Store backend set to %s", backend));
-        }
-        else
+        } else
             StoreOpener.backend = RrdBackendFactory.getDefaultFactory();
 
-        logger.debug(Util.delayedFormatString("Store backend used is %s",  StoreOpener.backend.getName()));
-        logger.debug(Util.delayedFormatString("use pool: %b",  usepool));
+        logger.debug(Util.delayedFormatString("Store backend used is %s", StoreOpener.backend.getName()));
+        logger.debug(Util.delayedFormatString("use pool: %b", usepool));
     }
 
     public static final void prepare(String backend, int dbPoolSize) {
@@ -101,12 +99,12 @@ public final class StoreOpener {
             } catch (Exception e) {
             }
         }
-        logger.debug(Util.delayedFormatString("Store backend used is %s",  StoreOpener.backend.getName()));
-        logger.debug(Util.delayedFormatString("use pool: %b %d",  usepool, dbPoolSize));
+        logger.debug(Util.delayedFormatString("Store backend used is %s", StoreOpener.backend.getName()));
+        logger.debug(Util.delayedFormatString("use pool: %b %d", usepool, dbPoolSize));
     }
 
     public static final void stop() {
-        logger.info("Average wait time: " +  waitTime.doubleValue() / lockCount.doubleValue() + " ms");
+        logger.info("Average wait time: " + waitTime.doubleValue() / lockCount.doubleValue() + " ms");
 
     }
 

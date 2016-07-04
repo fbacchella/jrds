@@ -16,16 +16,17 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Level;
 
 /**
-
- * A generic probe to collect an HTTP service. It uses <a href="http://hc.apache.org/httpclient-3.x/">Apache's Commons HttpClient</a>s to provide a better isolation with other web app
- * in the same container. So it should used in preference to HttpProbe and deprecate it.
- * default generic : 
- * port to provide a default port to collect
- * file to provide a specific file to collect
+ * 
+ * A generic probe to collect an HTTP service. It uses
+ * <a href="http://hc.apache.org/httpclient-3.x/">Apache's Commons
+ * HttpClient</a>s to provide a better isolation with other web app in the same
+ * container. So it should used in preference to HttpProbe and deprecate it.
+ * default generic : port to provide a default port to collect file to provide a
+ * specific file to collect
  * 
  * Implementation should implement the parseStream method
  *
- * @author Fabrice Bacchella 
+ * @author Fabrice Bacchella
  */
 @ProbeMeta(
         timerStarter=jrds.probe.HttpClientStarter.class
@@ -48,7 +49,7 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
             }
             entity = response.getEntity();
             if(entity == null) {
-                log(Level.ERROR, "Not response body to %s",getUrl());
+                log(Level.ERROR, "Not response body to %s", getUrl());
                 return null;
             }
             InputStream is = entity.getContent();

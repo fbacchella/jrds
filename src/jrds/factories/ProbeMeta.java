@@ -42,8 +42,7 @@ public @interface ProbeMeta {
         }
 
         @Override
-        public void addConnection(JrdsElement hostElement,
-                HttpServletRequest request) {
+        public void addConnection(JrdsElement hostElement, HttpServletRequest request) {
         }
 
         @Override
@@ -52,8 +51,7 @@ public @interface ProbeMeta {
         }
 
         @Override
-        public void addProbe(JrdsElement hostElement,
-                ProbeDescSummary summary, HttpServletRequest request) {
+        public void addProbe(JrdsElement hostElement, ProbeDescSummary summary, HttpServletRequest request) {
         }
     }
 
@@ -65,7 +63,9 @@ public @interface ProbeMeta {
     }
 
     Class<? extends DiscoverAgent> discoverAgent() default EmptyDiscoverAgent.class;
+
     Class<? extends Starter> timerStarter() default EmptyStarter.class;
+
     Class<? extends Starter> topStarter() default EmptyStarter.class;
 
 }

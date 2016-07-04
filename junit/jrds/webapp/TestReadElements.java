@@ -58,7 +58,7 @@ public class TestReadElements {
         tester.addServlet(JSonQueryParams.class, "/queryparams");
         tester.addServlet(JSonGraph.class, "/jsongraph");
         tester.addServlet(JSonDetails.class, "/details");
-        tester.start();        
+        tester.start();
     }
 
     private JSONObject jsonquery(String query) throws IOException, Exception {
@@ -67,36 +67,32 @@ public class TestReadElements {
         JSONObject content = new JSONObject(response.getContent());
         logger.debug(content);
 
-        return(content);
+        return (content);
     }
 
     private TreeContent scantree(JSONObject tree) throws IOException, Exception {
         TreeContent result = new TreeContent();
         int size = tree.getJSONArray("items").length();
-        for(int i=0;i < size ; i++) {
+        for(int i = 0; i < size; i++) {
             JSONObject item = tree.getJSONArray("items").getJSONObject(i);
             String type = item.getString("type");
             if("graph".equals(type)) {
                 String id = item.getString("id").split("\\.")[1];
-                JSONObject graphdetails = jsonquery("/jsongraph?id=" + id); 
+                JSONObject graphdetails = jsonquery("/jsongraph?id=" + id);
                 result.graphs.add(graphdetails);
-            }
-            else if("tree".equals(type)) {
+            } else if("tree".equals(type)) {
                 String id = item.getString("id").split("\\.")[1];
                 JSONObject subtree = jsonquery("/jsontree?tree=" + id);
-                logger.debug("subtree:  " +subtree.toString(2));
+                logger.debug("subtree:  " + subtree.toString(2));
                 TreeContent subresult = scantree(subtree);
                 result.graphs.addAll(subresult.graphs);
                 result.filters.addAll(subresult.filters);
                 result.trees.add(item);
-            }
-            else if("filter".equals(type)) {
+            } else if("filter".equals(type)) {
                 result.filters.add(item);
-            }
-            else if("node".equals(type)) {
+            } else if("node".equals(type)) {
                 result.nodes.add(item);
-            }
-            else {
+            } else {
                 Assert.fail(type);
             }
         }
@@ -106,7 +102,7 @@ public class TestReadElements {
     @Test
     public void testQueryHost() throws IOException, Exception {
         JSONObject tree = jsonquery("/jsontree?host=localhost");
-        Assert.assertEquals(4, tree.getJSONArray("items").length());   
+        Assert.assertEquals(4, tree.getJSONArray("items").length());
         Assert.assertEquals(3, scantree(tree).graphs.size());
         Assert.assertEquals(1, scantree(tree).trees.size());
         Assert.assertEquals(0, scantree(tree).filters.size());
@@ -116,7 +112,7 @@ public class TestReadElements {
     @Test
     public void testQueryFilter() throws IOException, Exception {
         JSONObject tree = jsonquery("/jsontree?filter=Localhost");
-        Assert.assertEquals(21, tree.getJSONArray("items").length());   
+        Assert.assertEquals(21, tree.getJSONArray("items").length());
         Assert.assertEquals(7, scantree(tree).graphs.size());
         Assert.assertEquals(2, scantree(tree).trees.size());
         Assert.assertEquals(0, scantree(tree).filters.size());
@@ -136,7 +132,7 @@ public class TestReadElements {
     @Test
     public void testViewTab() throws IOException, Exception {
         JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.VIEWSTAB);
-        Assert.assertEquals(11, tree.getJSONArray("items").length());        
+        Assert.assertEquals(11, tree.getJSONArray("items").length());
         Assert.assertEquals(3, scantree(tree).graphs.size());
         Assert.assertEquals(1, scantree(tree).trees.size());
         Assert.assertEquals(0, scantree(tree).filters.size());
@@ -146,7 +142,7 @@ public class TestReadElements {
     @Test
     public void testHostTab() throws IOException, Exception {
         JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.HOSTSTAB);
-        Assert.assertEquals(9, tree.getJSONArray("items").length());        
+        Assert.assertEquals(9, tree.getJSONArray("items").length());
         Assert.assertEquals(4, scantree(tree).graphs.size());
         Assert.assertEquals(1, scantree(tree).trees.size());
         Assert.assertEquals(0, scantree(tree).filters.size());
@@ -156,7 +152,7 @@ public class TestReadElements {
     @Test
     public void testTagsTab() throws IOException, Exception {
         JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.TAGSTAB);
-        Assert.assertEquals(1, tree.getJSONArray("items").length());        
+        Assert.assertEquals(1, tree.getJSONArray("items").length());
         Assert.assertEquals(0, scantree(tree).graphs.size());
         Assert.assertEquals(0, scantree(tree).trees.size());
         Assert.assertEquals(1, scantree(tree).filters.size());
@@ -166,7 +162,7 @@ public class TestReadElements {
     @Test
     public void testCustomTab() throws IOException, Exception {
         JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.CUSTOMGRAPHTAB);
-        Assert.assertEquals(2, tree.getJSONArray("items").length());        
+        Assert.assertEquals(2, tree.getJSONArray("items").length());
         Assert.assertEquals(1, scantree(tree).graphs.size());
         Assert.assertEquals(1, scantree(tree).trees.size());
         Assert.assertEquals(0, scantree(tree).filters.size());
@@ -197,13 +193,13 @@ public class TestReadElements {
     @Test
     public void testDetails() throws IOException, Exception {
         JSONObject details = jsonquery("/details?pid=-554902849");
-        Assert.assertEquals(-554902849, details.get("pid"));        
-        Assert.assertEquals("lo0", details.get("index"));        
-        Assert.assertEquals("localhost/ifx-lo0", details.get("probequalifiedname"));        
-        Assert.assertEquals("ifx-lo0", details.get("probeinstancename"));        
-        Assert.assertEquals("localhost", details.get("hostname"));        
-        Assert.assertEquals(17, details.getJSONArray("datastores").length());        
-        Assert.assertEquals(3, details.getJSONArray("graphs").length());        
+        Assert.assertEquals(-554902849, details.get("pid"));
+        Assert.assertEquals("lo0", details.get("index"));
+        Assert.assertEquals("localhost/ifx-lo0", details.get("probequalifiedname"));
+        Assert.assertEquals("ifx-lo0", details.get("probeinstancename"));
+        Assert.assertEquals("localhost", details.get("hostname"));
+        Assert.assertEquals(17, details.getJSONArray("datastores").length());
+        Assert.assertEquals(3, details.getJSONArray("graphs").length());
     }
 
 }

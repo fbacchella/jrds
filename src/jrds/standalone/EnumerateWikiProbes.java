@@ -27,7 +27,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
     String propFile = "jrds.properties";
 
     public void configure(Properties configuration) {
-        propFile =  configuration.getProperty("propertiesFile", propFile);
+        propFile = configuration.getProperty("propertiesFile", propFile);
     }
 
     private String classToLink(Class<?> c) {
@@ -42,17 +42,16 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         pm.importSystemProps();
         pm.update();
 
-        System.getProperties().setProperty("java.awt.headless","true");
+        System.getProperties().setProperty("java.awt.headless", "true");
 
         logger.debug("Starting parsing descriptions");
         ConfigObjectFactory conf = new ConfigObjectFactory(pm, pm.extensionClassLoader);
-        //Needed for the probe's graph list
+        // Needed for the probe's graph list
         conf.setGraphDescMap();
         Map<String, ProbeDesc> probesMap = conf.setProbeDescMap();
         if(args.length == 0) {
             dumpAll(probesMap.values());
-        }
-        else {
+        } else {
             ProbeDesc pd = probesMap.get(args[0]);
             if(pd != null)
                 dumpProbe(pd);
@@ -62,7 +61,9 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.standalone.CommandStarterImpl#help()
      */
     @Override
@@ -99,14 +100,14 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         ProbeDesc pd = p.getPd();
 
         String description = pd.getSpecific("description");
-        if (description == null)
+        if(description == null)
             description = "";
         return "| " + getSourceTypeLink(p, true) + " | " + description + " | " + classToLink(p.getClass()) + " | ";
     }
 
     private void dumpProbe(ProbeDesc pd) throws InstantiationException, IllegalAccessException, InvocationTargetException {
         Class<? extends Probe<?, ?>> c = pd.getProbeClass();
-        Probe<?,?> p = c.newInstance();
+        Probe<?, ?> p = c.newInstance();
         p.setPd(pd);
         System.out.println(oneLine(p));
 
@@ -133,23 +134,23 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
             }
         }
 
-        //Enumerates the beans informations
+        // Enumerates the beans informations
         List<GenericBean> tryBeans = new ArrayList<GenericBean>();
         for(GenericBean bean: pd.getBeans()) {
             tryBeans.add(bean);
         }
         Map<String, ProbeDesc.DefaultBean> defaultBeans = pd.getDefaultBeans();
-        if(! tryBeans.isEmpty()) {
+        if(!tryBeans.isEmpty()) {
             System.out.println(doTitle("Attributes"));
             System.out.println();
             System.out.println("^ Name ^ Default value ^ Description ^");
-            for(GenericBean bean: tryBeans) { 
+            for(GenericBean bean: tryBeans) {
                 String defaultValue = "";
                 ProbeDesc.DefaultBean currentAttribute = defaultBeans.get(bean.getName());
-                if(currentAttribute != null && ! currentAttribute.delayed) {
+                if(currentAttribute != null && !currentAttribute.delayed) {
                     defaultValue = currentAttribute.value;
                 }
-                if(bean != null )
+                if(bean != null)
                     System.out.println("| " + bean.getName() + " | " + defaultValue + " | | ");
             }
         }
@@ -159,26 +160,26 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         System.out.println();
         System.out.println("^ Name ^ Type ^ Description ^");
         for(DsDef ds: pd.getDsDefs()) {
-            System.out.println(String.format("| %s | %s | |",ds.getDsName(), ds.getDsType()));
+            System.out.println(String.format("| %s | %s | |", ds.getDsName(), ds.getDsType()));
         }
         System.out.println();
         System.out.println(doTitle("Graph provided"));
         System.out.println();
         System.out.println("^ Name ^ Description ^");
         for(String graphs: pd.getGraphClasses()) {
-            System.out.println(String.format("| %s | |",graphs));
+            System.out.println(String.format("| %s | |", graphs));
         }
-        System.out.println();		
+        System.out.println();
         if(ProbeConnected.class.isAssignableFrom(c)) {
             System.out.println(doTitle("Connection class"));
 
             Class<?> typeArg;
             Class<?> curs = c;
-            while(! ParameterizedType.class.isAssignableFrom(curs.getGenericSuperclass().getClass()))
+            while (!ParameterizedType.class.isAssignableFrom(curs.getGenericSuperclass().getClass()))
                 curs = curs.getSuperclass();
 
             ParameterizedType t = (ParameterizedType) curs.getGenericSuperclass();
-            typeArg = (Class<?>)t.getActualTypeArguments()[2];
+            typeArg = (Class<?>) t.getActualTypeArguments()[2];
 
             System.out.println(classToLink(typeArg));
             System.out.println("");

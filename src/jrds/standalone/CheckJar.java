@@ -34,7 +34,7 @@ public class CheckJar extends CommandStarterImpl {
         pm.strictparsing = true;
         pm.loglevel = Level.ERROR;
 
-        System.getProperties().setProperty("java.awt.headless","true");
+        System.getProperties().setProperty("java.awt.headless", "true");
 
         System.out.println("Starting parsing descriptions");
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
@@ -46,13 +46,16 @@ public class CheckJar extends CommandStarterImpl {
         for(String jarfile: args) {
             System.out.println("checking " + jarfile);
 
-            //pm.setProperty("libspath", (new File(jarfile).getCanonicalPath()));
-            //pm.update();
+            // pm.setProperty("libspath", (new
+            // File(jarfile).getCanonicalPath()));
+            // pm.update();
             pm.libspath.clear();
             URL jarfileurl = new File(jarfile).toURI().toURL();
             pm.libspath.add(jarfileurl.toURI());
             pm.extensionClassLoader = new URLClassLoader(new URL[] { jarfileurl }, getClass().getClassLoader()) {
-                /* (non-Javadoc)
+                /*
+                 * (non-Javadoc)
+                 * 
                  * @see java.lang.Object#toString()
                  */
                 @Override
@@ -61,13 +64,12 @@ public class CheckJar extends CommandStarterImpl {
                 }
             };
 
-
             ConfigObjectFactory confjar = new ConfigObjectFactory(pm);
 
             Map<String, GraphDesc> grapMapjar = confjar.setGraphDescMap();
             for(ProbeDesc pd: confjar.setProbeDescMap().values()) {
                 Class<?> pc = pd.getProbeClass();
-                while(pc != null && pc != StarterNode.class) {
+                while (pc != null && pc != StarterNode.class) {
                     if(pc.isAnnotationPresent(ProbeMeta.class)) {
                         ProbeMeta meta = pc.getAnnotation(ProbeMeta.class);
                         daList.add(meta.discoverAgent());
@@ -77,7 +79,7 @@ public class CheckJar extends CommandStarterImpl {
                 }
                 for(String ds: pd.getDs()) {
                     if(ds.length() > 20) {
-                        System.out.println(String.format("DS name %s too long for probe description %s", ds, pd.getName() ));
+                        System.out.println(String.format("DS name %s too long for probe description %s", ds, pd.getName()));
                     }
                 }
                 Collection<String> graphs = pd.getGraphClasses();
@@ -86,7 +88,7 @@ public class CheckJar extends CommandStarterImpl {
                     continue;
                 }
                 for(String graph: graphs) {
-                    if(! grapMap.containsKey(graph) && ! grapMapjar.containsKey(graph)) {
+                    if(!grapMap.containsKey(graph) && !grapMapjar.containsKey(graph)) {
                         System.out.println("Unknown graph " + graph + " for probe desc: " + pd.getName());
                     }
                 }

@@ -84,19 +84,20 @@ public class TestUrlParser {
         hl.addProbe(p);
 
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters, "DummyHost", "MockGraphInstance"), hl, "host", "graphname");
-        Assert.assertEquals("Graph not found by path", new Integer(gn.hashCode()), pb.getId());        
+        Assert.assertEquals("Graph not found by path", new Integer(gn.hashCode()), pb.getId());
         Assert.assertEquals("begin definition invalid", pb.getBegin(), begin.getTime());
         Assert.assertEquals("end definition invalid", pb.getEnd(), end.getTime());
     }
 
     /**
      * Test that missing rest argument can be provided as cgi parameters
+     * 
      * @throws ParseException
      */
     @Test
     public void checkGraphRestURL2() throws ParseException {
         Map<String, String[]> parameters = new HashMap<String, String[]>();
-        parameters.put("graphname", new String[] {"MockGraphInstance"});
+        parameters.put("graphname", new String[] { "MockGraphInstance" });
         parameters.put("begin", new String[] { "2007-01-01" });
         parameters.put("end", new String[] { "2007-12-31" });
         Date begin = fullISOFORMAT.parse("2007-01-01T00:00:00");
@@ -111,7 +112,7 @@ public class TestUrlParser {
         hl.addProbe(p);
 
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters, "DummyHost"), hl, "host", "graphname");
-        Assert.assertEquals("Graph not found by path", new Integer(gn.hashCode()), pb.getId());        
+        Assert.assertEquals("Graph not found by path", new Integer(gn.hashCode()), pb.getId());
         Assert.assertEquals("begin definition invalid", pb.getBegin(), begin.getTime());
         Assert.assertEquals("end definition invalid", pb.getEnd(), end.getTime());
     }
@@ -128,7 +129,7 @@ public class TestUrlParser {
     public void checkSortedFalseDefault() {
         Map<String, String[]> parameters = new HashMap<String, String[]>();
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
-        Assert.assertTrue(! pb.isSorted());
+        Assert.assertTrue(!pb.isSorted());
     }
 
     @Test
@@ -158,7 +159,7 @@ public class TestUrlParser {
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
         Period p = pb.getPeriod();
 
-        //Period drop milliseconds
+        // Period drop milliseconds
         Date now = new Date((long) (Math.floor(new Date().getTime() / 1000) * 1000L));
         long offset = Math.abs(now.getTime() - p.getEnd().getTime());
         logger.debug("end offset:" + offset);
@@ -171,11 +172,11 @@ public class TestUrlParser {
     @Test
     public void checkParseDate3() throws ParseException {
         Map<String, String[]> parameters = new HashMap<String, String[]>();
-        parameters.put("scale", new String [] { "4"} );
+        parameters.put("scale", new String[] { "4" });
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
         Period p = pb.getPeriod();
 
-        //Period drop milliseconds
+        // Period drop milliseconds
         Date now = new Date((long) (Math.floor(new Date().getTime() / 1000) * 1000L));
         Calendar calBegin = Calendar.getInstance();
         calBegin.setTime(now);
@@ -194,10 +195,10 @@ public class TestUrlParser {
     @Test
     public void checkUrl1() {
         Map<String, String[]> parameters = new HashMap<String, String[]>();
-        parameters.put("host", new String [] { "host"} );
-        parameters.put("scale", new String [] { "2"} );
-        parameters.put("max", new String [] { "2"} );
-        parameters.put("min", new String [] { "2"} );
+        parameters.put("host", new String[] { "host" });
+        parameters.put("scale", new String[] { "2" });
+        parameters.put("max", new String[] { "2" });
+        parameters.put("min", new String[] { "2" });
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
         String url = pb.makeObjectUrl("root", "", false);
         logger.trace(url);
@@ -213,8 +214,8 @@ public class TestUrlParser {
     @Test
     public void checkUrl2() {
         Map<String, String[]> parameters = new HashMap<String, String[]>();
-        parameters.put("max", new String [] { String.valueOf(Double.NaN)} );
-        parameters.put("min", new String [] { String.valueOf(Double.NaN)} );
+        parameters.put("max", new String[] { String.valueOf(Double.NaN) });
+        parameters.put("min", new String[] { String.valueOf(Double.NaN) });
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
         jrds.Filter f = new jrds.FilterHost("host");
         String url = pb.makeObjectUrl("root", f, true);
@@ -234,7 +235,7 @@ public class TestUrlParser {
         Map<String, String[]> parameters = new HashMap<String, String[]>();
         jrds.Filter f = jrds.Filter.ALLHOSTS;
         String filterName = f.getName();
-        parameters.put("filter", new String [] { filterName } );
+        parameters.put("filter", new String[] { filterName });
 
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
         String url = pb.makeObjectUrl("root", f, true);
@@ -246,13 +247,14 @@ public class TestUrlParser {
         Assert.assertFalse(url.contains("scale="));
     }
 
-    //	@Test
-    //	public void testUnpack() {
-    //		Map<String, String[]> parameters = new HashMap<String, String[]>();
-    //		parameters.put("p", new String [] {"E3JMQqAMBBE0auEqRPYNcbodp5DbISogYBgtBLvbiwEq3n8uWAhA%2FqU1BzTEfYMjWk7lxgwavB3rls%2B8lsIYljDQwo1mrL8whVUxGSoNdyqyorrSq7%2F2SsiIcL9ACNvWBB2AAAA"});
-    //		ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
-    //	}
-    //	
+    // @Test
+    // public void testUnpack() {
+    // Map<String, String[]> parameters = new HashMap<String, String[]>();
+    // parameters.put("p", new String []
+    // {"E3JMQqAMBBE0auEqRPYNcbodp5DbISogYBgtBLvbiwEq3n8uWAhA%2FqU1BzTEfYMjWk7lxgwavB3rls%2B8lsIYljDQwo1mrL8whVUxGSoNdyqyorrSq7%2F2SsiIcL9ACNvWBB2AAAA"});
+    // ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
+    // }
+    //
 
     @Test
     public void testPath() {
@@ -260,7 +262,7 @@ public class TestUrlParser {
         HttpServletRequest req = GetMoke.getRequest(parameters);
         ParamsBean pb = new ParamsBean(req, hl);
         String buildurl = pb.makeObjectUrl("graph", jrds.Filter.ALLHOSTS, true);
-        Assert.assertTrue("bad build url: "+ buildurl, buildurl.startsWith("/graph?"));
+        Assert.assertTrue("bad build url: " + buildurl, buildurl.startsWith("/graph?"));
     }
 
 }

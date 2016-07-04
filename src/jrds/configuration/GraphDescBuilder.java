@@ -33,26 +33,26 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
             throw new InvocationTargetException(e, GraphDescBuilder.class.getName());
         }
     }
+
     public GraphDesc makeGraphDesc(JrdsDocument n) throws Exception {
         JrdsElement subnode = n.getRootElement();
 
         GraphDesc gd = new GraphDesc();
 
-        //Identify the optionnal custom GraphDesc class
+        // Identify the optionnal custom GraphDesc class
         JrdsElement graphClass = subnode.getElementbyName("graphClass");
         if(graphClass != null) {
             String className = graphClass.getTextContent().trim();
-            if(! "".equals(className)) {
+            if(!"".equals(className)) {
                 @SuppressWarnings("unchecked")
                 Class<Graph> clazz = (Class<Graph>) pm.extensionClassLoader.loadClass(className);
                 // Check a valid constructor
                 Constructor<Graph> c = clazz.getConstructor(GraphNode.class);
-                if (c !=null )
+                if(c != null)
                     gd.setGraphClass(clazz);
                 else
                     throw new IllegalArgumentException("Invalid constructor");
-            }
-            else {
+            } else {
                 throw new IllegalArgumentException("Empty graphClass");
             }
         }
@@ -68,7 +68,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
 
         doACL(gd, n, subnode);
 
-        //Vertical label should never be empty
+        // Vertical label should never be empty
         if(gd.getVerticalLabel() == null)
             gd.setVerticalLabel("");
 
@@ -86,7 +86,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
         }
 
         for(JrdsElement addnode: subnode.getChildElements()) {
-            if(! "add".equals(addnode.getNodeName()) && ! "addpath".equals(addnode.getNodeName()) )
+            if(!"add".equals(addnode.getNodeName()) && !"addpath".equals(addnode.getNodeName()))
                 continue;
             Map<String, String> elements = new HashMap<String, String>(10);
             boolean withPath = false;
@@ -101,8 +101,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
                         }
                         elements.put("path" + key, value);
                     }
-                }
-                else {
+                } else {
                     String key = child.getNodeName();
                     String value = child.getTextContent();
                     if(value != null) {
@@ -117,10 +116,10 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
             String addLegend = elements.get("legend");
             String addrpn = elements.get("rpn");
             String consFunc = elements.get("cf");
-            String reversed = elements.get("reversed");	
-            String percentile = elements.get("percentile"); 
+            String reversed = elements.get("reversed");
+            String percentile = elements.get("percentile");
             if(elements.containsKey("percentile") && "".equals(percentile))
-                percentile="95";
+                percentile = "95";
             String host = null;
             String probe = null;
             String dsName;
@@ -128,8 +127,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
                 host = elements.get("pathhost");
                 probe = elements.get("pathprobe");
                 dsName = elements.get("pathdsName");
-            }
-            else 
+            } else
                 dsName = elements.get("dsName");
 
             gd.add(addName, addrpn, addgraphType, addColor, addLegend, consFunc, reversed, percentile, host, probe, dsName);
@@ -144,7 +142,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
 
         // If the class is not jrds.Graph, it's difficult to evaluate dimensions
         if(gd.getGraphClass() == jrds.Graph.class) {
-            gd.initializeLimits(g2d);            
+            gd.initializeLimits(g2d);
         }
         return gd;
     }
@@ -161,7 +159,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
             Object value;
             if("pathelement".equals(te.getNodeName()))
                 value = GraphDesc.resolvPathElement(te.getTextContent());
-            else 
+            else
                 value = te.getTextContent();
             pathString.add(value);
         }

@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-
 public class BootStrap {
-    static final private String[] propertiesList = { "jetty.host", "jetty.port", "propertiesFile", "loglevel"};
+    static final private String[] propertiesList = { "jetty.host", "jetty.port", "propertiesFile", "loglevel" };
     static final private String defaultCommand = "jetty";
     static final Map<String, String> cmdClasses = new HashMap<String, String>();
+
     static {
         cmdClasses.put("jetty", "jrds.standalone.Jetty");
         cmdClasses.put("jmxserver", "jrds.standalone.JMX");
@@ -41,7 +41,7 @@ public class BootStrap {
                 configuration.put(prop, propVal);
         }
 
-        //To remove WEB-INF/lib in the path and find the web root
+        // To remove WEB-INF/lib in the path and find the web root
         File webRoot = baseClassPath.getParentFile().getParentFile();
         if(webRoot.isDirectory()) {
             configuration.put("webRoot", webRoot.getAbsolutePath());
@@ -61,8 +61,7 @@ public class BootStrap {
                 commandName = args[1].trim().toLowerCase();
             else
                 doHelp();
-        }
-        else {
+        } else {
             if(args.length > 1)
                 args = Arrays.copyOfRange(args, 1, args.length);
             else
@@ -89,8 +88,7 @@ public class BootStrap {
         if(o instanceof Class<?>) {
             Class<?> c = (Class<?>) o;
             return "/".concat(c.getName().replace(".", "/").concat(".class"));
-        }
-        else if(o instanceof String) {
+        } else if(o instanceof String) {
             return (String) o;
         }
         return "";
@@ -105,11 +103,9 @@ public class BootStrap {
             if("jar".equals(protocol)) {
                 JarURLConnection cnx = (JarURLConnection) me.openConnection();
                 rootUrl = cnx.getJarFileURL();
-            }
-            else if("file".equals(protocol)) {
+            } else if("file".equals(protocol)) {
                 rootUrl = me;
-            }
-            else
+            } else
                 return null;
 
             File file = new File(rootUrl.getFile());
@@ -123,11 +119,11 @@ public class BootStrap {
 
     static private ClassLoader makeClassLoader(File baseClassPath) {
         try {
-            List<URL> classPath= new ArrayList<URL>();
+            List<URL> classPath = new ArrayList<URL>();
 
             classPath.add(baseClassPath.toURI().toURL());
 
-            FileFilter jarfilter = new  FileFilter(){
+            FileFilter jarfilter = new FileFilter() {
                 public boolean accept(File file) {
                     return file.isFile() && file.getName().endsWith(".jar");
                 }
@@ -136,7 +132,7 @@ public class BootStrap {
                 classPath.add(f.toURI().toURL());
             }
 
-            String libspath = System.getProperty("libspath","");
+            String libspath = System.getProperty("libspath", "");
 
             for(String path: libspath.split(String.valueOf(File.pathSeparatorChar))) {
                 File libFile = new File(path);
@@ -144,8 +140,7 @@ public class BootStrap {
                     for(File f: libFile.listFiles(jarfilter)) {
                         classPath.add(f.toURI().toURL());
                     }
-                }
-                else if(libFile.isFile() && libFile.getName().endsWith(".jar"))
+                } else if(libFile.isFile() && libFile.getName().endsWith(".jar"))
                     classPath.add(libFile.toURI().toURL());
             }
 

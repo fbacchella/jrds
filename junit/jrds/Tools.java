@@ -45,13 +45,13 @@ final public class Tools {
 
     static public void configure() throws IOException {
         Locale.setDefault(new Locale("POSIX"));
-        System.getProperties().setProperty("java.awt.headless","true");
-        System.setProperty("java.io.tmpdir",  "tmp");
+        System.getProperties().setProperty("java.awt.headless", "true");
+        System.setProperty("java.io.tmpdir", "tmp");
         LogManager.resetConfiguration();
-        //resetConfiguration is not enough
+        // resetConfiguration is not enough
         @SuppressWarnings("unchecked")
-        ArrayList<Logger> loggers = (ArrayList<Logger>)Collections.list(LogManager.getCurrentLoggers());
-        for (Logger l: loggers) {
+        ArrayList<Logger> loggers = (ArrayList<Logger>) Collections.list(LogManager.getCurrentLoggers());
+        for(Logger l: loggers) {
             l.removeAllAppenders();
             l.setLevel(Level.OFF);
         }
@@ -76,9 +76,11 @@ final public class Tools {
                 public void error(SAXParseException exception) throws SAXException {
                     throw exception;
                 }
+
                 public void fatalError(SAXParseException exception) throws SAXException {
                     throw exception;
                 }
+
                 public void warning(SAXParseException exception) throws SAXException {
                     throw exception;
                 }
@@ -95,19 +97,19 @@ final public class Tools {
         return new JrdsDocument(Tools.dbuilder.parse(is));
     }
 
-    static public JrdsDocument parseString(String s) throws Exception { 
+    static public JrdsDocument parseString(String s) throws Exception {
         InputStream is = new ByteArrayInputStream(s.getBytes());
         return Tools.parseRessource(is);
     }
 
     static public void setLevel(Logger logger, Level level, String... allLoggers) {
         Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDERNAME);
-        //The system property override the code log level
-        if(System.getProperty("jrds.testloglevel") != null){
+        // The system property override the code log level
+        if(System.getProperty("jrds.testloglevel") != null) {
             level = Level.toLevel(System.getProperty("jrds.testloglevel"));
         }
         if(logger != null) {
-            logger.setLevel(level);            
+            logger.setLevel(level);
         }
         for(String loggerName: allLoggers) {
             Logger l = Logger.getLogger(loggerName);
@@ -159,9 +161,11 @@ final public class Tools {
             protected void append(LoggingEvent arg0) {
                 logs.add(arg0);
             }
+
             public void close() {
                 logs.clear();
             }
+
             public boolean requiresLayout() {
                 return false;
             }
@@ -181,10 +185,10 @@ final public class Tools {
         pm.setProperty("tabs", "hoststab");
         for(String prop: props) {
             int pos = prop.indexOf('=');
-            if(pos == 0 || pos == (prop.length() - 1) )
+            if(pos == 0 || pos == (prop.length() - 1))
                 continue;
             String key = prop.substring(0, pos);
-            String value = prop.substring(pos +  1);
+            String value = prop.substring(pos + 1);
             pm.setProperty(key, value);
         }
         pm.update();

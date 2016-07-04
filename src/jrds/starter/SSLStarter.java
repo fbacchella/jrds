@@ -19,12 +19,14 @@ import jrds.PropertiesManager;
 public class SSLStarter extends Starter {
 
     // Create a trust manager that does not validate certificate chains
-    public static final X509TrustManager trustAllCerts= new X509TrustManager() {
+    public static final X509TrustManager trustAllCerts = new X509TrustManager() {
         public X509Certificate[] getAcceptedIssuers() {
             return null;
         }
+
         public void checkClientTrusted(X509Certificate[] certs, String authType) {
         }
+
         public void checkServerTrusted(X509Certificate[] certs, String authType) {
         }
     };
@@ -33,11 +35,13 @@ public class SSLStarter extends Starter {
 
     private String[] supportedProtocols = null;
     private String[] supportedCipherSuites = null;
-    private TrustManager[] trustManagers = new TrustManager[]{trustAllCerts};
+    private TrustManager[] trustManagers = new TrustManager[] { trustAllCerts };
 
     SSLContext sc = null;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.starter.Starter#configure(jrds.PropertiesManager)
      */
     @Override
@@ -49,8 +53,8 @@ public class SSLStarter extends Starter {
     public boolean start() {
         try {
             sc = SSLContext.getInstance(SSLProtocol);
-            if(! "Default".equals(sc.getProtocol())) {
-                sc.init(null, trustManagers, null);                
+            if(!"Default".equals(sc.getProtocol())) {
+                sc.init(null, trustManagers, null);
             }
         } catch (NoSuchAlgorithmException e) {
             log(Level.ERROR, e, "failed to init ssl: %s", e);
@@ -75,7 +79,7 @@ public class SSLStarter extends Starter {
     }
 
     public Socket connect(String host, int port) throws NoSuchAlgorithmException, KeyManagementException, UnknownHostException, IOException {
-        SocketFactory ss = getLevel().find(SocketFactory.class); 
+        SocketFactory ss = getLevel().find(SocketFactory.class);
         Socket s = ss.createSocket(host, port);
 
         SSLSocketFactory ssf = getContext().getSocketFactory();

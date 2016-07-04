@@ -20,12 +20,11 @@ import jrds.Renderer;
 
 import org.apache.log4j.Logger;
 
-
 /**
  * @author bacchell
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ *         TODO To change the template for this generated type comment go to
+ *         Window - Preferences - Java - Code Style - Code Templates
  */
 public class Grapher {
     static final private Logger logger = Logger.getLogger(Grapher.class);
@@ -39,7 +38,7 @@ public class Grapher {
         PropertiesManager pm = new PropertiesManager(new File(propFile));
         jrds.JrdsLoggerConfiguration.configure(pm);
 
-        System.getProperties().setProperty("java.awt.headless","true");
+        System.getProperties().setProperty("java.awt.headless", "true");
         System.getProperties().putAll(pm);
 
         HostsList hl = new HostsList(pm);
@@ -51,7 +50,7 @@ public class Grapher {
         for(GraphTree graphTree: hl.getTrees()) {
             logger.trace("Tree found: " + graphTree.getName());
             for(GraphNode gn: graphTree.enumerateChildsGraph(null)) {
-                if(! done.contains(gn.hashCode())) {
+                if(!done.contains(gn.hashCode())) {
                     done.add(gn.hashCode());
                     logger.debug("New graph: " + gn.getGraphTitle());
                     Graph g = gn.getGraph();

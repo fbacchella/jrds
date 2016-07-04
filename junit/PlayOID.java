@@ -5,7 +5,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.snmp4j.smi.OID;
 
-
 public class PlayOID {
 
     @Test
@@ -18,7 +17,7 @@ public class PlayOID {
         Assert.assertTrue(new OID("1").equals(key));
         for(OID k: map.keySet()) {
             Assert.assertTrue(map.containsKey(k));
-            Assert.assertEquals(map.get(k), 1);			
+            Assert.assertEquals(map.get(k), 1);
         }
     }
 

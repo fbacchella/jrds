@@ -13,19 +13,20 @@ import jrds.JrdsSample;
 import org.snmp4j.smi.OID;
 
 /**
- * @author Fabrice Bacchella 
+ * @author Fabrice Bacchella
  */
 public class ProcessStatusSolaris extends RdsSnmpSimple {
-    static final private String RUNNABLE="R";
-    static final private String STOPPED="T";
-    static final private String INPAGEWAIT="P";
-    static final private String NONINTERRUPTABLEWAIT="D";
-    static final private String SLEEPING="S";
-    static final private String IDLE="I";
-    static final private String ZOMBIE="Z";
+    static final private String RUNNABLE = "R";
+    static final private String STOPPED = "T";
+    static final private String INPAGEWAIT = "P";
+    static final private String NONINTERRUPTABLEWAIT = "D";
+    static final private String SLEEPING = "S";
+    static final private String IDLE = "I";
+    static final private String ZOMBIE = "Z";
 
-
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#modifySample(org.rrd4j.core.Sample, java.util.Map)
      */
     @Override
@@ -38,7 +39,7 @@ public class ProcessStatusSolaris extends RdsSnmpSimple {
         int idle = 0;
         int zombie = 0;
         for(Object val: snmpVars.values()) {
-            String state = val.toString();    
+            String state = val.toString();
             if(RUNNABLE.equals(state))
                 runnable++;
             else if(STOPPED.equals(state))

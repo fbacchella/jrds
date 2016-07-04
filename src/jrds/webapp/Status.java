@@ -19,21 +19,22 @@ import jrds.starter.Timer.Stats;
 
 /**
  * A few stats for jrds inner status
+ * 
  * @author Fabrice Bacchella
  */
 @ServletSecurity
 public class Status extends JrdsServlet {
 
     /**
-     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
+     *      javax.servlet.http.HttpServletResponse)
      */
-    public void doGet(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
         HostsList hl = getHostsList();
 
         ParamsBean params = new ParamsBean(req, hl);
-        if(! allowed(params, ACL.ALLOWEDACL, req, res)) {
+        if(!allowed(params, ACL.ALLOWEDACL, req, res)) {
             return;
         }
 
@@ -49,8 +50,8 @@ public class Status extends JrdsServlet {
             try {
                 stats.put(t.getName(), (Stats) t.getStats().clone());
             } catch (CloneNotSupportedException e) {
-                //No that's false, it's always supported
-            }            
+                // No that's false, it's always supported
+            }
         }
 
         if(params.getValue("json") != null) {
@@ -67,7 +68,7 @@ public class Status extends JrdsServlet {
                     writer.key("Name").value(e.getKey());
                     writer.key("LastCollect").value(lastCollectAgo);
                     writer.key("LastDuration").value(e.getValue().runtime);
-                    writer.endObject();            
+                    writer.endObject();
                 }
                 writer.endArray();
                 writer.key("Generation").value(generation);
@@ -75,8 +76,7 @@ public class Status extends JrdsServlet {
                 writer.flush();
             } catch (JSONException e) {
             }
-        }
-        else {
+        } else {
             res.setContentType("text/plain");
             res.addHeader("Cache-Control", "no-cache");
             PrintWriter writer = res.getWriter();
@@ -85,10 +85,10 @@ public class Status extends JrdsServlet {
             for(Map.Entry<String, Stats> e: stats.entrySet()) {
                 long lastCollectAgo = (System.currentTimeMillis() - e.getValue().lastCollect.getTime()) / 1000;
                 writer.println("Timer name: " + e.getKey());
-                writer.println("    Last collect: " + lastCollectAgo  + "s ago (" + lastCollectAgo + ")" );
+                writer.println("    Last collect: " + lastCollectAgo + "s ago (" + lastCollectAgo + ")");
                 writer.println("    Last running duration: " + e.getValue().runtime / 1000 + "s");
             }
-            writer.flush();			
+            writer.flush();
         }
     }
 }

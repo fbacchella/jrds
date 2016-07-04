@@ -4,7 +4,7 @@ import org.w3c.dom.DOMException;
 import org.w3c.dom.Text;
 
 public class JrdsText extends AbstractJrdsNode<Text> implements Text {
-    
+
     public JrdsText(Text n) {
         super(n);
     }
@@ -28,7 +28,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
         getParent().deleteData(arg0, arg1);
     }
 
-     /**
+    /**
      * @return
      * @throws DOMException
      * @see org.w3c.dom.CharacterData#getData()
@@ -78,8 +78,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
      * @throws DOMException
      * @see org.w3c.dom.CharacterData#replaceData(int, int, java.lang.String)
      */
-    public void replaceData(int arg0, int arg1, String arg2)
-            throws DOMException {
+    public void replaceData(int arg0, int arg1, String arg2) throws DOMException {
         getParent().replaceData(arg0, arg1, arg2);
     }
 
@@ -102,7 +101,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
         getParent().setData(arg0);
     }
 
-     /**
+    /**
      * @param offset
      * @return
      * @throws DOMException

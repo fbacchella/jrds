@@ -14,8 +14,12 @@ public class GraphiteStoreFactory extends AbstractStoreFactory<GraphiteStore> {
         return new GraphiteStore(p, cnx);
     }
 
-    /* (non-Javadoc)
-     * @see jrds.store.AbstractStoreFactory#configureStore(jrds.PropertiesManager, java.util.Properties)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * jrds.store.AbstractStoreFactory#configureStore(jrds.PropertiesManager,
+     * java.util.Properties)
      */
     @Override
     public void configureStore(PropertiesManager pm, Properties props) {
@@ -24,7 +28,7 @@ public class GraphiteStoreFactory extends AbstractStoreFactory<GraphiteStore> {
         String portStr = props.getProperty("port", "2003");
         int port = Util.parseStringNumber(portStr, new Integer(2003));
         String prefix = props.getProperty("prefix", "");
-        
+
         cnx = new GraphiteConnection(host, port, prefix);
 
     }

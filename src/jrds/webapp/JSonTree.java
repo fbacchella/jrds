@@ -29,52 +29,48 @@ public class JSonTree extends JSonData {
     @Override
     public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException, JSONException {
 
-        if(ParamsBean.TABCHOICE.equals(params.getChoiceType() ) ) {
+        if(ParamsBean.TABCHOICE.equals(params.getChoiceType())) {
             Tab tab = params.getTab();
             logger.debug(jrds.Util.delayedFormatString("Tab specified: %s", params.getChoiceValue()));
             if(tab == null)
                 return false;
-            if(tab.isFilters()){
+            if(tab.isFilters()) {
                 Set<Filter> fset = tab.getFilters();
-                if(fset != null && fset.size() !=0) {
+                if(fset != null && fset.size() != 0) {
                     logger.trace("Filters tab");
                     return dumpFilters(w, fset);
                 }
-            }
-            else {
+            } else {
                 GraphTree tabtree = tab.getGraphTree();
                 if(tabtree != null) {
                     logger.trace("Tree tab");
                     return evaluateTree(params, w, root, tabtree);
                 }
             }
-        }
-        else if(ParamsBean.HOSTCHOICE.equals(params.getChoiceType() ) ) {
+        } else if(ParamsBean.HOSTCHOICE.equals(params.getChoiceType())) {
             GraphTree tree = params.getTree();
             logger.debug(jrds.Util.delayedFormatString("Host specified: %s", params.getChoiceValue()));
             if(tree == null)
                 return false;
             return evaluateTree(params, w, root, tree);
-        }
-        else if(ParamsBean.TREECHOICE.equals(params.getChoiceType() ) ) {
+        } else if(ParamsBean.TREECHOICE.equals(params.getChoiceType())) {
             GraphTree tree = params.getTree();
             logger.debug(jrds.Util.delayedFormatString("Tree specified: %s", params.getChoiceValue()));
             if(tree == null)
                 return false;
             return evaluateTree(params, w, root, tree);
-        }
-        else if(ParamsBean.FILTERCHOICE.equals(params.getChoiceType() ) ) {
+        } else if(ParamsBean.FILTERCHOICE.equals(params.getChoiceType())) {
             Filter filter = params.getFilter();
             logger.debug(jrds.Util.delayedFormatString("Filter specified: %s", params.getChoiceValue()));
             if(filter == null)
                 return false;
             return evaluateFilter(params, w, root, filter);
         }
-        //Nothing requested, wrong query
+        // Nothing requested, wrong query
         else {
             return false;
         }
-        //No error, but nothing to do
+        // No error, but nothing to do
         return true;
     }
 
@@ -88,12 +84,12 @@ public class JSonTree extends JSonData {
     private boolean evaluateFilter(ParamsBean params, JrdsJSONWriter w, HostsList root, Filter f) throws IOException, JSONException {
         Collection<GraphTree> level = root.getTrees();
 
-        //We construct the graph tree root to use
-        //The tree is parsed twice, that's not optimal
+        // We construct the graph tree root to use
+        // The tree is parsed twice, that's not optimal
         Collection<GraphTree> rootToDo = new HashSet<GraphTree>(level.size());
         for(GraphTree tree: level) {
             GraphTree testTree = f.setRoot(tree);
-            if(testTree != null && ! rootToDo.contains(testTree) && testTree.enumerateChildsGraph(f).size() > 0) {
+            if(testTree != null && !rootToDo.contains(testTree) && testTree.enumerateChildsGraph(f).size() > 0) {
                 rootToDo.add(testTree);
             }
         }
@@ -106,18 +102,19 @@ public class JSonTree extends JSonData {
 
     /**
      * Look for the first level with many childs
+     * 
      * @param rootstry
      * @return
      */
     private Collection<GraphTree> findRoot(Collection<GraphTree> rootstry) {
-        while(rootstry.size() == 1) {
+        while (rootstry.size() == 1) {
             logger.trace(jrds.Util.delayedFormatString("Trying with graph tree roots: %s", rootstry));
             GraphTree child = rootstry.iterator().next();
             Map<String, GraphTree> childTree = child.getChildsMap();
-            //Don't go in empty nodes
+            // Don't go in empty nodes
             if(childTree.isEmpty())
                 break;
-            //a graph found, stop here
+            // a graph found, stop here
             if(child.getGraphsSet().size() > 0) {
                 break;
             }
@@ -131,7 +128,7 @@ public class JSonTree extends JSonData {
             String filterName = filter.getName();
             Map<String, String> href = new HashMap<String, String>();
             href.put("filter", filterName);
-            doTree(w,filterName, filter.hashCode(), "filter", null, href);
+            doTree(w, filterName, filter.hashCode(), "filter", null, href);
         }
         return true;
     }
@@ -143,7 +140,7 @@ public class JSonTree extends JSonData {
         Map<String, GraphTree> childs = gt.getChildsMap();
 
         List<String> childsref = new ArrayList<String>();
-        for(Map.Entry<String, GraphTree>e: childs.entrySet()) {
+        for(Map.Entry<String, GraphTree> e: childs.entrySet()) {
             String childid = sub(params, w, e.getValue(), "node", f, subpath, base);
             if(childid != null) {
                 hasChild = true;
@@ -153,20 +150,20 @@ public class JSonTree extends JSonData {
 
         for(Map.Entry<String, GraphNode> leaf: gt.getGraphsSet().entrySet()) {
             GraphNode child = leaf.getValue();
-            if(getPropertiesManager().security && ! child.getACL().check(params))
+            if(getPropertiesManager().security && !child.getACL().check(params))
                 continue;
             String leafName = leaf.getKey();
             if(f.acceptGraph(child, gt.getPath() + "/" + child.getName())) {
                 hasChild = true;
                 String graphid = base + "." + child.hashCode();
-                childsref.add(graphid );
-                doTree(w,leafName, graphid, "graph", null);
+                childsref.add(graphid);
+                doTree(w, leafName, graphid, "graph", null);
             }
         }
 
         if(hasChild) {
-            id = base + "." +  gt.getPath().hashCode();
-            doTree(w,gt.getName(), id, type, childsref);
+            id = base + "." + gt.getPath().hashCode();
+            doTree(w, gt.getName(), id, type, childsref);
         }
         return id;
     }

@@ -55,7 +55,7 @@ public class GenerateProbe {
 
     }
 
-    static public class EmptyProbe  extends Probe<String,Number> {
+    static public class EmptyProbe extends Probe<String, Number> {
         @Override
         public Map<String, Number> getNewSampleValues() {
             return Collections.emptyMap();
@@ -70,18 +70,18 @@ public class GenerateProbe {
     @SuppressWarnings("unchecked")
     public static final Probe<String, Number> quickProbe(TemporaryFolder folder, ChainedMap<Object>... args) throws Exception {
         ChainedMap<Object> arg = new ChainedMap<Object>(0);
-        for(int i=0; i< args.length; i++) {
+        for(int i = 0; i < args.length; i++) {
             arg.putAll(args[i]);
         }
         Class<?> probeClass = (Class<Probe<?, ?>>) arg.get(Probe.class.getCanonicalName());
         if(probeClass == null) {
             probeClass = EmptyProbe.class;
         }
-        Probe<?,?> probe  = (Probe<?, ?>) probeClass.getConstructor().newInstance();
-        return (Probe<String, Number>) fillProbe(probe, folder, arg );
+        Probe<?, ?> probe = (Probe<?, ?>) probeClass.getConstructor().newInstance();
+        return (Probe<String, Number>) fillProbe(probe, folder, arg);
     }
 
-    public static final Probe<?, ?> fillProbe(Probe<?,?> p, TemporaryFolder folder, ChainedMap<Object> args) throws Exception {
+    public static final Probe<?, ?> fillProbe(Probe<?, ?> p, TemporaryFolder folder, ChainedMap<Object> args) throws Exception {
 
         PropertiesManager pm = (PropertiesManager) args.get(PropertiesManager.class.getCanonicalName());
         if(pm == null) {

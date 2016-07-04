@@ -3,7 +3,7 @@ package jrds.mockobjects;
 import jrds.ProbeDesc;
 import jrds.factories.ProbeBean;
 
-@ProbeBean({"hostInfo"})
+@ProbeBean({ "hostInfo" })
 public class MokeProbeBean extends MokeProbe<String, Number> {
     String HostInfo;
 

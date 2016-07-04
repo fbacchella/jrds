@@ -17,6 +17,7 @@ import org.rrd4j.data.DataProcessor;
 
 /**
  * A servlet wich show the last update values and time
+ * 
  * @author Fabrice Bacchella
  * @version $Revision: 236 $
  */
@@ -24,17 +25,17 @@ public final class ProbeSummary extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(ProbeSummary.class);
 
     /**
-     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
+     *      javax.servlet.http.HttpServletResponse)
      */
-    public void doGet(HttpServletRequest req, HttpServletResponse res)
-            throws ServletException, IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         res.setContentType("text/plain");
         res.addHeader("Cache-Control", "no-cache");
         ServletOutputStream out = res.getOutputStream();
 
         ParamsBean params = getParamsBean(req);
 
-        Probe<?,?> probe = params.getProbe();
+        Probe<?, ?> probe = params.getProbe();
         if(probe != null) {
             Period p = params.getPeriod();
 
@@ -45,13 +46,12 @@ public final class ProbeSummary extends JrdsServlet {
                     out.print(dsName + " ");
                     out.print(dp.getAggregate(dsName, ConsolFun.AVERAGE) + " ");
                     out.print(dp.getAggregate(dsName, ConsolFun.MIN) + " ");
-                    out.println(dp.getAggregate(dsName, ConsolFun.MAX) );
+                    out.println(dp.getAggregate(dsName, ConsolFun.MAX));
                 } catch (IOException e) {
                     logger.error("Probe " + probe + "unusable: " + e);
                 }
             }
-        }
-        else {
+        } else {
             logger.error("Probe id provided " + params.getId() + " invalid");
         }
     }

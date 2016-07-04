@@ -23,7 +23,8 @@ public class JSonQueryParams extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(JSonQueryParams.class);
 
     /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+     *      response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ParamsBean params = getParamsBean(request);
@@ -37,7 +38,7 @@ public class JSonQueryParams extends JrdsServlet {
             doVariable(w, "gid", params.getValue("gid"));
             doVariable(w, "sort", params.getValue("sort"));
             String pathString = params.getValue("path");
-            if(pathString != null && ! "".equals(pathString)) {
+            if(pathString != null && !"".equals(pathString)) {
                 doVariable(w, "path", new JSONArray(pathString));
             }
             String choiceType = params.getChoiceType();
@@ -52,7 +53,7 @@ public class JSonQueryParams extends JrdsServlet {
             doVariable(w, "end", params.getEnd());
             doVariable(w, "autoperiod", params.getScale());
 
-            //Add the list of tabs
+            // Add the list of tabs
             w.key("tabslist");
             w.object();
             for(String id: root.getTabsId()) {
@@ -77,14 +78,14 @@ public class JSonQueryParams extends JrdsServlet {
 
     private void doVariable(JrdsJSONWriter w, String key, Object value) throws JSONException {
         logger.trace(Util.delayedFormatString("resolving %s with %s", key, value));
-        if(value == null) 
+        if(value == null)
             return;
         if(value instanceof String && "".equals(value.toString().trim())) {
             return;
         }
-        //		if(value != null && ! "".equals(value)) {
-        //			value = value.replace("'", " ");//.replace("\"", " ");
-        //		}
+        // if(value != null && ! "".equals(value)) {
+        // value = value.replace("'", " ");//.replace("\"", " ");
+        // }
         w.key(key).value(value);
     }
 

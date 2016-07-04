@@ -48,25 +48,28 @@ import org.w3c.dom.DocumentType;
 
 /**
  *
- * @author Fabrice Bacchella 
- * @version $Revision$,  $Date$
+ * @author Fabrice Bacchella
+ * @version $Revision$, $Date$
  */
 public class Util {
     static final private Logger logger = Logger.getLogger(Util.class);
 
     static private MessageDigest md5digest;
+
     static {
         try {
             md5digest = java.security.MessageDigest.getInstance("MD5");
-        }
-        catch (java.security.NoSuchAlgorithmException ex) {
+        } catch (java.security.NoSuchAlgorithmException ex) {
             logger.fatal("You should not see this message, MD5 not available");
         }
     }
 
     /**
-     * The SI prefix as an enumeration, with factor provided.<p>
-     * More informations can be found at <a target="_blank" href="http://en.wikipedia.org/wiki/SI_prefix">Wikipedia's page</a> 
+     * The SI prefix as an enumeration, with factor provided.
+     * <p>
+     * More informations can be found at
+     * <a target="_blank" href="http://en.wikipedia.org/wiki/SI_prefix">
+     * Wikipedia's page</a>
      */
     public enum SiPrefix {
         Y(24),
@@ -92,18 +95,20 @@ public class Util {
         y(-24);
 
         private int exponent;
+
         private SiPrefix(int exponent) {
             this.exponent = exponent;
         }
 
         /**
          * Evaluate a value in the context of this prefix
+         * 
          * @param value the value to evalute
          * @param isSi is the prefix metric or binary (power of 2)
          * @return the raw value
          */
         public double evaluate(double value, boolean isSi) {
-            return Math.pow(isSi ? 10 : 1024, isSi ? exponent: exponent/3.0 ) * value;
+            return Math.pow(isSi ? 10 : 1024, isSi ? exponent : exponent / 3.0) * value;
         }
 
         /**
@@ -118,34 +123,37 @@ public class Util {
         public void error(TransformerException e) throws TransformerException {
             logger.error("Invalid xsl: " + e.getMessageAndLocation());
         }
+
         public void fatalError(TransformerException e) throws TransformerException {
             logger.fatal("Invalid xsl: " + e.getMessageAndLocation());
         }
+
         public void warning(TransformerException e) throws TransformerException {
             logger.warn("Invalid xsl: " + e.getMessageAndLocation());
         }
     };
     static final TransformerFactory tFactory = TransformerFactory.newInstance();
+
     static {
         tFactory.setErrorListener(el);
     }
 
     /**
      * Return the md5 digest value of a string, encoded in base64
+     * 
      * @param s The string to use
      * @return the printable md5 digest value for s
      */
-    public static String stringSignature(String s)
-    {
+    public static String stringSignature(String s) {
         byte[] digestval;
-        synchronized(md5digest) {
+        synchronized (md5digest) {
             md5digest.reset();
             digestval = md5digest.digest(s.getBytes());
         }
         return Base64.encodeBytes(digestval);
     }
 
-    public static String cleanPath(String s){
+    public static String cleanPath(String s) {
         String retval = s.replace('\\', '_');
         retval = retval.replace(':', '_');
         retval = retval.replace('/', '_');
@@ -153,32 +161,34 @@ public class Util {
     }
 
     /**
-     * Used to normalize the end date to the last update time
-     * but only if it's close to it 
+     * Used to normalize the end date to the last update time but only if it's
+     * close to it
+     * 
      * @param p the probe to check against
      * @param endDate the desired end date
      * @return the normalized end date
      */
-    public static Date endDate(Probe<?,?> p, Date endDate) {
-        //Date normalized = endDate;
-        //We normalize the last update time, it can't be used directly
+    public static Date endDate(Probe<?, ?> p, Date endDate) {
+        // Date normalized = endDate;
+        // We normalize the last update time, it can't be used directly
         long step = p.getStep();
         Date lastUpdate = p.getLastUpdate();
 
-        //We dont want to graph past the last normalized update time
-        //but only if we are within a step interval
-        if( Math.abs(endDate.getTime() - lastUpdate.getTime()) <= (step * 1000L))
+        // We dont want to graph past the last normalized update time
+        // but only if we are within a step interval
+        if(Math.abs(endDate.getTime() - lastUpdate.getTime()) <= (step * 1000L))
             return normalize(lastUpdate, step);
 
-        //Else rrd4j will manage the normalization itself
+        // Else rrd4j will manage the normalization itself
         return endDate;
     }
 
     /**
-     * Normalize to a probe step, as org.rrd4j.core.Util.normalize
-     * But use a Date argument and return a Date
-     * @param date	A Date to normalize
-     * @param step	Step in seconds
+     * Normalize to a probe step, as org.rrd4j.core.Util.normalize But use a
+     * Date argument and return a Date
+     * 
+     * @param date A Date to normalize
+     * @param step Step in seconds
      * @return "Rounded" Date
      */
     public static Date normalize(Date date, long step) {
@@ -204,21 +214,22 @@ public class Util {
             out.append(before);
             String toAppend = null;
             Matcher varMatcher;
-            //We just found a lonely %, replace it with %% for latter String.format
+            // We just found a lonely %, replace it with %% for latter
+            // String.format
             if("%".equals(percent)) {
                 toAppend = "%%";
             }
-            //The variable referring to a system variable are directly resolved
+            // The variable referring to a system variable are directly resolved
             else if(var.startsWith("system.")) {
                 toAppend = System.getProperty(var.replace("system.", ""));
                 // Will be used as a format string, protect %
                 toAppend = toAppend.replace("%", "%%");
             }
-            //We found a ${\d+}, directly resolve with the first list argument
+            // We found a ${\d+}, directly resolve with the first list argument
             else if(digit.matcher(var).matches()) {
                 for(Object o: arguments) {
                     if(o instanceof List) {
-                        List <?> l = (List<?>)o;
+                        List<?> l = (List<?>) o;
                         toAppend = l.get(Integer.parseInt(var) - 1).toString();
                         break;
                     }
@@ -226,8 +237,8 @@ public class Util {
                 // Will be used as a format string, protect %
                 toAppend = toAppend.replace("%", "%%");
             }
-            //bean signatures are directly resolved
-            else if((varMatcher=attrSignature.matcher(var)).matches()) {
+            // bean signatures are directly resolved
+            else if((varMatcher = attrSignature.matcher(var)).matches()) {
                 String beanName = varMatcher.group(1);
                 for(Object o: arguments) {
                     if(o == null) {
@@ -235,13 +246,12 @@ public class Util {
                     }
                     // probe manage it's beans
                     if(o instanceof Probe) {
-                        GenericBean bean = ((Probe<?,?>) o).getPd().getBean(beanName);
+                        GenericBean bean = ((Probe<?, ?>) o).getPd().getBean(beanName);
                         if(bean != null) {
                             Object beanValue = bean.get(o);
                             if(beanValue != null) {
                                 toAppend = stringSignature(beanValue.toString());
-                            }
-                            else {
+                            } else {
                                 toAppend = "";
                             }
                             break;
@@ -263,8 +273,8 @@ public class Util {
                 // Will be used as a format string, protect %
                 toAppend = toAppend.replace("%", "%%");
             }
-            //beans are directly resolved
-            else if((varMatcher=attr.matcher(var)).matches()) {
+            // beans are directly resolved
+            else if((varMatcher = attr.matcher(var)).matches()) {
                 String beanName = varMatcher.group(1);
                 for(Object o: arguments) {
                     if(o == null) {
@@ -272,13 +282,12 @@ public class Util {
                     }
                     // probe manage it's beans
                     if(o instanceof Probe) {
-                        GenericBean bean = ((Probe<?,?>) o).getPd().getBean(beanName);
+                        GenericBean bean = ((Probe<?, ?>) o).getPd().getBean(beanName);
                         if(bean != null) {
                             Object beanValue = bean.get(o);
                             if(beanValue != null) {
                                 toAppend = beanValue.toString();
-                            }
-                            else {
+                            } else {
                                 toAppend = "";
                             }
                             break;
@@ -300,9 +309,10 @@ public class Util {
                 // Will be used as a format string, protect %
                 toAppend = toAppend.replace("%", "%%");
             }
-            //Common case, replace the variable with it's index, for MessageFormat
-            else  {
-                if(! indexes.containsKey(var)) {
+            // Common case, replace the variable with it's index, for
+            // MessageFormat
+            else {
+                if(!indexes.containsKey(var)) {
                     indexes.put(var, index++);
                 }
                 int slot = indexes.get(var) + 1;
@@ -318,15 +328,16 @@ public class Util {
     }
 
     /**
-     * A method to parse a template mixing old elements {x} with new variable ${variable}
-     * Should be not be used any more
+     * A method to parse a template mixing old elements {x} with new variable
+     * ${variable} Should be not be used any more
+     * 
      * @param template The template to parse
      * @param keys a array to match indexes elements
      * @param arguments some object to extract value. from
      * @return
      */
     public static String parseOldTemplate(String template, Object[] keys, Object... arguments) {
-        //Don't lose time with an empty template
+        // Don't lose time with an empty template
         if(template == null || "".equals(template.trim())) {
             return template;
         }
@@ -334,8 +345,8 @@ public class Util {
         Matcher m = oldvarregexp.matcher(template);
         String last = template;
         StringBuilder buffer = new StringBuilder();
-        while(m.find()) {
-            if(m.group(1) !=  null)
+        while (m.find()) {
+            if(m.group(1) != null)
                 buffer.append(m.group(1));
             buffer.append(keys[Integer.parseInt(m.group(2))]);
             last = m.group(3);
@@ -349,19 +360,19 @@ public class Util {
         index {
             @Override
             String toString(Object o) {
-                return  ((IndexedProbe) o).getIndexName();
+                return ((IndexedProbe) o).getIndexName();
             }
         },
         index_signature {
             @Override
             String toString(Object o) {
-                return  stringSignature(((IndexedProbe) o).getIndexName());
+                return stringSignature(((IndexedProbe) o).getIndexName());
             }
         },
         index_cleanpath {
             @Override
             String toString(Object o) {
-                return  cleanPath(((IndexedProbe) o).getIndexName());
+                return cleanPath(((IndexedProbe) o).getIndexName());
             }
         },
         url {
@@ -397,13 +408,13 @@ public class Util {
         probename {
             @Override
             String toString(Object o) {
-                return ((Probe<?,?>) o).getName();
+                return ((Probe<?, ?>) o).getName();
             }
         },
         label {
             @Override
             String toString(Object o) {
-                return ((Probe<?,?>) o).getLabel();
+                return ((Probe<?, ?>) o).getLabel();
             }
         },
         connection_name {
@@ -452,12 +463,12 @@ public class Util {
     }
 
     public static final String parseTemplate(String template, Object... arguments) {
-        //Don't lose time with an empty template
+        // Don't lose time with an empty template
         if(template == null || "".equals(template.trim())) {
             return template;
         }
 
-        Map<String, Integer> indexes =  new HashMap<String, Integer>();
+        Map<String, Integer> indexes = new HashMap<String, Integer>();
         String message = findVariables(template, 0, indexes, arguments);
         Object[] values = new Object[indexes.size()];
 
@@ -466,7 +477,7 @@ public class Util {
                 continue;
             if(logger.isTraceEnabled())
                 logger.trace(Util.delayedFormatString("Argument for template \"%s\": %s", template, o.getClass()));
-            if( o instanceof IndexedProbe) {
+            if(o instanceof IndexedProbe) {
                 check(o, indexes, values, evaluate.index);
                 check(o, indexes, values, evaluate.index_signature);
                 check(o, indexes, values, evaluate.index_cleanpath);
@@ -481,16 +492,16 @@ public class Util {
                 check(o, indexes, values, evaluate.connection_name_signature);
             }
             if(o instanceof Probe) {
-                Probe<?,?> p = ((Probe<?,?>) o);
+                Probe<?, ?> p = ((Probe<?, ?>) o);
                 HostInfo host = p.getHost();
                 check(host, indexes, values, evaluate.host);
                 check(p, indexes, values, evaluate.probename);
                 check(p, indexes, values, evaluate.label);
-            } 
-            if( o instanceof HostStarter) {
-                check(((HostStarter)o).getHost(), indexes, values, evaluate.host);
             }
-            if( o instanceof HostInfo) {
+            if(o instanceof HostStarter) {
+                check(((HostStarter) o).getHost(), indexes, values, evaluate.host);
+            }
+            if(o instanceof HostInfo) {
                 check(o, indexes, values, evaluate.host);
                 check(o, indexes, values, evaluate.dnsname);
             }
@@ -503,9 +514,10 @@ public class Util {
             }
             if(o instanceof Map) {
                 @SuppressWarnings("unchecked")
-                Map<? extends String, ?> tempMap = (Map<? extends String, ?>)o;
+                Map<? extends String, ?> tempMap = (Map<? extends String, ?>) o;
                 for(Map.Entry<String, Integer> e: indexes.entrySet()) {
-                    //Check if the given map contains a key to an empty slot in the values
+                    // Check if the given map contains a key to an empty slot in
+                    // the values
                     if(tempMap.containsKey(e.getKey()) && values[e.getValue()] == null) {
                         values[e.getValue()] = tempMap.get(e.getKey());
                     }
@@ -521,8 +533,14 @@ public class Util {
     }
 
     /**
-     * <p>A compact and exception free number parser.<p>
-     * <p>If the string can be parsed as the specified type, it return the default value<p>
+     * <p>
+     * A compact and exception free number parser.
+     * <p>
+     * <p>
+     * If the string can be parsed as the specified type, it return the default
+     * value
+     * <p>
+     * 
      * @param toParse The string to parse
      * @param defaultVal A default value to use it the string can't be parsed
      * @return An Number object using the same type than the default value.
@@ -550,7 +568,7 @@ public class Util {
     public static <NumberClass extends Number> NumberClass parseStringNumber(String toParse, Class<NumberClass> nc, NumberClass defaultVal) {
         if(toParse == null || "".equals(toParse))
             return defaultVal;
-        if(! (Number.class.isAssignableFrom(nc))) {
+        if(!(Number.class.isAssignableFrom(nc))) {
             return defaultVal;
         }
 
@@ -574,8 +592,7 @@ public class Util {
         if(transformerLocation != null) {
             Source stylesource = new StreamSource(transformerLocation.toString());
             transformer = tFactory.newTransformer(stylesource);
-        }
-        else
+        } else
             transformer = tFactory.newTransformer();
 
         String documentEncoding = d.getXmlEncoding();
@@ -585,7 +602,7 @@ public class Util {
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
 
         DocumentType dt = d.getDoctype();
-        //If no transformation, we try to keep the Document type
+        // If no transformation, we try to keep the Document type
         if(dt != null && transformerLocation == null) {
             String publicId = dt.getPublicId();
             if(publicId != null)
@@ -609,14 +626,16 @@ public class Util {
 
     public static <T> Iterable<T> iterate(final Enumeration<T> en) {
         final Iterator<T> iterator = new Iterator<T>() {
-            public boolean hasNext() {  
-                return en.hasMoreElements();  
+            public boolean hasNext() {
+                return en.hasMoreElements();
             }
+
             public T next() {
-                return en.nextElement();  
+                return en.nextElement();
             }
+
             public void remove() {
-                throw new UnsupportedOperationException("Cannot remove in XML serialization iterator");  
+                throw new UnsupportedOperationException("Cannot remove in XML serialization iterator");
             }
         };
         return new Iterable<T>() {
@@ -629,8 +648,9 @@ public class Util {
     public static final Comparator<String> nodeComparator = jrds.Util.AlphanumericSorting();
 
     /**
-     * Return an alpha numeric sorter where host2 is before host10
-     * Copied from http://sanjaal.com/java/tag/sample-alphanumeric-sorting/
+     * Return an alpha numeric sorter where host2 is before host10 Copied from
+     * http://sanjaal.com/java/tag/sample-alphanumeric-sorting/
+     * 
      * @return
      */
     private static Comparator<String> AlphanumericSorting() {
@@ -638,7 +658,7 @@ public class Util {
 
             public int compare(String firstString, String secondString) {
 
-                if (secondString == null || firstString == null) {
+                if(secondString == null || firstString == null) {
                     return 0;
                 }
 
@@ -665,7 +685,7 @@ public class Util {
                         space1[loc1++] = ch1;
                         index1++;
 
-                        if (index1 < lengthFirstStr) {
+                        if(index1 < lengthFirstStr) {
                             ch1 = firstString.charAt(index1);
                         } else {
                             break;
@@ -676,7 +696,7 @@ public class Util {
                         space2[loc2++] = ch2;
                         index2++;
 
-                        if (index2 < lengthSecondStr) {
+                        if(index2 < lengthSecondStr) {
                             ch2 = secondString.charAt(index2);
                         } else {
                             break;
@@ -688,20 +708,21 @@ public class Util {
 
                     int result;
 
-                    if (Character.isDigit(space1[0]) && Character.isDigit(space2[0])) {
+                    if(Character.isDigit(space1[0]) && Character.isDigit(space2[0])) {
                         try {
                             Long firstNumberToCompare = Long.parseLong(str1.trim());
                             Long secondNumberToCompare = Long.parseLong(str2.trim());
                             result = firstNumberToCompare.compareTo(secondNumberToCompare);
                         } catch (NumberFormatException e) {
-                            //Something prevent the number parsing, do a string comparaison
+                            // Something prevent the number parsing, do a string
+                            // comparaison
                             result = str1.compareTo(str2);
                         }
                     } else {
                         result = str1.compareTo(str2);
                     }
 
-                    if (result != 0) {
+                    if(result != 0) {
                         return result;
                     }
                 }
@@ -717,8 +738,8 @@ public class Util {
                 line.append("[").append(source.toString()).append("] ");
             line.append(String.format(format, args));
             namedLogger.log(l, line.toString());
-            //NPE should never happen, so it's always logged
-            if(e != null && (namedLogger.isDebugEnabled() || e instanceof NullPointerException) ) {
+            // NPE should never happen, so it's always logged
+            if(e != null && (namedLogger.isDebugEnabled() || e instanceof NullPointerException)) {
                 Writer w = new CharArrayWriter(e.getStackTrace().length + 20);
                 e.printStackTrace(new PrintWriter(w));
                 namedLogger.log(l, "Error stack: ");
@@ -728,31 +749,33 @@ public class Util {
     }
 
     static public boolean rolesAllowed(Set<String> allowedRoles, Set<String> userRoles) {
-        return ! Collections.disjoint(allowedRoles, userRoles);
+        return !Collections.disjoint(allowedRoles, userRoles);
     }
 
     private static final class Formater {
         private final String format;
         private final Object[] args;
-        private Formater(final String format, final Object ...args) {
+
+        private Formater(final String format, final Object... args) {
             this.format = format;
             this.args = args;
         }
+
         @Override
         public final String toString() {
             return String.format(format, args);
-        }        
+        }
     }
 
     /**
      * A wrapper method to delay evaluation of log4j arguments
+     * 
      * @param format
      * @param args
      * @return
      */
-    static public Object delayedFormatString(final String format, final Object ...args) {
+    static public Object delayedFormatString(final String format, final Object... args) {
         return new Formater(format, args);
     }
 
 }
-

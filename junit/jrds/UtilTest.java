@@ -90,11 +90,11 @@ public class UtilTest {
         Util.serialize(d, out, null, prop);
         outBuffer = out.toString();
         logger.debug("out buffer for testSerialization3: \n" + outBuffer + "\n");
-        //It should have auto-detected the doc type
+        // It should have auto-detected the doc type
         Assert.assertTrue(outBuffer.contains(publicId));
         Assert.assertTrue(outBuffer.contains(systemId));
         logger.debug(outBuffer.contains(d.getXmlEncoding()));
-        Assert.assertTrue("Output encoding "+ d.getXmlEncoding() + " not found", outBuffer.contains(d.getXmlEncoding()));
+        Assert.assertTrue("Output encoding " + d.getXmlEncoding() + " not found", outBuffer.contains(d.getXmlEncoding()));
     }
 
     @Test
@@ -124,7 +124,7 @@ public class UtilTest {
     @Test
     public void testParseStringNumber6() {
         double n = Util.parseStringNumber("1", 2.0d);
-        Assert.assertEquals(1.0,n , 0.001);
+        Assert.assertEquals(1.0, n, 0.001);
     }
 
     @Test
@@ -135,7 +135,7 @@ public class UtilTest {
 
     @Test
     public void testParseOldTemplate1() {
-        Probe<?,?> p = new MokeProbe<String, Number>();
+        Probe<?, ?> p = new MokeProbe<String, Number>();
         p.setHost(new HostStarter(new HostInfo("Moke")));
         p.setLabel("label");
         Object[] keys = {
@@ -149,7 +149,7 @@ public class UtilTest {
 
     @Test
     public void testParseOldTemplate2() {
-        Probe<?,?> p = new MokeProbe<String, Number>();
+        Probe<?, ?> p = new MokeProbe<String, Number>();
         p.setHost(new HostStarter(new HostInfo("Moke")));
         p.setLabel("label");
         Object[] keys = {
@@ -163,7 +163,7 @@ public class UtilTest {
 
     @Test
     public void testParseTemplate1() {
-        Probe<?,?> p = new MokeProbe<String, Number>();
+        Probe<?, ?> p = new MokeProbe<String, Number>();
         p.setHost(new HostStarter(new HostInfo("Moke")));
         p.setLabel("label");
         String parsed = Util.parseTemplate("'${host}' \"${probename}\" ${label}", p);
@@ -194,11 +194,12 @@ public class UtilTest {
 
     @Test
     public void testNormalization1() {
-        Probe<?,?> p = new jrds.mockobjects.DummyProbe() {
+        Probe<?, ?> p = new jrds.mockobjects.DummyProbe() {
             @Override
             public Date getLastUpdate() {
                 return new Date();
             }
+
             @Override
             public int getStep() {
                 return 300;
@@ -211,8 +212,8 @@ public class UtilTest {
     }
 
     @Test
-    public void testNormalization2() {		
-        Probe<?,?> p = new jrds.mockobjects.DummyProbe() {
+    public void testNormalization2() {
+        Probe<?, ?> p = new jrds.mockobjects.DummyProbe() {
             @Override
             public Date getLastUpdate() {
                 Date now = new Date();
@@ -221,6 +222,7 @@ public class UtilTest {
                 calBegin.add(Calendar.MONTH, -4);
                 return calBegin.getTime();
             }
+
             @Override
             public int getStep() {
                 return 300;
@@ -234,8 +236,8 @@ public class UtilTest {
     }
 
     @Test
-    public void testNormalization3() {		
-        Probe<?,?> p = new jrds.mockobjects.DummyProbe() {
+    public void testNormalization3() {
+        Probe<?, ?> p = new jrds.mockobjects.DummyProbe() {
             @Override
             public Date getLastUpdate() {
                 Date now = new Date();
@@ -244,6 +246,7 @@ public class UtilTest {
                 calBegin.add(Calendar.MONTH, 4);
                 return calBegin.getTime();
             }
+
             @Override
             public int getStep() {
                 return 300;
@@ -258,7 +261,7 @@ public class UtilTest {
 
     @Test
     public void testSort() {
-        String[] toSort =  new String[]{"zOS", "linux", "Linux", "host10", "host2", "host03", "redbus", "telecity", "linode"};
+        String[] toSort = new String[] { "zOS", "linux", "Linux", "host10", "host2", "host03", "redbus", "telecity", "linode" };
         Arrays.sort(toSort, jrds.Util.nodeComparator);
         String sorted = Arrays.asList(toSort).toString();
         logger.trace(Arrays.asList(toSort));

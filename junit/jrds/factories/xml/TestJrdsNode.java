@@ -1,6 +1,5 @@
 package jrds.factories.xml;
 
-
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,7 +28,7 @@ public class TestJrdsNode {
 
         Tools.prepareXml();
     }
-    
+
     @Test
     public void testFindbyPath() throws Exception {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");

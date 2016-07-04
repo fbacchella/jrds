@@ -54,7 +54,7 @@ public class TestGraphDescBuilder {
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, "jrds.GraphDesc", "jrds.Graph");
-        Tools.setLevel(Level.INFO,"jrds.factories.xml.CompiledXPath");
+        Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
 
         Tools.prepareXml();
     }
@@ -75,7 +75,7 @@ public class TestGraphDescBuilder {
             prop.put(OutputKeys.INDENT, "yes");
             prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
             jrds.Util.serialize(gddom, os, null, prop);
-            logger.trace(new String(os.toByteArray(),"UTF-8"));
+            logger.trace(new String(os.toByteArray(), "UTF-8"));
         }
         MokeProbe<String, Number> p = new MokeProbe<String, Number>();
         p.getHost().setHostDir(testFolder.getRoot());
@@ -110,7 +110,7 @@ public class TestGraphDescBuilder {
             prop.put(OutputKeys.INDENT, "yes");
             prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
             jrds.Util.serialize(gddom, os, null, prop);
-            logger.trace(new String(os.toByteArray(),"UTF-8"));
+            logger.trace(new String(os.toByteArray(), "UTF-8"));
         }
 
         logger.trace("Probe preparation done");
@@ -132,11 +132,11 @@ public class TestGraphDescBuilder {
 
         Assert.assertTrue("graph height invalid", 206 < gi.getHeight());
         Assert.assertTrue("graph width invalid", 578 < gi.getWidth());
-        Assert.assertEquals("graph byte count invalid", 12574 , gi.getByteCount(), 4000);
+        Assert.assertEquals("graph byte count invalid", 12574, gi.getByteCount(), 4000);
 
-        for(String treename: new String[]{PropertiesManager.HOSTSTAB, PropertiesManager.VIEWSTAB, "tab"}) {
+        for(String treename: new String[] { PropertiesManager.HOSTSTAB, PropertiesManager.VIEWSTAB, "tab" }) {
             List<String> tree = gd.getTree(new GraphNode(p, gd), treename);
-            Assert.assertEquals("not enough element in tree " +  treename, 2, tree.size());
+            Assert.assertEquals("not enough element in tree " + treename, 2, tree.size());
             int i = 1;
             for(String element: tree) {
                 Assert.assertEquals("wrong tree element", treename + i++, element);
@@ -144,8 +144,8 @@ public class TestGraphDescBuilder {
         }
     }
 
-    @Test(expected=NoSuchMethodException.class)
-    public void testBadGraphDescClass()  throws Exception {
+    @Test(expected = NoSuchMethodException.class)
+    public void testBadGraphDescClass() throws Exception {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         d.getRootElement().getElementbyName("graphClass").setTextContent(String.class.getName());
         GraphDescBuilder gdbuild = new GraphDescBuilder();
@@ -154,8 +154,8 @@ public class TestGraphDescBuilder {
         GraphDesc gd = gdbuild.makeGraphDesc(d);
     }
 
-    @Test(expected=IllegalArgumentException.class)
-    public void testEmptyGraphDescClass()  throws Exception {
+    @Test(expected = IllegalArgumentException.class)
+    public void testEmptyGraphDescClass() throws Exception {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         d.getRootElement().getElementbyName("graphClass").setTextContent("");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
@@ -175,16 +175,15 @@ public class TestGraphDescBuilder {
         Assert.assertEquals("graph name failed", "name", gd.getName());
         Assert.assertEquals("graph height invalid", 800, gd.getHeight());
         Assert.assertEquals("graph width invalid", 600, gd.getWidth());
-        Assert.assertTrue("Lower limit is a number (not a NaN)" + gd.getUpperLimit() , Double.isNaN(gd.getUpperLimit()));
-        Assert.assertEquals("graph lower limit is invalid", 1000, gd.getLowerLimit(),0.1);
+        Assert.assertTrue("Lower limit is a number (not a NaN)" + gd.getUpperLimit(), Double.isNaN(gd.getUpperLimit()));
+        Assert.assertEquals("graph lower limit is invalid", 1000, gd.getLowerLimit(), 0.1);
         Assert.assertFalse("graph is with legend", gd.withLegend());
         Assert.assertFalse("graph is with summary", gd.withSummary());
         Assert.assertEquals("legend count failed", 0, gd.getLegendLines());
     }
 
     @Test
-    public void testGraphDescBuilderParse()
-            throws Exception {
+    public void testGraphDescBuilderParse() throws Exception {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
         gdbuild.setPm(Tools.makePm());

@@ -19,15 +19,15 @@ import org.apache.log4j.Priority;
 public class JuliToLog4jHandler extends Handler {
 
     public static void catchLogger(String logger, org.apache.log4j.Level level) {
-        //If not already configured, we filter it
+        // If not already configured, we filter it
         JrdsLoggerConfiguration.configureLogger(logger, level);
         java.util.logging.Logger jilogger = java.util.logging.Logger.getLogger(logger);
         jilogger.setUseParentHandlers(false);
-        for(Handler h : jilogger.getHandlers()) {
+        for(Handler h: jilogger.getHandlers()) {
             jilogger.removeHandler(h);
         }
         jilogger.addHandler(new JuliToLog4jHandler());
-        //Log4j will filter
+        // Log4j will filter
         jilogger.setLevel(Level.ALL);
     }
 
@@ -45,12 +45,9 @@ public class JuliToLog4jHandler extends Handler {
         String message = record.getMessage();
         // Format message
         Object parameters[] = record.getParameters();
-        if (parameters != null && parameters.length != 0) {
+        if(parameters != null && parameters.length != 0) {
             // Check for the first few parameters ?
-            if (message.indexOf("{0}") >= 0 ||
-                    message.indexOf("{1}") >= 0 ||
-                    message.indexOf("{2}") >= 0 ||
-                    message.indexOf("{3}") >= 0) {
+            if(message.indexOf("{0}") >= 0 || message.indexOf("{1}") >= 0 || message.indexOf("{2}") >= 0 || message.indexOf("{3}") >= 0) {
                 message = MessageFormat.format(message, parameters);
             }
         }

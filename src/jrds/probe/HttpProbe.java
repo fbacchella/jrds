@@ -25,16 +25,14 @@ import jrds.starter.Starter;
 import org.apache.log4j.Level;
 
 /**
- * A generic probe to collect an HTTP service
- * default generic : 
- * port to provide a default port to collect
- * file to provide a specific file to collect
+ * A generic probe to collect an HTTP service default generic : port to provide
+ * a default port to collect file to provide a specific file to collect
  * 
  * Implementation should implement the parseStream method
  *
- * @author Fabrice Bacchella 
+ * @author Fabrice Bacchella
  */
-@ProbeBean({"port",  "file", "url", "urlhost", "scheme", "login", "password"})
+@ProbeBean({ "port", "file", "url", "urlhost", "scheme", "login", "password" })
 public abstract class HttpProbe extends Probe<String, Number> implements UrlProbe {
     protected URL url = null;
     protected String urlhost = null;
@@ -97,26 +95,27 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 
     private boolean finishConfigure(List<Object> argslist) {
         if(url == null) {
-            if(port <= 0 && (scheme == null ||scheme.isEmpty())) {
+            if(port <= 0 && (scheme == null || scheme.isEmpty())) {
                 port = 80;
                 scheme = "http";
-            } else if (scheme == null || scheme.isEmpty()) {
+            } else if(scheme == null || scheme.isEmpty()) {
                 if(port == 443) {
                     scheme = "https";
                 } else {
                     scheme = "http";
                 }
             }
-            // Check if authentication elements were given, and construct the authentication part if needed
+            // Check if authentication elements were given, and construct the
+            // authentication part if needed
             String userInfo = "";
             try {
-                if( login != null) {
+                if(login != null) {
                     userInfo = URLEncoder.encode(login, "UTF-8");
                 }
-                if( password != null) {
+                if(password != null) {
                     userInfo = userInfo + ":" + URLEncoder.encode(password, "UTF-8");
                 }
-                if(! userInfo.isEmpty()) {
+                if(!userInfo.isEmpty()) {
                     userInfo += '@';
                 }
             } catch (UnsupportedEncodingException e1) {
@@ -151,12 +150,14 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
         return true;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#isCollectRunning()
      */
     @Override
     public boolean isCollectRunning() {
-        if (resolver == null || ! resolver.isStarted())
+        if(resolver == null || !resolver.isStarted())
             return false;
         return super.isCollectRunning();
     }
@@ -169,6 +170,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 
     /**
      * A utility method that transform the input stream to a List of lines
+     * 
      * @param stream
      * @return
      */
@@ -179,7 +181,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
             BufferedReader in = new BufferedReader(new InputStreamReader(stream));
             lines = new ArrayList<String>();
             String lastLine;
-            while((lastLine = in.readLine()) != null)
+            while ((lastLine = in.readLine()) != null)
                 lines.add(lastLine);
             in.close();
         } catch (IOException e) {
@@ -188,7 +190,9 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
         return lines;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.aol.jrds.Probe#getNewSampleValues()
      */
     public Map<String, Number> getNewSampleValues() {
@@ -208,21 +212,23 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
             Map<String, Number> vars = parseStream(is);
             is.close();
             return vars;
-        } catch(ConnectException e) {
+        } catch (ConnectException e) {
             log(Level.ERROR, e, "Connection refused to %s", getUrl());
         } catch (IOException e) {
-            //Clean http connection error management
-            //see http://java.sun.com/j2se/1.5.0/docs/guide/net/http-keepalive.html
+            // Clean http connection error management
+            // see
+            // http://java.sun.com/j2se/1.5.0/docs/guide/net/http-keepalive.html
             try {
                 byte[] buffer = new byte[4096];
-                int respCode = ((HttpURLConnection)cnx).getResponseCode();
+                int respCode = ((HttpURLConnection) cnx).getResponseCode();
                 log(Level.ERROR, e, "Unable to read url %s because: %s, http error code: %d", getUrl(), e.getMessage(), respCode);
-                InputStream es = ((HttpURLConnection)cnx).getErrorStream();
+                InputStream es = ((HttpURLConnection) cnx).getErrorStream();
                 // read the response body
-                while (es.read(buffer) > 0) {}
+                while (es.read(buffer) > 0) {
+                }
                 // close the error stream
                 es.close();
-            } catch(IOException ex) {
+            } catch (IOException ex) {
                 log(Level.ERROR, ex, "Unable to recover from error in url %s because %s", getUrl(), ex.getMessage());
             }
         }

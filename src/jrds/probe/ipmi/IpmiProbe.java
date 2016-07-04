@@ -35,8 +35,7 @@ ProbeConnected<String, Number, IpmiConnection> implements IndexedProbe {
     }
 
     @Override
-    public Map<String, Number> getNewSampleValuesConnected(
-            IpmiConnection cnx) {
+    public Map<String, Number> getNewSampleValuesConnected(IpmiConnection cnx) {
 
         Handle handle = cnx.getConnection();
 
@@ -48,11 +47,11 @@ ProbeConnected<String, Number, IpmiConnection> implements IndexedProbe {
         Double value = Double.NaN;
 
         // Need to retry because of cancelled reservation
-        while(value.isNaN() && isCollectRunning()) {
+        while (value.isNaN() && isCollectRunning()) {
             try {
                 // Populate the sensor record and get ID of the next record in
                 // repository (see #getSensorData for details).
-                if ( ! isCollectRunning()) {
+                if(!isCollectRunning()) {
                     break;
                 }
                 SensorRecord record = handle.getSensorData(reservationId, new MutableInteger(indexKey));
@@ -60,7 +59,7 @@ ProbeConnected<String, Number, IpmiConnection> implements IndexedProbe {
                 FullSensorRecord fsr = (FullSensorRecord) record;
                 int recordReadingId = TypeConverter.byteToInt(fsr.getSensorNumber());
 
-                if ( ! isCollectRunning()) {
+                if(!isCollectRunning()) {
                     break;
                 }
                 GetSensorReadingResponseData data2 = handle.getSensorReading(recordReadingId);
@@ -73,11 +72,13 @@ ProbeConnected<String, Number, IpmiConnection> implements IndexedProbe {
                     lastReservationId = reservationId;
                     // If the cause of the failure was canceling of the
                     // reservation, we get new reservationId and retry. This can
-                    // happen many times during getting all sensors, since BMC can't
-                    // manage parallel sessions and invalidates old one if new one
+                    // happen many times during getting all sensors, since BMC
+                    // can't
+                    // manage parallel sessions and invalidates old one if new
+                    // one
                     // appears.
                     try {
-                        if ( ! isCollectRunning()) {
+                        if(!isCollectRunning()) {
                             break;
                         }
                         log(Level.DEBUG, "reservation cancelled");
@@ -85,10 +86,11 @@ ProbeConnected<String, Number, IpmiConnection> implements IndexedProbe {
                     } catch (Exception e1) {
                         log(Level.ERROR, e, "general failure: %s", e.getMessage());
                         break;
-                    }               
-                    // If getting sensor data failed, we check if it already failed
+                    }
+                    // If getting sensor data failed, we check if it already
+                    // failed
                     // with this reservation ID.
-                    if (lastReservationId == reservationId) {
+                    if(lastReservationId == reservationId) {
                         log(Level.ERROR, "%s", e.getMessage());
                         break;
                     }
@@ -102,11 +104,11 @@ ProbeConnected<String, Number, IpmiConnection> implements IndexedProbe {
                 break;
             }
         }
-        if(! value.isNaN()) {
+        if(!value.isNaN()) {
             String dsName = getPd().getCollectMapping().values().iterator().next();
-            return Collections.singletonMap(dsName, (Number) value);            
+            return Collections.singletonMap(dsName, (Number) value);
         } else {
-            return Collections.emptyMap();            
+            return Collections.emptyMap();
         }
     }
 

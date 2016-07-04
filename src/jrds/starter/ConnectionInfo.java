@@ -26,14 +26,12 @@ public class ConnectionInfo {
         this.beansValue = beansValue;
         if(name == null) {
             Set<ConnectionName> names = ArgFactory.enumerateAnnotation(type, ConnectionName.class, Connection.class);
-            if ( ! names.isEmpty()) {
+            if(!names.isEmpty()) {
                 this.name = names.iterator().next().value();
-            }
-            else {
+            } else {
                 this.name = type.getCanonicalName();
             }
-        }
-        else {
+        } else {
             this.name = name;
         }
         this.type = type;
@@ -44,7 +42,7 @@ public class ConnectionInfo {
             Class<?>[] constArgsType = new Class[args.size()];
             Object[] constArgsVal = new Object[args.size()];
             int index = 0;
-            for (Object arg: args) {
+            for(Object arg: args) {
                 constArgsType[index] = arg.getClass();
                 constArgsVal[index] = arg;
                 index++;
@@ -55,15 +53,13 @@ public class ConnectionInfo {
                 ArgFactory.beanSetter(cnx, e.getKey(), textValue);
                 cnx.log(Level.TRACE, "Setting bean '%s' to value '%s' for %s", e.getKey(), textValue, node);
             }
-            if(name != null && ! name.trim().isEmpty())
+            if(name != null && !name.trim().isEmpty())
                 cnx.setName(name.trim());
             node.registerStarter(cnx);
             logger.debug(Util.delayedFormatString("Connexion registred: %s for %s", cnx, node));
-        }
-        catch (InvocationTargetException ex) {
+        } catch (InvocationTargetException ex) {
             throw new InvocationTargetException(ex.getCause(), "Error during connection creation of type " + type.getName() + " for " + node + ": " + ex.getMessage());
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new InvocationTargetException(ex, "Error during connection creation of type " + type.getName() + " for " + node);
         }
     }
@@ -75,7 +71,9 @@ public class ConnectionInfo {
         return name;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     @Override
@@ -83,7 +81,9 @@ public class ConnectionInfo {
         return type.getCanonicalName() + (name == null ? "" : ("/" + name));
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override

@@ -22,7 +22,6 @@ import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDef;
 import org.rrd4j.core.Sample;
 
-
 public class TestUpgrade {
     static final private Logger logger = Logger.getLogger(TestUpgrade.class);
 
@@ -33,7 +32,7 @@ public class TestUpgrade {
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         JrdsLoggerConfiguration.configureLogger(TestUpgrade.class.getCanonicalName(), Level.DEBUG);
-        Tools.setLevel(logger.getLevel(), "jrds" );
+        Tools.setLevel(logger.getLevel(), "jrds");
     }
 
     @Test
@@ -43,7 +42,7 @@ public class TestUpgrade {
         pd.add("MokeDs2", DsType.GAUGE);
 
         @SuppressWarnings("unchecked")
-        Probe<String,Number> p = GenerateProbe.quickProbe(testFolder);
+        Probe<String, Number> p = GenerateProbe.quickProbe(testFolder);
         p.setPd(pd);
         p.setStep(300);
         p.setName("dummy");
@@ -57,16 +56,16 @@ public class TestUpgrade {
         Sample s = db.createSample();
         s.set(time + ":1:1");
         s.update();
-        time +=60;
+        time += 60;
         s.set(time + ":2:2");
         s.update();
-        time +=60;
+        time += 60;
         s.set(time + ":3:3");
         s.update();
-        time +=60;
+        time += 60;
         s.set(time + ":4:4");
         s.update();
-        time +=60;
+        time += 60;
         s.set(time + ":5:5");
         s.update();
 

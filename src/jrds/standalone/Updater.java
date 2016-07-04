@@ -24,16 +24,16 @@ public class Updater {
         PropertiesManager pm = new PropertiesManager(new File("jrds.properties"));
         pm.configureStores();
 
-        System.getProperties().setProperty("java.awt.headless","true");
+        System.getProperties().setProperty("java.awt.headless", "true");
         System.getProperties().putAll(pm);
-        HostsList hl =  new HostsList(pm);
+        HostsList hl = new HostsList(pm);
 
-        ExecutorService tpool =  Executors.newFixedThreadPool(3);
+        ExecutorService tpool = Executors.newFixedThreadPool(3);
 
         for(HostInfo host: hl.getHosts()) {
-            for(final Probe<?,?> p: host.getProbes()) {
+            for(final Probe<?, ?> p: host.getProbes()) {
                 final Runnable runUpgrade = new Runnable() {
-                    private Probe<?,?> lp = p;
+                    private Probe<?, ?> lp = p;
 
                     public void run() {
                         lp.checkStore();
@@ -41,8 +41,7 @@ public class Updater {
                 };
                 try {
                     tpool.execute(runUpgrade);
-                }
-                catch(RejectedExecutionException ex) {
+                } catch (RejectedExecutionException ex) {
                     logger.debug("collector thread dropped for probe " + p.getName());
                 }
             }

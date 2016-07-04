@@ -12,14 +12,14 @@ public class FilterTag extends Filter {
 
     @Override
     public boolean acceptGraph(GraphNode graph, String path) {
-        Probe<?,?> p = graph.getProbe();
+        Probe<?, ?> p = graph.getProbe();
         if(p == null)
             return false;
         HostInfo host = p.getHost();
         if(host == null)
             return false;
         Set<String> hostTags = graph.getProbe().getHost().getTags();
-        if (hostTags ==null) {
+        if(hostTags == null) {
             return false;
         }
         for(String oneTag: hostTags) {

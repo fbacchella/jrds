@@ -26,10 +26,10 @@ public class GraphiteConnection {
         super();
         this.host = host;
         this.port = port;
-        this.commonPrefix = (prefix != null && ! prefix.isEmpty()) ? prefix + "." : "";
+        this.commonPrefix = (prefix != null && !prefix.isEmpty()) ? prefix + "." : "";
     }
 
-    public void send(Probe<?,?> probe, JrdsSample sample) throws IOException {
+    public void send(Probe<?, ?> probe, JrdsSample sample) throws IOException {
         String prefix = getPrefix(probe);
         for(Map.Entry<String, Number> e: sample.entrySet()) {
             String msg = prefix + "." + e.getKey() + " " + e.getValue() + " " + (int) (sample.getTime().getTime() / 1000);
@@ -73,7 +73,7 @@ public class GraphiteConnection {
             InetSocketAddress graphiteServer = new InetSocketAddress(host, port);
             socket.setKeepAlive(true);
             socket.setSoTimeout(1000);
-            //flush is done manually, so try to buffer as much as possible
+            // flush is done manually, so try to buffer as much as possible
             socket.setTcpNoDelay(false);
             socket.setSendBufferSize(8192);
             socket.connect(graphiteServer, 1000);
@@ -87,13 +87,12 @@ public class GraphiteConnection {
         if(hostname.contains(".")) {
             String[] part = hostname.split("\\.");
             StringBuilder b = new StringBuilder(hostname.length());
-            for(int i=part.length -1; i>=0; i--) {
+            for(int i = part.length - 1; i >= 0; i--) {
                 b.append(part[i]);
                 b.append(".");
             }
             hostname = b.toString();
-        }
-        else {
+        } else {
             hostname = hostname + ".";
         }
         if(pname.contains(".")) {

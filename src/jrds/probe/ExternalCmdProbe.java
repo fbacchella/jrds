@@ -27,24 +27,25 @@ import org.rrd4j.core.DsDef;
 
 /**
  * This abstract class can be used to parse the results of an external command
- * @author Fabrice Bacchella 
- * @version $Revision$,  $Date$
+ * 
+ * @author Fabrice Bacchella
+ * @version $Revision$, $Date$
  */
 public abstract class ExternalCmdProbe extends Probe<String, Number> {
 
     protected String cmd = null;
 
     @Override
-    public void readProperties(PropertiesManager pm) {        
-        cmd = resolvCmdPath(pm.getProperty("path",""));
+    public void readProperties(PropertiesManager pm) {
+        cmd = resolvCmdPath(pm.getProperty("path", ""));
     }
 
     public Boolean configure() {
-        if (cmd == null) 
+        if(cmd == null)
             return false;
         String cmdargs = getPd().getSpecific("arguments");
-        if(cmdargs != null && ! cmdargs.trim().isEmpty()) {
-            cmd = cmd +  " " + Util.parseTemplate(cmdargs, this);
+        if(cmdargs != null && !cmdargs.trim().isEmpty()) {
+            cmd = cmd + " " + Util.parseTemplate(cmdargs, this);
         }
         return true;
     }
@@ -53,7 +54,7 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         List<String> pathelements = new ArrayList<String>();
         pathelements.addAll(Arrays.asList(path.split(";")));
         String envPath = System.getenv("PATH");
-        if(envPath != null && ! envPath.isEmpty()) {
+        if(envPath != null && !envPath.isEmpty()) {
             pathelements.addAll(Arrays.asList(envPath.split(System.getProperty("path.separator"))));
         }
         String cmdname = getPd().getSpecific("command");
@@ -73,7 +74,9 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         return cmd;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see com.aol.jrds.Probe#getNewSampleValues()
      */
     public Map<String, Number> getNewSampleValues() {
@@ -81,23 +84,21 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         String values[] = perfstring.split(":");
         DsDef[] defs = getPd().getDsDefs();
         int n = values.length;
-        if (values.length != defs.length + 1) {
-            throw new IllegalArgumentException("Invalid number of values specified (found " +
-                    values.length + ", " + defs.length + " allowed)");
+        if(values.length != defs.length + 1) {
+            throw new IllegalArgumentException("Invalid number of values specified (found " + values.length + ", " + defs.length + " allowed)");
         }
         long time;
         String timeToken = values[0];
         if(timeToken.equalsIgnoreCase("N") || timeToken.equalsIgnoreCase("NOW")) {
-            time =  System.currentTimeMillis() / 1000;
-        }
-        else {
+            time = System.currentTimeMillis() / 1000;
+        } else {
             time = jrds.Util.parseStringNumber(timeToken, Long.MAX_VALUE);
             if(time == Long.MAX_VALUE) {
                 throw new IllegalArgumentException("Invalid sample timestamp: " + timeToken);
             }
         }
         Map<String, Number> retValues = new HashMap<String, Number>(n - 1);
-        for(int i=0; i< defs.length; i++) {
+        for(int i = 0; i < defs.length; i++) {
             double value = jrds.Util.parseStringNumber(values[i + 1], Double.NaN);
             retValues.put(defs[i].getDsName(), value);
         }
@@ -123,16 +124,16 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         try {
             if(urlperfps != null) {
                 urlperfps.waitFor();
-                if(urlperfps.exitValue() !=0 ) {
+                if(urlperfps.exitValue() != 0) {
 
                     InputStream stderr = urlperfps.getErrorStream();
                     BufferedReader stderrtReader = new BufferedReader(new InputStreamReader(stderr));
                     String errostring = stderrtReader.readLine();
                     if(errostring == null) {
-                        errostring = "";                        
+                        errostring = "";
                     }
 
-                    log(Level.ERROR," command %s failed with %s", cmd, errostring);
+                    log(Level.ERROR, " command %s failed with %s", cmd, errostring);
                     perfstring = "";
                 }
                 urlperfps.getInputStream().close();

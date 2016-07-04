@@ -15,8 +15,7 @@ import javax.servlet.http.HttpSession;
 public class WhoAmI extends JrdsServlet {
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         ServletOutputStream out = resp.getOutputStream();
         resp.setContentType("text/plain");
@@ -36,14 +35,14 @@ public class WhoAmI extends JrdsServlet {
         for(String role: getPropertiesManager().defaultRoles) {
             if(req.isUserInRole(role)) {
                 out.print(" " + role);
-            }            
+            }
         }
         out.println();
         HttpSession s = req.getSession();
         if(s != null) {
             for(String attr: Collections.list(s.getAttributeNames())) {
                 out.println(attr + ": " + s.getAttribute(attr));
-            }            
+            }
         }
     }
 

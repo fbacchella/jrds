@@ -26,7 +26,7 @@ public class TestLoader {
     }
 
     @Test
-    public void doLoadJar() throws ParserConfigurationException, MalformedURLException  {
+    public void doLoadJar() throws ParserConfigurationException, MalformedURLException {
         Loader l = new Loader();
         l.importUrl(Tools.pathToUrl("desc"));
         l.done();
@@ -35,7 +35,7 @@ public class TestLoader {
     }
 
     @Test
-    public void doLoadHost() throws Exception  {
+    public void doLoadHost() throws Exception {
         Loader l = new Loader();
         l.importStream(getClass().getResourceAsStream("/ressources/host1.xml"), "");
         l.done();
@@ -44,7 +44,7 @@ public class TestLoader {
     }
 
     @Test
-    public void doLoadView() throws Exception  {
+    public void doLoadView() throws Exception {
         Loader l = new Loader();
 
         l.importStream(getClass().getResourceAsStream("/ressources/view1.xml"), "");
@@ -69,7 +69,7 @@ public class TestLoader {
     }
 
     @Test
-    public void doLoadGraph()  throws Exception {
+    public void doLoadGraph() throws Exception {
         Loader l = new Loader();
 
         l.importStream(getClass().getResourceAsStream("/ressources/customgraph.xml"), "");
@@ -81,7 +81,7 @@ public class TestLoader {
     }
 
     @Test
-    public void doLoadTab()  throws Exception {
+    public void doLoadTab() throws Exception {
         Loader l = new Loader();
 
         l.importStream(getClass().getResourceAsStream("/ressources/goodtab.xml"), "");

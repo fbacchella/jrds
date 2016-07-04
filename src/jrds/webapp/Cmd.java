@@ -24,7 +24,8 @@ public class Cmd extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(Cmd.class);
 
     /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+     *      response)
      */
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         ParamsBean params = new ParamsBean(req, getHostsList(), "command", "arg");
@@ -35,18 +36,17 @@ public class Cmd extends JrdsServlet {
         }
         logger.debug(Util.delayedFormatString("Command found: %s", command));
 
-        if(! allowed(params, getPropertiesManager().adminACL, req, res))
+        if(!allowed(params, getPropertiesManager().adminACL, req, res))
             return;
 
         if("reload".equalsIgnoreCase(command)) {
             ServletContext ctxt = getServletContext();
-            //only one reload allowed to run, just ignore synchronous reload
-            if ( ReloadHostList.reloading.tryAcquire()) {
+            // only one reload allowed to run, just ignore synchronous reload
+            if(ReloadHostList.reloading.tryAcquire()) {
                 reload(ctxt);
             }
             res.sendRedirect(req.getContextPath() + "/");
-        }
-        else if("pause".equalsIgnoreCase(command)) {
+        } else if("pause".equalsIgnoreCase(command)) {
             ServletContext ctxt = getServletContext();
             pause(ctxt, params.getValue("arg"));
             res.sendRedirect(req.getContextPath() + "/");
@@ -67,7 +67,7 @@ public class Cmd extends JrdsServlet {
         configthread.start();
     }
 
-    private void pause(final ServletContext ctxt, final String arg) {       
+    private void pause(final ServletContext ctxt, final String arg) {
         Thread configthread = new Thread("jrds-pause") {
             @Override
             public void run() {
@@ -76,7 +76,7 @@ public class Cmd extends JrdsServlet {
                     for(Timer t: hl.getTimers()) {
                         t.lockCollect();
                     }
-                    Thread.sleep(jrds.Util.parseStringNumber(arg, 1) * 1000 );
+                    Thread.sleep(jrds.Util.parseStringNumber(arg, 1) * 1000);
                 } catch (InterruptedException e) {
                 }
                 for(Timer t: hl.getTimers()) {

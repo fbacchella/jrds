@@ -20,12 +20,14 @@ public abstract class Connection<ConnectedType> extends Starter {
         return sf.createSocket(host, port);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Starter#getKey()
      */
     @Override
     public Object getKey() {
-        if(name !=null)
+        if(name != null)
             return name;
         else
             return getClass().getName();
@@ -47,15 +49,16 @@ public abstract class Connection<ConnectedType> extends Starter {
 
     /**
      * Return the host name associated
+     * 
      * @return
      */
     public String getHostName() {
         StarterNode level = getLevel();
-        if( level instanceof HostStarter) {
+        if(level instanceof HostStarter) {
             return ((HostStarter) level).getDnsName();
         }
         if(level instanceof Probe<?, ?>) {
-            return ((Probe<?,?>)level).getHost().getDnsName();
+            return ((Probe<?, ?>) level).getHost().getDnsName();
         }
         return null;
     }
@@ -72,20 +75,23 @@ public abstract class Connection<ConnectedType> extends Starter {
 
     /**
      * To get the default time out
+     * 
      * @return the connection timeout in second
      */
     public int getTimeout() {
         return getLevel().getTimeout();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Starter#start()
      */
     @Override
     public boolean start() {
-        if(! getResolver().isStarted())
+        if(!getResolver().isStarted())
             return false;
-        boolean started =  startConnection();
+        boolean started = startConnection();
         if(started) {
             uptime = setUptime();
             log(Level.DEBUG, "Uptime for %s = %ds", this, uptime);
@@ -93,7 +99,9 @@ public abstract class Connection<ConnectedType> extends Starter {
         return started;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Starter#stop()
      */
     @Override
@@ -102,12 +110,13 @@ public abstract class Connection<ConnectedType> extends Starter {
     }
 
     public abstract boolean startConnection();
+
     public abstract void stopConnection();
 
     /**
-     * Return the uptime of the end point of the connexion
-     * it's called once after the connexion start
-     * It should be in seconds
+     * Return the uptime of the end point of the connexion it's called once
+     * after the connexion start It should be in seconds
+     * 
      * @return
      */
     public abstract long setUptime();
@@ -119,7 +128,9 @@ public abstract class Connection<ConnectedType> extends Starter {
         return uptime;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Starter#toString()
      */
     @Override

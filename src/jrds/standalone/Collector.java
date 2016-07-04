@@ -9,7 +9,6 @@ import jrds.starter.Timer;
 
 import org.apache.log4j.Logger;
 
-
 /**
  * @author Fabrice Bacchella
  *
@@ -30,9 +29,8 @@ public class Collector extends CommandStarterImpl {
         PropertiesManager pm = new PropertiesManager(new File(propFile));
         jrds.JrdsLoggerConfiguration.configure(pm);
 
-        System.getProperties().setProperty("java.awt.headless","true");
+        System.getProperties().setProperty("java.awt.headless", "true");
         System.getProperties().putAll(pm);
-
 
         HostsList hl = new HostsList(pm);
 
@@ -44,4 +42,3 @@ public class Collector extends CommandStarterImpl {
     }
 
 }
-

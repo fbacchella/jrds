@@ -35,8 +35,9 @@ import org.w3c.dom.Element;
 
 /**
  * A abstract class that needs to be derived for specific probe.<br>
- * the derived class must construct a <code>ProbeDesc</code> and
- * can override some method as needed
+ * the derived class must construct a <code>ProbeDesc</code> and can override
+ * some method as needed
+ * 
  * @author Fabrice Bacchella
  */
 @ProbeMeta(
@@ -70,7 +71,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             this.put(e.getKey(), e.getValue());
         }
 
-        public Probe<KeyType,ValueType> getProbe() {
+        public Probe<KeyType, ValueType> getProbe() {
             return Probe.this;
         }
     }
@@ -91,6 +92,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * A special case constructor, mainly used by virtual probe
+     * 
      * @param pd
      */
     public Probe(ProbeDesc pd) {
@@ -113,16 +115,16 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     public void setPd(ProbeDesc pd) {
         this.pd = pd;
-        namedLogger =  Logger.getLogger("jrds.Probe." + pd.getName());
-        if( ! readSpecific()) {
+        namedLogger = Logger.getLogger("jrds.Probe." + pd.getName());
+        if(!readSpecific()) {
             throw new RuntimeException("Creation failed");
         }
     }
 
     public void setBean(String key, String value) {
-        //if beans size == 0, it's the empty Map
+        // if beans size == 0, it's the empty Map
         if(customBeans.size() == 0) {
-            customBeans = new HashMap<String, String>(); 
+            customBeans = new HashMap<String, String>();
         }
         customBeans.put(key, value);
     }
@@ -133,6 +135,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * Define the archive set to use for this probe
+     * 
      * @param archives
      */
     public void setArchives(ArchivesSet archives) {
@@ -164,26 +167,31 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * The method that return a map of data collected.<br>
-     * It should return return as raw as possible, they can even be opaque data tied to the probe.
-     * the key is resolved using the <code>ProbeDesc</code>. A key not associated with an existent datastore will generate a warning
+     * It should return return as raw as possible, they can even be opaque data
+     * tied to the probe. the key is resolved using the <code>ProbeDesc</code>.
+     * A key not associated with an existent datastore will generate a warning
      * but will not prevent the other values to be stored.<br>
+     * 
      * @return the map of collected object or null if the collect failed
      */
     public abstract Map<KeyType, ValueType> getNewSampleValues();
 
     /**
-     * This method convert the collected object to numbers and can do post treatment
+     * This method convert the collected object to numbers and can do post
+     * treatment
+     * 
      * @param valuesList
      * @return an map of value to be stored
      */
     @SuppressWarnings("unchecked")
-    public Map<KeyType, Number>  filterValues(Map<KeyType, ValueType> valuesList) {
-        return (Map<KeyType, Number>)valuesList;
+    public Map<KeyType, Number> filterValues(Map<KeyType, ValueType> valuesList) {
+        return (Map<KeyType, Number>) valuesList;
     }
 
     /**
-     * This method take two unsigned 32 integers and return a signed 64 bits long
-     * The input value me be stored in a Long object
+     * This method take two unsigned 32 integers and return a signed 64 bits
+     * long The input value me be stored in a Long object
+     * 
      * @param high high bits of the value
      * @param low low bits of the value
      * @return
@@ -199,6 +207,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * The sample itself can be modified<br>
+     * 
      * @param sample
      * @param values
      */
@@ -212,37 +221,39 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     @SuppressWarnings("unchecked")
     public Map<KeyType, String> getCollectMapping() {
-        Map<KeyType, String> rawMap = (Map<KeyType, String>)getPd().getCollectMapping();
+        Map<KeyType, String> rawMap = (Map<KeyType, String>) getPd().getCollectMapping();
         Map<KeyType, String> retValues = new HashMap<KeyType, String>(rawMap.size());
         for(Map.Entry<KeyType, String> e: rawMap.entrySet()) {
             String value = jrds.Util.parseTemplate(e.getValue(), this);
             KeyType key = e.getKey();
             if(key instanceof String)
-                key = (KeyType)jrds.Util.parseTemplate((String)key, this);
+                key = (KeyType) jrds.Util.parseTemplate((String) key, this);
             retValues.put(key, value);
         }
         return retValues;
     }
 
     /**
-     * Return true if is collect key was marked optionnal in the probe description
+     * Return true if is collect key was marked optionnal in the probe
+     * description
      * 
      * @param collect
      * @return
      */
-    public boolean isOptional(KeyType collect ) {
+    public boolean isOptional(KeyType collect) {
         return getPd().isOptional(getCollectMapping().get(collect));
     }
 
     /**
      * Return an new sample with collected values
+     * 
      * @param oneSample or null if collect failed
      */
     private JrdsSample updateSample() {
         JrdsSample sample = newSample();
         if(isCollectRunning()) {
             Map<KeyType, ValueType> sampleVals = getNewSampleValues();
-            if (sampleVals != null && sampleVals.size() != 0 && injectSample(sample, sampleVals)) {
+            if(sampleVals != null && sampleVals.size() != 0 && injectSample(sample, sampleVals)) {
                 return sample;
             }
         }
@@ -251,6 +262,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * Store the collected values in the sample
+     * 
      * @param oneSample
      */
     public boolean injectSample(JrdsSample oneSample, Map<KeyType, ValueType> sampleVals) {
@@ -259,20 +271,19 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             log(Level.INFO, "uptime too low: %.0f", getUptime() * pd.getUptimefactor());
             return false;
         }
-        //Set the default values that might be defined in the probe description
+        // Set the default values that might be defined in the probe description
         for(Map.Entry<String, Double> e: getPd().getDefaultValues().entrySet()) {
             oneSample.put(e);
         }
         Map<?, String> nameMap = getCollectMapping();
         log(Level.TRACE, "Collect keys: %s", nameMap);
-        Map<KeyType, Number>filteredSamples = filterValues(sampleVals);
+        Map<KeyType, Number> filteredSamples = filterValues(sampleVals);
         log(Level.TRACE, "Filtered values: %s", filteredSamples);
         for(Map.Entry<KeyType, Number> e: filteredSamples.entrySet()) {
             String dsName = nameMap.get(e.getKey());
-            if (dsName != null) {
+            if(dsName != null) {
                 oneSample.put(dsName, e.getValue());
-            }
-            else {
+            } else {
                 log(Level.TRACE, "Dropped entry: %s", e.getKey());
             }
         }
@@ -280,9 +291,10 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         return true;
     }
 
-
     /**
-     * Return a new JrdsSample. It can be overridden if a smarter sample is needed
+     * Return a new JrdsSample. It can be overridden if a smarter sample is
+     * needed
+     * 
      * @return
      */
     public JrdsSample newSample() {
@@ -298,13 +310,12 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
-     * Launch an collect of values.
-     * You should not try to override it
+     * Launch an collect of values. You should not try to override it
      */
     public void collect() {
         long start = System.currentTimeMillis();
         boolean interrupted = true;
-        if(! finished) {
+        if(!finished) {
             log(Level.ERROR, "Using an unfinished probe");
             return;
         }
@@ -313,26 +324,24 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             return;
         }
         startCollect();
-        //We only collect if the HostsList allow it
+        // We only collect if the HostsList allow it
         if(isCollectRunning()) {
             running = true;
-            log(Level.DEBUG,"launching collect");
+            log(Level.DEBUG, "launching collect");
             try {
-                //No collect if the thread was interrupted
-                if( isCollectRunning()) {
-                    JrdsSample sample = updateSample();                    
-                    //The collect might have been stopped
-                    //during the reading of samples
-                    if( sample!= null && sample.size() > 0 && isCollectRunning()) {
+                // No collect if the thread was interrupted
+                if(isCollectRunning()) {
+                    JrdsSample sample = updateSample();
+                    // The collect might have been stopped
+                    // during the reading of samples
+                    if(sample != null && sample.size() > 0 && isCollectRunning()) {
                         storeSample(sample);
                         interrupted = false;
                     }
                 }
-            }
-            catch (ArithmeticException ex) {
+            } catch (ArithmeticException ex) {
                 log(Level.WARN, ex, "Error while storing sample: %s", ex.getMessage());
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 Throwable rootCause = e;
                 Throwable upCause;
                 StringBuilder message = new StringBuilder();
@@ -340,8 +349,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                     String cause = rootCause.getMessage();
                     if(cause == null || "".equals(cause)) {
                         message.append(": ").append(rootCause.toString());
-                    }
-                    else {
+                    } else {
                         message.append(": ").append(cause);
                     }
                     upCause = rootCause.getCause();
@@ -349,18 +357,17 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                         rootCause = upCause;
                 } while (upCause != null);
                 log(Level.ERROR, e, "Error while collecting: %s", message);
-            }
-            finally  {
+            } finally {
                 stopCollect();
             }
             long end = System.currentTimeMillis();
             log(Level.DEBUG, "collect ran for %dms", (end - start));
             Timer timer = (Timer) getParent().getParent();
-            if( (end - start) > (timer.getSlowCollectTime() * 1000)) {
+            if((end - start) > (timer.getSlowCollectTime() * 1000)) {
                 log(Level.WARN, "slow collect time %.0fs for probe %s", 1.0 * (end - start) / 1000, this);
             }
             if(interrupted) {
-                float elapsed = ((float)(end - start))/1000;
+                float elapsed = ((float) (end - start)) / 1000;
                 log(Level.DEBUG, "Interrupted after %.2fs", elapsed);
             }
             running = false;
@@ -368,8 +375,9 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
-     * Return the string value of the probe as a path constituted of
-     * the host name / the probe name
+     * Return the string value of the probe as a path constituted of the host
+     * name / the probe name
+     * 
      * @see java.lang.Object#toString()
      */
     public String toString() {
@@ -387,8 +395,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * @return int
      */
     public int compareTo(Probe<KeyType, ValueType> arg0) {
-        return String.CASE_INSENSITIVE_ORDER.compare(toString(),
-                arg0.toString());
+        return String.CASE_INSENSITIVE_ORDER.compare(toString(), arg0.toString());
     }
 
     /**
@@ -404,10 +411,11 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * Return a unique name for the graph
+     * 
      * @return
      */
     public String getQualifiedName() {
-        return getHost().getName() + "/"  + getName();
+        return getHost().getName() + "/" + getName();
     }
 
     public int hashCode() {
@@ -421,10 +429,10 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     public abstract String getSourceType();
 
     /**
-     * This function it used by the probe to read all the specific it needs from the probe description
-     * It's called once during the probe initialization
-     * Every override should finish by:
-     * return super();
+     * This function it used by the probe to read all the specific it needs from
+     * the probe description It's called once during the probe initialization
+     * Every override should finish by: return super();
+     * 
      * @return
      */
     public boolean readSpecific() {
@@ -432,8 +440,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
-     * A probe can override it to extract custom values from the properties.
-     * It will be read just after it's created and before configuration.
+     * A probe can override it to extract custom values from the properties. It
+     * will be read just after it's created and before configuration.
      * 
      * @param pm
      */
@@ -442,11 +450,11 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
-     * This function should return the uptime of the probe
-     * If it's not overriden or fixed with setUptime, it will return Long.MAX_VALUE
-     * that's make it useless, as it used to make the probe pause 
-     * after a restart of the probe.
+     * This function should return the uptime of the probe If it's not overriden
+     * or fixed with setUptime, it will return Long.MAX_VALUE that's make it
+     * useless, as it used to make the probe pause after a restart of the probe.
      * It's called after filterValues
+     * 
      * @return the uptime in second
      */
     public long getUptime() {
@@ -455,6 +463,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * Define the uptime of the probe
+     * 
      * @param uptime in seconds
      */
     public void setUptime(long uptime) {
@@ -475,8 +484,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.newDocument();
-        Element root = 
-                (Element) document.createElement("probe"); 
+        Element root = (Element) document.createElement("probe");
         document.appendChild(root);
         root.setAttribute("name", name);
         root.setAttribute("host", host);
@@ -486,13 +494,13 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         root.appendChild(probeNameElement);
         if(this instanceof UrlProbe) {
             Element urlElement = document.createElement("url");
-            String url = ((UrlProbe)this).getUrlAsString();
+            String url = ((UrlProbe) this).getUrlAsString();
             urlElement.appendChild(document.createTextNode(url));
             root.appendChild(urlElement);
         }
         if(this instanceof IndexedProbe) {
             Element urlElement = document.createElement("index");
-            String index = ((IndexedProbe)this).getIndexName();
+            String index = ((IndexedProbe) this).getIndexName();
             urlElement.appendChild(document.createTextNode(index));
             root.appendChild(urlElement);
         }
@@ -506,9 +514,9 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             graph.setTextContent(qualifiedGraphName);
             graph.setAttribute("id", String.valueOf(gn.hashCode()));
         }
-        String[] dss = getPd().getDs().toArray(new String[]{});
+        String[] dss = getPd().getDs().toArray(new String[] {});
 
-        if (sorted)
+        if(sorted)
             Arrays.sort(dss);
 
         for(String dsName: dss) {
@@ -536,7 +544,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     public void log(Level l, String format, Object... elements) {
-        jrds.Util.log(this, namedLogger,l, null, format, elements);
+        jrds.Util.log(this, namedLogger, l, null, format, elements);
     }
 
     /**
@@ -551,14 +559,15 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
-     * Check the final status of the probe. It must be called once before an probe can be used
+     * Check the final status of the probe. It must be called once before an
+     * probe can be used
      * 
-     * Open the rrd backend of the probe.
-     * it's created if it's needed
+     * Open the rrd backend of the probe. it's created if it's needed
+     * 
      * @throws IOException
      * @throws RrdException
      */
-    public boolean checkStore()  {
+    public boolean checkStore() {
         ProbeDesc pd = getPd();
         if(pd == null) {
             log(Level.ERROR, "Missing Probe description");
@@ -569,7 +578,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             return false;
         }
 
-        //Name can be set by other means
+        // Name can be set by other means
         if(name == null)
             name = parseTemplate(pd.getProbeName());
 
@@ -588,7 +597,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         };
         return jrds.Util.parseOldTemplate(template, arguments, this);
     }
-
 
     /**
      * @return the stores
@@ -613,7 +621,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * @param mainStore the mainStore to set
-     * @throws InvocationTargetException 
+     * @throws InvocationTargetException
      */
     public void setMainStore(StoreFactory factory, Map<String, String> args) throws InvocationTargetException {
         this.mainStore = factory.configure(this, args);

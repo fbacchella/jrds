@@ -86,7 +86,7 @@ public class TestLoadConfiguration {
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
         conf.setGraphDescMap();
         conf.setProbeDescMap();
-        return conf;     
+        return conf;
     }
 
     @Test
@@ -96,7 +96,7 @@ public class TestLoadConfiguration {
         FilterBuilder fb = new FilterBuilder();
         fb.setPm(pm);
         Filter f = fb.makeFilter(d);
-        Assert.assertEquals("Test view 1",f.getName());
+        Assert.assertEquals("Test view 1", f.getName());
     }
 
     @Test
@@ -111,10 +111,10 @@ public class TestLoadConfiguration {
         HostInfo host = new HostInfo("testProbe2");
         host.setHostDir(pm.rrddir);
 
-        Probe<?,?> p = hb.makeProbe(d.getRootElement(), host, null);
+        Probe<?, ?> p = hb.makeProbe(d.getRootElement(), host, null);
         jrds.Util.serialize(p.dumpAsXml(), System.out, null, null);
         Assert.assertNotNull(p);
-        Assert.assertEquals(host.getName() + "/" + p.getName() , p.toString());
+        Assert.assertEquals(host.getName() + "/" + p.getName(), p.toString());
     }
 
     @Test
@@ -122,7 +122,7 @@ public class TestLoadConfiguration {
         JrdsDocument d = Tools.parseRessource("dsoverride.xml");
         PropertiesManager pm = Tools.makePm(testFolder);
         HostBuilder hb = new HostBuilder();
-        ProbeFactory pf =  new MokeProbeFactory();
+        ProbeFactory pf = new MokeProbeFactory();
         hb.setProbeFactory(pf);
         hb.setPm(pm);
         hb.setTimers(Tools.getSimpleTimerMap());
@@ -130,11 +130,11 @@ public class TestLoadConfiguration {
         HostInfo host = new HostInfo("testDsreplace");
         host.setHostDir(pm.rrddir);
 
-        Probe<?,?> p = hb.makeProbe(d.getRootElement().getElementbyName("probe"), host, null);
+        Probe<?, ?> p = hb.makeProbe(d.getRootElement().getElementbyName("probe"), host, null);
         ProbeDesc pd = p.getPd();
         Assert.assertNotNull(pd);
-        Assert.assertEquals(1 , pd.getSize());
-        Assert.assertNotSame(pf.getProbeDesc(pd.getName()) , pd.getSize());
+        Assert.assertEquals(1, pd.getSize());
+        Assert.assertNotSame(pf.getProbeDesc(pd.getName()), pd.getSize());
 
     }
 
@@ -179,7 +179,7 @@ public class TestLoadConfiguration {
 
         logger.debug("probes:" + host.getProbes());
         Collection<String> probesName = new ArrayList<String>();
-        for(Probe<?,?> p: host.getProbes()) {
+        for(Probe<?, ?> p: host.getProbes()) {
             probesName.add(p.toString());
         }
         Assert.assertTrue("MacroProbe1 not found", probesName.contains("myhost/MacroProbe1"));
@@ -213,7 +213,8 @@ public class TestLoadConfiguration {
         HostInfo host = hb.makeHost(hostdoc);
         logger.trace("dns name: " + host.getName());
         Assert.assertTrue("tag not found", host.getTags().contains(tagname));
-        // Assert.assertEquals("SNMP starter not found", "snmp:udp://myhost:161", host.find(SnmpConnection.class).toString());
+        // Assert.assertEquals("SNMP starter not found",
+        // "snmp:udp://myhost:161", host.find(SnmpConnection.class).toString());
     }
 
     @Test
@@ -235,13 +236,14 @@ public class TestLoadConfiguration {
         HostInfo h = hostMap.get("myhost");
         Assert.assertNotNull(h);
         Assert.assertEquals("myhost", h.getName());
-        Collection<Probe<?,?>> probes = new HashSet<Probe<?,?>>();
-        for(Probe<?,?> p : h.getProbes())
+        Collection<Probe<?, ?>> probes = new HashSet<Probe<?, ?>>();
+        for(Probe<?, ?> p: h.getProbes())
             probes.add(p);
         Assert.assertEquals(7, h.getNumProbes());
         Assert.assertTrue("tag not found", h.getTags().contains(tagname));
-        //Assert.assertEquals("SNMP starter not found", "snmp:udp://myhost:161", h.find(SnmpConnection.class).toString());
-        //logger.trace(h.find(SnmpConnection.class));
+        // Assert.assertEquals("SNMP starter not found",
+        // "snmp:udp://myhost:161", h.find(SnmpConnection.class).toString());
+        // logger.trace(h.find(SnmpConnection.class));
     }
 
     @Test

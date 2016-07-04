@@ -21,10 +21,11 @@ import jrds.store.StoreFactory;
 
 /**
  * A class wrapper to use rrdtool's files
+ * 
  * @author Fabrice Bacchella
  *
  */
-@ProbeBean({"rrdfile"})
+@ProbeBean({ "rrdfile" })
 public class RRDToolProbe extends Probe<String, Double> {
     private File rrdpath;
 
@@ -48,12 +49,13 @@ public class RRDToolProbe extends Probe<String, Double> {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#setMainStore(jrds.store.StoreFactory, java.util.Map)
      */
     @Override
-    public void setMainStore(StoreFactory factory, Map<String, String> args)
-            throws InvocationTargetException {
+    public void setMainStore(StoreFactory factory, Map<String, String> args) throws InvocationTargetException {
         if(factory.getClass() == RRDToolStoreFactory.class)
             super.setMainStore(factory, args);
     }
@@ -66,7 +68,9 @@ public class RRDToolProbe extends Probe<String, Double> {
         return rrdpath;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#addGraph(jrds.GraphNode)
      */
     @Override
@@ -74,7 +78,9 @@ public class RRDToolProbe extends Probe<String, Double> {
         super.addGraph(new RRDToolGraphNode(this, node.getGraphDesc(), rrdpath));
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#addGraph(jrds.GraphDesc)
      */
     @Override
@@ -92,14 +98,18 @@ public class RRDToolProbe extends Probe<String, Double> {
         return "RRDToolFile";
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#collect()
      */
     @Override
     public void collect() {
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#getLastUpdate()
      */
     @Override

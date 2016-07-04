@@ -25,7 +25,7 @@ public class TestIterator {
     private static final String xmlEmptyExample = "<root />";
 
     static final private Logger logger = Logger.getLogger(TestIterator.class);
-    
+
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
@@ -45,7 +45,7 @@ public class TestIterator {
         Assert.assertEquals(3, rank++);
 
     }
-    
+
     @Test
     public void iterateEmpty() throws Exception {
         JrdsDocument d = Tools.parseString(xmlEmptyExample);
@@ -58,4 +58,3 @@ public class TestIterator {
 
     }
 }
-

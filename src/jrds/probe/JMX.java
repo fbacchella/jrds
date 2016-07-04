@@ -28,7 +28,7 @@ import org.apache.log4j.Level;
 
 /**
  * 
- * @author Fabrice Bacchella 
+ * @author Fabrice Bacchella
  */
 @ProbeMeta(
         discoverAgent=JmxDiscoverAgent.class,
@@ -44,7 +44,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
     @Override
     public Boolean configure() {
         collectKeys = new HashMap<String, String>();
-        for(Map.Entry<String, String> e:getPd().getCollectStrings().entrySet()) {
+        for(Map.Entry<String, String> e: getPd().getCollectStrings().entrySet()) {
             String dsName = e.getValue();
             String solved = jrds.Util.parseTemplate(e.getKey(), this);
             collectKeys.put(solved, dsName);
@@ -54,7 +54,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
 
     @Override
     public Map<String, Double> getNewSampleValuesConnected(JMXConnection cnx) {
-        MBeanServerConnection mbean =  cnx.getConnection();
+        MBeanServerConnection mbean = cnx.getConnection();
         try {
             Set<String> collectKeys = getCollectMapping().keySet();
             Map<String, Double> retValues = new HashMap<String, Double>(collectKeys.size());
@@ -64,9 +64,9 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
                 int attrSplit = collect.indexOf(':');
                 attrSplit = collect.indexOf('/', attrSplit);
                 ObjectName mbeanName = new ObjectName(collect.substring(0, attrSplit));
-                String[] jmxPath = collect.substring(attrSplit+1).split("/");
-                String attributeName =  jmxPath[0];
-                log(Level.TRACE, "mbean name = %s, attributeName = %s", mbeanName, attributeName);                 
+                String[] jmxPath = collect.substring(attrSplit + 1).split("/");
+                String attributeName = jmxPath[0];
+                log(Level.TRACE, "mbean name = %s, attributeName = %s", mbeanName, attributeName);
                 try {
                     Object attr = mbean.getAttribute(mbeanName, attributeName);
                     Number v = resolvJmxObject(attr, jmxPath);
@@ -112,45 +112,42 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
      * @param jmxPath
      * @param o
      * @return
-     * @throws UnsupportedEncodingException 
+     * @throws UnsupportedEncodingException
      */
     Number resolvJmxObject(Object o, String[] jmxPath) throws UnsupportedEncodingException {
         Object value;
-        //Fast simple case
+        // Fast simple case
         if(o instanceof Number)
             return (Number) o;
         else if(o instanceof CompositeData && jmxPath.length == 2) {
             String subKey = URLDecoder.decode(jmxPath[1], "UTF-8");
             CompositeData co = (CompositeData) o;
             value = co.get(subKey);
-        }
-        else if(o instanceof Map<?, ?> && jmxPath.length == 2) {
+        } else if(o instanceof Map<?, ?> && jmxPath.length == 2) {
             String subKey = URLDecoder.decode(jmxPath[1], "UTF-8");
             value = ((Map<?, ?>) o).get(subKey);
-        }
-        else if(o instanceof Collection<?>) {
-            return ((Collection<?>) o ).size();
-        }
-        else if(o instanceof TabularData) {
+        } else if(o instanceof Collection<?>) {
+            return ((Collection<?>) o).size();
+        } else if(o instanceof TabularData) {
             return ((TabularData) o).size();
-        }
-        else if(o.getClass().isArray()) {
+        } else if(o.getClass().isArray()) {
             return Array.getLength(o);
         }
-        //Last try, make a wild guess
+        // Last try, make a wild guess
         else {
             value = o;
         }
         if(value instanceof Number) {
             return ((Number) value);
-        }
-        else if(value instanceof String) {
+        } else if(value instanceof String) {
             return jrds.Util.parseStringNumber((String) value, Double.NaN);
         }
         return Double.NaN;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#setPd(jrds.ProbeDesc)
      */
     @Override
@@ -159,7 +156,9 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
         collectKeys = getPd().getCollectStrings();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#getCollectkeys()
      */
     @Override

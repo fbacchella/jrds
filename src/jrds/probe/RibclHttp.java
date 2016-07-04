@@ -27,7 +27,7 @@ public class RibclHttp extends Ribcl {
     @Override
     public Map<String, Number> getNewSampleValues() {
 
-        if(! isCollectRunning())
+        if(!isCollectRunning())
             return Collections.emptyMap();
 
         XmlProvider xmlstarter = find(XmlProvider.class);
@@ -39,7 +39,7 @@ public class RibclHttp extends Ribcl {
         HttpClientStarter httpstarter = find(HttpClientStarter.class);
         HttpClient cnx = httpstarter.getHttpClient();
 
-        //Prepare the POST request
+        // Prepare the POST request
         HttpPost query = new HttpPost(String.format("https://%s:%d/ribcl", getIloHost(), getPort()));
         ByteArrayOutputStream bufferStream = new ByteArrayOutputStream();
         buildQuery(bufferStream, xmlstarter);
@@ -64,7 +64,7 @@ public class RibclHttp extends Ribcl {
         } catch (IOException e1) {
             log(Level.ERROR, e1, "Socket communication failed: %s", e1.getMessage());
         } finally {
-            EntityUtils.consumeQuietly(entity);             
+            EntityUtils.consumeQuietly(entity);
         }
 
         return values;

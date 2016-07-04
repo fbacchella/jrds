@@ -31,17 +31,20 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
 
     String backendName = null;
 
-    /* (non-Javadoc)
-     * @see jrds.store.AbstractStoreFactory#configureStore(jrds.PropertiesManager)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * jrds.store.AbstractStoreFactory#configureStore(jrds.PropertiesManager)
      */
     @Override
     public void configureStore(PropertiesManager pm, Properties props) {
         super.configureStore(pm, props);
 
         String backendName = null;
-        //Choose and configure the backend
+        // Choose and configure the backend
         String rrdbackendClassName = props.getProperty("rrdbackendclass", "");
-        if(! "".equals(rrdbackendClassName)) {
+        if(!"".equals(rrdbackendClassName)) {
             try {
                 @SuppressWarnings("unchecked")
                 Class<RrdBackendFactory> factoryClass = (Class<RrdBackendFactory>) pm.extensionClassLoader.loadClass(rrdbackendClassName);
@@ -63,7 +66,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
         // Analyze the backend properties
         Map<String, String> backendPropsMap = pm.subKey("rrdbackend");
 
-        if(backendPropsMap.size() > 0){
+        if(backendPropsMap.size() > 0) {
             logger.debug(Util.delayedFormatString("Configuring backend factory %s", backendFactory.getClass()));
             for(Map.Entry<String, String> e: backendPropsMap.entrySet()) {
                 try {
@@ -78,11 +81,13 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
         dbPoolSize = Util.parseStringNumber(props.getProperty("dbPoolSize"), 10) + pm.numCollectors;
         usepool = pm.parseBoolean(props.getProperty("usepool", "true"));
 
-        logger.debug(Util.delayedFormatString("Store backend used is %s",  backendName));
+        logger.debug(Util.delayedFormatString("Store backend used is %s", backendName));
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.store.AbstractStoreFactory#start()
      */
     @Override
@@ -98,7 +103,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
                 logger.warn("Trying to change default backend, a restart is needed");
             } catch (Exception e) {
                 throw new RuntimeException("Failed to configure RrdDbStoreFactory:" + e.getMessage(), e);
-            }            
+            }
             try {
                 instance = RrdDbPool.getInstance();
                 instance.setCapacity(dbPoolSize);
@@ -116,7 +121,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
 
     @Override
     public void stop() {
-        logger.info("Average wait time: " +  waitTime.doubleValue() / lockCount.doubleValue() + " ms");
+        logger.info("Average wait time: " + waitTime.doubleValue() / lockCount.doubleValue() + " ms");
     }
 
     /**
@@ -126,10 +131,9 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
      * @param rrdFile Name of the RRD datasource.
      * @return RrdDb instance of the datasource.
      * @throws IOException Thrown in case of I/O error.
-     * @throws InterruptedException 
+     * @throws InterruptedException
      */
-    public RrdDb getRrd(String rrdFile)
-            throws IOException {
+    public RrdDb getRrd(String rrdFile) throws IOException {
         File f = new File(rrdFile);
         String cp = f.getCanonicalPath();
         long start = System.currentTimeMillis();
@@ -147,7 +151,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
     /**
      * @param db
      */
-    public void releaseRrd(RrdDb db)  {
+    public void releaseRrd(RrdDb db) {
         try {
             long start = System.currentTimeMillis();
             if(usepool)
@@ -169,7 +173,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
      * @see org.rrd4j.core.RrdDbPool#getOpenCount(org.rrd4j.core.RrdDb)
      */
     public int getOpenCount(RrdDb rrdDb) throws IOException {
-        return usepool ? instance.getOpenCount(rrdDb):0;
+        return usepool ? instance.getOpenCount(rrdDb) : 0;
     }
 
     /**
@@ -179,11 +183,11 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
      * @see org.rrd4j.core.RrdDbPool#getOpenCount(java.lang.String)
      */
     public int getOpenCount(String path) throws IOException {
-        return usepool ? instance.getOpenCount(path):0;
+        return usepool ? instance.getOpenCount(path) : 0;
     }
 
     public String[] getOpenFiles() {
-        return usepool ? instance.getOpenFiles(): new String[] {};
+        return usepool ? instance.getOpenFiles() : new String[] {};
     }
 
 }

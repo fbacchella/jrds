@@ -41,8 +41,8 @@ public class TestBeans {
         // = new PropertiesManager();
         pm.update();
         pm.libspath.clear();
-        //pm.strictparsing = true;
-        //pm.rrdbackend = "FILE";
+        // pm.strictparsing = true;
+        // pm.rrdbackend = "FILE";
         File descpath = new File("desc");
         if(descpath.exists())
             pm.libspath.add(descpath.toURI());
@@ -57,14 +57,14 @@ public class TestBeans {
                 String className = classElem.getTextContent().trim();
                 name = root.getElementbyName("name").getTextContent();
                 @SuppressWarnings("unchecked")
-                Class<? extends Probe<?,?>> c = (Class<? extends Probe<?,?>>) pm.extensionClassLoader.loadClass(className);
+                Class<? extends Probe<?, ?>> c = (Class<? extends Probe<?, ?>>) pm.extensionClassLoader.loadClass(className);
                 pd.setProbeClass(c);
             } catch (Exception e) {
                 logger.error("Failed probedesc " + name + ": " + e.getMessage());
                 failed.add(name);
             }
         }
-        if(! failed.isEmpty()) {
+        if(!failed.isEmpty()) {
             Assert.fail("Invalid class:" + failed);
         }
     }

@@ -38,7 +38,7 @@ public class TestSum {
         Tools.prepareXml();
     }
 
-    @Test(expected=RuntimeException.class)
+    @Test(expected = RuntimeException.class)
     public void emptysum() throws Exception {
         HostsList hl = new HostsList();
         hl.configure(new PropertiesManager());
@@ -51,7 +51,7 @@ public class TestSum {
 
     @Test
     public void getSum() throws Exception {
-        PropertiesManager pm = Tools.makePm(testFolder);        
+        PropertiesManager pm = Tools.makePm(testFolder);
         HostsList hl = new HostsList(pm);
 
         GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
@@ -93,7 +93,7 @@ public class TestSum {
 
         Graph g = new Graph(s);
         g.setPeriod(pr);
-        File outputFile =  new File(testFolder.getRoot(), "sum.png");
+        File outputFile = new File(testFolder.getRoot(), "sum.png");
         OutputStream out = new FileOutputStream(outputFile);
         g.writePng(out);
     }

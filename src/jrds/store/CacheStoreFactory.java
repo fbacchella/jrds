@@ -10,17 +10,18 @@ import javax.management.StandardMBean;
 
 import jrds.Probe;
 
-public class CacheStoreFactory extends AbstractStoreFactory<CacheStore> implements SampleCacheMBean  {
+public class CacheStoreFactory extends AbstractStoreFactory<CacheStore> implements SampleCacheMBean {
     private final Map<String, Map<String, Map<String, Number>>> cache = new HashMap<String, Map<String, Map<String, Number>>>();
     @SuppressWarnings("unused")
     private final CacheMBean mbean;
+
     private final class CacheMBean extends StandardMBean implements SampleCacheMBean {
         protected CacheMBean() {
             super(SampleCacheMBean.class, false);
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             try {
                 ObjectName name = new ObjectName("jrds:type=SampleCache");
-                mbs.registerMBean(this, name);         
+                mbs.registerMBean(this, name);
             } catch (Exception e) {
                 throw new RuntimeException("Can't register cache mbean", e);
             }
@@ -29,7 +30,7 @@ public class CacheStoreFactory extends AbstractStoreFactory<CacheStore> implemen
         @Override
         public Map<String, Number> getValues(String host, String probe) {
             return CacheStoreFactory.this.getValues(host, probe);
-        } 
+        }
     }
 
     public CacheStoreFactory() {
@@ -40,10 +41,10 @@ public class CacheStoreFactory extends AbstractStoreFactory<CacheStore> implemen
     public CacheStore create(Probe<?, ?> p) {
         String hostname = p.getHost().getName();
         String probeName = p.getName();
-        if(! cache.containsKey(hostname))
+        if(!cache.containsKey(hostname))
             cache.put(hostname, new HashMap<String, Map<String, Number>>());
         Map<String, Map<String, Number>> probes = cache.get(hostname);
-        if(! probes.containsKey(probeName))
+        if(!probes.containsKey(probeName))
             probes.put(probeName, new HashMap<String, Number>(p.getPd().getDsDefs().length));
 
         return new CacheStore(p, probes.get(probeName));

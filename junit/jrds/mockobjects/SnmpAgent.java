@@ -57,17 +57,14 @@ public class SnmpAgent extends BaseAgent {
         };
         logger.debug("SnmpCommunityEntry: " + communityMIB.getSnmpCommunityEntry());
         @SuppressWarnings("rawtypes")
-        MOTableRow row =
-        communityMIB.getSnmpCommunityEntry().createRow(
-                new OctetString("public2public").toSubIndex(true), com2sec);
+        MOTableRow row = communityMIB.getSnmpCommunityEntry().createRow(new OctetString("public2public").toSubIndex(true), com2sec);
         logger.debug("Row: " + row);
         communityMIB.getSnmpCommunityEntry().addRow(row);
         snmpCommunityMIB.setSourceAddressFiltering(false);
     }
 
     @Override
-    protected void addNotificationTargets(SnmpTargetMIB targetMIB,
-            SnmpNotificationMIB arg1) {
+    protected void addNotificationTargets(SnmpTargetMIB targetMIB, SnmpNotificationMIB arg1) {
         targetMIB.addDefaultTDomains();
 
     }
@@ -155,10 +152,9 @@ public class SnmpAgent extends BaseAgent {
 
         transportMappings = new TransportMapping[1];
         port = gen.nextInt(32768) + 32768;
-        Address addr = new UdpAddress(InetAddress.getByAddress(new byte[] {127,0,0,1}), port);
+        Address addr = new UdpAddress(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port);
         @SuppressWarnings("rawtypes")
-        TransportMapping tm =
-        TransportMappings.getInstance().createTransportMapping(addr);
+        TransportMapping tm = TransportMappings.getInstance().createTransportMapping(addr);
         transportMappings[0] = tm;
     }
 
@@ -166,7 +162,9 @@ public class SnmpAgent extends BaseAgent {
         return port;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.snmp4j.agent.BaseAgent#initMessageDispatcher()
      */
     @Override
@@ -175,7 +173,9 @@ public class SnmpAgent extends BaseAgent {
         dispatcher.addTransportMapping(transportMappings[0]);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.snmp4j.agent.BaseAgent#getEngineBoots()
      */
     @Override
@@ -183,7 +183,9 @@ public class SnmpAgent extends BaseAgent {
         return ++boot;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.snmp4j.agent.BaseAgent#setEngineBoots(int)
      */
     @Override

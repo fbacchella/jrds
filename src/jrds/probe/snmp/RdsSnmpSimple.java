@@ -10,18 +10,20 @@ import java.util.Set;
 
 import org.snmp4j.smi.OID;
 
-
 /**
  * This probe is used to do simple mapping from oid to datastore
- * @author Fabrice Bacchella 
- * @version $Revision$,  $Date$
+ * 
+ * @author Fabrice Bacchella
+ * @version $Revision$, $Date$
  */
-public class RdsSnmpSimple extends SnmpProbe  {
+public class RdsSnmpSimple extends SnmpProbe {
 
-    /* (non-Javadoc)
-	 * @see com.aol.jrds.snmp.SnmpPreparator#makeOidSet()
-	 */
-	public Set<OID> getOidSet() {
-		return getOidNameMap().keySet();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.aol.jrds.snmp.SnmpPreparator#makeOidSet()
+     */
+    public Set<OID> getOidSet() {
+        return getOidNameMap().keySet();
+    }
 }

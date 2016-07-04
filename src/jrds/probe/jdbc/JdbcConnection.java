@@ -10,7 +10,7 @@ import jrds.starter.Connection;
 
 import org.apache.log4j.Level;
 
-@ProbeBean({"user", "password", "url", "driverClass"})
+@ProbeBean({ "user", "password", "url", "driverClass" })
 public class JdbcConnection extends Connection<Statement> {
 
     static protected final void registerDriver(Class<? extends Driver> JdbcDriver) {
@@ -19,7 +19,7 @@ public class JdbcConnection extends Connection<Statement> {
             DriverManager.registerDriver(jdbcDriver);
         } catch (Exception e) {
             throw new RuntimeException("Can't register JDBC driver " + JdbcDriver, e);
-        }   
+        }
     }
 
     private java.sql.Connection con;
@@ -58,7 +58,7 @@ public class JdbcConnection extends Connection<Statement> {
 
     public void checkDriver(String sqlurl) {
         try {
-            if(driverClass != null && ! "".equals(driverClass)) {
+            if(driverClass != null && !"".equals(driverClass)) {
                 Class.forName(driverClass);
             }
             DriverManager.getDriver(sqlurl);
@@ -81,13 +81,13 @@ public class JdbcConnection extends Connection<Statement> {
             String url = getUrl();
             try {
                 DriverManager.setLoginTimeout(getTimeout());
-                con = DriverManager.getConnection(url , user, passwd);
+                con = DriverManager.getConnection(url, user, passwd);
                 started = true;
             } catch (SQLException e) {
-                log(Level.ERROR, e, "Sql error for %s: %s" , url, e);
+                log(Level.ERROR, e, "Sql error for %s: %s", url, e);
             }
         }
-        return started;		
+        return started;
     }
 
     @Override

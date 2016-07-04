@@ -45,7 +45,9 @@ public class Graph implements WithACL {
         setEnd(end);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -63,36 +65,38 @@ public class Graph implements WithACL {
         return result;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if(this == obj)
             return true;
-        if (obj == null)
+        if(obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if(getClass() != obj.getClass())
             return false;
         final Graph other = (Graph) obj;
-        if (end == null) {
-            if (other.end != null)
+        if(end == null) {
+            if(other.end != null)
                 return false;
-        } else if (!end.equals(other.end))
+        } else if(!end.equals(other.end))
             return false;
-        if (Double.doubleToLongBits(max) != Double.doubleToLongBits(other.max))
+        if(Double.doubleToLongBits(max) != Double.doubleToLongBits(other.max))
             return false;
-        if (Double.doubleToLongBits(min) != Double.doubleToLongBits(other.min))
+        if(Double.doubleToLongBits(min) != Double.doubleToLongBits(other.min))
             return false;
-        if (node == null) {
-            if (other.node != null)
+        if(node == null) {
+            if(other.node != null)
                 return false;
-        } else if (!node.equals(other.node))
+        } else if(!node.equals(other.node))
             return false;
-        if (start == null) {
-            if (other.start != null)
+        if(start == null) {
+            if(other.start != null)
                 return false;
-        } else if (!start.equals(other.start))
+        } else if(!start.equals(other.start))
             return false;
         return true;
     }
@@ -101,14 +105,12 @@ public class Graph implements WithACL {
         Date lastUpdate = node.getProbe().getLastUpdate();
         graphDef.comment("\\l");
         graphDef.comment("\\l");
-        graphDef.comment("Last update: " + 
-                lastUpdateFormat.format(lastUpdate) + "\\L");
+        graphDef.comment("Last update: " + lastUpdateFormat.format(lastUpdate) + "\\L");
         String unit = "SI";
-        if(! getGraphDesc().isSiUnit()) 
+        if(!getGraphDesc().isSiUnit())
             unit = "binary";
         graphDef.comment("Unit type: " + unit + "\\r");
-        graphDef.comment("Period from " + lastUpdateFormat.format(start) +
-                " to " + lastUpdateFormat.format(end) + "\\L");
+        graphDef.comment("Period from " + lastUpdateFormat.format(start) + " to " + lastUpdateFormat.format(end) + "\\L");
         graphDef.comment("Source type: " + node.getProbe().getSourceType() + "\\r");
     }
 
@@ -133,10 +135,9 @@ public class Graph implements WithACL {
         }
     }
 
-    protected void setGraphDefData(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei,
-            Map<String, ? extends Plottable> customData) {
+    protected void setGraphDefData(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData) {
         GraphDesc gd = getGraphDesc();
-        gd.fillGraphDef(graphDef, node.getProbe(), ei, customData);        
+        gd.fillGraphDef(graphDef, node.getProbe(), ei, customData);
     }
 
     protected GraphDesc getGraphDesc() {
@@ -144,15 +145,15 @@ public class Graph implements WithACL {
     }
 
     protected long getStartSec() {
-        return start.getTime()/1000;
+        return start.getTime() / 1000;
     }
 
     protected long getEndSec() {
-        return Util.endDate(node.getProbe(), end).getTime()/1000;
+        return Util.endDate(node.getProbe(), end).getTime() / 1000;
     }
 
     protected void finishGraphDef(RrdGraphDef graphDef) {
-        if( ! Double.isNaN(max) && ! Double.isNaN(min) ) {
+        if(!Double.isNaN(max) && !Double.isNaN(min)) {
             graphDef.setMaxValue(max);
             graphDef.setMinValue(min);
             graphDef.setRigid(true);
@@ -166,6 +167,7 @@ public class Graph implements WithACL {
 
     /**
      * Provide a RrdGraphDef with template resolved for the node
+     * 
      * @return a RrdGraphDef with some default values
      */
     public RrdGraphDef getEmptyGraphDef() {
@@ -199,11 +201,12 @@ public class Graph implements WithACL {
     }
 
     public String getPngName() {
-        return node.getName().replaceAll("/","_").replaceAll(" ","_") + ".png";
+        return node.getName().replaceAll("/", "_").replaceAll(" ", "_") + ".png";
     }
 
     /**
      * Return a uniq name for the graph
+     * 
      * @return
      */
     public String getQualifiedName() {
@@ -271,7 +274,7 @@ public class Graph implements WithACL {
      * @param end the end to set
      */
     public void setEnd(Date end) {
-        //We normalize the last update time, it can't be used directly
+        // We normalize the last update time, it can't be used directly
         this.end = Util.endDate(node.getProbe(), end);
     }
 
@@ -290,8 +293,9 @@ public class Graph implements WithACL {
     }
 
     /**
-     * Return the dimension calculated by the graph desc
-     * can (and should) be overridden with custom graph classes 
+     * Return the dimension calculated by the graph desc can (and should) be
+     * overridden with custom graph classes
+     * 
      * @return the dimension of the graphic object
      */
     public Dimension getDimension() {

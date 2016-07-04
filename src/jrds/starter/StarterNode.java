@@ -25,7 +25,7 @@ public abstract class StarterNode implements StartersSet {
     private int slowCollectTime = -1;
 
     public StarterNode() {
-        if (this instanceof HostsList) {
+        if(this instanceof HostsList) {
             root = (HostsList) this;
         }
     }
@@ -45,21 +45,21 @@ public abstract class StarterNode implements StartersSet {
             log(Level.TRACE, "thread is stopped", this);
             return false;
         }
-        if(parent != null && ! parent.isCollectRunning())
+        if(parent != null && !parent.isCollectRunning())
             return false;
         return started;
     }
 
     public boolean startCollect() {
-        if(parent != null && ! parent.isCollectRunning()) {
+        if(parent != null && !parent.isCollectRunning()) {
             log(Level.TRACE, "parent of %s prevent starting", this);
             return false;
         }
         if(allStarters != null) {
             log(Level.DEBUG, "Starting %d starters for %s", allStarters.size(), this);
             for(Starter s: allStarters.values()) {
-                //If collect is stopped while we're starting, drop it
-                if(parent != null && ! parent.isCollectRunning())
+                // If collect is stopped while we're starting, drop it
+                if(parent != null && !parent.isCollectRunning())
                     return false;
                 try {
                     s.doStart();
@@ -92,15 +92,15 @@ public abstract class StarterNode implements StartersSet {
     public Starter registerStarter(Starter s) {
         Object key = s.getKey();
         if(allStarters == null)
-            //Must be a linked hashed map, order of insertion might be important
+            // Must be a linked hashed map, order of insertion might be
+            // important
             allStarters = new LinkedHashMap<Object, Starter>(2);
-        if(! allStarters.containsKey(key)) {
+        if(!allStarters.containsKey(key)) {
             s.initialize(this);
             allStarters.put(key, s);
             log(Level.DEBUG, "registering %s with key %s", s.getClass().getName(), key);
             return s;
-        }
-        else {
+        } else {
             return allStarters.get(key);
         }
     }
@@ -108,13 +108,15 @@ public abstract class StarterNode implements StartersSet {
     /**
      * Called in the host list configuration, used to finished the configuration
      * of the starters
+     * 
      * @param pm the configuration
      */
     public void configureStarters(PropertiesManager pm) {
         if(allStarters == null)
             return;
 
-        // needed because started can failed (and be removed) or add other starters
+        // needed because started can failed (and be removed) or add other
+        // starters
         List<Map.Entry<Object, Starter>> buffer = new ArrayList<>(allStarters.entrySet());
         for(Map.Entry<Object, Starter> me: buffer) {
             try {
@@ -132,7 +134,7 @@ public abstract class StarterNode implements StartersSet {
             Method m = sc.getMethod("makeKey", StarterNode.class);
             key = m.invoke(null, this);
         } catch (NoSuchMethodException e) {
-            //Not an error, the key is the the class
+            // Not an error, the key is the the class
             key = sc.getName();
         } catch (Exception e) {
             log(Level.ERROR, e, "Error for %s with %s: %s", this, sc, e);
@@ -143,10 +145,12 @@ public abstract class StarterNode implements StartersSet {
 
     @SuppressWarnings("unchecked")
     public <StarterClass extends Starter> StarterClass find(String key) {
-        return (StarterClass) find(Starter.class, key);        
+        return (StarterClass) find(Starter.class, key);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.starter.StartersSet#find(java.lang.Object)
      */
     @Deprecated
@@ -163,13 +167,11 @@ public abstract class StarterNode implements StartersSet {
             Starter stemp = allStarters.get(key);
             if(sc.isInstance(stemp)) {
                 s = (StarterClass) stemp;
-            }
-            else {
+            } else {
                 log(Level.ERROR, "Starter key error, got a %s expecting a %s", stemp.getClass(), sc);
                 return null;
             }
-        }
-        else if(parent != null )
+        } else if(parent != null)
             s = parent.find(sc, key);
         else
             log(Level.DEBUG, "Starter class %s not found for key %s", sc.getName(), key);
@@ -197,10 +199,9 @@ public abstract class StarterNode implements StartersSet {
         return parent;
     }
 
-    //Compatibily code
+    // Compatibily code
     /**
-     * @deprecated
-     * Useless method, it return <code>this</code>
+     * @deprecated Useless method, it return <code>this</code>
      * @return
      */
     @Deprecated
@@ -209,8 +210,7 @@ public abstract class StarterNode implements StartersSet {
     }
 
     /**
-     * @deprecated
-     * Useless method, it return <code>this</code>
+     * @deprecated Useless method, it return <code>this</code>
      * @return
      */
     @Deprecated
@@ -223,16 +223,22 @@ public abstract class StarterNode implements StartersSet {
         setParent((StarterNode) s);
     }
 
-    /* (non-Javadoc)
-     * @see jrds.starter.StartersSet#registerStarter(jrds.starter.Starter, jrds.starter.StarterNode)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see jrds.starter.StartersSet#registerStarter(jrds.starter.Starter,
+     * jrds.starter.StarterNode)
      */
     @Deprecated
     public Starter registerStarter(Starter s, StarterNode parent) {
         return registerStarter(s);
     }
 
-    /* (non-Javadoc)
-     * @see jrds.starter.StartersSet#find(java.lang.Class, jrds.starter.StarterNode)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see jrds.starter.StartersSet#find(java.lang.Class,
+     * jrds.starter.StarterNode)
      */
     @Deprecated
     public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, StarterNode nope) {

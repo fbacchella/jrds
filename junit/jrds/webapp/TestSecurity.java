@@ -13,7 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class TestSecurity  {
+public class TestSecurity {
     static final private Logger logger = Logger.getLogger(TestSecurity.class);
 
     ServletTester tester = null;
@@ -41,7 +41,6 @@ public class TestSecurity  {
 
         tester.start();
     }
-
 
     @Test
     public void testStatus() throws Exception {

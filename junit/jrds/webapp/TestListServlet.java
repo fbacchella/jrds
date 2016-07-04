@@ -37,29 +37,28 @@ public class TestListServlet {
         Tools.setLevel(logger, Level.TRACE, Status.class.getName());
     }
 
-    @Test 
-    public void testListServlet() throws Exception
-    {
+    @Test
+    public void testListServlet() throws Exception {
         Properties config = new Properties();
-        config.put("tmpdir", new File(testFolder.getRoot(),"tmp").getCanonicalPath());
-        config.put("configdir", new File(testFolder.getRoot(),"config").getCanonicalPath());
+        config.put("tmpdir", new File(testFolder.getRoot(), "tmp").getCanonicalPath());
+        config.put("configdir", new File(testFolder.getRoot(), "config").getCanonicalPath());
         config.put("autocreate", "true");
-        config.put("rrddir", new File(testFolder.getRoot(),"rrd").getCanonicalPath());
-        if(! Boolean.parseBoolean(System.getProperty("maven"))) {
+        config.put("rrddir", new File(testFolder.getRoot(), "rrd").getCanonicalPath());
+        if(!Boolean.parseBoolean(System.getProperty("maven"))) {
             config.put("libspath", "desc");
         }
         System.out.println(System.getProperty("java.io.tmpdir"));
 
         ServletTester tester = ToolsWebApp.getTestServer(config);
-        File cwd = new File (".");
+        File cwd = new File(".");
 
-        URLClassLoader cl = new URLClassLoader(new URL[] {cwd.toURI().toURL()});
+        URLClassLoader cl = new URLClassLoader(new URL[] { cwd.toURI().toURL() });
         InputStream webxmlStream = cl.getResourceAsStream("web/WEB-INF/web.xml");
         JrdsDocument webxml = Tools.parseRessource(webxmlStream);
         for(JrdsElement n: new NodeListIterator<JrdsElement>(webxml, Tools.xpather.compile("/web-app/servlet/servlet-class"))) {
             String servletClassName = n.getTextContent().trim();
             @SuppressWarnings("unchecked")
-            Class< ? extends HttpServlet> sclass = (Class<? extends HttpServlet>) getClass().getClassLoader().loadClass(servletClassName);
+            Class<? extends HttpServlet> sclass = (Class<? extends HttpServlet>) getClass().getClassLoader().loadClass(servletClassName);
             tester.addServlet(sclass, "/" + sclass.getCanonicalName());
             logger.trace(sclass);
         }

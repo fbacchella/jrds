@@ -10,12 +10,14 @@ import java.net.SocketException;
 public class SocketFactory extends Starter {
 
     public ServerSocket createServerSocket(int port) throws IOException {
-        if(! isStarted())
+        if(!isStarted())
             return null;
 
         ServerSocket s = new ServerSocket(port) {
 
-            /* (non-Javadoc)
+            /*
+             * (non-Javadoc)
+             * 
              * @see java.net.ServerSocket#accept()
              */
             @Override
@@ -31,7 +33,7 @@ public class SocketFactory extends Starter {
     }
 
     public Socket createSocket(String host, int port) throws IOException {
-        if(! isStarted())
+        if(!isStarted())
             return null;
 
         Socket s = getSocket();
@@ -41,11 +43,11 @@ public class SocketFactory extends Starter {
     }
 
     public Socket createSocket(StarterNode host, int port) throws IOException {
-        if(! isStarted())
+        if(!isStarted())
             return null;
 
         Resolver r = host.find(Resolver.class);
-        if(r == null || ! r.isStarted())
+        if(r == null || !r.isStarted())
             return null;
 
         Socket s = getSocket();
@@ -54,7 +56,7 @@ public class SocketFactory extends Starter {
     }
 
     public Socket createSocket() throws IOException {
-        if(! isStarted())
+        if(!isStarted())
             return null;
         return getSocket();
     }
@@ -66,8 +68,7 @@ public class SocketFactory extends Starter {
             }
 
             @Override
-            public void connect(SocketAddress endpoint, int timeout)
-                    throws IOException {
+            public void connect(SocketAddress endpoint, int timeout) throws IOException {
                 super.connect(endpoint, getTimeout() * 1000);
             }
         };

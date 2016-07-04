@@ -19,14 +19,15 @@ import org.snmp4j.smi.OID;
 
 /**
  * A class to probe info about a process, using MIB-II
- * @author Fabrice Bacchella 
+ * 
+ * @author Fabrice Bacchella
  */
-@ProbeBean({"index",  "pattern"})
+@ProbeBean({ "index", "pattern" })
 public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
     static final private OID hrSWRunPath = new OID(".1.3.6.1.2.1.25.4.2.1.4");
     static final private OID hrSWRunParameters = new OID(".1.3.6.1.2.1.25.4.2.1.5");
     static final private OID hrSWRunPerfMem = new OID(".1.3.6.1.2.1.25.5.1.1.2");
-    static final private OID  hrSWRunPerfCPU = new OID(".1.3.6.1.2.1.25.5.1.1.1");
+    static final private OID hrSWRunPerfCPU = new OID(".1.3.6.1.2.1.25.5.1.1.1");
     static final private String MIN = "Minimum";
     static final private String MAX = "Maximum";
     static final private String AVERAGE = "Average";
@@ -34,7 +35,6 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
     static final private String CPU = "Cpu";
 
     private Pattern pattern = Pattern.compile("^$");
-
 
     /**
      * @param indexName
@@ -72,9 +72,9 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
 
     public Collection<int[]> getProcsOID() {
         boolean found = false;
-        Collection<OID> soidSet= getIndexSet();
+        Collection<OID> soidSet = getIndexSet();
 
-        Collection<int[]>  oids = new HashSet<int[]>();
+        Collection<int[]> oids = new HashSet<int[]>();
         TabularIterator ti = new TabularIterator(getConnection(), soidSet);
         for(SnmpVars s: ti) {
             List<OID> lk = new ArrayList<OID>(s.keySet());
@@ -91,18 +91,19 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
                 found = true;
             }
         }
-        if(! found) {
+        if(!found) {
             log(Level.ERROR, "index for %s not found for host %s", indexKey, getHost().getName());
             oids = Collections.emptySet();
-        }
-        else {
+        } else {
             log(Level.DEBUG, "found %d processes", oids.size());
             log(Level.TRACE, "processes indexes found: %s", oids);
         }
         return oids;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#modifySample(org.rrd4j.core.Sample, java.util.Map)
      */
     @Override
@@ -116,14 +117,13 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
         for(Map.Entry<OID, Object> e: snmpVars.entrySet()) {
             OID oid = e.getKey();
             if(oid.startsWith(hrSWRunPerfMem)) {
-                double value = ((Number)e.getValue()).doubleValue() * 1024;
+                double value = ((Number) e.getValue()).doubleValue() * 1024;
                 max = Math.max(max, value);
                 min = Math.min(min, value);
                 average += value;
                 nbvalue++;
-            }
-            else if(oid.startsWith(hrSWRunPerfCPU)) {
-                cpuUsed += ((Number)e.getValue()).doubleValue() / 100.0;
+            } else if(oid.startsWith(hrSWRunPerfCPU)) {
+                cpuUsed += ((Number) e.getValue()).doubleValue() / 100.0;
             }
         }
         average /= nbvalue;
@@ -131,10 +131,12 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
         oneSample.put(MAX, max);
         oneSample.put(MIN, min);
         oneSample.put(AVERAGE, average);
-        oneSample.put(CPU, cpuUsed);		
+        oneSample.put(CPU, cpuUsed);
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.probe.snmp.SnmpProbe#getSuffixLength()
      */
     @Override
@@ -157,4 +159,3 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
     }
 
 }
-

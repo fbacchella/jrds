@@ -19,19 +19,19 @@ public abstract class AbstractStore<StoreObject> implements Store {
 
     @Override
     public abstract void commit(JrdsSample sample);
-    
+
     @Override
     public abstract Map<String, Number> getLastValues();
-    
+
     @Override
     public abstract boolean checkStoreFile(ArchivesSet archives);
-    
+
     @Override
     public abstract Date getLastUpdate();
-    
+
     @Override
     public abstract StoreObject getStoreObject();
-    
+
     @Override
     public abstract void closeStoreObject(Object object);
 

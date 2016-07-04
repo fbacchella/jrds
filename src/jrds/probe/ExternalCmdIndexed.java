@@ -2,10 +2,10 @@ package jrds.probe;
 
 import jrds.factories.ProbeBean;
 
-@ProbeBean({"node"})
+@ProbeBean({ "node" })
 public class ExternalCmdIndexed extends ExternalCmdProbe implements IndexedProbe {
     private String node;
-    
+
     /**
      * @return the host
      */

@@ -19,10 +19,13 @@ public class AutoGraph extends GraphNode {
     static int i;
     Operation op;
 
-    public AutoGraph(Probe<?,?> theStore, Operation op) {
+    public AutoGraph(Probe<?, ?> theStore, Operation op) {
         super(theStore, new GraphDesc() {
             String name = "autograph" + i++;
-            /* (non-Javadoc)
+
+            /*
+             * (non-Javadoc)
+             * 
              * @see jrds.GraphDesc#getGraphName()
              */
             @Override
@@ -30,19 +33,20 @@ public class AutoGraph extends GraphNode {
                 return name;
             }
 
-
         });
         GraphDesc gd = this.getGraphDesc();
         gd.setGraphName(theStore.getName());
         gd.setGraphTitle(theStore.getName());
         gd.setName(theStore.getName());
-        gd.setTree(PropertiesManager.HOSTSTAB, Arrays.<Object>asList(GraphDesc.TITLE));
+        gd.setTree(PropertiesManager.HOSTSTAB, Arrays.<Object> asList(GraphDesc.TITLE));
         logger.debug(this.getQualifiedName());
         this.op = op;
 
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.GraphNode#getGraph()
      */
     @Override

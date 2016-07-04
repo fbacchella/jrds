@@ -34,9 +34,9 @@ public abstract class JrdsServlet extends HttpServlet {
                 return true;
             if(logger.isTraceEnabled()) {
                 logger.trace("Checking if roles " + params.getRoles() + " in roles " + roles);
-                logger.trace("Disjoint: " +  Collections.disjoint(roles, params.getRoles()));
+                logger.trace("Disjoint: " + Collections.disjoint(roles, params.getRoles()));
             }
-            return ! Collections.disjoint(roles, params.getRoles());
+            return !Collections.disjoint(roles, params.getRoles());
         }
         return true;
     }
@@ -44,7 +44,7 @@ public abstract class JrdsServlet extends HttpServlet {
     protected boolean allowed(ParamsBean params, ACL acl, HttpServletRequest req, HttpServletResponse res) {
         if(getPropertiesManager().security) {
             logger.trace(jrds.Util.delayedFormatString("Looking if ACL %s allow access to %s", acl, req.getServletPath()));
-            if( ! acl.check(params) ) {
+            if(!acl.check(params)) {
                 res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return false;
             }

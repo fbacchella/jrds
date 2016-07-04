@@ -24,13 +24,15 @@ public class ContainerProbe extends Probe<Object, Number> {
         public String getName() {
             return "ContainerProbeDesc";
         }
+
         @Override
-        public Class<? extends Probe<?,?>> getProbeClass() {
+        public Class<? extends Probe<?, ?>> getProbeClass() {
             return ContainerProbe.class;
         }
+
         public String getProbeName() {
             return "ContainerProbeDesc";
-        }	
+        }
     };
 
     public ContainerProbe(String name) {
@@ -45,7 +47,7 @@ public class ContainerProbe extends Probe<Object, Number> {
         this.monitoredHost = monitoredHost;
     }
 
-    //An array list is needed, the introspection is picky
+    // An array list is needed, the introspection is picky
     public void configure(String name, ArrayList<String> graphList) {
         log(Level.DEBUG, "new container: %s", name);
         setName(name);
@@ -71,25 +73,30 @@ public class ContainerProbe extends Probe<Object, Number> {
 
     /**
      * This method does nothing for a virtual probe
+     * 
      * @see jrds.Probe#collect()
      */
     public void collect() {
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#getQualifiedName()
      */
     @Override
     public String getQualifiedName() {
-        return "/"  + getName();
+        return "/" + getName();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.Probe#getMainStore()
      */
     @Override
     public Store getMainStore() {
-        return new Store(){
+        return new Store() {
 
             @Override
             public void commit(JrdsSample sample) {
@@ -116,7 +123,7 @@ public class ContainerProbe extends Probe<Object, Number> {
             }
 
             @Override
-            public void closeStoreObject(Object object) {                
+            public void closeStoreObject(Object object) {
             }
 
             @Override

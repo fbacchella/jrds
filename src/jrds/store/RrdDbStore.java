@@ -48,13 +48,13 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     }
 
     public String getPath() {
-        String rrdName = p.getName().replaceAll("/","_");
-        return p.getHost().getHostDir() +
-                Util.getFileSeparator() + rrdName + ".rrd";
+        String rrdName = p.getName().replaceAll("/", "_");
+        return p.getHost().getHostDir() + Util.getFileSeparator() + rrdName + ".rrd";
     }
 
     /**
      * Create the probe file
+     * 
      * @throws IOException
      */
     protected void create(ArchivesSet archives) throws IOException {
@@ -67,7 +67,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     private void upgrade(ArchivesSet archives) {
         RrdDb rrdSource = null;
         try {
-            log(Level.WARN,"Definition is changed, the store needs to be upgraded");
+            log(Level.WARN, "Definition is changed, the store needs to be upgraded");
             File source = new File(getPath());
             rrdSource = new RrdDb(source.getCanonicalPath());
 
@@ -76,48 +76,47 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
             rrdDef.setPath(dest.getCanonicalPath());
             RrdDb rrdDest = new RrdDb(rrdDef);
 
-            log(Level.DEBUG, "updating %s to %s",source, dest);
+            log(Level.DEBUG, "updating %s to %s", source, dest);
 
             Set<String> badDs = new HashSet<String>();
             Header header = rrdSource.getHeader();
-            int dsCount = header.getDsCount();;
+            int dsCount = header.getDsCount();
+            ;
             header.copyStateTo(rrdDest.getHeader());
-            for (int i = 0; i < dsCount; i++) {
+            for(int i = 0; i < dsCount; i++) {
                 Datasource srcDs = rrdSource.getDatasource(i);
                 String dsName = srcDs.getName();
                 Datasource dstDS = rrdDest.getDatasource(dsName);
-                if (dstDS != null ) {
+                if(dstDS != null) {
                     try {
                         srcDs.copyStateTo(dstDS);
                         log(Level.TRACE, "Update %s", dsName);
                     } catch (RuntimeException e) {
                         badDs.add(dsName);
-                        log(Level.ERROR, e, "Datasource %s can't be upgraded: %s", dsName,  e.getMessage());
+                        log(Level.ERROR, e, "Datasource %s can't be upgraded: %s", dsName, e.getMessage());
                     }
                 }
             }
             int robinMigrated = 0;
-            for (int i = 0; i < rrdSource.getArcCount(); i++) {
+            for(int i = 0; i < rrdSource.getArcCount(); i++) {
                 Archive srcArchive = rrdSource.getArchive(i);
                 ConsolFun consolFun = srcArchive.getConsolFun();
                 int steps = srcArchive.getSteps();
                 Archive dstArchive = rrdDest.getArchive(consolFun, steps);
-                if (dstArchive != null) {
-                    if ( dstArchive.getConsolFun().equals(srcArchive.getConsolFun())  &&
-                            dstArchive.getSteps() == srcArchive.getSteps() ) {
-                        for (int k = 0; k < dsCount; k++) {
+                if(dstArchive != null) {
+                    if(dstArchive.getConsolFun().equals(srcArchive.getConsolFun()) && dstArchive.getSteps() == srcArchive.getSteps()) {
+                        for(int k = 0; k < dsCount; k++) {
                             Datasource srcDs = rrdSource.getDatasource(k);
                             String dsName = srcDs.getName();
                             try {
                                 int j = rrdDest.getDsIndex(dsName);
-                                if (j >= 0 && ! badDs.contains(dsName)) {
+                                if(j >= 0 && !badDs.contains(dsName)) {
                                     log(Level.TRACE, "Upgrade of %s from %s", dsName, srcArchive);
                                     srcArchive.getArcState(k).copyStateTo(dstArchive.getArcState(j));
                                     srcArchive.getRobin(k).copyStateTo(dstArchive.getRobin(j));
                                     robinMigrated++;
                                 }
-                            }
-                            catch (IllegalArgumentException e) {
+                            } catch (IllegalArgumentException e) {
                                 log(Level.TRACE, "Datastore %s removed", dsName);
                             }
 
@@ -134,8 +133,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
             copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
         } catch (IOException e) {
             log(Level.ERROR, e, "Upgrade failed: %s", e);
-        }
-        finally {
+        } finally {
             if(rrdSource != null)
                 try {
                     rrdSource.close();
@@ -144,22 +142,21 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
         }
     }
 
-    private static void copyFile(String sourcePath, String destPath)
-            throws IOException {
+    private static void copyFile(String sourcePath, String destPath) throws IOException {
         File source = new File(sourcePath);
         File dest = new File(destPath);
         File destOld = new File(destPath + ".old");
-        if (!dest.renameTo(destOld)) {
+        if(!dest.renameTo(destOld)) {
             throw new IOException("Could not rename file " + destPath + " from " + destOld);
         }
-        if (!source.renameTo(dest)) {
+        if(!source.renameTo(dest)) {
             throw new IOException("Could not rename file " + destPath + " from " + sourcePath);
         }
         deleteFile(destOld);
     }
 
     private static void deleteFile(File file) throws IOException {
-        if (file.exists() && !file.delete()) {
+        if(file.exists() && !file.delete()) {
             throw new IOException("Could not delete file: " + file.getCanonicalPath());
         }
     }
@@ -168,8 +165,8 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
         File rrdFile = new File(getPath());
 
         File rrdDir = p.getHost().getHostDir();
-        if (!rrdDir.isDirectory()) {
-            if( ! rrdDir.mkdir()) {
+        if(!rrdDir.isDirectory()) {
+            if(!rrdDir.mkdir()) {
                 try {
                     log(Level.ERROR, "prode dir %s creation failed ", rrdDir.getCanonicalPath());
                 } catch (IOException e) {
@@ -181,9 +178,9 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
         boolean retValue = false;
         RrdDb rrdDb = null;
         try {
-            if ( rrdFile.isFile() ) {
+            if(rrdFile.isFile()) {
                 rrdDb = new RrdDb(getPath());
-                //old definition
+                // old definition
                 RrdDef tmpdef = rrdDb.getRrdDef();
                 Date startTime = new Date();
                 tmpdef.setStartTime(startTime);
@@ -191,17 +188,16 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 long oldstep = tmpdef.getStep();
                 log(Level.TRACE, "Definition found: %s\n", oldDef);
 
-                //new definition
+                // new definition
                 tmpdef = getRrdDef(archives);
                 tmpdef.setStartTime(startTime);
                 String newDef = tmpdef.dump();
                 long newstep = tmpdef.getStep();
 
-                if(newstep != oldstep ) {
-                    log(Level.ERROR, "step changed, you're in trouble" );
+                if(newstep != oldstep) {
+                    log(Level.ERROR, "step changed, you're in trouble");
                     return false;
-                }
-                else if(! newDef.equals(oldDef)) {
+                } else if(!newDef.equals(oldDef)) {
                     rrdDb.close();
                     rrdDb = null;
                     upgrade(archives);
@@ -213,8 +209,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
             retValue = true;
         } catch (Exception e) {
             log(Level.ERROR, e, "Store %s unusable: %s", getPath(), e);
-        }
-        finally {
+        } finally {
             if(rrdDb != null)
                 try {
                     rrdDb.close();
@@ -227,6 +222,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
 
     /**
      * Return the date of the last update of the rrd backend
+     * 
      * @return The date
      */
     public Date getLastUpdate() {
@@ -237,8 +233,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
             lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
         } catch (Exception e) {
             throw new RuntimeException("Unable to get last update date for " + p.getQualifiedName(), e);
-        }
-        finally {
+        } finally {
             if(rrdDb != null)
                 factory.releaseRrd(rrdDb);
         }
@@ -256,19 +251,21 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
 
         return new jrds.store.AbstractExtractor<FetchData>() {
             boolean released = false;
-            
+
             public void release() {
                 factory.releaseRrd(rrdDb);
                 released = true;
             }
-            
-            /* (non-Javadoc)
+
+            /*
+             * (non-Javadoc)
+             * 
              * @see java.lang.Object#finalize()
              */
             @Override
             protected void finalize() throws Throwable {
-                if(! released) {
-                    log(Level.WARN,"%s was not release properly", rrdDb.getCanonicalPath());
+                if(!released) {
+                    log(Level.WARN, "%s was not release properly", rrdDb.getCanonicalPath());
                     factory.releaseRrd(rrdDb);
                     released = true;
                 }
@@ -308,13 +305,12 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
         try {
             rrdDb = factory.getRrd(getPath());
             String[] dsNames = rrdDb.getDsNames();
-            for(int i = 0; i < dsNames.length ; i ++) {
+            for(int i = 0; i < dsNames.length; i++) {
                 retValues.put(dsNames[i], rrdDb.getDatasource(i).getLastValue());
             }
         } catch (Exception e) {
             log(Level.ERROR, e, "Unable to get last values: %s", e.getMessage());
-        }
-        finally {
+        } finally {
             if(rrdDb != null)
                 factory.releaseRrd(rrdDb);
         }
@@ -334,8 +330,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
             onesample.update();
         } catch (IOException e) {
             log(Level.ERROR, e, "Error while collecting: %s", e.getMessage());
-        }            
-        finally  {
+        } finally {
             if(rrdDb != null)
                 factory.releaseRrd(rrdDb);
         }

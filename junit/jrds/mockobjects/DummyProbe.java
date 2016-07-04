@@ -21,16 +21,16 @@ import org.rrd4j.DsType;
 
 public class DummyProbe extends Probe<String, Number> {
 
-    Class<? extends Probe<?,?>> originalProbe;
+    Class<? extends Probe<?, ?>> originalProbe;
 
-    public void configure(Class<? extends Probe<?,?>> originalProbe) throws InvocationTargetException {
+    public void configure(Class<? extends Probe<?, ?>> originalProbe) throws InvocationTargetException {
         this.originalProbe = originalProbe;
         configure();
     }
 
     public void configure() throws InvocationTargetException {
         Map<String, String> empty = Collections.emptyMap();
-        setMainStore( new RrdDbStoreFactory(), empty);
+        setMainStore(new RrdDbStoreFactory(), empty);
         ProbeDesc pd = new ProbeDesc();
         pd.setName("DummyProbe");
         pd.setProbeName("dummyprobe");

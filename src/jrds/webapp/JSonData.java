@@ -18,7 +18,8 @@ public abstract class JSonData extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(JSonData.class);
 
     /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+     *      response)
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
@@ -31,7 +32,7 @@ public abstract class JSonData extends JrdsServlet {
             w.key("items");
             w.array();
             w.newLine();
-            if (! generate(w, root, params)) {
+            if(!generate(w, root, params)) {
                 logger.warn("Invalid request received: " + request.getRequestURI() + "?" + request.getQueryString());
             }
             w.endArray();
@@ -39,7 +40,7 @@ public abstract class JSonData extends JrdsServlet {
             w.newLine();
             w.flush();
         } catch (Exception e) {
-            logger.warn("Failed request: " + request.getRequestURI() + "?" + request.getQueryString() +": " + e, e);
+            logger.warn("Failed request: " + request.getRequestURI() + "?" + request.getQueryString() + ": " + e, e);
         }
     }
 
@@ -49,7 +50,7 @@ public abstract class JSonData extends JrdsServlet {
         return doTree(w, name, Integer.toString(id), type, childsref, null);
     }
 
-    public JrdsJSONWriter doTree(JrdsJSONWriter w,String name, int id, String type, List<String> childsref, Map<String, ?> attributes) throws JSONException {
+    public JrdsJSONWriter doTree(JrdsJSONWriter w, String name, int id, String type, List<String> childsref, Map<String, ?> attributes) throws JSONException {
         return doTree(w, name, Integer.toString(id), type, childsref, attributes);
     }
 
@@ -70,14 +71,14 @@ public abstract class JSonData extends JrdsServlet {
                 if(e.getValue() instanceof String) {
                     String value = (String) e.getValue();
                     w.value(value.replace("'", " "));
-                } else if(e.getValue() instanceof Map<?,?>) {
-                    w.map((Map<?,?>)e.getValue());
+                } else if(e.getValue() instanceof Map<?, ?>) {
+                    w.map((Map<?, ?>) e.getValue());
                 } else {
                     w.value(e.getValue());
                 }
             }
         }
-        if(childsref != null && childsref.size() >0 ) {
+        if(childsref != null && childsref.size() > 0) {
             w.key("children").array();
             for(String child: childsref) {
                 w.object().key("_reference").value(child).endObject();

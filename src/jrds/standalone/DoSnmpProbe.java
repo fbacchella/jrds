@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
 import org.snmp4j.smi.OID;
 
-public class DoSnmpProbe  extends CommandStarterImpl {
+public class DoSnmpProbe extends CommandStarterImpl {
     static final private Logger logger = Logger.getLogger(DoSnmpProbe.class);
     static final Pattern oidPattern = Pattern.compile("^(.\\d+)+$");
     static final Pattern namePattern = Pattern.compile("^(.+)\\s+OBJECT-TYPE$");
@@ -35,6 +35,7 @@ public class DoSnmpProbe  extends CommandStarterImpl {
 
     static final Map<String, Method> argstomethod = new HashMap<String, Method>();
     static final Map<String, Method> typeMapper = new HashMap<String, Method>();
+
     static {
         try {
             argstomethod.put("name", ProbeDesc.class.getMethod("setName", String.class));
@@ -55,7 +56,7 @@ public class DoSnmpProbe  extends CommandStarterImpl {
     private OidInfo translate(String oidstring) throws IOException {
         OidInfo info = new OidInfo();
 
-        Process p = Runtime.getRuntime().exec(new String[] {"snmptranslate", "-Td", "-On", oidstring});
+        Process p = Runtime.getRuntime().exec(new String[] { "snmptranslate", "-Td", "-On", oidstring });
         InputStreamReader isr = new InputStreamReader(p.getInputStream());
         BufferedReader r = new BufferedReader(isr);
         String line = r.readLine();
@@ -65,11 +66,9 @@ public class DoSnmpProbe  extends CommandStarterImpl {
             if(oidPattern.matcher(line.trim()).matches()) {
                 String oidString = line.substring(1);
                 info.oid = new OID(oidString);
-            }
-            else if(nameMatcher.matches()) {
+            } else if(nameMatcher.matches()) {
                 info.name = nameMatcher.group(1);
-            }
-            else if(syntaxMatcher.matches()) {
+            } else if(syntaxMatcher.matches()) {
                 String syntax = syntaxMatcher.group(1);
                 if("counter".matches(syntax.toLowerCase()))
                     info.type = DsType.COUNTER;
@@ -89,38 +88,33 @@ public class DoSnmpProbe  extends CommandStarterImpl {
         ProbeDesc pd = new ProbeDesc();
         pd.setProbeClass(jrds.probe.snmp.RdsSnmpSimple.class);
         boolean indexed = false;
-        for(int i=0; i < args.length ; i++) {
+        for(int i = 0; i < args.length; i++) {
             String cmd = args[i];
             if("--specific".equals(cmd.toLowerCase())) {
                 for(String specargs: args[++i].split(",")) {
                     String[] specinfo = specargs.split("=");
                     pd.addSpecific(specinfo[0], specinfo[1]);
                 }
-            }
-            else if("--index".equals(cmd.toLowerCase())) { 
+            } else if("--index".equals(cmd.toLowerCase())) {
                 OidInfo info = translate(args[++i]);
 
                 pd.setProbeClass(jrds.probe.snmp.RdsIndexedSnmpRrd.class);
                 pd.addSpecific(RdsIndexedSnmpRrd.INDEXOIDNAME, info.oid.toString());
                 indexed = true;
-            }
-            else if("--probeclass".equals(cmd.toLowerCase())) {
+            } else if("--probeclass".equals(cmd.toLowerCase())) {
                 Class<?> c = Class.forName(args[++i]);
                 pd.setProbeClass((Class<? extends Probe<?, ?>>) c);
-            }
-            else if("--graphs".equals(cmd.toLowerCase())) {
+            } else if("--graphs".equals(cmd.toLowerCase())) {
                 String graphsList = args[++i];
-                for(String g: graphsList.split(","))  {
+                for(String g: graphsList.split(",")) {
                     pd.addGraph(g.trim());
                 }
-            }
-            else if("--collect".equals(cmd.toLowerCase())) {
+            } else if("--collect".equals(cmd.toLowerCase())) {
                 for(String collectarg: args[++i].split(",")) {
                     OidInfo info = translate(collectarg);
                     pd.add(info.name, info.type, info.oid);
                 }
-            }
-            else if(cmd.startsWith("--") ) {
+            } else if(cmd.startsWith("--")) {
                 String key = cmd.replace("--", "").toLowerCase();
                 Object arg = args[++i];
                 Method m = argstomethod.get(key);
@@ -130,7 +124,7 @@ public class DoSnmpProbe  extends CommandStarterImpl {
                 m.invoke(pd, arg);
             }
         }
-        if( ! indexed)
+        if(!indexed)
             pd.addSpecific(RdsSnmpSimple.REQUESTERNAME, "simple");
 
         Map<String, String> prop = new HashMap<String, String>();

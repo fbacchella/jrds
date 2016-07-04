@@ -28,7 +28,7 @@ public class Configuration {
         oldConfig.stop();
         newConfig.start();
         conf = newConfig;
-        //Avoid a memory leak in perm gen
+        // Avoid a memory leak in perm gen
         java.beans.Introspector.flushCaches();
         logger.info("Configuration rescaned");
         return conf;
@@ -51,10 +51,11 @@ public class Configuration {
     }
 
     private void start() {
-        //If in read-only mode, no scheduler
+        // If in read-only mode, no scheduler
         if(propertiesManager.readonly)
             return;
-        // Add a shutdown hook, the shutdown signal might be send before the listener is stopped
+        // Add a shutdown hook, the shutdown signal might be send before the
+        // listener is stopped
         shutDownHook = new Thread("Collect-Shutdown") {
             @Override
             public void run() {
@@ -70,19 +71,19 @@ public class Configuration {
     private void stop() {
         hostsList.stop();
         Thread.yield();
-        //We don't care if it failed, just try
+        // We don't care if it failed, just try
         try {
             if(shutDownHook != null)
                 Runtime.getRuntime().removeShutdownHook(shutDownHook);
         } catch (Exception e1) {
         }
-        //Everything is stopped, wait for collect termination
+        // Everything is stopped, wait for collect termination
         try {
             for(Timer t: hostsList.getTimers()) {
                 t.lockCollect();
             }
             for(Timer t: hostsList.getTimers()) {
-                //Release it, it will not restart
+                // Release it, it will not restart
                 t.releaseCollect();
             }
         } catch (InterruptedException e) {
@@ -91,7 +92,7 @@ public class Configuration {
             sf.stop();
         }
         if(hostsList.getRenderer() != null) {
-            hostsList.getRenderer().finish();            
+            hostsList.getRenderer().finish();
         }
         propertiesManager.defaultStore.stop();
     }

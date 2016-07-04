@@ -24,106 +24,107 @@ import org.rrd4j.DsType;
 import org.rrd4j.core.Util;
 
 public class Full {
-	static final long SEED = 1909752002L;
-	static final Random RANDOM = new Random(SEED);
-	static final String FILE = "fullmock";
+    static final long SEED = 1909752002L;
+    static final Random RANDOM = new Random(SEED);
+    static final String FILE = "fullmock";
 
-	static public final long START = Util.getTimestamp(2003, 4, 1);
-	static public final long END = Util.getTimestamp(2003, 5, 1);
-	static public final int STEP = 300;
+    static public final long START = Util.getTimestamp(2003, 4, 1);
+    static public final long END = Util.getTimestamp(2003, 5, 1);
+    static public final int STEP = 300;
 
-	static final int IMG_WIDTH = 500;
-	static final int IMG_HEIGHT = 300;
-	
-	static public ProbeDesc getPd() {
-		ProbeDesc pd = new ProbeDesc();
-		
-		Map<String, Object> dsMap = new HashMap<String, Object>();
-		dsMap.put("dsName", "sun");
-		dsMap.put("dsType", DsType.GAUGE);
-		pd.add(dsMap);
-		
-		dsMap.clear();
-		dsMap.put("dsName", "shade");
-		dsMap.put("dsType", DsType.GAUGE);
-		pd.add(dsMap);
+    static final int IMG_WIDTH = 500;
+    static final int IMG_HEIGHT = 300;
 
-		pd.setName(FILE);
-		pd.setProbeName(FILE);
+    static public ProbeDesc getPd() {
+        ProbeDesc pd = new ProbeDesc();
 
-		return pd;
-	}
-	
-	static public GraphDesc getGd() {
-		GraphDesc gd = new GraphDesc();
+        Map<String, Object> dsMap = new HashMap<String, Object>();
+        dsMap.put("dsName", "sun");
+        dsMap.put("dsType", DsType.GAUGE);
+        pd.add(dsMap);
 
-		gd.add("sun", null, GraphDesc.LINE.toString(), "green", null, null, null, null, null, null, null);
-		gd.add("shade", null, GraphDesc.LINE.toString(), "blue", null, null, null, null, null, null, null);
-		gd.add("median", "sun,shade,+,2,/", GraphDesc.LINE.toString(), "magenta", null, null, null, null, null, null, null);
-		gd.add("diff", "sun,shade,-,ABS,-1,*", GraphDesc.AREA.toString(), "yellow", null, null, null, null, null, null, null);
+        dsMap.clear();
+        dsMap.put("dsName", "shade");
+        dsMap.put("dsType", DsType.GAUGE);
+        pd.add(dsMap);
 
-		gd.setGraphTitle("Temperatures in May 2003");
-		gd.setVerticalLabel("temperature");
-		return gd;
-	}
-	
-	static public Probe<?,?> getProbe() throws InvocationTargetException {
-		Probe<?,?> p = new Probe<String, Number>() {
+        pd.setName(FILE);
+        pd.setProbeName(FILE);
 
-			@Override
-			public Map<String, Number> getNewSampleValues() {
-				return Collections.emptyMap();
-			}
+        return pd;
+    }
 
-			@Override
-			public String getSourceType() {
-				return "fullmoke";
-			}
-		};
-		Map<String, String> empty = Collections.emptyMap();
-		p.setMainStore(new jrds.store.RrdDbStoreFactory(), empty);
-		p.setPd(getPd());
-		return p;
+    static public GraphDesc getGd() {
+        GraphDesc gd = new GraphDesc();
 
-	}
-	static public Probe<?,?> create(TemporaryFolder testFolder, int step) throws InvocationTargetException {
-		HostInfo host = new HostInfo("Empty");
-		host.setHostDir(testFolder.getRoot());
-		
-		Probe<?,?> p = getProbe();
-		p.setHost(new HostStarter(host));
-		p.setStep(step);
-		
-		Assert.assertTrue("Fail creating probe", p.checkStore());
-		
-		return p;
-	}
+        gd.add("sun", null, GraphDesc.LINE.toString(), "green", null, null, null, null, null, null, null);
+        gd.add("shade", null, GraphDesc.LINE.toString(), "blue", null, null, null, null, null, null, null);
+        gd.add("median", "sun,shade,+,2,/", GraphDesc.LINE.toString(), "magenta", null, null, null, null, null, null, null);
+        gd.add("diff", "sun,shade,-,ABS,-1,*", GraphDesc.AREA.toString(), "yellow", null, null, null, null, null, null, null);
 
-	static public long fill(Probe<?,?> p) throws IOException {
-		long start = System.currentTimeMillis() / 1000;
-		long end = start + 3600 * 24 * 30;
+        gd.setGraphTitle("Temperatures in May 2003");
+        gd.setVerticalLabel("temperature");
+        return gd;
+    }
 
-		// update database
-		GaugeSource sunSource = new GaugeSource(1200, 20);
-		GaugeSource shadeSource = new GaugeSource(300, 10);
-		long t = start;
-		
-		//Keep an handle to the object, for faster run
-		Object o = p.getMainStore().getStoreObject();
+    static public Probe<?, ?> getProbe() throws InvocationTargetException {
+        Probe<?, ?> p = new Probe<String, Number>() {
 
-		while (t <= end + 86400L) {
-	        JrdsSample sample = p.newSample();
-		    sample.setTime(new Date(t * 1000));
-			sample.put("sun", sunSource.getValue());
-			sample.put("shade", shadeSource.getValue());
-			p.getMainStore().commit(sample);
-			t += RANDOM.nextDouble() * STEP + 1;
-		}
-		p.getMainStore().closeStoreObject(o);
-		return t;
-	}
-	
-	static public Period getPeriod(Probe<?,?> p, long endSec) {
+            @Override
+            public Map<String, Number> getNewSampleValues() {
+                return Collections.emptyMap();
+            }
+
+            @Override
+            public String getSourceType() {
+                return "fullmoke";
+            }
+        };
+        Map<String, String> empty = Collections.emptyMap();
+        p.setMainStore(new jrds.store.RrdDbStoreFactory(), empty);
+        p.setPd(getPd());
+        return p;
+
+    }
+
+    static public Probe<?, ?> create(TemporaryFolder testFolder, int step) throws InvocationTargetException {
+        HostInfo host = new HostInfo("Empty");
+        host.setHostDir(testFolder.getRoot());
+
+        Probe<?, ?> p = getProbe();
+        p.setHost(new HostStarter(host));
+        p.setStep(step);
+
+        Assert.assertTrue("Fail creating probe", p.checkStore());
+
+        return p;
+    }
+
+    static public long fill(Probe<?, ?> p) throws IOException {
+        long start = System.currentTimeMillis() / 1000;
+        long end = start + 3600 * 24 * 30;
+
+        // update database
+        GaugeSource sunSource = new GaugeSource(1200, 20);
+        GaugeSource shadeSource = new GaugeSource(300, 10);
+        long t = start;
+
+        // Keep an handle to the object, for faster run
+        Object o = p.getMainStore().getStoreObject();
+
+        while (t <= end + 86400L) {
+            JrdsSample sample = p.newSample();
+            sample.setTime(new Date(t * 1000));
+            sample.put("sun", sunSource.getValue());
+            sample.put("shade", shadeSource.getValue());
+            p.getMainStore().commit(sample);
+            t += RANDOM.nextDouble() * STEP + 1;
+        }
+        p.getMainStore().closeStoreObject(o);
+        return t;
+    }
+
+    static public Period getPeriod(Probe<?, ?> p, long endSec) {
         Date end = org.rrd4j.core.Util.getDate(endSec);
         Calendar calBegin = Calendar.getInstance();
         calBegin.setTime(end);
@@ -138,29 +139,29 @@ public class Full {
         } catch (ParseException e) {
         }
         return pr;
-	}
-	
-	static class GaugeSource {
-		private double value;
-		private double step;
+    }
 
-		GaugeSource(double value, double step) {
-			this.value = value;
-			this.step = step;
-		}
+    static class GaugeSource {
+        private double value;
+        private double step;
 
-		long getValue() {
-			double oldValue = value;
-			double increment = RANDOM.nextDouble() * step;
-			if (RANDOM.nextDouble() > 0.5) {
-				increment *= -1;
-			}
-			value += increment;
-			if (value <= 0) {
-				value = 0;
-			}
-			return Math.round(oldValue);
-		}
-	}
+        GaugeSource(double value, double step) {
+            this.value = value;
+            this.step = step;
+        }
+
+        long getValue() {
+            double oldValue = value;
+            double increment = RANDOM.nextDouble() * step;
+            if(RANDOM.nextDouble() > 0.5) {
+                increment *= -1;
+            }
+            value += increment;
+            if(value <= 0) {
+                value = 0;
+            }
+            return Math.round(oldValue);
+        }
+    }
 
 }

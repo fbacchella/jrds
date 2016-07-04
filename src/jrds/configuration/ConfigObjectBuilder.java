@@ -33,31 +33,33 @@ abstract class ConfigObjectBuilder<BuildObject> {
     }
 
     /**
-     * Add a roles ACL to the object being build, but only if security was set in the properties.
-     * If the xpath match no roles, the object will have no ACL set, so it will use it's own default ACL.
+     * Add a roles ACL to the object being build, but only if security was set
+     * in the properties. If the xpath match no roles, the object will have no
+     * ACL set, so it will use it's own default ACL.
      * 
      * @param object The object to add a role to
-     * @param n  The DOM tree where the xpath will look into
+     * @param n The DOM tree where the xpath will look into
      * @param roleElements the role element
      */
     protected void doACL(WithACL object, JrdsDocument n, JrdsElement roleElements) {
-        if(pm.security){
+        if(pm.security) {
             List<String> roles = new ArrayList<String>();
             for(JrdsElement e: roleElements.getChildElementsByName("role")) {
                 roles.add(e.getTextContent());
             }
-            if(roles.size() > 0) {				
+            if(roles.size() > 0) {
                 object.addACL(new RolesACL(new HashSet<String>(roles)));
                 object.addACL(pm.adminACL);
-            }
-            else {
+            } else {
                 object.addACL(pm.defaultACL);
             }
         }
     }
 
     /**
-     * Extract the data store list from a DOM node, it must contains a list of ds elements
+     * Extract the data store list from a DOM node, it must contains a list of
+     * ds elements
+     * 
      * @param name the name of the graph desc being build
      * @param node a DOM node wrapped in a JrdsNode
      * @return a list of Map describing the data sources
@@ -72,13 +74,12 @@ abstract class ConfigObjectBuilder<BuildObject> {
                 String element = dsContent.getNodeName();
                 String textValue = dsContent.getTextContent().trim();
                 Object value = textValue;
-                if (element.startsWith("collect")) {
-                    if ("".equals(value))
+                if(element.startsWith("collect")) {
+                    if("".equals(value))
                         value = null;
                     dsMap.put("optional", Boolean.valueOf(dsContent.getAttribute("optional")));
-                }
-                else if("dsType".equals(element)) {
-                    if( !"NONE".equals(textValue.toUpperCase()))
+                } else if("dsType".equals(element)) {
+                    if(!"NONE".equals(textValue.toUpperCase()))
                         try {
                             value = DsType.valueOf(textValue.toUpperCase());
                         } catch (Exception e) {
@@ -88,8 +89,7 @@ abstract class ConfigObjectBuilder<BuildObject> {
                         }
                     else
                         value = null;
-                }
-                else if(element.startsWith("oid")) {
+                } else if(element.startsWith("oid")) {
                     value = new OID(textValue);
                     element = element.replace("oid", "collect");
                 }
@@ -110,8 +110,9 @@ abstract class ConfigObjectBuilder<BuildObject> {
     }
 
     /**
-     * Apply a method on a object with the value found in the XML element
-     * If the element is null, the method does nothing.
+     * Apply a method on a object with the value found in the XML element If the
+     * element is null, the method does nothing.
+     * 
      * @param e
      * @param o
      * @param method
@@ -128,8 +129,9 @@ abstract class ConfigObjectBuilder<BuildObject> {
     }
 
     /**
-     * Apply a method on a object with the value found in a collection of XML elements
-     * If the element is null, the method does nothing.
+     * Apply a method on a object with the value found in a collection of XML
+     * elements If the element is null, the method does nothing.
+     * 
      * @param e
      * @param o
      * @param method
@@ -153,10 +155,13 @@ abstract class ConfigObjectBuilder<BuildObject> {
     }
 
     /**
-     * Apply a method on a object with the value found in the XML element.<p>
-     * If the element is null, the method does nothing.<p>
-     * The text value of the element is parsed to the type given in the argument argType. This type must have a constructor
-     * that take a String argument.
+     * Apply a method on a object with the value found in the XML element.
+     * <p>
+     * If the element is null, the method does nothing.
+     * <p>
+     * The text value of the element is parsed to the type given in the argument
+     * argType. This type must have a constructor that take a String argument.
+     * 
      * @param element
      * @param o
      * @param method
@@ -169,7 +174,7 @@ abstract class ConfigObjectBuilder<BuildObject> {
      * @throws InvocationTargetException
      * @throws InstantiationException
      */
-    public boolean setMethod(JrdsElement element, Object o, String method, Class<?> argType) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException{
+    public boolean setMethod(JrdsElement element, Object o, String method, Class<?> argType) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
         if(element == null)
             return false;
 

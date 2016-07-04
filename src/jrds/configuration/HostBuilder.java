@@ -83,8 +83,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         HostInfo host;
         if(dnsHostname != null) {
             host = new HostInfo(hostName, dnsHostname);
-        }
-        else {
+        } else {
             host = new HostInfo(hostName);
         }
         host.setHostDir(new File(pm.rrddir, host.getName()));
@@ -133,17 +132,16 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 Map<String, String> macroProps = makeProperties(macroNode, properties, host);
                 logger.trace(Util.delayedFormatString("properties inherited for macro %s: %s", m, properties));
                 logger.trace(Util.delayedFormatString("local properties for macro %s: %s", m, macroProps));
-                Map<String, String> newProps = new HashMap<String, String>((properties !=null ? properties.size():0) + macroProps.size());
+                Map<String, String> newProps = new HashMap<String, String>((properties != null ? properties.size() : 0) + macroProps.size());
                 if(properties != null)
                     newProps.putAll(properties);
                 newProps.putAll(macroProps);
                 JrdsDocument hostdoc = (JrdsDocument) fragment.getOwnerDocument();
-                //Make a copy of the document fragment
+                // Make a copy of the document fragment
                 JrdsNode newDf = JrdsNode.build(hostdoc.importNode(m.getDf(), true));
-                JrdsElement macrodef = JrdsNode.build( newDf.getFirstChild());
+                JrdsElement macrodef = JrdsNode.build(newDf.getFirstChild());
                 parseFragment(macrodef, host, collections, newProps);
-            }
-            else {
+            } else {
                 logger.error("Unknown macro:" + name);
             }
         }
@@ -155,17 +153,16 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             String name = Util.parseTemplate(forNode.attrMap().get("collection"), this, properties);
             if(name != null) {
                 set = collections.get(name);
-            }
-            else if(forattr.containsKey("min") && forattr.containsKey("max") && forattr.containsKey("step")) {
+            } else if(forattr.containsKey("min") && forattr.containsKey("max") && forattr.containsKey("step")) {
                 int min = Util.parseStringNumber(Util.parseTemplate(forattr.get("min"), this, properties), Integer.MAX_VALUE);
                 int max = Util.parseStringNumber(Util.parseTemplate(forattr.get("max"), this, properties), Integer.MIN_VALUE);
                 int step = Util.parseStringNumber(Util.parseTemplate(forattr.get("step"), this, properties), Integer.MIN_VALUE);
-                if( min > max || step <= 0) {
+                if(min > max || step <= 0) {
                     logger.error("invalid range from " + min + " to " + max + " with step " + step);
                     break;
                 }
-                set = new ArrayList<String>((max - min)/step + 1);
-                for(int i=min; i <= max; i+= step) {
+                set = new ArrayList<String>((max - min) / step + 1);
+                for(int i = min; i <= max; i += step) {
                     set.add(Integer.toString(i));
                 }
             }
@@ -174,24 +171,22 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 for(String i: set) {
                     Map<String, String> temp;
                     if(properties != null) {
-                        temp = new HashMap<String, String>(properties.size() +1);
+                        temp = new HashMap<String, String>(properties.size() + 1);
                         temp.putAll(properties);
                         temp.put(iterprop, i);
-                    }
-                    else {
+                    } else {
                         temp = Collections.singletonMap(iterprop, i);
                     }
                     logger.trace(Util.delayedFormatString("for using %s", temp));
                     parseFragment(forNode, host, collections, temp);
                 }
-            }
-            else {
+            } else {
                 logger.error("Invalid host configuration, collection " + name + " not found");
             }
         }
 
         for(JrdsElement probeNode: fragment.getChildElements()) {
-            if(! "probe".equals(probeNode.getNodeName()) && ! "rrd".equals(probeNode.getNodeName()) )
+            if(!"probe".equals(probeNode.getNodeName()) && !"rrd".equals(probeNode.getNodeName()))
                 continue;
             try {
                 makeProbe(probeNode, host, properties);
@@ -213,16 +208,17 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         // Extract all the graph added at host level
         if(fragment.getElementbyName("graph") != null) {
             // They will be stored in a specific container probe
-            Probe<?,?> graphprobe = new ContainerProbe("_NodeLevelGraph_", host);
+            Probe<?, ?> graphprobe = new ContainerProbe("_NodeLevelGraph_", host);
             host.addProbe(graphprobe);
             for(JrdsElement graphNode: fragment.getChildElementsByName("graph")) {
                 GraphDesc gd = graphDescMap.get(graphNode.getAttribute("type"));
                 if(gd == null) {
-                    logger.error(String.format("Graph %s not found for host %s", graphNode.getAttribute("type"), host.getName())); 
+                    logger.error(String.format("Graph %s not found for host %s", graphNode.getAttribute("type"), host.getName()));
                     continue;
                 }
                 // Read the beans value for this graph and store them in a map
-                // The map is used for template parsing and will be used for graph instantiation
+                // The map is used for template parsing and will be used for
+                // graph instantiation
                 Map<String, String> attrs = new HashMap<String, String>(0);
                 for(JrdsElement attrNode: graphNode.getChildElementsByName("attr")) {
                     String name = attrNode.getAttribute("name");
@@ -236,8 +232,8 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         }
     }
 
-    public Probe<?,?> makeProbe(JrdsElement probeNode, HostInfo host, Map<String, String> properties) throws InvocationTargetException {
-        Probe<?,?> p = null;
+    public Probe<?, ?> makeProbe(JrdsElement probeNode, HostInfo host, Map<String, String> properties) throws InvocationTargetException {
+        Probe<?, ?> p = null;
         String type = probeNode.attrMap().get("type");
 
         List<Map<String, Object>> dsList = doDsList(type, probeNode.getElementbyName("dslist"));
@@ -251,8 +247,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             } catch (CloneNotSupportedException e) {
                 throw new InvocationTargetException(e, HostBuilder.class.getName());
             }
-        }
-        else {
+        } else {
             p = pf.makeProbe(type);
         }
         if(p == null)
@@ -267,8 +262,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         if(timer == null) {
             logger.error("Invalid timer '" + timerName + "' for probe " + host.getName() + "/" + type);
             return null;
-        }
-        else {
+        } else {
             logger.trace(Util.delayedFormatString("probe %s/%s will use timer %s", host, type, timer));
         }
         p.setStep(timer.getStep());
@@ -277,33 +271,32 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         // Identify the archive to use
         String archivesName;
         // Check if a custom archives list is defined
-        if (probeNode.hasAttribute("archivesset")) {
+        if(probeNode.hasAttribute("archivesset")) {
             archivesName = probeNode.getAttribute("archivesset");
-        }
-        else {
+        } else {
             archivesName = pm.archivesSet;
         }
-        if(archivesName == null || "".equals(archivesName) || ! archivessetmap.containsKey(archivesName)) {
+        if(archivesName == null || "".equals(archivesName) || !archivessetmap.containsKey(archivesName)) {
             logger.error("invalid archives set name: " + archivesName);
             return null;
         }
         ArchivesSet archives = archivessetmap.get(archivesName);
         p.setArchives(archives);
 
-        //The label is set
+        // The label is set
         String label = probeNode.getAttribute("label");
-        if(label != null && ! "".equals(label)) {
+        if(label != null && !"".equals(label)) {
             logger.trace(Util.delayedFormatString("Adding label %s to %s", label, p));
             p.setLabel(jrds.Util.parseTemplate(label, host, properties));
         }
 
-        //The host is set
+        // The host is set
         HostStarter shost = timer.getHost(host);
         p.setHost(shost);
 
         ProbeDesc pd = p.getPd();
         List<Object> args = ArgFactory.makeArgs(probeNode, host, properties);
-        //Prepare the probe with the default beans values
+        // Prepare the probe with the default beans values
         Map<String, ProbeDesc.DefaultBean> defaultBeans = pd.getDefaultBeans();
         for(Map.Entry<String, ProbeDesc.DefaultBean> e: defaultBeans.entrySet()) {
             if(e.getValue().delayed) {
@@ -311,12 +304,12 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             }
             String beanName = e.getKey();
             String beanValue = e.getValue().value;
-            if(! resolveDefaultBean(p, args, properties, beanName, beanValue)) {
+            if(!resolveDefaultBean(p, args, properties, beanName, beanValue)) {
                 return null;
             }
         }
 
-        //Resolve the beans
+        // Resolve the beans
         try {
             setAttributes(defaultBeans, probeNode, p, host, properties);
         } catch (IllegalArgumentException e) {
@@ -326,41 +319,41 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
         // Now evaluate the delayed default value parsing
         for(Map.Entry<String, ProbeDesc.DefaultBean> e: defaultBeans.entrySet()) {
-            if(! e.getValue().delayed) {
+            if(!e.getValue().delayed) {
                 continue;
             }
             String beanName = e.getKey();
             String beanValue = e.getValue().value;
-            if(! resolveDefaultBean(p, args, properties, beanName, beanValue)) {
+            if(!resolveDefaultBean(p, args, properties, beanName, beanValue)) {
                 return null;
             }
         }
 
-        if( !pf.configure(p, args)) {
+        if(!pf.configure(p, args)) {
             logger.error(p + " configuration failed");
             return null;
         }
 
-        //A connected probe, register the needed connection
-        //It can be defined within the node, referenced by it's name, or it's implied name
+        // A connected probe, register the needed connection
+        // It can be defined within the node, referenced by it's name, or it's
+        // implied name
         if(p instanceof ConnectedProbe) {
             String connectionName;
             ConnectedProbe cp = (ConnectedProbe) p;
-            //Register the connections defined within the probe
+            // Register the connections defined within the probe
             for(ConnectionInfo ci: makeConnexion(probeNode, p, properties)) {
                 ci.register(p);
             }
             String connexionName = probeNode.getAttribute("connection");
-            if(connexionName != null && ! "".equals(connexionName)) {
+            if(connexionName != null && !"".equals(connexionName)) {
                 logger.trace(Util.delayedFormatString("Adding connection %s to %s", connexionName, p));
                 connectionName = jrds.Util.parseTemplate(connexionName, host, properties);
                 cp.setConnectionName(connectionName);
-            }
-            else {
+            } else {
                 connectionName = cp.getConnectionName();
             }
-            //If the connection is not already registred, try looking for it
-            //And register it with the host
+            // If the connection is not already registred, try looking for it
+            // And register it with the host
             if(p.find(connectionName) == null) {
                 if(logger.isTraceEnabled())
                     logger.trace(Util.delayedFormatString("Looking for connection %s in %s", connectionName, host.getConnections()));
@@ -374,7 +367,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             }
         }
 
-        //try {
+        // try {
         Map<String, String> empty = Collections.emptyMap();
 
         try {
@@ -392,16 +385,15 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             }
         }
 
-        //A passive probe, perhaps a specific listener is defined
+        // A passive probe, perhaps a specific listener is defined
         if(p instanceof PassiveProbe) {
             PassiveProbe<?> pp = (PassiveProbe<?>) p;
             String listenerName = probeNode.getAttribute("listener");
-            if(listenerName != null && ! listenerName.trim().isEmpty()) {
+            if(listenerName != null && !listenerName.trim().isEmpty()) {
                 Listener<?, ?> l = listeners.get(listenerName);
                 if(l != null) {
                     pp.setListener(l);
-                }
-                else {
+                } else {
                     logger.error(Util.delayedFormatString("Listener name not found for %s: %s", pp, listenerName));
                 }
             }
@@ -409,32 +401,30 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
         if(p.checkStore()) {
             shost.addProbe(p);
-        }
-        else {
+        } else {
             return null;
         }
 
         return p;
     }
 
-    private boolean resolveDefaultBean(Probe<?,?> p, List<Object> args, Map<String, String> properties, String beanName, String beanValue) {
+    private boolean resolveDefaultBean(Probe<?, ?> p, List<Object> args, Map<String, String> properties, String beanName, String beanValue) {
         HostInfo host = p.getHost();
         ProbeDesc pd = p.getPd();
         GenericBean bean = pd.getBean(beanName);
         String value;
-        //If the last argument is a list, give it to the template parser
+        // If the last argument is a list, give it to the template parser
         Object lastArgs = args.isEmpty() ? null : args.get(args.size() - 1);
 
         try {
             if(lastArgs instanceof List) {
                 value = Util.parseTemplate(beanValue, host, p, lastArgs, properties);
-            }
-            else {
+            } else {
                 value = Util.parseTemplate(beanValue, host, p, properties);
             }
         } catch (Exception e) {
             Throwable root = e;
-            while(root.getCause() != null) {
+            while (root.getCause() != null) {
                 root = e.getCause();
             }
             logger.error(String.format("Probe %s: invalid bean %s template '%s': %s", pd.getName(), beanName, beanValue, root.getMessage()));
@@ -445,7 +435,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             bean.set(p, value);
         } catch (Exception e) {
             Throwable root = e;
-            while(root.getCause() != null) {
+            while (root.getCause() != null) {
                 root = e.getCause();
             }
             logger.error(String.format("Probe %s: invalid bean %s value '%s': %s", pd.getName(), beanName, beanValue, root.getMessage()));
@@ -457,6 +447,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     @SuppressWarnings("unchecked")
     /**
      * A compatibility method, snmp starter should be managed as a connection
+     * 
      * @param node
      * @param p
      * @param host
@@ -485,6 +476,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
     /**
      * Enumerate the connections found in an XML node
+     * 
      * @param domNode a node to parse
      * @param parent
      * @param properties
@@ -493,7 +485,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     Set<ConnectionInfo> makeConnexion(JrdsElement domNode, Object parent, Map<String, String> properties) {
         Set<ConnectionInfo> connectionSet = new HashSet<ConnectionInfo>();
 
-        //Check for the old SNMP connection node
+        // Check for the old SNMP connection node
         ConnectionInfo cnxSnmp = parseSnmp(domNode, parent, properties);
         if(cnxSnmp != null)
             connectionSet.add(cnxSnmp);
@@ -507,14 +499,14 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             String name = Util.parseTemplate(cnxNode.getAttribute("name"), parent, properties);
 
             try {
-                //Load the class for the connection
+                // Load the class for the connection
                 @SuppressWarnings("unchecked")
                 Class<? extends Connection<?>> connectionClass = (Class<? extends Connection<?>>) classLoader.loadClass(type);
 
-                //Build the arguments vector for the connection
+                // Build the arguments vector for the connection
                 List<Object> args = ArgFactory.makeArgs(cnxNode);
 
-                //Resolve the bean for the connection
+                // Resolve the bean for the connection
                 Map<String, String> attrs = new HashMap<String, String>();
                 for(JrdsElement attrNode: cnxNode.getChildElementsByName("attr")) {
                     String attrName = attrNode.getAttribute("name");
@@ -524,35 +516,28 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 ConnectionInfo cnx = new ConnectionInfo(connectionClass, name, args, attrs);
                 connectionSet.add(cnx);
                 logger.debug(Util.delayedFormatString("Added connection %s to node %s with beans %s", cnx, parent, attrs));
-            }
-            catch (ClassNotFoundException ex) {
+            } catch (ClassNotFoundException ex) {
                 logger.warn("Connection class not found: " + type + " for " + parent);
-            }
-            catch (NoClassDefFoundError ex) {
+            } catch (NoClassDefFoundError ex) {
                 logger.warn("Connection class not found: " + type + ": " + ex);
-            }
-            catch (ClassCastException ex) {
+            } catch (ClassCastException ex) {
                 logger.warn(type + " is not a connection");
-            }
-            catch (LinkageError ex) {
-                logger.warn("Incompatible code version during connection creation of type " + type +
-                        ": " + ex, ex);
-            }
-            catch (Exception ex) {
-                logger.warn("Error during connection creation of type " + type +
-                        ": " + ex, ex);
+            } catch (LinkageError ex) {
+                logger.warn("Incompatible code version during connection creation of type " + type + ": " + ex, ex);
+            } catch (Exception ex) {
+                logger.warn("Error during connection creation of type " + type + ": " + ex, ex);
             }
         }
         return connectionSet;
     }
 
     private void setAttributes(Map<String, ProbeDesc.DefaultBean> defaultBeans, JrdsElement probeNode, Probe<?, ?> p, Object... context) throws IllegalArgumentException, InvocationTargetException {
-        //Resolve the beans
+        // Resolve the beans
         for(JrdsElement attrNode: probeNode.getChildElementsByName("attr")) {
             String name = attrNode.getAttribute("name");
             GenericBean bean = p.getPd().getBean(name);
             if(bean == null) {
-                //Context[0] should be the host
+                // Context[0] should be the host
                 logger.error("Unknown bean '" + name + "' for " + context[0]);
                 continue;
             }

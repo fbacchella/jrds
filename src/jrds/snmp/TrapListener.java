@@ -20,7 +20,7 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
-@ProbeBean({"port", "community", "proto", "version"})
+@ProbeBean({ "port", "community", "proto", "version" })
 public class TrapListener extends Listener<CommandResponderEvent, OID> {
     static final String TCP = "tcp";
     static final String UDP = "udp";
@@ -28,7 +28,7 @@ public class TrapListener extends Listener<CommandResponderEvent, OID> {
     private String proto = UDP;
     private int port = 1162;
     private String community = "public";
-    private final CommandResponder trapReceiver =  new CommandResponder() {
+    private final CommandResponder trapReceiver = new CommandResponder() {
         public synchronized void processPdu(CommandResponderEvent e) {
             parsePDU(e);
         }
@@ -36,7 +36,9 @@ public class TrapListener extends Listener<CommandResponderEvent, OID> {
 
     Snmp snmp = null;
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.starter.Listener#start()
      */
     @Override
@@ -47,7 +49,7 @@ public class TrapListener extends Listener<CommandResponderEvent, OID> {
                 UdpAddress listenAddress = new UdpAddress(port);
                 transport = new DefaultUdpTransportMapping(listenAddress, true);
             }
-            if (transport != null) {
+            if(transport != null) {
                 snmp = new Snmp(transport);
                 snmp.addCommandResponder(trapReceiver);
                 transport.listen();
@@ -62,7 +64,9 @@ public class TrapListener extends Listener<CommandResponderEvent, OID> {
         }
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.starter.Listener#stop()
      */
     @Override

@@ -13,6 +13,7 @@ import org.apache.log4j.Level;
 public abstract class Mysql extends JdbcProbe {
 
     private final static int PORT = 3306;
+
     static {
         registerDriver(com.mysql.jdbc.Driver.class);
     }
@@ -48,8 +49,8 @@ public abstract class Mysql extends JdbcProbe {
                         stmt = getStatment();
                         if(stmt.execute("SHOW STATUS LIKE 'Uptime';")) {
                             ResultSet rs = stmt.getResultSet();
-                            while(rs.next()) {
-                                String key =  rs.getObject(1).toString();
+                            while (rs.next()) {
+                                String key = rs.getObject(1).toString();
                                 String oValue = rs.getObject(2).toString();
                                 if("Uptime".equals(key)) {
                                     uptime = Util.parseStringNumber(oValue, 0L);
@@ -67,9 +68,11 @@ public abstract class Mysql extends JdbcProbe {
                 log(Level.TRACE, "%s is started: %s", this, started);
                 return started;
             }
+
             public String getUrlAsString() {
                 return "jdbc:mysql://" + getHost().getDnsName() + ":" + getPort() + "/" + getDbName();
             }
+
             @Override
             public Properties getProperties() {
                 Properties p = super.getProperties();

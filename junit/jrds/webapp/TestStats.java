@@ -15,7 +15,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-public class TestStats  {
+public class TestStats {
     static final private Logger logger = Logger.getLogger(TestStats.class);
 
     ServletTester tester = null;
@@ -37,7 +37,7 @@ public class TestStats  {
         tester.start();
     }
 
-    @Test //(expected=NullPointerException.class)
+    @Test // (expected=NullPointerException.class)
     public void testStats() throws Exception {
         Response response = ToolsWebApp.doRequestGet(tester, "http://tester/status", 200);
         Assert.assertTrue(response.getContent().contains("Hosts: 1"));

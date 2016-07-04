@@ -20,7 +20,7 @@ public class TabularIterator implements Iterator<SnmpVars>, Iterable<SnmpVars> {
                 DefaultPDUFactory localfactory = new DefaultPDUFactory();
                 TableUtils tableRet = new TableUtils(starter.getSnmp(), localfactory);
                 tableRet.setMaxNumColumnsPerPDU(30);
-                OID[] oidTab= new OID[oids.size()];
+                OID[] oidTab = new OID[oids.size()];
                 oids.toArray(oidTab);
                 tabIterator = tableRet.getTable(snmpTarget, oidTab, null, null).iterator();
             }
@@ -32,7 +32,7 @@ public class TabularIterator implements Iterator<SnmpVars>, Iterable<SnmpVars> {
     }
 
     public SnmpVars next() {
-        TableEvent te =  tabIterator.next();
+        TableEvent te = tabIterator.next();
         VariableBinding[] columns = te.getColumns();
         SnmpVars vars;
         if(columns != null)

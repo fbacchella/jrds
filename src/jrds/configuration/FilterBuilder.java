@@ -41,8 +41,8 @@ public class FilterBuilder extends ConfigObjectBuilder<Filter> {
         if(name == null)
             return null;
         FilterXml f = new FilterXml(name.getTextContent());
-        setMethod(root.getChildElementsByName("path"),f, "addPath", String.class);
-        setMethod(root.getChildElementsByName("tag"),f, "addTag", String.class);
+        setMethod(root.getChildElementsByName("path"), f, "addPath", String.class);
+        setMethod(root.getChildElementsByName("tag"), f, "addTag", String.class);
         setMethod(root.getChildElementsByName("qualifiedname"), f, "addGraph", String.class);
         doACL(f, n, root);
         logger.trace(Util.delayedFormatString("Filter loaded: %s", f.getName()));

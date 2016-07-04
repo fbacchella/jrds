@@ -31,21 +31,21 @@ public class ConfigObjectFactory {
     private Map<String, GraphDesc> graphDescMap = Collections.emptyMap();
     private Map<String, Listener<?, ?>> listenerMap = Collections.emptyMap();
     Map<String, Macro> macrosmap = Collections.emptyMap();
-    Map<String, ArchivesSet> archivessetmap =  Collections.singletonMap(ArchivesSet.DEFAULT.getName(), ArchivesSet.DEFAULT);
+    Map<String, ArchivesSet> archivessetmap = Collections.singletonMap(ArchivesSet.DEFAULT.getName(), ArchivesSet.DEFAULT);
     private final jrds.PropertiesManager pm;
     private Loader load = null;
 
-    public ConfigObjectFactory(jrds.PropertiesManager pm){
+    public ConfigObjectFactory(jrds.PropertiesManager pm) {
         this.pm = pm;
         this.cl = pm.extensionClassLoader;
         init();
     }
 
-    public ConfigObjectFactory(jrds.PropertiesManager pm, ClassLoader cl){
+    public ConfigObjectFactory(jrds.PropertiesManager pm, ClassLoader cl) {
         this.pm = pm;
         this.cl = cl;
         init();
-    }	
+    }
 
     private void init() {
         try {
@@ -60,7 +60,7 @@ public class ConfigObjectFactory {
             load.importUrl(lib);
         }
 
-        if(pm.configdir !=null)
+        if(pm.configdir != null)
             load.importDir(pm.configdir);
 
         load.done();
@@ -89,7 +89,7 @@ public class ConfigObjectFactory {
             } catch (InvocationTargetException ex) {
                 logger.error("Fatal error for object of type " + ob.ct + " and name " + name + ":" + ex.getCause());
             }
-            //Remove DOM object as soon as it's not needed any more
+            // Remove DOM object as soon as it's not needed any more
             nodeMap.remove(e.getKey());
         }
         return objectMap;
@@ -182,7 +182,7 @@ public class ConfigObjectFactory {
         return tabsMap;
     }
 
-    public Map<String, Listener<?,?>> setListenerMap() {
+    public Map<String, Listener<?, ?>> setListenerMap() {
         Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.LISTENER);
         ListenerBuilder ob = new ListenerBuilder();
         ob.setClassLoader(cl);

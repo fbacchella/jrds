@@ -33,7 +33,7 @@ public class MockHttpServer extends Server {
             SslContextFactory sslContextFactory = new SslContextFactory();
 
             URL resource = MockHttpServer.class.getResource("/ressources/localhost.jks");
-            if (resource == null) {
+            if(resource == null) {
                 throw new RuntimeException("Unable to find 'localhost.jks' file to setup SSL connector");
             }
             sslContextFactory.setKeyStorePath(resource.toExternalForm());
@@ -45,7 +45,7 @@ public class MockHttpServer extends Server {
         }
         connector.setHost(InetAddress.getLoopbackAddress().getHostName());
         connector.setPort(0);
-        setConnectors(new Connector[]{connector});            
+        setConnectors(new Connector[] { connector });
         setHandler(handlers);
     }
 

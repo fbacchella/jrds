@@ -8,6 +8,7 @@ public enum ConfigType {
         public String getName(JrdsDocument d) {
             return getNameByElement(d);
         }
+
         @Override
         public String getRootNode() {
             return "filter";
@@ -17,6 +18,7 @@ public enum ConfigType {
         public String getName(JrdsDocument d) {
             return getNameByAttribute(d);
         }
+
         @Override
         public String getRootNode() {
             return "host";
@@ -26,6 +28,7 @@ public enum ConfigType {
         public String getName(JrdsDocument d) {
             return getNameByAttribute(d);
         }
+
         @Override
         public String getRootNode() {
             return "sum";
@@ -35,6 +38,7 @@ public enum ConfigType {
         public String getName(JrdsDocument d) {
             return getNameByAttribute(d);
         }
+
         @Override
         public String getRootNode() {
             return "tab";
@@ -44,6 +48,7 @@ public enum ConfigType {
         public String getName(JrdsDocument d) {
             return getNameByAttribute(d);
         }
+
         @Override
         public String getRootNode() {
             return "archivesset";
@@ -53,6 +58,7 @@ public enum ConfigType {
         public String getName(JrdsDocument d) {
             return getNameByAttribute(d);
         }
+
         @Override
         public String getRootNode() {
             return "macrodef";
@@ -62,6 +68,7 @@ public enum ConfigType {
         public String getName(JrdsDocument d) {
             return getNameByElement(d);
         }
+
         @Override
         public String getRootNode() {
             return "graph";
@@ -71,6 +78,7 @@ public enum ConfigType {
         public String getName(JrdsDocument d) {
             return getNameByElement(d);
         }
+
         @Override
         public String getRootNode() {
             return "graphdesc";
@@ -80,6 +88,7 @@ public enum ConfigType {
         public String getName(JrdsDocument d) {
             return getNameByElement(d);
         }
+
         @Override
         public String getRootNode() {
             return "probedesc";
@@ -88,11 +97,12 @@ public enum ConfigType {
     LISTENER {
         public String getName(JrdsDocument d) {
             String name = getNameByAttribute(d);
-            if (name == null || name.isEmpty()) {
-                name  = d.getRootElement().getAttribute("class");
+            if(name == null || name.isEmpty()) {
+                name = d.getRootElement().getAttribute("class");
             }
             return name != null ? name.trim() : null;
         }
+
         @Override
         public String getRootNode() {
             return "listener";
@@ -100,6 +110,7 @@ public enum ConfigType {
     };
 
     public abstract String getName(JrdsDocument d);
+
     public abstract String getRootNode();
 
     private static String getNameByAttribute(JrdsDocument d) {

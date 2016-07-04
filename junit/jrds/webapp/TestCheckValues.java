@@ -43,7 +43,7 @@ public class TestCheckValues {
         prop.put("configdir", configDirURL.getFile());
 
         tester = ToolsWebApp.getMonoServlet(testFolder, prop, CheckValues.class, "/values/*");
-        tester.start();        
+        tester.start();
     }
 
     @Test

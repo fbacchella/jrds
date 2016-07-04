@@ -16,25 +16,28 @@ import jrds.factories.ProbeFactory;
 public class MokeProbeFactory extends ProbeFactory {
     static Map<String, ProbeDesc> probeDescMap = new HashMap<String, ProbeDesc>();
     static Map<String, GraphDesc> graphDescMap = Collections.emptyMap();
-    static PropertiesManager  pm = new PropertiesManager();
+    static PropertiesManager pm = new PropertiesManager();
     static boolean legacymode = false;
 
     public MokeProbeFactory() {
         super(probeDescMap, graphDescMap);
     }
 
-    /* (non-Javadoc)
-     * @see jrds.factories.ProbeFactory#makeProbe(jrds.ProbeDesc, java.util.List)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see jrds.factories.ProbeFactory#makeProbe(jrds.ProbeDesc,
+     * java.util.List)
      */
-    public Probe<?,?> makeProbe(ProbeDesc pd) {
+    public Probe<?, ?> makeProbe(ProbeDesc pd) {
         return new MokeProbe<String, Number>(pd);
     }
-    
-    public Probe<?,?> makeProbe(String type) {
+
+    public Probe<?, ?> makeProbe(String type) {
         ProbeDesc pd = generateProbeDesc(type);
         return new MokeProbe<String, Number>(pd);
     }
-    
+
     protected ProbeDesc generateProbeDesc(String type) {
         ProbeDesc pd = new ProbeDesc();
         pd = new ProbeDesc();
@@ -57,26 +60,30 @@ public class MokeProbeFactory extends ProbeFactory {
         return pd;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.factories.ProbeFactory#configure(jrds.Probe, java.util.List)
      */
     @Override
     public boolean configure(Probe<?, ?> p, List<?> constArgs) {
         if(p instanceof MokeProbe) {
-            MokeProbe<?,?> mp = (MokeProbe<?,?>)p;
+            MokeProbe<?, ?> mp = (MokeProbe<?, ?>) p;
             mp.configure();
             mp.setArgs(constArgs);
         }
         return true;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.factories.ProbeFactory#getProbeDesc(java.lang.String)
      */
     @Override
     public ProbeDesc getProbeDesc(String name) {
-        if(!probeDescMap.containsKey(name) ) {
-            MokeProbe <String, Number> mp = new MokeProbe<String, Number>(name);
+        if(!probeDescMap.containsKey(name)) {
+            MokeProbe<String, Number> mp = new MokeProbe<String, Number>(name);
             mp.configure();
             probeDescMap.put(name, mp.getPd());
         }

@@ -23,7 +23,7 @@ import org.junit.rules.TemporaryFolder;
 
 public class TestPropertiesManager {
     static final private Logger logger = Logger.getLogger(TestPropertiesManager.class);
-    static private final String[] dirs = new String[] {"configdir", "rrddir", "tmpdir"};
+    static private final String[] dirs = new String[] { "configdir", "rrddir", "tmpdir" };
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -65,7 +65,7 @@ public class TestPropertiesManager {
         pm.setProperty("autocreate", "true");
         pm.update();
 
-        //Match the given name and was created
+        // Match the given name and was created
         for(Map.Entry<String, File> e: dirMap.entrySet()) {
             File dir = e.getValue();
             Assert.assertEquals(dir.getPath(), pm.getClass().getDeclaredField(e.getKey()).get(pm).toString());

@@ -6,11 +6,14 @@ import java.util.Set;
 public class MockParamsBean extends ParamsBean {
 
     Map<String, Object> params;
+
     public MockParamsBean(Map<String, Object> params) {
         this.params = params;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see jrds.webapp.ParamsBean#getRoles()
      */
     @SuppressWarnings("unchecked")

@@ -9,19 +9,19 @@ package jrds.probe.snmp;
 import org.apache.log4j.Level;
 
 /**
- * A extention of the partitionSpace probe, used tom manager the long naming convention
- * of disks in windows
- * For example :
- * HOST-RESOURCES-MIB::hrStorageDescr.2 = STRING: C:\ Label:Win2003  Serial Number 123abc
- * But we only want c:\
-
- * @author Fabrice Bacchella 
+ * A extention of the partitionSpace probe, used tom manager the long naming
+ * convention of disks in windows For example :
+ * HOST-RESOURCES-MIB::hrStorageDescr.2 = STRING: C:\ Label:Win2003 Serial
+ * Number 123abc But we only want c:\
+ * 
+ * @author Fabrice Bacchella
  */
 public class PartitionSpaceWindows extends PartitionSpace {
-    static final private char separator=' ';
+    static final private char separator = ' ';
 
     /**
-     *only compare with String found before " " 
+     * only compare with String found before " "
+     * 
      * @see jrds.probe.snmp.RdsIndexedSnmpRrd#matchIndex(java.lang.Object)
      */
     public boolean matchIndex(String key) {
@@ -29,7 +29,7 @@ public class PartitionSpaceWindows extends PartitionSpace {
 
         log(Level.DEBUG, "index split: found separator=\"%s\" in \"%s\" index=%s", separator, key, key);
 
-        if (nameIndex != -1) {
+        if(nameIndex != -1) {
             key = key.substring(0, nameIndex);
             log(Level.DEBUG, "index split: new name=\"%s\"", key);
         }

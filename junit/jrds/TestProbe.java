@@ -25,17 +25,18 @@ public class TestProbe {
         public DummyProbe() {
             super();
         }
+
         @Override
         public boolean isCollectRunning() {
             return true;
-        }           
+        }
+
         @Override
         public void modifySample(JrdsSample oneSample, Map<String, Long> values) {
             oneSample.setTime(new Date((getLastUpdate().getTime() + 1000) * 1000));
             super.modifySample(oneSample, values);
-        }           
+        }
     };
-
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();

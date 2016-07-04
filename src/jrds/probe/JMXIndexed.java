@@ -2,20 +2,19 @@ package jrds.probe;
 
 import jrds.factories.ProbeBean;
 
-
-@ProbeBean({"index"})
+@ProbeBean({ "index" })
 public class JMXIndexed extends JMX implements IndexedProbe {
-	
-	private String index;
-	
-	public boolean configure(String index) {
-		this.index = index;
-		return configure();
-	}
 
-	public String getIndexName() {
-		return index;
-	}
+    private String index;
+
+    public boolean configure(String index) {
+        this.index = index;
+        return configure();
+    }
+
+    public String getIndexName() {
+        return index;
+    }
 
     /**
      * @return the index
