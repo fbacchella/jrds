@@ -84,19 +84,6 @@
             jrds.webapp.Cmd</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>XmlRpcServlet</servlet-name>
-        <servlet-class>jrds.webapp.rpc.JrdsXmlRpcServlet</servlet-class>
-        <init-param>
-            <param-name>enabledForExtensions</param-name>
-            <param-value>true</param-value>
-            <description>
-                Sets, whether the servlet supports vendor
-                extensions for
-                XML-RPC.
-            </description>
-        </init-param>
-    </servlet>
-    <servlet>
         <servlet-name>JSonPack</servlet-name>
         <display-name>JSonPack</display-name>
         <description></description>
@@ -187,14 +174,6 @@
     <servlet-mapping>
         <servlet-name>Cmd</servlet-name>
         <url-pattern>/cmd/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>XmlRpcServlet</servlet-name>
-        <url-pattern>/xmlrpc</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>XmlRpcServlet</servlet-name>
-        <url-pattern>/xmlrpc/*</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>JSonPack</servlet-name>
