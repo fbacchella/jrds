@@ -75,7 +75,7 @@ public class MuninConnection extends Connection<MuninConnection.SocketChannels> 
             }
             channel.muninsSocket.close();
         } catch (IOException e) {
-        }		
+        }
     }
 
     /**

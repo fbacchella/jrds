@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -24,6 +23,7 @@ import jrds.webapp.DiscoverAgent;
 import org.apache.log4j.Level;
 
 public class MuninDiscoverAgent extends DiscoverAgent {
+
     Set<String> muninProbes = Collections.emptySet();
     int port = MuninConnection.DEFAULTMUNINPORT;
 
@@ -43,9 +43,9 @@ public class MuninDiscoverAgent extends DiscoverAgent {
 
     @Override
     public boolean exist(String hostName, HttpServletRequest request) {
+        Socket muninSocket = null;
         try {
             port = jrds.Util.parseStringNumber(request.getParameter("discoverMuninPort"), MuninConnection.DEFAULTMUNINPORT);
-            Socket muninSocket = null;
             try {
                 muninSocket = new Socket(hostName, port);
             } catch (IOException e) {
@@ -72,12 +72,16 @@ public class MuninDiscoverAgent extends DiscoverAgent {
 
             log(Level.DEBUG, "Munin probes found: %s", muninProbes);
             return true;
-        } catch (SocketException e) {
-            log(Level.ERROR, e, "Unable to connect: ",e);
-            return false;
         } catch (IOException e) {
-            log(Level.ERROR, e, "Unable to connect: ",e);
+            log(Level.ERROR, e, "Unable to connect: ", e);
             return false;
+        } finally {
+            if(muninSocket != null) {
+                try {
+                    muninSocket.close();
+                } catch (IOException e) {
+                }
+            }
         }
     }
 
@@ -93,8 +97,9 @@ public class MuninDiscoverAgent extends DiscoverAgent {
     @Override
     public boolean isGoodProbeDesc(ProbeDescSummary summary) {
         String fetch = summary.specifics.get("fetch");
-        if(fetch == null || fetch.isEmpty())
+        if(fetch == null || fetch.isEmpty()) {
             return false;
+        }
         return true;
     }
 
@@ -118,10 +123,11 @@ public class MuninDiscoverAgent extends DiscoverAgent {
             }
         }
         else{
-            if(! muninProbes.contains(fetch))
+            if(! muninProbes.contains(fetch)) {
                 return;
+            }
             muninProbes.remove(fetch);
-            addProbe(hostElement, name, null, null, null);            
+            addProbe(hostElement, name, null, null, null);
         }
     }
 }

@@ -1,8 +1,3 @@
-/*
- * Created on 8 f�vr. 2005
- *
- * TODO 
- */
 package jrds.probe.munin;
 
 import java.util.HashMap;
@@ -10,12 +5,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @author bacchell
+ * @author Fabrice Bacchella
  *
- * TODO 
  */
 public abstract class MuninsIndexedValuesProbe extends MuninIndexed {
-    
+
     /* (non-Javadoc)
      * @see jrds.Probe#filterValues(java.util.Map)
      */
