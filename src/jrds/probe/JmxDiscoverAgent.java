@@ -125,7 +125,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
                 log(Level.WARN, "Connection failed for auto discovery of probe %s: %s", summary.name, e.getMessage());
             }
         }
-        return valid & enumerated;
+        return valid && enumerated;
     }
 
     @Override
