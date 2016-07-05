@@ -2,6 +2,7 @@ package jrds.probe.munin;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -33,7 +34,7 @@ public class MuninConnection extends Connection<MuninConnection.SocketChannels> 
         this.port = port;
     }
 
-    /* (non-Javadoc)
+    /**
      * @see jrds.starter.Connection#getConnection()
      */
     @Override
@@ -41,7 +42,7 @@ public class MuninConnection extends Connection<MuninConnection.SocketChannels> 
         return channel;
     }
 
-    /* (non-Javadoc)
+    /**
      * @see jrds.starter.Connection#setUptime()
      */
     @Override
@@ -58,7 +59,7 @@ public class MuninConnection extends Connection<MuninConnection.SocketChannels> 
             channel.out = new PrintWriter(channel.muninsSocket.getOutputStream(), true);
             channel.in = new BufferedReader(new InputStreamReader(channel.muninsSocket.getInputStream()));
         } catch (IOException e) {
-            log(Level.ERROR, e, "Connection error", e);
+            log(Level.ERROR, e, "Connection error", e.getMessage());
             return false;
         }
         return true;
@@ -68,13 +69,17 @@ public class MuninConnection extends Connection<MuninConnection.SocketChannels> 
     public void stopConnection() {
         try {
             channel.out.println("quit");
-            int avalaible = channel.muninsSocket.getInputStream().available();
-            while(avalaible > 0) {
-                channel.muninsSocket.getInputStream().read(new byte[avalaible]);
-                avalaible = channel.muninsSocket.getInputStream().available();
+            InputStream is = channel.muninsSocket.getInputStream();
+            int available = is.available();
+            while(available > 0) {
+                is.skip(available);
+                available = is.available();
             }
+            channel.out.close();
+            channel.in.close();
             channel.muninsSocket.close();
         } catch (IOException e) {
+            log(Level.WARN, e, "Connection error during close", e.getMessage());
         }
     }
 
