@@ -132,9 +132,7 @@ class Loader {
             } else {
                 logger.error("ressource " + ressourceUrl + " can't be loaded");
             }
-        } catch (IOException e) {
-            logger.error("Invalid URL " + ressourceUrl + ": " + e);
-        } catch (URISyntaxException e) {
+        } catch (IOException | URISyntaxException e) {
             logger.error("Invalid URL " + ressourceUrl + ": " + e);
         }
     }

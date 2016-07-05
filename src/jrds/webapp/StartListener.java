@@ -1,6 +1,5 @@
 package jrds.webapp;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -133,7 +132,6 @@ public class StartListener implements ServletContextListener {
         if(localPropFile != null)
             try {
                 p.load(new FileReader(localPropFile));
-            } catch (FileNotFoundException e) {
             } catch (IOException e) {
             }
         return p;

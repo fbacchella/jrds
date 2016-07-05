@@ -55,10 +55,7 @@ public class SSLStarter extends Starter {
             if(!"Default".equals(sc.getProtocol())) {
                 sc.init(null, trustManagers, null);
             }
-        } catch (NoSuchAlgorithmException e) {
-            log(Level.ERROR, e, "failed to init ssl: %s", e);
-            return false;
-        } catch (KeyManagementException e) {
+        } catch (NoSuchAlgorithmException | KeyManagementException e) {
             log(Level.ERROR, e, "failed to init ssl: %s", e);
             return false;
         }

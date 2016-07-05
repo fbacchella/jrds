@@ -554,12 +554,7 @@ public class Util {
             Class<NumberClass> clazz = (Class<NumberClass>) defaultVal.getClass();
             Constructor<NumberClass> c = clazz.getConstructor(String.class);
             return c.newInstance(toParse);
-        } catch (SecurityException e) {
-        } catch (NoSuchMethodException e) {
-        } catch (IllegalArgumentException e) {
-        } catch (InstantiationException e) {
-        } catch (IllegalAccessException e) {
-        } catch (InvocationTargetException e) {
+        } catch (SecurityException | NoSuchMethodException | IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
         }
         return defaultVal;
     }
@@ -575,12 +570,7 @@ public class Util {
         try {
             Constructor<NumberClass> c = nc.getConstructor(String.class);
             return c.newInstance(toParse);
-        } catch (SecurityException e) {
-        } catch (NoSuchMethodException e) {
-        } catch (IllegalArgumentException e) {
-        } catch (InstantiationException e) {
-        } catch (IllegalAccessException e) {
-        } catch (InvocationTargetException e) {
+        } catch (SecurityException | NoSuchMethodException | IllegalArgumentException| InstantiationException | IllegalAccessException | InvocationTargetException e) {
         }
         return defaultVal;
     }

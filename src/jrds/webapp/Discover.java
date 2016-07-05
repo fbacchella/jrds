@@ -89,11 +89,7 @@ public class Discover extends JrdsServlet {
             prop.put(OutputKeys.DOCTYPE_PUBLIC, "-//jrds//DTD Host//EN");
             prop.put(OutputKeys.DOCTYPE_SYSTEM, "urn:jrds:host");
             Util.serialize(hostDom, response.getOutputStream(), null, prop);
-        } catch (IOException e) {
-            logger.error(e);
-        } catch (ParserConfigurationException e) {
-            logger.error(e);
-        } catch (TransformerException e) {
+        } catch (IOException | ParserConfigurationException | TransformerException e) {
             logger.error(e);
         }
     }

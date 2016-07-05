@@ -59,15 +59,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     HostInfo build(JrdsDocument n) throws InvocationTargetException {
         try {
             return makeHost(n);
-        } catch (SecurityException e) {
-            throw new InvocationTargetException(e, HostBuilder.class.getName());
-        } catch (IllegalArgumentException e) {
-            throw new InvocationTargetException(e, HostBuilder.class.getName());
-        } catch (NoSuchMethodException e) {
-            throw new InvocationTargetException(e, HostBuilder.class.getName());
-        } catch (IllegalAccessException e) {
-            throw new InvocationTargetException(e, HostBuilder.class.getName());
-        } catch (ClassNotFoundException e) {
+        } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | IllegalAccessException | ClassNotFoundException e) {
             throw new InvocationTargetException(e, HostBuilder.class.getName());
         }
     }

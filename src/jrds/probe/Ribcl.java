@@ -152,9 +152,7 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
         properties.put(OutputKeys.ENCODING, encoding);
         try {
             Util.serialize(ribclQ, out, null, properties);
-        } catch (TransformerException e) {
-            throw new RuntimeException("Unable to serialize in memory", e);
-        } catch (IOException e) {
+        } catch (TransformerException | IOException e) {
             throw new RuntimeException("Unable to serialize in memory", e);
         }
     }

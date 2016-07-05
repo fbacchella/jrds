@@ -1,6 +1,5 @@
 package jrds.probe.ipmi;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -76,9 +75,6 @@ public class IpmiConnection extends Connection<Handle> {
             jrdsHandle = new Handle(mainStarter.connector, handle);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            return false;
-        } catch (FileNotFoundException e) {
-            log(Level.ERROR, "invalid IPMI connection: %s", e.getMessage());
             return false;
         } catch (IOException e) {
             log(Level.ERROR, "IPMI network error: %s", e.getMessage());

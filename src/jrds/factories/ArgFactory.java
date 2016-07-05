@@ -104,8 +104,7 @@ public final class ArgFactory {
         for(String packageTry: argPackages) {
             try {
                 retValue = Class.forName(packageTry + name);
-            } catch (ClassNotFoundException ex) {
-            } catch (NoClassDefFoundError ex) {
+            } catch (ClassNotFoundException | NoClassDefFoundError ex) {
             }
         }
         if(retValue == null)
@@ -150,15 +149,8 @@ public final class ArgFactory {
                 throw new IllegalArgumentException("no single String constructor found");
             }
             return c.newInstance(value);
-        } catch (SecurityException e) {
-            throw new InvocationTargetException(e, clazz.getName());
-        } catch (NoSuchMethodException e) {
-            throw new InvocationTargetException(e, clazz.getName());
-        } catch (IllegalArgumentException e) {
-            throw new InvocationTargetException(e, clazz.getName());
-        } catch (InstantiationException e) {
-            throw new InvocationTargetException(e, clazz.getName());
-        } catch (IllegalAccessException e) {
+        } catch (SecurityException | NoSuchMethodException | IllegalArgumentException | 
+                InstantiationException | IllegalAccessException e) {
             throw new InvocationTargetException(e, clazz.getName());
         }
     }

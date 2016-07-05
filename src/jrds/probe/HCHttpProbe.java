@@ -9,7 +9,6 @@ import jrds.factories.ProbeMeta;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
@@ -56,11 +55,7 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
             Map<String, Number> vars = parseStream(is);
             is.close();
             return vars;
-        } catch (ClientProtocolException e) {
-            log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e.getMessage());
-        } catch (IllegalStateException e) {
-            log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e.getMessage());
-        } catch (IOException e) {
+        } catch (IllegalStateException | IOException e) {
             log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e.getMessage());
         } catch (URISyntaxException e) {
             log(Level.ERROR, "unable to parse %s", getUrl());

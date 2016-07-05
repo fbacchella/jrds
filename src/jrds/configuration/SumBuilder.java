@@ -17,15 +17,7 @@ public class SumBuilder extends ConfigObjectBuilder<Sum> {
     Sum build(JrdsDocument n) throws InvocationTargetException {
         try {
             return makeSum(n);
-        } catch (SecurityException e) {
-            throw new InvocationTargetException(e, FilterBuilder.class.getName());
-        } catch (IllegalArgumentException e) {
-            throw new InvocationTargetException(e, FilterBuilder.class.getName());
-        } catch (NoSuchMethodException e) {
-            throw new InvocationTargetException(e, FilterBuilder.class.getName());
-        } catch (IllegalAccessException e) {
-            throw new InvocationTargetException(e, FilterBuilder.class.getName());
-        } catch (InvocationTargetException e) {
+        } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             throw new InvocationTargetException(e, FilterBuilder.class.getName());
         }
     }

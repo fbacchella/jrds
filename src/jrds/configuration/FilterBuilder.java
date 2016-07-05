@@ -22,15 +22,7 @@ public class FilterBuilder extends ConfigObjectBuilder<Filter> {
     Filter build(JrdsDocument n) throws InvocationTargetException {
         try {
             return makeFilter(n);
-        } catch (SecurityException e) {
-            throw new InvocationTargetException(e, FilterBuilder.class.getName());
-        } catch (IllegalArgumentException e) {
-            throw new InvocationTargetException(e, FilterBuilder.class.getName());
-        } catch (NoSuchMethodException e) {
-            throw new InvocationTargetException(e, FilterBuilder.class.getName());
-        } catch (IllegalAccessException e) {
-            throw new InvocationTargetException(e, FilterBuilder.class.getName());
-        } catch (InstantiationException e) {
+        } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
             throw new InvocationTargetException(e, FilterBuilder.class.getName());
         }
     }

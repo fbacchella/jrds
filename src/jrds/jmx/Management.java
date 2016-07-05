@@ -29,15 +29,8 @@ public class Management extends StandardMBean implements ManagementMBean {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName name = new ObjectName("jrds:type=Management");
             mbs.registerMBean(new Management(configfile), name);
-        } catch (InstanceAlreadyExistsException e) {
-            throw new RuntimeException("jrds mbean failed to register", e);
-        } catch (MBeanRegistrationException e) {
-            throw new RuntimeException("jrds mbean failed to register", e);
-        } catch (NotCompliantMBeanException e) {
-            throw new RuntimeException("jrds mbean failed to register", e);
-        } catch (MalformedObjectNameException e) {
-            throw new RuntimeException("jrds mbean failed to register", e);
-        } catch (NullPointerException e) {
+        } catch (InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException |
+                MalformedObjectNameException | NullPointerException e) {
             throw new RuntimeException("jrds mbean failed to register", e);
         }
     }
@@ -47,15 +40,8 @@ public class Management extends StandardMBean implements ManagementMBean {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName name = new ObjectName("jrds:type=Management");
             mbs.registerMBean(new Management(ctxt), name);
-        } catch (InstanceAlreadyExistsException e) {
-            throw new RuntimeException("jrds mbean failed to register", e);
-        } catch (MBeanRegistrationException e) {
-            throw new RuntimeException("jrds mbean failed to register", e);
-        } catch (NotCompliantMBeanException e) {
-            throw new RuntimeException("jrds mbean failed to register", e);
-        } catch (MalformedObjectNameException e) {
-            throw new RuntimeException("jrds mbean failed to register", e);
-        } catch (NullPointerException e) {
+        } catch (InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException |
+                MalformedObjectNameException | NullPointerException e) {
             throw new RuntimeException("jrds mbean failed to register", e);
         }
     }
@@ -66,11 +52,7 @@ public class Management extends StandardMBean implements ManagementMBean {
         try {
             name = new ObjectName("jrds:type=Management");
             mbs.unregisterMBean(name);
-        } catch (MalformedObjectNameException e) {
-            throw new RuntimeException("jrds mbean failed to unregister", e);
-        } catch (MBeanRegistrationException e) {
-            throw new RuntimeException("jrds mbean failed to unregister", e);
-        } catch (InstanceNotFoundException e) {
+        } catch (MalformedObjectNameException | MBeanRegistrationException | InstanceNotFoundException e) {
             throw new RuntimeException("jrds mbean failed to unregister", e);
         }
     }

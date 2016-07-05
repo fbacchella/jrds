@@ -1,9 +1,6 @@
 package jrds.probe.ipmi;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -11,13 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-
-import jrds.Util;
-import jrds.factories.xml.JrdsDocument;
-import jrds.factories.xml.JrdsElement;
-import jrds.probe.ipmi.Handle.MutableInteger;
-import jrds.webapp.Discover.ProbeDescSummary;
-import jrds.webapp.DiscoverAgent;
 
 import org.apache.log4j.Level;
 
@@ -38,6 +28,13 @@ import com.veraxsystems.vxipmi.coding.payload.lan.IPMIException;
 import com.veraxsystems.vxipmi.coding.protocol.AuthenticationType;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 import com.veraxsystems.vxipmi.common.TypeConverter;
+
+import jrds.Util;
+import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
+import jrds.probe.ipmi.Handle.MutableInteger;
+import jrds.webapp.Discover.ProbeDescSummary;
+import jrds.webapp.DiscoverAgent;
 
 public class IpmiDiscoverAgent extends DiscoverAgent {
 
@@ -243,12 +240,6 @@ public class IpmiDiscoverAgent extends DiscoverAgent {
             log(Level.DEBUG, "UserLevelAuthenticationEnabled: %s", auth.isUserLevelAuthenticationEnabled());
             connector.openSession(handle, user, password, "".getBytes());
             jrdsHandle = new Handle(connector, handle);
-        } catch (FileNotFoundException e) {
-            jrdsHandle = null;
-        } catch (UnknownHostException e) {
-            jrdsHandle = null;
-        } catch (IOException e) {
-            jrdsHandle = null;
         } catch (Exception e) {
             jrdsHandle = null;
         }

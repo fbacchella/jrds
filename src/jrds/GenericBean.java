@@ -19,15 +19,7 @@ public interface GenericBean {
                 c = bean.getPropertyType().getConstructor(String.class);
                 Object value = c.newInstance(in);
                 bean.getWriteMethod().invoke(o, value);
-            } catch (NoSuchMethodException e) {
-                throw new IllegalStateException("Invalid bean " + bean.getName(), e);
-            } catch (SecurityException e) {
-                throw new IllegalStateException("Invalid bean " + bean.getName(), e);
-            } catch (InstantiationException e) {
-                throw new IllegalStateException("Invalid bean " + bean.getName(), e);
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException("Invalid bean " + bean.getName(), e);
-            } catch (IllegalArgumentException e) {
+            } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException| IllegalArgumentException e) {
                 throw new IllegalStateException("Invalid bean " + bean.getName(), e);
             } catch (InvocationTargetException e) {
                 throw new IllegalStateException("Invalid bean " + bean.getName(), e.getCause());
@@ -37,11 +29,7 @@ public interface GenericBean {
         public Object get(Object o) {
             try {
                 return bean.getReadMethod().invoke(o);
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException("Invalid bean " + bean.getName(), e);
-            } catch (IllegalArgumentException e) {
-                throw new IllegalStateException("Invalid bean " + bean.getName(), e);
-            } catch (InvocationTargetException e) {
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 throw new IllegalStateException("Invalid bean " + bean.getName(), e);
             }
         }

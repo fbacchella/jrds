@@ -557,9 +557,7 @@ public class ParamsBean implements Serializable {
                 p = p.next();
             else if(params.containsKey("periodprevious"))
                 p = p.previous();
-        } catch (NumberFormatException e) {
-            logger.error("Period cannot be parsed");
-        } catch (ParseException e) {
+        } catch (NumberFormatException | ParseException e) {
             logger.error("Period cannot be parsed");
         }
         return p;

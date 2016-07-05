@@ -62,9 +62,7 @@ public class JdbcConnection extends Connection<Statement> {
                 Class.forName(driverClass);
             }
             DriverManager.getDriver(sqlurl);
-        } catch (SQLException e) {
-            throw new RuntimeException("Error checking JDBC url " + sqlurl, e);
-        } catch (ClassNotFoundException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             throw new RuntimeException("Error checking JDBC url " + sqlurl, e);
         }
     }

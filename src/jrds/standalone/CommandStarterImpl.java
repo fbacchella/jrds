@@ -2,8 +2,6 @@ package jrds.standalone;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.net.MalformedURLException;
-import java.rmi.RemoteException;
 import java.util.Properties;
 
 import javax.management.InstanceAlreadyExistsException;
@@ -68,21 +66,8 @@ public abstract class CommandStarterImpl implements CommandStarter {
             ObjectName cntorServerName = ObjectName.getInstance("connectors:protocol=" + protocol);
             mbs.registerMBean(cs, cntorServerName);
 
-        } catch (RemoteException e) {
-            throw new RuntimeException("jmx remote access failed to configure", e);
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("jmx remote access failed to configure", e);
-        } catch (IOException e) {
-            throw new RuntimeException("jmx remote access failed to configure", e);
-        } catch (MalformedObjectNameException e) {
-            throw new RuntimeException("jmx remote access failed to configure", e);
-        } catch (NullPointerException e) {
-            throw new RuntimeException("jmx remote access failed to configure", e);
-        } catch (InstanceAlreadyExistsException e) {
-            throw new RuntimeException("jmx remote access failed to configure", e);
-        } catch (MBeanRegistrationException e) {
-            throw new RuntimeException("jmx remote access failed to configure", e);
-        } catch (NotCompliantMBeanException e) {
+        } catch (IOException | MalformedObjectNameException | 
+                NullPointerException | InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException e) {
             throw new RuntimeException("jmx remote access failed to configure", e);
         }
 

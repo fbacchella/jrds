@@ -79,9 +79,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
                 Probe<?, ?> p = c.newInstance();
                 p.setPd(pd);
                 System.out.println(oneLine(p));
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+            } catch (InstantiationException  | IllegalAccessException e) {
                 e.printStackTrace();
             }
         }

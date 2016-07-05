@@ -28,21 +28,8 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
     ProbeDesc build(JrdsDocument n) throws InvocationTargetException {
         try {
             return makeProbeDesc(n);
-        } catch (SecurityException e) {
-            throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
-        } catch (IllegalArgumentException e) {
-            throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
-        } catch (NoSuchMethodException e) {
-            throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
-        } catch (IllegalAccessException e) {
-            throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
-        } catch (InvocationTargetException e) {
-            throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
-        } catch (ClassNotFoundException e) {
-            throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
-        } catch (NoClassDefFoundError e) {
-            throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
-        } catch (InstantiationException e) {
+        } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | 
+                ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
             throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
         }
     }
