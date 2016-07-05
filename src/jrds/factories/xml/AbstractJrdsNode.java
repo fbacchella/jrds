@@ -13,7 +13,8 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.UserDataHandler;
 
 public class AbstractJrdsNode<NodeType extends Node> implements Node {
-    static final private Logger logger = Logger.getLogger(AbstractJrdsNode.class);
+    
+    private static final Logger logger = Logger.getLogger(AbstractJrdsNode.class);
 
     private final NodeType parent;
 
@@ -61,7 +62,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
             XPathExpression xpath = CompiledXPath.get(xpathString);
             return AbstractJrdsNode.build((Node) xpath.evaluate(parent, XPathConstants.NODE));
         } catch (XPathExpressionException e) {
-            throw new RuntimeException("xpath evaluate failed", e);
+            throw new RuntimeException("xpath evaluation failed", e);
         }
     }
 
@@ -411,24 +412,25 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
         return parent.toString();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
+     * This compare the DOM nodes of both object, so it can compare an jrds node to a DOM node
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object arg0) {
-        Class<?> c = arg0.getClass();
-        if(AbstractJrdsNode.class.isAssignableFrom(c)) {
-            JrdsNode otherNode = (JrdsNode) arg0;
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if( obj == null)
+            return false;
+        Class<?> c = obj.getClass();
+        if (AbstractJrdsNode.class.isAssignableFrom(c)) {
+            JrdsNode otherNode = (JrdsNode) obj;
             return parent.equals(otherNode.getParent());
         } else
-            return parent.equals(arg0);
+            return parent.equals(obj);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see java.lang.Object#hashCode()
      */
     @Override
