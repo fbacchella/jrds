@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
@@ -160,7 +159,7 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
         }
     }
 
-    private Socket connect() throws NoSuchAlgorithmException, KeyManagementException, UnknownHostException, IOException {
+    private Socket connect() throws NoSuchAlgorithmException, KeyManagementException, IOException {
         if(port == 23) {
             SocketFactory ss = find(SocketFactory.class);
             return ss.createSocket(iloHost, port);

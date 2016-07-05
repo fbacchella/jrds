@@ -1,6 +1,5 @@
 package jrds.factories.xml;
 
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Text;
 
 public class JrdsText extends AbstractJrdsNode<Text> implements Text {
@@ -14,7 +13,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
      * @throws DOMException
      * @see org.w3c.dom.CharacterData#appendData(java.lang.String)
      */
-    public void appendData(String arg0) throws DOMException {
+    public void appendData(String arg0) {
         getParent().appendData(arg0);
     }
 
@@ -24,7 +23,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
      * @throws DOMException
      * @see org.w3c.dom.CharacterData#deleteData(int, int)
      */
-    public void deleteData(int arg0, int arg1) throws DOMException {
+    public void deleteData(int arg0, int arg1) {
         getParent().deleteData(arg0, arg1);
     }
 
@@ -33,7 +32,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
      * @throws DOMException
      * @see org.w3c.dom.CharacterData#getData()
      */
-    public String getData() throws DOMException {
+    public String getData() {
         return getParent().getData();
     }
 
@@ -59,7 +58,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
      * @throws DOMException
      * @see org.w3c.dom.CharacterData#insertData(int, java.lang.String)
      */
-    public void insertData(int arg0, String arg1) throws DOMException {
+    public void insertData(int arg0, String arg1) {
         getParent().insertData(arg0, arg1);
     }
 
@@ -78,7 +77,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
      * @throws DOMException
      * @see org.w3c.dom.CharacterData#replaceData(int, int, java.lang.String)
      */
-    public void replaceData(int arg0, int arg1, String arg2) throws DOMException {
+    public void replaceData(int arg0, int arg1, String arg2) {
         getParent().replaceData(arg0, arg1, arg2);
     }
 
@@ -88,7 +87,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
      * @throws DOMException
      * @see org.w3c.dom.Text#replaceWholeText(java.lang.String)
      */
-    public Text replaceWholeText(String content) throws DOMException {
+    public Text replaceWholeText(String content) {
         return getParent().replaceWholeText(content);
     }
 
@@ -97,7 +96,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
      * @throws DOMException
      * @see org.w3c.dom.CharacterData#setData(java.lang.String)
      */
-    public void setData(String arg0) throws DOMException {
+    public void setData(String arg0) {
         getParent().setData(arg0);
     }
 
@@ -107,7 +106,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
      * @throws DOMException
      * @see org.w3c.dom.Text#splitText(int)
      */
-    public Text splitText(int offset) throws DOMException {
+    public Text splitText(int offset) {
         return getParent().splitText(offset);
     }
 
@@ -118,7 +117,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
      * @throws DOMException
      * @see org.w3c.dom.CharacterData#substringData(int, int)
      */
-    public String substringData(int arg0, int arg1) throws DOMException {
+    public String substringData(int arg0, int arg1) {
         return getParent().substringData(arg0, arg1);
     }
 

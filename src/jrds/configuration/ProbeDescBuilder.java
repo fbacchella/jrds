@@ -48,7 +48,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
     }
 
     @SuppressWarnings("unchecked")
-    public ProbeDesc makeProbeDesc(JrdsDocument n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, InstantiationException {
+    public ProbeDesc makeProbeDesc(JrdsDocument n) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, InstantiationException {
         ProbeDesc pd = new ProbeDesc();
 
         JrdsElement root = n.getRootElement();

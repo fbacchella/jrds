@@ -35,7 +35,7 @@ public class FilterBuilder extends ConfigObjectBuilder<Filter> {
         }
     }
 
-    public Filter makeFilter(JrdsDocument n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public Filter makeFilter(JrdsDocument n) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         JrdsElement root = n.getRootElement();
         JrdsElement name = root.getElementbyName("name");
         if(name == null)

@@ -72,7 +72,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         }
     }
 
-    public HostInfo makeHost(JrdsDocument n) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+    public HostInfo makeHost(JrdsDocument n) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
         JrdsElement hostNode = n.getRootElement();
         String hostName = hostNode.getAttribute("name");
         String dnsHostname = hostNode.getAttribute("dnsName");
@@ -98,7 +98,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         return host;
     }
 
-    private void parseFragment(JrdsElement fragment, HostInfo host, Map<String, Set<String>> collections, Map<String, String> properties) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private void parseFragment(JrdsElement fragment, HostInfo host, Map<String, Set<String>> collections, Map<String, String> properties) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 
         // Find the connection for this host
         // Will the registered latter, in the starter node, one for each timer
@@ -531,7 +531,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         return connectionSet;
     }
 
-    private void setAttributes(Map<String, ProbeDesc.DefaultBean> defaultBeans, JrdsElement probeNode, Probe<?, ?> p, Object... context) throws IllegalArgumentException, InvocationTargetException {
+    private void setAttributes(Map<String, ProbeDesc.DefaultBean> defaultBeans, JrdsElement probeNode, Probe<?, ?> p, Object... context) throws InvocationTargetException {
         // Resolve the beans
         for(JrdsElement attrNode: probeNode.getChildElementsByName("attr")) {
             String name = attrNode.getAttribute("name");

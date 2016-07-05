@@ -2,7 +2,6 @@ package jrds.starter;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -78,7 +77,7 @@ public class SSLStarter extends Starter {
         return supportedCipherSuites;
     }
 
-    public Socket connect(String host, int port) throws NoSuchAlgorithmException, KeyManagementException, UnknownHostException, IOException {
+    public Socket connect(String host, int port) throws NoSuchAlgorithmException, KeyManagementException, IOException {
         SocketFactory ss = getLevel().find(SocketFactory.class);
         Socket s = ss.createSocket(host, port);
 

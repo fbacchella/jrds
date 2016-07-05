@@ -67,14 +67,14 @@ public class PropertiesManager extends Properties {
         update();
     }
 
-    private int parseInteger(String s) throws NumberFormatException {
+    private int parseInteger(String s) {
         Integer integer;
-        if(s != null) {
-            if(s.startsWith("#")) {
+        if (s != null) {
+            if (s.startsWith("#")) {
                 integer = Integer.valueOf(s.substring(1), 16);
-            } else if(s.startsWith("0x")) {
+            } else if (s.startsWith("0x")) {
                 integer = Integer.valueOf(s.substring(2), 16);
-            } else if(s.startsWith("0") && s.length() > 1) {
+            } else if (s.startsWith("0") && s.length() > 1) {
                 integer = Integer.valueOf(s.substring(1), 8);
             } else {
                 integer = Integer.valueOf(s);

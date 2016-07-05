@@ -2,7 +2,6 @@ package jrds.starter;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 import org.apache.log4j.Level;
 
@@ -15,7 +14,7 @@ public abstract class Connection<ConnectedType> extends Starter {
 
     public abstract ConnectedType getConnection();
 
-    Socket makeSocket(String host, int port) throws UnknownHostException, IOException {
+    Socket makeSocket(String host, int port) throws IOException {
         SocketFactory sf = getLevel().find(SocketFactory.class);
         return sf.createSocket(host, port);
     }

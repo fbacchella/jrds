@@ -4,7 +4,6 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Comment;
 import org.w3c.dom.DOMConfiguration;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
@@ -43,7 +42,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @throws DOMException
      * @see org.w3c.dom.Document#adoptNode(org.w3c.dom.Node)
      */
-    public Node adoptNode(Node arg0) throws DOMException {
+    public Node adoptNode(Node arg0) {
         return getParent().adoptNode(arg0);
     }
 
@@ -53,7 +52,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @throws DOMException
      * @see org.w3c.dom.Document#createAttribute(java.lang.String)
      */
-    public Attr createAttribute(String arg0) throws DOMException {
+    public Attr createAttribute(String arg0) {
         return getParent().createAttribute(arg0);
     }
 
@@ -65,7 +64,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @see org.w3c.dom.Document#createAttributeNS(java.lang.String,
      *      java.lang.String)
      */
-    public Attr createAttributeNS(String arg0, String arg1) throws DOMException {
+    public Attr createAttributeNS(String arg0, String arg1) {
         return getParent().createAttributeNS(arg0, arg1);
     }
 
@@ -75,7 +74,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @throws DOMException
      * @see org.w3c.dom.Document#createCDATASection(java.lang.String)
      */
-    public CDATASection createCDATASection(String arg0) throws DOMException {
+    public CDATASection createCDATASection(String arg0) {
         return getParent().createCDATASection(arg0);
     }
 
@@ -102,7 +101,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @throws DOMException
      * @see org.w3c.dom.Document#createElement(java.lang.String)
      */
-    public Element createElement(String arg0) throws DOMException {
+    public Element createElement(String arg0) {
         return getParent().createElement(arg0);
     }
 
@@ -114,7 +113,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @see org.w3c.dom.Document#createElementNS(java.lang.String,
      *      java.lang.String)
      */
-    public Element createElementNS(String arg0, String arg1) throws DOMException {
+    public Element createElementNS(String arg0, String arg1) {
         return getParent().createElementNS(arg0, arg1);
     }
 
@@ -124,7 +123,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @throws DOMException
      * @see org.w3c.dom.Document#createEntityReference(java.lang.String)
      */
-    public EntityReference createEntityReference(String arg0) throws DOMException {
+    public EntityReference createEntityReference(String arg0) {
         return getParent().createEntityReference(arg0);
     }
 
@@ -136,7 +135,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @see org.w3c.dom.Document#createProcessingInstruction(java.lang.String,
      *      java.lang.String)
      */
-    public ProcessingInstruction createProcessingInstruction(String arg0, String arg1) throws DOMException {
+    public ProcessingInstruction createProcessingInstruction(String arg0, String arg1) {
         return getParent().createProcessingInstruction(arg0, arg1);
     }
 
@@ -270,7 +269,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @throws DOMException
      * @see org.w3c.dom.Document#importNode(org.w3c.dom.Node, boolean)
      */
-    public Node importNode(Node arg0, boolean arg1) throws DOMException {
+    public Node importNode(Node arg0, boolean arg1) {
         return getParent().importNode(arg0, arg1);
     }
 
@@ -291,7 +290,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @see org.w3c.dom.Document#renameNode(org.w3c.dom.Node, java.lang.String,
      *      java.lang.String)
      */
-    public Node renameNode(Node arg0, String arg1, String arg2) throws DOMException {
+    public Node renameNode(Node arg0, String arg1, String arg2) {
         return getParent().renameNode(arg0, arg1, arg2);
     }
 
@@ -308,7 +307,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @throws DOMException
      * @see org.w3c.dom.Node#setNodeValue(java.lang.String)
      */
-    public void setNodeValue(String nodeValue) throws DOMException {
+    public void setNodeValue(String nodeValue) {
         getParent().setNodeValue(nodeValue);
     }
 
@@ -325,7 +324,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @throws DOMException
      * @see org.w3c.dom.Document#setXmlStandalone(boolean)
      */
-    public void setXmlStandalone(boolean arg0) throws DOMException {
+    public void setXmlStandalone(boolean arg0) {
         getParent().setXmlStandalone(arg0);
     }
 
@@ -334,7 +333,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @throws DOMException
      * @see org.w3c.dom.Document#setXmlVersion(java.lang.String)
      */
-    public void setXmlVersion(String arg0) throws DOMException {
+    public void setXmlVersion(String arg0) {
         getParent().setXmlVersion(arg0);
     }
 

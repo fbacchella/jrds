@@ -2,7 +2,6 @@ package jrds.webapp;
 
 import java.util.Iterator;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JrdsJSONObject extends JSONObject implements Iterable<String> {
@@ -11,7 +10,7 @@ public class JrdsJSONObject extends JSONObject implements Iterable<String> {
         super();
     }
 
-    public JrdsJSONObject(String arg0) throws JSONException {
+    public JrdsJSONObject(String arg0) {
         super(arg0);
     }
 

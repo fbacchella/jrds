@@ -15,7 +15,6 @@ import jrds.Renderer;
 import jrds.Util;
 
 import org.apache.log4j.Logger;
-import org.json.JSONException;
 
 /**
  * Servlet implementation class JSonGraph
@@ -26,7 +25,7 @@ public class JSonGraph extends JSonData {
     private int periodHistory[] = { 7, 9, 11, 16 };
 
     @Override
-    public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException, JSONException {
+    public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException {
 
         if(params.getPeriod() == null) {
             return false;
@@ -62,7 +61,7 @@ public class JSonGraph extends JSonData {
         return true;
     }
 
-    private void doGraph(GraphNode gn, Renderer r, ParamsBean params, JrdsJSONWriter w) throws IOException, JSONException {
+    private void doGraph(GraphNode gn, Renderer r, ParamsBean params, JrdsJSONWriter w) throws IOException {
         jrds.Graph graph = gn.getGraph();
         params.configureGraph(graph);
 

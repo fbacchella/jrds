@@ -17,7 +17,6 @@ import jrds.HostsList;
 import jrds.Tab;
 
 import org.apache.log4j.Logger;
-import org.json.JSONException;
 
 /**
  * Servlet implementation class JSonTree
@@ -27,7 +26,7 @@ public class JSonTree extends JSonData {
     static final private Logger logger = Logger.getLogger(JSonTree.class);
 
     @Override
-    public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException, JSONException {
+    public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException {
 
         if(ParamsBean.TABCHOICE.equals(params.getChoiceType())) {
             Tab tab = params.getTab();
@@ -74,14 +73,14 @@ public class JSonTree extends JSonData {
         return true;
     }
 
-    private boolean evaluateTree(ParamsBean params, JrdsJSONWriter w, HostsList root, GraphTree trytree) throws IOException, JSONException {
+    private boolean evaluateTree(ParamsBean params, JrdsJSONWriter w, HostsList root, GraphTree trytree) throws IOException {
         for(GraphTree tree: findRoot(Collections.singleton(trytree))) {
             sub(params, w, tree, "tree", Filter.EVERYTHING, "", tree.getPath().hashCode());
         }
         return true;
     }
 
-    private boolean evaluateFilter(ParamsBean params, JrdsJSONWriter w, HostsList root, Filter f) throws IOException, JSONException {
+    private boolean evaluateFilter(ParamsBean params, JrdsJSONWriter w, HostsList root, Filter f) throws IOException {
         Collection<GraphTree> level = root.getTrees();
 
         // We construct the graph tree root to use
@@ -123,7 +122,7 @@ public class JSonTree extends JSonData {
         return rootstry;
     }
 
-    private boolean dumpFilters(JrdsJSONWriter w, Set<Filter> filterSet) throws JSONException {
+    private boolean dumpFilters(JrdsJSONWriter w, Set<Filter> filterSet) {
         for(Filter filter: filterSet) {
             String filterName = filter.getName();
             Map<String, String> href = new HashMap<String, String>();
@@ -133,7 +132,7 @@ public class JSonTree extends JSonData {
         return true;
     }
 
-    private String sub(ParamsBean params, JrdsJSONWriter w, GraphTree gt, String type, Filter f, String path, int base) throws IOException, JSONException {
+    private String sub(ParamsBean params, JrdsJSONWriter w, GraphTree gt, String type, Filter f, String path, int base) throws IOException {
         String id = null;
         String subpath = path + "/" + gt.getName();
         boolean hasChild = false;

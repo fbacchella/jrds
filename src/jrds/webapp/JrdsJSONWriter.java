@@ -9,7 +9,6 @@ import java.util.Map;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
-import org.json.JSONException;
 import org.json.JSONWriter;
 
 public class JrdsJSONWriter {
@@ -24,7 +23,7 @@ public class JrdsJSONWriter {
         jw = new JSONWriter(w);
     }
 
-    public JSONWriter map(Map<?, ?> map) throws JSONException {
+    public JSONWriter map(Map<?, ?> map) {
         jw.object();
         for(Map.Entry<?, ?> e: map.entrySet()) {
             jw.key(e.getKey().toString());
@@ -42,7 +41,7 @@ public class JrdsJSONWriter {
      * @throws JSONException
      * @see org.json.JSONWriter#array()
      */
-    public JSONWriter array() throws JSONException {
+    public JSONWriter array() {
         return jw.array();
     }
 
@@ -51,7 +50,7 @@ public class JrdsJSONWriter {
      * @throws JSONException
      * @see org.json.JSONWriter#endArray()
      */
-    public JSONWriter endArray() throws JSONException {
+    public JSONWriter endArray() {
         return jw.endArray();
     }
 
@@ -60,7 +59,7 @@ public class JrdsJSONWriter {
      * @throws JSONException
      * @see org.json.JSONWriter#endObject()
      */
-    public JSONWriter endObject() throws JSONException {
+    public JSONWriter endObject() {
         return jw.endObject();
     }
 
@@ -70,7 +69,7 @@ public class JrdsJSONWriter {
      * @throws JSONException
      * @see org.json.JSONWriter#key(java.lang.String)
      */
-    public JSONWriter key(String arg0) throws JSONException {
+    public JSONWriter key(String arg0) {
         return jw.key(arg0);
     }
 
@@ -79,7 +78,7 @@ public class JrdsJSONWriter {
      * @throws JSONException
      * @see org.json.JSONWriter#object()
      */
-    public JSONWriter object() throws JSONException {
+    public JSONWriter object() {
         return jw.object();
     }
 
@@ -89,7 +88,7 @@ public class JrdsJSONWriter {
      * @throws JSONException
      * @see org.json.JSONWriter#value(boolean)
      */
-    public JSONWriter value(boolean arg0) throws JSONException {
+    public JSONWriter value(boolean arg0) {
         return jw.value(arg0);
     }
 
@@ -99,7 +98,7 @@ public class JrdsJSONWriter {
      * @throws JSONException
      * @see org.json.JSONWriter#value(double)
      */
-    public JSONWriter value(double arg0) throws JSONException {
+    public JSONWriter value(double arg0) {
         return jw.value(arg0);
     }
 
@@ -109,7 +108,7 @@ public class JrdsJSONWriter {
      * @throws JSONException
      * @see org.json.JSONWriter#value(long)
      */
-    public JSONWriter value(long arg0) throws JSONException {
+    public JSONWriter value(long arg0) {
         return jw.value(arg0);
     }
 
@@ -119,7 +118,7 @@ public class JrdsJSONWriter {
      * @throws JSONException
      * @see org.json.JSONWriter#value(java.lang.Object)
      */
-    public JSONWriter value(Object arg0) throws JSONException {
+    public JSONWriter value(Object arg0) {
         return jw.value(arg0);
     }
 

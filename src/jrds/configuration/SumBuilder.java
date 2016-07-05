@@ -30,7 +30,7 @@ public class SumBuilder extends ConfigObjectBuilder<Sum> {
         }
     }
 
-    public Sum makeSum(JrdsDocument n) throws IllegalArgumentException, SecurityException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    public Sum makeSum(JrdsDocument n) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         JrdsElement root = n.getRootElement();
         String name = root.getAttribute("name");
         if(name != null && !"".equals(name)) {

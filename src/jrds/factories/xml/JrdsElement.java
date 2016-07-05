@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Attr;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -85,7 +84,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @see org.w3c.dom.Element#getAttributeNS(java.lang.String,
      *      java.lang.String)
      */
-    public String getAttributeNS(String namespaceURI, String localName) throws DOMException {
+    public String getAttributeNS(String namespaceURI, String localName) {
         return getParent().getAttributeNS(namespaceURI, localName);
     }
 
@@ -106,7 +105,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @see org.w3c.dom.Element#getAttributeNodeNS(java.lang.String,
      *      java.lang.String)
      */
-    public Attr getAttributeNodeNS(String namespaceURI, String localName) throws DOMException {
+    public Attr getAttributeNodeNS(String namespaceURI, String localName) {
         return getParent().getAttributeNodeNS(namespaceURI, localName);
     }
 
@@ -194,7 +193,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @see org.w3c.dom.Element#getElementsByTagNameNS(java.lang.String,
      *      java.lang.String)
      */
-    public NodeList getElementsByTagNameNS(String namespaceURI, String localName) throws DOMException {
+    public NodeList getElementsByTagNameNS(String namespaceURI, String localName) {
         return getParent().getElementsByTagNameNS(namespaceURI, localName);
     }
 
@@ -231,7 +230,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @see org.w3c.dom.Element#hasAttributeNS(java.lang.String,
      *      java.lang.String)
      */
-    public boolean hasAttributeNS(String namespaceURI, String localName) throws DOMException {
+    public boolean hasAttributeNS(String namespaceURI, String localName) {
         return getParent().hasAttributeNS(namespaceURI, localName);
     }
 
@@ -240,7 +239,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @throws DOMException
      * @see org.w3c.dom.Element#removeAttribute(java.lang.String)
      */
-    public void removeAttribute(String name) throws DOMException {
+    public void removeAttribute(String name) {
         getParent().removeAttribute(name);
     }
 
@@ -251,7 +250,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @see org.w3c.dom.Element#removeAttributeNS(java.lang.String,
      *      java.lang.String)
      */
-    public void removeAttributeNS(String namespaceURI, String localName) throws DOMException {
+    public void removeAttributeNS(String namespaceURI, String localName) {
         getParent().removeAttributeNS(namespaceURI, localName);
     }
 
@@ -261,7 +260,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @throws DOMException
      * @see org.w3c.dom.Element#removeAttributeNode(org.w3c.dom.Attr)
      */
-    public Attr removeAttributeNode(Attr oldAttr) throws DOMException {
+    public Attr removeAttributeNode(Attr oldAttr) {
         return getParent().removeAttributeNode(oldAttr);
     }
 
@@ -271,7 +270,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @throws DOMException
      * @see org.w3c.dom.Element#setAttribute(java.lang.String, java.lang.String)
      */
-    public void setAttribute(String name, String value) throws DOMException {
+    public void setAttribute(String name, String value) {
         getParent().setAttribute(name, value);
     }
 
@@ -283,7 +282,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @see org.w3c.dom.Element#setAttributeNS(java.lang.String,
      *      java.lang.String, java.lang.String)
      */
-    public void setAttributeNS(String namespaceURI, String qualifiedName, String value) throws DOMException {
+    public void setAttributeNS(String namespaceURI, String qualifiedName, String value) {
         getParent().setAttributeNS(namespaceURI, qualifiedName, value);
     }
 
@@ -293,7 +292,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @throws DOMException
      * @see org.w3c.dom.Element#setAttributeNode(org.w3c.dom.Attr)
      */
-    public Attr setAttributeNode(Attr newAttr) throws DOMException {
+    public Attr setAttributeNode(Attr newAttr) {
         return getParent().setAttributeNode(newAttr);
     }
 
@@ -303,7 +302,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @throws DOMException
      * @see org.w3c.dom.Element#setAttributeNodeNS(org.w3c.dom.Attr)
      */
-    public Attr setAttributeNodeNS(Attr newAttr) throws DOMException {
+    public Attr setAttributeNodeNS(Attr newAttr) {
         return getParent().setAttributeNodeNS(newAttr);
     }
 
@@ -313,7 +312,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @throws DOMException
      * @see org.w3c.dom.Element#setIdAttribute(java.lang.String, boolean)
      */
-    public void setIdAttribute(String name, boolean isId) throws DOMException {
+    public void setIdAttribute(String name, boolean isId) {
         getParent().setIdAttribute(name, isId);
     }
 
@@ -325,7 +324,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @see org.w3c.dom.Element#setIdAttributeNS(java.lang.String,
      *      java.lang.String, boolean)
      */
-    public void setIdAttributeNS(String namespaceURI, String localName, boolean isId) throws DOMException {
+    public void setIdAttributeNS(String namespaceURI, String localName, boolean isId) {
         getParent().setIdAttributeNS(namespaceURI, localName, isId);
     }
 
@@ -335,7 +334,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @throws DOMException
      * @see org.w3c.dom.Element#setIdAttributeNode(org.w3c.dom.Attr, boolean)
      */
-    public void setIdAttributeNode(Attr idAttr, boolean isId) throws DOMException {
+    public void setIdAttributeNode(Attr idAttr, boolean isId) {
         getParent().setIdAttributeNode(idAttr, isId);
     }
 

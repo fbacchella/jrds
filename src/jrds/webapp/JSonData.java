@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import jrds.HostsList;
 
 import org.apache.log4j.Logger;
-import org.json.JSONException;
 
 public abstract class JSonData extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(JSonData.class);
@@ -44,21 +43,21 @@ public abstract class JSonData extends JrdsServlet {
         }
     }
 
-    public abstract boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException, JSONException;
+    public abstract boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException;
 
-    public JrdsJSONWriter doTree(JrdsJSONWriter w, String name, int id, String type, List<String> childsref) throws JSONException {
+    public JrdsJSONWriter doTree(JrdsJSONWriter w, String name, int id, String type, List<String> childsref) {
         return doTree(w, name, Integer.toString(id), type, childsref, null);
     }
 
-    public JrdsJSONWriter doTree(JrdsJSONWriter w, String name, int id, String type, List<String> childsref, Map<String, ?> attributes) throws JSONException {
+    public JrdsJSONWriter doTree(JrdsJSONWriter w, String name, int id, String type, List<String> childsref, Map<String, ?> attributes) {
         return doTree(w, name, Integer.toString(id), type, childsref, attributes);
     }
 
-    public JrdsJSONWriter doTree(JrdsJSONWriter w, String name, String id, String type, List<String> childsref) throws JSONException {
+    public JrdsJSONWriter doTree(JrdsJSONWriter w, String name, String id, String type, List<String> childsref) {
         return doTree(w, name, id, type, childsref, null);
     }
 
-    public JrdsJSONWriter doTree(JrdsJSONWriter w, String name, String id, String type, List<String> childsref, Map<String, ?> attributes) throws JSONException {
+    public JrdsJSONWriter doTree(JrdsJSONWriter w, String name, String id, String type, List<String> childsref, Map<String, ?> attributes) {
         name = name.replace("'", " ").replace("\"", " ");
         w.object();
         w.key("name").value(name);

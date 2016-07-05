@@ -5,7 +5,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.log4j.Logger;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -72,7 +71,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @throws DOMException
      * @see org.w3c.dom.Node#appendChild(org.w3c.dom.Node)
      */
-    public Node appendChild(Node newChild) throws DOMException {
+    public Node appendChild(Node newChild) {
         return parent.appendChild(newChild);
     }
 
@@ -91,7 +90,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @throws DOMException
      * @see org.w3c.dom.Node#compareDocumentPosition(org.w3c.dom.Node)
      */
-    public short compareDocumentPosition(Node other) throws DOMException {
+    public short compareDocumentPosition(Node other) {
         return parent.compareDocumentPosition(other);
     }
 
@@ -194,7 +193,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @throws DOMException
      * @see org.w3c.dom.Node#getNodeValue()
      */
-    public String getNodeValue() throws DOMException {
+    public String getNodeValue() {
         return parent.getNodeValue();
     }
 
@@ -239,7 +238,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @throws DOMException
      * @see org.w3c.dom.Node#getTextContent()
      */
-    public String getTextContent() throws DOMException {
+    public String getTextContent() {
         return parent.getTextContent();
     }
 
@@ -275,7 +274,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @throws DOMException
      * @see org.w3c.dom.Node#insertBefore(org.w3c.dom.Node, org.w3c.dom.Node)
      */
-    public Node insertBefore(Node newChild, Node refChild) throws DOMException {
+    public Node insertBefore(Node newChild, Node refChild) {
         return parent.insertBefore(newChild, refChild);
     }
 
@@ -348,7 +347,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @throws DOMException
      * @see org.w3c.dom.Node#removeChild(org.w3c.dom.Node)
      */
-    public Node removeChild(Node oldChild) throws DOMException {
+    public Node removeChild(Node oldChild) {
         return parent.removeChild(oldChild);
     }
 
@@ -359,7 +358,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @throws DOMException
      * @see org.w3c.dom.Node#replaceChild(org.w3c.dom.Node, org.w3c.dom.Node)
      */
-    public Node replaceChild(Node newChild, Node oldChild) throws DOMException {
+    public Node replaceChild(Node newChild, Node oldChild) {
         return parent.replaceChild(newChild, oldChild);
     }
 
@@ -368,7 +367,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @throws DOMException
      * @see org.w3c.dom.Node#setNodeValue(java.lang.String)
      */
-    public void setNodeValue(String nodeValue) throws DOMException {
+    public void setNodeValue(String nodeValue) {
         parent.setNodeValue(nodeValue);
     }
 
@@ -377,7 +376,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @throws DOMException
      * @see org.w3c.dom.Node#setPrefix(java.lang.String)
      */
-    public void setPrefix(String prefix) throws DOMException {
+    public void setPrefix(String prefix) {
         parent.setPrefix(prefix);
     }
 
@@ -386,7 +385,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @throws DOMException
      * @see org.w3c.dom.Node#setTextContent(java.lang.String)
      */
-    public void setTextContent(String textContent) throws DOMException {
+    public void setTextContent(String textContent) {
         parent.setTextContent(textContent);
     }
 

@@ -124,7 +124,7 @@ abstract class ConfigObjectBuilder<BuildObject> {
      * @throws InvocationTargetException
      * @throws InstantiationException
      */
-    public boolean setMethod(JrdsElement e, Object o, String method) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public boolean setMethod(JrdsElement e, Object o, String method) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         return setMethod(e, o, method, String.class);
     }
 
@@ -144,7 +144,7 @@ abstract class ConfigObjectBuilder<BuildObject> {
      * @throws InvocationTargetException
      * @throws InstantiationException
      */
-    public boolean setMethod(Iterable<JrdsElement> e, Object o, String method, Class<?> argType) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public boolean setMethod(Iterable<JrdsElement> e, Object o, String method, Class<?> argType) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         if(e == null)
             return false;
         boolean setted = false;
@@ -174,7 +174,7 @@ abstract class ConfigObjectBuilder<BuildObject> {
      * @throws InvocationTargetException
      * @throws InstantiationException
      */
-    public boolean setMethod(JrdsElement element, Object o, String method, Class<?> argType) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public boolean setMethod(JrdsElement element, Object o, String method, Class<?> argType) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         if(element == null)
             return false;
 
