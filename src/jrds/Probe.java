@@ -418,8 +418,27 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         return getHost().getName() + "/" + getName();
     }
 
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
     public int hashCode() {
         return getQualifiedName().hashCode();
+    }
+
+    /**
+     * Two probes are equals if qualified names matches
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        } else {
+            return getQualifiedName().equals(obj);
+        }
     }
 
     public Set<String> getTags() {

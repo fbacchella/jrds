@@ -49,13 +49,6 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
     }
 
     /**
-     * @see java.lang.Object#hashCode()
-     */
-    public int hashCode() {
-        return getQualifiedName().hashCode();
-    }
-
-    /**
      * @return Returns the theStore.
      */
     public Probe<?, ?> getProbe() {
@@ -215,6 +208,29 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
 
     public void setBeans(Map<String, String> beans) {
         this.beans = beans;
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        return getQualifiedName().hashCode();
+    }
+
+    /**
+     * Two nodes are equals if qualified names matches
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        } else {
+            return getQualifiedName().equals(obj);
+        }
     }
 
 }

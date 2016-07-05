@@ -92,21 +92,35 @@ public class HostStarter extends StarterNode {
         return host.isHidden();
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + super.hashCode();
+        result = prime * result + (getParent() == null ? 0 : getParent().hashCode());
+        return result;
+    }
+
+    /**
+     * Two hosts are equals if they are equals and their parents too
      * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof HostStarter))
+        if (!(obj instanceof HostStarter)) {
             return false;
+        }
         HostStarter other = (HostStarter) obj;
         boolean parentEquals;
-        if(getParent() != null)
+        if (getParent() != null) {
             parentEquals = getParent().equals(other.getParent());
-        else
+        } else {
             parentEquals = other.getParent() == null;
+        }
         return host.equals(other.getHost()) && parentEquals;
     }
 

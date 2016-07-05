@@ -81,14 +81,44 @@ public class ConnectionInfo {
         return type.getCanonicalName() + (name == null ? "" : ("/" + name));
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
-        return name == null ? type.hashCode() : name.hashCode();
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + ((type == null) ? 0 : type.hashCode());
+        return result;
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        } else if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        } else {
+            ConnectionInfo other = (ConnectionInfo) obj;
+            if (name == null) {
+                if(other.name != null)
+                    return false;
+            } else if (!name.equals(other.name)) {
+                return false;
+            }
+            if (type == null) {
+                if (other.type != null) {
+                    return false;
+                }
+            } else if (!type.equals(other.type)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
