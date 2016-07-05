@@ -21,7 +21,12 @@ import org.rrd4j.graph.RrdGraphDef;
 public class Graph implements WithACL {
     static final private Logger logger = Logger.getLogger(Graph.class);
 
-    static final private SimpleDateFormat lastUpdateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    private static final ThreadLocal<SimpleDateFormat> lastUpdateFormat = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        }
+    };
 
     private final GraphNode node;
     private Date start;
@@ -105,12 +110,12 @@ public class Graph implements WithACL {
         Date lastUpdate = node.getProbe().getLastUpdate();
         graphDef.comment("\\l");
         graphDef.comment("\\l");
-        graphDef.comment("Last update: " + lastUpdateFormat.format(lastUpdate) + "\\L");
+        graphDef.comment("Last update: " + lastUpdateFormat.get().format(lastUpdate) + "\\L");
         String unit = "SI";
         if(!getGraphDesc().isSiUnit())
             unit = "binary";
         graphDef.comment("Unit type: " + unit + "\\r");
-        graphDef.comment("Period from " + lastUpdateFormat.format(start) + " to " + lastUpdateFormat.format(end) + "\\L");
+        graphDef.comment("Period from " + lastUpdateFormat.get().format(start) + " to " + lastUpdateFormat.get().format(end) + "\\L");
         graphDef.comment("Source type: " + node.getProbe().getSourceType() + "\\r");
     }
 

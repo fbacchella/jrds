@@ -28,7 +28,14 @@ import org.rrd4j.data.DataProcessor;
 public class Download extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(Download.class);
     static final String CONTENT_TYPE = "text/csv";
-    private static final SimpleDateFormat humanDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+    private static final ThreadLocal<SimpleDateFormat> humanDateFormat = new ThreadLocal<SimpleDateFormat>() {
+        @Override
+        protected SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        }
+    };
+
     protected static final ThreadLocal<DateFormat> epochFormat = new ThreadLocal<DateFormat>() {
         @Override
         protected DateFormat initialValue() {
@@ -119,7 +126,7 @@ public class Download extends JrdsServlet {
             ServletOutputStream out = res.getOutputStream();
             res.setContentType(CONTENT_TYPE);
             res.addHeader("content-disposition", "attachment; filename=" + fileName);
-            DateFormat exportDateFormat = humanDateFormat;
+            DateFormat exportDateFormat = humanDateFormat.get();
             if(params.getValue("epoch") != null) {
                 exportDateFormat = epochFormat.get();
             }
