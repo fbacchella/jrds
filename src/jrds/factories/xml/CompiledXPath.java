@@ -1,7 +1,7 @@
 package jrds.factories.xml;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
@@ -10,23 +10,32 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
 
+import jrds.Util;
+
 public class CompiledXPath {
-    static final private Logger logger = Logger.getLogger(CompiledXPath.class);
 
-    private static final XPath xpather = XPathFactory.newInstance().newXPath();
-    private static final Map<String, XPathExpression> xpc = new HashMap<String, XPathExpression>();
+    private static final Logger logger = Logger.getLogger(CompiledXPath.class);
 
-    public static XPathExpression get(String xpath) {
+    private static final XPathFactory XFACTORY = XPathFactory.newInstance();
+    private static final ThreadLocal<XPath> xpather = new ThreadLocal<XPath>() {
+        @Override
+        protected XPath initialValue() {
+            return XFACTORY.newXPath();
+        }
+    };
+
+    private static final Map<String, XPathExpression> xpc = new ConcurrentHashMap<>();
+
+    private CompiledXPath() {
+
+    }
+
+    public static XPathExpression get(String xpath) throws XPathExpressionException {
         XPathExpression e = xpc.get(xpath);
-        if(e == null) {
-            logger.debug("Uncompiled xpath: " + xpath);
-            try {
-                e = xpather.compile(xpath);
-                xpc.put(xpath, e);
-            } catch (XPathExpressionException e1) {
-                logger.error("invalid xpath:" + xpath);
-                throw new RuntimeException("Invalid xpath " + xpath, e1);
-            }
+        if (e == null) {
+            logger.debug(Util.delayedFormatString("Uncompiled xpath: %s", xpath));
+            e = xpather.get().compile(xpath);
+            xpc.put(xpath, e);
         }
         return e;
     }
