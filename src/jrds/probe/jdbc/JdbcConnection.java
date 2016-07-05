@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import jrds.PropertiesManager;
 import jrds.factories.ProbeBean;
 import jrds.starter.Connection;
 
@@ -13,20 +14,19 @@ import org.apache.log4j.Level;
 @ProbeBean({ "user", "password", "url", "driverClass" })
 public class JdbcConnection extends Connection<Statement> {
 
-    static protected final void registerDriver(Class<? extends Driver> JdbcDriver) {
-        try {
-            Driver jdbcDriver = JdbcDriver.newInstance();
-            DriverManager.registerDriver(jdbcDriver);
-        } catch (Exception e) {
-            throw new RuntimeException("Can't register JDBC driver " + JdbcDriver, e);
-        }
-    }
-
     private java.sql.Connection con;
     private String user;
     private String passwd;
     private String driverClass = null;
     private String url;
+
+    protected static final void registerDriver(Class<? extends Driver> jdbcDriver) {
+        try {
+            DriverManager.registerDriver(jdbcDriver.newInstance());
+        } catch (Exception e) {
+            throw new RuntimeException("Can't register JDBC driver " + jdbcDriver, e);
+        }
+    }
 
     public JdbcConnection() {
 
@@ -45,6 +45,12 @@ public class JdbcConnection extends Connection<Statement> {
         this.url = url;
         this.driverClass = driverClass;
         checkDriver(url);
+    }
+
+    @Override
+    public void configure(PropertiesManager pm) {
+        url = jrds.Util.parseTemplate(url, this, getLevel());
+        super.configure(pm);
     }
 
     public Statement getConnection() {
@@ -76,7 +82,6 @@ public class JdbcConnection extends Connection<Statement> {
     public boolean startConnection() {
         boolean started = false;
         if(getResolver().isStarted()) {
-            String url = getUrl();
             try {
                 DriverManager.setLoginTimeout(getTimeout());
                 con = DriverManager.getConnection(url, user, passwd);
@@ -104,7 +109,7 @@ public class JdbcConnection extends Connection<Statement> {
      * @return the url
      */
     public String getUrl() {
-        return jrds.Util.parseTemplate(url, this, getLevel());
+        return url;
     }
 
     /**

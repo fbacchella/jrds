@@ -24,6 +24,7 @@ import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 
 public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnection> implements UrlProbe, IndexedProbe {
+
     String query = null;
     String keyColumn = null;
     String index = "";
@@ -34,8 +35,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
         super(JdbcConnection.class.getName());
     }
 
-    /*
-     * (non-Javadoc)
+    /**
      * 
      * @see jrds.ProbeConnected#configure()
      */
@@ -71,40 +71,65 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
     public Map<String, Number> getNewSampleValuesConnected(JdbcConnection cnx) {
         Map<String, Number> values = null;
         Statement stmt = cnx.getConnection();
-        if(stmt != null && uptimeQuery != null && !"".equals(uptimeQuery)) {
-            if(!doUptimeQuery(stmt))
-                return null;
+        if (stmt == null) {
+            return Collections.emptyMap();
+        }
+        if(uptimeQuery != null && !"".equals(uptimeQuery) && !doUptimeQuery(stmt)) {
+            closeStatement(stmt);
+            return Collections.emptyMap();
         }
         try {
+            ResultSet rs = null;
             try {
                 log(Level.DEBUG, "sql query used: %s", query);
-                if(stmt != null && stmt.execute(query)) {
-                    ResultSet rs = stmt.getResultSet();
-                    Set<String> collectKeys = new HashSet<String>(getPd().getCollectStrings().keySet());
-                    if(uptimeQuery == null && uptimeRow != null)
+                if (stmt.execute(query)) {
+                    rs = stmt.getResultSet();
+                    Set<String> collectKeys = new HashSet<>(getPd().getCollectStrings().keySet());
+                    if (uptimeQuery == null && uptimeRow != null)
                         collectKeys.add(uptimeRow);
                     values = getValuesFromRS(rs, collectKeys);
-                    if(uptimeRow != null && values.containsKey(uptimeRow)) {
+                    if (uptimeRow != null && values.containsKey(uptimeRow)) {
                         setUptime(values.get(uptimeRow).longValue());
                         values.remove(uptimeRow);
                     }
                 }
             } finally {
-                if(stmt != null) {
-                    stmt.close();
-                }
+                closeResultSet(rs);
             }
             return values;
         } catch (SQLException e) {
-            log(Level.ERROR, e, "SQL exception while getting values: ", e.getMessage());
+            log(Level.ERROR, e, "SQL exception while getting values: %s", e.getMessage());
+        } finally {
+            closeStatement(stmt);
         }
-        return null;
+        return Collections.emptyMap();
+    }
+
+    private void closeStatement(Statement stmt) {
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (SQLException e) {
+                log(Level.ERROR, e, "SQL exception while closing statement: %s", e.getMessage());
+            }
+        }
+    }
+
+    private void closeResultSet(ResultSet rs) {
+        if(rs != null) {
+            try {
+                rs.close();
+            } catch (SQLException e) {
+                log(Level.ERROR, e, "SQL exception while closing results: %s", e.getMessage());
+            }
+        }
     }
 
     private boolean doUptimeQuery(Statement stmt) {
+        ResultSet rs = null;
         try {
             stmt.execute(uptimeQuery);
-            ResultSet rs = stmt.getResultSet();
+            rs = stmt.getResultSet();
             Map<String, Number> values = getValuesFromRS(rs, Collections.singleton(uptimeRow));
             if(uptimeRow != null && values.containsKey(uptimeRow)) {
                 setUptime(values.get(uptimeRow).longValue());
@@ -112,10 +137,11 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
             }
             return true;
         } catch (SQLException e) {
-            log(Level.ERROR, e, "SQL exception while getting uptime: ", e.getMessage());
+            log(Level.ERROR, e, "SQL exception while getting uptime: %s", e.getMessage());
+            return false;
+        } finally {
+            closeResultSet(rs);
         }
-
-        return false;
     }
 
     private Map<String, Number> getValuesFromRS(ResultSet rs, Set<String> collectKeys) {
@@ -123,7 +149,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
         try {
             ResultSetMetaData meta = rs.getMetaData();
             int columnCount = meta.getColumnCount();
-            values = new HashMap<String, Number>(columnCount);
+            values = new HashMap<>(columnCount);
             while (rs.next()) {
                 String keyValue = "";
                 if(keyColumn != null) {
@@ -137,13 +163,12 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
                         continue;
                     Number value;
                     Object oValue = rs.getObject(i);
-                    log(Level.TRACE, "type info for %s: type %d, %s = %s", key, meta.getColumnType(i), oValue.getClass(), oValue.toString());
-                    if(oValue instanceof Number) {
-                        value = ((Number) oValue);
+                    log(Level.TRACE, "type info for %s: type %d, %s = %s", key, meta.getColumnType(i), oValue.getClass(), oValue);
+                    if (oValue instanceof Number) {
+                        value = (Number) oValue;
                         values.put(key, value);
                     } else {
                         int type = meta.getColumnType(i);
-                        value = Double.NaN;
                         switch (type) {
                         case Types.DATE:
                             value = rs.getDate(i).getTime() / 1000;
@@ -157,6 +182,8 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
                         case Types.TIMESTAMP:
                             value = rs.getTimestamp(i).getTime() / 1000;
                             break;
+                        default:
+                            value = Double.NaN;
                         }
                         values.put(key, value);
                     }
@@ -174,10 +201,12 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
         return "JDBC";
     }
 
+    @Override
     public Integer getPort() {
         return 0;
     }
 
+    @Override
     public URL getUrl() {
         URL newurl = null;
         try {
@@ -188,10 +217,12 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
         return newurl;
     }
 
+    @Override
     public String getUrlAsString() {
         return getConnection().getUrl();
     }
 
+    @Override
     public String getIndexName() {
         return index;
     }
