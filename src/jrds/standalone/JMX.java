@@ -47,6 +47,7 @@ public class JMX extends CommandStarterImpl {
             Thread.currentThread().join();
             System.out.print("joined");
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
 
     }

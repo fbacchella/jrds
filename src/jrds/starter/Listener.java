@@ -23,7 +23,7 @@ public abstract class Listener<Message, KeyType> extends Starter {
                     try {
                         Listener.this.listen();
                     } catch (InterruptedException e) {
-                        // Normal exception, just exit
+                        Thread.currentThread().interrupt();
                         break;
                     } catch (Exception e) {
                         Date failedListen = new Date();
@@ -34,6 +34,7 @@ public abstract class Listener<Message, KeyType> extends Starter {
                         try {
                             Thread.sleep(lastsleep);
                         } catch (InterruptedException e1) {
+                            Thread.currentThread().interrupt();
                             break;
                         }
                         log(Level.ERROR, e, "Listener thread failed: %s", e.getMessage());

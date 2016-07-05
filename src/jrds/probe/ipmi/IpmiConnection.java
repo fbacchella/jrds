@@ -75,6 +75,7 @@ public class IpmiConnection extends Connection<Handle> {
             connector.openSession(handle, user, password, "".getBytes());
             jrdsHandle = new Handle(mainStarter.connector, handle);
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             return false;
         } catch (FileNotFoundException e) {
             log(Level.ERROR, "invalid IPMI connection: %s", e.getMessage());

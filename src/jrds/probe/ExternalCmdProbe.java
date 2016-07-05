@@ -143,7 +143,7 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         } catch (IOException e) {
             log(Level.ERROR, e, "Exception on close: %s", e);
         } catch (InterruptedException e) {
-            log(Level.ERROR, e, "Exception on close: %s", e);
+            Thread.currentThread().interrupt();
         }
         log(Level.DEBUG, "returned line: %s", perfstring);
         return perfstring;

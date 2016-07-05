@@ -156,7 +156,8 @@ public class Timer extends StarterNode {
                 return;
             }
         } catch (InterruptedException e) {
-            log(Level.FATAL, "A collect start was interrupted");
+            log(Level.INFO, "A collect start was interrupted");
+            Thread.currentThread().interrupt();
             return;
         }
         final AtomicInteger counter = new AtomicInteger(0);
@@ -199,6 +200,7 @@ public class Timer extends StarterNode {
                 log(Level.DEBUG, "collector thread refused");
             } catch (InterruptedException e) {
                 log(Level.INFO, "Collect interrupted");
+                Thread.currentThread().interrupt();
             }
             stopCollect();
             if(!tpool.isTerminated()) {
@@ -208,6 +210,7 @@ public class Timer extends StarterNode {
                     emergencystop = !tpool.awaitTermination(getTimeout(), TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
                     log(Level.INFO, "Collect interrupted in last chance");
+                    Thread.currentThread().interrupt();
                 }
                 if(emergencystop) {
                     log(Level.INFO, "Some task still alive, needs to be killed");

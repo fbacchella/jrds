@@ -66,6 +66,7 @@ ProbeConnected<String, Number, IpmiConnection> implements IndexedProbe {
                 log(Level.TRACE, "read %f for %s", data2.getSensorReading(fsr), getLabel());
                 value = data2.getSensorReading(fsr);
             } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
                 break;
             } catch (IPMIException e) {
                 if(e.getCompletionCode() == CompletionCode.ReservationCanceled) {

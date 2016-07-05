@@ -87,6 +87,7 @@ public class Configuration {
                 t.releaseCollect();
             }
         } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
         for(StoreFactory sf: propertiesManager.stores.values()) {
             sf.stop();

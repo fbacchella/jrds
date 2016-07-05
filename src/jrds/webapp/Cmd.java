@@ -78,6 +78,7 @@ public class Cmd extends JrdsServlet {
                     }
                     Thread.sleep(jrds.Util.parseStringNumber(arg, 1) * 1000);
                 } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
                 for(Timer t: hl.getTimers()) {
                     t.releaseCollect();

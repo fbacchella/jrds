@@ -51,6 +51,7 @@ public class Updater {
             tpool.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             logger.info("Collect interrupted");
+            Thread.currentThread().interrupt();
         }
         for(StoreFactory sf: pm.stores.values()) {
             sf.stop();

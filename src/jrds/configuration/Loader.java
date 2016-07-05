@@ -230,7 +230,7 @@ class Loader {
         try {
             tpool.awaitTermination(1000, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            logger.error(e);
+            Thread.currentThread().interrupt();
         }
     }
 }
