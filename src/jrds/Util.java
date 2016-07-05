@@ -199,11 +199,12 @@ public class Util {
     private static final Pattern varregexp = Pattern.compile("(.*?)(\\$\\{([\\w\\.-]+)\\}|%)(.*)");
     private static final Pattern oldvarregexp = Pattern.compile("(.*?[^\\$])??\\{(\\d+)\\}(.*)");
 
-    static private final Pattern digit = Pattern.compile("\\d+");
-    static private final Pattern attrSignature = Pattern.compile("attr\\.(.*)\\.signature");
-    static private final Pattern attr = Pattern.compile("attr\\.(.*)");
+    private static final Pattern digit = Pattern.compile("\\d+");
+    private static final Pattern attrSignature = Pattern.compile("attr\\.(.*)\\.signature");
+    private static final Pattern attr = Pattern.compile("attr\\.(.*)");
+    private static final Pattern PERCENT_PATTERN = Pattern.compile("%");
 
-    static private String findVariables(String in, int index, Map<String, Integer> indexes, Object... arguments) {
+    private static String findVariables(String in, int index, Map<String, Integer> indexes, Object... arguments) {
         Matcher m = varregexp.matcher(in);
         if(m.find()) {
             StringBuilder out = new StringBuilder();
@@ -212,44 +213,44 @@ public class Util {
             String var = m.group(3);
             String after = m.group(4);
             out.append(before);
-            String toAppend = null;
+            String toAppend = "";
             Matcher varMatcher;
             // We just found a lonely %, replace it with %% for latter
             // String.format
-            if("%".equals(percent)) {
+            if ("%".equals(percent)) {
                 toAppend = "%%";
             }
             // The variable referring to a system variable are directly resolved
-            else if(var.startsWith("system.")) {
+            else if (var.startsWith("system.")) {
                 toAppend = System.getProperty(var.replace("system.", ""));
                 // Will be used as a format string, protect %
-                toAppend = toAppend.replace("%", "%%");
+                toAppend = PERCENT_PATTERN.matcher(toAppend).replaceAll("%%");
             }
             // We found a ${\d+}, directly resolve with the first list argument
             else if(digit.matcher(var).matches()) {
                 for(Object o: arguments) {
-                    if(o instanceof List) {
+                    if (o instanceof List) {
                         List<?> l = (List<?>) o;
                         toAppend = l.get(Integer.parseInt(var) - 1).toString();
                         break;
                     }
                 }
                 // Will be used as a format string, protect %
-                toAppend = toAppend.replace("%", "%%");
+                toAppend = PERCENT_PATTERN.matcher(toAppend).replaceAll("%%");
             }
             // bean signatures are directly resolved
-            else if((varMatcher = attrSignature.matcher(var)).matches()) {
+            else if ((varMatcher = attrSignature.matcher(var)).matches()) {
                 String beanName = varMatcher.group(1);
                 for(Object o: arguments) {
                     if(o == null) {
                         continue;
                     }
                     // probe manage it's beans
-                    if(o instanceof Probe) {
+                    if (o instanceof Probe) {
                         GenericBean bean = ((Probe<?, ?>) o).getPd().getBean(beanName);
                         if(bean != null) {
                             Object beanValue = bean.get(o);
-                            if(beanValue != null) {
+                            if (beanValue != null) {
                                 toAppend = stringSignature(beanValue.toString());
                             } else {
                                 toAppend = "";
@@ -260,7 +261,7 @@ public class Util {
                         try {
                             PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
                             Method read = bean.getReadMethod();
-                            if(read != null)
+                            if (read != null)
                                 toAppend = stringSignature(read.invoke(o).toString());
                             break;
                         } catch (IntrospectionException e) {
@@ -271,17 +272,17 @@ public class Util {
                     }
                 }
                 // Will be used as a format string, protect %
-                toAppend = toAppend.replace("%", "%%");
+                toAppend = PERCENT_PATTERN.matcher(toAppend).replaceAll("%%");
             }
             // beans are directly resolved
             else if((varMatcher = attr.matcher(var)).matches()) {
                 String beanName = varMatcher.group(1);
-                for(Object o: arguments) {
-                    if(o == null) {
+                for (Object o: arguments) {
+                    if (o == null) {
                         continue;
                     }
                     // probe manage it's beans
-                    if(o instanceof Probe) {
+                    if (o instanceof Probe) {
                         GenericBean bean = ((Probe<?, ?>) o).getPd().getBean(beanName);
                         if(bean != null) {
                             Object beanValue = bean.get(o);
@@ -307,7 +308,7 @@ public class Util {
                     }
                 }
                 // Will be used as a format string, protect %
-                toAppend = toAppend.replace("%", "%%");
+                toAppend = PERCENT_PATTERN.matcher(toAppend).replaceAll("%%");
             }
             // Common case, replace the variable with it's index, for
             // MessageFormat
