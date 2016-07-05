@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -289,8 +290,9 @@ public class Renderer {
         }
         if(runRender != null && runRender.isReady()) {
             try {
-                return new FileInputStream(runRender.destFile).getChannel();
-            } catch (FileNotFoundException e) {
+                return FileChannel.open(runRender.destFile.toPath(), StandardOpenOption.READ);
+            } catch (IOException e) {
+                logger.error("Can't read graph cache file: " + e.getMessage());
                 return null;
             }
         } else {

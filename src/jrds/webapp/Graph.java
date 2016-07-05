@@ -89,10 +89,16 @@ public final class Graph extends JrdsServlet {
                     res.setContentLength((int) indata.size());
                 WritableByteChannel outC = Channels.newChannel(out);
                 indata.transferTo(0, indata.size(), outC);
-                indata.close();
             } else {
                 logger.debug(jrds.Util.delayedFormatString("graph %s not found in cache", graph));
                 graph.writePng(out);
+            }
+            if(indata != null) {
+                try {
+                    indata.close();
+                } catch (IOException e) {
+                    logger.error("failed to close cache file: " + e.getMessage());;
+                }
             }
 
             if(logger.isTraceEnabled()) {
