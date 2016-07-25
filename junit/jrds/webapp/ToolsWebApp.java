@@ -35,7 +35,9 @@ public class ToolsWebApp {
         config.put("configdir", root + "/config");
         config.put("autocreate", "true");
         config.put("rrddir", root);
-        if(!Boolean.parseBoolean(System.getProperty("maven"))) {
+        
+        // Tests might needs a little help to find descriptions folder
+        if (ServletTester.class.getClassLoader().getResource("desc/") == null) {
             config.put("libspath", "desc");
         }
         config.putAll(props);
