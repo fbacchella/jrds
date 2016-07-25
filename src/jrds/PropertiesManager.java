@@ -160,7 +160,7 @@ public class PropertiesManager extends Properties {
             }
         };
 
-        Collection<URI> urls = new HashSet<URI>();
+        Collection<URI> urls = new ArrayList<URI>();
 
         if(extendedclasspath != null && !"".equals(extendedclasspath)) {
             for(String pathElement: extendedclasspath.split(";")) {
@@ -319,6 +319,11 @@ public class PropertiesManager extends Properties {
         // **********************
         // The log configuration
 
+        // The class loader is configured early, it can be used by log4j
+        extensionClassLoader = doClassLoader(getProperty("classpath", ""));
+
+        // log4j uses the contextClassLoader, set it so it can uses fancy appenders
+        Thread.currentThread().setContextClassLoader(extensionClassLoader);
         // Log configuration is done early
         boolean nologging = parseBoolean(getProperty("nologging", "false"));
         String log4jXmlFile = getProperty("log4jxmlfile", "");
@@ -476,7 +481,6 @@ public class PropertiesManager extends Properties {
                     libspath.add(lib.toURI());
             }
         }
-        extensionClassLoader = doClassLoader(getProperty("classpath", ""));
 
         //
         // Tab configuration
