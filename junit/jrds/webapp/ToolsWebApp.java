@@ -37,7 +37,7 @@ public class ToolsWebApp {
         config.put("rrddir", root);
         
         // Tests might needs a little help to find descriptions folder
-        if (ServletTester.class.getClassLoader().getResource("desc/") == null) {
+        if (ServletTester.class.getClassLoader().getResource("probe/") == null) {
             config.put("libspath", "desc");
         }
         config.putAll(props);
