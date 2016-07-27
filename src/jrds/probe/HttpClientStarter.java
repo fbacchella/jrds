@@ -66,7 +66,12 @@ public class HttpClientStarter extends Starter {
         r.register("http", plainsf);
 
         // Register https
-        r.register("https", getSSLSocketFactory());
+        ConnectionSocketFactory sslfactory = getSSLSocketFactory();
+        if (sslfactory != null) {
+            r.register("https", getSSLSocketFactory());
+        } else {
+            log(Level.WARN, "ssl factory not found, won't manage https");
+        }
 
         HttpClientBuilder builder = HttpClientBuilder.create();
         builder.setUserAgent(USERAGENT);
@@ -93,6 +98,9 @@ public class HttpClientStarter extends Starter {
 
     private SSLConnectionSocketFactory getSSLSocketFactory() {
         SSLStarter sslstarter = getLevel().find(SSLStarter.class);
+        if (sslstarter == null) {
+            return null;
+        }
         SSLContext sc = sslstarter.getContext();
         try {
             sc = SSLContexts.custom().loadTrustMaterial(new TrustStrategy() {
@@ -124,6 +132,8 @@ public class HttpClientStarter extends Starter {
 
     @Override
     public boolean isStarted() {
-        return client != null && getLevel().find(SSLStarter.class).isStarted();
+        SSLStarter sslfactory = getLevel().find(SSLStarter.class);
+        // if no sslfactory, don't check if it's started
+        return client != null && (sslfactory != null ? sslfactory.isStarted() : true);
     }
 }
