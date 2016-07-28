@@ -194,11 +194,6 @@ public class PropertiesManager extends Properties {
         if(logger.isDebugEnabled())
             logger.debug("Internal class loader will look in:" + urls);
         return new URLClassLoader(arrayUrl, getClass().getClassLoader()) {
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.lang.Object#toString()
-             */
             @Override
             public String toString() {
                 return "JRDS' class loader";
@@ -317,10 +312,51 @@ public class PropertiesManager extends Properties {
         Locale.setDefault(new Locale("POSIX"));
 
         // **********************
-        // The log configuration
+        // The class loader configuration
+
+        // First resolve libspath, doClassLoader needs it
+        try {
+            Enumeration<URL> descurl = getClass().getClassLoader().getResources("desc");
+            while (descurl.hasMoreElements()) {
+                libspath.add(descurl.nextElement().toURI());
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("URI syntax exception", e);
+        } catch (IOException e) {
+            throw new RuntimeException("Can't locate embedded desc", e);
+        }
+
+        String libspathString = getProperty("libspath", "");
+        if(!"".equals(libspathString.trim())) {
+            for(String libName: libspathString.split(";")) {
+                File lib = new File(libName.trim());
+
+                boolean noJarDir = true;
+                if(lib.isDirectory()) {
+                    File[] foundFiles = lib.listFiles(filter);
+                    if(foundFiles == null) {
+                        logger.error("Failed to search in " + lib);
+                        continue;
+                    }
+                    for(File f: foundFiles) {
+                        libspath.add(f.toURI());
+                        noJarDir = false;
+                    }
+                }
+
+                // If a jar was found previously, it's not a source directory,
+                // don't add it, only the jar in it are interesting
+                if(lib.isFile() || (lib.isDirectory() && noJarDir))
+                    libspath.add(lib.toURI());
+            }
+        }
 
         // The class loader is configured early, it can be used by log4j
         extensionClassLoader = doClassLoader(getProperty("classpath", ""));
+
+
+        // **********************
+        // The log configuration
 
         // log4j uses the contextClassLoader, set it so it can uses fancy appenders
         Thread.currentThread().setContextClassLoader(extensionClassLoader);
@@ -376,6 +412,8 @@ public class PropertiesManager extends Properties {
         }
 
         legacymode = parseBoolean(getProperty("legacymode", "1"));
+
+        strictparsing = parseBoolean(getProperty("strictparsing", "false"));
 
         // Directories configuration
         autocreate = parseBoolean(getProperty("autocreate", "false"));
@@ -444,43 +482,6 @@ public class PropertiesManager extends Properties {
         ti.numCollectors = numCollectors;
         ti.slowCollectTime = slowcollecttime;
         timers.put(Timer.DEFAULTNAME, ti);
-
-        strictparsing = parseBoolean(getProperty("strictparsing", "false"));
-        try {
-            Enumeration<URL> descurl = getClass().getClassLoader().getResources("desc");
-            while (descurl.hasMoreElements()) {
-                libspath.add(descurl.nextElement().toURI());
-            }
-        } catch (URISyntaxException e) {
-            throw new RuntimeException("URI syntax exception", e);
-        } catch (IOException e) {
-            throw new RuntimeException("Can't locate embedded desc", e);
-        }
-
-        String libspathString = getProperty("libspath", "");
-        if(!"".equals(libspathString)) {
-            for(String libName: libspathString.split(";")) {
-                File lib = new File(libName);
-
-                boolean noJarDir = true;
-                if(lib.isDirectory()) {
-                    File[] foundFiles = lib.listFiles(filter);
-                    if(foundFiles == null) {
-                        logger.error("Failed to search in " + lib);
-                        continue;
-                    }
-                    for(File f: foundFiles) {
-                        libspath.add(f.toURI());
-                        noJarDir = false;
-                    }
-                }
-
-                // If a jar was found previously, it's not a source directory,
-                // don't add it
-                if(lib.isFile() || (lib.isDirectory() && noJarDir))
-                    libspath.add(lib.toURI());
-            }
-        }
 
         //
         // Tab configuration
