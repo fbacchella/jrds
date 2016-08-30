@@ -8,33 +8,31 @@ import java.awt.font.LineMetrics;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.log4j.Logger;
+import org.rrd4j.ConsolFun;
+import org.rrd4j.data.DataProcessor;
+import org.rrd4j.data.Plottable;
+import org.rrd4j.data.Variable;
+import org.rrd4j.graph.RrdGraphConstants;
+import org.rrd4j.graph.RrdGraphDef;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import jrds.Util.SiPrefix;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.probe.jdbc.JdbcProbe;
 import jrds.store.ExtractInfo;
-import jrds.store.Extractor;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
-
-import org.apache.log4j.Logger;
-import org.rrd4j.ConsolFun;
-import org.rrd4j.data.DataProcessor;
-import org.rrd4j.data.Plottable;
-import org.rrd4j.graph.RrdGraphConstants;
-import org.rrd4j.graph.RrdGraphDef;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 /**
  * A classed used to store the static description of a graph
@@ -520,7 +518,7 @@ public class GraphDesc implements Cloneable, WithACL {
         }
     }
 
-    static private final class DsDesc {
+    static final class DsDesc {
         final String name;
         final String dsName;
         final String rpn;
@@ -820,100 +818,7 @@ public class GraphDesc implements Cloneable, WithACL {
      *            associated probe
      */
     public void fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData) {
-        HostsList hl = defProbe.getHostList();
-        List<DsDesc> toDo = new ArrayList<DsDesc>();
-        // The datasources already found
-        Set<String> datasources = new HashSet<String>();
-
-        // The needed extractors
-        Map<Probe<?, ?>, Extractor> probeDS = new HashMap<Probe<?, ?>, Extractor>(1);
-        probeDS.put(defProbe, defProbe.getMainStore().getExtractor());
-
-        for(DsDesc ds: allds) {
-            boolean complete;
-            // Not a data source, don't try to add it in datasources
-            if(!ds.graphType.datasource()) {
-                complete = true;
-            }
-            // The graph is a percentile
-            else if(ds.percentile != null) {
-                complete = true;
-                if(!datasources.contains(ds.name)) {
-                    graphDef.percentile(ds.name, ds.dsName, ds.percentile);
-                    datasources.add(ds.name);
-                }
-            }
-            // A rpn datasource
-            else if(ds.rpn != null) {
-                complete = true;
-                if(!datasources.contains(ds.name)) {
-                    graphDef.datasource(ds.name, ds.rpn);
-                    datasources.add(ds.name);
-                }
-            }
-            // A legend
-            else if(ds.graphType == GraphType.LEGEND) {
-                complete = true;
-            }
-            // Does the datas existe in the provided values
-            // It override existing values in the probe
-            else if(customData != null && customData.containsKey(ds.dsName)) {
-                complete = true;
-                if(!datasources.contains(ds.name)) {
-                    graphDef.datasource(ds.name, customData.get(ds.dsName));
-                    datasources.add(ds.name);
-                    logger.trace(Util.delayedFormatString("custom data found for %s", ds.dsName));
-                }
-            }
-            // Last but common case, datasource refers to a rrd
-            // Or they might be on the associated rrd
-            else {
-                Probe<?, ?> probe = defProbe;
-                if(ds.dspath != null) {
-                    // If the host is not defined, use the current host
-                    String pathHost = ds.dspath.host;
-                    if(pathHost == null) {
-                        pathHost = defProbe.getHost().getName();
-                    }
-                    logger.trace(jrds.Util.delayedFormatString("External probe path: %s/%s/%s", pathHost, ds.dspath.probe, ds.dsName));
-                    probe = hl.getProbeByPath(pathHost, ds.dspath.probe);
-                    if(probe == null) {
-                        logger.error("Invalide probe: " + pathHost + "/" + ds.dspath.probe);
-                        continue;
-                    }
-                }
-                if(!probe.dsExist(ds.dsName)) {
-                    logger.error("Invalide datasource " + ds.dsName + ", not found in " + probe);
-                    continue;
-                }
-                complete = true;
-
-                // Add the dsName for the probe found
-                if(!probeDS.containsKey(probe)) {
-                    probeDS.put(probe, probe.getMainStore().getExtractor());
-                }
-                Extractor ex = probeDS.get(probe);
-                if(!datasources.contains(ds.name)) {
-                    ex.addSource(ds.name, ds.dsName);
-                    datasources.add(ds.name);
-                } else {
-                    logger.error("Datasource '" + ds.dsName + "' defined twice in " + name + ", for found: " + ds);
-                }
-            }
-            if(complete) {
-                toDo.add(ds);
-            } else {
-                logger.debug("Error for " + ds);
-                logger.error("No way to plot " + ds.name + " in " + name + " found");
-            }
-        }
-
-        // Fill the graphdef with extracted data
-        for(Extractor x: probeDS.values()) {
-            x.fill(graphDef, ei);
-            x.release();
-        }
-
+        List<DsDesc> toDo = DatasourcesPopulator.populate(graphDef, defProbe, ei, customData, allds, name);
         // The title line, only if values block is required
         if(withSummary) {
             graphDef.comment(""); // We simulate the color box
@@ -924,9 +829,6 @@ public class GraphDesc implements Cloneable, WithACL {
             graphDef.comment("  Maximum");
             graphDef.comment("\\l");
         }
-
-        logger.trace(Util.delayedFormatString("Datasource: %s", datasources));
-        logger.trace(Util.delayedFormatString("Todo: : %s", toDo));
 
         String shortLegend = withSummary ? " \\g" : null;
         for(DsDesc ds: toDo) {
@@ -949,88 +851,6 @@ public class GraphDesc implements Cloneable, WithACL {
     public RrdGraphDef getGraphDef(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> ownData) throws IOException {
         RrdGraphDef retValue = getEmptyGraphDef();
         fillGraphDef(retValue, defProbe, ei, ownData);
-        return retValue;
-    }
-
-    /**
-     * return the RrdGraphDef for this graph, used the indicated probe any data
-     * can be overridden of a provided map of Plottable
-     * 
-     * @param probe
-     * @param ownData data used to override probe's own values
-     * @return
-     * @throws IOException
-     */
-    public DataProcessor getPlottedDatas(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData) throws IOException {
-        DataProcessor retValue = ei.getDataProcessor();
-
-        HostsList hl = defProbe.getHostList();
-
-        // The datasources already found
-        Set<String> datasources = new HashSet<String>();
-
-        // The needed extractors
-        Map<Probe<?, ?>, Extractor> probeDS = new HashMap<Probe<?, ?>, Extractor>(1);
-        probeDS.put(defProbe, defProbe.getMainStore().getExtractor());
-
-        String lastName = null;
-        for(DsDesc ds: allds) {
-            boolean stack = ds.graphType == GraphType.STACK;
-            boolean plotted = stack || ds.graphType == GraphType.LINE || ds.graphType == GraphType.AREA;
-            if(ds.rpn == null && ds.dsName != null) {
-                // Does the datas exists in the provided values
-                if(customData != null && customData.containsKey(ds.dsName)) {
-                    retValue.addDatasource(ds.name, customData.get(ds.dsName));
-                } else {
-                    Probe<?, ?> probe = defProbe;
-                    if(ds.dspath != null) {
-                        logger.trace(jrds.Util.delayedFormatString("External probe path: %s/%s/%s", ds.dspath.host, ds.dspath.probe, ds.dsName));
-                        probe = hl.getProbeByPath(ds.dspath.host, ds.dspath.probe);
-                        if(probe == null) {
-                            logger.error("Invalide probe: " + ds.dspath.host + "/" + ds.dspath.probe);
-                            continue;
-                        }
-                    }
-                    if(!probe.dsExist(ds.dsName)) {
-                        logger.error("Invalide datasource " + ds.dsName + ", not found in " + probe);
-                        continue;
-                    }
-                    logger.trace(Util.delayedFormatString("ds '%s' found in probe %s", ds.dsName, probe));
-                    // Add the dsName for the probe found
-                    if(!probeDS.containsKey(probe)) {
-                        probeDS.put(probe, probe.getMainStore().getExtractor());
-                    }
-                    Extractor ex = probeDS.get(probe);
-                    if(!datasources.contains(ds.dsName)) {
-                        ex.addSource(ds.dsName, ds.name);
-                        datasources.add(ds.dsName);
-                    } else {
-                        logger.error("Datasource '" + ds.dsName + "' defined twice in " + name);
-                    }
-                }
-            } else if(ds.rpn != null) {
-                retValue.addDatasource(ds.name, ds.rpn);
-                datasources.add(ds.dsName);
-            }
-
-            if(plotted && stack) {
-                retValue.addDatasource("Plotted" + ds.name, lastName + ", " + ds.name + ", +");
-            } else if(plotted) {
-                retValue.addDatasource("Plotted" + ds.name, ds.name);
-            }
-            lastName = ds.name;
-        }
-        if(logger.isTraceEnabled()) {
-            logger.trace("Datasource for " + getName());
-            for(String s: retValue.getSourceNames())
-                logger.trace("\t" + s);
-        }
-
-        // Fill the dataprocessor with extracted data
-        for(Extractor x: probeDS.values()) {
-            x.fill(retValue, ei);
-            x.release();
-        }
         return retValue;
     }
 
@@ -1057,6 +877,19 @@ public class GraphDesc implements Cloneable, WithACL {
             def.gprint(ds, ConsolFun.MAX, "%8.2f%s");
             def.comment("\\l");
         }
+    }
+
+    /**
+     * return the RrdGraphDef for this graph, used the indicated probe any data
+     * can be overridden of a provided map of Plottable
+     * 
+     * @param probe
+     * @param ownData data used to override probe's own values
+     * @return
+     * @throws IOException
+     */
+    public DataProcessor getPlottedDatas(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData) throws IOException {
+        return DatasourcesPopulator.populate(defProbe, ei, customData, allds, name);
     }
 
     /**
