@@ -822,7 +822,7 @@ public class GraphDesc implements Cloneable, WithACL {
         // The title line, only if values block is required
         if(withSummary) {
             graphDef.comment(""); // We simulate the color box
-            graphDef.comment(MANYSPACE.substring(0, Math.min(maxLengthLegend, MANYSPACE.length() - 2) + 2));
+            graphDef.comment(MANYSPACE.substring(0, Math.min(maxLengthLegend, MANYSPACE.length() - 2) + 4));
             graphDef.comment("Current");
             graphDef.comment("  Average");
             graphDef.comment("  Minimum");
@@ -862,7 +862,8 @@ public class GraphDesc implements Cloneable, WithACL {
             int missingLength = Math.min(maxLengthLegend - legend.length(), MANYSPACE.length()) + 2;
             if(missingLength > 0)
                 def.comment(MANYSPACE.substring(0, missingLength));
-            def.gprint(ds, ConsolFun.MAX, "%6.2f%s");
+            def.datasource(ds + "_MAX", ds, new Variable.MAX());
+            def.gprint(ds + "_MAX", "%8.2f%s");
             def.comment("\\l");
         } else if(gt == GraphType.COMMENT) {
             def.comment(legend + "\\l");
@@ -871,10 +872,14 @@ public class GraphDesc implements Cloneable, WithACL {
             int missingLength = Math.min(maxLengthLegend - legend.length(), MANYSPACE.length()) + 2;
             if(missingLength > 0)
                 def.comment(MANYSPACE.substring(0, missingLength));
-            def.gprint(ds, ConsolFun.LAST, "%6.2f%s");
-            def.gprint(ds, ConsolFun.AVERAGE, "%8.2f%s");
-            def.gprint(ds, ConsolFun.MIN, "%8.2f%s");
-            def.gprint(ds, ConsolFun.MAX, "%8.2f%s");
+            def.datasource(ds + "_LAST", ds, new Variable.LAST());
+            def.gprint(ds + "_LAST", "%8.2f%s");
+            def.datasource(ds + "_AVERAGE", ds, new Variable.AVERAGE());
+            def.gprint(ds + "_AVERAGE", "%8.2f%s");
+            def.datasource(ds + "_MIN", ds, new Variable.MIN());
+            def.gprint(ds + "_MIN", "%8.2f%s");
+            def.datasource(ds + "_MAX", ds, new Variable.MAX());
+            def.gprint(ds + "_MAX", "%8.2f%s");
             def.comment("\\l");
         }
     }
