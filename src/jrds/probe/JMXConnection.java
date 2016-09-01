@@ -25,6 +25,22 @@ public class JMXConnection extends Connection<JmxAbstractDataSource<?>> {
     private boolean ssl = false;
     private AbstractJmxConnection cnx;
 
+    public JMXConnection() {
+        super();
+    }
+
+    public JMXConnection(Integer port) {
+        super();
+        this.port = port;
+    }
+
+    public JMXConnection(Integer port, String user, String password) {
+        super();
+        this.port = port;
+        this.user = user;
+        this.password = password;
+    }
+
     @Override
     public JmxAbstractDataSource<?> getConnection() {
         return cnx.getConnection();
