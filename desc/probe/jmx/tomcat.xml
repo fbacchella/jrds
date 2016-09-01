@@ -20,32 +20,32 @@ More informations can be found at http://java.sun.com/javase/6/docs/technotes/gu
     <ds>
         <dsName>bytesSent</dsName>
         <dsType>counter</dsType>
-        <collect>Catalina:type=GlobalRequestProcessor,name=${index}/bytesSent</collect>
+        <collect>Catalina:type=GlobalRequestProcessor,name="${index}"/bytesSent</collect>
     </ds>
     <ds>
         <dsName>bytesReceived</dsName>
         <dsType>counter</dsType>
-        <collect>Catalina:type=GlobalRequestProcessor,name=${index}/bytesReceived</collect>
+        <collect>Catalina:type=GlobalRequestProcessor,name="${index}"/bytesReceived</collect>
     </ds>
     <ds>
         <dsName>processingTime</dsName>
         <dsType>counter</dsType>
-        <collect>Catalina:type=GlobalRequestProcessor,name=${index}/processingTime</collect>
+        <collect>Catalina:type=GlobalRequestProcessor,name="${index}"/processingTime</collect>
     </ds>
     <ds>
         <dsName>errorCount</dsName>
         <dsType>counter</dsType>
-        <collect>Catalina:type=GlobalRequestProcessor,name=${index}/errorCount</collect>
+        <collect>Catalina:type=GlobalRequestProcessor,name="${index}"/errorCount</collect>
     </ds>
     <ds>
         <dsName>maxTime</dsName>
         <dsType>counter</dsType>
-        <collect>Catalina:type=GlobalRequestProcessor,name=${index}/maxTime</collect>
+        <collect>Catalina:type=GlobalRequestProcessor,name="${index}"/maxTime</collect>
     </ds>
     <ds>
         <dsName>requestCount</dsName>
         <dsType>counter</dsType>
-        <collect>Catalina:type=GlobalRequestProcessor,name=${index}/requestCount</collect>
+        <collect>Catalina:type=GlobalRequestProcessor,name="${index}"/requestCount</collect>
     </ds>
     <graphs>
         <name>TomcatHits</name>
