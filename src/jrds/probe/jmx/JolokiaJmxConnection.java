@@ -20,6 +20,7 @@ public class JolokiaJmxConnection extends AbstractJmxConnection {
     public JolokiaJmxConnection() {
         super();
         path = "/jolokia/";
+        port = -1;
     }
 
     @Override
@@ -35,7 +36,8 @@ public class JolokiaJmxConnection extends AbstractJmxConnection {
         }
         try {
             String protocol = ssl ? "https" : "http";
-            URL url = new URL(protocol, getHostName(), port, path);
+            int resolvedport = port > 0 ? port : ssl ? 443 : 80;
+            URL url = new URL(protocol, getHostName(), resolvedport, path);
             j4pClient = new J4pClient(url.toString(), httpstarter.getHttpClient());
             connection = new JolokiaJmxSource(j4pClient);
             return true;
