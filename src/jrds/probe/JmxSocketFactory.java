@@ -1,4 +1,4 @@
-package jrds.probe.jmx;
+package jrds.probe;
 
 import java.io.IOException;
 import java.net.Socket;

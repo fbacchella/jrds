@@ -28,6 +28,7 @@ import jrds.JuliToLog4jHandler;
 import jrds.PropertiesManager;
 import jrds.factories.ProbeBean;
 import jrds.jmx.JrdsSocketConnection;
+import jrds.probe.JmxSocketFactory;
 import jrds.starter.SocketFactory;
 
 @ProbeBean({ "url", "protocol", "port", "path", "user", "password" })

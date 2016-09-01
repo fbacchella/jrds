@@ -22,7 +22,6 @@ import jrds.ProbeDesc;
 import jrds.factories.ProbeMeta;
 import jrds.probe.jmx.JmxAbstractDataSource;
 import jrds.probe.jmx.JmxDiscoverAgent;
-import jrds.probe.jmx.JmxSocketFactory;
 
 /**
  * 

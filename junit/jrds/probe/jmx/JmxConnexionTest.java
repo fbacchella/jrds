@@ -41,6 +41,7 @@ import jrds.HostInfo;
 import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.probe.JMXConnection;
+import jrds.probe.JmxSocketFactory;
 import jrds.starter.HostStarter;
 import jrds.starter.SocketFactory;
 
