@@ -158,8 +158,18 @@ public class JMXConnection extends Connection<JmxAbstractDataSource<?>> {
         this.user = user;
     }
 
-    public int hashCode() {
-        return cnx.hashCode();
+    /**
+     * @return the ssl
+     */
+    public boolean isSsl() {
+        return ssl;
+    }
+
+    /**
+     * @param ssl the ssl to set
+     */
+    public void setSsl(boolean ssl) {
+        this.ssl = ssl;
     }
 
     public String toString() {
@@ -180,20 +190,6 @@ public class JMXConnection extends Connection<JmxAbstractDataSource<?>> {
      */
     public <T> T getMBean(String name, Class<T> interfaceClass) {
         return cnx.getMBean(name, interfaceClass);
-    }
-
-    /**
-     * @return the ssl
-     */
-    public boolean isSsl() {
-        return ssl;
-    }
-
-    /**
-     * @param ssl the ssl to set
-     */
-    public void setSsl(boolean ssl) {
-        this.ssl = ssl;
     }
 
 }
