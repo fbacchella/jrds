@@ -1,4 +1,4 @@
-package jrds.probe;
+package jrds.probe.jmx;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -25,7 +25,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
 
     private String hostname;
 
-    private final JMXConnection cnx = new JMXConnection() {
+    private final NativeJmxConnection cnx = new NativeJmxConnection() {
         @Override
         public String getHostName() {
             return JmxDiscoverAgent.this.hostname;
@@ -75,7 +75,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
         this.hostname = hostname;
         String protocolName = request.getParameter("discoverJmxProtocol");
         if(protocolName != null && !protocolName.trim().isEmpty()) {
-            cnx.setProtocol(protocolName.trim());
+            cnx.setProtocol(JmxProtocol.valueOf(protocolName.trim()));
         }
         Integer port = jrds.Util.parseStringNumber(request.getParameter("discoverJmxPort"), 0);
         if(port != 0) {
@@ -84,7 +84,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
         cnx.setUser(request.getParameter("discoverJmxUser"));
         cnx.setPassword(request.getParameter("discoverJmxPassword"));
         if(cnx.startConnection()) {
-            return cnx.getConnection();
+            return cnx.getConnection().connection;
         } else {
             return null;
         }
@@ -103,7 +103,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
 
     @Override
     public boolean isGoodProbeDesc(ProbeDescSummary summary) {
-        MBeanServerConnection mbean = cnx.getConnection();
+        MBeanServerConnection mbean = cnx.getConnection().connection;
         boolean valid = true;
         boolean enumerated = false;
         for(String name: summary.specifics.get("mbeanNames").split(" *; *")) {
@@ -131,12 +131,12 @@ public class JmxDiscoverAgent extends DiscoverAgent {
     @Override
     public void addConnection(JrdsElement hostElement, HttpServletRequest request) {
         JrdsElement cnxElem = hostElement.addElement("connection", "type=jrds.probe.JMXConnection");
-        cnxElem.addElement("attr", "name=protocol").setTextContent(cnx.getProtocol());
-        cnxElem.addElement("attr", "name=port").setTextContent(cnx.getPort().toString());
+        cnxElem.addElement("attr", "name=protocol").setTextContent(cnx.getProtocol().toString());
+        cnxElem.addElement("attr", "name=port").setTextContent(Integer.toString(cnx.getPort()));
     }
 
     private Set<String> enumerateIndexes(ProbeDescSummary summary) {
-        MBeanServerConnection mbean = cnx.getConnection();
+        MBeanServerConnection mbean = cnx.getConnection().connection;
         Set<String> indexes = new HashSet<String>();
         for(String name: summary.specifics.get("mbeanNames").split(" *; *")) {
             try {

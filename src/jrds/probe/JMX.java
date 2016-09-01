@@ -1,10 +1,8 @@
 package jrds.probe;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
-import java.net.URLDecoder;
-import java.util.Collection;
+import java.lang.reflect.InvocationTargetException;
+import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -12,19 +10,19 @@ import java.util.Set;
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
 import javax.management.MBeanException;
-import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
-import javax.management.openmbean.CompositeData;
-import javax.management.openmbean.TabularData;
+
+import org.apache.log4j.Level;
 
 import jrds.ConnectedProbe;
 import jrds.ProbeConnected;
 import jrds.ProbeDesc;
 import jrds.factories.ProbeMeta;
-
-import org.apache.log4j.Level;
+import jrds.probe.jmx.JmxAbstractDataSource;
+import jrds.probe.jmx.JmxDiscoverAgent;
+import jrds.probe.jmx.JmxSocketFactory;
 
 /**
  * 
@@ -34,7 +32,7 @@ import org.apache.log4j.Level;
         discoverAgent=JmxDiscoverAgent.class,
         topStarter=JmxSocketFactory.class
         )
-public class JMX extends ProbeConnected<String, Double, JMXConnection> implements ConnectedProbe {
+public class JMX extends ProbeConnected<String, Double, JMXConnection> implements ConnectedProbe, SSLProbe {
     private Map<String, String> collectKeys = null;
 
     public JMX() {
@@ -54,7 +52,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
 
     @Override
     public Map<String, Double> getNewSampleValuesConnected(JMXConnection cnx) {
-        MBeanServerConnection mbean = cnx.getConnection();
+        JmxAbstractDataSource<?> mbean = cnx.getConnection();
         try {
             Set<String> collectKeys = getCollectMapping().keySet();
             Map<String, Double> retValues = new HashMap<String, Double>(collectKeys.size());
@@ -68,24 +66,34 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
                 String attributeName = jmxPath[0];
                 log(Level.TRACE, "mbean name = %s, attributeName = %s", mbeanName, attributeName);
                 try {
-                    Object attr = mbean.getAttribute(mbeanName, attributeName);
-                    Number v = resolvJmxObject(attr, jmxPath);
+                    Number v = mbean.getValue(mbeanName, attributeName, jmxPath);
                     log(Level.TRACE, "JMX Path: %s = %s", collect, v);
-                    retValues.put(collect, v.doubleValue());
-                } catch (AttributeNotFoundException e1) {
-                    log(Level.ERROR, e1, "Invalide JMX attribue %s", attributeName);
-                } catch (InstanceNotFoundException e1) {
-                    Level l = Level.ERROR;
-                    if(isOptional(collect)) {
-                        l = Level.DEBUG;
+                    if (v != null) {
+                        retValues.put(collect, v.doubleValue());
                     }
-                    log(l, "JMX instance not found: %s", e1.getMessage());
-                } catch (MBeanException e1) {
-                    log(Level.ERROR, e1, "JMX MBeanException: %s", e1);
-                } catch (ReflectionException e1) {
-                    log(Level.ERROR, e1, "JMX reflection error: %s", e1);
-                } catch (IOException e1) {
-                    log(Level.ERROR, e1, "JMX IO error: %s", e1);
+                } catch (InvocationTargetException e) {
+                    if (e.getCause() != null) {
+                        try {
+                            throw e.getCause();
+                        } catch (RemoteException e1) {
+                            log(Level.ERROR, e1, "JMX remote exception: %s", e1.getMessage());
+                        } catch (AttributeNotFoundException e1) {
+                            log(Level.ERROR, e1, "Invalide JMX attribue %s", attributeName);
+                        } catch (InstanceNotFoundException e1) {
+                            Level l = Level.ERROR;
+                            if(isOptional(collect)) {
+                                l = Level.DEBUG;
+                            }
+                            log(l, "JMX instance not found: %s", e1.getMessage());
+                        } catch (MBeanException e1) {
+                            log(Level.ERROR, e1, "JMX MBeanException: %s", e1.getMessage());
+                        } catch (ReflectionException e1) {
+                            log(Level.ERROR, e1, "JMX reflection error: %s", e1.getMessage());
+                        } catch (IOException e1) {
+                            log(Level.ERROR, e1, "JMX IO error: %s", e1.getMessage());
+                        } catch (Throwable e1) {
+                        }
+                    }
                 }
             }
             return retValues;
@@ -103,47 +111,6 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
         return "JMX";
     }
 
-    /**
-     * Try to extract a numerical value from a jmx Path pointing to a jmx object
-     * If the attribute (element 0) of the path is a :
-     * - Set, array or TabularData, the size is used
-     * - Map, the second element is the key to the value
-     * - CompositeData, the second element is the key to the value
-     * @param jmxPath
-     * @param o
-     * @return
-     * @throws UnsupportedEncodingException
-     */
-    Number resolvJmxObject(Object o, String[] jmxPath) throws UnsupportedEncodingException {
-        Object value;
-        // Fast simple case
-        if(o instanceof Number)
-            return (Number) o;
-        else if(o instanceof CompositeData && jmxPath.length == 2) {
-            String subKey = URLDecoder.decode(jmxPath[1], "UTF-8");
-            CompositeData co = (CompositeData) o;
-            value = co.get(subKey);
-        } else if(o instanceof Map<?, ?> && jmxPath.length == 2) {
-            String subKey = URLDecoder.decode(jmxPath[1], "UTF-8");
-            value = ((Map<?, ?>) o).get(subKey);
-        } else if(o instanceof Collection<?>) {
-            return ((Collection<?>) o).size();
-        } else if(o instanceof TabularData) {
-            return ((TabularData) o).size();
-        } else if(o.getClass().isArray()) {
-            return Array.getLength(o);
-        }
-        // Last try, make a wild guess
-        else {
-            value = o;
-        }
-        if(value instanceof Number) {
-            return ((Number) value);
-        } else if(value instanceof String) {
-            return jrds.Util.parseStringNumber((String) value, Double.NaN);
-        }
-        return Double.NaN;
-    }
 
     /*
      * (non-Javadoc)

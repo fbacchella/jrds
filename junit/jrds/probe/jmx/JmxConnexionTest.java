@@ -1,4 +1,4 @@
-package jrds.probe;
+package jrds.probe.jmx;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -30,18 +30,19 @@ import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
 
-import jrds.HostInfo;
-import jrds.PropertiesManager;
-import jrds.Tools;
-import jrds.starter.HostStarter;
-import jrds.starter.SocketFactory;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import jrds.HostInfo;
+import jrds.PropertiesManager;
+import jrds.Tools;
+import jrds.probe.JMXConnection;
+import jrds.starter.HostStarter;
+import jrds.starter.SocketFactory;
 
 public class JmxConnexionTest {
     static final private Logger logger = Logger.getLogger(JmxConnexionTest.class);
@@ -70,7 +71,8 @@ public class JmxConnexionTest {
 
     private JrdsMBeanInfo mbi;
 
-    static private void enumerate(MBeanServerConnection mbean) throws InstanceNotFoundException, IntrospectionException, AttributeNotFoundException, ReflectionException, MBeanException, IllegalArgumentException, IOException {
+    static private void enumerate(NativeJmxSource source) throws InstanceNotFoundException, IntrospectionException, AttributeNotFoundException, ReflectionException, MBeanException, IllegalArgumentException, IOException {
+        MBeanServerConnection mbean = source.connection;
         Set<ObjectInstance> s = mbean.queryMBeans(null, null);
         for(ObjectInstance o: s) {
             logger.debug("Class: " + o.getClassName());
@@ -184,7 +186,7 @@ public class JmxConnexionTest {
         Assert.assertTrue("JMX Connection failed to start", cnx.isStarted());
         Assert.assertNotNull("Failed to read uptime", cnx.setUptime());
         if(false)
-            enumerate(cnx.getConnection());
+            enumerate((NativeJmxSource)cnx.getConnection());
     }
 
     @Test

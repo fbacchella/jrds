@@ -41,5 +41,6 @@
         <dependency org="org.glassfish.external" name="opendmk_jmxremote_optional_jar" rev="1.0-b01-ea" conf="libtest->default"/>
         <dependency org="net.iharder" name="base64" rev="2.3.8" conf="lib->default"/>
         <dependency org="fr.jrds.verax" name="vxIPMI" rev="1.0.17.2-SNAPSHOT" conf="lib->default"/>
+        <dependency org="org.jolokia" name="jolokia-client-java" rev="1.3.3" conf="lib->default"/>
     </dependencies>
 </ivy-module>
