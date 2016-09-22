@@ -45,7 +45,7 @@ import org.w3c.dom.Element;
         )
 public abstract class Probe<KeyType, ValueType> extends StarterNode implements Comparable<Probe<KeyType, ValueType>>  {
 
-    private class LocalJrdsSample extends HashMap<String, Number> implements JrdsSample {
+    protected class LocalJrdsSample extends HashMap<String, Number> implements JrdsSample {
         Date time;
 
         /**
@@ -68,7 +68,15 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         }
 
         public void put(Map.Entry<String, Double> e) {
-            this.put(e.getKey(), e.getValue());
+            if (e.getKey() == null) {
+                Probe.this.log(Level.ERROR, "trying to store a null key for a value");
+                return;
+            } else if (e.getValue() == null) {
+                Probe.this.log(Level.ERROR, "trying to store a null value for key %s", e.getKey());
+                return;
+            } else {
+                this.put(e.getKey(), e.getValue());
+            }
         }
 
         public Probe<KeyType, ValueType> getProbe() {
