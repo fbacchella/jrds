@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -53,16 +54,6 @@ import org.w3c.dom.DocumentType;
  */
 public class Util {
     static final private Logger logger = Logger.getLogger(Util.class);
-
-    static private MessageDigest md5digest;
-
-    static {
-        try {
-            md5digest = java.security.MessageDigest.getInstance("MD5");
-        } catch (java.security.NoSuchAlgorithmException ex) {
-            logger.fatal("You should not see this message, MD5 not available");
-        }
-    }
 
     /**
      * The SI prefix as an enumeration, with factor provided.
@@ -138,6 +129,22 @@ public class Util {
         tFactory.setErrorListener(el);
     }
 
+    private static final ThreadLocal<MessageDigest> md5Source = new ThreadLocal<MessageDigest>() {
+        @Override
+        protected MessageDigest initialValue() {
+            try {
+                return MessageDigest.getInstance("MD5");
+            } catch (NoSuchAlgorithmException e) {
+                logger.fatal("You should not see this message, MD5 not available");
+                throw new RuntimeException(e);
+            }
+        }
+    };
+
+    public static MessageDigest getmd5() {
+        return md5Source.get();
+    }
+
     /**
      * Return the md5 digest value of a string, encoded in base64
      * 
@@ -145,11 +152,9 @@ public class Util {
      * @return the printable md5 digest value for s
      */
     public static String stringSignature(String s) {
-        byte[] digestval;
-        synchronized (md5digest) {
-            md5digest.reset();
-            digestval = md5digest.digest(s.getBytes());
-        }
+        getmd5().reset();
+        byte[] digestval = getmd5().digest(s.getBytes());
+        getmd5().reset();
         return Base64.encodeBytes(digestval);
     }
 
