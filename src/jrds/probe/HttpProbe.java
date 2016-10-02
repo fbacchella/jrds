@@ -16,6 +16,7 @@ import java.util.IllegalFormatConversionException;
 import java.util.List;
 import java.util.Map;
 
+import jrds.ConnectedProbe;
 import jrds.Probe;
 import jrds.Util;
 import jrds.factories.ProbeBean;
@@ -33,7 +34,7 @@ import org.apache.log4j.Level;
  * @author Fabrice Bacchella
  */
 @ProbeBean({ "port", "file", "url", "urlhost", "scheme", "login", "password" })
-public abstract class HttpProbe extends Probe<String, Number> implements UrlProbe {
+public abstract class HttpProbe extends Probe<String, Number> implements UrlProbe, ConnectedProbe {
     protected URL url = null;
     protected String urlhost = null;
     protected int port = -1;
@@ -42,6 +43,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
     protected String login = null;
     protected String password = null;
     private Starter resolver = null;
+    protected String connectionName = null;
 
     public Boolean configure(URL url) {
         this.url = url;
@@ -323,6 +325,16 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public String getConnectionName() {
+        return connectionName ;
+    }
+
+    @Override
+    public void setConnectionName(String connectionName) {
+        this.connectionName = connectionName;
     }
 
 }

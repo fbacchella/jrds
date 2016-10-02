@@ -32,6 +32,17 @@ import org.apache.log4j.Level;
         )
 public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
 
+    private String sessionName = null;
+    private boolean mandatorySession = false;
+
+    @Override
+    public Boolean configure() {
+        if("true".equalsIgnoreCase(getPd().getSpecific("mandatorySession"))) {
+            mandatorySession = true;
+        }
+        return super.configure();
+    }
+
     @Override
     public Map<String, Number> getNewSampleValues() {
         log(Level.DEBUG, "Getting %s", getUrl());
@@ -40,6 +51,19 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
         HttpEntity entity = null;
         try {
             HttpGet hg = new HttpGet(getUrl().toURI());
+            HttpSession session = null;
+            if (sessionName != null) {
+                session = find(HttpSession.class, sessionName);
+                if (session != null) {
+                    if (!session.makeSession(hg)) {
+                        log(Level.ERROR, "session failed");
+                    }
+                }
+            }
+            if (session == null && mandatorySession) {
+                log(Level.ERROR, "missing session");
+                return null;
+            }
             HttpResponse response = cnx.execute(hg);
             if(response.getStatusLine().getStatusCode() != 200) {
                 log(Level.ERROR, "Connection to %s fail with %s", getUrl(), response.getStatusLine().getReasonPhrase());
@@ -66,6 +90,20 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
         }
 
         return null;
+    }
+
+    /**
+     * @return the session
+     */
+    public String getSession() {
+        return sessionName;
+    }
+
+    /**
+     * @param session the session to set
+     */
+    public void setSession(String session) {
+        this.sessionName = session;
     }
 
 }
