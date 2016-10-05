@@ -5,14 +5,14 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Map;
 
-import jrds.factories.ProbeMeta;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Level;
+
+import jrds.factories.ProbeMeta;
 
 /**
  * 
@@ -32,7 +32,6 @@ import org.apache.log4j.Level;
         )
 public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
 
-    private String sessionName = null;
     private boolean mandatorySession = false;
 
     @Override
@@ -45,15 +44,15 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
 
     @Override
     public Map<String, Number> getNewSampleValues() {
-        log(Level.DEBUG, "Getting %s", getUrl());
         HttpClientStarter httpstarter = find(HttpClientStarter.class);
         HttpClient cnx = httpstarter.getHttpClient();
         HttpEntity entity = null;
         try {
             HttpGet hg = new HttpGet(getUrl().toURI());
             HttpSession session = null;
-            if (sessionName != null) {
-                session = find(HttpSession.class, sessionName);
+            if (connectionName != null) {
+               log(Level.DEBUG, "looking for session %s", connectionName);
+                session = find(HttpSession.class, connectionName);
                 if (session != null) {
                     if (!session.makeSession(hg)) {
                         log(Level.ERROR, "session failed");
@@ -90,20 +89,6 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
         }
 
         return null;
-    }
-
-    /**
-     * @return the session
-     */
-    public String getSession() {
-        return sessionName;
-    }
-
-    /**
-     * @param session the session to set
-     */
-    public void setSession(String session) {
-        this.sessionName = session;
     }
 
 }
