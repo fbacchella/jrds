@@ -98,7 +98,6 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
     private boolean finishConfigure(List<Object> argslist) {
         if(url == null) {
             if(port <= 0 && (scheme == null || scheme.isEmpty())) {
-                port = 80;
                 scheme = "http";
             } else if(scheme == null || scheme.isEmpty()) {
                 if(port == 443) {
@@ -123,25 +122,26 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
             } catch (UnsupportedEncodingException e1) {
                 // never reached catch
             }
+            String portString = port < 0 ? "" : ":" + Integer.toString(port);
             if(urlhost == null) {
                 urlhost = getHost().getDnsName();
             }
             String urlString;
             if(argslist != null) {
                 try {
-                    urlString = String.format(scheme + "://" + userInfo + urlhost + ":" + port + file, argslist.toArray());
+                    urlString = String.format(scheme + "://" + userInfo + urlhost + portString + file, argslist.toArray());
                     urlString = Util.parseTemplate(urlString, getHost(), argslist);
                 } catch (IllegalFormatConversionException e) {
-                    log(Level.ERROR, "Illegal format string: %s://%s%s:%d%s, args %d", scheme, userInfo, urlhost, port, file, argslist.size());
+                    log(Level.ERROR, "Illegal format string: %s://%s%s:%d%s, args %d", scheme, userInfo, urlhost, portString, file, argslist.size());
                     return false;
                 }
             } else {
-                urlString = Util.parseTemplate(scheme + "://" + userInfo + urlhost + ":" + port + file, getHost());
+                urlString = Util.parseTemplate(scheme + "://" + userInfo + urlhost + portString + file, getHost());
             }
             try {
                 url = new URL(urlString);
             } catch (MalformedURLException e) {
-                log(Level.ERROR, e, "URL '%s:/%s/%s:%s%s' is invalid", scheme, userInfo, urlhost, port, file);
+                log(Level.ERROR, e, "URL '%s:/%s/%s:%s%s' is invalid", scheme, userInfo, urlhost, portString, file);
                 return false;
             }
         }
