@@ -346,11 +346,12 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             }
             // If the connection is not already registred, try looking for it
             // And register it with the host
-            if(p.find(connectionName) == null) {
-                if(logger.isTraceEnabled())
+            // If it's null, it an optionnal connection, like in HttpProbe, don't insist on registring it.
+            if (connectionName != null && p.find(connectionName) == null) {
+                if (logger.isTraceEnabled())
                     logger.trace(Util.delayedFormatString("Looking for connection %s in %s", connectionName, host.getConnections()));
                 ConnectionInfo ci = host.getConnection(connectionName);
-                if(ci != null)
+                if (ci != null)
                     ci.register(shost);
                 else {
                     logger.error(Util.delayedFormatString("Failed to find a connection %s for a probe %s", connectionName, cp));
