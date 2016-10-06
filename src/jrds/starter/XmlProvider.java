@@ -126,9 +126,9 @@ public class XmlProvider extends Starter {
             d = dbuilder.parse(stream);
             log(Level.TRACE, "just parsed a %s", d.getDocumentElement().getTagName());
         } catch (SAXException e) {
-            log(Level.ERROR, e, "Invalid XML");
+            log(Level.ERROR, e, "Invalid XML: %s", e.getMessage());
         } catch (IOException e) {
-            log(Level.ERROR, e, "IO Exception getting values");
+            log(Level.ERROR, e, "IO Exception getting values: %s", e.getMessage());
         }
         return d;
     }
