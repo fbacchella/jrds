@@ -9,6 +9,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Level;
 
@@ -48,24 +49,12 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
         HttpClient cnx = httpstarter.getHttpClient();
         HttpEntity entity = null;
         try {
-            HttpGet hg = new HttpGet(getUrl().toURI());
-            HttpSession session = null;
-            if (connectionName != null) {
-               log(Level.DEBUG, "looking for session %s", connectionName);
-                session = find(HttpSession.class, connectionName);
-                if (session != null) {
-                    if (!session.makeSession(hg)) {
-                        log(Level.ERROR, "session failed");
-                    }
-                }
-            }
-            if (session == null && mandatorySession) {
-                log(Level.ERROR, "missing session");
+            HttpRequestBase hg = new HttpGet(getUrl().toURI());
+            if (! changeRequest(hg)) {
                 return null;
             }
             HttpResponse response = cnx.execute(hg);
-            if(response.getStatusLine().getStatusCode() != 200) {
-                log(Level.ERROR, "Connection to %s fail with %s", getUrl(), response.getStatusLine().getReasonPhrase());
+            if (!validateResponse(response)) {
                 EntityUtils.consumeQuietly(response.getEntity());
                 return null;
             }
@@ -89,6 +78,44 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
         }
 
         return null;
+    }
+
+    /**
+     * This method can be overridden to change a request, the default implementation find
+     * a defined connection and delegate request changes to it.
+     * @param request the request to change
+     * @return true if change was successful.
+     */
+    public boolean changeRequest(HttpRequestBase request) {
+        HttpSession session = null;
+        if (connectionName != null) {
+            log(Level.DEBUG, "looking for session %s", connectionName);
+            session = find(HttpSession.class, connectionName);
+            if (session != null) {
+                if (!session.makeSession(request)) {
+                    log(Level.ERROR, "session failed");
+                }
+            }
+        }
+        if (session == null && mandatorySession) {
+            log(Level.ERROR, "missing session");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * This method can be used to validate the response, the default implementation check
+     * that the status code is 200.
+     * @param response the responce to check
+     * @return true if it's a valide response
+     */
+    public boolean validateResponse(HttpResponse response) {
+        if (response.getStatusLine().getStatusCode() != 200) {
+            log(Level.ERROR, "Connection to %s fail with %s", getUrl(), response.getStatusLine().getReasonPhrase());
+            return false;
+        }
+        return true;
     }
 
 }

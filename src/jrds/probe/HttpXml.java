@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Level;
+import org.w3c.dom.Document;
+
 import jrds.ProbeDesc;
 import jrds.Util;
 import jrds.factories.ProbeMeta;
 import jrds.starter.XmlProvider;
-
-import org.apache.log4j.Level;
-import org.w3c.dom.Document;
 
 /**
  * This probe can be used to collect values read from an XML document extracted
@@ -191,6 +191,9 @@ public class HttpXml extends HCHttpProbe {
         }
 
         Document d = xmlstarter.getDocument(stream);
+        if (! validateXml(xmlstarter, d)) {
+            return null;
+        }
         setUptime(findUptime(xmlstarter, d));
         Map<String, Number> vars = new HashMap<String, Number>();
         xmlstarter.fileFromXpaths(d, xpaths, vars);
@@ -198,6 +201,17 @@ public class HttpXml extends HCHttpProbe {
         vars = dom2Map(d, vars);
         log(Level.TRACE, "%s", vars);
         return vars;
+    }
+
+    /**
+     * This method can be used to check that a already parsed XML is comforming some
+     * expected rules. The default implementation always return true
+     * @param xmlstarter the help class for XML manipulation
+     * @param d the document to validate
+     * @return true if it complies with expected rules
+     */
+    protected boolean validateXml(XmlProvider xmlstarter, Document d) {
+        return true;
     }
 
     /*
