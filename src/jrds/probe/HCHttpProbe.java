@@ -3,6 +3,7 @@ package jrds.probe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
@@ -46,22 +47,28 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
     @Override
     public Map<String, Number> getNewSampleValues() {
         HttpClientStarter httpstarter = find(HttpClientStarter.class);
+        if (! httpstarter.isStarted()) {
+            return Collections.emptyMap();
+        }
         HttpClient cnx = httpstarter.getHttpClient();
         HttpEntity entity = null;
         try {
             HttpRequestBase hg = new HttpGet(getUrl().toURI());
             if (! changeRequest(hg)) {
-                return null;
+                return Collections.emptyMap();
+            }
+            if (! httpstarter.isStarted()) {
+                return Collections.emptyMap();
             }
             HttpResponse response = cnx.execute(hg);
             if (!validateResponse(response)) {
                 EntityUtils.consumeQuietly(response.getEntity());
-                return null;
+                return Collections.emptyMap();
             }
             entity = response.getEntity();
             if(entity == null) {
                 log(Level.ERROR, "Not response body to %s", getUrl());
-                return null;
+                return Collections.emptyMap();
             }
             InputStream is = entity.getContent();
             Map<String, Number> vars = parseStream(is);
@@ -77,7 +84,7 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
             }
         }
 
-        return null;
+        return Collections.emptyMap();
     }
 
     /**
