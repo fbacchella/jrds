@@ -76,7 +76,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
             rrdDef.setPath(dest.getCanonicalPath());
             RrdDb rrdDest = new RrdDb(rrdDef);
 
-            log(Level.DEBUG, "updating %s to %s", source, dest);
+            log(Level.DEBUG, "Updating %s to %s", source, dest);
 
             Set<String> badDs = new HashSet<String>();
             Header header = rrdSource.getHeader();
@@ -195,7 +195,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 long newstep = tmpdef.getStep();
 
                 if(newstep != oldstep) {
-                    log(Level.ERROR, "step changed, you're in trouble");
+                    log(Level.ERROR, "Step changed, this probe will not collect any more");
                     return false;
                 } else if(!newDef.equals(oldDef)) {
                     rrdDb.close();
