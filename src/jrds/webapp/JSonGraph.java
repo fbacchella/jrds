@@ -63,6 +63,9 @@ public class JSonGraph extends JSonData {
 
     private void doGraph(GraphNode gn, Renderer r, ParamsBean params, JrdsJSONWriter w) throws IOException {
         jrds.Graph graph = gn.getGraph();
+        if (graph == null) {
+            return;
+        }
         params.configureGraph(graph);
 
         Map<String, Object> imgProps = new HashMap<String, Object>();

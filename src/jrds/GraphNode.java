@@ -1,18 +1,19 @@
 package jrds;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
 
-import jrds.configuration.HostBuilder;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.rrd4j.data.DataProcessor;
+
 import jrds.factories.ArgFactory;
 import jrds.store.ExtractInfo;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
-
-import org.apache.log4j.Logger;
-import org.rrd4j.data.DataProcessor;
 
 /**
  * @author Fabrice Bacchella
@@ -131,26 +132,29 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
     public Graph getGraph() {
         Class<Graph> gclass = gd.getGraphClass();
 
+        Graph g;
+        Map<String, GenericBean> beansList;
         try {
-            Graph g = gclass.getConstructor(GraphNode.class).newInstance(this);
-            Map<String, GenericBean> beansList = ArgFactory.getBeanPropertiesMap(gclass, Graph.class);
-
-            // Resolve the beans
-            for(Map.Entry<String, String> e: beans.entrySet()) {
-                String name = Util.parseTemplate(e.getKey(), probe);
-                String textValue = Util.parseTemplate(e.getValue(), probe);
-                GenericBean bean = beansList.get(name);
-                if(bean == null) {
-                    logger.error(String.format("Unknown bean for %s: %s", gd.getName(), name));
-                    continue;
-                }
-                logger.trace(Util.delayedFormatString("Found attribute %s with value %s", name, textValue));
-                bean.set(g, textValue);
-            }
-            return g;
-        } catch (Exception e) {
-            throw new RuntimeException(HostBuilder.class.getName(), e);
+            g = gclass.getConstructor(GraphNode.class).newInstance(this);
+            beansList = ArgFactory.getBeanPropertiesMap(gclass, Graph.class);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+            Util.log(this, logger, Level.ERROR, e, "Failed to build a graph instance  %s", gclass.getCanonicalName());
+            return null;
         }
+
+        // Resolve the beans
+        for(Map.Entry<String, String> e: beans.entrySet()) {
+            String name = Util.parseTemplate(e.getKey(), probe);
+            String textValue = Util.parseTemplate(e.getValue(), probe);
+            GenericBean bean = beansList.get(name);
+            if(bean == null) {
+                logger.error(String.format("Unknown bean for %s: %s", gd.getName(), name));
+                continue;
+            }
+            logger.trace(Util.delayedFormatString("Found attribute %s with value %s", name, textValue));
+            bean.set(g, textValue);
+        }
+        return g;
     }
 
     /*
