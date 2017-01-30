@@ -1,27 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
-	"urn:jrds:graphdesc">
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
-	<name>SunJVM8MemoryPool</name>
-	<graphName>jvmsun8pool-${label}</graphName>
-	<graphTitle>JVM Memory Usage for ${label}</graphTitle>
-	<unit>
-		<binary />
-	</unit>
-	<verticalLabel>Bytes</verticalLabel>
-	<add>
-		<legend>Non Heap Memory</legend>
-	</add>
+    <name>SunJVM8MemoryPool</name>
+    <graphName>jvmsun8pool-${label}</graphName>
+    <graphTitle>JVM Memory Usage for ${label} on host ${host}</graphTitle>
+    <unit>
+        <binary />
+    </unit>
+    <verticalLabel>Bytes</verticalLabel>
+    <add>
+        <legend>Non Heap Memory</legend>
+    </add>
     <add>
         <name>CompressedClassSpace</name>
         <graphType>area</graphType>
         <legend>Compressed Class Space</legend>
     </add>
-	<add>
-		<name>Code Cache</name>
-		<graphType>stack</graphType>
-		<legend>Code Cache</legend>
-	</add>
+    <add>
+        <name>Code Cache</name>
+        <graphType>stack</graphType>
+        <legend>Code Cache</legend>
+    </add>
     <add>
         <name>Metaspace</name>
         <graphType>stack</graphType>
@@ -45,18 +44,18 @@
         <graphType>stack</graphType>
         <legend>Eden Space</legend>
     </add>
-	<hosttree>
-		<pathelement>HOST</pathelement>
-		<pathelement>SERVICES</pathelement>
-		<pathstring>JVM</pathstring>
-		<pathstring>${label}</pathstring>
-		<pathstring>Memory usage</pathstring>
-	</hosttree>
-	<viewtree>
-		<pathelement>SERVICES</pathelement>
-		<pathstring>JVM</pathstring>
-		<pathelement>HOST</pathelement>
-		<pathstring>Memory usage</pathstring>
-		<pathstring>${label}</pathstring>
-	</viewtree>
+    <hosttree>
+        <pathelement>HOST</pathelement>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>JVM</pathstring>
+        <pathstring>${label}</pathstring>
+        <pathstring>Memory usage</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>JVM</pathstring>
+        <pathelement>HOST</pathelement>
+        <pathstring>Memory usage</pathstring>
+        <pathstring>${label}</pathstring>
+    </viewtree>
 </graphdesc>

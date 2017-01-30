@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
-    <name>SunJVM5GCSpeed2</name>
+    <name>SunJVM5GCSpeed</name>
     <graphName>jvmsun5gcspeed-${label}</graphName>
     <graphTitle>JVM GC speed for ${label} on ${host}</graphTitle>
     <unit>
@@ -11,19 +11,19 @@
     <verticalLabel>s/collection</verticalLabel>
     <add>
         <name>majorcolltime</name>
-        <dsName>Old Coll Time</dsName>
+        <dsName>MS Coll Time</dsName>
     </add>
     <add>
         <name>minorcolltime</name>
-        <dsName>Young Coll Time</dsName>
+        <dsName>Copy Coll Time</dsName>
     </add>
     <add>
         <name>majorcolcount</name>
-        <dsName>Old Coll Count</dsName>
+        <dsName>MS Coll Count</dsName>
     </add>
     <add>
         <name>minorcolcount</name>
-        <dsName>Young Coll Count</dsName>
+        <dsName>Copy Coll Count</dsName>
     </add>
     <add>
         <rpn>majorcolltime,majorcolcount,1,MAX,1000,*,/</rpn>
