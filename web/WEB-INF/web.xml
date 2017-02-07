@@ -101,14 +101,19 @@
         <servlet-name>GetDiscoverHtmlCode</servlet-name>
         <display-name>GetDiscoverHtmlCode</display-name>
         <description></description>
-        <servlet-class>
-            jrds.webapp.GetDiscoverHtmlCode</servlet-class>
+        <servlet-class>jrds.webapp.GetDiscoverHtmlCode</servlet-class>
     </servlet>
     <servlet>
-    	<servlet-name>WhoAmI</servlet-name>
-    	<display-name>WhoAmI</display-name>
-    	<description></description>
-    	<servlet-class>jrds.webapp.WhoAmI</servlet-class>
+        <servlet-name>WhoAmI</servlet-name>
+        <display-name>WhoAmI</display-name>
+        <description></description>
+        <servlet-class>jrds.webapp.WhoAmI</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>GetGraphDesc</servlet-name>
+        <display-name>GetGraphDesc</display-name>
+        <description>Return the graphdesc from the given graph Id</description>
+        <servlet-class>jrds.webapp.GetGraphDesc</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>CheckValues</servlet-name>
@@ -188,8 +193,12 @@
         <url-pattern>/discoverhtml</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-    	<servlet-name>WhoAmI</servlet-name>
-    	<url-pattern>/whoami</url-pattern>
+        <servlet-name>WhoAmI</servlet-name>
+        <url-pattern>/whoami</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>GetGraphDesc</servlet-name>
+        <url-pattern>/graphdesc</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>

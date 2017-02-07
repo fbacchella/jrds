@@ -518,6 +518,13 @@ public class GraphDesc implements Cloneable, WithACL {
         }
     }
 
+    private static final Map<Color, String> colornames = new HashMap<>(Colors.length);
+    static {
+        for (Colors i: Colors.values()) {
+            colornames.put(i.getColor(), i.name().toLowerCase());
+        }
+    }
+
     static final class DsDesc {
         final String name;
         final String dsName;
@@ -1265,6 +1272,13 @@ public class GraphDesc implements Cloneable, WithACL {
                 specElement.appendChild(document.createElement("reversed"));
             }
             specElement.appendChild(document.createElement("graphType")).setTextContent(e.graphType.toString());
+            if(e.color != null) {
+                String colorString = colornames.get(e.color);
+                if (colorString == null) {
+                    colorString = String.format("#%X%X%X", e.color.getRed(), e.color.getGreen(), e.color.getBlue());
+                }
+                specElement.appendChild(document.createElement("color")).setTextContent(colorString);
+            }
             if(e.legend != null)
                 specElement.appendChild(document.createElement("legend")).setTextContent(e.legend);
             i++;
