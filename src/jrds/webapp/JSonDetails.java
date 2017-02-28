@@ -1,6 +1,9 @@
 package jrds.webapp;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -9,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import jrds.GraphNode;
 import jrds.Probe;
+import jrds.Util;
 import jrds.probe.IndexedProbe;
 
 import org.apache.log4j.Logger;
@@ -38,7 +42,10 @@ public class JSonDetails extends JrdsServlet {
             }
             w.key("datastores");
             w.array();
-            for(String datasource: p.getPd().getDs()) {
+            List<String> dsNames = new ArrayList<>();
+            dsNames.addAll(p.getPd().getDs());
+            Collections.sort(dsNames, Util.nodeComparator);
+            for(String datasource: dsNames) {
                 w.object();
                 w.key("id").value(datasource.hashCode());
                 w.key("name").value(datasource);
