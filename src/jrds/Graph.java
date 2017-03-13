@@ -18,6 +18,8 @@ import org.rrd4j.data.Plottable;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
 
+import eu.bengreen.data.utility.LargestTriangleThreeBuckets;
+
 public class Graph implements WithACL {
     static final private Logger logger = Logger.getLogger(Graph.class);
 
@@ -177,6 +179,7 @@ public class Graph implements WithACL {
      */
     public RrdGraphDef getEmptyGraphDef() {
         RrdGraphDef retValue = getGraphDesc().getEmptyGraphDef();
+        retValue.setDownsampler(new LargestTriangleThreeBuckets(getGraphDesc().getWidth()));
         retValue.setTitle(node.getGraphTitle());
         return retValue;
     }
