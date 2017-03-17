@@ -1222,7 +1222,9 @@ public class GraphDesc implements Cloneable, WithACL {
             root.appendChild(document.createElement("graphTitle")).setTextContent(graphTitle);
         Element unit = document.createElement("unit");
         if(siUnit) {
-            root.appendChild(unit).appendChild(document.createElement("SI"));
+            unit.appendChild(document.createElement("SI"));
+        } else {
+            unit.appendChild(document.createElement("binary"));
         }
         if(unitExponent != null) {
             for(SiPrefix unity: SiPrefix.values()) {
@@ -1231,11 +1233,12 @@ public class GraphDesc implements Cloneable, WithACL {
                     if(unity == SiPrefix.FIXED) {
                         suffix = "";
                     }
-                    root.appendChild(unit).appendChild(document.createElement("base")).setTextContent(suffix);
+                    unit.appendChild(document.createElement("base")).setTextContent(suffix);
                     break;
                 }
             }
         }
+        root.appendChild(unit);
         if(verticalLabel != null)
             root.appendChild(document.createElement("verticalLabel")).setTextContent(verticalLabel);
         if(!(lowerLimit == 0))
