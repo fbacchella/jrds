@@ -1,5 +1,6 @@
 package jrds.standalone;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -15,6 +16,7 @@ import jrds.ProbeConnected;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.configuration.ConfigObjectFactory;
+import jrds.probe.PassiveProbe;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.core.DsDef;
@@ -24,10 +26,10 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
 
     static final private String JAVADOCURLTEMPLATES = "http://jrds.fr/apidoc-core/index.html?%s.html";
 
-    String propFile = "jrds.properties";
+    String propFileName = "jrds.properties";
 
     public void configure(Properties configuration) {
-        propFile = configuration.getProperty("propertiesFile", propFile);
+        propFileName = configuration.getProperty("propertiesFile", propFileName);
     }
 
     private String classToLink(Class<?> c) {
@@ -39,8 +41,17 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
 
     public void start(String args[]) throws Exception {
         PropertiesManager pm = new PropertiesManager();
+        File propFile = new File(propFileName);
+        if(propFile.isFile()) {
+            pm.join(propFile);
+        }
         pm.importSystemProps();
-        pm.update();
+        try {
+            pm.update();
+        } catch (IllegalArgumentException e) {
+            System.err.println("invalid configuration, can't start: " + e.getMessage());
+            System.exit(1);
+        }
 
         System.getProperties().setProperty("java.awt.headless", "true");
 
@@ -76,6 +87,10 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         for(ProbeDesc pd: probes) {
             try {
                 Class<? extends Probe<?, ?>> c = pd.getProbeClass();
+                //Don't dump passive probes, nothing to show
+                if (PassiveProbe.class.isAssignableFrom(c)) {
+                    continue;
+                }
                 Probe<?, ?> p = c.newInstance();
                 p.setPd(pd);
                 System.out.println(oneLine(p));
