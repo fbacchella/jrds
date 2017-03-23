@@ -144,7 +144,6 @@ public class ParamsBean implements Serializable {
         parseReq(hl);
     }
 
-    @SuppressWarnings("unchecked")
     // Not a really useful method, just to reduce warning
     private Map<String, String[]> getReqParamsMap(HttpServletRequest req) {
         logger.trace(jrds.Util.delayedFormatString("Parameter map for %s: %s", req, req.getParameterMap()));
@@ -558,7 +557,7 @@ public class ParamsBean implements Serializable {
             else if(params.containsKey("periodprevious"))
                 p = p.previous();
         } catch (NumberFormatException | ParseException e) {
-            logger.error("Period cannot be parsed");
+            logger.error("Period cannot be parsed: " + e.getMessage());
         }
         return p;
     }
