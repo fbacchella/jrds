@@ -1113,7 +1113,6 @@ function filesLoaded(e) {
 function paramsToQuery() {
     var newQueryParams = {};
     for(var propertyName in queryParams) {
-        console.log(queryParams[propertyName] instanceof Date)
         if (queryParams[propertyName] instanceof Date) {
             newQueryParams[propertyName] = queryParams[propertyName].getTime();
         } else {
