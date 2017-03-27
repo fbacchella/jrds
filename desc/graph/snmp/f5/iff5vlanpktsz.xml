@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
-    <name>ifpktssz</name>
+    <name>IfF5Vlanpktsz</name>
     <graphName>ifpktssz-${index}</graphName>
     <graphTitle>Packets size on interface ${index} on ${host}</graphTitle>
     <unit>
@@ -10,32 +10,25 @@
     <verticalLabel>bytes</verticalLabel>
     <lowerLimit>NaN</lowerLimit>
     <add>
-        <name>ifOutUcastPkts</name>
+        <name>sysVlanStatPktsOut</name>
     </add>
     <add>
-        <name>ifOutNUcastPkts</name>
+        <name>sysVlanStatBytesOut</name>
     </add>
     <add>
-        <name>ifOutOctets</name>
-    </add>
-    <add>
-        <name>outPktSize</name>
-        <rpn>ifOutOctets, ifOutUcastPkts, ifOutNUcastPkts, +, /</rpn>
+        <rpn>sysVlanStatBytesOut, sysVlanStatPktsOut, /</rpn>
         <graphType>area</graphType>
         <legend>average packets size send</legend>
     </add>
     <add>
-        <name>ifInUcastPkts</name>
+        <name>sysVlanStatPktsIn</name>
     </add>
     <add>
-        <name>ifInNUcastPkts</name>
-    </add>
-    <add>
-        <name>ifInOctets</name>
+        <name>sysVlanStatBytesIn</name>
     </add>
     <add>
         <name>inPktSize</name>
-        <rpn>ifInOctets, ifInUcastPkts, ifInNUcastPkts, +, /</rpn>
+        <rpn>sysVlanStatBytesIn, sysVlanStatPktsIn, /</rpn>
         <reversed>true</reversed>
         <graphType>area</graphType>
         <legend>average packets size received</legend>
