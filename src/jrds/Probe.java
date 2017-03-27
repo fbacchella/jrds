@@ -372,7 +372,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
             log(Level.DEBUG, "collect ran for %dms", (end - start));
             Timer timer = (Timer) getParent().getParent();
             if((end - start) > (timer.getSlowCollectTime() * 1000)) {
-                log(Level.WARN, "slow collect time %.0fs for probe %s", 1.0 * (end - start) / 1000, this);
+                log(Level.WARN, "slow collect time %.0fs", 1.0 * (end - start) / 1000);
             }
             if(interrupted) {
                 float elapsed = ((float) (end - start)) / 1000;
