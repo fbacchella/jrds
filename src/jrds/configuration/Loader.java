@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,16 +25,16 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.Util;
-import jrds.factories.xml.EntityResolver;
-import jrds.factories.xml.JrdsDocument;
-
 import org.apache.log4j.Logger;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-class Loader {
+import jrds.Util;
+import jrds.factories.xml.EntityResolver;
+import jrds.factories.xml.JrdsDocument;
+
+public class Loader {
 
     static final private Logger logger = Logger.getLogger(Loader.class);
 
@@ -114,26 +113,29 @@ class Loader {
     }
 
     public void importUrl(URI ressourceUri) {
-        URL ressourceUrl = null;
         try {
-            ressourceUrl = ressourceUri.toURL();
-            logger.debug("Importing " + ressourceUrl);
-            String protocol = ressourceUrl.getProtocol();
+            logger.debug("Importing " + ressourceUri);
+            String protocol = ressourceUri.getScheme();
             if("file".equals(protocol)) {
-                String fileName = ressourceUrl.getFile();
-                File imported = new File(ressourceUrl.toURI());
-                if(imported.isDirectory())
+                String fileName = ressourceUri.getPath();
+                File imported = new File(ressourceUri);
+                if(imported.isDirectory()) {
                     importDir(imported);
-                else if(fileName.endsWith(".jar"))
+                }
+                else if(fileName.endsWith(".jar")) {
                     importJar(new JarFile(imported));
+                } else {
+                    importStream(new FileInputStream(fileName), fileName);
+                }
             } else if("jar".equals(protocol)) {
+                URL ressourceUrl = ressourceUri.toURL();
                 JarURLConnection cnx = (JarURLConnection) ressourceUrl.openConnection();
                 importJar(cnx.getJarFile());
             } else {
-                logger.error("ressource " + ressourceUrl + " can't be loaded");
+                logger.error("ressource " + ressourceUri + " can't be loaded");
             }
-        } catch (IOException | URISyntaxException e) {
-            logger.error("Invalid URL " + ressourceUrl + ": " + e);
+        } catch (IOException e) {
+            logger.error("Invalid URL " + ressourceUri + ": " + e);
         }
     }
 
