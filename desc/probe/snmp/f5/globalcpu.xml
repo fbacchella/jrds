@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>GlobalHostCpuF5</name>
+    <probeName>cpurawf5</probeName>
+    <probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
+    <specific name="requester">simple</specific>
+    <specific name="existOid">sysGlobalHostCpuCount</specific>
+    <ds>
+        <dsName>ssCpuRawUser</dsName>
+        <dsType>counter</dsType>
+        <oid>sysGlobalHostCpuUser</oid>
+    </ds>
+    <ds>
+        <dsName>ssCpuRawNice</dsName>
+        <dsType>counter</dsType>
+        <oid>sysGlobalHostCpuNice</oid>
+    </ds>
+    <ds>
+        <dsName>ssCpuRawSystem</dsName>
+        <dsType>counter</dsType>
+        <oid>sysGlobalHostCpuSystem</oid>
+    </ds>
+    <ds>
+        <dsName>ssCpuRawIdle</dsName>
+        <dsType>counter</dsType>
+        <oid>sysGlobalHostCpuIdle</oid>
+    </ds>
+    <ds>
+        <dsName>ssCpuRawInterrupt</dsName>
+        <dsType>counter</dsType>
+        <oid>sysGlobalHostCpuIrq</oid>
+    </ds>
+    <ds>
+        <dsName>ssCpuRawSoftIRQ</dsName>
+        <dsType>counter</dsType>
+        <oid>sysGlobalHostCpuSoftirq</oid>
+    </ds>
+    <ds>
+        <dsName>ssCpuRawWait</dsName>
+        <dsType>counter</dsType>
+        <oid>sysGlobalHostCpuIowait</oid>
+    </ds>
+    <ds>
+        <dsName>Stolen</dsName>
+        <dsType>counter</dsType>
+        <oid>sysGlobalHostCpuStolen</oid>
+    </ds>
+    <graphs>
+        <name>CpuRawTimeLinux2</name>
+    </graphs>
+</probedesc>
