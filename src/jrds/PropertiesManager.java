@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.xml.DOMConfigurator;
 
-import fr.jrds.SmiExtensions.MibTree;
 import fr.jrds.SmiExtensions.OIDFormatter;
 import jrds.starter.Timer;
 import jrds.store.RrdDbStoreFactory;
@@ -54,11 +53,9 @@ public class PropertiesManager extends Properties {
         public int numCollectors;
         public int slowCollectTime;
     }
-    
+
     static {
-        MibTree resolver = new MibTree();
-        OIDFormatter formater = new OIDFormatter(resolver);
-        formater.register();
+        OIDFormatter.register();
     }
 
     private final FileFilter filter = new FileFilter() {
