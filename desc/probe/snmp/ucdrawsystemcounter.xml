@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
     <name>UcdRawSystemCounter</name>
@@ -8,32 +8,32 @@
     <ds>
         <dsName>ssIORawSent</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.2021.11.57</oid>
+        <oid>ssIORawSent</oid>
     </ds>
     <ds>
         <dsName>ssIORawReceived</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.2021.11.58</oid>
+        <oid>ssIORawReceived</oid>
     </ds>
     <ds>
         <dsName>ssRawInterrupts</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.2021.11.59</oid>
+        <oid>ssRawInterrupts</oid>
     </ds>
     <ds>
         <dsName>ssRawContexts</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.2021.11.60</oid>
+        <oid>ssRawContexts</oid>
     </ds>
     <ds>
         <dsName>ssRawSwapIn</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.2021.11.62</oid>
+        <oid>ssRawSwapIn</oid>
     </ds>
     <ds>
         <dsName>ssRawSwapOut</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.2021.11.63</oid>
+        <oid>ssRawSwapOut</oid>
     </ds>
     <graphs>
         <name>Ucdswap</name>

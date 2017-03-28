@@ -1,15 +1,15 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
     <name>NumProcesses</name>
     <probeName>nprocesses</probeName>
     <probeClass>jrds.probe.snmp.RdsSnmpSimple</probeClass>
     <specific name="requester">simple</specific>
-    <specific name="existOid">1.3.6.1.2.1.25.1.6.0</specific>
+    <specific name="existOid">hrSystemProcesses</specific>
     <ds>
         <dsName>hrSystemProcesses</dsName>
         <dsType>gauge</dsType>
-        <oid>1.3.6.1.2.1.25.1.6</oid>
+        <oid>hrSystemProcesses</oid>
     </ds>
     <graphs>
         <name>numprocess</name>

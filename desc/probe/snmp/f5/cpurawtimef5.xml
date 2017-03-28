@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
     <name>CpuRawTimeF5</name>
@@ -8,32 +8,32 @@
     <ds>
         <dsName>ssCpuRawUser</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.2021.11.50</oid>
+        <oid>ssCpuRawUser</oid>
     </ds>
     <ds>
         <dsName>ssCpuRawNice</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.2021.11.51</oid>
+        <oid>ssCpuRawNice</oid>
     </ds>
     <ds>
         <dsName>ssCpuRawSystem</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.2021.11.52</oid>
+        <oid>ssCpuRawSystem</oid>
     </ds>
     <ds>
         <dsName>ssCpuRawIdle</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.2021.11.53</oid>
+        <oid>ssCpuRawIdle</oid>
     </ds>
     <ds>
         <dsName>ssRawInterrupts</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.2021.11.59</oid>
+        <oid>ssRawInterrupts</oid>
     </ds>
     <ds>
         <dsName>ssRawContexts</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.2021.11.60</oid>
+        <oid>ssRawContexts</oid>
     </ds>
     <graphs>
         <name>CpuRawTimeF5</name>

@@ -1,66 +1,65 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
     <name>IfF5Vlan</name>
     <probeName>iff5-${index}</probeName>
     <probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
-    <specific name="indexOid">1.3.6.1.4.1.3375.2.1.2.13.6.2.1.1</specific>
+    <specific name="indexOid">sysVlanStatVlanName</specific>
     <ds>
         <dsName>sysVlanStatPktsIn</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.13.6.2.1.2</oid>
+        <oid>sysVlanStatPktsIn</oid>
     </ds>
     <ds>
         <dsName>sysVlanStatBytesIn</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.13.6.2.1.3</oid>
+        <oid>sysVlanStatBytesIn</oid>
     </ds>
     <ds>
         <dsName>sysVlanStatPktsOut</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.13.6.2.1.4</oid>
+        <oid>sysVlanStatPktsOut</oid>
     </ds>
     <ds>
         <dsName>sysVlanStatBytesOut</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.13.6.2.1.5</oid>
+        <oid>sysVlanStatBytesOut</oid>
     </ds>
     <ds>
         <dsName>sysVlanStatMcastIn</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.13.6.2.1.6</oid>
+        <oid>sysVlanStatMcastIn</oid>
     </ds>
     <ds>
         <dsName>sysVlanStatMcastOut</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.13.6.2.1.7</oid>
+        <oid>sysVlanStatMcastOut</oid>
     </ds>
     <ds>
         <dsName>sysVlanStatErrorsIn</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.13.6.2.1.8</oid>
+        <oid>sysVlanStatErrorsIn</oid>
     </ds>
     <ds>
         <dsName>sysVlanStatErrorsOut</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.13.6.2.1.9</oid>
+        <oid>sysVlanStatErrorsOut</oid>
     </ds>
     <ds>
         <dsName>sysVlanStatDropsIn</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.13.6.2.1.10</oid>
+        <oid>sysVlanStatDropsIn</oid>
     </ds>
     <ds>
         <dsName>sysVlanStatDropsOut</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.13.6.2.1.11</oid>
+        <oid>sysVlanStatDropsOut</oid>
     </ds>
     <ds>
         <dsName>sysVlanStatCollisions</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.13.6.2.1.12</oid>
+        <oid>sysVlanStatCollisions</oid>
     </ds>
-
     <graphs>
         <name>IfF5Vlanbps</name>
         <name>IfF5Vlanpkt</name>

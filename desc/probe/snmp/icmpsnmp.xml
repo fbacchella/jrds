@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
     <name>IcmpSnmp</name>
@@ -8,132 +8,132 @@
     <ds>
         <dsName>InMsgs</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.1</oid>
+        <oid>icmpInMsgs</oid>
     </ds>
     <ds>
         <dsName>InErrors</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.2</oid>
+        <oid>icmpInErrors</oid>
     </ds>
     <ds>
         <dsName>InDestUnreachs</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.3</oid>
+        <oid>icmpInDestUnreachs</oid>
     </ds>
     <ds>
         <dsName>InTimeExcds</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.4</oid>
+        <oid>icmpInTimeExcds</oid>
     </ds>
     <ds>
         <dsName>InParmProbs</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.5</oid>
+        <oid>icmpInParmProbs</oid>
     </ds>
     <ds>
         <dsName>InSrcQuenchs</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.6</oid>
+        <oid>icmpInSrcQuenchs</oid>
     </ds>
     <ds>
         <dsName>InRedirects</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.7</oid>
+        <oid>icmpInRedirects</oid>
     </ds>
     <ds>
         <dsName>InEchos</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.8</oid>
+        <oid>icmpInEchos</oid>
     </ds>
     <ds>
         <dsName>InEchoReps</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.9</oid>
+        <oid>icmpInEchoReps</oid>
     </ds>
     <ds>
         <dsName>InTimestamps</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.10</oid>
+        <oid>icmpInTimestamps</oid>
     </ds>
     <ds>
         <dsName>InTimestampReps</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.11</oid>
+        <oid>icmpInTimestampReps</oid>
     </ds>
     <ds>
         <dsName>InAddrMasks</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.12</oid>
+        <oid>icmpInAddrMasks</oid>
     </ds>
     <ds>
         <dsName>InAddrMaskReps</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.13</oid>
+        <oid>icmpInAddrMaskReps</oid>
     </ds>
     <ds>
         <dsName>OutMsgs</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.14</oid>
+        <oid>icmpOutMsgs</oid>
     </ds>
     <ds>
         <dsName>OutErrors</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.15</oid>
+        <oid>icmpOutErrors</oid>
     </ds>
     <ds>
         <dsName>OutDestUnreachs</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.16</oid>
+        <oid>icmpOutDestUnreachs</oid>
     </ds>
     <ds>
         <dsName>OutTimeExcds</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.17</oid>
+        <oid>icmpOutTimeExcds</oid>
     </ds>
     <ds>
         <dsName>OutParmProbs</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.18</oid>
+        <oid>icmpOutParmProbs</oid>
     </ds>
     <ds>
         <dsName>OutSrcQuenchs</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.19</oid>
+        <oid>icmpOutSrcQuenchs</oid>
     </ds>
     <ds>
         <dsName>OutRedirects</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.20</oid>
+        <oid>icmpOutRedirects</oid>
     </ds>
     <ds>
         <dsName>OutEchos</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.21</oid>
+        <oid>icmpOutEchos</oid>
     </ds>
     <ds>
         <dsName>OutEchoReps</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.22</oid>
+        <oid>icmpOutEchoReps</oid>
     </ds>
     <ds>
         <dsName>OutTimestamps</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.23</oid>
+        <oid>icmpOutTimestamps</oid>
     </ds>
     <ds>
         <dsName>OutTimestampReps</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.24</oid>
+        <oid>icmpOutTimestampReps</oid>
     </ds>
     <ds>
         <dsName>OutAddrMasks</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.25</oid>
+        <oid>icmpOutAddrMasks</oid>
     </ds>
     <ds>
         <dsName>OutAddrMaskReps</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.2.1.5.26</oid>
+        <oid>icmpOutAddrMaskReps</oid>
     </ds>
     <graphs>
         <name>icmpsnmp</name>

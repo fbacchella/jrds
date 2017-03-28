@@ -1,49 +1,49 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
     <name>mtaGroup</name>
     <probeName>mtagroupsnmp-${index}</probeName>
-	<probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
-    <specific name="indexOid">1.3.6.1.2.1.28.2.1.25</specific>
+    <probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
+    <specific name="indexOid">mtaGroupName</specific>
     <ds>
         <dsName>mtaReceivedMsg</dsName>
         <dsType>counter</dsType>
-        <oid>.1.3.6.1.2.1.28.2.1.2</oid>
+        <oid>mtaGroupReceivedMessages</oid>
     </ds>
     <ds>
         <dsName>mtaGroupRejectedMsg</dsName>
         <dsType>counter</dsType>
-        <oid>.1.3.6.1.2.1.28.2.1.3</oid>
+        <oid>mtaGroupRejectedMessages</oid>
     </ds>
     <ds>
         <dsName>mtaStoredMsg</dsName>
         <dsType>gauge</dsType>
-        <oid>.1.3.6.1.2.1.28.2.1.4</oid>
+        <oid>mtaGroupStoredMessages</oid>
     </ds>
     <ds>
         <dsName>mtaTransmittedMsg</dsName>
         <dsType>counter</dsType>
-        <oid>.1.3.6.1.2.1.28.2.1.5</oid>
+        <oid>mtaGroupTransmittedMessages</oid>
     </ds>
     <ds>
         <dsName>mtaReceivedVolume</dsName>
         <dsType>counter</dsType>
-        <oid>.1.3.6.1.2.1.28.2.1.6</oid>
+        <oid>mtaGroupReceivedVolume</oid>
     </ds>
     <ds>
         <dsName>mtaStoredVolume</dsName>
         <dsType>gauge</dsType>
-        <oid>.1.3.6.1.2.1.28.2.1.7</oid>
+        <oid>mtaGroupStoredVolume</oid>
     </ds>
     <ds>
         <dsName>mtaTransmittedVolume</dsName>
         <dsType>counter</dsType>
-        <oid>.1.3.6.1.2.1.28.2.1.8</oid>
+        <oid>mtaGroupTransmittedVolume</oid>
     </ds>
     <graphs>
-		<name>mtaVolume</name>
- 		<name>mtaMessages</name>
-		<name>mtaStoredVolume</name>
- 		<name>mtaStoredMessages</name>
-   </graphs>
+        <name>mtaVolume</name>
+        <name>mtaMessages</name>
+        <name>mtaStoredVolume</name>
+        <name>mtaStoredMessages</name>
+    </graphs>
 </probedesc>

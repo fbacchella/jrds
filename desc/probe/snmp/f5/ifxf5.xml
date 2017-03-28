@@ -1,70 +1,70 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
     <name>IfxF5</name>
     <probeName>iff5-${index}</probeName>
     <probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
-    <specific name="indexOid">1.3.6.1.4.1.3375.2.1.2.4.5.3.1.1</specific>
+    <specific name="indexOid">sysIfxStatName</specific>
     <specific name="hides">IfSnmp,IfXSnmp</specific>
     <ds>
         <dsName>ifInMulticastPkts</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.4.5.3.1.2</oid>
+        <oid>sysIfxStatInMulticastPkts</oid>
     </ds>
     <ds>
         <dsName>ifInBroadcastPkts</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.4.5.3.1.3</oid>
+        <oid>sysIfxStatInBroadcastPkts</oid>
     </ds>
     <ds>
         <dsName>ifOutMulticastPkts</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.4.5.3.1.4</oid>
+        <oid>sysIfxStatOutMulticastPkts</oid>
     </ds>
     <ds>
         <dsName>ifOutBroadcastPkts</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.4.5.3.1.5</oid>
+        <oid>sysIfxStatOutBroadcastPkts</oid>
     </ds>
     <ds>
         <dsName>ifHCInOctets</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.4.5.3.1.6</oid>
+        <oid>sysIfxStatHcInOctets</oid>
     </ds>
     <ds>
         <dsName>ifHCInUcastPkts</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.4.5.3.1.7</oid>
+        <oid>sysIfxStatHcInUcastPkts</oid>
     </ds>
     <ds>
         <dsName>ifHCInMulticastPkts</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.4.5.3.1.8</oid>
+        <oid>sysIfxStatHcInMulticastPkts</oid>
     </ds>
     <ds>
         <dsName>ifHCInBroadcastPkts</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.4.5.3.1.9</oid>
+        <oid>sysIfxStatHcInBroadcastPkts</oid>
     </ds>
     <ds>
         <dsName>ifHCOutOctets</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.4.5.3.1.10</oid>
+        <oid>sysIfxStatHcOutOctets</oid>
     </ds>
     <ds>
         <dsName>ifHCOutUcastPkts</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.4.5.3.1.11</oid>
+        <oid>sysIfxStatHcOutUcastPkts</oid>
     </ds>
     <ds>
         <dsName>ifHCOutMulticastPkts</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.4.5.3.1.12</oid>
+        <oid>sysIfxStatHcOutMulticastPkts</oid>
     </ds>
     <ds>
         <dsName>ifHCOutBroadcastPkts</dsName>
         <dsType>counter</dsType>
-        <oid>1.3.6.1.4.1.3375.2.1.2.4.5.3.1.13</oid>
+        <oid>sysIfxStatHcOutBroadcastPkts</oid>
     </ds>
     <graphs>
         <name>ifxbps</name>

@@ -25,18 +25,20 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jrds.starter.Timer;
-import jrds.store.RrdDbStoreFactory;
-import jrds.store.StoreFactory;
-import jrds.webapp.ACL;
-import jrds.webapp.RolesACL;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.xml.DOMConfigurator;
+
+import fr.jrds.SmiExtensions.MibTree;
+import fr.jrds.SmiExtensions.OIDFormatter;
+import jrds.starter.Timer;
+import jrds.store.RrdDbStoreFactory;
+import jrds.store.StoreFactory;
+import jrds.webapp.ACL;
+import jrds.webapp.RolesACL;
 
 /**
  * An less ugly class supposed to manage properties should be reworked
@@ -51,6 +53,12 @@ public class PropertiesManager extends Properties {
         public int timeout;
         public int numCollectors;
         public int slowCollectTime;
+    }
+    
+    static {
+        MibTree resolver = new MibTree();
+        OIDFormatter formater = new OIDFormatter(resolver);
+        formater.register();
     }
 
     private final FileFilter filter = new FileFilter() {

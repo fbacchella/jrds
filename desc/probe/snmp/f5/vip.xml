@@ -4,52 +4,52 @@
     <name>VIPF5</name>
     <probeName>vipf5-${index}</probeName>
     <probeClass>jrds.probe.snmp.RdsIndexedSnmpRrd</probeClass>
-    <specific name="indexOid">1.3.6.1.4.1.3375.2.2.10.1.2.1.1</specific>
-    <specific name="labelOid">1.3.6.1.4.1.3375.2.2.10.1.2.1.1</specific>
+    <specific name="indexOid">ltmVirtualServName</specific>
+    <specific name="labelOid">ltmVirtualServName</specific>
     <ds>
         <dsName>ClientPktsIn</dsName>
         <dsType>COUNTER</dsType>
-        <oid>1.3.6.1.4.1.3375.2.2.10.2.3.1.6</oid>
+        <oid>ltmVirtualServStatClientPktsIn</oid>
     </ds>
     <ds>
         <dsName>ClientBytesIn</dsName>
         <dsType>COUNTER</dsType>
-        <oid>1.3.6.1.4.1.3375.2.2.10.2.3.1.7</oid>
+        <oid>ltmVirtualServStatClientBytesIn</oid>
     </ds>
     <ds>
         <dsName>ClientPktsOut</dsName>
         <dsType>COUNTER</dsType>
-        <oid>1.3.6.1.4.1.3375.2.2.10.2.3.1.8</oid>
+        <oid>ltmVirtualServStatClientPktsOut</oid>
     </ds>
     <ds>
         <dsName>ClientBytesOut</dsName>
         <dsType>COUNTER</dsType>
-        <oid>1.3.6.1.4.1.3375.2.2.10.2.3.1.9</oid>
+        <oid>ltmVirtualServStatClientBytesOut</oid>
     </ds>
     <ds>
         <dsName>ClientCurConns</dsName>
         <dsType>GAUGE</dsType>
-        <oid>1.3.6.1.4.1.3375.2.2.10.2.3.1.12</oid>
+        <oid>ltmVirtualServStatClientCurConns</oid>
     </ds>
     <ds>
         <dsName>ClientTotConns</dsName>
         <dsType>COUNTER</dsType>
-        <oid>1.3.6.1.4.1.3375.2.2.10.2.3.1.11</oid>
+        <oid>ltmVirtualServStatClientTotConns</oid>
     </ds>
     <ds>
         <dsName>CsMinConnDur</dsName>
         <dsType>GAUGE</dsType>
-        <oid>1.3.6.1.4.1.3375.2.2.10.2.3.1.2</oid>
+        <oid>ltmVirtualServStatCsMinConnDur</oid>
     </ds>
     <ds>
         <dsName>CsMaxConnDur</dsName>
         <dsType>GAUGE</dsType>
-        <oid>1.3.6.1.4.1.3375.2.2.10.2.3.1.3</oid>
+        <oid>ltmVirtualServStatCsMaxConnDur</oid>
     </ds>
     <ds>
         <dsName>CsMeanConnDur</dsName>
         <dsType>GAUGE</dsType>
-        <oid>1.3.6.1.4.1.3375.2.2.10.2.3.1.4</oid>
+        <oid>ltmVirtualServStatCsMeanConnDur</oid>
     </ds>
     <graphs>
         <name>VIPF5Bytes</name>
