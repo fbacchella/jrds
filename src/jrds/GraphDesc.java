@@ -731,22 +731,27 @@ public class GraphDesc implements Cloneable, WithACL {
                 c = Colors.resolveIndex(lastColor);
                 if(gt.toPlot())
                     lastColor++;
-
             }
         }
-        if(name != null) {
+
+        if (name != null) {
             // If not a rpn, it must be a datastore
             if(gt.datasource() && rpn == null && dsName == null) {
                 dsName = name;
             }
         }
         // If the name is missing, generate one ?
-        else {
+        else if (rpn != null){
+            name = Util.stringSignature(rpn);
+        } else if (dsName != null){
+            name = dsName;
+        } else {
             name = Integer.toHexString((int) (Math.random() * Integer.MAX_VALUE));
         }
         // Auto generated legend
-        if(legend == null && gt.legend())
+        if(legend == null && gt.legend()) {
             legend = name;
+        }
 
         Integer valPercentile = null;
         if(percentile != null && !"".equals(percentile)) {
