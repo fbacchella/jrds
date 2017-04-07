@@ -531,7 +531,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             GenericBean bean = p.getPd().getBean(name);
             if(bean == null) {
                 // Context[0] should be the host
-                logger.error("Unknown bean '" + name + "' for " + context[0]);
+                logger.error(context[0] + "/" + p.getPd().getName() + ": unknown bean '" + name + "'");
                 continue;
             }
             String textValue = Util.parseTemplate(attrNode.getTextContent(), context);
