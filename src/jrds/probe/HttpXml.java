@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +44,17 @@ public class HttpXml extends HCHttpProbe {
 
     private Set<String> xpaths = null;
     private Map<String, String> collectKeys = null;
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see jrds.probe.HttpProbe#configure()
+     */
+    public Boolean configure() {
+        boolean done = super.configure();
+        finishConfig(Collections.emptyList());
+        return done;
+    }
 
     /*
      * (non-Javadoc)
