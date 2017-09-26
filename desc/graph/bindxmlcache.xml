@@ -3,7 +3,7 @@
 <graphdesc>
     <name>BindCache</name>
     <graphName>bindcache.${attr.view}</graphName>
-    <graphTitle>Bind RR cache for view ${attr.view}</graphTitle>
+    <graphTitle>Bind RR cache for view ${attr.view} on host ${host}</graphTitle>
     <verticalLabel>RR entries</verticalLabel>
     <add>
         <name>cache.a</name>
