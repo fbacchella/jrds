@@ -87,7 +87,9 @@ public class ApacheHttpClientTest {
     }
 
     private HostStarter addConnection(Starter cnx) throws IOException {
-        PropertiesManager pm = Tools.makePm(testFolder, "timeout=1", "collectorThreads=1");
+        String truststore = MockHttpServer.class.getResource("/ressources/localhost.jks").getFile();
+        PropertiesManager pm = Tools.makePm(testFolder, "timeout=1", "collectorThreads=1",
+                "ssl.protocol=TLS", "ssl.strict=true", "ssl.truststore=" + truststore, "ssl.trustpassword=123456");
 
         HostStarter localhost = new HostStarter(new HostInfo("localhost"));
         Timer t = Tools.getDefaultTimer();
@@ -95,6 +97,7 @@ public class ApacheHttpClientTest {
         localhost.getHost().setHostDir(testFolder.getRoot());
         t.registerStarter(new SSLStarter());
         t.registerStarter(new SocketFactory());
+        t.configureStarters(pm);
         localhost.registerStarter(cnx);
         cnx.configure(pm);
         return localhost;
@@ -153,6 +156,7 @@ public class ApacheHttpClientTest {
         HttpClientStarter cnx = new HttpClientStarter();
         HostStarter localhost = addConnection(cnx);
         localhost.find(Resolver.class).doStart();
+        localhost.find(SSLStarter.class).doStart();
         cnx.doStart();
         TestHttpProbe p = new TestHttpProbe();
         p.setMainStore(new RrdDbStoreFactory(), empty);
@@ -163,6 +167,7 @@ public class ApacheHttpClientTest {
         p.checkStore();
         localhost.addProbe(p);
         localhost.getParent().startCollect();
+        Assert.assertTrue(p.find(SSLStarter.class).isStarted());
         shouldFail = false;
         localhost.collectAll();
         Assert.assertTrue("Didn't try to collect", p.collected);
