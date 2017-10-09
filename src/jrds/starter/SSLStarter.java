@@ -69,28 +69,28 @@ public class SSLStarter extends Starter {
     public boolean start() {
         try {
             sc = protocol != null ? SSLContext.getInstance(protocol) : SSLContext.getDefault();
-            KeyManager[] km = null;
-            TrustManager[] tm = null;
-            SecureRandom sr = null;
-            if ( ! strict ) {
-                tm = new TrustManager[] { trustAllCerts };
-            } else if (truststore != null) {
-                KeyStore ks = KeyStore.getInstance(format);
-                ks.load(new FileInputStream(truststore), trustpassword.toCharArray());
-
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-                tmf.init(ks);
-                tm = tmf.getTrustManagers();
-
-                KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-                kmf.init(ks, trustpassword.toCharArray());
-                km = kmf.getKeyManagers();
-            }
-            if (securerandom != null) {
-                sr = SecureRandom.getInstance(securerandom);
-            }
-            // Default SSLContext is already initialized
             if(!"Default".equals(sc.getProtocol())) {
+                KeyManager[] km = null;
+                TrustManager[] tm = null;
+                SecureRandom sr = null;
+                if ( ! strict ) {
+                    tm = new TrustManager[] { trustAllCerts };
+                } else if (truststore != null) {
+                    KeyStore ks = KeyStore.getInstance(format);
+                    ks.load(new FileInputStream(truststore), trustpassword.toCharArray());
+
+                    TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                    tmf.init(ks);
+                    tm = tmf.getTrustManagers();
+
+                    KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+                    kmf.init(ks, trustpassword.toCharArray());
+                    km = kmf.getKeyManagers();
+                }
+                if (securerandom != null) {
+                    sr = SecureRandom.getInstance(securerandom);
+                }
+                // Default SSLContext is already initialized
                 sc.init(km, tm, sr);
             }
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException | CertificateException | IOException | UnrecoverableKeyException e) {
