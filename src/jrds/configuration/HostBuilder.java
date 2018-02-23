@@ -40,6 +40,7 @@ import jrds.store.StoreFactory;
 import org.apache.log4j.Logger;
 
 public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
+
     static final private Logger logger = Logger.getLogger(HostBuilder.class);
 
     private ClassLoader classLoader = null;
@@ -120,7 +121,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             String name = macroNode.getAttribute("name");
             Macro m = macrosMap.get(name);
             logger.trace(Util.delayedFormatString("Adding macro %s: %s", name, m));
-            if(m != null) {
+            if (m != null) {
                 Map<String, String> macroProps = makeProperties(macroNode, properties, host);
                 logger.trace(Util.delayedFormatString("properties inherited for macro %s: %s", m, properties));
                 logger.trace(Util.delayedFormatString("local properties for macro %s: %s", m, macroProps));
@@ -138,23 +139,23 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             }
         }
 
-        for(JrdsElement forNode: fragment.getChildElementsByName("for")) {
+        for (JrdsElement forNode: fragment.getChildElementsByName("for")) {
             Map<String, String> forattr = forNode.attrMap();
             String iterprop = forattr.get("var");
             Collection<String> set = null;
             String name = Util.parseTemplate(forNode.attrMap().get("collection"), this, properties);
-            if(name != null) {
+            if (name != null) {
                 set = collections.get(name);
-            } else if(forattr.containsKey("min") && forattr.containsKey("max") && forattr.containsKey("step")) {
+            } else if (forattr.containsKey("min") && forattr.containsKey("max") && forattr.containsKey("step")) {
                 int min = Util.parseStringNumber(Util.parseTemplate(forattr.get("min"), this, properties), Integer.MAX_VALUE);
                 int max = Util.parseStringNumber(Util.parseTemplate(forattr.get("max"), this, properties), Integer.MIN_VALUE);
                 int step = Util.parseStringNumber(Util.parseTemplate(forattr.get("step"), this, properties), Integer.MIN_VALUE);
-                if(min > max || step <= 0) {
+                if (min > max || step <= 0) {
                     logger.error("invalid range from " + min + " to " + max + " with step " + step);
                     break;
                 }
                 set = new ArrayList<String>((max - min) / step + 1);
-                for(int i = min; i <= max; i += step) {
+                for (int i = min; i <= max; i += step) {
                     set.add(Integer.toString(i));
                 }
             }
@@ -227,6 +228,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     public Probe<?, ?> makeProbe(JrdsElement probeNode, HostInfo host, Map<String, String> properties) throws InvocationTargetException {
         Probe<?, ?> p = null;
         String type = probeNode.attrMap().get("type");
+        type = jrds.Util.parseTemplate(type, host, properties);
 
         List<Map<String, Object>> dsList = doDsList(type, probeNode.getElementbyName("dslist"));
         if(dsList.size() > 0) {
@@ -242,14 +244,16 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         } else {
             p = pf.makeProbe(type);
         }
-        if(p == null)
+        if(p == null) {
             return null;
+        }
 
         p.readProperties(pm);
 
         String timerName = probeNode.getAttribute("timer");
-        if(timerName == null)
+        if(timerName == null) {
             timerName = Timer.DEFAULTNAME;
+        }
         Timer timer = timers.get(timerName);
         if(timer == null) {
             logger.error("Invalid timer '" + timerName + "' for probe " + host.getName() + "/" + type);
