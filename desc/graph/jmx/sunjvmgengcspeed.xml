@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+    <name>SunJVMGenGCSpeed</name>
+    <graphName>sunjvmgengcspeed-${label}</graphName>
+    <graphTitle>JVM GC speed for ${label} on ${host}</graphTitle>
+    <unit>
+        <SI />
+        <base>m</base>
+    </unit>
+    <verticalLabel>s/collection</verticalLabel>
+    <add>
+        <name>majorcolltime</name>
+        <dsName>MajorTime</dsName>
+    </add>
+    <add>
+        <name>minorcolltime</name>
+        <dsName>MinorTime</dsName>
+    </add>
+    <add>
+        <name>majorcolcount</name>
+        <dsName>MajorCount</dsName>
+    </add>
+    <add>
+        <name>minorcolcount</name>
+        <dsName>MajorCount</dsName>
+    </add>
+    <add>
+        <rpn>majorcolltime,majorcolcount,1,MAX,1000,*,/</rpn>
+        <graphType>line</graphType>
+        <color>magenta</color>
+        <legend>Average duration of major collection</legend>
+    </add>
+    <add>
+        <rpn>minorcolltime,minorcolcount,1,MAX,1000,*,/</rpn>
+        <graphType>line</graphType>
+        <color>blue</color>
+        <legend>Average duration of minor collection</legend>
+    </add>
+    <hosttree>
+        <pathelement>HOST</pathelement>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>JVM</pathstring>
+        <pathstring>${label}</pathstring>
+        <pathstring>GC Speed</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>JVM</pathstring>
+        <pathelement>HOST</pathelement>
+        <pathstring>GC Speed</pathstring>
+        <pathstring>${label}</pathstring>
+    </viewtree>
+</graphdesc>

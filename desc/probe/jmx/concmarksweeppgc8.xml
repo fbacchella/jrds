@@ -5,7 +5,7 @@ This probe collect VM informations through jmx. To use it, one need to start the
 com.sun.management.jmxremote
 com.sun.management.jmxremote.port=<port>
 com.sun.management.jmxremote.authenticate=false
-Dcom.sun.management.jmxremote.ssl=false
+com.sun.management.jmxremote.ssl=false
 
 More informations can be found at http://java.sun.com/javase/6/docs/technotes/guides/management/agent.html
 

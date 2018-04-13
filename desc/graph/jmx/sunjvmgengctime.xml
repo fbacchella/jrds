@@ -1,28 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
-    <name>SunJVM5GCTime2</name>
-    <graphName>jvmsun5gctime-${label}</graphName>
+    <name>SunJVMGenGCTime</name>
+    <graphName>sunjvmgengctime-${label}</graphName>
     <graphTitle>JVM Cumulated GC time for ${label} on ${host}</graphTitle>
     <unit>
         <SI />
     </unit>
     <verticalLabel>s</verticalLabel>
     <add>
-        <name>majorcolltime</name>
-        <dsName>Old Coll Time</dsName>
+        <name>MajorTime</name>
     </add>
     <add>
-        <rpn>majorcolltime, 1000, /</rpn>
+        <rpn>MajorTime, 1000, /</rpn>
         <graphType>area</graphType>
         <legend>Major collection cumulated time</legend>
     </add>
     <add>
-        <name>minorcolltime</name>
-        <dsName>Young Coll Time</dsName>
+        <name>MinorTime</name>
     </add>
     <add>
-        <rpn>minorcolltime, 1000, /</rpn>
+        <rpn>MinorTime, 1000, /</rpn>
         <graphType>stack</graphType>
         <legend>Minor collection cumulated time</legend>
     </add>
