@@ -31,8 +31,8 @@ public class JuliToLog4jHandler extends Handler {
         jilogger.setLevel(Level.ALL);
     }
 
-    private JuliToLog4jHandler() {
-        super();
+    @Deprecated
+    public JuliToLog4jHandler() {
     }
 
     public void publish(LogRecord record) {
