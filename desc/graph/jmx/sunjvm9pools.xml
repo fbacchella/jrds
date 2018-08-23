@@ -23,11 +23,13 @@
     <add>
         <rpn>CodeHeap.nonnmethods,CodeHeap.profilednmethods,+,CodeHeap.nonprofilednmethods,+</rpn>
         <graphType>area</graphType>
+        <color>red</color>
         <legend>Code Heap</legend>
     </add>
     <add>
         <name>Metaspace</name>
         <graphType>stack</graphType>
+        <color>black</color>
         <legend>Metaspace</legend>
     </add>
     <add>
@@ -36,16 +38,19 @@
     <add>
         <name>Old Gen</name>
         <graphType>stack</graphType>
+        <color>blue</color>
         <legend>Old Gen</legend>
     </add>
     <add>
         <name>Survivor Space</name>
         <graphType>stack</graphType>
+        <color>cyan</color>
         <legend>Survivor Space</legend>
     </add>
     <add>
         <name>Eden Space</name>
         <graphType>stack</graphType>
+         <color>green</color>
         <legend>Eden Space</legend>
     </add>
     <hosttree>
