@@ -116,12 +116,12 @@ class DatasourcesPopulator<T> {
                     logger.trace(delayedFormatString("External probe path: %s/%s/%s", pathHost, ds.dspath.probe, ds.dsName));
                     probe = hl.getProbeByPath(pathHost, ds.dspath.probe);
                     if(probe == null) {
-                        logger.error("Invalide probe: " + pathHost + "/" + ds.dspath.probe);
+                        logger.error("Invalid probe: " + pathHost + "/" + ds.dspath.probe);
                         continue;
                     }
                 }
                 if(!probe.dsExist(ds.dsName)) {
-                    logger.error("Invalide datasource " + ds.dsName + ", not found in " + probe);
+                    logger.error("Invalid datasource " + ds.dsName + ", not found in " + probe);
                     continue;
                 }
                 complete = true;
