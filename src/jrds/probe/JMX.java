@@ -77,7 +77,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
                         } catch (RemoteException e1) {
                             log(Level.ERROR, e1, "JMX remote exception: %s", e1.getMessage());
                         } catch (AttributeNotFoundException e1) {
-                            log(Level.ERROR, e1, "Invalide JMX attribue %s", attributeName);
+                            log(Level.ERROR, e1, "Invalid JMX attribute %s", attributeName);
                         } catch (InstanceNotFoundException e1) {
                             Level l = Level.ERROR;
                             if(isOptional(collect)) {

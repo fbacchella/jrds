@@ -115,7 +115,7 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
      * This method can be used to validate the response, the default implementation check
      * that the status code is 200.
      * @param response the responce to check
-     * @return true if it's a valide response
+     * @return true if it's a valid response
      */
     public boolean validateResponse(HttpResponse response) {
         if (response.getStatusLine().getStatusCode() != 200) {
