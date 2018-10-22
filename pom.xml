@@ -21,6 +21,7 @@
         <dojo.unpacked.dir>${project.basedir}/target/dojo-unpacked</dojo.unpacked.dir>
         <webapp.root>${project.basedir}/web</webapp.root>
         <jrds.testloglevel>ERROR</jrds.testloglevel>
+        <jetty>9.2.26.v20180806</jetty>
     </properties>
 
     <dependencies>
@@ -58,7 +59,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.2.22.v20170606</version>
+            <version>${jetty}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -106,7 +107,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-jmx</artifactId>
-            <version>9.2.22.v20170606</version>
+            <version>${jetty}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -123,7 +124,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>9.2.22.v20170606</version>
+            <version>${jetty}</version>
             <optional>true</optional>
         </dependency>
         <dependency>

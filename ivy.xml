@@ -25,9 +25,9 @@
             <exclude module="snmp4j"/>
         </dependency>
         <dependency org="org.json" name="json" rev="20140107" conf="lib->default"/>
-        <dependency org="org.eclipse.jetty" name="jetty-server" rev="9.2.22.v20170606" conf="libjetty->default"/>
-        <dependency org="org.eclipse.jetty" name="jetty-webapp" rev="9.2.22.v20170606" conf="libjetty->default"/>
-        <dependency org="org.eclipse.jetty" name="jetty-jmx" rev="9.2.22.v20170606" conf="libjetty->default"/>
+        <dependency org="org.eclipse.jetty" name="jetty-server" rev="9.2.26.v20180806" conf="libjetty->default"/>
+        <dependency org="org.eclipse.jetty" name="jetty-webapp" rev="9.2.26.v20180806" conf="libjetty->default"/>
+        <dependency org="org.eclipse.jetty" name="jetty-jmx" rev="9.2.26.v20180806" conf="libjetty->default"/>
         <dependency org="org.slf4j" name="slf4j-api" rev="1.7.13" conf="libjetty->default"/>
         <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.7.13" conf="libjetty->default"/>
         <dependency org="commons-net" name="commons-net" rev="3.3" conf="lib->default"/>
