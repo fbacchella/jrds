@@ -27,7 +27,7 @@
         <dependency>
             <groupId>org.rrd4j</groupId>
             <artifactId>rrd4j</artifactId>
-            <version>3.2-SNAPSHOT</version>
+            <version>3.3.1</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
@@ -58,7 +58,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.2.13.v20150730</version>
+            <version>9.2.22.v20170606</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -106,7 +106,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-jmx</artifactId>
-            <version>9.2.13.v20150730</version>
+            <version>9.2.22.v20170606</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -123,7 +123,7 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>9.2.13.v20150730</version>
+            <version>9.2.22.v20170606</version>
             <optional>true</optional>
         </dependency>
         <dependency>

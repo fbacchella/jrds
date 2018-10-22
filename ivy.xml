@@ -14,7 +14,7 @@
         <artifact name="jrds" type="bundle" ext="tar.gz"/>
     </publications>
     <dependencies>
-        <dependency org="org.rrd4j" name="rrd4j" rev="3.2-SNAPSHOT" conf="lib->default"/>
+        <dependency org="org.rrd4j" name="rrd4j" rev="3.3.1" conf="lib->default"/>
         <dependency org="log4j" name="log4j" rev="1.2.17" conf="lib->default"/>
         <dependency org="org.dojotoolkit" name="dojo" rev="1.10.4" conf="lib->default">
             <artifact name="dojo" type="zip"/>
@@ -25,9 +25,9 @@
             <exclude module="snmp4j"/>
         </dependency>
         <dependency org="org.json" name="json" rev="20140107" conf="lib->default"/>
-        <dependency org="org.eclipse.jetty" name="jetty-server" rev="9.2.13.v20150730" conf="libjetty->default"/>
-        <dependency org="org.eclipse.jetty" name="jetty-webapp" rev="9.2.13.v20150730" conf="libjetty->default"/>
-        <dependency org="org.eclipse.jetty" name="jetty-jmx" rev="9.2.13.v20150730" conf="libjetty->default"/>
+        <dependency org="org.eclipse.jetty" name="jetty-server" rev="9.2.22.v20170606" conf="libjetty->default"/>
+        <dependency org="org.eclipse.jetty" name="jetty-webapp" rev="9.2.22.v20170606" conf="libjetty->default"/>
+        <dependency org="org.eclipse.jetty" name="jetty-jmx" rev="9.2.22.v20170606" conf="libjetty->default"/>
         <dependency org="org.slf4j" name="slf4j-api" rev="1.7.13" conf="libjetty->default"/>
         <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.7.13" conf="libjetty->default"/>
         <dependency org="commons-net" name="commons-net" rev="3.3" conf="lib->default"/>
