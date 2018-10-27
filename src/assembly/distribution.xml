@@ -5,7 +5,6 @@
   <formats>
     <format>tar.gz</format>
   </formats>
-  <baseDirectory>/</baseDirectory>
   <fileSets>
     <fileSet>
       <directory>${project.build.directory}</directory>
@@ -18,7 +17,7 @@
     </fileSet>
     <fileSet>
       <directory>${project.build.directory}/jrds</directory>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory>.</outputDirectory>
       <includes>
         <include>**</include>
       </includes>
@@ -33,9 +32,6 @@
       <useProjectArtifact>true</useProjectArtifact>
       <unpack>false</unpack>
       <scope>runtime</scope>
-      <excludes>
-        <exclude>**/dojo-*.zip</exclude>
-      </excludes>
     </dependencySet>
   </dependencySets>
 </assembly>

@@ -275,8 +275,6 @@
                         </goals>
                         <configuration>
                             <excludes>
-                                <!-- Exclude the converter and inspector 
-                                    from the default build. -->
                                 <exclude>**/bootstrap/*</exclude>
                             </excludes>
                         </configuration>
@@ -295,10 +293,6 @@
                                 <manifest>
                                     <mainClass>jrds.bootstrap.BootStrap</mainClass>
                                 </manifest>
-                                <manifestEntries>
-                                    <!-- Resolves to the default jar file. -->
-                                    <Class-Path>${project.build.finalName}.jar</Class-Path>
-                                </manifestEntries>
                             </archive>
                         </configuration>
                     </execution>
@@ -309,8 +303,6 @@
                         </goals>
                         <configuration>
                             <excludes>
-                                <!-- Exclude the converter and inspector 
-                                    from the default build. -->
                                 <exclude>**/bootstrap/*</exclude>
                                 <exclude>**/snmp/*</exclude>
                             </excludes>
@@ -328,11 +320,6 @@
                             </includes>
                         </configuration>
                     </execution>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -347,7 +334,7 @@
                             <directory>${webapp.root}</directory>
                         </resource>
                         <resource>
-                            <directory>${dojo.unpacked.dir}/dojo-release-${dojo.version}</directory>
+                            <directory>${dojo.unpacked.dir}/dojo-${dojo.version}</directory>
                             <include>dijit/themes/nihilo/nihilo.css</include>
                             <include>dijit/themes/nihilo/images/treeExpand_loading.gif</include>
                             <include>dijit/themes/nihilo/images/tabContainerSprite.gif</include>
@@ -372,8 +359,43 @@
                             <include>dijit/themes/nihilo/images/treeI.gif</include>
                             <include>dijit/themes/nihilo/images/treeI_half.gif</include>
                         </resource>
+                        <resource>
+                            <directory>target</directory>
+                            <targetPath>WEB-INF/lib</targetPath>
+                            <include>jrds-snmpprobes.jar</include>
+                            <include>jrds.jar</include>
+                        </resource>
                     </webResources>
+                    <packagingExcludes>WEB-INF/lib/jrds-1.0-SNAPSHOT.jar</packagingExcludes>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>war</id>
+                        <goals>
+                            <goal>war</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/distribution.xml</descriptor>
+                    </descriptors>
+                    <tarLongFileMode>posix</tarLongFileMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
