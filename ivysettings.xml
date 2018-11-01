@@ -3,9 +3,7 @@
         <url name="central" m2compatible="true">
             <artifact pattern="https://repo.maven.apache.org/maven2/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
         </url>
-        <url name="sonaytpe" m2compatible="true">
-            <artifact pattern="https://oss.sonatype.org/content/repositories/snapshots/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
-        </url>
+        <ibiblio name="sonaytpe" m2compatible="true" root="https://oss.sonatype.org/content/repositories/snapshots" checkmodified="true" changingMatcher="regexp"/>
         <url name="ivyrepo" m2compatible="true">
             <ivy pattern="http://jrds.fr/maven2/[organisation]/[module]/ivys/ivy-[revision].xml" />
             <artifact
@@ -23,7 +21,7 @@
     <modules>
         <module organisation="org.dojotoolkit" name="*" resolver="ivyrepo"/>
         <module organisation="fr.jrds.verax" name="*" resolver="ivyrepo"/>
-        <module organisation="fr.jrds" name="SmiExtensions" resolver="ivyrepo"/>
+        <module organisation="fr.jrds" name="snmpcodec" resolver="sonaytpe"/>
     </modules>
     <include url="${ivy.default.settings.dir}/ivysettings-public.xml" />
     <include url="${ivy.default.settings.dir}/ivysettings-shared.xml" />

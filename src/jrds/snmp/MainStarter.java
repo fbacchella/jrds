@@ -4,8 +4,10 @@
 package jrds.snmp;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import jrds.JrdsLoggerConfiguration;
+import jrds.PropertiesManager;
 import jrds.starter.Starter;
 
 import org.apache.log4j.Level;
@@ -13,6 +15,9 @@ import org.snmp4j.SNMP4JSettings;
 import org.snmp4j.Snmp;
 import org.snmp4j.log.Log4jLogFactory;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
+
+import fr.jrds.snmpcodec.OIDFormatter;
+import fr.jrds.snmpcodec.parsing.MibLoader;
 
 public class MainStarter extends Starter {
     // Used to setup the log configuration of SNMP4J
@@ -25,6 +30,16 @@ public class MainStarter extends Starter {
     }
 
     public volatile Snmp snmp = null;
+
+    @Override
+    public void configure(PropertiesManager pm) {
+        MibLoader loader = new MibLoader();
+        for (Path i: pm.snmpMibDirs) {
+            loader.load(i);
+        }
+        OIDFormatter.register(loader.buildTree());
+        super.configure(pm);
+    }
 
     public boolean start() {
         boolean started = false;
