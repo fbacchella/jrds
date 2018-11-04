@@ -1,5 +1,12 @@
 package jrds.mockobjects;
 
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Paths;
+
+import javax.servlet.http.HttpServlet;
+
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -14,25 +21,19 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-import javax.servlet.http.HttpServlet;
-
-import java.net.InetAddress;
-import java.net.URL;
-
 public class MockHttpServer extends Server {
 
     private ServletContextHandler ctx = null;
     private HandlerCollection handlers = new HandlerList();
 
-    public MockHttpServer(boolean withSSL) {
+    public MockHttpServer(boolean withSSL) throws MalformedURLException {
         super();
         ServerConnector connector;
         if(withSSL) {
             HttpConfiguration https = new HttpConfiguration();
             https.addCustomizer(new SecureRequestCustomizer());
             SslContextFactory sslContextFactory = new SslContextFactory();
-
-            URL resource = MockHttpServer.class.getResource("/ressources/localhost.jks");
+            URL resource = Paths.get("junit/ressources/localhost.jks").toUri().toURL();
             if(resource == null) {
                 throw new RuntimeException("Unable to find 'localhost.jks' file to setup SSL connector");
             }

@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import javax.servlet.ServletContextListener;
@@ -47,13 +49,12 @@ public class TestListServlet {
         if(!Boolean.parseBoolean(System.getProperty("maven"))) {
             config.put("libspath", "desc");
         }
-        System.out.println(System.getProperty("java.io.tmpdir"));
 
         ServletTester tester = ToolsWebApp.getTestServer(config);
         File cwd = new File(".");
 
         URLClassLoader cl = new URLClassLoader(new URL[] { cwd.toURI().toURL() });
-        InputStream webxmlStream = cl.getResourceAsStream("web/WEB-INF/web.xml");
+        InputStream webxmlStream = Files.newInputStream(Paths.get("web/WEB-INF/web.xml"));
         JrdsDocument webxml = Tools.parseRessource(webxmlStream);
         for(JrdsElement n: new NodeListIterator<JrdsElement>(webxml, Tools.xpather.compile("/web-app/servlet/servlet-class"))) {
             String servletClassName = n.getTextContent().trim();

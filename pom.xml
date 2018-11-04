@@ -200,15 +200,18 @@
                 </includes>
             </resource>
             <resource>
-                <directory>${project.basedir}/dtd</directory>
+                <directory>${project.basedir}/src/ressources</directory>
+                <includes>
+                    <include>**</include>
+                </includes>
             </resource>
         </resources>
         <testResources>
             <testResource>
                 <directory>${project.basedir}/junit</directory>
-                <includes>
-                    <include>ressources/**/*</include>
-                </includes>
+                <excludes>
+                    <exclude>ressources/**/*</exclude>
+                </excludes>
             </testResource>
         </testResources>
         <finalName>jrds</finalName>

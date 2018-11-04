@@ -32,15 +32,15 @@ public class EntityResolver implements org.xml.sax.EntityResolver {
         } else if("-//jrds//DTD Archives Set//EN".equals(publicId)) {
             realSystemId = getClass().getResource("/archives.dtd");
         } else if("-//W3C//DTD XHTML 1.0 Strict//EN".equals(publicId)) {
-            realSystemId = getClass().getResource("/ressources/xhtml1-strict.dtd");
+            realSystemId = getClass().getResource("/xhtml1-strict.dtd");
         } else if("-//W3C//ENTITIES Latin 1 for XHTML//EN".equals(publicId)) {
-            realSystemId = getClass().getResource("/ressources/xhtml-lat1.ent");
+            realSystemId = getClass().getResource("/xhtml-lat1.ent");
         } else if("-//W3C//ENTITIES Symbols for XHTML//EN".equals(publicId)) {
-            realSystemId = getClass().getResource("/ressources/xhtml-symbol.ent");
+            realSystemId = getClass().getResource("/xhtml-symbol.ent");
         } else if("-//W3C//ENTITIES Special for XHTML//EN".equals(publicId)) {
-            realSystemId = getClass().getResource("/ressources/xhtml-special.ent");
+            realSystemId = getClass().getResource("//xhtml-special.ent");
         } else if("-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN".equals(publicId)) {
-            realSystemId = getClass().getResource("/ressources/xhtml-special.ent");
+            realSystemId = getClass().getResource("/xhtml-special.ent");
         } else {
             realSystemId = new URL(systemId);
         }

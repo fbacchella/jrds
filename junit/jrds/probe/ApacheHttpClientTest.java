@@ -2,6 +2,7 @@ package jrds.probe;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 
@@ -87,7 +88,7 @@ public class ApacheHttpClientTest {
     }
 
     private HostStarter addConnection(Starter cnx) throws IOException {
-        String truststore = MockHttpServer.class.getResource("/ressources/localhost.jks").getFile();
+        String truststore = Paths.get("junit/ressources/localhost.jks").toFile().getAbsolutePath();
         PropertiesManager pm = Tools.makePm(testFolder, "timeout=1", "collectorThreads=1",
                 "ssl.protocol=TLS", "ssl.strict=true", "ssl.truststore=" + truststore, "ssl.trustpassword=123456");
 

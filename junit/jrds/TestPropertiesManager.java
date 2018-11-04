@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -112,23 +114,23 @@ public class TestPropertiesManager {
 
     @Test
     public void testlog4jpropfile() throws IOException {
-        InputStream is = Tools.class.getResourceAsStream("/ressources/log4j.properties");
-        ReadableByteChannel isChannel = Channels.newChannel(is);
-        File log4jprops = testFolder.newFile("log4j.properties");
-        FileOutputStream fos = new java.io.FileOutputStream(log4jprops);
-        fos.getChannel().transferFrom(isChannel, 0, 4096);
-        PropertiesManager pm = new PropertiesManager();
-        pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
-        pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
-        pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
-        pm.setProperty("log4jpropfile", log4jprops.getCanonicalPath());
-        pm.update();
-        logger.debug("log file created");
-
-        File logFile = new File("tmp/log4j.log");
-        Assert.assertTrue("Log4j file not created", logFile.canRead());
-        logFile.delete();
-        fos.close();
+        try (InputStream is = Files.newInputStream(Paths.get("junit/ressources/", "log4j.properties"))) {
+            ReadableByteChannel isChannel = Channels.newChannel(is);
+            File log4jprops = testFolder.newFile("log4j.properties");
+            try (FileOutputStream fos = new java.io.FileOutputStream(log4jprops)) {
+                fos.getChannel().transferFrom(isChannel, 0, 4096);
+                PropertiesManager pm = new PropertiesManager();
+                pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
+                pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
+                pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
+                pm.setProperty("log4jpropfile", log4jprops.getCanonicalPath());
+                pm.update();
+                logger.debug("log file created");
+                File logFile = new File("tmp/log4j.log");
+                Assert.assertTrue("Log4j file not created", logFile.canRead());
+                logFile.delete();
+            }
+        }
     }
 
     @Test

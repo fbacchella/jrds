@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -89,7 +91,7 @@ final public class Tools {
     }
 
     static public JrdsDocument parseRessource(String name) throws Exception {
-        InputStream is = Tools.class.getResourceAsStream("/ressources/" + name);
+        InputStream is = Files.newInputStream(Paths.get("junit/ressources/", name));
         return parseRessource(is);
     }
 

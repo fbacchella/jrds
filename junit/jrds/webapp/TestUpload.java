@@ -3,6 +3,8 @@ package jrds.webapp;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import jrds.Tools;
@@ -44,7 +46,7 @@ public class TestUpload {
 
     @Test
     public void testXXE1() throws Exception {
-        InputStream is = Tools.class.getResourceAsStream("/ressources/xxetesting1.mime");
+        InputStream is = Files.newInputStream(Paths.get("junit/ressources/xxetesting1.mime"));
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         byte[] buffer = new byte[8192];
@@ -78,7 +80,7 @@ public class TestUpload {
 
     @Test
     public void testXXE2() throws Exception {
-        InputStream is = Tools.class.getResourceAsStream("/ressources/xxetesting2.mime");
+        InputStream is = Files.newInputStream(Paths.get("junit/ressources/xxetesting2.mime"));
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         byte[] buffer = new byte[8192];
@@ -113,7 +115,7 @@ public class TestUpload {
 
     @Test
     public void testGood() throws Exception {
-        InputStream is = Tools.class.getResourceAsStream("/ressources/goodupload.mime");
+        InputStream is = Files.newInputStream(Paths.get("junit/ressources/goodupload.mime"));
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         byte[] buffer = new byte[8192];

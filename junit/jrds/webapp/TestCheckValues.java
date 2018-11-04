@@ -2,6 +2,7 @@ package jrds.webapp;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 import jrds.Tools;
@@ -30,12 +31,12 @@ public class TestCheckValues {
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, TestCheckValues.class.getName(), "jrds.webapp.CheckValues", "jrds.webapp");
+        Tools.setLevel(logger, Level.TRACE, TestCheckValues.class.getName(), "jrds.webapp.CheckValues", "jrds.webapp", "jrds.PropertiesManager");
     }
 
     @Before
     public void launchServer() throws Exception {
-        URL configDirURL = Tools.class.getResource("/ressources/configfull/");
+        URL configDirURL = Paths.get("junit/ressources/configfull/").toUri().toURL();
 
         Properties prop = new Properties();
         prop.setProperty("strictparsing", "true");

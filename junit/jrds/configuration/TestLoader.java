@@ -2,6 +2,8 @@ package jrds.configuration;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -37,7 +39,7 @@ public class TestLoader {
     @Test
     public void doLoadHost() throws Exception {
         Loader l = new Loader();
-        l.importStream(getClass().getResourceAsStream("/ressources/host1.xml"), "");
+        l.importStream(Files.newInputStream(Paths.get("junit/ressources/host1.xml")), "");
         l.done();
 
         Assert.assertTrue(l.getRepository(ConfigType.HOSTS).containsKey("name"));
@@ -47,7 +49,7 @@ public class TestLoader {
     public void doLoadView() throws Exception {
         Loader l = new Loader();
 
-        l.importStream(getClass().getResourceAsStream("/ressources/view1.xml"), "");
+        l.importStream(Files.newInputStream(Paths.get("junit/ressources/view1.xml")), "");
         l.done();
 
         Map<String, JrdsDocument> rep = l.getRepository(ConfigType.FILTER);
@@ -59,7 +61,7 @@ public class TestLoader {
     public void doLoadProbeDesc() throws Exception {
         Loader l = new Loader();
 
-        l.importStream(getClass().getResourceAsStream("/ressources/fulldesc.xml"), "");
+        l.importStream(Files.newInputStream(Paths.get("junit/ressources/fulldesc.xml")), "");
         l.done();
 
         Map<String, JrdsDocument> rep = l.getRepository(ConfigType.PROBEDESC);
@@ -71,8 +73,7 @@ public class TestLoader {
     @Test
     public void doLoadGraph() throws Exception {
         Loader l = new Loader();
-
-        l.importStream(getClass().getResourceAsStream("/ressources/customgraph.xml"), "");
+        l.importStream(Files.newInputStream(Paths.get("junit/ressources/customgraph.xml")), "");
         l.done();
 
         Map<String, JrdsDocument> rep = l.getRepository(ConfigType.GRAPH);
@@ -83,8 +84,7 @@ public class TestLoader {
     @Test
     public void doLoadTab() throws Exception {
         Loader l = new Loader();
-
-        l.importStream(getClass().getResourceAsStream("/ressources/goodtab.xml"), "");
+        l.importStream(Files.newInputStream(Paths.get("junit/ressources/goodtab.xml")), "");
         l.done();
 
         Map<String, JrdsDocument> rep = l.getRepository(ConfigType.TAB);

@@ -35,11 +35,7 @@ public class ToolsWebApp {
         config.put("configdir", root + "/config");
         config.put("autocreate", "true");
         config.put("rrddir", root);
-        
-        // Tests might needs a little help to find descriptions folder
-        if (ServletTester.class.getClassLoader().getResource("probe/") == null) {
-            config.put("libspath", "desc");
-        }
+        config.put("libspath", "target/test-classes");
         config.putAll(props);
 
         ServletTester tester = ToolsWebApp.getTestServer(config);

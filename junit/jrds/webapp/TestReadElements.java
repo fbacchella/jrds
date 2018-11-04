@@ -54,11 +54,11 @@ public class TestReadElements {
 
     @Before
     public void launchServer() throws Exception {
-        URL configDirURL = Tools.class.getResource("/ressources/configfull/");
+        URL configDirURL = Paths.get("junit/ressources/configfull/").toUri().toURL();
         logger.debug(configDirURL.getFile());
 
         Properties prop = new Properties();
-        prop.setProperty("strictparsing", "true");
+        prop.setProperty("strictparsing", "false");
         prop.setProperty("readonly", "true");
         prop.put("configdir", configDirURL.getFile());
 
@@ -73,8 +73,7 @@ public class TestReadElements {
         String url = String.format("http://tester%s", query);
         Response response = ToolsWebApp.doRequestGet(tester, url, 200);
         JSONObject content = new JSONObject(response.getContent());
-        logger.debug(content);
-
+        logger.debug("content read is " + content);
         return (content);
     }
 
