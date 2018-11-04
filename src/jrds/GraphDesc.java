@@ -900,8 +900,9 @@ public class GraphDesc implements Cloneable, WithACL {
      * return the RrdGraphDef for this graph, used the indicated probe any data
      * can be overridden of a provided map of Plottable
      * 
-     * @param probe
-     * @param ownData data used to override probe's own values
+     * @param defProbe
+     * @param ei
+     * @param customData data used to override probe's own values
      * @return
      * @throws IOException
      */

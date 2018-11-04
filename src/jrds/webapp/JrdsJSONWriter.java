@@ -38,7 +38,7 @@ public class JrdsJSONWriter {
 
     /**
      * @return
-     * @throws JSONException
+     * @throws org.json.JSONException
      * @see org.json.JSONWriter#array()
      */
     public JSONWriter array() {
@@ -47,7 +47,7 @@ public class JrdsJSONWriter {
 
     /**
      * @return
-     * @throws JSONException
+     * @throws org.json.JSONException
      * @see org.json.JSONWriter#endArray()
      */
     public JSONWriter endArray() {
@@ -56,7 +56,7 @@ public class JrdsJSONWriter {
 
     /**
      * @return
-     * @throws JSONException
+     * @throws org.json.JSONException
      * @see org.json.JSONWriter#endObject()
      */
     public JSONWriter endObject() {
@@ -66,7 +66,7 @@ public class JrdsJSONWriter {
     /**
      * @param arg0
      * @return
-     * @throws JSONException
+     * @throws org.json.JSONException
      * @see org.json.JSONWriter#key(java.lang.String)
      */
     public JSONWriter key(String arg0) {
@@ -75,7 +75,7 @@ public class JrdsJSONWriter {
 
     /**
      * @return
-     * @throws JSONException
+     * @throws org.json.JSONException
      * @see org.json.JSONWriter#object()
      */
     public JSONWriter object() {
@@ -85,7 +85,7 @@ public class JrdsJSONWriter {
     /**
      * @param arg0
      * @return
-     * @throws JSONException
+     * @throws org.json.JSONException
      * @see org.json.JSONWriter#value(boolean)
      */
     public JSONWriter value(boolean arg0) {
@@ -95,7 +95,7 @@ public class JrdsJSONWriter {
     /**
      * @param arg0
      * @return
-     * @throws JSONException
+     * @throws org.json.JSONException
      * @see org.json.JSONWriter#value(double)
      */
     public JSONWriter value(double arg0) {
@@ -105,7 +105,7 @@ public class JrdsJSONWriter {
     /**
      * @param arg0
      * @return
-     * @throws JSONException
+     * @throws org.json.JSONException
      * @see org.json.JSONWriter#value(long)
      */
     public JSONWriter value(long arg0) {
@@ -115,7 +115,7 @@ public class JrdsJSONWriter {
     /**
      * @param arg0
      * @return
-     * @throws JSONException
+     * @throws org.json.JSONException
      * @see org.json.JSONWriter#value(java.lang.Object)
      */
     public JSONWriter value(Object arg0) {

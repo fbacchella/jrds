@@ -69,7 +69,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
     /**
      * @param newChild
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Node#appendChild(org.w3c.dom.Node)
      */
     public Node appendChild(Node newChild) {
@@ -88,7 +88,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
     /**
      * @param other
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Node#compareDocumentPosition(org.w3c.dom.Node)
      */
     public short compareDocumentPosition(Node other) {
@@ -191,7 +191,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
 
     /**
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Node#getNodeValue()
      */
     public String getNodeValue() {
@@ -236,7 +236,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
 
     /**
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Node#getTextContent()
      */
     public String getTextContent() {
@@ -272,7 +272,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @param newChild
      * @param refChild
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Node#insertBefore(org.w3c.dom.Node, org.w3c.dom.Node)
      */
     public Node insertBefore(Node newChild, Node refChild) {
@@ -345,7 +345,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
     /**
      * @param oldChild
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Node#removeChild(org.w3c.dom.Node)
      */
     public Node removeChild(Node oldChild) {
@@ -356,7 +356,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
      * @param newChild
      * @param oldChild
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Node#replaceChild(org.w3c.dom.Node, org.w3c.dom.Node)
      */
     public Node replaceChild(Node newChild, Node oldChild) {
@@ -365,7 +365,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
 
     /**
      * @param nodeValue
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Node#setNodeValue(java.lang.String)
      */
     public void setNodeValue(String nodeValue) {
@@ -374,7 +374,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
 
     /**
      * @param prefix
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Node#setPrefix(java.lang.String)
      */
     public void setPrefix(String prefix) {
@@ -383,7 +383,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
 
     /**
      * @param textContent
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Node#setTextContent(java.lang.String)
      */
     public void setTextContent(String textContent) {

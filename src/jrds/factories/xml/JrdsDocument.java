@@ -39,7 +39,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
     /**
      * @param arg0
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Document#adoptNode(org.w3c.dom.Node)
      */
     public Node adoptNode(Node arg0) {
@@ -49,7 +49,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
     /**
      * @param arg0
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Document#createAttribute(java.lang.String)
      */
     public Attr createAttribute(String arg0) {
@@ -60,7 +60,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @param arg0
      * @param arg1
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Document#createAttributeNS(java.lang.String,
      *      java.lang.String)
      */
@@ -71,7 +71,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
     /**
      * @param arg0
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Document#createCDATASection(java.lang.String)
      */
     public CDATASection createCDATASection(String arg0) {
@@ -98,7 +98,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
     /**
      * @param arg0
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Document#createElement(java.lang.String)
      */
     public Element createElement(String arg0) {
@@ -109,7 +109,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @param arg0
      * @param arg1
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Document#createElementNS(java.lang.String,
      *      java.lang.String)
      */
@@ -120,7 +120,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
     /**
      * @param arg0
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Document#createEntityReference(java.lang.String)
      */
     public EntityReference createEntityReference(String arg0) {
@@ -131,7 +131,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @param arg0
      * @param arg1
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Document#createProcessingInstruction(java.lang.String,
      *      java.lang.String)
      */
@@ -266,7 +266,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @param arg0
      * @param arg1
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Document#importNode(org.w3c.dom.Node, boolean)
      */
     public Node importNode(Node arg0, boolean arg1) {
@@ -286,7 +286,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
      * @param arg1
      * @param arg2
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Document#renameNode(org.w3c.dom.Node, java.lang.String,
      *      java.lang.String)
      */
@@ -304,7 +304,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
 
     /**
      * @param nodeValue
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Node#setNodeValue(java.lang.String)
      */
     public void setNodeValue(String nodeValue) {
@@ -321,7 +321,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
 
     /**
      * @param arg0
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Document#setXmlStandalone(boolean)
      */
     public void setXmlStandalone(boolean arg0) {
@@ -330,7 +330,7 @@ public class JrdsDocument extends AbstractJrdsNode<Document> implements Document
 
     /**
      * @param arg0
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Document#setXmlVersion(java.lang.String)
      */
     public void setXmlVersion(String arg0) {

@@ -131,7 +131,6 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
      * @param rrdFile Name of the RRD datasource.
      * @return RrdDb instance of the datasource.
      * @throws IOException Thrown in case of I/O error.
-     * @throws InterruptedException
      */
     public RrdDb getRrd(String rrdFile) throws IOException {
         File f = new File(rrdFile);

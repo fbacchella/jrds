@@ -10,7 +10,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
 
     /**
      * @param arg0
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.CharacterData#appendData(java.lang.String)
      */
     public void appendData(String arg0) {
@@ -20,7 +20,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
     /**
      * @param arg0
      * @param arg1
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.CharacterData#deleteData(int, int)
      */
     public void deleteData(int arg0, int arg1) {
@@ -29,7 +29,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
 
     /**
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.CharacterData#getData()
      */
     public String getData() {
@@ -55,7 +55,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
     /**
      * @param arg0
      * @param arg1
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.CharacterData#insertData(int, java.lang.String)
      */
     public void insertData(int arg0, String arg1) {
@@ -74,7 +74,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
      * @param arg0
      * @param arg1
      * @param arg2
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.CharacterData#replaceData(int, int, java.lang.String)
      */
     public void replaceData(int arg0, int arg1, String arg2) {
@@ -84,7 +84,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
     /**
      * @param content
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Text#replaceWholeText(java.lang.String)
      */
     public Text replaceWholeText(String content) {
@@ -93,7 +93,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
 
     /**
      * @param arg0
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.CharacterData#setData(java.lang.String)
      */
     public void setData(String arg0) {
@@ -103,7 +103,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
     /**
      * @param offset
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Text#splitText(int)
      */
     public Text splitText(int offset) {
@@ -114,7 +114,7 @@ public class JrdsText extends AbstractJrdsNode<Text> implements Text {
      * @param arg0
      * @param arg1
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.CharacterData#substringData(int, int)
      */
     public String substringData(int arg0, int arg1) {

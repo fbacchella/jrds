@@ -48,9 +48,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     protected class LocalJrdsSample extends HashMap<String, Number> implements JrdsSample {
         Date time;
 
-        /**
-         * @return the time
-         */
         public LocalJrdsSample() {
             super(Probe.this.pd.getSize());
             time = new Date();
@@ -591,8 +588,6 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * 
      * Open the rrd backend of the probe. it's created if it's needed
      * 
-     * @throws IOException
-     * @throws RrdException
      */
     public boolean checkStore() {
         ProbeDesc pd = getPd();
@@ -633,7 +628,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
-     * @param stores the stores to set
+     * @param factory the stores factory to set
      */
     public void addStore(StoreFactory factory) {
         stores.add(factory.create(this));
@@ -647,7 +642,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     /**
-     * @param mainStore the mainStore to set
+     * @param factory factory for the store to use
+     * @param args
      * @throws InvocationTargetException
      */
     public void setMainStore(StoreFactory factory, Map<String, String> args) throws InvocationTargetException {

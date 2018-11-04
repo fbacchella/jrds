@@ -80,7 +80,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @param namespaceURI
      * @param localName
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Element#getAttributeNS(java.lang.String,
      *      java.lang.String)
      */
@@ -101,7 +101,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @param namespaceURI
      * @param localName
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Element#getAttributeNodeNS(java.lang.String,
      *      java.lang.String)
      */
@@ -189,7 +189,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @param namespaceURI
      * @param localName
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Element#getElementsByTagNameNS(java.lang.String,
      *      java.lang.String)
      */
@@ -226,7 +226,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @param namespaceURI
      * @param localName
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Element#hasAttributeNS(java.lang.String,
      *      java.lang.String)
      */
@@ -236,7 +236,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
 
     /**
      * @param name
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Element#removeAttribute(java.lang.String)
      */
     public void removeAttribute(String name) {
@@ -246,7 +246,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
     /**
      * @param namespaceURI
      * @param localName
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Element#removeAttributeNS(java.lang.String,
      *      java.lang.String)
      */
@@ -257,7 +257,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
     /**
      * @param oldAttr
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Element#removeAttributeNode(org.w3c.dom.Attr)
      */
     public Attr removeAttributeNode(Attr oldAttr) {
@@ -267,7 +267,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
     /**
      * @param name
      * @param value
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Element#setAttribute(java.lang.String, java.lang.String)
      */
     public void setAttribute(String name, String value) {
@@ -278,7 +278,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @param namespaceURI
      * @param qualifiedName
      * @param value
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Element#setAttributeNS(java.lang.String,
      *      java.lang.String, java.lang.String)
      */
@@ -289,7 +289,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
     /**
      * @param newAttr
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Element#setAttributeNode(org.w3c.dom.Attr)
      */
     public Attr setAttributeNode(Attr newAttr) {
@@ -299,7 +299,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
     /**
      * @param newAttr
      * @return
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Element#setAttributeNodeNS(org.w3c.dom.Attr)
      */
     public Attr setAttributeNodeNS(Attr newAttr) {
@@ -309,7 +309,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
     /**
      * @param name
      * @param isId
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Element#setIdAttribute(java.lang.String, boolean)
      */
     public void setIdAttribute(String name, boolean isId) {
@@ -320,7 +320,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
      * @param namespaceURI
      * @param localName
      * @param isId
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Element#setIdAttributeNS(java.lang.String,
      *      java.lang.String, boolean)
      */
@@ -331,7 +331,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
     /**
      * @param idAttr
      * @param isId
-     * @throws DOMException
+     * @throws org.w3c.dom.DOMException
      * @see org.w3c.dom.Element#setIdAttributeNode(org.w3c.dom.Attr, boolean)
      */
     public void setIdAttributeNode(Attr idAttr, boolean isId) {
