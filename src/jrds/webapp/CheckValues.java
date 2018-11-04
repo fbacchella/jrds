@@ -13,8 +13,8 @@ import jrds.Probe;
 import jrds.store.ExtractInfo;
 import jrds.store.Extractor;
 
-import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
+import org.rrd4j.data.Variable;
 
 /**
  * A servlet which returns datastore values from a probe. It can be used in many
@@ -49,52 +49,69 @@ public final class CheckValues extends JrdsServlet {
 
         long period = jrds.Util.parseStringNumber(params.getValue("period"), new Long(hl.getStep()));
         String cfName = params.getValue("cf");
-        if(cfName == null || "".equals(cfName.trim()))
+        if(cfName == null || cfName.trim().isEmpty())
             cfName = "AVERAGE";
-        ConsolFun cf = ConsolFun.valueOf(cfName.trim().toUpperCase());
-        Probe<?, ?> p = params.getProbe();
-
-        if(p != null) {
-            res.setContentType("text/plain");
-            res.addHeader("Cache-Control", "no-cache");
-            ServletOutputStream out = res.getOutputStream();
-
-            Date lastupdate = p.getLastUpdate();
-            long age = (new Date().getTime() - lastupdate.getTime()) / 1000;
-            // It the last update is too old, it fails
-            if(age > p.getStep() * 2) {
-                out.println("Probe too old: " + age);
-                return;
-            }
-            Date paste = new Date(lastupdate.getTime() - period * 1000);
-
-            Extractor ex = p.fetchData();
-
-            String ds = params.getValue("dsname");
-
-            ExtractInfo ei = ExtractInfo.get().make(paste, lastupdate).make(p.getStep());
-            if(ds != null && !"".equals(ds.trim())) {
-                String dsName = ds.trim();
-                ex.addSource(dsName, dsName);
-                DataProcessor dp = ei.getDataProcessor(ex);
-                double val = dp.getAggregate(dsName, cf);
-                out.print(val);
-            } else {
-                for(String dsName: p.getPd().getDs()) {
-                    ex.addSource(dsName, dsName);
-                }
-                DataProcessor dp = ei.getDataProcessor(ex);
-                for(String dsName: ex.getDsNames()) {
-                    double val = dp.getAggregate(dsName, cf);
-                    out.println(dsName + ": " + val);
-                }
-                out.println("Last update: " + p.getLastUpdate());
-                out.println("Last update age (ms): " + (new Date().getTime() - p.getLastUpdate().getTime()));
-            }
-            ex.release();
-        } else {
-            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "No matching probe");
+        Variable v;
+        switch (cfName.trim().toUpperCase()) {
+        case "AVERAGE": v = new Variable.AVERAGE(); break;
+        case "FIRST": v = new Variable.FIRST(); break;
+        case "LAST": v = new Variable.LAST(); break;
+        case "LSLCORREL": v = new Variable.LSLCORREL(); break;
+        case "LSLINT": v = new Variable.LSLINT(); break;
+        case "LSLSLOPE": v = new Variable.LSLSLOPE(); break;
+        case "MAX": v = new Variable.MAX(); break;
+        case "MIN": v = new Variable.MIN(); break;
+        case "PERCENTILE95": v = new Variable.PERCENTILE(95); break;
+        case "STDDEV": v = new Variable.STDDEV(); break;
+        case "TOTAL": v = new Variable.TOTAL(); break;
+        default:
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "No matching function");
+            return;
         }
+
+        Probe<?, ?> p = params.getProbe();
+        if (p == null) {
+            res.sendError(HttpServletResponse.SC_BAD_REQUEST, "No matching probe");
+            return;
+        }
+
+        res.setContentType("text/plain");
+        res.addHeader("Cache-Control", "no-cache");
+        ServletOutputStream out = res.getOutputStream();
+
+        Date lastupdate = p.getLastUpdate();
+        long age = (new Date().getTime() - lastupdate.getTime()) / 1000;
+        // It the last update is too old, it fails
+        if(age > p.getStep() * 2) {
+            out.println("Probe too old: " + age);
+            return;
+        }
+        Date paste = new Date(lastupdate.getTime() - period * 1000);
+
+        Extractor ex = p.fetchData();
+
+        String ds = params.getValue("dsname");
+
+        ExtractInfo ei = ExtractInfo.get().make(paste, lastupdate).make(p.getStep());
+        if (ds != null && !"".equals(ds.trim())) {
+            String dsName = ds.trim();
+            ex.addSource(dsName, dsName);
+            DataProcessor dp = ei.getDataProcessor(ex);
+            double val = dp.getVariable(dsName, v).value;
+            out.print(val);
+        } else {
+            for(String dsName: p.getPd().getDs()) {
+                ex.addSource(dsName, dsName);
+            }
+            DataProcessor dp = ei.getDataProcessor(ex);
+            for(String dsName: ex.getDsNames()) {
+                double val = dp.getVariable(dsName, v).value;
+                out.println(dsName + ": " + val);
+            }
+            out.println("Last update: " + p.getLastUpdate());
+            out.println("Last update age (ms): " + (new Date().getTime() - p.getLastUpdate().getTime()));
+        }
+        ex.release();
     }
 
 }
