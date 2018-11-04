@@ -7,21 +7,19 @@
     <version>1.0-SNAPSHOT</version>
     <name>JRDS</name>
     <url>http://jrds.fr</url>
-    <prerequisites>
-        <maven>2.2.1</maven>
-    </prerequisites>
     <properties>
         <!-- The project should have a source encoding set. -->
         <project.build.sourceEncoding>ISO8859-15</project.build.sourceEncoding>
-        <buildSource>1.8</buildSource>
-        <buildTarget>1.8</buildTarget>
         <!-- current year. -->
         <year>2018</year>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <dojo.version>1.10.4</dojo.version>
         <dojo.unpacked.dir>${project.basedir}/target/dojo-unpacked</dojo.unpacked.dir>
         <webapp.root>${project.basedir}/web</webapp.root>
         <jrds.testloglevel>ERROR</jrds.testloglevel>
         <jetty>9.2.26.v20180806</jetty>
+        <maven.plugin.surefire.version>2.19.1</maven.plugin.surefire.version>
     </properties>
 
     <dependencies>
@@ -250,15 +248,13 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.2</version>
                 <configuration>
-                    <source>${buildSource}</source>
-                    <target>${buildTarget}</target>
                     <showWarnings>true</showWarnings>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18.1</version>
+                <version>${maven.plugin.surefire.version}</version>
                 <configuration>
                     <systemProperties>
                         <property>
@@ -489,6 +485,11 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.9</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.1</version>
                 <configuration>
@@ -507,6 +508,11 @@
                         <link>http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/</link>
                     </links>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${maven.plugin.surefire.version}</version>
             </plugin>
         </plugins>
     </reporting>
