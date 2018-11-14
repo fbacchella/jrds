@@ -10,16 +10,16 @@
     </unit>
     <verticalLabel>s/collection</verticalLabel>
     <add>
-        <dsName>MajorTime</dsName>
+        <name>MajorTime</name>
     </add>
     <add>
-        <dsName>MinorTime</dsName>
+        <name>MinorTime</name>
     </add>
     <add>
-        <dsName>MajorCount</dsName>
+        <name>MajorCount</name>
     </add>
     <add>
-        <dsName>MinorCount</dsName>
+        <name>MinorCount</name>
     </add>
     <add>
         <rpn>MajorTime,MajorCount,1,MAX,1000,*,/</rpn>

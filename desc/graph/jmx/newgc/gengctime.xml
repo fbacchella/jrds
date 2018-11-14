@@ -9,7 +9,7 @@
     </unit>
     <verticalLabel>s</verticalLabel>
     <add>
-        <dsName>MajorTime</dsName>
+        <name>MajorTime</name>
     </add>
     <add>
         <rpn>MajorTime, 1000, /</rpn>
@@ -17,7 +17,7 @@
         <legend>Major collection cumulated time</legend>
     </add>
     <add>
-        <dsName>MinorTime</dsName>
+        <name>MinorTime</name>
     </add>
     <add>
         <rpn>MinorTime, 1000, /</rpn>
