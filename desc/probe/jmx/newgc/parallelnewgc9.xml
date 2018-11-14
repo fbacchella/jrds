@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>SunJVMParallelNewGC9v2</name>
+    <probeName>jvmpool-${label}</probeName>
+    <probeClass>jrds.probe.JMX</probeClass>
+
+    <specific name="mbeanNames">java.lang:type=GarbageCollector,name=Par MarkSweep;java.lang:type=GarbageCollector,name=Par Scavenge;java.lang:type=MemoryPool,name=Metaspace;java.lang:type=MemoryPool,name=CodeHeap 'non-nmethods'</specific>
+    <!-- ************ -->
+    <!-- Memory pools -->
+    <!-- ************ -->
+    <!-- The code memory pools -->
+    <ds>
+        <dsName>CodeHeap.nonnmethods</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=CodeHeap 'non-nmethods'/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>CodeHeap.nonprofilednmethods</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=CodeHeap 'non-profiled nmethods'/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>CodeHeap.profilednmethods</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=CodeHeap 'profiled nmethods'/Usage/used</collect>
+    </ds>
+    <!-- The permanent memory pools -->
+    <ds>
+        <dsName>CompressedClassSpace</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=Compressed Class Space/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>Metaspace</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=Metaspace/Usage/used</collect>
+    </ds>
+    <!-- the generational pools -->
+    <ds>
+        <dsName>Eden Space</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=Par Eden Space/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>Survivor Space</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=Par Survivor Space/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>Old Gen</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=Tenured Gen/Usage/used</collect>
+    </ds>
+    <!-- *********** -->
+    <!-- GC activity -->
+    <!-- *********** -->
+    <!-- the major GC -->
+    <ds>
+        <dsName>MajorCount</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=Par MarkSweep/CollectionCount</collect>
+    </ds>
+    <ds>
+        <dsName>MajorTime</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=Par MarkSweep/CollectionTime</collect>
+    </ds>
+    <ds>
+        <dsName>MinorCount</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=Par Scavenge/CollectionCount</collect>
+    </ds>
+    <ds>
+        <dsName>MinorTime</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=Par Scavenge/CollectionTime</collect>
+    </ds>
+    <graphs>
+        <name>SunJVM9MemoryPools</name>
+        <name>GenGCCount</name>
+        <name>GenGCSpeed</name>
+        <name>GenGCTime</name>
+    </graphs>
+</probedesc>

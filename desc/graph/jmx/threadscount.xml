@@ -24,14 +24,16 @@
         <pathelement>HOST</pathelement>
         <pathelement>SERVICES</pathelement>
         <pathstring>JVM</pathstring>
+        <pathstring>Threads</pathstring>
         <pathstring>${label}</pathstring>
         <pathstring>Threads count</pathstring>
     </hosttree>
     <viewtree>
         <pathelement>SERVICES</pathelement>
         <pathstring>JVM</pathstring>
-        <pathelement>HOST</pathelement>
-        <pathstring>Threads count</pathstring>
+        <pathstring>Threads</pathstring>
         <pathstring>${label}</pathstring>
+        <pathstring>Threads count</pathstring>
+        <pathelement>HOST</pathelement>
     </viewtree>
 </graphdesc>
