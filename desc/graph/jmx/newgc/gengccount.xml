@@ -29,9 +29,9 @@
     <viewtree>
         <pathelement>SERVICES</pathelement>
         <pathstring>JVM</pathstring>
+        <pathstring>${label}</pathstring>
         <pathstring>GC Activity</pathstring>
         <pathstring>Count</pathstring>
-        <pathstring>${label}</pathstring>
         <pathelement>HOST</pathelement>
     </viewtree>
 </graphdesc>
