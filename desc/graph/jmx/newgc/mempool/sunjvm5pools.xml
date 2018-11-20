@@ -54,8 +54,8 @@
     <viewtree>
         <pathelement>SERVICES</pathelement>
         <pathstring>JVM</pathstring>
-        <pathstring>Memory usage</pathstring>
         <pathstring>${label}</pathstring>
+        <pathstring>Memory usage</pathstring>
         <pathelement>HOST</pathelement>
     </viewtree>
 </graphdesc>
