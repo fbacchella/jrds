@@ -44,12 +44,12 @@ public class IpmiConnection extends Connection<Handle> {
     @Override
     public boolean startConnection() {
         Resolver resolver = getLevel().find(Resolver.class, starterKey);
-        if(!resolver.isStarted()) {
+        if(resolver == null || !resolver.isStarted()) {
             return false;
         }
 
         IpmiConnectorStarter mainStarter = getLevel().find(IpmiConnectorStarter.class);
-        if(!mainStarter.isStarted()) {
+        if(mainStarter == null || !mainStarter.isStarted()) {
             return false;
         }
 
