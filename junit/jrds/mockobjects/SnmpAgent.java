@@ -177,6 +177,11 @@ public class SnmpAgent extends BaseAgent {
      */
     @Override
     protected int getEngineBoots() {
+        return boot;
+    }
+
+    @Override
+    protected int updateEngineBoots() {
         return ++boot;
     }
 
