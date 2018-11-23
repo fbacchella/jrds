@@ -8,9 +8,9 @@ import org.apache.log4j.Logger;
 import org.snmp4j.TransportMapping;
 import org.snmp4j.agent.BaseAgent;
 import org.snmp4j.agent.CommandProcessor;
-import org.snmp4j.agent.mo.MOTableRow;
 import org.snmp4j.agent.mo.snmp.RowStatus;
 import org.snmp4j.agent.mo.snmp.SnmpCommunityMIB;
+import org.snmp4j.agent.mo.snmp.SnmpCommunityMIB.SnmpCommunityEntryRow;
 import org.snmp4j.agent.mo.snmp.SnmpNotificationMIB;
 import org.snmp4j.agent.mo.snmp.SnmpTargetMIB;
 import org.snmp4j.agent.mo.snmp.StorageType;
@@ -30,7 +30,8 @@ import org.snmp4j.transport.TransportMappings;
 import org.snmp4j.util.ThreadPool;
 
 public class SnmpAgent extends BaseAgent {
-    Logger logger = Logger.getLogger(SnmpAgent.class);
+
+    private static final Logger logger = Logger.getLogger(SnmpAgent.class);
     int port = 0;
     int boot = 0;
 
@@ -43,21 +44,19 @@ public class SnmpAgent extends BaseAgent {
         finishInit();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void addCommunities(SnmpCommunityMIB communityMIB) {
         Variable[] com2sec = new Variable[] {
                 new OctetString("public"),              // community name
-                new OctetString("cpublic"),              // security name
+                new OctetString("cpublic"),             // security name
                 getAgent().getContextEngineID(),        // local engine ID
                 new OctetString("public"),              // default context name
                 new OctetString(),                      // transport tag
-                new Integer32(StorageType.nonVolatile),    // storage type
+                new Integer32(StorageType.nonVolatile), // storage type
                 new Integer32(RowStatus.active)         // row status
         };
         logger.debug("SnmpCommunityEntry: " + communityMIB.getSnmpCommunityEntry());
-        @SuppressWarnings("rawtypes")
-        MOTableRow row = communityMIB.getSnmpCommunityEntry().createRow(new OctetString("public2public").toSubIndex(true), com2sec);
+        SnmpCommunityEntryRow row = communityMIB.getSnmpCommunityEntry().createRow(new OctetString("public2public").toSubIndex(true), com2sec);
         logger.debug("Row: " + row);
         communityMIB.getSnmpCommunityEntry().addRow(row);
         snmpCommunityMIB.setSourceAddressFiltering(false);
@@ -66,12 +65,10 @@ public class SnmpAgent extends BaseAgent {
     @Override
     protected void addNotificationTargets(SnmpTargetMIB targetMIB, SnmpNotificationMIB arg1) {
         targetMIB.addDefaultTDomains();
-
     }
 
     @Override
     protected void addUsmUser(USM arg0) {
-
     }
 
     @Override
@@ -147,14 +144,14 @@ public class SnmpAgent extends BaseAgent {
     protected void unregisterManagedObjects() {
     }
 
+    @SuppressWarnings("unchecked")
     protected void initTransportMappings() throws IOException {
         Random gen = new Random();
 
         transportMappings = new TransportMapping[1];
         port = gen.nextInt(32768) + 32768;
         Address addr = new UdpAddress(InetAddress.getByAddress(new byte[] { 127, 0, 0, 1 }), port);
-        @SuppressWarnings("rawtypes")
-        TransportMapping tm = TransportMappings.getInstance().createTransportMapping(addr);
+        TransportMapping<? extends Address> tm = TransportMappings.getInstance().createTransportMapping(addr);
         transportMappings[0] = tm;
     }
 
@@ -181,16 +178,6 @@ public class SnmpAgent extends BaseAgent {
     @Override
     protected int getEngineBoots() {
         return ++boot;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.snmp4j.agent.BaseAgent#setEngineBoots(int)
-     */
-    @Override
-    protected void setEngineBoots(int engineBoots) {
-        this.boot = engineBoots;
     }
 
 }
