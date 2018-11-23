@@ -19,8 +19,8 @@
         <dependency org="org.dojotoolkit" name="dojo" rev="1.10.4" conf="lib->default">
             <artifact name="dojo" type="zip"/>
         </dependency>
-        <dependency org="org.snmp4j" name="snmp4j" rev="2.3.4" conf="lib->default"/>
-        <dependency org="org.snmp4j" name="snmp4j-agent" rev="2.1.3" conf="libtest->default">
+        <dependency org="org.snmp4j" name="snmp4j" rev="2.6.3" conf="lib->default"/>
+        <dependency org="org.snmp4j" name="snmp4j-agent" rev="2.6.3" conf="libtest->default">
             <exclude module="log4j"/>
             <exclude module="snmp4j"/>
         </dependency>
@@ -28,6 +28,7 @@
         <dependency org="org.eclipse.jetty" name="jetty-server" rev="9.2.26.v20180806" conf="libjetty->default"/>
         <dependency org="org.eclipse.jetty" name="jetty-webapp" rev="9.2.26.v20180806" conf="libjetty->default"/>
         <dependency org="org.eclipse.jetty" name="jetty-jmx" rev="9.2.26.v20180806" conf="libjetty->default"/>
+        <dependency org="org.eclipse.jetty" name="jetty-http" rev="9.2.26.v20180806" conf="libtest->default"/>
         <dependency org="org.slf4j" name="slf4j-api" rev="1.7.13" conf="libjetty->default"/>
         <dependency org="org.slf4j" name="slf4j-log4j12" rev="1.7.13" conf="libjetty->default"/>
         <dependency org="commons-net" name="commons-net" rev="3.3" conf="lib->default"/>

@@ -1,5 +1,11 @@
 <ivysettings>
     <resolvers>
+        <url name="central" m2compatible="true">
+            <artifact pattern="https://repo.maven.apache.org/maven2/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+        </url>
+        <url name="sonaytpe" m2compatible="true">
+            <artifact pattern="https://oss.sonatype.org/content/repositories/snapshots/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+        </url>
         <url name="ivyrepo" m2compatible="true">
             <ivy pattern="http://jrds.fr/maven2/[organisation]/[module]/ivys/ivy-[revision].xml" />
             <artifact
@@ -13,7 +19,12 @@
             <artifact pattern="${buildir}/maven/[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]"/>
         </filesystem>
     </resolvers>
-    <settings defaultResolver="ivyrepo" />
+    <settings defaultResolver="central" />
+    <modules>
+        <module organisation="org.dojotoolkit" name="*" resolver="ivyrepo"/>
+        <module organisation="fr.jrds.verax" name="*" resolver="ivyrepo"/>
+        <module organisation="fr.jrds" name="SmiExtensions" resolver="ivyrepo"/>
+    </modules>
     <include url="${ivy.default.settings.dir}/ivysettings-public.xml" />
     <include url="${ivy.default.settings.dir}/ivysettings-shared.xml" />
     <include url="${ivy.default.settings.dir}/ivysettings-local.xml" />
