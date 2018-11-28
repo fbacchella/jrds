@@ -13,10 +13,10 @@
     <properties>
         <!-- The project should have a source encoding set. -->
         <project.build.sourceEncoding>ISO8859-15</project.build.sourceEncoding>
-        <buildSource>1.7</buildSource>
-        <buildTarget>1.7</buildTarget>
+        <buildSource>1.8</buildSource>
+        <buildTarget>1.8</buildTarget>
         <!-- current year. -->
-        <year>2015</year>
+        <year>2018</year>
         <dojo.version>1.10.4</dojo.version>
         <dojo.unpacked.dir>${project.basedir}/target/dojo-unpacked</dojo.unpacked.dir>
         <webapp.root>${project.basedir}/web</webapp.root>

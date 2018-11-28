@@ -102,7 +102,7 @@
         </antcall>
     </target>
 
-    <!-- See http://remotetea.sourceforge.net, needs  oncprc.jar-->
+    <!-- See http://remotetea.sourceforge.net, needs oncprc.jar-->
     <target name="rstat" depends="compile" description="To use rstat, needs oncprc.jar from http://remotetea.sourceforge.net/">
         <antcall target="compile.subprobes">
             <param name="subprobe" value="rstat" />
