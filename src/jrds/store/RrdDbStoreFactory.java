@@ -1,26 +1,28 @@
 package jrds.store;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.log4j.Logger;
+import org.rrd4j.core.RrdBackendFactory;
+import org.rrd4j.core.RrdDb;
+import org.rrd4j.core.RrdDbPool;
+import org.rrd4j.core.RrdFileBackendFactory;
 
 import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.Util;
 import jrds.factories.ArgFactory;
 
-import org.apache.log4j.Logger;
-import org.rrd4j.core.RrdBackendFactory;
-import org.rrd4j.core.RrdDb;
-import org.rrd4j.core.RrdDbPool;
-import org.rrd4j.core.RrdRandomAccessFileBackendFactory;
-
 public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
-    private final Logger logger = Logger.getLogger(RrdDbStoreFactory.class);
+    private static final Logger logger = Logger.getLogger(RrdDbStoreFactory.class);
     private RrdBackendFactory backendFactory = null;
     private RrdDbPool instance = null;
 
@@ -62,6 +64,8 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
             backendName = props.getProperty("rrdbackend", "FILE");
             backendFactory = RrdBackendFactory.getFactory(backendName);
         }
+        
+        RrdBackendFactory.setActiveFactories(backendFactory);
 
         // Analyze the backend properties
         Map<String, String> backendPropsMap = pm.subKey("rrdbackend");
@@ -93,7 +97,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
     @Override
     public void start() {
         super.start();
-        boolean filebasedbackend = RrdRandomAccessFileBackendFactory.class.isAssignableFrom(RrdBackendFactory.getDefaultFactory().getClass());
+        boolean filebasedbackend = backendFactory instanceof RrdFileBackendFactory;
         if(usepool || filebasedbackend) {
             try {
                 String backendName = backendFactory.getName();
@@ -133,14 +137,15 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
      * @throws IOException Thrown in case of I/O error.
      */
     public RrdDb getRrd(String rrdFile) throws IOException {
-        File f = new File(rrdFile);
-        String cp = f.getCanonicalPath();
+        Path rrdPath = Paths.get(rrdFile);
         long start = System.currentTimeMillis();
         RrdDb db;
-        if(usepool)
-            db = instance.requestRrdDb(cp);
-        else
-            db = new RrdDb(cp, backendFactory);
+        if(usepool) {
+            db = instance.requestRrdDb(rrdPath.toUri());
+        }
+        else {
+            db = new RrdDb(rrdPath.toRealPath(LinkOption.NOFOLLOW_LINKS).normalize().toString(), backendFactory);
+        }
         long finish = System.currentTimeMillis();
         waitTime.addAndGet(finish - start);
         lockCount.incrementAndGet();
