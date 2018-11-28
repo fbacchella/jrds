@@ -190,14 +190,14 @@ public class JmxConnexionTest {
             enumerate((NativeJmxSource)cnx.getConnection());
     }
 
-    @Test
+    @Test(timeout=5000)
     public void ConnectJmxmpTest() throws Exception {
         int port = findPort();
         Assert.assertTrue("can't allocate port " + port, port >= 32767);
         doTest("jmxmp", port);
     }
 
-    @Test
+    @Test(timeout=5000)
     public void ConnectRmiTest() throws Exception {
         int port = findPort();
         Assert.assertTrue("can't allocate port " + port, port >= 32767);
