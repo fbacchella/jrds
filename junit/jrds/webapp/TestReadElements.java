@@ -2,6 +2,7 @@ package jrds.webapp;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -21,6 +22,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import fr.jrds.snmpcodec.OIDFormatter;
+import fr.jrds.snmpcodec.parsing.MibLoader;
+
 public class TestReadElements {
     static final private Logger logger = Logger.getLogger(TestReadElements.class);
 
@@ -38,6 +42,10 @@ public class TestReadElements {
 
     @BeforeClass
     static public void configure() throws Exception {
+        MibLoader loader = new MibLoader();
+        loader.load(Paths.get("/usr/share/snmp/mibs"));
+        OIDFormatter.register(loader.buildTree());
+
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
