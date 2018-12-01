@@ -189,16 +189,12 @@ public class TestMacro {
 
         JrdsDocument d = Tools.parseString(goodMacroXml);
         d.getRootElement().addElement("probe", "type=MacroProbe3").addElement("attr", "name=val").addTextNode("${a}");
-        jrds.Util.serialize(d, System.out, null, prop);
-        System.out.println();
 
         Macro m = doMacro(d, "macrodef");
         m.getDf();
 
         JrdsDocument hostdoc = Tools.parseString(goodHostXml);
         hostdoc.getRootElement().getChildElementsByName("macro").iterator().next().addElement("arg", "type=String", "value=${a}");
-        jrds.Util.serialize(hostdoc, System.out, null, prop);
-        System.out.println();
 
         HostBuilder hb = getBuilder(m);
         HostInfo host = hb.makeHost(hostdoc);
@@ -222,7 +218,6 @@ public class TestMacro {
     public void testCollection() throws Exception {
         JrdsDocument d = Tools.parseString(goodMacroXml);
         Tools.appendString(Tools.appendString(Tools.appendString(d.getDocumentElement(), "<for var=\"a\" collection=\"c\"/>"), "<probe type = \"MacroProbe3\" />"), "<arg type=\"String\" value=\"${a}\" />");
-        jrds.Util.serialize(d, System.err, null, null);
 
         Macro m = doMacro(d, "macrodef");
 

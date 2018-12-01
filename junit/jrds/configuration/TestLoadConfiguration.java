@@ -112,7 +112,6 @@ public class TestLoadConfiguration {
         host.setHostDir(pm.rrddir);
 
         Probe<?, ?> p = hb.makeProbe(d.getRootElement(), host, null);
-        jrds.Util.serialize(p.dumpAsXml(), System.out, null, null);
         Assert.assertNotNull(p);
         Assert.assertEquals(host.getName() + "/" + p.getName(), p.toString());
     }
@@ -167,7 +166,6 @@ public class TestLoadConfiguration {
         hostdoc.setDocumentURI("-//jrds//DTD Graph Description//EN");
 
         hostdoc.getRootElement().addElement("macro", "name=macrodef");
-        jrds.Util.serialize(hostdoc, System.out, null, null);
         PropertiesManager pm = Tools.makePm(testFolder);
         HostBuilder hb = new HostBuilder();
         hb.setPm(pm);

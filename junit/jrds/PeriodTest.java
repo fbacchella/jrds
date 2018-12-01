@@ -159,8 +159,6 @@ public class PeriodTest {
         begin = strictISOFORMAT.parse("20070101T00:00:00+0000");
         end = strictISOFORMAT.parse("20071231T23:59:59+0000");
         Period p = new Period("20070101T00:00:00Z", "20071231T23:59:59Z");
-        System.out.println(begin.getTime() - p.getBegin().getTime());
-        System.out.println(p.getBegin().getTime());
         Assert.assertEquals(end, p.getEnd());
         Assert.assertEquals(begin, p.getBegin());
         Assert.assertEquals(0, p.getScale());

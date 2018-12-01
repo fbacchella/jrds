@@ -46,7 +46,6 @@ public class TestDiscoverAgent {
         Map<String, String> properties = new HashMap<String, String>();
         properties.put(OutputKeys.INDENT, "yes");
         properties.put("{http://xml.apache.org/xslt}indent-amount", "4");
-        jrds.Util.serialize(d, System.out, null, properties);
     }
 
 }

@@ -33,7 +33,6 @@ public class TestPropertiesManager {
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
-        System.out.println(System.getProperties().keySet());
         Tools.setLevel(logger, Level.TRACE, "jrds.PropertiesManager");
     }
 

@@ -62,7 +62,6 @@ public class TestSum {
 
         jrds.GraphNode mg = new MockGraph();
         mg.getGraphDesc().add("plot");
-        jrds.Util.serialize(mg.getGraphDesc().dumpAsXml(), System.out, null, null);
 
         hl.addHost(mg.getProbe().getHost());
         hl.addProbe(mg.getProbe());
@@ -79,7 +78,6 @@ public class TestSum {
         HostsList hl = new HostsList();
         Sum s = doSum(d, hl);
         Document sumDocument = s.getGraphDesc().dumpAsXml();
-        jrds.Util.serialize(sumDocument, System.out, null, null);
         logger.trace(sumDocument);
     }
 
