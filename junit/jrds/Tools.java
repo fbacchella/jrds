@@ -108,6 +108,14 @@ final public class Tools {
         // The system property override the code log level
         if(System.getProperty("jrds.testloglevel") != null) {
             level = Level.toLevel(System.getProperty("jrds.testloglevel"));
+            if (app != null) {
+                app.addFilter(new org.apache.log4j.spi.Filter() {
+                    @Override
+                    public int decide(LoggingEvent event) {
+                        return -1;
+                    }
+                });
+            }
         }
         if(logger != null) {
             logger.setLevel(level);
