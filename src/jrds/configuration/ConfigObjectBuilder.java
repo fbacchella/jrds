@@ -18,7 +18,6 @@ import jrds.webapp.WithACL;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
-import org.snmp4j.smi.OID;
 
 abstract class ConfigObjectBuilder<BuildObject> {
     static final private Logger logger = Logger.getLogger(ConfigObjectBuilder.class);
@@ -90,7 +89,6 @@ abstract class ConfigObjectBuilder<BuildObject> {
                     else
                         value = null;
                 } else if(element.startsWith("oid")) {
-                    value = new OID(textValue);
                     element = element.replace("oid", "collect");
                 }
                 dsMap.put(element, value);

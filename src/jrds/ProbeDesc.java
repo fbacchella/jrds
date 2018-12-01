@@ -24,7 +24,6 @@ import jrds.starter.StarterNode;
 import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
 import org.rrd4j.core.DsDef;
-import org.snmp4j.smi.OID;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -125,36 +124,6 @@ public class ProbeDesc<KeyType> implements Cloneable {
     public void add(String dsName, DsType dsType, String probeName, double min, double max) {
         dsMap.put(dsName, new DsDesc(dsType, heartBeatDefault, min, max, probeName));
     }
-
-    /**
-     * Add a SNMP probe what will be stored
-     * 
-     * @param name
-     * @param dsType
-     * @param oid
-     */
-    public void add(String name, DsType dsType, OID oid) {
-        dsMap.put(name, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, oid));
-    }
-
-    public void add(String name, DsType dsType, OID oid, double min, double max) {
-        dsMap.put(name, new DsDesc(dsType, heartBeatDefault, min, max, oid));
-    }
-
-    /**
-     * Add a SNMP probe not to be stored
-     * 
-     * @param name
-     * @param oid
-     */
-    public void add(String name, OID oid) {
-        dsMap.put(name, new DsDesc(null, heartBeatDefault, MINDEFAULT, MAXDEFAULT, oid));
-    }
-
-    public void add(String name, DsType dsType, Object index, double min, double max) {
-        dsMap.put(name, new DsDesc(null, heartBeatDefault, MINDEFAULT, MAXDEFAULT, index));
-    }
-
     public static final class Joined {
         Object keyhigh;
         Object keylow;
@@ -235,37 +204,6 @@ public class ProbeDesc<KeyType> implements Cloneable {
         for(Map<String, Object> dsinfo: dsList) {
             add(dsinfo);
         }
-    }
-
-    /**
-     * Return a map that translate an OID to the datastore name
-     * 
-     * @return a Map of collect oids to datastore name
-     */
-    public Map<OID, String> getCollectOids() {
-        Map<OID, String> retValue = new LinkedHashMap<OID, String>(dsMap.size());
-        for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
-            DsDesc dd = e.getValue();
-            if(dd.collectKey != null && dd.collectKey instanceof OID)
-                retValue.put((OID) dd.collectKey, e.getKey());
-        }
-        return retValue;
-    }
-
-    /**
-     * Return a map that translate the probe technical name as a string to the
-     * datastore name
-     * 
-     * @return a Map of collect names to datastore name
-     */
-    public Map<String, String> getCollectStrings() {
-        Map<String, String> retValue = new LinkedHashMap<String, String>(dsMap.size());
-        for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
-            DsDesc dd = e.getValue();
-            if(dd.collectKey != null && dd.collectKey instanceof String && !"".equals(dd.collectKey))
-                retValue.put((String) dd.collectKey, e.getKey());
-        }
-        return retValue;
     }
 
     /**
@@ -502,8 +440,6 @@ public class ProbeDesc<KeyType> implements Cloneable {
             DsDesc desc = e.getValue();
             if(desc.dsType != null)
                 dsElement.appendChild(document.createElement("dsType")).setTextContent(desc.dsType.toString());
-            if(desc.collectKey instanceof OID)
-                dsElement.appendChild(document.createElement("oid")).setTextContent(desc.collectKey.toString());
             if(desc.collectKey instanceof String)
                 dsElement.appendChild(document.createElement("collect")).setTextContent(desc.collectKey.toString());
             if(desc.minValue != MINDEFAULT)
