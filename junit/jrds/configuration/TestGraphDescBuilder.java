@@ -61,11 +61,10 @@ public class TestGraphDescBuilder {
 
     @Test
     public void testGraphDesc() throws Exception {
-
-        PropertiesManager pm = Tools.makePm();
+        PropertiesManager pm = Tools.makePm(testFolder);
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
-        gdbuild.setPm(Tools.makePm());
+        gdbuild.setPm(pm);
         GraphDesc gd = gdbuild.build(d);
         if(logger.isTraceEnabled()) {
             Document gddom = gd.dumpAsXml();
@@ -149,7 +148,7 @@ public class TestGraphDescBuilder {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         d.getRootElement().getElementbyName("graphClass").setTextContent(String.class.getName());
         GraphDescBuilder gdbuild = new GraphDescBuilder();
-        gdbuild.setPm(Tools.makePm());
+        gdbuild.setPm(Tools.makePm(testFolder));
         @SuppressWarnings("unused")
         GraphDesc gd = gdbuild.makeGraphDesc(d);
     }
@@ -159,7 +158,7 @@ public class TestGraphDescBuilder {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         d.getRootElement().getElementbyName("graphClass").setTextContent("");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
-        gdbuild.setPm(Tools.makePm());
+        gdbuild.setPm(Tools.makePm(testFolder));
         @SuppressWarnings("unused")
         GraphDesc gd = gdbuild.makeGraphDesc(d);
     }
@@ -168,7 +167,7 @@ public class TestGraphDescBuilder {
     public void testCustomGraph() throws Exception {
         JrdsDocument d = Tools.parseRessource("customgraph.xml");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
-        gdbuild.setPm(Tools.makePm());
+        gdbuild.setPm(Tools.makePm(testFolder));
         GraphDesc gd = gdbuild.makeGraphDesc(d);
         Assert.assertEquals("graph name failed", "graphName", gd.getGraphName());
         Assert.assertEquals("graph title failed", "", gd.getGraphTitle());
@@ -186,14 +185,14 @@ public class TestGraphDescBuilder {
     public void testGraphDescBuilderParse() throws Exception {
         JrdsDocument d = Tools.parseRessource("graphdesc.xml");
         GraphDescBuilder gdbuild = new GraphDescBuilder();
-        gdbuild.setPm(Tools.makePm());
+        gdbuild.setPm(Tools.makePm(testFolder));
         @SuppressWarnings("unused")
         GraphDesc gd = gdbuild.build(d);
     }
 
     @Test
     public void testFullConfigpath() throws Exception {
-        PropertiesManager localpm = Tools.makePm();
+        PropertiesManager localpm = Tools.makePm(testFolder);
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm);
         conf.getNodeMap(ConfigType.GRAPHDESC).put("graphdesc", Tools.parseRessource("graphdesc.xml"));
         Assert.assertNotNull("Graphdesc not build", conf.setGraphDescMap().get("graphdesctest"));

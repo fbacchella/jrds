@@ -14,22 +14,20 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestTab {
     static final private Logger logger = Logger.getLogger(TestTab.class);
 
-    static private PropertiesManager pm = null;
-    static final private HostsList hl = new HostsList();
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.prepareXml(true);
-
-        pm = Tools.makePm("security=true");
-
-        hl.configure(pm);
 
         Tools.setLevel(logger, Level.TRACE, "jrds.configuration", "jrds.factories");
         Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
@@ -37,6 +35,10 @@ public class TestTab {
 
     @Test
     public void testLoad() throws Exception {
+        PropertiesManager pm = Tools.makePm(testFolder, "security=true");
+        HostsList hl = new HostsList();
+        hl.configure(pm);
+
         JrdsDocument d = Tools.parseRessource("goodtab.xml");
 
         TabBuilder tb = new TabBuilder();

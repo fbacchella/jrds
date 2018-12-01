@@ -15,7 +15,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestProbeDescBuilder {
     static final private Logger logger = Logger.getLogger(TestProbeDescBuilder.class);
@@ -29,9 +31,12 @@ public class TestProbeDescBuilder {
         Tools.prepareXml();
     }
 
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
     @Test
     public void testFullConfigpath() throws Exception {
-        PropertiesManager localpm = Tools.makePm();
+        PropertiesManager localpm = Tools.makePm(testFolder);
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
         conf.getNodeMap(ConfigType.PROBEDESC).put("name", Tools.parseRessource("httpxmlprobedesc.xml"));
 
@@ -41,7 +46,7 @@ public class TestProbeDescBuilder {
 
     @Test
     public void testOptional() throws Exception {
-        PropertiesManager localpm = Tools.makePm();
+        PropertiesManager localpm = Tools.makePm(testFolder);
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
         JrdsDocument pddoc = Tools.parseRessource("httpxmlprobedesc.xml");
         pddoc.getRootElement().getElementbyName("probeClass").setTextContent("jrds.mockobjects.MokeProbeBean");
@@ -61,7 +66,7 @@ public class TestProbeDescBuilder {
 
     @Test
     public void testDefaultArgs() throws Exception {
-        PropertiesManager localpm = Tools.makePm();
+        PropertiesManager localpm = Tools.makePm(testFolder);
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
         JrdsDocument pddoc = Tools.parseRessource("beans.xml");
         pddoc.getRootElement().getElementbyName("probeClass").setTextContent("jrds.mockobjects.MokeProbeBean");
@@ -73,7 +78,7 @@ public class TestProbeDescBuilder {
 
     @Test
     public void testCustomBeans() throws Exception {
-        PropertiesManager localpm = Tools.makePm();
+        PropertiesManager localpm = Tools.makePm(testFolder);
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
         JrdsDocument pddoc = Tools.parseRessource("beans.xml");
         pddoc.getRootElement().getElementbyName("probeClass").setTextContent("jrds.mockobjects.MokeProbeBean");

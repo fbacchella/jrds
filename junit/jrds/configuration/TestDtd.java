@@ -8,10 +8,15 @@ import jrds.Tools;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestDtd {
     static final private Logger logger = Logger.getLogger(TestDtd.class);
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws Exception {
@@ -25,7 +30,7 @@ public class TestDtd {
     public void scanPaths() throws Exception {
         Loader l = new Loader();
 
-        PropertiesManager pm = Tools.makePm("strict=true");
+        PropertiesManager pm = Tools.makePm(testFolder, "strict=true");
 
         for(URI lib: pm.libspath) {
             logger.info("Adding lib " + lib);

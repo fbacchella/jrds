@@ -17,7 +17,9 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 public class TestFilter {
     static final private Logger logger = Logger.getLogger(TestSum.class);
@@ -28,6 +30,9 @@ public class TestFilter {
                     "<filter>" +
                     "<name>filtername</name>" +
                     "</filter>";
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
@@ -41,7 +46,7 @@ public class TestFilter {
 
     private Filter doFilter(JrdsDocument d) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
         FilterBuilder sm = new FilterBuilder();
-        sm.setPm(Tools.makePm("security=true"));
+        sm.setPm(Tools.makePm(testFolder, "security=true"));
 
         return sm.makeFilter(d);
     }
@@ -70,7 +75,7 @@ public class TestFilter {
 
     @Test
     public void testFullConfigpath() throws Exception {
-        PropertiesManager localpm = Tools.makePm();
+        PropertiesManager localpm = Tools.makePm(testFolder);
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm);
         conf.getNodeMap(ConfigType.FILTER).put("filtername", Tools.parseString(goodFilterXml));
 

@@ -48,7 +48,6 @@ final public class Tools {
     static public void configure() throws IOException {
         Locale.setDefault(new Locale("POSIX"));
         System.getProperties().setProperty("java.awt.headless", "true");
-        System.setProperty("java.io.tmpdir", "tmp");
         LogManager.resetConfiguration();
         // resetConfiguration is not enough
         @SuppressWarnings("unchecked")
@@ -199,17 +198,6 @@ final public class Tools {
         pm.defaultStore.configureStore(pm, new Properties());
         pm.defaultStore.start();
         return pm;
-    }
-
-    static public final PropertiesManager makePm(String... props) throws IOException {
-        PropertiesManager pm = new PropertiesManager();
-        pm.setProperty("tmpdir", new File("tmp").getPath());
-        pm.setProperty("configdir", new File("tmp").getPath());
-        pm.setProperty("rrddir", new File("tmp").getPath());
-        pm.setProperty("autocreate", "false");
-        pm.setProperty("usepool", "false");
-
-        return finishPm(pm, props);
     }
 
     static public final PropertiesManager makePm(TemporaryFolder testFolder, String... props) throws IOException {

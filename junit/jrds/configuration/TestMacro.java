@@ -267,7 +267,7 @@ public class TestMacro {
 
     @Test
     public void testFullConfigpath() throws Exception {
-        PropertiesManager localpm = Tools.makePm();
+        PropertiesManager localpm = Tools.makePm(testFolder);
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
         conf.getNodeMap(ConfigType.MACRODEF).put("macrodef", Tools.parseString(goodMacroXml));
         Assert.assertNotNull("Macro not build", conf.setMacroMap().get("macrodef"));
