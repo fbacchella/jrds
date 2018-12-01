@@ -89,7 +89,6 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
             @SuppressWarnings("unchecked")
             ProbeDesc<Object> castedpd = (ProbeDesc<Object>) pd;
             try {
-                @SuppressWarnings("unchecked")
                 Class<? extends Probe<Object, ?>> c = (Class<? extends Probe<Object, ?>>) castedpd.getProbeClass();
                 //Don't dump passive probes, nothing to show
                 if (PassiveProbe.class.isAssignableFrom(c)) {
@@ -123,7 +122,6 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
     }
 
     private void dumpProbe(ProbeDesc<Object> pd) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        @SuppressWarnings("unchecked")
         Class<? extends Probe<Object, ?>> c = (Class<? extends Probe<Object, ?>>) pd.getProbeClass();
         Probe<Object, ?> p = c.newInstance();
         p.setPd(pd);

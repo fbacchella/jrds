@@ -31,7 +31,7 @@ public class DummyProbe extends Probe<String, Number> {
     public void configure() throws InvocationTargetException {
         Map<String, String> empty = Collections.emptyMap();
         setMainStore(new RrdDbStoreFactory(), empty);
-        ProbeDesc pd = new ProbeDesc();
+        ProbeDesc<String> pd = new ProbeDesc<>();
         pd.setName("DummyProbe");
         pd.setProbeName("dummyprobe");
         setPd(pd);

@@ -51,13 +51,13 @@ public class TestBeans {
         for(JrdsDocument n: conf.getNodeMap(ConfigType.PROBEDESC).values()) {
             JrdsElement root = n.getRootElement();
             JrdsElement classElem = root.getElementbyName("probeClass");
-            ProbeDesc<?> pd = new ProbeDesc<>();
+            ProbeDesc<String> pd = new ProbeDesc<>();
             String name = "";
             try {
                 String className = classElem.getTextContent().trim();
                 name = root.getElementbyName("name").getTextContent();
                 @SuppressWarnings("unchecked")
-                Class<? extends Probe<?, ?>> c = (Class<? extends Probe<?, ?>>) pm.extensionClassLoader.loadClass(className);
+                Class<? extends Probe<String, ?>> c = (Class<? extends Probe<String, ?>>) pm.extensionClassLoader.loadClass(className);
                 pd.setProbeClass(c);
             } catch (Exception e) {
                 logger.error("Failed probedesc " + name + ": " + e.getMessage());

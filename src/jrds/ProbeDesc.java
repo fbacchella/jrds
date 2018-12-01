@@ -59,7 +59,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
     private String probeName;
     private String name;
     private final Collection<String> graphesList = new ArrayList<String>();
-    private Class<? extends Probe<?, ?>> probeClass = null;
+    private Class<? extends Probe<KeyType, ?>> probeClass = null;
     private Map<String, ProbeDesc.DefaultBean> defaultsBeans = Collections.emptyMap();
     private float uptimefactor = (float) 1.0;
     private Map<String, Double> defaultValues = new HashMap<String, Double>(0);
@@ -320,12 +320,12 @@ public class ProbeDesc<KeyType> implements Cloneable {
         this.graphesList.add(graph);
     }
 
-    public Class<? extends Probe<?, ?>> getProbeClass() {
+    public Class<? extends Probe<KeyType, ?>> getProbeClass() {
         return probeClass;
     }
 
     @SuppressWarnings("unchecked")
-    public void setProbeClass(Class<? extends Probe<?, ?>> probeClass) throws InvocationTargetException {
+    public void setProbeClass(Class<? extends Probe<KeyType, ?>> probeClass) throws InvocationTargetException {
         beans.putAll(ArgFactory.getBeanPropertiesMap(probeClass, Probe.class));
         for (ProbeMeta pm: ArgFactory.enumerateAnnotation(probeClass, ProbeMeta.class, StarterNode.class)) {
             Class<? extends CollectResolver<?>> cr = pm.collectResolver();

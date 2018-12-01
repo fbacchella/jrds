@@ -77,20 +77,21 @@ public class GenerateProbe {
         if(probeClass == null) {
             probeClass = EmptyProbe.class;
         }
-        Probe<?, ?> probe = (Probe<?, ?>) probeClass.getConstructor().newInstance();
-        return (Probe<String, Number>) fillProbe(probe, folder, arg);
+        Probe<String, Number> probe = (Probe<String, Number>) probeClass.getConstructor().newInstance();
+        return fillProbe(probe, folder, arg);
     }
 
-    public static final Probe<?, ?> fillProbe(Probe<?, ?> p, TemporaryFolder folder, ChainedMap<Object> args) throws Exception {
+    public static final Probe<String, Number> fillProbe(Probe<String, Number> p, TemporaryFolder folder, ChainedMap<Object> args) throws Exception {
 
         PropertiesManager pm = (PropertiesManager) args.get(PropertiesManager.class.getCanonicalName());
         if(pm == null) {
             pm = Tools.makePm(folder);
         }
 
-        ProbeDesc pd = (ProbeDesc) args.get(ProbeDesc.class.getCanonicalName());
+        @SuppressWarnings("unchecked")
+        ProbeDesc<String> pd = (ProbeDesc<String>) args.get(ProbeDesc.class.getCanonicalName());
         if(pd == null) {
-            pd = new ProbeDesc();
+            pd = new ProbeDesc<String>();
         }
         p.setPd(pd);
 

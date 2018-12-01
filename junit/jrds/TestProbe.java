@@ -49,7 +49,7 @@ public class TestProbe {
 
     @Test
     public void testHighLow() throws Exception {
-        ProbeDesc pd = new ProbeDesc();
+        ProbeDesc<String> pd = new ProbeDesc<String>();
         pd.setName("empty");
         pd.setProbeName("empty");
         Map<String, Object> dsMap = new HashMap<String, Object>();
@@ -83,7 +83,7 @@ public class TestProbe {
 
     @Test
     public void testDefault() throws Exception {
-        ProbeDesc pd = new ProbeDesc();
+        ProbeDesc<String> pd = new ProbeDesc<String>();
         pd.setName("empty");
         pd.setProbeName("empty");
         Map<String, Object> dsMap = new HashMap<String, Object>();

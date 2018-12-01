@@ -35,7 +35,7 @@ public class TestFullLifeCycle {
     @Test
     public void create() throws Exception {
         @SuppressWarnings("unchecked")
-        Probe<?, ?> p = GenerateProbe.quickProbe(testFolder);
+        Probe<String, Number> p = GenerateProbe.quickProbe(testFolder);
         p.setPd(Full.getPd());
         File rrdFile = new File(p.getMainStore().getPath());
         Assert.assertTrue("Failed to create probe " + rrdFile.getAbsolutePath(), p.checkStore());

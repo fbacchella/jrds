@@ -26,7 +26,7 @@ public class ContainerProbe extends Probe<Object, Number> {
         }
 
         @Override
-        public Class<? extends Probe<?, ?>> getProbeClass() {
+        public Class<? extends Probe<Object, Number>> getProbeClass() {
             return ContainerProbe.class;
         }
 

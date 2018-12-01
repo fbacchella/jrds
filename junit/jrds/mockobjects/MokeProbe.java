@@ -27,7 +27,7 @@ public class MokeProbe<A, B> extends Probe<A, B> {
         setStep(300);
     }
 
-    public MokeProbe(ProbeDesc pd) {
+    public MokeProbe(ProbeDesc<A> pd) {
         probeType = pd.getName();
         setPd(pd);
         setStep(300);
@@ -45,9 +45,9 @@ public class MokeProbe<A, B> extends Probe<A, B> {
 
     @SuppressWarnings("unchecked")
     public void configure() {
-        ProbeDesc pd = getPd();
+        ProbeDesc<A> pd = getPd();
         if(pd == null) {
-            pd = new ProbeDesc();
+            pd = new ProbeDesc<A>();
             pd.setName(probeType);
             pd.setProbeName("dummyprobe");
             Map<String, Object> dsMap = new HashMap<String, Object>();
@@ -68,7 +68,7 @@ public class MokeProbe<A, B> extends Probe<A, B> {
         }
         if(pd.getProbeClass() == null)
             try {
-                pd.setProbeClass((Class<? extends Probe<?, ?>>) this.getClass());
+                pd.setProbeClass((Class<? extends Probe<A, B>>) this.getClass());
             } catch (InvocationTargetException e) {
                 throw new RuntimeException("Can't build moke probe", e);
             }

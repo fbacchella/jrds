@@ -83,7 +83,6 @@ public class DoSnmpProbe extends CommandStarterImpl {
         return info;
     }
 
-    @SuppressWarnings("unchecked")
     public void start(String[] args) throws Exception {
         ProbeDesc<OID> pd = new ProbeDesc<>();
         pd.setProbeClass(jrds.probe.snmp.RdsSnmpSimple.class);
@@ -102,8 +101,9 @@ public class DoSnmpProbe extends CommandStarterImpl {
                 pd.addSpecific(RdsIndexedSnmpRrd.INDEXOIDNAME, info.oid.toString());
                 indexed = true;
             } else if("--probeclass".equals(cmd.toLowerCase())) {
-                Class<?> c = Class.forName(args[++i]);
-                pd.setProbeClass((Class<? extends Probe<?, ?>>) c);
+                @SuppressWarnings("unchecked")
+                Class<? extends Probe<OID, ?>> c = (Class<? extends Probe<OID, ?>>)Class.forName(args[++i]);
+                pd.setProbeClass(c);
             } else if("--graphs".equals(cmd.toLowerCase())) {
                 String graphsList = args[++i];
                 for(String g: graphsList.split(",")) {

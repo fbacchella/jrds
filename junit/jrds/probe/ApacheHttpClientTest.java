@@ -58,11 +58,11 @@ public class ApacheHttpClientTest {
         }
     };
 
-    private static class TestHttpProbe extends HCHttpProbe {
+    private static class TestHttpProbe extends HCHttpProbe<String> {
         boolean collected;
 
         public TestHttpProbe() {
-            ProbeDesc pd = new ProbeDesc();
+            ProbeDesc<String> pd = new ProbeDesc<>();
             pd.setName("ApacheHttpClientTester");
             pd.add("test", DsType.COUNTER);
             setPd(pd);

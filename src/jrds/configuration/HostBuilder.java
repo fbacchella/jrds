@@ -233,9 +233,9 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         List<Map<String, Object>> dsList = doDsList(type, probeNode.getElementbyName("dslist"));
         if(dsList.size() > 0) {
             logger.trace(Util.delayedFormatString("Data source replaced for %s/%s: %s", host, type, dsList));
-            ProbeDesc oldpd = pf.getProbeDesc(type);
+            ProbeDesc<?> oldpd = pf.getProbeDesc(type);
             try {
-                ProbeDesc pd = (ProbeDesc) oldpd.clone();
+                ProbeDesc<?> pd = (ProbeDesc<?>) oldpd.clone();
                 pd.replaceDs(dsList);
                 p = pf.makeProbe(pd);
             } catch (CloneNotSupportedException e) {
@@ -290,7 +290,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         HostStarter shost = timer.getHost(host);
         p.setHost(shost);
 
-        ProbeDesc pd = p.getPd();
+        ProbeDesc<?> pd = p.getPd();
         List<Object> args = ArgFactory.makeArgs(probeNode, host, properties);
         // Prepare the probe with the default beans values
         Map<String, ProbeDesc.DefaultBean> defaultBeans = pd.getDefaultBeans();
@@ -407,7 +407,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
     private boolean resolveDefaultBean(Probe<?, ?> p, List<Object> args, Map<String, String> properties, String beanName, String beanValue) {
         HostInfo host = p.getHost();
-        ProbeDesc pd = p.getPd();
+        ProbeDesc<?> pd = p.getPd();
         GenericBean bean = pd.getBean(beanName);
         String value;
         // If the last argument is a list, give it to the template parser

@@ -35,8 +35,8 @@ public class Full {
     static final int IMG_WIDTH = 500;
     static final int IMG_HEIGHT = 300;
 
-    static public ProbeDesc getPd() {
-        ProbeDesc pd = new ProbeDesc();
+    static public <KeyType> ProbeDesc<KeyType> getPd() {
+        ProbeDesc<KeyType> pd = new ProbeDesc<KeyType>();
 
         Map<String, Object> dsMap = new HashMap<String, Object>();
         dsMap.put("dsName", "sun");

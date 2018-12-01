@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.HostInfo;
+import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.Tools;
 import jrds.Util;
@@ -34,7 +35,7 @@ public class HttpTest {
         Tools.setLevel(logger, Level.TRACE, "jrds.Util");
     }
 
-    private void validateBean(HttpProbe p) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    private void validateBean(HttpProbe<String> p) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         Assert.assertEquals("invalid url bean", p.getUrl(), p.getPd().getBean("url").get(p));
         Assert.assertEquals("invalid port bean", p.getPort(), p.getPd().getBean("port").get(p));
         Assert.assertEquals("invalid file bean", p.getFile(), p.getPd().getBean("file").get(p));
@@ -44,16 +45,17 @@ public class HttpTest {
         Assert.assertEquals("invalid file bean template", p.getFile(), Util.parseTemplate("${attr.file}", p));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void build1() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        HttpProbe p = new HttpProbe() {
+        HttpProbe<String> p = new HttpProbe<String>() {
             @Override
             protected Map<String, Number> parseStream(InputStream stream) {
                 return null;
             }
         };
-        ProbeDesc pd = new ProbeDesc();
-        pd.setProbeClass(p.getClass());
+        ProbeDesc<String> pd = new ProbeDesc<>();
+        pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
         p.setHost(webserver);
         p.setPd(pd);
         p.setFile("/");
@@ -63,17 +65,18 @@ public class HttpTest {
         validateBean(p);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void build2() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        HttpProbe p = new HttpProbe() {
+        HttpProbe<String> p = new HttpProbe<String>() {
             @Override
             protected Map<String, Number> parseStream(InputStream stream) {
                 return null;
             }
         };
         p.setHost(webserver);
-        ProbeDesc pd = new ProbeDesc();
-        pd.setProbeClass(p.getClass());
+        ProbeDesc<String> pd = new ProbeDesc<String>();
+        pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
         p.setPd(pd);
         p.setFile("/file");
         p.setPort(80);
@@ -82,17 +85,18 @@ public class HttpTest {
         validateBean(p);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void build3() throws IntrospectionException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        HttpProbe p = new HttpProbe() {
+        HttpProbe<String> p = new HttpProbe<String>() {
             @Override
             protected Map<String, Number> parseStream(InputStream stream) {
                 return null;
             }
         };
         p.setHost(webserver);
-        ProbeDesc pd = new ProbeDesc();
-        pd.setProbeClass(p.getClass());
+        ProbeDesc<String> pd = new ProbeDesc<String>();
+        pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
         p.setPd(pd);
         p.setFile("/file");
         p.setPort(81);
@@ -102,16 +106,17 @@ public class HttpTest {
         validateBean(p);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void build4() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        HttpProbe p = new HttpProbe() {
+        HttpProbe<String> p = new HttpProbe<String>() {
             @Override
             protected Map<String, Number> parseStream(InputStream stream) {
                 return null;
             }
         };
-        ProbeDesc pd = new ProbeDesc();
-        pd.setProbeClass(p.getClass());
+        ProbeDesc<String> pd = new ProbeDesc<String>();
+        pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
         p.setHost(webserver);
         p.setPd(pd);
         p.setFile("/");
@@ -123,16 +128,17 @@ public class HttpTest {
         validateBean(p);
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void build5() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        HttpProbe p = new HttpProbe() {
+        HttpProbe<String> p = new HttpProbe<String>() {
             @Override
             protected Map<String, Number> parseStream(InputStream stream) {
                 return null;
             }
         };
-        ProbeDesc pd = new ProbeDesc();
-        pd.setProbeClass(p.getClass());
+        ProbeDesc<String> pd = new ProbeDesc<String>();
+        pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
         p.setHost(webserver);
         p.setPd(pd);
         p.setFile("/${1}");

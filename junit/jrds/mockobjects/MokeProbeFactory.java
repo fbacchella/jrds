@@ -29,19 +29,19 @@ public class MokeProbeFactory extends ProbeFactory {
      * @see jrds.factories.ProbeFactory#makeProbe(jrds.ProbeDesc,
      * java.util.List)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public <KeyType, ValueType> Probe<KeyType, ValueType> makeProbe(ProbeDesc<KeyType> pd) {
-        return (Probe<KeyType, ValueType>) new MokeProbe<String, Number>(pd);
+        return (Probe<KeyType, ValueType>) new MokeProbe<KeyType, ValueType>(pd);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Probe<?, ?> makeProbe(String type) {
         ProbeDesc<?> pd = generateProbeDesc(type);
-        return new MokeProbe<String, Number>(pd);
+        return new MokeProbe(pd);
     }
 
-    protected ProbeDesc<String> generateProbeDesc(String type) {
-        ProbeDesc<String> pd = new ProbeDesc<>();
+    protected <KeyType> ProbeDesc<KeyType> generateProbeDesc(String type) {
+        ProbeDesc<KeyType> pd = new ProbeDesc<>();
         pd.setName(type);
         pd.setProbeName("dummyprobe");
         Map<String, Object> dsMap = new HashMap<String, Object>();

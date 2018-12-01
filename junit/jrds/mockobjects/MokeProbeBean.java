@@ -11,7 +11,7 @@ public class MokeProbeBean extends MokeProbe<String, Number> {
         super();
     }
 
-    public MokeProbeBean(ProbeDesc pd) {
+    public MokeProbeBean(ProbeDesc<String> pd) {
         super(pd);
     }
 

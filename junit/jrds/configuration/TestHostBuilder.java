@@ -68,7 +68,7 @@ public class TestHostBuilder {
             @Override
             public Probe<?, ?> makeProbe(String type) {
                 logger.trace(type);
-                ProbeDesc<?> pd = generateProbeDesc(type);
+                ProbeDesc<String> pd = generateProbeDesc(type);
                 try {
                     pd.setProbeClass(MokeProbeBean.class);
                 } catch (InvocationTargetException e1) {

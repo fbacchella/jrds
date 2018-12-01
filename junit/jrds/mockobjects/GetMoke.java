@@ -45,16 +45,16 @@ public class GetMoke {
         return new HostInfo("MokeHost");
     }
 
-    static public ProbeDesc getPd() {
-        ProbeDesc pd = new ProbeDesc();
+    static public ProbeDesc<String> getPd() {
+        ProbeDesc<String> pd = new ProbeDesc<String>();
         pd.setName("MokeProbeDesc");
         pd.setProbeName("mokeprobedesc");
         pd.add("MokeDs", DsType.COUNTER);
         return pd;
     }
 
-    static public Probe<?, ?> getProbe() throws InvocationTargetException {
-        Probe<?, ?> p = new MokeProbe<String, Number>();
+    static public Probe<String, Number> getProbe() throws InvocationTargetException {
+        Probe<String, Number> p = new MokeProbe<String, Number>();
         p.setPd(getPd());
         p.setHost(new HostStarter(getHost()));
         Map<String, String> empty = Collections.emptyMap();

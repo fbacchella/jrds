@@ -51,7 +51,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Ob
         }
         String className = classElem.getTextContent().trim();
         Class<? extends Probe<?, ?>> c = (Class<? extends Probe<?, ?>>) classLoader.loadClass(className);
-        pd.setProbeClass(c);
+        pd.setProbeClass((Class<? extends Probe<KeyType, ?>>) c);
 
         pd.setHeartBeatDefault(pm.step * 2);
 
