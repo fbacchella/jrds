@@ -84,13 +84,9 @@ public class TestDescFactory {
         Assert.assertEquals(0.5, pd.getUptimefactor(), 0);
         Assert.assertEquals((long) pm.step * 2, pd.getHeartBeatDefault());
         logger.trace(pd.getCollectMapping());
-        logger.trace(pd.getCollectOids());
-        logger.trace(pd.getCollectStrings());
         logger.trace(pd.getDefaultBeans());
         // A collect string "" should not be collected
         Assert.assertEquals(3, pd.getCollectMapping().size());
-        Assert.assertEquals(1, pd.getCollectOids().size());
-        Assert.assertEquals(3, pd.getCollectStrings().size());
     }
 
     @Test
@@ -102,12 +98,9 @@ public class TestDescFactory {
 
         ProbeDescBuilder builder = new ProbeDescBuilder();
         builder.setPm(pm);
-        ProbeDesc pd = builder.makeProbeDesc(d);
+        ProbeDesc<?> pd = builder.makeProbeDesc(d);
         logger.trace("Collect mapping: " + pd.getCollectMapping());
-        logger.trace("Collect oids: " + pd.getCollectOids());
-        logger.trace("Collect strings: " + pd.getCollectStrings());
         Assert.assertEquals(1, pd.getCollectMapping().size());
-        Assert.assertEquals(1, pd.getCollectStrings().size());
         boolean found = false;
         for(LoggingEvent le: logged) {
             String message = le.getRenderedMessage();
