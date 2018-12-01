@@ -3,7 +3,7 @@ What is it?
 
 Jrds is performance collector, much like cacti or munins. But it intends to be more easy to use and able to collect a high
 number of machines in a very short time. It's fully written in java and avoid call external process to increase
-performances. It uses [RRD4J](http://code.google.com/p/rrd4j/), a clone of [rrdtool](http://oss.oetiker.ch/rrdtool/|)
+performances. It uses [RRD4J](http://www.rrd4j.org/), a clone of [rrdtool](http://oss.oetiker.ch/rrdtool/|)
 written in java.
 
 The site is [jrds.fr](http://jrds.fr)
