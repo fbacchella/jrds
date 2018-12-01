@@ -21,14 +21,14 @@ import org.apache.log4j.Logger;
 public class ProbeFactory {
 
     private final Logger logger = Logger.getLogger(ProbeFactory.class);
-    private Map<String, ProbeDesc> probeDescMap;
+    private Map<String, ProbeDesc<?>> probeDescMap;
     private Map<String, GraphDesc> graphDescMap;
 
     /**
      * @param probeDescMap
      * @param graphDescMap
      */
-    public ProbeFactory(Map<String, ProbeDesc> probeDescMap, Map<String, GraphDesc> graphDescMap) {
+    public ProbeFactory(Map<String, ProbeDesc<?>> probeDescMap, Map<String, GraphDesc> graphDescMap) {
         this.probeDescMap = probeDescMap;
         this.graphDescMap = graphDescMap;
     }
@@ -41,7 +41,7 @@ public class ProbeFactory {
      * @return A probe
      */
     public Probe<?, ?> makeProbe(String probeName) {
-        ProbeDesc pd = probeDescMap.get(probeName);
+        ProbeDesc<?> pd = probeDescMap.get(probeName);
         if(pd == null) {
             logger.error("Probe named " + probeName + " not found");
             return null;
@@ -55,15 +55,16 @@ public class ProbeFactory {
      * @param pd a probe description
      * @return A probe
      */
-    public Probe<?, ?> makeProbe(ProbeDesc pd) {
-        Class<? extends Probe<?, ?>> probeClass = pd.getProbeClass();
+    public <KeyType, ValueType> Probe<KeyType, ValueType> makeProbe(ProbeDesc<KeyType> pd) {
+        @SuppressWarnings("unchecked")
+        Class<? extends Probe<KeyType, ValueType>> probeClass = (Class<? extends Probe<KeyType, ValueType>>) pd.getProbeClass();
         if(probeClass == null) {
             logger.error("Invalid probe description " + pd.getName() + ", probe class name not found");
             return null;
         }
-        Probe<?, ?> retValue;
+        Probe<KeyType, ValueType> retValue;
         try {
-            Constructor<? extends Probe<?, ?>> c = probeClass.getConstructor();
+            Constructor<? extends Probe<KeyType, ValueType>> c = probeClass.getConstructor();
             retValue = c.newInstance();
         } catch (LinkageError ex) {
             logger.warn("Error creating probe's " + pd.getName() + ": " + ex);
@@ -134,7 +135,7 @@ public class ProbeFactory {
         return false;
     }
 
-    public ProbeDesc getProbeDesc(String name) {
+    public ProbeDesc<?> getProbeDesc(String name) {
         return probeDescMap.get(name);
     }
 

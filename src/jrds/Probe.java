@@ -41,7 +41,8 @@ import org.w3c.dom.Element;
  * @author Fabrice Bacchella
  */
 @ProbeMeta(
-        topStarter=jrds.starter.SocketFactory.class
+        topStarter=jrds.starter.SocketFactory.class,
+        collectResolver=CollectResolver.StringResolver.class
         )
 public abstract class Probe<KeyType, ValueType> extends StarterNode implements Comparable<Probe<KeyType, ValueType>>  {
 
@@ -84,7 +85,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     private String name = null;
     protected HostInfo monitoredHost;
     private Collection<GraphNode> graphList = new ArrayList<GraphNode>();
-    private ProbeDesc pd;
+    private ProbeDesc<KeyType> pd;
     private long uptime = Long.MAX_VALUE;
     private boolean finished = false;
     private String label = null;
@@ -100,7 +101,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * 
      * @param pd
      */
-    public Probe(ProbeDesc pd) {
+    public Probe(ProbeDesc<KeyType> pd) {
         super();
         setPd(pd);
     }
@@ -118,7 +119,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         setParent(monitoredHost);
     }
 
-    public void setPd(ProbeDesc pd) {
+    public void setPd(ProbeDesc<KeyType> pd) {
         this.pd = pd;
         namedLogger = Logger.getLogger("jrds.Probe." + pd.getName());
         if(!readSpecific()) {
@@ -406,7 +407,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     /**
      * @return Returns the <code>ProbeDesc</code> of the probe.
      */
-    public ProbeDesc getPd() {
+    public ProbeDesc<KeyType> getPd() {
         return pd;
     }
 
@@ -590,7 +591,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * 
      */
     public boolean checkStore() {
-        ProbeDesc pd = getPd();
+        ProbeDesc<KeyType> pd = getPd();
         if(pd == null) {
             log(Level.ERROR, "Missing Probe description");
             return false;

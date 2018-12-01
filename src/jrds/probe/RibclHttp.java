@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
+import javax.xml.xpath.XPathExpression;
+
 import jrds.factories.ProbeMeta;
 import jrds.starter.XmlProvider;
 
@@ -25,7 +27,7 @@ import org.w3c.dom.Node;
 public class RibclHttp extends Ribcl {
 
     @Override
-    public Map<String, Number> getNewSampleValues() {
+    public Map<XPathExpression, Number> getNewSampleValues() {
 
         if(!isCollectRunning())
             return Collections.emptyMap();
@@ -47,7 +49,7 @@ public class RibclHttp extends Ribcl {
         ByteArrayEntity xmlcmd = new ByteArrayEntity(bufferStream.toByteArray());
         query.setEntity(xmlcmd);
 
-        Map<String, Number> values = Collections.emptyMap();
+        Map<XPathExpression, Number> values = Collections.emptyMap();
         HttpEntity entity = null;
         try {
             HttpResponse response = cnx.execute(query);

@@ -131,7 +131,7 @@ public class TestLoadConfiguration {
         host.setHostDir(pm.rrddir);
 
         Probe<?, ?> p = hb.makeProbe(d.getRootElement().getElementbyName("probe"), host, null);
-        ProbeDesc pd = p.getPd();
+        ProbeDesc<?> pd = p.getPd();
         Assert.assertNotNull(pd);
         Assert.assertEquals(1, pd.getSize());
         Assert.assertNotSame(pf.getProbeDesc(pd.getName()), pd.getSize());

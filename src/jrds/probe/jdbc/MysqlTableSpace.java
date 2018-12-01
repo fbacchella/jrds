@@ -25,7 +25,7 @@ public class MysqlTableSpace extends Mysql {
     @Override
     public Map<String, Number> parseRs(ResultSet rs) throws SQLException {
         Map<String, Number> retValues = new HashMap<String, Number>(getPd().getSize());
-        for(String key: getPd().getCollectStrings().keySet()) {
+        for(String key: getPd().getCollectMapping().keySet()) {
             retValues.put(key, 0);
         }
         for(Map<String, Object> m: parseRsHorizontaly(rs, false)) {

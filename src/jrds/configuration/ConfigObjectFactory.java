@@ -128,13 +128,13 @@ public class ConfigObjectFactory {
         return graphDescMap;
     }
 
-    public Map<String, ProbeDesc> setProbeDescMap() {
+    public Map<String, ProbeDesc<? extends Object>> setProbeDescMap() {
         Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.PROBEDESC);
         ProbeDescBuilder ob = new ProbeDescBuilder();
         ob.setClassLoader(cl);
         ob.setPm(pm);
         ob.setGraphDescMap(graphDescMap);
-        Map<String, ProbeDesc> probeDescMap = getObjectMap(ob, nodemap);
+        Map<String, ProbeDesc<? extends Object>> probeDescMap = getObjectMap(ob, nodemap);
         pf = new ProbeFactory(probeDescMap, graphDescMap);
         logger.debug(jrds.Util.delayedFormatString("Probe description configured: %s", probeDescMap.keySet()));
         return probeDescMap;

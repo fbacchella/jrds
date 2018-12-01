@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import jrds.CollectResolver;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.starter.Starter;
@@ -67,5 +68,7 @@ public @interface ProbeMeta {
     Class<? extends Starter> timerStarter() default EmptyStarter.class;
 
     Class<? extends Starter> topStarter() default EmptyStarter.class;
+
+    Class<? extends CollectResolver<?>> collectResolver() default CollectResolver.NoneResolver.class;
 
 }

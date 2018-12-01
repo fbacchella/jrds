@@ -18,6 +18,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.factories.ArgFactory;
+import jrds.factories.ProbeMeta;
+import jrds.starter.StarterNode;
 
 import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
@@ -36,7 +38,7 @@ import org.w3c.dom.Element;
  * @author Fabrice Bacchella
  *
  */
-public class ProbeDesc implements Cloneable {
+public class ProbeDesc<KeyType> implements Cloneable {
     static final private Logger logger = Logger.getLogger(ProbeDesc.class);
 
     public static class DefaultBean {
@@ -64,20 +66,24 @@ public class ProbeDesc implements Cloneable {
     private Map<String, Double> defaultValues = new HashMap<String, Double>(0);
     private Map<String, GenericBean> beans = new HashMap<String, GenericBean>(0);
     private final Set<String> optionals = new HashSet<String>(0);
+    private final Map<String, Joined> highlowcollectmap = new HashMap<String, Joined>();
+    private Map<KeyType, String> collectMap = null;
+    @SuppressWarnings("unchecked")
+    private CollectResolver<KeyType> collectResolver = (CollectResolver<KeyType>) new CollectResolver.StringResolver();
 
-    private static final class DsDesc {
-        public DsType dsType;
-        public long heartbeat;
-        public double minValue;
-        public double maxValue;
-        public Object collectKey;
+    private class DsDesc {
+        final DsType dsType;
+        final long heartbeat;
+        final double minValue;
+        final double maxValue;
+        final KeyType collectKey;
 
-        public DsDesc(DsType dsType, long heartbeat, double minValue, double maxValue, Object key) {
+        public DsDesc(DsType dsType, long heartbeat, double minValue, double maxValue, String collectKey) {
             this.dsType = dsType;
             this.heartbeat = heartbeat;
             this.minValue = minValue;
             this.maxValue = maxValue;
-            this.collectKey = key;
+            this.collectKey = ProbeDesc.this.collectResolver.resolve(collectKey);
         }
     }
 
@@ -159,8 +165,6 @@ public class ProbeDesc implements Cloneable {
         }
     }
 
-    Map<String, Joined> highlowcollectmap = new HashMap<String, Joined>();
-
     /**
      * @return the highlowcollectmap
      */
@@ -172,7 +176,7 @@ public class ProbeDesc implements Cloneable {
         long heartbeat = heartBeatDefault;
         double min = MINDEFAULT;
         double max = MAXDEFAULT;
-        Object collectKey = null;
+        String collectKey = null;
         String name = null;
         DsType type = null;
 
@@ -189,10 +193,10 @@ public class ProbeDesc implements Cloneable {
 
         // Where to look for the collect info
         if(valuesMap.containsKey("collect")) {
-            collectKey = valuesMap.get("collect");
+            collectKey = (String) valuesMap.get("collect");
         } else if(valuesMap.containsKey("collecthigh") && valuesMap.containsKey("collectlow")) {
-            Object keyHigh = valuesMap.get("collecthigh");
-            Object keyLow = valuesMap.get("collectlow");
+            String keyHigh = valuesMap.get("collecthigh").toString();
+            String keyLow = valuesMap.get("collectlow").toString();
             dsMap.put(name + "high", new DsDesc(null, heartbeat, min, max, keyHigh));
             dsMap.put(name + "low", new DsDesc(null, heartbeat, min, max, keyLow));
             highlowcollectmap.put(name, new Joined(keyHigh, keyLow));
@@ -270,14 +274,20 @@ public class ProbeDesc implements Cloneable {
      * 
      * @return a Map of collect names to datastore name
      */
-    public Map<Object, String> getCollectMapping() {
-        Map<Object, String> retValue = new LinkedHashMap<Object, String>(dsMap.size());
-        for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
-            DsDesc dd = e.getValue();
-            if(dd.collectKey != null && dd.dsType != null)
-                retValue.put(dd.collectKey, e.getKey());
+    public synchronized Map<KeyType, String> getCollectMapping() {
+        if (collectMap == null) {
+            collectMap = new LinkedHashMap<>(dsMap.size());
+            for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
+                DsDesc dd = e.getValue();
+                if(dd.collectKey != null && dd.dsType != null)
+                    collectMap.put(dd.collectKey, e.getKey());
+            }
+            collectMap = Collections.unmodifiableMap(collectMap);
+            // Once called, it's not possible to add any more collect
+            // so drop the collect resolver
+            collectResolver = null;
         }
-        return retValue;
+        return collectMap;
     }
 
     public DsDef[] getDsDefs() {
@@ -376,8 +386,22 @@ public class ProbeDesc implements Cloneable {
         return probeClass;
     }
 
+    @SuppressWarnings("unchecked")
     public void setProbeClass(Class<? extends Probe<?, ?>> probeClass) throws InvocationTargetException {
         beans.putAll(ArgFactory.getBeanPropertiesMap(probeClass, Probe.class));
+        for (ProbeMeta pm: ArgFactory.enumerateAnnotation(probeClass, ProbeMeta.class, StarterNode.class)) {
+            Class<? extends CollectResolver<?>> cr = pm.collectResolver();
+            if (cr == CollectResolver.NoneResolver.class) {
+                continue;
+            } else {
+                try {
+                    collectResolver = (CollectResolver<KeyType>) pm.collectResolver().newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    throw new InvocationTargetException(e);
+                }
+                break;
+            }
+        }
         this.probeClass = probeClass;
     }
 
@@ -500,9 +524,10 @@ public class ProbeDesc implements Cloneable {
      * 
      * @see java.lang.Object#clone()
      */
+    @SuppressWarnings("unchecked")
     @Override
     public Object clone() throws CloneNotSupportedException {
-        return (ProbeDesc) super.clone();
+        return (ProbeDesc<KeyType>) super.clone();
     }
 
     /**

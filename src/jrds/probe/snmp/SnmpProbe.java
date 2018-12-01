@@ -49,7 +49,7 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
      */
     @Override
     public boolean readSpecific() {
-        nameMap = getPd().getCollectOids();
+        nameMap = getPd().getCollectMapping();
         boolean readOK = false;
         try {
             String requesterName = getPd().getSpecific(REQUESTERNAME);
@@ -72,7 +72,7 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
     }
 
     private Map<OID, String> initNameMap() {
-        return getPd().getCollectOids();
+        return getPd().getCollectMapping();
     }
 
     public Map<OID, String> getOidNameMap() {

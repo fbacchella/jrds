@@ -19,7 +19,7 @@ import org.apache.log4j.Level;
 public class ContainerProbe extends Probe<Object, Number> {
     static private final HostInfo ContainerHost = new HostInfo("ContainerHost");
 
-    static final ProbeDesc pd = new ProbeDesc(0) {
+    static final ProbeDesc<Object> pd = new ProbeDesc<Object>(0) {
         @Override
         public String getName() {
             return "ContainerProbeDesc";

@@ -71,7 +71,7 @@ public class DoSnmpProbe2 extends CommandStarterImpl {
     }
 
     public void start(String[] args) throws Exception {
-        ProbeDesc pd = new ProbeDesc();
+        ProbeDesc<OID> pd = new ProbeDesc<>();
         pd.setProbeClass(jrds.probe.snmp.RdsSnmpSimple.class);
         List<String> xmlPaths = new ArrayList<>();
         MibLoader loader = new MibLoader();

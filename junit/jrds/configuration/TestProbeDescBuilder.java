@@ -35,7 +35,7 @@ public class TestProbeDescBuilder {
         ConfigObjectFactory conf = new ConfigObjectFactory(localpm, localpm.extensionClassLoader);
         conf.getNodeMap(ConfigType.PROBEDESC).put("name", Tools.parseRessource("httpxmlprobedesc.xml"));
 
-        ProbeDesc pd = conf.setProbeDescMap().get("name");
+        ProbeDesc<?> pd = conf.setProbeDescMap().get("name");
         Assert.assertNotNull("Probedesc not build", pd);
     }
 
@@ -48,7 +48,8 @@ public class TestProbeDescBuilder {
 
         conf.getNodeMap(ConfigType.PROBEDESC).put("name", pddoc);
 
-        ProbeDesc pd = conf.setProbeDescMap().get("name");
+        @SuppressWarnings("unchecked")
+        ProbeDesc<String> pd = (ProbeDesc<String>) conf.setProbeDescMap().get("name");
         Assert.assertNotNull("Probedesc not build", pd);
 
         @SuppressWarnings("unchecked")
@@ -65,7 +66,7 @@ public class TestProbeDescBuilder {
         JrdsDocument pddoc = Tools.parseRessource("beans.xml");
         pddoc.getRootElement().getElementbyName("probeClass").setTextContent("jrds.mockobjects.MokeProbeBean");
         conf.getNodeMap(ConfigType.PROBEDESC).put("name", pddoc);
-        ProbeDesc pd = conf.setProbeDescMap().get("name");
+        ProbeDesc<?> pd = conf.setProbeDescMap().get("name");
         Assert.assertEquals("bean default value not found", "defaultattr1", pd.getDefaultBeans().get("customattr1").value);
         Assert.assertEquals("default attribute not delayed", true, pd.getDefaultBeans().get("customattr2").delayed);
     }
@@ -77,7 +78,8 @@ public class TestProbeDescBuilder {
         JrdsDocument pddoc = Tools.parseRessource("beans.xml");
         pddoc.getRootElement().getElementbyName("probeClass").setTextContent("jrds.mockobjects.MokeProbeBean");
         conf.getNodeMap(ConfigType.PROBEDESC).put("name", pddoc);
-        ProbeDesc pd = conf.setProbeDescMap().get("name");
+        @SuppressWarnings("unchecked")
+        ProbeDesc<String> pd = (ProbeDesc<String>) conf.setProbeDescMap().get("name");
         Assert.assertNotNull("custom bean customattr1 not found", pd.getBean("customattr1"));
         Assert.assertNotNull("custom bean customattr2 not found", pd.getBean("customattr2"));
 

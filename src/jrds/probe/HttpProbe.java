@@ -34,7 +34,7 @@ import org.apache.log4j.Level;
  * @author Fabrice Bacchella
  */
 @ProbeBean({ "port", "file", "url", "urlhost", "scheme", "login", "password" })
-public abstract class HttpProbe extends Probe<String, Number> implements UrlProbe, ConnectedProbe {
+public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implements UrlProbe, ConnectedProbe {
     protected URL url = null;
     protected String urlhost = null;
     protected int port = -1;
@@ -168,7 +168,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
      * @param stream A stream collected from the http source
      * @return a map of collected value
      */
-    protected abstract Map<String, Number> parseStream(InputStream stream);
+    protected abstract Map<KeyType, Number> parseStream(InputStream stream);
 
     /**
      * A utility method that transform the input stream to a List of lines
@@ -197,7 +197,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
      * 
      * @see com.aol.jrds.Probe#getNewSampleValues()
      */
-    public Map<String, Number> getNewSampleValues() {
+    public Map<KeyType, Number> getNewSampleValues() {
         log(Level.DEBUG, "Getting %s", getUrl());
         URLConnection cnx;
         try {
@@ -211,7 +211,7 @@ public abstract class HttpProbe extends Probe<String, Number> implements UrlProb
         }
         try {
             InputStream is = cnx.getInputStream();
-            Map<String, Number> vars = parseStream(is);
+            Map<KeyType, Number> vars = parseStream(is);
             is.close();
             return vars;
         } catch (ConnectException e) {

@@ -23,7 +23,7 @@ public abstract class Mysql extends JdbcProbe {
         this.setPort(PORT);
     }
 
-    public Mysql(ProbeDesc pd) {
+    public Mysql(ProbeDesc<String> pd) {
         super(pd);
         this.setPort(PORT);
     }

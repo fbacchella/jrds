@@ -47,7 +47,7 @@ public class AllProbeCreationTest {
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
 
         Map<String, GraphDesc> graphDescMap = conf.setGraphDescMap();
-        Map<String, ProbeDesc> probeDescMap = conf.setProbeDescMap();
+        Map<String, ProbeDesc<?>> probeDescMap = conf.setProbeDescMap();
 
         ProbeFactory pf = new ProbeFactory(probeDescMap, graphDescMap);
 
@@ -55,7 +55,7 @@ public class AllProbeCreationTest {
         HostInfo host = new HostInfo("Empty");
         host.setHostDir(pm.rrddir);
         HostStarter hs = new HostStarter(host);
-        for(ProbeDesc pd: probeDescMap.values()) {
+        for(ProbeDesc<?> pd: probeDescMap.values()) {
             logger.trace("Will create probedesc " + pd.getName());
             Probe<?, ?> p = pf.makeProbe(pd.getName());
             p.setHost(hs);

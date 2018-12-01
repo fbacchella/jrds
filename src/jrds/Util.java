@@ -440,7 +440,7 @@ public class Util {
         probedesc_name {
             @Override
             String toString(Object o) {
-                ProbeDesc pd = (ProbeDesc) o;
+                ProbeDesc<?> pd = (ProbeDesc<?>) o;
                 return pd.getName();
             }
         },

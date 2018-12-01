@@ -75,7 +75,7 @@ public class TestDescFactory {
 
         ProbeDescBuilder builder = new ProbeDescBuilder();
         builder.setPm(new PropertiesManager());
-        ProbeDesc pd = builder.makeProbeDesc(d);
+        ProbeDesc<?> pd = builder.makeProbeDesc(d);
         Assert.assertEquals("name", pd.getName());
         Assert.assertEquals("probename", pd.getProbeName());
         Assert.assertEquals(jrds.mockobjects.MokeProbe.class, pd.getProbeClass());

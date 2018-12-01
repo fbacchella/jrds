@@ -41,7 +41,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
      */
     public Boolean configure(List<?> args) {
         if(super.configure()) {
-            ProbeDesc pd = getPd();
+            ProbeDesc<String> pd = getPd();
             query = jrds.Util.parseTemplate(pd.getSpecific("query"), getHost(), args);
             keyColumn = jrds.Util.parseTemplate(pd.getSpecific("key"), getHost(), args);
             uptimeQuery = jrds.Util.parseTemplate(pd.getSpecific("uptimeQuery"), getHost(), args);
@@ -84,7 +84,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
                 log(Level.DEBUG, "sql query used: %s", query);
                 if (stmt.execute(query)) {
                     rs = stmt.getResultSet();
-                    Set<String> collectKeys = new HashSet<>(getPd().getCollectStrings().keySet());
+                    Set<String> collectKeys = new HashSet<>(getPd().getCollectMapping().keySet());
                     if (uptimeQuery == null && uptimeRow != null)
                         collectKeys.add(uptimeRow);
                     values = getValuesFromRS(rs, collectKeys);

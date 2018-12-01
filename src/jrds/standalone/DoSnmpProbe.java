@@ -85,7 +85,7 @@ public class DoSnmpProbe extends CommandStarterImpl {
 
     @SuppressWarnings("unchecked")
     public void start(String[] args) throws Exception {
-        ProbeDesc pd = new ProbeDesc();
+        ProbeDesc<OID> pd = new ProbeDesc<>();
         pd.setProbeClass(jrds.probe.snmp.RdsSnmpSimple.class);
         boolean indexed = false;
         for(int i = 0; i < args.length; i++) {
@@ -112,7 +112,7 @@ public class DoSnmpProbe extends CommandStarterImpl {
             } else if("--collect".equals(cmd.toLowerCase())) {
                 for(String collectarg: args[++i].split(",")) {
                     OidInfo info = translate(collectarg);
-                    pd.add(info.name, info.type, info.oid);
+                    pd.add(info.name, info.type, info.oid.format());
                 }
             } else if(cmd.startsWith("--")) {
                 String key = cmd.replace("--", "").toLowerCase();

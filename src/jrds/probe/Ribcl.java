@@ -13,6 +13,11 @@ import java.util.Map;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpression;
+
+import org.apache.log4j.Level;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import jrds.Probe;
 import jrds.Util;
@@ -22,15 +27,13 @@ import jrds.starter.SSLStarter;
 import jrds.starter.SocketFactory;
 import jrds.starter.XmlProvider;
 
-import org.apache.log4j.Level;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 @ProbeMeta(
-        topStarter = jrds.starter.XmlProvider.class
+        topStarter = jrds.starter.XmlProvider.class,
+        collectResolver = XmlProvider.XmlResolver.class
         )
 @ProbeBean({"user", "password", "iloHost", "port"})
-public class Ribcl extends Probe<String, Number> implements SSLProbe {
+public class Ribcl extends Probe<XPathExpression, Number> implements SSLProbe {
+
     private String user;
     private String passwd;
     private String iloHost;
@@ -57,7 +60,7 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
     }
 
     @Override
-    public Map<String, Number> getNewSampleValues() {
+    public Map<XPathExpression, Number> getNewSampleValues() {
         Socket s;
         try {
             s = connect();
@@ -111,14 +114,14 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
         return "RIBCL";
     }
 
-    Map<String, Number> parseRibcl(String message, XmlProvider xmlstarter) {
+    Map<XPathExpression, Number> parseRibcl(String message, XmlProvider xmlstarter) {
         int start = 0;
         int end = 0;
-        Map<String, Number> vars = new HashMap<String, Number>();
+        Map<XPathExpression, Number> vars = new HashMap<>();
         while (start >= 0) {
             int nextstart = message.indexOf("<?xml ", end + 2);
             end = (nextstart != -1 ? nextstart : message.length()) - 1;
-            parse(message.substring(start, end), vars, xmlstarter);
+            vars.putAll(parse(message.substring(start, end), xmlstarter));
             start = nextstart;
         }
         return vars;
@@ -166,15 +169,17 @@ public class Ribcl extends Probe<String, Number> implements SSLProbe {
         }
     }
 
-    public void parse(String message, Map<String, Number> vars, XmlProvider xmlstarter) {
-        if(message == null || "".equals(message))
-            return;
-        log(Level.TRACE, "new message to parse: ");
-        log(Level.TRACE, message);
-        // The XML returned from an iLO is buggy, up to ilO2 1.50
-        message = message.replaceAll("<RIBCL VERSION=\"[0-9\\.]+\"/>", "<RIBCL >");
-        Document d = xmlstarter.getDocument(new StringReader(message));
-        xmlstarter.fileFromXpaths(d, getPd().getCollectStrings().keySet(), vars);
+    private Map<XPathExpression, Number> parse(String message, XmlProvider xmlstarter) {
+        if(message == null || "".equals(message)) {
+            return Collections.emptyMap();
+        } else {
+            log(Level.TRACE, "new message to parse: ");
+            log(Level.TRACE, message);
+            // The XML returned from an iLO is buggy, up to ilO2 1.50
+            message = message.replaceAll("<RIBCL VERSION=\"[0-9\\.]+\"/>", "<RIBCL >");
+            Document d = xmlstarter.getDocument(new StringReader(message));
+            return xmlstarter.fileFromXpaths(d, getPd().getCollectMapping().keySet());
+        }
     }
 
     /*

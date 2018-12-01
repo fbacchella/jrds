@@ -20,7 +20,7 @@ import org.apache.log4j.Level;
  * 
  * @author Fabrice Bacchella
  */
-public class ApacheStatus extends HCHttpProbe implements IndexedProbe {
+public class ApacheStatus extends HCHttpProbe<String> implements IndexedProbe {
 
     public ApacheStatus() {
         super();

@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,6 +16,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
@@ -24,6 +26,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import jrds.CollectResolver;
 
 /**
  * @author bacchell A provider is used for XML to solve multi thread problems
@@ -54,6 +58,26 @@ public class XmlProvider extends Starter {
             return XPathFactory.newInstance().newXPath();
         }
     };
+
+    public static class XmlResolver implements CollectResolver<XPathExpression> {
+
+        private static final ThreadLocal<XPath> localXpath = new ThreadLocal<XPath>() {
+            @Override
+            protected XPath initialValue() {
+                return XPathFactory.newInstance().newXPath();
+            }
+        };
+
+        @Override
+        public XPathExpression resolve(String collectKey) {
+            try {
+                return localXpath.get().compile(collectKey);
+            } catch (XPathExpressionException e) {
+                return null;
+            }
+        }
+
+    }
 
     public long findUptimeByDate(Document d, String startTimePath, String currentTimePath, DateFormat pattern) {
         XPath xpather = localXpath.get();
@@ -94,19 +118,16 @@ public class XmlProvider extends Starter {
         return uptime;
     }
 
-    public void fileFromXpaths(Document d, Set<String> xpaths, Map<String, Number> oldMap) {
-        XPath xpather = localXpath.get();
-        for(String xpath: xpaths) {
+    public Map<XPathExpression, Number> fileFromXpaths(Document d, Set<XPathExpression> xpaths) {
+        Map<XPathExpression, Number> values = new HashMap<>(xpaths.size());
+        for(XPathExpression xpath: xpaths) {
             try {
                 log(Level.TRACE, "Will search the xpath \"%s\"", xpath);
-                if(xpath == null || "".equals(xpath))
-                    continue;
-                Node n = (Node) xpather.evaluate(xpath, d, XPathConstants.NODE);
+                Node n = (Node) xpath.evaluate(d, XPathConstants.NODE);
                 Double value;
                 if(n != null) {
-                    log(Level.TRACE, "%s", n);
                     value = jrds.Util.parseStringNumber(n.getTextContent(), Double.NaN);
-                    oldMap.put(xpath, value);
+                    values.put(xpath, value);
                 }
             } catch (XPathExpressionException e) {
                 log(Level.ERROR, "Invalid XPATH : " + xpath + " for " + this);
@@ -114,7 +135,8 @@ public class XmlProvider extends Starter {
                 log(Level.WARN, e, "value read from %s  not parsable", xpath);
             }
         }
-        log(Level.TRACE, "Values found: %s", oldMap);
+        log(Level.TRACE, "Values found: %s", values);
+        return values;
     }
 
     public Document getDocument(InputSource stream) {

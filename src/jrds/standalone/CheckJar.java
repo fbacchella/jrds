@@ -67,7 +67,7 @@ public class CheckJar extends CommandStarterImpl {
             ConfigObjectFactory confjar = new ConfigObjectFactory(pm);
 
             Map<String, GraphDesc> grapMapjar = confjar.setGraphDescMap();
-            for(ProbeDesc pd: confjar.setProbeDescMap().values()) {
+            for(ProbeDesc<?> pd: confjar.setProbeDescMap().values()) {
                 Class<?> pc = pd.getProbeClass();
                 while (pc != null && pc != StarterNode.class) {
                     if(pc.isAnnotationPresent(ProbeMeta.class)) {

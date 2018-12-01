@@ -41,7 +41,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
     @Override
     public Boolean configure() {
         collectKeys = new HashMap<String, String>();
-        for(Map.Entry<String, String> e: getPd().getCollectStrings().entrySet()) {
+        for(Map.Entry<String, String> e: getPd().getCollectMapping().entrySet()) {
             String dsName = e.getValue();
             String solved = jrds.Util.parseTemplate(e.getKey(), this);
             collectKeys.put(solved, dsName);
@@ -117,9 +117,9 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
      * @see jrds.Probe#setPd(jrds.ProbeDesc)
      */
     @Override
-    public void setPd(ProbeDesc pd) {
+    public void setPd(ProbeDesc<String> pd) {
         super.setPd(pd);
-        collectKeys = getPd().getCollectStrings();
+        collectKeys = getPd().getCollectMapping();
     }
 
     /*

@@ -59,11 +59,12 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         ConfigObjectFactory conf = new ConfigObjectFactory(pm, pm.extensionClassLoader);
         // Needed for the probe's graph list
         conf.setGraphDescMap();
-        Map<String, ProbeDesc> probesMap = conf.setProbeDescMap();
+        Map<String, ProbeDesc<? extends Object>> probesMap = conf.setProbeDescMap();
         if(args.length == 0) {
             dumpAll(probesMap.values());
         } else {
-            ProbeDesc pd = probesMap.get(args[0]);
+            @SuppressWarnings("unchecked")
+            ProbeDesc<Object> pd = (ProbeDesc<Object>) probesMap.get(args[0]);
             if(pd != null)
                 dumpProbe(pd);
             else {
@@ -83,16 +84,19 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         System.out.println("If a probe name is provided, dump more details about it, style in wiki format");
     }
 
-    private void dumpAll(Collection<ProbeDesc> probes) {
-        for(ProbeDesc pd: probes) {
+    private void dumpAll(Collection<ProbeDesc<? extends Object>> probes) {
+        for(ProbeDesc<? extends Object> pd: probes) {
+            @SuppressWarnings("unchecked")
+            ProbeDesc<Object> castedpd = (ProbeDesc<Object>) pd;
             try {
-                Class<? extends Probe<?, ?>> c = pd.getProbeClass();
+                @SuppressWarnings("unchecked")
+                Class<? extends Probe<Object, ?>> c = (Class<? extends Probe<Object, ?>>) castedpd.getProbeClass();
                 //Don't dump passive probes, nothing to show
                 if (PassiveProbe.class.isAssignableFrom(c)) {
                     continue;
                 }
-                Probe<?, ?> p = c.newInstance();
-                p.setPd(pd);
+                Probe<Object, ?> p = c.newInstance();
+                p.setPd(castedpd);
                 System.out.println(oneLine(p));
             } catch (InstantiationException  | IllegalAccessException e) {
                 e.printStackTrace();
@@ -110,7 +114,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
     }
 
     private String oneLine(Probe<?, ?> p) {
-        ProbeDesc pd = p.getPd();
+        ProbeDesc<?> pd = p.getPd();
 
         String description = pd.getSpecific("description");
         if(description == null)
@@ -118,9 +122,10 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         return "| " + getSourceTypeLink(p, true) + " | " + description + " | " + classToLink(p.getClass()) + " | ";
     }
 
-    private void dumpProbe(ProbeDesc pd) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        Class<? extends Probe<?, ?>> c = pd.getProbeClass();
-        Probe<?, ?> p = c.newInstance();
+    private void dumpProbe(ProbeDesc<Object> pd) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        @SuppressWarnings("unchecked")
+        Class<? extends Probe<Object, ?>> c = (Class<? extends Probe<Object, ?>>) pd.getProbeClass();
+        Probe<Object, ?> p = c.newInstance();
         p.setPd(pd);
         System.out.println(oneLine(p));
 

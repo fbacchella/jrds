@@ -51,7 +51,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
         starter = setStarter();
     }
 
-    public JdbcProbe(ProbeDesc pd) {
+    public JdbcProbe(ProbeDesc<String> pd) {
         super(pd);
         starter = setStarter();
     }

@@ -51,7 +51,7 @@ public class TestBeans {
         for(JrdsDocument n: conf.getNodeMap(ConfigType.PROBEDESC).values()) {
             JrdsElement root = n.getRootElement();
             JrdsElement classElem = root.getElementbyName("probeClass");
-            ProbeDesc pd = new ProbeDesc();
+            ProbeDesc<?> pd = new ProbeDesc<>();
             String name = "";
             try {
                 String className = classElem.getTextContent().trim();

@@ -68,7 +68,7 @@ public class TestHostBuilder {
             @Override
             public Probe<?, ?> makeProbe(String type) {
                 logger.trace(type);
-                ProbeDesc pd = generateProbeDesc(type);
+                ProbeDesc<?> pd = generateProbeDesc(type);
                 try {
                     pd.setProbeClass(MokeProbeBean.class);
                 } catch (InvocationTargetException e1) {
@@ -127,7 +127,7 @@ public class TestHostBuilder {
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
 
         Map<String, GraphDesc> graphDescMap = conf.setGraphDescMap();
-        Map<String, ProbeDesc> probeDescMap = conf.setProbeDescMap();
+        Map<String, ProbeDesc<? extends Object>> probeDescMap = conf.setProbeDescMap();
         ProbeFactory pf = new ProbeFactory(probeDescMap, graphDescMap);
 
         HostBuilder hb = new HostBuilder();
@@ -172,7 +172,7 @@ public class TestHostBuilder {
         conf.getNodeMap(ConfigType.PROBEDESC).put("name", pddoc);
 
         Map<String, GraphDesc> graphDescMap = conf.setGraphDescMap();
-        Map<String, ProbeDesc> probeDescMap = conf.setProbeDescMap();
+        Map<String, ProbeDesc<? extends Object>> probeDescMap = conf.setProbeDescMap();
         ProbeFactory pf = new ProbeFactory(probeDescMap, graphDescMap);
 
         HostBuilder hb = new HostBuilder();

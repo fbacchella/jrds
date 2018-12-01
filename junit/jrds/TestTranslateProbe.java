@@ -13,15 +13,15 @@ import org.junit.Test;
 
 public class TestTranslateProbe {
     static final private Logger logger = Logger.getLogger(TestTranslateProbe.class);
-    static ProbeDesc pd;
+    static ProbeDesc<String> pd;
 
+    @SuppressWarnings("unchecked")
     @BeforeClass
     static public void configure() throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, Exception {
         Tools.configure();
         Tools.prepareXml();
         Tools.setLevel(logger, Level.ERROR, "jrds.Probe");
-
-        pd = jrds.configuration.GeneratorHelper.getProbeDesc(Tools.parseRessource("fulldesc.xml"));
+        pd = (ProbeDesc<String>) jrds.configuration.GeneratorHelper.getProbeDesc(Tools.parseRessource("fulldesc.xml"));
 
     }
 

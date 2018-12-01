@@ -23,8 +23,9 @@ import org.junit.Test;
 public class XmlProbeTest {
     static Logger logger = Logger.getLogger(XmlProbeTest.class);
     XPath xpath = XPathFactory.newInstance().newXPath();
-    static ProbeDesc pd;
+    static ProbeDesc<String> pd;
 
+    @SuppressWarnings("unchecked")
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
@@ -33,7 +34,7 @@ public class XmlProbeTest {
         Tools.setLevel(logger, Level.TRACE, "jrds.Probe.HttpXml", "jrds.Probe.HttpProbe", "jrds.starter.XmlProvider");
         Tools.prepareXml(false);
 
-        pd = jrds.configuration.GeneratorHelper.getProbeDesc(Tools.parseRessource("httpxmlprobedesc.xml"));
+        pd = (ProbeDesc<String>) jrds.configuration.GeneratorHelper.getProbeDesc(Tools.parseRessource("httpxmlprobedesc.xml"));
     }
 
     @Test
@@ -95,8 +96,8 @@ public class XmlProbeTest {
         p.configure(url, args);
         Map<String, String> keys = p.getCollectMapping();
         logger.trace("Collect keys: " + p.getCollectMapping());
-        logger.trace("Collect strings: " + pd.getCollectStrings());
-        Assert.assertTrue(keys.containsKey("/jrdsstats/stat[@key='a']/@value"));
+        logger.trace("Collect strings: " + pd.getCollectMapping());
+        Assert.assertTrue(keys.containsKey("/jrdsstats/stat[@key='%1$s']/@value"));
         Assert.assertTrue(keys.containsKey("/jrdsstats/stat[@key='b']/@value"));
         Assert.assertTrue(keys.containsKey("c"));
     }

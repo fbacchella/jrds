@@ -124,8 +124,8 @@ public class HostsList extends StarterNode {
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
         conf.setArchiveSetMap();
         conf.setGraphDescMap();
-        Map<String, ProbeDesc> allProbeDesc = conf.setProbeDescMap();
-        for(ProbeDesc pd: allProbeDesc.values()) {
+        Map<String, ProbeDesc<?>> allProbeDesc = conf.setProbeDescMap();
+        for(ProbeDesc<?> pd: allProbeDesc.values()) {
             for(ProbeMeta meta: ArgFactory.enumerateAnnotation(pd.getProbeClass(), ProbeMeta.class, StarterNode.class)) {
                 log(Level.TRACE, "new probe meta: %s", meta);
                 daList.add(meta.discoverAgent());

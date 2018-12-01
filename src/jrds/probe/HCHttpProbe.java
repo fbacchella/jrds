@@ -32,7 +32,7 @@ import jrds.factories.ProbeMeta;
 @ProbeMeta(
         timerStarter=jrds.probe.HttpClientStarter.class
         )
-public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
+public abstract class HCHttpProbe<KeyType> extends HttpProbe<KeyType> implements SSLProbe {
 
     private boolean mandatorySession = false;
 
@@ -45,7 +45,7 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
     }
 
     @Override
-    public Map<String, Number> getNewSampleValues() {
+    public Map<KeyType, Number> getNewSampleValues() {
         HttpClientStarter httpstarter = find(HttpClientStarter.class);
         if (! httpstarter.isStarted()) {
             return Collections.emptyMap();
@@ -71,7 +71,7 @@ public abstract class HCHttpProbe extends HttpProbe implements SSLProbe {
                 return Collections.emptyMap();
             }
             InputStream is = entity.getContent();
-            Map<String, Number> vars = parseStream(is);
+            Map<KeyType, Number> vars = parseStream(is);
             is.close();
             return vars;
         } catch (IllegalStateException | IOException e) {

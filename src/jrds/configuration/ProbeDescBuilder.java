@@ -14,7 +14,7 @@ import jrds.factories.xml.JrdsElement;
 
 import org.apache.log4j.Logger;
 
-public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
+public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Object>> {
     static final private Logger logger = Logger.getLogger(ProbeDescBuilder.class);
 
     private ClassLoader classLoader = ProbeDescBuilder.class.getClassLoader();
@@ -25,7 +25,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
     }
 
     @Override
-    ProbeDesc build(JrdsDocument n) throws InvocationTargetException {
+    ProbeDesc<? extends Object> build(JrdsDocument n) throws InvocationTargetException {
         try {
             return makeProbeDesc(n);
         } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | 
@@ -35,8 +35,8 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc> {
     }
 
     @SuppressWarnings("unchecked")
-    public ProbeDesc makeProbeDesc(JrdsDocument n) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, InstantiationException {
-        ProbeDesc pd = new ProbeDesc();
+    public <KeyType> ProbeDesc<KeyType> makeProbeDesc(JrdsDocument n) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, InstantiationException {
+        ProbeDesc<KeyType> pd = new ProbeDesc<KeyType>();
 
         JrdsElement root = n.getRootElement();
         setMethod(root.getElementbyName("probeName"), pd, "setProbeName");

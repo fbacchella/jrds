@@ -82,7 +82,7 @@ public class TestGraphDescBuilder {
 
         p.setMainStore(pm.defaultStore, new HashMap<String, String>(0));
 
-        ProbeDesc pd = p.getPd();
+        ProbeDesc<?> pd = p.getPd();
 
         ChainedMap<Object> dsMap = GenerateProbe.ChainedMap.start();
         dsMap.set("dsName", "space separated").set("dsType", DsType.COUNTER);

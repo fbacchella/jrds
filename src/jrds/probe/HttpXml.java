@@ -6,15 +6,15 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import javax.xml.xpath.XPathExpression;
 
 import org.apache.log4j.Level;
 import org.w3c.dom.Document;
 
-import jrds.ProbeDesc;
+import jrds.CollectResolver;
 import jrds.Util;
 import jrds.factories.ProbeMeta;
 import jrds.starter.XmlProvider;
@@ -39,11 +39,13 @@ import jrds.starter.XmlProvider;
  * 
  * @author Fabrice Bacchella
  */
-@ProbeMeta(topStarter = jrds.starter.XmlProvider.class)
-public class HttpXml extends HCHttpProbe {
+@ProbeMeta(
+        topStarter = jrds.starter.XmlProvider.class,
+        collectResolver = CollectResolver.StringResolver.class
+)
+public class HttpXml extends HCHttpProbe<String> {
 
-    private Set<String> xpaths = null;
-    private Map<String, String> collectKeys = null;
+    private Map<XPathExpression, String> collectKeys = null;
 
     /*
      * (non-Javadoc)
@@ -114,38 +116,21 @@ public class HttpXml extends HCHttpProbe {
 
     private void finishConfig(List<Object> args) {
         log(Level.TRACE, "Configuring collect xpath with %s", args);
-        xpaths = new HashSet<String>(getPd().getCollectStrings().size());
-        collectKeys = new HashMap<String, String>(xpaths.size());
-        for(Map.Entry<String, String> e: getPd().getCollectStrings().entrySet()) {
-            String xpath = e.getKey();
-            String dsName = e.getValue();
-            String solved = Util.parseTemplate(String.format(xpath, args.toArray()), this, args);
-            xpaths.add(solved);
-            collectKeys.put(solved, dsName);
+        CollectResolver<XPathExpression> cr = new XmlProvider.XmlResolver();
+        System.out.println(getPd().getCollectMapping());
+        collectKeys = new HashMap<>(getPd().getCollectMapping().size());
+        for(Map.Entry<String, String> e: getPd().getCollectMapping().entrySet()) {
+            String solved = Util.parseTemplate(String.format(e.getKey(), args.toArray()), this, args);
+            XPathExpression xpath = cr.resolve(solved);
+            if (xpath ==  null) {
+                log(Level.DEBUG, "unparsed xpath: %s", e.getKey());
+                continue;
+            } else {
+                collectKeys.put(xpath, solved);
+            }
         }
+        collectKeys = Collections.unmodifiableMap(collectKeys);
         log(Level.TRACE, "collect xpath mapping %s", collectKeys);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see jrds.Probe#setPd(jrds.ProbeDesc)
-     */
-    @Override
-    public void setPd(ProbeDesc pd) {
-        super.setPd(pd);
-        xpaths = getPd().getCollectStrings().keySet();
-        collectKeys = getPd().getCollectStrings();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see jrds.Probe#getCollectkeys()
-     */
-    @Override
-    public Map<String, String> getCollectMapping() {
-        return collectKeys;
     }
 
     /**
@@ -207,8 +192,11 @@ public class HttpXml extends HCHttpProbe {
             return null;
         }
         setUptime(findUptime(xmlstarter, d));
-        Map<String, Number> vars = new HashMap<String, Number>();
-        xmlstarter.fileFromXpaths(d, xpaths, vars);
+        Map<String, Number> vars = new HashMap<>(collectKeys.size());
+        for (Map.Entry<XPathExpression, Number> e: xmlstarter.fileFromXpaths(d, collectKeys.keySet()).entrySet()) {
+            vars.put(collectKeys.get(e.getKey()), e.getValue());
+        }
+        log(Level.TRACE, "Values found: %s", vars);
         log(Level.TRACE, "%s", vars);
         vars = dom2Map(d, vars);
         log(Level.TRACE, "%s", vars);
