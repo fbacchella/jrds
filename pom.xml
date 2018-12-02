@@ -192,12 +192,6 @@
     <build>
         <resources>
             <resource>
-                <directory>${project.basedir}</directory>
-                <includes>
-                    <include>desc/**</include>
-                </includes>
-            </resource>
-            <resource>
                 <directory>${project.basedir}/src/ressources</directory>
                 <includes>
                     <include>**</include>
@@ -244,6 +238,31 @@
                 </executions>
             </plugin>
             <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <!-- here the phase you need -->
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/desc</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/desc</directory>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.2</version>
@@ -264,6 +283,10 @@
                         <property>
                             <name>jrds.testloglevel</name>
                             <value>error</value>
+                        </property>
+                        <property>
+                            <name>jrds.snmpdirs</name>
+                            <value>/usr/share/snmp/mibs</value>
                         </property>
                     </systemProperties>
                 </configuration>
@@ -429,8 +452,7 @@
         </plugins>
         <pluginManagement>
             <plugins>
-                <!--This plugin's configuration is used to store Eclipse 
-                    m2e settings only. It has no influence on the Maven build itself. -->
+                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>

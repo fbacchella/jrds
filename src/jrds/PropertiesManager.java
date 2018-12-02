@@ -10,8 +10,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.xml.DOMConfigurator;
 
-import fr.jrds.snmpcodec.OIDFormatter;
+import jrds.snmp.MainStarter;
 import jrds.starter.Timer;
 import jrds.store.RrdDbStoreFactory;
 import jrds.store.StoreFactory;
@@ -54,10 +52,6 @@ public class PropertiesManager extends Properties {
         public int timeout;
         public int numCollectors;
         public int slowCollectTime;
-    }
-
-    static {
-        OIDFormatter.register();
     }
 
     private final FileFilter filter = new FileFilter() {
@@ -541,18 +535,14 @@ public class PropertiesManager extends Properties {
         // SNMP MIB configuration
         //
 
-        String propertiesmibDirs = getProperty("mibdirs", ";");
+        String propertiesmibDirs = getProperty("mibdirs", "");
         if(!propertiesmibDirs.trim().isEmpty()) {
-            snmpMibDirs = new ArrayList<>();
-            for(String i: propertiesmibDirs.split(";")) {
-                i = i.trim();
-                snmpMibDirs.add(Paths.get(i));
+            try {
+                MainStarter.configure(propertiesmibDirs);
+            } catch (NoClassDefFoundError e) {
+                logger.error("mibdirs configured, but SNMP code not availabe");
             }
-            snmpMibDirs = Collections.unmodifiableList(snmpMibDirs);
-        } else {
-            snmpMibDirs = Collections.emptyList();
         }
-
     }
 
     public File configdir;
@@ -592,7 +582,6 @@ public class PropertiesManager extends Properties {
     public static final String ADMINTAB = "adminTab";
     public Map<String, StoreFactory> stores = new HashMap<String, StoreFactory>();
     public StoreFactory defaultStore;
-    public List<Path>snmpMibDirs = Collections.emptyList();
 
     public List<String> tabsList = Arrays.asList(FILTERTAB, CUSTOMGRAPHTAB, "@", SUMSTAB, SERVICESTAB, VIEWSTAB, HOSTSTAB, TAGSTAB, ADMINTAB);
 }

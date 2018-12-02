@@ -73,6 +73,7 @@ public class TestLoadConfiguration {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
+        Tools.configureSnmp();
         Tools.prepareXml(false);
         Tools.setLevel(logger, Level.TRACE, "jrds", "jrds.configuration", "jrds.Probe.DummyProbe", "jrds.snmp");
         Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);

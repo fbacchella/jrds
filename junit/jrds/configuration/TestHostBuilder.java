@@ -42,6 +42,7 @@ public class TestHostBuilder {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
+        Tools.configureSnmp();
         Tools.setLevel(logger, Level.TRACE, "jrds.RdsHost", "jrds.starter", "jrds.Starter", "jrds.configuration.HostBuilder");
         Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
 

@@ -10,10 +10,6 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.configuration.ConfigObjectFactory;
-import jrds.factories.ProbeFactory;
-import jrds.starter.HostStarter;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -21,6 +17,10 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import jrds.configuration.ConfigObjectFactory;
+import jrds.factories.ProbeFactory;
+import jrds.starter.HostStarter;
 
 public class AllProbeCreationTest {
     static final private Logger logger = Logger.getLogger(AllProbeCreationTest.class);
@@ -31,6 +31,7 @@ public class AllProbeCreationTest {
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
+        Tools.configureSnmp();
         Tools.setLevel(logger, Level.TRACE, "jrds.Util");
     }
 

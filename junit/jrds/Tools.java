@@ -24,6 +24,7 @@ import javax.xml.xpath.XPathFactory;
 import jrds.PropertiesManager.TimerInfo;
 import jrds.factories.xml.EntityResolver;
 import jrds.factories.xml.JrdsDocument;
+import jrds.snmp.MainStarter;
 import jrds.starter.Timer;
 
 import org.apache.log4j.Appender;
@@ -59,6 +60,11 @@ final public class Tools {
         JrdsLoggerConfiguration.jrdsAppender = new ConsoleAppender(new org.apache.log4j.PatternLayout(JrdsLoggerConfiguration.DEFAULTLAYOUT), ConsoleAppender.SYSTEM_OUT);
         JrdsLoggerConfiguration.jrdsAppender.setName(JrdsLoggerConfiguration.APPENDERNAME);
         JrdsLoggerConfiguration.initLog4J();
+    }
+
+    static public void configureSnmp() {
+        String snmpdirs = System.getProperties().getProperty("jrds.snmpdirs", "/usr/share/snmp/mibs");
+        MainStarter.configure(snmpdirs);
     }
 
     static public void prepareXml() throws ParserConfigurationException {

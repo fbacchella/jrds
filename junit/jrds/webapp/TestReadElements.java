@@ -7,9 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import jrds.PropertiesManager;
-import jrds.Tools;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpTester.Response;
@@ -22,8 +19,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import fr.jrds.snmpcodec.OIDFormatter;
-import fr.jrds.snmpcodec.parsing.MibLoader;
+import jrds.PropertiesManager;
+import jrds.Tools;
 
 public class TestReadElements {
     static final private Logger logger = Logger.getLogger(TestReadElements.class);
@@ -42,14 +39,11 @@ public class TestReadElements {
 
     @BeforeClass
     static public void configure() throws Exception {
-        MibLoader loader = new MibLoader();
-        loader.load(Paths.get("/usr/share/snmp/mibs"));
-        OIDFormatter.register(loader.buildTree());
-
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, TestReadElements.class.getName(), "jrds.webapp");
+        Tools.configureSnmp();
     }
 
     @Before
