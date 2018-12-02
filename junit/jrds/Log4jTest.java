@@ -59,7 +59,7 @@ public class Log4jTest {
         Logger l = Logger.getLogger("jrds");
         l.error("A message");
         l.debug("A debug message");
-        Assert.assertEquals(1, logs.size());
+        Assert.assertEquals(2, logs.size());
     }
 
 }
