@@ -102,7 +102,6 @@ public class ProbeDesc<KeyType> implements Cloneable {
         dsMap = new LinkedHashMap<String, DsDesc>();
     }
 
-    // Differets way to add a munins probe
     /**
      * A datastore that is stored but not collected
      * 
@@ -133,7 +132,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
             this.keylow = keylow;
         }
     }
-
+    
     /**
      * @return the highlowcollectmap
      */
@@ -317,7 +316,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
      * @param graph a graph name to add.
      */
     public void addGraph(String graph) {
-        this.graphesList.add(graph);
+        graphesList.add(graph);
     }
 
     public Class<? extends Probe<KeyType, ?>> getProbeClass() {

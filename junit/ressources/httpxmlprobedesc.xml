@@ -2,39 +2,38 @@
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN"
 	"urn:jrds:probedesc">
 <probedesc>
-	<name>name</name>
-	<probeName>probename</probeName>
-	<probeClass>jrds.probe.HttpXml</probeClass>
-	<specific name="upTimePath">/element/@uptime</specific>
-	<uptimefactor>0.5</uptimefactor>
-	<defaultargs>
+    <name>name</name>
+    <probeName>probename</probeName>
+    <probeClass>jrds.probe.HttpXml</probeClass>
+    <specific name="upTimePath">/element/@uptime</specific>
+    <uptimefactor>0.5</uptimefactor>
+    <defaultargs>
         <attr name="port">80</attr>
-	</defaultargs>
-	<ds>
-		<dsName>a</dsName>
-		<dsType>counter</dsType>
-		<collect>/jrdsstats/stat[@key='%1$s']/@value</collect>
-	</ds>
-	<ds>
-		<dsName>b</dsName>
-		<dsType>counter</dsType>
-		<collect>/jrdsstats/stat[@key='b']/@value</collect>
-	</ds>
-	<ds>
-		<dsName>c</dsName>
-		<dsType>counter</dsType>
-		
-	</ds>
-	<ds>
-		<dsName>d</dsName>
-		<dsType>counter</dsType>
-		<collect optional="false">%2$s</collect>
-	</ds>
+    </defaultargs>
+    <ds>
+        <dsName>a</dsName>
+        <dsType>counter</dsType>
+        <collect>/jrdsstats/stat[@key='%1$s']/@value</collect>
+    </ds>
+    <ds>
+        <dsName>b</dsName>
+        <dsType>counter</dsType>
+        <collect>/jrdsstats/stat[@key='b']/@value</collect>
+    </ds>
+    <ds>
+        <dsName>c</dsName>
+        <dsType>counter</dsType>
+    </ds>
+    <ds>
+        <dsName>d</dsName>
+        <dsType>counter</dsType>
+        <collect optional="false">%2$s</collect>
+    </ds>
     <ds>
         <dsName>e</dsName>
         <dsType>counter</dsType>
         <collect optional="true">${label}</collect>
     </ds>
-	<graphs>
-	</graphs>
+    <graphs>
+    </graphs>
 </probedesc>

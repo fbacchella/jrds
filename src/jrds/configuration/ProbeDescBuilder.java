@@ -115,7 +115,6 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Ob
                 pd.addDefaultBean(beanName, beanValue, finalBean);
             }
         }
-
         for(Map<String, Object> dsMap: doDsList(pd.getName(), root)) {
             pd.add(dsMap);
         }

@@ -38,11 +38,8 @@ public class TestBeans {
     @Test
     public void enumerateProbe() throws IOException {
         PropertiesManager pm = Tools.makePm(testFolder, "autocreate=false", "strictparsing=true");
-        // = new PropertiesManager();
         pm.update();
         pm.libspath.clear();
-        // pm.strictparsing = true;
-        // pm.rrdbackend = "FILE";
         File descpath = new File("desc");
         if(descpath.exists())
             pm.libspath.add(descpath.toURI());
