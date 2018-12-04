@@ -10,6 +10,7 @@ import java.util.Set;
 
 import jrds.ProbeConnected;
 import jrds.factories.ProbeMeta;
+import jrds.snmp.SnmpCollectResolver;
 import jrds.snmp.SnmpConnection;
 import jrds.snmp.SnmpDiscoverAgent;
 import jrds.snmp.SnmpRequester;
@@ -28,7 +29,8 @@ import org.snmp4j.smi.OID;
  */
 @ProbeMeta(
         timerStarter=jrds.snmp.MainStarter.class,
-        discoverAgent=SnmpDiscoverAgent.class
+        discoverAgent=SnmpDiscoverAgent.class,
+        collectResolver=SnmpCollectResolver.class
         )
 public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnection> {
     public final static String REQUESTERNAME = "requester";
