@@ -77,11 +77,6 @@ public class CheckJar extends CommandStarterImpl {
                     }
                     pc = pc.getSuperclass();
                 }
-                for(String ds: pd.getDs()) {
-                    if(ds.length() > 20) {
-                        System.out.println(String.format("DS name %s too long for probe description %s", ds, pd.getName()));
-                    }
-                }
                 Collection<String> graphs = pd.getGraphClasses();
                 if(graphs.size() == 0) {
                     System.out.println("no graphs for probe desc: " + pd.getName());

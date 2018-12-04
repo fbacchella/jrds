@@ -514,7 +514,7 @@
                     <links>
                         <link>https://docs.oracle.com/javaee/7/api/</link>
                         <link>http://www.snmp4j.org/doc/</link>
-                        <link>http://jrds.fr/jenkins/job/rrd4j/site/apidocs/</link>
+                        <link>https://rrd4j.github.io/rrd4j/apidocs/</link>
                         <link>http://junit.org/apidocs/</link>
                         <link>http://download.eclipse.org/jetty/stable-9/apidocs/</link>
                         <link>http://ws.apache.org/xmlrpc/apidocs/</link>
