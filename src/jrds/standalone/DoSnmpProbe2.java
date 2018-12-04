@@ -16,7 +16,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 
-import org.apache.log4j.Logger;
 import org.snmp4j.smi.OID;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -30,7 +29,7 @@ import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 
 public class DoSnmpProbe2 extends CommandStarterImpl {
-    static final private Logger logger = Logger.getLogger(DoSnmpProbe2.class);
+
     static final Pattern oidPattern = Pattern.compile("^(.\\d+)+$");
     static final Pattern namePattern = Pattern.compile("^(.+)\\s+OBJECT-TYPE$");
     static final Pattern syntaxPattern = Pattern.compile(".*SYNTAX\\s+([a-zA-Z0-9]+).*");

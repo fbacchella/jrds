@@ -31,6 +31,7 @@ import jrds.jmx.JrdsSocketConnection;
 import jrds.probe.JmxSocketFactory;
 import jrds.starter.SocketFactory;
 
+@SuppressWarnings("restriction")
 @ProbeBean({ "url", "protocol", "port", "path", "user", "password" })
 public class NativeJmxConnection extends AbstractJmxConnection {
     

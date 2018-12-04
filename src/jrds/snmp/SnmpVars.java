@@ -30,7 +30,6 @@ import org.snmp4j.smi.VariableBinding;
  *
  * @author Fabrice Bacchella
  */
-@SuppressWarnings("serial")
 public class SnmpVars extends HashMap<OID, Object> {
     static final private Logger logger = Logger.getLogger(SnmpVars.class);
 

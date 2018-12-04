@@ -14,6 +14,7 @@ import org.junit.Test;
 
 public class TestJrdsNode {
     static class Convert {
+        @SafeVarargs
         static <T> T[] convert(T... types) {
             return types;
         }

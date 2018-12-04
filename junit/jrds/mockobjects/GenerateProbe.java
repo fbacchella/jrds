@@ -95,8 +95,10 @@ public class GenerateProbe {
         }
         p.setPd(pd);
 
+        @SuppressWarnings("unlikely-arg-type")
         HostStarter hs = (HostStarter) args.get(HostStarter.class);
         if(hs == null) {
+            @SuppressWarnings("unlikely-arg-type")
             HostInfo hi = (HostInfo) args.get(HostInfo.class);
             if(hi == null) {
                 hi = new HostInfo("localhost");
