@@ -157,7 +157,7 @@ public class BootStrap {
             System.out.println("    " + commandName);
         }
         System.out.println("");
-        System.out.println("Lists of configuration propreties:");
+        System.out.println("Lists of configuration properties:");
         for(String propName: propertiesList) {
             System.out.println("    " + propName);
         }
