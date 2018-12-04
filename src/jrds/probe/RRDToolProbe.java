@@ -114,8 +114,7 @@ public class RRDToolProbe extends Probe<String, Double> {
      */
     @Override
     public Date getLastUpdate() {
-        try {
-            RRDatabase db = new RRDatabase(rrdpath);
+        try (RRDatabase db = new RRDatabase(rrdpath)){
             return db.getLastUpdate();
         } catch (IOException e) {
             log(Level.ERROR, "probe %s, read failed: %s", e.getMessage());

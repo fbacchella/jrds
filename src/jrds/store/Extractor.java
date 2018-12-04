@@ -1,9 +1,11 @@
 package jrds.store;
 
+import java.io.Closeable;
+
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.graph.RrdGraphDef;
 
-public interface Extractor {
+public interface Extractor extends Closeable {
 
     public abstract void release();
     public String[] getNames();
@@ -13,4 +15,5 @@ public interface Extractor {
     public int getColumnCount();
     public void addSource(String name, String dsName);
     public String getPath();
+    public default void close() { release(); }; 
 }

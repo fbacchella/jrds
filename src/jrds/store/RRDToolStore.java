@@ -63,8 +63,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
      */
     @Override
     public Date getLastUpdate() {
-        try {
-            RRDatabase db = new RRDatabase(rrdpath);
+        try (RRDatabase db = new RRDatabase(rrdpath)) {
             return db.getLastUpdate();
         } catch (IOException e) {
             log(Level.ERROR, e, "invalid rrd file %s: %s", rrdpath, e.getMessage());
@@ -78,9 +77,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
 
     @Override
     public Map<String, Number> getLastValues() {
-        RRDatabase db;
-        try {
-            db = new RRDatabase(rrdpath);
+        try (RRDatabase db = new RRDatabase(rrdpath)) {
             Map<String, Number> values = new HashMap<String, Number>(db.getDataSourcesName().size());
             for(int i = db.getDataSourcesName().size() - 1; i >= 0; i--) {
                 DataSource source = db.getDataSource(i);

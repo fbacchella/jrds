@@ -31,8 +31,7 @@ public class RRDToolGraphNode extends GraphNode {
         PlottableMap pp = new PlottableMap() {
             @Override
             public void configure(long start, long end, long step) {
-                try {
-                    RRDatabase db = new RRDatabase(rrdpath);
+                try (RRDatabase db = new RRDatabase(rrdpath)){
                     DataChunk chunck = db.getData(ConsolidationFunctionType.AVERAGE, start, end, step);
                     for(String name: db.getDataSourcesName()) {
                         put(name, chunck.toPlottable(name));
