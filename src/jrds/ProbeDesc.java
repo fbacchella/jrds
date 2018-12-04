@@ -82,7 +82,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
             this.heartbeat = heartbeat;
             this.minValue = minValue;
             this.maxValue = maxValue;
-            this.collectKey = ProbeDesc.this.collectResolver.resolve(collectKey);
+            this.collectKey = collectKey != null ? ProbeDesc.this.collectResolver.resolve(collectKey) : null;
         }
     }
 
