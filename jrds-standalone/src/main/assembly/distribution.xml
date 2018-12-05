@@ -7,7 +7,7 @@
     <fileSets>
         <fileSet>
             <directory>${project.build.directory}</directory>
-            <outputDirectory>WEB-INF/lib</outputDirectory>
+            <outputDirectory></outputDirectory>
             <includes>
                 <include>jrds-standalone-${project.version}-boot.jar</include>
             </includes>
