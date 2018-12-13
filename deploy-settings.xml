@@ -4,7 +4,7 @@
     http://maven.apache.org/xsd/settings-1.0.0.xsd">
     <servers>
         <server>
-            <id>jfrog-snapshots</id>
+            <id>sonatype-nexus-snapshots</id>
             <username>${env.CI_DEPLOY_USERNAME}</username>
             <password>${env.CI_DEPLOY_PASSWORD}</password>
         </server>
