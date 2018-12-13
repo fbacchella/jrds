@@ -33,16 +33,6 @@
             </releases>
             <snapshots />
         </repository>
-        <repository>
-            <id>jrds</id>
-            <name>jrds Java Packages</name>
-            <url>http://jrds.fr/jenkins/plugin/repository/everything</url>
-            <layout>default</layout>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots />
-        </repository>
     </repositories>
 
     <build>
