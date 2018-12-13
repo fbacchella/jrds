@@ -10,6 +10,12 @@
     <name>JRDS</name>
     <url>http://jrds.fr</url>
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <modules>
         <module>jrds-core</module>
         <module>jrds-webapp</module>
