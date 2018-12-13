@@ -60,7 +60,7 @@ public class IpmiConnection extends Connection<Handle> {
 
             CipherSuite cs;
             // Get cipher suites supported by the remote host
-            List<CipherSuite> suites = connector.getAllCipherSuites(handle);
+            List<CipherSuite> suites = connector.getAvailableCipherSuites(handle);
             if(suites.size() > 3) {
                 cs = suites.get(3);
             } else if(suites.size() > 2) {
