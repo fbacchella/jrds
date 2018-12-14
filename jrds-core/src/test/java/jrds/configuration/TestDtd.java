@@ -1,11 +1,6 @@
 package jrds.configuration;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.net.URI;
-
-import jrds.PropertiesManager;
-import jrds.Tools;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -13,6 +8,9 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import jrds.PropertiesManager;
+import jrds.Tools;
 
 public class TestDtd {
     static final private Logger logger = Logger.getLogger(TestDtd.class);
@@ -72,9 +70,7 @@ public class TestDtd {
 
     @Test
     public void checkListener() throws Exception {
-        try (InputStream is = new FileInputStream("src/test/resources/configfull/listener.xml")) {
-            Tools.parseRessource(is);
-        }
+        Tools.parseRessource("listener.xml");
     }
 
 }

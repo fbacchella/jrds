@@ -20,16 +20,6 @@ import org.junit.Test;
 public class TestArgFactory {
     static final private Logger logger = Logger.getLogger(ArgFactory.class);
 
-    static final private Class<?> OIDCLASS;
-
-    static {
-        try {
-            OIDCLASS = Class.forName("org.snmp4j.smi.OID");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
@@ -76,9 +66,6 @@ public class TestArgFactory {
 
         c = ArgFactory.resolvClass("File");
         Assert.assertEquals("can't resolve type File", c, File.class);
-
-        c = ArgFactory.resolvClass("OID");
-        Assert.assertEquals("can't resolve type File", c, OIDCLASS);
     }
 
     @Test
@@ -96,10 +83,6 @@ public class TestArgFactory {
 
         o = ArgFactory.ConstructFromString(File.class, "/");
         Assert.assertEquals("can't build type File", o.getClass(), File.class);
-
-        o = ArgFactory.ConstructFromString(OIDCLASS, "1.2");
-        Assert.assertEquals("can't build type File", o.getClass(), OIDCLASS);
-
     }
 
 }

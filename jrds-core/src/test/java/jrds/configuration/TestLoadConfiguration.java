@@ -1,15 +1,21 @@
 package jrds.configuration;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import jrds.Filter;
 import jrds.HostInfo;
@@ -21,16 +27,7 @@ import jrds.Tab;
 import jrds.Tools;
 import jrds.factories.ProbeFactory;
 import jrds.factories.xml.JrdsDocument;
-import jrds.factories.xml.JrdsElement;
 import jrds.mockobjects.MokeProbeFactory;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 public class TestLoadConfiguration {
     static final private Logger logger = Logger.getLogger(TestLoadConfiguration.class);
@@ -45,7 +42,7 @@ public class TestLoadConfiguration {
                     "<arg type=\"String\" value=\"/\" />" +
                     "</probe>";
 
-    static final private String goodMacroXml =
+    static final String goodMacroXml =
             "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
                     "<!DOCTYPE macrodef PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
                     "<macrodef name=\"macrodef\">" +
@@ -57,7 +54,7 @@ public class TestLoadConfiguration {
                     "</probe>" +
                     "</macrodef>";
 
-    static final private String goodHostXml = 
+    static final String goodHostXml = 
             "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
                     "<!DOCTYPE host PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
                     "<host name=\"myhost\">" +
@@ -73,21 +70,10 @@ public class TestLoadConfiguration {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.configureSnmp();
+        //Tools.configureSnmp();
         Tools.prepareXml(false);
-        Tools.setLevel(logger, Level.TRACE, "jrds", "jrds.configuration", "jrds.Probe.DummyProbe", "jrds.snmp");
+        Tools.setLevel(logger, Level.TRACE, "jrds", "jrds.configuration", "jrds.Probe.DummyProbe");
         Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
-    }
-
-    private ConfigObjectFactory prepare(PropertiesManager pm) throws IOException {
-        File descpath = new File(System.getProperty("user.dir"), "desc");
-        if(descpath.exists())
-            pm.libspath.add(descpath.toURI());
-
-        ConfigObjectFactory conf = new ConfigObjectFactory(pm);
-        conf.setGraphDescMap();
-        conf.setProbeDescMap();
-        return conf;
     }
 
     @Test
@@ -183,67 +169,6 @@ public class TestLoadConfiguration {
         }
         Assert.assertTrue("MacroProbe1 not found", probesName.contains("myhost/MacroProbe1"));
         Assert.assertTrue("MacroProbe2 not found", probesName.contains("myhost/MacroProbe2"));
-    }
-
-    @Test
-    public void testRecursiveMacro() throws Exception {
-        JrdsDocument d = Tools.parseString(goodMacroXml);
-        String tagname = "mytag";
-
-        JrdsElement root = d.getRootElement();
-        root.addElement("tag").addTextNode(tagname);
-        root.addElement("snmp", "community=public", "version=2");
-
-        MacroBuilder b = new MacroBuilder();
-
-        Macro m = b.makeMacro(d);
-
-        Map<String, Macro> macroMap = new HashMap<String, Macro>();
-        macroMap.put(m.getName(), m);
-
-        JrdsDocument hostdoc = Tools.parseString(goodHostXml);
-        hostdoc.getRootElement().addElement("macro", "name=macrodef");
-        PropertiesManager pm = Tools.makePm(testFolder);
-        HostBuilder hb = new HostBuilder();
-        hb.setPm(pm);
-        hb.setMacros(macroMap);
-        hb.setProbeFactory(new MokeProbeFactory());
-
-        HostInfo host = hb.makeHost(hostdoc);
-        logger.trace("dns name: " + host.getName());
-        Assert.assertTrue("tag not found", host.getTags().contains(tagname));
-        // Assert.assertEquals("SNMP starter not found",
-        // "snmp:udp://myhost:161", host.find(SnmpConnection.class).toString());
-    }
-
-    @Test
-    public void testHost() throws Exception {
-        PropertiesManager pm = Tools.makePm(testFolder);
-        pm.libspath.add(getClass().getClassLoader().getResource("desc").toURI());
-        ConfigObjectFactory conf = prepare(pm);
-        Map<String, JrdsDocument> hostDescMap = new HashMap<String, JrdsDocument>();
-        conf.getLoader().setRepository(ConfigType.HOSTS, hostDescMap);
-
-        JrdsDocument hostNode = Tools.parseRessource("goodhost1.xml");
-        String tagname = "mytag";
-        JrdsElement je = hostNode.getRootElement();
-        je.addElement("tag").addTextNode(tagname);
-        je.addElement("snmp", "community=public", "version=2");
-        hostDescMap.put("name", hostNode);
-        Map<String, HostInfo> hostMap = conf.setHostMap(Tools.getSimpleTimerMap());
-
-        logger.trace(hostMap);
-        HostInfo h = hostMap.get("myhost");
-        Assert.assertNotNull(h);
-        Assert.assertEquals("myhost", h.getName());
-        Collection<Probe<?, ?>> probes = new HashSet<Probe<?, ?>>();
-        for(Probe<?, ?> p: h.getProbes())
-            probes.add(p);
-        Assert.assertEquals(7, h.getNumProbes());
-        Assert.assertTrue("tag not found", h.getTags().contains(tagname));
-        // Assert.assertEquals("SNMP starter not found",
-        // "snmp:udp://myhost:161", h.find(SnmpConnection.class).toString());
-        // logger.trace(h.find(SnmpConnection.class));
     }
 
     @Test

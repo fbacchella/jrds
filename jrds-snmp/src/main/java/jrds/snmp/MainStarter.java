@@ -4,9 +4,6 @@
 package jrds.snmp;
 
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.log4j.Level;
 import org.snmp4j.SNMP4JSettings;
@@ -30,18 +27,6 @@ public class MainStarter extends Starter {
     }
 
     static OIDFormatter formatter;
-
-    public static void configure(String paths) {
-        List<String> snmpMibDirs = new ArrayList<>();
-        for(String i: paths.split(";")) {
-            i = i.trim();
-            snmpMibDirs.add(Paths.get(i).toString());
-        }
-        if (snmpMibDirs.size() > 0) {
-            String[] paths_list = snmpMibDirs.toArray(new String[0]);
-            OIDFormatter.register(paths_list);
-        }
-    }
 
     public volatile Snmp snmp = null;
 

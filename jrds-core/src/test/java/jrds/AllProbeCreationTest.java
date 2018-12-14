@@ -31,7 +31,6 @@ public class AllProbeCreationTest {
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
-        Tools.configureSnmp();
         Tools.setLevel(logger, Level.TRACE, "jrds.Util");
     }
 

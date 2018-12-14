@@ -37,7 +37,7 @@ public class JrdsLoggerConfiguration {
     static public final String DEFAULTLAYOUT = "[%d] %5p %c : %m%n";
     static public Appender jrdsAppender = null;
     // The managed loggers list
-    static public final Set<String> rootLoggers = new HashSet<String>(Arrays.asList(new String[] { "jrds", "org.mortbay.log", "org.apache", "org.eclipse.jetty" }));
+    static public final Set<String> rootLoggers = new HashSet<String>(Arrays.asList(new String[] {"jrds", "org.mortbay.log", "org.apache", "org.eclipse.jetty" }));
     // Used to check if jrds "own" the log configuration
     // null = we don't know yet
     static private Boolean logOwner = null;

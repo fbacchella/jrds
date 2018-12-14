@@ -9,16 +9,6 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 
-import jrds.HostInfo;
-import jrds.Macro;
-import jrds.Probe;
-import jrds.PropertiesManager;
-import jrds.Tools;
-import jrds.factories.xml.JrdsDocument;
-import jrds.mockobjects.MokeProbe;
-import jrds.mockobjects.MokeProbeFactory;
-import jrds.starter.ConnectionInfo;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -28,27 +18,36 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.w3c.dom.DocumentFragment;
 
+import jrds.HostInfo;
+import jrds.Macro;
+import jrds.Probe;
+import jrds.PropertiesManager;
+import jrds.Tools;
+import jrds.factories.xml.JrdsDocument;
+import jrds.mockobjects.MokeProbe;
+import jrds.mockobjects.MokeProbeFactory;
+
 public class TestMacro {
     static final private Logger logger = Logger.getLogger(TestMacro.class);
 
-    static final private String goodMacroXml =
-            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
-                    "<!DOCTYPE macrodef PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
-                    "<macrodef name=\"macrodef\">" +
-                    "<probe type = \"MacroProbe1\">" +
-                    "<arg type=\"String\" value=\"${a}\" />" +
-                    "</probe>" + 
-                    "<probe type = \"MacroProbe2\">" +
-                    "<arg type=\"String\" value=\"/\" />" +
-                    "</probe>" +
-                    "</macrodef>";
+    protected static final String goodMacroXml =
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+                                    "<!DOCTYPE macrodef PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
+                                    "<macrodef name=\"macrodef\">" +
+                                    "<probe type = \"MacroProbe1\">" +
+                                    "<arg type=\"String\" value=\"${a}\" />" +
+                                    "</probe>" + 
+                                    "<probe type = \"MacroProbe2\">" +
+                                    "<arg type=\"String\" value=\"/\" />" +
+                                    "</probe>" +
+                                    "</macrodef>";
 
-    static final private String goodHostXml = 
-            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
-                    "<!DOCTYPE host PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
-                    "<host name=\"myhost\">" +
-                    "<macro name=\"macrodef\" />" +
-                    "</host>";
+    protected static final String goodHostXml = 
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
+                                    "<!DOCTYPE host PUBLIC \"-//jrds//DTD Host//EN\" \"urn:jrds:host\">" +
+                                    "<host name=\"myhost\">" +
+                                    "<macro name=\"macrodef\" />" +
+                                    "</host>";
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -62,7 +61,7 @@ public class TestMacro {
         Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
     }
 
-    static private Macro doMacro(JrdsDocument d, String name) {
+    protected static Macro doMacro(JrdsDocument d, String name) {
         DocumentFragment df = d.createDocumentFragment();
         df.appendChild(d.removeChild(d.getDocumentElement()));
 
@@ -72,7 +71,7 @@ public class TestMacro {
         return m;
     }
 
-    private HostBuilder getBuilder(Macro... macros) throws IOException {
+    HostBuilder getBuilder(Macro... macros) throws IOException {
         HostBuilder hb = new HostBuilder();
         hb.setPm(Tools.makePm(testFolder));
         hb.setTimers(Tools.getSimpleTimerMap());
@@ -117,29 +116,6 @@ public class TestMacro {
         logger.trace(probesName);
         Assert.assertTrue("MacroProbe1 not found", probesName.contains("myhost/MacroProbe1"));
         Assert.assertTrue("MacroProbe2 not found", probesName.contains("myhost/MacroProbe2"));
-    }
-
-    @Test
-    public void testMacroStarter() throws Exception {
-        JrdsDocument d = Tools.parseString(goodMacroXml);
-        d.getRootElement().addElement("snmp", "community=public", "version=2");
-
-        Macro m = doMacro(d, "macrodef");
-
-        HostBuilder hb = getBuilder(m);
-
-        JrdsDocument hostdoc = Tools.parseString(goodHostXml);
-        HostInfo host = hb.makeHost(hostdoc);
-
-        ConnectionInfo found = null;
-        for(ConnectionInfo ci: host.getConnections()) {
-            if("jrds.snmp.SnmpConnection".equals(ci.getName())) {
-                found = ci;
-                break;
-            }
-        }
-        Assert.assertNotNull("SNMP starter not found", found);
-        Assert.assertEquals("Starter not found", "jrds.snmp.SnmpConnection", found.getName());
     }
 
     @Test

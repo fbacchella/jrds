@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -37,7 +40,6 @@ import org.xml.sax.SAXParseException;
 import jrds.PropertiesManager.TimerInfo;
 import jrds.factories.xml.EntityResolver;
 import jrds.factories.xml.JrdsDocument;
-import jrds.snmp.MainStarter;
 import jrds.starter.Timer;
 
 final public class Tools {
@@ -50,7 +52,7 @@ final public class Tools {
         LogManager.resetConfiguration();
         // resetConfiguration is not enough
         @SuppressWarnings("unchecked")
-        ArrayList<Logger> loggers = (ArrayList<Logger>) Collections.list(LogManager.getCurrentLoggers());
+        List<Logger> loggers = (List<Logger>) Collections.list(LogManager.getCurrentLoggers());
         for(Logger l: loggers) {
             l.removeAllAppenders();
             l.setLevel(Level.OFF);
@@ -58,11 +60,6 @@ final public class Tools {
         JrdsLoggerConfiguration.jrdsAppender = new ConsoleAppender(new org.apache.log4j.PatternLayout(JrdsLoggerConfiguration.DEFAULTLAYOUT), ConsoleAppender.SYSTEM_OUT);
         JrdsLoggerConfiguration.jrdsAppender.setName(JrdsLoggerConfiguration.APPENDERNAME);
         JrdsLoggerConfiguration.initLog4J();
-    }
-
-    static public void configureSnmp() {
-        String snmpdirs = System.getProperties().getProperty("jrds.snmpdirs", "/usr/share/snmp/mibs");
-        MainStarter.configure(snmpdirs);
     }
 
     static public void prepareXml() throws ParserConfigurationException {
@@ -95,8 +92,8 @@ final public class Tools {
 
     static public JrdsDocument parseRessource(String name) throws Exception {
         InputStream is = Tools.class.getClassLoader().getResourceAsStream(name);
-        return parseRessource(is);
-    }
+            return parseRessource(is);
+        }
 
     static public JrdsDocument parseRessource(InputStream is) throws Exception {
         return new JrdsDocument(Tools.dbuilder.parse(is));
@@ -104,8 +101,8 @@ final public class Tools {
 
     static public JrdsDocument parseString(String s) throws Exception {
         InputStream is = new ByteArrayInputStream(s.getBytes());
-        return Tools.parseRessource(is);
-    }
+            return Tools.parseRessource(is);
+        }
 
     static public void setLevel(Logger logger, Level level, String... allLoggers) {
         Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDERNAME);
@@ -241,5 +238,15 @@ final public class Tools {
         ti.step = 300;
         ti.timeout = 10;
         return new Timer("TimerTester", ti);
+    }
+    
+    static public void findDescs(PropertiesManager pm) {
+        try {
+            for(URL u: jrds.Util.iterate(pm.extensionClassLoader.getResources("desc"))) {
+                pm.libspath.add(u.toURI());
+            }
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

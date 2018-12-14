@@ -19,6 +19,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import fr.jrds.snmpcodec.OIDFormatter;
 import jrds.PropertiesManager;
 import jrds.Tools;
 
@@ -43,13 +44,13 @@ public class TestReadElements {
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
         Tools.setLevel(logger, Level.TRACE, TestReadElements.class.getName(), "jrds.webapp");
-        Tools.configureSnmp();
+        //Tools.configureSnmp();
+        OIDFormatter.register("/usr/share/snmp/mibs");
     }
 
     @Before
     public void launchServer() throws Exception {
         URL configDirURL = Paths.get("src/test/resources/configfull/").toUri().toURL();
-        logger.debug(configDirURL.getFile());
 
         Properties prop = new Properties();
         prop.setProperty("strictparsing", "false");

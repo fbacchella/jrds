@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 
 import jrds.Tools;
+import jrds.probe.jdbc.JdbcConnection;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -23,7 +24,7 @@ public class TestConnectionInfo {
 
     @Test
     public void testRegister() throws InvocationTargetException {
-        ConnectionInfo ci = new ConnectionInfo(jrds.snmp.SnmpConnection.class, "jrds.snmp.SnmpConnection", Collections.emptyList(), Collections.singletonMap("port", "162"));
+        ConnectionInfo ci = new ConnectionInfo(JdbcConnection.class, "jrds.probe.jdbc.JdbcConnection", Collections.emptyList(), Collections.singletonMap("user", "admin"));
         StarterNode sn = new StarterNode() {};
         ci.register(sn);
     }

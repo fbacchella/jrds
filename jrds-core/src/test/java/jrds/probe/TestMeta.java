@@ -14,11 +14,11 @@ import org.junit.Test;
 import jrds.Probe;
 import jrds.Tools;
 import jrds.factories.ProbeMeta;
-import jrds.snmp.SnmpDiscoverAgent;
+import jrds.probe.munin.MuninDiscoverAgent;
 import jrds.webapp.DiscoverAgent;
 
 public class TestMeta {
-    @ProbeMeta(discoverAgent = SnmpDiscoverAgent.class)
+    @ProbeMeta(discoverAgent = MuninDiscoverAgent.class)
     public abstract class DummyProbe1<A, B> extends Probe<A, B> {
 
     }

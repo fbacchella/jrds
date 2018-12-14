@@ -20,6 +20,7 @@
         <module>jrds-core</module>
         <module>jrds-webapp</module>
         <module>jrds-standalone</module>
+        <module>jrds-snmp</module>
     </modules>
 
     <repositories>
@@ -86,5 +87,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jetty.version>9.2.26.v20180806</jetty.version>
         <maven.plugin.surefire.version>2.19.1</maven.plugin.surefire.version>
+        <servlet-api.version>3.1.0</servlet-api.version>
+        <junit.version>4.12</junit.version>
     </properties>
 </project>

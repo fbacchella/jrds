@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE listener PUBLIC "-//jrds//DTD Listener//EN"
+                           "urn:jrds:listner">
+<listener class="jrds.starter.ListnerTest.PassiveListener">
+    <attr name="dummy">dummy</attr>
+</listener>

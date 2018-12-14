@@ -34,7 +34,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class TestHostBuilder {
-    static final private Logger logger = Logger.getLogger(TestProbeDescBuilder.class);
+
+    static final private Logger logger = Logger.getLogger(TestHostBuilder.class);
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -42,7 +43,6 @@ public class TestHostBuilder {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.configureSnmp();
         Tools.setLevel(logger, Level.TRACE, "jrds.RdsHost", "jrds.starter", "jrds.Starter", "jrds.configuration.HostBuilder");
         Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
 
@@ -116,47 +116,6 @@ public class TestHostBuilder {
             JMXConnection cnx = sn.find(JMXConnection.class);
             Assert.assertEquals("Attributed not setted", new Integer(8999), cnx.getPort());
         }
-    }
-
-    @Test
-    public void testFullHost() throws Exception {
-        PropertiesManager pm = Tools.makePm(testFolder);
-        pm.libspath.add(getClass().getClassLoader().getResource("desc").toURI());
-
-        ConfigObjectFactory conf = new ConfigObjectFactory(pm);
-
-        Map<String, GraphDesc> graphDescMap = conf.setGraphDescMap();
-        Map<String, ProbeDesc<? extends Object>> probeDescMap = conf.setProbeDescMap();
-        ProbeFactory pf = new ProbeFactory(probeDescMap, graphDescMap);
-
-        HostBuilder hb = new HostBuilder();
-        hb.setPm(pm);
-        hb.setClassLoader(this.getClass().getClassLoader());
-        hb.setMacros(new HashMap<String, Macro>(0));
-        hb.setProbeFactory(pf);
-        Map<String, Timer> timerMap = Tools.getSimpleTimerMap();
-        timerMap.put("another", timerMap.get(Timer.DEFAULTNAME));
-        hb.setTimers(timerMap);
-
-        JrdsDocument fullhost = Tools.parseRessource("fullhost.xml");
-
-        HostInfo hi = hb.build(fullhost);
-
-        Assert.assertEquals("fqdn.jrds.fr", hi.getDnsName());
-
-        Map<String, Probe<?, ?>> probes = new HashMap<String, Probe<?, ?>>(hi.getNumProbes());
-
-        for(Probe<?, ?> p: hi.getProbes()) {
-            String name = p.getQualifiedName();
-            probes.put(name, p);
-        }
-        Assert.assertTrue(probes.containsKey("myhost/tcp_snmp"));
-        Assert.assertTrue(probes.containsKey("myhost/fs-_"));
-        Assert.assertTrue(probes.containsKey("myhost/fs-_data"));
-        Assert.assertTrue(probes.containsKey("myhost/ifx-eth0"));
-        Assert.assertTrue(probes.containsKey("myhost/ifx-eth1"));
-        Assert.assertTrue(probes.containsKey("myhost/ifx-eth2"));
-        Assert.assertTrue(probes.containsKey("myhost/ifx-eth3"));
     }
 
     @Test

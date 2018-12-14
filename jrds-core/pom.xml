@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jrds-core</artifactId>
@@ -10,7 +10,6 @@
     <properties>
         <jrds.testloglevel>ERROR</jrds.testloglevel>
         <slf4j.version>1.7.25</slf4j.version>
-        <snmp4j.version>2.6.3</snmp4j.version>
     </properties>
 
     <dependencies>
@@ -23,22 +22,6 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
-        </dependency>
-        <dependency>
-            <groupId>org.snmp4j</groupId>
-            <artifactId>snmp4j</artifactId>
-            <version>${snmp4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.snmp4j</groupId>
-            <artifactId>snmp4j-agent</artifactId>
-            <version>${snmp4j.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>fr.jrds</groupId>
-            <artifactId>snmpcodec</artifactId>
-            <version>0.0.7-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
@@ -78,7 +61,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -91,12 +74,6 @@
             <artifactId>opendmk_jmxremote_optional_jar</artifactId>
             <version>1.0-b01-ea</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-http</artifactId>
-            <version>${jetty.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -130,12 +107,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
             <version>${jetty.version}</version>
@@ -146,6 +117,12 @@
             <artifactId>jetty-servlet</artifactId>
             <version>${jetty.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${servlet-api.version}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
     <build>
@@ -181,10 +158,6 @@
                             <name>jrds.testloglevel</name>
                             <value>error</value>
                         </property>
-                        <property>
-                            <name>jrds.snmpdirs</name>
-                            <value>/usr/share/snmp/mibs</value>
-                        </property>
                     </systemProperties>
                 </configuration>
             </plugin>
@@ -197,23 +170,9 @@
                         <id>default-jar</id>
                         <configuration>
                             <excludes>
-                                <exclude>**/snmp</exclude>
-                                <exclude>**/snmp/**/*</exclude>
                                 <exclude>**/webapp</exclude>
                                 <exclude>**/webapp/**/*</exclude>
                             </excludes>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>snmpprobes</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <classifier>snmpprobes</classifier>
-                            <includes>
-                                <include>**/snmp/*</include>
-                            </includes>
                         </configuration>
                     </execution>
                     <execution>
@@ -227,6 +186,11 @@
                                 <include>**/webapp/*</include>
                             </includes>
                         </configuration>
+                    </execution>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
