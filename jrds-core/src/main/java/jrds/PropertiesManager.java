@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.xml.DOMConfigurator;
 
-import jrds.snmp.MainStarter;
+import jrds.configuration.ModuleConfigurator;
 import jrds.starter.Timer;
 import jrds.store.RrdDbStoreFactory;
 import jrds.store.StoreFactory;
@@ -525,18 +526,13 @@ public class PropertiesManager extends Properties {
         }
         archivesSet = getProperty("archivesset", ArchivesSet.DEFAULT.getName());
 
-        //
-        // SNMP MIB configuration
-        //
-
-        String propertiesmibDirs = getProperty("mibdirs", "");
-        if(!propertiesmibDirs.trim().isEmpty()) {
-            try {
-                MainStarter.configure(propertiesmibDirs);
-            } catch (NoClassDefFoundError e) {
-                logger.error("mibdirs configured, but SNMP code not availabe");
+        ServiceLoader<ModuleConfigurator> sl = ServiceLoader.load(ModuleConfigurator.class, extensionClassLoader);
+        sl.forEach(i -> {
+            Object subconf = i.configure(this);
+            if (subconf != null) {
+                extendedConfiguration.put(i.getClass(), subconf);
             }
-        }
+        });
     }
 
     public File configdir;
@@ -576,6 +572,7 @@ public class PropertiesManager extends Properties {
     public static final String ADMINTAB = "adminTab";
     public Map<String, StoreFactory> stores = new HashMap<String, StoreFactory>();
     public StoreFactory defaultStore;
+    public Map<Class <? extends ModuleConfigurator>, Object> extendedConfiguration = new HashMap<>();
 
     public List<String> tabsList = Arrays.asList(FILTERTAB, CUSTOMGRAPHTAB, "@", SUMSTAB, SERVICESTAB, VIEWSTAB, HOSTSTAB, TAGSTAB, ADMINTAB);
 }
