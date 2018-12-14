@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -120,8 +119,7 @@ public class PropertiesManager extends Properties {
     }
 
     public void join(URL url) {
-        try {
-            InputStream inputstream = url.openStream();
+        try (InputStream inputstream = url.openStream()){
             load(inputstream);
             inputstream.close();
         } catch (IOException ex) {
@@ -135,14 +133,10 @@ public class PropertiesManager extends Properties {
 
     public void join(File propFile) {
         logger.debug("Using propertie file " + propFile.getAbsolutePath());
-        InputStream inputstream = null;
-        try {
-            inputstream = new FileInputStream(propFile);
+        try (InputStream inputstream = new FileInputStream(propFile)) {
             load(inputstream);
         } catch (IOException ex) {
             logger.warn("Invalid properties file " + propFile.getAbsolutePath() + ": " + ex.getLocalizedMessage());
-        } finally {
-            IOUtils.closeQuietly(inputstream);
         }
     }
 
