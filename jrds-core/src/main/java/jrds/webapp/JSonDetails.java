@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -32,35 +33,37 @@ public class JSonDetails extends JrdsServlet {
 
             JrdsJSONWriter w = new JrdsJSONWriter(response);
             w.object();
-            w.key("probequalifiedname").value(p.getQualifiedName());
-            w.key("probeinstancename").value(p.getName());
-            w.key("probename").value(p.getPd().getName());
-            w.key("hostname").value(p.getHost().getName());
-            w.key("pid").value(params.getPid());
-            if(p instanceof IndexedProbe) {
-                w.key("index").value(((IndexedProbe) p).getIndexName());
+            if (p != null) {
+                Optional.ofNullable(p.getQualifiedName()).ifPresent( i -> w.key("probequalifiedname").value(i));
+                Optional.ofNullable(p.getName()).ifPresent( i-> w.key("probeinstancename").value(i));
+                Optional.ofNullable(p.getPd().getName()).ifPresent( i-> w.key("probename").value(i));
+                Optional.ofNullable(p.getHost().getName()).ifPresent( i-> w.key("hostname").value(i));
+                Optional.ofNullable(params.getPid()).ifPresent( i-> w.key("pid").value(i));
+                if(p instanceof IndexedProbe) {
+                    Optional.ofNullable(((IndexedProbe) p).getIndexName()).ifPresent( i-> w.key("index").value(i));
+                }
+                w.key("datastores");
+                w.array();
+                List<String> dsNames = new ArrayList<>();
+                dsNames.addAll(p.getPd().getDs());
+                Collections.sort(dsNames, Util.nodeComparator);
+                for(String datasource: dsNames) {
+                    w.object();
+                    w.key("id").value(datasource.hashCode());
+                    w.key("name").value(datasource);
+                    w.endObject();
+                }
+                w.endArray();
+                w.key("graphs");
+                w.array();
+                for(GraphNode gn: p.getGraphList()) {
+                    w.object();
+                    w.key("id").value(gn.getQualifiedName().hashCode());
+                    w.key("name").value(gn.getQualifiedName());
+                    w.endObject();
+                }
+                w.endArray();
             }
-            w.key("datastores");
-            w.array();
-            List<String> dsNames = new ArrayList<>();
-            dsNames.addAll(p.getPd().getDs());
-            Collections.sort(dsNames, Util.nodeComparator);
-            for(String datasource: dsNames) {
-                w.object();
-                w.key("id").value(datasource.hashCode());
-                w.key("name").value(datasource);
-                w.endObject();
-            }
-            w.endArray();
-            w.key("graphs");
-            w.array();
-            for(GraphNode gn: p.getGraphList()) {
-                w.object();
-                w.key("id").value(gn.getQualifiedName().hashCode());
-                w.key("name").value(gn.getQualifiedName());
-                w.endObject();
-            }
-            w.endArray();
             w.endObject();
             w.flush();
         } catch (Exception e) {
