@@ -91,18 +91,20 @@ final public class Tools {
     }
 
     static public JrdsDocument parseRessource(String name) throws Exception {
-        InputStream is = Tools.class.getClassLoader().getResourceAsStream(name);
+        try (InputStream is = Tools.class.getClassLoader().getResourceAsStream(name)) {
             return parseRessource(is);
         }
+    }
 
     static public JrdsDocument parseRessource(InputStream is) throws Exception {
         return new JrdsDocument(Tools.dbuilder.parse(is));
     }
 
     static public JrdsDocument parseString(String s) throws Exception {
-        InputStream is = new ByteArrayInputStream(s.getBytes());
+        try (InputStream is = new ByteArrayInputStream(s.getBytes())) {
             return Tools.parseRessource(is);
         }
+    }
 
     static public void setLevel(Logger logger, Level level, String... allLoggers) {
         Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDERNAME);
