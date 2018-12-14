@@ -7,19 +7,18 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+import org.rrd4j.data.DataProcessor;
+import org.rrd4j.data.Variable;
+
 import jrds.Period;
 import jrds.Probe;
 import jrds.store.ExtractInfo;
-
-import org.apache.log4j.Logger;
-import org.rrd4j.ConsolFun;
-import org.rrd4j.data.DataProcessor;
 
 /**
  * A servlet wich show the last update values and time
  * 
  * @author Fabrice Bacchella
- * @version $Revision: 236 $
  */
 public final class ProbeSummary extends JrdsServlet {
     static final private Logger logger = Logger.getLogger(ProbeSummary.class);
@@ -44,9 +43,9 @@ public final class ProbeSummary extends JrdsServlet {
             for(String dsName: probe.getPd().getDs()) {
                 try {
                     out.print(dsName + " ");
-                    out.print(dp.getAggregate(dsName, ConsolFun.AVERAGE) + " ");
-                    out.print(dp.getAggregate(dsName, ConsolFun.MIN) + " ");
-                    out.println(dp.getAggregate(dsName, ConsolFun.MAX));
+                    out.println(dp.getVariable(dsName, new Variable.AVERAGE()).value + " ");
+                    out.println(dp.getVariable(dsName, new Variable.MIN()).value + " ");
+                    out.println(dp.getVariable(dsName, new Variable.MAX()).value);
                 } catch (IOException e) {
                     logger.error("Probe " + probe + "unusable: " + e);
                 }
