@@ -17,19 +17,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Level;
+import org.rrd4j.core.DsDef;
+
 import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.Util;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Level;
-import org.rrd4j.core.DsDef;
 
 /**
  * This abstract class can be used to parse the results of an external command
  * 
  * @author Fabrice Bacchella
- * @version $Revision$, $Date$
  */
 public abstract class ExternalCmdProbe extends Probe<String, Number> {
 
@@ -108,17 +106,15 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
     protected String launchCmd() {
         String perfstring = "";
         Process urlperfps = null;
-        InputStream stdout = null;
         try {
             log(Level.DEBUG, "executing: %s", cmd);
             urlperfps = Runtime.getRuntime().exec(getCmd());
-            stdout = urlperfps.getInputStream();
-            BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(stdout));
-            perfstring = stdoutReader.readLine();
+            try (InputStream  stdout = urlperfps.getInputStream()) {
+                BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(stdout));
+                perfstring = stdoutReader.readLine();
+            }
         } catch (IOException e) {
             log(Level.ERROR, e, "external command failed : %s", e);
-        } finally {
-            IOUtils.closeQuietly(stdout);
         }
 
         try {
