@@ -18,9 +18,10 @@
 
     <modules>
         <module>jrds-core</module>
+        <module>jrds-snmp</module>
+        <module>jrds-ipmi</module>
         <module>jrds-webapp</module>
         <module>jrds-standalone</module>
-        <module>jrds-snmp</module>
     </modules>
 
     <repositories>

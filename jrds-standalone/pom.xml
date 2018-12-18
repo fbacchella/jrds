@@ -50,6 +50,11 @@
         </dependency>
         <dependency>
             <groupId>fr.jrds</groupId>
+            <artifactId>jrds-ipmi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.jrds</groupId>
             <artifactId>jrds-core</artifactId>
             <classifier>webapp</classifier>
             <version>${project.version}</version>
