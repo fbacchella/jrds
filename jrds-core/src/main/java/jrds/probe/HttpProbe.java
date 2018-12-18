@@ -95,7 +95,7 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
         return finishConfigure(null);
     }
 
-    private boolean finishConfigure(List<Object> argslist) {
+    protected boolean finishConfigure(List<Object> argslist) {
         if(url == null) {
             if(port <= 0 && (scheme == null || scheme.isEmpty())) {
                 scheme = "http";

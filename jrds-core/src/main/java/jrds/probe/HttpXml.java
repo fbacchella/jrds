@@ -1,7 +1,6 @@
 package jrds.probe;
 
 import java.io.InputStream;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -40,87 +39,20 @@ import jrds.starter.XmlProvider;
  * @author Fabrice Bacchella
  */
 @ProbeMeta(
-        topStarter = jrds.starter.XmlProvider.class,
-        collectResolver = CollectResolver.StringResolver.class
-)
+           topStarter = jrds.starter.XmlProvider.class,
+           collectResolver = CollectResolver.StringResolver.class
+                )
 public class HttpXml extends HCHttpProbe<String> {
 
     private Map<XPathExpression, String> collectKeys = null;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see jrds.probe.HttpProbe#configure()
-     */
-    public Boolean configure() {
-        boolean done = super.configure();
-        finishConfig(Collections.emptyList());
-        return done;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see jrds.probe.HttpProbe#configure(java.util.List)
-     */
-    public Boolean configure(List<Object> args) {
-        boolean done = super.configure(args);
-        finishConfig(args);
-        return done;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see jrds.probe.HttpProbe#configure(java.lang.String, java.util.List)
-     */
-    public Boolean configure(String file, List<Object> args) {
-        boolean done = super.configure(file, args);
-        finishConfig(args);
-        return done;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see jrds.probe.HttpProbe#configure(java.lang.Integer, java.util.List)
-     */
-    public Boolean configure(Integer port, List<Object> args) {
-        boolean done = super.configure(port, args);
-        finishConfig(args);
-        return done;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see jrds.probe.HttpProbe#configure(java.net.URL, java.util.List)
-     */
-    public Boolean configure(URL url, List<Object> args) {
-        boolean done = super.configure(url, args);
-        finishConfig(args);
-        return done;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see jrds.probe.HttpProbe#configure(java.lang.Integer, java.lang.String,
-     * java.util.List)
-     */
-    public Boolean configure(Integer port, String file, List<Object> args) {
-        boolean done = super.configure(port, file, args);
-        finishConfig(args);
-        return done;
-    }
-
-    private void finishConfig(List<Object> args) {
+    @Override
+    protected boolean finishConfigure(List<Object> args) {
         log(Level.TRACE, "Configuring collect xpath with %s", args);
         CollectResolver<XPathExpression> cr = new XmlProvider.XmlResolver();
-        System.out.println(getPd().getCollectMapping());
         collectKeys = new HashMap<>(getPd().getCollectMapping().size());
         for(Map.Entry<String, String> e: getPd().getCollectMapping().entrySet()) {
-            String solved = Util.parseTemplate(String.format(e.getKey(), args.toArray()), this, args);
+            String solved = Util.parseTemplate(String.format(e.getKey(), args != null ? args.toArray() : null), this, args);
             XPathExpression xpath = cr.resolve(solved);
             if (xpath ==  null) {
                 log(Level.DEBUG, "unparsed xpath: %s", e.getKey());
@@ -131,6 +63,7 @@ public class HttpXml extends HCHttpProbe<String> {
         }
         collectKeys = Collections.unmodifiableMap(collectKeys);
         log(Level.TRACE, "collect xpath mapping %s", collectKeys);
+        return super.finishConfigure(args);
     }
 
     /**
