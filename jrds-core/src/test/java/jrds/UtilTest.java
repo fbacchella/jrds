@@ -11,18 +11,24 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.mockobjects.MokeProbe;
-import jrds.starter.HostStarter;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.w3c.dom.Document;
+
+import jrds.mockobjects.GenerateProbe;
+import jrds.mockobjects.MokeProbe;
+import jrds.starter.HostStarter;
 
 public class UtilTest {
     static final private Logger logger = Logger.getLogger(UtilTest.class);
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws IOException, ParserConfigurationException {
@@ -139,9 +145,9 @@ public class UtilTest {
         p.setHost(new HostStarter(new HostInfo("Moke")));
         p.setLabel("label");
         Object[] keys = {
-                "${host}",
-                "${probename}",
-                "${label}"
+                         "${host}",
+                         "${probename}",
+                         "${label}"
         };
         String parsed = Util.parseOldTemplate("{0} {1} {2} ${label}", keys, p);
         Assert.assertEquals("Moke DummyProbe label label", parsed);
@@ -153,9 +159,9 @@ public class UtilTest {
         p.setHost(new HostStarter(new HostInfo("Moke")));
         p.setLabel("label");
         Object[] keys = {
-                "${host}",
-                "${probename}",
-                "${label}"
+                         "${host}",
+                         "${probename}",
+                         "${label}"
         };
         String parsed = Util.parseOldTemplate("${label} {0} {1} {2} ${label}", keys, p);
         Assert.assertEquals("label Moke DummyProbe label label", parsed);
@@ -190,6 +196,37 @@ public class UtilTest {
     public void testParseTemplate4() {
         String parsed = Util.parseTemplate("%string");
         Assert.assertEquals("%string", parsed);
+    }
+
+    @Test
+    public void testParseTemplate5() throws Exception {
+        Probe<String, Number> testProbe = GenerateProbe.fillProbe(new GenerateProbe.EmptyProbe(), testFolder, GenerateProbe.ChainedMap.start());
+        GenericBean b1 = new GenericBean.CustomBean("one");
+        b1.set(testProbe, "one");
+        testProbe.getPd().addBean(b1);
+        GenericBean b2 = new GenericBean.CustomBean("two");
+        testProbe.getPd().addBean(b2);
+        String parsed = Util.parseTemplate("${attr.one} ${attr.two} ${attr.two.signature} ${attr.three} ${probename}", testProbe);
+        Assert.assertEquals("one ${attr.two} ${attr.two.signature}  EmptyProbe", parsed);
+    }
+
+    @Test
+    @SuppressWarnings("unused")
+    public void testParseTemplate6() throws Exception {
+        Object o = new Object() {
+            public String getOne() {
+                return "one";
+            }
+            public void setOne(String bean) {
+            }
+            public String getTwo() {
+                return null;
+            }
+            public void setTwo(String bean) {
+            }
+        };
+        String parsed = Util.parseTemplate("${attr.one} ${attr.two} ${attr.two.signature} ${attr.three}", o);
+        Assert.assertEquals("one ${attr.two} ${attr.two.signature} ", parsed);
     }
 
     @Test

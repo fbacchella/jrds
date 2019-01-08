@@ -258,7 +258,7 @@ public class Util {
                             if (beanValue != null) {
                                 toAppend = stringSignature(beanValue.toString());
                             } else {
-                                toAppend = "";
+                                toAppend = m.group(2);
                             }
                             break;
                         }
@@ -266,9 +266,15 @@ public class Util {
                         try {
                             PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
                             Method read = bean.getReadMethod();
-                            if (read != null)
-                                toAppend = stringSignature(read.invoke(o).toString());
+                            if(read != null) {
+                                Object beanValue = read.invoke(o);
+                                if(beanValue != null) {
+                                    toAppend = stringSignature(beanValue.toString());
+                                } else {
+                                    toAppend = m.group(2);
+                                }
                             break;
+                            }
                         } catch (IntrospectionException e) {
                             // not a bean, skip it
                         } catch (Exception e) {
@@ -294,7 +300,7 @@ public class Util {
                             if(beanValue != null) {
                                 toAppend = beanValue.toString();
                             } else {
-                                toAppend = "";
+                                toAppend = m.group(2);
                             }
                             break;
                         }
@@ -302,9 +308,15 @@ public class Util {
                         try {
                             PropertyDescriptor bean = new PropertyDescriptor(beanName, o.getClass());
                             Method read = bean.getReadMethod();
-                            if(read != null)
-                                toAppend = read.invoke(o).toString();
+                            if(read != null) {
+                                Object beanValue = read.invoke(o);
+                                if(beanValue != null) {
+                                    toAppend = beanValue.toString();
+                                } else {
+                                    toAppend = m.group(2);
+                                }
                             break;
+                            }
                         } catch (IntrospectionException e) {
                             // not a bean, skip it
                         } catch (Exception e) {
