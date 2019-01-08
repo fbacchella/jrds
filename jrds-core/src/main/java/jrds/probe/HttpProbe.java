@@ -130,13 +130,13 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
             if(argslist != null) {
                 try {
                     urlString = String.format(scheme + "://" + userInfo + urlhost + portString + file, argslist.toArray());
-                    urlString = Util.parseTemplate(urlString, getHost(), argslist);
+                    urlString = Util.parseTemplate(urlString, getHost(), argslist, this);
                 } catch (IllegalFormatConversionException e) {
                     log(Level.ERROR, "Illegal format string: %s://%s%s:%d%s, args %d", scheme, userInfo, urlhost, portString, file, argslist.size());
                     return false;
                 }
             } else {
-                urlString = Util.parseTemplate(scheme + "://" + userInfo + urlhost + portString + file, getHost());
+                urlString = Util.parseTemplate(scheme + "://" + userInfo + urlhost + portString + file, this, getHost());
             }
             try {
                 url = new URL(urlString);
