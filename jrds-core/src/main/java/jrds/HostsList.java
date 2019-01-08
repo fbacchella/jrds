@@ -179,6 +179,7 @@ public class HostsList extends StarterNode {
                 Starter top = starterClass.newInstance();
                 topStarters.add(top);
                 registerStarter(top);
+                top.configure(pm);
             } catch (Throwable e) {
                 log(Level.ERROR, e, "Top level starter %s failed to register: %s", starterClass, e.getMessage());
             }
