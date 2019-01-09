@@ -273,7 +273,7 @@ public class Util {
                                 } else {
                                     toAppend = m.group(2);
                                 }
-                            break;
+                                break;
                             }
                         } catch (IntrospectionException e) {
                             // not a bean, skip it
@@ -315,7 +315,7 @@ public class Util {
                                 } else {
                                     toAppend = m.group(2);
                                 }
-                            break;
+                                break;
                             }
                         } catch (IntrospectionException e) {
                             // not a bean, skip it

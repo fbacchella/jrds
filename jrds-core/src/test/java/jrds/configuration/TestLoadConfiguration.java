@@ -121,7 +121,6 @@ public class TestLoadConfiguration {
         Assert.assertNotNull(pd);
         Assert.assertEquals(1, pd.getSize());
         Assert.assertNotSame(pf.getProbeDesc(pd.getName()), pd.getSize());
-
     }
 
     @Test

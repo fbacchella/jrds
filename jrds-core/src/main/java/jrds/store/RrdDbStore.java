@@ -81,7 +81,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
             Set<String> badDs = new HashSet<String>();
             Header header = rrdSource.getHeader();
             int dsCount = header.getDsCount();
-            ;
+
             header.copyStateTo(rrdDest.getHeader());
             for(int i = 0; i < dsCount; i++) {
                 Datasource srcDs = rrdSource.getDatasource(i);
