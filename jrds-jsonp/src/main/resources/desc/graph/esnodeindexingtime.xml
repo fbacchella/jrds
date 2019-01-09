@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+                           "urn:jrds:graphdesc">
+<graphdesc>
+    <name>ElasticNodeIndicesTime</name>
+    <graphName>elasticnode_operation_time_${attr.nodename}</graphName>
+    <graphTitle>Elastic operation for node ${attr.nodename} on ${host}</graphTitle>
+    <verticalLabel>s</verticalLabel>
+    <add>
+        <name>indices.indexing.index_total</name>
+    </add>
+    <add>
+        <name>indices.indexing.index_time_in_millis</name>
+    </add>
+    <add>
+        <name>indices.indexing.delete_total</name>
+    </add>
+    <add>
+        <name>indices.indexing.delete_time_in_millis</name>
+    </add>
+    <add>
+        <name>indices.search.query_total</name>
+    </add>
+    <add>
+        <name>indices.search.query_time_in_millis</name>
+    </add>
+    <add>
+        <name>indices.search.fetch_total</name>
+    </add>
+    <add>
+        <name>indices.search.fetch_time_in_millis</name>
+    </add>
+    <add>
+        <rpn>indices.indexing.index_time_in_millis, indices.indexing.index_total, 1000, *, /</rpn>
+        <graphType>line</graphType>
+        <legend>Average indexing time</legend>
+    </add>
+    <add>
+        <rpn>indices.search.query_time_in_millis, indices.search.query_total, 1000, *, /</rpn>
+        <graphType>line</graphType>
+        <legend>Average search time</legend>
+    </add>
+    <add>
+        <rpn>indices.search.fetch_time_in_millis, indices.search.fetch_total, 1000, *, /</rpn>
+        <graphType>line</graphType>
+        <legend>Average fetch time</legend>
+    </add>
+    <hosttree>
+        <pathelement>HOST</pathelement>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>Elasticearch</pathstring>
+        <pathstring>${attr.nodename}</pathstring>
+        <pathstring>Averation operation time</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>Elasticearch</pathstring>
+        <pathstring>Averation operation time</pathstring>
+        <pathstring>${attr.nodename}</pathstring>
+    </viewtree>
+</graphdesc>

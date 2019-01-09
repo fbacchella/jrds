@@ -22,6 +22,7 @@
         <module>jrds-ipmi</module>
         <module>jrds-webapp</module>
         <module>jrds-standalone</module>
+        <module>jrds-jsonp</module>
     </modules>
 
     <repositories>

@@ -1,0 +1,8 @@
+{ "jrdsstats":
+    {"stat":
+        [{"a": 1},
+        {"key": "b", "value": 2}],
+     "f": "3.5",
+     "uptime": 3
+    }
+}

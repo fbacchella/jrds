@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>name</name>
+    <probeName>probename</probeName>
+    <probeClass>jrds.probe.HttpXml</probeClass>
+    <specific name="upTimePath">$.jrdsstats.uptime</specific>
+    <uptimefactor>0.5</uptimefactor>
+    <defaultargs>
+        <attr name="port">80</attr>
+    </defaultargs>
+    <ds>
+        <dsName>a</dsName>
+        <dsType>counter</dsType>
+        <collect>$.jrdsstats.stat[0]['a']</collect>
+    </ds>
+    <ds>
+        <dsName>b</dsName>
+        <dsType>counter</dsType>
+        <collect>$.jrdsstats.stat[*][?(@.key == 'b')].value</collect>
+    </ds>
+    <ds>
+        <dsName>e</dsName>
+        <dsType>counter</dsType>
+        <collect optional="true">$.jrdsstats.${label}</collect>
+    </ds>
+    <graphs>
+    </graphs>
+</probedesc>
