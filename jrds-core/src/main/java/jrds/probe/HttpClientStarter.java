@@ -60,7 +60,7 @@ public class HttpClientStarter extends Starter {
         // Register https
         ConnectionSocketFactory sslfactory = getSSLSocketFactory();
         if (sslfactory != null) {
-            r.register("https", getSSLSocketFactory());
+            r.register("https", sslfactory);
         } else {
             log(Level.WARN, "ssl factory not found, won't manage https");
         }
@@ -77,10 +77,10 @@ public class HttpClientStarter extends Starter {
         builder.setConnectionManager(cm);
 
         RequestConfig rc = RequestConfig.custom()
-                .setConnectionRequestTimeout(timeout * 1000)
-                .setConnectTimeout(timeout * 1000)
-                .setSocketTimeout(timeout * 1000)
-                .build();
+                        .setConnectionRequestTimeout(timeout * 1000)
+                        .setConnectTimeout(timeout * 1000)
+                        .setSocketTimeout(timeout * 1000)
+                        .build();
         builder.setDefaultRequestConfig(rc);
 
         client = builder.build();

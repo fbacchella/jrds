@@ -28,8 +28,9 @@ public class SSLStarter extends Starter {
 
     // Create a trust manager that does not validate certificate chains
     private static final X509TrustManager trustAllCerts = new X509TrustManager() {
+        private final X509Certificate[] empty = new java.security.cert.X509Certificate[]{};
         public X509Certificate[] getAcceptedIssuers() {
-            return null;
+            return empty;
         }
         public void checkClientTrusted(X509Certificate[] certs, String authType) {
         }
