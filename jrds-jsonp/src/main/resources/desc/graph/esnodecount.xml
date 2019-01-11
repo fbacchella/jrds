@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+                           "urn:jrds:graphdesc">
+<graphdesc>
+    <name>ElasticNodeDocCounts</name>
+    <graphName>elasticnode_docs_${attr.nodename}</graphName>
+    <graphTitle>Elastic documents count for ${attr.nodename} on ${host}</graphTitle>
+    <verticalLabel>cos</verticalLabel>
+    <add>
+        <name>indices.docs.count</name>
+        <graphType>area</graphType>
+        <legend>Number of docs</legend>
+    </add>
+    <add>
+        <name>indices.docs.deleted</name>
+        <graphType>line</graphType>
+        <legend>Deleted docs</legend>
+    </add>
+    <hosttree>
+        <pathelement>HOST</pathelement>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>Elasticearch</pathstring>
+        <pathstring>${attr.nodename}</pathstring>
+        <pathstring>Docs counts</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>Elasticearch</pathstring>
+        <pathstring>Docs counts</pathstring>
+        <pathstring>${attr.nodename}</pathstring>
+    </viewtree>
+</graphdesc>

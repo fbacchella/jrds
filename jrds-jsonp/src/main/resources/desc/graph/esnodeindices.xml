@@ -3,20 +3,38 @@
                            "urn:jrds:graphdesc">
 <graphdesc>
     <name>ElasticNodeIndices</name>
-    <graphName>elasticnode_indexing${attr.nodename}</graphName>
+    <graphName>elasticnode_indexing_${attr.nodename}</graphName>
     <graphTitle>Elastic Indexing for ${attr.nodename} on ${host}</graphTitle>
     <verticalLabel>request/s</verticalLabel>
     <add>
         <name>indices.indexing.index_total</name>
         <graphType>line</graphType>
+        <legend>Indexing</legend>
     </add>
     <add>
-        <name>indices.indexing.index_time_in_millis</name>
+        <name>indices.indexing.delete_total</name>
         <graphType>line</graphType>
+        <legend>Deleting</legend>
     </add>
     <add>
-        <name>indices.indexing.index_current</name>
+        <name>indices.search.query_total</name>
         <graphType>line</graphType>
+        <legend>Search query</legend>
+    </add>
+    <add>
+        <name>indices.search.fetch_total</name>
+        <graphType>line</graphType>
+        <legend>Search fetch</legend>
+    </add>
+    <add>
+        <name>indices.search.scroll_total</name>
+        <graphType>line</graphType>
+        <legend>Search scroll</legend>
+    </add>
+    <add>
+        <name>indices.search.suggest_total</name>
+        <graphType>line</graphType>
+        <legend>Search suggest</legend>
     </add>
     <hosttree>
         <pathelement>HOST</pathelement>

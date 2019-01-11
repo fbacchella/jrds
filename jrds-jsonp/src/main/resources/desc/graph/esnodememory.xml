@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+                           "urn:jrds:graphdesc">
+<graphdesc>
+    <name>ElasticNodeMemory</name>
+    <graphName>elasticnode_mem_${attr.nodename}</graphName>
+    <graphTitle>Elastic memory usage ${attr.nodename} on ${host}</graphTitle>
+    <unit>
+        <binary />
+    </unit>
+    <verticalLabel>bytes</verticalLabel>
+    <add>
+        <legend>Lucene</legend>
+    </add>
+    <add>
+        <name>indices.segments.terms_memory_in_bytes</name>
+        <graphType>area</graphType>
+        <legend>Terms</legend>
+    </add>
+    <add>
+        <name>indices.segments.stored_fields_memory_in_bytes</name>
+        <graphType>stack</graphType>
+        <legend>Stored fields</legend>
+    </add>
+    <!-- Not used -->
+    <!-- add>
+        <name>indices.segments.term_vectors_memory_in_bytes</name>
+    </add -->
+    <add>
+        <name>indices.segments.norms_memory_in_bytes</name>
+        <graphType>stack</graphType>
+        <legend>Norms</legend>
+    </add>
+    <add>
+        <name>indices.segments.points_memory_in_bytes</name>
+        <graphType>stack</graphType>
+        <legend>Points</legend>
+    </add>
+    <add>
+        <name>indices.segments.doc_values_memory_in_bytes</name>
+        <graphType>stack</graphType>
+        <legend>Doc values</legend>
+    </add>
+    <add>
+        <name>indices.segments.version_map_memory_in_bytes</name>
+        <graphType>stack</graphType>
+        <legend>Version Map</legend>
+    </add>
+    <add>
+        <name>indices.segments.fixed_bit_set_memory_in_bytes</name>
+        <graphType>stack</graphType>
+        <legend>Fixed Bitsets</legend>
+    </add>
+    <add>
+        <legend>Elasticsearch</legend>
+    </add>
+    <add>
+        <name>indices.query_cache.memory_size_in_bytes</name>
+        <graphType>stack</graphType>
+        <legend>Query cache</legend>
+    </add>
+    <add>
+        <name>indices.request_cache.memory_size_in_bytes</name>
+        <graphType>stack</graphType>
+        <legend>Request Cache</legend>
+    </add>
+    <add>
+        <name>indices.fielddata.memory_size_in_bytes</name>
+        <graphType>stack</graphType>
+        <legend>Fielddata</legend>
+    </add>
+    <add>
+        <name>indices.segments.index_writer_memory_in_bytes</name>
+        <graphType>stack</graphType>
+        <legend>Index Writer</legend>
+    </add>
+    <add>
+        <legend>Other memory usage</legend>
+    </add>
+    <add>
+        <name>indices.merges.current_size_in_bytes</name>
+        <graphType>area</graphType>
+        <legend>Merges</legend>
+    </add>
+    <hosttree>
+        <pathelement>HOST</pathelement>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>Elasticearch</pathstring>
+        <pathstring>${attr.nodename}</pathstring>
+        <pathstring>Memory usage</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>Elasticearch</pathstring>
+        <pathstring>Memory usage</pathstring>
+        <pathstring>${attr.nodename}</pathstring>
+    </viewtree>
+</graphdesc>
