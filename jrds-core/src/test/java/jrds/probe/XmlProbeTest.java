@@ -25,7 +25,6 @@ public class XmlProbeTest {
     XPath xpath = XPathFactory.newInstance().newXPath();
     static ProbeDesc<String> pd;
 
-    @SuppressWarnings("unchecked")
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
@@ -34,7 +33,7 @@ public class XmlProbeTest {
         Tools.setLevel(logger, Level.TRACE, "jrds.Probe.HttpXml", "jrds.Probe.HttpProbe", "jrds.starter.XmlProvider");
         Tools.prepareXml(false);
 
-        pd = (ProbeDesc<String>) jrds.configuration.GeneratorHelper.getProbeDesc(Tools.parseRessource("httpxmlprobedesc.xml"));
+        pd = jrds.configuration.GeneratorHelper.getProbeDesc(Tools.parseRessource("httpxmlprobedesc.xml"));
     }
 
     @Test

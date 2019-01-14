@@ -5,6 +5,13 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.spi.LoggingEvent;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.ProbeDesc;
@@ -12,13 +19,6 @@ import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 import jrds.mockobjects.GetMoke;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 public class TestDescFactory {
     static final private Logger logger = Logger.getLogger(TestDescFactory.class);
