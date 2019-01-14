@@ -21,6 +21,13 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>fr.jrds</groupId>
+            <artifactId>jrds-core</artifactId>
+            <version>${project.version}</version>
+            <classifier>webapp</classifier>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
             <version>2.4.0</version>
