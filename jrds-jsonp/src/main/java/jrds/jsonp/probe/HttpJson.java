@@ -77,8 +77,14 @@ public class HttpJson extends HCHttpProbe<String> {
         for (Map.Entry<JsonPath, String> e: collectKeys.entrySet()) {
             try {
                 JSONArray v = protectedRead(ctx, e.getKey());
+                if (v.isEmpty()) {
+                    log(Level.ERROR, "Failed to collect data '%s': not found", e.getValue());
+                    break;
+                }
                 vars.put(e.getValue(), valueToNum(v.get(0)));
-            } catch (JSONException | PathNotFoundException ex) {
+            } catch (PathNotFoundException ex) {
+                log(Level.ERROR, "Failed to collect data '%s': not found", e.getValue());
+            } catch (JSONException ex) {
                 log(Level.ERROR, "Failed to collect data '%s': %s", e.getValue(), ex.getMessage());
             }
         }
