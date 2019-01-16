@@ -7,6 +7,7 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -224,11 +225,17 @@ public class GraphDesc implements Cloneable, WithACL {
     }
 
     // Old name kept
+    @Deprecated
     static final public GraphType NONE = GraphType.NONE;
+    @Deprecated
     static final public GraphType DATASOURCE = GraphType.NONE;
+    @Deprecated
     static final public GraphType LINE = GraphType.LINE;
+    @Deprecated
     static final public GraphType AREA = GraphType.AREA;
+    @Deprecated
     static final public GraphType STACK = GraphType.STACK;
+    @Deprecated
     static final public GraphType COMMENT = GraphType.COMMENT;
 
     private enum PathElement {
@@ -518,37 +525,39 @@ public class GraphDesc implements Cloneable, WithACL {
         }
     }
 
-    private static final Map<Color, String> colornames = new HashMap<>(Colors.length);
+    private static final Map<Color, String> colornames;
     static {
+        Map<Color, String> _colornames = new HashMap<>(Colors.length);
         for (Colors i: Colors.values()) {
-            colornames.put(i.getColor(), i.name().toLowerCase());
+            _colornames.put(i.getColor(), i.name().toLowerCase());
+        }
+        colornames = Collections.unmodifiableMap(_colornames);
+    }
+
+    public static class DsPath {
+        public final String host;
+        public final String probe;
+
+        DsPath(String host, String probe) {
+            this.host = host;
+            this.probe = probe;
         }
     }
 
-    static final class DsDesc {
-        final String name;
-        final String dsName;
-        final String rpn;
-        final GraphType graphType;
-        final Color color;
-        final String legend;
-        final ConsolFun cf;
-        final Integer percentile;
+    public static class DsDesc {
+        public final String name;
+        public final String dsName;
+        public final String rpn;
+        public final GraphType graphType;
+        public final Color color;
+        public final String legend;
+        public final ConsolFun cf;
+        public final Integer percentile;
+        public final DsPath dspath;
 
-        static final class DsPath {
-            public final String host;
-            public final String probe;
-
-            DsPath(String host, String probe) {
-                this.host = host;
-                this.probe = probe;
-            }
-        }
-
-        final DsPath dspath;
         DsDesc(String name, String dsName, String rpn,
-                GraphType graphType, Color color, String legend,
-                ConsolFun cf, String host, String probe) {
+               GraphType graphType, Color color, String legend,
+               ConsolFun cf, String host, String probe) {
             this.name = name;
             this.dsName = dsName;
             this.rpn = rpn;
@@ -602,22 +611,22 @@ public class GraphDesc implements Cloneable, WithACL {
 
         public String toString() {
             return String.format("DsDesc(%s,[%s/%s/%s],\"%s\",%s,Color[%d, %d, %d],\"%s\",%s)",
-                    name,
-                    (dspath == null ? "" : dspath.host),
-                    (dspath == null ? "" : dspath.probe),
-                    dsName,
-                    (rpn == null ? "" : rpn),
-                    graphType,
-                    (color != null ? color.getRed() : 0),
-                    (color != null ? color.getGreen() : 0),
-                    (color != null ? color.getBlue() : 0),
-                    (legend == null ? "" : legend),
-                    cf
-                    );
+                                 name,
+                                 (dspath == null ? "" : dspath.host),
+                                 (dspath == null ? "" : dspath.probe),
+                                 dsName,
+                                 (rpn == null ? "" : rpn),
+                                 graphType,
+                                 (color != null ? color.getRed() : 0),
+                                 (color != null ? color.getGreen() : 0),
+                                 (color != null ? color.getBlue() : 0),
+                                 (legend == null ? "" : legend),
+                                 cf
+                            );
         }
     }
 
-    private List<DsDesc> allds;
+    private final List<DsDesc> allds = new ArrayList<DsDesc>();
     private int width = 578;
     private int height = 206;
     private double upperLimit = Double.NaN;
@@ -633,31 +642,18 @@ public class GraphDesc implements Cloneable, WithACL {
     private boolean logarithmic = false;
     private Integer unitExponent = null;
     private boolean withLegend = true; // To show the values block under the
-                                       // graph
+    // graph
     private boolean withSummary = true; // To show the summary with last update,
-                                        // period, etc. information block
+    // period, etc. information block
     private ACL acl = ACL.ALLOWEDACL;
     private Class<Graph> graphClass = Graph.class;
 
-    public static final class Dimension {
+    public static class Dimension {
         public int width = 0;
         public int height = 0;
     }
 
     private Dimension dimension = null;
-
-    /**
-     * A constructor wich pre allocate the desired size
-     * 
-     * @param size the estimated number of graph that will be created
-     */
-    public GraphDesc(int size) {
-        allds = new ArrayList<DsDesc>(size);
-    }
-
-    public GraphDesc() {
-        allds = new ArrayList<DsDesc>();
-    }
 
     public void add(String name, GraphType graphType) {
         add(name, name, null, graphType, Colors.resolveIndex(lastColor), name, DEFAULTCF, false, null, null, null);
@@ -690,10 +686,10 @@ public class GraphDesc implements Cloneable, WithACL {
      * @param dsName
      */
     public void add(String name, String rpn,
-            String graphType, String color, String legend,
-            String consFunc, String reversed, String percentile,
-            //The path to an external datastore
-            String host, String probe, String dsName) {
+                    String graphType, String color, String legend,
+                    String consFunc, String reversed, String percentile,
+                    //The path to an external datastore
+                    String host, String probe, String dsName) {
         if(logger.isTraceEnabled())
             logger.trace("Adding " + name + ", " + rpn + ", " + graphType + ", " + color + ", " + legend + ", " + consFunc + ", " + reversed + ", " + host + ", " + probe);
         GraphType gt;
@@ -758,16 +754,16 @@ public class GraphDesc implements Cloneable, WithACL {
             valPercentile = jrds.Util.parseStringNumber(percentile, Integer.valueOf(0));
         }
         logger.trace(Util.delayedFormatString(
-                "Adding '%s': %s/'%s', %s, %s, '%s', %s, %s, %d, %s, %s",
-                name, dsName, rpn, graphType, color, legend, consFunc, reversed, valPercentile, host, probe));
+                                              "Adding '%s': %s/'%s', %s, %s, '%s', %s, %s, %d, %s, %s",
+                                              name, dsName, rpn, graphType, color, legend, consFunc, reversed, valPercentile, host, probe));
         add(name, dsName, rpn, gt, c, legend, cf, reversed != null, valPercentile, host, probe);
     }
 
     public void add(String name, String dsName, String rpn,
-            GraphType graphType, Color color, String legend,
-            ConsolFun cf, boolean reversed, Integer percentile,
-            //The path to an external datastore
-            String host, String probe) {
+                    GraphType graphType, Color color, String legend,
+                    ConsolFun cf, boolean reversed, Integer percentile,
+                    //The path to an external datastore
+                    String host, String probe) {
         if(reversed) {
             String revRpn = "0, " + name + ", -";
             allds.add(new DsDesc(name, dsName, rpn, GraphType.NONE, null, null, cf, host, probe));
@@ -1201,7 +1197,6 @@ public class GraphDesc implements Cloneable, WithACL {
     @Override
     public Object clone() throws CloneNotSupportedException {
         GraphDesc newgd = (GraphDesc) super.clone();
-        newgd.allds = new ArrayList<DsDesc>(allds.size());
         newgd.allds.addAll(allds);
         newgd.trees = new HashMap<String, List<?>>(trees.size());
         for(Map.Entry<String, List<?>> e: trees.entrySet()) {
@@ -1358,6 +1353,15 @@ public class GraphDesc implements Cloneable, WithACL {
      */
     public void setGraphClass(Class<Graph> graphClass) {
         this.graphClass = graphClass;
+    }
+    
+    /**
+     * Return an unmodifiable list of the graph descriptions elements
+     * @return the list
+     * @since 20190116
+     */
+    public List<DsDesc> getGraphElements() {
+        return Collections.unmodifiableList(allds);
     }
 
 }
