@@ -85,8 +85,8 @@ public class TestDescFactory {
         Assert.assertEquals((long) pm.step * 2, pd.getHeartBeatDefault());
         logger.trace(pd.getCollectMapping());
         logger.trace(pd.getDefaultBeans());
-        // A collect string "" should not be collected
-        Assert.assertEquals(3, pd.getCollectMapping().size());
+        // An empty collect string should not be collected
+        Assert.assertEquals(5, pd.getCollectMapping().size());
     }
 
     @Test

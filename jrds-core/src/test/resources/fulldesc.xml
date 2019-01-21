@@ -1,49 +1,51 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN"
-	"urn:jrds:probedesc">
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
-	<name>name</name>
-	<probeName>probename</probeName>
-	<probeClass>jrds.mockobjects.MokeProbe</probeClass>
-	<customattr name="customattr1" />
+    <name>name</name>
+    <probeName>probename</probeName>
+    <probeClass>jrds.mockobjects.MokeProbe</probeClass>
+    <customattr name="customattr1" />
     <customattr name="customattr2" />
-	<specific name="specificname1">specificvalue1</specific>
-	<specific name="specificname2">specificvalue2</specific>
-	<uptimefactor>0.5</uptimefactor>
-	<defaultargs>
+    <specific name="specificname1">specificvalue1</specific>
+    <specific name="specificname2">specificvalue2</specific>
+    <uptimefactor>0.5</uptimefactor>
+    <defaultargs>
         <attr name="hostInfo">beanvalue</attr>
-	</defaultargs>
-	<ds>
-		<dsName>a</dsName>
-		<dsType>counter</dsType>
-		<collect>/jrdsstats/stat[@key='a']/@value</collect>
-	</ds>
-	<ds>
-		<dsName>Total kBytes</dsName>
-		<dsType>counter</dsType>
-		<oid>.1.3.6.1.4.1.9.9.109.1.1.1.1.2</oid>
-	</ds>
-	<ds>
-		<dsName>CPULoad</dsName>
-		<dsType>gauge</dsType>
-	</ds>
-	<ds>
-		<dsName>Uptime</dsName>
-		<dsType>none</dsType>
-	</ds>
-	<ds>
-		<dsName>NotCollected1</dsName>
-		<dsType>gauge</dsType>
-		<collect></collect>
-	</ds>
-	<ds>
-		<dsName>NotCollected2</dsName>
-		<dsType>gauge</dsType>
-		<collect />
-	</ds>
-	<graphs>
-		<name>ApacheRequests</name>
-		<name>ApacheTransfer</name>
-		<name>ApacheWorkers</name>
-	</graphs>
+    </defaultargs>
+    <ds>
+        <dsName>a</dsName>
+        <dsType>counter</dsType>
+        <collect>/jrdsstats/stat[@key='a']/@value</collect>
+    </ds>
+    <ds>
+        <dsName>Total kBytes</dsName>
+        <dsType>counter</dsType>
+        <oid>.1.3.6.1.4.1.9.9.109.1.1.1.1.2</oid>
+    </ds>
+    <ds>
+        <dsName>CPULoad</dsName>
+        <dsType>gauge</dsType>
+    </ds>
+    <ds>
+        <dsName>Uptime</dsName>
+        <dsType>none</dsType>
+    </ds>
+    <ds>
+        <collect>OnlyCollect</collect>
+    </ds>
+    <ds>
+        <dsName>NotCollected1</dsName>
+        <dsType>gauge</dsType>
+        <collect></collect>
+    </ds>
+    <ds>
+        <dsName>NotCollected2</dsName>
+        <dsType>gauge</dsType>
+        <collect />
+    </ds>
+    <graphs>
+        <name>ApacheRequests</name>
+        <name>ApacheTransfer</name>
+        <name>ApacheWorkers</name>
+    </graphs>
 </probedesc>

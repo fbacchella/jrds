@@ -132,7 +132,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
             this.keylow = keylow;
         }
     }
-    
+
     /**
      * @return the highlowcollectmap
      */
@@ -216,8 +216,9 @@ public class ProbeDesc<KeyType> implements Cloneable {
             collectMap = new LinkedHashMap<>(dsMap.size());
             for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
                 DsDesc dd = e.getValue();
-                if(dd.collectKey != null && dd.dsType != null)
+                if(dd.collectKey != null) {
                     collectMap.put(dd.collectKey, e.getKey());
+                }
             }
             collectMap = Collections.unmodifiableMap(collectMap);
             // Once called, it's not possible to add any more collect
