@@ -74,10 +74,8 @@ public class TestSomeProbes {
 
         ProbeDesc<? extends Object> partitionSpace = probeDescMap.get("ProcessStatusHostResources");
         Collection<String> collected = partitionSpace.getCollectMapping().values();
-        Assert.assertEquals(3, collected.size());
-        Assert.assertTrue(collected.contains("Total"));
-        Assert.assertTrue(collected.contains("Used"));
-        Assert.assertTrue(collected.contains("hrStorageAllocationUnits"));
+        Assert.assertEquals(1, collected.size());
+        Assert.assertTrue(collected.contains("hrSWRunStatus"));
     }
 
     @Test
@@ -121,7 +119,7 @@ public class TestSomeProbes {
                 return new CommunityTarget();
             }
         };
-        Map<OID, Object> collected = p.getNewSampleValuesConnected(cnx);
+        p.getNewSampleValuesConnected(cnx);
     }
 
 }

@@ -1,9 +1,3 @@
-/*##########################################################################
- _##
- _##  $Id$
- _##
- _##########################################################################*/
-
 package jrds.probe.snmp;
 
 import java.util.HashMap;
@@ -12,9 +6,8 @@ import java.util.Map;
 import org.snmp4j.smi.OID;
 
 /**
- * @author bacchell
+ * @author Fabrice Bacchella
  *
- *         TODO
  */
 public class PartitionSpace extends RdsIndexedSnmpRrd {
     static final private OID allocUnitOid = new OID(".1.3.6.1.2.1.25.2.3.1.4");
@@ -33,7 +26,7 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
         long total = 0;
         long used = 0;
         for(Map.Entry<OID, Object> e: snmpVars.entrySet()) {
-            OID oid = new OID(e.getKey());
+            OID oid = e.getKey();
             Number value = (Number) e.getValue();
             if(allocUnitOid.equals(oid)) {
                 allocUnit = value.intValue();
