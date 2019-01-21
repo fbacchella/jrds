@@ -41,7 +41,7 @@ public class TestSomeProbes {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.prepareXml(true);
-        Tools.setLevel(logger, Level.TRACE, "jrds.PropertiesManager");
+        Tools.setLevel(logger, Level.TRACE, "jrds.PropertiesManager", "jrds.probe.snmp", "jrds.snmp");
     }
 
     /**
@@ -95,7 +95,7 @@ public class TestSomeProbes {
 
             @Override
             public boolean isStarted() {
-                return false;
+                return true;
             }
             @Override
             public Snmp getSnmp() {

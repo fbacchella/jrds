@@ -104,7 +104,7 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
         Set<OID> oids = getOidSet();
         if(oids != null) {
             try {
-                oids = oids.stream().filter(NULLOID::equals).map(i -> {
+                oids = oids.stream().filter( i -> ! NULLOID.equals(i)).map(i -> {
                     log(Level.ERROR, "can't collect null OID");
                     return i;
                 }).collect(Collectors.toSet());
