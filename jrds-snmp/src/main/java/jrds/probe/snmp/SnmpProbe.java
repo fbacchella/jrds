@@ -1,12 +1,15 @@
 package jrds.probe.snmp;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.log4j.Level;
+import org.snmp4j.smi.OID;
 
 import jrds.ProbeConnected;
 import jrds.factories.ProbeMeta;
@@ -14,9 +17,6 @@ import jrds.snmp.SnmpCollectResolver;
 import jrds.snmp.SnmpConnection;
 import jrds.snmp.SnmpDiscoverAgent;
 import jrds.snmp.SnmpRequester;
-
-import org.apache.log4j.Level;
-import org.snmp4j.smi.OID;
 
 /**
  * A abstract class from which all snmp probes should be derived.
@@ -33,6 +33,9 @@ import org.snmp4j.smi.OID;
         collectResolver=SnmpCollectResolver.class
         )
 public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnection> {
+    
+    private static final OID NULLOID = new OID(new int[] {0,0});
+    
     public final static String REQUESTERNAME = "requester";
     public final static String UPTIMEOIDNAME = "uptimeOid";
     private Map<OID, String> nameMap = null;
@@ -98,9 +101,13 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
     @Override
     public Map<OID, Object> getNewSampleValuesConnected(SnmpConnection cnx) {
         Map<OID, Object> retValue = null;
-        Collection<OID> oids = getOidSet();
+        Set<OID> oids = getOidSet();
         if(oids != null) {
             try {
+                oids = oids.stream().filter(NULLOID::equals).map(i -> {
+                    log(Level.ERROR, "can't collect null OID");
+                    return i;
+                }).collect(Collectors.toSet());
                 Map<OID, Object> rawValues = requester.doSnmpGet(cnx, oids);
                 retValue = new HashMap<OID, Object>(rawValues.size());
                 for(Map.Entry<OID, Object> e: rawValues.entrySet()) {
@@ -148,10 +155,9 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
             Object o = e.getValue();
             if(o instanceof Number) {
                 retValue.put(oid, (Number) o);
-            }
-            if(o instanceof Date) {
+            } else if(o instanceof Date) {
                 Date value = (Date) o;
-                retValue.put(oid, new Double(value.getTime()));
+                retValue.put(oid, new Long(value.getTime()));
             }
         }
         return retValue;
