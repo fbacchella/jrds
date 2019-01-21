@@ -124,9 +124,8 @@ public class ProbeDesc<KeyType> implements Cloneable {
         dsMap.put(dsName, new DsDesc(dsType, heartBeatDefault, min, max, probeName));
     }
     public static final class Joined {
-        Object keyhigh;
-        Object keylow;
-
+        final Object keyhigh;
+        final Object keylow;
         Joined(Object keyhigh, Object keylow) {
             this.keyhigh = keyhigh;
             this.keylow = keylow;

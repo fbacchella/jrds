@@ -219,10 +219,14 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      */
     public void modifySample(JrdsSample sample, Map<KeyType, ValueType> values) {
         for(Map.Entry<String, ProbeDesc.Joined> e: getPd().getHighlowcollectmap().entrySet()) {
-            Long joined = joinCounter32(values.get(e.getValue().keyhigh), values.get(e.getValue().keylow));
-            if(joined != null)
+            Long joined = joinCounter32(values.remove(e.getValue().keyhigh), values.remove(e.getValue().keylow));
+            if(joined != null) {
+                Map<KeyType, String> mapping = getPd().getCollectMapping();
+                sample.remove(mapping.get(e.getValue().keyhigh));
+                sample.remove(mapping.get(e.getValue().keylow));
                 sample.put(e.getKey(), joined.doubleValue());
         }
+    }
     }
 
     @SuppressWarnings("unchecked")
