@@ -11,18 +11,22 @@
     <ds>
         <dsName>running</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <ds>
         <dsName>runnable</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <ds>
         <dsName>notRunnable</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <ds>
         <dsName>invalid</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <graphs>
         <name>processstatushostsresources</name>

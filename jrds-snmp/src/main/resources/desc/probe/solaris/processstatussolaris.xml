@@ -11,30 +11,37 @@
     <ds>
         <dsName>R</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <ds>
         <dsName>T</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <ds>
         <dsName>P</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <ds>
         <dsName>D</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <ds>
         <dsName>S</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <ds>
         <dsName>I</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <ds>
         <dsName>Z</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <graphs>
         <name>processstatus</name>
