@@ -21,7 +21,7 @@ public class SnmpConfigurator extends ModuleConfigurator {
 
     @Override
     public Object configure(PropertiesManager pm) {
-        String propertiesmibDirs = pm.getProperty("mibdirs", "/usr/share/snmp");
+        String propertiesmibDirs = pm.getProperty("mibdirs", "/usr/share/snmp/mibs");
         if(!propertiesmibDirs.trim().isEmpty()) {
             List<String> snmpMibDirs = new ArrayList<>();
             for( String i: propertiesmibDirs.split(";")) {
@@ -29,7 +29,7 @@ public class SnmpConfigurator extends ModuleConfigurator {
                 snmpMibDirs.add(Paths.get(i).toString());
             }
             if (snmpMibDirs.size() > 0) {
-                String[] paths_list = snmpMibDirs.toArray(new String[0]);
+                String[] paths_list = snmpMibDirs.toArray(new String[snmpMibDirs.size()]);
                 return OIDFormatter.register(paths_list);
             }
         }
