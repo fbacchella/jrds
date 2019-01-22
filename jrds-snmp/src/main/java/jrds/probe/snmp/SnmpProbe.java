@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.log4j.Level;
 import org.snmp4j.smi.OID;
@@ -27,15 +26,12 @@ import jrds.snmp.SnmpRequester;
  * 
  * @author Fabrice Bacchella
  */
-@ProbeMeta(
-        timerStarter=jrds.snmp.MainStarter.class,
-        discoverAgent=SnmpDiscoverAgent.class,
-        collectResolver=SnmpCollectResolver.class
-        )
+@ProbeMeta(timerStarter=jrds.snmp.MainStarter.class,
+           discoverAgent=SnmpDiscoverAgent.class,
+           collectResolver=SnmpCollectResolver.class
+          )
 public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnection> {
-    
-    private static final OID NULLOID = new OID(new int[] {0,0});
-    
+
     public final static String REQUESTERNAME = "requester";
     public final static String UPTIMEOIDNAME = "uptimeOid";
     private Map<OID, String> nameMap = null;
@@ -104,10 +100,6 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
         Set<OID> oids = getOidSet();
         if(oids != null) {
             try {
-                oids = oids.stream().filter( i -> ! NULLOID.equals(i)).map(i -> {
-                    log(Level.ERROR, "can't collect null OID");
-                    return i;
-                }).collect(Collectors.toSet());
                 Map<OID, Object> rawValues = requester.doSnmpGet(cnx, oids);
                 retValue = new HashMap<OID, Object>(rawValues.size());
                 for(Map.Entry<OID, Object> e: rawValues.entrySet()) {
