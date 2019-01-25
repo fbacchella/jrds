@@ -227,6 +227,24 @@ public class ProbeDesc<KeyType> implements Cloneable {
         return collectMap;
     }
 
+     /**
+     * Return a map that translate the probe technical name as a string to the
+     * datastore name
+     *
+     * @return a Map of collect names to datastore name
+     * @deprecated Replaced by {@link #getCollectMapping()}.
+     */
+    @Deprecated
+    public Map<String, String> getCollectStrings() {
+        Map<String, String> retValue = new LinkedHashMap<String, String>(dsMap.size());
+        for (Map.Entry<String, DsDesc> e : dsMap.entrySet()) {
+            DsDesc dd = e.getValue();
+            if (dd.collectKey instanceof String && !"".equals(dd.collectKey))
+                retValue.put((String) dd.collectKey, e.getKey());
+        }
+        return retValue;
+    }
+
     public DsDef[] getDsDefs() {
         List<DsDef> dsList = new ArrayList<DsDef>(dsMap.size());
         for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
