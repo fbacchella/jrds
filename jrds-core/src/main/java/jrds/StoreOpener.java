@@ -36,11 +36,7 @@ public final class StoreOpener {
         File f = new File(rrdFile);
         String cp = f.getCanonicalPath();
         long start = System.currentTimeMillis();
-        RrdDb db;
-        if(usepool)
-            db = instance.requestRrdDb(cp);
-        else
-            db = new RrdDb(cp, backend);
+        RrdDb db = RrdDb.getBuilder().setUsePool(usepool).setBackendFactory(backend).setPath(cp).build();
         long finish = System.currentTimeMillis();
         waitTime.addAndGet(finish - start);
         lockCount.incrementAndGet();
@@ -53,10 +49,7 @@ public final class StoreOpener {
     public final static void releaseRrd(RrdDb db) {
         try {
             long start = System.currentTimeMillis();
-            if(usepool)
-                instance.release(db);
-            else
-                db.close();
+            db.close();
             long finish = System.currentTimeMillis();
             waitTime.addAndGet(finish - start);
             lockCount.incrementAndGet();

@@ -60,85 +60,73 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     protected void create(ArchivesSet archives) throws IOException {
         log(Level.INFO, "Need to create rrd");
         RrdDef def = getRrdDef(archives);
-        RrdDb rrdDb = new RrdDb(def);
-        rrdDb.close();
+        RrdDb.getBuilder().setRrdDef(def).build().close();
     }
 
     private void upgrade(ArchivesSet archives) {
-        RrdDb rrdSource = null;
         try {
             log(Level.WARN, "Definition is changed, the store needs to be upgraded");
             File source = new File(getPath());
-            rrdSource = new RrdDb(source.getCanonicalPath());
-
             RrdDef rrdDef = getRrdDef(archives);
             File dest = File.createTempFile("JRDS_", ".tmp", source.getParentFile());
             rrdDef.setPath(dest.getCanonicalPath());
-            RrdDb rrdDest = new RrdDb(rrdDef);
-
-            log(Level.DEBUG, "Updating %s to %s", source, dest);
-
-            Set<String> badDs = new HashSet<String>();
-            Header header = rrdSource.getHeader();
-            int dsCount = header.getDsCount();
-
-            header.copyStateTo(rrdDest.getHeader());
-            for(int i = 0; i < dsCount; i++) {
-                Datasource srcDs = rrdSource.getDatasource(i);
-                String dsName = srcDs.getName();
-                Datasource dstDS = rrdDest.getDatasource(dsName);
-                if(dstDS != null) {
-                    try {
-                        srcDs.copyStateTo(dstDS);
-                        log(Level.TRACE, "Update %s", dsName);
-                    } catch (RuntimeException e) {
-                        badDs.add(dsName);
-                        log(Level.ERROR, e, "Datasource %s can't be upgraded: %s", dsName, e.getMessage());
-                    }
-                }
-            }
-            int robinMigrated = 0;
-            for(int i = 0; i < rrdSource.getArcCount(); i++) {
-                Archive srcArchive = rrdSource.getArchive(i);
-                ConsolFun consolFun = srcArchive.getConsolFun();
-                int steps = srcArchive.getSteps();
-                Archive dstArchive = rrdDest.getArchive(consolFun, steps);
-                if(dstArchive != null) {
-                    if(dstArchive.getConsolFun().equals(srcArchive.getConsolFun()) && dstArchive.getSteps() == srcArchive.getSteps()) {
-                        for(int k = 0; k < dsCount; k++) {
-                            Datasource srcDs = rrdSource.getDatasource(k);
-                            String dsName = srcDs.getName();
-                            try {
-                                int j = rrdDest.getDsIndex(dsName);
-                                if(j >= 0 && !badDs.contains(dsName)) {
-                                    log(Level.TRACE, "Upgrade of %s from %s", dsName, srcArchive);
-                                    srcArchive.getArcState(k).copyStateTo(dstArchive.getArcState(j));
-                                    srcArchive.getRobin(k).copyStateTo(dstArchive.getRobin(j));
-                                    robinMigrated++;
-                                }
-                            } catch (IllegalArgumentException e) {
-                                log(Level.TRACE, "Datastore %s removed", dsName);
-                            }
-
+            try (RrdDb rrdSource = RrdDb.getBuilder().setPath(source.getCanonicalPath()).build();
+                 RrdDb rrdDest = RrdDb.getBuilder().setRrdDef(rrdDef).build()) {
+                log(Level.DEBUG, "Updating %s to %s", source, dest);
+                Set<String> badDs = new HashSet<String>();
+                Header header = rrdSource.getHeader();
+                int dsCount = header.getDsCount();
+                header.copyStateTo(rrdDest.getHeader());
+                for(int i = 0; i < dsCount; i++) {
+                    Datasource srcDs = rrdSource.getDatasource(i);
+                    String dsName = srcDs.getName();
+                    Datasource dstDS = rrdDest.getDatasource(dsName);
+                    if(dstDS != null) {
+                        try {
+                            srcDs.copyStateTo(dstDS);
+                            log(Level.TRACE, "Update %s", dsName);
+                        } catch (RuntimeException e) {
+                            badDs.add(dsName);
+                            log(Level.ERROR, e, "Datasource %s can't be upgraded: %s", dsName, e.getMessage());
                         }
-                        log(Level.TRACE, "Update %s", srcArchive);
                     }
                 }
+                int robinMigrated = 0;
+                for(int i = 0; i < rrdSource.getArcCount(); i++) {
+                    Archive srcArchive = rrdSource.getArchive(i);
+                    ConsolFun consolFun = srcArchive.getConsolFun();
+                    int steps = srcArchive.getSteps();
+                    Archive dstArchive = rrdDest.getArchive(consolFun, steps);
+                    if(dstArchive != null) {
+                        if(dstArchive.getConsolFun().equals(srcArchive.getConsolFun()) && dstArchive.getSteps() == srcArchive.getSteps()) {
+                            for(int k = 0; k < dsCount; k++) {
+                                Datasource srcDs = rrdSource.getDatasource(k);
+                                String dsName = srcDs.getName();
+                                try {
+                                    int j = rrdDest.getDsIndex(dsName);
+                                    if(j >= 0 && !badDs.contains(dsName)) {
+                                        log(Level.TRACE, "Upgrade of %s from %s", dsName, srcArchive);
+                                        srcArchive.getArcState(k).copyStateTo(dstArchive.getArcState(j));
+                                        srcArchive.getRobin(k).copyStateTo(dstArchive.getRobin(j));
+                                        robinMigrated++;
+                                    }
+                                } catch (IllegalArgumentException e) {
+                                    e.printStackTrace();
+                                    log(Level.TRACE, "Datastore %s removed: %s", dsName, e.getMessage());
+                                }
+                                
+                            }
+                            log(Level.TRACE, "Update %s", srcArchive);
+                        }
+                    }
+                }
+                log(Level.DEBUG, "Robin migrated: %s", robinMigrated);
+                rrdSource.close();
             }
-            log(Level.DEBUG, "Robin migrated: %s", robinMigrated);
-
-            rrdDest.close();
-            rrdSource.close();
             log(Level.DEBUG, "Size difference : %d", (dest.length() - source.length()));
             copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
         } catch (IOException e) {
             log(Level.ERROR, e, "Upgrade failed: %s", e);
-        } finally {
-            if(rrdSource != null)
-                try {
-                    rrdSource.close();
-                } catch (IOException e) {
-                }
         }
     }
 
@@ -179,7 +167,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
         RrdDb rrdDb = null;
         try {
             if(rrdFile.isFile()) {
-                rrdDb = new RrdDb(getPath());
+                rrdDb = RrdDb.getBuilder().setPath(getPath()).build();
                 // old definition
                 RrdDef tmpdef = rrdDb.getRrdDef();
                 Date startTime = new Date();
@@ -201,7 +189,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                     rrdDb.close();
                     rrdDb = null;
                     upgrade(archives);
-                    rrdDb = new RrdDb(getPath());
+                    rrdDb = RrdDb.getBuilder().setPath(getPath()).build();
                 }
                 log(Level.TRACE, "******");
             } else
