@@ -254,6 +254,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         if(timerName == null) {
             timerName = Timer.DEFAULTNAME;
         }
+        timerName = Util.parseTemplate(timerName, properties, p, host);
         Timer timer = timers.get(timerName);
         if(timer == null) {
             logger.error("Invalid timer '" + timerName + "' for probe " + host.getName() + "/" + type);
@@ -276,6 +277,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             logger.error("invalid archives set name: " + archivesName);
             return null;
         }
+        archivesName = Util.parseTemplate(archivesName, properties, p, host);
         ArchivesSet archives = archivessetmap.get(archivesName);
         p.setArchives(archives);
 
@@ -283,7 +285,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         String label = probeNode.getAttribute("label");
         if(label != null && !"".equals(label)) {
             logger.trace(Util.delayedFormatString("Adding label %s to %s", label, p));
-            p.setLabel(jrds.Util.parseTemplate(label, host, properties));
+            p.setLabel(jrds.Util.parseTemplate(label, properties, p, host));
         }
 
         // The host is set
