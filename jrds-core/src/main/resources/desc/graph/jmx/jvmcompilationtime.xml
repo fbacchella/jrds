@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+    <name>JVMCompilationTime</name>
+    <graphName>jvmcompilationtime-${label}</graphName>
+    <graphTitle>JVM compilation time for ${label} on ${host}</graphTitle>
+    <unit>
+        <SI />
+    </unit>
+    <verticalLabel>ms</verticalLabel>
+    <add>
+        <name>CompilationTime</name>
+        <graphType>line</graphType>
+        <legend>Time spent compiling</legend>
+    </add>
+    <hosttree>
+        <pathelement>HOST</pathelement>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>JVM</pathstring>
+        <pathstring>${label}</pathstring>
+        <pathstring>Compilation Time</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>JVM</pathstring>
+        <pathelement>HOST</pathelement>
+        <pathstring>Compilation Time</pathstring>
+        <pathstring>${label}</pathstring>
+    </viewtree>
+</graphdesc>
