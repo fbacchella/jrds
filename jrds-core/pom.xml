@@ -16,7 +16,7 @@
         <dependency>
             <groupId>org.rrd4j</groupId>
             <artifactId>rrd4j</artifactId>
-            <version>3.5-SNAPSHOT</version>
+            <version>3.5</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>

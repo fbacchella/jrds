@@ -25,7 +25,7 @@
         <dependency>
             <groupId>fr.jrds</groupId>
             <artifactId>snmpcodec</artifactId>
-            <version>0.0.7-SNAPSHOT</version>
+            <version>0.0.7</version>
         </dependency>
         <dependency>
             <groupId>fr.jrds</groupId>
