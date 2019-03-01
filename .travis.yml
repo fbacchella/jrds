@@ -8,7 +8,7 @@ cache:
 install:
   - mvn clean validate
 script:
-  - mvn compile package deploy --settings deploy-settings.xml
+  - mvn deploy --settings deploy-settings.xml
 notifications:
   webhooks:
     urls:
