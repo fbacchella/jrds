@@ -261,10 +261,44 @@
         <dsType>gauge</dsType>
         <collect>$.nodes.*.indices.segments.fixed_bit_set_memory_in_bytes</collect>
     </ds>
+    <!-- query_cache -->
+    <ds>
+        <dsName>indices.request_cache.memory_size_in_bytes</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.*.indices.request_cache.memory_size_in_bytes</collect>
+    </ds>
+    <!-- translog -->
+    <ds>
+        <dsName>indices.translog.operations</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.*.indices.translog.operations</collect>
+    </ds>
+    <ds>
+        <dsName>indices.translog.size_in_bytes</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.*.indices.translog.size_in_bytes</collect>
+    </ds>
+    <ds>
+        <dsName>indices.translog.uncommitted_operations</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.*.indices.translog.uncommitted_operations</collect>
+    </ds>
+    <ds>
+        <dsName>indices.translog.uncommitted_size_in_bytes</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.*.indices.translog.uncommitted_size_in_bytes</collect>
+    </ds>
+    <ds>
+        <dsName>indices.translog.earliest_last_modified_age</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.*.indices.translog.earliest_last_modified_age</collect>
+    </ds>
     <graphs>
         <name>ElasticNodeIndices</name>
         <name>ElasticNodeIndicesTime</name>
         <name>ElasticNodeDocCounts</name>
         <name>ElasticNodeMemory</name>
+        <name>ElasticNodeTranslogSize</name>
+        <name>ElasticNodeTranslogCount</name>
     </graphs>
 </probedesc>

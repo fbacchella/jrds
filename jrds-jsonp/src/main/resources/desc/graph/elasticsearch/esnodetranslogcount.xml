@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+                           "urn:jrds:graphdesc">
+<graphdesc>
+    <name>ElasticNodeTranslogCount</name>
+    <graphName>elasticnode_translog_count_${attr.nodename}</graphName>
+    <graphTitle>Elastic translog operations count for ${attr.nodename} on ${host}</graphTitle>
+    <verticalLabel>Operations</verticalLabel>
+    <add>
+        <name>indices.translog.operations</name>
+        <graphType>area</graphType>
+        <legend>Total operations count</legend>
+    </add>
+    <add>
+        <name>indices.translog.uncommitted_operations</name>
+        <graphType>area</graphType>
+        <legend>Uncommitted operations</legend>
+    </add>
+    <hosttree>
+        <pathelement>HOST</pathelement>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>Elasticearch</pathstring>
+        <pathstring>${attr.nodename}</pathstring>
+        <pathstring>Translog operations</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>Elasticearch</pathstring>
+        <pathstring>Translog operations</pathstring>
+        <pathstring>${attr.nodename}</pathstring>
+    </viewtree>
+</graphdesc>

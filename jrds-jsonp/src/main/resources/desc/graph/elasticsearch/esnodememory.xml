@@ -15,11 +15,13 @@
     <add>
         <name>indices.segments.terms_memory_in_bytes</name>
         <graphType>area</graphType>
+        <color>blue</color>
         <legend>Terms</legend>
     </add>
     <add>
         <name>indices.segments.stored_fields_memory_in_bytes</name>
         <graphType>stack</graphType>
+        <color>green</color>
         <legend>Stored fields</legend>
     </add>
     <!-- Not used -->
@@ -29,26 +31,31 @@
     <add>
         <name>indices.segments.norms_memory_in_bytes</name>
         <graphType>stack</graphType>
+        <color>red</color>
         <legend>Norms</legend>
     </add>
     <add>
         <name>indices.segments.points_memory_in_bytes</name>
         <graphType>stack</graphType>
+        <color>cyan</color>
         <legend>Points</legend>
     </add>
     <add>
         <name>indices.segments.doc_values_memory_in_bytes</name>
         <graphType>stack</graphType>
+        <color>orange</color>
         <legend>Doc values</legend>
     </add>
     <add>
         <name>indices.segments.version_map_memory_in_bytes</name>
         <graphType>stack</graphType>
+        <color>teal</color>
         <legend>Version Map</legend>
     </add>
     <add>
         <name>indices.segments.fixed_bit_set_memory_in_bytes</name>
         <graphType>stack</graphType>
+        <color>yellow</color>
         <legend>Fixed Bitsets</legend>
     </add>
     <add>
@@ -57,21 +64,25 @@
     <add>
         <name>indices.query_cache.memory_size_in_bytes</name>
         <graphType>stack</graphType>
+        <color>cyan</color>
         <legend>Query cache</legend>
     </add>
     <add>
         <name>indices.request_cache.memory_size_in_bytes</name>
         <graphType>stack</graphType>
+        <color>red</color>
         <legend>Request Cache</legend>
     </add>
     <add>
         <name>indices.fielddata.memory_size_in_bytes</name>
         <graphType>stack</graphType>
+        <color>green</color>
         <legend>Fielddata</legend>
     </add>
     <add>
         <name>indices.segments.index_writer_memory_in_bytes</name>
         <graphType>stack</graphType>
+        <color>lime</color>
         <legend>Index Writer</legend>
     </add>
     <add>
@@ -79,7 +90,8 @@
     </add>
     <add>
         <name>indices.merges.current_size_in_bytes</name>
-        <graphType>area</graphType>
+        <graphType>line</graphType>
+        <color>red</color>
         <legend>Merges</legend>
     </add>
     <hosttree>

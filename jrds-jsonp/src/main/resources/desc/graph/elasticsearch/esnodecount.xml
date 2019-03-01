@@ -5,7 +5,7 @@
     <name>ElasticNodeDocCounts</name>
     <graphName>elasticnode_docs_${attr.nodename}</graphName>
     <graphTitle>Elastic documents count for ${attr.nodename} on ${host}</graphTitle>
-    <verticalLabel>cos</verticalLabel>
+    <verticalLabel>docs</verticalLabel>
     <add>
         <name>indices.docs.count</name>
         <graphType>area</graphType>
