@@ -51,7 +51,7 @@ public enum SnmpRequester {
     TABULAR() {
         @Override
         public Map<OID, Object> doSnmpGet(SnmpConnection cnx, Collection<OID> oids) {
-
+            
             Target snmpTarget = cnx.getConnection();
             Snmp snmp = cnx.getSnmp();
 
@@ -139,7 +139,7 @@ public enum SnmpRequester {
 
         PDU requestPDU = cnx.getPdufactory().createPDU(snmpTarget);
         requestPDU.addAll(vars);
-
+        
         // If no oid to collect, nothing to do
         if(requestPDU.size() < 1)
             return Collections.emptyMap();

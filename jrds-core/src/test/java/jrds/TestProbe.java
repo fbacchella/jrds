@@ -58,7 +58,7 @@ public class TestProbe {
         dsMap.put("collecthigh", "high");
         dsMap.put("collectlow", "low");
         pd.add(dsMap);
-
+        
         GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
         args.set(ProbeDesc.class, pd).set(Probe.class, DummyProbe.class);
         @SuppressWarnings("unchecked")

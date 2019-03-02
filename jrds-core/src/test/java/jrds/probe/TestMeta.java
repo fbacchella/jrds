@@ -18,6 +18,7 @@ import jrds.probe.munin.MuninDiscoverAgent;
 import jrds.webapp.DiscoverAgent;
 
 public class TestMeta {
+
     @ProbeMeta(discoverAgent = MuninDiscoverAgent.class)
     public abstract class DummyProbe1<A, B> extends Probe<A, B> {
 

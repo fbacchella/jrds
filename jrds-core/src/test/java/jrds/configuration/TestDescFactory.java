@@ -95,7 +95,6 @@ public class TestDescFactory {
         PropertiesManager pm = new PropertiesManager();
 
         List<LoggingEvent> logged = Tools.getLockChecker("jrds.configuration.ConfigObjectBuilder");
-
         ProbeDescBuilder builder = new ProbeDescBuilder();
         builder.setPm(pm);
         ProbeDesc<?> pd = builder.makeProbeDesc(d);

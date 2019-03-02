@@ -225,8 +225,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                 sample.remove(mapping.get(e.getValue().keyhigh));
                 sample.remove(mapping.get(e.getValue().keylow));
                 sample.put(e.getKey(), joined.doubleValue());
+            }
         }
-    }
     }
 
     @SuppressWarnings("unchecked")
@@ -615,12 +615,12 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     private final String parseTemplate(String template) {
         Object[] arguments = {
-                "${host}",
-                "${index}",
-                "${url}",
-                "${port}",
-                "${index.signature}",
-                "${url.signature}"
+                              "${host}",
+                              "${index}",
+                              "${url}",
+                              "${port}",
+                              "${index.signature}",
+                              "${url.signature}"
         };
         return jrds.Util.parseOldTemplate(template, arguments, this);
     }
