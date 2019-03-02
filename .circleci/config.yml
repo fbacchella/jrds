@@ -27,7 +27,7 @@ jobs:
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
             - run:
-                command: mvn -B clean compile -DskipTests
+                command: mvn -B clean compile install -DskipTests
                 environment:
                     JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
             - persist_to_workspace:
