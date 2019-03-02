@@ -46,6 +46,7 @@ public class TestSomeProbes {
         Map<String, ProbeDesc<? extends Object>> probeDescMap = conf.setProbeDescMap();
 
         ProbeDesc<? extends Object> partitionSpace = probeDescMap.get("PartitionSpace");
+        Assert.assertNotNull("PartitionSpace probe not found", partitionSpace);
         Collection<String> collected = partitionSpace.getCollectMapping().values();
         Assert.assertEquals(3, collected.size());
         Assert.assertTrue(collected.contains("Total"));
@@ -62,6 +63,7 @@ public class TestSomeProbes {
         Map<String, ProbeDesc<? extends Object>> probeDescMap = conf.setProbeDescMap();
 
         ProbeDesc<? extends Object> partitionSpace = probeDescMap.get("ProcessStatusHostResources");
+        Assert.assertNotNull("PartitionSpace probe not found", partitionSpace);
         Collection<String> collected = partitionSpace.getCollectMapping().values();
         Assert.assertEquals(1, collected.size());
         Assert.assertTrue(collected.contains("hrSWRunStatus"));
