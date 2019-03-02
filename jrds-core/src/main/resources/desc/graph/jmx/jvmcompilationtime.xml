@@ -7,9 +7,12 @@
     <unit>
         <SI />
     </unit>
-    <verticalLabel>ms</verticalLabel>
+    <verticalLabel>s</verticalLabel>
     <add>
         <name>CompilationTime</name>
+    </add>
+    <add>
+        <rpn>CompilationTime,1000,/</rpn>
         <graphType>line</graphType>
         <legend>Time spent compiling</legend>
     </add>
@@ -23,8 +26,8 @@
     <viewtree>
         <pathelement>SERVICES</pathelement>
         <pathstring>JVM</pathstring>
-        <pathelement>HOST</pathelement>
-        <pathstring>Compilation Time</pathstring>
         <pathstring>${label}</pathstring>
+        <pathstring>Compilation Time</pathstring>
+        <pathelement>HOST</pathelement>
     </viewtree>
 </graphdesc>
