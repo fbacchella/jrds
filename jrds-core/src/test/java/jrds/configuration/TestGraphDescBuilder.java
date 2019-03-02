@@ -8,6 +8,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 
@@ -117,8 +120,14 @@ public class TestGraphDescBuilder {
         Period pr = new Period();
         ExtractInfo ei = ExtractInfo.get().make(pr.getBegin(), pr.getEnd());
         Map<String, Plottable> empty = Collections.emptyMap();
+
+        ImageWriter iw = ImageIO.getImageWritersByFormatName("BMP").next();
+        ImageWriteParam iwp = iw.getDefaultWriteParam();
+        iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+        iwp.unsetCompression();
+
         RrdGraphDef def = gd.getGraphDef(p, ei, empty);
-        RrdGraphInfo gi = new RrdGraph(def).getRrdGraphInfo();
+        RrdGraphInfo gi = new RrdGraph(def, iw, iwp).getRrdGraphInfo();
 
         logger.debug(Arrays.asList(gi.getPrintLines()));
 
@@ -131,7 +140,7 @@ public class TestGraphDescBuilder {
 
         Assert.assertTrue("graph height invalid", 206 < gi.getHeight());
         Assert.assertTrue("graph width invalid", 578 < gi.getWidth());
-        Assert.assertEquals("graph byte count invalid", 12574, gi.getByteCount(), 4000);
+        Assert.assertEquals("graph byte count invalid", 626550, gi.getByteCount());
 
         for(String treename: new String[] { PropertiesManager.HOSTSTAB, PropertiesManager.VIEWSTAB, "tab" }) {
             List<String> tree = gd.getTree(new GraphNode(p, gd), treename);
