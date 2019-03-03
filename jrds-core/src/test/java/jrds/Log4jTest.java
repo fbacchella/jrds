@@ -19,11 +19,11 @@ public class Log4jTest {
     public TemporaryFolder testFolder = new TemporaryFolder();
 
     static final private String TANAME = "TANAME";
-    static final private List<LoggingEvent> logs = new ArrayList<LoggingEvent>();
+    static final private List<String> logs = new ArrayList<String>();
     static final Appender ta = new AppenderSkeleton() {
         @Override
         protected void append(LoggingEvent arg0) {
-            logs.add(arg0);
+            logs.add(arg0.getMessage().toString());
         }
 
         public void close() {
@@ -41,7 +41,7 @@ public class Log4jTest {
         JrdsLoggerConfiguration.initLog4J();
         Logger jrdsLogger = LogManager.getLoggerRepository().exists("jrds");
         Assert.assertNotNull(jrdsLogger);
-        PropertiesManager pm = Tools.makePm(testFolder, "loglevel=warn");
+        PropertiesManager pm = Tools.makePm(testFolder, "loglevel=error");
         JrdsLoggerConfiguration.configure(pm);
         Assert.assertEquals(pm.loglevel, jrdsLogger.getLevel());
     }
@@ -59,7 +59,7 @@ public class Log4jTest {
         Logger l = Logger.getLogger("jrds");
         l.error("A message");
         l.debug("A debug message");
-        Assert.assertEquals(2, logs.size());
+        Assert.assertEquals("found logs: " + logs, 1, logs.size());
     }
 
 }

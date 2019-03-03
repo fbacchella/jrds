@@ -8,13 +8,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -26,7 +24,6 @@ import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.rules.TemporaryFolder;
@@ -49,14 +46,7 @@ final public class Tools {
     static public void configure() throws IOException {
         Locale.setDefault(new Locale("POSIX"));
         System.getProperties().setProperty("java.awt.headless", "true");
-        LogManager.resetConfiguration();
-        // resetConfiguration is not enough
-        @SuppressWarnings("unchecked")
-        List<Logger> loggers = (List<Logger>) Collections.list(LogManager.getCurrentLoggers());
-        for(Logger l: loggers) {
-            l.removeAllAppenders();
-            l.setLevel(Level.OFF);
-        }
+        JrdsLoggerConfiguration.reset();
         JrdsLoggerConfiguration.jrdsAppender = new ConsoleAppender(new org.apache.log4j.PatternLayout(JrdsLoggerConfiguration.DEFAULTLAYOUT), ConsoleAppender.SYSTEM_OUT);
         JrdsLoggerConfiguration.jrdsAppender.setName(JrdsLoggerConfiguration.APPENDERNAME);
         JrdsLoggerConfiguration.initLog4J();
@@ -111,14 +101,6 @@ final public class Tools {
         // The system property override the code log level
         if(System.getProperty("jrds.testloglevel") != null) {
             level = Level.toLevel(System.getProperty("jrds.testloglevel"));
-            if (app != null) {
-                app.addFilter(new org.apache.log4j.spi.Filter() {
-                    @Override
-                    public int decide(LoggingEvent event) {
-                        return -1;
-                    }
-                });
-            }
         }
         if(logger != null) {
             logger.setLevel(level);
@@ -126,9 +108,8 @@ final public class Tools {
         for(String loggerName: allLoggers) {
             Logger l = Logger.getLogger(loggerName);
             l.setLevel(level);
-            if(l.getAppender(JrdsLoggerConfiguration.APPENDERNAME) != null) {
-                l.addAppender(app);
-            }
+            l.setAdditivity(false);
+            l.addAppender(app);
         }
     }
 
@@ -187,6 +168,7 @@ final public class Tools {
             Logger logger = Logger.getLogger(loggername);
             logger.addAppender(ta);
             logger.setLevel(Level.TRACE);
+            logger.setAdditivity(false);
         }
         return logs;
     }
@@ -241,7 +223,7 @@ final public class Tools {
         ti.timeout = 10;
         return new Timer("TimerTester", ti);
     }
-    
+
     static public void findDescs(PropertiesManager pm) {
         try {
             for(URL u: jrds.Util.iterate(pm.extensionClassLoader.getResources("desc"))) {

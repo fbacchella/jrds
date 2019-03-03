@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.log4j.Appender;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.DailyRollingFileAppender;
+import org.apache.log4j.Hierarchy;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -33,7 +34,7 @@ import org.apache.log4j.PatternLayout;
  */
 public class JrdsLoggerConfiguration {
     static public final String APPENDERNAME = "jrdsAppender";
-    static public final String DEFAULTLOGFILE = ConsoleAppender.SYSTEM_ERR;
+    static public final String DEFAULTLOGFILE = "System.err";
     static public final String DEFAULTLAYOUT = "[%d] %5p %c : %m%n";
     static public Appender jrdsAppender = null;
     // The managed loggers list
@@ -103,6 +104,15 @@ public class JrdsLoggerConfiguration {
             // Keep the new logger name
             rootLoggers.add(logname);
         }
+
+        private static void reset() {
+            LogManager.resetConfiguration();
+            Hierarchy logHierarchy = (Hierarchy) LogManager.getLoggerRepository();
+            logHierarchy.clear();
+            logOwner = null;
+            jrdsAppender = null;
+        }
+
     }
 
     private JrdsLoggerConfiguration() {
@@ -114,6 +124,12 @@ public class JrdsLoggerConfiguration {
      */
     static public void setExternal() {
         logOwner = false;
+    }
+
+    static public void reset() {
+        if (isLogOwner()) {
+            JrdsLoggerConfigurationWorker.reset();
+        }
     }
 
     /**
