@@ -53,8 +53,6 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Ob
         Class<? extends Probe<?, ?>> c = (Class<? extends Probe<?, ?>>) classLoader.loadClass(className);
         pd.setProbeClass((Class<? extends Probe<KeyType, ?>>) c);
 
-        pd.setHeartBeatDefault(pm.step * 2);
-
         setMethod(root.getElementbyName("uptimefactor"), pd, "setUptimefactor", Float.TYPE);
 
         boolean withgraphs = false;

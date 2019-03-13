@@ -175,7 +175,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         System.out.println(doTitle("Data stores"));
         System.out.println();
         System.out.println("^ Name ^ Type ^ Description ^");
-        for(DsDef ds: pd.getDsDefs()) {
+        for(DsDef ds: pd.getDsDefs(1)) {
             System.out.println(String.format("| %s | %s | |", ds.getDsName(), ds.getDsType()));
         }
         System.out.println();

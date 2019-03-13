@@ -134,6 +134,7 @@ public class ApacheHttpClientTest {
         p.setMainStore(new RrdDbStoreFactory(), empty);
         p.setHost(localhost);
         p.setPort(server.getURI().toURL().getPort());
+        p.setStep(30);
         p.configure();
         p.checkStore();
         localhost.addProbe(p);
@@ -163,6 +164,7 @@ public class ApacheHttpClientTest {
         p.setHost(localhost);
         p.setPort(server.getURI().toURL().getPort());
         p.setScheme("https");
+        p.setStep(30);
         p.configure();
         p.checkStore();
         localhost.addProbe(p);

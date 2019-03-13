@@ -53,7 +53,6 @@ public class ProbeDesc<KeyType> implements Cloneable {
     static public final double MINDEFAULT = 0;
     static public final double MAXDEFAULT = Double.NaN;
 
-    private long heartBeatDefault = 600;
     private Map<String, DsDesc> dsMap;
     private Map<String, String> specific = new HashMap<String, String>();
     private String probeName;
@@ -72,17 +71,22 @@ public class ProbeDesc<KeyType> implements Cloneable {
 
     private class DsDesc {
         final DsType dsType;
-        final long heartbeat;
         final double minValue;
         final double maxValue;
         final KeyType collectKey;
 
-        public DsDesc(DsType dsType, long heartbeat, double minValue, double maxValue, String collectKey) {
+        public DsDesc(DsType dsType, double minValue, double maxValue, String collectKey) {
             this.dsType = dsType;
-            this.heartbeat = heartbeat;
             this.minValue = minValue;
             this.maxValue = maxValue;
             this.collectKey = collectKey != null ? ProbeDesc.this.collectResolver.resolve(collectKey) : null;
+        }
+
+        @Override
+        public String toString() {
+            return "DsDesc [dsType=" + dsType
+                            + ", minValue=" + minValue + ", maxValue=" + maxValue
+                            + ", collectKey=" + collectKey + "]";
         }
     }
 
@@ -109,19 +113,19 @@ public class ProbeDesc<KeyType> implements Cloneable {
      * @param dsType
      */
     public void add(String name, DsType dsType) {
-        dsMap.put(name, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, name));
+        dsMap.put(name, new DsDesc(dsType, MINDEFAULT, MAXDEFAULT, name));
     }
 
     public void add(String name, DsType dsType, double min, double max) {
-        dsMap.put(name, new DsDesc(dsType, heartBeatDefault, min, max, name));
+        dsMap.put(name, new DsDesc(dsType, min, max, name));
     }
 
     public void add(String dsName, DsType dsType, String probeName) {
-        dsMap.put(dsName, new DsDesc(dsType, heartBeatDefault, MINDEFAULT, MAXDEFAULT, probeName));
+        dsMap.put(dsName, new DsDesc(dsType, MINDEFAULT, MAXDEFAULT, probeName));
     }
 
     public void add(String dsName, DsType dsType, String probeName, double min, double max) {
-        dsMap.put(dsName, new DsDesc(dsType, heartBeatDefault, min, max, probeName));
+        dsMap.put(dsName, new DsDesc(dsType, min, max, probeName));
     }
     public static final class Joined {
         final Object keyhigh;
@@ -140,7 +144,6 @@ public class ProbeDesc<KeyType> implements Cloneable {
     }
 
     public void add(Map<String, Object> valuesMap) {
-        long heartbeat = heartBeatDefault;
         double min = MINDEFAULT;
         double max = MAXDEFAULT;
         String collectKey = null;
@@ -164,8 +167,8 @@ public class ProbeDesc<KeyType> implements Cloneable {
         } else if(valuesMap.containsKey("collecthigh") && valuesMap.containsKey("collectlow")) {
             String keyHigh = valuesMap.get("collecthigh").toString();
             String keyLow = valuesMap.get("collectlow").toString();
-            dsMap.put(name + "high", new DsDesc(null, heartbeat, min, max, keyHigh));
-            dsMap.put(name + "low", new DsDesc(null, heartbeat, min, max, keyLow));
+            dsMap.put(name + "high", new DsDesc(null, min, max, keyHigh));
+            dsMap.put(name + "low", new DsDesc(null, min, max, keyLow));
             highlowcollectmap.put(name, new Joined(keyHigh, keyLow));
         } else {
             collectKey = name;
@@ -187,7 +190,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
             }
         }
 
-        dsMap.put(name, new DsDesc(type, heartbeat, min, max, collectKey));
+        dsMap.put(name, new DsDesc(type, min, max, collectKey));
     }
 
     /**
@@ -227,7 +230,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
         return collectMap;
     }
 
-     /**
+    /**
      * Return a map that translate the probe technical name as a string to the
      * datastore name
      *
@@ -245,12 +248,12 @@ public class ProbeDesc<KeyType> implements Cloneable {
         return retValue;
     }
 
-    public DsDef[] getDsDefs() {
+    public DsDef[] getDsDefs(long requiredUptime) {
         List<DsDef> dsList = new ArrayList<DsDef>(dsMap.size());
         for(Map.Entry<String, DsDesc> e: dsMap.entrySet()) {
             DsDesc desc = e.getValue();
             if(desc.dsType != null)
-                dsList.add(new DsDef(e.getKey(), desc.dsType, desc.heartbeat, desc.minValue, desc.maxValue));
+                dsList.add(new DsDef(e.getKey(), desc.dsType, requiredUptime, desc.minValue, desc.maxValue));
         }
         return dsList.toArray(new DsDef[dsList.size()]);
     }
@@ -406,20 +409,6 @@ public class ProbeDesc<KeyType> implements Cloneable {
         Map<String, ProbeDesc.DefaultBean> beans = new HashMap<String, ProbeDesc.DefaultBean>(defaultsBeans.size());
         beans.putAll(defaultsBeans);
         return beans;
-    }
-
-    /**
-     * @return the heartBeatDefault
-     */
-    public long getHeartBeatDefault() {
-        return heartBeatDefault;
-    }
-
-    /**
-     * @param heartBeatDefault the heartBeatDefault to set
-     */
-    public void setHeartBeatDefault(long heartBeatDefault) {
-        this.heartBeatDefault = heartBeatDefault;
     }
 
     /**

@@ -277,7 +277,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      */
     public boolean injectSample(JrdsSample oneSample, Map<KeyType, ValueType> sampleVals) {
         log(Level.TRACE, "Collected values: %s", sampleVals);
-        if(getUptime() * pd.getUptimefactor() < pd.getHeartBeatDefault()) {
+        if(getUptime() * pd.getUptimefactor() < getRequiredUptime()) {
             log(Level.INFO, "uptime too low: %.0f", getUptime() * pd.getUptimefactor());
             return false;
         }
@@ -488,6 +488,10 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      */
     public long getUptime() {
         return uptime;
+    }
+
+    public long getRequiredUptime() {
+        return getStep() * 2;
     }
 
     /**

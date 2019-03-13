@@ -80,7 +80,7 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
     public Map<String, Number> getNewSampleValues() {
         String perfstring = launchCmd();
         String values[] = perfstring.split(":");
-        DsDef[] defs = getPd().getDsDefs();
+        DsDef[] defs = getPd().getDsDefs(getRequiredUptime());
         int n = values.length;
         if(values.length != defs.length + 1) {
             throw new IllegalArgumentException("Invalid number of values specified (found " + values.length + ", " + defs.length + " allowed)");
