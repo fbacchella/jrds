@@ -102,6 +102,14 @@ public class TestGraphDescBuilder {
         dsMap.set("dsName", "add3").set("dsType", DsType.COUNTER);
         pd.add(dsMap);
 
+        dsMap.clear();
+        dsMap.set("dsName", "add4").set("dsType", DsType.COUNTER);
+        pd.add(dsMap);
+
+        dsMap.clear();
+        dsMap.set("dsName", "add5").set("dsType", DsType.COUNTER);
+        pd.add(dsMap);
+
         p.checkStore();
 
         if(logger.isTraceEnabled()) {
@@ -129,18 +137,16 @@ public class TestGraphDescBuilder {
         RrdGraphDef def = gd.getGraphDef(p, ei, empty);
         RrdGraphInfo gi = new RrdGraph(def, iw, iwp).getRrdGraphInfo();
 
-        logger.debug(Arrays.asList(gi.getPrintLines()));
-
         Assert.assertEquals("graph name failed", "graphName", gd.getGraphName());
         Assert.assertEquals("graph title failed", "graphTitle", gd.getGraphTitle());
         Assert.assertEquals("graph name failed", "graphdesctest", gd.getName());
-        Assert.assertEquals("legend count failed", 5, gd.getLegendLines());
+        Assert.assertEquals("legend count failed", 6, gd.getLegendLines());
         Assert.assertFalse("Graph unit should be binary", gd.isSiUnit());
         Assert.assertEquals("Graph unit scale should be fixed", 0, gd.getUnitExponent().intValue());
 
         Assert.assertTrue("graph height invalid", 206 < gi.getHeight());
         Assert.assertTrue("graph width invalid", 578 < gi.getWidth());
-        Assert.assertEquals("graph byte count invalid", 626550, gi.getByteCount());
+        Assert.assertEquals("graph byte count invalid", 678758, gi.getByteCount());
 
         for(String treename: new String[] { PropertiesManager.HOSTSTAB, PropertiesManager.VIEWSTAB, "tab" }) {
             List<String> tree = gd.getTree(new GraphNode(p, gd), treename);

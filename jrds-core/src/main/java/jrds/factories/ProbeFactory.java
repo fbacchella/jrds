@@ -111,10 +111,10 @@ public class ProbeFactory {
             if(name == null)
                 name = jrds.Util.parseTemplate(p.getPd().getProbeName(), p);
             p.setName(name);
-            for(String graphName: p.getPd().getGraphClasses()) {
+            for(String graphName: p.getPd().getGraphs()) {
                 GraphDesc gd = graphDescMap.get(graphName);
                 if(gd != null) {
-                    p.addGraph(new GraphNode(p, gd));
+                    p.addGraph(gd);
                 } else {
                     logger.warn(Util.delayedFormatString("Unknown graph %s for probe %s", graphName, p));
                 }

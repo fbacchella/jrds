@@ -122,7 +122,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
                         builder.setRpn(value);
                         break;
                     case "reversed":
-                        builder.setReversed(value != null && ! value.isEmpty());
+                        builder.setReversed(! "false".equalsIgnoreCase(value));
                         break;
                     case "dsName":
                         builder.setDsName(value);

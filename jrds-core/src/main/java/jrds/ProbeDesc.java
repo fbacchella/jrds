@@ -329,7 +329,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
     /**
      * @return Returns the list of graph names.
      */
-    public Collection<String> getGraphClasses() {
+    public Collection<String> getGraphs() {
         return graphesList;
     }
 

@@ -69,7 +69,7 @@ public class AllProbeCreationTest {
                 }
             }
             p.configureStarters(pm);
-            for(String graphName: p.getPd().getGraphClasses()) {
+            for(String graphName: p.getPd().getGraphs()) {
                 try {
                     GraphDesc gd = graphDescMap.get(graphName);
                     p.addGraph(gd);

@@ -8,11 +8,13 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,7 +45,7 @@ import lombok.experimental.Accessors;
  * 
  * @author Fabrice Bacchella
  */
-public class GraphDesc implements Cloneable, WithACL {
+public class GraphDesc implements WithACL {
     static final private Logger logger = Logger.getLogger(GraphDesc.class);
 
     static public final ConsolFun DEFAULTCF = ConsolFun.AVERAGE;
@@ -702,7 +704,7 @@ public class GraphDesc implements Cloneable, WithACL {
                                  name,
                                  (dspath == null ? "" : dspath.host),
                                  (dspath == null ? "" : dspath.probe),
-                                 dsName,
+                                 (dsName == null ? "" : dsName),
                                  (rpn == null ? "" : rpn),
                                  graphType,
                                  colorString,
@@ -782,6 +784,27 @@ public class GraphDesc implements Cloneable, WithACL {
 
         public Builder emptyDs() {
             allds = null;
+            return this;
+        }
+
+        public Builder emptyTrees() {
+            trees = new HashMap<String, List<?>>();
+            return this;
+        }
+
+        public Builder addTree(String name, List<?> hierarchy) {
+            if(trees == null) {
+                emptyTrees();
+            }
+            trees.put(name, hierarchy);
+            return this;
+        }
+
+        public Builder addTree(String name, String... hierarchy) {
+            if(trees == null) {
+                emptyTrees();
+            }
+            trees.put(name, Arrays.asList(hierarchy));
             return this;
         }
 
@@ -925,6 +948,10 @@ public class GraphDesc implements Cloneable, WithACL {
         String bprobe = builder.dspath != null ? builder.dspath.probe : null;
         String bname = builder.name;
         String bdsname = builder.dsName;
+        // dsName unknown, try to extract from name
+        if (bdsname == null && bgt.datasource() && builder.rpn == null && bname != null) {
+            bdsname = bname;
+        }
         // Unknown name, where to get it from ?
         if (bname == null) {
             // If the name is missing, generate one ?
@@ -933,26 +960,21 @@ public class GraphDesc implements Cloneable, WithACL {
             } else if (bdsname != null){
                 bname = bdsname;
             } else {
-                bname = Integer.toHexString((int) (Math.random() * Integer.MAX_VALUE));
+                bname = Integer.toHexString(ThreadLocalRandom.current().nextInt());
             }
         }
-        // dsName unknown, try to extract from name
-        if (bdsname == null && bgt.datasource() && builder.rpn == null && bname != null) {
-            bdsname = bname;
-        }
-        String dlegend = null;
+        String blegend = builder.legend;
         // Auto generated legend
-        if(builder.legend == null && bgt.legend()) {
-            dlegend = bname;
+        if(blegend == null && bgt.legend()) {
+            blegend = bname;
         }
-
         if(builder.reversed) {
-            String revRpn = "0, " + name + ", -";
+            String revRpn = "0, " + bname + ", -";
             allds.add(new DsDesc(bname, bdsname, builder.rpn, GraphType.NONE, null, null, builder.cf, bhost, bprobe));
-            allds.add(new DsDesc("rev_" + name, revRpn, bgt, bcolor, null));
-            allds.add(new DsDesc(bname, GraphType.LEGEND, dlegend, builder.cf));
+            allds.add(new DsDesc("rev_" + bname, revRpn, bgt, bcolor, null));
+            allds.add(new DsDesc(bname, GraphType.LEGEND, blegend, builder.cf));
         } else {
-            allds.add(new DsDesc(bname, bdsname, builder.rpn, bgt, builder.color, dlegend, builder.cf, bhost, bprobe));
+            allds.add(new DsDesc(bname, bdsname, builder.rpn, bgt, bcolor, blegend, builder.cf, bhost, bprobe));
         }
         if(builder.percentile != null) {
             String percentileName = "percentile" + builder.percentile + "_" + name;
@@ -969,8 +991,8 @@ public class GraphDesc implements Cloneable, WithACL {
             allds.add(new DsDesc(percentileName, GraphType.PERCENTILELEGEND, percentileLegend, builder.cf));
             maxLengthLegend = Math.max(maxLengthLegend, percentileLegend.length());
         }
-        if(dlegend != null) {
-            maxLengthLegend = Math.max(maxLengthLegend, dlegend.length());
+        if(blegend != null) {
+            maxLengthLegend = Math.max(maxLengthLegend, blegend.length());
         }
     }
 
@@ -1369,24 +1391,6 @@ public class GraphDesc implements Cloneable, WithACL {
 
     public ACL getACL() {
         return acl;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#clone()
-     */
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        GraphDesc newgd = (GraphDesc) super.clone();
-        newgd.allds.addAll(allds);
-        newgd.trees = new HashMap<String, List<?>>(trees.size());
-        for(Map.Entry<String, List<?>> e: trees.entrySet()) {
-            List<Object> tree = new ArrayList<Object>(e.getValue().size());
-            tree.addAll(e.getValue());
-            newgd.trees.put(e.getKey(), tree);
-        }
-        return newgd;
     }
 
     public Document dumpAsXml() throws ParserConfigurationException, IOException {
