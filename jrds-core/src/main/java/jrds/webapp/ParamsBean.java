@@ -29,6 +29,7 @@ import jrds.Configuration;
 import jrds.Filter;
 import jrds.Graph;
 import jrds.GraphDesc;
+import jrds.GraphDesc.GraphType;
 import jrds.GraphNode;
 import jrds.GraphTree;
 import jrds.HostsList;
@@ -353,12 +354,12 @@ public class ParamsBean implements Serializable {
 
             Graphics2D g2d = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
             String graphDescName = p.getName() + "." + dsName;
-
-            GraphDesc gd = new GraphDesc();
-            gd.setName(graphDescName);
-            gd.setGraphName(p.getHost().getName() + "." + p.getName() + "." + dsName);
-            gd.setGraphTitle(p.getName() + "." + dsName + " on ${host}");
-            gd.add(dsName, GraphDesc.LINE);
+            GraphDesc gd = GraphDesc.getBuilder()
+                            .setName(graphDescName)
+                            .setGraphName(p.getHost().getName() + "." + p.getName() + "." + dsName)
+                            .setGraphTitle(p.getName() + "." + dsName + " on ${host}")
+                            .addDsSecBuilder(GraphDesc.getDsDescBuilder().setDsName(dsName).setGraphType(GraphType.LINE))
+                            .build();
             gd.initializeLimits(g2d);
 
             gn = new GraphNode(p, gd);

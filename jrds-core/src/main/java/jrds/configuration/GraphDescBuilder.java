@@ -10,8 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.rrd4j.ConsolFun;
+
 import jrds.Graph;
 import jrds.GraphDesc;
+import jrds.GraphDesc.DsDescBuilder;
 import jrds.GraphNode;
 import jrds.PropertiesManager;
 import jrds.factories.xml.JrdsDocument;
@@ -90,6 +93,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
                 continue;
             Map<String, String> elements = new HashMap<String, String>(10);
             boolean withPath = false;
+            DsDescBuilder builder = GraphDesc.getDsDescBuilder();
             for(JrdsElement child: addnode.getChildElements()) {
                 if("path".equals(child.getNodeName())) {
                     withPath = true;
@@ -99,7 +103,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
                         if(value != null) {
                             value = value.trim();
                         }
-                        elements.put("path" + key, value);
+                        elements.put(key, value);
                     }
                 } else {
                     String key = child.getNodeName();
@@ -107,30 +111,48 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
                     if(value != null) {
                         value = value.trim();
                     }
-                    elements.put(key, value);
+                    switch(key) {
+                    case "name":
+                        builder.setName(value);
+                        break;
+                    case "legend":
+                        builder.setLegend(value);
+                        break;
+                    case "rpn":
+                        builder.setRpn(value);
+                        break;
+                    case "reversed":
+                        builder.setReversed(value != null && ! value.isEmpty());
+                        break;
+                    case "dsName":
+                        builder.setDsName(value);
+                        break;
+                    case "percentile":
+                        Integer percentile = jrds.Util.parseStringNumber(value, Integer.valueOf(95));
+                        builder.setPercentile(percentile);
+                        break;
+                    case "color":
+                        builder.setColorString(value);
+                        break;
+                    case "graphType":
+                        builder.setGraphType(GraphDesc.GraphType.valueOf(value.toUpperCase()));
+                        break;
+                    case "cf":
+                        builder.setCf(ConsolFun.valueOf(value.toUpperCase()));
+                        break;
+                    default:
+                        elements.put(key, value);
+                    }
                 }
             }
-            String addName = elements.get("name");
-            String addgraphType = elements.get("graphType");
-            String addColor = elements.get("color");
-            String addLegend = elements.get("legend");
-            String addrpn = elements.get("rpn");
-            String consFunc = elements.get("cf");
-            String reversed = elements.get("reversed");
-            String percentile = elements.get("percentile");
-            if(elements.containsKey("percentile") && "".equals(percentile))
-                percentile = "95";
-            String host = null;
-            String probe = null;
-            String dsName;
             if(withPath) {
-                host = elements.get("pathhost");
-                probe = elements.get("pathprobe");
-                dsName = elements.get("pathdsName");
-            } else
-                dsName = elements.get("dsName");
-
-            gd.add(addName, addrpn, addgraphType, addColor, addLegend, consFunc, reversed, percentile, host, probe, dsName);
+                String host = elements.get("host");
+                String probe = elements.get("probe");
+                String dsName = elements.get("dsName");
+                builder.setPath(host, probe);
+                builder.setDsName(dsName);
+            }
+            gd.add(builder);
         }
 
         gd.setTree(PropertiesManager.HOSTSTAB, enumerateTree(subnode.getElementbyName("hosttree")));

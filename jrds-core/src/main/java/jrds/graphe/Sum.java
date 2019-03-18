@@ -50,15 +50,11 @@ public class Sum extends AutonomousGraphNode {
         }
         // The last graph found is used to clone the graphdesc and use it
         if(g != null) {
-            try {
-                GraphDesc oldgd = g.getGraphDesc();
-                GraphDesc newgd = (GraphDesc) oldgd.clone();
-                newgd.setGraphTitle(getName());
-                setGraphDesc(newgd);
-                logger.debug(Util.delayedFormatString("Adding sum called %s", getQualifiedName()));
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(String.format("GraphDesc is supposed to be clonnable, what happened with %s ?", getName()));
-            }
+            GraphDesc oldgd = g.getGraphDesc();
+            GraphDesc newgd = GraphDesc.getBuilder().fromGraphDesc(oldgd).setGraphTitle(getName()).build();
+            newgd.setGraphTitle(getName());
+            setGraphDesc(newgd);
+            logger.debug(Util.delayedFormatString("Adding sum called %s", getQualifiedName()));
         } else {
             throw new RuntimeException(String.format("Not graph found in %s definition, unusable sum", getName()));
         }

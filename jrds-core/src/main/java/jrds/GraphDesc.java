@@ -3,6 +3,7 @@ package jrds;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.io.IOException;
@@ -34,6 +35,8 @@ import jrds.probe.jdbc.JdbcProbe;
 import jrds.store.ExtractInfo;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  * A classed used to store the static description of a graph
@@ -138,7 +141,7 @@ public class GraphDesc implements Cloneable, WithACL {
             }
         },
         LINE {
-            public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
+            public void draw(RrdGraphDef rgd, String sn, Paint color, String legend) {
                 rgd.line(sn, color, legend);
             }
 
@@ -159,8 +162,30 @@ public class GraphDesc implements Cloneable, WithACL {
                 return true;
             }
         },
+        LINENOLEGEND {
+            public void draw(RrdGraphDef rgd, String sn, Paint color, String legend) {
+                rgd.line(sn, color, legend);
+            }
+
+            @Override
+            public String toString() {
+                return "line";
+            }
+
+            public boolean datasource() {
+                return true;
+            }
+
+            public boolean toPlot() {
+                return true;
+            }
+
+            public boolean legend() {
+                return false;
+            }
+        },
         AREA {
-            public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
+            public void draw(RrdGraphDef rgd, String sn, Paint color, String legend) {
                 rgd.area(sn, color, legend);
             }
 
@@ -182,7 +207,7 @@ public class GraphDesc implements Cloneable, WithACL {
             }
         },
         STACK {
-            public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
+            public void draw(RrdGraphDef rgd, String sn, Paint color, String legend) {
                 rgd.stack(sn, color, legend);
             }
 
@@ -204,7 +229,7 @@ public class GraphDesc implements Cloneable, WithACL {
             }
         };
 
-        public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
+        public void draw(RrdGraphDef rgd, String sn, Paint color, String legend) {
         }
 
         /**
@@ -544,19 +569,73 @@ public class GraphDesc implements Cloneable, WithACL {
         }
     }
 
+    public static DsDescBuilder getDsDescBuilder() {
+        return new DsDescBuilder();
+    }
+
+    public static class DsDescBuilder {
+        @Setter @Accessors(chain=true)
+        private String name;
+        @Setter @Accessors(chain=true)
+        private String dsName;
+        @Setter @Accessors(chain=true)
+        private String rpn;
+        @Setter @Accessors(chain=true)
+        private GraphType graphType;
+        @Setter @Accessors(chain=true)
+        private Paint color;
+        @Setter @Accessors(chain=true)
+        private String legend;
+        @Setter @Accessors(chain=true)
+        private ConsolFun cf;
+        @Setter @Accessors(chain=true)
+        private Integer percentile;
+        @Setter @Accessors(chain=true)
+        private DsPath dspath;
+        @Setter @Accessors(chain=true)
+        private boolean reversed;
+
+        private DsDescBuilder() {
+        }
+
+        public DsDescBuilder setPath(String host, String probe) {
+            this.dspath = new DsPath(host, probe);
+            return this;
+        }
+
+        public DsDescBuilder setColorString(String colorName) {
+            if(colorName != null && colorName.toUpperCase().matches("^#[0-9A-F]{6}")) {
+                int r = Integer.parseInt(colorName.substring(1, 3), 16);
+                int g = Integer.parseInt(colorName.substring(3, 5), 16);
+                int b = Integer.parseInt(colorName.substring(5, 7), 16);
+                color = new Color(r, g, b);
+            } else if(colorName != null && !"".equals(colorName)) {
+                color = Colors.valueOf(colorName.toUpperCase()).getColor();
+                if(color == null) {
+                    color = Color.getColor(colorName);
+                }
+                if(color == null) {
+                    logger.error("Cannot read color " + colorName);
+                    color = Color.white;
+                }
+            }
+            return this;
+        }
+    }
+
     public static class DsDesc {
         public final String name;
         public final String dsName;
         public final String rpn;
         public final GraphType graphType;
-        public final Color color;
+        public final Paint color;
         public final String legend;
         public final ConsolFun cf;
         public final Integer percentile;
         public final DsPath dspath;
 
         DsDesc(String name, String dsName, String rpn,
-               GraphType graphType, Color color, String legend,
+               GraphType graphType, Paint color, String legend,
                ConsolFun cf, String host, String probe) {
             this.name = name;
             this.dsName = dsName;
@@ -573,7 +652,7 @@ public class GraphDesc implements Cloneable, WithACL {
             }
         }
 
-        public DsDesc(String name, String rpn, GraphType graphType, Color color, String legend) {
+        public DsDesc(String name, String rpn, GraphType graphType, Paint color, String legend) {
             this.name = name;
             this.rpn = rpn;
             this.graphType = graphType;
@@ -585,7 +664,7 @@ public class GraphDesc implements Cloneable, WithACL {
             this.dspath = null;
         }
 
-        public DsDesc(String name, String dsName, Integer percentile, GraphType graphType, Color color) {
+        public DsDesc(String name, String dsName, Integer percentile, GraphType graphType, Paint color) {
             this.name = name;
             this.dsName = dsName;
             this.percentile = percentile;
@@ -610,23 +689,120 @@ public class GraphDesc implements Cloneable, WithACL {
         }
 
         public String toString() {
-            return String.format("DsDesc(%s,[%s/%s/%s],\"%s\",%s,Color[%d, %d, %d],\"%s\",%s)",
+            String colorString;
+            if (color instanceof Color) {
+                Color c = (Color) color;
+                colorString = String.format("Color[%d, %d, %d]", c.getRed(), c.getGreen(), c.getBlue());
+            } else if (color != null) {
+                colorString = color.toString();
+            } else {
+                colorString = "None";
+            }
+            return String.format("DsDesc(%s,[%s/%s/%s],\"%s\",%s,%s,\"%s\",%s)",
                                  name,
                                  (dspath == null ? "" : dspath.host),
                                  (dspath == null ? "" : dspath.probe),
                                  dsName,
                                  (rpn == null ? "" : rpn),
                                  graphType,
-                                 (color != null ? color.getRed() : 0),
-                                 (color != null ? color.getGreen() : 0),
-                                 (color != null ? color.getBlue() : 0),
+                                 colorString,
                                  (legend == null ? "" : legend),
                                  cf
                             );
         }
     }
 
-    private final List<DsDesc> allds = new ArrayList<DsDesc>();
+    public static class Builder {
+        @Setter @Accessors(chain=true)
+        private List<DsDesc> allds = new ArrayList<DsDesc>();
+        @Setter @Accessors(chain=true)
+        private List<DsDescBuilder> descbuilders = null;
+        @Setter @Accessors(chain=true)
+        private int width = 578;
+        @Setter @Accessors(chain=true)
+        private int height = 206;
+        @Setter @Accessors(chain=true)
+        private double upperLimit = Double.NaN;
+        @Setter @Accessors(chain=true)
+        private double lowerLimit = 0;
+        @Setter @Accessors(chain=true)
+        private String verticalLabel = null;
+        @Setter @Accessors(chain=true)
+        private int lastColor = 0;
+        @Setter @Accessors(chain=true)
+        private Map<String, List<?>> trees = new HashMap<String, List<?>>(2);
+        @Setter @Accessors(chain=true)
+        private String graphName;
+        @Setter @Accessors(chain=true)
+        private String name;
+        @Setter @Accessors(chain=true)
+        private String graphTitle = "${graphdesc.name} on ${host}";
+        @Setter @Accessors(chain=true)
+        private int maxLengthLegend = 0;
+        @Setter @Accessors(chain=true)
+        private boolean siUnit = true;
+        @Setter @Accessors(chain=true)
+        private boolean logarithmic = false;
+        @Setter @Accessors(chain=true)
+        private Integer unitExponent = null;
+        @Setter @Accessors(chain=true)
+        private boolean withLegend = true;
+        @Setter @Accessors(chain=true)
+        private boolean withSummary = true;
+        @Setter @Accessors(chain=true)
+        private ACL acl = ACL.ALLOWEDACL;
+        @Setter @Accessors(chain=true)
+
+        private Class<Graph> graphClass = Graph.class;
+
+        public Builder fromGraphDesc(GraphDesc parent) {
+            allds = new ArrayList<DsDesc>(parent.allds);
+            width = parent.width;
+            height = parent.height;
+            upperLimit = parent.upperLimit;
+            lowerLimit = parent.lowerLimit;
+            verticalLabel = parent.verticalLabel;
+            lastColor = parent.lastColor;
+            trees = new HashMap<String, List<?>>(parent.trees.size());
+            parent.trees.forEach((k, v) -> trees.put(k, new ArrayList<Object>(v)));
+            graphName = parent.graphName;
+            name = parent.name;
+            graphTitle = parent.graphTitle;
+            maxLengthLegend = parent.maxLengthLegend;
+            siUnit = parent.siUnit;
+            logarithmic = parent.logarithmic;
+            unitExponent = parent.unitExponent;
+            withLegend = parent.withLegend;
+            withSummary = parent.withSummary;
+            acl = parent.acl;
+            graphClass =parent.graphClass;
+
+            return this;
+        }
+
+        public Builder emptyDs() {
+            allds = null;
+            return this;
+        }
+
+        public Builder addDsSecBuilder(DsDescBuilder builder) {
+            if(descbuilders == null) {
+                descbuilders = new ArrayList<>();
+            }
+            descbuilders.add(builder);
+            return this;
+        }
+
+        public GraphDesc build() {
+            return new GraphDesc(this);
+        }
+    }
+
+    public static Builder getBuilder() {
+        return new Builder();
+    }
+
+    private List<DsDesc> allds = null;
     private int width = 578;
     private int height = 206;
     private double upperLimit = Double.NaN;
@@ -655,10 +831,46 @@ public class GraphDesc implements Cloneable, WithACL {
 
     private Dimension dimension = null;
 
+    public GraphDesc() {
+        allds = new ArrayList<DsDesc>();
+    }
+
+    public GraphDesc(Builder builder) {
+        allds = builder.allds;
+        width = builder.width;
+        height = builder.height;
+        upperLimit = builder.upperLimit;
+        lowerLimit = builder.lowerLimit;
+        verticalLabel = builder.verticalLabel;
+        lastColor = builder.lastColor;
+        if(builder.trees != null) {
+            trees = new HashMap<>(builder.trees.size());
+            builder.trees.forEach((k,v) -> {
+                trees.put(k, new ArrayList<>(v));
+            });
+        }
+        graphName = builder.graphName;
+        name = builder.name;
+        graphTitle = builder.graphTitle;
+        maxLengthLegend = builder.maxLengthLegend;
+        siUnit = builder.siUnit;
+        logarithmic = builder.logarithmic;
+        unitExponent = builder.unitExponent;
+        withLegend = builder.withLegend;
+        withSummary = builder.withSummary;
+        acl = builder.acl;
+        graphClass =builder.graphClass;
+        if(builder.descbuilders != null) {
+            builder.descbuilders.forEach(this::add);
+        }
+    }
+
     public void add(String name, GraphType graphType) {
-        add(name, name, null, graphType, Colors.resolveIndex(lastColor), name, DEFAULTCF, false, null, null, null);
-        if(graphType.toPlot())
-            lastColor++;
+        DsDescBuilder builder = new DsDescBuilder();
+        builder.name = name;
+        builder.dsName = name;
+        builder.graphType = graphType;
+        builder.cf = DEFAULTCF;
     }
 
     /**
@@ -667,128 +879,98 @@ public class GraphDesc implements Cloneable, WithACL {
      * @param name String
      */
     public void add(String name) {
-        add(name, name, null, GraphType.NONE, null, null, DEFAULTCF, false, null, null, null);
-    }
-
-    /**
-     * Add a plot, but only uses String as parameters, for the GraphFactory
-     * 
-     * @param name Name of the plot
-     * @param dsName the datastore to use
-     * @param rpn The RPN, used instead of the datastore
-     * @param graphType
-     * @param color
-     * @param legend
-     * @param consFunc
-     * @param reversed
-     * @param host
-     * @param probe
-     * @param dsName
-     */
-    public void add(String name, String rpn,
-                    String graphType, String color, String legend,
-                    String consFunc, String reversed, String percentile,
-                    //The path to an external datastore
-                    String host, String probe, String dsName) {
-        if(logger.isTraceEnabled())
-            logger.trace("Adding " + name + ", " + rpn + ", " + graphType + ", " + color + ", " + legend + ", " + consFunc + ", " + reversed + ", " + host + ", " + probe);
-        GraphType gt;
-        if(graphType == null || "".equals(graphType)) {
-            if(legend != null)
-                gt = GraphType.COMMENT;
-            else
-                gt = GraphType.NONE;
-        } else
-            gt = GraphType.valueOf(graphType.toUpperCase());
-
-        ConsolFun cf = null;
-        if(gt != GraphType.COMMENT) {
-            cf = DEFAULTCF;
-            if(consFunc != null && !"".equals(consFunc))
-                cf = ConsolFun.valueOf(consFunc.toUpperCase());
-        }
-
-        Color c = null;
-        if(gt.toPlot()) {
-            if(color != null && color.toUpperCase().matches("^#[0-9A-F]{6}")) {
-                int r = Integer.parseInt(color.substring(1, 3), 16);
-                int g = Integer.parseInt(color.substring(3, 5), 16);
-                int b = Integer.parseInt(color.substring(5, 7), 16);
-                c = new Color(r, g, b);
-            } else if(color != null && !"".equals(color)) {
-                c = Colors.valueOf(color.toUpperCase()).getColor();
-                if(c == null)
-                    c = Color.getColor(color);
-                if(c == null) {
-                    logger.error("Cannot read color " + color);
-                    c = Color.white;
-                }
-            } else {
-                c = Colors.resolveIndex(lastColor);
-                if(gt.toPlot())
-                    lastColor++;
-            }
-        }
-
-        if (name != null) {
-            // If not a rpn, it must be a datastore
-            if(gt.datasource() && rpn == null && dsName == null) {
-                dsName = name;
-            }
-        }
-        // If the name is missing, generate one ?
-        else if (rpn != null){
-            name = Util.stringSignature(rpn);
-        } else if (dsName != null){
-            name = dsName;
-        } else {
-            name = Integer.toHexString((int) (Math.random() * Integer.MAX_VALUE));
-        }
-        // Auto generated legend
-        if(legend == null && gt.legend()) {
-            legend = name;
-        }
-
-        Integer valPercentile = null;
-        if(percentile != null && !"".equals(percentile)) {
-            valPercentile = jrds.Util.parseStringNumber(percentile, Integer.valueOf(0));
-        }
-        logger.trace(Util.delayedFormatString(
-                                              "Adding '%s': %s/'%s', %s, %s, '%s', %s, %s, %d, %s, %s",
-                                              name, dsName, rpn, graphType, color, legend, consFunc, reversed, valPercentile, host, probe));
-        add(name, dsName, rpn, gt, c, legend, cf, reversed != null, valPercentile, host, probe);
+        DsDescBuilder builder = new DsDescBuilder();
+        builder.name = name;
+        builder.dsName = name;
+        builder.graphType = GraphType.NONE;
+        builder.cf = DEFAULTCF;
+        add(builder);
     }
 
     public void add(String name, String dsName, String rpn,
-                    GraphType graphType, Color color, String legend,
+                    GraphType graphType, Paint color, String legend,
                     ConsolFun cf, boolean reversed, Integer percentile,
                     //The path to an external datastore
                     String host, String probe) {
-        if(reversed) {
-            String revRpn = "0, " + name + ", -";
-            allds.add(new DsDesc(name, dsName, rpn, GraphType.NONE, null, null, cf, host, probe));
-            allds.add(new DsDesc("rev_" + name, revRpn, graphType, color, null));
-            allds.add(new DsDesc(name, GraphType.LEGEND, legend, cf));
-        } else {
-            allds.add(new DsDesc(name, dsName, rpn, graphType, color, legend, cf, host, probe));
+        DsDescBuilder builder = new DsDescBuilder();
+        builder.name = name;
+        builder.dsName = dsName;
+        builder.rpn = rpn;
+        builder.graphType = graphType;
+        builder.color = color;
+        builder.legend = legend;
+        builder.cf = cf;
+        builder.reversed = reversed;
+        builder.percentile = percentile;
+        if (host != null && probe != null) {
+            builder.dspath = new DsPath(host, probe);
         }
-        if(percentile != null) {
-            String percentileName = "percentile" + percentile + "_" + name;
-            String percentileLegend = percentile + "th percentile";
-            Color percentilColor = color.darker();
-            if(!reversed) {
-                allds.add(new DsDesc(percentileName, name, percentile, GraphType.LINE, percentilColor));
+    }
+
+    public void add(DsDescBuilder builder) {
+        Paint bcolor = builder.color;
+        GraphType bgt = builder.graphType;
+        if(bgt == null) {
+            if(builder.legend != null) {
+                bgt = GraphType.COMMENT;
+            }
+            else {
+                bgt = GraphType.NONE;
+            }
+        };
+        if(bgt.toPlot() && bcolor == null) {
+            bcolor = Colors.resolveIndex(lastColor++);
+        }
+        String bhost = builder.dspath != null ? builder.dspath.host : null;
+        String bprobe = builder.dspath != null ? builder.dspath.probe : null;
+        String bname = builder.name;
+        String bdsname = builder.dsName;
+        // Unknown name, where to get it from ?
+        if (bname == null) {
+            // If the name is missing, generate one ?
+            if (builder.rpn != null){
+                bname = Util.stringSignature(builder.rpn);
+            } else if (bdsname != null){
+                bname = bdsname;
+            } else {
+                bname = Integer.toHexString((int) (Math.random() * Integer.MAX_VALUE));
+            }
+        }
+        // dsName unknown, try to extract from name
+        if (bdsname == null && bgt.datasource() && builder.rpn == null && bname != null) {
+            bdsname = bname;
+        }
+        String dlegend = null;
+        // Auto generated legend
+        if(builder.legend == null && bgt.legend()) {
+            dlegend = bname;
+        }
+
+        if(builder.reversed) {
+            String revRpn = "0, " + name + ", -";
+            allds.add(new DsDesc(bname, bdsname, builder.rpn, GraphType.NONE, null, null, builder.cf, bhost, bprobe));
+            allds.add(new DsDesc("rev_" + name, revRpn, bgt, bcolor, null));
+            allds.add(new DsDesc(bname, GraphType.LEGEND, dlegend, builder.cf));
+        } else {
+            allds.add(new DsDesc(bname, bdsname, builder.rpn, bgt, builder.color, dlegend, builder.cf, bhost, bprobe));
+        }
+        if(builder.percentile != null) {
+            String percentileName = "percentile" + builder.percentile + "_" + name;
+            String percentileLegend = builder.percentile + "th percentile";
+            Color percentilColor = ((Color)bcolor).darker();
+            if(!builder.reversed) {
+                allds.add(new DsDesc(percentileName, name, builder.percentile, GraphType.LINE, percentilColor));
             } else {
                 String revPercentilRpn = "0, " + percentileName + ", -";
-                allds.add(new DsDesc(percentileName, name, percentile, GraphType.NONE, null));
+                allds.add(new DsDesc(percentileName, bname, builder.percentile, GraphType.NONE, null));
                 allds.add(new DsDesc("rev_" + percentileName, revPercentilRpn, GraphType.LINE, percentilColor, null));
 
             }
-            allds.add(new DsDesc(percentileName, GraphType.PERCENTILELEGEND, percentileLegend, cf));
+            allds.add(new DsDesc(percentileName, GraphType.PERCENTILELEGEND, percentileLegend, builder.cf));
             maxLengthLegend = Math.max(maxLengthLegend, percentileLegend.length());
         }
-        if(legend != null) {
-            maxLengthLegend = Math.max(maxLengthLegend, legend.length());
+        if(dlegend != null) {
+            maxLengthLegend = Math.max(maxLengthLegend, dlegend.length());
         }
     }
 
@@ -1276,10 +1458,11 @@ public class GraphDesc implements Cloneable, WithACL {
                 specElement.appendChild(document.createElement("reversed"));
             }
             specElement.appendChild(document.createElement("graphType")).setTextContent(e.graphType.toString());
-            if(e.color != null) {
-                String colorString = colornames.get(e.color);
+            if(e.color != null && e.color instanceof Color) {
+                Color c = (Color) e.color;
+                String colorString = colornames.get(c);
                 if (colorString == null) {
-                    colorString = String.format("#%X%X%X", e.color.getRed(), e.color.getGreen(), e.color.getBlue());
+                    colorString = String.format("#%X%X%X", c.getRed(), c.getGreen(), c.getBlue());
                 }
                 specElement.appendChild(document.createElement("color")).setTextContent(colorString);
             }
@@ -1354,7 +1537,7 @@ public class GraphDesc implements Cloneable, WithACL {
     public void setGraphClass(Class<Graph> graphClass) {
         this.graphClass = graphClass;
     }
-    
+
     /**
      * Return an unmodifiable list of the graph descriptions elements
      * @return the list
