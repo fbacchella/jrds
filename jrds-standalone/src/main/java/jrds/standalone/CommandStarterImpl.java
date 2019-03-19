@@ -26,11 +26,7 @@ public abstract class CommandStarterImpl implements CommandStarter {
     }
 
     static {
-        try {
-            jrds.JrdsLoggerConfiguration.initLog4J();
-        } catch (IOException e) {
-            throw new RuntimeException("Log configuration failed", e);
-        }
+        jrds.JrdsLoggerConfiguration.initLog4J();
     }
 
     public void configure(Properties configuration) {

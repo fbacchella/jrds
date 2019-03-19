@@ -182,7 +182,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         System.out.println(doTitle("Graph provided"));
         System.out.println();
         System.out.println("^ Name ^ Description ^");
-        for(String graphs: pd.getGraphClasses()) {
+        for(String graphs: pd.getGraphs()) {
             System.out.println(String.format("| %s | |", graphs));
         }
         System.out.println();

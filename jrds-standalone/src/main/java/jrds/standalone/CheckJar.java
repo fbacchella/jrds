@@ -77,7 +77,7 @@ public class CheckJar extends CommandStarterImpl {
                     }
                     pc = pc.getSuperclass();
                 }
-                Collection<String> graphs = pd.getGraphClasses();
+                Collection<String> graphs = pd.getGraphs();
                 if(graphs.size() == 0) {
                     System.out.println("no graphs for probe desc: " + pd.getName());
                     continue;
