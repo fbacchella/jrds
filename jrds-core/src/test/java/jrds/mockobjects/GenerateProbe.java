@@ -67,6 +67,7 @@ public class GenerateProbe {
         }
     }
 
+    @SafeVarargs
     @SuppressWarnings("unchecked")
     public static final Probe<String, Number> quickProbe(TemporaryFolder folder, ChainedMap<Object>... args) throws Exception {
         ChainedMap<Object> arg = new ChainedMap<Object>(0);

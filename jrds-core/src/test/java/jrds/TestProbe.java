@@ -5,10 +5,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import jrds.mockobjects.GenerateProbe;
-import jrds.mockobjects.MokeProbe;
-import jrds.starter.HostStarter;
-
 import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,6 +13,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
+
+import jrds.mockobjects.GenerateProbe;
+import jrds.mockobjects.MokeProbe;
+import jrds.starter.HostStarter;
 
 public class TestProbe {
 
@@ -64,10 +64,9 @@ public class TestProbe {
         dsMap.put("collecthigh", "high");
         dsMap.put("collectlow", "low");
         pd.add(dsMap);
-        
+
         GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
         args.set(ProbeDesc.class, pd).set(Probe.class, DummyProbe.class);
-        @SuppressWarnings("unchecked")
         MokeProbe<String, Number> p = (MokeProbe<String, Number>) GenerateProbe.quickProbe(testFolder, args);
 
         HostStarter host = new HostStarter(new HostInfo("DummyHost"));
@@ -105,7 +104,6 @@ public class TestProbe {
 
         GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
         args.set(ProbeDesc.class, pd).set(Probe.class, DummyProbe.class);
-        @SuppressWarnings("unchecked")
         MokeProbe<String, Number> p = (MokeProbe<String, Number>) GenerateProbe.quickProbe(testFolder, args);
 
         HostStarter host = new HostStarter(new HostInfo("DummyHost"));

@@ -4,10 +4,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -111,21 +110,22 @@ public class TestPropertiesManager {
 
     @Test
     public void testlog4jpropfile() throws IOException {
-        try (InputStream is = getClass().getClassLoader().getResourceAsStream("log4j.properties")) {
-            ReadableByteChannel isChannel = Channels.newChannel(is);
-            File log4jprops = testFolder.newFile("log4j.properties");
-            try (FileOutputStream fos = new java.io.FileOutputStream(log4jprops)) {
-                fos.getChannel().transferFrom(isChannel, 0, 4096);
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream("testpmlog4j.properties")) {
+            Properties log4jprops = new Properties();
+            log4jprops.load(is);
+            log4jprops.setProperty("log4j.appender.A2.file", testFolder.newFile().getAbsolutePath());
+            File log4jpropsdest = testFolder.newFile("testpmlog4j.properties");
+            log4jpropsdest.delete();
+            try (FileOutputStream fos = new FileOutputStream(log4jpropsdest)) {
+                log4jprops.store(fos, "");
                 PropertiesManager pm = new PropertiesManager();
                 pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
                 pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
                 pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
-                pm.setProperty("log4jpropfile", log4jprops.getCanonicalPath());
+                pm.setProperty("log4jpropfile", log4jpropsdest.getCanonicalPath());
                 pm.update();
                 logger.debug("log file created");
-                File logFile = new File("tmp/log4j.log");
-                Assert.assertTrue("Log4j file not created", logFile.canRead());
-                logFile.delete();
+                Assert.assertTrue("Log4j file not created", log4jpropsdest.canRead());
             }
         }
     }
