@@ -12,7 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -22,7 +21,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
@@ -43,13 +41,13 @@ final public class Tools {
     public static DocumentBuilder dbuilder = null;
     public static XPath xpather = null;
 
-    static public void configure() throws IOException {
+    static {
         Locale.setDefault(new Locale("POSIX"));
         System.getProperties().setProperty("java.awt.headless", "true");
-        JrdsLoggerConfiguration.reset();
-        JrdsLoggerConfiguration.jrdsAppender = new ConsoleAppender(new org.apache.log4j.PatternLayout(JrdsLoggerConfiguration.DEFAULTLAYOUT), ConsoleAppender.SYSTEM_OUT);
-        JrdsLoggerConfiguration.jrdsAppender.setName(JrdsLoggerConfiguration.APPENDERNAME);
-        JrdsLoggerConfiguration.initLog4J();
+        Log4JRule.configure();
+    }
+
+    static public void configure() throws IOException {
     }
 
     static public void prepareXml() throws ParserConfigurationException {
@@ -98,12 +96,10 @@ final public class Tools {
 
     static public void setLevel(Logger logger, Level level, String... allLoggers) {
         Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDERNAME);
-        // The system property override the code log level
-        if(System.getProperty("jrds.testloglevel") != null) {
-            level = Level.toLevel(System.getProperty("jrds.testloglevel"));
-        }
         if(logger != null) {
             logger.setLevel(level);
+            logger.setAdditivity(false);
+            logger.addAppender(app);
         }
         for(String loggerName: allLoggers) {
             Logger l = Logger.getLogger(loggerName);
@@ -147,9 +143,14 @@ final public class Tools {
         return path.toURI();
     }
 
-    static public List<LoggingEvent> getLockChecker(String... loggers) {
+    static public List<LoggingEvent> getLogChecker(String... loggers) {
         final List<LoggingEvent> logs = new ArrayList<LoggingEvent>();
         Appender ta = new AppenderSkeleton() {
+            @Override
+            public synchronized void doAppend(LoggingEvent event) {
+                super.doAppend(event);
+            }
+
             @Override
             protected void append(LoggingEvent arg0) {
                 logs.add(arg0);
@@ -168,7 +169,7 @@ final public class Tools {
             Logger logger = Logger.getLogger(loggername);
             logger.addAppender(ta);
             logger.setLevel(Level.TRACE);
-            logger.setAdditivity(false);
+            logger.setAdditivity(true);
         }
         return logs;
     }

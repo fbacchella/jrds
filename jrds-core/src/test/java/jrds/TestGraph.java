@@ -3,13 +3,8 @@ package jrds;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
-
-import jrds.mockobjects.GenerateProbe;
-import jrds.mockobjects.GetMoke;
 
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -18,8 +13,14 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
 
+import jrds.mockobjects.GenerateProbe;
+import jrds.mockobjects.GetMoke;
+
 public class TestGraph {
-    static final Logger logger = Logger.getLogger(TestGraph.class);
+
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
+
     HostsList hl;
     PropertiesManager pm;
     Probe<?, ?> p;
@@ -28,12 +29,16 @@ public class TestGraph {
     public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
-    static public void configure() throws IOException, URISyntaxException {
+    static public void configure() throws IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.Graph");
     }
 
-    @SuppressWarnings("unchecked")
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.Graph");
+    }
+
+
     @Before
     public void prepare() throws Exception {
         pm = Tools.makePm(testFolder);

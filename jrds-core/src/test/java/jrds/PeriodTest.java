@@ -10,14 +10,19 @@ import java.util.Date;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class PeriodTest {
-    static final private Logger logger = Logger.getLogger(PeriodTest.class);
 
     static final private DateFormat fullISOFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     static final private DateFormat strictISOFORMAT = new SimpleDateFormat("yyyyMMdd'T'HH:mm:ssZ");
+
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
 
     private Date begin;
     private Date end;
@@ -25,7 +30,11 @@ public class PeriodTest {
     @BeforeClass
     static public void configure() throws IOException {
         jrds.Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.Period");
+    }
+    
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.Period");
     }
 
     @Test

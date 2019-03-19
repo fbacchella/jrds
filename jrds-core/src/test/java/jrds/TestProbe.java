@@ -10,8 +10,8 @@ import jrds.mockobjects.MokeProbe;
 import jrds.starter.HostStarter;
 
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,7 +19,6 @@ import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
 
 public class TestProbe {
-    static final private Logger logger = Logger.getLogger(TestProbe.class);
 
     static public final class DummyProbe extends MokeProbe<String, Long> {
         public DummyProbe() {
@@ -41,10 +40,17 @@ public class TestProbe {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.Probe", "jrds.ProbeDesc");
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.Probe", "jrds.ProbeDesc");
     }
 
     @Test

@@ -10,7 +10,6 @@ import java.util.Set;
 import org.apache.log4j.Appender;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.DailyRollingFileAppender;
-import org.apache.log4j.Hierarchy;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -52,7 +51,7 @@ public class JrdsLoggerConfiguration {
      */
     private static class JrdsLoggerConfigurationWorker {
 
-        private static void initLog4J() throws IOException {
+        private static void initLog4J() {
             if (jrdsAppender == null) {
                 jrdsAppender = new ConsoleAppender(new org.apache.log4j.SimpleLayout(), DEFAULTLOGFILE);
                 jrdsAppender.setName(APPENDERNAME);
@@ -72,8 +71,6 @@ public class JrdsLoggerConfiguration {
             for (String logger : rootLoggers) {
                 configureLogger(logger, pm.loglevel);
             }
-            // getLogger change the level of new loggers only
-            Logger.getLogger("jrds").setLevel(pm.loglevel);
 
             for (Map.Entry<Level, List<String>> e : pm.loglevels.entrySet()) {
                 Level l = e.getKey();
@@ -84,16 +81,11 @@ public class JrdsLoggerConfiguration {
         }
 
         private static void configureLogger(String logname, Level level) {
-            Logger externallogger = LogManager.getLoggerRepository().exists(logname);
-            // Change level only for new logger
-            if (externallogger == null) {
-                externallogger = Logger.getLogger(logname);
-                externallogger.setLevel(level);
-            }
+            Logger logger = Logger.getLogger(logname);
+            logger.setLevel(level);
 
             // Replace the appender, not optionally add it
             if (jrdsAppender != null) {
-                Logger logger = Logger.getLogger(logname);
                 Appender oldApp = logger.getAppender(jrdsAppender.getName());
                 if (oldApp != null)
                     logger.removeAppender(oldApp);
@@ -106,9 +98,7 @@ public class JrdsLoggerConfiguration {
         }
 
         private static void reset() {
-            LogManager.resetConfiguration();
-            Hierarchy logHierarchy = (Hierarchy) LogManager.getLoggerRepository();
-            logHierarchy.clear();
+            LogManager.shutdown();
             logOwner = null;
             jrdsAppender = null;
         }
@@ -127,9 +117,7 @@ public class JrdsLoggerConfiguration {
     }
 
     static public void reset() {
-        if (isLogOwner()) {
-            JrdsLoggerConfigurationWorker.reset();
-        }
+        JrdsLoggerConfigurationWorker.reset();
     }
 
     /**
@@ -137,10 +125,8 @@ public class JrdsLoggerConfiguration {
      * should be used once. It does nothing if it detect that a appender already
      * exist for the logger <code>jrds</code>. The default logger is the system
      * error output and the default level is error.
-     *
-     * @throws IOException
      */
-    static public void initLog4J() throws IOException {
+    static public void initLog4J() {
         // Do nothing if jrds is not allowed to setup logs
         if (isLogOwner()) {
             JrdsLoggerConfigurationWorker.initLog4J();

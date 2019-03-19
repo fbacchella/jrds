@@ -8,15 +8,17 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class TestHostsList {
-    static final private Logger logger = Logger.getLogger(TestHostsList.class);
+
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
     static final private String[] optionalstabs = { "@", "sumstab", "customgraph" };
 
     @Rule
@@ -25,7 +27,11 @@ public class TestHostsList {
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, HostsList.class.getName());
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, HostsList.class.getName());
     }
 
     @Test
@@ -88,4 +94,5 @@ public class TestHostsList {
         Assert.assertTrue(found);
         Assert.assertNotEquals(graphTrees.size(), 0);
     }
+
 }

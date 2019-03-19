@@ -4,23 +4,30 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map;
 
+import org.apache.log4j.Level;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+
 import jrds.probe.jdbc.JdbcConnection;
 import jrds.starter.ConnectionInfo;
 import jrds.starter.HostStarter;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 public class TestHostInfo {
-    static final private Logger logger = Logger.getLogger(TestHostInfo.class);
+
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.starter.ConnectionInfo", "jrds.snmp.SnmpConnection", "jrds.HostInfo");
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.starter.ConnectionInfo", "jrds.snmp.SnmpConnection", "jrds.HostInfo");
     }
 
     @Test

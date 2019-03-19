@@ -7,23 +7,31 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.mockobjects.MockGraph;
-
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
+import jrds.mockobjects.MockGraph;
+
 public class TestGraphTree {
-    static final private Logger logger = Logger.getLogger(TestGraphTree.class);
+
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws IOException, ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml();
-        Tools.setLevel(logger, Level.TRACE, "jrds.GraphTree");
     }
+    
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.GraphTree");
+    }
+
 
     private List<String> doList(String... pathelems) {
         return new ArrayList<String>(Arrays.asList(pathelems));

@@ -17,6 +17,7 @@ import javax.xml.transform.OutputKeys;
 import jrds.GraphDesc;
 import jrds.Period;
 import jrds.GraphNode;
+import jrds.Log4JRule;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.Tools;
@@ -29,6 +30,7 @@ import jrds.store.ExtractInfo;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,7 +43,6 @@ import org.rrd4j.graph.RrdGraphInfo;
 import org.w3c.dom.Document;
 
 public class TestGraphDescBuilder {
-    static final private Logger logger = Logger.getLogger(TestGraphDescBuilder.class);
 
     static final ConfigObjectBuilder<Object> ob = new ConfigObjectBuilder<Object>(ConfigType.GRAPHDESC) {
         @Override
@@ -53,13 +54,20 @@ public class TestGraphDescBuilder {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
+
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.GraphDesc", "jrds.Graph");
-        Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
-
         Tools.prepareXml();
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.GraphDesc", "jrds.Graph");
+        logrule.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
     }
 
     @Test

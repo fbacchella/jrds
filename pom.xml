@@ -23,6 +23,7 @@
         <servlet-api.version>3.1.0</servlet-api.version>
         <junit.version>4.12</junit.version>
         <log4j.version>1.2.17</log4j.version>
+        <jrds.hidelogs>true</jrds.hidelogs>
     </properties>
 
     <modules>
@@ -130,8 +131,8 @@
                     <configuration>
                         <systemProperties>
                             <property>
-                                <name>jrds.testloglevel</name>
-                                <value>off</value>
+                                <name>jrds.hidelogs</name>
+                                <value>${jrds.hidelogs}</value>
                             </property>
                         </systemProperties>
                     </configuration>

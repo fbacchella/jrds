@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.Log4JRule;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
@@ -17,22 +18,29 @@ import jrds.factories.xml.JrdsElement;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class TestBeans {
-    static final private Logger logger = Logger.getLogger(TestBeans.class);
-
-    @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        logger.setLevel(Level.DEBUG);
-        Tools.setLevel(logger, Level.TRACE, "jrds.Util");
+    }
+
+    @Rule
+    public TemporaryFolder testFolder = new TemporaryFolder();
+
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.Util");
     }
 
     @Test

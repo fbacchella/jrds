@@ -10,8 +10,6 @@ import jrds.Probe;
 import jrds.Tools;
 import jrds.mockobjects.GenerateProbe;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -20,8 +18,11 @@ import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
 import org.rrd4j.data.DataProcessor;
 
+import jrds.Log4JRule;
 public class TestRrdDbStore {
-    static final private Logger logger = Logger.getLogger(TestRrdDbStore.class);
+
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -29,7 +30,6 @@ public class TestRrdDbStore {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE);
         Tools.prepareXml(false);
     }
 

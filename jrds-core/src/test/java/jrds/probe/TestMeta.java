@@ -8,9 +8,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
+import jrds.Log4JRule;
 import jrds.Probe;
 import jrds.Tools;
 import jrds.factories.ProbeMeta;
@@ -24,14 +27,19 @@ public class TestMeta {
 
     }
 
-    static final private Logger logger = Logger.getLogger(TestMeta.class);
-
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        logger.setLevel(Level.DEBUG);
-        Tools.setLevel(new String[] { "jrds.Util" }, logger.getLevel());
     }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.Util");
+    }
+
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
 
     @Test
     public void build1() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {

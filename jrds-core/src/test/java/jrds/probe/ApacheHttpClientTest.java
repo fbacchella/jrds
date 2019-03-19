@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,6 +22,7 @@ import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
 
 import jrds.HostInfo;
+import jrds.Log4JRule;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
@@ -36,9 +38,12 @@ import jrds.starter.Timer;
 import jrds.store.RrdDbStoreFactory;
 
 public class ApacheHttpClientTest {
-    static final private Logger logger = Logger.getLogger(ApacheHttpClientTest.class);
 
     static private final Map<String, String> empty = Collections.emptyMap();
+
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -82,9 +87,14 @@ public class ApacheHttpClientTest {
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, HCHttpProbe.class.getName(), HttpClientStarter.class.getName(), Resolver.class.getName(), Connection.class.getName(), "jrds.Starter", "jrds.Probe.ApacheHttpClientTester");
         StoreOpener.prepare("FILE");
     }
+    
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, HCHttpProbe.class.getName(), HttpClientStarter.class.getName(), Resolver.class.getName(), Connection.class.getName(), "jrds.Starter", "jrds.Probe.ApacheHttpClientTester");
+    }
+
 
     private HostStarter addConnection(Starter cnx) throws IOException {
         String truststore = getClass().getClassLoader().getResource("localhost.jks").getFile();

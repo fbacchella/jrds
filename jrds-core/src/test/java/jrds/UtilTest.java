@@ -14,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,7 +26,10 @@ import jrds.mockobjects.MokeProbe;
 import jrds.starter.HostStarter;
 
 public class UtilTest {
-    static final private Logger logger = Logger.getLogger(UtilTest.class);
+
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -34,7 +38,11 @@ public class UtilTest {
     static public void configure() throws IOException, ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml();
-        Tools.setLevel(logger, Level.TRACE, "jrds.Util");
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.Util");
     }
 
     @Test

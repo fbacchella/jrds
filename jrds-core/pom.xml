@@ -8,7 +8,6 @@
     <name>JRDS core</name>
     <url>http://jrds.fr</url>
     <properties>
-        <jrds.testloglevel>ERROR</jrds.testloglevel>
         <slf4j.version>1.7.26</slf4j.version>
     </properties>
 

@@ -4,6 +4,15 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.log4j.Level;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+
+import jrds.Log4JRule;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
@@ -11,28 +20,25 @@ import jrds.Tools;
 import jrds.Util;
 import jrds.factories.xml.JrdsDocument;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
 public class TestProbeDescBuilder {
-    static final private Logger logger = Logger.getLogger(TestProbeDescBuilder.class);
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.ProbeDesc");
-        Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
-
         Tools.prepareXml();
     }
 
     @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
+
+    @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.DEBUG, "jrds.ProbeDesc");
+        logrule.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
+    }
 
     @Test
     public void testFullConfigpath() throws Exception {

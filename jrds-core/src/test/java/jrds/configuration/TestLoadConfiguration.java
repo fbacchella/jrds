@@ -12,6 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import org.junit.rules.TemporaryFolder;
 
 import jrds.Filter;
 import jrds.HostInfo;
+import jrds.Log4JRule;
 import jrds.Macro;
 import jrds.Probe;
 import jrds.ProbeDesc;
@@ -30,7 +32,10 @@ import jrds.factories.xml.JrdsDocument;
 import jrds.mockobjects.MokeProbeFactory;
 
 public class TestLoadConfiguration {
-    static final private Logger logger = Logger.getLogger(TestLoadConfiguration.class);
+
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
 
     @Rule
     public final TemporaryFolder testFolder = new TemporaryFolder();
@@ -70,10 +75,13 @@ public class TestLoadConfiguration {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        //Tools.configureSnmp();
         Tools.prepareXml(false);
-        Tools.setLevel(logger, Level.TRACE, "jrds", "jrds.configuration", "jrds.Probe.DummyProbe");
-        Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
+    }
+
+    @Before
+    public void loggers() throws IOException {
+        logrule.setLevel(Level.TRACE, "jrds.configuration", "jrds.Probe.DummyProbe", "jrds.factories");
+        logrule.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
     }
 
     @Test
