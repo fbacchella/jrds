@@ -7,19 +7,11 @@ import jrds.Probe;
 public class MockGraph extends GraphNode {
 
     public MockGraph() {
-        super(new MokeProbe<String, Number>(), new GraphDesc());
+        super(new MokeProbe.SelfDescMokeProbe<String, Number>(), new GraphDesc());
     }
 
     public MockGraph(Probe<?, ?> theStore) {
         super(theStore, new GraphDesc());
     }
-
-    // /* (non-Javadoc)
-    // * @see jrds.GraphNode#getName()
-    // */
-    // @Override
-    // public String getName() {
-    // return "MockGraph";
-    // }
 
 }

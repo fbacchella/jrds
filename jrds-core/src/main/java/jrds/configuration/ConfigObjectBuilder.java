@@ -4,20 +4,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.rrd4j.DsType;
+
+import jrds.ProbeDesc;
+import jrds.ProbeDesc.DataSourceBuilder;
 import jrds.PropertiesManager;
+import jrds.Util;
 import jrds.factories.ArgFactory;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.webapp.RolesACL;
 import jrds.webapp.WithACL;
-
-import org.apache.log4j.Logger;
-import org.rrd4j.DsType;
 
 abstract class ConfigObjectBuilder<BuildObject> {
     static final private Logger logger = Logger.getLogger(ConfigObjectBuilder.class);
@@ -63,38 +64,62 @@ abstract class ConfigObjectBuilder<BuildObject> {
      * @param node a DOM node wrapped in a JrdsNode
      * @return a list of Map describing the data sources
      */
-    protected List<Map<String, Object>> doDsList(String name, JrdsElement node) {
-        if(node == null)
+    protected List<DataSourceBuilder> doDsList(String name, JrdsElement node) {
+        if(node == null) {
             return Collections.emptyList();
-        List<Map<String, Object>> dsList = new ArrayList<Map<String, Object>>();
+        }
+        List<DataSourceBuilder> dsList = new ArrayList<>();
         for(JrdsElement dsNode: node.getChildElementsByName("ds")) {
-            Map<String, Object> dsMap = new HashMap<String, Object>(4);
+            DataSourceBuilder builder = ProbeDesc.getDataSourceBuilder();
             for(JrdsElement dsContent: dsNode.getChildElements()) {
-                String element = dsContent.getNodeName();
                 String textValue = dsContent.getTextContent().trim();
-                Object value = textValue;
-                if(element.startsWith("collect")) {
-                    if("".equals(value))
-                        value = null;
-                    dsMap.put("optional", Boolean.valueOf(dsContent.getAttribute("optional")));
-                } else if("dsType".equals(element)) {
-                    if(!"NONE".equals(textValue.toUpperCase()))
-                        try {
-                            value = DsType.valueOf(textValue.toUpperCase());
-                        } catch (Exception e) {
-                            logger.error("Invalid ds type specified for " + name + ": " + textValue);
-                            dsMap = null;
-                            break;
-                        }
-                    else
-                        value = null;
-                } else if(element.startsWith("oid")) {
-                    element = element.replace("oid", "collect");
+                String nodeName = dsContent.getNodeName();
+                if (nodeName.startsWith("collect")) {
+                    if (textValue.isEmpty()) {
+                        continue;
+                    }
+                    builder.setOptionnal(Boolean.valueOf(dsContent.getAttribute("optional")));
                 }
-                dsMap.put(element, value);
+                switch (nodeName) {
+                case "dsName":
+                    builder.setName(textValue);
+                    break;
+                case "dsType":
+                    if(!"none".equalsIgnoreCase(textValue)) {
+                        try {
+                            builder.setDsType(DsType.valueOf(textValue.toUpperCase()));
+                        } catch (IllegalArgumentException e) {
+                            logger.error("Invalid ds type specified for " + name + ": " + textValue);
+                            builder = null;
+                        }
+                    }
+                    break;
+                case "collect":
+                    builder.setCollectKey(textValue);
+                    break;
+                case "collecthigh":
+                    builder.setCollectKeyHigh(textValue);
+                    break;
+                case "collectlow":
+                    builder.setCollectKeyLow(textValue);
+                    break;
+                case "defaultValue":
+                    builder.setDefaultValue(Util.parseStringNumber(textValue, Double.NaN));
+                    break;
+                case "minValue":
+                    builder.setMinValue(Util.parseStringNumber(textValue, 0.0));
+                    break;
+                case "maxValue":
+                    builder.setMaxValue(Util.parseStringNumber(textValue, Double.NaN));
+                    break;
+                }
+                if (builder == null) {
+                    break;
+                }
             }
-            if(dsMap != null)
-                dsList.add(dsMap);
+            if (builder != null) {
+                dsList.add(builder);
+            }
         }
         logger.trace(jrds.Util.delayedFormatString("data store list build: %s", dsList));
         return dsList;

@@ -58,12 +58,7 @@ public class TestProbe {
         ProbeDesc<String> pd = new ProbeDesc<String>();
         pd.setName("empty");
         pd.setProbeName("empty");
-        Map<String, Object> dsMap = new HashMap<String, Object>();
-        dsMap.put("dsName", "ds0");
-        dsMap.put("dsType", DsType.COUNTER);
-        dsMap.put("collecthigh", "high");
-        dsMap.put("collectlow", "low");
-        pd.add(dsMap);
+        pd.add(ProbeDesc.getDataSourceBuilder("ds0", DsType.COUNTER).setCollectKeyHigh("high").setCollectKeyLow("low"));
 
         GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
         args.set(ProbeDesc.class, pd).set(Probe.class, DummyProbe.class);
@@ -91,16 +86,9 @@ public class TestProbe {
         ProbeDesc<String> pd = new ProbeDesc<String>();
         pd.setName("empty");
         pd.setProbeName("empty");
-        Map<String, Object> dsMap = new HashMap<String, Object>();
-        dsMap.put("dsName", "ds0");
-        dsMap.put("dsType", DsType.COUNTER);
-        dsMap.put("defaultValue", "1");
-        pd.add(dsMap);
-        dsMap.clear();
-        dsMap.put("dsName", "ds1");
-        dsMap.put("dsType", DsType.COUNTER);
-        dsMap.put("defaultValue", "1");
-        pd.add(dsMap);
+
+        pd.add(ProbeDesc.getDataSourceBuilder("ds0", DsType.COUNTER).setDefaultValue(1.0));
+        pd.add(ProbeDesc.getDataSourceBuilder("ds1", DsType.COUNTER).setDefaultValue(1.0));
 
         GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
         args.set(ProbeDesc.class, pd).set(Probe.class, DummyProbe.class);

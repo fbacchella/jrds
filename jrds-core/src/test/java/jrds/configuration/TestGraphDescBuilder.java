@@ -2,7 +2,6 @@ package jrds.configuration;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -13,19 +12,6 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
-
-import jrds.GraphDesc;
-import jrds.Period;
-import jrds.GraphNode;
-import jrds.Log4JRule;
-import jrds.ProbeDesc;
-import jrds.PropertiesManager;
-import jrds.Tools;
-import jrds.factories.xml.JrdsDocument;
-import jrds.mockobjects.GenerateProbe;
-import jrds.mockobjects.GenerateProbe.ChainedMap;
-import jrds.mockobjects.MokeProbe;
-import jrds.store.ExtractInfo;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -41,6 +27,17 @@ import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
 import org.rrd4j.graph.RrdGraphInfo;
 import org.w3c.dom.Document;
+
+import jrds.GraphDesc;
+import jrds.GraphNode;
+import jrds.Log4JRule;
+import jrds.Period;
+import jrds.ProbeDesc;
+import jrds.PropertiesManager;
+import jrds.Tools;
+import jrds.factories.xml.JrdsDocument;
+import jrds.mockobjects.MokeProbe;
+import jrds.store.ExtractInfo;
 
 public class TestGraphDescBuilder {
 
@@ -88,35 +85,19 @@ public class TestGraphDescBuilder {
             logger.trace(new String(os.toByteArray(), "UTF-8"));
         }
         MokeProbe<String, Number> p = new MokeProbe<String, Number>();
+        p.configure();
         p.getHost().setHostDir(testFolder.getRoot());
 
         p.setMainStore(pm.defaultStore, new HashMap<String, String>(0));
 
         ProbeDesc<?> pd = p.getPd();
 
-        ChainedMap<Object> dsMap = GenerateProbe.ChainedMap.start();
-        dsMap.set("dsName", "space separated").set("dsType", DsType.COUNTER);
-        pd.add(dsMap);
-
-        dsMap.clear();
-        dsMap.set("dsName", "add1").set("dsType", DsType.COUNTER);
-        pd.add(dsMap);
-
-        dsMap.clear();
-        dsMap.set("dsName", "add2").set("dsType", DsType.COUNTER);
-        pd.add(dsMap);
-
-        dsMap.clear();
-        dsMap.set("dsName", "add3").set("dsType", DsType.COUNTER);
-        pd.add(dsMap);
-
-        dsMap.clear();
-        dsMap.set("dsName", "add4").set("dsType", DsType.COUNTER);
-        pd.add(dsMap);
-
-        dsMap.clear();
-        dsMap.set("dsName", "add5").set("dsType", DsType.COUNTER);
-        pd.add(dsMap);
+        pd.add(ProbeDesc.getDataSourceBuilder("space separated", DsType.COUNTER));
+        pd.add(ProbeDesc.getDataSourceBuilder("add1", DsType.COUNTER));
+        pd.add(ProbeDesc.getDataSourceBuilder("add2", DsType.COUNTER));
+        pd.add(ProbeDesc.getDataSourceBuilder("add3", DsType.COUNTER));
+        pd.add(ProbeDesc.getDataSourceBuilder("add4", DsType.COUNTER));
+        pd.add(ProbeDesc.getDataSourceBuilder("add5", DsType.COUNTER));
 
         p.checkStore();
 

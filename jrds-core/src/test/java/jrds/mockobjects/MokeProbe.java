@@ -4,18 +4,23 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jrds.HostInfo;
-import jrds.starter.HostStarter;
-import jrds.Probe;
-import jrds.ProbeDesc;
-
 import org.rrd4j.DsType;
 
+import jrds.HostInfo;
+import jrds.Probe;
+import jrds.ProbeDesc;
+import jrds.starter.HostStarter;
+
 public class MokeProbe<A, B> extends Probe<A, B> {
+
+    public static class SelfDescMokeProbe<A, B> extends MokeProbe<A, B> {
+        public SelfDescMokeProbe() {
+            configure();
+        }
+    }
 
     Class<? extends Probe<?, ?>> originalProbe;
     String probeType = "DummyProbe";
@@ -34,7 +39,6 @@ public class MokeProbe<A, B> extends Probe<A, B> {
     }
 
     public MokeProbe() {
-        configure();
         setStep(300);
     }
 
@@ -50,20 +54,9 @@ public class MokeProbe<A, B> extends Probe<A, B> {
             pd = new ProbeDesc<A>();
             pd.setName(probeType);
             pd.setProbeName("dummyprobe");
-            Map<String, Object> dsMap = new HashMap<String, Object>();
-            dsMap.put("dsName", "ds0");
-            dsMap.put("dsType", DsType.COUNTER);
-            dsMap.put("collectKey", "/jrdsstats/stat[@key='a']/@value");
-            pd.add(dsMap);
-            dsMap = new HashMap<String, Object>();
-            dsMap.put("dsName", "ds1");
-            dsMap.put("dsType", DsType.COUNTER);
-            dsMap.put("collectKey", "/jrdsstats/stat[@key='b']/@value");
-            pd.add(dsMap);
-            dsMap = new HashMap<String, Object>();
-            dsMap.put("dsName", "ds2");
-            dsMap.put("dsType", DsType.COUNTER);
-            pd.add(dsMap);
+            pd.add(ProbeDesc.getDataSourceBuilder("ds0", DsType.COUNTER).setCollectKey("/jrdsstats/stat[@key='a']/@value"));
+            pd.add(ProbeDesc.getDataSourceBuilder("ds1", DsType.COUNTER).setCollectKey("/jrdsstats/stat[@key='b']/@value"));
+            pd.add(ProbeDesc.getDataSourceBuilder("ds2", DsType.COUNTER));
             setPd(pd);
         }
         if(pd.getProbeClass() == null)

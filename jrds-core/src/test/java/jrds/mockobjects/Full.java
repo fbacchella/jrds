@@ -6,9 +6,13 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import org.junit.Assert;
+import org.junit.rules.TemporaryFolder;
+import org.rrd4j.DsType;
+import org.rrd4j.core.Util;
 
 import jrds.GraphDesc;
 import jrds.GraphDesc.GraphType;
@@ -18,11 +22,6 @@ import jrds.Period;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.starter.HostStarter;
-import org.junit.Assert;
-
-import org.junit.rules.TemporaryFolder;
-import org.rrd4j.DsType;
-import org.rrd4j.core.Util;
 
 public class Full {
     static final long SEED = 1909752002L;
@@ -39,15 +38,8 @@ public class Full {
     static public <KeyType> ProbeDesc<KeyType> getPd() {
         ProbeDesc<KeyType> pd = new ProbeDesc<KeyType>();
 
-        Map<String, Object> dsMap = new HashMap<String, Object>();
-        dsMap.put("dsName", "sun");
-        dsMap.put("dsType", DsType.GAUGE);
-        pd.add(dsMap);
-
-        dsMap.clear();
-        dsMap.put("dsName", "shade");
-        dsMap.put("dsType", DsType.GAUGE);
-        pd.add(dsMap);
+        pd.add(ProbeDesc.getDataSourceBuilder("sun", DsType.GAUGE));
+        pd.add(ProbeDesc.getDataSourceBuilder("shade", DsType.GAUGE));
 
         pd.setName(FILE);
         pd.setProbeName(FILE);

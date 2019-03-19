@@ -4,10 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.junit.BeforeClass;
+import org.rrd4j.DsType;
 
 import jrds.HostInfo;
 import jrds.Probe;
@@ -15,9 +17,6 @@ import jrds.ProbeDesc;
 import jrds.Tools;
 import jrds.starter.HostStarter;
 import jrds.store.RrdDbStoreFactory;
-
-import org.junit.BeforeClass;
-import org.rrd4j.DsType;
 
 public class DummyProbe extends Probe<String, Number> {
 
@@ -40,20 +39,9 @@ public class DummyProbe extends Probe<String, Number> {
             host.setHostDir(new File("tmp"));
             setHost(new HostStarter(host));
         }
-        Map<String, Object> dsMap = new HashMap<String, Object>();
-        dsMap.put("dsName", "ds0");
-        dsMap.put("dsType", DsType.COUNTER);
-        dsMap.put("collectKey", "/jrdsstats/stat[@key='a']/@value");
-        pd.add(dsMap);
-        dsMap = new HashMap<String, Object>();
-        dsMap.put("dsName", "ds1");
-        dsMap.put("dsType", DsType.COUNTER);
-        dsMap.put("collectKey", "/jrdsstats/stat[@key='b']/@value");
-        pd.add(dsMap);
-        dsMap = new HashMap<String, Object>();
-        dsMap.put("dsName", "ds2");
-        dsMap.put("dsType", DsType.COUNTER);
-        pd.add(dsMap);
+        pd.add(ProbeDesc.getDataSourceBuilder("ds0", DsType.COUNTER).setCollectKey("/jrdsstats/stat[@key='a']/@value"));
+        pd.add(ProbeDesc.getDataSourceBuilder("ds1", DsType.COUNTER).setCollectKey("/jrdsstats/stat[@key='b']/@value"));
+        pd.add(ProbeDesc.getDataSourceBuilder("ds2", DsType.COUNTER));
     }
 
     @Override

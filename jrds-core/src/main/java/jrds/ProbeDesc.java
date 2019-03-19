@@ -17,15 +17,17 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.factories.ArgFactory;
-import jrds.factories.ProbeMeta;
-import jrds.starter.StarterNode;
-
 import org.apache.log4j.Logger;
 import org.rrd4j.DsType;
 import org.rrd4j.core.DsDef;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import jrds.factories.ArgFactory;
+import jrds.factories.ProbeMeta;
+import jrds.starter.StarterNode;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  * The description of a probe that must be used for each probe.
@@ -90,6 +92,43 @@ public class ProbeDesc<KeyType> implements Cloneable {
         }
     }
 
+    public static class DataSourceBuilder {
+        @Setter @Accessors(chain=true)
+        private String name;
+        @Setter @Accessors(chain=true)
+        private DsType dsType;
+        @Setter @Accessors(chain=true)
+        private Double defaultValue = null;
+        @Setter @Accessors(chain=true)
+        private double minValue = MINDEFAULT;
+        @Setter @Accessors(chain=true)
+        private double maxValue = MAXDEFAULT;
+        @Setter @Accessors(chain=true)
+        private String collectKey;
+        @Setter @Accessors(chain=true)
+        private String collectKeyHigh;
+        @Setter @Accessors(chain=true)
+        private String collectKeyLow;
+        @Setter @Accessors(chain=true)
+        private boolean optionnal;
+
+        private DataSourceBuilder(String name, DsType dsType) {
+            this.name = name;
+            this.dsType = dsType;
+        }
+
+        private DataSourceBuilder() {
+        }
+    }
+
+    public static DataSourceBuilder getDataSourceBuilder(String name, DsType dsType) {
+        return new DataSourceBuilder(name, dsType);
+    }
+
+    public static DataSourceBuilder getDataSourceBuilder() {
+        return new DataSourceBuilder();
+    }
+
     /**
      * Create a new Probe Description, with <em>size</em> elements in prevision
      * 
@@ -116,17 +155,6 @@ public class ProbeDesc<KeyType> implements Cloneable {
         dsMap.put(name, new DsDesc(dsType, MINDEFAULT, MAXDEFAULT, name));
     }
 
-    public void add(String name, DsType dsType, double min, double max) {
-        dsMap.put(name, new DsDesc(dsType, min, max, name));
-    }
-
-    public void add(String dsName, DsType dsType, String probeName) {
-        dsMap.put(dsName, new DsDesc(dsType, MINDEFAULT, MAXDEFAULT, probeName));
-    }
-
-    public void add(String dsName, DsType dsType, String probeName, double min, double max) {
-        dsMap.put(dsName, new DsDesc(dsType, min, max, probeName));
-    }
     public static final class Joined {
         final Object keyhigh;
         final Object keylow;
@@ -143,54 +171,39 @@ public class ProbeDesc<KeyType> implements Cloneable {
         return highlowcollectmap;
     }
 
-    public void add(Map<String, Object> valuesMap) {
-        double min = MINDEFAULT;
-        double max = MAXDEFAULT;
+    public void add(DataSourceBuilder builder) {
         String collectKey = null;
-        String name = null;
-        DsType type = null;
+        String bname = null;
 
         // Where to look for the added name
-        if(valuesMap.containsKey("dsName")) {
-            name = (String) valuesMap.get("dsName");
-        } else if(valuesMap.containsKey("collect")) {
-            name = valuesMap.get("collect").toString();
-        }
-
-        if(valuesMap.containsKey("dsType")) {
-            type = (DsType) valuesMap.get("dsType");
+        if(builder.name != null) {
+            bname = builder.name;
+        } else if(builder.collectKey != null) {
+            bname = builder.collectKey;
         }
 
         // Where to look for the collect info
-        if(valuesMap.containsKey("collect")) {
-            collectKey = (String) valuesMap.get("collect");
-        } else if(valuesMap.containsKey("collecthigh") && valuesMap.containsKey("collectlow")) {
-            String keyHigh = valuesMap.get("collecthigh").toString();
-            String keyLow = valuesMap.get("collectlow").toString();
-            dsMap.put(name + "high", new DsDesc(null, min, max, keyHigh));
-            dsMap.put(name + "low", new DsDesc(null, min, max, keyLow));
-            highlowcollectmap.put(name, new Joined(keyHigh, keyLow));
+        if(builder.collectKey != null) {
+            collectKey = builder.collectKey;
+        } else if(builder.collectKeyHigh != null && builder.collectKeyLow != null) {
+            dsMap.put(bname + "high", new DsDesc(null, builder.minValue, builder.maxValue, builder.collectKeyHigh));
+            dsMap.put(bname + "low", new DsDesc(null, builder.minValue, builder.maxValue, builder.collectKeyLow));
+            highlowcollectmap.put(bname, new Joined(builder.collectKeyHigh, builder.collectKeyLow));
         } else {
-            collectKey = name;
+            collectKey = bname;
         }
 
-        if(valuesMap.containsKey("defaultValue")) {
-            defaultValues.put(name, jrds.Util.parseStringNumber(valuesMap.get("defaultValue").toString(), Double.NaN));
-        }
-        if(valuesMap.containsKey("minValue")) {
-            min = jrds.Util.parseStringNumber(valuesMap.get("minValue").toString(), MINDEFAULT);
-        }
-        if(valuesMap.containsKey("maxValue")) {
-            max = jrds.Util.parseStringNumber(valuesMap.get("maxValue").toString(), MAXDEFAULT);
-        }
-        if(valuesMap.containsKey("optional") && valuesMap.get("optional") instanceof Boolean) {
-            boolean optional = (Boolean) valuesMap.get("optional");
-            if(optional) {
-                optionals.add(name);
-            }
+        if(builder.defaultValue != null && builder.defaultValue != Double.NaN) {
+            defaultValues.put(bname, builder.defaultValue);
         }
 
-        dsMap.put(name, new DsDesc(type, min, max, collectKey));
+        if (builder.optionnal) {
+            optionals.add(collectKey);
+        }
+
+        if (builder.dsType != null) {
+            dsMap.put(bname, new DsDesc(builder.dsType, builder.minValue, builder.maxValue, collectKey));
+        }
     }
 
     /**
@@ -199,12 +212,11 @@ public class ProbeDesc<KeyType> implements Cloneable {
      * 
      * @param dsList a list of data source description as a map.
      */
-    public void replaceDs(List<Map<String, Object>> dsList) {
+    public void replaceDs(List<DataSourceBuilder> dsList) {
         defaultValues = new HashMap<String, Double>(0);
         dsMap = new HashMap<String, DsDesc>(dsList.size());
-        for(Map<String, Object> dsinfo: dsList) {
-            add(dsinfo);
-        }
+        collectMap = null;
+        dsList.forEach(this::add);
     }
 
     /**
@@ -481,6 +493,15 @@ public class ProbeDesc<KeyType> implements Cloneable {
      */
     boolean isOptional(String dsName) {
         return optionals.contains(dsName);
+    }
+    
+    public Set<KeyType> getOptionalsCollect(Probe<KeyType, ?> p) {
+        Set<KeyType> newOptionals = new HashSet<>(optionals.size());
+        optionals.stream()
+        .map(o -> Util.parseTemplate(o, p, this))
+        .map(collectResolver::resolve)
+        .forEach(newOptionals::add);
+        return newOptionals;
     }
 
 }

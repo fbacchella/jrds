@@ -65,8 +65,9 @@ public class TestProbeDescBuilder {
 
         @SuppressWarnings("unchecked")
         Probe<String, String> p = (Probe<String, String>) pd.getProbeClass().getConstructor().newInstance();
-        p.setPd(pd);
         p.setLabel("goodlabel");
+        p.setPd(pd);
+        p.setOptionalsCollect();
         Assert.assertTrue("optional resolution broken", p.isOptional("goodlabel"));
     }
 

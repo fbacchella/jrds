@@ -16,22 +16,22 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.factories.ProbeMeta;
-import jrds.probe.IndexedProbe;
-import jrds.probe.UrlProbe;
-import jrds.starter.HostStarter;
-import jrds.starter.StarterNode;
-import jrds.store.ExtractInfo;
-import jrds.store.Extractor;
-import jrds.store.Store;
-import jrds.store.StoreFactory;
-import jrds.starter.Timer;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.rrd4j.data.DataProcessor;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import jrds.factories.ProbeMeta;
+import jrds.probe.IndexedProbe;
+import jrds.probe.UrlProbe;
+import jrds.starter.HostStarter;
+import jrds.starter.StarterNode;
+import jrds.starter.Timer;
+import jrds.store.ExtractInfo;
+import jrds.store.Extractor;
+import jrds.store.Store;
+import jrds.store.StoreFactory;
 
 /**
  * A abstract class that needs to be derived for specific probe.<br>
@@ -40,10 +40,8 @@ import org.w3c.dom.Element;
  * 
  * @author Fabrice Bacchella
  */
-@ProbeMeta(
-        topStarter=jrds.starter.SocketFactory.class,
-        collectResolver=CollectResolver.StringResolver.class
-        )
+@ProbeMeta(topStarter=jrds.starter.SocketFactory.class,
+           collectResolver=CollectResolver.StringResolver.class)
 public abstract class Probe<KeyType, ValueType> extends StarterNode implements Comparable<Probe<KeyType, ValueType>>  {
 
     protected class LocalJrdsSample extends HashMap<String, Number> implements JrdsSample {
@@ -95,6 +93,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     private Store mainStore;
     private ArchivesSet archives = ArchivesSet.DEFAULT;
     private Map<String, String> customBeans = Collections.emptyMap();
+    private Set<KeyType> optionalsCollect = Collections.emptySet();
 
     /**
      * A special case constructor, mainly used by virtual probe
@@ -125,6 +124,10 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         if(!readSpecific()) {
             throw new RuntimeException("Creation failed");
         }
+    }
+
+    public void setOptionalsCollect() {
+        optionalsCollect = pd.getOptionalsCollect(this);
     }
 
     public void setBean(String key, String value) {
@@ -236,8 +239,9 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         for(Map.Entry<KeyType, String> e: rawMap.entrySet()) {
             String value = jrds.Util.parseTemplate(e.getValue(), this);
             KeyType key = e.getKey();
-            if(key instanceof String)
+            if(key instanceof String) {
                 key = (KeyType) jrds.Util.parseTemplate((String) key, this);
+            }
             retValues.put(key, value);
         }
         return retValues;
@@ -251,7 +255,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * @return
      */
     public boolean isOptional(KeyType collect) {
-        return getPd().isOptional(getCollectMapping().get(collect));
+        return optionalsCollect.contains(collect);
     }
 
     /**

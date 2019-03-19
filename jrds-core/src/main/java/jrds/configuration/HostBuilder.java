@@ -22,6 +22,7 @@ import jrds.HostInfo;
 import jrds.Macro;
 import jrds.Probe;
 import jrds.ProbeDesc;
+import jrds.ProbeDesc.DataSourceBuilder;
 import jrds.Util;
 import jrds.factories.ArgFactory;
 import jrds.factories.ProbeFactory;
@@ -230,7 +231,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         String type = probeNode.attrMap().get("type");
         type = jrds.Util.parseTemplate(type, host, properties);
 
-        List<Map<String, Object>> dsList = doDsList(type, probeNode.getElementbyName("dslist"));
+        List<DataSourceBuilder> dsList = doDsList(type, probeNode.getElementbyName("dslist"));
         if(dsList.size() > 0) {
             logger.trace(Util.delayedFormatString("Data source replaced for %s/%s: %s", host, type, dsList));
             ProbeDesc<?> oldpd = pf.getProbeDesc(type);
@@ -331,6 +332,8 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             logger.error(p + " configuration failed");
             return null;
         }
+
+        p.setOptionalsCollect();
 
         // A connected probe, register the needed connection
         // It can be defined within the node, referenced by it's name, or it's
