@@ -37,7 +37,9 @@ import jrds.probe.jdbc.JdbcProbe;
 import jrds.store.ExtractInfo;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 /**
@@ -561,7 +563,8 @@ public class GraphDesc implements WithACL {
         colornames = Collections.unmodifiableMap(_colornames);
     }
 
-    public static class DsPath {
+    @ToString @EqualsAndHashCode
+    static class DsPath {
         public final String host;
         public final String probe;
 
@@ -569,6 +572,7 @@ public class GraphDesc implements WithACL {
             this.host = host;
             this.probe = probe;
         }
+        
     }
 
     public static DsDescBuilder getDsDescBuilder() {
@@ -636,9 +640,9 @@ public class GraphDesc implements WithACL {
         public final Integer percentile;
         public final DsPath dspath;
 
-        DsDesc(String name, String dsName, String rpn,
+        private DsDesc(String name, String dsName, String rpn,
                GraphType graphType, Paint color, String legend,
-               ConsolFun cf, String host, String probe) {
+               ConsolFun cf, DsPath dspath) {
             this.name = name;
             this.dsName = dsName;
             this.rpn = rpn;
@@ -647,14 +651,10 @@ public class GraphDesc implements WithACL {
             this.color = color;
             this.legend = legend;
             this.cf = cf;
-            if(probe != null) {
-                this.dspath = new DsPath(host, probe);
-            } else {
-                this.dspath = null;
-            }
+            this.dspath = dspath;
         }
 
-        public DsDesc(String name, String rpn, GraphType graphType, Paint color, String legend) {
+        private DsDesc(String name, String rpn, GraphType graphType, Paint color, String legend) {
             this.name = name;
             this.rpn = rpn;
             this.graphType = graphType;
@@ -666,7 +666,7 @@ public class GraphDesc implements WithACL {
             this.dspath = null;
         }
 
-        public DsDesc(String name, String dsName, Integer percentile, GraphType graphType, Paint color) {
+        private DsDesc(String name, String dsName, Integer percentile, GraphType graphType, Paint color) {
             this.name = name;
             this.dsName = dsName;
             this.percentile = percentile;
@@ -678,7 +678,7 @@ public class GraphDesc implements WithACL {
             this.dspath = null;
         }
 
-        public DsDesc(String dsName, GraphType graphType, String legend, ConsolFun cf) {
+        private  DsDesc(String dsName, GraphType graphType, String legend, ConsolFun cf) {
             this.name = dsName;
             this.dsName = dsName;
             this.graphType = graphType;
@@ -730,8 +730,6 @@ public class GraphDesc implements WithACL {
         @Setter @Accessors(chain=true)
         private String verticalLabel = null;
         @Setter @Accessors(chain=true)
-        private int lastColor = 0;
-        @Setter @Accessors(chain=true)
         private Map<String, List<?>> trees = new HashMap<String, List<?>>(2);
         @Setter @Accessors(chain=true)
         private String graphName;
@@ -739,8 +737,6 @@ public class GraphDesc implements WithACL {
         private String name;
         @Setter @Accessors(chain=true)
         private String graphTitle = "${graphdesc.name} on ${host}";
-        @Setter @Accessors(chain=true)
-        private int maxLengthLegend = 0;
         @Setter @Accessors(chain=true)
         private boolean siUnit = true;
         @Setter @Accessors(chain=true)
@@ -754,7 +750,6 @@ public class GraphDesc implements WithACL {
         @Setter @Accessors(chain=true)
         private ACL acl = ACL.ALLOWEDACL;
         @Setter @Accessors(chain=true)
-
         private Class<Graph> graphClass = Graph.class;
 
         public Builder fromGraphDesc(GraphDesc parent) {
@@ -764,13 +759,11 @@ public class GraphDesc implements WithACL {
             upperLimit = parent.upperLimit;
             lowerLimit = parent.lowerLimit;
             verticalLabel = parent.verticalLabel;
-            lastColor = parent.lastColor;
             trees = new HashMap<String, List<?>>(parent.trees.size());
             parent.trees.forEach((k, v) -> trees.put(k, new ArrayList<Object>(v)));
             graphName = parent.graphName;
             name = parent.name;
             graphTitle = parent.graphTitle;
-            maxLengthLegend = parent.maxLengthLegend;
             siUnit = parent.siUnit;
             logarithmic = parent.logarithmic;
             unitExponent = parent.unitExponent;
@@ -808,7 +801,7 @@ public class GraphDesc implements WithACL {
             return this;
         }
 
-        public Builder addDsSecBuilder(DsDescBuilder builder) {
+        public Builder addDsDesc(DsDescBuilder builder) {
             if(descbuilders == null) {
                 descbuilders = new ArrayList<>();
             }
@@ -859,13 +852,12 @@ public class GraphDesc implements WithACL {
     }
 
     public GraphDesc(Builder builder) {
-        allds = builder.allds;
+        allds = new ArrayList<>(builder.allds);
         width = builder.width;
         height = builder.height;
         upperLimit = builder.upperLimit;
         lowerLimit = builder.lowerLimit;
         verticalLabel = builder.verticalLabel;
-        lastColor = builder.lastColor;
         if(builder.trees != null) {
             trees = new HashMap<>(builder.trees.size());
             builder.trees.forEach((k,v) -> {
@@ -875,7 +867,6 @@ public class GraphDesc implements WithACL {
         graphName = builder.graphName;
         name = builder.name;
         graphTitle = builder.graphTitle;
-        maxLengthLegend = builder.maxLengthLegend;
         siUnit = builder.siUnit;
         logarithmic = builder.logarithmic;
         unitExponent = builder.unitExponent;
@@ -885,48 +876,6 @@ public class GraphDesc implements WithACL {
         graphClass =builder.graphClass;
         if(builder.descbuilders != null) {
             builder.descbuilders.forEach(this::add);
-        }
-    }
-
-    public void add(String name, GraphType graphType) {
-        DsDescBuilder builder = new DsDescBuilder();
-        builder.name = name;
-        builder.dsName = name;
-        builder.graphType = graphType;
-        builder.cf = DEFAULTCF;
-    }
-
-    /**
-     * Add a datastore that will not generate a graph
-     *
-     * @param name String
-     */
-    public void add(String name) {
-        DsDescBuilder builder = new DsDescBuilder();
-        builder.name = name;
-        builder.dsName = name;
-        builder.graphType = GraphType.NONE;
-        builder.cf = DEFAULTCF;
-        add(builder);
-    }
-
-    public void add(String name, String dsName, String rpn,
-                    GraphType graphType, Paint color, String legend,
-                    ConsolFun cf, boolean reversed, Integer percentile,
-                    //The path to an external datastore
-                    String host, String probe) {
-        DsDescBuilder builder = new DsDescBuilder();
-        builder.name = name;
-        builder.dsName = dsName;
-        builder.rpn = rpn;
-        builder.graphType = graphType;
-        builder.color = color;
-        builder.legend = legend;
-        builder.cf = cf;
-        builder.reversed = reversed;
-        builder.percentile = percentile;
-        if (host != null && probe != null) {
-            builder.dspath = new DsPath(host, probe);
         }
     }
 
@@ -944,8 +893,6 @@ public class GraphDesc implements WithACL {
         if(bgt.toPlot() && bcolor == null) {
             bcolor = Colors.resolveIndex(lastColor++);
         }
-        String bhost = builder.dspath != null ? builder.dspath.host : null;
-        String bprobe = builder.dspath != null ? builder.dspath.probe : null;
         String bname = builder.name;
         String bdsname = builder.dsName;
         // dsName unknown, try to extract from name
@@ -970,11 +917,11 @@ public class GraphDesc implements WithACL {
         }
         if(builder.reversed) {
             String revRpn = "0, " + bname + ", -";
-            allds.add(new DsDesc(bname, bdsname, builder.rpn, GraphType.NONE, null, null, builder.cf, bhost, bprobe));
+            allds.add(new DsDesc(bname, bdsname, builder.rpn, GraphType.NONE, null, null, builder.cf, builder.dspath));
             allds.add(new DsDesc("rev_" + bname, revRpn, bgt, bcolor, null));
             allds.add(new DsDesc(bname, GraphType.LEGEND, blegend, builder.cf));
         } else {
-            allds.add(new DsDesc(bname, bdsname, builder.rpn, bgt, bcolor, blegend, builder.cf, bhost, bprobe));
+            allds.add(new DsDesc(bname, bdsname, builder.rpn, bgt, bcolor, blegend, builder.cf, builder.dspath));
         }
         if(builder.percentile != null) {
             String percentileName = "percentile" + builder.percentile + "_" + name;
@@ -986,7 +933,6 @@ public class GraphDesc implements WithACL {
                 String revPercentilRpn = "0, " + percentileName + ", -";
                 allds.add(new DsDesc(percentileName, bname, builder.percentile, GraphType.NONE, null));
                 allds.add(new DsDesc("rev_" + percentileName, revPercentilRpn, GraphType.LINE, percentilColor, null));
-
             }
             allds.add(new DsDesc(percentileName, GraphType.PERCENTILELEGEND, percentileLegend, builder.cf));
             maxLengthLegend = Math.max(maxLengthLegend, percentileLegend.length());
@@ -1449,7 +1395,7 @@ public class GraphDesc implements WithACL {
                 skip = 2;
                 DsDesc rev = allds.get(i + 1);
                 DsDesc leg = allds.get(i + 2);
-                e = new DsDesc(curs.name, curs.dsName, curs.rpn, rev.graphType, rev.color, leg.legend, curs.cf, null, null);
+                e = new DsDesc(curs.name, curs.dsName, curs.rpn, rev.graphType, rev.color, leg.legend, curs.cf, null);
             }
             Element specElement = (Element) root.appendChild(document.createElement("add"));
             specElement.appendChild(document.createElement("name")).setTextContent(e.name);

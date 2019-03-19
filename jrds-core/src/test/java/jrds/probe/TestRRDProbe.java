@@ -12,6 +12,7 @@ import java.util.Map;
 
 import jrds.Graph;
 import jrds.GraphDesc;
+import jrds.GraphDesc.GraphType;
 import jrds.GraphNode;
 import jrds.ProbeDesc;
 import jrds.HostInfo;
@@ -74,8 +75,8 @@ public class TestRRDProbe {
         GraphDesc gd = new GraphDesc();
         gd.setGraphName("rrdtool");
         gd.setName("rrdtool");
-        gd.add("speed", "speed", null, GraphDesc.LINE, Color.BLUE, "speed", GraphDesc.DEFAULTCF, false, null, null, null);
-        gd.add("weight", "weight", null, GraphDesc.LINE, Color.GREEN, "weight", GraphDesc.DEFAULTCF, false, null, null, null);
+        gd.add(GraphDesc.getDsDescBuilder().setName("speed").setDsName("speed").setGraphType(GraphType.LINE).setColor(Color.BLUE).setLegend("speed"));
+        gd.add(GraphDesc.getDsDescBuilder().setName("weight").setDsName("weight").setGraphType(GraphType.LINE).setColor(Color.GREEN).setLegend("weight"));
         p.addGraph(gd);
         for(GraphNode gn: p.getGraphList()) {
             Graph g = gn.getGraph();

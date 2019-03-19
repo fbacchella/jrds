@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import jrds.GraphDesc;
 import jrds.HostInfo;
 import jrds.HostsList;
 import jrds.Tools;
@@ -61,7 +62,7 @@ public class TestSum {
         hl.addProbe(sp.getProbe());
 
         jrds.GraphNode mg = new MockGraph();
-        mg.getGraphDesc().add("plot");
+        mg.getGraphDesc().add(GraphDesc.getDsDescBuilder().setName("plot"));
 
         hl.addHost(mg.getProbe().getHost());
         hl.addProbe(mg.getProbe());

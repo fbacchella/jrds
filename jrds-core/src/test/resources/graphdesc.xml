@@ -2,49 +2,55 @@
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
                            "urn:jrds:graphdesc">
 <graphdesc>
-	<name>graphdesctest</name>
-	<graphName>graphName</graphName>
+    <name>graphdesctest</name>
+    <graphName>graphName</graphName>
     <graphClass>jrds.Graph</graphClass>
-	<graphTitle>graphTitle</graphTitle>
+    <graphTitle>graphTitle</graphTitle>
     <unit>
         <binary />
         <base />
     </unit>
-	<verticalLabel>verticalLabel</verticalLabel>
+    <verticalLabel>verticalLabel</verticalLabel>
     <!-- a plain ds declaration -->
     <add>
         <name>add1</name>
     </add>
     <!-- a ds declaration but use it with another name -->
-	<add>
-		<name>add2</name>
-		<dsName>space separated</dsName>
-	</add>
+    <add>
+        <name>add2</name>
+        <dsName>space separated</dsName>
+    </add>
     <!-- add a rpn as a source -->
     <add>
         <name>add3</name>
         <rpn>add1, add2, *</rpn>
     </add>
     <!-- add a ds and plot it -->
-	<add>
-		<name>add4</name>
-		<graphType>line</graphType>
-		<legend>legend1</legend>
-	</add>
+    <add>
+        <name>add4</name>
+        <graphType>line</graphType>
+        <legend>legend1</legend>
+    </add>
     <!-- add a ds and plot it reversed -->
-	<add>
-		<name>add3</name>
-		<reversed/>
-		<graphType>line</graphType>
-		<legend>legend3</legend>
-	</add>
+    <add>
+        <rpn>add3</rpn>
+        <reversed />
+        <graphType>line</graphType>
+        <legend>legend3</legend>
+    </add>
+    <add>
+        <name>add5</name>
+        <reversed>true</reversed>
+        <graphType>line</graphType>
+        <legend>add5 legend</legend>
+    </add>
     <!-- use a rpn to plot -->
-	<add>
-		<rpn>add1, add2, +</rpn>
-		<graphType>area</graphType>
-		<color>#010203</color>
-	</add>
-    <!--  plot a previously declared source -->
+    <add>
+        <rpn>add1, add2, +</rpn>
+        <graphType>area</graphType>
+        <color>#010203</color>
+    </add>
+    <!-- plot a previously declared source -->
     <add>
         <dsName>add1</dsName>
         <graphType>line</graphType>
@@ -53,14 +59,14 @@
     <add>
         <legend>a legend</legend>
     </add>
-	<hosttree>
-		<pathstring>hoststab1</pathstring>
-		<pathstring>hoststab2</pathstring>
-	</hosttree>
-	<viewtree>
-		<pathstring>viewstab1</pathstring>
-		<pathstring>viewstab2</pathstring>
-	</viewtree>
+    <hosttree>
+        <pathstring>hoststab1</pathstring>
+        <pathstring>hoststab2</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathstring>viewstab1</pathstring>
+        <pathstring>viewstab2</pathstring>
+    </viewtree>
     <tree tab="tab">
         <pathstring>tab1</pathstring>
         <pathstring>tab2</pathstring>

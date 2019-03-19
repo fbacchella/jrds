@@ -358,7 +358,7 @@ public class ParamsBean implements Serializable {
                             .setName(graphDescName)
                             .setGraphName(p.getHost().getName() + "." + p.getName() + "." + dsName)
                             .setGraphTitle(p.getName() + "." + dsName + " on ${host}")
-                            .addDsSecBuilder(GraphDesc.getDsDescBuilder().setDsName(dsName).setGraphType(GraphType.LINE))
+                            .addDsDesc(GraphDesc.getDsDescBuilder().setDsName(dsName).setGraphType(GraphType.LINE))
                             .build();
             gd.initializeLimits(g2d);
 

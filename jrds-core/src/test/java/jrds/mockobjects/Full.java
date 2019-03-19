@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Random;
 
 import jrds.GraphDesc;
+import jrds.GraphDesc.GraphType;
 import jrds.HostInfo;
 import jrds.JrdsSample;
 import jrds.Period;
@@ -55,15 +56,11 @@ public class Full {
     }
 
     static public GraphDesc getGd() {
-        GraphDesc gd = new GraphDesc();
-
-        gd.add("sun", null, GraphDesc.LINE.toString(), "green", null, null, null, null, null, null, null);
-        gd.add("shade", null, GraphDesc.LINE.toString(), "blue", null, null, null, null, null, null, null);
-        gd.add("median", "sun,shade,+,2,/", GraphDesc.LINE.toString(), "magenta", null, null, null, null, null, null, null);
-        gd.add("diff", "sun,shade,-,ABS,-1,*", GraphDesc.AREA.toString(), "yellow", null, null, null, null, null, null, null);
-
-        gd.setGraphTitle("Temperatures in May 2003");
-        gd.setVerticalLabel("temperature");
+        GraphDesc gd = GraphDesc.getBuilder().setGraphTitle("Temperatures in May 2003").setVerticalLabel("temperature").build();
+        gd.add(GraphDesc.getDsDescBuilder().setName("sun").setGraphType(GraphType.LINE).setColorString("green"));
+        gd.add(GraphDesc.getDsDescBuilder().setName("shade").setGraphType(GraphType.LINE).setColorString("blue"));
+        gd.add(GraphDesc.getDsDescBuilder().setName("median").setRpn("sun,shade,+,2,/").setGraphType(GraphType.LINE).setColorString("magenta"));
+        gd.add(GraphDesc.getDsDescBuilder().setName("diff").setRpn("sun,shade,-,ABS,-1,*").setGraphType(GraphType.AREA).setColorString("magenta"));
         return gd;
     }
 
