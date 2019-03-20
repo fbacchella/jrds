@@ -112,7 +112,7 @@ public class DoSnmpProbe extends CommandStarterImpl {
             } else if("--collect".equals(cmd.toLowerCase())) {
                 for(String collectarg: args[++i].split(",")) {
                     OidInfo info = translate(collectarg);
-                    pd.add(info.name, info.type, info.oid.format());
+                    pd.add(ProbeDesc.getDataSourceBuilder(info.name, info.type).setCollectKey(info.oid.format()));
                 }
             } else if(cmd.startsWith("--")) {
                 String key = cmd.replace("--", "").toLowerCase();
