@@ -13,22 +13,27 @@
     <ds>
         <dsName>Minimum</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <ds>
         <dsName>Maximum</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <ds>
         <dsName>Average</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <ds>
         <dsName>Number</dsName>
         <dsType>gauge</dsType>
+        <collect />
     </ds>
     <ds>
         <dsName>Cpu</dsName>
         <dsType>derive</dsType>
+        <collect />
     </ds>
     <graphs>
         <name>ProcessInfoNumber</name>
