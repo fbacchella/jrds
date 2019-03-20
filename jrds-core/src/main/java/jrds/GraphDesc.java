@@ -3,7 +3,6 @@ package jrds;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Paint;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.io.IOException;
@@ -145,7 +144,7 @@ public class GraphDesc implements WithACL {
             }
         },
         LINE {
-            public void draw(RrdGraphDef rgd, String sn, Paint color, String legend) {
+            public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
                 rgd.line(sn, color, legend);
             }
 
@@ -167,7 +166,7 @@ public class GraphDesc implements WithACL {
             }
         },
         LINENOLEGEND {
-            public void draw(RrdGraphDef rgd, String sn, Paint color, String legend) {
+            public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
                 rgd.line(sn, color, legend);
             }
 
@@ -189,7 +188,7 @@ public class GraphDesc implements WithACL {
             }
         },
         AREA {
-            public void draw(RrdGraphDef rgd, String sn, Paint color, String legend) {
+            public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
                 rgd.area(sn, color, legend);
             }
 
@@ -211,7 +210,7 @@ public class GraphDesc implements WithACL {
             }
         },
         STACK {
-            public void draw(RrdGraphDef rgd, String sn, Paint color, String legend) {
+            public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
                 rgd.stack(sn, color, legend);
             }
 
@@ -233,7 +232,7 @@ public class GraphDesc implements WithACL {
             }
         };
 
-        public void draw(RrdGraphDef rgd, String sn, Paint color, String legend) {
+        public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
         }
 
         /**
@@ -589,7 +588,7 @@ public class GraphDesc implements WithACL {
         @Setter @Accessors(chain=true)
         private GraphType graphType;
         @Setter @Accessors(chain=true)
-        private Paint color;
+        private Color color;
         @Setter @Accessors(chain=true)
         private String legend;
         @Setter @Accessors(chain=true)
@@ -634,14 +633,14 @@ public class GraphDesc implements WithACL {
         public final String dsName;
         public final String rpn;
         public final GraphType graphType;
-        public final Paint color;
+        public final Color color;
         public final String legend;
         public final ConsolFun cf;
         public final Integer percentile;
         public final DsPath dspath;
 
         private DsDesc(String name, String dsName, String rpn,
-               GraphType graphType, Paint color, String legend,
+               GraphType graphType, Color color, String legend,
                ConsolFun cf, DsPath dspath) {
             this.name = name;
             this.dsName = dsName;
@@ -654,7 +653,7 @@ public class GraphDesc implements WithACL {
             this.dspath = dspath;
         }
 
-        private DsDesc(String name, String rpn, GraphType graphType, Paint color, String legend) {
+        private DsDesc(String name, String rpn, GraphType graphType, Color color, String legend) {
             this.name = name;
             this.rpn = rpn;
             this.graphType = graphType;
@@ -666,7 +665,7 @@ public class GraphDesc implements WithACL {
             this.dspath = null;
         }
 
-        private DsDesc(String name, String dsName, Integer percentile, GraphType graphType, Paint color) {
+        private DsDesc(String name, String dsName, Integer percentile, GraphType graphType, Color color) {
             this.name = name;
             this.dsName = dsName;
             this.percentile = percentile;
@@ -880,7 +879,7 @@ public class GraphDesc implements WithACL {
     }
 
     public void add(DsDescBuilder builder) {
-        Paint bcolor = builder.color;
+        Color bcolor = builder.color;
         GraphType bgt = builder.graphType;
         if(bgt == null) {
             if(builder.legend != null) {
