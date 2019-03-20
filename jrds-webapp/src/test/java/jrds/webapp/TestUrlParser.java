@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import jrds.GraphNode;
 import jrds.HostsList;
+import jrds.Log4JRule;
 import jrds.Period;
 import jrds.Probe;
 import jrds.PropertiesManager;
@@ -26,11 +27,12 @@ import jrds.mockobjects.MokeProbe;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 
 public class TestUrlParser {
-    static final Logger logger = Logger.getLogger(TestUrlParser.class);
     static final private DateFormat fullISOFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
     static private HostsList hl;
 
@@ -39,8 +41,16 @@ public class TestUrlParser {
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, ParamsBean.class.getName());
         hl = new HostsList(new PropertiesManager());
+    }
+
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, ParamsBean.class.getName());
     }
 
     @Test
@@ -57,7 +67,8 @@ public class TestUrlParser {
         parameters.put("host", new String[] { "DummyHost" });
         parameters.put("graphname", new String[] { "MockGraph" });
 
-        Probe<String, Number> p = new MokeProbe<String, Number>();
+        MokeProbe<String, Number> p = new MokeProbe<String, Number>();
+        p.configure();
         GraphNode gn = new MockGraph(p);
         gn.getGraphDesc().setGraphName("MockGraph");
         logger.trace(gn);
@@ -74,7 +85,8 @@ public class TestUrlParser {
         parameters.put("end", new String[] { "2007-12-31" });
         Date begin = fullISOFORMAT.parse("2007-01-01T00:00:00");
         Date end = fullISOFORMAT.parse("2007-12-31T23:59:59");
-        Probe<String, Number> p = new MokeProbe<String, Number>();
+        MokeProbe<String, Number> p = new MokeProbe<String, Number>();
+        p.configure();
         GraphNode gn = new MockGraph(p);
         gn.getGraphDesc().setGraphName("MockGraphInstance");
         logger.debug("Graph name: " + gn.getGraphDesc().getGraphName());
@@ -102,7 +114,8 @@ public class TestUrlParser {
         parameters.put("end", new String[] { "2007-12-31" });
         Date begin = fullISOFORMAT.parse("2007-01-01T00:00:00");
         Date end = fullISOFORMAT.parse("2007-12-31T23:59:59");
-        Probe<String, Number> p = new MokeProbe<String, Number>();
+        MokeProbe<String, Number> p = new MokeProbe<String, Number>();
+        p.configure();
         GraphNode gn = new MockGraph(p);
         gn.getGraphDesc().setGraphName("MockGraphInstance");
         logger.debug("Graph name: " + gn.getGraphDesc().getGraphName());
