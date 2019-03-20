@@ -74,10 +74,7 @@ abstract class ConfigObjectBuilder<BuildObject> {
             for(JrdsElement dsContent: dsNode.getChildElements()) {
                 String textValue = dsContent.getTextContent().trim();
                 String nodeName = dsContent.getNodeName();
-                if (nodeName.startsWith("collect")) {
-                    if (textValue.isEmpty()) {
-                        continue;
-                    }
+                if (nodeName.startsWith("collect") || nodeName.startsWith("oid")) {
                     builder.setOptionnal(Boolean.valueOf(dsContent.getAttribute("optional")));
                 }
                 switch (nodeName) {
@@ -95,12 +92,15 @@ abstract class ConfigObjectBuilder<BuildObject> {
                     }
                     break;
                 case "collect":
+                case "oid":
                     builder.setCollectKey(textValue);
                     break;
                 case "collecthigh":
+                case "oidhigh":
                     builder.setCollectKeyHigh(textValue);
                     break;
                 case "collectlow":
+                case "oidlow":
                     builder.setCollectKeyLow(textValue);
                     break;
                 case "defaultValue":

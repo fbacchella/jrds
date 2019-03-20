@@ -16,5 +16,10 @@ public interface CollectResolver<K> {
         }
     }
 
+    /**
+     * @param collectKey
+     * @return
+     * @throws IllegalArgumentException when resolution failed
+     */
     public K resolve(String collectKey);
 }
