@@ -46,6 +46,7 @@ jobs:
                     mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
+            - run: sudo apt install libsnmp-base
             - run:
                 command: |
                     # If no symbolic name, it's a PR, will run sonar
