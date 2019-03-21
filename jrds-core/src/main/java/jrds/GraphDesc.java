@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -578,6 +579,7 @@ public class GraphDesc implements WithACL {
         return new DsDescBuilder();
     }
 
+    private static final Pattern COLORSTRINGPATTERN = Pattern.compile("^#[0-9A-F]{6,8}");
     public static class DsDescBuilder {
         @Setter @Accessors(chain=true)
         private String name;
@@ -609,11 +611,15 @@ public class GraphDesc implements WithACL {
         }
 
         public DsDescBuilder setColorString(String colorName) {
-            if(colorName != null && colorName.toUpperCase().matches("^#[0-9A-F]{6}")) {
+            if(colorName != null && COLORSTRINGPATTERN.matcher(colorName).matches()) {
                 int r = Integer.parseInt(colorName.substring(1, 3), 16);
                 int g = Integer.parseInt(colorName.substring(3, 5), 16);
                 int b = Integer.parseInt(colorName.substring(5, 7), 16);
-                color = new Color(r, g, b);
+                int alpha = 255;
+                if (colorName.length() == 9) {
+                    alpha = Integer.parseInt(colorName.substring(7, 9), 16);
+                }
+                color = new Color(r, g, b, alpha);
             } else if(colorName != null && !"".equals(colorName)) {
                 color = Colors.valueOf(colorName.toUpperCase()).getColor();
                 if(color == null) {
@@ -1411,7 +1417,7 @@ public class GraphDesc implements WithACL {
                 Color c = (Color) e.color;
                 String colorString = colornames.get(c);
                 if (colorString == null) {
-                    colorString = String.format("#%X%X%X", c.getRed(), c.getGreen(), c.getBlue());
+                    colorString = String.format("#%02X%02X%02X%02X", c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
                 }
                 specElement.appendChild(document.createElement("color")).setTextContent(colorString);
             }
