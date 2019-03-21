@@ -756,6 +756,7 @@ public class GraphDesc implements WithACL {
         private ACL acl = ACL.ALLOWEDACL;
         @Setter @Accessors(chain=true)
         private Class<Graph> graphClass = Graph.class;
+        private int maxLengthLegend = 0;
 
         public Builder fromGraphDesc(GraphDesc parent) {
             allds = new ArrayList<DsDesc>(parent.allds);
@@ -768,6 +769,7 @@ public class GraphDesc implements WithACL {
             parent.trees.forEach((k, v) -> trees.put(k, new ArrayList<Object>(v)));
             graphName = parent.graphName;
             name = parent.name;
+            maxLengthLegend = parent.maxLengthLegend;
             graphTitle = parent.graphTitle;
             siUnit = parent.siUnit;
             logarithmic = parent.logarithmic;
@@ -870,6 +872,7 @@ public class GraphDesc implements WithACL {
             });
         }
         graphName = builder.graphName;
+        maxLengthLegend = builder.maxLengthLegend;
         name = builder.name;
         graphTitle = builder.graphTitle;
         siUnit = builder.siUnit;
