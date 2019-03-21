@@ -7,7 +7,7 @@
     <verticalLabel>paquets/s</verticalLabel>
     <lowerLimit>NaN</lowerLimit>
     <add>
-        <legend>Upward graph</legend>
+        <legend>Sent</legend>
     </add>
     <add>
         <name>ifHCOutUcastPkts</name>
@@ -34,7 +34,7 @@
         <legend>non unicast paquets send/s</legend>
     </add>
     <add>
-        <legend>Downward graph</legend>
+        <legend>Received</legend>
     </add>
     <add>
         <name>ifHCInUcastPkts</name>
