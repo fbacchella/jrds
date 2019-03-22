@@ -114,44 +114,52 @@ public final class ArgFactory {
     }
 
     /**
-     * Create an object providing the class and a String argument. So the class
-     * must have a constructor taking only a string as an argument.
+     * Create an object providing the class and a String argument. So the class must have
+     * a constructor taking only a string as an argument.
      * 
      * It can manage native type and return an boxed object
-     * 
-     * @param clazz
-     * @param value
-     * @return
-     * @throws InvocationTargetException
+     * @param <T> The value type
+     * @param clazz the class of the new object
+     * @param value the value as a string
+     * @return a conversion from String
+     * @throws InvocationTargetException if it fails to construct the value
      */
-    public static Object ConstructFromString(Class<?> clazz, String value) throws InvocationTargetException {
+    @SuppressWarnings("unchecked")
+    public static <T> T ConstructFromString(Class<T> clazz, String value) throws InvocationTargetException {
         try {
-            Constructor<?> c;
-            if(!clazz.isPrimitive()) {
-                c = clazz.getConstructor(String.class);
-            } else if(clazz == Integer.TYPE) {
-                c = Integer.class.getConstructor(String.class);
-            } else if(clazz == Double.TYPE) {
-                c = Double.class.getConstructor(String.class);
-            } else if(clazz == Float.TYPE) {
-                c = Float.class.getConstructor(String.class);
-            } else if(clazz == Byte.TYPE) {
-                c = Byte.class.getConstructor(String.class);
-            } else if(clazz == Long.TYPE) {
-                c = Long.class.getConstructor(String.class);
-            } else if(clazz == Short.TYPE) {
-                c = Short.class.getConstructor(String.class);
-            } else if(clazz == Boolean.TYPE) {
-                c = Boolean.class.getConstructor(String.class);
-            } else if(clazz == Character.TYPE) {
-                c = Character.class.getConstructor(String.class);
+            Constructor<T> c = null;
+            if (clazz == Integer.TYPE || Integer.class.equals(clazz)) {
+                return (T) Integer.valueOf(value);
+            } else if (clazz == Double.TYPE || Integer.class.equals(clazz)) {
+                return (T) Double.valueOf(value);
+            } else if (clazz == Float.TYPE || Float.class.equals(clazz)) {
+                return (T) Float.valueOf(value);
+            } else if (clazz == Byte.TYPE || Byte.class.equals(clazz)) {
+                return (T) Byte.valueOf(value);
+            } else if (clazz == Long.TYPE || Long.class.equals(clazz)) {
+                return (T) Long.valueOf(value);
+            } else if (clazz == Short.TYPE || Short.class.equals(clazz)) {
+                return (T) Short.valueOf(value);
+            } else if (clazz == Boolean.TYPE || Boolean.class.equals(clazz)) {
+                c = (Constructor<T>) Boolean.class.getConstructor(String.class);
+            } else if (clazz == Character.TYPE || Character.class.equals(clazz)) {
+                c = (Constructor<T>) Character.class.getConstructor(String.class);
             } else {
-                throw new IllegalArgumentException("no single String constructor found");
+                c = clazz.getConstructor(String.class);
             }
             return c.newInstance(value);
-        } catch (SecurityException | NoSuchMethodException | IllegalArgumentException | 
-                InstantiationException | IllegalAccessException e) {
+        } catch (SecurityException e) {
             throw new InvocationTargetException(e, clazz.getName());
+        } catch (NoSuchMethodException e) {
+            throw new InvocationTargetException(e, clazz.getName());
+        } catch (IllegalArgumentException e) {
+            throw new InvocationTargetException(e, clazz.getName());
+        } catch (InstantiationException e) {
+            throw new InvocationTargetException(e, clazz.getName());
+        } catch (IllegalAccessException e) {
+            throw new InvocationTargetException(e, clazz.getName());
+        } catch (InvocationTargetException e) {
+            throw e;
         }
     }
 

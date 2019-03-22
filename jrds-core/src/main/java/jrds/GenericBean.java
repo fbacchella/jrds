@@ -1,8 +1,9 @@
 package jrds;
 
 import java.beans.PropertyDescriptor;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
+import jrds.factories.ArgFactory;
 
 public interface GenericBean {
 
@@ -14,12 +15,10 @@ public interface GenericBean {
         }
 
         public void set(Object o, String in) {
-            Constructor<?> c;
             try {
-                c = bean.getPropertyType().getConstructor(String.class);
-                Object value = c.newInstance(in);
+                Object value = ArgFactory.ConstructFromString(bean.getPropertyType(), in);
                 bean.getWriteMethod().invoke(o, value);
-            } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException| IllegalArgumentException e) {
+            } catch (SecurityException | IllegalAccessException| IllegalArgumentException e) {
                 throw new IllegalStateException("Invalid bean " + bean.getName(), e);
             } catch (InvocationTargetException e) {
                 throw new IllegalStateException("Invalid bean " + bean.getName(), e.getCause());
