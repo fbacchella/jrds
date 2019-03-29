@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>OpenJ9JVM</name>
+    <probeName>jvmpool-${label}</probeName>
+    <probeClass>jrds.probe.JMX</probeClass>
+
+    <specific name="mbeanNames">java.lang:type=GarbageCollector,name=global;java.lang:type=GarbageCollector,name=scavenge</specific>
+    <!-- ************ -->
+    <!-- Memory pools -->
+    <!-- ************ -->
+    <ds>
+        <dsName>JIT code cache</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=JIT code cache/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>JIT data cache</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=JIT data cache/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>class storage</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=class storage/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>miscellaneous non-heap storage</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=miscellaneous non-heap storage/Usage/used</collect>
+    </ds>
+    <!-- the generational pools -->
+    <ds>
+        <dsName>nursery-survivor</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=nursery-survivor/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>nursery-allocate</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=nursery-allocate/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>tenured-LOA</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=tenured-LOA/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>tenured-SOA</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=tenured-SOA/Usage/used</collect>
+    </ds>
+    <!-- *********** -->
+    <!-- GC activity -->
+    <!-- *********** -->
+    <!-- the major GC -->
+    <ds>
+        <dsName>MajorCount</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=global/CollectionCount</collect>
+    </ds>
+    <ds>
+        <dsName>MajorTime</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=global/CollectionTime</collect>
+    </ds>
+    <ds>
+        <dsName>MajorMemoryFreed</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=global/TotalMemoryFreed</collect>
+    </ds>
+    <ds>
+        <dsName>MinorCount</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=scavenge/CollectionCount</collect>
+    </ds>
+    <ds>
+        <dsName>MinorTime</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=scavenge/CollectionTime</collect>
+    </ds>
+    <ds>
+        <dsName>MinorMemoryFreed</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=scavenge/TotalMemoryFreed</collect>
+    </ds>
+    <graphs>
+        <name>J9MemoryPools</name>
+        <name>GenGCCount</name>
+        <name>GenGCSpeed</name>
+        <name>GenGCTime</name>
+    </graphs>
+</probedesc>
