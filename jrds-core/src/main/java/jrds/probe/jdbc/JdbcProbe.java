@@ -27,9 +27,8 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 
     static final void registerDriver(String JdbcDriver) {
         try {
-            Driver jdbcDriver = (Driver) Class.forName(JdbcDriver).newInstance();
-            DriverManager.registerDriver(jdbcDriver);
-        } catch (Exception e) {
+            registerDriver(Class.forName(JdbcDriver));
+        } catch (ClassNotFoundException e) {
             throw new RuntimeException("Can't register JDBC driver " + JdbcDriver, e);
         }
     }
@@ -38,7 +37,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
         try {
             Driver jdbcDriver = (Driver) JdbcDriver.newInstance();
             DriverManager.registerDriver(jdbcDriver);
-        } catch (Exception e) {
+        } catch (SQLException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException("Can't register JDBC driver " + JdbcDriver, e);
         }
     }

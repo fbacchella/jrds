@@ -15,7 +15,7 @@ public abstract class Mysql extends JdbcProbe {
     private final static int PORT = 3306;
 
     static {
-        registerDriver(com.mysql.jdbc.Driver.class);
+        registerDriver(com.mysql.cj.jdbc.Driver.class);
     }
 
     public Mysql() {
@@ -76,8 +76,9 @@ public abstract class Mysql extends JdbcProbe {
             @Override
             public Properties getProperties() {
                 Properties p = super.getProperties();
-                p.put("connectTimeout", 10000);
-                p.put("socketTimeout", 10000);
+                p.put("connectTimeout", getTimeout() * 1000);
+                p.put("socketTimeout", getTimeout() * 1000);
+                p.put("serverTimezone", "UTC");
                 return p;
             }
 

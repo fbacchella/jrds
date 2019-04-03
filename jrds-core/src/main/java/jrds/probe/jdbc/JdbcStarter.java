@@ -35,7 +35,7 @@ public abstract class JdbcStarter extends Starter {
             p.put("password", passwd);
             try {
                 DriverManager.setLoginTimeout(10);
-                con = DriverManager.getConnection(url, user, passwd);
+                con = DriverManager.getConnection(url, p);
                 started = true;
             } catch (SQLException e) {
                 log(Level.ERROR, e, "SQL error: %s", e);

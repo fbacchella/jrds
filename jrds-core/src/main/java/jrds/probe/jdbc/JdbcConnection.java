@@ -4,14 +4,15 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
+
+import org.apache.log4j.Level;
 
 import jrds.PropertiesManager;
 import jrds.factories.ProbeBean;
 import jrds.starter.Connection;
 
-import org.apache.log4j.Level;
-
-@ProbeBean({ "user", "password", "url", "driverClass" })
+@ProbeBean({ "user", "password", "url", "driverClass"})
 public class JdbcConnection extends Connection<Statement> {
 
     private java.sql.Connection con;
@@ -82,15 +83,22 @@ public class JdbcConnection extends Connection<Statement> {
     public boolean startConnection() {
         boolean started = false;
         if(getResolver().isStarted()) {
+            Properties p = getProperties();
+            p.put("user", user);
+            p.put("password", passwd);
             try {
                 DriverManager.setLoginTimeout(getTimeout());
-                con = DriverManager.getConnection(url, user, passwd);
+                con = DriverManager.getConnection(url, p);
                 started = true;
             } catch (SQLException e) {
                 log(Level.ERROR, e, "Sql error for %s: %s", url, e);
             }
         }
         return started;
+    }
+
+    private Properties getProperties() {
+        return new Properties();
     }
 
     @Override
