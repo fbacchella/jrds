@@ -12,10 +12,10 @@
         <legend>Non Heap Memory</legend>
     </add>
     <add>
-        <dsName>JIT code cache</dsName>
+        <name>JIT code cache</name>
     </add>
     <add>
-        <dsName>class storage</dsName>
+        <name>class storage</name>
     </add>
     <add>
         <rpn>JIT code cache,class storage,+</rpn>
@@ -50,10 +50,10 @@
         <legend>Survivor Space</legend>
     </add>
     <add>
-        <dsName>tenured-LOA</dsName>
+        <name>tenured-LOA</name>
     </add>
     <add>
-        <dsName>tenured-SOA</dsName>
+        <name>tenured-SOA</name>
     </add>
     <add>
         <name>Old Gen</name>
