@@ -9,7 +9,7 @@
     <ds>
         <dsName>serviceForks</dsName>
         <dsType>counter</dsType>
-        <collect optional="false">1.3.6.1.4.1.3.6.1.2.1.1</collect>
+        <collect optional="false">serviceForks</collect>
     </ds>
     <ds>
         <dsName>serviceActive</dsName>
@@ -19,7 +19,7 @@
     <ds>
         <dsName>serviceConnections</dsName>
         <dsType>counter</dsType>
-        <collect optional="false">1.3.6.1.4.1.3.6.1.2.1.5</collect>
+        <collect optional="false">serviceConnections</collect>
     </ds>
     <graphs>
         <name>CyrusMasterActive</name>
