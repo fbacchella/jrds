@@ -61,6 +61,41 @@
         <dsType>counter</dsType>
         <collect>java.lang:type=GarbageCollector,name=Copy/CollectionTime</collect>
     </ds>
+    <!-- *********** -->
+    <!-- BufferPool -->
+    <!-- *********** -->
+    <!-- direct -->
+    <ds>
+        <dsName>DirectCount</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.nio:type=BufferPool,name=direct/Count</collect>
+    </ds>
+    <ds>
+        <dsName>DirectUsed</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.nio:type=BufferPool,name=direct/MemoryUsed</collect>
+    </ds>
+    <ds>
+        <dsName>DirectCapacity</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.nio:type=BufferPool,name=direct/TotalCapacity</collect>
+    </ds>
+    <!-- mapped -->
+    <ds>
+        <dsName>MappedCount</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.nio:type=BufferPool,name=mapped/Count</collect>
+    </ds>
+    <ds>
+        <dsName>MappedUsed</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.nio:type=BufferPool,name=mapped/MemoryUsed</collect>
+    </ds>
+    <ds>
+        <dsName>MappedCapacity</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.nio:type=BufferPool,name=mapped/TotalCapacity</collect>
+    </ds>
     <graphs>
         <name>SunJVM5MemoryPools</name>
         <name>GenGCCount</name>

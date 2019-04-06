@@ -59,6 +59,15 @@
         <color>green</color>
         <legend>Eden space</legend>
     </add>
+    <add>
+        <legend>Other</legend>
+    </add>
+    <add>
+        <name>DirectUsed</name>
+        <graphType>stack</graphType>
+        <color>black</color>
+        <legend>Direct pool used</legend>
+    </add>
     <hosttree>
         <pathelement>HOST</pathelement>
         <pathelement>SERVICES</pathelement>
