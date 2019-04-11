@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
@@ -60,7 +61,19 @@ public class SnmpConfigurator extends ModuleConfigurator {
                 throw new IllegalArgumentException("Can't read OID mapping from " + t, e);
             }
         });
-        oidmapreader.accept(SnmpConfigurator.class.getClassLoader().getResourceAsStream("oidmap.properties"));
+        try {
+            Collections.list(SnmpConfigurator.class.getClassLoader().getResources("oidmap.properties")).stream()
+            .map(u -> {
+                try {
+                    return u.openStream();
+                } catch (IOException ex) {
+                    throw new IllegalArgumentException("Can't read OID mapping from " + u, ex);
+                }
+            })
+            .forEach(oidmapreader);
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Can't find oidmap.properties", ex);
+        }
         String oidmapfiles = pm.getProperty("oidmaps", "");
         Arrays.stream(oidmapfiles.split(";"))
         .map(String::trim)
