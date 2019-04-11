@@ -48,8 +48,8 @@ jobs:
                     mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
-                    mkdir -p /usr/share/snmp/mibs/
-                    mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
+                    sudo mkdir -p /usr/share/snmp/mibs/
+                    sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
             - run:
                 command: |
                     # If no symbolic name, it's a PR, will run sonar
@@ -78,8 +78,8 @@ jobs:
                     mv -n /tmp/ws/home/circleci/.sonar /home/circleci/
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
-                    mkdir -p /usr/share/snmp/mibs/
-                    mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
+                    sudo mkdir -p /usr/share/snmp/mibs/
+                    sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
             - run:
                 command: |
                     mvn -B test -Dmaven.resources.skip=true -Dmaven.main.skip=true
