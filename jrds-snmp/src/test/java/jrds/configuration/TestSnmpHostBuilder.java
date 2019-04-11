@@ -14,6 +14,7 @@ import org.junit.rules.TemporaryFolder;
 
 import jrds.GraphDesc;
 import jrds.HostInfo;
+import jrds.Log4JRule;
 import jrds.Macro;
 import jrds.Probe;
 import jrds.ProbeDesc;
@@ -27,6 +28,9 @@ public class TestSnmpHostBuilder {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
+
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
@@ -64,13 +68,13 @@ public class TestSnmpHostBuilder {
             String name = p.getQualifiedName();
             probes.put(name, p);
         }
-        Assert.assertTrue(probes.containsKey("myhost/tcp_snmp"));
-        Assert.assertTrue(probes.containsKey("myhost/fs-_"));
-        Assert.assertTrue(probes.containsKey("myhost/fs-_data"));
-        Assert.assertTrue(probes.containsKey("myhost/ifx-eth0"));
-        Assert.assertTrue(probes.containsKey("myhost/ifx-eth1"));
-        Assert.assertTrue(probes.containsKey("myhost/ifx-eth2"));
-        Assert.assertTrue(probes.containsKey("myhost/ifx-eth3"));
+        Assert.assertTrue("myhost/tcp_snmp not found in " + probes.toString(), probes.containsKey("myhost/tcp_snmp"));
+        Assert.assertTrue("myhost/fs-_ not found in " + probes.toString(), probes.containsKey("myhost/fs-_"));
+        Assert.assertTrue("myhost/fs-_data not found in " + probes.toString(), probes.containsKey("myhost/fs-_data"));
+        Assert.assertTrue("myhost/ifx-eth0 not found in " + probes.toString(), probes.containsKey("myhost/ifx-eth0"));
+        Assert.assertTrue("myhost/ifx-eth1 not found in " + probes.toString(), probes.containsKey("myhost/ifx-eth1"));
+        Assert.assertTrue("myhost/ifx-eth2 not found in " + probes.toString(), probes.containsKey("myhost/ifx-eth2"));
+        Assert.assertTrue("myhost/ifx-eth3 not found in " + probes.toString(), probes.containsKey("myhost/ifx-eth3"));
     }
 
 }

@@ -11,12 +11,14 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import jrds.HostInfo;
+import jrds.Log4JRule;
 import jrds.Macro;
 import jrds.Probe;
 import jrds.PropertiesManager;
@@ -27,19 +29,25 @@ import jrds.mockobjects.MokeProbeFactory;
 
 public class TestSnmpLoadConfiguration {
 
-    static final private Logger logger = Logger.getLogger(TestSnmpLoadConfiguration.class);
-
     @Rule
     public final TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
+
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
-        Tools.setLevel(logger, Level.TRACE, "jrds", "jrds.configuration", "jrds.Probe.DummyProbe", "jrds.snmp");
         Tools.configure();
         Tools.prepareXml(false);
-        Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
     }
 
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.snmp");
+        logrule.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
+    }
+    
     private ConfigObjectFactory prepare(PropertiesManager pm) throws IOException {
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
         conf.setGraphDescMap();
@@ -68,9 +76,10 @@ public class TestSnmpLoadConfiguration {
         Assert.assertNotNull(h);
         Assert.assertEquals("myhost", h.getName());
         Collection<Probe<?, ?>> probes = new HashSet<Probe<?, ?>>();
-        for(Probe<?, ?> p: h.getProbes())
+        for(Probe<?, ?> p: h.getProbes()) {
             probes.add(p);
-        Assert.assertEquals(7, h.getNumProbes());
+        }
+        Assert.assertEquals("hosts only contains " + probes, 7, h.getNumProbes());
         Assert.assertTrue("tag not found", h.getTags().contains(tagname));
         Assert.assertEquals("SNMP starter not found", "jrds.snmp.SnmpConnection", h.getConnection("jrds.snmp.SnmpConnection").getName());
     }
