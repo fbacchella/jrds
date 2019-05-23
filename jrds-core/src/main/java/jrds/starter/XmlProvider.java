@@ -73,7 +73,7 @@ public class XmlProvider extends Starter {
             try {
                 return localXpath.get().compile(collectKey);
             } catch (XPathExpressionException e) {
-                return null;
+                throw new IllegalArgumentException(e.getMessage(), e);
             }
         }
 
