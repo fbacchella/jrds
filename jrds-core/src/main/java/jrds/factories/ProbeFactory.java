@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.ProbeDesc;
-import jrds.Util;
 
 /**
  * A class to find probe by their names
@@ -116,20 +115,20 @@ public class ProbeFactory {
                 if(gd != null) {
                     p.addGraph(gd);
                 } else {
-                    logger.warn("{}", Util.delayedFormatString("Unknown graph %s for probe %s", graphName, p));
+                    logger.warn("Unknown graph {} for probe {}", graphName, p);
                 }
             }
             return true;
         } catch (SecurityException e) {
         } catch (NoSuchMethodException e) {
-            logger.warn("Probe arguments not matching configurators for " + p.getPd().getName() + ": " + e.getMessage());
+            logger.warn("Probe arguments not matching configurators for {}: {}", p.getPd().getName(), e.getMessage());
             return false;
         } catch (Exception ex) {
             Throwable showException = ex;
             Throwable t = ex.getCause();
             if(t != null)
                 showException = t;
-            logger.warn("Error during probe creation of type " + p.getPd().getName() + " with args " + constArgs + ": ", showException);
+            logger.warn("Error during probe creation of type {} with args {}: {}", p.getPd().getName(), constArgs, showException.getMessage());
             return false;
         }
         return false;

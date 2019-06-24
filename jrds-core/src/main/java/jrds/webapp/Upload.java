@@ -74,7 +74,7 @@ public class Upload extends JrdsServlet {
             w.array();
 
             for(FileItem item: items) {
-                logger.debug("{}", jrds.Util.delayedFormatString("Item send: %s", item));
+                logger.debug("Item send: {}", item);
 
                 // Process a file upload
                 if(!item.isFormField()) {

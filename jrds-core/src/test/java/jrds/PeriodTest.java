@@ -21,7 +21,7 @@ public class PeriodTest {
     static final private DateFormat strictISOFORMAT = new SimpleDateFormat("yyyyMMdd'T'HH:mm:ssZ");
 
     @Rule
-    public Log4JRule logrule = new Log4JRule(this);
+    public final Log4JRule logrule = new Log4JRule(this);
     private final Logger logger = logrule.getTestlogger();
 
     private Date begin;

@@ -31,7 +31,7 @@ public class HttpTest {
     static final private HostStarter webserver = new HostStarter(new HostInfo(HOST));
 
     @Rule
-    public Log4JRule logrule = new Log4JRule(this);
+    public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {

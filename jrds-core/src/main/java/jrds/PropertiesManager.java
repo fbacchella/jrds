@@ -258,7 +258,7 @@ public class PropertiesManager extends Properties {
             defaultStoreProps.put("factory", RrdDbStoreFactory.class.getName());
         }
 
-        logger.trace("{}", Util.delayedFormatString("Stores configuration: %s", storesConfig));
+        logger.trace("Stores configuration: {}", storesConfig);
 
         // Ok, now configure and store the factories
         for(Map.Entry<String, Properties> e: storesConfig.entrySet()) {
@@ -272,14 +272,14 @@ public class PropertiesManager extends Properties {
                     sf.start();
                     stores.put(storeName, sf);
                 } else {
-                    logger.error("{}", Util.delayedFormatString("store factory %s invalid, no factory given", storeName));
+                    logger.error("store factory {} invalid, no factory given", storeName);
                 }
             } catch (Exception e1) {
                 jrds.Util.log(getClass().getCanonicalName(), logger, Level.ERROR, e1, "store factory %s failed to configure: %s", storeName, e1);
             }
         }
-        logger.debug("{}", Util.delayedFormatString("Stores configured: %s", stores));
-        logger.debug("{}", Util.delayedFormatString("default store: %s", defaultStorename));
+        logger.debug("Stores configured: {}", stores);
+        logger.debug("default store: {}", defaultStorename);
 
         defaultStore = stores.remove(defaultStorename);
 
@@ -467,8 +467,8 @@ public class PropertiesManager extends Properties {
             defaultACL = new RolesACL(defaultRoles);
             defaultACL = defaultACL.join(adminACL);
 
-            logger.debug("{}", jrds.Util.delayedFormatString("Admin ACL is %s", adminACL));
-            logger.debug("{}", jrds.Util.delayedFormatString("Default ACL is %s", defaultACL));
+            logger.debug("Admin ACL is {}", adminACL);
+            logger.debug("Default ACL is {}", defaultACL);
         }
 
         readonly = parseBoolean(getProperty("readonly", "0"));

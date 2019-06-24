@@ -1,7 +1,6 @@
 package jrds.configuration;
 
 import jrds.Macro;
-import jrds.Util;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 
@@ -24,7 +23,7 @@ public class MacroBuilder extends ConfigObjectBuilder<Macro> {
     public Macro makeMacro(JrdsDocument n) {
         Macro m = new Macro();
         String name = n.getRootElement().getAttribute("name");
-        logger.debug("{}", Util.delayedFormatString("Building macro %s", name));
+        logger.debug("Building macro {}", name);
         if(name != null && !"".equals(name)) {
             m.setName(name);
         }

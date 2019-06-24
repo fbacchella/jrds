@@ -8,19 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.Plottable;
 import org.rrd4j.data.Variable;
 import org.rrd4j.graph.RrdGraphDef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jrds.GraphDesc.DsDesc;
 import jrds.GraphDesc.GraphType;
 import jrds.store.ExtractInfo;
 import jrds.store.Extractor;
-
-import static jrds.Util.delayedFormatString;
 
 /**
  * A class that populate a DataProcess or a RrdGraphDef with data from a probe and custom data
@@ -101,7 +99,7 @@ class DatasourcesPopulator<T> {
                 if(!datasources.contains(ds.name)) {
                     datasource(ds.name, customData.get(ds.dsName));
                     datasources.add(ds.name);
-                    logger.trace("{}", delayedFormatString("custom data found for %s", ds.dsName));
+                    logger.trace("custom data found for {}", ds.dsName);
                 }
             }
             // Last but common case, datasource refers to a rrd
@@ -114,7 +112,7 @@ class DatasourcesPopulator<T> {
                     if(pathHost == null) {
                         pathHost = defProbe.getHost().getName();
                     }
-                    logger.trace("{}", delayedFormatString("External probe path: %s/%s/%s", pathHost, ds.dspath.probe, ds.dsName));
+                    logger.trace("External probe path: {}/{}/{}", pathHost, ds.dspath.probe, ds.dsName);
                     probe = hl.getProbeByPath(pathHost, ds.dspath.probe);
                     if(probe == null) {
                         logger.error("Invalid probe: " + pathHost + "/" + ds.dspath.probe);
@@ -157,9 +155,9 @@ class DatasourcesPopulator<T> {
             x.release();
         }
 
-        logger.trace("{}", delayedFormatString("Datasource: %s", datasources));
+        logger.trace("Datasource: {}", datasources);
         if (graphDef != null) {
-            logger.trace("{}", delayedFormatString("Todo: : %s", toDo));
+            logger.trace("Todo: : {}", toDo);
         }
 
     }

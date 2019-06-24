@@ -31,7 +31,6 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import jrds.Util;
 import jrds.factories.xml.EntityResolver;
 import jrds.factories.xml.JrdsDocument;
 
@@ -51,7 +50,7 @@ public class Loader {
             String threadName = "DomParser" + threadCount.getAndIncrement();
             Thread t = new Thread(r, threadName);
             t.setDaemon(true);
-            logger.debug("{}", Util.delayedFormatString("New thread name: %s", threadName));
+            logger.debug("New thread name: {}", threadName);
             return t;
         }
     });
@@ -197,7 +196,7 @@ public class Loader {
                         return;
                     }
                     String name = t.getName(d);
-                    logger.trace("{}", Util.delayedFormatString("Found a %s with name %s", t.getRootNode(), name));
+                    logger.trace("Found a {} with name {}", t.getRootNode(), name);
                     // We check the Name
                     if(name != null && !"".equals(name)) {
                         Map<String, JrdsDocument> rep = repositories.get(t);

@@ -40,7 +40,7 @@ public class GetDiscoverHtmlCode extends JrdsServlet {
             JrdsDocument hostDom = new JrdsDocument(dbuilder.newDocument());
             hostDom.doRootElement("div");
             for(DiscoverAgent da: getHostsList().getDiscoverAgent()) {
-                logger.debug("{}", jrds.Util.delayedFormatString("Adding discover agent %s", da));
+                logger.debug("Adding discover agent {}", da);
                 da.doHtmlDiscoverFields(hostDom);
             }
             resp.setContentType(CONTENT_TYPE);

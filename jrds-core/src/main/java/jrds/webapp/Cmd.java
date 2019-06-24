@@ -9,13 +9,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jrds.Configuration;
-import jrds.HostsList;
-import jrds.Util;
-import jrds.starter.Timer;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jrds.Configuration;
+import jrds.HostsList;
+import jrds.starter.Timer;
 
 /**
  * Servlet implementation class Cmd
@@ -35,7 +34,7 @@ public class Cmd extends JrdsServlet {
         if(command == null || "".equals(command)) {
             command = req.getServletPath().substring(1);
         }
-        logger.debug("{}", Util.delayedFormatString("Command found: %s", command));
+        logger.debug("Command found: {}", command);
 
         if(!allowed(params, getPropertiesManager().adminACL, req, res))
             return;

@@ -69,8 +69,7 @@ public class FilterXml extends Filter {
         else if(!tags.isEmpty() || !goodPaths.isEmpty())
             accepted = (acceptPath(path) && acceptTag(graph.getProbe()));
 
-        if(logger.isTraceEnabled())
-            logger.trace("{}", Util.delayedFormatString("Tried to accept : %s=%s, %s: %b", path, graph.getQualifiedName(), graph.getProbe() != null ? graph.getProbe().getTags() : "", accepted));
+        logger.trace("Tried to accept : {}={}, {}: {}", path, graph.getQualifiedName(), graph.getProbe() != null ? graph.getProbe().getTags() : "", accepted);
 
         return accepted;
     }

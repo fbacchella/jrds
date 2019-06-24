@@ -68,10 +68,10 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
         Map<String, String> backendPropsMap = pm.subKey("rrdbackend");
 
         if(backendPropsMap.size() > 0) {
-            logger.debug("{}", Util.delayedFormatString("Configuring backend factory %s", backendFactory.getClass()));
+            logger.debug("Configuring backend factory {}", backendFactory.getClass());
             for(Map.Entry<String, String> e: backendPropsMap.entrySet()) {
                 try {
-                    logger.trace("{}", Util.delayedFormatString("Will set backend end bean '%s' to '%s'", e.getKey(), e.getValue()));
+                    logger.trace("Will set backend end bean '{}' to '{}'", e.getKey(), e.getValue());
                     ArgFactory.beanSetter(backendFactory, e.getKey(), e.getValue());
                 } catch (InvocationTargetException e1) {
                     throw new RuntimeException("Failed to configure RrdDbStoreFactory:" + e1.getMessage(), e1);
@@ -82,7 +82,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
         dbPoolSize = Util.parseStringNumber(props.getProperty("dbPoolSize"), 10) + pm.numCollectors;
         usepool = pm.parseBoolean(props.getProperty("usepool", "true"));
 
-        logger.debug("{}", Util.delayedFormatString("Store backend used is %s", backendName));
+        logger.debug("Store backend used is {}", backendName);
 
     }
 
@@ -98,7 +98,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
         if(usepool || filebasedbackend) {
             try {
                 RrdBackendFactory.setActiveFactories(backendFactory);;
-                logger.trace("{}", Util.delayedFormatString("Store backend set to %s", backendName));
+                logger.trace("Store backend set to {}", backendName);
             } catch (IllegalStateException e) {
                 logger.warn("Trying to change default backend, a restart is needed");
             } catch (Exception e) {
@@ -121,7 +121,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
 
     @Override
     public void stop() {
-        logger.info("Average wait time: " + waitTime.doubleValue() / lockCount.doubleValue() + " ms");
+        logger.info("Average wait time: {} ms", waitTime.doubleValue() / lockCount.doubleValue());
     }
 
     /**
@@ -152,8 +152,8 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
             long finish = System.currentTimeMillis();
             waitTime.addAndGet(finish - start);
             lockCount.incrementAndGet();
-        } catch (Exception e) {
-            logger.debug("Strange error " + e);
+        } catch (IOException e) {
+            logger.error("Unable to release RrdDb '{}': {}", db.getPath(), e.getMessage());
         }
     }
 

@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import jrds.HostsList;
+import jrds.Util;
 import net.iharder.Base64;
 
 import org.slf4j.Logger;
@@ -57,7 +58,7 @@ public final class Graph extends JrdsServlet {
 
             if(getPropertiesManager().security) {
                 boolean allowed = graph.getACL().check(p);
-                logger.trace("{}", jrds.Util.delayedFormatString("Looking if ACL %s allow access to %s", graph.getACL(), this));
+                logger.trace("Looking if ACL {} allow access to {}", Util.delayedFormatString(graph::getACL), this);
                 if(!allowed) {
                     res.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid role access");
                     return;
@@ -85,13 +86,13 @@ public final class Graph extends JrdsServlet {
             // If a cache file exist, try to be smart, but only if caching is
             // allowed
             if(indata != null && cache) {
-                logger.debug("{}", jrds.Util.delayedFormatString("graph %s is cached", graph));
+                logger.debug("graph {} is cached", graph);
                 if(indata.size() < Integer.MAX_VALUE)
                     res.setContentLength((int) indata.size());
                 WritableByteChannel outC = Channels.newChannel(out);
                 indata.transferTo(0, indata.size(), outC);
             } else {
-                logger.debug("{}", jrds.Util.delayedFormatString("graph %s not found in cache", graph));
+                logger.debug("graph {} not found in cache", graph);
                 graph.writePng(out);
             }
             if(indata != null) {

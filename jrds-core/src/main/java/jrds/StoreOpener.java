@@ -63,12 +63,12 @@ public final class StoreOpener {
         usepool = false;
         if(backend != null) {
             StoreOpener.backend = RrdBackendFactory.getFactory(backend);
-            logger.trace("{}", Util.delayedFormatString("Store backend set to %s", backend));
+            logger.trace("Store backend set to {}", backend);
         } else
             StoreOpener.backend = RrdBackendFactory.getDefaultFactory();
 
-        logger.debug("{}", Util.delayedFormatString("Store backend used is %s", StoreOpener.backend.getName()));
-        logger.debug("{}", Util.delayedFormatString("use pool: %b", usepool));
+        logger.debug("Store backend used is {}", StoreOpener.backend.getName());
+        logger.debug("use pool: {}", usepool);
     }
 
     public static final void prepare(String backend, int dbPoolSize) {
@@ -76,7 +76,7 @@ public final class StoreOpener {
         if(backend != null) {
             try {
                 RrdBackendFactory.setDefaultFactory(backend);
-                logger.trace("{}", Util.delayedFormatString("Store backend set to %s", backend));
+                logger.trace("Store backend set to {}", backend);
             } catch (IllegalArgumentException e) {
                 logger.error("Backend not configured: {}", e.getMessage());
             } catch (IllegalStateException e) {
@@ -93,8 +93,8 @@ public final class StoreOpener {
             } catch (Exception e) {
             }
         }
-        logger.debug("{}", Util.delayedFormatString("Store backend used is %s", StoreOpener.backend.getName()));
-        logger.debug("{}", Util.delayedFormatString("use pool: %b %d", usepool, dbPoolSize));
+        logger.debug("Store backend used is {}", StoreOpener.backend.getName());
+        logger.debug("use pool: {} {}", usepool, dbPoolSize);
     }
 
     public static final void stop() {

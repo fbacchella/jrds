@@ -30,7 +30,7 @@ public class ArchivesSet extends ArrayList<ArcDef> {
 
     public void addArchive(ArcDef arcDef) {
         add(arcDef);
-        logger.trace("Adding archive: {}", Util.delayedFormatString("%s", arcDef.dump()));
+        logger.trace("Adding archive: {}", Util.delayedFormatString(arcDef::dump));
     }
 
     public ArcDef[] getArchives() {

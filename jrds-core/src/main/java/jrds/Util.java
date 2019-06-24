@@ -281,7 +281,7 @@ public class Util {
                         } catch (IntrospectionException e) {
                             // not a bean, skip it
                         } catch (Exception e) {
-                            logger.warn("{}", Util.delayedFormatString("can't output bean %s for %s", beanName, o));
+                            logger.warn("can't output bean {} for {}", beanName, o);
                         }
                     }
                 }
@@ -323,7 +323,8 @@ public class Util {
                         } catch (IntrospectionException e) {
                             // not a bean, skip it
                         } catch (Exception e) {
-                            logger.warn("{}", Util.delayedFormatString("can't output bean %s for %s", beanName, o), e);
+                            logger.warn("can't output bean {} for {}", beanName, o, e.getMessage());
+                            logger.warn("{}", e);
                         }
                     }
                 }
@@ -497,7 +498,7 @@ public class Util {
             if(o == null)
                 continue;
             if(logger.isTraceEnabled())
-                logger.trace("{}", Util.delayedFormatString("Argument for template \"%s\": %s", template, o.getClass()));
+                logger.trace("Argument for template \"{}\": {}", template, o.getClass());
             if(o instanceof IndexedProbe) {
                 check(o, indexes, values, evaluate.index);
                 check(o, indexes, values, evaluate.index_signature);
@@ -798,30 +799,20 @@ public class Util {
     }
 
     private static final class Formater {
-        private final String format;
-        private final Object[] args;
+        private final Supplier<Object> source;
 
-        private Formater(final String format, final Object... args) {
-            this.format = format;
-            this.args = args;
+        private Formater(Supplier<Object> source) {
+            this.source = source;
         }
 
         @Override
         public final String toString() {
-            return String.format(format, args);
+            return source.get().toString();
         }
     }
 
-    /**
-     * A wrapper method to delay evaluation of log4j arguments
-     * 
-     * @param format
-     * @param args
-     * @return
-     */
-    static public Object delayedFormatString(final String format, final Object... args) {
-        Supplier<Object> s = () ->  new Formater(format, args);
-        return s;
+    public static Object delayedFormatString(Supplier<Object> source) {
+        return new Formater(source);
     }
 
 }

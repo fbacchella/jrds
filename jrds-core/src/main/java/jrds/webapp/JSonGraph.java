@@ -43,7 +43,7 @@ public class JSonGraph extends JSonData {
                 }
             });
         }
-        logger.debug("{}", jrds.Util.delayedFormatString("Graphs returned: %s", graphs));
+        logger.debug("Graphs returned: {}", graphs);
         if(!graphs.isEmpty()) {
             Renderer r = root.getRenderer();
             for(GraphNode gn: graphs) {

@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import jrds.Util;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.snmp4j.PDU;
@@ -130,7 +128,7 @@ public enum SnmpRequester {
     private static Map<OID, Object> doRequest(SnmpConnection cnx, VariableBinding[] vars) throws IOException {
         Snmp snmp = cnx.getSnmp();
         if(snmp == null) {
-            logger.warn("{}", Util.delayedFormatString("invalid snmp connection state for %s", cnx));
+            logger.warn("invalid snmp connection state for {}", cnx);
             return Collections.emptyMap();
         }
 

@@ -122,7 +122,7 @@ abstract class ConfigObjectBuilder<BuildObject> {
                 dsList.add(builder);
             }
         }
-        logger.trace("{}", jrds.Util.delayedFormatString("data store list build: %s", dsList));
+        logger.trace("data store list build: {}", dsList);
         return dsList;
     }
 

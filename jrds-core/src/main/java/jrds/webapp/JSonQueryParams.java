@@ -9,12 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import jrds.HostsList;
 import jrds.Tab;
-import jrds.Util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Servlet implementation class JSonQueryParams
@@ -78,7 +77,7 @@ public class JSonQueryParams extends JrdsServlet {
     }
 
     private void doVariable(JrdsJSONWriter w, String key, Object value) {
-        logger.trace("{}", Util.delayedFormatString("resolving %s with %s", key, value));
+        logger.trace("resolving {} with {}", key, value);
         if(value == null)
             return;
         if(value instanceof String && "".equals(value.toString().trim())) {

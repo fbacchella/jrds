@@ -3,8 +3,6 @@ package jrds.factories.xml;
 import java.io.IOException;
 import java.net.URL;
 
-import jrds.Util;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
@@ -14,7 +12,7 @@ public class EntityResolver implements org.xml.sax.EntityResolver {
     static final Logger logger = LoggerFactory.getLogger(EntityResolver.class);
 
     public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-        logger.trace("{}", Util.delayedFormatString("Will look for DTD %s %s", publicId, systemId));
+        logger.trace("Will look for DTD {} {}", publicId, systemId);
         URL realSystemId;
         if("-//jrds//DTD Graph Description//EN".equals(publicId)) {
             realSystemId = getClass().getResource("/graphdesc.dtd");
@@ -46,7 +44,7 @@ public class EntityResolver implements org.xml.sax.EntityResolver {
             realSystemId = new URL(systemId);
         }
 
-        logger.trace("{}", Util.delayedFormatString("Resolving \"%s\" \"%s\" to %s", publicId, systemId, realSystemId));
+        logger.trace("Resolving \"{}\" \"{}\" to {}", publicId, systemId, realSystemId);
         if(realSystemId == null) {
             throw new SAXException("Failed to resolve " + publicId + " " + systemId);
         }

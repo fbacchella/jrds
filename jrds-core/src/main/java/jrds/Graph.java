@@ -288,7 +288,7 @@ public class Graph implements WithACL {
     }
 
     public void setPeriod(Period p) {
-        logger.trace("{}", jrds.Util.delayedFormatString("Period for graph: %s", p));
+        logger.trace("Period for graph: {}", p);
         setStart(p.getBegin());
         setEnd(p.getEnd());
     }

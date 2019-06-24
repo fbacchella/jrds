@@ -163,7 +163,7 @@ public class Renderer {
             String threadName = "RendererThread" + counter;
             Thread t = new Thread(r, threadName);
             t.setDaemon(true);
-            logger.debug("{}", Util.delayedFormatString("New thread name: %s", threadName));
+            logger.debug("New thread name: {}", threadName);
             return t;
         }
     });

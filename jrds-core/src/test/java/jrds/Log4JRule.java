@@ -33,7 +33,7 @@ public class Log4JRule implements TestRule {
 
     static {
         appenders = new HashMap<>();
-        Log4JRule.configure();
+        configure();
     }
 
     public synchronized static void configure() {

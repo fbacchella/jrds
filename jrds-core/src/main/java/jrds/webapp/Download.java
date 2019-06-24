@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import jrds.Period;
 import jrds.Probe;
+import jrds.Util;
 import jrds.store.ExtractInfo;
 
 import org.slf4j.Logger;
@@ -70,7 +71,7 @@ public class Download extends JrdsServlet {
                 } else if("graph".equals(cmd)) {
                     params = getParamsBean(req, "cmd", "host", "graphname");
                 } else {
-                    logger.error("{}", jrds.Util.delayedFormatString("Invalid command: %s", cmd));
+                    logger.error("Invalid command: {}", cmd);
                     res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     return;
                 }
@@ -91,7 +92,7 @@ public class Download extends JrdsServlet {
             }
             if(getPropertiesManager().security) {
                 boolean allowed = graph.getACL().check(params);
-                logger.trace("{}", jrds.Util.delayedFormatString("Looking if ACL %s allow access to %s", graph.getACL(), this));
+                logger.trace("Looking if ACL {} allow access to {}", Util.delayedFormatString(graph::getACL), this);
                 if(!allowed) {
                     res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     return;

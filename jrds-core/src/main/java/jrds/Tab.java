@@ -82,7 +82,7 @@ public abstract class Tab {
                 List<String> path = e.getValue();
                 GraphNode gn = hostlist.getGraphById(id.hashCode());
                 if(gn == null) {
-                    logger.warn("{}", jrds.Util.delayedFormatString("Graph not found for %s: %s", name, id));
+                    logger.warn("Graph not found for {}: {}", name, id);
                     continue;
                 }
                 gt.addGraphByPath(path, gn);

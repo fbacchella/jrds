@@ -62,7 +62,7 @@ public final class ArgFactory {
         List<Object> argsList = new ArrayList<Object>(elements.size());
         for(JrdsElement listNode: elements) {
             String localName = listNode.getNodeName();
-            logger.trace("{}", Util.delayedFormatString("Element to check: %s", localName));
+            logger.trace("Element to check: {}", localName);
             if("arg".equals(localName)) {
                 String type = listNode.getAttribute("type");
                 String value;
@@ -77,7 +77,7 @@ public final class ArgFactory {
                 argsList.add(makeArgs(listNode, arguments));
             }
         }
-        logger.debug("{}", Util.delayedFormatString("arg vector: %s", argsList));
+        logger.debug("arg vector: {}", argsList);
         return argsList;
     }
 

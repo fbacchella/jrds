@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jrds.Util;
 import net.iharder.Base64;
 
 import org.slf4j.Logger;
@@ -46,7 +45,7 @@ public class JSonPack extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int len = request.getContentLength();
         if(len > 4096) {
-            logger.error("post data too big: " + len);
+            logger.error("post data too big: {}", len);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "post data too big: " + len);
             return;
         }
@@ -60,7 +59,7 @@ public class JSonPack extends HttpServlet {
             postDataBuffer.write(bufferin, 0, read);
         }
         String postData = postDataBuffer.toString();
-        logger.debug("{}", Util.delayedFormatString("Post data: %s", postData));
+        logger.debug("Post data: {}", postData);
 
         JrdsJSONObject paramsClean;
 
@@ -78,7 +77,7 @@ public class JSonPack extends HttpServlet {
                 }
             }
         } catch (JSONException e) {
-            logger.error("Invalid JSON object:" + postData);
+            logger.error("Invalid JSON object: {}", postData);
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid POST data");
             return;
         }
@@ -95,7 +94,7 @@ public class JSonPack extends HttpServlet {
                 new URL(referer); // make sure valid URL
             } catch (MalformedURLException e) {
                 referer = null;
-                logger.warn("Malformed referer URL: " + referer);
+                logger.warn("Malformed referer URL: {}", referer);
             }
         }
         if(referer == null) {

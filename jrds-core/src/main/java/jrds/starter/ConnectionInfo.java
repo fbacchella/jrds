@@ -57,7 +57,7 @@ public class ConnectionInfo {
             if(name != null && !name.trim().isEmpty())
                 cnx.setName(name.trim());
             node.registerStarter(cnx);
-            logger.debug("{}", Util.delayedFormatString("Connexion registred: %s for %s", cnx, node));
+            logger.debug("Connexion registred: {} for {}", cnx, node);
         } catch (InvocationTargetException ex) {
             String message = ex.getCause() != null ? ex.getCause().getMessage(): ex.getMessage();
             throw new InvocationTargetException(ex.getCause(), "Error during connection creation of type " + type.getName() + " for " + node + ": " + message);

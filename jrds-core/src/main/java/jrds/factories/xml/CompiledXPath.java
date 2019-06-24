@@ -11,8 +11,6 @@ import javax.xml.xpath.XPathFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jrds.Util;
-
 public class CompiledXPath {
 
     private static final Logger logger = LoggerFactory.getLogger(CompiledXPath.class);
@@ -34,7 +32,7 @@ public class CompiledXPath {
     public static XPathExpression get(String xpath) throws XPathExpressionException {
         XPathExpression e = xpc.get(xpath);
         if (e == null) {
-            logger.debug("{}", Util.delayedFormatString("Uncompiled xpath: %s", xpath));
+            logger.debug("Uncompiled xpath: {}", xpath);
             e = xpather.get().compile(xpath);
             xpc.put(xpath, e);
         }

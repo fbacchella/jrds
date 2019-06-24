@@ -98,7 +98,7 @@ public class Period {
         begin = begin.withMillisOfSecond(0);
 
         long interval = end.getMillis() - begin.getMillis();
-        logger.trace("{}", Util.delayedFormatString("initially, interval %d, begin is %s, end is %s", interval / 1000, begin, end));
+        logger.trace("initially, interval {}, begin is {}, end is {}", interval / 1000, begin, end);
 
         if(begin.getSecondOfMinute() == end.getSecondOfMinute()) {
             // second for end and begin are the same, that's mathematically
@@ -114,7 +114,7 @@ public class Period {
         this.begin = begin;
         this.end = end;
 
-        logger.trace("{}", Util.delayedFormatString("now Period is %s, begin is %s, end is %s", period, begin, end));
+        logger.trace("now Period is {}, begin is {}, end is {}", period, begin, end);
     }
 
     public Period previous() {

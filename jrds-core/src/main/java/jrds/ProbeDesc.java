@@ -430,7 +430,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
             defaultsBeans = new HashMap<String, ProbeDesc.DefaultBean>();
         if(beans.containsKey(beanName)) {
             defaultsBeans.put(beanName, attr);
-            logger.trace("{}", Util.delayedFormatString("Adding bean %s=%s to default beans", beanName, beanValue));
+            logger.trace("Adding bean {}={} to default beans", beanName, beanValue);
         }
     }
 

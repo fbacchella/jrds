@@ -46,7 +46,7 @@ public class Sum extends AutonomousGraphNode {
         for(String graphname: graphList) {
             g = hl.getGraphById(graphname.hashCode());
             if(g == null) {
-                logger.warn("{}", Util.delayedFormatString("graph %s not found for sum '%s'", graphname, getName()));
+                logger.warn("graph {} not found for sum '{}'", graphname, Util.delayedFormatString(this::getName));
             }
         }
         // The last graph found is used to clone the graphdesc and use it
@@ -55,9 +55,9 @@ public class Sum extends AutonomousGraphNode {
             GraphDesc newgd = GraphDesc.getBuilder().fromGraphDesc(oldgd).setGraphTitle(getName()).build();
             newgd.setGraphTitle(getName());
             setGraphDesc(newgd);
-            logger.debug("{}", Util.delayedFormatString("Adding sum called %s", getQualifiedName()));
+            logger.debug("Adding sum called {}", Util.delayedFormatString(this::getQualifiedName));
         } else {
-            throw new RuntimeException(String.format("Not graph found in %s definition, unusable sum", getName()));
+            throw new RuntimeException(String.format("Not graph found in {} definition, unusable sum", Util.delayedFormatString(this::getName)));
         }
     }
 
@@ -75,23 +75,23 @@ public class Sum extends AutonomousGraphNode {
                         .make(new Date(start * 1000), new Date(end * 1000))
                         .make(step)
                         .make(ConsolFun.AVERAGE);
-                logger.debug("{}", Util.delayedFormatString("Configuring the sum %s from %d to %d, step %d", Sum.this.getName(), start, end, step));
+                logger.debug("Configuring the sum {} from {} to {}, step {}", Util.delayedFormatString(Sum.this::getName), start, end, step);
                 // Used to kept the last fetched data and analyse the
                 DataProcessor dp = null;
 
                 double[][] allvalues = null;
                 for(String name: graphList) {
                     GraphNode g = hl.getGraphById(name.hashCode());
-                    logger.trace("Looking for " + name + " in graph base, and found " + g);
+                    logger.trace("Looking for {} in graph base, and found {}", name, g);
                     if(g == null) {
-                        logger.error("Graph not found: " + name);
+                        logger.error("Graph not found: {}", name);
                         continue;
                     }
 
                     try {
                         dp = g.getPlottedDate(ei);
                     } catch (IOException e) {
-                        logger.error("Failed to read " + g.getProbe());
+                        logger.error("Failed to read {}", g.getProbe());
                         continue;
                     }
 
@@ -126,10 +126,10 @@ public class Sum extends AutonomousGraphNode {
                     for(int i = 0; i < dsNames.length; i++) {
                         Plottable pl = new LinearInterpolator(ts, allvalues[i]);
                         put(dsNames[i], pl);
-                        logger.trace("{}", Util.delayedFormatString("Added %s to sum plottables", dsNames[i]));
+                        logger.trace("Added {} to sum plottables", dsNames[i]);
                     }
                 } else {
-                    logger.error("{}", Util.delayedFormatString("Sum %s unusable, not graph found", Sum.this));
+                    logger.error("Sum {} unusable, not graph found", Sum.this);
                 }
             }
         };
