@@ -5,10 +5,11 @@ import java.util.Properties;
 import jrds.starter.Timer;
 import jrds.store.StoreFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Configuration {
-    static private final Logger logger = Logger.getLogger(Configuration.class);
+    static private final Logger logger = LoggerFactory.getLogger(Configuration.class);
 
     static private Configuration conf;
 

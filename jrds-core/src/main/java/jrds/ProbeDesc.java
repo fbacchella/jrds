@@ -17,7 +17,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.rrd4j.DsType;
 import org.rrd4j.core.DsDef;
 import org.w3c.dom.Document;
@@ -42,7 +43,7 @@ import lombok.experimental.Accessors;
  *
  */
 public class ProbeDesc<KeyType> implements Cloneable {
-    static final private Logger logger = Logger.getLogger(ProbeDesc.class);
+    static final private Logger logger = LoggerFactory.getLogger(ProbeDesc.class);
 
     public static class DefaultBean {
         public final String value;
@@ -187,7 +188,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
                 highlowcollectmap.put(bname, new Joined(builder.collectKeyHigh, builder.collectKeyLow));
             } catch (IllegalArgumentException e) {
                 logger.error(String.format("Probe description %s: unable to parse collect key '%s': %s", name, collectKeyName, e.getMessage()));
-                logger.debug(e);
+                logger.debug("{}", e);
             }
         } else if (builder.collectKey != null) {
             //If collect was given an empty value, it was to prevent collect
@@ -203,7 +204,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
                 collectKey = collectResolver.resolve(collectKeyName);
             } catch (IllegalArgumentException e) {
                 logger.error(String.format("Probe description %s: unable to parse collect key '%s': %s", name, collectKeyName, e.getMessage()));
-                logger.debug(e);
+                logger.debug("{}", e);
             }
         }
 
@@ -429,7 +430,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
             defaultsBeans = new HashMap<String, ProbeDesc.DefaultBean>();
         if(beans.containsKey(beanName)) {
             defaultsBeans.put(beanName, attr);
-            logger.trace(Util.delayedFormatString("Adding bean %s=%s to default beans", beanName, beanValue));
+            logger.trace("{}", Util.delayedFormatString("Adding bean %s=%s to default beans", beanName, beanValue));
         }
     }
 

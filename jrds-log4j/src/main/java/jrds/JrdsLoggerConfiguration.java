@@ -51,35 +51,6 @@ public class JrdsLoggerConfiguration {
      */
     private static class JrdsLoggerConfigurationWorker {
 
-        private static void initLog4J() {
-            if (jrdsAppender == null) {
-                jrdsAppender = new ConsoleAppender(new org.apache.log4j.SimpleLayout(), DEFAULTLOGFILE);
-                jrdsAppender.setName(APPENDERNAME);
-            }
-            // Configure all the manager logger
-            // Default level is debug, not a very good idea
-            for (String loggerName : rootLoggers) {
-                configureLogger(loggerName, Level.ERROR);
-            }
-        }
-
-        private static void configure(PropertiesManager pm) throws IOException {
-            if (pm.logfile != null && !"".equals(pm.logfile)) {
-                jrdsAppender = new DailyRollingFileAppender(new PatternLayout(DEFAULTLAYOUT), pm.logfile, "'.'yyyy-ww");
-                jrdsAppender.setName(APPENDERNAME);
-            }
-            for (String logger : rootLoggers) {
-                configureLogger(logger, pm.loglevel);
-            }
-
-            for (Map.Entry<Level, List<String>> e : pm.loglevels.entrySet()) {
-                Level l = e.getKey();
-                for (String logName : e.getValue()) {
-                    Logger.getLogger(logName).setLevel(l);
-                }
-            }
-        }
-
         private static void configureLogger(String logname, Level level) {
             Logger logger = Logger.getLogger(logname);
             logger.setLevel(level);
@@ -129,7 +100,15 @@ public class JrdsLoggerConfiguration {
     static public void initLog4J() {
         // Do nothing if jrds is not allowed to setup logs
         if (isLogOwner()) {
-            JrdsLoggerConfigurationWorker.initLog4J();
+            if (jrdsAppender == null) {
+                jrdsAppender = new ConsoleAppender(new org.apache.log4j.SimpleLayout(), DEFAULTLOGFILE);
+                jrdsAppender.setName(APPENDERNAME);
+            }
+            // Configure all the manager logger
+            // Default level is debug, not a very good idea
+            for (String loggerName : rootLoggers) {
+                configureLogger(loggerName, Level.ERROR);
+            }
         }
     }
 
@@ -143,13 +122,28 @@ public class JrdsLoggerConfiguration {
      * <li><code>log.&lt;level&gt;</code>, followed by a comma separated list of
      * logger, to set the level of those logger to <code>level</code></li>
      * </ul>
+     * @param loglevels 
+     * @param loglevel 
+     * @param logfile 
      *
-     * @param pm a configured PropertiesManager object
      * @throws IOException
      */
-    static public void configure(PropertiesManager pm) throws IOException {
+    static public void configure(String logfile, Level loglevel, Map<Level, List<String>> loglevels) throws IOException {
         if (isLogOwner()) {
-            JrdsLoggerConfigurationWorker.configure(pm);
+            if (logfile != null && ! logfile.isEmpty()) {
+                jrdsAppender = new DailyRollingFileAppender(new PatternLayout(DEFAULTLAYOUT), logfile, "'.'yyyy-ww");
+                jrdsAppender.setName(APPENDERNAME);
+            }
+            for (String logger : rootLoggers) {
+                configureLogger(logger, loglevel);
+            }
+
+            for (Map.Entry<Level, List<String>> e : loglevels.entrySet()) {
+                Level l = e.getKey();
+                for (String logName : e.getValue()) {
+                    Logger.getLogger(logName).setLevel(l);
+                }
+            }
         }
     }
 

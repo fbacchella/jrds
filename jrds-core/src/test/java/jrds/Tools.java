@@ -7,9 +7,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -19,11 +17,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.log4j.Appender;
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggingEvent;
 import org.junit.rules.TemporaryFolder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -94,29 +87,6 @@ final public class Tools {
         }
     }
 
-    static public void setLevel(Logger logger, Level level, String... allLoggers) {
-        Appender app = Logger.getLogger("jrds").getAppender(JrdsLoggerConfiguration.APPENDERNAME);
-        if(logger != null) {
-            logger.setLevel(level);
-            logger.setAdditivity(false);
-            logger.addAppender(app);
-        }
-        for(String loggerName: allLoggers) {
-            Logger l = Logger.getLogger(loggerName);
-            l.setLevel(level);
-            l.setAdditivity(false);
-            l.addAppender(app);
-        }
-    }
-
-    static public void setLevel(Level level, String... allLoggers) {
-        setLevel(allLoggers, level);
-    }
-
-    static public void setLevel(String[] allLoggers, Level level) {
-        setLevel(null, level, allLoggers);
-    }
-
     static public Element appendElement(Node n, String name, Map<String, String> attributes) {
         Document d = n.getOwnerDocument();
         Element e = d.createElement(name);
@@ -141,37 +111,6 @@ final public class Tools {
     static public URI pathToUrl(String pathname) {
         File path = new File(pathname);
         return path.toURI();
-    }
-
-    static public List<LoggingEvent> getLogChecker(String... loggers) {
-        final List<LoggingEvent> logs = new ArrayList<LoggingEvent>();
-        Appender ta = new AppenderSkeleton() {
-            @Override
-            public synchronized void doAppend(LoggingEvent event) {
-                super.doAppend(event);
-            }
-
-            @Override
-            protected void append(LoggingEvent arg0) {
-                logs.add(arg0);
-            }
-
-            public void close() {
-                logs.clear();
-            }
-
-            public boolean requiresLayout() {
-                return false;
-            }
-        };
-
-        for(String loggername: loggers) {
-            Logger logger = Logger.getLogger(loggername);
-            logger.addAppender(ta);
-            logger.setLevel(Level.TRACE);
-            logger.setAdditivity(true);
-        }
-        return logs;
     }
 
     static private final PropertiesManager finishPm(PropertiesManager pm, String... props) {

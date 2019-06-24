@@ -4,9 +4,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import jrds.probe.PassiveProbe;
+import org.slf4j.event.Level;
 
-import org.apache.log4j.Level;
+import jrds.probe.PassiveProbe;
 
 public abstract class Listener<Message, KeyType> extends Starter {
 

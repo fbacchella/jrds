@@ -4,12 +4,12 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
+import org.slf4j.event.Level;
+
 import jrds.JrdsSample;
 import jrds.Probe;
 import jrds.starter.Listener;
 import jrds.starter.StarterNode;
-
-import org.apache.log4j.Level;
 
 public class PassiveProbe<KeyType> extends Probe<KeyType, Number> {
 

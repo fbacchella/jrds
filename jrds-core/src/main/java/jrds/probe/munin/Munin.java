@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.slf4j.event.Level;
+
 import jrds.ProbeConnected;
 import jrds.factories.ProbeMeta;
-
-import org.apache.log4j.Level;
 
 /**
  * @author Fabrice Bacchella

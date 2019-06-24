@@ -15,7 +15,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jrds.HostsList;
 import jrds.PropertiesManager;
@@ -26,7 +27,7 @@ import jrds.store.RrdDbStoreFactory;
  */
 @ServletSecurity
 public final class WhichLibs extends JrdsServlet {
-    static final private Logger logger = Logger.getLogger(WhichLibs.class);
+    static final private Logger logger = LoggerFactory.getLogger(WhichLibs.class);
 
     /**
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
@@ -101,7 +102,7 @@ public final class WhichLibs extends JrdsServlet {
                 out.println("Principal: " + p.getName() + " (" + p.getClass().getSimpleName() + ")");
             }
         } catch (RuntimeException e) {
-            logger.error(e, e);
+            logger.error("{}", e.getMessage(), e);
         }
     }
 

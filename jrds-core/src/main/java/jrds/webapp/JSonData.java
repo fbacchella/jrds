@@ -11,10 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import jrds.HostsList;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class JSonData extends JrdsServlet {
-    static final private Logger logger = Logger.getLogger(JSonData.class);
+    static final private Logger logger = LoggerFactory.getLogger(JSonData.class);
 
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse

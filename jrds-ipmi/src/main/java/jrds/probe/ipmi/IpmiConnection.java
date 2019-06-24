@@ -3,14 +3,13 @@ package jrds.probe.ipmi;
 import java.io.IOException;
 import java.util.List;
 
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 
 import com.veraxsystems.vxipmi.api.async.ConnectionHandle;
 import com.veraxsystems.vxipmi.api.sync.IpmiConnector;
 import com.veraxsystems.vxipmi.coding.commands.PrivilegeLevel;
 import com.veraxsystems.vxipmi.coding.security.CipherSuite;
 
-import jrds.JuliToLog4jHandler;
 import jrds.PropertiesManager;
 import jrds.factories.ProbeBean;
 import jrds.starter.Connection;
@@ -18,11 +17,6 @@ import jrds.starter.Resolver;
 
 @ProbeBean({ "bmcname", "user", "password" })
 public class IpmiConnection extends Connection<Handle> {
-
-    static {
-        // If not already configured, we filter it
-        JuliToLog4jHandler.catchLogger("com.veraxsystems.vxipmi", Level.FATAL);
-    }
 
     String bmcname;
     String user;

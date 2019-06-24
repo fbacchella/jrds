@@ -7,7 +7,8 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.Variable;
 
@@ -21,7 +22,7 @@ import jrds.store.ExtractInfo;
  * @author Fabrice Bacchella
  */
 public final class ProbeSummary extends JrdsServlet {
-    static final private Logger logger = Logger.getLogger(ProbeSummary.class);
+    static final private Logger logger = LoggerFactory.getLogger(ProbeSummary.class);
 
     /**
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,

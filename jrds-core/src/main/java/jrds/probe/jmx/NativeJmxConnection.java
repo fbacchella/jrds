@@ -22,23 +22,16 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.generic.GenericConnector;
 
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 
-import jrds.JuliToLog4jHandler;
 import jrds.PropertiesManager;
 import jrds.factories.ProbeBean;
 import jrds.jmx.JrdsSocketConnection;
 import jrds.probe.JmxSocketFactory;
 import jrds.starter.SocketFactory;
 
-@SuppressWarnings("restriction")
 @ProbeBean({ "url", "protocol", "port", "path", "user", "password" })
 public class NativeJmxConnection extends AbstractJmxConnection {
-    
-    static {
-        JuliToLog4jHandler.catchLogger("javax.management", Level.FATAL);
-        JuliToLog4jHandler.catchLogger("sun.rmi", Level.ERROR);
-    }
 
     public class RmiSocketFactory implements RMIClientSocketFactory {
         public Socket createSocket(String host, int port) throws IOException {

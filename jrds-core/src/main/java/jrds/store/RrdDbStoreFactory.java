@@ -10,7 +10,8 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.rrd4j.core.RrdBackendFactory;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDbPool;
@@ -22,7 +23,7 @@ import jrds.Util;
 import jrds.factories.ArgFactory;
 
 public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
-    private static final Logger logger = Logger.getLogger(RrdDbStoreFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(RrdDbStoreFactory.class);
     private RrdBackendFactory backendFactory = null;
     private RrdDbPool instance = null;
 
@@ -67,10 +68,10 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
         Map<String, String> backendPropsMap = pm.subKey("rrdbackend");
 
         if(backendPropsMap.size() > 0) {
-            logger.debug(Util.delayedFormatString("Configuring backend factory %s", backendFactory.getClass()));
+            logger.debug("{}", Util.delayedFormatString("Configuring backend factory %s", backendFactory.getClass()));
             for(Map.Entry<String, String> e: backendPropsMap.entrySet()) {
                 try {
-                    logger.trace(Util.delayedFormatString("Will set backend end bean '%s' to '%s'", e.getKey(), e.getValue()));
+                    logger.trace("{}", Util.delayedFormatString("Will set backend end bean '%s' to '%s'", e.getKey(), e.getValue()));
                     ArgFactory.beanSetter(backendFactory, e.getKey(), e.getValue());
                 } catch (InvocationTargetException e1) {
                     throw new RuntimeException("Failed to configure RrdDbStoreFactory:" + e1.getMessage(), e1);
@@ -81,7 +82,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
         dbPoolSize = Util.parseStringNumber(props.getProperty("dbPoolSize"), 10) + pm.numCollectors;
         usepool = pm.parseBoolean(props.getProperty("usepool", "true"));
 
-        logger.debug(Util.delayedFormatString("Store backend used is %s", backendName));
+        logger.debug("{}", Util.delayedFormatString("Store backend used is %s", backendName));
 
     }
 
@@ -97,7 +98,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
         if(usepool || filebasedbackend) {
             try {
                 RrdBackendFactory.setActiveFactories(backendFactory);;
-                logger.trace(Util.delayedFormatString("Store backend set to %s", backendName));
+                logger.trace("{}", Util.delayedFormatString("Store backend set to %s", backendName));
             } catch (IllegalStateException e) {
                 logger.warn("Trying to change default backend, a restart is needed");
             } catch (Exception e) {

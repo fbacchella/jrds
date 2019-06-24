@@ -8,29 +8,37 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
 import jrds.mockobjects.EmptyStoreFactory;
 import jrds.webapp.ACL.AdminACL;
 import jrds.webapp.RolesACL;
 
 public class TestPropertiesManager {
-    static final private Logger logger = Logger.getLogger(TestPropertiesManager.class);
     static private final String[] dirs = new String[] { "configdir", "rrddir", "tmpdir" };
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
+    
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.PropertiesManager");
+    }
+    
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.PropertiesManager");
     }
 
     @Test

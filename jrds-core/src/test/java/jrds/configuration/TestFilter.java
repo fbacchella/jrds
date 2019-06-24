@@ -5,7 +5,16 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.slf4j.event.Level;
+
 import jrds.Filter;
+import jrds.Log4JRule;
 import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
@@ -13,16 +22,7 @@ import jrds.factories.xml.JrdsElement;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
 public class TestFilter {
-    static final private Logger logger = Logger.getLogger(TestSum.class);
 
     static final private String goodFilterXml =
             "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
@@ -34,15 +34,22 @@ public class TestFilter {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
+
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.prepareXml(false);
-
-        logger.setLevel(Level.TRACE);
-        Tools.setLevel(logger, Level.TRACE, "jrds.factories", "jrds.Filter", "jrds.FilterXml");
-        Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
     }
+    
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
+        logrule.setLevel(Level.TRACE, "jrds.factories", "jrds.Filter", "jrds.FilterXml");
+    }
+
+
 
     private Filter doFilter(JrdsDocument d) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
         FilterBuilder sm = new FilterBuilder();

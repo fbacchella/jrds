@@ -22,10 +22,10 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.event.Level;
+
 import jrds.HostInfo;
 import jrds.PropertiesManager;
-
-import org.apache.log4j.Level;
 
 public class Timer extends StarterNode {
 
@@ -126,7 +126,7 @@ public class Timer extends StarterNode {
                         try {
                             Timer.this.collectAll();
                         } catch (RuntimeException e) {
-                            Timer.this.log(Level.FATAL, e, "A fatal error occured during collect: %s", e.getMessage());
+                            Timer.this.log(Level.ERROR, e, "A fatal error occured during collect: %s", e.getMessage());
                         }
                     }
                 };
@@ -152,7 +152,7 @@ public class Timer extends StarterNode {
         Date start = new Date();
         try {
             if(!collectMutex.tryAcquire(getTimeout(), TimeUnit.SECONDS)) {
-                log(Level.FATAL, "A collect failed because a start time out");
+                log(Level.ERROR, "A collect failed because a start time out");
                 return;
             }
         } catch (InterruptedException e) {

@@ -17,7 +17,8 @@ import jrds.factories.xml.JrdsElement;
 import jrds.webapp.Discover.ProbeDescSummary;
 import jrds.webapp.DiscoverAgent;
 
-import org.apache.log4j.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uk.co.petertribble.jkstat.api.JKstat;
 import uk.co.petertribble.jkstat.api.Kstat;

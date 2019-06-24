@@ -11,14 +11,14 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 import org.w3c.dom.Document;
 
 import jrds.mockobjects.GenerateProbe;
@@ -107,7 +107,7 @@ public class UtilTest {
         // It should have auto-detected the doc type
         Assert.assertTrue(outBuffer.contains(publicId));
         Assert.assertTrue(outBuffer.contains(systemId));
-        logger.debug(outBuffer.contains(d.getXmlEncoding()));
+        logger.debug("{}", outBuffer.contains(d.getXmlEncoding()));
         Assert.assertTrue("Output encoding " + d.getXmlEncoding() + " not found", outBuffer.contains(d.getXmlEncoding()));
     }
 
@@ -309,7 +309,7 @@ public class UtilTest {
         String[] toSort = new String[] { "zOS", "linux", "Linux", "host10", "host2", "host03", "redbus", "telecity", "linode" };
         Arrays.sort(toSort, jrds.Util.nodeComparator);
         String sorted = Arrays.asList(toSort).toString();
-        logger.trace(Arrays.asList(toSort));
+        logger.trace("{}", Arrays.asList(toSort));
         Assert.assertEquals("[host2, host03, host10, linode, linux, Linux, redbus, telecity, zOS]", sorted);
     }
 

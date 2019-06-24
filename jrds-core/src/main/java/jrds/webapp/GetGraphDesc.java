@@ -11,7 +11,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 import jrds.Graph;
@@ -21,7 +22,7 @@ import jrds.Util;
 
 public class GetGraphDesc extends JrdsServlet {
 
-    static final private Logger logger = Logger.getLogger(GetGraphDesc.class);
+    static final private Logger logger = LoggerFactory.getLogger(GetGraphDesc.class);
     static final private String CONTENT_TYPE = "application/xml";
 
     /**

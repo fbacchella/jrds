@@ -8,14 +8,14 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
 import jrds.HostInfo;
 import jrds.Log4JRule;
@@ -71,7 +71,7 @@ public class TestSnmpLoadConfiguration {
         hostDescMap.put("name", hostNode);
         Map<String, HostInfo> hostMap = conf.setHostMap(Tools.getSimpleTimerMap());
 
-        logger.trace(hostMap);
+        logger.trace("{}", hostMap);
         HostInfo h = hostMap.get("myhost");
         Assert.assertNotNull(h);
         Assert.assertEquals("myhost", h.getName());

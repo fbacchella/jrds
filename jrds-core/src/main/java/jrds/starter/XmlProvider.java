@@ -20,7 +20,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -47,7 +47,7 @@ public class XmlProvider extends Starter {
             try {
                 return instance.newDocumentBuilder();
             } catch (ParserConfigurationException e) {
-                log(Level.FATAL, e, "No Document builder available");
+                log(Level.ERROR, e, "No Document builder available");
                 return null;
             }
         }
@@ -111,7 +111,7 @@ public class XmlProvider extends Starter {
                 String dateString = upTimeNode.getTextContent();
                 uptime = jrds.Util.parseStringNumber(dateString, 0L);
             }
-            log(Level.ALL, "uptime is %d", uptime);
+            log(Level.TRACE, "uptime is %d", uptime);
         } catch (XPathExpressionException e) {
             log(Level.ERROR, e, "Uptime not found");
         }

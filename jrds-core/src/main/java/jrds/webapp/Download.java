@@ -16,7 +16,8 @@ import jrds.Period;
 import jrds.Probe;
 import jrds.store.ExtractInfo;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.rrd4j.data.DataProcessor;
 
 /**
@@ -26,7 +27,7 @@ import org.rrd4j.data.DataProcessor;
  */
 
 public class Download extends JrdsServlet {
-    static final private Logger logger = Logger.getLogger(Download.class);
+    static final private Logger logger = LoggerFactory.getLogger(Download.class);
     static final String CONTENT_TYPE = "text/csv";
 
     private static final ThreadLocal<SimpleDateFormat> humanDateFormat = new ThreadLocal<SimpleDateFormat>() {
@@ -69,7 +70,7 @@ public class Download extends JrdsServlet {
                 } else if("graph".equals(cmd)) {
                     params = getParamsBean(req, "cmd", "host", "graphname");
                 } else {
-                    logger.error(jrds.Util.delayedFormatString("Invalid command: %s", cmd));
+                    logger.error("{}", jrds.Util.delayedFormatString("Invalid command: %s", cmd));
                     res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                     return;
                 }
@@ -90,7 +91,7 @@ public class Download extends JrdsServlet {
             }
             if(getPropertiesManager().security) {
                 boolean allowed = graph.getACL().check(params);
-                logger.trace(jrds.Util.delayedFormatString("Looking if ACL %s allow access to %s", graph.getACL(), this));
+                logger.trace("{}", jrds.Util.delayedFormatString("Looking if ACL %s allow access to %s", graph.getACL(), this));
                 if(!allowed) {
                     res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     return;

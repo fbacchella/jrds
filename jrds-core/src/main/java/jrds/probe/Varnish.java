@@ -11,11 +11,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.slf4j.event.Level;
+
 import jrds.Probe;
 import jrds.factories.ProbeBean;
 import jrds.starter.SocketFactory;
-
-import org.apache.log4j.Level;
 
 @ProbeBean({ "port", "welcome" })
 public class Varnish extends Probe<String, Number> implements IndexedProbe {

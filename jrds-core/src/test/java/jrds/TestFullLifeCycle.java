@@ -9,14 +9,14 @@ import java.io.OutputStream;
 
 import javax.imageio.ImageIO;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
 import jrds.mockobjects.Full;
 import jrds.mockobjects.GenerateProbe;
@@ -52,7 +52,7 @@ public class TestFullLifeCycle {
         long endSec = Full.fill(p);
         logger.debug("fill time: " + endSec);
 
-        logger.debug(p.getLastUpdate());
+        logger.debug("{}", p.getLastUpdate());
 
         Period pr = Full.getPeriod(p, endSec);
 

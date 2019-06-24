@@ -6,7 +6,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import jrds.Tools;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.snmp4j.CommunityTarget;
@@ -25,7 +26,7 @@ import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
 public class DismanPlay {
-    static final private Logger logger = Logger.getLogger(DismanPlay.class);
+    static final private Logger logger = LoggerFactory.getLogger(DismanPlay.class);
 
     OID snmpTrapOID = new OID("1.3.6.1.6.3.1.1.4.1.0");
     OID sysUpTime = new OID("1.3.6.1.2.1.1.3");

@@ -5,7 +5,8 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.snmp4j.PDU;
 import org.snmp4j.asn1.BER;
 import org.snmp4j.asn1.BERInputStream;
@@ -31,7 +32,7 @@ import org.snmp4j.smi.VariableBinding;
  * @author Fabrice Bacchella
  */
 public class SnmpVars extends HashMap<OID, Object> {
-    static final private Logger logger = Logger.getLogger(SnmpVars.class);
+    static final private Logger logger = LoggerFactory.getLogger(SnmpVars.class);
 
     static final private byte TAG1 = (byte) 0x9f;
     static final private byte TAG_FLOAT = (byte) 0x78;

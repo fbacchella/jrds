@@ -4,28 +4,35 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 
-import jrds.HostsList;
-import jrds.PropertiesManager;
-import jrds.Tools;
-import jrds.mockobjects.GetMoke;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.event.Level;
+
+import jrds.HostsList;
+import jrds.Log4JRule;
+import jrds.PropertiesManager;
+import jrds.Tools;
+import jrds.mockobjects.GetMoke;
 
 public class TestParamsBean {
-    static final private Logger logger = Logger.getLogger(TestParamsBean.class);
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.webapp.ParamsBean");
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.webapp.ParamsBean");
     }
 
     @Test

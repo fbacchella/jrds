@@ -19,14 +19,15 @@ import javax.servlet.http.HttpServletResponse;
 import jrds.Util;
 import net.iharder.Base64;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.json.JSONException;
 
 /**
  * Servlet implementation class JSonPack
  */
 public class JSonPack extends HttpServlet {
-    static final private Logger logger = Logger.getLogger(JSonPack.class);
+    static final private Logger logger = LoggerFactory.getLogger(JSonPack.class);
     static final public List<String> JSONKEYS = Arrays.asList("id", "autoperiod", "filter", "host", "path", "begin", "end", "max", "min", "tab", "sort", "tree");
     static final public Map<String, Integer> JSONDICT = new HashMap<String, Integer>(JSONKEYS.size());
 
@@ -59,7 +60,7 @@ public class JSonPack extends HttpServlet {
             postDataBuffer.write(bufferin, 0, read);
         }
         String postData = postDataBuffer.toString();
-        logger.debug(Util.delayedFormatString("Post data: %s", postData));
+        logger.debug("{}", Util.delayedFormatString("Post data: %s", postData));
 
         JrdsJSONObject paramsClean;
 

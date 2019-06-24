@@ -7,9 +7,9 @@ import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 
-import jrds.starter.Connection;
+import org.slf4j.event.Level;
 
-import org.apache.log4j.Level;
+import jrds.starter.Connection;
 
 public class LdapConnection extends Connection<DirContext> {
     private String binddn;

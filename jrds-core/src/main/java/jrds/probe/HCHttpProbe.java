@@ -12,7 +12,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 
 import jrds.factories.ProbeMeta;
 

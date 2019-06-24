@@ -22,7 +22,7 @@
         <maven.plugin.surefire.version>2.22.1</maven.plugin.surefire.version>
         <servlet-api.version>3.1.0</servlet-api.version>
         <junit.version>4.12</junit.version>
-        <log4j.version>1.2.17</log4j.version>
+        <slf4j.version>1.7.26</slf4j.version>
         <jrds.hidelogs>true</jrds.hidelogs>
     </properties>
 
@@ -30,9 +30,10 @@
         <module>jrds-core</module>
         <module>jrds-snmp</module>
         <module>jrds-ipmi</module>
+        <module>jrds-jsonp</module>
+        <module>jrds-log4j</module>
         <module>jrds-webapp</module>
         <module>jrds-standalone</module>
-        <module>jrds-jsonp</module>
     </modules>
 
     <repositories>

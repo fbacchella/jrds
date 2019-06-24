@@ -15,7 +15,7 @@ import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPathExpression;
 
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

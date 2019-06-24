@@ -16,11 +16,11 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.event.Level;
+
 import jrds.factories.xml.JrdsElement;
 import jrds.webapp.Discover.ProbeDescSummary;
 import jrds.webapp.DiscoverAgent;
-
-import org.apache.log4j.Level;
 
 public class MuninDiscoverAgent extends DiscoverAgent {
 

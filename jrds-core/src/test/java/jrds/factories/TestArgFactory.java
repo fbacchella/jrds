@@ -8,22 +8,23 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+
+import jrds.Log4JRule;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 public class TestArgFactory {
-    static final private Logger logger = Logger.getLogger(ArgFactory.class);
+
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE);
         Tools.prepareXml(false);
     }
 

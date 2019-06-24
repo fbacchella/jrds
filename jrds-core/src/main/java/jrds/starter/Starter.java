@@ -2,10 +2,11 @@ package jrds.starter;
 
 import java.util.Date;
 
-import jrds.PropertiesManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import jrds.PropertiesManager;
 
 public abstract class Starter {
     private StarterNode level;
@@ -16,7 +17,7 @@ public abstract class Starter {
 
     public Starter() {
         String[] classElements = getClass().getName().split("\\.");
-        namedLogger = Logger.getLogger("jrds.Starter." + classElements[classElements.length - 1].replaceAll("\\$", ".\\$"));
+        namedLogger = LoggerFactory.getLogger("jrds.Starter." + classElements[classElements.length - 1].replaceAll("\\$", ".\\$"));
     }
 
     /**

@@ -25,7 +25,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
@@ -36,7 +37,7 @@ import jrds.factories.xml.JrdsDocument;
 
 public class Loader {
 
-    static final private Logger logger = Logger.getLogger(Loader.class);
+    static final private Logger logger = LoggerFactory.getLogger(Loader.class);
 
     private static final FileFilter filter = new FileFilter() {
         public boolean accept(File file) {
@@ -50,7 +51,7 @@ public class Loader {
             String threadName = "DomParser" + threadCount.getAndIncrement();
             Thread t = new Thread(r, threadName);
             t.setDaemon(true);
-            logger.debug(Util.delayedFormatString("New thread name: %s", threadName));
+            logger.debug("{}", Util.delayedFormatString("New thread name: %s", threadName));
             return t;
         }
     });
@@ -196,7 +197,7 @@ public class Loader {
                         return;
                     }
                     String name = t.getName(d);
-                    logger.trace(Util.delayedFormatString("Found a %s with name %s", t.getRootNode(), name));
+                    logger.trace("{}", Util.delayedFormatString("Found a %s with name %s", t.getRootNode(), name));
                     // We check the Name
                     if(name != null && !"".equals(name)) {
                         Map<String, JrdsDocument> rep = repositories.get(t);

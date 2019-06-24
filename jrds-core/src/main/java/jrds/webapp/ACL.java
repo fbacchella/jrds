@@ -1,9 +1,10 @@
 package jrds.webapp;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class ACL {
-    static final protected Logger logger = Logger.getLogger(ACL.class);
+    static final protected Logger logger = LoggerFactory.getLogger(ACL.class);
 
     static final public ACL ALLOWEDACL = new ACL() {
         public boolean check(ParamsBean params) {

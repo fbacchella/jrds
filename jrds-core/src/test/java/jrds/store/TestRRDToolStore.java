@@ -5,24 +5,27 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.Period;
-import jrds.Probe;
-import jrds.Tools;
-import jrds.mockobjects.GenerateProbe;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
 import org.rrd4j.data.DataProcessor;
+import org.slf4j.event.Level;
+
+import jrds.Log4JRule;
+import jrds.Period;
+import jrds.Probe;
+import jrds.Tools;
+import jrds.mockobjects.GenerateProbe;
 
 public class TestRRDToolStore {
-    static final private Logger logger = Logger.getLogger(TestRRDToolStore.class);
     static final private File rrdfile = new File(TestRRDToolStore.class.getClassLoader().getResource("rrdtool.rrd").getFile());
+
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -30,7 +33,11 @@ public class TestRRDToolStore {
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, RRDToolStore.class.getCanonicalName(), "jrds.Probe");
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, RRDToolStore.class.getCanonicalName(), "jrds.Probe");
     }
 
     @Test

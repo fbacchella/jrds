@@ -8,8 +8,18 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
+
 import jrds.GraphDesc;
 import jrds.HostInfo;
+import jrds.Log4JRule;
 import jrds.Macro;
 import jrds.Probe;
 import jrds.ProbeDesc;
@@ -25,28 +35,25 @@ import jrds.starter.ConnectionInfo;
 import jrds.starter.StarterNode;
 import jrds.starter.Timer;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
 public class TestHostBuilder {
-
-    static final private Logger logger = Logger.getLogger(TestHostBuilder.class);
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
+
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.RdsHost", "jrds.starter", "jrds.Starter", "jrds.configuration.HostBuilder");
-        Tools.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
-
         Tools.prepareXml(false);
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.RdsHost", "jrds.starter", "jrds.Starter", "jrds.configuration.HostBuilder");
+        logrule.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
     }
 
     @Test

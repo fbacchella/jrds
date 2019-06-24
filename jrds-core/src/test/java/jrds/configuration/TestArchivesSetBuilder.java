@@ -4,28 +4,34 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.ArchivesSet;
-import jrds.Tools;
-import jrds.factories.xml.JrdsDocument;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.ArcDef;
+import org.slf4j.event.Level;
+
+import jrds.ArchivesSet;
+import jrds.Log4JRule;
+import jrds.Tools;
+import jrds.factories.xml.JrdsDocument;
 
 public class TestArchivesSetBuilder {
-    static final private Logger logger = Logger.getLogger(TestArchivesSetBuilder.class);
-
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.prepareXml(true);
+    }
 
-        Tools.setLevel(logger, Level.TRACE, "jrds.configuration", "jrds.factories");
-        Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
+        logrule.setLevel(Level.TRACE, "jrds.configuration", "jrds.factories");
     }
 
     @Test

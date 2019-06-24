@@ -18,7 +18,8 @@ import jrds.Period;
 import jrds.PropertiesManager;
 import jrds.Renderer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author bacchell
@@ -27,16 +28,13 @@ import org.apache.log4j.Logger;
  *         Window - Preferences - Java - Code Style - Code Templates
  */
 public class Grapher {
-    static final private Logger logger = Logger.getLogger(Grapher.class);
+    static final private Logger logger = LoggerFactory.getLogger(Grapher.class);
 
     public static void main(String[] args) throws Exception {
-        jrds.JrdsLoggerConfiguration.initLog4J();
-
         String propFile = "jrds.properties";
         if(args.length == 1)
             propFile = args[0];
         PropertiesManager pm = new PropertiesManager(new File(propFile));
-        jrds.JrdsLoggerConfiguration.configure(pm);
 
         System.getProperties().setProperty("java.awt.headless", "true");
         System.getProperties().putAll(pm);
@@ -46,7 +44,7 @@ public class Grapher {
         Period p = new Period();
         Renderer r = new Renderer(10, pm.tmpdir);
         Collection<Integer> done = new HashSet<Integer>();
-        logger.debug(hl.getTrees());
+        logger.debug("{}", hl.getTrees());
         for(GraphTree graphTree: hl.getTrees()) {
             logger.trace("Tree found: " + graphTree.getName());
             for(GraphNode gn: graphTree.enumerateChildsGraph(null)) {

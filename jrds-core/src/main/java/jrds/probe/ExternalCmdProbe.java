@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Level;
 import org.rrd4j.core.DsDef;
+import org.slf4j.event.Level;
 
 import jrds.Probe;
 import jrds.PropertiesManager;

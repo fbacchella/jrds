@@ -11,7 +11,7 @@ import jrds.starter.Resolver;
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.NtpV3Packet;
 import org.apache.commons.net.ntp.TimeInfo;
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 
 @ProbeBean({ "port" })
 public class Ntp extends Probe<String, Number> {
@@ -54,7 +54,7 @@ public class Ntp extends Probe<String, Number> {
             retValues.put("Delay", ti.getDelay());
             return retValues;
         } catch (IOException e) {
-            log(Level.ERROR, e, "NTP IO exception %s", e);
+            log(Level.ERROR, e, "NTP IO exception %s", e.getMessage());
         }
         return null;
     }

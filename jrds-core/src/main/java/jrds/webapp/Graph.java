@@ -14,7 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import jrds.HostsList;
 import net.iharder.Base64;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A servlet wich generate a png for a graph
@@ -23,7 +24,7 @@ import org.apache.log4j.Logger;
  * @version $Revision$
  */
 public final class Graph extends JrdsServlet {
-    static final private Logger logger = Logger.getLogger(Graph.class);
+    static final private Logger logger = LoggerFactory.getLogger(Graph.class);
 
     /**
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
@@ -56,7 +57,7 @@ public final class Graph extends JrdsServlet {
 
             if(getPropertiesManager().security) {
                 boolean allowed = graph.getACL().check(p);
-                logger.trace(jrds.Util.delayedFormatString("Looking if ACL %s allow access to %s", graph.getACL(), this));
+                logger.trace("{}", jrds.Util.delayedFormatString("Looking if ACL %s allow access to %s", graph.getACL(), this));
                 if(!allowed) {
                     res.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid role access");
                     return;
@@ -84,13 +85,13 @@ public final class Graph extends JrdsServlet {
             // If a cache file exist, try to be smart, but only if caching is
             // allowed
             if(indata != null && cache) {
-                logger.debug(jrds.Util.delayedFormatString("graph %s is cached", graph));
+                logger.debug("{}", jrds.Util.delayedFormatString("graph %s is cached", graph));
                 if(indata.size() < Integer.MAX_VALUE)
                     res.setContentLength((int) indata.size());
                 WritableByteChannel outC = Channels.newChannel(out);
                 indata.transferTo(0, indata.size(), outC);
             } else {
-                logger.debug(jrds.Util.delayedFormatString("graph %s not found in cache", graph));
+                logger.debug("{}", jrds.Util.delayedFormatString("graph %s not found in cache", graph));
                 graph.writePng(out);
             }
             if(indata != null) {
@@ -113,9 +114,9 @@ public final class Graph extends JrdsServlet {
             }
         } catch (RuntimeException e) {
             if(logger.isDebugEnabled())
-                logger.error(e, e);
+                logger.error("{}", e, e);
             else
-                logger.error(e);
+                logger.error("{}", e);
 
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid graph request");
         }

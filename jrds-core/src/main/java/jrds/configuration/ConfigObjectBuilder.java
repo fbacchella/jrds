@@ -7,7 +7,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.rrd4j.DsType;
 
 import jrds.ProbeDesc;
@@ -21,7 +22,7 @@ import jrds.webapp.RolesACL;
 import jrds.webapp.WithACL;
 
 abstract class ConfigObjectBuilder<BuildObject> {
-    static final private Logger logger = Logger.getLogger(ConfigObjectBuilder.class);
+    static final private Logger logger = LoggerFactory.getLogger(ConfigObjectBuilder.class);
 
     PropertiesManager pm;
     public ConfigType ct;
@@ -121,7 +122,7 @@ abstract class ConfigObjectBuilder<BuildObject> {
                 dsList.add(builder);
             }
         }
-        logger.trace(jrds.Util.delayedFormatString("data store list build: %s", dsList));
+        logger.trace("{}", jrds.Util.delayedFormatString("data store list build: %s", dsList));
         return dsList;
     }
 

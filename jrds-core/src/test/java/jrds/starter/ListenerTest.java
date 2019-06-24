@@ -1,10 +1,12 @@
 package jrds.starter;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.event.Level;
 
+import jrds.Log4JRule;
 import jrds.Tools;
 import jrds.factories.ProbeBean;
 import jrds.probe.PassiveProbe;
@@ -56,14 +58,17 @@ public class ListenerTest {
 
     }
 
-    static Logger logger = Logger.getLogger(ListenerTest.class);
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
+    }
 
-        logger.setLevel(Level.TRACE);
-        Tools.setLevel(new String[] { StarterNode.class.toString(), Starter.class.toString() }, logger.getLevel());
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, StarterNode.class.toString(), Starter.class.toString());
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

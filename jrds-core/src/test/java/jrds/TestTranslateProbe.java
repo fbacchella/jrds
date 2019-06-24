@@ -6,22 +6,32 @@ import java.util.Map;
 
 import jrds.mockobjects.MokeProbe;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
 public class TestTranslateProbe {
-    static final private Logger logger = Logger.getLogger(TestTranslateProbe.class);
+
     static ProbeDesc<String> pd;
+
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
     static public void configure() throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, Exception {
         Tools.configure();
         Tools.prepareXml();
-        Tools.setLevel(logger, Level.ERROR, "jrds.Probe");
         pd = jrds.configuration.GeneratorHelper.getProbeDesc(Tools.parseRessource("fulldesc.xml"));
 
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.Probe");
     }
 
     @Test

@@ -10,10 +10,23 @@ import java.util.Properties;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.jetty.http.HttpTester.Response;
+import org.eclipse.jetty.servlet.ServletTester;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.rrd4j.data.DataProcessor;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
+
 import jrds.Configuration;
 import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.HostsList;
+import jrds.Log4JRule;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
@@ -24,22 +37,14 @@ import jrds.mockobjects.Full;
 import jrds.mockobjects.GenerateProbe;
 import jrds.mockobjects.MokeProbe;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.eclipse.jetty.http.HttpTester.Response;
-import org.eclipse.jetty.servlet.ServletTester;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-import org.rrd4j.data.DataProcessor;
-
 public class TestDownload extends Download {
-    static final private Logger logger = Logger.getLogger(TestDownload.class);
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
+
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
     static public void configure() throws IOException, ParserConfigurationException {
@@ -47,7 +52,11 @@ public class TestDownload extends Download {
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
         Tools.prepareXml(false);
-        Tools.setLevel(logger, Level.TRACE, "jrds.webapp.ParamsBean", "jrds.webapp.JSonTree", "jrds.GraphDesc", Download.class.getCanonicalName(), "jrds.graphe.Sum");
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.webapp.ParamsBean", "jrds.webapp.JSonTree", "jrds.GraphDesc", Download.class.getCanonicalName(), "jrds.graphe.Sum");
     }
 
     @Test

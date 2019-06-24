@@ -12,7 +12,6 @@ import jrds.ArchivesSet;
 import jrds.JrdsSample;
 import jrds.Probe;
 
-import org.apache.log4j.Level;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.Archive;
 import org.rrd4j.core.Datasource;
@@ -25,6 +24,7 @@ import org.rrd4j.core.Sample;
 import org.rrd4j.core.Util;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.graph.RrdGraphDef;
+import org.slf4j.event.Level;
 
 public class RrdDbStore extends AbstractStore<RrdDb> {
     private final RrdDbStoreFactory factory;

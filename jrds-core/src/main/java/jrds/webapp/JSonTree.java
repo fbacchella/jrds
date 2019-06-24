@@ -16,21 +16,22 @@ import jrds.GraphTree;
 import jrds.HostsList;
 import jrds.Tab;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Servlet implementation class JSonTree
  */
 @ServletSecurity
 public class JSonTree extends JSonData {
-    static final private Logger logger = Logger.getLogger(JSonTree.class);
+    static final private Logger logger = LoggerFactory.getLogger(JSonTree.class);
 
     @Override
     public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException {
 
         if(ParamsBean.TABCHOICE.equals(params.getChoiceType())) {
             Tab tab = params.getTab();
-            logger.debug(jrds.Util.delayedFormatString("Tab specified: %s", params.getChoiceValue()));
+            logger.debug("{}", jrds.Util.delayedFormatString("Tab specified: %s", params.getChoiceValue()));
             if(tab == null)
                 return false;
             if(tab.isFilters()) {
@@ -48,19 +49,19 @@ public class JSonTree extends JSonData {
             }
         } else if(ParamsBean.HOSTCHOICE.equals(params.getChoiceType())) {
             GraphTree tree = params.getTree();
-            logger.debug(jrds.Util.delayedFormatString("Host specified: %s", params.getChoiceValue()));
+            logger.debug("{}", jrds.Util.delayedFormatString("Host specified: %s", params.getChoiceValue()));
             if(tree == null)
                 return false;
             return evaluateTree(params, w, root, tree);
         } else if(ParamsBean.TREECHOICE.equals(params.getChoiceType())) {
             GraphTree tree = params.getTree();
-            logger.debug(jrds.Util.delayedFormatString("Tree specified: %s", params.getChoiceValue()));
+            logger.debug("{}", jrds.Util.delayedFormatString("Tree specified: %s", params.getChoiceValue()));
             if(tree == null)
                 return false;
             return evaluateTree(params, w, root, tree);
         } else if(ParamsBean.FILTERCHOICE.equals(params.getChoiceType())) {
             Filter filter = params.getFilter();
-            logger.debug(jrds.Util.delayedFormatString("Filter specified: %s", params.getChoiceValue()));
+            logger.debug("{}", jrds.Util.delayedFormatString("Filter specified: %s", params.getChoiceValue()));
             if(filter == null)
                 return false;
             return evaluateFilter(params, w, root, filter);
@@ -107,7 +108,7 @@ public class JSonTree extends JSonData {
      */
     private Collection<GraphTree> findRoot(Collection<GraphTree> rootstry) {
         while (rootstry.size() == 1) {
-            logger.trace(jrds.Util.delayedFormatString("Trying with graph tree roots: %s", rootstry));
+            logger.trace("{}", jrds.Util.delayedFormatString("Trying with graph tree roots: %s", rootstry));
             GraphTree child = rootstry.iterator().next();
             Map<String, GraphTree> childTree = child.getChildsMap();
             // Don't go in empty nodes

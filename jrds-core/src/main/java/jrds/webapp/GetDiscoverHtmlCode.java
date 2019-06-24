@@ -13,14 +13,15 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jrds.Util;
 import jrds.factories.xml.JrdsDocument;
 
 public class GetDiscoverHtmlCode extends JrdsServlet {
 
-    static final private Logger logger = Logger.getLogger(GetDiscoverHtmlCode.class);
+    static final private Logger logger = LoggerFactory.getLogger(GetDiscoverHtmlCode.class);
 
     private static final String CONTENT_TYPE = "application/xml";
     private static final long serialVersionUID = 1L;
@@ -39,7 +40,7 @@ public class GetDiscoverHtmlCode extends JrdsServlet {
             JrdsDocument hostDom = new JrdsDocument(dbuilder.newDocument());
             hostDom.doRootElement("div");
             for(DiscoverAgent da: getHostsList().getDiscoverAgent()) {
-                logger.debug(jrds.Util.delayedFormatString("Adding discover agent %s", da));
+                logger.debug("{}", jrds.Util.delayedFormatString("Adding discover agent %s", da));
                 da.doHtmlDiscoverFields(hostDom);
             }
             resp.setContentType(CONTENT_TYPE);

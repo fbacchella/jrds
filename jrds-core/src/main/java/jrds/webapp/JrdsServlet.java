@@ -7,14 +7,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jrds.Configuration;
 import jrds.HostsList;
 import jrds.PropertiesManager;
 
 public abstract class JrdsServlet extends HttpServlet {
-    static final private Logger logger = Logger.getLogger(JrdsServlet.class);
+    static final private Logger logger = LoggerFactory.getLogger(JrdsServlet.class);
 
     protected HostsList getHostsList() {
         return Configuration.get().getHostsList();
@@ -47,7 +48,7 @@ public abstract class JrdsServlet extends HttpServlet {
 
     protected boolean allowed(ParamsBean params, ACL acl, HttpServletRequest req, HttpServletResponse res) {
         if (getPropertiesManager().security) {
-            logger.trace(jrds.Util.delayedFormatString("Looking if ACL %s allow access to %s", acl, req.getServletPath()));
+            logger.trace("{}", jrds.Util.delayedFormatString("Looking if ACL %s allow access to %s", acl, req.getServletPath()));
             if (!acl.check(params)) {
                 res.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 return false;

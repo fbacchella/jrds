@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpTester.Request;
 import org.eclipse.jetty.http.HttpTester.Response;
 import org.json.JSONObject;
@@ -16,24 +14,34 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
+import jrds.Log4JRule;
 import jrds.Tools;
 import jrds.factories.xml.EntityResolver;
 
 public class TestUpload {
-    static final private Logger logger = Logger.getLogger(TestStats.class);
 
     org.eclipse.jetty.servlet.ServletTester tester = null;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
+
     @BeforeClass
     static public void configure() throws Exception {
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, Upload.class.getName(), EntityResolver.class.getName());
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, Upload.class.getName(), EntityResolver.class.getName());
     }
 
     @Before
@@ -107,7 +115,7 @@ public class TestUpload {
         JSONObject jobject = new JSONObject("{ \"vector\": " + content.substring(content.indexOf('['), content.lastIndexOf(']') + 1) + "}");
         Assert.assertEquals(1, jobject.getJSONArray("vector").length());
         // If parsing is secure, it doesn't fail on a non existent file
-        logger.debug(jobject.getJSONArray("vector").getJSONObject(0));
+        logger.debug("{}", jobject.getJSONArray("vector").getJSONObject(0));
         Assert.assertEquals(Boolean.TRUE, jobject.getJSONArray("vector").getJSONObject(0).get("parsed"));
     }
 

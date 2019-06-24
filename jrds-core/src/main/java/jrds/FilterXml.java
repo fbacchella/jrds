@@ -4,7 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This a a filter generated using an XML config file
@@ -12,7 +13,7 @@ import org.apache.log4j.Logger;
  * @author Fabrice Bacchella
  */
 public class FilterXml extends Filter {
-    static private final Logger logger = Logger.getLogger(FilterXml.class);
+    static private final Logger logger = LoggerFactory.getLogger(FilterXml.class);
 
     private final Set<Pattern> goodPaths = new HashSet<Pattern>();
     private final Set<Pattern> tags = new HashSet<Pattern>();
@@ -69,7 +70,7 @@ public class FilterXml extends Filter {
             accepted = (acceptPath(path) && acceptTag(graph.getProbe()));
 
         if(logger.isTraceEnabled())
-            logger.trace(Util.delayedFormatString("Tried to accept : %s=%s, %s: %b", path, graph.getQualifiedName(), graph.getProbe() != null ? graph.getProbe().getTags() : "", accepted));
+            logger.trace("{}", Util.delayedFormatString("Tried to accept : %s=%s, %s: %b", path, graph.getQualifiedName(), graph.getProbe() != null ? graph.getProbe().getTags() : "", accepted));
 
         return accepted;
     }

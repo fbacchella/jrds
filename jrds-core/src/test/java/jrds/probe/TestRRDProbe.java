@@ -10,27 +10,28 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.slf4j.event.Level;
+
 import jrds.Graph;
 import jrds.GraphDesc;
 import jrds.GraphDesc.GraphType;
 import jrds.GraphNode;
-import jrds.ProbeDesc;
 import jrds.HostInfo;
+import jrds.Log4JRule;
+import jrds.ProbeDesc;
 import jrds.Tools;
 import jrds.Util;
 import jrds.starter.HostStarter;
 import jrds.store.RrdDbStoreFactory;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
 public class TestRRDProbe {
-    static final private Logger logger = Logger.getLogger(TestRRDProbe.class);
+
     static final private File rrdfile = new File(TestRRDProbe.class.getClassLoader().getResource("rrdtool.rrd").getFile());
     static final private long start = 920802300;
     static final private long end = 920808900;
@@ -38,10 +39,17 @@ public class TestRRDProbe {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.Probe.RRDToolGraphNode", "jrds.graphe.RRDToolGraphNode");
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.Probe.RRDToolGraphNode", "jrds.graphe.RRDToolGraphNode", "javax.management", "sun.rmi");
     }
 
     @Test

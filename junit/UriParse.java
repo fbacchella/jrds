@@ -7,12 +7,13 @@ import java.net.URL;
 
 import jrds.Tools;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class UriParse {
-    static final private Logger logger = Logger.getLogger(UriParse.class);
+    static final private Logger logger = LoggerFactory.getLogger(UriParse.class);
 
     @BeforeClass
     static public void configure() throws IOException {

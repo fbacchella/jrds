@@ -10,7 +10,7 @@ import java.util.Map;
 
 import javax.xml.xpath.XPathExpression;
 
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 import org.w3c.dom.Document;
 
 import jrds.CollectResolver;

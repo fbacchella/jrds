@@ -10,29 +10,37 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.slf4j.event.Level;
+
 import jrds.HostInfo;
+import jrds.Log4JRule;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.Tools;
 import jrds.Util;
 import jrds.starter.HostStarter;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 public class HttpTest {
-    static final private Logger logger = Logger.getLogger(HttpTest.class);
 
     static final private String HOST = "testhost";
     static final private HostStarter webserver = new HostStarter(new HostInfo(HOST));
 
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.Util");
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.Util");
     }
 
     private void validateBean(HttpProbe<String> p) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {

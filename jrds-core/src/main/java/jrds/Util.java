@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UnknownFormatConversionException;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,8 +44,9 @@ import jrds.probe.UrlProbe;
 import jrds.starter.HostStarter;
 import net.iharder.Base64;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 
@@ -53,7 +56,7 @@ import org.w3c.dom.DocumentType;
  * @version $Revision$, $Date$
  */
 public class Util {
-    static final private Logger logger = Logger.getLogger(Util.class);
+    static final private Logger logger = LoggerFactory.getLogger(Util.class);
 
     /**
      * The SI prefix as an enumeration, with factor provided.
@@ -116,7 +119,7 @@ public class Util {
         }
 
         public void fatalError(TransformerException e) throws TransformerException {
-            logger.fatal("Invalid xsl: " + e.getMessageAndLocation());
+            logger.error("Invalid xsl: " + e.getMessageAndLocation());
         }
 
         public void warning(TransformerException e) throws TransformerException {
@@ -135,7 +138,7 @@ public class Util {
             try {
                 return MessageDigest.getInstance("MD5");
             } catch (NoSuchAlgorithmException e) {
-                logger.fatal("You should not see this message, MD5 not available");
+                logger.error("You should not see this message, MD5 not available");
                 throw new RuntimeException(e);
             }
         }
@@ -278,7 +281,7 @@ public class Util {
                         } catch (IntrospectionException e) {
                             // not a bean, skip it
                         } catch (Exception e) {
-                            logger.warn(Util.delayedFormatString("can't output bean %s for %s", beanName, o));
+                            logger.warn("{}", Util.delayedFormatString("can't output bean %s for %s", beanName, o));
                         }
                     }
                 }
@@ -320,7 +323,7 @@ public class Util {
                         } catch (IntrospectionException e) {
                             // not a bean, skip it
                         } catch (Exception e) {
-                            logger.warn(Util.delayedFormatString("can't output bean %s for %s", beanName, o), e);
+                            logger.warn("{}", Util.delayedFormatString("can't output bean %s for %s", beanName, o), e);
                         }
                     }
                 }
@@ -494,7 +497,7 @@ public class Util {
             if(o == null)
                 continue;
             if(logger.isTraceEnabled())
-                logger.trace(Util.delayedFormatString("Argument for template \"%s\": %s", template, o.getClass()));
+                logger.trace("{}", Util.delayedFormatString("Argument for template \"%s\": %s", template, o.getClass()));
             if(o instanceof IndexedProbe) {
                 check(o, indexes, values, evaluate.index);
                 check(o, indexes, values, evaluate.index_signature);
@@ -739,20 +742,54 @@ public class Util {
         };
     }
 
+    private static class LambdaString {
+        private final Supplier<String> source;
+        private LambdaString(Supplier<String> source) {
+            this.source = source;
+        }
+        @Override
+        public String toString() {
+            return source.get();
+        }
+    }
+
     static final public void log(Object source, Logger namedLogger, Level l, Throwable e, String format, Object... args) {
-        if(namedLogger.isEnabledFor(l)) {
+        LambdaString ls = new LambdaString(() -> {
             StringBuilder line = new StringBuilder();
-            if(source != null)
+            if(source != null) {
                 line.append("[").append(source.toString()).append("] ");
-            line.append(String.format(format, args));
-            namedLogger.log(l, line.toString());
-            // NPE should never happen, so it's always logged
-            if(e != null && (namedLogger.isDebugEnabled() || e instanceof NullPointerException)) {
-                Writer w = new CharArrayWriter(e.getStackTrace().length + 20);
-                e.printStackTrace(new PrintWriter(w));
-                namedLogger.log(l, "Error stack: ");
-                namedLogger.log(l, w);
             }
+            line.append(String.format(format, args));
+            return line.toString();
+        });
+        Consumer<Object> lg;
+        switch(l) {
+        case TRACE:
+            lg = (i) -> namedLogger.trace("{}", i);
+            break;
+        case DEBUG:
+            lg = (i) -> namedLogger.debug("{}", i);
+            break;
+        case INFO:
+            lg = (i) -> namedLogger.info("{}", i);
+            break;
+        case WARN:
+            lg = (i) -> namedLogger.warn("{}", i);
+            break;
+        case ERROR:
+            lg = (i) -> namedLogger.error("{}", i);
+            break;
+        default:
+            lg = (i) -> {};
+        }
+        lg.accept(ls);
+        // NPE should never happen, so it's always logged
+        if(e != null && (namedLogger.isDebugEnabled() || e instanceof NullPointerException)) {
+            StackTraceElement[] stack = e.getStackTrace();
+            Writer w = new CharArrayWriter(stack.length*20);
+            e.printStackTrace(new PrintWriter(w));
+            lg.accept("Error stack: ");
+            lg.accept(w);
         }
     }
 
@@ -783,7 +820,8 @@ public class Util {
      * @return
      */
     static public Object delayedFormatString(final String format, final Object... args) {
-        return new Formater(format, args);
+        Supplier<Object> s = () ->  new Formater(format, args);
+        return s;
     }
 
 }

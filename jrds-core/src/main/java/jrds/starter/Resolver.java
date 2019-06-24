@@ -3,10 +3,10 @@ package jrds.starter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.slf4j.event.Level;
+
 import jrds.HostInfo;
 import jrds.Probe;
-
-import org.apache.log4j.Level;
 
 public class Resolver extends Starter {
     String hostname = "";

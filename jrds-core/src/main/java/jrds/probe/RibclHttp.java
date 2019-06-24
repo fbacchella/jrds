@@ -17,7 +17,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 

@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 import org.snmp4j.smi.OID;
 
 import jrds.ProbeConnected;

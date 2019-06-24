@@ -16,9 +16,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.rrd4j.data.DataProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -87,7 +88,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     private long uptime = Long.MAX_VALUE;
     private boolean finished = false;
     private String label = null;
-    private Logger namedLogger = Logger.getLogger("jrds.Probe.EmptyProbe");
+    private Logger namedLogger = LoggerFactory.getLogger("jrds.Probe.EmptyProbe");
     private volatile boolean running = false;
     private Set<Store> stores = new HashSet<Store>();
     private Store mainStore;
@@ -120,7 +121,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     public void setPd(ProbeDesc<KeyType> pd) {
         this.pd = pd;
-        namedLogger = Logger.getLogger("jrds.Probe." + pd.getName());
+        namedLogger = LoggerFactory.getLogger("jrds.Probe." + pd.getName());
         if(!readSpecific()) {
             throw new RuntimeException("Creation failed");
         }

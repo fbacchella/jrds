@@ -7,11 +7,11 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import org.slf4j.event.Level;
+
 import jrds.factories.ProbeBean;
 import jrds.starter.Connection;
 import jrds.starter.SocketFactory;
-
-import org.apache.log4j.Level;
 
 @ProbeBean({"port"})
 public class MuninConnection extends Connection<MuninConnection.SocketChannels> {

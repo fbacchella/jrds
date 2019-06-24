@@ -6,14 +6,14 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
 import jrds.GraphDesc;
 import jrds.GraphNode;
@@ -57,8 +57,8 @@ public class TestDescFactory {
         Assert.assertTrue(gd.isSiUnit());
         Assert.assertEquals("verticalLabel", gd.getVerticalLabel());
         GraphNode gn = new GraphNode(GetMoke.getProbe(), gd);
-        logger.debug(gd.getHostTree(gn));
-        logger.debug(gd.getViewTree(gn));
+        logger.debug("{}", gd.getHostTree(gn));
+        logger.debug("{}", gd.getViewTree(gn));
     }
 
     @Test
@@ -75,8 +75,8 @@ public class TestDescFactory {
         Assert.assertTrue(gd.isSiUnit());
         Assert.assertEquals("verticallabel", gd.getVerticalLabel());
         GraphNode gn = new GraphNode(GetMoke.getProbe(), gd);
-        logger.debug(gd.getHostTree(gn));
-        logger.debug(gd.getViewTree(gn));
+        logger.debug("{}", gd.getHostTree(gn));
+        logger.debug("{}", gd.getViewTree(gn));
     }
 
     @Test
@@ -92,8 +92,8 @@ public class TestDescFactory {
         Assert.assertEquals("specificvalue1", pd.getSpecific("specificname1"));
         Assert.assertEquals("specificvalue2", pd.getSpecific("specificname2"));
         Assert.assertEquals(0.5, pd.getUptimefactor(), 0);
-        logger.trace(pd.getCollectMapping());
-        logger.trace(pd.getDefaultBeans());
+        logger.trace("{}", pd.getCollectMapping());
+        logger.trace("{}", pd.getDefaultBeans());
         // An empty collect string should not be collected
         Assert.assertEquals(5, pd.getCollectMapping().size());
     }
@@ -103,7 +103,7 @@ public class TestDescFactory {
         JrdsDocument d = Tools.parseRessource("baddesc.xml");
         PropertiesManager pm = new PropertiesManager();
 
-        List<LoggingEvent> logged = Tools.getLogChecker("jrds.configuration.ConfigObjectBuilder");
+        List<LoggingEvent> logged = logrule.getLogChecker("jrds.configuration.ConfigObjectBuilder");
 
         ProbeDescBuilder builder = new ProbeDescBuilder();
         builder.setPm(pm);

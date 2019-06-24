@@ -21,10 +21,11 @@ import jrds.graphe.Sum;
 import jrds.starter.Listener;
 import jrds.starter.Timer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConfigObjectFactory {
-    static final private Logger logger = Logger.getLogger(ConfigObjectFactory.class);
+    static final private Logger logger = LoggerFactory.getLogger(ConfigObjectFactory.class);
 
     private ProbeFactory pf;
     private ClassLoader cl = this.getClass().getClassLoader();
@@ -54,9 +55,9 @@ public class ConfigObjectFactory {
             throw new RuntimeException("Can't build loader parser", e);
         }
 
-        logger.debug(jrds.Util.delayedFormatString("Scanning %s for probes libraries", pm.libspath));
+        logger.debug("{}", jrds.Util.delayedFormatString("Scanning %s for probes libraries", pm.libspath));
         for(URI lib: pm.libspath) {
-            logger.info(jrds.Util.delayedFormatString("Adding lib %s", lib));
+            logger.info("{}", jrds.Util.delayedFormatString("Adding lib %s", lib));
             load.importUrl(lib);
         }
 
@@ -99,14 +100,14 @@ public class ConfigObjectFactory {
         Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.ARCHIVESSET);
         archivessetmap = getObjectMap(new ArchivesSetBuilder(), nodemap);
         archivessetmap.put(ArchivesSet.DEFAULT.getName(), ArchivesSet.DEFAULT);
-        logger.debug(jrds.Util.delayedFormatString("Archives set configured: %s", archivessetmap.keySet()));
+        logger.debug("{}", jrds.Util.delayedFormatString("Archives set configured: %s", archivessetmap.keySet()));
         return archivessetmap;
     }
 
     public Map<String, Macro> setMacroMap() {
         Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.MACRODEF);
         macrosmap = getObjectMap(new MacroBuilder(), nodemap);
-        logger.debug(jrds.Util.delayedFormatString("Macro configured: %s", macrosmap.keySet()));
+        logger.debug("{}", jrds.Util.delayedFormatString("Macro configured: %s", macrosmap.keySet()));
         return macrosmap;
     }
 
@@ -115,7 +116,7 @@ public class ConfigObjectFactory {
         GraphDescBuilder ob = new GraphDescBuilder();
         ob.setPm(pm);
         Map<String, GraphDesc> graphsMap = getObjectMap(ob, nodemap);
-        logger.debug(jrds.Util.delayedFormatString("Graphs configured: %s", graphsMap.keySet()));
+        logger.debug("{}", jrds.Util.delayedFormatString("Graphs configured: %s", graphsMap.keySet()));
         return graphsMap;
     }
 
@@ -124,7 +125,7 @@ public class ConfigObjectFactory {
         GraphDescBuilder ob = new GraphDescBuilder();
         ob.setPm(pm);
         graphDescMap = getObjectMap(ob, nodemap);
-        logger.debug(jrds.Util.delayedFormatString("Graph description configured: %s", graphDescMap.keySet()));
+        logger.debug("{}", jrds.Util.delayedFormatString("Graph description configured: %s", graphDescMap.keySet()));
         return graphDescMap;
     }
 
@@ -136,7 +137,7 @@ public class ConfigObjectFactory {
         ob.setGraphDescMap(graphDescMap);
         Map<String, ProbeDesc<? extends Object>> probeDescMap = getObjectMap(ob, nodemap);
         pf = new ProbeFactory(probeDescMap, graphDescMap);
-        logger.debug(jrds.Util.delayedFormatString("Probe description configured: %s", probeDescMap.keySet()));
+        logger.debug("{}", jrds.Util.delayedFormatString("Probe description configured: %s", probeDescMap.keySet()));
         return probeDescMap;
     }
 
@@ -152,7 +153,7 @@ public class ConfigObjectFactory {
         ob.setGraphDescMap(graphDescMap);
         ob.setArchivesSetMap(archivessetmap);
         Map<String, HostInfo> hostsMap = getObjectMap(ob, nodemap);
-        logger.debug(jrds.Util.delayedFormatString("Hosts configured: %s", hostsMap.keySet()));
+        logger.debug("{}", jrds.Util.delayedFormatString("Hosts configured: %s", hostsMap.keySet()));
         return hostsMap;
     }
 
@@ -161,7 +162,7 @@ public class ConfigObjectFactory {
         FilterBuilder ob = new FilterBuilder();
         ob.setPm(pm);
         Map<String, Filter> filtersMap = getObjectMap(ob, nodemap);
-        logger.debug(jrds.Util.delayedFormatString("Filters configured: %s", filtersMap.keySet()));
+        logger.debug("{}", jrds.Util.delayedFormatString("Filters configured: %s", filtersMap.keySet()));
         return filtersMap;
     }
 
@@ -170,7 +171,7 @@ public class ConfigObjectFactory {
         SumBuilder ob = new SumBuilder();
         ob.setPm(pm);
         Map<String, Sum> sumpsMap = getObjectMap(ob, nodemap);
-        logger.debug(jrds.Util.delayedFormatString("Sums configured: %s", sumpsMap.keySet()));
+        logger.debug("{}", jrds.Util.delayedFormatString("Sums configured: %s", sumpsMap.keySet()));
         return sumpsMap;
     }
 
@@ -178,7 +179,7 @@ public class ConfigObjectFactory {
         Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.TAB);
         TabBuilder ob = new TabBuilder();
         Map<String, Tab> tabsMap = getObjectMap(ob, nodemap);
-        logger.debug(jrds.Util.delayedFormatString("Tabs configured: %s", tabsMap.keySet()));
+        logger.debug("{}", jrds.Util.delayedFormatString("Tabs configured: %s", tabsMap.keySet()));
         return tabsMap;
     }
 
@@ -187,7 +188,7 @@ public class ConfigObjectFactory {
         ListenerBuilder ob = new ListenerBuilder();
         ob.setClassLoader(cl);
         listenerMap = getObjectMap(ob, nodemap);
-        logger.debug(jrds.Util.delayedFormatString("listener configured: %s", listenerMap.keySet()));
+        logger.debug("{}", jrds.Util.delayedFormatString("listener configured: %s", listenerMap.keySet()));
         return listenerMap;
     }
 

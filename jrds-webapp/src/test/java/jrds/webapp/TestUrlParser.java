@@ -13,24 +13,23 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import jrds.GraphNode;
-import jrds.HostsList;
-import jrds.Log4JRule;
-import jrds.Period;
-import jrds.Probe;
-import jrds.PropertiesManager;
-import jrds.Tools;
-import jrds.mockobjects.GetMoke;
-import jrds.mockobjects.MockGraph;
-import jrds.mockobjects.MokeProbe;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
+
+import jrds.GraphNode;
+import jrds.HostsList;
+import jrds.Log4JRule;
+import jrds.Period;
+import jrds.PropertiesManager;
+import jrds.Tools;
+import jrds.mockobjects.GetMoke;
+import jrds.mockobjects.MockGraph;
+import jrds.mockobjects.MokeProbe;
 
 public class TestUrlParser {
     static final private DateFormat fullISOFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -71,7 +70,7 @@ public class TestUrlParser {
         p.configure();
         GraphNode gn = new MockGraph(p);
         gn.getGraphDesc().setGraphName("MockGraph");
-        logger.trace(gn);
+        logger.trace("{}", gn);
         p.addGraph(gn);
         hl.addProbe(p);
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);

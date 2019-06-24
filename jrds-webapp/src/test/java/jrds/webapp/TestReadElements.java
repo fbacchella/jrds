@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpTester.Response;
 import org.eclipse.jetty.servlet.ServletTester;
 import org.json.JSONObject;
@@ -18,14 +16,15 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
 import fr.jrds.snmpcodec.OIDFormatter;
+import jrds.Log4JRule;
 import jrds.PropertiesManager;
 import jrds.Tools;
 
 public class TestReadElements {
-    static final private Logger logger = Logger.getLogger(TestReadElements.class);
-
     static ServletTester tester = null;
 
     private final class TreeContent {
@@ -36,16 +35,23 @@ public class TestReadElements {
     }
 
     @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    public final TemporaryFolder testFolder = new TemporaryFolder();
+
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
     static public void configure() throws Exception {
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, TestReadElements.class.getName(), "jrds.webapp");
-        //Tools.configureSnmp();
         OIDFormatter.register("/usr/share/snmp/mibs");
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, TestReadElements.class.getName(), "jrds.webapp");
     }
 
     @Before

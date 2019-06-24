@@ -1,13 +1,15 @@
 package jrds.starter;
 
-import jrds.HostsList;
-import jrds.Tools;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.event.Level;
+
+import jrds.HostsList;
+import jrds.Log4JRule;
+import jrds.Tools;
 
 public class StarterTest {
     static class LocalStarter extends Starter {
@@ -32,14 +34,17 @@ public class StarterTest {
         }
     }
 
-    static Logger logger = Logger.getLogger(StarterTest.class);
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
+    }
 
-        logger.setLevel(Level.TRACE);
-        Tools.setLevel(new String[] { StarterNode.class.toString(), Starter.class.toString() }, logger.getLevel());
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, StarterNode.class.toString(), Starter.class.toString());
     }
 
     @Test

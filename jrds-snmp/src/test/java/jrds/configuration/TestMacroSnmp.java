@@ -1,17 +1,40 @@
 package jrds.configuration;
+
+import java.io.IOException;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.event.Level;
 
 import jrds.HostInfo;
+import jrds.Log4JRule;
 import jrds.Macro;
 import jrds.Tools;
-import jrds.configuration.HostBuilder;
-import jrds.configuration.TestMacro;
 import jrds.factories.xml.JrdsDocument;
 import jrds.starter.ConnectionInfo;
 
 public class TestMacroSnmp extends TestMacro {
-    
+
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+
+    @BeforeClass
+    static public void configure() throws ParserConfigurationException, IOException {
+        Tools.configure();
+        Tools.prepareXml(false);
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.configuration.HostBuilder", "jrds.factories", "jrds.starter.ChainedProperties", "jrds.factories.xml");
+        logrule.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
+    }
+
     @Test
     public void testMacroStarter() throws Exception {
         JrdsDocument d = Tools.parseString(TestMacro.goodMacroXml);

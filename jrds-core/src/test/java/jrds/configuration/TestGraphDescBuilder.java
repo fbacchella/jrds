@@ -13,8 +13,6 @@ import javax.imageio.ImageWriter;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -26,6 +24,8 @@ import org.rrd4j.data.Plottable;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
 import org.rrd4j.graph.RrdGraphInfo;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 import org.w3c.dom.Document;
 
 import jrds.GraphDesc;

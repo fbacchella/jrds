@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 
 import jrds.PropertiesManager;
 import jrds.factories.ProbeBean;

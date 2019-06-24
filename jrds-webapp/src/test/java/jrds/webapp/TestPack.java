@@ -4,11 +4,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Properties;
 
-import jrds.Period;
-import jrds.Tools;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpTester.Request;
 import org.eclipse.jetty.http.HttpTester.Response;
 import org.eclipse.jetty.servlet.ServletTester;
@@ -19,21 +14,34 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
+
+import jrds.Log4JRule;
+import jrds.Period;
+import jrds.Tools;
 
 public class TestPack {
-    static final private Logger logger = Logger.getLogger(TestPack.class);
 
     ServletTester tester = null;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
+
     @BeforeClass
     static public void configure() throws Exception {
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, ParamsBean.class.getName(), JSonQueryParams.class.getName(), JSonPack.class.getName());
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, ParamsBean.class.getName(), JSonQueryParams.class.getName(), JSonPack.class.getName());
     }
 
     @Before
@@ -73,7 +81,7 @@ public class TestPack {
         Assert.assertEquals("0", params.get("min"));
         Assert.assertEquals("10", params.get("max"));
         Period p = new Period(params.get("begin").toString(), params.get("end").toString());
-        logger.trace(p);
+        logger.trace("{}", p);
         Assert.assertEquals(1000, p.getBegin().getTime());
         Assert.assertEquals(60000, p.getEnd().getTime());
     }

@@ -14,7 +14,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 
 import jrds.ConnectedProbe;
 import jrds.ProbeConnected;

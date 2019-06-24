@@ -9,13 +9,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.slf4j.event.Level;
+import org.snmp4j.smi.OID;
+
 import jrds.JrdsSample;
 import jrds.factories.ProbeBean;
 import jrds.snmp.SnmpVars;
 import jrds.snmp.TabularIterator;
-
-import org.apache.log4j.Level;
-import org.snmp4j.smi.OID;
 
 /**
  * A class to probe info about a process, using MIB-II

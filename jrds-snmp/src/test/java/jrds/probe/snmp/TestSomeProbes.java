@@ -1,20 +1,20 @@
 package jrds.probe.snmp;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.event.Level;
 
+import jrds.Log4JRule;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.Tools;
@@ -22,15 +22,23 @@ import jrds.configuration.ConfigObjectFactory;
 
 public class TestSomeProbes {
 
-    static final private Logger logger = Logger.getLogger(MethodHandles.lookup().lookupClass());
+    @BeforeClass
+    static public void configure() throws ParserConfigurationException, IOException {
+        Tools.prepareXml(true);
+        Tools.configure();
+    }
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
-    @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
-        Tools.prepareXml(true);
-        Tools.setLevel(logger, Level.TRACE, "jrds.PropertiesManager", "jrds.probe.snmp", "jrds.snmp");
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.PropertiesManager", "jrds.probe.snmp", "jrds.snmp");
+        logrule.setLevel(Level.ERROR, "jrds.configuration.ProbeDescBuilder");
+        logrule.setLevel(Level.ERROR, "jrds.ProbeDesc");
     }
 
     /**

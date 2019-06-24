@@ -11,17 +11,18 @@ import jrds.store.ExtractInfo;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.Plottable;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 import eu.bengreen.data.utility.LargestTriangleThreeBuckets;
 
 public class Graph implements WithACL {
-    static final private Logger logger = Logger.getLogger(Graph.class);
+    static final private Logger logger = LoggerFactory.getLogger(Graph.class);
 
     private static final ThreadLocal<SimpleDateFormat> lastUpdateFormat = new ThreadLocal<SimpleDateFormat>() {
         @Override
@@ -287,7 +288,7 @@ public class Graph implements WithACL {
     }
 
     public void setPeriod(Period p) {
-        logger.trace(jrds.Util.delayedFormatString("Period for graph: %s", p));
+        logger.trace("{}", jrds.Util.delayedFormatString("Period for graph: %s", p));
         setStart(p.getBegin());
         setEnd(p.getEnd());
     }

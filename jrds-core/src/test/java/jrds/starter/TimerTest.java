@@ -2,29 +2,34 @@ package jrds.starter;
 
 import java.io.IOException;
 
-import jrds.PropertiesManager;
-import jrds.Tools;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.event.Level;
+
+import jrds.Log4JRule;
+import jrds.PropertiesManager;
+import jrds.Tools;
 
 public class TimerTest {
-    static Logger logger = Logger.getLogger(TimerTest.class);
 
     @Rule
     public final TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
+    }
 
-        logger.setLevel(Level.TRACE);
-        Tools.setLevel(logger.getLevel(), StarterNode.class.getCanonicalName(), Starter.class.getCanonicalName());
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, StarterNode.class.getCanonicalName(), Starter.class.getCanonicalName());
     }
 
     @Test

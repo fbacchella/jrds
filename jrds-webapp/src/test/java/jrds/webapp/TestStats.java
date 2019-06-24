@@ -2,10 +2,6 @@ package jrds.webapp;
 
 import java.util.Properties;
 
-import jrds.Tools;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpTester.Response;
 import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Assert;
@@ -14,21 +10,31 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.event.Level;
+
+import jrds.Log4JRule;
+import jrds.Tools;
 
 public class TestStats {
-    static final private Logger logger = Logger.getLogger(TestStats.class);
 
     ServletTester tester = null;
 
     @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    public final TemporaryFolder testFolder = new TemporaryFolder();
+
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws Exception {
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, Status.class.getName());
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, Status.class.getName());
     }
 
     @Before

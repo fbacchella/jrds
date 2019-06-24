@@ -6,9 +6,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.rrd4j.data.DataProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 import jrds.factories.ArgFactory;
 import jrds.store.ExtractInfo;
@@ -21,7 +22,7 @@ import jrds.webapp.WithACL;
  */
 public class GraphNode implements Comparable<GraphNode>, WithACL {
 
-    static final private Logger logger = Logger.getLogger(GraphNode.class);
+    static final private Logger logger = LoggerFactory.getLogger(GraphNode.class);
 
     protected Probe<?, ?> probe;
     private String viewPath = null;
@@ -138,7 +139,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
             g = gclass.getConstructor(GraphNode.class).newInstance(this);
             beansList = ArgFactory.getBeanPropertiesMap(gclass, Graph.class);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            Util.log(this, logger, Level.ERROR, e, "Failed to build a graph instance  %s", gclass.getCanonicalName());
+            Util.log(this, logger, Level.ERROR, e, "Failed to build a graph instance %s: %s", gclass.getCanonicalName(), e.getMessage());
             return null;
         }
 
@@ -151,7 +152,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
                 logger.error(String.format("Unknown bean for %s: %s", gd.getName(), name));
                 continue;
             }
-            logger.trace(Util.delayedFormatString("Found attribute %s with value %s", name, textValue));
+            logger.trace("{}", Util.delayedFormatString("Found attribute %s with value %s", name, textValue));
             bean.set(g, textValue);
         }
         return g;

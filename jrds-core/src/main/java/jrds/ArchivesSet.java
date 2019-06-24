@@ -3,7 +3,8 @@ package jrds;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.ArcDef;
 
@@ -14,7 +15,7 @@ import org.rrd4j.core.ArcDef;
  *
  */
 public class ArchivesSet extends ArrayList<ArcDef> {
-    static private final Logger logger = Logger.getLogger(ArchivesSet.class);
+    static private final Logger logger = LoggerFactory.getLogger(ArchivesSet.class);
 
     private final String name;
 
@@ -29,7 +30,7 @@ public class ArchivesSet extends ArrayList<ArcDef> {
 
     public void addArchive(ArcDef arcDef) {
         add(arcDef);
-        logger.trace(Util.delayedFormatString("Adding archive: %s", arcDef.dump()));
+        logger.trace("Adding archive: {}", Util.delayedFormatString("%s", arcDef.dump()));
     }
 
     public ArcDef[] getArchives() {

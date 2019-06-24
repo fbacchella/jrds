@@ -8,11 +8,12 @@ import jrds.Util;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FilterBuilder extends ConfigObjectBuilder<Filter> {
 
-    static final private Logger logger = Logger.getLogger(FilterBuilder.class);
+    static final private Logger logger = LoggerFactory.getLogger(FilterBuilder.class);
 
     public FilterBuilder() {
         super(ConfigType.FILTER);
@@ -37,7 +38,7 @@ public class FilterBuilder extends ConfigObjectBuilder<Filter> {
         setMethod(root.getChildElementsByName("tag"), f, "addTag", String.class);
         setMethod(root.getChildElementsByName("qualifiedname"), f, "addGraph", String.class);
         doACL(f, n, root);
-        logger.trace(Util.delayedFormatString("Filter loaded: %s", f.getName()));
+        logger.trace("{}", Util.delayedFormatString("Filter loaded: %s", f.getName()));
         return f;
     }
 

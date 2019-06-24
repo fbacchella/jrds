@@ -40,7 +40,8 @@ import jrds.Util;
 import jrds.Util.SiPrefix;
 import net.iharder.Base64;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.json.JSONException;
 
 /**
@@ -50,7 +51,7 @@ import org.json.JSONException;
  */
 public class ParamsBean implements Serializable {
 
-    static final private Logger logger = Logger.getLogger(ParamsBean.class);
+    static final private Logger logger = LoggerFactory.getLogger(ParamsBean.class);
 
     static public final String TREECHOICE = "tree";
     static public final String TABCHOICE = "tab";
@@ -113,7 +114,7 @@ public class ParamsBean implements Serializable {
                     sb.append(m.group(i));
                     sb.append(" ");
                 }
-                logger.trace(sb);
+                logger.trace("{}", sb);
                 String next = m.group(2);
                 if(next != null)
                     m = splitPattern.matcher(next);
@@ -122,7 +123,7 @@ public class ParamsBean implements Serializable {
             }
             params = new HashMap<String, String[]>(restPath.length);
             String[] path = probeInfo.trim().split("/");
-            logger.trace(jrds.Util.delayedFormatString("mapping %s to %s", Arrays.asList(path), Arrays.asList(restPath)));
+            logger.trace("{}", jrds.Util.delayedFormatString("mapping %s to %s", Arrays.asList(path), Arrays.asList(restPath)));
             int elem = Math.min(path.length - 1, restPath.length);
             for(int i = 0; i < elem; i++) {
                 String value = path[i + 1];
@@ -147,7 +148,7 @@ public class ParamsBean implements Serializable {
 
     // Not a really useful method, just to reduce warning
     private Map<String, String[]> getReqParamsMap(HttpServletRequest req) {
-        logger.trace(jrds.Util.delayedFormatString("Parameter map for %s: %s", req, req.getParameterMap()));
+        logger.trace("{}", jrds.Util.delayedFormatString("Parameter map for %s: %s", req, req.getParameterMap()));
         return new HashMap<String, String[]>(req.getParameterMap());
     }
 
@@ -173,7 +174,7 @@ public class ParamsBean implements Serializable {
                     roles.add(role);
             }
         }
-        logger.trace(Util.delayedFormatString("Found user %s with roles %s", user, roles));
+        logger.trace("{}", Util.delayedFormatString("Found user %s with roles %s", user, roles));
     }
 
     private void unpack(String packed) {
@@ -198,14 +199,14 @@ public class ParamsBean implements Serializable {
                 Object value = json.get(key);
                 String newkey = JSonPack.JSONKEYS.get(new Integer(key));
                 params.put(newkey, new String[] { value.toString() });
-                logger.trace(jrds.Util.delayedFormatString("adding %s = %s", newkey, value));
+                logger.trace("{}", jrds.Util.delayedFormatString("adding %s = %s", newkey, value));
             }
         } catch (IOException e) {
             logger.error("IOException " + e, e);
         } catch (JSONException e) {
             logger.error("JSON parsing exception " + e);
         }
-        logger.trace(jrds.Util.delayedFormatString("Params unpacked: %s", params));
+        logger.trace("{}", jrds.Util.delayedFormatString("Params unpacked: %s", params));
     }
 
     private void parseReq(HostsList hl) {
@@ -341,7 +342,7 @@ public class ParamsBean implements Serializable {
         if(id != null)
             gn = hostlist.getGraphById(id);
         if(gn != null) {
-            logger.debug(jrds.Util.delayedFormatString("Graph found: %s", gn));
+            logger.debug("{}", jrds.Util.delayedFormatString("Graph found: %s", gn));
         } else if(pid != null && pid != 0 && dsName != null) {
             if(!caller.allowed(this, hostlist.getDefaultRoles()))
                 return null;
@@ -350,7 +351,7 @@ public class ParamsBean implements Serializable {
                 logger.error("Looking for unknown probe");
                 return null;
             }
-            logger.debug(jrds.Util.delayedFormatString("Probe found: %s", p));
+            logger.debug("{}", jrds.Util.delayedFormatString("Probe found: %s", p));
 
             Graphics2D g2d = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB).createGraphics();
             String graphDescName = p.getName() + "." + dsName;
@@ -376,14 +377,14 @@ public class ParamsBean implements Serializable {
         if(id != null) {
             GraphTree node = hostlist.getNodeById(id);
             if(node != null) {
-                logger.debug(jrds.Util.delayedFormatString("Tree found: %s", node));
+                logger.debug("{}", jrds.Util.delayedFormatString("Tree found: %s", node));
                 Filter filter = getFilter();
                 return node.enumerateChildsGraph(filter);
             }
         }
         GraphNode gn = getGraphNode(caller);
         if(gn != null) {
-            logger.debug(jrds.Util.delayedFormatString("Graph found: %s", gn));
+            logger.debug("{}", jrds.Util.delayedFormatString("Graph found: %s", gn));
             return Collections.singletonList(gn);
         }
         return Collections.emptyList();
@@ -467,7 +468,7 @@ public class ParamsBean implements Serializable {
 
     public String makeObjectUrl(String file, Object o, boolean timeAbsolute) {
         Map<String, Object> args = doArgsMap(o, timeAbsolute);
-        logger.trace(jrds.Util.delayedFormatString("Params string:%s ", args));
+        logger.trace("{}", jrds.Util.delayedFormatString("Params string:%s ", args));
         // We build the Url
         StringBuilder urlBuffer = new StringBuilder();
         urlBuffer.append(contextPath);

@@ -10,8 +10,10 @@ import jrds.Tools;
 import jrds.mockobjects.GenerateProbe;
 import jrds.mockobjects.GetMoke;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -23,7 +25,7 @@ import org.rrd4j.core.RrdDef;
 import org.rrd4j.core.Sample;
 
 public class TestUpgrade {
-    static final private Logger logger = Logger.getLogger(TestUpgrade.class);
+    static final private Logger logger = LoggerFactory.getLogger(TestUpgrade.class);
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();

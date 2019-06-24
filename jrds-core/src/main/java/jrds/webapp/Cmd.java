@@ -14,14 +14,15 @@ import jrds.HostsList;
 import jrds.Util;
 import jrds.starter.Timer;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Servlet implementation class Cmd
  */
 @ServletSecurity
 public class Cmd extends JrdsServlet {
-    static final private Logger logger = Logger.getLogger(Cmd.class);
+    static final private Logger logger = LoggerFactory.getLogger(Cmd.class);
 
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
@@ -34,7 +35,7 @@ public class Cmd extends JrdsServlet {
         if(command == null || "".equals(command)) {
             command = req.getServletPath().substring(1);
         }
-        logger.debug(Util.delayedFormatString("Command found: %s", command));
+        logger.debug("{}", Util.delayedFormatString("Command found: %s", command));
 
         if(!allowed(params, getPropertiesManager().adminACL, req, res))
             return;

@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
+import org.slf4j.event.Level;
+
 import jrds.ArchivesSet;
 import jrds.HostInfo;
 import jrds.JrdsSample;
@@ -13,8 +15,6 @@ import jrds.ProbeDesc;
 import jrds.store.EmptyExtractor;
 import jrds.store.Extractor;
 import jrds.store.Store;
-
-import org.apache.log4j.Level;
 
 public class ContainerProbe extends Probe<Object, Number> {
     static private final HostInfo ContainerHost = new HostInfo("ContainerHost");

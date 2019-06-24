@@ -7,11 +7,12 @@ import jrds.Tab;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TabBuilder extends ConfigObjectBuilder<Tab> {
 
-    static final private Logger logger = Logger.getLogger(TabBuilder.class);
+    static final private Logger logger = LoggerFactory.getLogger(TabBuilder.class);
 
     public TabBuilder() {
         super(ConfigType.TAB);

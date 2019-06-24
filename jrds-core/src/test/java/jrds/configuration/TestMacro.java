@@ -9,16 +9,18 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 import org.w3c.dom.DocumentFragment;
 
 import jrds.HostInfo;
+import jrds.Log4JRule;
 import jrds.Macro;
 import jrds.Probe;
 import jrds.PropertiesManager;
@@ -28,7 +30,6 @@ import jrds.mockobjects.MokeProbe;
 import jrds.mockobjects.MokeProbeFactory;
 
 public class TestMacro {
-    static final private Logger logger = Logger.getLogger(TestMacro.class);
 
     protected static final String goodMacroXml =
                     "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>" +
@@ -52,13 +53,20 @@ public class TestMacro {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
+
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.prepareXml(false);
+    }
 
-        Tools.setLevel(logger, Level.TRACE, "jrds.configuration.HostBuilder", "jrds.factories", "jrds.starter.ChainedProperties", "jrds.factories.xml");
-        Logger.getLogger("jrds.factories.xml.CompiledXPath").setLevel(Level.INFO);
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
+        logrule.setLevel(Level.TRACE, "jrds.configuration.HostBuilder", "jrds.factories", "jrds.starter.ChainedProperties", "jrds.factories.xml");
     }
 
     protected static Macro doMacro(JrdsDocument d, String name) {
@@ -113,7 +121,7 @@ public class TestMacro {
         for(Probe<?, ?> p: host.getProbes()) {
             probesName.add(p.toString());
         }
-        logger.trace(probesName);
+        logger.trace("{}", probesName);
         Assert.assertTrue("MacroProbe1 not found", probesName.contains("myhost/MacroProbe1"));
         Assert.assertTrue("MacroProbe2 not found", probesName.contains("myhost/MacroProbe2"));
     }

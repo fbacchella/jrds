@@ -6,11 +6,12 @@ import java.util.Properties;
 
 import jrds.jmx.Management;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JMX extends CommandStarterImpl {
 
-    static private final Logger logger = Logger.getLogger(Jetty.class);
+    static private final Logger logger = LoggerFactory.getLogger(Jetty.class);
 
     int port = 8080;
     String propFileName = "jrds.properties";
@@ -26,16 +27,12 @@ public class JMX extends CommandStarterImpl {
     public void start(String[] args) throws Exception {
         System.setProperty("java.awt.headless", "true");
 
-        jrds.JrdsLoggerConfiguration.initLog4J();
-
         Properties pm = new Properties();
         File propFile = new File(propFileName);
         if(propFile.isFile())
             pm.load(new FileReader(propFile));
         pm.setProperty("withjmx", "yes");
         jrds.Configuration.configure(pm);
-
-        jrds.JrdsLoggerConfiguration.configure(jrds.Configuration.get().getPropertiesManager());
 
         if(jrds.Configuration.get().getPropertiesManager().withjmx) {
             doJmx(jrds.Configuration.get().getPropertiesManager());

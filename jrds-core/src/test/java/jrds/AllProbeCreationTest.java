@@ -10,14 +10,14 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
 import jrds.configuration.ConfigObjectFactory;
 import jrds.factories.ProbeFactory;
@@ -26,17 +26,17 @@ import jrds.starter.HostStarter;
 public class AllProbeCreationTest {
 
     @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    public final TemporaryFolder testFolder = new TemporaryFolder();
 
     @Rule
-    public Log4JRule logrule = new Log4JRule(this);
+    public final Log4JRule logrule = new Log4JRule(this);
     private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
     }
-    
+
     @Before
     public void loggers() {
         logrule.setLevel(Level.TRACE, "jrds.Util");

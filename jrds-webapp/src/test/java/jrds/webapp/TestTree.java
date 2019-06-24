@@ -2,10 +2,6 @@ package jrds.webapp;
 
 import java.util.Properties;
 
-import jrds.Tools;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpTester.Response;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -14,15 +10,22 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
+
+import jrds.Log4JRule;
+import jrds.Tools;
 
 public class TestTree {
-
-    static final private Logger logger = Logger.getLogger(TestQueryParams.class);
 
     org.eclipse.jetty.servlet.ServletTester tester = null;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
+
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
     static public void configure() throws Exception {
@@ -30,7 +33,11 @@ public class TestTree {
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
         Tools.prepareXml(false);
-        Tools.setLevel(logger, Level.TRACE, GetDiscoverHtmlCode.class.getName(), "jrds.webapp.Configuration", "jrds.webapp.JrdsServlet");
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, GetDiscoverHtmlCode.class.getName(), "jrds.webapp.Configuration", "jrds.webapp.JrdsServlet");
     }
 
     @Before
@@ -43,7 +50,7 @@ public class TestTree {
     public void testDiscover() throws Exception {
         Response response = ToolsWebApp.doRequestGet(tester, "http://localhost/jsontree?tab=hoststab", 200);
 
-        logger.trace(response.getContent());
+        logger.trace("{}", response.getContent());
         JSONObject qp = new JSONObject(response.getContent());
         for(String key: new String[] { "identifier", "label", "items" }) {
             Assert.assertTrue(key + " not found", qp.has(key));

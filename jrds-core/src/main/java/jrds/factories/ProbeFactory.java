@@ -5,13 +5,13 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jrds.GraphDesc;
-import jrds.GraphNode;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.Util;
-
-import org.apache.log4j.Logger;
 
 /**
  * A class to find probe by their names
@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
  */
 public class ProbeFactory {
 
-    private final Logger logger = Logger.getLogger(ProbeFactory.class);
+    private final Logger logger = LoggerFactory.getLogger(ProbeFactory.class);
     private Map<String, ProbeDesc<?>> probeDescMap;
     private Map<String, GraphDesc> graphDescMap;
 
@@ -116,7 +116,7 @@ public class ProbeFactory {
                 if(gd != null) {
                     p.addGraph(gd);
                 } else {
-                    logger.warn(Util.delayedFormatString("Unknown graph %s for probe %s", graphName, p));
+                    logger.warn("{}", Util.delayedFormatString("Unknown graph %s for probe %s", graphName, p));
                 }
             }
             return true;

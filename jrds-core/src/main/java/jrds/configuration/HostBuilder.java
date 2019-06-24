@@ -38,11 +38,12 @@ import jrds.starter.Listener;
 import jrds.starter.Timer;
 import jrds.store.StoreFactory;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
-    static final private Logger logger = Logger.getLogger(HostBuilder.class);
+    static final private Logger logger = LoggerFactory.getLogger(HostBuilder.class);
 
     private ClassLoader classLoader = null;
     private ProbeFactory pf;
@@ -101,7 +102,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         }
 
         for(JrdsElement tagElem: fragment.getChildElementsByName("tag")) {
-            logger.trace(Util.delayedFormatString("adding tag %s to %s", tagElem, host));
+            logger.trace("{}", Util.delayedFormatString("adding tag %s to %s", tagElem, host));
             String textContent = tagElem.getTextContent();
             if(textContent != null) {
                 host.addTag(Util.parseTemplate(textContent.trim(), host, properties));
@@ -115,17 +116,17 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 set.add(e.getTextContent());
             }
             collections.put(name, set);
-            logger.trace(Util.delayedFormatString("adding collection %s with name %s to %s", set, name, host));
+            logger.trace("{}", Util.delayedFormatString("adding collection %s with name %s to %s", set, name, host));
         }
 
         for(JrdsElement macroNode: fragment.getChildElementsByName("macro")) {
             String name = macroNode.getAttribute("name");
             Macro m = macrosMap.get(name);
-            logger.trace(Util.delayedFormatString("Adding macro %s: %s", name, m));
+            logger.trace("{}", Util.delayedFormatString("Adding macro %s: %s", name, m));
             if (m != null) {
                 Map<String, String> macroProps = makeProperties(macroNode, properties, host);
-                logger.trace(Util.delayedFormatString("properties inherited for macro %s: %s", m, properties));
-                logger.trace(Util.delayedFormatString("local properties for macro %s: %s", m, macroProps));
+                logger.trace("{}", Util.delayedFormatString("properties inherited for macro %s: %s", m, properties));
+                logger.trace("{}", Util.delayedFormatString("local properties for macro %s: %s", m, macroProps));
                 Map<String, String> newProps = new HashMap<String, String>((properties != null ? properties.size() : 0) + macroProps.size());
                 if(properties != null)
                     newProps.putAll(properties);
@@ -171,7 +172,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                     } else {
                         temp = Collections.singletonMap(iterprop, i);
                     }
-                    logger.trace(Util.delayedFormatString("for using %s", temp));
+                    logger.trace("{}", Util.delayedFormatString("for using %s", temp));
                     parseFragment(forNode, host, collections, temp);
                 }
             } else {
@@ -189,13 +190,13 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 if(logger.isDebugEnabled()) {
                     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                     e.printStackTrace(new PrintStream(buffer));
-                    logger.debug(buffer);
+                    logger.debug("{}", buffer);
                 }
             } catch (Exception e) {
                 logger.error("Probe creation failed for host " + host.getName() + ": ");
                 ByteArrayOutputStream buffer = new ByteArrayOutputStream();
                 e.printStackTrace(new PrintStream(buffer));
-                logger.error(buffer);
+                logger.error("{}", buffer);
             }
         }
 
@@ -233,7 +234,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
         List<DataSourceBuilder> dsList = doDsList(type, probeNode.getElementbyName("dslist"));
         if(dsList.size() > 0) {
-            logger.trace(Util.delayedFormatString("Data source replaced for %s/%s: %s", host, type, dsList));
+            logger.trace("{}", Util.delayedFormatString("Data source replaced for %s/%s: %s", host, type, dsList));
             ProbeDesc<?> oldpd = pf.getProbeDesc(type);
             try {
                 ProbeDesc<?> pd = (ProbeDesc<?>) oldpd.clone();
@@ -261,7 +262,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             logger.error("Invalid timer '" + timerName + "' for probe " + host.getName() + "/" + type);
             return null;
         } else {
-            logger.trace(Util.delayedFormatString("probe %s/%s will use timer %s", host, type, timer));
+            logger.trace("{}", Util.delayedFormatString("probe %s/%s will use timer %s", host, type, timer));
         }
         p.setStep(timer.getStep());
         p.setTimeout(timer.getTimeout());
@@ -285,7 +286,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         // The label is set
         String label = probeNode.getAttribute("label");
         if(label != null && !"".equals(label)) {
-            logger.trace(Util.delayedFormatString("Adding label %s to %s", label, p));
+            logger.trace("{}", Util.delayedFormatString("Adding label %s to %s", label, p));
             p.setLabel(jrds.Util.parseTemplate(label, properties, p, host));
         }
 
@@ -347,7 +348,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             }
             String connexionName = probeNode.getAttribute("connection");
             if(connexionName != null && !"".equals(connexionName)) {
-                logger.trace(Util.delayedFormatString("Adding connection %s to %s", connexionName, p));
+                logger.trace("{}", Util.delayedFormatString("Adding connection %s to %s", connexionName, p));
                 connectionName = jrds.Util.parseTemplate(connexionName, host, properties);
                 cp.setConnectionName(connectionName);
             } else {
@@ -358,12 +359,12 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             // If it's null, it an optionnal connection, like in HttpProbe, don't insist on registring it.
             if (connectionName != null && p.find(connectionName) == null) {
                 if (logger.isTraceEnabled())
-                    logger.trace(Util.delayedFormatString("Looking for connection %s in %s", connectionName, host.getConnections()));
+                    logger.trace("{}", Util.delayedFormatString("Looking for connection %s in %s", connectionName, host.getConnections()));
                 ConnectionInfo ci = host.getConnection(connectionName);
                 if (ci != null)
                     ci.register(shost);
                 else {
-                    logger.error(Util.delayedFormatString("Failed to find a connection %s for a probe %s", connectionName, cp));
+                    logger.error("{}", Util.delayedFormatString("Failed to find a connection %s for a probe %s", connectionName, cp));
                     return null;
                 }
             }
@@ -375,7 +376,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         try {
             p.setMainStore(pm.defaultStore, empty);
         } catch (Exception e1) {
-            logger.error(Util.delayedFormatString("Failed to configure the default store for the probe %s", pm.defaultStore.getClass(), p));
+            logger.error("{}", Util.delayedFormatString("Failed to configure the default store for the probe %s", pm.defaultStore.getClass(), p));
             return null;
         }
 
@@ -383,7 +384,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             try {
                 p.addStore(e.getValue());
             } catch (Exception e1) {
-                logger.warn(Util.delayedFormatString("Failed to configure the store %s for the probe %s", e.getKey(), e.getValue().getClass().getCanonicalName(), p));
+                logger.warn("{}", Util.delayedFormatString("Failed to configure the store %s for the probe %s", e.getKey(), e.getValue().getClass().getCanonicalName(), p));
             }
         }
 
@@ -396,7 +397,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 if(l != null) {
                     pp.setListener(l);
                 } else {
-                    logger.error(Util.delayedFormatString("Listener name not found for %s: %s", pp, listenerName));
+                    logger.error("{}", Util.delayedFormatString("Listener name not found for %s: %s", pp, listenerName));
                 }
             }
         }
@@ -432,7 +433,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             logger.error(String.format("Probe %s: invalid bean %s template '%s': %s", pd.getName(), beanName, beanValue, root.getMessage()));
             return false;
         }
-        logger.trace(Util.delayedFormatString("Adding attribute %s=%s (%s) to default args", beanName, value, value.getClass()));
+        logger.trace("{}", Util.delayedFormatString("Adding attribute %s=%s (%s) to default args", beanName, value, value.getClass()));
         try {
             bean.set(p, value);
         } catch (Exception e) {
@@ -517,7 +518,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 }
                 ConnectionInfo cnx = new ConnectionInfo(connectionClass, name, args, attrs);
                 connectionSet.add(cnx);
-                logger.debug(Util.delayedFormatString("Added connection %s to node %s with beans %s", cnx, parent, attrs));
+                logger.debug("{}", Util.delayedFormatString("Added connection %s to node %s with beans %s", cnx, parent, attrs));
             } catch (ClassNotFoundException ex) {
                 logger.warn("Connection class not found: " + type + " for " + parent);
             } catch (NoClassDefFoundError ex) {
@@ -544,7 +545,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 continue;
             }
             String textValue = Util.parseTemplate(attrNode.getTextContent(), context);
-            logger.trace(Util.delayedFormatString("Found attribute %s with value %s", name, textValue));
+            logger.trace("{}", Util.delayedFormatString("Found attribute %s with value %s", name, textValue));
             bean.set(p, textValue);
             if(defaultBeans.containsKey(name)) {
                 defaultBeans.remove(name);
@@ -565,11 +566,11 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             if(key != null) {
                 String value = propNode.getTextContent();
                 value = Util.parseTemplate(value, o);
-                logger.trace(Util.delayedFormatString("Adding propertie %s=%s", key, value));
+                logger.trace("{}", Util.delayedFormatString("Adding propertie %s=%s", key, value));
                 props.put(key, value);
             }
         }
-        logger.debug(Util.delayedFormatString("Properties map: %s", props));
+        logger.debug("{}", Util.delayedFormatString("Properties map: %s", props));
         return props;
     }
 
@@ -610,7 +611,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     }
 
     public void setArchivesSetMap(Map<String, ArchivesSet> archivessetmap) {
-        logger.debug(Util.delayedFormatString("will look for archives in %s", archivessetmap));
+        logger.debug("{}", Util.delayedFormatString("will look for archives in %s", archivessetmap));
         this.archivessetmap = archivessetmap;
     }
 

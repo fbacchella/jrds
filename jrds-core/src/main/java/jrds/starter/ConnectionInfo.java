@@ -5,15 +5,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
+
 import jrds.Util;
 import jrds.factories.ArgFactory;
 import jrds.factories.ConnectionName;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-
 public class ConnectionInfo {
-    static final private Logger logger = Logger.getLogger(ConnectionInfo.class);
+    static final private Logger logger = LoggerFactory.getLogger(ConnectionInfo.class);
 
     private final List<Object> args;
     private final Map<String, String> beansValue;
@@ -56,7 +57,7 @@ public class ConnectionInfo {
             if(name != null && !name.trim().isEmpty())
                 cnx.setName(name.trim());
             node.registerStarter(cnx);
-            logger.debug(Util.delayedFormatString("Connexion registred: %s for %s", cnx, node));
+            logger.debug("{}", Util.delayedFormatString("Connexion registred: %s for %s", cnx, node));
         } catch (InvocationTargetException ex) {
             String message = ex.getCause() != null ? ex.getCause().getMessage(): ex.getMessage();
             throw new InvocationTargetException(ex.getCause(), "Error during connection creation of type " + type.getName() + " for " + node + ": " + message);

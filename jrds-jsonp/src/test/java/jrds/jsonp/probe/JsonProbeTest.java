@@ -6,13 +6,13 @@ import java.io.UncheckedIOException;
 import java.net.URL;
 import java.util.Map;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.event.Level;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
@@ -21,6 +21,7 @@ import com.jayway.jsonpath.spi.mapper.JsonOrgMappingProvider;
 
 import jrds.HostInfo;
 import jrds.JrdsSample;
+import jrds.Log4JRule;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.Tools;
@@ -29,18 +30,22 @@ import jrds.probe.HttpClientStarter;
 import jrds.starter.HostStarter;
 
 public class JsonProbeTest {
-    static Logger logger = Logger.getLogger(JsonProbeTest.class);
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
-
-        logger.setLevel(Level.TRACE);
-        Tools.setLevel(logger, Level.TRACE, "jrds.jsonp.probe.HttpJson", "jrds.jsonp.starter.JsonpProvider");
         Tools.prepareXml(false);
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.jsonp.probe.HttpJson", "jrds.jsonp.starter.JsonpProvider");
     }
 
     // Expected to fail when https://github.com/json-path/JsonPath/issues/497 will be corrected

@@ -11,25 +11,30 @@ import java.util.Properties;
 import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpServlet;
 
-import jrds.Tools;
-import jrds.factories.xml.JrdsDocument;
-import jrds.factories.xml.JrdsElement;
-import jrds.factories.xml.NodeListIterator;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.eclipse.jetty.servlet.ServletTester;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
+
+import jrds.Log4JRule;
+import jrds.Tools;
+import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
+import jrds.factories.xml.NodeListIterator;
 
 public class TestListServlet {
-    static final private Logger logger = Logger.getLogger(TestListServlet.class);
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
+
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
     static public void configure() throws Exception {
@@ -37,7 +42,11 @@ public class TestListServlet {
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
         Tools.prepareXml(false);
-        Tools.setLevel(logger, Level.TRACE, Status.class.getName());
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, Status.class.getName());
     }
 
     @Ignore
@@ -63,13 +72,13 @@ public class TestListServlet {
             @SuppressWarnings("unchecked")
             Class<? extends HttpServlet> sclass = (Class<? extends HttpServlet>) getClass().getClassLoader().loadClass(servletClassName);
             tester.addServlet(sclass, "/" + sclass.getCanonicalName());
-            logger.trace(sclass);
+            logger.trace("{}", sclass);
         }
         for(JrdsElement n: new NodeListIterator<JrdsElement>(webxml, Tools.xpather.compile("/web-app/listener/listener-class"))) {
             String className = n.getTextContent().trim();
             @SuppressWarnings("unchecked")
             Class<ServletContextListener> sclass = (Class<ServletContextListener>) getClass().getClassLoader().loadClass(className);
-            logger.trace(sclass);
+            logger.trace("{}", sclass);
         }
         cl.close();
     }

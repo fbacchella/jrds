@@ -8,7 +8,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class Tab {
     public static final class Filters extends Tab {
@@ -81,7 +82,7 @@ public abstract class Tab {
                 List<String> path = e.getValue();
                 GraphNode gn = hostlist.getGraphById(id.hashCode());
                 if(gn == null) {
-                    logger.warn(jrds.Util.delayedFormatString("Graph not found for %s: %s", name, id));
+                    logger.warn("{}", jrds.Util.delayedFormatString("Graph not found for %s: %s", name, id));
                     continue;
                 }
                 gt.addGraphByPath(path, gn);
@@ -90,7 +91,7 @@ public abstract class Tab {
         }
     }
 
-    static protected final Logger logger = Logger.getLogger(Tab.class);
+    static protected final Logger logger = LoggerFactory.getLogger(Tab.class);
 
     protected String name;
     protected String id;

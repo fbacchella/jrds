@@ -11,7 +11,8 @@ import jrds.HostsList;
 import jrds.Tab;
 import jrds.Util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -20,7 +21,7 @@ import org.json.JSONException;
  */
 public class JSonQueryParams extends JrdsServlet {
     private static final long serialVersionUID = 1L;
-    static final private Logger logger = Logger.getLogger(JSonQueryParams.class);
+    static final private Logger logger = LoggerFactory.getLogger(JSonQueryParams.class);
 
     /**
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
@@ -72,12 +73,12 @@ public class JSonQueryParams extends JrdsServlet {
             w.newLine();
             w.flush();
         } catch (JSONException e) {
-            logger.fatal(e.getMessage(), e);
+            logger.error("{}", e.getMessage(), e);
         }
     }
 
     private void doVariable(JrdsJSONWriter w, String key, Object value) {
-        logger.trace(Util.delayedFormatString("resolving %s with %s", key, value));
+        logger.trace("{}", Util.delayedFormatString("resolving %s with %s", key, value));
         if(value == null)
             return;
         if(value instanceof String && "".equals(value.toString().trim())) {

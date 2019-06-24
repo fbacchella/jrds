@@ -13,14 +13,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.event.Level;
+
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.Util;
 import jrds.factories.ProbeBean;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
-
-import org.apache.log4j.Level;
 
 @ProbeBean({ "port", "user", "password" })
 public abstract class JdbcProbe extends Probe<String, Number> implements UrlProbe, IndexedProbe {

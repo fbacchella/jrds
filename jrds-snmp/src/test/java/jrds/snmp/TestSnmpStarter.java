@@ -2,34 +2,42 @@ package jrds.snmp;
 
 import java.io.IOException;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
+
 import jrds.HostInfo;
 import jrds.HostsList;
+import jrds.Log4JRule;
 import jrds.Tools;
 import jrds.mockobjects.SnmpAgent;
 import jrds.probe.snmp.RdsSnmpSimple;
 import jrds.starter.HostStarter;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
-
 public class TestSnmpStarter {
-    static private final Logger logger = Logger.getLogger(TestSnmpStarter.class);
     static private SnmpAgent agent;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
+
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
-
-        Tools.setLevel(logger, Level.TRACE, "org.snmp4j.agent.request.SnmpRequest", "org.snmp4j", "jrds.snmp", "jrds.Starter.SnmpConnection", "jrds.starter", "jrds.mockobjects");
         agent = new SnmpAgent();
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "org.snmp4j.agent.request.SnmpRequest", "org.snmp4j", "jrds.snmp", "jrds.Starter.SnmpConnection", "jrds.starter", "jrds.mockobjects");
     }
 
     private HostsList registerHost(HostStarter h, RdsSnmpSimple probe) throws IOException {
@@ -118,7 +126,7 @@ public class TestSnmpStarter {
         logger.debug("Starting at level 3");
         n2.startCollect();
 
-        logger.debug(n2.find(SnmpConnection.class));
+        logger.debug("{}", n2.find(SnmpConnection.class));
         Assert.assertEquals("Uptime not 0", 0, n2.find(SnmpConnection.class).getUptime());
 
         logger.debug("Stopping at level 2");

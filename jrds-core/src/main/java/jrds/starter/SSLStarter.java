@@ -20,7 +20,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 
 import jrds.PropertiesManager;
 

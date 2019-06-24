@@ -7,23 +7,33 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
+import jrds.Log4JRule;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 
 public class TestLoader {
-    static final private Logger logger = Logger.getLogger(TestLoader.class);
+    
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds");
         Tools.prepareXml();
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds");
     }
 
     @Test
@@ -52,7 +62,7 @@ public class TestLoader {
         l.done();
 
         Map<String, JrdsDocument> rep = l.getRepository(ConfigType.FILTER);
-        logger.trace(rep);
+        logger.trace("{}", rep);
         Assert.assertTrue(rep.containsKey("Test view 1"));
     }
 
@@ -64,7 +74,7 @@ public class TestLoader {
         l.done();
 
         Map<String, JrdsDocument> rep = l.getRepository(ConfigType.PROBEDESC);
-        logger.trace(rep);
+        logger.trace("{}", rep);
         Assert.assertTrue(rep.containsKey("name"));
 
     }
@@ -76,7 +86,7 @@ public class TestLoader {
         l.done();
 
         Map<String, JrdsDocument> rep = l.getRepository(ConfigType.GRAPH);
-        logger.trace(rep);
+        logger.trace("{}", rep);
         Assert.assertTrue(rep.containsKey("name"));
     }
 
@@ -87,7 +97,7 @@ public class TestLoader {
         l.done();
 
         Map<String, JrdsDocument> rep = l.getRepository(ConfigType.TAB);
-        logger.trace(rep);
+        logger.trace("{}", rep);
         Assert.assertTrue(rep.containsKey("goodtab"));
     }
 

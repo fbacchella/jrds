@@ -7,8 +7,9 @@ import java.util.Map;
 import javax.management.remote.JMXServiceURL;
 import javax.management.remote.message.Message;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 import com.sun.jmx.remote.socket.SocketConnection;
 
@@ -16,7 +17,7 @@ import jrds.starter.SocketFactory;
 
 public class JrdsSocketConnection extends SocketConnection {
 
-    private static final Logger logger = Logger.getLogger(JrdsSocketConnection.class);
+    private static final Logger logger = LoggerFactory.getLogger(JrdsSocketConnection.class);
 
     private final String host;
     private final int port;

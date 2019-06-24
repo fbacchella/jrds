@@ -22,8 +22,6 @@ import jrds.starter.Starter;
 import jrds.starter.StarterNode;
 import jrds.webapp.DiscoverAgent;
 
-import org.apache.log4j.Level;
-
 public class CheckJar extends CommandStarterImpl {
 
     public void start(String[] args) throws Exception {
@@ -32,7 +30,6 @@ public class CheckJar extends CommandStarterImpl {
         pm.update();
         pm.configdir = null;
         pm.strictparsing = true;
-        pm.loglevel = Level.ERROR;
 
         System.getProperties().setProperty("java.awt.headless", "true");
 

@@ -8,32 +8,41 @@ import java.util.Map;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
+
 import jrds.HostInfo;
+import jrds.Log4JRule;
 import jrds.ProbeDesc;
 import jrds.Tools;
 import jrds.starter.HostStarter;
 import jrds.starter.XmlProvider;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 public class XmlProbeTest {
-    static Logger logger = Logger.getLogger(XmlProbeTest.class);
+
     XPath xpath = XPathFactory.newInstance().newXPath();
     static ProbeDesc<String> pd;
+
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
     static public void configure() throws Exception {
         Tools.configure();
-
-        logger.setLevel(Level.TRACE);
-        Tools.setLevel(logger, Level.TRACE, "jrds.Probe.HttpXml", "jrds.Probe.HttpProbe", "jrds.starter.XmlProvider");
         Tools.prepareXml(false);
 
         pd = jrds.configuration.GeneratorHelper.getProbeDesc(Tools.parseRessource("httpxmlprobedesc.xml"));
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.Probe.HttpXml", "jrds.Probe.HttpProbe", "jrds.starter.XmlProvider");
     }
 
     @Test

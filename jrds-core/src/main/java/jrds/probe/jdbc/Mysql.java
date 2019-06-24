@@ -5,10 +5,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
+import org.slf4j.event.Level;
+
 import jrds.ProbeDesc;
 import jrds.Util;
-
-import org.apache.log4j.Level;
 
 public abstract class Mysql extends JdbcProbe {
 

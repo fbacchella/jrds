@@ -9,8 +9,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.junit.Assert;
@@ -20,6 +18,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
 import jrds.HostInfo;
 import jrds.Log4JRule;
@@ -94,7 +94,6 @@ public class ApacheHttpClientTest {
     public void loggers() {
         logrule.setLevel(Level.TRACE, HCHttpProbe.class.getName(), HttpClientStarter.class.getName(), Resolver.class.getName(), Connection.class.getName(), "jrds.Starter", "jrds.Probe.ApacheHttpClientTester");
     }
-
 
     private HostStarter addConnection(Starter cnx) throws IOException {
         String truststore = getClass().getClassLoader().getResource("localhost.jks").getFile();

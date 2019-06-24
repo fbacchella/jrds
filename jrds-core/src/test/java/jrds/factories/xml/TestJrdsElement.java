@@ -5,22 +5,30 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.event.Level;
 
+import jrds.Log4JRule;
 import jrds.Tools;
 
 public class TestJrdsElement {
-    static final private Logger logger = Logger.getLogger(TestJrdsNode.class);
+    
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.prepareXml(false);
-        Tools.setLevel(logger, Level.TRACE, "jrds.factories.xml");
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.factories.xml");
     }
 
     @Test

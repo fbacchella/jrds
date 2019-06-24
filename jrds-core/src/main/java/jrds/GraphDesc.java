@@ -20,7 +20,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.Plottable;
@@ -48,7 +49,7 @@ import lombok.experimental.Accessors;
  * @author Fabrice Bacchella
  */
 public class GraphDesc implements WithACL {
-    static final private Logger logger = Logger.getLogger(GraphDesc.class);
+    static final private Logger logger = LoggerFactory.getLogger(GraphDesc.class);
 
     static public final ConsolFun DEFAULTCF = ConsolFun.AVERAGE;
 
@@ -1183,7 +1184,7 @@ public class GraphDesc implements WithACL {
 
     public void addTree(String tab, List<?> tree) {
         trees.put(tab, tree);
-        logger.trace(jrds.Util.delayedFormatString("Adding tree %s to tab %s", tree, tab));
+        logger.trace("{}", jrds.Util.delayedFormatString("Adding tree %s to tab %s", tree, tab));
     }
 
     public void setTree(String tab, List<?> tree) {

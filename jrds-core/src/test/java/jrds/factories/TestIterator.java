@@ -4,17 +4,19 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.slf4j.event.Level;
+import org.w3c.dom.Node;
+
+import jrds.Log4JRule;
 import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.factories.xml.NodeListIterator;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.w3c.dom.Node;
 
 public class TestIterator {
     private static final String xmlGoodExample = 
@@ -24,13 +26,18 @@ public class TestIterator {
                     "</root>";
     private static final String xmlEmptyExample = "<root />";
 
-    static final private Logger logger = Logger.getLogger(TestIterator.class);
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, TestIterator.class.getName(), NodeListIterator.class.getName());
         Tools.prepareXml(false);
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, TestIterator.class.getName(), NodeListIterator.class.getName());
     }
 
     @Test

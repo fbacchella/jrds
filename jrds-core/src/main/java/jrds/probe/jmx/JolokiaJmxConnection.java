@@ -7,8 +7,8 @@ import java.net.URL;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
-import org.apache.log4j.Level;
 import org.jolokia.client.J4pClient;
+import org.slf4j.event.Level;
 
 import jrds.probe.HttpClientStarter;
 

@@ -8,10 +8,6 @@ import java.util.Properties;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 
-import jrds.PropertiesManager;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.eclipse.jetty.jmx.MBeanContainer;
 import org.eclipse.jetty.security.Authenticator;
 import org.eclipse.jetty.security.ConstraintMapping;
@@ -29,10 +25,14 @@ import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.webapp.WebAppContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import jrds.PropertiesManager;
 
 public class Jetty extends CommandStarterImpl {
 
-    static private final Logger logger = Logger.getLogger(Jetty.class);
+    static private final Logger logger = LoggerFactory.getLogger(Jetty.class);
 
     int port = 8080;
     String host;
@@ -52,8 +52,6 @@ public class Jetty extends CommandStarterImpl {
     }
 
     public void start(String args[]) {
-        Logger.getRootLogger().setLevel(Level.ERROR);
-
         PropertiesManager pm = new PropertiesManager();
         File propFile = new File(propFileName);
         if(propFile.isFile())

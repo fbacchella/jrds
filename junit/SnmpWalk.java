@@ -3,8 +3,10 @@ import java.util.List;
 
 import jrds.Tools;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.snmp4j.AbstractTarget;
@@ -23,7 +25,7 @@ import org.snmp4j.util.TreeEvent;
 import org.snmp4j.util.TreeUtils;
 
 public class SnmpWalk {
-    static final private Logger logger = Logger.getLogger(SnmpWalk.class);
+    static final private Logger logger = LoggerFactory.getLogger(SnmpWalk.class);
 
     static class ActiveSnmp {
         Snmp snmp;
@@ -36,7 +38,7 @@ public class SnmpWalk {
         Tools.configure();
         logger.setLevel(Level.DEBUG);
         Tools.setLevel(new String[] { "jrds" }, logger.getLevel());
-        logger.addAppender(Logger.getLogger("jrds").getAppender("jrds"));
+        logger.addAppender(LoggerFactory.getLogger("jrds").getAppender("jrds"));
     }
 
     @Test

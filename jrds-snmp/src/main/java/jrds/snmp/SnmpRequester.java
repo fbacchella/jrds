@@ -8,7 +8,8 @@ import java.util.Map;
 
 import jrds.Util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.Target;
@@ -114,7 +115,7 @@ public enum SnmpRequester {
         }
     };
 
-    static private final Logger logger = Logger.getLogger(SnmpRequester.class);
+    static private final Logger logger = LoggerFactory.getLogger(SnmpRequester.class);
 
     /**
      * The method that need to be implemented to do the request
@@ -129,7 +130,7 @@ public enum SnmpRequester {
     private static Map<OID, Object> doRequest(SnmpConnection cnx, VariableBinding[] vars) throws IOException {
         Snmp snmp = cnx.getSnmp();
         if(snmp == null) {
-            logger.warn(Util.delayedFormatString("invalid snmp connection state for %s", cnx));
+            logger.warn("{}", Util.delayedFormatString("invalid snmp connection state for %s", cnx));
             return Collections.emptyMap();
         }
 

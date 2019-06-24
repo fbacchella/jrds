@@ -20,7 +20,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.json.JSONWriter;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
@@ -28,7 +29,7 @@ import org.xml.sax.SAXParseException;
 
 @ServletSecurity
 public class Upload extends JrdsServlet {
-    static final private Logger logger = Logger.getLogger(Upload.class);
+    static final private Logger logger = LoggerFactory.getLogger(Upload.class);
 
     /**
      * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
@@ -73,7 +74,7 @@ public class Upload extends JrdsServlet {
             w.array();
 
             for(FileItem item: items) {
-                logger.debug(jrds.Util.delayedFormatString("Item send: %s", item));
+                logger.debug("{}", jrds.Util.delayedFormatString("Item send: %s", item));
 
                 // Process a file upload
                 if(!item.isFormField()) {

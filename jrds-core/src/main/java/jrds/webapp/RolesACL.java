@@ -4,10 +4,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RolesACL extends ACL {
-    static final private Logger logger = Logger.getLogger(ACL.class.getName() + ".RolesACL");
+    static final private Logger logger = LoggerFactory.getLogger(ACL.class.getName() + ".RolesACL");
 
     Set<String> roles;
 

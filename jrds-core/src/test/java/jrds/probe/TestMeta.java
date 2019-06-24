@@ -5,13 +5,13 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
 
 import jrds.Log4JRule;
 import jrds.Probe;
@@ -45,7 +45,7 @@ public class TestMeta {
     public void build1() throws IllegalArgumentException, SecurityException, InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Assert.assertTrue(DummyProbe1.class.isAnnotationPresent(ProbeMeta.class));
         ProbeMeta meta = DummyProbe1.class.getAnnotation(ProbeMeta.class);
-        logger.debug(meta.discoverAgent());
+        logger.debug("{}", meta.discoverAgent());
         DiscoverAgent da = meta.discoverAgent().getConstructor().newInstance();
         Assert.assertNotNull("a discover agent can't be build", da);
     }

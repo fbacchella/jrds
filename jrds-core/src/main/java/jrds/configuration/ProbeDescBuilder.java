@@ -12,10 +12,11 @@ import jrds.Util;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Object>> {
-    static final private Logger logger = Logger.getLogger(ProbeDescBuilder.class);
+    static final private Logger logger = LoggerFactory.getLogger(ProbeDescBuilder.class);
 
     private ClassLoader classLoader = ProbeDescBuilder.class.getClassLoader();
     private Map<String, GraphDesc> graphDescMap = Collections.emptyMap();
@@ -43,7 +44,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Ob
         setMethod(root.getElementbyName("name"), pd, "setName");
         setMethod(root.getElementbyName("index"), pd, "setIndex");
 
-        logger.trace(Util.delayedFormatString("Creating probe description %s", pd.getName()));
+        logger.trace("{}", Util.delayedFormatString("Creating probe description %s", pd.getName()));
 
         JrdsElement classElem = root.getElementbyName("probeClass");
         if(classElem == null) {
@@ -64,14 +65,14 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Ob
                 if(graphDescMap.containsKey(graphName)) {
                     pd.addGraph(graphName);
                     withgraphs = true;
-                    logger.trace(Util.delayedFormatString("Adding graph: %s", graphName));
+                    logger.trace("{}", Util.delayedFormatString("Adding graph: %s", graphName));
                 } else {
-                    logger.info(Util.delayedFormatString("Missing graph %s for probe %s", graphName, pd.getName()));
+                    logger.info("{}", Util.delayedFormatString("Missing graph %s for probe %s", graphName, pd.getName()));
                 }
             }
         }
         if(!withgraphs) {
-            logger.debug(Util.delayedFormatString("No graph defined for probe %s", pd.getName()));
+            logger.debug("{}", Util.delayedFormatString("No graph defined for probe %s", pd.getName()));
         }
 
         for(JrdsElement specificNode: root.getChildElementsByName("specific")) {
@@ -80,7 +81,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Ob
                 String name = m.get("name");
                 String value = specificNode.getTextContent().trim();
                 pd.addSpecific(name, value);
-                logger.trace(Util.delayedFormatString("Specific added: %s='%s'", name, value));
+                logger.trace("{}", Util.delayedFormatString("Specific added: %s='%s'", name, value));
             }
         }
 
@@ -91,7 +92,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Ob
                 snmpRequester = snmpRequester.trim();
                 if(!snmpRequester.isEmpty()) {
                     pd.addSpecific("requester", snmpRequester);
-                    logger.trace(Util.delayedFormatString("Specific added: requester='%s'", snmpRequester));
+                    logger.trace("{}", Util.delayedFormatString("Specific added: requester='%s'", snmpRequester));
                 }
             }
         }

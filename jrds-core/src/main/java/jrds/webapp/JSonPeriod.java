@@ -9,14 +9,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import jrds.Period;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.json.JSONException;
 
 /**
  * Servlet implementation class JSonPeriod
  */
 public class JSonPeriod extends JrdsServlet {
-    static final private Logger logger = Logger.getLogger(JSonPeriod.class);
+    static final private Logger logger = LoggerFactory.getLogger(JSonPeriod.class);
 
     private static final long serialVersionUID = 1L;
 

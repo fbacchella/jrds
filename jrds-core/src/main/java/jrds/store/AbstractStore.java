@@ -3,11 +3,11 @@ package jrds.store;
 import java.util.Date;
 import java.util.Map;
 
+import org.slf4j.event.Level;
+
 import jrds.ArchivesSet;
 import jrds.JrdsSample;
 import jrds.Probe;
-
-import org.apache.log4j.Level;
 
 public abstract class AbstractStore<StoreObject> implements Store {
     protected final Probe<?, ?> p;

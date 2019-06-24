@@ -24,7 +24,8 @@ import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.probe.IndexedProbe;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 /**
@@ -32,7 +33,7 @@ import org.w3c.dom.Document;
  */
 @ServletSecurity
 public class Discover extends JrdsServlet {
-    static final private Logger logger = Logger.getLogger(Discover.class);
+    static final private Logger logger = LoggerFactory.getLogger(Discover.class);
 
     private static final String CONTENT_TYPE = "application/xml";
     private static final long serialVersionUID = 1L;
@@ -89,8 +90,10 @@ public class Discover extends JrdsServlet {
             prop.put(OutputKeys.DOCTYPE_PUBLIC, "-//jrds//DTD Host//EN");
             prop.put(OutputKeys.DOCTYPE_SYSTEM, "urn:jrds:host");
             Util.serialize(hostDom, response.getOutputStream(), null, prop);
-        } catch (IOException | ParserConfigurationException | TransformerException e) {
-            logger.error(e);
+        } catch (IOException ex) {
+            logger.warn("failed to send body: " + ex.getMessage());
+        } catch (ParserConfigurationException | TransformerException ex) {
+            logger.error("Error rendering content: " + ex.getMessage(), ex);
         }
     }
 

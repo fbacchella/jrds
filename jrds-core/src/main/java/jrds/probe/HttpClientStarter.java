@@ -16,7 +16,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.protocol.HttpContext;
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 
 import jrds.PropertiesManager;
 import jrds.starter.SSLStarter;

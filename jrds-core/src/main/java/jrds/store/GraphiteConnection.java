@@ -10,10 +10,11 @@ import java.util.Map;
 import jrds.JrdsSample;
 import jrds.Probe;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GraphiteConnection {
-    static private final Logger logger = Logger.getLogger(GraphiteConnection.class);
+    static private final Logger logger = LoggerFactory.getLogger(GraphiteConnection.class);
 
     private final String host;
     private final int port;

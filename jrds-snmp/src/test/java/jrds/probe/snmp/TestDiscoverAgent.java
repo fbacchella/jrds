@@ -8,29 +8,34 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.slf4j.event.Level;
+
+import jrds.Log4JRule;
 import jrds.Probe;
 import jrds.Tools;
 import jrds.factories.ProbeMeta;
 import jrds.factories.xml.JrdsDocument;
-import jrds.probe.TestMeta;
 import jrds.webapp.DiscoverAgent;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 public class TestDiscoverAgent {
-    static final private Logger logger = Logger.getLogger(TestMeta.class);
+
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.prepareXml();
+    }
 
-        logger.setLevel(Level.DEBUG);
-        Tools.setLevel(new String[] { "jrds.DiscoverAgent.SNMP" }, logger.getLevel());
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.DiscoverAgent.SNMP");
     }
 
     @SuppressWarnings("unchecked")

@@ -7,14 +7,15 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Element;
+
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.webapp.Discover.ProbeDescSummary;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.w3c.dom.DOMException;
-import org.w3c.dom.Element;
 
 public abstract class DiscoverAgent {
     protected enum DojoType {
@@ -64,7 +65,7 @@ public abstract class DiscoverAgent {
     private int timeout;
 
     protected DiscoverAgent(String name, Class<?>... validClasses) {
-        namedLogger = Logger.getLogger("jrds.DiscoverAgent." + name);
+        namedLogger = LoggerFactory.getLogger("jrds.DiscoverAgent." + name);
         this.validClasses = new HashSet<Class<?>>(validClasses.length);
         for(Class<?> c: validClasses) {
             this.validClasses.add(c);

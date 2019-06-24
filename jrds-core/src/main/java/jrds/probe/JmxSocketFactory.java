@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.rmi.server.RMIClientSocketFactory;
 
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 
 import jrds.starter.SocketFactory;
 import jrds.starter.Starter;

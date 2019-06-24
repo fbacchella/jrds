@@ -5,11 +5,12 @@ import jrds.Util;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.DocumentFragment;
 
 public class MacroBuilder extends ConfigObjectBuilder<Macro> {
-    static final private Logger logger = Logger.getLogger(MacroBuilder.class);
+    static final private Logger logger = LoggerFactory.getLogger(MacroBuilder.class);
 
     public MacroBuilder() {
         super(ConfigType.MACRODEF);
@@ -23,7 +24,7 @@ public class MacroBuilder extends ConfigObjectBuilder<Macro> {
     public Macro makeMacro(JrdsDocument n) {
         Macro m = new Macro();
         String name = n.getRootElement().getAttribute("name");
-        logger.debug(Util.delayedFormatString("Building macro %s", name));
+        logger.debug("{}", Util.delayedFormatString("Building macro %s", name));
         if(name != null && !"".equals(name)) {
             m.setName(name);
         }

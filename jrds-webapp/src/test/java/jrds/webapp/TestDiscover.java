@@ -2,12 +2,6 @@ package jrds.webapp;
 
 import java.util.Properties;
 
-import jrds.Tools;
-import jrds.factories.xml.JrdsDocument;
-import jrds.factories.xml.JrdsElement;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.eclipse.jetty.http.HttpTester.Response;
 import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Assert;
@@ -16,14 +10,24 @@ import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.Logger;
+import org.slf4j.event.Level;
+
+import jrds.Log4JRule;
+import jrds.Tools;
+import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
 
 public class TestDiscover {
-    static final private Logger logger = Logger.getLogger(TestDiscover.class);
 
     static ServletTester tester = null;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
+
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+    private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
     static public void configure() throws Exception {
@@ -31,8 +35,12 @@ public class TestDiscover {
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
         Tools.prepareXml(false);
-        Tools.setLevel(logger, Level.TRACE, GetDiscoverHtmlCode.class.getName(), "jrds.webapp.Configuration", "jrds.webapp.JrdsServlet");
-        Tools.setLevel(Level.INFO, "jrds.standalone.JettyLogger");
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, GetDiscoverHtmlCode.class.getName(), "jrds.webapp.Configuration", "jrds.webapp.JrdsServlet");
+        logrule.setLevel(Level.INFO, "jrds.standalone.JettyLogger");
     }
 
     @Before

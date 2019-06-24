@@ -8,7 +8,8 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
@@ -20,7 +21,7 @@ import org.joda.time.LocalTime;
  * @author Fabrice Bacchella
  */
 public class Period {
-    static final private Logger logger = Logger.getLogger(Period.class);
+    static final private Logger logger = LoggerFactory.getLogger(Period.class);
     static private final String dateRegexpBoth = "((\\d\\d\\d\\d)-?(\\d\\d)-?(\\d\\d))?";
     static private final String timeRegexp = "((\\d?\\d):(\\d\\d))?(:(\\d\\d))?";
     static private final Pattern datePatternBoth = Pattern.compile(dateRegexpBoth + "[T ]?" + timeRegexp + "(.*)");
@@ -97,7 +98,7 @@ public class Period {
         begin = begin.withMillisOfSecond(0);
 
         long interval = end.getMillis() - begin.getMillis();
-        logger.trace(Util.delayedFormatString("initially, interval %d, begin is %s, end is %s", interval / 1000, begin, end));
+        logger.trace("{}", Util.delayedFormatString("initially, interval %d, begin is %s, end is %s", interval / 1000, begin, end));
 
         if(begin.getSecondOfMinute() == end.getSecondOfMinute()) {
             // second for end and begin are the same, that's mathematically
@@ -113,7 +114,7 @@ public class Period {
         this.begin = begin;
         this.end = end;
 
-        logger.trace(Util.delayedFormatString("now Period is %s, begin is %s, end is %s", period, begin, end));
+        logger.trace("{}", Util.delayedFormatString("now Period is %s, begin is %s, end is %s", period, begin, end));
     }
 
     public Period previous() {

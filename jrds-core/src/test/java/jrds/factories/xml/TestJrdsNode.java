@@ -4,13 +4,13 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.Tools;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+
+import jrds.Log4JRule;
+import jrds.Tools;
 
 public class TestJrdsNode {
     static class Convert {
@@ -20,13 +20,12 @@ public class TestJrdsNode {
         }
     }
 
-    static final private Logger logger = Logger.getLogger(TestJrdsNode.class);
+    @Rule
+    public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        logger.setLevel(Level.TRACE);
-
         Tools.prepareXml();
     }
 

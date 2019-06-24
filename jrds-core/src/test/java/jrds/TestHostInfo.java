@@ -4,12 +4,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map;
 
-import org.apache.log4j.Level;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.event.Level;
 
 import jrds.probe.jdbc.JdbcConnection;
 import jrds.starter.ConnectionInfo;

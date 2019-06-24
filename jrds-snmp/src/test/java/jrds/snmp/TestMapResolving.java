@@ -2,11 +2,11 @@ package jrds.snmp;
 
 import java.io.IOException;
 
-import org.apache.log4j.Level;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.event.Level;
 import org.snmp4j.smi.OID;
 
 import jrds.Log4JRule;
@@ -23,7 +23,7 @@ public class TestMapResolving {
 
     @Before
     public void loggers() {
-        logrule.setLevel(Level.TRACE, "jrds.snmp.SnmpConfigurator");
+        logrule.setLevel(Level.TRACE, "jrds.snmp.SnmpConfigurator", "jrds.snmp.SnmpCollectResolver");
     }
 
     @Test

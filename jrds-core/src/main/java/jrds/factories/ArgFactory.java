@@ -19,7 +19,8 @@ import jrds.GenericBean;
 import jrds.Util;
 import jrds.factories.xml.JrdsElement;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A class to build args from a string constructor
@@ -28,7 +29,7 @@ import org.apache.log4j.Logger;
  */
 
 public final class ArgFactory {
-    static private final Logger logger = Logger.getLogger(ArgFactory.class);
+    static private final Logger logger = LoggerFactory.getLogger(ArgFactory.class);
 
     static private final String[] argPackages = new String[] { "java.lang.", "java.net.", "org.snmp4j.smi.", "java.io.", "" };
     static private final Map<String, Class<?>> classCache = new ConcurrentHashMap<String, Class<?>>();
@@ -61,7 +62,7 @@ public final class ArgFactory {
         List<Object> argsList = new ArrayList<Object>(elements.size());
         for(JrdsElement listNode: elements) {
             String localName = listNode.getNodeName();
-            logger.trace(Util.delayedFormatString("Element to check: %s", localName));
+            logger.trace("{}", Util.delayedFormatString("Element to check: %s", localName));
             if("arg".equals(localName)) {
                 String type = listNode.getAttribute("type");
                 String value;
@@ -76,7 +77,7 @@ public final class ArgFactory {
                 argsList.add(makeArgs(listNode, arguments));
             }
         }
-        logger.debug(Util.delayedFormatString("arg vector: %s", argsList));
+        logger.debug("{}", Util.delayedFormatString("arg vector: %s", argsList));
         return argsList;
     }
 

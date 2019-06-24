@@ -7,23 +7,29 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jrds.TestPropertiesManager;
-import jrds.Tools;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.event.Level;
+
+import jrds.Log4JRule;
+import jrds.Tools;
 
 public class TestACL {
 
-    static final private Logger logger = Logger.getLogger(TestPropertiesManager.class);
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.webapp.ACL");
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.webapp.ACL");
     }
 
     private ParamsBean prepareMoke(String[] keys, Object[] values) {

@@ -2,7 +2,7 @@ package jrds.probe.ipmi;
 
 import java.io.IOException;
 
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 
 import com.veraxsystems.vxipmi.api.sync.IpmiConnector;
 

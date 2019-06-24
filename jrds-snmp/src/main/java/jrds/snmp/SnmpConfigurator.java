@@ -24,8 +24,9 @@ import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 import org.snmp4j.smi.OID;
 
 import fr.jrds.snmpcodec.MibStore;
@@ -37,7 +38,7 @@ import jrds.configuration.ModuleConfigurator;
 
 public class SnmpConfigurator extends ModuleConfigurator {
 
-    static final private Logger logger = Logger.getLogger(MethodHandles.lookup().lookupClass());
+    static final private Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     static MibStore resolver;
 

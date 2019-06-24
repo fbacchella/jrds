@@ -22,8 +22,9 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 public class Renderer {
     final int PRIME = 31;
@@ -146,7 +147,7 @@ public class Renderer {
 
     }
 
-    static private final Logger logger = Logger.getLogger(Renderer.class);
+    static private final Logger logger = LoggerFactory.getLogger(Renderer.class);
     static private final float hashTableLoadFactor = 0.75f;
     final private Object counter = new Object() {
         int i = 0;
@@ -162,7 +163,7 @@ public class Renderer {
             String threadName = "RendererThread" + counter;
             Thread t = new Thread(r, threadName);
             t.setDaemon(true);
-            logger.debug(Util.delayedFormatString("New thread name: %s", threadName));
+            logger.debug("{}", Util.delayedFormatString("New thread name: %s", threadName));
             return t;
         }
     });

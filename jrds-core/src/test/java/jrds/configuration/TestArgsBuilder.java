@@ -6,24 +6,32 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.slf4j.event.Level;
+
+import jrds.Log4JRule;
 import jrds.Tools;
 import jrds.factories.ArgFactory;
 import jrds.factories.xml.JrdsDocument;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 public class TestArgsBuilder {
-    static final private Logger logger = Logger.getLogger(TestArgsBuilder.class);
+
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.factories");
         Tools.prepareXml(false);
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.factories");
     }
 
     @SuppressWarnings("unchecked")

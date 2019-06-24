@@ -15,27 +15,33 @@ import jrds.mockobjects.GenerateProbe;
 import jrds.mockobjects.MokeProbe;
 import jrds.store.ExtractInfo;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.LinearInterpolator;
+import org.slf4j.event.Level;
 
 public class TestSum {
-    static final private Logger logger = Logger.getLogger(TestSum.class);
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+
     @BeforeClass
     static public void configure() throws IOException, ParserConfigurationException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.graphe.Sum");
         Tools.prepareXml();
+    }
+    
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.graphe.Sum");
     }
 
     @Test(expected = RuntimeException.class)

@@ -25,10 +25,6 @@ public abstract class CommandStarterImpl implements CommandStarter {
         System.out.println("Unimplemented help");
     }
 
-    static {
-        jrds.JrdsLoggerConfiguration.initLog4J();
-    }
-
     public void configure(Properties configuration) {
     }
 

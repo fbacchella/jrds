@@ -3,7 +3,7 @@ package jrds.starter;
 import java.io.IOException;
 import java.net.Socket;
 
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 
 import jrds.Probe;
 

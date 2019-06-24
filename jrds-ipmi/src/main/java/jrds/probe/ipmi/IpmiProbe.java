@@ -10,7 +10,7 @@ import jrds.factories.ProbeMeta;
 import jrds.probe.IndexedProbe;
 import jrds.probe.ipmi.Handle.MutableInteger;
 
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 
 import com.veraxsystems.vxipmi.coding.commands.sdr.GetSensorReadingResponseData;
 import com.veraxsystems.vxipmi.coding.commands.sdr.record.FullSensorRecord;

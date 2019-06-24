@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -26,12 +27,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
+import jrds.configuration.LogConfigurator;
 import jrds.configuration.ModuleConfigurator;
 import jrds.starter.Timer;
 import jrds.store.RrdDbStoreFactory;
@@ -45,7 +45,7 @@ import jrds.webapp.RolesACL;
  * @author Fabrice Bacchella
  */
 public class PropertiesManager extends Properties {
-    private final Logger logger = Logger.getLogger(PropertiesManager.class);
+    private final Logger logger = LoggerFactory.getLogger(PropertiesManager.class);
 
     public static final class TimerInfo {
         public int step;
@@ -258,7 +258,7 @@ public class PropertiesManager extends Properties {
             defaultStoreProps.put("factory", RrdDbStoreFactory.class.getName());
         }
 
-        logger.trace(Util.delayedFormatString("Stores configuration: %s", storesConfig));
+        logger.trace("{}", Util.delayedFormatString("Stores configuration: %s", storesConfig));
 
         // Ok, now configure and store the factories
         for(Map.Entry<String, Properties> e: storesConfig.entrySet()) {
@@ -272,14 +272,14 @@ public class PropertiesManager extends Properties {
                     sf.start();
                     stores.put(storeName, sf);
                 } else {
-                    logger.error(Util.delayedFormatString("store factory %s invalid, no factory given", storeName));
+                    logger.error("{}", Util.delayedFormatString("store factory %s invalid, no factory given", storeName));
                 }
             } catch (Exception e1) {
                 jrds.Util.log(getClass().getCanonicalName(), logger, Level.ERROR, e1, "store factory %s failed to configure: %s", storeName, e1);
             }
         }
-        logger.debug(Util.delayedFormatString("Stores configured: %s", stores));
-        logger.debug(Util.delayedFormatString("default store: %s", defaultStorename));
+        logger.debug("{}", Util.delayedFormatString("Stores configured: %s", stores));
+        logger.debug("{}", Util.delayedFormatString("default store: %s", defaultStorename));
 
         defaultStore = stores.remove(defaultStorename);
 
@@ -354,57 +354,13 @@ public class PropertiesManager extends Properties {
         // **********************
         // The log configuration
 
-        // log4j uses the contextClassLoader, set it so it can uses fancy appenders
-        Thread.currentThread().setContextClassLoader(extensionClassLoader);
-        // Log configuration is done early
         boolean nologging = parseBoolean(getProperty("nologging", "false"));
-        String log4jXmlFile = getProperty("log4jxmlfile", "");
-        String log4jPropFile = getProperty("log4jpropfile", "");
-        if(log4jXmlFile != null && !log4jXmlFile.trim().isEmpty()) {
-            File xmlfile = new File(log4jXmlFile.trim());
-            if(!xmlfile.canRead()) {
-                logger.error("log4j xml file " + xmlfile.getPath() + " can't be read, log4j not configured");
-            } else {
-                BasicConfigurator.resetConfiguration();
-                DOMConfigurator.configure(xmlfile.getPath());
-                nologging = true;
-                logger.info("configured with " + xmlfile.getPath());
+        if (!nologging) {
+            ServiceLoader<LogConfigurator> logservices = ServiceLoader.load(LogConfigurator.class, extensionClassLoader);
+            Iterator<LogConfigurator> iter = logservices.iterator();
+            if (iter.hasNext()) {
+                iter.next().configure(this);
             }
-        } else if(log4jPropFile != null && !log4jPropFile.trim().isEmpty()) {
-            File propfile = new File(log4jPropFile.trim());
-            if(!propfile.canRead()) {
-                logger.error("log4j properties file " + propfile.getPath() + " can't be read, log4j not configured");
-            } else {
-                BasicConfigurator.resetConfiguration();
-                PropertyConfigurator.configure(propfile.getPath());
-                nologging = true;
-                logger.info("configured with " + propfile.getPath());
-            }
-        }
-        // the logging setup was not previously captured
-        if(!nologging) {
-            for(String ls: new String[] { "trace", "debug", "info", "error", "fatal", "warn" }) {
-                Level l = Level.toLevel(ls);
-                String param = getProperty("log." + ls, "");
-                if(!"".equals(param)) {
-                    String[] loggersName = param.split(",");
-                    List<String> loggerList = new ArrayList<String>(loggersName.length);
-                    for(String logger: loggersName) {
-                        loggerList.add(logger.trim());
-                    }
-                    loglevels.put(l, loggerList);
-                }
-            }
-            loglevel = Level.toLevel(getProperty("loglevel", "info"));
-            logfile = getProperty("logfile");
-
-            try {
-                JrdsLoggerConfiguration.configure(this);
-            } catch (IOException e1) {
-                logger.error("Unable to set log file to " + this.logfile + ": " + e1);
-            }
-        } else {
-            JrdsLoggerConfiguration.setExternal();
         }
 
         legacymode = parseBoolean(getProperty("legacymode", "1"));
@@ -511,8 +467,8 @@ public class PropertiesManager extends Properties {
             defaultACL = new RolesACL(defaultRoles);
             defaultACL = defaultACL.join(adminACL);
 
-            logger.debug(jrds.Util.delayedFormatString("Admin ACL is %s", adminACL));
-            logger.debug(jrds.Util.delayedFormatString("Default ACL is %s", defaultACL));
+            logger.debug("{}", jrds.Util.delayedFormatString("Admin ACL is %s", adminACL));
+            logger.debug("{}", jrds.Util.delayedFormatString("Default ACL is %s", defaultACL));
         }
 
         readonly = parseBoolean(getProperty("readonly", "0"));
@@ -539,7 +495,6 @@ public class PropertiesManager extends Properties {
     public File rrddir;
     public File tmpdir;
     public String urlpngroot;
-    public String logfile;
     public int slowcollecttime;
     public int step;
     public Map<String, TimerInfo> timers = new HashMap<String, TimerInfo>();
@@ -547,8 +502,6 @@ public class PropertiesManager extends Properties {
     public final Set<URI> libspath = new HashSet<URI>();
     public boolean strictparsing = false;
     public ClassLoader extensionClassLoader;
-    public final Map<Level, List<String>> loglevels = new HashMap<Level, List<String>>();
-    public Level loglevel;
     public boolean legacymode;
     public boolean autocreate;
     public int timeout;

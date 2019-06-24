@@ -6,28 +6,35 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.slf4j.event.Level;
+
 import jrds.GenericBean;
 import jrds.HostInfo;
+import jrds.Log4JRule;
 import jrds.Tools;
 import jrds.factories.ArgFactory;
 import jrds.starter.HostStarter;
 import jrds.starter.Starter;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
 public class TestSnmpConnection {
-    static final private Logger logger = Logger.getLogger(TestSnmpConnection.class);
+
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
         Tools.prepareXml();
+    }
 
-        Tools.setLevel(logger, Level.TRACE, "jrds.snmp.SnmpConnection", "jrds.RdsHost");
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.snmp.SnmpConnection", "jrds.RdsHost");
     }
 
     @Test

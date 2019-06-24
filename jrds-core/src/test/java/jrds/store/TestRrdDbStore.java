@@ -5,11 +5,6 @@ import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.JrdsSample;
-import jrds.Probe;
-import jrds.Tools;
-import jrds.mockobjects.GenerateProbe;
-
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -18,7 +13,12 @@ import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
 import org.rrd4j.data.DataProcessor;
 
+import jrds.JrdsSample;
 import jrds.Log4JRule;
+import jrds.Probe;
+import jrds.Tools;
+import jrds.mockobjects.GenerateProbe;
+
 public class TestRrdDbStore {
 
     @Rule

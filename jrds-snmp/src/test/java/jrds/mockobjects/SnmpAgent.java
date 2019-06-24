@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.snmp4j.TransportMapping;
 import org.snmp4j.agent.BaseAgent;
 import org.snmp4j.agent.CommandProcessor;
@@ -31,7 +32,7 @@ import org.snmp4j.util.ThreadPool;
 
 public class SnmpAgent extends BaseAgent {
 
-    private static final Logger logger = Logger.getLogger(SnmpAgent.class);
+    private static final Logger logger = LoggerFactory.getLogger(SnmpAgent.class);
     int port = 0;
     int boot = 0;
 

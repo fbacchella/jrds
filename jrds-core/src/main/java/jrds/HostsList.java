@@ -15,6 +15,8 @@ import java.util.Timer;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.slf4j.event.Level;
+
 import jrds.PropertiesManager.TimerInfo;
 import jrds.configuration.ConfigObjectFactory;
 import jrds.factories.ArgFactory;
@@ -27,8 +29,6 @@ import jrds.starter.StarterNode;
 import jrds.webapp.ACL;
 import jrds.webapp.DiscoverAgent;
 import jrds.webapp.RolesACL;
-
-import org.apache.log4j.Level;
 
 /**
  * The central repository of all informations : hosts, graph, and everything

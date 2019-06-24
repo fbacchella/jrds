@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
-import org.apache.log4j.Level;
+import org.slf4j.event.Level;
 
 import jrds.ArchivesSet;
 import jrds.JrdsSample;

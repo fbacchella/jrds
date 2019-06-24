@@ -17,7 +17,8 @@ import jrds.starter.Resolver;
 import org.acplt.oncrpc.OncRpcException;
 import org.acplt.oncrpc.OncRpcProgramNotRegisteredException;
 import org.acplt.oncrpc.OncRpcProtocols;
-import org.apache.log4j.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This probe is used to collect data throught rstatd, version 3. The process in.rstatd or rstat

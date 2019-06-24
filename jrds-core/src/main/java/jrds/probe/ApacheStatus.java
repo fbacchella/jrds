@@ -11,9 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jrds.Util;
+import org.slf4j.event.Level;
 
-import org.apache.log4j.Level;
+import jrds.Util;
 
 /**
  * A class to probe the apache status from the mod_status

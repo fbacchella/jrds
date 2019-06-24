@@ -4,28 +4,35 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
-import jrds.Configuration;
-import jrds.Tools;
-import jrds.mockobjects.MokeServletContext;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.slf4j.event.Level;
+
+import jrds.Configuration;
+import jrds.Log4JRule;
+import jrds.Tools;
+import jrds.mockobjects.MokeServletContext;
 
 public class TestConfiguration {
-    static final private Logger logger = Logger.getLogger(TestConfiguration.class);
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+    @Rule
+    public Log4JRule logrule = new Log4JRule(this);
+
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
-        Tools.setLevel(logger, Level.TRACE, "jrds.HostList", "jrds.PropertiesManager", ParamsBean.class.getName(), Configuration.class.getName());
+    }
+
+    @Before
+    public void loggers() {
+        logrule.setLevel(Level.TRACE, "jrds.HostList", "jrds.PropertiesManager", ParamsBean.class.getName(), Configuration.class.getName());
     }
 
     @Test

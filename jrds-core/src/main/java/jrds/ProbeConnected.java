@@ -3,9 +3,9 @@ package jrds;
 import java.util.Collections;
 import java.util.Map;
 
-import jrds.starter.Connection;
+import org.slf4j.event.Level;
 
-import org.apache.log4j.Level;
+import jrds.starter.Connection;
 
 public abstract class ProbeConnected<KeyType, ValueType, ConnectionClass extends jrds.starter.Connection<?>> extends Probe<KeyType, ValueType> implements ConnectedProbe {
     private String connectionName;

@@ -18,11 +18,12 @@ import jrds.PropertiesManager;
 import jrds.configuration.ConfigObjectFactory;
 import jrds.probe.PassiveProbe;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.rrd4j.core.DsDef;
 
 public class EnumerateWikiProbes extends CommandStarterImpl {
-    static private final Logger logger = Logger.getLogger(EnumerateWikiProbes.class);
+    static private final Logger logger = LoggerFactory.getLogger(EnumerateWikiProbes.class);
 
     static final private String JAVADOCURLTEMPLATES = "http://jrds.fr/apidoc-core/index.html?%s.html";
 

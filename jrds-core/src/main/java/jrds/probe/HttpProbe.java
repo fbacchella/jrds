@@ -16,14 +16,14 @@ import java.util.IllegalFormatConversionException;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.event.Level;
+
 import jrds.ConnectedProbe;
 import jrds.Probe;
 import jrds.Util;
 import jrds.factories.ProbeBean;
 import jrds.starter.Resolver;
 import jrds.starter.Starter;
-
-import org.apache.log4j.Level;
 
 /**
  * A generic probe to collect an HTTP service default generic : port to provide

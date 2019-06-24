@@ -18,7 +18,8 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
 import javax.servlet.http.HttpServlet;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jrds.Configuration;
 import jrds.PropertiesManager;
@@ -46,7 +47,9 @@ import jrds.jmx.Management;
  * @version $Revision$, $Date$
  */
 public class StartListener implements ServletContextListener {
-    static private final Logger logger = Logger.getLogger(StartListener.class);
+
+    static private final Logger logger = LoggerFactory.getLogger(StartListener.class);
+
     static private boolean started = false;
 
     /*
@@ -75,9 +78,10 @@ public class StartListener implements ServletContextListener {
                         Set<ServletSecurity> securitySet = ArgFactory.enumerateAnnotation(servletClass, ServletSecurity.class, HttpServlet.class);
                         if(securitySet.size() > 0) {
                             filter.addMappingForServletNames(EnumSet.of(DispatcherType.REQUEST), false, e.getKey());
-                            logger.debug("adding security to servlet " + e.getKey());
+                            logger.debug("{}", "adding security to servlet " + e.getKey());
                         }
                     } catch (ClassNotFoundException ex) {
+                        // Can't happen
                     }
                 }
             }
@@ -86,7 +90,7 @@ public class StartListener implements ServletContextListener {
                 Management.register(ctxt);
             }
             started = true;
-            logger.info("Application jrds started");
+            logger.info("{}", "Application jrds started");
         }
     }
 
@@ -98,14 +102,14 @@ public class StartListener implements ServletContextListener {
      */
     public void contextDestroyed(ServletContextEvent arg0) {
         if(started) {
-            logger.info("Application jrds will stop");
+            logger.info("{}", "Application jrds will stop");
             started = false;
             jrds.Configuration.stopConf();
             StoreOpener.stop();
             if(MBeanServerFactory.findMBeanServer(null).size() > 0) {
                 Management.unregister();
             }
-            logger.info("Application jrds stopped");
+            logger.info("{}", "Application jrds stopped");
         }
     }
 

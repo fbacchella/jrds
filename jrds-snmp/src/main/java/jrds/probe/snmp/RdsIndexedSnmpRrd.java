@@ -8,12 +8,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.event.Level;
+import org.snmp4j.smi.OID;
+
 import jrds.factories.ProbeBean;
 import jrds.probe.IndexedProbe;
 import jrds.snmp.SnmpRequester;
-
-import org.apache.log4j.Level;
-import org.snmp4j.smi.OID;
 
 /**
  * @author Fabrice Bacchella

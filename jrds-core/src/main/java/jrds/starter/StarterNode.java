@@ -6,11 +6,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
+
 import jrds.HostsList;
 import jrds.PropertiesManager;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 @SuppressWarnings("deprecation")
 public abstract class StarterNode implements StartersSet {
@@ -246,11 +246,11 @@ public abstract class StarterNode implements StartersSet {
     }
 
     public void log(Level l, Throwable e, String format, Object... elements) {
-        jrds.Util.log(this, Logger.getLogger(getClass()), l, e, format, elements);
+        jrds.Util.log(this, LoggerFactory.getLogger(getClass()), l, e, format, elements);
     }
 
     public void log(Level l, String format, Object... elements) {
-        jrds.Util.log(this, Logger.getLogger(getClass()), l, null, format, elements);
+        jrds.Util.log(this, LoggerFactory.getLogger(getClass()), l, null, format, elements);
     }
 
     /**

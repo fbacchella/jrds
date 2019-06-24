@@ -14,13 +14,14 @@ import jrds.Probe;
 import jrds.Renderer;
 import jrds.Util;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Servlet implementation class JSonGraph
  */
 public class JSonGraph extends JSonData {
-    static final private Logger logger = Logger.getLogger(JSonGraph.class);
+    static final private Logger logger = LoggerFactory.getLogger(JSonGraph.class);
     private static final long serialVersionUID = 1L;
     private int periodHistory[] = { 7, 9, 11, 16 };
 
@@ -42,7 +43,7 @@ public class JSonGraph extends JSonData {
                 }
             });
         }
-        logger.debug(jrds.Util.delayedFormatString("Graphs returned: %s", graphs));
+        logger.debug("{}", jrds.Util.delayedFormatString("Graphs returned: %s", graphs));
         if(!graphs.isEmpty()) {
             Renderer r = root.getRenderer();
             for(GraphNode gn: graphs) {

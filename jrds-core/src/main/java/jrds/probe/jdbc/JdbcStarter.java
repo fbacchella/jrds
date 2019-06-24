@@ -6,11 +6,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
+import org.slf4j.event.Level;
+
 import jrds.HostInfo;
 import jrds.starter.Resolver;
 import jrds.starter.Starter;
-
-import org.apache.log4j.Level;
 
 public abstract class JdbcStarter extends Starter {
     private Connection con;

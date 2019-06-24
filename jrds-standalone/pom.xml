@@ -5,7 +5,7 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jrds-standalone</artifactId>
-    <name>JRDS</name>
+    <name>JRDS standalone packaging</name>
     <url>http://jrds.fr</url>
 
     <dependencies>
@@ -62,6 +62,11 @@
             <groupId>fr.jrds</groupId>
             <artifactId>jrds-core</artifactId>
             <classifier>webapp</classifier>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.jrds</groupId>
+            <artifactId>jrds-log4j</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>
