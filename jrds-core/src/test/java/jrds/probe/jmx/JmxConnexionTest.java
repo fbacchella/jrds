@@ -2,28 +2,12 @@ package jrds.probe.jmx;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.lang.reflect.Array;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Random;
-import java.util.Set;
 
-import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.IntrospectionException;
-import javax.management.MBeanAttributeInfo;
-import javax.management.MBeanException;
-import javax.management.MBeanInfo;
 import javax.management.MBeanServer;
-import javax.management.MBeanServerConnection;
-import javax.management.ObjectInstance;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
-import javax.management.openmbean.CompositeData;
-import javax.management.openmbean.CompositeType;
-import javax.management.openmbean.TabularData;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXConnectorServer;
@@ -36,7 +20,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
 import org.slf4j.event.Level;
 
 import jrds.HostInfo;
@@ -74,50 +57,8 @@ public class JmxConnexionTest {
 
     private JrdsMBeanInfo mbi;
 
-    static private void enumerate(NativeJmxSource source) throws InstanceNotFoundException, IntrospectionException, AttributeNotFoundException, ReflectionException, MBeanException, IllegalArgumentException, IOException {
-        MBeanServerConnection mbean = source.connection;
-        Set<ObjectInstance> s = mbean.queryMBeans(null, null);
-        for(ObjectInstance o: s) {
-            logger.debug("Class: " + o.getClassName());
-        }
-
-        for(String domains: mbean.getDomains()) {
-            logger.debug("Domains: " + domains);
-        }
-
-        for(ObjectName name: mbean.queryNames(null, null)) {
-            logger.debug(name);
-            MBeanInfo info = mbean.getMBeanInfo(name);
-            MBeanAttributeInfo[] attrs = info.getAttributes();
-            for(MBeanAttributeInfo attr: attrs) {
-                if("javax.management.openmbean.TabularData".equals(attr.getType())) {
-                    TabularData td = (TabularData) mbean.getAttribute(name, attr.getName());
-                    logger.debug("    TabularData[" + td.size() + "] " + attr.getName());
-
-                } else if("javax.management.openmbean.CompositeData".equals(attr.getType())) {
-                    CompositeData cd = (CompositeData) mbean.getAttribute(name, attr.getName());
-                    if(cd != null) {
-                        CompositeType ct = cd.getCompositeType();
-                        for(Object key: ct.keySet()) {
-                            Object value = cd.get((String) key);
-                            logger.debug("    " + "    " + value.getClass().getName() + " " + key);
-
-                        }
-                    }
-                } else if(attr.getType().startsWith("[")) {
-                    Object o = mbean.getAttribute(name, attr.getName());
-                    if(o == null)
-                        continue;
-                    logger.debug("    " + o.getClass().getComponentType().getName() + "[" + Array.getLength(o) + "]" + " " + attr.getName());
-                } else {
-                    logger.debug("    " + attr.getType() + " " + attr.getName());
-                }
-            }
-        }
-    }
     @Rule
     public final Log4JRule logrule = new Log4JRule(this);
-    private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
     static public void configure() throws Exception {
@@ -126,8 +67,8 @@ public class JmxConnexionTest {
 
     @Before
     public void loggers() {
-        logrule.setLevel(Level.TRACE, JmxConnexionTest.class.getName(), JMXConnection.class.getName(), "jrds.Starter",
-                         "javax.management", "sun.rmi");
+        logrule.setLevel(Level.TRACE, JmxConnexionTest.class.getName(), JMXConnection.class.getName(), 
+                         "jrds.Starter", "javax.management", "sun.rmi");
     }
 
     @After
@@ -139,28 +80,13 @@ public class JmxConnexionTest {
         }
     }
 
-    private int findPort() {
-        Random r = new Random();
-        int port = -1;
-        ServerSocket serverSocket = null;
-        for(int i = 0; i < 10; i++) {
-            port = r.nextInt(32767) + 32767;
-            try {
-                InetSocketAddress sa = new InetSocketAddress("localhost", port);
-                serverSocket = new ServerSocket();
-                serverSocket.setReuseAddress(true);
-                serverSocket.bind(sa);
-                break;
-            } catch (IOException e) {
-            } finally {
-                if(serverSocket != null)
-                    try {
-                        serverSocket.close();
-                    } catch (IOException e) {
-                    }
-            }
+    private int findPort() throws IOException {
+        try (ServerSocket  serverSocket = new ServerSocket()){
+            serverSocket.setReuseAddress(true);
+            InetSocketAddress sa = new InetSocketAddress("localhost", 0);
+            serverSocket.bind(sa);
+            return serverSocket.getLocalPort();
         }
-        return port;
     }
 
     private JMXConnection getCnx(String proto, int port) {
@@ -175,7 +101,6 @@ public class JmxConnexionTest {
         return cnx;
     }
 
-    @SuppressWarnings("unused")
     private void doTest(String proto, int port) throws Exception {
         mbi = new JrdsMBeanInfo(proto, "localhost", port);
 
@@ -195,8 +120,6 @@ public class JmxConnexionTest {
         host.startCollect();
         Assert.assertTrue("JMX Connection failed to start", cnx.isStarted());
         Assert.assertNotNull("Failed to read uptime", cnx.setUptime());
-        if(false)
-            enumerate((NativeJmxSource)cnx.getConnection());
     }
 
     @Test(timeout=5000)
