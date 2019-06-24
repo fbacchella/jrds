@@ -8,13 +8,13 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.rrd4j.data.DataProcessor;
+import org.rrd4j.data.Variable;
+
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.store.ExtractInfo;
 import jrds.store.Extractor;
-
-import org.rrd4j.data.DataProcessor;
-import org.rrd4j.data.Variable;
 
 /**
  * A servlet which returns datastore values from a probe. It can be used in many

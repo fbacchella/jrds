@@ -5,10 +5,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import jrds.factories.ProbeBean;
-import jrds.probe.PassiveProbe;
-import jrds.starter.Listener;
-
 import org.slf4j.event.Level;
 import org.snmp4j.CommandResponder;
 import org.snmp4j.CommandResponderEvent;
@@ -19,6 +15,10 @@ import org.snmp4j.smi.IpAddress;
 import org.snmp4j.smi.OID;
 import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
+
+import jrds.factories.ProbeBean;
+import jrds.probe.PassiveProbe;
+import jrds.starter.Listener;
 
 @ProbeBean({ "port", "community", "proto", "version" })
 public class TrapListener extends Listener<CommandResponderEvent, OID> {

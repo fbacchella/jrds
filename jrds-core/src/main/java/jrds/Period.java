@@ -8,12 +8,12 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class used to manage a time interval

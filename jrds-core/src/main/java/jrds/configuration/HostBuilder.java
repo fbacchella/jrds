@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jrds.ArchivesSet;
 import jrds.ConnectedProbe;
 import jrds.GenericBean;
@@ -37,9 +40,6 @@ import jrds.starter.HostStarter;
 import jrds.starter.Listener;
 import jrds.starter.Timer;
 import jrds.store.StoreFactory;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 

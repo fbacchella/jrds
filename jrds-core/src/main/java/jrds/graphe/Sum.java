@@ -4,6 +4,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
+import org.rrd4j.ConsolFun;
+import org.rrd4j.data.DataProcessor;
+import org.rrd4j.data.LinearInterpolator;
+import org.rrd4j.data.Plottable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jrds.AutonomousGraphNode;
 import jrds.GraphDesc;
 import jrds.GraphNode;
@@ -12,13 +19,6 @@ import jrds.PlottableMap;
 import jrds.Util;
 import jrds.store.ExtractInfo;
 import jrds.store.Extractor;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.rrd4j.ConsolFun;
-import org.rrd4j.data.DataProcessor;
-import org.rrd4j.data.LinearInterpolator;
-import org.rrd4j.data.Plottable;
 
 public class Sum extends AutonomousGraphNode {
     static final private Logger logger = LoggerFactory.getLogger(Sum.class);

@@ -15,12 +15,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import jrds.GenericBean;
-import jrds.Util;
-import jrds.factories.xml.JrdsElement;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jrds.GenericBean;
+import jrds.factories.xml.JrdsElement;
 
 /**
  * A class to build args from a string constructor

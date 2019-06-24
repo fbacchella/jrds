@@ -7,11 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import jrds.ArchivesSet;
-import jrds.JrdsSample;
-import jrds.Probe;
-import jrds.factories.ProbeBean;
-
 import org.rrd4j.core.jrrd.ConsolidationFunctionType;
 import org.rrd4j.core.jrrd.DataChunk;
 import org.rrd4j.core.jrrd.DataSource;
@@ -19,6 +14,11 @@ import org.rrd4j.core.jrrd.RRDatabase;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.graph.RrdGraphDef;
 import org.slf4j.event.Level;
+
+import jrds.ArchivesSet;
+import jrds.JrdsSample;
+import jrds.Probe;
+import jrds.factories.ProbeBean;
 
 @ProbeBean({ "rrdfile" })
 public class RRDToolStore extends AbstractStore<RRDatabase> {

@@ -7,14 +7,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jrds.HostInfo;
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.store.StoreFactory;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Updater {
     static final private Logger logger = LoggerFactory.getLogger(Updater.class);

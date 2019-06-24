@@ -10,15 +10,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jrds.Filter;
 import jrds.GraphNode;
 import jrds.GraphTree;
 import jrds.HostsList;
 import jrds.Tab;
 import jrds.Util;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Servlet implementation class JSonTree

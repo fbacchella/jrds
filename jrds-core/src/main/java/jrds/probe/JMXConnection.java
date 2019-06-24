@@ -8,9 +8,9 @@ import jrds.PropertiesManager;
 import jrds.factories.ProbeBean;
 import jrds.probe.jmx.AbstractJmxConnection;
 import jrds.probe.jmx.JmxAbstractDataSource;
-import jrds.probe.jmx.NativeJmxConnection;
 import jrds.probe.jmx.JmxProtocol;
 import jrds.probe.jmx.JolokiaJmxConnection;
+import jrds.probe.jmx.NativeJmxConnection;
 import jrds.starter.Connection;
 
 @ProbeBean({ "url", "protocol", "port", "path", "user", "password", "ssl" })

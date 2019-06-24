@@ -4,14 +4,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-import jrds.mockobjects.MokeProbe;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.event.Level;
+
+import jrds.mockobjects.MokeProbe;
 
 public class TestTranslateProbe {
 

@@ -7,10 +7,10 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.Variable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jrds.Period;
 import jrds.Probe;

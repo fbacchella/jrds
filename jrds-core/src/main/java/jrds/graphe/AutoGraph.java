@@ -2,14 +2,14 @@ package jrds.graphe;
 
 import java.util.Arrays;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jrds.Graph;
 import jrds.GraphDesc;
 import jrds.GraphNode;
 import jrds.Probe;
 import jrds.PropertiesManager;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AutoGraph extends GraphNode {
     public enum Operation {

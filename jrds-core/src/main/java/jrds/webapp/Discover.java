@@ -16,6 +16,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.TransformerException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+
 import jrds.PropertiesManager;
 import jrds.Util;
 import jrds.configuration.ConfigObjectFactory;
@@ -23,10 +27,6 @@ import jrds.configuration.ConfigType;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.probe.IndexedProbe;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 
 /**
  * Servlet implementation class AutoDetect

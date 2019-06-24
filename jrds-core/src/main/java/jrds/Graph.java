@@ -6,11 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
-import jrds.GraphDesc.Dimension;
-import jrds.store.ExtractInfo;
-import jrds.webapp.ACL;
-import jrds.webapp.WithACL;
-
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.Plottable;
 import org.rrd4j.graph.RrdGraph;
@@ -20,6 +15,10 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import eu.bengreen.data.utility.LargestTriangleThreeBuckets;
+import jrds.GraphDesc.Dimension;
+import jrds.store.ExtractInfo;
+import jrds.webapp.ACL;
+import jrds.webapp.WithACL;
 
 public class Graph implements WithACL {
     static final private Logger logger = LoggerFactory.getLogger(Graph.class);

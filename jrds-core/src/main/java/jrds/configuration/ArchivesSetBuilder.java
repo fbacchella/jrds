@@ -2,13 +2,13 @@ package jrds.configuration;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.rrd4j.ConsolFun;
+import org.rrd4j.core.ArcDef;
+
 import jrds.ArchivesSet;
 import jrds.Util;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
-
-import org.rrd4j.ConsolFun;
-import org.rrd4j.core.ArcDef;
 
 public class ArchivesSetBuilder extends ConfigObjectBuilder<ArchivesSet> {
 

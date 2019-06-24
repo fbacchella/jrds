@@ -11,13 +11,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jrds.GraphNode;
 import jrds.Probe;
 import jrds.Util;
 import jrds.probe.IndexedProbe;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JSonDetails extends JrdsServlet {
 

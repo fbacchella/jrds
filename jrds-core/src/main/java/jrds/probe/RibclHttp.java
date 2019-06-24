@@ -7,9 +7,6 @@ import java.util.Map;
 
 import javax.xml.xpath.XPathExpression;
 
-import jrds.factories.ProbeMeta;
-import jrds.starter.XmlProvider;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -20,6 +17,9 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.event.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import jrds.factories.ProbeMeta;
+import jrds.starter.XmlProvider;
 
 @ProbeMeta(
         timerStarter = jrds.probe.HttpClientStarter.class

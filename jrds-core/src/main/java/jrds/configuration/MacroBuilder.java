@@ -1,12 +1,12 @@
 package jrds.configuration;
 
-import jrds.Macro;
-import jrds.factories.xml.JrdsDocument;
-import jrds.factories.xml.JrdsElement;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DocumentFragment;
+
+import jrds.Macro;
+import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
 
 public class MacroBuilder extends ConfigObjectBuilder<Macro> {
     static final private Logger logger = LoggerFactory.getLogger(MacroBuilder.class);

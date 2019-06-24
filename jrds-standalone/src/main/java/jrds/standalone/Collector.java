@@ -3,12 +3,12 @@ package jrds.standalone;
 import java.io.File;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jrds.HostsList;
 import jrds.PropertiesManager;
 import jrds.starter.Timer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author Fabrice Bacchella

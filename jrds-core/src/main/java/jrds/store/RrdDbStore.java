@@ -8,10 +8,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import jrds.ArchivesSet;
-import jrds.JrdsSample;
-import jrds.Probe;
-
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.Archive;
 import org.rrd4j.core.Datasource;
@@ -25,6 +21,10 @@ import org.rrd4j.core.Util;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.graph.RrdGraphDef;
 import org.slf4j.event.Level;
+
+import jrds.ArchivesSet;
+import jrds.JrdsSample;
+import jrds.Probe;
 
 public class RrdDbStore extends AbstractStore<RrdDb> {
     private final RrdDbStoreFactory factory;

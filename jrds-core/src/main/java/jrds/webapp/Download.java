@@ -12,14 +12,14 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.rrd4j.data.DataProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jrds.Period;
 import jrds.Probe;
 import jrds.Util;
 import jrds.store.ExtractInfo;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.rrd4j.data.DataProcessor;
 
 /**
  * This servlet is used to download the values of a graph as an xml file

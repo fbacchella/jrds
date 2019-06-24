@@ -9,10 +9,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import jrds.HostsList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jrds.HostsList;
 
 public abstract class JSonData extends JrdsServlet {
     static final private Logger logger = LoggerFactory.getLogger(JSonData.class);

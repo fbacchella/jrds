@@ -7,15 +7,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jrds.GraphDesc.Dimension;
 import jrds.GraphNode;
 import jrds.HostsList;
 import jrds.Probe;
 import jrds.Renderer;
 import jrds.Util;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Servlet implementation class JSonGraph

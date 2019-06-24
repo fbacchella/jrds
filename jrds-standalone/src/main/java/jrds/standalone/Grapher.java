@@ -10,6 +10,9 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jrds.Graph;
 import jrds.GraphNode;
 import jrds.GraphTree;
@@ -17,9 +20,6 @@ import jrds.HostsList;
 import jrds.Period;
 import jrds.PropertiesManager;
 import jrds.Renderer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author bacchell

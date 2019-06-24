@@ -8,13 +8,6 @@ import java.util.ArrayList;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import jrds.TestProbe.DummyProbe;
-import jrds.graphe.Sum;
-import jrds.mockobjects.Full;
-import jrds.mockobjects.GenerateProbe;
-import jrds.mockobjects.MokeProbe;
-import jrds.store.ExtractInfo;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -24,6 +17,13 @@ import org.junit.rules.TemporaryFolder;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.LinearInterpolator;
 import org.slf4j.event.Level;
+
+import jrds.TestProbe.DummyProbe;
+import jrds.graphe.Sum;
+import jrds.mockobjects.Full;
+import jrds.mockobjects.GenerateProbe;
+import jrds.mockobjects.MokeProbe;
+import jrds.store.ExtractInfo;
 
 public class TestSum {
 

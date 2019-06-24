@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import jrds.Probe;
-import jrds.factories.ProbeBean;
-import jrds.starter.Resolver;
-
 import org.apache.commons.net.ntp.NTPUDPClient;
 import org.apache.commons.net.ntp.NtpV3Packet;
 import org.apache.commons.net.ntp.TimeInfo;
 import org.slf4j.event.Level;
+
+import jrds.Probe;
+import jrds.factories.ProbeBean;
+import jrds.starter.Resolver;
 
 @ProbeBean({ "port" })
 public class Ntp extends Probe<String, Number> {

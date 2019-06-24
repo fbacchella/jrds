@@ -4,10 +4,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import jrds.factories.ProbeBean;
-import jrds.starter.Connection;
-import jrds.starter.Resolver;
-
 import org.slf4j.event.Level;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
@@ -23,6 +19,10 @@ import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.util.DefaultPDUFactory;
 import org.snmp4j.util.PDUFactory;
+
+import jrds.factories.ProbeBean;
+import jrds.starter.Connection;
+import jrds.starter.Resolver;
 
 @ProbeBean({ "community", "port", "version", "ping" })
 public class SnmpConnection extends Connection<Target> {

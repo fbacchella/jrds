@@ -4,10 +4,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Properties;
 
-import jrds.jmx.Management;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jrds.jmx.Management;
 
 public class JMX extends CommandStarterImpl {
 

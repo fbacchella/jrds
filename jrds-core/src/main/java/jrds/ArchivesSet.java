@@ -3,10 +3,10 @@ package jrds;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.ArcDef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A archive container

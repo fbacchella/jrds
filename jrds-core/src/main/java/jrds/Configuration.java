@@ -2,11 +2,11 @@ package jrds;
 
 import java.util.Properties;
 
-import jrds.starter.Timer;
-import jrds.store.StoreFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jrds.starter.Timer;
+import jrds.store.StoreFactory;
 
 public class Configuration {
     static private final Logger logger = LoggerFactory.getLogger(Configuration.class);

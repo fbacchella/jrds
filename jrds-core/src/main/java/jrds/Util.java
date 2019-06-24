@@ -39,16 +39,16 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import jrds.probe.IndexedProbe;
-import jrds.probe.UrlProbe;
-import jrds.starter.HostStarter;
-import net.iharder.Base64;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
+
+import jrds.probe.IndexedProbe;
+import jrds.probe.UrlProbe;
+import jrds.starter.HostStarter;
+import net.iharder.Base64;
 
 /**
  *

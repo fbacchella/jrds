@@ -25,6 +25,10 @@ import java.util.zip.GZIPInputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jrds.Configuration;
 import jrds.Filter;
 import jrds.Graph;
@@ -39,10 +43,6 @@ import jrds.Tab;
 import jrds.Util;
 import jrds.Util.SiPrefix;
 import net.iharder.Base64;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.json.JSONException;
 
 /**
  * A bean to parse the request paramaters

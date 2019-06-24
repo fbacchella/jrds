@@ -5,12 +5,12 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.rrd4j.core.RrdBackendFactory;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDbPool;
 import org.rrd4j.core.RrdFileBackendFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A wrapper classe, to manage the rrdDb operations

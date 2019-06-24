@@ -7,11 +7,11 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Map;
 
-import jrds.JrdsSample;
-import jrds.Probe;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jrds.JrdsSample;
+import jrds.Probe;
 
 public class GraphiteConnection {
     static private final Logger logger = LoggerFactory.getLogger(GraphiteConnection.class);

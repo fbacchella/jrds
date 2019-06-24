@@ -12,15 +12,15 @@ import java.util.regex.Pattern;
 
 import javax.xml.transform.OutputKeys;
 
+import org.rrd4j.DsType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.snmp4j.smi.OID;
+
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.probe.snmp.RdsIndexedSnmpRrd;
 import jrds.probe.snmp.RdsSnmpSimple;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.rrd4j.DsType;
-import org.snmp4j.smi.OID;
 
 public class DoSnmpProbe extends CommandStarterImpl {
     static final private Logger logger = LoggerFactory.getLogger(DoSnmpProbe.class);

@@ -8,6 +8,9 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jrds.ArchivesSet;
 import jrds.Filter;
 import jrds.GraphDesc;
@@ -21,9 +24,6 @@ import jrds.factories.xml.JrdsDocument;
 import jrds.graphe.Sum;
 import jrds.starter.Listener;
 import jrds.starter.Timer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ConfigObjectFactory {
     static final private Logger logger = LoggerFactory.getLogger(ConfigObjectFactory.class);

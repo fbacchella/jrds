@@ -14,11 +14,6 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import jrds.factories.xml.JrdsDocument;
-import jrds.factories.xml.JrdsElement;
-import jrds.webapp.Discover.ProbeDescSummary;
-import jrds.webapp.DiscoverAgent;
-
 import org.slf4j.event.Level;
 import org.snmp4j.CommunityTarget;
 import org.snmp4j.Snmp;
@@ -29,6 +24,11 @@ import org.snmp4j.smi.OID;
 import org.snmp4j.smi.OctetString;
 import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
+
+import jrds.factories.xml.JrdsDocument;
+import jrds.factories.xml.JrdsElement;
+import jrds.webapp.Discover.ProbeDescSummary;
+import jrds.webapp.DiscoverAgent;
 
 public class SnmpDiscoverAgent extends DiscoverAgent {
     // Used to check if snmp is on

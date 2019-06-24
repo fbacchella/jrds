@@ -3,13 +3,6 @@ package jrds.probe.ipmi;
 import java.util.Collections;
 import java.util.Map;
 
-import jrds.ProbeConnected;
-import jrds.Util;
-import jrds.factories.ProbeBean;
-import jrds.factories.ProbeMeta;
-import jrds.probe.IndexedProbe;
-import jrds.probe.ipmi.Handle.MutableInteger;
-
 import org.slf4j.event.Level;
 
 import com.veraxsystems.vxipmi.coding.commands.sdr.GetSensorReadingResponseData;
@@ -18,6 +11,13 @@ import com.veraxsystems.vxipmi.coding.commands.sdr.record.SensorRecord;
 import com.veraxsystems.vxipmi.coding.payload.CompletionCode;
 import com.veraxsystems.vxipmi.coding.payload.lan.IPMIException;
 import com.veraxsystems.vxipmi.common.TypeConverter;
+
+import jrds.ProbeConnected;
+import jrds.Util;
+import jrds.factories.ProbeBean;
+import jrds.factories.ProbeMeta;
+import jrds.probe.IndexedProbe;
+import jrds.probe.ipmi.Handle.MutableInteger;
 
 
 @ProbeMeta(

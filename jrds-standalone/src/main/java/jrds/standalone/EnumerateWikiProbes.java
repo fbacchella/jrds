@@ -10,6 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.rrd4j.core.DsDef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jrds.GenericBean;
 import jrds.Probe;
 import jrds.ProbeConnected;
@@ -17,10 +21,6 @@ import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.configuration.ConfigObjectFactory;
 import jrds.probe.PassiveProbe;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.rrd4j.core.DsDef;
 
 public class EnumerateWikiProbes extends CommandStarterImpl {
     static private final Logger logger = LoggerFactory.getLogger(EnumerateWikiProbes.class);

@@ -2,9 +2,9 @@ package jrds;
 
 import java.util.HashMap;
 
-import jrds.store.ExtractInfo;
-
 import org.rrd4j.data.Plottable;
+
+import jrds.store.ExtractInfo;
 
 public abstract class PlottableMap extends HashMap<String, Plottable> {
     public static class ProxyPlottable extends Plottable {
