@@ -34,8 +34,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import jrds.Util.SiPrefix;
-import jrds.factories.GraphDescFilter;
-import jrds.factories.GraphDescFilterInstance;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.probe.jdbc.JdbcProbe;
