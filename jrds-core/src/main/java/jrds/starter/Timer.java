@@ -234,7 +234,6 @@ public class Timer extends StarterNode {
             stats.lastCollect = start;
             stats.runtime = duration;
         }
-        System.gc();
         log(Level.INFO, "Collect started at " + start + " ran for " + duration + "ms");
     }
 
