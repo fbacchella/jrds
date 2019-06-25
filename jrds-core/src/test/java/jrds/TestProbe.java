@@ -38,7 +38,7 @@ public class TestProbe {
     };
 
     @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    public final TemporaryFolder testFolder = new TemporaryFolder();
 
     @Rule
     public final Log4JRule logrule = new Log4JRule(this);

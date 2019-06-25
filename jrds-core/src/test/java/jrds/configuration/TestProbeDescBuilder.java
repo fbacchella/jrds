@@ -32,7 +32,7 @@ public class TestProbeDescBuilder {
     public final Log4JRule logrule = new Log4JRule(this);
 
     @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    public final TemporaryFolder testFolder = new TemporaryFolder();
 
     @Before
     public void loggers() {

@@ -46,7 +46,7 @@ public class ApacheHttpClientTest {
     private final Logger logger = logrule.getTestlogger();
 
     @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    public final TemporaryFolder testFolder = new TemporaryFolder();
 
     private volatile boolean shouldFail = true;
     private final ResourceHandler staticFiles = new ResourceHandler() {

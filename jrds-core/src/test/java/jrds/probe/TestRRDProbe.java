@@ -37,7 +37,7 @@ public class TestRRDProbe {
     static final private long end = 920808900;
 
     @Rule
-    public TemporaryFolder testFolder = new TemporaryFolder();
+    public final TemporaryFolder testFolder = new TemporaryFolder();
 
     @Rule
     public final Log4JRule logrule = new Log4JRule(this);
