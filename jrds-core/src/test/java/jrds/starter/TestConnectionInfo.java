@@ -34,4 +34,5 @@ public class TestConnectionInfo {
         StarterNode sn = new StarterNode() {};
         ci.register(sn);
     }
+
 }

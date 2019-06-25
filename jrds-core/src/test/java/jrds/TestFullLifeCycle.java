@@ -27,14 +27,14 @@ public class TestFullLifeCycle {
     public final Log4JRule logrule = new Log4JRule(this);
     private final Logger logger = logrule.getTestlogger();
 
-   @Rule
+    @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
     static public void configure() throws IOException {
         Tools.configure();
     }
-    
+
     @Before
     public void loggers() {
         logrule.setLevel(Level.TRACE, "jrds.Graph", "jrds.GraphNode");

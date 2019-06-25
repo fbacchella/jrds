@@ -26,6 +26,7 @@ import net.iharder.Base64;
  * Servlet implementation class JSonPack
  */
 public class JSonPack extends HttpServlet {
+
     static final private Logger logger = LoggerFactory.getLogger(JSonPack.class);
     static final public List<String> JSONKEYS = Arrays.asList("id", "autoperiod", "filter", "host", "path", "begin", "end", "max", "min", "tab", "sort", "tree");
     static final public Map<String, Integer> JSONDICT = new HashMap<String, Integer>(JSONKEYS.size());

@@ -30,7 +30,7 @@ public class GetGraphDesc extends JrdsServlet {
      *      javax.servlet.http.HttpServletResponse)
      */
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        
+
         HostsList hl = getHostsList();
 
         ParamsBean p = new ParamsBean(req, hl, "host", "graphname");
@@ -41,7 +41,7 @@ public class GetGraphDesc extends JrdsServlet {
             return;
         }
         GraphDesc gd = graph.getNode().getGraphDesc();
-        
+
         try {
             Document d = gd.dumpAsXml();
             res.setContentType(CONTENT_TYPE);

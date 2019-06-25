@@ -19,6 +19,7 @@ import jrds.Tools;
 import jrds.factories.xml.JrdsDocument;
 
 public class TestArchivesSetBuilder {
+
     @BeforeClass
     static public void configure() throws ParserConfigurationException, IOException {
         Tools.configure();
