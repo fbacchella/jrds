@@ -8,10 +8,10 @@ import java.io.IOException;
 import org.slf4j.event.Level;
 import org.snmp4j.SNMP4JSettings;
 import org.snmp4j.Snmp;
-import org.snmp4j.log.JavaLogFactory;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
 import fr.jrds.snmpcodec.OIDFormatter;
+import jrds.snmp.log.Slf4jLogFactory;
 import jrds.starter.Starter;
 
 public class MainStarter extends Starter {
@@ -20,7 +20,7 @@ public class MainStarter extends Starter {
     static {
         // Don't care about strict conformity
         SNMP4JSettings.setAllowSNMPv2InV1(true);
-        org.snmp4j.log.LogFactory.setLogFactory(new JavaLogFactory());
+        org.snmp4j.log.LogFactory.setLogFactory(new Slf4jLogFactory());
     }
 
     static OIDFormatter formatter;
