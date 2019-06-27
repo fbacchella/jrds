@@ -56,6 +56,11 @@
         </dependency>
         <dependency>
             <groupId>fr.jrds</groupId>
+            <artifactId>jrds-log4j</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.jrds</groupId>
             <artifactId>jrds-snmp</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -67,11 +72,6 @@
         <dependency>
             <groupId>fr.jrds</groupId>
             <artifactId>jrds-jsonp</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.jrds</groupId>
-            <artifactId>jrds-log4j</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
