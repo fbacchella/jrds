@@ -401,7 +401,7 @@ public class ParamsBean implements Serializable {
     }
 
     private void addPeriodArgs(Map<String, Object> args, boolean timeAbsolute) {
-        if(!timeAbsolute && period.getScale() != 0) {
+        if(!timeAbsolute && period.getScale() != Period.Scale.MANUAL) {
             args.put("scale", period.getScale());
         } else {
             args.put("begin", period.getBegin().getTime());
@@ -479,8 +479,15 @@ public class ParamsBean implements Serializable {
         urlBuffer.append(file).append("?");
 
         for(Map.Entry<String, Object> e: args.entrySet()) {
+            String key = e.getKey();
+            String value;
+            if ("scale".equals(key)) {
+                value = Integer.toString(((Period.Scale)e.getValue()).ordinal());
+            } else {
+                value = e.getValue().toString();
+            }
             try {
-                urlBuffer.append(e.getKey()).append("=").append(URLEncoder.encode(e.getValue().toString(), "UTF-8")).append("&");
+                urlBuffer.append(key).append("=").append(URLEncoder.encode(value, "UTF-8")).append("&");
             } catch (UnsupportedEncodingException e1) {
             }
         }
@@ -575,7 +582,7 @@ public class ParamsBean implements Serializable {
      * @return the p
      */
     public Period getPeriod() {
-        if(period.getScale() != 0)
+        if(period.getScale() != Period.Scale.MANUAL)
             period = new Period(period.getScale());
         return period;
     }
@@ -585,7 +592,7 @@ public class ParamsBean implements Serializable {
      */
     public String getStringBegin() {
         String formatted = "";
-        if(period.getScale() == 0)
+        if(period.getScale() == Period.Scale.MANUAL)
             formatted = df.get().format(period.getBegin());
         return formatted;
     }
@@ -595,7 +602,7 @@ public class ParamsBean implements Serializable {
      */
     public String getStringEnd() {
         String formatted = "";
-        if(period.getScale() == 0)
+        if(period.getScale() == Period.Scale.MANUAL)
             formatted = df.get().format(period.getEnd());
         return formatted;
     }
@@ -621,7 +628,7 @@ public class ParamsBean implements Serializable {
     /**
      * @return Returns the scale.
      */
-    public int getScale() {
+    public Period.Scale getScale() {
         return period.getScale();
     }
 

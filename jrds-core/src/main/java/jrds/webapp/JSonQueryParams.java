@@ -51,7 +51,7 @@ public class JSonQueryParams extends JrdsServlet {
             doVariable(w, "dsName", params.getValue("dsName"));
             doVariable(w, "begin", params.getBegin());
             doVariable(w, "end", params.getEnd());
-            doVariable(w, "autoperiod", params.getScale());
+            doVariable(w, "autoperiod", params.getScale().ordinal());
 
             // Add the list of tabs
             w.key("tabslist");
@@ -83,9 +83,6 @@ public class JSonQueryParams extends JrdsServlet {
         if(value instanceof String && "".equals(value.toString().trim())) {
             return;
         }
-        // if(value != null && ! "".equals(value)) {
-        // value = value.replace("'", " ");//.replace("\"", " ");
-        // }
         w.key(key).value(value);
     }
 

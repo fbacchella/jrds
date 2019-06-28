@@ -37,9 +37,9 @@ public class JSonPeriod extends JrdsServlet {
             w.key("begin").value(params.getStringBegin());
             w.key("end").value(params.getStringEnd());
 
-            int scale = p.getScale();
-            if(scale != 0) {
-                w.key("scale").value(scale);
+            Period.Scale scale = p.getScale();
+            if(scale != Period.Scale.MANUAL) {
+                w.key("scale").value(scale.ordinal());
             }
             w.endObject();
             w.newLine();

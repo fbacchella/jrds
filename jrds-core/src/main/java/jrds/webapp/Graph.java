@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jrds.HostsList;
+import jrds.Period;
 import jrds.Util;
 import net.iharder.Base64;
 
@@ -74,7 +75,7 @@ public final class Graph extends JrdsServlet {
             // requested
             // So the image have short lifetime, just one step
             int graphStep = graph.getNode().getProbe().getStep();
-            if(p.period.getScale() != 0 || !cache) {
+            if(p.period.getScale() != Period.Scale.MANUAL || !cache) {
                 res.addDateHeader("Expires", new Date().getTime() + graphStep * 1000);
             }
             res.addDateHeader("Last-Modified", graph.getEnd().getTime());

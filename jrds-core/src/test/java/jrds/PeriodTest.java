@@ -53,7 +53,7 @@ public class PeriodTest {
         logger.debug("delta being is " + deltaBegin + ", delta end is " + deltaEnd);
         Assert.assertTrue("Delta end is too wide: " + deltaEnd, deltaEnd < 1000);
         Assert.assertTrue("Delta begin is too wide: " + deltaBegin, deltaBegin < 1000);
-        Assert.assertEquals(7, p.getScale());
+        Assert.assertEquals(Period.Scale.DAY, p.getScale());
     }
 
     @Test
@@ -66,12 +66,12 @@ public class PeriodTest {
         calBegin.add(Calendar.HOUR, -4);
         Date begin = calBegin.getTime();
 
-        Period p = new Period(4);
+        Period p = new Period(Period.Scale.HOURS4);
         long deltaBegin = Math.abs(p.getBegin().getTime() - begin.getTime());
         long deltaEnd = Math.abs(p.getEnd().getTime() + 1000 - end.getTime());
         Assert.assertTrue("Delta end is too wide: " + deltaEnd, deltaEnd < 1000);
         Assert.assertTrue("Delta begin is too wide: " + deltaBegin, deltaBegin < 1000);
-        Assert.assertEquals(new Integer(4), new Integer(p.getScale()));
+        Assert.assertEquals(Period.Scale.HOURS4, p.getScale());
     }
 
     @Test
@@ -86,7 +86,7 @@ public class PeriodTest {
         // Less than 1 second appart
         Assert.assertTrue(Math.abs(deltaBegin) < 999);
         Assert.assertTrue(Math.abs(deltaEnd) < 999);
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class PeriodTest {
         Period p = new Period("2007-01-01", "2007-12-31");
         Assert.assertEquals(p.getBegin(), begin);
         Assert.assertEquals(p.getEnd(), end);
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test
@@ -106,7 +106,7 @@ public class PeriodTest {
         Period p = new Period("2007-01-01T00:00", "2007-12-31T23:59");
         Assert.assertEquals(p.getBegin(), begin);
         Assert.assertEquals(p.getEnd(), end);
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test
@@ -128,7 +128,7 @@ public class PeriodTest {
         Period p = new Period("1:12", "22:58");
         Assert.assertEquals(begin, p.getBegin());
         Assert.assertEquals(end, p.getEnd());
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test
@@ -150,7 +150,7 @@ public class PeriodTest {
         Period p = new Period("01:12:15", "22:58:57");
         Assert.assertEquals(begin, p.getBegin());
         Assert.assertEquals(end, p.getEnd());
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test
@@ -160,7 +160,7 @@ public class PeriodTest {
         Period p = new Period("2007-01-01T00:00:00", "2007-12-31T23:59:59");
         Assert.assertEquals(begin, p.getBegin());
         Assert.assertEquals(end, p.getEnd());
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test
@@ -170,7 +170,7 @@ public class PeriodTest {
         Period p = new Period("20070101T00:00:00Z", "20071231T23:59:59Z");
         Assert.assertEquals(end, p.getEnd());
         Assert.assertEquals(begin, p.getBegin());
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test
@@ -180,7 +180,7 @@ public class PeriodTest {
         Period p = new Period("2007-02-01 00:15:31", "2007-12-31 23:59:50");
         Assert.assertEquals(begin, p.getBegin());
         Assert.assertEquals(end, p.getEnd());
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test
@@ -188,11 +188,11 @@ public class PeriodTest {
         begin = fullISOFORMAT.parse("2007-03-01T00:00:00");
         end = fullISOFORMAT.parse("2007-03-01T23:59:59");
         Period p = new Period("2007-03-02 00:00:00", "2007-03-02 23:59:59").previous();
-        logger.trace("{}", p.getBegin());
-        logger.trace("{}", p.getEnd());
+        logger.trace("New begin is {}", p.getBegin());
+        logger.trace("New end is {}", p.getEnd());
         Assert.assertEquals(begin, p.getBegin());
         Assert.assertEquals(end, p.getEnd());
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test
@@ -204,7 +204,7 @@ public class PeriodTest {
         logger.trace("{}", p.getEnd());
         Assert.assertEquals(begin, p.getBegin());
         Assert.assertEquals(end, p.getEnd());
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test
@@ -216,7 +216,7 @@ public class PeriodTest {
         logger.trace("{}", p.getEnd());
         Assert.assertEquals(begin, p.getBegin());
         Assert.assertEquals(end, p.getEnd());
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test
@@ -224,7 +224,7 @@ public class PeriodTest {
         Period p = new Period().previous();
         long offsetDay = 86400 * 1000 - (p.getEnd().getTime() - p.getBegin().getTime());
         Assert.assertTrue("offset to large: " + offsetDay, Math.abs(offsetDay) < 1100);
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test
@@ -234,7 +234,7 @@ public class PeriodTest {
         logger.trace("{}", p.getEnd());
         long offsetDay = 86400 * 1000 - (p.getEnd().getTime() - p.getBegin().getTime());
         Assert.assertTrue("offset to large: " + offsetDay, Math.abs(offsetDay) < 1100);
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test
@@ -244,7 +244,7 @@ public class PeriodTest {
         Period p = new Period("1000", "100000");
         Assert.assertEquals(begin, p.getBegin());
         Assert.assertEquals(end, p.getEnd());
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test(expected = ParseException.class)
@@ -252,7 +252,7 @@ public class PeriodTest {
         Period p = new Period("a1", "2007-01");
         Assert.assertNull(p.getBegin());
         Assert.assertNull(p.getEnd());
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test(expected = ParseException.class)
@@ -260,7 +260,7 @@ public class PeriodTest {
         Period p = new Period(" ", "");
         Assert.assertNull(p.getBegin());
         Assert.assertNull(p.getEnd());
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test(expected = ParseException.class)
@@ -268,7 +268,7 @@ public class PeriodTest {
         Period p = new Period(null, null);
         Assert.assertNull(p.getBegin());
         Assert.assertNull(p.getEnd());
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
     }
 
     @Test(expected = ParseException.class)

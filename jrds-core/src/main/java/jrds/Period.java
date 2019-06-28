@@ -1,17 +1,20 @@
 package jrds;
 
 import java.text.ParseException;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-import org.joda.time.LocalTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,28 +31,28 @@ public class Period {
     static private final Pattern secondsPattern = Pattern.compile("\\d+");
 
     public enum Scale {
-        MANUAL("Manual", new org.joda.time.Period()),
-        HOUR("Last Hour", org.joda.time.Period.hours(1)),
-        HOURS2("Last 2 Hours", org.joda.time.Period.hours(2)),
-        HOURS3("Last 3 Hours", org.joda.time.Period.hours(3)),
-        HOURS4("Last 4 Hours", org.joda.time.Period.hours(4)),
-        HOURS6("Last 6 Hours", org.joda.time.Period.hours(6)),
-        HOURS12("Last 12 Hours", org.joda.time.Period.hours(12)),
-        DAY("Last Day", org.joda.time.Period.days(1)),
-        DAYS2("Last 2 Days", org.joda.time.Period.days(2)),
-        WEEK("Last Week", org.joda.time.Period.weeks(1)),
-        WEEKS2("Last 2 Weeks", org.joda.time.Period.weeks(2)),
-        MONTH("Last Month", org.joda.time.Period.months(1)),
-        MONTH2("Last 2 Months", org.joda.time.Period.months(2)),
-        MONTH3("Last 3 Months", org.joda.time.Period.months(3)),
-        MONTH4("Last 4 Months", org.joda.time.Period.months(4)),
-        MONTH6("Last 6 Months", org.joda.time.Period.months(6)),
-        YEAR("Last Year", org.joda.time.Period.years(1)),
-        YEARS2("Last 2 Years", org.joda.time.Period.years(2));
+        MANUAL("Manual", null),
+        HOUR("Last Hour", Duration.of(1, ChronoUnit.HOURS)),
+        HOURS2("Last 2 Hours", Duration.of(2, ChronoUnit.HOURS)),
+        HOURS3("Last 3 Hours", Duration.of(3, ChronoUnit.HOURS)),
+        HOURS4("Last 4 Hours", Duration.of(4, ChronoUnit.HOURS)),
+        HOURS6("Last 6 Hours", Duration.of(6, ChronoUnit.HOURS)),
+        HOURS12("Last 12 Hours", Duration.of(12, ChronoUnit.HOURS)),
+        DAY("Last Day", Duration.of(24, ChronoUnit.HOURS)),
+        DAYS2("Last 2 Days", Duration.of(48, ChronoUnit.HOURS)),
+        WEEK("Last Week", java.time.Period.ofDays(7)),
+        WEEKS2("Last 2 Weeks", java.time.Period.ofDays(14)),
+        MONTH("Last Month", java.time.Period.ofMonths(1)),
+        MONTH2("Last 2 Months", java.time.Period.ofMonths(2)),
+        MONTH3("Last 3 Months", java.time.Period.ofMonths(3)),
+        MONTH4("Last 4 Months", java.time.Period.ofMonths(4)),
+        MONTH6("Last 6 Months", java.time.Period.ofMonths(6)),
+        YEAR("Last Year", java.time.Period.ofYears(1)),
+        YEARS2("Last 2 Years",java.time.Period.ofYears(2));
         public final String name;
-        public final org.joda.time.Period p;
+        public final TemporalAmount p;
 
-        Scale(String name, org.joda.time.Period p) {
+        Scale(String name, TemporalAmount p) {
             this.name = name;
             this.p = p;
         }
@@ -58,7 +61,7 @@ public class Period {
             if(ordinal < 0) {
                 throw new IllegalArgumentException("Period invalid: " + ordinal);
             }
-            final Scale[] scales = values();
+            Scale[] scales = values();
             if(ordinal > scales.length) {
                 throw new IllegalArgumentException("Period invalid: " + ordinal);
             }
@@ -66,13 +69,10 @@ public class Period {
         }
     }
 
-    /**
-     * 
-     */
-    private final DateTime begin;
-    private final DateTime end;
+    private final ZonedDateTime begin;
+    private final ZonedDateTime end;
     private final Scale scale;
-    private final org.joda.time.Period period;
+    private final Duration period;
 
     public Period() {
         this(Scale.DAY);
@@ -83,37 +83,38 @@ public class Period {
     }
 
     public Period(Scale scale) {
-        this(scale, new DateTime().minus(scale.p), new DateTime());
+        this(scale, null, null);
     }
 
     public Period(String begin, String end) throws ParseException {
         this(Scale.MANUAL, string2Date(begin, true), string2Date(end, false));
     }
 
-    private Period(Scale scale, DateTime begin, DateTime end) {
+    private Period(Scale scale, ZonedDateTime begin, ZonedDateTime end) {
         this.scale = scale;
 
-        // Drop milliseconds, rrd4j precision is second anyway
-        end = end.withMillisOfSecond(0);
-        begin = begin.withMillisOfSecond(0);
-
-        long interval = end.getMillis() - begin.getMillis();
-        logger.trace("initially, interval {}, begin is {}, end is {}", interval / 1000, begin, end);
-
-        if(begin.getSecondOfMinute() == end.getSecondOfMinute()) {
+        if (begin == null || end ==  null) {
+            end = ZonedDateTime.now().withNano(0);
+            begin = end.minus(scale.p);
+        } else {
+            // Drop milliseconds, rrd4j precision is second anyway
+            end = end.withNano(0);
+            begin = begin.withNano(0);
+        }
+        Duration tryperiod = Duration.between(begin, end);
+        if(begin.getSecond() == end.getSecond()) {
             // second for end and begin are the same, that's mathematically
             // wrong
             // but that's the way human and joda's period manage this
             // set end to one second less
-            period = new org.joda.time.Period(begin, end);
+            tryperiod = Duration.between(begin, end);
             end = end.minusSeconds(1);
         } else {
-            period = new org.joda.time.Period(begin, end.plusSeconds(1));
+            tryperiod = tryperiod.plusSeconds(1);
         }
-
+        this.period = tryperiod;
         this.begin = begin;
         this.end = end;
-
         logger.trace("now Period is {}, begin is {}, end is {}", period, begin, end);
     }
 
@@ -129,22 +130,22 @@ public class Period {
      * @return Returns the begin of the period.
      */
     public Date getBegin() {
-        return begin.toDate();
+        return Date.from(begin.toInstant());
     }
 
     /**
      * @return Returns the end of the period.
      */
     public Date getEnd() {
-        return end.toDate();
+        return Date.from(end.toInstant());
     }
 
     /**
      * @return the period's scale ordinal
      */
-    public int getScale() {
+    public Scale getScale() {
         // should return the enum instead of ordinal here..
-        return scale.ordinal();
+        return scale;
     }
 
     /**
@@ -154,15 +155,15 @@ public class Period {
      * @param isBegin
      * @throws ParseException
      */
-    private static DateTime string2Date(String date, boolean isBegin) throws ParseException {
+    private static ZonedDateTime string2Date(String date, boolean isBegin) throws ParseException {
         if(date == null) {
             throw new ParseException("Null string to parse", 0);
         }
         Matcher dateMatcher = datePatternBoth.matcher(date);
         if("NOW".compareToIgnoreCase(date) == 0) {
-            return new DateTime();
-        } else if(secondsPattern.matcher(date).matches()) {
-            return new DateTime(Util.parseStringNumber(date, Long.MIN_VALUE).longValue());
+            return ZonedDateTime.now();
+        } else if (secondsPattern.matcher(date).matches()) {
+            return ZonedDateTime.ofInstant(Instant.ofEpochMilli(Util.parseStringNumber(date, Long.MIN_VALUE).longValue()), ZoneId.systemDefault());
         } else if(date.length() >= 4 && dateMatcher.find()) {
             try {
                 if(logger.isTraceEnabled()) {
@@ -179,18 +180,18 @@ public class Period {
                     throw new ParseException("Invalid string to parse: " + date, 0);
                 }
 
-                DateTimeZone tz = DateTimeZone.getDefault();
+                ZoneId tz = ZoneId.systemDefault();
 
-                if(timeZoneFound != null && !"".equals(timeZoneFound)) {
-                    tz = DateTimeZone.forTimeZone(TimeZone.getTimeZone(timeZoneFound));
+                if(timeZoneFound != null && ! timeZoneFound.isEmpty()) {
+                    tz = ZoneId.of(timeZoneFound);
                 }
 
-                LocalDate jdate = new LocalDate(tz);
+                LocalDate jdate = LocalDate.now(tz);
                 if(dateFound != null && !"".equals(dateFound)) {
                     int year = jrds.Util.parseStringNumber(dateMatcher.group(2), 1970);
                     int month = jrds.Util.parseStringNumber(dateMatcher.group(3), 1);
                     int day = jrds.Util.parseStringNumber(dateMatcher.group(4), 1);
-                    jdate = new LocalDate(year, month, day);
+                    jdate = LocalDate.of(year, month, day);
                 }
 
                 int hour;
@@ -217,8 +218,9 @@ public class Period {
                 } else {
                     second = jrds.Util.parseStringNumber(dateMatcher.group(9), 0);
                 }
-                LocalTime jtime = new LocalTime(hour, minute, second);
-                return jdate.toDateTime(jtime, tz);
+                LocalTime jtime = LocalTime.of(hour, minute, second);
+
+                return ZonedDateTime.of(jdate, jtime, tz);
             } catch (Exception e) {
                 ParseException newex = new ParseException("Invalid string to parse: " + date, 0);
                 newex.initCause(e);

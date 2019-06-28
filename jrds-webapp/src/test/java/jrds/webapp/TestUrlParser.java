@@ -156,7 +156,7 @@ public class TestUrlParser {
         Date end = fullISOFORMAT.parse("2007-12-31T23:59:59");
         Assert.assertEquals(p.getBegin(), begin);
         Assert.assertEquals(p.getEnd(), end);
-        Assert.assertEquals(0, p.getScale());
+        Assert.assertEquals(Period.Scale.MANUAL, p.getScale());
 
         String url = pb.makeObjectUrl("root", "", false);
         Assert.assertTrue(url.contains("begin=" + begin.getTime()));
@@ -176,7 +176,7 @@ public class TestUrlParser {
         long offset = Math.abs(now.getTime() - p.getEnd().getTime());
         logger.debug("end offset:" + offset);
         Assert.assertTrue("bad value for offset:" + offset, offset > 980 && offset < 1200);
-        Assert.assertEquals(7, p.getScale());
+        Assert.assertEquals(Period.Scale.DAY, p.getScale());
         String url = pb.makeObjectUrl("root", "", false);
         logger.trace(url);
     }
@@ -199,7 +199,7 @@ public class TestUrlParser {
         long offset = Math.abs(now.getTime() - p.getEnd().getTime());
         Assert.assertTrue("bad value for offset:" + offset, offset > 980 && offset < 1200);
         Assert.assertTrue("delta begin is too high: " + delta, delta < 1000);
-        Assert.assertEquals(4, p.getScale());
+        Assert.assertEquals(Period.Scale.HOURS4, p.getScale());
         String url = pb.makeObjectUrl("root", "", false);
         logger.trace(url);
     }
