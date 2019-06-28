@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
+import java.util.Base64;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -17,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import jrds.HostsList;
 import jrds.Period;
 import jrds.Util;
-import net.iharder.Base64;
 
 /**
  * A servlet wich generate a png for a graph
@@ -81,7 +81,7 @@ public final class Graph extends JrdsServlet {
             res.addDateHeader("Last-Modified", graph.getEnd().getTime());
             res.addHeader("Content-disposition", "inline; filename=" + graph.getPngName());
             String eTagBaseString = getServletName() + graph.hashCode();
-            res.addHeader("ETag", Base64.encodeBytes(eTagBaseString.getBytes()));
+            res.addHeader("ETag", Base64.getEncoder().encodeToString(eTagBaseString.getBytes()));
             ServletOutputStream out = res.getOutputStream();
             FileChannel indata = hl.getRenderer().sendInfo(graph);
             // If a cache file exist, try to be smart, but only if caching is

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.iharder.Base64;
 
 /**
  * Servlet implementation class JSonPack
@@ -84,7 +83,7 @@ public class JSonPack extends HttpServlet {
         }
 
         ByteArrayOutputStream packedDataBuffer = new ByteArrayOutputStream(len);
-        GZIPOutputStream gzipBuffer = new GZIPOutputStream(new Base64.OutputStream(packedDataBuffer), len);
+        GZIPOutputStream gzipBuffer = new GZIPOutputStream(Base64.getEncoder().wrap(packedDataBuffer), len);
         gzipBuffer.write(paramsClean.toString().getBytes());
         gzipBuffer.close();
 

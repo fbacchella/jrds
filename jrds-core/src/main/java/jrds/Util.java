@@ -14,6 +14,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -48,7 +49,6 @@ import org.w3c.dom.DocumentType;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.starter.HostStarter;
-import net.iharder.Base64;
 
 /**
  *
@@ -158,7 +158,7 @@ public class Util {
         getmd5().reset();
         byte[] digestval = getmd5().digest(s.getBytes());
         getmd5().reset();
-        return Base64.encodeBytes(digestval);
+        return Base64.getEncoder().encodeToString(digestval);
     }
 
     public static String cleanPath(String s) {

@@ -13,6 +13,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -42,7 +43,6 @@ import jrds.Probe;
 import jrds.Tab;
 import jrds.Util;
 import jrds.Util.SiPrefix;
-import net.iharder.Base64;
 
 /**
  * A bean to parse the request paramaters
@@ -183,7 +183,7 @@ public class ParamsBean implements Serializable {
         logger.trace(formatedpack);
         ByteArrayOutputStream outbuffer = new ByteArrayOutputStream(formatedpack.length());
         try {
-            InputStream inbuffer = new Base64.InputStream(new ByteArrayInputStream(formatedpack.getBytes()), Base64.DECODE);
+            InputStream inbuffer = Base64.getDecoder().wrap(new ByteArrayInputStream(formatedpack.getBytes()));
 
             byte[] copybuffer = new byte[1500];
             GZIPInputStream os = new GZIPInputStream(inbuffer);
