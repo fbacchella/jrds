@@ -35,8 +35,7 @@ public class TestRrdDbStore {
 
     @Test
     public void testCreate() throws Exception {
-        @SuppressWarnings("unchecked")
-        Probe<?, ?> p = GenerateProbe.quickProbe(testFolder, GenerateProbe.ChainedMap.start(0));
+        Probe<String, Number> p = GenerateProbe.quickProbe(testFolder, GenerateProbe.ChainedMap.start(0));
         p.getPd().add("test", DsType.COUNTER);
         Assert.assertTrue("Probe file creation failed", p.checkStore());
         Extractor e = p.getMainStore().getExtractor();
@@ -48,8 +47,7 @@ public class TestRrdDbStore {
 
     @Test
     public void testFill() throws Exception {
-        @SuppressWarnings("unchecked")
-        Probe<?, ?> p = GenerateProbe.quickProbe(testFolder);
+        Probe<String, Number> p = GenerateProbe.quickProbe(testFolder);
         p.setStep(30);
         p.getPd().add("test", DsType.GAUGE);
         Assert.assertTrue("Probe file creation failed", p.checkStore());

@@ -63,7 +63,6 @@ public class TestSum {
         GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
         args.set(ProbeDesc.class, Full.getPd()).set(Probe.class, DummyProbe.class).set(PropertiesManager.class, pm);
 
-        @SuppressWarnings("unchecked")
         Probe<String, Number> p = (MokeProbe<String, Number>) GenerateProbe.quickProbe(testFolder, args);
 
         p.checkStore();

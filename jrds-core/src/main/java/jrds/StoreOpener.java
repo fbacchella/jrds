@@ -59,6 +59,7 @@ public final class StoreOpener {
         }
     }
 
+    @SuppressWarnings("deprecation")
     public static final void prepare(String backend) {
         usepool = false;
         if(backend != null) {
@@ -71,6 +72,7 @@ public final class StoreOpener {
         logger.debug("use pool: {}", usepool);
     }
 
+    @SuppressWarnings("deprecation")
     public static final void prepare(String backend, int dbPoolSize) {
         usepool = false;
         if(backend != null) {

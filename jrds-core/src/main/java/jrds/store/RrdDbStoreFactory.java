@@ -40,6 +40,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
      * @see
      * jrds.store.AbstractStoreFactory#configureStore(jrds.PropertiesManager)
      */
+    @SuppressWarnings("deprecation")
     @Override
     public void configureStore(PropertiesManager pm, Properties props) {
         super.configureStore(pm, props);
