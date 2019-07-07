@@ -11,14 +11,20 @@ import jrds.GenericBean;
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.ProbeDesc;
+import jrds.PropertiesManager;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Object>> {
     static final private Logger logger = LoggerFactory.getLogger(ProbeDescBuilder.class);
 
-    private ClassLoader classLoader = ProbeDescBuilder.class.getClassLoader();
     private Map<String, GraphDesc> graphDescMap = Collections.emptyMap();
+
+    @Getter @Setter @Accessors(chain=true)
+    private ProbeClassResolver probeClassResolver = new ProbeClassResolver(ProbeDescBuilder.class.getClassLoader());
 
     public ProbeDescBuilder() {
         super(ConfigType.PROBEDESC);
@@ -29,7 +35,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Ob
         try {
             return makeProbeDesc(n);
         } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | 
-                ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
+                        ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
             throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
         }
     }
@@ -50,7 +56,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Ob
             throw new RuntimeException("Probe " + pd.getProbeName() + "defined without class");
         }
         String className = classElem.getTextContent().trim();
-        Class<? extends Probe<?, ?>> c = (Class<? extends Probe<?, ?>>) classLoader.loadClass(className);
+        Class<? extends Probe<?, ?>> c = probeClassResolver.getClassByName(className);
         pd.setProbeClass((Class<? extends Probe<KeyType, ?>>) c);
 
         setMethod(root.getElementbyName("uptimefactor"), pd, "setUptimefactor", Float.TYPE);
@@ -118,15 +124,14 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Ob
         return pd;
     }
 
-    /**
-     * @param classLoader the classLoader to set
-     */
-    void setClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
-    }
-
     public void setGraphDescMap(Map<String, GraphDesc> graphDescMap) {
         this.graphDescMap = graphDescMap;
+    }
+
+    @Override
+    void setPm(PropertiesManager pm) {
+        super.setPm(pm);
+        this.probeClassResolver = new ProbeClassResolver(pm.extensionClassLoader);
     }
 
 }

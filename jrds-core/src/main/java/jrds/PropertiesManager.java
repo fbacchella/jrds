@@ -501,7 +501,7 @@ public class PropertiesManager extends Properties {
     public int numCollectors;
     public final Set<URI> libspath = new HashSet<URI>();
     public boolean strictparsing = false;
-    public ClassLoader extensionClassLoader;
+    public ClassLoader extensionClassLoader = getClass().getClassLoader();
     public boolean legacymode;
     public boolean autocreate;
     public int timeout;

@@ -19,6 +19,7 @@ import org.slf4j.event.Level;
 
 import jrds.PropertiesManager.TimerInfo;
 import jrds.configuration.ConfigObjectFactory;
+import jrds.configuration.ProbeClassResolver;
 import jrds.factories.ArgFactory;
 import jrds.factories.ProbeMeta;
 import jrds.graphe.Sum;
@@ -29,6 +30,9 @@ import jrds.starter.StarterNode;
 import jrds.webapp.ACL;
 import jrds.webapp.DiscoverAgent;
 import jrds.webapp.RolesACL;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  * The central repository of all informations : hosts, graph, and everything
@@ -58,6 +62,9 @@ public class HostsList extends StarterNode {
     // A global flag that tells globally that this HostsList can be used
     volatile private boolean started = false;
     private Set<Class<? extends DiscoverAgent>> daList = new HashSet<Class<? extends DiscoverAgent>>();
+    
+    @Getter @Setter @Accessors(chain=true)
+    private ProbeClassResolver probeClassResolver = new ProbeClassResolver(HostsList.class.getClassLoader());
 
     /**
      *  
@@ -124,6 +131,7 @@ public class HostsList extends StarterNode {
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
         conf.setArchiveSetMap();
         conf.setGraphDescMap();
+        conf.setProbeClassResolver(probeClassResolver);
         Map<String, ProbeDesc<?>> allProbeDesc = conf.setProbeDescMap();
         for(ProbeDesc<?> pd: allProbeDesc.values()) {
             for(ProbeMeta meta: ArgFactory.enumerateAnnotation(pd.getProbeClass(), ProbeMeta.class, StarterNode.class)) {

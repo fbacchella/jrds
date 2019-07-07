@@ -24,6 +24,9 @@ import jrds.factories.xml.JrdsDocument;
 import jrds.graphe.Sum;
 import jrds.starter.Listener;
 import jrds.starter.Timer;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 public class ConfigObjectFactory {
     static final private Logger logger = LoggerFactory.getLogger(ConfigObjectFactory.class);
@@ -36,6 +39,9 @@ public class ConfigObjectFactory {
     Map<String, ArchivesSet> archivessetmap = Collections.singletonMap(ArchivesSet.DEFAULT.getName(), ArchivesSet.DEFAULT);
     private final jrds.PropertiesManager pm;
     private Loader load = null;
+
+    @Getter @Setter @Accessors(chain=true)
+    private ProbeClassResolver probeClassResolver = new ProbeClassResolver(ProbeDescBuilder.class.getClassLoader());
 
     public ConfigObjectFactory(jrds.PropertiesManager pm) {
         this.pm = pm;
@@ -134,9 +140,9 @@ public class ConfigObjectFactory {
     public Map<String, ProbeDesc<? extends Object>> setProbeDescMap() {
         Map<String, JrdsDocument> nodemap = load.getRepository(ConfigType.PROBEDESC);
         ProbeDescBuilder ob = new ProbeDescBuilder();
-        ob.setClassLoader(cl);
         ob.setPm(pm);
         ob.setGraphDescMap(graphDescMap);
+        ob.setProbeClassResolver(probeClassResolver);
         Map<String, ProbeDesc<? extends Object>> probeDescMap = getObjectMap(ob, nodemap);
         pf = new ProbeFactory(probeDescMap, graphDescMap);
         logger.debug("Probe description configured:{}", Util.delayedFormatString(probeDescMap::keySet));
