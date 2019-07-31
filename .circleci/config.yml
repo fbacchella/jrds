@@ -8,13 +8,14 @@ jobs:
             - restore_cache:
                 key: jrds-{{ checksum "pom.xml" }}
             - run: sudo apt install libsnmp-base
-            - run: mkdir -p /home/circleci/.sonar/cache /home/circleci/.m2/repository
-            - run: "mvn -B dependency:go-offline -Psonar,versions"
+            - run: mkdir -p /home/circleci/.m2/repository
+            - run: "mvn -B dependency:go-offline -DoutputFile=offline.log || true"
+            - run: "[ -x /home/circleci/jfrog ] || (cd && curl -fL https://getcli.jfrog.io | sh)"
             - persist_to_workspace:
                 root: /
                 paths:
                     - home/circleci/.m2/repository
-                    - home/circleci/.sonar/cache
+                    - home/circleci/jfrog
                     - home/circleci/project
                     - usr/share/snmp/mibs/
     build:
@@ -29,7 +30,7 @@ jobs:
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
             - run:
-                command: mvn -B clean compile install -DskipTests
+                command: mvn -B clean compile install -DskipTests -Djdk.compile.home=/usr/lib/jvm/java-8-openjdk-amd64
                 environment:
                     JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
             - persist_to_workspace:
@@ -52,46 +53,13 @@ jobs:
                     sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
             - run:
                 command: |
-                    # If no symbolic name, it's a PR, will run sonar
-                    if [ -n "$(git symbolic-ref HEAD 2>/dev/null )" ] ; then
-                        SONAR="-Psonar"
-                    else
-                        SONAR=""
-                    fi
-                    echo "publishing jobs: $SONAR"
                     #see https://stackoverflow.com/questions/53010200/maven-surefire-could-not-find-forkedbooter-class for disableClassPathURLCheck
-                    mvn -B test -Dmaven.resources.skip=true -Dmaven.main.skip=true $SONAR -Dsonar.login=$SONARCLOUD_LOGIN -DargLine="-Xmx2048m -Djdk.net.URLClassPath.disableClassPathURLCheck=true"
+                    mvn -B test -Dmaven.resources.skip=true -Dmaven.main.skip=true -DargLine="-Xmx2048m -Djdk.net.URLClassPath.disableClassPathURLCheck=true"
                 environment:
                     JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
             - store_test_results:
                 path: target/surefire-reports
             #don't persist_to_workspace, can't be done in parallel with testsj11
-    testsj11:
-        docker:
-            - image: circleci/openjdk:11-jdk
-        steps:
-            - attach_workspace:
-                at: /tmp/ws
-            - run:
-                command: |
-                    mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
-                    mv -n /tmp/ws/home/circleci/.sonar /home/circleci/
-                    mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
-                    mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
-                    sudo mkdir -p /usr/share/snmp/mibs/
-                    sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
-            - run:
-                command: |
-                    mvn -B test -Dmaven.resources.skip=true -Dmaven.main.skip=true
-                environment:
-                    JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
-            - store_test_results:
-                path: target/surefire-reports
-            - persist_to_workspace:
-                root: /
-                paths:
-                    - home/circleci/.m2/repository
-                    - home/circleci/.sonar/cache
     publish:
         docker:
             - image: circleci/openjdk:11-jdk
@@ -101,26 +69,32 @@ jobs:
             - run:
                 command: |
                     mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
-                    mv -n /tmp/ws/home/circleci/.sonar /home/circleci/
+                    mv -n /tmp/ws/home/circleci/jfrog /home/circleci/jfrog
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
             - run:
                 command: |
-                    # If no symbolic name, it's a PR, will not publish results
-                    if [ -n "$(git symbolic-ref HEAD 2>/dev/null )" ] ; then
-                        PUBLISH="deploy"
-                    else
-                        PUBLISH="install"
-                    fi
-                    echo "publishing jobs: $PUBLISH"
-                    mvn -B $PUBLISH site -Dmaven.resources.skip=true -Dmaven.test.skip=true -Dmaven.main.skip=true -s .circleci/settings.xml
+                     mvn -B deploy site -Dmaven.resources.skip=true -Dmaven.test.skip=true -Dmaven.main.skip=true -DaltDeploymentRepository=local::default::file:target/deploy
+                environment:
+                    JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
+            - run:
+                command: |
+                    VERSION=$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)
+                    GROUPPATH=$(mvn -B help:evaluate -Dexpression=project.groupId -q -DforceStdout | sed 's#\.#/#g')
+                    for a in target/deploy/$GROUPPATH/* ; do \
+                        ( \
+                            echo "$a"
+                            cd "$a" && \
+                            echo "$BINTRAY_REPO/$ARTEFACT/$VERSION $GROUPPATH/$ARTEFACT/$VERSION/" && \
+                            /home/circleci/jfrog bt u --user $BINTRAY_USER --key $BINTRAY_KEY '*' "$BINTRAY_REPO/$a/$VERSION" "$GROUPPATH/$a/$VERSION/" \
+                        ) \
+                    done
                 environment:
                     JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
             - persist_to_workspace:
                 root: /
                 paths:
                     - home/circleci/.m2/repository
-                    - home/circleci/.sonar/cache
     savecache:
         docker:
             - image: circleci/openjdk:11-jdk
@@ -131,11 +105,9 @@ jobs:
                 command: |
                     mv /tmp/ws/home/circleci/project/pom.xml /home/circleci/project/
                     mv /tmp/ws/home/circleci/.m2 /home/circleci/
-                    mv /tmp/ws/home/circleci/.sonar /home/circleci/
             - save_cache:
                 paths:
                     - /home/circleci/.m2/repository
-                    - /home/circleci/.sonar/cache
                 key: jrds-{{ checksum "pom.xml" }}
             
 workflows:
@@ -147,9 +119,6 @@ workflows:
           requires:
               - checkout
       - testsj8:
-          requires:
-              - build
-      - testsj11:
           requires:
               - build
       - publish:

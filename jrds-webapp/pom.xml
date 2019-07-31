@@ -7,7 +7,7 @@
     <parent>
         <groupId>fr.jrds</groupId>
         <artifactId>jrds</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0-RC1</version>
     </parent>
     <artifactId>jrds-webapp</artifactId>
     <packaging>war</packaging>
