@@ -52,6 +52,7 @@ public class ReadOnlyProbeClassResolver extends ProbeClassResolver {
             this.index = index;
             return true;
         }
+
     }
 
     public ReadOnlyProbeClassResolver(ClassLoader classLoader) {
