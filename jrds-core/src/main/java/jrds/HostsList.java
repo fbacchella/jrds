@@ -62,9 +62,9 @@ public class HostsList extends StarterNode {
     // A global flag that tells globally that this HostsList can be used
     volatile private boolean started = false;
     private Set<Class<? extends DiscoverAgent>> daList = new HashSet<Class<? extends DiscoverAgent>>();
-    
+
     @Getter @Setter @Accessors(chain=true)
-    private ProbeClassResolver probeClassResolver = new ProbeClassResolver(HostsList.class.getClassLoader());
+    private ProbeClassResolver probeClassResolver;
 
     /**
      *  
@@ -101,6 +101,8 @@ public class HostsList extends StarterNode {
 
     public void configure(PropertiesManager pm) {
         started = false;
+
+        probeClassResolver = new ProbeClassResolver(pm.extensionClassLoader);
 
         if(pm.rrddir == null) {
             log(Level.ERROR, "Probes directory not configured, can't configure");
