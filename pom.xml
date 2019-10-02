@@ -24,6 +24,7 @@
         <junit.version>4.12</junit.version>
         <slf4j.version>1.7.28</slf4j.version>
         <jrds.hidelogs>true</jrds.hidelogs>
+        <jdk.compile.home>${java.home}</jdk.compile.home>
     </properties>
 
     <modules>
@@ -76,6 +77,16 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.0</version>
+                    <configuration>
+                        <compilerArgs>
+                            <arg>-Xlint</arg>
+                            <arg>-Xbootclasspath/p:${jdk.compile.home}/lib/rt.jar</arg>
+                        </compilerArgs>
+                        <showWarnings>false</showWarnings>
+                        <!-- needed for maven-plugin-javadoc to find the source version to use -->
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -101,20 +112,22 @@
                         <quiet/>
                         <links>
                             <link>https://docs.oracle.com/javaee/7/api/</link>
-                            <link>http://www.snmp4j.org/doc/</link>
+                            <!--link>http://www.snmp4j.org/doc/</link-->
                             <link>https://rrd4j.github.io/rrd4j/apidocs/</link>
-                            <link>http://junit.org/apidocs/</link>
-                            <link>http://download.eclipse.org/jetty/stable-9/apidocs/</link>
+                            <link>https://junit.org/junit4/javadoc/latest/</link>
+                            <link>https://www.eclipse.org/jetty/javadoc/9.2.22.v20170606/</link>
                             <link>http://ws.apache.org/xmlrpc/apidocs/</link>
-                            <link>http://www.json.org/javadoc/</link>
+                            <link>https://stleary.github.io/JSON-java/</link>
                             <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
-                            <link>http://commons.apache.org/proper/commons-net/javadocs/api-3.3/</link>
+                            <link>http://commons.apache.org/proper/commons-net/javadocs/api-3.6/</link>
                             <link>http://commons.apache.org/fileupload/apidocs/</link>
                             <link>http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/</link>
                             <link>http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/</link>
-                            <link>https://www.javadoc.io/doc/com.jayway.jsonpath/json-path/2.4.0</link>
+                            <!--link>https://javadoc.io/doc/com.jayway.jsonpath/json-path/2.4.0</link-->
+                            <detectJavaApiLink>true</detectJavaApiLink>
                         </links>
-                        <bootclasspath>${sun.boot.class.path}</bootclasspath>
+                        <bootclasspath>${jdk.compile.home}/lib/rt.jar</bootclasspath>
+                        <source>${maven.compiler.source}</source>
                     </configuration>
                     <executions>
                         <execution>

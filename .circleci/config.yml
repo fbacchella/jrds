@@ -7,9 +7,12 @@ jobs:
             - checkout
             - restore_cache:
                 key: jrds-{{ checksum "pom.xml" }}
-            - run: sudo apt install libsnmp-base
-            - run: mkdir -p /home/circleci/.sonar/cache /home/circleci/.m2/repository
-            - run: "mvn -B dependency:go-offline -Psonar,versions"
+            - run:
+                command: |
+                    sudo apt-get update
+                    sudo apt install libsnmp-base
+                    mkdir -p /home/circleci/.sonar/cache /home/circleci/.m2/repository
+                    mvn -B dependency:go-offline -Psonar,versions
             - persist_to_workspace:
                 root: /
                 paths:
