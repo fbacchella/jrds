@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -82,17 +83,32 @@ public class XmlProvider extends Starter {
     public long findUptimeByDate(Document d, String startTimePath, String currentTimePath, DateFormat pattern) {
         XPath xpather = localXpath.get();
         try {
-            Node startTimeNode = (Node) xpather.evaluate(startTimePath, d, XPathConstants.NODE);
-            String startTimeString = startTimeNode.getTextContent();
-            Date startTime = pattern.parse(startTimeString);
-            Node currentTimeNode = (Node) xpather.evaluate(currentTimePath, d, XPathConstants.NODE);
-            String currentTimeString = currentTimeNode.getTextContent();
-            Date currentTime = pattern.parse(currentTimeString);
-            return (currentTime.getTime() - startTime.getTime()) / 1000;
+            Date startTime = Optional.ofNullable((Node) xpather.evaluate(startTimePath, d, XPathConstants.NODE))
+                .map(Node::getTextContent)
+                .map(t -> {
+                    try {
+                        return pattern.parse(t);
+                    } catch (ParseException e) {
+                        log(Level.ERROR, e, "Date not parsed with pattern " + ((SimpleDateFormat) pattern).toPattern());
+                        return null;
+                    }
+                }).orElse(null);
+
+            Date currentTime = Optional.ofNullable((Node) xpather.evaluate(currentTimePath, d, XPathConstants.NODE))
+                .map(Node::getTextContent)
+                .map(t -> {
+                    try {
+                        return pattern.parse(t);
+                    } catch (ParseException e) {
+                        log(Level.ERROR, e, "Date not parsed with pattern " + ((SimpleDateFormat) pattern).toPattern());
+                        return null;
+                    }
+                }).orElse(null);
+            if (startTime != null &&currentTime != null) {
+                return (currentTime.getTime() - startTime.getTime()) / 1000;
+            }
         } catch (XPathExpressionException e) {
             log(Level.ERROR, e, "Time not found");
-        } catch (ParseException e) {
-            log(Level.ERROR, e, "Date not parsed with pattern " + ((SimpleDateFormat) pattern).toPattern());
         }
         return 0;
     }
