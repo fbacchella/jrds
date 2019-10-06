@@ -12,7 +12,7 @@ jobs:
                     sudo apt-get update
                     sudo apt install libsnmp-base
                     mkdir -p /home/circleci/.sonar/cache /home/circleci/.m2/repository
-                    mvn -B dependency:go-offline -Psonar,versions
+                    mvn -B dependency:go-offline -Psonar,versions -s .circleci/settings.xml
             - persist_to_workspace:
                 root: /
                 paths:
@@ -32,7 +32,7 @@ jobs:
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
             - run:
-                command: mvn -B clean compile install -DskipTests
+                command: mvn -B clean compile install -DskipTests -s .circleci/settings.xml
                 environment:
                     JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
             - persist_to_workspace:
@@ -63,7 +63,7 @@ jobs:
                     fi
                     echo "publishing jobs: $SONAR"
                     #see https://stackoverflow.com/questions/53010200/maven-surefire-could-not-find-forkedbooter-class for disableClassPathURLCheck
-                    mvn -B test -Dmaven.resources.skip=true -Dmaven.main.skip=true $SONAR -Dsonar.login=$SONARCLOUD_LOGIN -DargLine="-Xmx2048m -Djdk.net.URLClassPath.disableClassPathURLCheck=true"
+                    mvn -B test -Pskip $SONAR -Dsonar.login=$SONARCLOUD_LOGIN -DargLine="-Xmx2048m -Djdk.net.URLClassPath.disableClassPathURLCheck=true" -s .circleci/settings.xml
                 environment:
                     JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
             - store_test_results:
@@ -85,7 +85,7 @@ jobs:
                     sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
             - run:
                 command: |
-                    mvn -B test -Dmaven.resources.skip=true -Dmaven.main.skip=true
+                    mvn -B test -Pskip -s .circleci/settings.xml
                 environment:
                     JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
             - store_test_results:
@@ -116,7 +116,7 @@ jobs:
                         PUBLISH="install"
                     fi
                     echo "publishing jobs: $PUBLISH"
-                    mvn -B $PUBLISH site -Dmaven.resources.skip=true -Dmaven.test.skip=true -Dmaven.main.skip=true -s .circleci/settings.xml
+                    mvn -B $PUBLISH site -Pskip -Dmaven.test.skip=true -s .circleci/settings.xml
                 environment:
                     JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
             - persist_to_workspace:

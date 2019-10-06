@@ -16,6 +16,7 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <jdk.compile.home>${jdk.8.home}</jdk.compile.home>
         <year>2019</year>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jetty.version>9.2.28.v20190418</jetty.version>
@@ -24,7 +25,6 @@
         <junit.version>4.12</junit.version>
         <slf4j.version>1.7.28</slf4j.version>
         <jrds.hidelogs>true</jrds.hidelogs>
-        <jdk.compile.home>${java.home}</jdk.compile.home>
     </properties>
 
     <modules>
@@ -122,11 +122,12 @@
                             <link>http://commons.apache.org/proper/commons-net/javadocs/api-3.6/</link>
                             <link>http://commons.apache.org/fileupload/apidocs/</link>
                             <link>http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/</link>
-                            <link>http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/</link>
+                            <!-- sometime fails for no reason -->
+                            <!--link>http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/</link-->
                             <!--link>https://javadoc.io/doc/com.jayway.jsonpath/json-path/2.4.0</link-->
                             <detectJavaApiLink>true</detectJavaApiLink>
                         </links>
-                        <bootclasspath>${jdk.compile.home}/lib/rt.jar</bootclasspath>
+                        <bootclasspath>${jdk.compile.home}/jre/lib/rt.jar</bootclasspath>
                         <source>${maven.compiler.source}</source>
                     </configuration>
                     <executions>
