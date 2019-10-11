@@ -31,7 +31,7 @@ import jrds.probe.JmxSocketFactory;
 import jrds.starter.SocketFactory;
 
 @ProbeBean({ "url", "protocol", "port", "path", "user", "password" })
-public class NativeJmxConnection extends AbstractJmxConnection {
+public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnection, NativeJmxSource> {
 
     public class RmiSocketFactory implements RMIClientSocketFactory {
         public Socket createSocket(String host, int port) throws IOException {
@@ -39,7 +39,6 @@ public class NativeJmxConnection extends AbstractJmxConnection {
             return getLevel().find(SocketFactory.class).createSocket(host, port);
         }
     }
-
 
     // close can be slow
     private final static AtomicInteger closed = new AtomicInteger();
