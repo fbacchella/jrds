@@ -1,5 +1,6 @@
 package jrds.probe.jmx;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.rmi.RemoteException;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.jolokia.client.exception.J4pException;
 import org.jolokia.client.exception.J4pRemoteException;
 import org.jolokia.client.request.J4pReadRequest;
 import org.jolokia.client.request.J4pReadResponse;
+import org.json.simple.JSONObject;
 
 public class JolokiaJmxSource extends JmxAbstractDataSource<J4pClient> {
 
@@ -50,7 +52,7 @@ public class JolokiaJmxSource extends JmxAbstractDataSource<J4pClient> {
             if (errorValue != null) {
                 throw new InvocationTargetException(new RemoteException(e.getErrorType() + ": " + errorValue.get("message").toString()));
             } else {
-                throw new InvocationTargetException(new RemoteException(e.getErrorType() + ": unspecified by remote jolokia"));
+                throw new InvocationTargetException(new IOException("HTTP status: "+ e.getStatus()));
             }
         } catch (J4pException e) {
             if (e.getCause() != null) {
