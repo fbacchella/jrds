@@ -2,6 +2,7 @@ package jrds.store;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +50,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
 
     public String getPath() {
         String rrdName = p.getName().replaceAll("/", "_");
-        return p.getHost().getHostDir() + Util.getFileSeparator() + rrdName + ".rrd";
+        return Paths.get(p.getHost().getHostDir().getPath(), rrdName + ".rrd").normalize().toString();
     }
 
     /**
@@ -185,7 +186,8 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 if(newstep != oldstep) {
                     log(Level.ERROR, "Step changed, this probe will not collect any more");
                     return false;
-                } else if(!newDef.equals(oldDef)) {
+                } else if (!newDef.equals(oldDef)) {
+                    log(Level.TRACE, "New definition should be: %s\n", newDef);
                     rrdDb.close();
                     rrdDb = null;
                     upgrade(archives);
