@@ -168,7 +168,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
         RrdDb rrdDb = null;
         try {
             if(rrdFile.isFile()) {
-                rrdDb = RrdDb.getBuilder().setPath(getPath()).build();
+                rrdDb = RrdDb.of(getPath());
                 // old definition
                 RrdDef tmpdef = rrdDb.getRrdDef();
                 Date startTime = new Date();
@@ -180,6 +180,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 // new definition
                 tmpdef = getRrdDef(archives);
                 tmpdef.setStartTime(startTime);
+                tmpdef.setPath(rrdDb.getPath());
                 String newDef = tmpdef.dump();
                 long newstep = tmpdef.getStep();
 
