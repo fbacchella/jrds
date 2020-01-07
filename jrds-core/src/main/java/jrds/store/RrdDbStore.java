@@ -2,6 +2,9 @@ package jrds.store;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,8 +52,16 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     }
 
     public String getPath() {
+        try {
+            return resolvePath().toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Can't resolve probe path", e);
+        }
+    }
+
+    private Path resolvePath() throws IOException {
         String rrdName = p.getName().replaceAll("/", "_");
-        return Paths.get(p.getHost().getHostDir().getPath(), rrdName + ".rrd").normalize().toString();
+        return Paths.get(p.getHost().getHostDir().getPath(), rrdName + ".rrd").normalize();
     }
 
     /**
@@ -115,7 +126,6 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                                     e.printStackTrace();
                                     log(Level.TRACE, "Datastore %s removed: %s", dsName, e.getMessage());
                                 }
-                                
                             }
                             log(Level.TRACE, "Update %s", srcArchive);
                         }
@@ -151,11 +161,9 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     }
 
     public boolean checkStoreFile(ArchivesSet archives) {
-        File rrdFile = new File(getPath());
-
         File rrdDir = p.getHost().getHostDir();
-        if(!rrdDir.isDirectory()) {
-            if(!rrdDir.mkdir()) {
+        if (!rrdDir.isDirectory()) {
+            if (!rrdDir.mkdir()) {
                 try {
                     log(Level.ERROR, "prode dir %s creation failed ", rrdDir.getCanonicalPath());
                 } catch (IOException e) {
@@ -163,50 +171,46 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 return false;
             }
         }
-
         boolean retValue = false;
-        RrdDb rrdDb = null;
         try {
-            if(rrdFile.isFile()) {
-                rrdDb = RrdDb.of(getPath());
-                // old definition
-                RrdDef tmpdef = rrdDb.getRrdDef();
+            Path rrdPath = resolvePath();
+            if (Files.exists(rrdPath)) {
                 Date startTime = new Date();
-                tmpdef.setStartTime(startTime);
-                String oldDef = tmpdef.dump();
-                long oldstep = tmpdef.getStep();
-                log(Level.TRACE, "Definition found: %s\n", oldDef);
+                rrdPath = rrdPath.toRealPath(LinkOption.NOFOLLOW_LINKS);
+
+                // old definition
+                RrdDef oldDef;
+                try (RrdDb rrdDb = RrdDb.of(rrdPath.toString())) {
+                    oldDef = rrdDb.getRrdDef();
+                };
+                oldDef.setStartTime(startTime);
+                oldDef.setPath(rrdPath.toString());
+                String oldDefDump = oldDef.dump();
+                long oldstep = oldDef.getStep();
+                log(Level.TRACE, "Definition found: %s\n", oldDefDump);
 
                 // new definition
-                tmpdef = getRrdDef(archives);
-                tmpdef.setStartTime(startTime);
-                tmpdef.setPath(rrdDb.getPath());
-                String newDef = tmpdef.dump();
-                long newstep = tmpdef.getStep();
+                RrdDef newDef = getRrdDef(archives);
+                newDef.setStartTime(startTime);
+                newDef.setPath(rrdPath.toString());
+                String newDefDump = oldDef.dump();
+                long newstep = oldDef.getStep();
 
                 if(newstep != oldstep) {
                     log(Level.ERROR, "Step changed, this probe will not collect any more");
                     return false;
-                } else if (!newDef.equals(oldDef)) {
+                } else if (!newDefDump.equals(oldDefDump)) {
                     log(Level.TRACE, "New definition should be: %s\n", newDef);
-                    rrdDb.close();
-                    rrdDb = null;
                     upgrade(archives);
-                    rrdDb = RrdDb.getBuilder().setPath(getPath()).build();
+                    RrdDb.of(getPath());
                 }
                 log(Level.TRACE, "******");
-            } else
+            } else {
                 create(archives);
+            }
             retValue = true;
         } catch (Exception e) {
             log(Level.ERROR, e, "Store %s unusable: %s", getPath(), e);
-        } finally {
-            if(rrdDb != null)
-                try {
-                    rrdDb.close();
-                } catch (IOException e) {
-                }
-
         }
         return retValue;
     }

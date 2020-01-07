@@ -1,6 +1,9 @@
 package jrds.store;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileTime;
 import java.util.Date;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -38,11 +41,23 @@ public class TestRrdDbStore {
         Probe<String, Number> p = GenerateProbe.quickProbe(testFolder, GenerateProbe.ChainedMap.start(0));
         p.getPd().add("test", DsType.COUNTER);
         Assert.assertTrue("Probe file creation failed", p.checkStore());
-        Extractor e = p.getMainStore().getExtractor();
-        e.addSource("test", "test");
-        String[] dsNames = e.getNames();
-        Assert.assertEquals("data source test not found", "test", dsNames[0]);
-        e.release();
+        try (Extractor e = p.getMainStore().getExtractor()) {
+            e.addSource("test", "test");
+            String[] dsNames = e.getNames();
+            Assert.assertEquals("data source test not found", "test", dsNames[0]);
+        };
+    }
+
+    @Test
+    public void testCheckNoUpdate() throws Exception {
+        Probe<String, Number> p = GenerateProbe.quickProbe(testFolder, GenerateProbe.ChainedMap.start(0));
+        p.getPd().add("test", DsType.COUNTER);
+        Assert.assertTrue("Probe file creation failed", p.checkStore());
+        FileTime before = Files.getLastModifiedTime(Paths.get(p.getMainStore().getPath()));
+        Thread.sleep(2000);
+        Assert.assertTrue("Probe file creation failed", p.checkStore());
+        FileTime after = Files.getLastModifiedTime(Paths.get(p.getMainStore().getPath()));
+        Assert.assertEquals(before, after);
     }
 
     @Test
