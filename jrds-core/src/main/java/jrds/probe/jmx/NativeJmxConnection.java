@@ -66,7 +66,7 @@ public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnec
             try {
                 url = protocol.getURL(this);
             } catch (MalformedURLException e) {
-                throw new RuntimeException(String.format("Invalid jmx URL %s: %s", protocol.toString()), e);
+                throw new RuntimeException(String.format("Invalid jmx URL %s: %s", protocol.toString(), e.getMessage()), e);
             }
         }
         // connector is always set, so close in Stop() always works
