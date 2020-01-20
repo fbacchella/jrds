@@ -43,45 +43,28 @@ public class MuninDiscoverAgent extends DiscoverAgent {
 
     @Override
     public boolean exist(String hostName, HttpServletRequest request) {
-        Socket muninSocket = null;
-        try {
-            port = jrds.Util.parseStringNumber(request.getParameter("discoverMuninPort"), MuninConnection.DEFAULTMUNINPORT);
-            try {
-                muninSocket = new Socket(hostName, port);
-            } catch (IOException e) {
-                log(Level.INFO, "Munin not running on %s", hostName);
-                return false;
-            }
+        port = jrds.Util.parseStringNumber(request.getParameter("discoverMuninPort"), MuninConnection.DEFAULTMUNINPORT);
+        try (Socket muninSocket = new Socket(hostName, port)) {
             muninSocket.setTcpNoDelay(true);
-
-            PrintWriter out = null;
-            BufferedReader in = null;
-            out = new PrintWriter(muninSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(muninSocket.getInputStream()));
-            //Drop the  welcome line
-            in.readLine();
-            out.println("list");
-            muninProbes = new HashSet<String>();
-            for(String p: in.readLine().split(" ")) {
-                muninProbes.add(p);
-                log(Level.TRACE, "Munin probe found : %s", p);
+            try (PrintWriter out = new PrintWriter(muninSocket.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(new InputStreamReader(muninSocket.getInputStream()))){
+                //Drop the  welcome line
+                in.readLine();
+                out.println("list");
+                muninProbes = new HashSet<String>();
+                for (String p: in.readLine().split(" ")) {
+                    muninProbes.add(p);
+                    log(Level.TRACE, "Munin probe found : %s", p);
+                }
+                out.println("quit");
+                out.close();
+                in.close();
+                log(Level.DEBUG, "Munin probes found: %s", muninProbes);
+                return true;
             }
-            out.println("quit");
-            out.close();
-            in.close();
-
-            log(Level.DEBUG, "Munin probes found: %s", muninProbes);
-            return true;
         } catch (IOException e) {
             log(Level.ERROR, e, "Unable to connect: ", e);
             return false;
-        } finally {
-            if(muninSocket != null) {
-                try {
-                    muninSocket.close();
-                } catch (IOException e) {
-                }
-            }
         }
     }
 

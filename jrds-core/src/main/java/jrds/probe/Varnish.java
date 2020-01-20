@@ -40,21 +40,12 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
 
     @Override
     public Map<String, Number> getNewSampleValues() {
-        Socket s;
-        try {
-            SocketFactory ss = find(SocketFactory.class);
-            if(!ss.isStarted())
-                return null;
-            s = ss.createSocket(this, port);
-        } catch (Exception e) {
-            log(Level.ERROR, e, "Connect error %s", e);
+        SocketFactory ss = find(SocketFactory.class);
+        if (ss == null || !ss.isStarted()) {
             return null;
         }
 
-        if(s == null)
-            return null;
-
-        try {
+        try (Socket s = ss.createSocket(this, port)) {
             PrintWriter outputSocket = new PrintWriter(s.getOutputStream());
             BufferedReader inputSocket = new BufferedReader(new InputStreamReader(s.getInputStream()));
 

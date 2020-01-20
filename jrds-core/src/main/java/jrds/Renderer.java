@@ -72,17 +72,17 @@ public class Renderer {
         public void send(OutputStream out) throws IOException {
             if(isReady()) {
                 WritableByteChannel outC = Channels.newChannel(out);
-                FileInputStream inStream = new FileInputStream(destFile);
-                FileChannel inC = inStream.getChannel();
-                inC.transferTo(0, destFile.length(), outC);
-                inStream.close();
+                try (FileInputStream inStream = new FileInputStream(destFile)) {
+                    FileChannel inC = inStream.getChannel();
+                    inC.transferTo(0, destFile.length(), outC);
+                }
             }
         }
 
         public void write() throws IOException {
-            OutputStream out = new BufferedOutputStream(new FileOutputStream(new File(graph.getPngName())));
-            send(out);
-            out.close();
+            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(new File(graph.getPngName())))) {
+                send(out);
+            }
         }
 
         public void clean() {
@@ -103,9 +103,10 @@ public class Renderer {
             try {
                 if(!finished) {
                     long starttime = System.currentTimeMillis();
-                    OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile));
+                    try(OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile))) {
+                        graph.writePng(out);
+                    };
                     long middletime = System.currentTimeMillis();
-                    graph.writePng(out);
                     if(logger.isTraceEnabled()) {
                         long endtime = System.currentTimeMillis();
                         long duration1 = (middletime - starttime);

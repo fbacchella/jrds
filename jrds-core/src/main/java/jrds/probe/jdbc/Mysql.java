@@ -48,13 +48,14 @@ public abstract class Mysql extends JdbcProbe {
                     try {
                         stmt = getStatment();
                         if(stmt.execute("SHOW STATUS LIKE 'Uptime';")) {
-                            ResultSet rs = stmt.getResultSet();
-                            while (rs.next()) {
-                                String key = rs.getObject(1).toString();
-                                String oValue = rs.getObject(2).toString();
-                                if("Uptime".equals(key)) {
-                                    uptime = Util.parseStringNumber(oValue, 0L);
-                                    break;
+                            try (ResultSet rs = stmt.getResultSet()) {
+                                while (rs.next()) {
+                                    String key = rs.getObject(1).toString();
+                                    String oValue = rs.getObject(2).toString();
+                                    if("Uptime".equals(key)) {
+                                        uptime = Util.parseStringNumber(oValue, 0L);
+                                        break;
+                                    }
                                 }
                             }
                         }

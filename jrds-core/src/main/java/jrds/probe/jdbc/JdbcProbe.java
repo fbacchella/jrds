@@ -166,17 +166,18 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
             stmt = starter.getStatment();
             if(stmt.execute(query)) {
                 do {
-                    ResultSet rs = stmt.getResultSet();
-                    while (rs.next()) {
-                        String key = rs.getString(keyCol);
-                        Number value;
-                        Object oValue = rs.getObject(valCol);
-                        if(oValue instanceof Number)
-                            value = (Number) oValue;
-                        else
-                            value = new Double(Double.NaN);
-
-                        values.put(key, value);
+                    try (ResultSet rs = stmt.getResultSet()) {
+                        while (rs.next()) {
+                            String key = rs.getString(keyCol);
+                            Number value;
+                            Object oValue = rs.getObject(valCol);
+                            if(oValue instanceof Number)
+                                value = (Number) oValue;
+                            else
+                                value = new Double(Double.NaN);
+                            
+                            values.put(key, value);
+                        }
                     }
                 } while (stmt.getMoreResults());
             }

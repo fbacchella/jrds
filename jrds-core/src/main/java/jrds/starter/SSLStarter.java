@@ -2,6 +2,7 @@ package jrds.starter;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -76,8 +77,9 @@ public class SSLStarter extends Starter {
                     tm = new TrustManager[] { trustAllCerts };
                 } else if (truststore != null) {
                     KeyStore ks = KeyStore.getInstance(format);
-                    ks.load(new FileInputStream(truststore), trustpassword.toCharArray());
-
+                    try (InputStream kis = new FileInputStream(truststore)) {
+                        ks.load(kis, trustpassword.toCharArray());
+                    }
                     TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                     tmf.init(ks);
                     tm = tmf.getTrustManagers();
