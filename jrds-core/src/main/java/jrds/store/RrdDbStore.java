@@ -123,7 +123,6 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                                         robinMigrated++;
                                     }
                                 } catch (IllegalArgumentException e) {
-                                    e.printStackTrace();
                                     log(Level.TRACE, "Datastore %s removed: %s", dsName, e.getMessage());
                                 }
                             }
