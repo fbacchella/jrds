@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+                           "urn:jrds:graphdesc">
+<graphdesc>
+    <name>ElasticClusterShards</name>
+    <graphName>elasticnode_shards_${port}</graphName>
+    <graphTitle>Elastic cluster shards seen on ${host}:${port}</graphTitle>
+    <verticalLabel>shards</verticalLabel>
+    <add>
+        <name>active_primary_shards</name>
+        <graphType>line</graphType>
+        <legend>Active primary shards</legend>
+    </add>
+    <add>
+        <name>active_shards</name>
+        <graphType>line</graphType>
+        <legend>Active shards</legend>
+    </add>
+    <add>
+        <name>delayed_unassigned_shards</name>
+        <graphType>line</graphType>
+        <legend>Delayed unassined shards</legend>
+    </add>
+    <add>
+        <name>initializing_shards</name>
+        <graphType>line</graphType>
+        <legend>Initializing shards</legend>
+    </add>
+    <add>
+        <name>relocating_shards</name>
+        <graphType>line</graphType>
+        <legend>Relocating shards</legend>
+    </add>
+    <add>
+        <name>unassigned_shards</name>
+        <graphType>line</graphType>
+        <legend>Unassigned shards</legend>
+    </add>
+    <hosttree>
+        <pathelement>HOST</pathelement>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>Elasticearch</pathstring>
+        <pathstring>${port}</pathstring>
+        <pathstring>Shards count</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>Elasticearch</pathstring>
+        <pathstring>Shards count</pathstring>
+        <pathstring>${host}:${port}</pathstring>
+    </viewtree>
+</graphdesc>
