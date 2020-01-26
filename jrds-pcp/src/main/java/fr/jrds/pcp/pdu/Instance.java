@@ -3,7 +3,7 @@ package fr.jrds.pcp.pdu;
 import java.util.ArrayList;
 import java.util.List;
 
-import fr.jrds.pcp.InstanceInstance;
+import fr.jrds.pcp.InstanceInfo;
 import fr.jrds.pcp.MessageBuffer;
 import lombok.Getter;
 
@@ -13,7 +13,7 @@ public class Instance extends Pdu {
     private int instanceDomain;
     
     @Getter
-    private List<InstanceInstance> instances = new ArrayList<>();
+    private List<InstanceInfo> instances = new ArrayList<>();
 
     @Override
     public PDU_TYPE getType() {
@@ -25,7 +25,7 @@ public class Instance extends Pdu {
         instanceDomain = buffer.getInt();
         int count = buffer.getInt();
         for (int i = 0; i < count ; i++) {
-            InstanceInstance ii = new InstanceInstance();
+            InstanceInfo ii = new InstanceInfo();
             ii.parse(buffer);
             instances.add(ii);
         }

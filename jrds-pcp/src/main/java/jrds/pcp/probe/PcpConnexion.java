@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import fr.jrds.pcp.Connection;
-import fr.jrds.pcp.InstanceInstance;
+import fr.jrds.pcp.InstanceInfo;
 import fr.jrds.pcp.PCPException;
 import fr.jrds.pcp.PmDesc;
 import fr.jrds.pcp.PmId;
@@ -50,6 +50,7 @@ public class PcpConnexion extends jrds.starter.Connection<Connection> {
     public boolean startConnection() {
         try {
             cnx = new fr.jrds.pcp.Connection(new InetSocketAddress(getResolver().getInetAddress(), 44321), 0);
+            cnx.startClient();
             cnx.authentication(new CVersion());
             return true;
         } catch (IOException | PCPException | InterruptedException e) {
@@ -103,7 +104,7 @@ public class PcpConnexion extends jrds.starter.Connection<Connection> {
                     Map<String, Number> idvalues = new HashMap<>(lr.get(id).size());
                     if (lr.get(id).size() > 1) {
                         PmDesc desc = cnx.getDescription(id);
-                        List<InstanceInstance> lin = cnx.getInstance(desc.getIndom(), 0xffffffff, "");
+                        List<InstanceInfo> lin = cnx.getInstance(desc.getIndom(), 0xffffffff, "");
                         for (int j = 0 ; j < lin.size() ; j++) {
                             idvalues.put(lin.get(j).getName(), lr.get(id).get(j).getCheckedValue());
                         }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>PcpDisk</name>
+    <probeName>disk-${index}</probeName>
+    <probeClass>jrds.pcp.probe.PcpProbeIndexed</probeClass>
+    <ds>
+        <dsName>read</dsName>
+        <dsType>counter</dsType>
+        <collect>disk.dev.read</collect>
+    </ds>
+    <ds>
+        <dsName>write</dsName>
+        <dsType>counter</dsType>
+        <collect>disk.dev.write</collect>
+    </ds>
+    <graphs>
+    </graphs>
+</probedesc>

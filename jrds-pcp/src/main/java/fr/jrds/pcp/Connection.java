@@ -25,6 +25,7 @@ import fr.jrds.pcp.pdu.PnmsNames;
 import fr.jrds.pcp.pdu.PnmsTraverse;
 import fr.jrds.pcp.pdu.Profile;
 import fr.jrds.pcp.pdu.Result;
+import fr.jrds.pcp.pdu.Start;
 
 public class Connection implements Closeable {
 
@@ -44,11 +45,17 @@ public class Connection implements Closeable {
 
     public Connection(Transport trp) throws IOException, PCPException, InterruptedException {
         phandler = new ProtocolHandler(trp);
-        open();
     }
 
-    private void open() throws IOException, PCPException, InterruptedException {
-        phandler.receive();
+    public ServerInfo startClient() throws IOException, PCPException, InterruptedException {
+        Start start = phandler.receive();
+        return start.getServerInfo();
+    }
+
+    public void startServer(ServerInfo si) throws IOException, PCPException, InterruptedException {
+        Start start = new Start();
+        start.setServerInfo(si);
+        phandler.send(start);
     }
 
     @Override
@@ -144,7 +151,7 @@ public class Connection implements Closeable {
         return PmDesc.of(d);
     }
 
-    public List<InstanceInstance> getInstance(int instanceDomain, int instance, String instanceName) throws IOException, PCPException, InterruptedException {
+    public List<InstanceInfo> getInstance(int instanceDomain, int instance, String instanceName) throws IOException, PCPException, InterruptedException {
         InstanceReq ir = new InstanceReq();
         ir.setInstanceDomain(instanceDomain);
         ir.setInstance(instance);
@@ -152,6 +159,14 @@ public class Connection implements Closeable {
         phandler.send(ir);
         Instance i = phandler.receive();
         return i.getInstances();
+    }
+    
+    public void setFrom(int from) {
+        phandler.setFrom(from);
+    }
+
+    public int getFrom() {
+        return phandler.getFrom();
     }
 
 }

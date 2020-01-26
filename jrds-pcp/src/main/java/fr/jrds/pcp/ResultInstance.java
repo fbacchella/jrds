@@ -21,8 +21,13 @@ public class ResultInstance {
 
     @Setter(AccessLevel.NONE) @Getter(AccessLevel.NONE)
     Object value;
-    
+
     public ResultInstance() {
+    }
+
+    public ResultInstance(int instance, Object value) {
+        this.instance = instance;
+        this.value = value;
     }
 
     public ResultInstance(ERROR error) {

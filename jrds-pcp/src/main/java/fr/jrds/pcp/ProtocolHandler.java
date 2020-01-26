@@ -11,10 +11,15 @@ import org.slf4j.LoggerFactory;
 import fr.jrds.pcp.pdu.PDU_TYPE;
 import fr.jrds.pcp.pdu.PdpError;
 import fr.jrds.pcp.pdu.Pdu;
+import lombok.Getter;
+import lombok.Setter;
 
 public class ProtocolHandler implements Closeable {
 
     static private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    @Getter @Setter
+    int from = 0;
 
     private final Transport transport;
     private final ByteBuffer sizeBuffer;
@@ -28,6 +33,7 @@ public class ProtocolHandler implements Closeable {
     protected void send(Pdu toSend) throws IOException, InterruptedException {
         logger.debug("Sending pdu type: {}", toSend.getType());
         MessageBuffer buffer = new MessageBuffer(toSend.bufferSize(), transport.getByteOrder());
+        toSend.setFrom(from);
         toSend.write(buffer);
         buffer.flip();
         transport.write(buffer.getView());

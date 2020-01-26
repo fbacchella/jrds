@@ -7,15 +7,20 @@ import org.slf4j.LoggerFactory;
 
 import fr.jrds.pcp.MessageBuffer;
 import fr.jrds.pcp.PCPException;
+import lombok.Getter;
+import lombok.Setter;
 
 public abstract class Pdu {
 
     static private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    
+    @Getter @Setter
+    int from = 0;
 
     public final void write(MessageBuffer buffer) {
         buffer.putInt(0);
         buffer.putInt(getType().code);
-        buffer.putInt(0);
+        buffer.putInt(from);
         fill(buffer);
         buffer.putInt(0, buffer.position());
     }
@@ -23,7 +28,7 @@ public abstract class Pdu {
     public final void read(MessageBuffer buffer) throws PCPException {
         int size = buffer.getInt();
         int type = buffer.getInt();
-        int from = buffer.getInt();
+        from = buffer.getInt();
         logger.trace("PDU header: size={} type={} from={}", size, type, from);
         parse(buffer);
     }

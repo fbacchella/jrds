@@ -15,16 +15,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PlainTcpTransport implements Transport {
-    
+
     static private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final Selector selector = Selector.open();
     private final SocketChannel soc;
     private final Transport.Waiter waiter;
-    
+
     public PlainTcpTransport(InetSocketAddress isa, long timeout) throws IOException, InterruptedException {
         soc = SocketChannel.open();
-        waiter = (op) -> {
+        waiter = getWaiter(soc, timeout);
+        soc.setOption(StandardSocketOptions.TCP_NODELAY, true);
+        soc.configureBlocking(false);
+        soc.connect(isa);
+        waiter.waitFor(SelectionKey.OP_CONNECT);
+    }
+
+    public PlainTcpTransport(SocketChannel soc, long timeout) throws IOException, InterruptedException {
+        this.soc = soc;
+        soc.setOption(StandardSocketOptions.TCP_NODELAY, true);
+        soc.configureBlocking(false);
+        waiter = getWaiter(soc, timeout);
+    }
+
+    private Waiter getWaiter(SocketChannel soc, long timeout) {
+        return (op) -> {
             try {
                 SelectionKey key = soc.register(selector, op);
                 selector.select(timeout);
@@ -37,10 +52,6 @@ public class PlainTcpTransport implements Transport {
                 throw new IllegalStateException("Closed channel");
             }
         };
-        soc.setOption(StandardSocketOptions.TCP_NODELAY, true);
-        soc.configureBlocking(false);
-        soc.connect(isa);
-        waiter.waitFor(SelectionKey.OP_CONNECT);
     }
 
     @Override
@@ -49,7 +60,9 @@ public class PlainTcpTransport implements Transport {
         while (buffer.remaining() > 0) {
             waiter.waitFor(SelectionKey.OP_READ);
             int bytesReads = soc.read(buffer);
-            if (bytesReads <= 0) {
+            if (bytesReads < 0) {
+                throw new ClosedChannelException();
+            } else if (bytesReads == 0) {
                 break;
             }
             read += bytesReads;

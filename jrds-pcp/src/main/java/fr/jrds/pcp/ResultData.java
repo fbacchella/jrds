@@ -6,9 +6,10 @@ import java.util.Map;
 
 import fr.jrds.pcp.pdu.Result;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 
-@Builder
+@Builder @Data
 public class ResultData {
 
     @Getter

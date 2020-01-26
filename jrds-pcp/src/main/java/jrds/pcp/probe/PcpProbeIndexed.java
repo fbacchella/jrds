@@ -8,17 +8,25 @@ import org.slf4j.event.Level;
 
 import fr.jrds.pcp.PCPException;
 import jrds.ProbeConnected;
+import jrds.factories.ProbeBean;
+import jrds.probe.IndexedProbe;
+import lombok.Getter;
+import lombok.Setter;
 
-public class PcpProbe extends ProbeConnected<String, Number, PcpConnexion> {
+@ProbeBean({ "index" })
+public class PcpProbeIndexed extends ProbeConnected<String, Number, PcpConnexion> implements IndexedProbe {
 
-    public PcpProbe() {
+    @Getter @Setter
+    private String index;
+
+    public PcpProbeIndexed() {
         super(PcpConnexion.class.getName());
     }
 
     @Override
     public Map<String, Number> getNewSampleValuesConnected(PcpConnexion cnx) {
         try {
-            return cnx.getValue(getCollectMapping().keySet());
+            return cnx.getValue(index, getCollectMapping().keySet());
         } catch (InterruptedException e) {
             log(Level.WARN, e, "Collect interrupted");
             return Collections.emptyMap();
@@ -34,6 +42,11 @@ public class PcpProbe extends ProbeConnected<String, Number, PcpConnexion> {
     @Override
     public String getSourceType() {
         return "PCP";
+    }
+
+    @Override
+    public String getIndexName() {
+        return index;
     }
 
 }

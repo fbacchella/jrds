@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Data
-public class InstanceInstance {
+public class InstanceInfo {
 
     @Getter @Setter(AccessLevel.NONE)
     int instance;
