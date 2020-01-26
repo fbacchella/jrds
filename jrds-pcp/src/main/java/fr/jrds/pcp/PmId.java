@@ -6,16 +6,6 @@ import lombok.Getter;
 @Data
 public class PmId {
 
-    /*
-     * From src/include/pcp/libpcp.h:
-     * 
-     * Internally, this is how to decode a PMID!
-     * - flag is to denote state internally in some operations
-     * - domain is usually the unique domain number of a PMDA, but see
-     *   below for some special cases
-     * - cluster and item together uniquely identify a metric within a domain
-     */
-
     @Getter
     private final int id;
 
@@ -23,4 +13,13 @@ public class PmId {
         this.id = pmid;
     }
 
+    @Override
+    public String toString() {
+        short domain = (short) ((id >> 22) & ((2<<9) -1));
+        short cluster = (short) ((id >> 10) & ((2<<12) -1));
+        short item = (short) (id & ((2<<10) -1));
+        return "" + Domains.instance.getDomain(domain) + "." + cluster + "." + item;
+    }
+
+    
 }
