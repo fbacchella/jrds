@@ -73,13 +73,11 @@ public enum ERROR {
     NEEDCLIENTCERT   ("PMCD requires a client certificate"),
     BADDERIVE        ("Derived metric definition failed"),
     NOLABELS         ("No support for label metadata"),
-
     @Deprecated
     CTXBUSY          ("Context is busy", 97),
     TOOSMALL         ("Insufficient elements in list", 98),
     TOOBIG           ("Result size exceeded", 99),
     FAULT            ("QA fault injected", 100), 
-
     PMDAREADY        ("Now ready to respond", 1048),
     PMDANOTREADY     ("Not yet ready to respond", 1049),
     NYI              ("Functionality not yet implemented [end-of-range mark]", 8999),
@@ -89,7 +87,7 @@ public enum ERROR {
 
     private final int errnum;
     private final String message;
-    
+
     ERROR(String message) {
         this.errnum = -BASE-ordinal();
         this.message = message;
@@ -113,4 +111,5 @@ public enum ERROR {
         Arrays.stream(ERROR.values()).forEach(e -> _errors.put(e.errnum, e));
         errors = Collections.unmodifiableMap(_errors);
     }
+
 }

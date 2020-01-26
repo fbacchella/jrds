@@ -130,7 +130,7 @@ public class Connection implements Closeable {
         ids.forEach(fetch::addPmId);
         phandler.send(fetch);
         Result r = phandler.receive();
-        return ResultData.of(r);
+        return r.getRd();
     }
 
     public ResultData fetchValue(PmId... ids) throws IOException, PCPException, InterruptedException {
@@ -140,7 +140,7 @@ public class Connection implements Closeable {
         Arrays.stream(ids).forEach(fetch::addPmId);
         phandler.send(fetch);
         Result r = phandler.receive();
-        return ResultData.of(r);
+        return r.getRd();
     }
 
     public PmDesc getDescription(PmId id) throws IOException, PCPException, InterruptedException {
@@ -148,7 +148,7 @@ public class Connection implements Closeable {
         desReq.setId(id);
         phandler.send(desReq);
         Desc d = phandler.receive();
-        return PmDesc.of(d);
+        return d.getDesc();
     }
 
     public List<InstanceInfo> getInstance(int instanceDomain, int instance, String instanceName) throws IOException, PCPException, InterruptedException {
@@ -160,7 +160,7 @@ public class Connection implements Closeable {
         Instance i = phandler.receive();
         return i.getInstances();
     }
-    
+
     public void setFrom(int from) {
         phandler.setFrom(from);
     }

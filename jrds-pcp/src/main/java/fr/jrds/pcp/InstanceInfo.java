@@ -1,22 +1,16 @@
 package fr.jrds.pcp;
 
-import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
 
-@Data
+@Data @Builder
 public class InstanceInfo {
 
-    @Getter @Setter(AccessLevel.NONE)
-    int instance;
+    @Getter
+    private final int instance;
 
-    @Getter@Setter(AccessLevel.NONE)
-    String name;
-
-    public void parse(MessageBuffer buffer) {
-        instance = buffer.getInt();
-        name = buffer.getString();
-    }
+    @Getter
+    private final String name;
 
 }

@@ -52,8 +52,6 @@ public class TestCapture extends Tester {
             byte[] ref = new byte[buffer.remaining()];
             content.get(ref);
             buffer.get(sent);
-            System.out.println(Arrays.toString(ref));
-            System.out.println(Arrays.toString(sent));
             Assert.assertArrayEquals(ref, sent);
         }
 
@@ -83,16 +81,17 @@ public class TestCapture extends Tester {
     public void testdpr() throws IOException, PCPException, InterruptedException {
         try (Connection cnx = readPcap("pcap/disk.partitions.read.pcap")) {
             cnx.setFrom(0);
-            Assert.assertEquals(serverFeatures, cnx.startClient());
+            Assert.assertEquals(serverFeatures, cnx.startClient().getFeatures());
             cnx.authentication(new CVersion());
             String[] names = cnx.getNames(0, "disk.partitions.read").toArray(new String[] {});
             Map<String, PmId> id = cnx.resolveName(names);
             cnx.profile();
             ResultData r = cnx.fetchValue(new ArrayList<>(id.values()));
             Assert.assertEquals(Instant.ofEpochSecond(1579898739,468458000), r.getDate());
-            Assert.assertEquals(new ResultInstance(0, Long.valueOf(3992)), r.getIds().get(new PmId(251668480)).get(0));
-            Assert.assertEquals(new ResultInstance(1, Long.valueOf(44819)), r.getIds().get(new PmId(251668480)).get(1));
-            Assert.assertEquals(new ResultInstance(2, Long.valueOf(185)), r.getIds().get(new PmId(251668480)).get(2));
+
+            Assert.assertEquals(ResultInstance.builder().instance(0).value(Long.valueOf(3992)).build(), r.getIds().get(new PmId(251668480)).get(0));
+            Assert.assertEquals(ResultInstance.builder().instance(1).value(Long.valueOf(44819)).build(), r.getIds().get(new PmId(251668480)).get(1));
+            Assert.assertEquals(ResultInstance.builder().instance(2).value(Long.valueOf(185)).build(), r.getIds().get(new PmId(251668480)).get(2));
             Assert.assertEquals(3, r.getIds().get(new PmId(251668480)).size());
         }
     }
@@ -101,7 +100,7 @@ public class TestCapture extends Tester {
     public void testempty() throws IOException, PCPException, InterruptedException {
         try (Connection cnx = readPcap("pcap/empty.pcap")) {
             cnx.setFrom(12710);
-            Assert.assertEquals(serverFeatures, cnx.startClient());
+            Assert.assertEquals(serverFeatures, cnx.startClient().getFeatures());
             cnx.authentication(new CVersion());
             cnx.setFrom(0);
             cnx.checkName(0, "empty");

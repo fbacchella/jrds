@@ -1,6 +1,7 @@
 package fr.jrds.pcp.pdu;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import fr.jrds.pcp.InstanceInfo;
@@ -25,10 +26,12 @@ public class Instance extends Pdu {
         instanceDomain = buffer.getInt();
         int count = buffer.getInt();
         for (int i = 0; i < count ; i++) {
-            InstanceInfo ii = new InstanceInfo();
-            ii.parse(buffer);
+            int instance = buffer.getInt();
+            String name = buffer.getString();
+            InstanceInfo ii = InstanceInfo.builder().instance(instance).name(name).build();
             instances.add(ii);
         }
+        instances = Collections.unmodifiableList(instances);
     }
 
 }
