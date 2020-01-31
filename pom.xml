@@ -32,6 +32,7 @@
         <module>jrds-snmp</module>
         <module>jrds-ipmi</module>
         <module>jrds-jsonp</module>
+        <module>jrds-pcp</module>
         <module>jrds-log4j</module>
         <module>jrds-webapp</module>
         <module>jrds-standalone</module>
