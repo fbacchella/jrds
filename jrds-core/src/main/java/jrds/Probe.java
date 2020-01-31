@@ -673,13 +673,12 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     public DataProcessor extract(ExtractInfo ei) throws IOException {
-        Extractor ex = mainStore.getExtractor();
-        for(String dsName: pd.getDs()) {
-            ex.addSource(dsName, dsName);
+        try (Extractor ex = mainStore.getExtractor()) {
+            for(String dsName: pd.getDs()) {
+                ex.addSource(dsName, dsName);
+            }
+            return  ei.getDataProcessor(ex);
         }
-        DataProcessor dp = ei.getDataProcessor(ex);
-        ex.release();
-        return dp;
     }
 
 }

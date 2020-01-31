@@ -29,8 +29,42 @@ import org.slf4j.event.Level;
 import jrds.ArchivesSet;
 import jrds.JrdsSample;
 import jrds.Probe;
+import lombok.Getter;
 
 public class RrdDbStore extends AbstractStore<RrdDb> {
+
+    private class RrdDbExtractor extends AbstractExtractor<FetchData> {
+        @Getter
+        private final int columnCount;
+
+        RrdDbExtractor(RrdDb rrdDb) {
+            this.columnCount = rrdDb.getDsCount();
+        }
+
+        @Override
+        public void release() {
+        }
+
+        @Override
+        public void fill(RrdGraphDef gd, ExtractInfo ei) {
+            for(Map.Entry<String, String> e: sources.entrySet()) {
+                gd.datasource(e.getKey(), RrdDbStore.this.getPath(), e.getValue(), ei.cf);
+            }
+        }
+
+        @Override
+        public void fill(DataProcessor dp, ExtractInfo ei) {
+            for(Map.Entry<String, String> e: sources.entrySet()) {
+                dp.addDatasource(e.getKey(), RrdDbStore.this.getPath(), e.getValue(), ei.cf);
+            }
+        }
+
+        @Override
+        public String getPath() {
+            return RrdDbStore.this.getPath();
+        }
+    }
+
     private final RrdDbStoreFactory factory;
 
     public RrdDbStore(Probe<?, ?> p, RrdDbStoreFactory factory) {
@@ -221,100 +255,38 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
      */
     public Date getLastUpdate() {
         Date lastUpdate = null;
-        RrdDb rrdDb = null;
-        try {
-            rrdDb = factory.getRrd(getPath());
+        try (RrdDb rrdDb = factory.getRrd(getPath())){
             lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
         } catch (Exception e) {
             throw new RuntimeException("Unable to get last update date for " + p.getQualifiedName(), e);
-        } finally {
-            if(rrdDb != null)
-                factory.releaseRrd(rrdDb);
         }
         return lastUpdate;
     }
 
     @Override
     public AbstractExtractor<FetchData> getExtractor() {
-        final RrdDb rrdDb;
-        try {
-            rrdDb = factory.getRrd(getPath());
+        try (RrdDb rrdDb = factory.getRrd(getPath())){
+            return new RrdDbExtractor(rrdDb);
         } catch (IOException e) {
             throw new RuntimeException("Failed to access rrd file  " + getPath(), e);
         }
-
-        return new jrds.store.AbstractExtractor<FetchData>() {
-            boolean released = false;
-
-            public void release() {
-                factory.releaseRrd(rrdDb);
-                released = true;
-            }
-
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.lang.Object#finalize()
-             */
-            @Override
-            protected void finalize() throws Throwable {
-                if(!released) {
-                    log(Level.WARN, "%s was not release properly", rrdDb.getCanonicalPath());
-                    factory.releaseRrd(rrdDb);
-                    released = true;
-                }
-                super.finalize();
-            }
-
-            @Override
-            public int getColumnCount() {
-                return rrdDb.getDsCount();
-            }
-
-            @Override
-            public void fill(RrdGraphDef gd, ExtractInfo ei) {
-                for(Map.Entry<String, String> e: sources.entrySet()) {
-                    gd.datasource(e.getKey(), RrdDbStore.this.getPath(), e.getValue(), ei.cf);
-                }
-            }
-
-            @Override
-            public void fill(DataProcessor dp, ExtractInfo ei) {
-                for(Map.Entry<String, String> e: sources.entrySet()) {
-                    dp.addDatasource(e.getKey(), RrdDbStore.this.getPath(), e.getValue(), ei.cf);
-                }
-            }
-
-            @Override
-            public String getPath() {
-                return RrdDbStore.this.getPath();
-            }
-
-        };
     }
 
     public Map<String, Number> getLastValues() {
         Map<String, Number> retValues = new HashMap<String, Number>();
-        RrdDb rrdDb = null;
-        try {
-            rrdDb = factory.getRrd(getPath());
+        try (RrdDb rrdDb = factory.getRrd(getPath())){
             String[] dsNames = rrdDb.getDsNames();
             for(int i = 0; i < dsNames.length; i++) {
                 retValues.put(dsNames[i], rrdDb.getDatasource(i).getLastValue());
             }
         } catch (Exception e) {
             log(Level.ERROR, e, "Unable to get last values: %s", e.getMessage());
-        } finally {
-            if(rrdDb != null)
-                factory.releaseRrd(rrdDb);
         }
         return retValues;
     }
 
     public void commit(JrdsSample sample) {
-        RrdDb rrdDb = null;
-        try {
-            rrdDb = factory.getRrd(getPath());
+        try (RrdDb rrdDb = factory.getRrd(getPath())){
             Sample onesample = rrdDb.createSample(sample.getTime().getTime() / 1000);
             for(Map.Entry<String, Number> e: sample.entrySet()) {
                 onesample.setValue(e.getKey(), e.getValue().doubleValue());
@@ -323,10 +295,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 log(Level.DEBUG, "%s", onesample.dump());
             onesample.update();
         } catch (IOException e) {
-            log(Level.ERROR, e, "Error while collecting: %s", e.getMessage());
-        } finally {
-            if(rrdDb != null)
-                factory.releaseRrd(rrdDb);
+            log(Level.ERROR, e, "Error while committing to rrd db: %s", e.getMessage());
         }
     }
 
@@ -342,8 +311,9 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
 
     @Override
     public void closeStoreObject(Object rrdDb) {
-        if(rrdDb != null)
+        if(rrdDb != null) {
             factory.releaseRrd((RrdDb) rrdDb);
+        }
     }
 
 }

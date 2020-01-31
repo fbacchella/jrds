@@ -88,30 +88,28 @@ public final class CheckValues extends JrdsServlet {
         }
         Date paste = new Date(lastupdate.getTime() - period * 1000);
 
-        Extractor ex = p.fetchData();
-
-        String ds = params.getValue("dsname");
-
-        ExtractInfo ei = ExtractInfo.get().make(paste, lastupdate).make(p.getStep());
-        if (ds != null && !"".equals(ds.trim())) {
-            String dsName = ds.trim();
-            ex.addSource(dsName, dsName);
-            DataProcessor dp = ei.getDataProcessor(ex);
-            double val = dp.getVariable(dsName, v).value;
-            out.print(val);
-        } else {
-            for(String dsName: p.getPd().getDs()) {
+        try (Extractor ex = p.fetchData()) {
+            String ds = params.getValue("dsname");
+            ExtractInfo ei = ExtractInfo.get().make(paste, lastupdate).make(p.getStep());
+            if (ds != null && !"".equals(ds.trim())) {
+                String dsName = ds.trim();
                 ex.addSource(dsName, dsName);
-            }
-            DataProcessor dp = ei.getDataProcessor(ex);
-            for(String dsName: ex.getDsNames()) {
+                DataProcessor dp = ei.getDataProcessor(ex);
                 double val = dp.getVariable(dsName, v).value;
-                out.println(dsName + ": " + val);
+                out.print(val);
+            } else {
+                for(String dsName: p.getPd().getDs()) {
+                    ex.addSource(dsName, dsName);
+                }
+                DataProcessor dp = ei.getDataProcessor(ex);
+                for(String dsName: ex.getDsNames()) {
+                    double val = dp.getVariable(dsName, v).value;
+                    out.println(dsName + ": " + val);
+                }
+                out.println("Last update: " + p.getLastUpdate());
+                out.println("Last update age (ms): " + (new Date().getTime() - p.getLastUpdate().getTime()));
             }
-            out.println("Last update: " + p.getLastUpdate());
-            out.println("Last update age (ms): " + (new Date().getTime() - p.getLastUpdate().getTime()));
         }
-        ex.release();
     }
 
 }
