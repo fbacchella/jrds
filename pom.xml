@@ -17,6 +17,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <jdk.compile.home>${jdk.8.home}</jdk.compile.home>
+        <bootclasspath>${jdk.compile.home}/jre/lib/rt.jar</bootclasspath>
         <year>2019</year>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jetty.version>9.2.29.v20191105</jetty.version>
@@ -29,11 +30,11 @@
 
     <modules>
         <module>jrds-core</module>
+        <module>jrds-log4j</module>
         <module>jrds-snmp</module>
         <module>jrds-ipmi</module>
         <module>jrds-jsonp</module>
         <module>jrds-pcp</module>
-        <module>jrds-log4j</module>
         <module>jrds-webapp</module>
         <module>jrds-standalone</module>
     </modules>
@@ -81,7 +82,7 @@
                     <configuration>
                         <compilerArgs>
                             <arg>-Xlint</arg>
-                            <arg>-Xbootclasspath/p:${jdk.compile.home}/lib/rt.jar</arg>
+                            <arg>-Xbootclasspath/p:${bootclasspath}</arg>
                         </compilerArgs>
                         <showWarnings>false</showWarnings>
                         <!-- needed for maven-plugin-javadoc to find the source version to use -->
@@ -128,7 +129,7 @@
                             <!--link>https://javadoc.io/doc/com.jayway.jsonpath/json-path/2.4.0</link-->
                             <detectJavaApiLink>true</detectJavaApiLink>
                         </links>
-                        <bootclasspath>${jdk.compile.home}/jre/lib/rt.jar</bootclasspath>
+                        <bootclasspath>${bootclasspath}</bootclasspath>
                         <source>${maven.compiler.source}</source>
                     </configuration>
                     <executions>
@@ -288,7 +289,11 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
             </extension>
-            <!-- >extension> <groupId>org.apache.maven.releas</groupId> <artifactId>maven-release-manager</artifactId> <version>2.5.3</version> </extension -->
+            <extension>
+                <groupId>org.apache.maven.surefire</groupId>
+                <artifactId>surefire-junit4</artifactId>
+                <version>3.0.0-M3</version>
+            </extension>
         </extensions>
     </build>
     <profiles>

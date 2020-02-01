@@ -2,7 +2,7 @@ version: 2.1
 jobs:
     checkout:
         docker:
-            - image: circleci/openjdk:8-jdk
+            - image: circleci/openjdk:13-jdk-buster
         steps:
             - checkout
             - restore_cache:
@@ -20,21 +20,31 @@ jobs:
                     - home/circleci/.sonar/cache
                     - home/circleci/project
                     - usr/share/snmp/mibs/
+    jdk8_jre:
+        docker:
+            - image: circleci/openjdk:8-jdk
+        steps:
+            - persist_to_workspace:
+                root: /
+                paths:
+                    - usr/lib/jvm/java-8-openjdk-amd64
     build:
         docker:
-            - image: circleci/openjdk:11-jdk
+            - image: circleci/openjdk:13-jdk-buster
         steps:
             - attach_workspace:
                 at: /tmp/ws
             - run:
                 command: |
+                    sudo mkdir -p /usr/lib/jvm
+                    sudo mv -n /tmp/ws/usr/lib/jvm/java-8-openjdk-amd64 /usr/lib/jvm/
                     mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
             - run:
                 command: mvn -B clean compile install -DskipTests -s .circleci/settings.xml
                 environment:
-                    JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
+                    JAVA_HOME: /usr/java/openjdk-13
             - persist_to_workspace:
                 root: /
                 paths:
@@ -57,13 +67,13 @@ jobs:
                 command: |
                     # If no symbolic name, it's a PR, will run sonar
                     if [ -n "$(git symbolic-ref HEAD 2>/dev/null )" ] ; then
-                        SONAR="-Psonar"
+                        SONAR="sonar:sonar -Psonar"
+                        echo "Doing sonar"
                     else
                         SONAR=""
                     fi
-                    echo "publishing jobs: $SONAR"
                     #see https://stackoverflow.com/questions/53010200/maven-surefire-could-not-find-forkedbooter-class for disableClassPathURLCheck
-                    mvn -B test -Pskip $SONAR -Dsonar.login=$SONARCLOUD_LOGIN -DargLine="-Xmx2048m -Djdk.net.URLClassPath.disableClassPathURLCheck=true" -s .circleci/settings.xml
+                    mvn -B test $SONAR -Pskip -Dsonar.login=$SONARCLOUD_LOGIN -DargLine="-Xmx2048m -Djdk.net.URLClassPath.disableClassPathURLCheck=true" -s .circleci/settings.xml
                 environment:
                     JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
             - store_test_results:
@@ -88,6 +98,7 @@ jobs:
                     mvn -B test -Pskip -s .circleci/settings.xml
                 environment:
                     JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
+                    MAVEN_OPTS: "-Xmx2048m"
             - store_test_results:
                 path: target/surefire-reports
             - persist_to_workspace:
@@ -97,7 +108,7 @@ jobs:
                     - home/circleci/.sonar/cache
     publish:
         docker:
-            - image: circleci/openjdk:11-jdk
+            - image: circleci/openjdk:13-jdk-buster
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -111,14 +122,14 @@ jobs:
                 command: |
                     # If no symbolic name, it's a PR, will not publish results
                     if [ -n "$(git symbolic-ref HEAD 2>/dev/null )" ] ; then
-                        PUBLISH="deploy"
+                        PUBLISH="maven-deploy-plugin:deploy"
                     else
-                        PUBLISH="install"
+                        PUBLISH="maven-install-plugin:install"
                     fi
                     echo "publishing jobs: $PUBLISH"
-                    mvn -B $PUBLISH site -Pskip -Dmaven.test.skip=true -s .circleci/settings.xml
+                    mvn -B $PUBLISH -s .circleci/settings.xml
                 environment:
-                    JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
+                    JAVA_HOME: /usr/java/openjdk-13
             - persist_to_workspace:
                 root: /
                 paths:
@@ -126,7 +137,7 @@ jobs:
                     - home/circleci/.sonar/cache
     savecache:
         docker:
-            - image: circleci/openjdk:11-jdk
+            - image: circleci/openjdk:13-jdk-buster
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -146,9 +157,11 @@ workflows:
   build_and_test:
     jobs:
       - checkout
+      - jdk8_jre
       - build:
           requires:
               - checkout
+              - jdk8_jre
       - testsj8:
           requires:
               - build
