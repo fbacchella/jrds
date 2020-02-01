@@ -19,7 +19,6 @@ import fr.jrds.pcp.PCPException;
 import fr.jrds.pcp.PmId;
 import fr.jrds.pcp.ResultData;
 import fr.jrds.pcp.ResultInstance;
-import fr.jrds.pcp.ResultInstance.ResultInstanceBuilder;
 import fr.jrds.pcp.VALFMT;
 import fr.jrds.pcp.VALUE_TYPE;
 import lombok.Getter;
@@ -69,7 +68,7 @@ public class Result extends Pdu {
     }
 
     public ResultInstance parseValue(MessageBuffer buffer, VALFMT valfmt) {
-        ResultInstanceBuilder builder = ResultInstance.builder();
+        ResultInstance.ResultInstanceBuilder builder = ResultInstance.builder();
         builder.instance(buffer.getInt());
         switch(valfmt) {
         case INSITU:
