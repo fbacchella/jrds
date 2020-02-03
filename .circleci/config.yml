@@ -76,6 +76,7 @@ jobs:
                     mvn -B test $SONAR -Pskip -Dsonar.login=$SONARCLOUD_LOGIN -DargLine="-Xmx2048m -Djdk.net.URLClassPath.disableClassPathURLCheck=true" -s .circleci/settings.xml
                 environment:
                     JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+                    MAVEN_OPTS: "-Xmx2048m"
             - store_test_results:
                 path: target/surefire-reports
             #don't persist_to_workspace, can't be done in parallel with testsj11
@@ -122,12 +123,12 @@ jobs:
                 command: |
                     # If no symbolic name, it's a PR, will not publish results
                     if [ -n "$(git symbolic-ref HEAD 2>/dev/null )" ] ; then
-                        PUBLISH="maven-deploy-plugin:deploy"
+                        PUBLISH="deploy"
                     else
                         PUBLISH="maven-install-plugin:install"
                     fi
                     echo "publishing jobs: $PUBLISH"
-                    mvn -B $PUBLISH -s .circleci/settings.xml
+                    mvn -B $PUBLISH -Pskip -Dmaven.test.skip -s .circleci/settings.xml
                 environment:
                     JAVA_HOME: /usr/java/openjdk-13
             - persist_to_workspace:
@@ -171,6 +172,7 @@ workflows:
       - publish:
           requires:
               - testsj8
+              - testsj11
       - savecache:
           requires:
               - publish
