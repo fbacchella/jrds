@@ -226,7 +226,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 RrdDef newDef = getRrdDef(archives);
                 newDef.setStartTime(startTime);
                 newDef.setPath(rrdPath.toString());
-                String newDefDump = oldDef.dump();
+                String newDefDump = newDef.dump();
                 long newstep = oldDef.getStep();
 
                 if(newstep != oldstep) {

@@ -1,7 +1,9 @@
 package jrds.store;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.Date;
@@ -52,12 +54,35 @@ public class TestRrdDbStore {
     public void testCheckNoUpdate() throws Exception {
         Probe<String, Number> p = GenerateProbe.quickProbe(testFolder, GenerateProbe.ChainedMap.start(0));
         p.getPd().add("test", DsType.COUNTER);
+
         Assert.assertTrue("Probe file creation failed", p.checkStore());
         FileTime before = Files.getLastModifiedTime(Paths.get(p.getMainStore().getPath()));
+        long sizeBefore = Files.size(Paths.get(p.getMainStore().getPath()));
         Thread.sleep(2000);
+
+        // Change the path representation
+        File hostdir = p.getHost().getHostDir();
+        Path newdest = Files.createDirectory(Paths.get(hostdir.getCanonicalPath(), "sub"));
+        p.getHost().setHostDir(Paths.get(newdest.toString(), "..").toFile());
+
         Assert.assertTrue("Probe file creation failed", p.checkStore());
         FileTime after = Files.getLastModifiedTime(Paths.get(p.getMainStore().getPath()));
+        long sizeAfter = Files.size(Paths.get(p.getMainStore().getPath()));
         Assert.assertEquals(before, after);
+        Assert.assertEquals(sizeBefore, sizeAfter);
+    }
+
+    @Test
+    public void testCheckUpdate() throws Exception {
+        Probe<String, Number> p = GenerateProbe.quickProbe(testFolder, GenerateProbe.ChainedMap.start(0));
+        Path storePath = Paths.get(p.getMainStore().getPath());
+        p.getPd().add("test1", DsType.COUNTER);
+        Assert.assertTrue("Probe file creation failed", p.checkStore());
+        long sizeBefore = Files.size(storePath);
+        p.getPd().add("test2", DsType.COUNTER);
+        Assert.assertTrue("Probe file creation failed", p.checkStore());
+        long sizeAfter = Files.size(storePath);
+        Assert.assertNotEquals(sizeBefore, sizeAfter);
     }
 
     @Test
