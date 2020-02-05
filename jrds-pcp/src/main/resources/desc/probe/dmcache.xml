@@ -80,7 +80,8 @@
         <collect>dmcache.cache.total</collect>
     </ds>
     <graphs>
-        <name>DmCacheUse</name>
+        <name>DmCacheDataUsage</name>
+        <name>DmCacheMetadataUsage</name>
         <name>DmCacheAccess</name>
         <name>DmCacheBlockPromotions</name>
     </graphs>

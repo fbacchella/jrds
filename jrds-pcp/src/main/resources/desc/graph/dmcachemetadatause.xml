@@ -2,21 +2,13 @@
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
     "urn:jrds:graphdesc">
 <graphdesc>
-    <name>DmCacheUse</name>
-    <graphName>dmcacheused-${index}</graphName>
-    <graphTitle>DM cache used in device ${index} on ${host}</graphTitle>
+    <name>DmCacheMetadataUsage</name>
+    <graphName>dmcachemetadatausage-${index}</graphName>
+    <graphTitle>DM Cache metadata usage in volume ${index} on ${host}</graphTitle>
     <unit>
         <binary />
     </unit>
     <verticalLabel>Bytes</verticalLabel>
-    <add>
-        <name>dirty</name>
-    </add>
-    <add>
-        <rpn>dirty, 512, *</rpn>
-        <graphType>line</graphType>
-        <legend>Dirty blocks</legend>
-    </add>
     <add>
         <name>metadata.used</name>
     </add>
@@ -33,34 +25,17 @@
         <graphType>stack</graphType>
         <legend>Metadata Free</legend>
     </add>
-    
-    <add>
-        <name>cache.used</name>
-    </add>
-    <add>
-        <rpn>cache.used, 1024, *</rpn>
-        <graphType>line</graphType>
-        <legend>Cache data used</legend>
-    </add>
-    <add>
-        <name>cache.total</name>
-    </add>
-    <add>
-        <rpn>cache.total, cache.used, -, 1024, *</rpn>
-        <graphType>stack</graphType>
-        <legend>Cache data Free</legend>
-    </add>
     <hosttree>
         <pathelement>HOST</pathelement>
         <pathelement>DISK</pathelement>
         <pathstring>DM cache</pathstring>
         <pathelement>INDEX</pathelement>
-        <pathstring>Usage</pathstring>
+        <pathstring>Metadata usage</pathstring>
     </hosttree>
     <viewtree>
         <pathelement>DISK</pathelement>
         <pathstring>DM cache</pathstring>
-        <pathstring>Usage</pathstring>
+        <pathstring>Metadata usage</pathstring>
         <pathelement>HOST</pathelement>
         <pathelement>INDEX</pathelement>
     </viewtree>

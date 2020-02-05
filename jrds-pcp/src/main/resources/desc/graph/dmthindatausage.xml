@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+    <name>DmThinDataUse</name>
+    <graphName>dmthindatause-${index}</graphName>
+    <graphTitle>Data usage in thin pool ${index} on ${host}</graphTitle>
+    <unit>
+        <binary />
+    </unit>
+    <verticalLabel>Bytes</verticalLabel>
+    <add>
+        <name>size</name>
+    </add>
+    <add>
+        <name>data.used</name>
+    </add>
+    <add>
+        <name>data.total</name>
+    </add>
+    <add>
+        <name>chunck_size_bytes</name>
+        <rpn>size, data.total, /, 512, *</rpn>
+    </add>
+    <add>
+        <rpn>data.used, chunck_size_bytes, *</rpn>
+        <graphType>line</graphType>
+        <legend>Data used</legend>
+    </add>
+    <add>
+        <rpn>data.total, data.used, -, chunck_size_bytes, *</rpn>
+        <graphType>stack</graphType>
+        <legend>Data Free</legend>
+    </add>
+    <hosttree>
+        <pathelement>HOST</pathelement>
+        <pathelement>DISK</pathelement>
+        <pathstring>DM thin pool</pathstring>
+        <pathelement>INDEX</pathelement>
+        <pathstring>Data usage</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathelement>DISK</pathelement>
+        <pathstring>DM thin pool</pathstring>
+        <pathstring>Data usage</pathstring>
+        <pathelement>HOST</pathelement>
+        <pathelement>INDEX</pathelement>
+    </viewtree>
+</graphdesc>
