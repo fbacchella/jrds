@@ -17,8 +17,26 @@ import org.junit.Test;
 
 public class TestNetwork extends Tester {
 
-    @Test(expected = InterruptedException.class, timeout=3000)
+    @Test(expected = IOException.class, timeout=3000)
     public void timeout() throws UnknownHostException, IOException, PCPException, InterruptedException {
+        try (Connection cnx = new Connection(new InetSocketAddress(InetAddress.getByName("169.254.1.1"), 44321), 2000)) {
+        }
+    }
+
+    @Test(expected = InterruptedException.class, timeout=3000)
+    public void interrupted() throws UnknownHostException, IOException, PCPException, InterruptedException {
+        Thread current = Thread.currentThread();
+        Thread stopper = new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(1000);
+                    current.interrupt();
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+        stopper.start();
         try (Connection cnx = new Connection(new InetSocketAddress(InetAddress.getByName("169.254.1.1"), 44321), 2000)) {
         }
     }
@@ -54,7 +72,7 @@ public class TestNetwork extends Tester {
                 try {
                     SocketChannel client = listenSocket.accept();
                     try (Transport clientTransport = new PlainTcpTransport(client, 500);
-                         Connection cnx = new Connection(clientTransport);) {
+                                    Connection cnx = new Connection(clientTransport);) {
                         ServerInfo si = ServerInfo.builder().features(Collections.singleton(FEATURES.CREDS_REQD)).licensed((byte)0).version((byte)2).build();
                         cnx.startServer(si);
                     }

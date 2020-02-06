@@ -44,7 +44,11 @@ public class PlainTcpTransport implements Transport {
                 SelectionKey key = soc.register(selector, op);
                 selector.select(timeout);
                 if ( (key.readyOps() & op) == 0) {
-                    throw new InterruptedException("Timeout waiting IO");
+                    if ( Thread.interrupted()) {
+                        throw new InterruptedException();
+                    } else {
+                        throw new IOException("Interrupted by timeout");
+                    }
                 } else if (op == SelectionKey.OP_CONNECT) {
                     soc.finishConnect();
                 }
