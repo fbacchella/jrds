@@ -35,7 +35,7 @@ public class PcpConnexion extends jrds.starter.Connection<Connection> {
     private Connection cnx;
 
     @Getter @Setter
-    private int port;
+    private int port = 44321;
 
     private final Map<String, Map<String, Number>> valueCache = new HashMap<>();
     private final Function<String, PmId> lookup = (s) -> {
@@ -51,7 +51,7 @@ public class PcpConnexion extends jrds.starter.Connection<Connection> {
     @Override
     public boolean startConnection() {
         try {
-            cnx = new fr.jrds.pcp.Connection(new InetSocketAddress(getResolver().getInetAddress(), 44321), 0);
+            cnx = new fr.jrds.pcp.Connection(new InetSocketAddress(getResolver().getInetAddress(), port), getTimeout() * 1000 + 100);
             cnx.startClient();
             cnx.authentication(new CVersion());
             return true;
