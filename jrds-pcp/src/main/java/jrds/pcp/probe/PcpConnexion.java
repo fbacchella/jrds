@@ -122,7 +122,7 @@ public class PcpConnexion extends jrds.starter.Connection<Connection> {
                         for (int j = 0 ; j < lin.size() ; j++) {
                             idvalues.put(lin.get(j).getName(), lr.get(id).get(j).getCheckedValue());
                         }
-                    } else {
+                    } else if (! lr.get(id).isEmpty()) {
                         idvalues.put(key, lr.get(id).get(0).getCheckedValue());
                     }
                     valueCache.put(name, idvalues);
