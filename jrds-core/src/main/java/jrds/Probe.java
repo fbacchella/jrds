@@ -329,7 +329,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      */
     public void collect() {
         long start = System.currentTimeMillis();
-        boolean interrupted = true;
+        boolean failed = true;
         if(!finished) {
             log(Level.ERROR, "Using an unfinished probe");
             return;
@@ -351,7 +351,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                     // during the reading of samples
                     if(sample != null && sample.size() > 0 && isCollectRunning()) {
                         storeSample(sample);
-                        interrupted = false;
+                        failed = false;
                     }
                 }
             } catch (ArithmeticException ex) {
@@ -376,14 +376,16 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                 stopCollect();
             }
             long end = System.currentTimeMillis();
-            log(Level.DEBUG, "collect ran for %dms", (end - start));
-            Timer timer = (Timer) getParent().getParent();
-            if((end - start) > (timer.getSlowCollectTime() * 1000)) {
-                log(Level.WARN, "slow collect time %.0fs", 1.0 * (end - start) / 1000);
-            }
-            if(interrupted) {
+            if (failed) {
                 float elapsed = ((float) (end - start)) / 1000;
-                log(Level.DEBUG, "Interrupted after %.2fs", elapsed);
+                log(Level.DEBUG, "Failed after %.2fs", elapsed);
+            } else {
+                Timer timer = (Timer) getParent().getParent();
+                if((end - start) > (timer.getSlowCollectTime() * 1000)) {
+                    log(Level.WARN, "Slow collect time %.0fs", 1.0 * (end - start) / 1000);
+                } else {
+                    log(Level.DEBUG, "Collect ran for %dms", (end - start));
+                }
             }
             running = false;
         }
