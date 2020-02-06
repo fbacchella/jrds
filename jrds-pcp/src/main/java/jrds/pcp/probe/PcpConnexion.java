@@ -11,6 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.slf4j.event.Level;
+
 import fr.jrds.pcp.Connection;
 import fr.jrds.pcp.InstanceInfo;
 import fr.jrds.pcp.PCPException;
@@ -53,9 +55,15 @@ public class PcpConnexion extends jrds.starter.Connection<Connection> {
             cnx.startClient();
             cnx.authentication(new CVersion());
             return true;
-        } catch (IOException | PCPException | InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (IOException e) {
+            log(Level.ERROR, e, "Can't connect to pmcd: %s", e.getMessage());
+            return false;
+        } catch (PCPException e) {
+            log(Level.ERROR, e, "Can't talk to pmcd", e.getMessage());
+            return false;
+        } catch (InterruptedException e) {
+            log(Level.ERROR, e, "Interrupted");
+            Thread.currentThread().interrupt();
             return false;
         }
     }
@@ -65,8 +73,7 @@ public class PcpConnexion extends jrds.starter.Connection<Connection> {
         try {
             cnx.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            log(Level.ERROR, e, "Connection to pcmd reseted: %s", e.getMessage());
         }
         valueCache.clear();
         cnx = null;
@@ -79,9 +86,15 @@ public class PcpConnexion extends jrds.starter.Connection<Connection> {
             cnx.profile();
             Number uptime = cnx.fetchValue(kernelUptime).getIds().get(kernelUptime).get(0).getCheckedValue();
             return uptime.longValue();
-        } catch (IOException | PCPException | InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (IOException e) {
+            log(Level.ERROR, e, "Can't connect to pmcd: %s", e.getMessage());
+            return 0;
+        } catch (PCPException e) {
+            log(Level.ERROR, e, "Can't talk to pmcd", e.getMessage());
+            return 0;
+        } catch (InterruptedException e) {
+            log(Level.ERROR, "Interrupted");
+            Thread.currentThread().interrupt();
             return 0;
         }
     }
