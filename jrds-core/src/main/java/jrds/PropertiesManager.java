@@ -54,11 +54,19 @@ public class PropertiesManager extends Properties {
         public int slowCollectTime;
     }
 
-    private final FileFilter filter = new FileFilter() {
-        public boolean accept(File file) {
-            return (!file.isHidden()) && (file.isFile() && file.getName().endsWith(".jar"));
+    private static final class JrdsClassLoader extends URLClassLoader {
+        public JrdsClassLoader(URL[] arrayUrl, ClassLoader classLoader) {
+            super(arrayUrl, classLoader);
         }
-    };
+
+        @Override
+        public String toString() {
+            return "JRDS' class loader";
+        }
+    }
+
+
+    private static final FileFilter jarfilter = file -> (!file.isHidden()) && (file.isFile() && file.getName().endsWith(".jar"));
 
     public PropertiesManager() {
     }
@@ -150,11 +158,6 @@ public class PropertiesManager extends Properties {
     }
 
     private ClassLoader doClassLoader(String extendedclasspath) {
-        FileFilter filter = new FileFilter() {
-            public boolean accept(File file) {
-                return (!file.isHidden()) && file.isFile() && file.getName().endsWith(".jar");
-            }
-        };
 
         Collection<URI> urls = new ArrayList<URI>();
 
@@ -165,10 +168,10 @@ public class PropertiesManager extends Properties {
                 File path = new File(pathElement);
 
                 if(path.isDirectory()) {
-                    for(File f: path.listFiles(filter)) {
+                    for(File f: path.listFiles(jarfilter)) {
                         urls.add(f.toURI());
                     }
-                } else if(filter.accept(path)) {
+                } else if(jarfilter.accept(path)) {
                     urls.add(path.toURI());
                 }
             }
@@ -189,12 +192,8 @@ public class PropertiesManager extends Properties {
         }
         if(logger.isDebugEnabled())
             logger.debug("Internal class loader will look in:" + urls);
-        return new URLClassLoader(arrayUrl, getClass().getClassLoader()) {
-            @Override
-            public String toString() {
-                return "JRDS' class loader";
-            }
-        };
+
+        return new JrdsClassLoader(arrayUrl, getClass().getClassLoader());
     }
 
     private File prepareDir(File dir, boolean autocreate, boolean readOnly) throws IOException {
@@ -329,7 +328,7 @@ public class PropertiesManager extends Properties {
 
                 boolean noJarDir = true;
                 if(lib.isDirectory()) {
-                    File[] foundFiles = lib.listFiles(filter);
+                    File[] foundFiles = lib.listFiles(jarfilter);
                     if(foundFiles == null) {
                         logger.error("Failed to search in " + lib);
                         continue;
