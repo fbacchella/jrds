@@ -38,6 +38,7 @@ import jrds.store.RrdDbStoreFactory;
 import jrds.store.StoreFactory;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
+import lombok.Builder;
 
 /**
  * An less ugly class supposed to manage properties should be reworked
@@ -47,11 +48,12 @@ import jrds.webapp.RolesACL;
 public class PropertiesManager extends Properties {
     private final Logger logger = LoggerFactory.getLogger(PropertiesManager.class);
 
+    @Builder
     public static final class TimerInfo {
-        public int step;
-        public int timeout;
-        public int numCollectors;
-        public int slowCollectTime;
+        public final int step;
+        public final int timeout;
+        public final int numCollectors;
+        public final int slowCollectTime;
     }
 
     private static final class JrdsClassLoader extends URLClassLoader {
@@ -413,13 +415,14 @@ public class PropertiesManager extends Properties {
         if(!propertiesList.trim().isEmpty()) {
             for(String timerName: propertiesList.split(",")) {
                 timerName = timerName.trim();
-                TimerInfo ti = new TimerInfo();
-                ti.step = parseInteger(getProperty("timer." + timerName + ".step", Integer.toString(step)));
-                ti.timeout = parseInteger(getProperty("timer." + timerName + ".timeout", Integer.toString(timeout)));
-                ti.numCollectors = parseInteger(getProperty("timer." + timerName + ".collectorThreads", Integer.toString(numCollectors)));
-                ti.slowCollectTime = parseInteger(getProperty("timer." + timerName + ".slowcollecttime", Integer.toString(ti.timeout + 1)));
-                if(ti.timeout * 2 >= ti.step) {
-                    logger.warn("useless timer " + timerName + ", step must be more than twice the timeout");
+                TimerInfo ti = TimerInfo.builder()
+                .step(parseInteger(getProperty("timer." + timerName + ".step", Integer.toString(step))))
+                .timeout(parseInteger(getProperty("timer." + timerName + ".timeout", Integer.toString(timeout))))
+                .numCollectors(parseInteger(getProperty("timer." + timerName + ".collectorThreads", Integer.toString(numCollectors))))
+                .slowCollectTime(parseInteger(getProperty("timer." + timerName + ".slowcollecttime", Integer.toString(slowcollecttime))))
+                .build();
+                 if(ti.timeout * 2 >= ti.step) {
+                    logger.warn("useless timer " + timerName + ", step must be more than the timeout");
                     break;
                 }
 
@@ -427,11 +430,12 @@ public class PropertiesManager extends Properties {
             }
         }
         // Add the default timer
-        TimerInfo ti = new TimerInfo();
-        ti.step = step;
-        ti.timeout = timeout;
-        ti.numCollectors = numCollectors;
-        ti.slowCollectTime = slowcollecttime;
+        TimerInfo ti = TimerInfo.builder()
+                        .step(step)
+                        .timeout(timeout)
+                        .numCollectors(numCollectors)
+                        .slowCollectTime(slowcollecttime)
+                        .build();
         timers.put(Timer.DEFAULTNAME, ti);
 
         //

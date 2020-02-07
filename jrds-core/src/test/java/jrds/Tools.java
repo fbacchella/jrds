@@ -143,10 +143,7 @@ final public class Tools {
     }
 
     static public final Map<String, Timer> getSimpleTimerMap() {
-        PropertiesManager.TimerInfo ti = new PropertiesManager.TimerInfo();
-        ti.numCollectors = 1;
-        ti.step = 300;
-        ti.timeout = 10;
+        PropertiesManager.TimerInfo ti = TimerInfo.builder().numCollectors(1).step(300).timeout(10).build();
         Timer t = new Timer(Timer.DEFAULTNAME, ti);
         Map<String, Timer> timerMap = new HashMap<String, Timer>(1);
         timerMap.put(t.getName(), t);
@@ -154,11 +151,7 @@ final public class Tools {
     }
 
     static public final Timer getDefaultTimer() {
-        TimerInfo ti = new PropertiesManager.TimerInfo();
-        ti.numCollectors = 1;
-        ti.slowCollectTime = 5;
-        ti.step = 300;
-        ti.timeout = 10;
+        PropertiesManager.TimerInfo ti = TimerInfo.builder().numCollectors(1).step(300).timeout(10).slowCollectTime(5).build();
         return new Timer("TimerTester", ti);
     }
 
