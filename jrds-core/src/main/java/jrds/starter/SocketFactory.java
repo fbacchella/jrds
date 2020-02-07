@@ -1,14 +1,13 @@
 package jrds.starter;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
-import java.net.SocketException;
+
+import jrds.FastSocketFactory;
 
 public class SocketFactory extends Starter {
-    
+
     private static class FastServerSocket extends ServerSocket {
         private final int timeout;
         public FastServerSocket(int port, int timeout) throws IOException {
@@ -26,19 +25,6 @@ public class SocketFactory extends Starter {
         }
     }
 
-    private static class FastSocket extends Socket {
-        private final int timeout;
-        public FastSocket(int timeout) throws SocketException {
-            super();
-            this.timeout = timeout;
-            setSoTimeout(timeout);
-            setTcpNoDelay(true);
-        }
-        public void connect(SocketAddress endpoint) throws IOException {
-            super.connect(endpoint, timeout);
-        }
-    }
-
     public ServerSocket createServerSocket(int port) throws IOException {
         if(!isStarted()) {
             return null;
@@ -47,16 +33,25 @@ public class SocketFactory extends Starter {
         }
     }
 
+    private final FastSocketFactory socketFactory;
+
+    public SocketFactory(int timeout) {
+        this.socketFactory = new FastSocketFactory(timeout);
+    }
+
+    public javax.net.SocketFactory getFactory() {
+        return socketFactory;
+    }
+    
+    @Deprecated
     public Socket createSocket(String host, int port) throws IOException {
         if(!isStarted())
             return null;
 
-        Socket s = getSocket();
-        s.connect(new InetSocketAddress(host, port));
-
-        return s;
+        return socketFactory.createSocket(host, port);
     }
 
+    @Deprecated
     public Socket createSocket(StarterNode host, int port) throws IOException {
         if(!isStarted())
             return null;
@@ -65,26 +60,22 @@ public class SocketFactory extends Starter {
         if(r == null || !r.isStarted())
             return null;
 
-        Socket s = getSocket();
-        s.connect(new InetSocketAddress(r.getInetAddress(), port));
-        return s;
+        return socketFactory.createSocket(r.getInetAddress(), port);
     }
 
+    @Deprecated
     public Socket createSocket() throws IOException {
         if(!isStarted()) {
             return null;
         } else {
-            return getSocket();
+            return socketFactory.createSocket();
         }
-    }
-
-    private Socket getSocket() throws SocketException {
-        return new FastSocket(getTimeout() * 1000);
     }
 
     /**
      * @return the timeout
      */
+    @Deprecated
     public int getTimeout() {
         return getLevel().getTimeout();
     }

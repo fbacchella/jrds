@@ -89,7 +89,7 @@ public class ApacheHttpClientTest {
         Tools.configure();
         StoreOpener.prepare("FILE");
     }
-    
+
     @Before
     public void loggers() {
         logrule.setLevel(Level.TRACE, HCHttpProbe.class.getName(), HttpClientStarter.class.getName(), Resolver.class.getName(), Connection.class.getName(), "jrds.Starter", "jrds.Probe.ApacheHttpClientTester");
@@ -105,7 +105,7 @@ public class ApacheHttpClientTest {
         localhost.setParent(t);
         localhost.getHost().setHostDir(testFolder.getRoot());
         t.registerStarter(new SSLStarter());
-        t.registerStarter(new SocketFactory());
+        t.registerStarter(new SocketFactory(1));
         t.configureStarters(pm);
         localhost.registerStarter(cnx);
         cnx.configure(pm);

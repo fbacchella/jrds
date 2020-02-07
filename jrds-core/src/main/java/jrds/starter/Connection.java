@@ -16,7 +16,7 @@ public abstract class Connection<ConnectedType> extends Starter {
 
     Socket makeSocket(String host, int port) throws IOException {
         SocketFactory sf = getLevel().find(SocketFactory.class);
-        return sf.createSocket(host, port);
+        return sf.getFactory().createSocket(host, port);
     }
 
     /*

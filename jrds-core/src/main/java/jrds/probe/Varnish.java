@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -15,6 +16,7 @@ import org.slf4j.event.Level;
 
 import jrds.Probe;
 import jrds.factories.ProbeBean;
+import jrds.starter.Resolver;
 import jrds.starter.SocketFactory;
 
 @ProbeBean({ "port", "welcome" })
@@ -42,10 +44,15 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
     public Map<String, Number> getNewSampleValues() {
         SocketFactory ss = find(SocketFactory.class);
         if (ss == null || !ss.isStarted()) {
-            return null;
+            return Collections.emptyMap();
         }
 
-        try (Socket s = ss.createSocket(this, port)) {
+        Resolver r = find(Resolver.class);
+        if (r == null || !r.isStarted()) {
+            return Collections.emptyMap();
+        }
+
+        try (Socket s = ss.getFactory().createSocket(r.getInetAddress(), port)) {
             PrintWriter outputSocket = new PrintWriter(s.getOutputStream());
             BufferedReader inputSocket = new BufferedReader(new InputStreamReader(s.getInputStream()));
 

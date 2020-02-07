@@ -40,7 +40,7 @@ public class JrdsSocketConnection extends SocketConnection {
     }
 
     public JrdsSocketConnection(String host, int port, SocketFactory sf) throws IOException {
-        super(sf.createSocket(host, port));
+        super(sf.getFactory().createSocket(host, port));
         this.host = host;
         this.port = port;
     }

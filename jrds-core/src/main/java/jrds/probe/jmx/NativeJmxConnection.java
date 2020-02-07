@@ -3,8 +3,6 @@ package jrds.probe.jmx;
 import java.io.IOException;
 import java.lang.management.RuntimeMXBean;
 import java.net.MalformedURLException;
-import java.net.Socket;
-import java.rmi.server.RMIClientSocketFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,13 +30,6 @@ import jrds.starter.SocketFactory;
 
 @ProbeBean({ "url", "protocol", "port", "path", "user", "password" })
 public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnection, NativeJmxSource> {
-
-    public class RmiSocketFactory implements RMIClientSocketFactory {
-        public Socket createSocket(String host, int port) throws IOException {
-            log(Level.DEBUG, "creating a RMI socket to %s:%d", host, port);
-            return getLevel().find(SocketFactory.class).createSocket(host, port);
-        }
-    }
 
     // close can be slow
     private final static AtomicInteger closed = new AtomicInteger();
@@ -131,7 +122,7 @@ public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnec
             attributes.put("jmx.remote.x.client.connected.state.timeout", getTimeout() * 1000);
             if(protocol == JmxProtocol.rmi) {
                 attributes.put("sun.rmi.transport.tcp.responseTimeout", getTimeout() * 1000);
-                attributes.put("com.sun.jndi.rmi.factory.socket", getLevel().find(JmxSocketFactory.class));
+                attributes.put("com.sun.jndi.rmi.factory.socket", getLevel().find(JmxSocketFactory.class).getFactory());
             } else if(protocol == JmxProtocol.jmxmp) {
                 Object sc = JrdsSocketConnection.create(url, getLevel().find(SocketFactory.class));
                 attributes.put(GenericConnector.MESSAGE_CONNECTION, sc);

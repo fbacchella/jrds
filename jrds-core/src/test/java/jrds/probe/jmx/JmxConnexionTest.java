@@ -111,7 +111,7 @@ public class JmxConnexionTest {
         };
         host.setTimeout(1);
         JMXConnection cnx = getCnx(proto, port);
-        host.registerStarter(new SocketFactory());
+        host.registerStarter(new SocketFactory(1));
         host.registerStarter(new JmxSocketFactory());
         host.registerStarter(cnx);
 
