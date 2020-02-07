@@ -96,59 +96,61 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
     }
 
     protected boolean finishConfigure(List<Object> argslist) {
-        if(url == null) {
-            if(port <= 0 && (scheme == null || scheme.isEmpty())) {
-                scheme = "http";
-            } else if(scheme == null || scheme.isEmpty()) {
-                if(port == 443) {
-                    scheme = "https";
-                } else {
+        if(getConnectionName() == null) {
+            if(url == null) {
+                if(port <= 0 && (scheme == null || scheme.isEmpty())) {
                     scheme = "http";
+                } else if(scheme == null || scheme.isEmpty()) {
+                    if(port == 443) {
+                        scheme = "https";
+                    } else {
+                        scheme = "http";
+                    }
                 }
-            }
-            // Check if authentication elements were given, and construct the
-            // authentication part if needed
-            String userInfo = "";
-            try {
-                if(login != null) {
-                    userInfo = URLEncoder.encode(login, "UTF-8");
-                }
-                if(password != null) {
-                    userInfo = userInfo + ":" + URLEncoder.encode(password, "UTF-8");
-                }
-                if(!userInfo.isEmpty()) {
-                    userInfo += '@';
-                }
-            } catch (UnsupportedEncodingException e1) {
-                // never reached catch
-            }
-            String portString = port < 0 ? "" : ":" + Integer.toString(port);
-            if(urlhost == null) {
-                urlhost = getHost().getDnsName();
-            }
-            String urlString;
-            if(argslist != null) {
+                // Check if authentication elements were given, and construct the
+                // authentication part if needed
+                String userInfo = "";
                 try {
-                    urlString = String.format(scheme + "://" + userInfo + urlhost + portString + file, argslist.toArray());
-                    urlString = Util.parseTemplate(urlString, getHost(), argslist, this);
-                } catch (IllegalFormatConversionException e) {
-                    log(Level.ERROR, "Illegal format string: %s://%s%s:%d%s, args %d", scheme, userInfo, urlhost, portString, file, argslist.size());
+                    if(login != null) {
+                        userInfo = URLEncoder.encode(login, "UTF-8");
+                    }
+                    if(password != null) {
+                        userInfo = userInfo + ":" + URLEncoder.encode(password, "UTF-8");
+                    }
+                    if(!userInfo.isEmpty()) {
+                        userInfo += '@';
+                    }
+                } catch (UnsupportedEncodingException e1) {
+                    // never reached catch
+                }
+                String portString = port < 0 ? "" : ":" + Integer.toString(port);
+                if(urlhost == null) {
+                    urlhost = getHost().getDnsName();
+                }
+                String urlString;
+                if(argslist != null) {
+                    try {
+                        urlString = String.format(scheme + "://" + userInfo + urlhost + portString + file, argslist.toArray());
+                        urlString = Util.parseTemplate(urlString, getHost(), argslist, this);
+                    } catch (IllegalFormatConversionException e) {
+                        log(Level.ERROR, "Illegal format string: %s://%s%s:%d%s, args %d", scheme, userInfo, urlhost, portString, file, argslist.size());
+                        return false;
+                    }
+                } else {
+                    urlString = Util.parseTemplate(scheme + "://" + userInfo + urlhost + portString + file, this, getHost());
+                }
+                try {
+                    url = new URL(urlString);
+                } catch (MalformedURLException e) {
+                    log(Level.ERROR, e, "URL '%s:/%s/%s:%s%s' is invalid", scheme, userInfo, urlhost, portString, file);
                     return false;
                 }
-            } else {
-                urlString = Util.parseTemplate(scheme + "://" + userInfo + urlhost + portString + file, this, getHost());
             }
-            try {
-                url = new URL(urlString);
-            } catch (MalformedURLException e) {
-                log(Level.ERROR, e, "URL '%s:/%s/%s:%s%s' is invalid", scheme, userInfo, urlhost, portString, file);
-                return false;
+            if("http".equals(url.getProtocol()) || "https".equals(url.getProtocol())) {
+                resolver = getParent().registerStarter(new Resolver(url.getHost()));
             }
+            log(Level.DEBUG, "URL to collect is %s", getUrl());
         }
-        if("http".equals(url.getProtocol()) || "https".equals(url.getProtocol())) {
-            resolver = getParent().registerStarter(new Resolver(url.getHost()));
-        }
-        log(Level.DEBUG, "URL to collect is %s", getUrl());
         return true;
     }
 
