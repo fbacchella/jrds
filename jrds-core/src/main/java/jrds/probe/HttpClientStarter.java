@@ -1,26 +1,20 @@
 package jrds.probe;
 
 import java.io.IOException;
-import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.protocol.HttpContext;
 import org.slf4j.event.Level;
 
 import jrds.PropertiesManager;
 import jrds.starter.SSLStarter;
-import jrds.starter.SocketFactory;
 import jrds.starter.Starter;
 
 public class HttpClientStarter extends Starter {
@@ -28,7 +22,6 @@ public class HttpClientStarter extends Starter {
 
     private CloseableHttpClient client = null;
     private int maxConnect = 0;
-    private int timeout = 0;
 
     /*
      * (non-Javadoc)
@@ -39,38 +32,24 @@ public class HttpClientStarter extends Starter {
     public void configure(PropertiesManager pm) {
         super.configure(pm);
         maxConnect = pm.numCollectors;
-        timeout = pm.timeout;
     }
 
     @Override
     public boolean start() {
-
-        RegistryBuilder<ConnectionSocketFactory> r = RegistryBuilder.<ConnectionSocketFactory> create();
-
-        // Register http and his plain socket factory
-        final SocketFactory ss = getLevel().find(SocketFactory.class);
-        ConnectionSocketFactory plainsf = new PlainConnectionSocketFactory() {
-            @Override
-            public Socket createSocket(HttpContext context) throws IOException {
-                return ss.createSocket();
-            }
-        };
-        r.register("http", plainsf);
-
-        // Register https
-        ConnectionSocketFactory sslfactory = getSSLSocketFactory();
-        if (sslfactory != null) {
-            r.register("https", sslfactory);
-        } else {
-            log(Level.WARN, "ssl factory not found, won't manage https");
-        }
+        int timeout = getLevel().getTimeout();
+        int step = getLevel().getStep();
 
         HttpClientBuilder builder = HttpClientBuilder.create();
         builder.setUserAgent(USERAGENT);
-        builder.setConnectionTimeToLive(timeout, TimeUnit.SECONDS);
-        builder.evictIdleConnections((long) timeout, TimeUnit.SECONDS);
+        builder.setConnectionTimeToLive(step, TimeUnit.SECONDS);
+        builder.evictIdleConnections((long) step, TimeUnit.SECONDS);
+        try {
+            builder.setSSLContext(getSSLSocketFactory());
+        } catch (NoSuchAlgorithmException e) {
+            log(Level.ERROR, "No default SSLContext available", e.getMessage());
+        }
 
-        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager(r.build());
+        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
         cm.setMaxTotal(maxConnect * 2);
         cm.setDefaultMaxPerRoute(2);
         cm.setValidateAfterInactivity(timeout * 1000);
@@ -88,13 +67,12 @@ public class HttpClientStarter extends Starter {
         return true;
     }
 
-    private SSLConnectionSocketFactory getSSLSocketFactory() {
+    private SSLContext getSSLSocketFactory() throws NoSuchAlgorithmException {
         SSLStarter sslstarter = getLevel().find(SSLStarter.class);
         if (sslstarter == null) {
-            return null;
+            return SSLContext.getDefault();
         } else {
-            SSLContext sc = sslstarter.getContext();
-            return new SSLConnectionSocketFactory(sc);
+            return sslstarter.getContext();
         }
     }
 
@@ -118,4 +96,5 @@ public class HttpClientStarter extends Starter {
         // if no sslfactory, don't check if it's started
         return client != null && (sslfactory != null ? sslfactory.isStarted() : true);
     }
+
 }
