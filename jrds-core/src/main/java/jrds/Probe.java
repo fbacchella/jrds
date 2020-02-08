@@ -41,8 +41,7 @@ import jrds.store.StoreFactory;
  * 
  * @author Fabrice Bacchella
  */
-@ProbeMeta(topStarter=jrds.starter.SocketFactory.class,
-           collectResolver=CollectResolver.StringResolver.class)
+@ProbeMeta(collectResolver=CollectResolver.StringResolver.class)
 public abstract class Probe<KeyType, ValueType> extends StarterNode implements Comparable<Probe<KeyType, ValueType>>  {
 
     protected class LocalJrdsSample extends HashMap<String, Number> implements JrdsSample {

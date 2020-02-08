@@ -29,7 +29,7 @@ import jrds.probe.jmx.JmxDiscoverAgent;
  */
 @ProbeMeta(
         discoverAgent=JmxDiscoverAgent.class,
-        topStarter=JmxSocketFactory.class
+        timerStarter=JmxSocketFactory.class
         )
 public class JMX extends ProbeConnected<String, Double, JMXConnection> implements ConnectedProbe, SSLProbe {
     private Map<String, String> collectKeys = null;
