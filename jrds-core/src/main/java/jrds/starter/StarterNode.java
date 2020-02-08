@@ -11,6 +11,8 @@ import org.slf4j.event.Level;
 
 import jrds.HostsList;
 import jrds.PropertiesManager;
+import lombok.Getter;
+import lombok.Setter;
 
 @SuppressWarnings("deprecation")
 public abstract class StarterNode implements StartersSet {
@@ -20,8 +22,32 @@ public abstract class StarterNode implements StartersSet {
     private HostsList root = null;
     private volatile boolean started = false;
     private StarterNode parent = null;
+
+    /**
+     * The time out during collect
+     * 
+     * @param timeout Timeout in seconds.
+     * @return The timeout in seconds.
+     */
+    @Getter @Setter
     private int timeout = -1;
+
+    /**
+     * The interval between collect.
+     * 
+     * @param step Interval in seconds.
+     * @return The collect interval in seconds.
+     */
+    @Getter @Setter
     private int step = -1;
+
+    /**
+     * The collect time that will generate a warning in logs
+     * 
+     * @param slowCollectTime The slow collect time.
+     * @return The slow collect time.
+     */
+    @Getter @Setter
     private int slowCollectTime = -1;
 
     public StarterNode() {
@@ -37,6 +63,9 @@ public abstract class StarterNode implements StartersSet {
     public void setParent(StarterNode parent) {
         root = parent.root;
         this.parent = parent;
+        this.timeout = this.timeout < 0 ? parent.getTimeout() : this.timeout;
+        this.step = this.step < 0 ? parent.getStep() : this.step;
+        this.slowCollectTime = this.slowCollectTime < 0 ? parent.getSlowCollectTime() : this.slowCollectTime;
     }
 
     public boolean isCollectRunning() {
@@ -251,42 +280,6 @@ public abstract class StarterNode implements StartersSet {
 
     public void log(Level l, String format, Object... elements) {
         jrds.Util.log(this, LoggerFactory.getLogger(getClass()), l, null, format, elements);
-    }
-
-    /**
-     * @return the timeout
-     */
-    public int getTimeout() {
-        return timeout;
-    }
-
-    /**
-     * @param timeout the timeout to set
-     */
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
-
-    /**
-     * @return the step
-     */
-    public int getStep() {
-        return step;
-    }
-
-    /**
-     * @param step the step to set
-     */
-    public void setStep(int step) {
-        this.step = step;
-    }
-
-    public int getSlowCollectTime() {
-        return slowCollectTime;
-    }
-
-    public void setSlowCollectTime(int slowCollectTime) {
-        this.slowCollectTime = slowCollectTime;
     }
 
 }

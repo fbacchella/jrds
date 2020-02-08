@@ -103,6 +103,7 @@ public class Timer extends StarterNode {
             hostList.put(hostName, starter);
             starter.setTimeout(getTimeout());
             starter.setStep(getStep());
+            starter.setSlowCollectTime(getSlowCollectTime());
             starter.setParent(this);
         }
         return starter;

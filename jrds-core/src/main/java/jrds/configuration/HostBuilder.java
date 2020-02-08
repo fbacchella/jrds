@@ -266,6 +266,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         }
         p.setStep(timer.getStep());
         p.setTimeout(timer.getTimeout());
+        p.setSlowCollectTime(timer.getSlowCollectTime());
 
         // Identify the archive to use
         String archivesName;
