@@ -1,12 +1,12 @@
 package jrds;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jrds.starter.Timer;
-import jrds.store.StoreFactory;
 
 public class Configuration {
     static private final Logger logger = LoggerFactory.getLogger(Configuration.class);
@@ -90,13 +90,15 @@ public class Configuration {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        for(StoreFactory sf: propertiesManager.stores.values()) {
-            sf.stop();
-        }
         if(hostsList.getRenderer() != null) {
             hostsList.getRenderer().finish();
         }
-        propertiesManager.defaultStore.stop();
+        try {
+            propertiesManager.close();
+        } catch (IOException e) {
+            logger.error("Failed to close old classloader: %s", e.getMessage());
+        }
+
     }
 
     /**

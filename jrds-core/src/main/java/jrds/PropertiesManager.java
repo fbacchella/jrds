@@ -1,5 +1,6 @@
 package jrds;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -45,7 +46,7 @@ import lombok.Builder;
  * 
  * @author Fabrice Bacchella
  */
-public class PropertiesManager extends Properties {
+public class PropertiesManager extends Properties implements Closeable {
     private final Logger logger = LoggerFactory.getLogger(PropertiesManager.class);
 
     @Builder
@@ -494,6 +495,15 @@ public class PropertiesManager extends Properties {
         });
     }
 
+    @Override
+    public void close() throws IOException {
+        stores.values().forEach(StoreFactory::stop);
+        defaultStore.stop();
+        if (extensionClassLoader instanceof URLClassLoader && ! extensionClassLoader.equals(getClass().getClassLoader())) {
+            ((URLClassLoader)extensionClassLoader).close();
+        }
+    }
+
     public File configdir;
     public File rrddir;
     public File tmpdir;
@@ -531,4 +541,5 @@ public class PropertiesManager extends Properties {
     public Map<Class <? extends ModuleConfigurator>, Object> extendedConfiguration = new HashMap<>();
 
     public List<String> tabsList = Arrays.asList(FILTERTAB, CUSTOMGRAPHTAB, "@", SUMSTAB, SERVICESTAB, VIEWSTAB, HOSTSTAB, TAGSTAB, ADMINTAB);
+
 }
