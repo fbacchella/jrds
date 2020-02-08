@@ -25,9 +25,9 @@ jobs:
             - image: circleci/openjdk:8-jdk
         steps:
             - persist_to_workspace:
-                root: /
+                root: /usr/local
                 paths:
-                    - usr/lib/jvm/java-8-openjdk-amd64
+                    - openjdk-8
     build:
         docker:
             - image: circleci/openjdk:13-jdk-buster
@@ -37,7 +37,7 @@ jobs:
             - run:
                 command: |
                     sudo mkdir -p /usr/lib/jvm
-                    sudo mv -n /tmp/ws/usr/lib/jvm/java-8-openjdk-amd64 /usr/lib/jvm/
+                    [ -d /tmp/ws/openjdk-8 ] && sudo mv -n /tmp/ws/openjdk-8 /usr/lib/jvm/java-8-openjdk-amd64
                     mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
@@ -58,6 +58,8 @@ jobs:
                 at: /tmp/ws
             - run:
                 command: |
+                    sudo mkdir -p /usr/lib/jvm
+                    [ -d /tmp/ws/openjdk-8 ] && sudo mv -n /tmp/ws/openjdk-8 /usr/lib/jvm/java-8-openjdk-amd64
                     mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
