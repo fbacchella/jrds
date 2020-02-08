@@ -2,6 +2,8 @@ package jrds.probe;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 
@@ -93,12 +95,13 @@ public class ApacheHttpClientTest {
     @Before
     public void loggers() {
         logrule.setLevel(Level.TRACE, HCHttpProbe.class.getName(), HttpClientStarter.class.getName(), Resolver.class.getName(), Connection.class.getName(), "jrds.Starter", "jrds.Probe.ApacheHttpClientTester");
+        logrule.setLevel(Level.INFO, "org.eclipse");
     }
 
     private HostStarter addConnection(Starter cnx) throws IOException {
         String truststore = getClass().getClassLoader().getResource("localhost.jks").getFile();
-        PropertiesManager pm = Tools.makePm(testFolder, "timeout=1", "collectorThreads=1",
-                "ssl.protocol=TLS", "ssl.strict=true", "ssl.truststore=" + truststore, "ssl.trustpassword=123456");
+        PropertiesManager pm = Tools.makePm(testFolder, "collectorThreads=1",
+                                            "ssl.protocol=TLSv1.2", "ssl.strict=true", "ssl.truststore=" + truststore, "ssl.trustpassword=123456");
 
         HostStarter localhost = new HostStarter(new HostInfo("localhost"));
         Timer t = Tools.getDefaultTimer();
@@ -107,6 +110,8 @@ public class ApacheHttpClientTest {
         t.registerStarter(new SSLStarter());
         t.registerStarter(new SocketFactory(1));
         t.configureStarters(pm);
+        localhost.find(Resolver.class).doStart();
+        localhost.find(SSLStarter.class).doStart();
         localhost.registerStarter(cnx);
         cnx.configure(pm);
         return localhost;
@@ -120,8 +125,6 @@ public class ApacheHttpClientTest {
 
         HttpClientStarter cnx = new HttpClientStarter();
         HostStarter localhost = addConnection(cnx);
-        localhost.find(SSLStarter.class).doStart();
-        localhost.find(Resolver.class).doStart();
         logger.debug("resolver started for localhost:" + localhost.find(Resolver.class).isStarted());
         cnx.doStart();
         Assert.assertTrue("Apache HttpClient failed to start", cnx.isStarted());
@@ -143,7 +146,6 @@ public class ApacheHttpClientTest {
         p.setMainStore(new RrdDbStoreFactory(), empty);
         p.setHost(localhost);
         p.setPort(server.getURI().toURL().getPort());
-        p.setStep(30);
         p.configure();
         p.checkStore();
         localhost.addProbe(p);
@@ -165,15 +167,12 @@ public class ApacheHttpClientTest {
 
         HttpClientStarter cnx = new HttpClientStarter();
         HostStarter localhost = addConnection(cnx);
-        localhost.find(Resolver.class).doStart();
-        localhost.find(SSLStarter.class).doStart();
         cnx.doStart();
         TestHttpProbe p = new TestHttpProbe();
         p.setMainStore(new RrdDbStoreFactory(), empty);
         p.setHost(localhost);
         p.setPort(server.getURI().toURL().getPort());
         p.setScheme("https");
-        p.setStep(30);
         p.configure();
         p.checkStore();
         localhost.addProbe(p);

@@ -8,9 +8,9 @@ import javax.net.ssl.SSLContext;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.slf4j.event.Level;
 
 import jrds.PropertiesManager;
@@ -48,12 +48,10 @@ public class HttpClientStarter extends Starter {
         } catch (NoSuchAlgorithmException e) {
             log(Level.ERROR, "No default SSLContext available", e.getMessage());
         }
-
-        PoolingHttpClientConnectionManager cm = new PoolingHttpClientConnectionManager();
-        cm.setMaxTotal(maxConnect * 2);
-        cm.setDefaultMaxPerRoute(2);
-        cm.setValidateAfterInactivity(timeout * 1000);
-        builder.setConnectionManager(cm);
+        builder.setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(timeout * 1000).build());
+        builder.setConnectionManagerShared(false);
+        builder.setMaxConnPerRoute(2);
+        builder.setMaxConnTotal(maxConnect * 2);
 
         RequestConfig rc = RequestConfig.custom()
                         .setConnectionRequestTimeout(timeout * 1000)
