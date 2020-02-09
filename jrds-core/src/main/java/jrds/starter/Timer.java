@@ -1,16 +1,12 @@
 package jrds.starter;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RunnableFuture;
@@ -56,11 +52,11 @@ public class Timer extends StarterNode {
 
     public static final class Stats implements Cloneable {
         Stats() {
-            lastCollect = new Date(0);
+            lastCollect = 0;
         }
 
         public long runtime = 0;
-        public Date lastCollect;
+        public long lastCollect;
 
         /*
          * (non-Javadoc)
@@ -72,7 +68,7 @@ public class Timer extends StarterNode {
             Stats newstates = new Stats();
             synchronized (this) {
                 newstates.runtime = runtime;
-                newstates.lastCollect = new Date(lastCollect.getTime());
+                newstates.lastCollect = System.currentTimeMillis();
             }
             return newstates;
         }
@@ -150,7 +146,7 @@ public class Timer extends StarterNode {
             return;
         }
         log(Level.DEBUG, "One collect is launched");
-        Date start = new Date();
+        long start = System.currentTimeMillis();
         try {
             if(!collectMutex.tryAcquire(getTimeout(), TimeUnit.SECONDS)) {
                 log(Level.ERROR, "A collect failed because a start time out");
@@ -183,18 +179,15 @@ public class Timer extends StarterNode {
                 };
             }
         };
-        List<Future<Object>> running = new ArrayList<>(toSchedule.size());
         try {
             if (startCollect()) {
-                tpool.invokeAll(toSchedule, getStep() - getTimeout(), TimeUnit.SECONDS).stream()
-                .filter(f-> ! f.isDone() && ! f.isCancelled())
-                .forEach(running::add);
+                tpool.invokeAll(toSchedule, getStep() - getTimeout(), TimeUnit.SECONDS);
                 stopCollect();
                 // Waited for late collect arrival, after the shutdownNow
                 if (!tpool.isTerminated()) {
                     tpool.shutdownNow();
                     if (! tpool.awaitTermination(getTimeout(), TimeUnit.SECONDS)) {
-                        dumpCollectHanged(running);
+                        log(Level.ERROR, "Lost collect");
                     }
                 }
             }
@@ -202,24 +195,21 @@ public class Timer extends StarterNode {
             log(Level.DEBUG, "collector thread refused");
         } catch (InterruptedException e) {
             log(Level.INFO, "Collect interrupted");
-            tpool.shutdownNow();
             Thread.currentThread().interrupt();
         } catch (RuntimeException e) {
             log(Level.ERROR, e, "problem while collecting data: %s", e);
         } finally {
-            synchronized (running) {
-                tpool.shutdownNow();
-                tpool = null;
-            }
+            tpool.shutdownNow();
             collectMutex.release();
+            tpool = null;
+            long end = System.currentTimeMillis();
+            long duration = end - start;
+            synchronized (stats) {
+                stats.lastCollect = start;
+                stats.runtime = duration;
+            }
+            log(Level.INFO, "Collect started at " + start + " ran for " + duration + "ms");
         }
-        Date end = new Date();
-        long duration = end.getTime() - start.getTime();
-        synchronized (stats) {
-            stats.lastCollect = start;
-            stats.runtime = duration;
-        }
-        log(Level.INFO, "Collect started at " + start + " ran for " + duration + "ms");
     }
 
     public void lockCollect() throws InterruptedException {
@@ -259,16 +249,6 @@ public class Timer extends StarterNode {
         if(tpool != null) {
             tpool.shutdownNow();
         }
-    }
-
-    private void dumpCollectHanged(List<Future<Object>> running) {
-        running.stream()
-        .filter(f-> ! f.isDone() && ! f.isCancelled())
-        .forEach(waiting -> {
-            if (waiting.cancel(true)) {
-                log(Level.WARN, "%s blocked", waiting);
-            }
-        });
     }
 
 }

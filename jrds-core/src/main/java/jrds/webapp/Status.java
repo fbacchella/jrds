@@ -64,7 +64,7 @@ public class Status extends JrdsServlet {
                 writer.array();
                 for(Map.Entry<String, Stats> e: stats.entrySet()) {
                     writer.object();
-                    long lastCollectAgo = (System.currentTimeMillis() - e.getValue().lastCollect.getTime()) / 1000;
+                    long lastCollectAgo = (System.currentTimeMillis() - e.getValue().lastCollect) / 1000;
                     writer.key("Name").value(e.getKey());
                     writer.key("LastCollect").value(lastCollectAgo);
                     writer.key("LastDuration").value(e.getValue().runtime);
@@ -83,7 +83,7 @@ public class Status extends JrdsServlet {
             writer.println("Hosts: " + numHosts);
             writer.println("Probes: " + numProbes);
             for(Map.Entry<String, Stats> e: stats.entrySet()) {
-                long lastCollectAgo = (System.currentTimeMillis() - e.getValue().lastCollect.getTime()) / 1000;
+                long lastCollectAgo = (System.currentTimeMillis() - e.getValue().lastCollect) / 1000;
                 writer.println("Timer name: " + e.getKey());
                 writer.println("    Last collect: " + lastCollectAgo + "s ago (" + lastCollectAgo + ")");
                 writer.println("    Last running duration: " + e.getValue().runtime / 1000 + "s");
