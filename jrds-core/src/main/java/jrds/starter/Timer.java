@@ -42,11 +42,13 @@ public class Timer extends StarterNode {
 
         @Override
         public Object call() throws Exception {
-            log(Level.DEBUG, "Collect all stats for host %s", host.getName());
-            String collectName = Timer.this.name + "/" + "JrdsCollect-" + host.getName();
-            host.setRunningname(collectName);
-            host.collectAll();
-            host.setRunningname(collectName + ":notrunning");
+            if (host.isCollectRunning()) {
+                log(Level.DEBUG, "Collect all stats for host %s", host.getName());
+                String collectName = Timer.this.name + "/" + "JrdsCollect-" + host.getName();
+                host.setRunningname(collectName);
+                host.collectAll();
+                host.setRunningname(collectName + ":notrunning");
+            }
             return null;
         }
 
@@ -139,10 +141,10 @@ public class Timer extends StarterNode {
     public void collectAll() {
         // Build the list of host that will be collected
         Set<Callable<Object>> toSchedule = new HashSet<Callable<Object>>();
-        for(final HostStarter host: hostList.values()) {
-            Callable<Object> runCollect = new CollectCallable(host);
-            toSchedule.add(runCollect);
-        }
+        hostList.values().stream()
+        .map(CollectCallable::new)
+        .forEach(toSchedule::add);
+
         if(toSchedule.size() == 0) {
             log(Level.INFO, "skipping timer, empty");
             return;
