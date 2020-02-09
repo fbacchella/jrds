@@ -2,8 +2,10 @@ package jrds;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.rmi.server.RMIClientSocketFactory;
 
@@ -13,16 +15,12 @@ public class FastSocketFactory extends SocketFactory {
 
     private static class FastSocket extends Socket {
         private final int timeout;
-        public FastSocket(int timeout, InetAddress address, int port, InetAddress localAddr,
-                          int localPort)
-                        throws IOException {
-            super(address, port, localAddr, localPort);
-            this.timeout = timeout;
-            setSoTimeout(timeout);
-            setTcpNoDelay(true);
-        }
-        public FastSocket(int timeout, InetAddress address, int port) throws IOException {
-            super(address, port);
+        /**
+         * Only this creator is allowed, otherwise connect will be called with a 0 (uninitialized) value
+         * @param timeout
+         * @throws SocketException
+         */
+        public FastSocket(int timeout) throws SocketException {
             this.timeout = timeout;
             setSoTimeout(timeout);
             setTcpNoDelay(true);
@@ -31,46 +29,57 @@ public class FastSocketFactory extends SocketFactory {
             super.connect(endpoint, timeout);
         }
     }
-    
+
     private final int timeout;
-    
+
     public FastSocketFactory(int timeout) {
-        this.timeout = timeout;
+        this.timeout = timeout * 1000;
     }
 
     @Override
     public Socket createSocket(String host, int port)
                     throws IOException, UnknownHostException {
-        Socket s = new FastSocket(timeout, InetAddress.getByName(host), port);
+        Socket s = new FastSocket(timeout);
+        s.connect(new InetSocketAddress(InetAddress.getByName(host), port));
         return s;
     }
 
     @Override
     public Socket createSocket(InetAddress host, int port) throws IOException {
-        return new FastSocket(timeout, host, port);
+        Socket s = new FastSocket(timeout);
+        s.connect(new InetSocketAddress(host, port));
+        return s;
     }
 
     @Override
     public Socket createSocket(String host, int port, InetAddress localHost,
                                int localPort)
-                    throws IOException, UnknownHostException {
-        return new FastSocket(timeout, InetAddress.getByName(host), port, localHost, localPort);
+                                               throws IOException, UnknownHostException {
+        Socket s = new FastSocket(timeout);
+        s.connect(new InetSocketAddress(host, port));
+        return s;
     }
 
     @Override
     public Socket createSocket(InetAddress address, int port,
                                InetAddress localAddress, int localPort)
-                    throws IOException {
-        return new FastSocket(timeout, address, port, localAddress, localPort);
+                                               throws IOException {
+        Socket s = new FastSocket(timeout);
+        s.bind(new InetSocketAddress(localAddress, localPort) );
+        s.connect(new InetSocketAddress(localAddress, port));
+        return s;
     }
-    
+
+    @Deprecated
     RMIClientSocketFactory getRMIClientSocketFactory() {
         return new RMIClientSocketFactory() {
 
             @Override
             public Socket createSocket(String host, int port)
                             throws IOException {
-                return new FastSocket(timeout, InetAddress.getByName(host), port);
+                Socket s = new FastSocket(timeout);
+                s.connect(new InetSocketAddress(InetAddress.getByName(host), port));
+                return s;
             }
         };
     }
