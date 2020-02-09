@@ -1,5 +1,6 @@
 package jrds.starter;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -38,25 +39,23 @@ public class Timer extends StarterNode {
 
         @Override
         public Object call() throws Exception {
-            if (host.isCollectRunning()) {
-                log(Level.DEBUG, "Collect all stats for host %s", host.getName());
-                String collectName = Timer.this.name + "/" + "JrdsCollect-" + host.getName();
-                host.setRunningname(collectName);
-                host.collectAll();
-                host.setRunningname(collectName + ":notrunning");
-            }
+            log(Level.DEBUG, "Collect all stats for host %s", host.getName());
+            String collectName = Timer.this.name + "/" + "JrdsCollect-" + host.getName();
+            host.setRunningname(collectName);
+            host.collectAll();
+            host.setRunningname(collectName + ":notrunning");
             return null;
         }
 
     };
 
     public static final class Stats implements Cloneable {
-        Stats() {
-            lastCollect = 0;
-        }
-
         public long runtime = 0;
-        public long lastCollect;
+        public Date lastCollect;
+
+        Stats() {
+            lastCollect = new Date(0);
+        }
 
         /*
          * (non-Javadoc)
@@ -68,7 +67,7 @@ public class Timer extends StarterNode {
             Stats newstates = new Stats();
             synchronized (this) {
                 newstates.runtime = runtime;
-                newstates.lastCollect = System.currentTimeMillis();
+                newstates.lastCollect = new Date();
             }
             return newstates;
         }
@@ -146,7 +145,7 @@ public class Timer extends StarterNode {
             return;
         }
         log(Level.DEBUG, "One collect is launched");
-        long start = System.currentTimeMillis();
+        Date start = new Date();
         try {
             if(!collectMutex.tryAcquire(getTimeout(), TimeUnit.SECONDS)) {
                 log(Level.ERROR, "A collect failed because a start time out");
@@ -203,7 +202,7 @@ public class Timer extends StarterNode {
             collectMutex.release();
             tpool = null;
             long end = System.currentTimeMillis();
-            long duration = end - start;
+            long duration = end - start.getTime();
             synchronized (stats) {
                 stats.lastCollect = start;
                 stats.runtime = duration;
