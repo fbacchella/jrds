@@ -39,11 +39,15 @@ public class Timer extends StarterNode {
 
         @Override
         public Object call() throws Exception {
-            log(Level.DEBUG, "Collect all stats for host %s", host.getName());
-            String collectName = Timer.this.name + "/" + "JrdsCollect-" + host.getName();
-            host.setRunningname(collectName);
-            host.collectAll();
-            host.setRunningname(collectName + ":notrunning");
+            if (Timer.this.isCollectRunning()) {
+                log(Level.DEBUG, "Collect all stats for host %s",
+                    host.getName());
+                String collectName = Timer.this.name + "/" + "JrdsCollect-"
+                                + host.getName();
+                host.setRunningname(collectName);
+                host.collectAll();
+                host.setRunningname(collectName + ":notrunning");
+            }
             return null;
         }
 
@@ -156,7 +160,7 @@ public class Timer extends StarterNode {
             Thread.currentThread().interrupt();
             return;
         }
-        final AtomicInteger counter = new AtomicInteger(0);
+        AtomicInteger counter = new AtomicInteger(0);
         // Generate threads with a default name
         ThreadFactory tf = new ThreadFactory() {
             public Thread newThread(Runnable r) {
@@ -178,27 +182,43 @@ public class Timer extends StarterNode {
                 };
             }
         };
+
         try {
             if (startCollect()) {
-                tpool.invokeAll(toSchedule, getStep() - getTimeout(), TimeUnit.SECONDS);
-                stopCollect();
-                // Waited for late collect arrival, after the shutdownNow
-                if (!tpool.isTerminated()) {
-                    tpool.shutdownNow();
-                    if (! tpool.awaitTermination(getTimeout(), TimeUnit.SECONDS)) {
-                        log(Level.ERROR, "Lost collect");
+                toSchedule.stream().forEach(tpool::submit);
+                tpool.shutdown();
+                long collectStart = System.currentTimeMillis();
+                long maxCollectTime = (getStep() - getTimeout()) * 1000;
+                while (! tpool.awaitTermination(getTimeout(), TimeUnit.SECONDS)) {
+                    if ((System.currentTimeMillis() - collectStart) > maxCollectTime && ! tpool.isTerminated()) {
+                        log(Level.ERROR, "Unfinished collect, lost %d tasks", tpool.getQueue().size());
+                        break;
+                    } else {
+                        log(Level.TRACE, "Still %s waiting or running tasks", tpool.getQueue().size());
                     }
                 }
             }
-        } catch (RejectedExecutionException ex) {
-            log(Level.DEBUG, "collector thread refused");
+        } catch (RejectedExecutionException e) {
+            log(Level.DEBUG, e, "Collector thread refused new task");
         } catch (InterruptedException e) {
             log(Level.INFO, "Collect interrupted");
             Thread.currentThread().interrupt();
         } catch (RuntimeException e) {
-            log(Level.ERROR, e, "problem while collecting data: %s", e);
+            log(Level.ERROR, e, "Problem while collecting data: %s", e);
         } finally {
-            tpool.shutdownNow();
+            stopCollect();
+            // Waited for late collect arrival, after the shutdownNow
+            if (!tpool.isTerminated()) {
+                tpool.shutdownNow();
+                try {
+                    if (! tpool.awaitTermination(getTimeout(), TimeUnit.SECONDS)) {
+                        log(Level.ERROR, "Lost collect");
+                    }
+                } catch (InterruptedException e) {
+                    log(Level.ERROR, "Lost collect");
+                    Thread.currentThread().interrupt();
+                }
+            }
             collectMutex.release();
             tpool = null;
             long end = System.currentTimeMillis();
