@@ -1,10 +1,10 @@
 package jrds.starter;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
@@ -25,11 +25,11 @@ import lombok.Getter;
 
 public class Timer extends StarterNode {
 
-    private class CollectCallable implements Callable<Object> {
+    private class CollectRunnable implements Runnable {
 
         private final HostStarter host;
 
-        CollectCallable(HostStarter host) {
+        CollectRunnable(HostStarter host) {
             this.host = host;
         }
 
@@ -39,7 +39,7 @@ public class Timer extends StarterNode {
         }
 
         @Override
-        public Object call() throws Exception {
+        public void run() {
             if (Timer.this.isCollectRunning()) {
                 log(Level.DEBUG, "Collect all stats for host %s",
                     host.getName());
@@ -49,7 +49,6 @@ public class Timer extends StarterNode {
                 host.collectAll();
                 host.setRunningname(collectName + ":notrunning");
             }
-            return null;
         }
 
     };
@@ -141,9 +140,9 @@ public class Timer extends StarterNode {
 
     public void collectAll() {
         // Build the list of host that will be collected
-        Set<Callable<Object>> toSchedule = new HashSet<Callable<Object>>();
+        List<Runnable> toSchedule = new ArrayList<Runnable>(hostList.size());
         hostList.values().stream()
-        .map(CollectCallable::new)
+        .map(CollectRunnable::new)
         .forEach(toSchedule::add);
 
         if(toSchedule.size() == 0) {
@@ -173,7 +172,7 @@ public class Timer extends StarterNode {
             }
         };
 
-        tpool = new ThreadPoolExecutor(0, numCollectors, getTimeout(), TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(toSchedule.size()), tf) {
+        tpool = new ThreadPoolExecutor(numCollectors, numCollectors, getTimeout() * 2, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(toSchedule.size()), tf) {
             @Override
             protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
                 return new FutureTask<T>(callable) {
@@ -187,7 +186,7 @@ public class Timer extends StarterNode {
 
         try {
             if (startCollect()) {
-                toSchedule.stream().forEach(tpool::submit);
+                toSchedule.stream().forEach(tpool::execute);
                 tpool.shutdown();
                 long collectStart = System.currentTimeMillis();
                 long maxCollectTime = (getStep() - getTimeout()) * 1000;
