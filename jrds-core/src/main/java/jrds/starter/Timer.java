@@ -21,6 +21,7 @@ import org.slf4j.event.Level;
 
 import jrds.HostInfo;
 import jrds.PropertiesManager;
+import lombok.Getter;
 
 public class Timer extends StarterNode {
 
@@ -53,28 +54,29 @@ public class Timer extends StarterNode {
 
     };
 
-    public static final class Stats implements Cloneable {
-        public long runtime = 0;
-        public Date lastCollect;
+    public static final class Stats {
+        @Getter
+        private long duration;
+        @Getter
+        private Date lastCollect;
 
         Stats() {
             lastCollect = new Date(0);
+            duration = 0;
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see java.lang.Object#clone()
-         */
-        @Override
-        public Object clone() throws CloneNotSupportedException {
-            Stats newstates = new Stats();
-            synchronized (this) {
-                newstates.runtime = runtime;
-                newstates.lastCollect = new Date();
+        Stats(Stats source) {
+            synchronized (source) {
+                lastCollect = source.lastCollect;
+                duration = source.duration;
             }
-            return newstates;
         }
+
+        public void refresh(Date lastCollect, long duration) {
+            this.lastCollect = lastCollect;
+            this.duration = duration;
+        }
+
     }
 
     public final static String DEFAULTNAME = "_default";
@@ -223,10 +225,7 @@ public class Timer extends StarterNode {
             tpool = null;
             long end = System.currentTimeMillis();
             long duration = end - start.getTime();
-            synchronized (stats) {
-                stats.lastCollect = start;
-                stats.runtime = duration;
-            }
+            stats.refresh(start, duration);
             log(Level.INFO, "Collect started at " + start + " ran for " + duration + "ms");
         }
     }
@@ -260,7 +259,7 @@ public class Timer extends StarterNode {
      * @return the stats
      */
     public Stats getStats() {
-        return stats;
+        return new Stats(stats);
     }
 
     public void interrupt() {
