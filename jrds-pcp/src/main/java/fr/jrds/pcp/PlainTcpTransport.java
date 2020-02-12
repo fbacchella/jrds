@@ -94,6 +94,7 @@ public class PlainTcpTransport implements Transport {
     @Override
     public void close() throws IOException {
         soc.close();
+        selector.close();
     }
 
 }
