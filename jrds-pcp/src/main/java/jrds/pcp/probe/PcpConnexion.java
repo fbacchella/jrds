@@ -51,22 +51,29 @@ public class PcpConnexion extends jrds.starter.Connection<Connection> {
 
     @Override
     public boolean startConnection() {
+        boolean success = false;
         try {
-            cnx = new fr.jrds.pcp.Connection(new InetSocketAddress(getResolver().getInetAddress(), port), getTimeout() * 1000);
+            cnx = new Connection(new InetSocketAddress(getResolver().getInetAddress(), port), getTimeout() * 1000);
             cnx.startClient();
             cnx.authentication(new CVersion());
-            return true;
+            success = true;
         } catch (IOException e) {
-            log(Level.ERROR, e, "Can't connect to pmcd: %s", e.getMessage());
-            return false;
+            log(Level.ERROR, e, "Can't connect to pmcd: %s", e);
         } catch (PCPException e) {
-            log(Level.ERROR, e, "Can't talk to pmcd", e.getMessage());
-            return false;
+            log(Level.ERROR, e, "Can't talk to pmcd", e);
         } catch (InterruptedException e) {
             log(Level.ERROR, e, "Interrupted");
             Thread.currentThread().interrupt();
-            return false;
+        } finally {
+            if (! success && cnx != null) {
+                try {
+                    cnx.close();
+                    cnx = null;
+                } catch (IOException e) {
+                }
+            }
         }
+        return success;
     }
 
     @Override
