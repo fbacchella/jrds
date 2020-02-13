@@ -95,7 +95,7 @@ public class SSLStarter extends Starter {
                 sc.init(km, tm, sr);
             }
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException | CertificateException | IOException | UnrecoverableKeyException e) {
-            log(Level.ERROR, e, "failed to init ssl: %s", e.getMessage());
+            log(Level.ERROR, e, "failed to init ssl: %s", e);
             sc = null;
             return false;
         }

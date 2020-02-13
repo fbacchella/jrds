@@ -62,7 +62,7 @@ public class JolokiaJmxConnection extends AbstractJmxConnection<J4pClient, Jolok
             if (errorValue != null) {
                 log(Level.ERROR, e, "Can't connect to jolokia URL: %s: %s", e.getErrorType(), errorValue.get("message"));
             } else {
-                log(Level.ERROR, e, "Can't connect to jolokia URL: %s (HTTP status %d)", e.getMessage(), e.getStatus());
+                log(Level.ERROR, e, "Can't connect to jolokia URL: %s (HTTP status %d)", e, e.getStatus());
             }
             return false;
         } catch (J4pException e) {

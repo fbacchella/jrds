@@ -59,7 +59,7 @@ public class MuninConnection extends Connection<MuninConnection.SocketChannels> 
             channel.out = new PrintWriter(channel.muninsSocket.getOutputStream(), true);
             channel.in = new BufferedReader(new InputStreamReader(channel.muninsSocket.getInputStream()));
         } catch (IOException e) {
-            log(Level.ERROR, e, "Connection error", e.getMessage());
+            log(Level.ERROR, e, "Connection error", e);
             return false;
         }
         return true;
@@ -79,7 +79,7 @@ public class MuninConnection extends Connection<MuninConnection.SocketChannels> 
             channel.in.close();
             channel.muninsSocket.close();
         } catch (IOException e) {
-            log(Level.WARN, e, "Connection error during close", e.getMessage());
+            log(Level.WARN, e, "Connection error during close", e);
         }
     }
 

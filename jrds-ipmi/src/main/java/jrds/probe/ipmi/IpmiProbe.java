@@ -85,7 +85,7 @@ ProbeConnected<String, Number, IpmiConnection> implements IndexedProbe {
                         log(Level.DEBUG, "reservation cancelled");
                         reservationId = handle.reserveSdrRepository();
                     } catch (Exception e1) {
-                        log(Level.ERROR, e, "general failure: %s", e.getMessage());
+                        log(Level.ERROR, e, "general failure: %s", e);
                         break;
                     }
                     // If getting sensor data failed, we check if it already
@@ -97,11 +97,11 @@ ProbeConnected<String, Number, IpmiConnection> implements IndexedProbe {
                     }
                     lastReservationId = reservationId;
                 } else {
-                    log(Level.ERROR, e, "IPMI failure: %s", e.getMessage());
+                    log(Level.ERROR, e, "IPMI failure: %s", e);
                     break;
                 }
             } catch (Exception e) {
-                log(Level.ERROR, e, "general failure: %s", e.getMessage());
+                log(Level.ERROR, e, "general failure: %s", e);
                 break;
             }
         }

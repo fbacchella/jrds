@@ -68,7 +68,7 @@ public class PassiveProbe<KeyType> extends Probe<KeyType, Number> {
                 Class<Listener<?, KeyType>> listenerClass = (Class<Listener<?, KeyType>>) this.getClass().getClassLoader().loadClass(listenerClassName);
                 listener = parent.find(listenerClass);
             } catch (ClassNotFoundException e) {
-                log(Level.ERROR, e, "Can't find listener class: %s", e.getMessage());
+                log(Level.ERROR, e, "Can't find listener class: %s", e);
             }
         }
     }

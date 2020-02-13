@@ -75,7 +75,7 @@ public abstract class HCHttpProbe<KeyType> extends HttpProbe<KeyType> implements
             is.close();
             return vars;
         } catch (IllegalStateException | IOException e) {
-            log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e.getMessage());
+            log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e);
         } catch (URISyntaxException e) {
             log(Level.ERROR, "unable to parse %s", getUrl());
         } finally {

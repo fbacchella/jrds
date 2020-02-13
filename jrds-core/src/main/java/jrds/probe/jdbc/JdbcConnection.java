@@ -58,7 +58,7 @@ public class JdbcConnection extends Connection<Statement> {
         try {
             return con.createStatement();
         } catch (SQLException e) {
-            log(Level.ERROR, "JDBC Statment failed: " + e.getMessage());
+            log(Level.ERROR, "JDBC Statment failed: %s", e);
             return null;
         }
     }
@@ -107,7 +107,7 @@ public class JdbcConnection extends Connection<Statement> {
             try {
                 con.close();
             } catch (SQLException e) {
-                log(Level.ERROR, e, "Error with %s: %s", getUrl(), e.getMessage());
+                log(Level.ERROR, e, "Error with %s: %s", getUrl(), e);
             }
         }
         con = null;

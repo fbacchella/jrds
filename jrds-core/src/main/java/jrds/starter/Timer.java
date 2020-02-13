@@ -127,7 +127,7 @@ public class Timer extends StarterNode {
                         try {
                             Timer.this.collectAll();
                         } catch (RuntimeException e) {
-                            Timer.this.log(Level.ERROR, e, "A fatal error occured during collect: %s", e.getMessage());
+                            Timer.this.log(Level.ERROR, e, "A fatal error occured during collect: %s", e);
                         }
                     }
                 };

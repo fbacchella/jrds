@@ -187,7 +187,7 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
                 lines.add(lastLine);
             in.close();
         } catch (IOException e) {
-            log(Level.ERROR, e, "Unable to read url %s because: %s", getUrl(), e.getMessage());
+            log(Level.ERROR, e, "Unable to read url %s because: %s", getUrl(), e);
         }
         return lines;
     }
@@ -206,7 +206,7 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
             cnx.setReadTimeout(getTimeout() * 1000);
             cnx.connect();
         } catch (IOException e) {
-            log(Level.ERROR, e, "Connection to %s failed: %s", getUrl(), e.getMessage());
+            log(Level.ERROR, e, "Connection to %s failed: %s", getUrl(), e);
             return null;
         }
         try {
@@ -223,7 +223,7 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
             try {
                 byte[] buffer = new byte[4096];
                 int respCode = ((HttpURLConnection) cnx).getResponseCode();
-                log(Level.ERROR, e, "Unable to read url %s because: %s, http error code: %d", getUrl(), e.getMessage(), respCode);
+                log(Level.ERROR, e, "Unable to read url %s because: %s, http error code: %d", getUrl(), e, respCode);
                 InputStream es = ((HttpURLConnection) cnx).getErrorStream();
                 // read the response body
                 while (es.read(buffer) > 0) {
@@ -231,7 +231,7 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
                 // close the error stream
                 es.close();
             } catch (IOException ex) {
-                log(Level.ERROR, ex, "Unable to recover from error in url %s because %s", getUrl(), ex.getMessage());
+                log(Level.ERROR, ex, "Unable to recover from error in url %s because %s", getUrl(), ex);
             }
         }
 

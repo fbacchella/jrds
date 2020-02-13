@@ -67,7 +67,7 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
                 uptimeoid = new OID(uptimeOidName);
             }
         } catch (Exception e) {
-            log(Level.ERROR, e, "Unable to read specific: %s", e.getMessage());
+            log(Level.ERROR, e, "Unable to read specific: %s", e);
         }
         return readOK && super.readSpecific();
     }
@@ -108,7 +108,7 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
                     retValue.put(oid, e.getValue());
                 }
             } catch (IOException e) {
-                log(Level.ERROR, e, "IO Error: %s", e.getMessage());
+                log(Level.ERROR, e, "IO Error: %s", e);
             }
         }
 

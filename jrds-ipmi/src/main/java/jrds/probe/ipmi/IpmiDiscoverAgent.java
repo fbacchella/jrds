@@ -185,7 +185,7 @@ public class IpmiDiscoverAgent extends DiscoverAgent {
                     try {
                         reservationId = ((ReserveSdrRepositoryResponseData) jrdsHandle.sendMessage(new ReserveSdrRepository(IpmiVersion.V20, jrdsHandle.getCipherSuite(), AuthenticationType.RMCPPlus))).getReservationId();
                     } catch (Exception e1) {
-                        log(Level.ERROR, e, "general failure: %s", e.getMessage());
+                        log(Level.ERROR, e, "general failure: %s", e);
                         break;
                     }
                     // If getting sensor data failed, we check if it already
@@ -197,10 +197,10 @@ public class IpmiDiscoverAgent extends DiscoverAgent {
                     }
                     lastReservationId = reservationId;
                 } else {
-                    log(Level.ERROR, e, "IPMI failure: %s", e.getMessage());
+                    log(Level.ERROR, e, "IPMI failure: %s", e);
                 }
             } catch (Exception e) {
-                log(Level.ERROR, e, "general failure: %s", e.getMessage());
+                log(Level.ERROR, e, "general failure: %s", e);
                 break;
             }
         }

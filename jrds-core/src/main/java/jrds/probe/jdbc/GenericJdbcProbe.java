@@ -98,7 +98,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
             }
             return values;
         } catch (SQLException e) {
-            log(Level.ERROR, e, "SQL exception while getting values: %s", e.getMessage());
+            log(Level.ERROR, e, "SQL exception while getting values: %s", e);
         } finally {
             closeStatement(stmt);
         }
@@ -110,7 +110,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
             try {
                 stmt.close();
             } catch (SQLException e) {
-                log(Level.ERROR, e, "SQL exception while closing statement: %s", e.getMessage());
+                log(Level.ERROR, e, "SQL exception while closing statement: %s", e);
             }
         }
     }
@@ -120,7 +120,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
             try {
                 rs.close();
             } catch (SQLException e) {
-                log(Level.ERROR, e, "SQL exception while closing results: %s", e.getMessage());
+                log(Level.ERROR, e, "SQL exception while closing results: %s", e);
             }
         }
     }
@@ -137,7 +137,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
             }
             return true;
         } catch (SQLException e) {
-            log(Level.ERROR, e, "SQL exception while getting uptime: %s", e.getMessage());
+            log(Level.ERROR, e, "SQL exception while getting uptime: %s", e);
             return false;
         } finally {
             closeResultSet(rs);
@@ -190,7 +190,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
                 }
             }
         } catch (SQLException e) {
-            log(Level.ERROR, e, "SQL exception while getting values: ", e.getMessage());
+            log(Level.ERROR, e, "SQL exception while getting values: ", e);
         }
         log(Level.TRACE, "values found: %s", values);
         return values;

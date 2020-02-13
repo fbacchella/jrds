@@ -62,9 +62,9 @@ public class RibclHttp extends Ribcl {
             }
             values = parseRibcl(bufferStream.toString(), xmlstarter);
         } catch (ClientProtocolException e1) {
-            log(Level.ERROR, e1, "HTTP protocol failed: %s", e1.getMessage());
+            log(Level.ERROR, e1, "HTTP protocol failed: %s", e1);
         } catch (IOException e1) {
-            log(Level.ERROR, e1, "Socket communication failed: %s", e1.getMessage());
+            log(Level.ERROR, e1, "Socket communication failed: %s", e1);
         } finally {
             EntityUtils.consumeQuietly(entity);
         }

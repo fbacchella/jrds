@@ -81,7 +81,7 @@ public class PcpConnexion extends jrds.starter.Connection<Connection> {
         try {
             cnx.close();
         } catch (IOException e) {
-            log(Level.ERROR, e, "Connection to pcmd reseted: %s", e.getMessage());
+            log(Level.ERROR, e, "Connection to pcmd reset: %s", e);
         }
         valueCache.clear();
         cnx = null;
@@ -95,10 +95,10 @@ public class PcpConnexion extends jrds.starter.Connection<Connection> {
             Number uptime = cnx.fetchValue(kernelUptime).getIds().get(kernelUptime).get(0).getCheckedValue();
             return uptime.longValue();
         } catch (IOException e) {
-            log(Level.ERROR, e, "Can't connect to pmcd: %s", e.getMessage());
+            log(Level.ERROR, e, "Can't connect to pmcd: %s", e);
             return 0;
         } catch (PCPException e) {
-            log(Level.ERROR, e, "Can't talk to pmcd", e.getMessage());
+            log(Level.ERROR, e, "Can't talk to pmcd", e);
             return 0;
         } catch (InterruptedException e) {
             log(Level.ERROR, "Interrupted");

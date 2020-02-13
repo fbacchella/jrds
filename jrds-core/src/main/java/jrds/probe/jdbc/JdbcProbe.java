@@ -183,7 +183,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
             }
             stmt.close();
         } catch (SQLException e) {
-            log(Level.ERROR, e, "SQL Error: %s", e.getLocalizedMessage());
+            log(Level.ERROR, e, "SQL Error: %s", e);
         }
         return values;
     }
@@ -277,7 +277,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
         try {
             newurl = new URL(getUrlAsString());
         } catch (MalformedURLException e) {
-            log(Level.ERROR, e, "Invalid jdbc url: " + getUrlAsString());
+            log(Level.ERROR, e, "Invalid jdbc url '{}': %s", getUrlAsString(), e);
         }
         return newurl;
     }

@@ -168,7 +168,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
                 retValues.put(a.getID(), a.get());
             }
         } catch (NamingException e) {
-            log(Level.ERROR, e, e.getMessage());
+            log(Level.ERROR, e, "LDAP naming error: %s", e);
         }
         return retValues;
     }

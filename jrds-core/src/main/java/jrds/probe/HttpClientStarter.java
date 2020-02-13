@@ -46,7 +46,7 @@ public class HttpClientStarter extends Starter {
         try {
             builder.setSSLContext(getSSLSocketFactory());
         } catch (NoSuchAlgorithmException e) {
-            log(Level.ERROR, "No default SSLContext available", e.getMessage());
+            log(Level.ERROR, "No default SSLContext available", e);
         }
         builder.setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(timeout * 1000).build());
         builder.setConnectionManagerShared(false);
@@ -79,7 +79,7 @@ public class HttpClientStarter extends Starter {
         try {
             client.close();
         } catch (IOException e) {
-            log(Level.ERROR, "http client closed failed: %s", e.getMessage());
+            log(Level.ERROR, "http client closed failed: %s", e);
         }
         client = null;
     }

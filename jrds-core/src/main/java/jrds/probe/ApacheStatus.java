@@ -61,7 +61,7 @@ public class ApacheStatus extends HCHttpProbe<String> implements IndexedProbe {
             in.close();
             vars = parseLines(lines);
         } catch (IOException e) {
-            log(Level.ERROR, e, "Unable to read url %s because %s", getUrl(), e.getMessage());
+            log(Level.ERROR, e, "Unable to read url %s because %s", getUrl(), e);
         }
         return vars;
     }

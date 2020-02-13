@@ -168,7 +168,7 @@ public class HostsList extends StarterNode {
                             topStarterClasses.add(meta.topStarter());
                         }
                     } catch (Exception e) {
-                        log(Level.ERROR, e, "Error inserting probe " + p + ": " + e.getMessage());
+                        log(Level.ERROR, e, "Error inserting probe " + p + ": " + e);
                     }
                 }
             }
@@ -177,7 +177,7 @@ public class HostsList extends StarterNode {
                 try {
                     timer.registerStarter(starterClass.newInstance());
                 } catch (Throwable e) {
-                    log(Level.ERROR, e, "Starter %s failed to register for timer %s: %s", starterClass, timer.getName(), e.getMessage());
+                    log(Level.ERROR, e, "Starter %s failed to register for timer %s: %s", starterClass, timer.getName(), e);
                 }
             }
             timer.configureStarters(pm);
@@ -191,7 +191,7 @@ public class HostsList extends StarterNode {
                 registerStarter(top);
                 top.configure(pm);
             } catch (Throwable e) {
-                log(Level.ERROR, e, "Top level starter %s failed to register: %s", starterClass, e.getMessage());
+                log(Level.ERROR, e, "Top level starter %s failed to register: %s", starterClass, e);
             }
         }
 

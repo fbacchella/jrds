@@ -354,7 +354,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                     }
                 }
             } catch (ArithmeticException ex) {
-                log(Level.WARN, ex, "Error while storing sample: %s", ex.getMessage());
+                log(Level.WARN, ex, "Error while storing sample: %s", ex);
             } catch (Exception e) {
                 Throwable rootCause = e;
                 Throwable upCause;
