@@ -43,9 +43,9 @@ public class HostStarter extends StarterNode {
             log(Level.TRACE, "Starting collect of probe %s", probe);
             setRunningname(oldThreadName + "/" + probe.getName());
             probe.collect();
-            long duration = System.currentTimeMillis() - start;
-            if ((duration) > (probe.getStep() * 1000 / 2)) {
-                log(Level.ERROR, "collect too slow: %dms for timer %s", duration, timer);
+            long duration = Math.floorDiv(System.currentTimeMillis() - start, 1000);
+            if (duration > (probe.getStep() / 2)) {
+                log(Level.ERROR, "Collect too slow: %ds for time %s", duration, timer.getName());
                 break;
             }
             setRunningname(oldThreadName + ":finished");
