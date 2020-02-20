@@ -40,7 +40,7 @@ public class Connection implements Closeable {
 
     public Connection(InetSocketAddress isa, long timeout) throws IOException, PCPException, InterruptedException {
         this(new PlainTcpTransport(isa, timeout));
-        logger.info("Connected to {}", isa);
+        logger.debug("Connected to {}", isa);
     }
 
     public Connection(Transport trp) throws IOException, PCPException, InterruptedException {
