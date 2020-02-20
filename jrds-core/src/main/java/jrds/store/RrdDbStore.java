@@ -215,20 +215,18 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 RrdDef oldDef;
                 try (RrdDb rrdDb = RrdDb.of(rrdPath.toString())) {
                     oldDef = rrdDb.getRrdDef();
-                };
+                }
                 oldDef.setStartTime(startTime);
                 oldDef.setPath(rrdPath.toString());
                 String oldDefDump = oldDef.dump();
                 long oldstep = oldDef.getStep();
                 log(Level.TRACE, "Definition found: %s\n", oldDefDump);
-
                 // new definition
                 RrdDef newDef = getRrdDef(archives);
                 newDef.setStartTime(startTime);
                 newDef.setPath(rrdPath.toString());
                 String newDefDump = newDef.dump();
                 long newstep = oldDef.getStep();
-
                 if(newstep != oldstep) {
                     log(Level.ERROR, "Step changed, this probe will not collect any more");
                     return false;

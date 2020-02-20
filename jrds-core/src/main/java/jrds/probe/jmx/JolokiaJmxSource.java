@@ -12,7 +12,6 @@ import org.jolokia.client.exception.J4pException;
 import org.jolokia.client.exception.J4pRemoteException;
 import org.jolokia.client.request.J4pReadRequest;
 import org.jolokia.client.request.J4pReadResponse;
-import org.json.simple.JSONObject;
 
 public class JolokiaJmxSource extends JmxAbstractDataSource<J4pClient> {
 

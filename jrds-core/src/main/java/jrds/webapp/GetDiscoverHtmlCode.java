@@ -45,7 +45,7 @@ public class GetDiscoverHtmlCode extends JrdsServlet {
             }
             resp.setContentType(CONTENT_TYPE);
 
-            Map<String, String> prop = new HashMap<String, String>(1);
+            Map<String, String> prop = new HashMap<String, String>(3);
             prop.put(OutputKeys.OMIT_XML_DECLARATION, "no");
             prop.put(OutputKeys.INDENT, "yes");
             prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
@@ -54,7 +54,6 @@ public class GetDiscoverHtmlCode extends JrdsServlet {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Parser configuration error");
         } catch (TransformerException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Transformer exception error");
-
         }
     }
 
