@@ -36,7 +36,7 @@ public class GraphiteStore extends AbstractStore<GraphiteConnection> {
             cnx.send(p, sample);
             lastUpdate = sample.getTime();
         } catch (Exception e) {
-            log(Level.ERROR, e, "Failed to send sample to graphite server: %s", e.getMessage());
+            log(Level.ERROR, e, "Failed to send sample to graphite server: %s", e);
         }
     }
 

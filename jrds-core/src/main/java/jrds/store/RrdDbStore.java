@@ -133,7 +133,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                             log(Level.TRACE, "Update %s", dsName);
                         } catch (RuntimeException e) {
                             badDs.add(dsName);
-                            log(Level.ERROR, e, "Datasource %s can't be upgraded: %s", dsName, e.getMessage());
+                            log(Level.ERROR, e, "Datasource %s can't be upgraded: %s", dsName, e);
                         }
                     }
                 }
@@ -157,7 +157,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                                         robinMigrated++;
                                     }
                                 } catch (IllegalArgumentException e) {
-                                    log(Level.TRACE, "Datastore %s removed: %s", dsName, e.getMessage());
+                                    log(Level.TRACE, e, "Datastore %s removed: %s", dsName, e);
                                 }
                             }
                             log(Level.TRACE, "Update %s", srcArchive);
@@ -280,7 +280,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 retValues.put(dsNames[i], rrdDb.getDatasource(i).getLastValue());
             }
         } catch (Exception e) {
-            log(Level.ERROR, e, "Unable to get last values: %s", e.getMessage());
+            log(Level.ERROR, e, "Unable to get last values: %s", e);
         }
         return retValues;
     }
@@ -295,7 +295,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 log(Level.DEBUG, "%s", onesample.dump());
             onesample.update();
         } catch (IOException e) {
-            log(Level.ERROR, e, "Error while committing to rrd db: %s", e.getMessage());
+            log(Level.ERROR, e, "Error while committing to rrd db: %s", e);
         }
     }
 
@@ -304,7 +304,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
         try {
             return factory.getRrd(getPath());
         } catch (IOException e) {
-            log(Level.ERROR, e, "Failed to access rrd file %s: %s ", getPath(), e.getMessage());
+            log(Level.ERROR, e, "Failed to access rrd file %s: %s ", getPath(), e);
             return null;
         }
     }
