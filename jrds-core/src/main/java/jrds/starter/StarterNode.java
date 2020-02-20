@@ -81,11 +81,11 @@ public abstract class StarterNode implements StartersSet {
 
     public boolean startCollect() {
         if(parent != null && !parent.isCollectRunning()) {
-            log(Level.TRACE, "parent of %s prevent starting", this);
+            log(Level.TRACE, "parent preventing start", this);
             return false;
         }
         if(allStarters != null) {
-            log(Level.DEBUG, "Starting %d starters for %s", allStarters.size(), this);
+            log(Level.DEBUG, "Starting %d starters", allStarters.size());
             for(Starter s: allStarters.values()) {
                 // If collect is stopped while we're starting, drop it
                 if(parent != null && !parent.isCollectRunning())
@@ -98,7 +98,7 @@ public abstract class StarterNode implements StartersSet {
             }
         }
         started = true;
-        log(Level.DEBUG, "Starting for %s done", this);
+        log(Level.DEBUG, "Starting done");
         return isCollectRunning();
     }
 

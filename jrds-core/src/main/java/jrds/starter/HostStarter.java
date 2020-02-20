@@ -45,8 +45,7 @@ public class HostStarter extends StarterNode {
                 log(Level.ERROR, "Collect too slow: %ds for timer %s", duration, timer);
                 break;
             }
-            log(Level.TRACE, "Starting collect for %s", probe);
-            log(Level.DEBUG, "Collect all stats for host " + host.getName());
+            log(Level.TRACE, "Starting collect of probe %s", probe);
             setRunningname(oldThreadName + "/" + probe.getName());
             probe.collect();
             setRunningname(oldThreadName + ":finished");
@@ -54,7 +53,7 @@ public class HostStarter extends StarterNode {
         stopCollect();
         long end = System.currentTimeMillis();
         float elapsed = (end - start) / 1000f;
-        log(Level.DEBUG, "Collect time for %s: %fs", host.getName(), elapsed);
+        log(Level.DEBUG, "Collect time: %fs", elapsed);
     }
 
     public String toString() {

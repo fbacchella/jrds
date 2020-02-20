@@ -11,6 +11,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.event.Level;
 
@@ -74,6 +75,8 @@ public abstract class HCHttpProbe<KeyType> extends HttpProbe<KeyType> implements
             Map<KeyType, Number> vars = parseStream(is);
             is.close();
             return vars;
+        } catch (HttpHostConnectException e) {
+            log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e.getCause());
         } catch (IllegalStateException | IOException e) {
             log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e);
         } catch (URISyntaxException e) {
