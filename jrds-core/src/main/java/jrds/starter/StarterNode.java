@@ -69,13 +69,14 @@ public abstract class StarterNode implements StartersSet {
     }
 
     public boolean isCollectRunning() {
-        if(Thread.interrupted()) {
-            started = false;
-            log(Level.TRACE, "thread is stopped", this);
-            return false;
+        if (started) {
+            if (Thread.interrupted()) {
+                started = false;
+                log(Level.TRACE, "Thread is stopped", this);
+            } else if (parent != null && !parent.isCollectRunning()) {
+                started = false;
+            } 
         }
-        if(parent != null && !parent.isCollectRunning())
-            return false;
         return started;
     }
 
