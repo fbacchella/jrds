@@ -3,6 +3,7 @@ package fr.jrds.pcp;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.InetSocketAddress;
+import java.net.SocketTimeoutException;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -10,6 +11,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,19 +25,38 @@ public class PlainTcpTransport implements Transport {
     private final Transport.Waiter waiter;
 
     public PlainTcpTransport(InetSocketAddress isa, long timeout) throws IOException, InterruptedException {
-        soc = SocketChannel.open();
-        waiter = getWaiter(soc, timeout);
-        soc.setOption(StandardSocketOptions.TCP_NODELAY, true);
-        soc.configureBlocking(false);
-        soc.connect(isa);
-        waiter.waitFor(SelectionKey.OP_CONNECT);
+        // Needed because ofNullable won't accept uninitialized variable
+        SocketChannel tempsoc = null;
+        try {
+            tempsoc = SocketChannel.open();
+            tempsoc.setOption(StandardSocketOptions.TCP_NODELAY, true);
+            tempsoc.configureBlocking(false);
+            tempsoc.connect(isa);
+            waiter = getWaiter(tempsoc, timeout);
+            waiter.waitFor(SelectionKey.OP_CONNECT);
+            soc = tempsoc;
+        } catch (IOException | InterruptedException | RuntimeException e) {
+            selector.close();
+            Optional.ofNullable(tempsoc).ifPresent(t -> {
+                try {
+                    t.close();
+                } catch (IOException e1) {
+                }
+            });
+            throw e;
+        }
     }
 
     public PlainTcpTransport(SocketChannel soc, long timeout) throws IOException, InterruptedException {
-        this.soc = soc;
-        soc.setOption(StandardSocketOptions.TCP_NODELAY, true);
-        soc.configureBlocking(false);
-        waiter = getWaiter(soc, timeout);
+        try {
+            this.soc = soc;
+            soc.setOption(StandardSocketOptions.TCP_NODELAY, true);
+            soc.configureBlocking(false);
+            waiter = getWaiter(soc, timeout);
+        } catch (IOException | RuntimeException e) {
+            selector.close();
+            throw e;
+        }
     }
 
     private Waiter getWaiter(SocketChannel soc, long timeout) {
