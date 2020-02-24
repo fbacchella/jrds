@@ -2,6 +2,7 @@ package jrds;
 
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.CancellationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,6 @@ public class Configuration {
         hostsList.startTimers();
     }
 
-    @SuppressWarnings("unchecked")
     private void stop() {
         hostsList.stopTimers();
         Thread.yield();
@@ -81,14 +81,15 @@ public class Configuration {
         }
         // Everything is stopped, wait for collect termination
         try {
-            for(Timer t: hostsList.getTimers()) {
-                t.lockCollect();
-            }
-            for(Timer t: hostsList.getTimers()) {
-                // Release it, it will not restart
-                t.releaseCollect();
-            }
-        } catch (InterruptedException e) {
+            hostsList.getChildsStream().forEach(t -> {
+                try {
+                    t.lockCollect();
+                } catch (InterruptedException e) {
+                    throw new CancellationException();
+                }
+            });
+            hostsList.getChildsStream().forEach(Timer::releaseCollect);
+        } catch (CancellationException e) {
             Thread.currentThread().interrupt();
         }
         if(hostsList.getRenderer() != null) {

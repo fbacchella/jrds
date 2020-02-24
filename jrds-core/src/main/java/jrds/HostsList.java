@@ -48,7 +48,6 @@ public class HostsList extends StarterNode {
 
     private final int thisgeneration = generation.incrementAndGet();
     private final Set<HostInfo> hostList = new HashSet<HostInfo>();
-    private final Set<Starter> topStarters = new HashSet<Starter>();
     private final Map<String, jrds.starter.Timer> timers = new HashMap<String, jrds.starter.Timer>();
     private final Map<Integer, GraphNode> graphMap = new HashMap<Integer, GraphNode>();
     private final Map<Integer, Probe<?, ?>> probeMap = new HashMap<Integer, Probe<?, ?>>();
@@ -143,7 +142,6 @@ public class HostsList extends StarterNode {
         conf.setMacroMap();
         for(Listener<?, ?> l: conf.setListenerMap().values()) {
             registerStarter(l);
-            topStarters.add(l);
         }
 
         Set<String> hostsTags = new HashSet<String>();
@@ -185,7 +183,6 @@ public class HostsList extends StarterNode {
         for(Class<? extends Starter> starterClass: topStarterClasses) {
             try {
                 Starter top = starterClass.newInstance();
-                topStarters.add(top);
                 registerStarter(top);
                 top.configure(pm);
             } catch (Throwable e) {
@@ -260,9 +257,7 @@ public class HostsList extends StarterNode {
         for(jrds.starter.Timer t: timers.values()) {
             t.startTimer(collectTimer);
         }
-        for(Starter s: topStarters) {
-            s.doStart();
-        }
+        startCollect();
     }
 
     /**
