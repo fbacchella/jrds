@@ -2,9 +2,12 @@ package jrds.starter;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -105,14 +108,15 @@ public abstract class StarterNode implements StartersSet {
 
     public synchronized void stopCollect() {
         started = false;
-        if(allStarters != null)
-            for(Starter s: allStarters.values()) {
-                try {
-                    s.doStop();
-                } catch (Exception e) {
-                    log(Level.ERROR, e, "Unable to stop timer %s: %s", s.getKey(), e);
-                }
+        getChildsStream().forEach(StarterNode::stopCollect);
+        Optional.ofNullable(allStarters).orElse(Collections.emptyMap()).values().stream()
+        .forEach(s -> {
+            try {
+                s.doStop();
+            } catch (Exception e) {
+                log(Level.ERROR, e, "Unable to stop timer %s: %s", s.getKey(), e);
             }
+        });
     }
 
     /**
@@ -227,6 +231,10 @@ public abstract class StarterNode implements StartersSet {
      */
     public StarterNode getParent() {
         return parent;
+    }
+
+    public<C extends StarterNode> Stream<C> getChildsStream() {
+        return Stream.empty();
     }
 
     // Compatibily code

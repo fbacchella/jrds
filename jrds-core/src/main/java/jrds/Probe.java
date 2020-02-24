@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -164,6 +165,11 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      */
     public Collection<GraphNode> getGraphList() {
         return graphList;
+    }
+
+    @Override
+    public <C extends StarterNode> Stream<C> getChildsStream() {
+        return Stream.empty();
     }
 
     public String getName() {

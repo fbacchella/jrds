@@ -60,7 +60,7 @@ public class Configuration {
         shutDownHook = new Thread("Collect-Shutdown") {
             @Override
             public void run() {
-                hostsList.stop();
+                hostsList.stopTimers();
                 if(hostsList.getRenderer() != null)
                     hostsList.getRenderer().finish();
             }
@@ -69,8 +69,9 @@ public class Configuration {
         hostsList.startTimers();
     }
 
+    @SuppressWarnings("unchecked")
     private void stop() {
-        hostsList.stop();
+        hostsList.stopTimers();
         Thread.yield();
         // We don't care if it failed, just try
         try {

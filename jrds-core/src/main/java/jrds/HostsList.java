@@ -10,10 +10,12 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import org.slf4j.event.Level;
 
@@ -59,8 +61,6 @@ public class HostsList extends StarterNode {
     // The list of roles known to jrds
     private Set<String> roles = new HashSet<String>();
     private Set<String> defaultRoles = Collections.emptySet();
-    // A global flag that tells globally that this HostsList can be used
-    volatile private boolean started = false;
     private Set<Class<? extends DiscoverAgent>> daList = new HashSet<Class<? extends DiscoverAgent>>();
 
     @Getter @Setter @Accessors(chain=true)
@@ -100,8 +100,6 @@ public class HostsList extends StarterNode {
     }
 
     public void configure(PropertiesManager pm) {
-        started = false;
-
         probeClassResolver = new ProbeClassResolver(pm.extensionClassLoader);
 
         if(pm.rrddir == null) {
@@ -255,42 +253,25 @@ public class HostsList extends StarterNode {
                 checkRoles(gn, GraphTree.VIEWROOT, gn.getTreePathByView());
             }
         }
-        started = true;
     }
 
     public void startTimers() {
-        if(started)
-            collectTimer = new Timer("jrds-main-timer/" + thisgeneration, true);
+        collectTimer = new Timer("jrds-main-timer/" + thisgeneration, true);
         for(jrds.starter.Timer t: timers.values()) {
             t.startTimer(collectTimer);
         }
-        for(Starter s: this.topStarters) {
+        for(Starter s: topStarters) {
             s.doStart();
         }
     }
 
     /**
-     * Ensure that all collects are stopped, some slow probes might need a
-     * little help
+     * Ensure that all collects are stopped forever.
      */
-    public void stop() {
-        started = false;
-        if(collectTimer != null)
-            collectTimer.cancel();
+    public void stopTimers() {
+        Optional.ofNullable(collectTimer).ifPresent(Timer::cancel);
         collectTimer = null;
-        for(Starter s: topStarters) {
-            s.doStop();
-        }
-        for(jrds.starter.Timer t: timers.values()) {
-            t.stopCollect();
-            for(HostStarter h: t.getAllHosts()) {
-                h.stopCollect();
-                for(Probe<?, ?> p: h.getAllProbes()) {
-                    p.stopCollect();
-                }
-            }
-            t.interrupt();
-        }
+        stopCollect();
     }
 
     String makeTabs(List<String> tabsList, Set<Tab> moretabs, Map<String, Tab> customTabMap, Map<String, Tab> tabs) {
@@ -556,16 +537,6 @@ public class HostsList extends StarterNode {
         return renderer;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see jrds.starter.StarterNode#isCollectRunning()
-     */
-    @Override
-    public boolean isCollectRunning() {
-        return started;
-    }
-
     /**
      * @return the roles
      */
@@ -613,4 +584,11 @@ public class HostsList extends StarterNode {
     public int getGeneration() {
         return thisgeneration;
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Stream<jrds.starter.Timer> getChildsStream() {
+        return timers.values().stream();
+    }
+
 }

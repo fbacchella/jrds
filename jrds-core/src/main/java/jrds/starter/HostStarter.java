@@ -3,6 +3,7 @@ package jrds.starter;
 import java.io.File;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import org.slf4j.event.Level;
 
@@ -130,6 +131,12 @@ public class HostStarter extends StarterNode {
     public void setRunningname(String runningname) {
         Thread.currentThread().setName(runningname);
         this.runningname = runningname;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Stream<Probe<?, ?>> getChildsStream() {
+        return allProbes.stream();
     }
 
 }

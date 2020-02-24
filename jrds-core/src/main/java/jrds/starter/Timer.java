@@ -16,6 +16,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 import org.slf4j.event.Level;
 
@@ -210,7 +211,6 @@ public class Timer extends StarterNode {
             stopCollect();
             // Waited for late collect arrival, after the shutdownNow
             if (!tpool.isTerminated()) {
-                tpool.shutdownNow();
                 try {
                     if (! tpool.awaitTermination(getTimeout(), TimeUnit.SECONDS)) {
                         log(Level.ERROR, "Lost collect");
@@ -227,6 +227,21 @@ public class Timer extends StarterNode {
             stats.refresh(start, duration);
             log(Level.INFO, "Collect started at " + start + " ran for " + duration + "ms");
         }
+    }
+
+    
+    @Override
+    public synchronized void stopCollect() {
+        super.stopCollect();
+        if(tpool != null) {
+            tpool.shutdownNow();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Stream<HostStarter> getChildsStream() {
+        return hostList.values().stream();
     }
 
     public void lockCollect() throws InterruptedException {
@@ -259,13 +274,6 @@ public class Timer extends StarterNode {
      */
     public Stats getStats() {
         return new Stats(stats);
-    }
-
-    public void interrupt() {
-        log(Level.DEBUG, "timer interrupted");
-        if(tpool != null) {
-            tpool.shutdownNow();
-        }
     }
 
 }
