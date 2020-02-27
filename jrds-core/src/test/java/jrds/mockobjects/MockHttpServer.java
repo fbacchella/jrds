@@ -1,5 +1,7 @@
 package jrds.mockobjects;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -20,7 +22,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-public class MockHttpServer extends Server {
+public class MockHttpServer extends Server implements Closeable {
 
     private ServletContextHandler ctx = null;
     private HandlerCollection handlers = new HandlerList();
@@ -61,5 +63,14 @@ public class MockHttpServer extends Server {
         handlers.addHandler(handler);
         return this;
 
+    }
+
+    @Override
+    public void close() throws IOException {
+        try {
+            stop();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
