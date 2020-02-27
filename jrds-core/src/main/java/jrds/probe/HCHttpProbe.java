@@ -5,7 +5,9 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -18,9 +20,10 @@ import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.event.Level;
 
-import jrds.Util;
+import jrds.ConnectedProbe;
 import jrds.factories.ProbeMeta;
-import jrds.starter.Starter;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 
@@ -38,73 +41,53 @@ import jrds.starter.Starter;
 @ProbeMeta(
         timerStarter=jrds.probe.HttpClientStarter.class
         )
-public abstract class HCHttpProbe<KeyType> extends HttpProbe<KeyType> implements SSLProbe {
+public abstract class HCHttpProbe<KeyType> extends HttpProbe<KeyType> implements SSLProbe, ConnectedProbe  {
+
+    @Getter @Setter
+    protected String connectionName = null;
 
     private boolean mandatorySession = false;
 
     @Override
-    public Boolean configure() {
+    protected boolean finishConfigure(List<Object> args) {
         if("true".equalsIgnoreCase(getPd().getSpecific("mandatorySession"))) {
             mandatorySession = true;
         }
-        if(getConnectionName() != null) {
-            HttpClientConnection httpcnx = find(getConnectionName());
-            HttpHost host = httpcnx.getHttpHost();
-            try {
-                url = new URL(httpcnx.getScheme(), host.getHostName(), host.getPort(), Util.parseTemplate(getFile()));
-                System.out.format("%s://%s:%d%s\n", httpcnx.getScheme(), host.getHostName(), host.getPort(), Util.parseTemplate(getFile()));
-                System.out.println(url);
-            } catch (MalformedURLException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+        return super.finishConfigure(args);
+    }
+
+    @Override
+    protected URL resolveUrl(HttpClientStarter.UrlBuilder builder, List<Object> args) throws MalformedURLException {
+        HttpClientConnection httpcnx;
+        if (getConnectionName() != null) {
+            httpcnx = find(getConnectionName());
+        } else {
+            httpcnx = new HttpClientConnection();
+            httpcnx.setScheme(scheme);
+            httpcnx.setLogin(login);
+            httpcnx.setPassword(password);
+            httpcnx.setPort(port);
+            httpcnx.setFile(file);
+            httpcnx.setName(httpcnx.getKey().toString());
+            setConnectionName(httpcnx.getName());
+            registerStarter(httpcnx);
         }
-        return super.configure();
-//        if (super.configure()) {
-//            if ( !url.getUserInfo().isEmpty()) {
-//                String userInfo = url.getUserInfo();
-//                try {
-//                    url = new URL(url.getProtocol(), url.getHost(), url.getPort(), url.getFile());
-//                } catch (MalformedURLException e) {
-//                    // TODO Auto-generated catch block
-//                    e.printStackTrace();
-//                }
-//            }
-//            return true;
-//        } else {
-//            return false;
-//        }
+        return httpcnx.resolve(builder, this, args);
     }
 
     @Override
     public Map<KeyType, Number> getNewSampleValues() {
         HttpClientConnection httpcnx = find(getConnectionName());
-        HttpClientContext ctx;
-        HttpHost host;
-        HttpClient client;
-        Starter starter;
-        if (httpcnx != null) {
-            starter = httpcnx;
-            host = httpcnx.getHttpHost();
-            client = httpcnx.getHttpClient();
-            ctx = httpcnx.getClientContext();
-        } else {
-            HttpClientStarter httpstarter = find(HttpClientStarter.class);
-            starter  = httpstarter;
-            host = new HttpHost(getUrl().getHost(), getUrl().getPort(), getUrl().getProtocol());
-            client = httpstarter.getHttpClient();
-            ctx = null;
-        }
-        if (! starter.isStarted()) {
+        if (! httpcnx.isStarted()) {
             return Collections.emptyMap();
         }
+        HttpClientContext ctx = httpcnx.getClientContext();
+        HttpClient client = find(HttpClientStarter.class).getHttpClient();
+        HttpHost host = new HttpHost(resolver.getInetAddress(), url.getPort(), url.getProtocol());
         HttpEntity entity = null;
         try {
-            HttpRequestBase hg = new HttpGet(Util.parseTemplate(getFile(), getHost(), this));
-//            if (! changeRequest(hg)) {
-//                return Collections.emptyMap();
-//            }
-            if (! starter.isStarted()) {
+            HttpRequestBase hg = new HttpGet(url.getFile());
+            if (! httpcnx.isStarted()) {
                 return Collections.emptyMap();
             }
             HttpResponse response = client.execute(host, hg, ctx);
@@ -113,22 +96,20 @@ public abstract class HCHttpProbe<KeyType> extends HttpProbe<KeyType> implements
                 return Collections.emptyMap();
             }
             entity = response.getEntity();
-            if(entity == null) {
+            if (entity == null) {
                 log(Level.ERROR, "Not response body to %s", getUrl());
                 return Collections.emptyMap();
             }
-            InputStream is = entity.getContent();
-            Map<KeyType, Number> vars = parseStream(is);
-            is.close();
-            return vars;
+            try (InputStream is = entity.getContent()) {
+                Map<KeyType, Number> vars = parseStream(is);
+                return vars;
+            }
         } catch (HttpHostConnectException e) {
             log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e.getCause());
         } catch (IllegalStateException | IOException e) {
             log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e);
         } finally {
-            if(entity != null) {
-                EntityUtils.consumeQuietly(entity);
-            }
+            Optional.ofNullable(entity).ifPresent(EntityUtils::consumeQuietly);
         }
 
         return Collections.emptyMap();
@@ -145,11 +126,11 @@ public abstract class HCHttpProbe<KeyType> extends HttpProbe<KeyType> implements
         if (connectionName != null) {
             log(Level.DEBUG, "looking for session %s", connectionName);
             session = find(HttpSession.class, connectionName);
-            if (session != null) {
-                if (!session.makeSession(request)) {
+            Optional.ofNullable(session).ifPresent(s -> {
+                if (!s.makeSession(request)) {
                     log(Level.ERROR, "session failed");
                 }
-            }
+            });
         }
         if (session == null && mandatorySession) {
             log(Level.ERROR, "missing session");

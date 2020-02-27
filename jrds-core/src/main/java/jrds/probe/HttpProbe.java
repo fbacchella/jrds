@@ -4,26 +4,24 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.IllegalFormatConversionException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.event.Level;
 
-import jrds.ConnectedProbe;
 import jrds.Probe;
-import jrds.Util;
 import jrds.factories.ProbeBean;
 import jrds.starter.Resolver;
-import jrds.starter.Starter;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * A generic probe to collect an HTTP service default generic : port to provide
@@ -34,16 +32,24 @@ import jrds.starter.Starter;
  * @author Fabrice Bacchella
  */
 @ProbeBean({ "port", "file", "url", "urlhost", "scheme", "login", "password" })
-public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implements UrlProbe, ConnectedProbe {
+public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implements UrlProbe {
+
+    @Getter @Setter
     protected URL url = null;
+    @Getter @Setter
     protected String urlhost = null;
-    protected int port = -1;
-    protected String file = "/";
+    @Getter @Setter
+    protected Integer port = null;
+    @Getter @Setter
+    protected String file = null;
+    @Getter @Setter
     protected String scheme = null;
+    @Getter @Setter
     protected String login = null;
+    @Getter @Setter
     protected String password = null;
-    private Starter resolver = null;
-    protected String connectionName = null;
+
+    protected Resolver resolver = null;
 
     public Boolean configure(URL url) {
         this.url = url;
@@ -95,63 +101,34 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
         return finishConfigure(null);
     }
 
-    protected boolean finishConfigure(List<Object> argslist) {
-        if(getConnectionName() == null) {
-            if(url == null) {
-                if(port <= 0 && (scheme == null || scheme.isEmpty())) {
-                    scheme = "http";
-                } else if(scheme == null || scheme.isEmpty()) {
-                    if(port == 443) {
-                        scheme = "https";
-                    } else {
-                        scheme = "http";
-                    }
-                }
-                // Check if authentication elements were given, and construct the
-                // authentication part if needed
-                String userInfo = "";
-                try {
-                    if(login != null) {
-                        userInfo = URLEncoder.encode(login, "UTF-8");
-                    }
-                    if(password != null) {
-                        userInfo = userInfo + ":" + URLEncoder.encode(password, "UTF-8");
-                    }
-                    if(!userInfo.isEmpty()) {
-                        userInfo += '@';
-                    }
-                } catch (UnsupportedEncodingException e1) {
-                    // never reached catch
-                }
-                String portString = port < 0 ? "" : ":" + Integer.toString(port);
-                if(urlhost == null) {
-                    urlhost = getHost().getDnsName();
-                }
-                String urlString;
-                if(argslist != null) {
-                    try {
-                        urlString = String.format(scheme + "://" + userInfo + urlhost + portString + file, argslist.toArray());
-                        urlString = Util.parseTemplate(urlString, getHost(), argslist, this);
-                    } catch (IllegalFormatConversionException e) {
-                        log(Level.ERROR, "Illegal format string: %s://%s%s:%d%s, args %d", scheme, userInfo, urlhost, portString, file, argslist.size());
-                        return false;
-                    }
-                } else {
-                    urlString = Util.parseTemplate(scheme + "://" + userInfo + urlhost + portString + file, this, getHost());
-                }
-                try {
-                    url = new URL(urlString);
-                } catch (MalformedURLException e) {
-                    log(Level.ERROR, e, "URL '%s:/%s/%s:%s%s' is invalid", scheme, userInfo, urlhost, portString, file);
-                    return false;
-                }
-            }
-            if("http".equals(url.getProtocol()) || "https".equals(url.getProtocol())) {
-                resolver = getParent().registerStarter(new Resolver(url.getHost()));
-            }
-            log(Level.DEBUG, "URL to collect is %s", getUrl());
+    protected boolean finishConfigure(List<Object> args) {
+        try {
+            url = resolveUrl(getUrlBuilder(), args);
+            log(Level.DEBUG, "Collected URL: %s", url);
+        } catch (MalformedURLException e) {
+            log(Level.ERROR, e, "failed resolve URL %s", e);
+            return false;
         }
+        if ("http".equals(url.getProtocol()) || "https".equals(url.getProtocol())) {
+            resolver = (Resolver) getParent().registerStarter(new Resolver(url.getHost()));
+        }
+        log(Level.DEBUG, "URL to collect is %s", url);
         return true;
+    }
+
+    private HttpClientStarter.UrlBuilder getUrlBuilder() {
+        HttpClientStarter.UrlBuilder urlbuilder = HttpClientStarter.builder();
+        Optional.ofNullable(url).ifPresent(urlbuilder::setUrl);
+        Optional.ofNullable(scheme).ifPresent(urlbuilder::setScheme);
+        Optional.ofNullable(login).ifPresent(urlbuilder::setLogin);
+        Optional.ofNullable(password).ifPresent(urlbuilder::setPassword);
+        Optional.ofNullable(port).ifPresent(urlbuilder::setPort);
+        Optional.ofNullable(file).ifPresent(urlbuilder::setFile);
+        return urlbuilder;
+    }
+
+    protected URL resolveUrl(HttpClientStarter.UrlBuilder builder, List<Object> args) throws MalformedURLException {
+        return builder.build(this, args);
     }
 
     /*
@@ -161,9 +138,11 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
      */
     @Override
     public boolean isCollectRunning() {
-        if(resolver == null || !resolver.isStarted())
+        if(resolver == null || !resolver.isStarted()) {
             return false;
-        return super.isCollectRunning();
+        } else {
+            return super.isCollectRunning();
+        }
     }
 
     /**
@@ -179,25 +158,22 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
      * @return
      */
     public List<String> parseStreamToLines(InputStream stream) {
-        List<String> lines = java.util.Collections.emptyList();
-        log(Level.DEBUG, "Getting %s", getUrl());
-        try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(stream));
-            lines = new ArrayList<String>();
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(stream))){
+            List<String> lines = new ArrayList<String>();
             String lastLine;
             while ((lastLine = in.readLine()) != null)
                 lines.add(lastLine);
-            in.close();
+            return lines;
         } catch (IOException e) {
-            log(Level.ERROR, e, "Unable to read url %s because: %s", getUrl(), e);
+            log(Level.ERROR, e, "Unable to read url %s because: %s", url, e);
+            return Collections.emptyList();
         }
-        return lines;
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see com.aol.jrds.Probe#getNewSampleValues()
+     * @see jrds.Probe#getNewSampleValues()
      */
     public Map<KeyType, Number> getNewSampleValues() {
         log(Level.DEBUG, "Getting %s", getUrl());
@@ -211,10 +187,8 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
             log(Level.ERROR, e, "Connection to %s failed: %s", getUrl(), e);
             return null;
         }
-        try {
-            InputStream is = cnx.getInputStream();
+        try (InputStream is = cnx.getInputStream()) {
             Map<KeyType, Number> vars = parseStream(is);
-            is.close();
             return vars;
         } catch (ConnectException e) {
             log(Level.ERROR, e, "Connection refused to %s", getUrl());
@@ -222,16 +196,13 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
             // Clean http connection error management
             // see
             // http://java.sun.com/j2se/1.5.0/docs/guide/net/http-keepalive.html
-            try {
+            try (InputStream es = ((HttpURLConnection) cnx).getErrorStream();){
                 byte[] buffer = new byte[4096];
                 int respCode = ((HttpURLConnection) cnx).getResponseCode();
                 log(Level.ERROR, e, "Unable to read url %s because: %s, http error code: %d", getUrl(), e, respCode);
-                InputStream es = ((HttpURLConnection) cnx).getErrorStream();
                 // read the response body
                 while (es.read(buffer) > 0) {
                 }
-                // close the error stream
-                es.close();
             } catch (IOException ex) {
                 log(Level.ERROR, ex, "Unable to recover from error in url %s because %s", getUrl(), ex);
             }
@@ -247,96 +218,8 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
         return getUrl().toString();
     }
 
-    public Integer getPort() {
-        return port;
-    }
-
-    /**
-     * @return Returns the url.
-     */
-    public URL getUrl() {
-        return url;
-    }
-
-    /**
-     * @param url The url to set.
-     */
-    public void setUrl(URL url) {
-        this.url = url;
-    }
-
     @Override
     public String getSourceType() {
         return "HTTP";
     }
-
-    /**
-     * @param port the port to set
-     */
-    public void setPort(Integer port) {
-        this.port = port;
-    }
-
-    /**
-     * @return the path
-     */
-    public String getFile() {
-        return file;
-    }
-
-    /**
-     * @param path the path to set
-     */
-    public void setFile(String path) {
-        this.file = path;
-    }
-
-    /**
-     * @return the urlhost
-     */
-    public String getUrlhost() {
-        return urlhost;
-    }
-
-    /**
-     * @param urlhost the urlhost to set
-     */
-    public void setUrlhost(String urlhost) {
-        this.urlhost = urlhost;
-    }
-
-    public String getScheme() {
-        return scheme;
-    }
-
-    public void setScheme(String scheme) {
-        this.scheme = scheme;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @Override
-    public String getConnectionName() {
-        return connectionName ;
-    }
-
-    @Override
-    public void setConnectionName(String connectionName) {
-        this.connectionName = connectionName;
-    }
-
 }

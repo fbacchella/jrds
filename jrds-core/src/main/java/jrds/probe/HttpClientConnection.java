@@ -1,8 +1,10 @@
 package jrds.probe;
 
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
+import java.util.Optional;
 
-import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -11,6 +13,7 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 
 import jrds.PropertiesManager;
+import jrds.Util;
 import jrds.factories.ProbeBean;
 import jrds.starter.Connection;
 import lombok.Getter;
@@ -24,9 +27,9 @@ public class HttpClientConnection extends Connection<HttpClient> {
     @Getter @Setter
     private String urlhost = null;
     @Getter @Setter
-    private int port = -1;
+    private Integer port = null;
     @Getter @Setter
-    private String file = "/";
+    private String file = null;
     @Getter @Setter
     private String scheme = null;
     @Getter @Setter
@@ -34,13 +37,10 @@ public class HttpClientConnection extends Connection<HttpClient> {
     @Getter @Setter
     private String password = null;
 
-    private final HttpClientStarter starter = new HttpClientStarter();
     private final HttpClientContext context = HttpClientContext.create();
 
     @Override
     public void configure(PropertiesManager pm) {
-        starter.initialize(getLevel());
-        starter.configure(pm);
         super.configure(pm);
         if (login != null && password != null) {
             CredentialsProvider bcp = new BasicCredentialsProvider();
@@ -50,23 +50,28 @@ public class HttpClientConnection extends Connection<HttpClient> {
         }
     }
 
+    public URL resolve(HttpClientStarter.UrlBuilder urlbuilder, HttpProbe<?> p, List<Object> args) throws MalformedURLException {
+        Optional.ofNullable(url).ifPresent(urlbuilder::setUrl);
+        Optional.ofNullable(scheme).ifPresent(s -> {
+            urlbuilder.setScheme(Util.parseTemplate(scheme, p, args));
+        });
+        Optional.ofNullable(urlhost).ifPresent(s -> {
+            urlbuilder.setUrlhost(Util.parseTemplate(urlhost, p, args));
+        });
+        Optional.ofNullable(port).ifPresent(urlbuilder::setPort);
+        Optional.ofNullable(file).ifPresent(s -> {
+            urlbuilder.setFile(Util.parseTemplate(file, p, args));
+        });
+        return urlbuilder.build(p);
+    }
+
     @Override
     public HttpClient getConnection() {
-        return starter.getHttpClient();
+        return getHttpClient();
     }
 
     public HttpClientContext getClientContext() {
         return context;
-    }
-
-    @Override
-    public boolean startConnection() {
-        return starter.start();
-    }
-
-    @Override
-    public void stopConnection() {
-        starter.stop();
     }
 
     @Override
@@ -75,11 +80,16 @@ public class HttpClientConnection extends Connection<HttpClient> {
     }
 
     public HttpClient getHttpClient() {
-        return starter.getHttpClient();
+        return getLevel().find(HttpClientStarter.class).getHttpClient();
     }
 
-    public HttpHost getHttpHost() {
-        return new HttpHost(getHostName(), port, scheme);
+    @Override
+    public boolean startConnection() {
+        return true;
+    }
+
+    @Override
+    public void stopConnection() {
     }
 
 }
