@@ -4,7 +4,10 @@ import java.beans.IntrospectionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -23,12 +26,26 @@ import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.Tools;
 import jrds.Util;
+import jrds.probe.HttpClientStarter.UrlBuilder;
 import jrds.starter.HostStarter;
 
 public class HttpTest {
 
     static final private String HOST = "testhost";
     static final private HostStarter webserver = new HostStarter(new HostInfo(HOST));
+    
+    static private class TestHttpProbe extends HttpProbe<String> {
+        @Override
+        protected Map<String, Number> parseStream(InputStream stream) {
+            return Collections.emptyMap();
+        }
+
+        @Override
+        protected URL resolveUrl(UrlBuilder builder, List<Object> args)
+                        throws MalformedURLException {
+            return builder.build(this, args);
+        }
+    }
 
     @Rule
     public final Log4JRule logrule = new Log4JRule(this);
@@ -56,12 +73,7 @@ public class HttpTest {
     @SuppressWarnings("unchecked")
     @Test
     public void build1() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        HttpProbe<String> p = new HttpProbe<String>() {
-            @Override
-            protected Map<String, Number> parseStream(InputStream stream) {
-                return null;
-            }
-        };
+        HttpProbe<String> p = new TestHttpProbe();
         ProbeDesc<String> pd = new ProbeDesc<>();
         pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
         p.setHost(webserver);
@@ -76,12 +88,7 @@ public class HttpTest {
     @SuppressWarnings("unchecked")
     @Test
     public void build2() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        HttpProbe<String> p = new HttpProbe<String>() {
-            @Override
-            protected Map<String, Number> parseStream(InputStream stream) {
-                return null;
-            }
-        };
+        HttpProbe<String> p = new TestHttpProbe();
         p.setHost(webserver);
         ProbeDesc<String> pd = new ProbeDesc<String>();
         pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
@@ -96,12 +103,7 @@ public class HttpTest {
     @SuppressWarnings("unchecked")
     @Test
     public void build3() throws IntrospectionException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        HttpProbe<String> p = new HttpProbe<String>() {
-            @Override
-            protected Map<String, Number> parseStream(InputStream stream) {
-                return null;
-            }
-        };
+        HttpProbe<String> p = new TestHttpProbe();
         p.setHost(webserver);
         ProbeDesc<String> pd = new ProbeDesc<String>();
         pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
@@ -117,12 +119,7 @@ public class HttpTest {
     @SuppressWarnings("unchecked")
     @Test
     public void build4() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        HttpProbe<String> p = new HttpProbe<String>() {
-            @Override
-            protected Map<String, Number> parseStream(InputStream stream) {
-                return null;
-            }
-        };
+        HttpProbe<String> p = new TestHttpProbe();
         ProbeDesc<String> pd = new ProbeDesc<String>();
         pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
         p.setHost(webserver);
@@ -132,19 +129,14 @@ public class HttpTest {
         p.setLogin("login@domain");
         p.setPassword("password");
         Assert.assertTrue(p.configure());
-        Assert.assertEquals("http://login%40domain:password@" + HOST + ":80/", p.getUrlAsString());
+        Assert.assertEquals("http://" + HOST + ":80/", p.getUrlAsString());
         validateBean(p);
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void build5() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-        HttpProbe<String> p = new HttpProbe<String>() {
-            @Override
-            protected Map<String, Number> parseStream(InputStream stream) {
-                return null;
-            }
-        };
+        HttpProbe<String> p = new TestHttpProbe();
         ProbeDesc<String> pd = new ProbeDesc<String>();
         pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
         p.setHost(webserver);

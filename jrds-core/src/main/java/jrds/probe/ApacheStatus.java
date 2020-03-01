@@ -31,7 +31,7 @@ public class ApacheStatus extends HCHttpProbe<String> implements IndexedProbe {
      */
     public String getUrlAsString() {
         try {
-            return new URL(getScheme(), getUrl().getHost(), getUrl().getPort(), "/").toString();
+            return new URL(getUrl().getProtocol(), getUrl().getHost(), getUrl().getPort(), "/").toString();
         } catch (MalformedURLException e) {
             throw new RuntimeException("MalformedURLException", e);
         }
