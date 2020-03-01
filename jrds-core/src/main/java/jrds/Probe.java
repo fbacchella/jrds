@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -403,10 +404,9 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        String hn = "<empty>";
-        if(getHost() != null)
-            hn = getHost().getName();
-        return hn + "/" + getName();
+        String hn = Optional.ofNullable(getHost()).map(HostInfo::getName).orElse("<Orphan>");
+        String probeName = Optional.ofNullable(getName()).orElse(pd != null ? pd.getName() : "<EMPTY>");
+        return hn + "/" + probeName;
     }
 
     /**
