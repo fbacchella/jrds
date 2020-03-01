@@ -408,7 +408,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         // Done after that the probe is registered to is host, and after configuration, because some probes can generate their own connection
         if (p instanceof ConnectedProbe) {
             ConnectedProbe cp = (ConnectedProbe) p;
-            if (p.find(cp.getConnectionName()) == null) {
+            if (cp.getConnectionName() != null && p.find(cp.getConnectionName()) == null) {
                 logger.error("Failed to find a connection {} for a probe {}", cp.getConnectionName(), p);
                 return null;
             }
