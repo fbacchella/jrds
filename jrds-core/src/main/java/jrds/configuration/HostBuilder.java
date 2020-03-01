@@ -186,10 +186,10 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             try {
                 makeProbe(probeNode, host, properties);
             } catch (InvocationTargetException e) {
-                logger.error("Probe creation failed for host " + host.getName() + ": " + e.getMessage());
+                logger.error("Probe creation failed for host " + host.getName() + ": " + Util.resolveThrowableException(e.getCause()));
                 if(logger.isDebugEnabled()) {
                     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                    e.printStackTrace(new PrintStream(buffer));
+                    e.getCause().printStackTrace(new PrintStream(buffer));
                     logger.debug("{}", buffer);
                 }
             } catch (Exception e) {
@@ -371,21 +371,21 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             }
         }
 
-        // try {
-        Map<String, String> empty = Collections.emptyMap();
+        p.setOptionalsCollect();
 
         try {
-            p.setMainStore(pm.defaultStore, empty);
-        } catch (Exception e1) {
-            logger.error("Failed to configure the default store for the probe {}", pm.defaultStore.getClass(), p);
+            p.setMainStore(pm.defaultStore, Collections.emptyMap());
+        } catch (InvocationTargetException ex) {
+            logger.error("Failed to configure the default store {} for the probe {}: {}", pm.defaultStore.getClass(), p, Util.resolveThrowableException(ex));
             return null;
         }
 
         for(Map.Entry<String, StoreFactory> e: pm.stores.entrySet()) {
             try {
                 p.addStore(e.getValue());
-            } catch (Exception e1) {
-                logger.warn("Failed to configure the store {} for the probe {}", e.getKey(), Util.delayedFormatString(() -> e.getValue().getClass().getCanonicalName()), p);
+            } catch (Exception ex) {
+                logger.warn("Failed to configure the store {} for the probe {}: {}",
+                            e.getKey(), Util.delayedFormatString(() -> e.getValue().getClass().getCanonicalName()), p, Util.resolveThrowableException(ex));
             }
         }
 

@@ -1,5 +1,7 @@
 package jrds.factories;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -11,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import jrds.GraphDesc;
 import jrds.Probe;
 import jrds.ProbeDesc;
+import jrds.Util;
 
 /**
  * A class to find probe by their names
@@ -124,11 +127,12 @@ public class ProbeFactory {
             logger.warn("Probe arguments not matching configurators for {}: {}", p.getPd().getName(), e.getMessage());
             return false;
         } catch (Exception ex) {
-            Throwable showException = ex;
-            Throwable t = ex.getCause();
-            if(t != null)
-                showException = t;
-            logger.warn("Error during probe creation of type {} with args {}: {}", p.getPd().getName(), constArgs, showException.getMessage());
+            logger.warn("Error during probe creation of type {} with args {}: {}", p.getPd().getName(), constArgs, Util.resolveThrowableException(ex));
+            if(logger.isDebugEnabled()) {
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                ex.getCause().printStackTrace(new PrintStream(buffer));
+                logger.debug("{}", buffer);
+            }
             return false;
         }
         return false;

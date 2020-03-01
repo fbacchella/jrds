@@ -94,8 +94,7 @@ public abstract class ProbeConnected<KeyType, ValueType, ConnectionClass extends
     public boolean isCollectRunning() {
         String cnxName = getConnectionName();
         Connection<?> cnx = find(Connection.class, cnxName);
-        if(getNamedLogger().isTraceEnabled())
-            log(Level.TRACE, "Connection %s started: %s", cnxName, (cnx != null ? Boolean.toString(cnx.isStarted()) : "null"));
+        log(Level.TRACE, "Connection %s started: %s", cnxName, Util.delayedFormatString(() -> (cnx != null ? Boolean.toString(cnx.isStarted()) : "null")));
         if(cnx == null || !cnx.isStarted())
             return false;
         return super.isCollectRunning();
