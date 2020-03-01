@@ -12,28 +12,26 @@ import org.slf4j.event.Level;
 import jrds.Util;
 import jrds.factories.ArgFactory;
 import jrds.factories.ConnectionName;
+import lombok.Getter;
 
 public class ConnectionInfo {
+
     static final private Logger logger = LoggerFactory.getLogger(ConnectionInfo.class);
 
     private final List<Object> args;
     private final Map<String, String> beansValue;
+    @Getter
     private final String name;
     private final Class<? extends Connection<?>> type;
 
     public ConnectionInfo(Class<? extends Connection<?>> type, String name, List<Object> args, Map<String, String> beansValue) {
-        super();
         this.args = args;
         this.beansValue = beansValue;
-        if(name == null) {
+        if (name == null) {
             Set<ConnectionName> names = ArgFactory.enumerateAnnotation(type, ConnectionName.class, Connection.class);
-            if(!names.isEmpty()) {
-                this.name = names.iterator().next().value();
-            } else {
-                this.name = type.getCanonicalName();
-            }
+            this.name = names.stream().findFirst().map(ConnectionName::value).orElse(type.getCanonicalName());
         } else {
-            this.name = name;
+            this.name = name.trim();
         }
         this.type = type;
     }
@@ -54,23 +52,16 @@ public class ConnectionInfo {
                 ArgFactory.beanSetter(cnx, e.getKey(), textValue);
                 cnx.log(Level.TRACE, "Setting bean '%s' to value '%s' for %s", e.getKey(), textValue, node);
             }
-            if(name != null && !name.trim().isEmpty())
-                cnx.setName(name.trim());
+            cnx.setName(name);
             node.registerStarter(cnx);
             logger.debug("Connexion registred: {} for {}", cnx, node);
         } catch (InvocationTargetException ex) {
-            String message = ex.getCause() != null ? ex.getCause().getMessage(): ex.getMessage();
+            String message = Util.resolveThrowableException(ex.getCause());
             throw new InvocationTargetException(ex.getCause(), "Error during connection creation of type " + type.getName() + " for " + node + ": " + message);
         } catch (Exception ex) {
-            throw new InvocationTargetException(ex, "Error during connection creation of type " + type.getName() + " for " + node);
+            String message = Util.resolveThrowableException(ex);
+            throw new InvocationTargetException(ex, "Error during connection creation of type " + type.getName() + " for " + node + ": " + message);
         }
-    }
-
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
     }
 
     /*
@@ -80,7 +71,7 @@ public class ConnectionInfo {
      */
     @Override
     public String toString() {
-        return type.getCanonicalName() + (name == null ? "" : ("/" + name));
+        return type.getCanonicalName() + "/" + name;
     }
 
     /**
