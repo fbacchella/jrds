@@ -23,11 +23,12 @@ import jrds.Util;
 import jrds.starter.SSLStarter;
 import jrds.starter.Starter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 public class HttpClientStarter extends Starter {
 
-    @Accessors(chain = true)
+    @Accessors(chain = true) @ToString
     public static class UrlBuilder {
         @Setter
         private URL url = null;
@@ -43,6 +44,7 @@ public class HttpClientStarter extends Starter {
         private String login = null;
         @Setter
         private String password = null;
+
         private UrlBuilder() {}
 
         public URL build(Probe<?, ?> p) throws MalformedURLException {

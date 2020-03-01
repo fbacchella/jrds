@@ -330,45 +330,40 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             }
         }
 
+        // Resolve the nested connections
+        for (ConnectionInfo ci: makeConnexion(probeNode, p, properties)) {
+            ci.register(p);
+        }
+
+        // Resolve the eventual connection name
+        String connectionName = probeNode.getAttribute("connection");
+
+        if (p instanceof ConnectedProbe) {
+            ConnectedProbe cp = (ConnectedProbe) p;
+            if (connectionName != null) {
+                connectionName = jrds.Util.parseTemplate(connectionName, host, properties, args);
+                logger.trace("Setting connection {} used by {}/{}", connectionName, host, p);
+                cp.setConnectionName(connectionName);
+            } else {
+                // connectionName resolves to the default connection name
+                connectionName = cp.getConnectionName();
+            }
+            // If the connection is not already registered, try searching it in the host
+            // and register it with the host's starter node. It's need because the probe is not yet linked to the host
+            if (p.find(connectionName) == null) {
+                logger.trace("Looking for connection {} in {}", connectionName, Util.delayedFormatString(host::getConnections));
+                ConnectionInfo ci = host.getConnection(connectionName);
+                if (ci != null) {
+                    ci.register(shost);
+                }
+            }
+        } else if (connectionName != null) {
+            logger.warn("Useless connection defined on the not connected probe {}, it will be ignored", p);
+        }
+
         if(!pf.configure(p, args)) {
             logger.error(p + " configuration failed");
             return null;
-        }
-
-        p.setOptionalsCollect();
-
-        // A connected probe, register the needed connection
-        // It can be defined within the node, referenced by it's name, or it's
-        // implied name
-        if(p instanceof ConnectedProbe) {
-            String connectionName;
-            ConnectedProbe cp = (ConnectedProbe) p;
-            // Register the connections defined within the probe
-            for(ConnectionInfo ci: makeConnexion(probeNode, p, properties)) {
-                ci.register(p);
-            }
-            String connexionName = probeNode.getAttribute("connection");
-            if(connexionName != null && !"".equals(connexionName)) {
-                logger.trace("Adding connection {} to {}", connexionName, p);
-                connectionName = jrds.Util.parseTemplate(connexionName, host, properties);
-                cp.setConnectionName(connectionName);
-            } else {
-                connectionName = cp.getConnectionName();
-            }
-            // If the connection is not already registred, try looking for it
-            // And register it with the host
-            // If it's null, it an optionnal connection, like in HttpProbe, don't insist on registring it.
-            if (connectionName != null && p.find(connectionName) == null) {
-                if (logger.isTraceEnabled())
-                    logger.trace("Looking for connection {} in {}", connectionName, Util.delayedFormatString(host::getConnections));
-                ConnectionInfo ci = host.getConnection(connectionName);
-                if (ci != null)
-                    ci.register(shost);
-                else {
-                    logger.error("Failed to find a connection {} for a probe {}", connectionName, cp);
-                    return null;
-                }
-            }
         }
 
         // try {
@@ -409,6 +404,15 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             return null;
         }
 
+        // Check that the probe can really find the requested connection
+        // Done after that the probe is registered to is host, and after configuration, because some probes can generate their own connection
+        if (p instanceof ConnectedProbe) {
+            ConnectedProbe cp = (ConnectedProbe) p;
+            if (p.find(cp.getConnectionName()) == null) {
+                logger.error("Failed to find a connection {} for a probe {}", cp.getConnectionName(), p);
+                return null;
+            }
+        }
         return p;
     }
 

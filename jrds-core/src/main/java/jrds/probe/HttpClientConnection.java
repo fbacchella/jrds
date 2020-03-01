@@ -76,7 +76,7 @@ public class HttpClientConnection extends Connection<HttpClient> {
 
     @Override
     public long setUptime() {
-        return 0;
+        return Long.MAX_VALUE;
     }
 
     public HttpClient getHttpClient() {
