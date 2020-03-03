@@ -2,13 +2,17 @@ package jrds.starter;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Optional;
 
 import org.slf4j.event.Level;
 
 import jrds.Probe;
+import lombok.Getter;
+import lombok.Setter;
 
 public abstract class Connection<ConnectedType> extends Starter {
 
+    @Getter @Setter
     private String name;
     private long uptime;
 
@@ -26,24 +30,7 @@ public abstract class Connection<ConnectedType> extends Starter {
      */
     @Override
     public Object getKey() {
-        if(name != null)
-            return name;
-        else
-            return getClass().getName();
-    }
-
-    /**
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * @param name the name to set
-     */
-    public void setName(String name) {
-        this.name = name;
+        return Optional.ofNullable(name).orElse(getClass().getName());
     }
 
     /**
@@ -63,10 +50,9 @@ public abstract class Connection<ConnectedType> extends Starter {
     }
 
     public Resolver getResolver() {
-        String hostName = getHostName();
-        Resolver r = getLevel().find(Resolver.class);
-        if(r == null) {
-            r = new Resolver(hostName);
+        Resolver r = getLevel().find(Resolver.class, Resolver.makeKey(getLevel()));
+        if (r == null) {
+            r = new Resolver(getHostName());
             getLevel().registerStarter(r);
         }
         return r;
@@ -88,14 +74,13 @@ public abstract class Connection<ConnectedType> extends Starter {
      */
     @Override
     public boolean start() {
-        if(!getResolver().isStarted())
-            return false;
-        boolean started = startConnection();
-        if(started) {
+        if (startConnection()) {
             uptime = setUptime();
             log(Level.DEBUG, "Uptime for %s = %ds", this, uptime);
+            return super.start();
+        } else {
+            return false;
         }
-        return started;
     }
 
     /*
