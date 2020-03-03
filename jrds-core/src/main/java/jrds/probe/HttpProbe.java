@@ -110,7 +110,7 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
             return false;
         }
         if ("http".equals(url.getProtocol()) || "https".equals(url.getProtocol())) {
-            resolver = (Resolver) getParent().registerStarter(new Resolver(url.getHost()));
+            resolver = (Resolver) registerStarter(new Resolver(url.getHost()));
         }
         log(Level.DEBUG, "URL to collect is %s", url);
         return true;
@@ -138,11 +138,7 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
      */
     @Override
     public boolean isCollectRunning() {
-        if(resolver == null || !resolver.isStarted()) {
-            return false;
-        } else {
-            return super.isCollectRunning();
-        }
+        return (resolver == null ? true : resolver.isStarted()) && super.isCollectRunning();
     }
 
     /**
