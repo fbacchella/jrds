@@ -150,12 +150,11 @@ public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnec
     public void stopConnection() {
         // close can be slow, do it in a separate thread
         // but don' try to create a new one each time
-        final JMXConnector current = connector;
         closer.submit(new Runnable() {
             @Override
             public void run() {
                 try {
-                    current.close();
+                    connector.close();
                 } catch (IOException e) {
                     log(Level.ERROR, e, "JMXConnector to %s close failed because of: %s", this, e);
                 }
