@@ -35,6 +35,7 @@
         <module>jrds-ipmi</module>
         <module>jrds-jsonp</module>
         <module>jrds-pcp</module>
+        <module>jrds-munin</module>
         <module>jrds-webapp</module>
         <module>jrds-standalone</module>
     </modules>

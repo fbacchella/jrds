@@ -80,6 +80,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>fr.jrds</groupId>
+            <artifactId>jrds-munin</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>${servlet-api.version}</version>

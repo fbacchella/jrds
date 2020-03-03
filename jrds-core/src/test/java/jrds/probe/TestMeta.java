@@ -17,12 +17,11 @@ import jrds.Log4JRule;
 import jrds.Probe;
 import jrds.Tools;
 import jrds.factories.ProbeMeta;
-import jrds.probe.munin.MuninDiscoverAgent;
 import jrds.webapp.DiscoverAgent;
 
 public class TestMeta {
 
-    @ProbeMeta(discoverAgent = MuninDiscoverAgent.class)
+    @ProbeMeta(discoverAgent = ProbeMeta.EmptyDiscoverAgent.class)
     public abstract class DummyProbe1<A, B> extends Probe<A, B> {
 
     }
@@ -49,4 +48,5 @@ public class TestMeta {
         DiscoverAgent da = meta.discoverAgent().getConstructor().newInstance();
         Assert.assertNotNull("a discover agent can't be build", da);
     }
+
 }
