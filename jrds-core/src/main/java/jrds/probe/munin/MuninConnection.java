@@ -1,6 +1,7 @@
 package jrds.probe.munin;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,25 +13,39 @@ import org.slf4j.event.Level;
 import jrds.factories.ProbeBean;
 import jrds.starter.Connection;
 import jrds.starter.SocketFactory;
+import lombok.Getter;
+import lombok.Setter;
 
 @ProbeBean({"port"})
 public class MuninConnection extends Connection<MuninConnection.SocketChannels> {
-    public final static class SocketChannels {
-        PrintWriter out;
-        BufferedReader in;
-        Socket muninsSocket;
+
+    public final static class SocketChannels implements Closeable {
+        public final PrintWriter out;
+        public final BufferedReader in;
+        public final Socket muninsSocket;
+        SocketChannels(Socket muninSocket) throws IOException {
+            this.muninsSocket = muninSocket;
+            in = new BufferedReader(new InputStreamReader(muninSocket.getInputStream()));
+            out = new PrintWriter(muninSocket.getOutputStream(), true);
+        }
+        @Override
+        public void close() throws IOException {
+            out.close();
+            in.close();
+            muninsSocket.close();
+        }
     }
-    static final int DEFAULTMUNINPORT = 4949;
+    static public final int DEFAULTMUNINPORT = 4949;
 
     private SocketChannels channel = null;
+
+    @Getter @Setter
     private int port = DEFAULTMUNINPORT;
 
     public MuninConnection() {
-        super();
     }
 
     public MuninConnection(Integer port) {
-        super();
         this.port = port;
     }
 
@@ -53,11 +68,8 @@ public class MuninConnection extends Connection<MuninConnection.SocketChannels> 
     @Override
     public boolean startConnection() {
         SocketFactory ss = getLevel().find(SocketFactory.class);
-        channel = new SocketChannels();
         try {
-            channel.muninsSocket = ss.createSocket(getHostName(), port);
-            channel.out = new PrintWriter(channel.muninsSocket.getOutputStream(), true);
-            channel.in = new BufferedReader(new InputStreamReader(channel.muninsSocket.getInputStream()));
+            channel = new SocketChannels(ss.getFactory().createSocket(getHostName(), port));
         } catch (IOException e) {
             log(Level.ERROR, e, "Connection error", e);
             return false;
@@ -75,26 +87,11 @@ public class MuninConnection extends Connection<MuninConnection.SocketChannels> 
                 is.skip(available);
                 available = is.available();
             }
-            channel.out.close();
-            channel.in.close();
-            channel.muninsSocket.close();
+            channel.close();
+            channel = null;
         } catch (IOException e) {
             log(Level.WARN, e, "Connection error during close", e);
         }
-    }
-
-    /**
-     * @return the port
-     */
-    public int getPort() {
-        return port;
-    }
-
-    /**
-     * @param port the port to set
-     */
-    public void setPort(int port) {
-        this.port = port;
     }
 
 }
