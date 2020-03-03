@@ -73,6 +73,17 @@ public class TestRrdDbStore {
     }
 
     @Test
+    public void testStepChanged() throws Exception {
+        Probe<String, Number> p = GenerateProbe.quickProbe(testFolder, GenerateProbe.ChainedMap.start(0));
+        p.setStep(30);
+        p.getPd().add("test1", DsType.COUNTER);
+        Assert.assertTrue("Probe file creation failed", p.checkStore());
+        p.setStep(60);
+        p.getPd().add("test1", DsType.COUNTER);
+        Assert.assertFalse("Probe file creation should have failed", p.checkStore());
+    }
+
+    @Test
     public void testCheckUpdate() throws Exception {
         Probe<String, Number> p = GenerateProbe.quickProbe(testFolder, GenerateProbe.ChainedMap.start(0));
         Path storePath = Paths.get(p.getMainStore().getPath());

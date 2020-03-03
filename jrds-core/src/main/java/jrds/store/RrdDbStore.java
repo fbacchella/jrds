@@ -226,7 +226,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 newDef.setStartTime(startTime);
                 newDef.setPath(rrdPath.toString());
                 String newDefDump = newDef.dump();
-                long newstep = oldDef.getStep();
+                long newstep = newDef.getStep();
                 if(newstep != oldstep) {
                     log(Level.ERROR, "Step changed, this probe will not collect any more");
                     return false;
