@@ -123,19 +123,27 @@ public abstract class StarterNode implements StartersSet {
      * @param s the starter to register
      * @return the starter that will be used
      */
-    public Starter registerStarter(Starter s) {
+    public <S extends Starter> Starter registerStarter(S s) {
         Object key = s.getKey();
-        if(allStarters == null)
-            // Must be a linked hashed map, order of insertion might be
-            // important
-            allStarters = new LinkedHashMap<Object, Starter>(2);
-        if(!allStarters.containsKey(key)) {
-            s.initialize(this);
-            allStarters.put(key, s);
-            log(Level.DEBUG, "registering %s with key %s", s.getClass().getName(), key);
-            return s;
+        @SuppressWarnings("unchecked")
+        S parentStarter = (S) find(s.getClass(), key);
+        if (parentStarter != null) {
+            return parentStarter;
         } else {
-            return allStarters.get(key);
+            if (allStarters == null) {
+                // Must be a linked hashed map, order of insertion might be
+                // important
+                allStarters = new LinkedHashMap<Object, Starter>(2);
+            }
+            if (! allStarters.containsKey(key) ) {
+                // Attention, Starter.initialize can add Starters, don't call it inside the map
+                s.initialize(this);
+                allStarters.put(key, s);
+                log(Level.DEBUG, "registering %s with key %s", s.getClass().getName(), key);
+                return s;
+            } else {
+                return allStarters.get(key);
+            }
         }
     }
 
@@ -193,14 +201,14 @@ public abstract class StarterNode implements StartersSet {
     }
 
     @SuppressWarnings("unchecked")
-    public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, Object key) {
-        StarterClass s = null;
+    public <SC extends Starter> SC find(Class<SC> sc, Object key) {
+        SC s = null;
         if(allStarters != null)
             log(Level.TRACE, "Looking for starter %s with key %s in %s", sc, key, allStarters);
         if(allStarters != null && allStarters.containsKey(key)) {
             Starter stemp = allStarters.get(key);
             if(sc.isInstance(stemp)) {
-                s = (StarterClass) stemp;
+                s = (SC) stemp;
             } else {
                 log(Level.ERROR, "Starter key error, got a %s expecting a %s", stemp.getClass(), sc);
                 return null;
