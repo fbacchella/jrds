@@ -1,13 +1,11 @@
 package jrds;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Properties;
-import java.util.concurrent.CancellationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jrds.starter.Timer;
 
 public class Configuration {
     static private final Logger logger = LoggerFactory.getLogger(Configuration.class);
@@ -61,9 +59,7 @@ public class Configuration {
         shutDownHook = new Thread("Collect-Shutdown") {
             @Override
             public void run() {
-                hostsList.stopTimers();
-                if(hostsList.getRenderer() != null)
-                    hostsList.getRenderer().finish();
+                hostsList.stopCollect();
             }
         };
         Runtime.getRuntime().addShutdownHook(shutDownHook);
@@ -71,36 +67,17 @@ public class Configuration {
     }
 
     private void stop() {
-        hostsList.stopTimers();
-        Thread.yield();
-        // We don't care if it failed, just try
+        hostsList.stopCollect();
         try {
-            if(shutDownHook != null)
-                Runtime.getRuntime().removeShutdownHook(shutDownHook);
-        } catch (Exception e1) {
-        }
-        // Everything is stopped, wait for collect termination
-        try {
-            hostsList.getChildsStream().forEach(t -> {
-                try {
-                    t.lockCollect();
-                } catch (InterruptedException e) {
-                    throw new CancellationException();
-                }
-            });
-            hostsList.getChildsStream().forEach(Timer::releaseCollect);
-        } catch (CancellationException e) {
-            Thread.currentThread().interrupt();
-        }
-        if(hostsList.getRenderer() != null) {
-            hostsList.getRenderer().finish();
+            Optional.ofNullable(shutDownHook).ifPresent(s -> Runtime.getRuntime().removeShutdownHook(s));
+        } catch (Exception ex) {
+            // We don't care if it failed, just tried
         }
         try {
             propertiesManager.close();
         } catch (IOException e) {
             logger.error("Failed to close old classloader: %s", e.getMessage());
         }
-
     }
 
     /**

@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TreeMap;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -69,7 +70,6 @@ public class HostsList extends StarterNode {
      *  
      */
     public HostsList() {
-        super();
         init();
     }
 
@@ -584,6 +584,26 @@ public class HostsList extends StarterNode {
     @Override
     public Stream<jrds.starter.Timer> getChildsStream() {
         return timers.values().stream();
+    }
+
+    @Override
+    public void stopCollect() {
+        super.stopCollect();
+        // Everything is stopped, wait for collect termination
+        try {
+            timers.values().forEach(t -> {
+                try {
+                    t.lockCollect();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new CancellationException();
+                }
+            });
+            timers.values().forEach(jrds.starter.Timer::releaseCollect);
+        } catch (CancellationException e) {
+            // The interrupt was already handled
+        }
+        Optional.ofNullable(renderer).ifPresent(Renderer::finish);
     }
 
 }
