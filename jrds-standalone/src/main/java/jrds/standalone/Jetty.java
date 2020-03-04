@@ -39,9 +39,6 @@ public class Jetty extends CommandStarterImpl {
     String propFileName = "jrds.properties";
     String webRoot = ".";
 
-    public Jetty() {
-    }
-
     public void configure(Properties configuration) {
         logger.debug("Configuration: " + configuration);
 

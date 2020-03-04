@@ -104,6 +104,7 @@ public final class StoreOpener {
 
     }
 
+    @Deprecated
     public static final void reset() {
     }
 
