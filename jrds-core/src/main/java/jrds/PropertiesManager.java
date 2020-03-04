@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -498,7 +499,7 @@ public class PropertiesManager extends Properties implements Closeable {
     @Override
     public void close() throws IOException {
         stores.values().forEach(StoreFactory::stop);
-        defaultStore.stop();
+        Optional.ofNullable(defaultStore).ifPresent(StoreFactory::stop);
         if (extensionClassLoader instanceof URLClassLoader && ! extensionClassLoader.equals(getClass().getClassLoader())) {
             ((URLClassLoader)extensionClassLoader).close();
         }
