@@ -130,7 +130,7 @@ jobs:
                         PUBLISH="maven-install-plugin:install"
                     fi
                     echo "publishing jobs: $PUBLISH"
-                    mvn -B $PUBLISH -Pskip -s .circleci/settings.xml
+                    mvn -B $PUBLISH -Pskip -DskipTests -s .circleci/settings.xml
                 environment:
                     JAVA_HOME: /usr/java/openjdk-13
             - persist_to_workspace:
