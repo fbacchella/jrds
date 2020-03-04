@@ -3,7 +3,6 @@ package jrds;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -16,10 +15,12 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.slf4j.Logger;
@@ -27,50 +28,34 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 public class Renderer {
-    final int PRIME = 31;
-    final File tmpDir;
 
     public class RendererRun implements Runnable {
-        Graph graph;
-        boolean finished = false;
-        final ReentrantLock running = new ReentrantLock();
-        File destFile;
+        private final Graph graph;
+        volatile boolean finished = false;
+        private final ReentrantLock running = new ReentrantLock();
+        private final File destFile;
 
         public RendererRun(Graph graph) throws IOException {
             this.graph = graph;
             destFile = new File(tmpDir, Integer.toHexString(graph.hashCode()) + ".png");
         }
 
-        @Override
-        protected void finalize() throws Throwable {
-            clean();
-            super.finalize();
-        }
-
         public void run() {
             try {
-                if(!finished) {
-                    writeImg();
-                }
+                writeImg();
             } catch (Exception e) {
-                logger.error("Uncatched error while rendering " + graph + ": " + e, e);
+                Util.log(this, logger, Level.ERROR, e, "Uncatched error while rendering graph %s: %s", graph, e);
             }
         }
 
         public boolean isReady() {
-            boolean retValue = false;
             // isReady is sometimes call before run
-            if(!finished) {
-                writeImg();
-            }
-            if(destFile.isFile() && destFile.canRead() && destFile.length() > 0)
-                retValue = true;
-            return retValue;
-
+            writeImg();
+            return destFile.isFile() && destFile.canRead() && destFile.length() > 0;
         }
 
         public void send(OutputStream out) throws IOException {
-            if(isReady()) {
+            if (isReady()) {
                 WritableByteChannel outC = Channels.newChannel(out);
                 try (FileInputStream inStream = new FileInputStream(destFile)) {
                     FileChannel inC = inStream.getChannel();
@@ -86,22 +71,15 @@ public class Renderer {
         }
 
         public void clean() {
-            if(logger.isTraceEnabled()) {
-                logger.trace("clean in");
-                for(StackTraceElement e: Thread.currentThread().getStackTrace()) {
-                    logger.trace("    " + e.toString());
-                }
+            if (!destFile.isFile() || !destFile.delete()) {
+                logger.warn("Failed to delete {}", destFile.getPath());
             }
-            if(destFile.isFile())
-                if(!destFile.delete() && destFile.isFile()) {
-                    logger.warn("Failed to delete " + destFile.getPath());
-                }
         }
 
-        private synchronized void writeImg() {
+        private void writeImg() {
             running.lock();
             try {
-                if(!finished) {
+                if (!finished) {
                     long starttime = System.currentTimeMillis();
                     try(OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile))) {
                         graph.writePng(out);
@@ -114,30 +92,23 @@ public class Renderer {
                         logger.trace("Graph " + graph.getQualifiedName() + " renderding ran for (ms) " + duration1 + ":" + duration2);
                     }
                 }
-            } catch (FileNotFoundException e) {
-                logger.error("Error with temporary output file: " + e);
             } catch (IOException e) {
-                logger.error("Error with temporary output file: " + e);
-                Throwable cause = e.getCause();
-                if(cause != null)
-                    logger.error("    Cause was: " + cause);
+                Util.log(this, logger, Level.ERROR, e, "Error with temporary output file: %s", e);
             } catch (Exception e) {
                 String message;
                 try {
                     String graphName = graph.getQualifiedName();
-                    message = String.format("Error rendering graph %s: %s", graphName, e.getMessage());
+                    message = String.format("Error rendering graph %s: %s", graphName, Util.resolveThrowableException(e));
                 } catch (Exception e1) {
                     String graphName = graph.getNode().getProbe().getName() + "/" + graph.getNode().getGraphDesc().getGraphName();
-                    message = String.format("Error rendering incomplete graph %s: %s", graphName, e.getMessage());
+                    message = String.format("Error rendering incomplete graph %s: %s", graphName, Util.resolveThrowableException(e));
                 }
-                if(logger.isDebugEnabled())
-                    logger.error(message, e);
-                else
-                    logger.error(message);
+                Util.log(this, logger, Level.ERROR, e, message);
             } finally {
                 // Always set to true, we do not try again in case of failure
                 finished = true;
                 running.unlock();
+                clean();
             }
         }
 
@@ -150,18 +121,11 @@ public class Renderer {
 
     static private final Logger logger = LoggerFactory.getLogger(Renderer.class);
     static private final float hashTableLoadFactor = 0.75f;
-    final private Object counter = new Object() {
-        int i = 0;
-
-        @Override
-        public String toString() {
-            return Integer.toString(i++);
-        }
-    };
+    static private final AtomicInteger counter = new AtomicInteger(0);
 
     private final ExecutorService tpool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 3, new ThreadFactory() {
         public Thread newThread(Runnable r) {
-            String threadName = "RendererThread" + counter;
+            String threadName = "RendererThread" + counter.getAndIncrement();
             Thread t = new Thread(r, threadName);
             t.setDaemon(true);
             logger.debug("New thread name: {}", threadName);
@@ -170,13 +134,12 @@ public class Renderer {
     });
     private int cacheSize;
     private final Map<Integer, RendererRun> rendered;
+    private final File tmpDir;
 
     public Renderer(int cacheSize, File tmpDir) {
         this.tmpDir = tmpDir;
         this.cacheSize = cacheSize;
         Map<Integer, RendererRun> m = new LinkedHashMap<Integer, RendererRun>(cacheSize + 5, hashTableLoadFactor, true) {
-            private static final long serialVersionUID = 1L;
-
             /*
              * (non-Javadoc)
              * 
@@ -205,66 +168,39 @@ public class Renderer {
                 rr.clean();
                 return rr;
             }
-
-            /*
-             * (non-Javadoc)
-             * 
-             * @see java.lang.Object#finalize()
-             */
-            @Override
-            protected void finalize() throws Throwable {
-                for(RendererRun rr: this.values()) {
-                    rr.clean();
-                }
-                super.finalize();
-            }
-
         };
         rendered = Collections.synchronizedMap(m);
     }
 
-    public void render(Graph graph) throws IOException {
-        if(!rendered.containsKey(graph.hashCode())) {
-            synchronized (rendered) {
-                if(!rendered.containsKey(graph.hashCode())) {
-                    RendererRun runRender = new RendererRun(graph);
-                    // Create graphics object
-                    rendered.put(graph.hashCode(), runRender);
-                    try {
-                        tpool.execute(runRender);
-                    } catch (RejectedExecutionException ex) {
-                        logger.warn("Render thread dropped for graph " + graph);
-                    }
-                    logger.debug("wants to render " + runRender);
-                }
+    public RendererRun render(Graph graph) {
+        return rendered.computeIfAbsent(graph.hashCode(), i -> {
+            RendererRun runRender = null;
+            try {
+                runRender = new RendererRun(graph);
+                tpool.execute(runRender);
+                logger.debug("wants to render {}", runRender);
+                return runRender;
+            } catch (RejectedExecutionException ex) {
+                runRender.clean();
+                logger.warn("Render thread dropped for graph {}", graph);
+                return null;
+            } catch (IOException ex) {
+                Util.log(this, logger, Level.WARN, ex, "Fail to render %s: %s", ex);
+                return null;
             }
-        }
+        });
     }
 
     public Graph getGraph(int key) {
-        Graph g = null;
         if(key != 0) {
-            RendererRun rr = rendered.get(key);
-            if(rr != null)
-                g = rr.graph;
+            return Optional.ofNullable(rendered.get(key)).map(rr -> rr.graph).orElse(null);
+        } else {
+            return null;
         }
-        return g;
     }
 
     public boolean isReady(Graph graph) {
-        RendererRun runRender = rendered.get(graph.hashCode());
-        if(runRender == null) {
-            try {
-                render(graph);
-                runRender = rendered.get(graph.hashCode());
-            }
-            // If cannot launch render, will always be false
-            catch (IOException e) {
-                logger.error("graph " + graph + " will not be calculated:" + e);
-                runRender = null;
-            }
-        }
-        return (runRender != null) && runRender.isReady();
+        return Optional.ofNullable(render(graph)).map(RendererRun::isReady).orElse(false);
     }
 
     public void send(Graph graph, OutputStream out) throws IOException {
@@ -272,12 +208,12 @@ public class Renderer {
         try {
             runRender = rendered.get(graph.hashCode());
         } catch (Exception e) {
-            logger.error("Error with probe: " + e);
+            logger.error("Error with probe: {}", Util.resolveThrowableException(e));
         }
         if(runRender != null && runRender.isReady()) {
             runRender.send(out);
         } else {
-            logger.info("No valid precalculated render found for " + graph);
+            logger.info("No valid precalculated render found for {}", graph);
             // No precalculation found, so we do it right now
             graph.writePng(out);
         }
