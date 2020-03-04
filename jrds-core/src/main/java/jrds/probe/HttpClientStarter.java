@@ -73,7 +73,7 @@ public class HttpClientStarter extends Starter {
                         urlString = String.format(scheme + "://" + urlhost + portString + file, argslist.toArray());
                         urlString = Util.parseTemplate(urlString, p.getHost(), argslist, p);
                     } catch (IllegalFormatConversionException e) {
-                        throw new MalformedURLException(String.format("Illegal format string: %s://%s:%d%s, args %d", scheme, urlhost, portString, file, argslist.size()));
+                        throw new MalformedURLException(String.format("Illegal format string: %s://%s:%s%s, args %d", scheme, urlhost, portString, file, argslist.size()));
                     }
                 } else {
                     urlString = Util.parseTemplate(scheme + "://" + urlhost + portString + file, p, p.getHost());
