@@ -24,7 +24,7 @@
                 <maven.resources.skip>true</maven.resources.skip>
                 <maven.main.skip>true</maven.main.skip>
                 <maven.javadoc.skip>true</maven.javadoc.skip>
-                <skipTests>true</true>
+                <skipTests>true</skipTests>
             </properties>
         </profile>
     </profiles>
