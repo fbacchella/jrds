@@ -114,6 +114,7 @@ public class Result extends Pdu {
         case I32:
         case U32:
             value = ByteBuffer.wrap(valueBytes).getInt();
+            break;
         default:
             throw new UnsupportedOperationException(type.toString());
         }
