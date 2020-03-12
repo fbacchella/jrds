@@ -2,6 +2,8 @@ package jrds;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.WritableByteChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -194,6 +196,12 @@ public class Graph implements WithACL {
 
     public void writePng(OutputStream out) throws IOException {
         byte[] buffer = getRrdGraph().getRrdGraphInfo().getBytes();
+        out.write(buffer);
+    }
+
+    public void writePng(WritableByteChannel out) throws IOException {
+        byte[] bytes = getRrdGraph().getRrdGraphInfo().getBytes();
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
         out.write(buffer);
     }
 

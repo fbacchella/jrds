@@ -1,14 +1,13 @@
 package jrds;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,13 +30,14 @@ public class Renderer {
 
     public class RendererRun implements Runnable {
         private final Graph graph;
-        volatile boolean finished = false;
+        volatile boolean finished;
         private final ReentrantLock running = new ReentrantLock();
         private final File destFile;
 
         public RendererRun(Graph graph) throws IOException {
             this.graph = graph;
             destFile = new File(tmpDir, Integer.toHexString(graph.hashCode()) + ".png");
+            finished = destFile.isFile() && destFile.canRead() && destFile.length() > 0;
         }
 
         public void run() {
@@ -45,45 +45,67 @@ public class Renderer {
                 writeImg();
             } catch (Exception e) {
                 Util.log(this, logger, Level.ERROR, e, "Uncatched error while rendering graph %s: %s", graph, e);
+                clean();
             }
         }
 
         public boolean isReady() {
             // isReady is sometimes call before run
             writeImg();
-            return destFile.isFile() && destFile.canRead() && destFile.length() > 0;
+            return finished;
         }
 
         public void send(OutputStream out) throws IOException {
             if (isReady()) {
                 WritableByteChannel outC = Channels.newChannel(out);
-                try (FileInputStream inStream = new FileInputStream(destFile)) {
-                    FileChannel inC = inStream.getChannel();
-                    inC.transferTo(0, destFile.length(), outC);
+                send(outC);
+            }
+        }
+
+        public void send(WritableByteChannel out) throws IOException {
+            if (isReady()) {
+                try (FileChannel inC = FileChannel.open(destFile.toPath(), StandardOpenOption.READ)) {
+                    inC.transferTo(0, destFile.length(), out);
                 }
             }
         }
 
         public void write() throws IOException {
-            try (OutputStream out = new BufferedOutputStream(new FileOutputStream(new File(graph.getPngName())))) {
+            try (FileChannel out = FileChannel.open(Paths.get(graph.getPngName()), 
+                                                    StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
                 send(out);
             }
         }
 
         public void clean() {
-            if (!destFile.isFile() || !destFile.delete()) {
-                logger.warn("Failed to delete {}", destFile.getPath());
+            try {
+                running.lockInterruptibly();
+                if (tmpDir.exists() && destFile.exists() && destFile.isFile()) {
+                    Files.delete(destFile.toPath());
+                }
+            } catch (IOException ex) {
+                logger.warn("Failed to delete {}: {}", destFile.getPath(), ex);
+            } catch (InterruptedException e) {
+                // Locked failed, will not do anything
+                Thread.currentThread().interrupt();
+            } finally {
+                // Always set to true, we do not try again in case of failure
+                finished = false;
+                if (running.isHeldByCurrentThread()) {
+                    running.unlock();
+                }
             }
         }
 
         private void writeImg() {
-            running.lock();
             try {
+                running.lockInterruptibly();
                 if (!finished) {
                     long starttime = System.currentTimeMillis();
-                    try(OutputStream out = new BufferedOutputStream(new FileOutputStream(destFile))) {
+                    try (WritableByteChannel out = FileChannel.open(destFile.toPath(),
+                                                                    StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
                         graph.writePng(out);
-                    };
+                    }
                     long middletime = System.currentTimeMillis();
                     if(logger.isTraceEnabled()) {
                         long endtime = System.currentTimeMillis();
@@ -92,8 +114,12 @@ public class Renderer {
                         logger.trace("Graph " + graph.getQualifiedName() + " renderding ran for (ms) " + duration1 + ":" + duration2);
                     }
                 }
+            } catch (InterruptedException e) {
+                // Locked failed, will not do anything
+                Thread.currentThread().interrupt();
             } catch (IOException e) {
-                Util.log(this, logger, Level.ERROR, e, "Error with temporary output file: %s", e);
+                Util.log(this, logger, Level.ERROR, e, "Error writting temporary output file: %s", e);
+                clean();
             } catch (Exception e) {
                 String message;
                 try {
@@ -104,11 +130,13 @@ public class Renderer {
                     message = String.format("Error rendering incomplete graph %s: %s", graphName, Util.resolveThrowableException(e));
                 }
                 Util.log(this, logger, Level.ERROR, e, message);
+                clean();
             } finally {
                 // Always set to true, we do not try again in case of failure
                 finished = true;
-                running.unlock();
-                clean();
+                if (running.isHeldByCurrentThread()) {
+                    running.unlock();
+                }
             }
         }
 
@@ -150,8 +178,9 @@ public class Renderer {
             protected boolean removeEldestEntry(Entry<Integer, RendererRun> eldest) {
                 RendererRun rr = eldest.getValue();
                 if(rr != null && rr.finished && size() > Renderer.this.cacheSize) {
+                    rr.clean();
                     return true;
-                } else if(rr != null && size() > Renderer.this.cacheSize) {
+                } else if (rr != null && size() > Renderer.this.cacheSize) {
                     Util.log(null, logger, Level.DEBUG, null, "Graph queue too short, it's now %d instead of %d", size(), Renderer.this.cacheSize);
                 }
                 return false;
@@ -192,11 +221,10 @@ public class Renderer {
     }
 
     public Graph getGraph(int key) {
-        if(key != 0) {
-            return Optional.ofNullable(rendered.get(key)).map(rr -> rr.graph).orElse(null);
-        } else {
-            return null;
-        }
+        return Optional.ofNullable(key)
+                        .filter(k -> key != 0)
+                        .map(rendered::get)
+                        .map(rr -> rr.graph).orElse(null);
     }
 
     public boolean isReady(Graph graph) {
@@ -226,11 +254,11 @@ public class Renderer {
         } catch (Exception e) {
             logger.error("Error with probe: " + e);
         }
-        if(runRender != null && runRender.isReady()) {
+        if (runRender != null && runRender.isReady()) {
             try {
                 return FileChannel.open(runRender.destFile.toPath(), StandardOpenOption.READ);
             } catch (IOException e) {
-                logger.error("Can't read graph cache file: " + e.getMessage());
+                Util.log(this, logger, Level.ERROR, e, "Can't read graph cache file: %s", e);
                 return null;
             }
         } else {
