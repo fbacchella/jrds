@@ -20,9 +20,9 @@ jobs:
                     - home/circleci/.sonar/cache
                     - home/circleci/project
                     - usr/share/snmp/mibs/
-    jdk8_jre:
+    jdk8:
         docker:
-            - image: circleci/openjdk:8-jdk
+            - image: circleci/openjdk:8-buster
         steps:
             - persist_to_workspace:
                 root: /usr/local
@@ -36,8 +36,6 @@ jobs:
                 at: /tmp/ws
             - run:
                 command: |
-                    sudo mkdir -p /usr/lib/jvm
-                    [ -d /tmp/ws/openjdk-8 ] && sudo mv -n /tmp/ws/openjdk-8 /usr/lib/jvm/java-8-openjdk-amd64
                     mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
@@ -45,21 +43,20 @@ jobs:
                 command: mvn -B clean compile install -DskipTests -s .circleci/settings.xml
                 environment:
                     JAVA_HOME: /usr/java/openjdk-13
+                    MAVEN_OPTS: "-Xmx2048m"
             - persist_to_workspace:
                 root: /
                 paths:
                     - home/circleci/.m2/repository
                     - home/circleci/project
-    testsj8:
+    testsj13:
         docker:
-            - image: circleci/openjdk:8-jdk
+            - image: circleci/openjdk:13-jdk-buster
         steps:
             - attach_workspace:
                 at: /tmp/ws
             - run:
                 command: |
-                    sudo mkdir -p /usr/lib/jvm
-                    [ -d /tmp/ws/openjdk-8 ] && sudo mv -n /tmp/ws/openjdk-8 /usr/lib/jvm/java-8-openjdk-amd64
                     mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
@@ -69,22 +66,21 @@ jobs:
                 command: |
                     # If no symbolic name, it's a PR, will run sonar
                     if [ -n "$(git symbolic-ref HEAD 2>/dev/null )" ] ; then
-                        SONAR="sonar:sonar -Psonar"
+                        SONAR="jacoco:report sonar:sonar -Psonar"
                         echo "Doing sonar"
                     else
                         SONAR=""
                     fi
-                    #see https://stackoverflow.com/questions/53010200/maven-surefire-could-not-find-forkedbooter-class for disableClassPathURLCheck
-                    mvn -B test $SONAR -Pskip -Dsonar.login=$SONARCLOUD_LOGIN -DargLine="-Xmx2048m -Djdk.net.URLClassPath.disableClassPathURLCheck=true" -s .circleci/settings.xml
+                    mvn -B surefire:test $SONAR -Pskip -DargLine="-Xmx2048m" -s .circleci/settings.xml
                 environment:
-                    JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
-                    MAVEN_OPTS: "-Xmx2048m"
+                    JAVA_HOME: /usr/java/openjdk-13
+                    MAVEN_OPTS: "-Xmx1024m"
             - store_test_results:
                 path: target/surefire-reports
             #don't persist_to_workspace, can't be done in parallel with testsj11
     testsj11:
         docker:
-            - image: circleci/openjdk:11-jdk
+            - image: circleci/openjdk:11-buster
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -98,17 +94,34 @@ jobs:
                     sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
             - run:
                 command: |
-                    mvn -B test -Pskip -s .circleci/settings.xml
+                    mvn -B surefire:test -Pskip -DargLine="-Xmx2048m" -s .circleci/settings.xml
                 environment:
-                    JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
-                    MAVEN_OPTS: "-Xmx2048m"
+                    JAVA_HOME: /usr/local/openjdk-11
+                    MAVEN_OPTS: "-Xmx512m"
             - store_test_results:
                 path: target/surefire-reports
-            - persist_to_workspace:
-                root: /
-                paths:
-                    - home/circleci/.m2/repository
-                    - home/circleci/.sonar/cache
+    testsj8:
+        docker:
+            - image: circleci/openjdk:8-buster
+        steps:
+            - attach_workspace:
+                at: /tmp/ws
+            - run:
+                command: |
+                    mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
+                    mv -n /tmp/ws/home/circleci/.sonar /home/circleci/
+                    mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
+                    mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
+                    sudo mkdir -p /usr/share/snmp/mibs/
+                    sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
+            - run:
+                command: |
+                    mvn -B test -Pskip -DargLine="-Xmx2048m" -s .circleci/settings.xml
+                environment:
+                    JAVA_HOME: /usr/local/openjdk-8
+                    MAVEN_OPTS: "-Xmx512m"
+            - store_test_results:
+                path: target/surefire-reports
     publish:
         docker:
             - image: circleci/openjdk:13-jdk-buster
@@ -133,6 +146,7 @@ jobs:
                     mvn -B $PUBLISH -Pskip -DskipTests -s .circleci/settings.xml
                 environment:
                     JAVA_HOME: /usr/java/openjdk-13
+                    MAVEN_OPTS: "-Xmx2048m"
             - persist_to_workspace:
                 root: /
                 paths:
@@ -153,28 +167,31 @@ jobs:
                 paths:
                     - /home/circleci/.m2/repository
                     - /home/circleci/.sonar/cache
-                key: jrds-{{ checksum "pom.xml" }}
-            
+                key: jrds-{{ checksum "pom.xml" }}-{{ checksum "jrds-core/pom.xml" }}-{{ checksum "jrds-ipmi/pom.xml" }}-{{ checksum "jrds-jsonp/pom.xml" }}-{{ checksum "jrds-log4j/pom.xml" }}-{{ checksum "jrds-snmp/pom.xml" }}-{{ checksum "jrds-standalone/pom.xml" }}-{{ checksum "jrds-webapp/pom.xml" }}
 workflows:
   version: 2.1
   build_and_test:
     jobs:
       - checkout
-      - jdk8_jre
+      - jdk8
       - build:
           requires:
               - checkout
-              - jdk8_jre
-      - testsj8:
+              - jdk8
+      - testsj13:
           requires:
               - build
       - testsj11:
           requires:
               - build
+      - testsj8:
+          requires:
+              - build
       - publish:
           requires:
-              - testsj8
+              - testsj13
               - testsj11
+              - testsj8
       - savecache:
           requires:
               - publish
