@@ -11,7 +11,7 @@ import org.slf4j.event.Level;
 
 import jrds.Log4JRule;
 import jrds.Tools;
-import jrds.probe.jdbc.JdbcConnection;
+import jrds.probe.JMXConnection;
 
 public class TestConnectionInfo {
 
@@ -25,12 +25,12 @@ public class TestConnectionInfo {
 
     @Before
     public void loggers() {
-        logrule.setLevel(Level.TRACE, "jrds.starter", "jrds.Starter", "jrds.starter.ConnectionInfo");
+        logrule.setLevel(Level.TRACE, "jrds.starter", "jrds.Starter", "jrds.probe.JMXConnection");
     }
 
     @Test
     public void testRegister() throws InvocationTargetException {
-        ConnectionInfo ci = new ConnectionInfo(JdbcConnection.class, "jrds.probe.jdbc.JdbcConnection", Collections.emptyList(), Collections.singletonMap("user", "admin"));
+        ConnectionInfo ci = new ConnectionInfo(JMXConnection.class, "jrds.probe.JMXConnection", Collections.emptyList(), Collections.singletonMap("user", "admin"));
         StarterNode sn = new StarterNode() {};
         ci.register(sn);
     }

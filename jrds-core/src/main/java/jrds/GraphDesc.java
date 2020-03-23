@@ -34,7 +34,6 @@ import org.w3c.dom.Element;
 import jrds.Util.SiPrefix;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
-import jrds.probe.jdbc.JdbcProbe;
 import jrds.store.ExtractInfo;
 import jrds.webapp.ACL;
 import jrds.webapp.WithACL;
@@ -309,7 +308,7 @@ public class GraphDesc implements WithACL {
         },
         JDBC {
             public String resolve(GraphNode graph) {
-                return ((JdbcProbe) graph.getProbe()).getUrlAsString();
+                return ((UrlProbe) graph.getProbe()).getUrlAsString();
             }
         },
         DISK {
@@ -374,7 +373,7 @@ public class GraphDesc implements WithACL {
         },
         DBINSTANCE {
             public String resolve(GraphNode graph) {
-                JdbcProbe dbprobe = (JdbcProbe) graph.getProbe();
+                UrlProbe dbprobe = (UrlProbe) graph.getProbe();
                 return dbprobe.getUrlAsString();
             }
         };

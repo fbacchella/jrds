@@ -13,6 +13,7 @@ import jrds.starter.Resolver;
 import jrds.starter.Starter;
 
 public abstract class JdbcStarter extends Starter {
+
     private Connection con;
     private String url;
     private String user;
