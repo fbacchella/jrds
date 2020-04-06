@@ -260,15 +260,6 @@ public class HostsList extends StarterNode {
         startCollect();
     }
 
-    /**
-     * Ensure that all collects are stopped forever.
-     */
-    public void stopTimers() {
-        Optional.ofNullable(collectTimer).ifPresent(Timer::cancel);
-        collectTimer = null;
-        stopCollect();
-    }
-
     String makeTabs(List<String> tabsList, Set<Tab> moretabs, Map<String, Tab> customTabMap, Map<String, Tab> tabs) {
         Map<String, Tab> tabsmap = new HashMap<String, Tab>(moretabs.size());
         for(Tab t: moretabs) {
@@ -589,6 +580,8 @@ public class HostsList extends StarterNode {
     @Override
     public void stopCollect() {
         super.stopCollect();
+        Optional.ofNullable(collectTimer).ifPresent(Timer::cancel);
+        collectTimer = null;
         // Everything is stopped, wait for collect termination
         try {
             timers.values().forEach(t -> {
