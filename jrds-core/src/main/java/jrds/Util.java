@@ -827,8 +827,8 @@ public class Util {
             lg = (i) -> {};
         }
         lg.accept(ls);
-        // NPE should never happen, so it's always logged
-        if(e != null && (namedLogger.isDebugEnabled() || e instanceof NullPointerException)) {
+        // NPE or ArrayIndexOutOfBoundsException should never happen, so it's always logged
+        if(e != null && (namedLogger.isDebugEnabled() || e instanceof NullPointerException || e instanceof ArrayIndexOutOfBoundsException)) {
             StackTraceElement[] stack = e.getStackTrace();
             Writer w = new CharArrayWriter(stack.length*20);
             e.printStackTrace(new PrintWriter(w));
