@@ -16,6 +16,7 @@ import java.util.Timer;
 import java.util.TreeMap;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.slf4j.event.Level;
@@ -64,6 +65,7 @@ public class HostsList extends StarterNode {
     private Set<Class<? extends DiscoverAgent>> daList = new HashSet<Class<? extends DiscoverAgent>>();
 
     @Getter @Setter @Accessors(chain=true)
+    private Function<ClassLoader, ProbeClassResolver> probeClassResolverSource = ProbeClassResolver::new;
     private ProbeClassResolver probeClassResolver;
 
     /**
@@ -99,7 +101,7 @@ public class HostsList extends StarterNode {
     }
 
     public void configure(PropertiesManager pm) {
-        probeClassResolver = new ProbeClassResolver(pm.extensionClassLoader);
+        probeClassResolver = probeClassResolverSource.apply(pm.extensionClassLoader);
 
         if(pm.rrddir == null) {
             log(Level.ERROR, "Probes directory not configured, can't configure");
