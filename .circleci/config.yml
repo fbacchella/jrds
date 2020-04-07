@@ -6,7 +6,7 @@ jobs:
         steps:
             - checkout
             - restore_cache:
-                key: jrds-{{ checksum "pom.xml" }}-{{ checksum "jrds-core/pom.xml" }}-{{ checksum "jrds-ipmi/pom.xml" }}-{{ checksum "jrds-jsonp/pom.xml" }}-{{ checksum "jrds-log4j/pom.xml" }}-{{ checksum "jrds-snmp/pom.xml" }}-{{ checksum "jrds-standalone/pom.xml" }}-{{ checksum "jrds-webapp/pom.xml" }}
+                key: jrds-{{ checksum "pom.xml" }}-{{ checksum "jrds-core/pom.xml" }}-{{ checksum "jrds-ipmi/pom.xml" }}-{{ checksum "jrds-jsonp/pom.xml" }}-{{ checksum "jrds-log4j/pom.xml" }}-{{ checksum "jrds-snmp/pom.xml" }}-{{ checksum "jrds-standalone/pom.xml" }}-{{ checksum "jrds-webapp/pom.xml" }}-{{ checksum "jrds-jdbc/pom.xml" }}
             - run:
                 command: |
                     sudo apt-get update
