@@ -223,6 +223,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * The sample itself can be modified<br>
+     * The default modification can be used to join 64bits values splited as a high and low 32 bits parts. It can be overridden.
      * 
      * @param sample
      * @param values
