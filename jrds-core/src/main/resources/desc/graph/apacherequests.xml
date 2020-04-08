@@ -4,7 +4,7 @@
 <graphdesc>
   <name>ApacheRequests</name>
   <graphName>apachereq_${index}</graphName>
-  <graphTitle>Requests on port ${index}</graphTitle>
+  <graphTitle>Requests on port ${index} on ${host}</graphTitle>
   <unit>
     <base/>
   </unit>
