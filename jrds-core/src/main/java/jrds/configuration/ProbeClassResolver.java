@@ -1,9 +1,11 @@
 package jrds.configuration;
 
 import jrds.Probe;
+import lombok.Getter;
 
 public class ProbeClassResolver {
 
+    @Getter
     protected final ClassLoader classLoader;
 
     public ProbeClassResolver(ClassLoader classLoader) {

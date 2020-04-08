@@ -1,6 +1,5 @@
 package jrds;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -22,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -47,7 +45,7 @@ import lombok.Builder;
  * 
  * @author Fabrice Bacchella
  */
-public class PropertiesManager extends Properties implements Closeable {
+public class PropertiesManager extends Properties {
     private final Logger logger = LoggerFactory.getLogger(PropertiesManager.class);
 
     @Builder
@@ -272,7 +270,6 @@ public class PropertiesManager extends Properties implements Closeable {
                 if(storefactoryclassname != null && !storefactoryclassname.isEmpty()) {
                     StoreFactory sf = (StoreFactory) extensionClassLoader.loadClass(storefactoryclassname).getConstructor().newInstance();
                     sf.configureStore(this, storesInfo);
-                    sf.start();
                     stores.put(storeName, sf);
                 } else {
                     logger.error("store factory {} invalid, no factory given", storeName);
@@ -285,7 +282,6 @@ public class PropertiesManager extends Properties implements Closeable {
         logger.debug("default store: {}", defaultStorename);
 
         defaultStore = stores.remove(defaultStorename);
-
     }
 
     @SuppressWarnings("unchecked")
@@ -411,19 +407,19 @@ public class PropertiesManager extends Properties implements Closeable {
         numCollectors = parseInteger(getProperty("collectorThreads", "1"));
         slowcollecttime = parseInteger(getProperty("slowcollecttime", Integer.toString(timeout + 1)));
         String propertiesList = getProperty("timers", "");
-        if(timeout * 2 >= step) {
+        if (timeout * 2 >= step) {
             logger.warn("useless default timer, step must be more than twice the timeout");
         }
-        if(!propertiesList.trim().isEmpty()) {
-            for(String timerName: propertiesList.split(",")) {
+        if (!propertiesList.trim().isEmpty()) {
+            for (String timerName: propertiesList.split(",")) {
                 timerName = timerName.trim();
                 TimerInfo ti = TimerInfo.builder()
-                .step(parseInteger(getProperty("timer." + timerName + ".step", Integer.toString(step))))
-                .timeout(parseInteger(getProperty("timer." + timerName + ".timeout", Integer.toString(timeout))))
-                .numCollectors(parseInteger(getProperty("timer." + timerName + ".collectorThreads", Integer.toString(numCollectors))))
-                .slowCollectTime(parseInteger(getProperty("timer." + timerName + ".slowcollecttime", Integer.toString(slowcollecttime))))
-                .build();
-                 if(ti.timeout * 2 >= ti.step) {
+                                .step(parseInteger(getProperty("timer." + timerName + ".step", Integer.toString(step))))
+                                .timeout(parseInteger(getProperty("timer." + timerName + ".timeout", Integer.toString(timeout))))
+                                .numCollectors(parseInteger(getProperty("timer." + timerName + ".collectorThreads", Integer.toString(numCollectors))))
+                                .slowCollectTime(parseInteger(getProperty("timer." + timerName + ".slowcollecttime", Integer.toString(slowcollecttime))))
+                                .build();
+                if (ti.timeout * 2 >= ti.step) {
                     logger.warn("useless timer " + timerName + ", step must be more than the timeout");
                     break;
                 }
@@ -494,15 +490,6 @@ public class PropertiesManager extends Properties implements Closeable {
                 extendedConfiguration.put(i.getClass(), subconf);
             }
         });
-    }
-
-    @Override
-    public void close() throws IOException {
-        stores.values().forEach(StoreFactory::stop);
-        Optional.ofNullable(defaultStore).ifPresent(StoreFactory::stop);
-        if (extensionClassLoader instanceof URLClassLoader && ! extensionClassLoader.equals(getClass().getClassLoader())) {
-            ((URLClassLoader)extensionClassLoader).close();
-        }
     }
 
     public File configdir;

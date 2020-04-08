@@ -1,6 +1,5 @@
 package jrds;
 
-import java.io.IOException;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -52,16 +51,12 @@ public class Configuration {
 
     private void start() {
         // If in read-only mode, no scheduler
-        if(propertiesManager.readonly)
+        if (propertiesManager.readonly) {
             return;
+        }
         // Add a shutdown hook, the shutdown signal might be send before the
         // listener is stopped
-        shutDownHook = new Thread("Collect-Shutdown") {
-            @Override
-            public void run() {
-                hostsList.stopCollect();
-            }
-        };
+        shutDownHook = new Thread(hostsList::stopCollect, "Collect-Shutdown");
         Runtime.getRuntime().addShutdownHook(shutDownHook);
         hostsList.startTimers();
     }
@@ -72,11 +67,6 @@ public class Configuration {
             Optional.ofNullable(shutDownHook).ifPresent(s -> Runtime.getRuntime().removeShutdownHook(s));
         } catch (Exception ex) {
             // We don't care if it failed, just tried
-        }
-        try {
-            propertiesManager.close();
-        } catch (IOException e) {
-            logger.error("Failed to close old classloader: %s", e.getMessage());
         }
     }
 

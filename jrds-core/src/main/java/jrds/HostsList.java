@@ -1,6 +1,8 @@
 
 package jrds;
 
+import java.io.IOException;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +33,7 @@ import jrds.starter.HostStarter;
 import jrds.starter.Listener;
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;
+import jrds.store.StoreFactory;
 import jrds.webapp.ACL;
 import jrds.webapp.DiscoverAgent;
 import jrds.webapp.RolesACL;
@@ -63,7 +66,7 @@ public class HostsList extends StarterNode {
     private Set<String> roles = new HashSet<String>();
     private Set<String> defaultRoles = Collections.emptySet();
     private Set<Class<? extends DiscoverAgent>> daList = new HashSet<Class<? extends DiscoverAgent>>();
-
+    private Set<StoreFactory> stores = Collections.emptySet();
     @Getter @Setter @Accessors(chain=true)
     private Function<ClassLoader, ProbeClassResolver> probeClassResolverSource = ProbeClassResolver::new;
     private ProbeClassResolver probeClassResolver;
@@ -114,6 +117,12 @@ public class HostsList extends StarterNode {
         }
 
         pm.configureStores();
+        stores = new HashSet<>(pm.stores.size() + 1);
+        stores.addAll(pm.stores.values());
+        stores.add(pm.defaultStore);
+        stores.forEach(StoreFactory::start);
+        stores = Collections.unmodifiableSet(stores);
+
         setTimeout(pm.timeout);
         setStep(pm.step);
 
@@ -599,6 +608,15 @@ public class HostsList extends StarterNode {
             // The interrupt was already handled
         }
         Optional.ofNullable(renderer).ifPresent(Renderer::finish);
+        stores.forEach(StoreFactory::stop);
+        ClassLoader probeClassLoader = probeClassResolver.getClassLoader();
+        try {
+            if (probeClassLoader instanceof URLClassLoader && ! probeClassLoader.equals(getClass().getClassLoader())) {
+                ((URLClassLoader)probeClassLoader).close();
+            }
+        } catch (IOException ex) {
+            log(Level.ERROR, ex, "Failed to stop probes class loader: {}", Util.resolveThrowableException(ex));
+        }
     }
 
 }
