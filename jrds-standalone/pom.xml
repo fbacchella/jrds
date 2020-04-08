@@ -45,6 +45,12 @@
         </dependency>
         <dependency>
             <groupId>fr.jrds</groupId>
+            <artifactId>jrds-core</artifactId>
+            <classifier>webapp</classifier>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.jrds</groupId>
             <artifactId>jrds-log4j</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -60,7 +66,22 @@
         </dependency>
         <dependency>
             <groupId>fr.jrds</groupId>
+            <artifactId>jrds-jdbc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.jrds</groupId>
             <artifactId>jrds-jsonp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.jrds</groupId>
+            <artifactId>jrds-pcp</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.jrds</groupId>
+            <artifactId>jrds-munin</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -220,6 +241,6 @@
     <parent>
         <groupId>fr.jrds</groupId>
         <artifactId>jrds</artifactId>
-        <version>1.0-RC1</version>
+        <version>2020.1</version>
     </parent>
 </project>

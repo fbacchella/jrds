@@ -54,7 +54,7 @@ public class Ntp extends Probe<String, Number> {
             retValues.put("Delay", ti.getDelay());
             return retValues;
         } catch (IOException e) {
-            log(Level.ERROR, e, "NTP IO exception %s", e.getMessage());
+            log(Level.ERROR, e, "NTP IO exception %s", e);
         }
         return null;
     }

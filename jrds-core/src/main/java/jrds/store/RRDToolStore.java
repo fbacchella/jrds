@@ -66,7 +66,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
         try (RRDatabase db = new RRDatabase(rrdpath)) {
             return db.getLastUpdate();
         } catch (IOException e) {
-            log(Level.ERROR, e, "invalid rrd file %s: %s", rrdpath, e.getMessage());
+            log(Level.ERROR, e, "invalid rrd file %s: %s", rrdpath, e);
             return new Date(0);
         }
     }
@@ -85,7 +85,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
             }
             return values;
         } catch (IOException e) {
-            log(Level.ERROR, e, "invalid rrd file %s: %s", rrdpath, e.getMessage());
+            log(Level.ERROR, e, "invalid rrd file %s: %s", rrdpath, e);
             return Collections.emptyMap();
         }
     }
@@ -158,7 +158,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
         try {
             return new RRDatabase(rrdpath);
         } catch (IOException e) {
-            log(Level.ERROR, e, "invalid rrd file %s: %s", rrdpath, e.getMessage());
+            log(Level.ERROR, e, "invalid rrd file %s: %s", rrdpath, e);
             return null;
         }
     }
@@ -168,7 +168,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
         try {
             ((RRDatabase) object).close();
         } catch (IOException e) {
-            log(Level.ERROR, e, "invalid rrd file %s: %s", rrdpath, e.getMessage());
+            log(Level.ERROR, e, "invalid rrd file %s: %s", rrdpath, e);
         }
     }
 

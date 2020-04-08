@@ -38,19 +38,18 @@ public class Log4JRule implements TestRule {
 
     public synchronized static void configure() {
         if (! configured) {
+            LogManager.getRootLogger().removeAllAppenders();
             jrdsAppender = new ConsoleAppender(new org.apache.log4j.PatternLayout(DEFAULTLAYOUT),
                                                ConsoleAppender.SYSTEM_OUT);
             jrdsAppender.setName(APPENDERNAME);
-            LogManager.getRootLogger().setLevel(Level.WARN);
+
             LogManager.getRootLogger().addAppender(jrdsAppender);
             if (System.getProperty("jrds.hidelogs") != null) {
                 jrdsAppender.addFilter(new DenyAllFilter());
             }
             LogManager.getLoggerRepository().addHierarchyEventListener(new HierarchyEventListener() {
-
                 @Override
                 public synchronized void addAppenderEvent(Category cat, Appender appender) {
-                    System.out.format("addAppenderEvent %s %s\n", cat, appender);
                     appenders.computeIfAbsent(appender, k -> new HashSet<>()).add(cat);
                 }
 

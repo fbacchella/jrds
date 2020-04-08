@@ -1,12 +1,10 @@
 package jrds;
 
+import java.util.Optional;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jrds.starter.Timer;
-import jrds.store.StoreFactory;
 
 public class Configuration {
     static private final Logger logger = LoggerFactory.getLogger(Configuration.class);
@@ -53,50 +51,23 @@ public class Configuration {
 
     private void start() {
         // If in read-only mode, no scheduler
-        if(propertiesManager.readonly)
+        if (propertiesManager.readonly) {
             return;
+        }
         // Add a shutdown hook, the shutdown signal might be send before the
         // listener is stopped
-        shutDownHook = new Thread("Collect-Shutdown") {
-            @Override
-            public void run() {
-                hostsList.stop();
-                if(hostsList.getRenderer() != null)
-                    hostsList.getRenderer().finish();
-            }
-        };
+        shutDownHook = new Thread(hostsList::stopCollect, "Collect-Shutdown");
         Runtime.getRuntime().addShutdownHook(shutDownHook);
         hostsList.startTimers();
     }
 
     private void stop() {
-        hostsList.stop();
-        Thread.yield();
-        // We don't care if it failed, just try
+        hostsList.stopCollect();
         try {
-            if(shutDownHook != null)
-                Runtime.getRuntime().removeShutdownHook(shutDownHook);
-        } catch (Exception e1) {
+            Optional.ofNullable(shutDownHook).ifPresent(s -> Runtime.getRuntime().removeShutdownHook(s));
+        } catch (Exception ex) {
+            // We don't care if it failed, just tried
         }
-        // Everything is stopped, wait for collect termination
-        try {
-            for(Timer t: hostsList.getTimers()) {
-                t.lockCollect();
-            }
-            for(Timer t: hostsList.getTimers()) {
-                // Release it, it will not restart
-                t.releaseCollect();
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        for(StoreFactory sf: propertiesManager.stores.values()) {
-            sf.stop();
-        }
-        if(hostsList.getRenderer() != null) {
-            hostsList.getRenderer().finish();
-        }
-        propertiesManager.defaultStore.stop();
     }
 
     /**

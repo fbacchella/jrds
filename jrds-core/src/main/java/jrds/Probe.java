@@ -10,7 +10,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,8 +43,7 @@ import jrds.store.StoreFactory;
  * 
  * @author Fabrice Bacchella
  */
-@ProbeMeta(topStarter=jrds.starter.SocketFactory.class,
-           collectResolver=CollectResolver.StringResolver.class)
+@ProbeMeta(collectResolver=CollectResolver.StringResolver.class)
 public abstract class Probe<KeyType, ValueType> extends StarterNode implements Comparable<Probe<KeyType, ValueType>>  {
 
     protected class LocalJrdsSample extends HashMap<String, Number> implements JrdsSample {
@@ -167,6 +168,11 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         return graphList;
     }
 
+    @Override
+    public <C extends StarterNode> Stream<C> getChildsStream() {
+        return Stream.empty();
+    }
+
     public String getName() {
         return name;
     }
@@ -217,6 +223,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     /**
      * The sample itself can be modified<br>
+     * The default modification can be used to join 64bits values splited as a high and low 32 bits parts. It can be overridden.
      * 
      * @param sample
      * @param values
@@ -329,7 +336,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      */
     public void collect() {
         long start = System.currentTimeMillis();
-        boolean interrupted = true;
+        boolean failed = true;
         if(!finished) {
             log(Level.ERROR, "Using an unfinished probe");
             return;
@@ -351,11 +358,11 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                     // during the reading of samples
                     if(sample != null && sample.size() > 0 && isCollectRunning()) {
                         storeSample(sample);
-                        interrupted = false;
+                        failed = false;
                     }
                 }
             } catch (ArithmeticException ex) {
-                log(Level.WARN, ex, "Error while storing sample: %s", ex.getMessage());
+                log(Level.WARN, ex, "Error while storing sample: %s", ex);
             } catch (Exception e) {
                 Throwable rootCause = e;
                 Throwable upCause;
@@ -376,14 +383,16 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                 stopCollect();
             }
             long end = System.currentTimeMillis();
-            log(Level.DEBUG, "collect ran for %dms", (end - start));
-            Timer timer = (Timer) getParent().getParent();
-            if((end - start) > (timer.getSlowCollectTime() * 1000)) {
-                log(Level.WARN, "slow collect time %.0fs", 1.0 * (end - start) / 1000);
-            }
-            if(interrupted) {
+            if (failed) {
                 float elapsed = ((float) (end - start)) / 1000;
-                log(Level.DEBUG, "Interrupted after %.2fs", elapsed);
+                log(Level.DEBUG, "Failed after %.2fs", elapsed);
+            } else {
+                Timer timer = (Timer) getParent().getParent();
+                if((end - start) > (timer.getSlowCollectTime() * 1000)) {
+                    log(Level.WARN, "Slow collect time %.0fs", 1.0 * (end - start) / 1000);
+                } else {
+                    log(Level.DEBUG, "Collect ran for %dms", (end - start));
+                }
             }
             running = false;
         }
@@ -396,10 +405,9 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        String hn = "<empty>";
-        if(getHost() != null)
-            hn = getHost().getName();
-        return hn + "/" + getName();
+        String hn = Optional.ofNullable(getHost()).map(HostInfo::getName).orElse("<Orphan>");
+        String probeName = Optional.ofNullable(getName()).orElse(pd != null ? pd.getName() : "<EMPTY>");
+        return hn + "/" + probeName;
     }
 
     /**
@@ -673,13 +681,12 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     public DataProcessor extract(ExtractInfo ei) throws IOException {
-        Extractor ex = mainStore.getExtractor();
-        for(String dsName: pd.getDs()) {
-            ex.addSource(dsName, dsName);
+        try (Extractor ex = mainStore.getExtractor()) {
+            for(String dsName: pd.getDs()) {
+                ex.addSource(dsName, dsName);
+            }
+            return  ei.getDataProcessor(ex);
         }
-        DataProcessor dp = ei.getDataProcessor(ex);
-        ex.release();
-        return dp;
     }
 
 }

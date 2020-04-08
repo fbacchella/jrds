@@ -2,9 +2,5 @@
 <!DOCTYPE host PUBLIC "-//jrds//DTD Host//EN"
                            "urn:jrds:host">
 <host name="name" dnsName="dnsName">
-	<child >1<subnode /></child>
-	<child >2</child>
-	<properties>
-		<entry key="key">value</entry>
-	</properties>
+    <tag>testhost</tag> 
 </host>

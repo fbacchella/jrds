@@ -2,15 +2,17 @@ version: 2.1
 jobs:
     checkout:
         docker:
-            - image: circleci/openjdk:8-jdk
+            - image: circleci/openjdk:14-jdk-buster
         steps:
             - checkout
             - restore_cache:
-                key: jrds-{{ checksum "pom.xml" }}
-            - run: sudo apt install libsnmp-base
-            - run: mkdir -p /home/circleci/.m2/repository
-            - run: "mvn -B dependency:go-offline -DoutputFile=offline.log || true"
-            - run: "[ -x /home/circleci/jfrog ] || (cd && curl -fL https://getcli.jfrog.io | sh)"
+                key: jrds-{{ checksum "pom.xml" }}-{{ checksum "jrds-core/pom.xml" }}-{{ checksum "jrds-ipmi/pom.xml" }}-{{ checksum "jrds-jsonp/pom.xml" }}-{{ checksum "jrds-log4j/pom.xml" }}-{{ checksum "jrds-snmp/pom.xml" }}-{{ checksum "jrds-standalone/pom.xml" }}-{{ checksum "jrds-webapp/pom.xml" }}-{{ checksum "jrds-jdbc/pom.xml" }}
+            - run:
+                command: |
+                    sudo apt-get update
+                    sudo apt install libsnmp-base
+                    mkdir -p /home/circleci/.sonar/cache /home/circleci/.m2/repository
+                    mvn -B dependency:go-offline -Psonar,versions -s .circleci/settings.xml -DexcludeGroupIds=fr.jrds
             - persist_to_workspace:
                 root: /
                 paths:
@@ -18,9 +20,17 @@ jobs:
                     - home/circleci/jfrog
                     - home/circleci/project
                     - usr/share/snmp/mibs/
+    jdk8:
+        docker:
+            - image: circleci/openjdk:8-buster
+        steps:
+            - persist_to_workspace:
+                root: /usr/local
+                paths:
+                    - openjdk-8
     build:
         docker:
-            - image: circleci/openjdk:11-jdk
+            - image: circleci/openjdk:14-jdk-buster
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -30,17 +40,18 @@ jobs:
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
             - run:
-                command: mvn -B clean compile install -DskipTests -Djdk.compile.home=/usr/lib/jvm/java-8-openjdk-amd64
+                command: mvn -B clean compile install -DskipTests -s .circleci/settings.xml
                 environment:
-                    JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
+                    JAVA_HOME: /usr/java/openjdk-14
+                    MAVEN_OPTS: "-Xmx2048m"
             - persist_to_workspace:
                 root: /
                 paths:
                     - home/circleci/.m2/repository
                     - home/circleci/project
-    testsj8:
+    testsj13:
         docker:
-            - image: circleci/openjdk:8-jdk
+            - image: circleci/openjdk:13-jdk-buster
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -53,51 +64,83 @@ jobs:
                     sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
             - run:
                 command: |
-                    #see https://stackoverflow.com/questions/53010200/maven-surefire-could-not-find-forkedbooter-class for disableClassPathURLCheck
-                    mvn -B test -Dmaven.resources.skip=true -Dmaven.main.skip=true -DargLine="-Xmx2048m -Djdk.net.URLClassPath.disableClassPathURLCheck=true"
+                    mvn -B test -Pskip -DargLine="-Xmx2048m" -s .circleci/settings.xml
                 environment:
-                    JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+                    JAVA_HOME: /usr/java/openjdk-13
+                    MAVEN_OPTS: "-Xmx1024m"
             - store_test_results:
                 path: target/surefire-reports
             #don't persist_to_workspace, can't be done in parallel with testsj11
-    publish:
+    testsj11:
         docker:
-            - image: circleci/openjdk:11-jdk
+            - image: circleci/openjdk:11-buster
         steps:
             - attach_workspace:
                 at: /tmp/ws
             - run:
                 command: |
                     mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
-                    mv -n /tmp/ws/home/circleci/jfrog /home/circleci/jfrog
+                    mv -n /tmp/ws/home/circleci/.sonar /home/circleci/
+                    mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
+                    mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
+                    sudo mkdir -p /usr/share/snmp/mibs/
+                    sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
+            - run:
+                command: |
+                    mvn -B test -Pskip -DargLine="-Xmx2048m" -s .circleci/settings.xml
+                environment:
+                    JAVA_HOME: /usr/local/openjdk-11
+                    MAVEN_OPTS: "-Xmx512m"
+            - store_test_results:
+                path: target/surefire-reports
+    testsj8:
+        docker:
+            - image: circleci/openjdk:8-buster
+        steps:
+            - attach_workspace:
+                at: /tmp/ws
+            - run:
+                command: |
+                    mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
+                    mv -n /tmp/ws/home/circleci/.sonar /home/circleci/
+                    mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
+                    mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
+                    sudo mkdir -p /usr/share/snmp/mibs/
+                    sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
+            - run:
+                command: |
+                    mvn -B test -Pskip -DargLine="-Xmx2048m" -s .circleci/settings.xml
+                environment:
+                    JAVA_HOME: /usr/local/openjdk-8
+                    MAVEN_OPTS: "-Xmx512m"
+            - store_test_results:
+                path: target/surefire-reports
+    publish:
+        docker:
+            - image: circleci/openjdk:14-jdk-buster
+        steps:
+            - attach_workspace:
+                at: /tmp/ws
+            - run:
+                command: |
+                    mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
+                    mv -n /tmp/ws/home/circleci/.sonar /home/circleci/
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
             - run:
                 command: |
-                     mvn -B deploy site -Dmaven.resources.skip=true -Dmaven.test.skip=true -Dmaven.main.skip=true -DaltDeploymentRepository=local::default::file:target/deploy
+                    mvn -B deploy -Pskip -Dmaven.test.skip=true -s .circleci/settings.xml
                 environment:
-                    JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
-            - run:
-                command: |
-                    VERSION=$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)
-                    GROUPPATH=$(mvn -B help:evaluate -Dexpression=project.groupId -q -DforceStdout | sed 's#\.#/#g')
-                    for a in target/deploy/$GROUPPATH/* ; do \
-                        ( \
-                            echo "$a"
-                            cd "$a" && \
-                            echo "$BINTRAY_REPO/$ARTEFACT/$VERSION $GROUPPATH/$ARTEFACT/$VERSION/" && \
-                            /home/circleci/jfrog bt u --user $BINTRAY_USER --key $BINTRAY_KEY '*' "$BINTRAY_REPO/$a/$VERSION" "$GROUPPATH/$a/$VERSION/" \
-                        ) \
-                    done
-                environment:
-                    JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
+                    JAVA_HOME: /usr/java/openjdk-14
+                    MAVEN_OPTS: "-Xmx2048m"
             - persist_to_workspace:
                 root: /
                 paths:
                     - home/circleci/.m2/repository
+                    - home/circleci/.sonar/cache
     savecache:
         docker:
-            - image: circleci/openjdk:11-jdk
+            - image: circleci/openjdk:14-jdk-buster
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -108,21 +151,31 @@ jobs:
             - save_cache:
                 paths:
                     - /home/circleci/.m2/repository
-                key: jrds-{{ checksum "pom.xml" }}
-            
+                    - /home/circleci/.sonar/cache
+                key: jrds-{{ checksum "pom.xml" }}-{{ checksum "jrds-core/pom.xml" }}-{{ checksum "jrds-ipmi/pom.xml" }}-{{ checksum "jrds-jsonp/pom.xml" }}-{{ checksum "jrds-log4j/pom.xml" }}-{{ checksum "jrds-snmp/pom.xml" }}-{{ checksum "jrds-standalone/pom.xml" }}-{{ checksum "jrds-webapp/pom.xml" }}
 workflows:
   version: 2.1
   build_and_test:
     jobs:
       - checkout
+      - jdk8
       - build:
           requires:
               - checkout
+              - jdk8
+      - testsj13:
+          requires:
+              - build
+      - testsj11:
+          requires:
+              - build
       - testsj8:
           requires:
               - build
       - publish:
           requires:
+              - testsj13
+              - testsj11
               - testsj8
       - savecache:
           requires:

@@ -4,11 +4,11 @@ import java.lang.reflect.InvocationTargetException;
 
 import javax.management.ObjectName;
 
-public abstract class JmxAbstractDataSource<JmxConnection> {
+public abstract class JmxAbstractDataSource<CNX> {
 
-    public final JmxConnection connection;
+    public final CNX connection;
 
-    JmxAbstractDataSource(JmxConnection connection) {
+    JmxAbstractDataSource(CNX connection) {
         this.connection = connection;
     }
 

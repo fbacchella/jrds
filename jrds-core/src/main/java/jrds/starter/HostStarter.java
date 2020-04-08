@@ -3,6 +3,7 @@ package jrds.starter;
 import java.io.File;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import org.slf4j.event.Level;
 
@@ -34,27 +35,26 @@ public class HostStarter extends StarterNode {
     public void collectAll() {
         log(Level.DEBUG, "Starting collect");
         Timer timer = (Timer) getParent();
-        long start = System.currentTimeMillis();
         startCollect();
         String oldThreadName = Thread.currentThread().getName();
+        long start = System.currentTimeMillis();
         for(Probe<?, ?> probe: allProbes) {
             if(!isCollectRunning())
                 break;
-            long duration = (System.currentTimeMillis() - start) / 1000;
-            if(duration > (probe.getStep() / 2)) {
-                log(Level.ERROR, "Collect too slow: %ds for timer %s", duration, timer);
-                break;
-            }
-            log(Level.TRACE, "Starting collect for %s", probe);
-            log(Level.DEBUG, "Collect all stats for host " + host.getName());
+            log(Level.TRACE, "Starting collect of probe %s", probe);
             setRunningname(oldThreadName + "/" + probe.getName());
             probe.collect();
+            long duration = Math.floorDiv(System.currentTimeMillis() - start, 1000L);
+            if (duration > (probe.getStep() / 2)) {
+                log(Level.ERROR, "Collect too slow: %ds for time %s", duration, timer.getName());
+                break;
+            }
             setRunningname(oldThreadName + ":finished");
         }
         stopCollect();
         long end = System.currentTimeMillis();
         float elapsed = (end - start) / 1000f;
-        log(Level.DEBUG, "Collect time for %s: %fs", host.getName(), elapsed);
+        log(Level.DEBUG, "Collect time: %fs", elapsed);
     }
 
     public String toString() {
@@ -131,6 +131,12 @@ public class HostStarter extends StarterNode {
     public void setRunningname(String runningname) {
         Thread.currentThread().setName(runningname);
         this.runningname = runningname;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Stream<Probe<?, ?>> getChildsStream() {
+        return allProbes.stream();
     }
 
 }

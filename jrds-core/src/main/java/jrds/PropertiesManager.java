@@ -38,6 +38,7 @@ import jrds.store.RrdDbStoreFactory;
 import jrds.store.StoreFactory;
 import jrds.webapp.ACL;
 import jrds.webapp.RolesACL;
+import lombok.Builder;
 
 /**
  * An less ugly class supposed to manage properties should be reworked
@@ -47,18 +48,27 @@ import jrds.webapp.RolesACL;
 public class PropertiesManager extends Properties {
     private final Logger logger = LoggerFactory.getLogger(PropertiesManager.class);
 
+    @Builder
     public static final class TimerInfo {
-        public int step;
-        public int timeout;
-        public int numCollectors;
-        public int slowCollectTime;
+        public final int step;
+        public final int timeout;
+        public final int numCollectors;
+        public final int slowCollectTime;
     }
 
-    private final FileFilter filter = new FileFilter() {
-        public boolean accept(File file) {
-            return (!file.isHidden()) && (file.isFile() && file.getName().endsWith(".jar"));
+    private static final class JrdsClassLoader extends URLClassLoader {
+        public JrdsClassLoader(URL[] arrayUrl, ClassLoader classLoader) {
+            super(arrayUrl, classLoader);
         }
-    };
+
+        @Override
+        public String toString() {
+            return "JRDS' class loader";
+        }
+    }
+
+
+    private static final FileFilter jarfilter = file -> (!file.isHidden()) && (file.isFile() && file.getName().endsWith(".jar"));
 
     public PropertiesManager() {
     }
@@ -150,11 +160,6 @@ public class PropertiesManager extends Properties {
     }
 
     private ClassLoader doClassLoader(String extendedclasspath) {
-        FileFilter filter = new FileFilter() {
-            public boolean accept(File file) {
-                return (!file.isHidden()) && file.isFile() && file.getName().endsWith(".jar");
-            }
-        };
 
         Collection<URI> urls = new ArrayList<URI>();
 
@@ -165,10 +170,10 @@ public class PropertiesManager extends Properties {
                 File path = new File(pathElement);
 
                 if(path.isDirectory()) {
-                    for(File f: path.listFiles(filter)) {
+                    for(File f: path.listFiles(jarfilter)) {
                         urls.add(f.toURI());
                     }
-                } else if(filter.accept(path)) {
+                } else if(jarfilter.accept(path)) {
                     urls.add(path.toURI());
                 }
             }
@@ -189,12 +194,8 @@ public class PropertiesManager extends Properties {
         }
         if(logger.isDebugEnabled())
             logger.debug("Internal class loader will look in:" + urls);
-        return new URLClassLoader(arrayUrl, getClass().getClassLoader()) {
-            @Override
-            public String toString() {
-                return "JRDS' class loader";
-            }
-        };
+
+        return new JrdsClassLoader(arrayUrl, getClass().getClassLoader());
     }
 
     private File prepareDir(File dir, boolean autocreate, boolean readOnly) throws IOException {
@@ -269,7 +270,6 @@ public class PropertiesManager extends Properties {
                 if(storefactoryclassname != null && !storefactoryclassname.isEmpty()) {
                     StoreFactory sf = (StoreFactory) extensionClassLoader.loadClass(storefactoryclassname).getConstructor().newInstance();
                     sf.configureStore(this, storesInfo);
-                    sf.start();
                     stores.put(storeName, sf);
                 } else {
                     logger.error("store factory {} invalid, no factory given", storeName);
@@ -282,7 +282,6 @@ public class PropertiesManager extends Properties {
         logger.debug("default store: {}", defaultStorename);
 
         defaultStore = stores.remove(defaultStorename);
-
     }
 
     @SuppressWarnings("unchecked")
@@ -329,7 +328,7 @@ public class PropertiesManager extends Properties {
 
                 boolean noJarDir = true;
                 if(lib.isDirectory()) {
-                    File[] foundFiles = lib.listFiles(filter);
+                    File[] foundFiles = lib.listFiles(jarfilter);
                     if(foundFiles == null) {
                         logger.error("Failed to search in " + lib);
                         continue;
@@ -408,19 +407,20 @@ public class PropertiesManager extends Properties {
         numCollectors = parseInteger(getProperty("collectorThreads", "1"));
         slowcollecttime = parseInteger(getProperty("slowcollecttime", Integer.toString(timeout + 1)));
         String propertiesList = getProperty("timers", "");
-        if(timeout * 2 >= step) {
+        if (timeout * 2 >= step) {
             logger.warn("useless default timer, step must be more than twice the timeout");
         }
-        if(!propertiesList.trim().isEmpty()) {
-            for(String timerName: propertiesList.split(",")) {
+        if (!propertiesList.trim().isEmpty()) {
+            for (String timerName: propertiesList.split(",")) {
                 timerName = timerName.trim();
-                TimerInfo ti = new TimerInfo();
-                ti.step = parseInteger(getProperty("timer." + timerName + ".step", Integer.toString(step)));
-                ti.timeout = parseInteger(getProperty("timer." + timerName + ".timeout", Integer.toString(timeout)));
-                ti.numCollectors = parseInteger(getProperty("timer." + timerName + ".collectorThreads", Integer.toString(numCollectors)));
-                ti.slowCollectTime = parseInteger(getProperty("timer." + timerName + ".slowcollecttime", Integer.toString(ti.timeout + 1)));
-                if(ti.timeout * 2 >= ti.step) {
-                    logger.warn("useless timer " + timerName + ", step must be more than twice the timeout");
+                TimerInfo ti = TimerInfo.builder()
+                                .step(parseInteger(getProperty("timer." + timerName + ".step", Integer.toString(step))))
+                                .timeout(parseInteger(getProperty("timer." + timerName + ".timeout", Integer.toString(timeout))))
+                                .numCollectors(parseInteger(getProperty("timer." + timerName + ".collectorThreads", Integer.toString(numCollectors))))
+                                .slowCollectTime(parseInteger(getProperty("timer." + timerName + ".slowcollecttime", Integer.toString(slowcollecttime))))
+                                .build();
+                if (ti.timeout * 2 >= ti.step) {
+                    logger.warn("useless timer " + timerName + ", step must be more than the timeout");
                     break;
                 }
 
@@ -428,11 +428,12 @@ public class PropertiesManager extends Properties {
             }
         }
         // Add the default timer
-        TimerInfo ti = new TimerInfo();
-        ti.step = step;
-        ti.timeout = timeout;
-        ti.numCollectors = numCollectors;
-        ti.slowCollectTime = slowcollecttime;
+        TimerInfo ti = TimerInfo.builder()
+                        .step(step)
+                        .timeout(timeout)
+                        .numCollectors(numCollectors)
+                        .slowCollectTime(slowcollecttime)
+                        .build();
         timers.put(Timer.DEFAULTNAME, ti);
 
         //
@@ -528,4 +529,5 @@ public class PropertiesManager extends Properties {
     public Map<Class <? extends ModuleConfigurator>, Object> extendedConfiguration = new HashMap<>();
 
     public List<String> tabsList = Arrays.asList(FILTERTAB, CUSTOMGRAPHTAB, "@", SUMSTAB, SERVICESTAB, VIEWSTAB, HOSTSTAB, TAGSTAB, ADMINTAB);
+
 }

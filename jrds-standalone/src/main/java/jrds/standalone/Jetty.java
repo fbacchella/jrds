@@ -39,9 +39,6 @@ public class Jetty extends CommandStarterImpl {
     String propFileName = "jrds.properties";
     String webRoot = ".";
 
-    public Jetty() {
-    }
-
     public void configure(Properties configuration) {
         logger.debug("Configuration: " + configuration);
 
@@ -71,82 +68,72 @@ public class Jetty extends CommandStarterImpl {
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
 
-        final Server server = new Server();
-        ServerConnector connector = new ServerConnector(server);
-        if(host != null) {
-            connector.setHost(host);
-        }
-        connector.setPort(port);
-
-        // Let's try to start the connector before the application
-        try {
-            connector.open();
-        } catch (IOException e) {
-            connector.close();
-            throw new RuntimeException("Jetty server failed to start", e);
-        }
-        server.setConnectors(new Connector[] { connector });
-
-        WebAppContext webapp = new WebAppContext();
-        webapp.setContextPath("/");
-        webapp.setResourceBase(webRoot);
-        webapp.setClassLoader(getClass().getClassLoader());
-        webapp.setInitParameter("propertiesFile", propFileName);
-
-        ResourceHandler staticFiles = new ResourceHandler();
-        staticFiles.setWelcomeFiles(new String[] { "index.html" });
-        staticFiles.setResourceBase(webRoot);
-
-        if(pm.security) {
-            LoginService loginService = new HashLoginService("jrds", pm.userfile);
-            server.addBean(loginService);
-
-            Authenticator auth = new BasicAuthenticator();
-            Constraint constraint = new Constraint();
-            constraint.setName("jrds");
-            constraint.setRoles(new String[] { Constraint.ANY_ROLE });
-            constraint.setAuthenticate(true);
-            constraint.setDataConstraint(Constraint.DC_NONE);
-
-            ConstraintMapping cm = new ConstraintMapping();
-            cm.setConstraint(constraint);
-            cm.setPathSpec("/*");
-
-            ConstraintSecurityHandler sh = new ConstraintSecurityHandler();
-            sh.setConstraintMappings(Collections.singletonList(cm));
-            sh.setAuthenticator(auth);
-            webapp.setSecurityHandler(sh);
-        }
-
-        HandlerCollection handlers = new HandlerList();
-        handlers.setHandlers(new Handler[] { staticFiles, webapp });
-        server.setHandler(handlers);
-
-        if(pm.withjmx || MBeanServerFactory.findMBeanServer(null).size() > 0) {
-            MBeanServer mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
-            server.addBean(new MBeanContainer(mbs));
-            handlers.addHandler(new StatisticsHandler());
-        }
-
-        // Properties are not needed any more
-        pm = null;
-
-        Thread finish = new Thread() {
-            public void run() {
-                try {
-                    server.stop();
-                } catch (Exception e) {
-                    throw new RuntimeException("Jetty server failed to stop", e);
-                }
+        Server server = new Server();
+        try (ServerConnector connector = new ServerConnector(server)) {
+            if(host != null) {
+                connector.setHost(host);
             }
-        };
-        Runtime.getRuntime().addShutdownHook(finish);
+            connector.setPort(port);
+            // Let's try to start the connector before the application
+            try {
+                connector.open();
+            } catch (IOException e) {
+                connector.close();
+                throw new RuntimeException("Jetty server failed to start", e);
+            }
+            server.setConnectors(new Connector[] { connector });
+            WebAppContext webapp = new WebAppContext();
+            webapp.setContextPath("/");
+            webapp.setResourceBase(webRoot);
+            webapp.setClassLoader(getClass().getClassLoader());
+            webapp.setInitParameter("propertiesFile", propFileName);
+            ResourceHandler staticFiles = new ResourceHandler();
+            staticFiles.setWelcomeFiles(new String[] { "index.html" });
+            staticFiles.setResourceBase(webRoot);
+            if (pm.security) {
+                LoginService loginService = new HashLoginService("jrds", pm.userfile);
+                server.addBean(loginService);
 
-        try {
-            server.start();
-            server.join();
-        } catch (Exception e) {
-            throw new RuntimeException("Jetty server failed to start", e);
+                Authenticator auth = new BasicAuthenticator();
+                Constraint constraint = new Constraint();
+                constraint.setName("jrds");
+                constraint.setRoles(new String[] { Constraint.ANY_ROLE });
+                constraint.setAuthenticate(true);
+                constraint.setDataConstraint(Constraint.DC_NONE);
+
+                ConstraintMapping cm = new ConstraintMapping();
+                cm.setConstraint(constraint);
+                cm.setPathSpec("/*");
+
+                ConstraintSecurityHandler sh = new ConstraintSecurityHandler();
+                sh.setConstraintMappings(Collections.singletonList(cm));
+                sh.setAuthenticator(auth);
+                webapp.setSecurityHandler(sh);
+            }
+            HandlerCollection handlers = new HandlerList();
+            handlers.setHandlers(new Handler[] { staticFiles, webapp });
+            server.setHandler(handlers);
+            if (pm.withjmx || MBeanServerFactory.findMBeanServer(null).size() > 0) {
+                MBeanServer mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
+                server.addBean(new MBeanContainer(mbs));
+                handlers.addHandler(new StatisticsHandler());
+            }
+            Thread finish = new Thread() {
+                public void run() {
+                    try {
+                        server.stop();
+                    } catch (Exception e) {
+                        throw new RuntimeException("Jetty server failed to stop", e);
+                    }
+                }
+            };
+            Runtime.getRuntime().addShutdownHook(finish);
+            try {
+                server.start();
+                server.join();
+            } catch (Exception e) {
+                throw new RuntimeException("Jetty server failed to start", e);
+            }
         }
     }
 

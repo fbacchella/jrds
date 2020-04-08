@@ -29,7 +29,7 @@ import jrds.probe.jmx.JmxDiscoverAgent;
  */
 @ProbeMeta(
         discoverAgent=JmxDiscoverAgent.class,
-        topStarter=JmxSocketFactory.class
+        timerStarter=JmxSocketFactory.class
         )
 public class JMX extends ProbeConnected<String, Double, JMXConnection> implements ConnectedProbe, SSLProbe {
     private Map<String, String> collectKeys = null;
@@ -75,7 +75,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
                         try {
                             throw e.getCause();
                         } catch (RemoteException e1) {
-                            log(Level.ERROR, e1, "JMX remote exception: %s", e1.getMessage());
+                            log(Level.ERROR, e1, "JMX remote exception: %s", e1);
                         } catch (AttributeNotFoundException e1) {
                             log(Level.ERROR, e1, "Invalid JMX attribute %s", attributeName);
                         } catch (InstanceNotFoundException e1) {
@@ -83,13 +83,13 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
                             if(isOptional(collect)) {
                                 l = Level.DEBUG;
                             }
-                            log(l, "JMX instance not found: %s", e1.getMessage());
+                            log(l, "JMX instance not found: %s", e1);
                         } catch (MBeanException e1) {
-                            log(Level.ERROR, e1, "JMX MBeanException: %s", e1.getMessage());
+                            log(Level.ERROR, e1, "JMX MBeanException: %s", e1);
                         } catch (ReflectionException e1) {
-                            log(Level.ERROR, e1, "JMX reflection error: %s", e1.getMessage());
+                            log(Level.ERROR, e1, "JMX reflection error: %s", e1);
                         } catch (IOException e1) {
-                            log(Level.ERROR, e1, "JMX IO error: %s", e1.getMessage());
+                            log(Level.ERROR, e1, "JMX IO error: %s", e1);
                         } catch (Throwable e1) {
                         }
                     }

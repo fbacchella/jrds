@@ -3,8 +3,6 @@ package jrds.probe.jmx;
 import java.io.IOException;
 import java.lang.management.RuntimeMXBean;
 import java.net.MalformedURLException;
-import java.net.Socket;
-import java.rmi.server.RMIClientSocketFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,15 +29,7 @@ import jrds.probe.JmxSocketFactory;
 import jrds.starter.SocketFactory;
 
 @ProbeBean({ "url", "protocol", "port", "path", "user", "password" })
-public class NativeJmxConnection extends AbstractJmxConnection {
-
-    public class RmiSocketFactory implements RMIClientSocketFactory {
-        public Socket createSocket(String host, int port) throws IOException {
-            log(Level.DEBUG, "creating a RMI socket to %s:%d", host, port);
-            return getLevel().find(SocketFactory.class).createSocket(host, port);
-        }
-    }
-
+public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnection, NativeJmxSource> {
 
     // close can be slow
     private final static AtomicInteger closed = new AtomicInteger();
@@ -67,7 +57,7 @@ public class NativeJmxConnection extends AbstractJmxConnection {
             try {
                 url = protocol.getURL(this);
             } catch (MalformedURLException e) {
-                throw new RuntimeException(String.format("Invalid jmx URL %s: %s", protocol.toString()), e);
+                throw new RuntimeException(String.format("Invalid jmx URL %s: %s", protocol.toString(), e.getMessage()), e);
             }
         }
         // connector is always set, so close in Stop() always works
@@ -132,7 +122,7 @@ public class NativeJmxConnection extends AbstractJmxConnection {
             attributes.put("jmx.remote.x.client.connected.state.timeout", getTimeout() * 1000);
             if(protocol == JmxProtocol.rmi) {
                 attributes.put("sun.rmi.transport.tcp.responseTimeout", getTimeout() * 1000);
-                attributes.put("com.sun.jndi.rmi.factory.socket", getLevel().find(JmxSocketFactory.class));
+                attributes.put("com.sun.jndi.rmi.factory.socket", getLevel().find(JmxSocketFactory.class).getFactory());
             } else if(protocol == JmxProtocol.jmxmp) {
                 Object sc = JrdsSocketConnection.create(url, getLevel().find(SocketFactory.class));
                 attributes.put(GenericConnector.MESSAGE_CONNECTION, sc);
@@ -160,12 +150,11 @@ public class NativeJmxConnection extends AbstractJmxConnection {
     public void stopConnection() {
         // close can be slow, do it in a separate thread
         // but don' try to create a new one each time
-        final JMXConnector current = connector;
         closer.submit(new Runnable() {
             @Override
             public void run() {
                 try {
-                    current.close();
+                    connector.close();
                 } catch (IOException e) {
                     log(Level.ERROR, e, "JMXConnector to %s close failed because of: %s", this, e);
                 }

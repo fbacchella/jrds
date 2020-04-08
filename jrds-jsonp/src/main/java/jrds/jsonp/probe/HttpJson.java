@@ -85,7 +85,7 @@ public class HttpJson extends HCHttpProbe<String> {
             } catch (PathNotFoundException ex) {
                 log(Level.ERROR, "Failed to collect data '%s': not found", e.getValue());
             } catch (JSONException ex) {
-                log(Level.ERROR, "Failed to collect data '%s': %s", e.getValue(), ex.getMessage());
+                log(Level.ERROR, "Failed to collect data '%s': %s", e.getValue(), ex);
             }
         }
         return vars;
@@ -129,7 +129,7 @@ public class HttpJson extends HCHttpProbe<String> {
             }
             return returned;
         } catch (JSONException | PathNotFoundException e) {
-            log(Level.ERROR, "Failed checking uptime: %s", e.getMessage());
+            log(Level.ERROR, "Failed checking uptime: %s", e);
             return 0;
         }
     }

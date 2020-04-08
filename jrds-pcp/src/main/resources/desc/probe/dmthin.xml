@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>PcpDmThin</name>
+    <probeName>dmthin-${index}</probeName>
+    <probeClass>jrds.pcp.probe.PcpProbeIndexed</probeClass>
+    <ds>
+        <dsName>size</dsName>
+        <dsType>gauge</dsType>
+        <collect>dmthin.pool.size</collect>
+    </ds>
+    <ds>
+        <dsName>metadata.used</dsName>
+        <dsType>gauge</dsType>
+        <collect>dmthin.pool.metadata.used</collect>
+    </ds>
+    <ds>
+        <dsName>metadata.total</dsName>
+        <dsType>gauge</dsType>
+        <collect>dmthin.pool.metadata.total</collect>
+    </ds>
+    <ds>
+        <dsName>data.used</dsName>
+        <dsType>gauge</dsType>
+        <collect>dmthin.pool.data.used</collect>
+    </ds>
+    <ds>
+        <dsName>data.total</dsName>
+        <dsType>gauge</dsType>
+        <collect>dmthin.pool.data.total</collect>
+    </ds>
+    <graphs>
+        <name>DmThinDataUse</name>
+        <name>DmThinMetadaUse</name>
+    </graphs>
+</probedesc>

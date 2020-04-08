@@ -120,9 +120,9 @@ public class JmxDiscoverAgent extends DiscoverAgent {
                     valid = false;
                 }
             } catch (MalformedObjectNameException e) {
-                log(Level.WARN, "invalid name for auto discovery of probe %s: %s", summary.name, e.getMessage());
+                log(Level.WARN, "invalid name for auto discovery of probe %s: %s", summary.name, e);
             } catch (IOException e) {
-                log(Level.WARN, "Connection failed for auto discovery of probe %s: %s", summary.name, e.getMessage());
+                log(Level.WARN, "Connection failed for auto discovery of probe %s: %s", summary.name, e);
             }
         }
         return valid && enumerated;
@@ -151,9 +151,9 @@ public class JmxDiscoverAgent extends DiscoverAgent {
                     }
                 }
             } catch (MalformedObjectNameException e) {
-                log(Level.WARN, "invalid name for auto discovery of probe %s: %s", summary.name, e.getMessage());
+                log(Level.WARN, "invalid name for auto discovery of probe %s: %s", summary.name, e);
             } catch (IOException e) {
-                log(Level.WARN, "Connection failed for auto discovery of probe %s: %s", summary.name, e.getMessage());
+                log(Level.WARN, "Connection failed for auto discovery of probe %s: %s", summary.name, e);
             }
         }
         return indexes;

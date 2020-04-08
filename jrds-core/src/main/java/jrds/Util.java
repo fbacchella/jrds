@@ -12,6 +12,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.nio.channels.ClosedChannelException;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -754,8 +757,48 @@ public class Util {
         }
     }
 
+    /**
+     * It tries to extract a meaningful message from any exception
+     * @param t
+     * @return
+     */
+    public static String resolveThrowableException(Throwable t) {
+        StringBuilder builder = new StringBuilder();
+        while(t.getCause() != null) {
+            String message = t.getMessage();
+            if (message == null) {
+                message = t.getClass().getSimpleName();
+            }
+            builder.append(message).append(": ");
+            t = t.getCause();
+        }
+        String message = t.getMessage();
+        // Helping resolve bad exception's message
+        if (t instanceof NoSuchMethodException) {
+            message = "No such method: " + t.getMessage();
+        } else if (t instanceof ArrayIndexOutOfBoundsException) {
+            message = "Array out of bounds: " + message;
+        } else if (t instanceof IllegalCharsetNameException) {
+            message = "Illegal charset name: " + t.getMessage();
+        } else if (t instanceof UnsupportedCharsetException) {
+            message = "Unsupported charset name: " + t.getMessage();
+        } else if (t instanceof ClosedChannelException) {
+            message = "Closed channel";
+        } else if (message == null) {
+            message = t.getClass().getSimpleName();
+        }
+        builder.append(message);
+        return builder.toString();
+    }
+
+
     static final public void log(Object source, Logger namedLogger, Level l, Throwable e, String format, Object... args) {
         LambdaString ls = new LambdaString(() -> {
+            for (int i = 0 ; i < args.length ; i++) {
+                if (args[i] instanceof Throwable) {
+                    args[i] = resolveThrowableException((Throwable)args[i]);
+                }
+            }
             StringBuilder line = new StringBuilder();
             if(source != null) {
                 line.append("[").append(source.toString()).append("] ");
@@ -784,8 +827,8 @@ public class Util {
             lg = (i) -> {};
         }
         lg.accept(ls);
-        // NPE should never happen, so it's always logged
-        if(e != null && (namedLogger.isDebugEnabled() || e instanceof NullPointerException)) {
+        // NPE or ArrayIndexOutOfBoundsException should never happen, so it's always logged
+        if(e != null && (namedLogger.isDebugEnabled() || e instanceof NullPointerException || e instanceof ArrayIndexOutOfBoundsException)) {
             StackTraceElement[] stack = e.getStackTrace();
             Writer w = new CharArrayWriter(stack.length*20);
             e.printStackTrace(new PrintWriter(w));

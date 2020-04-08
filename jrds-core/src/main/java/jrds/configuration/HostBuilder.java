@@ -186,10 +186,10 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             try {
                 makeProbe(probeNode, host, properties);
             } catch (InvocationTargetException e) {
-                logger.error("Probe creation failed for host " + host.getName() + ": " + e.getMessage());
+                logger.error("Probe creation failed for host " + host.getName() + ": " + Util.resolveThrowableException(e.getCause()));
                 if(logger.isDebugEnabled()) {
                     ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                    e.printStackTrace(new PrintStream(buffer));
+                    e.getCause().printStackTrace(new PrintStream(buffer));
                     logger.debug("{}", buffer);
                 }
             } catch (Exception e) {
@@ -266,6 +266,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         }
         p.setStep(timer.getStep());
         p.setTimeout(timer.getTimeout());
+        p.setSlowCollectTime(timer.getSlowCollectTime());
 
         // Identify the archive to use
         String archivesName;
@@ -329,6 +330,37 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             }
         }
 
+        // Resolve the nested connections
+        for (ConnectionInfo ci: makeConnexion(probeNode, p, properties)) {
+            ci.register(p);
+        }
+
+        // Resolve the eventual connection name
+        String connectionName = probeNode.getAttribute("connection");
+
+        if (p instanceof ConnectedProbe) {
+            ConnectedProbe cp = (ConnectedProbe) p;
+            if (connectionName != null) {
+                connectionName = jrds.Util.parseTemplate(connectionName, host, properties, args);
+                logger.trace("Setting connection {} used by {}/{}", connectionName, host, p);
+                cp.setConnectionName(connectionName);
+            } else {
+                // connectionName resolves to the default connection name
+                connectionName = cp.getConnectionName();
+            }
+            // If the connection is not already registered, try searching it in the host
+            // and register it with the host's starter node. It's need because the probe is not yet linked to the host
+            if (p.find(connectionName) == null) {
+                logger.trace("Looking for connection {} in {}", connectionName, Util.delayedFormatString(host::getConnections));
+                ConnectionInfo ci = host.getConnection(connectionName);
+                if (ci != null) {
+                    ci.register(shost);
+                }
+            }
+        } else if (connectionName != null) {
+            logger.warn("Useless connection defined on the not connected probe {}, it will be ignored", p);
+        }
+
         if(!pf.configure(p, args)) {
             logger.error(p + " configuration failed");
             return null;
@@ -336,55 +368,19 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
         p.setOptionalsCollect();
 
-        // A connected probe, register the needed connection
-        // It can be defined within the node, referenced by it's name, or it's
-        // implied name
-        if(p instanceof ConnectedProbe) {
-            String connectionName;
-            ConnectedProbe cp = (ConnectedProbe) p;
-            // Register the connections defined within the probe
-            for(ConnectionInfo ci: makeConnexion(probeNode, p, properties)) {
-                ci.register(p);
-            }
-            String connexionName = probeNode.getAttribute("connection");
-            if(connexionName != null && !"".equals(connexionName)) {
-                logger.trace("Adding connection {} to {}", connexionName, p);
-                connectionName = jrds.Util.parseTemplate(connexionName, host, properties);
-                cp.setConnectionName(connectionName);
-            } else {
-                connectionName = cp.getConnectionName();
-            }
-            // If the connection is not already registred, try looking for it
-            // And register it with the host
-            // If it's null, it an optionnal connection, like in HttpProbe, don't insist on registring it.
-            if (connectionName != null && p.find(connectionName) == null) {
-                if (logger.isTraceEnabled())
-                    logger.trace("Looking for connection {} in {}", connectionName, Util.delayedFormatString(host::getConnections));
-                ConnectionInfo ci = host.getConnection(connectionName);
-                if (ci != null)
-                    ci.register(shost);
-                else {
-                    logger.error("Failed to find a connection {} for a probe {}", connectionName, cp);
-                    return null;
-                }
-            }
-        }
-
-        // try {
-        Map<String, String> empty = Collections.emptyMap();
-
         try {
-            p.setMainStore(pm.defaultStore, empty);
-        } catch (Exception e1) {
-            logger.error("Failed to configure the default store for the probe {}", pm.defaultStore.getClass(), p);
+            p.setMainStore(pm.defaultStore, Collections.emptyMap());
+        } catch (InvocationTargetException ex) {
+            logger.error("Failed to configure the default store {} for the probe {}: {}", pm.defaultStore.getClass(), p, Util.resolveThrowableException(ex));
             return null;
         }
 
         for(Map.Entry<String, StoreFactory> e: pm.stores.entrySet()) {
             try {
                 p.addStore(e.getValue());
-            } catch (Exception e1) {
-                logger.warn("Failed to configure the store {} for the probe {}", e.getKey(), Util.delayedFormatString(() -> e.getValue().getClass().getCanonicalName()), p);
+            } catch (Exception ex) {
+                logger.warn("Failed to configure the store {} for the probe {}: {}",
+                            e.getKey(), Util.delayedFormatString(() -> e.getValue().getClass().getCanonicalName()), p, Util.resolveThrowableException(ex));
             }
         }
 
@@ -408,6 +404,15 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             return null;
         }
 
+        // Check that the probe can really find the requested connection
+        // Done after that the probe is registered to is host, and after configuration, because some probes can generate their own connection
+        if (p instanceof ConnectedProbe) {
+            ConnectedProbe cp = (ConnectedProbe) p;
+            if (cp.getConnectionName() != null && p.find(cp.getConnectionName()) == null) {
+                logger.error("Failed to find a connection {} for a probe {}", cp.getConnectionName(), p);
+                return null;
+            }
+        }
         return p;
     }
 

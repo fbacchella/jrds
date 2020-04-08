@@ -1,6 +1,8 @@
 
 package jrds;
 
+import java.io.IOException;
+import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,10 +12,14 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TreeMap;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.slf4j.event.Level;
 
@@ -27,6 +33,7 @@ import jrds.starter.HostStarter;
 import jrds.starter.Listener;
 import jrds.starter.Starter;
 import jrds.starter.StarterNode;
+import jrds.store.StoreFactory;
 import jrds.webapp.ACL;
 import jrds.webapp.DiscoverAgent;
 import jrds.webapp.RolesACL;
@@ -46,7 +53,6 @@ public class HostsList extends StarterNode {
 
     private final int thisgeneration = generation.incrementAndGet();
     private final Set<HostInfo> hostList = new HashSet<HostInfo>();
-    private final Set<Starter> topStarters = new HashSet<Starter>();
     private final Map<String, jrds.starter.Timer> timers = new HashMap<String, jrds.starter.Timer>();
     private final Map<Integer, GraphNode> graphMap = new HashMap<Integer, GraphNode>();
     private final Map<Integer, Probe<?, ?>> probeMap = new HashMap<Integer, Probe<?, ?>>();
@@ -59,18 +65,16 @@ public class HostsList extends StarterNode {
     // The list of roles known to jrds
     private Set<String> roles = new HashSet<String>();
     private Set<String> defaultRoles = Collections.emptySet();
-    // A global flag that tells globally that this HostsList can be used
-    volatile private boolean started = false;
     private Set<Class<? extends DiscoverAgent>> daList = new HashSet<Class<? extends DiscoverAgent>>();
-    
+    private Set<StoreFactory> stores = Collections.emptySet();
     @Getter @Setter @Accessors(chain=true)
-    private ProbeClassResolver probeClassResolver = new ProbeClassResolver(HostsList.class.getClassLoader());
+    private Function<ClassLoader, ProbeClassResolver> probeClassResolverSource = ProbeClassResolver::new;
+    private ProbeClassResolver probeClassResolver;
 
     /**
      *  
      */
     public HostsList() {
-        super();
         init();
     }
 
@@ -100,7 +104,7 @@ public class HostsList extends StarterNode {
     }
 
     public void configure(PropertiesManager pm) {
-        started = false;
+        probeClassResolver = probeClassResolverSource.apply(pm.extensionClassLoader);
 
         if(pm.rrddir == null) {
             log(Level.ERROR, "Probes directory not configured, can't configure");
@@ -113,6 +117,12 @@ public class HostsList extends StarterNode {
         }
 
         pm.configureStores();
+        stores = new HashSet<>(pm.stores.size() + 1);
+        stores.addAll(pm.stores.values());
+        stores.add(pm.defaultStore);
+        stores.forEach(StoreFactory::start);
+        stores = Collections.unmodifiableSet(stores);
+
         setTimeout(pm.timeout);
         setStep(pm.step);
 
@@ -143,7 +153,6 @@ public class HostsList extends StarterNode {
         conf.setMacroMap();
         for(Listener<?, ?> l: conf.setListenerMap().values()) {
             registerStarter(l);
-            topStarters.add(l);
         }
 
         Set<String> hostsTags = new HashSet<String>();
@@ -166,7 +175,7 @@ public class HostsList extends StarterNode {
                             topStarterClasses.add(meta.topStarter());
                         }
                     } catch (Exception e) {
-                        log(Level.ERROR, e, "Error inserting probe " + p + ": " + e.getMessage());
+                        log(Level.ERROR, e, "Error inserting probe " + p + ": " + e);
                     }
                 }
             }
@@ -175,7 +184,7 @@ public class HostsList extends StarterNode {
                 try {
                     timer.registerStarter(starterClass.newInstance());
                 } catch (Throwable e) {
-                    log(Level.ERROR, e, "Starter %s failed to register for timer %s: %s", starterClass, timer.getName(), e.getMessage());
+                    log(Level.ERROR, e, "Starter %s failed to register for timer %s: %s", starterClass, timer.getName(), e);
                 }
             }
             timer.configureStarters(pm);
@@ -185,11 +194,10 @@ public class HostsList extends StarterNode {
         for(Class<? extends Starter> starterClass: topStarterClasses) {
             try {
                 Starter top = starterClass.newInstance();
-                topStarters.add(top);
                 registerStarter(top);
                 top.configure(pm);
             } catch (Throwable e) {
-                log(Level.ERROR, e, "Top level starter %s failed to register: %s", starterClass, e.getMessage());
+                log(Level.ERROR, e, "Top level starter %s failed to register: %s", starterClass, e);
             }
         }
 
@@ -253,42 +261,14 @@ public class HostsList extends StarterNode {
                 checkRoles(gn, GraphTree.VIEWROOT, gn.getTreePathByView());
             }
         }
-        started = true;
     }
 
     public void startTimers() {
-        if(started)
-            collectTimer = new Timer("jrds-main-timer/" + thisgeneration, true);
+        collectTimer = new Timer("jrds-main-timer/" + thisgeneration, true);
         for(jrds.starter.Timer t: timers.values()) {
             t.startTimer(collectTimer);
         }
-        for(Starter s: this.topStarters) {
-            s.doStart();
-        }
-    }
-
-    /**
-     * Ensure that all collects are stopped, some slow probes might need a
-     * little help
-     */
-    public void stop() {
-        started = false;
-        if(collectTimer != null)
-            collectTimer.cancel();
-        collectTimer = null;
-        for(Starter s: topStarters) {
-            s.doStop();
-        }
-        for(jrds.starter.Timer t: timers.values()) {
-            t.stopCollect();
-            for(HostStarter h: t.getAllHosts()) {
-                h.stopCollect();
-                for(Probe<?, ?> p: h.getAllProbes()) {
-                    p.stopCollect();
-                }
-            }
-            t.interrupt();
-        }
+        startCollect();
     }
 
     String makeTabs(List<String> tabsList, Set<Tab> moretabs, Map<String, Tab> customTabMap, Map<String, Tab> tabs) {
@@ -554,16 +534,6 @@ public class HostsList extends StarterNode {
         return renderer;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see jrds.starter.StarterNode#isCollectRunning()
-     */
-    @Override
-    public boolean isCollectRunning() {
-        return started;
-    }
-
     /**
      * @return the roles
      */
@@ -611,4 +581,42 @@ public class HostsList extends StarterNode {
     public int getGeneration() {
         return thisgeneration;
     }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Stream<jrds.starter.Timer> getChildsStream() {
+        return timers.values().stream();
+    }
+
+    @Override
+    public void stopCollect() {
+        super.stopCollect();
+        Optional.ofNullable(collectTimer).ifPresent(Timer::cancel);
+        collectTimer = null;
+        // Everything is stopped, wait for collect termination
+        try {
+            timers.values().forEach(t -> {
+                try {
+                    t.lockCollect();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new CancellationException();
+                }
+            });
+            timers.values().forEach(jrds.starter.Timer::releaseCollect);
+        } catch (CancellationException e) {
+            // The interrupt was already handled
+        }
+        Optional.ofNullable(renderer).ifPresent(Renderer::finish);
+        stores.forEach(StoreFactory::stop);
+        ClassLoader probeClassLoader = probeClassResolver.getClassLoader();
+        try {
+            if (probeClassLoader instanceof URLClassLoader && ! probeClassLoader.equals(getClass().getClassLoader())) {
+                ((URLClassLoader)probeClassLoader).close();
+            }
+        } catch (IOException ex) {
+            log(Level.ERROR, ex, "Failed to stop probes class loader: {}", Util.resolveThrowableException(ex));
+        }
+    }
+
 }

@@ -41,17 +41,19 @@ public class ConfigObjectFactory {
     private Loader load = null;
 
     @Getter @Setter @Accessors(chain=true)
-    private ProbeClassResolver probeClassResolver = new ProbeClassResolver(ProbeDescBuilder.class.getClassLoader());
+    private ProbeClassResolver probeClassResolver;
 
     public ConfigObjectFactory(jrds.PropertiesManager pm) {
         this.pm = pm;
         this.cl = pm.extensionClassLoader;
+        this.probeClassResolver = new ProbeClassResolver(pm.extensionClassLoader);
         init();
     }
 
     public ConfigObjectFactory(jrds.PropertiesManager pm, ClassLoader cl) {
         this.pm = pm;
         this.cl = cl;
+        this.probeClassResolver = new ProbeClassResolver(cl);
         init();
     }
 

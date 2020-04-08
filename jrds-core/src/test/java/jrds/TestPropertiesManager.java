@@ -26,7 +26,7 @@ public class TestPropertiesManager {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
-    
+
     @Rule
     public final Log4JRule logrule = new Log4JRule(this);
     private final Logger logger = logrule.getTestlogger();
@@ -35,7 +35,7 @@ public class TestPropertiesManager {
     static public void configure() throws IOException {
         Tools.configure();
     }
-    
+
     @Before
     public void loggers() {
         logrule.setLevel(Level.TRACE, "jrds.PropertiesManager");
@@ -126,12 +126,14 @@ public class TestPropertiesManager {
             log4jpropsdest.delete();
             try (FileOutputStream fos = new FileOutputStream(log4jpropsdest)) {
                 log4jprops.store(fos, "");
+
                 PropertiesManager pm = new PropertiesManager();
                 pm.setProperty("configdir", testFolder.getRoot().getCanonicalPath());
                 pm.setProperty("rrddir", testFolder.getRoot().getCanonicalPath());
                 pm.setProperty("tmpdir", testFolder.getRoot().getCanonicalPath());
                 pm.setProperty("log4jpropfile", log4jpropsdest.getCanonicalPath());
                 pm.update();
+
                 logger.debug("log file created");
                 Assert.assertTrue("Log4j file not created", log4jpropsdest.canRead());
             }

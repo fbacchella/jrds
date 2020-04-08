@@ -37,7 +37,7 @@ public abstract class Listener<Message, KeyType> extends Starter {
                             Thread.currentThread().interrupt();
                             break;
                         }
-                        log(Level.ERROR, e, "Listener thread failed: %s", e.getMessage());
+                        log(Level.ERROR, e, "Listener thread failed: %s", e);
                     }
                 }
             }

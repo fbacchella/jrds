@@ -2,15 +2,20 @@ package jrds.starter;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import jrds.HostsList;
 import jrds.PropertiesManager;
+import lombok.Getter;
+import lombok.Setter;
 
 @SuppressWarnings("deprecation")
 public abstract class StarterNode implements StartersSet {
@@ -20,8 +25,32 @@ public abstract class StarterNode implements StartersSet {
     private HostsList root = null;
     private volatile boolean started = false;
     private StarterNode parent = null;
+
+    /**
+     * The time out during collect
+     * 
+     * @param timeout Timeout in seconds.
+     * @return The timeout in seconds.
+     */
+    @Getter @Setter
     private int timeout = -1;
+
+    /**
+     * The interval between collect.
+     * 
+     * @param step Interval in seconds.
+     * @return The collect interval in seconds.
+     */
+    @Getter @Setter
     private int step = -1;
+
+    /**
+     * The collect time that will generate a warning in logs
+     * 
+     * @param slowCollectTime The slow collect time.
+     * @return The slow collect time.
+     */
+    @Getter @Setter
     private int slowCollectTime = -1;
 
     public StarterNode() {
@@ -37,26 +66,30 @@ public abstract class StarterNode implements StartersSet {
     public void setParent(StarterNode parent) {
         root = parent.root;
         this.parent = parent;
+        this.timeout = this.timeout < 0 ? parent.getTimeout() : this.timeout;
+        this.step = this.step < 0 ? parent.getStep() : this.step;
+        this.slowCollectTime = this.slowCollectTime < 0 ? parent.getSlowCollectTime() : this.slowCollectTime;
     }
 
     public boolean isCollectRunning() {
-        if(Thread.interrupted()) {
-            started = false;
-            log(Level.TRACE, "thread is stopped", this);
-            return false;
+        if (started) {
+            if (Thread.interrupted()) {
+                started = false;
+                log(Level.TRACE, "Thread is stopped", this);
+            } else if (parent != null && !parent.isCollectRunning()) {
+                started = false;
+            } 
         }
-        if(parent != null && !parent.isCollectRunning())
-            return false;
         return started;
     }
 
     public boolean startCollect() {
         if(parent != null && !parent.isCollectRunning()) {
-            log(Level.TRACE, "parent of %s prevent starting", this);
+            log(Level.TRACE, "parent preventing start", this);
             return false;
         }
         if(allStarters != null) {
-            log(Level.DEBUG, "Starting %d starters for %s", allStarters.size(), this);
+            log(Level.DEBUG, "Starting %d starters", allStarters.size());
             for(Starter s: allStarters.values()) {
                 // If collect is stopped while we're starting, drop it
                 if(parent != null && !parent.isCollectRunning())
@@ -69,39 +102,48 @@ public abstract class StarterNode implements StartersSet {
             }
         }
         started = true;
-        log(Level.DEBUG, "Starting for %s done", this);
+        log(Level.DEBUG, "Starting done");
         return isCollectRunning();
     }
 
     public synchronized void stopCollect() {
         started = false;
-        if(allStarters != null)
-            for(Starter s: allStarters.values()) {
-                try {
-                    s.doStop();
-                } catch (Exception e) {
-                    log(Level.ERROR, e, "Unable to stop timer %s: %s", s.getKey(), e);
-                }
+        getChildsStream().forEach(StarterNode::stopCollect);
+        Optional.ofNullable(allStarters).orElse(Collections.emptyMap()).values().stream()
+        .forEach(s -> {
+            try {
+                s.doStop();
+            } catch (Exception e) {
+                log(Level.ERROR, e, "Unable to stop timer %s: %s", s.getKey(), e);
             }
+        });
     }
 
     /**
      * @param s the starter to register
      * @return the starter that will be used
      */
-    public Starter registerStarter(Starter s) {
+    public <S extends Starter> Starter registerStarter(S s) {
         Object key = s.getKey();
-        if(allStarters == null)
-            // Must be a linked hashed map, order of insertion might be
-            // important
-            allStarters = new LinkedHashMap<Object, Starter>(2);
-        if(!allStarters.containsKey(key)) {
-            s.initialize(this);
-            allStarters.put(key, s);
-            log(Level.DEBUG, "registering %s with key %s", s.getClass().getName(), key);
-            return s;
+        @SuppressWarnings("unchecked")
+        S parentStarter = (S) find(s.getClass(), key);
+        if (parentStarter != null) {
+            return parentStarter;
         } else {
-            return allStarters.get(key);
+            if (allStarters == null) {
+                // Must be a linked hashed map, order of insertion might be
+                // important
+                allStarters = new LinkedHashMap<Object, Starter>(2);
+            }
+            if (! allStarters.containsKey(key) ) {
+                // Attention, Starter.initialize can add Starters, don't call it inside the map
+                s.initialize(this);
+                allStarters.put(key, s);
+                log(Level.DEBUG, "registering %s with key %s", s.getClass().getName(), key);
+                return s;
+            } else {
+                return allStarters.get(key);
+            }
         }
     }
 
@@ -159,14 +201,14 @@ public abstract class StarterNode implements StartersSet {
     }
 
     @SuppressWarnings("unchecked")
-    public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, Object key) {
-        StarterClass s = null;
+    public <SC extends Starter> SC find(Class<SC> sc, Object key) {
+        SC s = null;
         if(allStarters != null)
             log(Level.TRACE, "Looking for starter %s with key %s in %s", sc, key, allStarters);
         if(allStarters != null && allStarters.containsKey(key)) {
             Starter stemp = allStarters.get(key);
             if(sc.isInstance(stemp)) {
-                s = (StarterClass) stemp;
+                s = (SC) stemp;
             } else {
                 log(Level.ERROR, "Starter key error, got a %s expecting a %s", stemp.getClass(), sc);
                 return null;
@@ -197,6 +239,10 @@ public abstract class StarterNode implements StartersSet {
      */
     public StarterNode getParent() {
         return parent;
+    }
+
+    public<C extends StarterNode> Stream<C> getChildsStream() {
+        return Stream.empty();
     }
 
     // Compatibily code
@@ -251,42 +297,6 @@ public abstract class StarterNode implements StartersSet {
 
     public void log(Level l, String format, Object... elements) {
         jrds.Util.log(this, LoggerFactory.getLogger(getClass()), l, null, format, elements);
-    }
-
-    /**
-     * @return the timeout
-     */
-    public int getTimeout() {
-        return timeout;
-    }
-
-    /**
-     * @param timeout the timeout to set
-     */
-    public void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
-
-    /**
-     * @return the step
-     */
-    public int getStep() {
-        return step;
-    }
-
-    /**
-     * @param step the step to set
-     */
-    public void setStep(int step) {
-        this.step = step;
-    }
-
-    public int getSlowCollectTime() {
-        return slowCollectTime;
-    }
-
-    public void setSlowCollectTime(int slowCollectTime) {
-        this.slowCollectTime = slowCollectTime;
     }
 
 }

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+                           "urn:jrds:graphdesc">
+<graphdesc>
+    <name>ElasticNodeFileDescriptors</name>
+    <graphName>elasticnode_fd_${attr.nodename}</graphName>
+    <graphTitle>Open file descriptors for ${attr.nodename} on ${host}</graphTitle>
+    <verticalLabel>count</verticalLabel>
+    <add>
+        <name>process.open_file_descriptors</name>
+        <graphType>line</graphType>
+        <legend>Number of open files</legend>
+    </add>
+    <add>
+        <name>process.max_file_descriptors</name>
+        <graphType>line</graphType>
+        <legend>Maximum number of open files</legend>
+    </add>
+    <hosttree>
+        <pathelement>HOST</pathelement>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>Elasticearch</pathstring>
+        <pathstring>${attr.nodename}</pathstring>
+        <pathstring>Open file descriptors</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>Elasticearch</pathstring>
+        <pathstring>Open file descriptors</pathstring>
+        <pathstring>${attr.nodename}</pathstring>
+    </viewtree>
+</graphdesc>

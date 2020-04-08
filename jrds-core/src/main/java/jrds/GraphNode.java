@@ -139,7 +139,7 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
             g = gclass.getConstructor(GraphNode.class).newInstance(this);
             beansList = ArgFactory.getBeanPropertiesMap(gclass, Graph.class);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-            Util.log(this, logger, Level.ERROR, e, "Failed to build a graph instance %s: %s", gclass.getCanonicalName(), e.getMessage());
+            Util.log(this, logger, Level.ERROR, e, "Failed to build a graph instance %s: %s", gclass.getCanonicalName(), e);
             return null;
         }
 

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN"
+    "urn:jrds:graphdesc">
+<graphdesc>
+    <name>DmCacheMetadataUsage</name>
+    <graphName>dmcachemetadatausage-${index}</graphName>
+    <graphTitle>DM Cache metadata usage in volume ${index} on ${host}</graphTitle>
+    <unit>
+        <binary />
+    </unit>
+    <verticalLabel>Bytes</verticalLabel>
+    <add>
+        <name>metadata.used</name>
+    </add>
+    <add>
+        <rpn>metadata.used, 1024, *</rpn>
+        <graphType>line</graphType>
+        <legend>Metadata used</legend>
+    </add>
+    <add>
+        <name>metadata.total</name>
+    </add>
+    <add>
+        <rpn>metadata.total, metadata.used, -, 1024, *</rpn>
+        <graphType>stack</graphType>
+        <legend>Metadata Free</legend>
+    </add>
+    <hosttree>
+        <pathelement>HOST</pathelement>
+        <pathelement>DISK</pathelement>
+        <pathstring>DM cache</pathstring>
+        <pathelement>INDEX</pathelement>
+        <pathstring>Metadata usage</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathelement>DISK</pathelement>
+        <pathstring>DM cache</pathstring>
+        <pathstring>Metadata usage</pathstring>
+        <pathelement>HOST</pathelement>
+        <pathelement>INDEX</pathelement>
+    </viewtree>
+</graphdesc>

@@ -117,7 +117,7 @@ public class RRDToolProbe extends Probe<String, Double> {
         try (RRDatabase db = new RRDatabase(rrdpath)){
             return db.getLastUpdate();
         } catch (IOException e) {
-            log(Level.ERROR, "probe %s, read failed: %s", e.getMessage());
+            log(Level.ERROR, "probe %s, read failed: %s", e);
         }
         return new Date(0);
     }

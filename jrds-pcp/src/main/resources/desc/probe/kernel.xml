@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>PcpKernel</name>
+    <probeName>pcpkernel</probeName>
+    <probeClass>jrds.pcp.probe.PcpProbe</probeClass>
+    <ds>
+        <dsName>intr</dsName>
+        <dsType>counter</dsType>
+        <collect>kernel.all.intr</collect>
+    </ds>
+    <ds>
+        <dsName>pswitch</dsName>
+        <dsType>counter</dsType>
+        <collect>kernel.all.pswitch</collect>
+    </ds>
+    <ds>
+        <dsName>sysfork</dsName>
+        <dsType>counter</dsType>
+        <collect>kernel.all.sysfork</collect>
+    </ds>
+    <ds>
+        <dsName>running</dsName>
+        <dsType>counter</dsType>
+        <collect>kernel.all.running</collect>
+    </ds>
+    <ds>
+        <dsName>blocked</dsName>
+        <dsType>counter</dsType>
+        <collect>kernel.all.blocked</collect>
+    </ds>
+    <graphs>
+    </graphs>
+</probedesc>

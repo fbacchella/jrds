@@ -96,9 +96,9 @@ public class Sum extends AutonomousGraphNode {
                     }
 
                     if(g != null) {
-                        Extractor ex = g.getProbe().fetchData();
-                        ex.fill(dp, ei);
-                        ex.release();
+                        try (Extractor ex = g.getProbe().fetchData()) {
+                            ex.fill(dp, ei);
+                        }
                         // First pass, no data to use
                         if(allvalues == null) {
                             allvalues = dp.getValues().clone();

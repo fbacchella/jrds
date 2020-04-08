@@ -23,7 +23,7 @@ public class JMXConnection extends Connection<JmxAbstractDataSource<?>> {
     private String user = null;
     private String password = null;
     private boolean ssl = false;
-    private AbstractJmxConnection cnx;
+    private AbstractJmxConnection<?, ?> cnx;
 
     public JMXConnection() {
         super();

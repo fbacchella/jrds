@@ -2,6 +2,7 @@ package jrds.starter;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -76,8 +77,9 @@ public class SSLStarter extends Starter {
                     tm = new TrustManager[] { trustAllCerts };
                 } else if (truststore != null) {
                     KeyStore ks = KeyStore.getInstance(format);
-                    ks.load(new FileInputStream(truststore), trustpassword.toCharArray());
-
+                    try (InputStream kis = new FileInputStream(truststore)) {
+                        ks.load(kis, trustpassword.toCharArray());
+                    }
                     TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                     tmf.init(ks);
                     tm = tmf.getTrustManagers();
@@ -93,7 +95,7 @@ public class SSLStarter extends Starter {
                 sc.init(km, tm, sr);
             }
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException | CertificateException | IOException | UnrecoverableKeyException e) {
-            log(Level.ERROR, e, "failed to init ssl: %s", e.getMessage());
+            log(Level.ERROR, e, "failed to init ssl: %s", e);
             sc = null;
             return false;
         }
@@ -107,7 +109,7 @@ public class SSLStarter extends Starter {
 
     public Socket connect(String host, int port) throws NoSuchAlgorithmException, KeyManagementException, IOException {
         SocketFactory ss = getLevel().find(SocketFactory.class);
-        Socket s = ss.createSocket(host, port);
+        Socket s = ss.getFactory().createSocket(host, port);
 
         SSLSocketFactory ssf = getContext().getSocketFactory();
         s = ssf.createSocket(s, host, port, true);

@@ -6,9 +6,6 @@ public class Macro {
     private DocumentFragment df;
     private String name;
 
-    public Macro() {
-    }
-
     @Override
     public String toString() {
         return "Macro$" + name;

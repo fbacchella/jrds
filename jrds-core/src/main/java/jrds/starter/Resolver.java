@@ -7,13 +7,22 @@ import org.slf4j.event.Level;
 
 import jrds.HostInfo;
 import jrds.Probe;
+import lombok.Data;
+import lombok.Getter;
 
 public class Resolver extends Starter {
-    String hostname = "";
-    InetAddress address = null;
+
+    @Data
+    public static final class ResolverKey {
+        private final String hostname;
+    }
+
+    @Getter
+    private final ResolverKey key;
+    private InetAddress address = null;
 
     public Resolver(String hostname) {
-        this.hostname = hostname;
+        key = new ResolverKey(hostname);
         log(Level.DEBUG, "New dns resolver");
     }
 
@@ -21,10 +30,10 @@ public class Resolver extends Starter {
     public boolean start() {
         boolean started = false;
         try {
-            address = InetAddress.getByName(hostname);
+            address = InetAddress.getByName(key.hostname);
             started = true;
         } catch (UnknownHostException e) {
-            log(Level.ERROR, e, "DNS host name %s can't be found", hostname);
+            log(Level.ERROR, e, "DNS host name %s can't be found", key.hostname);
         }
         return started;
     }
@@ -38,11 +47,6 @@ public class Resolver extends Starter {
         return address;
     }
 
-    @Override
-    public Object getKey() {
-        return "resolver:" + hostname;
-    }
-
     public static Object makeKey(StarterNode node) {
         HostInfo host;
         if(node instanceof HostStarter)
@@ -53,11 +57,11 @@ public class Resolver extends Starter {
         } else {
             return null;
         }
-        return "resolver:" + host.getDnsName();
+        return new ResolverKey(host.getDnsName());
     }
 
     @Deprecated
     public static Object makeKey(String hostname) {
-        return "resolver:" + hostname;
+        return new ResolverKey(hostname);
     }
 }

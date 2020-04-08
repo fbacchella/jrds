@@ -6,7 +6,7 @@ import jrds.probe.JMXConnection;
 import jrds.starter.Connection;
 import jrds.starter.StarterNode;
 
-public abstract class AbstractJmxConnection extends Connection<JmxAbstractDataSource<?>> {
+public abstract class AbstractJmxConnection<CNX, DS extends JmxAbstractDataSource<CNX>> extends Connection<JmxAbstractDataSource<CNX>> {
 
     protected static final String startTimeObjectName = "java.lang:type=Runtime";
     protected static final String startTimeAttribue = "Uptime";

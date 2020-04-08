@@ -12,8 +12,10 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.rrd4j.core.RrdException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.event.Level;
 
 import jrds.HostsList;
 import jrds.Period;
@@ -114,12 +116,8 @@ public final class Graph extends JrdsServlet {
                 long duration2 = finish.getTime() - middle.getTime();
                 logger.trace("Graph " + graph + " rendering, started at " + start + ", ran for " + duration1 + ":" + duration2 + "ms");
             }
-        } catch (RuntimeException e) {
-            if(logger.isDebugEnabled())
-                logger.error("{}", e, e);
-            else
-                logger.error("{}", e);
-
+        } catch (RuntimeException | RrdException ex) {
+            Util.log(this, logger, Level.ERROR, ex, "Failed to render a graph: %s", ex);
             res.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid graph request");
         }
     }

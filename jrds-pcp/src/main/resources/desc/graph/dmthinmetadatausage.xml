@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+    <name>DmThinMetadaUse</name>
+    <graphName>dmthinmetadatause-${index}</graphName>
+    <graphTitle>Metadata usage in thin pool ${index} on ${host}</graphTitle>
+    <unit>
+        <binary />
+    </unit>
+    <verticalLabel>Bytes</verticalLabel>
+    <add>
+        <name>metadata.used</name>
+    </add>
+    <!-- The 4096 block size was assumed, as it's nowhere to be found in lvs, so it's probably hardcoded -->
+    <add>
+        <rpn>metadata.used, 4096, *</rpn>
+        <graphType>line</graphType>
+        <legend>Metadata used</legend>
+    </add>
+    <add>
+        <name>metadata.total</name>
+    </add>
+    <add>
+        <rpn>metadata.total, metadata.used, -, 4096, *</rpn>
+        <graphType>stack</graphType>
+        <legend>Metadata Free</legend>
+    </add>
+    <hosttree>
+        <pathelement>HOST</pathelement>
+        <pathelement>DISK</pathelement>
+        <pathstring>DM thin pool</pathstring>
+        <pathelement>INDEX</pathelement>
+        <pathstring>Metada usage</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathelement>DISK</pathelement>
+        <pathstring>DM thin pool</pathstring>
+        <pathstring>Metada usage</pathstring>
+        <pathelement>HOST</pathelement>
+        <pathelement>INDEX</pathelement>
+    </viewtree>
+</graphdesc>

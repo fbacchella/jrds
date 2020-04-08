@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.jrds</groupId>
     <artifactId>jrds</artifactId>
-    <version>1.0-RC1</version>
+    <version>2020.1</version>
     <packaging>pom</packaging>
     <name>JRDS</name>
     <url>http://jrds.fr</url>
@@ -16,22 +16,29 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <year>2019</year>
+        <jdk.compile.home>${jdk.8.home}</jdk.compile.home>
+        <bootclasspath>${jdk.compile.home}/jre/lib/rt.jar</bootclasspath>
+        <year>2020</year>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.2.28.v20190418</jetty.version>
-        <maven.plugin.surefire.version>2.22.1</maven.plugin.surefire.version>
+        <jetty.version>9.2.29.v20191105</jetty.version>
+        <maven.plugin.surefire.version>3.0.0-M3</maven.plugin.surefire.version>
         <servlet-api.version>3.1.0</servlet-api.version>
-        <junit.version>4.12</junit.version>
-        <slf4j.version>1.7.26</slf4j.version>
+        <junit.version>4.13</junit.version>
+        <slf4j.version>1.7.30</slf4j.version>
         <jrds.hidelogs>true</jrds.hidelogs>
+        <!-- Tell sonar where to look for the coverage file. Property inherited by submodules -->
+        <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
     </properties>
 
     <modules>
         <module>jrds-core</module>
+        <module>jrds-log4j</module>
         <module>jrds-snmp</module>
         <module>jrds-ipmi</module>
+        <module>jrds-jdbc</module>
         <module>jrds-jsonp</module>
-        <module>jrds-log4j</module>
+        <module>jrds-pcp</module>
+        <module>jrds-munin</module>
         <module>jrds-webapp</module>
         <module>jrds-standalone</module>
     </modules>
@@ -75,7 +82,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.0</version>
+                    <version>3.8.1</version>
+                    <configuration>
+                        <compilerArgs>
+                            <arg>-Xlint</arg>
+                            <arg>-Xbootclasspath/p:${bootclasspath}</arg>
+                        </compilerArgs>
+                        <showWarnings>false</showWarnings>
+                        <!-- needed for maven-plugin-javadoc to find the source version to use -->
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -91,30 +108,33 @@
                     <!-- Needed by mvn help:evaluate -Dexpression=project.version -q -DforceStdout -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-help-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.1.1</version>
                     <configuration>
                         <quiet/>
                         <links>
                             <link>https://docs.oracle.com/javaee/7/api/</link>
-                            <link>http://www.snmp4j.org/doc/</link>
+                            <!--link>http://www.snmp4j.org/doc/</link-->
                             <link>https://rrd4j.github.io/rrd4j/apidocs/</link>
-                            <link>http://junit.org/apidocs/</link>
-                            <link>http://download.eclipse.org/jetty/stable-9/apidocs/</link>
+                            <link>https://junit.org/junit4/javadoc/latest/</link>
+                            <link>https://www.eclipse.org/jetty/javadoc/9.2.22.v20170606/</link>
                             <link>http://ws.apache.org/xmlrpc/apidocs/</link>
-                            <link>http://www.json.org/javadoc/</link>
+                            <link>https://stleary.github.io/JSON-java/</link>
                             <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
-                            <link>http://commons.apache.org/proper/commons-net/javadocs/api-3.3/</link>
+                            <link>http://commons.apache.org/proper/commons-net/javadocs/api-3.6/</link>
                             <link>http://commons.apache.org/fileupload/apidocs/</link>
                             <link>http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/</link>
-                            <link>http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/</link>
-                            <link>https://www.javadoc.io/doc/com.jayway.jsonpath/json-path/2.4.0</link>
+                            <!-- sometime fails for no reason -->
+                            <!--link>http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/</link-->
+                            <!--link>https://javadoc.io/doc/com.jayway.jsonpath/json-path/2.4.0</link-->
+                            <detectJavaApiLink>true</detectJavaApiLink>
                         </links>
-                        <bootclasspath>${sun.boot.class.path}</bootclasspath>
+                        <bootclasspath>${bootclasspath}</bootclasspath>
+                        <source>${maven.compiler.source}</source>
                     </configuration>
                     <executions>
                         <execution>
@@ -156,12 +176,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
+                    <version>3.0.0-M1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>2.5.2</version>
+                    <version>3.0.0-M1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -176,12 +196,30 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.3 </version>
+                    <version>0.8.5</version>
+                    <executions>
+                        <execution>
+                             <id>merge</id>
+                             <goals>
+                                 <goal>merge</goal>
+                             </goals>
+                             <configuration>
+                                 <fileSets>
+                                     <fileSet implementation="org.apache.maven.shared.model.fileset.FileSet">
+                                         <directory>${project.basedir}</directory>
+                                         <includes>
+                                             <include>**/*.exec</include>
+                                         </includes>
+                                     </fileSet>
+                                 </fileSets>
+                             </configuration>
+                         </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>3.2.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -273,7 +311,11 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5.3</version>
             </extension>
-            <!-- >extension> <groupId>org.apache.maven.releas</groupId> <artifactId>maven-release-manager</artifactId> <version>2.5.3</version> </extension -->
+            <extension>
+                <groupId>org.apache.maven.surefire</groupId>
+                <artifactId>surefire-junit4</artifactId>
+                <version>3.0.0-M3</version>
+            </extension>
         </extensions>
     </build>
     <profiles>
@@ -288,7 +330,7 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.3</version>
+                        <version>0.8.4</version>
                         <configuration>
                             <output>file</output>
                             <append>true</append>
@@ -350,9 +392,8 @@
 
     <distributionManagement>
         <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Nexus Release Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>bintray-release</id>
+            <url>https://api.bintray.com/maven/fbacchella/maven/jrds</url>
         </repository>
         <snapshotRepository>
             <id>sonatype-nexus-snapshots</id>

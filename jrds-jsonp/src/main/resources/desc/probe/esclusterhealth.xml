@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN"
+    "urn:jrds:probedesc">
+<probedesc>
+    <name>ElasticClusterHealth</name>
+    <probeName>elasticcluster_health${attr.port}</probeName>
+    <probeClass>jrds.jsonp.probe.HttpJson</probeClass>
+    <defaultargs>
+        <attr name="port">9200</attr>
+        <attr name="file">/_cluster/health</attr>
+    </defaultargs>
+    <!-- docs -->
+    <ds>
+        <dsName>active_primary_shards</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.active_primary_shards</collect>
+    </ds>
+    <ds>
+        <dsName>active_shards</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.active_shards</collect>
+    </ds>
+    <ds>
+        <dsName>delayed_unassigned_shards</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.delayed_unassigned_shards</collect>
+    </ds>
+    <ds>
+        <dsName>initializing_shards</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.initializing_shards</collect>
+    </ds>
+    <ds>
+        <dsName>number_of_data_nodes</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.number_of_data_nodes</collect>
+    </ds>
+    <ds>
+        <dsName>number_of_in_flight_fetch</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.number_of_in_flight_fetch</collect>
+    </ds>
+    <ds>
+        <dsName>number_of_nodes</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.number_of_nodes</collect>
+    </ds>
+    <ds>
+        <dsName>number_of_pending_tasks</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.number_of_pending_tasks</collect>
+    </ds>
+    <ds>
+        <dsName>relocating_shards</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.relocating_shards</collect>
+    </ds>
+    <ds>
+        <dsName>task_max_waiting_in_queue_millis</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.task_max_waiting_in_queue_millis</collect>
+    </ds>
+    <ds>
+        <dsName>unassigned_shards</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.unassigned_shards</collect>
+    </ds>
+
+    <graphs>
+        <name>ElasticClusterShards</name>
+    </graphs>
+</probedesc>

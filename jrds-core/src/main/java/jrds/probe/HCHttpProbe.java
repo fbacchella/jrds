@@ -2,19 +2,30 @@ package jrds.probe;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.protocol.HttpClientContext;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.event.Level;
 
+import jrds.ConnectedProbe;
 import jrds.factories.ProbeMeta;
+import jrds.starter.Connection;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 
@@ -32,56 +43,77 @@ import jrds.factories.ProbeMeta;
 @ProbeMeta(
         timerStarter=jrds.probe.HttpClientStarter.class
         )
-public abstract class HCHttpProbe<KeyType> extends HttpProbe<KeyType> implements SSLProbe {
+public abstract class HCHttpProbe<KeyType> extends HttpProbe<KeyType> implements SSLProbe, ConnectedProbe  {
+
+    @Getter @Setter
+    protected String connectionName = null;
 
     private boolean mandatorySession = false;
+    // Connection of type HttpSession can be used. It will then hide the HttpClientConnection
+    // So store it
+    private HttpClientConnection httpcnx;
 
     @Override
-    public Boolean configure() {
+    protected boolean finishConfigure(List<Object> args) {
+        if (connectionName == null || !(find(connectionName) instanceof HttpClientConnection)) {
+            log(Level.DEBUG, "Instanciating a self registrer HttpClientConnection");
+            httpcnx = new HttpClientConnection();
+            httpcnx.setScheme(scheme);
+            httpcnx.setLogin(login);
+            httpcnx.setPassword(password);
+            httpcnx.setPort(port);
+            httpcnx.setFile(file);
+            httpcnx.setName(httpcnx.getKey().toString());
+            registerStarter(httpcnx);
+        } else {
+            httpcnx = find(connectionName);
+        }
         if("true".equalsIgnoreCase(getPd().getSpecific("mandatorySession"))) {
             mandatorySession = true;
         }
-        return super.configure();
+        return super.finishConfigure(args);
+    }
+
+    @Override
+    protected URL resolveUrl(HttpClientStarter.UrlBuilder builder, List<Object> args) throws MalformedURLException {
+        return httpcnx.resolve(builder, this, args);
     }
 
     @Override
     public Map<KeyType, Number> getNewSampleValues() {
-        HttpClientStarter httpstarter = find(HttpClientStarter.class);
-        if (! httpstarter.isStarted()) {
+        if (! httpcnx.isStarted()) {
             return Collections.emptyMap();
         }
-        HttpClient cnx = httpstarter.getHttpClient();
+        HttpClientContext ctx = httpcnx.getClientContext();
+        HttpClient client = find(HttpClientStarter.class).getHttpClient();
         HttpEntity entity = null;
         try {
-            HttpRequestBase hg = new HttpGet(getUrl().toURI());
-            if (! changeRequest(hg)) {
+            HttpRequestBase hg = new HttpGet(url.toURI());
+            if (!changeRequest(hg)) {
                 return Collections.emptyMap();
             }
-            if (! httpstarter.isStarted()) {
-                return Collections.emptyMap();
-            }
-            HttpResponse response = cnx.execute(hg);
+            URL newUrl = hg.getURI().toURL();
+            HttpHost host = new HttpHost(resolver.getInetAddress(), newUrl.getPort(), newUrl.getProtocol());
+            HttpResponse response = client.execute(host, hg, ctx);
             if (!validateResponse(response)) {
                 EntityUtils.consumeQuietly(response.getEntity());
                 return Collections.emptyMap();
             }
             entity = response.getEntity();
-            if(entity == null) {
+            if (entity == null) {
                 log(Level.ERROR, "Not response body to %s", getUrl());
                 return Collections.emptyMap();
             }
-            InputStream is = entity.getContent();
-            Map<KeyType, Number> vars = parseStream(is);
-            is.close();
-            return vars;
-        } catch (IllegalStateException | IOException e) {
-            log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e.getMessage());
-        } catch (URISyntaxException e) {
-            log(Level.ERROR, "unable to parse %s", getUrl());
-        } finally {
-            if(entity != null) {
-                EntityUtils.consumeQuietly(entity);
+            try (InputStream is = entity.getContent()) {
+                Map<KeyType, Number> vars = parseStream(is);
+                return vars;
             }
+        } catch (HttpHostConnectException e) {
+            log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e.getCause());
+        } catch (IllegalStateException | IOException | URISyntaxException e) {
+            log(Level.ERROR, e, "Unable to read %s because: %s", getUrl(), e);
+        } finally {
+            Optional.ofNullable(entity).ifPresent(EntityUtils::consumeQuietly);
         }
 
         return Collections.emptyMap();
@@ -97,18 +129,22 @@ public abstract class HCHttpProbe<KeyType> extends HttpProbe<KeyType> implements
         HttpSession session = null;
         if (connectionName != null) {
             log(Level.DEBUG, "looking for session %s", connectionName);
-            session = find(HttpSession.class, connectionName);
-            if (session != null) {
-                if (!session.makeSession(request)) {
+            session = Optional.ofNullable(find(Connection.class, connectionName))
+                            .filter(HttpSession.class::isInstance)
+                            .map(s -> (HttpSession)s)
+                            .orElse(null);
+            Optional.ofNullable(session).ifPresent(s -> {
+                if (!s.makeSession(request)) {
                     log(Level.ERROR, "session failed");
                 }
-            }
+            });
         }
         if (session == null && mandatorySession) {
             log(Level.ERROR, "missing session");
             return false;
+        } else {
+            return true;
         }
-        return true;
     }
 
     /**

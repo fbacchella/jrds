@@ -162,8 +162,7 @@ public class Ribcl extends Probe<XPathExpression, Number> implements SSLProbe {
 
     private Socket connect() throws NoSuchAlgorithmException, KeyManagementException, IOException {
         if(port == 23) {
-            SocketFactory ss = find(SocketFactory.class);
-            return ss.createSocket(iloHost, port);
+            return find(SocketFactory.class).getFactory().createSocket(iloHost, port);
         } else {
             return find(SSLStarter.class).connect(iloHost, port);
         }

@@ -71,10 +71,10 @@ public class IpmiConnection extends Connection<Handle> {
             Thread.currentThread().interrupt();
             return false;
         } catch (IOException e) {
-            log(Level.ERROR, "IPMI network error: %s", e.getMessage());
+            log(Level.ERROR, "IPMI network error: %s", e);
             return false;
         } catch (Exception e) {
-            log(Level.ERROR, "invalid IPMI connection: %s", e.getMessage());
+            log(Level.ERROR, "invalid IPMI connection: %s", e);
             return false;
         }
         return true;
