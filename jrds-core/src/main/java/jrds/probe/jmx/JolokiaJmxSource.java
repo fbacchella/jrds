@@ -3,6 +3,7 @@ package jrds.probe.jmx;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.rmi.RemoteException;
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.management.ObjectName;
@@ -26,12 +27,14 @@ public class JolokiaJmxSource extends JmxAbstractDataSource<J4pClient> {
         try {
             J4pReadResponse resp = connection.execute(req);
             Object o = resp.getValue();
-            for (String i: jmxPath) {
-                if (o instanceof Map) {
-                    Map<String, Object> m = (Map<String, Object>) o;
-                    o = m.get(i);
-                    if (o == null) {
-                        return null;
+            if (jmxPath.length > 1) {
+                for (String i: Arrays.copyOfRange(jmxPath, 1, jmxPath.length)) {
+                    if (o instanceof Map) {
+                        Map<String, Object> m = (Map<String, Object>) o;
+                        o = m.get(i);
+                        if (o == null) {
+                            return null;
+                        }
                     }
                 }
             }
