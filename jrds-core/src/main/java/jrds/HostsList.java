@@ -21,6 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import jrds.PropertiesManager.TimerInfo;
@@ -48,6 +50,8 @@ import lombok.experimental.Accessors;
  * @author Fabrice Bacchella
  */
 public class HostsList extends StarterNode {
+
+    static final private Logger logger = LoggerFactory.getLogger(HostsList.class);
 
     static final private AtomicInteger generation = new AtomicInteger(0);
 
@@ -617,6 +621,11 @@ public class HostsList extends StarterNode {
         } catch (IOException ex) {
             log(Level.ERROR, ex, "Failed to stop probes class loader: {}", Util.resolveThrowableException(ex));
         }
+    }
+
+    @Override
+    public Logger getInstanceLogger() {
+        return logger;
     }
 
 }

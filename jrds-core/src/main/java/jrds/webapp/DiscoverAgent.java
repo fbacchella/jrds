@@ -13,11 +13,13 @@ import org.slf4j.event.Level;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Element;
 
+import jrds.InstanceLogger;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.webapp.Discover.ProbeDescSummary;
 
-public abstract class DiscoverAgent {
+public abstract class DiscoverAgent implements InstanceLogger{
+
     protected enum DojoType {
         ToggleButton {
             @Override
@@ -188,20 +190,17 @@ public abstract class DiscoverAgent {
         }
     }
 
-    protected void log(Level l, Throwable e, String format, Object... elements) {
-        jrds.Util.log(this, namedLogger, l, e, format, elements);
-    }
-
-    protected void log(Level l, String format, Object... elements) {
-        jrds.Util.log(this, namedLogger, l, null, format, elements);
-    }
-
     public int getTimeout() {
         return timeout;
     }
 
     public void setTimeout(int timeout) {
         this.timeout = timeout;
+    }
+
+    @Override
+    public Logger getInstanceLogger() {
+        return this.namedLogger;
     }
 
 }

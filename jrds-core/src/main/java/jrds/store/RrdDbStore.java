@@ -289,7 +289,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
             for(Map.Entry<String, Number> e: sample.entrySet()) {
                 onesample.setValue(e.getKey(), e.getValue().doubleValue());
             }
-            if(p.getNamedLogger().isDebugEnabled())
+            if(p.getInstanceLogger().isDebugEnabled())
                 log(Level.DEBUG, "%s", onesample.dump());
             onesample.update();
         } catch (IOException e) {

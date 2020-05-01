@@ -18,6 +18,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import jrds.HostInfo;
@@ -25,6 +27,8 @@ import jrds.PropertiesManager;
 import lombok.Getter;
 
 public class Timer extends StarterNode {
+
+    static final private Logger logger = LoggerFactory.getLogger(Timer.class);
 
     private class CollectRunnable implements Runnable {
 
@@ -274,6 +278,11 @@ public class Timer extends StarterNode {
      */
     public Stats getStats() {
         return new Stats(stats);
+    }
+
+    @Override
+    public Logger getInstanceLogger() {
+        return logger;
     }
 
 }
