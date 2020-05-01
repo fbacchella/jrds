@@ -3,6 +3,7 @@ package jrds.probe.jmx;
 import java.io.IOException;
 import java.lang.management.RuntimeMXBean;
 import java.net.MalformedURLException;
+import java.rmi.ConnectIOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,12 +20,15 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.generic.GenericConnector;
+import javax.naming.CommunicationException;
+import javax.naming.ServiceUnavailableException;
 
 import org.slf4j.event.Level;
 
 import jrds.PropertiesManager;
 import jrds.factories.ProbeBean;
 import jrds.jmx.JrdsSocketConnection;
+import jrds.probe.JMXConnection;
 import jrds.probe.JmxSocketFactory;
 import jrds.starter.SocketFactory;
 
@@ -45,8 +49,8 @@ public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnec
     protected JMXConnector connector;
     private NativeJmxSource connection;
 
-    public NativeJmxConnection() {
-        super();
+    public NativeJmxConnection(JMXConnection parent) {
+        super(parent);
         path = "/jmxrmi";
     }
 
@@ -94,9 +98,11 @@ public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnec
     @Override
     public long setUptime() {
         try {
-            RuntimeMXBean mxbean = getMBean(startTimeObjectName, RuntimeMXBean.class);
-            if(mxbean != null)
+            MBeanServerConnection mbsc = getConnection().connection;
+            RuntimeMXBean mxbean = javax.management.JMX.newMBeanProxy(mbsc, startTimeRequestsParams.mbeanName, RuntimeMXBean.class, true);
+            if(mxbean != null) {
                 return mxbean.getUptime() / 1000;
+            }
         } catch (Exception e) {
             log(Level.ERROR, e, "Uptime error for %s: %s", this, e);
         }
@@ -113,17 +119,17 @@ public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnec
         try {
             log(Level.TRACE, "connecting to %s", url);
             Map<String, Object> attributes = new HashMap<String, Object>();
-            if(user != null && password != null) {
+            if (user != null && password != null) {
                 String[] credentials = new String[] { user, password };
                 attributes.put("jmx.remote.credentials", credentials);
             }
             attributes.put("jmx.remote.x.request.timeout", getTimeout() * 1000);
             attributes.put("jmx.remote.x.server.side.connecting.timeout", getTimeout() * 1000);
             attributes.put("jmx.remote.x.client.connected.state.timeout", getTimeout() * 1000);
-            if(protocol == JmxProtocol.rmi) {
+            if (protocol == JmxProtocol.rmi) {
                 attributes.put("sun.rmi.transport.tcp.responseTimeout", getTimeout() * 1000);
                 attributes.put("com.sun.jndi.rmi.factory.socket", getLevel().find(JmxSocketFactory.class).getFactory());
-            } else if(protocol == JmxProtocol.jmxmp) {
+            } else if (protocol == JmxProtocol.jmxmp) {
                 Object sc = JrdsSocketConnection.create(url, getLevel().find(SocketFactory.class));
                 attributes.put(GenericConnector.MESSAGE_CONNECTION, sc);
             }
@@ -136,7 +142,15 @@ public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnec
             connection = new NativeJmxSource(connector.getMBeanServerConnection());
             return true;
         } catch (IOException e) {
-            log(Level.ERROR, e, "Communication error with %s: %s", protocol.toString(), e);
+            // The exception needs to be cleaned, the stack is too depth
+            Throwable cause = e;
+            while (cause.getCause() instanceof IOException
+                            || cause.getCause() instanceof ConnectIOException 
+                            || cause.getCause() instanceof CommunicationException
+                            || cause.getCause() instanceof ServiceUnavailableException) {
+                cause = cause.getCause();
+            }
+            log(Level.ERROR, e, "Communication error with %s: %s", url, cause);
         }
         return false;
     }
@@ -170,7 +184,7 @@ public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnec
      */
     @Override
     public String toString() {
-        if(url == null) {
+        if (url == null) {
             try {
                 return protocol.getURL(this).toString();
             } catch (MalformedURLException e) {

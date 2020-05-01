@@ -10,7 +10,7 @@ import jrds.starter.SocketFactory;
 import jrds.starter.Starter;
 
 public class JmxSocketFactory extends Starter implements RMIClientSocketFactory {
-    
+
     private static class RMIFastClientSocketFactory implements RMIClientSocketFactory {
 
         private final javax.net.SocketFactory factory;
@@ -24,13 +24,13 @@ public class JmxSocketFactory extends Starter implements RMIClientSocketFactory 
     }
 
     private RMIFastClientSocketFactory factory;
-    
+
     @Deprecated
     public Socket createSocket(String host, int port) throws IOException {
         log(Level.DEBUG, "creating a RMI socket to %s:%d", host, port);
         return getLevel().find(SocketFactory.class).createSocket(host, port);
     }
-    
+
     public synchronized RMIClientSocketFactory getFactory() {
         if (factory == null) {
             factory = new RMIFastClientSocketFactory(getLevel().find(SocketFactory.class).getFactory());

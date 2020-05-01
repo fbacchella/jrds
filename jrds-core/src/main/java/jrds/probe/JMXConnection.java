@@ -65,13 +65,12 @@ public class JMXConnection extends Connection<JmxAbstractDataSource<?>> {
     public void configure(PropertiesManager pm) {
         switch(protocol) {
         case jolokia:
-            cnx = new JolokiaJmxConnection();
+            cnx = new JolokiaJmxConnection(this);
             break;
         default:
-            cnx = new NativeJmxConnection();
+            cnx = new NativeJmxConnection(this);
             break;
         }
-        cnx.setParent(this);
         cnx.setProtocol(protocol);
         if (port != null) {
             cnx.setPort(port);

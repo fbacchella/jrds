@@ -1,7 +1,7 @@
 package jrds.probe.jmx;
 
-import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.management.MBeanServerConnection;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +17,7 @@ import org.slf4j.event.Level;
 
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
+import jrds.probe.JMXConnection;
 import jrds.webapp.Discover.ProbeDescSummary;
 import jrds.webapp.DiscoverAgent;
 
@@ -25,7 +25,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
 
     private String hostname;
 
-    private final NativeJmxConnection cnx = new NativeJmxConnection() {
+    private final JMXConnection cnx = new JMXConnection() {
         @Override
         public String getHostName() {
             return JmxDiscoverAgent.this.hostname;
@@ -71,11 +71,11 @@ public class JmxDiscoverAgent extends DiscoverAgent {
         return Arrays.asList(port, protocol, user, password);
     }
 
-    private MBeanServerConnection connect(String hostname, HttpServletRequest request) {
+    private JmxAbstractDataSource<?> connect(String hostname, HttpServletRequest request) {
         this.hostname = hostname;
         String protocolName = request.getParameter("discoverJmxProtocol");
         if(protocolName != null && !protocolName.trim().isEmpty()) {
-            cnx.setProtocol(JmxProtocol.valueOf(protocolName.trim()));
+            cnx.setProtocol(JmxProtocol.valueOf(protocolName.trim()).toString());
         }
         Integer port = jrds.Util.parseStringNumber(request.getParameter("discoverJmxPort"), 0);
         if(port != 0) {
@@ -84,7 +84,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
         cnx.setUser(request.getParameter("discoverJmxUser"));
         cnx.setPassword(request.getParameter("discoverJmxPassword"));
         if(cnx.startConnection()) {
-            return cnx.getConnection().connection;
+            return cnx.getConnection();
         } else {
             return null;
         }
@@ -97,19 +97,19 @@ public class JmxDiscoverAgent extends DiscoverAgent {
 
     @Override
     public void discoverPost(String hostname, JrdsElement hostEleme,
-            Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
+                             Map<String, JrdsDocument> probdescs, HttpServletRequest request) {
         cnx.stopConnection();
     }
 
     @Override
     public boolean isGoodProbeDesc(ProbeDescSummary summary) {
-        MBeanServerConnection mbean = cnx.getConnection().connection;
+        JmxAbstractDataSource<?> mbean = cnx.getConnection();
         boolean valid = true;
         boolean enumerated = false;
         for(String name: summary.specifics.get("mbeanNames").split(" *; *")) {
             enumerated = true;
             try {
-                Set<ObjectName> mbeanNames = mbean.queryNames(new ObjectName(name), null);
+                Collection<ObjectName> mbeanNames = mbean.getNames(this, new ObjectName(name));
                 log(Level.TRACE, "%s", "found mbeans %s for %s", mbeanNames, summary.name);
                 if(mbeanNames.size() > 1 && !summary.isIndexed) {
                     log(Level.WARN, "not indexed probe %s return more than one mbean", summary.name);
@@ -121,8 +121,6 @@ public class JmxDiscoverAgent extends DiscoverAgent {
                 }
             } catch (MalformedObjectNameException e) {
                 log(Level.WARN, "invalid name for auto discovery of probe %s: %s", summary.name, e);
-            } catch (IOException e) {
-                log(Level.WARN, "Connection failed for auto discovery of probe %s: %s", summary.name, e);
             }
         }
         return valid && enumerated;
@@ -136,11 +134,11 @@ public class JmxDiscoverAgent extends DiscoverAgent {
     }
 
     private Set<String> enumerateIndexes(ProbeDescSummary summary) {
-        MBeanServerConnection mbean = cnx.getConnection().connection;
+        JmxAbstractDataSource<?> mbean = cnx.getConnection();
         Set<String> indexes = new HashSet<String>();
         for(String name: summary.specifics.get("mbeanNames").split(" *; *")) {
             try {
-                Set<ObjectName> mbeanNames = mbean.queryNames(new ObjectName(name), null);
+                Collection<ObjectName> mbeanNames = mbean.getNames(this, new ObjectName(name));
                 Pattern p = Pattern.compile(summary.specifics.get("mbeanIndex"));
                 for(ObjectName oneMbean: mbeanNames) {
                     log(Level.DEBUG, "%s", oneMbean.getCanonicalName());
@@ -152,8 +150,6 @@ public class JmxDiscoverAgent extends DiscoverAgent {
                 }
             } catch (MalformedObjectNameException e) {
                 log(Level.WARN, "invalid name for auto discovery of probe %s: %s", summary.name, e);
-            } catch (IOException e) {
-                log(Level.WARN, "Connection failed for auto discovery of probe %s: %s", summary.name, e);
             }
         }
         return indexes;

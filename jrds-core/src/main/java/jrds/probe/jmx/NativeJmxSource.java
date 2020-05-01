@@ -1,12 +1,9 @@
 package jrds.probe.jmx;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URLDecoder;
-import java.util.Collection;
-import java.util.Map;
+import java.rmi.RemoteException;
+import java.util.Collections;
+import java.util.Set;
 
 import javax.management.AttributeNotFoundException;
 import javax.management.InstanceNotFoundException;
@@ -14,8 +11,12 @@ import javax.management.MBeanException;
 import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
-import javax.management.openmbean.CompositeData;
-import javax.management.openmbean.TabularData;
+
+import org.slf4j.event.Level;
+
+import jrds.InstanceLogger;
+import jrds.Probe;
+import jrds.Util;
 
 public class NativeJmxSource extends JmxAbstractDataSource<MBeanServerConnection>{
 
@@ -24,56 +25,47 @@ public class NativeJmxSource extends JmxAbstractDataSource<MBeanServerConnection
     }
 
     @Override
-    public Number getValue(ObjectName mbeanName, String attributeName, String[] jmxPath) throws InvocationTargetException {
+    public Number getValue(InstanceLogger node, RequestParams params) {
+        Number v = null;
         try {
-            Object attr = connection.getAttribute(mbeanName, attributeName);
-            Number v = resolvJmxObject(attr, jmxPath);
-            return v;
-        } catch (AttributeNotFoundException | InstanceNotFoundException | MBeanException | ReflectionException | IOException e) {
-            throw new InvocationTargetException(e);
+            Object attr = connection.getAttribute(params.mbeanName, params.attributeName);
+            v = resolvJmxObject(attr, params);
+        } catch (AttributeNotFoundException ex) {
+            node.log(Level.ERROR, ex, "Invalid JMX attribute %s", params.attributeName);
+        } catch (InstanceNotFoundException ex) {
+            Level l = Level.ERROR;
+            if (node instanceof Probe) {
+                @SuppressWarnings("unchecked")
+                Probe<String, Double> p = (Probe<String, Double>) node;
+                if (p.isOptional(params.jmxCollectPath)) {
+                    l = Level.DEBUG;
+                }
+           }
+           node.log(l, "JMX instance not found: %s", ex);
+        } catch (MBeanException ex) {
+            Throwable cause = ex.getCause();
+            String format = "JMX MBeanException: %s";
+            if (cause instanceof RemoteException) {
+                cause = cause.getCause();
+                format = "Remote RMI exception: %s";
+            }
+            node.log(Level.ERROR, cause, format, Util.resolveThrowableException(cause));
+        } catch (ReflectionException ex) {
+            node.log(Level.ERROR, ex, "JMX reflection error: %s", ex);
+        } catch (IOException ex) {
+            node. log(Level.ERROR, ex, "JMX IO error: %s", ex);
         }
+        return v;
     }
 
-    /**
-     * Try to extract a numerical value from a jmx Path pointing to a jmx object
-     * If the attribute (element 0) of the path is a :
-     * - Set, array or TabularData, the size is used
-     * - Map, the second element is the key to the value
-     * - CompositeData, the second element is the key to the value
-     * @param jmxPath
-     * @param o
-     * @return
-     * @throws UnsupportedEncodingException
-     */
-    Number resolvJmxObject(Object o, String[] jmxPath) throws UnsupportedEncodingException {
-        Object value;
-        // Fast simple case
-        if(o instanceof Number)
-            return (Number) o;
-        else if(o instanceof CompositeData && jmxPath.length == 2) {
-            String subKey = URLDecoder.decode(jmxPath[1], "UTF-8");
-            CompositeData co = (CompositeData) o;
-            value = co.get(subKey);
-        } else if(o instanceof Map<?, ?> && jmxPath.length == 2) {
-            String subKey = URLDecoder.decode(jmxPath[1], "UTF-8");
-            value = ((Map<?, ?>) o).get(subKey);
-        } else if(o instanceof Collection<?>) {
-            return ((Collection<?>) o).size();
-        } else if(o instanceof TabularData) {
-            return ((TabularData) o).size();
-        } else if(o.getClass().isArray()) {
-            return Array.getLength(o);
+    @Override
+    public Set<ObjectName> getNames(InstanceLogger node, ObjectName dest) {
+        try {
+            return connection.queryNames(dest, null);
+        } catch (IOException ex) {
+            node. log(Level.ERROR, ex, "JMX IO error: %s", ex);
+            return Collections.emptySet();
         }
-        // Last try, make a wild guess
-        else {
-            value = o;
-        }
-        if(value instanceof Number) {
-            return ((Number) value);
-        } else if(value instanceof String) {
-            return jrds.Util.parseStringNumber((String) value, Double.NaN);
-        }
-        return Double.NaN;
     }
 
 }
