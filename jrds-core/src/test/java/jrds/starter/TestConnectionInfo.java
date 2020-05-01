@@ -29,7 +29,7 @@ public class TestConnectionInfo {
     }
 
     @Test
-    public void testRegister() throws InvocationTargetException {
+    public void testRegister() throws InvocationTargetException, NoSuchMethodException, SecurityException {
         ConnectionInfo ci = new ConnectionInfo(JMXConnection.class, "jrds.probe.JMXConnection", Collections.emptyList(), Collections.singletonMap("user", "admin"));
         StarterNode sn = new StarterNode() {};
         ci.register(sn);

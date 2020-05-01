@@ -1,5 +1,6 @@
 package jrds.starter;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
@@ -18,14 +19,14 @@ public class ConnectionInfo {
 
     static final private Logger logger = LoggerFactory.getLogger(ConnectionInfo.class);
 
-    private final List<Object> args;
+    private final Object[] args;
     private final Map<String, String> beansValue;
     @Getter
     private final String name;
     private final Class<? extends Connection<?>> type;
 
-    public ConnectionInfo(Class<? extends Connection<?>> type, String name, List<Object> args, Map<String, String> beansValue) {
-        this.args = args;
+    public ConnectionInfo(Class<? extends Connection<?>> type, String name, List<Object> args, Map<String, String> beansValue) throws NoSuchMethodException, SecurityException {
+        this.args = args.toArray();
         this.beansValue = beansValue;
         if (name == null) {
             Set<ConnectionName> names = ArgFactory.enumerateAnnotation(type, ConnectionName.class, Connection.class);
@@ -34,19 +35,13 @@ public class ConnectionInfo {
             this.name = name.trim();
         }
         this.type = type;
+        // Check the constructor
+        getConstructor();
     }
 
     public void register(StarterNode node) throws InvocationTargetException {
         try {
-            Class<?>[] constArgsType = new Class[args.size()];
-            Object[] constArgsVal = new Object[args.size()];
-            int index = 0;
-            for(Object arg: args) {
-                constArgsType[index] = arg.getClass();
-                constArgsVal[index] = arg;
-                index++;
-            }
-            Connection<?> cnx = type.getConstructor(constArgsType).newInstance(constArgsVal);
+            Connection<?> cnx = getConstructor().newInstance(args);
             for(Map.Entry<String, String> e: beansValue.entrySet()) {
                 String textValue = Util.parseTemplate(e.getValue(), cnx);
                 ArgFactory.beanSetter(cnx, e.getKey(), textValue);
@@ -62,6 +57,16 @@ public class ConnectionInfo {
             String message = Util.resolveThrowableException(ex);
             throw new InvocationTargetException(ex, "Error during connection creation of type " + type.getName() + " for " + node + ": " + message);
         }
+    }
+    
+    private Constructor<? extends Connection<?>> getConstructor() throws NoSuchMethodException, SecurityException {
+        Class<?>[] constArgsType = new Class[args.length];
+        int index = 0;
+        for(Object arg: args) {
+            constArgsType[index] = arg.getClass();
+            index++;
+        }
+        return type.getConstructor(constArgsType);
     }
 
     /*
