@@ -12,7 +12,8 @@ jobs:
                     sudo apt-get update
                     sudo apt install libsnmp-base
                     mkdir -p /home/circleci/.sonar/cache /home/circleci/.m2/repository
-                    mvn -B dependency:go-offline -Psonar,versions -s .circleci/settings.xml
+                    # A bug in dependency:go-offline, see https://issues.apache.org/jira/browse/MDEP-688
+                    mvn -B dependency:resolve dependency:resolve-plugins -Psonar,versions -s .circleci/settings.xml
             - persist_to_workspace:
                 root: /
                 paths:
