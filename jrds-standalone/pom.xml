@@ -84,12 +84,6 @@
             <artifactId>jrds-munin</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>fr.jrds</groupId>
-            <artifactId>jrds-core</artifactId>
-            <classifier>webapp</classifier>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
     <build>
         <finalName>jrds-standalone-${project.version}</finalName>
