@@ -106,18 +106,18 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     protected void create(ArchivesSet archives) throws IOException {
         log(Level.INFO, "Need to create rrd");
         RrdDef def = getRrdDef(archives);
-        RrdDb.getBuilder().setRrdDef(def).build().close();
+        factory.getRrd(def).close();
     }
 
     private void upgrade(ArchivesSet archives) {
         try {
-            log(Level.WARN, "Definition is changed, the store needs to be upgraded");
             File source = new File(getPath());
-            RrdDef rrdDef = getRrdDef(archives);
             File dest = File.createTempFile("JRDS_", ".tmp", source.getParentFile());
+            log(Level.WARN, "Definition is changed, the store needs to be upgraded");
+            RrdDef rrdDef = getRrdDef(archives);
             rrdDef.setPath(dest.getCanonicalPath());
-            try (RrdDb rrdSource = RrdDb.getBuilder().setPath(source.getCanonicalPath()).build();
-                 RrdDb rrdDest = RrdDb.getBuilder().setRrdDef(rrdDef).build()) {
+            try (RrdDb rrdSource = factory.getRrd(source.getCanonicalPath());
+                 RrdDb rrdDest = factory.getRrd(rrdDef)) {
                 log(Level.DEBUG, "Updating %s to %s", source, dest);
                 Set<String> badDs = new HashSet<String>();
                 Header header = rrdSource.getHeader();
@@ -165,7 +165,6 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                     }
                 }
                 log(Level.DEBUG, "Robin migrated: %s", robinMigrated);
-                rrdSource.close();
             }
             log(Level.DEBUG, "Size difference : %d", (dest.length() - source.length()));
             copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
@@ -188,8 +187,8 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     }
 
     private static void deleteFile(File file) throws IOException {
-        if(file.exists() && !file.delete()) {
-            throw new IOException("Could not delete file: " + file.getCanonicalPath());
+        if (file.exists()) {
+            Files.delete(file.toPath());
         }
     }
 
@@ -213,7 +212,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
 
                 // old definition
                 RrdDef oldDef;
-                try (RrdDb rrdDb = RrdDb.of(rrdPath.toString())) {
+                try (RrdDb rrdDb = factory.getRrd(rrdPath.toString())) {
                     oldDef = rrdDb.getRrdDef();
                 }
                 oldDef.setStartTime(startTime);
@@ -233,7 +232,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 } else if (!newDefDump.equals(oldDefDump)) {
                     log(Level.TRACE, "New definition should be: %s\n", newDef);
                     upgrade(archives);
-                    RrdDb.of(getPath());
+                    factory.getRrd(getPath()).close();
                 }
                 log(Level.TRACE, "******");
             } else {
