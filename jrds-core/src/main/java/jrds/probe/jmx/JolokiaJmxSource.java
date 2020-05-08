@@ -48,7 +48,7 @@ public class JolokiaJmxSource extends JmxAbstractDataSource<J4pClient> {
         }
     }
 
-    static void handleJolokiaException(InstanceLogger node, J4pException ex) {
+    private void handleJolokiaException(InstanceLogger node, J4pException ex) {
         ex.printStackTrace();
         if (ex instanceof J4pRemoteException) {
             J4pRemoteException rex = (J4pRemoteException) ex;
