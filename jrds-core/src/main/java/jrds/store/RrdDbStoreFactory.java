@@ -2,19 +2,18 @@ package jrds.store;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
 
 import org.rrd4j.core.RrdBackendFactory;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDbPool;
 import org.rrd4j.core.RrdDef;
-import org.rrd4j.core.RrdFileBackendFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +74,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
         }
 
         dbPoolSize = Util.parseStringNumber(props.getProperty("dbPoolSize"), 10) + pm.numCollectors;
-        usepool = pm.parseBoolean(props.getProperty("usepool", "true")) || backendFactory instanceof RrdFileBackendFactory;
+        usepool = pm.parseBoolean(props.getProperty("usepool", "true"));
 
         logger.debug("Store backend used is {}", backendFactory.getName());
     }
@@ -89,26 +88,19 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
     public void start() {
         super.start();
         if (usepool ) {
-            Optional.of(instance).ifPresent(i -> Arrays.stream(i.getOpenUri()).map(t -> {
-                try {
-                    return instance.requestRrdDb(t);
-                } catch (IOException ex) {
-                    return null;
-                }
-            })
-            .filter(Objects::nonNull)
-            .forEach(t -> {
-                try {
-                    t.close();
-                } catch (IOException ex) {
-                }
-            }));
+            Lock oldPoolLock = null;
             try {
+                if (instance != null) {
+                    oldPoolLock = instance.lockEmpty(0, TimeUnit.DAYS);
+                }
                 instance = new RrdDbPool(backendFactory);
                 instance.setCapacity(dbPoolSize);
-                usepool = true;
             } catch (IllegalStateException e) {
                 logger.warn("Trying to change rrd pool size failed, a restart is needed");
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } finally {
+                Optional.ofNullable(oldPoolLock).ifPresent(Lock::unlock);
             }
         }
     }
