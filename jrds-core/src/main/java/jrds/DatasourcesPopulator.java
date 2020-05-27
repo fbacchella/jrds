@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.rrd4j.core.DataHolder;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.IPlottable;
 import org.rrd4j.data.Variable;
@@ -26,12 +27,9 @@ import jrds.store.Extractor;
  *
  * @param <T>
  */
-class DatasourcesPopulator<T> {
+class DatasourcesPopulator<T extends DataHolder> {
 
     static final private Logger logger = LoggerFactory.getLogger(DatasourcesPopulator.class);
-
-    final RrdGraphDef graphDef;
-    final DataProcessor dp;
 
     private final List<DsDesc> toDo = new ArrayList<DsDesc>();
 
@@ -40,30 +38,20 @@ class DatasourcesPopulator<T> {
         return Collections.unmodifiableList(p.toDo);
     }
 
-    static DataProcessor populate(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData, List<DsDesc> allds, String name) {
+    static DataProcessor populate(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> customData, List<DsDesc> allds, String name) {
         DataProcessor dp = ei.getDataProcessor();
-        new DatasourcesPopulator<DataProcessor>(dp, defProbe, ei, customData, allds, name);
+        new DatasourcesPopulator<>(dp, defProbe, ei, customData, allds, name);
         return dp;
     }
 
     private DatasourcesPopulator(T data, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> customData, List<DsDesc> allds, String name) {
         HostsList hl = defProbe.getHostList();
 
-        if (wrapped instanceof RrdGraphDef) {
-            graphDef = (RrdGraphDef) wrapped;
-            dp = null;
-        } else if (wrapped instanceof DataProcessor) {
-            dp = (DataProcessor) wrapped;
-            graphDef = null;
-        } else {
-            throw new RuntimeException();
-        }
-
         // The datasources already found
         Set<String> datasources = new HashSet<String>();
 
         // The needed extractors
-        Map<Probe<?, ?>, Extractor> probeDS = new HashMap<Probe<?, ?>, Extractor>(1);
+        Map<Probe<?, ?>, Extractor> probeDS = new HashMap<>(customData.size() + allds.size());
         probeDS.put(defProbe, defProbe.getMainStore().getExtractor());
 
         for (DsDesc ds: allds) {
@@ -76,7 +64,7 @@ class DatasourcesPopulator<T> {
             else if (ds.percentile != null) {
                 complete = true;
                 if (!datasources.contains(ds.name)) {
-                    percentile(ds.name, ds.dsName, ds.percentile);
+                    data.datasource(ds.name, ds.dsName, new Variable.PERCENTILE(ds.percentile));
                     datasources.add(ds.name);
                 }
             }
@@ -84,7 +72,7 @@ class DatasourcesPopulator<T> {
             else if(ds.rpn != null) {
                 complete = true;
                 if(!datasources.contains(ds.name)) {
-                    datasource(ds.name, ds.rpn);
+                    data.datasource(ds.name, ds.rpn);
                     datasources.add(ds.name);
                 }
             }
@@ -97,7 +85,7 @@ class DatasourcesPopulator<T> {
             else if(customData != null && customData.containsKey(ds.dsName)) {
                 complete = true;
                 if(!datasources.contains(ds.name)) {
-                    datasource(ds.name, customData.get(ds.dsName));
+                    data.datasource(ds.name, customData.get(ds.dsName));
                     datasources.add(ds.name);
                     logger.trace("custom data found for {}", ds.dsName);
                 }
@@ -125,11 +113,7 @@ class DatasourcesPopulator<T> {
                 }
                 complete = true;
 
-                // Add the dsName for the probe found
-                if(!probeDS.containsKey(probe)) {
-                    probeDS.put(probe, probe.getMainStore().getExtractor());
-                }
-                Extractor ex = probeDS.get(probe);
+                Extractor ex = probeDS.computeIfAbsent(probe, p -> p.getMainStore().getExtractor());
                 if(!datasources.contains(ds.name)) {
                     ex.addSource(ds.name, ds.dsName);
                     datasources.add(ds.name);
@@ -147,43 +131,15 @@ class DatasourcesPopulator<T> {
 
         // Fill the graphdef with extracted data
         for(Extractor x: probeDS.values()) {
-            if (graphDef != null) {
-                x.fill(graphDef, ei);
-            } else {
-                x.fill(dp, ei);
-            }
+            x.fill(data, ei);
             x.release();
         }
 
         logger.trace("Datasource: {}", datasources);
-        if (graphDef != null) {
+        if (data instanceof RrdGraphDef) {
             logger.trace("Todo: : {}", toDo);
         }
 
-    }
-
-    private void datasource(String name, Plottable plottable) {
-        if (graphDef != null) {
-            graphDef.datasource(name, plottable);
-        } else {
-            dp.addDatasource(name, plottable);
-        }
-    }
-
-    private void datasource(String name, String rpn) {
-        if (graphDef != null) {
-            graphDef.datasource(name, rpn);
-        } else {
-            dp.addDatasource(name, rpn);
-        }
-    }
-
-    private void percentile(String name, String dsName, int percentile) {
-        if (graphDef != null) {
-            graphDef.datasource(name, dsName, new Variable.PERCENTILE(percentile));
-        } else {
-            dp.addDatasource(name, dsName, new Variable.PERCENTILE(percentile));
-        }
     }
 
 }

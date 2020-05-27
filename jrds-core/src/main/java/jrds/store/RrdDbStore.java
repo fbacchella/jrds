@@ -14,54 +14,70 @@ import java.util.Set;
 
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.Archive;
+import org.rrd4j.core.DataHolder;
 import org.rrd4j.core.Datasource;
 import org.rrd4j.core.DsDef;
 import org.rrd4j.core.FetchData;
+import org.rrd4j.core.FetchRequest;
 import org.rrd4j.core.Header;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDef;
 import org.rrd4j.core.Sample;
-import org.rrd4j.core.Util;
-import org.rrd4j.data.DataProcessor;
-import org.rrd4j.graph.RrdGraphDef;
 import org.slf4j.event.Level;
 
 import jrds.ArchivesSet;
 import jrds.JrdsSample;
 import jrds.Probe;
-import lombok.Getter;
+import jrds.Util;
 
 public class RrdDbStore extends AbstractStore<RrdDb> {
 
     private class RrdDbExtractor extends AbstractExtractor<FetchData> {
-        @Getter
-        private final int columnCount;
+        private final RrdDb rrdDb;
 
         RrdDbExtractor(RrdDb rrdDb) {
-            this.columnCount = rrdDb.getDsCount();
+            this.rrdDb = rrdDb;
         }
 
         @Override
         public void release() {
-        }
-
-        @Override
-        public void fill(RrdGraphDef gd, ExtractInfo ei) {
-            for(Map.Entry<String, String> e: sources.entrySet()) {
-                gd.datasource(e.getKey(), RrdDbStore.this.getPath(), e.getValue(), ei.cf);
+            try {
+                rrdDb.close();
+            } catch (IOException e) {
+                RrdDbStore.this.log(Level.ERROR, e, "Failed to close %s: %s", rrdDb, Util.resolveThrowableException(e));
             }
         }
 
         @Override
-        public void fill(DataProcessor dp, ExtractInfo ei) {
-            for(Map.Entry<String, String> e: sources.entrySet()) {
-                dp.addDatasource(e.getKey(), RrdDbStore.this.getPath(), e.getValue(), ei.cf);
+        public void fill(DataHolder dp, ExtractInfo ei) {
+            try {
+                FetchData fd = getFetchData(ei);
+                for(Map.Entry<String, String> e: sources.entrySet()) {
+                    dp.datasource(e.getKey(), e.getValue(), fd);
+                }
+            } catch (IOException e) {
+                RrdDbStore.this.log(Level.ERROR, e, "Failed to fill with data from {}: {}", rrdDb, Util.resolveThrowableException(e));
+           }
+        }
+
+        private FetchData getFetchData(ExtractInfo ei) throws IOException {
+            FetchRequest fr;
+            if (ei.step == 0) {
+                fr = rrdDb.createFetchRequest(ei.cf, ei.start.getEpochSecond(), ei.end.getEpochSecond());
+            } else {
+                fr = rrdDb.createFetchRequest(ei.cf, ei.start.getEpochSecond(), ei.end.getEpochSecond(), ei.step);
             }
+            return fr.fetchData();
         }
 
         @Override
         public String getPath() {
             return RrdDbStore.this.getPath();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return rrdDb.getDsCount();
         }
     }
 
@@ -253,7 +269,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     public Date getLastUpdate() {
         Date lastUpdate = null;
         try (RrdDb rrdDb = factory.getRrd(getPath())){
-            lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
+            lastUpdate = org.rrd4j.core.Util.getDate(rrdDb.getLastUpdateTime());
         } catch (Exception e) {
             throw new RuntimeException("Unable to get last update date for " + p.getQualifiedName(), e);
         }
@@ -262,7 +278,8 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
 
     @Override
     public AbstractExtractor<FetchData> getExtractor() {
-        try (RrdDb rrdDb = factory.getRrd(getPath())){
+        try {
+            RrdDb rrdDb = factory.getRrd(getPath());
             return new RrdDbExtractor(rrdDb);
         } catch (IOException e) {
             throw new RuntimeException("Failed to access rrd file  " + getPath(), e);
@@ -276,7 +293,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
             for(int i = 0; i < dsNames.length; i++) {
                 retValues.put(dsNames[i], rrdDb.getDatasource(i).getLastValue());
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             log(Level.ERROR, e, "Unable to get last values: %s", e);
         }
         return retValues;

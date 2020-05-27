@@ -7,12 +7,11 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.rrd4j.core.DataHolder;
 import org.rrd4j.core.jrrd.ConsolidationFunctionType;
 import org.rrd4j.core.jrrd.DataChunk;
 import org.rrd4j.core.jrrd.DataSource;
 import org.rrd4j.core.jrrd.RRDatabase;
-import org.rrd4j.data.DataProcessor;
-import org.rrd4j.graph.RrdGraphDef;
 import org.slf4j.event.Level;
 
 import jrds.ArchivesSet;
@@ -100,39 +99,20 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
         }
 
         return new AbstractExtractor<DataChunk>() {
-
-            @Override
-            protected void finalize() throws Throwable {
-                super.finalize();
-                db.close();
-            }
-
             @Override
             public int getColumnCount() {
                 return db.getDataSourcesName().size();
             }
 
             @Override
-            public void fill(RrdGraphDef gd, ExtractInfo ei) {
+            public void fill(DataHolder gd, ExtractInfo ei) {
                 try {
-                    DataChunk dc = db.getData(ConsolidationFunctionType.AVERAGE, ei.start, ei.end, ei.step);
+                    DataChunk dc = db.getData(ConsolidationFunctionType.AVERAGE, ei.start.getEpochSecond(), ei.end.getEpochSecond(), ei.step);
                     for(Map.Entry<String, String> e: sources.entrySet()) {
                         gd.datasource(e.getKey(), dc.toPlottable(e.getValue()));
                     }
                 } catch (IOException e) {
                     throw new RuntimeException("Failed to access rrd file  " + db.toString(), e);
-                }
-            }
-
-            @Override
-            public void fill(DataProcessor dp, ExtractInfo ei) {
-                try {
-                    DataChunk dc = db.getData(ConsolidationFunctionType.AVERAGE, ei.start, ei.end, ei.step);
-                    for(Map.Entry<String, String> e: sources.entrySet()) {
-                        dp.addDatasource(e.getKey(), dc.toPlottable(e.getValue()));
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException("Failed to access rrd file  " + RRDToolStore.this.getPath(), e);
                 }
             }
 

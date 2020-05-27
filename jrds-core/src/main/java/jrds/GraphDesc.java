@@ -951,7 +951,7 @@ public class GraphDesc implements WithACL {
     }
 
     public RrdGraphDef getEmptyGraphDef() {
-        RrdGraphDef retValue = new RrdGraphDef();
+        RrdGraphDef retValue = new RrdGraphDef(1, 2);
         if(!Double.isNaN(lowerLimit))
             retValue.setMinValue(lowerLimit);
         if(!Double.isNaN(upperLimit))
@@ -966,7 +966,6 @@ public class GraphDesc implements WithACL {
             retValue.setUnitsExponent(unitExponent);
         }
         retValue.setLogarithmic(logarithmic);
-        retValue.setPoolUsed(true);
         retValue.setAntiAliasing(true);
         retValue.setTextAntiAliasing(true);
         retValue.setImageFormat("PNG");
