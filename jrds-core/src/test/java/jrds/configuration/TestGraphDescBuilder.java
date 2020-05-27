@@ -115,7 +115,7 @@ public class TestGraphDescBuilder {
         logger.trace("Probe preparation done");
 
         Period pr = new Period();
-        ExtractInfo ei = ExtractInfo.get().make(pr.getBegin(), pr.getEnd());
+        ExtractInfo ei = ExtractInfo.of(pr.getBegin(), pr.getEnd());
         Map<String, IPlottable> empty = Collections.emptyMap();
 
         ImageWriter iw = ImageIO.getImageWritersByFormatName("BMP").next();

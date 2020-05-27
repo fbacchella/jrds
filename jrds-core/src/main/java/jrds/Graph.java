@@ -128,7 +128,7 @@ public class Graph implements WithACL {
         try {
             long startsec = getStartSec();
             long endsec = getEndSec();
-            ExtractInfo ei = ExtractInfo.get().make(start, end);
+            ExtractInfo ei = ExtractInfo.builder().interval(start, end).build();
             graphDef.setStartTime(startsec);
             graphDef.setEndTime(endsec);
             PlottableMap customData = node.getCustomData();
@@ -212,7 +212,7 @@ public class Graph implements WithACL {
      * @throws IOException
      */
     public DataProcessor getDataProcessor() throws IOException {
-        ExtractInfo ei = ExtractInfo.get().make(start, end);
+        ExtractInfo ei = ExtractInfo.of(start, end);
         return getNode().getPlottedDate(ei);
     }
 

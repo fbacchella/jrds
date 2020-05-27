@@ -60,6 +60,6 @@ public abstract class PlottableMap extends HashMap<String, IPlottable> {
     public abstract void configure(long start, long end, long step);
 
     public void configure(ExtractInfo ei) {
-        configure(ei.start.getTime() / 1000L, ei.end.getTime() / 1000L, ei.step);
+        configure(ei.start.getEpochSecond(), ei.end.getEpochSecond(), ei.step);
     }
 }

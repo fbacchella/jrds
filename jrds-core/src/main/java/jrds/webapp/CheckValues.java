@@ -90,7 +90,7 @@ public final class CheckValues extends JrdsServlet {
 
         try (Extractor ex = p.fetchData()) {
             String ds = params.getValue("dsname");
-            ExtractInfo ei = ExtractInfo.get().make(paste, lastupdate).make(p.getStep());
+            ExtractInfo ei = ExtractInfo.builder().interval(paste, lastupdate).step(p.getStep()).build();
             if (ds != null && !"".equals(ds.trim())) {
                 String dsName = ds.trim();
                 ex.addSource(dsName, dsName);
