@@ -208,7 +208,7 @@ public class UtilTest {
 
     @Test
     public void testParseTemplate5() throws Exception {
-        Probe<String, Number> testProbe = GenerateProbe.fillProbe(new GenerateProbe.EmptyProbe(), testFolder, GenerateProbe.ChainedMap.start());
+        Probe<String, Number> testProbe = GenerateProbe.fillProbe(new GenerateProbe.EmptyProbe<String, Number>(), testFolder, GenerateProbe.ChainedMap.start());
         GenericBean b1 = new GenericBean.CustomBean("one");
         b1.set(testProbe, "one");
         testProbe.getPd().addBean(b1);

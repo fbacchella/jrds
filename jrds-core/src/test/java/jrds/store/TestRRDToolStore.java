@@ -46,7 +46,7 @@ public class TestRRDToolStore {
         GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start(2)
                 .set(StoreFactory.class, new RRDToolStoreFactory())
                 .set(GenerateProbe.FACTORYCONFIG, factoryArgs);
-        Probe<?,?> p = GenerateProbe.fillProbe(new GenerateProbe.EmptyProbe(), testFolder, args);
+        Probe<String, Number> p = GenerateProbe.fillProbe(new GenerateProbe.EmptyProbe<String, Number>(), testFolder, args);
         p.getPd().add("speed", DsType.GAUGE);
         p.getPd().add("weight", DsType.GAUGE);
         Assert.assertTrue(p.checkStore());

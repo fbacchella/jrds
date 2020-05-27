@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.junit.rules.TemporaryFolder;
+
 import jrds.HostInfo;
 import jrds.Probe;
 import jrds.ProbeDesc;
@@ -12,8 +14,6 @@ import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.starter.HostStarter;
 import jrds.store.StoreFactory;
-
-import org.junit.rules.TemporaryFolder;
 
 public class GenerateProbe {
     static public final String FACTORYCONFIG = "factoryconfig";
@@ -55,9 +55,9 @@ public class GenerateProbe {
 
     }
 
-    static public class EmptyProbe extends Probe<String, Number> {
+    static public class EmptyProbe<T, V> extends Probe<T, V> {
         @Override
-        public Map<String, Number> getNewSampleValues() {
+        public Map<T, V> getNewSampleValues() {
             return Collections.emptyMap();
         }
 
@@ -68,45 +68,49 @@ public class GenerateProbe {
     }
 
     @SafeVarargs
-    @SuppressWarnings("unchecked")
-    public static final Probe<String, Number> quickProbe(TemporaryFolder folder, ChainedMap<Object>... args) throws Exception {
+    @SuppressWarnings({ "unchecked"})
+    public static final <P extends Probe<T, V>, T, V> P quickProbe(TemporaryFolder folder, ChainedMap<Object>... args) throws Exception {
         ChainedMap<Object> arg = new ChainedMap<Object>(0);
         for(int i = 0; i < args.length; i++) {
             arg.putAll(args[i]);
         }
-        Class<?> probeClass = (Class<Probe<?, ?>>) arg.get(Probe.class.getCanonicalName());
-        if(probeClass == null) {
-            probeClass = EmptyProbe.class;
+        Class<P> probeClass = (Class<P>) arg.get(Probe.class.getCanonicalName());
+        P probe;
+        if(probeClass != null) {
+            probe = (P) probeClass.getConstructor().newInstance();
+        } else {
+            probe = (P) new EmptyProbe<T,V>();
         }
-        Probe<String, Number> probe = (Probe<String, Number>) probeClass.getConstructor().newInstance();
         return fillProbe(probe, folder, arg);
     }
 
-    public static final Probe<String, Number> fillProbe(Probe<String, Number> p, TemporaryFolder folder, ChainedMap<Object> args) throws Exception {
+    @SuppressWarnings({ "unlikely-arg-type", "unchecked" })
+    public static final <P extends Probe<T, V>, T, V> P fillProbe(P p, TemporaryFolder folder, ChainedMap<Object> args) throws Exception {
 
         PropertiesManager pm = (PropertiesManager) args.get(PropertiesManager.class.getCanonicalName());
         if(pm == null) {
             pm = Tools.makePm(folder);
         }
 
-        @SuppressWarnings("unchecked")
-        ProbeDesc<String> pd = (ProbeDesc<String>) args.get(ProbeDesc.class.getCanonicalName());
+        ProbeDesc<T> pd = (ProbeDesc<T>) args.get(ProbeDesc.class.getCanonicalName());
         if(pd == null) {
-            pd = new ProbeDesc<String>();
+            pd = (ProbeDesc<T>) args.get(ProbeDesc.class);
+        }
+        if(pd == null) {
+            pd = new ProbeDesc<T>();
         }
         p.setPd(pd);
 
-        @SuppressWarnings("unlikely-arg-type")
-        HostStarter hs = (HostStarter) args.get(HostStarter.class);
+        HostStarter hs = (HostStarter) args.get(HostStarter.class.getCanonicalName());
         if(hs == null) {
-            @SuppressWarnings("unlikely-arg-type")
-            HostInfo hi = (HostInfo) args.get(HostInfo.class);
+            HostInfo hi = (HostInfo) args.get(HostInfo.class.getCanonicalName());
             if(hi == null) {
                 hi = new HostInfo("localhost");
                 hi.setHostDir(folder.newFolder());
                 hs = new HostStarter(hi);
             }
         }
+        hs.configureStarters(pm);
         p.setHost(hs);
 
         String name = (String) args.get("name");
@@ -124,12 +128,12 @@ public class GenerateProbe {
         sf.configureStore(pm, new Properties());
         sf.start();
 
-        @SuppressWarnings("unchecked")
         Map<String, String> factoryArgs = (Map<String, String>) args.get(FACTORYCONFIG);
         if(factoryArgs == null) {
             factoryArgs = Collections.emptyMap();
         }
         p.setMainStore(sf, factoryArgs);
+        p.configureStarters(pm);
 
         return p;
     }
