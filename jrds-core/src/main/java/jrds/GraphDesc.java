@@ -22,7 +22,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
-import org.rrd4j.data.Plottable;
+import org.rrd4j.data.IPlottable;
 import org.rrd4j.data.Variable;
 import org.rrd4j.graph.RrdGraphConstants;
 import org.rrd4j.graph.RrdGraphDef;
@@ -983,7 +983,7 @@ public class GraphDesc implements WithACL {
      * @param customData some custom data, they override existing values in the
      *            associated probe
      */
-    public void fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData) {
+    public void fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> customData) {
         List<DsDesc> toDo = DatasourcesPopulator.populate(graphDef, defProbe, ei, customData, allds, name);
         // The title line, only if values block is required
         if(withSummary) {
@@ -1014,7 +1014,7 @@ public class GraphDesc implements WithACL {
      * @return
      * @throws IOException
      */
-    public RrdGraphDef getGraphDef(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> ownData) throws IOException {
+    public RrdGraphDef getGraphDef(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> ownData) throws IOException {
         RrdGraphDef retValue = getEmptyGraphDef();
         fillGraphDef(retValue, defProbe, ei, ownData);
         return retValue;
@@ -1060,7 +1060,7 @@ public class GraphDesc implements WithACL {
      * @return
      * @throws IOException
      */
-    public DataProcessor getPlottedDatas(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData) throws IOException {
+    public DataProcessor getPlottedDatas(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> customData) throws IOException {
         return DatasourcesPopulator.populate(defProbe, ei, customData, allds, name);
     }
 

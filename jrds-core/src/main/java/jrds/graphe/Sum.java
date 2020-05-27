@@ -7,7 +7,7 @@ import java.util.Date;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.LinearInterpolator;
-import org.rrd4j.data.Plottable;
+import org.rrd4j.data.IPlottable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,7 +124,7 @@ public class Sum extends AutonomousGraphNode {
                     long[] ts = dp.getTimestamps();
                     String[] dsNames = dp.getSourceNames();
                     for(int i = 0; i < dsNames.length; i++) {
-                        Plottable pl = new LinearInterpolator(ts, allvalues[i]);
+                        IPlottable pl = new LinearInterpolator(ts, allvalues[i]);
                         put(dsNames[i], pl);
                         logger.trace("Added {} to sum plottables", dsNames[i]);
                     }

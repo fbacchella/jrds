@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.rrd4j.data.DataProcessor;
-import org.rrd4j.data.Plottable;
+import org.rrd4j.data.IPlottable;
 import org.rrd4j.data.Variable;
 import org.rrd4j.graph.RrdGraphDef;
 import org.slf4j.Logger;
@@ -35,8 +35,8 @@ class DatasourcesPopulator<T> {
 
     private final List<DsDesc> toDo = new ArrayList<DsDesc>();
 
-    static List<DsDesc> populate(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData, List<DsDesc> allds, String name) {
-        DatasourcesPopulator<RrdGraphDef> p = new DatasourcesPopulator<RrdGraphDef>(graphDef, defProbe, ei, customData, allds, name);
+    static List<DsDesc> populate(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> customData, List<DsDesc> allds, String name) {
+        DatasourcesPopulator<RrdGraphDef> p = new DatasourcesPopulator<>(graphDef, defProbe, ei, customData, allds, name);
         return Collections.unmodifiableList(p.toDo);
     }
 
@@ -46,7 +46,7 @@ class DatasourcesPopulator<T> {
         return dp;
     }
 
-    private DatasourcesPopulator(T wrapped, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData, List<DsDesc> allds, String name) {
+    private DatasourcesPopulator(T data, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> customData, List<DsDesc> allds, String name) {
         HostsList hl = defProbe.getHostList();
 
         if (wrapped instanceof RrdGraphDef) {
