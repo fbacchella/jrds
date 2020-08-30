@@ -131,7 +131,7 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         try {
             log(Level.DEBUG, "executing: %s", cmd);
             perfProcess = Runtime.getRuntime().exec(getCmd());
-            perfProcess.getInputStream().close();
+            perfProcess.getOutputStream();
             try (InputStream  stdout = perfProcess.getInputStream()) {
                 BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(stdout));
                 perfstring = stdoutReader.readLine();
