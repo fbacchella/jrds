@@ -43,7 +43,7 @@ jobs:
             - run:
                 command: mvn -B clean compile install -DskipTests -s .circleci/settings.xml
                 environment:
-                    JAVA_HOME: /usr/java/openjdk-14
+                    JAVA_HOME: /usr/local/openjdk-14
                     MAVEN_OPTS: "-Xmx2048m"
             - persist_to_workspace:
                 root: /
@@ -146,7 +146,7 @@ jobs:
                     echo "publishing jobs: $PUBLISH"
                     mvn -B $PUBLISH -Pskip -DskipTests -s .circleci/settings.xml
                 environment:
-                    JAVA_HOME: /usr/java/openjdk-14
+                    JAVA_HOME: /usr/local/openjdk-14
                     MAVEN_OPTS: "-Xmx2048m"
             - persist_to_workspace:
                 root: /
