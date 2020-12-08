@@ -20,11 +20,13 @@
         <bootclasspath>${jdk.compile.home}/jre/lib/rt.jar</bootclasspath>
         <year>2019</year>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.2.29.v20191105</jetty.version>
+        <jetty.version>9.2.30.v20200428</jetty.version>
         <maven.plugin.surefire.version>3.0.0-M4</maven.plugin.surefire.version>
         <servlet-api.version>3.1.0</servlet-api.version>
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
         <slf4j.version>1.7.30</slf4j.version>
+        <log4j2.version>2.14.0</log4j2.version>
+        <lombok.version>1.18.16</lombok.version>
         <jrds.hidelogs>true</jrds.hidelogs>
         <!-- Tell sonar where to look for the coverage file. Property inherited by submodules -->
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
@@ -107,7 +109,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.2.0</version>
                     <configuration>
                         <quiet/>
                         <links>
@@ -185,7 +187,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
