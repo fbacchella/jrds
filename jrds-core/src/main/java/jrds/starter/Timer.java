@@ -237,7 +237,7 @@ public class Timer extends StarterNode {
     @Override
     public synchronized void stopCollect() {
         super.stopCollect();
-        if(tpool != null) {
+        if (tpool != null) {
             tpool.shutdownNow();
         }
     }

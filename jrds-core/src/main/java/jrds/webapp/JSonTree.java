@@ -110,7 +110,7 @@ public class JSonTree extends JSonData {
     private Collection<GraphTree> findRoot(Collection<GraphTree> rootstry) {
         while (rootstry.size() == 1) {
             logger.trace("Trying with graph tree roots: {}", rootstry);
-            GraphTree child = rootstry.iterator().next();
+            GraphTree child = rootstry.stream().findAny().get();
             Map<String, GraphTree> childTree = child.getChildsMap();
             // Don't go in empty nodes
             if(childTree.isEmpty())

@@ -17,7 +17,7 @@ import jrds.Probe;
 import jrds.store.ExtractInfo;
 
 /**
- * A servlet wich show the last update values and time
+ * A servlet which show the last update values and time
  * 
  * @author Fabrice Bacchella
  */
