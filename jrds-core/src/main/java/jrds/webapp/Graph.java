@@ -84,25 +84,21 @@ public final class Graph extends JrdsServlet {
             res.addHeader("Content-disposition", "inline; filename=" + graph.getPngName());
             String eTagBaseString = getServletName() + graph.hashCode();
             res.addHeader("ETag", Base64.getEncoder().encodeToString(eTagBaseString.getBytes()));
-            ServletOutputStream out = res.getOutputStream();
-            FileChannel indata = hl.getRenderer().sendInfo(graph);
-            // If a cache file exist, try to be smart, but only if caching is
-            // allowed
-            if(indata != null && cache) {
-                logger.debug("graph {} is cached", graph);
-                if(indata.size() < Integer.MAX_VALUE)
-                    res.setContentLength((int) indata.size());
-                WritableByteChannel outC = Channels.newChannel(out);
-                indata.transferTo(0, indata.size(), outC);
-            } else {
-                logger.debug("graph {} not found in cache", graph);
-                graph.writePng(out);
-            }
-            if(indata != null) {
-                try {
-                    indata.close();
-                } catch (IOException e) {
-                    logger.error("failed to close cache file: " + e.getMessage());;
+
+            try (ServletOutputStream out = res.getOutputStream();
+                 FileChannel indata = hl.getRenderer().sendInfo(graph);
+                ) {
+                // If a cache file exist, try to be smart, but only if caching is
+                // allowed
+                if (indata != null && cache) {
+                    logger.debug("graph {} is cached", graph);
+                    if (indata.size() < Integer.MAX_VALUE)
+                        res.setContentLength((int) indata.size());
+                    WritableByteChannel outC = Channels.newChannel(out);
+                    indata.transferTo(0, indata.size(), outC);
+                } else {
+                    logger.debug("graph {} not found in cache", graph);
+                    graph.writePng(out);
                 }
             }
 

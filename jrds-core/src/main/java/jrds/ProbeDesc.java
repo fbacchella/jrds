@@ -382,8 +382,8 @@ public class ProbeDesc<KeyType> implements Cloneable {
                 continue;
             } else {
                 try {
-                    collectResolver = (CollectResolver<KeyType>) pm.collectResolver().newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
+                    collectResolver = (CollectResolver<KeyType>) pm.collectResolver().getConstructor().newInstance();
+                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | NoSuchMethodException | SecurityException e) {
                     throw new InvocationTargetException(e);
                 }
                 break;

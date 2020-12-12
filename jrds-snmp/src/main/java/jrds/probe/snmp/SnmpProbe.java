@@ -149,7 +149,7 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
                 retValue.put(oid, (Number) o);
             } else if(o instanceof Date) {
                 Date value = (Date) o;
-                retValue.put(oid, new Long(value.getTime()));
+                retValue.put(oid, value.getTime());
             }
         }
         return retValue;

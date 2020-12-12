@@ -1,5 +1,6 @@
 package jrds.probe.jdbc;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Driver;
@@ -35,9 +36,9 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
 
     static final void registerDriver(Class<?> JdbcDriver) {
         try {
-            Driver jdbcDriver = (Driver) JdbcDriver.newInstance();
+            Driver jdbcDriver = (Driver) JdbcDriver.getConstructor().newInstance();
             DriverManager.registerDriver(jdbcDriver);
-        } catch (SQLException | InstantiationException | IllegalAccessException e) {
+        } catch (SQLException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
             throw new RuntimeException("Can't register JDBC driver " + JdbcDriver, e);
         }
     }
@@ -142,16 +143,14 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
      */
     public Map<String, Number> select2Map(String query) {
         Map<String, Number> values = new HashMap<String, Number>();
-        try {
-            Statement stmt = starter.getStatment();
-            if(stmt.execute(query)) {
+        try (Statement stmt = starter.getStatment()) {
+            if (stmt.execute(query)) {
                 do {
                     values = parseRs(stmt.getResultSet());
                 } while (stmt.getMoreResults());
             } else {
                 log(Level.WARN, "Not a select query");
             }
-            stmt.close();
         } catch (SQLException e) {
             log(Level.ERROR, e, "SQL Error: " + e);
         }

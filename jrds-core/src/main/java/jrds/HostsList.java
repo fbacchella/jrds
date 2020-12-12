@@ -186,7 +186,7 @@ public class HostsList extends StarterNode {
             log(Level.DEBUG, "timer starters added %s for timer %s", timerStarterClasses, timer.getName());
             for(Class<? extends Starter> starterClass: timerStarterClasses) {
                 try {
-                    timer.registerStarter(starterClass.newInstance());
+                    timer.registerStarter(starterClass.getConstructor().newInstance());
                 } catch (Throwable e) {
                     log(Level.ERROR, e, "Starter %s failed to register for timer %s: %s", starterClass, timer.getName(), e);
                 }
@@ -197,7 +197,7 @@ public class HostsList extends StarterNode {
         log(Level.DEBUG, "top starters added %s", topStarterClasses);
         for(Class<? extends Starter> starterClass: topStarterClasses) {
             try {
-                Starter top = starterClass.newInstance();
+                Starter top = starterClass.getConstructor().newInstance();
                 registerStarter(top);
                 top.configure(pm);
             } catch (Throwable e) {
@@ -556,7 +556,7 @@ public class HostsList extends StarterNode {
         Set<DiscoverAgent> daSet = new HashSet<DiscoverAgent>(daList.size());
         for(Class<? extends DiscoverAgent> daa: daList) {
             try {
-                daSet.add(daa.newInstance());
+                daSet.add(daa.getConstructor().newInstance());
             } catch (Exception e) {
                 log(Level.ERROR, e, "Error creating discover agent " + daa.getName() + ": " + e);
             }
