@@ -5,6 +5,11 @@
             <username>${env.CI_DEPLOY_USERNAME}</username>
             <password>${env.CI_DEPLOY_PASSWORD}</password>
         </server>
+        <server>
+            <id>bintray-release</id>
+            <username>${env.BINTRAY_USERNAME}</username>
+            <password>${env.BINTRAY_PASSWORDD}</password>
+        </server>
     </servers>
     <activeProfiles>
         <activeProfile>jdkpaths</activeProfile>
