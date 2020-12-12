@@ -291,7 +291,7 @@ public class GraphDesc implements WithACL {
                         retValue.append(" (").append(label).append(")");
                     }
                 } else {
-                    logger.debug("Bad graph definition for " + graph);
+                    logger.debug("Bad graph definition for {}", graph);
                 }
                 return retValue.toString();
             }
@@ -626,7 +626,7 @@ public class GraphDesc implements WithACL {
                     color = Color.getColor(colorName);
                 }
                 if(color == null) {
-                    logger.error("Cannot read color " + colorName);
+                    logger.error("Cannot read color {}", colorName);
                     color = Color.white;
                 }
             }

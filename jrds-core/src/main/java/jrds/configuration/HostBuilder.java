@@ -137,7 +137,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 JrdsElement macrodef = JrdsNode.build(newDf.getFirstChild());
                 parseFragment(macrodef, host, collections, newProps);
             } else {
-                logger.error("Unknown macro:" + name);
+                logger.error("Unknown macro: {}", name);
             }
         }
 
@@ -153,7 +153,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 int max = Util.parseStringNumber(Util.parseTemplate(forattr.get("max"), this, properties), Integer.MIN_VALUE);
                 int step = Util.parseStringNumber(Util.parseTemplate(forattr.get("step"), this, properties), Integer.MIN_VALUE);
                 if (min > max || step <= 0) {
-                    logger.error("invalid range from " + min + " to " + max + " with step " + step);
+                    logger.error("invalid range from{} to {} with step {}", min, max, step);
                     break;
                 }
                 set = new ArrayList<String>((max - min) / step + 1);
@@ -176,7 +176,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                     parseFragment(forNode, host, collections, temp);
                 }
             } else {
-                logger.error("Invalid host configuration, collection " + name + " not found");
+                logger.error("Invalid host configuration, collection {} not found", name);
             }
         }
 

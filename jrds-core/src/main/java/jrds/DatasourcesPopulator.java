@@ -103,12 +103,12 @@ class DatasourcesPopulator<T extends DataHolder> {
                     logger.trace("External probe path: {}/{}/{}", pathHost, ds.dspath.probe, ds.dsName);
                     probe = hl.getProbeByPath(pathHost, ds.dspath.probe);
                     if(probe == null) {
-                        logger.error("Invalid probe: " + pathHost + "/" + ds.dspath.probe);
+                        logger.error("Invalid probe: {}/{}", pathHost, ds.dspath.probe);
                         continue;
                     }
                 }
                 if(!probe.dsExist(ds.dsName)) {
-                    logger.error("Invalid datasource " + ds.dsName + ", not found in " + probe);
+                    logger.error("Invalid datasource {}, not found in {}" , ds.dsName, probe);
                     continue;
                 }
                 complete = true;
@@ -118,14 +118,14 @@ class DatasourcesPopulator<T extends DataHolder> {
                     ex.addSource(ds.name, ds.dsName);
                     datasources.add(ds.name);
                 } else {
-                    logger.error("Datasource '" + ds.dsName + "' defined twice in " + name + ", for found: " + ds);
+                    logger.error("Datasource '{}' defined twice in {}, for found: {}" , ds.dsName, name, ds);
                 }
             }
             if(complete) {
                 toDo.add(ds);
             } else {
-                logger.debug("Error for " + ds);
-                logger.error("No way to plot " + ds.name + " in " + name + " found");
+                logger.debug("Error for {}", ds);
+                logger.error("No way to plot {} in {} found", ds.name, name);
             }
         }
 

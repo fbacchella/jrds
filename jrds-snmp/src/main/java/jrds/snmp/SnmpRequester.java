@@ -159,7 +159,7 @@ public enum SnmpRequester {
             } else {
                 int index = response.getErrorIndex() - 1;
                 VariableBinding vb = response.get(index);
-                logger.warn(response.getErrorStatusText() + " on " + vb.getOid().toString());
+                logger.warn("{} on {}" , response.getErrorStatusText(), vb.getOid());
                 /* If there is still variable to get, we try again */
                 if(requestPDU.size() > 1) {
                     requestPDU = response;

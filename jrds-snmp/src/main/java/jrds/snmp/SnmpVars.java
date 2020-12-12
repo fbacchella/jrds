@@ -93,7 +93,7 @@ public class SnmpVars extends HashMap<OID, Object> {
                 exceptionName = "Unknown exception";
                 break;
             }
-            logger.trace("Exception " + exceptionName + " for " + vb.getOid());
+            logger.trace("Exception {} for {}", exceptionName, vb.getOid());
         }
         return retValue;
     }
@@ -150,7 +150,7 @@ public class SnmpVars extends HashMap<OID, Object> {
                         OctetString newVar = octetVar.substring(0, length - 1);
                         if(newVar.isPrintable()) {
                             valueAsVar = newVar;
-                            logger.debug("Convertion an octet stream from " + octetVar + " to " + valueAsVar);
+                            logger.debug("Convertion an octet stream from{} to {}", octetVar, valueAsVar);
                         }
                     }
                     retvalue = valueAsVar.toString();

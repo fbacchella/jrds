@@ -114,7 +114,7 @@ public class Loader {
 
     public void importUrl(URI ressourceUri) {
         try {
-            logger.debug("Importing " + ressourceUri);
+            logger.debug("Importing {}", ressourceUri);
             String protocol = ressourceUri.getScheme();
             if("file".equals(protocol)) {
                 String fileName = ressourceUri.getPath();
@@ -140,9 +140,9 @@ public class Loader {
     }
 
     public void importDir(File path) {
-        logger.trace("Importing directory " + path);
+        logger.trace("Importing directory {}", path);
         if(!path.isDirectory()) {
-            logger.warn(path + " is not a directory");
+            logger.warn("{} is not a directory", path);
             return;
         }
         // listFiles can return null
@@ -171,7 +171,7 @@ public class Loader {
         for(JarEntry je: Collections.list(jarfile.entries())) {
             String name = je.getName();
             if(!je.isDirectory() && name.endsWith(".xml") && (name.startsWith("desc/") || name.startsWith("graph/") || name.startsWith("probe/"))) {
-                logger.trace("Will import jar entry " + je);
+                logger.trace("Will import jar entry {}", je);
                 importStream(jarfile.getInputStream(je), je + " in " + jarfile);
             }
         }
