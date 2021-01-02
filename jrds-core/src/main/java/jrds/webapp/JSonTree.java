@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,22 +85,24 @@ public class JSonTree extends JSonData {
     }
 
     private boolean evaluateFilter(ParamsBean params, JrdsJSONWriter w, HostsList root, Filter f) throws IOException {
-        Collection<GraphTree> level = root.getTrees();
-
         // We construct the graph tree root to use
         // The tree is parsed twice, that's not optimal
-        Collection<GraphTree> rootToDo = new HashSet<GraphTree>(level.size());
-        for(GraphTree tree: level) {
+        Set<GraphTree> rootToDo = new TreeSet<GraphTree>(this::graphTreeCompare);
+        for (GraphTree tree: root.getTrees()) {
             GraphTree testTree = f.setRoot(tree);
-            if(testTree != null && !rootToDo.contains(testTree) && testTree.enumerateChildsGraph(f).size() > 0) {
+            if (testTree != null && !rootToDo.contains(testTree) && testTree.acceptSome(f)) {
                 rootToDo.add(testTree);
             }
         }
-
-        for(GraphTree tree: findRoot(rootToDo)) {
+        for (GraphTree tree: findRoot(rootToDo)) {
             sub(params, w, tree, "tree", f, "", tree.getPath().hashCode());
         }
+
         return true;
+    }
+
+    private int graphTreeCompare(GraphTree gt1, GraphTree gt2) {
+        return Util.nodeComparator.compare(gt1.getName(), gt2.getName());
     }
 
     /**
@@ -113,13 +117,13 @@ public class JSonTree extends JSonData {
             GraphTree child = rootstry.stream().findAny().get();
             Map<String, GraphTree> childTree = child.getChildsMap();
             // Don't go in empty nodes
-            if(childTree.isEmpty())
+            if (childTree.isEmpty())
                 break;
             // a graph found, stop here
-            if(child.getGraphsSet().size() > 0) {
+            if (child.getGraphsSet().size() > 0) {
                 break;
             }
-            rootstry = child.getChildsMap().values();
+            rootstry = childTree.values();
         }
         return rootstry;
     }

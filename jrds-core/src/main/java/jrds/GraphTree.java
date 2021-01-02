@@ -181,6 +181,28 @@ public class GraphTree {
         return enumerateChildsGraph(null);
     }
 
+    public boolean acceptSome(Filter f) {
+        if (f == null) {
+            return true;
+        }
+        if (graphsSet != null) {
+            for (GraphNode g: graphsSet.values()) {
+                String path = getPath() + "/" + g.getName();
+                if (f.acceptGraph(g, path)) {
+                    return true;
+                }
+            }
+        }
+        if(childsMap != null) {
+            for(GraphTree child: childsMap.values()) {
+                if (child.acceptSome(f) ) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public String toString() {
         return name;
     }
