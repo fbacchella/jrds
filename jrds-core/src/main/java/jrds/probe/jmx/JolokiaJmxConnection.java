@@ -1,15 +1,13 @@
 package jrds.probe.jmx;
 
-import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
+import java.util.Optional;
 
 import org.jolokia.client.J4pClient;
 import org.jolokia.client.exception.J4pException;
 import org.jolokia.client.exception.J4pRemoteException;
+import org.jolokia.client.exception.J4pTimeoutException;
 import org.jolokia.client.request.J4pResponse;
 import org.jolokia.client.request.J4pVersionRequest;
 import org.json.simple.JSONObject;
@@ -17,14 +15,15 @@ import org.slf4j.event.Level;
 
 import jrds.PropertiesManager;
 import jrds.probe.HttpClientStarter;
+import jrds.probe.JMXConnection;
 
 public class JolokiaJmxConnection extends AbstractJmxConnection<J4pClient, JolokiaJmxSource> {
 
     private J4pClient j4pClient;
     private JolokiaJmxSource connection;
 
-    public JolokiaJmxConnection() {
-        super();
+    public JolokiaJmxConnection(JMXConnection parent) {
+        super(parent);
         path = "/jolokia/";
         port = -1;
     }
@@ -46,17 +45,20 @@ public class JolokiaJmxConnection extends AbstractJmxConnection<J4pClient, Jolok
         if (httpstarter == null || !httpstarter.isStarted()) {
             return false;
         }
+        String protocol = ssl ? "https" : "http";
+        int resolvedport = port > 0 ? port : ssl ? 443 : 80;
+        URL url;
         try {
-            String protocol = ssl ? "https" : "http";
-            int resolvedport = port > 0 ? port : ssl ? 443 : 80;
-            URL url = new URL(protocol, getHostName(), resolvedport, path);
+            url = new URL(protocol, getHostName(), resolvedport, path);
+        } catch (MalformedURLException e) {
+            log(Level.ERROR, e, "can't build jolokia URL: %s", e.getMessage());
+            return false;
+        }
+        try {
             j4pClient = new J4pClient(url.toString(), httpstarter.getHttpClient());
             connection = new JolokiaJmxSource(j4pClient);
             J4pResponse<J4pVersionRequest> ver = j4pClient.execute(new J4pVersionRequest());
             return ver.getValue() != null;
-        } catch (MalformedURLException e) {
-            log(Level.ERROR, e, "can't build jolokia URL: %s", e.getMessage());
-            return false;
         } catch (J4pRemoteException e) {
             JSONObject errorValue = e.getErrorValue();
             if (errorValue != null) {
@@ -64,6 +66,9 @@ public class JolokiaJmxConnection extends AbstractJmxConnection<J4pClient, Jolok
             } else {
                 log(Level.ERROR, e, "Can't connect to jolokia URL: %s (HTTP status %d)", e, e.getStatus());
             }
+            return false;
+        } catch (J4pTimeoutException e) {
+            log(Level.ERROR, "Timeout connecting to jolokia URL: %s", url);
             return false;
         } catch (J4pException e) {
             if (e.getCause() != null) {
@@ -83,16 +88,7 @@ public class JolokiaJmxConnection extends AbstractJmxConnection<J4pClient, Jolok
 
     @Override
     public long setUptime() {
-        try {
-            ObjectName mbeanName = new ObjectName(startTimeObjectName);
-            return connection.getValue(mbeanName, startTimeAttribue, new String[]{}).longValue();
-        } catch (InvocationTargetException e) {
-            log(Level.ERROR, e, "Uptime error for %s: %s", this, e.getCause());
-            return 0;
-        } catch (MalformedObjectNameException e) {
-            log(Level.ERROR, e, "Uptime error for %s: %s", this, e);
-            return 0;
-        }
+        return Optional.ofNullable(connection.getValue(this.getLevel(), startTimeRequestsParams)).orElse(0).longValue();
     }
 
     @Override

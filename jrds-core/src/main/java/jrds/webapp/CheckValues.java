@@ -47,7 +47,7 @@ public final class CheckValues extends JrdsServlet {
         HostsList hl = getHostsList();
         ParamsBean params = new ParamsBean(req, hl, "host", "probe", "dsname", "period", "cf");
 
-        long period = jrds.Util.parseStringNumber(params.getValue("period"), new Long(hl.getStep()));
+        long period = jrds.Util.parseStringNumber(params.getValue("period"), (long) hl.getStep());
         String cfName = params.getValue("cf");
         if(cfName == null || cfName.trim().isEmpty())
             cfName = "AVERAGE";
@@ -90,7 +90,7 @@ public final class CheckValues extends JrdsServlet {
 
         try (Extractor ex = p.fetchData()) {
             String ds = params.getValue("dsname");
-            ExtractInfo ei = ExtractInfo.get().make(paste, lastupdate).make(p.getStep());
+            ExtractInfo ei = ExtractInfo.builder().interval(paste, lastupdate).step(p.getStep()).build();
             if (ds != null && !"".equals(ds.trim())) {
                 String dsName = ds.trim();
                 ex.addSource(dsName, dsName);

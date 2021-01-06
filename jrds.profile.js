@@ -1,8 +1,9 @@
 // cd $DOJOSRC
+// WEBAPPDIR=$JRDS_HOME/jrds-webapp/src/main/webapp
 // LANG=C $DOJOSRC/util/buildscripts/build.sh  --profile $JRDS_HOME/jrds.profile.js --bin java basePath=$PWD
-// rsync -av release/jrds/dojo/dojo.js $JRDS_HOME/web/dojo/dojo.js
-// rsync -av release/jrds/dojo/nls/dojo_en-us.js $JRDS_HOME/web/dojo/nls/dojo_en-us.js
-// rsync -av --exclude '*.js.uncompressed.js' --delete release/jrds/{dojo,dojox,dijit} /var/jrds/
+// rsync -av $DOJOSRC/release/jrds/dojo/dojo.js $WEBAPPDIR/dojo/dojo.js
+// rsync -av $DOJOSRC/release/jrds/dojo/nls/dojo_en-us.js $WEBAPPDIR/dojo/nls/dojo_en-us.js
+// rsync -av --exclude '*.js.uncompressed.js' --delete $DOJOSRC/release/jrds/{dojo,dojox,dijit} /var/jrds/
 dependencies = [
     "dojo/main",
     "dijit/main",
@@ -47,7 +48,7 @@ dependencies = [
 
 var profile = (function(){
     return {
-    	releaseDir: "release",
+        releaseDir: "release",
         releaseName: "jrds",
         action: "release",
         //Optimization
@@ -68,12 +69,12 @@ var profile = (function(){
             location: "dojox"
         }],
         
-	    layers: {
-	    	"dojo/dojo": {
-	    		include: dependencies,
-	    		customBase: true,
-	    		boot: true
-	    	}
-	    }
-	};
+        layers: {
+            "dojo/dojo": {
+                include: dependencies,
+                customBase: true,
+                boot: true
+            }
+        }
+    };
 })();

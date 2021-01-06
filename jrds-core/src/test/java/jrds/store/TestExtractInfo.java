@@ -11,13 +11,11 @@ public class TestExtractInfo {
     @Test
     public void test1() {
         Date now = new Date();
-        ExtractInfo ei = ExtractInfo.get();
-
-        ei = ei.make(now, now).make(1).make("ds").make(ConsolFun.AVERAGE);
-        Assert.assertEquals(now, ei.start);
-        Assert.assertEquals(now, ei.end);
+        ExtractInfo ei = ExtractInfo.builder().interval(now, now).step(1).ds("ds").cf(ConsolFun.MAX).build();
+        Assert.assertEquals(now.getTime(), ei.start.toEpochMilli());
+        Assert.assertEquals(now.getTime(), ei.end.toEpochMilli());
         Assert.assertEquals("ds", ei.ds);
-        Assert.assertEquals(ConsolFun.AVERAGE, ei.cf);
+        Assert.assertEquals(ConsolFun.MAX, ei.cf);
     }
 
 }

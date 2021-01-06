@@ -14,54 +14,70 @@ import java.util.Set;
 
 import org.rrd4j.ConsolFun;
 import org.rrd4j.core.Archive;
+import org.rrd4j.core.DataHolder;
 import org.rrd4j.core.Datasource;
 import org.rrd4j.core.DsDef;
 import org.rrd4j.core.FetchData;
+import org.rrd4j.core.FetchRequest;
 import org.rrd4j.core.Header;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDef;
 import org.rrd4j.core.Sample;
-import org.rrd4j.core.Util;
-import org.rrd4j.data.DataProcessor;
-import org.rrd4j.graph.RrdGraphDef;
 import org.slf4j.event.Level;
 
 import jrds.ArchivesSet;
 import jrds.JrdsSample;
 import jrds.Probe;
-import lombok.Getter;
+import jrds.Util;
 
 public class RrdDbStore extends AbstractStore<RrdDb> {
 
     private class RrdDbExtractor extends AbstractExtractor<FetchData> {
-        @Getter
-        private final int columnCount;
+        private final RrdDb rrdDb;
 
         RrdDbExtractor(RrdDb rrdDb) {
-            this.columnCount = rrdDb.getDsCount();
+            this.rrdDb = rrdDb;
         }
 
         @Override
         public void release() {
-        }
-
-        @Override
-        public void fill(RrdGraphDef gd, ExtractInfo ei) {
-            for(Map.Entry<String, String> e: sources.entrySet()) {
-                gd.datasource(e.getKey(), RrdDbStore.this.getPath(), e.getValue(), ei.cf);
+            try {
+                rrdDb.close();
+            } catch (IOException e) {
+                RrdDbStore.this.log(Level.ERROR, e, "Failed to close %s: %s", rrdDb, Util.resolveThrowableException(e));
             }
         }
 
         @Override
-        public void fill(DataProcessor dp, ExtractInfo ei) {
-            for(Map.Entry<String, String> e: sources.entrySet()) {
-                dp.addDatasource(e.getKey(), RrdDbStore.this.getPath(), e.getValue(), ei.cf);
+        public void fill(DataHolder dp, ExtractInfo ei) {
+            try {
+                FetchData fd = getFetchData(ei);
+                for(Map.Entry<String, String> e: sources.entrySet()) {
+                    dp.datasource(e.getKey(), e.getValue(), fd);
+                }
+            } catch (IOException e) {
+                RrdDbStore.this.log(Level.ERROR, e, "Failed to fill with data from {}: {}", rrdDb, Util.resolveThrowableException(e));
+           }
+        }
+
+        private FetchData getFetchData(ExtractInfo ei) throws IOException {
+            FetchRequest fr;
+            if (ei.step == 0) {
+                fr = rrdDb.createFetchRequest(ei.cf, ei.start.getEpochSecond(), ei.end.getEpochSecond());
+            } else {
+                fr = rrdDb.createFetchRequest(ei.cf, ei.start.getEpochSecond(), ei.end.getEpochSecond(), ei.step);
             }
+            return fr.fetchData();
         }
 
         @Override
         public String getPath() {
             return RrdDbStore.this.getPath();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return rrdDb.getDsCount();
         }
     }
 
@@ -106,18 +122,18 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     protected void create(ArchivesSet archives) throws IOException {
         log(Level.INFO, "Need to create rrd");
         RrdDef def = getRrdDef(archives);
-        RrdDb.getBuilder().setRrdDef(def).build().close();
+        factory.getRrd(def).close();
     }
 
     private void upgrade(ArchivesSet archives) {
         try {
-            log(Level.WARN, "Definition is changed, the store needs to be upgraded");
             File source = new File(getPath());
-            RrdDef rrdDef = getRrdDef(archives);
             File dest = File.createTempFile("JRDS_", ".tmp", source.getParentFile());
+            log(Level.WARN, "Definition is changed, the store needs to be upgraded");
+            RrdDef rrdDef = getRrdDef(archives);
             rrdDef.setPath(dest.getCanonicalPath());
-            try (RrdDb rrdSource = RrdDb.getBuilder().setPath(source.getCanonicalPath()).build();
-                 RrdDb rrdDest = RrdDb.getBuilder().setRrdDef(rrdDef).build()) {
+            try (RrdDb rrdSource = factory.getRrd(source.getCanonicalPath());
+                 RrdDb rrdDest = factory.getRrd(rrdDef)) {
                 log(Level.DEBUG, "Updating %s to %s", source, dest);
                 Set<String> badDs = new HashSet<String>();
                 Header header = rrdSource.getHeader();
@@ -165,7 +181,6 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                     }
                 }
                 log(Level.DEBUG, "Robin migrated: %s", robinMigrated);
-                rrdSource.close();
             }
             log(Level.DEBUG, "Size difference : %d", (dest.length() - source.length()));
             copyFile(dest.getCanonicalPath(), source.getCanonicalPath());
@@ -188,8 +203,8 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     }
 
     private static void deleteFile(File file) throws IOException {
-        if(file.exists() && !file.delete()) {
-            throw new IOException("Could not delete file: " + file.getCanonicalPath());
+        if (file.exists()) {
+            Files.delete(file.toPath());
         }
     }
 
@@ -213,7 +228,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
 
                 // old definition
                 RrdDef oldDef;
-                try (RrdDb rrdDb = RrdDb.of(rrdPath.toString())) {
+                try (RrdDb rrdDb = factory.getRrd(rrdPath.toString())) {
                     oldDef = rrdDb.getRrdDef();
                 }
                 oldDef.setStartTime(startTime);
@@ -233,7 +248,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
                 } else if (!newDefDump.equals(oldDefDump)) {
                     log(Level.TRACE, "New definition should be: %s\n", newDef);
                     upgrade(archives);
-                    RrdDb.of(getPath());
+                    factory.getRrd(getPath()).close();
                 }
                 log(Level.TRACE, "******");
             } else {
@@ -254,7 +269,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     public Date getLastUpdate() {
         Date lastUpdate = null;
         try (RrdDb rrdDb = factory.getRrd(getPath())){
-            lastUpdate = Util.getDate(rrdDb.getLastUpdateTime());
+            lastUpdate = org.rrd4j.core.Util.getDate(rrdDb.getLastUpdateTime());
         } catch (Exception e) {
             throw new RuntimeException("Unable to get last update date for " + p.getQualifiedName(), e);
         }
@@ -263,7 +278,8 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
 
     @Override
     public AbstractExtractor<FetchData> getExtractor() {
-        try (RrdDb rrdDb = factory.getRrd(getPath())){
+        try {
+            RrdDb rrdDb = factory.getRrd(getPath());
             return new RrdDbExtractor(rrdDb);
         } catch (IOException e) {
             throw new RuntimeException("Failed to access rrd file  " + getPath(), e);
@@ -277,7 +293,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
             for(int i = 0; i < dsNames.length; i++) {
                 retValues.put(dsNames[i], rrdDb.getDatasource(i).getLastValue());
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             log(Level.ERROR, e, "Unable to get last values: %s", e);
         }
         return retValues;
@@ -289,7 +305,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
             for(Map.Entry<String, Number> e: sample.entrySet()) {
                 onesample.setValue(e.getKey(), e.getValue().doubleValue());
             }
-            if(p.getNamedLogger().isDebugEnabled())
+            if(p.getInstanceLogger().isDebugEnabled())
                 log(Level.DEBUG, "%s", onesample.dump());
             onesample.update();
         } catch (IOException e) {

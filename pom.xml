@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.jrds</groupId>
     <artifactId>jrds</artifactId>
-    <version>2020.1</version>
+    <version>2021.1</version>
     <packaging>pom</packaging>
     <name>JRDS</name>
     <url>http://jrds.fr</url>
@@ -16,15 +16,15 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <jdk.compile.home>${jdk.8.home}</jdk.compile.home>
-        <bootclasspath>${jdk.compile.home}/jre/lib/rt.jar</bootclasspath>
         <year>2020</year>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.2.29.v20191105</jetty.version>
-        <maven.plugin.surefire.version>3.0.0-M3</maven.plugin.surefire.version>
+        <jetty.version>9.2.30.v20200428</jetty.version>
+        <maven.plugin.surefire.version>3.0.0-M4</maven.plugin.surefire.version>
         <servlet-api.version>3.1.0</servlet-api.version>
-        <junit.version>4.13</junit.version>
+        <junit.version>4.13.1</junit.version>
         <slf4j.version>1.7.30</slf4j.version>
+        <log4j2.version>2.14.0</log4j2.version>
+        <lombok.version>1.18.16</lombok.version>
         <jrds.hidelogs>true</jrds.hidelogs>
         <!-- Tell sonar where to look for the coverage file. Property inherited by submodules -->
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
@@ -67,7 +67,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -103,12 +103,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>3.1.1</version>
-                </plugin>
-                <plugin>
-                    <!-- Needed by mvn help:evaluate -Dexpression=project.version -q -DforceStdout -->
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-help-plugin</artifactId>
-                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -191,7 +185,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -314,11 +308,83 @@
             <extension>
                 <groupId>org.apache.maven.surefire</groupId>
                 <artifactId>surefire-junit4</artifactId>
-                <version>3.0.0-M3</version>
+                <version>${maven.plugin.surefire.version}</version>
+            </extension>
+             <extension>
+                <groupId>org.hamcrest</groupId>
+                <artifactId>hamcrest-library</artifactId>
+                <version>1.3</version>
+            </extension>
+             <extension>
+                <groupId>org.easytesting</groupId>
+                <artifactId>fest-assert</artifactId>
+                <version>1.4</version>
+            </extension>
+             <extension>
+                <groupId>org.easytesting</groupId>
+                <artifactId>fest-util</artifactId>
+                <version>1.1.6</version>
+            </extension>
+             <extension>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.0</version>
             </extension>
         </extensions>
     </build>
     <profiles>
+        <profile>
+            <!-- With this profile, it's possible to used the latest jvm but still get jar compatible with pre-9 JVM.
+            It's activated when jdk.compile.home is defined. Example:
+            JAVA_HOME=$JAVA14_HOME mvn compile -Djdk.compile.home=$JAVA8_HOME !-->
+            <id>crosscompile</id>
+            <activation>
+                <property>
+                    <name>jdk.compile.home</name>
+                </property>
+            </activation>
+            <properties>
+                <bootclasspath>${jdk.compile.home}/jre/lib/rt.jar</bootclasspath>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <compilerArgs>
+                                <arg>-Xbootclasspath:${bootclasspath}</arg>
+                            </compilerArgs>
+                            <!-- needed for maven-plugin-javadoc to find the source version to use -->
+                            <source>${maven.compiler.source}</source>
+                            <target>${maven.compiler.target}</target>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- The default compile settings, when jdk.compile.home is not defined -->
+            <id>nocrosscompile</id>
+            <activation>
+                <property>
+                    <name>!jdk.compile.home</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <!-- needed for maven-plugin-javadoc to find the source version to use -->
+                            <source>${maven.compiler.source}</source>
+                            <target>${maven.compiler.target}</target>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>sonar</id>
             <properties>

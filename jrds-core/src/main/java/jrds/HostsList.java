@@ -21,6 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import jrds.PropertiesManager.TimerInfo;
@@ -48,6 +50,8 @@ import lombok.experimental.Accessors;
  * @author Fabrice Bacchella
  */
 public class HostsList extends StarterNode {
+
+    static final private Logger logger = LoggerFactory.getLogger(HostsList.class);
 
     static final private AtomicInteger generation = new AtomicInteger(0);
 
@@ -182,7 +186,7 @@ public class HostsList extends StarterNode {
             log(Level.DEBUG, "timer starters added %s for timer %s", timerStarterClasses, timer.getName());
             for(Class<? extends Starter> starterClass: timerStarterClasses) {
                 try {
-                    timer.registerStarter(starterClass.newInstance());
+                    timer.registerStarter(starterClass.getConstructor().newInstance());
                 } catch (Throwable e) {
                     log(Level.ERROR, e, "Starter %s failed to register for timer %s: %s", starterClass, timer.getName(), e);
                 }
@@ -193,7 +197,7 @@ public class HostsList extends StarterNode {
         log(Level.DEBUG, "top starters added %s", topStarterClasses);
         for(Class<? extends Starter> starterClass: topStarterClasses) {
             try {
-                Starter top = starterClass.newInstance();
+                Starter top = starterClass.getConstructor().newInstance();
                 registerStarter(top);
                 top.configure(pm);
             } catch (Throwable e) {
@@ -552,7 +556,7 @@ public class HostsList extends StarterNode {
         Set<DiscoverAgent> daSet = new HashSet<DiscoverAgent>(daList.size());
         for(Class<? extends DiscoverAgent> daa: daList) {
             try {
-                daSet.add(daa.newInstance());
+                daSet.add(daa.getConstructor().newInstance());
             } catch (Exception e) {
                 log(Level.ERROR, e, "Error creating discover agent " + daa.getName() + ": " + e);
             }
@@ -617,6 +621,11 @@ public class HostsList extends StarterNode {
         } catch (IOException ex) {
             log(Level.ERROR, ex, "Failed to stop probes class loader: {}", Util.resolveThrowableException(ex));
         }
+    }
+
+    @Override
+    public Logger getInstanceLogger() {
+        return logger;
     }
 
 }

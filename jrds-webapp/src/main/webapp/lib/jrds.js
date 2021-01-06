@@ -605,7 +605,7 @@ return declare("jrds.ReloadButton", button, {
 
 function initIndex() {
     initQuery();
-    dojo.cookie("treeOneSaveStateCookie", null, {expires: -1});
+    dojo.cookie("treeOneSaveStateCookie", null, {expires: -1, SameSite: 'Strict'});
 
     //The copy is saved
     var tempMainPane = dojo.byId('mainTab');

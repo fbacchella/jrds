@@ -30,7 +30,7 @@ public class TestHostInfo {
     }
 
     @Test
-    public void instantiate() throws InvocationTargetException {
+    public void instantiate() throws InvocationTargetException, NoSuchMethodException, SecurityException {
         ConnectionInfo ci = new ConnectionInfo(JMXConnection.class, "jrds.probe.JMXConnection", Collections.emptyList(), Collections.singletonMap("user", "admin"));
 
         HostInfo hi = new HostInfo("localhost");

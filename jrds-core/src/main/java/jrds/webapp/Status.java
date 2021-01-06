@@ -14,7 +14,6 @@ import org.json.JSONException;
 
 import jrds.HostInfo;
 import jrds.HostsList;
-import jrds.starter.Timer;
 import jrds.starter.Timer.Stats;
 
 /**
@@ -46,9 +45,7 @@ public class Status extends JrdsServlet {
             numProbes += h.getNumProbes();
         }
         Map<String, Stats> stats = new HashMap<String, Stats>();
-        for(Timer t: hl.getTimers()) {
-            stats.put(t.getName(), t.getStats());
-        }
+        hl.getChildsStream().forEach(t -> stats.put(t.getName(), t.getStats()));
 
         if(params.getValue("json") != null) {
             JrdsJSONWriter writer = new JrdsJSONWriter(res);

@@ -118,7 +118,12 @@ public class TestHostBuilder {
         cnxdoc.doRootElement("host").addElement("connection", "type=jrds.probe.JMXConnection").addElement("attr", "name=port").setTextContent("8999");
         for(ConnectionInfo ci: hb.makeConnexion(cnxdoc.getRootElement(), new HostInfo("localhost"), new HashMap<String, String>(0))) {
             logger.trace(ci.getName());
-            StarterNode  sn = new StarterNode() {};
+            StarterNode  sn = new StarterNode() {
+                @Override
+                public Logger getInstanceLogger() {
+                    return logrule.getTestlogger();
+                }
+            };
             ci.register(sn);
             JMXConnection cnx = sn.find(JMXConnection.class);
             Assert.assertEquals("Attributed not setted", new Integer(8999), cnx.getPort());

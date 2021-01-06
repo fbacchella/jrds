@@ -114,7 +114,7 @@ public class Download extends JrdsServlet {
                 return;
             }
             Period p = params.getPeriod();
-            ExtractInfo ei = ExtractInfo.get().make(p.getBegin(), p.getEnd()).make(probe.getStep());
+            ExtractInfo ei = ExtractInfo.builder().interval(p.getBegin(), p.getEnd()).step(probe.getStep()).build();
             try {
                 sourceDp = probe.extract(ei);
                 fileName = probe.getName().replaceFirst("\\.rrd", ".csv");

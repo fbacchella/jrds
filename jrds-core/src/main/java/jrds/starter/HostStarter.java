@@ -5,12 +5,17 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import jrds.HostInfo;
 import jrds.Probe;
 
 public class HostStarter extends StarterNode {
+
+    static final private Logger logger = LoggerFactory.getLogger(HostStarter.class);
+
     private HostInfo host;
     private final Set<Probe<?, ?>> allProbes = new TreeSet<Probe<?, ?>>();
 
@@ -139,4 +144,9 @@ public class HostStarter extends StarterNode {
         return allProbes.stream();
     }
 
+    @Override
+    public Logger getInstanceLogger() {
+        return logger;
+    }
+ 
 }

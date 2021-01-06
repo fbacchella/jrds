@@ -3,8 +3,7 @@ package jrds.store;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.rrd4j.data.DataProcessor;
-import org.rrd4j.graph.RrdGraphDef;
+import org.rrd4j.core.DataHolder;
 
 public abstract class AbstractExtractor<Source> implements Extractor {
 
@@ -50,10 +49,7 @@ public abstract class AbstractExtractor<Source> implements Extractor {
     public abstract String getPath();
 
     @Override
-    public abstract void fill(DataProcessor dp, ExtractInfo ei);
-
-    @Override
-    public abstract void fill(RrdGraphDef gd, ExtractInfo ei);
+    public abstract void fill(DataHolder dp, ExtractInfo ei);
 
     /*
      * (non-Javadoc)

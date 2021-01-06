@@ -52,6 +52,5 @@ public class TestTranslateProbe {
                 logger.debug("Dropped entry: " + e.getKey());
             }
         }
-
     }
 }

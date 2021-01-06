@@ -73,16 +73,15 @@ public class Upload extends JrdsServlet {
             JSONWriter w = new JSONWriter(outputWriter);
             w.array();
 
-            for(FileItem item: items) {
+            for (FileItem item: items) {
                 logger.debug("Item send: {}", item);
 
                 // Process a file upload
-                if(!item.isFormField()) {
+                if (!item.isFormField()) {
                     w.object();
                     String fileName = item.getName();
                     w.key("name").value(fileName);
-                    InputStream uploadedStream = item.getInputStream();
-                    try {
+                    try (InputStream uploadedStream = item.getInputStream()) {
                         dbuilder.parse(uploadedStream);
                         File destination = new File(getPropertiesManager().configdir, fileName);
                         if(!destination.exists()) {
@@ -97,7 +96,6 @@ public class Upload extends JrdsServlet {
                         w.key("parsed").value(false);
                         logger.error("upload file failed: " + e, e);
                     }
-                    uploadedStream.close();
                     w.endObject();
                 }
             }

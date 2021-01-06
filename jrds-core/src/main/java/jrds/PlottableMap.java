@@ -2,13 +2,13 @@ package jrds;
 
 import java.util.HashMap;
 
-import org.rrd4j.data.Plottable;
+import org.rrd4j.data.IPlottable;
 
 import jrds.store.ExtractInfo;
 
-public abstract class PlottableMap extends HashMap<String, Plottable> {
-    public static class ProxyPlottable extends Plottable {
-        Plottable real = new Plottable() {
+public abstract class PlottableMap extends HashMap<String, IPlottable> {
+    public static class ProxyPlottable implements IPlottable {
+        IPlottable real = new IPlottable() {
             @Override
             public double getValue(long timestamp) {
                 return Double.NaN;
@@ -20,7 +20,7 @@ public abstract class PlottableMap extends HashMap<String, Plottable> {
             return real.getValue(timestamp);
         }
 
-        public void setReal(Plottable real) {
+        public void setReal(IPlottable real) {
             this.real = real;
         }
     };
@@ -31,12 +31,12 @@ public abstract class PlottableMap extends HashMap<String, Plottable> {
         }
 
         @Override
-        public Plottable put(String key, Plottable value) {
+        public IPlottable put(String key, IPlottable value) {
             throw new UnsupportedOperationException("read only empty map");
         }
 
         @Override
-        public Plottable get(Object key) {
+        public IPlottable get(Object key) {
             return null;
         }
     };
@@ -60,6 +60,6 @@ public abstract class PlottableMap extends HashMap<String, Plottable> {
     public abstract void configure(long start, long end, long step);
 
     public void configure(ExtractInfo ei) {
-        configure(ei.start.getTime() / 1000L, ei.end.getTime() / 1000L, ei.step);
+        configure(ei.start.getEpochSecond(), ei.end.getEpochSecond(), ei.step);
     }
 }

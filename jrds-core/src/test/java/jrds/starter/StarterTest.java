@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
+import org.slf4j.Logger;
 import org.slf4j.event.Level;
 
 import jrds.HostsList;
@@ -50,6 +51,10 @@ public class StarterTest {
     @Test
     public void simpleStarter() {
         StarterNode n = new StarterNode() {
+            @Override
+            public Logger getInstanceLogger() {
+                return logrule.getTestlogger();
+            }
         };
         Starter s = new Starter() {
         };
@@ -61,12 +66,20 @@ public class StarterTest {
     @Test
     public void simpleStarter2() {
         StarterNode n1 = new StarterNode() {
+            @Override
+            public Logger getInstanceLogger() {
+                return logrule.getTestlogger();
+            }
         };
         Starter s1 = new Starter() {
         };
         n1.registerStarter(s1);
 
         StarterNode n2 = new StarterNode(n1) {
+            @Override
+            public Logger getInstanceLogger() {
+                return logrule.getTestlogger();
+            }
         };
 
         Assert.assertNotNull(n2.find(s1.getClass()));
@@ -75,6 +88,10 @@ public class StarterTest {
     @Test
     public void oneLevel() {
         StarterNode n = new StarterNode() {
+            @Override
+            public Logger getInstanceLogger() {
+                return logrule.getTestlogger();
+            }
         };
         Starter s = new LocalStarter(0);
         n.registerStarter(s);
@@ -84,11 +101,19 @@ public class StarterTest {
     @Test
     public void twoLevel() {
         StarterNode n1 = new StarterNode() {
+            @Override
+            public Logger getInstanceLogger() {
+                return logrule.getTestlogger();
+            }
         };
         Starter s1 = new LocalStarter(0);
         n1.registerStarter(s1);
 
         StarterNode n2 = new StarterNode() {
+            @Override
+            public Logger getInstanceLogger() {
+                return logrule.getTestlogger();
+            }
         };
         n2.setParent(n1);
         Starter s2 = new LocalStarter(1);
@@ -102,8 +127,16 @@ public class StarterTest {
     public void testHostList1() {
         HostsList hl = new HostsList();
         StarterNode n2 = new StarterNode(hl) {
+            @Override
+            public Logger getInstanceLogger() {
+                return logrule.getTestlogger();
+            }
         };
         StarterNode n3 = new StarterNode(n2) {
+            @Override
+            public Logger getInstanceLogger() {
+                return logrule.getTestlogger();
+            }
         };
 
         Assert.assertEquals(hl, n3.getHostList());
@@ -112,8 +145,16 @@ public class StarterTest {
     @Test
     public void testHostList2() {
         StarterNode n2 = new StarterNode() {
+            @Override
+            public Logger getInstanceLogger() {
+                return logrule.getTestlogger();
+            }
         };
         StarterNode n3 = new StarterNode(n2) {
+            @Override
+            public Logger getInstanceLogger() {
+                return logrule.getTestlogger();
+            }
         };
 
         HostsList hl = new HostsList();

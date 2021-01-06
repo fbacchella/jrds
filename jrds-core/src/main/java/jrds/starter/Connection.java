@@ -76,7 +76,7 @@ public abstract class Connection<ConnectedType> extends Starter {
     public boolean start() {
         if (startConnection()) {
             uptime = setUptime();
-            log(Level.DEBUG, "Uptime for %s = %ds", this, uptime);
+            log(Level.DEBUG, "Uptime is %ds", uptime);
             return super.start();
         } else {
             return false;

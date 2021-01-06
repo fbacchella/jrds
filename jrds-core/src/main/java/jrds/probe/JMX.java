@@ -1,18 +1,10 @@
 package jrds.probe;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
 
 import org.slf4j.event.Level;
 
@@ -58,41 +50,10 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
 
             log(Level.DEBUG, "will collect: %s", collectKeys);
             for(String collect: collectKeys) {
-                int attrSplit = collect.indexOf(':');
-                attrSplit = collect.indexOf('/', attrSplit);
-                ObjectName mbeanName = new ObjectName(collect.substring(0, attrSplit));
-                String[] jmxPath = collect.substring(attrSplit + 1).split("/");
-                String attributeName = jmxPath[0];
-                log(Level.TRACE, "mbean name = %s, attributeName = %s", mbeanName, attributeName);
-                try {
-                    Number v = mbean.getValue(mbeanName, attributeName, jmxPath);
-                    log(Level.TRACE, "JMX Path: %s = %s", collect, v);
-                    if (v != null) {
-                        retValues.put(collect, v.doubleValue());
-                    }
-                } catch (InvocationTargetException e) {
-                    if (e.getCause() != null) {
-                        try {
-                            throw e.getCause();
-                        } catch (RemoteException e1) {
-                            log(Level.ERROR, e1, "JMX remote exception: %s", e1);
-                        } catch (AttributeNotFoundException e1) {
-                            log(Level.ERROR, e1, "Invalid JMX attribute %s", attributeName);
-                        } catch (InstanceNotFoundException e1) {
-                            Level l = Level.ERROR;
-                            if(isOptional(collect)) {
-                                l = Level.DEBUG;
-                            }
-                            log(l, "JMX instance not found: %s", e1);
-                        } catch (MBeanException e1) {
-                            log(Level.ERROR, e1, "JMX MBeanException: %s", e1);
-                        } catch (ReflectionException e1) {
-                            log(Level.ERROR, e1, "JMX reflection error: %s", e1);
-                        } catch (IOException e1) {
-                            log(Level.ERROR, e1, "JMX IO error: %s", e1);
-                        } catch (Throwable e1) {
-                        }
-                    }
+                Number v = mbean.collect(this, collect);
+                log(Level.TRACE, "JMX Path: %s = %s", collect, v);
+                if (v != null) {
+                    retValues.put(collect, v.doubleValue());
                 }
             }
             return retValues;

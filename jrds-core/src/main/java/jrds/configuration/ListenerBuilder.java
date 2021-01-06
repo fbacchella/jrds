@@ -27,7 +27,7 @@ public class ListenerBuilder extends ConfigObjectBuilder<Listener<?, ?>> {
         try {
             @SuppressWarnings("unchecked")
             Class<? extends Listener> starterClass = (Class<? extends Listener>) classLoader.loadClass(className);
-            return starterClass.newInstance();
+            return starterClass.getConstructor().newInstance();
         } catch (Exception e) {
             throw new InvocationTargetException(e, ListenerBuilder.class.getName());
         }

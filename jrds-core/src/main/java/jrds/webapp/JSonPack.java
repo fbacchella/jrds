@@ -83,9 +83,9 @@ public class JSonPack extends HttpServlet {
         }
 
         ByteArrayOutputStream packedDataBuffer = new ByteArrayOutputStream(len);
-        GZIPOutputStream gzipBuffer = new GZIPOutputStream(Base64.getEncoder().wrap(packedDataBuffer), len);
-        gzipBuffer.write(paramsClean.toString().getBytes());
-        gzipBuffer.close();
+        try (GZIPOutputStream gzipBuffer = new GZIPOutputStream(Base64.getEncoder().wrap(packedDataBuffer), len)) {
+            gzipBuffer.write(paramsClean.toString().getBytes());
+        }
 
         // get or build referer
         String referer = request.getHeader("Referer");

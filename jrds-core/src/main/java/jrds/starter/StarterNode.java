@@ -9,16 +9,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
 import jrds.HostsList;
+import jrds.InstanceLogger;
 import jrds.PropertiesManager;
 import lombok.Getter;
 import lombok.Setter;
 
 @SuppressWarnings("deprecation")
-public abstract class StarterNode implements StartersSet {
+public abstract class StarterNode implements StartersSet, InstanceLogger {
 
     private Map<Object, Starter> allStarters = null;
 
@@ -289,14 +289,6 @@ public abstract class StarterNode implements StartersSet {
     @Deprecated
     public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, StarterNode nope) {
         return find(sc);
-    }
-
-    public void log(Level l, Throwable e, String format, Object... elements) {
-        jrds.Util.log(this, LoggerFactory.getLogger(getClass()), l, e, format, elements);
-    }
-
-    public void log(Level l, String format, Object... elements) {
-        jrds.Util.log(this, LoggerFactory.getLogger(getClass()), l, null, format, elements);
     }
 
 }

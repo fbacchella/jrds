@@ -67,11 +67,11 @@ public class GraphTree {
     }
 
     public GraphTree getByPath(String... path) {
-        logger.trace(Arrays.asList(path) + " match " + name);
-        logger.trace("childs: " + childsMap);
-        if(!path[0].equals(this.name))
+        logger.trace("{} match {}", Util.delayedFormatString(() -> Arrays.asList(path)), name);
+        logger.trace("childs: {}", childsMap);
+        if (!path[0].equals(this.name))
             return null;
-        if(path.length == 1)
+        if (path.length == 1)
             return this;
         GraphTree child = childsMap.get(path[1]);
         if(child != null)
@@ -113,7 +113,7 @@ public class GraphTree {
      */
     public void addGraphByPath(List<String> path, GraphNode nodesGraph) {
         if(path.size() < 1) {
-            logger.error("Path is empty : " + path + " for graph " + nodesGraph.getGraphTitle());
+            logger.error("Path is empty: {} for graph {}", path, nodesGraph.getGraphTitle());
         } else
             _addGraphByPath(new LinkedList<String>(path), nodesGraph);
     }
@@ -179,6 +179,28 @@ public class GraphTree {
 
     public List<GraphNode> enumerateChildsGraph() {
         return enumerateChildsGraph(null);
+    }
+
+    public boolean acceptSome(Filter f) {
+        if (f == null) {
+            return true;
+        }
+        if (graphsSet != null) {
+            for (GraphNode g: graphsSet.values()) {
+                String path = getPath() + "/" + g.getName();
+                if (f.acceptGraph(g, path)) {
+                    return true;
+                }
+            }
+        }
+        if(childsMap != null) {
+            for(GraphTree child: childsMap.values()) {
+                if (child.acceptSome(f) ) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public String toString() {

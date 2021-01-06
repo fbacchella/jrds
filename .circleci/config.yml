@@ -2,7 +2,7 @@ version: 2.1
 jobs:
     checkout:
         docker:
-            - image: circleci/openjdk:14-jdk-buster
+            - image: circleci/openjdk:15-jdk-buster
         steps:
             - checkout
             - restore_cache:
@@ -12,12 +12,13 @@ jobs:
                     sudo apt-get update
                     sudo apt install libsnmp-base
                     mkdir -p /home/circleci/.sonar/cache /home/circleci/.m2/repository
-                    mvn -B dependency:go-offline -Psonar,versions -s .circleci/settings.xml -DexcludeGroupIds=fr.jrds
+                    # A bug in dependency:go-offline, see https://issues.apache.org/jira/browse/MDEP-688
+                    mvn -B dependency:resolve dependency:resolve-plugins -Psonar,versions -s .circleci/settings.xml
             - persist_to_workspace:
                 root: /
                 paths:
                     - home/circleci/.m2/repository
-                    - home/circleci/jfrog
+                    - home/circleci/.sonar/cache
                     - home/circleci/project
                     - usr/share/snmp/mibs/
     jdk8:
@@ -30,7 +31,7 @@ jobs:
                     - openjdk-8
     build:
         docker:
-            - image: circleci/openjdk:14-jdk-buster
+            - image: circleci/openjdk:15-jdk-buster
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -40,9 +41,9 @@ jobs:
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
             - run:
-                command: mvn -B clean compile install -DskipTests -s .circleci/settings.xml
+                command: mvn -B clean compile install -DskipTests -s .circleci/settings.xml -Djdk.compile.home=/tmp/ws/openjdk-8
                 environment:
-                    JAVA_HOME: /usr/java/openjdk-14
+                    JAVA_HOME: /usr/local/openjdk-15
                     MAVEN_OPTS: "-Xmx2048m"
             - persist_to_workspace:
                 root: /
@@ -64,7 +65,14 @@ jobs:
                     sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
             - run:
                 command: |
-                    mvn -B test -Pskip -DargLine="-Xmx2048m" -s .circleci/settings.xml
+                    # If no symbolic name, it's a PR, will run sonar
+                    if [ -n "$(git symbolic-ref HEAD 2>/dev/null )" ] ; then
+                        SONAR="jacoco:report sonar:sonar -Psonar"
+                        echo "Doing sonar"
+                    else
+                        SONAR=""
+                    fi
+                    mvn -B surefire:test $SONAR -Pskip -DargLine="-Xmx2048m" -s .circleci/settings.xml
                 environment:
                     JAVA_HOME: /usr/java/openjdk-13
                     MAVEN_OPTS: "-Xmx1024m"
@@ -87,9 +95,31 @@ jobs:
                     sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
             - run:
                 command: |
-                    mvn -B test -Pskip -DargLine="-Xmx2048m" -s .circleci/settings.xml
+                    mvn -B surefire:test -Pskip -DargLine="-Xmx2048m" -s .circleci/settings.xml
                 environment:
                     JAVA_HOME: /usr/local/openjdk-11
+                    MAVEN_OPTS: "-Xmx512m"
+            - store_test_results:
+                path: target/surefire-reports
+    testsj15:
+        docker:
+            - image: circleci/openjdk:15-buster
+        steps:
+            - attach_workspace:
+                at: /tmp/ws
+            - run:
+                command: |
+                    mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
+                    mv -n /tmp/ws/home/circleci/.sonar /home/circleci/
+                    mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
+                    mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
+                    sudo mkdir -p /usr/share/snmp/mibs/
+                    sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
+            - run:
+                command: |
+                    mvn -B surefire:test -Pskip -DargLine="-Xmx2048m" -s .circleci/settings.xml
+                environment:
+                    JAVA_HOME: /usr/local/openjdk-15
                     MAVEN_OPTS: "-Xmx512m"
             - store_test_results:
                 path: target/surefire-reports
@@ -117,7 +147,7 @@ jobs:
                 path: target/surefire-reports
     publish:
         docker:
-            - image: circleci/openjdk:14-jdk-buster
+            - image: circleci/openjdk:15-jdk-buster
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -129,9 +159,16 @@ jobs:
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
             - run:
                 command: |
-                    mvn -B deploy -Pskip -Dmaven.test.skip=true -s .circleci/settings.xml
+                    # If no symbolic name, it's a PR, will not publish results
+                    if [ -n "$(git symbolic-ref HEAD 2>/dev/null )" ] ; then
+                        PUBLISH="deploy"
+                    else
+                        PUBLISH="maven-install-plugin:install"
+                    fi
+                    echo "publishing jobs: $PUBLISH"
+                    mvn -B $PUBLISH -Pskip -DskipTests -s .circleci/settings.xml
                 environment:
-                    JAVA_HOME: /usr/java/openjdk-14
+                    JAVA_HOME: /usr/local/openjdk-15
                     MAVEN_OPTS: "-Xmx2048m"
             - persist_to_workspace:
                 root: /
@@ -148,6 +185,7 @@ jobs:
                 command: |
                     mv /tmp/ws/home/circleci/project/pom.xml /home/circleci/project/
                     mv /tmp/ws/home/circleci/.m2 /home/circleci/
+                    mv /tmp/ws/home/circleci/.sonar /home/circleci/
             - save_cache:
                 paths:
                     - /home/circleci/.m2/repository
@@ -163,6 +201,9 @@ workflows:
           requires:
               - checkout
               - jdk8
+      - testsj15:
+          requires:
+              - build
       - testsj13:
           requires:
               - build
@@ -174,6 +215,7 @@ workflows:
               - build
       - publish:
           requires:
+              - testsj15
               - testsj13
               - testsj11
               - testsj8

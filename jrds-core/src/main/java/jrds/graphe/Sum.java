@@ -1,13 +1,13 @@
 package jrds.graphe;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.LinearInterpolator;
-import org.rrd4j.data.Plottable;
+import org.rrd4j.data.IPlottable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,10 +71,11 @@ public class Sum extends AutonomousGraphNode {
         return new PlottableMap() {
             @Override
             public void configure(long start, long end, long step) {
-                ExtractInfo ei = ExtractInfo.get()
-                        .make(new Date(start * 1000), new Date(end * 1000))
-                        .make(step)
-                        .make(ConsolFun.AVERAGE);
+                ExtractInfo ei = ExtractInfo.builder()
+                                            .interval(Instant.ofEpochSecond(start), Instant.ofEpochSecond(end))
+                                            .step(step)
+                                            .cf(ConsolFun.AVERAGE)
+                                            .build();
                 logger.debug("Configuring the sum {} from {} to {}, step {}", Util.delayedFormatString(Sum.this::getName), start, end, step);
                 // Used to kept the last fetched data and analyse the
                 DataProcessor dp = null;
@@ -124,7 +125,7 @@ public class Sum extends AutonomousGraphNode {
                     long[] ts = dp.getTimestamps();
                     String[] dsNames = dp.getSourceNames();
                     for(int i = 0; i < dsNames.length; i++) {
-                        Plottable pl = new LinearInterpolator(ts, allvalues[i]);
+                        IPlottable pl = new LinearInterpolator(ts, allvalues[i]);
                         put(dsNames[i], pl);
                         logger.trace("Added {} to sum plottables", dsNames[i]);
                     }

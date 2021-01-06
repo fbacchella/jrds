@@ -23,7 +23,7 @@ public class JdbcConnection extends Connection<Statement> {
 
     protected static final void registerDriver(Class<? extends Driver> jdbcDriver) {
         try {
-            DriverManager.registerDriver(jdbcDriver.newInstance());
+            DriverManager.registerDriver(jdbcDriver.getConstructor().newInstance());
         } catch (Exception e) {
             throw new RuntimeException("Can't register JDBC driver " + jdbcDriver, e);
         }

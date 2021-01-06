@@ -585,18 +585,10 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         this.label = label;
     }
 
-    public void log(Level l, Throwable e, String format, Object... elements) {
-        jrds.Util.log(this, namedLogger, l, e, format, elements);
-    }
-
-    public void log(Level l, String format, Object... elements) {
-        jrds.Util.log(this, namedLogger, l, null, format, elements);
-    }
-
     /**
      * @return the namedLogger
      */
-    public Logger getNamedLogger() {
+    public Logger getInstanceLogger() {
         return namedLogger;
     }
 

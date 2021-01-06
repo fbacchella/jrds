@@ -43,18 +43,18 @@ public class Log4JConfigurator implements LogConfigurator {
             if (Files.isReadable(xmlfile)) {
                 BasicConfigurator.resetConfiguration();
                 DOMConfigurator.configure(xmlfile.toString());
-                logger.info("Configured with xml file {}", xmlfile.toString());
+                logger.info("Configured with xml file {}", xmlfile);
             } else {
-                logger.error("log4j xml file {} can't be read, log4j not configured", xmlfile.toString());
+                logger.error("log4j xml file {} can't be read, log4j not configured", xmlfile);
             }
         } else if(log4jPropFile != null && !log4jPropFile.trim().isEmpty()) {
             Path propfile = Paths.get(log4jPropFile.trim());
             if (Files.isReadable(propfile)) {
                 BasicConfigurator.resetConfiguration();
                 PropertyConfigurator.configure(propfile.toString());
-                logger.info("Configured with properties file {}", propfile.toString());
+                logger.info("Configured with properties file {}", propfile);
             } else {
-                logger.error("log4j properties file {} can't be read, log4j not configured", propfile.toString());
+                logger.error("log4j properties file {} can't be read, log4j not configured", propfile);
             }
         } else {
             Map<Level, List<String>> loglevels = new HashMap<Level, List<String>>();

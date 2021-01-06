@@ -62,7 +62,7 @@ public class TestProbe {
 
         GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
         args.set(ProbeDesc.class, pd).set(Probe.class, DummyProbe.class);
-        MokeProbe<String, Number> p = (MokeProbe<String, Number>) GenerateProbe.quickProbe(testFolder, args);
+        MokeProbe<String, Number> p = GenerateProbe.quickProbe(testFolder, args);
 
         HostStarter host = new HostStarter(new HostInfo("DummyHost"));
         host.setParent(Tools.getDefaultTimer());
@@ -92,7 +92,7 @@ public class TestProbe {
 
         GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
         args.set(ProbeDesc.class, pd).set(Probe.class, DummyProbe.class);
-        MokeProbe<String, Number> p = (MokeProbe<String, Number>) GenerateProbe.quickProbe(testFolder, args);
+        MokeProbe<String, Number> p = GenerateProbe.quickProbe(testFolder, args);
 
         HostStarter host = new HostStarter(new HostInfo("DummyHost"));
         host.setParent(Tools.getDefaultTimer());

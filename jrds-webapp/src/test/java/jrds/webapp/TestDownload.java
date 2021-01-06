@@ -35,7 +35,6 @@ import jrds.Tools;
 import jrds.graphe.Sum;
 import jrds.mockobjects.Full;
 import jrds.mockobjects.GenerateProbe;
-import jrds.mockobjects.MokeProbe;
 
 public class TestDownload extends Download {
 
@@ -66,7 +65,6 @@ public class TestDownload extends Download {
 
         Assert.assertEquals("0", formatted);
         Assert.assertEquals(new Date(0), start);
-
     }
 
     @Test
@@ -92,8 +90,7 @@ public class TestDownload extends Download {
         GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
         args.set(ProbeDesc.class, Full.getPd()).set(Probe.class, DummyProbe.class).set(PropertiesManager.class, pm);
 
-        @SuppressWarnings("unchecked")
-        Probe<String, Number> p = (MokeProbe<String, Number>) GenerateProbe.quickProbe(testFolder, args);
+        Probe<String, Number> p = GenerateProbe.quickProbe(testFolder, args);
 
         p.checkStore();
 
@@ -117,8 +114,6 @@ public class TestDownload extends Download {
 
         Response response = ToolsWebApp.doRequestGet(tester, "http://localhost/download?id=" + id, 200);
         Assert.assertEquals("Invalid content type", Download.CONTENT_TYPE, response.get("Content-Type"));
-        ;
-
     }
 
 }

@@ -93,7 +93,7 @@ public class SnmpVars extends HashMap<OID, Object> {
                 exceptionName = "Unknown exception";
                 break;
             }
-            logger.trace("Exception " + exceptionName + " for " + vb.getOid());
+            logger.trace("Exception {} for {}", exceptionName, vb.getOid());
         }
         return retValue;
     }
@@ -123,40 +123,41 @@ public class SnmpVars extends HashMap<OID, Object> {
 
     private Object convertVar(Variable valueAsVar) {
         Object retvalue = null;
-        if(valueAsVar != null) {
+        if (valueAsVar != null) {
             int type = valueAsVar.getSyntax();
-            if(valueAsVar instanceof OID) {
+            if (valueAsVar instanceof OID) {
                 retvalue = valueAsVar;
-            } else if(valueAsVar instanceof UnsignedInteger32) {
-                if(valueAsVar instanceof TimeTicks) {
-                    long epochcentisecond = valueAsVar.toLong();
-                    retvalue = new Double(epochcentisecond / 100.0);
-                } else
+            } else if (valueAsVar instanceof UnsignedInteger32) {
+                if (valueAsVar instanceof TimeTicks) {
+                    double epochcentisecond = valueAsVar.toLong();
+                    retvalue = epochcentisecond / 100.0;
+                } else {
                     retvalue = valueAsVar.toLong();
-            } else if(valueAsVar instanceof Integer32)
+                }
+            } else if (valueAsVar instanceof Integer32)
                 retvalue = valueAsVar.toInt();
-            else if(valueAsVar instanceof Counter64)
+            else if (valueAsVar instanceof Counter64)
                 retvalue = valueAsVar.toLong();
-            else if(valueAsVar instanceof OctetString) {
-                if(valueAsVar instanceof Opaque) {
+            else if (valueAsVar instanceof OctetString) {
+                if (valueAsVar instanceof Opaque) {
                     retvalue = resolvOpaque((Opaque) valueAsVar);
                 } else {
                     // It might be a C string, try to remove the last 0;
                     // But only if the new string is printable
                     OctetString octetVar = (OctetString) valueAsVar;
                     int length = octetVar.length();
-                    if(length > 1 && octetVar.get(length - 1) == 0) {
+                    if (length > 1 && octetVar.get(length - 1) == 0) {
                         OctetString newVar = octetVar.substring(0, length - 1);
                         if(newVar.isPrintable()) {
                             valueAsVar = newVar;
-                            logger.debug("Convertion an octet stream from " + octetVar + " to " + valueAsVar);
+                            logger.debug("Convertion an octet stream from{} to {}", octetVar, valueAsVar);
                         }
                     }
                     retvalue = valueAsVar.toString();
                 }
-            } else if(valueAsVar instanceof Null) {
+            } else if (valueAsVar instanceof Null) {
                 retvalue = null;
-            } else if(valueAsVar instanceof IpAddress) {
+            } else if (valueAsVar instanceof IpAddress) {
                 retvalue = ((IpAddress) valueAsVar).getInetAddress();
             } else {
                 logger.warn("Unknown syntax " + AbstractVariable.getSyntaxString(type));
@@ -179,9 +180,9 @@ public class SnmpVars extends HashMap<OID, Object> {
             int l = BER.decodeLength(beris);
             if(t1 == TAG1) {
                 if(t2 == TAG_FLOAT && l == 4)
-                    value = new Float(bais.getFloat());
+                    value = bais.getFloat();
                 else if(t2 == TAG_DOUBLE && l == 8)
-                    value = new Double(bais.getDouble());
+                    value = bais.getDouble();
             }
         } catch (IOException e) {
             logger.error(var.toString());

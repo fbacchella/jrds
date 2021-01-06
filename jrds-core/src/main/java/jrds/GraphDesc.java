@@ -22,7 +22,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
-import org.rrd4j.data.Plottable;
+import org.rrd4j.data.IPlottable;
 import org.rrd4j.data.Variable;
 import org.rrd4j.graph.RrdGraphConstants;
 import org.rrd4j.graph.RrdGraphDef;
@@ -291,7 +291,7 @@ public class GraphDesc implements WithACL {
                         retValue.append(" (").append(label).append(")");
                     }
                 } else {
-                    logger.debug("Bad graph definition for " + graph);
+                    logger.debug("Bad graph definition for {}", graph);
                 }
                 return retValue.toString();
             }
@@ -626,7 +626,7 @@ public class GraphDesc implements WithACL {
                     color = Color.getColor(colorName);
                 }
                 if(color == null) {
-                    logger.error("Cannot read color " + colorName);
+                    logger.error("Cannot read color {}", colorName);
                     color = Color.white;
                 }
             }
@@ -951,7 +951,7 @@ public class GraphDesc implements WithACL {
     }
 
     public RrdGraphDef getEmptyGraphDef() {
-        RrdGraphDef retValue = new RrdGraphDef();
+        RrdGraphDef retValue = new RrdGraphDef(1, 2);
         if(!Double.isNaN(lowerLimit))
             retValue.setMinValue(lowerLimit);
         if(!Double.isNaN(upperLimit))
@@ -966,7 +966,6 @@ public class GraphDesc implements WithACL {
             retValue.setUnitsExponent(unitExponent);
         }
         retValue.setLogarithmic(logarithmic);
-        retValue.setPoolUsed(true);
         retValue.setAntiAliasing(true);
         retValue.setTextAntiAliasing(true);
         retValue.setImageFormat("PNG");
@@ -983,7 +982,7 @@ public class GraphDesc implements WithACL {
      * @param customData some custom data, they override existing values in the
      *            associated probe
      */
-    public void fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData) {
+    public void fillGraphDef(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> customData) {
         List<DsDesc> toDo = DatasourcesPopulator.populate(graphDef, defProbe, ei, customData, allds, name);
         // The title line, only if values block is required
         if(withSummary) {
@@ -1014,7 +1013,7 @@ public class GraphDesc implements WithACL {
      * @return
      * @throws IOException
      */
-    public RrdGraphDef getGraphDef(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> ownData) throws IOException {
+    public RrdGraphDef getGraphDef(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> ownData) throws IOException {
         RrdGraphDef retValue = getEmptyGraphDef();
         fillGraphDef(retValue, defProbe, ei, ownData);
         return retValue;
@@ -1060,7 +1059,7 @@ public class GraphDesc implements WithACL {
      * @return
      * @throws IOException
      */
-    public DataProcessor getPlottedDatas(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData) throws IOException {
+    public DataProcessor getPlottedDatas(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> customData) throws IOException {
         return DatasourcesPopulator.populate(defProbe, ei, customData, allds, name);
     }
 
@@ -1234,7 +1233,7 @@ public class GraphDesc implements WithACL {
         }
         if(unitExponent == null) {
             try {
-                unitExponent = new Integer(exponent);
+                unitExponent = Integer.getInteger(exponent);
             } catch (NumberFormatException e) {
                 logger.debug("Base unit not identified: " + exponent);
             }

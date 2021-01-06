@@ -1,7 +1,6 @@
 package jrds.store;
 
-import org.rrd4j.data.DataProcessor;
-import org.rrd4j.graph.RrdGraphDef;
+import org.rrd4j.core.DataHolder;
 
 public class EmptyExtractor extends AbstractExtractor<Object> {
 
@@ -11,12 +10,7 @@ public class EmptyExtractor extends AbstractExtractor<Object> {
     }
 
     @Override
-    public void fill(RrdGraphDef gd, ExtractInfo ei) {
-    }
-
-    @Override
-    public void fill(DataProcessor dp, ExtractInfo ei) {
-
+    public void fill(DataHolder gd, ExtractInfo ei) {
     }
 
     @Override

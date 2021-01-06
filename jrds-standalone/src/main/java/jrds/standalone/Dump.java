@@ -4,15 +4,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Properties;
 
 import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
 
-import jrds.GraphDesc;
-import jrds.GraphNode;
-import jrds.GraphTree;
 import jrds.HostInfo;
 import jrds.HostsList;
 import jrds.Probe;
@@ -43,15 +39,10 @@ public class Dump extends CommandStarterImpl {
         propertiesManager.importSystemProps();
         propertiesManager.update();
         HostsList hostsList = new HostsList(propertiesManager);
-        GraphTree gt = hostsList.getGraphTreeByHost();
-        for (GraphNode gn: gt.enumerateChildsGraph()) {
-            GraphDesc gd = gn.getGraphDesc();
-            List<String> path = gd.getViewTree(gn);
-        }
         Date now = new Date();
         Date start = new Date(now.getTime() - 10000000);
         long step = 100;
-        ExtractInfo ei = ExtractInfo.get().make(ConsolFun.AVERAGE).make(start, now).make(step);
+        ExtractInfo ei = ExtractInfo.builder().cf(ConsolFun.AVERAGE).interval(start, now).step(step).build();
         for (HostInfo hi: hostsList.getHosts()) {
             System.out.println(hi.getName());
             for (Probe<?, ?> p: hi.getProbes()) {

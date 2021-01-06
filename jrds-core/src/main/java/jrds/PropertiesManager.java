@@ -165,7 +165,7 @@ public class PropertiesManager extends Properties {
 
         if(extendedclasspath != null && !"".equals(extendedclasspath)) {
             for(String pathElement: extendedclasspath.split(";")) {
-                logger.debug("Setting class directories to: " + pathElement);
+                logger.debug("Setting class directories to: {}", pathElement);
 
                 File path = new File(pathElement);
 
@@ -330,7 +330,7 @@ public class PropertiesManager extends Properties {
                 if(lib.isDirectory()) {
                     File[] foundFiles = lib.listFiles(jarfilter);
                     if(foundFiles == null) {
-                        logger.error("Failed to search in " + lib);
+                        logger.error("Failed to search in {}", lib);
                         continue;
                     }
                     for(File f: foundFiles) {
@@ -420,7 +420,7 @@ public class PropertiesManager extends Properties {
                                 .slowCollectTime(parseInteger(getProperty("timer." + timerName + ".slowcollecttime", Integer.toString(slowcollecttime))))
                                 .build();
                 if (ti.timeout * 2 >= ti.step) {
-                    logger.warn("useless timer " + timerName + ", step must be more than the timeout");
+                    logger.warn("useless timer {}, step must be more than the timeout", timerName);
                     break;
                 }
 

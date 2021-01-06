@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.rrd4j.data.DataProcessor;
-import org.rrd4j.data.Plottable;
+import org.rrd4j.data.IPlottable;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
 import org.slf4j.Logger;
@@ -128,7 +128,7 @@ public class Graph implements WithACL {
         try {
             long startsec = getStartSec();
             long endsec = getEndSec();
-            ExtractInfo ei = ExtractInfo.get().make(start, end);
+            ExtractInfo ei = ExtractInfo.builder().interval(start, end).build();
             graphDef.setStartTime(startsec);
             graphDef.setEndTime(endsec);
             PlottableMap customData = node.getCustomData();
@@ -144,7 +144,7 @@ public class Graph implements WithACL {
         }
     }
 
-    protected void setGraphDefData(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, ? extends Plottable> customData) {
+    protected void setGraphDefData(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> customData) {
         GraphDesc gd = getGraphDesc();
         gd.fillGraphDef(graphDef, node.getProbe(), ei, customData);
     }
@@ -212,7 +212,7 @@ public class Graph implements WithACL {
      * @throws IOException
      */
     public DataProcessor getDataProcessor() throws IOException {
-        ExtractInfo ei = ExtractInfo.get().make(start, end);
+        ExtractInfo ei = ExtractInfo.of(start, end);
         return getNode().getPlottedDate(ei);
     }
 

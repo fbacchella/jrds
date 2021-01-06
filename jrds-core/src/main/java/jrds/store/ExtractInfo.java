@@ -1,76 +1,55 @@
 package jrds.store;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Date;
 
 import org.rrd4j.ConsolFun;
 import org.rrd4j.data.DataProcessor;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.AccessLevel;
+
+@Builder @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExtractInfo {
-    private final class ImmutableDate extends Date {
-        ImmutableDate() {
-            super();
-        }
 
-        ImmutableDate(Date date) {
-            super(date.getTime());
+    public static class ExtractInfoBuilder {
+        private ExtractInfoBuilder() {
+            start = Instant.now();
+            end = Instant.now();
+            step = 0;
+            ds = "";
+            cf = ConsolFun.AVERAGE;
         }
-
-        @Override
-        public void setTime(long time) {
-            throw new UnsupportedOperationException("read only date");
+        public ExtractInfoBuilder interval(Date start, Date end) {
+            this.start = Instant.ofEpochMilli(start.getTime());
+            this.end = Instant.ofEpochMilli(end.getTime());
+            return this;
         }
-    };
+        public ExtractInfoBuilder interval(Instant start, Instant end) {
+            this.start = start;
+            this.end = end;
+            return this;
+        }
+        public ExtractInfoBuilder step(int step) {
+            this.step = step;
+            return this;
+        }
+        public ExtractInfoBuilder step(long step) {
+            this.step = step;
+            return this;
+        }
+    }
 
-    public final Date start;
-    public final Date end;
-    public final Long step;
+    public final Instant start;
+    public final Instant end;
+    public final long step;
     public final String ds;
     public final ConsolFun cf;
 
-    public static final ExtractInfo get() {
-        return new ExtractInfo();
-    }
-
-    private ExtractInfo() {
-        start = new ImmutableDate();
-        end = new ImmutableDate();
-        step = new Long(0);
-        ds = "";
-        cf = ConsolFun.AVERAGE;
-    }
-
-    private ExtractInfo(Date start, Date end, long step, String ds, ConsolFun cf) {
-        super();
-        this.start = start;
-        this.end = end;
-        this.step = step;
-        this.ds = ds;
-        this.cf = cf;
-    }
-
-    public final ExtractInfo make(Date start, Date end) {
-        return new ExtractInfo(new ImmutableDate(start), new ImmutableDate(end), this.step, this.ds, this.cf);
-    }
-
-    public final ExtractInfo make(long step) {
-        return new ExtractInfo(this.start, this.end, step, this.ds, this.cf);
-    }
-
-    public final ExtractInfo make(String ds) {
-        return new ExtractInfo(this.start, this.end, this.step, ds, this.cf);
-    }
-
-    public final ExtractInfo make(ConsolFun cf) {
-        return new ExtractInfo(this.start, this.end, this.step, this.ds, cf);
-    }
-
-    public final DataProcessor getDataProcessor() {
-        return new DataProcessor(start, end);
-    }
-
     public final DataProcessor getDataProcessor(Extractor ex) {
-        DataProcessor dp = new DataProcessor(start, end);
+        DataProcessor dp = new DataProcessor(start.getEpochSecond(), end.getEpochSecond());
         ex.fill(dp, this);
         try {
             dp.processData();
@@ -78,6 +57,18 @@ public class ExtractInfo {
             throw new RuntimeException("Failed to access rrd file  " + ex.getPath(), e);
         }
         return dp;
+    }
+    
+    public final DataProcessor getDataProcessor() {
+        DataProcessor dp = new DataProcessor(start.getEpochSecond(), end.getEpochSecond());
+        if (step != 0) {
+            dp.setStep(step);
+        }
+        return dp;
+    }
+
+    public static ExtractInfo of(Date start, Date end) {
+        return ExtractInfo.builder().interval(start, end).build();
     }
 
 }

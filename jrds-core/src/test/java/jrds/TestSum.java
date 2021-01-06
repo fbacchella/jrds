@@ -22,7 +22,6 @@ import jrds.TestProbe.DummyProbe;
 import jrds.graphe.Sum;
 import jrds.mockobjects.Full;
 import jrds.mockobjects.GenerateProbe;
-import jrds.mockobjects.MokeProbe;
 import jrds.store.ExtractInfo;
 
 public class TestSum {
@@ -63,7 +62,7 @@ public class TestSum {
         GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start();
         args.set(ProbeDesc.class, Full.getPd()).set(Probe.class, DummyProbe.class).set(PropertiesManager.class, pm);
 
-        Probe<String, Number> p = (MokeProbe<String, Number>) GenerateProbe.quickProbe(testFolder, args);
+        Probe<String, Number> p = GenerateProbe.quickProbe(testFolder, args);
 
         p.checkStore();
         long endSec = Full.fill(p);
@@ -86,7 +85,7 @@ public class TestSum {
         PlottableMap ppm = s.getCustomData();
         ppm.configure(begin, end, Full.STEP);
 
-        ExtractInfo ei = ExtractInfo.get().make(pr.getBegin(), pr.getEnd());
+        ExtractInfo ei = ExtractInfo.of(pr.getBegin(), pr.getEnd());
         DataProcessor dp = p.extract(ei);
 
         LinearInterpolator li = new LinearInterpolator(dp.getTimestamps(), dp.getValues("shade"));

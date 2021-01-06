@@ -46,12 +46,12 @@ public class TestRRDToolStore {
         GenerateProbe.ChainedMap<Object> args = GenerateProbe.ChainedMap.start(2)
                 .set(StoreFactory.class, new RRDToolStoreFactory())
                 .set(GenerateProbe.FACTORYCONFIG, factoryArgs);
-        Probe<?,?> p = GenerateProbe.fillProbe(new GenerateProbe.EmptyProbe(), testFolder, args);
+        Probe<String, Number> p = GenerateProbe.fillProbe(new GenerateProbe.EmptyProbe<String, Number>(), testFolder, args);
         p.getPd().add("speed", DsType.GAUGE);
         p.getPd().add("weight", DsType.GAUGE);
         Assert.assertTrue(p.checkStore());
         Period period = new Period("1999-03-07T13:00:00", "1999-03-07T13:15:00");
-        DataProcessor dp = p.extract(ExtractInfo.get().make(period.getBegin(), period.getEnd()));
+        DataProcessor dp = p.extract(ExtractInfo.of(period.getBegin(), period.getEnd()));
         String[] dsNames = dp.getSourceNames();
         Assert.assertEquals("data source weight not found", "weight", dsNames[0]);
         Assert.assertEquals("data source speed not found", "speed", dsNames[1]);

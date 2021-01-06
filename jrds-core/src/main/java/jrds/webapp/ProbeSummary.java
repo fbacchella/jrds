@@ -17,7 +17,7 @@ import jrds.Probe;
 import jrds.store.ExtractInfo;
 
 /**
- * A servlet wich show the last update values and time
+ * A servlet which show the last update values and time
  * 
  * @author Fabrice Bacchella
  */
@@ -39,7 +39,7 @@ public final class ProbeSummary extends JrdsServlet {
         if(probe != null) {
             Period p = params.getPeriod();
 
-            ExtractInfo ei = ExtractInfo.get().make(p.getBegin(), p.getEnd());
+            ExtractInfo ei = ExtractInfo.builder().interval(p.getBegin(), p.getEnd()).build();
             DataProcessor dp = probe.extract(ei);
             for(String dsName: probe.getPd().getDs()) {
                 try {

@@ -2,18 +2,18 @@ package jrds.store;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.LinkOption;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.Lock;
 
 import org.rrd4j.core.RrdBackendFactory;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdDbPool;
-import org.rrd4j.core.RrdFileBackendFactory;
+import org.rrd4j.core.RrdDef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +32,6 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
     private boolean usepool = false;
     private int dbPoolSize = 0;
 
-    String backendName = null;
-
     /*
      * (non-Javadoc)
      * 
@@ -45,32 +43,27 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
     public void configureStore(PropertiesManager pm, Properties props) {
         super.configureStore(pm, props);
 
-        String backendName = null;
         // Choose and configure the backend
-        String rrdbackendClassName = props.getProperty("rrdbackendclass", "");
-        if(!"".equals(rrdbackendClassName)) {
+        String rrdbackendClassName = Optional.ofNullable(props.getProperty("rrdbackendclass")).map(String::trim).filter(p -> ! p.isEmpty()).orElse(null);
+        if (rrdbackendClassName != null) {
             try {
                 @SuppressWarnings("unchecked")
                 Class<RrdBackendFactory> factoryClass = (Class<RrdBackendFactory>) pm.extensionClassLoader.loadClass(rrdbackendClassName);
                 backendFactory = factoryClass.getConstructor().newInstance();
-                RrdBackendFactory.setActiveFactories(backendFactory);
-                backendName = backendFactory.getName();
             } catch (Exception e) {
-                throw new RuntimeException("Failed to configure RrdDbStoreFactory:" + e.getMessage(), e);
+                throw new RuntimeException("Failed to configure RrdDbStoreFactory:" + Util.resolveThrowableException(e), e);
             }
         } else {
-            backendName = props.getProperty("rrdbackend", "FILE");
+            String backendName = props.getProperty("rrdbackend", "FILE");
             backendFactory = RrdBackendFactory.getFactory(backendName);
         }
-        
-        RrdBackendFactory.setActiveFactories(backendFactory);
 
         // Analyze the backend properties
         Map<String, String> backendPropsMap = pm.subKey("rrdbackend");
 
-        if(backendPropsMap.size() > 0) {
+        if (backendPropsMap.size() > 0) {
             logger.debug("Configuring backend factory {}", backendFactory.getClass());
-            for(Map.Entry<String, String> e: backendPropsMap.entrySet()) {
+            for (Map.Entry<String, String> e: backendPropsMap.entrySet()) {
                 try {
                     logger.trace("Will set backend end bean '{}' to '{}'", e.getKey(), e.getValue());
                     ArgFactory.beanSetter(backendFactory, e.getKey(), e.getValue());
@@ -83,8 +76,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
         dbPoolSize = Util.parseStringNumber(props.getProperty("dbPoolSize"), 10) + pm.numCollectors;
         usepool = pm.parseBoolean(props.getProperty("usepool", "true"));
 
-        logger.debug("Store backend used is {}", backendName);
-
+        logger.debug("Store backend used is {}", backendFactory.getName());
     }
 
     /*
@@ -95,22 +87,20 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
     @Override
     public void start() {
         super.start();
-        boolean filebasedbackend = backendFactory instanceof RrdFileBackendFactory;
-        if(usepool || filebasedbackend) {
+        if (usepool ) {
+            Lock oldPoolLock = null;
             try {
-                RrdBackendFactory.setActiveFactories(backendFactory);;
-                logger.trace("Store backend set to {}", backendName);
-            } catch (IllegalStateException e) {
-                logger.warn("Trying to change default backend, a restart is needed");
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to configure RrdDbStoreFactory:" + e.getMessage(), e);
-            }
-            try {
-                instance = RrdDbPool.getInstance();
+                if (instance != null) {
+                    oldPoolLock = instance.lockEmpty(0, TimeUnit.DAYS);
+                }
+                instance = new RrdDbPool(backendFactory);
                 instance.setCapacity(dbPoolSize);
-                usepool = true;
-            } catch (Exception e) {
-                logger.warn("Trying to change rrd pool size, a restart is needed");
+            } catch (IllegalStateException e) {
+                logger.warn("Trying to change rrd pool size failed, a restart is needed");
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } finally {
+                Optional.ofNullable(oldPoolLock).ifPresent(Lock::unlock);
             }
         }
     }
@@ -134,13 +124,25 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
      * @throws IOException Thrown in case of I/O error.
      */
     public RrdDb getRrd(String rrdFile) throws IOException {
-        Path rrdPath = Paths.get(rrdFile);
         long start = System.currentTimeMillis();
-        RrdDb db = RrdDb.getBuilder().setPath(rrdPath.toRealPath(LinkOption.NOFOLLOW_LINKS).normalize().toUri()).setBackendFactory(backendFactory).build();
+        RrdDb db;
+        if (usepool) {
+            db = instance.requestRrdDb(rrdFile);
+        } else {
+            db = RrdDb.getBuilder().setPath(rrdFile).setBackendFactory(backendFactory).build();
+        }
         long finish = System.currentTimeMillis();
         waitTime.addAndGet(finish - start);
         lockCount.incrementAndGet();
         return db;
+    }
+
+    public RrdDb getRrd(RrdDef def) throws IOException {
+        if (usepool) {
+            return instance.requestRrdDb(def);
+        } else {
+            return RrdDb.getBuilder().setRrdDef(def).setBackendFactory(backendFactory).build();
+        }
     }
 
     /**
@@ -154,7 +156,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
             waitTime.addAndGet(finish - start);
             lockCount.incrementAndGet();
         } catch (IOException e) {
-            logger.error("Unable to release RrdDb '{}': {}", db.getPath(), e.getMessage());
+            logger.error("Unable to release RrdDb '{}': {}", db.getPath(), Util.resolveThrowableException(e));
         }
     }
 

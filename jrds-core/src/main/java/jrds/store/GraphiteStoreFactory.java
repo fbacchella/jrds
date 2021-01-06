@@ -26,7 +26,7 @@ public class GraphiteStoreFactory extends AbstractStoreFactory<GraphiteStore> {
         super.configureStore(pm, props);
         String host = props.getProperty("host", "localhost");
         String portStr = props.getProperty("port", "2003");
-        int port = Util.parseStringNumber(portStr, new Integer(2003));
+        int port = Util.parseStringNumber(portStr, 2003);
         String prefix = props.getProperty("prefix", "");
 
         cnx = new GraphiteConnection(host, port, prefix);

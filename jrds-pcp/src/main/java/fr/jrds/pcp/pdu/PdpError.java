@@ -28,7 +28,7 @@ public class PdpError extends Pdu {
     @Override
     protected void parse(MessageBuffer buffer) {
         int errnum = buffer.getInt();
-        logger.debug("errnum=" + errnum);
+        logger.debug("errnum={}", errnum);
         error = ERROR.errors.get(errnum);
     }
 

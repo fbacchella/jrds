@@ -1,5 +1,6 @@
 package jrds.probe.jmx;
 
+import javax.management.MalformedObjectNameException;
 import javax.management.remote.JMXServiceURL;
 
 import jrds.probe.JMXConnection;
@@ -8,8 +9,14 @@ import jrds.starter.StarterNode;
 
 public abstract class AbstractJmxConnection<CNX, DS extends JmxAbstractDataSource<CNX>> extends Connection<JmxAbstractDataSource<CNX>> {
 
-    protected static final String startTimeObjectName = "java.lang:type=Runtime";
-    protected static final String startTimeAttribue = "Uptime";
+    protected static final RequestParams startTimeRequestsParams;
+    static {
+        try {
+            startTimeRequestsParams = new RequestParams("java.lang:type=Runtime/Uptime");
+        } catch (MalformedObjectNameException ex) {
+            throw new IllegalStateException(ex);
+        }
+    }
 
     protected JMXServiceURL url;
     protected JmxProtocol protocol;
@@ -17,10 +24,14 @@ public abstract class AbstractJmxConnection<CNX, DS extends JmxAbstractDataSourc
     protected String path;
     protected String user;
     protected String password;
-    protected JMXConnection parent;
+    protected final JMXConnection parent;
     protected boolean ssl;
 
     public abstract <T> T getMBean(String name, Class<T> interfaceClass);
+
+    AbstractJmxConnection(JMXConnection parent) {
+        this.parent = parent;
+    }
 
     /**
      * @return the password
@@ -104,10 +115,6 @@ public abstract class AbstractJmxConnection<CNX, DS extends JmxAbstractDataSourc
      */
     public void setPath(String path) {
         this.path = path;
-    }
-
-    public void setParent(JMXConnection parent) {
-        this.parent = parent;
     }
 
     @Override

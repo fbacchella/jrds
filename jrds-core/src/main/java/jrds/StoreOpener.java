@@ -100,8 +100,7 @@ public final class StoreOpener {
     }
 
     public static final void stop() {
-        logger.info("Average wait time: " + waitTime.doubleValue() / lockCount.doubleValue() + " ms");
-
+        logger.info("Average wait time: {} ms", waitTime.doubleValue() / lockCount.doubleValue());
     }
 
     @Deprecated

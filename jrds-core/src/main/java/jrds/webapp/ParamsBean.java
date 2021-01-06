@@ -180,24 +180,20 @@ public class ParamsBean implements Serializable {
     private void unpack(String packed) {
         String formatedpack;
         formatedpack = JSonPack.GZIPHEADER + packed.replace('!', '=').replace('$', '/').replace('*', '+');
-        logger.trace(formatedpack);
-        ByteArrayOutputStream outbuffer = new ByteArrayOutputStream(formatedpack.length());
-        try {
-            InputStream inbuffer = Base64.getDecoder().wrap(new ByteArrayInputStream(formatedpack.getBytes()));
-
-            byte[] copybuffer = new byte[1500];
-            GZIPInputStream os = new GZIPInputStream(inbuffer);
-            int realread = os.read(copybuffer);
-            while (realread > 0) {
+        try (ByteArrayOutputStream outbuffer = new ByteArrayOutputStream(formatedpack.length());
+             InputStream inbuffer = Base64.getDecoder().wrap(new ByteArrayInputStream(formatedpack.getBytes()));
+             GZIPInputStream os = new GZIPInputStream(inbuffer);
+            ) {
+            byte[] copybuffer = new byte[4096];
+            int realread;
+            while ((realread = os.read(copybuffer))> 0) {
                 outbuffer.write(copybuffer, 0, realread);
-                realread = os.read(copybuffer);
             }
-            os.close();
 
             JrdsJSONObject json = new JrdsJSONObject(outbuffer.toString());
-            for(String key: json) {
+            for (String key: json) {
                 Object value = json.get(key);
-                String newkey = JSonPack.JSONKEYS.get(new Integer(key));
+                String newkey = JSonPack.JSONKEYS.get(Integer.parseInt(key));
                 params.put(newkey, new String[] { value.toString() });
                 logger.trace("adding {} = {}", newkey, value);
             }

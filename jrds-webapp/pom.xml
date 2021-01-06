@@ -7,14 +7,14 @@
     <parent>
         <groupId>fr.jrds</groupId>
         <artifactId>jrds</artifactId>
-        <version>2020.1</version>
+        <version>2021.1</version>
     </parent>
     <artifactId>jrds-webapp</artifactId>
     <packaging>war</packaging>
     <name>JRDS Webapp</name>
     <url>http://jrds.fr</url>
     <properties>
-        <dojo.version>1.10.8</dojo.version>
+        <dojo.version>1.12.3</dojo.version>
         <dojo.unpacked.dir>${project.basedir}/target/dojo-unpacked</dojo.unpacked.dir>
     </properties>
     <dependencies>

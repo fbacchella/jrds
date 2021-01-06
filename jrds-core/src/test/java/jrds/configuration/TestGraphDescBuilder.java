@@ -20,7 +20,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.rrd4j.DsType;
-import org.rrd4j.data.Plottable;
+import org.rrd4j.data.IPlottable;
 import org.rrd4j.graph.RrdGraph;
 import org.rrd4j.graph.RrdGraphDef;
 import org.rrd4j.graph.RrdGraphInfo;
@@ -115,8 +115,8 @@ public class TestGraphDescBuilder {
         logger.trace("Probe preparation done");
 
         Period pr = new Period();
-        ExtractInfo ei = ExtractInfo.get().make(pr.getBegin(), pr.getEnd());
-        Map<String, Plottable> empty = Collections.emptyMap();
+        ExtractInfo ei = ExtractInfo.of(pr.getBegin(), pr.getEnd());
+        Map<String, IPlottable> empty = Collections.emptyMap();
 
         ImageWriter iw = ImageIO.getImageWritersByFormatName("BMP").next();
         ImageWriteParam iwp = iw.getDefaultWriteParam();
