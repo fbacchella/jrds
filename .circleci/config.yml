@@ -9,13 +9,13 @@ jobs:
                 key: jrds-{{ checksum "pom.xml" }}-{{ checksum "jrds-core/pom.xml" }}-{{ checksum "jrds-ipmi/pom.xml" }}-{{ checksum "jrds-jsonp/pom.xml" }}-{{ checksum "jrds-log4j/pom.xml" }}-{{ checksum "jrds-snmp/pom.xml" }}-{{ checksum "jrds-standalone/pom.xml" }}-{{ checksum "jrds-webapp/pom.xml" }}-{{ checksum "jrds-jdbc/pom.xml" }}
             - run:
                 command: |
+                    set -x
                     sudo apt-get update
                     sudo apt install libsnmp-base
                     mkdir -p /home/circleci/.sonar/cache /home/circleci/.m2/repository
                     # A bug in dependency:go-offline, see https://issues.apache.org/jira/browse/MDEP-688
                     # Another one: https://issues.apache.org/jira/browse/MDEP-735
-                    mvn -B dependency:resolve dependency:resolve-plugins -Psonar,versions -s .circleci/settings.xml
-                    for p in */pom.xml ./pom.xml ; do d=$(dirname $p) ; echo $d ; (cd $d && mvn -B dependency:resolve dependency:resolve-plugins -Psonar,versions  -s .circleci/settings.xml || true) ; done
+                    (for p in */pom.xml ./pom.xml ; do d=$(dirname $p) ; echo $d ; (cd $d && mvn -B dependency:resolve dependency:resolve-plugins -Psonar,versions  -s .circleci/settings.xml || true) ; done ) || true
             - persist_to_workspace:
                 root: /
                 paths:
@@ -209,6 +209,7 @@ workflows:
       - testsj13:
           requires:
               - build
+          context: "Security variables"
       - testsj11:
           requires:
               - build
@@ -221,6 +222,7 @@ workflows:
               - testsj13
               - testsj11
               - testsj8
+          context: "Security variables"
       - savecache:
           requires:
               - publish
