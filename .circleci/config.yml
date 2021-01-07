@@ -15,7 +15,7 @@ jobs:
                     mkdir -p /home/circleci/.sonar/cache /home/circleci/.m2/repository
                     # A bug in dependency:go-offline, see https://issues.apache.org/jira/browse/MDEP-688
                     # Another one: https://issues.apache.org/jira/browse/MDEP-735
-                    (for p in */pom.xml ./pom.xml ; do d=$(dirname $p) ; echo $d ; (cd $d && mvn -B dependency:resolve dependency:resolve-plugins -Psonar,versions  -s .circleci/settings.xml || true) ; done ) || true
+                    (for p in ./pom.xml */pom.xml ; do d=$(dirname $p) ; echo $d ; (cd $d && mvn -B dependency:resolve dependency:resolve-plugins -Psonar,versions || true) ; done ) || true
             - persist_to_workspace:
                 root: /
                 paths:
@@ -52,9 +52,9 @@ jobs:
                 paths:
                     - home/circleci/.m2/repository
                     - home/circleci/project
-    testsj13:
+    testsj14:
         docker:
-            - image: circleci/openjdk:13-jdk-buster
+            - image: circleci/openjdk:14-jdk-buster
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -76,7 +76,7 @@ jobs:
                     fi
                     mvn -B surefire:test $SONAR -Pskip -DargLine="-Xmx2048m" -s .circleci/settings.xml
                 environment:
-                    JAVA_HOME: /usr/java/openjdk-13
+                    JAVA_HOME: /usr/local/openjdk-14
                     MAVEN_OPTS: "-Xmx1024m"
             - store_test_results:
                 path: target/surefire-reports
@@ -206,7 +206,7 @@ workflows:
       - testsj15:
           requires:
               - build
-      - testsj13:
+      - testsj14:
           requires:
               - build
           context: "Security variables"
@@ -219,7 +219,7 @@ workflows:
       - publish:
           requires:
               - testsj15
-              - testsj13
+              - testsj14
               - testsj11
               - testsj8
           context: "Security variables"
