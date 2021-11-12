@@ -19,12 +19,13 @@
         <year>2020</year>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jetty.version>9.2.30.v20200428</jetty.version>
-        <maven.plugin.surefire.version>3.0.0-M4</maven.plugin.surefire.version>
+        <maven.plugin.surefire.version>3.0.0-M5</maven.plugin.surefire.version>
         <servlet-api.version>3.1.0</servlet-api.version>
-        <junit.version>4.13.1</junit.version>
-        <slf4j.version>1.7.30</slf4j.version>
-        <log4j2.version>2.14.0</log4j2.version>
-        <lombok.version>1.18.16</lombok.version>
+        <junit.version>4.13.2</junit.version>
+        <slf4j.version>1.7.32</slf4j.version>
+        <log4j2.version>2.14.1</log4j2.version>
+        <lombok.version>1.18.22</lombok.version>
+        <jolokia.version>1.7.1</jolokia.version>
         <jrds.hidelogs>true</jrds.hidelogs>
         <!-- Tell sonar where to look for the coverage file. Property inherited by submodules -->
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
@@ -67,17 +68,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
-                    <version>1.8</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -97,36 +98,33 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.3.1</version>
                     <configuration>
                         <quiet/>
                         <links>
-                            <link>https://docs.oracle.com/javaee/7/api/</link>
-                            <!--link>http://www.snmp4j.org/doc/</link-->
                             <link>https://rrd4j.github.io/rrd4j/apidocs/</link>
                             <link>https://junit.org/junit4/javadoc/latest/</link>
-                            <link>https://www.eclipse.org/jetty/javadoc/9.2.22.v20170606/</link>
+                            <link>https://javadoc.io/doc/org.eclipse.jetty/jetty-http/${jetty.version}/</link>
                             <link>http://ws.apache.org/xmlrpc/apidocs/</link>
                             <link>https://stleary.github.io/JSON-java/</link>
                             <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
                             <link>http://commons.apache.org/proper/commons-net/javadocs/api-3.6/</link>
-                            <link>http://commons.apache.org/fileupload/apidocs/</link>
-                            <link>http://hc.apache.org/httpcomponents-client-ga/httpclient/apidocs/</link>
+                            <link>https://commons.apache.org/proper/commons-fileupload/apidocs/</link>
+                            <link>https://hc.apache.org/httpcomponents-client-5.1.x/current/httpclient5/apidocs/</link>
                             <!-- sometime fails for no reason -->
-                            <!--link>http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/</link-->
                             <!--link>https://javadoc.io/doc/com.jayway.jsonpath/json-path/2.4.0</link-->
-                            <detectJavaApiLink>true</detectJavaApiLink>
                         </links>
+                        <detectJavaApiLink>true</detectJavaApiLink>
                         <bootclasspath>${bootclasspath}</bootclasspath>
                         <source>${maven.compiler.source}</source>
                     </configuration>
@@ -156,7 +154,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.2.1</version>
                     <executions>
                         <execution>
                             <id>attach-source</id>
@@ -180,17 +178,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.7.1</version>
+                    <version>3.9.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.5</version>
+                    <version>0.8.7</version>
                     <executions>
                         <execution>
                              <id>merge</id>
@@ -213,7 +211,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>3.2.2</version>
+                    <version>3.3.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>3.0.0-M4</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -299,11 +302,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-help-plugin</artifactId>
                 <version>3.1.1</version>
-            </extension>
-            <extension>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
             </extension>
             <extension>
                 <groupId>org.apache.maven.surefire</groupId>
@@ -396,7 +394,6 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <version>0.8.4</version>
                         <configuration>
                             <output>file</output>
                             <append>true</append>
