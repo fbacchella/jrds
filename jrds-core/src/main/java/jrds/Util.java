@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.nio.CharBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
@@ -660,91 +661,81 @@ public class Util {
         };
     }
 
-    public static final Comparator<String> nodeComparator = jrds.Util.AlphanumericSorting();
-
     /**
-     * Return an alpha numeric sorter where host2 is before host10 Copied from
-     * http://sanjaal.com/java/tag/sample-alphanumeric-sorting/
-     * 
-     * @return
+     * Contains an alpha numeric sorter where host2 is before host10
      */
-    private static Comparator<String> AlphanumericSorting() {
-        return new Comparator<String>() {
+    public static final Comparator<String> nodeComparator = (firstString, secondString) -> {
+        if (secondString == null || firstString == null) {
+            return 0;
+        }
 
-            public int compare(String firstString, String secondString) {
+        firstString = firstString.toLowerCase();
+        secondString = secondString.toLowerCase();
 
-                if(secondString == null || firstString == null) {
-                    return 0;
+        int lengthFirstStr = firstString.length();
+        int lengthSecondStr = secondString.length();
+
+        int index1 = 0;
+        int index2 = 0;
+
+        CharBuffer space1 = CharBuffer.allocate(lengthFirstStr);
+        CharBuffer space2 = CharBuffer.allocate(lengthSecondStr);
+
+        while (index1 < lengthFirstStr && index2 < lengthSecondStr) {
+            space1.clear();
+            space2.clear();
+
+            char ch1 = firstString.charAt(index1);
+            boolean isDigit1 = Character.isDigit(ch1);
+            char ch2 = secondString.charAt(index2);
+            boolean isDigit2 = Character.isDigit(ch2);
+
+            do {
+                space1.append(ch1);
+                index1++;
+
+                if(index1 < lengthFirstStr) {
+                    ch1 = firstString.charAt(index1);
+                } else {
+                    break;
                 }
+            } while (Character.isDigit(ch1) == isDigit1);
 
-                firstString = firstString.toLowerCase();
-                secondString = secondString.toLowerCase();
+            do {
+                space2.append(ch2);
+                index2++;
 
-                int lengthFirstStr = firstString.length();
-                int lengthSecondStr = secondString.length();
-
-                int index1 = 0;
-                int index2 = 0;
-
-                while (index1 < lengthFirstStr && index2 < lengthSecondStr) {
-                    char ch1 = firstString.charAt(index1);
-                    char ch2 = secondString.charAt(index2);
-
-                    char[] space1 = new char[lengthFirstStr];
-                    char[] space2 = new char[lengthSecondStr];
-
-                    int loc1 = 0;
-                    int loc2 = 0;
-
-                    do {
-                        space1[loc1++] = ch1;
-                        index1++;
-
-                        if(index1 < lengthFirstStr) {
-                            ch1 = firstString.charAt(index1);
-                        } else {
-                            break;
-                        }
-                    } while (Character.isDigit(ch1) == Character.isDigit(space1[0]));
-
-                    do {
-                        space2[loc2++] = ch2;
-                        index2++;
-
-                        if(index2 < lengthSecondStr) {
-                            ch2 = secondString.charAt(index2);
-                        } else {
-                            break;
-                        }
-                    } while (Character.isDigit(ch2) == Character.isDigit(space2[0]));
-
-                    String str1 = new String(space1);
-                    String str2 = new String(space2);
-
-                    int result;
-
-                    if(Character.isDigit(space1[0]) && Character.isDigit(space2[0])) {
-                        try {
-                            Long firstNumberToCompare = Long.parseLong(str1.trim());
-                            Long secondNumberToCompare = Long.parseLong(str2.trim());
-                            result = firstNumberToCompare.compareTo(secondNumberToCompare);
-                        } catch (NumberFormatException e) {
-                            // Something prevent the number parsing, do a string
-                            // comparaison
-                            result = str1.compareTo(str2);
-                        }
-                    } else {
-                        result = str1.compareTo(str2);
-                    }
-
-                    if(result != 0) {
-                        return result;
-                    }
+                if(index2 < lengthSecondStr) {
+                    ch2 = secondString.charAt(index2);
+                } else {
+                    break;
                 }
-                return lengthFirstStr - lengthSecondStr;
+            } while (Character.isDigit(ch2) == isDigit2);
+
+            String str1 = space1.flip().toString();
+            String str2 = space2.flip().toString();
+
+            int result;
+
+            if (isDigit1 && isDigit2) {
+                try {
+                    long firstNumberToCompare = Long.parseLong(str1);
+                    long secondNumberToCompare = Long.parseLong(str2);
+                    result = Long.compare(firstNumberToCompare, secondNumberToCompare);
+                } catch (NumberFormatException e) {
+                    // Something prevent the number parsing, do a string
+                    // comparaison
+                    result = str1.compareTo(str2);
+                }
+            } else {
+                result = str1.compareTo(str2);
             }
-        };
-    }
+            if (result != 0) {
+                return result;
+            }
+        }
+        return lengthFirstStr - lengthSecondStr;
+    };
 
     private static class LambdaString {
         private final Supplier<String> source;
