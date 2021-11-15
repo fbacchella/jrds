@@ -14,11 +14,6 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.event.Level;
 
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.spi.json.JsonOrgJsonProvider;
-import com.jayway.jsonpath.spi.mapper.JsonOrgMappingProvider;
-
 import jrds.HostInfo;
 import jrds.JrdsSample;
 import jrds.Log4JRule;
@@ -46,19 +41,6 @@ public class JsonProbeTest {
     @Before
     public void loggers() {
         logrule.setLevel(Level.TRACE, "jrds.jsonp.probe.HttpJson", "jrds.jsonp.starter.JsonpProvider");
-    }
-
-    // Expected to fail when https://github.com/json-path/JsonPath/issues/497 will be corrected
-    @Test(expected=NullPointerException.class)
-    public void issue497() throws IOException {
-        String json = "{\"foo\": \"bar\", \"emptyObject\": {}}";
-
-        Configuration config = Configuration.defaultConfiguration()
-                        .jsonProvider(new JsonOrgJsonProvider())
-                        .mappingProvider(new JsonOrgMappingProvider());
-
-        Object result = JsonPath.using(config).parse(json).read("$..foo");
-        Assert.assertNotNull(result);
     }
 
     @Test

@@ -76,7 +76,7 @@ public class HttpJson extends HCHttpProbe<String> {
 
         for (Map.Entry<JsonPath, String> e: collectKeys.entrySet()) {
             try {
-                JSONArray v = protectedRead(ctx, e.getKey());
+                JSONArray v = ctx.read(e.getKey(), JSONArray.class);
                 if (v.isEmpty()) {
                     log(Level.ERROR, "Failed to collect data '%s': not found", e.getValue());
                     break;
@@ -107,18 +107,18 @@ public class HttpJson extends HCHttpProbe<String> {
             JSONArray v;
             long returned;
             if (uptimePointer != null) {
-                v = protectedRead(ctx, uptimePointer);
+                v = ctx.read(uptimePointer, JSONArray.class);
                 if (v == null || v.isEmpty()) {
                     return 0;
                 }
                 returned = valueToNum(v.get(0)).longValue();
             } else if (startPointer != null) {
-                v = protectedRead(ctx, startPointer);
+                v = ctx.read(startPointer, JSONArray.class);
                 if (v == null || v.isEmpty()) {
                     return 0;
                 }
                 long start = valueToNum(v.get(0)).longValue();
-                v = protectedRead(ctx, currentTimePointer);
+                v = ctx.read(currentTimePointer, JSONArray.class);
                 if (v == null || v.isEmpty()) {
                     return 0;
                 }
@@ -131,20 +131,6 @@ public class HttpJson extends HCHttpProbe<String> {
         } catch (JSONException | PathNotFoundException e) {
             log(Level.ERROR, "Failed checking uptime: %s", e);
             return 0;
-        }
-    }
-
-    /**
-     * A protection against issue https://github.com/json-path/JsonPath/issues/497
-     * @param ctx
-     * @param path
-     * @return
-     */
-    private JSONArray protectedRead(DocumentContext ctx, JsonPath path) {
-        try {
-            return ctx.read(path, JSONArray.class);
-        } catch (NullPointerException ex) {
-            return new JSONArray();
         }
     }
 
