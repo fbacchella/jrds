@@ -53,7 +53,7 @@ public class PcpConnexion extends jrds.starter.Connection<Connection> {
     public boolean startConnection() {
         boolean success = false;
         try {
-            cnx = new Connection(new InetSocketAddress(getResolver().getInetAddress(), port), getTimeout() * 1000);
+            cnx = new Connection(new InetSocketAddress(getResolver().getInetAddress(), port), getTimeout() * 1000L);
             cnx.startClient();
             cnx.authentication(new CVersion());
             success = true;

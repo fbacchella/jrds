@@ -39,7 +39,7 @@ public class Result extends Pdu {
     protected void parse(MessageBuffer buffer) throws PCPException {
         int seconds = buffer.getInt();
         int microsecends = buffer.getInt();
-        Instant date = Instant.ofEpochSecond(seconds, microsecends * 1000);
+        Instant date = Instant.ofEpochSecond(seconds, microsecends * 1000L);
         int count = buffer.getInt();
         Map<PmId, List<ResultInstance>> ids = new HashMap<>(count);
         for (int i=0 ; i < count ; i++) {
