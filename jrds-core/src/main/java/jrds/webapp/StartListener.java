@@ -133,11 +133,12 @@ public class StartListener implements ServletContextListener {
         }
 
         String localPropFile = ctxt.getInitParameter("propertiesFile");
-        if(localPropFile != null)
-            try {
-                p.load(new FileReader(localPropFile));
+        if(localPropFile != null) {
+            try (FileReader r = new FileReader(localPropFile)){
+                p.load(r);
             } catch (IOException e) {
             }
+        }
         return p;
     }
 
