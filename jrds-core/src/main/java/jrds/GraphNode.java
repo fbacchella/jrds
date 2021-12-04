@@ -3,7 +3,7 @@ package jrds;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.rrd4j.data.DataProcessor;
@@ -67,11 +67,11 @@ public class GraphNode implements Comparable<GraphNode>, WithACL {
         this.probe = probe;
     }
 
-    public LinkedList<String> getTreePathByHost() {
+    public List<String> getTreePathByHost() {
         return gd.getHostTree(this);
     }
 
-    public LinkedList<String> getTreePathByView() {
+    public List<String> getTreePathByView() {
         return gd.getViewTree(this);
     }
 

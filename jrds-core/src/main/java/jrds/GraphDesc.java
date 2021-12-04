@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
@@ -1154,22 +1153,23 @@ public class GraphDesc implements WithACL {
     /**
      * @return Returns the viewTree.
      */
-    public LinkedList<String> getViewTree(GraphNode graph) {
+    public List<String> getViewTree(GraphNode graph) {
         return getTree(graph, PropertiesManager.VIEWSTAB);
     }
 
     /**
      * @return Returns the hostTree.
      */
-    public LinkedList<String> getHostTree(GraphNode graph) {
+    public List<String> getHostTree(GraphNode graph) {
         return getTree(graph, PropertiesManager.HOSTSTAB);
     }
 
-    public LinkedList<String> getTree(GraphNode graph, String tabname) {
+    public List<String> getTree(GraphNode graph, String tabname) {
         List<?> elementsTree = trees.get(tabname);
-        LinkedList<String> tree = new LinkedList<String>();
-        if(elementsTree == null)
-            return tree;
+        if(elementsTree == null) {
+            return Collections.emptyList();
+        }
+        List<String> tree = new ArrayList<String>(elementsTree.size());
         for(Object o: elementsTree) {
             if(o instanceof String) {
                 String pathElem = jrds.Util.parseTemplate((String) o, graph.getProbe(), this, graph.getProbe().getHost());
