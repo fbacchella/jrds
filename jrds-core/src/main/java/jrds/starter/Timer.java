@@ -76,7 +76,7 @@ public class Timer extends StarterNode {
             }
         }
 
-        public void refresh(Date lastCollect, long duration) {
+        public synchronized void refresh(Date lastCollect, long duration) {
             this.lastCollect = lastCollect;
             this.duration = duration;
         }
