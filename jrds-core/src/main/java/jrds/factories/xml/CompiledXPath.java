@@ -30,13 +30,18 @@ public class CompiledXPath {
     }
 
     public static XPathExpression get(String xpath) throws XPathExpressionException {
-        XPathExpression e = xpc.get(xpath);
-        if (e == null) {
-            logger.debug("Uncompiled xpath: {}", xpath);
-            e = xpather.get().compile(xpath);
-            xpc.put(xpath, e);
+        try {
+            return xpc.computeIfAbsent(xpath, k -> {
+                logger.debug("Uncompiled xpath: {}", k);
+                try {
+                    return xpather.get().compile(k);
+                } catch (XPathExpressionException ex) {
+                    throw new IllegalArgumentException(ex);
+                }
+            });
+        } catch (IllegalArgumentException ex) {
+            throw (XPathExpressionException) ex.getCause();
         }
-        return e;
     }
 
 }

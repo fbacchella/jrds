@@ -41,13 +41,9 @@ public class CacheStoreFactory extends AbstractStoreFactory<CacheStore> implemen
     public CacheStore create(Probe<?, ?> p) {
         String hostname = p.getHost().getName();
         String probeName = p.getName();
-        if(!cache.containsKey(hostname))
-            cache.put(hostname, new HashMap<String, Map<String, Number>>());
-        Map<String, Map<String, Number>> probes = cache.get(hostname);
-        if(!probes.containsKey(probeName))
-            probes.put(probeName, new HashMap<String, Number>(p.getPd().getDsDefs(p.getRequiredUptime()).length));
-
-        return new CacheStore(p, probes.get(probeName));
+        Map<String, Number> c = cache.computeIfAbsent(hostname, k -> new HashMap<String, Map<String, Number>>())
+                                     .computeIfAbsent(probeName, k -> new HashMap<String, Number>(p.getPd().getDsDefs(p.getRequiredUptime()).length));
+        return new CacheStore(p, c);
     }
 
     @Override

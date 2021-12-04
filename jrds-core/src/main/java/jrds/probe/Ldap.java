@@ -128,10 +128,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
                 rdn = ".";
                 field = parsed[0];
             }
-            if(!retValue.containsKey(rdn)) {
-                retValue.put(rdn, new HashSet<String>());
-            }
-            retValue.get(rdn).add(field);
+            retValue.computeIfAbsent(rdn, k -> new HashSet<String>()).add(field);
         }
         log(Level.TRACE, "Preparing a request info: %s", retValue);
 

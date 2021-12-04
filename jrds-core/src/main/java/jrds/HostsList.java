@@ -398,12 +398,9 @@ public class HostsList extends StarterNode {
      * @return a graph tree
      */
     private GraphTree addTree(String label, String root) {
-        if(!treeMap.containsKey(label)) {
-            GraphTree newTree = GraphTree.makeGraph(root);
-            treeMap.put(label, newTree);
-            return newTree;
-        }
-        return null;
+        return treeMap.computeIfAbsent(label, k -> {
+           return GraphTree.makeGraph(root);
+        });
     }
 
     public void addGraphs(Collection<GraphNode> graphs) {

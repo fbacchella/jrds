@@ -103,17 +103,14 @@ public class Timer extends StarterNode {
     }
 
     public HostStarter getHost(HostInfo info) {
-        String hostName = info.getName();
-        HostStarter starter = hostList.get(hostName);
-        if(starter == null) {
-            starter = new HostStarter(info);
-            hostList.put(hostName, starter);
-            starter.setTimeout(getTimeout());
-            starter.setStep(getStep());
-            starter.setSlowCollectTime(getSlowCollectTime());
-            starter.setParent(this);
-        }
-        return starter;
+        return hostList.computeIfAbsent(info.getName(), k -> {
+            HostStarter s = new HostStarter(info);
+            s.setTimeout(getTimeout());
+            s.setStep(getStep());
+            s.setSlowCollectTime(getSlowCollectTime());
+            s.setParent(this);
+            return s;
+        });
     }
 
     public Iterable<HostStarter> getAllHosts() {

@@ -85,13 +85,13 @@ public class GraphTree {
     }
 
     synchronized private void addChild(String childName) {
-        if(!childsMap.containsKey(childName)) {
+        childsMap.computeIfAbsent(childName, k -> {
             GraphTree newChild = new GraphTree(childName);
-            childsMap.put(childName, newChild);
             newChild.parent = this;
             newChild.pathsMap = pathsMap;
             pathsMap.put(newChild.getPath().hashCode(), newChild);
-        }
+            return newChild;
+        });
     }
 
     private void _addGraphByPath(LinkedList<String> path, GraphNode nodesGraph) {
