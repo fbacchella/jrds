@@ -1,6 +1,7 @@
 package jrds.webapp;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import jrds.Util;
 public class JSonGraph extends JSonData {
     static final private Logger logger = LoggerFactory.getLogger(JSonGraph.class);
     private static final long serialVersionUID = 1L;
-    private int periodHistory[] = { 7, 9, 11, 16 };
+    private static final List<Integer> periodHistory = Arrays.asList(7, 9, 11, 16);
 
     @Override
     public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException {
