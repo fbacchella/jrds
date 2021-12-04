@@ -3,7 +3,6 @@ package jrds.webapp;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,13 +34,11 @@ public class JSonGraph extends JSonData {
 
         List<GraphNode> graphs = params.getGraphs(this);
         if(params.isSorted() && graphs.size() > 1) {
-            Collections.sort(graphs, new Comparator<GraphNode>() {
-                public int compare(GraphNode g1, GraphNode g2) {
-                    int order = Util.nodeComparator.compare(g1.getName(), g2.getName());
-                    if(order == 0)
-                        order = Util.nodeComparator.compare(g1.getProbe().getHost().getName(), g2.getProbe().getHost().getName());
-                    return order;
-                }
+            Collections.sort(graphs, (g1, g2) -> {
+                int order = Util.nodeComparator.compare(g1.getName(), g2.getName());
+                if(order == 0)
+                    order = Util.nodeComparator.compare(g1.getProbe().getHost().getName(), g2.getProbe().getHost().getName());
+                return order;
             });
         }
         logger.debug("Graphs returned: {}", graphs);

@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -151,15 +150,14 @@ public class Renderer {
     static private final float hashTableLoadFactor = 0.75f;
     static private final AtomicInteger counter = new AtomicInteger(0);
 
-    private final ExecutorService tpool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 3, new ThreadFactory() {
-        public Thread newThread(Runnable r) {
-            String threadName = "RendererThread" + counter.getAndIncrement();
-            Thread t = new Thread(r, threadName);
-            t.setDaemon(true);
-            logger.debug("New thread name: {}", threadName);
-            return t;
-        }
+    private final ExecutorService tpool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 3, r -> {
+        String threadName = "RendererThread" + counter.getAndIncrement();
+        Thread t = new Thread(r, threadName);
+        t.setDaemon(true);
+        logger.debug("New thread name: {}", threadName);
+        return t;
     });
+
     private int cacheSize;
     private final Map<Integer, RendererRun> rendered;
     private final File tmpDir;

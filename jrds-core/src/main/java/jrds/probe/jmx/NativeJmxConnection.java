@@ -37,12 +37,10 @@ public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnec
 
     // close can be slow
     private final static AtomicInteger closed = new AtomicInteger();
-    private final static ThreadFactory closerFactory = new ThreadFactory() {
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r, "Closer" + closed.getAndIncrement());
-            t.setDaemon(true);
-            return t;
-        }
+    private final static ThreadFactory closerFactory = r -> {
+        Thread t = new Thread(r, "Closer" + closed.getAndIncrement());
+        t.setDaemon(true);
+        return t;
     };
     private final static ExecutorService closer = new ThreadPoolExecutor(0, 4, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), closerFactory);
 

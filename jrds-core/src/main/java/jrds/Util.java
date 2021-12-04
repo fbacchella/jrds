@@ -642,7 +642,7 @@ public class Util {
     }
 
     public static <T> Iterable<T> iterate(final Enumeration<T> en) {
-        final Iterator<T> iterator = new Iterator<T>() {
+        Iterator<T> iterator = new Iterator<T>() {
             public boolean hasNext() {
                 return en.hasMoreElements();
             }
@@ -655,13 +655,10 @@ public class Util {
                 throw new UnsupportedOperationException("Cannot remove in XML serialization iterator");
             }
         };
-        return new Iterable<T>() {
-            public Iterator<T> iterator() {
-                return iterator;
-            }
-        };
+        Iterable<T> iter = () -> iterator;
+        return iter;
     }
-    
+
     private static final Collator defaultCollator = Collator.getInstance();
 
     /**

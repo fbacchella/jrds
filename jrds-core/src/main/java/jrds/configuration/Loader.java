@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarEntry;
@@ -38,21 +37,17 @@ public class Loader {
 
     static final private Logger logger = LoggerFactory.getLogger(Loader.class);
 
-    private static final FileFilter filter = new FileFilter() {
-        public boolean accept(File file) {
-            return (!file.isHidden()) && (file.isDirectory()) || (file.isFile() && file.getName().endsWith(".xml"));
-        }
+    private static final FileFilter filter = file -> {
+        return (!file.isHidden()) && (file.isDirectory()) || (file.isFile() && file.getName().endsWith(".xml"));
     };
 
     private final AtomicInteger threadCount = new AtomicInteger(0);
-    private final ExecutorService tpool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2, new ThreadFactory() {
-        public Thread newThread(Runnable r) {
-            String threadName = "DomParser" + threadCount.getAndIncrement();
-            Thread t = new Thread(r, threadName);
-            t.setDaemon(true);
-            logger.debug("New thread name: {}", threadName);
-            return t;
-        }
+    private final ExecutorService tpool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2, r -> {
+        String threadName = "DomParser" + threadCount.getAndIncrement();
+        Thread t = new Thread(r, threadName);
+        t.setDaemon(true);
+        logger.debug("New thread name: {}", threadName);
+        return t;
     });
 
     private final ThreadLocal<DocumentBuilder> localDocumentBuilder = new ThreadLocal<DocumentBuilder>() {
@@ -184,42 +179,39 @@ public class Loader {
      * @param source a identifier for the source
      */
     void importStream(final InputStream xmlstream, final Object source) {
-        Runnable importer = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    JrdsDocument d = new JrdsDocument(localDocumentBuilder.get().parse(xmlstream));
+        Runnable importer = () -> {
+            try {
+                JrdsDocument d = new JrdsDocument(localDocumentBuilder.get().parse(xmlstream));
 
-                    ConfigType t = nodesTypes.get(d.getRootElement().getNodeName());
-                    if(t == null) {
-                        logger.error("Invalid type " + d.getRootElement().getNodeName() + " for: " + source);
-                        return;
-                    }
-                    String name = t.getName(d);
-                    logger.trace("Found a {} with name {}", t.getRootNode(), name);
-                    // We check the Name
-                    if(name != null && !"".equals(name)) {
-                        Map<String, JrdsDocument> rep = repositories.get(t);
-                        // We warn for dual inclusion, none is loaded, as we
-                        // don't know the good one
-                        if(rep.containsKey(name)) {
-                            logger.error("Dual definition of " + t + " with name " + name);
-                            rep.remove(name);
-                        } else {
-                            rep.put(name, d);
-                        }
-                    } else {
-                        logger.error("name not found in " + source);
-                    }
-                } catch (FileNotFoundException e) {
-                    logger.error("File not found: " + source);
-                } catch (SAXParseException e) {
-                    logger.error("Invalid xml document " + source + " (line " + e.getLineNumber() + "): " + e.getMessage());
-                } catch (SAXException e) {
-                    logger.error("Invalid xml document " + source + ": " + e);
-                } catch (IOException e) {
-                    logger.error("IO error with " + source + ": " + e);
+                ConfigType t = nodesTypes.get(d.getRootElement().getNodeName());
+                if(t == null) {
+                    logger.error("Invalid type " + d.getRootElement().getNodeName() + " for: " + source);
+                    return;
                 }
+                String name = t.getName(d);
+                logger.trace("Found a {} with name {}", t.getRootNode(), name);
+                // We check the Name
+                if(name != null && !"".equals(name)) {
+                    Map<String, JrdsDocument> rep = repositories.get(t);
+                    // We warn for dual inclusion, none is loaded, as we
+                    // don't know the good one
+                    if(rep.containsKey(name)) {
+                        logger.error("Dual definition of " + t + " with name " + name);
+                        rep.remove(name);
+                    } else {
+                        rep.put(name, d);
+                    }
+                } else {
+                    logger.error("name not found in " + source);
+                }
+            } catch (FileNotFoundException e) {
+                logger.error("File not found: " + source);
+            } catch (SAXParseException e) {
+                logger.error("Invalid xml document " + source + " (line " + e.getLineNumber() + "): " + e.getMessage());
+            } catch (SAXException e) {
+                logger.error("Invalid xml document " + source + ": " + e);
+            } catch (IOException e) {
+                logger.error("IO error with " + source + ": " + e);
             }
         };
         tpool.execute(importer);

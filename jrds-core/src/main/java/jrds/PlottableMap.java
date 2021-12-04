@@ -8,12 +8,7 @@ import jrds.store.ExtractInfo;
 
 public abstract class PlottableMap extends HashMap<String, IPlottable> {
     public static class ProxyPlottable implements IPlottable {
-        IPlottable real = new IPlottable() {
-            @Override
-            public double getValue(long timestamp) {
-                return Double.NaN;
-            }
-        };
+        IPlottable real = ts -> Double.NaN;
 
         @Override
         public double getValue(long timestamp) {

@@ -168,13 +168,11 @@ public class Timer extends StarterNode {
         }
         AtomicInteger counter = new AtomicInteger(0);
         // Generate threads with a default name
-        ThreadFactory tf = new ThreadFactory() {
-            public Thread newThread(Runnable r) {
-                Thread t = new Thread(r);
-                t.setName(Timer.this.name + "/CollectorThread" + counter.getAndIncrement());
-                t.setDaemon(true);
-                return t;
-            }
+        ThreadFactory tf = r -> {
+            Thread t = new Thread(r);
+            t.setName(Timer.this.name + "/CollectorThread" + counter.getAndIncrement());
+            t.setDaemon(true);
+            return t;
         };
 
         tpool = new ThreadPoolExecutor(numCollectors, numCollectors, getTimeout() * 2L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(toSchedule.size()), tf) {

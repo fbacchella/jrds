@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -393,11 +392,8 @@ public class ProbeDesc<KeyType> implements Cloneable {
     }
 
     public Iterable<GenericBean> getBeans() {
-        return new Iterable<GenericBean>() {
-            public Iterator<GenericBean> iterator() {
-                return beans.values().iterator();
-            }
-        };
+        Iterable<GenericBean> iter = () -> beans.values().iterator();
+        return iter;
     }
 
     public GenericBean getBean(String name) {

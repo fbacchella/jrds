@@ -139,7 +139,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
     }
 
     public Iterable<JrdsElement> getChildElementsByName(final String name) {
-        final Iterator<JrdsElement> iter = new Iterator<JrdsElement>() {
+        Iterator<JrdsElement> iter = new Iterator<JrdsElement>() {
             JrdsElement curs = getElementbyName(name);
 
             public boolean hasNext() {
@@ -168,11 +168,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
                 throw new UnsupportedOperationException("Cannot remove in a JrdsNode");
             }
         };
-        return new Iterable<JrdsElement>() {
-            public Iterator<JrdsElement> iterator() {
-                return iter;
-            }
-        };
+        return () -> iter;
 
     }
 
