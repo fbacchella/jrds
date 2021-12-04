@@ -593,7 +593,7 @@ public class HostsList extends StarterNode {
     }
 
     @Override
-    public void stopCollect() {
+    public synchronized void stopCollect() {
         super.stopCollect();
         Optional.ofNullable(collectTimer).ifPresent(Timer::cancel);
         collectTimer = null;
