@@ -35,7 +35,7 @@ public class MysqlStatus extends Mysql {
                 // We only keep the data in data stores list
                 if(toCollect.contains(e.getKey())) {
                     if(e.getValue() instanceof String)
-                        d = Util.parseStringNumber((String) e.getValue(), Double.NaN).doubleValue();
+                        d = Util.parseStringNumber((String) e.getValue(), Double.NaN);
                     retValues.put(e.getKey(), d);
                 }
             }

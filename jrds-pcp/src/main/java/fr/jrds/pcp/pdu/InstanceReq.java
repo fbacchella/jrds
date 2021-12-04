@@ -14,7 +14,7 @@ public class InstanceReq extends Pdu {
     private Instant timeValue = Instant.EPOCH;
 
     @Setter
-    private int instance = Long.valueOf(0xffffffffl).intValue();
+    private int instance = 0xffffffff;
 
     @Setter
     private String instanceName = null;
