@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -306,11 +308,13 @@ public class UtilTest {
 
     @Test
     public void testSort() {
-        String[] toSort = new String[] { "zOS", "linux", "Linux", "host10", "host2", "host03", "redbus", "telecity", "linode" };
-        Arrays.sort(toSort, jrds.Util.nodeComparator);
-        String sorted = Arrays.asList(toSort).toString();
-        logger.trace("{}", Arrays.asList(toSort));
-        Assert.assertEquals("[host2, host03, host10, linode, linux, Linux, redbus, telecity, zOS]", sorted);
+        // Test using a set, as value that compare with 0 will be merged
+        String[] toSort = new String[] {
+                "zOS", "linux", "Linux", "host10", "host2", "host03",
+                "st001", "st01a", "st01"};
+        Set<String> sorted = new TreeSet<>(jrds.Util.nodeComparator);
+        sorted.addAll(Arrays.asList(toSort));
+        Assert.assertEquals("[host2, host03, host10, linux, Linux, st001, st01, st01a, zOS]", sorted.toString());
     }
 
 }

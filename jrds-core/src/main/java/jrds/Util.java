@@ -18,6 +18,7 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.Collator;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.Comparator;
@@ -660,18 +661,19 @@ public class Util {
             }
         };
     }
+    
+    private static final Collator defaultCollator = Collator.getInstance();
 
     /**
      * Contains an alpha numeric sorter where host2 is before host10
      */
     public static final Comparator<String> nodeComparator = (firstString, secondString) -> {
-        if (secondString == null || firstString == null) {
-            return 0;
+        if (firstString == null || secondString == null) {
+            throw new NullPointerException();
         }
 
-        firstString = firstString.toLowerCase();
-        secondString = secondString.toLowerCase();
-
+        int result = 0;
+ 
         int lengthFirstStr = firstString.length();
         int lengthSecondStr = secondString.length();
 
@@ -715,26 +717,33 @@ public class Util {
             String str1 = space1.flip().toString();
             String str2 = space2.flip().toString();
 
-            int result;
-
             if (isDigit1 && isDigit2) {
                 try {
                     long firstNumberToCompare = Long.parseLong(str1);
                     long secondNumberToCompare = Long.parseLong(str2);
                     result = Long.compare(firstNumberToCompare, secondNumberToCompare);
+                    if (result == 0) {
+                        // 1 == 01 is true with a number, but not with a string, check for a string equality
+                        result = defaultCollator.compare(str1, str2);
+                    }
                 } catch (NumberFormatException e) {
                     // Something prevent the number parsing, do a string
-                    // comparaison
-                    result = str1.compareTo(str2);
+                    // comparison
+                    result = defaultCollator.compare(str1, str2);
                 }
             } else {
-                result = str1.compareTo(str2);
+                result = defaultCollator.compare(str1, str2);
             }
+            // A difference was found, exit the loop
             if (result != 0) {
-                return result;
+                break;
             }
         }
-        return lengthFirstStr - lengthSecondStr;
+        // one string might be a substring of the other, check that
+        if (result == 0) {
+            result = lengthFirstStr - lengthSecondStr;
+        }
+        return result;
     };
 
     private static class LambdaString {
