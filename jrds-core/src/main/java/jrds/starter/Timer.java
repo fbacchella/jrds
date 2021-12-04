@@ -177,7 +177,7 @@ public class Timer extends StarterNode {
             }
         };
 
-        tpool = new ThreadPoolExecutor(numCollectors, numCollectors, getTimeout() * 2, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(toSchedule.size()), tf) {
+        tpool = new ThreadPoolExecutor(numCollectors, numCollectors, getTimeout() * 2L, TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(toSchedule.size()), tf) {
             @Override
             protected <T> RunnableFuture<T> newTaskFor(Callable<T> callable) {
                 return new FutureTask<T>(callable) {
@@ -194,7 +194,7 @@ public class Timer extends StarterNode {
                 toSchedule.stream().forEach(tpool::execute);
                 tpool.shutdown();
                 long collectStart = System.currentTimeMillis();
-                long maxCollectTime = (getStep() - getTimeout()) * 1000;
+                long maxCollectTime = (getStep() - getTimeout()) * 1000L;
                 while (! tpool.awaitTermination(getTimeout(), TimeUnit.SECONDS)) {
                     if ((System.currentTimeMillis() - collectStart) > maxCollectTime && ! tpool.isTerminated()) {
                         log(Level.ERROR, "Unfinished collect, lost %d tasks", tpool.getQueue().size());
