@@ -20,7 +20,6 @@ import org.snmp4j.smi.OID;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.probe.snmp.RdsIndexedSnmpRrd;
-import jrds.probe.snmp.RdsSnmpSimple;
 import jrds.probe.snmp.SnmpProbe;
 
 public class DoSnmpProbe extends CommandStarterImpl {
@@ -57,32 +56,31 @@ public class DoSnmpProbe extends CommandStarterImpl {
 
     private OidInfo translate(String oidstring) throws IOException {
         OidInfo info = new OidInfo();
-
         Process p = Runtime.getRuntime().exec(new String[] { "snmptranslate", "-Td", "-On", oidstring });
-        InputStreamReader isr = new InputStreamReader(p.getInputStream());
-        BufferedReader r = new BufferedReader(isr);
-        String line = r.readLine();
-        while (line != null) {
-            Matcher nameMatcher = namePattern.matcher(line);
-            Matcher syntaxMatcher = syntaxPattern.matcher(line);
-            if(oidPattern.matcher(line.trim()).matches()) {
-                String oidString = line.substring(1);
-                info.oid = new OID(oidString);
-            } else if(nameMatcher.matches()) {
-                info.name = nameMatcher.group(1);
-            } else if(syntaxMatcher.matches()) {
-                String syntax = syntaxMatcher.group(1);
-                if("counter".matches(syntax.toLowerCase()))
-                    info.type = DsType.COUNTER;
-                else if("integer".matches(syntax.toLowerCase()))
-                    info.type = DsType.GAUGE;
-                else if("gauge32".matches(syntax.toLowerCase()))
-                    info.type = DsType.GAUGE;
+        try (InputStreamReader isr = new InputStreamReader(p.getInputStream());
+             BufferedReader r = new BufferedReader(isr)) {
+            String line = r.readLine();
+            while (line != null) {
+                Matcher nameMatcher = namePattern.matcher(line);
+                Matcher syntaxMatcher = syntaxPattern.matcher(line);
+                if(oidPattern.matcher(line.trim()).matches()) {
+                    String oidString = line.substring(1);
+                    info.oid = new OID(oidString);
+                } else if(nameMatcher.matches()) {
+                    info.name = nameMatcher.group(1);
+                } else if(syntaxMatcher.matches()) {
+                    String syntax = syntaxMatcher.group(1);
+                    if("counter".matches(syntax.toLowerCase()))
+                        info.type = DsType.COUNTER;
+                    else if("integer".matches(syntax.toLowerCase()))
+                        info.type = DsType.GAUGE;
+                    else if("gauge32".matches(syntax.toLowerCase()))
+                        info.type = DsType.GAUGE;
+                }
+                line = r.readLine();
             }
-            line = r.readLine();
+            return info;
         }
-        r.close();
-        return info;
     }
 
     public void start(String[] args) throws Exception {
