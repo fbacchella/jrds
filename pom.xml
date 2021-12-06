@@ -143,12 +143,9 @@
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${maven.plugin.surefire.version}</version>
                     <configuration>
-                        <systemProperties>
-                            <property>
-                                <name>jrds.hidelogs</name>
-                                <value>${jrds.hidelogs}</value>
-                            </property>
-                        </systemProperties>
+                        <systemPropertyVariables>
+                            <jrds.hidelogs>${jrds.hidelogs}</jrds.hidelogs>
+                        </systemPropertyVariables>
                     </configuration>
                 </plugin>
                 <plugin>

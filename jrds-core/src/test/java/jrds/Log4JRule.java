@@ -44,7 +44,7 @@ public class Log4JRule implements TestRule {
             jrdsAppender.setName(APPENDERNAME);
 
             LogManager.getRootLogger().addAppender(jrdsAppender);
-            if (System.getProperty("jrds.hidelogs") != null) {
+            if ("true".equalsIgnoreCase(System.getProperty("jrds.hidelogs"))) {
                 jrdsAppender.addFilter(new DenyAllFilter());
             }
             LogManager.getLoggerRepository().addHierarchyEventListener(new HierarchyEventListener() {
