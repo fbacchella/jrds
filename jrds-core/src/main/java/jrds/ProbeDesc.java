@@ -43,7 +43,7 @@ import lombok.experimental.Accessors;
  * @author Fabrice Bacchella
  *
  */
-public class ProbeDesc<KeyType> implements Cloneable {
+public class ProbeDesc<KeyType> {
 
     static final private Logger logger = LoggerFactory.getLogger(ProbeDesc.class);
 
