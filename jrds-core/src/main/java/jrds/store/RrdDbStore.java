@@ -110,7 +110,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     }
 
     private Path resolvePath() throws IOException {
-        String rrdName = p.getName().replaceAll("/", "_");
+        String rrdName = p.getName().replace("/", "_");
         return Paths.get(p.getHost().getHostDir().getPath(), rrdName + ".rrd").normalize();
     }
 

@@ -17,7 +17,7 @@ public abstract class Starter {
 
     public Starter() {
         String[] classElements = getClass().getName().split("\\.");
-        namedLogger = LoggerFactory.getLogger("jrds.Starter." + classElements[classElements.length - 1].replaceAll("\\$", ".\\$"));
+        namedLogger = LoggerFactory.getLogger("jrds.Starter." + classElements[classElements.length - 1].replace("$", ".$"));
     }
 
     /**

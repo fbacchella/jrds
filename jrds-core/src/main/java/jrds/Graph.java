@@ -217,7 +217,7 @@ public class Graph implements WithACL {
     }
 
     public String getPngName() {
-        return node.getName().replaceAll("/", "_").replaceAll(" ", "_") + ".png";
+        return node.getName().replace("/", "_").replace(" ", "_") + ".png";
     }
 
     /**
