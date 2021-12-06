@@ -236,13 +236,8 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         if(dsList.size() > 0) {
             logger.trace("Data source replaced for {}/{}: {}", host, type, dsList);
             ProbeDesc<?> oldpd = pf.getProbeDesc(type);
-            try {
-                ProbeDesc<?> pd = (ProbeDesc<?>) oldpd.clone();
-                pd.replaceDs(dsList);
-                p = pf.makeProbe(pd);
-            } catch (CloneNotSupportedException e) {
-                throw new InvocationTargetException(e, HostBuilder.class.getName());
-            }
+            ProbeDesc<?> pd = new ProbeDesc<>(oldpd, dsList);
+            p = pf.makeProbe(pd);
         } else {
             p = pf.makeProbe(type);
         }
@@ -312,7 +307,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
         // Resolve the beans
         try {
-            setAttributes(defaultBeans, probeNode, p, host, properties);
+            setAttributes(p, probeNode, host, properties);
         } catch (IllegalArgumentException e) {
             logger.error(String.format("Can't configure %s for %s: %s", pd.getName(), host, e));
             return null;
@@ -539,7 +534,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         return connectionSet;
     }
 
-    private void setAttributes(Map<String, ProbeDesc.DefaultBean> defaultBeans, JrdsElement probeNode, Probe<?, ?> p, Object... context) throws InvocationTargetException {
+    private void setAttributes(Probe<?, ?> p, JrdsElement probeNode, Object... context) throws InvocationTargetException {
         // Resolve the beans
         for(JrdsElement attrNode: probeNode.getChildElementsByName("attr")) {
             String name = attrNode.getAttribute("name");
@@ -552,9 +547,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             String textValue = Util.parseTemplate(attrNode.getTextContent(), context);
             logger.trace("Found attribute {} with value {}", name, textValue);
             bean.set(p, textValue);
-            if(defaultBeans.containsKey(name)) {
-                defaultBeans.remove(name);
-            }
+            p.getPd().resolvedBean(name);
         }
     }
 

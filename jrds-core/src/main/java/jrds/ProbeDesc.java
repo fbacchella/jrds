@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -27,6 +28,7 @@ import jrds.factories.ArgFactory;
 import jrds.factories.ProbeMeta;
 import jrds.starter.StarterNode;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
@@ -42,6 +44,7 @@ import lombok.experimental.Accessors;
  *
  */
 public class ProbeDesc<KeyType> implements Cloneable {
+
     static final private Logger logger = LoggerFactory.getLogger(ProbeDesc.class);
 
     public static class DefaultBean {
@@ -108,6 +111,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
         private DataSourceBuilder(String name, DsType dsType) {
             this.name = name;
             this.dsType = dsType;
+            this.collectKey = name;
         }
 
         private DataSourceBuilder() {
@@ -125,19 +129,22 @@ public class ProbeDesc<KeyType> implements Cloneable {
     static public final double MINDEFAULT = 0;
     static public final double MAXDEFAULT = Double.NaN;
 
-    private Map<String, DsDesc<KeyType>> dsMap;
-    private Map<String, String> specific = new HashMap<String, String>();
+    private final Map<String, DsDesc<KeyType>> dsMap;
+    private final Map<String, String> specific;
+    @Getter @Setter
     private String probeName;
+    @Getter @Setter
     private String name;
-    private final Collection<String> graphesList = new ArrayList<String>();
-    private Class<? extends Probe<KeyType, ?>> probeClass = null;
-    private Map<String, ProbeDesc.DefaultBean> defaultsBeans = Collections.emptyMap();
+    private final List<String> graphesList;
+    private Class<? extends Probe<KeyType, ?>> probeClass;
+    private final Map<String, ProbeDesc.DefaultBean> defaultsBeans;
+    @Getter @Setter
     private float uptimefactor = (float) 1.0;
-    private Map<String, Double> defaultValues = new HashMap<String, Double>(0);
-    private Map<String, GenericBean> beans = new HashMap<String, GenericBean>(0);
-    private final Set<String> optionals = new HashSet<String>(0);
-    private final Map<String, Joined> highlowcollectmap = new HashMap<String, Joined>();
-    private Map<KeyType, String> collectMap = null;
+    private final Map<String, Double> defaultValues;
+    private final Map<String, GenericBean> beans;
+    private final Set<String> optionals;
+    private final Map<String, Joined> highlowcollectmap;
+    private final Map<KeyType, String> collectMap;
     @SuppressWarnings("unchecked")
     private CollectResolver<KeyType> collectResolver = (CollectResolver<KeyType>) new CollectResolver.StringResolver();
 
@@ -147,14 +154,43 @@ public class ProbeDesc<KeyType> implements Cloneable {
      * @param size estimated elements number
      */
     public ProbeDesc(int size) {
-        dsMap = new LinkedHashMap<String, DsDesc<KeyType>>(size);
+        dsMap = new LinkedHashMap<>(size == -1 ? 16 : size);
+        specific = new HashMap<>();
+        graphesList = new ArrayList<>();
+        defaultsBeans = new HashMap<>(0);
+        defaultValues = new HashMap<>(0);
+        beans = new HashMap<>(0);
+        optionals = new HashSet<>(0);
+        highlowcollectmap = new HashMap<>();
+        collectMap = new HashMap<>(size == -1 ? 16 : size);
     }
 
     /**
      * Create a new Probe Description
      */
     public ProbeDesc() {
-        dsMap = new LinkedHashMap<String, DsDesc<KeyType>>();
+        this(-1);
+    }
+
+    /**
+     * Create a new Probe Description
+     */
+    public ProbeDesc(ProbeDesc<KeyType> oldpd, List<DataSourceBuilder> dsList) {
+        dsMap = new HashMap<>(dsList.size());
+        collectMap = new HashMap<>(dsList.size());
+        dsList.forEach(this::add);
+
+        specific = Collections.unmodifiableMap(oldpd.specific);
+        probeName = oldpd.probeName;
+        name = oldpd.name;
+        graphesList = Collections.unmodifiableList(oldpd.graphesList);
+        probeClass = oldpd.getProbeClass();
+        defaultsBeans = new HashMap<>(oldpd.defaultsBeans);
+        uptimefactor = oldpd.uptimefactor;
+        beans = Collections.unmodifiableMap(oldpd.beans);
+        optionals = Collections.unmodifiableSet(oldpd.optionals);
+        highlowcollectmap = oldpd.getHighlowcollectmap();
+        defaultValues = oldpd.getDefaultValues();
     }
 
     /**
@@ -164,7 +200,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
      * @param dsType
      */
     public void add(String name, DsType dsType) {
-        dsMap.put(name, new DsDesc<KeyType>(dsType, MINDEFAULT, MAXDEFAULT, collectResolver.resolve(name)));
+        add(getDataSourceBuilder(name, dsType));
     }
 
     public void add(DataSourceBuilder builder) {
@@ -189,13 +225,11 @@ public class ProbeDesc<KeyType> implements Cloneable {
                 logger.error(String.format("Probe description %s: unable to parse collect key '%s': %s", name, collectKeyName, e.getMessage()));
                 logger.debug("{}", e);
             }
-        } else if (builder.collectKey != null) {
-            //If collect was given an empty value, it was to prevent collect
-            if (! builder.collectKey.isEmpty()) {
-                collectKeyName = builder.collectKey;
-            }
-        } else {
+        } else if (builder.collectKey == null) {
             collectKeyName = bname;
+        } else if (builder.collectKey != null && ! builder.collectKey.isEmpty()) {
+            //If collect was given an empty value, it was to prevent collect
+            collectKeyName = builder.collectKey;
         }
 
         if (collectKeyName != null) {
@@ -207,7 +241,7 @@ public class ProbeDesc<KeyType> implements Cloneable {
             }
         }
 
-        if(builder.defaultValue != null && builder.defaultValue != Double.NaN) {
+        if (builder.defaultValue != null && builder.defaultValue != Double.NaN) {
             defaultValues.put(bname, builder.defaultValue);
         }
 
@@ -216,13 +250,17 @@ public class ProbeDesc<KeyType> implements Cloneable {
         }
 
         dsMap.put(bname, new DsDesc<KeyType>(builder.dsType, builder.minValue, builder.maxValue, collectKey));
+
+        if (collectKey != null) {
+            collectMap.put(collectKey, bname);
+        }
     }
 
     /**
      * @return the highlowcollectmap
      */
     public Map<String, Joined> getHighlowcollectmap() {
-        return highlowcollectmap;
+        return Collections.unmodifiableMap(highlowcollectmap);
     }
 
     /**
@@ -230,12 +268,11 @@ public class ProbeDesc<KeyType> implements Cloneable {
      * provided
      * 
      * @param dsList a list of data source description as a map.
+     * @deprecated use the copy constructor
      */
+    @Deprecated
     public void replaceDs(List<DataSourceBuilder> dsList) {
-        defaultValues = new HashMap<String, Double>(0);
-        dsMap = new HashMap<>(dsList.size());
-        collectMap = null;
-        dsList.forEach(this::add);
+        throw new UnsupportedOperationException("Not to be used any more");
     }
 
     /**
@@ -245,54 +282,23 @@ public class ProbeDesc<KeyType> implements Cloneable {
      * @return a Map of collect names to datastore name
      */
     public synchronized Map<KeyType, String> getCollectMapping() {
-        if (collectMap == null) {
-            collectMap = new LinkedHashMap<>(dsMap.size());
-            for(Map.Entry<String, DsDesc<KeyType>> e: dsMap.entrySet()) {
-                DsDesc<KeyType> dd = e.getValue();
-                if(dd.collectKey != null) {
-                    collectMap.put(dd.collectKey, e.getKey());
-                }
-            }
-            collectMap = Collections.unmodifiableMap(collectMap);
-        }
-        return collectMap;
-    }
-
-    /**
-     * Return a map that translate the probe technical name as a string to the
-     * datastore name
-     *
-     * @return a Map of collect names to datastore name
-     * @deprecated Replaced by {@link #getCollectMapping()}.
-     */
-    @Deprecated
-    public Map<String, String> getCollectStrings() {
-        Map<String, String> retValue = new LinkedHashMap<String, String>(dsMap.size());
-        for (Map.Entry<String, DsDesc<KeyType>> e : dsMap.entrySet()) {
-            DsDesc<KeyType> dd = e.getValue();
-            if (dd.collectKey instanceof String && !"".equals(dd.collectKey))
-                retValue.put((String) dd.collectKey, e.getKey());
-        }
-        return retValue;
+        return Collections.unmodifiableMap(collectMap);
     }
 
     public DsDef[] getDsDefs(long requiredUptime) {
-        List<DsDef> dsList = new ArrayList<DsDef>(dsMap.size());
-        for(Map.Entry<String, DsDesc<KeyType>> e: dsMap.entrySet()) {
-            DsDesc<KeyType> desc = e.getValue();
-            if(desc.dsType != null)
-                dsList.add(new DsDef(e.getKey(), desc.dsType, requiredUptime, desc.minValue, desc.maxValue));
-        }
-        return dsList.toArray(new DsDef[dsList.size()]);
+        return dsMap.entrySet()
+                    .stream()
+                    .filter(e -> e.getValue().dsType != null)
+                    .map(e -> new DsDef(e.getKey(), e.getValue().dsType, requiredUptime, e.getValue().minValue, e.getValue().maxValue))
+                    .toArray(DsDef[]::new);
     }
 
     public Collection<String> getDs() {
-        HashSet<String> dsList = new HashSet<String>(dsMap.size());
-        for(Map.Entry<String, DsDesc<KeyType>> e: dsMap.entrySet()) {
-            if(e.getValue().dsType != null)
-                dsList.add(e.getKey());
-        }
-        return dsList;
+        return dsMap.entrySet()
+                    .stream()
+                    .filter(e -> e.getValue().dsType != null)
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
     }
 
     public boolean dsExist(String dsName) {
@@ -305,27 +311,6 @@ public class ProbeDesc<KeyType> implements Cloneable {
      */
     public int getSize() {
         return dsMap.size();
-    }
-
-    /**
-     * @return Returns the rrdName.
-     */
-    public String getProbeName() {
-        return probeName;
-    }
-
-    /**
-     * @param probeName The rrdName to set.
-     */
-    public void setProbeName(String probeName) {
-        this.probeName = probeName;
-    }
-
-    /**
-     * @return the uptimefactor
-     */
-    public float getUptimefactor() {
-        return uptimefactor;
     }
 
     /**
@@ -348,17 +333,10 @@ public class ProbeDesc<KeyType> implements Cloneable {
     }
 
     /**
-     * @param uptimefactor the uptimefactor to set
-     */
-    public void setUptimefactor(float uptimefactor) {
-        this.uptimefactor = uptimefactor;
-    }
-
-    /**
      * @return Returns the list of graph names.
      */
     public Collection<String> getGraphs() {
-        return graphesList;
+        return Collections.unmodifiableList(graphesList);
     }
 
     /**
@@ -404,14 +382,6 @@ public class ProbeDesc<KeyType> implements Cloneable {
         beans.put(bean.getName(), bean);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getSpecific(String name) {
         return specific.get(name);
     }
@@ -422,8 +392,6 @@ public class ProbeDesc<KeyType> implements Cloneable {
 
     public void addDefaultBean(String beanName, String beanValue, boolean finalBean) throws InvocationTargetException {
         ProbeDesc.DefaultBean attr = new ProbeDesc.DefaultBean(beanValue, finalBean);
-        if(defaultsBeans.size() == 0)
-            defaultsBeans = new HashMap<String, ProbeDesc.DefaultBean>();
         if(beans.containsKey(beanName)) {
             defaultsBeans.put(beanName, attr);
             logger.trace("Adding bean {}={} to default beans", beanName, beanValue);
@@ -431,16 +399,14 @@ public class ProbeDesc<KeyType> implements Cloneable {
     }
 
     public Map<String, ProbeDesc.DefaultBean> getDefaultBeans() {
-        Map<String, ProbeDesc.DefaultBean> beans = new HashMap<String, ProbeDesc.DefaultBean>(defaultsBeans.size());
-        beans.putAll(defaultsBeans);
-        return beans;
+        return Collections.unmodifiableMap(defaultsBeans);
     }
 
     /**
      * @return the defaultValues
      */
     public Map<String, Double> getDefaultValues() {
-        return defaultValues;
+        return Collections.unmodifiableMap(defaultValues);
     }
 
     public Document dumpAsXml() throws ParserConfigurationException, IOException {
@@ -486,17 +452,6 @@ public class ProbeDesc<KeyType> implements Cloneable {
         return document;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#clone()
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        return (ProbeDesc<KeyType>) super.clone();
-    }
-
     /**
      * Return true if the given datasource was associated with an optional
      * collect string
@@ -509,12 +464,16 @@ public class ProbeDesc<KeyType> implements Cloneable {
     }
 
     public Set<KeyType> getOptionalsCollect(Probe<KeyType, ?> p) {
-        Set<KeyType> newOptionals = new HashSet<>(optionals.size());
-        optionals.stream()
-        .map(o -> Util.parseTemplate(o, p, this))
-        .map(collectResolver::resolve)
-        .forEach(newOptionals::add);
-        return newOptionals;
+        return optionals.stream()
+                        .map(o -> Util.parseTemplate(o, p, this))
+                        .map(collectResolver::resolve)
+                        .collect(Collectors.toSet());
+    }
+
+    public void resolvedBean(String name) {
+        if(defaultsBeans.containsKey(name)) {
+            defaultsBeans.remove(name);
+        }
     }
 
 }
