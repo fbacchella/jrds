@@ -50,7 +50,7 @@ public class StartListener implements ServletContextListener {
 
     static private final Logger logger = LoggerFactory.getLogger(StartListener.class);
 
-    static private boolean started = false;
+    private boolean started = false;
 
     /*
      * (non-Javadoc)
