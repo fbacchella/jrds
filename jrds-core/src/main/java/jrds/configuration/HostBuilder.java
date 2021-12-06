@@ -29,6 +29,7 @@ import jrds.ProbeDesc.DataSourceBuilder;
 import jrds.Util;
 import jrds.factories.ArgFactory;
 import jrds.factories.ProbeFactory;
+import jrds.factories.xml.AbstractJrdsNode;
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;
 import jrds.factories.xml.JrdsNode;
@@ -133,8 +134,8 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 newProps.putAll(macroProps);
                 JrdsDocument hostdoc = (JrdsDocument) fragment.getOwnerDocument();
                 // Make a copy of the document fragment
-                JrdsNode newDf = JrdsNode.build(hostdoc.importNode(m.getDf(), true));
-                JrdsElement macrodef = JrdsNode.build(newDf.getFirstChild());
+                JrdsNode newDf = AbstractJrdsNode.build(hostdoc.importNode(m.getDf(), true));
+                JrdsElement macrodef = AbstractJrdsNode.build(newDf.getFirstChild());
                 parseFragment(macrodef, host, collections, newProps);
             } else {
                 logger.error("Unknown macro: {}", name);

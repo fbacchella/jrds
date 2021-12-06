@@ -21,6 +21,7 @@ import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.probe.snmp.RdsIndexedSnmpRrd;
 import jrds.probe.snmp.RdsSnmpSimple;
+import jrds.probe.snmp.SnmpProbe;
 
 public class DoSnmpProbe extends CommandStarterImpl {
     static final private Logger logger = LoggerFactory.getLogger(DoSnmpProbe.class);
@@ -126,7 +127,7 @@ public class DoSnmpProbe extends CommandStarterImpl {
             }
         }
         if(!indexed)
-            pd.addSpecific(RdsSnmpSimple.REQUESTERNAME, "simple");
+            pd.addSpecific(SnmpProbe.REQUESTERNAME, "simple");
 
         Map<String, String> prop = new HashMap<String, String>();
         prop.put(OutputKeys.INDENT, "yes");
@@ -137,4 +138,5 @@ public class DoSnmpProbe extends CommandStarterImpl {
         jrds.Util.serialize(pd.dumpAsXml(), System.out, null, prop);
         System.out.println();
     }
+
 }
