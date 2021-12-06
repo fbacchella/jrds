@@ -67,6 +67,8 @@ jobs:
                     mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
+                    sudo mkdir -p /usr/share/snmp/mibs/
+                    sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
             - run:
                 command: |
                     # If no symbolic name, it's a PR, will run sonar
