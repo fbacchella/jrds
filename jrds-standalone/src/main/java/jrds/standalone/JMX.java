@@ -29,8 +29,11 @@ public class JMX extends CommandStarterImpl {
 
         Properties pm = new Properties();
         File propFile = new File(propFileName);
-        if(propFile.isFile())
-            pm.load(new FileReader(propFile));
+        if(propFile.isFile()) {
+            try (FileReader fr = new FileReader(propFile)) {
+                pm.load(fr);
+            }
+        }
         pm.setProperty("withjmx", "yes");
         jrds.Configuration.configure(pm);
 

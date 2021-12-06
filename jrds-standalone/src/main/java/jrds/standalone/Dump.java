@@ -31,7 +31,9 @@ public class Dump extends CommandStarterImpl {
         Properties props = new Properties();
         File propFile = new File(propFileName);
         if(propFile.isFile()) {
-            props.load(new FileReader(propFile));
+            try (FileReader fr = new FileReader(propFile)) {
+                props.load(fr);
+            }
         }
 
         PropertiesManager propertiesManager = new PropertiesManager();
