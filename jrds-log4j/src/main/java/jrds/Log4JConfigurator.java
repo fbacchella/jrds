@@ -27,7 +27,6 @@ public class Log4JConfigurator implements LogConfigurator {
     static public final String APPENDERNAME = "jrdsAppender";
     static public final String DEFAULTLOGFILE = "System.out";
     static public final String DEFAULTLAYOUT = "[%d] %5p %c : %m%n";
-    static public Appender jrdsAppender = null;
 
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(Log4JConfigurator.class);
 
@@ -86,18 +85,20 @@ public class Log4JConfigurator implements LogConfigurator {
     }
 
     private void configure(String logfile, Level loglevel, Map<Level, List<String>> loglevels) throws IOException {
-            if (logfile != null && ! logfile.isEmpty()) {
-                jrdsAppender = new DailyRollingFileAppender(new PatternLayout(DEFAULTLAYOUT), logfile, "'.'yyyy-ww");
-            } else {
-                jrdsAppender = new ConsoleAppender(new PatternLayout(DEFAULTLAYOUT), DEFAULTLOGFILE);
+        Appender jrdsAppender;
+        if (logfile != null && ! logfile.isEmpty()) {
+            jrdsAppender = new DailyRollingFileAppender(new PatternLayout(DEFAULTLAYOUT), logfile, "'.'yyyy-ww");
+        } else {
+            jrdsAppender = new ConsoleAppender(new PatternLayout(DEFAULTLAYOUT), DEFAULTLOGFILE);
+        }
+        jrdsAppender.setName(APPENDERNAME);
+        for (Map.Entry<Level, List<String>> e : loglevels.entrySet()) {
+            Level l = e.getKey();
+            for (String logName : e.getValue()) {
+                Logger.getLogger(logName).setLevel(l);
             }
-            jrdsAppender.setName(APPENDERNAME);
-            for (Map.Entry<Level, List<String>> e : loglevels.entrySet()) {
-                Level l = e.getKey();
-                for (String logName : e.getValue()) {
-                    Logger.getLogger(logName).setLevel(l);
-                }
-            }
+        }
+        BasicConfigurator.configure(jrdsAppender);
     }
 
 }
