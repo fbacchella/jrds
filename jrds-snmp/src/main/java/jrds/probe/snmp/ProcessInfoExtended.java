@@ -114,24 +114,25 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
         double average = 0;
         int nbvalue = 0;
         double cpuUsed = 0;
-        for(Map.Entry<OID, Object> e: snmpVars.entrySet()) {
+        for (Map.Entry<OID, Object> e: snmpVars.entrySet()) {
             OID oid = e.getKey();
-            if(oid.startsWith(hrSWRunPerfMem)) {
+            if (oid.startsWith(hrSWRunPerfMem)) {
                 double value = ((Number) e.getValue()).doubleValue() * 1024;
                 max = Math.max(max, value);
                 min = Math.min(min, value);
                 average += value;
                 nbvalue++;
-            } else if(oid.startsWith(hrSWRunPerfCPU)) {
+            } else if (oid.startsWith(hrSWRunPerfCPU)) {
                 cpuUsed += ((Number) e.getValue()).doubleValue() / 100.0;
             }
         }
-        average /= nbvalue;
-        oneSample.put(NUM, nbvalue);
-        oneSample.put(MAX, max);
-        oneSample.put(MIN, min);
-        oneSample.put(AVERAGE, average);
-        oneSample.put(CPU, cpuUsed);
+        if (nbvalue != 0) {
+            oneSample.put(NUM, nbvalue);
+            oneSample.put(MAX, max);
+            oneSample.put(MIN, min);
+            oneSample.put(AVERAGE, average / nbvalue);
+            oneSample.put(CPU, cpuUsed);
+        }
     }
 
     /*
