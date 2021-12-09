@@ -504,7 +504,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     public long getRequiredUptime() {
-        return getStep() * 2L;
+        return Math.max(getStep() * 2L, 60L);
     }
 
     /**
