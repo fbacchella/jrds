@@ -28,9 +28,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UnknownFormatConversionException;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -383,109 +385,118 @@ public class Util {
         return jrds.Util.parseTemplate(buffer.toString(), arguments);
     }
 
-    private enum evaluate {
+    private enum Evaluate {
         index {
             @Override
             String toString(Object o) {
-                return ((IndexedProbe) o).getIndexName();
+                return convert(o, IndexedProbe.class, IndexedProbe::getIndexName);
             }
         },
         index_signature {
             @Override
             String toString(Object o) {
-                return stringSignature(((IndexedProbe) o).getIndexName());
+                return convert(o, IndexedProbe.class, p -> stringSignature(p.getIndexName()));
             }
         },
         index_cleanpath {
             @Override
             String toString(Object o) {
-                return cleanPath(((IndexedProbe) o).getIndexName());
+                return convert(o, IndexedProbe.class, p -> cleanPath(p.getIndexName()));
             }
         },
         url {
             @Override
             String toString(Object o) {
-                return ((UrlProbe) o).getUrlAsString();
+                return convert(o, UrlProbe.class, UrlProbe::getUrlAsString);
             }
         },
         url_signature {
             @Override
             String toString(Object o) {
-                return stringSignature(((UrlProbe) o).getUrlAsString());
+                return convert(o, UrlProbe.class, p -> stringSignature(p.getUrlAsString()));
             }
         },
         port {
             @Override
             String toString(Object o) {
-                return Integer.toString(((UrlProbe) o).getPort());
+                return convert(o, UrlProbe.class, u -> Integer.toString(u.getPort()));
             }
         },
         host {
             @Override
             String toString(Object o) {
-                return ((HostInfo) o).getName();
+                return convert(o, HostInfo.class, HostInfo::getName);
             }
         },
         dnsname {
             @Override
             String toString(Object o) {
-                return ((HostInfo) o).getDnsName();
+                return convert(o, HostInfo.class, HostInfo::getDnsName);
             }
         },
         probename {
             @Override
             String toString(Object o) {
-                return ((Probe<?, ?>) o).getName();
+                return convert(o, Probe.class, Probe::getName);
             }
         },
         label {
             @Override
             String toString(Object o) {
-                return ((Probe<?, ?>) o).getLabel();
+                return convert(o, Probe.class, Probe::getLabel);
             }
         },
         connection_name {
             @Override
             String toString(Object o) {
-                ConnectedProbe cp = (ConnectedProbe) o;
-                return cp.getConnectionName();
+                return convert(o, ConnectedProbe.class, ConnectedProbe::getConnectionName);
             }
         },
         connection_name_signature {
             @Override
             String toString(Object o) {
-                ConnectedProbe cp = (ConnectedProbe) o;
-                return stringSignature(cp.getConnectionName());
+                return convert(o, ConnectedProbe.class, p -> stringSignature(p.getConnectionName()));
             }
         },
         probedesc_name {
             @Override
             String toString(Object o) {
-                ProbeDesc<?> pd = (ProbeDesc<?>) o;
-                return pd.getName();
+                return convert(o, ProbeDesc.class,ProbeDesc::getName);
             }
         },
         graphdesc_title {
             @Override
             String toString(Object o) {
-                GraphDesc gd = (GraphDesc) o;
-                return gd.getGraphTitle();
+                return convert(o, GraphDesc.class, GraphDesc::getGraphTitle);
             }
         },
         graphdesc_name {
             @Override
             String toString(Object o) {
-                GraphDesc gd = (GraphDesc) o;
-                return gd.getGraphName();
+                return convert(o, GraphDesc.class, GraphDesc::getGraphName);
             }
         };
         abstract String toString(Object o);
+        <T> String convert(Object o, Class<T> clazz, Function<T, String> apply) {
+            try {
+                return Optional.ofNullable(o)
+                               .filter(v -> v != null)
+                               .filter(v -> clazz.isAssignableFrom(v.getClass()))
+                               .map(clazz::cast)
+                               .map(apply::apply)
+                               .orElse(null);
+            } catch (RuntimeException e) {
+                logger.error("Failed to evalute template for {} on {}, because of {}", clazz.getCanonicalName(), o, resolveThrowableException(e));
+                logger.debug("Cause: ", e);
+                return null;
+            }
+        }
     }
 
-    private static void check(Object o, Map<String, Integer> indexes, Object[] values, evaluate e) {
+    private static void check(Object o, Map<String, Integer> indexes, Object[] values, Evaluate e) {
         String name = e.name().replace('_', '.');
-        if(indexes.containsKey(name)) {
-            values[indexes.get(name)] = e.toString(o);
+        if (indexes.containsKey(name)) {
+            Optional.ofNullable(e.toString(o)).ifPresent(s -> values[indexes.get(name)] = s);
         }
     }
 
@@ -505,39 +516,39 @@ public class Util {
             if(logger.isTraceEnabled())
                 logger.trace("Argument for template \"{}\": {}", template, o.getClass());
             if(o instanceof IndexedProbe) {
-                check(o, indexes, values, evaluate.index);
-                check(o, indexes, values, evaluate.index_signature);
-                check(o, indexes, values, evaluate.index_cleanpath);
+                check(o, indexes, values, Evaluate.index);
+                check(o, indexes, values, Evaluate.index_signature);
+                check(o, indexes, values, Evaluate.index_cleanpath);
             }
             if(o instanceof UrlProbe) {
-                check(o, indexes, values, evaluate.url);
-                check(o, indexes, values, evaluate.port);
-                check(o, indexes, values, evaluate.url_signature);
+                check(o, indexes, values, Evaluate.url);
+                check(o, indexes, values, Evaluate.port);
+                check(o, indexes, values, Evaluate.url_signature);
             }
             if(o instanceof ConnectedProbe) {
-                check(o, indexes, values, evaluate.connection_name);
-                check(o, indexes, values, evaluate.connection_name_signature);
+                check(o, indexes, values, Evaluate.connection_name);
+                check(o, indexes, values, Evaluate.connection_name_signature);
             }
             if(o instanceof Probe) {
                 Probe<?, ?> p = ((Probe<?, ?>) o);
                 HostInfo host = p.getHost();
-                check(host, indexes, values, evaluate.host);
-                check(p, indexes, values, evaluate.probename);
-                check(p, indexes, values, evaluate.label);
+                check(host, indexes, values, Evaluate.host);
+                check(p, indexes, values, Evaluate.probename);
+                check(p, indexes, values, Evaluate.label);
             }
             if(o instanceof HostStarter) {
-                check(((HostStarter) o).getHost(), indexes, values, evaluate.host);
+                check(((HostStarter) o).getHost(), indexes, values, Evaluate.host);
             }
             if(o instanceof HostInfo) {
-                check(o, indexes, values, evaluate.host);
-                check(o, indexes, values, evaluate.dnsname);
+                check(o, indexes, values, Evaluate.host);
+                check(o, indexes, values, Evaluate.dnsname);
             }
             if(o instanceof GraphDesc) {
-                check(o, indexes, values, evaluate.graphdesc_name);
-                check(o, indexes, values, evaluate.graphdesc_title);
+                check(o, indexes, values, Evaluate.graphdesc_name);
+                check(o, indexes, values, Evaluate.graphdesc_title);
             }
             if(o instanceof ProbeDesc) {
-                check(o, indexes, values, evaluate.probedesc_name);
+                check(o, indexes, values, Evaluate.probedesc_name);
             }
             if(o instanceof Map) {
                 @SuppressWarnings("unchecked")
