@@ -37,6 +37,7 @@ import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.SSLHandshakeException;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -784,14 +785,24 @@ public class Util {
         // Helping resolve bad exception's message
         if (t instanceof NoSuchMethodException) {
             message = "No such method: " + t.getMessage();
+        } else if (t instanceof java.lang.NegativeArraySizeException) {
+            message = "Negative array size: " + message;
         } else if (t instanceof ArrayIndexOutOfBoundsException) {
             message = "Array out of bounds: " + message;
+        } else if (t instanceof ClassNotFoundException) {
+            message = "Class not found: " + message;
         } else if (t instanceof IllegalCharsetNameException) {
             message = "Illegal charset name: " + t.getMessage();
         } else if (t instanceof UnsupportedCharsetException) {
             message = "Unsupported charset name: " + t.getMessage();
         } else if (t instanceof ClosedChannelException) {
             message = "Closed channel";
+        } else if (t instanceof SSLHandshakeException) {
+            // SSLHandshakeException is a chain of the same message, keep the last one
+            builder.setLength(0);
+        } else if (t instanceof InterruptedException) {
+            builder.setLength(0);
+            message = "Interrupted";
         } else if (message == null) {
             message = t.getClass().getSimpleName();
         }
