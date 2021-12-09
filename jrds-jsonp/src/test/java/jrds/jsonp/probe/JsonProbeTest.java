@@ -85,7 +85,7 @@ public class JsonProbeTest {
         Assert.assertEquals(1.0, sample.get("a").doubleValue(), 1e-5);
         Assert.assertEquals(2.0, sample.get("b").doubleValue(), 1e-5);
         Assert.assertEquals(3.5, sample.get("e").doubleValue(), 1e-5);
-        Assert.assertEquals(3, p.getUptime());
+        Assert.assertEquals(121, p.getUptime());
     }
 
 }
