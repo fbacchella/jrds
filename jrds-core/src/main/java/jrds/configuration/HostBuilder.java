@@ -294,7 +294,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         ProbeDesc<?> pd = p.getPd();
         List<Object> args = ArgFactory.makeArgs(probeNode, host, properties);
         // Prepare the probe with the default beans values
-        Map<String, ProbeDesc.DefaultBean> defaultBeans = pd.getDefaultBeans();
+        Map<String, ProbeDesc.DefaultBean> defaultBeans = new HashMap<>(pd.getDefaultBeans());
         for(Map.Entry<String, ProbeDesc.DefaultBean> e: defaultBeans.entrySet()) {
             if(e.getValue().delayed) {
                 continue;
@@ -308,7 +308,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
         // Resolve the beans
         try {
-            setAttributes(p, probeNode, host, properties);
+            setAttributes(p, defaultBeans, probeNode, host, properties);
         } catch (IllegalArgumentException e) {
             logger.error(String.format("Can't configure %s for %s: %s", pd.getName(), host, e));
             return null;
@@ -535,7 +535,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         return connectionSet;
     }
 
-    private void setAttributes(Probe<?, ?> p, JrdsElement probeNode, Object... context) throws InvocationTargetException {
+    private void setAttributes(Probe<?, ?> p, Map<String, ProbeDesc.DefaultBean> defaultBeans, JrdsElement probeNode, Object... context) throws InvocationTargetException {
         // Resolve the beans
         for(JrdsElement attrNode: probeNode.getChildElementsByName("attr")) {
             String name = attrNode.getAttribute("name");
@@ -548,7 +548,9 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             String textValue = Util.parseTemplate(attrNode.getTextContent(), context);
             logger.trace("Found attribute {} with value {}", name, textValue);
             bean.set(p, textValue);
-            p.getPd().resolvedBean(name);
+            if (defaultBeans.containsKey(name)) {
+                defaultBeans.remove(name);
+            }
         }
     }
 

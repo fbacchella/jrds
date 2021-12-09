@@ -470,10 +470,4 @@ public class ProbeDesc<KeyType> {
                         .collect(Collectors.toSet());
     }
 
-    public void resolvedBean(String name) {
-        if(defaultsBeans.containsKey(name)) {
-            defaultsBeans.remove(name);
-        }
-    }
-
 }
