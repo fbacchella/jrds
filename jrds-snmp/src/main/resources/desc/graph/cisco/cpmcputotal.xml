@@ -2,8 +2,8 @@
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
 	<name>cpmCPUTotal</name>
-	<graphName>cpmcputotal</graphName>
-	<graphTitle>CPU usage on cpu {2} on {1}</graphTitle>
+	<graphName>cpmcputotal-${index}</graphName>
+	<graphTitle>CPU usage on cpu ${index} on ${host}</graphTitle>
 	<verticalLabel>%</verticalLabel>
 	<add>
 		<name>5sec</name>
@@ -13,7 +13,7 @@
 	<add>
 		<name>1min</name>
 		<graphType>line</graphType>
-		<legend>Overall CPU busy percentage in the last minut</legend>
+		<legend>Overall CPU busy percentage in the last minutes</legend>
 	</add>
 	<add>
 		<name>5min</name>
@@ -24,12 +24,12 @@
 		<pathelement>HOST</pathelement>
 		<pathelement>SYSTEM</pathelement>
 		<pathelement>LOAD</pathelement>
-		<pathstring>CPU Load</pathstring>
+		<pathstring>CPU ${index} Load</pathstring>
 	</hosttree>
 	<viewtree>
 		<pathelement>SYSTEM</pathelement>
 		<pathelement>LOAD</pathelement>
-		<pathstring>CPU Load</pathstring>
+		<pathstring>CPU ${index} Load</pathstring>
 		<pathelement>HOST</pathelement>
 	</viewtree>
 </graphdesc>
