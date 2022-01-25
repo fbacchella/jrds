@@ -450,15 +450,14 @@
     </profiles>
 
     <distributionManagement>
-        <repository>
-            <id>bintray-release</id>
-            <url>https://api.bintray.com/maven/fbacchella/maven/jrds</url>
-        </repository>
         <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
     </distributionManagement>
 
     <description>Another monitoring application, intentend to be simple to use and extensible.</description>
