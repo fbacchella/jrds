@@ -75,7 +75,7 @@ public abstract class StarterNode implements StartersSet, InstanceLogger {
         if (started) {
             if (Thread.interrupted()) {
                 started = false;
-                log(Level.TRACE, "Thread is stopped", this);
+                log(Level.INFO, "Thread was interrupted", this);
             } else if (parent != null && !parent.isCollectRunning()) {
                 started = false;
             } 
