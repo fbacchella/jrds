@@ -34,6 +34,7 @@ public class BootStrap {
         cmdClasses.put("collect", "jrds.standalone.Collector");
         cmdClasses.put("dosnmpprobe", "jrds.standalone.DoSnmpProbe");
         cmdClasses.put("dump", "jrds.standalone.Dump");
+        cmdClasses.put("secrets", "jrds.standalone.SecretsHandling");
     }
 
     /**

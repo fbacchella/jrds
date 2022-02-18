@@ -15,6 +15,7 @@ import java.net.URL;
 import java.nio.CharBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -57,6 +58,7 @@ import org.w3c.dom.DocumentType;
 import jrds.probe.IndexedProbe;
 import jrds.probe.UrlProbe;
 import jrds.starter.HostStarter;
+import jrds.starter.StarterNode;
 
 /**
  *
@@ -241,6 +243,30 @@ public class Util {
                 toAppend = System.getProperty(var.replace("system.", ""));
                 // Will be used as a format string, protect %
                 toAppend = PERCENT_PATTERN.matcher(toAppend).replaceAll("%%");
+            }
+            // Looking for a secret
+            else if (var.startsWith("secret.")) {
+                SecretStore secrets = null;
+                for (Object a : arguments) {
+                    Thread.dumpStack();
+                    System.out.format("%s %s%n", a, a.getClass());
+                    if (a instanceof StarterNode) {
+                        secrets = ((StarterNode) a).getHostList().getSecrets();
+                        break;
+                    } else if (a instanceof SecretStore) {
+                        secrets = (SecretStore) a;
+                    } else if (a instanceof GraphNode) {
+                        GraphNode gn = (GraphNode) a;
+                        secrets = gn.getProbe().getHostList().getSecrets();
+                    }
+                }
+                if (secrets != null) {
+                    byte[] secret = secrets.get(var.replace("secret.", ""));
+                    toAppend = new String(secret, StandardCharsets.UTF_8);
+                } else {
+                    toAppend = var;
+                }
+                System.out.println("var = " + var + ", value = '" + toAppend + "'");
             }
             // We found a ${\d+}, directly resolve with the first list argument
             else if(digit.matcher(var).matches()) {

@@ -308,7 +308,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
         // Resolve the beans
         try {
-            setAttributes(p, defaultBeans, probeNode, host, properties);
+            setAttributes(p, defaultBeans, probeNode, host, properties, pm.secrets);
         } catch (IllegalArgumentException e) {
             logger.error(String.format("Can't configure %s for %s: %s", pd.getName(), host, e));
             return null;

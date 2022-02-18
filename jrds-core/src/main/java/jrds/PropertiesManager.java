@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
@@ -483,6 +484,15 @@ public class PropertiesManager extends Properties {
         }
         archivesSet = getProperty("archivesset", ArchivesSet.DEFAULT.getName());
 
+        this.secrets = Optional.ofNullable(getProperty("secrets")).map(s -> {
+            try {
+                return SecretStore.load(s);
+            } catch (IOException ex) {
+                logger.error("Unable to open secrets holder: {}", Util.resolveThrowableException(ex));
+                return null;
+            }
+        }).orElseGet(SecretStore::empty);
+
         ServiceLoader<ModuleConfigurator> sl = ServiceLoader.load(ModuleConfigurator.class, extensionClassLoader);
         sl.forEach(i -> {
             Object subconf = i.configure(this);
@@ -527,6 +537,7 @@ public class PropertiesManager extends Properties {
     public Map<String, StoreFactory> stores = new HashMap<String, StoreFactory>();
     public StoreFactory defaultStore;
     public Map<Class <? extends ModuleConfigurator>, Object> extendedConfiguration = new HashMap<>();
+    public SecretStore secrets = SecretStore.empty();
 
     public List<String> tabsList = Arrays.asList(FILTERTAB, CUSTOMGRAPHTAB, "@", SUMSTAB, SERVICESTAB, VIEWSTAB, HOSTSTAB, TAGSTAB, ADMINTAB);
 

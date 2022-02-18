@@ -339,7 +339,7 @@
                 </property>
             </activation>
             <properties>
-                <bootclasspath>${jdk.compile.home}/jre/lib/rt.jar</bootclasspath>
+                <bootclasspath>${jdk.compile.home}/jre/lib/rt.jar:${jdk.compile.home}/jre/lib/jce.jar</bootclasspath>
             </properties>
             <build>
                 <plugins>

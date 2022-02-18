@@ -1,11 +1,15 @@
 package jrds;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,6 +18,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.slf4j.event.Level;
+
+import jrds.mockobjects.MokeProbe;
+import jrds.starter.HostStarter;
 
 public class TestHostsList {
 
@@ -40,6 +47,7 @@ public class TestHostsList {
         HostsList hl = new HostsList(pm);
         Assert.assertEquals("First tab not found", pm.tabsList.get(0), hl.getFirstTab());
         Assert.assertEquals("Missing tabs", pm.tabsList.size() - optionalstabs.length, hl.getTabsId().size());
+        Assert.assertEquals(0, hl.getSecrets().list().collect(Collectors.toList()).size());
     }
 
     @Test
@@ -93,6 +101,27 @@ public class TestHostsList {
         Assert.assertNotNull(graphMap.get(node.hashCode()));
         Assert.assertTrue(found);
         Assert.assertNotEquals(graphTrees.size(), 0);
+    }
+
+    @Test
+    public void testSecretHandler() throws IOException {
+        String secretsPath = testFolder.newFile().getCanonicalPath();
+        Files.delete(Paths.get(secretsPath));
+        try (SecretStore sh = SecretStore.create(secretsPath)) {
+            sh.add("somesecret", "thesecret".getBytes(StandardCharsets.UTF_8));
+        }
+        PropertiesManager pm = Tools.makePm(testFolder);
+        pm.setProperty("secrets", secretsPath);
+        pm.update();
+        HostsList hl = new HostsList(pm);
+        String thesecret = new String(hl.getSecrets().get("somesecret"), StandardCharsets.UTF_8);
+        Assert.assertEquals("thesecret", thesecret);
+        HostStarter hs = new HostStarter(new HostInfo("Moke"));
+        hs.setParent(hl);
+        Probe<?, ?> p = new MokeProbe<String, Number>();
+        p.setParent(hs);
+        String result = Util.parseTemplate("${secret.somesecret}", p);
+        Assert.assertEquals("thesecret", result);
     }
 
 }

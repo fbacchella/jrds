@@ -84,6 +84,11 @@
             <artifactId>jrds-munin</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.81</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>jrds-standalone-${project.version}</finalName>

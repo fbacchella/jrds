@@ -73,6 +73,8 @@ public class HostsList extends StarterNode {
     @Getter @Setter @Accessors(chain=true)
     private Function<ClassLoader, ProbeClassResolver> probeClassResolverSource = ProbeClassResolver::new;
     private ProbeClassResolver probeClassResolver;
+    @Getter
+    private SecretStore secrets;
 
     /**
      *  
@@ -107,6 +109,8 @@ public class HostsList extends StarterNode {
     }
 
     public void configure(PropertiesManager pm) {
+        secrets = pm.secrets;
+
         probeClassResolver = probeClassResolverSource.apply(pm.extensionClassLoader);
 
         if(pm.rrddir == null) {
