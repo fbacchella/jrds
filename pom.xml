@@ -22,7 +22,7 @@
         <maven.plugin.surefire.version>3.0.0-M5</maven.plugin.surefire.version>
         <servlet-api.version>3.1.0</servlet-api.version>
         <junit.version>4.13.2</junit.version>
-        <slf4j.version>1.7.35</slf4j.version>
+        <slf4j.version>1.7.36</slf4j.version>
         <log4j2.version>2.17.1</log4j2.version>
         <lombok.version>1.18.22</lombok.version>
         <jolokia.version>1.7.1</jolokia.version>
@@ -108,7 +108,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.3.1</version>
+                    <version>3.3.2</version>
                     <configuration>
                         <quiet/>
                         <links>
@@ -180,7 +180,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.2.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -259,6 +259,11 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
                 <version>4.1.0</version>
+            </extension>
+            <extension>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>5.1.4</version>
             </extension>
             <extension>
                 <groupId>org.sonatype.plugins</groupId>
