@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import jrds.Configuration;
 import jrds.PropertiesManager;
 import jrds.StoreOpener;
+import jrds.Util;
 import jrds.factories.ArgFactory;
 import jrds.jmx.Management;
 
@@ -121,7 +122,7 @@ public class StartListener implements ServletContextListener {
             try {
                 p.load(propStream);
             } catch (IOException ex) {
-                logger.warn("Invalid properties stream " + propStream + ": " + ex);
+                logger.warn("Invalid properties stream {}: {}", propStream, Util.resolveThrowableException(ex));
             }
         }
 

@@ -54,8 +54,8 @@ public final class StoreOpener {
             long finish = System.currentTimeMillis();
             waitTime.addAndGet(finish - start);
             lockCount.incrementAndGet();
-        } catch (Exception e) {
-            logger.debug("Strange error " + e);
+        } catch (Exception ex) {
+            logger.debug("Strange error {}", Util.delayedFormatString(() -> Util.resolveThrowableException(ex)));
         }
     }
 

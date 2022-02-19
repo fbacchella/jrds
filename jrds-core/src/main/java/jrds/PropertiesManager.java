@@ -135,7 +135,7 @@ public class PropertiesManager extends Properties {
             load(inputstream);
             inputstream.close();
         } catch (IOException ex) {
-            logger.warn("Invalid URL: " + ex.getLocalizedMessage());
+            logger.warn("Invalid URL: {}", Util.resolveThrowableException(ex));
         }
     }
 
@@ -144,11 +144,11 @@ public class PropertiesManager extends Properties {
     }
 
     public void join(File propFile) {
-        logger.debug("Using propertie file " + propFile.getAbsolutePath());
+        logger.debug("Using properties file {}", propFile.getAbsolutePath());
         try (InputStream inputstream = new FileInputStream(propFile)) {
             load(inputstream);
         } catch (IOException ex) {
-            logger.warn("Invalid properties file " + propFile.getAbsolutePath() + ": " + ex.getLocalizedMessage());
+            logger.warn("Invalid properties file{}: {}", propFile.getAbsolutePath(), Util.resolveThrowableException(ex));
         }
     }
 
@@ -156,7 +156,7 @@ public class PropertiesManager extends Properties {
         try {
             load(propStream);
         } catch (IOException ex) {
-            logger.warn("Invalid properties stream " + propStream + ": " + ex);
+            logger.warn("Invalid properties stream {}: {}", propStream, Util.resolveThrowableException(ex));
         }
     }
 
@@ -190,11 +190,11 @@ public class PropertiesManager extends Properties {
             try {
                 arrayUrl[i++] = u.toURL();
             } catch (MalformedURLException e) {
-                logger.error("Invalid URL in libs path: " + u);
+                logger.error("Invalid URL in libs path: {}", u);
             }
         }
         if(logger.isDebugEnabled())
-            logger.debug("Internal class loader will look in:" + urls);
+            logger.debug("Internal class loader will look in: {}", urls);
 
         return new JrdsClassLoader(arrayUrl, getClass().getClassLoader());
     }

@@ -222,8 +222,8 @@ public class ProbeDesc<KeyType> {
                 dsMap.put(bname + "low", new DsDesc<KeyType>(null, builder.minValue, builder.maxValue, collectResolver.resolve(builder.collectKeyLow)));
                 highlowcollectmap.put(bname, new Joined(builder.collectKeyHigh, builder.collectKeyLow));
             } catch (IllegalArgumentException e) {
-                logger.error(String.format("Probe description %s: unable to parse collect key '%s': %s", name, collectKeyName, e.getMessage()));
-                logger.debug("{}", e);
+                logger.error("Probe description {}: unable to parse collect key '{}': {}", name, collectKeyName, e.getMessage());
+                logger.debug("Cause", e);
             }
         } else if (builder.collectKey == null) {
             collectKeyName = bname;
@@ -236,8 +236,8 @@ public class ProbeDesc<KeyType> {
             try {
                 collectKey = collectResolver.resolve(collectKeyName);
             } catch (IllegalArgumentException e) {
-                logger.error(String.format("Probe description %s: unable to parse collect key '%s': %s", name, collectKeyName, e.getMessage()));
-                logger.debug("{}", e);
+                logger.error("Probe description {}: unable to parse collect key '{}': {}", name, collectKeyName, e.getMessage());
+                logger.debug("Cause", e);
             }
         }
 

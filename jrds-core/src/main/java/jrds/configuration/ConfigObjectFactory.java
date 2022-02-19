@@ -97,8 +97,8 @@ public class ConfigObjectFactory {
                     objectMap.put(name, o);
                 }
             } catch (InvocationTargetException ex) {
-                logger.error("Fatal error for object of type {} and name {}: {}", ob.ct, name, ex.getCause(), ex.getMessage());
-                logger.debug("Cause: ", ex);
+                logger.error("Fatal error for object of type {} and name {}: {}", ob.ct, name, Util.resolveThrowableException(ex.getCause()));
+                logger.debug("Cause", ex);
             }
             // Remove DOM object as soon as it's not needed any more
             nodeMap.remove(e.getKey());
@@ -163,7 +163,7 @@ public class ConfigObjectFactory {
         ob.setGraphDescMap(graphDescMap);
         ob.setArchivesSetMap(archivessetmap);
         Map<String, HostInfo> hostsMap = getObjectMap(ob, nodemap);
-        logger.debug("Hosts configured: %s", Util.delayedFormatString(hostsMap::keySet));
+        logger.debug("Hosts configured: {}", Util.delayedFormatString(hostsMap::keySet));
         return hostsMap;
     }
 
@@ -198,7 +198,7 @@ public class ConfigObjectFactory {
         ListenerBuilder ob = new ListenerBuilder();
         ob.setClassLoader(cl);
         listenerMap = getObjectMap(ob, nodemap);
-        logger.debug("Lstener configured: {}", Util.delayedFormatString(listenerMap::keySet));
+        logger.debug("Listener configured: {}", Util.delayedFormatString(listenerMap::keySet));
         return listenerMap;
     }
 

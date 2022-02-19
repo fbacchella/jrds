@@ -1235,7 +1235,7 @@ public class GraphDesc implements WithACL {
             try {
                 unitExponent = Integer.getInteger(exponent);
             } catch (NumberFormatException e) {
-                logger.debug("Base unit not identified: " + exponent);
+                logger.debug("Base unit not identified: {}", exponent);
             }
         }
     }

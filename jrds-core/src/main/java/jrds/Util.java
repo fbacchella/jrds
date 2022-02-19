@@ -125,15 +125,15 @@ public class Util {
 
     static final private ErrorListener el = new ErrorListener() {
         public void error(TransformerException e) throws TransformerException {
-            logger.error("Invalid xsl: " + e.getMessageAndLocation());
+            logger.error("Invalid xsl: {}",  e.getMessageAndLocation());
         }
 
         public void fatalError(TransformerException e) throws TransformerException {
-            logger.error("Invalid xsl: " + e.getMessageAndLocation());
+            logger.error("Invalid xsl: {}", e.getMessageAndLocation());
         }
 
         public void warning(TransformerException e) throws TransformerException {
-            logger.warn("Invalid xsl: " + e.getMessageAndLocation());
+            logger.warn("Invalid xsl: {}", e.getMessageAndLocation());
         }
     };
     static final TransformerFactory tFactory = TransformerFactory.newInstance();
@@ -354,8 +354,8 @@ public class Util {
                         } catch (IntrospectionException e) {
                             // not a bean, skip it
                         } catch (Exception e) {
-                            logger.warn("can't output bean {} for {}", beanName, o, e.getMessage());
-                            logger.warn("{}", e);
+                            logger.warn("can't output bean {} for {}", beanName, o);
+                            logger.warn("Cause", e);
                         }
                     }
                 }
@@ -589,7 +589,7 @@ public class Util {
         try {
             return String.format(message, values);
         } catch (UnknownFormatConversionException e) {
-            logger.error("Unable for format " + message);
+            logger.error("Unable for format {}", message);
             throw e;
         }
     }

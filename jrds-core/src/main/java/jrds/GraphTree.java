@@ -67,7 +67,7 @@ public class GraphTree {
     }
 
     public GraphTree getByPath(String... path) {
-        logger.trace("{} match {}", Util.delayedFormatString(() -> Arrays.asList(path)), name);
+        logger.trace("{} match {}", Util.delayedFormatString(() -> Arrays.toString(path)), name);
         logger.trace("childs: {}", childsMap);
         if (!path[0].equals(this.name))
             return null;

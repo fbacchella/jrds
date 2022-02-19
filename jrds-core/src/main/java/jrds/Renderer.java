@@ -249,8 +249,8 @@ public class Renderer {
         RendererRun runRender = null;
         try {
             runRender = rendered.get(graph.hashCode());
-        } catch (Exception e) {
-            logger.error("Error with probe: " + e);
+        } catch (Exception ex) {
+            logger.error("Error with probe: {}", Util.resolveThrowableException(ex));
         }
         if (runRender != null && runRender.isReady()) {
             try {

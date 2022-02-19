@@ -633,7 +633,7 @@ public class ParamsBean implements Serializable {
     }
 
     public List<String> getPeriodNames() {
-        logger.trace("Knonw period names: " + Period.getPeriodNames());
+        logger.trace("Knonw period names: {}", Util.delayedFormatString(Period::getPeriodNames));
         return Period.getPeriodNames();
     }
 

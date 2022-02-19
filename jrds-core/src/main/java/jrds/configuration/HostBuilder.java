@@ -187,17 +187,11 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             try {
                 makeProbe(probeNode, host, properties);
             } catch (InvocationTargetException e) {
-                logger.error("Probe creation failed for host " + host.getName() + ": " + Util.resolveThrowableException(e.getCause()));
-                if(logger.isDebugEnabled()) {
-                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                    e.getCause().printStackTrace(new PrintStream(buffer));
-                    logger.debug("{}", buffer);
-                }
+                logger.error("Probe creation failed for host {}: {}", host.getName(), Util.resolveThrowableException(e.getCause()));
+                logger.debug("Cause", e);
             } catch (Exception e) {
-                logger.error("Probe creation failed for host " + host.getName() + ": ");
-                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-                e.printStackTrace(new PrintStream(buffer));
-                logger.error("{}", buffer);
+                logger.error("Probe creation failed for host {}: {}", host.getName(), Util.resolveThrowableException(e.getCause()));
+                logger.error("Cause", e);
             }
         }
 
@@ -209,7 +203,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             for(JrdsElement graphNode: fragment.getChildElementsByName("graph")) {
                 GraphDesc gd = graphDescMap.get(graphNode.getAttribute("type"));
                 if(gd == null) {
-                    logger.error(String.format("Graph %s not found for host %s", graphNode.getAttribute("type"), host.getName()));
+                    logger.error("Graph {} not found for host {}", graphNode.getAttribute("type"), host.getName());
                     continue;
                 }
                 // Read the beans value for this graph and store them in a map

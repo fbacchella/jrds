@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jrds.Util;
+
 public class SecurityFilter implements Filter {
 
     static private final Logger logger = LoggerFactory.getLogger(SecurityFilter.class);
@@ -31,7 +33,7 @@ public class SecurityFilter implements Filter {
             boolean ok = req.authenticate(rep);
             if(logger.isDebugEnabled()) {
                 if(ok) {
-                    logger.debug("authenticated as: " + req.getUserPrincipal().getName());
+                    logger.debug("authenticated as: {}" + Util.delayedFormatString(() -> req.getUserPrincipal().getName()));
                 } else {
                     logger.debug("authenticated failed");
                 }
