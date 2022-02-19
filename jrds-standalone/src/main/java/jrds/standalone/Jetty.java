@@ -78,7 +78,6 @@ public class Jetty extends CommandStarterImpl {
             try {
                 connector.open();
             } catch (IOException e) {
-                connector.close();
                 throw new RuntimeException("Jetty server failed to start", e);
             }
             server.setConnectors(new Connector[] { connector });

@@ -57,8 +57,6 @@ public class MuninDiscoverAgent extends DiscoverAgent {
                     log(Level.TRACE, "Munin probe found : %s", p);
                 }
                 out.println("quit");
-                out.close();
-                in.close();
                 log(Level.DEBUG, "Munin probes found: %s", muninProbes);
                 return true;
             }

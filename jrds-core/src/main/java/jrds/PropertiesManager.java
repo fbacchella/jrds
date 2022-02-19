@@ -133,7 +133,6 @@ public class PropertiesManager extends Properties {
     public void join(URL url) {
         try (InputStream inputstream = url.openStream()){
             load(inputstream);
-            inputstream.close();
         } catch (IOException ex) {
             logger.warn("Invalid URL: {}", Util.resolveThrowableException(ex));
         }

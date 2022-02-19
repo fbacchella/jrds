@@ -78,8 +78,6 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
 
             getAnswer(inputSocket, outputSocket, "quit");
 
-            s.close();
-
             Number uptime = vars.remove(getPd().getSpecific("uptime"));
             if(uptime != null) {
                 setUptime(uptime.longValue());
