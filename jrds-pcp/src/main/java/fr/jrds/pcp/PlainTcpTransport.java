@@ -3,7 +3,6 @@ package fr.jrds.pcp;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.InetSocketAddress;
-import java.net.SocketTimeoutException;
 import java.net.StandardSocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -47,7 +46,7 @@ public class PlainTcpTransport implements Transport {
         }
     }
 
-    public PlainTcpTransport(SocketChannel soc, long timeout) throws IOException, InterruptedException {
+    public PlainTcpTransport(SocketChannel soc, long timeout) throws IOException {
         try {
             this.soc = soc;
             soc.setOption(StandardSocketOptions.TCP_NODELAY, true);

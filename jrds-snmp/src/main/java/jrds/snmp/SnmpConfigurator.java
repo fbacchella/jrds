@@ -136,7 +136,7 @@ public class SnmpConfigurator extends ModuleConfigurator {
         return loader.buildTree();
     }
 
-    public static void SaveMapping(String path) throws FileNotFoundException, IOException {
+    public static void SaveMapping(String path) throws IOException {
         Properties oidprops = new Properties();
         SnmpCollectResolver.oidmapping.forEach((k,v) -> oidprops.setProperty(k, v.toDottedString()));
         try (Writer dest =new OutputStreamWriter(new FileOutputStream(path, false), StandardCharsets.US_ASCII)) {

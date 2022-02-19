@@ -38,12 +38,12 @@ public class Connection implements Closeable {
 
     private final ProtocolHandler phandler;
 
-    public Connection(InetSocketAddress isa, long timeout) throws IOException, PCPException, InterruptedException {
+    public Connection(InetSocketAddress isa, long timeout) throws IOException, InterruptedException {
         this(new PlainTcpTransport(isa, timeout));
         logger.debug("Connected to {}", isa);
     }
 
-    public Connection(Transport trp) throws IOException, PCPException, InterruptedException {
+    public Connection(Transport trp) {
         phandler = new ProtocolHandler(trp);
     }
 
@@ -52,7 +52,7 @@ public class Connection implements Closeable {
         return start.getServerInfo();
     }
 
-    public void startServer(ServerInfo si) throws IOException, PCPException, InterruptedException {
+    public void startServer(ServerInfo si) throws IOException, InterruptedException {
         Start start = new Start();
         start.setServerInfo(si);
         phandler.send(start);
@@ -63,7 +63,7 @@ public class Connection implements Closeable {
         phandler.close();
     }
 
-    public void authentication(Credential nc) throws IOException, PCPException, InterruptedException {
+    public void authentication(Credential nc) throws IOException, InterruptedException {
         Creds creds = new Creds();
         creds.addCred(nc);
         phandler.send(creds);

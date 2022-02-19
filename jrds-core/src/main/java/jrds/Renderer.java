@@ -33,7 +33,7 @@ public class Renderer {
         private final ReentrantLock running = new ReentrantLock();
         private final File destFile;
 
-        public RendererRun(Graph graph) throws IOException {
+        public RendererRun(Graph graph) {
             this.graph = graph;
             destFile = new File(tmpDir, Integer.toHexString(graph.hashCode()) + ".png");
             finished = destFile.isFile() && destFile.canRead() && destFile.length() > 0;
@@ -210,9 +210,6 @@ public class Renderer {
             } catch (RejectedExecutionException ex) {
                 runRender.clean();
                 logger.warn("Render thread dropped for graph {}", graph);
-                return null;
-            } catch (IOException ex) {
-                Util.log(this, logger, Level.WARN, ex, "Fail to render %s: %s", ex);
                 return null;
             }
         });

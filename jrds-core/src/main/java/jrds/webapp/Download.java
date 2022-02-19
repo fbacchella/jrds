@@ -115,14 +115,8 @@ public class Download extends JrdsServlet {
             }
             Period p = params.getPeriod();
             ExtractInfo ei = ExtractInfo.builder().interval(p.getBegin(), p.getEnd()).step(probe.getStep()).build();
-            try {
-                sourceDp = probe.extract(ei);
-                fileName = probe.getName().replaceFirst("\\.rrd", ".csv");
-            } catch (IOException e) {
-                logger.error("Unable to process probe data");
-                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
-            }
+            sourceDp = probe.extract(ei);
+            fileName = probe.getName().replaceFirst("\\.rrd", ".csv");
         }
         try {
             ServletOutputStream out = res.getOutputStream();

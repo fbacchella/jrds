@@ -60,7 +60,7 @@ public class JSonGraph extends JSonData {
         return true;
     }
 
-    private void doGraph(GraphNode gn, Renderer r, ParamsBean params, JrdsJSONWriter w) throws IOException {
+    private void doGraph(GraphNode gn, Renderer r, ParamsBean params, JrdsJSONWriter w) {
         jrds.Graph graph = gn.getGraph();
         if (graph == null) {
             return;

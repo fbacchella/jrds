@@ -35,13 +35,13 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Ob
         try {
             return makeProbeDesc(n);
         } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | 
-                        ClassNotFoundException | NoClassDefFoundError | InstantiationException e) {
+                        ClassNotFoundException | NoClassDefFoundError e) {
             throw new InvocationTargetException(e, ProbeDescBuilder.class.getName());
         }
     }
 
     @SuppressWarnings("unchecked")
-    public <KeyType> ProbeDesc<KeyType> makeProbeDesc(JrdsDocument n) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, InstantiationException {
+    public <KeyType> ProbeDesc<KeyType> makeProbeDesc(JrdsDocument n) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
         ProbeDesc<KeyType> pd = new ProbeDesc<KeyType>();
 
         JrdsElement root = n.getRootElement();

@@ -63,12 +63,12 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     HostInfo build(JrdsDocument n) throws InvocationTargetException {
         try {
             return makeHost(n);
-        } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | IllegalAccessException | ClassNotFoundException e) {
+        } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | IllegalAccessException  e) {
             throw new InvocationTargetException(e, HostBuilder.class.getName());
         }
     }
 
-    public HostInfo makeHost(JrdsDocument n) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
+    public HostInfo makeHost(JrdsDocument n) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         JrdsElement hostNode = n.getRootElement();
         String hostName = hostNode.getAttribute("name");
         String dnsHostname = hostNode.getAttribute("dnsName");
@@ -529,7 +529,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         return connectionSet;
     }
 
-    private void setAttributes(Probe<?, ?> p, Map<String, ProbeDesc.DefaultBean> defaultBeans, JrdsElement probeNode, Object... context) throws InvocationTargetException {
+    private void setAttributes(Probe<?, ?> p, Map<String, ProbeDesc.DefaultBean> defaultBeans, JrdsElement probeNode, Object... context) {
         // Resolve the beans
         for(JrdsElement attrNode: probeNode.getChildElementsByName("attr")) {
             String name = attrNode.getAttribute("name");

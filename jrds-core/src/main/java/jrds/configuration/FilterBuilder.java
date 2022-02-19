@@ -23,12 +23,12 @@ public class FilterBuilder extends ConfigObjectBuilder<Filter> {
     Filter build(JrdsDocument n) throws InvocationTargetException {
         try {
             return makeFilter(n);
-        } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | IllegalAccessException | InstantiationException e) {
+        } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | IllegalAccessException e) {
             throw new InvocationTargetException(e, FilterBuilder.class.getName());
         }
     }
 
-    public Filter makeFilter(JrdsDocument n) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public Filter makeFilter(JrdsDocument n) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         JrdsElement root = n.getRootElement();
         JrdsElement name = root.getElementbyName("name");
         if(name == null)

@@ -517,11 +517,11 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         this.uptime = uptime;
     }
 
-    public Document dumpAsXml() throws ParserConfigurationException, IOException {
+    public Document dumpAsXml() throws ParserConfigurationException {
         return dumpAsXml(false);
     }
 
-    public Document dumpAsXml(boolean sorted) throws ParserConfigurationException, IOException {
+    public Document dumpAsXml(boolean sorted) throws ParserConfigurationException {
         String probeName = getPd().getName();
         String name = getName();
         String host = "";
@@ -672,7 +672,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         return mainStore.getExtractor();
     }
 
-    public DataProcessor extract(ExtractInfo ei) throws IOException {
+    public DataProcessor extract(ExtractInfo ei) {
         try (Extractor ex = mainStore.getExtractor()) {
             for(String dsName: pd.getDs()) {
                 ex.addSource(dsName, dsName);

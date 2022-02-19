@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,11 +56,7 @@ public class ConfigObjectFactory {
     }
 
     private void init() {
-        try {
-            load = new Loader(pm.strictparsing);
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException("Can't build loader parser", e);
-        }
+        load = new Loader(pm.strictparsing);
 
         logger.debug("Scanning {} for probes libraries", pm.libspath);
         for(URI lib: pm.libspath) {

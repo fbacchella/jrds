@@ -55,19 +55,11 @@ public class SecretStore implements Closeable {
     private boolean modified = false;
 
     public static SecretStore load(@NonNull String storePath) throws IOException {
-        try {
-            return new SecretStore(toURI(storePath), ACTION.LOAD);
-        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException ex) {
-            throw new IllegalStateException("Keystore environment unusable", ex);
-        }
+        return new SecretStore(toURI(storePath), ACTION.LOAD);
     }
 
     public static SecretStore create(@NonNull String storePath) throws IOException {
-        try {
-            return new SecretStore(toURI(storePath), ACTION.CREATE);
-        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException ex) {
-            throw new IllegalStateException("Keystore environment unusable", ex);
-        }
+        return new SecretStore(toURI(storePath), ACTION.CREATE);
     }
 
     public static SecretStore empty() {
@@ -90,7 +82,7 @@ public class SecretStore implements Closeable {
         }
     }
 
-    private SecretStore(URI storePath, ACTION action) throws FileNotFoundException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+    private SecretStore(URI storePath, ACTION action) throws IOException {
         this.storePath = storePath;
         switch (action) {
         case LOAD:
@@ -185,7 +177,7 @@ public class SecretStore implements Closeable {
         }
     }
 
-    public void add(String alias, byte[] secret) throws IOException {
+    public void add(String alias, byte[] secret) {
         try {
             if (ks.containsAlias(alias)) {
                 throw new IllegalArgumentException("Alias already exists, remove it before adding: " + alias);

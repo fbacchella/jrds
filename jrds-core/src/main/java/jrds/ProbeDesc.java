@@ -1,6 +1,5 @@
 package jrds;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -390,7 +389,7 @@ public class ProbeDesc<KeyType> {
         specific.put(name, value);
     }
 
-    public void addDefaultBean(String beanName, String beanValue, boolean finalBean) throws InvocationTargetException {
+    public void addDefaultBean(String beanName, String beanValue, boolean finalBean) {
         ProbeDesc.DefaultBean attr = new ProbeDesc.DefaultBean(beanValue, finalBean);
         if(beans.containsKey(beanName)) {
             defaultsBeans.put(beanName, attr);
@@ -409,7 +408,7 @@ public class ProbeDesc<KeyType> {
         return Collections.unmodifiableMap(defaultValues);
     }
 
-    public Document dumpAsXml() throws ParserConfigurationException, IOException {
+    public Document dumpAsXml() throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.newDocument();

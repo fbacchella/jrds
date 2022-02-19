@@ -115,7 +115,7 @@ public class BootStrap {
         return Paths.get(rootUrl.toURI()).getParent();
     }
 
-    static private ClassLoader makeClassLoader(Path baseClassPath) throws IOException {
+    static private ClassLoader makeClassLoader(Path baseClassPath) {
         List<URL> classPath = new ArrayList<URL>();
 
         Predicate<Path> filter = p -> {return Files.isRegularFile(p) && p.toString().endsWith(".jar");};

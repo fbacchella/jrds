@@ -97,7 +97,7 @@ public class Discover extends JrdsServlet {
         }
     }
 
-    private Document generate(String hostname, Map<String, JrdsDocument> probdescs, HttpServletRequest request) throws IOException, ParserConfigurationException {
+    private Document generate(String hostname, Map<String, JrdsDocument> probdescs, HttpServletRequest request) throws ParserConfigurationException {
 
         DocumentBuilder dbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         JrdsDocument hostDom = new JrdsDocument(dbuilder.newDocument());

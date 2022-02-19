@@ -102,14 +102,10 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     }
 
     public String getPath() {
-        try {
-            return resolvePath().toString();
-        } catch (IOException e) {
-            throw new RuntimeException("Can't resolve probe path", e);
-        }
+        return resolvePath().toString();
     }
 
-    private Path resolvePath() throws IOException {
+    private Path resolvePath()  {
         String rrdName = p.getName().replace("/", "_");
         return Paths.get(p.getHost().getHostDir().getPath(), rrdName + ".rrd").normalize();
     }

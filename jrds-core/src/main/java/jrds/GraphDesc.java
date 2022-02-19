@@ -1010,9 +1010,8 @@ public class GraphDesc implements WithACL {
      * @param defProbe
      * @param ownData data used to override probe's own values
      * @return
-     * @throws IOException
      */
-    public RrdGraphDef getGraphDef(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> ownData) throws IOException {
+    public RrdGraphDef getGraphDef(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> ownData) {
         RrdGraphDef retValue = getEmptyGraphDef();
         fillGraphDef(retValue, defProbe, ei, ownData);
         return retValue;
@@ -1056,9 +1055,8 @@ public class GraphDesc implements WithACL {
      * @param ei
      * @param customData data used to override probe's own values
      * @return
-     * @throws IOException
      */
-    public DataProcessor getPlottedDatas(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> customData) throws IOException {
+    public DataProcessor getPlottedDatas(Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> customData) {
         return DatasourcesPopulator.populate(defProbe, ei, customData, allds, name);
     }
 
@@ -1346,7 +1344,7 @@ public class GraphDesc implements WithACL {
         return acl;
     }
 
-    public Document dumpAsXml() throws ParserConfigurationException, IOException {
+    public Document dumpAsXml() throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.newDocument();

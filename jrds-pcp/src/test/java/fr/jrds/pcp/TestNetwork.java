@@ -76,7 +76,7 @@ public class TestNetwork extends Tester {
                         ServerInfo si = ServerInfo.builder().features(Collections.singleton(FEATURES.CREDS_REQD)).licensed((byte)0).version((byte)2).build();
                         cnx.startServer(si);
                     }
-                } catch (IOException | InterruptedException | PCPException e) {
+                } catch (IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
             };

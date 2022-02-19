@@ -5,8 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.net.Socket;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -160,7 +158,7 @@ public class Ribcl extends Probe<XPathExpression, Number> implements SSLProbe {
         }
     }
 
-    private Socket connect() throws NoSuchAlgorithmException, KeyManagementException, IOException {
+    private Socket connect() throws IOException {
         if(port == 23) {
             return find(SocketFactory.class).getFactory().createSocket(iloHost, port);
         } else {

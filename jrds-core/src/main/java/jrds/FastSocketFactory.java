@@ -6,7 +6,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.rmi.server.RMIClientSocketFactory;
 
 import javax.net.SocketFactory;
@@ -37,8 +36,7 @@ public class FastSocketFactory extends SocketFactory {
     }
 
     @Override
-    public Socket createSocket(String host, int port)
-                    throws IOException, UnknownHostException {
+    public Socket createSocket(String host, int port) throws IOException {
         Socket s = new FastSocket(timeout);
         s.connect(new InetSocketAddress(InetAddress.getByName(host), port));
         return s;
@@ -53,8 +51,7 @@ public class FastSocketFactory extends SocketFactory {
 
     @Override
     public Socket createSocket(String host, int port, InetAddress localHost,
-                               int localPort)
-                                               throws IOException, UnknownHostException {
+                               int localPort) throws IOException {
         Socket s = new FastSocket(timeout);
         s.connect(new InetSocketAddress(host, port));
         return s;

@@ -84,7 +84,7 @@ public class Loader {
         this(false);
     }
 
-    public Loader(boolean strict) throws ParserConfigurationException {
+    public Loader(boolean strict) {
         instance = DocumentBuilderFactory.newInstance();
         // Focus on content, not structure
         instance.setIgnoringComments(true);

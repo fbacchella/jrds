@@ -1,7 +1,6 @@
 package jrds.standalone;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -122,7 +121,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         return "| " + getSourceTypeLink(p, true) + " | " + description + " | " + classToLink(p.getClass()) + " | ";
     }
 
-    private void dumpProbe(ProbeDesc<Object> pd) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+    private void dumpProbe(ProbeDesc<Object> pd) throws InstantiationException, IllegalAccessException {
         Class<? extends Probe<Object, ?>> c = (Class<? extends Probe<Object, ?>>) pd.getProbeClass();
         Probe<Object, ?> p = c.newInstance();
         p.setPd(pd);

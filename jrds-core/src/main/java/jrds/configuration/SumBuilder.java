@@ -17,12 +17,12 @@ public class SumBuilder extends ConfigObjectBuilder<Sum> {
     Sum build(JrdsDocument n) throws InvocationTargetException {
         try {
             return makeSum(n);
-        } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        } catch (SecurityException | IllegalArgumentException e) {
             throw new InvocationTargetException(e, FilterBuilder.class.getName());
         }
     }
 
-    public Sum makeSum(JrdsDocument n) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    public Sum makeSum(JrdsDocument n) {
         JrdsElement root = n.getRootElement();
         String name = root.getAttribute("name");
         if(name != null && !"".equals(name)) {

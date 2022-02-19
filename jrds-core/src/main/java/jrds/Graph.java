@@ -186,7 +186,7 @@ public class Graph implements WithACL {
         return retValue;
     }
 
-    public RrdGraphDef getRrdGraphDef() throws IOException {
+    public RrdGraphDef getRrdGraphDef() {
         RrdGraphDef graphDef = getEmptyGraphDef();
         fillGraphDef(graphDef);
         finishGraphDef(graphDef);
