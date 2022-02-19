@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -18,7 +19,6 @@ import org.w3c.dom.TypeInfo;
 public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
 
     private NamedNodeMap attrs = null;
-    private JrdsElement nextOfTag = null;
     private Map<String, JrdsElement> firstChildbyTag = new HashMap<String, JrdsElement>();
 
     public JrdsElement(Element n) {
@@ -137,37 +137,34 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
         return null;
     }
 
-    public Iterable<JrdsElement> getChildElementsByName(final String name) {
-        Iterator<JrdsElement> iter = new Iterator<JrdsElement>() {
+    public Iterable<JrdsElement> getChildElementsByName(String name) {
+        return () -> new Iterator<JrdsElement>() {
             JrdsElement curs = getElementbyName(name);
 
             public boolean hasNext() {
-                if(curs == null)
-                    return false;
-                Node nextnode = curs.getNextSibling();
-                while (nextnode != null) {
-                    if(nextnode.getNodeType() == Node.ELEMENT_NODE) {
-                        if(nextnode.getNodeName().equals(name)) {
-                            curs.nextOfTag = AbstractJrdsNode.build(nextnode);
-                            break;
-                        }
-                    }
-                    nextnode = nextnode.getNextSibling();
-                }
-                return true;
+                return curs != null;
             }
 
             public JrdsElement next() {
-                JrdsElement step = curs;
-                curs = curs.nextOfTag;
-                return step;
+                if (curs != null) {
+                    Node nextnode = curs;
+                    while ((nextnode = nextnode.getNextSibling()) != null) {
+                        if (nextnode.getNodeType() == Node.ELEMENT_NODE && nextnode.getNodeName().equals(name)) {
+                            break;
+                        }
+                    }
+                    JrdsElement step = curs;
+                    curs = nextnode == null ? null : AbstractJrdsNode.build(nextnode);
+                    return step;
+                } else {
+                    throw new NoSuchElementException();
+                }
             }
 
             public void remove() {
-                throw new UnsupportedOperationException("Cannot remove in a JrdsNode");
+                throw new UnsupportedOperationException("Cannot remove in a JrdsElement");
             }
         };
-        return () -> iter;
 
     }
 

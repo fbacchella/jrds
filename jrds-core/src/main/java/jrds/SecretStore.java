@@ -29,6 +29,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -229,7 +230,11 @@ public class SecretStore implements Closeable {
                     return e.hasMoreElements();
                 }
                 @Override public E next() {
-                    return e.nextElement();
+                    if (hasNext()) {
+                        return e.nextElement();
+                    } else {
+                        throw new NoSuchElementException();
+                    }
                 }
             };
         };

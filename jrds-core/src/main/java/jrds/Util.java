@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UnknownFormatConversionException;
@@ -676,22 +677,24 @@ public class Util {
         out.flush();
     }
 
-    public static <T> Iterable<T> iterate(final Enumeration<T> en) {
-        Iterator<T> iterator = new Iterator<T>() {
+    public static <T> Iterable<T> iterate(Enumeration<T> en) {
+        return () -> new Iterator<T>() {
             public boolean hasNext() {
                 return en.hasMoreElements();
             }
 
             public T next() {
-                return en.nextElement();
+                if (hasNext()) {
+                    return en.nextElement();
+                } else {
+                    throw new NoSuchElementException();
+                }
             }
 
             public void remove() {
-                throw new UnsupportedOperationException("Cannot remove in XML serialization iterator");
+                throw new UnsupportedOperationException("Cannot remove in Enumeration wrapper");
             }
         };
-        Iterable<T> iter = () -> iterator;
-        return iter;
     }
 
     private static final Collator defaultCollator = Collator.getInstance();

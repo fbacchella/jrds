@@ -1,6 +1,7 @@
 package jrds.factories.xml;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -38,7 +39,11 @@ public class NodeListIterator<N extends AbstractJrdsNode<?>> implements Iterable
             }
 
             public N next() {
-                return AbstractJrdsNode.build(nl.item(i++));
+                if (hasNext()) {
+                    return AbstractJrdsNode.build(nl.item(i++));
+                } else {
+                    throw new NoSuchElementException();
+                }
             }
 
             public void remove() {
