@@ -117,8 +117,7 @@ public class JSonPack extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid referer");
                 return;
             }
-        }
-        if (referer == null) {
+        } else {
             referer = "http://" + request.getHeader("Host") + request.getContextPath() + "/";
         }
 
