@@ -248,8 +248,6 @@ public class Util {
             else if (var.startsWith("secret.")) {
                 SecretStore secrets = null;
                 for (Object a : arguments) {
-                    Thread.dumpStack();
-                    System.out.format("%s %s%n", a, a.getClass());
                     if (a instanceof StarterNode) {
                         secrets = ((StarterNode) a).getHostList().getSecrets();
                         break;
@@ -266,7 +264,6 @@ public class Util {
                 } else {
                     toAppend = var;
                 }
-                System.out.println("var = " + var + ", value = '" + toAppend + "'");
             }
             // We found a ${\d+}, directly resolve with the first list argument
             else if(digit.matcher(var).matches()) {
