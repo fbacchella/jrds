@@ -119,10 +119,9 @@ public class Timer extends StarterNode {
         TimerTask collector = new TimerTask() {
             public void run() {
                 collectCount.incrementAndGet();
-                ThreadGroup collectGroup = new ThreadGroup("Collect/" + Timer.this.name);
                 // The collect is done in a different thread
                 // So a collect failure will no prevent other collect from running
-                Thread subcollector = new Thread(collectGroup, Timer.this::collectAll, collectGroup.getName());
+                Thread subcollector = new Thread(Timer.this::collectAll, "Collect/" + Timer.this.name);
                 subcollector.setDaemon(true);
                 subcollector.setUncaughtExceptionHandler((t, ex) -> {
                     Timer.this.log(Level.ERROR, ex, "A fatal error occured during collect: %s", ex);
@@ -160,7 +159,7 @@ public class Timer extends StarterNode {
         AtomicInteger counter = new AtomicInteger(0);
         // Generate threads with a default name
         ThreadFactory tf = r -> {
-            Thread t = new Thread(Thread.currentThread().getThreadGroup(), r) {
+            Thread t = new Thread(r) {
                 @Override
                 public void run() {
                     MDC.put("collectIteration", String.valueOf(collectCount.get()));
