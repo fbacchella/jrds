@@ -54,12 +54,7 @@ public class HttpXml extends HCHttpProbe<String> {
         for(Map.Entry<String, String> e: getPd().getCollectMapping().entrySet()) {
             String solved = Util.parseTemplate(String.format(e.getKey(), args != null ? args.toArray() : null), this, args);
             XPathExpression xpath = cr.resolve(solved);
-            if (xpath ==  null) {
-                log(Level.DEBUG, "unparsed xpath: %s", e.getKey());
-                continue;
-            } else {
-                collectKeys.put(xpath, solved);
-            }
+            collectKeys.put(xpath, solved);
         }
         collectKeys = Collections.unmodifiableMap(collectKeys);
         log(Level.TRACE, "collect xpath mapping %s", collectKeys);

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,6 +30,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import jrds.CollectResolver;
+import jrds.Util;
 
 /**
  * @author bacchell A provider is used for XML to solve multi thread problems
@@ -39,45 +41,46 @@ import jrds.CollectResolver;
  * 
  */
 public class XmlProvider extends Starter {
-    private ThreadLocal<DocumentBuilder> localDocumentBuilder = new ThreadLocal<DocumentBuilder>() {
-        @Override
-        protected DocumentBuilder initialValue() {
-            DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
-            instance.setIgnoringComments(true);
-            instance.setValidating(false);
-            try {
-                return instance.newDocumentBuilder();
-            } catch (ParserConfigurationException e) {
-                log(Level.ERROR, e, "No Document builder available");
-                return null;
-            }
-        }
-    };
-    private ThreadLocal<XPath> localXpath = new ThreadLocal<XPath>() {
-        @Override
-        protected XPath initialValue() {
-            return XPathFactory.newInstance().newXPath();
-        }
-    };
 
     public static class XmlResolver implements CollectResolver<XPathExpression> {
-
-        private static final ThreadLocal<XPath> localXpath = new ThreadLocal<XPath>() {
-            @Override
-            protected XPath initialValue() {
-                return XPathFactory.newInstance().newXPath();
-            }
-        };
+        private static final XPathFactory factory = XPathFactory.newInstance();
+        private static final ThreadLocal<XPath> localXpath = ThreadLocal.withInitial(() -> factory.newXPath());
 
         @Override
         public XPathExpression resolve(String collectKey) {
             try {
                 return localXpath.get().compile(collectKey);
-            } catch (XPathExpressionException e) {
-                throw new IllegalArgumentException(e.getMessage(), e);
+            } catch (XPathExpressionException ex) {
+                throw new IllegalArgumentException(ex.getMessage(), ex);
             }
         }
+    }
 
+    private final ThreadLocal<DocumentBuilder> localDocumentBuilder;
+    private final ThreadLocal<XPath> localXpath;
+
+    public XmlProvider() {
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setIgnoringComments(true);
+        documentBuilderFactory.setValidating(false);
+        Stream.of("http://xml.org/sax/features/external-general-entities",
+                  "http://xml.org/sax/features/external-parameter-entities")
+              .forEach(s -> {
+                  try {
+                      documentBuilderFactory.setFeature(s, false);
+                  } catch (ParserConfigurationException ex) {
+                      log(Level.ERROR, ex, "Unsupported feature: {}", Util.resolveThrowableException(ex));
+                  }
+              });
+        localDocumentBuilder = ThreadLocal.withInitial(() -> {
+            try {
+                return documentBuilderFactory.newDocumentBuilder();
+            } catch (ParserConfigurationException ex) {
+                throw new IllegalStateException("No Document builder available: " + Util.resolveThrowableException(ex), ex);
+            }
+        });
+        XPathFactory xPathFactory = XPathFactory.newInstance();
+        localXpath = ThreadLocal.withInitial(xPathFactory::newXPath);
     }
 
     public long findUptimeByDate(Document d, String startTimePath, String currentTimePath, DateFormat pattern) {
@@ -104,25 +107,27 @@ public class XmlProvider extends Starter {
                         return null;
                     }
                 }).orElse(null);
-            if (startTime != null &&currentTime != null) {
+            if (startTime != null && currentTime != null) {
                 return (currentTime.getTime() - startTime.getTime()) / 1000;
+            } else {
+                return 0;
             }
         } catch (XPathExpressionException e) {
             log(Level.ERROR, e, "Time not found");
+            return 0;
         }
-        return 0;
     }
 
     public long findUptime(Document d, String upTimePath) {
         long uptime = 0;
-        if(upTimePath == null) {
+        if (upTimePath == null) {
             log(Level.ERROR, "No xpath for the uptime for " + this);
             return 0;
         }
         try {
             XPath xpather = localXpath.get();
             Node upTimeNode = (Node) xpather.evaluate(upTimePath, d, XPathConstants.NODE);
-            if(upTimeNode != null) {
+            if (upTimeNode != null) {
                 log(Level.TRACE, "Will parse uptime: %s", upTimeNode.getTextContent());
                 String dateString = upTimeNode.getTextContent();
                 uptime = jrds.Util.parseStringNumber(dateString, 0L);
@@ -136,19 +141,18 @@ public class XmlProvider extends Starter {
 
     public Map<XPathExpression, Number> fileFromXpaths(Document d, Set<XPathExpression> xpaths) {
         Map<XPathExpression, Number> values = new HashMap<>(xpaths.size());
-        for(XPathExpression xpath: xpaths) {
+        for (XPathExpression xpath: xpaths) {
             try {
                 log(Level.TRACE, "Will search the xpath \"%s\"", xpath);
                 Node n = (Node) xpath.evaluate(d, XPathConstants.NODE);
-                Double value;
-                if(n != null) {
-                    value = jrds.Util.parseStringNumber(n.getTextContent(), Double.NaN);
+                if (n != null) {
+                    Double value = jrds.Util.parseStringNumber(n.getTextContent(), Double.NaN);
                     values.put(xpath, value);
                 }
             } catch (XPathExpressionException e) {
-                log(Level.ERROR, "Invalid XPATH : " + xpath + " for " + this);
+                log(Level.ERROR, "Invalid XPATH : %s for %s", xpath, this);
             } catch (NumberFormatException e) {
-                log(Level.WARN, e, "value read from %s  not parsable", xpath);
+                log(Level.WARN, e, "value read from %s not parsable", xpath);
             }
         }
         log(Level.TRACE, "Values found: %s", values);
@@ -157,18 +161,19 @@ public class XmlProvider extends Starter {
 
     public Document getDocument(InputSource stream) {
         DocumentBuilder dbuilder = localDocumentBuilder.get();
-        Document d = null;
-        log(Level.TRACE, "%s %s %s started %s@%s", stream, dbuilder, isStarted(), getClass().getName(), Integer.toHexString(hashCode()));
+        log(Level.TRACE, "%s %s %s started %s@%s", stream, dbuilder, isStarted(), getClass().getName(), Util.delayedFormatString(() -> Integer.toHexString(hashCode())));
         try {
             dbuilder.reset();
-            d = dbuilder.parse(stream);
+            Document d = dbuilder.parse(stream);
             log(Level.TRACE, "just parsed a %s", d.getDocumentElement().getTagName());
+            return d;
         } catch (SAXException e) {
             log(Level.ERROR, e, "Invalid XML: %s", e);
+            return dbuilder.newDocument();
         } catch (IOException e) {
             log(Level.ERROR, e, "IO Exception getting values: %s", e);
+            return dbuilder.newDocument();
         }
-        return d;
     }
 
     public Document getDocument(InputStream stream) {
@@ -196,6 +201,14 @@ public class XmlProvider extends Starter {
 
     public Node getNode(Document d, String xpath) throws XPathExpressionException {
         return (Node) localXpath.get().evaluate(xpath, d, XPathConstants.NODE);
+    }
+
+    public XPathExpression compile(String path) {
+        try {
+            return localXpath.get().compile(path);
+        } catch (XPathExpressionException ex) {
+            throw new IllegalArgumentException(ex.getMessage(), ex);
+        }
     }
 
 }
