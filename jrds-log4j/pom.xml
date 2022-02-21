@@ -75,6 +75,6 @@
     <parent>
         <groupId>fr.jrds</groupId>
         <artifactId>jrds</artifactId>
-        <version>2021.2-SNAPSHOT</version>
+        <version>2022.1-SNAPSHOT</version>
     </parent>
 </project>
