@@ -104,7 +104,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             logger.trace("adding tag {} to {}", tagElem, host);
             String textContent = tagElem.getTextContent();
             if(textContent != null) {
-                host.addTag(Util.parseTemplate(textContent.trim(), host, properties));
+                host.addTag(Util.parseTemplate(textContent.trim(), host, properties, pm.secrets));
             }
         }
 
@@ -144,13 +144,13 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             Map<String, String> forattr = forNode.attrMap();
             String iterprop = forattr.get("var");
             Collection<String> set = null;
-            String name = Util.parseTemplate(forNode.attrMap().get("collection"), this, properties);
+            String name = Util.parseTemplate(forNode.attrMap().get("collection"), this, properties, pm.secrets);
             if (name != null) {
                 set = collections.get(name);
             } else if (forattr.containsKey("min") && forattr.containsKey("max") && forattr.containsKey("step")) {
-                int min = Util.parseStringNumber(Util.parseTemplate(forattr.get("min"), this, properties), Integer.MAX_VALUE);
-                int max = Util.parseStringNumber(Util.parseTemplate(forattr.get("max"), this, properties), Integer.MIN_VALUE);
-                int step = Util.parseStringNumber(Util.parseTemplate(forattr.get("step"), this, properties), Integer.MIN_VALUE);
+                int min = Util.parseStringNumber(Util.parseTemplate(forattr.get("min"), this, properties, pm.secrets), Integer.MAX_VALUE);
+                int max = Util.parseStringNumber(Util.parseTemplate(forattr.get("max"), this, properties, pm.secrets), Integer.MIN_VALUE);
+                int step = Util.parseStringNumber(Util.parseTemplate(forattr.get("step"), this, properties, pm.secrets), Integer.MIN_VALUE);
                 if (min > max || step <= 0) {
                     logger.error("invalid range from{} to {} with step {}", min, max, step);
                     break;
@@ -210,7 +210,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 Map<String, String> attrs = new HashMap<String, String>(0);
                 for(JrdsElement attrNode: graphNode.getChildElementsByName("attr")) {
                     String name = attrNode.getAttribute("name");
-                    String value = Util.parseTemplate(attrNode.getTextContent(), host, gd);
+                    String value = Util.parseTemplate(attrNode.getTextContent(), host, gd, pm.secrets);
                     attrs.put(name, value);
                 }
                 GraphNode gn = new GraphNode(graphprobe, gd);
@@ -223,7 +223,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     public Probe<?, ?> makeProbe(JrdsElement probeNode, HostInfo host, Map<String, String> properties) throws InvocationTargetException {
         Probe<?, ?> p = null;
         String type = probeNode.attrMap().get("type");
-        type = jrds.Util.parseTemplate(type, host, properties);
+        type = jrds.Util.parseTemplate(type, host, properties, pm.secrets);
 
         List<DataSourceBuilder> dsList = doDsList(type, probeNode.getElementbyName("dslist"));
         if(dsList.size() > 0) {
@@ -244,7 +244,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         if(timerName == null) {
             timerName = Timer.DEFAULTNAME;
         }
-        timerName = Util.parseTemplate(timerName, properties, p, host);
+        timerName = Util.parseTemplate(timerName, properties, p, host, pm.secrets);
         Timer timer = timers.get(timerName);
         if(timer == null) {
             logger.error("Invalid timer '" + timerName + "' for probe " + host.getName() + "/" + type);
@@ -268,7 +268,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             logger.error("invalid archives set name: " + archivesName);
             return null;
         }
-        archivesName = Util.parseTemplate(archivesName, properties, p, host);
+        archivesName = Util.parseTemplate(archivesName, properties, p, host, pm.secrets);
         ArchivesSet archives = archivessetmap.get(archivesName);
         p.setArchives(archives);
 
@@ -276,7 +276,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         String label = probeNode.getAttribute("label");
         if(label != null && !"".equals(label)) {
             logger.trace("Adding label {} to {}", label, p);
-            p.setLabel(jrds.Util.parseTemplate(label, properties, p, host));
+            p.setLabel(jrds.Util.parseTemplate(label, properties, p, host, pm.secrets));
         }
 
         // The host is set
@@ -284,7 +284,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         p.setHost(shost);
 
         ProbeDesc<?> pd = p.getPd();
-        List<Object> args = ArgFactory.makeArgs(probeNode, host, properties);
+        List<Object> args = ArgFactory.makeArgs(probeNode, host, properties, pm.secrets);
         // Prepare the probe with the default beans values
         Map<String, ProbeDesc.DefaultBean> defaultBeans = new HashMap<>(pd.getDefaultBeans());
         for(Map.Entry<String, ProbeDesc.DefaultBean> e: defaultBeans.entrySet()) {
@@ -329,7 +329,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         if (p instanceof ConnectedProbe) {
             ConnectedProbe cp = (ConnectedProbe) p;
             if (connectionName != null) {
-                connectionName = jrds.Util.parseTemplate(connectionName, host, properties, args);
+                connectionName = jrds.Util.parseTemplate(connectionName, host, properties, args, pm.secrets);
                 logger.trace("Setting connection {} used by {}/{}", connectionName, host, p);
                 cp.setConnectionName(connectionName);
             } else {
@@ -414,9 +414,9 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
         try {
             if(lastArgs instanceof List) {
-                value = Util.parseTemplate(beanValue, host, p, lastArgs, properties);
+                value = Util.parseTemplate(beanValue, host, p, lastArgs, properties, pm.secrets);
             } else {
-                value = Util.parseTemplate(beanValue, host, p, properties);
+                value = Util.parseTemplate(beanValue, host, p, properties, pm.secrets);
             }
         } catch (Exception e) {
             Throwable root = e;
@@ -458,7 +458,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
                 Map<String, String> attrs = new HashMap<String, String>();
                 for(Map.Entry<String, String> e: snmpNode.attrMap().entrySet()) {
-                    attrs.put(e.getKey(), Util.parseTemplate(e.getValue(), parent, properties));
+                    attrs.put(e.getKey(), Util.parseTemplate(e.getValue(), parent, properties, pm.secrets));
                 }
                 return new ConnectionInfo(connectionClass, connectionClassName, Collections.emptyList(), attrs);
             }
@@ -492,7 +492,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 logger.error("No type declared for a connection");
                 continue;
             }
-            String name = Util.parseTemplate(cnxNode.getAttribute("name"), parent, properties);
+            String name = Util.parseTemplate(cnxNode.getAttribute("name"), parent, properties, pm.secrets);
 
             try {
                 // Load the class for the connection
@@ -500,13 +500,13 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 Class<? extends Connection<?>> connectionClass = (Class<? extends Connection<?>>) classLoader.loadClass(type);
 
                 // Build the arguments vector for the connection
-                List<Object> args = ArgFactory.makeArgs(cnxNode);
+                List<Object> args = ArgFactory.makeArgs(cnxNode, pm.secrets);
 
                 // Resolve the bean for the connection
                 Map<String, String> attrs = new HashMap<String, String>();
                 for(JrdsElement attrNode: cnxNode.getChildElementsByName("attr")) {
                     String attrName = attrNode.getAttribute("name");
-                    String textValue = Util.parseTemplate(attrNode.getTextContent(), parent, properties);
+                    String textValue = Util.parseTemplate(attrNode.getTextContent(), parent, properties, pm.secrets);
                     attrs.put(attrName, textValue);
                 }
                 ConnectionInfo cnx = new ConnectionInfo(connectionClass, name, args, attrs);
@@ -537,7 +537,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 logger.error(context[0] + "/" + p.getPd().getName() + ": unknown bean '" + name + "'");
                 continue;
             }
-            String textValue = Util.parseTemplate(attrNode.getTextContent(), context);
+            String textValue = Util.parseTemplate(attrNode.getTextContent(), context, pm.secrets);
             logger.trace("Found attribute {} with value {}", name, textValue);
             bean.set(p, textValue);
             if (defaultBeans.containsKey(name)) {
@@ -558,7 +558,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             String key = propNode.getAttribute("key");
             if(key != null) {
                 String value = propNode.getTextContent();
-                value = Util.parseTemplate(value, o);
+                value = Util.parseTemplate(value, o, pm.secrets);
                 logger.trace("Adding propertie {}={}", key, value);
                 props.put(key, value);
             }
