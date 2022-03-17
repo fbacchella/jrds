@@ -123,7 +123,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             Macro m = macrosMap.get(name);
             logger.trace("Adding macro {}: {}", name, m);
             if (m != null) {
-                Map<String, String> macroProps = makeProperties(macroNode, properties, host);
+                Map<String, String> macroProps = makeProperties(macroNode, properties, host, pm.secrets);
                 logger.trace("properties inherited for macro {}: {}", m, properties);
                 logger.trace("local properties for macro {}: {}", m, macroProps);
                 Map<String, String> newProps = new HashMap<String, String>((properties != null ? properties.size() : 0) + macroProps.size());
@@ -537,7 +537,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 logger.error(context[0] + "/" + p.getPd().getName() + ": unknown bean '" + name + "'");
                 continue;
             }
-            String textValue = Util.parseTemplate(attrNode.getTextContent(), context, pm.secrets);
+            String textValue = Util.parseTemplate(attrNode.getTextContent(), context);
             logger.trace("Found attribute {} with value {}", name, textValue);
             bean.set(p, textValue);
             if (defaultBeans.containsKey(name)) {
@@ -558,7 +558,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             String key = propNode.getAttribute("key");
             if(key != null) {
                 String value = propNode.getTextContent();
-                value = Util.parseTemplate(value, o, pm.secrets);
+                value = Util.parseTemplate(value, o);
                 logger.trace("Adding propertie {}={}", key, value);
                 props.put(key, value);
             }
