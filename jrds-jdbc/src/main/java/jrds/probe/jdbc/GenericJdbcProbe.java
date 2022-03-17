@@ -40,16 +40,17 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
      * @see jrds.ProbeConnected#configure()
      */
     public Boolean configure(List<?> args) {
-        if(super.configure()) {
+        if (super.configure()) {
             ProbeDesc<String> pd = getPd();
-            query = jrds.Util.parseTemplate(pd.getSpecific("query"), getHost(), args);
-            keyColumn = jrds.Util.parseTemplate(pd.getSpecific("key"), getHost(), args);
-            uptimeQuery = jrds.Util.parseTemplate(pd.getSpecific("uptimeQuery"), getHost(), args);
-            uptimeRow = jrds.Util.parseTemplate(pd.getSpecific("uptimeRow"), getHost(), args);
+            query = jrds.Util.parseTemplate(pd.getSpecific("query"), this, getHost(), args);
+            keyColumn = jrds.Util.parseTemplate(pd.getSpecific("key"), this, getHost(), args);
+            uptimeQuery = jrds.Util.parseTemplate(pd.getSpecific("uptimeQuery"), this, getHost(), args);
+            uptimeRow = jrds.Util.parseTemplate(pd.getSpecific("uptimeRow"), this, getHost(), args);
             String indexTemplate = pd.getSpecific("index");
-            if(indexTemplate != null && !"".equals(indexTemplate))
-                index = jrds.Util.parseTemplate(indexTemplate, getHost(), args);
-            setName(jrds.Util.parseTemplate(pd.getProbeName(), args));
+            if (indexTemplate != null && !"".equals(indexTemplate)) {
+                index = jrds.Util.parseTemplate(indexTemplate, this, getHost(), args);
+            }
+            setName(jrds.Util.parseTemplate(pd.getProbeName(), this, getHost(), args));
             return true;
         }
         return false;
@@ -144,7 +145,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
         }
     }
 
-    private Map<String, Number> getValuesFromRS(ResultSet rs, Set<String> collectKeys) {
+    protected Map<String, Number> getValuesFromRS(ResultSet rs, Set<String> collectKeys) {
         Map<String, Number> values = null;
         try {
             ResultSetMetaData meta = rs.getMetaData();
