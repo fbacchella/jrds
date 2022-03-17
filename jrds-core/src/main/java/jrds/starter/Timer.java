@@ -134,6 +134,7 @@ public class Timer extends StarterNode {
 
     public void collectAll() {
         MDC.put("collectIteration", String.valueOf(collectCount.get()));
+        MDC.put("timer", name);
         // Build the list of host that will be collected
         List<Runnable> toSchedule = new ArrayList<Runnable>(hostList.size());
         hostList.values().stream()
