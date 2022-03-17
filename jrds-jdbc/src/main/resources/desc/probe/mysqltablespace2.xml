@@ -2,7 +2,7 @@
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
   <name>MysqlTableSpace2</name>
-  <probeName>mysqltablespace-${attr.table}</probeName>
+  <probeName>jdbc-${url.signature}</probeName>
   <probeClass>jrds.probe.jdbc.MysqlTableSpace2</probeClass>
   <specific name="query">show table status from ${attr.table};</specific>
   <ds>
