@@ -11,6 +11,7 @@ import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.nio.CharBuffer;
 import java.nio.channels.ClosedChannelException;
@@ -799,7 +800,10 @@ public class Util {
      */
     public static String resolveThrowableException(Throwable t) {
         StringBuilder builder = new StringBuilder();
-        while(t.getCause() != null) {
+        if (t instanceof UndeclaredThrowableException) {
+            t = t.getCause();
+        }
+        while (t.getCause() != null) {
             String message = t.getMessage();
             if (message == null) {
                 message = t.getClass().getSimpleName();
