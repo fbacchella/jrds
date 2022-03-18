@@ -119,6 +119,7 @@ public class Timer extends StarterNode {
         MDC.put("timer", name);
         TimerTask collector = new TimerTask() {
             public void run() {
+                MDC.put("timer", name);
                 collectCount.incrementAndGet();
                 // The collect is done in a different thread
                 // So a collect failure will no prevent other collect from running
@@ -128,9 +129,11 @@ public class Timer extends StarterNode {
                     Timer.this.log(Level.ERROR, ex, "A fatal error occured during collect: %s", ex);
                 });
                 subcollector.start();
+                MDC.remove("timer");
             }
         };
         collectTimer.scheduleAtFixedRate(collector, getTimeout() * 1000L, getStep() * 1000L);
+        MDC.remove("timer");
     }
 
     public void collectAll() {
@@ -166,7 +169,11 @@ public class Timer extends StarterNode {
                 public void run() {
                     MDC.put("collectIteration", String.valueOf(collectCount.get()));
                     MDC.put("collectorInstance", String.valueOf(counter.incrementAndGet()));
+                    MDC.put("timer", name);
                     super.run();
+                    MDC.remove("collectIteration");
+                    MDC.remove("collectorInstance");
+                    MDC.remove("timer");
                 }
             };
             t.setName("Collect/" + Timer.this.name + "/Collector");
@@ -219,6 +226,7 @@ public class Timer extends StarterNode {
             long duration = end - start.getTime();
             stats.refresh(start, duration);
             log(Level.INFO, "Collect started at " + start + " ran for " + duration + "ms");
+            MDC.remove("timer");
         }
     }
 
@@ -227,7 +235,6 @@ public class Timer extends StarterNode {
     public synchronized void stopCollect() {
         Optional.ofNullable(collectThread).ifPresent(Thread::interrupt);
         super.stopCollect();
-        MDC.remove("timer");
     }
 
     @SuppressWarnings("unchecked")
