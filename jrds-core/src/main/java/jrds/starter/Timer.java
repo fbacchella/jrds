@@ -116,6 +116,7 @@ public class Timer extends StarterNode {
     }
 
     public void startTimer(java.util.Timer collectTimer) {
+        MDC.put("timer", name);
         TimerTask collector = new TimerTask() {
             public void run() {
                 collectCount.incrementAndGet();
@@ -226,6 +227,7 @@ public class Timer extends StarterNode {
     public synchronized void stopCollect() {
         Optional.ofNullable(collectThread).ifPresent(Thread::interrupt);
         super.stopCollect();
+        MDC.remove("timer");
     }
 
     @SuppressWarnings("unchecked")
