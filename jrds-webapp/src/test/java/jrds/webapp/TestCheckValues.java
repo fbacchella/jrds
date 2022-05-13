@@ -56,7 +56,7 @@ public class TestCheckValues {
     public void testFail() throws IOException, Exception {
         String url = "http://tester%s/values/localhost/truc/bad";
         Response response = ToolsWebApp.doRequestGet(tester, url, 400);
-        Assert.assertEquals("Invalid error message", "No matching probe", response.getReason());
+        Assert.assertTrue(response.getContent().contains("No matching probe"));
     }
 
     @Test
