@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-"http://java.sun.com/dtd/web-app_2_3.dtd">
-<web-app>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
     <display-name>jrds</display-name>
     <listener>
         <listener-class>jrds.webapp.StartListener</listener-class>
@@ -45,15 +46,13 @@
         <servlet-name>discover</servlet-name>
         <display-name>discover</display-name>
         <description></description>
-        <servlet-class>
-            jrds.webapp.Discover</servlet-class>
+        <servlet-class>jrds.webapp.Discover</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>JSonTree</servlet-name>
         <display-name>JSonTree</display-name>
         <description></description>
-        <servlet-class>
-            jrds.webapp.JSonTree</servlet-class>
+        <servlet-class>jrds.webapp.JSonTree</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>JSonGraph</servlet-name>
@@ -66,8 +65,7 @@
         <servlet-name>JSonPeriod</servlet-name>
         <display-name>JSonPeriod</display-name>
         <description></description>
-        <servlet-class>
-            jrds.webapp.JSonPeriod</servlet-class>
+        <servlet-class>jrds.webapp.JSonPeriod</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>JSonQueryParams</servlet-name>
@@ -203,4 +201,7 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
     </welcome-file-list>
+    <session-config>
+        <tracking-mode>COOKIE</tracking-mode>
+    </session-config>
 </web-app>
