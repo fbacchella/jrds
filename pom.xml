@@ -18,7 +18,7 @@
         <maven.compiler.target>8</maven.compiler.target>
         <year>2022</year>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.2.30.v20200428</jetty.version>
+        <jetty.version>9.4.46.v20220331</jetty.version>
         <maven.plugin.surefire.version>3.0.0-M5</maven.plugin.surefire.version>
         <servlet-api.version>3.1.0</servlet-api.version>
         <junit.version>4.13.2</junit.version>
