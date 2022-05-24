@@ -137,4 +137,9 @@ public class DoSnmpProbe extends CommandStarterImpl {
         System.out.println();
     }
 
+    @Override
+    public String getName() {
+        return "dosnmpprobe";
+    }
+
 }

@@ -115,4 +115,9 @@ public class SecretsHandling extends CommandStarterImpl {
         }
     }
 
+    @Override
+    public String getName() {
+        return "secrets";
+    }
+
 }

@@ -102,4 +102,10 @@ public class CheckJar extends CommandStarterImpl {
         jrds.Util.serialize(doc, System.out, null, prop);
         System.out.println(externalStarters);
     }
+
+    @Override
+    public String getName() {
+        return "checkjar";
+    }
+
 }

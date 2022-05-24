@@ -14,72 +14,80 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import jrds.Util;
+
 public class BootStrap {
 
-    static final private String[] propertiesList = { "jetty.host", "jetty.port", "propertiesFile", "loglevel" };
-    static final private String defaultCommand = "jetty";
-    static final Map<String, String> cmdClasses = new HashMap<String, String>();
-
-    static {
-        cmdClasses.put("jetty", "jrds.standalone.Jetty");
-        cmdClasses.put("jmxserver", "jrds.standalone.JMX");
-        cmdClasses.put("wikidoc", "jrds.standalone.EnumerateWikiProbes");
-        cmdClasses.put("checkjar", "jrds.standalone.CheckJar");
-        cmdClasses.put("collect", "jrds.standalone.Collector");
-        cmdClasses.put("dosnmpprobe", "jrds.standalone.DoSnmpProbe");
-        cmdClasses.put("dump", "jrds.standalone.Dump");
-        cmdClasses.put("secrets", "jrds.standalone.SecretsHandling");
-    }
+    private static final String[] propertiesList = { "jetty.host", "jetty.port", "propertiesFile", "loglevel" };
+    private static final String defaultCommand = "jetty";
+    static final Map<String, CommandStarter> cmdClasses = new HashMap<>();
 
     /**
      * @param args
      * @throws Exception 
      */
     public static void main(String[] args) throws Exception {
-
         Path baseClassPath = getBaseClassPath();
         Properties configuration = new Properties();
-        for(String prop: propertiesList) {
+        for (String prop: propertiesList) {
             String propVal = System.getProperty(prop);
-            if(propVal != null)
+            if (propVal != null) {
                 configuration.put(prop, propVal);
+            }
         }
 
         configuration.put("webRoot", baseClassPath.normalize().toString());
 
-        ClassLoader cl = makeClassLoader(baseClassPath.resolve(Paths.get("WEB-INF", "lib")));
+        Path libpath = baseClassPath.resolve(Paths.get("WEB-INF", "lib"));
+        ClassLoader cl = makeClassLoader(libpath);
 
         String commandName = defaultCommand;
         if(args.length > 0) {
             commandName = args[0].trim().toLowerCase();
         }
 
+        ServiceLoader<CommandStarter> serviceLoader = ServiceLoader.load(CommandStarter.class, cl);
+        Iterator<CommandStarter> i = serviceLoader.iterator();
+        while (i.hasNext()) {
+            try {
+                CommandStarter cmd = i.next();
+                cmdClasses.put(cmd.getName(), cmd);
+            } catch (Exception e) {
+                System.out.format("Failed comamnd: %s%n", Util.resolveThrowableException(e));
+            }
+        }
+
         boolean help = false;
-        if("help".equals(commandName)) {
+        if ("help".equals(commandName)) {
             help = true;
             if(args.length > 1)
                 commandName = args[1].trim().toLowerCase();
             else
                 doHelp();
         } else {
-            if(args.length > 1)
+            if (args.length > 1)
                 args = Arrays.copyOfRange(args, 1, args.length);
             else {
                 args = new String[0];
             }
         }
 
-        CommandStarter command = findCmdClass(commandName, cl);
-        if(command == null) {
+        CommandStarter command = cmdClasses.get(commandName);
+        if (command == null) {
+            System.out.format("No command given, available commands: %s%n", String.join(", ", cmdClasses.keySet()));
             System.exit(1);
         }
-        if(help) {
+        // Release unused commands
+        cmdClasses.clear();
+        if (help) {
             command.help();
             System.exit(0);
         }
@@ -87,19 +95,8 @@ public class BootStrap {
         command.start(args);
     }
 
-    static private String ressourcePath(Object o) {
-        if(o instanceof Class<?>) {
-            Class<?> c = (Class<?>) o;
-            return "/".concat(c.getName().replace(".", "/").concat(".class"));
-        } else if(o instanceof String) {
-            return (String) o;
-        } else {
-            return "";
-        }
-    }
-
-    static private Path getBaseClassPath() throws IOException, URISyntaxException {
-        String path = ressourcePath(BootStrap.class);
+    private static Path getBaseClassPath() throws IOException, URISyntaxException {
+        String path = "/" + BootStrap.class.getName().replace(".", "/") + ".class";
         URL me = BootStrap.class.getResource(path);
         String protocol = me.getProtocol();
         URL rootUrl;
@@ -111,88 +108,67 @@ public class BootStrap {
         } else {
             throw new URISyntaxException(me.toString(), "Unhandled protocol");
         }
-
         return Paths.get(rootUrl.toURI()).getParent();
     }
 
-    static private ClassLoader makeClassLoader(Path baseClassPath) {
-        List<URL> classPath = new ArrayList<URL>();
+    private static ClassLoader makeClassLoader(Path baseClassPath) {
+        List<URL> classPath = new ArrayList<>();
 
-        Predicate<Path> filter = p -> {return Files.isRegularFile(p) && p.toString().endsWith(".jar");};
+        Predicate<Path> filter = p -> Files.isRegularFile(p) && p.toString().endsWith(".jar");
 
         Consumer<Path> enumerateDirectory = p -> {
             try {
                 Files.list(p)
-                .filter(filter)
-                .map( i -> i.normalize())
-                .map( i-> i.toUri())
-                .map(i -> {
-                    try {
-                        return i.toURL();
-                    } catch (MalformedURLException e) {
-                        throw new UncheckedIOException(e);
-                    }
-                })
-                .forEach(classPath::add);
+                     .filter(filter)
+                     .map(Path::normalize)
+                     .map(Path::toUri)
+                     .map(i -> {
+                         try {
+                             return i.toURL();
+                         } catch (MalformedURLException e) {
+                             throw new UncheckedIOException(e);
+                         }
+                     })
+                     .forEach(classPath::add);
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
             }
         };
 
-        enumerateDirectory.accept(baseClassPath);
+        if (Files.isDirectory(baseClassPath)) {
+            enumerateDirectory.accept(baseClassPath);
+        }
 
         String libspath = System.getProperty("libspath", "");
 
         Arrays.stream(libspath.split(String.valueOf(File.pathSeparatorChar)))
-        .map(Paths::get)
-        .forEach( p -> {
-            if (Files.isDirectory (p)) {
-                enumerateDirectory.accept(p);
-            } else if (filter.test(p)){
-                try {
-                    classPath.add(p.normalize().toUri().toURL());
-                } catch (MalformedURLException e) {
-                    throw new UncheckedIOException(e);
-                }
-
-            }
-        });
-        return URLClassLoader.newInstance(classPath.toArray(new URL[classPath.size()]));
+              .map(Paths::get)
+              .forEach(p -> {
+                  if (Files.isDirectory (p)) {
+                      enumerateDirectory.accept(p);
+                  } else if (filter.test(p)){
+                      try {
+                          classPath.add(p.normalize().toUri().toURL());
+                      } catch (MalformedURLException e) {
+                          throw new UncheckedIOException(e);
+                      }
+                  }
+              });
+        return URLClassLoader.newInstance(classPath.toArray(new URL[0]));
     }
 
-    static private void doHelp() {
+    private static void doHelp() {
         System.out.println("Lists of available command:");
-        for(String commandName: cmdClasses.keySet()) {
+        for (String commandName: cmdClasses.keySet()) {
             System.out.println("    " + commandName);
         }
         System.out.println("");
         System.out.println("Lists of configuration properties:");
-        for(String propName: propertiesList) {
+        for (String propName: propertiesList) {
             System.out.println("    " + propName);
         }
         System.out.println(String.format("A class path can be auto build with the system property libspath that contains  list of directory or jar, separated by a %s", File.pathSeparatorChar));
         System.exit(0);
     }
 
-    @SuppressWarnings("unchecked")
-    static private CommandStarter findCmdClass(String command, ClassLoader cl) {
-        String cmdClass = cmdClasses.get(command);
-        if(cmdClass == null) {
-            System.out.println("Unknown command: " + command);
-            return null;
-        }
-        Class<CommandStarter> cmdStarter;
-        try {
-            cmdStarter = (Class<CommandStarter>) cl.loadClass(cmdClass);
-        } catch (ClassNotFoundException e) {
-            System.err.println("JRDS installation not found");
-            return null;
-        }
-        try {
-            return cmdStarter.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
 }

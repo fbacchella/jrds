@@ -209,4 +209,10 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
     private String doTitle(String title) {
         return String.format("=====%s=====", title);
     }
+
+    @Override
+    public String getName() {
+        return "wikidoc";
+    }
+
 }

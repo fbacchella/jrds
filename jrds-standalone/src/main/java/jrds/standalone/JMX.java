@@ -65,4 +65,9 @@ public class JMX extends CommandStarterImpl {
         System.out.println("The jrds configuration file is specified using the property propertiesFile");
     }
 
+    @Override
+    public String getName() {
+        return "jmxserver";
+    }
+
 }

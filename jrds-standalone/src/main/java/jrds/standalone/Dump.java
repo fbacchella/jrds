@@ -61,4 +61,9 @@ public class Dump extends CommandStarterImpl {
         }
     }
 
+    @Override
+    public String getName() {
+        return "dump";
+    }
+
 }

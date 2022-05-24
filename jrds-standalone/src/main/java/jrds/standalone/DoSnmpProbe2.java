@@ -132,4 +132,9 @@ public class DoSnmpProbe2 extends CommandStarterImpl {
             System.out.println("can't manage " + oidstring);
         }
     }
+    @Override
+    public String getName() {
+        return null;
+    }
+
 }

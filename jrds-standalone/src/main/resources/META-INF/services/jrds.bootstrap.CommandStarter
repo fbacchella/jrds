@@ -1,0 +1,8 @@
+jrds.standalone.Jetty
+jrds.standalone.JMX
+jrds.standalone.EnumerateWikiProbes
+jrds.standalone.CheckJar
+jrds.standalone.Collector
+jrds.standalone.DoSnmpProbe
+jrds.standalone.Dump
+jrds.standalone.SecretsHandling

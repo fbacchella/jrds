@@ -41,4 +41,9 @@ public class Collector extends CommandStarterImpl {
         }
     }
 
+    @Override
+    public String getName() {
+        return "collect";
+    }
+
 }
