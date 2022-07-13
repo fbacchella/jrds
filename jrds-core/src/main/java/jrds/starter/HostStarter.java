@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.slf4j.event.Level;
 
 import jrds.HostInfo;
@@ -38,12 +39,14 @@ public class HostStarter extends StarterNode {
     }
 
     public void collectAll() {
+        MDC.put("host", host.getName());
         log(Level.DEBUG, "Starting collect");
         Timer timer = (Timer) getParent();
         startCollect();
         String oldThreadName = Thread.currentThread().getName();
         long start = System.currentTimeMillis();
         for(Probe<?, ?> probe: allProbes) {
+            MDC.put("probe", probe.getName());
             if(!isCollectRunning())
                 break;
             log(Level.TRACE, "Starting collect of probe %s", probe);
@@ -55,11 +58,13 @@ public class HostStarter extends StarterNode {
                 break;
             }
             setRunningname(oldThreadName + ":finished");
+            MDC.remove("probe");
         }
         stopCollect();
         long end = System.currentTimeMillis();
         float elapsed = (end - start) / 1000f;
         log(Level.DEBUG, "Collect time: %fs", elapsed);
+        MDC.remove("host");
     }
 
     public String toString() {
