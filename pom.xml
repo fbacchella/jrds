@@ -16,13 +16,13 @@
     <properties>
         <year>2022</year>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.4.46.v20220331</jetty.version>
+        <jetty.version>9.4.48.v20220622</jetty.version>
         <maven.plugin.surefire.version>3.0.0-M5</maven.plugin.surefire.version>
         <servlet-api.version>3.1.0</servlet-api.version>
         <junit.version>4.13.2</junit.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <log4j2.version>2.17.1</log4j2.version>
-        <lombok.version>1.18.22</lombok.version>
+        <log4j2.version>2.18.0</log4j2.version>
+        <lombok.version>1.18.24</lombok.version>
         <jolokia.version>1.7.1</jolokia.version>
         <jrds.hidelogs>true</jrds.hidelogs>
         <!-- Tell sonar where to look for the coverage file. Property inherited by submodules -->
@@ -113,10 +113,10 @@
                             <link>https://rrd4j.github.io/rrd4j/apidocs/</link>
                             <link>https://junit.org/junit4/javadoc/latest/</link>
                             <link>https://javadoc.io/doc/org.eclipse.jetty/jetty-http/${jetty.version}/</link>
-                            <link>http://ws.apache.org/xmlrpc/apidocs/</link>
+                            <link>https://ws.apache.org/xmlrpc/apidocs/</link>
                             <link>https://stleary.github.io/JSON-java/</link>
-                            <link>http://logging.apache.org/log4j/1.2/apidocs/</link>
-                            <link>http://commons.apache.org/proper/commons-net/javadocs/api-3.6/</link>
+                            <link>https://logging.apache.org/log4j/1.2/apidocs/</link>
+                            <link>https://commons.apache.org/proper/commons-net/javadocs/api-3.6/</link>
                             <link>https://commons.apache.org/proper/commons-fileupload/apidocs/</link>
                             <link>https://hc.apache.org/httpcomponents-client-5.1.x/current/httpclient5/apidocs/</link>
                             <!-- sometime fails for no reason -->
@@ -183,7 +183,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.2.1</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
