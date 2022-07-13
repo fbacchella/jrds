@@ -118,7 +118,7 @@
                             <link>https://logging.apache.org/log4j/1.2/apidocs/</link>
                             <link>https://commons.apache.org/proper/commons-net/javadocs/api-3.6/</link>
                             <link>https://commons.apache.org/proper/commons-fileupload/apidocs/</link>
-                            <link>https://hc.apache.org/httpcomponents-client-5.1.x/current/httpclient5/apidocs/</link>
+                            <link>https://javadoc.io/doc/org.apache.httpcomponents.client5/httpclient5/5.1/</link>
                             <!-- sometime fails for no reason -->
                             <!--link>https://javadoc.io/doc/com.jayway.jsonpath/json-path/2.4.0</link-->
                         </links>
