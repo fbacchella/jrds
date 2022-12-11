@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -260,15 +261,19 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         String archivesName;
         // Check if a custom archives list is defined
         if(probeNode.hasAttribute("archivesset")) {
-            archivesName = probeNode.getAttribute("archivesset");
+            archivesName = Optional.ofNullable(probeNode.getAttribute("archivesset")).filter(s -> ! s.isEmpty()).orElse(null);
+            if(archivesName == null) {
+                logger.error("Empty archives set name");
+                return null;
+            }
         } else {
             archivesName = pm.archivesSet;
         }
-        if(archivesName == null || "".equals(archivesName) || !archivessetmap.containsKey(archivesName)) {
-            logger.error("invalid archives set name: " + archivesName);
+        archivesName = Util.parseTemplate(archivesName, properties, p, host, pm.secrets);
+        if(!archivessetmap.containsKey(archivesName)) {
+            logger.error("Invalid archives set name: " + archivesName);
             return null;
         }
-        archivesName = Util.parseTemplate(archivesName, properties, p, host, pm.secrets);
         ArchivesSet archives = archivessetmap.get(archivesName);
         p.setArchives(archives);
 
