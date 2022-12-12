@@ -11,11 +11,33 @@ import org.slf4j.event.Level;
 
 import jrds.Probe;
 import jrds.factories.ProbeBean;
+import jrds.factories.ProbeMeta;
 import jrds.starter.Resolver;
+import jrds.starter.Starter;
 
 @ProbeBean({ "port" })
+@ProbeMeta(timerStarter=Ntp.NtpClientStarter.class)
 public class Ntp extends Probe<String, Number> {
-    static final NTPUDPClient client = new NTPUDPClient();
+
+    public static class NtpClientStarter extends Starter {
+        private ThreadLocal<NTPUDPClient> clientProvider;
+        @Override
+        public boolean start() {
+            clientProvider = ThreadLocal.withInitial(NTPUDPClient::new);
+            return super.start();
+        }
+
+        @Override
+        public void stop() {
+            clientProvider = null;
+            super.stop();
+        }
+
+        public NTPUDPClient getUdpClient() {
+            return clientProvider.get();
+        }
+    }
+
     int port = NTPUDPClient.DEFAULT_PORT;
 
     public Boolean configure() {
@@ -24,39 +46,32 @@ public class Ntp extends Probe<String, Number> {
 
     public Boolean configure(Integer port) {
         this.port = port;
-        return configure();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see jrds.Probe#setTimeout(int)
-     */
-    @Override
-    public void setTimeout(int timeout) {
-        super.setTimeout(timeout);
-        client.setDefaultTimeout(timeout);
+        return true;
     }
 
     @Override
     public Map<String, Number> getNewSampleValues() {
         Resolver resolv = find(Resolver.class);
-        if(!resolv.isStarted())
+        if(!resolv.isStarted()) {
             return null;
-        try {
-            TimeInfo ti = client.getTime(resolv.getInetAddress(), port);
-            ti.computeDetails();
-            NtpV3Packet pkct = ti.getMessage();
-            Map<String, Number> retValues = new HashMap<String, Number>(4);
-            retValues.put("RootDelay", pkct.getRootDelayInMillisDouble());
-            retValues.put("RootDispersion", pkct.getRootDispersionInMillisDouble());
-            retValues.put("Offset", ti.getOffset());
-            retValues.put("Delay", ti.getDelay());
-            return retValues;
-        } catch (IOException e) {
-            log(Level.ERROR, e, "NTP IO exception %s", e);
+        } else {
+            try {
+                NTPUDPClient client = find(NtpClientStarter.class).getUdpClient();
+                client.setDefaultTimeout(this.getTimeout() * 1000);
+                TimeInfo ti = client.getTime(resolv.getInetAddress(), port);
+                ti.computeDetails();
+                NtpV3Packet pkct = ti.getMessage();
+                Map<String, Number> retValues = new HashMap<>(4);
+                retValues.put("RootDelay", pkct.getRootDelayInMillisDouble());
+                retValues.put("RootDispersion", pkct.getRootDispersionInMillisDouble());
+                retValues.put("Offset", ti.getOffset());
+                retValues.put("Delay", ti.getDelay());
+                return retValues;
+            } catch (IOException e) {
+                log(Level.ERROR, e, "NTP IO exception %s", e);
+                return null;
+            }
         }
-        return null;
     }
 
     @Override
