@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.13</version>
+            <version>4.5.14</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -194,6 +194,6 @@
     <parent>
         <groupId>fr.jrds</groupId>
         <artifactId>jrds</artifactId>
-        <version>2022.1-SNAPSHOT</version>
+        <version>2023.1-SNAPSHOT</version>
     </parent>
 </project>

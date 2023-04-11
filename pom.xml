@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.jrds</groupId>
     <artifactId>jrds</artifactId>
-    <version>2022.1-SNAPSHOT</version>
+    <version>2023.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>JRDS</name>
     <url>http://jrds.fr</url>
@@ -14,16 +14,16 @@
     </organization>
 
     <properties>
-        <year>2022</year>
+        <year>2023</year>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jetty.version>9.4.50.v20221201</jetty.version>
-        <maven.plugin.surefire.version>3.0.0-M7</maven.plugin.surefire.version>
+        <jetty.version>9.4.51.v20230217</jetty.version>
+        <maven.plugin.surefire.version>3.0.0-M9</maven.plugin.surefire.version>
         <servlet-api.version>3.1.0</servlet-api.version>
         <junit.version>4.13.2</junit.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <log4j2.version>2.19.0</log4j2.version>
-        <lombok.version>1.18.24</lombok.version>
-        <jolokia.version>1.7.1</jolokia.version>
+        <log4j2.version>2.20.0</log4j2.version>
+        <lombok.version>1.18.26</lombok.version>
+        <jolokia.version>1.7.2</jolokia.version>
         <jrds.hidelogs>true</jrds.hidelogs>
         <!-- Tell sonar where to look for the coverage file. Property inherited by submodules -->
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
@@ -66,7 +66,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -81,32 +81,22 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.10.1</version>
-                    <configuration>
-                        <compilerArgs>
-                            <arg>-Xlint</arg>
-                            <arg>-Xbootclasspath/p:${bootclasspath}</arg>
-                        </compilerArgs>
-                        <showWarnings>false</showWarnings>
-                        <!-- needed for maven-plugin-javadoc to find the source version to use -->
-                        <source>${maven.compiler.source}</source>
-                        <target>${maven.compiler.target}</target>
-                    </configuration>
+                    <version>3.11.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.2</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.5.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.5.0</version>
                     <configuration>
                         <quiet/>
                         <links>
@@ -168,22 +158,22 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>3.0.0-M2</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>4.0.0-M2</version>
+                    <version>4.0.0-M5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>3.4.1</version>
+                    <version>3.4.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -216,7 +206,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.0.0-M6</version>
+                    <version>3.0.0-M7</version>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -45,12 +45,12 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.31</version>
+            <version>8.0.32</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.5.1</version>
+            <version>42.6.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -105,6 +105,6 @@
     <parent>
         <groupId>fr.jrds</groupId>
         <artifactId>jrds</artifactId>
-        <version>2022.1-SNAPSHOT</version>
+        <version>2023.1-SNAPSHOT</version>
     </parent>
 </project>
