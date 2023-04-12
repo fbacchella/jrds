@@ -22,6 +22,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.event.Level;
 
 import jrds.ConnectedProbe;
+import jrds.factories.ProbeBean;
 import jrds.factories.ProbeMeta;
 import jrds.starter.Connection;
 import lombok.Getter;
@@ -43,6 +44,7 @@ import lombok.Setter;
 @ProbeMeta(
         timerStarter=jrds.probe.HttpClientStarter.class
         )
+@ProbeBean({ "connectionName" })
 public abstract class HCHttpProbe<KeyType> extends HttpProbe<KeyType> implements SSLProbe, ConnectedProbe  {
 
     @Getter @Setter

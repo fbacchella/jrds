@@ -1,26 +1,23 @@
 package jrds.probe;
 
-import java.net.MalformedURLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import jrds.Probe;
 import jrds.factories.ArgFactory;
 import jrds.factories.ProbeBean;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 public class ApacheStatusTest extends ApacheStatusDetails {
-
-    public ApacheStatusTest() throws MalformedURLException {
-    }
 
     @Test
     public void parse() {
-        Map<String, Number> values = new HashMap<String, Number>();
+        Map<String, Number> values = new HashMap<>();
 
         parseScoreboard("_SRWKDCLGI.", values);
 
@@ -38,11 +35,13 @@ public class ApacheStatusTest extends ApacheStatusDetails {
 
     @Test
     public void testBeans() {
-        Set<String> beans = new HashSet<String>();
+        Set<String> beans = new HashSet<>();
         for(ProbeBean beansAnnotation: ArgFactory.enumerateAnnotation(ApacheStatusDetails.class, ProbeBean.class, Probe.class)) {
-            for(String bean: beansAnnotation.value()) {
-                beans.add(bean);
-            }
+            Collections.addAll(beans, beansAnnotation.value());
+        }
+        for(String goodBean: HCHttpProbe.class.getAnnotation(ProbeBean.class).value()) {
+            Assert.assertTrue(goodBean + " not found", beans.contains(goodBean));
+            beans.remove(goodBean);
         }
         for(String goodBean: HttpProbe.class.getAnnotation(ProbeBean.class).value()) {
             Assert.assertTrue(goodBean + " not found", beans.contains(goodBean));
@@ -50,4 +49,5 @@ public class ApacheStatusTest extends ApacheStatusDetails {
         }
         Assert.assertEquals("unknown beans  " + beans, 0, beans.size());
     }
+
 }
