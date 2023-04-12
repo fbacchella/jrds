@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>ElasticNodeProcess7</name>
+    <probeName>elasticnode_process${attr.nodename}</probeName>
+    <probeClass>jrds.jsonp.probe.HttpJson</probeClass>
+    <customattr name="nodename" />
+    <specific name="upTimePath">$.nodes.*.jvm.uptime_in_millis</specific>
+    <uptimefactor>0.001</uptimefactor>
+    <defaultargs>
+        <attr name="port">9200</attr>
+        <attr name="file">/_nodes/_local/stats/jvm,process</attr>
+    </defaultargs>
+    <!-- process -->
+    <ds>
+        <dsName>process.open_file_descriptors</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.*.process.open_file_descriptors</collect>
+    </ds>
+    <ds>
+        <dsName>process.max_file_descriptors</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.*.process.max_file_descriptors</collect>
+    </ds>
+    <graphs>
+        <name>ElasticNodeFileDescriptors</name>
+    </graphs>
+</probedesc>
