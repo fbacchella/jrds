@@ -20,13 +20,15 @@
         <pathelement>HOST</pathelement>
         <pathelement>SERVICES</pathelement>
         <pathstring>Elasticearch</pathstring>
+        <pathstring>Node</pathstring>
         <pathstring>${attr.nodename}</pathstring>
-        <pathstring>Docs counts</pathstring>
+        <pathstring>Documents counts</pathstring>
     </hosttree>
     <viewtree>
         <pathelement>SERVICES</pathelement>
         <pathstring>Elasticearch</pathstring>
-        <pathstring>Docs counts</pathstring>
+        <pathstring>Node</pathstring>
+        <pathstring>Documents counts</pathstring>
         <pathstring>${attr.nodename}</pathstring>
     </viewtree>
 </graphdesc>

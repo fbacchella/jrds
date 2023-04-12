@@ -49,12 +49,14 @@
         <pathelement>HOST</pathelement>
         <pathelement>SERVICES</pathelement>
         <pathstring>Elasticearch</pathstring>
+        <pathstring>Node</pathstring>
         <pathstring>${attr.nodename}</pathstring>
         <pathstring>Averation operation time</pathstring>
     </hosttree>
     <viewtree>
         <pathelement>SERVICES</pathelement>
         <pathstring>Elasticearch</pathstring>
+        <pathstring>Node</pathstring>
         <pathstring>Averation operation time</pathstring>
         <pathstring>${attr.nodename}</pathstring>
     </viewtree>

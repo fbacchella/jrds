@@ -20,12 +20,14 @@
         <pathelement>HOST</pathelement>
         <pathelement>SERVICES</pathelement>
         <pathstring>Elasticearch</pathstring>
+        <pathstring>Node</pathstring>
         <pathstring>${attr.nodename}</pathstring>
         <pathstring>Translog size</pathstring>
     </hosttree>
     <viewtree>
         <pathelement>SERVICES</pathelement>
         <pathstring>Elasticearch</pathstring>
+        <pathstring>Node</pathstring>
         <pathstring>Translog size</pathstring>
         <pathstring>${attr.nodename}</pathstring>
     </viewtree>

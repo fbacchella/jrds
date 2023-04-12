@@ -98,12 +98,14 @@
         <pathelement>HOST</pathelement>
         <pathelement>SERVICES</pathelement>
         <pathstring>Elasticearch</pathstring>
+        <pathstring>Node</pathstring>
         <pathstring>${attr.nodename}</pathstring>
         <pathstring>Threads completed</pathstring>
     </hosttree>
     <viewtree>
         <pathelement>SERVICES</pathelement>
         <pathstring>Elasticearch</pathstring>
+        <pathstring>Node</pathstring>
         <pathstring>Threads completed</pathstring>
         <pathstring>${attr.nodename}</pathstring>
     </viewtree>

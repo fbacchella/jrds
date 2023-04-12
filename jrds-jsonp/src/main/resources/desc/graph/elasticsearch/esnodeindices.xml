@@ -40,12 +40,14 @@
         <pathelement>HOST</pathelement>
         <pathelement>SERVICES</pathelement>
         <pathstring>Elasticearch</pathstring>
+        <pathstring>Node</pathstring>
         <pathstring>${attr.nodename}</pathstring>
         <pathstring>Requests/s</pathstring>
     </hosttree>
     <viewtree>
         <pathelement>SERVICES</pathelement>
         <pathstring>Elasticearch</pathstring>
+        <pathstring>Node</pathstring>
         <pathstring>Requests/s</pathstring>
         <pathstring>${attr.nodename}</pathstring>
     </viewtree>

@@ -22,12 +22,14 @@
         <pathelement>HOST</pathelement>
         <pathelement>SERVICES</pathelement>
         <pathstring>Elasticearch</pathstring>
+        <pathstring>Cluster</pathstring>
         <pathstring>${port}</pathstring>
         <pathstring>Documents count</pathstring>
     </hosttree>
     <viewtree>
         <pathelement>SERVICES</pathelement>
         <pathstring>Elasticearch</pathstring>
+        <pathstring>Cluster</pathstring>
         <pathstring>Documents count</pathstring>
         <pathstring>${host}:${port}</pathstring>
     </viewtree>
