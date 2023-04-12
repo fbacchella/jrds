@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN"
+    "urn:jrds:probedesc">
+<probedesc>
+    <name>Elastic7ClusterStats</name>
+    <probeName>elasticcluster_stats${attr.port}</probeName>
+    <probeClass>jrds.jsonp.probe.HttpJson</probeClass>
+    <defaultargs>
+        <attr name="port">9200</attr>
+        <attr name="file">/_cluster/stats</attr>
+    </defaultargs>
+    <!-- indices -->
+    <ds>
+        <dsName>indices.count</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.indices.count</collect>
+    </ds>
+    <!-- shards -->
+    <ds>
+        <dsName>indices.shards.total</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.indices.shards.total</collect>
+    </ds>
+    <ds>
+        <dsName>indices.shards.primaries</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.indices.shards.primaries</collect>
+    </ds>
+    <!-- docs -->
+    <ds>
+        <dsName>indices.docs.count</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.indices.docs.count</collect>
+    </ds>
+    <ds>
+        <dsName>indices.docs.deleted</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.indices.docs.deleted</collect>
+    </ds>
+    <!-- nodes -->
+    <ds>
+        <dsName>nodes.count.total</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.count.total</collect>
+    </ds>
+    <ds>
+        <dsName>nodes.count.coordinating_only</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.count.coordinating_only</collect>
+    </ds>
+    <ds>
+        <dsName>nodes.count.data</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.count.data</collect>
+    </ds>
+    <ds>
+        <dsName>nodes.count.data_cold</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.count.data_cold</collect>
+    </ds>
+    <ds>
+        <dsName>nodes.count.data_content</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.count.data_content</collect>
+    </ds>
+    <ds>
+        <dsName>nodes.count.data_frozen</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.count.data_frozen</collect>
+    </ds>
+    <ds>
+        <dsName>nodes.count.data_hot</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.count.data_hot</collect>
+    </ds>
+    <ds>
+        <dsName>nodes.count.data_warm</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.count.data_warm</collect>
+    </ds>
+    <ds>
+        <dsName>nodes.count.ingest</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.count.ingest</collect>
+    </ds>
+    <ds>
+        <dsName>nodes.count.master</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.count.master</collect>
+    </ds>
+    <ds>
+        <dsName>nodes.count.ml</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.count.ml</collect>
+    </ds>
+    <ds>
+        <dsName>nodes.count.remote_cluster_client</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.count.remote_cluster_client</collect>
+    </ds>
+    <ds>
+        <dsName>nodes.count.transform</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.count.transform</collect>
+    </ds>
+    <ds>
+        <dsName>nodes.count.voting_only</dsName>
+        <dsType>gauge</dsType>
+        <collect>$.nodes.count.voting_only</collect>
+    </ds>
+
+    <graphs>
+        <name>ElasticClusterDocuments</name>
+    </graphs>
+</probedesc>

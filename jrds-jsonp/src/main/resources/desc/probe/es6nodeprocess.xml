@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN"
+    "urn:jrds:probedesc">
 <probedesc>
-    <name>ElasticNodeProcess7</name>
+    <name>Elastic6NodeProcess</name>
     <probeName>elasticnode_process${attr.nodename}</probeName>
     <probeClass>jrds.jsonp.probe.HttpJson</probeClass>
     <customattr name="nodename" />
