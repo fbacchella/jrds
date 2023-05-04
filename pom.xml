@@ -15,6 +15,7 @@
 
     <properties>
         <year>2023</year>
+        <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jetty.version>9.4.51.v20230217</jetty.version>
         <maven.plugin.surefire.version>3.0.0-M9</maven.plugin.surefire.version>
@@ -326,35 +327,6 @@
         </extensions>
     </build>
     <profiles>
-        <profile>
-            <id>java8</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <maven.compiler.source>1.8</maven.compiler.source>
-                <maven.compiler.target>1.8</maven.compiler.target>
-                <argLine>${arg.line}</argLine>
-            </properties>
-        </profile>
-        <profile>
-            <id>notjava8</id>
-            <activation>
-                <jdk>(1.8,)</jdk>
-            </activation>
-            <properties>
-                <maven.compiler.release>8</maven.compiler.release>
-                <argLine>${arg.line}</argLine>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>sonar</id>
             <build>

@@ -2,7 +2,7 @@ version: 2.1
 jobs:
     checkout:
         docker:
-            - image: cimg/openjdk:18.0
+            - image: cimg/openjdk:19.0
         steps:
             - checkout
             - restore_cache:
@@ -29,7 +29,7 @@ jobs:
                     - usr/share/snmp/mibs/
     build:
         docker:
-            - image: cimg/openjdk:18.0
+            - image: cimg/openjdk:19.0
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -48,9 +48,9 @@ jobs:
                 paths:
                     - home/circleci/.m2/repository
                     - home/circleci/project
-    testsj18:
+    testsj19:
         docker:
-            - image: cimg/openjdk:18.0
+            - image: cimg/openjdk:19.0
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -127,32 +127,9 @@ jobs:
             - store_test_results:
                 path: target/surefire-reports
             #don't persist_to_workspace, can't be done in parallel with testsj17
-    testsj8:
-        docker:
-            - image: cimg/openjdk:8.0
-        steps:
-            - attach_workspace:
-                at: /tmp/ws
-            - run:
-                command: |
-                    mv -n /tmp/ws/home/circleci/.m2 /home/circleci/
-                    mv -n /tmp/ws/home/circleci/.sonar /home/circleci/
-                    mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
-                    mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
-                    sudo mkdir -p /usr/share/snmp/mibs/
-                    sudo mv -n /tmp/ws/usr/share/snmp/mibs/* /usr/share/snmp/mibs/
-            - run:
-                command: |
-                    mkdir -p /tmp/$CIRCLE_JOB
-                    mvn -B test -Pskip -Darg.line="-Xmx2048m -Djava.io.tmpdir=/tmp/$CIRCLE_JOB" -s .circleci/settings.xml
-                environment:
-                    MAVEN_OPTS: "-Xmx512m"
-            - store_test_results:
-                path: target/surefire-reports
-            #don't persist_to_workspace, can't be done in parallel with testsj13
     publish:
         docker:
-            - image: cimg/openjdk:18.0
+            - image: cimg/openjdk:19.0
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -181,7 +158,7 @@ jobs:
                     - home/circleci/.sonar/cache
     savecache:
         docker:
-            - image: cimg/openjdk:18.0
+            - image: cimg/openjdk:19.0
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -203,7 +180,7 @@ workflows:
       - build:
           requires:
               - checkout
-      - testsj18:
+      - testsj19:
           requires:
               - build
           context: "Security variables"
@@ -213,15 +190,11 @@ workflows:
       - testsj11:
           requires:
               - build
-      - testsj8:
-          requires:
-              - build
       - publish:
           requires:
-              - testsj18
+              - testsj19
               - testsj17
               - testsj11
-              - testsj8
           context: "Security variables"
       - savecache:
           requires:
