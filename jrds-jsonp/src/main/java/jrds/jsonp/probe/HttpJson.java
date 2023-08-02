@@ -30,7 +30,6 @@ public class HttpJson extends HCHttpProbe<String> {
     private JsonPath uptimePointer = null;
     private JsonPath startPointer = null;
     private JsonPath currentTimePointer = null;
-    private String timePattern = null;
 
     @Override
     public Boolean configure() {
@@ -54,7 +53,7 @@ public class HttpJson extends HCHttpProbe<String> {
             } else {
                 String startTimePath = getPd().getSpecific("startTimePath");
                 String currentTimePath = getPd().getSpecific("currentTimePath");
-                timePattern = getPd().getSpecific("timePattern");
+                String timePattern = getPd().getSpecific("timePattern");
                 if(startTimePath != null && currentTimePath != null && timePattern != null) {
                     startPointer = JsonPath.compile(Util.parseTemplate(startTimePath, this));
                     currentTimePointer = JsonPath.compile(Util.parseTemplate(startTimePath, this));

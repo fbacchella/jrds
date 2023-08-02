@@ -34,14 +34,13 @@ public class DoSnmpProbe2 extends CommandStarterImpl {
     static final Pattern namePattern = Pattern.compile("^(.+)\\s+OBJECT-TYPE$");
     static final Pattern syntaxPattern = Pattern.compile(".*SYNTAX\\s+([a-zA-Z0-9]+).*");
 
-    private final DocumentBuilderFactory instance;
     private final DocumentBuilder dbuilder;
 
 
     public DoSnmpProbe2() {
         super();
         try {
-            instance = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
             // Focus on content, not structure
             instance.setIgnoringComments(true);
             instance.setValidating(true);
