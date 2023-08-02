@@ -70,7 +70,7 @@ public class TestReadElements {
         tester.start();
     }
 
-    private JSONObject jsonquery(String query) throws IOException, Exception {
+    private JSONObject jsonquery(String query) throws Exception {
         String url = String.format("http://tester%s", query);
         Response response = ToolsWebApp.doRequestGet(tester, url, 200);
         JSONObject content = new JSONObject(response.getContent());
@@ -78,7 +78,7 @@ public class TestReadElements {
         return (content);
     }
 
-    private TreeContent scantree(JSONObject tree) throws IOException, Exception {
+    private TreeContent scantree(JSONObject tree) throws Exception {
         TreeContent result = new TreeContent();
         int size = tree.getJSONArray("items").length();
         for(int i = 0; i < size; i++) {
@@ -108,7 +108,7 @@ public class TestReadElements {
     }
 
     @Test
-    public void testQueryHost() throws IOException, Exception {
+    public void testQueryHost() throws Exception {
         JSONObject tree = jsonquery("/jsontree?host=localhost");
         Assert.assertEquals(4, tree.getJSONArray("items").length());
         Assert.assertEquals(3, scantree(tree).graphs.size());
@@ -118,7 +118,7 @@ public class TestReadElements {
     }
 
     @Test
-    public void testQueryFilter() throws IOException, Exception {
+    public void testQueryFilter() throws Exception {
         JSONObject tree = jsonquery("/jsontree?filter=Localhost");
         Assert.assertEquals(21, tree.getJSONArray("items").length());
         Assert.assertEquals(7, scantree(tree).graphs.size());
@@ -128,7 +128,7 @@ public class TestReadElements {
     }
 
     @Test
-    public void testServicesTab() throws IOException, Exception {
+    public void testServicesTab() throws Exception {
         JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.SERVICESTAB);
         Assert.assertEquals(0, tree.getJSONArray("items").length());
         Assert.assertEquals(0, scantree(tree).graphs.size());
@@ -138,7 +138,7 @@ public class TestReadElements {
     }
 
     @Test
-    public void testViewTab() throws IOException, Exception {
+    public void testViewTab() throws Exception {
         JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.VIEWSTAB);
         Assert.assertEquals(11, tree.getJSONArray("items").length());
         Assert.assertEquals(3, scantree(tree).graphs.size());
@@ -148,7 +148,7 @@ public class TestReadElements {
     }
 
     @Test
-    public void testHostTab() throws IOException, Exception {
+    public void testHostTab() throws Exception {
         JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.HOSTSTAB);
         Assert.assertEquals(9, tree.getJSONArray("items").length());
         Assert.assertEquals(4, scantree(tree).graphs.size());
@@ -158,7 +158,7 @@ public class TestReadElements {
     }
 
     @Test
-    public void testTagsTab() throws IOException, Exception {
+    public void testTagsTab() throws Exception {
         JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.TAGSTAB);
         Assert.assertEquals(1, tree.getJSONArray("items").length());
         Assert.assertEquals(0, scantree(tree).graphs.size());
@@ -168,7 +168,7 @@ public class TestReadElements {
     }
 
     @Test
-    public void testCustomTab() throws IOException, Exception {
+    public void testCustomTab() throws Exception {
         JSONObject tree = jsonquery("/jsontree?tab=" + PropertiesManager.CUSTOMGRAPHTAB);
         Assert.assertEquals(2, tree.getJSONArray("items").length());
         Assert.assertEquals(1, scantree(tree).graphs.size());
@@ -178,7 +178,7 @@ public class TestReadElements {
     }
 
     @Test
-    public void testTabList() throws IOException, Exception {
+    public void testTabList() throws Exception {
         JSONObject queryparams = jsonquery("/queryparams");
         JSONObject tabslist = queryparams.getJSONObject("tabslist");
         for(String key: new String[]{ PropertiesManager.FILTERTAB, 
@@ -199,7 +199,7 @@ public class TestReadElements {
     }
 
     @Test
-    public void testDetails() throws IOException, Exception {
+    public void testDetails() throws Exception {
         JSONObject details = jsonquery("/details?pid=-554902849");
         Assert.assertEquals(-554902849, details.get("pid"));
         Assert.assertEquals("lo0", details.get("index"));

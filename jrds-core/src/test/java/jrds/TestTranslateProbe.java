@@ -22,7 +22,7 @@ public class TestTranslateProbe {
     private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
-    static public void configure() throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, Exception {
+    static public void configure() throws Exception {
         Tools.configure();
         Tools.prepareXml();
         pd = jrds.configuration.GeneratorHelper.getProbeDesc(Tools.parseRessource("fulldesc.xml"));
