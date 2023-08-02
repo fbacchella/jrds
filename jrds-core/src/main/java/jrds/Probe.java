@@ -67,10 +67,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         public void put(Map.Entry<String, Double> e) {
             if (e.getKey() == null) {
                 Probe.this.log(Level.ERROR, "trying to store a null key for a value");
-                return;
             } else if (e.getValue() == null) {
                 Probe.this.log(Level.ERROR, "trying to store a null value for key %s", e.getKey());
-                return;
             } else {
                 this.put(e.getKey(), e.getValue());
             }
