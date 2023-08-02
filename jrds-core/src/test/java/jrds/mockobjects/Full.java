@@ -1,6 +1,5 @@
 package jrds.mockobjects;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.Calendar;

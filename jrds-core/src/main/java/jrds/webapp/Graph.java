@@ -7,7 +7,6 @@ import java.nio.channels.WritableByteChannel;
 import java.util.Base64;
 import java.util.Date;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

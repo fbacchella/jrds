@@ -1,9 +1,6 @@
 package jrds.probe;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
 import org.junit.Before;

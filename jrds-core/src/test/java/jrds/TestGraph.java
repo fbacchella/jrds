@@ -1,8 +1,6 @@
 package jrds;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 
 import org.junit.Assert;
 import org.junit.Before;

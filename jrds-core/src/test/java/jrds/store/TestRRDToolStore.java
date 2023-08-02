@@ -1,9 +1,6 @@
 package jrds.store;
 
 import java.io.File;
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;
 import org.junit.Before;

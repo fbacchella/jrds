@@ -1,9 +1,7 @@
 package jrds.mockobjects;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.servlet.http.HttpServlet;

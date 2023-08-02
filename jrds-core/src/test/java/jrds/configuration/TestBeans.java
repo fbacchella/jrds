@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;

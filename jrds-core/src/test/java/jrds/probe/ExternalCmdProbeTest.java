@@ -5,8 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;

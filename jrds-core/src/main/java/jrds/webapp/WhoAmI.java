@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Collections;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;

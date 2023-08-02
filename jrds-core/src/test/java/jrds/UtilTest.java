@@ -1,7 +1,6 @@
 package jrds;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;

@@ -1,7 +1,5 @@
 package jrds.factories;
 
-import java.io.IOException;
-
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Assert;

@@ -1,7 +1,5 @@
 package jrds.configuration;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Map;
 

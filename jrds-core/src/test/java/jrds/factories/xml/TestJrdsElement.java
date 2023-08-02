@@ -1,9 +1,6 @@
 package jrds.factories.xml;
 
-import java.io.IOException;
-
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.junit.Assert;
 import org.junit.Before;
