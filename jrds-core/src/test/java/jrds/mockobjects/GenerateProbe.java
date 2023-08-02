@@ -71,8 +71,8 @@ public class GenerateProbe {
     @SuppressWarnings({ "unchecked"})
     public static final <P extends Probe<T, V>, T, V> P quickProbe(TemporaryFolder folder, ChainedMap<Object>... args) throws Exception {
         ChainedMap<Object> arg = new ChainedMap<Object>(0);
-        for(int i = 0; i < args.length; i++) {
-            arg.putAll(args[i]);
+        for (ChainedMap<Object> objectChainedMap : args) {
+            arg.putAll(objectChainedMap);
         }
         Class<P> probeClass = (Class<P>) arg.get(Probe.class.getCanonicalName());
         P probe;

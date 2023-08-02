@@ -34,8 +34,8 @@ public class TestACL {
 
     private ParamsBean prepareMoke(String[] keys, Object[] values) {
         Map<String, Object> paramsargs = new HashMap<String, Object>(keys.length);
-        for(int i = 0; i < keys.length; i++) {
-            paramsargs.put(keys[i], values[0]);
+        for (String key : keys) {
+            paramsargs.put(key, values[0]);
         }
         return new MockParamsBean(paramsargs);
     }
