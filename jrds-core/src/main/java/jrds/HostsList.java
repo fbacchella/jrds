@@ -401,9 +401,7 @@ public class HostsList extends StarterNode {
      * @return a graph tree
      */
     private GraphTree addTree(String label, String root) {
-        return treeMap.computeIfAbsent(label, k -> {
-           return GraphTree.makeGraph(root);
-        });
+        return treeMap.computeIfAbsent(label, k -> GraphTree.makeGraph(root));
     }
 
     public void addGraphs(Collection<GraphNode> graphs) {

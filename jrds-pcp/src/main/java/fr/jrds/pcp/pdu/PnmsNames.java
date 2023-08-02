@@ -34,7 +34,7 @@ public class PnmsNames extends Pdu {
         buffer.putInt(size);
         buffer.putInt(status);
         buffer.putInt(names.size());
-        names.forEach(s -> buffer.putString(s));
+        names.forEach(buffer::putString);
     }
 
     @Override

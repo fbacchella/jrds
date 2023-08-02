@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UnknownFormatConversionException;
@@ -144,17 +145,14 @@ public class Util {
         tFactory.setErrorListener(el);
     }
 
-    private static final ThreadLocal<MessageDigest> md5Source = new ThreadLocal<MessageDigest>() {
-        @Override
-        protected MessageDigest initialValue() {
-            try {
-                return MessageDigest.getInstance("MD5");
-            } catch (NoSuchAlgorithmException e) {
-                logger.error("You should not see this message, MD5 not available");
-                throw new RuntimeException(e);
-            }
+    private static final ThreadLocal<MessageDigest> md5Source = ThreadLocal.withInitial(() -> {
+        try {
+            return MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("You should not see this message, MD5 not available");
+            throw new RuntimeException(e);
         }
-    };
+    });
 
     public static MessageDigest getmd5() {
         return md5Source.get();
@@ -506,7 +504,7 @@ public class Util {
         <T> String convert(Object o, Class<T> clazz, Function<T, String> apply) {
             try {
                 return Optional.ofNullable(o)
-                               .filter(v -> v != null)
+                               .filter(Objects::nonNull)
                                .filter(v -> clazz.isAssignableFrom(v.getClass()))
                                .map(clazz::cast)
                                .map(apply::apply)

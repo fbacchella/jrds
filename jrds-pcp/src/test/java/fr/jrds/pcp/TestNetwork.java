@@ -26,16 +26,13 @@ public class TestNetwork extends Tester {
     @Test(expected = InterruptedException.class, timeout=3000)
     public void interrupted() throws UnknownHostException, IOException, InterruptedException {
         Thread current = Thread.currentThread();
-        Thread stopper = new Thread() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                    current.interrupt();
-                } catch (InterruptedException e) {
-                }
+        Thread stopper = new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                current.interrupt();
+            } catch (InterruptedException e) {
             }
-        };
+        });
         stopper.start();
         try (Connection cnx = new Connection(new InetSocketAddress(InetAddress.getByName("169.254.1.1"), 44321), 2000)) {
         }

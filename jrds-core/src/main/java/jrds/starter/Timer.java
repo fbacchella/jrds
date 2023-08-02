@@ -125,9 +125,7 @@ public class Timer extends StarterNode {
                 // So a collect failure will no prevent other collect from running
                 Thread subcollector = new Thread(Timer.this::collectAll, "Collect/" + Timer.this.name);
                 subcollector.setDaemon(true);
-                subcollector.setUncaughtExceptionHandler((t, ex) -> {
-                    Timer.this.log(Level.ERROR, ex, "A fatal error occured during collect: %s", ex);
-                });
+                subcollector.setUncaughtExceptionHandler((t, ex) -> Timer.this.log(Level.ERROR, ex, "A fatal error occured during collect: %s", ex));
                 subcollector.start();
                 MDC.remove("timer");
             }

@@ -25,12 +25,8 @@ import jrds.webapp.WithACL;
 public class Graph implements WithACL {
     static final private Logger logger = LoggerFactory.getLogger(Graph.class);
 
-    private static final ThreadLocal<SimpleDateFormat> lastUpdateFormat = new ThreadLocal<SimpleDateFormat>() {
-        @Override
-        protected SimpleDateFormat initialValue() {
-            return new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        }
-    };
+    private static final ThreadLocal<SimpleDateFormat> lastUpdateFormat = ThreadLocal.withInitial(
+            () -> new SimpleDateFormat("dd/MM/yyyy HH:mm"));
 
     private final GraphNode node;
     private Date start;

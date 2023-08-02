@@ -31,30 +31,21 @@ public class Download extends JrdsServlet {
     static final private Logger logger = LoggerFactory.getLogger(Download.class);
     static final String CONTENT_TYPE = "text/csv";
 
-    private static final ThreadLocal<SimpleDateFormat> humanDateFormat = new ThreadLocal<SimpleDateFormat>() {
-        @Override
-        protected SimpleDateFormat initialValue() {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        }
-    };
+    private static final ThreadLocal<SimpleDateFormat> humanDateFormat = ThreadLocal.withInitial(
+            () -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
-    protected static final ThreadLocal<DateFormat> epochFormat = new ThreadLocal<DateFormat>() {
+    protected static final ThreadLocal<DateFormat> epochFormat = ThreadLocal.withInitial(() -> new DateFormat() {
         @Override
-        protected DateFormat initialValue() {
-            return new DateFormat() {
-                @Override
-                public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition arg2) {
-                    return toAppendTo.append(date.getTime() / 1000);
-                }
-
-                @Override
-                public Date parse(String source, ParsePosition pos) {
-                    pos.setIndex(source.length());
-                    return new Date(Long.parseLong(source) * 1000);
-                }
-            };
+        public StringBuffer format(Date date, StringBuffer toAppendTo, FieldPosition arg2) {
+            return toAppendTo.append(date.getTime() / 1000);
         }
-    };
+
+        @Override
+        public Date parse(String source, ParsePosition pos) {
+            pos.setIndex(source.length());
+            return new Date(Long.parseLong(source) * 1000);
+        }
+    });
 
     public void doGet(HttpServletRequest req, HttpServletResponse res) {
 

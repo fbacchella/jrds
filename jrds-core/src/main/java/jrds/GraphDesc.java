@@ -865,9 +865,7 @@ public class GraphDesc implements WithACL {
         verticalLabel = builder.verticalLabel;
         if(builder.trees != null) {
             trees = new HashMap<>(builder.trees.size());
-            builder.trees.forEach((k,v) -> {
-                trees.put(k, new ArrayList<>(v));
-            });
+            builder.trees.forEach((k,v) -> trees.put(k, new ArrayList<>(v)));
         }
         graphName = builder.graphName;
         maxLengthLegend = builder.maxLengthLegend;

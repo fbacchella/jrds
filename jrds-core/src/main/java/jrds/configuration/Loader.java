@@ -37,9 +37,7 @@ public class Loader {
 
     static final private Logger logger = LoggerFactory.getLogger(Loader.class);
 
-    private static final FileFilter filter = file -> {
-        return (!file.isHidden()) && (file.isDirectory()) || (file.isFile() && file.getName().endsWith(".xml"));
-    };
+    private static final FileFilter filter = file -> (!file.isHidden()) && (file.isDirectory()) || (file.isFile() && file.getName().endsWith(".xml"));
 
     private final AtomicInteger threadCount = new AtomicInteger(0);
     private final ExecutorService tpool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2, r -> {

@@ -58,12 +58,8 @@ public class ParamsBean implements Serializable {
     static public final String FILTERCHOICE = "filter";
     static public final String HOSTCHOICE = "host";
 
-    private static final ThreadLocal<DateFormat> df = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            return new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        }
-    };
+    private static final ThreadLocal<DateFormat> df = ThreadLocal.withInitial(
+            () -> new SimpleDateFormat("yyyy-MM-dd HH:mm"));
 
     static private final Pattern rangePattern = Pattern.compile("(-?\\d+(.\\d+)?)([a-zA-Z]{0,2})");
     // static private final Pattern splitPattern =

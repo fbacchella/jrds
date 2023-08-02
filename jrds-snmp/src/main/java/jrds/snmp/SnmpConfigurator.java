@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -122,7 +123,7 @@ public class SnmpConfigurator extends ModuleConfigurator {
                         } catch (IOException e1) {
                             return false;
                         }
-                    }).toArray(j -> new Path[j]);
+                    }).toArray(Path[]::new);
                 } else {
                     return new Path[] {i};
                 }
@@ -130,8 +131,8 @@ public class SnmpConfigurator extends ModuleConfigurator {
                 return null;
             }
         })
-        .filter(i -> i != null)
-        .forEach( i-> loader.load(i));
+        .filter(Objects::nonNull)
+        .forEach(loader::load);
 
         return loader.buildTree();
     }

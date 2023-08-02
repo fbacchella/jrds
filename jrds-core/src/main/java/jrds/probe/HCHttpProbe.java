@@ -133,7 +133,7 @@ public abstract class HCHttpProbe<KeyType> extends HttpProbe<KeyType> implements
             log(Level.DEBUG, "looking for session %s", connectionName);
             session = Optional.ofNullable(find(Connection.class, connectionName))
                             .filter(HttpSession.class::isInstance)
-                            .map(s -> (HttpSession)s)
+                            .map(HttpSession.class::cast)
                             .orElse(null);
             Optional.ofNullable(session).ifPresent(s -> {
                 if (!s.makeSession(request)) {

@@ -117,15 +117,13 @@ public class Jetty extends CommandStarterImpl {
                 server.addBean(new MBeanContainer(mbs));
                 handlers.addHandler(new StatisticsHandler());
             }
-            Thread finish = new Thread() {
-                public void run() {
-                    try {
-                        server.stop();
-                    } catch (Exception e) {
-                        throw new RuntimeException("Jetty server failed to stop", e);
-                    }
+            Thread finish = new Thread(() -> {
+                try {
+                    server.stop();
+                } catch (Exception e) {
+                    throw new RuntimeException("Jetty server failed to stop", e);
                 }
-            };
+            });
             Runtime.getRuntime().addShutdownHook(finish);
             try {
                 server.start();

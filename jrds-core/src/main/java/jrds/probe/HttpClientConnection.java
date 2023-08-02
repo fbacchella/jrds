@@ -52,16 +52,10 @@ public class HttpClientConnection extends Connection<HttpClient> {
 
     public URL resolve(HttpClientStarter.UrlBuilder urlbuilder, HttpProbe<?> p, List<Object> args) throws MalformedURLException {
         Optional.ofNullable(url).ifPresent(urlbuilder::setUrl);
-        Optional.ofNullable(scheme).ifPresent(s -> {
-            urlbuilder.setScheme(Util.parseTemplate(scheme, p, args));
-        });
-        Optional.ofNullable(urlhost).ifPresent(s -> {
-            urlbuilder.setUrlhost(Util.parseTemplate(urlhost, p, args));
-        });
+        Optional.ofNullable(scheme).ifPresent(s -> urlbuilder.setScheme(Util.parseTemplate(scheme, p, args)));
+        Optional.ofNullable(urlhost).ifPresent(s -> urlbuilder.setUrlhost(Util.parseTemplate(urlhost, p, args)));
         Optional.ofNullable(port).ifPresent(urlbuilder::setPort);
-        Optional.ofNullable(file).ifPresent(s -> {
-            urlbuilder.setFile(Util.parseTemplate(file, p, args));
-        });
+        Optional.ofNullable(file).ifPresent(s -> urlbuilder.setFile(Util.parseTemplate(file, p, args)));
         return urlbuilder.build(p);
     }
 

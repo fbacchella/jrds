@@ -135,9 +135,7 @@ public class PcpConnexion extends jrds.starter.Connection<Connection> {
                     valueCache.put(name, idvalues);
                 }
             }
-            metricsnames.forEach(mn -> {
-                Optional.ofNullable(valueCache.get(mn).get(key)).ifPresent(n -> values.put(mn, n));
-            });
+            metricsnames.forEach(mn -> Optional.ofNullable(valueCache.get(mn).get(key)).ifPresent(n -> values.put(mn, n)));
             return values;
         } catch (UncheckedIOException e) {
             throw e.getCause();

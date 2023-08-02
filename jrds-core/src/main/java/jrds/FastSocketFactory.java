@@ -69,15 +69,10 @@ public class FastSocketFactory extends SocketFactory {
 
     @Deprecated
     RMIClientSocketFactory getRMIClientSocketFactory() {
-        return new RMIClientSocketFactory() {
-
-            @Override
-            public Socket createSocket(String host, int port)
-                            throws IOException {
-                Socket s = new FastSocket(timeout);
-                s.connect(new InetSocketAddress(InetAddress.getByName(host), port));
-                return s;
-            }
+        return (host, port) -> {
+            Socket s = new FastSocket(timeout);
+            s.connect(new InetSocketAddress(InetAddress.getByName(host), port));
+            return s;
         };
     }
 

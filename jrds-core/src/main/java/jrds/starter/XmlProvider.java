@@ -44,7 +44,7 @@ public class XmlProvider extends Starter {
 
     public static class XmlResolver implements CollectResolver<XPathExpression> {
         private static final XPathFactory factory = XPathFactory.newInstance();
-        private static final ThreadLocal<XPath> localXpath = ThreadLocal.withInitial(() -> factory.newXPath());
+        private static final ThreadLocal<XPath> localXpath = ThreadLocal.withInitial(factory::newXPath);
 
         @Override
         public XPathExpression resolve(String collectKey) {
