@@ -121,7 +121,7 @@ public class AbstractJrdsNode<NodeType extends Node> implements Node {
     }
 
     public NodeListIterator<AbstractJrdsNode<?>> getChildNodesIterator() {
-        return new NodeListIterator<AbstractJrdsNode<?>>(parent.getChildNodes());
+        return new NodeListIterator<>(parent.getChildNodes());
     }
 
     /**

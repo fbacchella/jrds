@@ -62,7 +62,7 @@ public class TestPropertiesManager {
     public void testConfigAutoCreate() throws IOException, IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
         PropertiesManager pm = new PropertiesManager();
 
-        Map<String, File> dirMap = new HashMap<String, File>(dirs.length);
+        Map<String, File> dirMap = new HashMap<>(dirs.length);
         for(String dirname: dirs) {
             File dir = testFolder.newFolder(dirname);
             pm.setProperty(dirname, dir.getPath());
@@ -83,7 +83,7 @@ public class TestPropertiesManager {
     public void testConfigNoAutoCreate() throws IOException, IllegalArgumentException, SecurityException {
         PropertiesManager pm = new PropertiesManager();
 
-        Map<String, File> dirMap = new HashMap<String, File>(dirs.length);
+        Map<String, File> dirMap = new HashMap<>(dirs.length);
         for(String dirname: dirs) {
             File dir = testFolder.newFolder(dirname);
             dir.delete();

@@ -86,7 +86,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         String hidden = hostNode.getAttribute("hidden");
         host.setHidden(hidden != null && Boolean.parseBoolean(hidden));
 
-        Map<String, Set<String>> collections = new HashMap<String, Set<String>>();
+        Map<String, Set<String>> collections = new HashMap<>();
 
         parseFragment(hostNode, host, collections, null);
 
@@ -111,7 +111,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
 
         for(JrdsElement collectionNode: fragment.getChildElementsByName("collection")) {
             String name = collectionNode.getAttribute("name");
-            Set<String> set = new HashSet<String>();
+            Set<String> set = new HashSet<>();
             for(JrdsElement e: collectionNode.getChildElementsByName("element")) {
                 set.add(e.getTextContent());
             }
@@ -127,7 +127,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 Map<String, String> macroProps = makeProperties(macroNode, properties, host, pm.secrets);
                 logger.trace("properties inherited for macro {}: {}", m, properties);
                 logger.trace("local properties for macro {}: {}", m, macroProps);
-                Map<String, String> newProps = new HashMap<String, String>((properties != null ? properties.size() : 0) + macroProps.size());
+                Map<String, String> newProps = new HashMap<>((properties != null ? properties.size() : 0) + macroProps.size());
                 if(properties != null)
                     newProps.putAll(properties);
                 newProps.putAll(macroProps);
@@ -156,7 +156,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                     logger.error("invalid range from{} to {} with step {}", min, max, step);
                     break;
                 }
-                set = new ArrayList<String>((max - min) / step + 1);
+                set = new ArrayList<>((max - min) / step + 1);
                 for (int i = min; i <= max; i += step) {
                     set.add(Integer.toString(i));
                 }
@@ -166,7 +166,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 for(String i: set) {
                     Map<String, String> temp;
                     if(properties != null) {
-                        temp = new HashMap<String, String>(properties.size() + 1);
+                        temp = new HashMap<>(properties.size() + 1);
                         temp.putAll(properties);
                         temp.put(iterprop, i);
                     } else {
@@ -208,7 +208,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 // Read the beans value for this graph and store them in a map
                 // The map is used for template parsing and will be used for
                 // graph instantiation
-                Map<String, String> attrs = new HashMap<String, String>(0);
+                Map<String, String> attrs = new HashMap<>(0);
                 for(JrdsElement attrNode: graphNode.getChildElementsByName("attr")) {
                     String name = attrNode.getAttribute("name");
                     String value = Util.parseTemplate(attrNode.getTextContent(), host, gd, pm.secrets);
@@ -461,7 +461,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 String connectionClassName = "jrds.snmp.SnmpConnection";
                 Class<? extends Connection<?>> connectionClass = (Class<? extends Connection<?>>) pm.extensionClassLoader.loadClass(connectionClassName);
 
-                Map<String, String> attrs = new HashMap<String, String>();
+                Map<String, String> attrs = new HashMap<>();
                 for(Map.Entry<String, String> e: snmpNode.attrMap().entrySet()) {
                     attrs.put(e.getKey(), Util.parseTemplate(e.getValue(), parent, properties, pm.secrets));
                 }
@@ -484,7 +484,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
      * @return
      */
     Set<ConnectionInfo> makeConnexion(JrdsElement domNode, Object parent, Map<String, String> properties) {
-        Set<ConnectionInfo> connectionSet = new HashSet<ConnectionInfo>();
+        Set<ConnectionInfo> connectionSet = new HashSet<>();
 
         // Check for the old SNMP connection node
         ConnectionInfo cnxSnmp = parseSnmp(domNode, parent, properties);
@@ -508,7 +508,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 List<Object> args = ArgFactory.makeArgs(cnxNode, pm.secrets);
 
                 // Resolve the bean for the connection
-                Map<String, String> attrs = new HashMap<String, String>();
+                Map<String, String> attrs = new HashMap<>();
                 for(JrdsElement attrNode: cnxNode.getChildElementsByName("attr")) {
                     String attrName = attrNode.getAttribute("name");
                     String textValue = Util.parseTemplate(attrNode.getTextContent(), parent, properties, pm.secrets);
@@ -558,7 +558,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         if(propElem == null)
             return Collections.emptyMap();
 
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, String> props = new HashMap<>();
         for(JrdsElement propNode: propElem.getChildElementsByName("entry")) {
             String key = propNode.getAttribute("key");
             if(key != null) {

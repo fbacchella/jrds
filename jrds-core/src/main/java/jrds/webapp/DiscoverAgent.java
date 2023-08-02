@@ -68,7 +68,7 @@ public abstract class DiscoverAgent implements InstanceLogger{
 
     protected DiscoverAgent(String name, Class<?>... validClasses) {
         namedLogger = LoggerFactory.getLogger("jrds.DiscoverAgent." + name);
-        this.validClasses = new HashSet<Class<?>>(validClasses.length);
+        this.validClasses = new HashSet<>(validClasses.length);
         for(Class<?> c: validClasses) {
             this.validClasses.add(c);
         }

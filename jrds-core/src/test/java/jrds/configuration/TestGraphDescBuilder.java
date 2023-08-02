@@ -41,7 +41,7 @@ import jrds.store.ExtractInfo;
 
 public class TestGraphDescBuilder {
 
-    static final ConfigObjectBuilder<Object> ob = new ConfigObjectBuilder<Object>(ConfigType.GRAPHDESC) {
+    static final ConfigObjectBuilder<Object> ob = new ConfigObjectBuilder<>(ConfigType.GRAPHDESC) {
         @Override
         Object build(JrdsDocument n) {
             return null;
@@ -77,18 +77,18 @@ public class TestGraphDescBuilder {
         if(logger.isTraceEnabled()) {
             Document gddom = gd.dumpAsXml();
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            Map<String, String> prop = new HashMap<String, String>(3);
+            Map<String, String> prop = new HashMap<>(3);
             prop.put(OutputKeys.OMIT_XML_DECLARATION, "no");
             prop.put(OutputKeys.INDENT, "yes");
             prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
             jrds.Util.serialize(gddom, os, null, prop);
             logger.trace(new String(os.toByteArray(), StandardCharsets.UTF_8));
         }
-        MokeProbe<String, Number> p = new MokeProbe<String, Number>();
+        MokeProbe<String, Number> p = new MokeProbe<>();
         p.configure();
         p.getHost().setHostDir(testFolder.getRoot());
 
-        p.setMainStore(pm.defaultStore, new HashMap<String, String>(0));
+        p.setMainStore(pm.defaultStore, new HashMap<>(0));
 
         ProbeDesc<?> pd = p.getPd();
 
@@ -104,7 +104,7 @@ public class TestGraphDescBuilder {
         if(logger.isTraceEnabled()) {
             Document gddom = p.dumpAsXml(true);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            Map<String, String> prop = new HashMap<String, String>(3);
+            Map<String, String> prop = new HashMap<>(3);
             prop.put(OutputKeys.OMIT_XML_DECLARATION, "no");
             prop.put(OutputKeys.INDENT, "yes");
             prop.put("{http://xml.apache.org/xslt}indent-amount", "4");

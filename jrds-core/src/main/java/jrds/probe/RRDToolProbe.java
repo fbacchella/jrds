@@ -35,7 +35,7 @@ public class RRDToolProbe extends Probe<String, Double> {
             log(Level.TRACE, "rrd is %s", rrdpath.getCanonicalPath());
         } catch (IOException e) {
         }
-        Map<String, String> args = new HashMap<String, String>(1);
+        Map<String, String> args = new HashMap<>(1);
         try {
             args.put("rrdfile", rrdpath.getCanonicalPath());
             setMainStore(new RRDToolStoreFactory(), args);

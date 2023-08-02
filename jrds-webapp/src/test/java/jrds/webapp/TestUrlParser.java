@@ -54,7 +54,7 @@ public class TestUrlParser {
 
     @Test
     public void checkId() {
-        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        Map<String, String[]> parameters = new HashMap<>();
         parameters.put("id", new String[] { "1" });
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
         Assert.assertEquals(new Integer(1), pb.getId());
@@ -62,11 +62,11 @@ public class TestUrlParser {
 
     @Test
     public void checkIdRest() {
-        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        Map<String, String[]> parameters = new HashMap<>();
         parameters.put("host", new String[] { "DummyHost" });
         parameters.put("graphname", new String[] { "MockGraph" });
 
-        MokeProbe<String, Number> p = new MokeProbe<String, Number>();
+        MokeProbe<String, Number> p = new MokeProbe<>();
         p.configure();
         GraphNode gn = new MockGraph(p);
         gn.getGraphDesc().setGraphName("MockGraph");
@@ -79,12 +79,12 @@ public class TestUrlParser {
 
     @Test
     public void checkGraphRestURL1() throws ParseException {
-        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        Map<String, String[]> parameters = new HashMap<>();
         parameters.put("begin", new String[] { "2007-01-01" });
         parameters.put("end", new String[] { "2007-12-31" });
         Date begin = fullISOFORMAT.parse("2007-01-01T00:00:00");
         Date end = fullISOFORMAT.parse("2007-12-31T23:59:59");
-        MokeProbe<String, Number> p = new MokeProbe<String, Number>();
+        MokeProbe<String, Number> p = new MokeProbe<>();
         p.configure();
         GraphNode gn = new MockGraph(p);
         gn.getGraphDesc().setGraphName("MockGraphInstance");
@@ -107,13 +107,13 @@ public class TestUrlParser {
      */
     @Test
     public void checkGraphRestURL2() throws ParseException {
-        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        Map<String, String[]> parameters = new HashMap<>();
         parameters.put("graphname", new String[] { "MockGraphInstance" });
         parameters.put("begin", new String[] { "2007-01-01" });
         parameters.put("end", new String[] { "2007-12-31" });
         Date begin = fullISOFORMAT.parse("2007-01-01T00:00:00");
         Date end = fullISOFORMAT.parse("2007-12-31T23:59:59");
-        MokeProbe<String, Number> p = new MokeProbe<String, Number>();
+        MokeProbe<String, Number> p = new MokeProbe<>();
         p.configure();
         GraphNode gn = new MockGraph(p);
         gn.getGraphDesc().setGraphName("MockGraphInstance");
@@ -131,7 +131,7 @@ public class TestUrlParser {
 
     @Test
     public void checkSortedTrue() {
-        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        Map<String, String[]> parameters = new HashMap<>();
         parameters.put("sort", new String[] { "true" });
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
         Assert.assertTrue(pb.isSorted());
@@ -139,14 +139,14 @@ public class TestUrlParser {
 
     @Test
     public void checkSortedFalseDefault() {
-        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        Map<String, String[]> parameters = new HashMap<>();
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
         Assert.assertTrue(!pb.isSorted());
     }
 
     @Test
     public void checkParseDate1() throws ParseException {
-        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        Map<String, String[]> parameters = new HashMap<>();
         parameters.put("begin", new String[] { "2007-01-01" });
         parameters.put("end", new String[] { "2007-12-31" });
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
@@ -167,7 +167,7 @@ public class TestUrlParser {
 
     @Test
     public void checkParseDate2() {
-        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        Map<String, String[]> parameters = new HashMap<>();
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
         Period p = pb.getPeriod();
 
@@ -183,7 +183,7 @@ public class TestUrlParser {
 
     @Test
     public void checkParseDate3() {
-        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        Map<String, String[]> parameters = new HashMap<>();
         parameters.put("scale", new String[] { "4" });
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
         Period p = pb.getPeriod();
@@ -206,7 +206,7 @@ public class TestUrlParser {
 
     @Test
     public void checkUrl1() {
-        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        Map<String, String[]> parameters = new HashMap<>();
         parameters.put("host", new String[] { "host" });
         parameters.put("scale", new String[] { "2" });
         parameters.put("max", new String[] { "2" });
@@ -225,7 +225,7 @@ public class TestUrlParser {
 
     @Test
     public void checkUrl2() {
-        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        Map<String, String[]> parameters = new HashMap<>();
         parameters.put("max", new String[] { String.valueOf(Double.NaN) });
         parameters.put("min", new String[] { String.valueOf(Double.NaN) });
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
@@ -244,7 +244,7 @@ public class TestUrlParser {
 
     @Test
     public void checkUrl3() throws UnsupportedEncodingException {
-        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        Map<String, String[]> parameters = new HashMap<>();
         jrds.Filter f = jrds.Filter.ALLHOSTS;
         String filterName = f.getName();
         parameters.put("filter", new String[] { filterName });
@@ -270,7 +270,7 @@ public class TestUrlParser {
 
     @Test
     public void testPath() {
-        Map<String, String[]> parameters = new HashMap<String, String[]>();
+        Map<String, String[]> parameters = new HashMap<>();
         HttpServletRequest req = GetMoke.getRequest(parameters);
         ParamsBean pb = new ParamsBean(req, hl);
         String buildurl = pb.makeObjectUrl("graph", jrds.Filter.ALLHOSTS, true);

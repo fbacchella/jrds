@@ -24,7 +24,7 @@ public class ApacheStatusDetails extends ApacheStatus {
     // "C" Closing connection, "L" Logging, "G" Gracefully finishing,
     // "I" Idle cleanup of worker, "." Open slot with no current process
     // Can't be within the enum, it's defined after the first call toll add
-    static private final Map<Character, WorkerStat> map = new HashMap<Character, WorkerStat>();
+    static private final Map<Character, WorkerStat> map = new HashMap<>();
 
     enum WorkerStat {
         WAITING('_'),
@@ -58,7 +58,7 @@ public class ApacheStatusDetails extends ApacheStatus {
      * @see com.aol.jrds.HttpProbe#parseLines(java.util.List)
      */
     protected Map<String, Number> parseLines(List<String> lines) {
-        Map<String, Number> retValue = new HashMap<String, Number>(lines.size());
+        Map<String, Number> retValue = new HashMap<>(lines.size());
         for(String l: lines) {
             String[] kvp = l.split(":");
             if(kvp.length != 2)

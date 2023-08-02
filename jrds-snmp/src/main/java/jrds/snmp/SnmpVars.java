@@ -38,7 +38,7 @@ public class SnmpVars extends HashMap<OID, Object> {
     static final private byte TAG_FLOAT = (byte) 0x78;
     static final private byte TAG_DOUBLE = (byte) 0x79;
 
-    private final Map<OID, Integer> errors = new HashMap<OID, Integer>(0);
+    private final Map<OID, Integer> errors = new HashMap<>(0);
 
     public SnmpVars(PDU data) {
         super(data.size());

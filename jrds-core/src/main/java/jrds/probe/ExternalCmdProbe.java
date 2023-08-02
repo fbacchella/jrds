@@ -54,7 +54,7 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
     }
 
     protected String resolvCmdPath(String path) {
-        List<String> pathelements = new ArrayList<String>();
+        List<String> pathelements = new ArrayList<>();
         pathelements.addAll(Arrays.asList(path.split(";")));
         String envPath = System.getenv("PATH");
         String pathSeparator = System.getProperty("path.separator");

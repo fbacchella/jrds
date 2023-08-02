@@ -176,7 +176,7 @@ public class ProtocolBody extends KaitaiStruct {
      private final long id;
      ProtocolEnum(long id) { this.id = id; }
      public long id() { return id; }
-     private static final Map<Long, ProtocolEnum> byId = new HashMap<Long, ProtocolEnum>(144);
+     private static final Map<Long, ProtocolEnum> byId = new HashMap<>(144);
      static {
          for (ProtocolEnum e : ProtocolEnum.values())
              byId.put(e.id(), e);

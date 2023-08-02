@@ -83,7 +83,7 @@ public class TestMacro {
         HostBuilder hb = new HostBuilder();
         hb.setPm(Tools.makePm(testFolder));
         hb.setTimers(Tools.getSimpleTimerMap());
-        Map<String, Macro> mmap = new HashMap<String, Macro>(macros.length);
+        Map<String, Macro> mmap = new HashMap<>(macros.length);
         for(Macro m: macros) {
             mmap.put(m.getName(), m);
         }
@@ -117,7 +117,7 @@ public class TestMacro {
 
         HostInfo host = hb.makeHost(hostdoc);
 
-        Collection<String> probesName = new ArrayList<String>();
+        Collection<String> probesName = new ArrayList<>();
         for(Probe<?, ?> p: host.getProbes()) {
             probesName.add(p.toString());
         }
@@ -166,7 +166,7 @@ public class TestMacro {
 
     @Test
     public void testMacroFillwithProps2() throws Exception {
-        Map<String, String> prop = new HashMap<String, String>();
+        Map<String, String> prop = new HashMap<>();
         prop.put(OutputKeys.INDENT, "yes");
         prop.put(OutputKeys.INDENT, "yes");
         prop.put("{http://xml.apache.org/xslt}indent-amount", "4");

@@ -35,7 +35,7 @@ public class Full {
     static final int IMG_HEIGHT = 300;
 
     static public <KeyType> ProbeDesc<KeyType> getPd() {
-        ProbeDesc<KeyType> pd = new ProbeDesc<KeyType>();
+        ProbeDesc<KeyType> pd = new ProbeDesc<>();
 
         pd.add(ProbeDesc.getDataSourceBuilder("sun", DsType.GAUGE));
         pd.add(ProbeDesc.getDataSourceBuilder("shade", DsType.GAUGE));

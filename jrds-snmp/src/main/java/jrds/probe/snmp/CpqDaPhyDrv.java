@@ -22,7 +22,7 @@ public class CpqDaPhyDrv extends RdsIndexedSnmpRrd {
 
     @Override
     public Collection<OID> getIndexSet() {
-        Collection<OID> indexes = new HashSet<OID>(2);
+        Collection<OID> indexes = new HashSet<>(2);
         indexes.add(cpqDaPhyDrvCntlrIndex);
         indexes.add(cpqDaPhyDrvIndex);
         return indexes;

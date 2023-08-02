@@ -37,7 +37,7 @@ public class TabularIterator implements Iterable<SnmpVars> {
     @Override
     public Iterator<SnmpVars> iterator() {
         Iterator<TableEvent> tabIterator = events.iterator();
-        return new Iterator<SnmpVars>() {
+        return new Iterator<>() {
 
             @Override
             public boolean hasNext() {

@@ -79,7 +79,7 @@ public class ConfigObjectFactory {
     }
 
     public <BuildObject> Map<String, BuildObject> getObjectMap(ConfigObjectBuilder<BuildObject> ob, Map<String, JrdsDocument> nodeMap) {
-        Map<String, BuildObject> objectMap = new HashMap<String, BuildObject>();
+        Map<String, BuildObject> objectMap = new HashMap<>();
 
         for(Map.Entry<String, JrdsDocument> e: nodeMap.entrySet()) {
             JrdsDocument n = e.getValue();

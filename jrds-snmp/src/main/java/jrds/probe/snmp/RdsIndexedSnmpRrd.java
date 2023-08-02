@@ -90,7 +90,7 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
      * @return a set of OID that will be collected
      */
     protected Set<OID> makeIndexed(Collection<OID> oids, int[] index) {
-        Set<OID> oidToGet = new HashSet<OID>(oids.size());
+        Set<OID> oidToGet = new HashSet<>(oids.size());
         for(OID oidCurs: oids) {
             OID oidBuf = new OID(oidCurs.getValue(), index);
             oidToGet.add(oidBuf);

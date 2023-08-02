@@ -19,7 +19,7 @@ import org.w3c.dom.TypeInfo;
 public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
 
     private NamedNodeMap attrs = null;
-    private Map<String, JrdsElement> firstChildbyTag = new HashMap<String, JrdsElement>();
+    private Map<String, JrdsElement> firstChildbyTag = new HashMap<>();
 
     public JrdsElement(Element n) {
         super(n);
@@ -46,7 +46,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
     public Map<String, String> attrMap() {
         if(!checkAttributes())
             return Collections.emptyMap();
-        Map<String, String> retValues = new HashMap<String, String>(attrs.getLength());
+        Map<String, String> retValues = new HashMap<>(attrs.getLength());
         for(int i = 0; i < attrs.getLength(); i++) {
             Node attrNode = attrs.item(i);
             retValues.put(attrNode.getNodeName(), attrNode.getNodeValue());
@@ -138,7 +138,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
     }
 
     public Iterable<JrdsElement> getChildElementsByName(String name) {
-        return () -> new Iterator<JrdsElement>() {
+        return () -> new Iterator<>() {
             JrdsElement curs = getElementbyName(name);
 
             public boolean hasNext() {
@@ -169,7 +169,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
     }
 
     public List<JrdsElement> getChildElements() {
-        List<JrdsElement> elems = new ArrayList<JrdsElement>();
+        List<JrdsElement> elems = new ArrayList<>();
         for(AbstractJrdsNode<?> n: getChildNodesIterator()) {
             if(n.getNodeType() == Node.ELEMENT_NODE)
                 elems.add(new JrdsElement((Element) n));

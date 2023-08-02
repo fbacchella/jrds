@@ -82,7 +82,7 @@ public class UtilTest {
         String outBuffer;
 
         d = Tools.parseRessource("goodhost1.xml");
-        prop = new HashMap<String, String>();
+        prop = new HashMap<>();
         prop.put("omit-xml-declaration", "yes");
         Util.serialize(d, out, null, prop);
         outBuffer = out.toString();
@@ -100,7 +100,7 @@ public class UtilTest {
         d = Tools.parseRessource("customgraph.xml");
         String publicId = d.getDoctype().getPublicId();
         String systemId = d.getDoctype().getSystemId();
-        prop = new HashMap<String, String>();
+        prop = new HashMap<>();
 
         Util.serialize(d, out, null, prop);
         outBuffer = out.toString();
@@ -209,7 +209,7 @@ public class UtilTest {
 
     @Test
     public void testParseTemplate5() throws Exception {
-        Probe<String, Number> testProbe = GenerateProbe.fillProbe(new GenerateProbe.EmptyProbe<String, Number>(), testFolder, GenerateProbe.ChainedMap.start());
+        Probe<String, Number> testProbe = GenerateProbe.fillProbe(new GenerateProbe.EmptyProbe<>(), testFolder, GenerateProbe.ChainedMap.start());
         GenericBean b1 = new GenericBean.CustomBean("one");
         b1.set(testProbe, "one");
         testProbe.getPd().addBean(b1);

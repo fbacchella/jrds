@@ -43,7 +43,7 @@ public class Grapher {
 
         Period p = new Period();
         Renderer r = new Renderer(10, pm.tmpdir);
-        Collection<Integer> done = new HashSet<Integer>();
+        Collection<Integer> done = new HashSet<>();
         logger.debug("{}", hl.getTrees());
         for(GraphTree graphTree: hl.getTrees()) {
             logger.trace("Tree found: " + graphTree.getName());

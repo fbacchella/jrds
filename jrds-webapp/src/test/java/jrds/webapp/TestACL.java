@@ -32,7 +32,7 @@ public class TestACL {
     }
 
     private ParamsBean prepareMoke(String[] keys, Object[] values) {
-        Map<String, Object> paramsargs = new HashMap<String, Object>(keys.length);
+        Map<String, Object> paramsargs = new HashMap<>(keys.length);
         for (String key : keys) {
             paramsargs.put(key, values[0]);
         }
@@ -41,7 +41,7 @@ public class TestACL {
 
     @SuppressWarnings("unchecked")
     private <T> Set<T> arrayToSet(T... args) {
-        Set<T> set = new HashSet<T>(args.length);
+        Set<T> set = new HashSet<>(args.length);
         set.addAll(Arrays.asList(args));
         return set;
     }

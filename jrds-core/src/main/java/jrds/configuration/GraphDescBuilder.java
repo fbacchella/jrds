@@ -91,7 +91,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
         for(JrdsElement addnode: subnode.getChildElements()) {
             if(!"add".equals(addnode.getNodeName()) && !"addpath".equals(addnode.getNodeName()))
                 continue;
-            Map<String, String> elements = new HashMap<String, String>(10);
+            Map<String, String> elements = new HashMap<>(10);
             boolean withPath = false;
             DsDescBuilder builder = GraphDesc.getDsDescBuilder();
             for(JrdsElement child: addnode.getChildElements()) {
@@ -176,7 +176,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
         if(path.isEmpty())
             return Collections.emptyList();
 
-        List<Object> pathString = new ArrayList<Object>(path.size());
+        List<Object> pathString = new ArrayList<>(path.size());
         for(JrdsElement te: path) {
             Object value;
             if("pathelement".equals(te.getNodeName()))

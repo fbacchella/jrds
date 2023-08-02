@@ -59,7 +59,7 @@ public class TestSnmpLoadConfiguration {
         PropertiesManager pm = Tools.makePm(testFolder);
         Tools.findDescs(pm);
         ConfigObjectFactory conf = prepare(pm);
-        Map<String, JrdsDocument> hostDescMap = new HashMap<String, JrdsDocument>();
+        Map<String, JrdsDocument> hostDescMap = new HashMap<>();
         conf.getLoader().setRepository(ConfigType.HOSTS, hostDescMap);
 
         JrdsDocument hostNode = Tools.parseRessource("goodhost1.xml");
@@ -74,7 +74,7 @@ public class TestSnmpLoadConfiguration {
         HostInfo h = hostMap.get("myhost");
         Assert.assertNotNull(h);
         Assert.assertEquals("myhost", h.getName());
-        Collection<Probe<?, ?>> probes = new HashSet<Probe<?, ?>>();
+        Collection<Probe<?, ?>> probes = new HashSet<>();
         for(Probe<?, ?> p: h.getProbes()) {
             probes.add(p);
         }
@@ -96,7 +96,7 @@ public class TestSnmpLoadConfiguration {
 
         Macro m = b.makeMacro(d);
 
-        Map<String, Macro> macroMap = new HashMap<String, Macro>();
+        Map<String, Macro> macroMap = new HashMap<>();
         macroMap.put(m.getName(), m);
 
         JrdsDocument hostdoc = Tools.parseString(TestLoadConfiguration.goodHostXml);

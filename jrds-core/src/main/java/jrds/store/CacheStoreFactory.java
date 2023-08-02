@@ -11,7 +11,7 @@ import javax.management.StandardMBean;
 import jrds.Probe;
 
 public class CacheStoreFactory extends AbstractStoreFactory<CacheStore> implements SampleCacheMBean {
-    private final Map<String, Map<String, Map<String, Number>>> cache = new HashMap<String, Map<String, Map<String, Number>>>();
+    private final Map<String, Map<String, Map<String, Number>>> cache = new HashMap<>();
     @SuppressWarnings("unused")
     private final CacheMBean mbean;
 
@@ -41,8 +41,8 @@ public class CacheStoreFactory extends AbstractStoreFactory<CacheStore> implemen
     public CacheStore create(Probe<?, ?> p) {
         String hostname = p.getHost().getName();
         String probeName = p.getName();
-        Map<String, Number> c = cache.computeIfAbsent(hostname, k -> new HashMap<String, Map<String, Number>>())
-                                     .computeIfAbsent(probeName, k -> new HashMap<String, Number>(p.getPd().getDsDefs(p.getRequiredUptime()).length));
+        Map<String, Number> c = cache.computeIfAbsent(hostname, k -> new HashMap<>())
+                                     .computeIfAbsent(probeName, k -> new HashMap<>(p.getPd().getDsDefs(p.getRequiredUptime()).length));
         return new CacheStore(p, c);
     }
 

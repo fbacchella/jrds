@@ -84,7 +84,7 @@ public class JSonTree extends JSonData {
     private boolean evaluateFilter(ParamsBean params, JrdsJSONWriter w, HostsList root, Filter f) {
         // We construct the graph tree root to use
         // The tree is parsed twice, that's not optimal
-        Set<GraphTree> rootToDo = new TreeSet<GraphTree>(this::graphTreeCompare);
+        Set<GraphTree> rootToDo = new TreeSet<>(this::graphTreeCompare);
         for (GraphTree tree: root.getTrees()) {
             GraphTree testTree = f.setRoot(tree);
             if (testTree != null && !rootToDo.contains(testTree) && testTree.acceptSome(f)) {
@@ -128,7 +128,7 @@ public class JSonTree extends JSonData {
     private boolean dumpFilters(JrdsJSONWriter w, Set<Filter> filterSet) {
         for(Filter filter: filterSet) {
             String filterName = filter.getName();
-            Map<String, String> href = new HashMap<String, String>();
+            Map<String, String> href = new HashMap<>();
             href.put("filter", filterName);
             doTree(w, filterName, filter.hashCode(), "filter", null, href);
         }
@@ -141,7 +141,7 @@ public class JSonTree extends JSonData {
         boolean hasChild = false;
         Map<String, GraphTree> childs = gt.getChildsMap();
 
-        List<String> childsref = new ArrayList<String>();
+        List<String> childsref = new ArrayList<>();
         for(Map.Entry<String, GraphTree> e: childs.entrySet()) {
             String childid = sub(params, w, e.getValue(), "node", f, subpath, base);
             if(childid != null) {

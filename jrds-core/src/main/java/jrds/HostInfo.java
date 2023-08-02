@@ -15,8 +15,8 @@ public class HostInfo {
     private Set<String> tags = null;
     private File hostdir = null;
     private boolean hidden = false;
-    private final Map<String, ConnectionInfo> cnxList = new HashMap<String, ConnectionInfo>();
-    private final Set<Probe<?, ?>> probesList = new HashSet<Probe<?, ?>>();
+    private final Map<String, ConnectionInfo> cnxList = new HashMap<>();
+    private final Set<Probe<?, ?>> probesList = new HashSet<>();
 
     public HostInfo(String name) {
         super();
@@ -42,14 +42,14 @@ public class HostInfo {
 
     public void addTag(String tag) {
         if(tags == null)
-            tags = new HashSet<String>();
+            tags = new HashSet<>();
         tags.add(tag);
     }
 
     public Set<String> getTags() {
         Set<String> temptags = tags;
         if(tags == null)
-            temptags = new HashSet<String>();
+            temptags = new HashSet<>();
         return temptags;
     }
 

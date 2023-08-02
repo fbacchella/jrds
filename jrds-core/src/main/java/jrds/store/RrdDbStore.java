@@ -131,7 +131,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
             try (RrdDb rrdSource = factory.getRrd(source.getCanonicalPath());
                  RrdDb rrdDest = factory.getRrd(rrdDef)) {
                 log(Level.DEBUG, "Updating %s to %s", source, dest);
-                Set<String> badDs = new HashSet<String>();
+                Set<String> badDs = new HashSet<>();
                 Header header = rrdSource.getHeader();
                 int dsCount = header.getDsCount();
                 header.copyStateTo(rrdDest.getHeader());
@@ -283,7 +283,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     }
 
     public Map<String, Number> getLastValues() {
-        Map<String, Number> retValues = new HashMap<String, Number>();
+        Map<String, Number> retValues = new HashMap<>();
         try (RrdDb rrdDb = factory.getRrd(getPath())){
             String[] dsNames = rrdDb.getDsNames();
             for(int i = 0; i < dsNames.length; i++) {

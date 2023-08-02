@@ -39,7 +39,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
         Map<String, Set<String>> requestInfo = buildRequestInfo(getCollectMapping().keySet());
         Map<String, Object> foundValues = doMultiSearch(cnx, requestInfo);
 
-        Map<String, Number> retValues = new HashMap<String, Number>();
+        Map<String, Number> retValues = new HashMap<>();
         for(Map.Entry<String, Object> e: foundValues.entrySet()) {
             if(collected.contains(e.getKey())) {
                 double val = jrds.Util.parseStringNumber(e.getValue().toString(), Double.NaN);
@@ -78,7 +78,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
     }
 
     protected long findUptime(LdapConnection cnx) {
-        Set<String> collectPaths = new HashSet<String>(upTimeSpecifics.length);
+        Set<String> collectPaths = new HashSet<>(upTimeSpecifics.length);
         for(String s: upTimeSpecifics) {
             String v = getPd().getSpecific(s);
             if(v != null && !"".equals(v.trim()))
@@ -117,7 +117,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
     }
 
     protected Map<String, Set<String>> buildRequestInfo(Set<String> collectPaths) {
-        Map<String, Set<String>> retValue = new HashMap<String, Set<String>>();
+        Map<String, Set<String>> retValue = new HashMap<>();
         for(String path: collectPaths) {
             String[] parsed = jrds.Util.parseTemplate(path, this).split("\\?");
             String rdn = null, field = null;
@@ -128,7 +128,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
                 rdn = ".";
                 field = parsed[0];
             }
-            retValue.computeIfAbsent(rdn, k -> new HashSet<String>()).add(field);
+            retValue.computeIfAbsent(rdn, k -> new HashSet<>()).add(field);
         }
         log(Level.TRACE, "Preparing a request info: %s", retValue);
 
@@ -136,7 +136,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
     }
 
     protected Map<String, Object> doMultiSearch(LdapConnection cnx, Map<String, Set<String>> requestInfo) {
-        Map<String, Object> retValues = new HashMap<String, Object>();
+        Map<String, Object> retValues = new HashMap<>();
 
         for(Map.Entry<String, Set<String>> e: requestInfo.entrySet()) {
             Map<String, Object> attributes = doSearchFielsEntry(cnx, e.getKey(), e.getValue());
@@ -157,7 +157,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
 
         DirContext dctx = cnx.getConnection();
 
-        Map<String, Object> retValues = new HashMap<String, Object>();
+        Map<String, Object> retValues = new HashMap<>();
         try {
             Attributes attributesList = dctx.getAttributes(base, fields.toArray(new String[fields.size()]));
             for(Attribute a: jrds.Util.iterate(attributesList.getAll())) {

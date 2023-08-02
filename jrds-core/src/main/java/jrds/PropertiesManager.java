@@ -117,7 +117,7 @@ public class PropertiesManager extends Properties {
 
     public Map<String, String> subKey(String prefix) {
         Pattern regex = Pattern.compile("^" + prefix + "\\.");
-        Map<String, String> props = new HashMap<String, String>();
+        Map<String, String> props = new HashMap<>();
 
         for(Map.Entry<Object, Object> e: entrySet()) {
             String key = (String) e.getKey();
@@ -161,7 +161,7 @@ public class PropertiesManager extends Properties {
 
     private ClassLoader doClassLoader(String extendedclasspath) {
 
-        Collection<URI> urls = new ArrayList<URI>();
+        Collection<URI> urls = new ArrayList<>();
 
         if(extendedclasspath != null && !"".equals(extendedclasspath)) {
             for(String pathElement: extendedclasspath.split(";")) {
@@ -227,7 +227,7 @@ public class PropertiesManager extends Properties {
 
     public void configureStores() {
         String defaultStorename = getProperty("defaultstore", StoreFactory.DEFAULTNAME);
-        Map<String, Properties> storesConfig = new HashMap<String, Properties>(1);
+        Map<String, Properties> storesConfig = new HashMap<>(1);
         storesConfig.put(defaultStorename, new Properties());
 
         Properties defaultStoreProps = storesConfig.get(defaultStorename);
@@ -444,7 +444,7 @@ public class PropertiesManager extends Properties {
         // spaces are non-significant
         String tabsList = getProperty("tabs");
         if(tabsList != null && !"".equals(tabsList.trim())) {
-            this.tabsList = new ArrayList<String>();
+            this.tabsList = new ArrayList<>();
             for(String tab: tabsList.split(",")) {
                 this.tabsList.add(tab.trim());
             }
@@ -461,7 +461,7 @@ public class PropertiesManager extends Properties {
             adminACL = new ACL.AdminACL(adminrole);
 
             String defaultRolesString = getProperty("defaultroles", "ANONYMOUS");
-            defaultRoles = new HashSet<String>();
+            defaultRoles = new HashSet<>();
             for(String aRole: defaultRolesString.split(",")) {
                 defaultRoles.add(aRole.trim());
             }
@@ -507,9 +507,9 @@ public class PropertiesManager extends Properties {
     public String urlpngroot;
     public int slowcollecttime;
     public int step;
-    public Map<String, TimerInfo> timers = new HashMap<String, TimerInfo>();
+    public Map<String, TimerInfo> timers = new HashMap<>();
     public int numCollectors;
-    public final Set<URI> libspath = new HashSet<URI>();
+    public final Set<URI> libspath = new HashSet<>();
     public boolean strictparsing = false;
     public ClassLoader extensionClassLoader = getClass().getClassLoader();
     public boolean legacymode;
@@ -533,7 +533,7 @@ public class PropertiesManager extends Properties {
     public static final String HOSTSTAB = "hoststab";
     public static final String TAGSTAB = "tagstab";
     public static final String ADMINTAB = "adminTab";
-    public Map<String, StoreFactory> stores = new HashMap<String, StoreFactory>();
+    public Map<String, StoreFactory> stores = new HashMap<>();
     public StoreFactory defaultStore;
     public Map<Class <? extends ModuleConfigurator>, Object> extendedConfiguration = new HashMap<>();
     public SecretStore secrets = SecretStore.empty();

@@ -29,7 +29,7 @@ public class Munin extends ProbeConnected<String, Number, MuninConnection> {
     public Map<String, Number> getNewSampleValuesConnected(MuninConnection cnx) {
         MuninConnection.SocketChannels muninSocket = cnx.getConnection();
 
-        Map<String, Number> retValue = new HashMap<String, Number>();
+        Map<String, Number> retValue = new HashMap<>();
         String fetchList = getPd().getSpecific("fetch");
         if (fetchList == null) {
             log(Level.ERROR, "no fetch list defined");

@@ -43,7 +43,7 @@ public class Status extends JrdsServlet {
         for(HostInfo h: hosts) {
             numProbes += h.getNumProbes();
         }
-        Map<String, Stats> stats = new HashMap<String, Stats>();
+        Map<String, Stats> stats = new HashMap<>();
         hl.getChildsStream().forEach(t -> stats.put(t.getName(), t.getStats()));
 
         if(params.getValue("json") != null) {

@@ -46,7 +46,7 @@ public class TestDiscoverAgent {
         JrdsDocument d = new JrdsDocument(Tools.dbuilder.newDocument());
         d.doRootElement("host");
         da.doHtmlDiscoverFields(d);
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
         properties.put(OutputKeys.INDENT, "yes");
         properties.put("{http://xml.apache.org/xslt}indent-amount", "4");
     }

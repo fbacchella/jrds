@@ -44,12 +44,12 @@ abstract class ConfigObjectBuilder<BuildObject> {
      */
     protected void doACL(WithACL object, JrdsDocument n, JrdsElement roleElements) {
         if(pm.security) {
-            List<String> roles = new ArrayList<String>();
+            List<String> roles = new ArrayList<>();
             for(JrdsElement e: roleElements.getChildElementsByName("role")) {
                 roles.add(e.getTextContent());
             }
             if(roles.size() > 0) {
-                object.addACL(new RolesACL(new HashSet<String>(roles)));
+                object.addACL(new RolesACL(new HashSet<>(roles)));
                 object.addACL(pm.adminACL);
             } else {
                 object.addACL(pm.defaultACL);

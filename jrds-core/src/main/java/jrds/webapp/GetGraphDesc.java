@@ -44,7 +44,7 @@ public class GetGraphDesc extends JrdsServlet {
         try {
             Document d = gd.dumpAsXml();
             res.setContentType(CONTENT_TYPE);
-            Map<String, String> prop = new HashMap<String, String>(5);
+            Map<String, String> prop = new HashMap<>(5);
             prop.put(OutputKeys.OMIT_XML_DECLARATION, "no");
             prop.put(OutputKeys.INDENT, "yes");
             prop.put("{http://xml.apache.org/xslt}indent-amount", "4");

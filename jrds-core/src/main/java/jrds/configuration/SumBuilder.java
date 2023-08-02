@@ -26,7 +26,7 @@ public class SumBuilder extends ConfigObjectBuilder<Sum> {
         JrdsElement root = n.getRootElement();
         String name = root.getAttribute("name");
         if(name != null && !"".equals(name)) {
-            ArrayList<String> elements = new ArrayList<String>();
+            ArrayList<String> elements = new ArrayList<>();
             for(JrdsElement elemNode: root.getChildElementsByName("element")) {
                 String elemName = elemNode.getAttribute("name");
                 elements.add(elemName);

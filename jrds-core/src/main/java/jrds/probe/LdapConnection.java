@@ -53,7 +53,7 @@ public class LdapConnection extends Connection<DirContext> {
      */
     @Override
     public boolean startConnection() {
-        Hashtable<String, String> env = new Hashtable<String, String>();
+        Hashtable<String, String> env = new Hashtable<>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.PROVIDER_URL, "ldap://" + getHostName() + ":" + port);
         if(binddn != null && password != null) {

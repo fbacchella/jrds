@@ -21,8 +21,8 @@ import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
 public class MokeServletContext implements ServletContext {
-    public Map<String, Object> attributes = new HashMap<String, Object>();
-    public Map<String, String> initParameters = new HashMap<String, String>();
+    public Map<String, Object> attributes = new HashMap<>();
+    public Map<String, String> initParameters = new HashMap<>();
 
     public Object getAttribute(String name) {
         return attributes.get(name);

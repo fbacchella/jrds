@@ -44,7 +44,7 @@ public class GetDiscoverHtmlCode extends JrdsServlet {
             }
             resp.setContentType(CONTENT_TYPE);
 
-            Map<String, String> prop = new HashMap<String, String>(3);
+            Map<String, String> prop = new HashMap<>(3);
             prop.put(OutputKeys.OMIT_XML_DECLARATION, "no");
             prop.put(OutputKeys.INDENT, "yes");
             prop.put("{http://xml.apache.org/xslt}indent-amount", "4");

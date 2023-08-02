@@ -51,7 +51,7 @@ public class MokeProbe<A, B> extends Probe<A, B> {
     public void configure() {
         ProbeDesc<A> pd = getPd();
         if(pd == null) {
-            pd = new ProbeDesc<A>();
+            pd = new ProbeDesc<>();
             pd.setName(probeType);
             pd.setProbeName("dummyprobe");
             pd.add(ProbeDesc.getDataSourceBuilder("ds0", DsType.COUNTER).setCollectKey("/jrdsstats/stat[@key='a']/@value"));

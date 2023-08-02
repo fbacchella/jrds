@@ -50,7 +50,7 @@ public class TestBeans {
         if(descpath.exists())
             pm.libspath.add(descpath.toURI());
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
-        Set<String> failed = new HashSet<String>();
+        Set<String> failed = new HashSet<>();
         for(JrdsDocument n: conf.getNodeMap(ConfigType.PROBEDESC).values()) {
             JrdsElement root = n.getRootElement();
             JrdsElement classElem = root.getElementbyName("probeClass");

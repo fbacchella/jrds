@@ -101,7 +101,7 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
         if(oids != null) {
             try {
                 Map<OID, Object> rawValues = requester.doSnmpGet(cnx, oids);
-                retValue = new HashMap<OID, Object>(rawValues.size());
+                retValue = new HashMap<>(rawValues.size());
                 for(Map.Entry<OID, Object> e: rawValues.entrySet()) {
                     OID oid = new OID(e.getKey());
                     oid.trim(getSuffixLength());
@@ -141,7 +141,7 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
      */
     @Override
     public Map<OID, Number> filterValues(Map<OID, Object> snmpVars) {
-        Map<OID, Number> retValue = new HashMap<OID, Number>(snmpVars.size());
+        Map<OID, Number> retValue = new HashMap<>(snmpVars.size());
         for(Map.Entry<OID, Object> e: snmpVars.entrySet()) {
             OID oid = e.getKey();
             Object o = e.getValue();

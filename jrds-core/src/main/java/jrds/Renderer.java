@@ -165,7 +165,7 @@ public class Renderer {
     public Renderer(int cacheSize, File tmpDir) {
         this.tmpDir = tmpDir;
         this.cacheSize = cacheSize;
-        Map<Integer, RendererRun> m = new LinkedHashMap<Integer, RendererRun>(cacheSize + 5, hashTableLoadFactor, true) {
+        Map<Integer, RendererRun> m = new LinkedHashMap<>(cacheSize + 5, hashTableLoadFactor, true) {
             /*
              * (non-Javadoc)
              * 

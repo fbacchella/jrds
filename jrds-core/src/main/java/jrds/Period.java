@@ -237,7 +237,7 @@ public class Period {
      * @return a list of string label
      */
     static public List<String> getPeriodNames() {
-        List<String> periodName = new ArrayList<String>(Scale.YEARS2.ordinal() + 1);
+        List<String> periodName = new ArrayList<>(Scale.YEARS2.ordinal() + 1);
         for(Scale pi: Scale.values())
             periodName.add(pi.name);
         return periodName;

@@ -34,7 +34,7 @@ public class EthernetFrame extends KaitaiStruct {
      private final long id;
      EtherTypeEnum(long id) { this.id = id; }
      public long id() { return id; }
-     private static final Map<Long, EtherTypeEnum> byId = new HashMap<Long, EtherTypeEnum>(9);
+     private static final Map<Long, EtherTypeEnum> byId = new HashMap<>(9);
      static {
          for (EtherTypeEnum e : EtherTypeEnum.values())
              byId.put(e.id(), e);

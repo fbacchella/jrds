@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class Tab {
     public static final class Filters extends Tab {
-        private final Set<String> filters = new TreeSet<String>(jrds.Util.nodeComparator);
+        private final Set<String> filters = new TreeSet<>(jrds.Util.nodeComparator);
 
         public Filters(String name) {
             super(name);
@@ -28,7 +28,7 @@ public abstract class Tab {
         }
 
         public Set<jrds.Filter> getFilters() {
-            Set<jrds.Filter> filtersset = new LinkedHashSet<jrds.Filter>(filters.size());
+            Set<jrds.Filter> filtersset = new LinkedHashSet<>(filters.size());
             for(String filtername: filters) {
                 jrds.Filter f = hostlist.getFilter(filtername);
                 if(f != null)
@@ -61,7 +61,7 @@ public abstract class Tab {
     }
 
     public static final class DynamicTree extends Tab {
-        private final Map<String, List<String>> paths = new TreeMap<String, List<String>>(jrds.Util.nodeComparator);
+        private final Map<String, List<String>> paths = new TreeMap<>(jrds.Util.nodeComparator);
 
         public DynamicTree(String name) {
             super(name);

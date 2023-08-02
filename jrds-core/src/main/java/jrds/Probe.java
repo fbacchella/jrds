@@ -81,14 +81,14 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     private String name = null;
     protected HostInfo monitoredHost;
-    private Collection<GraphNode> graphList = new ArrayList<GraphNode>();
+    private Collection<GraphNode> graphList = new ArrayList<>();
     private ProbeDesc<KeyType> pd;
     private long uptime = Long.MAX_VALUE;
     private boolean finished = false;
     private String label = null;
     private Logger namedLogger = LoggerFactory.getLogger("jrds.Probe.EmptyProbe");
     private volatile boolean running = false;
-    private Set<Store> stores = new HashSet<Store>();
+    private Set<Store> stores = new HashSet<>();
     private Store mainStore;
     private ArchivesSet archives = ArchivesSet.DEFAULT;
     private Map<String, String> customBeans = Collections.emptyMap();
@@ -132,7 +132,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     public void setBean(String key, String value) {
         // if beans size == 0, it's the empty Map
         if(customBeans.size() == 0) {
-            customBeans = new HashMap<String, String>();
+            customBeans = new HashMap<>();
         }
         customBeans.put(key, value);
     }
@@ -240,7 +240,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     @SuppressWarnings("unchecked")
     public Map<KeyType, String> getCollectMapping() {
         Map<KeyType, String> rawMap = (Map<KeyType, String>) getPd().getCollectMapping();
-        Map<KeyType, String> retValues = new HashMap<KeyType, String>(rawMap.size());
+        Map<KeyType, String> retValues = new HashMap<>(rawMap.size());
         for(Map.Entry<KeyType, String> e: rawMap.entrySet()) {
             String value = jrds.Util.parseTemplate(e.getValue(), this);
             KeyType key = e.getKey();

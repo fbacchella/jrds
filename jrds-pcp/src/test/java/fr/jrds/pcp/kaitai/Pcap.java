@@ -131,7 +131,7 @@ public class Pcap extends KaitaiStruct {
         private final long id;
         Linktype(long id) { this.id = id; }
         public long id() { return id; }
-        private static final Map<Long, Linktype> byId = new HashMap<Long, Linktype>(104);
+        private static final Map<Long, Linktype> byId = new HashMap<>(104);
         static {
             for (Linktype e : Linktype.values())
                 byId.put(e.id(), e);
@@ -155,7 +155,7 @@ public class Pcap extends KaitaiStruct {
     }
     private void _read() {
         this.hdr = new Header(this._io, this, _root);
-        this.packets = new ArrayList<Packet>();
+        this.packets = new ArrayList<>();
         while (!this._io.isEof()) {
             this.packets.add(new Packet(this._io, this, _root));
         }

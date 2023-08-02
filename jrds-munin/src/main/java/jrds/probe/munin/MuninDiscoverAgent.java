@@ -51,7 +51,7 @@ public class MuninDiscoverAgent extends DiscoverAgent {
                 //Drop the  welcome line
                 in.readLine();
                 out.println("list");
-                muninProbes = new HashSet<String>();
+                muninProbes = new HashSet<>();
                 for (String p: in.readLine().split(" ")) {
                     muninProbes.add(p);
                     log(Level.TRACE, "Munin probe found : %s", p);

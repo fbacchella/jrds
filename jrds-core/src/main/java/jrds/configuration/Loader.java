@@ -48,7 +48,7 @@ public class Loader {
         return t;
     });
 
-    private final ThreadLocal<DocumentBuilder> localDocumentBuilder = new ThreadLocal<DocumentBuilder>() {
+    private final ThreadLocal<DocumentBuilder> localDocumentBuilder = new ThreadLocal<>() {
         @Override
         protected DocumentBuilder initialValue() {
             try {
@@ -74,8 +74,8 @@ public class Loader {
         }
     };
 
-    final private Map<ConfigType, Map<String, JrdsDocument>> repositories = new HashMap<ConfigType, Map<String, JrdsDocument>>(ConfigType.values().length);
-    final private Map<String, ConfigType> nodesTypes = new HashMap<String, ConfigType>(ConfigType.values().length);
+    final private Map<ConfigType, Map<String, JrdsDocument>> repositories = new HashMap<>(ConfigType.values().length);
+    final private Map<String, ConfigType> nodesTypes = new HashMap<>(ConfigType.values().length);
     private final DocumentBuilderFactory instance;
 
     public Loader() {
@@ -92,7 +92,7 @@ public class Loader {
         instance.setExpandEntityReferences(true);
 
         for(ConfigType t: ConfigType.values()) {
-            repositories.put(t, new ConcurrentHashMap<String, JrdsDocument>());
+            repositories.put(t, new ConcurrentHashMap<>());
             nodesTypes.put(t.getRootNode(), t);
         }
     }

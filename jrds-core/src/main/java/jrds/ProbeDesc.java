@@ -217,8 +217,8 @@ public class ProbeDesc<KeyType> {
         // Where to look for the collect info
         if (builder.collectKeyHigh != null && builder.collectKeyLow != null) {
             try {
-                dsMap.put(bname + "high", new DsDesc<KeyType>(null, builder.minValue, builder.maxValue, collectResolver.resolve(builder.collectKeyHigh)));
-                dsMap.put(bname + "low", new DsDesc<KeyType>(null, builder.minValue, builder.maxValue, collectResolver.resolve(builder.collectKeyLow)));
+                dsMap.put(bname + "high", new DsDesc<>(null, builder.minValue, builder.maxValue, collectResolver.resolve(builder.collectKeyHigh)));
+                dsMap.put(bname + "low", new DsDesc<>(null, builder.minValue, builder.maxValue, collectResolver.resolve(builder.collectKeyLow)));
                 highlowcollectmap.put(bname, new Joined(builder.collectKeyHigh, builder.collectKeyLow));
             } catch (IllegalArgumentException e) {
                 logger.error("Probe description {}: unable to parse collect key '{}': {}", name, collectKeyName, e.getMessage());
@@ -248,7 +248,7 @@ public class ProbeDesc<KeyType> {
             optionals.add(collectKeyName);
         }
 
-        dsMap.put(bname, new DsDesc<KeyType>(builder.dsType, builder.minValue, builder.maxValue, collectKey));
+        dsMap.put(bname, new DsDesc<>(builder.dsType, builder.minValue, builder.maxValue, collectKey));
 
         if (collectKey != null) {
             collectMap.put(collectKey, bname);

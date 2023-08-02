@@ -97,7 +97,7 @@ public class DoSnmpProbe2 extends CommandStarterImpl {
                 JrdsElement oidNode = n.getRootElement().findByPath(xp);
                 transform(oidNode);
             }
-            Map<String, String> prop = new HashMap<String, String>();
+            Map<String, String> prop = new HashMap<>();
             prop.put(OutputKeys.INDENT, "yes");
             prop.put(OutputKeys.DOCTYPE_PUBLIC, "-//jrds//DTD Probe Description//EN");
             prop.put(OutputKeys.DOCTYPE_SYSTEM, "urn:jrds:probedesc");

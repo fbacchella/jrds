@@ -135,7 +135,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
 
     private Set<String> enumerateIndexes(ProbeDescSummary summary) {
         JmxAbstractDataSource<?> mbean = cnx.getConnection();
-        Set<String> indexes = new HashSet<String>();
+        Set<String> indexes = new HashSet<>();
         for(String name: summary.specifics.get("mbeanNames").split(" *; *")) {
             try {
                 Collection<ObjectName> mbeanNames = mbean.getNames(this, new ObjectName(name));

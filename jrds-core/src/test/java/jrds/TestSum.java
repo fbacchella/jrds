@@ -47,7 +47,7 @@ public class TestSum {
         HostsList hl = new HostsList();
         hl.configure(new PropertiesManager());
 
-        ArrayList<String> graphlist = new ArrayList<String>();
+        ArrayList<String> graphlist = new ArrayList<>();
         graphlist.add("badhost/badgraph");
         Sum s = new Sum("emptysum", graphlist);
         s.configure(hl);
@@ -77,7 +77,7 @@ public class TestSum {
         hl.addHost(p.getHost());
         hl.addProbe(p);
 
-        ArrayList<String> glist = new ArrayList<String>();
+        ArrayList<String> glist = new ArrayList<>();
         glist.add(p.getGraphList().iterator().next().getQualifiedName());
         Sum s = new Sum("A sum test", glist);
         s.configure(hl);

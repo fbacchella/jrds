@@ -74,7 +74,7 @@ public class MokeProbeFactory extends ProbeFactory {
     @Override
     public ProbeDesc<String> getProbeDesc(String name) {
         if(!probeDescMap.containsKey(name)) {
-            MokeProbe<String, Number> mp = new MokeProbe<String, Number>(name);
+            MokeProbe<String, Number> mp = new MokeProbe<>(name);
             mp.configure();
             probeDescMap.put(name, mp.getPd());
         }

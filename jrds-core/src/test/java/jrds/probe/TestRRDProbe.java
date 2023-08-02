@@ -56,7 +56,7 @@ public class TestRRDProbe {
     public void testBean() throws InvocationTargetException, IllegalArgumentException {
         RRDToolProbe p = new RRDToolProbe();
         p.setHost(new HostStarter(new HostInfo("toto")));
-        ProbeDesc<String> pd = new ProbeDesc<String>();
+        ProbeDesc<String> pd = new ProbeDesc<>();
         pd.setProbeClass(p.getClass());
         pd.setName("Rrdtool");
         pd.setProbeName("rrdtool");
@@ -70,7 +70,7 @@ public class TestRRDProbe {
     public void test1() throws IOException, InvocationTargetException {
         RRDToolProbe p = new RRDToolProbe();
         p.setHost(new HostStarter(new HostInfo("toto")));
-        ProbeDesc<String> pd = new ProbeDesc<String>();
+        ProbeDesc<String> pd = new ProbeDesc<>();
         pd.setName("Rrdtool");
         pd.setProbeName("rrdtool");
         p.setPd(pd);

@@ -19,7 +19,7 @@ import jrds.store.Store;
 public class ContainerProbe extends Probe<Object, Number> {
     static private final HostInfo ContainerHost = new HostInfo("ContainerHost");
 
-    static final ProbeDesc<Object> pd = new ProbeDesc<Object>(0) {
+    static final ProbeDesc<Object> pd = new ProbeDesc<>(0) {
         @Override
         public String getName() {
             return "ContainerProbeDesc";

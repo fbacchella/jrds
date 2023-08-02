@@ -11,7 +11,7 @@ import jrds.probe.PassiveProbe;
 public abstract class Listener<Message, KeyType> extends Starter {
 
     Thread listenerThread = null;
-    private final Map<String, Map<String, PassiveProbe<KeyType>>> probes = new HashMap<String, Map<String, PassiveProbe<KeyType>>>();
+    private final Map<String, Map<String, PassiveProbe<KeyType>>> probes = new HashMap<>();
 
     public boolean start() {
         listenerThread = new Thread() {
@@ -59,7 +59,7 @@ public abstract class Listener<Message, KeyType> extends Starter {
         log(Level.DEBUG, "adding %s", p);
         String hostname = getHost(p);
         if(!probes.containsKey(p.getHost().getDnsName())) {
-            probes.put(hostname, new HashMap<String, PassiveProbe<KeyType>>());
+            probes.put(hostname, new HashMap<>());
         }
         probes.get(hostname).put(p.getName(), p);
     }

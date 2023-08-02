@@ -81,8 +81,8 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
     private Target hosttarget;
     private LocalSnmpConnection active;
     // Sort descriptions
-    private final LinkedList<String> sortedProbeName = new LinkedList<String>();
-    private final Map<String, ProbeDescSummary> summaries = new HashMap<String, ProbeDescSummary>();
+    private final LinkedList<String> sortedProbeName = new LinkedList<>();
+    private final Map<String, ProbeDescSummary> summaries = new HashMap<>();
 
     public SnmpDiscoverAgent() {
         super("SNMP", jrds.probe.snmp.SnmpProbe.class);
@@ -109,7 +109,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         if(withOidStr != null && "true".equals(withOidStr.toLowerCase()))
             withOid = true;
 
-        Set<String> done = new HashSet<String>();
+        Set<String> done = new HashSet<>();
 
         log(Level.DEBUG, "Will search for probes %s", sortedProbeName);
         for(String name: sortedProbeName) {
@@ -188,7 +188,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
         log(Level.TRACE, "Elements : %s", indexes);
         for(Map.Entry<OID, Object> e: indexes.entrySet()) {
             count++;
-            Map<String, String> beans = new HashMap<String, String>(2);
+            Map<String, String> beans = new HashMap<>(2);
             OID rowOid = e.getKey();
             String indexName = e.getValue().toString();
             beans.put("index", indexName);

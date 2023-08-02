@@ -147,7 +147,7 @@ public class Ribcl extends Probe<XPathExpression, Number> implements SSLProbe {
 
     protected void buildQuery(OutputStream out, XmlProvider xmlstarter) {
         Document ribclQ = makeDocument(xmlstarter);
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
         properties.put(OutputKeys.INDENT, "no");
         properties.put(OutputKeys.OMIT_XML_DECLARATION, "yes");
         properties.put(OutputKeys.ENCODING, encoding);

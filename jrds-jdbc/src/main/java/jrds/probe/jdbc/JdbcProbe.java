@@ -85,7 +85,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
     abstract JdbcStarter setStarter();
 
     public Map<String, Number> getNewSampleValues() {
-        Map<String, Number> retValue = new HashMap<String, Number>(getPd().getSize());
+        Map<String, Number> retValue = new HashMap<>(getPd().getSize());
 
         for(String query: getQueries()) {
             log(Level.DEBUG, "Getting %s", query);
@@ -97,12 +97,12 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
     public abstract List<String> getQueries();
 
     protected List<Map<String, Object>> parseRsVerticaly(ResultSet rs, boolean numFilter) throws SQLException {
-        ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
+        ArrayList<Map<String, Object>> values = new ArrayList<>();
         ResultSetMetaData rsmd = rs.getMetaData();
         int colCount = rsmd.getColumnCount();
         log(Level.DEBUG, "Columns: %d", colCount);
         while (rs.next()) {
-            Map<String, Object> row = new HashMap<String, Object>(colCount);
+            Map<String, Object> row = new HashMap<>(colCount);
             String key = rs.getObject(1).toString();
             Object oValue = rs.getObject(2).toString();
             row.put(key, oValue);
@@ -113,11 +113,11 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
     }
 
     protected List<Map<String, Object>> parseRsHorizontaly(ResultSet rs, boolean numFilter) throws SQLException {
-        ArrayList<Map<String, Object>> values = new ArrayList<Map<String, Object>>();
+        ArrayList<Map<String, Object>> values = new ArrayList<>();
         ResultSetMetaData rsmd = rs.getMetaData();
         int colCount = rsmd.getColumnCount();
         while (rs.next()) {
-            Map<String, Object> row = new HashMap<String, Object>(colCount);
+            Map<String, Object> row = new HashMap<>(colCount);
             for(int i = 1; i <= colCount; i++) {
                 String key = rsmd.getColumnLabel(i);
                 Object oValue = rs.getObject(i);
@@ -142,7 +142,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
      * @return a List of Map of values
      */
     public Map<String, Number> select2Map(String query) {
-        Map<String, Number> values = new HashMap<String, Number>();
+        Map<String, Number> values = new HashMap<>();
         try (Statement stmt = starter.getStatment()) {
             if (stmt.execute(query)) {
                 do {
@@ -158,7 +158,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
     }
 
     public Map<String, Object> select2Map(String query, String keyCol, String valCol) {
-        Map<String, Object> values = new HashMap<String, Object>();
+        Map<String, Object> values = new HashMap<>();
         log(Level.DEBUG, "Getting %s", query);
         Statement stmt;
         try {

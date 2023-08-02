@@ -38,7 +38,7 @@ public class PartitionSpace extends RdsIndexedSnmpRrd {
         }
         total *= allocUnit;
         used *= allocUnit;
-        Map<OID, Number> retValue = new HashMap<OID, Number>(2);
+        Map<OID, Number> retValue = new HashMap<>(2);
         retValue.put(totalOid, total);
         retValue.put(usedOid, used);
 

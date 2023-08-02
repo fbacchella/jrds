@@ -82,7 +82,7 @@ public class Timer extends StarterNode {
 
     public final static String DEFAULTNAME = "_default";
 
-    private final Map<String, HostStarter> hostList = new HashMap<String, HostStarter>();
+    private final Map<String, HostStarter> hostList = new HashMap<>();
     private final Semaphore collectMutex = new Semaphore(1);
     private final Stats stats = new Stats();
     private final int numCollectors;
@@ -138,7 +138,7 @@ public class Timer extends StarterNode {
         MDC.put("collectIteration", String.valueOf(collectCount.get()));
         MDC.put("timer", name);
         // Build the list of host that will be collected
-        List<Runnable> toSchedule = new ArrayList<Runnable>(hostList.size());
+        List<Runnable> toSchedule = new ArrayList<>(hostList.size());
         hostList.values().stream()
                 .map(CollectRunnable::new)
                 .forEach(toSchedule::add);
@@ -180,8 +180,7 @@ public class Timer extends StarterNode {
         };
 
         long maxCollectTime = (getStep() - getTimeout());
-        ThreadPoolExecutor tpool = new ThreadPoolExecutor(numCollectors, numCollectors, 1, TimeUnit.SECONDS,
-                                                          new ArrayBlockingQueue<Runnable>(toSchedule.size()), tf);
+        ThreadPoolExecutor tpool = new ThreadPoolExecutor(numCollectors, numCollectors, 1, TimeUnit.SECONDS, new ArrayBlockingQueue<>(toSchedule.size()), tf);
         tpool.allowCoreThreadTimeOut(true);
         try {
             if (startCollect()) {

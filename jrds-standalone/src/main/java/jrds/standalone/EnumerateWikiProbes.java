@@ -151,7 +151,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         }
 
         // Enumerates the beans informations
-        List<GenericBean> tryBeans = new ArrayList<GenericBean>();
+        List<GenericBean> tryBeans = new ArrayList<>();
         for(GenericBean bean: pd.getBeans()) {
             tryBeans.add(bean);
         }

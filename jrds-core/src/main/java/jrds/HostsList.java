@@ -55,20 +55,20 @@ public class HostsList extends StarterNode {
     static final private AtomicInteger generation = new AtomicInteger(0);
 
     private final int thisgeneration = generation.incrementAndGet();
-    private final Set<HostInfo> hostList = new HashSet<HostInfo>();
-    private final Map<String, jrds.starter.Timer> timers = new HashMap<String, jrds.starter.Timer>();
-    private final Map<Integer, GraphNode> graphMap = new HashMap<Integer, GraphNode>();
-    private final Map<Integer, Probe<?, ?>> probeMap = new HashMap<Integer, Probe<?, ?>>();
-    private final Map<String, GraphTree> treeMap = new LinkedHashMap<String, GraphTree>(3);
-    private final Map<String, Filter> filters = new TreeMap<String, Filter>(String.CASE_INSENSITIVE_ORDER);
-    private Map<String, Tab> tabs = new LinkedHashMap<String, Tab>();
+    private final Set<HostInfo> hostList = new HashSet<>();
+    private final Map<String, jrds.starter.Timer> timers = new HashMap<>();
+    private final Map<Integer, GraphNode> graphMap = new HashMap<>();
+    private final Map<Integer, Probe<?, ?>> probeMap = new HashMap<>();
+    private final Map<String, GraphTree> treeMap = new LinkedHashMap<>(3);
+    private final Map<String, Filter> filters = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+    private Map<String, Tab> tabs = new LinkedHashMap<>();
     private String firstTab = null;
     private Renderer renderer = null;
     private Timer collectTimer;
     // The list of roles known to jrds
-    private Set<String> roles = new HashSet<String>();
+    private Set<String> roles = new HashSet<>();
     private Set<String> defaultRoles = Collections.emptySet();
-    private Set<Class<? extends DiscoverAgent>> daList = new HashSet<Class<? extends DiscoverAgent>>();
+    private Set<Class<? extends DiscoverAgent>> daList = new HashSet<>();
     private Set<StoreFactory> stores = Collections.emptySet();
     @Getter @Setter @Accessors(chain=true)
     private Function<ClassLoader, ProbeClassResolver> probeClassResolverSource = ProbeClassResolver::new;
@@ -162,14 +162,14 @@ public class HostsList extends StarterNode {
             registerStarter(l);
         }
 
-        Set<String> hostsTags = new HashSet<String>();
+        Set<String> hostsTags = new HashSet<>();
         Map<String, HostInfo> allHosts = conf.setHostMap(timers);
         hostList.addAll(allHosts.values());
-        Set<Class<? extends Starter>> topStarterClasses = new HashSet<Class<? extends Starter>>();
+        Set<Class<? extends Starter>> topStarterClasses = new HashSet<>();
 
         // We try to load top level starter defined in probes
         for(jrds.starter.Timer timer: timers.values()) {
-            Set<Class<? extends Starter>> timerStarterClasses = new HashSet<Class<? extends Starter>>();
+            Set<Class<? extends Starter>> timerStarterClasses = new HashSet<>();
             for(HostStarter host: timer.getAllHosts()) {
                 hostsTags.addAll(host.getTags());
                 host.configureStarters(pm);
@@ -224,7 +224,7 @@ public class HostsList extends StarterNode {
             filter.addACL(pm.defaultACL);
         }
 
-        Set<Tab> allTabs = new HashSet<Tab>();
+        Set<Tab> allTabs = new HashSet<>();
 
         // Let's build the tab for all the tags
         doTagsTabs(hostsTags, allTabs);
@@ -279,7 +279,7 @@ public class HostsList extends StarterNode {
     }
 
     String makeTabs(List<String> tabsList, Set<Tab> moretabs, Map<String, Tab> customTabMap, Map<String, Tab> tabs) {
-        Map<String, Tab> tabsmap = new HashMap<String, Tab>(moretabs.size());
+        Map<String, Tab> tabsmap = new HashMap<>(moretabs.size());
         for(Tab t: moretabs) {
             if(t != null)
                 tabsmap.put(t.getId(), t);
@@ -551,7 +551,7 @@ public class HostsList extends StarterNode {
     }
 
     public Set<DiscoverAgent> getDiscoverAgent() {
-        Set<DiscoverAgent> daSet = new HashSet<DiscoverAgent>(daList.size());
+        Set<DiscoverAgent> daSet = new HashSet<>(daList.size());
         for(Class<? extends DiscoverAgent> daa: daList) {
             try {
                 daSet.add(daa.getConstructor().newInstance());

@@ -27,7 +27,7 @@ public class MysqlStatus extends Mysql {
 
     @Override
     public Map<String, Number> parseRs(ResultSet rs) throws SQLException {
-        Map<String, Number> retValues = new HashMap<String, Number>(getPd().getSize());
+        Map<String, Number> retValues = new HashMap<>(getPd().getSize());
         Set<String> toCollect = getPd().getCollectMapping().keySet();
         for(Map<String, Object> m: parseRsVerticaly(rs, false)) {
             for(Map.Entry<String, Object> e: m.entrySet()) {

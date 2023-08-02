@@ -102,11 +102,11 @@ public class TestDownload extends Download {
         hl.addHost(p.getHost());
         hl.addProbe(p);
 
-        ArrayList<String> glist = new ArrayList<String>();
+        ArrayList<String> glist = new ArrayList<>();
         glist.add(p.getGraphList().iterator().next().getQualifiedName());
         Sum s = new Sum("A sum test", glist);
         s.configure(hl);
-        Collection<GraphNode> c = new HashSet<GraphNode>(1);
+        Collection<GraphNode> c = new HashSet<>(1);
         c.add(s);
         hl.addGraphs(c);
 

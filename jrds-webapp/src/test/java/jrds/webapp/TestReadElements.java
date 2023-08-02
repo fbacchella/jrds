@@ -27,10 +27,10 @@ public class TestReadElements {
     static ServletTester tester = null;
 
     private final class TreeContent {
-        List<JSONObject> graphs = new ArrayList<JSONObject>();
-        List<JSONObject> trees = new ArrayList<JSONObject>();
-        List<JSONObject> filters = new ArrayList<JSONObject>();
-        List<JSONObject> nodes = new ArrayList<JSONObject>();
+        List<JSONObject> graphs = new ArrayList<>();
+        List<JSONObject> trees = new ArrayList<>();
+        List<JSONObject> filters = new ArrayList<>();
+        List<JSONObject> nodes = new ArrayList<>();
     }
 
     @Rule

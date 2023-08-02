@@ -46,7 +46,7 @@ public class GetMoke {
     }
 
     static public ProbeDesc<String> getPd() {
-        ProbeDesc<String> pd = new ProbeDesc<String>();
+        ProbeDesc<String> pd = new ProbeDesc<>();
         pd.setName("MokeProbeDesc");
         pd.setProbeName("mokeprobedesc");
         pd.add("MokeDs", DsType.COUNTER);
@@ -54,7 +54,7 @@ public class GetMoke {
     }
 
     static public Probe<String, Number> getProbe() throws InvocationTargetException {
-        Probe<String, Number> p = new MokeProbe<String, Number>();
+        Probe<String, Number> p = new MokeProbe<>();
         p.setPd(getPd());
         p.setHost(new HostStarter(getHost()));
         Map<String, String> empty = Collections.emptyMap();

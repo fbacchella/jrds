@@ -32,11 +32,11 @@ public class GenerateProbe {
         }
 
         public static <ValueClass> ChainedMap<ValueClass> start() {
-            return new ChainedMap<ValueClass>();
+            return new ChainedMap<>();
         }
 
         public static <ValueClass> ChainedMap<ValueClass> start(int size) {
-            return new ChainedMap<ValueClass>(size);
+            return new ChainedMap<>(size);
         }
 
         public ChainedMap<ValueClass> set(String key, ValueClass value) {
@@ -70,7 +70,7 @@ public class GenerateProbe {
     @SafeVarargs
     @SuppressWarnings({ "unchecked"})
     public static <P extends Probe<T, V>, T, V> P quickProbe(TemporaryFolder folder, ChainedMap<Object>... args) throws Exception {
-        ChainedMap<Object> arg = new ChainedMap<Object>(0);
+        ChainedMap<Object> arg = new ChainedMap<>(0);
         for (ChainedMap<Object> objectChainedMap : args) {
             arg.putAll(objectChainedMap);
         }
@@ -97,7 +97,7 @@ public class GenerateProbe {
             pd = (ProbeDesc<T>) args.get(ProbeDesc.class);
         }
         if(pd == null) {
-            pd = new ProbeDesc<T>();
+            pd = new ProbeDesc<>();
         }
         p.setPd(pd);
 

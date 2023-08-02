@@ -118,7 +118,7 @@ public class ParamsBean implements Serializable {
                 else
                     break;
             }
-            params = new HashMap<String, String[]>(restPath.length);
+            params = new HashMap<>(restPath.length);
             String[] path = probeInfo.trim().split("/");
             logger.trace("mapping {} to {}", Util.delayedFormatString(() -> Arrays.asList(path)), Util.delayedFormatString(() -> Arrays.asList(restPath)));
             int elem = Math.min(path.length - 1, restPath.length);
@@ -146,7 +146,7 @@ public class ParamsBean implements Serializable {
     // Not a really useful method, just to reduce warning
     private Map<String, String[]> getReqParamsMap(HttpServletRequest req) {
         logger.trace("Parameter map for {}: {}", req, Util.delayedFormatString(req::getParameterMap));
-        return new HashMap<String, String[]>(req.getParameterMap());
+        return new HashMap<>(req.getParameterMap());
     }
 
     public String getValue(String key) {
@@ -165,7 +165,7 @@ public class ParamsBean implements Serializable {
     public void readAuthorization(HttpServletRequest req, HostsList hl) {
         user = req.getRemoteUser();
         if(user != null) {
-            roles = new HashSet<String>();
+            roles = new HashSet<>();
             for(String role: hl.getRoles()) {
                 if(req.isUserInRole(role))
                     roles.add(role);
@@ -426,7 +426,7 @@ public class ParamsBean implements Serializable {
      * @return
      */
     public Map<String, Object> doArgsMap(Object o, boolean timeAbsolute) {
-        Map<String, Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new HashMap<>();
         addPeriodArgs(args, timeAbsolute);
         addMinMaxArgs(args);
         if(o instanceof jrds.FilterHost) {
@@ -488,7 +488,7 @@ public class ParamsBean implements Serializable {
     public String toString() {
         StringBuilder parambuff = new StringBuilder();
 
-        Map<String, Object> args = new HashMap<String, Object>();
+        Map<String, Object> args = new HashMap<>();
         addFilterArgs(args);
         addPeriodArgs(args, true);
         addMinMaxArgs(args);

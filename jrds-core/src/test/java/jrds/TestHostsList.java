@@ -67,7 +67,7 @@ public class TestHostsList {
         pm.update();
         HostsList hl = new HostsList(pm);
         Set<String> hostsTags = Collections.singleton("tag");
-        Set<Tab> tabs = new HashSet<Tab>();
+        Set<Tab> tabs = new HashSet<>();
         hl.doTagsTabs(hostsTags, tabs);
         Tab tab = (Tab) tabs.toArray()[0];
         Assert.assertTrue(tab.isFilters());
@@ -82,11 +82,11 @@ public class TestHostsList {
         GraphDesc gd = new GraphDesc();
         gd.setName("truc");
         gd.setGraphTitle("title");
-        Map<String, GraphDesc> gdmap = new HashMap<String, GraphDesc>();
+        Map<String, GraphDesc> gdmap = new HashMap<>();
         gdmap.put(gd.getName(), gd);
-        Set<Tab> tabs = new HashSet<Tab>();
-        Map<Integer, GraphNode> graphMap = new HashMap<Integer, GraphNode>();
-        Map<String, GraphTree> graphTrees = new HashMap<String, GraphTree>();
+        Set<Tab> tabs = new HashSet<>();
+        Map<Integer, GraphNode> graphMap = new HashMap<>();
+        Map<String, GraphTree> graphTrees = new HashMap<>();
         hl.doCustomGraphs(gdmap, graphMap, graphTrees, tabs);
         hl.addGraphs(graphMap.values());
         boolean found = false;

@@ -35,12 +35,12 @@ public class TestTranslateProbe {
 
     @Test
     public void constructAndCheckImmediateHigh() {
-        Probe<String, Number> p = new MokeProbe<String, Number>();
+        Probe<String, Number> p = new MokeProbe<>();
         p.setPd(pd);
 
         Map<String, String> nameMap = p.getCollectMapping();
-        Map<String, Number> filteredSamples = new HashMap<String, Number>();
-        Map<String, Number> resultSample = new HashMap<String, Number>();
+        Map<String, Number> filteredSamples = new HashMap<>();
+        Map<String, Number> resultSample = new HashMap<>();
 
         for(Map.Entry<String, Number> e: filteredSamples.entrySet()) {
             String dsName = nameMap.get(e.getKey());

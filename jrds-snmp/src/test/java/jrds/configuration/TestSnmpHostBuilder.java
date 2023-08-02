@@ -49,7 +49,7 @@ public class TestSnmpHostBuilder {
         HostBuilder hb = new HostBuilder();
         hb.setPm(pm);
         hb.setClassLoader(this.getClass().getClassLoader());
-        hb.setMacros(new HashMap<String, Macro>(0));
+        hb.setMacros(new HashMap<>(0));
         hb.setProbeFactory(pf);
         Map<String, Timer> timerMap = Tools.getSimpleTimerMap();
         timerMap.put("another", timerMap.get(Timer.DEFAULTNAME));
@@ -61,7 +61,7 @@ public class TestSnmpHostBuilder {
 
         Assert.assertEquals("fqdn.jrds.fr", hi.getDnsName());
 
-        Map<String, Probe<?, ?>> probes = new HashMap<String, Probe<?, ?>>(hi.getNumProbes());
+        Map<String, Probe<?, ?>> probes = new HashMap<>(hi.getNumProbes());
 
         for(Probe<?, ?> p: hi.getProbes()) {
             String name = p.getQualifiedName();

@@ -88,7 +88,7 @@ public class TrapListener extends Listener<CommandResponderEvent, OID> {
         log(Level.DEBUG, "trap received: %s", ev);
         PassiveProbe<OID> pp = findProbe(ev);
         Map<OID, Object> vars = new SnmpVars(ev.getPDU().toArray());
-        Map<OID, Number> oids = new HashMap<OID, Number>(vars.size());
+        Map<OID, Number> oids = new HashMap<>(vars.size());
         for(Map.Entry<OID, Object> e: vars.entrySet()) {
             if(e.getValue() instanceof Number) {
                 oids.put(e.getKey(), (Number) e.getValue());

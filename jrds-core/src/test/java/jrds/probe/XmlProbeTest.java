@@ -89,7 +89,7 @@ public class XmlProbeTest {
     @Test
     public void manageArgs() {
         URL url = getClass().getResource("/ressources/xmldata.xml");
-        List<Object> args = new ArrayList<Object>(1);
+        List<Object> args = new ArrayList<>(1);
         args.add("a");
         args.add("/jrdsstats/stat[@key='a']/@value");
         HttpXml p = new jrds.probe.HttpXml() {

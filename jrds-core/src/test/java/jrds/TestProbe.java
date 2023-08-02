@@ -54,7 +54,7 @@ public class TestProbe {
 
     @Test
     public void testHighLow() throws Exception {
-        ProbeDesc<String> pd = new ProbeDesc<String>();
+        ProbeDesc<String> pd = new ProbeDesc<>();
         pd.setName("empty");
         pd.setProbeName("empty");
         pd.add(ProbeDesc.getDataSourceBuilder("ds0", DsType.COUNTER).setCollectKeyHigh("high").setCollectKeyLow("low"));
@@ -70,7 +70,7 @@ public class TestProbe {
 
         p.configure();
         Assert.assertTrue("Failed to create storage", p.checkStore());
-        Map<String, Number> val = new HashMap<String, Number>();
+        Map<String, Number> val = new HashMap<>();
         long high = 255L;
         long low = 64L;
         val.put("high", high);
@@ -82,7 +82,7 @@ public class TestProbe {
 
     @Test
     public void testDefault() throws Exception {
-        ProbeDesc<String> pd = new ProbeDesc<String>();
+        ProbeDesc<String> pd = new ProbeDesc<>();
         pd.setName("empty");
         pd.setProbeName("empty");
 
@@ -99,7 +99,7 @@ public class TestProbe {
         p.setHost(host);
 
         Assert.assertTrue("Failed to create storage", p.checkStore());
-        Map<String, Number> val = new HashMap<String, Number>();
+        Map<String, Number> val = new HashMap<>();
         val.put("ds1", 2L);
 
         p.checkStore();

@@ -82,7 +82,7 @@ public class Log4JRule implements TestRule {
                     Set<Map.Entry<Category, Appender>> collected = new HashSet<>();
                     appenders.entrySet().stream()
                     .forEach(e -> e.getValue().stream()
-                             .map(c -> new SimpleEntry<Category, Appender>(c, e.getKey()))
+                             .map(c -> new SimpleEntry<>(c, e.getKey()))
                              .forEach(collected::add));
                     collected.stream()
                     .filter( e -> jrdsAppender == null || ! jrdsAppender.equals(e.getValue()))
@@ -106,7 +106,7 @@ public class Log4JRule implements TestRule {
     }
 
     public List<LoggingEvent> getLogChecker(String... loggers) {
-        final List<LoggingEvent> logs = new ArrayList<LoggingEvent>();
+        final List<LoggingEvent> logs = new ArrayList<>();
         Appender ta = new AppenderSkeleton() {
             @Override
             public synchronized void doAppend(LoggingEvent event) {

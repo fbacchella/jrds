@@ -39,11 +39,11 @@ public class RolesACL extends ACL {
     @Override
     public ACL join(ACL acl) {
         if(acl instanceof RolesACL) {
-            Set<String> newRoles = new HashSet<String>(roles);
+            Set<String> newRoles = new HashSet<>(roles);
             newRoles.addAll(((RolesACL) acl).getRoles());
             return new RolesACL(newRoles);
         } else if(acl instanceof AdminACL) {
-            Set<String> newRoles = new HashSet<String>(roles);
+            Set<String> newRoles = new HashSet<>(roles);
             newRoles.add(((AdminACL) acl).getAdminRole());
             return new RolesACL(newRoles);
         } else {

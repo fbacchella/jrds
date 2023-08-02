@@ -34,8 +34,8 @@ public class DoSnmpProbe extends CommandStarterImpl {
         DsType type;
     }
 
-    static final Map<String, Method> argstomethod = new HashMap<String, Method>();
-    static final Map<String, Method> typeMapper = new HashMap<String, Method>();
+    static final Map<String, Method> argstomethod = new HashMap<>();
+    static final Map<String, Method> typeMapper = new HashMap<>();
 
     static {
         try {
@@ -127,7 +127,7 @@ public class DoSnmpProbe extends CommandStarterImpl {
         if(!indexed)
             pd.addSpecific(SnmpProbe.REQUESTERNAME, "simple");
 
-        Map<String, String> prop = new HashMap<String, String>();
+        Map<String, String> prop = new HashMap<>();
         prop.put(OutputKeys.INDENT, "yes");
         prop.put(OutputKeys.DOCTYPE_PUBLIC, "-//jrds//DTD Probe Description//EN");
         prop.put(OutputKeys.DOCTYPE_SYSTEM, "urn:jrds:probedesc");

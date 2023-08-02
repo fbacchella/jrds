@@ -54,7 +54,7 @@ public class ApacheStatus extends HCHttpProbe<String> implements IndexedProbe {
         Map<String, Number> vars = null;
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(stream));
-            List<String> lines = new ArrayList<String>();
+            List<String> lines = new ArrayList<>();
             String lastLine;
             while ((lastLine = in.readLine()) != null)
                 lines.add(lastLine);
@@ -72,7 +72,7 @@ public class ApacheStatus extends HCHttpProbe<String> implements IndexedProbe {
      * @see com.aol.jrds.HttpProbe#parseLines(java.util.List)
      */
     protected Map<String, Number> parseLines(List<String> lines) {
-        Map<String, Number> retValue = new HashMap<String, Number>(lines.size());
+        Map<String, Number> retValue = new HashMap<>(lines.size());
         for(String l: lines) {
             String[] kvp = l.split(":");
             if(kvp.length != 2)

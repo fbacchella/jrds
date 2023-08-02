@@ -155,7 +155,7 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
      */
     public List<String> parseStreamToLines(InputStream stream) {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(stream))){
-            List<String> lines = new ArrayList<String>();
+            List<String> lines = new ArrayList<>();
             String lastLine;
             while ((lastLine = in.readLine()) != null)
                 lines.add(lastLine);

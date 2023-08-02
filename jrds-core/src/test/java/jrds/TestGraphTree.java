@@ -33,7 +33,7 @@ public class TestGraphTree {
 
 
     private List<String> doList(String... pathelems) {
-        return new ArrayList<String>(Arrays.asList(pathelems));
+        return new ArrayList<>(Arrays.asList(pathelems));
     }
 
     @Test

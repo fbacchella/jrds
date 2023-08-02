@@ -42,7 +42,7 @@ public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnec
         t.setDaemon(true);
         return t;
     };
-    private final static ExecutorService closer = new ThreadPoolExecutor(0, 4, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), closerFactory);
+    private final static ExecutorService closer = new ThreadPoolExecutor(0, 4, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), closerFactory);
 
     protected JMXConnector connector;
     private NativeJmxSource connection;
@@ -116,7 +116,7 @@ public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnec
     public boolean startConnection() {
         try {
             log(Level.TRACE, "connecting to %s", url);
-            Map<String, Object> attributes = new HashMap<String, Object>();
+            Map<String, Object> attributes = new HashMap<>();
             if (user != null && password != null) {
                 String[] credentials = new String[] { user, password };
                 attributes.put("jmx.remote.credentials", credentials);

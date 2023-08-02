@@ -31,7 +31,7 @@ class DatasourcesPopulator<T extends DataHolder> {
 
     static final private Logger logger = LoggerFactory.getLogger(DatasourcesPopulator.class);
 
-    private final List<DsDesc> toDo = new ArrayList<DsDesc>();
+    private final List<DsDesc> toDo = new ArrayList<>();
 
     static List<DsDesc> populate(RrdGraphDef graphDef, Probe<?, ?> defProbe, ExtractInfo ei, Map<String, IPlottable> customData, List<DsDesc> allds, String name) {
         DatasourcesPopulator<RrdGraphDef> p = new DatasourcesPopulator<>(graphDef, defProbe, ei, customData, allds, name);
@@ -48,7 +48,7 @@ class DatasourcesPopulator<T extends DataHolder> {
         HostsList hl = defProbe.getHostList();
 
         // The datasources already found
-        Set<String> datasources = new HashSet<String>();
+        Set<String> datasources = new HashSet<>();
 
         // The needed extractors
         Map<Probe<?, ?>, Extractor> probeDS = new HashMap<>(customData.size() + allds.size());

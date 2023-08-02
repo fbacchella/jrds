@@ -116,7 +116,7 @@ public class TestHostBuilder {
 
         JrdsDocument cnxdoc = new JrdsDocument(Tools.dbuilder.newDocument());
         cnxdoc.doRootElement("host").addElement("connection", "type=jrds.probe.JMXConnection").addElement("attr", "name=port").setTextContent("8999");
-        for(ConnectionInfo ci: hb.makeConnexion(cnxdoc.getRootElement(), new HostInfo("localhost"), new HashMap<String, String>(0))) {
+        for(ConnectionInfo ci: hb.makeConnexion(cnxdoc.getRootElement(), new HostInfo("localhost"), new HashMap<>(0))) {
             logger.trace(ci.getName());
             StarterNode  sn = new StarterNode() {
                 @Override
@@ -148,7 +148,7 @@ public class TestHostBuilder {
         HostBuilder hb = new HostBuilder();
         hb.setPm(pm);
         hb.setClassLoader(this.getClass().getClassLoader());
-        hb.setMacros(new HashMap<String, Macro>(0));
+        hb.setMacros(new HashMap<>(0));
         hb.setProbeFactory(pf);
         Map<String, Timer> timerMap = Tools.getSimpleTimerMap();
         timerMap.put("another", timerMap.get(Timer.DEFAULTNAME));

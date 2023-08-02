@@ -37,8 +37,8 @@ public class CheckJar extends CommandStarterImpl {
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
         Map<String, GraphDesc> grapMap = conf.setGraphDescMap();
 
-        Set<Class<? extends DiscoverAgent>> daList = new HashSet<Class<? extends DiscoverAgent>>();
-        Set<Class<? extends Starter>> externalStarters = new HashSet<Class<? extends Starter>>();
+        Set<Class<? extends DiscoverAgent>> daList = new HashSet<>();
+        Set<Class<? extends Starter>> externalStarters = new HashSet<>();
 
         for(String jarfile: args) {
             System.out.println("checking " + jarfile);
@@ -94,7 +94,7 @@ public class CheckJar extends CommandStarterImpl {
             da.doHtmlDiscoverFields(doc);
         }
         System.out.println("Discovery <div> will be:");
-        Map<String, String> prop = new HashMap<String, String>(4);
+        Map<String, String> prop = new HashMap<>(4);
         prop.put(OutputKeys.OMIT_XML_DECLARATION, "yes");
         prop.put(OutputKeys.INDENT, "yes");
         prop.put(OutputKeys.STANDALONE, "yes");

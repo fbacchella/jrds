@@ -145,7 +145,7 @@ final public class Tools {
     static public Map<String, Timer> getSimpleTimerMap() {
         PropertiesManager.TimerInfo ti = TimerInfo.builder().numCollectors(1).step(300).timeout(10).build();
         Timer t = new Timer(Timer.DEFAULTNAME, ti);
-        Map<String, Timer> timerMap = new HashMap<String, Timer>(1);
+        Map<String, Timer> timerMap = new HashMap<>(1);
         timerMap.put(t.getName(), t);
         return timerMap;
     }

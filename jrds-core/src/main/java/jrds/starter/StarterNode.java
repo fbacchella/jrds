@@ -133,7 +133,7 @@ public abstract class StarterNode implements StartersSet, InstanceLogger {
             if (allStarters == null) {
                 // Must be a linked hashed map, order of insertion might be
                 // important
-                allStarters = new LinkedHashMap<Object, Starter>(2);
+                allStarters = new LinkedHashMap<>(2);
             }
             if (! allStarters.containsKey(key) ) {
                 // Attention, Starter.initialize can add Starters, don't call it inside the map

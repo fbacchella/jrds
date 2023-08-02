@@ -86,7 +86,7 @@ public class HttpTest {
     public void build2() throws IllegalArgumentException, InvocationTargetException {
         HttpProbe<String> p = new TestHttpProbe();
         p.setHost(webserver);
-        ProbeDesc<String> pd = new ProbeDesc<String>();
+        ProbeDesc<String> pd = new ProbeDesc<>();
         pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
         p.setPd(pd);
         p.setFile("/file");
@@ -101,7 +101,7 @@ public class HttpTest {
     public void build3() throws IllegalArgumentException, InvocationTargetException {
         HttpProbe<String> p = new TestHttpProbe();
         p.setHost(webserver);
-        ProbeDesc<String> pd = new ProbeDesc<String>();
+        ProbeDesc<String> pd = new ProbeDesc<>();
         pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
         p.setPd(pd);
         p.setFile("/file");
@@ -116,7 +116,7 @@ public class HttpTest {
     @Test
     public void build4() throws IllegalArgumentException, InvocationTargetException {
         HttpProbe<String> p = new TestHttpProbe();
-        ProbeDesc<String> pd = new ProbeDesc<String>();
+        ProbeDesc<String> pd = new ProbeDesc<>();
         pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
         p.setHost(webserver);
         p.setPd(pd);
@@ -133,7 +133,7 @@ public class HttpTest {
     @Test
     public void build5() throws IllegalArgumentException, InvocationTargetException {
         HttpProbe<String> p = new TestHttpProbe();
-        ProbeDesc<String> pd = new ProbeDesc<String>();
+        ProbeDesc<String> pd = new ProbeDesc<>();
         pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
         p.setHost(webserver);
         p.setPd(pd);

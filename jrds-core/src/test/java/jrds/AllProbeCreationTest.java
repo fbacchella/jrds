@@ -55,7 +55,7 @@ public class AllProbeCreationTest {
 
         ProbeFactory pf = new ProbeFactory(probeDescMap, graphDescMap);
 
-        Set<GraphNode> allgraphs = new HashSet<GraphNode>();
+        Set<GraphNode> allgraphs = new HashSet<>();
         HostInfo host = new HostInfo("Empty");
         host.setHostDir(pm.rrddir);
         HostStarter hs = new HostStarter(host);

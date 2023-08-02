@@ -32,7 +32,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
 
     @Override
     public Boolean configure() {
-        collectKeys = new HashMap<String, String>();
+        collectKeys = new HashMap<>();
         for(Map.Entry<String, String> e: getPd().getCollectMapping().entrySet()) {
             String dsName = e.getValue();
             String solved = jrds.Util.parseTemplate(e.getKey(), this);
@@ -46,7 +46,7 @@ public class JMX extends ProbeConnected<String, Double, JMXConnection> implement
         JmxAbstractDataSource<?> mbean = cnx.getConnection();
         try {
             Set<String> collectKeys = getCollectMapping().keySet();
-            Map<String, Double> retValues = new HashMap<String, Double>(collectKeys.size());
+            Map<String, Double> retValues = new HashMap<>(collectKeys.size());
 
             log(Level.DEBUG, "will collect: %s", collectKeys);
             for(String collect: collectKeys) {

@@ -42,7 +42,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<?>> {
 
     @SuppressWarnings("unchecked")
     public <KeyType> ProbeDesc<KeyType> makeProbeDesc(JrdsDocument n) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, ClassNotFoundException {
-        ProbeDesc<KeyType> pd = new ProbeDesc<KeyType>();
+        ProbeDesc<KeyType> pd = new ProbeDesc<>();
 
         JrdsElement root = n.getRootElement();
         setMethod(root.getElementbyName("probeName"), pd, "setProbeName");

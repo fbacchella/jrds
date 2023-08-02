@@ -7,7 +7,7 @@ import org.rrd4j.core.DataHolder;
 
 public abstract class AbstractExtractor<Source> implements Extractor {
 
-    protected Map<String, String> sources = new HashMap<String, String>();
+    protected Map<String, String> sources = new HashMap<>();
 
     public AbstractExtractor() {
         super();

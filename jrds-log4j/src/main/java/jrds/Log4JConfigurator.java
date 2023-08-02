@@ -56,7 +56,7 @@ public class Log4JConfigurator implements LogConfigurator {
                 logger.error("log4j properties file {} can't be read, log4j not configured", propfile);
             }
         } else {
-            Map<Level, List<String>> loglevels = new HashMap<Level, List<String>>();
+            Map<Level, List<String>> loglevels = new HashMap<>();
             Level loglevel = null;
             String logfile = null;
 
@@ -65,7 +65,7 @@ public class Log4JConfigurator implements LogConfigurator {
                 String param = pm.getProperty("log." + ls, "");
                 if(!"".equals(param)) {
                     String[] loggersName = param.split(",");
-                    List<String> loggerList = new ArrayList<String>(loggersName.length);
+                    List<String> loggerList = new ArrayList<>(loggersName.length);
                     for(String logger: loggersName) {
                         loggerList.add(logger.trim());
                     }

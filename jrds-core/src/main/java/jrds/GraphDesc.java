@@ -719,7 +719,7 @@ public class GraphDesc implements WithACL {
 
     public static class Builder {
         @Setter @Accessors(chain=true)
-        private List<DsDesc> allds = new ArrayList<DsDesc>();
+        private List<DsDesc> allds = new ArrayList<>();
         @Setter @Accessors(chain=true)
         private List<DsDescBuilder> descbuilders = null;
         @Setter @Accessors(chain=true)
@@ -733,7 +733,7 @@ public class GraphDesc implements WithACL {
         @Setter @Accessors(chain=true)
         private String verticalLabel = null;
         @Setter @Accessors(chain=true)
-        private Map<String, List<?>> trees = new HashMap<String, List<?>>(2);
+        private Map<String, List<?>> trees = new HashMap<>(2);
         @Setter @Accessors(chain=true)
         private String graphName;
         @Setter @Accessors(chain=true)
@@ -757,13 +757,13 @@ public class GraphDesc implements WithACL {
         private int maxLengthLegend = 0;
 
         public Builder fromGraphDesc(GraphDesc parent) {
-            allds = new ArrayList<DsDesc>(parent.allds);
+            allds = new ArrayList<>(parent.allds);
             width = parent.width;
             height = parent.height;
             upperLimit = parent.upperLimit;
             lowerLimit = parent.lowerLimit;
             verticalLabel = parent.verticalLabel;
-            trees = new HashMap<String, List<?>>(parent.trees.size());
+            trees = new HashMap<>(parent.trees.size());
             parent.trees.forEach((k, v) -> trees.put(k, new ArrayList<Object>(v)));
             graphName = parent.graphName;
             name = parent.name;
@@ -786,7 +786,7 @@ public class GraphDesc implements WithACL {
         }
 
         public Builder emptyTrees() {
-            trees = new HashMap<String, List<?>>();
+            trees = new HashMap<>();
             return this;
         }
 
@@ -830,7 +830,7 @@ public class GraphDesc implements WithACL {
     private double lowerLimit = 0;
     private String verticalLabel = null;
     private int lastColor = 0;
-    private Map<String, List<?>> trees = new HashMap<String, List<?>>(2);
+    private Map<String, List<?>> trees = new HashMap<>(2);
     private String graphName;
     private String name;
     private String graphTitle = "${graphdesc.name} on ${host}";
@@ -853,7 +853,7 @@ public class GraphDesc implements WithACL {
     private Dimension dimension = null;
 
     public GraphDesc() {
-        allds = new ArrayList<DsDesc>();
+        allds = new ArrayList<>();
     }
 
     public GraphDesc(Builder builder) {
@@ -1164,7 +1164,7 @@ public class GraphDesc implements WithACL {
         if(elementsTree == null) {
             return Collections.emptyList();
         }
-        List<String> tree = new ArrayList<String>(elementsTree.size());
+        List<String> tree = new ArrayList<>(elementsTree.size());
         for(Object o: elementsTree) {
             if(o instanceof String) {
                 String pathElem = jrds.Util.parseTemplate((String) o, graph.getProbe(), this, graph.getProbe().getHost());

@@ -96,7 +96,7 @@ public class SnmpConnection extends Connection<Target> {
 
     @Override
     public long setUptime() {
-        Set<OID> upTimesOids = new HashSet<OID>(2);
+        Set<OID> upTimesOids = new HashSet<>(2);
         upTimesOids.add(uptimeOid);
         // Fallback uptime OID, it should be always defined, from SNMPv2-MIB
         upTimesOids.add(sysUpTimeInstance);

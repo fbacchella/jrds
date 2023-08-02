@@ -41,7 +41,7 @@ public class TabBuilder extends ConfigObjectBuilder<Tab> {
                 String id = elemNode.getAttribute("id");
                 if("cgraph".equals(elemNode.getNodeName()))
                     id = "/" + id;
-                List<String> path = new ArrayList<String>();
+                List<String> path = new ArrayList<>();
                 for(JrdsElement pathNode: elemNode.getChildElementsByName("path")) {
                     path.add(pathNode.getTextContent());
                 }

@@ -31,7 +31,7 @@ public final class ArgFactory {
     static private final Logger logger = LoggerFactory.getLogger(ArgFactory.class);
 
     static private final String[] argPackages = new String[] { "java.lang.", "java.net.", "org.snmp4j.smi.", "java.io.", "" };
-    static private final Map<String, Class<?>> classCache = new ConcurrentHashMap<String, Class<?>>();
+    static private final Map<String, Class<?>> classCache = new ConcurrentHashMap<>();
 
     /**
      * This method build a list from an XML enumeration of element.
@@ -58,7 +58,7 @@ public final class ArgFactory {
      */
     public static List<Object> makeArgs(JrdsElement sequence, Object... arguments) throws InvocationTargetException {
         List<JrdsElement> elements = sequence.getChildElements();
-        List<Object> argsList = new ArrayList<Object>(elements.size());
+        List<Object> argsList = new ArrayList<>(elements.size());
         for(JrdsElement listNode: elements) {
             String localName = listNode.getNodeName();
             logger.trace("Element to check: {}", localName);
@@ -202,7 +202,7 @@ public final class ArgFactory {
         Set<ProbeBean> beansAnnotations = ArgFactory.enumerateAnnotation(c, ProbeBean.class, topClass);
         if(beansAnnotations.isEmpty())
             return Collections.emptyMap();
-        Map<String, GenericBean> beanProperties = new HashMap<String, GenericBean>();
+        Map<String, GenericBean> beanProperties = new HashMap<>();
         for(ProbeBean annotation: beansAnnotations) {
             for(String beanName: annotation.value()) {
                 // Bean already found, don't work on it again
@@ -231,7 +231,7 @@ public final class ArgFactory {
      * @return
      */
     static public <T extends Annotation> Set<T> enumerateAnnotation(Class<?> searched, Class<T> annontationClass, Class<?> stop) {
-        Set<T> annotations = new LinkedHashSet<T>();
+        Set<T> annotations = new LinkedHashSet<>();
         while (searched != null && stop.isAssignableFrom(searched)) {
             if(searched.isAnnotationPresent(annontationClass)) {
                 T annotation = searched.getAnnotation(annontationClass);

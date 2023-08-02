@@ -77,7 +77,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
     @Override
     public Map<String, Number> getLastValues() {
         try (RRDatabase db = new RRDatabase(rrdpath)) {
-            Map<String, Number> values = new HashMap<String, Number>(db.getDataSourcesName().size());
+            Map<String, Number> values = new HashMap<>(db.getDataSourcesName().size());
             for(int i = db.getDataSourcesName().size() - 1; i >= 0; i--) {
                 DataSource source = db.getDataSource(i);
                 values.put(source.getName(), source.getPDPStatusBlock().getValue());
@@ -98,7 +98,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
             throw new RuntimeException("Failed to access rrd file  " + getPath(), e);
         }
 
-        return new AbstractExtractor<DataChunk>() {
+        return new AbstractExtractor<>() {
             @Override
             public int getColumnCount() {
                 return db.getDataSourcesName().size();
@@ -108,7 +108,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
             public void fill(DataHolder gd, ExtractInfo ei) {
                 try {
                     DataChunk dc = db.getData(ConsolidationFunctionType.AVERAGE, ei.start.getEpochSecond(), ei.end.getEpochSecond(), ei.step);
-                    for(Map.Entry<String, String> e: sources.entrySet()) {
+                    for (Map.Entry<String, String> e : sources.entrySet()) {
                         gd.datasource(e.getKey(), dc.toPlottable(e.getValue()));
                     }
                 } catch (IOException e) {

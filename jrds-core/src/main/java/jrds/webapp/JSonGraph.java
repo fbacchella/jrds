@@ -66,7 +66,7 @@ public class JSonGraph extends JSonData {
         }
         params.configureGraph(graph);
 
-        Map<String, Object> imgProps = new HashMap<String, Object>();
+        Map<String, Object> imgProps = new HashMap<>();
         r.render(graph);
         Probe<?, ?> p = gn.getProbe();
         imgProps.put("probename", p.getName());

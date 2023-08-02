@@ -53,7 +53,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
 
     @Override
     public Collection<OID> getIndexSet() {
-        Collection<OID> indexes = new HashSet<OID>(2);
+        Collection<OID> indexes = new HashSet<>(2);
         indexes.add(hrSWRunPath);
         indexes.add(hrSWRunParameters);
         return indexes;
@@ -63,7 +63,7 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
      * @see jrds.probe.snmp.SnmpProbe#getOidSet()
      */
     public Set<OID> getOidSet() {
-        Set<OID> retValue = new HashSet<OID>();
+        Set<OID> retValue = new HashSet<>();
         for(int[] indexArray: getProcsOID()) {
             retValue.addAll(makeIndexed(getOidNameMap().keySet(), indexArray));
         }
@@ -74,10 +74,10 @@ public class ProcessInfoExtended extends RdsIndexedSnmpRrd {
         boolean found = false;
         Collection<OID> soidSet = getIndexSet();
 
-        Collection<int[]> oids = new HashSet<int[]>();
+        Collection<int[]> oids = new HashSet<>();
         TabularIterator ti = new TabularIterator(getConnection(), soidSet);
         for(SnmpVars s: ti) {
-            List<OID> lk = new ArrayList<OID>(s.keySet());
+            List<OID> lk = new ArrayList<>(s.keySet());
             Collections.sort(lk);
             StringBuilder cmdBuf = new StringBuilder();
             for(OID oid: lk) {

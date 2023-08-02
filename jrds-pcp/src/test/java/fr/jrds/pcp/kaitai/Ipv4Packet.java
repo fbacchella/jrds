@@ -65,7 +65,7 @@ public class Ipv4Packet extends KaitaiStruct {
          _read();
      }
      private void _read() {
-         this.entries = new ArrayList<Ipv4Option>();
+         this.entries = new ArrayList<>();
          while (!this._io.isEof()) {
              this.entries.add(new Ipv4Option(this._io, this, _root));
          }

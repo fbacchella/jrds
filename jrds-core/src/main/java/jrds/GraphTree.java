@@ -48,8 +48,8 @@ public class GraphTree {
      * 
      */
     private GraphTree(String name) {
-        graphsSet = new TreeMap<String, GraphNode>(jrds.Util.nodeComparator);
-        childsMap = new TreeMap<String, GraphTree>(jrds.Util.nodeComparator);
+        graphsSet = new TreeMap<>(jrds.Util.nodeComparator);
+        childsMap = new TreeMap<>(jrds.Util.nodeComparator);
         this.name = name;
     }
 
@@ -61,7 +61,7 @@ public class GraphTree {
      */
     public static GraphTree makeGraph(String root) {
         GraphTree rootNode = new GraphTree(root);
-        rootNode.pathsMap = new HashMap<Integer, GraphTree>();
+        rootNode.pathsMap = new HashMap<>();
         rootNode.pathsMap.put(rootNode.getPath().hashCode(), rootNode);
         return rootNode;
     }
@@ -115,7 +115,7 @@ public class GraphTree {
         if(path.size() < 1) {
             logger.error("Path is empty: {} for graph {}", path, nodesGraph.getGraphTitle());
         } else
-            _addGraphByPath(new LinkedList<String>(path), nodesGraph);
+            _addGraphByPath(new LinkedList<>(path), nodesGraph);
     }
 
     /**
@@ -127,7 +127,7 @@ public class GraphTree {
         if(path.length < 1) {
             logger.error("Path is empty");
         } else
-            _addGraphByPath(new LinkedList<String>(Arrays.asList(path)), null);
+            _addGraphByPath(new LinkedList<>(Arrays.asList(path)), null);
     }
 
     public GraphTree getChildbyName(String name) {
@@ -157,7 +157,7 @@ public class GraphTree {
      * @return
      */
     public List<GraphNode> enumerateChildsGraph(Filter f) {
-        List<GraphNode> retValue = new ArrayList<GraphNode>();
+        List<GraphNode> retValue = new ArrayList<>();
         if(graphsSet != null) {
             if(f == null)
                 retValue.addAll(graphsSet.values());

@@ -63,7 +63,7 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
 
             BufferedReader statsbuffer = getAnswer(inputSocket, outputSocket, getPd().getSpecific("command"));
 
-            Map<String, Number> vars = new HashMap<String, Number>();
+            Map<String, Number> vars = new HashMap<>();
             while (statsbuffer.ready()) {
                 String statsline = statsbuffer.readLine();
                 Matcher m = statlinepattern.matcher(statsline);

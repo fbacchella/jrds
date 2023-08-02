@@ -15,9 +15,9 @@ import org.slf4j.LoggerFactory;
 public class FilterXml extends Filter {
     static private final Logger logger = LoggerFactory.getLogger(FilterXml.class);
 
-    private final Set<Pattern> goodPaths = new HashSet<Pattern>();
-    private final Set<Pattern> tags = new HashSet<Pattern>();
-    private final Set<String> names = new HashSet<String>();
+    private final Set<Pattern> goodPaths = new HashSet<>();
+    private final Set<Pattern> tags = new HashSet<>();
+    private final Set<String> names = new HashSet<>();
     private final String name;
 
     /**

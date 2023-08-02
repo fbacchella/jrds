@@ -152,7 +152,7 @@ public class TestLoadConfiguration {
 
         Macro m = b.makeMacro(d);
 
-        Map<String, Macro> macroMap = new HashMap<String, Macro>();
+        Map<String, Macro> macroMap = new HashMap<>();
         macroMap.put(m.getName(), m);
 
         JrdsDocument hostdoc = Tools.parseString(goodHostXml);
@@ -169,7 +169,7 @@ public class TestLoadConfiguration {
         HostInfo host = hb.makeHost(hostdoc);
 
         logger.debug("probes:" + host.getProbes());
-        Collection<String> probesName = new ArrayList<String>();
+        Collection<String> probesName = new ArrayList<>();
         for(Probe<?, ?> p: host.getProbes()) {
             probesName.add(p.toString());
         }

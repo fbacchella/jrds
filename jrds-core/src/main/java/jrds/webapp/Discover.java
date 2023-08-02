@@ -41,7 +41,7 @@ public class Discover extends JrdsServlet {
     public static final class ProbeDescSummary {
         public final Class<?> clazz;
         public final String name;
-        public final Map<String, String> specifics = new HashMap<String, String>();
+        public final Map<String, String> specifics = new HashMap<>();
         public final boolean isIndexed;
 
         ProbeDescSummary(JrdsDocument probdesc, ClassLoader cl) throws ClassNotFoundException {
@@ -83,7 +83,7 @@ public class Discover extends JrdsServlet {
             response.setContentType(CONTENT_TYPE);
             response.addHeader("Cache-Control", "no-cache");
 
-            Map<String, String> prop = new HashMap<String, String>(1);
+            Map<String, String> prop = new HashMap<>(1);
             prop.put(OutputKeys.OMIT_XML_DECLARATION, "no");
             prop.put(OutputKeys.INDENT, "yes");
             prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
@@ -111,7 +111,7 @@ public class Discover extends JrdsServlet {
                 tagElem.setTextContent(tag);
             }
 
-        List<String> probeDescsName = new ArrayList<String>();
+        List<String> probeDescsName = new ArrayList<>();
         probeDescsName.addAll(probdescs.keySet());
         Collections.sort(probeDescsName);
 

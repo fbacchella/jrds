@@ -530,7 +530,7 @@ public class Util {
             return template;
         }
 
-        Map<String, Integer> indexes = new HashMap<String, Integer>();
+        Map<String, Integer> indexes = new HashMap<>();
         String message = findVariables(template, 0, indexes, arguments);
         Object[] values = new Object[indexes.size()];
 
@@ -677,7 +677,7 @@ public class Util {
     }
 
     public static <T> Iterable<T> iterate(Enumeration<T> en) {
-        return () -> new Iterator<T>() {
+        return () -> new Iterator<>() {
             public boolean hasNext() {
                 return en.hasMoreElements();
             }
