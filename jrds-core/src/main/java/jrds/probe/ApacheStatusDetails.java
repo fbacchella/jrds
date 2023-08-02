@@ -77,7 +77,7 @@ public class ApacheStatusDetails extends ApacheStatus {
     }
 
     void parseScoreboard(String scoreboard, Map<String, Number> retValue) {
-        int workers[] = new int[WorkerStat.values().length];
+        int[] workers = new int[WorkerStat.values().length];
         for(char c: scoreboard.toCharArray()) {
             WorkerStat worker = WorkerStat.resolv(c);
             if(worker != null)

@@ -39,7 +39,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         return String.format("[[%s|%s]]", newurl, className);
     }
 
-    public void start(String args[]) throws Exception {
+    public void start(String[] args) throws Exception {
         PropertiesManager pm = new PropertiesManager();
         File propFile = new File(propFileName);
         if(propFile.isFile()) {

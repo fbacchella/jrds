@@ -54,7 +54,7 @@ public class Download extends JrdsServlet {
 
         String pi = req.getPathInfo();
         if(pi != null && pi.length() > 2) {
-            String cmds[] = pi.split("/");
+            String[] cmds = pi.split("/");
             if(cmds.length == 4) {
                 cmd = cmds[1];
                 if("probe".equals(cmd)) {
@@ -125,7 +125,7 @@ public class Download extends JrdsServlet {
     }
 
     protected void writeCsv(OutputStream out, DataProcessor dp, DateFormat exportDateFormat) throws IOException {
-        String sources[] = dp.getSourceNames();
+        String[] sources = dp.getSourceNames();
         StringBuilder sourcesline = new StringBuilder();
         sourcesline.append("Date,");
         for(String name: sources) {

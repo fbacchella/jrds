@@ -28,7 +28,7 @@ public abstract class CommandStarterImpl implements CommandStarter {
     public void configure(Properties configuration) {
     }
 
-    public abstract void start(String args[]) throws Exception;
+    public abstract void start(String[] args) throws Exception;
 
     public void doJmx(PropertiesManager pm) {
         if(!pm.withjmx)

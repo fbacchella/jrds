@@ -48,7 +48,7 @@ public class Jetty extends CommandStarterImpl {
         webRoot = configuration.getProperty("webRoot", webRoot);
     }
 
-    public void start(String args[]) {
+    public void start(String[] args) {
         PropertiesManager pm = new PropertiesManager();
         File propFile = new File(propFileName);
         if(propFile.isFile())
