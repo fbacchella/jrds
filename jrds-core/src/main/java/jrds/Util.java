@@ -507,7 +507,7 @@ public class Util {
                                .filter(Objects::nonNull)
                                .filter(v -> clazz.isAssignableFrom(v.getClass()))
                                .map(clazz::cast)
-                               .map(apply::apply)
+                               .map(apply)
                                .orElse(null);
             } catch (RuntimeException e) {
                 logger.error("Failed to evalute template for {} on {}, because of {}", clazz.getCanonicalName(), o, resolveThrowableException(e));

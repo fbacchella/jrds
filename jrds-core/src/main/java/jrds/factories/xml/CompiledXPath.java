@@ -16,7 +16,7 @@ public class CompiledXPath {
     private static final Logger logger = LoggerFactory.getLogger(CompiledXPath.class);
 
     private static final XPathFactory XFACTORY = XPathFactory.newInstance();
-    private static final ThreadLocal<XPath> xpather = ThreadLocal.withInitial(() -> XFACTORY.newXPath());
+    private static final ThreadLocal<XPath> xpather = ThreadLocal.withInitial(XFACTORY::newXPath);
 
     private static final Map<String, XPathExpression> xpc = new ConcurrentHashMap<>();
 
