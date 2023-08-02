@@ -619,7 +619,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         return finished;
     }
 
-    private final String parseTemplate(String template) {
+    private String parseTemplate(String template) {
         Object[] arguments = {
                               "${host}",
                               "${index}",
