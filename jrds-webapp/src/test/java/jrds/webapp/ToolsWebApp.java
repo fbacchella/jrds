@@ -51,7 +51,7 @@ public class ToolsWebApp {
         return tester;
     }
 
-    static Response doRequestGet(ServletTester tester, String query, int expectedStatus) throws IOException, Exception {
+    static Response doRequestGet(ServletTester tester, String query, int expectedStatus) throws Exception {
         URL queryURL = new URL(query);
         Request request = HttpTester.newRequest();
         request.setMethod("GET");
@@ -69,7 +69,8 @@ public class ToolsWebApp {
         abstract void fillRequest(Request r);
     }
 
-    static Response doRequestPost(ServletTester tester, String query, MakePostContent filler, int expectedStatus) throws IOException, Exception {
+    static Response doRequestPost(ServletTester tester, String query, MakePostContent filler, int expectedStatus) throws
+            Exception {
         URL queryURL = new URL(query);
         Request request = HttpTester.newRequest();
         request.setMethod("POST");
