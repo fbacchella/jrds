@@ -848,7 +848,7 @@ public class Util {
             }
             StringBuilder line = new StringBuilder();
             if(source != null) {
-                line.append("[").append(source.toString()).append("] ");
+                line.append("[").append(source).append("] ");
             }
             line.append(String.format(format, args));
             return line.toString();

@@ -367,7 +367,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                 do {
                     String cause = rootCause.getMessage();
                     if(cause == null || "".equals(cause)) {
-                        message.append(": ").append(rootCause.toString());
+                        message.append(": ").append(rootCause);
                     } else {
                         message.append(": ").append(cause);
                     }
