@@ -255,9 +255,7 @@ public class PropertiesManager extends Properties {
         }
 
         // Ensure that the default store was not forgotten
-        if(defaultStoreProps.get("factory") == null) {
-            defaultStoreProps.put("factory", RrdDbStoreFactory.class.getName());
-        }
+        defaultStoreProps.computeIfAbsent("factory", k -> RrdDbStoreFactory.class.getName());
 
         logger.trace("Stores configuration: {}", storesConfig);
 
