@@ -101,7 +101,7 @@ public class Util {
         z(-21),
         y(-24);
 
-        private int exponent;
+        private final int exponent;
 
         SiPrefix(int exponent) {
             this.exponent = exponent;
