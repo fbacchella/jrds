@@ -207,7 +207,7 @@ public class SnmpDiscoverAgent extends DiscoverAgent {
             if(label != null && !label.isEmpty()) {
                 OID suffixOid = new OID(index);
                 for(String lookin: label.split(",")) {
-                    OID labelOID = new OID(lookin.trim() + "." + suffixOid.toString());
+                    OID labelOID = new OID(lookin.trim() + "." + suffixOid);
                     labelValue = getLabel(active, labelOID);
                     if(labelValue != null)
                         break;

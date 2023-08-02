@@ -112,7 +112,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
                         gd.datasource(e.getKey(), dc.toPlottable(e.getValue()));
                     }
                 } catch (IOException e) {
-                    throw new RuntimeException("Failed to access rrd file  " + db.toString(), e);
+                    throw new RuntimeException("Failed to access rrd file  " + db, e);
                 }
             }
 

@@ -68,13 +68,13 @@ public class TestSnmpHostBuilder {
             String name = p.getQualifiedName();
             probes.put(name, p);
         }
-        Assert.assertTrue("myhost/tcp_snmp not found in " + probes.toString(), probes.containsKey("myhost/tcp_snmp"));
-        Assert.assertTrue("myhost/fs-_ not found in " + probes.toString(), probes.containsKey("myhost/fs-_"));
-        Assert.assertTrue("myhost/fs-_data not found in " + probes.toString(), probes.containsKey("myhost/fs-_data"));
-        Assert.assertTrue("myhost/ifx-eth0 not found in " + probes.toString(), probes.containsKey("myhost/ifx-eth0"));
-        Assert.assertTrue("myhost/ifx-eth1 not found in " + probes.toString(), probes.containsKey("myhost/ifx-eth1"));
-        Assert.assertTrue("myhost/ifx-eth2 not found in " + probes.toString(), probes.containsKey("myhost/ifx-eth2"));
-        Assert.assertTrue("myhost/ifx-eth3 not found in " + probes.toString(), probes.containsKey("myhost/ifx-eth3"));
+        Assert.assertTrue("myhost/tcp_snmp not found in " + probes, probes.containsKey("myhost/tcp_snmp"));
+        Assert.assertTrue("myhost/fs-_ not found in " + probes, probes.containsKey("myhost/fs-_"));
+        Assert.assertTrue("myhost/fs-_data not found in " + probes, probes.containsKey("myhost/fs-_data"));
+        Assert.assertTrue("myhost/ifx-eth0 not found in " + probes, probes.containsKey("myhost/ifx-eth0"));
+        Assert.assertTrue("myhost/ifx-eth1 not found in " + probes, probes.containsKey("myhost/ifx-eth1"));
+        Assert.assertTrue("myhost/ifx-eth2 not found in " + probes, probes.containsKey("myhost/ifx-eth2"));
+        Assert.assertTrue("myhost/ifx-eth3 not found in " + probes, probes.containsKey("myhost/ifx-eth3"));
     }
 
 }
