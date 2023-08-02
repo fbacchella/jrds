@@ -3,6 +3,7 @@ package jrds.webapp;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
 import org.eclipse.jetty.http.HttpTester.Request;
@@ -62,17 +63,13 @@ public class TestUpload {
         }
         baos.flush();
 
-        logger.debug("Sending " + baos.toString("UTF-8"));
+        logger.debug("Sending " + baos.toString(StandardCharsets.UTF_8));
 
         Response response = ToolsWebApp.doRequestPost(tester, "http://tester/upload", new ToolsWebApp.MakePostContent() {
             @Override
             void fillRequest(Request r) {
                 r.setHeader("Content-Type", "multipart/form-data; boundary=----------------------------84223b7e8d58");
-                try {
-                    r.setContent(baos.toString("UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    throw new RuntimeException(e);
-                }
+                r.setContent(baos.toString(StandardCharsets.UTF_8));
             }
         }, 200);
         Assert.assertEquals(200, response.getStatus());
@@ -96,17 +93,13 @@ public class TestUpload {
         }
         baos.flush();
 
-        logger.debug("Sending " + baos.toString("UTF-8"));
+        logger.debug("Sending " + baos.toString(StandardCharsets.UTF_8));
 
         Response response = ToolsWebApp.doRequestPost(tester, "http://tester/upload", new ToolsWebApp.MakePostContent() {
             @Override
             void fillRequest(Request r) {
                 r.setHeader("Content-Type", "multipart/form-data; boundary=----------------------------84223b7e8d58");
-                try {
-                    r.setContent(baos.toString("UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    throw new RuntimeException(e);
-                }
+                r.setContent(baos.toString(StandardCharsets.UTF_8));
             }
         }, 200);
         Assert.assertEquals(200, response.getStatus());
@@ -131,17 +124,13 @@ public class TestUpload {
         }
         baos.flush();
 
-        logger.debug("Sending " + baos.toString("UTF-8"));
+        logger.debug("Sending " + baos.toString(StandardCharsets.UTF_8));
 
         Response response = ToolsWebApp.doRequestPost(tester, "http://tester/upload", new ToolsWebApp.MakePostContent() {
             @Override
             void fillRequest(Request r) {
                 r.setHeader("Content-Type", "multipart/form-data; boundary=----------------------------84223b7e8d58");
-                try {
-                    r.setContent(baos.toString("UTF-8"));
-                } catch (UnsupportedEncodingException e) {
-                    throw new RuntimeException(e);
-                }
+                r.setContent(baos.toString(StandardCharsets.UTF_8));
             }
         }, 200);
         String content = response.getContent();

@@ -3,6 +3,7 @@ package jrds.webapp;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -251,7 +252,7 @@ public class TestUrlParser {
 
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
         String url = pb.makeObjectUrl("root", f, true);
-        Assert.assertTrue(url.contains("filter=" + URLEncoder.encode(filterName, "UTF-8")));
+        Assert.assertTrue(url.contains("filter=" + URLEncoder.encode(filterName, StandardCharsets.UTF_8)));
         Assert.assertTrue(url.contains("/root?"));
         Assert.assertFalse(url.contains("id=" + f.hashCode()));
         Assert.assertTrue(url.contains("begin="));

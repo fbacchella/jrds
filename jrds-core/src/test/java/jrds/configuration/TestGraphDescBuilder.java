@@ -2,6 +2,7 @@ package jrds.configuration;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -82,7 +83,7 @@ public class TestGraphDescBuilder {
             prop.put(OutputKeys.INDENT, "yes");
             prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
             jrds.Util.serialize(gddom, os, null, prop);
-            logger.trace(new String(os.toByteArray(), "UTF-8"));
+            logger.trace(new String(os.toByteArray(), StandardCharsets.UTF_8));
         }
         MokeProbe<String, Number> p = new MokeProbe<String, Number>();
         p.configure();
@@ -109,7 +110,7 @@ public class TestGraphDescBuilder {
             prop.put(OutputKeys.INDENT, "yes");
             prop.put("{http://xml.apache.org/xslt}indent-amount", "4");
             jrds.Util.serialize(gddom, os, null, prop);
-            logger.trace(new String(os.toByteArray(), "UTF-8"));
+            logger.trace(new String(os.toByteArray(), StandardCharsets.UTF_8));
         }
 
         logger.trace("Probe preparation done");

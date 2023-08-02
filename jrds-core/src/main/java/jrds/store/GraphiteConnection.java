@@ -5,6 +5,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -78,7 +79,7 @@ public class GraphiteConnection {
             socket.setTcpNoDelay(false);
             socket.setSendBufferSize(8192);
             socket.connect(graphiteServer, 1000);
-            writer = new OutputStreamWriter(socket.getOutputStream(), "UTF-8");
+            writer = new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8);
         }
     }
 

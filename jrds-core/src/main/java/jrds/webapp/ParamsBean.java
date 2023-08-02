@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -478,10 +479,7 @@ public class ParamsBean implements Serializable {
             } else {
                 value = e.getValue().toString();
             }
-            try {
-                urlBuffer.append(key).append("=").append(URLEncoder.encode(value, "UTF-8")).append("&");
-            } catch (UnsupportedEncodingException e1) {
-            }
+            urlBuffer.append(key).append("=").append(URLEncoder.encode(value, StandardCharsets.UTF_8)).append("&");
         }
         urlBuffer.deleteCharAt(urlBuffer.length() - 1);
         return urlBuffer.toString();
