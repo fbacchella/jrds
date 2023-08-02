@@ -19,7 +19,7 @@ public class JMX extends CommandStarterImpl {
     public void configure(Properties configuration) {
         logger.debug("Configuration: " + configuration);
 
-        port = jrds.Util.parseStringNumber((String) configuration.getProperty("jmx.port"), port).intValue();
+        port = jrds.Util.parseStringNumber((String) configuration.getProperty("jmx.port"), port);
         propFileName = configuration.getProperty("propertiesFile", propFileName);
     }
 

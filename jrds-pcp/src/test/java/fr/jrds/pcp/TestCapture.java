@@ -87,9 +87,9 @@ public class TestCapture extends Tester {
             ResultData r = cnx.fetchValue(new ArrayList<>(id.values()));
             Assert.assertEquals(Instant.ofEpochSecond(1579898739,468458000), r.getDate());
 
-            Assert.assertEquals(ResultInstance.builder().instance(0).value(Long.valueOf(3992)).build(), r.getIds().get(new PmId(251668480)).get(0));
-            Assert.assertEquals(ResultInstance.builder().instance(1).value(Long.valueOf(44819)).build(), r.getIds().get(new PmId(251668480)).get(1));
-            Assert.assertEquals(ResultInstance.builder().instance(2).value(Long.valueOf(185)).build(), r.getIds().get(new PmId(251668480)).get(2));
+            Assert.assertEquals(ResultInstance.builder().instance(0).value(3992L).build(), r.getIds().get(new PmId(251668480)).get(0));
+            Assert.assertEquals(ResultInstance.builder().instance(1).value(44819L).build(), r.getIds().get(new PmId(251668480)).get(1));
+            Assert.assertEquals(ResultInstance.builder().instance(2).value(185L).build(), r.getIds().get(new PmId(251668480)).get(2));
             Assert.assertEquals(3, r.getIds().get(new PmId(251668480)).size());
         }
     }

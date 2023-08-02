@@ -76,7 +76,7 @@ abstract class ConfigObjectBuilder<BuildObject> {
                 String textValue = dsContent.getTextContent().trim();
                 String nodeName = dsContent.getNodeName();
                 if (nodeName.startsWith("collect") || nodeName.startsWith("oid")) {
-                    builder.setOptionnal(Boolean.valueOf(dsContent.getAttribute("optional")));
+                    builder.setOptionnal(Boolean.parseBoolean(dsContent.getAttribute("optional")));
                 }
                 switch (nodeName) {
                 case "dsName":

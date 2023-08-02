@@ -42,7 +42,7 @@ public class Ldap extends ProbeConnected<String, Number, LdapConnection> {
         Map<String, Number> retValues = new HashMap<String, Number>();
         for(Map.Entry<String, Object> e: foundValues.entrySet()) {
             if(collected.contains(e.getKey())) {
-                double val = jrds.Util.parseStringNumber(e.getValue().toString(), Double.NaN).doubleValue();
+                double val = jrds.Util.parseStringNumber(e.getValue().toString(), Double.NaN);
                 retValues.put(e.getKey(), val);
             }
         }

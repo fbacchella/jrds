@@ -128,7 +128,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
                         builder.setDsName(value);
                         break;
                     case "percentile":
-                        Integer percentile = jrds.Util.parseStringNumber(value, Integer.valueOf(95));
+                        Integer percentile = jrds.Util.parseStringNumber(value, 95);
                         builder.setPercentile(percentile);
                         break;
                     case "color":

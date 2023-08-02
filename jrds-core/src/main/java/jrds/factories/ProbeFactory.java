@@ -105,7 +105,7 @@ public class ProbeFactory {
                 if(logger.isTraceEnabled())
                     logger.trace("Result of configuration for " + p + ": " + result);
                 Boolean configured = (Boolean) result;
-                if(!configured.booleanValue()) {
+                if(!configured) {
                     return false;
                 }
             }

@@ -105,8 +105,8 @@ public class Varnish extends Probe<String, Number> implements IndexedProbe {
         if(statusinfo.length != 2) {
             return new BufferedReader(new CharArrayReader(new char[0]));
         }
-        int statuscode = jrds.Util.parseStringNumber(statusinfo[0], -1).intValue();
-        int size = jrds.Util.parseStringNumber(statusinfo[1], -1).intValue();
+        int statuscode = jrds.Util.parseStringNumber(statusinfo[0], -1);
+        int size = jrds.Util.parseStringNumber(statusinfo[1], -1);
         log(Level.TRACE, "status code: %d", statuscode);
         if((statuscode != 200 && statuscode != 500) || size < 1) {
             log(Level.ERROR, "communication error, code: %d, byte expected: %d", statuscode, size);

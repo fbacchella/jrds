@@ -33,7 +33,7 @@ public class TestArgFactory {
         JrdsDocument d = Tools.parseString("<body><arg type=\"Integer\" value=\"1\" /></body>");
         List<Object> l = ArgFactory.makeArgs(d.getRootElement());
         Assert.assertEquals("Wrong number of elements", 1, l.size());
-        Assert.assertEquals("Wrong value", new Integer(1), l.get(0));
+        Assert.assertEquals("Wrong value", 1, l.get(0));
     }
 
     @Test
@@ -41,7 +41,7 @@ public class TestArgFactory {
         JrdsDocument d = Tools.parseString("<body><arg type=\"Integer\">1</arg><arg type=\"String\">1</arg></body>");
         List<Object> l = ArgFactory.makeArgs(d.getRootElement());
         Assert.assertEquals("Wrong number of elements", 2, l.size());
-        Assert.assertEquals("Wrong value", new Integer(1), l.get(0));
+        Assert.assertEquals("Wrong value", 1, l.get(0));
         Assert.assertEquals("Wrong value", "1", l.get(1));
     }
 
@@ -51,7 +51,7 @@ public class TestArgFactory {
         List<Object> l = ArgFactory.makeArgs(d.getRootElement());
         Assert.assertEquals("Wrong number of elements", 2, l.size());
         Assert.assertTrue("Wrong value", l.get(0) instanceof List);
-        Assert.assertEquals("Wrong value", new Integer(1), l.get(1));
+        Assert.assertEquals("Wrong value", 1, l.get(1));
     }
 
     @Test

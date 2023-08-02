@@ -30,7 +30,7 @@ public class CpqDaPhyDrv extends RdsIndexedSnmpRrd {
 
     private double joinCounter32(Long high, Long low) {
         if(high != null && low != null)
-            return high.longValue() << 32 + low.longValue();
+            return high << 32 + low;
         else
             return Double.NaN;
 

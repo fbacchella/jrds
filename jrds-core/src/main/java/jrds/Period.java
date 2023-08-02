@@ -163,7 +163,7 @@ public class Period {
         if("NOW".compareToIgnoreCase(date) == 0) {
             return ZonedDateTime.now();
         } else if (secondsPattern.matcher(date).matches()) {
-            return ZonedDateTime.ofInstant(Instant.ofEpochMilli(Util.parseStringNumber(date, Long.MIN_VALUE).longValue()), ZoneId.systemDefault());
+            return ZonedDateTime.ofInstant(Instant.ofEpochMilli(Util.parseStringNumber(date, Long.MIN_VALUE)), ZoneId.systemDefault());
         } else if(date.length() >= 4 && dateMatcher.find()) {
             try {
                 if(logger.isTraceEnabled()) {

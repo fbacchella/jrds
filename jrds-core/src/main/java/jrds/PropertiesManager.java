@@ -91,7 +91,7 @@ public class PropertiesManager extends Properties {
             } else {
                 integer = Integer.valueOf(s);
             }
-            return integer.intValue();
+            return integer;
         }
         throw new NumberFormatException("Parsing null string");
     }
