@@ -38,7 +38,7 @@ public class Start extends Pdu {
             serverInfo = ServerInfo.builder().features(features).licensed(licensed).version(version).build();
             logger.debug("Starting with status={} version={} licensed={} features={}", 
                          status, serverInfo.getVersion(), serverInfo.getLicensed(), serverInfo.getFeatures());
-        };
+        }
     }
 
     @Override

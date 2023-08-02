@@ -32,7 +32,7 @@ public class ReadOnlyProbeClassResolver extends ProbeClassResolver {
             return true;
         }
 
-    };
+    }
 
     @ProbeBean({"index", "pattern" })
     public static class DummyProbeIndexed extends DummyProbe implements IndexedProbe {

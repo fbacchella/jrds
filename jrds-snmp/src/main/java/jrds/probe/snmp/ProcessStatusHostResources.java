@@ -22,7 +22,7 @@ public class ProcessStatusHostResources extends RdsSnmpSimple {
         running,
         runnable,
         notRunnable,
-        invalid;
+        invalid
     }
 
     /*

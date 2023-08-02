@@ -86,8 +86,7 @@ public final class Graph extends JrdsServlet {
             res.addHeader("ETag", Base64.getEncoder().encodeToString(eTagBaseString.getBytes()));
 
             try (ServletOutputStream out = res.getOutputStream();
-                 FileChannel indata = hl.getRenderer().sendInfo(graph);
-                ) {
+                 FileChannel indata = hl.getRenderer().sendInfo(graph)) {
                 // If a cache file exist, try to be smart, but only if caching is
                 // allowed
                 if (indata != null && cache) {

@@ -55,7 +55,7 @@ public class TestRrdDbStore {
             e.addSource("test", "test");
             String[] dsNames = e.getNames();
             Assert.assertEquals("data source test not found", "test", dsNames[0]);
-        };
+        }
     }
 
     @Test

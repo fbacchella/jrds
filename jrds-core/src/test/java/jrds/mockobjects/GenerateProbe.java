@@ -21,7 +21,7 @@ public class GenerateProbe {
     public static class ChainedMap<ValueClass> extends HashMap<String, ValueClass> {
         public static final class ChainedProperties extends ChainedMap<String> {
 
-        };
+        }
 
         private ChainedMap() {
             super();

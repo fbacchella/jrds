@@ -893,7 +893,7 @@ public class GraphDesc implements WithACL {
             else {
                 bgt = GraphType.NONE;
             }
-        };
+        }
         if(bgt.toPlot() && bcolor == null) {
             bcolor = Colors.resolveIndex(lastColor++);
         }

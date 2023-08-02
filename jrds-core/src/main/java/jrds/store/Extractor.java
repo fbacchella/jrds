@@ -13,5 +13,5 @@ public interface Extractor extends Closeable {
     int getColumnCount();
     void addSource(String name, String dsName);
     String getPath();
-    default void close() { release(); };
+    default void close() { release(); }
 }

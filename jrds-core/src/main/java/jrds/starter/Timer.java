@@ -53,7 +53,7 @@ public class Timer extends StarterNode {
             }
         }
 
-    };
+    }
 
     public static final class Stats {
         @Getter

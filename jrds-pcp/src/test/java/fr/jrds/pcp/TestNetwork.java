@@ -61,7 +61,7 @@ public class TestNetwork extends Tester {
 
     @Test(timeout=500)
     public void connectStart() throws IOException, PCPException, InterruptedException {
-        try (ServerSocketChannel listenSocket = ServerSocketChannel.open();) {
+        try (ServerSocketChannel listenSocket = ServerSocketChannel.open()) {
             InetSocketAddress listenAddr = new InetSocketAddress(InetAddress.getLocalHost(), 0);
             listenSocket.bind(listenAddr);
 
@@ -69,7 +69,7 @@ public class TestNetwork extends Tester {
                 try {
                     SocketChannel client = listenSocket.accept();
                     try (Transport clientTransport = new PlainTcpTransport(client, 500);
-                                    Connection cnx = new Connection(clientTransport);) {
+                                    Connection cnx = new Connection(clientTransport)) {
                         ServerInfo si = ServerInfo.builder().features(Collections.singleton(FEATURES.CREDS_REQD)).licensed((byte)0).version((byte)2).build();
                         cnx.startServer(si);
                     }

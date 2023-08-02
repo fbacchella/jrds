@@ -18,7 +18,7 @@ public abstract class PlottableMap extends HashMap<String, IPlottable> {
         public void setReal(IPlottable real) {
             this.real = real;
         }
-    };
+    }
 
     public static final PlottableMap Empty = new PlottableMap(0) {
         @Override

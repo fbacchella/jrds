@@ -179,8 +179,7 @@ public class ParamsBean implements Serializable {
         formatedpack = JSonPack.GZIPHEADER + packed.replace('!', '=').replace('$', '/').replace('*', '+');
         try (ByteArrayOutputStream outbuffer = new ByteArrayOutputStream(formatedpack.length());
              InputStream inbuffer = Base64.getDecoder().wrap(new ByteArrayInputStream(formatedpack.getBytes()));
-             GZIPInputStream os = new GZIPInputStream(inbuffer);
-            ) {
+             GZIPInputStream os = new GZIPInputStream(inbuffer)) {
             byte[] copybuffer = new byte[4096];
             int realread;
             while ((realread = os.read(copybuffer))> 0) {

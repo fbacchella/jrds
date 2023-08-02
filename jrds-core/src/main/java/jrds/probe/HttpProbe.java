@@ -192,7 +192,7 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
             // Clean http connection error management
             // see
             // http://java.sun.com/j2se/1.5.0/docs/guide/net/http-keepalive.html
-            try (InputStream es = ((HttpURLConnection) cnx).getErrorStream();){
+            try (InputStream es = ((HttpURLConnection) cnx).getErrorStream()){
                 byte[] buffer = new byte[4096];
                 int respCode = ((HttpURLConnection) cnx).getResponseCode();
                 log(Level.ERROR, e, "Unable to read url %s because: %s, http error code: %d", getUrl(), e, respCode);

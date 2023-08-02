@@ -85,7 +85,6 @@ public class SnmpConfigurator extends ModuleConfigurator {
         oidprops.entrySet().stream()
         .map(e -> new AbstractMap.SimpleEntry<String, OID>(e.getKey().toString(), new OID(e.getValue().toString())))
         .forEach(e -> SnmpCollectResolver.oidmapping.put(e.getKey(), e.getValue()));
-        ;
         // Using the full mib parser
         String propertiesmibDirs = pm.getProperty("mibdirs", "/usr/share/snmp/mibs");
         if(!propertiesmibDirs.trim().isEmpty()) {

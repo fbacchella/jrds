@@ -35,7 +35,7 @@ public class TestProbe {
             oneSample.setTime(new Date((getLastUpdate().getTime() + 1000) * 1000));
             super.modifySample(oneSample, values);
         }
-    };
+    }
 
     @Rule
     public final TemporaryFolder testFolder = new TemporaryFolder();
