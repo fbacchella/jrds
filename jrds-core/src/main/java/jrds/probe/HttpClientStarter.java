@@ -63,7 +63,7 @@ public class HttpClientStarter extends Starter {
                         scheme = "http";
                     }
                 }
-                String portString = port < 0 ? "" : (":" + Integer.toString(port));
+                String portString = port < 0 ? "" : (":" + port);
                 if (urlhost == null) {
                     urlhost = p.getHost().getDnsName();
                 }

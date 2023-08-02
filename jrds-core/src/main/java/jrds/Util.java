@@ -371,7 +371,7 @@ public class Util {
                     indexes.put(var, index++);
                 }
                 int slot = indexes.get(var) + 1;
-                toAppend = "%" + Integer.toString(slot) + "$s";
+                toAppend = "%" + slot + "$s";
             }
             out.append(toAppend);
             if(after.length() > 0) {
