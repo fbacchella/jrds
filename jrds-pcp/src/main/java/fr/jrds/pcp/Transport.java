@@ -8,13 +8,13 @@ import java.nio.ByteOrder;
 public interface Transport extends Closeable {
     
     @FunctionalInterface
-    public static interface Waiter {
-        public void waitFor(int op) throws InterruptedException, IOException;
+    interface Waiter {
+        void waitFor(int op) throws InterruptedException, IOException;
     }
 
-    public void read(ByteBuffer buffer) throws InterruptedException, IOException;
-    public void write(ByteBuffer buffer) throws InterruptedException, IOException;
-    public Waiter getWaiter();
-    public ByteOrder getByteOrder();
+    void read(ByteBuffer buffer) throws InterruptedException, IOException;
+    void write(ByteBuffer buffer) throws InterruptedException, IOException;
+    Waiter getWaiter();
+    ByteOrder getByteOrder();
 
 }

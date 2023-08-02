@@ -19,7 +19,7 @@ import jrds.webapp.DiscoverAgent;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface ProbeMeta {
-    public class EmptyDiscoverAgent extends DiscoverAgent {
+    class EmptyDiscoverAgent extends DiscoverAgent {
         public EmptyDiscoverAgent() {
             super("Empty");
         }
@@ -60,7 +60,7 @@ public @interface ProbeMeta {
      * @author bacchell
      *
      */
-    public class EmptyStarter extends Starter {
+    class EmptyStarter extends Starter {
     }
 
     Class<? extends DiscoverAgent> discoverAgent() default EmptyDiscoverAgent.class;

@@ -26,7 +26,7 @@ public class ApacheStatusDetails extends ApacheStatus {
     // Can't be within the enum, it's defined after the first call toll add
     static private final Map<Character, WorkerStat> map = new HashMap<Character, WorkerStat>();
 
-    static enum WorkerStat {
+    enum WorkerStat {
         WAITING('_'),
         STARTING('S'),
         READING('R'),
@@ -47,7 +47,7 @@ public class ApacheStatusDetails extends ApacheStatus {
             map.put(key, value);
         }
 
-        private WorkerStat(char key) {
+        WorkerStat(char key) {
             WorkerStat.add(key, this);
         }
     }

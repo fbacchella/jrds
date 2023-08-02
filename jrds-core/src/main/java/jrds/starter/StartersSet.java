@@ -12,9 +12,9 @@ public interface StartersSet {
      * @return the starter that will be used
      * @deprecated The second argument is not used, it can be removed
      */
-    public Starter registerStarter(Starter s, StarterNode none);
+    Starter registerStarter(Starter s, StarterNode none);
 
-    public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, StarterNode node);
+    <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, StarterNode node);
 
     /**
      * @param key
@@ -22,15 +22,15 @@ public interface StartersSet {
      *             Starter&gt; StarterClass find(Class&lt;StarterClass&gt; sc);
      * @return
      */
-    public Starter find(Object key);
+    Starter find(Object key);
 
-    public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, Object key);
+    <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, Object key);
 
-    public boolean isStarted(Object key);
+    boolean isStarted(Object key);
 
-    public void setParent(StartersSet s);
+    void setParent(StartersSet s);
 
-    public StartersSet getParent();
+    StartersSet getParent();
 
-    public StarterNode getLevel();
+    StarterNode getLevel();
 }

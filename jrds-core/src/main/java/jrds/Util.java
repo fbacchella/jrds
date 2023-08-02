@@ -102,7 +102,7 @@ public class Util {
 
         private int exponent;
 
-        private SiPrefix(int exponent) {
+        SiPrefix(int exponent) {
             this.exponent = exponent;
         }
 

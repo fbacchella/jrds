@@ -30,8 +30,8 @@ import fr.jrds.pcp.pdu.Start;
 public class Connection implements Closeable {
 
     @FunctionalInterface
-    public static interface Waiter {
-        public void waitFor(int op) throws InterruptedException, IOException;
+    public interface Waiter {
+        void waitFor(int op) throws InterruptedException, IOException;
     }
 
     static private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

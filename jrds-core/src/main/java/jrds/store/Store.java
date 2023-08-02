@@ -7,13 +7,13 @@ import jrds.ArchivesSet;
 import jrds.JrdsSample;
 
 public interface Store {
-    public void commit(JrdsSample sample);
-    public Map<String, Number> getLastValues();
-    public boolean checkStoreFile(ArchivesSet archives);
-    public Date getLastUpdate();
-    public Object getStoreObject();
-    public void closeStoreObject(Object object);
-    public Extractor getExtractor();
-    public String getPath();
+    void commit(JrdsSample sample);
+    Map<String, Number> getLastValues();
+    boolean checkStoreFile(ArchivesSet archives);
+    Date getLastUpdate();
+    Object getStoreObject();
+    void closeStoreObject(Object object);
+    Extractor getExtractor();
+    String getPath();
 
 }

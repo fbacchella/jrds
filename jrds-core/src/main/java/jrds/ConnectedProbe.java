@@ -42,7 +42,7 @@ package jrds;
  *          2007) $
  */
 public interface ConnectedProbe {
-    public String getConnectionName();
+    String getConnectionName();
 
-    public void setConnectionName(String connection);
+    void setConnectionName(String connection);
 }

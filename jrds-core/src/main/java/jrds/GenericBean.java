@@ -7,7 +7,7 @@ import jrds.factories.ArgFactory;
 
 public interface GenericBean {
 
-    public class JavaBean implements GenericBean {
+    class JavaBean implements GenericBean {
         final private PropertyDescriptor bean;
 
         public JavaBean(PropertyDescriptor bean) {
@@ -39,7 +39,7 @@ public interface GenericBean {
 
     }
 
-    public class CustomBean implements GenericBean {
+    class CustomBean implements GenericBean {
 
         private final String name;
 
@@ -63,8 +63,8 @@ public interface GenericBean {
 
     }
 
-    public void set(Object o, String in);
-    public Object get(Object o);
-    public String getName();
+    void set(Object o, String in);
+    Object get(Object o);
+    String getName();
 
 }
