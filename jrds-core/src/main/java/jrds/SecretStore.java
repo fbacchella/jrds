@@ -215,11 +215,14 @@ public class SecretStore implements Closeable {
     }
 
     private <E> Iterable<E> enumIterable(Enumeration<E> e){
-        return () -> new Iterator<E>() {
-            @Override public boolean hasNext() {
+        return () -> new Iterator<>() {
+            @Override
+            public boolean hasNext() {
                 return e.hasMoreElements();
             }
-            @Override public E next() {
+
+            @Override
+            public E next() {
                 if (hasNext()) {
                     return e.nextElement();
                 } else {

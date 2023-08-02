@@ -168,14 +168,14 @@ public class Renderer {
         Map<Integer, RendererRun> m = new LinkedHashMap<>(cacheSize + 5, hashTableLoadFactor, true) {
             /*
              * (non-Javadoc)
-             * 
+             *
              * @see
              * java.util.LinkedHashMap#removeEldestEntry(java.util.Map.Entry)
              */
             @Override
             protected boolean removeEldestEntry(Entry<Integer, RendererRun> eldest) {
                 RendererRun rr = eldest.getValue();
-                if(rr != null && rr.finished && size() > Renderer.this.cacheSize) {
+                if (rr != null && rr.finished && size() > Renderer.this.cacheSize) {
                     rr.clean();
                     return true;
                 } else if (rr != null && size() > Renderer.this.cacheSize) {
@@ -186,7 +186,7 @@ public class Renderer {
 
             /*
              * (non-Javadoc)
-             * 
+             *
              * @see java.util.HashMap#remove(java.lang.Object)
              */
             @Override
