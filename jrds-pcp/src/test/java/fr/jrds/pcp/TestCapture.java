@@ -24,7 +24,7 @@ import io.kaitai.struct.ByteBufferKaitaiStream;
 
 public class TestCapture extends Tester {
 
-    private class ByteArrayTransport implements Transport {
+    private static class ByteArrayTransport implements Transport {
 
         private final ByteBuffer content;
 

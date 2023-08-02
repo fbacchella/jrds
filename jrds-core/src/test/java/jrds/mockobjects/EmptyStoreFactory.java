@@ -11,7 +11,7 @@ import jrds.store.AbstractStoreFactory;
 import jrds.store.Extractor;
 
 public class EmptyStoreFactory extends AbstractStoreFactory<EmptyStoreFactory.EmptyStore> {
-    public class EmptyStore extends AbstractStore<String> {
+    public static class EmptyStore extends AbstractStore<String> {
 
         public EmptyStore(Probe<?, ?> p) {
             super(p);

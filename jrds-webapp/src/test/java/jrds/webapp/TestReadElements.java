@@ -26,7 +26,7 @@ import jrds.Tools;
 public class TestReadElements {
     static ServletTester tester = null;
 
-    private final class TreeContent {
+    private static final class TreeContent {
         List<JSONObject> graphs = new ArrayList<>();
         List<JSONObject> trees = new ArrayList<>();
         List<JSONObject> filters = new ArrayList<>();

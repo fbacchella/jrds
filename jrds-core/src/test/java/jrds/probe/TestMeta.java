@@ -19,7 +19,7 @@ import jrds.webapp.DiscoverAgent;
 public class TestMeta {
 
     @ProbeMeta(discoverAgent = ProbeMeta.EmptyDiscoverAgent.class)
-    public abstract class DummyProbe1<A, B> extends Probe<A, B> {
+    public abstract static class DummyProbe1<A, B> extends Probe<A, B> {
 
     }
 
