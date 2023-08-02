@@ -50,9 +50,9 @@ public class TestSomeProbes {
         Tools.findDescs(pm);
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
 
-        Map<String, ProbeDesc<? extends Object>> probeDescMap = conf.setProbeDescMap();
+        Map<String, ProbeDesc<?>> probeDescMap = conf.setProbeDescMap();
 
-        ProbeDesc<? extends Object> partitionSpace = probeDescMap.get("PartitionSpace");
+        ProbeDesc<?> partitionSpace = probeDescMap.get("PartitionSpace");
         Assert.assertNotNull("PartitionSpace probe not found", partitionSpace);
         Collection<String> collected = partitionSpace.getCollectMapping().values();
         Assert.assertEquals(3, collected.size());
@@ -67,9 +67,9 @@ public class TestSomeProbes {
         Tools.findDescs(pm);
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
 
-        Map<String, ProbeDesc<? extends Object>> probeDescMap = conf.setProbeDescMap();
+        Map<String, ProbeDesc<?>> probeDescMap = conf.setProbeDescMap();
 
-        ProbeDesc<? extends Object> partitionSpace = probeDescMap.get("ProcessStatusHostResources");
+        ProbeDesc<?> partitionSpace = probeDescMap.get("ProcessStatusHostResources");
         Assert.assertNotNull("PartitionSpace probe not found", partitionSpace);
         Collection<String> collected = partitionSpace.getCollectMapping().values();
         Assert.assertEquals(1, collected.size());

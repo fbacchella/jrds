@@ -59,7 +59,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         ConfigObjectFactory conf = new ConfigObjectFactory(pm, pm.extensionClassLoader);
         // Needed for the probe's graph list
         conf.setGraphDescMap();
-        Map<String, ProbeDesc<? extends Object>> probesMap = conf.setProbeDescMap();
+        Map<String, ProbeDesc<?>> probesMap = conf.setProbeDescMap();
         if(args.length == 0) {
             dumpAll(probesMap.values());
         } else {
@@ -84,8 +84,8 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         System.out.println("If a probe name is provided, dump more details about it, style in wiki format");
     }
 
-    private void dumpAll(Collection<ProbeDesc<? extends Object>> probes) {
-        for(ProbeDesc<? extends Object> pd: probes) {
+    private void dumpAll(Collection<ProbeDesc<?>> probes) {
+        for(ProbeDesc<?> pd: probes) {
             @SuppressWarnings("unchecked")
             ProbeDesc<Object> castedpd = (ProbeDesc<Object>) pd;
             try {

@@ -18,7 +18,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Object>> {
+public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<?>> {
     static final private Logger logger = LoggerFactory.getLogger(ProbeDescBuilder.class);
 
     private Map<String, GraphDesc> graphDescMap = Collections.emptyMap();
@@ -31,7 +31,7 @@ public class ProbeDescBuilder extends ConfigObjectBuilder<ProbeDesc<? extends Ob
     }
 
     @Override
-    ProbeDesc<? extends Object> build(JrdsDocument n) throws InvocationTargetException {
+    ProbeDesc<?> build(JrdsDocument n) throws InvocationTargetException {
         try {
             return makeProbeDesc(n);
         } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | IllegalAccessException | InvocationTargetException | 

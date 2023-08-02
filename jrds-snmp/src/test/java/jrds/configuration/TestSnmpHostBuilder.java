@@ -43,7 +43,7 @@ public class TestSnmpHostBuilder {
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
 
         Map<String, GraphDesc> graphDescMap = conf.setGraphDescMap();
-        Map<String, ProbeDesc<? extends Object>> probeDescMap = conf.setProbeDescMap();
+        Map<String, ProbeDesc<?>> probeDescMap = conf.setProbeDescMap();
         ProbeFactory pf = new ProbeFactory(probeDescMap, graphDescMap);
 
         HostBuilder hb = new HostBuilder();
