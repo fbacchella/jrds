@@ -32,7 +32,7 @@ public class TestPropertiesManager {
     private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
-    static public void configure() throws IOException {
+    static public void configure() {
         Tools.configure();
     }
 
@@ -80,7 +80,7 @@ public class TestPropertiesManager {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testConfigNoAutoCreate() throws IOException, IllegalArgumentException, SecurityException, IllegalAccessException, NoSuchFieldException {
+    public void testConfigNoAutoCreate() throws IOException, IllegalArgumentException, SecurityException {
         PropertiesManager pm = new PropertiesManager();
 
         Map<String, File> dirMap = new HashMap<String, File>(dirs.length);

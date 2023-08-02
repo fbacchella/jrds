@@ -23,7 +23,7 @@ import jrds.configuration.ConfigObjectFactory;
 public class TestSomeProbes {
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() throws ParserConfigurationException {
         Tools.prepareXml(true);
         Tools.configure();
     }

@@ -33,7 +33,7 @@ public class TestDescFactory {
     static Loader l;
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml();
     }

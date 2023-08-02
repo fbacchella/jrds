@@ -27,7 +27,7 @@ public class TestSnmpConnection {
     public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml();
     }
@@ -38,7 +38,7 @@ public class TestSnmpConnection {
     }
 
     @Test
-    public void testBuild() throws InvocationTargetException, IllegalArgumentException, IllegalAccessException {
+    public void testBuild() throws InvocationTargetException, IllegalArgumentException {
         SnmpConnection cnx = new SnmpConnection();
         Map<String, GenericBean> beans = ArgFactory.getBeanPropertiesMap(cnx.getClass(), Starter.class);
         beans.get("community").set(cnx, "public");

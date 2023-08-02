@@ -37,7 +37,7 @@ public class TestSnmpLoadConfiguration {
     private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml(false);
     }
@@ -48,7 +48,7 @@ public class TestSnmpLoadConfiguration {
         logrule.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
     }
     
-    private ConfigObjectFactory prepare(PropertiesManager pm) throws IOException {
+    private ConfigObjectFactory prepare(PropertiesManager pm) {
         ConfigObjectFactory conf = new ConfigObjectFactory(pm);
         conf.setGraphDescMap();
         conf.setProbeDescMap();

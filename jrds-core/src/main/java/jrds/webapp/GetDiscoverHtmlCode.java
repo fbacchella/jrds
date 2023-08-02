@@ -33,7 +33,7 @@ public class GetDiscoverHtmlCode extends JrdsServlet {
      * HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         DocumentBuilder dbuilder;
         try {
             dbuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();

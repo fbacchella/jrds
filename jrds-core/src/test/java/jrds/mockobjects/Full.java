@@ -89,7 +89,7 @@ public class Full {
         return p;
     }
 
-    static public long fill(Probe<?, ?> p) throws IOException {
+    static public long fill(Probe<?, ?> p) {
         long start = System.currentTimeMillis() / 1000;
         long end = start + 3600 * 24 * 30;
 

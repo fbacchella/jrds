@@ -73,13 +73,13 @@ public class TestLoadConfiguration {
     static DocumentBuilder dbuilder;
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml(false);
     }
 
     @Before
-    public void loggers() throws IOException {
+    public void loggers() {
         logrule.setLevel(Level.TRACE, "jrds.configuration", "jrds.Probe.DummyProbe", "jrds.factories");
         logrule.setLevel(Level.INFO, "jrds.factories.xml.CompiledXPath");
     }

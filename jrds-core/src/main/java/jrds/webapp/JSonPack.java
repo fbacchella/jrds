@@ -46,7 +46,7 @@ public class JSonPack extends HttpServlet {
      * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
      *      response)
      */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int len = request.getContentLength();
         if (len > 4096) {
             logger.error("post data too big: {}", len);

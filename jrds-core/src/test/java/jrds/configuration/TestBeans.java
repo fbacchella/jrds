@@ -27,7 +27,7 @@ import jrds.factories.xml.JrdsElement;
 public class TestBeans {
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() {
         Tools.configure();
     }
 

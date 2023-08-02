@@ -62,12 +62,12 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
     HostInfo build(JrdsDocument n) throws InvocationTargetException {
         try {
             return makeHost(n);
-        } catch (SecurityException | IllegalArgumentException | NoSuchMethodException | IllegalAccessException  e) {
+        } catch (SecurityException | IllegalArgumentException e) {
             throw new InvocationTargetException(e, HostBuilder.class.getName());
         }
     }
 
-    public HostInfo makeHost(JrdsDocument n) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public HostInfo makeHost(JrdsDocument n) {
         JrdsElement hostNode = n.getRootElement();
         String hostName = hostNode.getAttribute("name");
         String dnsHostname = hostNode.getAttribute("dnsName");
@@ -93,7 +93,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
         return host;
     }
 
-    private void parseFragment(JrdsElement fragment, HostInfo host, Map<String, Set<String>> collections, Map<String, String> properties) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    private void parseFragment(JrdsElement fragment, HostInfo host, Map<String, Set<String>> collections, Map<String, String> properties) {
 
         // Find the connection for this host
         // Will the registered latter, in the starter node, one for each timer

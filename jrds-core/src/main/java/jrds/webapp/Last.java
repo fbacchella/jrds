@@ -31,7 +31,7 @@ public final class Last extends JrdsServlet {
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      */
-    public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         boolean found = false;
         res.setContentType("text/plain");
         res.addHeader("Cache-Control", "no-cache");

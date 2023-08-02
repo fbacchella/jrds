@@ -76,7 +76,7 @@ public class MokeServletContext implements ServletContext {
         return null;
     }
 
-    public URL getResource(String path) throws MalformedURLException {
+    public URL getResource(String path) {
         return null;
     }
 
@@ -93,7 +93,7 @@ public class MokeServletContext implements ServletContext {
         return null;
     }
 
-    public Servlet getServlet(String name) throws ServletException {
+    public Servlet getServlet(String name) {
         return null;
     }
 
@@ -164,15 +164,15 @@ public class MokeServletContext implements ServletContext {
         return null;
     }
 
-    public <T extends Filter> T createFilter(Class<T> arg0) throws ServletException {
+    public <T extends Filter> T createFilter(Class<T> arg0) {
         return null;
     }
 
-    public <T extends EventListener> T createListener(Class<T> arg0) throws ServletException {
+    public <T extends EventListener> T createListener(Class<T> arg0) {
         return null;
     }
 
-    public <T extends Servlet> T createServlet(Class<T> arg0) throws ServletException {
+    public <T extends Servlet> T createServlet(Class<T> arg0) {
         return null;
     }
 

@@ -44,7 +44,7 @@ public class TestProbe {
     public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
-    static public void configure() throws IOException {
+    static public void configure() {
         Tools.configure();
     }
 

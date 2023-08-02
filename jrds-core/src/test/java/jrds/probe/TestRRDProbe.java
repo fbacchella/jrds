@@ -43,7 +43,7 @@ public class TestRRDProbe {
     public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
-    static public void configure() throws Exception {
+    static public void configure() {
         Tools.configure();
     }
 
@@ -53,7 +53,7 @@ public class TestRRDProbe {
     }
 
     @Test
-    public void testBean() throws IOException, InvocationTargetException, IllegalArgumentException, IllegalAccessException {
+    public void testBean() throws InvocationTargetException, IllegalArgumentException {
         RRDToolProbe p = new RRDToolProbe();
         p.setHost(new HostStarter(new HostInfo("toto")));
         ProbeDesc<String> pd = new ProbeDesc<String>();

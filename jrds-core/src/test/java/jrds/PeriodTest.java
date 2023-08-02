@@ -28,7 +28,7 @@ public class PeriodTest {
     private Date end;
 
     @BeforeClass
-    static public void configure() throws IOException {
+    static public void configure() {
         jrds.Tools.configure();
     }
 
@@ -220,7 +220,7 @@ public class PeriodTest {
     }
 
     @Test
-    public void previousScale() throws ParseException {
+    public void previousScale() {
         Period p = new Period().previous();
         long offsetDay = 86400 * 1000 - (p.getEnd().getTime() - p.getBegin().getTime());
         Assert.assertTrue("offset to large: " + offsetDay, Math.abs(offsetDay) < 1100);
@@ -228,7 +228,7 @@ public class PeriodTest {
     }
 
     @Test
-    public void nextScale() throws ParseException {
+    public void nextScale() {
         Period p = new Period().next();
         logger.trace("{}", p.getBegin());
         logger.trace("{}", p.getEnd());

@@ -52,7 +52,7 @@ public class ApacheHttpClientTest {
     private volatile boolean shouldFail = true;
     private final ResourceHandler staticFiles = new ResourceHandler() {
         @Override
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
             if(ApacheHttpClientTest.this.shouldFail) {
                 response.setStatus(404);
             } else {
@@ -86,7 +86,7 @@ public class ApacheHttpClientTest {
     }
 
     @BeforeClass
-    static public void configure() throws Exception {
+    static public void configure() {
         Tools.configure();
         StoreOpener.prepare("FILE");
     }

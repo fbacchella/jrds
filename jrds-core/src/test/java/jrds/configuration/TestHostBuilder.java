@@ -45,7 +45,7 @@ public class TestHostBuilder {
     private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml(false);
     }
@@ -67,7 +67,7 @@ public class TestHostBuilder {
     }
 
     @Test
-    public void testNewProbe() throws InvocationTargetException, IllegalArgumentException, IllegalAccessException, IOException {
+    public void testNewProbe() throws InvocationTargetException, IllegalArgumentException, IOException {
         PropertiesManager localpm = Tools.makePm(testFolder);
 
         HostBuilder hb = new HostBuilder();

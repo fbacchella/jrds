@@ -33,7 +33,7 @@ public class AllProbeCreationTest {
     private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
-    static public void configure() throws IOException {
+    static public void configure() {
         Tools.configure();
     }
 
@@ -43,7 +43,7 @@ public class AllProbeCreationTest {
     }
 
     @Test
-    public void makeProbe() throws ParserConfigurationException, IOException, URISyntaxException, InvocationTargetException {
+    public void makeProbe() throws IOException {
         PropertiesManager pm = Tools.makePm(testFolder);
 
         File descpath = new File("desc");

@@ -28,7 +28,7 @@ public class ReloadHostList extends JrdsServlet {
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.
      * HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
-    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
 
         // only one reload allowed to run, just ignore synchronous reload
         if(!reloading.tryAcquire()) {

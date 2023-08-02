@@ -80,7 +80,7 @@ public class TrapListener extends Listener<CommandResponderEvent, OID> {
     }
 
     @Override
-    public void listen() throws IOException, InterruptedException {
+    public void listen() throws InterruptedException {
         Thread.currentThread().join();
     }
 

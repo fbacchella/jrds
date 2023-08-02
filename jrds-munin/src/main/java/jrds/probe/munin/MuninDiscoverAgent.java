@@ -27,7 +27,7 @@ public class MuninDiscoverAgent extends DiscoverAgent {
     Set<String> muninProbes = Collections.emptySet();
     int port = MuninConnection.DEFAULTMUNINPORT;
 
-    public MuninDiscoverAgent() throws ClassNotFoundException {
+    public MuninDiscoverAgent() {
         super("Munin", jrds.probe.munin.Munin.class);
     }
 

@@ -80,7 +80,7 @@ public class Loader {
     final private Map<String, ConfigType> nodesTypes = new HashMap<String, ConfigType>(ConfigType.values().length);
     private final DocumentBuilderFactory instance;
 
-    public Loader() throws ParserConfigurationException {
+    public Loader() {
         this(false);
     }
 

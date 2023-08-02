@@ -22,7 +22,7 @@ public class TestGraphTree {
     public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
-    static public void configure() throws IOException, ParserConfigurationException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml();
     }

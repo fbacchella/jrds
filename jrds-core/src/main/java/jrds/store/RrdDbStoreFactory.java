@@ -163,20 +163,18 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
     /**
      * @param rrdDb
      * @return
-     * @throws IOException
      * @see org.rrd4j.core.RrdDbPool#getOpenCount(org.rrd4j.core.RrdDb)
      */
-    public int getOpenCount(RrdDb rrdDb) throws IOException {
+    public int getOpenCount(RrdDb rrdDb) {
         return usepool ? instance.getOpenCount(rrdDb) : 0;
     }
 
     /**
      * @param path
      * @return
-     * @throws IOException
      * @see org.rrd4j.core.RrdDbPool#getOpenCount(java.lang.String)
      */
-    public int getOpenCount(String path) throws IOException {
+    public int getOpenCount(String path) {
         return usepool ? instance.getOpenCount(path) : 0;
     }
 

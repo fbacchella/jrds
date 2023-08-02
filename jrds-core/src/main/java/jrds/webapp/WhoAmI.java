@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 public class WhoAmI extends JrdsServlet {
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         ServletOutputStream out = resp.getOutputStream();
         resp.setContentType("text/plain");

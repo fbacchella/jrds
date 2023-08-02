@@ -27,7 +27,7 @@ public class JSonDetails extends JrdsServlet {
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
      *      response)
      */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             ParamsBean params = getParamsBean(request);
             Probe<?, ?> p = params.getProbe();

@@ -87,7 +87,7 @@ public class XmlProbeTest {
     }
 
     @Test
-    public void manageArgs() throws Exception {
+    public void manageArgs() {
         URL url = getClass().getResource("/ressources/xmldata.xml");
         List<Object> args = new ArrayList<Object>(1);
         args.add("a");

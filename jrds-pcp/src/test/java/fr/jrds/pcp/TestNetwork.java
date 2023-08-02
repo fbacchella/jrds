@@ -18,13 +18,13 @@ import org.junit.Test;
 public class TestNetwork extends Tester {
 
     @Test(expected = IOException.class, timeout=3000)
-    public void timeout() throws UnknownHostException, IOException, PCPException, InterruptedException {
+    public void timeout() throws UnknownHostException, IOException, InterruptedException {
         try (Connection cnx = new Connection(new InetSocketAddress(InetAddress.getByName("169.254.1.1"), 44321), 2000)) {
         }
     }
 
     @Test(expected = InterruptedException.class, timeout=3000)
-    public void interrupted() throws UnknownHostException, IOException, PCPException, InterruptedException {
+    public void interrupted() throws UnknownHostException, IOException, InterruptedException {
         Thread current = Thread.currentThread();
         Thread stopper = new Thread() {
             @Override

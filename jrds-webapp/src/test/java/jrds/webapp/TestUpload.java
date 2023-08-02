@@ -33,7 +33,7 @@ public class TestUpload {
     private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
-    static public void configure() throws Exception {
+    static public void configure() {
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();

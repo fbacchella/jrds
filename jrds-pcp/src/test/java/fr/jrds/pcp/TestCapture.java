@@ -28,26 +28,24 @@ public class TestCapture extends Tester {
 
         private final ByteBuffer content;
 
-        ByteArrayTransport(byte[] p) throws IOException {
+        ByteArrayTransport(byte[] p) {
             this.content = ByteBuffer.wrap(p);
         }
 
         @Override
-        public void close() throws IOException {
+        public void close() {
 
         }
 
         @Override
-        public void read(ByteBuffer buffer)
-                        throws InterruptedException, IOException {
+        public void read(ByteBuffer buffer) {
             byte[] b = new byte[buffer.remaining()];
             content.get(b);
             buffer.put(b);
         }
 
         @Override
-        public void write(ByteBuffer buffer)
-                        throws InterruptedException, IOException {
+        public void write(ByteBuffer buffer) {
             byte[] sent = new byte[buffer.remaining()];
             byte[] ref = new byte[buffer.remaining()];
             content.get(ref);
@@ -97,7 +95,7 @@ public class TestCapture extends Tester {
     }
 
     @Test
-    public void testempty() throws IOException, PCPException, InterruptedException {
+    public void testempty() throws IOException, InterruptedException {
         try (Connection cnx = readPcap("pcap/empty.pcap")) {
             cnx.setFrom(12710);
             Assert.assertEquals(serverFeatures, cnx.startClient().getFeatures());
@@ -110,7 +108,7 @@ public class TestCapture extends Tester {
         }
     }
 
-    private Connection readPcap(String ressource) throws IOException, PCPException, InterruptedException {
+    private Connection readPcap(String ressource) throws IOException {
         InputStream in = TestCapture.class.getClassLoader().getResourceAsStream(ressource);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         byte[] buf = new byte[4096];

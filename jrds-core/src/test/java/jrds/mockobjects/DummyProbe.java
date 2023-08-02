@@ -55,7 +55,7 @@ public class DummyProbe extends Probe<String, Number> {
     }
 
     @BeforeClass
-    static public void prepare() throws IOException, ParserConfigurationException {
+    static public void prepare() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml();
     }

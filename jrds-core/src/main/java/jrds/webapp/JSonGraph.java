@@ -26,7 +26,7 @@ public class JSonGraph extends JSonData {
     private static final List<Integer> periodHistory = Arrays.asList(7, 9, 11, 16);
 
     @Override
-    public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException {
+    public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) {
 
         if(params.getPeriod() == null) {
             return false;

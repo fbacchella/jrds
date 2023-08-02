@@ -33,7 +33,7 @@ public class TestSum {
     public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
-    static public void configure() throws IOException, ParserConfigurationException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml();
     }
@@ -44,7 +44,7 @@ public class TestSum {
     }
 
     @Test(expected = RuntimeException.class)
-    public void emptysum() throws Exception {
+    public void emptysum() {
         HostsList hl = new HostsList();
         hl.configure(new PropertiesManager());
 

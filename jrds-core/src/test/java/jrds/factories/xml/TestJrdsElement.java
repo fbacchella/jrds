@@ -21,7 +21,7 @@ public class TestJrdsElement {
     public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml(false);
     }
@@ -32,7 +32,7 @@ public class TestJrdsElement {
     }
 
     @Test
-    public void testIteration() throws TransformerException, IOException {
+    public void testIteration() {
         JrdsDocument d = AbstractJrdsNode.build(Tools.dbuilder.newDocument());
         JrdsElement root = AbstractJrdsNode.build(d.appendChild(d.createElement("root")));
         for(int i = 0; i < 5; i++) {

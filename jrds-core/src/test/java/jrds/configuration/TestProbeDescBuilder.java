@@ -23,7 +23,7 @@ import jrds.factories.xml.JrdsDocument;
 public class TestProbeDescBuilder {
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml();
     }

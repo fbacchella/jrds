@@ -40,7 +40,7 @@ final public class Tools {
         Log4JRule.configure();
     }
 
-    static public void configure() throws IOException {
+    static public void configure() {
     }
 
     static public void prepareXml() throws ParserConfigurationException {

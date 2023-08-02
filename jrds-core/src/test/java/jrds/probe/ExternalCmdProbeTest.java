@@ -49,7 +49,7 @@ public class ExternalCmdProbeTest {
     public final TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() {
         Tools.configure();
     }
 
@@ -84,7 +84,7 @@ public class ExternalCmdProbeTest {
         p.collect();
     }
 
-    private HostStarter getHostStarter(PropertiesManager pm) throws IOException {
+    private HostStarter getHostStarter(PropertiesManager pm) {
         HostStarter localhost = new HostStarter(new HostInfo("localhost"));
         Timer t = Tools.getDefaultTimer();
         localhost.setParent(t);

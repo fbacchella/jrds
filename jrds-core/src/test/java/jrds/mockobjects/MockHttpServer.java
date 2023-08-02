@@ -27,7 +27,7 @@ public class MockHttpServer extends Server implements Closeable {
     private ServletContextHandler ctx = null;
     private HandlerCollection handlers = new HandlerList();
 
-    public MockHttpServer(boolean withSSL) throws MalformedURLException {
+    public MockHttpServer(boolean withSSL) {
         super();
         ServerConnector connector;
         if(withSSL) {
@@ -66,7 +66,7 @@ public class MockHttpServer extends Server implements Closeable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         try {
             stop();
         } catch (Exception e) {

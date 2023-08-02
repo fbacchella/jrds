@@ -51,7 +51,7 @@ public class HttpTest {
     public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() {
         Tools.configure();
     }
 
@@ -60,7 +60,7 @@ public class HttpTest {
         logrule.setLevel(Level.TRACE, "jrds.Util");
     }
 
-    private void validateBean(HttpProbe<String> p) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    private void validateBean(HttpProbe<String> p) throws IllegalArgumentException {
         Assert.assertEquals("invalid url bean", p.getUrl(), p.getPd().getBean("url").get(p));
         Assert.assertEquals("invalid port bean", p.getPort(), p.getPd().getBean("port").get(p));
         Assert.assertEquals("invalid file bean", p.getFile(), p.getPd().getBean("file").get(p));
@@ -72,7 +72,7 @@ public class HttpTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void build1() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    public void build1() throws IllegalArgumentException, InvocationTargetException {
         HttpProbe<String> p = new TestHttpProbe();
         ProbeDesc<String> pd = new ProbeDesc<>();
         pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
@@ -87,7 +87,7 @@ public class HttpTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void build2() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    public void build2() throws IllegalArgumentException, InvocationTargetException {
         HttpProbe<String> p = new TestHttpProbe();
         p.setHost(webserver);
         ProbeDesc<String> pd = new ProbeDesc<String>();
@@ -102,7 +102,7 @@ public class HttpTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void build3() throws IntrospectionException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    public void build3() throws IllegalArgumentException, InvocationTargetException {
         HttpProbe<String> p = new TestHttpProbe();
         p.setHost(webserver);
         ProbeDesc<String> pd = new ProbeDesc<String>();
@@ -118,7 +118,7 @@ public class HttpTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void build4() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    public void build4() throws IllegalArgumentException, InvocationTargetException {
         HttpProbe<String> p = new TestHttpProbe();
         ProbeDesc<String> pd = new ProbeDesc<String>();
         pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
@@ -135,7 +135,7 @@ public class HttpTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void build5() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    public void build5() throws IllegalArgumentException, InvocationTargetException {
         HttpProbe<String> p = new TestHttpProbe();
         ProbeDesc<String> pd = new ProbeDesc<String>();
         pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());

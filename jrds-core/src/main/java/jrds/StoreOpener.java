@@ -117,20 +117,18 @@ public final class StoreOpener {
     /**
      * @param rrdDb
      * @return
-     * @throws IOException
      * @see org.rrd4j.core.RrdDbPool#getOpenCount(org.rrd4j.core.RrdDb)
      */
-    public static int getOpenCount(RrdDb rrdDb) throws IOException {
+    public static int getOpenCount(RrdDb rrdDb) {
         return instance.getOpenCount(rrdDb);
     }
 
     /**
      * @param path
      * @return
-     * @throws IOException
      * @see org.rrd4j.core.RrdDbPool#getOpenCount(java.lang.String)
      */
-    public static int getOpenCount(String path) throws IOException {
+    public static int getOpenCount(String path) {
         return instance.getOpenCount(path);
     }
 }

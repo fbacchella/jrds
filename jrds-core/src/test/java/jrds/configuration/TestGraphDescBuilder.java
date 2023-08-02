@@ -56,7 +56,7 @@ public class TestGraphDescBuilder {
     private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml();
     }

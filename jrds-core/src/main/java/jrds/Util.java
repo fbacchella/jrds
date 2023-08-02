@@ -126,15 +126,15 @@ public class Util {
     }
 
     static final private ErrorListener el = new ErrorListener() {
-        public void error(TransformerException e) throws TransformerException {
+        public void error(TransformerException e) {
             logger.error("Invalid xsl: {}",  e.getMessageAndLocation());
         }
 
-        public void fatalError(TransformerException e) throws TransformerException {
+        public void fatalError(TransformerException e) {
             logger.error("Invalid xsl: {}", e.getMessageAndLocation());
         }
 
-        public void warning(TransformerException e) throws TransformerException {
+        public void warning(TransformerException e) {
             logger.warn("Invalid xsl: {}", e.getMessageAndLocation());
         }
     };

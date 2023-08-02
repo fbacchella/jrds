@@ -28,7 +28,7 @@ public class JSonTree extends JSonData {
     static final private Logger logger = LoggerFactory.getLogger(JSonTree.class);
 
     @Override
-    public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) throws IOException {
+    public boolean generate(JrdsJSONWriter w, HostsList root, ParamsBean params) {
 
         if(ParamsBean.TABCHOICE.equals(params.getChoiceType())) {
             Tab tab = params.getTab();
@@ -75,14 +75,14 @@ public class JSonTree extends JSonData {
         return true;
     }
 
-    private boolean evaluateTree(ParamsBean params, JrdsJSONWriter w, HostsList root, GraphTree trytree) throws IOException {
+    private boolean evaluateTree(ParamsBean params, JrdsJSONWriter w, HostsList root, GraphTree trytree) {
         for(GraphTree tree: findRoot(Collections.singleton(trytree))) {
             sub(params, w, tree, "tree", Filter.EVERYTHING, "", tree.getPath().hashCode());
         }
         return true;
     }
 
-    private boolean evaluateFilter(ParamsBean params, JrdsJSONWriter w, HostsList root, Filter f) throws IOException {
+    private boolean evaluateFilter(ParamsBean params, JrdsJSONWriter w, HostsList root, Filter f) {
         // We construct the graph tree root to use
         // The tree is parsed twice, that's not optimal
         Set<GraphTree> rootToDo = new TreeSet<GraphTree>(this::graphTreeCompare);
@@ -136,7 +136,7 @@ public class JSonTree extends JSonData {
         return true;
     }
 
-    private String sub(ParamsBean params, JrdsJSONWriter w, GraphTree gt, String type, Filter f, String path, int base) throws IOException {
+    private String sub(ParamsBean params, JrdsJSONWriter w, GraphTree gt, String type, Filter f, String path, int base) {
         String id = null;
         String subpath = path + "/" + gt.getName();
         boolean hasChild = false;

@@ -27,7 +27,7 @@ public class Cmd extends JrdsServlet {
      * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
      *      response)
      */
-    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         ParamsBean params = new ParamsBean(req, getHostsList(), "command", "arg");
 
         String command = params.getValue("command");

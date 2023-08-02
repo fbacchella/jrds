@@ -87,7 +87,7 @@ public class JmxConnexionTest {
 
     public static class Implementation extends StandardMBean implements TestMBean {
         public Implementation()
-                        throws NotCompliantMBeanException, MalformedObjectNameException, InstanceAlreadyExistsException, MBeanRegistrationException {
+                        throws NotCompliantMBeanException {
             super(TestMBean.class);
         }
 
@@ -123,7 +123,7 @@ public class JmxConnexionTest {
     public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
-    static public void configure() throws Exception {
+    static public void configure() {
         Tools.configure();
     }
 

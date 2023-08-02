@@ -25,7 +25,7 @@ public class Collector extends CommandStarterImpl {
         propFile = configuration.getProperty("propertiesFile", propFile);
     }
 
-    public void start(String[] args) throws Exception {
+    public void start(String[] args) {
 
         PropertiesManager pm = new PropertiesManager(new File(propFile));
 

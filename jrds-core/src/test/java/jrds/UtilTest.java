@@ -37,7 +37,7 @@ public class UtilTest {
     public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
-    static public void configure() throws IOException, ParserConfigurationException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml();
     }
@@ -222,7 +222,7 @@ public class UtilTest {
 
     @Test
     @SuppressWarnings("unused")
-    public void testParseTemplate6() throws Exception {
+    public void testParseTemplate6() {
         Object o = new Object() {
             public String getOne() {
                 return "one";

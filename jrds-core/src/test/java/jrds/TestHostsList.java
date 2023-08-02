@@ -32,7 +32,7 @@ public class TestHostsList {
     public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
-    static public void configure() throws Exception {
+    static public void configure() {
         Tools.configure();
     }
 

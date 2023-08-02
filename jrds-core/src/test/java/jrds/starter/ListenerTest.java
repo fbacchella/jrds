@@ -29,7 +29,7 @@ public class ListenerTest {
         }
 
         @Override
-        public void listen() throws Exception {
+        public void listen() {
         }
 
         @Override
@@ -62,7 +62,7 @@ public class ListenerTest {
     public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
-    static public void configure() throws Exception {
+    static public void configure() {
         Tools.configure();
     }
 

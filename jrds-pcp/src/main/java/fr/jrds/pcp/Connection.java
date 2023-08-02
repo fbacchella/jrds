@@ -31,7 +31,7 @@ public class Connection implements Closeable {
 
     @FunctionalInterface
     public interface Waiter {
-        void waitFor(int op) throws InterruptedException, IOException;
+        void waitFor(int op);
     }
 
     static private final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

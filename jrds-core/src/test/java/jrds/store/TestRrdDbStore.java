@@ -36,7 +36,7 @@ public class TestRrdDbStore {
     public final TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml(false);
     }

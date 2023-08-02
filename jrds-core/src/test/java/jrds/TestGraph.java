@@ -29,7 +29,7 @@ public class TestGraph {
     public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
-    static public void configure() throws IOException {
+    static public void configure() {
         Tools.configure();
     }
 
@@ -61,7 +61,7 @@ public class TestGraph {
     }
 
     @Test
-    public void compare() throws IOException, InvocationTargetException {
+    public void compare() {
         GraphNode gn = new GraphNode(p, GetMoke.getGraphDesc());
         Period pr = new Period();
         Graph g1 = new Graph(gn);

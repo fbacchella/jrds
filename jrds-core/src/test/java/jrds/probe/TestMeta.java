@@ -27,7 +27,7 @@ public class TestMeta {
     }
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() {
         Tools.configure();
     }
 

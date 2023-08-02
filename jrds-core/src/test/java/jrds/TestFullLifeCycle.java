@@ -31,7 +31,7 @@ public class TestFullLifeCycle {
     public TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
-    static public void configure() throws IOException {
+    static public void configure() {
         Tools.configure();
     }
 

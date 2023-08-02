@@ -38,7 +38,7 @@ public class TestFilter {
     public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml(false);
     }
@@ -51,7 +51,8 @@ public class TestFilter {
 
 
 
-    private Filter doFilter(JrdsDocument d) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException {
+    private Filter doFilter(JrdsDocument d) throws SecurityException, IllegalArgumentException, NoSuchMethodException, IllegalAccessException, InvocationTargetException,
+                                                           IOException {
         FilterBuilder sm = new FilterBuilder();
         sm.setPm(Tools.makePm(testFolder, "security=true"));
 

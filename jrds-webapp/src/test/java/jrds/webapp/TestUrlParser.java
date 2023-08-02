@@ -36,7 +36,7 @@ public class TestUrlParser {
     static private HostsList hl;
 
     @BeforeClass
-    static public void configure() throws IOException {
+    static public void configure() {
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();
@@ -166,7 +166,7 @@ public class TestUrlParser {
     }
 
     @Test
-    public void checkParseDate2() throws ParseException {
+    public void checkParseDate2() {
         Map<String, String[]> parameters = new HashMap<String, String[]>();
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
         Period p = pb.getPeriod();
@@ -182,7 +182,7 @@ public class TestUrlParser {
     }
 
     @Test
-    public void checkParseDate3() throws ParseException {
+    public void checkParseDate3() {
         Map<String, String[]> parameters = new HashMap<String, String[]>();
         parameters.put("scale", new String[] { "4" });
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);

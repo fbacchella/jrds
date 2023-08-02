@@ -28,7 +28,7 @@ public final class ProbeSummary extends JrdsServlet {
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
      *      javax.servlet.http.HttpServletResponse)
      */
-    public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("text/plain");
         res.addHeader("Cache-Control", "no-cache");
         ServletOutputStream out = res.getOutputStream();

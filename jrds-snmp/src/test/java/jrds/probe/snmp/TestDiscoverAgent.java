@@ -28,7 +28,7 @@ public class TestDiscoverAgent {
     public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml();
     }
@@ -40,7 +40,7 @@ public class TestDiscoverAgent {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void getHtmlCode() throws ClassNotFoundException, InstantiationException, IllegalAccessException, TransformerException, IOException {
+    public void getHtmlCode() throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Class<? extends Probe<?, ?>> snmpProbeClass = (Class<? extends Probe<?, ?>>) Class.forName("jrds.probe.snmp.SnmpProbe");
         ProbeMeta m = snmpProbeClass.getAnnotation(ProbeMeta.class);
         DiscoverAgent da = m.discoverAgent().newInstance();

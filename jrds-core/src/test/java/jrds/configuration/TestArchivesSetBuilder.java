@@ -21,7 +21,7 @@ import jrds.factories.xml.JrdsDocument;
 public class TestArchivesSetBuilder {
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml(true);
     }

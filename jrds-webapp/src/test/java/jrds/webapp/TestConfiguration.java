@@ -26,7 +26,7 @@ public class TestConfiguration {
     public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
-    static public void configure() throws IOException {
+    static public void configure() {
         Tools.configure();
     }
 
@@ -36,7 +36,7 @@ public class TestConfiguration {
     }
 
     @Test
-    public void test1() throws IOException {
+    public void test1() {
         MokeServletContext sc = new MokeServletContext();
         File tempRoot = testFolder.getRoot();
         File configDir = new File(tempRoot, "config");

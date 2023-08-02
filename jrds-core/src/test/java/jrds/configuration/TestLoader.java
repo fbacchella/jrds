@@ -26,7 +26,7 @@ public class TestLoader {
     private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() throws ParserConfigurationException {
         Tools.configure();
         Tools.prepareXml();
     }
@@ -37,7 +37,7 @@ public class TestLoader {
     }
 
     @Test
-    public void doLoadJar() throws ParserConfigurationException, MalformedURLException, URISyntaxException {
+    public void doLoadJar() throws URISyntaxException {
         Loader l = new Loader();
         l.importUrl(getClass().getClassLoader().getResource("desc").toURI());
         l.done();
@@ -46,7 +46,7 @@ public class TestLoader {
     }
 
     @Test
-    public void doLoadHost() throws Exception {
+    public void doLoadHost() {
         Loader l = new Loader();
         l.importStream(getClass().getClassLoader().getResourceAsStream("host1.xml"), "");
         l.done();
@@ -55,7 +55,7 @@ public class TestLoader {
     }
 
     @Test
-    public void doLoadView() throws Exception {
+    public void doLoadView() {
         Loader l = new Loader();
 
         l.importStream(getClass().getClassLoader().getResourceAsStream("view1.xml"), "");
@@ -67,7 +67,7 @@ public class TestLoader {
     }
 
     @Test
-    public void doLoadProbeDesc() throws Exception {
+    public void doLoadProbeDesc() {
         Loader l = new Loader();
 
         l.importStream(getClass().getClassLoader().getResourceAsStream("fulldesc.xml"), "");
@@ -80,7 +80,7 @@ public class TestLoader {
     }
 
     @Test
-    public void doLoadGraph() throws Exception {
+    public void doLoadGraph() {
         Loader l = new Loader();
         l.importStream(getClass().getClassLoader().getResourceAsStream("customgraph.xml"), "");
         l.done();
@@ -91,7 +91,7 @@ public class TestLoader {
     }
 
     @Test
-    public void doLoadTab() throws Exception {
+    public void doLoadTab() {
         Loader l = new Loader();
         l.importStream(getClass().getClassLoader().getResourceAsStream("goodtab.xml"), "");
         l.done();

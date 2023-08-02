@@ -35,7 +35,7 @@ public class Upload extends JrdsServlet {
      * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
      *      response)
      */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         FileItemFactory factory = new DiskFileItemFactory();
         ServletFileUpload upload = new ServletFileUpload(factory);
 
@@ -58,7 +58,7 @@ public class Upload extends JrdsServlet {
                     throw exception;
                 }
 
-                public void warning(SAXParseException exception) throws SAXException {
+                public void warning(SAXParseException exception) {
                     logger.warn(exception.getMessage());
                 }
             });

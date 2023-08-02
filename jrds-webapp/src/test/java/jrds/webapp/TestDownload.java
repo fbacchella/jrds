@@ -46,7 +46,7 @@ public class TestDownload extends Download {
     private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
-    static public void configure() throws IOException, ParserConfigurationException {
+    static public void configure() throws ParserConfigurationException {
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.Slf4jLog");
         System.setProperty("org.eclipse.jetty.LEVEL", "DEBUG");
         Tools.configure();

@@ -31,7 +31,7 @@ public class TestRRDToolStore {
     public final TemporaryFolder testFolder = new TemporaryFolder();
 
     @BeforeClass
-    static public void configure() throws ParserConfigurationException, IOException {
+    static public void configure() {
         Tools.configure();
     }
 

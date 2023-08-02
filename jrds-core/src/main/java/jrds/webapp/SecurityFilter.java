@@ -21,7 +21,7 @@ public class SecurityFilter implements Filter {
     static private final Logger logger = LoggerFactory.getLogger(SecurityFilter.class);
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
     }
 
     @Override

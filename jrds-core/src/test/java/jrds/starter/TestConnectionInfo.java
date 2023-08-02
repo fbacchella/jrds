@@ -20,7 +20,7 @@ public class TestConnectionInfo {
     public final Log4JRule logrule = new Log4JRule(this);
 
     @BeforeClass
-    static public void configure() throws Exception {
+    static public void configure() {
         Tools.configure();
     }
 
