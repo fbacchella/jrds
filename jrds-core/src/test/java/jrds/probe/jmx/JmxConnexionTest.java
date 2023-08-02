@@ -80,7 +80,7 @@ public class JmxConnexionTest {
     
     @MXBean
     public interface TestMBean {
-        default public long getFailure() throws RemoteException {
+        default long getFailure() throws RemoteException {
             throw new RemoteException("failed", new RuntimeException("Original failed"));
         }
     }
