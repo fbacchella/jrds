@@ -24,7 +24,7 @@ import jrds.PropertiesManager;
 import jrds.webapp.StartListener;
 
 public class Management extends StandardMBean implements ManagementMBean {
-    static public final void register(File configfile) {
+    static public void register(File configfile) {
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName name = new ObjectName("jrds:type=Management");
@@ -35,7 +35,7 @@ public class Management extends StandardMBean implements ManagementMBean {
         }
     }
 
-    static public final void register(ServletContext ctxt) {
+    static public void register(ServletContext ctxt) {
         try {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             ObjectName name = new ObjectName("jrds:type=Management");
@@ -46,7 +46,7 @@ public class Management extends StandardMBean implements ManagementMBean {
         }
     }
 
-    static public final void unregister() {
+    static public void unregister() {
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName name;
         try {

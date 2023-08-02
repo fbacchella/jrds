@@ -15,13 +15,13 @@ public class Configuration {
     private final HostsList hostsList;
     private Thread shutDownHook;
 
-    public static final synchronized Configuration configure(Properties p) {
+    public static synchronized Configuration configure(Properties p) {
         conf = new Configuration(p);
         conf.start();
         return conf;
     }
 
-    public static final synchronized Configuration switchConf(Properties p) {
+    public static synchronized Configuration switchConf(Properties p) {
         Configuration oldConfig = conf;
         Configuration newConfig = new Configuration(p);
         oldConfig.stop();
@@ -33,11 +33,11 @@ public class Configuration {
         return conf;
     }
 
-    public static final synchronized Configuration get() {
+    public static synchronized Configuration get() {
         return conf;
     }
 
-    public static final synchronized void stopConf() {
+    public static synchronized void stopConf() {
         conf.stop();
     }
 

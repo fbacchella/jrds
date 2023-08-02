@@ -547,7 +547,7 @@ public class GraphDesc implements WithACL {
 
         public static final int length = Colors.values().length;
 
-        public static final Color resolveIndex(int i) {
+        public static Color resolveIndex(int i) {
             return Colors.values()[i % Colors.length].getColor();
         }
     }
@@ -1198,7 +1198,7 @@ public class GraphDesc implements WithACL {
         this.graphTitle = graphTitle;
     }
 
-    public static final PathElement resolvPathElement(String name) {
+    public static PathElement resolvPathElement(String name) {
         return PathElement.valueOf(name.toUpperCase());
     }
 

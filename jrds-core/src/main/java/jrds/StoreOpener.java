@@ -33,7 +33,7 @@ public final class StoreOpener {
      * @return RrdDb instance of the datasource.
      * @throws IOException Thrown in case of I/O error.
      */
-    public final static RrdDb getRrd(String rrdFile) throws IOException {
+    public static RrdDb getRrd(String rrdFile) throws IOException {
         File f = new File(rrdFile);
         String cp = f.getCanonicalPath();
         long start = System.currentTimeMillis();
@@ -47,7 +47,7 @@ public final class StoreOpener {
     /**
      * @param db
      */
-    public final static void releaseRrd(RrdDb db) {
+    public static void releaseRrd(RrdDb db) {
         try {
             long start = System.currentTimeMillis();
             db.close();
@@ -60,7 +60,7 @@ public final class StoreOpener {
     }
 
     @SuppressWarnings("deprecation")
-    public static final void prepare(String backend) {
+    public static void prepare(String backend) {
         usepool = false;
         if(backend != null) {
             StoreOpener.backend = RrdBackendFactory.getFactory(backend);
@@ -73,7 +73,7 @@ public final class StoreOpener {
     }
 
     @SuppressWarnings("deprecation")
-    public static final void prepare(String backend, int dbPoolSize) {
+    public static void prepare(String backend, int dbPoolSize) {
         usepool = false;
         if(backend != null) {
             try {
@@ -99,12 +99,12 @@ public final class StoreOpener {
         logger.debug("use pool: {} {}", usepool, dbPoolSize);
     }
 
-    public static final void stop() {
+    public static void stop() {
         logger.info("Average wait time: {} ms", waitTime.doubleValue() / lockCount.doubleValue());
     }
 
     @Deprecated
-    public static final void reset() {
+    public static void reset() {
     }
 
     /**

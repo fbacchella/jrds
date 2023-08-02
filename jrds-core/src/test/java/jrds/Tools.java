@@ -113,7 +113,7 @@ final public class Tools {
         return path.toURI();
     }
 
-    static private final PropertiesManager finishPm(PropertiesManager pm, String... props) {
+    static private PropertiesManager finishPm(PropertiesManager pm, String... props) {
         pm.setProperty("strictparsing", "true");
 
         pm.setProperty("tabs", "hoststab");
@@ -131,7 +131,7 @@ final public class Tools {
         return pm;
     }
 
-    static public final PropertiesManager makePm(TemporaryFolder testFolder, String... props) throws IOException {
+    static public PropertiesManager makePm(TemporaryFolder testFolder, String... props) throws IOException {
         PropertiesManager pm = new PropertiesManager();
         pm.setProperty("tmpdir", testFolder.newFolder("tmp").getCanonicalPath());
         pm.setProperty("configdir", testFolder.newFolder("config").getCanonicalPath());
@@ -142,7 +142,7 @@ final public class Tools {
         return finishPm(pm, props);
     }
 
-    static public final Map<String, Timer> getSimpleTimerMap() {
+    static public Map<String, Timer> getSimpleTimerMap() {
         PropertiesManager.TimerInfo ti = TimerInfo.builder().numCollectors(1).step(300).timeout(10).build();
         Timer t = new Timer(Timer.DEFAULTNAME, ti);
         Map<String, Timer> timerMap = new HashMap<String, Timer>(1);
@@ -150,7 +150,7 @@ final public class Tools {
         return timerMap;
     }
 
-    static public final Timer getDefaultTimer() {
+    static public Timer getDefaultTimer() {
         PropertiesManager.TimerInfo ti = TimerInfo.builder().numCollectors(1).step(300).timeout(10).slowCollectTime(5).build();
         return new Timer("TimerTester", ti);
     }

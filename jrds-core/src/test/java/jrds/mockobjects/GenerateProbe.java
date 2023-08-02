@@ -69,7 +69,7 @@ public class GenerateProbe {
 
     @SafeVarargs
     @SuppressWarnings({ "unchecked"})
-    public static final <P extends Probe<T, V>, T, V> P quickProbe(TemporaryFolder folder, ChainedMap<Object>... args) throws Exception {
+    public static <P extends Probe<T, V>, T, V> P quickProbe(TemporaryFolder folder, ChainedMap<Object>... args) throws Exception {
         ChainedMap<Object> arg = new ChainedMap<Object>(0);
         for (ChainedMap<Object> objectChainedMap : args) {
             arg.putAll(objectChainedMap);
@@ -85,7 +85,7 @@ public class GenerateProbe {
     }
 
     @SuppressWarnings({ "unlikely-arg-type", "unchecked" })
-    public static final <P extends Probe<T, V>, T, V> P fillProbe(P p, TemporaryFolder folder, ChainedMap<Object> args) throws Exception {
+    public static <P extends Probe<T, V>, T, V> P fillProbe(P p, TemporaryFolder folder, ChainedMap<Object> args) throws Exception {
 
         PropertiesManager pm = (PropertiesManager) args.get(PropertiesManager.class.getCanonicalName());
         if(pm == null) {

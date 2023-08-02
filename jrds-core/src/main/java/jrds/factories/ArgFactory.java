@@ -56,7 +56,7 @@ public final class ArgFactory {
      * @return
      * @throws InvocationTargetException
      */
-    public static final List<Object> makeArgs(JrdsElement sequence, Object... arguments) throws InvocationTargetException {
+    public static List<Object> makeArgs(JrdsElement sequence, Object... arguments) throws InvocationTargetException {
         List<JrdsElement> elements = sequence.getChildElements();
         List<Object> argsList = new ArrayList<Object>(elements.size());
         for(JrdsElement listNode: elements) {
@@ -80,7 +80,7 @@ public final class ArgFactory {
         return argsList;
     }
 
-    static final Class<?> resolvClass(String name) {
+    static Class<?> resolvClass(String name) {
         if(classCache.containsKey(name))
             return classCache.get(name);
         Class<?> retValue = null;

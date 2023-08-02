@@ -524,7 +524,7 @@ public class Util {
         }
     }
 
-    public static final String parseTemplate(String template, Object... arguments) {
+    public static String parseTemplate(String template, Object... arguments) {
         // Don't lose time with an empty template
         if(template == null || "".equals(template.trim())) {
             return template;
@@ -839,7 +839,7 @@ public class Util {
     }
 
 
-    static final public void log(Object source, Logger namedLogger, Level l, Throwable e, String format, Object... args) {
+    static public void log(Object source, Logger namedLogger, Level l, Throwable e, String format, Object... args) {
         LambdaString ls = new LambdaString(() -> {
             for (int i = 0 ; i < args.length ; i++) {
                 if (args[i] instanceof Throwable) {

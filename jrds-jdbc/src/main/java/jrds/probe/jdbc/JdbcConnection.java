@@ -21,7 +21,7 @@ public class JdbcConnection extends Connection<Statement> {
     private String driverClass = null;
     private String url;
 
-    protected static final void registerDriver(Class<? extends Driver> jdbcDriver) {
+    protected static void registerDriver(Class<? extends Driver> jdbcDriver) {
         try {
             DriverManager.registerDriver(jdbcDriver.getConstructor().newInstance());
         } catch (Exception e) {

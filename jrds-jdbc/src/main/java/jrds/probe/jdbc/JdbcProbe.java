@@ -26,7 +26,7 @@ import jrds.probe.UrlProbe;
 @ProbeBean({ "port", "user", "password" })
 public abstract class JdbcProbe extends Probe<String, Number> implements UrlProbe, IndexedProbe {
 
-    static final void registerDriver(String JdbcDriver) {
+    static void registerDriver(String JdbcDriver) {
         try {
             registerDriver(Class.forName(JdbcDriver));
         } catch (ClassNotFoundException e) {
@@ -34,7 +34,7 @@ public abstract class JdbcProbe extends Probe<String, Number> implements UrlProb
         }
     }
 
-    static final void registerDriver(Class<?> JdbcDriver) {
+    static void registerDriver(Class<?> JdbcDriver) {
         try {
             Driver jdbcDriver = (Driver) JdbcDriver.getConstructor().newInstance();
             DriverManager.registerDriver(jdbcDriver);
