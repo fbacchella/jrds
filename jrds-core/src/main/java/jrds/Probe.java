@@ -239,7 +239,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     @SuppressWarnings("unchecked")
     public Map<KeyType, String> getCollectMapping() {
-        Map<KeyType, String> rawMap = (Map<KeyType, String>) getPd().getCollectMapping();
+        Map<KeyType, String> rawMap = getPd().getCollectMapping();
         Map<KeyType, String> retValues = new HashMap<>(rawMap.size());
         for(Map.Entry<KeyType, String> e: rawMap.entrySet()) {
             String value = jrds.Util.parseTemplate(e.getValue(), this);
@@ -527,7 +527,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         Document document = builder.newDocument();
-        Element root = (Element) document.createElement("probe");
+        Element root = document.createElement("probe");
         document.appendChild(root);
         root.setAttribute("name", name);
         root.setAttribute("host", host);

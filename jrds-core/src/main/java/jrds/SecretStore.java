@@ -251,7 +251,7 @@ public class SecretStore implements Closeable {
                 }
             })
             .filter(Objects::nonNull)
-            .map(e -> (Map.Entry<String, KeyStore.SecretKeyEntry>)e)
+            .map(e -> e)
             ;
         } catch (KeyStoreException ex) {
             throw new IllegalStateException("Keystore environment unusable", ex);

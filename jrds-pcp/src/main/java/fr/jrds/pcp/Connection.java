@@ -76,7 +76,7 @@ public class Connection implements Closeable {
         phandler.send(traverse);
 
         PnmsNames received = phandler.receive();
-        PnmsNames namesPdu = (PnmsNames)received;
+        PnmsNames namesPdu = received;
         return name.equals(namesPdu.getNames().get(0)) && namesPdu.getNames().size() == 1;
     }
 

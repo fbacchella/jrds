@@ -74,7 +74,7 @@ public class TestSnmpVars {
         OID oid1 = new OID("7");
         VariableBinding vb = new VariableBinding(oid1, new org.snmp4j.smi.TimeTicks(1));
         vars.addVariable(vb);
-        Assert.assertEquals(vars.get(oid1), (double) 0.01);
+        Assert.assertEquals(vars.get(oid1), 0.01);
     }
 
     @Test

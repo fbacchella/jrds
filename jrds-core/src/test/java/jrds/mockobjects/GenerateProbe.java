@@ -77,7 +77,7 @@ public class GenerateProbe {
         Class<P> probeClass = (Class<P>) arg.get(Probe.class.getCanonicalName());
         P probe;
         if(probeClass != null) {
-            probe = (P) probeClass.getConstructor().newInstance();
+            probe = probeClass.getConstructor().newInstance();
         } else {
             probe = (P) new EmptyProbe<T,V>();
         }

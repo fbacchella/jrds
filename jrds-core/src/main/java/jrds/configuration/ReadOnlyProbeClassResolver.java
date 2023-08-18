@@ -63,9 +63,9 @@ public class ReadOnlyProbeClassResolver extends ProbeClassResolver {
     public Class<? extends Probe<?, ?>> getClassByName(String className) throws ClassNotFoundException {
         Class<? extends Probe<?, ?>> originalClass = (Class<? extends Probe<?, ?>>) classLoader.loadClass(className);
         if (IndexedProbe.class.isAssignableFrom(originalClass)) {
-            return (Class<? extends Probe<?, ?>>) DummyProbeIndexed.class;
+            return DummyProbeIndexed.class;
         } else {
-            return (Class<? extends Probe<?, ?>>) DummyProbe.class;
+            return DummyProbe.class;
         }
     }
 

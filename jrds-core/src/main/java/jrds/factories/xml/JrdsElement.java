@@ -129,7 +129,7 @@ public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
             if(n.getNodeType() != Node.ELEMENT_NODE)
                 continue;
             String nodeName = n.getNodeName();
-            firstChildbyTag.computeIfAbsent(nodeName, k -> (JrdsElement) AbstractJrdsNode.build(n));
+            firstChildbyTag.computeIfAbsent(nodeName, k -> AbstractJrdsNode.build(n));
             if(n.getNodeName().equals(name)) {
                 return new JrdsElement((Element) n);
             }

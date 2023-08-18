@@ -89,10 +89,10 @@ public class DoSnmpProbe2 extends CommandStarterImpl {
             try (InputStream fis = new FileInputStream(xmlpath)) {
                 n = new JrdsDocument(dbuilder.parse(fis));
             }
-            transform((JrdsElement) n.getRootElement().findByPath("/probedesc/specific[@name='indexOid']"));
-            transform((JrdsElement) n.getRootElement().findByPath("/probedesc/specific[@name='labelOid']"));
-            transform((JrdsElement) n.getRootElement().findByPath("/probedesc/specific[@name='existOid']"));
-            transform((JrdsElement) n.getRootElement().findByPath("/probedesc/specific[@name='uptimeOid']"));
+            transform(n.getRootElement().findByPath("/probedesc/specific[@name='indexOid']"));
+            transform(n.getRootElement().findByPath("/probedesc/specific[@name='labelOid']"));
+            transform(n.getRootElement().findByPath("/probedesc/specific[@name='existOid']"));
+            transform(n.getRootElement().findByPath("/probedesc/specific[@name='uptimeOid']"));
             for (String xp: new String[] {"/probedesc/ds/oid", "/probedesc/ds/oidhigh", "/probedesc/ds/oidlow"}) {
                 JrdsElement oidNode = n.getRootElement().findByPath(xp);
                 transform(oidNode);

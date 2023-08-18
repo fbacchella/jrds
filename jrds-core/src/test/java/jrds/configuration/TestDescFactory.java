@@ -48,7 +48,7 @@ public class TestDescFactory {
         JrdsDocument d = Tools.parseRessource("customgraph.xml");
         GraphDescBuilder builder = new GraphDescBuilder();
         builder.setPm(new PropertiesManager());
-        GraphDesc gd = (GraphDesc) builder.build(d);
+        GraphDesc gd = builder.build(d);
 
         Assert.assertEquals("name", gd.getName());
         Assert.assertEquals("graphName", gd.getGraphName());
@@ -66,7 +66,7 @@ public class TestDescFactory {
 
         GraphDescBuilder builder = new GraphDescBuilder();
         builder.setPm(new PropertiesManager());
-        GraphDesc gd = (GraphDesc) builder.build(d);
+        GraphDesc gd = builder.build(d);
 
         Assert.assertEquals("mokegraph", gd.getName());
         Assert.assertEquals("mokegraphname", gd.getGraphName());

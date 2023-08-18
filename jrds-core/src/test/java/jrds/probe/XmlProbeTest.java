@@ -69,20 +69,20 @@ public class XmlProbeTest {
         p.find(XmlProvider.class).start();
         uptimeXml = "<?xml version=\"1.0\" ?><element uptime=\"1125\" />";
         l = p.findUptime(p.find(XmlProvider.class), Tools.parseString(uptimeXml));
-        Assert.assertEquals((long) 1125, l);
+        Assert.assertEquals(1125, l);
         p.find(XmlProvider.class).stop();
 
         p.find(XmlProvider.class).start();
         uptimeXml = "<?xml version=\"1.0\" ?><element />";
         l = p.findUptime(p.find(XmlProvider.class), Tools.parseString(uptimeXml));
-        Assert.assertEquals((long) 0, l);
+        Assert.assertEquals(0, l);
         p.find(XmlProvider.class).stop();
 
         pd.addSpecific("upTimePath", "A/element/@uptime");
         p.find(XmlProvider.class).start();
         uptimeXml = "<?xml version=\"1.0\" ?><element />";
         l = p.findUptime(p.find(XmlProvider.class), Tools.parseString(uptimeXml));
-        Assert.assertEquals((long) 0, l);
+        Assert.assertEquals(0, l);
         p.find(XmlProvider.class).stop();
     }
 

@@ -37,7 +37,7 @@ public class SnmpAgent extends BaseAgent {
     int boot = 0;
 
     public SnmpAgent() throws IOException {
-        super((String) null);
+        super(null);
         agent = new CommandProcessor(new OctetString(MPv3.createLocalEngineID()));
         agent.setWorkerPool(ThreadPool.create("RequestPool", 4));
         init();

@@ -31,7 +31,7 @@ public class MokeProbeFactory extends ProbeFactory {
      */
     @Override
     public <KeyType, ValueType> Probe<KeyType, ValueType> makeProbe(ProbeDesc<KeyType> pd) {
-        return (Probe<KeyType, ValueType>) new MokeProbe<KeyType, ValueType>(pd);
+        return new MokeProbe<KeyType, ValueType>(pd);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

@@ -105,7 +105,7 @@ public class Ipv4Packet extends KaitaiStruct {
      public Integer copy() {
          if (this.copy != null)
              return this.copy;
-         int _tmp = (int) (((b1() & 128) >> 7));
+         int _tmp = ((b1() & 128) >> 7);
          this.copy = _tmp;
          return this.copy;
      }
@@ -113,7 +113,7 @@ public class Ipv4Packet extends KaitaiStruct {
      public Integer optClass() {
          if (this.optClass != null)
              return this.optClass;
-         int _tmp = (int) (((b1() & 96) >> 5));
+         int _tmp = ((b1() & 96) >> 5);
          this.optClass = _tmp;
          return this.optClass;
      }
@@ -121,7 +121,7 @@ public class Ipv4Packet extends KaitaiStruct {
      public Integer number() {
          if (this.number != null)
              return this.number;
-         int _tmp = (int) ((b1() & 31));
+         int _tmp = (b1() & 31);
          this.number = _tmp;
          return this.number;
      }
@@ -140,7 +140,7 @@ public class Ipv4Packet extends KaitaiStruct {
  public Integer version() {
      if (this.version != null)
          return this.version;
-     int _tmp = (int) (((b1() & 240) >> 4));
+     int _tmp = ((b1() & 240) >> 4);
      this.version = _tmp;
      return this.version;
  }
@@ -148,7 +148,7 @@ public class Ipv4Packet extends KaitaiStruct {
  public Integer ihl() {
      if (this.ihl != null)
          return this.ihl;
-     int _tmp = (int) ((b1() & 15));
+     int _tmp = (b1() & 15);
      this.ihl = _tmp;
      return this.ihl;
  }
@@ -156,7 +156,7 @@ public class Ipv4Packet extends KaitaiStruct {
  public Integer ihlBytes() {
      if (this.ihlBytes != null)
          return this.ihlBytes;
-     int _tmp = (int) ((ihl() * 4));
+     int _tmp = (ihl() * 4);
      this.ihlBytes = _tmp;
      return this.ihlBytes;
  }

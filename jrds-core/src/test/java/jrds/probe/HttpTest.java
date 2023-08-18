@@ -139,7 +139,7 @@ public class HttpTest {
         p.setPd(pd);
         p.setFile("/${1}");
         p.setPort(80);
-        List<Object> args = List.of((Object) "file");
+        List<Object> args = List.of("file");
         Assert.assertTrue(p.configure(args));
         Assert.assertEquals("http://" + HOST + ":80/file", p.getUrlAsString());
         validateBean(p);

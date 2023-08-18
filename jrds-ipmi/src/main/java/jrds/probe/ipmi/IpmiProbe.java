@@ -107,7 +107,7 @@ ProbeConnected<String, Number, IpmiConnection> implements IndexedProbe {
         }
         if(!Double.isNaN(value)) {
             String dsName = getPd().getCollectMapping().values().iterator().next();
-            return Collections.singletonMap(dsName, (Number) value);
+            return Collections.singletonMap(dsName, value);
         } else {
             return Collections.emptyMap();
         }

@@ -696,7 +696,7 @@ public class GraphDesc implements WithACL {
         public String toString() {
             String colorString;
             if (color instanceof Color) {
-                Color c = (Color) color;
+                Color c = color;
                 colorString = String.format("Color[%d, %d, %d]", c.getRed(), c.getGreen(), c.getBlue());
             } else if (color != null) {
                 colorString = color.toString();
@@ -930,7 +930,7 @@ public class GraphDesc implements WithACL {
         if(builder.percentile != null) {
             String percentileName = "percentile" + builder.percentile + "_" + name;
             String percentileLegend = builder.percentile + "th percentile";
-            Color percentilColor = ((Color)bcolor).darker();
+            Color percentilColor = bcolor.darker();
             if(!builder.reversed) {
                 allds.add(new DsDesc(percentileName, name, builder.percentile, GraphType.LINE, percentilColor));
             } else {
@@ -1411,7 +1411,7 @@ public class GraphDesc implements WithACL {
             }
             specElement.appendChild(document.createElement("graphType")).setTextContent(e.graphType.toString());
             if(e.color != null && e.color instanceof Color) {
-                Color c = (Color) e.color;
+                Color c = e.color;
                 String colorString = colornames.get(c);
                 if (colorString == null) {
                     colorString = String.format("#%02X%02X%02X%02X", c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());

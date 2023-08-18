@@ -113,7 +113,7 @@ public class HttpClientStarter extends Starter {
         HttpClientBuilder builder = HttpClientBuilder.create();
         builder.setUserAgent(USERAGENT);
         builder.setConnectionTimeToLive(step, TimeUnit.SECONDS);
-        builder.evictIdleConnections((long) step, TimeUnit.SECONDS);
+        builder.evictIdleConnections(step, TimeUnit.SECONDS);
         try {
             builder.setSSLContext(getSSLSocketFactory());
         } catch (NoSuchAlgorithmException e) {

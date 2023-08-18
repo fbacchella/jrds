@@ -67,7 +67,7 @@ public class ExternalCmdProbeTest {
         ProbeDesc<String> pd = new ProbeDesc<>();
         pd.addSpecific("command", "echo");
         pd.addSpecific("arguments", "N:1:2");
-        pd.setProbeClass((Class<? extends Probe<String, ?>>) p.getClass());
+        pd.setProbeClass(p.getClass());
         pd.add("ds1", DsType.ABSOLUTE);
         pd.add("ds2", DsType.ABSOLUTE);
         pd.setProbeName("DummyExternalCmdProbe");
