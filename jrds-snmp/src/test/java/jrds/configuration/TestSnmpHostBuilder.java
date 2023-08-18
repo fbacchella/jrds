@@ -14,7 +14,6 @@ import org.junit.rules.TemporaryFolder;
 import jrds.GraphDesc;
 import jrds.HostInfo;
 import jrds.Log4JRule;
-import jrds.Macro;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;

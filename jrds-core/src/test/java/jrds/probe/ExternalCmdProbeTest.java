@@ -17,7 +17,6 @@ import org.slf4j.event.Level;
 
 import jrds.HostInfo;
 import jrds.Log4JRule;
-import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.Tools;
