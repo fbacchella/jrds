@@ -1,5 +1,6 @@
 package jrds.webapp;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -69,9 +70,7 @@ public abstract class DiscoverAgent implements InstanceLogger{
     protected DiscoverAgent(String name, Class<?>... validClasses) {
         namedLogger = LoggerFactory.getLogger("jrds.DiscoverAgent." + name);
         this.validClasses = new HashSet<>(validClasses.length);
-        for(Class<?> c: validClasses) {
-            this.validClasses.add(c);
-        }
+        this.validClasses.addAll(Arrays.asList(validClasses));
     }
 
     /**

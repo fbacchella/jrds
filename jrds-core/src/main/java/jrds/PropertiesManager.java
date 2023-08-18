@@ -175,9 +175,7 @@ public class PropertiesManager extends Properties {
             }
         }
 
-        for(URI u: libspath) {
-            urls.add(u);
-        }
+        urls.addAll(libspath);
 
         URL[] arrayUrl = new URL[urls.size()];
         int i = 0;

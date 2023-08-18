@@ -59,7 +59,7 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         String envPath = System.getenv("PATH");
         String pathSeparator = System.getProperty("path.separator");
         if (envPath != null && !envPath.isEmpty()) {
-            Arrays.stream(envPath.split(pathSeparator)).forEach(pathelements::add);
+            pathelements.addAll(Arrays.asList(envPath.split(pathSeparator)));
         }
         String cmdname = getPd().getSpecific("command");
         log(Level.DEBUG, "will look for %s in %s", cmdname, pathelements);
