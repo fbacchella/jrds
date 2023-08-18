@@ -80,7 +80,7 @@ public class PropertiesManager extends Properties {
     }
 
     private int parseInteger(String s) {
-        Integer integer;
+        int integer;
         if (s != null) {
             if (s.startsWith("#")) {
                 integer = Integer.valueOf(s.substring(1), 16);
@@ -89,7 +89,7 @@ public class PropertiesManager extends Properties {
             } else if (s.startsWith("0") && s.length() > 1) {
                 integer = Integer.valueOf(s.substring(1), 8);
             } else {
-                integer = Integer.valueOf(s);
+                integer = Integer.parseInt(s);
             }
             return integer;
         }

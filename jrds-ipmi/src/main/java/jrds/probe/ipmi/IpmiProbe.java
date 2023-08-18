@@ -44,10 +44,10 @@ ProbeConnected<String, Number, IpmiConnection> implements IndexedProbe {
         int reservationId = 0;
         int lastReservationId = -1;
 
-        Double value = Double.NaN;
+        double value = Double.NaN;
 
         // Need to retry because of cancelled reservation
-        while (value.isNaN() && isCollectRunning()) {
+        while (Double.isNaN(value) && isCollectRunning()) {
             try {
                 // Populate the sensor record and get ID of the next record in
                 // repository (see #getSensorData for details).
@@ -105,7 +105,7 @@ ProbeConnected<String, Number, IpmiConnection> implements IndexedProbe {
                 break;
             }
         }
-        if(!value.isNaN()) {
+        if(!Double.isNaN(value)) {
             String dsName = getPd().getCollectMapping().values().iterator().next();
             return Collections.singletonMap(dsName, (Number) value);
         } else {
