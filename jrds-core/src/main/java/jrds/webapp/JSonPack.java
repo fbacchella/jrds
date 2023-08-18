@@ -28,7 +28,8 @@ public class JSonPack extends HttpServlet {
 
     static private final Logger logger = LoggerFactory.getLogger(JSonPack.class);
 
-    static public final List<String> JSONKEYS = Collections.unmodifiableList(Arrays.asList("id", "autoperiod", "filter", "host", "path", "begin", "end", "max", "min", "tab", "sort", "tree"));
+    static public final List<String> JSONKEYS = List.of("id", "autoperiod", "filter", "host", "path", "begin", "end",
+            "max", "min", "tab", "sort", "tree");
     static public final Map<String, Integer> JSONDICT;
 
     static {
