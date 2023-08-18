@@ -97,22 +97,18 @@ public class PropertiesManager extends Properties {
     }
 
     public boolean parseBoolean(String s) {
-        s = s.toLowerCase().trim();
-        boolean retValue = false;
-        if("1".equals(s))
-            retValue = true;
-        else if("yes".equals(s))
-            retValue = true;
-        else if("y".equals(s))
-            retValue = true;
-        else if("true".equals(s))
-            retValue = true;
-        else if("enable".equals(s))
-            retValue = true;
-        else if("on".equals(s))
-            retValue = true;
-
-        return retValue;
+        s = s.toLowerCase(Locale.ENGLISH).trim();
+        switch (s) {
+        case "1":
+        case "yes":
+        case "y":
+        case "true":
+        case "enable":
+        case "on":
+            return true;
+        default:
+            return false;
+        }
     }
 
     public Map<String, String> subKey(String prefix) {
