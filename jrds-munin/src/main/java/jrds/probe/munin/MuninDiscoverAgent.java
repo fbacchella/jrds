@@ -38,7 +38,7 @@ public class MuninDiscoverAgent extends DiscoverAgent {
         fi1.id = "discoverMuninPort";
         fi1.label = "Munin listening port";
 
-        return Arrays.asList(fi1);
+        return List.of(fi1);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package jrds.graphe;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,7 @@ public class AutoGraph extends GraphNode {
         gd.setGraphName(theStore.getName());
         gd.setGraphTitle(theStore.getName());
         gd.setName(theStore.getName());
-        gd.setTree(PropertiesManager.HOSTSTAB, Arrays.<Object> asList(GraphDesc.TITLE));
+        gd.setTree(PropertiesManager.HOSTSTAB, List.<Object>of(GraphDesc.TITLE));
         logger.debug(this.getQualifiedName());
         this.op = op;
 
