@@ -243,7 +243,7 @@ public class TestUrlParser {
     }
 
     @Test
-    public void checkUrl3() throws UnsupportedEncodingException {
+    public void checkUrl3() {
         Map<String, String[]> parameters = new HashMap<>();
         jrds.Filter f = jrds.Filter.ALLHOSTS;
         String filterName = f.getName();
