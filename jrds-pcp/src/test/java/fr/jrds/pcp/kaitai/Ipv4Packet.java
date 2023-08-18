@@ -71,8 +71,8 @@ public class Ipv4Packet extends KaitaiStruct {
          }
      }
      private ArrayList<Ipv4Option> entries;
-     private Ipv4Packet _root;
-     private Ipv4Packet _parent;
+     private final Ipv4Packet _root;
+     private final Ipv4Packet _parent;
      public ArrayList<Ipv4Option> entries() { return entries; }
      public Ipv4Packet _root() { return _root; }
      public Ipv4Packet _parent() { return _parent; }
@@ -128,8 +128,8 @@ public class Ipv4Packet extends KaitaiStruct {
      private int b1;
      private int len;
      private byte[] body;
-     private Ipv4Packet _root;
-     private Ipv4Packet.Ipv4Options _parent;
+     private final Ipv4Packet _root;
+     private final Ipv4Packet.Ipv4Options _parent;
      public int b1() { return b1; }
      public int len() { return len; }
      public byte[] body() { return body; }
@@ -172,8 +172,8 @@ public class Ipv4Packet extends KaitaiStruct {
  private byte[] dstIpAddr;
  private Ipv4Options options;
  private ProtocolBody body;
- private Ipv4Packet _root;
- private KaitaiStruct _parent;
+ private final Ipv4Packet _root;
+ private final KaitaiStruct _parent;
  private byte[] _raw_options;
  private byte[] _raw_body;
  public int b1() { return b1; }

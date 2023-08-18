@@ -16,8 +16,8 @@ public class Domains {
     public static final String PROPERTY = "jrds.pcp.domains";
     public static final Domains instance = new Domains();
 
-    private Map<String, Short> domainsByName = new HashMap<>();
-    private Map<Short, String> domainsById = new HashMap<>();
+    private final Map<String, Short> domainsByName = new HashMap<>();
+    private final Map<Short, String> domainsById = new HashMap<>();
     private Domains() {
         try {
             String domainFile = System.getProperty(PROPERTY);

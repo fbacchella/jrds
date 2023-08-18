@@ -23,7 +23,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 public class MockHttpServer extends Server implements Closeable {
 
     private ServletContextHandler ctx = null;
-    private HandlerCollection handlers = new HandlerList();
+    private final HandlerCollection handlers = new HandlerList();
 
     public MockHttpServer(boolean withSSL) {
         super();

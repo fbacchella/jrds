@@ -158,7 +158,7 @@ public class Renderer {
         return t;
     });
 
-    private int cacheSize;
+    private final int cacheSize;
     private final Map<Integer, RendererRun> rendered;
     private final File tmpDir;
 

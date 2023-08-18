@@ -17,7 +17,7 @@ public class HostStarter extends StarterNode {
 
     static final private Logger logger = LoggerFactory.getLogger(HostStarter.class);
 
-    private HostInfo host;
+    private final HostInfo host;
     private final Set<Probe<?, ?>> allProbes = new TreeSet<>();
 
     private String runningname;

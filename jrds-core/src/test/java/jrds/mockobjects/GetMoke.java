@@ -73,7 +73,7 @@ public class GetMoke {
             private String encoding = null;
             private String type = null;
             private final ServletOutputStream internalOs = new ServletOutputStream() {
-                private DataOutputStream stream = new DataOutputStream(os);
+                private final DataOutputStream stream = new DataOutputStream(os);
 
                 @Override
                 public void write(int b) throws IOException { stream.write(b); }

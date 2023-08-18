@@ -23,8 +23,8 @@ import jrds.Util;
 public class ProbeFactory {
 
     private final Logger logger = LoggerFactory.getLogger(ProbeFactory.class);
-    private Map<String, ProbeDesc<?>> probeDescMap;
-    private Map<String, GraphDesc> graphDescMap;
+    private final Map<String, ProbeDesc<?>> probeDescMap;
+    private final Map<String, GraphDesc> graphDescMap;
 
     /**
      * @param probeDescMap

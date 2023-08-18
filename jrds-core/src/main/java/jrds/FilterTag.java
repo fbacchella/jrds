@@ -3,7 +3,7 @@ package jrds;
 import java.util.Set;
 
 public class FilterTag extends Filter {
-    private String tag;
+    private final String tag;
 
     public FilterTag(String tag) {
         super();

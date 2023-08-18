@@ -22,7 +22,7 @@ public class AutoGraph extends GraphNode {
 
     public AutoGraph(Probe<?, ?> theStore, Operation op) {
         super(theStore, new GraphDesc() {
-            String name = "autograph" + i++;
+            final String name = "autograph" + i++;
 
             /*
              * (non-Javadoc)

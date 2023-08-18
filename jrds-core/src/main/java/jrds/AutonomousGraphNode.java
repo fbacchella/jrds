@@ -5,7 +5,7 @@ import jrds.webapp.WithACL;
 
 public class AutonomousGraphNode extends GraphNode implements WithACL {
 
-    private String name;
+    private final String name;
 
     protected AutonomousGraphNode(String name) {
         this.name = name;

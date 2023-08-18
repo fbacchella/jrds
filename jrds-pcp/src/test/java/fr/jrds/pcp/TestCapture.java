@@ -65,7 +65,7 @@ public class TestCapture extends Tester {
 
     }
 
-    private static Set<FEATURES> serverFeatures = new HashSet<>();
+    private static final Set<FEATURES> serverFeatures = new HashSet<>();
     static {
         serverFeatures.add(FEATURES.SECURE);
         serverFeatures.add(FEATURES.COMPRESS);

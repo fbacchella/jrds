@@ -250,8 +250,8 @@ public class ProtocolBody extends KaitaiStruct {
      }
      private void _read() {
      }
-     private ProtocolBody _root;
-     private ProtocolBody _parent;
+     private final ProtocolBody _root;
+     private final ProtocolBody _parent;
      public ProtocolBody _root() { return _root; }
      public ProtocolBody _parent() { return _parent; }
  }
@@ -284,8 +284,8 @@ public class ProtocolBody extends KaitaiStruct {
      private int hdrExtLen;
      private byte[] body;
      private ProtocolBody nextHeader;
-     private ProtocolBody _root;
-     private ProtocolBody _parent;
+     private final ProtocolBody _root;
+     private final ProtocolBody _parent;
      public int nextHeaderType() { return nextHeaderType; }
      public int hdrExtLen() { return hdrExtLen; }
      public byte[] body() { return body; }
@@ -301,9 +301,9 @@ public class ProtocolBody extends KaitaiStruct {
      return this.protocol;
  }
  private KaitaiStruct body;
- private int protocolNum;
- private ProtocolBody _root;
- private KaitaiStruct _parent;
+ private final int protocolNum;
+ private final ProtocolBody _root;
+ private final KaitaiStruct _parent;
  public KaitaiStruct body() { return body; }
 
  /**

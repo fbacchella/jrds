@@ -49,8 +49,8 @@ public class Ipv6Packet extends KaitaiStruct {
  private byte[] dstIpv6Addr;
  private ProtocolBody nextHeader;
  private byte[] rest;
- private Ipv6Packet _root;
- private KaitaiStruct _parent;
+ private final Ipv6Packet _root;
+ private final KaitaiStruct _parent;
  public long version() { return version; }
  public long trafficClass() { return trafficClass; }
  public long flowLabel() { return flowLabel; }

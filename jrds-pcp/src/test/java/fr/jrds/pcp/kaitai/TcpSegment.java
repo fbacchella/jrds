@@ -55,8 +55,8 @@ public class TcpSegment extends KaitaiStruct {
  private int checksum;
  private int urgentPointer;
  private byte[] body;
- private TcpSegment _root;
- private KaitaiStruct _parent;
+ private final TcpSegment _root;
+ private final KaitaiStruct _parent;
  public int srcPort() { return srcPort; }
  public int dstPort() { return dstPort; }
  public long seqNum() { return seqNum; }

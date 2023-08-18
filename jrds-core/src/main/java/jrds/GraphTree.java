@@ -37,11 +37,11 @@ public class GraphTree {
     private GraphTree parent;
     private Map<Integer, GraphTree> pathsMap;
     // The node's name
-    private String name;
+    private final String name;
     // The childs
-    private Map<String, GraphTree> childsMap;
+    private final Map<String, GraphTree> childsMap;
     // The graphs in this node
-    private Map<String, GraphNode> graphsSet;
+    private final Map<String, GraphNode> graphsSet;
 
     /**
      * Private constructor, no one can generate an graph on the fly

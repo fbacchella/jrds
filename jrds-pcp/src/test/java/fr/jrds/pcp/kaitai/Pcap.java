@@ -199,8 +199,8 @@ public class Pcap extends KaitaiStruct {
         private long sigfigs;
         private long snaplen;
         private Linktype network;
-        private Pcap _root;
-        private Pcap _parent;
+        private final Pcap _root;
+        private final Pcap _parent;
         public byte[] magicNumber() { return magicNumber; }
         public int versionMajor() { return versionMajor; }
         public int versionMinor() { return versionMinor; }
@@ -278,8 +278,8 @@ public class Pcap extends KaitaiStruct {
         private long inclLen;
         private long origLen;
         private Object body;
-        private Pcap _root;
-        private Pcap _parent;
+        private final Pcap _root;
+        private final Pcap _parent;
         private byte[] _raw_body;
         public long tsSec() { return tsSec; }
         public long tsUsec() { return tsUsec; }
@@ -304,8 +304,8 @@ public class Pcap extends KaitaiStruct {
     }
     private Header hdr;
     private ArrayList<Packet> packets;
-    private Pcap _root;
-    private KaitaiStruct _parent;
+    private final Pcap _root;
+    private final KaitaiStruct _parent;
     public Header hdr() { return hdr; }
     public ArrayList<Packet> packets() { return packets; }
     public Pcap _root() { return _root; }

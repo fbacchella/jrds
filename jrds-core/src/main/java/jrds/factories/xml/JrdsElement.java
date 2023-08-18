@@ -19,7 +19,7 @@ import org.w3c.dom.TypeInfo;
 public class JrdsElement extends AbstractJrdsNode<Element> implements Element {
 
     private NamedNodeMap attrs = null;
-    private Map<String, JrdsElement> firstChildbyTag = new HashMap<>();
+    private final Map<String, JrdsElement> firstChildbyTag = new HashMap<>();
 
     public JrdsElement(Element n) {
         super(n);

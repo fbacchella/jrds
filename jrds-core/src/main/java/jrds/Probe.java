@@ -81,14 +81,14 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     private String name = null;
     protected HostInfo monitoredHost;
-    private Collection<GraphNode> graphList = new ArrayList<>();
+    private final Collection<GraphNode> graphList = new ArrayList<>();
     private ProbeDesc<KeyType> pd;
     private long uptime = Long.MAX_VALUE;
     private boolean finished = false;
     private String label = null;
     private Logger namedLogger = LoggerFactory.getLogger("jrds.Probe.EmptyProbe");
     private volatile boolean running = false;
-    private Set<Store> stores = new HashSet<>();
+    private final Set<Store> stores = new HashSet<>();
     private Store mainStore;
     private ArchivesSet archives = ArchivesSet.DEFAULT;
     private Map<String, String> customBeans = Collections.emptyMap();

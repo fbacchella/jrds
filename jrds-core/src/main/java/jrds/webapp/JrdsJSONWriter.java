@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONWriter;
 
 public class JrdsJSONWriter {
-    private JSONWriter jw;
-    private Writer w;
+    private final JSONWriter jw;
+    private final Writer w;
 
     public JrdsJSONWriter(HttpServletResponse response) throws IOException {
         response.setContentType("application/json");

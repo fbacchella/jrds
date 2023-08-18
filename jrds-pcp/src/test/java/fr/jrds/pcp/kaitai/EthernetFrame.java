@@ -117,8 +117,8 @@ public class EthernetFrame extends KaitaiStruct {
      private long priority;
      private boolean dropEligible;
      private long vlanId;
-     private EthernetFrame _root;
-     private EthernetFrame _parent;
+     private final EthernetFrame _root;
+     private final EthernetFrame _parent;
 
      /**
       * Priority Code Point (PCP) is used to specify priority for
@@ -161,8 +161,8 @@ public class EthernetFrame extends KaitaiStruct {
  private TagControlInfo tci;
  private EtherTypeEnum etherType2;
  private Object body;
- private EthernetFrame _root;
- private KaitaiStruct _parent;
+ private final EthernetFrame _root;
+ private final KaitaiStruct _parent;
  private byte[] _raw_body;
 
  /**

@@ -61,14 +61,14 @@ public class HostsList extends StarterNode {
     private final Map<Integer, Probe<?, ?>> probeMap = new HashMap<>();
     private final Map<String, GraphTree> treeMap = new LinkedHashMap<>(3);
     private final Map<String, Filter> filters = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-    private Map<String, Tab> tabs = new LinkedHashMap<>();
+    private final Map<String, Tab> tabs = new LinkedHashMap<>();
     private String firstTab = null;
     private Renderer renderer = null;
     private Timer collectTimer;
     // The list of roles known to jrds
-    private Set<String> roles = new HashSet<>();
-    private Set<String> defaultRoles = Collections.emptySet();
-    private Set<Class<? extends DiscoverAgent>> daList = new HashSet<>();
+    private final Set<String> roles = new HashSet<>();
+    private final Set<String> defaultRoles = Collections.emptySet();
+    private final Set<Class<? extends DiscoverAgent>> daList = new HashSet<>();
     private Set<StoreFactory> stores = Collections.emptySet();
     @Getter @Setter @Accessors(chain=true)
     private Function<ClassLoader, ProbeClassResolver> probeClassResolverSource = ProbeClassResolver::new;

@@ -32,7 +32,7 @@ public class Updater {
         for(HostInfo host: hl.getHosts()) {
             for(final Probe<?, ?> p: host.getProbes()) {
                 final Runnable runUpgrade = new Runnable() {
-                    private Probe<?, ?> lp = p;
+                    private final Probe<?, ?> lp = p;
 
                     public void run() {
                         lp.checkStore();

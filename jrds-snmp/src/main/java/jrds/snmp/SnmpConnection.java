@@ -39,7 +39,7 @@ public class SnmpConnection extends Connection<Target> {
     private String community = "public";
     private OID ping = sysDescr;
     // A default value for the uptime OID, from the HOST-RESSOURCES MIB
-    private OID uptimeOid = hrSystemUptime;
+    private final OID uptimeOid = hrSystemUptime;
     private Target snmpTarget;
 
     @Override
