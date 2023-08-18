@@ -57,7 +57,7 @@ public class TestUrlParser {
         Map<String, String[]> parameters = new HashMap<>();
         parameters.put("id", new String[] { "1" });
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
-        Assert.assertEquals(new Integer(1), pb.getId());
+        Assert.assertEquals(Integer.valueOf(1), pb.getId());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class TestUrlParser {
         p.addGraph(gn);
         hl.addProbe(p);
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters), hl);
-        Assert.assertEquals("Graph not found by path", new Integer(gn.hashCode()), pb.getId());
+        Assert.assertEquals("Graph not found by path", Integer.valueOf(gn.hashCode()), pb.getId());
     }
 
     @Test
@@ -95,7 +95,7 @@ public class TestUrlParser {
         hl.addProbe(p);
 
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters, "DummyHost", "MockGraphInstance"), hl, "host", "graphname");
-        Assert.assertEquals("Graph not found by path", new Integer(gn.hashCode()), pb.getId());
+        Assert.assertEquals("Graph not found by path", Integer.valueOf(gn.hashCode()), pb.getId());
         Assert.assertEquals("begin definition invalid", pb.getBegin(), begin.getTime());
         Assert.assertEquals("end definition invalid", pb.getEnd(), end.getTime());
     }
@@ -124,7 +124,7 @@ public class TestUrlParser {
         hl.addProbe(p);
 
         ParamsBean pb = new ParamsBean(GetMoke.getRequest(parameters, "DummyHost"), hl, "host", "graphname");
-        Assert.assertEquals("Graph not found by path", new Integer(gn.hashCode()), pb.getId());
+        Assert.assertEquals("Graph not found by path", Integer.valueOf(gn.hashCode()), pb.getId());
         Assert.assertEquals("begin definition invalid", pb.getBegin(), begin.getTime());
         Assert.assertEquals("end definition invalid", pb.getEnd(), end.getTime());
     }

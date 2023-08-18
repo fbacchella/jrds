@@ -126,7 +126,7 @@ public class TestHostBuilder {
             };
             ci.register(sn);
             JMXConnection cnx = sn.find(JMXConnection.class);
-            Assert.assertEquals("Attributed not setted", new Integer(8999), cnx.getPort());
+            Assert.assertEquals("Attributed not setted", Integer.valueOf(8999), cnx.getPort());
         }
     }
 
