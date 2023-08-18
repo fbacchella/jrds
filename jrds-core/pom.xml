@@ -12,7 +12,7 @@
         <dependency>
             <groupId>org.rrd4j</groupId>
             <artifactId>rrd4j</artifactId>
-            <version>3.9-SNAPSHOT</version>
+            <version>3.9</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
