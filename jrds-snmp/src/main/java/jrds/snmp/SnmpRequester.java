@@ -58,7 +58,7 @@ public enum SnmpRequester {
                 TableUtils tableRet = new TableUtils(snmp, cnx.getPdufactory());
                 tableRet.setMaxNumColumnsPerPDU(30);
                 tableRet.setMaxNumRowsPerPDU(20);
-                OID[] oidTab = oids.toArray(new OID[oids.size()]);
+                OID[] oidTab = oids.toArray(new OID[0]);
                 SnmpVars retValue = new SnmpVars();
                 for(TableEvent te: tableRet.getTable(snmpTarget, oidTab, null, null)) {
                     if(!cnx.isStarted()) {

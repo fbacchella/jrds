@@ -94,7 +94,7 @@ public class SnmpConfigurator extends ModuleConfigurator {
                 snmpMibDirs.add(Paths.get(i).toString());
             }
             if (snmpMibDirs.size() > 0) {
-                String[] paths_list = snmpMibDirs.toArray(new String[snmpMibDirs.size()]);
+                String[] paths_list = snmpMibDirs.toArray(new String[0]);
                 return OIDFormatter.register(paths_list);
             }
         }
