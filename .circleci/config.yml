@@ -2,7 +2,7 @@ version: 2.1
 jobs:
     checkout:
         docker:
-            - image: cimg/openjdk:19.0
+            - image: cimg/openjdk:20.0
         steps:
             - checkout
             - restore_cache:
@@ -13,8 +13,6 @@ jobs:
                     sudo apt-get update
                     sudo apt install libsnmp-base
                     mkdir -p /home/circleci/.sonar/cache /home/circleci/.m2/repository
-                    # First -N install to ensure that pom parent is installed
-                    mvn -B -N clean install -DskipTests -s .circleci/settings.xml
                     # A bug in dependency:go-offline, see https://issues.apache.org/jira/browse/MDEP-688
                     # Another one: https://issues.apache.org/jira/browse/MDEP-735
                     (for p in ./pom.xml */pom.xml ; do d=$(dirname $p) ; echo $d ; (cd $d && mvn -B dependency:resolve dependency:resolve-plugins sonar:help jacoco:help -Psonar,versions || true) ; done ) || true
@@ -39,8 +37,7 @@ jobs:
                     mv -n /tmp/ws/home/circleci/project/* /home/circleci/project/
                     mv -n /tmp/ws/home/circleci/project/.??* /home/circleci/project/
             - run:
-                # install phase is needed to ensure consistency between modules compilation and tests
-                command: mvn -B clean install -DskipTests -s .circleci/settings.xml
+                command: mvn -B clean verify -DskipTests -s .circleci/settings.xml
                 environment:
                     MAVEN_OPTS: "-Xmx2048m"
             - persist_to_workspace:
@@ -48,9 +45,9 @@ jobs:
                 paths:
                     - home/circleci/.m2/repository
                     - home/circleci/project
-    testsj19:
+    testsj20:
         docker:
-            - image: cimg/openjdk:19.0
+            - image: cimg/openjdk:20.0
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -71,7 +68,7 @@ jobs:
                         SONAR=""
                     fi
                     mkdir -p /tmp/$CIRCLE_JOB
-                    mvn -B test $SONAR -Pskip -Darg.line="-Xmx2048m -Djava.io.tmpdir=/tmp/$CIRCLE_JOB" -s .circleci/settings.xml
+                    mvn -B verify $SONAR -Pskip -Darg.line="-Xmx2048m -Djava.io.tmpdir=/tmp/$CIRCLE_JOB" -s .circleci/settings.xml
                 environment:
                     MAVEN_OPTS: "-Xmx1024m"
             - store_test_results:
@@ -98,7 +95,7 @@ jobs:
             - run:
                   command: |
                       mkdir -p /tmp/$CIRCLE_JOB
-                      mvn -B test -Pskip -Darg.line="-Xmx2048m -Djava.io.tmpdir=/tmp/$CIRCLE_JOB" -s .circleci/settings.xml
+                      mvn -B verify -Pskip -Darg.line="-Xmx2048m -Djava.io.tmpdir=/tmp/$CIRCLE_JOB" -s .circleci/settings.xml
                   environment:
                       MAVEN_OPTS: "-Xmx512m"
             - store_test_results:
@@ -121,7 +118,7 @@ jobs:
             - run:
                 command: |
                     mkdir -p /tmp/$CIRCLE_JOB
-                    mvn -B test -Pskip -Darg.line="-Xmx2048m -Djava.io.tmpdir=/tmp/$CIRCLE_JOB" -s .circleci/settings.xml
+                    mvn -B verify -Pskip -Darg.line="-Xmx2048m -Djava.io.tmpdir=/tmp/$CIRCLE_JOB" -s .circleci/settings.xml
                 environment:
                     MAVEN_OPTS: "-Xmx512m"
             - store_test_results:
@@ -129,7 +126,7 @@ jobs:
             #don't persist_to_workspace, can't be done in parallel with testsj17
     publish:
         docker:
-            - image: cimg/openjdk:19.0
+            - image: cimg/openjdk:20.0
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -148,7 +145,7 @@ jobs:
                         PUBLISH="install"
                     fi
                     echo "publishing jobs: $PUBLISH"
-                    mvn -B $PUBLISH -Pskip -Dmaven.test.skip=true -s .circleci/settings.xml
+                    mvn -B $PUBLISH -Pskip -DskipTests -s .circleci/settings.xml
                 environment:
                     MAVEN_OPTS: "-Xmx2048m"
             - persist_to_workspace:
@@ -158,7 +155,7 @@ jobs:
                     - home/circleci/.sonar/cache
     savecache:
         docker:
-            - image: cimg/openjdk:19.0
+            - image: cimg/openjdk:20.0
         steps:
             - attach_workspace:
                 at: /tmp/ws
@@ -180,7 +177,7 @@ workflows:
       - build:
           requires:
               - checkout
-      - testsj19:
+      - testsj20:
           requires:
               - build
           context: "Security variables"
@@ -192,7 +189,7 @@ workflows:
               - build
       - publish:
           requires:
-              - testsj19
+              - testsj20
               - testsj17
               - testsj11
           context: "Security variables"
