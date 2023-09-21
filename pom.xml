@@ -23,7 +23,7 @@
         <junit.version>4.13.2</junit.version>
         <slf4j.version>1.7.36</slf4j.version>
         <log4j2.version>2.20.0</log4j2.version>
-        <lombok.version>1.18.28</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
         <jolokia.version>1.7.2</jolokia.version>
         <jrds.hidelogs>true</jrds.hidelogs>
         <!-- Tell sonar where to look for the coverage file. Property inherited by submodules -->
@@ -97,7 +97,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.6.0</version>
                     <configuration>
                         <quiet/>
                         <links>
@@ -140,7 +140,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.9.1.2184</version>
+                    <version>3.10.0.2594</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
