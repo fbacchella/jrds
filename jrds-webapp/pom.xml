@@ -14,7 +14,7 @@
     <name>JRDS Webapp</name>
     <url>http://jrds.fr</url>
     <properties>
-        <dojo.version>1.12.3</dojo.version>
+        <dojo.version>1.14.0</dojo.version>
         <dojo.unpacked.dir>${project.basedir}/target/dojo-unpacked</dojo.unpacked.dir>
     </properties>
     <dependencies>
