@@ -779,15 +779,12 @@ function doGraphList(result) {
 function getGraphList() {
     if(! queryParams.id &&  ! queryParams.pid)
         return;
-    
-    var graphStandby = startStandBy('graphPane');
 
     return dojo.xhrGet( {
         content: cleanParams(['id', 'begin', 'end', 'min', 'max', 'sort', 'autoperiod', 'periodnext', 'periodprevious', 'history', 'filter', 'pid', 'dsName']),
         url: "jsongraph",
         handleAs: "json",
-        load: doGraphList,
-        standby: graphStandby
+        load: doGraphList
     });
 }
 
