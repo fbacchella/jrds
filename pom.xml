@@ -114,8 +114,7 @@
                             <!--link>https://javadoc.io/doc/com.jayway.jsonpath/json-path/2.4.0</link-->
                         </links>
                         <detectJavaApiLink>true</detectJavaApiLink>
-                        <bootclasspath>${bootclasspath}</bootclasspath>
-                        <source>${maven.compiler.source}</source>
+                        <source>${maven.compiler.release}</source>
                     </configuration>
                     <executions>
                         <execution>
