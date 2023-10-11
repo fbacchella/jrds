@@ -152,6 +152,39 @@ jobs:
                     mvn -B $PUBLISH -Pskip $GPGSIGN -DskipTests -s .circleci/settings.xml
                 environment:
                     MAVEN_OPTS: "-Xmx2048m"
+            - store_artifacts:
+                  path: /home/circleci/.m2/repository/fr/jrds/jrds
+                  destination: /jrds
+            - store_artifacts:
+                  path: /home/circleci/.m2/repository/fr/jrds/jrds-core
+                  destination: /jrds-core
+            - store_artifacts:
+                  path: /home/circleci/.m2/repository/fr/jrds/jrds-ipmi
+                  destination: /jrds-ipmi
+            - store_artifacts:
+                  path: /home/circleci/.m2/repository/fr/jrds/jrds-jdbc
+                  destination: /jrds-jdbc
+            - store_artifacts:
+                  path: /home/circleci/.m2/repository/fr/jrds/jrds-jsonp
+                  destination: /jrds-jsonp
+            - store_artifacts:
+                  path: /home/circleci/.m2/repository/fr/jrds/jrds-log4j
+                  destination: /jrds-log4j
+            - store_artifacts:
+                  path: /home/circleci/.m2/repository/fr/jrds/jrds-munin
+                  destination: /jrds-munin
+            - store_artifacts:
+                  path: /home/circleci/.m2/repository/fr/jrds/jrds-pcp
+                  destination: /jrds-pcp
+            - store_artifacts:
+                  path: /home/circleci/.m2/repository/fr/jrds/jrds-snmp
+                  destination: /jrds-snmp
+            - store_artifacts:
+                  path: /home/circleci/.m2/repository/fr/jrds/jrds-standalone
+                  destination: /jrds-standalone
+            - store_artifacts:
+                  path: /home/circleci/.m2/repository/fr/jrds/jrds-webapp
+                  destination: /jrds-webapp
             - persist_to_workspace:
                 root: /
                 paths:
