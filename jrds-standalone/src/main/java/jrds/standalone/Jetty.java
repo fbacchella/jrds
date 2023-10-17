@@ -22,7 +22,6 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.server.handler.StatisticsHandler;
 import org.eclipse.jetty.util.security.Constraint;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.Logger;
@@ -115,7 +114,6 @@ public class Jetty extends CommandStarterImpl {
             if (pm.withjmx || MBeanServerFactory.findMBeanServer(null).size() > 0) {
                 MBeanServer mbs = java.lang.management.ManagementFactory.getPlatformMBeanServer();
                 server.addBean(new MBeanContainer(mbs));
-                handlers.addHandler(new StatisticsHandler());
             }
             Thread finish = new Thread(() -> {
                 try {
