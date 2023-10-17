@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>OpenJ9BalancedJVM</name>
+    <probeName>jvmpool-${label}</probeName>
+    <probeClass>jrds.probe.JMX</probeClass>
+
+    <specific name="mbeanNames">java.lang:type=GarbageCollector,name=global garbage collect;java.lang:type=GarbageCollector,name=partial gc</specific>
+    <!-- ************ -->
+    <!-- Memory pools -->
+    <!-- ************ -->
+    <ds>
+        <dsName>JIT code cache</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=JIT code cache/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>JIT data cache</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=JIT data cache/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>class storage</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=class storage/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>miscellaneous non-heap storage</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=miscellaneous non-heap storage/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>balanced-eden</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=balanced-eden/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>balanced-old</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=balanced-old/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>balanced-reserved</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=balanced-reserved/Usage/used</collect>
+    </ds>
+    <ds>
+        <dsName>balanced-survivor</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.lang:type=MemoryPool,name=balanced-survivor/Usage/used</collect>
+    </ds>
+    <!-- *********** -->
+    <!-- GC activity -->
+    <!-- *********** -->
+    <!-- the major GC -->
+    <ds>
+        <dsName>MajorCount</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=global garbage collect/CollectionCount</collect>
+    </ds>
+    <ds>
+        <dsName>MajorTime</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=global garbage collect/CollectionTime</collect>
+    </ds>
+    <ds>
+        <dsName>MajorMemoryFreed</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=global garbage collect/TotalMemoryFreed</collect>
+    </ds>
+    <ds>
+        <dsName>MinorCount</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=partial gc/CollectionCount</collect>
+    </ds>
+    <ds>
+        <dsName>MinorTime</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=partial gc/CollectionTime</collect>
+    </ds>
+    <ds>
+        <dsName>MinorMemoryFreed</dsName>
+        <dsType>counter</dsType>
+        <collect>java.lang:type=GarbageCollector,name=partial gc/TotalMemoryFreed</collect>
+    </ds>
+    <!-- *********** -->
+    <!-- BufferPool -->
+    <!-- *********** -->
+    <!-- direct -->
+    <ds>
+        <dsName>DirectCount</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.nio:type=BufferPool,name=direct/Count</collect>
+    </ds>
+    <ds>
+        <dsName>DirectUsed</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.nio:type=BufferPool,name=direct/MemoryUsed</collect>
+    </ds>
+    <ds>
+        <dsName>DirectCapacity</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.nio:type=BufferPool,name=direct/TotalCapacity</collect>
+    </ds>
+    <!-- mapped -->
+    <ds>
+        <dsName>MappedCount</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.nio:type=BufferPool,name=mapped/Count</collect>
+    </ds>
+    <ds>
+        <dsName>MappedUsed</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.nio:type=BufferPool,name=mapped/MemoryUsed</collect>
+    </ds>
+    <ds>
+        <dsName>MappedCapacity</dsName>
+        <dsType>gauge</dsType>
+        <collect>java.nio:type=BufferPool,name=mapped/TotalCapacity</collect>
+    </ds>
+    <graphs>
+        <name>J9BalancedMemoryPools</name>
+        <name>GenGCCount</name>
+        <name>GenGCSpeed</name>
+        <name>GenGCTime</name>
+    </graphs>
+</probedesc>

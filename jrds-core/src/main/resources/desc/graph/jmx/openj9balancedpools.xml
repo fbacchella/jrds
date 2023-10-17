@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
+<graphdesc>
+    <name>J9BalancedMemoryPools</name>
+    <graphName>openj9pool-${label}</graphName>
+    <graphTitle>JVM Memory Usage for ${label} on host ${host}</graphTitle>
+    <unit>
+        <binary />
+    </unit>
+    <verticalLabel>Bytes</verticalLabel>
+    <add>
+        <legend>Non Heap Memory</legend>
+    </add>
+    <add>
+        <name>JIT code cache</name>
+    </add>
+    <add>
+        <name>class storage</name>
+    </add>
+    <add>
+        <rpn>JIT code cache,class storage,+</rpn>
+        <graphType>area</graphType>
+        <color>red</color>
+        <legend>Code Heap</legend>
+    </add>
+    <add>
+        <name>JIT data cache</name>
+        <graphType>stack</graphType>
+        <color>orange</color>
+    </add>
+    <add>
+        <name>miscellaneous non-heap storage</name>
+        <graphType>stack</graphType>
+        <color>black</color>
+        <legend>Miscellaneous non-heap storage</legend>
+    </add>
+    <add>
+        <name>balanced-reserved</name>
+        <graphType>stack</graphType>
+        <color>gray</color>
+        <legend>Reserved</legend>
+    </add>
+    <add>
+        <legend>Heap Memory</legend>
+    </add>
+    <add>
+        <name>balanced-eden</name>
+        <graphType>stack</graphType>
+         <color>green</color>
+        <legend>Eden Space</legend>
+    </add>
+    <add>
+        <name>balanced-survivor</name>
+        <graphType>stack</graphType>
+        <color>cyan</color>
+        <legend>Survivor Space</legend>
+    </add>
+    <add>
+        <name>balanced-old</name>
+        <graphType>stack</graphType>
+        <color>blue</color>
+        <legend>Old Gen</legend>
+    </add>
+    <hosttree>
+        <pathelement>HOST</pathelement>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>JVM</pathstring>
+        <pathstring>${label}</pathstring>
+        <pathstring>Memory usage</pathstring>
+    </hosttree>
+    <viewtree>
+        <pathelement>SERVICES</pathelement>
+        <pathstring>JVM</pathstring>
+        <pathstring>${label}</pathstring>
+        <pathstring>Memory usage</pathstring>
+        <pathelement>HOST</pathelement>
+    </viewtree>
+</graphdesc>
