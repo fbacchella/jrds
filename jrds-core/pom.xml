@@ -198,6 +198,6 @@
     <parent>
         <groupId>fr.jrds</groupId>
         <artifactId>jrds</artifactId>
-        <version>2023.1-SNAPSHOT</version>
+        <version>2023.1</version>
     </parent>
 </project>
