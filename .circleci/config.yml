@@ -15,7 +15,7 @@ jobs:
                     mkdir -p /home/circleci/.sonar/cache /home/circleci/.m2/repository
                     # A bug in dependency:go-offline, see https://issues.apache.org/jira/browse/MDEP-688
                     # Another one: https://issues.apache.org/jira/browse/MDEP-735
-                    (for p in ./pom.xml */pom.xml ; do d=$(dirname $p) ; echo $d ; (cd $d && mvn -B dependency:resolve dependency:resolve-plugins sonar:help jacoco:help gpg:help -Psonar,versions || true) ; done ) || true
+                    mvn -B dependency:resolve dependency:resolve-plugins sonar:help jacoco:help gpg:help -Psonar,versions -fn
                 environment:
                     MAVEN_OPTS: "-Xmx1024m"
             - persist_to_workspace:
@@ -144,12 +144,12 @@ jobs:
                     fi
                     # If no symbolic name, it's a PR, will not publish results
                     if [ -n "$(git symbolic-ref HEAD 2>/dev/null )" ] ; then
-                        PUBLISH="deploy"
+                        PUBLISH="deploy:deploy"
                     else
-                        PUBLISH="install"
+                        PUBLISH="install:install"
                     fi
                     echo "publishing jobs: $PUBLISH"
-                    mvn -B $PUBLISH -Pskip $GPGSIGN -DskipTests -s .circleci/settings.xml
+                    mvn -B jar:jar jar:test-jar source:jar-no-fork $PUBLISH -s .circleci/settings.xml
                 environment:
                     MAVEN_OPTS: "-Xmx2048m"
             - store_artifacts:
