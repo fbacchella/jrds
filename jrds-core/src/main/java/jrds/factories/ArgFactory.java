@@ -148,15 +148,8 @@ public final class ArgFactory {
                 c = clazz.getConstructor(String.class);
             }
             return c.newInstance(value);
-        } catch (SecurityException e) {
-            throw new InvocationTargetException(e, clazz.getName());
-        } catch (NoSuchMethodException e) {
-            throw new InvocationTargetException(e, clazz.getName());
-        } catch (IllegalArgumentException e) {
-            throw new InvocationTargetException(e, clazz.getName());
-        } catch (InstantiationException e) {
-            throw new InvocationTargetException(e, clazz.getName());
-        } catch (IllegalAccessException e) {
+        } catch (SecurityException | IllegalAccessException | InstantiationException | IllegalArgumentException |
+                 NoSuchMethodException e) {
             throw new InvocationTargetException(e, clazz.getName());
         } catch (InvocationTargetException e) {
             throw e;
