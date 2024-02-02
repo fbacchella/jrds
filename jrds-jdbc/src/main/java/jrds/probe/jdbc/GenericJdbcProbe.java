@@ -170,22 +170,13 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
                         values.put(key, value);
                     } else {
                         int type = meta.getColumnType(i);
-                        switch (type) {
-                        case Types.DATE:
-                            value = rs.getDate(i).getTime() / 1000;
-                            break;
-                        case Types.TIME:
-                            value = rs.getTime(i).getTime() / 1000;
-                            break;
-                        case Types.VARCHAR:
-                            value = Util.parseStringNumber(rs.getString(i), Double.NaN);
-                            break;
-                        case Types.TIMESTAMP:
-                            value = rs.getTimestamp(i).getTime() / 1000;
-                            break;
-                        default:
-                            value = Double.NaN;
-                        }
+                        value = switch (type) {
+                            case Types.DATE -> rs.getDate(i).getTime() / 1000;
+                            case Types.TIME -> rs.getTime(i).getTime() / 1000;
+                            case Types.VARCHAR -> Util.parseStringNumber(rs.getString(i), Double.NaN);
+                            case Types.TIMESTAMP -> rs.getTimestamp(i).getTime() / 1000;
+                            default -> Double.NaN;
+                        };
                         values.put(key, value);
                     }
                 }

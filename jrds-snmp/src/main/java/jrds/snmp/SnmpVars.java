@@ -78,21 +78,12 @@ public class SnmpVars extends HashMap<OID, Object> {
         } else {
             errors.put(vb.getOid(), vb.getSyntax());
             int exception = vb.getSyntax();
-            String exceptionName;
-            switch (exception) {
-            case SMIConstants.EXCEPTION_END_OF_MIB_VIEW:
-                exceptionName = "End of mib view";
-                break;
-            case SMIConstants.EXCEPTION_NO_SUCH_INSTANCE:
-                exceptionName = "No such instance";
-                break;
-            case SMIConstants.EXCEPTION_NO_SUCH_OBJECT:
-                exceptionName = "No such object";
-                break;
-            default:
-                exceptionName = "Unknown exception";
-                break;
-            }
+            String exceptionName = switch (exception) {
+                case SMIConstants.EXCEPTION_END_OF_MIB_VIEW -> "End of mib view";
+                case SMIConstants.EXCEPTION_NO_SUCH_INSTANCE -> "No such instance";
+                case SMIConstants.EXCEPTION_NO_SUCH_OBJECT -> "No such object";
+                default -> "Unknown exception";
+            };
             logger.trace("Exception {} for {}", exceptionName, vb.getOid());
         }
         return retValue;

@@ -853,26 +853,15 @@ public class Util {
             line.append(String.format(format, args));
             return line.toString();
         });
-        Consumer<Object> lg;
-        switch(l) {
-        case TRACE:
-            lg = (i) -> namedLogger.trace("{}", i);
-            break;
-        case DEBUG:
-            lg = (i) -> namedLogger.debug("{}", i);
-            break;
-        case INFO:
-            lg = (i) -> namedLogger.info("{}", i);
-            break;
-        case WARN:
-            lg = (i) -> namedLogger.warn("{}", i);
-            break;
-        case ERROR:
-            lg = (i) -> namedLogger.error("{}", i);
-            break;
-        default:
-            lg = (i) -> {};
-        }
+        Consumer<Object> lg = switch (l) {
+            case TRACE -> (i) -> namedLogger.trace("{}", i);
+            case DEBUG -> (i) -> namedLogger.debug("{}", i);
+            case INFO -> (i) -> namedLogger.info("{}", i);
+            case WARN -> (i) -> namedLogger.warn("{}", i);
+            case ERROR -> (i) -> namedLogger.error("{}", i);
+            default -> (i) -> {
+            };
+        };
         lg.accept(ls);
         // NPE or ArrayIndexOutOfBoundsException should never happen, so it's always logged
         if(e != null && (namedLogger.isDebugEnabled() || e instanceof NullPointerException || e instanceof ArrayIndexOutOfBoundsException)) {

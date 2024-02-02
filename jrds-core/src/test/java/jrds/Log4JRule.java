@@ -137,20 +137,14 @@ public class Log4JRule implements TestRule {
     }
 
     private Level resolveLevel(org.slf4j.event.Level l) {
-        switch (l) {
-        case TRACE:
-            return org.apache.log4j.Level.TRACE;
-        case DEBUG:
-            return org.apache.log4j.Level.DEBUG;
-        case WARN:
-            return org.apache.log4j.Level.WARN;
-        case INFO:
-            return org.apache.log4j.Level.INFO;
-        case ERROR:
-            return org.apache.log4j.Level.ERROR;
-        default:
-            return null;
-        }
+        return switch (l) {
+            case TRACE -> Level.TRACE;
+            case DEBUG -> Level.DEBUG;
+            case WARN -> Level.WARN;
+            case INFO -> Level.INFO;
+            case ERROR -> Level.ERROR;
+            default -> null;
+        };
     }
 
 }

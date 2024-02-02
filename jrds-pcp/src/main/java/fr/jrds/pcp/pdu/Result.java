@@ -95,29 +95,16 @@ public class Result extends Pdu {
         int valueLength = ByteBuffer.wrap(valueLengthBytes).getInt();
         byte[] valueBytes = new byte[valueLength - 4];
         buffer.getByte(valueBytes);
-        Object value;
-        switch (type) {
-        case STRING:
-            // A zero-terminated string
-            value = new String(valueBytes, 0, valueBytes.length -1);
-            break;
-        case DOUBLE:
-            value = ByteBuffer.wrap(valueBytes).getDouble();
-            break;
-        case FLOAT:
-            value = ByteBuffer.wrap(valueBytes).getFloat();
-            break;
-        case U64:
-        case I64:
-            value = ByteBuffer.wrap(valueBytes).getLong();
-            break;
-        case I32:
-        case U32:
-            value = ByteBuffer.wrap(valueBytes).getInt();
-            break;
-        default:
-            throw new UnsupportedOperationException(type.toString());
-        }
+        Object value = switch (type) {
+            case STRING ->
+                // A zero-terminated string
+                    new String(valueBytes, 0, valueBytes.length - 1);
+            case DOUBLE -> ByteBuffer.wrap(valueBytes).getDouble();
+            case FLOAT -> ByteBuffer.wrap(valueBytes).getFloat();
+            case U64, I64 -> ByteBuffer.wrap(valueBytes).getLong();
+            case I32, U32 -> ByteBuffer.wrap(valueBytes).getInt();
+            default -> throw new UnsupportedOperationException(type.toString());
+        };
         buffer.reset();
         return value;
     }

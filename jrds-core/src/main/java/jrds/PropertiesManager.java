@@ -98,17 +98,10 @@ public class PropertiesManager extends Properties {
 
     public boolean parseBoolean(String s) {
         s = s.toLowerCase(Locale.ENGLISH).trim();
-        switch (s) {
-        case "1":
-        case "yes":
-        case "y":
-        case "true":
-        case "enable":
-        case "on":
-            return true;
-        default:
-            return false;
-        }
+        return switch (s) {
+            case "1", "yes", "y", "true", "enable", "on" -> true;
+            default -> false;
+        };
     }
 
     public Map<String, String> subKey(String prefix) {
