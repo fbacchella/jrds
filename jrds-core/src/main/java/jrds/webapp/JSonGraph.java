@@ -33,10 +33,11 @@ public class JSonGraph extends JSonData {
 
         List<GraphNode> graphs = params.getGraphs(this);
         if(params.isSorted() && graphs.size() > 1) {
-            Collections.sort(graphs, (g1, g2) -> {
+            graphs.sort((g1, g2) -> {
                 int order = Util.nodeComparator.compare(g1.getName(), g2.getName());
-                if(order == 0)
-                    order = Util.nodeComparator.compare(g1.getProbe().getHost().getName(), g2.getProbe().getHost().getName());
+                if (order == 0)
+                    order = Util.nodeComparator.compare(g1.getProbe().getHost().getName(),
+                            g2.getProbe().getHost().getName());
                 return order;
             });
         }

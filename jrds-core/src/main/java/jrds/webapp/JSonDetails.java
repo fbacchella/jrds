@@ -45,7 +45,7 @@ public class JSonDetails extends JrdsServlet {
                 w.array();
                 List<String> dsNames = new ArrayList<>();
                 dsNames.addAll(p.getPd().getDs());
-                Collections.sort(dsNames, Util.nodeComparator);
+                dsNames.sort(Util.nodeComparator);
                 for(String datasource: dsNames) {
                     w.object();
                     w.key("id").value(datasource.hashCode());
