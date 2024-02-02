@@ -6,17 +6,18 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.List;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.DiskFileItem;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.core.FileItem;
+import org.apache.commons.fileupload2.core.FileItemFactory;
+import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload;
 import org.json.JSONWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +36,8 @@ public class Upload extends JrdsServlet {
      *      response)
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        FileItemFactory factory = new DiskFileItemFactory();
-        ServletFileUpload upload = new ServletFileUpload(factory);
+        FileItemFactory<DiskFileItem> factory = DiskFileItemFactory.builder().get();
+        JakartaServletFileUpload upload = new JakartaServletFileUpload(factory);
 
         try {
             DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
@@ -84,7 +85,7 @@ public class Upload extends JrdsServlet {
                         dbuilder.parse(uploadedStream);
                         File destination = new File(getPropertiesManager().configdir, fileName);
                         if(!destination.exists()) {
-                            item.write(destination);
+                            item.write(destination.toPath());
                             w.key("parsed").value(true);
                         } else {
                             w.key("error").value("file existe");

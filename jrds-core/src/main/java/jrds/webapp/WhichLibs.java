@@ -6,10 +6,10 @@ import java.net.URI;
 import java.net.URL;
 import java.security.Principal;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -29,8 +29,8 @@ public final class WhichLibs extends JrdsServlet {
     static final private Logger logger = LoggerFactory.getLogger(WhichLibs.class);
 
     /**
-     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
-     *      javax.servlet.http.HttpServletResponse)
+     * @see jakarta.servlet.http.HttpServlet#doGet(jakarta.servlet.http.HttpServletRequest,
+     *      jakarta.servlet.http.HttpServletResponse)
      */
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         HostsList hl = getHostsList();
@@ -88,7 +88,7 @@ public final class WhichLibs extends JrdsServlet {
             } catch (ParserConfigurationException e) {
                 out.println("Invalid DOM parser configuration");
             }
-            out.println(resolv("Servlet API", javax.servlet.ServletContext.class));
+            out.println(resolv("Servlet API", jakarta.servlet.ServletContext.class));
             out.println(resolv("SNMP4J", "org.snmp4j.transport.DefaultUdpTransportMapping"));
             out.println(resolv("Jrds Agent", "jrds.probe.RMI"));
             out.println(resolv("Log4j", logger.getClass()));

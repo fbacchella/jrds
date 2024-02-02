@@ -14,7 +14,7 @@ import javax.management.MalformedObjectNameException;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import jrds.Configuration;
 import jrds.HostInfo;

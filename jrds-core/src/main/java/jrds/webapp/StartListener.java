@@ -10,13 +10,13 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.management.MBeanServerFactory;
-import javax.servlet.DispatcherType;
-import javax.servlet.FilterRegistration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.ServletRegistration;
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.FilterRegistration;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.http.HttpServlet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +57,7 @@ public class StartListener implements ServletContextListener {
      * (non-Javadoc)
      * 
      * @see
-     * javax.servlet.ServletContextListener#contextInitialized(javax.servlet.
+     * jakarta.servlet.ServletContextListener#contextInitialized(jakarta.servlet.
      * ServletContextEvent)
      */
     public void contextInitialized(ServletContextEvent arg0) {
@@ -98,7 +98,7 @@ public class StartListener implements ServletContextListener {
     /*
      * (non-Javadoc)
      * 
-     * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.
+     * @see jakarta.servlet.ServletContextListener#contextDestroyed(jakarta.servlet.
      * ServletContextEvent)
      */
     public void contextDestroyed(ServletContextEvent arg0) {

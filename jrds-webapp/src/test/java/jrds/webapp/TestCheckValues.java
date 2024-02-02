@@ -53,14 +53,14 @@ public class TestCheckValues {
 
     @Test
     public void testFail() throws Exception {
-        String url = "http://tester%s/values/localhost/truc/bad";
+        String url = "http://tester/values/localhost/truc/bad";
         Response response = ToolsWebApp.doRequestGet(tester, url, 400);
         Assert.assertTrue(response.getContent().contains("No matching probe"));
     }
 
     @Test
     public void testSucessProbe() throws Exception {
-        String url = "http://tester%s/values/localhost/ifx-lo0";
+        String url = "http://tester/values/localhost/ifx-lo0";
         Response response = ToolsWebApp.doRequestGet(tester, url, 200);
         String content = response.getContent();
         Assert.assertTrue("last update not found", content.contains("Last update:"));
@@ -71,14 +71,14 @@ public class TestCheckValues {
 
     @Test
     public void testSucessOneDS() throws Exception {
-        String url = "http://tester%s/values/localhost/ifx-lo0/ifInMulticastPkts";
+        String url = "http://tester/values/localhost/ifx-lo0/ifInMulticastPkts";
         Response response = ToolsWebApp.doRequestGet(tester, url, 200);
         Assert.assertEquals("DS request invalid", "NaN", response.getContent().trim());
     }
 
     @Test
     public void testSucessOneDSWithCf() throws Exception {
-        String url = "http://tester%s/values/localhost/ifx-lo0/ifInMulticastPkts/1000/max";
+        String url = "http://tester/values/localhost/ifx-lo0/ifInMulticastPkts/1000/max";
         Response response = ToolsWebApp.doRequestGet(tester, url, 200);
         Assert.assertEquals("DS request invalid", "NaN", response.getContent().trim());
     }

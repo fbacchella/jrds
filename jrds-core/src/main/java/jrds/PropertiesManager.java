@@ -378,7 +378,7 @@ public class PropertiesManager extends Properties {
         try {
             String tmpDirProperty = getProperty("tmpdir", "");
             if(tmpDirProperty.isEmpty()) {
-                tmpDirProperty = System.getProperty("javax.servlet.context.tempdir", "");
+                tmpDirProperty = System.getProperty("jakarta.servlet.context.tempdir", "");
             }
             if(tmpDirProperty.isEmpty()) {
                 File tempDirPath = new File(System.getProperty("java.io.tmpdir"), "jrds");

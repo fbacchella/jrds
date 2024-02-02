@@ -2,9 +2,9 @@ package jrds.webapp;
 
 import java.io.IOException;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.rrd4j.data.DataProcessor;
 import org.rrd4j.data.Variable;
@@ -24,8 +24,8 @@ public final class ProbeSummary extends JrdsServlet {
     static final private Logger logger = LoggerFactory.getLogger(ProbeSummary.class);
 
     /**
-     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
-     *      javax.servlet.http.HttpServletResponse)
+     * @see jakarta.servlet.http.HttpServlet#doGet(jakarta.servlet.http.HttpServletRequest,
+     *      jakarta.servlet.http.HttpServletResponse)
      */
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         res.setContentType("text/plain");

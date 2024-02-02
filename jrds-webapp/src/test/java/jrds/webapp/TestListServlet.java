@@ -8,8 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-import javax.servlet.ServletContextListener;
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.http.HttpServlet ;
 
 import org.eclipse.jetty.servlet.ServletTester;
 import org.junit.Before;

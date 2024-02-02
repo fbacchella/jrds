@@ -9,16 +9,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterRegistration;
-import javax.servlet.FilterRegistration.Dynamic;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
-import javax.servlet.SessionCookieConfig;
-import javax.servlet.SessionTrackingMode;
-import javax.servlet.descriptor.JspConfigDescriptor;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterRegistration;
+import jakarta.servlet.FilterRegistration.Dynamic;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.SessionCookieConfig;
+import jakarta.servlet.SessionTrackingMode;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
 
 public class MokeServletContext implements ServletContext {
     public Map<String, Object> attributes = new HashMap<>();
@@ -150,15 +150,20 @@ public class MokeServletContext implements ServletContext {
     public void addListener(Class<? extends EventListener> arg0) {
     }
 
-    public javax.servlet.ServletRegistration.Dynamic addServlet(String arg0, String arg1) {
+    public ServletRegistration.Dynamic addServlet(String arg0, String arg1) {
         return null;
     }
 
-    public javax.servlet.ServletRegistration.Dynamic addServlet(String arg0, Servlet arg1) {
+    public ServletRegistration.Dynamic addServlet(String arg0, Servlet arg1) {
         return null;
     }
 
-    public javax.servlet.ServletRegistration.Dynamic addServlet(String arg0, Class<? extends Servlet> arg1) {
+    public ServletRegistration.Dynamic addServlet(String arg0, Class<? extends Servlet> arg1) {
+        return null;
+    }
+
+    @Override
+    public ServletRegistration.Dynamic addJspFile(String s, String s1) {
         return null;
     }
 
@@ -223,6 +228,36 @@ public class MokeServletContext implements ServletContext {
 
     public String getVirtualServerName() {
         return null;
+    }
+
+    @Override
+    public int getSessionTimeout() {
+        return 0;
+    }
+
+    @Override
+    public void setSessionTimeout(int i) {
+
+    }
+
+    @Override
+    public String getRequestCharacterEncoding() {
+        return null;
+    }
+
+    @Override
+    public void setRequestCharacterEncoding(String s) {
+
+    }
+
+    @Override
+    public String getResponseCharacterEncoding() {
+        return null;
+    }
+
+    @Override
+    public void setResponseCharacterEncoding(String s) {
+
     }
 
     public boolean setInitParameter(String arg0, String arg1) {

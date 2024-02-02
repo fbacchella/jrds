@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import jrds.factories.xml.JrdsDocument;
 import jrds.factories.xml.JrdsElement;

@@ -8,9 +8,9 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.rrd4j.data.DataProcessor;
 import org.slf4j.Logger;

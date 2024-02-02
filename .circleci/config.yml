@@ -221,14 +221,10 @@ workflows:
       - testsj17:
             requires:
                 - build
-      - testsj11:
-          requires:
-              - build
       - publish:
           requires:
               - testsj21
               - testsj17
-              - testsj11
           context: "Security variables"
       - savecache:
           requires:

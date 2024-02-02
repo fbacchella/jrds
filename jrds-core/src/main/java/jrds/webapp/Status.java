@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.json.JSONException;
 
@@ -24,8 +24,8 @@ import jrds.starter.Timer.Stats;
 public class Status extends JrdsServlet {
 
     /**
-     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
-     *      javax.servlet.http.HttpServletResponse)
+     * @see jakarta.servlet.http.HttpServlet#doGet(jakarta.servlet.http.HttpServletRequest,
+     *      jakarta.servlet.http.HttpServletResponse)
      */
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
 

@@ -4,7 +4,7 @@ import java.io.Closeable;
 import java.net.InetAddress;
 import java.net.URL;
 
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServlet ;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -31,7 +31,7 @@ public class MockHttpServer extends Server implements Closeable {
         if(withSSL) {
             HttpConfiguration https = new HttpConfiguration();
             https.addCustomizer(new SecureRequestCustomizer());
-            SslContextFactory sslContextFactory = new SslContextFactory();
+            SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
             URL resource = getClass().getClassLoader().getResource("localhost.jks");
             if(resource == null) {
                 throw new RuntimeException("Unable to find 'localhost.jks' file to setup SSL connector");

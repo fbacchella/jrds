@@ -9,9 +9,9 @@ package jrds.webapp;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import jrds.GraphNode;
 import jrds.HostsList;
@@ -27,8 +27,8 @@ public final class Last extends JrdsServlet {
     static public String name = null;
 
     /**
-     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
-     *      javax.servlet.http.HttpServletResponse)
+     * @see jakarta.servlet.http.HttpServlet#doGet(jakarta.servlet.http.HttpServletRequest,
+     *      jakarta.servlet.http.HttpServletResponse)
      */
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         boolean found = false;

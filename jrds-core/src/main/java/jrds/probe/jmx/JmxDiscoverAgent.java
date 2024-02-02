@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.slf4j.event.Level;
 

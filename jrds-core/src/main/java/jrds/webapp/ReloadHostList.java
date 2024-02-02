@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.Semaphore;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import jrds.Configuration;
 
@@ -24,8 +24,8 @@ public class ReloadHostList extends JrdsServlet {
     /*
      * (non-Javadoc)
      * 
-     * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.
-     * HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     * @see jakarta.servlet.http.HttpServlet#doGet(jakarta.servlet.http.
+     * HttpServletRequest, jakarta.servlet.http.HttpServletResponse)
      */
     protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
 
