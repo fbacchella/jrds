@@ -32,6 +32,7 @@
 
     <modules>
         <module>jrds-core</module>
+        <module>jrds-virtualthreads</module>
         <module>jrds-log4j</module>
         <module>jrds-snmp</module>
         <module>jrds-ipmi</module>

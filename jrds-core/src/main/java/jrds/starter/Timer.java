@@ -7,13 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimerTask;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -89,6 +87,7 @@ public class Timer extends StarterNode {
     private final String name;
     private final AtomicInteger collectCount = new AtomicInteger(0);
     private volatile Thread collectThread = null;
+    private final TimerThreadService threadService;
 
     public Timer(String name, PropertiesManager.TimerInfo ti) {
         super();
@@ -98,6 +97,16 @@ public class Timer extends StarterNode {
         setSlowCollectTime(ti.slowCollectTime);
         this.numCollectors = ti.numCollectors;
         registerStarter(new SocketFactory(ti.timeout));
+        BiConsumer<AtomicInteger, Runnable> wrapRunner = (ai, r) -> {
+            MDC.put("collectIteration", String.valueOf(collectCount.get()));
+            MDC.put("collectorInstance", String.valueOf(ai.incrementAndGet()));
+            MDC.put("timer", name);
+            r.run();
+            MDC.remove("collectIteration");
+            MDC.remove("collectorInstance");
+            MDC.remove("timer");
+        };
+        threadService = TimerThreadService.builder().wrapRunner(wrapRunner).numCollectors(numCollectors).timerName(name).build();
     }
 
     public HostStarter getHost(HostInfo info) {
@@ -122,7 +131,7 @@ public class Timer extends StarterNode {
                 MDC.put("timer", name);
                 collectCount.incrementAndGet();
                 // The collect is done in a different thread
-                // So a collect failure will no prevent other collect from running
+                // So a collect failure will not prevent other collect from running
                 Thread subcollector = new Thread(Timer.this::collectAll, "Collect/" + Timer.this.name);
                 subcollector.setDaemon(true);
                 subcollector.setUncaughtExceptionHandler((t, ex) -> Timer.this.log(Level.ERROR, ex, "A fatal error occured during collect: %s", ex));
@@ -160,28 +169,8 @@ public class Timer extends StarterNode {
             return;
         }
         AtomicInteger counter = new AtomicInteger(0);
-        // Generate threads with a default name
-        ThreadFactory tf = r -> {
-            Thread t = new Thread(r) {
-                @Override
-                public void run() {
-                    MDC.put("collectIteration", String.valueOf(collectCount.get()));
-                    MDC.put("collectorInstance", String.valueOf(counter.incrementAndGet()));
-                    MDC.put("timer", name);
-                    super.run();
-                    MDC.remove("collectIteration");
-                    MDC.remove("collectorInstance");
-                    MDC.remove("timer");
-                }
-            };
-            t.setName("Collect/" + Timer.this.name + "/Collector");
-            t.setDaemon(true);
-            return t;
-        };
-
         long maxCollectTime = (getStep() - getTimeout());
-        ThreadPoolExecutor tpool = new ThreadPoolExecutor(numCollectors, numCollectors, 1, TimeUnit.SECONDS, new ArrayBlockingQueue<>(toSchedule.size()), tf);
-        tpool.allowCoreThreadTimeOut(true);
+        ExtendedExecutorService tpool = threadService.getExecutor(toSchedule.size(), counter);
         try {
             if (startCollect()) {
                 tpool.prestartAllCoreThreads();
@@ -190,19 +179,19 @@ public class Timer extends StarterNode {
                 collectThread = Thread.currentThread();
                 boolean terminated = tpool.awaitTermination(maxCollectTime, TimeUnit.SECONDS);
                 if (!terminated) {
-                    log(Level.ERROR, "Unfinished collect, lost %d tasks", tpool.getQueue().size());
+                    log(Level.ERROR, "Unfinished collect, lost %d tasks", tpool.missed());
                 }
             }
         } catch (RejectedExecutionException e) {
             log(Level.DEBUG, e, "Collector thread refused new task");
         } catch (InterruptedException e) {
-            log(Level.INFO, "Collect interrupted, lost %d tasks", tpool.getQueue().size());
+            log(Level.INFO, "Collect interrupted, lost %d tasks", tpool.missed());
             Thread.currentThread().interrupt();
         } catch (RuntimeException e) {
             log(Level.ERROR, e, "Problem while collecting data: %s", e);
         } finally {
             collectThread = null;
-            int missed = tpool.getQueue().size();
+            int missed = tpool.missed();
             stopCollect();
             Thread.yield();
             // Waited for late collect arrival, after the stopCollect
