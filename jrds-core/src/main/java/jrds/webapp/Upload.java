@@ -6,9 +6,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.List;
 
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -17,7 +14,7 @@ import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.fileupload2.core.DiskFileItemFactory;
 import org.apache.commons.fileupload2.core.FileItem;
 import org.apache.commons.fileupload2.core.FileItemFactory;
-import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
+import org.apache.commons.fileupload2.jakarta.servlet5.JakartaServletFileUpload;
 import org.json.JSONWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +22,9 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jrds.factories.xml.EntityResolver;
 
 @ServletSecurity
@@ -37,7 +37,7 @@ public class Upload extends JrdsServlet {
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         FileItemFactory<DiskFileItem> factory = DiskFileItemFactory.builder().get();
-        JakartaServletFileUpload upload = new JakartaServletFileUpload(factory);
+        JakartaServletFileUpload<DiskFileItem, FileItemFactory<DiskFileItem>> upload = new JakartaServletFileUpload<>(factory);
 
         try {
             DocumentBuilderFactory instance = DocumentBuilderFactory.newInstance();
@@ -63,7 +63,7 @@ public class Upload extends JrdsServlet {
                 }
             });
 
-            List<FileItem> items = upload.parseRequest(request);
+            List<DiskFileItem> items = upload.parseRequest(request);
 
             response.setContentType("text/html");
 
@@ -73,7 +73,7 @@ public class Upload extends JrdsServlet {
             JSONWriter w = new JSONWriter(outputWriter);
             w.array();
 
-            for (FileItem item: items) {
+            for (FileItem<DiskFileItem> item: items) {
                 logger.debug("Item send: {}", item);
 
                 // Process a file upload
