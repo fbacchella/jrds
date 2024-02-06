@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.jrds</groupId>
     <artifactId>jrds</artifactId>
-    <version>2024.1-SNAPSHOT</version>
+    <version>2024.1</version>
     <packaging>pom</packaging>
     <name>JRDS</name>
     <url>http://jrds.fr</url>
@@ -14,7 +14,7 @@
     </organization>
 
     <properties>
-        <year>2023</year>
+        <year>2024</year>
         <maven.compiler.release>17</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jetty.version>11.0.20</jetty.version>

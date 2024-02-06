@@ -144,12 +144,12 @@ jobs:
                     fi
                     # If no symbolic name, it's a PR, will not publish results
                     if [ -n "$(git symbolic-ref HEAD 2>/dev/null )" ] ; then
-                        PUBLISH="deploy:deploy"
+                        PUBLISH="deploy"
                     else
-                        PUBLISH="install:install"
+                        PUBLISH="install"
                     fi
                     echo "publishing jobs: $PUBLISH"
-                    mvn -B jar:jar jar:test-jar source:jar-no-fork $PUBLISH -s .circleci/settings.xml
+                    mvn -B $PUBLISH $GPGSIGN -s .circleci/settings.xml -Pskip
                 environment:
                     MAVEN_OPTS: "-Xmx2048m"
             - store_artifacts:
