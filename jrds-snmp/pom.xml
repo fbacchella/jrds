@@ -106,6 +106,6 @@
     <parent>
         <groupId>fr.jrds</groupId>
         <artifactId>jrds</artifactId>
-        <version>2024.1</version>
+        <version>2024.2-SNAPSHOT</version>
     </parent>
 </project>

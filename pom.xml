@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.jrds</groupId>
     <artifactId>jrds</artifactId>
-    <version>2024.1</version>
+    <version>2024.2-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>JRDS</name>
     <url>http://jrds.fr</url>
