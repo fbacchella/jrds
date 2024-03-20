@@ -50,7 +50,7 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.1</version>
+            <version>42.7.2</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -105,6 +105,6 @@
     <parent>
         <groupId>fr.jrds</groupId>
         <artifactId>jrds</artifactId>
-        <version>2024.1-SNAPSHOT</version>
+        <version>2023.2-SNAPSHOT</version>
     </parent>
 </project>

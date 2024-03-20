@@ -132,7 +132,7 @@ public class GetMoke {
     }
 
     static public HttpServletRequest getRequest(final Map<String, String[]> p, String... ctxPathArgs) {
-        StringBuffer buffer = new StringBuffer("/");
+        StringBuilder buffer = new StringBuilder("/");
         if(ctxPathArgs != null && ctxPathArgs.length > 0) {
             for(String element: ctxPathArgs)
                 buffer.append('/').append(element);
