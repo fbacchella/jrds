@@ -21,10 +21,10 @@
         <servlet-api.version>3.1.0</servlet-api.version>
         <maven.plugin.surefire.version>3.2.5</maven.plugin.surefire.version>
         <junit.version>4.13.2</junit.version>
-        <slf4j.version>1.7.36</slf4j.version>
-        <log4j2.version>2.22.1</log4j2.version>
-        <lombok.version>1.18.30</lombok.version>
-        <jolokia.version>1.7.2</jolokia.version>
+        <slf4j.version>2.0.12</slf4j.version>
+        <log4j2.version>2.23.1</log4j2.version>
+        <lombok.version>1.18.32</lombok.version>
+        <jolokia.version>2.0.2</jolokia.version>
         <jrds.hidelogs>true</jrds.hidelogs>
         <!-- Tell sonar where to look for the coverage file. Property inherited by submodules -->
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
@@ -87,7 +87,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.12.1</version>
+                    <version>3.13.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -97,7 +97,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.6.0</version>
+                    <version>3.7.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -149,7 +149,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>3.10.0.2594</version>
+                    <version>3.11.0.3922</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -173,7 +173,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.2.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -372,7 +372,7 @@
              <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.16.0</version>
+                <version>1.16.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -417,9 +417,9 @@
                         <reportSets>
                             <reportSet>
                                 <reports>
-                                    <report>dependency-updates-report</report>
-                                    <report>plugin-updates-report</report>
-                                    <report>property-updates-report</report>
+                                    <report>dependency-updates-aggregate-report</report>
+                                    <report>plugin-updates-aggregate-report</report>
+                                    <report>parent-updates-report</report>
                                 </reports>
                             </reportSet>
                         </reportSets>

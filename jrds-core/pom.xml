@@ -95,19 +95,10 @@
         <dependency>
             <groupId>org.jolokia</groupId>
             <artifactId>jolokia-jvm</artifactId>
-            <version>${jolokia.version}</version>
+            <version>1.7.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>commons-codec</groupId>
-                <artifactId>commons-codec</artifactId>
-                <version>1.16.0</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
     <build>
         <testResources>
             <testResource>
