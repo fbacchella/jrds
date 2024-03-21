@@ -166,7 +166,7 @@ public class GraphDesc implements WithACL {
         },
         LINENOLEGEND {
             public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
-                rgd.line(sn, color, legend);
+                rgd.line(sn, color);
             }
 
             @Override
@@ -206,6 +206,28 @@ public class GraphDesc implements WithACL {
 
             public boolean legend() {
                 return true;
+            }
+        },
+        AREANOLEGEND {
+            public void draw(RrdGraphDef rgd, String sn, Color color, String legend) {
+                rgd.area(sn, color);
+            }
+
+            @Override
+            public String toString() {
+                return "area";
+            }
+
+            public boolean datasource() {
+                return true;
+            }
+
+            public boolean toPlot() {
+                return true;
+            }
+
+            public boolean legend() {
+                return false;
             }
         },
         STACK {

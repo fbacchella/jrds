@@ -42,7 +42,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
 
         GraphDesc gd = new GraphDesc();
 
-        // Identify the optionnal custom GraphDesc class
+        // Identify the optional custom GraphDesc class
         JrdsElement graphClass = subnode.getElementbyName("graphClass");
         if(graphClass != null) {
             String className = graphClass.getTextContent().trim();

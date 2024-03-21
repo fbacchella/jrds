@@ -81,7 +81,7 @@ class DatasourcesPopulator<T extends DataHolder> {
                 complete = true;
             }
             // Does the datas existe in the provided values
-            // It override existing values in the probe
+            // It overrides existing values in the probe
             else if(customData != null && customData.containsKey(ds.dsName)) {
                 complete = true;
                 if(!datasources.contains(ds.name)) {
@@ -89,6 +89,10 @@ class DatasourcesPopulator<T extends DataHolder> {
                     datasources.add(ds.name);
                     logger.trace("custom data found for {}", ds.dsName);
                 }
+            }
+            else if (datasources.contains(ds.dsName)) {
+                // Already completed, no need to redo
+                complete = true;
             }
             // Last but common case, datasource refers to a rrd
             // Or they might be on the associated rrd
