@@ -122,6 +122,10 @@ public class PcpConnexion extends jrds.starter.Connection<Connection> {
                 for (int i = 0 ; i < missingMetrics.size() ; i++) {
                     String name = missingMetrics.get(i);
                     PmId id = idsToCollect.get(i);
+                    if (! lr.containsKey(id)) {
+                        log(Level.INFO, "Searching %s not found in %s", id, lr.keySet());
+                        continue;
+                    }
                     Map<String, Number> idvalues = new HashMap<>(lr.get(id).size());
                     if (lr.get(id).size() > 1) {
                         PmDesc desc = cnx.getDescription(id);
