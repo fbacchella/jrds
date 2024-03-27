@@ -13,7 +13,7 @@ public class PCPException extends Exception {
 
     @Override
     public String getMessage() {
-        if (error.getMessage() != null) {
+        if (error != null && error.getMessage() != null) {
             return error.getMessage();
         } else {
             return "PCPException";
