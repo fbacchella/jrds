@@ -123,7 +123,7 @@ public abstract class StarterNode implements StartersSet, InstanceLogger {
      * @param s the starter to register
      * @return the starter that will be used
      */
-    public <S extends Starter> Starter registerStarter(S s) {
+    public <S extends Starter> S registerStarter(S s) {
         Object key = s.getKey();
         @SuppressWarnings("unchecked")
         S parentStarter = (S) find(s.getClass(), key);
@@ -142,7 +142,7 @@ public abstract class StarterNode implements StartersSet, InstanceLogger {
                 log(Level.DEBUG, "registering %s with key %s", s.getClass().getName(), key);
                 return s;
             } else {
-                return allStarters.get(key);
+                return (S) allStarters.get(key);
             }
         }
     }
