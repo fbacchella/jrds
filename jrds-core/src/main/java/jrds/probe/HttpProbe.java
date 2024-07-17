@@ -128,7 +128,7 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
     }
 
     protected URL resolveUrl(HttpClientStarter.UrlBuilder builder, List<Object> args) throws MalformedURLException {
-        return builder.build(this, args);
+        return builder.setProbe(this).build(args);
     }
 
     /*

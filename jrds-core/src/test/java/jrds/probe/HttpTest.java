@@ -2,8 +2,6 @@ package jrds.probe;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +19,6 @@ import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.Tools;
 import jrds.Util;
-import jrds.probe.HttpClientStarter.UrlBuilder;
 import jrds.starter.HostStarter;
 
 public class HttpTest {
@@ -33,12 +30,6 @@ public class HttpTest {
         @Override
         protected Map<String, Number> parseStream(InputStream stream) {
             return Collections.emptyMap();
-        }
-
-        @Override
-        protected URL resolveUrl(UrlBuilder builder, List<Object> args)
-                        throws MalformedURLException {
-            return builder.build(this, args);
         }
     }
 
