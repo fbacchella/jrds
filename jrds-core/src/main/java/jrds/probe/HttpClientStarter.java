@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.IllegalFormatConversionException;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
@@ -20,6 +22,7 @@ import org.slf4j.event.Level;
 import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.Util;
+import jrds.starter.Connection;
 import jrds.starter.SSLStarter;
 import jrds.starter.Starter;
 import lombok.Setter;
@@ -28,33 +31,32 @@ import lombok.experimental.Accessors;
 
 public class HttpClientStarter extends Starter {
 
+    @Setter
     @Accessors(chain = true) @ToString
     public static class UrlBuilder {
-        @Setter
         private URL url = null;
-        @Setter
         private String urlhost = null;
-        @Setter
         private int port = -1;
-        @Setter
         private String file = "/";
-        @Setter
         String scheme = null;
-        @Setter
         private String login = null;
-        @Setter
         private String password = null;
+        private Probe<?, ?> probe = null;
+        private Connection<?> connection = null;
 
         private UrlBuilder() {}
 
-        public URL build(Probe<?, ?> p) throws MalformedURLException {
-            return build(p, null);
+        public URL build() throws MalformedURLException {
+            return build(List.of());
         }
 
-        public URL build(Probe<?, ?> p, List<Object> argslist) throws MalformedURLException {
-            URL generatedUrl = null;
+        public URL build(List<Object> argslist) throws MalformedURLException {
+            if (argslist == null) {
+                argslist = List.of();
+            }
+            URL generatedUrl;
             if (url == null) {
-                if(port <= 0 && (scheme == null || scheme.isEmpty())) {
+                if (port <= 0 && (scheme == null || scheme.isEmpty())) {
                     scheme = "http";
                 } else if (scheme == null || scheme.isEmpty()) {
                     if (port == 443) {
@@ -64,21 +66,26 @@ public class HttpClientStarter extends Starter {
                     }
                 }
                 String portString = port < 0 ? "" : (":" + port);
-                if (urlhost == null) {
-                    urlhost = p.getHost().getDnsName();
+                if (urlhost == null && probe != null) {
+                    urlhost = probe.getHost().getDnsName();
                 }
-                String urlString;
-                if (argslist != null) {
-                    try {
-                        urlString = String.format(scheme + "://" + urlhost + portString + file, argslist.toArray());
-                        urlString = Util.parseTemplate(urlString, p.getHost(), argslist, p);
-                    } catch (IllegalFormatConversionException e) {
-                        throw new MalformedURLException(String.format("Illegal format string: %s://%s:%s%s, args %d", scheme, urlhost, portString, file, argslist.size()));
-                    }
-                } else {
-                    urlString = Util.parseTemplate(scheme + "://" + urlhost + portString + file, p, p.getHost());
+                if (urlhost == null && connection != null) {
+                    urlhost = connection.getHostName();
                 }
-                generatedUrl = new URL(urlString);
+                List<Object> templateArgs = new ArrayList<>();
+                templateArgs.add(argslist);
+                Optional.ofNullable(probe).ifPresent(p -> {
+                    templateArgs.add(p);
+                    templateArgs.add(p.getHost());
+                });
+                Optional.ofNullable(connection).ifPresent(templateArgs::add);
+                try {
+                    String urlString = String.format(scheme + "://" + urlhost + portString + file, argslist.toArray());
+                    urlString = Util.parseTemplate(urlString, templateArgs.toArray());
+                    generatedUrl = new URL(urlString);
+                } catch (IllegalFormatConversionException e) {
+                    throw new MalformedURLException(String.format("Illegal format string: %s://%s:%s%s, args %d", scheme, urlhost, portString, file, argslist.size()));
+                }
             } else {
                 generatedUrl = url;
             }
@@ -162,7 +169,7 @@ public class HttpClientStarter extends Starter {
     public boolean isStarted() {
         SSLStarter sslfactory = getLevel().find(SSLStarter.class);
         // if no sslfactory, don't check if it's started
-        return client != null && (sslfactory != null ? sslfactory.isStarted() : true);
+        return client != null && (sslfactory == null || sslfactory.isStarted());
     }
 
 }

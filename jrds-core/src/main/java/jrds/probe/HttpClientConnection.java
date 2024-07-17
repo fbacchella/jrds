@@ -56,7 +56,8 @@ public class HttpClientConnection extends Connection<HttpClient> {
         Optional.ofNullable(urlhost).ifPresent(s -> urlbuilder.setUrlhost(Util.parseTemplate(urlhost, p, args)));
         Optional.ofNullable(port).ifPresent(urlbuilder::setPort);
         Optional.ofNullable(file).ifPresent(s -> urlbuilder.setFile(Util.parseTemplate(file, p, args)));
-        return urlbuilder.build(p);
+        Optional.ofNullable(p).ifPresent(s -> urlbuilder.setProbe(p));
+        return urlbuilder.build();
     }
 
     @Override
