@@ -15,7 +15,7 @@
 
     <properties>
         <year>2024</year>
-        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jetty.version>11.0.20</jetty.version>
         <maven.plugin.surefire.version>3.2.5</maven.plugin.surefire.version>
