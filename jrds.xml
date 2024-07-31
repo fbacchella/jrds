@@ -1,8 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<Context debug="1" displayName="jrds" docBase="/data/jrds/webapp" path="/rds" workDir="work/Catalina/localhost/rds">
-        <Valve className="org.apache.catalina.valves.AccessLogValve" 
-                directory="/data/jrds/logs" fileDateFormat="yyyy-MM-dd" 
-                prefix="access." suffix=".log"/>
-        <Environment description="" name="propertiesFile" type="java.lang.String" value="/data/jrds/conf/jrds.properties"/>
-        <Parameter name="propertiesFile" value="/data/jrds/conf/jrds.properties"/>
-</Context>
