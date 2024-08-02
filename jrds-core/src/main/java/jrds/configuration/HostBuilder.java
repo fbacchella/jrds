@@ -189,7 +189,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
                 logger.error("Probe creation failed for host {}: {}", host.getName(), Util.resolveThrowableException(e.getCause()));
                 logger.debug("Cause", e);
             } catch (Exception e) {
-                logger.error("Probe creation failed for host {}: {}", host.getName(), Util.resolveThrowableException(e.getCause()));
+                logger.error("Probe creation failed for host {}: {}", host.getName(), Util.resolveThrowableException(e));
                 logger.error("Cause", e);
             }
         }
