@@ -103,7 +103,7 @@ jobs:
                         PUBLISH="install"
                     fi
                     echo "publishing jobs: $PUBLISH"
-                    mvn -B $PUBLISH -Pskip $GPGSIGN -Dmaven.test.skip=true -Dmaven.javadoc.skip=false -s .circleci/settings.xml
+                    mvn -B $PUBLISH -Pskip $GPGSIGN -DskipTests -s .circleci/settings.xml
                 environment:
                     MAVEN_OPTS: "-Xmx2048m"
             - store_artifacts:
