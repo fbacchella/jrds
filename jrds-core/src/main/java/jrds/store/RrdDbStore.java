@@ -29,8 +29,13 @@ import jrds.ArchivesSet;
 import jrds.JrdsSample;
 import jrds.Probe;
 import jrds.Util;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class RrdDbStore extends AbstractStore<RrdDb> {
+
+    ExecutorService executorService = Executors.newFixedThreadPool(20);
 
     private class RrdDbExtractor extends AbstractExtractor<FetchData> {
         private final RrdDb rrdDb;
@@ -296,17 +301,20 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     }
 
     public void commit(JrdsSample sample) {
-        try (RrdDb rrdDb = factory.getRrd(getPath())){
-            Sample onesample = rrdDb.createSample(sample.getTime().getTime() / 1000);
-            for(Map.Entry<String, Number> e: sample.entrySet()) {
-                onesample.setValue(e.getKey(), e.getValue().doubleValue());
+        Runnable r = () -> {
+            try (RrdDb rrdDb = factory.getRrd(getPath())){
+                Sample onesample = rrdDb.createSample(sample.getTime().getTime() / 1000);
+                for(Map.Entry<String, Number> e: sample.entrySet()) {
+                    onesample.setValue(e.getKey(), e.getValue().doubleValue());
+                }
+                if(p.getInstanceLogger().isDebugEnabled())
+                    log(Level.DEBUG, "%s", onesample.dump());
+                onesample.update();
+            } catch (IOException e) {
+                log(Level.ERROR, e, "Error while committing to rrd db: %s", e);
             }
-            if(p.getInstanceLogger().isDebugEnabled())
-                log(Level.DEBUG, "%s", onesample.dump());
-            onesample.update();
-        } catch (IOException e) {
-            log(Level.ERROR, e, "Error while committing to rrd db: %s", e);
-        }
+        };
+        executorService.submit(r);
     }
 
     @Override

@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -98,6 +99,7 @@ public class Renderer {
 
         private void writeImg() {
             try {
+                concurrentWrite.acquire();
                 running.lockInterruptibly();
                 if (!finished) {
                     long starttime = System.currentTimeMillis();
@@ -106,18 +108,18 @@ public class Renderer {
                         graph.writePng(out);
                     }
                     long middletime = System.currentTimeMillis();
-                    if(logger.isTraceEnabled()) {
+                    if (logger.isTraceEnabled()) {
                         long endtime = System.currentTimeMillis();
                         long duration1 = (middletime - starttime);
                         long duration2 = (endtime - middletime);
-                        logger.trace("Graph " + graph.getQualifiedName() + " renderding ran for (ms) " + duration1 + ":" + duration2);
+                        logger.trace("Graph {} rendering ran for (ms) {}: {}", graph.getQualifiedName(), duration1, duration2);
                     }
                 }
             } catch (InterruptedException e) {
                 // Locked failed, will not do anything
                 Thread.currentThread().interrupt();
             } catch (IOException e) {
-                Util.log(this, logger, Level.ERROR, e, "Error writting temporary output file: %s", e);
+                Util.log(this, logger, Level.ERROR, e, "Error writing temporary output file: %s", e);
                 clean();
             } catch (Exception e) {
                 String message;
@@ -136,6 +138,7 @@ public class Renderer {
                 if (running.isHeldByCurrentThread()) {
                     running.unlock();
                 }
+                concurrentWrite.release();
             }
         }
 
@@ -150,9 +153,9 @@ public class Renderer {
     static private final float hashTableLoadFactor = 0.75f;
     static private final AtomicInteger counter = new AtomicInteger(0);
 
-    private final ExecutorService tpool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 3, r -> {
+    private final ExecutorService tpool = Executors.newThreadPerTaskExecutor(r -> {
         String threadName = "RendererThread" + counter.getAndIncrement();
-        Thread t = new Thread(r, threadName);
+        Thread t = Thread.ofVirtual().name(threadName).unstarted(r);
         t.setDaemon(true);
         logger.debug("New thread name: {}", threadName);
         return t;
@@ -161,6 +164,7 @@ public class Renderer {
     private final int cacheSize;
     private final Map<Integer, RendererRun> rendered;
     private final File tmpDir;
+    private final Semaphore concurrentWrite = new Semaphore(Runtime.getRuntime().availableProcessors() * 3);
 
     public Renderer(int cacheSize, File tmpDir) {
         this.tmpDir = tmpDir;
@@ -201,9 +205,8 @@ public class Renderer {
 
     public RendererRun render(Graph graph) {
         return rendered.computeIfAbsent(graph.hashCode(), i -> {
-            RendererRun runRender = null;
+            RendererRun runRender = new RendererRun(graph);
             try {
-                runRender = new RendererRun(graph);
                 tpool.execute(runRender);
                 logger.debug("wants to render {}", runRender);
                 return runRender;
@@ -216,7 +219,7 @@ public class Renderer {
     }
 
     public Graph getGraph(int key) {
-        return Optional.ofNullable(key)
+        return Optional.of(key)
                         .filter(k -> key != 0)
                         .map(rendered::get)
                         .map(rr -> rr.graph).orElse(null);

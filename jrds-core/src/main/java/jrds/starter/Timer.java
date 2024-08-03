@@ -7,13 +7,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimerTask;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -85,7 +89,6 @@ public class Timer extends StarterNode {
     private final Map<String, HostStarter> hostList = new HashMap<>();
     private final Semaphore collectMutex = new Semaphore(1);
     private final Stats stats = new Stats();
-    private final int numCollectors;
     private final String name;
     private final AtomicInteger collectCount = new AtomicInteger(0);
     private volatile Thread collectThread = null;
@@ -96,7 +99,6 @@ public class Timer extends StarterNode {
         setTimeout(ti.timeout);
         setStep(ti.step);
         setSlowCollectTime(ti.slowCollectTime);
-        this.numCollectors = ti.numCollectors;
         registerStarter(new SocketFactory(ti.timeout));
     }
 
@@ -143,7 +145,7 @@ public class Timer extends StarterNode {
                 .map(CollectRunnable::new)
                 .forEach(toSchedule::add);
 
-        if (toSchedule.size() == 0) {
+        if (toSchedule.isEmpty()) {
             log(Level.INFO, "skipping timer, empty");
             return;
         }
@@ -160,61 +162,51 @@ public class Timer extends StarterNode {
             return;
         }
         AtomicInteger counter = new AtomicInteger(0);
+
         // Generate threads with a default name
-        ThreadFactory tf = r -> {
-            Thread t = new Thread(r) {
-                @Override
-                public void run() {
-                    MDC.put("collectIteration", String.valueOf(collectCount.get()));
-                    MDC.put("collectorInstance", String.valueOf(counter.incrementAndGet()));
-                    MDC.put("timer", name);
-                    super.run();
-                    MDC.remove("collectIteration");
-                    MDC.remove("collectorInstance");
-                    MDC.remove("timer");
-                }
-            };
-            t.setName("Collect/" + Timer.this.name + "/Collector");
-            t.setDaemon(true);
-            return t;
-        };
+        ThreadFactory tf = Thread.ofVirtual()
+                                 .name("Collect/" + Timer.this.name + "/Collector")
+                                 .factory();
 
         long maxCollectTime = (getStep() - getTimeout());
-        ThreadPoolExecutor tpool = new ThreadPoolExecutor(numCollectors, numCollectors, 1, TimeUnit.SECONDS, new ArrayBlockingQueue<>(toSchedule.size()), tf);
-        tpool.allowCoreThreadTimeOut(true);
+        ExecutorService tpool = Executors.newThreadPerTaskExecutor(tf);
+        List<Future<Boolean>> futures = new ArrayList<>();
         try {
             if (startCollect()) {
-                tpool.prestartAllCoreThreads();
-                toSchedule.stream().forEach(tpool::execute);
+                List<Callable<Boolean>> tasks = toSchedule.stream().map(r -> wrapCollectRunnable(r, counter)).collect(Collectors.toList());
+                futures.addAll(tpool.invokeAll(tasks));
                 tpool.shutdown();
                 collectThread = Thread.currentThread();
                 boolean terminated = tpool.awaitTermination(maxCollectTime, TimeUnit.SECONDS);
                 if (!terminated) {
-                    log(Level.ERROR, "Unfinished collect, lost %d tasks", tpool.getQueue().size());
+                    long missed = futures.stream().filter(f -> ! f.isDone()).count();
+                    log(Level.ERROR, "Unfinished collect, lost %d tasks", missed);
                 }
             }
         } catch (RejectedExecutionException e) {
             log(Level.DEBUG, e, "Collector thread refused new task");
         } catch (InterruptedException e) {
-            log(Level.INFO, "Collect interrupted, lost %d tasks", tpool.getQueue().size());
-            Thread.currentThread().interrupt();
+            log(Level.INFO, "Collect interrupted");
+            collectThread.interrupt();
         } catch (RuntimeException e) {
             log(Level.ERROR, e, "Problem while collecting data: %s", e);
         } finally {
             collectThread = null;
-            int missed = tpool.getQueue().size();
             stopCollect();
             Thread.yield();
             // Waited for late collect arrival, after the stopCollect
             if (!tpool.isTerminated()) {
                 tpool.shutdownNow();
-                String missedMessage = missed == 0 ? "" : ", missed " + missed + " hosts";
+                Supplier<String> missedProducer = () -> {
+                    long missed = futures.stream().filter(f -> ! f.isDone()).count();
+                    return missed == 0 ? "" : ", missed " + missed + " hosts";
+                };
                 try {
                     if (! tpool.awaitTermination(getTimeout(), TimeUnit.SECONDS)) {
-                        log(Level.ERROR, "Lost collect" + missedMessage);
+                        log(Level.ERROR, "Lost collect" + missedProducer.get());
                     }
                 } catch (InterruptedException e) {
-                    log(Level.ERROR, "Lost collect" + missedMessage);
+                    log(Level.ERROR, "Lost collect" +  missedProducer.get());
                     Thread.currentThread().interrupt();
                 }
             }
@@ -227,6 +219,18 @@ public class Timer extends StarterNode {
         }
     }
 
+    private Callable<Boolean> wrapCollectRunnable(Runnable r, AtomicInteger counter) {
+        return () -> {
+            MDC.put("collectIteration", String.valueOf(collectCount.get()));
+            MDC.put("collectorInstance", String.valueOf(counter.incrementAndGet()));
+            MDC.put("timer", name);
+            r.run();
+            MDC.remove("collectIteration");
+            MDC.remove("collectorInstance");
+            MDC.remove("timer");
+            return true;
+        };
+    }
     
     @Override
     public synchronized void stopCollect() {
