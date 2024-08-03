@@ -5,87 +5,120 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import org.rrd4j.core.DsDef;
 import org.slf4j.event.Level;
 
 import jrds.JrdsSample;
 import jrds.Probe;
+import jrds.ProbeDesc;
 import jrds.PropertiesManager;
 import jrds.Util;
+import jrds.factories.ProbeBean;
 import lombok.Getter;
+import lombok.Setter;
 
 /**
  * This abstract class can be used to parse the results of an external command
  * 
  * @author Fabrice Bacchella
  */
+@ProbeBean({"cmd", "arguments", "output"})
 public abstract class ExternalCmdProbe extends Probe<String, Number> {
 
-    @Getter
+    protected enum Output {
+        STDOUT,
+        STDERR
+    }
+
+    @Getter @Setter
     protected String cmd = null;
 
+    @Getter
+    private String arguments = null;
+
+    private List<String> argsList = List.of();
+
+    protected Output output = Output.STDOUT;
+
     private long sampleTime;
+    private ProcessBuilder processBuilder = null;
+
+    @Override
+    public void setPd(ProbeDesc<String> pd) {
+        super.setPd(pd);
+        cmd = pd.getSpecific("command");
+        arguments = pd.getSpecific("arguments");
+        argsList = parseArgsLine(arguments);
+        output = Optional.ofNullable(pd.getSpecific("output"))
+                         .map(o -> Output.valueOf(o.toUpperCase(Locale.ENGLISH)))
+                         .orElse(Output.STDOUT);
+    }
 
     @Override
     public void readProperties(PropertiesManager pm) {
-        cmd = resolvCmdPath(pm.getProperty("path", ""));
+        cmd = resolvCmdPath(pm.getProperty("path", ""), cmd);
     }
 
     public Boolean configure() {
         if (cmd == null) {
             return false;
         }
-        Optional.ofNullable(getPd().getSpecific("arguments"))
-                .map(String::trim)
-                .filter(s -> ! s.isEmpty())
-                .ifPresent(s -> cmd = cmd + " " + Util.parseTemplate(s, this));
+        List<String> cmdList = new ArrayList<>();
+        cmdList.add(cmd);
+        cmdList.addAll(argsList);
+        processBuilder = new ProcessBuilder(cmdList); //.redirectInput(ProcessBuilder.Redirect.DISCARD);
         return true;
     }
 
-    protected String resolvCmdPath(String path) {
-        List<String> pathelements = new ArrayList<>();
-        pathelements.addAll(Arrays.asList(path.split(";")));
+    protected String resolvCmdPath(String path, String trycmd) {
+        Set<String> pathElements = new LinkedHashSet<>();
+        pathElements.add("");
+        pathElements.addAll(Arrays.asList(path.split(";")));
         String envPath = System.getenv("PATH");
-        String pathSeparator = System.getProperty("path.separator");
         if (envPath != null && !envPath.isEmpty()) {
-            pathelements.addAll(Arrays.asList(envPath.split(pathSeparator)));
+            pathElements.addAll(Arrays.asList(envPath.split(File.pathSeparator)));
         }
-        String cmdname = getPd().getSpecific("command");
-        log(Level.DEBUG, "will look for %s in %s", cmdname, pathelements);
-        for (String pathdir: pathelements) {
-            File tryfile = new File(pathdir, cmdname);
-            log(Level.TRACE, "trying if %s can execute", tryfile);
+        log(Level.DEBUG, "Will look for %s in %s", trycmd, pathElements);
+        String resolvedCmd = null;
+        for (String pathdir: pathElements) {
+            File tryfile = new File(pathdir, trycmd);
+            log(Level.TRACE, "Trying if %s can execute", tryfile);
             if (tryfile.canExecute()) {
-                log(Level.DEBUG, "will use %s as a command", tryfile.getAbsolutePath());
-                cmd = tryfile.getAbsolutePath();
+                log(Level.DEBUG, "Will use %s as a command", tryfile.getAbsolutePath());
+                resolvedCmd = tryfile.getAbsolutePath();
                 break;
             }
         }
-        if (cmd == null) {
-            log(Level.ERROR, "command %s not found", cmdname);
+        if (resolvedCmd == null) {
+            log(Level.ERROR, "Command %s not found", trycmd);
         }
-        return cmd;
+        return resolvedCmd;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see jrds.Probe#getNewSampleValues()
-     */
     public Map<String, Number> getNewSampleValues() {
-        String perfstring = launchCmd();
-        String[] values = perfstring.split(":");
+        return launchCmd().map(this::resolveSampleValues).orElseGet(Map::of);
+    }
+
+    protected Map<String, Number> resolveSampleValues(String output) {
+        String[] values = output.split(":");
         DsDef[] defs = getPd().getDsDefs(getRequiredUptime());
         int n = values.length;
         if (values.length != defs.length + 1) {
@@ -105,7 +138,7 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         }
         Map<String, Number> retValues = new HashMap<>(n - 1);
         for (int i = 0; i < defs.length; i++) {
-            double value = jrds.Util.parseStringNumber(values[i + 1], Double.NaN);
+            double value = Util.parseStringNumber(values[i + 1], Double.NaN);
             retValues.put(defs[i].getDsName(), value);
         }
         return retValues;
@@ -124,27 +157,25 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
         }
     }
 
-    protected String launchCmd() {
-        String perfstring = "";
+    protected Optional<String> launchCmd() {
+        String perfstring = null;
         Process perfProcess = null;
         boolean needsToKill = false;
         try {
-            log(Level.DEBUG, "executing: %s", cmd);
-            perfProcess = Runtime.getRuntime().exec(getCmd());
-            perfProcess.getOutputStream();
-            try (InputStream  stdout = perfProcess.getInputStream()) {
+            log(Level.DEBUG, "Executing: %s %s", cmd, arguments);
+            perfProcess = processBuilder.start();
+            Supplier<InputStream> dataStream = switch (output) {
+                case STDOUT -> perfProcess::getInputStream;
+                case STDERR -> perfProcess::getErrorStream;
+            };
+            try (InputStream  stdout = dataStream.get()) {
                 BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(stdout));
                 perfstring = stdoutReader.readLine();
             }
             needsToKill = ! perfProcess.waitFor(getTimeout(), TimeUnit.SECONDS);
             if (perfProcess.exitValue() != 0) {
-
-                try (InputStream stderr = perfProcess.getErrorStream();
-                                BufferedReader stderrtReader = new BufferedReader(new InputStreamReader(stderr))) {
-                    String errostring = Optional.ofNullable(stderrtReader.readLine()).orElse("");
-                    log(Level.ERROR, " command %s failed with %s", cmd, errostring);
-                    perfstring = "";
-                }
+                perfstring = null;
+                log(Level.ERROR, " command '%s %s' failed with status %s", cmd, arguments, perfProcess.exitValue());
             }
         } catch (InterruptedException e) {
             log(Level.INFO, e, "External command interrupted");
@@ -158,11 +189,66 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
             perfProcess.destroyForcibly();
         }
         log(Level.DEBUG, "returned line: %s", perfstring);
-        return perfstring;
+        return Optional.ofNullable(perfstring);
+    }
+
+    protected List<String> parseArgsLine(String input) {
+        try (Reader r = new StringReader(input)) {
+            return parseArgsLine(r);
+        } catch (IOException e) {
+            return List.of();
+        }
+    }
+
+    protected List<String> parseArgsLine(Reader input) throws IOException {
+        StreamTokenizer tokenizer = new StreamTokenizer(input);
+        tokenizer.wordChars(33, 255);
+        tokenizer.whitespaceChars(0, ' ');
+        tokenizer.quoteChar('"');
+        tokenizer.quoteChar('\'');
+        List<String> result = new ArrayList<>();
+        int token;
+        String previousWord = "";
+        while ((token = tokenizer.nextToken()) != StreamTokenizer.TT_EOF) {
+            if (token != StreamTokenizer.TT_EOL) {
+                String currentWord = previousWord.isEmpty() ? tokenizer.sval : previousWord + tokenizer.sval;
+                if (currentWord.endsWith("\\")) {
+                    previousWord =  currentWord.substring(0, currentWord.length() - 1) + " ";
+                } else {
+                    previousWord = "";
+                    result.add(currentWord);
+                }
+            }
+        }
+
+        if (! previousWord.isEmpty()) {
+            result.add(previousWord);
+        }
+
+        return result;
     }
 
     @Override
     public String getSourceType() {
         return "external command";
     }
+
+    public String getOutput() {
+        return output.name();
+    }
+
+    public void setOutput(String output) {
+        this.output = Output.valueOf(output.toUpperCase(Locale.ENGLISH));
+    }
+
+    public void setArguments(String arguments) {
+        this.arguments = arguments;
+        argsList = parseArgsLine(arguments);
+    }
+
+    public void setArgsList(List<String> argsList) {
+        this.argsList = List.copyOf(argsList);
+        this.arguments = String.join(" ", argsList);
+    }
+
 }
