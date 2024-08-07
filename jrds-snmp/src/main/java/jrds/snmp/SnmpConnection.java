@@ -1,8 +1,14 @@
 package jrds.snmp;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.slf4j.event.Level;
 import org.snmp4j.CommunityTarget;
@@ -19,28 +25,36 @@ import org.snmp4j.smi.UdpAddress;
 import org.snmp4j.smi.VariableBinding;
 import org.snmp4j.util.DefaultPDUFactory;
 import org.snmp4j.util.PDUFactory;
+import org.snmp4j.util.TableEvent;
+import org.snmp4j.util.TableUtils;
 
 import jrds.factories.ProbeBean;
 import jrds.starter.Connection;
 import jrds.starter.Resolver;
 
-@ProbeBean({ "community", "port", "version", "ping" })
+@ProbeBean({ "community", "port", "version"})
 public class SnmpConnection extends Connection<Target> {
     static final String TCP = "tcp";
     static final String UDP = "udp";
     static final private OID hrSystemUptime = new OID(".1.3.6.1.2.1.25.1.1.0");
     static final private OID sysUpTimeInstance = new OID(".1.3.6.1.2.1.1.3.0");
-    static final private OID sysDescr = new OID("1.3.6.1.2.1.1.1.0");
     static final private PDUFactory pdufactory = new DefaultPDUFactory(PDU.GET);
 
     private int version = SnmpConstants.version2c;
     private String proto = UDP;
     private int port = 161;
     private String community = "public";
-    private OID ping = sysDescr;
     // A default value for the uptime OID, from the HOST-RESSOURCES MIB
     private final OID uptimeOid = hrSystemUptime;
     private Target snmpTarget;
+    private final Map<OID, VariableBinding> toCollect = new HashMap<>();
+    private final Map<OID, Map<Object, OID>> index = new HashMap<>();
+    private final SnmpVars collected = new SnmpVars();
+
+    public SnmpConnection() {
+        toCollect.put(hrSystemUptime, new VariableBinding(hrSystemUptime));
+        toCollect.put(sysUpTimeInstance, new VariableBinding(sysUpTimeInstance));
+    }
 
     @Override
     public Target getConnection() {
@@ -73,14 +87,7 @@ public class SnmpConnection extends Connection<Target> {
         }
         // Do a "snmp ping", to check if host is reachable
         try {
-            PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
-            requestPDU.addOID(new VariableBinding(ping));
-
-            // we don't care about the response
-            request(requestPDU, snmpTarget);
-
-            // Everything went fine, host is reachable, authentication is
-            // working
+            doValueCache();
             return true;
         } catch (Exception e) {
             log(Level.ERROR, e, "Unable to reach host: %s", e);
@@ -89,14 +96,76 @@ public class SnmpConnection extends Connection<Target> {
         return false;
     }
 
+    private void doValueCache() throws IOException {
+        collected.clear();
+        index.values().forEach(Map::clear);
+        VariableBinding[] vbs = toCollect.values().toArray(VariableBinding[]::new);
+        Map<OID, Object> wasCollected = SnmpRequester.populate(this, vbs);
+        collected.putAll(wasCollected);
+        if (! index.isEmpty()) {
+            fillIndexes();
+        }
+    }
+
+    private void fillIndexes() {
+        TableUtils tableRet = new TableUtils(this.getSnmp(), getPdufactory());
+        tableRet.setMaxNumColumnsPerPDU(30);
+        tableRet.setMaxNumRowsPerPDU(20);
+        OID[] oidTab = index.keySet().toArray(OID[]::new);
+        for(TableEvent te: tableRet.getTable(snmpTarget, oidTab, null, null)) {
+            if (te.isError()) {
+                continue;
+            }
+            SnmpVars values = new SnmpVars();
+            Arrays.stream(te.getColumns()).filter(Objects::nonNull).forEach(values::addVariable);
+            for (var e: values.entrySet()) {
+                OID indexOID = new OID(e.getKey());
+                indexOID.trim(te.getIndex().size());
+                index.computeIfAbsent(indexOID, o -> new HashMap<>()).put(e.getValue(), te.getIndex());
+            }
+        }
+    }
+
+    public boolean wasNotCollected(OID oid) {
+        toCollect.computeIfAbsent(oid, VariableBinding::new);
+        return ! collected.containsKey(oid);
+    }
+
+    public boolean wasNotIndexed(OID oid) {
+        return index.computeIfAbsent(oid, o -> new HashMap<>()).isEmpty();
+    }
+
+    public Optional<int[]> findOidIndex(OID indexOid, Predicate<Object> filter) {
+        for (var e: index.computeIfAbsent(indexOid, o -> new HashMap<>()).entrySet()) {
+            if (filter.test(e.getKey())) {
+                return Optional.of(e.getValue().getValue());
+            }
+        }
+        return Optional.empty();
+    }
+
+    public Map<OID, Object> joinCollected(Set<OID> oidsSet, Map<OID, Object> wasCollected) {
+        for (OID oid: oidsSet) {
+            if (! wasCollected.containsKey(oid) && collected.containsKey(oid)) {
+                wasCollected.put(oid, collected.get(oid));
+            } else {
+                OID newOid = (OID) oid.clone();
+                toCollect.put(newOid, new VariableBinding(newOid));
+            }
+        }
+        return wasCollected;
+    }
+
     @Override
     public void stopConnection() {
         snmpTarget = null;
+        collected.clear();
+        index.values().forEach(Map::clear);
     }
 
     @Override
     public long setUptime() {
-        Set<OID> upTimesOids = new HashSet<>(2);
+        Set<OID> upTimesOids = HashSet.newHashSet(2);
         upTimesOids.add(uptimeOid);
         // Fallback uptime OID, it should be always defined, from SNMPv2-MIB
         upTimesOids.add(sysUpTimeInstance);
@@ -105,12 +174,8 @@ public class SnmpConnection extends Connection<Target> {
 
     public long readUptime(Set<OID> upTimesOids) {
         try {
-            for(OID uptimeoid: upTimesOids) {
-                PDU requestPDU = DefaultPDUFactory.createPDU(snmpTarget, PDU.GET);
-                requestPDU.addOID(new VariableBinding(uptimeoid));
-                PDU response = request(requestPDU, snmpTarget);
-                Object value = new SnmpVars(response).get(uptimeoid);
-                if(value instanceof Number) {
+            for (Object value: SnmpRequester.RAW.doSnmpGet(this, upTimesOids).values()) {
+                if (value instanceof Number) {
                     return ((Number) value).longValue();
                 }
             }
@@ -205,20 +270,6 @@ public class SnmpConnection extends Connection<Target> {
     @Override
     public String toString() {
         return "snmp:" + proto + "://" + getHostName() + ":" + port;
-    }
-
-    /**
-     * @return the ping
-     */
-    public OID getPing() {
-        return ping;
-    }
-
-    /**
-     * @param ping the ping to set
-     */
-    public void setPing(OID ping) {
-        this.ping = ping;
     }
 
 }

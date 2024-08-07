@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.event.Level;
@@ -124,13 +125,17 @@ public class RdsIndexedSnmpRrd extends SnmpProbe implements IndexedProbe {
             return key.getValue();
         } else {
             try {
-                Collection<OID> soidSet = getIndexSet();
-                Map<OID, Object> somevars = indexFinder.doSnmpGet(getConnection(), soidSet);
-
-                for(Map.Entry<OID, Object> e: somevars.entrySet()) {
-                    OID tryoid = e.getKey();
-                    if(e.getValue() != null && matchIndex(somevars.get(tryoid))) {
-                        return Arrays.copyOfRange(tryoid.getValue(), getIndexPrefixLength(), tryoid.size());
+                Optional<int[]> indexOptionnal = getConnection().findOidIndex(indexOid, this::matchIndex);
+                if (indexOptionnal.isPresent()) {
+                    return indexOptionnal.get();
+                } else {
+                    Collection<OID> soidSet = getIndexSet();
+                    Map<OID, Object> somevars = indexFinder.doSnmpGet(getConnection(), soidSet);
+                    for(Map.Entry<OID, Object> e: somevars.entrySet()) {
+                        OID tryoid = e.getKey();
+                        if(e.getValue() != null && matchIndex(somevars.get(tryoid))) {
+                            return Arrays.copyOfRange(tryoid.getValue(), getIndexPrefixLength(), tryoid.size());
+                        }
                     }
                 }
                 log(Level.ERROR, "index for %s not found", indexKey);

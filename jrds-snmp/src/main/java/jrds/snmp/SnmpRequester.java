@@ -3,8 +3,10 @@ package jrds.snmp;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,14 +36,14 @@ public enum SnmpRequester {
     SIMPLE() {
         @Override
         public Map<OID, Object> doSnmpGet(SnmpConnection cnx, Collection<OID> oidsSet) throws IOException {
-            VariableBinding[] vars = new VariableBinding[oidsSet.size()];
-            int j = 0;
-            for(OID i: oidsSet) {
-                OID currentOid = (OID) i.clone();
-                currentOid.append("0");
-                vars[j++] = new VariableBinding(currentOid);
-            }
-            return doRequest(cnx, vars);
+            Set<OID> willCollect = new HashSet<>();
+            VariableBinding[] vars = oidsSet.stream()
+                                            .map(oid -> ((OID) oid.clone()).append("0"))
+                                            .peek(willCollect::add)
+                                            .filter(cnx::wasNotCollected)
+                                            .map(VariableBinding::new)
+                                            .toArray(VariableBinding[]::new);
+            return cnx.joinCollected(willCollect, doRequest(cnx, vars, false));
         }
     },
     /**
@@ -58,15 +60,17 @@ public enum SnmpRequester {
                 TableUtils tableRet = new TableUtils(snmp, cnx.getPdufactory());
                 tableRet.setMaxNumColumnsPerPDU(30);
                 tableRet.setMaxNumRowsPerPDU(20);
-                OID[] oidTab = oids.toArray(new OID[0]);
+                OID[] oidTab = oids.stream().filter(cnx::wasNotIndexed).toArray(OID[]::new);
                 SnmpVars retValue = new SnmpVars();
-                for(TableEvent te: tableRet.getTable(snmpTarget, oidTab, null, null)) {
-                    if(!cnx.isStarted()) {
-                        retValue = new SnmpVars();
-                        break;
-                    }
-                    if(!te.isError()) {
-                        retValue.join(te.getColumns());
+                if (oidTab.length != 0) {
+                    for(TableEvent te: tableRet.getTable(snmpTarget, oidTab, null, null)) {
+                        if(!cnx.isStarted()) {
+                            retValue = new SnmpVars();
+                            break;
+                        }
+                        if(!te.isError()) {
+                            retValue.join(te.getColumns());
+                        }
                     }
                 }
                 return retValue;
@@ -80,7 +84,6 @@ public enum SnmpRequester {
     TREE() {
         @Override
         public Map<OID, Object> doSnmpGet(SnmpConnection cnx, Collection<OID> oids) {
-
             Target snmpTarget = cnx.getConnection();
             Snmp snmp = cnx.getSnmp();
             if(cnx.isStarted() && snmpTarget != null && snmp != null) {
@@ -104,12 +107,13 @@ public enum SnmpRequester {
     RAW() {
         @Override
         public Map<OID, Object> doSnmpGet(SnmpConnection cnx, Collection<OID> oidsSet) throws IOException {
-            VariableBinding[] vars = new VariableBinding[oidsSet.size()];
-            int j = 0;
-            for(OID currentOid: oidsSet) {
-                vars[j++] = new VariableBinding(currentOid);
-            }
-            return doRequest(cnx, vars);
+            Set<OID> willCollect = new HashSet<>();
+            VariableBinding[] vars = oidsSet.stream()
+                                            .peek(willCollect::add)
+                                            .filter(cnx::wasNotCollected)
+                                            .map(VariableBinding::new)
+                                            .toArray(VariableBinding[]::new);
+            return cnx.joinCollected(willCollect, doRequest(cnx, vars, false));
         }
     };
 
@@ -125,27 +129,28 @@ public enum SnmpRequester {
      */
     public abstract Map<OID, Object> doSnmpGet(SnmpConnection cnx, Collection<OID> oidsSet) throws IOException;
 
-    private static Map<OID, Object> doRequest(SnmpConnection cnx, VariableBinding[] vars) throws IOException {
+    private static Map<OID, Object> doRequest(SnmpConnection cnx, VariableBinding[] vars, boolean force) throws IOException {
         Snmp snmp = cnx.getSnmp();
-        if(snmp == null) {
+        if (snmp == null) {
             logger.warn("invalid snmp connection state for {}", cnx);
-            return Collections.emptyMap();
+            return Map.of();
         }
 
-        Map<OID, Object> snmpVars = Collections.emptyMap();
+        Map<OID, Object> snmpVars = new SnmpVars();
+
+        // If no oid to collect, nothing to do
+        if(vars.length == 0) {
+            return snmpVars;
+        }
 
         Target snmpTarget = cnx.getConnection();
 
         PDU requestPDU = cnx.getPdufactory().createPDU(snmpTarget);
         requestPDU.addAll(vars);
-        
-        // If no oid to collect, nothing to do
-        if(requestPDU.size() < 1)
-            return Collections.emptyMap();
 
         boolean doAgain = true;
 
-        while (doAgain && cnx.isStarted()) {
+        while (doAgain && (force || cnx.isStarted())) {
             ResponseEvent re = snmp.send(requestPDU, snmpTarget);
             if(re == null) {
                 throw new IOException("SNMP Timeout");
@@ -170,6 +175,10 @@ public enum SnmpRequester {
             }
         }
         return snmpVars;
+    }
+
+    public static Map<OID, Object> populate(SnmpConnection cnx, VariableBinding[] toCollect) throws IOException {
+        return doRequest(cnx, toCollect, true);
     }
 
 }

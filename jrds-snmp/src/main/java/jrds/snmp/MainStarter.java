@@ -8,6 +8,8 @@ import java.io.IOException;
 import org.slf4j.event.Level;
 import org.snmp4j.SNMP4JSettings;
 import org.snmp4j.Snmp;
+import org.snmp4j.fluent.SnmpBuilder;
+import org.snmp4j.transport.DefaultTcpTransportMapping;
 import org.snmp4j.transport.DefaultUdpTransportMapping;
 
 import fr.jrds.snmpcodec.OIDFormatter;
@@ -30,7 +32,14 @@ public class MainStarter extends Starter {
     public boolean start() {
         boolean started = false;
         try {
-            snmp = new Snmp(new DefaultUdpTransportMapping());
+            SnmpBuilder snmpBuilder = new SnmpBuilder();
+            snmp = snmpBuilder.v2c().build();
+            DefaultTcpTransportMapping ttm = new DefaultTcpTransportMapping();
+            ttm.setConnectionTimeout(getLevel().getTimeout() * 1000L);
+            snmp.addTransportMapping(ttm);
+            DefaultUdpTransportMapping utm = new DefaultUdpTransportMapping();
+            utm.setSocketTimeout(getLevel().getTimeout() * 1000);
+            snmp.addTransportMapping(utm);
             snmp.listen();
             started = true;
         } catch (IOException e) {
