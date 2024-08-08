@@ -15,6 +15,7 @@ import jrds.factories.ProbeMeta;
 import jrds.snmp.SnmpCollectResolver;
 import jrds.snmp.SnmpConnection;
 import jrds.snmp.SnmpDiscoverAgent;
+import jrds.snmp.SnmpMainStarter;
 import jrds.snmp.SnmpRequester;
 
 /**
@@ -26,7 +27,7 @@ import jrds.snmp.SnmpRequester;
  * 
  * @author Fabrice Bacchella
  */
-@ProbeMeta(timerStarter=jrds.snmp.MainStarter.class,
+@ProbeMeta(timerStarter=SnmpMainStarter.class,
            discoverAgent=SnmpDiscoverAgent.class,
            collectResolver=SnmpCollectResolver.class
           )
@@ -147,8 +148,7 @@ public abstract class SnmpProbe extends ProbeConnected<OID, Object, SnmpConnecti
             Object o = e.getValue();
             if(o instanceof Number) {
                 retValue.put(oid, (Number) o);
-            } else if(o instanceof Date) {
-                Date value = (Date) o;
+            } else if(o instanceof Date value) {
                 retValue.put(oid, value.getTime());
             }
         }

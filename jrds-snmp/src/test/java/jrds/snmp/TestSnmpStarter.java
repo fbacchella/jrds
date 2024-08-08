@@ -60,7 +60,7 @@ public class TestSnmpStarter {
         hl.addHost(h.getHost());
         h.setParent(hl);
 
-        h.registerStarter(new MainStarter());
+        h.registerStarter(new SnmpMainStarter());
 
         SnmpConnection snmp = new SnmpConnection();
         snmp.setPort(agent.getPort());

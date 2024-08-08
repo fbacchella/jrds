@@ -24,10 +24,12 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
+import org.snmp4j.SNMP4JSettings;
 import org.snmp4j.smi.OID;
 
 import fr.jrds.snmpcodec.MibStore;
@@ -36,15 +38,21 @@ import fr.jrds.snmpcodec.parsing.MibLoader;
 import jrds.PropertiesManager;
 import jrds.Util;
 import jrds.configuration.ModuleConfigurator;
+import jrds.snmp.log.Slf4jLogFactory;
 
 public class SnmpConfigurator extends ModuleConfigurator {
 
-    static final private Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    // Used to set up the log configuration of SNMP4J
+    static {
+        org.snmp4j.log.LogFactory.setLogFactory(new Slf4jLogFactory());
+    }
 
-    static MibStore resolver;
+    static final private Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Override
     public Object configure(PropertiesManager pm) {
+        SNMP4JSettings.setDefaultTimeoutMillis(pm.timeout * 1000L);
+        SNMP4JSettings.setAllowSNMPv2InV1(true);
         SnmpCollectResolver.oidmapping.clear();
         // Try to resolve OID from a simple properties file
         Properties oidprops = new Properties();
@@ -78,13 +86,13 @@ public class SnmpConfigurator extends ModuleConfigurator {
         }
         String oidmapfiles = pm.getProperty("oidmaps", "");
         Arrays.stream(oidmapfiles.split(";"))
-        .map(String::trim)
-        .filter(i -> ! i.isEmpty())
-        .map(failopener)
-        .forEach(oidmapreader);
+              .map(String::trim)
+              .filter(i -> ! i.isEmpty())
+              .map(failopener)
+              .forEach(oidmapreader);
         oidprops.entrySet().stream()
-        .map(e -> new AbstractMap.SimpleEntry<>(e.getKey().toString(), new OID(e.getValue().toString())))
-        .forEach(e -> SnmpCollectResolver.oidmapping.put(e.getKey(), e.getValue()));
+                .map(e -> new AbstractMap.SimpleEntry<>(e.getKey().toString(), new OID(e.getValue().toString())))
+                .forEach(e -> SnmpCollectResolver.oidmapping.put(e.getKey(), e.getValue()));
         // Using the full mib parser
         String propertiesmibDirs = pm.getProperty("mibdirs", "/usr/share/snmp/mibs");
         if(!propertiesmibDirs.trim().isEmpty()) {
@@ -93,7 +101,7 @@ public class SnmpConfigurator extends ModuleConfigurator {
                 i = i.trim();
                 snmpMibDirs.add(Paths.get(i).toString());
             }
-            if (snmpMibDirs.size() > 0) {
+            if (!snmpMibDirs.isEmpty()) {
                 String[] paths_list = snmpMibDirs.toArray(new String[0]);
                 return OIDFormatter.register(paths_list);
             }
@@ -104,34 +112,36 @@ public class SnmpConfigurator extends ModuleConfigurator {
     public MibStore register(String... mibdirs) {
         MibLoader loader = new MibLoader();
         Arrays.stream(mibdirs)
-        .map(Paths::get)
-        .filter( i-> {
-            try {
-                File dest = i.toRealPath().toFile();
-                return dest.isDirectory() || dest.isFile();
-            } catch (IOException e) {
-                return false;
-            }
-        })
-        .map( i -> {
-            try {
-                if (i.toRealPath().toFile().isDirectory()) {
-                    return Files.list(i).filter(j -> {
-                        try {
-                            return j.toRealPath().toFile().isFile();
-                        } catch (IOException e1) {
-                            return false;
-                        }
-                    }).toArray(Path[]::new);
-                } else {
-                    return new Path[] {i};
-                }
-            } catch (IOException e1) {
-                return null;
-            }
-        })
-        .filter(Objects::nonNull)
-        .forEach(loader::load);
+              .map(Paths::get)
+              .filter( i-> {
+                  try {
+                      File dest = i.toRealPath().toFile();
+                      return dest.isDirectory() || dest.isFile();
+                  } catch (IOException e) {
+                      return false;
+                  }
+              })
+              .map(i -> {
+                  try {
+                      if (i.toRealPath().toFile().isDirectory()) {
+                          try (Stream<Path> fl = Files.list(i)) {
+                              return fl.filter(j -> {
+                                  try {
+                                      return j.toRealPath().toFile().isFile();
+                                  } catch (IOException e1) {
+                                      return false;
+                                  }
+                              }).toArray(Path[]::new);
+                          }
+                      } else {
+                          return new Path[] {i};
+                      }
+                  } catch (IOException e1) {
+                      return null;
+                  }
+              })
+              .filter(Objects::nonNull)
+              .forEach(loader::load);
 
         return loader.buildTree();
     }

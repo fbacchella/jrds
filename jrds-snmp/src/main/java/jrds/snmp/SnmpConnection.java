@@ -15,7 +15,6 @@ import org.snmp4j.CommunityTarget;
 import org.snmp4j.PDU;
 import org.snmp4j.Snmp;
 import org.snmp4j.Target;
-import org.snmp4j.event.ResponseEvent;
 import org.snmp4j.mp.SnmpConstants;
 import org.snmp4j.smi.Address;
 import org.snmp4j.smi.OID;
@@ -33,7 +32,7 @@ import jrds.starter.Connection;
 import jrds.starter.Resolver;
 
 @ProbeBean({ "community", "port", "version"})
-public class SnmpConnection extends Connection<Target> {
+public class SnmpConnection extends Connection<Target<? extends Address>> {
     static final String TCP = "tcp";
     static final String UDP = "udp";
     static final private OID hrSystemUptime = new OID(".1.3.6.1.2.1.25.1.1.0");
@@ -46,7 +45,7 @@ public class SnmpConnection extends Connection<Target> {
     private String community = "public";
     // A default value for the uptime OID, from the HOST-RESSOURCES MIB
     private final OID uptimeOid = hrSystemUptime;
-    private Target snmpTarget;
+    private Target<? extends Address> snmpTarget;
     private final Map<OID, VariableBinding> toCollect = new HashMap<>();
     private final Map<OID, Map<Object, OID>> index = new HashMap<>();
     private final SnmpVars collected = new SnmpVars();
@@ -57,7 +56,7 @@ public class SnmpConnection extends Connection<Target> {
     }
 
     @Override
-    public Target getConnection() {
+    public Target<? extends Address> getConnection() {
         return snmpTarget;
     }
 
@@ -67,33 +66,35 @@ public class SnmpConnection extends Connection<Target> {
         if(!resolver.isStarted())
             return false;
 
-        if(!getLevel().find(MainStarter.class).isStarted())
+        if(!getLevel().find(SnmpMainStarter.class).isStarted())
             return false;
 
         Address address;
 
-        if(UDP.equals(proto.toLowerCase())) {
+        if (UDP.equalsIgnoreCase(proto)) {
             address = new UdpAddress(resolver.getInetAddress(), port);
-        } else if(TCP.equals(proto.toLowerCase())) {
+        } else if (TCP.equalsIgnoreCase(proto)) {
             address = new TcpAddress(resolver.getInetAddress(), port);
         } else {
             return false;
         }
-        if(community != null) {
-            snmpTarget = new CommunityTarget(address, new OctetString(community));
-            snmpTarget.setVersion(version);
-            snmpTarget.setTimeout(getLevel().getTimeout() * 1000 / 2);
-            snmpTarget.setRetries(1);
+        if (community != null) {
+            snmpTarget = new CommunityTarget<>(address, new OctetString(community));
+        } else {
+            log(Level.ERROR, "Only community-based security model supported");
+            return false;
         }
-        // Do a "snmp ping", to check if host is reachable
+        snmpTarget.setVersion(version);
+        snmpTarget.setTimeout(getLevel().getTimeout() * 1000L / 2);
+        snmpTarget.setRetries(1);
         try {
             doValueCache();
             return true;
         } catch (Exception e) {
             log(Level.ERROR, e, "Unable to reach host: %s", e);
+            snmpTarget = null;
+            return false;
         }
-        snmpTarget = null;
-        return false;
     }
 
     private void doValueCache() throws IOException {
@@ -136,7 +137,7 @@ public class SnmpConnection extends Connection<Target> {
     }
 
     public Optional<int[]> findOidIndex(OID indexOid, Predicate<Object> filter) {
-        for (var e: index.computeIfAbsent(indexOid, o -> new HashMap<>()).entrySet()) {
+        for (Map.Entry<Object, OID> e: index.computeIfAbsent(indexOid, o -> new HashMap<>()).entrySet()) {
             if (filter.test(e.getKey())) {
                 return Optional.of(e.getValue().getValue());
             }
@@ -179,29 +180,14 @@ public class SnmpConnection extends Connection<Target> {
                     return ((Number) value).longValue();
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             log(Level.ERROR, e, "Unable to get uptime: %s", e);
         }
         return 0;
     }
 
-    private PDU request(PDU requestPDU, Target target) throws Exception {
-        Snmp snmp = getSnmp();
-        ResponseEvent re = snmp.send(requestPDU, target);
-        if(re == null)
-            throw new IOException("SNMP Timeout");
-        PDU response = re.getResponse();
-        if(response == null || re.getError() != null) {
-            Exception snmpException = re.getError();
-            if(snmpException == null)
-                snmpException = new IOException("SNMP Timeout");
-            throw snmpException;
-        }
-        return response;
-    }
-
     public Snmp getSnmp() {
-        return getLevel().find(MainStarter.class).snmp;
+        return getLevel().find(SnmpMainStarter.class).snmp;
     }
 
     /**
