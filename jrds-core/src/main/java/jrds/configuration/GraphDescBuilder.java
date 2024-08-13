@@ -118,6 +118,9 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
                     case "legend":
                         builder.setLegend(value);
                         break;
+                    case "nolegend":
+                        builder.withLegend(value);
+                        break;
                     case "rpn":
                         builder.setRpn(value);
                         break;

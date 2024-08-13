@@ -621,12 +621,25 @@ public class GraphDesc implements WithACL {
         private DsPath dspath;
         @Setter @Accessors(chain=true)
         private boolean reversed;
+        private boolean nolegend = false;
 
         private DsDescBuilder() {
         }
 
         public DsDescBuilder setPath(String host, String probe) {
             this.dspath = new DsPath(host, probe);
+            return this;
+        }
+
+        public DsDescBuilder withLegend(String value) {
+            if (value != null && value.isEmpty()) {
+                nolegend = true;
+            } else if (value != null) {
+                nolegend = Boolean.parseBoolean(value) || "yes".equalsIgnoreCase(value);
+            }
+            if (nolegend) {
+                legend = null;
+            }
             return this;
         }
 
@@ -664,10 +677,11 @@ public class GraphDesc implements WithACL {
         public final ConsolFun cf;
         public final Integer percentile;
         public final DsPath dspath;
+        public final boolean nolegend;
 
         private DsDesc(String name, String dsName, String rpn,
                GraphType graphType, Color color, String legend,
-               ConsolFun cf, DsPath dspath) {
+               ConsolFun cf, DsPath dspath, boolean nolegend) {
             this.name = name;
             this.dsName = dsName;
             this.rpn = rpn;
@@ -677,6 +691,7 @@ public class GraphDesc implements WithACL {
             this.legend = legend;
             this.cf = cf;
             this.dspath = dspath;
+            this.nolegend = nolegend;
         }
 
         private DsDesc(String name, String rpn, GraphType graphType, Color color, String legend) {
@@ -689,6 +704,7 @@ public class GraphDesc implements WithACL {
             this.cf = null;
             this.percentile = null;
             this.dspath = null;
+            this.nolegend = false;
         }
 
         private DsDesc(String name, String dsName, Integer percentile, GraphType graphType, Color color) {
@@ -701,6 +717,7 @@ public class GraphDesc implements WithACL {
             this.legend = null;
             this.cf = null;
             this.dspath = null;
+            this.nolegend = false;
         }
 
         private  DsDesc(String dsName, GraphType graphType, String legend, ConsolFun cf) {
@@ -713,6 +730,7 @@ public class GraphDesc implements WithACL {
             this.color = null;
             this.percentile = null;
             this.dspath = null;
+            this.nolegend = false;
         }
 
         public String toString() {
@@ -943,11 +961,13 @@ public class GraphDesc implements WithACL {
         }
         if(builder.reversed) {
             String revRpn = "0, " + bname + ", -";
-            allds.add(new DsDesc(bname, bdsname, builder.rpn, GraphType.NONE, null, null, builder.cf, builder.dspath));
+            allds.add(new DsDesc(bname, bdsname, builder.rpn, GraphType.NONE, null, null, builder.cf, builder.dspath,
+                    builder.nolegend));
             allds.add(new DsDesc("rev_" + bname, revRpn, bgt, bcolor, null));
             allds.add(new DsDesc(bname, GraphType.LEGEND, blegend, builder.cf));
         } else {
-            allds.add(new DsDesc(bname, bdsname, builder.rpn, bgt, bcolor, blegend, builder.cf, builder.dspath));
+            allds.add(new DsDesc(bname, bdsname, builder.rpn, bgt, bcolor, blegend, builder.cf, builder.dspath,
+                    builder.nolegend));
         }
         if(builder.percentile != null) {
             String percentileName = "percentile" + builder.percentile + "_" + name;
@@ -1015,9 +1035,11 @@ public class GraphDesc implements WithACL {
 
         String shortLegend = withSummary ? " \\g" : null;
         for(DsDesc ds: toDo) {
-            ds.graphType.draw(graphDef, ds.name, ds.color, shortLegend);
-            if(withSummary && ds.graphType.legend())
-                addLegend(graphDef, ds.name, ds.graphType, ds.legend);
+            if (! ds.nolegend) {
+                ds.graphType.draw(graphDef, ds.name, ds.color, shortLegend);
+                if(withSummary && ds.graphType.legend())
+                    addLegend(graphDef, ds.name, ds.graphType, ds.legend);
+            }
         }
 
     }
@@ -1419,7 +1441,7 @@ public class GraphDesc implements WithACL {
                 skip = 2;
                 DsDesc rev = allds.get(i + 1);
                 DsDesc leg = allds.get(i + 2);
-                e = new DsDesc(curs.name, curs.dsName, curs.rpn, rev.graphType, rev.color, leg.legend, curs.cf, null);
+                e = new DsDesc(curs.name, curs.dsName, curs.rpn, rev.graphType, rev.color, leg.legend, curs.cf, null, false);
             }
             Element specElement = (Element) root.appendChild(document.createElement("add"));
             specElement.appendChild(document.createElement("name")).setTextContent(e.name);
