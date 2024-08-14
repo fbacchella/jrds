@@ -97,7 +97,7 @@ public class Timer extends StarterNode {
         setStep(ti.step);
         setSlowCollectTime(ti.slowCollectTime);
         this.numCollectors = ti.numCollectors;
-        registerStarter(new SocketFactory(ti.timeout));
+        registerStarter(SocketFactory.class, SocketFactory.class.getName(), () -> new SocketFactory(ti.timeout));
     }
 
     public HostStarter getHost(HostInfo info) {

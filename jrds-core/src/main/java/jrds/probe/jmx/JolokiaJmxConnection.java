@@ -56,7 +56,9 @@ public class JolokiaJmxConnection extends AbstractJmxConnection<J4pClient, Jolok
 
     @Override
     public void configure(PropertiesManager pm) {
-        getLevel().getParent().registerStarter(new HttpClientStarter());
+        getLevel().getParent().registerStarter(
+                HttpClientStarter.class, HttpClientStarter.class.getName(), HttpClientStarter::new
+        );
         super.configure(pm);
     }
 

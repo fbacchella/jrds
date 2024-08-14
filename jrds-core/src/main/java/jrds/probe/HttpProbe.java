@@ -110,7 +110,7 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
             return false;
         }
         if ("http".equals(url.getProtocol()) || "https".equals(url.getProtocol())) {
-            resolver = (Resolver) registerStarter(new Resolver(url.getHost()));
+            resolver = Resolver.register(this, url.getHost());
         }
         log(Level.DEBUG, "URL to collect is %s", url);
         return true;

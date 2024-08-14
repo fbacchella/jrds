@@ -64,4 +64,11 @@ public class Resolver extends Starter {
     public static Object makeKey(String hostname) {
         return new ResolverKey(hostname);
     }
+
+    public static Resolver register(StarterNode node, String name) {
+        return node.registerStarter(
+                Resolver.class, new Resolver.ResolverKey(name), () -> new Resolver(name)
+        );
+    }
+
 }

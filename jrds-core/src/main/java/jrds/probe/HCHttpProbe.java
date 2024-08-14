@@ -57,23 +57,27 @@ public abstract class HCHttpProbe<KeyType> extends HttpProbe<KeyType> implements
 
     @Override
     protected boolean finishConfigure(List<Object> args) {
-        if (connectionName == null || !(find(connectionName) instanceof HttpClientConnection)) {
-            log(Level.DEBUG, "Instanciating a self registrer HttpClientConnection");
-            httpcnx = new HttpClientConnection();
-            httpcnx.setScheme(scheme);
-            httpcnx.setLogin(login);
-            httpcnx.setPassword(password);
-            httpcnx.setPort(port);
-            httpcnx.setFile(file);
-            httpcnx.setName(httpcnx.getKey().toString());
-            registerStarter(httpcnx);
-        } else {
-            httpcnx = find(connectionName);
-        }
+        httpcnx = registerStarter(
+                HttpClientConnection.class,
+                Optional.ofNullable(connectionName).orElse(getClass().getName()),
+                this::newConnection
+        );
         if("true".equalsIgnoreCase(getPd().getSpecific("mandatorySession"))) {
             mandatorySession = true;
         }
         return super.finishConfigure(args);
+    }
+
+    private HttpClientConnection newConnection() {
+        log(Level.DEBUG, "Instanciating a self registrer HttpClientConnection");
+        HttpClientConnection cnx = new HttpClientConnection();
+        cnx.setScheme(scheme);
+        cnx.setLogin(login);
+        cnx.setPassword(password);
+        cnx.setPort(port);
+        cnx.setFile(file);
+        cnx.setName(cnx.getKey().toString());
+        return cnx;
     }
 
     @Override

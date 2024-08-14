@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.slf4j.event.Level;
@@ -141,6 +142,33 @@ public abstract class StarterNode implements StartersSet, InstanceLogger {
                 allStarters.put(key, s);
                 log(Level.DEBUG, "registering %s with key %s", s.getClass().getName(), key);
                 return s;
+            } else {
+                return (S) allStarters.get(key);
+            }
+        }
+    }
+
+    public <S extends Starter> S registerStarter(Class<S> startClass, Supplier<S> source) {
+        return registerStarter(startClass, startClass, source);
+    }
+
+    public <S extends Starter> S registerStarter(Class<S> startClass, Object key, Supplier<S> source) {
+        S parentStarter = find(startClass, key);
+        if (parentStarter != null) {
+            return parentStarter;
+        } else {
+            if (allStarters == null) {
+                // Must be a linked hashed map, order of insertion might be
+                // important
+                allStarters = new LinkedHashMap<>(2);
+            }
+            if (! allStarters.containsKey(key) ) {
+                S newStarter = source.get();
+                // Attention, Starter.initialize can add Starters, don't call it inside the map
+                newStarter.initialize(this);
+                allStarters.put(key, newStarter);
+                log(Level.DEBUG, "registering %s with key %s", newStarter.getClass().getName(), key);
+                return newStarter;
             } else {
                 return (S) allStarters.get(key);
             }
