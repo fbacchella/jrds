@@ -26,7 +26,7 @@ public class HostStarter extends StarterNode {
         super();
         this.host = host;
         this.runningname = host.getName() + ":notrunning";
-        registerStarter(new Resolver(host.getDnsName()));
+        Resolver.register(this, host.getDnsName());
     }
 
     public void addProbe(Probe<?, ?> p) {

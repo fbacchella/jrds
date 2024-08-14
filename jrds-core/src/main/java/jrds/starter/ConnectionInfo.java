@@ -2,6 +2,7 @@ package jrds.starter;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,7 +16,7 @@ import jrds.factories.ArgFactory;
 import jrds.factories.ConnectionName;
 import lombok.Getter;
 
-public class ConnectionInfo {
+public class ConnectionInfo<C extends Connection<O>, O> {
 
     static final private Logger logger = LoggerFactory.getLogger(ConnectionInfo.class);
 
@@ -23,9 +24,9 @@ public class ConnectionInfo {
     private final Map<String, String> beansValue;
     @Getter
     private final String name;
-    private final Class<? extends Connection<?>> type;
+    private final Class<C> type;
 
-    public ConnectionInfo(Class<? extends Connection<?>> type, String name, List<Object> args, Map<String, String> beansValue) throws NoSuchMethodException, SecurityException {
+    public ConnectionInfo(Class<C> type, String name, List<Object> args, Map<String, String> beansValue) throws NoSuchMethodException, SecurityException {
         this.args = args.toArray();
         this.beansValue = beansValue;
         if (name == null) {
@@ -41,25 +42,33 @@ public class ConnectionInfo {
 
     public void register(StarterNode node) throws InvocationTargetException {
         try {
-            Connection<?> cnx = getConstructor().newInstance(args);
-            for(Map.Entry<String, String> e: beansValue.entrySet()) {
+            node.registerStarter(type, name, () -> newConnections(node));
+        } catch (UndeclaredThrowableException e) {
+            throw (InvocationTargetException) e.getCause();
+        }
+    }
+
+    private C newConnections(StarterNode node) {
+        try {
+            C cnx = getConstructor().newInstance(args);
+            for (Map.Entry<String, String> e: beansValue.entrySet()) {
                 String textValue = Util.parseTemplate(e.getValue(), cnx);
                 ArgFactory.beanSetter(cnx, e.getKey(), textValue);
                 cnx.log(Level.TRACE, "Setting bean '%s' to value '%s' for %s", e.getKey(), textValue, node);
             }
             cnx.setName(name);
-            node.registerStarter(cnx);
             logger.debug("Connexion registred: {} for {}", cnx, node);
+            return cnx;
         } catch (InvocationTargetException ex) {
             String message = Util.resolveThrowableException(ex.getCause());
-            throw new InvocationTargetException(ex.getCause(), "Error during connection creation of type " + type.getName() + " for " + node + ": " + message);
+            throw new UndeclaredThrowableException(new InvocationTargetException(ex.getCause(), "Error during connection creation of type " + type.getName() + " for " + node + ": " + message));
         } catch (Exception ex) {
             String message = Util.resolveThrowableException(ex);
-            throw new InvocationTargetException(ex, "Error during connection creation of type " + type.getName() + " for " + node + ": " + message);
+            throw new UndeclaredThrowableException(new InvocationTargetException(ex, "Error during connection creation of type " + type.getName() + " for " + node + ": " + message));
         }
     }
     
-    private Constructor<? extends Connection<?>> getConstructor() throws NoSuchMethodException, SecurityException {
+    private Constructor<C> getConstructor() throws NoSuchMethodException, SecurityException {
         Class<?>[] constArgsType = new Class[args.length];
         int index = 0;
         for(Object arg: args) {
@@ -80,7 +89,7 @@ public class ConnectionInfo {
     }
 
     /**
-     * @see java.lang.Object#hashCode()
+     * @see Object#hashCode()
      */
     @Override
     public int hashCode() {
@@ -92,7 +101,7 @@ public class ConnectionInfo {
     }
 
     /**
-     * @see java.lang.Object#equals(java.lang.Object)
+     * @see Object#equals(Object)
      */
     @Override
     public boolean equals(Object obj) {
@@ -101,7 +110,7 @@ public class ConnectionInfo {
         } else if (obj == null || getClass() != obj.getClass()) {
             return false;
         } else {
-            ConnectionInfo other = (ConnectionInfo) obj;
+            ConnectionInfo<?,?> other = (ConnectionInfo<?,?>) obj;
             if (name == null) {
                 if(other.name != null)
                     return false;
@@ -109,14 +118,10 @@ public class ConnectionInfo {
                 return false;
             }
             if (type == null) {
-                if (other.type != null) {
-                    return false;
-                }
-            } else if (!type.equals(other.type)) {
-                return false;
-            }
+                return other.type == null;
+            } else
+                return type.equals(other.type);
         }
-        return true;
     }
 
 }

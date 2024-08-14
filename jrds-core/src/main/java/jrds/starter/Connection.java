@@ -50,12 +50,9 @@ public abstract class Connection<ConnectedType> extends Starter {
     }
 
     public Resolver getResolver() {
-        Resolver r = getLevel().find(Resolver.class, Resolver.makeKey(getLevel()));
-        if (r == null) {
-            r = new Resolver(getHostName());
-            getLevel().registerStarter(r);
-        }
-        return r;
+        return getLevel().registerStarter(
+                Resolver.class, Resolver.makeKey(getLevel()), () -> new Resolver(getHostName())
+        );
     }
 
     /**

@@ -21,13 +21,13 @@ public class IpmiConnection extends Connection<Handle> {
     String bmcname;
     String user;
     String password;
-    Object starterKey;
+    Resolver resolver;
     Handle jrdsHandle;
 
     @Override
     public void configure(PropertiesManager pm) {
         super.configure(pm);
-        starterKey = getLevel().getParent().registerStarter(new Resolver(bmcname)).getKey();
+        resolver = Resolver.register(getLevel().getParent(), bmcname);
     }
 
     @Override
@@ -37,8 +37,7 @@ public class IpmiConnection extends Connection<Handle> {
 
     @Override
     public boolean startConnection() {
-        Resolver resolver = getLevel().find(Resolver.class, starterKey);
-        if(resolver == null || !resolver.isStarted()) {
+        if (resolver == null || !resolver.isStarted()) {
             return false;
         }
 
