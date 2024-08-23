@@ -9,7 +9,7 @@ import jrds.ArchivesSet;
 import jrds.JrdsSample;
 import jrds.Probe;
 
-public abstract class AbstractStore<StoreObject> implements Store {
+public abstract class AbstractStore<SO> implements Store<SO> {
     protected final Probe<?, ?> p;
 
     public AbstractStore(Probe<?, ?> p) {
@@ -30,10 +30,10 @@ public abstract class AbstractStore<StoreObject> implements Store {
     public abstract Date getLastUpdate();
 
     @Override
-    public abstract StoreObject getStoreObject();
+    public abstract SO getStoreObject();
 
     @Override
-    public abstract void closeStoreObject(Object object);
+    public abstract void closeStoreObject(SO object);
 
     public void log(Level l, Throwable e, String format, Object... elements) {
         p.log(l, e, format, elements);

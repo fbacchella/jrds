@@ -95,7 +95,7 @@ public class ContainerProbe extends Probe<Object, Number> {
      * @see jrds.Probe#getMainStore()
      */
     @Override
-    public Store getMainStore() {
+    public Store<?> getMainStore() {
         return new Store() {
 
             @Override

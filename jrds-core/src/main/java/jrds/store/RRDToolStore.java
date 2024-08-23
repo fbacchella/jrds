@@ -144,7 +144,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
     }
 
     @Override
-    public void closeStoreObject(Object object) {
+    public void closeStoreObject(RRDatabase object) {
         try {
             ((RRDatabase) object).close();
         } catch (IOException e) {

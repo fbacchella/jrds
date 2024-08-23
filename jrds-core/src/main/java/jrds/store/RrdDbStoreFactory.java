@@ -22,7 +22,7 @@ import jrds.PropertiesManager;
 import jrds.Util;
 import jrds.factories.ArgFactory;
 
-public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
+public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDb, RrdDbStore> {
     private static final Logger logger = LoggerFactory.getLogger(RrdDbStoreFactory.class);
     private RrdBackendFactory backendFactory = null;
     private RrdDbPool instance = null;
@@ -61,7 +61,7 @@ public class RrdDbStoreFactory extends AbstractStoreFactory<RrdDbStore> {
         // Analyze the backend properties
         Map<String, String> backendPropsMap = pm.subKey("rrdbackend");
 
-        if (backendPropsMap.size() > 0) {
+        if (!backendPropsMap.isEmpty()) {
             logger.debug("Configuring backend factory {}", backendFactory.getClass());
             for (Map.Entry<String, String> e: backendPropsMap.entrySet()) {
                 try {

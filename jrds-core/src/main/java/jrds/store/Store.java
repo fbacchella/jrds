@@ -6,14 +6,13 @@ import java.util.Map;
 import jrds.ArchivesSet;
 import jrds.JrdsSample;
 
-public interface Store {
+public interface Store<SO> {
     void commit(JrdsSample sample);
     Map<String, Number> getLastValues();
     boolean checkStoreFile(ArchivesSet archives);
     Date getLastUpdate();
-    Object getStoreObject();
-    void closeStoreObject(Object object);
+    SO getStoreObject();
+    void closeStoreObject(SO object);
     Extractor getExtractor();
     String getPath();
-
 }

@@ -7,7 +7,7 @@ import java.util.Properties;
 import jrds.Probe;
 import jrds.PropertiesManager;
 
-public interface StoreFactory {
+public interface StoreFactory<SO> {
 
     String DEFAULTNAME = "_default";
 
@@ -15,9 +15,9 @@ public interface StoreFactory {
 
     void start();
 
-    Store create(Probe<?, ?> p);
+    Store<SO> create(Probe<?, ?> p);
 
-    Store configure(Probe<?, ?> p, Map<String, String> properties) throws InvocationTargetException;
+    Store<SO> configure(Probe<?, ?> p, Map<String, String> properties) throws InvocationTargetException;
 
     void stop();
 

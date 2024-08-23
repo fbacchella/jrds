@@ -9,7 +9,7 @@ import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.factories.ArgFactory;
 
-public abstract class AbstractStoreFactory<StoreType extends AbstractStore<?>> implements StoreFactory {
+public abstract class AbstractStoreFactory<SO, StoreType extends AbstractStore<SO>> implements StoreFactory<SO> {
 
     @Override
     public abstract StoreType create(Probe<?, ?> p);
