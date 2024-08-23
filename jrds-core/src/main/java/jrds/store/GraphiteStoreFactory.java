@@ -6,7 +6,7 @@ import jrds.Probe;
 import jrds.PropertiesManager;
 import jrds.Util;
 
-public class GraphiteStoreFactory extends AbstractStoreFactory<GraphiteStore> {
+public class GraphiteStoreFactory extends AbstractStoreFactory<GraphiteConnection, GraphiteStore> {
     GraphiteConnection cnx;
 
     @Override
@@ -30,7 +30,6 @@ public class GraphiteStoreFactory extends AbstractStoreFactory<GraphiteStore> {
         String prefix = props.getProperty("prefix", "");
 
         cnx = new GraphiteConnection(host, port, prefix);
-
     }
 
 }

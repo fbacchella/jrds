@@ -10,7 +10,8 @@ import javax.management.StandardMBean;
 
 import jrds.Probe;
 
-public class CacheStoreFactory extends AbstractStoreFactory<CacheStore> implements SampleCacheMBean {
+public class CacheStoreFactory extends AbstractStoreFactory<Map<String, Number>, CacheStore> implements SampleCacheMBean {
+
     private final Map<String, Map<String, Map<String, Number>>> cache = new HashMap<>();
     @SuppressWarnings("unused")
     private final CacheMBean mbean;

@@ -320,9 +320,9 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     }
 
     @Override
-    public void closeStoreObject(Object rrdDb) {
-        if(rrdDb != null) {
-            factory.releaseRrd((RrdDb) rrdDb);
+    public void closeStoreObject(RrdDb rrdDb) {
+        if (rrdDb != null) {
+            factory.releaseRrd(rrdDb);
         }
     }
 

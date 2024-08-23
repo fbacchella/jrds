@@ -8,6 +8,7 @@ import jrds.JrdsSample;
 import jrds.Probe;
 
 public class CacheStore extends AbstractStore<Map<String, Number>> {
+
     private final Map<String, Number> cache;
     private Date lastUpdate = new Date(0);
 
@@ -48,7 +49,7 @@ public class CacheStore extends AbstractStore<Map<String, Number>> {
     }
 
     @Override
-    public void closeStoreObject(Object object) {
+    public void closeStoreObject(Map<String, Number> object) {
 
     }
 

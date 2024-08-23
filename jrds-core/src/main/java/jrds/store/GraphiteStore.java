@@ -65,7 +65,7 @@ public class GraphiteStore extends AbstractStore<GraphiteConnection> {
     }
 
     @Override
-    public void closeStoreObject(Object object) {
+    public void closeStoreObject(GraphiteConnection object) {
 
     }
 

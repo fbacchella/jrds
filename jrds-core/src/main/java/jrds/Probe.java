@@ -88,8 +88,8 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     private String label = null;
     private Logger namedLogger = LoggerFactory.getLogger("jrds.Probe.EmptyProbe");
     private volatile boolean running = false;
-    private final Set<Store> stores = new HashSet<>();
-    private Store mainStore;
+    private final Set<Store<?>> stores = new HashSet<>();
+    private Store<?> mainStore;
     private ArchivesSet archives = ArchivesSet.DEFAULT;
     private Map<String, String> customBeans = Collections.emptyMap();
     private Set<KeyType> optionalsCollect = Collections.emptySet();
@@ -322,7 +322,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
 
     public void storeSample(JrdsSample sample) {
         mainStore.commit(sample);
-        for(Store store: stores) {
+        for (Store<?> store: stores) {
             store.commit(sample);
         }
 
@@ -634,7 +634,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     /**
      * @return the stores
      */
-    public Set<Store> getStores() {
+    public Set<Store<?>> getStores() {
         return stores;
     }
 
@@ -648,7 +648,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     /**
      * @return the mainStore
      */
-    public Store getMainStore() {
+    public Store<?> getMainStore() {
         return mainStore;
     }
 

@@ -10,7 +10,8 @@ import jrds.store.AbstractStore;
 import jrds.store.AbstractStoreFactory;
 import jrds.store.Extractor;
 
-public class EmptyStoreFactory extends AbstractStoreFactory<EmptyStoreFactory.EmptyStore> {
+public class EmptyStoreFactory extends AbstractStoreFactory<String, EmptyStoreFactory.EmptyStore> {
+
     public static class EmptyStore extends AbstractStore<String> {
 
         public EmptyStore(Probe<?, ?> p) {
@@ -53,11 +54,12 @@ public class EmptyStoreFactory extends AbstractStoreFactory<EmptyStoreFactory.Em
         }
 
         @Override
-        public void closeStoreObject(Object object) {
+        public void closeStoreObject(String object) {
 
         }
 
     }
+
     @Override
     public EmptyStore create(Probe<?, ?> p) {
         return null;

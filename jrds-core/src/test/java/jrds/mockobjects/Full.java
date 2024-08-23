@@ -21,6 +21,7 @@ import jrds.Period;
 import jrds.Probe;
 import jrds.ProbeDesc;
 import jrds.starter.HostStarter;
+import jrds.store.Store;
 
 public class Full {
     static final long SEED = 1909752002L;
@@ -88,7 +89,7 @@ public class Full {
         return p;
     }
 
-    static public long fill(Probe<?, ?> p) {
+    static public <SO> long fill(Probe<?, ?> p) {
         long start = System.currentTimeMillis() / 1000;
         long end = start + 3600 * 24 * 30;
 
@@ -97,8 +98,10 @@ public class Full {
         GaugeSource shadeSource = new GaugeSource(300, 10);
         long t = start;
 
-        // Keep an handle to the object, for faster run
-        Object o = p.getMainStore().getStoreObject();
+        @SuppressWarnings("unchecked")
+        Store<SO> store = (Store<SO>) p.getMainStore();
+        // Keep a handle to the object, for faster run
+        SO o = store.getStoreObject();
 
         while (t <= end + 86400L) {
             JrdsSample sample = p.newSample();
@@ -108,7 +111,7 @@ public class Full {
             p.getMainStore().commit(sample);
             t += RANDOM.nextDouble() * STEP + 1;
         }
-        p.getMainStore().closeStoreObject(o);
+        store.closeStoreObject(o);
         return t;
     }
 
