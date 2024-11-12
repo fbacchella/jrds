@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.rrd4j.core.DsDef;
 import org.slf4j.event.Level;
@@ -82,9 +83,11 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
             return false;
         }
         List<String> cmdList = new ArrayList<>();
-        cmdList.add(cmd);
-        cmdList.addAll(argsList);
-        processBuilder = new ProcessBuilder(cmdList); //.redirectInput(ProcessBuilder.Redirect.DISCARD);
+        cmdList.add(Util.parseTemplate(cmd, this));
+        argsList.stream()
+                .map(s -> Util.parseTemplate(s, this))
+                .collect(Collectors.toCollection(() -> cmdList));
+        processBuilder = new ProcessBuilder(cmdList);
         return true;
     }
 
