@@ -257,6 +257,11 @@
                     <artifactId>central-publishing-maven-plugin</artifactId>
                     <version>0.7.0</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.sonatype.central</groupId>
+                    <artifactId>central-publishing-maven-plugin</artifactId>
+                    <version>0.7.0</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <!-- Used to help dependency:go-offline -->
