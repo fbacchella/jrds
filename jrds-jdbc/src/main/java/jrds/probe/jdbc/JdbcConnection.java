@@ -45,12 +45,12 @@ public class JdbcConnection extends Connection<Statement> {
         this.passwd = passwd;
         this.url = url;
         this.driverClass = driverClass;
-        checkDriver(url);
     }
 
     @Override
     public void configure(PropertiesManager pm) {
         url = jrds.Util.parseTemplate(url, this, getLevel());
+        checkDriver(url);
         super.configure(pm);
     }
 
