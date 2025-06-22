@@ -70,7 +70,8 @@ public class JdbcConnection extends Connection<Statement> {
             }
             DriverManager.getDriver(sqlurl);
         } catch (SQLException | ClassNotFoundException e) {
-            throw new RuntimeException("Error checking JDBC url " + sqlurl, e);
+            url = null;
+            throw new IllegalStateException("Error checking JDBC url " + sqlurl, e);
         }
     }
 
@@ -81,6 +82,9 @@ public class JdbcConnection extends Connection<Statement> {
 
     @Override
     public boolean startConnection() {
+        if (url == null) {
+            return false;
+        }
         boolean started = false;
         if(getResolver().isStarted()) {
             Properties p = getProperties();
