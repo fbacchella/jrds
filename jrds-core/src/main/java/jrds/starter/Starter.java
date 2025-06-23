@@ -14,6 +14,7 @@ public abstract class Starter {
 
     private long uptime = Long.MAX_VALUE;
     volatile private boolean started = false;
+    private boolean configured = false;
 
     public Starter() {
         String[] classElements = getClass().getName().split("\\.");
@@ -42,9 +43,14 @@ public abstract class Starter {
      */
     public void configure(PropertiesManager pm) {
         log(Level.DEBUG, "registred to %s", getLevel());
+        configured = true;
     }
 
     public final void doStart() {
+        if (! configured) {
+            log(Level.TRACE, "Not configured, skipped starting");
+            return;
+        }
         log(Level.TRACE, "Starting");
         try {
             long begin = new Date().getTime();
