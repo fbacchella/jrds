@@ -22,7 +22,7 @@ import org.jolokia.client.request.J4pReadRequest;
 import org.jolokia.client.request.J4pReadResponse;
 import org.jolokia.client.request.J4pResponse;
 import org.jolokia.client.request.J4pVersionRequest;
-import org.json.simple.JSONObject;
+import org.jolokia.json.JSONObject;
 import org.slf4j.event.Level;
 
 import jrds.PropertiesManager;

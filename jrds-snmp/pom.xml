@@ -4,6 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>fr.jrds</groupId>
+        <artifactId>jrds</artifactId>
+        <version>2023.2-SNAPSHOT</version>
+    </parent>
     <artifactId>jrds-snmp</artifactId>
     <properties>
         <jrds.testloglevel>ERROR</jrds.testloglevel>
@@ -23,7 +28,7 @@
         <dependency>
             <groupId>org.snmp4j</groupId>
             <artifactId>snmp4j-agent</artifactId>
-            <version>3.8.1</version>
+            <version>3.8.2</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -103,9 +108,4 @@
         </plugins>
     </reporting>
 
-    <parent>
-        <groupId>fr.jrds</groupId>
-        <artifactId>jrds</artifactId>
-        <version>2023.2-SNAPSHOT</version>
-    </parent>
 </project>
