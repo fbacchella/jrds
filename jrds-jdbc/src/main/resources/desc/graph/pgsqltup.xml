@@ -2,33 +2,33 @@
 <graphdesc>
   <name>pgsqltup</name>
   <graphName>pgsqltup-${index}</graphName>
-  <graphTitle>PostgreSQL tup on ${index}</graphTitle>
-  <verticalLabel>tup/s</verticalLabel>
+  <graphTitle>PostgreSQL rows activity on ${index}</graphTitle>
+  <verticalLabel>Rows activity/s</verticalLabel>
 
   <add>
     <name>tup_returned</name>
     <graphType>area</graphType>
-    <legend>tup_returned</legend>
+    <legend>Rows returned by queries</legend>
   </add>
   <add>
     <name>tup_fetched</name>
     <graphType>stack</graphType>
-    <legend>tup_fetched</legend>
+    <legend>Rows fetched via index scans or table access</legend>
   </add>
   <add>
     <name>tup_inserted</name>
     <graphType>stack</graphType>
-    <legend>tup_inserted</legend>
+    <legend>Rows inserted</legend>
   </add>
   <add>
     <name>tup_updated</name>
     <graphType>stack</graphType>
-    <legend>tup_updated</legend>
+    <legend>Rows updated</legend>
   </add>
   <add>
     <name>tup_deleted</name>
     <graphType>stack</graphType>
-    <legend>tup_deleted</legend>
+    <legend>Rows deleted</legend>
   </add>
 
   <hosttree>
@@ -36,13 +36,13 @@
     <pathelement>SERVICES</pathelement>
     <pathelement>URL</pathelement>
     <pathstring>${index}</pathstring>
-    <pathstring>tup</pathstring>
+    <pathstring>Rows activity</pathstring>
   </hosttree>
   <viewtree>
     <pathelement>SERVICES</pathelement>
     <pathstring>Postgresql</pathstring>
     <pathelement>URL</pathelement>
     <pathstring>${index}</pathstring>
-    <pathstring>tup</pathstring>
+    <pathstring>Rows activity</pathstring>
   </viewtree>
 </graphdesc>

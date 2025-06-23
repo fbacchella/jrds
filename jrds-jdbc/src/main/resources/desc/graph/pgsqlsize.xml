@@ -1,19 +1,17 @@
 <!DOCTYPE graphdesc PUBLIC "-//jrds//DTD Graph Description//EN" "urn:jrds:graphdesc">
 <graphdesc>
-  <name>pgsqlblks</name>
-  <graphName>pgsqlblks-${index}</graphName>
-  <graphTitle>PostgreSQL blocks reads on ${index}</graphTitle>
-  <verticalLabel>block/s</verticalLabel>
+  <name>pgsqlsize</name>
+  <graphName>pgsize-${index}</graphName>
+  <graphTitle>PostgreSQL database ${index} size on ${host}</graphTitle>
+  <unit>
+    <binary/>
+  </unit>
+  <verticalLabel>bytes</verticalLabel>
 
   <add>
-    <name>blks_read</name>
+    <name>pg_database_size</name>
     <graphType>area</graphType>
-    <legend>Disk blocks read</legend>
-  </add>
-  <add>
-    <name>blks_hit</name>
-    <graphType>stack</graphType>
-    <legend>Buffer hits</legend>
+    <legend>Database size</legend>
   </add>
 
   <hosttree>
@@ -21,13 +19,13 @@
     <pathelement>SERVICES</pathelement>
     <pathelement>URL</pathelement>
     <pathstring>${index}</pathstring>
-    <pathstring>Blocks</pathstring>
+    <pathstring>Size</pathstring>
   </hosttree>
   <viewtree>
     <pathelement>SERVICES</pathelement>
     <pathstring>Postgresql</pathstring>
     <pathelement>URL</pathelement>
     <pathstring>${index}</pathstring>
-    <pathstring>Blocks</pathstring>
+    <pathstring>Size</pathstring>
   </viewtree>
 </graphdesc>

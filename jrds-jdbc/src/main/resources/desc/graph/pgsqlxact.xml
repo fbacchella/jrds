@@ -22,13 +22,13 @@
     <pathelement>SERVICES</pathelement>
     <pathelement>URL</pathelement>
     <pathstring>${index}</pathstring>
-    <pathstring>transaction</pathstring>
+    <pathstring>Transactions activity</pathstring>
   </hosttree>
   <viewtree>
     <pathelement>SERVICES</pathelement>
     <pathstring>Postgresql</pathstring>
     <pathelement>URL</pathelement>
     <pathstring>${index}</pathstring>
-    <pathstring>transaction</pathstring>
+    <pathstring>Transactions activity</pathstring>
   </viewtree>
 </graphdesc>

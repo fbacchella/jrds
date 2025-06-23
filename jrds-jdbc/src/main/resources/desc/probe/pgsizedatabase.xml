@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
+<probedesc>
+    <name>PgSizeDatabase</name>
+    <probeName>pgsizetdatabase-${attr.database}</probeName>
+    <probeClass>jrds.probe.jdbc.GenericJdbcProbe</probeClass>
+    <customattr name="database"/>
+    <specific name="query">select pg_database_size('${attr.database}');</specific>
+    <specific name="index">${attr.database}</specific>
+    <specific name="uptimeQuery">SELECT EXTRACT(EPOCH FROM (now() - pg_postmaster_start_time())) AS seconds;</specific>
+    <specific name="uptimeRow">seconds</specific>
+    <ds>
+        <dsName>pg_database_size</dsName>
+        <dsType>gauge</dsType>
+    </ds>
+    <graphs>
+        <name>pgsqlsize</name>
+    </graphs>
+</probedesc>
