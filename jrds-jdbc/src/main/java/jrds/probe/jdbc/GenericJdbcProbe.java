@@ -1,6 +1,7 @@
 package jrds.probe.jdbc;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.event.Level;
@@ -209,18 +211,23 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
 
     @Override
     public URL getUrl() {
-        URL newurl = null;
+        return Optional.ofNullable(getUrlAsString())
+                       .map(this::mapUrl)
+                       .orElse(null);
+    }
+
+    private URL mapUrl(String url) {
         try {
-            newurl = new URL(getUrlAsString());
+            return URI.create(url).toURL();
         } catch (MalformedURLException e) {
             log(Level.ERROR, e, "Invalid jdbc url: " + getUrlAsString());
+            return null;
         }
-        return newurl;
     }
 
     @Override
     public String getUrlAsString() {
-        return getConnection().getUrl();
+        return Optional.ofNullable(getConnection()).map(JdbcConnection::getUrl).orElse(null);
     }
 
     @Override

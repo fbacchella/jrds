@@ -11,14 +11,19 @@ import org.slf4j.event.Level;
 import jrds.PropertiesManager;
 import jrds.factories.ProbeBean;
 import jrds.starter.Connection;
+import lombok.Getter;
+import lombok.Setter;
 
 @ProbeBean({ "user", "password", "url", "driverClass"})
 public class JdbcConnection extends Connection<Statement> {
 
     private java.sql.Connection con;
+    @Setter @Getter
     private String user;
     private String passwd;
+    @Getter
     private String driverClass = null;
+    @Setter @Getter
     private String url;
 
     protected static void registerDriver(Class<? extends Driver> jdbcDriver) {
@@ -65,12 +70,11 @@ public class JdbcConnection extends Connection<Statement> {
 
     public void checkDriver(String sqlurl) {
         try {
-            if(driverClass != null && !"".equals(driverClass)) {
+            if (driverClass != null && !"".equals(driverClass)) {
                 Class.forName(driverClass);
             }
             DriverManager.getDriver(sqlurl);
         } catch (SQLException | ClassNotFoundException e) {
-            url = null;
             throw new IllegalStateException("Error checking JDBC url " + sqlurl, e);
         }
     }
@@ -82,11 +86,8 @@ public class JdbcConnection extends Connection<Statement> {
 
     @Override
     public boolean startConnection() {
-        if (url == null) {
-            return false;
-        }
         boolean started = false;
-        if(getResolver().isStarted()) {
+        if (getResolver().isStarted()) {
             Properties p = getProperties();
             p.put("user", user);
             p.put("password", passwd);
@@ -118,27 +119,6 @@ public class JdbcConnection extends Connection<Statement> {
     }
 
     /**
-     * @return the url
-     */
-    public String getUrl() {
-        return url;
-    }
-
-    /**
-     * @return the user
-     */
-    public String getUser() {
-        return user;
-    }
-
-    /**
-     * @param user the user to set
-     */
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    /**
      * @return the passwd
      */
     public String getPassword() {
@@ -150,20 +130,6 @@ public class JdbcConnection extends Connection<Statement> {
      */
     public void setPassword(String passwd) {
         this.passwd = passwd;
-    }
-
-    /**
-     * @param url the url to set
-     */
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    /**
-     * @return the driverClass
-     */
-    public String getDriverClass() {
-        return driverClass;
     }
 
     /**
