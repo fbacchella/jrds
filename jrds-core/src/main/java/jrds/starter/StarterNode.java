@@ -192,7 +192,6 @@ public abstract class StarterNode implements StartersSet, InstanceLogger {
             try {
                 me.getValue().configure(pm);
             } catch (Exception e) {
-                allStarters.remove(me.getKey());
                 log(Level.ERROR, e, "Starter %s failed to configure: %s", me.getValue(), e);
             }
         }
