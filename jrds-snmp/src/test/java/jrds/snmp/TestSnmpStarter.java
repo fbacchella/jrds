@@ -14,13 +14,14 @@ import org.slf4j.event.Level;
 import jrds.HostInfo;
 import jrds.HostsList;
 import jrds.Log4JRule;
+import jrds.PropertiesManager;
 import jrds.Tools;
 import jrds.mockobjects.SnmpAgent;
 import jrds.probe.snmp.RdsSnmpSimple;
 import jrds.starter.HostStarter;
 
 public class TestSnmpStarter {
-    static private SnmpAgent agent;
+    private static SnmpAgent agent;
 
     @Rule
     public final TemporaryFolder testFolder = new TemporaryFolder();
@@ -30,7 +31,7 @@ public class TestSnmpStarter {
     private final Logger logger = logrule.getTestlogger();
 
     @BeforeClass
-    static public void configure() throws Exception {
+    public static void configure() throws Exception {
         Tools.configure();
         agent = new SnmpAgent();
     }
@@ -41,6 +42,7 @@ public class TestSnmpStarter {
     }
 
     private HostsList registerHost(HostStarter h, RdsSnmpSimple probe) throws IOException {
+        PropertiesManager pm = new PropertiesManager();
         HostsList hl = new HostsList(Tools.makePm(testFolder)) {
             @Override
             public boolean isCollectRunning() {
@@ -70,7 +72,7 @@ public class TestSnmpStarter {
         probe.setHost(h);
         probe.configure();
         h.addProbe(probe);
-
+        h.configureStarters(pm);
         return hl;
     }
 

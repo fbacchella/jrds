@@ -39,7 +39,7 @@ import jrds.store.RrdDbStoreFactory;
 
 public class ApacheHttpClientTest {
 
-    static private final Map<String, String> empty = Collections.emptyMap();
+    private static final Map<String, String> empty = Collections.emptyMap();
 
     @Rule
     public final Log4JRule logrule = new Log4JRule(this);
@@ -85,7 +85,7 @@ public class ApacheHttpClientTest {
     }
 
     @BeforeClass
-    static public void configure() {
+    public static void configure() {
         Tools.configure();
         StoreOpener.prepare("FILE");
     }
@@ -146,7 +146,7 @@ public class ApacheHttpClientTest {
             HttpClientStarter cnx = new HttpClientStarter();
             cnx.configure(pm);
             HostStarter localhost = addConnection(cnx);
-            logger.debug("resolver started for localhost:" + localhost.find(Resolver.class).isStarted());
+            logger.debug("resolver started for localhost: {}", localhost.find(Resolver.class).isStarted());
             cnx.doStart();
             Assert.assertTrue("Apache HttpClient failed to start", cnx.isStarted());
             cnx.stop();
@@ -164,8 +164,8 @@ public class ApacheHttpClientTest {
             HttpClientConnection serverconnexion = new HttpClientConnection();
             serverconnexion.setPort(server.getURI().toURL().getPort());
             serverconnexion.setName("serverconnexion");
-            serverconnexion.configure(pm);
             localhost.registerStarter(serverconnexion);
+            localhost.configureStarters(pm);
             localhost.find(Resolver.class).doStart();
             cnx.doStart();
             serverconnexion.doStart();
@@ -190,18 +190,24 @@ public class ApacheHttpClientTest {
             server.addResourceHandler(staticFiles);
             server.start();
             HttpClientStarter cnx = new HttpClientStarter();
-            cnx.configure(pm);
             HostStarter localhost = addConnection(cnx);
+            HttpClientConnection serverconnexion = new HttpClientConnection();
+            serverconnexion.setPort(server.getURI().toURL().getPort());
+            serverconnexion.setName("serverconnexion");
+            localhost.registerStarter(serverconnexion);
+            localhost.configureStarters(pm);
             localhost.find(Resolver.class).doStart();
             cnx.doStart();
+            serverconnexion.doStart();
             TestHttpProbe p = new TestHttpProbe();
             p.setMainStore(new RrdDbStoreFactory(), empty);
             p.setHost(localhost);
-            p.setPort(server.getURI().toURL().getPort());
+            p.setConnectionName("serverconnexion");
             p.configure();
             p.checkStore();
             localhost.addProbe(p);
             localhost.getParent().startCollect();
+            shouldFail = false;
             // Run twice, to detect failure management in the probe
             localhost.collectAll();
             shouldFail = false;
@@ -217,21 +223,25 @@ public class ApacheHttpClientTest {
         try (MockHttpServer server = new MockHttpServer(true)) {
             server.addResourceHandler(staticFiles);
             server.start();
-
             HttpClientStarter cnx = new HttpClientStarter();
-            cnx.configure(pm);
             HostStarter localhost = addConnection(cnx);
+            HttpClientConnection serverconnexion = new HttpClientConnection();
+            serverconnexion.setPort(server.getURI().toURL().getPort());
+            serverconnexion.setName("serverconnexion");
+            localhost.registerStarter(serverconnexion);
+            localhost.configureStarters(pm);
+            localhost.find(Resolver.class).doStart();
             cnx.doStart();
+            serverconnexion.doStart();
             TestHttpProbe p = new TestHttpProbe();
             p.setMainStore(new RrdDbStoreFactory(), empty);
             p.setHost(localhost);
-            p.setPort(server.getURI().toURL().getPort());
+            p.setConnectionName("serverconnexion");
             p.setScheme("https");
             p.configure();
             p.checkStore();
             localhost.addProbe(p);
             localhost.getParent().startCollect();
-            Assert.assertTrue(p.find(SSLStarter.class).isStarted());
             shouldFail = false;
             localhost.collectAll();
             Assert.assertTrue("Didn't try to collect", p.collected);

@@ -176,12 +176,12 @@ public class JmxConnexionTest {
             hi.setDnsName(InetAddress.getLoopbackAddress().getCanonicalHostName());
             HostStarter host = new HostStarter(hi);
             JMXConnection cnx = getCnx(proto, port);
-            cnx.configure(pm);
             host.setParent(top);
             host.registerStarter(new SocketFactory(1));
             host.registerStarter(new JmxSocketFactory());
             host.registerStarter(cnx);
             host.configureStarters(pm);
+            top.configureStarters(pm);
             top.startCollect();
             Assert.assertTrue("JMX Connection failed to start", host.startCollect());
             Assert.assertTrue("JMX Connection failed to start",

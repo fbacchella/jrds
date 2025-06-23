@@ -108,8 +108,8 @@ public class HttpClientStarter extends Starter {
      */
     @Override
     public void configure(PropertiesManager pm) {
-        super.configure(pm);
         maxConnect = pm.numCollectors;
+        super.configure(pm);
     }
 
     @Override
