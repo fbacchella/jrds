@@ -138,11 +138,13 @@ public class ApacheHttpClientTest {
 
     @Test
     public void testStart() throws Exception {
+        PropertiesManager pm = new PropertiesManager();
         try (MockHttpServer server = new MockHttpServer(false)) {
             server.addResourceHandler(staticFiles);
             server.start();
 
             HttpClientStarter cnx = new HttpClientStarter();
+            cnx.configure(pm);
             HostStarter localhost = addConnection(cnx);
             logger.debug("resolver started for localhost:" + localhost.find(Resolver.class).isStarted());
             cnx.doStart();
@@ -153,6 +155,7 @@ public class ApacheHttpClientTest {
 
     @Test
     public void testConnectedConnexion() throws Exception {
+        PropertiesManager pm = new PropertiesManager();
         try (MockHttpServer server = new MockHttpServer(false)) {
             server.addResourceHandler(staticFiles);
             server.start();
@@ -161,6 +164,7 @@ public class ApacheHttpClientTest {
             HttpClientConnection serverconnexion = new HttpClientConnection();
             serverconnexion.setPort(server.getURI().toURL().getPort());
             serverconnexion.setName("serverconnexion");
+            serverconnexion.configure(pm);
             localhost.registerStarter(serverconnexion);
             localhost.find(Resolver.class).doStart();
             cnx.doStart();
@@ -181,10 +185,12 @@ public class ApacheHttpClientTest {
 
     @Test
     public void testConnectTwice() throws Exception {
+        PropertiesManager pm = new PropertiesManager();
         try (MockHttpServer server = new MockHttpServer(false)) {
             server.addResourceHandler(staticFiles);
             server.start();
             HttpClientStarter cnx = new HttpClientStarter();
+            cnx.configure(pm);
             HostStarter localhost = addConnection(cnx);
             localhost.find(Resolver.class).doStart();
             cnx.doStart();
@@ -207,11 +213,13 @@ public class ApacheHttpClientTest {
 
     @Test
     public void testConnectSSL() throws Exception {
+        PropertiesManager pm = new PropertiesManager();
         try (MockHttpServer server = new MockHttpServer(true)) {
             server.addResourceHandler(staticFiles);
             server.start();
 
             HttpClientStarter cnx = new HttpClientStarter();
+            cnx.configure(pm);
             HostStarter localhost = addConnection(cnx);
             cnx.doStart();
             TestHttpProbe p = new TestHttpProbe();

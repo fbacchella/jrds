@@ -41,13 +41,13 @@ public class HttpClientConnection extends Connection<HttpClient> {
 
     @Override
     public void configure(PropertiesManager pm) {
-        super.configure(pm);
         if (login != null && password != null) {
             CredentialsProvider bcp = new BasicCredentialsProvider();
             bcp.setCredentials(new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT),
                                new UsernamePasswordCredentials(login, password));
             context.setCredentialsProvider(bcp);
         }
+        super.configure(pm);
     }
 
     public URL resolve(HttpClientStarter.UrlBuilder urlbuilder, HttpProbe<?> p, List<Object> args) throws MalformedURLException {

@@ -156,6 +156,7 @@ public class JmxConnexionTest {
     }
 
     private void doTest(String proto, Consumer<Integer> start, Runnable stop) throws Exception {
+        PropertiesManager pm = new PropertiesManager();
         StarterNode top = new StarterNode() {
             @Override
             public boolean isCollectRunning() {
@@ -175,11 +176,12 @@ public class JmxConnexionTest {
             hi.setDnsName(InetAddress.getLoopbackAddress().getCanonicalHostName());
             HostStarter host = new HostStarter(hi);
             JMXConnection cnx = getCnx(proto, port);
+            cnx.configure(pm);
             host.setParent(top);
             host.registerStarter(new SocketFactory(1));
             host.registerStarter(new JmxSocketFactory());
             host.registerStarter(cnx);
-            host.configureStarters(new PropertiesManager());
+            host.configureStarters(pm);
             top.startCollect();
             Assert.assertTrue("JMX Connection failed to start", host.startCollect());
             Assert.assertTrue("JMX Connection failed to start",
