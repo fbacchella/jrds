@@ -2,10 +2,11 @@
 <!DOCTYPE probedesc PUBLIC "-//jrds//DTD Probe Description//EN" "urn:jrds:probedesc">
 <probedesc>
     <name>PgStatDatabase</name>
-    <probeName>pgstatdatabase-${1}</probeName>
+    <probeName>pgstatdatabase-${attr.database}</probeName>
     <probeClass>jrds.probe.jdbc.GenericJdbcProbe</probeClass>
-    <specific name="query">select * from pg_stat_database where datname='${1}';</specific>
-    <specific name="index">${1}</specific>
+    <customattr name="database"/>
+    <specific name="query">select * from pg_stat_database where datname='${attr.database}';</specific>
+    <specific name="index">${attr.database}</specific>
     <specific name="uptimeQuery">SELECT EXTRACT(EPOCH FROM (now() - pg_postmaster_start_time())) AS seconds;</specific>
     <specific name="uptimeRow">seconds</specific>
     <ds>

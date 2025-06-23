@@ -26,14 +26,6 @@ public class JdbcConnection extends Connection<Statement> {
     @Setter @Getter
     private String url;
 
-    protected static void registerDriver(Class<? extends Driver> jdbcDriver) {
-        try {
-            DriverManager.registerDriver(jdbcDriver.getConstructor().newInstance());
-        } catch (Exception e) {
-            throw new RuntimeException("Can't register JDBC driver " + jdbcDriver, e);
-        }
-    }
-
     public JdbcConnection() {
 
     }
@@ -140,7 +132,7 @@ public class JdbcConnection extends Connection<Statement> {
         try {
             Class.forName(driverClass);
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Can't find JDBC driver " + driverClass, e);
+            throw new IllegalArgumentException("Can't find JDBC driver " + driverClass, e);
         }
     }
 

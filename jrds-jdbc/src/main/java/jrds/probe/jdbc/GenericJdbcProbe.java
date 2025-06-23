@@ -58,6 +58,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
         return false;
     }
 
+    @Override
     public Boolean configure() {
         return configure(Collections.emptyList());
     }
@@ -152,7 +153,7 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
         try {
             ResultSetMetaData meta = rs.getMetaData();
             int columnCount = meta.getColumnCount();
-            values = new HashMap<>(columnCount);
+            values = HashMap.newHashMap(columnCount);
             while (rs.next()) {
                 String keyValue = "";
                 if(keyColumn != null) {
@@ -167,8 +168,8 @@ public class GenericJdbcProbe extends ProbeConnected<String, Number, JdbcConnect
                     Number value;
                     Object oValue = rs.getObject(i);
                     log(Level.TRACE, "type info for %s: type %d, %s = %s", key, meta.getColumnType(i), oValue.getClass(), oValue);
-                    if (oValue instanceof Number) {
-                        value = (Number) oValue;
+                    if (oValue instanceof Number n) {
+                        value = n;
                         values.put(key, value);
                     } else {
                         int type = meta.getColumnType(i);
