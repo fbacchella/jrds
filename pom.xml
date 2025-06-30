@@ -108,12 +108,13 @@
                         <links>
                             <link>https://rrd4j.github.io/rrd4j/apidocs/</link>
                             <link>https://junit.org/junit4/javadoc/latest/</link>
-                            <link>https://eclipse.dev/jetty/javadoc/jetty-11/</link>
+                            <link>https://javadoc.jetty.org/jetty-11/</link>
                             <link>https://ws.apache.org/xmlrpc/apidocs/</link>
                             <link>https://stleary.github.io/JSON-java/</link>
                             <link>https://logging.apache.org/log4j/1.2/apidocs/</link>
                             <link>https://commons.apache.org/proper/commons-net/javadocs/api-3.6/</link>
-                            <link>https://commons.apache.org/proper/commons-fileupload/apidocs/</link>
+                            <link>https://javadoc.io/doc/org.apache.commons/commons-fileupload2-core/latest/</link>
+                            <link>https://javadoc.io/doc/org.apache.commons/commons-fileupload2-jakarta-servlet5/latest/</link>
                             <link>https://javadoc.io/doc/org.apache.httpcomponents.client5/httpclient5/5.1/</link>
                             <!-- sometime fails for no reason -->
                             <!--link>https://javadoc.io/doc/com.jayway.jsonpath/json-path/2.4.0</link-->
