@@ -17,6 +17,23 @@
         <dojo.version>1.17.3</dojo.version>
         <dojo.unpacked.dir>${project.basedir}/target/dojo-unpacked</dojo.unpacked.dir>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Vulnerability GHSA-735f-pc8j-v9w8 -->
+            <dependency>
+                <groupId>net.minidev</groupId>
+                <artifactId>json-smart</artifactId>
+                <version>2.5.2</version>
+            </dependency>
+            <!-- Vulnerability GHSA-735f-pc8j-v9w8 -->
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>3.25.5</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
