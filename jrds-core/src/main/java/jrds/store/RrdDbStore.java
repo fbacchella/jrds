@@ -62,10 +62,10 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
 
         private FetchData getFetchData(ExtractInfo ei) throws IOException {
             FetchRequest fr;
-            if (ei.step == 0) {
+            if (ei.step == null) {
                 fr = rrdDb.createFetchRequest(ei.cf, ei.start.getEpochSecond(), ei.end.getEpochSecond());
             } else {
-                fr = rrdDb.createFetchRequest(ei.cf, ei.start.getEpochSecond(), ei.end.getEpochSecond(), ei.step);
+                fr = rrdDb.createFetchRequest(ei.cf, ei.start.getEpochSecond(), ei.end.getEpochSecond(), ei.step.toSeconds());
             }
             return fr.fetchData();
         }
@@ -97,7 +97,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
         def.setVersion(2);
         def.addDatasource(getDsDefs());
         def.addArchive(archives.getArchives());
-        def.setStep(p.getStep());
+        def.setStep(p.getStep().toSeconds());
         return def;
     }
 

@@ -1,6 +1,7 @@
 package jrds.starter;
 
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -33,8 +34,7 @@ public abstract class StarterNode implements StartersSet, InstanceLogger {
      * @param timeout Timeout in seconds.
      * @return The timeout in seconds.
      */
-    @Getter @Setter
-    private int timeout = -1;
+    private Duration timeout = null;
 
     /**
      * The interval between collect.
@@ -43,7 +43,7 @@ public abstract class StarterNode implements StartersSet, InstanceLogger {
      * @return The collect interval in seconds.
      */
     @Getter @Setter
-    private int step = -1;
+    private Duration step = null;
 
     /**
      * The collect time that will generate a warning in logs
@@ -52,7 +52,7 @@ public abstract class StarterNode implements StartersSet, InstanceLogger {
      * @return The slow collect time.
      */
     @Getter @Setter
-    private int slowCollectTime = -1;
+    private Duration slowCollectTime = null;
 
     public StarterNode() {
         if(this instanceof HostsList) {
@@ -67,9 +67,9 @@ public abstract class StarterNode implements StartersSet, InstanceLogger {
     public void setParent(StarterNode parent) {
         root = parent.root;
         this.parent = parent;
-        this.timeout = this.timeout < 0 ? parent.getTimeout() : this.timeout;
-        this.step = this.step < 0 ? parent.getStep() : this.step;
-        this.slowCollectTime = this.slowCollectTime < 0 ? parent.getSlowCollectTime() : this.slowCollectTime;
+        this.timeout = Optional.ofNullable(timeout).orElse(parent.getTimeoutDuration());
+        this.step = Optional.ofNullable(step).orElse(parent.getStep());
+        this.slowCollectTime = Optional.ofNullable(slowCollectTime).orElse(parent.getSlowCollectTime());
     }
 
     public boolean isCollectRunning() {
@@ -316,6 +316,22 @@ public abstract class StarterNode implements StartersSet, InstanceLogger {
     @Deprecated
     public <StarterClass extends Starter> StarterClass find(Class<StarterClass> sc, StarterNode nope) {
         return find(sc);
+    }
+
+    public Duration getTimeoutDuration() {
+        return timeout;
+    }
+
+    public int getTimeout() {
+        return (int) timeout.toSeconds();
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = Duration.ofSeconds(timeout);
+    }
+
+    public void setTimeout(Duration timeout) {
+        this.timeout = timeout;
     }
 
 }

@@ -1,6 +1,7 @@
 package jrds.snmp;
 
 import java.io.IOException;
+import java.time.Duration;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,13 +51,13 @@ public class TestSnmpStarter {
             }
 
             @Override
-            public int getTimeout() {
-                return 1;
+            public Duration getTimeoutDuration() {
+                return Duration.ofSeconds(1);
             }
 
             @Override
-            public int getStep() {
-                return 300;
+            public Duration getStep() {
+                return Duration.ofSeconds(300);
             }
         };
         hl.addHost(h.getHost());
@@ -79,9 +80,9 @@ public class TestSnmpStarter {
     @Test
     public void testSucess() throws IOException {
         HostStarter n1 = new HostStarter(new HostInfo("127.0.0.1"));
-        n1.setTimeout(2);
+        n1.setTimeout(Duration.ofSeconds(2));
         RdsSnmpSimple n2 = new RdsSnmpSimple();
-        n2.setTimeout(2);
+        n2.setTimeout(Duration.ofSeconds(2));
         HostsList hl = registerHost(n1, n2);
 
         agent.run();

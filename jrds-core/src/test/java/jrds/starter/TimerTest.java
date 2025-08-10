@@ -36,18 +36,18 @@ public class TimerTest {
     public void buildDefault() throws IOException {
         PropertiesManager pm = Tools.makePm(testFolder, "timeout=1", "step=5", "slowcollecttime=1");
         Timer t = new Timer(Timer.DEFAULTNAME, pm.timers.get(Timer.DEFAULTNAME));
-        Assert.assertEquals("bad timeout", 1, t.getTimeout());
-        Assert.assertEquals("bad step", 5, t.getStep());
-        Assert.assertEquals("bad slow collect time", 1, t.getSlowCollectTime());
+        Assert.assertEquals("bad timeout", 1000, t.getTimeoutDuration().toMillis());
+        Assert.assertEquals("bad step", 5000, t.getStep().toMillis());
+        Assert.assertEquals("bad slow collect time", 1000, t.getSlowCollectTime().toMillis());
     }
 
     @Test
     public void buildOther() throws IOException {
         PropertiesManager pm = Tools.makePm(testFolder, "timeout=1", "step=5", "timers=slow", "timer.slow.timeout=30", "timer.slow.step=3600", "timer.slow.slowcollecttime=15");
         Timer t = new Timer("slow", pm.timers.get("slow"));
-        Assert.assertEquals("bad timeout", 30, t.getTimeout());
-        Assert.assertEquals("bad step", 3600, t.getStep());
-        Assert.assertEquals("bad slow collect time", 15, t.getSlowCollectTime());
+        Assert.assertEquals("bad timeout", 30000, t.getTimeoutDuration().toMillis());
+        Assert.assertEquals("bad step", 3600000, t.getStep().toMillis());
+        Assert.assertEquals("bad slow collect time", 15000, t.getSlowCollectTime().toMillis());
     }
 
 }

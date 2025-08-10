@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -143,7 +144,7 @@ final public class Tools {
     }
 
     static public Map<String, Timer> getSimpleTimerMap() {
-        PropertiesManager.TimerInfo ti = TimerInfo.builder().numCollectors(1).step(300).timeout(10).build();
+        PropertiesManager.TimerInfo ti = TimerInfo.builder().numCollectors(1).step(Duration.ofSeconds(300)).timeout(Duration.ofSeconds(10)).build();
         Timer t = new Timer(Timer.DEFAULTNAME, ti);
         Map<String, Timer> timerMap = new HashMap<>(1);
         timerMap.put(t.getName(), t);
@@ -151,7 +152,12 @@ final public class Tools {
     }
 
     static public Timer getDefaultTimer() {
-        PropertiesManager.TimerInfo ti = TimerInfo.builder().numCollectors(1).step(300).timeout(10).slowCollectTime(5).build();
+        PropertiesManager.TimerInfo ti = TimerInfo.builder()
+                                                  .numCollectors(1)
+                                                  .step(Duration.ofSeconds(300))
+                                                  .timeout(Duration.ofSeconds(10))
+                                                  .slowCollectTime(Duration.ofSeconds(5))
+                                                  .build();
         return new Timer("TimerTester", ti);
     }
 

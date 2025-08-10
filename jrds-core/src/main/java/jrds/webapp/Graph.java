@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
 
@@ -75,9 +76,9 @@ public final class Graph extends JrdsServlet {
             // No caching, the date might be in the future, a period is
             // requested
             // So the image have short lifetime, just one step
-            int graphStep = graph.getNode().getProbe().getStep();
+            Duration graphStep = graph.getNode().getProbe().getStep();
             if(p.period.getScale() != Period.Scale.MANUAL || !cache) {
-                res.addDateHeader("Expires", new Date().getTime() + graphStep * 1000);
+                res.addDateHeader("Expires", new Date().getTime() + graphStep.toMillis());
             }
             res.addDateHeader("Last-Modified", graph.getEnd().getTime());
             res.addHeader("Content-disposition", "inline; filename=" + graph.getPngName());

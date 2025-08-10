@@ -57,7 +57,7 @@ public class Ntp extends Probe<String, Number> {
         } else {
             try {
                 NTPUDPClient client = find(NtpClientStarter.class).getUdpClient();
-                client.setDefaultTimeout(this.getTimeout() * 1000);
+                client.setDefaultTimeout((int) getTimeoutDuration().toMillis());
                 TimeInfo ti = client.getTime(resolv.getInetAddress(), port);
                 ti.computeDetails();
                 NtpV3Packet pkct = ti.getMessage();

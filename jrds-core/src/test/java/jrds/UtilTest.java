@@ -1,6 +1,7 @@
 package jrds;
 
 import java.io.ByteArrayOutputStream;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -247,8 +248,8 @@ public class UtilTest {
             }
 
             @Override
-            public int getStep() {
-                return 300;
+            public Duration getStep() {
+                return Duration.ofSeconds(300);
             }
         };
         Date now = new Date();
@@ -270,8 +271,8 @@ public class UtilTest {
             }
 
             @Override
-            public int getStep() {
-                return 300;
+            public Duration getStep() {
+                return Duration.ofSeconds(300);
             }
         };
 
@@ -294,8 +295,8 @@ public class UtilTest {
             }
 
             @Override
-            public int getStep() {
-                return 300;
+            public Duration getStep() {
+                return Duration.ofSeconds(300);
             }
         };
 

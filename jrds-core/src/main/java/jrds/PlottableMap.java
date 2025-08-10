@@ -1,5 +1,6 @@
 package jrds;
 
+import java.time.Duration;
 import java.util.HashMap;
 
 import org.rrd4j.data.IPlottable;
@@ -22,7 +23,7 @@ public abstract class PlottableMap extends HashMap<String, IPlottable> {
 
     public static final PlottableMap Empty = new PlottableMap(0) {
         @Override
-        public void configure(long start, long end, long step) {
+        public void configure(long start, long end, Duration step) {
         }
 
         @Override
@@ -52,7 +53,7 @@ public abstract class PlottableMap extends HashMap<String, IPlottable> {
      * @param end the end time, in second
      * @param step the step, in second
      */
-    public abstract void configure(long start, long end, long step);
+    public abstract void configure(long start, long end, Duration step);
 
     public void configure(ExtractInfo ei) {
         configure(ei.start.getEpochSecond(), ei.end.getEpochSecond(), ei.step);

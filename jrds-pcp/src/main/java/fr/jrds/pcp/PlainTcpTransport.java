@@ -10,6 +10,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.time.Duration;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ public class PlainTcpTransport implements Transport {
     private final SocketChannel soc;
     private final Transport.Waiter waiter;
 
-    public PlainTcpTransport(InetSocketAddress isa, long timeout) throws IOException, InterruptedException {
+    public PlainTcpTransport(InetSocketAddress isa, Duration timeout) throws IOException, InterruptedException {
         // Needed because ofNullable won't accept uninitialized variable
         SocketChannel tempsoc = null;
         try {
@@ -46,7 +47,7 @@ public class PlainTcpTransport implements Transport {
         }
     }
 
-    public PlainTcpTransport(SocketChannel soc, long timeout) throws IOException {
+    public PlainTcpTransport(SocketChannel soc, Duration timeout) throws IOException {
         try {
             this.soc = soc;
             soc.setOption(StandardSocketOptions.TCP_NODELAY, true);
@@ -58,11 +59,11 @@ public class PlainTcpTransport implements Transport {
         }
     }
 
-    private Waiter getWaiter(SocketChannel soc, long timeout) {
+    private Waiter getWaiter(SocketChannel soc, Duration timeout) {
         return (op) -> {
             try {
                 SelectionKey key = soc.register(selector, op);
-                selector.select(timeout);
+                selector.select(timeout.toMillis());
                 if ( (key.readyOps() & op) == 0) {
                     if ( Thread.interrupted()) {
                         throw new InterruptedException();

@@ -4,6 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -38,9 +39,13 @@ public class Connection implements Closeable {
 
     private final ProtocolHandler phandler;
 
-    public Connection(InetSocketAddress isa, long timeout) throws IOException, InterruptedException {
+    public Connection(InetSocketAddress isa, Duration timeout) throws IOException, InterruptedException {
         this(new PlainTcpTransport(isa, timeout));
         logger.debug("Connected to {}", isa);
+    }
+
+    public Connection(InetSocketAddress isa, int timeout) throws IOException, InterruptedException {
+        this(isa, Duration.ofSeconds(timeout));
     }
 
     public Connection(Transport trp) {

@@ -85,7 +85,7 @@ public class SnmpConnection extends Connection<Target<? extends Address>> {
             return false;
         }
         snmpTarget.setVersion(version);
-        snmpTarget.setTimeout(getLevel().getTimeout() * 1000L / 2);
+        snmpTarget.setTimeout(getLevel().getTimeoutDuration().toMillis());
         snmpTarget.setRetries(1);
         try {
             doValueCache();

@@ -51,7 +51,7 @@ public class SnmpConfigurator extends ModuleConfigurator {
 
     @Override
     public Object configure(PropertiesManager pm) {
-        SNMP4JSettings.setDefaultTimeoutMillis(pm.timeout * 1000L);
+        SNMP4JSettings.setDefaultTimeoutMillis(pm.timeout.toMillis());
         SNMP4JSettings.setAllowSNMPv2InV1(true);
         SnmpCollectResolver.oidmapping.clear();
         // Try to resolve OID from a simple properties file

@@ -2,6 +2,7 @@ package jrds.mockobjects;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -29,17 +30,17 @@ public class MokeProbe<A, B> extends Probe<A, B> {
 
     public MokeProbe(String probeType) {
         this.probeType = probeType;
-        setStep(300);
+        setStep(Duration.ofSeconds(300));
     }
 
     public MokeProbe(ProbeDesc<A> pd) {
         probeType = pd.getName();
         setPd(pd);
-        setStep(300);
+        setStep(Duration.ofSeconds(300));
     }
 
     public MokeProbe() {
-        setStep(300);
+        setStep(Duration.ofSeconds(300));
     }
 
     public void configure(Class<? extends Probe<?, ?>> originalProbe) {

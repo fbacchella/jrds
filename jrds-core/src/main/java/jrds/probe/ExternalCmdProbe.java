@@ -175,7 +175,7 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
                 BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(stdout));
                 perfstring = stdoutReader.readLine();
             }
-            needsToKill = ! perfProcess.waitFor(getTimeout(), TimeUnit.SECONDS);
+            needsToKill = ! perfProcess.waitFor(getTimeoutDuration().toMillis(), TimeUnit.MILLISECONDS);
             if (perfProcess.exitValue() != 0) {
                 perfstring = null;
                 log(Level.ERROR, " command '%s %s' failed with status %s", cmd, arguments, perfProcess.exitValue());

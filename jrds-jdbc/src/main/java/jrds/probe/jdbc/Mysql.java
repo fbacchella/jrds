@@ -77,8 +77,8 @@ public abstract class Mysql extends JdbcProbe {
             @Override
             public Properties getProperties() {
                 Properties p = super.getProperties();
-                p.put("connectTimeout", getTimeout() * 1000);
-                p.put("socketTimeout", getTimeout() * 1000);
+                p.put("connectTimeout", getTimeoutDuration().toMillis());
+                p.put("socketTimeout", getTimeoutDuration().toMillis());
                 p.put("serverTimezone", "UTC");
                 return p;
             }

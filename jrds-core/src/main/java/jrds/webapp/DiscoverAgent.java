@@ -1,5 +1,6 @@
 package jrds.webapp;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -65,7 +66,7 @@ public abstract class DiscoverAgent implements InstanceLogger{
 
     private final Logger namedLogger;
     final Set<Class<?>> validClasses;
-    private int timeout;
+    private Duration timeout;
 
     protected DiscoverAgent(String name, Class<?>... validClasses) {
         namedLogger = LoggerFactory.getLogger("jrds.DiscoverAgent." + name);
@@ -189,11 +190,11 @@ public abstract class DiscoverAgent implements InstanceLogger{
         }
     }
 
-    public int getTimeout() {
+    public Duration getTimeout() {
         return timeout;
     }
 
-    public void setTimeout(int timeout) {
+    public void setTimeout(Duration timeout) {
         this.timeout = timeout;
     }
 

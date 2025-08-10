@@ -5,6 +5,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.util.Date;
 import java.util.Map;
 
@@ -130,7 +131,7 @@ public class Graph implements WithACL {
             PlottableMap customData = node.getCustomData();
             if(customData != null) {
                 long step = Math.max((endsec - startsec) / gd.getWidth(), 1);
-                customData.configure(startsec, endsec, step);
+                customData.configure(startsec, endsec, Duration.ofSeconds(step));
             }
             setGraphDefData(graphDef, node.getProbe(), ei, customData);
             if(gd.withLegend())
@@ -271,7 +272,7 @@ public class Graph implements WithACL {
      * @param start the start to set
      */
     public void setStart(Date start) {
-        long step = getNode().getProbe().getStep();
+        long step = getNode().getProbe().getStep().getSeconds();
         this.start = new Date(org.rrd4j.core.Util.normalize(start.getTime() / 1000L, step) * 1000L);
     }
 

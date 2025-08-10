@@ -107,7 +107,7 @@ public class RRDToolStore extends AbstractStore<RRDatabase> {
             @Override
             public void fill(DataHolder gd, ExtractInfo ei) {
                 try {
-                    DataChunk dc = db.getData(ConsolidationFunctionType.AVERAGE, ei.start.getEpochSecond(), ei.end.getEpochSecond(), ei.step);
+                    DataChunk dc = db.getData(ConsolidationFunctionType.AVERAGE, ei.start.getEpochSecond(), ei.end.getEpochSecond(), ei.step.toSeconds());
                     for (Map.Entry<String, String> e : sources.entrySet()) {
                         gd.datasource(e.getKey(), dc.toPlottable(e.getValue()));
                     }

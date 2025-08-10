@@ -61,7 +61,7 @@ public class LdapConnection extends Connection<DirContext> {
             env.put(Context.SECURITY_PRINCIPAL, binddn);
             env.put(Context.SECURITY_CREDENTIALS, password);
         }
-        env.put("com.sun.jndi.ldap.connect.timeout", "" + getTimeout() * 1000);
+        env.put("com.sun.jndi.ldap.connect.timeout", "" + getTimeoutDuration().toMillis());
 
         try {
             dctx = new InitialDirContext(env);

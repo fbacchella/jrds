@@ -214,7 +214,7 @@ public class IpmiDiscoverAgent extends DiscoverAgent {
 
             IpmiConnector connector = new IpmiConnector(0);
             ConnectionHandle handle = connector.createConnection(InetAddress.getByName(bmcname));
-            connector.setTimeout(handle, getTimeout() * 1000);
+            connector.setTimeout(handle, (int) getTimeout().toMillis());
             CipherSuite cs;
             // Get cipher suites supported by the remote host
             List<CipherSuite> suites = connector.getAvailableCipherSuites(handle);

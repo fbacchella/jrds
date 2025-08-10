@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.IllegalFormatConversionException;
 import java.util.List;
@@ -114,27 +115,27 @@ public class HttpClientStarter extends Starter {
 
     @Override
     public boolean start() {
-        int timeout = getLevel().getTimeout();
-        int step = getLevel().getStep();
+        int timeout = (int)getLevel().getTimeoutDuration().toMillis();
+        Duration step = getLevel().getStep();
 
         HttpClientBuilder builder = HttpClientBuilder.create();
         builder.setUserAgent(USERAGENT);
-        builder.setConnectionTimeToLive(step, TimeUnit.SECONDS);
-        builder.evictIdleConnections(step, TimeUnit.SECONDS);
+        builder.setConnectionTimeToLive(step.toMillis(), TimeUnit.MILLISECONDS);
+        builder.evictIdleConnections(step.toMillis(), TimeUnit.MILLISECONDS);
         try {
             builder.setSSLContext(getSSLSocketFactory());
         } catch (NoSuchAlgorithmException e) {
             log(Level.ERROR, "No default SSLContext available", e);
         }
-        builder.setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(timeout * 1000).setTcpNoDelay(true).build());
+        builder.setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(timeout).setTcpNoDelay(true).build());
         builder.setConnectionManagerShared(false);
         builder.setMaxConnPerRoute(2);
         builder.setMaxConnTotal(maxConnect * 2);
 
         RequestConfig rc = RequestConfig.custom()
-                        .setConnectionRequestTimeout(timeout * 1000)
-                        .setConnectTimeout(timeout * 1000)
-                        .setSocketTimeout(timeout * 1000)
+                        .setConnectionRequestTimeout(timeout)
+                        .setConnectTimeout(timeout)
+                        .setSocketTimeout(timeout)
                         .build();
         builder.setDefaultRequestConfig(rc);
 

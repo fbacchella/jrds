@@ -46,7 +46,7 @@ public final class CheckValues extends JrdsServlet {
         HostsList hl = getHostsList();
         ParamsBean params = new ParamsBean(req, hl, "host", "probe", "dsname", "period", "cf");
 
-        long period = jrds.Util.parseStringNumber(params.getValue("period"), (long) hl.getStep());
+        long period = jrds.Util.parseStringNumber(params.getValue("period"), (long) hl.getStep().toSeconds());
         String cfName = params.getValue("cf");
         if(cfName == null || cfName.trim().isEmpty())
             cfName = "AVERAGE";
@@ -79,9 +79,9 @@ public final class CheckValues extends JrdsServlet {
         ServletOutputStream out = res.getOutputStream();
 
         Date lastupdate = p.getLastUpdate();
-        long age = (new Date().getTime() - lastupdate.getTime()) / 1000;
+        long age = (new Date().getTime() - lastupdate.getTime());
         // It the last update is too old, it fails
-        if(age > p.getStep() * 2) {
+        if(age > p.getStep().toMillis() * 2) {
             out.println("Probe too old: " + age);
             return;
         }

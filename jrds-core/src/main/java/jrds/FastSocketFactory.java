@@ -7,32 +7,37 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.rmi.server.RMIClientSocketFactory;
+import java.time.Duration;
 
 import javax.net.SocketFactory;
 
 public class FastSocketFactory extends SocketFactory {
 
     private static class FastSocket extends Socket {
-        private final int timeout;
+        private final Duration timeout;
         /**
          * Only this creator is allowed, otherwise connect will be called with a 0 (uninitialized) value
          * @param timeout
          * @throws SocketException
          */
-        public FastSocket(int timeout) throws SocketException {
+        public FastSocket(Duration timeout) throws SocketException {
             this.timeout = timeout;
-            setSoTimeout(timeout);
+            setSoTimeout((int) timeout.toMillis());
             setTcpNoDelay(true);
         }
         public void connect(SocketAddress endpoint) throws IOException {
-            super.connect(endpoint, timeout);
+            super.connect(endpoint, (int) timeout.toMillis());
         }
     }
 
-    private final int timeout;
+    private final Duration timeout;
+
+    public FastSocketFactory(Duration timeout) {
+        this.timeout = timeout;
+    }
 
     public FastSocketFactory(int timeout) {
-        this.timeout = timeout * 1000;
+        this.timeout = Duration.ofSeconds(timeout);
     }
 
     @Override

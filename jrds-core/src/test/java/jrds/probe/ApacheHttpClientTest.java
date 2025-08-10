@@ -3,6 +3,7 @@ package jrds.probe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 
@@ -109,7 +110,7 @@ public class ApacheHttpClientTest {
         localhost.setParent(t);
         localhost.getHost().setHostDir(testFolder.getRoot());
         t.registerStarter(new SSLStarter());
-        t.registerStarter(new SocketFactory(1));
+        t.registerStarter(new SocketFactory(Duration.ofSeconds(1)));
         t.configureStarters(pm);
         if (start) {
             localhost.find(Resolver.class).doStart();

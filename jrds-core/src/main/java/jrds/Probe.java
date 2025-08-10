@@ -1,6 +1,7 @@
 package jrds;
 
 import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -380,15 +381,15 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
                 stopCollect();
             }
             long end = System.currentTimeMillis();
+            Duration collectDuration = Duration.ofMillis(end - start);
             if (failed) {
-                float elapsed = ((float) (end - start)) / 1000;
-                log(Level.DEBUG, "Failed after %.2fs", elapsed);
+                log(Level.DEBUG, "Failed after %.2fs", collectDuration.toSeconds() / 1000.0);
             } else {
                 Timer timer = (Timer) getParent().getParent();
-                if((end - start) > (timer.getSlowCollectTime() * 1000)) {
-                    log(Level.WARN, "Slow collect time %.0fs", 1.0 * (end - start) / 1000);
+                if (collectDuration.compareTo(timer.getSlowCollectTime()) > 0) {
+                    log(Level.WARN, "Slow collect time %.0fs", collectDuration.toSeconds() / 1000.0);
                 } else {
-                    log(Level.DEBUG, "Collect ran for %dms", (end - start));
+                    log(Level.DEBUG, "Collect ran for %dms", collectDuration.toMillis());
                 }
             }
             running = false;
@@ -501,7 +502,7 @@ public abstract class Probe<KeyType, ValueType> extends StarterNode implements C
     }
 
     public long getRequiredUptime() {
-        return Math.max(getStep() * 2L, 60L);
+        return Math.max(getStep().getSeconds() * 3L, 60L);
     }
 
     /**

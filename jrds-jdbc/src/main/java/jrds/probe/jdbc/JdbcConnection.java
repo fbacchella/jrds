@@ -1,6 +1,5 @@
 package jrds.probe.jdbc;
 
-import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -84,7 +83,7 @@ public class JdbcConnection extends Connection<Statement> {
             p.put("user", user);
             p.put("password", passwd);
             try {
-                DriverManager.setLoginTimeout(getTimeout());
+                DriverManager.setLoginTimeout((int) getTimeoutDuration().toSeconds());
                 con = DriverManager.getConnection(url, p);
                 started = true;
             } catch (SQLException e) {

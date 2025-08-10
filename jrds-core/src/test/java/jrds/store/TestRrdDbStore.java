@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
@@ -82,10 +83,10 @@ public class TestRrdDbStore {
     @Test
     public void testStepChanged() throws Exception {
         Probe<String, Number> p = GenerateProbe.quickProbe(testFolder, GenerateProbe.ChainedMap.start(0));
-        p.setStep(30);
+        p.setStep(Duration.ofSeconds(30));
         p.getPd().add("test1", DsType.COUNTER);
         Assert.assertTrue("Probe file creation failed", p.checkStore());
-        p.setStep(60);
+        p.setStep(Duration.ofSeconds(60));
         p.getPd().add("test1", DsType.COUNTER);
         Assert.assertFalse("Probe file creation should have failed", p.checkStore());
     }
@@ -106,7 +107,7 @@ public class TestRrdDbStore {
     @Test
     public void testFill() throws Exception {
         Probe<String, Number> p = GenerateProbe.quickProbe(testFolder);
-        p.setStep(30);
+        p.setStep(Duration.ofSeconds(30));
         p.getPd().add("test", DsType.GAUGE);
         Assert.assertTrue("Probe file creation failed", p.checkStore());
         Extractor e = p.getMainStore().getExtractor();
@@ -116,20 +117,20 @@ public class TestRrdDbStore {
         long start = p.getLastUpdate().getTime();
         for(int i = 1; i <= 30; i++) {
             JrdsSample s = p.newSample();
-            long sampletime = i * p.getStep() * 1000 + start;
-            sampletime = (sampletime) - (sampletime % (p.getStep() * 1000));
+            long sampletime = i * p.getStep().toMillis() + start;
+            sampletime = (sampletime) - (sampletime % (p.getStep().toMillis()));
             s.setTime(new Date(sampletime));
             s.put("test", i);
             p.getMainStore().commit(s);
         }
-        ExtractInfo ei = ExtractInfo.builder().interval(Instant.ofEpochMilli(start), Instant.ofEpochMilli(start + 30 * p.getStep() * 1000)).build();
+        ExtractInfo ei = ExtractInfo.builder().interval(Instant.ofEpochMilli(start), Instant.ofEpochMilli(start + 30 * p.getStep().toMillis())).build();
         DataProcessor dp = p.extract(ei);
         double[][] values = dp.getValues();
         for(int i = 1; i <= 30; i++) {
             // Check raw values
             Assert.assertEquals("Wrong values stored", i, values[0][i], 1e-10);
-            long sampletime = i * p.getStep() * 1000 + start;
-            sampletime = (sampletime) - (sampletime % (p.getStep() * 1000));
+            long sampletime = i * p.getStep().toMillis() + start;
+            sampletime = (sampletime) - (sampletime % (p.getStep().toMillis()));
         }
     }
 

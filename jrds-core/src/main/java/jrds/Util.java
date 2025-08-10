@@ -189,13 +189,12 @@ public class Util {
     public static Date endDate(Probe<?, ?> p, Date endDate) {
         // Date normalized = endDate;
         // We normalize the last update time, it can't be used directly
-        long step = p.getStep();
         Date lastUpdate = p.getLastUpdate();
 
         // We dont want to graph past the last normalized update time
         // but only if we are within a step interval
-        if(Math.abs(endDate.getTime() - lastUpdate.getTime()) <= (step * 1000L))
-            return normalize(lastUpdate, step);
+        if(Math.abs(endDate.getTime() - lastUpdate.getTime()) <= p.getStep().toMillis())
+            return normalize(lastUpdate, p.getStep().toSeconds());
 
         // Else rrd4j will manage the normalization itself
         return endDate;

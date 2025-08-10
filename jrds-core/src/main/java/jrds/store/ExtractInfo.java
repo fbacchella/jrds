@@ -1,6 +1,7 @@
 package jrds.store;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
@@ -18,7 +19,7 @@ public class ExtractInfo {
         private ExtractInfoBuilder() {
             start = Instant.now();
             end = Instant.now();
-            step = 0;
+            step = Duration.ofSeconds(1);
             ds = "";
             cf = ConsolFun.AVERAGE;
         }
@@ -32,11 +33,7 @@ public class ExtractInfo {
             this.end = end;
             return this;
         }
-        public ExtractInfoBuilder step(int step) {
-            this.step = step;
-            return this;
-        }
-        public ExtractInfoBuilder step(long step) {
+        public ExtractInfoBuilder step(Duration step) {
             this.step = step;
             return this;
         }
@@ -44,7 +41,7 @@ public class ExtractInfo {
 
     public final Instant start;
     public final Instant end;
-    public final long step;
+    public final Duration step;
     public final String ds;
     public final ConsolFun cf;
 
@@ -61,8 +58,8 @@ public class ExtractInfo {
     
     public final DataProcessor getDataProcessor() {
         DataProcessor dp = new DataProcessor(start.getEpochSecond(), end.getEpochSecond());
-        if (step != 0) {
-            dp.setStep(step);
+        if (step != null) {
+            dp.setStep(step.toSeconds());
         }
         return dp;
     }

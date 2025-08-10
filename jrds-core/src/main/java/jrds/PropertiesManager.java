@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -51,10 +52,10 @@ public class PropertiesManager extends Properties {
 
     @Builder
     public static final class TimerInfo {
-        public final int step;
-        public final int timeout;
+        public final Duration step;
+        public final Duration timeout;
         public final int numCollectors;
-        public final int slowCollectTime;
+        public final Duration slowCollectTime;
     }
 
     private static final class JrdsClassLoader extends URLClassLoader {
@@ -94,6 +95,29 @@ public class PropertiesManager extends Properties {
             return integer;
         }
         throw new NumberFormatException("Parsing null string");
+    }
+
+    private static final Pattern PATTERN = Pattern.compile("^(\\d+)(s|ms|m|h|d)?$");
+    private Duration parseDuration(String s) {
+        if (s == null) {
+            throw new NumberFormatException("Parsing null string");
+        }
+        Matcher matcher = PATTERN.matcher(s.trim());
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Invalid duration format: " + s);
+        }
+
+        long value = Long.parseLong(matcher.group(1));
+        String unit = Optional.ofNullable(matcher.group(2)).orElse("s");
+
+        switch (unit) {
+        case "s": return Duration.ofSeconds(value);
+        case "ms": return Duration.ofMillis(value);
+        case "m": return Duration.ofMinutes(value);
+        case "h": return Duration.ofHours(value);
+        case "d": return Duration.ofDays(value);
+        default: throw new IllegalArgumentException("Unknown time unit: " + unit);
+        }
     }
 
     public boolean parseBoolean(String s) {
@@ -394,24 +418,24 @@ public class PropertiesManager extends Properties {
         }
 
         // Configure the timers
-        step = parseInteger(getProperty("step", "300"));
-        timeout = parseInteger(getProperty("timeout", "10"));
+        step = parseDuration(getProperty("step", "300"));
+        timeout = parseDuration(getProperty("timeout", "10"));
+        slowcollecttime = parseDuration(getProperty("slowcollecttime", Long.toString(timeout.getSeconds() + 1)));
         numCollectors = parseInteger(getProperty("collectorThreads", "1"));
-        slowcollecttime = parseInteger(getProperty("slowcollecttime", Integer.toString(timeout + 1)));
         String propertiesList = getProperty("timers", "");
-        if (timeout * 2 >= step) {
+        if (timeout.toMillis() * 2 >= step.toMillis()) {
             logger.warn("useless default timer, step must be more than twice the timeout");
         }
         if (!propertiesList.trim().isEmpty()) {
             for (String timerName: propertiesList.split(",")) {
                 timerName = timerName.trim();
                 TimerInfo ti = TimerInfo.builder()
-                                .step(parseInteger(getProperty("timer." + timerName + ".step", Integer.toString(step))))
-                                .timeout(parseInteger(getProperty("timer." + timerName + ".timeout", Integer.toString(timeout))))
+                                .step(parseDuration(getProperty("timer." + timerName + ".step", Long.toString(step.getSeconds()))))
+                                .timeout(parseDuration(getProperty("timer." + timerName + ".timeout", Long.toString(timeout.getSeconds()))))
                                 .numCollectors(parseInteger(getProperty("timer." + timerName + ".collectorThreads", Integer.toString(numCollectors))))
-                                .slowCollectTime(parseInteger(getProperty("timer." + timerName + ".slowcollecttime", Integer.toString(slowcollecttime))))
+                                .slowCollectTime(parseDuration(getProperty("timer." + timerName + ".slowcollecttime", Long.toString(slowcollecttime.getSeconds()))))
                                 .build();
-                if (ti.timeout * 2 >= ti.step) {
+                if (ti.timeout.toMillis() * 2 >= ti.step.toMillis()) {
                     logger.warn("useless timer {}, step must be more than the timeout", timerName);
                     break;
                 }
@@ -497,8 +521,9 @@ public class PropertiesManager extends Properties {
     public File rrddir;
     public File tmpdir;
     public String urlpngroot;
-    public int slowcollecttime;
-    public int step;
+    public Duration slowcollecttime;
+    public Duration step;
+    public Duration timeout;
     public Map<String, TimerInfo> timers = new HashMap<>();
     public int numCollectors;
     public final Set<URI> libspath = new HashSet<>();
@@ -506,7 +531,6 @@ public class PropertiesManager extends Properties {
     public ClassLoader extensionClassLoader = getClass().getClassLoader();
     public boolean legacymode;
     public boolean autocreate;
-    public int timeout;
     public boolean security = false;
     public String userfile = "/dev/zero";
     public Set<String> defaultRoles = Collections.emptySet();

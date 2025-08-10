@@ -1,5 +1,6 @@
 package jrds.probe.jmx;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,7 +33,7 @@ public class JmxDiscoverAgent extends DiscoverAgent {
         }
 
         @Override
-        public int getTimeout() {
+        public Duration getTimeoutDuration() {
             return JmxDiscoverAgent.this.getTimeout();
         }
 

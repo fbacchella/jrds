@@ -1,5 +1,6 @@
 package jrds.store;
 
+import java.time.Duration;
 import java.util.Date;
 
 import org.junit.Assert;
@@ -11,7 +12,7 @@ public class TestExtractInfo {
     @Test
     public void test1() {
         Date now = new Date();
-        ExtractInfo ei = ExtractInfo.builder().interval(now, now).step(1).ds("ds").cf(ConsolFun.MAX).build();
+        ExtractInfo ei = ExtractInfo.builder().interval(now, now).step(Duration.ofSeconds(1)).ds("ds").cf(ConsolFun.MAX).build();
         Assert.assertEquals(now.getTime(), ei.start.toEpochMilli());
         Assert.assertEquals(now.getTime(), ei.end.toEpochMilli());
         Assert.assertEquals("ds", ei.ds);

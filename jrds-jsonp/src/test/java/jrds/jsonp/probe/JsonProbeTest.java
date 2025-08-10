@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -63,6 +64,7 @@ public class JsonProbeTest {
             }
         };
         HostStarter host = new HostStarter(new HostInfo("moke", "127.0.0.1"));
+        host.setStep(Duration.ofSeconds(1));
         ProbeDesc<String> pd = jrds.configuration.GeneratorHelper.getProbeDesc(Tools.parseRessource("httpjsonprobedesc.xml"));
         p.setHost(host);
         p.setPd(pd);

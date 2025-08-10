@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.rmi.RemoteException;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -167,7 +168,8 @@ public class JmxConnexionTest {
                 return logrule.getTestlogger();
             }
         };
-        top.setTimeout(1);
+        top.setTimeout(Duration.ofSeconds(1));
+        top.setStep(Duration.ofSeconds(1));
         int port = findPort();
         Assert.assertTrue("can't allocate port " + port, port >= 32767);
         start.accept(port);
@@ -177,7 +179,7 @@ public class JmxConnexionTest {
             HostStarter host = new HostStarter(hi);
             JMXConnection cnx = getCnx(proto, port);
             host.setParent(top);
-            host.registerStarter(new SocketFactory(1));
+            host.registerStarter(new SocketFactory(Duration.ofSeconds(1)));
             host.registerStarter(new JmxSocketFactory());
             host.registerStarter(cnx);
             host.configureStarters(pm);

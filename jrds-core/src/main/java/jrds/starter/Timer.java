@@ -1,5 +1,6 @@
 package jrds.starter;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -130,7 +131,7 @@ public class Timer extends StarterNode {
                 MDC.remove("timer");
             }
         };
-        collectTimer.scheduleAtFixedRate(collector, getTimeout() * 1000L, getStep() * 1000L);
+        collectTimer.scheduleAtFixedRate(collector, getTimeoutDuration().toMillis(), getStep().toMillis());
         MDC.remove("timer");
     }
 
@@ -150,7 +151,7 @@ public class Timer extends StarterNode {
         log(Level.DEBUG, "One collect is launched");
         Date start = new Date();
         try {
-            if (!collectMutex.tryAcquire(getTimeout(), TimeUnit.SECONDS)) {
+            if (!collectMutex.tryAcquire(getTimeoutDuration().toMillis(), TimeUnit.MILLISECONDS)) {
                 log(Level.ERROR, "A collect failed because a start time out");
                 return;
             }
@@ -179,7 +180,7 @@ public class Timer extends StarterNode {
             return t;
         };
 
-        long maxCollectTime = (getStep() - getTimeout());
+        Duration maxCollectTime = getStep().minus(getTimeoutDuration());
         ThreadPoolExecutor tpool = new ThreadPoolExecutor(numCollectors, numCollectors, 1, TimeUnit.SECONDS, new ArrayBlockingQueue<>(toSchedule.size()), tf);
         tpool.allowCoreThreadTimeOut(true);
         try {
@@ -188,7 +189,7 @@ public class Timer extends StarterNode {
                 toSchedule.stream().forEach(tpool::execute);
                 tpool.shutdown();
                 collectThread = Thread.currentThread();
-                boolean terminated = tpool.awaitTermination(maxCollectTime, TimeUnit.SECONDS);
+                boolean terminated = tpool.awaitTermination(maxCollectTime.toMillis(), TimeUnit.MILLISECONDS);
                 if (!terminated) {
                     log(Level.ERROR, "Unfinished collect, lost %d tasks", tpool.getQueue().size());
                 }
@@ -210,7 +211,7 @@ public class Timer extends StarterNode {
                 tpool.shutdownNow();
                 String missedMessage = missed == 0 ? "" : ", missed " + missed + " hosts";
                 try {
-                    if (! tpool.awaitTermination(getTimeout(), TimeUnit.SECONDS)) {
+                    if (! tpool.awaitTermination(getTimeoutDuration().toMillis(), TimeUnit.MILLISECONDS)) {
                         log(Level.ERROR, "Lost collect" + missedMessage);
                     }
                 } catch (InterruptedException e) {

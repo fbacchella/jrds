@@ -90,7 +90,8 @@ public class TestSum {
         LinearInterpolator li = new LinearInterpolator(dp.getTimestamps(), dp.getValues("shade"));
         Assert.assertTrue("datasource shade not found", ppm.containsKey("shade"));
         Assert.assertTrue("datasource shade not found", ppm.containsKey("sun"));
-        for(long i = begin; i < end - Full.STEP; i += Full.STEP) {
+        long step = Full.STEP.toSeconds();
+        for(long i = begin; i < end - step; i += step) {
             Assert.assertEquals("Sum get wrong value", ppm.get("shade").getValue(i), li.getValue(i), 1e-7);
         }
 

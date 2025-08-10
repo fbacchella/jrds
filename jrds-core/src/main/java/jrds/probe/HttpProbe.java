@@ -176,8 +176,8 @@ public abstract class HttpProbe<KeyType> extends Probe<KeyType, Number> implemen
         URLConnection cnx;
         try {
             cnx = getUrl().openConnection();
-            cnx.setConnectTimeout(getTimeout() * 1000);
-            cnx.setReadTimeout(getTimeout() * 1000);
+            cnx.setConnectTimeout((int) getTimeoutDuration().toMillis());
+            cnx.setReadTimeout((int) getTimeoutDuration().toMillis());
             cnx.connect();
         } catch (IOException e) {
             log(Level.ERROR, e, "Connection to %s failed: %s", getUrl(), e);

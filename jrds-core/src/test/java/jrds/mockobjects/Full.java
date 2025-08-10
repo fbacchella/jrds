@@ -2,6 +2,7 @@ package jrds.mockobjects;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
+import java.time.Duration;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -30,7 +31,7 @@ public class Full {
 
     static public final long START = Util.getTimestamp(2003, 4, 1);
     static public final long END = Util.getTimestamp(2003, 5, 1);
-    static public final int STEP = 300;
+    static public final Duration STEP = Duration.ofSeconds(300);
 
     static final int IMG_WIDTH = 500;
     static final int IMG_HEIGHT = 300;
@@ -76,7 +77,7 @@ public class Full {
 
     }
 
-    static public Probe<?, ?> create(TemporaryFolder testFolder, int step) throws InvocationTargetException {
+    static public Probe<?, ?> create(TemporaryFolder testFolder, Duration step) throws InvocationTargetException {
         HostInfo host = new HostInfo("Empty");
         host.setHostDir(testFolder.getRoot());
 
@@ -109,7 +110,7 @@ public class Full {
             sample.put("sun", sunSource.getValue());
             sample.put("shade", shadeSource.getValue());
             p.getMainStore().commit(sample);
-            t += RANDOM.nextDouble() * STEP + 1;
+            t += RANDOM.nextDouble() * STEP.toSeconds() + 1;
         }
         store.closeStoreObject(o);
         return t;
@@ -122,7 +123,7 @@ public class Full {
         calBegin.add(Calendar.MONTH, -1);
         Date begin = calBegin.getTime();
 
-        end = jrds.Util.normalize(end, p.getStep());
+        end = jrds.Util.normalize(end, p.getStep().toSeconds());
 
         Period pr = null;
         try {

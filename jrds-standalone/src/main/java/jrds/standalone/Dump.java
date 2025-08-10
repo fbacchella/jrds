@@ -2,6 +2,7 @@ package jrds.standalone;
 
 import java.io.File;
 import java.io.FileReader;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
@@ -43,7 +44,7 @@ public class Dump extends CommandStarterImpl {
         HostsList hostsList = new HostsList(propertiesManager);
         Date now = new Date();
         Date start = new Date(now.getTime() - 10000000);
-        long step = 100;
+        Duration step = Duration.ofSeconds(100);
         ExtractInfo ei = ExtractInfo.builder().cf(ConsolFun.AVERAGE).interval(start, now).step(step).build();
         for (HostInfo hi: hostsList.getHosts()) {
             System.out.println(hi.getName());

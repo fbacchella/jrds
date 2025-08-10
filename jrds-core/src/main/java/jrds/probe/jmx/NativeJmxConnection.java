@@ -121,11 +121,11 @@ public class NativeJmxConnection extends AbstractJmxConnection<MBeanServerConnec
                 String[] credentials = new String[] { user, password };
                 attributes.put("jmx.remote.credentials", credentials);
             }
-            attributes.put("jmx.remote.x.request.timeout", getTimeout() * 1000);
-            attributes.put("jmx.remote.x.server.side.connecting.timeout", getTimeout() * 1000);
-            attributes.put("jmx.remote.x.client.connected.state.timeout", getTimeout() * 1000);
+            attributes.put("jmx.remote.x.request.timeout", getTimeoutDuration().toMillis());
+            attributes.put("jmx.remote.x.server.side.connecting.timeout", getTimeoutDuration().toMillis());
+            attributes.put("jmx.remote.x.client.connected.state.timeout", getTimeoutDuration().toMillis());
             if (protocol == JmxProtocol.rmi) {
-                attributes.put("sun.rmi.transport.tcp.responseTimeout", getTimeout() * 1000);
+                attributes.put("sun.rmi.transport.tcp.responseTimeout", getTimeoutDuration().toMillis());
                 attributes.put("com.sun.jndi.rmi.factory.socket", getLevel().find(JmxSocketFactory.class).getFactory());
             } else if (protocol == JmxProtocol.jmxmp) {
                 Object sc = JrdsSocketConnection.create(url, getLevel().find(SocketFactory.class));

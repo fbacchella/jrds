@@ -2,6 +2,7 @@ package jrds.graphe;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 
 import org.rrd4j.core.jrrd.ConsolidationFunctionType;
 import org.rrd4j.core.jrrd.DataChunk;
@@ -30,9 +31,9 @@ public class RRDToolGraphNode extends GraphNode {
     public Graph getGraph() {
         PlottableMap pp = new PlottableMap() {
             @Override
-            public void configure(long start, long end, long step) {
+            public void configure(long start, long end, Duration step) {
                 try (RRDatabase db = new RRDatabase(rrdpath)){
-                    DataChunk chunck = db.getData(ConsolidationFunctionType.AVERAGE, start, end, step);
+                    DataChunk chunck = db.getData(ConsolidationFunctionType.AVERAGE, start, end, step.toSeconds());
                     for(String name: db.getDataSourcesName()) {
                         put(name, chunck.toPlottable(name));
                     }

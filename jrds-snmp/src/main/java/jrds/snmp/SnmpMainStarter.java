@@ -6,6 +6,7 @@ package jrds.snmp;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.time.Duration;
 
 import org.slf4j.event.Level;
 import org.snmp4j.MessageDispatcher;
@@ -22,17 +23,17 @@ import jrds.starter.Starter;
 public class SnmpMainStarter extends Starter {
 
     private static class CustomUdpTransportMapping extends DefaultUdpTransportMapping {
-        private final int timeout;
+        private final Duration timeout;
         private final int bufferSize;
-        public CustomUdpTransportMapping(int timeout, int bufferSize) throws SocketException {
+        public CustomUdpTransportMapping(Duration timeout, int bufferSize) throws SocketException {
             this.timeout = timeout;
             this.bufferSize = bufferSize;
         }
         @Override
         protected synchronized DatagramSocket ensureSocket() throws SocketException {
             DatagramSocket ds = super.ensureSocket();
-            if (timeout > 0) {
-                ds.setSoTimeout(timeout);
+            if (timeout != null) {
+                ds.setSoTimeout((int) timeout.toMillis());
             }
             if (bufferSize > 0) {
                 ds.setReceiveBufferSize(bufferSize);
@@ -52,10 +53,10 @@ public class SnmpMainStarter extends Starter {
             DefaultTcpTransportMapping ttm = new DefaultTcpTransportMapping();
             ttm.setServerEnabled(false);
             ttm.addTransportListener(md);
-            ttm.setConnectionTimeout(getLevel().getTimeout() * 1000L);
+            ttm.setConnectionTimeout(getLevel().getTimeoutDuration().toMillis());
             md.addTransportMapping(ttm);
             // Don't use UdpTransportMapping.setSocketTimeout(), it introduce long shutdown time
-            DefaultUdpTransportMapping utm = new CustomUdpTransportMapping(getLevel().getTimeout(), -1);
+            DefaultUdpTransportMapping utm = new CustomUdpTransportMapping(getLevel().getTimeoutDuration(), -1);
             md.addTransportMapping(utm);
             utm.addTransportListener(md);
             snmp = new Snmp(md);

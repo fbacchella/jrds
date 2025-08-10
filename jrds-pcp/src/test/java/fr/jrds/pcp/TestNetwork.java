@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Set;
 
@@ -16,14 +17,17 @@ import org.junit.Test;
 
 public class TestNetwork extends Tester {
 
-    @Test(expected = IOException.class, timeout=3000)
-    public void timeout() throws IOException, InterruptedException {
-        try (Connection cnx = new Connection(new InetSocketAddress(InetAddress.getByName("169.254.1.1"), 44321), 2000)) {
-        }
+    @Test(timeout=3000)
+    public void timeout() {
+        IOException ex = Assert.assertThrows(IOException.class, () -> {
+            try (Connection cnx = new Connection(new InetSocketAddress(InetAddress.getByName("169.254.1.1"), 44321), Duration.ofSeconds(2))) {
+            }
+        });
+        Assert.assertEquals("Interrupted by timeout", ex.getMessage());
     }
 
-    @Test(expected = InterruptedException.class, timeout=3000)
-    public void interrupted() throws IOException, InterruptedException {
+    @Test(timeout=3000)
+    public void interrupted(){
         Thread current = Thread.currentThread();
         Thread stopper = new Thread(() -> {
             try {
@@ -33,8 +37,10 @@ public class TestNetwork extends Tester {
             }
         });
         stopper.start();
-        try (Connection cnx = new Connection(new InetSocketAddress(InetAddress.getByName("169.254.1.1"), 44321), 2000)) {
-        }
+        Assert.assertThrows(InterruptedException.class, () -> {
+            try (Connection cnx = new Connection(new InetSocketAddress(InetAddress.getByName("169.254.1.1"), 44321), Duration.ofSeconds(2))) {
+            }
+        });
     }
 
     @Test(expected = ClosedChannelException.class, timeout=500)
@@ -50,7 +56,7 @@ public class TestNetwork extends Tester {
             Thread t = new Thread(r2);
             t.setDaemon(true);
             t.start();
-            try (Connection cnx = new Connection(new InetSocketAddress(InetAddress.getLocalHost(), serverSocket.getLocalPort()), 2000)) {
+            try (Connection cnx = new Connection(new InetSocketAddress(InetAddress.getLocalHost(), serverSocket.getLocalPort()), Duration.ofSeconds(2000))) {
                 cnx.startClient();
             } finally {
                 t.interrupt();
@@ -67,7 +73,7 @@ public class TestNetwork extends Tester {
             Runnable r2 = () -> {
                 try {
                     SocketChannel client = listenSocket.accept();
-                    try (Transport clientTransport = new PlainTcpTransport(client, 500);
+                    try (Transport clientTransport = new PlainTcpTransport(client, Duration.ofSeconds(500));
                                     Connection cnx = new Connection(clientTransport)) {
                         ServerInfo si = ServerInfo.builder().features(Collections.singleton(FEATURES.CREDS_REQD)).licensed((byte)0).version((byte)2).build();
                         cnx.startServer(si);
@@ -79,7 +85,7 @@ public class TestNetwork extends Tester {
             Thread t = new Thread(r2);
             t.setDaemon(true);
             t.start();
-            try (Connection cnx = new Connection(new InetSocketAddress(InetAddress.getLocalHost(), listenSocket.socket().getLocalPort()), 2000)) {
+            try (Connection cnx = new Connection(new InetSocketAddress(InetAddress.getLocalHost(), listenSocket.socket().getLocalPort()), Duration.ofSeconds(2000))) {
                 ServerInfo si = cnx.startClient();
                 Set<FEATURES> features = si.getFeatures();
                 Assert.assertEquals(Collections.singleton(FEATURES.CREDS_REQD), features);

@@ -1,6 +1,7 @@
 package jrds.graphe;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 
@@ -70,7 +71,7 @@ public class Sum extends AutonomousGraphNode {
     public PlottableMap getCustomData() {
         return new PlottableMap() {
             @Override
-            public void configure(long start, long end, long step) {
+            public void configure(long start, long end, Duration step) {
                 ExtractInfo ei = ExtractInfo.builder()
                                             .interval(Instant.ofEpochSecond(start), Instant.ofEpochSecond(end))
                                             .step(step)

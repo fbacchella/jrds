@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -69,7 +70,9 @@ public class TestRRDProbe {
     @Test
     public void test1() throws IOException, InvocationTargetException {
         RRDToolProbe p = new RRDToolProbe();
-        p.setHost(new HostStarter(new HostInfo("toto")));
+        HostStarter hs = new HostStarter(new HostInfo("toto"));
+        hs.setStep(Duration.ofSeconds(5));
+        p.setHost(hs);
         ProbeDesc<String> pd = new ProbeDesc<>();
         pd.setName("Rrdtool");
         pd.setProbeName("rrdtool");

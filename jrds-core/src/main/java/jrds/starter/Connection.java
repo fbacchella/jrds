@@ -2,6 +2,7 @@ package jrds.starter;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.time.Duration;
 import java.util.Optional;
 
 import org.slf4j.event.Level;
@@ -60,8 +61,12 @@ public abstract class Connection<ConnectedType> extends Starter {
      * 
      * @return the connection timeout in second
      */
+    public Duration getTimeoutDuration() {
+        return getLevel().getTimeoutDuration();
+    }
+
     public int getTimeout() {
-        return getLevel().getTimeout();
+        return (int) getLevel().getTimeoutDuration().toSeconds();
     }
 
     /*

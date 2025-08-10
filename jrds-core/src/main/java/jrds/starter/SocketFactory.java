@@ -3,14 +3,15 @@ package jrds.starter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.Duration;
 
 import jrds.FastSocketFactory;
 
 public class SocketFactory extends Starter {
 
     private static class FastServerSocket extends ServerSocket {
-        private final int timeout;
-        public FastServerSocket(int port, int timeout) throws IOException {
+        private final Duration timeout;
+        public FastServerSocket(int port, Duration timeout) throws IOException {
             super(port);
             this.timeout = timeout;
         }
@@ -19,7 +20,7 @@ public class SocketFactory extends Starter {
         public Socket accept() throws IOException {
             Socket accepted = super.accept();
             accepted.setTcpNoDelay(true);
-            accepted.setSoTimeout(timeout);
+            accepted.setSoTimeout((int) timeout.toMillis());
 
             return accepted;
         }
@@ -29,14 +30,18 @@ public class SocketFactory extends Starter {
         if(!isStarted()) {
             return null;
         } else {
-            return new FastServerSocket(port, getTimeout() * 1000);
+            return new FastServerSocket(port, getTimeoutDuration());
         }
     }
 
     private final FastSocketFactory socketFactory;
 
-    public SocketFactory(int timeout) {
+    public SocketFactory(Duration timeout) {
         this.socketFactory = new FastSocketFactory(timeout);
+    }
+
+    public SocketFactory(int timeout) {
+        this.socketFactory = new FastSocketFactory(Duration.ofSeconds(timeout));
     }
 
     public javax.net.SocketFactory getFactory() {
@@ -76,8 +81,16 @@ public class SocketFactory extends Starter {
      * @return the timeout
      */
     @Deprecated
+    public Duration getTimeoutDuration() {
+        return getLevel().getTimeoutDuration();
+    }
+
+    /**
+     * @return the timeout
+     */
+    @Deprecated
     public int getTimeout() {
-        return getLevel().getTimeout();
+        return (int) getLevel().getTimeoutDuration().toSeconds();
     }
 
 }
