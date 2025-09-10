@@ -254,7 +254,7 @@ public class HostBuilder extends ConfigObjectBuilder<HostInfo> {
             logger.trace("probe {}/{} will use timer {}", host, type, timer);
         }
         p.setStep(timer.getStep());
-        p.setTimeout(timer.getTimeout());
+        p.setTimeout(timer.getTimeoutDuration());
         p.setSlowCollectTime(timer.getSlowCollectTime());
 
         // Identify the archive to use

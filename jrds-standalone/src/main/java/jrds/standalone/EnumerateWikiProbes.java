@@ -3,6 +3,7 @@ package jrds.standalone;
 import java.io.File;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -175,7 +176,7 @@ public class EnumerateWikiProbes extends CommandStarterImpl {
         System.out.println(doTitle("Data stores"));
         System.out.println();
         System.out.println("^ Name ^ Type ^ Description ^");
-        for(DsDef ds: pd.getDsDefs(1)) {
+        for(DsDef ds: pd.getDsDefs(1, Duration.ofSeconds(1))) {
             System.out.println(String.format("| %s | %s | |", ds.getDsName(), ds.getDsType()));
         }
         System.out.println();

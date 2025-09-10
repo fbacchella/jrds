@@ -25,6 +25,9 @@ public class FastSocketFactory extends SocketFactory {
             setSoTimeout((int) timeout.toMillis());
             setTcpNoDelay(true);
         }
+        public FastSocket(int timeout) throws SocketException {
+            this(Duration.ofSeconds(timeout));
+        }
         public void connect(SocketAddress endpoint) throws IOException {
             super.connect(endpoint, (int) timeout.toMillis());
         }

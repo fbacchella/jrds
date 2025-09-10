@@ -1,6 +1,7 @@
 package jrds;
 
 import java.lang.reflect.InvocationTargetException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -284,11 +285,13 @@ public class ProbeDesc<KeyType> {
         return Collections.unmodifiableMap(collectMap);
     }
 
-    public DsDef[] getDsDefs(long requiredUptime) {
+    public DsDef[] getDsDefs(long requiredUptime, Duration step) {
+        long stepSeconds = step.toSeconds();
+        long heartbeat = Math.max(step.toSeconds(), (long)((((float)requiredUptime / stepSeconds) - 1) * stepSeconds));
         return dsMap.entrySet()
                     .stream()
                     .filter(e -> e.getValue().dsType != null)
-                    .map(e -> new DsDef(e.getKey(), e.getValue().dsType, requiredUptime, e.getValue().minValue, e.getValue().maxValue))
+                    .map(e -> new DsDef(e.getKey(), e.getValue().dsType, heartbeat, e.getValue().minValue, e.getValue().maxValue))
                     .toArray(DsDef[]::new);
     }
 

@@ -122,7 +122,7 @@ public abstract class ExternalCmdProbe extends Probe<String, Number> {
 
     protected Map<String, Number> resolveSampleValues(String output) {
         String[] values = output.split(":");
-        DsDef[] defs = getPd().getDsDefs(getRequiredUptime());
+        DsDef[] defs = getPd().getDsDefs(getRequiredUptime(), getStep());
         int n = values.length;
         if (values.length != defs.length + 1) {
             log(Level.ERROR, "Invalid number of values specified (found " + values.length + ", " + defs.length + " allowed)");

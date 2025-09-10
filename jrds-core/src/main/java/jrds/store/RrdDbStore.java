@@ -89,7 +89,7 @@ public class RrdDbStore extends AbstractStore<RrdDb> {
     }
 
     protected DsDef[] getDsDefs() {
-        return p.getPd().getDsDefs(p.getRequiredUptime());
+        return p.getPd().getDsDefs(p.getRequiredUptime(), p.getStep());
     }
 
     public RrdDef getRrdDef(ArchivesSet archives) {

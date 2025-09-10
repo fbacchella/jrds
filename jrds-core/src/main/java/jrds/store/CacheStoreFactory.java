@@ -43,7 +43,7 @@ public class CacheStoreFactory extends AbstractStoreFactory<Map<String, Number>,
         String hostname = p.getHost().getName();
         String probeName = p.getName();
         Map<String, Number> c = cache.computeIfAbsent(hostname, k -> new HashMap<>())
-                                     .computeIfAbsent(probeName, k -> new HashMap<>(p.getPd().getDsDefs(p.getRequiredUptime()).length));
+                                     .computeIfAbsent(probeName, k -> new HashMap<>(p.getPd().getDsDefs(p.getRequiredUptime(), p.getStep()).length));
         return new CacheStore(p, c);
     }
 
