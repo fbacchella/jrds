@@ -153,7 +153,9 @@ public class JolokiaJmxConnection extends AbstractJmxConnection<J4pClient, Jolok
 
     @Override
     public long setUptime() {
-        return Optional.ofNullable(connection.getValue(this.getLevel(), startTimeRequestsParams)).orElse(0).longValue();
+        return Optional.ofNullable(connection.getValue(this.getLevel(), startTimeRequestsParams))
+                       .map(n -> n.longValue() / 1000)
+                       .orElse(0L);
     }
 
     @Override
