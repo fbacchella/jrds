@@ -154,6 +154,7 @@ public class GraphDescBuilder extends ConfigObjectBuilder<GraphDesc> {
             }
             gd.add(builder);
         }
+        gd.setAutoColors();
 
         gd.setTree(PropertiesManager.HOSTSTAB, enumerateTree(subnode.getElementbyName("hosttree")));
         gd.setTree(PropertiesManager.VIEWSTAB, enumerateTree(subnode.getElementbyName("viewtree")));

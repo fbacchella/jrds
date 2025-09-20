@@ -418,6 +418,8 @@ public class GraphDesc implements WithACL {
     static final public PathElement INTERFACES = PathElement.INTERFACES;
     static final public PathElement DATABASE = PathElement.DATABASE;
 
+    private static final Color AUTO_COLOR = new Color(0, 0,0, 0);
+
     public enum Colors {
         // 240°
         BLUE {
@@ -563,6 +565,12 @@ public class GraphDesc implements WithACL {
             public Color getColor() {
                 return Color.WHITE;
             }
+        },
+        AUTO {
+            @Override
+            public Color getColor() {
+                return AUTO_COLOR;
+            }
         };
 
         public abstract Color getColor();
@@ -665,6 +673,18 @@ public class GraphDesc implements WithACL {
         public final Integer percentile;
         public final DsPath dspath;
 
+        private DsDesc(DsDesc source, Color newColor) {
+            this.name = source.name;
+            this.dsName = source.dsName;
+            this.rpn = source.rpn;
+            this.percentile = source.percentile;
+            this.graphType = source.graphType;
+            this.color = newColor;
+            this.legend = source.legend;
+            this.cf = source.cf;
+            this.dspath = source.dspath;
+        }
+
         private DsDesc(String name, String dsName, String rpn,
                GraphType graphType, Color color, String legend,
                ConsolFun cf, DsPath dspath) {
@@ -703,7 +723,7 @@ public class GraphDesc implements WithACL {
             this.dspath = null;
         }
 
-        private  DsDesc(String dsName, GraphType graphType, String legend, ConsolFun cf) {
+        private DsDesc(String dsName, GraphType graphType, String legend, ConsolFun cf) {
             this.name = dsName;
             this.dsName = dsName;
             this.graphType = graphType;
@@ -717,7 +737,9 @@ public class GraphDesc implements WithACL {
 
         public String toString() {
             String colorString;
-            if (color instanceof Color) {
+            if (color == AUTO_COLOR) {
+                colorString = "auto";
+            } else if (color instanceof Color) {
                 Color c = color;
                 colorString = String.format("Color[%d, %d, %d]", c.getRed(), c.getGreen(), c.getBlue());
             } else if (color != null) {
@@ -965,6 +987,21 @@ public class GraphDesc implements WithACL {
         }
         if(blegend != null) {
             maxLengthLegend = Math.max(maxLengthLegend, blegend.length());
+        }
+    }
+
+    public void setAutoColors() {
+        long autoColorsCount = allds.stream().filter(dd -> dd.color == AUTO_COLOR).count();
+        if (autoColorsCount != 0) {
+            for (int i = 0, ac = 0; i < allds.size(); i++) {
+                DsDesc previousColor = allds.get(i);
+                if (previousColor.color != AUTO_COLOR) {
+                    continue;
+                }
+                float hue = (float) ac++ / autoColorsCount;
+                Color newColor = Color.getHSBColor(hue, 1f, 1f);
+                allds.set(i, new DsDesc(previousColor, newColor));
+            }
         }
     }
 
