@@ -126,6 +126,7 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.12.0</version>
                     <configuration>
+                        <doclint>none</doclint>
                         <quiet/>
                         <links>
                             <link>https://rrd4j.github.io/rrd4j/apidocs/</link>
@@ -133,9 +134,9 @@
                             <link>https://javadoc.io/doc/org.eclipse.jetty/jetty-http/${jetty.version}/</link>
                             <link>https://ws.apache.org/xmlrpc/apidocs/</link>
                             <link>https://stleary.github.io/JSON-java/</link>
-                            <link>https://logging.apache.org/log4j/1.2/apidocs/</link>
+                            <link>https://logging.apache.org/log4j/1.x/apidocs/</link>
                             <link>https://commons.apache.org/proper/commons-net/javadocs/api-3.6/</link>
-                            <link>https://javadoc.io/doc/commons-fileupload/commons-fileupload/latest/</link>
+                            <link>https://javadoc.io/doc/commons-fileupload/commons-fileupload/1.6.0/</link>
                             <link>https://javadoc.io/doc/org.apache.httpcomponents.client5/httpclient5/5.1/</link>
                             <!-- sometime fails for no reason -->
                             <!--link>https://javadoc.io/doc/com.jayway.jsonpath/json-path/2.4.0</link-->
