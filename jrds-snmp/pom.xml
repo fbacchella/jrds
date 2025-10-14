@@ -10,6 +10,10 @@
         <version>2023.2-SNAPSHOT</version>
     </parent>
     <artifactId>jrds-snmp</artifactId>
+    <packaging>jar</packaging>
+
+    <name>jrds-snmp</name>
+
     <properties>
         <jrds.testloglevel>ERROR</jrds.testloglevel>
     </properties>

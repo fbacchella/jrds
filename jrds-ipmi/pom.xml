@@ -7,6 +7,10 @@
         <version>2023.2-SNAPSHOT</version>
     </parent>
     <artifactId>jrds-ipmi</artifactId>
+    <packaging>jar</packaging>
+
+    <name>jrds-ipmi</name>
+
     <dependencies>
         <dependency>
             <groupId>fr.jrds</groupId>
