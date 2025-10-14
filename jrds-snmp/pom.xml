@@ -5,6 +5,10 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>jrds-snmp</artifactId>
+    <packaging>jar</packaging>
+
+    <name>jrds-snmp</name>
+
     <properties>
         <jrds.testloglevel>ERROR</jrds.testloglevel>
     </properties>
